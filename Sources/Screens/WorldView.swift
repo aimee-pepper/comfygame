@@ -214,8 +214,11 @@ struct WorldView: View {
         } message: {
             Text("Your satchel is full. Choose the exact slot to leave behind, or keep what you have.")
         }
-        .overlay(alignment: .bottom) {
-            if let id = tutorialLesson, let lesson = TutorialRules.definition(id), !tutorialSuppressed {
+        .tutorialHoverOverlay(
+            isPresented: tutorialLesson != nil && !tutorialSuppressed,
+            alignment: .bottom
+        ) {
+            if let id = tutorialLesson, let lesson = TutorialRules.definition(id) {
                 TutorialCard(lesson: lesson,
                              gotIt: { dismissedTutorials.insert(id); tutorialLesson = nil },
                              notNow: {
@@ -223,8 +226,6 @@ struct WorldView: View {
                                  store.deferTutorial(id)
                                  tutorialLesson = nil
                              })
-                    .padding(.horizontal, 12)
-                    .padding(.bottom, 12)
                     .transition(.opacity)
             }
         }
@@ -540,8 +541,8 @@ struct WorldView: View {
                         .lineLimit(1)
                         .minimumScaleFactor(0.85)
                         .frame(maxWidth: .infinity, minHeight: WorldControlsLayout.actionHeight)
-                        .foregroundStyle(PixelUITheme.screen)
-                        .background(PixelUITheme.primary)
+                        .foregroundStyle(canInteract ? PixelUITheme.screen : PixelUITheme.muted)
+                        .background(canInteract ? PixelUITheme.primary : PixelUITheme.neutral)
                         .overlay(Rectangle().stroke(PixelUITheme.edgeDark, lineWidth: 2))
                         .buttonStyle(.plain)
                         .disabled(!canInteract)

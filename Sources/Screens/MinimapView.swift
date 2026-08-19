@@ -59,7 +59,7 @@ struct MinimapView: View {
             Image(systemName: "exclamationmark.triangle.fill").font(.system(size: 8, weight: .bold)).foregroundStyle(.orange).tag("hazard")
         }
         .aspectRatio(1, contentMode: .fit)
-        .background(.thinMaterial, in: RoundedRectangle(cornerRadius: 8))
+        .background(Color.black)
         .overlay {
             RoundedRectangle(cornerRadius: 8)
                 .stroke(Color.primary.opacity(0.08))
@@ -77,7 +77,7 @@ struct MinimapView: View {
     }
 
     private func colour(for tile: Tile) -> Color {
-        guard tile.isRevealed else { return Color(.systemFill) }        // unexplored
+        guard tile.isRevealed else { return .black }                    // unexplored
         if tile.isCrumbled { return .clear }                            // gone
         switch tile.content {
         case .empty:
@@ -119,7 +119,9 @@ enum MinimapDisclosure {
     }
 
     static func marker(at point: GridPoint, in run: WorldRun) -> Marker? {
-        let visibleEnemy = run.enemies.first { $0.position == point && WorldRules.isVisible($0, in: run) }
+        let visibleEnemy = run.enemies.first {
+            $0.position == point && WorldRules.isCurrentlyVisible($0, in: run)
+        }
         return marker(for: run.map[point], enemy: visibleEnemy)
     }
 }

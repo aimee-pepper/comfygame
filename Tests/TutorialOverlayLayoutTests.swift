@@ -38,7 +38,7 @@ final class TutorialOverlayLayoutTests: XCTestCase {
         let base = try read("Sources/Screens/BaseView.swift")
         XCTAssertTrue(base.contains(".overlay(alignment: .top)"))
         let world = try read("Sources/Screens/WorldView.swift")
-        XCTAssertTrue(world.contains(".overlay(alignment: .bottom)"))
+        XCTAssertTrue(world.contains(".tutorialHoverOverlay("))
     }
 
     func testAccessibility3PromptIsSafeAreaBoundedAndInternallyScrollable() {

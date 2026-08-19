@@ -1033,7 +1033,8 @@ final class WorldTests: XCTestCase {
                       "The control pair must be vertically centered inside symmetric padding")
         XCTAssertTrue(source.contains("Rectangle().fill(PixelUITheme.edge).frame(height: 2)"))
         XCTAssertTrue(source.contains(".background(PixelUITheme.surfaceInset)"))
-        XCTAssertTrue(source.contains(".background(PixelUITheme.primary)"))
+        XCTAssertTrue(source.contains("canInteract ? PixelUITheme.primary : PixelUITheme.neutral"),
+                      "An exhausted node must leave a visibly grey, disabled Interact control")
         XCTAssertTrue(source.contains(".font(.custom(\"Tiny5\", size: 10))"))
         XCTAssertFalse(source.contains(".clipShape(RoundedRectangle(cornerRadius: 10))"),
                        "The approved World map has hard square viewport edges")

@@ -200,7 +200,7 @@ final class WorldVisibilityRulesTests: XCTestCase {
         let map = openMap(width: 21, height: 21, entry: centre)
         let profile = WorldRules.visibilityProfile(illumination: 45)
 
-        XCTAssertEqual(WorldRules.visibility(of: GridPoint(x: 17, y: 12), from: centre,
+        XCTAssertEqual(WorldRules.visibility(of: GridPoint(x: 17, y: 10), from: centre,
                                              in: map, profile: profile), .full)
         XCTAssertEqual(WorldRules.visibility(of: GridPoint(x: 17, y: 13), from: centre,
                                              in: map, profile: profile), .fringe)
@@ -208,6 +208,18 @@ final class WorldVisibilityRulesTests: XCTestCase {
                                              in: map, profile: profile), .fringe)
         XCTAssertEqual(WorldRules.visibility(of: GridPoint(x: 19, y: 14), from: centre,
                                              in: map, profile: profile), .hidden)
+    }
+
+    func testMinimumRadiusUsesCardinalFullTilesAndDiagonalFringe() {
+        let centre = GridPoint(x: 2, y: 2)
+        let map = openMap(width: 5, height: 5, entry: centre)
+        let profile = WorldRules.visibilityProfile(illumination: 0)
+
+        XCTAssertEqual(WorldRules.visibility(of: GridPoint(x: 3, y: 2), from: centre,
+                                             in: map, profile: profile), .full)
+        XCTAssertEqual(WorldRules.visibility(of: GridPoint(x: 3, y: 3), from: centre,
+                                             in: map, profile: profile), .fringe,
+                       "A 3x3 full square is never an acceptable circle approximation")
     }
 
     func testBlockingGroundAndElevationStopBothVisibilityBands() {

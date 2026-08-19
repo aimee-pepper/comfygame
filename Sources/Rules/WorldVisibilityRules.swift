@@ -90,7 +90,10 @@ extension WorldRules {
         let dx = candidate.x - origin.x
         let dy = candidate.y - origin.y
         let distance = sqrt(Double(dx * dx + dy * dy))
-        let fullBoundary = Double(profile.fullRadius) + 0.5
+        // Full sight is a discrete Euclidean circle, not a square disguised by cell-centre
+        // padding. At radius one the four cardinal neighbours are full while the four diagonal
+        // corners are fringe; larger radii follow the same closest-grid approximation.
+        let fullBoundary = Double(profile.fullRadius)
         let fringeBoundary = Double(profile.fullRadius + profile.fringeWidth) + 0.5
         guard distance <= fringeBoundary,
               hasLineOfSight(from: origin, to: candidate, in: map,
