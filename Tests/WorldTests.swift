@@ -1013,10 +1013,15 @@ final class WorldTests: XCTestCase {
                           "Map, Field Kit, and navigation are ordered siblings in one layout")
         XCTAssertTrue(source.contains("MapGrid("))
         XCTAssertFalse(source.contains("MapGrid(") && source.contains("eventLog.padding(8)"))
-        XCTAssertTrue(source.contains("eventLog\n                            .padding(.horizontal, 12)\n                            .padding(.bottom, 8)"),
-                      "Narration floats at the viewport boundary immediately above the bottom HUD")
-        XCTAssertTrue(source.contains("PixelUITheme.surfaceInset.opacity(0.36)"))
-        XCTAssertTrue(source.contains("PixelUITheme.surfaceInset.opacity(0.88)"))
+        XCTAssertTrue(source.contains("placeInformation(run)"),
+                      "The current redesign keeps place information inside the map stage")
+        XCTAssertTrue(source.contains(".aspectRatio(1, contentMode: .fit)"),
+                      "The current redesign keeps the map stage square without a magic height")
+        XCTAssertTrue(source.contains("Text(\"Explore\")"))
+        XCTAssertTrue(source.contains("Text(\"STABILITY\")"))
+        XCTAssertTrue(source.contains("Text(\"COLLAPSE\")"))
+        XCTAssertTrue(source.contains("Text(placeEyebrow)"))
+        XCTAssertTrue(source.contains("Text(placeTitle)"))
         XCTAssertTrue(source.contains(".allowsHitTesting(false)"))
         XCTAssertTrue(source.contains("HStack(alignment: .center, spacing: WorldControlsLayout.navigationSpacing)"))
         XCTAssertTrue(source.contains("VStack(spacing: 12)"),
@@ -1030,8 +1035,10 @@ final class WorldTests: XCTestCase {
         XCTAssertTrue(source.contains(".background(PixelUITheme.surfaceInset)"))
         XCTAssertTrue(source.contains(".background(PixelUITheme.primary)"))
         XCTAssertTrue(source.contains(".font(.custom(\"Tiny5\", size: 10))"))
-        XCTAssertTrue(source.contains(".clipShape(RoundedRectangle(cornerRadius: 10))"),
-                      "No map pixels may escape the viewport or render beneath the Field Kit border")
+        XCTAssertFalse(source.contains(".clipShape(RoundedRectangle(cornerRadius: 10))"),
+                       "The approved World map has hard square viewport edges")
+        XCTAssertTrue(source.contains(".clipped()"),
+                      "No map pixels may escape the square viewport or render beneath the Field Kit border")
     }
 
     func testFieldKitIsACompactTwoTrayInventoryInsteadOfAFullWidthList() throws {

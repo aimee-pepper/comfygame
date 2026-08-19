@@ -118,18 +118,19 @@ struct WorldView: View {
                             tapped(point, in: run)
                         }
                         .padding(.top, 8)
+                        .overlay(alignment: .bottom) {
+                            placeInformation(run)
+                                .padding(.horizontal, 8)
+                                .padding(.bottom, 8)
+                        }
                         Spacer(minLength: 0)
-                    }
-                    .overlay(alignment: .bottom) {
-                        eventLog
-                            .padding(.horizontal, 12)
-                            .padding(.bottom, 8)
                     }
                     .overlay(alignment: .top) {
                         LootDecisionCard()
                             .padding(12)
                     }
                 }
+                .aspectRatio(1, contentMode: .fit)
                 .clipped()
 
                 VStack(spacing: 0) {
@@ -387,6 +388,74 @@ struct WorldView: View {
 
     // MARK: Satchel
 
+    private func placeInformation(_ run: WorldRun) -> some View {
+        HStack(spacing: 10) {
+            Text(placeIcon)
+                .font(.custom("Jersey 10", size: 24))
+                .frame(width: 40, height: 40)
+                .foregroundStyle(PixelUITheme.text)
+                .background(PixelUITheme.surfaceRaised.opacity(0.92))
+                .overlay(Rectangle().stroke(PixelUITheme.edge, lineWidth: 2))
+
+            VStack(alignment: .leading, spacing: 1) {
+                Text(placeEyebrow)
+                    .font(.custom("Tiny5", size: 7))
+                    .foregroundStyle(PixelUITheme.muted)
+                Text(placeTitle)
+                    .font(.custom("Jersey 10", size: 16))
+                    .foregroundStyle(PixelUITheme.text)
+                    .lineLimit(1)
+                Text(interactionDetail(in: run))
+                    .font(.custom("Tiny5", size: 7))
+                    .foregroundStyle(PixelUITheme.muted)
+                    .lineLimit(1)
+            }
+            Spacer(minLength: 0)
+        }
+        .padding(8)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(
+            LinearGradient(colors: [PixelUITheme.surfaceInset.opacity(0.94),
+                                    PixelUITheme.surface.opacity(0.82)],
+                           startPoint: .leading, endPoint: .trailing)
+        )
+        .overlay(Rectangle().stroke(PixelUITheme.edge, lineWidth: 2))
+        .allowsHitTesting(false)
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("At this place. \(placeTitle). \(interactionDetail(in: run))")
+    }
+
+    private var placeEyebrow: String {
+        isLookArmed ? "LOOK · NO TURN SPENT" : "AT THIS PLACE · VISIBLE"
+    }
+
+    private var placeIcon: String {
+        if store.harvestableHere != nil { return "⌁" }
+        if store.searchableHere != nil { return "⌂" }
+        if store.canPortalHere { return "◇" }
+        if store.isOnLockedCache { return "▣" }
+        if store.offeredWorldPageHere != nil { return "▦" }
+        if store.canUseNaturalAnchor || store.canPlaceAnchorFrame { return "◆" }
+        if isLookArmed { return "◎" }
+        return "·"
+    }
+
+    private var placeTitle: String {
+        if let node = store.harvestableHere {
+            return ContentCatalog.shared.resource(node.resource)?.name ?? "Resource"
+        }
+        if let site = store.searchableHere { return site.definition?.name ?? "Site" }
+        if store.canPortalHere { return "Atlas Seam" }
+        if store.isOnLockedCache { return "Locked cache" }
+        if let page = store.offeredWorldPageHere {
+            return page.inspected ? page.definition.title : "Unknown World Page"
+        }
+        if store.canUseNaturalAnchor { return "Natural Atlas Seam" }
+        if store.canPlaceAnchorFrame { return "Anchor point" }
+        if isLookArmed { return "Adjacent ground" }
+        return "Forest track"
+    }
+
     /// What you're carrying, and how long you've been at it.
     ///
     /// **The haul scrolls sideways.** With four resources in the game this was a fixed row; with
@@ -434,7 +503,8 @@ struct WorldView: View {
                 .fixedSize()
         }
         .font(.footnote.monospacedDigit())
-        .padding(10)
+        .padding(.horizontal, 8)
+        .frame(minHeight: 44)
         .frame(maxWidth: .infinity)
         .foregroundStyle(PixelUITheme.text)
         .background(PixelUITheme.surfaceInset)
@@ -833,45 +903,42 @@ private struct PartyHealthStrip: View {
     let state: GameState
 
     var body: some View {
-        HStack(spacing: 14) {
-            health("You", icon: "person.fill", current: run.binderHP,
+        HStack(spacing: 4) {
+            health("Binder", current: run.binderHP,
                    maximum: CombatRules.health(of: .binder, in: run).max)
             ForEach(state.base.activeParty, id: \.self) { index in
                 let member = state.base.roster[index]
-                health(member.name, icon: member.icon,
+                health(member.name,
                        current: CombatRules.health(of: .companion(index), in: run).current,
                        maximum: CombatRules.health(of: .companion(index), in: run).max)
             }
         }
-        .padding(.horizontal, 16)
-        .padding(.bottom, 8)
+        .padding(.horizontal, 8)
+        .frame(height: 39)
         .foregroundStyle(PixelUITheme.text)
-        .background(PixelUITheme.headerB)
+        .background(PixelUITheme.surface)
+        .overlay(alignment: .bottom) { Rectangle().fill(PixelUITheme.edge).frame(height: 2) }
     }
 
-    private func health(_ name: String, icon: String, current: Int, maximum: Int) -> some View {
-        HStack(spacing: 6) {
-            Image(systemName: icon)
-                .font(.caption)
-            VStack(alignment: .leading, spacing: 2) {
-                HStack {
-                    Text(name).lineLimit(1)
-                    Spacer(minLength: 4)
-                    Text("\(current)/\(maximum)").monospacedDigit()
-                }
-                .font(.caption2)
-                GeometryReader { proxy in
-                    Rectangle()
-                        .fill(PixelUITheme.edgeDark)
-                        .overlay(alignment: .leading) {
-                            Rectangle()
-                                .fill(current <= maximum / 3 ? Color.red : Color.green)
-                                .frame(width: proxy.size.width * min(1, max(0, Double(current) / Double(maximum))))
-                        }
-                        .overlay(Rectangle().stroke(PixelUITheme.edge, lineWidth: 1))
-                }
-                .frame(height: 5)
+    private func health(_ name: String, current: Int, maximum: Int) -> some View {
+        VStack(alignment: .leading, spacing: 2) {
+            HStack(spacing: 3) {
+                Text(name).lineLimit(1)
+                Spacer(minLength: 2)
+                Text("\(current)/\(maximum)").monospacedDigit()
             }
+            .font(.custom("Tiny5", size: 7))
+            GeometryReader { proxy in
+                Rectangle()
+                    .fill(PixelUITheme.edgeDark)
+                    .overlay(alignment: .leading) {
+                        Rectangle()
+                            .fill(current <= maximum / 3 ? Color.red : Color.green)
+                            .frame(width: proxy.size.width * min(1, max(0, Double(current) / Double(maximum))))
+                    }
+                    .overlay(Rectangle().stroke(PixelUITheme.edge, lineWidth: 1))
+            }
+            .frame(height: 5)
         }
         .frame(maxWidth: .infinity)
         .accessibilityElement(children: .ignore)
@@ -886,32 +953,48 @@ private struct StabilityHeader: View {
     let run: WorldRun
 
     var body: some View {
-        VStack(spacing: 4) {
-            HStack(alignment: .firstTextBaseline) {
-                Text("\(Int(run.stability.rounded()))")
-                    .font(.title2.weight(.bold).monospacedDigit())
+        HStack(spacing: 10) {
+            Rectangle()
+                .fill(PixelUITheme.clasp)
+                .frame(width: 5, height: 34)
+            Text("Explore")
+                .font(.custom("Jersey 10", size: 25))
+                .foregroundStyle(PixelUITheme.text)
+            Spacer(minLength: 4)
+            VStack(alignment: .leading, spacing: 1) {
+                Text("STABILITY")
+                    .font(.custom("Tiny5", size: 6))
+                    .foregroundStyle(PixelUITheme.muted)
+                Text("\(Int(run.stability.rounded()))%")
+                    .font(.custom("Tiny5", size: 8))
                     .foregroundStyle(colour)
-                Text(bandText)
-                    .font(.footnote)
-                    .foregroundStyle(colour)
-                Spacer()
-                Text(turnsLeftText)
-                    .font(.footnote.monospacedDigit())
-                    .foregroundStyle(.secondary)
             }
             GeometryReader { proxy in
-                ZStack(alignment: .leading) {
-                    Rectangle().fill(PixelUITheme.edgeDark)
-                    Rectangle().fill(colour)
-                        .frame(width: proxy.size.width * (run.stability / Tuning.World.startingStability))
-                }
-                .overlay(Rectangle().stroke(PixelUITheme.edge, lineWidth: 1))
+                Rectangle()
+                    .fill(PixelUITheme.edgeDark)
+                    .overlay(alignment: .leading) {
+                        Rectangle().fill(colour)
+                            .frame(width: proxy.size.width * min(1, max(0,
+                                run.stability / Tuning.World.startingStability)))
+                    }
+                    .overlay(Rectangle().stroke(PixelUITheme.edge, lineWidth: 1))
             }
-            .frame(height: 6)
+            .frame(width: 78, height: 6)
+            VStack(alignment: .trailing, spacing: 1) {
+                Text("COLLAPSE")
+                    .font(.custom("Tiny5", size: 6))
+                    .foregroundStyle(PixelUITheme.muted)
+                Text(turnsLeftText)
+                    .font(.custom("Tiny5", size: 7))
+                    .foregroundStyle(PixelUITheme.text)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.7)
+                }
         }
-        .padding(.horizontal, 16)
-        .padding(.vertical, 8)
+        .padding(.horizontal, 8)
+        .frame(height: 58)
         .background(PixelUITheme.headerB)
+        .overlay(alignment: .bottom) { Rectangle().fill(PixelUITheme.edge).frame(height: 2) }
     }
 
     private var turnsLeftText: String {
@@ -1064,10 +1147,9 @@ private struct MapGrid: View {
         .background(
             Color(red: Double(WorldMapLayout.backdropRGB[0]) / 255,
                   green: Double(WorldMapLayout.backdropRGB[1]) / 255,
-                  blue: Double(WorldMapLayout.backdropRGB[2]) / 255),
-            in: RoundedRectangle(cornerRadius: 10)
+                  blue: Double(WorldMapLayout.backdropRGB[2]) / 255)
         )
-        .clipShape(RoundedRectangle(cornerRadius: 10))
+        .clipped()
     }
 
     private var simpleRenderer: Bool {
