@@ -870,9 +870,9 @@ struct RGBA: Equatable {
         return recolored.map { command in
             guard command.y >= wallY else { return command }
             var shaded = command
-            shaded.color.red = shaded.color.red * 3 / 4
-            shaded.color.green = shaded.color.green * 3 / 4
-            shaded.color.blue = shaded.color.blue * 3 / 4
+            shaded.color.red = UInt8(Int(shaded.color.red) * 3 / 4)
+            shaded.color.green = UInt8(Int(shaded.color.green) * 3 / 4)
+            shaded.color.blue = UInt8(Int(shaded.color.blue) * 3 / 4)
             return shaded
         }
     }

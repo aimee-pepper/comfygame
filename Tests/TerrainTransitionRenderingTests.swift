@@ -60,6 +60,16 @@ import XCTest
         }
     }
 
+    func testBrightLiftedTerrainShadesWithoutChannelOverflow() {
+        for ground in GroundType.allCases {
+            let pixels = try! MapAssetTestSupport.renderedTerrainPixels(
+                ground: ground, elevation: MapAssetContract.maximumElevation,
+                southExposureLevels: MapAssetContract.maximumElevation)
+            XCTAssertEqual(pixels.count,
+                           MapAssetContract.spriteWidth * MapAssetContract.spriteHeight * 4)
+        }
+    }
+
     func testWaterAnimatesContinuouslyInFourCrispFrames() {
         let frames = (0..<4).map {
             MapAssetTestSupport.animatedTerrainPixels(ground: .water, tick: $0)
