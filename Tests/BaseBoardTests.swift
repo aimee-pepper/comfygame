@@ -1,7 +1,42 @@
+import SwiftUI
+import UIKit
 import XCTest
 @testable import Bookbinder
 
 final class BaseBoardTests: XCTestCase {
+    @MainActor
+    func testApprovedHomeRendersAt368By800InLightAndDark() throws {
+        let store = GameStore(io: .temporary(name: "base-render-\(UUID().uuidString)"))
+        store.mutate("prepare base render fixture") { state in
+            for lesson in TutorialLessonID.allCases {
+                state.tutorial.complete(lesson, fact: "visual_fixture")
+            }
+        }
+        for scheme in [ColorScheme.light, .dark] {
+            let controller = UIHostingController(rootView:
+                NavigationStack { BaseView().environmentObject(store) }
+                    .environment(\.colorScheme, scheme)
+                    .environment(\.dynamicTypeSize, .large)
+                    .frame(width: 368, height: 800)
+            )
+            let window = UIWindow(frame: CGRect(x: 0, y: 0, width: 368, height: 800))
+            window.rootViewController = controller
+            window.makeKeyAndVisible()
+            controller.view.frame = window.bounds
+            controller.view.layoutIfNeeded()
+            RunLoop.main.run(until: Date().addingTimeInterval(0.05))
+            let image = UIGraphicsImageRenderer(size: window.bounds.size).image { _ in
+                controller.view.drawHierarchy(in: controller.view.bounds, afterScreenUpdates: true)
+            }
+            window.isHidden = true
+            XCTAssertEqual(image.size, CGSize(width: 368, height: 800))
+            let attachment = XCTAttachment(image: image)
+            attachment.name = "base-home-\(scheme == .light ? "light" : "dark")"
+            attachment.lifetime = .keepAlways
+            add(attachment)
+        }
+    }
+
     func testBaseSaveMenuIsADirectFullSizeSettingsDestination() throws {
         let root = URL(fileURLWithPath: #filePath)
             .deletingLastPathComponent().deletingLastPathComponent()

@@ -111,7 +111,7 @@ struct BaseView: View {
                     VStack(spacing: 3) {
                         sectionPicker
                         Text(districtCaption)
-                            .font(.caption2.weight(.bold).monospaced())
+                            .font(.custom("Tiny5", size: 8))
                             .foregroundStyle(.white)
                             .padding(.horizontal, 8)
                             .padding(.vertical, 3)
@@ -126,11 +126,11 @@ struct BaseView: View {
         .background(PixelUITheme.screen)
         .navigationTitle("Base")
         .toolbar(.hidden, for: .navigationBar)
-        .safeAreaInset(edge: .bottom) {
+        .safeAreaInset(edge: .bottom, spacing: 0) {
             departure
                 .padding(.horizontal, 12)
-                .padding(.vertical, 8)
-                .background(PixelUITheme.surfaceRaised)
+                .padding(.vertical, 4)
+                .background(PixelUITheme.screen)
                 .overlay(alignment: .top) {
                     Rectangle().fill(PixelUITheme.edge).frame(height: 2)
                 }
@@ -150,27 +150,35 @@ struct BaseView: View {
     private var contextRow: some View {
         HStack(spacing: 12) {
             Text("Base")
-                .font(.title2.weight(.bold))
+                .font(.custom("Jersey 10", size: 26))
                 .accessibilityAddTraits(.isHeader)
             Spacer(minLength: 4)
-            CompactCurrency(icon: "drop.fill", label: "Essence",
-                            value: state.base.essence, tint: .teal)
-            CompactCurrency(icon: "star.fill", label: "Motes",
-                            value: state.reality.motes, tint: .purple)
-            NavigationLink(value: AppRoute.settings) {
-                Image(systemName: "ellipsis.circle")
-                    .font(.title3)
-                    .frame(width: 44, height: 44)
+            HStack(spacing: 5) {
+                CompactCurrency(icon: "drop.fill", label: "Essence",
+                                value: state.base.essence, tint: .teal)
+                Text("·").foregroundStyle(PixelUITheme.muted)
+                CompactCurrency(icon: "star.fill", label: "Motes",
+                                value: state.reality.motes, tint: .purple)
+                NavigationLink(value: AppRoute.settings) {
+                    Image(systemName: "gearshape.fill")
+                        .font(.system(size: 9, weight: .bold))
+                        .frame(width: 24, height: 28)
+                }
+                .buttonStyle(.plain)
+                .contentShape(Rectangle())
+                .accessibilityLabel("Settings and save games")
             }
-            .buttonStyle(.plain)
-            .contentShape(Rectangle())
-            .accessibilityLabel("Settings and save games")
+            .padding(.leading, 8)
+            .padding(.trailing, 4)
+            .frame(height: 32)
+            .background(PixelUITheme.surfaceRaised)
+            .overlay(Rectangle().stroke(PixelUITheme.edge, lineWidth: 1))
         }
-        .frame(minHeight: 44)
+        .frame(height: 62)
         .padding(.horizontal, 12)
-        .padding(.vertical, 6)
         .foregroundStyle(PixelUITheme.text)
         .background(PixelUITheme.headerB)
+        .overlay { PixelPaperGrid().allowsHitTesting(false) }
         .overlay(alignment: .bottom) {
             Rectangle().fill(PixelUITheme.edge).frame(height: 2)
         }
@@ -229,7 +237,7 @@ struct BaseView: View {
                     selectedSection = section
                 } label: {
                     Text(section.title)
-                        .font(.caption.weight(.bold).monospaced())
+                        .font(.custom("Tiny5", size: 10))
                         .foregroundStyle(section == selectedSection
                                          ? PixelUITheme.edgeDark : PixelUITheme.text)
                         .frame(maxWidth: .infinity, minHeight: 42)
@@ -408,29 +416,35 @@ struct BaseView: View {
     @ViewBuilder private var baseActionButtons: some View {
         NavigationLink(value: AppRoute.party) {
             Label("Party", systemImage: "person.2.fill")
-                .font(.subheadline.weight(.semibold))
+                .font(.custom("Jersey 10", size: 16))
                 .foregroundStyle(PixelUITheme.text)
-                .frame(minWidth: dynamicTypeSize.isAccessibilitySize ? 0 : 96,
+                .frame(minWidth: dynamicTypeSize.isAccessibilitySize ? 0 : 92,
                        maxWidth: dynamicTypeSize.isAccessibilitySize ? .infinity : nil)
-                .frame(minHeight: 48)
+                .frame(minHeight: 44)
                 .background(PixelUITheme.surfaceRaised)
                 .overlay {
-                    RoundedRectangle(cornerRadius: 12)
-                        .stroke(PixelUITheme.neutralHighlight, lineWidth: 1)
+                    Rectangle().stroke(PixelUITheme.edge, lineWidth: 2)
                 }
-                .clipShape(RoundedRectangle(cornerRadius: 12))
+                .background {
+                    Rectangle().fill(PixelUITheme.shadow.opacity(0.55)).offset(x: 2, y: 2)
+                }
         }
         .buttonStyle(.plain)
         .accessibilityHint("Manage party members, gear and gambits")
 
         NavigationLink(value: AppRoute.writingDesk) {
             Label("Bind & Depart", systemImage: "arrow.up.forward.circle.fill")
-                .font(.subheadline.weight(.semibold))
+                .font(.custom("Tiny5", size: 12))
+                .foregroundStyle(.white)
                 .frame(maxWidth: .infinity)
-                .frame(minHeight: 48)
+                .frame(minHeight: 44)
+                .background(PixelUITheme.primary)
+                .overlay(Rectangle().stroke(PixelUITheme.edgeDark, lineWidth: 2))
+                .background {
+                    Rectangle().fill(PixelUITheme.shadow.opacity(0.55)).offset(x: 2, y: 2)
+                }
         }
-        .buttonStyle(.borderedProminent)
-        .tint(PixelUITheme.primary)
+        .buttonStyle(.plain)
         .accessibilityHint(departureHint)
         .simultaneousGesture(TapGesture().onEnded {
             store.openedFirstReturnDestination(.writingDesk)
@@ -621,13 +635,32 @@ private struct CompactCurrency: View {
 
     var body: some View {
         Label {
-            Text(value, format: .number)
-                .font(.subheadline.weight(.semibold).monospacedDigit())
+            Text("\(value) \(label)")
+                .font(.custom("Tiny5", size: 8))
         } icon: {
-            Image(systemName: icon).foregroundStyle(tint)
+            Image(systemName: icon)
+                .font(.system(size: 8, weight: .bold))
+                .foregroundStyle(tint)
         }
         .labelStyle(.titleAndIcon)
         .accessibilityLabel("\(value) \(label)")
+    }
+}
+
+private struct PixelPaperGrid: View {
+    var body: some View {
+        Canvas { context, size in
+            var path = Path()
+            for x in stride(from: CGFloat.zero, through: size.width, by: 8) {
+                path.move(to: CGPoint(x: x, y: 0))
+                path.addLine(to: CGPoint(x: x, y: size.height))
+            }
+            for y in stride(from: CGFloat.zero, through: size.height, by: 8) {
+                path.move(to: CGPoint(x: 0, y: y))
+                path.addLine(to: CGPoint(x: size.width, y: y))
+            }
+            context.stroke(path, with: .color(PixelUITheme.edge.opacity(0.08)), lineWidth: 0.5)
+        }
     }
 }
 

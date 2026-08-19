@@ -11,14 +11,20 @@ final class StartingTownHomeSceneTests: XCTestCase {
         let digest = try SHA256.hash(data: Data(contentsOf: source))
             .map { String(format: "%02x", $0) }.joined()
         XCTAssertEqual(digest, StartingTownHomeRules.authoredAssetSHA256)
+
+        let display = root.appending(path:
+            "AssetLab/integration/starting-town-home-v1/town-starting-home-v1-phone-v2.png")
+        let displayDigest = try SHA256.hash(data: Data(contentsOf: display))
+            .map { String(format: "%02x", $0) }.joined()
+        XCTAssertEqual(displayDigest, StartingTownHomeRules.displayAssetSHA256)
     }
 
     @MainActor
     func testProcessedBundlePNGStillResolvesTheHomeScene() throws {
         let scene = try XCTUnwrap(StartingTownHomeResource.scene())
         XCTAssertEqual(scene.definition.sha256, StartingTownHomeRules.authoredAssetSHA256)
-        XCTAssertEqual(scene.image.cgImage?.width, scene.definition.pixelWidth)
-        XCTAssertEqual(scene.image.cgImage?.height, scene.definition.pixelHeight)
+        XCTAssertEqual(scene.image.cgImage?.width, Int(StartingTownHomeRules.displayPixelSize.width))
+        XCTAssertEqual(scene.image.cgImage?.height, Int(StartingTownHomeRules.displayPixelSize.height))
     }
 
     func testManifestOwnsExactBandOneHomeDestinations() throws {

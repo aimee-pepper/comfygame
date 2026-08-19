@@ -28,6 +28,9 @@ enum StartingTownHomeRules {
     static let manifestName = "starting-town-home-v1"
     static let assetName = "town-starting-v1"
     static let authoredAssetSHA256 = "287d28f294139a6ce9c37e10602c110c10202b5ebe24c7810088b9f53c0939c3"
+    static let displayAssetName = "town-starting-home-v1-phone-v2"
+    static let displayPixelSize = CGSize(width: 941, height: 1672)
+    static let displayAssetSHA256 = "ddc4b29ecda5428378e86aaa0dd3abe7b58dc9db7d6b956dcf4e2df708cf07f2"
 
     static func load(manifestURL: URL, assetURL: URL) -> Scene? {
         guard let data = try? Data(contentsOf: manifestURL),
@@ -90,7 +93,9 @@ enum StartingTownHomeRules {
               let assetURL = Bundle.main.url(forResource: StartingTownHomeRules.assetName,
                                              withExtension: "png"),
               let definition = StartingTownHomeRules.load(manifestURL: manifestURL, assetURL: assetURL),
-              let image = image(named: definition.assetName) else { return nil }
+              let image = image(named: StartingTownHomeRules.displayAssetName),
+              image.cgImage?.width == Int(StartingTownHomeRules.displayPixelSize.width),
+              image.cgImage?.height == Int(StartingTownHomeRules.displayPixelSize.height) else { return nil }
         return (definition, image)
     }
 
@@ -111,8 +116,7 @@ struct StartingTownHomeScene: View {
     var body: some View {
         GeometryReader { geometry in
             let imageRect = StartingTownHomeRules.renderedImageRect(
-                imageSize: CGSize(width: scene.definition.pixelWidth,
-                                  height: scene.definition.pixelHeight),
+                imageSize: StartingTownHomeRules.displayPixelSize,
                 in: geometry.size)
             ZStack {
                 Image(uiImage: scene.image)
@@ -129,7 +133,8 @@ struct StartingTownHomeScene: View {
                         NavigationLink(value: route) {
                             ZStack {
                                 Color.clear
-                                TownHotspotSign(title: hotspot.label)
+                                TownHotspotSign(title: hotspot.label,
+                                                subtitle: subtitle(for: hotspot.id))
                             }
                             .contentShape(Rectangle())
                         }
@@ -147,19 +152,37 @@ struct StartingTownHomeScene: View {
         }
         .clipped()
     }
+
+    private func subtitle(for hotspotID: String) -> String {
+        switch hotspotID {
+        case "writingDesk": "compose"
+        case "workshop": "make"
+        case "storehouse": "stored goods"
+        case "essenceSpring": "refine"
+        case "firepit": "gather"
+        default: ""
+        }
+    }
 }
 
 private struct TownHotspotSign: View {
     let title: String
+    let subtitle: String
 
     var body: some View {
-        Text(title)
-            .font(.system(size: 11, weight: .bold, design: .monospaced))
+        VStack(spacing: 1) {
+            Text(title)
+                .font(.custom("Tiny5", size: 9))
+            Text(subtitle)
+                .font(.custom("Tiny5", size: 7))
+                .foregroundStyle(PixelUITheme.neutralHighlight)
+        }
             .foregroundStyle(.white)
-            .lineLimit(1)
-            .padding(.horizontal, 8)
-            .padding(.vertical, 5)
-            .background(PixelUITheme.edgeDark.opacity(0.86))
+            .lineLimit(2)
+            .multilineTextAlignment(.center)
+            .padding(.horizontal, 7)
+            .padding(.vertical, 4)
+            .background(PixelUITheme.edgeDark.opacity(0.85))
             .overlay {
                 Rectangle().stroke(PixelUITheme.neutralHighlight, lineWidth: 1)
             }
