@@ -4,7 +4,7 @@ const pending=source=>({status:"pending",source,issues:["Native behavior audit h
 export const nativeConformance={
   campaigns:failed("CampaignStartView.swift + CampaignStartPresentationTests.swift",["Native valid-save taps load immediately; the mock adds a persistent selection step and bottom rail.","The mock invents health metadata; native shelf facts are level, location, progression, last played, progress-book count and save validity."]),
   home:failed("BaseView.swift + StartingTownHomeScene.swift",["The current primary label claims a named world is bound, but native opens Writing Desk.","Make, Study and Realms states are not represented yet."]),
-  "writing-desk":{status:"verified",source:"WritingDeskView.swift:99-167, 222-430, 479-797 + ui-writing-candidate.test.js",issues:[],designVersion:"native-1"},
+  "writing-desk":{status:"verified",source:"WritingDeskView.swift:99-167, 222-430, 479-980 + ui-writing-candidate.test.js",issues:[],designVersion:"native-2"},
   storehouse:failed("StationViews.swift",["Native modes are Items, Resources, Field Kit and Waiting; the mock invents Gear and Sort."]),
   workshop:failed("StationViews.swift",["Native Workshop is resource context plus ResearchTree; the mock invents fabrication projects."]),
   party:failed("PartyRosterView.swift",["The mock invents formation roles and omits the native member pager and Gear/Training/Stats/Gambits structure."]),
@@ -31,7 +31,7 @@ export const nativeConformance={
   channelworks:failed("StationViews.swift",["The mock invents route planning; native owns one conduit housing and Build another."]),
   firepit:failed("FirepitView.swift",["The mock invents seats, Binder membership and global transfer actions."]),
   gear:failed("GearView.swift",["The mock omits candidate locations, worn-by-other, empty, take-off and carried refusal states."]),
-  world:{status:"verified",source:"WorldView.swift:89-141, 438-501 + WorldTests.swift:920-963 + ui-world-candidate.test.js",issues:[],designVersion:"native-1"},
+  world:{status:"verified",source:"WorldView.swift:89-141, 438-501 + WorldTests.swift:920-963 + ui-world-candidate.test.js",issues:[],designVersion:"native-2"},
   encounter:failed("EncounterView.swift",["Native actions are Attack, Techniques, Item and Withdraw; Confirm, Pass and Remedy are invented."]),
   "loot-decision":failed("LootDecisionView.swift",["The mock skips the carried-item selection step and irreversible Leave confirmation."]),
   "return-recap":failed("RootView.swift",["Native recap is one comprehensive scroll; Recovered/Lost tabs and History action are invented."]),
