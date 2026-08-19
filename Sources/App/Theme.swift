@@ -36,6 +36,7 @@ enum PixelUITheme {
         let wood: RGB
         let woodHighlight: RGB
         let woodDark: RGB
+        let shelfInscription: RGB
         let coverOchre: RGB
         let coverTeal: RGB
         let coverMauve: RGB
@@ -49,6 +50,7 @@ enum PixelUITheme {
         neutral: rgb(0xCFAA72), neutralHighlight: rgb(0xEFD39D), primary: rgb(0x2F718F),
         primaryHighlight: rgb(0x63A7BD), danger: rgb(0x943D35), shadow: rgb(0x2F241C),
         wood: rgb(0x7E5434), woodHighlight: rgb(0xB17B48), woodDark: rgb(0x3C281B),
+        shelfInscription: rgb(0xEFD39C),
         coverOchre: rgb(0xC99656), coverTeal: rgb(0x73908A), coverMauve: rgb(0x9A6C78),
         clasp: rgb(0xD7B66F))
 
@@ -59,6 +61,7 @@ enum PixelUITheme {
         neutral: rgb(0x31484B), neutralHighlight: rgb(0x526C6E), primary: rgb(0x347DA7),
         primaryHighlight: rgb(0x69AFD4), danger: rgb(0xEF8A82), shadow: rgb(0x05090A),
         wood: rgb(0x4A3529), woodHighlight: rgb(0x765537), woodDark: rgb(0x17100D),
+        shelfInscription: rgb(0xEFD39C),
         coverOchre: rgb(0x8C6944), coverTeal: rgb(0x506F6D), coverMauve: rgb(0x72515F),
         clasp: rgb(0xC5A663))
 
@@ -88,6 +91,7 @@ enum PixelUITheme {
     static let wood = adaptive(\.wood)
     static let woodHighlight = adaptive(\.woodHighlight)
     static let woodDark = adaptive(\.woodDark)
+    static let shelfInscription = adaptive(\.shelfInscription)
     static let coverOchre = adaptive(\.coverOchre)
     static let coverTeal = adaptive(\.coverTeal)
     static let coverMauve = adaptive(\.coverMauve)

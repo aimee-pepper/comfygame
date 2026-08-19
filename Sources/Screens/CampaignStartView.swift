@@ -214,25 +214,30 @@ struct CampaignStartView: View {
         VStack(spacing: 0) {
             HStack(alignment: .center) {
                 Text("Campaigns")
-                    .font(.custom("Jersey 10", size: 28))
+                    .font(.custom("Jersey 10", size: 23))
                     .accessibilityAddTraits(.isHeader)
                 Spacer()
                 Text("\(presentation.slots.count) campaign \(presentation.slots.count == 1 ? "book" : "books")")
-                    .font(.custom("Tiny5", size: 11))
+                    .font(.custom("Tiny5", size: 8))
                     .foregroundStyle(CampaignShelfPalette.muted)
-                    .padding(.horizontal, 7)
-                    .padding(.vertical, 5)
-                    .background(CampaignShelfPalette.pageHighlight)
+                    .lineLimit(1)
+                    .frame(width: 97, height: 24)
+                    .background { Rectangle().fill(CampaignShelfPalette.pageHighlight) }
                     .overlay(Rectangle().stroke(PixelUITheme.edge, lineWidth: 1))
             }
             .frame(height: 62)
-            .padding(.horizontal, 14)
+            .padding(.leading, 21)
+            .padding(.trailing, 14)
             .background {
                 LinearGradient(colors: [PixelUITheme.headerB, PixelUITheme.screen],
                                startPoint: .leading, endPoint: .trailing)
             }
             .overlay(alignment: .leading) {
-                Rectangle().fill(PixelUITheme.edge).frame(width: 4)
+                Rectangle()
+                    .fill(PixelUITheme.edge)
+                    .frame(width: 5)
+                    .padding(.leading, 8)
+                    .padding(.vertical, 8)
             }
             .overlay(alignment: .bottom) {
                 VStack(spacing: 2) {
@@ -261,14 +266,24 @@ struct CampaignStartView: View {
                 .frame(height: CampaignStartLayoutPolicy.ordinaryShelfHeight)
 
                 if let slot = presentation.continueSlot {
-                    HStack(spacing: 8) {
-                        Text("Selected campaign")
-                            .font(.custom("Tiny5", size: 9))
-                            .textCase(.uppercase)
-                        Text(slot.name)
-                            .font(.custom("Jersey 10", size: 15))
-                            .lineLimit(1)
-                        Spacer(minLength: 0)
+                    VStack(alignment: .leading, spacing: 3) {
+                        HStack(spacing: 8) {
+                            Text("Selected campaign")
+                                .font(.custom("Tiny5", size: 9))
+                                .textCase(.uppercase)
+                            Text(slot.name)
+                                .font(.custom("Jersey 10", size: 15))
+                                .lineLimit(1)
+                            Spacer(minLength: 0)
+                        }
+                        if presentation.slots.contains(where: { !$0.health.canLoad }) {
+                            Text("Older test books open Details; they never load or overwrite.")
+                                .font(.custom("Tiny5", size: 9))
+                                .textCase(.uppercase)
+                                .foregroundStyle(CampaignShelfPalette.muted)
+                                .lineLimit(1)
+                                .minimumScaleFactor(0.75)
+                        }
                     }
                     .padding(.horizontal, 10)
                     .frame(minHeight: 54)
@@ -283,16 +298,24 @@ struct CampaignStartView: View {
             .padding(.vertical, 10)
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
 
-            primaryActions
-                .padding(.horizontal, 14)
-                .padding(.top, 10)
-                .padding(.bottom, 20)
-                .frame(height: CampaignStartLayoutPolicy.ordinaryBottomRailHeight)
-                .background(PixelUITheme.surfaceRaised)
-                .overlay(alignment: .top) { Rectangle().fill(PixelUITheme.edge).frame(height: 2) }
         }
         .foregroundStyle(CampaignShelfPalette.ink)
         .background(CampaignPaperBackground())
+        .overlay(alignment: .bottom) {
+            ZStack(alignment: .bottom) {
+                Rectangle()
+                    .fill(PixelUITheme.surfaceRaised)
+                    .frame(height: CampaignStartLayoutPolicy.ordinaryBottomRailHeight + 33)
+                primaryActions
+                    .padding(.horizontal, 14)
+                    .padding(.top, 10)
+                    .padding(.bottom, 20)
+                    .frame(height: CampaignStartLayoutPolicy.ordinaryBottomRailHeight)
+                    .background { Rectangle().fill(PixelUITheme.surfaceRaised) }
+                    .overlay(alignment: .top) { Rectangle().fill(PixelUITheme.edge).frame(height: 2) }
+                    .offset(y: -33)
+            }
+        }
     }
 
     private var emptyShelf: some View {
@@ -476,9 +499,9 @@ private struct CampaignArchiveShelf<Content: View>: View {
                 }
             }
             Text("ARCHIVE SHELF")
-                .font(.custom("Tiny5", size: 9))
+                .font(.custom("Tiny5", size: 8))
                 .tracking(2)
-                .foregroundStyle(PixelUITheme.neutralHighlight)
+                .foregroundStyle(PixelUITheme.shelfInscription)
                 .padding(.leading, 12)
                 .padding(.top, 6)
 
@@ -693,13 +716,13 @@ private struct CampaignSlotStatusBadge: View {
 
     var body: some View {
         Text(slot.health.label.uppercased())
-            .font(.system(size: 7, weight: .bold, design: .monospaced))
+            .font(.custom("Tiny5", size: 8))
             .lineLimit(1)
             .minimumScaleFactor(0.7)
             .foregroundStyle(slot.health.canLoad
                              ? CampaignShelfPalette.ink.opacity(0.74) : PixelUITheme.danger)
-            .padding(.horizontal, 4)
-            .padding(.vertical, 2)
+            .padding(.horizontal, 5)
+            .padding(.vertical, 3)
             .background(CampaignShelfPalette.pageHighlight)
             .overlay(Rectangle().stroke(CampaignShelfPalette.shelf.opacity(0.55), lineWidth: 1))
     }

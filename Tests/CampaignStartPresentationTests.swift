@@ -127,6 +127,10 @@ final class CampaignStartPresentationTests: XCTestCase {
         XCTAssertTrue(ordinary.contains("CampaignArchiveShelf"))
         XCTAssertTrue(ordinary.contains("ordinaryShelfHeight"))
         XCTAssertTrue(ordinary.contains("ordinaryBottomRailHeight"))
+        XCTAssertTrue(ordinary.contains(".overlay(alignment: .bottom)"),
+                      "The fixed rail must be drawn wholly inside the ordinary-phone viewport")
+        XCTAssertTrue(ordinary.contains(".offset(y: -33)"),
+                      "Action shadows need the approved sixteen-point bottom clearance")
         XCTAssertFalse(ordinary.contains("ScrollView"),
                        "The page and fixed action rail must not scroll; only CampaignArchiveShelf may scroll.")
 
@@ -134,6 +138,25 @@ final class CampaignStartPresentationTests: XCTestCase {
         let actionStart = try XCTUnwrap(source.range(of: "struct CampaignStartActionLabel",
                                                      range: shelfStart.upperBound..<source.endIndex))
         XCTAssertTrue(String(source[shelfStart.lowerBound..<actionStart.lowerBound]).contains("ScrollView"))
+    }
+
+    func testFrozenCampaignHeaderAndCaptionMatchTheApprovedArchiveGeometry() throws {
+        let root = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent().deletingLastPathComponent()
+        let source = try String(contentsOf: root.appending(path: "Sources/Screens/CampaignStartView.swift"),
+                                encoding: .utf8)
+        let start = try XCTUnwrap(source.range(of: "private var ordinaryCampaignSurface"))
+        let end = try XCTUnwrap(source.range(of: "private var emptyShelf",
+                                             range: start.upperBound..<source.endIndex))
+        let ordinary = String(source[start.lowerBound..<end.lowerBound])
+
+        XCTAssertTrue(ordinary.contains(".font(.custom(\"Jersey 10\", size: 23))"))
+        XCTAssertTrue(ordinary.contains(".frame(width: 97, height: 24)"))
+        XCTAssertTrue(ordinary.contains(".padding(.leading, 21)"))
+        XCTAssertTrue(ordinary.contains(".frame(width: 5)"))
+        XCTAssertTrue(ordinary.contains(".padding(.leading, 8)"))
+        XCTAssertTrue(ordinary.contains("Older test books open Details; they never load or overwrite."))
+        XCTAssertTrue(ordinary.contains(".overlay(alignment: .bottom)"))
     }
 
     func testCompactSlotUsesTheWholeCardForLoadAndLongPressForDetails() throws {
