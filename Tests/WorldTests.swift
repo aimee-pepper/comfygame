@@ -949,7 +949,7 @@ final class WorldTests: XCTestCase {
         XCTAssertEqual(WorldMapLayout.viewportRows(mapWidth: phone, availableHeight: 260,
                                                    viewportColumns: 11, mapRows: 30), 7)
         XCTAssertEqual(WorldMapLayout.viewportRows(mapWidth: phone, availableHeight: 500,
-                                                   viewportColumns: 11, mapRows: 30), 14)
+                                                   viewportColumns: 11, mapRows: 30), 11)
         XCTAssertEqual(WorldMapLayout.viewportRows(mapWidth: phone, availableHeight: 500,
                                                    viewportColumns: 11, mapRows: 9), 9)
         let rows = WorldMapLayout.viewportRows(mapWidth: phone, availableHeight: 500,
@@ -958,21 +958,26 @@ final class WorldTests: XCTestCase {
                                "Only complete rows that fit may be admitted to the viewport")
     }
 
-    func testWorldCameraKeepsTheResolvedSightFringeOnscreenWhileFollowing() {
+    func testWorldCameraNeverResizesTilesToFitVisibility() {
         let ordinary = WorldRules.visibilityProfile(illumination: 100, baseRadius: 7)
         XCTAssertEqual(ordinary.fullRadius, 7)
         XCTAssertEqual(ordinary.fringeWidth, 2)
         XCTAssertEqual(WorldMapLayout.viewportColumns(
-            mapColumns: 30, minimumColumns: 11, visibilityProfile: ordinary), 19,
-            "A centred camera must include full sight plus fringe on both sides")
+            mapColumns: 30, cameraColumns: 11), 11,
+            "A large sight field must not zoom the camera out or shrink its tiles")
 
         let darkness = WorldRules.visibilityProfile(illumination: 0, baseRadius: 7)
+        XCTAssertLessThan(darkness.fullRadius, ordinary.fullRadius)
         XCTAssertEqual(WorldMapLayout.viewportColumns(
-            mapColumns: 30, minimumColumns: 11, visibilityProfile: darkness), 11,
-            "A smaller sight field must not zoom past the established phone framing")
+            mapColumns: 30, cameraColumns: 11), 11,
+            "Lighting changes must not alter the established phone framing")
         XCTAssertEqual(WorldMapLayout.viewportColumns(
-            mapColumns: 14, minimumColumns: 11, visibilityProfile: ordinary), 14,
-            "Small maps remain bounded by their real columns")
+            mapColumns: 9, cameraColumns: 11), 9,
+            "Only a genuinely smaller map may reduce the camera column count")
+        XCTAssertEqual(WorldMapLayout.viewportRows(
+            mapWidth: 367, availableHeight: 2_000,
+            viewportColumns: 11, mapRows: 30), 11,
+            "Extra page height must not expose the full map vertically")
     }
 
     func testWorldControlsHaveExactlyTwoActionsInOneNonOverlappingBottomDock() throws {

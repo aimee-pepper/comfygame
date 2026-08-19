@@ -96,8 +96,7 @@ struct WorldView: View {
                         in: run, party: WorldRules.sightBonus(in: store.state))
                     let viewportColumns = WorldMapLayout.viewportColumns(
                         mapColumns: run.map.width,
-                        minimumColumns: Tuning.World.viewportTiles,
-                        visibilityProfile: visibilityProfile)
+                        cameraColumns: Tuning.World.viewportTiles)
                     let mapWidth = WorldMapLayout.maximumSide(
                         containerWidth: viewport.size.width,
                         viewportHeight: viewport.size.height,
@@ -947,14 +946,10 @@ enum WorldMapLayout {
     /// system/card background. It is the same non-informative dark used by accepted fog art.
     static let backdropRGB: [UInt8] = [23, 23, 26]
 
-    /// Keep the rules-owned sight field inside the camera after it begins following the player.
-    /// This changes presentation scale only: sight, exploration, and interaction ranges remain
-    /// owned by `VisibilityProfile` and the World rules.
-    static func viewportColumns(mapColumns: Int, minimumColumns: Int,
-                                visibilityProfile: WorldRules.VisibilityProfile) -> Int {
-        let outerRadius = visibilityProfile.fullRadius + visibilityProfile.fringeWidth
-        let sightDiameter = outerRadius * 2 + 1
-        return min(max(1, mapColumns), max(max(1, minimumColumns), sightDiameter))
+    /// Camera scale is stable and independent of sight. Visibility may extend beyond the camera;
+    /// changing illumination or party sight must never resize tiles or expose the whole map.
+    static func viewportColumns(mapColumns: Int, cameraColumns: Int) -> Int {
+        min(max(1, mapColumns), max(1, cameraColumns))
     }
 
     /// The map is width-owned. Secondary chrome may make the page scroll, but it must never make
@@ -969,14 +964,14 @@ enum WorldMapLayout {
         return max(tiles, cellPixels) * tiles / scale
     }
 
-    /// Use the available vertical field as well as the width. A phone world window is deliberately
-    /// taller than it is wide; additional rows reveal world, never stretched tiles or filler.
+    /// Admit only complete rows that fit, capped to the stable camera span. Extra vertical room
+    /// belongs to surrounding UI; it must never zoom the camera out to reveal the whole map.
     static func viewportRows(mapWidth: CGFloat, availableHeight: CGFloat,
                              viewportColumns: Int, mapRows: Int) -> Int {
         let columns = max(1, viewportColumns)
         let tileSide = mapWidth / CGFloat(columns)
         let completeRowsThatFit = Int(floor(max(0, availableHeight) / max(1, tileSide)))
-        return min(max(1, mapRows), max(1, completeRowsThatFit))
+        return min(max(1, mapRows), columns, max(1, completeRowsThatFit))
     }
 }
 
