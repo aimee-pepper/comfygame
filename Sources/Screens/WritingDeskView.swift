@@ -126,24 +126,6 @@ struct WritingDeskView: View {
         .background(WritingDeskPaperBackground())
         .navigationBarTitleDisplayMode(.inline)
         .navigationTitle("Writing Desk")
-        .toolbar {
-            ToolbarItemGroup(placement: .topBarTrailing) {
-                if pane == .write {
-                    Button {
-                        templateName = ""
-                        isNamingTemplate = true
-                    } label: {
-                        Image(systemName: "square.and.arrow.down")
-                    }
-                    .disabled(state.base.page.runes.isEmpty)
-                    .accessibilityLabel("Save Template")
-                    Button("Clear") {
-                        isConfirmingClear = true
-                    }
-                    .disabled(state.base.page.runes.isEmpty)
-                }
-            }
-        }
         .confirmationDialog(
             "Clear this page?",
             isPresented: $isConfirmingClear,
@@ -246,15 +228,19 @@ struct WritingDeskView: View {
             let side = floor(min(byWidth, byHeight))
 
             VStack(spacing: 6) {
-                PageGridView(ghost: $ghost, side: side,
-                             dismissalToken: pageInteractionDismissalToken)
-                    .padding(10)
-                    .background(PixelUITheme.surface)
-                    .overlay(Rectangle().inset(by: 7).stroke(PixelUITheme.edge.opacity(0.45), lineWidth: 1))
-                    .overlay(Rectangle().stroke(PixelUITheme.edgeDark, lineWidth: 3))
-                    .background {
-                        Rectangle().fill(PixelUITheme.shadow).offset(x: 6, y: 6)
-                    }
+                ZStack(alignment: .topTrailing) {
+                    PageGridView(ghost: $ghost, side: side,
+                                 dismissalToken: pageInteractionDismissalToken)
+                        .padding(10)
+                        .background(PixelUITheme.surface)
+                        .overlay(Rectangle().inset(by: 7).stroke(PixelUITheme.edge.opacity(0.45), lineWidth: 1))
+                        .overlay(Rectangle().stroke(PixelUITheme.edgeDark, lineWidth: 3))
+                        .background {
+                            Rectangle().fill(PixelUITheme.shadow).offset(x: 6, y: 6)
+                        }
+                    writingContextTools
+                        .padding(8)
+                }
                 inkWellBar
                 binTabs
                     .simultaneousGesture(TapGesture().onEnded { dismissPageInteraction() })
@@ -266,6 +252,37 @@ struct WritingDeskView: View {
             .padding(.vertical, 10)
             .background(WritingDeskWoodBackground())
         }
+    }
+
+    private var writingContextTools: some View {
+        HStack(spacing: 4) {
+            Button {
+                templateName = ""
+                isNamingTemplate = true
+            } label: {
+                Text("Save Template")
+                    .padding(.horizontal, 6)
+                    .frame(minHeight: 44)
+                    .background(PixelUITheme.surfaceInset)
+                    .overlay(Rectangle().stroke(PixelUITheme.edge, lineWidth: 1))
+            }
+            .disabled(state.base.page.runes.isEmpty)
+            .accessibilityLabel("Save Template")
+
+            Button {
+                isConfirmingClear = true
+            } label: {
+                Text(clearPageActionLabel)
+                    .padding(.horizontal, 6)
+                    .frame(minHeight: 44)
+                    .background(PixelUITheme.surfaceInset)
+                    .overlay(Rectangle().stroke(PixelUITheme.edge, lineWidth: 1))
+            }
+            .disabled(state.base.page.runes.isEmpty)
+            .foregroundStyle(state.base.page.runes.isEmpty ? PixelUITheme.muted : PixelUITheme.danger)
+        }
+        .font(.custom("Tiny5", size: 8))
+        .buttonStyle(.plain)
     }
 
     private func dismissPageInteraction() {

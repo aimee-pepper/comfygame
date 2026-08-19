@@ -1,5 +1,7 @@
-import XCTest
 import CryptoKit
+import SwiftUI
+import UIKit
+import XCTest
 @testable import Bookbinder
 
 /// The page as a spatial grid (`writing-system-rune-spec.md` §2–3).
@@ -8,6 +10,38 @@ import CryptoKit
 /// sits never changes what it says — and **refinement is literacy, not power** — a better hand lets
 /// you say the same thing in less space and never unlocks a meaning.
 final class PageTests: XCTestCase {
+    @MainActor
+    func testWritingDeskRendersAtApprovedOrdinaryPhoneSize() throws {
+        let store = GameStore(io: .temporary(name: "writing-render-\(UUID().uuidString)"))
+        store.mutate("prepare writing render fixture") { state in
+            for lesson in TutorialLessonID.allCases {
+                state.tutorial.complete(lesson, fact: "visual_fixture")
+            }
+        }
+        for scheme in [ColorScheme.light, .dark] {
+            let controller = UIHostingController(rootView:
+                NavigationStack { WritingDeskView().environmentObject(store) }
+                    .environment(\.colorScheme, scheme)
+                    .environment(\.dynamicTypeSize, .large)
+                    .frame(width: 368, height: 800)
+            )
+            let window = UIWindow(frame: CGRect(x: 0, y: 0, width: 368, height: 800))
+            window.rootViewController = controller
+            window.makeKeyAndVisible()
+            controller.view.frame = window.bounds
+            controller.view.layoutIfNeeded()
+            RunLoop.main.run(until: Date().addingTimeInterval(0.05))
+            let image = UIGraphicsImageRenderer(size: window.bounds.size).image { _ in
+                controller.view.drawHierarchy(in: controller.view.bounds, afterScreenUpdates: true)
+            }
+            window.isHidden = true
+            XCTAssertEqual(image.size, CGSize(width: 368, height: 800))
+            let attachment = XCTAttachment(image: image)
+            attachment.name = "writing-desk-write-\(scheme == .light ? "light" : "dark")"
+            attachment.lifetime = .keepAlways
+            add(attachment)
+        }
+    }
     @MainActor
     func testEarthlikeTestWorldIsPermanentAndAddedToExistingCampaigns() throws {
         let earth = WorldPageCatalog.earthlikeTestInstance
@@ -277,7 +311,10 @@ final class PageTests: XCTestCase {
         XCTAssertEqual(definitions.map { $0.candidateUnknownSymbolIDs.map(\.rawValue) },
                        [[], [], [], [], [], ["storm"], ["blight"], ["mote_vein"]])
         XCTAssertTrue(definitions.allSatisfy { $0.seed == 0 && $0.disposition.isRandom })
-        XCTAssertEqual(WorldPageCatalog.definitions.count, 11)
+        XCTAssertEqual(WorldPageCatalog.definitions.count,
+                       WorldPageCatalog.starterDefinitions.count
+                           + WorldPageCatalog.repeatableDefinitions.count + 1,
+                       "the permanent Earthlike testing page is additional to authored starter and wild pages")
         XCTAssertEqual(WorldPageCatalog.definition("wild_storm_coast")?.title, "Storm Coast")
 
         let page = try XCTUnwrap(WorldPageCatalog.definition("wild_storm_coast"))
@@ -730,7 +767,9 @@ final class PageTests: XCTestCase {
             encoding: .utf8
         )
 
-        XCTAssertTrue(source.contains("Button(\"Clear\") {\n                        isConfirmingClear = true"))
+        XCTAssertTrue(source.contains("private var writingContextTools"))
+        XCTAssertTrue(source.contains("Text(clearPageActionLabel)"))
+        XCTAssertTrue(source.contains("isConfirmingClear = true"))
         XCTAssertTrue(source.contains("\"Clear this page?\""))
         XCTAssertTrue(source.contains("Button(clearPageActionLabel, role: .destructive)"))
         XCTAssertTrue(source.contains("Button(\"Keep writing\", role: .cancel)"))

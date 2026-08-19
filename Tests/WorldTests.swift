@@ -1,9 +1,54 @@
-import XCTest
 import CryptoKit
+import SwiftUI
+import UIKit
+import XCTest
 @testable import Bookbinder
 
 /// Worldgen determinism, movement, decay, and the rules that end a run.
 final class WorldTests: XCTestCase {
+
+    @MainActor
+    func testWorldTravelRendersAtApprovedOrdinaryPhoneSize() throws {
+        let store = GameStore(io: .temporary(name: "world-render-\(UUID().uuidString)"))
+        let state = startedRun(book(["terrain": "plains"]), seed: 101)
+        store.mutate("test: world render") { saved in
+            saved = state
+            if var run = saved.worlds.activeRun {
+                let center = GridPoint(x: run.map.width / 2, y: run.map.height / 2)
+                run.playerPosition = center
+                for point in run.map.allPoints {
+                    run.map[point].isRevealed = true
+                }
+                saved.worlds.activeRun = run
+            }
+            for lesson in TutorialLessonID.allCases {
+                saved.tutorial.complete(lesson, fact: "visual_fixture")
+            }
+        }
+        for scheme in [ColorScheme.light, .dark] {
+            let controller = UIHostingController(rootView:
+                WorldView().environmentObject(store)
+                    .environment(\.colorScheme, scheme)
+                    .environment(\.dynamicTypeSize, .large)
+                    .frame(width: 368, height: 800)
+            )
+            let window = UIWindow(frame: CGRect(x: 0, y: 0, width: 368, height: 800))
+            window.rootViewController = controller
+            window.makeKeyAndVisible()
+            controller.view.frame = window.bounds
+            controller.view.layoutIfNeeded()
+            RunLoop.main.run(until: Date().addingTimeInterval(0.08))
+            let image = UIGraphicsImageRenderer(size: window.bounds.size).image { _ in
+                controller.view.drawHierarchy(in: controller.view.bounds, afterScreenUpdates: true)
+            }
+            window.isHidden = true
+            XCTAssertEqual(image.size, CGSize(width: 368, height: 800))
+            let attachment = XCTAttachment(image: image)
+            attachment.name = "world-travel-\(scheme == .light ? "light" : "dark")"
+            attachment.lifetime = .keepAlways
+            add(attachment)
+        }
+    }
 
     private let owned = Set(ContentCatalog.shared.starterSymbolIDs)
 
