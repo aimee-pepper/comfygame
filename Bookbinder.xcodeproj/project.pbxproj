@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		N10000000000000000000001 /* Jersey10-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = N20000000000000000000001 /* Jersey10-Regular.ttf */; };
+		N10000000000000000000002 /* Tiny5-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = N20000000000000000000002 /* Tiny5-Regular.ttf */; };
 		L10000000000000000000001 /* ResourceSpriteV1Registry.generated.swift in Sources */ = {isa = PBXBuildFile; fileRef = L20000000000000000000001 /* ResourceSpriteV1Registry.generated.swift */; };
 		L10000000000000000000002 /* ResourceSpriteV1RegistryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = L20000000000000000000002 /* ResourceSpriteV1RegistryTests.swift */; };
 		M10000000000000000000001 /* MobGearSpriteV1Registry.generated.swift in Sources */ = {isa = PBXBuildFile; fileRef = M20000000000000000000001 /* MobGearSpriteV1Registry.generated.swift */; };
@@ -300,6 +302,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		N20000000000000000000001 /* Jersey10-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "Jersey10-Regular.ttf"; path = "AssetLab/fonts/Jersey10-Regular.ttf"; sourceTree = SOURCE_ROOT; };
+		N20000000000000000000002 /* Tiny5-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "Tiny5-Regular.ttf"; path = "AssetLab/fonts/Tiny5-Regular.ttf"; sourceTree = SOURCE_ROOT; };
 		L20000000000000000000001 /* ResourceSpriteV1Registry.generated.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResourceSpriteV1Registry.generated.swift; sourceTree = "<group>"; };
 		L20000000000000000000002 /* ResourceSpriteV1RegistryTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResourceSpriteV1RegistryTests.swift; sourceTree = "<group>"; };
 		M20000000000000000000001 /* MobGearSpriteV1Registry.generated.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MobGearSpriteV1Registry.generated.swift; sourceTree = "<group>"; };
@@ -751,11 +755,21 @@
 		45223024247727E345FE8AC7 = {
 			isa = PBXGroup;
 			children = (
+				N30000000000000000000001 /* Fonts */,
 				BC0CE529F9D43490953E09A0 /* Sources */,
 				AD5AD96F34050F6073DCC407 /* Support */,
 				D1F197F56457F06C0D463B6A /* Tests */,
 				86D3F0D811C9C291D68E4FB1 /* Products */,
 			);
+			sourceTree = "<group>";
+		};
+		N30000000000000000000001 /* Fonts */ = {
+			isa = PBXGroup;
+			children = (
+				N20000000000000000000001 /* Jersey10-Regular.ttf */,
+				N20000000000000000000002 /* Tiny5-Regular.ttf */,
+			);
+			name = Fonts;
 			sourceTree = "<group>";
 		};
 		4DD13C27AAD6A718AC4C8188 /* Persistence */ = {
@@ -1101,6 +1115,8 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				N10000000000000000000001 /* Jersey10-Regular.ttf in Resources */,
+				N10000000000000000000002 /* Tiny5-Regular.ttf in Resources */,
 				C10000000000000000000001 /* town-empty-v1.png in Resources */,
 				C10000000000000000000002 /* building-workshop-v1.png in Resources */,
 				C10000000000000000000003 /* building-storehouse-v1.png in Resources */,

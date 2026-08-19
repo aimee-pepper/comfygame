@@ -96,22 +96,17 @@ final class CampaignStartPresentationTests: XCTestCase {
         XCTAssertTrue(CampaignStartLayoutPolicy.usesSingleColumn(dynamicTypeSize: .accessibility5))
     }
 
-    func testEightOrdinarySlotsUseACompactTwoByFourShelf() {
-        XCTAssertEqual(CampaignStartLayoutPolicy.ordinarySlotColumnCount, 2)
+    func testEightOrdinarySlotsUseTheApprovedScrollableArchiveShelf() {
+        XCTAssertEqual(CampaignStartLayoutPolicy.ordinarySlotColumnCount, 1)
         XCTAssertEqual(CampaignStartLayoutPolicy.ordinarySlotRowCount(slotCount: 0), 0)
         XCTAssertEqual(CampaignStartLayoutPolicy.ordinarySlotRowCount(slotCount: 1), 1)
-        XCTAssertEqual(CampaignStartLayoutPolicy.ordinarySlotRowCount(slotCount: 8), 4)
-        XCTAssertGreaterThanOrEqual(CampaignStartLayoutPolicy.ordinarySlotCardMinimumHeight, 44)
-
-        let shelfHeight =
-            CGFloat(CampaignStartLayoutPolicy.ordinarySlotRowCount(slotCount: 8))
-            * CampaignStartLayoutPolicy.ordinarySlotCardMinimumHeight
-            + 30 // three ten-point row gutters
-        XCTAssertLessThanOrEqual(shelfHeight, 370,
-                                 "Eight slots must leave ordinary-phone room for title and actions.")
+        XCTAssertEqual(CampaignStartLayoutPolicy.ordinarySlotRowCount(slotCount: 8), 8)
+        XCTAssertEqual(CampaignStartLayoutPolicy.ordinarySlotCardMinimumHeight, 112)
+        XCTAssertEqual(CampaignStartLayoutPolicy.ordinaryShelfHeight, 430)
+        XCTAssertEqual(CampaignStartLayoutPolicy.ordinaryBottomRailHeight, 84)
     }
 
-    func testOrdinaryCampaignSurfaceIsStaticWhileAccessibilityRetainsFallbackScrolling() throws {
+    func testOrdinaryCampaignSurfaceScrollsOnlyInsideTheFixedArchiveShelf() throws {
         let root = URL(fileURLWithPath: #filePath)
             .deletingLastPathComponent().deletingLastPathComponent()
         let source = try String(contentsOf: root.appending(path: "Sources/Screens/CampaignStartView.swift"),
@@ -123,8 +118,22 @@ final class CampaignStartPresentationTests: XCTestCase {
 
         XCTAssertTrue(body.contains("if dynamicTypeSize.isAccessibilitySize"))
         XCTAssertTrue(body.contains("ScrollView { campaignContents(compactSlots: false)"))
-        XCTAssertTrue(body.contains("campaignContents(compactSlots: true)"))
-        XCTAssertFalse(body.contains("ScrollView { campaignContents(compactSlots: true)"))
+        XCTAssertTrue(body.contains("ordinaryCampaignSurface"))
+
+        let ordinaryStart = try XCTUnwrap(source.range(of: "private var ordinaryCampaignSurface"))
+        let contentsStart = try XCTUnwrap(source.range(of: "private func campaignContents",
+                                                       range: ordinaryStart.upperBound..<source.endIndex))
+        let ordinary = String(source[ordinaryStart.lowerBound..<contentsStart.lowerBound])
+        XCTAssertTrue(ordinary.contains("CampaignArchiveShelf"))
+        XCTAssertTrue(ordinary.contains("ordinaryShelfHeight"))
+        XCTAssertTrue(ordinary.contains("ordinaryBottomRailHeight"))
+        XCTAssertFalse(ordinary.contains("ScrollView"),
+                       "The page and fixed action rail must not scroll; only CampaignArchiveShelf may scroll.")
+
+        let shelfStart = try XCTUnwrap(source.range(of: "private struct CampaignArchiveShelf"))
+        let actionStart = try XCTUnwrap(source.range(of: "struct CampaignStartActionLabel",
+                                                     range: shelfStart.upperBound..<source.endIndex))
+        XCTAssertTrue(String(source[shelfStart.lowerBound..<actionStart.lowerBound]).contains("ScrollView"))
     }
 
     func testCompactSlotUsesTheWholeCardForLoadAndLongPressForDetails() throws {
@@ -160,8 +169,9 @@ final class CampaignStartPresentationTests: XCTestCase {
         XCTAssertTrue(compact.contains("CampaignBookplateMotif"))
         XCTAssertTrue(compact.contains("Level \\(slot.binderLevel)"))
         XCTAssertTrue(compact.contains("slot.lastPlayed.formatted(date: .abbreviated, time: .shortened)"))
-        XCTAssertTrue(compact.contains(".padding(.horizontal, 7)"))
-        XCTAssertTrue(compact.contains(".padding(.vertical, 5)"))
+        XCTAssertTrue(compact.contains(".padding(.leading, 10)"))
+        XCTAssertTrue(compact.contains(".padding(.trailing, 36)"))
+        XCTAssertTrue(compact.contains(".padding(.vertical, 7)"))
         XCTAssertFalse(compact.contains(".padding(14)"))
         XCTAssertFalse(compact.contains("HStack(spacing: 4) {\n                if slot.health.canLoad"))
     }
@@ -180,7 +190,8 @@ final class CampaignStartPresentationTests: XCTestCase {
         XCTAssertTrue(compact.contains("CampaignShelfProgress.volumeLabel(for: slot.progressBookCount)"))
         XCTAssertTrue(compact.contains("Text(slot.location)"))
         XCTAssertTrue(compact.contains("slot.lastPlayed.formatted(date: .abbreviated, time: .shortened)"))
-        XCTAssertTrue(compact.contains("if let debugVersion = slot.debugVersion"))
+        XCTAssertFalse(compact.contains("debugVersion"),
+                       "Technical schema metadata belongs in Details, never in the compact book card.")
         XCTAssertFalse(compact.contains("slot.progression"),
                        "The compact shelf must not squeeze paragraph-length progression prose into a card.")
         XCTAssertTrue(compact.contains(".contextMenu"))
@@ -227,8 +238,69 @@ final class CampaignStartPresentationTests: XCTestCase {
         XCTAssertTrue(source.contains("static let page = PixelUITheme.screen"))
         XCTAssertTrue(source.contains("static let ink = PixelUITheme.text"))
         XCTAssertTrue(source.contains("PixelUITheme.primary"))
+        XCTAssertTrue(source.contains("PixelUITheme.wood"))
+        XCTAssertTrue(source.contains("PixelUITheme.coverOchre"))
+        XCTAssertTrue(source.contains("PixelUITheme.coverTeal"))
+        XCTAssertTrue(source.contains("PixelUITheme.coverMauve"))
         XCTAssertFalse(source.contains("Color(red:"),
                        "Campaign must consume shared semantic roles, never copy literal theme colours.")
+    }
+
+    func testApprovedCampaignFontsAreBundledAndRegistered() throws {
+        let root = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent().deletingLastPathComponent()
+        let info = try String(contentsOf: root.appending(path: "Support/Info.plist"), encoding: .utf8)
+        let project = try String(contentsOf: root.appending(path: "Bookbinder.xcodeproj/project.pbxproj"),
+                                 encoding: .utf8)
+        let source = try String(contentsOf: root.appending(path: "Sources/Screens/CampaignStartView.swift"),
+                                encoding: .utf8)
+
+        for font in ["Jersey10-Regular.ttf", "Tiny5-Regular.ttf"] {
+            XCTAssertTrue(FileManager.default.fileExists(atPath: root.appending(path: "AssetLab/fonts/\(font)").path))
+            XCTAssertTrue(info.contains(font))
+            XCTAssertTrue(project.contains("\(font) in Resources"))
+        }
+        XCTAssertTrue(source.contains(".custom(\"Jersey 10\""))
+        XCTAssertTrue(source.contains(".custom(\"Tiny5\""))
+    }
+
+    @MainActor
+    func testApprovedCampaignFixturesRenderAt368By800InLightAndDark() throws {
+        let mixed = campaignFixtureSlots(count: 3, includesInvalid: true)
+        let full = campaignFixtureSlots(count: 8, includesInvalid: true)
+        for (name, slots, scheme) in [
+            ("campaign-three-light", mixed, ColorScheme.light),
+            ("campaign-three-dark", mixed, ColorScheme.dark),
+            ("campaign-eight-light", full, ColorScheme.light)
+        ] {
+            let controller = UIHostingController(rootView:
+                CampaignStartView(
+                    presentation: CampaignStartPresentation(slots: slots),
+                    onContinue: { _ in }, onNewGame: {}, onLoad: { _ in },
+                    onDelete: { _ in }, onExport: { _ in })
+                .environment(\.colorScheme, scheme)
+                .environment(\.dynamicTypeSize, .large)
+                .frame(width: 368, height: 800)
+            )
+            let window = UIWindow(frame: CGRect(x: 0, y: 0, width: 368, height: 800))
+            window.rootViewController = controller
+            window.makeKeyAndVisible()
+            controller.view.frame = window.bounds
+            controller.view.setNeedsLayout()
+            controller.view.layoutIfNeeded()
+            RunLoop.main.run(until: Date().addingTimeInterval(0.05))
+            let renderer = UIGraphicsImageRenderer(size: window.bounds.size)
+            let image = renderer.image { _ in
+                controller.view.drawHierarchy(in: controller.view.bounds, afterScreenUpdates: true)
+            }
+            window.isHidden = true
+            XCTAssertEqual(image.size.width, 368, accuracy: 0.5)
+            XCTAssertEqual(image.size.height, 800, accuracy: 0.5)
+            let attachment = XCTAttachment(image: image)
+            attachment.name = name
+            attachment.lifetime = .keepAlways
+            add(attachment)
+        }
     }
 
     @MainActor
@@ -355,5 +427,25 @@ final class CampaignStartPresentationTests: XCTestCase {
                             binderLevel: 4, location: "Home",
                             progression: "3 travellers · 2 stations",
                             health: health, debugVersion: "build 1 · schema 15")
+    }
+
+    private func campaignFixtureSlots(count: Int, includesInvalid: Bool) -> [CampaignSlotSummary] {
+        (0..<count).map { index in
+            let id = UUID(uuidString: String(format: "%02X000000-0000-0000-0000-%012d",
+                                             index % 3, index + 1))!
+            let health: CampaignSlotHealth = includesInvalid && index == count - 1
+                ? .corrupt(message: "Export this campaign for recovery.") : .valid
+            return CampaignSlotSummary(
+                id: id,
+                name: index == 0 ? "Aimee’s Book" : index == count - 1 ? "Old Test Book" : "Field Notes \(index)",
+                lastPlayed: Date(timeIntervalSince1970: TimeInterval(10_000 - index)),
+                binderLevel: max(1, 4 - index / 2),
+                location: index.isMultiple(of: 2) ? "Home" : "World",
+                progression: "Authored fixture",
+                progressBookCount: min(7, max(1, count - index)),
+                health: health,
+                debugVersion: "fixture",
+                hasKnownMetadata: true)
+        }
     }
 }

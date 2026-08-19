@@ -124,8 +124,10 @@ struct CampaignStartPresentation: Equatable, Sendable {
 }
 
 enum CampaignStartLayoutPolicy {
-    static let ordinarySlotColumnCount = 2
-    static let ordinarySlotCardMinimumHeight: CGFloat = 84
+    static let ordinarySlotColumnCount = 1
+    static let ordinarySlotCardMinimumHeight: CGFloat = 112
+    static let ordinaryShelfHeight: CGFloat = 430
+    static let ordinaryBottomRailHeight: CGFloat = 84
 
     static func primaryActionLabelHeight(dynamicTypeSize: DynamicTypeSize) -> CGFloat {
         dynamicTypeSize.isAccessibilitySize ? 88 : 52
@@ -142,8 +144,7 @@ enum CampaignStartLayoutPolicy {
     }
 
     static func ordinarySlotRowCount(slotCount: Int) -> Int {
-        guard slotCount > 0 else { return 0 }
-        return Int(ceil(Double(slotCount) / Double(ordinarySlotColumnCount)))
+        slotCount
     }
 }
 
@@ -152,16 +153,16 @@ private enum CampaignShelfPalette {
     static let pageHighlight = PixelUITheme.surface
     static let ink = PixelUITheme.text
     static let muted = PixelUITheme.muted
-    static let shelf = PixelUITheme.edgeDark
-    static let shelfHighlight = PixelUITheme.neutralHighlight
+    static let shelf = PixelUITheme.woodDark
+    static let shelfWood = PixelUITheme.wood
+    static let shelfHighlight = PixelUITheme.woodHighlight
 
     static func cover(for id: UUID) -> Color {
-        let index = withUnsafeBytes(of: id.uuid) { Int($0[0]) % 4 }
+        let index = withUnsafeBytes(of: id.uuid) { Int($0[0]) % 3 }
         return [
-            PixelUITheme.neutral,
-            PixelUITheme.surfaceRaised,
-            PixelUITheme.surfaceInset,
-            PixelUITheme.headerB
+            PixelUITheme.coverOchre,
+            PixelUITheme.coverTeal,
+            PixelUITheme.coverMauve
         ][index]
     }
 }
@@ -183,9 +184,7 @@ struct CampaignStartView: View {
             if dynamicTypeSize.isAccessibilitySize {
                 ScrollView { campaignContents(compactSlots: false).padding(16) }
             } else {
-                campaignContents(compactSlots: true)
-                    .padding(16)
-                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+                ordinaryCampaignSurface
             }
         }
         .background(CampaignShelfPalette.page)
@@ -209,6 +208,102 @@ struct CampaignStartView: View {
         } message: { slot in
             Text("Only this campaign will be removed. Other campaigns will not be changed.")
         }
+    }
+
+    private var ordinaryCampaignSurface: some View {
+        VStack(spacing: 0) {
+            HStack(alignment: .center) {
+                Text("Campaigns")
+                    .font(.custom("Jersey 10", size: 28))
+                    .accessibilityAddTraits(.isHeader)
+                Spacer()
+                Text("\(presentation.slots.count) campaign \(presentation.slots.count == 1 ? "book" : "books")")
+                    .font(.custom("Tiny5", size: 11))
+                    .foregroundStyle(CampaignShelfPalette.muted)
+                    .padding(.horizontal, 7)
+                    .padding(.vertical, 5)
+                    .background(CampaignShelfPalette.pageHighlight)
+                    .overlay(Rectangle().stroke(PixelUITheme.edge, lineWidth: 1))
+            }
+            .frame(height: 62)
+            .padding(.horizontal, 14)
+            .background {
+                LinearGradient(colors: [PixelUITheme.headerB, PixelUITheme.screen],
+                               startPoint: .leading, endPoint: .trailing)
+            }
+            .overlay(alignment: .leading) {
+                Rectangle().fill(PixelUITheme.edge).frame(width: 4)
+            }
+            .overlay(alignment: .bottom) {
+                VStack(spacing: 2) {
+                    Rectangle().fill(PixelUITheme.edge).frame(height: 2)
+                    Rectangle().fill(PixelUITheme.edge.opacity(0.45)).frame(height: 1)
+                }
+            }
+
+            VStack(spacing: 10) {
+                CampaignArchiveShelf {
+                    if presentation.slots.isEmpty {
+                        emptyShelf
+                    } else {
+                        VStack(spacing: 8) {
+                            ForEach(presentation.slots) { slot in
+                                CampaignSlotCard(
+                                    slot: slot,
+                                    compact: true,
+                                    isContinueSlot: slot.id == presentation.continueSlot?.id,
+                                    onLoad: { onLoad(slot.id) },
+                                    onDetails: { focusedSlot = slot })
+                            }
+                        }
+                    }
+                }
+                .frame(height: CampaignStartLayoutPolicy.ordinaryShelfHeight)
+
+                if let slot = presentation.continueSlot {
+                    HStack(spacing: 8) {
+                        Text("Selected campaign")
+                            .font(.custom("Tiny5", size: 9))
+                            .textCase(.uppercase)
+                        Text(slot.name)
+                            .font(.custom("Jersey 10", size: 15))
+                            .lineLimit(1)
+                        Spacer(minLength: 0)
+                    }
+                    .padding(.horizontal, 10)
+                    .frame(minHeight: 54)
+                    .background {
+                        Rectangle().fill(PixelUITheme.shadow.opacity(0.45)).offset(x: 3, y: 3)
+                        Rectangle().fill(PixelUITheme.surface)
+                    }
+                    .overlay(Rectangle().stroke(PixelUITheme.edge, lineWidth: 2))
+                }
+            }
+            .padding(.horizontal, 12)
+            .padding(.vertical, 10)
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+
+            primaryActions
+                .padding(.horizontal, 14)
+                .padding(.top, 10)
+                .padding(.bottom, 20)
+                .frame(height: CampaignStartLayoutPolicy.ordinaryBottomRailHeight)
+                .background(PixelUITheme.surfaceRaised)
+                .overlay(alignment: .top) { Rectangle().fill(PixelUITheme.edge).frame(height: 2) }
+        }
+        .foregroundStyle(CampaignShelfPalette.ink)
+        .background(CampaignPaperBackground())
+    }
+
+    private var emptyShelf: some View {
+        VStack(spacing: 7) {
+            Text("▥").font(.system(size: 48, weight: .bold, design: .monospaced))
+            Text("Your shelf is waiting").font(.custom("Jersey 10", size: 20))
+            Text("Begin a campaign. Each new game keeps its own progress.")
+                .font(.callout)
+                .foregroundStyle(CampaignShelfPalette.muted)
+        }
+        .frame(maxWidth: .infinity, minHeight: 360)
     }
 
     private func campaignContents(compactSlots: Bool) -> some View {
@@ -280,21 +375,21 @@ struct CampaignStartView: View {
     }
 
     @ViewBuilder private var primaryActionButtons: some View {
+            CampaignStartPrimaryAction(title: "New Game",
+                                       subtitle: "",
+                                       icon: "plus.rectangle.on.folder",
+                                       emphasized: presentation.isEmpty,
+                                       identifier: "campaign.primary.new",
+                                       action: onNewGame)
+
             if let slot = presentation.continueSlot {
-                CampaignStartPrimaryAction(title: "Continue", subtitle: slot.name,
+                CampaignStartPrimaryAction(title: "Continue \(slot.name)", subtitle: "",
                                            icon: "book.pages.fill", emphasized: true,
                                            identifier: "campaign.primary.continue") {
                     onContinue(slot.id)
                 }
                 .accessibilityHint("Opens the most recently played available campaign")
             }
-
-            CampaignStartPrimaryAction(title: "New Game",
-                                       subtitle: "Create a separate campaign",
-                                       icon: "plus.rectangle.on.folder",
-                                       emphasized: presentation.isEmpty,
-                                       identifier: "campaign.primary.new",
-                                       action: onNewGame)
     }
 
     private var slotColumns: [GridItem] {
@@ -325,14 +420,16 @@ struct CampaignStartPrimaryAction: View {
         button
             .buttonStyle(.plain)
             .foregroundStyle(emphasized ? Color.white : CampaignShelfPalette.ink)
-            .background(emphasized ? PixelUITheme.primary : CampaignShelfPalette.pageHighlight)
+            .background {
+                Rectangle().fill(CampaignShelfPalette.shelf.opacity(0.45)).offset(x: 3, y: 3)
+                Rectangle().fill(emphasized ? PixelUITheme.primary : CampaignShelfPalette.pageHighlight)
+            }
             .overlay {
                 Rectangle()
                     .stroke(emphasized ? PixelUITheme.primaryHighlight : CampaignShelfPalette.shelf,
                             lineWidth: 2)
                     .allowsHitTesting(false)
             }
-            .shadow(color: CampaignShelfPalette.shelf.opacity(0.45), radius: 0, x: 3, y: 3)
         .frame(maxWidth: .infinity)
     }
 
@@ -363,6 +460,62 @@ private struct CampaignShelf<Content: View>: View {
     }
 }
 
+private struct CampaignArchiveShelf<Content: View>: View {
+    let content: Content
+
+    init(@ViewBuilder content: () -> Content) { self.content = content() }
+
+    var body: some View {
+        ZStack(alignment: .topLeading) {
+            HStack(spacing: 0) {
+                ForEach(0..<18, id: \.self) { index in
+                    Rectangle()
+                        .fill(index.isMultiple(of: 3)
+                              ? CampaignShelfPalette.shelfHighlight
+                              : CampaignShelfPalette.shelfWood)
+                }
+            }
+            Text("ARCHIVE SHELF")
+                .font(.custom("Tiny5", size: 9))
+                .tracking(2)
+                .foregroundStyle(PixelUITheme.neutralHighlight)
+                .padding(.leading, 12)
+                .padding(.top, 6)
+
+            ScrollView {
+                content.padding(.horizontal, 12).padding(.vertical, 4)
+            }
+            .scrollIndicators(.hidden)
+            .contentMargins(.top, 24, for: .scrollContent)
+            .contentMargins(.bottom, 18, for: .scrollContent)
+        }
+        .overlay(alignment: .top) { Rectangle().fill(CampaignShelfPalette.shelfHighlight).frame(height: 4) }
+        .overlay(alignment: .bottom) { Rectangle().fill(CampaignShelfPalette.shelf).frame(height: 9) }
+        .overlay(Rectangle().stroke(CampaignShelfPalette.shelf, lineWidth: 3))
+        .background {
+            Rectangle().fill(PixelUITheme.shadow.opacity(0.65)).offset(x: 5, y: 5)
+        }
+        .accessibilityIdentifier("campaign.archive-shelf")
+    }
+}
+
+private struct CampaignPaperBackground: View {
+    var body: some View {
+        Canvas { context, size in
+            context.fill(Path(CGRect(origin: .zero, size: size)), with: .color(PixelUITheme.screen))
+            var grid = Path()
+            stride(from: CGFloat(0), through: size.width, by: 8).forEach { x in
+                grid.move(to: CGPoint(x: x, y: 0)); grid.addLine(to: CGPoint(x: x, y: size.height))
+            }
+            stride(from: CGFloat(0), through: size.height, by: 8).forEach { y in
+                grid.move(to: CGPoint(x: 0, y: y)); grid.addLine(to: CGPoint(x: size.width, y: y))
+            }
+            context.stroke(grid, with: .color(PixelUITheme.edge.opacity(0.08)), lineWidth: 0.5)
+        }
+        .allowsHitTesting(false)
+    }
+}
+
 struct CampaignStartActionLabel: View {
     let title: String
     let subtitle: String
@@ -370,14 +523,11 @@ struct CampaignStartActionLabel: View {
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
     var body: some View {
-        HStack(spacing: 12) {
-            Image(systemName: icon).font(.body.weight(.semibold))
-            VStack(alignment: .leading, spacing: 2) {
-                Text(title).font(.callout.weight(.semibold))
-                Text(subtitle).font(.caption).lineLimit(2)
-            }
-            Spacer()
-        }
+        Text(title)
+            .font(.custom("Jersey 10", size: 17))
+            .lineLimit(1)
+            .minimumScaleFactor(0.72)
+            .multilineTextAlignment(.center)
         .frame(maxWidth: .infinity,
                minHeight: CampaignStartLayoutPolicy.primaryActionLabelHeight(
                    dynamicTypeSize: dynamicTypeSize
@@ -385,14 +535,17 @@ struct CampaignStartActionLabel: View {
                maxHeight: CampaignStartLayoutPolicy.primaryActionLabelHeight(
                    dynamicTypeSize: dynamicTypeSize
                ),
-               alignment: .leading)
+               alignment: .center)
         .contentShape(Rectangle())
+        .clipShape(.rect(cornerRadii: RectangleCornerRadii(topLeading: 4, bottomLeading: 4,
+                                                            bottomTrailing: 4, topTrailing: 4)))
     }
 }
 
 private struct CampaignSlotCard: View {
     let slot: CampaignSlotSummary
     let compact: Bool
+    var isContinueSlot = false
     let onLoad: () -> Void
     let onDetails: () -> Void
 
@@ -402,60 +555,54 @@ private struct CampaignSlotCard: View {
 
     private var compactBody: some View {
         Button(action: slot.health.canLoad ? onLoad : onDetails) {
-            VStack(alignment: .leading, spacing: 4) {
-                HStack(alignment: .top, spacing: 6) {
+            VStack(alignment: .leading, spacing: 0) {
+                HStack(alignment: .bottom, spacing: 7) {
                     CampaignBookplateMotif(id: slot.id, bookCount: slot.progressBookCount)
-                        .frame(height: 25)
+                        .frame(height: 34)
                         .accessibilityHidden(true)
                     Spacer(minLength: 0)
                     CampaignSlotStatusBadge(slot: slot)
                 }
-
-                HStack(alignment: .firstTextBaseline, spacing: 4) {
-                    Text(slot.name)
-                        .font(.subheadline.weight(.semibold))
-                        .lineLimit(1)
-                    Spacer(minLength: 0)
+                .padding(.bottom, 4)
+                .overlay(alignment: .bottom) {
+                    Rectangle().fill(CampaignShelfPalette.shelf.opacity(0.65)).frame(height: 1)
                 }
 
+                Text(slot.name)
+                    .font(.custom("Jersey 10", size: 16))
+                    .lineLimit(1)
+                    .padding(.top, 4)
+
                 if slot.hasKnownMetadata {
-                    HStack(spacing: 5) {
+                    HStack(spacing: 4) {
                         Text("Level \(slot.binderLevel)")
-                        Text("·")
+                        Spacer(minLength: 4)
                         Text(slot.location)
                     }
-                    .font(.caption2)
+                    .font(.custom("Tiny5", size: 9))
                     .lineLimit(1)
-                    .minimumScaleFactor(0.78)
 
                     HStack(spacing: 4) {
                         Text(CampaignShelfProgress.volumeLabel(for: slot.progressBookCount))
-                        Text("·")
+                        Spacer(minLength: 4)
                         Text(slot.lastPlayed.formatted(date: .abbreviated, time: .shortened))
                     }
-                    .font(.caption2)
+                    .font(.custom("Tiny5", size: 9))
                     .foregroundStyle(CampaignShelfPalette.muted)
                     .lineLimit(1)
-                    .minimumScaleFactor(0.72)
                     .accessibilityElement(children: .combine)
                     .accessibilityLabel(
                         "Level \(slot.binderLevel), \(slot.location), \(CampaignShelfProgress.volumeLabel(for: slot.progressBookCount)), last played \(slot.lastPlayed.formatted(date: .abbreviated, time: .shortened))"
                     )
                 }
 
-                #if DEBUG
-                if let debugVersion = slot.debugVersion {
-                    Text(debugVersion.uppercased())
-                        .font(.system(size: 7, weight: .bold, design: .monospaced))
-                        .lineLimit(1)
-                        .foregroundStyle(CampaignShelfPalette.muted)
-                }
-                #endif
             }
-            .padding(.horizontal, 7)
-            .padding(.vertical, 5)
+            .padding(.leading, 10)
+            .padding(.trailing, 36)
+            .padding(.vertical, 7)
             .frame(maxWidth: .infinity,
                    minHeight: CampaignStartLayoutPolicy.ordinarySlotCardMinimumHeight,
+                   maxHeight: CampaignStartLayoutPolicy.ordinarySlotCardMinimumHeight,
                    alignment: .leading)
             .contentShape(Rectangle())
         }
@@ -469,12 +616,29 @@ private struct CampaignSlotCard: View {
             Button("Details", systemImage: "info.circle", action: onDetails)
         }
         .foregroundStyle(CampaignShelfPalette.ink)
-        .background(CampaignShelfPalette.cover(for: slot.id))
-        .overlay(alignment: .leading) {
-            Rectangle().fill(CampaignShelfPalette.pageHighlight.opacity(0.72)).frame(width: 5)
+        .background {
+            Rectangle().fill(PixelUITheme.shadow.opacity(0.7)).offset(x: 4, y: 5)
+            Rectangle().fill(CampaignShelfPalette.cover(for: slot.id))
         }
-        .overlay(Rectangle().stroke(CampaignShelfPalette.shelf, lineWidth: 2))
-        .shadow(color: CampaignShelfPalette.shelf.opacity(0.48), radius: 0, x: 3, y: 3)
+        .overlay {
+            Rectangle().inset(by: 5).stroke(CampaignShelfPalette.shelf.opacity(0.55), lineWidth: 1)
+                .allowsHitTesting(false)
+        }
+        .overlay(alignment: .bottomTrailing) {
+            Text(isContinueSlot ? "◆" : slot.health.canLoad ? "◇" : "×")
+                .font(.custom("Tiny5", size: 12))
+                .foregroundStyle(CampaignShelfPalette.shelf)
+                .frame(width: 23, height: 23)
+                .background(PixelUITheme.clasp)
+                .overlay(Rectangle().stroke(CampaignShelfPalette.shelf, lineWidth: 2))
+                .padding(7)
+        }
+        .overlay(Rectangle().stroke(CampaignShelfPalette.shelf, lineWidth: 3))
+        .overlay {
+            if isContinueSlot {
+                Rectangle().stroke(PixelUITheme.clasp, lineWidth: 3).padding(-3)
+            }
+        }
         .accessibilityElement(children: .contain)
     }
 
@@ -528,9 +692,7 @@ private struct CampaignSlotStatusBadge: View {
     let slot: CampaignSlotSummary
 
     var body: some View {
-        Label(slot.health.label.uppercased(),
-              systemImage: slot.health.canLoad ? "checkmark.circle.fill" : "exclamationmark.triangle.fill")
-            .labelStyle(.titleAndIcon)
+        Text(slot.health.label.uppercased())
             .font(.system(size: 7, weight: .bold, design: .monospaced))
             .lineLimit(1)
             .minimumScaleFactor(0.7)
@@ -599,26 +761,33 @@ private struct CampaignBookplateMotif: View {
     let id: UUID
     let bookCount: Int
 
-    private var marks: [Bool] {
-        withUnsafeBytes(of: id.uuid) { bytes in
-            (0..<max(0, bookCount)).map { index in
-                (bytes[index % bytes.count] & UInt8(1 << (index % 4))) != 0
-            }
-        }
-    }
-
     var body: some View {
         HStack(spacing: 3) {
-            ForEach(marks.indices, id: \.self) { index in
-                RoundedRectangle(cornerRadius: 1)
-                    .fill(marks[index] ? Color.primary.opacity(0.68) : Color.primary.opacity(0.2))
-                    .frame(width: index.isMultiple(of: 3) ? 5 : 3,
-                           height: marks[index] ? 28 : 18)
+            ForEach(0..<max(0, bookCount), id: \.self) { index in
+                ZStack(alignment: .bottom) {
+                    Rectangle()
+                        .fill(volumeColor(index))
+                        .overlay(alignment: .leading) {
+                            Rectangle().fill(Color.white.opacity(0.28)).frame(width: 2)
+                        }
+                        .overlay(Rectangle().stroke(CampaignShelfPalette.shelf, lineWidth: 2))
+                    Text("\(index + 1)")
+                        .font(.custom("Tiny5", size: 6))
+                        .foregroundStyle(CampaignShelfPalette.shelf)
+                        .padding(.bottom, 2)
+                }
+                .frame(width: 12, height: CGFloat([24, 28, 32][index % 3]))
             }
         }
-        .padding(.horizontal, 10)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .overlay(alignment: .bottom) { Rectangle().fill(Color.primary.opacity(0.5)).frame(height: 2) }
+    }
+
+    private func volumeColor(_ index: Int) -> Color {
+        switch index % 3 {
+        case 0: PixelUITheme.neutralHighlight
+        case 1: PixelUITheme.danger.opacity(0.78)
+        default: PixelUITheme.primary.opacity(0.78)
+        }
     }
 }
 

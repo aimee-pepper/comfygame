@@ -33,6 +33,13 @@ enum PixelUITheme {
         let primaryHighlight: RGB
         let danger: RGB
         let shadow: RGB
+        let wood: RGB
+        let woodHighlight: RGB
+        let woodDark: RGB
+        let coverOchre: RGB
+        let coverTeal: RGB
+        let coverMauve: RGB
+        let clasp: RGB
     }
 
     static let light = Palette(
@@ -40,14 +47,20 @@ enum PixelUITheme {
         surfaceRaised: rgb(0xEAD6AA), surfaceInset: rgb(0xD8BD88), edge: rgb(0x62472E),
         edgeDark: rgb(0x32261D), text: rgb(0x2D2118), muted: rgb(0x665542),
         neutral: rgb(0xCFAA72), neutralHighlight: rgb(0xEFD39D), primary: rgb(0x2F718F),
-        primaryHighlight: rgb(0x63A7BD), danger: rgb(0x943D35), shadow: rgb(0x2F241C))
+        primaryHighlight: rgb(0x63A7BD), danger: rgb(0x943D35), shadow: rgb(0x2F241C),
+        wood: rgb(0x7E5434), woodHighlight: rgb(0xB17B48), woodDark: rgb(0x3C281B),
+        coverOchre: rgb(0xC99656), coverTeal: rgb(0x73908A), coverMauve: rgb(0x9A6C78),
+        clasp: rgb(0xD7B66F))
 
     static let dark = Palette(
         screen: rgb(0x111B1D), headerB: rgb(0x263B3E), surface: rgb(0x223538),
         surfaceRaised: rgb(0x2A4043), surfaceInset: rgb(0x19292C), edge: rgb(0x607B78),
         edgeDark: rgb(0x0A1214), text: rgb(0xF2EAD9), muted: rgb(0xA9BFBA),
         neutral: rgb(0x31484B), neutralHighlight: rgb(0x526C6E), primary: rgb(0x347DA7),
-        primaryHighlight: rgb(0x69AFD4), danger: rgb(0xEF8A82), shadow: rgb(0x05090A))
+        primaryHighlight: rgb(0x69AFD4), danger: rgb(0xEF8A82), shadow: rgb(0x05090A),
+        wood: rgb(0x4A3529), woodHighlight: rgb(0x765537), woodDark: rgb(0x17100D),
+        coverOchre: rgb(0x8C6944), coverTeal: rgb(0x506F6D), coverMauve: rgb(0x72515F),
+        clasp: rgb(0xC5A663))
 
     static func palette(for scheme: ColorScheme) -> Palette { scheme == .dark ? dark : light }
 
@@ -72,6 +85,13 @@ enum PixelUITheme {
     static let primaryHighlight = adaptive(\.primaryHighlight)
     static let danger = adaptive(\.danger)
     static let shadow = adaptive(\.shadow)
+    static let wood = adaptive(\.wood)
+    static let woodHighlight = adaptive(\.woodHighlight)
+    static let woodDark = adaptive(\.woodDark)
+    static let coverOchre = adaptive(\.coverOchre)
+    static let coverTeal = adaptive(\.coverTeal)
+    static let coverMauve = adaptive(\.coverMauve)
+    static let clasp = adaptive(\.clasp)
 
     private static func adaptive(_ role: KeyPath<Palette, RGB>) -> Color {
         Color(uiColor: UIColor { traits in
