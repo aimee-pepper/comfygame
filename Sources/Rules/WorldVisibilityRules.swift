@@ -19,8 +19,9 @@ extension WorldRules {
         let fullRadius: Int
         let fringeWidth: Int
         let fringeOpacity: Double
-        let fringeBlurFraction: Double
-        let fogEdgeBlurPoints: Double
+        /// Blur represents particulate atmosphere only. Ordinary darkness and sight falloff are
+        /// expressed through disclosure and brightness, never by defocusing terrain.
+        let atmosphericBlurPoints: Double
         let obscurantDensity: Double
     }
 
@@ -60,8 +61,7 @@ extension WorldRules {
             fullRadius: fullRadius,
             fringeWidth: fringeWidth,
             fringeOpacity: Tuning.Visibility.defaultFringeOpacity * lightFraction * obscurantTransmission,
-            fringeBlurFraction: min(1, Tuning.Visibility.defaultFringeBlurFraction + density / 200),
-            fogEdgeBlurPoints: Tuning.Visibility.defaultFogEdgeBlurPoints + density * 0.04,
+            atmosphericBlurPoints: density / 100 * Tuning.Visibility.maximumAtmosphericBlurPoints,
             obscurantDensity: density
         )
     }

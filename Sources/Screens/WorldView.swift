@@ -1163,12 +1163,6 @@ struct WorldTileVisibilityPresentation {
             : profile.fringeOpacity
     }
 
-    static func fringeBlurFraction(profile: WorldRules.VisibilityProfile,
-                                   remembered: Bool) -> Double {
-        remembered ? min(profile.fringeBlurFraction,
-                          Tuning.Visibility.defaultFringeBlurFraction)
-            : profile.fringeBlurFraction
-    }
 }
 
 private struct TileView: View {
@@ -1192,21 +1186,9 @@ private struct TileView: View {
             if visibility == .hidden {
                 Rectangle().fill(Color.black)
             } else if useSimpleRenderer {
-                Rectangle().fill(background)
-                if tile.isRevealed && tile.isCracking && !tile.isCrumbled {
-                    SimpleCrackShape()
-                        .stroke(Color.orange.opacity(0.95),
-                                style: StrokeStyle(lineWidth: max(1, side * 0.07),
-                                                   lineCap: .round, lineJoin: .round))
-                        .padding(side * 0.12)
-                }
-            } else if let artRequest {
-                MapTileArt(request: artRequest)
-                    .frame(width: side,
-                           height: side * CGFloat(MapAssetContract.spriteHeight)
-                               / CGFloat(MapAssetContract.logicalSide))
-                    .offset(y: -side * CGFloat(MapAssetContract.maximumElevation)
-                            / CGFloat(MapAssetContract.logicalSide))
+                terrainLayer
+            } else if artRequest != nil {
+                terrainLayer
             }
             ZStack {
                 // The player gets a filled disc behind them: at 27pt a bare glyph disappears into
@@ -1248,9 +1230,6 @@ private struct TileView: View {
                     .offset(x: side * 0.30, y: -side * 0.30)
             }
         }
-        .blur(radius: visibility == .fringe
-              ? side * CGFloat(WorldTileVisibilityPresentation.fringeBlurFraction(
-                  profile: visibilityProfile, remembered: isRememberedTerrain)) : 0)
         .overlay {
             switch visibility {
             case .full:
@@ -1264,6 +1243,37 @@ private struct TileView: View {
         }
         .frame(width: side, height: side)
         .contentShape(Rectangle())
+    }
+
+    @ViewBuilder private var terrainLayer: some View {
+        Group {
+            if useSimpleRenderer {
+                ZStack {
+                    Rectangle().fill(background)
+                    if tile.isRevealed && tile.isCracking && !tile.isCrumbled {
+                        SimpleCrackShape()
+                            .stroke(Color.orange.opacity(0.95),
+                                    style: StrokeStyle(lineWidth: max(1, side * 0.07),
+                                                       lineCap: .round, lineJoin: .round))
+                            .padding(side * 0.12)
+                    }
+                }
+            } else if let artRequest {
+                MapTileArt(request: artRequest)
+                    .frame(width: side,
+                           height: side * CGFloat(MapAssetContract.spriteHeight)
+                               / CGFloat(MapAssetContract.logicalSide))
+                    .offset(y: -side * CGFloat(MapAssetContract.maximumElevation)
+                            / CGFloat(MapAssetContract.logicalSide))
+            }
+        }
+        // Establish the logical tile before filtering. This prevents the lifted 16×19 sprite and
+        // neighbouring rows from becoming one blur input. `opaque` edge-clamps the already-cropped
+        // terrain instead of sampling transparent elevation padding.
+        .frame(width: side, height: side, alignment: .top)
+        .clipped()
+        .blur(radius: CGFloat(visibilityProfile.atmosphericBlurPoints), opaque: true)
+        .clipped()
     }
 
     private var surfaceLift: CGFloat {

@@ -308,8 +308,7 @@ enum Tuning {
         static let defaultFringeWidth = 2
         static let darkFringeWidth = 0
         static let defaultFringeOpacity = 0.5
-        static let defaultFringeBlurFraction = 0.5
-        static let defaultFogEdgeBlurPoints = 2.0
+        static let maximumAtmosphericBlurPoints = 4.0
         static let lowLightUpperBound = 25.0
         static let ordinaryLightFloor = 45.0
         static let densityPerRadiusLoss = 25.0

@@ -22,8 +22,7 @@ final class WorldVisibilityRulesTests: XCTestCase {
         let pitchBlack = WorldRules.visibilityProfile(illumination: 0)
         XCTAssertEqual(WorldTileVisibilityPresentation.fringeOpacity(
             profile: pitchBlack, remembered: true), Tuning.Visibility.defaultFringeOpacity)
-        XCTAssertEqual(WorldTileVisibilityPresentation.fringeBlurFraction(
-            profile: pitchBlack, remembered: true), Tuning.Visibility.defaultFringeBlurFraction)
+        XCTAssertEqual(pitchBlack.atmosphericBlurPoints, 0)
         XCTAssertEqual(WorldTileVisibilityPresentation.fringeOpacity(
             profile: pitchBlack, remembered: false), 0)
     }
@@ -134,8 +133,7 @@ final class WorldVisibilityRulesTests: XCTestCase {
         XCTAssertEqual(profile.fullRadius, 7)
         XCTAssertEqual(profile.fringeWidth, 2)
         XCTAssertEqual(profile.fringeOpacity, 0.5, accuracy: 0.000_001)
-        XCTAssertEqual(profile.fringeBlurFraction, 0.5, accuracy: 0.000_001)
-        XCTAssertEqual(profile.fogEdgeBlurPoints, 2, accuracy: 0.000_001)
+        XCTAssertEqual(profile.atmosphericBlurPoints, 0, accuracy: 0.000_001)
     }
 
     func testPitchBlackLeavesOnlyImmediateRingAndNoFringe() {
@@ -154,8 +152,7 @@ final class WorldVisibilityRulesTests: XCTestCase {
         XCTAssertEqual(profile.fullRadius, 3)
         XCTAssertEqual(profile.fringeWidth, 1)
         XCTAssertEqual(profile.fringeOpacity, 0.16, accuracy: 0.000_001)
-        XCTAssertEqual(profile.fringeBlurFraction, 0.925, accuracy: 0.000_001)
-        XCTAssertEqual(profile.fogEdgeBlurPoints, 5.4, accuracy: 0.000_001)
+        XCTAssertEqual(profile.atmosphericBlurPoints, 3.4, accuracy: 0.000_001)
     }
 
     func testObscurantCanNeverHideTheImmediateRing() {
