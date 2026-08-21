@@ -190,7 +190,8 @@ When two documents disagree:
 | Player-facing screen grammar | `player-facing-screen-grammar-current.md` | Semantic spatial/grid/list rules and ordered correction queue |
 | Remaining native list audit | `remaining-native-list-surface-audit-current.md` | Code-backed classification of three remaining collection/action list failures versus legitimate ordered/detail lists |
 | Base destination catalogue compatibility | `base-destination-board-current.md` | Stable internal destination IDs/routes only; player placement is Binder House + Library shelves + three village districts |
-| Binder House and village | `home-house-and-village-current.md` | Four-zone house cutaway, exterior village, standardized signs, persisted attention and no town damage |
+| Binder House and village | `home-house-and-village-current.md` | Binder House/yard root, three village districts, preserved Constellation route, standardized signs, persisted attention and no town damage |
+| Village progression and production assets | `village-progression-and-asset-matrix-current.md` | Destination kinds, exact district map, built/improved/mastered ladder, six-star district/combat Mote proposal and asset-by-asset functional referents |
 | Workshop / Constellation role review | `workshop-constellation-role-audit-current.md` | Workshop removal settled; Party never teaches; recovered knowledge, physical capacity owners and the campaign-wide Mote mastery proposal are specified with open choices labelled |
 | Active House/village/Library Asset packet | `home-village-library-asset-packet-current.md` | Exact AssetLab-only camera, topology, fixture, evidence and stop conditions; no native or invented mechanics |
 | Historical starting-town slice | `starting-town-band1-integration-current.md` | Superseded five-hotspot proposal retained for history only |

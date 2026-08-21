@@ -53,6 +53,10 @@ fixtures for the complete data-driven mineral table in `resource-extraction-prog
 
 **Date:** 21 August 2026
 
+**Historical correction:** the original six-hotspot sentence below records the proposal at this point in
+the session. Decision 294 removes Workshop; Decision 300 preserves Constellation as a review-gated mastery
+surface. Current navigation authority is `home-house-and-village-current.md`.
+
 The Base root is the Binder House/yard, not House/Village tabs. Its six hotspots are Writing Desk, Library,
 Constellation, Workshop, Party and yard Essence Spring. Bestiary is inside Library. Storehouse is a separate
 town-supplying building in The Commons. Left/right/down open Commerce Row, Makers' Row and The Commons; the
@@ -151,6 +155,9 @@ belongs to Storehouse/Tannery. Existing ownership and paid effects are preserved
 
 **Date:** 21 August 2026
 
+**Historical status:** Decision 300 expands this three-star proposal into the current review-gated pair of
+three-star clusters. This entry preserves the earlier reasoning and is not the current full graph.
+
 Do not retire or expand Constellation yet. The current review proposes three campaign-wide stars that open
 depths 4–5 of Offense, Defense or Craft for every current/future person while every node still costs its
 ordinary point and prerequisites. Long Instruction may remain as the one universal Gambit-capacity star once
@@ -190,3 +197,45 @@ The shorthand `3% / 1.5% / 0.5%` means absolute per-victorious-ordinary-encounte
 eligible consumable and ordinary cache key respectively, with 95% no bonus and at most one result. It is
 equivalent to one 5% find roll followed by 60/30/10 category weights. It is per encounter, not per creature,
 and Teeming does not multiply it. These rates are explained for review, not yet authorized for implementation.
+
+## 299. Every real village building gets Built, Improved and Mastered forms
+
+**Date:** 21 August 2026
+
+The live station catalogue's mixed `maxTier` values are not visual or progression authority. Every actual
+village building now targets three constructed forms: useful Built/Tier 0, decision-adding Improved/Tier 1
+and culminating Mastered/Tier 2. No village structure is ever damaged. Rooms, shelves, Party, Essence Spring,
+Constellation and removed Workshop compatibility are not fake buildings and do not inherit these tiers.
+
+Each rung has a real capability and a physical addition to the same recognizable structure. Station tiers
+open capabilities, schematics, convenience or reach; they never impose a hard quality cap. Exact building
+effects and visual anchors are in `village-progression-and-asset-matrix-current.md`. Existing higher-tier
+save entitlements must migrate to the nearest equal-or-better new entitlement without loss.
+
+## 300. The current Constellation recommendation is two matched three-star mastery clusters
+
+**Date:** 21 August 2026
+
+**Review status:** reversible Game Design recommendation awaiting Aimee's direct acceptance; do not implement
+new consumers yet.
+
+Keep the current Long Instruction star and propose Offense, Defense and Fieldcraft mastery beside Commerce,
+Makers and Commons mastery. A combat star permits depth-4/5 purchases in that discipline campaign-wide; a
+village star permits Tier-2 activation across that district. The Mote buys permission—not a node, recipe or
+building—and every underlying purchase/cost/prerequisite remains. Initial tuning is one Mote per mastery.
+Purchases live in the current save's Reality layer; a genuinely new save starts clean.
+
+This uses three village gates instead of taxing every shop and aligns the town's three directions with the
+combat tree's three disciplines. Exact prerequisites and migration are in
+`village-progression-and-asset-matrix-current.md` and `workshop-constellation-role-audit-current.md`.
+
+## 301. Village art advances through one finished-sprite style gate
+
+**Date:** 21 August 2026
+
+The rejected House/Library batches remain exporter infrastructure, not an aesthetic seed. Asset work resumes
+with one finished label-free Tier-0 Trading Post sprite. It must pass native-size, 400% nearest-neighbour,
+grayscale and phone-placement review before the opening-five set, upgrade forms, Binder House or close-up
+Library proceeds. This prevents another technically complete batch from propagating an unaccepted visual
+language. Exact pixel dimensions, physical referents and forbidden readings live in
+`home-village-library-asset-packet-current.md` and `village-progression-and-asset-matrix-current.md`.

@@ -1,7 +1,8 @@
 # Workshop and Constellation role audit — current
 
-**Status:** Workshop removal is settled. Knowledge redistribution and Constellation/Mote expansion are
-current Game Design work; their open choices are explicitly labelled below.
+**Status:** Workshop removal is settled. Knowledge redistribution remains current Game Design work. The
+six-star Constellation structure below is the current reversible recommendation for direct Aimee review;
+Engineering must not add its new consumers until that review.
 **Scope:** the opening Binder House destinations, 54 live Workshop nodes, Gambit acquisition/capacity,
 world-writing vocabulary, Storehouse/satchel capacity and Mote progression.
 **Updated:** 21 August 2026
@@ -16,9 +17,9 @@ it selects people, gear, rank/formation, skills and already-known Gambits. It ne
 teaches anything. Learning must have an attributable source in the world, in writing, from a person or at a
 real building; the Party surface only applies what the campaign already knows.
 
-The earlier recommendation to retire Constellation is also **not settled**. Aimee's Mote-gate proposal gives
-it a potentially coherent job, evaluated below. Asset and Engineering must not remove, expand or finalize
-the hotspot until that model is accepted or rejected.
+The earlier recommendation to retire Constellation is withdrawn for now. Aimee's Mote-gate proposal gives
+it a coherent job, evaluated below. Preserve the current truthful one-star surface; Asset and Engineering
+must not expand it until the six-star model is accepted or revised.
 
 ## What the live Workshop actually contains
 
@@ -142,8 +143,10 @@ migration:
 
 ### The useful version
 
-Keep Constellation as a small campaign-mastery graph if Motes open **upper bands**, rather than purchasing
-individual skills or acting as a tax on every upgrade.
+Keep Constellation as a small campaign-mastery graph where Motes open **upper bands**, rather than purchasing
+individual skills or acting as a tax on every upgrade. The current complete recommendation is specified in
+`village-progression-and-asset-matrix-current.md`: two matched trios—personal combat mastery and village
+district mastery—plus the smaller Long Instruction star.
 
 First proposed live graph:
 
@@ -152,14 +155,18 @@ First proposed live graph:
 | Offensive Mastery | any person owns a connected depth-3 Offense node | depth 4–5 Offense nodes may be bought normally | every current/future person in this campaign |
 | Defensive Mastery | same for Defense | depth 4–5 Defense nodes may be bought normally | same |
 | Fieldcraft Mastery | same for Craft | depth 4–5 Craft nodes may be bought normally | same |
+| Commerce Mastery | one Commerce building has reached effective Tier 1 | Tier-2/mastered Commerce upgrades may activate | every current/future Commerce building in this campaign |
+| Makers' Mastery | one Makers' Row building has reached effective Tier 1 | Tier-2/mastered Makers' upgrades may activate | every current/future Makers' building in this campaign |
+| Commons Mastery | one Commons building has reached effective Tier 1 | Tier-2/mastered Commons upgrades may activate | every current/future Commons building in this campaign |
 | The Long Instruction | current live purchase | +1 Gambit rule capacity | every current/future eligible person |
 
-The Mote buys permission, not the skill. Every combat node still needs its point and prerequisites. One star
-opens a whole tree for the campaign, so recruits do not pay again and the player is not charged per person or
-per node. Initial playtest recommendation is **one Mote per mastery star**; this is tuning, not settled
-economy. Long Instruction retains its current cost until the first combined Mote-economy simulation.
+The Mote buys permission, not the skill or building. Every combat node still needs its point and
+prerequisites; every mastered building still needs its own Tier-2 cost and prerequisites. One star opens a
+whole tree/district for the campaign, so the player is not charged per person, node, recipe or shop. Initial
+playtest recommendation is **one Mote per mastery star**; this is tuning, not settled economy. Long
+Instruction retains its current cost until the first combined Mote-economy simulation.
 
-### Why not put Motes on every shop track
+### Why district permissions are not per-shop Mote taxes
 
 Potential benefits are a meaningful rare currency, memorable capstone moments and long-term value that
 survives later campaign-layer resets. The costs are more serious:
@@ -170,10 +177,10 @@ survives later campaign-layer resets. The costs are more serious:
 - account-wide persistence across unrelated save slots makes fresh starts and testing dishonest;
 - a late shop can be blocked by Mote luck even after the player built it and supplied its resources.
 
-Therefore the first slice gates only the three combat-tree mastery bands. Shop use remains a later, bounded
-experiment: at most one broad **masterwork permission** shared by multiple eligible maker stations, never one
-Mote per ordinary station tier. Do not add that star until the hybrid crafting rules and at least one
-masterwork recipe are live.
+Therefore one village star covers one entire district. A building's Tier 0 and Tier 1 never require a Mote;
+the star permits only the Tier-2/mastered rung, and buying/earning that rung at each building remains a
+separate ordinary progression decision. This preserves the useful broad-masterwork idea while matching the
+settled three-district geography and avoiding one Mote per shop.
 
 ### Persistence boundary
 
@@ -193,7 +200,7 @@ if Aimee explicitly chooses account-wide meta-progression after seeing the campa
 5. Add decode-only redirects for legacy Workshop links. `workshop` remains a compatibility station ID but
    never renders for a new campaign.
 6. Remove Workshop from House navigation only after all five branch families pass reachability fixtures.
-7. If the Constellation proposal is accepted, migrate Long Instruction unchanged and add only the three real
+7. If the Constellation proposal is accepted, migrate Long Instruction unchanged and add the six real
    mastery consumers; otherwise retain the current one-star compatibility surface until a later decision.
 
 ## Acceptance
@@ -210,7 +217,7 @@ if Aimee explicitly chooses account-wide meta-progression after seeing the campa
 
 ## Open decisions
 
-1. Accept/revise the three campaign-wide combat mastery stars and one-Mote starting price?
+1. Accept/revise the paired three combat + three district mastery stars and one-Mote starting price?
 2. Confirm campaign-slot Reality persistence (recommended) rather than account-wide persistence across
    genuinely separate New Games?
 3. Accept/revise the three Storehouse + three post-starter satchel improvement compression?

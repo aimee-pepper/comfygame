@@ -1,8 +1,9 @@
 # Binder House and village districts — current
 
 **Status:** Game Design implementation authority for the House/district topology. Workshop removal is
-settled by `workshop-constellation-role-audit-current.md`; Constellation alone remains an open interactive
-hotspot pending the Mote-mastery decision. This document replaces the opening spatial model in
+settled by `workshop-constellation-role-audit-current.md`. Constellation is retained as the proposed
+campaign-mastery hotspot while the exact six-star recommendation awaits Aimee's direct acceptance; no
+native expansion may precede that acceptance. This document replaces the opening spatial model in
 `starting-town-band1-integration-current.md` and the Home-tab presentation in
 `base-destination-board-current.md`. It does not change the rules or internal routes of the destinations
 named here.
@@ -75,12 +76,13 @@ points.
 | Work area | optional noninteractive workbench dressing | no Workshop destination; ordinary making belongs to real village stations |
 | Common/planning room | table, chairs/party tokens | **Party** |
 | Yard | spring basin and restrained runoff/growth | **Essence Spring** |
+| Wall chart beside the Library/study | removable star chart or aperture, visually distinct from the bookcase | **Constellation**, reserved but not expanded until the six-star proposal is accepted |
 
 **Bestiary is inside the Library** as its own shelf, governed by `library-shelves-current.md`; it is not a
 separate house hotspot. Workshop remains decode-only compatibility and may appear only as noninteractive
-workbench dressing. Constellation's current implementation is preserved while the real Mote-mastery proposal
-is reviewed; Asset may reserve removable star-chart space but may not wire or finalize it. If Constellation
-remains, this table and the final hotspot manifest are revised before native implementation.
+workbench dressing. Constellation's current one-star route is preserved. The House may reserve its removable
+chart hotspot, but Asset must not illustrate the proposed six purchases and Engineering must not add their
+consumers until Aimee accepts or revises `village-progression-and-asset-matrix-current.md` section 2.
 
 The house contains no Storehouse, Firepit, Trading Post, Recycler, Blacksmith or recruit station. The Essence
 Spring is outside in the house's visible yard, never turned into a household sink. Storehouse and Firepit
@@ -204,7 +206,8 @@ House. Diary deep-links are governed by the Party/Library contract and return to
 
 Asset Design must prove, before native consumption:
 
-1. the ordinary-phone house/yard cutaway with the four settled hotspots above and three district arrows;
+1. the ordinary-phone house/yard cutaway with Writing Desk, Library, Party, Essence Spring, the removable
+   reserved Constellation chart and three district arrows;
 2. a collision overlay showing 44×44 minimum targets and no overlap;
 3. color and grayscale/value versions;
 4. opening Commerce Row, Makers' Row and Commons scenes with no duplicate House tile;
@@ -219,8 +222,9 @@ space. Any visible value/action must exist in the game-owned adapter.
 
 ## Engineering checkpoint order
 
-1. Freeze normalized Binder-House/district metadata with Workshop absent. Keep the Constellation hotspot
-   optional/unwired until its Mote role decision; no native visual replacement may imply the open outcome.
+1. Freeze normalized Binder-House/district metadata with Workshop absent. Preserve the existing
+   Constellation route behind a removable chart hotspot, but do not expand its graph or imply that the open
+   six-star proposal is accepted.
 2. Add presentation-event receipts, idempotent creation/clear rules and migration defaults; expose a DEBUG
    injector for the four exact reasons.
 3. Integrate House cutaway behind a DEBUG route using the existing destination navigation; verify no route
@@ -237,7 +241,8 @@ space. Any visible value/action must exist in the game-owned adapter.
 
 1. Fresh launch, load and expedition return land on the full unclipped Binder House/yard scene.
 2. All accepted house/yard hotspots and three arrows route correctly; no generic Study or Make screen is
-   required to find them. Workshop is absent; Constellation appears only if its role decision retains it.
+   required to find them. Workshop is absent; Constellation retains only its current truthful route until
+   the mastery proposal is accepted.
 3. Party management, Prepare a world and all three districts are reachable without scrolling on 368×800.
 4. Essence Spring is in the house yard; Storehouse and Firepit are in The Commons.
 5. Unknown future stations leak neither name nor silhouette; known buildable stations truthfully explain

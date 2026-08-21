@@ -1,7 +1,10 @@
 # Station integration matrix — current design
 
 **Status:** implementation-facing ownership/dependency authority. Existing live costs remain current;
-new cost bundles are reversible economy placeholders exposed in debug tuning.
+new cost bundles are reversible economy placeholders exposed in debug tuning. Destination kind,
+district placement, the target built/improved/mastered ladder and Asset state are superseded by
+`village-progression-and-asset-matrix-current.md`; catalogue `maxTier` remains a known migration gap
+until each new rung has its real consumer.
 
 ## Station lifecycle types
 

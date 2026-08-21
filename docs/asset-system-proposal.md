@@ -5026,3 +5026,47 @@ functional architecture without labels, intentional material/palette/light/value
 paper→folio→book forms, full native composites and 400% nearest-neighbour crops. Preserve the exact settled
 topology and do not invent mechanics or destinations. Ordinary Chrome visual verification remains open even
 though the HTTP route/MIME and standalone PNG fallback are valid.
+
+#### 21 Aug 2026 — v0.1 second visual pass
+
+**Disposition: still rejected as production art; do not commit, promote, golden or integrate.** Game
+Design inspected the refreshed contact sheet, all three ordinary-phone composites, the five 400%
+station crops, Binder House crop, Library crop and collection-growth crop. The revision is a real
+structural improvement: district, house and Library now read as coherent scenes, the five opening
+stations have distinct functional silhouettes, and the exported outputs are actual deterministic
+RGBA sprites rather than HTML/CSS pseudo-art. Those facts satisfy the technical delivery contract,
+not the aesthetic acceptance gate.
+
+The pixels are still placeholder-quality. Large flat rectangles dominate every sprite; the Trading
+Post is a shop counter, Recycler is a box-and-pipe, Storehouse is three dark rectangles, and Firepit
+is a flame beneath a roof. Binder House contains little beyond a blank desk, shelves, a table and
+three empty blocks, with no convincing domestic or bookbinding material detail. The Library remains
+a labelled shelf matrix with sparse geometric books instead of an inviting, inhabited room whose
+collections visibly grow. Labels continue to carry identity that the art itself should communicate.
+
+The next pass must be an **aesthetic production pass**, not another geometry-density pass. Keep the
+settled topology and stable output contract, but author finished pixel-art source sprites/scenes with
+intentional silhouettes, texture clusters, construction materials, props, shadow and warm/cool light.
+Use direct bitmap art generation and deliberate pixel cleanup where appropriate; do not treat
+integer rectangle commands as the art style. Provide label-free crops as the primary review evidence,
+then the ordinary 368x800 colour/grayscale composites. The Library destination must be a close-up of
+one large bookcase (at most two adjoining cases only if required for native target geometry), with
+recognizable paper, stitched folios, softbound and hardcover forms integrated into its five clickable
+physical shelves. The wider Library area belongs only in the Binder House cutaway; do not make the
+destination a second full-room scene. Binder House must read as a lived-in bookbinder's home and yard;
+each opening station must remain identifiable with its label removed. Ordinary Chrome visual verification
+remains open. No mechanics, destinations or navigation may be invented while correcting the art.
+
+### 21 Aug 2026 — House/village/Library production restart boundary
+
+**Disposition: resume only the Trading Post Tier-0 style gate; all other place art remains paused.** The
+complete purpose, tier and physical-referent authority is now
+`docs/village-progression-and-asset-matrix-current.md`. The active Asset packet requires one 96×80 logical
+pixel, transparent, label-free `trading_post.built` sprite with 400% nearest-neighbour, literal grayscale and
+368×800 Commerce placement evidence. The merchant counter, cloth awning, hanging balance, ledger, tagged
+stock and coin drawer must carry the identity without text, giant iconography or exchange arrows.
+
+Do not continue the interrupted whole-batch bitmap candidate and do not draw Recycler, opening-five, upgrade
+tiers, House, Library, goldens or native assets before this one sprite receives visual acceptance. Existing
+uncommitted files may remain as technical exporter infrastructure only; their previous pixels are not the
+aesthetic source of truth.

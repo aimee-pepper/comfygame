@@ -1,9 +1,11 @@
 # Binder House, village districts and Library — active AssetLab packet
 
-**Status:** Active Asset Design assignment from the Game Design/Orchestration Lead. AssetLab only; no native
-game, Xcode, gameplay schema, roadmap priority or Simulator lifecycle changes.
-**Repository status checked before dispatch:** reconciled `main` at `f9fb44a50ca1ad2c4e8051e8246baab84f600bc9`;
-Engineering idle; Asset Lead idle; encounter scaling remains the sole Engineering source primary.
+**Status:** Active Asset Design assignment from the Game Design/Orchestration Lead. The only current art
+checkpoint is the Trading Post Tier-0 style gate defined below. The larger Library/House/village milestones
+remain future work until that gate is accepted. AssetLab only; no native game, Xcode, gameplay schema,
+roadmap priority or Simulator lifecycle changes.
+**Repository status checked before dispatch:** shared tree reconciled against current status immediately
+before the 21 August assignment; encounter scaling remains the sole Engineering source primary.
 **Player outcome:** Home and Library become recognizable places instead of categories/lists while every
 hotspot continues to mean only its already-settled destination.
 **Updated:** 21 August 2026
@@ -12,18 +14,52 @@ hotspot continues to mean only its already-settled destination.
 
 Asset Design must read and apply these exact current authorities before editing:
 
-1. `home-house-and-village-current.md` — spatial topology, district membership and attention semantics;
-2. `library-shelves-current.md` — five shelves, derived collection stages and disclosure;
-3. `workshop-constellation-role-audit-current.md` — Workshop and Constellation are under active role review;
-4. `asset-questions-decisions.md` — camera, ownership and established AssetLab constraints;
-5. `asset-system-proposal.md` authored-place v0.4 final disposition — accepted station silhouettes;
-6. `asset-production-output-contract-current.md` — reusable pixel products, quality and Chrome-review gate;
-7. `AssetLab/artifacts/place-identity-adaptation-proof-v0.4.png` — current functional identity contract;
-8. approved UI style snapshot
+1. `village-progression-and-asset-matrix-current.md` — exact destination kinds, districts, building
+   tiers, per-asset functional referents, dimensions, camera, materials and review order;
+2. `home-house-and-village-current.md` — spatial topology, district membership and attention semantics;
+3. `library-shelves-current.md` — five shelves, derived collection stages and disclosure;
+4. `workshop-constellation-role-audit-current.md` — Workshop removal and Constellation progression;
+5. `asset-questions-decisions.md` — camera, ownership and established AssetLab constraints;
+6. `asset-system-proposal.md` authored-place v0.4 final disposition — accepted station silhouettes;
+7. `asset-production-output-contract-current.md` — reusable pixel products, quality and Chrome-review gate;
+8. `AssetLab/artifacts/place-identity-adaptation-proof-v0.4.png` — functional collision reference only,
+   not the final aesthetic bar;
+9. approved UI style snapshot
    `AssetLab/reviews/approved-styles/75c4fe58789b8cb16b6587d439a87e5ec5cbed58f211cb8ebc1b0df0416da5a2.css`.
 
 If an older document conflicts, these current design/decision authorities win. Report the conflict; do
 not blend both versions.
+
+The current rejected House/Library v0.1 working files remain technical infrastructure only. Resume art
+from the **Style gate** in `village-progression-and-asset-matrix-current.md`; do not continue the interrupted
+whole-batch bitmap candidate or infer missing details from it.
+
+## Current checkpoint — Trading Post Tier-0 style gate only
+
+Produce one finished label-free `trading_post.built` sprite before drawing any other building, district,
+House room or Library shelf. This is an aesthetic gate, not a request for another complete prototype.
+
+- **Product:** one 96×80 logical-pixel transparent RGBA building sprite using the shared village camera,
+  plus a 400% nearest-neighbour crop, literal grayscale crop and one Commerce Row placement at 368×800.
+- **Identity:** a small timber merchant frontage with open counter, cloth awning, hanging balance, ledger,
+  tagged shelves/crates and a secured coin drawer. Goods may vary, but the scale/ledger/counter must make
+  Vance's buy/sell/appraisal role readable without words.
+- **Continuity anchors reserved for later tiers:** the original counter, balance and primary awning must
+  remain in Tier 1 and Tier 2. Do not draw those later tiers in this checkpoint.
+- **Materials/light:** dark walnut structure, warmer worn counter, muted ochre/cream awning, cool slate
+  shadows, restrained brass highlights and one warm task-light cluster. Use deliberate clusters, texture,
+  wear and shadow; no broad flat placeholder rectangles.
+- **Forbidden readings:** resource-conversion booth, bank, tavern, general house, treasure room, caravan map,
+  supermarket or auction house. Do not use exchange arrows, a giant coin, text label or UI icon to carry the
+  identity.
+- **Source requirement:** direct production bitmap/pixel source with deterministic export metadata. HTML/CSS
+  may frame review but may not depict the building. Preserve the existing technical exporter only where it
+  can carry this actual art without raster alteration.
+- **Technical evidence:** assert exact 96×80 dimensions, nonempty transparent margins, nearest-neighbour-only
+  scaling, stable source/export hash and exact crop/placement identity. These gates prove transport only;
+  the label-free visual review decides whether the sprite passes.
+- **Stop condition:** send the lossless crop and phone placement to Game Design. Do not create Recycler,
+  opening-five, House, Library, upgrade tiers, goldens or native integration before this sprite is accepted.
 
 ## Ownership and file boundary
 
@@ -124,13 +160,17 @@ does not solve future zoning by guesswork.
 
 Unknown future buildings are absent, not locked silhouettes, empty named lots or blurred spoilers.
 
-## Milestone 1 — Library root (fully unblocked)
+## Future reference — Library root (after the style gate)
 
-Build the Library first because its contents are settled and independent of Workshop/Constellation review.
+Build the Library only after the Trading Post style gate is accepted. Its contents are settled and
+independent of Workshop/Constellation review.
 
 ### Composition
 
-The root is a recognizable side-view library room/bookcase with exactly five physical shelf destinations:
+The root is a **close-up of one large bookcase**, or at most two adjoining bookcases if one case cannot
+provide honest native tap geometry, with exactly five physical shelf destinations. The broader Library area
+appears only in the Binder House cutaway. Do not draw a second full room, floor plan or navigable interior for
+the Library destination.
 
 1. **Diaries**;
 2. **Bestiary**;
@@ -181,7 +221,7 @@ changing earlier thresholds.
 The Library does not contain a separate top-level Bestiary hotspot elsewhere. Constellation is not one of the
 five shelves.
 
-## Milestone 2 — opening village districts (fully unblocked)
+## Future reference — opening village districts (after the style gate)
 
 Create three separate fixed side-view phone screens using the accepted station silhouettes.
 
@@ -230,7 +270,7 @@ need. This is a readability/density test only. It must answer:
 Do not implement a carousel, scrolling town or final multi-block map in this packet. Report the evidence to
 Game Design for a later zoning decision.
 
-## Milestone 3 — Binder House/yard shell (partially blocked)
+## Future reference — Binder House/yard shell
 
 Build a functional visual shell around only the settled interactive anchors:
 
@@ -240,9 +280,11 @@ Build a functional visual shell around only the settled interactive anchors:
 - yard Essence Spring;
 - the three district arrows.
 
-The Workshop and Constellation are under `workshop-constellation-role-audit-current.md` review. Therefore:
+Workshop is removed. Constellation retains its existing route while the six-star expansion remains under
+`workshop-constellation-role-audit-current.md` review. Therefore:
 
-- do not label or wire either as a hotspot;
+- do not label or wire Workshop as a hotspot;
+- reserve one removable Constellation chart hotspot, but do not depict unaccepted stars or costs;
 - a neutral workbench may exist as ordinary house dressing;
 - a neutral star chart/window may exist as ordinary dressing;
 - their presence cannot imply a missing action, currency wallet or future tree;
@@ -265,9 +307,11 @@ The Workshop and Constellation are under `workshop-constellation-role-audit-curr
 3. Library attention and Essence Spring attention independently shown;
 4. all three arrows selected in turn;
 5. grayscale/value and collision overlays;
-6. Workshop/star-chart decorative layers removed to prove they are not structural dependencies.
+6. Workshop dressing and the removable Constellation chart layer separately removed to prove they are not
+   structural dependencies.
 
-Do not finalize the House hotspot manifest until Game Design records Aimee's Workshop/Constellation choice.
+Do not finalize the Constellation graph contents until Game Design records Aimee's six-star choice. Workshop
+is already absent from the manifest.
 
 ## Shared attention grammar
 
@@ -305,7 +349,8 @@ Asset Lead must provide:
 5. collision/ownership overlay PNGs;
 6. count→growth-stage unit tests for `0/1/2/4/7/10`;
 7. absence tests for unknown traveller/species/building content;
-8. test proving Workshop/Constellation are not interactive in the provisional House fixture;
+8. test proving Workshop is absent and the provisional Constellation chart routes only to the preserved
+   current surface without implying new stars;
 9. test proving no station damage state is requested/rendered;
 10. existing complete AssetLab test/regression report with intentional new fixtures isolated from prior
     goldens.
@@ -315,16 +360,14 @@ goldens remain unchanged.
 
 ## Review order and stop conditions
 
-Work continuously through:
+Current work stops after the single Trading Post style gate. Once Game Design accepts it, a new receipt will
+release the following order: opening-five built identity set → each building's continuity states → Binder
+House → close-up Library → later buildings in campaign order. Do not batch the future milestones merely
+because their specifications are present in this file.
 
-1. Library functional layout and fixtures;
-2. opening district layouts and density evidence;
-3. provisional House shell and removable disputed décor.
+Stop immediately and report rather than inventing:
 
-Request one review after all three are source/test complete, unless a real conflict with an authority makes
-continuation unsafe. Stop immediately and report rather than inventing:
-
-- a final place for Workshop or Constellation;
+- a Workshop destination or any unaccepted Constellation purchase;
 - later station district membership;
 - a new mechanic/control;
 - a sixth Library shelf;
@@ -334,7 +377,7 @@ continuation unsafe. Stop immediately and report rather than inventing:
 ## Engineering handoff later
 
 This packet deliberately produces no native code. After Game Design accepts a proof and Aimee settles the
-two destination questions, a separate Engineering packet will specify:
+Constellation expansion, a separate Engineering packet will specify:
 
 - stable screen/destination adapters;
 - exact hotspot manifest loading and aspect-fit transform;

@@ -5,7 +5,7 @@ presentation. It relocates Bestiary navigation inside the Library without changi
 species knowledge or diary-page rules.
 **Priority:** after the first-world causal presentation baseline and before adding more full-width Library
 lists or late archival systems.
-**Owners:** Game Design owns shelf taxonomy and growth receipts; Asset Design owns the room/shelf/book grammar;
+**Owners:** Game Design owns shelf taxonomy and growth receipts; Asset Design owns the bookcase/shelf/book grammar;
 Engineering owns routes, derived fill stages and existing collection consumers; Aimee owns final visual
 acceptance.
 **Updated:** 21 August 2026
@@ -13,8 +13,11 @@ acceptance.
 ## Player outcome
 
 The Library is a place the player recognizes and watches fill, not a tab strip leading to five long lists.
-Opening it shows one front-facing/very slightly oblique library-room composition with distinct shelves. Loose
-paper becomes folders, pamphlets and increasingly substantial books as the underlying collections grow.
+The Binder House cutaway shows the wider Library area. Opening that hotspot moves to a close-up of **one
+large bookcase or, only if native target geometry requires it, two adjoining bookcases**. The case fills most
+of the destination viewport and its physical shelves are the five category controls. Do not repeat the whole
+room, add navigable furniture or turn the destination into a miniature interior scene. Loose paper becomes
+folders, pamphlets and increasingly substantial books as the underlying collections grow.
 
 The art reflects real saved knowledge only. It never fabricates books, species, pages or world history to
 make the room look fuller.
@@ -41,8 +44,9 @@ because they are paper.
 ## Ordinary-phone composition
 
 At 368×800, all five shelf identities fit in the initial Library viewport without scrolling required solely
-to discover a category. Recommended composition is two wide shelves above a three-shelf lower cabinet, or
-another fixed five-hotspot bookcase arrangement proven at native scale.
+to discover a category. Recommended composition is one close-up case with two wide shelves above a
+three-shelf lower cabinet. Two adjoining cases are the only alternate, and only when that produces
+materially better 44×44 shelf targets.
 
 Each shelf hotspot includes:
 
@@ -149,7 +153,7 @@ or new knowledge type to balance the composition.
 2. Move the Bestiary route under Library while preserving its stable destination, deep links and Back state.
 3. Implement per-traveller Diary growth from recovered-page counts; no separate visual-stage persistence.
 4. Add shelf-level unchecked-content receipts using the shared attention-event semantics.
-5. Integrate the functional shelf-room asset behind a reversible DEBUG route, then promote after phone proof.
+5. Integrate the functional close-up bookcase asset behind a reversible DEBUG route, then promote after phone proof.
 6. Convert shelf collection children to the settled icon/object grammar without rewriting their domain rules.
 
 ## Acceptance
