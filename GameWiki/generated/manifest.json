@@ -1,9 +1,9 @@
 {
   "schemaVersion": 1,
-  "aggregateSourceHash": "4aed29d45e857a421928090ba132de73b9394fbd12b27fdcabcb998d8da8cc91",
+  "aggregateSourceHash": "56fdeea87cc0617afbcab1ead56f0839e15a229d6ec1d57bcfb205b8aa49eb13",
   "inputs": {
     "Sources/Content/Data/items.json": "b94b1107229f217e14f1d7fa936d8eea938f9782c06c583be32302f10d432bc9",
-    "Sources/Content/Data/playability-roadmap.json": "5ff8339ea79d355a1c2ccacab2ca70a97df9809a524f06ca0802dcb3cb6775fe",
+    "Sources/Content/Data/playability-roadmap.json": "f4887c012db804775b2538fb82784923b4ec92d359dccffe46f799483b0bbfff",
     "Sources/Content/Data/resources.json": "8eee965ce7df075abfe3f646bb36d416a10ef1d7d194845e30fa0f31b7b23e6f",
     "Sources/Content/Data/stations.json": "21b5e9f3bee2d9115acf535ef2ff1db350b87b8ee33755e79a3b3e4584102e2b",
     "Sources/Content/Data/symbols.json": "c1ec5dd7b661680b358e21a56124b6080aa28d93db51fd2f6b80214ced1dcb16",
@@ -36,7 +36,7 @@
     "docs/archive/code-audit-7.md": "aefa1f5376df5a382f3f69d1aacdb2e8b5bea1d7ae7eba48f75d5165b1a26b17",
     "docs/archive/code-audit-8.md": "596bb540c1ee04ad8c1bf4b1d686339d16f0dd13a61fe4e435fba88a6dd055fa",
     "docs/archive/code-audit-9-and-answers.md": "3b36f585c23d8e5f5638f07bf5fe8a6c47897217192dd65768e85fe29f2fd50e",
-    "docs/archive/creature-material-no-grade-alternative-2026-08-21.md": "89713e0f4a3651f92a64da6c526c2e3161b64bcbf417b4fe95d92c4fc9ce1a38",
+    "docs/archive/creature-material-no-grade-alternative-2026-08-21.md": "6287ee7f632363341f0395c08cd9cf37ffa9d5730c814a0a4a09732cfff34351",
     "docs/archive/decisions-session-10.md": "d7c710c29da85315e798682295a9e925cbf7c78df95abf94f5aa28819a3eb00f",
     "docs/archive/decisions-session-11.md": "38663e502e2c0281a0dbe7bbef873ed71dc823a5533b139f76134888dd3a4356",
     "docs/archive/decisions-session-12.md": "e5ee72cf553e525bbc449e6fbc83912f3111f47344f0916e47e5a349aa7a5a3b",
@@ -110,11 +110,11 @@
     "docs/crafted-gear-migration-current.md": "f26d9524154672e59c50415b59c2cd3fe745741d9d8bafc136c46333469fa558",
     "docs/crafting-components-and-schematics-current.md": "c95517d88d373eea5be411b019f3893da5cdf948cb569309e4ac9c88cb09ca86",
     "docs/crafting-intuition-and-quality-review-current.md": "7cfe996ccda8bd3cdf150c36cc827bf57d64b72937d183dfe58586fbbf8fef22",
-    "docs/creature-ecology-and-materials-overhaul-current.md": "04752e46e263b65e342ac45aff88d1c679a8957f050af621bd2062075ca57461",
+    "docs/creature-ecology-and-materials-overhaul-current.md": "b5fcd006c87cba3fa7de872e884259bcfe253918fad125b45069ea8e3ccff704",
     "docs/creature-territory-finds-current.md": "07792ad39d56392aaadc4507520015020a77171b6e6486f22aa3381903027385",
     "docs/cross-lead-delivery-contract-current.md": "af95f3e6668995134aaca7e0a1ac6bacd1e81305696c16734ed859f92fd14b2b",
     "docs/curio-identification-knowledge-current.md": "31acb95848598b0874e3978a9488f122b8bfee115e16867a5dca9fa1c33986f0",
-    "docs/current-design-index.md": "6625ba812ad738219a494eba590c7c87187117ddfb8f47591103c10f76394b96",
+    "docs/current-design-index.md": "7bc613a5bca3f7151839908ee292d80d2e74c53cd30289c69afe2d906f33f9f3",
     "docs/cycle-system-current.md": "3a472c56d4c78299574f768de122d2ac11e7387eeae8fd723667e73f96fbd598",
     "docs/dagg-recovery-teaching-current.md": "a6f2e09d574fde643ce524b90c7c76482925010c6d8af53bc327fd4fe3480546",
     "docs/debug-authored-text-atlas-current.md": "dde26130930d41c60ef958393390774a36c6bf37999a2428420db634df1c7dd2",
@@ -280,7 +280,7 @@
     "docs/writing-tool-progression-current.md": "be17fe07aa89aaaab7117a2faca43d7e1eb1be23202d19106c67c42547b23bb0"
   },
   "outputs": {
-    "generated/wiki-data.json": "40aef5c446484388fe9f19cbaf9f489bfdad56fa11ef0da6abc5fa03fd65b38e",
-    "generated/source-registry.json": "4444240f1566a9b30bb555d56595c9530e12c57e6c38d2c644f64975e39d1d5c"
+    "generated/wiki-data.json": "e7a3793cf2135de12f5593aaad4dce1e11a50617f91aa0b32956914c202adb53",
+    "generated/source-registry.json": "1a3399d35f8f5c7948312fc9355c6ac86200bedb858003af6b54c7a38c2da57b"
   }
 }

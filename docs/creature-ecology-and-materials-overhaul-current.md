@@ -14,7 +14,8 @@ silhouette proofs; Aimee owns final creature and material art.
 **Updated:** 21 August 2026
 
 Machine authority and freshness gate:
-`creature-material-projection-authority.json` and
+`creature-habitat-authority.json`, `creature-material-projection-authority.json`,
+`python3 scripts/validate_creature_habitat.py`, and
 `python3 scripts/validate_creature_material_projection.py`.
 
 ## Player outcome
@@ -139,8 +140,102 @@ Habitat is chosen from both resolved world facts and actual painted terrain avai
 5. Shape body-plan/appendage weights inside the chosen habitat; never choose habitat by looking at a name.
 6. Persist the result before roster/placement.
 
-Minimum legal area is a tuning value exposed in World Generator Web diagnostics, but the default must allow
-at least one spawn plus one legal neighbouring move. A one-tile puddle cannot become an aquatic ecosystem.
+### Exact v1 availability and weights
+
+`creature-habitat-authority.json` is the machine source for this section. Habitat weights are reversible
+playtest tuning, but Engineering does not replace them with an intuitive guess.
+
+Build four-way connected components after terrain painting, entry correction and start-connected reachability:
+
+- **liquid water** is exactly Shallow Water + Deep Water; Ice is not liquid habitat in v1;
+- **terrestrial** is start-connected passable non-water ground;
+- **shore** is Shallow Water plus start-connected passable non-water ground cardinally adjacent to liquid
+  water;
+- **aquatic** is each connected Shallow+Deep Water component, including deep-only components; and
+- **aerial** is the start-connected current passable component, excluding Deep Water and Chasm.
+
+An eligible component has at least two tiles and one legal cardinal movement edge. Its stable component ID
+is the minimum row-major tile index. A one-tile puddle cannot become an ecosystem. Content occupancy does
+not change habitat identity; it is filtered later during specimen placement.
+
+Inputs use the painted map and frozen readings:
+
+```text
+waterFraction   = 100 × liquidWaterTiles / nonChasmTiles
+shoreFraction   = 100 × shoreUnionTiles / nonChasmTiles
+liquidHydrology = Hydrology peak × clamp(standingShare + flowingShare, 0, 1)
+verticality     = Relief.verticality
+motion          = Atmosphere.motion
+```
+
+Raw weights are:
+
+```text
+terrestrial = 20 + 0.80 × (100 - waterFraction)
+shore       = 0.60 × shoreFraction + 0.25 × liquidHydrology
+aquatic     = 0.80 × waterFraction + 0.30 × liquidHydrology
+aerial      = 0.35 × verticality + 0.35 × motion
+```
+
+An unavailable habitat has weight zero. The first species samples only among habitats with at least one
+player-contact-eligible component: any terrestrial/aerial component; a Shore component containing a
+start-connected passable tile; or an Aquatic component containing start-connected Shallow Water. This
+guarantees the world has at least one species the player can actually encounter without boats/fishing.
+
+For later species, multiply each habitat's raw weight by `0.65 ^ alreadySelectedCountForThatHabitat`, then
+sample from a dedicated versioned ecology stream. This encourages a coherent mixed cast without forcing two
+otherwise dry/flat worlds to invent specialized habitats. Record raw and adjusted weights in World Generator
+Web diagnostics.
+
+### Exact morphology constraints
+
+Habitat changes visual morphology and legal placement, not the costly combat trait budget. Body plan is
+sampled from these exact 100-point tables on the ecology stream:
+
+| Habitat | Quadruped | Biped | Serpentine | Segmented | Radial | Piscine | Amorphous |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| Terrestrial | 45 | 15 | 15 | 10 | 7 | 0 | 8 |
+| Shore | 35 | 0 | 20 | 15 | 15 | 10 | 5 |
+| Aquatic | 0 | 0 | 25 | 5 | 15 | 45 | 10 |
+| Aerial | 35 | 20 | 25 | 10 | 5 | 0 | 5 |
+
+Appendage choice starts from the existing pressure-derived appendage weights, then multiplies them:
+
+| Habitat | None | Membrane | Feathered | Finned | Limbed |
+|---|---:|---:|---:|---:|---:|
+| Terrestrial | ×1 | ×1 | ×1 | ×0 | ×1 |
+| Shore | ×0.75 | ×0.5 | ×0.5 | ×2 | ×1.5 |
+| Aquatic | ×1.5 | ×0 | ×0 | ×5 | ×0.5 |
+| Aerial | ×0 | ×1 | ×1 | ×0 | ×0 |
+
+If Aerial's transformed Feathered and Membrane weights are both zero, use `1:1`; flight identity is
+required. Existing pressure tendencies still decide whether one is favoured. Cranial feature remains the
+current stable morphology distribution. Habitat/morphology use the new ecology stream and cannot consume or
+reorder gameplay RNG.
+
+### Spawn quota, guardians and movement
+
+For an ordinary enemy count `N`, at least
+`min(N, max(1, ceil(0.65 × N)))` placed specimens use a player-contact-eligible component. Remaining
+placements may use deep-only Aquatic ecology. This lets inaccessible fish visibly inhabit deep water without
+turning most of the world's combat population into unreachable decoration.
+
+For each quota slot, choose equally among awake roster species with at least one free legal tile for that
+quota, then choose a legal tile after the existing entry-distance and occupancy checks. If no candidate
+exists, skip that placement; never put the creature in an illegal habitat or reroll the declared enemy count
+with unrelated RNG. Diagnostics name the skipped slot/reason.
+
+Each specimen freezes its habitat component ID. Pursuit pathfinding is restricted to that component:
+
+- Terrestrial stays on its persisted terrestrial component;
+- Shore stays inside its persisted shoreline union;
+- Aquatic stays inside its persisted Shallow+Deep Water component;
+- Aerial stays in the persisted current passable component in v1 and cannot cross Deep Water or Chasm.
+
+No legal path means hold position; no teleport or nearest-land correction. Deep-water occupants cannot be
+bumped until a later legitimate adjacent/fishing/boat rule exists. A site guardian is the highest-appetite
+local species whose habitat can occupy the exact site tile, with stable Species ID as tie-breaker; it never
+pulls an Aquatic species onto a ruin floor.
 
 ### Pressure-to-form tendencies
 
