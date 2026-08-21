@@ -1,0 +1,806 @@
+{
+  "schemaVersion": 1,
+  "identity": "world-atmosphere-presentation-assets-0.1",
+  "integrationReady": false,
+  "exporter": {
+    "file": "scripts/export-atmosphere-presentation-kit.mjs",
+    "sha256": "643031c154c4d430e8a7d28fc5174f9f4558ac7df7452b2ad1a505f0de29230c"
+  },
+  "nativeTileSize": {
+    "width": 16,
+    "height": 16
+  },
+  "fixedFixture": {
+    "map": "earthlike-15x15",
+    "width": 15,
+    "height": 15,
+    "phone": {
+      "width": 368,
+      "height": 800
+    }
+  },
+  "phaseSeed": 1248969427,
+  "resolverVersion": "asset-proof-only-no-source-resolution",
+  "densityBands": {
+    "trace": 18,
+    "light": 36,
+    "heavy": 64,
+    "dense": 88
+  },
+  "motionBands": {
+    "calm": 0,
+    "moving": 1,
+    "strong": 2
+  },
+  "families": {
+    "smoke": {
+      "stableID": "atmosphere.smoke.v1",
+      "paletteRamp": [
+        [
+          64,
+          61,
+          58
+        ],
+        [
+          104,
+          98,
+          90
+        ],
+        [
+          146,
+          137,
+          124
+        ]
+      ],
+      "layer": "suspended",
+      "source": {
+        "trace": {
+          "file": "source/smoke-trace-logical-16x16.png",
+          "width": 16,
+          "height": 16,
+          "sha256": "9d6d41ba55e2209f6e21e37661f6ae3e022debdf1e507a8133de1cfb512e39e9"
+        },
+        "light": {
+          "file": "source/smoke-light-logical-16x16.png",
+          "width": 16,
+          "height": 16,
+          "sha256": "94a2bbc4e3a57f841d9fe137bf14b7fb0a40f4f454ae559915167555b02b0031"
+        },
+        "heavy": {
+          "file": "source/smoke-heavy-logical-16x16.png",
+          "width": 16,
+          "height": 16,
+          "sha256": "2c9c528cb715b721b8746d8e4fb2721d8afa38a92f0f82f17e169e3cd05ddad0"
+        },
+        "dense": {
+          "file": "source/smoke-dense-logical-16x16.png",
+          "width": 16,
+          "height": 16,
+          "sha256": "158a5eeb682ea2b3537a70beec120e452dc55b74cb274a49538bd2b7d81da1a5"
+        }
+      },
+      "binaryStaticFallback": {
+        "file": "source/smoke-light-logical-16x16.png",
+        "width": 16,
+        "height": 16,
+        "sha256": "94a2bbc4e3a57f841d9fe137bf14b7fb0a40f4f454ae559915167555b02b0031"
+      }
+    },
+    "airborneAsh": {
+      "stableID": "atmosphere.airborneAsh.v1",
+      "paletteRamp": [
+        [
+          67,
+          72,
+          78
+        ],
+        [
+          116,
+          122,
+          128
+        ],
+        [
+          174,
+          176,
+          176
+        ]
+      ],
+      "layer": "particulate",
+      "source": {
+        "trace": {
+          "file": "source/airborneAsh-trace-logical-16x16.png",
+          "width": 16,
+          "height": 16,
+          "sha256": "ded8d8d54ab09f2887d7c346c8d48f9765cea7e3d015bcf3758584422b515a3e"
+        },
+        "light": {
+          "file": "source/airborneAsh-light-logical-16x16.png",
+          "width": 16,
+          "height": 16,
+          "sha256": "3b8fc3a318fb57caab98c08ab08df8f5b4f6586c899a1fdf9a4b46eb3f9058ae"
+        },
+        "heavy": {
+          "file": "source/airborneAsh-heavy-logical-16x16.png",
+          "width": 16,
+          "height": 16,
+          "sha256": "0b7acecdf971c2690bde6c13db9a13556fc2d7bcef50b1b71df9a01bd5756a95"
+        },
+        "dense": {
+          "file": "source/airborneAsh-dense-logical-16x16.png",
+          "width": 16,
+          "height": 16,
+          "sha256": "e539b28d1b83813286e54930c36decaf3020b13e3c5843b058a48f9f27302f6c"
+        }
+      },
+      "binaryStaticFallback": {
+        "file": "source/airborneAsh-light-logical-16x16.png",
+        "width": 16,
+        "height": 16,
+        "sha256": "3b8fc3a318fb57caab98c08ab08df8f5b4f6586c899a1fdf9a4b46eb3f9058ae"
+      }
+    },
+    "mist": {
+      "stableID": "atmosphere.mist.v1",
+      "paletteRamp": [
+        [
+          91,
+          111,
+          116
+        ],
+        [
+          137,
+          155,
+          157
+        ],
+        [
+          190,
+          201,
+          198
+        ]
+      ],
+      "layer": "suspended",
+      "source": {
+        "trace": {
+          "file": "source/mist-trace-logical-16x16.png",
+          "width": 16,
+          "height": 16,
+          "sha256": "5ecb76ac2dcfa6b28856c677d38f82c89b7f14fb2819e23637c54fd98f6c4882"
+        },
+        "light": {
+          "file": "source/mist-light-logical-16x16.png",
+          "width": 16,
+          "height": 16,
+          "sha256": "ace09f1081af634dfa9065fff1580b5128cf7a62632bda3065bd2456413b3e9b"
+        },
+        "heavy": {
+          "file": "source/mist-heavy-logical-16x16.png",
+          "width": 16,
+          "height": 16,
+          "sha256": "34db89576a245ca8bf96b23328cb0df50bd2c20386417e9d9d0b755ae5f874e7"
+        },
+        "dense": {
+          "file": "source/mist-dense-logical-16x16.png",
+          "width": 16,
+          "height": 16,
+          "sha256": "268f820f36186d32362a37566d1ee02d70305c6935ddb3a21e2ad76e62d7038b"
+        }
+      },
+      "binaryStaticFallback": {
+        "file": "source/mist-light-logical-16x16.png",
+        "width": 16,
+        "height": 16,
+        "sha256": "ace09f1081af634dfa9065fff1580b5128cf7a62632bda3065bd2456413b3e9b"
+      }
+    },
+    "miasma": {
+      "stableID": "atmosphere.miasma.v1",
+      "paletteRamp": [
+        [
+          66,
+          61,
+          70
+        ],
+        [
+          105,
+          92,
+          112
+        ],
+        [
+          151,
+          133,
+          151
+        ]
+      ],
+      "layer": "suspended",
+      "source": {
+        "trace": {
+          "file": "source/miasma-trace-logical-16x16.png",
+          "width": 16,
+          "height": 16,
+          "sha256": "b0710a9337b7276497107f202ca9a3f50b40da670b0d8312d825c3400dc590cb"
+        },
+        "light": {
+          "file": "source/miasma-light-logical-16x16.png",
+          "width": 16,
+          "height": 16,
+          "sha256": "7ef454d0e3946a8c9970e62ffaec1d6427ed58641c69b0430301814586859098"
+        },
+        "heavy": {
+          "file": "source/miasma-heavy-logical-16x16.png",
+          "width": 16,
+          "height": 16,
+          "sha256": "5bdfb78abc7dc43e1dfba9a12a8af588468d97df1ddf88c6863c3a7ac70fb18d"
+        },
+        "dense": {
+          "file": "source/miasma-dense-logical-16x16.png",
+          "width": 16,
+          "height": 16,
+          "sha256": "c0e1c7efb4df1eeec2bf11df85e5fefd268506593b8bcaf8e44599395ae0194b"
+        }
+      },
+      "binaryStaticFallback": {
+        "file": "source/miasma-light-logical-16x16.png",
+        "width": 16,
+        "height": 16,
+        "sha256": "7ef454d0e3946a8c9970e62ffaec1d6427ed58641c69b0430301814586859098"
+      }
+    },
+    "rain": {
+      "stableID": "atmosphere.rain.v1",
+      "paletteRamp": [
+        [
+          84,
+          129,
+          151
+        ],
+        [
+          134,
+          174,
+          191
+        ],
+        [
+          192,
+          216,
+          221
+        ]
+      ],
+      "layer": "precipitation",
+      "source": {
+        "trace": {
+          "file": "source/rain-trace-logical-16x16.png",
+          "width": 16,
+          "height": 16,
+          "sha256": "fe01f28c3e68c9b88b79ea91844998a6dc57571f6775819832adcaedff0a2a4b"
+        },
+        "light": {
+          "file": "source/rain-light-logical-16x16.png",
+          "width": 16,
+          "height": 16,
+          "sha256": "3f8955c2f68e5873fc5ace631c4e179e2ec2e65d9d5b4cb6a496e2e5616bcccf"
+        },
+        "heavy": {
+          "file": "source/rain-heavy-logical-16x16.png",
+          "width": 16,
+          "height": 16,
+          "sha256": "d9f05f8866fe60cdc029252433c8161f51731e4c47e1d82414ac935031052b8a"
+        },
+        "dense": {
+          "file": "source/rain-dense-logical-16x16.png",
+          "width": 16,
+          "height": 16,
+          "sha256": "4fef1cdb1473ad52dd55d9fdb935427e5afd690aa427cd3401af9d1b8ca73738"
+        }
+      },
+      "binaryStaticFallback": {
+        "file": "source/rain-light-logical-16x16.png",
+        "width": 16,
+        "height": 16,
+        "sha256": "3f8955c2f68e5873fc5ace631c4e179e2ec2e65d9d5b4cb6a496e2e5616bcccf"
+      }
+    },
+    "snow": {
+      "stableID": "atmosphere.snow.v1",
+      "paletteRamp": [
+        [
+          126,
+          143,
+          151
+        ],
+        [
+          184,
+          196,
+          199
+        ],
+        [
+          232,
+          234,
+          226
+        ]
+      ],
+      "layer": "precipitation",
+      "source": {
+        "trace": {
+          "file": "source/snow-trace-logical-16x16.png",
+          "width": 16,
+          "height": 16,
+          "sha256": "74a5cb34451cc27f168f510485f6199b6260097e28574be2cef11f7fbf248b59"
+        },
+        "light": {
+          "file": "source/snow-light-logical-16x16.png",
+          "width": 16,
+          "height": 16,
+          "sha256": "c14008796c57b92fa6c7d047e50629e756586b6381072f1f1dcabdc51ecad48d"
+        },
+        "heavy": {
+          "file": "source/snow-heavy-logical-16x16.png",
+          "width": 16,
+          "height": 16,
+          "sha256": "22b74e939a31ee36c5b935ca3886f78d16b1cf02bd0eb95ee29ba15b0c1eddab"
+        },
+        "dense": {
+          "file": "source/snow-dense-logical-16x16.png",
+          "width": 16,
+          "height": 16,
+          "sha256": "ed63521cd79c07695a04e43375fff1928a6a8b8fbba5a0b15c0be7cce41d2ac6"
+        }
+      },
+      "binaryStaticFallback": {
+        "file": "source/snow-light-logical-16x16.png",
+        "width": 16,
+        "height": 16,
+        "sha256": "c14008796c57b92fa6c7d047e50629e756586b6381072f1f1dcabdc51ecad48d"
+      }
+    },
+    "mixedRainSnow": {
+      "stableID": "atmosphere.mixedRainSnow.v1",
+      "paletteRamp": [
+        [
+          91,
+          132,
+          149
+        ],
+        [
+          181,
+          193,
+          195
+        ],
+        [
+          232,
+          229,
+          214
+        ]
+      ],
+      "layer": "precipitation",
+      "source": {
+        "trace": {
+          "file": "source/mixedRainSnow-trace-logical-16x16.png",
+          "width": 16,
+          "height": 16,
+          "sha256": "d2f22c0c6829bcec4357261ef5c9f164bd61fc3727c92d57a2366f66663e32ac"
+        },
+        "light": {
+          "file": "source/mixedRainSnow-light-logical-16x16.png",
+          "width": 16,
+          "height": 16,
+          "sha256": "c1b5f4ba47792fbda8a8e3ea56b564499eca0bed20684dd32304e9bd22998c59"
+        },
+        "heavy": {
+          "file": "source/mixedRainSnow-heavy-logical-16x16.png",
+          "width": 16,
+          "height": 16,
+          "sha256": "83f4df46faa1bb7200891d70ed05b1070d2fc98b9c0c874c536f5a85a68f9266"
+        },
+        "dense": {
+          "file": "source/mixedRainSnow-dense-logical-16x16.png",
+          "width": 16,
+          "height": 16,
+          "sha256": "d54a50902840a5d35258a3b43602df9a96bb9d190ef380f31a67d359d8940b50"
+        }
+      },
+      "binaryStaticFallback": {
+        "file": "source/mixedRainSnow-light-logical-16x16.png",
+        "width": 16,
+        "height": 16,
+        "sha256": "c1b5f4ba47792fbda8a8e3ea56b564499eca0bed20684dd32304e9bd22998c59"
+      }
+    }
+  },
+  "contactShade": {
+    "stableID": "elevation.contact-shade.v1",
+    "lowerSurfaceOnly": true,
+    "maxDepth": 2,
+    "sources": {
+      "equal": {
+        "file": "source/contact-shade-equal-logical-16x16.png",
+        "width": 16,
+        "height": 16,
+        "sha256": "e5c6aeefea107c3a49e4c5dc68e127e53c88e718ab4a740efb6aa1a2954dcb70"
+      },
+      "oneStep": {
+        "file": "source/contact-shade-one-step-logical-16x16.png",
+        "width": 16,
+        "height": 16,
+        "sha256": "5743c17579794691822650681af21d9bf9daaf9dd0a5bde6c2f74d5b22c4d5ec"
+      },
+      "twoStep": {
+        "file": "source/contact-shade-two-step-logical-16x16.png",
+        "width": 16,
+        "height": 16,
+        "sha256": "eff611223b88b68a5a2f99a3aa34217b4182ae85c0c810ef6ff665ef84643422"
+      }
+    }
+  },
+  "compositionOrder": [
+    "terrain",
+    "genuine-elevation-contact-shade",
+    "static-content",
+    "suspended-medium",
+    "precipitation",
+    "visible-actors-and-cues",
+    "visibility-treatment",
+    "opaque-hidden-mask",
+    "hud"
+  ],
+  "evidence": {
+    "clear": {
+      "color": {
+        "file": "evidence/clear-368x800.png",
+        "width": 368,
+        "height": 800,
+        "sha256": "7e4a7effdee8df0245d564eb2ea14ac75eb8fb144c5f0529b4bbdf5805ec9a91"
+      },
+      "grayscale": {
+        "file": "evidence/clear-grayscale-368x800.png",
+        "width": 368,
+        "height": 800,
+        "sha256": "9953d7a9a23ccd0c30545ecb82419bb7e036235212ad548ec90177fcfa43f345"
+      }
+    },
+    "smoke-trace": {
+      "color": {
+        "file": "evidence/smoke-trace-368x800.png",
+        "width": 368,
+        "height": 800,
+        "sha256": "272a97a18478d386dc23022aeffc25509cd16505202e988e8a004dd40b1e345c"
+      },
+      "grayscale": {
+        "file": "evidence/smoke-trace-grayscale-368x800.png",
+        "width": 368,
+        "height": 800,
+        "sha256": "5c0f9a87e45ce0f157cac3a61dbe78c8fec5a526f0bcd80a5d3ac959417aca5b"
+      }
+    },
+    "smoke-light": {
+      "color": {
+        "file": "evidence/smoke-light-368x800.png",
+        "width": 368,
+        "height": 800,
+        "sha256": "2dd02075a4d9490d723e72c41180b53e70f16cad9064bd3049a2a955fd5629f4"
+      },
+      "grayscale": {
+        "file": "evidence/smoke-light-grayscale-368x800.png",
+        "width": 368,
+        "height": 800,
+        "sha256": "2fc99390a1291e153e58148c9c8cab9c41b329eb1c6e8a5cf1356f7d2b3a5a97"
+      }
+    },
+    "smoke-heavy": {
+      "color": {
+        "file": "evidence/smoke-heavy-368x800.png",
+        "width": 368,
+        "height": 800,
+        "sha256": "f367538b95f3c2ba61073223cab5e0a7ae69a6c6dcbcc56fc0efdc1a056c2769"
+      },
+      "grayscale": {
+        "file": "evidence/smoke-heavy-grayscale-368x800.png",
+        "width": 368,
+        "height": 800,
+        "sha256": "5be4365463caf2f4148acf99574dbd3d764a7d19ee4677262322e20b26af0744"
+      }
+    },
+    "ash-light": {
+      "color": {
+        "file": "evidence/ash-light-368x800.png",
+        "width": 368,
+        "height": 800,
+        "sha256": "c2c8ec12548f22a87959aa7034bdeed44e5c3ffa46808509d2a73532e1d80dee"
+      },
+      "grayscale": {
+        "file": "evidence/ash-light-grayscale-368x800.png",
+        "width": 368,
+        "height": 800,
+        "sha256": "8945582b0fc8de5dcd9423a10f88ffa126c69f6d0295cb1488bbdbcd40c0fa86"
+      }
+    },
+    "ash-heavy": {
+      "color": {
+        "file": "evidence/ash-heavy-368x800.png",
+        "width": 368,
+        "height": 800,
+        "sha256": "500336b3c47162b5e913ab5d08cc1d47a281abf0d1a4ecafdff7184896602d26"
+      },
+      "grayscale": {
+        "file": "evidence/ash-heavy-grayscale-368x800.png",
+        "width": 368,
+        "height": 800,
+        "sha256": "1d7f12967120b3d0a96e498e2c0edde596d30561b7c8aa8db670f30faf097f01"
+      }
+    },
+    "mist-light": {
+      "color": {
+        "file": "evidence/mist-light-368x800.png",
+        "width": 368,
+        "height": 800,
+        "sha256": "36a09b9aa3a80eb914d0c6c29508aa958d8eff4bb5110558c31fa7f0c1fdcab7"
+      },
+      "grayscale": {
+        "file": "evidence/mist-light-grayscale-368x800.png",
+        "width": 368,
+        "height": 800,
+        "sha256": "60d1fc24c8ee3a489dba02022a1e2db6c3aed8dcc9ab722e5ca7e018dafb6647"
+      }
+    },
+    "fog-heavy": {
+      "color": {
+        "file": "evidence/fog-heavy-368x800.png",
+        "width": 368,
+        "height": 800,
+        "sha256": "a8c6d81f8ad516e3505f9ff8c54086d87e0f399cf9acace2c7c519ed206ca10c"
+      },
+      "grayscale": {
+        "file": "evidence/fog-heavy-grayscale-368x800.png",
+        "width": 368,
+        "height": 800,
+        "sha256": "a7272f3f5f6c8f17d64db58e58a3076286989b07271c0e60203dca749be118db"
+      }
+    },
+    "miasma-light": {
+      "color": {
+        "file": "evidence/miasma-light-368x800.png",
+        "width": 368,
+        "height": 800,
+        "sha256": "99c3e358b0da8eaf5b4aa7146ad3aeb84bffee96fe4ec4833d7ac401669c8ff7"
+      },
+      "grayscale": {
+        "file": "evidence/miasma-light-grayscale-368x800.png",
+        "width": 368,
+        "height": 800,
+        "sha256": "1fa7f19a29a40492765b10a72cb18ca630f0140d9f8be521bd7b28f6d41e4dd4"
+      }
+    },
+    "miasma-heavy": {
+      "color": {
+        "file": "evidence/miasma-heavy-368x800.png",
+        "width": 368,
+        "height": 800,
+        "sha256": "28202b83bae478ffd1f505d7d097dbdcec595d129bf41170d884ba6e5d35bcc4"
+      },
+      "grayscale": {
+        "file": "evidence/miasma-heavy-grayscale-368x800.png",
+        "width": 368,
+        "height": 800,
+        "sha256": "c492221911f510ca86bb7eb8250c0852d2a905a81cb6ad7c2c489d95cf7aef54"
+      }
+    },
+    "rain-light": {
+      "color": {
+        "file": "evidence/rain-light-368x800.png",
+        "width": 368,
+        "height": 800,
+        "sha256": "7460ab5425e73bf5645fe7c98a0946a3ee33534b905a2cd94a5b1b376a7b8da0"
+      },
+      "grayscale": {
+        "file": "evidence/rain-light-grayscale-368x800.png",
+        "width": 368,
+        "height": 800,
+        "sha256": "b9b161f7c2629e5a00b0dbcc0a3f819efaa61ec00fffeb3f8820833b5f5a9450"
+      }
+    },
+    "rain-heavy": {
+      "color": {
+        "file": "evidence/rain-heavy-368x800.png",
+        "width": 368,
+        "height": 800,
+        "sha256": "2e677032fcca597b465058ea67b546a679d3732ccee5a18ce811112cb725ba68"
+      },
+      "grayscale": {
+        "file": "evidence/rain-heavy-grayscale-368x800.png",
+        "width": 368,
+        "height": 800,
+        "sha256": "41f13cdc8ae0d2e473f59dd29939cead3e5a286962bb1fcfb30e5fd64bc7eabd"
+      }
+    },
+    "snow-light": {
+      "color": {
+        "file": "evidence/snow-light-368x800.png",
+        "width": 368,
+        "height": 800,
+        "sha256": "cce4a069f057595be761f697a26b4fd66a4cab622eac16ae0ab880eef830c7f6"
+      },
+      "grayscale": {
+        "file": "evidence/snow-light-grayscale-368x800.png",
+        "width": 368,
+        "height": 800,
+        "sha256": "dbce6d15f6dc246f70a09b2f5464274cd9a192317f04e6a1f3e7eb6f5ca1399a"
+      }
+    },
+    "snow-heavy": {
+      "color": {
+        "file": "evidence/snow-heavy-368x800.png",
+        "width": 368,
+        "height": 800,
+        "sha256": "38bc264ec77447b182bcd4f873e7049269cc0db6f1ed94090764cf0ca3cae73e"
+      },
+      "grayscale": {
+        "file": "evidence/snow-heavy-grayscale-368x800.png",
+        "width": 368,
+        "height": 800,
+        "sha256": "d9f68ec9b5b926a5f2509b0bc49081f3e4b06314b411fd6b46fd9511a99a7862"
+      }
+    },
+    "mixed-light": {
+      "color": {
+        "file": "evidence/mixed-light-368x800.png",
+        "width": 368,
+        "height": 800,
+        "sha256": "abec490760aeb9eb134e4ae03191f89d9dc47d5265eaa366697268f6b22367e5"
+      },
+      "grayscale": {
+        "file": "evidence/mixed-light-grayscale-368x800.png",
+        "width": 368,
+        "height": 800,
+        "sha256": "23df042fae97d965aff6d4a37628441cc9aea14e04447a6314efef53591d737f"
+      }
+    },
+    "mixed-heavy": {
+      "color": {
+        "file": "evidence/mixed-heavy-368x800.png",
+        "width": 368,
+        "height": 800,
+        "sha256": "0abc72e3aac94e4374f0ac6f5e40ef805d5738536f644fd97692f85361462291"
+      },
+      "grayscale": {
+        "file": "evidence/mixed-heavy-grayscale-368x800.png",
+        "width": 368,
+        "height": 800,
+        "sha256": "05b7c4725c30c2bed2ffabe19fc732b99b5e68b5992e02aeb89ca207fefc1dbd"
+      }
+    },
+    "smoke-rain": {
+      "color": {
+        "file": "evidence/smoke-rain-368x800.png",
+        "width": 368,
+        "height": 800,
+        "sha256": "0ab422d4e5fedb83c6bf894d3a2fde462945b67f67f4729340c5fb12dbfe0f6a"
+      },
+      "grayscale": {
+        "file": "evidence/smoke-rain-grayscale-368x800.png",
+        "width": 368,
+        "height": 800,
+        "sha256": "d7c4b32d28ed5bf3c907f0fb41f40faa1ef09ff3e846073b887efc2f8a58e196"
+      }
+    },
+    "mist-snow": {
+      "color": {
+        "file": "evidence/mist-snow-368x800.png",
+        "width": 368,
+        "height": 800,
+        "sha256": "0391fc4c73d4dfad7b7216c8ac8e957276fa39504088eb7d7027dbfc0f9b22a5"
+      },
+      "grayscale": {
+        "file": "evidence/mist-snow-grayscale-368x800.png",
+        "width": 368,
+        "height": 800,
+        "sha256": "c000ccaeb87aba78b4ea310d4e9204cb371fffc27f581dccc9a2afaacadd3f6a"
+      }
+    },
+    "motion-calm": {
+      "color": {
+        "file": "evidence/motion-calm-368x800.png",
+        "width": 368,
+        "height": 800,
+        "sha256": "2dd02075a4d9490d723e72c41180b53e70f16cad9064bd3049a2a955fd5629f4"
+      }
+    },
+    "motion-moving": {
+      "color": {
+        "file": "evidence/motion-moving-368x800.png",
+        "width": 368,
+        "height": 800,
+        "sha256": "a4261d14683a2f3a257bb3e0d367f8ce763d7ba501fb41d0f93b712bd6779381"
+      }
+    },
+    "motion-strong": {
+      "color": {
+        "file": "evidence/motion-strong-368x800.png",
+        "width": 368,
+        "height": 800,
+        "sha256": "2eae023c58b588f3e117ea7ee994418e7916a2a56446f3ecd540422cbb057264"
+      }
+    },
+    "visibility": {
+      "ordinary": {
+        "file": "evidence/visibility-boundaries-368x800.png",
+        "width": 368,
+        "height": 800,
+        "sha256": "a8c6d81f8ad516e3505f9ff8c54086d87e0f399cf9acace2c7c519ed206ca10c"
+      },
+      "remoteMutation": {
+        "file": "evidence/visibility-boundaries-remote-mutation-368x800.png",
+        "width": 368,
+        "height": 800,
+        "sha256": "a8c6d81f8ad516e3505f9ff8c54086d87e0f399cf9acace2c7c519ed206ca10c"
+      }
+    }
+  },
+  "contactSheet": {
+    "file": "contact/native-family-contact-sheet-400pct.png",
+    "width": 512,
+    "height": 728,
+    "sha256": "63201e4e5032d6d3bf342b0ee5c349303d46fefc1e0ad5d0a1ff6844f090c587"
+  },
+  "proofMatrix": {
+    "file": "contact/phone-proof-matrix.png",
+    "width": 1368,
+    "height": 5100,
+    "sha256": "1897ae0cf97380883dd6a46023349fa0d8379dc827163f8ca50cf247552f6eee"
+  },
+  "grayscaleProofMatrix": {
+    "file": "contact/phone-proof-matrix-grayscale.png",
+    "width": 1368,
+    "height": 5100,
+    "sha256": "0b6a2881f267bcfd69056bd945581c6348df120faccb48736f52e73f4632b438"
+  },
+  "motionMatrix": {
+    "file": "contact/motion-band-matrix.png",
+    "width": 1368,
+    "height": 850,
+    "sha256": "4a0baa46b3f18eb7187142e920d0f70a51ad70e8f1ea7476f8ff46628d4258d8"
+  },
+  "contactShadeMatrix": {
+    "file": "contact/elevation-contact-shade-matrix-800pct.png",
+    "width": 608,
+    "height": 160,
+    "sha256": "a8950b0a60176e148ed6ed7ac50d8504f2bb68ec2adddb1483cc8559bff10e5c"
+  },
+  "contactShadeGrayscaleMatrix": {
+    "file": "contact/elevation-contact-shade-matrix-grayscale-800pct.png",
+    "width": 608,
+    "height": 160,
+    "sha256": "b3fe6fde02b615665a9daeaef7871b394d70b068c32f8c39718b6813bbe2c885"
+  },
+  "visibilityMatrix": {
+    "file": "contact/visibility-disclosure-matrix.png",
+    "width": 912,
+    "height": 850,
+    "sha256": "2a9c092597323be18e82b6104c54fbbb50228d47a0c08312608fc9595e5e3b5d"
+  },
+  "disclosure": {
+    "atmosphereStates": [
+      "current-full",
+      "current-fringe"
+    ],
+    "rememberedAtmosphere": false,
+    "hiddenRGBA": [
+      0,
+      0,
+      0,
+      255
+    ],
+    "movingEntitiesRemembered": false
+  },
+  "forbidden": [
+    "clouds",
+    "lightning",
+    "puddles",
+    "snow-terrain",
+    "snowdrifts",
+    "generic-tint",
+    "standalone-wind-lines",
+    "weather-gameplay",
+    "native-gameplay",
+    "terrain-mutation",
+    "layout-mutation"
+  ],
+  "provenance": "Deterministic integer-pixel runtime-composable AssetLab proof; phone images are evidence, not integration authority."
+}
