@@ -5099,3 +5099,19 @@ low stepped/pitched slate-and-wood lean-to or shallow hipped roof: visible overh
 clusters and support joinery, subordinate to the awning, with no domestic attic/chimney. Quiet the pixels
 behind the balance and ledger enough for both appraiser anchors to read in grayscale. The flat Commerce Row
 placement remains scale evidence only, not accepted district art.
+
+#### Trading Post Tier-0 v0.3 disposition
+
+**Accepted as the production visual style gate; preserve the exact logical sprite while the opening identity
+set proceeds.** Game Design inspected the native 96×80 sprite, 400% nearest-neighbour crop, literal grayscale
+and 368×800 Commerce placement. The shallow clustered slate roof now reads as constructed village architecture
+rather than a domestic house, kiosk cap or UI slab. The open counter and ochre/cream awning remain the primary
+merchant silhouette; the balance and open ledger read independently in both colour and grayscale; tagged mixed
+stock remains useful secondary detail. The result is finished logical-grid pixel art rather than placeholder
+web geometry or a downsampled antialiased render.
+
+This acceptance covers `trading_post.built` only. It does not accept the flat district background as final art,
+authorize later Trading Post states or promote native integration. Asset checkpoint 2 is now released exactly
+as written in `village-progression-and-asset-matrix-current.md`: Recycler, Blacksmith, Storehouse and Firepit
+Built/Tier-0 sprites, reviewed label-free beside the accepted Trading Post in colour and literal grayscale.
+All four must retain their own functional silhouette and must not converge on a recoloured generic façade.

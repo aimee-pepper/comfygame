@@ -363,10 +363,11 @@ goldens remain unchanged.
 
 ## Review order and stop conditions
 
-Current work stops after the single Trading Post style gate. Once Game Design accepts it, a new receipt will
-release the following order: opening-five built identity set → each building's continuity states → Binder
-House → close-up Library → later buildings in campaign order. Do not batch the future milestones merely
-because their specifications are present in this file.
+The Trading Post v0.3 style gate is Game-Design accepted. Current work is the opening identity set only:
+Recycler, Blacksmith, Storehouse and Firepit Built/Tier-0, compared label-free with the accepted Trading Post
+in colour and literal grayscale. After that review, the remaining order is: each building's continuity states
+→ Binder House → close-up Library → later buildings in campaign order. Do not batch those future milestones
+merely because their specifications are present in this file.
 
 Stop immediately and report rather than inventing:
 
