@@ -1366,7 +1366,7 @@ private struct EncounterScalingPhoneAcceptanceView: View {
                     .buttonStyle(.borderedProminent)
                     .accessibilityHint("Opens \(next.title), the first incomplete fixture in matrix order")
                 } else {
-                    Label("All six progression fixtures complete", systemImage: "checkmark.seal.fill")
+                    Label("All progression fixtures complete", systemImage: "checkmark.seal.fill")
                         .font(.headline)
                         .foregroundStyle(.green)
                         .accessibilityIdentifier("progression-scaling-matrix-complete")

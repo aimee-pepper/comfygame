@@ -270,6 +270,7 @@ enum EncounterScalingProgressionFixtureKind: String, Identifiable, CaseIterable,
     case freshSolo
     case experiencedSolo
     case ordinaryTwoPerson
+    case ordinaryThreePerson
     case experiencedParty
     case ordinaryFivePerson
     case apexParty
@@ -282,6 +283,7 @@ enum EncounterScalingProgressionFixtureKind: String, Identifiable, CaseIterable,
         switch self {
         case .freshSolo, .experiencedSolo: []
         case .ordinaryTwoPerson: [8]
+        case .ordinaryThreePerson: [8, 6]
         case .experiencedParty: [8, 6, 4]
         case .ordinaryFivePerson: [8, 6, 4, 2]
         case .apexParty: [8, 6, 4]
@@ -292,6 +294,7 @@ enum EncounterScalingProgressionFixtureKind: String, Identifiable, CaseIterable,
         case .freshSolo: "Solo · Binder level 1"
         case .experiencedSolo: "Solo · Binder level 8"
         case .ordinaryTwoPerson: "Ordinary · 2 people · levels 8 / 8"
+        case .ordinaryThreePerson: "Ordinary · 3 people · levels 8 / 8 / 6"
         case .experiencedParty: "Party · levels 8 / 8 / 6 / 4"
         case .ordinaryFivePerson: "Ordinary · 5 people · levels 8 / 8 / 6 / 4 / 2"
         case .apexParty: "Apex · party levels 8 / 8 / 6 / 4"

@@ -247,7 +247,7 @@ final class EncounterScalingIntegrationTests: XCTestCase {
         let decoded = EncounterScalingAcceptanceRecorder(preferences: preferences)
         XCTAssertEqual(decoded.records.count, 4, "all summaries remain visible and clearable")
         XCTAssertEqual(decoded.completionCount, 1)
-        XCTAssertEqual(decoded.nextUnrecorded, .ordinaryFivePerson)
+        XCTAssertEqual(decoded.nextUnrecorded, .ordinaryThreePerson)
         XCTAssertEqual(decoded.nextIncomplete, .experiencedSolo,
                        "unfinished saved rows must not be skipped")
     }
@@ -299,7 +299,7 @@ final class EncounterScalingIntegrationTests: XCTestCase {
         XCTAssertTrue(source.contains("Clear \\(acceptance.records.count) saved verdicts"))
         XCTAssertTrue(source.contains("Campaign saves are unchanged"))
         XCTAssertTrue(source.contains("Open next unrecorded fixture"))
-        XCTAssertTrue(source.contains("All six progression fixtures complete"))
+        XCTAssertTrue(source.contains("All progression fixtures complete"))
         XCTAssertTrue(source.contains("highlightedProgressionKind = acceptance.nextIncomplete"))
     }
 
@@ -355,6 +355,7 @@ final class EncounterScalingIntegrationTests: XCTestCase {
         let fresh = try XCTUnwrap(receipts.first { $0.kind == .freshSolo })
         let solo = try XCTUnwrap(receipts.first { $0.kind == .experiencedSolo })
         let two = try XCTUnwrap(receipts.first { $0.kind == .ordinaryTwoPerson })
+        let three = try XCTUnwrap(receipts.first { $0.kind == .ordinaryThreePerson })
         let party = try XCTUnwrap(receipts.first { $0.kind == .experiencedParty })
         let five = try XCTUnwrap(receipts.first { $0.kind == .ordinaryFivePerson })
         let apex = try XCTUnwrap(receipts.first { $0.kind == .apexParty })
@@ -363,10 +364,11 @@ final class EncounterScalingIntegrationTests: XCTestCase {
         XCTAssertEqual(solo.partyLevels, [8])
         XCTAssertEqual(party.partyLevels, [8, 8, 6, 4])
         XCTAssertEqual(two.partyLevels, [8, 8])
+        XCTAssertEqual(three.partyLevels, [8, 8, 6])
         XCTAssertEqual(five.partyLevels, [8, 8, 6, 4, 2])
         XCTAssertEqual(apex.partyLevels, [8, 8, 6, 4])
         XCTAssertEqual(receipts.filter { !$0.kind.isApex }.map(\.rootSeed),
-                       Array(repeating: 101, count: 5))
+                       Array(repeating: 101, count: 6))
         XCTAssertEqual(apex.rootSeed, 909)
         XCTAssertEqual(Set(receipts.filter { !$0.kind.isApex }.map(\.mapSeed)).count, 1)
         XCTAssertTrue(receipts.allSatisfy {
@@ -379,33 +381,44 @@ final class EncounterScalingIntegrationTests: XCTestCase {
         XCTAssertEqual(solo.anchorLevel, 8)
         XCTAssertEqual(party.anchorLevel, 8)
         XCTAssertEqual(two.partyCount, 2)
+        XCTAssertEqual(three.partyCount, 3)
         XCTAssertEqual(five.partyCount, 5)
         XCTAssertTrue(apex.foeIsApex.allSatisfy { $0 })
         XCTAssertFalse(two.foeIsApex.contains(true))
+        XCTAssertFalse(three.foeIsApex.contains(true))
         XCTAssertFalse(five.foeIsApex.contains(true))
         XCTAssertEqual(fresh.healthCaps, [30])
         XCTAssertEqual(solo.healthCaps, [30])
         XCTAssertEqual(party.healthCaps, [30, 24, 24, 24])
         XCTAssertEqual(two.healthCaps, [30, 24])
+        XCTAssertEqual(three.healthCaps, [30, 24, 24])
         XCTAssertEqual(five.healthCaps, [30, 24, 24, 24, 24])
         XCTAssertEqual(two.worldLevel, 6)
+        XCTAssertEqual(three.worldLevel, 6)
         XCTAssertEqual(five.worldLevel, 6)
         XCTAssertEqual(apex.worldLevel, 6)
         XCTAssertEqual(two.foeLevels, [6])
+        XCTAssertEqual(three.foeLevels, [6])
         XCTAssertEqual(five.foeLevels, [6])
         XCTAssertEqual(apex.foeLevels, [10])
         XCTAssertEqual(two.foeHP, [21])
+        XCTAssertEqual(three.foeHP, [23])
         XCTAssertEqual(five.foeHP, [24])
         XCTAssertEqual(apex.foeHP, [53])
         XCTAssertEqual(two.groupingRadius, 1)
+        XCTAssertEqual(three.groupingRadius, 2)
         XCTAssertEqual(five.groupingRadius, 3)
         XCTAssertEqual(apex.groupingRadius, 2)
         XCTAssertEqual(two.cappedPartyPowerBudget, 1.5, accuracy: 0.000_000_001)
+        XCTAssertEqual(three.cappedPartyPowerBudget, 1.9208399966332799,
+                       accuracy: 0.000_000_001)
         XCTAssertEqual(five.cappedPartyPowerBudget, 2.573186265605486,
                        accuracy: 0.000_000_001)
         XCTAssertEqual(apex.cappedPartyPowerBudget, 2.275052602165878,
                        accuracy: 0.000_000_001)
         XCTAssertEqual(two.hpAllocationByFoeID.values.reduce(0, +), 3)
+        XCTAssertEqual(three.hpAllocationByFoeID.values.reduce(0, +), 5)
+        XCTAssertEqual(three.wholePressureSlots, 0)
         XCTAssertEqual(five.hpAllocationByFoeID.values.reduce(0, +), 6)
         XCTAssertTrue(apex.hpAllocationByFoeID.isEmpty)
         XCTAssertEqual(fresh.worldLevel, 1)
@@ -475,6 +488,7 @@ final class EncounterScalingIntegrationTests: XCTestCase {
             kind: .experiencedParty, rootSeed: 101, from: party.store)))
 
         let two = try EncounterScalingProgressionFixtureSession(kind: .ordinaryTwoPerson)
+        let three = try EncounterScalingProgressionFixtureSession(kind: .ordinaryThreePerson)
         let five = try EncounterScalingProgressionFixtureSession(kind: .ordinaryFivePerson)
         let apex = try EncounterScalingProgressionFixtureSession(kind: .apexParty)
         XCTAssertEqual(two.receipt.phoneSummaryLines, [
@@ -482,6 +496,12 @@ final class EncounterScalingIntegrationTests: XCTestCase {
             "Pressure 1.500 · radius 1",
             "Foe L6 · 21 HP",
             "Allocation +3 HP · 0 pressure slots"
+        ])
+        XCTAssertEqual(three.receipt.phoneSummaryLines, [
+            "Party levels 8 / 8 / 6",
+            "Pressure 1.921 · radius 2",
+            "Foe L6 · 23 HP",
+            "Allocation +5 HP · 0 pressure slots"
         ])
         XCTAssertEqual(five.receipt.phoneSummaryLines, [
             "Party levels 8 / 8 / 6 / 4 / 2",
@@ -521,6 +541,7 @@ final class EncounterScalingIntegrationTests: XCTestCase {
         let fresh = try XCTUnwrap(byKind[.freshSolo])
         let experiencedSolo = try XCTUnwrap(byKind[.experiencedSolo])
         let ordinaryTwo = try XCTUnwrap(byKind[.ordinaryTwoPerson])
+        let ordinaryThree = try XCTUnwrap(byKind[.ordinaryThreePerson])
         let experiencedParty = try XCTUnwrap(byKind[.experiencedParty])
         let ordinaryFive = try XCTUnwrap(byKind[.ordinaryFivePerson])
         let apex = try XCTUnwrap(byKind[.apexParty])
@@ -529,6 +550,8 @@ final class EncounterScalingIntegrationTests: XCTestCase {
         XCTAssertGreaterThan(experiencedSolo.foeLevel, fresh.foeLevel)
         XCTAssertGreaterThan(experiencedSolo.foeStartingHP, fresh.foeStartingHP)
         XCTAssertGreaterThan(ordinaryFive.partyPowerBudget, ordinaryTwo.partyPowerBudget)
+        XCTAssertGreaterThan(ordinaryThree.partyPowerBudget, ordinaryTwo.partyPowerBudget)
+        XCTAssertLessThanOrEqual(ordinaryThree.partyPowerBudget, ordinaryFive.partyPowerBudget)
         XCTAssertGreaterThanOrEqual(ordinaryFive.foeStartingHP, ordinaryTwo.foeStartingHP)
         XCTAssertGreaterThan(apex.foeStartingHP, experiencedParty.foeStartingHP)
         XCTAssertEqual(apex.partyLevels, experiencedParty.partyLevels)
