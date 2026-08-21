@@ -1,0 +1,480 @@
+{
+  "schemaVersion": 1,
+  "integrationReady": false,
+  "checkpoint": "runtime-opening-district-roots",
+  "logicalSize": {
+    "width": 184,
+    "height": 300
+  },
+  "shells": {
+    "commerce": {
+      "source": {
+        "file": "source/commerce-empty-shell-logical-184x300.png",
+        "width": 184,
+        "height": 300,
+        "sha256": "a64ea5511490c6fe841ae5b63484a55b136f3a83fb429e70b7295cb64513083f"
+      },
+      "reference": {
+        "file": "references/commerce-shell-reference.png",
+        "sha256": "f52bd55cf2e8978a2dde360af7bbfb9a951ab3888a5c32c40516c989a6aafb81",
+        "productionSource": false
+      },
+      "palette": "commerce-specific bounded 64-color RGBA"
+    },
+    "makers": {
+      "source": {
+        "file": "source/makers-empty-shell-logical-184x300.png",
+        "width": 184,
+        "height": 300,
+        "sha256": "3e8367cc2522048b775e4dedf2406415e7a000a5ab8488229b97fdcc4d8ca05e"
+      },
+      "reference": {
+        "file": "references/makers-shell-reference.png",
+        "sha256": "ece2a52f33c57a6ccf014ab4cee2ca953c6eee4c05d055e8ffd8f5623597b7cc",
+        "productionSource": false
+      },
+      "palette": "makers-specific bounded 64-color RGBA"
+    },
+    "commons": {
+      "source": {
+        "file": "source/commons-empty-shell-logical-184x300.png",
+        "width": 184,
+        "height": 300,
+        "sha256": "018ad5596e0e7526e10920b8ecad46a629cb846387a689c31c131db28694adbb"
+      },
+      "reference": {
+        "file": "references/commons-shell-reference.png",
+        "sha256": "855c0a1e1188b293ed7d608c5673b84f9b666165d98ca422b0b1cd9ea8e0b0b8",
+        "productionSource": false
+      },
+      "palette": "commons-specific bounded 64-color RGBA"
+    }
+  },
+  "districts": {
+    "commerce": {
+      "title": "COMMERCE ROW",
+      "slots": {
+        "trading_post": {
+          "x": 4,
+          "y": 44,
+          "width": 96,
+          "height": 80
+        },
+        "recycler": {
+          "x": 84,
+          "y": 142,
+          "width": 96,
+          "height": 80
+        }
+      }
+    },
+    "makers": {
+      "title": "MAKERS' ROW",
+      "slots": {
+        "blacksmith": {
+          "x": 44,
+          "y": 100,
+          "width": 96,
+          "height": 80
+        }
+      }
+    },
+    "commons": {
+      "title": "THE COMMONS",
+      "slots": {
+        "storehouse": {
+          "x": 4,
+          "y": 48,
+          "width": 96,
+          "height": 80
+        },
+        "firepit": {
+          "x": 84,
+          "y": 152,
+          "width": 96,
+          "height": 80
+        }
+      }
+    }
+  },
+  "homeReturn": {
+    "route": "binder_house",
+    "target": {
+      "x": 70,
+      "y": 250,
+      "width": 44,
+      "height": 44
+    },
+    "deviceBackEquivalent": true
+  },
+  "acceptedBuiltHashes": {
+    "trading_post": "4adceed893c35c804b7b6bdc2b9429715ea5c5b7bf7faaca79b82f4684d1f4e9",
+    "recycler": "8b6b5b173f6678a9546d94ef361f7c8135c79d24ba175584897170f21405d7a6",
+    "blacksmith": "33e7a730bccf03d04a11934d39d5fa25d287ef6926f26fa3c5252b624ec9b53f",
+    "storehouse": "a7ea01e39f2064868cf7216f992b9b7f7d4a0a96344787cff30a99357af8d110",
+    "firepit": "8cc24a5f38096ccc4e543b968b26ff42688d93432a414a169eadd90a61514ce7"
+  },
+  "buildingLayers": {
+    "trading_post": {
+      "built": {
+        "file": "artifacts/opening-state-continuity-v0.1/source/trading_post-built-logical-96x80.png",
+        "sha256": "4adceed893c35c804b7b6bdc2b9429715ea5c5b7bf7faaca79b82f4684d1f4e9"
+      },
+      "foundation": {
+        "file": "artifacts/opening-state-continuity-v0.1/source/trading_post-foundation-logical-96x80.png",
+        "sha256": "4f8ed1e8e6cbcb110f56ff595671ff4da82cb0521b5a0b131bcd0e0574b71ee5"
+      },
+      "improved": {
+        "file": "artifacts/opening-state-continuity-v0.1/source/trading_post-improved-logical-96x80.png",
+        "sha256": "982fc426aeba77f852fe5a921e56b116f5a9fdf34f386450fabaad190bceddd6"
+      },
+      "mastered": {
+        "file": "artifacts/opening-state-continuity-v0.1/source/trading_post-mastered-logical-96x80.png",
+        "sha256": "218a977481d5970cf267eccaade61ffb02ae4303ce65eaf8e0338a06440007c1"
+      },
+      "attention": {
+        "file": "artifacts/opening-state-continuity-v0.1/source/trading_post-attention-logical-96x80.png",
+        "sha256": "57d02d8c5bf4ae2e37e0fb820013fb80ac2952ba1818324df388d87f5f191dbb"
+      }
+    },
+    "recycler": {
+      "built": {
+        "file": "artifacts/opening-identities-built-v0.1/source/recycler-built-logical-96x80.png",
+        "sha256": "8b6b5b173f6678a9546d94ef361f7c8135c79d24ba175584897170f21405d7a6"
+      },
+      "attention": {
+        "file": "overlays/recycler-attention-logical-96x80.png",
+        "sha256": "62d7d259bb6e474c93285e188fc9e870d91566ab4f8b150492cea521f4ca4f7c"
+      }
+    },
+    "blacksmith": {
+      "built": {
+        "file": "artifacts/opening-identities-built-v0.1/source/blacksmith-built-logical-96x80.png",
+        "sha256": "33e7a730bccf03d04a11934d39d5fa25d287ef6926f26fa3c5252b624ec9b53f"
+      },
+      "attention": {
+        "file": "overlays/blacksmith-attention-logical-96x80.png",
+        "sha256": "a1cdcb6fbc559581e37ccb693031b5c00faca3e42c579a31f3871667e4fa9b8b"
+      },
+      "foundation": {
+        "file": "overlays/blacksmith-foundation-logical-96x80.png",
+        "sha256": "f8c0004d970ef2cfb8521c2dbfba29857aa8587c225b6f8ff9291bf9bef7b20a"
+      }
+    },
+    "storehouse": {
+      "built": {
+        "file": "artifacts/opening-identities-built-v0.1/source/storehouse-built-logical-96x80.png",
+        "sha256": "a7ea01e39f2064868cf7216f992b9b7f7d4a0a96344787cff30a99357af8d110"
+      },
+      "attention": {
+        "file": "overlays/storehouse-attention-logical-96x80.png",
+        "sha256": "a71b72f9e0981bcf16fdfe21780b1409d524f9d09e61bb5cd8dd52c818a852de"
+      }
+    },
+    "firepit": {
+      "built": {
+        "file": "artifacts/opening-state-continuity-v0.1/source/firepit-built-logical-96x80.png",
+        "sha256": "8cc24a5f38096ccc4e543b968b26ff42688d93432a414a169eadd90a61514ce7"
+      },
+      "foundation": {
+        "file": "artifacts/opening-state-continuity-v0.1/source/firepit-foundation-logical-96x80.png",
+        "sha256": "a2b286ff245a414ca821005a274b47628b3bbccae98c5768da1fe3b56cbf72c4"
+      },
+      "improved": {
+        "file": "artifacts/opening-state-continuity-v0.1/source/firepit-improved-logical-96x80.png",
+        "sha256": "ff0c7fb780b15aaea8114c115996023970a7c28fe261abc97c432ffadce80174"
+      },
+      "mastered": {
+        "file": "artifacts/opening-state-continuity-v0.1/source/firepit-mastered-logical-96x80.png",
+        "sha256": "35adb12fd71c37758b16801d939be4191ef83d2a585dd2566ef7e6e6847f98d6"
+      },
+      "attention": {
+        "file": "artifacts/opening-state-continuity-v0.1/source/firepit-attention-logical-96x80.png",
+        "sha256": "6cdb57e8b65f9535ec13a7c76cd356541233f397e6cc7d0b751a630dbe2dae7e"
+      }
+    }
+  },
+  "sequences": {
+    "commerce": [
+      {},
+      {
+        "trading_post": {
+          "state": "built"
+        }
+      },
+      {
+        "trading_post": {
+          "state": "built"
+        },
+        "recycler": {
+          "state": "built"
+        }
+      },
+      {
+        "trading_post": {
+          "state": "improved"
+        },
+        "recycler": {
+          "state": "built"
+        }
+      },
+      {
+        "trading_post": {
+          "state": "built",
+          "attention": true
+        },
+        "recycler": {
+          "state": "built"
+        }
+      },
+      {
+        "trading_post": {
+          "state": "built"
+        },
+        "recycler": {
+          "state": "built",
+          "attention": true
+        }
+      }
+    ],
+    "makers": [
+      {},
+      {
+        "blacksmith": {
+          "state": "foundation"
+        }
+      },
+      {
+        "blacksmith": {
+          "state": "built"
+        }
+      },
+      {
+        "blacksmith": {
+          "state": "built",
+          "attention": true
+        }
+      }
+    ],
+    "commons": [
+      {
+        "storehouse": {
+          "state": "built"
+        },
+        "firepit": {
+          "state": "built"
+        }
+      },
+      {
+        "storehouse": {
+          "state": "built",
+          "attention": true
+        },
+        "firepit": {
+          "state": "built"
+        }
+      },
+      {
+        "storehouse": {
+          "state": "built"
+        },
+        "firepit": {
+          "state": "built",
+          "attention": true
+        }
+      },
+      {
+        "storehouse": {
+          "state": "built"
+        },
+        "firepit": {
+          "state": "improved"
+        }
+      },
+      {
+        "storehouse": {
+          "state": "built"
+        },
+        "firepit": {
+          "state": "mastered"
+        }
+      }
+    ]
+  },
+  "evidence": {
+    "commerce": {
+      "phones": [
+        {
+          "file": "evidence/commerce-state-1-368x800.png",
+          "width": 368,
+          "height": 800,
+          "sha256": "f4f08367bba6bb2033b9b124b2f26bee21d7c546fb69a7b9a342a12705947540"
+        },
+        {
+          "file": "evidence/commerce-state-2-368x800.png",
+          "width": 368,
+          "height": 800,
+          "sha256": "659a3253c6315d3df6b3151e44a1b47596b67887498b4b9c142e7e7e2b5e659e"
+        },
+        {
+          "file": "evidence/commerce-state-3-368x800.png",
+          "width": 368,
+          "height": 800,
+          "sha256": "fc4300f8820817520b80a672130f7a8f1825c73e4cb8b256064a6428eba9f9bf"
+        },
+        {
+          "file": "evidence/commerce-state-4-368x800.png",
+          "width": 368,
+          "height": 800,
+          "sha256": "d936b980aaa628237ad2e8bc161c5648f4403b163c03cbaecec4f3bf01b41118"
+        },
+        {
+          "file": "evidence/commerce-state-5-368x800.png",
+          "width": 368,
+          "height": 800,
+          "sha256": "3bca997940e77a7bf4223f25df03d1c27ce810085bbac69cb84531d9a1dedf9a"
+        },
+        {
+          "file": "evidence/commerce-state-6-368x800.png",
+          "width": 368,
+          "height": 800,
+          "sha256": "4502d74d4a56301fe6bd359dba4835879de787b007d8c151263997a4e72e438b"
+        }
+      ],
+      "collision": {
+        "file": "evidence/commerce-collision.png",
+        "width": 184,
+        "height": 300,
+        "sha256": "4be4b8c0cd7d65a3e82e6057e4a6d0d0dda64769160119296d4e0e8399ce5b73"
+      },
+      "grayscale": {
+        "file": "evidence/commerce-developed-grayscale-368x800.png",
+        "width": 368,
+        "height": 800,
+        "sha256": "346d711b06dee9a06fa0060006f74b72c83fb95b4825eacb2a906c51e31d5e45"
+      }
+    },
+    "makers": {
+      "phones": [
+        {
+          "file": "evidence/makers-state-1-368x800.png",
+          "width": 368,
+          "height": 800,
+          "sha256": "2c94880b5f19382c7c744bf6eeeac2aa028c09dc096517d58781c7ea11c4a0fc"
+        },
+        {
+          "file": "evidence/makers-state-2-368x800.png",
+          "width": 368,
+          "height": 800,
+          "sha256": "b219e6c9cbec41750e7c2eaf8d083807886c3aedbc13067ab982b7acb2122a3d"
+        },
+        {
+          "file": "evidence/makers-state-3-368x800.png",
+          "width": 368,
+          "height": 800,
+          "sha256": "16c9abb0ec336ef3de138a6e317cb8f1003fd1f9a92dee1530b72e5823b3302e"
+        },
+        {
+          "file": "evidence/makers-state-4-368x800.png",
+          "width": 368,
+          "height": 800,
+          "sha256": "e4330b3c8e8cb7661c63a8cb396d2ab491a8384681e9d9eaab8f0bd092ffc68c"
+        }
+      ],
+      "collision": {
+        "file": "evidence/makers-collision.png",
+        "width": 184,
+        "height": 300,
+        "sha256": "8401a5ce86985bb968fb4f553aad44cd90cbc042314e8f96b439290d8166a1ef"
+      },
+      "grayscale": {
+        "file": "evidence/makers-developed-grayscale-368x800.png",
+        "width": 368,
+        "height": 800,
+        "sha256": "3d5ed8224a5d65a405a24a5a66fc727e4f0b2006d21e20b15c07ec37c45278a9"
+      }
+    },
+    "commons": {
+      "phones": [
+        {
+          "file": "evidence/commons-state-1-368x800.png",
+          "width": 368,
+          "height": 800,
+          "sha256": "019a564a321e2e15eb8e4f21e8ba5b63bf446160389754533a302b0afb68e65d"
+        },
+        {
+          "file": "evidence/commons-state-2-368x800.png",
+          "width": 368,
+          "height": 800,
+          "sha256": "cb5a3ff04f7b855bdadf331f590b736cbed3c76ca3c037274787dec9f62f7830"
+        },
+        {
+          "file": "evidence/commons-state-3-368x800.png",
+          "width": 368,
+          "height": 800,
+          "sha256": "19fe601ca255eb7d7f659929083f9d761475fa826a56c64e226fd8755fb909ab"
+        },
+        {
+          "file": "evidence/commons-state-4-368x800.png",
+          "width": 368,
+          "height": 800,
+          "sha256": "cb39bd0a3d599b1db0750cf5da81aa3354ed5f6975b6c51acd70bb51a88402ff"
+        },
+        {
+          "file": "evidence/commons-state-5-368x800.png",
+          "width": 368,
+          "height": 800,
+          "sha256": "f20826b6bc3e6190aa0be24c208381e492b2da92a77cb3ee57c70aa84cf04ba4"
+        }
+      ],
+      "collision": {
+        "file": "evidence/commons-collision.png",
+        "width": 184,
+        "height": 300,
+        "sha256": "d5c54bf691479649ed6585438173776aac647da43917308f9a1e99fdcb44fc38"
+      },
+      "grayscale": {
+        "file": "evidence/commons-developed-grayscale-368x800.png",
+        "width": 368,
+        "height": 800,
+        "sha256": "728c37de5624551ecc1d8cc82345e9c8c335979dcc37bf786eb1cdddadb546f3"
+      }
+    }
+  },
+  "identityEvidence": [
+    {
+      "file": "artifacts/opening-identities-built-v0.1/evidence/opening-five-comparison-color.png",
+      "sha256": "9b4f2d8f0aadc3f60ef3228a945f76c9a7156e059465b016aee51936ccfa3bd0",
+      "labelsRemoved": true
+    },
+    {
+      "file": "artifacts/opening-identities-built-v0.1/evidence/opening-five-comparison-grayscale.png",
+      "sha256": "dbb61e4d89ba5f6e658d47316a103d7b8f1628794090323b8c3756c52342037e",
+      "labelsRemoved": true
+    }
+  ],
+  "routeEvidence": {
+    "file": "evidence/opening-route-contact-sheet.png",
+    "width": 736,
+    "height": 2400,
+    "sha256": "b2db28c0feec777454037bc8624fa16c98c9bad79ef3bd4639602001df71ce3c"
+  },
+  "compositor": {
+    "module": "scripts/export-opening-district-roots.mjs",
+    "export": "composeDistrict",
+    "canonicalInputOrder": "stable building ID",
+    "stateAuthority": "empty shell + accepted structure + sign + optional attention; phone composites are evidence"
+  },
+  "forbidden": [
+    "unknown-lot",
+    "walking-avatar",
+    "district-shortcut",
+    "route-graph",
+    "damage-state",
+    "static-town-bitmap",
+    "scrolling",
+    "invented-station",
+    "native-integration"
+  ],
+  "provenance": "Accepted Built sources are referenced and hashed byte-identically; district shells and independent supporting overlays are reusable runtime layers."
+}
