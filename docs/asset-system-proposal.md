@@ -5261,3 +5261,27 @@ recorded there. This remains a **Game Design candidate only** while uncommitted/
 `integrationReady:false`. It does not authorize native asset packaging, later district density, later
 building states, final zoning or new goldens. Asset pauses at checkpoint 6 until a separate next assignment
 is scheduled.
+
+#### Atmospheric world presentation v0.1 disposition
+
+**Accepted by Game Design as a frozen-ready Asset candidate; native integration remains unaccepted.** Game
+Design inspected the native 16×16 family/density sheet, exact 368×800 phone matrix, literal-grayscale matrix,
+full/fringe/remembered/hidden disclosure proof, calm/moving/strong phases, genuine zero/one/two-step contact
+shade, mixed Smoke+Rain and Mist+Snow compositions, and remote-hidden-mutation fixture. The kit keeps hidden
+tiles opaque and unconstructed, removes live atmosphere from remembered tiles, leaves currently visible
+terrain/actors legible, and never turns precipitation into Mud, ice, lightning or another gameplay fact.
+Equal-height material changes produce no false sidewall; only genuine elevation produces contact shade.
+
+The first visual pass's repeated Mist/Fog scanlines and dash-like Smoke were rejected. The final candidate
+uses irregular multi-tile Fog banks with density-owned thickness and clean pockets, plus porous plume/curl
+Smoke. Light Mist and heavy Fog are now visibly different at ordinary phone scale and in literal grayscale;
+heavy/dense coverage remains atmosphere rather than a substitute for the visibility mask. Airborne Ash,
+Miasma, Rain, Snow and mixed precipitation remain distinguishable through shape/value/motion rather than hue
+alone. Motion shifts placement without changing identity or density.
+
+The accepted candidate manifest is
+`AssetLab/artifacts/atmosphere-presentation-v0.1/manifest.json`, SHA-256
+`b402400f57b55c92f79b3cda43a36fb77738dce2ce2c3c11a06746fb6f874ee9`. Its exact isolated boundary is the
+atmosphere exporter, focused test and `atmosphere-presentation-v0.1` artifact tree. It remains uncommitted,
+unpromoted and `integrationReady:false`; this disposition authorizes Asset to checkpoint/freeze that exact
+candidate, not to edit native gameplay, promote goldens or begin another Asset milestone without assignment.

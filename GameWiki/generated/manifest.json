@@ -1,9 +1,9 @@
 {
   "schemaVersion": 1,
-  "aggregateSourceHash": "42870cc7c277d9eb160756a05e425eceea5e202977f630db647ddabc5771e22a",
+  "aggregateSourceHash": "4ba126036b54d07801736abe2d39f19d088fa6f273b38c2855759e1d7f640a6a",
   "inputs": {
     "Sources/Content/Data/items.json": "b94b1107229f217e14f1d7fa936d8eea938f9782c06c583be32302f10d432bc9",
-    "Sources/Content/Data/playability-roadmap.json": "f4887c012db804775b2538fb82784923b4ec92d359dccffe46f799483b0bbfff",
+    "Sources/Content/Data/playability-roadmap.json": "5e9d6309ad6ea63359a8d9a28442300cd382c4b4183d40073dafb9dd8bf41839",
     "Sources/Content/Data/resources.json": "8eee965ce7df075abfe3f646bb36d416a10ef1d7d194845e30fa0f31b7b23e6f",
     "Sources/Content/Data/stations.json": "21b5e9f3bee2d9115acf535ef2ff1db350b87b8ee33755e79a3b3e4584102e2b",
     "Sources/Content/Data/symbols.json": "c1ec5dd7b661680b358e21a56124b6080aa28d93db51fd2f6b80214ced1dcb16",
@@ -68,7 +68,7 @@
     "docs/armoury-rebuild-implementation-current.md": "a9e893f4660b274e35c530ff1228ba232570bc7858442617d81e7eb34c1ecf82",
     "docs/ashe-ground-technique-current.md": "14287d7178f1148f4f765e50a7debf15d6f21efb9197181396407057794a161c",
     "docs/asset-production-output-contract-current.md": "e9734d8e96290e0e4f79af180624cf5115d4379cf16a52bbb688f1cea34ee675",
-    "docs/asset-system-proposal.md": "d98b674c5d154e4c065929b68d22813cc2cf8da20494ef0920fae344803a5d83",
+    "docs/asset-system-proposal.md": "f14e842c3c82da82275ffbb2bf08572997923e5117885ea9a95bff3ed90e4cdc",
     "docs/atmospheric-world-presentation-current.md": "1b23bbf2f4fe8c92df422dc15259c7d8b47363aa81ab8e58a36435113472246c",
     "docs/authored-color-vocabulary-current.md": "41aa98371136bf274cf0f8160d822d0b8ff84c479882ffbc8c7847ae6a33b58d",
     "docs/authored-text-audit-current.md": "97c31e4a0564595cc62dbce0920999d648f94208b6f207b903f8cf517bc7b0fa",
@@ -111,11 +111,11 @@
     "docs/crafting-components-and-schematics-current.md": "c95517d88d373eea5be411b019f3893da5cdf948cb569309e4ac9c88cb09ca86",
     "docs/crafting-intuition-and-quality-review-current.md": "7cfe996ccda8bd3cdf150c36cc827bf57d64b72937d183dfe58586fbbf8fef22",
     "docs/creature-ecology-and-materials-overhaul-current.md": "e71a15702256af55de1c34b0269b14f2e657109c32f9dac53acdfae2ea59885f",
-    "docs/creature-ecology-asset-packet-current.md": "493475df3c3d8e857a5c808edbe4655535d1d9abe2999488e97d0c6937b8cbd9",
+    "docs/creature-ecology-asset-packet-current.md": "cbc0ee75b4ef1c40d7a1418f88d6033f4faf89e4e97be14facd9aacba5e234c2",
     "docs/creature-territory-finds-current.md": "07792ad39d56392aaadc4507520015020a77171b6e6486f22aa3381903027385",
     "docs/cross-lead-delivery-contract-current.md": "af95f3e6668995134aaca7e0a1ac6bacd1e81305696c16734ed859f92fd14b2b",
     "docs/curio-identification-knowledge-current.md": "31acb95848598b0874e3978a9488f122b8bfee115e16867a5dca9fa1c33986f0",
-    "docs/current-design-index.md": "70cbae2e60c79a037d2d6df03224c61a22206e3e3ddaecab3ea0e3d7485d6520",
+    "docs/current-design-index.md": "a3b3a14d5e9499e9f8fd31cdceaaef0354e6d82337f2aad957972b9d3454f8dd",
     "docs/cycle-system-current.md": "3a472c56d4c78299574f768de122d2ac11e7387eeae8fd723667e73f96fbd598",
     "docs/dagg-recovery-teaching-current.md": "a6f2e09d574fde643ce524b90c7c76482925010c6d8af53bc327fd4fe3480546",
     "docs/debug-authored-text-atlas-current.md": "dde26130930d41c60ef958393390774a36c6bf37999a2428420db634df1c7dd2",
@@ -281,7 +281,7 @@
     "docs/writing-tool-progression-current.md": "be17fe07aa89aaaab7117a2faca43d7e1eb1be23202d19106c67c42547b23bb0"
   },
   "outputs": {
-    "generated/wiki-data.json": "48201a58a641a4e1a6a61d46c4e7c0e45a9e23a421b7b782edde4c63822ab137",
-    "generated/source-registry.json": "64cfb358cfc5c151baa8606de732a19116d6652d32dd5a3693fce4f3fbb2d3ad"
+    "generated/wiki-data.json": "0d5a0856c6b090717ecd591106fbf27ddca5fc8bf1c12eb3b843e4ad27e7f77d",
+    "generated/source-registry.json": "dc23eef37a5d45f2d57c98a24d706516a42a94c370e2c102a39712415d2eb4d0"
   }
 }

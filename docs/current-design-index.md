@@ -163,7 +163,7 @@ When two documents disagree:
 | Creature ecology and materials | `creature-ecology-and-materials-overhaul-current.md` | Habitat-aware pressure-generated life including deep water and body-derived Creature materials |
 | Creature habitat machine authority | `creature-habitat-authority.json` | Exact terrain availability, reversible pressure/map weights, body/appendage constraints, contact quota and movement components |
 | Creature material projection | `creature-material-projection-authority.json` | Exact v1 species→family, capability, quality-input and deterministic quantity machine authority |
-| Creature ecology Asset packet | `creature-ecology-asset-packet-current.md` | Exact seven-species dual-camera proof, 18-family 32px material atlas, six-band frames, disclosure and production gates |
+| Creature ecology Asset packet | `creature-ecology-asset-packet-current.md` + `creature-ecology-asset-fixtures.json` | Machine-checked seven-species dual-camera proof, 18-family 32px material atlas, six-band frames, disclosure and production gates |
 | Creature territory finds | `creature-territory-finds-current.md` | One rare encounter-level found-object roll; exact gear/consumable/Cache-Key eligibility, provenance, capacity and disclosure |
 | Earlier loot quality hybrid review | `loot-quality-hybrid-review-current.md` | Historical first candidate; superseded for current review by the crafting-intuition audit |
 | Crafting intuition and quality review | `crafting-intuition-and-quality-review-current.md` | Settled six bands, 70/30 component weighting, no hard station cap and Refitting; exact content now delegated to the component/schematic authority |

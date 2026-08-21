@@ -1,0 +1,144 @@
+{
+  "schemaVersion": 1,
+  "authorityID": "creature-ecology-asset-fixtures-v1",
+  "status": "settled-proof-fixtures-not-live-content",
+  "profiles": {
+    "world": { "width": 16, "height": 16, "camera": "straightTopDown" },
+    "encounterDetail": { "width": 48, "height": 48, "camera": "acceptedShallowSide" },
+    "material": { "width": 32, "height": 32, "camera": "objectIcon" }
+  },
+  "qualityFrames": ["rough", "standard", "fine", "superior", "exceptional", "peerless"],
+  "materialAtlasIDs": [
+    "hide", "pelt", "down", "feather", "fin", "bone",
+    "scale", "quill", "fang", "claw", "oil", "plate",
+    "chitin", "shell", "tusk", "horn", "venom", "ichor"
+  ],
+  "species": [
+    {
+      "id": "ecology.furred_hunter",
+      "speciesSeed": 1001,
+      "specimenSeed": 2001,
+      "habitat": "terrestrial",
+      "traits": {
+        "size": 72, "build": 62, "bodyPlan": "quadruped", "cranialFeature": "none",
+        "covering": { "hardness": 18, "length": 75, "coverage": 85 },
+        "boneDensity": 60, "ornament": 20,
+        "appendages": { "count": 4, "type": "limbed" },
+        "armament": { "pierce": 10, "crush": 8, "rend": 55, "reach": "close", "delivery": "single" },
+        "coloration": { "cyan": 20, "magenta": 30, "yellow": 50, "depth": 55, "patterning": 20 },
+        "finish": { "opacity": 90, "shine": 8, "schiller": 2 },
+        "sensory": { "vision": 35, "mechano": 30, "chemo": 25, "thermo": 10 },
+        "emanation": null, "defence": "speed", "isToxic": false
+      },
+      "expectedFamilies": ["pelt", "claw", "bone"]
+    },
+    {
+      "id": "ecology.plated_crawler",
+      "speciesSeed": 1002,
+      "specimenSeed": 2002,
+      "habitat": "terrestrial",
+      "traits": {
+        "size": 60, "build": 78, "bodyPlan": "segmented", "cranialFeature": "sensoryFan",
+        "covering": { "hardness": 80, "length": 15, "coverage": 90 },
+        "boneDensity": 75, "ornament": 15,
+        "appendages": { "count": 8, "type": "limbed" },
+        "armament": { "pierce": 10, "crush": 55, "rend": 15, "reach": "close", "delivery": "multi" },
+        "coloration": { "cyan": 45, "magenta": 20, "yellow": 35, "depth": 65, "patterning": 40 },
+        "finish": { "opacity": 35, "shine": 10, "schiller": 55 },
+        "sensory": { "vision": 20, "mechano": 35, "chemo": 35, "thermo": 10 },
+        "emanation": null, "defence": "armour", "isToxic": false
+      },
+      "expectedFamilies": ["chitin", "tusk", "bone"]
+    },
+    {
+      "id": "ecology.shore_runner",
+      "speciesSeed": 1003,
+      "specimenSeed": 2003,
+      "habitat": "shore",
+      "traits": {
+        "size": 45, "build": 42, "bodyPlan": "quadruped", "cranialFeature": "none",
+        "covering": { "hardness": 15, "length": 35, "coverage": 70 },
+        "boneDensity": 40, "ornament": 12,
+        "appendages": { "count": 4, "type": "finned" },
+        "armament": { "pierce": 8, "crush": 7, "rend": 12, "reach": "close", "delivery": "single" },
+        "coloration": { "cyan": 55, "magenta": 20, "yellow": 25, "depth": 40, "patterning": 30 },
+        "finish": { "opacity": 80, "shine": 15, "schiller": 5 },
+        "sensory": { "vision": 25, "mechano": 25, "chemo": 35, "thermo": 15 },
+        "emanation": null, "defence": "speed", "isToxic": false
+      },
+      "expectedFamilies": ["hide", "fin", "bone"]
+    },
+    {
+      "id": "ecology.deepwater_biter",
+      "speciesSeed": 1004,
+      "specimenSeed": 2004,
+      "habitat": "aquatic",
+      "traits": {
+        "size": 55, "build": 38, "bodyPlan": "piscine", "cranialFeature": "crest",
+        "covering": { "hardness": 40, "length": 75, "coverage": 70 },
+        "boneDensity": 55, "ornament": 18,
+        "appendages": { "count": 4, "type": "finned" },
+        "armament": { "pierce": 55, "crush": 10, "rend": 10, "reach": "mid", "delivery": "single" },
+        "coloration": { "cyan": 60, "magenta": 15, "yellow": 25, "depth": 55, "patterning": 45 },
+        "finish": { "opacity": 55, "shine": 30, "schiller": 15 },
+        "sensory": { "vision": 20, "mechano": 25, "chemo": 40, "thermo": 15 },
+        "emanation": null, "defence": "speed", "isToxic": false
+      },
+      "expectedFamilies": ["scale", "fin", "fang", "bone", "oil"]
+    },
+    {
+      "id": "ecology.feathered_glider",
+      "speciesSeed": 1005,
+      "specimenSeed": 2005,
+      "habitat": "aerial",
+      "traits": {
+        "size": 35, "build": 30, "bodyPlan": "biped", "cranialFeature": "crest",
+        "covering": { "hardness": 25, "length": 65, "coverage": 80 },
+        "boneDensity": 35, "ornament": 45,
+        "appendages": { "count": 4, "type": "feathered" },
+        "armament": { "pierce": 10, "crush": 5, "rend": 45, "reach": "mid", "delivery": "multi" },
+        "coloration": { "cyan": 15, "magenta": 45, "yellow": 40, "depth": 45, "patterning": 65 },
+        "finish": { "opacity": 30, "shine": 25, "schiller": 45 },
+        "sensory": { "vision": 55, "mechano": 15, "chemo": 10, "thermo": 20 },
+        "emanation": null, "defence": "speed", "isToxic": false
+      },
+      "expectedFamilies": ["feather", "down", "claw", "bone"]
+    },
+    {
+      "id": "ecology.membrane_serpent",
+      "speciesSeed": 1006,
+      "specimenSeed": 2006,
+      "habitat": "aerial",
+      "traits": {
+        "size": 50, "build": 20, "bodyPlan": "serpentine", "cranialFeature": "sensoryFan",
+        "covering": { "hardness": 20, "length": 20, "coverage": 65 },
+        "boneDensity": 30, "ornament": 25,
+        "appendages": { "count": 2, "type": "membrane" },
+        "armament": { "pierce": 50, "crush": 5, "rend": 10, "reach": "mid", "delivery": "single" },
+        "coloration": { "cyan": 50, "magenta": 35, "yellow": 15, "depth": 60, "patterning": 35 },
+        "finish": { "opacity": 75, "shine": 20, "schiller": 5 },
+        "sensory": { "vision": 35, "mechano": 25, "chemo": 25, "thermo": 15 },
+        "emanation": null, "defence": "crypsis", "isToxic": false
+      },
+      "expectedFamilies": ["hide", "fang", "bone"]
+    },
+    {
+      "id": "ecology.tide_shell",
+      "speciesSeed": 1007,
+      "specimenSeed": 2007,
+      "habitat": "shore",
+      "traits": {
+        "size": 65, "build": 70, "bodyPlan": "radial", "cranialFeature": "none",
+        "covering": { "hardness": 75, "length": 10, "coverage": 90 },
+        "boneDensity": 40, "ornament": 70,
+        "appendages": { "count": 0, "type": "none" },
+        "armament": { "pierce": 5, "crush": 10, "rend": 5, "reach": "far", "delivery": "area" },
+        "coloration": { "cyan": 25, "magenta": 55, "yellow": 20, "depth": 55, "patterning": 80 },
+        "finish": { "opacity": 40, "shine": 30, "schiller": 30 },
+        "sensory": { "vision": 10, "mechano": 20, "chemo": 55, "thermo": 15 },
+        "emanation": { "strength": 70, "kind": "caustic" }, "defence": "aposematism", "isToxic": true
+      },
+      "expectedFamilies": ["shell", "bone", "venom", "ichor"]
+    }
+  ]
+}

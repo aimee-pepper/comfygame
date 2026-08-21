@@ -458,9 +458,9 @@
       "priority": "B1.7c",
       "title": "Atmospheric color, visibility memory and terrain shadows",
       "status": "queued",
-      "detail": "Design is closed in atmospheric-world-presentation-current.md: new binds freeze one typed dominant Smoke/Airborne Ash/Mist/Miasma layer, independent Rain/Snow/mixed precipitation, motion band, palettes and phase seed; current sight consumes only typed suspended density. Runtime memory is last-seen stationary truth, and only genuine elevation receives a top-down contact shade.",
-      "gate": "Asset next proves the exact reusable native pixel families, density/motion matrix, color+literal-grayscale disclosure boundaries and equal-height/no-sidewall counter-fixture. After visual acceptance, Engineering follows the seven contained receipt→visibility→snapshot→compositor→shade→DEBUG harness→phone slices; encounter scaling remains the sole current Engineering primary. Authority: docs/atmospheric-world-presentation-current.md.",
-      "workstream": "asset",
+      "detail": "Design is closed in atmospheric-world-presentation-current.md. Asset candidate b402400f is visually accepted/frozen-ready: typed Smoke/Airborne Ash/Mist/Miasma, independent Rain/Snow/mixed precipitation, density/motion, last-seen disclosure and genuine-height contact shade are proven at native phone scale without scanline Fog, false sidewalls or hidden mutation leakage.",
+      "gate": "After the exact accepted Asset checkpoint is committed and dependency-reconciled, Engineering follows the seven contained receipt→visibility→snapshot→compositor→shade→DEBUG harness→phone slices. Native current sight consumes only typed suspended density; Rain/Snow/motion remain presentation-only in v1; hidden is opaque and unconstructed; remembered is stationary last-seen truth. Keep queued behind the current Engineering primary until that boundary releases. Authority: docs/atmospheric-world-presentation-current.md and accepted manifest b402400f57b55c92f79b3cda43a36fb77738dce2ce2c3c11a06746fb6f874ee9.",
+      "workstream": "engineering",
       "isPrimary": false
     },
     {

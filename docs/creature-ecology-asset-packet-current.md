@@ -7,15 +7,21 @@ game semantics; Aimee still accepts or rejects the resulting art.
 inventory identities. No native integration, ecology rules or combat tuning are part of the Asset task.
 **Updated:** 21 August 2026
 
+Machine proof authority and freshness gate:
+`creature-ecology-asset-fixtures.json` and
+`python3 scripts/validate_creature_ecology_asset_fixtures.py`.
+
 ## Authorities Asset must consume
 
 In descending order:
 
-1. `creature-habitat-authority.json` — four habitats, body-plan and appendage constraints;
-2. `creature-material-projection-authority.json` — exact 18 families and morphology-to-material rules;
-3. `creature-ecology-and-materials-overhaul-current.md` — player promise, disclosure and presentation;
-4. `asset-production-output-contract-current.md` — actual lossless pixel deliverables;
-5. accepted creature camera/stage dispositions in `asset-system-proposal.md`.
+1. `creature-ecology-asset-fixtures.json` — exact proof descriptors, profiles, material IDs and expected
+   projection sets;
+2. `creature-habitat-authority.json` — four habitats, body-plan and appendage constraints;
+3. `creature-material-projection-authority.json` — exact 18 families and morphology-to-material rules;
+4. `creature-ecology-and-materials-overhaul-current.md` — player promise, disclosure and presentation;
+5. `asset-production-output-contract-current.md` — actual lossless pixel deliverables;
+6. accepted creature camera/stage dispositions in `asset-system-proposal.md`.
 
 Asset may report a contradiction but may not resolve one by inventing a fifth habitat, another body part,
 an Earth-species catalogue or a new gameplay stat.
@@ -78,9 +84,11 @@ Colour, patterning, shine and schiller support these reads but cannot be their o
 
 ### Frozen proof vectors
 
-Use these exact normalized inputs for the seven proof identities. They are fixed review fixtures, not a
-replacement for pressure-driven live generation. Armament columns are Pierce/Crush/Rend; finish columns are
-Opacity/Shine/Schiller and sum to 100; colour columns are Cyan/Magenta/Yellow, followed by Depth/Patterning.
+The sole machine source for these exact normalized inputs is
+`creature-ecology-asset-fixtures.json`. The table below is its human-readable review mirror, not a second
+editable fixture catalogue. They are fixed review fixtures, not a replacement for pressure-driven live
+generation. Armament columns are Pierce/Crush/Rend; finish columns are Opacity/Shine/Schiller and sum to 100;
+colour columns are Cyan/Magenta/Yellow, followed by Depth/Patterning.
 
 | Fixture | Size | Cover H/L/C | Bone | Body / head | Appendages | Armament P/C/R | Ornament | CMY · depth/pattern | Finish O/S/Sch | Toxic | Emanation |
 |---|---:|---|---:|---|---|---|---:|---|---|---|---|
