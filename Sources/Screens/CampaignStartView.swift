@@ -124,8 +124,8 @@ struct CampaignStartPresentation: Equatable, Sendable {
 }
 
 enum CampaignStartLayoutPolicy {
-    static let ordinarySlotColumnCount = 2
-    static let ordinarySlotCardMinimumHeight: CGFloat = 84
+    static let ordinarySlotColumnCount = 1
+    static let ordinarySlotCardMinimumHeight: CGFloat = 96
 
     static func primaryActionLabelHeight(dynamicTypeSize: DynamicTypeSize) -> CGFloat {
         dynamicTypeSize.isAccessibilitySize ? 88 : 52
@@ -182,9 +182,7 @@ struct CampaignStartView: View {
             if dynamicTypeSize.isAccessibilitySize {
                 ScrollView { campaignContents(compactSlots: false).padding(16) }
             } else {
-                campaignContents(compactSlots: true)
-                    .padding(16)
-                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+                ordinaryCampaignSurface
             }
         }
         .background(CampaignShelfPalette.page)
@@ -210,6 +208,69 @@ struct CampaignStartView: View {
         }
     }
 
+    private var ordinaryCampaignSurface: some View {
+        VStack(alignment: .leading, spacing: 0) {
+            title
+                .padding(.horizontal, 18)
+                .padding(.top, 14)
+                .padding(.bottom, 10)
+
+            Rectangle()
+                .fill(CampaignShelfPalette.shelf)
+                .frame(height: 3)
+
+            ScrollView {
+                VStack(alignment: .leading, spacing: 10) {
+                    if presentation.slots.isEmpty {
+                        emptyShelf
+                    } else {
+                        ForEach(presentation.slots) { slot in
+                            CampaignSlotCard(
+                                slot: slot,
+                                compact: true,
+                                isContinueSlot: slot.id == presentation.continueSlot?.id,
+                                onLoad: { onLoad(slot.id) },
+                                onDetails: { focusedSlot = slot }
+                            )
+                        }
+
+                        Text("Older test books open details; they never load or overwrite.")
+                            .font(.caption)
+                            .foregroundStyle(CampaignShelfPalette.ink.opacity(0.72))
+                            .padding(.horizontal, 4)
+                    }
+                }
+                .padding(.horizontal, 18)
+                .padding(.vertical, 14)
+            }
+            .scrollIndicators(.hidden)
+
+            Rectangle()
+                .fill(CampaignShelfPalette.shelf)
+                .frame(height: 3)
+
+            primaryActions
+                .padding(14)
+                .background(CampaignShelfPalette.pageHighlight)
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+    }
+
+    private var emptyShelf: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            Text("Your shelf is waiting")
+                .font(.title3.weight(.semibold))
+            Text("Begin a new campaign. Each game keeps its own progress book.")
+                .font(.callout)
+                .foregroundStyle(CampaignShelfPalette.ink.opacity(0.72))
+        }
+        .padding(16)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(CampaignShelfPalette.pageHighlight)
+        .overlay(Rectangle().stroke(CampaignShelfPalette.shelf, lineWidth: 2))
+        .shadow(color: CampaignShelfPalette.shelf.opacity(0.4), radius: 0, x: 3, y: 3)
+    }
+
     private func campaignContents(compactSlots: Bool) -> some View {
         LazyVStack(alignment: .leading, spacing: compactSlots ? 14 : 20) {
             title
@@ -227,6 +288,7 @@ struct CampaignStartView: View {
                                 ForEach(presentation.slots) { slot in
                                     CampaignSlotCard(slot: slot,
                                                      compact: true,
+                                                     isContinueSlot: slot.id == presentation.continueSlot?.id,
                                                      onLoad: { onLoad(slot.id) },
                                                      onDetails: { focusedSlot = slot })
                                 }
@@ -235,9 +297,10 @@ struct CampaignStartView: View {
                     } else {
                         LazyVGrid(columns: slotColumns, spacing: 10) {
                             ForEach(presentation.slots) { slot in
-                                CampaignSlotCard(slot: slot,
-                                                 compact: false,
-                                                 onLoad: { onLoad(slot.id) },
+                            CampaignSlotCard(slot: slot,
+                                             compact: false,
+                                             isContinueSlot: slot.id == presentation.continueSlot?.id,
+                                             onLoad: { onLoad(slot.id) },
                                                  onDetails: { focusedSlot = slot })
                             }
                         }
@@ -248,12 +311,14 @@ struct CampaignStartView: View {
     }
 
     private var title: some View {
-        VStack(alignment: .leading, spacing: 4) {
-            Text("Campaigns").font(.largeTitle.bold())
-            Text(presentation.isEmpty
-                 ? "Begin a campaign. Each new game keeps its own progress."
-                 : "Choose a campaign to continue.")
-                .foregroundStyle(.secondary)
+        HStack(alignment: .firstTextBaseline) {
+            Text("Campaigns")
+                .font(.largeTitle.weight(.heavy))
+                .foregroundStyle(CampaignShelfPalette.ink)
+            Spacer()
+            Text("\(presentation.slots.count) campaign \(presentation.slots.count == 1 ? "book" : "books")")
+                .font(.caption.weight(.semibold))
+                .foregroundStyle(CampaignShelfPalette.ink.opacity(0.68))
         }
     }
 
@@ -279,6 +344,13 @@ struct CampaignStartView: View {
     }
 
     @ViewBuilder private var primaryActionButtons: some View {
+            CampaignStartPrimaryAction(title: "New Game",
+                                       subtitle: "Create a separate campaign",
+                                       icon: "plus.rectangle.on.folder",
+                                       emphasized: presentation.isEmpty,
+                                       identifier: "campaign.primary.new",
+                                       action: onNewGame)
+
             if let slot = presentation.continueSlot {
                 CampaignStartPrimaryAction(title: "Continue", subtitle: slot.name,
                                            icon: "book.pages.fill", emphasized: true,
@@ -287,13 +359,6 @@ struct CampaignStartView: View {
                 }
                 .accessibilityHint("Opens the most recently played available campaign")
             }
-
-            CampaignStartPrimaryAction(title: "New Game",
-                                       subtitle: "Create a separate campaign",
-                                       icon: "plus.rectangle.on.folder",
-                                       emphasized: presentation.isEmpty,
-                                       identifier: "campaign.primary.new",
-                                       action: onNewGame)
     }
 
     private var slotColumns: [GridItem] {
@@ -391,6 +456,7 @@ struct CampaignStartActionLabel: View {
 private struct CampaignSlotCard: View {
     let slot: CampaignSlotSummary
     let compact: Bool
+    let isContinueSlot: Bool
     let onLoad: () -> Void
     let onDetails: () -> Void
 
@@ -400,41 +466,42 @@ private struct CampaignSlotCard: View {
 
     private var compactBody: some View {
         Button(action: slot.health.canLoad ? onLoad : onDetails) {
-            VStack(alignment: .leading, spacing: 3) {
+            HStack(spacing: 10) {
                 CampaignBookplateMotif(id: slot.id, bookCount: slot.progressBookCount)
-                    .frame(height: 20)
+                    .frame(width: 82, height: 66)
                     .accessibilityHidden(true)
 
-                HStack(spacing: 4) {
-                    Text(slot.name)
-                        .font(.subheadline.weight(.semibold))
-                        .lineLimit(1)
-                    Spacer(minLength: 0)
-                    Image(systemName: slot.health.canLoad
-                          ? "checkmark.circle" : "exclamationmark.triangle")
-                        .font(.caption2.weight(.semibold))
-                        .foregroundStyle(slot.health.canLoad ? Color.secondary : Color.orange)
-                        .accessibilityLabel(slot.health.label)
-                }
-
-                if slot.hasKnownMetadata {
+                VStack(alignment: .leading, spacing: 3) {
                     HStack(spacing: 5) {
-                        Label("Level \(slot.binderLevel)", systemImage: "figure.stand")
-                        Text("·")
-                        Text(slot.lastPlayed.formatted(date: .abbreviated, time: .shortened))
+                        Text(slot.name)
+                            .font(.title3.weight(.bold))
+                            .lineLimit(1)
+                        Spacer(minLength: 0)
+                        Text(slot.health.label.uppercased())
+                            .font(.caption2.weight(.bold))
+                            .foregroundStyle(slot.health.canLoad
+                                             ? CampaignShelfPalette.ink.opacity(0.72)
+                                             : Color.orange)
                     }
-                    .font(.caption2)
-                    .foregroundStyle(.secondary)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.82)
-                    .accessibilityElement(children: .combine)
-                    .accessibilityLabel(
-                        "Level \(slot.binderLevel), last played \(slot.lastPlayed.formatted(date: .abbreviated, time: .shortened))"
-                    )
+
+                    if slot.hasKnownMetadata {
+                        Text("Level \(slot.binderLevel) · \(slot.location)")
+                            .font(.caption.weight(.semibold))
+                            .lineLimit(1)
+                        Text(slot.lastPlayed.formatted(date: .abbreviated, time: .shortened))
+                            .font(.caption2)
+                            .foregroundStyle(CampaignShelfPalette.ink.opacity(0.68))
+                            .lineLimit(1)
+                    } else if let message = slot.health.recoveryMessage {
+                        Text(message)
+                            .font(.caption2)
+                            .foregroundStyle(CampaignShelfPalette.ink.opacity(0.68))
+                            .lineLimit(2)
+                    }
                 }
             }
-            .padding(.horizontal, 7)
-            .padding(.vertical, 5)
+            .padding(.horizontal, 10)
+            .padding(.vertical, 8)
             .frame(maxWidth: .infinity,
                    minHeight: CampaignStartLayoutPolicy.ordinarySlotCardMinimumHeight,
                    alignment: .leading)
@@ -452,7 +519,13 @@ private struct CampaignSlotCard: View {
         .foregroundStyle(CampaignShelfPalette.ink)
         .background(CampaignShelfPalette.cover(for: slot.id))
         .overlay(alignment: .leading) {
-            Rectangle().fill(CampaignShelfPalette.pageHighlight.opacity(0.72)).frame(width: 5)
+            Rectangle().fill(CampaignShelfPalette.pageHighlight.opacity(0.78)).frame(width: 7)
+        }
+        .overlay(alignment: .trailing) {
+            Text(isContinueSlot ? "◆" : slot.health.canLoad ? "◇" : "×")
+                .font(.caption.weight(.black))
+                .padding(7)
+                .foregroundStyle(CampaignShelfPalette.ink.opacity(0.8))
         }
         .overlay(Rectangle().stroke(CampaignShelfPalette.shelf, lineWidth: 2))
         .shadow(color: CampaignShelfPalette.shelf.opacity(0.48), radius: 0, x: 3, y: 3)
@@ -570,16 +643,27 @@ private struct CampaignBookplateMotif: View {
     }
 
     var body: some View {
-        HStack(spacing: 3) {
-            ForEach(marks.indices, id: \.self) { index in
-                RoundedRectangle(cornerRadius: 1)
-                    .fill(marks[index] ? Color.primary.opacity(0.68) : Color.primary.opacity(0.2))
-                    .frame(width: index.isMultiple(of: 3) ? 5 : 3,
-                           height: marks[index] ? 28 : 18)
+        ZStack(alignment: .bottomLeading) {
+            Rectangle()
+                .fill(CampaignShelfPalette.pageHighlight.opacity(0.18))
+
+            HStack(alignment: .bottom, spacing: 2) {
+                ForEach(marks.indices, id: \.self) { index in
+                    Rectangle()
+                        .fill(marks[index]
+                              ? CampaignShelfPalette.pageHighlight.opacity(0.9)
+                              : CampaignShelfPalette.ink.opacity(0.32))
+                        .frame(width: index.isMultiple(of: 3) ? 7 : 5,
+                               height: CGFloat(30 + (index % 3) * 6))
+                        .overlay(Rectangle().stroke(CampaignShelfPalette.ink.opacity(0.55), lineWidth: 1))
+                }
             }
+            .padding(.horizontal, 7)
+            .padding(.bottom, 7)
         }
-        .padding(.horizontal, 10)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .overlay(alignment: .bottom) { Rectangle().fill(Color.primary.opacity(0.5)).frame(height: 2) }
+        .overlay(alignment: .bottom) {
+            Rectangle().fill(CampaignShelfPalette.ink.opacity(0.72)).frame(height: 3)
+        }
+        .overlay(Rectangle().stroke(CampaignShelfPalette.ink.opacity(0.55), lineWidth: 1))
     }
 }

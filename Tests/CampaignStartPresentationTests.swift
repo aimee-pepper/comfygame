@@ -96,19 +96,19 @@ final class CampaignStartPresentationTests: XCTestCase {
         XCTAssertTrue(CampaignStartLayoutPolicy.usesSingleColumn(dynamicTypeSize: .accessibility5))
     }
 
-    func testEightOrdinarySlotsUseACompactTwoByFourShelf() {
-        XCTAssertEqual(CampaignStartLayoutPolicy.ordinarySlotColumnCount, 2)
+    func testOrdinarySlotsUseAReadableSingleBookShelf() {
+        XCTAssertEqual(CampaignStartLayoutPolicy.ordinarySlotColumnCount, 1)
         XCTAssertEqual(CampaignStartLayoutPolicy.ordinarySlotRowCount(slotCount: 0), 0)
         XCTAssertEqual(CampaignStartLayoutPolicy.ordinarySlotRowCount(slotCount: 1), 1)
-        XCTAssertEqual(CampaignStartLayoutPolicy.ordinarySlotRowCount(slotCount: 8), 4)
+        XCTAssertEqual(CampaignStartLayoutPolicy.ordinarySlotRowCount(slotCount: 8), 8)
         XCTAssertGreaterThanOrEqual(CampaignStartLayoutPolicy.ordinarySlotCardMinimumHeight, 44)
 
         let shelfHeight =
             CGFloat(CampaignStartLayoutPolicy.ordinarySlotRowCount(slotCount: 8))
             * CampaignStartLayoutPolicy.ordinarySlotCardMinimumHeight
-            + 30 // three ten-point row gutters
-        XCTAssertLessThanOrEqual(shelfHeight, 370,
-                                 "Eight slots must leave ordinary-phone room for title and actions.")
+            + 70 // seven ten-point row gutters
+        XCTAssertGreaterThan(shelfHeight, 370,
+                             "A long shelf should scroll behind pinned primary actions.")
     }
 
     func testOrdinaryCampaignSurfaceIsStaticWhileAccessibilityRetainsFallbackScrolling() throws {
@@ -123,8 +123,9 @@ final class CampaignStartPresentationTests: XCTestCase {
 
         XCTAssertTrue(body.contains("if dynamicTypeSize.isAccessibilitySize"))
         XCTAssertTrue(body.contains("ScrollView { campaignContents(compactSlots: false)"))
-        XCTAssertTrue(body.contains("campaignContents(compactSlots: true)"))
-        XCTAssertFalse(body.contains("ScrollView { campaignContents(compactSlots: true)"))
+        XCTAssertTrue(body.contains("ordinaryCampaignSurface"))
+        XCTAssertTrue(source.contains("ScrollView {"))
+        XCTAssertTrue(source.contains("primaryActions\n                .padding(14)"))
     }
 
     func testCompactSlotUsesTheWholeCardForLoadAndLongPressForDetails() throws {
@@ -160,8 +161,8 @@ final class CampaignStartPresentationTests: XCTestCase {
         XCTAssertTrue(compact.contains("CampaignBookplateMotif"))
         XCTAssertTrue(compact.contains("Level \\(slot.binderLevel)"))
         XCTAssertTrue(compact.contains("slot.lastPlayed.formatted(date: .abbreviated, time: .shortened)"))
-        XCTAssertTrue(compact.contains(".padding(.horizontal, 7)"))
-        XCTAssertTrue(compact.contains(".padding(.vertical, 5)"))
+        XCTAssertTrue(compact.contains(".padding(.horizontal, 10)"))
+        XCTAssertTrue(compact.contains(".padding(.vertical, 8)"))
         XCTAssertFalse(compact.contains(".padding(14)"))
         XCTAssertFalse(compact.contains("HStack(spacing: 4) {\n                if slot.health.canLoad"))
     }
