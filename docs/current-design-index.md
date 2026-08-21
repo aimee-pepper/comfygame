@@ -7,6 +7,10 @@
 - `game-design-ux-assessment-current.md` — current lead assessment of the playable product, its
   strongest identity, first-hour weaknesses and progression-ordered product direction.
 - `playability-priority-sequence-current.md` — cross-lead execution order and WIP limits.
+- `first-three-worlds-execution-plan-current.md` — exact Gates A–G with per-packet Engineering/Asset scope,
+  dependencies, prohibited interpretation and acceptance cards.
+- `core-loop-causal-presentation-plan-current.md` — product through-line from writing to growth; subordinate
+  to the exact execution/system packets where they are more specific.
 - `feature-completion-priority-audit-current.md` — definition of fully implemented and ordered
   completion tiers.
 - `phase-1-phone-acceptance-card-current.md` — exact phone pass/fail sequence for the active
@@ -44,7 +48,7 @@
 > **Launch quality:** `app-launch-loading-current.md` defines immediate static and honest in-app
 > loading surfaces plus timing, accessibility and failure-recovery gates.
 
-**Updated:** 20 Aug 2026
+**Updated:** 21 Aug 2026
 **Purpose:** Fast routing for design, engineering and asset work. Start here instead of inferring
 authority from filename age or chat history.
 
@@ -53,7 +57,7 @@ authority from filename age or chat history.
 When two documents disagree:
 
 1. A clearly labelled current decision in the relevant living system document wins.
-2. `decisions-session-18.md` wins over earlier session logs for work covered by the current lead pass.
+2. `decisions-session-19.md` wins over earlier session logs for work covered by the current lead pass.
 3. `design-review-queue.md` identifies placeholders, reviews and blocks; a placeholder is usable but
    not final.
 4. `roster-coherence-audit-current.md` controls cross-roster ownership and distribution.
@@ -64,7 +68,7 @@ When two documents disagree:
 
 | Area | Start here | Notes |
 |---|---|---|
-| Current decisions | `decisions-session-18.md` | Settled calls and labelled holds from the takeover onward |
+| Current decisions | `decisions-session-19.md` | Latest settled causal-presentation, ecology, extraction, Home and Party corrections; earlier session logs remain historical |
 | Playability priority sequence | `playability-priority-sequence-current.md` | Numbered Phase 0–9 execution order, entry/exit gates and parked design-audit disposition |
 | Feature-completion priority audit | `feature-completion-priority-audit-current.md` | Finish rules/persistence/UI/device acceptance for existing systems before late buildings or simulation breadth |
 | Questions for Aimee | `design-review-queue.md` | Short active list; placeholders may unblock work |
@@ -150,7 +154,9 @@ When two documents disagree:
 | Noll opening review packet | `noll-opening-review-packet-current.md` | Compact approval recommendations for identity, voice delta, signature, Recycler cost and held field-kit question |
 | Trading Post economy | `trading-post-recycler-economy-current.md` | Merchant trade bands, rotating stock snapshot, conversion rates and cumulative salvage receipt |
 | Essence continuation economy | `essence-continuation-economy-current.md` | Authored-world continuation invariant, temporary Raw Essence profiles and required runway telemetry |
-| Property-bearing world-resource reserve | `world-resource-reserve-current.md` | Hides, bones and other harvested samples are slot-free Resources; exact provenance survives while recap/UI aggregate by kind |
+| Slot-free harvest reserve foundation | `world-resource-reserve-current.md` | Exact property-bearing harvests are slot-free; current combined category is transitional |
+| Creature ecology and materials | `creature-ecology-and-materials-overhaul-current.md` | Habitat-aware pressure-generated life; body-derived Creature materials separate from World resources; no generic quality ladder |
+| World-resource extraction | `resource-extraction-progression-current.md` | Equipped Field Pick ranks; disclosed Gold progression; complete mineral table and no-deadlock Iron |
 | Essence refining progression audit | `essence-refining-progression-audit-current.md` | Review-only correction removing the paid quantity-control toll and earning 3:1 through demonstrated baseline refining |
 | Compound assembly / station trees | `compound-assembly-station-trees-current.md` | Proven-statement receipts, Scriptorium formalization, frozen personal compounds and Penmanship topology |
 | Tavern / random companions | `tavern-random-companions-current.md` | Uncapped roster, five-person party, persistent generated people and reachable wants |
@@ -178,8 +184,12 @@ When two documents disagree:
 | World History collection / comparison | `world-history-collection-comparison-current.md` | Compact frozen covers, arbitrary two-record comparison, earned disclosure and safe keep/erase behavior |
 | Player-facing screen grammar | `player-facing-screen-grammar-current.md` | Semantic spatial/grid/list rules and ordered correction queue |
 | Remaining native list audit | `remaining-native-list-surface-audit-current.md` | Code-backed classification of three remaining collection/action list failures versus legitimate ordered/detail lists |
-| Base destination board | `base-destination-board-current.md` | Home/Make/Study/Realms place tabs, complete station mapping, lifecycle tiles and deterministic ordering schema |
-| Starting-town Band 1 | `starting-town-band1-integration-current.md` | Home-only scenic checkpoint, exact five hotspots, phone aspect/coordinate contract and later-town package split |
+| Base destination catalogue compatibility | `base-destination-board-current.md` | Stable destination IDs/order/routes beneath the current House/Village surface |
+| Binder House and village | `home-house-and-village-current.md` | Four-zone house cutaway, exterior village, standardized signs, persisted attention and no town damage |
+| Historical starting-town slice | `starting-town-band1-integration-current.md` | Superseded five-hotspot proposal retained for history only |
+| Party and character surface | `party-character-surface-current.md` | Five-person grid; Stats/Gear/Skills/Gambit; Diary deep-link; production graph entry |
+| Field consequence and pickup feedback | `field-feedback-and-loot-presentation-current.md` | Adjacent harm/slow cues, contextual Look and local 1.5-tile pickup fade |
+| World arrival causal reveal | `world-arrival-causal-reveal-current.md` | Frozen dynamic image plus concrete description; hidden-site-safe lifecycle |
 | Maker-station screens | `maker-station-screen-grammar-current.md` | Shared recipe/profile grids, exact-object stock trays, persistent preview/commit flow and Blacksmith-first checkpoint |
 | Playtest UI corrections | `playtest-ui-corrections-current.md` | Party Stats-tab cleanup, minimap placement and disclosure boundary |
 | World Look / control occlusion | `world-look-and-control-occlusion-current.md` | Adjacent no-turn inspection and measured fixed-control scroll inset |

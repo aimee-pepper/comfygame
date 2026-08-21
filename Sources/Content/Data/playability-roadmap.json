@@ -1,31 +1,31 @@
 {
   "schemaVersion": 3,
-  "updated": "20 Aug 2026",
+  "updated": "21 Aug 2026",
   "essenceBaseline": "a816113",
   "campaignBands": [
     {
       "id": "band-0",
       "title": "Band 0 · Testable shell",
       "reach": "Before starting or loading a campaign",
-      "itemIDs": ["launch-handoff", "save-slots", "bug-reporter", "spatial-ui"]
+      "itemIDs": ["launch-handoff", "save-slots", "bug-reporter", "godmode-testing", "spatial-ui"]
     },
     {
       "id": "band-1",
       "title": "Band 1 · First world, fight and return",
       "reach": "Worlds 1–3 · Binder + Quill · levels 1–3",
-      "itemIDs": ["encounter-scaling", "field-kit-loadout", "essence", "starter-world-pages", "collapse-hud-truth", "terrain-blocked-feedback", "world-visibility", "location-clue-plain-language", "world-resource-reserve", "field-note-generator", "seamlight", "field-controls", "world-color", "world-contact", "encounter-opening", "return-receipt-authority", "failure-retention-correctness", "combat-affliction-authority"]
+      "itemIDs": ["encounter-scaling", "field-kit-loadout", "essence", "starter-world-pages", "collapse-hud-truth", "terrain-blocked-feedback", "world-visibility", "location-clue-plain-language", "world-resource-reserve", "field-note-generator", "writing-causal-presentation", "world-arrival-reveal", "field-consequence-cues", "local-pickup-feedback", "seamlight", "field-controls", "world-color", "world-contact", "encounter-opening", "return-receipt-authority", "failure-retention-correctness", "combat-affliction-authority"]
     },
     {
       "id": "band-2",
       "title": "Band 2 · Opening economy and travellers",
       "reach": "Worlds 2–8 · levels 2–6 · Vance, Noll, Halloway",
-      "itemIDs": ["rune-dictionary", "saved-page-templates", "traveller-world-pacing", "traveller-clue-distribution", "trading-post-stock-breadth", "recycler", "maker-stations", "item-popover", "item-character-identities", "library-collection-accuracy", "authored-text-first-review", "legacy-token-quirk-cleanup"]
+      "itemIDs": ["rune-dictionary", "saved-page-templates", "traveller-world-pacing", "traveller-clue-distribution", "trading-post-stock-breadth", "recycler", "maker-stations", "item-popover", "item-character-identities", "library-collection-accuracy", "authored-text-first-review", "house-village", "creature-ecology-materials", "return-object-layout", "legacy-token-quirk-cleanup"]
     },
     {
       "id": "band-3",
       "title": "Band 3 · Early knowledge and choices",
       "reach": "Worlds 5–15 · levels 4–10 · Mara through Orsa",
-      "itemIDs": ["wild-world-pages", "early-knowledge-stations", "combat-tree-opening-choices", "refining", "constellation-first-slice", "penmanship-native", "colored-ink-mixing", "equipment-inscriptions"]
+      "itemIDs": ["wild-world-pages", "early-knowledge-stations", "party-character-surface", "combat-tree-opening-choices", "resource-extraction", "refining", "constellation-first-slice", "penmanship-native", "colored-ink-mixing", "equipment-inscriptions"]
     },
     {
       "id": "band-4",
@@ -136,10 +136,10 @@
     {
       "id": "world-resource-reserve",
       "priority": "B1.4e",
-      "title": "Slot-free harvested world resources",
+      "title": "Slot-free harvested-material reserve foundation",
       "status": "readyToTest",
-      "detail": "Source checkpoint 8c6280a completes the slot-free world-resource reserve across acquisition, return, deterministic failure partitioning, crafting, commerce and Storehouse presentation. Hides, bones and every other property-bearing harvested material retain exact stable identity, grade, properties and provenance while ordinary presentation groups them by kind.",
-      "gate": "Nineteen hides render once as Hides +19 under Resources; hides and bones consume no expedition or Storehouse item slots and never enter item swap/spillover; exact properties, grade, source and qualifier survive return/relaunch; failure partitioning, crafting selection and legacy-bin migration are deterministic, atomic and lossless. Authority: world-resource-reserve-current.md.",
+      "detail": "Source checkpoint 8c6280a completes the slot-free exact-sample storage foundation across acquisition, return, deterministic failure partitioning, crafting, commerce and Storehouse presentation. The current combined Resources label and generic grade-led presentation are transitional; Creature materials must separate from World resources under the ecology overhaul.",
+      "gate": "Nineteen hides render once and consume no expedition or Storehouse item slots; hides and bones never enter item swap/spillover; exact properties, source and qualifier survive return/relaunch; failure partitioning, crafting selection and legacy-bin migration are deterministic, atomic and lossless. Do not accept the temporary combined player-facing category as final. Authorities: world-resource-reserve-current.md and creature-ecology-and-materials-overhaul-current.md.",
       "workstream": "engineering",
       "isPrimary": false
     },
@@ -318,8 +318,8 @@
       "priority": "P1",
       "title": "Spatial game hubs",
       "status": "readyToTest",
-      "detail": "Several semantic shells are source-complete, but the first-loop presentation is split across receipts. origin/main is 66f728f; clean branch 2d2e7ce contains later Home/Writing/World/Return work and is the strongest source receipt for phone build 234. Campaign and Writing remain visually unresolved, Home has a queued departure correction, and no screen in the chain is playtest-accepted merely because that branch is installed.",
-      "gate": "Reconcile Campaign, Home departure, Writing projection, World and Return screen by screen under cross-lead-delivery-contract-current.md; integrate one clean shared checkpoint, install it with exact provenance, then pass Campaign → Home → Writing → World → Return without invented mechanics, manufactured scrolling or a visually rejected sibling riding inside a package approval.",
+      "detail": "Repository reconciliation preserved phone-source baseline 2d2e7ce and later source work on current main, but the opening presentation remains split across exact packets. The broad spatial-hubs item is now an umbrella acceptance result rather than authorization for one large implementation: Writing, arrival, field feedback, Return, Binder House/Village and Party each have separate current authorities and receipts.",
+      "gate": "Accept the granular Gate B–F packets in first-three-worlds-execution-plan-current.md, then pass Campaign → House → Writing → generated arrival → matching World → object-like Return without invented mechanics or manufactured scrolling. No screen is accepted because a sibling candidate or cumulative build is green.",
       "workstream": "acceptance",
       "isPrimary": false
     },
@@ -714,6 +714,106 @@
       "isPrimary": false
     },
     {
+      "id": "godmode-testing",
+      "priority": "B1.3b",
+      "title": "DEBUG God mode for noncombat testing",
+      "status": "queued",
+      "detail": "After ordinary level-1 scaling closes, add a DEBUG-only encounter-frozen toggle. Enemy decisions, damage, conditions, cooldowns and logs execute normally, but active party HP cannot fall below 1 and defeat is suppressed. It grants no offense, loot, XP, spawn or retreat benefit and marks receipts/bug reports as invalid balance evidence.",
+      "gate": "Default off; relaunch persistence; newly created encounter only; lethal damage remains fully logged at 1 HP; next encounter with toggle off defeats normally; persistent banner and receipt flag; no mid-encounter ambiguity. Authority: first-three-worlds-execution-plan-current.md Gate A2.",
+      "workstream": "engineering",
+      "isPrimary": false
+    },
+    {
+      "id": "writing-causal-presentation",
+      "priority": "B1.5a",
+      "title": "Page-first Writing and truthful world projection",
+      "status": "queued",
+      "detail": "Correct Write and The world as one page-owned causal flow: the paper and placed marks dominate; compact trays avoid parameter-list UI; projection derives only legitimate tendencies, open dimensions, cost/runway, stability and blockers from current rules. Template loading instantly rebuilds the saved composition but never binds or waives cost.",
+      "gate": "Starter, blank and authored-resource pages retain one identity through Write/projection/History; viewing and cancellation mutate nothing; unknown marks never leak; final Bind & Depart spends/consumes once and emits the one frozen arrival receipt. Authority: core-loop-causal-presentation-plan-current.md and first-three-worlds-execution-plan-current.md B1–B2.",
+      "workstream": "engineering",
+      "isPrimary": false
+    },
+    {
+      "id": "world-arrival-reveal",
+      "priority": "B1.6a",
+      "title": "Generated world image and concrete arrival description",
+      "status": "queued",
+      "detail": "Persist one bind-time arrival receipt and render the accepted book-tableau grammar plus two or three concrete 18–55 word sentences from actual ground/water, light/air and ecology/authored-open facts. It consumes no new RNG. Site appearance remains a pinned later visual choice; v1 cannot reveal a hidden site.",
+      "gate": "Open Meadow, Rainwashed Shore and Stone Hollow plus near/far pairs agree among page, image, description and first map; relaunch is deterministic; unknown marks and hidden site/resource/traveller/apex identities do not leak; loading remains a separate honest surface. Authority: world-arrival-causal-reveal-current.md.",
+      "workstream": "asset",
+      "isPrimary": false
+    },
+    {
+      "id": "field-consequence-cues",
+      "priority": "B1.8a",
+      "title": "Visible adjacent harm and slow consequences",
+      "status": "queued",
+      "detail": "One rules-owned four-direction preview drives red outer harm crescents, three grey slow lines, combined states and Look copy. Slow footing may read on sight; flora harm appears only after exact species/defence learning. Hidden/fringe cells and undiscovered content produce nothing.",
+      "gate": "All four directions, learned/unlearned flora, mud, combined state, deep water/chasm/collapse and stale-preview cases agree with commit rules; no fog/minimap/content leak; ordinary-phone visual review tunes contrast. Authority: field-feedback-and-loot-presentation-current.md.",
+      "workstream": "engineering",
+      "isPrimary": false
+    },
+    {
+      "id": "local-pickup-feedback",
+      "priority": "B1.10a",
+      "title": "Local rising pickup feedback",
+      "status": "queued",
+      "detail": "After a successful field transaction, update ownership immediately and raise the source icon locally 1.5 tile heights over 450 ms while it fades. Do not fly it toward a counter. Same-kind multi-yield is one ×N; clamp at map edges; animation is nonblocking and never owns mutation.",
+      "gate": "Ordinary/top-edge, ×19, multi-kind, cancellation, duplicate-tap and reduced-motion fixtures; no animation on refusal; exact ownership survives navigation/relaunch. Authority: field-feedback-and-loot-presentation-current.md.",
+      "workstream": "asset",
+      "isPrimary": false
+    },
+    {
+      "id": "house-village",
+      "priority": "B2.12",
+      "title": "Binder House cutaway and growing village",
+      "status": "queued",
+      "detail": "Replace the Base category-board root with House/Village. House has four zones and exact Writing, Library/Constellation/Bestiary, Workshop/Storehouse and Party hotspots. Village starts with House, Firepit and Essence Spring, then real reachable buildings with silhouette plus sign. Persist truthful attention until checked. The town is never damaged.",
+      "gate": "Full 368×800 House without manufactured scroll; exact direct routes and noncommitting Prepare a world; buildable/built/improved/attention village states; four idempotent attention reasons and clear rules; opening Trading Post → Recycler → Blacksmith; no hidden station or damage/repair UI. Authority: home-house-and-village-current.md.",
+      "workstream": "asset",
+      "isPrimary": false
+    },
+    {
+      "id": "creature-ecology-materials",
+      "priority": "B2.13",
+      "title": "Habitat-aware life and body-derived Creature materials",
+      "status": "queued",
+      "detail": "Separate World resources from slot-free Creature materials. Persist terrestrial/shore/aquatic/aerial ecology identity after real terrain availability; constrain placement/roaming; derive feather, fin, pelt, scale/plate/chitin/shell, weapon, bone and special materials from the visible body. Remove universal quality labels and unrelated ordinary-animal world-resource/gear/curio drops.",
+      "gate": "Fishlike life remains in connected shallow water; terrestrial life remains off water; pressure-biased feathered/furred/plated forms are deterministic without gameplay RNG change; remains match body and retain properties/provenance; legacy samples migrate; no ordinary unrelated drop. Authority: creature-ecology-and-materials-overhaul-current.md.",
+      "workstream": "engineering",
+      "isPrimary": false
+    },
+    {
+      "id": "return-object-layout",
+      "priority": "B2.14",
+      "title": "Object-like expedition Return collection",
+      "status": "queued",
+      "detail": "Project the one frozen outcome as six-across World resources, Creature materials, exact Items, Writing recovered and People who came home before concise XP. Quantities aggregate only by legitimate family and anchored detail retains exact provenance/identity without a new full screen.",
+      "gate": "Nineteen Hides once; Hides/Bones separate; distinct same-family property profiles preserved in detail; exact item/page/person and failure/loss receipts; every edge/bottom detail stays on-screen and relaunch agrees. Depends on the creature-material category split. Authority: first-three-worlds-execution-plan-current.md C3.",
+      "workstream": "engineering",
+      "isPrimary": false
+    },
+    {
+      "id": "party-character-surface",
+      "priority": "B3.7a",
+      "title": "Compact Party and character build surface",
+      "status": "queued",
+      "detail": "Party fits five identity tiles without oversized full-width cards. Character tabs are exactly Stats, Gear, Skills and Gambit. Diary deep-links to that person's Library record and Back restores the person/tab. Skills is the production combat graph; dashed alternatives are exact OR parents, never an extra cost or free node.",
+      "gate": "Five-person 368×800 grid with Rank labels; no Story/ambiguous Combat tab; Diary route round-trip; exact Gear ownership; stable production graph with typed purchases, solid/dashed prerequisites and no Learn-next list. Authority: party-character-surface-current.md.",
+      "workstream": "engineering",
+      "isPrimary": false
+    },
+    {
+      "id": "resource-extraction",
+      "priority": "B3.12",
+      "title": "Equipped Field Pick mineral progression",
+      "status": "queued",
+      "detail": "Known Gold before extraction is deliberate progression. Highest qualifying Field Pick equipped by the departing party supplies rank 0–4; Binder level and Home tools do not. Iron/Salt/Sulfur remain rank 0; Gold/Silver rank 2; later strange/extreme minerals rank 3–4. Known writing warns but does not block; unknown marks do not leak.",
+      "gate": "Iron/Gold/Adamant vertical fixtures prove no deadlock, truthful writing warning, no-turn under-equipped refusal, atomic exact harvest and relaunch; then validator covers the complete mineral table. No durability, hidden Mining XP, partial yield or automatic Home tool. Authority: resource-extraction-progression-current.md.",
+      "workstream": "engineering",
+      "isPrimary": false
+    },
+    {
       "id": "legacy-token-quirk-cleanup",
       "priority": "P3",
       "title": "Remove retired Token and Quirk promises",
@@ -732,6 +832,6 @@
     "Generated people, Tavern visitors, Menagerie, animal combat, predation and group motion",
     "Anchored-realm production and anchor-route retuning",
     "Great Work, Reality reset and Tam",
-    "Animation and non-blocking polish"
+    "Broad decorative animation and non-blocking polish, except the explicitly queued causal pickup feedback"
   ]
 }

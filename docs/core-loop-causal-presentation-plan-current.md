@@ -6,7 +6,12 @@ feature merely by naming it.
 **Owner:** Game Design owns player outcome and behavior; Engineering owns native rules and composition;
 Asset Design owns functional visual grammar and conformance; Aimee owns final handmade pictorial art and
 playtest acceptance.
-**Updated:** 20 August 2026
+**Updated:** 21 August 2026
+
+**Execution boundary:** this document owns the product through-line. Exact implementation packets and order
+are now in `first-three-worlds-execution-plan-current.md`; system behavior is further frozen by the linked
+arrival, field feedback, creature ecology/material, Home/village, Party and extraction authorities. When
+this overview is less specific than one of those packets, the packet wins.
 
 ## Product outcome
 
@@ -50,9 +55,10 @@ resolved simulation data is an interpretation of the writing, not a form the pla
 4. The rune palette shows symbols and ownership state. A known meaning may be inspected; an encountered
    but unresolved lexeme remains `??`. Selecting a rune does not turn the page into a list of its numeric
    pressure contributions.
-5. **Pages** treats collected World Pages as physical consumable sheets and templates as player-made
-   tracings. Loading a template reconstructs the player's current persisted page representation; it does
-   not become a conventional preset/settings screen.
+5. **Pages** treats collected World Pages as physical consumable sheets and Templates as player-made saved
+   compositions. One load action instantly reconstructs the complete saved rune placement and links, with
+   confirmation before replacing a different nonempty draft. This anti-tedium behavior is half of the
+   feature's purpose. Loading remains editable and never binds, spends Essence or waives normal cost.
 6. **The world** is the Binder's reading of the completed page. It shows a small page thumbnail, Essence
    cost/runway, binding blockers and a concise uncertain projection: dominant tendencies, important
    tensions and visibly open/unwritten dimensions. It does not promise spawn counts, reveal sites or
@@ -85,16 +91,19 @@ emotional and visual answer to “what did this writing make?” before presenti
 3. Compose only legitimate entry knowledge: dominant terrain/material, current light, actual atmosphere
    and non-spoiling ecological silhouettes. Do not reveal an undiscovered resource, site, traveller or
    identifiable rare/apex creature.
-4. Echo authored causality with at most two short lines:
-   - one concrete statement about the strongest authored/resolved identity;
-   - one concrete tension or uncertainty if it materially affects the opening.
-   These are descriptions, not riddles and not a generated lore monologue.
+4. Pair the generated image with two or three concrete generated sentences (18–55 words total) derived from
+   the same frozen receipt: ground/water form first, consequential light/air second, then ecology or an
+   authored/open tension when useful. These are readily parseable descriptions, not riddles, aphorisms or a
+   generated lore monologue. Unknown marks never disclose their meaning.
 5. Keep the world title, source-page thumbnail and entry action visually subordinate to the scene. The
    screen is a reveal, not a receipt table.
 6. Enter the exact map state after dismissal. The splash cannot create a second camera truth, entity
    placement, palette or weather state.
 7. Reuse the same world identity on exit/return while showing the actual lifecycle outcome: portal return,
    defeat/emergency extraction, collapse and anchored continuity remain distinct.
+8. A site may eventually appear in the splash, but that disclosure is deliberately pinned for visual
+   testing. Native v1 may show only an entry-visible/disclosed site or disclosure-neutral structure; it
+   cannot glamour-shot an undiscovered site. This open extension does not block the base splash.
 
 ### Acceptance
 
@@ -205,20 +214,23 @@ after-the-fact message. Warnings describe only visible facts the party could leg
 ### During exploration
 
 1. A discovered resource or object uses its stable family silhouette on the map and in the Field Kit.
-2. Collection gives a short object-to-satchel/reserve motion and updates the corresponding compact icon
-   quantity; it does not interrupt exploration with a full-screen list.
-3. Gear, consumables and curios use exact item instances and real capacity rules. World resources—including
-   Hides and Bones—enter the non-slot resource reserve, retain sample grade/properties/provenance, and never
-   consume item/satchel slots.
+2. On successful collection, its icon appears at the source tile, rises roughly 1.5 tile heights over about
+   450 ms and fades locally. It does not fly across the screen to a counter. Ownership updates immediately;
+   the nonblocking animation may cancel without changing the receipt. Same-kind multi-yield is one `×N`.
+3. Gear, consumables and curios use exact item instances and real capacity rules. **World resources** come
+   from named ground/flora/site sources; **Creature materials** come from creature bodies. Both are slot-free
+   but remain separate player-facing reserves/groups with exact properties and provenance.
 4. The HUD shows only the compact carried summary needed in-world. Tap opens anchored detail; it does not
    permanently print every object name.
 
 ### Return presentation
 
-Present the haul as a laid-out collection with four semantic groups:
+Present the haul as a laid-out collection with five semantic groups:
 
-- **Resources:** six-across resource silhouettes with aggregate quantity; `Hides +19` is one object tile,
-  not nineteen `Hides +1` lines. Tap exposes retained sample grades/properties and origin.
+- **World resources:** six-across named resource silhouettes with aggregate quantity.
+- **Creature materials:** six-across body-part/material families; `Hides +19` is one object tile, not
+  nineteen `Hides +1` lines. Detail exposes exact functional properties and origin, not a generic quality
+  ladder.
 - **Items:** six-across exact-instance icons, with quantity only where the item genuinely stacks.
 - **Writing recovered:** physical page/book tiles, permanent Diary/lexeme result and source.
 - **People who came home:** identity tiles and exact arrival/recruitment result.
@@ -227,25 +239,15 @@ XP/progression remains a concise breakdown after the recovered evidence. Failure
 grammar so the player can tell what was lost rather than reading a generic receipt. Continue is available
 only after the recap has been presented once, but detail inspection is optional.
 
-### Progression option — deliberately not yet settled
+### Settled mineral extraction progression
 
-Do not immediately hard-gate Gold behind Binder level. That would let a player deliberately write/find a
-valuable world and then discover that an arbitrary number makes it unusable. The recommended experiment is
-**capability-based extraction**:
-
-- common exposed material is always collectable;
-- a hard/delicate/volatile source yields a small surface sample with the basic kit;
-- the correct tool/training enables full yield, better retained quality/properties, safer collection or
-  lower turn cost;
-- no tool durability system is implied;
-- disposable worlds always permit some meaningful takeaway because “return later” is not reliable before
-  anchoring.
-
-Test this first on three families—hard ore/Gold, fragile Quartz and one organic source—before redesigning
-all resources or gear. Mara/Survey Post owns detection and field instruments; Halloway/Blacksmith may own
-extraction tools; Sela/Wayfarer's Table owns practical flora recognition/packing, not a route-map subsystem.
-If the proof creates satisfying preparation choices, expand family by family. If it feels like arbitrary
-denial, retain seeking and current collection rather than forcing a resource overhaul.
+Gold may be learned before it is mineable by design. That creates a visible reason to improve a Field Pick
+and later write a Gold world; the problem would be hiding the requirement, not allowing the rune early.
+Extraction is based on the best qualifying Field Pick equipped by the departing party, never Binder level.
+Rank-0 Iron remains collectable so Blacksmith construction cannot deadlock; Gold/Silver require rank 2 and
+later strange/extreme minerals require ranks 3–4. Known explicit writing warns but never blocks binding;
+under-equipped field use refuses without a turn or node mutation. Unknown marks do not leak. The full table,
+transaction and fixture order are authoritative in `resource-extraction-progression-current.md`.
 
 ### Acceptance
 
@@ -256,44 +258,43 @@ denial, retain seeking and current collection rather than forcing a resource ove
   position.
 - Provenance answers “what world/creature/site produced this?” and suggests a real future use.
 
-## 6. Home: a growing community rather than a station menu
+## 6. Home: Binder House and a growing village
 
 ### Intended experience
 
-Home is the stable place altered by people and expeditions. The player should recognize where work happens,
-who contributed it and what changed since the last return without traversing a simulation-heavy town.
+Base opens on a cutaway view of the Binder's house rather than a category board. Its rooms make the recurring
+verbs spatial: Writing Desk; Library/Constellation/Bestiary; Workshop/Storehouse; and Party. A separate
+Village exterior contains the Binder House, Firepit and Essence Spring at the opening, then gains real
+recruit-enabled buildings in campaign order.
 
-### Destination-board correction
+### Exact corrections
 
-1. Preserve the settled **Home / Make / Study / Realms** navigation groups, but present each as a consistent
-   illustrated district/page of the same Base—not a categorized settings list.
-2. Station positions and silhouettes are stable. Foundation, built, improved and damaged states alter the
-   same place rather than creating a new menu row.
-3. The opening Home view contains exactly Writing Desk, Storehouse, Firepit, Essence Spring and Workshop,
-   with Party and departure as utilities rather than fictional buildings.
-4. A station tile leads with its structure and function silhouette. Its name and at most one truthful
-   attention state support the image; it is not a large card containing its full backend.
-5. New people leave a small authored signature at the station they enable and appear in the Base's people
-   context even when assigned to the travel party. Do not make a building unusable because its owner is
-   currently travelling.
-6. Return changes are visible on the board: a constructed destination, a refreshed merchant, one waiting
-   recovery, or a newly available contribution may receive a restrained marker. No decorative exclamation
-   marks and no invented chores/upkeep.
-7. Entering a place reveals only its distinct verbs. For example, Wayfarer's Table owns packing, provisions,
-   practical field notes/visible-flora recognition and related yield; it does **not** own a campaign route
-   graph, world selection or a second departure system.
-8. Home's departure shortcut opens Writing Desk → The world and commits nothing. The only bind transaction
-   remains inside Writing Desk.
-9. The board fits its finite opening set on an ordinary 368×800 phone without unnecessary scrolling. Later
-   districts may scroll/page because their collections are genuinely larger, not because tiles have
-   arbitrary oversized minimum heights.
+1. Root scene selectors are **House / Village**, not Home / Make / Study / Realms. Existing routes continue
+   behind exact spatial hotspots.
+2. The whole four-zone house and all recurring actions fit on 368×800 without manufactured scrolling.
+3. Firepit and Essence Spring remain outdoors. Trading Post, Recycler, Blacksmith and later stations appear
+   in Village only when their real availability permits them.
+4. Village lifecycle is unknown/absent → known buildable → built → improved, with a temporary attention
+   overlay. **The town is never damaged** and has no repair/rebuilding/defence state.
+5. Building silhouettes/functional fixtures own identity. Because many specialist buildings are obscure,
+   each also has a standardized façade/entrance sign with functional pictogram and short name; the sign
+   reinforces rather than replaces silhouette.
+6. Construction complete, contribution unlocked, stock refreshed and waiting item/recovery create persisted
+   warm-gold attention events. The glow clears only when the exact destination/content has been checked and
+   may recur for a later distinct event.
+7. A place exposes only its real verbs. Wayfarer's Table never becomes a route graph, world selector or
+   second departure system because a mock needs content.
+8. **Prepare a world** opens Writing Desk → The world and commits nothing; only final Bind & Depart binds.
+
+The complete rooms, hotspots, attention receipts, signs, Asset proof and native gates are authoritative in
+`home-house-and-village-current.md`.
 
 ### Acceptance
 
-- A fresh-save player can point to the five opening places and describe each first payoff.
-- Recruiting/building changes one persistent visual location and unlocks one understandable contribution.
-- The player can find Storehouse, Writing, Party and departure from visual place identity rather than
-  remembering a list position.
+- House reads as a home with every opening recurring verb directly reachable.
+- Village growth reflects actual people/construction without fake chores or damage.
+- Obscure stations are recognizable through silhouette plus sign.
+- New/updated destinations glow truthfully and stop glowing after the exact check.
 - No destination mockup invents mechanics merely to fill visual space.
 
 ## 7. Character growth and combat skills: visible builds rather than administration
@@ -302,17 +303,20 @@ who contributed it and what changed since the last return without traversing a s
 
 1. Party is a compact identity grid; all five ordinary party slots fit at 368×800. Each tile shows portrait,
    name, health/level and labelled rank without becoming a full-width button.
-2. Tapping a person opens stable tabs such as **Overview / Gear / Combat / Gambit / Story**. Do not show every
-   stat, biography, equipment slot and rule on the collection surface.
-3. Overview visualizes the person's current role and consequential changes. Gear uses body/slot placement
-   plus the exact six-across source tray. Gambit remains an ordered list because order is its mechanic.
+2. Tapping a person opens exactly **Stats / Gear / Skills / Gambit**. **Skills** is the combat skill tree;
+   there is no ambiguous Combat tab and no generic Story tab.
+3. A **Diary** header action opens that exact person's Library diary/dossier; Back restores the originating
+   person and tab. Stats visualizes role/consequential changes. Gear uses body/slot placement plus the exact
+   six-across source tray. Gambit remains an ordered list because order is its mechanic.
 
 ### True combat graph
 
 1. Replace production `Learn next`/branch-card progression with the accepted real fan-and-fork graph derived
    from stable node IDs and generated Effect copy. It is a mechanics migration, not a reskin.
-2. Show the three roots, parent connectors, cross-discipline alternate prerequisites, owned/available/
-   blocked state and the person's unspent point count simultaneously at ordinary size.
+2. Show the three roots, parent connectors, exact same-discipline parents and dashed **alternate hybrid
+   routes**, owned/available/blocked state and the person's unspent point count simultaneously at ordinary
+   size. A dashed route is an OR: own the solid parent **or** the named dashed parent, then still spend one
+   point. It is never an extra AND cost, free node or generic cross-branch jump.
 3. Tap selects a node and opens collision-aware anchored detail with exact effect, prerequisites, current
    loadout applicability and explicit **Learn**. Merely selecting never purchases.
 4. Purchase is one typed atomic legal transaction: spend one point, persist the exact stable node, reveal
@@ -327,6 +331,9 @@ who contributed it and what changed since the last return without traversing a s
    silently substituting another skill.
 8. Respec remains a deliberate full rebuild at the Essence Spring with exact cost, removed techniques and
    returned point budget. No auto-recommended rebuild and no tutorial gate.
+
+The complete shell, Diary route, alternate-parent examples and handoff gates are authoritative in
+`party-character-surface-current.md`.
 
 ### Combat presentation connection
 
@@ -404,61 +411,22 @@ party HP, with wider bands for legitimate groups. Apex tuning is a separate 2/3/
 
 ## 10. Granular implementation order
 
-### Phase 0 — repository truth (**complete**)
+The earlier phase sketch has been replaced by `first-three-worlds-execution-plan-current.md`. That packet
+defines exact Gates A–G, player results, dependencies, Engineering and Asset boundaries, prohibited scope,
+automated/phone acceptance and the required twelve-field handoff. Its current order is:
 
-- Reconciled `main` preserves the installed phone-source baseline and current Design authority.
-- Rejected/historical/unfinished work remains preserved outside `main` rather than silently merged.
-- Every future assignment begins by checking HEAD/origin, dirty ownership, visual disposition and installed
-  provenance.
+1. close early encounter scaling, then add receipt-labelled DEBUG God mode;
+2. accept already-built Band-1 truth fixes without reimplementing them;
+3. Template reconstruction → Writing projection → frozen arrival receipt → dynamic image+description →
+   relative-diversity map;
+4. adjacent consequence cues → local pickup feedback → object-like Return collection;
+5. Binder House cutaway → village signs/lifecycle/attention, with no town damage;
+6. split World resources from Creature materials → habitat-aware ecology → body-derived rewards;
+7. promote reachable meetings → Party tabs/Diary route → reachable production graph choices;
+8. equipped-tool mineral extraction from Iron/Gold/Adamant fixtures through the full catalogue;
+9. only then resume later Band-3+ systems in campaign reachability order; tutorials remain dead last.
 
-### Phase 1 — make current testing honest
-
-1. DEBUG Godmode, with receipt marking and no reward/scaling mutation.
-2. Finish the early combat scaling acceptance matrix with Godmode off.
-3. Verify the existing Campaign → Home → Writing → World → Return chain for three fresh-save expeditions.
-
-**Exit:** Aimee can test any current noncombat feature without repeated defeats, while ordinary combat has
-one accepted early curve rather than being alternately lethal and trivial.
-
-### Phase 2 — make the first expedition causally legible
-
-Implement as separate receipts in player order:
-
-1. Writing Desk composition/projection transaction.
-2. Native entry/exit lifecycle splash using the accepted compositor.
-3. World-grade-2 relative-diversity integration and map material/ecology composition.
-4. Adjacent harm/slow cues plus exact Look/blocked-movement language.
-5. Compact in-world collection and object-like Return layout/resource aggregation.
-6. Home district/place presentation and return-state changes.
-
-**Exit:** three starter/free-written worlds visibly connect page, place, decisions, haul and Home without
-DEBUG explanation or hidden POI leakage.
-
-### Phase 3 — make the first progression arc expressive
-
-1. Production true combat graph and levels 2–5 purchase/respec acceptance.
-2. Opening traveller meetings promoted in reachability order and reviewed during play.
-3. First mineral seeker-instrument proof using the Field Kit/Survey Post grammar.
-4. Continue Band-3 meetings only as their clue and contribution paths become reachable.
-
-**Exit:** the player has at least one meaningful build fork, one deliberate field-preparation choice and a
-growing community whose people are actually encountered.
-
-### Phase 4 — test deeper gathering before committing to a revamp
-
-1. Three-family capability-based extraction proof: hard ore/Gold, Quartz and one organic source.
-2. Measure whether partial basic yield plus improved trained yield creates anticipation rather than denial.
-3. If accepted, define the minimum extraction-tool recipes and extend by resource family.
-4. Only then revisit the broader resource/gear economy. Do not create durability, mining levels or a complete
-   equipment rewrite as accidental dependencies.
-
-### Phase 5 — broaden only behind a reachable complete band
-
-- Promote later meetings, stations, specialist shops, combat nodes and resource techniques in the order the
-  playable campaign reaches them.
-- A later feature enters implementation only when its prerequisite loop is implemented, installed and
-  playable—not merely documented or green in isolation.
-- Tutorials remain dead last, after the mechanics and layouts they would teach are stable.
+This overview may not be used as an Engineering/Asset handoff. The exact execution packet is mandatory.
 
 ## Cross-lead acceptance discipline
 

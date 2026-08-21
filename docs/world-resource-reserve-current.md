@@ -1,25 +1,42 @@
-# Property-Bearing World Resource Reserve
+# Property-Bearing Harvest Reserve — storage foundation
 
-**Status:** settled correction; implementation active and generic build-for-testing green
+**Status:** source-complete slot/correctness foundation; player-facing category and quality semantics are
+superseded by `creature-ecology-and-materials-overhaul-current.md`
 **Priority:** active Band 1.4e checkpoint, after the landed durable Field Kit; before later crafting,
 station, creature-display, or world-content breadth
 **Supersedes:** the slot-consuming material-bin decision in `decisions-session-16.md` and the open
 stacking question in `materials-crafting-spec.md` §9
-**Preserves:** the settled `MaterialSample` property, grade, source, qualifier, and provenance model
+**Preserves:** exact `MaterialSample` properties, source, qualifier and provenance while the creature
+overhaul removes generic quality from primary presentation and splits animal-derived units into a distinct
+Creature-material reserve
+
+The superseding authority also replaces every live use of universal material grade: construction tier comes
+from maker progression; Trading Post price uses family plus named capabilities; Distillery potency uses the
+attunement's actual properties; Scent Mask uses a scent-bearing family; Recycler uses frozen receipt order.
+Do not treat older grade formulas later in this document as target behavior for that migration.
 
 ## Player promise
 
-Hides, bones, and every other ordinary harvested creature/flora material are **world resources**.
-They do not consume item or Field Kit slots. A player may carry nineteen hides without losing the
-ability to carry a blade, curio, consumable, or other actual item.
+Hides, bones, and every other ordinary harvested creature/flora material do not consume item or Field Kit
+slots. A player may carry nineteen hides without losing the ability to carry a blade, curio, consumable, or
+other actual item.
+
+The settled player-facing split is now:
+
+- **World resources:** named ground, flora and site yields;
+- **Creature materials:** body-derived animal parts such as hides, bones, feathers, scales and ichor;
+- **Items:** gear, consumables, curios and other capacity-bearing instances.
+
+The current combined reserve implementation is useful storage/migration groundwork, not authority to call
+Hides/Bones world resources in final UI.
 
 The UI groups them by kind and quantity:
 
 - `Hides ×19`
 - `Bones ×6`
 
-A resource detail may expose the individual samples when that distinction is useful for crafting:
-grade, inherited properties, source creature/world, and qualifier remain intact. Aggregated
+A material detail may expose the individual samples when that distinction is useful for crafting:
+inherited properties, source creature/world, and qualifier remain intact. Aggregated
 presentation must not flatten mechanically distinct samples into one averaged or invented sample.
 
 ## Canonical storage boundary
@@ -31,14 +48,16 @@ collection of exact `MaterialSample` values. The implementation may index or gro
 by `MaterialKind`, but ordering and exact sample identity must remain deterministic so a crafting
 selection can still commit the exact sample previewed.
 
-- **Home:** property-bearing world-resource reserve, independent of Storehouse item capacity.
-- **Expedition:** property-bearing haul reserve, independent of satchel item capacity.
+- **Home:** property-bearing harvest reserves, independently grouped as World resources or Creature
+  materials and independent of Storehouse item capacity.
+- **Expedition:** property-bearing haul reserves with the same domain split, independent of satchel item
+  capacity.
 - **Bulk `ResourcePool`:** remains appropriate for homogeneous named resources whose individual
   provenance/properties do not matter. It must not absorb a `MaterialSample` by discarding facts.
 - **Items:** gear, consumables, curios, keys, treasures, cores, and other physical item instances.
 
-“World resource” is the player-facing family shared by bulk resources and property-bearing harvested
-resources. Their internal representations may differ because only the latter need exact provenance.
+The internal exact-sample representation may be shared where useful, but internal storage reuse cannot
+collapse the player-facing World-resource/Creature-material distinction.
 
 ## Acquisition and capacity
 
