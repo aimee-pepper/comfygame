@@ -3568,3 +3568,17 @@ the feature contract. A visually approved fixture cannot create currencies, role
 forecasts, transactions or hidden interactions. Engineering must preserve both the settled behavior
 and approved hierarchy. Current Campaign/Home/Writing/World interpretations and the required handoff
 packet are frozen in `cross-lead-delivery-contract-current.md`.
+
+## 282. First-three-world causality is current; Atlas review and extraction breadth are bounded
+
+**Date:** 20 August 2026
+
+The DEBUG Authored Text Atlas remains an optional review and navigation tool, not a gate that
+completed coherent content must pass before promotion. The first-three-world causal presentation
+outcome and its granular phase order are current in
+`core-loop-causal-presentation-plan-current.md`; each phase still requires its own implementation
+and acceptance receipts.
+
+Deeper resource extraction is not settled as a wholesale progression rewrite. Test capability-based
+extraction first on exactly three families—hard ore/Gold, fragile Quartz and one organic source—and
+expand only if that bounded experiment produces useful preparation choices without arbitrary denial.

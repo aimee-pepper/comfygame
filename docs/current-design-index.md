@@ -6,6 +6,8 @@
   exact Campaign/Home/Writing/World ambiguity resolutions for Design, Asset and Engineering.
 - `game-design-ux-assessment-current.md` — current lead assessment of the playable product, its
   strongest identity, first-hour weaknesses and progression-ordered product direction.
+- `core-loop-causal-presentation-plan-current.md` — first-three-world causal presentation outcome,
+  granular phase order and independently accepted screen/system checkpoints.
 - `playability-priority-sequence-current.md` — cross-lead execution order and WIP limits.
 - `feature-completion-priority-audit-current.md` — definition of fully implemented and ordered
   completion tiers.
