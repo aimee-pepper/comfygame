@@ -5070,3 +5070,17 @@ Do not continue the interrupted whole-batch bitmap candidate and do not draw Rec
 tiers, House, Library, goldens or native assets before this one sprite receives visual acceptance. Existing
 uncommitted files may remain as technical exporter infrastructure only; their previous pixels are not the
 aesthetic source of truth.
+
+#### Trading Post Tier-0 v0.1 disposition
+
+**Rejected as the production pixel gate; composition reference retained.** The label-free merchant frontage
+is materially stronger than the old placeholder work: awning, open counter, balance, ledger, tagged stock and
+secured drawer read correctly in color and grayscale. However, the 96×80 output was sampled from a
+1374×1145 antialiased render and contains 77 alpha values plus 4,891 distinct nontransparent RGBA values.
+That is high-resolution rendered detail reduced into noise, not deliberately authored logical-pixel clusters.
+
+Correct this same sprite at the actual 96×80 grid: binary alpha, deliberate bounded palette (target ≤64
+opaque RGB colors), no gradient/antialias residue or arbitrary sampled speckle, and native/400%/grayscale
+readability. Remove the chimney/domestic dormer so the commercial awning/frontage dominates in isolation.
+Preserve the accepted composition and palette roles. No second building or later state begins before v0.2
+passes.

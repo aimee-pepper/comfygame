@@ -93,6 +93,41 @@ Constellation purchases live in the save's Reality layer. They survive any later
 cycle inside that campaign. A genuinely separate save slot/New Game starts clean; global account-wide
 unlocking would invalidate fresh-save balance tests.
 
+### Stable purchase contract and graph layout
+
+| Stable purchase ID | Visible name | Eligibility blocker before purchase |
+|---|---|---|
+| `mastery_offense` | Offensive Mastery | no current person owns a connected depth-3 Offense node |
+| `mastery_defense` | Defensive Mastery | no current person owns a connected depth-3 Defense node |
+| `mastery_fieldcraft` | Fieldcraft Mastery | no current person owns a connected depth-3 Craft/Fieldcraft node |
+| `mastery_commerce` | Commerce Mastery | no Commerce building has effective Tier 1 |
+| `mastery_makers` | Makers' Mastery | no Makers' Row building has effective Tier 1 |
+| `mastery_commons` | Commons Mastery | no Commons building has effective Tier 1 |
+| existing stable ID | The Long Instruction | retain the current authored blocker/cost |
+
+Eligibility never spends or grants anything. Confirming an eligible unowned mastery atomically spends the
+displayed Mote cost and records that exact purchase; stale confirmation changes nothing. Masteries are not
+refundable in the first implementation because refunding a permission beneath already-purchased skills or
+building tiers would require deactivation rules the game does not need. Owned stars remain inspectable and
+state the permission they grant.
+
+The visual graph is two non-hierarchical triangular clusters with the smaller Long Instruction star centred
+between/below them:
+
+- left cluster: Offense at top, Defense lower-left, Fieldcraft lower-right;
+- right cluster: Commerce at top, Makers lower-left, Commons lower-right;
+- Long Instruction is independent and visually smaller;
+- a quiet enclosing arc/three-point figure may group each trio, but **no line between independent stars may
+  look like a prerequisite edge**;
+- available, blocked, selected and owned states use the accepted combat-graph state grammar, while the left
+  cluster uses person/tree motifs and the right cluster uses district/building motifs. Text remains exact;
+  symbols never substitute for the names.
+
+Migration is lossless and never retroactively charges Motes. If an existing save already owns any depth-4/5
+node in a discipline, grant that discipline's mastery receipt. If it already owns or has earned an effective
+Tier-2 building, grant the corresponding district mastery receipt. Preserve Long Instruction unchanged.
+Existing lower progress makes a star eligible but does not grant it for free. A clean New Game receives none.
+
 ### Keeper-earned tiers
 
 `effectiveTier = max(purchasedTier, keeperEarnedTier)` remains true. A district mastery is a separate

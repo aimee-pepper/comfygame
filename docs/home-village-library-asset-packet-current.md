@@ -55,9 +55,12 @@ House room or Library shelf. This is an aesthetic gate, not a request for anothe
 - **Source requirement:** direct production bitmap/pixel source with deterministic export metadata. HTML/CSS
   may frame review but may not depict the building. Preserve the existing technical exporter only where it
   can carry this actual art without raster alteration.
-- **Technical evidence:** assert exact 96×80 dimensions, nonempty transparent margins, nearest-neighbour-only
-  scaling, stable source/export hash and exact crop/placement identity. These gates prove transport only;
-  the label-free visual review decides whether the sprite passes.
+- **Technical evidence:** assert exact 96×80 dimensions, binary alpha only (`0` or `255`), nonempty transparent
+  margins, nearest-neighbour-only scaling, a deliberate bounded palette (target no more than 64 opaque RGB
+  colors unless Game Design accepts a specific exception), stable source/export hash and exact
+  crop/placement identity. The source of truth is the 96×80 logical grid or an exact integer-multiple grid,
+  never an antialiased high-resolution render sampled down. These gates prove transport only; the label-free
+  visual review decides whether the sprite passes.
 - **Stop condition:** send the lossless crop and phone placement to Game Design. Do not create Recycler,
   opening-five, House, Library, upgrade tiers, goldens or native integration before this sprite is accepted.
 
