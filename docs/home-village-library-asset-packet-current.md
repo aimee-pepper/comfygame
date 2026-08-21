@@ -1,8 +1,8 @@
 # Binder House, village districts and Library — active AssetLab packet
 
 **Status:** Active Asset Design assignment from the Game Design/Orchestration Lead. Trading Post v0.3, the
-five opening Built/Tier-0 identities, and Trading Post/Firepit state continuity are accepted Game-Design
-candidates. The only current art checkpoint is Binder House; the close-up Library and later building families
+five opening Built/Tier-0 identities, Trading Post/Firepit state continuity, and Binder House v0.1 are accepted
+Game-Design candidates. The only current art checkpoint is the close-up Library; later building families
 remain held. AssetLab only; no native game, Xcode, gameplay schema, roadmap priority or Simulator lifecycle
 changes.
 **Repository status checked before dispatch:** shared tree reconciled against current status immediately
@@ -164,10 +164,10 @@ does not solve future zoning by guesswork.
 
 Unknown future buildings are absent, not locked silhouettes, empty named lots or blurred spoilers.
 
-## Future reference — Library root (after the style gate)
+## Current checkpoint 5 — close-up Library root
 
-Build the Library only after the Trading Post style gate is accepted. Its contents are settled and
-independent of Workshop/Constellation review.
+Build the Library now from the settled contents below. The Trading Post, opening-five, state-continuity and
+Binder House gates are already accepted; this release does not authorize later buildings.
 
 ### Composition
 
@@ -274,9 +274,9 @@ need. This is a readability/density test only. It must answer:
 Do not implement a carousel, scrolling town or final multi-block map in this packet. Report the evidence to
 Game Design for a later zoning decision.
 
-## Future reference — Binder House/yard shell
+## Completed checkpoint 4 — Binder House/yard shell
 
-Build a functional visual shell around only the settled interactive anchors:
+The accepted functional visual shell contains only these settled interactive anchors:
 
 - Writing Desk;
 - Library;
@@ -365,11 +365,10 @@ goldens remain unchanged.
 ## Review order and stop conditions
 
 Trading Post v0.3 and the Recycler/Blacksmith/Storehouse/Firepit Built/Tier-0 opening identity set are
-Game-Design accepted candidates. Trading Post and Firepit foundation/built/improved/mastered continuity rows
-and independent warm-gold attention overlays are also accepted candidates, with both accepted Built sources
-preserved byte-identically. Current work is Binder House only. After that review, the remaining order is:
-close-up Library → later buildings in campaign order. Do not batch those future milestones merely because
-their specifications are present in this file.
+Game-Design accepted candidates. Trading Post and Firepit foundation/built/improved/mastered continuity rows,
+independent warm-gold attention overlays, and Binder House v0.1 are also accepted candidates. Current work is
+the close-up Library only. After that review, later buildings proceed in campaign order. Do not batch those
+future milestones merely because their specifications are present in this file.
 
 Stop immediately and report rather than inventing:
 

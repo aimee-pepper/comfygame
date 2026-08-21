@@ -67,7 +67,7 @@ assert(stationByID.constellation.upgradeAuthorityStatus === "partial" && station
 assert(stationByID.constellation.constellationProposal.filter(star => star.status === "proposed / review-gated").length === 6, "Constellation mastery expansion must remain explicitly unimplemented");
 assert(stationByID.constellation.constellationProposal.find(star => star.name === "The Long Instruction")?.status === "implemented", "Long Instruction must remain the implemented star");
 assert(data.assetGallery.acceptedAssets.length === 0 && data.assetGallery.reviewEvidence.length === 0, "rejected or uncommitted pixels entered the gallery");
-assert(data.assetGallery.slots.length === 85, "asset gallery must reserve 17×5 stable building/state slots");
+assert(data.assetGallery.slots.length === 86, "asset gallery must reserve 17×5 building/state slots plus the manifested Binder House root");
 assert(data.assetGallery.slots.find(slot => slot.key === "trading_post.built")?.status === "Game Design accepted candidate / native integration not yet accepted", "Trading Post v0.3 must be distinguished from packaged/native/live art");
 assert(data.assetGallery.slots.find(slot => slot.key === "trading_post.built")?.assetPath === null, "Trading Post acceptance must not invent a packaged asset path");
 for (const id of ["recycler", "blacksmith", "storehouse", "firepit"]) {
@@ -84,7 +84,11 @@ for (const key of acceptedContinuityKeys) {
   assert(slot?.status === "Game Design accepted candidate / native integration not yet accepted", `${key} must preserve the checkpoint-3 candidate/native distinction`);
   assert(slot?.assetPath === null, `${key} must not invent a packaged asset path`);
 }
-assert(data.assetGallery.slots.filter(slot => slot.status === "Game Design accepted candidate / native integration not yet accepted").length === 13, "only the five Built candidates and eight checkpoint-3 states may be candidate-accepted");
+const binderHouseRoot = data.assetGallery.slots.find(slot => slot.key === "binder_house.root");
+assert(binderHouseRoot?.status === "Game Design accepted candidate / native integration not yet accepted", "Binder House root must preserve the candidate/native distinction");
+assert(binderHouseRoot?.assetPath === null, "Binder House root must not invent a packaged asset path");
+assert(!data.assetGallery.slots.some(slot => slot.key.startsWith("binder_house.") && slot.key !== "binder_house.root"), "Binder House must not invent independent state or attention asset IDs");
+assert(data.assetGallery.slots.filter(slot => slot.status === "Game Design accepted candidate / native integration not yet accepted").length === 14, "only the five Built candidates, eight checkpoint-3 states and Binder House root may be candidate-accepted");
 assert(data.assetGallery.slots.every(slot => slot.assetPath === null), "no unaccepted art path may enter a stable slot");
 for (const item of data.search) {
   assert(item.provenance.generatedAtSourceHash === data.generatedAtSourceHash, `fact hash missing: ${item.type}/${item.id}`);

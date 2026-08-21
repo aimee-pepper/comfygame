@@ -5155,7 +5155,7 @@ Built and Mastered silhouettes at ordinary phone scale, are not baked into any s
 danger, fire or building damage. The final phone evidence keeps every district heading inside the 368-point
 canvas. Both previously accepted Built sources remain byte-identical. The checkpoint manifest is
 `AssetLab/artifacts/opening-state-continuity-v0.1/manifest.json`, SHA-256
-`2caf25e0b226ed74d48d2eb184287c472277b119538c7e0f439d6a995a47d100`; its exact source and evidence hashes are
+`f4807f119a4257883fece298b02c565db52d77b0aeb9c2aedf38568bc8657921`; its exact source and evidence hashes are
 recorded there.
 
 This accepts eight new state/overlay IDs as **Game Design candidates only** while they remain
@@ -5166,3 +5166,35 @@ authorize native packaging, or release Recycler/Blacksmith/Storehouse later form
 released for Binder House only, following the exact cutaway, yard, hotspot and district-exit authority in
 `village-progression-and-asset-matrix-current.md` and `home-village-library-asset-packet-current.md`; the
 close-up Library and later buildings remain held.
+
+#### Binder House v0.1 disposition
+
+**Accepted by Game Design as the production-visual Binder House root candidate; native integration remains
+unaccepted.** Game Design inspected the fresh/developed full 368×800 scenes, developed literal-grayscale
+scene, label-free Writing/Library/Party/yard crops, independent Library and Essence Spring attention proofs,
+collision overlay, and all three selected-exit states. The cutaway reads as one warm, lived-in bookbinder's
+home and yard rather than a floor diagram: the writing study contains paper and binding tools; the Library
+corner is a broad bookcase destination; the common table reads as domestic Party planning; the cot, stove,
+coat hooks and cloth make the rest of the house noninteractive habitation; and the stone Spring, controlled
+runoff, path and drying paper own the cooler yard. Writing desk, bookcase and common table remain distinct in
+literal grayscale.
+
+Exactly seven routes are accepted: Writing Desk, Library, Party, Essence Spring, Commerce left, Makers right
+and Commons down. Their exact 2× `scaledToFit` hit rectangles are at least 44 points, in bounds and pairwise
+non-overlapping. The corrected persistent exit plaques carry distinct compact motifs—balanced pans with a
+tagged parcel for Commerce, crossed hammer and awl for Makers, and three seats around a hearth dot for
+Commons—while selection remains an independent outline. No Workshop, Storehouse, Firepit, station, Bestiary
+or Constellation-content hotspot is present, and no walking simulation or invented House activity is implied.
+
+The checkpoint manifest is `AssetLab/artifacts/binder-house-v0.1/manifest.json`, SHA-256
+`e4f331f297f26f221e911a434e9318eb32ad0cba3e0b40ee014f4bf46ff7e6b0`. The accepted fresh/developed logical
+sources are exact 184×319 binary-alpha bounded-palette bitmaps with hashes
+`bed2eb0211f1b51bcf06ffdeb1ad083c7b0fe39ad1c6f898a8df1e08890123fd` and
+`029a798eff82c4c3ede0f9df1ca051267a69233ccf9fb5c01f4ea28e23a09379`. Library and Spring attention remain
+independent overlays. This remains a **Game Design candidate only** while uncommitted/unpromoted and
+`integrationReady:false`; it does not authorize native packaging or accept any district background.
+
+Asset checkpoint 5 is released for the close-up Library only: one floor-to-ceiling bookcase, at most two
+adjoining cases only if honest tap geometry requires it, with exactly five physical clickable shelf regions
+for Diaries, Bestiary, Dictionary, Field Notes and World History. Its contents must grow from real collection
+counts and preserve disclosure; it is not a second full-room scene. Later buildings remain held.

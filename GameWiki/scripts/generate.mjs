@@ -216,6 +216,7 @@ const tradingPostCandidateRejected = /Trading Post Tier-0 v0\.1 disposition[\s\S
 const tradingPostCandidateAccepted = /Trading Post Tier-0 v0\.3 disposition[\s\S]{0,300}Accepted as the production visual style gate/i.test(assetProposalText);
 const openingIdentitySetAccepted = /Opening Built\/Tier-0 identity set v0\.1 disposition[\s\S]{0,300}Accepted by Game Design/i.test(assetProposalText);
 const openingStateContinuityAccepted = /Opening state-continuity v0\.1 disposition[\s\S]{0,300}Accepted by Game Design/i.test(assetProposalText);
+const binderHouseCandidateAccepted = /Binder House v0\.1 disposition[\s\S]{0,300}Accepted by Game Design/i.test(assetProposalText);
 const acceptedBuiltCandidateIDs = new Set([
   ...(tradingPostCandidateAccepted ? ["trading_post"] : []),
   ...(openingIdentitySetAccepted ? ["recycler", "blacksmith", "storehouse", "firepit"] : [])
@@ -224,6 +225,12 @@ const acceptedStateCandidateKeys = new Set(openingStateContinuityAccepted ? [
   "trading_post.foundation", "trading_post.improved", "trading_post.mastered", "trading_post.attention",
   "firepit.foundation", "firepit.improved", "firepit.mastered", "firepit.attention"
 ] : []);
+const binderHouseRootSlot = binderHouseCandidateAccepted ? [{
+  key: "binder_house.root",
+  state: "root",
+  status: "Game Design accepted candidate / native integration not yet accepted",
+  assetPath: null
+}] : [];
 
 const travellersByID = Object.fromEntries(travellersJSON.travellers.map(item => [item.id, item]));
 const catalogueIDs = stationsJSON.stations.map(station => station.id).sort();
@@ -345,7 +352,7 @@ const wikiData = {
   assetGallery: {
     acceptedAssets: [],
     reviewEvidence: [],
-    slots: stations.filter(station => station.destinationKind === "villageBuilding").flatMap(station => station.assetSlots),
+    slots: [...stations.filter(station => station.destinationKind === "villageBuilding").flatMap(station => station.assetSlots), ...binderHouseRootSlot],
     note: "No accepted building pixels are registered. Rejected and uncommitted candidates are not displayed; stable building/state slots remain reserved for reviewed assets."
   }
 };
