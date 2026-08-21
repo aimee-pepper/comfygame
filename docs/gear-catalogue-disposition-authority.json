@@ -1,0 +1,222 @@
+{
+  "schemaVersion": 1,
+  "status": "current",
+  "updated": "2026-08-21",
+  "catalogueSource": "Sources/Content/Data/items.json",
+  "componentAuthority": "docs/crafting-components-and-schematics-current.md",
+  "qualityMigration": {
+    "legacyTier1": "standard",
+    "legacyTier2": "fine",
+    "legacyTier3": "superior",
+    "legacyTier4": "exceptional",
+    "roughMigratedGearIsInvented": false,
+    "peerlessMigratedGearIsInvented": false,
+    "preserveExactEffectivePowerAsLegacyCredit": true,
+    "legacyRarityLabelsArePlayerFacingAfterMigration": false
+  },
+  "ordinaryFoundLines": [
+    ["blade_chipped", "blade_keen", "ripping_hook", "the_long_grievance"],
+    ["bone_awl", "raking_edge", "blade_binders", "hairsplitter"],
+    ["field_maul", "banded_mace", "anvilfall", "the_settled_argument"],
+    ["long_pick", "warded_spear", "parting_needle", "the_kept_distance"],
+    ["split_board", "banded_buckler", "tower_guard", "the_unarguable"],
+    ["padded_cap", "ridged_helm", "visored_casque", "crown_of_quiet"],
+    ["guard_padded", "guard_banded", "guard_vault", "the_standing_wall"],
+    ["wrapped_hands", "studded_gloves", "gauntlets_of_hold", "the_sure_hands"],
+    ["worn_boots", "shod_boots", "longstriders", "the_unhurried"],
+    ["bent_pick", "balanced_pick", "corebreaker", "the_willing_edge"],
+    ["pressed_leaf", "cold_compass", "someones_ring", "the_first_page"]
+  ],
+  "ordinaryFoundRules": {
+    "futureAcquisition": true,
+    "territoryFindEligible": true,
+    "tradingPostEligible": true,
+    "qualityIsFrozenPerInstance": true,
+    "catalogueIDDefinesAuthoredObjectIdentity": true,
+    "componentReceiptMayBeInventedForLegacyInstance": false,
+    "craftingUsesSchematicIdentityInstead": true
+  },
+  "wildApexOnly": [
+    "two_natured_blade",
+    "long_fang",
+    "ranked_spear",
+    "rimed_edge",
+    "living_hook",
+    "quiet_knife",
+    "bloodletter",
+    "warded_haft"
+  ],
+  "wildApexRules": {
+    "futureAcquisition": "apex-reward-only",
+    "territoryFindEligible": false,
+    "tradingPostEligible": false,
+    "recyclerEligible": false,
+    "specialRuleIsSeparateFromQuality": true,
+    "growthMaySilentlyChangeQualityBand": false
+  },
+  "componentAuthoredFound": [
+    {
+      "id": "rubble_sling",
+      "receiptMode": "schematic",
+      "schematicID": "sling",
+      "qualityBand": "standard",
+      "territoryFindEligible": true,
+      "components": [
+        {"socket": "cord", "family": "world.fiber", "band": "standard"},
+        {"socket": "projectile", "family": "world.rubble", "band": "standard"},
+        {"socket": "pouch", "family": "creature.hide", "band": "standard"}
+      ]
+    },
+    {
+      "id": "ironwork_blade",
+      "receiptMode": "schematic",
+      "schematicID": "cutting_blade",
+      "qualityBand": "fine",
+      "territoryFindEligible": true,
+      "components": [
+        {"socket": "edge", "family": "world.ore", "band": "fine"},
+        {"socket": "grip", "family": "creature.hide", "band": "fine"}
+      ]
+    },
+    {
+      "id": "copper_buckler",
+      "receiptMode": "schematic",
+      "schematicID": "shield",
+      "qualityBand": "fine",
+      "territoryFindEligible": true,
+      "components": [
+        {"socket": "face", "family": "world.copper", "band": "fine"},
+        {"socket": "brace", "family": "world.timber", "band": "fine"},
+        {"socket": "binding", "family": "world.fiber", "band": "fine"}
+      ]
+    },
+    {
+      "id": "silvered_helm",
+      "receiptMode": "schematic",
+      "schematicID": "armoury_balanced_laminate",
+      "outputSlot": "head",
+      "qualityBand": "superior",
+      "territoryFindEligible": true,
+      "components": [
+        {"socket": "body", "family": "world.ore", "band": "superior"},
+        {"socket": "lining", "family": "creature.hide", "band": "superior"},
+        {"socket": "binding", "family": "world.fiber", "band": "superior"},
+        {"socket": "fitting", "family": "world.silver", "band": "superior"}
+      ]
+    },
+    {
+      "id": "golden_keepsake",
+      "receiptMode": "fixed-found",
+      "fixedIdentity": "worked-gold-keepsake",
+      "qualityBand": "superior",
+      "territoryFindEligible": true,
+      "components": [
+        {"socket": "fitting", "family": "world.gold", "band": "superior"}
+      ]
+    },
+    {
+      "id": "quartz_point",
+      "receiptMode": "schematic",
+      "schematicID": "long_spear",
+      "qualityBand": "fine",
+      "territoryFindEligible": true,
+      "components": [
+        {"socket": "point", "family": "world.quartz", "band": "fine"},
+        {"socket": "haft", "family": "world.timber", "band": "fine"},
+        {"socket": "binding", "family": "world.fiber", "band": "fine"}
+      ]
+    },
+    {
+      "id": "obsidian_edge",
+      "receiptMode": "schematic",
+      "schematicID": "weaponsmith_fitted_edge",
+      "qualityBand": "superior",
+      "territoryFindEligible": true,
+      "components": [
+        {"socket": "edge", "family": "world.obsidian", "band": "superior"},
+        {"socket": "grip", "family": "creature.hide", "band": "superior"},
+        {"socket": "fitting", "family": "creature.bone", "band": "superior"}
+      ]
+    },
+    {
+      "id": "adamant_cuirass",
+      "receiptMode": "schematic",
+      "schematicID": "rigid_guard",
+      "qualityBand": "exceptional",
+      "territoryFindEligible": true,
+      "components": [
+        {"socket": "body-1", "family": "world.adamant", "band": "exceptional"},
+        {"socket": "body-2", "family": "world.adamant", "band": "exceptional"},
+        {"socket": "binding", "family": "world.fiber", "band": "exceptional"}
+      ]
+    },
+    {
+      "id": "woven_sling",
+      "receiptMode": "schematic",
+      "schematicID": "sling",
+      "qualityBand": "standard",
+      "territoryFindEligible": true,
+      "components": [
+        {"socket": "cord", "family": "world.fiber", "band": "standard"},
+        {"socket": "projectile", "family": "world.clay", "band": "standard"},
+        {"socket": "pouch", "family": "world.fiber", "band": "standard"}
+      ]
+    },
+    {
+      "id": "timber_longbow",
+      "receiptMode": "schematic",
+      "schematicID": "longbow",
+      "qualityBand": "standard",
+      "territoryFindEligible": true,
+      "components": [
+        {"socket": "limb-1", "family": "world.timber", "band": "standard"},
+        {"socket": "limb-2", "family": "world.timber", "band": "standard"},
+        {"socket": "string", "family": "world.fiber", "band": "standard"}
+      ]
+    },
+    {
+      "id": "resinbound_boots",
+      "receiptMode": "schematic",
+      "schematicID": "working_boots",
+      "qualityBand": "standard",
+      "territoryFindEligible": true,
+      "components": [
+        {"socket": "upper", "family": "creature.hide", "band": "standard"},
+        {"socket": "sole", "family": "world.timber", "band": "standard"},
+        {"socket": "binding", "family": "world.resin", "band": "standard"}
+      ]
+    },
+    {
+      "id": "riftglass_rapier",
+      "receiptMode": "fixed-special",
+      "fixedIdentity": "riftglass-rapier",
+      "qualityBand": "exceptional",
+      "territoryFindEligible": false,
+      "components": [
+        {"socket": "special-core", "family": "world.rift_glass", "band": "exceptional"}
+      ]
+    }
+  ],
+  "retiredFromNewAcquisition": [
+    {"id": "fired_clay_guard", "reason": "Clay is not an ordinary protective socket and the item has no authored special rule."},
+    {"id": "saltward_pendant", "reason": "Its air-warning promise has no live exact consumer."},
+    {"id": "sulfurous_maul", "reason": "Sulfur is a reagent, while the supposed reactive trace has no live exact effect."},
+    {"id": "mercurial_gloves", "reason": "Mercury is a liquid reagent and the gloves have no authored balancing effect."},
+    {"id": "pressed_pulp_cap", "reason": "Pulp is an ingredient rather than protective material and the cap adds no distinct rule."},
+    {"id": "toxin_edge", "reason": "Toxin belongs to coatings; a permanent toxin component would bypass the coating system."},
+    {"id": "sporeward_coat", "reason": "Spore is a reagent and no exact spore ward exists."},
+    {"id": "reagent_field_pick", "reason": "The description promises resource revelation without an authored tool effect and overlaps Survey Needle."},
+    {"id": "ichor_hook", "reason": "world.ichor is legacy-only and the reactive reservoir has no exact physical consumer."},
+    {"id": "raw_essence_pendant", "reason": "The protected pendant has no exact Essence-capacity or other gear effect."},
+    {"id": "mote_compass", "reason": "The protected compass promises Reality detection without an exact rule and overlaps later seeking/mastery systems."}
+  ],
+  "retirementRules": {
+    "removeFromNewDrops": true,
+    "removeFromNewTradingStock": true,
+    "removeFromNewAuthoredWorldPages": true,
+    "preserveExistingSaveInstances": true,
+    "preserveInstalledPowerAndTradeRecyclerDisposition": true,
+    "keepDecodeOnlyCatalogueDefinitions": true,
+    "mayReturnOnlyAfterExactRuleAndSourceAreAuthored": true
+  }
+}

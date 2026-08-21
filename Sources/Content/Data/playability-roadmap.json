@@ -120,7 +120,7 @@
       "status": "queued",
       "detail": "Add the approved Field Kit supply that spends one world turn and then shows soft directional arcs along the first step of the shortest currently walkable route to the nearest standing portal. Brightness rises with proximity; it never reveals the portal, route, distance or minimap POI and never returns the party automatically.",
       "gate": "Use seamlight-current.md. Exact-instance use, duplicate refusal, relaunch, blocked-terrain routing, collapse retargeting, far/near/on-portal feedback, fog/minimap nondisclosure, Trading Post stock and Apothecary Fieldwork recipe pass. It does not extend the Wayfarer's Table or pre-empt active Band 1.3 scaling acceptance.",
-      "workstream": "design",
+      "workstream": "engineering",
       "isPrimary": false
     },
     {
@@ -130,7 +130,7 @@
       "status": "queued",
       "detail": "Add the Scriptorium-owned authored equipment-enchantment system for one inscription on one exact Body or Keepsake item. The first recipe sacrifices a Seamlight to make Seamward, which wakes only during collapse and provides the same fog-neutral portal guidance without consuming an expedition item or turn.",
       "gate": "Use equipment-inscription-system-current.md after Seamlight, exact gear identity and Scriptorium Ink preparation are stable. Prove atomic install/erase, slot eligibility, stable-instance persistence, reforge/equip/trade/recycle retention, frozen departure ownership, collapse-only activation, duplicate nonstacking, route retargeting and portal/minimap nondisclosure. Do not infer inscriptions from arbitrary consumables or make Waystone inscribable.",
-      "workstream": "design",
+      "workstream": "engineering",
       "isPrimary": false
     },
     {
@@ -468,9 +468,9 @@
       "priority": "B1.7d",
       "title": "Unlimited Earth-like visibility test page",
       "status": "queued",
-      "detail": "Add the directly requested testing page/profile with zero Essence cost and unlimited use so ordinary lighting and controlled atmosphere can be compared against a deliberately limited ecology without consuming campaign resources. It is a testing instrument, not a fourth starter World Page or a progression reward.",
-      "gate": "Before Engineering starts, freeze whether it is DEBUG-only and exactly which world/history/loot/progression receipts are suppressed. Require deterministic seed/profile selection, explicit TESTING label, no economy farming or traveller/story leakage, and direct comparison fixtures for clear/smoke/ash/snow/fog/rain visibility.",
-      "workstream": "design",
+      "detail": "Add the DEBUG-only Visibility World: one frozen 15×15 live-renderer fixture with clear, dim, pitch-black, rain, snow, fog, smoke and airborne-ash profiles; zero Essence, unlimited entries, isolated disposable HP/reveal and no campaign receipt or reward.",
+      "gate": "Use earthlike-visibility-test-world-current.md. The exact fixture and seed never reroll; typed live visibility owns clear/dim/dark/smoke/ash while absent rain/snow/fog consumers say Visual only. Prove all suppressed campaign state byte-equivalent, inert content awards nothing, profile switching preserves coordinates/memory, ordinary phone layout is unchanged, and Release has no route.",
+      "workstream": "engineering",
       "isPrimary": false
     },
     {
@@ -857,17 +857,17 @@
       "id": "house-village",
       "priority": "B2.12",
       "title": "Binder House, yard and three village districts",
-      "status": "inProgress",
-      "detail": "Game Design has accepted candidate visual identities for the opening five Built structures, Trading Post/Firepit lifecycle families, Binder House root and runtime Library. They remain unpromoted and not native. Asset checkpoint 6 now owns exactly three runtime-composed opening district shells—Commerce Row, Makers' Row and Commons—using the byte-identical accepted building layers, fixed slots, signs and independent attention.",
-      "gate": "Three exact 184×300 logical shells and deterministic compositor pass empty/absent disclosure, fixed collision-safe slots, 368×800 colour/grayscale state fixtures, Home direction, label-free identity and single-region state-change tests. No walking, scrolling, town map, invented building, damage, later-state work or native packaging. Authorities: village-progression-and-asset-matrix-current.md, home-village-library-asset-packet-current.md, asset-system-proposal.md and asset-production-output-contract-current.md.",
-      "workstream": "asset",
+      "status": "queued",
+      "detail": "Game Design accepted the opening five Built identities, Trading Post/Firepit lifecycle families, Binder House root, runtime Library and all three runtime district shells. Asset checkpoint 6 is preserved at 8a97908 with exact fixed-slot Commerce, Makers and Commons roots; every accepted candidate remains unpromoted and not native.",
+      "gate": "Engineering later packages only accepted manifests/sprites/compositors, derives live presence/state/attention, and replaces the current hub at the roadmap-ordered native checkpoint. Phone acceptance proves exact House targets, Library counts, district absence/presence, Back/Home routes and live attention without walking, scroll-map, invented buildings or crop/hotspot drift. Authorities: village-progression-and-asset-matrix-current.md, home-village-library-asset-packet-current.md, asset-system-proposal.md and asset-production-output-contract-current.md.",
+      "workstream": "engineering",
       "isPrimary": false
     },
     {
       "id": "workshop-constellation-role",
       "priority": "B2.12a",
       "title": "Remove Workshop; settle recovered teaching and Mote mastery",
-      "status": "inProgress",
+      "status": "paused",
       "detail": "Workshop removal and Party's non-teaching role are settled. The exact 38-entry recovered-teaching catalogue covers every removed knowledge/automation grant. Capacity ownership and tuning are now exact: Storehouse 16→28→40, field pack 8→11→14→20, Sela +2, with decode-only legacy credits preserving old maxima. Game Design's reversible Constellation recommendation remains three combat plus three district mastery permissions and Long Instruction.",
       "gate": "Recovered-teaching freshness passes python3 scripts/validate_recovered_teachings.py, and capacity migration passes every old count without loss. Homework holds Aimee's 3+3 mastery, campaign persistence and exact capacity-profile decisions; current recommendations are reversible and do not block unrelated work. Engineering does not remove live Workshop routes until every old entitlement has an equal-or-better migration and every knowledge ID remains reachable. Authorities: recovered-teachings-current.md, capacity-progression-current.md, workshop-constellation-role-audit-current.md and village-progression-and-asset-matrix-current.md.",
       "workstream": "design",
@@ -908,9 +908,9 @@
       "priority": "B2.13b",
       "title": "Material-responsive full gear catalogue",
       "status": "queued",
-      "detail": "Expand ordinary gear across the real resource/component pool so Schematic identity survives while selected primary/secondary materials alter the relevant component treatment, named effect and appearance. This includes the directly requested broad catalogue and six-band presentation; it must not infer mechanics from colour or an obsolete continuous-property model.",
-      "gate": "The Design content dependency is closed by crafting-components-and-schematics-current.md. Wait for the roadmap-ordered material migration and exact Pointed Blade rules fixture; then Asset proves one modular Pointed Blade kit across material/quality variants and Engineering proves stable exact-instance component receipts before expanding the catalogue. No bulk final-art production ahead of the rules.",
-      "workstream": "design",
+      "detail": "Implement the settled 21-Schematic component system and exact 75-Gear disposition: 44 ordinary found identities, 8 apex-only, 12 truthful component/fixed receipts and 11 decode-only placeholders retired from new acquisition. Remove legacy rarity copy and preserve exact instance power while material components and six-band quality remain independent.",
+      "gate": "Design is complete in crafting-components-and-schematics-current.md and gear-catalogue-disposition-authority.json, validated by both content scripts. Wait for the roadmap-ordered material migration and exact Pointed Blade rules fixture; then Asset proves one modular Pointed Blade kit and Engineering proves stable receipts before catalogue expansion. No bulk final-art production ahead of the rules.",
+      "workstream": "engineering",
       "isPrimary": false
     },
     {

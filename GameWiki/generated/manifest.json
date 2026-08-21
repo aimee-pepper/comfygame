@@ -1,9 +1,9 @@
 {
   "schemaVersion": 1,
-  "aggregateSourceHash": "424cf6dc0970d2ddd445c24127fc0670a0162eaea9357c2cb61ce241830f5445",
+  "aggregateSourceHash": "e29cd5cb3bf9b1fdaf689b076345047577811ac1c99d1d470dd8bffcf405a4fa",
   "inputs": {
     "Sources/Content/Data/items.json": "b94b1107229f217e14f1d7fa936d8eea938f9782c06c583be32302f10d432bc9",
-    "Sources/Content/Data/playability-roadmap.json": "5c68f12457a684e73263956f4a353aa048be8f15459a2e463f9d715aabeb5109",
+    "Sources/Content/Data/playability-roadmap.json": "4790468114d411773e015f74fcbf9c6b51e5a1a68b992498338e64baf37651d7",
     "Sources/Content/Data/resources.json": "8eee965ce7df075abfe3f646bb36d416a10ef1d7d194845e30fa0f31b7b23e6f",
     "Sources/Content/Data/stations.json": "21b5e9f3bee2d9115acf535ef2ff1db350b87b8ee33755e79a3b3e4584102e2b",
     "Sources/Content/Data/symbols.json": "c1ec5dd7b661680b358e21a56124b6080aa28d93db51fd2f6b80214ced1dcb16",
@@ -107,12 +107,12 @@
     "docs/count-description-current.md": "7d600486af7ad5d1b9898bae6470ade91613abd2bfefaa31ab4413f5bb007973",
     "docs/crafted-gear-migration-current.md": "f26d9524154672e59c50415b59c2cd3fe745741d9d8bafc136c46333469fa558",
     "docs/crafting-components-and-schematics-current.md": "364a7af402ebaee8be562b57e44a71b4f31c12cc4de09da9678af2b87bf23765",
-    "docs/crafting-intuition-and-quality-review-current.md": "4ed600ce73b5a2dcc6238a84bbd05f317d4e6afa4d1287e4ee488f51c51c680e",
+    "docs/crafting-intuition-and-quality-review-current.md": "7cfe996ccda8bd3cdf150c36cc827bf57d64b72937d183dfe58586fbbf8fef22",
     "docs/creature-ecology-and-materials-overhaul-current.md": "1941fd1ba9992464bea6fcbbfc3fe9804cdc9cabdc5c1fec590893e5b552f29a",
-    "docs/creature-territory-finds-current.md": "ec9a84eb1393a0573c6b38a53a622d64574d02f35dc98b0b857447ea99f717c3",
+    "docs/creature-territory-finds-current.md": "07792ad39d56392aaadc4507520015020a77171b6e6486f22aa3381903027385",
     "docs/cross-lead-delivery-contract-current.md": "af95f3e6668995134aaca7e0a1ac6bacd1e81305696c16734ed859f92fd14b2b",
     "docs/curio-identification-knowledge-current.md": "31acb95848598b0874e3978a9488f122b8bfee115e16867a5dca9fa1c33986f0",
-    "docs/current-design-index.md": "412079186ef9788208cd52ca0dd7c4346638634120a7eca452402538272aa030",
+    "docs/current-design-index.md": "74d2667102215812db560f2c3cae3376e404a812549a0c3a359f45c30314e987",
     "docs/cycle-system-current.md": "3a472c56d4c78299574f768de122d2ac11e7387eeae8fd723667e73f96fbd598",
     "docs/dagg-recovery-teaching-current.md": "a6f2e09d574fde643ce524b90c7c76482925010c6d8af53bc327fd4fe3480546",
     "docs/debug-authored-text-atlas-current.md": "dde26130930d41c60ef958393390774a36c6bf37999a2428420db634df1c7dd2",
@@ -143,6 +143,7 @@
     "docs/diary-teaching-registry-current.md": "e69477b94d5d3dc926f72e234741077bfead4758315ac83998c247bcfc178081",
     "docs/diary-teaching-registry-implementation-audit-current.md": "6eba96c729ef69d28b3e45ee108c45a95dab72a6174373732f8bdd6d2bf68967",
     "docs/distillery-system-current.md": "c4aa4a4c4a2be2f01d169e41a5002fa6523409d219f24f0ca2ef2dcbd13f9bf9",
+    "docs/earthlike-visibility-test-world-current.md": "abc01addeeb431862d159a7079ff66fe10b6dc12a8c04b0d92a1926461eff19e",
     "docs/encounter-scaling-phone-test-card-current.md": "7b652c4e5c4eaecd2bcc3959881b231466f4096384a6aadfbe22a523db7037c9",
     "docs/encounter-scaling-playtest-current.md": "a953a537fd97c84e60ebcd3176f43e683a7940050f6e1a24e67413d67a503ff5",
     "docs/encounter-scaling-simulation-current.md": "23a206e3853ba4f20d9b871ad2624c3a604170ba56ee5313ab2c21608ddc7b5d",
@@ -166,7 +167,8 @@
     "docs/gambit-stat-thresholds-current.md": "6549465eed132bc9b7c7dca35df9ce457e9772f583d3290a7c6d26849a0889db",
     "docs/game-design-ux-assessment-current.md": "495980049344c1f8c025e0a6bb6bfd3d464f9ee188fa301473659a5b25f9a931",
     "docs/game-wiki-content-contract-current.md": "44df634863caef57bc46b29c8c8a9517f8136e103886d150ce32c03e0aaa00dd",
-    "docs/gear-crafting-families-current.md": "c264201890e85ee5fbebfde27e4edef64e7529218ff24c7e9da660f1b52172fd",
+    "docs/gear-catalogue-disposition-current.md": "cc7c7e0918a955fcee8e3699303bb52654fb5caddd9bc63a6b811f34bf9237ca",
+    "docs/gear-crafting-families-current.md": "8a80c3a6f1d97c5bb61a15be857b71b3c0dbc2d0f0081b65411809784ddaebe5",
     "docs/generated-companion-arrival-builds-current.md": "1f9c3d35e2a5ffc0a8b472cac33e14f5b9619a6f4c3b09acadd4b2a6e8d354fc",
     "docs/glass-quartz-waystone-audit-current.md": "cddf5ddb222afe5173020d2785c4f94da1287b2df138e2d58900eb8c623bb1f5",
     "docs/great-work-boundary-current.md": "df6a758383e183ae8b52bab8a4ef78f53707edeae4a57722ee2af5a1f4301665",
@@ -225,7 +227,7 @@
     "docs/static-manual-authority-audit-current.md": "b40e88ce676b71f2353fa0d2c873b375c4c1df16aeea4be2e03b7eadd01f1b47",
     "docs/station-first-use-reachability-audit-current.md": "39e1a563922923190b196d04a44cc6bebdcde8095d040a87211ae09aa53e306e",
     "docs/station-integration-matrix-current.md": "a7894b1dab11b032bde1a35ea04293e76ca6b325b628a16c19c341cae1aceaf6",
-    "docs/survey-needle-current.md": "9bb3883b13373dddba3f9b4248ed5b01de75bad781559405f467ffa9b9628e57",
+    "docs/survey-needle-current.md": "ff08c6a7c51f7aaa7d40982e2af545d3c74630ce72fa968e8531983b67101d75",
     "docs/tannery-system-current.md": "a6544afbb2d77c2369b37922b443cd7d2244ce43bc358d632eeab7b30844499c",
     "docs/tavern-random-companions-current.md": "e7b86a31548089a4a122fba51a1fb1f246d14d84de948300a1873b38ae9648c2",
     "docs/top-down-map-asset-integration-current.md": "60fbd5232a171bdbe2e7f9f162764c5efd71ac820bde4a71caa4d74a298c962a",
@@ -276,7 +278,7 @@
     "docs/writing-tool-progression-current.md": "be17fe07aa89aaaab7117a2faca43d7e1eb1be23202d19106c67c42547b23bb0"
   },
   "outputs": {
-    "generated/wiki-data.json": "cf7a9ecf2277e9272aa24570a1cc8ddc22fa61a1be8df3503fcf4e0b33be3890",
-    "generated/source-registry.json": "1f9212724e26855b579f8024ea31bf96c8b64a92c4fc07478ae675c9694bf3f7"
+    "generated/wiki-data.json": "33ea8e47fa5844ab59d25a4ab522a51a923842f5bd991c6ba31c38acfd199464",
+    "generated/source-registry.json": "3833b5a0e740ef5a10550fae2e86418598d49a2df4d3d11c12810239affd7abb"
   }
 }

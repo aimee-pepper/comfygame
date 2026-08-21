@@ -136,6 +136,7 @@ When two documents disagree:
 | Wayfarer's Table flora recognition | `wayfarers-table-flora-recognition-current.md` | Station-owned on-sight practical flora name/defence/yield notes layered onto disclosure-neutral Look consequences |
 | Seamlight portal guidance | `seamlight-current.md` | Fog-neutral, walkable-path guidance toward the nearest usable portal |
 | Survey Needle resource guidance | `survey-needle-current.md` | Home-tuned reusable Field Kit instrument; paid broad path-sector and signal-strength readings without fog/minimap reveal |
+| Earth-like visibility test world | `earthlike-visibility-test-world-current.md` | DEBUG-only fixed live-renderer fixture; eight controlled light/air profiles and zero campaign/economy mutation |
 | Equipment inscriptions | `equipment-inscription-system-current.md` | One authored durable instruction per exact Body/Keepsake piece; first effect is collapse-only Seamward |
 | Implemented-six station audit | `implemented-six-station-contribution-audit-current.md` | Evidence-led audit showing five first slices fulfilled and Sela's flora recognition as the one missing promised contribution |
 | Station reachability and first use | `station-first-use-reachability-audit-current.md` | Complete 23-station lifecycle/payoff matrix; Apothecary access/empty-room correction plus Channelworks one-time restoration receipt |
@@ -163,6 +164,7 @@ When two documents disagree:
 | Earlier loot quality hybrid review | `loot-quality-hybrid-review-current.md` | Historical first candidate; superseded for current review by the crafting-intuition audit |
 | Crafting intuition and quality review | `crafting-intuition-and-quality-review-current.md` | Settled six bands, 70/30 component weighting, no hard station cap and Refitting; exact content now delegated to the component/schematic authority |
 | Crafting components and schematics | `crafting-components-and-schematics-current.md` | Complete World/Creature component profiles, exact 21-Schematic socket lists, contribution scales, migration and Pointed Blade fixture |
+| Gear catalogue disposition | `gear-catalogue-disposition-current.md` + `gear-catalogue-disposition-authority.json` | Exact 75-Gear partition, found/apex/component/decode-only migration, future acquisition eligibility and old-rarity removal |
 | Library shelves | `library-shelves-current.md` | Close-up Library root, reusable runtime-composed collection assets, habitat/Dictionary volumes and per-diary page→book progression |
 | Internal Game Wiki | `game-wiki-content-contract-current.md` | Required route depth, catalogue/resource taxonomy, stable detail pages and automatic no-placeholder completeness gates |
 | Recovered teachings | `recovered-teachings-current.md` | Exact 38-entry replacement catalogue for Workshop knowledge, with plain copy, evidence placement, pacing, pity and migration |
@@ -216,7 +218,7 @@ When two documents disagree:
 | Predation / living worlds | `predation-living-worlds-current.md` | Awareness-bounded trait interactions and reduced-yield carcasses without simulation creep |
 | Count descriptions | `count-description-current.md` | Exact small counts, qualitative upper rungs and focus-authored prose through history |
 | Void cap | `void-cap-current.md` | Categorical celestial suppression with visible contradictions and non-celestial light preserved |
-| Gear crafting families | `gear-crafting-families-current.md` | 21 physical families, specialist tier ownership and crafted-instance provenance |
+| Gear crafting families | `gear-crafting-families-current.md` | Current 21 physical families, specialist ownership, no-cap quality boundary and crafted-instance provenance |
 | Armoury rebuild | `armoury-rebuild-implementation-current.md` | Exact Rigid/Balanced/Insulated rebuild eligibility, tier trade-offs, provenance and commit safety |
 | Armoury profile balance | `armoury-profile-offset-audit-current.md` | Recommended 0/−0.5/−1.0 native comparison profile and retuning evidence |
 | Weaponsmith | `weaponsmith-implementation-current.md` | Exact Maud station lifecycle, four advanced melee recipes, diary-pattern polearm and no fitted-item subsystem |

@@ -11,6 +11,10 @@ playability primary permits it. The territory-find mix remains a separate open t
 Recycler, Distillery, or any native UI.
 **Updated:** 21 August 2026
 
+The exact disposition of all 75 currently live Gear catalogue IDs is now frozen separately in
+`gear-catalogue-disposition-authority.json`. It prevents legacy found objects, apex rules and resource-named
+placeholder gear from being mistaken for interchangeable crafted Schematics during this migration.
+
 ## Audit conclusion
 
 The live crafting implementation is logically consistent but too difficult to predict from ordinary game
