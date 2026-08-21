@@ -180,6 +180,156 @@ Creature-material details retain source species, source world/run and the releva
 collection surface aggregates by family (`Feathers ×8`), while the detail surface can filter/select exact
 units for crafting without making each provenance sample consume a slot.
 
+## Exact replacement for every live grade consumer
+
+Removing `MaterialSample.grade` is not a copy change. The current value also controls construction tier,
+Trading Post price, Distillery potency, Scent Mask eligibility, Recycler defaults and several automatic
+pickers. Engineering must migrate those consumers in the same checkpoint sequence; it must not delete the
+field while quietly substituting `max(properties)` as a new unnamed universal quality score.
+
+### Shared unit and reserve shape
+
+Use one value shape, `CraftMaterialUnit`, with these persisted fields:
+
+```text
+stableUnitID
+domain                 // world or creature
+familyID
+properties             // hardness, density, insulation, flexibility, lustre, reactivity
+sourceReceipt
+schemaVersion
+```
+
+The value shape is shared only so recipes and property inspectors do not need two implementations. Storage
+remains two explicit reserves:
+
+- `WorldMaterialReserve` for provenance-bearing harvested world materials such as Timber, Fibre, Pulp and
+  future flora products;
+- `CreatureMaterialReserve` for Hide, Feather, Scale, Bone, Venom and the other families in this document.
+
+Bulk counted ore, clay, salt, sulfur, Raw Essence and similar `ResourceID` holdings remain in the existing
+world-resource ledger. The player sees both bulk holdings and provenance-bearing world materials under
+**World resources**, but never sees creature parts there. A recipe may accept units from either reserve only
+when its authored family requirement says so. Item capacity applies to neither reserve.
+
+`domain` is not inferred from family at display time. It is frozen at collection/migration so a future family
+shared by both domains cannot jump categories after a catalogue edit.
+
+### Construction tier comes from the maker, not generic material quality
+
+Recipe family and explicit property floors answer **can this material perform this job?** The maker's
+available process answers **what construction tier can this recipe produce?** Once every selected unit meets
+its authored requirements, excess property strength never raises the item's tier by itself.
+
+| Maker state at commit | Exact output tier |
+|---|---:|
+| Blacksmith, effective tier 0 | 1 |
+| Blacksmith, effective tier 1 or more | 2 |
+| Tannery Wear root without `tannery_wear_tier_two` | 1 |
+| Tannery with `tannery_wear_tier_two` | 2 |
+| Bowyer, Weaponsmith or Armoury, effective tier 0 or 1 | 3 |
+| Bowyer, Weaponsmith or Armoury, effective tier 2 or more | 4 |
+
+Recipe-specific station caps still apply. The existing 12/24/48/80 Essence costs use this frozen output tier.
+Remove `craftGrade`, `naturalTier`, `wastesGradeAboveCap`, below-headline-material warnings and their grade
+labels from current previews. Keep construction tier, station cap, recipe property requirements, exact
+selected units, insulation/reactivity receipts and specialist-profile trade-offs.
+
+This makes Halloway and Corrin foundational Tier-1/2 makers and preserves Fen, Maud and Bracken as the
+higher-tier ranged, melee and armour specialists already settled. Stronger-than-required material is still
+valuable when it satisfies another recipe or provides a better frozen insulation/reactivity receipt; it is
+not transmuted into a universally higher-tier sword.
+
+### Candidate selection is requirement-specific
+
+For one requirement, compute each eligible unit's **surplus** only from that requirement:
+
+1. for every mandatory floor, add `max(0, property - floor)`;
+2. for an OR group, use the smallest surplus among the alternatives that pass;
+3. sort by total surplus ascending, then stable unit ID ascending;
+4. never use an unrelated property, a price or an old grade as a tiebreaker.
+
+The default therefore spends the least-overqualified valid unit. The player may replace any default with
+another exact valid unit before confirming. One unit may satisfy only one requirement in a recipe.
+
+Single-property consumers follow the same rule. Reforging and Instrument upgrades sort by the one authored
+working property ascending, then stable unit ID; they do not consult price, family or another property after
+eligibility. Storehouse sorting offers Family, Source and each named property, never “Best,” “Finest” or
+Grade. Stable content hashes for new units omit grade; migrated units preserve their existing stable unit ID
+rather than minting a new identity from the reduced field set.
+
+### Trading Post values capability; it does not rank every part
+
+Every creature family has a small authored base value and exactly two commercially relevant capabilities:
+
+| Base | Families | Relevant capabilities |
+|---:|---|---|
+| 1 | Hide, Down, Feather, Fin, Bone | Hide: flexibility/hardness; Down: insulation/flexibility; Feather: flexibility/lustre; Fin: flexibility/insulation; Bone: density/hardness |
+| 2 | Pelt, Scale, Quill, Fang, Claw, Oil | Pelt: insulation/flexibility; Scale: hardness/flexibility; Quill: hardness/flexibility; Fang: hardness/reactivity; Claw: hardness/flexibility; Oil: insulation/reactivity |
+| 3 | Plate, Chitin, Shell, Tusk, Horn, Venom | Plate/Chitin/Shell: hardness/density; Tusk/Horn: density/hardness; Venom: reactivity/lustre |
+| 4 | Ichor | reactivity/lustre |
+
+`sale price = base + number of the two relevant capabilities that are at least 60`, producing 1–6 Gold.
+The detail/preview names both contributing capabilities; it never shows a quality star or rarity colour.
+When Vance adds that exact sold unit to stock, its repurchase price is `sale price + 1`. Generated merchant
+material stock uses the same formula after its frozen family/properties are generated, so purchase and resale
+cannot produce Gold. The Trading Post never averages multiple units into one quote.
+
+### Distillery potency uses the attunement's actual job
+
+Candidate eligibility keeps its existing explicit property floors. Potency becomes:
+
+- Heat: `round(0.65 × reactivity + 0.35 × insulation)`;
+- Caustic: `round(reactivity)`;
+- Light: `round(0.65 × lustre + 0.35 × hardness)`.
+
+Clamp to 0–100 after rounding. Sort the default candidate by potency ascending and stable unit ID so the
+least potent valid unit is consumed first; show the projected potency before commit. The frozen distilled
+core retains exact origin, attunement and potency. No grade term remains.
+
+### Scent Mask accepts a material with the right physical fiction
+
+Replace “one animal resource, grade 25+” with **one scent-bearing creature material**. Valid families are
+Hide, Pelt, Down and Oil. No property floor is added: being one of these tissues is the relevant capability.
+The existing exact-unit preview/commit remains atomic. Feather, Bone, Fang and other unrelated parts cannot
+stand in merely because a hidden number is high.
+
+### Recycler returns truth, not an invented best part
+
+For constructed gear, the existing immutable construction receipt remains authoritative. Recovery capacity
+is unchanged, but the initial checked units are the first recoverable receipt entries in frozen construction
+order. The player may change the selection before confirming. Do not sort by grade, price, maximum property
+or a synthetic score.
+
+For catalogue gear without a construction receipt, never fabricate creature provenance. Replace the current
+generic `reclaimedHide` salvage output with the authored bulk **Fibre** output already used by padded/boot
+profiles. Exact creature materials are recoverable only when an exact creature-material unit exists in the
+gear's receipt.
+
+### Migration and compatibility
+
+1. Decode legacy `MaterialSample.grade` only as migration input; do not persist it into a current unit.
+2. Preserve every unit's stable identity, domain (derived once from the legacy family/source route), family,
+   six properties and source receipt. Existing properties already carry the functional distinctions.
+3. Existing crafted gear keeps its frozen construction tier, specialist profile, protection, insulation,
+   reactivity and consumed-unit receipt. It is not rebuilt or weakened on load.
+4. Legacy creature samples move to `CreatureMaterialReserve`; legacy Timber/Fibre/Pulp and other harvested
+   world materials move to `WorldMaterialReserve`; bulk `ResourceID` balances remain untouched.
+5. Recompute only future quotes, candidate order and future construction previews. A pending unsaved preview
+   may be discarded on migration; no committed holding may be lost.
+6. Once migration succeeds, current encode writes only the newest schema. If an old save cannot be migrated
+   without loss, use the visible save-version incompatibility route rather than shipping two live material
+   systems.
+7. Flora/world harvesting derives family, properties and quantity without producing a grade. Predation and
+   failure/return partitioning move exact units without ranking them. Any later Deep Works receipt freezes
+   resource family, properties and pull count—not a universal grade.
+8. Remove grade from current Storehouse, Trading Post, Recycler, Apothecary, Blacksmith, DEBUG receipt and
+   accessibility copy. No hidden/debug surface remains the accidental public authority.
+
+The version transition is accepted only when a fixture covering every old `MaterialKind` accounts for the
+same number of units before and after migration and all grade-dependent live consumers have zero current
+references.
+
 ## Exact remains derivation
 
 One defeated ordinary creature produces at most four semantic groups. Every group is derived, never rolled
@@ -302,7 +452,8 @@ may add a new creature stat, habitat or drop family.
 1. Add persisted ecology identity and versioned legacy freeze without changing gameplay RNG or existing
    saved enemy positions.
 2. Add habitat availability/resolution and exact spawn/movement eligibility.
-3. Add the new creature-material family/receipt/reserve and no-grade capability projection.
+3. Add the shared material-unit value plus separate world/creature reserves and migrate every grade consumer
+   using the exact rules above.
 4. Implement exact remains derivation and remove ordinary unrelated resource/item drops.
 5. Migrate existing animal `MaterialSample` units losslessly into creature-material units; convert old
    grade-based recipe gates to family/property requirements before deleting their consumer.
@@ -327,10 +478,13 @@ uses the explicit save-format version boundary approved for this early stage.
 8. Creature-material families aggregate visually while exact properties/provenance survive crafting,
    failure partition, return and relaunch.
 9. Existing animal samples migrate without count loss; no old item slot remains occupied by them.
-10. No player-facing `crude/fine/superb/monstrous` or material-grade requirement remains in current content.
-11. World Generator Web reports habitat counts, species ecology identities, legal placement count and
+10. No current `grade` field, player-facing `crude/fine/superb/monstrous`, material-grade requirement,
+    grade-derived tier/price/potency or grade-based automatic selection remains.
+11. Blacksmith/Tannery/Specialist construction tiers, weakest-qualifying surplus ordering, family price,
+    Distillery potency, Scent Mask eligibility and Recycler receipt selection match their exact tables.
+12. World Generator Web reports habitat counts, species ecology identities, legal placement count and
     material-family projections for rapid review.
-12. Ordinary phone proof shows each reference ecosystem in world, combat, Bestiary, loot and Return
+13. Ordinary phone proof shows each reference ecosystem in world, combat, Bestiary, loot and Return
     contexts without text being the sole identity.
 
 ## Explicit exclusions

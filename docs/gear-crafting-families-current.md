@@ -1,5 +1,12 @@
 # Gear crafting families — current design
 
+> **Incoming material-system correction (21 August 2026):** Recipe families, property floors, station
+> ownership, construction receipts and specialist trade-offs remain authoritative. Universal sample grade,
+> natural-tier calculation and grade warnings are superseded for the next material migration by
+> `creature-ecology-and-materials-overhaul-current.md`. Future output tier comes from the maker's exact
+> progression table there. This note prevents the implemented old formula below from being mistaken for the
+> target contract while migration is not yet live.
+
 **Status:** Current structural design; thresholds, costs and within-tier bonuses are playtest values.  
 **Scope:** Blacksmith, Tannery, Armoury, Bowyer, Weaponsmith and physical gear instance data.
 Channelworks remains governed by `channelworks-system-current.md`.

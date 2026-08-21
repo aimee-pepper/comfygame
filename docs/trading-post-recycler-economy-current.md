@@ -1,5 +1,11 @@
 # Trading Post / Recycler economy and provenance migration
 
+> **Incoming material-domain correction (21 August 2026):** Gold currency, rotating stock, exact atomic
+> transactions, outcome refresh and Recycler receipt/capacity behavior remain authoritative. Universal
+> material grade, grade-band sale prices, animal parts as World resources, highest-grade Recycler defaults
+> and fabricated reclaimed Hide are superseded by `creature-ecology-and-materials-overhaul-current.md`.
+> Family/capability price and frozen receipt order replace them when that migration lands.
+
 **Status:** Trading Post and Recycler first rules slices implemented. Prices, stock counts, recovery
 fractions and phone interaction remain debug/playtest values; destructive-action and provenance
 boundaries are current.

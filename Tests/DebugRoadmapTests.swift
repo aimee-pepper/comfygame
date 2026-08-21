@@ -67,8 +67,13 @@ final class DebugRoadmapTests: XCTestCase {
         for checkpoint in ["7772df0", "5e5aa14", "2ced55a", "543ddfe"] {
             XCTAssertTrue(item.detail.contains(checkpoint), "missing Scent Mask evidence \(checkpoint)")
         }
-        for pendingGate in ["Phone-only", "368×800", "sensory matrix", "nonstacking", "relaunch"] {
+        for pendingGate in ["Phone-only", "sensory behavior", "Quiet Step", "relaunch", "protected Field Kit"] {
             XCTAssertTrue(item.gate.contains(pendingGate), "missing pending phone gate: \(pendingGate)")
+        }
+        XCTAssertTrue(item.detail.contains("grade-25+ animal-world-resource ingredient is transitional"))
+        for finalIngredient in ["Hide", "Pelt", "Down", "Oil", "no grade"] {
+            XCTAssertTrue(item.gate.contains(finalIngredient),
+                          "missing final Creature-material gate: \(finalIngredient)")
         }
     }
 

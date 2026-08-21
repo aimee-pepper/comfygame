@@ -14,6 +14,24 @@ the missing benefit without an owned knowledge boundary.
 The Table is a shared field workspace, not a shop counter and not a reason Sela must remain Home.
 Building it makes her field guide and route notes available to every later expedition.
 
+## Exact screen boundary
+
+“Route notes” is fiction for the passive fieldcraft benefits below. The Wayfarer's Table is **not** a route
+planner or departure hub. Its native destination may show its current contribution, Field Guide and real
+improvements, but it has no Route / Party / Supplies tabs and no interactive world graph.
+
+These verbs stay in their existing homes:
+
+- choosing/writing a world: Writing Desk;
+- reviewing visited worlds: Library → History;
+- assembling/equipping the party: Party;
+- packing consumables and desired quantities: Field Kit;
+- reviewing and confirming departure: the Writing Desk's existing bind/departure flow.
+
+Do not add risk ratings, anchors, world selection, party slots, item packing or a review-departure action to
+this station. A visual proof may show a table, field guide, provisions and route markings as environmental
+identity, but none of those props authorize a new tab or verb.
+
 ## First slice
 
 ### Before the Table is built

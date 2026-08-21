@@ -26,6 +26,12 @@ Remove the generic material-quality ladder from primary identity and remove unre
 gear and curio drops from ordinary animals. Preserve exact functional properties/provenance. Full schema,
 habitat and reward rules are in `creature-ecology-and-materials-overhaul-current.md`.
 
+Universal material grade is removed as a current field, not merely hidden. Recipe family/property floors
+decide eligibility; maker progression decides gear tier; family plus two named capabilities decides merchant
+value; attunement properties decide Distillery potency; Hide/Pelt/Down/Oil decide Scent Mask eligibility; and
+Recycler defaults to frozen receipt order. A shared material value may serve recipes, but World-material and
+Creature-material reserves remain distinct player domains.
+
 ## 285. Known Gold before mining access is deliberate progression
 
 **Date:** 21 August 2026
