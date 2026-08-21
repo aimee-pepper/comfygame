@@ -5008,3 +5008,21 @@ Native handoff gates, without Source edits here:
 
 This closes the smallest named-character transport/consumer seam. It does not reopen character
 aesthetics, buildings/stations, weapons/items, sigils, combat mechanics or tutorials.
+
+### 21 Aug 2026 — House/village/Library v0.1 visual disposition
+
+**Disposition: rejected as production art; technical sprite/export foundation accepted only as
+infrastructure.** Game Design inspected the lossless contact sheet, full 368×800 House, Library and
+Commerce screens, plus individual station and room sprites. The candidate correctly replaced CSS/div
+objects with deterministic integer-command RGBA outputs and a hashed manifest, but the visual result still
+reads as placeholder geometry: tiny 48×32 props depend on labels for identity, districts are flat empty
+fields, Binder House is a labelled box diagram, and Library collection stages are coloured rectangles inside
+a shelf matrix rather than a beautiful inhabited room.
+
+Keep the same checkpoint open. Do not commit/promote goldens, mark integration-ready or request native
+integration. Correct it under `asset-production-output-contract-current.md` and
+`home-village-library-asset-packet-current.md`: detail-bearing task-appropriate sprite/scene scale, recognizable
+functional architecture without labels, intentional material/palette/light/value treatment, real
+paper→folio→book forms, full native composites and 400% nearest-neighbour crops. Preserve the exact settled
+topology and do not invent mechanics or destinations. Ordinary Chrome visual verification remains open even
+though the HTTP route/MIME and standalone PNG fallback are valid.

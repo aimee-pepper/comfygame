@@ -4,6 +4,8 @@
 
 - `cross-lead-delivery-contract-current.md` — required delivery receipts, mockup behavior fence and
   exact Campaign/Home/Writing/World ambiguity resolutions for Design, Asset and Engineering.
+- `asset-production-output-contract-current.md` — task-specific lossless pixel sprite/scene/modular output,
+  art-quality acceptance, ordinary-Chrome review and no-silent-promotion boundary.
 - `game-design-ux-assessment-current.md` — current lead assessment of the playable product, its
   strongest identity, first-hour weaknesses and progression-ordered product direction.
 - `playability-priority-sequence-current.md` — cross-lead execution order and WIP limits.
@@ -157,7 +159,7 @@ When two documents disagree:
 | Slot-free harvest reserve foundation | `world-resource-reserve-current.md` | Exact property-bearing harvests are slot-free; current combined category is transitional |
 | Creature ecology and materials | `creature-ecology-and-materials-overhaul-current.md` | Habitat-aware pressure-generated life including deep water; body-derived Creature materials and rare encounter-level territory gear |
 | Earlier loot quality hybrid review | `loot-quality-hybrid-review-current.md` | Historical first candidate; superseded for current review by the crafting-intuition audit |
-| Crafting intuition and quality review | `crafting-intuition-and-quality-review-current.md` | Current replacement proposal: component sockets, primary/secondary quality weighting, no hard station cap and Refitting; awaiting Aimee decisions |
+| Crafting intuition and quality review | `crafting-intuition-and-quality-review-current.md` | Settled six bands, 70/30 component weighting, no hard station cap and Refitting; complete ComponentProfile/schematic tables still required before implementation |
 | Library shelves | `library-shelves-current.md` | Library-room root, Bestiary shelf, five growing collections and per-diary folded-page→hardcover progression |
 | World-resource extraction | `resource-extraction-progression-current.md` | Equipped Field Pick ranks; disclosed Gold progression; complete mineral table and no-deadlock Iron |
 | Essence refining progression audit | `essence-refining-progression-audit-current.md` | Review-only correction removing the paid quantity-control toll and earning 3:1 through demonstrated baseline refining |
@@ -189,7 +191,7 @@ When two documents disagree:
 | Remaining native list audit | `remaining-native-list-surface-audit-current.md` | Code-backed classification of three remaining collection/action list failures versus legitimate ordered/detail lists |
 | Base destination catalogue compatibility | `base-destination-board-current.md` | Stable internal destination IDs/routes only; player placement is Binder House + Library shelves + three village districts |
 | Binder House and village | `home-house-and-village-current.md` | Four-zone house cutaway, exterior village, standardized signs, persisted attention and no town damage |
-| Workshop / Constellation role review | `workshop-constellation-role-audit-current.md` | Current 54-node Workshop and one-star Constellation audit; recommends rehoming functions and preserving purchases before removing standalone hotspots |
+| Workshop / Constellation role review | `workshop-constellation-role-audit-current.md` | Workshop removal settled; Party never teaches; recovered knowledge, physical capacity owners and the campaign-wide Mote mastery proposal are specified with open choices labelled |
 | Active House/village/Library Asset packet | `home-village-library-asset-packet-current.md` | Exact AssetLab-only camera, topology, fixture, evidence and stop conditions; no native or invented mechanics |
 | Historical starting-town slice | `starting-town-band1-integration-current.md` | Superseded five-hotspot proposal retained for history only |
 | Party and character surface | `party-character-surface-current.md` | Five-person grid; Stats/Gear/Skills/Gambit; Diary deep-link; production graph entry |

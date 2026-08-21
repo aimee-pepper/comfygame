@@ -1,7 +1,8 @@
 # Crafting intuition and loot quality — current review
 
-**Status:** Game Design audit and replacement recommendation. The six-band loot vocabulary is approved in
-principle; the component/output rules below remain under Aimee review and are not Engineering authority yet.
+**Status:** Core model settled by Aimee: six quality bands, 70/30 primary/secondary weighting, no hard
+station quality caps and Refitting. Engineering remains held until Game Design freezes the complete material
+profile and schematic-socket tables. The territory-find mix remains a separate open tuning decision.
 **Supersedes for review:** the continuous six-property player-facing recipe puzzle, the
 `0.6 × weakest + 0.4 × average` output rule, and hard station quality caps in
 `loot-quality-hybrid-review-current.md` and `gear-crafting-families-current.md`.
@@ -36,7 +37,7 @@ expanded.
 
 Crafting should be explainable in three sentences:
 
-1. Pick the object pattern you want to make.
+1. Pick the object **schematic** you want to make.
 2. Choose a material for each pictured component; the component says what broad materials fit there.
 3. The primary component has the strongest effect, while fittings change secondary stats, appearance and
    value. Better-colour inputs make a better-colour finished object.
@@ -51,9 +52,13 @@ Do not collapse these into one universal “better” number:
 
 | Identity | Question answered | Example |
 |---|---|---|
-| **Pattern** | What object and combat/tool behavior is this? | Pointed Blade, Long Spear, Supple Coat |
+| **Schematic** | What object and combat/tool behavior is this? | Pointed Blade, Long Spear, Supple Coat |
 | **Material** | What characteristic does this component add? | Adamant is forceful/heavy; Pelt insulates; Gold is valuable/conductive |
 | **Quality** | How exceptional is this particular material or finished object? | Rough, Standard, Fine, Superior, Exceptional, Peerless |
+
+`Schematic` is the player-facing word for what earlier documents and internal stable IDs may call a
+`Pattern`: the recipe/object plan, not a textile print or a random appearance pattern. Existing stable
+PatternIDs may remain decode aliases, but new UI and content copy say **Schematic**.
 
 Material identity is not a total ordering. Adamant is not “higher-quality Gold.” They are different inputs
 with different uses. A recipe may permit both Pelt and Gold in a grip/trim component; the Pelt version gains
@@ -141,7 +146,7 @@ outputQualityBand = nearest whole band, halves round upward
 
 - Core/Body sockets are normally primary.
 - Grip/Binding/Lining/Fitting sockets are normally secondary.
-- A pattern may mark two structural sockets primary; they split the 70% share equally.
+- A schematic may mark two structural sockets primary; they split the 70% share equally.
 - If a recipe has no secondary socket, primary components own 100%.
 - A recipe may not change weights merely to force its intended output colour.
 
@@ -159,19 +164,19 @@ This incorporates both directions the earlier formula missed: exceptional suppor
 plain core, and an exceptional core can carry ordinary fittings, but component importance decides which has
 more influence. All-Peerless inputs always produce a Peerless output.
 
-**Decision under review:** 70/30 is the recommended starting weight. It is exposed in DEBUG tuning during
-the first complete crafting fixture; changing it changes future crafts only, never existing frozen gear.
+**Settled starting rule:** 70/30 is the authored starting weight. It is exposed in DEBUG tuning during the
+first complete crafting fixture; changing it changes future crafts only, never existing frozen gear.
 
-## Stations and patterns: no hard quality cap
+## Stations and schematics: no hard quality cap
 
 Remove the hard rule that a Blacksmith cannot preserve quality above Tier 2 or a specialist cannot preserve
-quality above another numerical cap. If a station can make the pattern and every selected component is
+quality above another numerical cap. If a station can make the schematic and every selected component is
 Peerless, the finished object is Peerless.
 
 Station progression instead controls:
 
-- which patterns are available;
-- how many meaningful component sockets/choices a pattern supports;
+- which schematics are available;
+- how many meaningful component sockets/choices a schematic supports;
 - specialist combat/tool profiles;
 - deterministic material efficiency where explicitly authored;
 - later refitting/reconstruction options.
@@ -179,16 +184,16 @@ Station progression instead controls:
 Examples:
 
 - Halloway can make a Peerless Pointed Blade from Peerless inputs, but it remains the straightforward
-  close-pierce Pointed Blade pattern.
-- Maud's Weaponsmith unlocks Fitted Point, Fitted Edge, Fitted Maul and Fitted Polearm patterns with advanced
+  close-pierce Pointed Blade schematic.
+- Maud's Weaponsmith unlocks Fitted Point, Fitted Edge, Fitted Maul and Fitted Polearm schematics with advanced
   base profiles and fittings. A Standard Fitted Point may have behavior a Pointed Blade never gains.
 - Bracken's Armoury unlocks Rigid, Insulated and Balanced protective profiles. Colour does not replace the
   profile choice.
 
-Pattern and quality both affect final performance:
+Schematic and quality both affect final performance:
 
 ```text
-finished performance = authored pattern baseline
+finished performance = authored schematic baseline
                      + quality-band contribution
                      + named material component modifiers
                      + preserved legacy credit, if any
@@ -207,7 +212,7 @@ For new gear, Halloway's repeatable improvement should become **Refit**:
 5. confirm one atomic replacement.
 
 The old component returns only if an authored recovery rule says it survives; ordinary refitting consumes
-it. A refit cannot change the pattern's slot/damage/reach identity. Specialist Rebuild may change the pattern
+it. A refit cannot change the schematic's slot/damage/reach identity. Specialist Rebuild may change the schematic
 when its station explicitly allows it.
 
 Existing paid reforge ranks/power remain preserved through migration. They become frozen legacy workmanship
@@ -249,7 +254,7 @@ roll, category and selected table.
 
 ## Crafting UI contract
 
-The station surface begins with six-across pattern icons, not recipe rows. Selecting one opens an anchored,
+The station surface begins with six-across schematic icons, not recipe rows. Selecting one opens an anchored,
 edge-clamped detail containing:
 
 1. object silhouette, slot and behavior;
@@ -264,7 +269,7 @@ Default selection uses the lowest-quality compatible stock that produces the cur
 never consumes a higher band without showing it. The player may explicitly choose higher-quality components.
 No hidden auto-selection occurs at commit; every selected stack and count is frozen in the quote.
 
-## Engineering sequence after approval
+## Engineering sequence after content freeze
 
 Do not implement this as scattered consumer patches. The required sequence is:
 
@@ -278,16 +283,16 @@ Do not implement this as scattered consumer patches. The required sequence is:
 5. Implement one Pointed Blade vertical slice: stack selection, visual component receipt, output quality,
    material modifier, atomic commit, Recycler receipt and save round-trip.
 6. Convert Trading Post, Recycler, Storehouse, failure return and gear presentation to family+band stacks.
-7. Convert the remaining current physical patterns and Refitting.
+7. Convert the remaining current physical schematics and Refitting.
 8. Convert Instrument, Scent Mask, Distillery and special consumers only from explicit authored component/
    ingredient rules; none may infer behavior from colour alone.
 9. Remove continuous grade/property-floor UI and old hard station caps only after zero current consumers rely
    on them.
 
 Each checkpoint has one source test matrix and one ordinary-phone acceptance card. Engineering does not start
-this sequence while `loot-quality-hybrid` remains paused.
+this sequence before the complete ComponentProfile and schematic-socket authorities validate.
 
-## Asset sequence after approval
+## Asset sequence after content freeze
 
 Quality frames are a separate future packet. Asset Design must not begin them until this rule is accepted.
 That packet will require:
@@ -295,14 +300,21 @@ That packet will require:
 - six redundant frames in colour and grayscale;
 - component socket silhouettes for the first Pointed Blade fixture;
 - Gold, Adamant, Pelt, Hide, Plate, Bone, Feather/Down and Timber component treatments;
-- one pattern rendered with alternate primary and secondary components while retaining pattern identity;
+- one schematic rendered with alternate primary and secondary components while retaining object identity;
 - Rough through Peerless output without changing the object's underlying silhouette;
 - Storehouse stack tiles and one local pickup treatment.
 
-## Decisions still required
+## Remaining Game Design work and open tuning
 
-1. Accept or revise the recommended 70/30 primary/secondary quality weight.
-2. Accept removing station quality caps in favour of pattern/profile progression.
-3. Accept Refitting as the replacement for future opaque reforge ranks.
-4. After those decisions, Game Design authors the complete component profile and recipe socket tables before
-   either lead receives an implementation packet.
+Settled: 70/30 component weighting, no station quality caps and Refitting.
+
+Before either implementation lead receives the crafting migration packet, Game Design must author and
+validate:
+
+1. the complete live material-family ComponentProfile table;
+2. every current physical schematic's primary/secondary sockets and eligible material tags;
+3. the deterministic material contribution and trade-off copy used by preview/receipts;
+4. legacy Tier/reforge-to-band migration examples with equal effective performance;
+5. the Pointed Blade reference fixture used by rules, UI and multipart sprite assembly.
+
+The 3%/1.5%/0.5% territory-find proposal remains open and independent of the accepted crafting model.

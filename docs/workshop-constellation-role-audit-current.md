@@ -1,195 +1,218 @@
-# Workshop and Constellation role audit — current review
+# Workshop and Constellation role audit — current
 
-**Status:** Game Design audit with recommendations for Aimee discussion. No native route/content removal is
-authorized until the recommendations are accepted.
-**Scope:** opening Binder House destinations, the 87-node research catalogue, Gambit capacity, Motes and the
-single live Constellation node.
+**Status:** Workshop removal is settled. Knowledge redistribution and Constellation/Mote expansion are
+current Game Design work; their open choices are explicitly labelled below.
+**Scope:** the opening Binder House destinations, 54 live Workshop nodes, Gambit acquisition/capacity,
+world-writing vocabulary, Storehouse/satchel capacity and Mote progression.
 **Updated:** 21 August 2026
 
-## Conclusion
+## Settled correction
 
-The **Workshop is a relic and should stop being a standalone destination**. It does no coherent physical
-crafting. Its current five branches collect unrelated systems that now have clear owners elsewhere.
+The **Workshop will be removed as a standalone destination**. It is a historical catch-all, not a coherent
+place or action. Removing it does not authorize deleting learned knowledge, capacity or paid progress.
 
-The **Constellation does not currently earn a standalone House destination**. Its one purchase duplicates
-the same Gambit-capacity axis already sold twice by Workshop research, while the promised Reality/reset
-distinction has no current game event that makes it matter.
+The earlier proposal to move Instruction into **Party planning is withdrawn**. Party is deliberately small:
+it selects people, gear, rank/formation, skills and already-known Gambits. It never sells, researches or
+teaches anything. Learning must have an attributable source in the world, in writing, from a person or at a
+real building; the Party surface only applies what the campaign already knows.
 
-Recommended direction:
+The earlier recommendation to retire Constellation is also **not settled**. Aimee's Mote-gate proposal gives
+it a potentially coherent job, evaluated below. Asset and Engineering must not remove, expand or finalize
+the hotspot until that model is accepted or rejected.
 
-1. distribute every Workshop branch to the destination that actually owns its outcome;
-2. remove Workshop as an interactive House hotspot once routes/deep links migrate;
-3. remove Constellation as an opening House hotspot and hide its standalone screen for new campaigns;
-4. preserve existing purchases exactly;
-5. reintroduce a visible Constellation only when at least three genuinely campaign-wide/world-rule effects
-   exist and are worth choosing between.
+## What the live Workshop actually contains
 
-## Live audit
+The live Workshop renders every branch whose `station` is absent: **54 nodes**.
 
-### Workshop
-
-The live Workshop renders every research branch whose `station` is `nil`. That currently means **54 nodes**
-across five branches:
-
-| Branch | Nodes | Actual outcomes | Why Workshop is the wrong owner |
+| Branch | Nodes | Live result | Audit finding |
 |---|---:|---|---|
-| Instruction | 12 | Gambit selectors, thresholds, actions, +2 shared slots, automate Binder | party planning/behavior, not fabrication |
-| The Hand | 2 | two writable symbols | written vocabulary/Dictionary |
-| The Hold | 14 | Storehouse and satchel capacity | Storehouse construction and Tannery carry craft |
-| The Lexicon | 19 | writable pressure focuses | Dictionary/knowledge |
-| The Bargain | 7 | danger/stability-trade symbols | Dictionary/Writing knowledge |
+| Instruction | 12 | nine Gambit words, two global Gambit slots, automate Binder | mixes vocabulary, capacity and behavior; every generic Gambit word is also cache-eligible |
+| The Hand | 2 | Verdigris Bloom and Mote Vein symbols | world knowledge sold from a generic room; Verdigris is also site-taught and both are cache-eligible |
+| The Hold | 14 | nine Storehouse and five satchel increments | physical improvements with real owners, but too many repetitive rungs after resources became slot-free |
+| The Lexicon | 19 | writable pressure focuses | currently research-only despite being descriptions of phenomena the player should discover |
+| The Bargain | 7 | danger/stability symbols | generic purchases duplicate the cache route and detach the vocabulary from surviving its consequence |
 
-The Workshop header shows Essence, Ore and Fibre, but the underlying branches consume many unrelated
-resources and grant knowledge, capacities and Gambit rules. The physical fiction does not explain the
-contents. It also makes the Binder House carry a generic menu for systems that later specialist buildings
-already own.
+This is genuine duplicate/conflicting acquisition, not merely bad navigation:
 
-### Constellation
+- locked caches may directly award any unowned symbol or Gambit component;
+- traveller diary pages already teach eight unique Gambit subjects and eighteen exclusive focuses;
+- sites already teach specific symbols;
+- the Workshop sells nine generic Gambit components and nine symbols that remain eligible for the cache
+  pool;
+- the nineteen Lexicon focuses are marked `research`, so the cache's world-drop filter can never select
+  them despite cache copy calling itself the wild route into vocabulary.
 
-The live Constellation contains exactly one maximum-rank-one node:
+Moving these 39 knowledge nodes unchanged into Library would only relocate the contradiction.
 
-- **The Long Instruction** — costs 3 Motes and gives +1 Gambit slot to every current/future person.
+## Replacement acquisition grammar
 
-The Workshop's Instruction branch already sells two +1 shared Gambit-slot nodes. The Constellation version
-is distinguished mainly by persistence through a hypothetical Base reset, but no player-facing reset exists
-and current design prohibits promising one. The visible screen is therefore a rare-currency wallet plus one
-administrative capacity purchase—not a meaningful constellation or Reality-altering choice.
+### One concept, one primary acquisition source
 
-Motes themselves are not invalid. They are a rare Reality resource, a cache fallback, a world yield and an
-ingredient in the existing Waystone recipe. Removing the standalone screen does not require deleting Motes.
+Every learnable rune/focus/Gambit component receives exactly one primary source class:
 
-## Recommended destination ownership
+1. **Starter** — the small authored vocabulary needed to use the opening system.
+2. **Recovered teaching** — an authored field instruction, cache text, site rubbing or non-diary writing
+   recovered during exploration.
+3. **Traveller teaching** — one exact authored diary/meeting reward owned by that person.
+4. **Specialist instruction** — a bounded capability taught at the specialist's real building because the
+   act requires their apparatus or practice.
 
-### 1. Party planning table — Instruction
+A fallback/pity route may target an eligible unknown entry from the same source class, but it may not create
+a second paid catalogue for the same knowledge. Known IDs remain stable and duplicate acquisition is a
+harmless no-op.
 
-Move the Instruction branch into **Party → Gambits → Planning** at the Binder House's party table.
+### Recovery versus learning
 
-- Global Gambit vocabulary remains campaign knowledge.
-- The surface shows a true prerequisite graph, not a list.
-- Nodes that unlock selectors/thresholds/actions state the new rule phrase.
-- Capacity nodes appear beside the Gambit rules they enlarge.
-- Diary-taught Gambit components continue to enter the same vocabulary without being repurchased.
+World collection establishes permanent recovery immediately, so collapse can never erase knowledge the
+player reached. The recovered object appears as unread attention in the **Library**. Opening that exact page,
+rubbing or instruction there applies its teaching and clears the attention. This is one read action, not a
+currency purchase or a research tree.
 
-The two current ordinary capacity nodes and The Long Instruction require one combined redesign before
-migration. Do not ship three visually separate ways of buying the same `+1 slot` result.
+This gives the rule “learning comes from a building” a physical home without pretending the Library invented
+the knowledge. It also keeps Party planning free of teaching UI. A later playtest may collapse recovery and
+study into one receipt if the home visit feels like empty friction; it may not put teaching into Party.
 
-Recommended first track:
+Collected World Pages remain the explicit exception described by their own authority: seeing an unknown mark
+adds `??` to the Dictionary but does **not** teach its meaning merely because the page can generate a world.
 
-1. **Longer Instruction I** — current ordinary research cost/effect;
-2. **Longer Instruction II** — current chained ordinary research cost/effect;
-3. **The Long Instruction** — optional rare 3-Mote capstone, campaign-wide and current/future.
+## Exact Workshop branch disposition
 
-This retains all paid effects and gives the Mote purchase a comprehensible relationship to the ordinary
-track. It does not claim to alter Reality or survive an unimplemented reset. Existing Constellation purchase
-migrates to capstone ownership; existing Workshop slot purchases migrate to ranks I/II.
+### Instruction: remove the paid tree
 
-### 2. Library Dictionary — The Hand, Lexicon and Bargain
+Keep the current starter set and two starter Gambits. The nine generic Workshop components become recovered
+instruction content, staged by campaign band rather than sold for Essence:
 
-Move all writable-vocabulary study into **Library → Dictionary → Study**:
+| Band | Eligible recovered instructions | Reason |
+|---|---|---|
+| opening/early | `subject_self`, `act_flee`, `act_skill` | broad actions the player can immediately understand and test |
+| developing | `thr_30`, `thr_70`, `cmp_above` | greater conditional precision after the 50% starter rule is familiar |
+| later | `thr_10`, `subject_foe_lowest`, `subject_foe_highest` | extreme thresholds and focus-fire priority that materially sharpen automation |
 
-- The Hand's two symbols join the symbol/rune study graph.
-- Lexicon focuses join the focus vocabulary graph.
-- Bargain danger/stability symbols form a clearly labelled danger-writing branch within the Dictionary.
-- Known/unknown entries still obey encounter and meaning-disclosure rules.
-- A learned entry remains learned regardless of route migration.
+The pool must guarantee one still-unknown generic instruction within three eligible successful returns; a
+specific traveller teaching never enters that pity pool. Cache selection may draw from the same eligible
+pool, but no longer directly chooses from every Gambit component in the catalogue.
 
-The Library root remains the five visual shelves. `Study` appears only after entering Dictionary; it does not
-turn the Library room back into a tabbed research menu.
+Other Instruction effects:
 
-### 3. Storehouse — shelving capacity
+- Remove the two ordinary `+1 Gambit slot` research purchases from new progression. Personal Wit remains
+  the ordinary capacity progression; a possible single campaign-wide Constellation bonus is reviewed below.
+- Replace `automate_self` with one authored advanced instruction recovered no earlier than Band 3 and read
+  in the Library. It is a singular capability, not a research branch or random repeatable cache reward.
+- Preserve all currently owned components, automation and slot benefit during migration. New acquisition
+  changes future routes, never revokes an entitlement.
 
-Move `shelving_one...nine` to **Storehouse → Improvements**. Their costs and capacity effects remain until a
-separate balance pass. The Storehouse building visibly grows storage bays/rooms at meaningful milestones.
-Later Tannery prerequisite nodes remain explicit requirements where lining/construction is fictionally
-needed, but the purchase occurs at the Storehouse because that is the structure being improved.
+### Hand, Lexicon and Bargain: discovery vocabulary, not a shop tree
 
-### 4. Tannery — satchel capacity
+Remove their 28 knowledge purchases from the generic research catalogue for new progression.
 
-Move `satchel_one...five` to **Tannery → Carry**. Existing opening rungs require a migration-safe availability
-route so a fresh player is not capacity-blocked before Corrin. Recommended behavior:
+- Lexicon focuses become recovered-teaching/world-observation targets, except entries already registered as
+  diary-exclusive.
+- Danger symbols are tied to authored evidence of the matching phenomenon: Storm to severe weather,
+  Tremor to unstable ground, Predation to dangerous fauna, Blight to hostile growth/decay, Miasma to foul
+  air, Swarm to overwhelming small life. Peace requires at least two learned danger bargains and a separate
+  authored counterexample; it is not a cheap starter safety switch.
+- Verdigris Bloom keeps its authored site-teaching route. Mote Vein comes from a Mote-bearing site/cache
+  teaching, not from purchasing “permanence” after Verdigris.
+- Simply seeing a phenomenon records it in Reality/Dictionary but does not necessarily teach the writable
+  term; the recovered teaching supplies the meaning.
+- Specialist buildings may teach a small apparatus-bound capability or one authored anchor word. They may
+  not sell long noun lists that compete with discovery.
 
-- current pre-Corrin ranks already owned remain owned;
-- the opening Field Kit capacity remains sufficient for the first campaign band;
-- Corrin's Tannery owns future constructed expansion;
-- no duplicate satchel ladder remains at Storehouse/Workshop.
+Game Design must freeze stable recovered-teaching IDs, exact eligibility and pity coverage before Engineering
+removes the live research nodes. Until then the old nodes remain compatibility content, not approved future
+UX.
 
-Exact early capacity and Corrin reachability must be proven before the route changes.
+### Hold: move and simplify physical upgrades
 
-## Workshop removal and migration
+Storehouse capacity belongs to **Storehouse Improvements**. Satchel construction belongs to **Corrin's
+Tannery → Carry**. No capacity purchase lives in Library, Party or a replacement generic room.
 
-Workshop removal is a navigation/content-owner migration, not deletion of progress.
+The live nine shelving and five satchel rungs are disproportionate now that world resources and Creature
+materials are slot-free. Current Design recommendation, still requiring Aimee's approval before number
+migration:
 
-Engineering sequence after approval:
+- three visible Storehouse improvements instead of nine repetitive shelving increments;
+- three visible satchel improvements after the starting kit instead of five increments;
+- starting capacity must carry the first campaign band without Corrin;
+- existing saves retain at least their current effective capacity, with old completed node IDs mapped to the
+  nearest equal-or-better new entitlement;
+- construction states alter the real Storehouse/pack silhouette at meaningful milestones.
 
-1. Add stable destination ownership metadata for the five affected branch groups without changing node IDs,
-   prerequisites, costs or grants.
-2. Add deep-link adapters from legacy Workshop node/branch links to Party, Dictionary, Storehouse or Tannery.
-3. Preserve `completedResearch`, partial research-lead progress and attention receipts by stable node ID.
-4. Ensure unavailable Tannery routes do not hide already purchased satchel results or break opening capacity.
-5. Remove Workshop from new House presentation and current station navigation.
-6. Keep the stable `workshop` station ID as decode-only compatibility for old saves; it never renders as a
-   destination and receives no future branches.
-7. Remove legacy tutorial copy that routes Workshop refinement to Essence Spring only as part of the dead-last
-   tutorial pass; do not pre-empt current work for it.
+## Constellation and Motes — current proposal
 
-The physical house may retain a decorative workbench, but it is not tappable and does not imply a missing
-generic crafting screen.
+### The useful version
 
-## Constellation options
+Keep Constellation as a small campaign-mastery graph if Motes open **upper bands**, rather than purchasing
+individual skills or acting as a tax on every upgrade.
 
-### Option A — retire the standalone screen now (recommended)
+First proposed live graph:
 
-- Migrate Long Instruction ownership into the Party/Gambit capstone.
-- Hide the Constellation route and House hotspot for new campaigns.
-- Preserve Motes and all current sources/other costs.
-- Keep a decorative star chart/window in the Library or House if desired, with no tap target.
-- Reintroduce the system only after three approved, nonredundant, live effects exist.
+| Star | Requirement | Effect | Scope |
+|---|---|---|---|
+| Offensive Mastery | any person owns a connected depth-3 Offense node | depth 4–5 Offense nodes may be bought normally | every current/future person in this campaign |
+| Defensive Mastery | same for Defense | depth 4–5 Defense nodes may be bought normally | same |
+| Fieldcraft Mastery | same for Craft | depth 4–5 Craft nodes may be bought normally | same |
+| The Long Instruction | current live purchase | +1 Gambit rule capacity | every current/future eligible person |
 
-This minimizes misleading UI and avoids designing an impressive screen around one redundant upgrade.
+The Mote buys permission, not the skill. Every combat node still needs its point and prerequisites. One star
+opens a whole tree for the campaign, so recruits do not pay again and the player is not charged per person or
+per node. Initial playtest recommendation is **one Mote per mastery star**; this is tuning, not settled
+economy. Long Instruction retains its current cost until the first combined Mote-economy simulation.
 
-### Option B — nest one star chart inside the Library
+### Why not put Motes on every shop track
 
-- Library includes a non-shelf wall chart leading to the current one-star detail.
-- Long Instruction remains a Mote purchase.
-- It no longer consumes a House hotspot.
+Potential benefits are a meaningful rare currency, memorable capstone moments and long-term value that
+survives later campaign-layer resets. The costs are more serious:
 
-This preserves the fiction but does not fix the functional redundancy. It is acceptable only as a temporary
-compatibility surface.
+- skill points/resources/prerequisites plus a Mote become opaque double or triple gating;
+- putting one on every station creates a repetitive license tax and encourages hoarding;
+- Motes already compete with Waystone and crafting uses;
+- account-wide persistence across unrelated save slots makes fresh starts and testing dishonest;
+- a late shop can be blocked by Mote luck even after the player built it and supplied its resources.
 
-### Option C — keep the standalone House destination
+Therefore the first slice gates only the three combat-tree mastery bands. Shop use remains a later, bounded
+experiment: at most one broad **masterwork permission** shared by multiple eligible maker stations, never one
+Mote per ordinary station tier. Do not add that star until the hybrid crafting rules and at least one
+masterwork recipe are live.
 
-Not recommended. It spends prime opening navigation on one administrative upgrade and encourages Asset
-Design to imply future content that has not been designed.
+### Persistence boundary
 
-## When a Constellation may return
+Recommended: Constellation purchases live in the save's Reality layer and therefore survive any future
+Base/Great-Work cycle inside that campaign. A genuinely separate **New Game/save slot starts clean**. Global
+account unlocks would make deletion, new-game balance and comparative testing ambiguous; implement them only
+if Aimee explicitly chooses account-wide meta-progression after seeing the campaign-scoped version.
 
-Game Design may propose the Constellation again only when all of the following are true:
+## Workshop removal and migration sequence
 
-1. at least three effects have implemented consumers and tests;
-2. each affects the campaign/world rules broadly, not one station/person/item;
-3. at least one real choice or prerequisite relationship exists;
-4. Mote acquisition and costs are balanced against other Mote uses;
-5. the Great Work/Reality fiction is settled enough that the screen can describe itself truthfully;
-6. old Long Instruction ownership has one clear relationship to the new graph.
+1. Freeze stable replacement acquisition IDs and prove every current knowledge grant remains reachable.
+2. Add recovered-teaching records and one Library read/apply transaction; preserve discovery on collapse,
+   idempotence and relaunch.
+3. Move Storehouse/Tannery capacity ownership with an equal-or-better legacy entitlement mapping.
+4. Preserve `completedResearch`, owned vocabulary/components, automation, Gambit capacity and attention by
+   stable ID/effect receipt.
+5. Add decode-only redirects for legacy Workshop links. `workshop` remains a compatibility station ID but
+   never renders for a new campaign.
+6. Remove Workshop from House navigation only after all five branch families pass reachability fixtures.
+7. If the Constellation proposal is accepted, migrate Long Instruction unchanged and add only the three real
+   mastery consumers; otherwise retain the current one-star compatibility surface until a later decision.
 
-No fake locked stars, promised reset, decorative edges or fossil effects may be used to meet the count.
+## Acceptance
 
-## House impact while open
+1. Party contains no research, teaching, currency purchase or hidden unlock path.
+2. Every removed Workshop knowledge ID has exactly one reachable primary source plus any explicit pity.
+3. An unknown World Page glyph remains `??`; a recovered teaching becomes writable only through its exact
+   teaching receipt.
+4. Existing saves lose no owned word, Gambit, capacity, automation or spent-Mote effect.
+5. New saves render no Workshop destination or generic research catch-all.
+6. Storehouse and satchel improvements occur at their physical owners and never block the opening loop.
+7. A Mote mastery star, if accepted, unlocks depth 4–5 purchases for the named tree across current/future
+   people and grants no skill for free.
 
-Until Aimee decides:
+## Open decisions
 
-- Writing Desk, Library, Party and yard Essence Spring are settled interactive House anchors.
-- Storehouse and Firepit remain in The Commons.
-- Workshop and Constellation are **not** approved as final interactive hotspots for new Asset work.
-- Asset Design may reserve decorative workbench/star-chart space but may not label or wire it as navigation.
-
-If both recommendations are accepted, the House has four opening interactive anchors plus the three district
-arrows. This is not “too empty”: each anchor is a substantial spatial destination, and removing redundant
-menus gives the cutaway room to read like a home.
-
-## Decisions needed
-
-1. Remove Workshop as a standalone destination and distribute its branches as specified?
-2. Retire Constellation as a standalone destination now (Option A), temporarily nest it in Library (Option
-   B), or keep it (Option C)?
-3. If Option A/B, accept the combined three-rung Gambit-capacity track and exact old-purchase migration?
+1. Accept/revise the three campaign-wide combat mastery stars and one-Mote starting price?
+2. Confirm campaign-slot Reality persistence (recommended) rather than account-wide persistence across
+   genuinely separate New Games?
+3. Accept/revise the three Storehouse + three post-starter satchel improvement compression?
+4. After a playtest, decide whether the one Library read step adds satisfying causality or empty friction;
+   teaching must not move to Party either way.
