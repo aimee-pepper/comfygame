@@ -2,8 +2,9 @@
 
 > **Quality migration hold (21 August 2026):** Recipe families, property requirements, station ownership,
 > receipts and specialist trade-offs remain authoritative. Continuous grade/output presentation is under
-> review in `loot-quality-hybrid-review-current.md`. Keep the implemented formula until Aimee settles the
-> hybrid; do not implement the withdrawn pure-no-grade maker table.
+> review in `crafting-intuition-and-quality-review-current.md`. Keep the implemented formula only as a
+> compatibility baseline until Aimee settles the replacement; do not expand it or implement the withdrawn
+> pure-no-grade maker table.
 
 **Status:** Current structural design; thresholds, costs and within-tier bonuses are playtest values.  
 **Scope:** Blacksmith, Tannery, Armoury, Bowyer, Weaponsmith and physical gear instance data.

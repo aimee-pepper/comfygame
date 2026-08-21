@@ -7,19 +7,19 @@
       "id": "band-0",
       "title": "Band 0 · Testable shell",
       "reach": "Before starting or loading a campaign",
-      "itemIDs": ["launch-handoff", "save-slots", "bug-reporter", "godmode-testing", "spatial-ui"]
+      "itemIDs": ["launch-handoff", "save-slots", "bug-reporter", "godmode-testing", "world-generator-tester", "spatial-ui"]
     },
     {
       "id": "band-1",
       "title": "Band 1 · First world, fight and return",
       "reach": "Worlds 1–3 · Binder + Quill · levels 1–3",
-      "itemIDs": ["encounter-scaling", "field-kit-loadout", "essence", "starter-world-pages", "collapse-hud-truth", "terrain-blocked-feedback", "world-visibility", "location-clue-plain-language", "world-resource-reserve", "field-note-generator", "writing-causal-presentation", "world-arrival-reveal", "field-consequence-cues", "local-pickup-feedback", "seamlight", "field-controls", "world-color", "world-contact", "encounter-opening", "return-receipt-authority", "failure-retention-correctness", "combat-affliction-authority"]
+      "itemIDs": ["encounter-scaling", "field-kit-loadout", "essence", "starter-world-pages", "collapse-hud-truth", "terrain-blocked-feedback", "world-visibility", "location-clue-plain-language", "world-resource-reserve", "field-note-generator", "writing-causal-presentation", "world-arrival-reveal", "field-consequence-cues", "local-pickup-feedback", "seamlight", "field-controls", "world-screen-presentation", "world-color", "terrain-layering-animation", "atmospheric-world-presentation", "earth-lighting-test-page", "world-contact", "encounter-opening", "return-receipt-authority", "expedition-review-persistence", "failure-retention-correctness", "combat-affliction-authority"]
     },
     {
       "id": "band-2",
       "title": "Band 2 · Opening economy and travellers",
       "reach": "Worlds 2–8 · levels 2–6 · Vance, Noll, Halloway",
-      "itemIDs": ["rune-dictionary", "saved-page-templates", "traveller-world-pacing", "traveller-clue-distribution", "trading-post-stock-breadth", "recycler", "maker-stations", "item-popover", "item-character-identities", "library-collection-accuracy", "library-shelves", "authored-text-first-review", "house-village", "creature-ecology-materials", "loot-quality-hybrid", "return-object-layout", "legacy-token-quirk-cleanup"]
+      "itemIDs": ["rune-dictionary", "saved-page-templates", "traveller-world-pacing", "traveller-clue-distribution", "trading-post-stock-breadth", "recycler", "maker-stations", "item-popover", "item-character-identities", "library-collection-accuracy", "library-shelves", "authored-text-first-review", "house-village", "workshop-constellation-role", "creature-ecology-materials", "loot-quality-hybrid", "gear-catalogue-breadth", "return-object-layout", "legacy-token-quirk-cleanup"]
     },
     {
       "id": "band-3",
@@ -306,20 +306,50 @@
     {
       "id": "terrain",
       "priority": "P1",
-      "title": "Terrain border correction",
+      "title": "Closed terrain border correction",
       "status": "complete",
-      "detail": "Lifted-terrain conformance and resource v0.6 are installed through b709e7c.",
-      "gate": "Reopen only for a contradictory physical-phone screenshot and exact location.",
+      "detail": "Lifted-terrain conformance and resource v0.6 are installed through b709e7c. This receipt covers the false-sidewall/border defect only; it does not claim the later layered-terrain, atmospheric-shadow or animation work is complete.",
+      "gate": "Reopen this closed correction only for a contradictory physical-phone screenshot and exact location. Track later terrain presentation in terrain-layering-animation and atmospheric-world-presentation.",
       "workstream": "acceptance",
+      "isPrimary": false
+    },
+    {
+      "id": "global-scroll-physics",
+      "priority": "P1",
+      "title": "No fake elastic pull-down on fitting screens",
+      "status": "complete",
+      "detail": "The app-level scroll configuration disables edge elasticity when content fits while retaining real overflow scrolling. This records the direct one-on-one correction independently from later screen redesigns.",
+      "gate": "Reopen only if an ordinary screen can expose blank elastic space despite fitting, or if the global rule prevents a genuinely overflowing screen from scrolling to its final content/action.",
+      "workstream": "acceptance",
+      "isPrimary": false
+    },
+    {
+      "id": "world-generator-tester",
+      "priority": "P1",
+      "title": "Standalone World Generator Tester website",
+      "status": "readyToTest",
+      "detail": "The isolated AssetLab website uses the live Swift world generator, deliberately reveals the whole map and reports terrain, flora, creatures, resources, sites, writing, travellers, apex placement and diagnostics. Its splash slot remains truthfully pending the generated-arrival pipeline.",
+      "gate": "Open AssetLab/world-generator-tester.html through its local server; prove same seed+page reproduces the same full snapshot/census, no tester override changes generation beyond fog reveal, JSON export is complete, and the future splash consumes the same frozen result rather than rerolling it.",
+      "workstream": "asset",
+      "isPrimary": false
+    },
+    {
+      "id": "asset-review-tooling",
+      "priority": "P2",
+      "title": "AssetLab shared review and approval tooling",
+      "status": "complete",
+      "detail": "The shared AssetLab review workflow now records the pixel-UI reference/style distillation, Jersey10/Tiny5 typography selection, selected font/style, explicit Save, per-screen Yes/No/Queue Changes decisions, direct-readable ledgers and immutable approval locks. This is a tooling receipt, not evidence that every candidate screen is accepted or native.",
+      "gate": "Reopen only if a saved review is mutable, unreadable across leads, loses its exact candidate/style identity or falsely promotes an unapproved asset.",
+      "workstream": "asset",
       "isPrimary": false
     },
     {
       "id": "spatial-ui",
       "priority": "P1",
       "title": "Spatial game hubs",
-      "status": "readyToTest",
-      "detail": "Repository reconciliation preserved phone-source baseline 2d2e7ce and later source work on current main, but the opening presentation remains split across exact packets. The broad spatial-hubs item is now an umbrella acceptance result rather than authorization for one large implementation: Writing, arrival, field feedback, Return, Binder House/yard plus three districts, Library shelves and Party each have separate current authorities and receipts.",
-      "gate": "Accept the granular Gate B–F packets in first-three-worlds-execution-plan-current.md, then pass Campaign → House → Writing → generated arrival → matching World → object-like Return without invented mechanics or manufactured scrolling. No screen is accepted because a sibling candidate or cumulative build is green.",
+      "status": "queued",
+      "detail": "This is an umbrella outcome, not one implemented screen. Campaign, Binder House/yard, Writing, generated arrival, World, object-like Return, Library and Party each require their own current visual/source/install/phone receipt. Earlier cumulative prototypes and a green sibling screen cannot satisfy it.",
+      "gate": "Complete and accept each granular packet in first-three-worlds-execution-plan-current.md, then pass the causal route Campaign → House → Writing → generated arrival → matching World → object-like Return without invented mechanics, manufactured scrolling or list-first substitutions. Track each screen independently in the operational ledger.",
       "workstream": "acceptance",
       "isPrimary": false
     },
@@ -337,10 +367,10 @@
       "id": "constellation-first-slice",
       "priority": "P1",
       "title": "Truthful one-star Constellation",
-      "status": "readyToTest",
-      "detail": "The single live Long Instruction is now one centred stateful star with anchored detail, campaign-scoped effect copy and atomic no-op rejection for insufficient or duplicate purchase attempts.",
-      "gate": "Phone proof preserves wallet, star state, exact 0/1 rank and Mote cost without implying a reset, prestige loop or unavailable constellation graph.",
-      "workstream": "acceptance",
+      "status": "paused",
+      "detail": "The one-star source slice is implemented, but standalone product acceptance is paused: Long Instruction duplicates the Gambit-capacity axis and one purchase does not justify a prime House destination. Preserve it as compatibility work while workshop-constellation-role is decided.",
+      "gate": "Do not spend phone/Asset time polishing the standalone screen. Resume only if Aimee keeps or nests Constellation, or migrate its exact ownership into the proposed Party/Gambit capacity track without losing Motes or purchases. Authority: workshop-constellation-role-audit-current.md.",
+      "workstream": "design",
       "isPrimary": false
     },
     {
@@ -348,8 +378,18 @@
       "priority": "P1",
       "title": "Look + fixed field controls",
       "status": "readyToTest",
-      "detail": "D-pad stays left; minimap stays right; Interact and Look are the only two buttons beneath it. Look retains zero-turn adjacent inspection and Interact owns the current tile action without adding vertical control rows.",
-      "gate": "368×800 shows the complete satchel/event row above the fixed pane, both action buttons below the minimap, exact movement/hazard parity, zero Look mutation and no white lifted-tile seams.",
+      "detail": "D-pad stays left; minimap stays right; Interact and Look are the only two buttons beneath it. Look retains zero-turn adjacent inspection and Interact owns the current tile action, including exact loose-page pickup, without adding vertical control rows. Depleted/tapped-out current-tile actions must look and behave disabled rather than remaining apparently tappable.",
+      "gate": "368×800 shows the complete satchel/event row above the fixed pane, both action buttons below the minimap, exact movement/hazard parity, zero Look mutation, exact loose-page Interact pickup, truthful depleted disabled state and no white lifted-tile seams.",
+      "workstream": "engineering",
+      "isPrimary": false
+    },
+    {
+      "id": "world-screen-presentation",
+      "priority": "B1.8b",
+      "title": "World screen phone composition receipt",
+      "status": "queued",
+      "detail": "Close the directly reported World-screen presentation contract as its own receipt: square complete tiles at the correct viewport scale; no clipped bottom row or map/control gap; readable dynamic event text in a transparent/non-displacing panel; a clear minimap border; fixed controls that never cover the Field Kit/resources; and tutorial messages presented only as overlays.",
+      "gate": "Fresh/loaded/long-event/tutorial fixtures at 368×800 show the full map edge, party strip, D-pad, minimap, Look/Interact, event text and Field Kit without geometry changes between overlays. Tapped-out controls are visibly disabled; edge pull-down cannot expose fake blank space; minimap unexplored space stays black and all POIs remain disclosure-gated.",
       "workstream": "engineering",
       "isPrimary": false
     },
@@ -401,6 +441,36 @@
       "detail": "Checkpoint bd2b5d2 integrates the accepted pack, frozen game-owned bind adapter, canonical receipt self-hash, immutable run/History persistence and exact native renderer/cache selection. No raw Illumination/Vitality or temperature/wetness tint is used.",
       "gate": "New binds freeze the exact accepted descriptor while legacy bound/anchored worlds remain world-grade-1; save/load/redraw/cache/fog/geometry tests pass; native color and literal grayscale show proportionate differentiation while similar worlds may remain related. Authority: docs/world-color-differentiation-current.md and docs/world-grade-2-native-handoff-current.md.",
       "workstream": "acceptance",
+      "isPrimary": false
+    },
+    {
+      "id": "terrain-layering-animation",
+      "priority": "B1.7b",
+      "title": "Layered terrain shapes and restrained motion",
+      "status": "queued",
+      "detail": "Future joint visual/source slice: render recolourable terrain as ordered material layers with irregular rounded boundaries rather than a dominant square grid, then add continuous water motion, rare ice glints and wind-driven grass motion without changing passability, visibility or generation RNG. The closed false-sidewall fix remains a separate receipt.",
+      "gate": "First freeze an AssetLab material-stack contract (water below rock below dirt below grass), adjacency and elevation ownership, motion phase/seed inputs and reduced/static fallback. Then prove terrain identity and collision stay bit-for-bit rules-equivalent, hidden tiles disclose nothing, similar worlds remain visually related, and animation does not move gameplay state. Village/House/Library proof is the current Asset assignment; this waits behind it.",
+      "workstream": "asset",
+      "isPrimary": false
+    },
+    {
+      "id": "atmospheric-world-presentation",
+      "priority": "B1.7c",
+      "title": "Atmospheric color, visibility memory and terrain shadows",
+      "status": "queued",
+      "detail": "Give actual smoke, airborne ash, snow, fog and rain distinct bounded visual treatments; add elevation-aware environmental shadows; retain explored static terrain/resources while out-of-sight moving creatures disappear. Presentation consumes the current visibility/world receipts and cannot create weather, light, reveal or gameplay consequences.",
+      "gate": "Design freezes color/particle/shadow ownership per actual atmosphere and elevation first. Asset proves color+grayscale near/far fixtures; Engineering consumes only current visible/fringe/remembered state. Unexplored remains opaque black, remembered static objects never disclose a later mutation, moving mobs are absent outside current visibility, and terrain animation remains an independent layer.",
+      "workstream": "asset",
+      "isPrimary": false
+    },
+    {
+      "id": "earth-lighting-test-page",
+      "priority": "B1.7d",
+      "title": "Unlimited Earth-like visibility test page",
+      "status": "queued",
+      "detail": "Add the directly requested testing page/profile with zero Essence cost and unlimited use so ordinary lighting and controlled atmosphere can be compared against a deliberately limited ecology without consuming campaign resources. It is a testing instrument, not a fourth starter World Page or a progression reward.",
+      "gate": "Before Engineering starts, freeze whether it is DEBUG-only and exactly which world/history/loot/progression receipts are suppressed. Require deterministic seed/profile selection, explicit TESTING label, no economy farming or traveller/story leakage, and direct comparison fixtures for clear/smoke/ash/snow/fog/rain visibility.",
+      "workstream": "design",
       "isPrimary": false
     },
     {
@@ -568,8 +638,8 @@
       "priority": "B7.8",
       "title": "Finish tutorial content dead last",
       "status": "paused",
-      "detail": "Tutorial completion is the final implementation band because the mechanics and UI it teaches are still changing. Existing popup regressions remain ordinary bugs, not tutorial expansion.",
-      "gate": "The complete ordinary UI and mechanics are stable before their final teaching sequence is authored and accepted.",
+      "detail": "Tutorial completion is the final implementation band because the mechanics and UI it teaches are still changing. Existing popup regressions remain ordinary bugs, not tutorial expansion. Every current or future tutorial is always a hovering overlay and may never enter layout flow or resize/displace the screen it explains.",
+      "gate": "The complete ordinary UI and mechanics are stable before their final teaching sequence is authored and accepted. Independently, any existing popup immediately passes the overlay/no-layout-mutation invariant on every screen where it appears.",
       "workstream": "design",
       "isPrimary": false
     },
@@ -664,6 +734,16 @@
       "isPrimary": false
     },
     {
+      "id": "expedition-review-persistence",
+      "priority": "B1.11a",
+      "title": "Return review persists until player dismissal",
+      "status": "queued",
+      "detail": "An expedition outcome review remains recoverable across navigation, interruption and relaunch until the player explicitly dismisses that exact outcome. Presentation may be object-like later, but persistence is one rules-owned pending-review receipt rather than view-local state.",
+      "gate": "Portal, Waystone, collapse, defeat and abandon each create exactly one pending review; leaving/relaunching restores it; inspecting detail or visiting another safe screen does not acknowledge it; Continue/dismiss clears only that outcome idempotently; the next outcome cannot overwrite an undismissed receipt without a truthful queue/decision.",
+      "workstream": "engineering",
+      "isPrimary": false
+    },
+    {
       "id": "penmanship-native",
       "priority": "P2",
       "title": "Brush, ink and Fountain pen progression",
@@ -728,7 +808,7 @@
       "priority": "B1.5a",
       "title": "Page-first Writing and truthful world projection",
       "status": "queued",
-      "detail": "Correct Write and The world as one page-owned causal flow: the paper and placed marks dominate; compact trays avoid parameter-list UI; projection derives only legitimate tendencies, open dimensions, cost/runway, stability and blockers from current rules. Template loading instantly rebuilds the saved composition but never binds or waives cost.",
+      "detail": "Correct Write and The world as one page-owned causal flow: the paper and placed marks dominate; compact trays avoid parameter-list UI; projection derives only legitimate tendencies, open dimensions, cost/runway, stability and blockers from current rules. Template loading instantly rebuilds the saved composition but never binds or waives cost. A preserved AssetLab candidate still requires visual review before native translation; its existence is not source acceptance.",
       "gate": "Starter, blank and authored-resource pages retain one identity through Write/projection/History; viewing and cancellation mutate nothing; unknown marks never leak; final Bind & Depart spends/consumes once and emits the one frozen arrival receipt. Authority: core-loop-causal-presentation-plan-current.md and first-three-worlds-execution-plan-current.md B1–B2.",
       "workstream": "engineering",
       "isPrimary": false
@@ -767,9 +847,9 @@
       "id": "library-shelves",
       "priority": "B2.11a",
       "title": "Visual Library shelves and growing books",
-      "status": "queued",
-      "detail": "Move Bestiary under a visual Library root with Diaries, Bestiary, Dictionary, Field Notes and World History shelves. Real counts derive empty→folded paper→folio→softbound→hardcover stages; every traveller diary grows from its own recovered pages. Shelf attention clears only after exact new content renders.",
-      "gate": "All five shelves fit the first 368×800 viewport; count fixtures 0/1/2/4/7/10 derive exact stages; Bestiary records survive route migration; unknown people/runes/species do not leak; shelf attention/relaunch/back-focus pass. Authority: library-shelves-current.md.",
+      "status": "inProgress",
+      "detail": "The current AssetLab packet begins with a visual Library root containing Diaries, Bestiary, Dictionary, Field Notes and World History shelves. Real counts derive empty→folded paper→folio→softbound→hardcover stages; every traveller diary grows from its own recovered pages. This is an isolated visual proof, not native implementation.",
+      "gate": "All five shelves fit the first 368×800 viewport; count fixtures 0/1/2/4/7/10 derive exact stages; Bestiary records survive future route migration; unknown people/runes/species do not leak; shelf attention/relaunch/back-focus semantics are represented without invented native state. Authorities: library-shelves-current.md and home-village-library-asset-packet-current.md.",
       "workstream": "asset",
       "isPrimary": false
     },
@@ -777,10 +857,20 @@
       "id": "house-village",
       "priority": "B2.12",
       "title": "Binder House, yard and three village districts",
-      "status": "queued",
-      "detail": "Replace the Base category-board root with the Binder House/yard: Writing, Library, Constellation, Workshop, Party and Essence Spring, plus left/right/down exits to Commerce Row, Makers' Row and The Commons. Bestiary lives in Library; Storehouse and Firepit live in The Commons; House is not duplicated as a district tile. Persist truthful attention until checked. The town is never damaged.",
-      "gate": "Full 368×800 six-hotspot House/yard plus three arrows without manufactured scroll; Commerce Row/Makers' Row/Commons and direct Home returns; Bestiary nested in Library; Storehouse/Firepit and yard Spring geography; buildable/built/improved/attention states; four idempotent attention reasons; opening Trading Post → Recycler → Blacksmith; no hidden station, duplicate House or damage/repair UI. Authority: home-house-and-village-current.md.",
+      "status": "inProgress",
+      "detail": "The active AssetLab packet proves the Binder House/yard shell and three fixed districts without native edits. Settled House anchors are Writing, Library, Party and yard Essence Spring; left/right/down open Commerce Row, Makers' Row and The Commons. Workshop and Constellation are explicitly withheld as interactive hotspots pending the role decision. Bestiary lives in Library; Storehouse and Firepit live in The Commons; the town is never damaged.",
+      "gate": "At 368×800: Library plus opening Commerce/Makers/Commons screens first, then a provisional House shell with exact normalized hotspots and direct returns. Reuse accepted station silhouettes; prove absent/known/buildable/built/improved/attention and never damage/repair. Do not finalize the House manifest, later district zoning, Workshop or Constellation. Authority: home-village-library-asset-packet-current.md; topology authority remains home-house-and-village-current.md after the open role decision is resolved.",
       "workstream": "asset",
+      "isPrimary": false
+    },
+    {
+      "id": "workshop-constellation-role",
+      "priority": "B2.12a",
+      "title": "Retire or rehome Workshop and Constellation",
+      "status": "paused",
+      "detail": "Design audit finds Workshop is a 54-node catch-all rather than a coherent crafting place, and the one-star Constellation duplicates Gambit capacity. Recommended review direction: route Gambit planning to Party, vocabulary to Library/Dictionary, shelving to Storehouse and carry capacity to Tannery; retire both standalone House hotspots while preserving every stable purchase and Mote.",
+      "gate": "Aimee decides Workshop removal and Constellation option A/B/C in workshop-constellation-role-audit-current.md. Then freeze exact node-owner metadata, legacy deep links, pre-Corrin satchel reachability, combined Gambit-capacity migration, attention routes and decode-only station behavior before Engineering or final House hotspot art begins.",
+      "workstream": "design",
       "isPrimary": false
     },
     {
@@ -788,8 +878,8 @@
       "priority": "B2.13",
       "title": "Habitat-aware life and body-derived Creature materials",
       "status": "queued",
-      "detail": "Persist terrestrial/shore/aquatic/aerial ecology identity after real terrain availability; fish may occupy connected shallow and deep water, with deep occupants non-enterable until they reach shallow water or a later interaction exists. Derive feather, fin, pelt, scale/plate/chitin/shell, weapon, bone and special materials from the visible body. Remove unrelated ordinary-animal world-resource/curio drops, but allow one 3% eligible territory-gear roll per victorious encounter. Final stack/quality/crafting migration waits on loot-quality-hybrid.",
-      "gate": "Aquatic life remains in connected shallow+deep water; terrestrial life remains off water; pressure-biased feathered/furred/plated forms are deterministic without gameplay RNG change; remains match body; one gear roll maximum per encounter and no key/quest/unique/apex leakage. Do not implement quality/storage migration before the hybrid decision. Authorities: creature-ecology-and-materials-overhaul-current.md and loot-quality-hybrid-review-current.md.",
+      "detail": "Persist terrestrial/shore/aquatic/aerial ecology identity after real terrain availability; fish may occupy connected shallow and deep water, with deep occupants non-enterable until they reach shallow water or a later interaction exists. Derive feather, fin, pelt, scale/plate/chitin/shell, weapon, bone and special materials from the visible body. Remove unrelated ordinary-animal world-resource drops. The rare territory-find category mix is reopened in the crafting review so gear/consumable/ordinary-key eligibility is not implemented from the older gear-only rule.",
+      "gate": "Aquatic life remains in connected shallow+deep water; terrestrial life remains off water; pressure-biased feathered/furred/plated forms are deterministic without gameplay RNG change; remains match visible body. Asset must prove the terrestrial/shore/aquatic/aerial and material atlas before native promotion. Do not implement the territory-find table or quality/storage migration before crafting-intuition-and-quality-review-current.md is accepted/revised.",
       "workstream": "engineering",
       "isPrimary": false
     },
@@ -798,8 +888,18 @@
       "priority": "B2.13a",
       "title": "Material identity plus six-band loot quality",
       "status": "paused",
-      "detail": "Decision candidate: material/family owns capability; grey/white/green/blue/purple/orange quality owns within-family strength and value; gear item level/output derives from recipe, input bands and maker cap. Same domain+family+band resources stack, while Bestiary/History preserve known source records. This is a Design decision hold, not implementation work.",
-      "gate": "Aimee accepts or revises loot-quality-hybrid-review-current.md before any material storage/crafting migration. Then the complete family capability table, band generation, current Tier1–4 migration, price multipliers, consumer conversions and save test must be frozen before Engineering starts.",
+      "detail": "The six quality bands are accepted in principle: grey Rough/vendor-trash, white Standard/common, green Fine/uncommon, blue Superior/rare, purple Exceptional/epic and orange Peerless/legendary. The replacement proposal removes six continuous player-facing property puzzles and hard station caps, uses pictured component roles, gives primary components more weight than secondary fittings, and guarantees all-Peerless inputs produce Peerless output. Exact weights/refit behavior remain a Design decision hold.",
+      "gate": "Aimee accepts or revises the 70/30 component weighting, no-hard-cap station rule and Refitting in crafting-intuition-and-quality-review-current.md. Game Design then authors the complete component-profile and recipe-socket tables before Engineering begins any material/crafting migration or Asset begins rarity/component art.",
+      "workstream": "design",
+      "isPrimary": false
+    },
+    {
+      "id": "gear-catalogue-breadth",
+      "priority": "B2.13b",
+      "title": "Material-responsive full gear catalogue",
+      "status": "paused",
+      "detail": "Expand ordinary gear across the real resource/component pool so pattern identity survives while selected primary/secondary materials alter the relevant component treatment, named effect and appearance. This includes the directly requested broad catalogue and six-band presentation; it must not infer mechanics from colour or an obsolete continuous-property model.",
+      "gate": "Blocked on accepted crafting-intuition-and-quality-review-current.md plus complete material ComponentProfile and recipe-socket tables. Then Asset proves one pattern across material/quality variants and Engineering proves stable exact-instance component receipts before expanding the catalogue; no bulk final-art production ahead of the rules.",
       "workstream": "design",
       "isPrimary": false
     },
@@ -809,7 +909,7 @@
       "title": "Object-like expedition Return collection",
       "status": "queued",
       "detail": "Project the one frozen outcome as six-across World resources, Creature materials, exact Items, Writing recovered and People who came home before concise XP. Resources aggregate by the settled domain+family+quality stack key; collection-source records live in Bestiary/World History rather than fabricated per-unit provenance after merging.",
-      "gate": "Nineteen Hides of one quality once; Hides/Bones and different quality bands separate; exact item/page/person and failure/loss receipts; every edge/bottom detail stays on-screen and relaunch agrees. Depends on the Creature-material category and quality decision. Authority: first-three-worlds-execution-plan-current.md C3 and loot-quality-hybrid-review-current.md.",
+      "gate": "Nineteen units of one Creature-material family/band appear once; different families/bands separate; exact item/page/person and failure/loss receipts; every edge/bottom detail stays on-screen and relaunch agrees. Depends on the Creature-material category and quality decision. Authorities: first-three-worlds-execution-plan-current.md C3 and crafting-intuition-and-quality-review-current.md.",
       "workstream": "engineering",
       "isPrimary": false
     },
@@ -818,7 +918,7 @@
       "priority": "B3.7a",
       "title": "Compact Party and character build surface",
       "status": "queued",
-      "detail": "Party fits five identity tiles without oversized full-width cards. Character tabs are exactly Stats, Gear, Skills and Gambit. Diary deep-links to that person's Library record and Back restores the person/tab. Skills is the production combat graph; dashed alternatives are exact OR parents, never an extra cost or free node.",
+      "detail": "Party fits five identity tiles without oversized full-width cards. Character tabs are exactly Stats, Gear, Skills and Gambit. Diary deep-links to that person's Library record and Back restores the person/tab. Skills is the production combat graph; dashed alternatives are exact OR parents, never an extra cost or free node. Native behavior is Engineering-owned; the identity/grid/graph presentation requires an Asset proof before promotion.",
       "gate": "Five-person 368×800 grid with Rank labels; no Story/ambiguous Combat tab; Diary route round-trip; exact Gear ownership; stable production graph with typed purchases, solid/dashed prerequisites and no Learn-next list. Authority: party-character-surface-current.md.",
       "workstream": "engineering",
       "isPrimary": false

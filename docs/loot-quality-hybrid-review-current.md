@@ -1,10 +1,11 @@
 # Material identity + six-band loot quality — review candidate
 
-**Status:** Game Design recommendation for Aimee's review; not yet settled and not implementation authority.
+**Status:** Historical first recommendation, superseded for current review by
+`crafting-intuition-and-quality-review-current.md`; not implementation authority.
 Engineering must not remove the legacy grade field or migrate current material/gear power until this choice
 is accepted. Ecology families, habitats and storage-domain work may be designed independently.
-**Question:** Should family/material identity and a discrete six-band loot-quality system replace continuous
-sample grade and the current overlapping gear rarity/construction-tier presentation?
+**Question preserved for history:** Should family/material identity and a discrete six-band loot-quality
+system replace continuous sample grade and the current overlapping gear rarity/construction-tier presentation?
 **Updated:** 21 August 2026
 
 ## Recommendation

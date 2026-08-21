@@ -2,7 +2,7 @@
 
 **Status:** Game Design implementation authority for habitat, body-derived material families and ordinary
 reward provenance. Not yet implemented. The final material-quality/storage migration is reopened under
-`loot-quality-hybrid-review-current.md`; Engineering must not implement either this document's withdrawn
+`crafting-intuition-and-quality-review-current.md`; Engineering must not implement either this document's withdrawn
 pure-no-grade comparison or the hybrid until Aimee settles that choice. The pressure-budget creature
 generator remains the underlying causal model.
 **Priority:** after the early encounter-scaling **source checkpoint** and the opening causal field baseline;
@@ -473,10 +473,10 @@ may add a new creature stat, habitat or drop family.
 1. Add persisted ecology identity and versioned legacy freeze without changing gameplay RNG or existing
    saved enemy positions.
 2. Add habitat availability/resolution and exact spawn/movement eligibility.
-3. After Aimee settles `loot-quality-hybrid-review-current.md`, implement its exact stack/value/crafting
+3. After Aimee settles `crafting-intuition-and-quality-review-current.md`, implement its exact stack/value/crafting
    model with separate world/creature domains. Do not implement the withdrawn pure-no-grade comparison.
-4. Implement exact remains derivation, remove ordinary unrelated resource/curio drops and add the one-roll
-   3% encounter-level eligible-gear route.
+4. Implement exact remains derivation and remove ordinary unrelated resource/curio drops. Add no rare
+   territory-find category until the current review freezes its gear/consumable/ordinary-key mix.
 5. Migrate existing animal `MaterialSample` units losslessly into the settled creature-material stack shape;
    preserve or visibly version-gate saves according to the accepted quality decision.
 6. Split Storehouse/Field/Return presentation into World resources vs Creature materials.
@@ -496,14 +496,14 @@ uses the explicit save-format version boundary approved for this early stage.
 4. New morphology consumes no gameplay RNG and does not change existing combat trait budgets.
 5. Feathered, fish-like, armoured/scaled, furred predator and radial/amorphous fixtures produce the exact
    expected material families.
-6. No ordinary animal awards a named world resource or curio; ordinary gear appears only through the single
-   3% eligible encounter-level territory roll.
-7. Apex and authored guardian reward routes remain explicit and do not double-award ordinary gear.
+6. No ordinary animal awards a named world resource or curio; at most one accepted territory find appears
+   per encounter, never per creature, and Teeming cannot multiply it.
+7. Apex and authored guardian reward routes remain explicit and do not double-award ordinary territory finds.
 8. Creature-material stacks aggregate only by the settled family/quality key while collection-source records,
    crafting identity, failure partition, return and relaunch remain truthful.
 9. Existing animal samples migrate without count loss; no old item slot remains occupied by them.
 10. The settled quality model's current field, six labels/frames, stack key, material capability table and
-    consumer conversions match `loot-quality-hybrid-review-current.md` after Aimee accepts or revises it.
+    consumer conversions match `crafting-intuition-and-quality-review-current.md` after Aimee accepts or revises it.
 11. No parallel legacy grade, catalogue rarity colour or synthetic unnamed quality score remains after that
     migration.
 12. World Generator Web reports habitat counts, species ecology identities, legal placement count and
