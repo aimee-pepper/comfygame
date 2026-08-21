@@ -15,6 +15,7 @@ const coreInputs = [
   "Sources/Content/Data/symbols.json",
   "Sources/Content/Data/playability-roadmap.json",
   "Sources/Model/Materials.swift",
+  "docs/crafting-components-and-schematics-current.md",
   "docs/asset-system-proposal.md",
   "docs/current-design-index.md",
   "docs/station-integration-matrix-current.md",
@@ -372,14 +373,46 @@ function resourceRecord(resource) {
 function materialFamilies() {
   const materialPath = "Sources/Model/Materials.swift";
   const ecologyPath = "docs/creature-ecology-and-materials-overhaul-current.md";
+  const componentPath = "docs/crafting-components-and-schematics-current.md";
   const enumBody = contents[materialPath].match(/enum MaterialKind[\s\S]*?\{([\s\S]*?)\n\s*var isAnimalWorldResource/)?.[1] ?? "";
   const live = [...enumBody.matchAll(/\bcase\s+([^\n/]+)/g)].flatMap(match => match[1].split(",").map(value => value.trim())).filter(Boolean);
   const animalLive = live.filter(id => !["timber", "fibre", "pulp", "toxin", "reagent"].includes(id));
-  const vocabulary = markdownTableAfter(contents[ecologyPath], "## Creature-material vocabulary")
-    .flatMap(([, families]) => [...families.matchAll(/([a-z_]+)/g)].map(match => match[1]));
+  const designed = markdownTableAfter(contents[componentPath], "## 5. Complete ComponentProfile table — Creature domain")
+    .filter(([stableFamily]) => /^creature\.[a-z_]+$/.test(stableFamily));
   return [
-    ...animalLive.map(id => ({ id: `live:${id}`, familyID: id, name: id.replace(/_/g, " "), status: "live legacy material model", disposition: "live", provenance: provenance([materialPath], id, "live legacy material model", hashes, aggregateHash) })),
-    ...vocabulary.map(id => ({ id: `designed:${id}`, familyID: id, name: id.replace(/_/g, " "), status: "current design / not yet live", disposition: "proposed", provenance: provenance([ecologyPath], id, "current design / not yet live", hashes, aggregateHash) }))
+    ...animalLive.map(id => ({
+      type: "creatureMaterial",
+      id: `live:${id}`,
+      slug: `live-${slug(id)}`,
+      familyID: id,
+      name: id.replace(/_/g, " "),
+      summary: "Currently implemented transitional MaterialKind harvested from creature remains; it is not the final anatomy-derived family model.",
+      legalRoles: "Current live consumers remain governed by Swift rules.",
+      contribution: "Legacy property-bearing material unit.",
+      restriction: "Transitional live model; do not infer a final ComponentProfile.",
+      visualTreatment: "No final family-specific visual authority.",
+      status: "live legacy material model",
+      disposition: "live",
+      provenance: provenance([materialPath, ecologyPath], id, "live legacy material model", hashes, aggregateHash)
+    })),
+    ...designed.map(([stableFamily, legalRoles, contribution, restriction, visualTreatment]) => {
+      const familyID = stableFamily.replace(/^creature\./, "");
+      return {
+        type: "creatureMaterial",
+        id: `designed:${familyID}`,
+        slug: `designed-${slug(familyID)}`,
+        familyID,
+        name: familyID.replace(/_/g, " "),
+        summary: `${contribution}; ${restriction}`,
+        legalRoles,
+        contribution,
+        restriction,
+        visualTreatment,
+        status: "current design / not yet live",
+        disposition: "proposed",
+        provenance: provenance([componentPath, ecologyPath], familyID, "current design / not yet live", hashes, aggregateHash)
+      };
+    })
   ];
 }
 
@@ -412,15 +445,16 @@ const routes = [
   "village-buildings", "resources-crafting", "catalogue", "catalogue/gear", "catalogue/consumables",
   "catalogue/curios", "catalogue/treasures", "catalogue/keys", "roadmap", "history", "asset-gallery",
   ...stations.map(station => `station/${station.slug}`),
-  ...items.map(item => `item/${item.slug}`), ...resources.map(resource => `resource/${resource.slug}`)
+  ...items.map(item => `item/${item.slug}`), ...resources.map(resource => `resource/${resource.slug}`),
+  ...creatureMaterials.map(material => `creature-material/${material.slug}`)
 ];
-const search = [...stations, ...travellers, ...resources, ...items, ...symbols, ...roadmap].map(entity => ({
+const search = [...stations, ...travellers, ...resources, ...creatureMaterials, ...items, ...symbols, ...roadmap].map(entity => ({
   type: entity.type,
   id: entity.id,
   name: entity.name,
   summary: entity.blurb ?? entity.summary ?? "",
   category: entity.category ?? entity.type,
-  route: entity.type === "station" ? `station/${entity.slug}` : entity.type === "roadmap" ? "roadmap" : entity.type === "traveller" ? "people" : ["gear", "consumable", "curio", "treasure", "key"].includes(entity.type) ? `item/${entity.slug}` : entity.type === "resource" ? `resource/${entity.slug}` : entity.type === "rune" ? "world-writing" : "overview",
+  route: entity.type === "station" ? `station/${entity.slug}` : entity.type === "roadmap" ? "roadmap" : entity.type === "traveller" ? "people" : ["gear", "consumable", "curio", "treasure", "key"].includes(entity.type) ? `item/${entity.slug}` : entity.type === "resource" ? `resource/${entity.slug}` : entity.type === "creatureMaterial" ? `creature-material/${entity.slug}` : entity.type === "rune" ? "world-writing" : "overview",
   disposition: entity.disposition,
   provenance: entity.provenance
 }));

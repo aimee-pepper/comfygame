@@ -1,3 +1,5 @@
+import { resetRouteScroll } from "./route-scroll.js";
+
 const data = await fetch("./generated/wiki-data.json").then(response => {
   if (!response.ok) throw new Error("Generated wiki data is unavailable. Run npm run build.");
   return response.json();
@@ -111,7 +113,7 @@ function resources() {
   const world = data.resources.filter(item => item.domain === "worldResource");
   const currencies = data.resources.filter(item => item.domain === "currencyEssence");
   const resourceCards = records => `<div class="grid">${records.map(item => `<a class="card" href="#/resource/${item.slug}"><h3>${escapeHTML(item.name)}</h3>${badge(item.disposition)}${badge(item.tradeBand)}<p>${escapeHTML(item.summary)}</p></a>`).join("")}</div>`;
-  const materialCards = records => `<div class="grid">${records.map(item => `<article class="card"><h3>${escapeHTML(titleCase(item.name))}</h3>${badge(item.status)}<p><code>${escapeHTML(item.familyID)}</code></p>${provenance(item)}</article>`).join("")}</div>`;
+  const materialCards = records => `<div class="grid">${records.map(item => `<a class="card" href="#/creature-material/${item.slug}"><h3>${escapeHTML(titleCase(item.name))}</h3>${badge(item.status)}<p>${escapeHTML(item.summary)}</p><p><code>${escapeHTML(item.familyID)}</code></p></a>`).join("")}</div>`;
   return header("Source-partitioned catalogue", "Resources & Crafting", "World resources, creature materials and currencies remain separate. Live and proposed material models are never merged.")
     + `<h2>World Resources · live</h2>${resourceCards(world)}`
     + `<h2>Creature Materials · current live model</h2>${materialCards(data.creatureMaterials.filter(item => item.disposition === "live"))}`
@@ -167,6 +169,14 @@ function resourceDetail(slug) {
   return header(`${titleCase(item.domain)} · live`, item.name, item.summary) + `<div class="facts"><dl class="fact"><dt>Stable ID</dt><dd>${escapeHTML(item.id)}</dd></dl><dl class="fact"><dt>Driven by</dt><dd>${escapeHTML(item.drivenBy)}</dd></dl><dl class="fact"><dt>Trade band</dt><dd>${escapeHTML(item.tradeBand)}</dd></dl><dl class="fact"><dt>Reality currency</dt><dd>${item.isRealityCurrency ? "Yes" : "No"}</dd></dl></div><h2>Requires</h2><div class="card"><p>${escapeHTML(item.requires.join(" · ") || "No hard generation requirement.")}</p></div><h2>Favours</h2><div class="card"><p>${escapeHTML(item.favours.join(" · ") || "No authored favour condition.")}</p></div><h2>Known live uses</h2><div class="card"><ul>${item.currentUses.map(use => `<li>${escapeHTML(use)}</li>`).join("")}</ul></div>${provenance(item)}<p>${hashLink("resources-crafting", "← Resources & Crafting")}</p>`;
 }
 
+function creatureMaterialDetail(slug) {
+  const material = data.creatureMaterials.find(candidate => candidate.slug === slug);
+  if (!material) return notFound();
+  return header(`${material.disposition === "live" ? "Live transitional model" : "Settled design · not yet live"}`, titleCase(material.name), material.summary)
+    + `<div class="facts"><dl class="fact"><dt>Stable family</dt><dd>${escapeHTML(material.familyID)}</dd></dl><dl class="fact"><dt>Implementation</dt><dd>${escapeHTML(material.status)}</dd></dl><dl class="fact"><dt>Legal roles</dt><dd>${escapeHTML(material.legalRoles)}</dd></dl><dl class="fact"><dt>Named contribution</dt><dd>${escapeHTML(material.contribution)}</dd></dl><dl class="fact"><dt>Restriction / trade-off</dt><dd>${escapeHTML(material.restriction)}</dd></dl><dl class="fact"><dt>Visual treatment</dt><dd>${escapeHTML(material.visualTreatment)}</dd></dl></div>`
+    + `${provenance(material)}<p>${hashLink("resources-crafting", "← Resources & Crafting")}</p>`;
+}
+
 function roadmap() {
   return header("Operational board", "Roadmap", "Current statuses remain operational facts, including explicit holds and provisional work.") + `<div class="table-wrap"><table><thead><tr><th>Item</th><th>Status</th><th>Workstream</th></tr></thead><tbody>${data.roadmap.map(item => `<tr><td><strong>${escapeHTML(item.name)}</strong><br><small>${escapeHTML(item.id)}</small></td><td>${badge(item.status)}</td><td>${escapeHTML(item.workstream)}</td></tr>`).join("")}</tbody></table></div>`;
 }
@@ -181,7 +191,7 @@ function assets() {
 
 function notFound() { return header("404", "Page not found", "This internal route is not registered."); }
 
-function render() {
+function render({ resetScroll = false } = {}) {
   const route = location.hash.replace(/^#\/?/, "") || "overview";
   const [root, detail] = route.split("/");
   let content;
@@ -193,6 +203,7 @@ function render() {
   else if (root === "catalogue") content = catalogue(detail);
   else if (root === "item") content = itemDetail(detail);
   else if (root === "resource") content = resourceDetail(detail);
+  else if (root === "creature-material") content = creatureMaterialDetail(detail);
   else if (root === "roadmap") content = roadmap();
   else if (root === "history") content = history();
   else if (root === "asset-gallery") content = assets();
@@ -212,7 +223,8 @@ function render() {
   kindFilter?.addEventListener("change", () => {
     document.querySelectorAll("[data-destination-kind]").forEach(card => { card.hidden = kindFilter.value !== "all" && card.dataset.destinationKind !== kindFilter.value; });
   });
+  if (resetScroll) resetRouteScroll(window, document.querySelector(".main"));
 }
 
-addEventListener("hashchange", render);
-render();
+addEventListener("hashchange", () => render({ resetScroll: true }));
+render({ resetScroll: true });

@@ -26,7 +26,7 @@ const generatorSource = await readFile(join(root, "scripts/generate.mjs"), "utf8
 const stationsAuthority = JSON.parse(await readFile(resolve(root, "../Sources/Content/Data/stations.json"), "utf8"));
 const itemsAuthority = JSON.parse(await readFile(resolve(root, "../Sources/Content/Data/items.json"), "utf8"));
 const resourcesAuthority = JSON.parse(await readFile(resolve(root, "../Sources/Content/Data/resources.json"), "utf8"));
-for (const type of ["station", "traveller", "resource", "gear", "consumable", "curio", "treasure", "key", "rune", "roadmap"]) {
+for (const type of ["station", "traveller", "resource", "creatureMaterial", "gear", "consumable", "curio", "treasure", "key", "rune", "roadmap"]) {
   assert(data.search.some(item => item.type === type), `search lacks ${type}`);
   const example = data.search.find(item => item.type === type);
   const query = example.name.toLowerCase();
@@ -43,6 +43,11 @@ assert(data.resources.length === 23 && data.resources.length === resourcesAuthor
 assert(data.resources.every(item => ["worldResource", "currencyEssence"].includes(item.domain) && item.summary && item.currentUses.length && data.routes.includes(`resource/${item.slug}`)), "every resource needs one domain, explanation, uses and stable detail route");
 assert(data.resources.filter(item => item.domain === "worldResource").length + data.resources.filter(item => item.domain === "currencyEssence").length === 23, "resource domains must form an exact partition");
 assert(data.creatureMaterials.some(item => item.status === "live legacy material model") && data.creatureMaterials.some(item => item.status === "current design / not yet live"), "live and designed creature-material families must remain visibly separate");
+const designedCreatureFamilies = data.creatureMaterials.filter(item => item.disposition === "proposed").map(item => item.familyID).sort();
+assert(JSON.stringify(designedCreatureFamilies) === JSON.stringify(["bone", "chitin", "claw", "down", "fang", "feather", "fin", "hide", "horn", "ichor", "oil", "pelt", "plate", "quill", "scale", "shell", "tusk", "venom"]), "designed Creature Materials must be the exact 18-family ComponentProfile register");
+assert(!designedCreatureFamilies.includes("table") && !designedCreatureFamilies.includes("families"), "Markdown table labels leaked into Creature Materials");
+assert(data.creatureMaterials.every(item => item.summary && data.routes.includes(`creature-material/${item.slug}`)), "every Creature Material needs a nonempty explanation and stable detail route");
+assert(data.search.filter(item => item.type === "creatureMaterial").every(item => item.route.startsWith("creature-material/") && item.category === "creatureMaterial"), "Creature Material search routes must remain exact");
 assert(data.search.filter(item => ["gear", "consumable", "curio", "treasure", "key"].includes(item.type)).every(item => item.route.startsWith("item/") && item.category === item.type), "item search routes and categories must be exact");
 assert(data.search.filter(item => item.type === "resource").every(item => item.route.startsWith("resource/") && ["worldResource", "currencyEssence"].includes(item.category)), "resource search routes and domains must be exact");
 for (const station of data.stations) {
@@ -112,4 +117,8 @@ for (const item of data.search) {
 for (const route of ["overview", "core-loop", "world-writing", "exploration", "combat", "people", "village-buildings", "resources-crafting", "catalogue", "catalogue/gear", "catalogue/consumables", "catalogue/curios", "catalogue/treasures", "catalogue/keys", "roadmap", "history", "asset-gallery"]) {
   assert(data.routes.includes(route), `required route missing: ${route}`);
 }
+const { resetRouteScroll } = await import("../public/route-scroll.js");
+const scrollCalls = [];
+resetRouteScroll({ scrollTo: options => scrollCalls.push(["window", options]) }, { scrollTo: options => scrollCalls.push(["content", options]) });
+assert(scrollCalls.length === 2 && scrollCalls.every(([, options]) => options.top === 0 && options.left === 0 && options.behavior === "instant"), "phone route transitions must reset window and content scroll to the route top");
 console.log(`Wiki tests passed: ${data.routes.length} routes, ${data.search.length} searchable facts, ${data.stations.length} station pages.`);

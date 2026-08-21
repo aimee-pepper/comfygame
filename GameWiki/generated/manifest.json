@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "aggregateSourceHash": "304195e71a2ea6aa7ce28670e1d3e6d8d2e7f618a3b5b943ae653977ebf86208",
+  "aggregateSourceHash": "a0818603cad3324450bf14ffe7e5074f2736fa5b6c4ac343d24a9a3d0cb21b5a",
   "inputs": {
     "Sources/Content/Data/items.json": "b94b1107229f217e14f1d7fa936d8eea938f9782c06c583be32302f10d432bc9",
     "Sources/Content/Data/playability-roadmap.json": "2ab045a5a59658f9558a347379994a1ec6056d52882d23b04edcf6bb6ed149e4",
@@ -104,11 +104,12 @@
     "docs/core-loop-causal-presentation-plan-current.md": "3f7ae201e054026cea8cf0503ba7144b02111334e7ea60ce44d0302f23f934f1",
     "docs/count-description-current.md": "7d600486af7ad5d1b9898bae6470ade91613abd2bfefaa31ab4413f5bb007973",
     "docs/crafted-gear-migration-current.md": "f26d9524154672e59c50415b59c2cd3fe745741d9d8bafc136c46333469fa558",
+    "docs/crafting-components-and-schematics-current.md": "364a7af402ebaee8be562b57e44a71b4f31c12cc4de09da9678af2b87bf23765",
     "docs/crafting-intuition-and-quality-review-current.md": "796ea5dce302a8d3493e7c6323c7ef2dc0d4e305c077bf6a412a40ab1de736df",
     "docs/creature-ecology-and-materials-overhaul-current.md": "0dc84a02b6e8b494d8cdded81d7b9bb1114a28a03f0d82cbe111e95c9a86fa3d",
     "docs/cross-lead-delivery-contract-current.md": "af95f3e6668995134aaca7e0a1ac6bacd1e81305696c16734ed859f92fd14b2b",
     "docs/curio-identification-knowledge-current.md": "31acb95848598b0874e3978a9488f122b8bfee115e16867a5dca9fa1c33986f0",
-    "docs/current-design-index.md": "10c32cd58c4e8af393de126ac171d50142fa5de81c7619a3e63d80bd825efe67",
+    "docs/current-design-index.md": "be96c5de4ec34c8ffcdfc05fede2a92a79a150dd989dae8d22b38611e9c684ff",
     "docs/cycle-system-current.md": "3a472c56d4c78299574f768de122d2ac11e7387eeae8fd723667e73f96fbd598",
     "docs/dagg-recovery-teaching-current.md": "a6f2e09d574fde643ce524b90c7c76482925010c6d8af53bc327fd4fe3480546",
     "docs/debug-authored-text-atlas-current.md": "dde26130930d41c60ef958393390774a36c6bf37999a2428420db634df1c7dd2",
@@ -270,7 +271,7 @@
     "docs/writing-tool-progression-current.md": "be17fe07aa89aaaab7117a2faca43d7e1eb1be23202d19106c67c42547b23bb0"
   },
   "outputs": {
-    "generated/wiki-data.json": "6c672f1cd646d89540959b9bc48c931190bb8cb381c7c352a1d53a0a79dcc298",
-    "generated/source-registry.json": "2898b6620445b830ae456bd99cc40eb1b962c2acfb12c54c707cb2425dde5875"
+    "generated/wiki-data.json": "28e16c30de6cd6a589a2db237842bc950d68c6f002e4a0d006f7169bd48f8ce6",
+    "generated/source-registry.json": "69c0b136e90269e5cf63cbac5a28db772c99353bc72be454a72c38d49a1e3e22"
   }
 }
