@@ -1,0 +1,654 @@
+{
+  "schemaVersion": 2,
+  "integrationReady": false,
+  "assetID": "library.bookcase.runtime-kit",
+  "logicalSize": {
+    "width": 184,
+    "height": 260
+  },
+  "shell": {
+    "file": "source/library-empty-shell-logical-184x260.png",
+    "width": 184,
+    "height": 260,
+    "sha256": "b502e415a823d9b5c82dca4ea75762856f2e8e8e6ba907ddc6255310b4ebd762"
+  },
+  "sectionLayout": {
+    "diaries": {
+      "x": 20,
+      "y": 27,
+      "width": 144,
+      "height": 65,
+      "label": "DIARIES",
+      "socket": {
+        "x": 24,
+        "y": 39,
+        "width": 136,
+        "height": 44,
+        "rows": 2
+      }
+    },
+    "bestiary": {
+      "x": 20,
+      "y": 97,
+      "width": 70,
+      "height": 67,
+      "label": "BESTIARY",
+      "socket": {
+        "x": 24,
+        "y": 119,
+        "width": 62,
+        "height": 34
+      }
+    },
+    "dictionary": {
+      "x": 94,
+      "y": 97,
+      "width": 70,
+      "height": 67,
+      "label": "DICTIONARY",
+      "socket": {
+        "x": 98,
+        "y": 119,
+        "width": 62,
+        "height": 34
+      }
+    },
+    "fieldNotes": {
+      "x": 20,
+      "y": 170,
+      "width": 70,
+      "height": 68,
+      "label": "FIELD NOTES",
+      "socket": {
+        "x": 24,
+        "y": 192,
+        "width": 62,
+        "height": 34
+      }
+    },
+    "worldHistory": {
+      "x": 94,
+      "y": 170,
+      "width": 70,
+      "height": 68,
+      "label": "WORLD HISTORY",
+      "socket": {
+        "x": 98,
+        "y": 192,
+        "width": 62,
+        "height": 34
+      }
+    }
+  },
+  "countSemantics": {
+    "diaries": "one stable-ID object per discovered traveller; page count grows that object; authored order; two rows on overflow",
+    "bestiary": "Land, Shore, Water and Air independently add one volume per started group of 8; last volume 1-2/3-5/6-8",
+    "dictionary": "volumes I 1-7, II 8-14, III 15-21 in canonical rune order; unknown meaning uses ?? slip",
+    "fieldNotes": "one notebook per started group of 8",
+    "worldHistory": "one atlas per started group of 8"
+  },
+  "sprites": {
+    "stages": {
+      "loose-page": {
+        "file": "kit/loose-page.png",
+        "width": 14,
+        "height": 24,
+        "sha256": "0c6e0a60d96893a44607a526b2fb7e832b2deb5b66aa65331818f00ccc986f2e"
+      },
+      "stitched-folio": {
+        "file": "kit/stitched-folio.png",
+        "width": 14,
+        "height": 24,
+        "sha256": "cf825c0b03ea7873c28f78114ee25146b25116644e1f6fd00ba78380dc2aa729"
+      },
+      "softbound": {
+        "file": "kit/softbound.png",
+        "width": 14,
+        "height": 24,
+        "sha256": "5c59dccb135ff85d8e2aad470df40585fd6efca192d525ae2ba2e728e95c8d12"
+      },
+      "hardcover": {
+        "file": "kit/hardcover.png",
+        "width": 14,
+        "height": 24,
+        "sha256": "3bf179ac9f56013cad6de2ca77da214d42a7c7e14bb7d2df28265d2cc90f7f19"
+      },
+      "full-hardcover-with-slips": {
+        "file": "kit/full-hardcover-with-slips.png",
+        "width": 14,
+        "height": 24,
+        "sha256": "8b3e5489d021035b6bfcd04d7ee5cfd231671bc7029dbe17540d9a54e4162a46"
+      }
+    },
+    "spineVariants": [
+      {
+        "file": "kit/spine-01.png",
+        "width": 14,
+        "height": 24,
+        "sha256": "95e081f9b9da3ef9a4fce0c6f1a3006a74c338d72a3e2a7f614cd3a57b2c6885"
+      },
+      {
+        "file": "kit/spine-02.png",
+        "width": 14,
+        "height": 24,
+        "sha256": "98e3147794047fffa4ade740a0f382626f58e1d3615b631ff6b2c1e131fb2a39"
+      },
+      {
+        "file": "kit/spine-03.png",
+        "width": 14,
+        "height": 24,
+        "sha256": "c3381ab246822f6231afca235eea5d57ff281a10eced6f3b80b45e7cfbc7b571"
+      },
+      {
+        "file": "kit/spine-04.png",
+        "width": 14,
+        "height": 24,
+        "sha256": "8708dbd33056abd7d6cd45c8f8ccdea92f695d26fa8abc1240081f11e6873849"
+      },
+      {
+        "file": "kit/spine-05.png",
+        "width": 14,
+        "height": 24,
+        "sha256": "f88b5e5fe99dedbccb0c64fa289f14be942ad7e9beadd0f2d2b70156840187e3"
+      },
+      {
+        "file": "kit/spine-06.png",
+        "width": 14,
+        "height": 24,
+        "sha256": "59c4014aa87d6843b2ee59f99ceee5f2c1711257280240fbb4fc4f05662af38f"
+      },
+      {
+        "file": "kit/spine-07.png",
+        "width": 14,
+        "height": 24,
+        "sha256": "e312bf792a61b2374ff82c94ce845f97e0c08e20bf90bf8e39cb154a72e5ad23"
+      },
+      {
+        "file": "kit/spine-08.png",
+        "width": 14,
+        "height": 24,
+        "sha256": "ac20c8bca8171c635d0b1a12b29ca7a91fbc374a6346fbc03c482a3b6a1f5585"
+      },
+      {
+        "file": "kit/spine-09.png",
+        "width": 14,
+        "height": 24,
+        "sha256": "ce367f54a79fb5e3300ad99e05951193ee9f9163c05a864f648ada15debbb394"
+      },
+      {
+        "file": "kit/spine-10.png",
+        "width": 14,
+        "height": 24,
+        "sha256": "5710c4625fdb22d0c5dc900f02339393ff05434022bbd797cf8e0ab7ea7e33c6"
+      },
+      {
+        "file": "kit/spine-11.png",
+        "width": 14,
+        "height": 24,
+        "sha256": "5ca27e2e3e3dbe238e9cf9029d39625638c554525311eaff6b4384db6ff731ab"
+      },
+      {
+        "file": "kit/spine-12.png",
+        "width": 14,
+        "height": 24,
+        "sha256": "6a6deb80580f98a2f5fe929f3e8e62473bc0ada21524f0d467e1a09f0336862c"
+      },
+      {
+        "file": "kit/spine-13.png",
+        "width": 14,
+        "height": 24,
+        "sha256": "a640684417685e24f3d9f1c2632b77b1191ac23157ecb1eab02f93148731084b"
+      },
+      {
+        "file": "kit/spine-14.png",
+        "width": 14,
+        "height": 24,
+        "sha256": "925bc9e1e27f529fafb7f6541ac5c0d80643619c2c2194a9932fe61f9ed91dc6"
+      },
+      {
+        "file": "kit/spine-15.png",
+        "width": 14,
+        "height": 24,
+        "sha256": "c9ef343682d46ada27a4b824e8d91a0588a0f68c28ccc1abf6dccdacfc8af4b0"
+      },
+      {
+        "file": "kit/spine-16.png",
+        "width": 14,
+        "height": 24,
+        "sha256": "95e081f9b9da3ef9a4fce0c6f1a3006a74c338d72a3e2a7f614cd3a57b2c6885"
+      },
+      {
+        "file": "kit/spine-17.png",
+        "width": 14,
+        "height": 24,
+        "sha256": "28134445854418ce8e5d24cd75258b29844ea78655f064b8c89878387a8f486f"
+      },
+      {
+        "file": "kit/spine-18.png",
+        "width": 14,
+        "height": 24,
+        "sha256": "bfbab16ef3922e8ea12918b554973c2d7c42dbf98e976f23740aabd380b2117e"
+      },
+      {
+        "file": "kit/spine-19.png",
+        "width": 14,
+        "height": 24,
+        "sha256": "0e0dc1cfa00d69c60f695212aa7baddedab22a3f415382190e6d0e33406e6f85"
+      },
+      {
+        "file": "kit/spine-20.png",
+        "width": 14,
+        "height": 24,
+        "sha256": "472d1761cd624baba5aec267feb10d74d14ce6beee90396ebfdd61a957e8a436"
+      },
+      {
+        "file": "kit/spine-21.png",
+        "width": 14,
+        "height": 24,
+        "sha256": "6fed4de0ff849c9e8b45f6a8bf05d6c636953fc280b61ed43af67ce636ec8a43"
+      },
+      {
+        "file": "kit/spine-22.png",
+        "width": 14,
+        "height": 24,
+        "sha256": "fe997fe6522fb53798c07566185e848bea5512e51ced12d3c029a42c4b0e5f51"
+      },
+      {
+        "file": "kit/spine-23.png",
+        "width": 14,
+        "height": 24,
+        "sha256": "e38a6691afd5120f2003c8dba09c0b7f4d14b87e57f0a5ac2d5a1bfe9213ece6"
+      },
+      {
+        "file": "kit/spine-24.png",
+        "width": 14,
+        "height": 24,
+        "sha256": "d215db7c1d83a8e73593e649f29ba7f59041112ca09476c728fbb2568c217e90"
+      },
+      {
+        "file": "kit/spine-25.png",
+        "width": 14,
+        "height": 24,
+        "sha256": "69376e26db623031e293d55efccf1b85f4acfcf180d14917e8e6340d6bd25674"
+      },
+      {
+        "file": "kit/spine-26.png",
+        "width": 14,
+        "height": 24,
+        "sha256": "9d98e798b55f29701622a89f5a18c9593a2987c1131502614e365ba5fb0fe8f1"
+      },
+      {
+        "file": "kit/spine-27.png",
+        "width": 14,
+        "height": 24,
+        "sha256": "bfbab16ef3922e8ea12918b554973c2d7c42dbf98e976f23740aabd380b2117e"
+      },
+      {
+        "file": "kit/spine-28.png",
+        "width": 14,
+        "height": 24,
+        "sha256": "8e9750d2ba82118b05fe64a4c7b1d19c5e515eeb37bc14a3b32add9848afcea1"
+      },
+      {
+        "file": "kit/spine-29.png",
+        "width": 14,
+        "height": 24,
+        "sha256": "947797aee16e7e2cc4b9f556270cab6ebe216b3fc7ce1e48e20a62cceb76a45f"
+      }
+    ],
+    "variantRule": "FNV-1a stable ID selects width/height/binding/color/pattern; color never carries disclosure alone"
+  },
+  "compositor": {
+    "module": "scripts/export-library-bookcase.mjs",
+    "export": "composeLibrary",
+    "normalizer": "normalizeCollection",
+    "canonicalOrder": "authored diary order; canonical rune index; stable IDs elsewhere",
+    "stateAuthority": "runtime records + shell + sprites + sockets; evidence PNGs are non-authoritative"
+  },
+  "fixtures": {
+    "empty": {},
+    "early": {
+      "diaries": [
+        {
+          "id": "vance",
+          "authoredOrder": 1,
+          "pageCount": 1
+        }
+      ],
+      "bestiary": {
+        "land": [
+          "fox"
+        ],
+        "shore": [],
+        "water": [],
+        "air": []
+      },
+      "dictionary": [
+        {
+          "id": "rune.1",
+          "encountered": true,
+          "known": true
+        },
+        {
+          "id": "rune.2",
+          "encountered": true,
+          "known": false
+        }
+      ],
+      "fieldNotes": [
+        "note.1"
+      ],
+      "worldHistory": [
+        "history.1"
+      ]
+    },
+    "developed": {
+      "diaries": [
+        {
+          "id": "vance",
+          "authoredOrder": 1,
+          "pageCount": 1
+        },
+        {
+          "id": "noll",
+          "authoredOrder": 2,
+          "pageCount": 2
+        },
+        {
+          "id": "halloway",
+          "authoredOrder": 3,
+          "pageCount": 4
+        },
+        {
+          "id": "mara",
+          "authoredOrder": 4,
+          "pageCount": 7
+        },
+        {
+          "id": "quill",
+          "authoredOrder": 5,
+          "pageCount": 10
+        }
+      ],
+      "bestiary": {
+        "land": [
+          "land.0",
+          "land.1",
+          "land.2",
+          "land.3",
+          "land.4",
+          "land.5",
+          "land.6",
+          "land.7",
+          "land.8"
+        ],
+        "shore": [
+          "shore.0",
+          "shore.1",
+          "shore.2",
+          "shore.3",
+          "shore.4",
+          "shore.5",
+          "shore.6",
+          "shore.7",
+          "shore.8"
+        ],
+        "water": [
+          "water.0",
+          "water.1",
+          "water.2",
+          "water.3",
+          "water.4",
+          "water.5",
+          "water.6",
+          "water.7",
+          "water.8"
+        ],
+        "air": [
+          "air.0",
+          "air.1",
+          "air.2",
+          "air.3",
+          "air.4",
+          "air.5",
+          "air.6",
+          "air.7",
+          "air.8"
+        ]
+      },
+      "dictionary": [
+        {
+          "id": "rune.1",
+          "encountered": true,
+          "known": true
+        },
+        {
+          "id": "rune.2",
+          "encountered": true,
+          "known": false
+        },
+        {
+          "id": "rune.3",
+          "encountered": true,
+          "known": true
+        },
+        {
+          "id": "rune.4",
+          "encountered": true,
+          "known": true
+        },
+        {
+          "id": "rune.5",
+          "encountered": true,
+          "known": true
+        },
+        {
+          "id": "rune.6",
+          "encountered": true,
+          "known": true
+        },
+        {
+          "id": "rune.7",
+          "encountered": true,
+          "known": true
+        },
+        {
+          "id": "rune.8",
+          "encountered": true,
+          "known": true
+        }
+      ],
+      "fieldNotes": [
+        "note.0",
+        "note.1",
+        "note.2",
+        "note.3",
+        "note.4",
+        "note.5",
+        "note.6",
+        "note.7",
+        "note.8"
+      ],
+      "worldHistory": [
+        "history.0",
+        "history.1",
+        "history.2",
+        "history.3",
+        "history.4",
+        "history.5",
+        "history.6",
+        "history.7",
+        "history.8",
+        "history.9"
+      ]
+    }
+  },
+  "attention": {
+    "diaries": {
+      "file": "kit/attention-diaries.png",
+      "width": 184,
+      "height": 260,
+      "sha256": "867f4ce904d8f03c9180809c9db4bfb2a2e7ecf6435f5757a4cb118e270e7b00",
+      "composition": "independent overlay"
+    },
+    "bestiary": {
+      "file": "kit/attention-bestiary.png",
+      "width": 184,
+      "height": 260,
+      "sha256": "2980a1ee48caab61b31be17cdd1e920b857c862bed96a31ddd999fc0c3cbd0a5",
+      "composition": "independent overlay"
+    }
+  },
+  "unknownRuneDisclosure": "??",
+  "undiscoveredPeopleAndSpecies": "absent",
+  "deepWaterSemantics": "Water family may include legitimate deep-water sightings; no combat or harvest inference",
+  "evidence": {
+    "emptyPhone": {
+      "file": "evidence/library-empty-368x800.png",
+      "width": 368,
+      "height": 800,
+      "sha256": "cb0788cf09dbb35832d3eb96631ce57af1ac4b942abb5abc1559381cf9965882"
+    },
+    "earlyPhone": {
+      "file": "evidence/library-early-368x800.png",
+      "width": 368,
+      "height": 800,
+      "sha256": "92591bcd6224395bf09364bed358176664265e5326ed07aa86c6a071320251af"
+    },
+    "developedPhone": {
+      "file": "evidence/library-developed-368x800.png",
+      "width": 368,
+      "height": 800,
+      "sha256": "db6b201785d4da1ae5634cea05ae46033b8f3920efbad85f6f17b75226a810a2"
+    },
+    "diaryAttentionPhone": {
+      "file": "evidence/library-diaries-attention-368x800.png",
+      "width": 368,
+      "height": 800,
+      "sha256": "9d66c8fe651b6b4d4d00cf39569a82bfe9b248167b4662a5a2a98902e551f3b8"
+    },
+    "bestiaryAttentionPhone": {
+      "file": "evidence/library-bestiary-attention-368x800.png",
+      "width": 368,
+      "height": 800,
+      "sha256": "48c151bfa3b99b8ed7bc6c39face4b31ea2df5a3e21cefadae9ddb9364ced60d"
+    },
+    "grayscalePhone": {
+      "file": "evidence/library-developed-grayscale-368x800.png",
+      "width": 368,
+      "height": 800,
+      "sha256": "9f1327ad72b32a7839b21e761057f2fe87ae4730d225450cace4da34a1687779"
+    },
+    "collisionDisclosurePhone": {
+      "file": "evidence/library-collision-disclosure-368x800.png",
+      "width": 368,
+      "height": 800,
+      "sha256": "fbc20f456c3018c9940e4550ce73d822e63e4d988b4ad29bc80a1b7854e2aa31"
+    },
+    "kitContactSheet": {
+      "file": "evidence/library-runtime-kit-contact-sheet.png",
+      "width": 700,
+      "height": 520,
+      "sha256": "00cd9f53aabf456ebae51768357d8a47de146c305e845077ffa7db98c440ab26"
+    },
+    "diaryOnePagePhone": {
+      "file": "evidence/library-diary-one-page-368x800.png",
+      "width": 368,
+      "height": 800,
+      "sha256": "5fe133b28046c539644ddf68a4e676a1030c22c2a397cad9e47aa35e1ba336fb"
+    },
+    "diaryGrownPhone": {
+      "file": "evidence/library-diary-grown-368x800.png",
+      "width": 368,
+      "height": 800,
+      "sha256": "9cd0a80fdc9d77c1f43b995b9e14189763feff846b7d461d883f1ffb17c308c6"
+    },
+    "diaryAddedPhone": {
+      "file": "evidence/library-diary-added-368x800.png",
+      "width": 368,
+      "height": 800,
+      "sha256": "28986c81d86daeb78ca71396c3c25476917e2c1cbbb899d3985eb17129013c79"
+    },
+    "bestiaryEightPhone": {
+      "file": "evidence/library-bestiary-8-368x800.png",
+      "width": 368,
+      "height": 800,
+      "sha256": "32c8957c06c608e502716c2003dccff07372d0c23d87943fbbb58c3b2305e027"
+    },
+    "bestiaryNinePhone": {
+      "file": "evidence/library-bestiary-9-368x800.png",
+      "width": 368,
+      "height": 800,
+      "sha256": "27ecb8e56046cb9d0e974f38cdff4c80aa12ddbefc34f0e9b4e72ec15c568063"
+    },
+    "dictionarySevenPhone": {
+      "file": "evidence/library-dictionary-7-368x800.png",
+      "width": 368,
+      "height": 800,
+      "sha256": "60559c8284a4ceffd4ded7f258ac35fb0008a95142601ca6c2028b594f3521c8"
+    },
+    "dictionaryEightPhone": {
+      "file": "evidence/library-dictionary-8-368x800.png",
+      "width": 368,
+      "height": 800,
+      "sha256": "e935f219bb6745a1a9cf71367aef80a7b511279963c23a9c7a2e8f1de72ca01a"
+    },
+    "diaryGrowthPhones": [
+      {
+        "file": "evidence/library-diary-1-page-368x800.png",
+        "width": 368,
+        "height": 800,
+        "sha256": "5fe133b28046c539644ddf68a4e676a1030c22c2a397cad9e47aa35e1ba336fb"
+      },
+      {
+        "file": "evidence/library-diary-2-page-368x800.png",
+        "width": 368,
+        "height": 800,
+        "sha256": "197705a6a6b5af839b16d5d727f810b91ae8e6346b5b9d6d9a550a90168786cf"
+      },
+      {
+        "file": "evidence/library-diary-3-page-368x800.png",
+        "width": 368,
+        "height": 800,
+        "sha256": "9d2ade035e500d2a973b658b0fe53fd4b53ea3ea387e4acee8915244bb5d98e5"
+      },
+      {
+        "file": "evidence/library-diary-4-page-368x800.png",
+        "width": 368,
+        "height": 800,
+        "sha256": "1cc190ad7f8890fd73b44e4fe9c280f5a67c60fc77f6ea32cd65368005f574af"
+      }
+    ],
+    "diaryGrowthSequence": {
+      "file": "evidence/library-diary-growth-1-2-3-4-side-by-side.png",
+      "width": 1472,
+      "height": 800,
+      "sha256": "a16f0be6228f47cf72912903ea7435f4e1f1a16cefcba0052a48806c0b211620"
+    },
+    "diaryGrowthGrayscale": {
+      "file": "evidence/library-diary-growth-1-2-3-4-grayscale.png",
+      "width": 1472,
+      "height": 800,
+      "sha256": "63e608a2faf3607b75fc88a3baa8d95ad2400e8da6b7431dc065f9cc343166aa"
+    }
+  },
+  "forbidden": [
+    "pre-baked-state-authority",
+    "second-room",
+    "tabs",
+    "sixth-shelf",
+    "scrolling",
+    "native-integration"
+  ],
+  "provenance": "Only the empty shell, reusable sprites, sockets and deterministic compositor are integration authority.",
+  "paperStageLegibility": {
+    "loosePage": "off-white grounded 8x7 logical packet with folded corner",
+    "stitchedFolio": "8-9x13 logical bound packet with dark seam and repeating stitches",
+    "sequence": [
+      1,
+      2,
+      3,
+      4
+    ]
+  }
+}
