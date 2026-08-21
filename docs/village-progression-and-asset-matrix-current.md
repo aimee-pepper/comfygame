@@ -246,11 +246,15 @@ smelter or Blacksmith forge. Noll separates and records; they do not melt proven
 
 **Purpose:** consumable remedies, coatings and preparations from world-grown inputs.
 
+Station tier controls **preparation permission**, not recipe discovery. Finding/inferencing a higher recipe
+records it normally and may show its name/requirements, but preparation remains blocked by the named bench.
+Legacy saves retain every already-known/preparable recipe through an explicit grandfathered entitlement.
+
 | Form | Player capability | Required physical change |
 |---|---|---|
-| Built · Tier 0 | Current basic salves, antidotes and coatings | Clean herb room with heat-safe ceramic vessels, mortar, drying bundles, narrow shelves and one small controlled burner |
-| Improved · Tier 1 — **Concentration Bench** | Advanced authored remedies and safe two-dose batch recipes where the recipe explicitly supports batching | Same room gains condenser coil, second mortar, labelled bottle cabinet and washable stone worktop |
-| Mastered · Tier 2 — **Compound Cabinet** | Masterwork preparation recipes with authored dual-purpose behavior; never combines effects generically | Same structure gains locked reagent cabinet, precision scales and separated hot/cold work areas |
+| Built · Tier 0 | Prepare every current common/uncommon formula: Lesser Salve, Salve, Clearing/Quenching Draughts, Stonebark, four coatings, Solvent, Lure, Scent Mask and Torch | Clean herb room with heat-safe ceramic vessels, mortar, drying bundles, narrow shelves and one small controlled burner |
+| Improved · Tier 1 — **Concentration Bench** | Prepare the current rare formulae Greater Salve, Broad Antidote, Stillwater and Farsight Draught once each is legitimately known; quantity crafting remains a baseline UI, not an upgrade | Same room gains condenser coil, second mortar, labelled bottle cabinet and washable stone worktop |
+| Mastered · Tier 2 — **Compound Cabinet** | Prepare the current mythic Waystone once legitimately known; future mythic formulae require separately authored recipes and never combine effects generically | Same structure gains locked reagent cabinet, precision scales and separated hot/cold work areas |
 
 #### Distillery — Auber
 
@@ -515,8 +519,8 @@ The Wiki must show the matrix beside, not instead of, current implementation tru
 - **Current authored extension with a named authority:** Blacksmith Refitting; Tannery Wear/Carry/Keep and
   compressed capacity migration; Firepit→Tavern visitor system; Reliquary known-site likelihood; Anchorage
   portfolio/assignment/deliveries. These use their named current documents and still follow roadmap order.
-- **Held until its exact content/consumer table exists:** Apothecary Tier-2 dual-purpose recipes, Distillery
-  Tier-2 masterwork cores/retuning limits, Channelworks Tier-2 shaping choices and any maker “masterwork”
+- **Held until its exact content/consumer table exists:** Distillery Tier-2 masterwork cores/retuning limits,
+  Channelworks Tier-2 shaping choices and any maker “masterwork”
   family not present in the settled schematic/socket catalogue. The building form may be designed, but the
   gameplay button stays absent rather than letting Engineering or Asset invent the missing content.
 - **Playtest-tuning proposals:** exact Storehouse capacities, Wayfarer's second yield step, Trading Post
@@ -532,6 +536,8 @@ stay ahead of late station gameplay.
 - exact upgrade costs and keeper-level milestones;
 - 16/28/40 Storehouse tuning;
 - Trading Post request/hold frequency and rare-stock band;
+- whether one-time Makers' Mastery plus Waystone's existing per-item Mote cost feels like meaningful late
+  commitment or opaque double-gating;
 - whether the Tavern Tier-2 visitor hold is useful or administrative;
 - whether Wayfarer's Table's Tier-2 second organic-yield step is worthwhile;
 - the exact Anchorage prepayment amount and whether it reduces friction enough to keep;
