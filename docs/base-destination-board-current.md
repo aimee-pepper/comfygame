@@ -59,7 +59,7 @@ render it or depend on contiguous integers.
 | Study | 3 | `survey_post` | Survey Post | Mara |
 | Study | 4 | `reliquary` | Reliquary | Edren |
 | Study | 5 | `scriptorium` | Scriptorium | Isolde |
-| Realms | 0 | `wayfarers_table` | Wayfarer's Table | Sela; routes/provisions |
+| Realms | 0 | `wayfarers_table` | Wayfarer's Table | Sela; passive fieldcraft, organic yield and visible-flora recognition; never a route/party/supplies hub |
 | Realms | 1 | `menagerie` | Menagerie | Sabine; animal care/assignment |
 | Realms | 2 | `deep_works` | Deep Works | Grimmond; depth/sign work |
 | Realms | 3 | `anchorage` | Anchorage | Tovin; realm portfolio |

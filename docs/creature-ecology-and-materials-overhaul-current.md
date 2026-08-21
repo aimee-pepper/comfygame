@@ -252,6 +252,12 @@ For one requirement, compute each eligible unit's **surplus** only from that req
 The default therefore spends the least-overqualified valid unit. The player may replace any default with
 another exact valid unit before confirming. One unit may satisfy only one requirement in a recipe.
 
+Single-property consumers follow the same rule. Reforging and Instrument upgrades sort by the one authored
+working property ascending, then stable unit ID; they do not consult price, family or another property after
+eligibility. Storehouse sorting offers Family, Source and each named property, never “Best,” “Finest” or
+Grade. Stable content hashes for new units omit grade; migrated units preserve their existing stable unit ID
+rather than minting a new identity from the reduced field set.
+
 ### Trading Post values capability; it does not rank every part
 
 Every creature family has a small authored base value and exactly two commercially relevant capabilities:
@@ -314,6 +320,11 @@ gear's receipt.
 6. Once migration succeeds, current encode writes only the newest schema. If an old save cannot be migrated
    without loss, use the visible save-version incompatibility route rather than shipping two live material
    systems.
+7. Flora/world harvesting derives family, properties and quantity without producing a grade. Predation and
+   failure/return partitioning move exact units without ranking them. Any later Deep Works receipt freezes
+   resource family, properties and pull count—not a universal grade.
+8. Remove grade from current Storehouse, Trading Post, Recycler, Apothecary, Blacksmith, DEBUG receipt and
+   accessibility copy. No hidden/debug surface remains the accidental public authority.
 
 The version transition is accepted only when a fixture covering every old `MaterialKind` accounts for the
 same number of units before and after migration and all grade-dependent live consumers have zero current

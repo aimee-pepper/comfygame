@@ -1,5 +1,11 @@
 # Scent Mask — first-slice candidate
 
+> **Incoming material-domain correction (21 August 2026):** Contact, duration, sensory composition and
+> exact atomic item behavior below remain authoritative. The ingredient is superseded by
+> `creature-ecology-and-materials-overhaul-current.md`: one Hide, Pelt, Down or Oil Creature material, with no
+> universal grade floor. It is no longer an “animal world resource.” The old grade language below describes
+> the currently implemented source checkpoint only until that migration lands.
+
 **Status:** source-complete through domain/provider `7772df0`, player UI `5e5aa14`, focused fixture
 `2ced55a` and release-content checkpoint `543ddfe`; duration and material floor remain playtest tuning,
 and 368×800 physical-phone acceptance remains pending

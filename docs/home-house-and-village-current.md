@@ -190,7 +190,7 @@ their originating character.
 
 Asset Design must prove, before native consumption:
 
-1. the ordinary-phone house cutaway with all eight exact hotspots above;
+1. the ordinary-phone house cutaway with all seven exact hotspots above;
 2. a collision overlay showing 44×44 minimum targets and no overlap;
 3. color and grayscale/value versions;
 4. Village opening scene with House, Firepit and Essence Spring;
@@ -221,7 +221,7 @@ space. Any visible value/action must exist in the game-owned adapter.
 ## Acceptance
 
 1. Fresh launch, load and expedition return land on the full unclipped House scene.
-2. All eight house hotspots route to the correct existing destinations; no generic Study or Make screen is
+2. All seven house hotspots route to the correct existing destinations; no generic Study or Make screen is
    required to find them.
 3. Party management and Prepare a world are reachable without scrolling on 368×800.
 4. Firepit and Essence Spring exist in Village, not the house.

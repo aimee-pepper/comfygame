@@ -598,8 +598,8 @@
       "priority": "P2",
       "title": "Prepared animal-avoidance route",
       "status": "readyToTest",
-      "detail": "Source-complete in 7772df0 (domain/provider rules), 5e5aa14 (player UI), 2ced55a (focused Lure visibility fixture) and 543ddfe (release consumable contract): Nessa tier-0 Scent Mask consumes one Reagent plus one exact grade-25+ animal world resource, costs 0 Essence, and grants 12 turns of chemo-only hesitation without hiding creatures, affecting apexes or stacking a second Quiet Step hesitation.",
-      "gate": "Phone-only acceptance remains: at 368×800 verify exact-instance preview/commit, all animal/flora material boundaries, the chemo/mixed/direct-contact sensory matrix, nonstacking Quiet Step composition, relaunch persistence and protected Field Kit return. Automated/source evidence does not accept the feature. Authority: scent-mask-first-slice-current.md and Decision155.",
+      "detail": "Source-complete sensory/transaction foundation in 7772df0, 5e5aa14, 2ced55a and 543ddfe: Nessa tier-0 Scent Mask costs 0 Essence and grants 12 turns of chemo-only hesitation without hiding creatures, affecting apexes or stacking a second Quiet Step hesitation. Its currently implemented grade-25+ animal-world-resource ingredient is transitional, not accepted target semantics; the Creature-material migration replaces it with one exact Hide, Pelt, Down or Oil and no grade floor.",
+      "gate": "Phone-only acceptance may verify exact-instance commit, chemo/mixed/direct-contact sensory behavior, Quiet Step composition, relaunch and protected Field Kit return without accepting the old ingredient taxonomy. Final material acceptance occurs with creature-ecology-materials: Hide/Pelt/Down/Oil pass, all other families fail, and no grade remains. Authorities: scent-mask-first-slice-current.md and creature-ecology-and-materials-overhaul-current.md.",
       "workstream": "engineering",
       "isPrimary": false
     },
@@ -778,8 +778,8 @@
       "priority": "B2.13",
       "title": "Habitat-aware life and body-derived Creature materials",
       "status": "queued",
-      "detail": "Separate World resources from slot-free Creature materials. Persist terrestrial/shore/aquatic/aerial ecology identity after real terrain availability; constrain placement/roaming; derive feather, fin, pelt, scale/plate/chitin/shell, weapon, bone and special materials from the visible body. Remove universal quality labels and unrelated ordinary-animal world-resource/gear/curio drops.",
-      "gate": "Fishlike life remains in connected shallow water; terrestrial life remains off water; pressure-biased feathered/furred/plated forms are deterministic without gameplay RNG change; remains match body and retain properties/provenance; legacy samples migrate; no ordinary unrelated drop. Authority: creature-ecology-and-materials-overhaul-current.md.",
+      "detail": "Separate bulk/provenance-bearing World resources from slot-free Creature materials through one shared material-unit value and two explicit reserves. Persist terrestrial/shore/aquatic/aerial ecology identity after real terrain availability; constrain placement/roaming; derive feather, fin, pelt, scale/plate/chitin/shell, weapon, bone and special materials from the visible body. Remove universal grade and unrelated ordinary-animal world-resource/gear/curio drops. In the same migration, maker progression sets gear tier, requirement surplus sets default selection, family/capability sets price, attunement properties set potency, scent-bearing families gate Scent Mask, and Recycler uses receipt order.",
+      "gate": "Fishlike life remains in connected shallow water; terrestrial life remains off water; pressure-biased feathered/furred/plated forms are deterministic without gameplay RNG change; remains match body and retain properties/provenance; every legacy kind migrates; no ordinary unrelated drop; and no current grade field, label, tier/price/potency formula or automatic grade selection remains. Exact replacement tables pass. Authority: creature-ecology-and-materials-overhaul-current.md.",
       "workstream": "engineering",
       "isPrimary": false
     },

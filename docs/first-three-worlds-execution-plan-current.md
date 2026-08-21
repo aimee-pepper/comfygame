@@ -307,12 +307,22 @@ neither consumes item slots.
 
 **Authority:** `creature-ecology-and-materials-overhaul-current.md`.
 
-**Engineering:** preserve existing property-bearing sample identity/provenance but migrate/lift animal-derived
-samples to a distinct material reserve. World ResourceID nodes/flora/sites remain world resources. Items
-remain item-capacity objects. Legacy carried/home/spillover material samples migrate losslessly.
+**Engineering:** replace the legacy sample value with the authority's shared `CraftMaterialUnit`, while
+keeping `WorldMaterialReserve` and `CreatureMaterialReserve` as distinct storage domains. Bulk `ResourceID`
+nodes remain in the existing world-resource ledger; property-bearing Timber/Fibre/Pulp and future flora
+products use the world-material reserve; body-derived parts use the creature-material reserve. Items remain
+item-capacity objects. Legacy carried/home/spillover material units migrate losslessly.
 
-**Pass:** zero capacity use, exact failure/return/crafting/commerce behavior, save migration or clearly
-versioned incompatibility under policy. No generic quality label in primary presentation.
+The same contained sequence replaces every grade consumer before the old field is removed: maker progression
+sets construction tier; requirement-specific surplus sets default craft selection; family/capability sets
+Trading Post value; attunement properties set Distillery potency; Scent Mask accepts Hide/Pelt/Down/Oil; and
+Recycler defaults to frozen receipt order. Do not substitute maximum/average properties as a new universal
+quality score.
+
+**Pass:** zero capacity use, exact failure/return/crafting/commerce behavior, every old kind accounted for in
+save migration or clearly versioned incompatibility under policy, and zero current grade-dependent consumer.
+Blacksmith/Tannery/Specialist output tiers, price table, three Distillery formulas, Scent Mask families,
+Recycler order and weakest-valid crafting selection match the authority. No generic quality label remains.
 
 ### E2 · Habitat-aware creature identities
 

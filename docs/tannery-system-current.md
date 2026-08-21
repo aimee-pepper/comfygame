@@ -87,6 +87,10 @@ merely because the schema can hold deep trees.
 
 ## Materials and quality
 
+> **Incoming correction:** `creature-ecology-and-materials-overhaul-current.md` replaces universal grade
+> with family/property capability and makes the Tannery Wear process itself determine Tier 1 or Tier 2.
+> The bullets below describe the currently implemented system only until that migration lands.
+
 - Tannery recipes select exact samples using the shared property-driven crafting UI.
 - Flexible organic kinds receive the most natural copy, but any material meeting every requirement
   is allowed unless its physical form makes the output nonsensical.
