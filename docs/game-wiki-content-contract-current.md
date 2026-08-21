@@ -163,4 +163,3 @@ available, continue without treating each slice as a stop:
 
 Each slice is source-generated and tested. Completion receipts say what became useful to Aimee, not merely
 how many files or hashes changed.
-
