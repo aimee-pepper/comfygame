@@ -319,4 +319,6 @@ Engineering validates:
 4. legacy Tier/reforge-to-band equal-performance migration;
 5. the Pointed Blade rules/UI/multipart-sprite reference fixture.
 
-The 3%/1.5%/0.5% territory-find proposal remains open and independent of the accepted crafting model.
+The exact territory-find transaction, eligibility and presentation are now specified in
+`creature-territory-finds-current.md`. Only its recommended 3%/1.5%/0.5% frequency mix remains open through
+Homework `territory-find-frequency`; it is independent of the accepted crafting model.

@@ -1,9 +1,9 @@
 {
   "schemaVersion": 1,
-  "aggregateSourceHash": "87aead3c02ecd676b3075d6db4a6636d6a4ffcd355b9e91ebde2f98a4a8f3796",
+  "aggregateSourceHash": "424cf6dc0970d2ddd445c24127fc0670a0162eaea9357c2cb61ce241830f5445",
   "inputs": {
     "Sources/Content/Data/items.json": "b94b1107229f217e14f1d7fa936d8eea938f9782c06c583be32302f10d432bc9",
-    "Sources/Content/Data/playability-roadmap.json": "d14a3ba9f809ac369898759cfab4d3e4cbf807f3bb0d7ae9ffb6e2e4b00b0d2c",
+    "Sources/Content/Data/playability-roadmap.json": "5c68f12457a684e73263956f4a353aa048be8f15459a2e463f9d715aabeb5109",
     "Sources/Content/Data/resources.json": "8eee965ce7df075abfe3f646bb36d416a10ef1d7d194845e30fa0f31b7b23e6f",
     "Sources/Content/Data/stations.json": "21b5e9f3bee2d9115acf535ef2ff1db350b87b8ee33755e79a3b3e4584102e2b",
     "Sources/Content/Data/symbols.json": "c1ec5dd7b661680b358e21a56124b6080aa28d93db51fd2f6b80214ced1dcb16",
@@ -67,7 +67,7 @@
     "docs/armoury-rebuild-implementation-current.md": "a9e893f4660b274e35c530ff1228ba232570bc7858442617d81e7eb34c1ecf82",
     "docs/ashe-ground-technique-current.md": "14287d7178f1148f4f765e50a7debf15d6f21efb9197181396407057794a161c",
     "docs/asset-production-output-contract-current.md": "e9734d8e96290e0e4f79af180624cf5115d4379cf16a52bbb688f1cea34ee675",
-    "docs/asset-system-proposal.md": "49b2fc7b7a8d889be49a4d51898cca70e02a4ab3cc39ca6acb44eed576217b37",
+    "docs/asset-system-proposal.md": "d98b674c5d154e4c065929b68d22813cc2cf8da20494ef0920fae344803a5d83",
     "docs/authored-color-vocabulary-current.md": "41aa98371136bf274cf0f8160d822d0b8ff84c479882ffbc8c7847ae6a33b58d",
     "docs/authored-text-audit-current.md": "97c31e4a0564595cc62dbce0920999d648f94208b6f207b903f8cf517bc7b0fa",
     "docs/authored-world-blueprints-current.md": "218498315a42ab8a0f63523e586a83f33cdeef7bd9c13fc09dee65d020d736a1",
@@ -107,11 +107,12 @@
     "docs/count-description-current.md": "7d600486af7ad5d1b9898bae6470ade91613abd2bfefaa31ab4413f5bb007973",
     "docs/crafted-gear-migration-current.md": "f26d9524154672e59c50415b59c2cd3fe745741d9d8bafc136c46333469fa558",
     "docs/crafting-components-and-schematics-current.md": "364a7af402ebaee8be562b57e44a71b4f31c12cc4de09da9678af2b87bf23765",
-    "docs/crafting-intuition-and-quality-review-current.md": "65e71e9fe1430cc8d033d69e9fe04653c1ee1660c5cd710d3d2f60ba02e4db40",
-    "docs/creature-ecology-and-materials-overhaul-current.md": "99d658e56b7ea4e24246e22b465dc06d3722ea1c60e908beaafc2921c64d8b12",
+    "docs/crafting-intuition-and-quality-review-current.md": "4ed600ce73b5a2dcc6238a84bbd05f317d4e6afa4d1287e4ee488f51c51c680e",
+    "docs/creature-ecology-and-materials-overhaul-current.md": "1941fd1ba9992464bea6fcbbfc3fe9804cdc9cabdc5c1fec590893e5b552f29a",
+    "docs/creature-territory-finds-current.md": "ec9a84eb1393a0573c6b38a53a622d64574d02f35dc98b0b857447ea99f717c3",
     "docs/cross-lead-delivery-contract-current.md": "af95f3e6668995134aaca7e0a1ac6bacd1e81305696c16734ed859f92fd14b2b",
     "docs/curio-identification-knowledge-current.md": "31acb95848598b0874e3978a9488f122b8bfee115e16867a5dca9fa1c33986f0",
-    "docs/current-design-index.md": "9d0644719d0fa3866f7d9deb8c60e9398bb0a7dd8e470a82ba7946e6283cde2e",
+    "docs/current-design-index.md": "412079186ef9788208cd52ca0dd7c4346638634120a7eca452402538272aa030",
     "docs/cycle-system-current.md": "3a472c56d4c78299574f768de122d2ac11e7387eeae8fd723667e73f96fbd598",
     "docs/dagg-recovery-teaching-current.md": "a6f2e09d574fde643ce524b90c7c76482925010c6d8af53bc327fd4fe3480546",
     "docs/debug-authored-text-atlas-current.md": "dde26130930d41c60ef958393390774a36c6bf37999a2428420db634df1c7dd2",
@@ -126,7 +127,7 @@
     "docs/decisions-session-19.md": "d160c88379577e0a7a3f83fb255b850b8031209d4dce133b1fb901f91504adef",
     "docs/deep-works-system-current.md": "7bd0d2bcc38c3c899ba06c8ee1327d03453723438d3684322fc6ccff9b908cdd",
     "docs/description-analysis-surface-current.md": "0fb1e025514de28b63b3b905c7e7d3eb6da0c183fa800669e1bec6c73f236f7e",
-    "docs/design-homework-current.md": "5374a0289f1971f8e07e1459081360613585f160bc6529f13472f9c351a93567",
+    "docs/design-homework-current.md": "e95fe461c6e883977b5cdaf0415d20c66b9583e96f85f06d357a2f706381f831",
     "docs/design-review-batch-next-current.md": "c02163eb9d715c28e0b9d936c9f750d8e4e5919a4b464f2bb7a337c054ec8d9a",
     "docs/dialogue-review-first-batch-current.md": "64fe60403e588900acfbe35d835f05fcd4eb993fc517d97b3e10d6708248c210",
     "docs/diary-corpus-audit-current.md": "57e6e8d8c35666447efd6372a6b749661e3547d96a2b08577688df3a0e4b4f45",
@@ -171,7 +172,7 @@
     "docs/great-work-boundary-current.md": "df6a758383e183ae8b52bab8a4ef78f53707edeae4a57722ee2af5a1f4301665",
     "docs/handmade-art-ownership-current.md": "5273cea105f1e93ace9f44892a474c1eb0edcb3c23fb4654d868ed8d8a01c8ad",
     "docs/home-house-and-village-current.md": "89635da2c3e24b057a79b8d835cede2c506defa17ebac7d6536a19e99503b403",
-    "docs/home-village-library-asset-packet-current.md": "8a7b81ed401ecef2d5a008eb4d6e1fc570039cc069f69f04f4a5c1d5450845ed",
+    "docs/home-village-library-asset-packet-current.md": "bdc61be9f2e56265657ba377db998a8803fbc573d726c3fd4db0036b1f3aa556",
     "docs/implemented-six-diary-packets-current.md": "090aad2a8bf2d6982e7dfc560759e4f6fce12b371a15dd8d6fa6c8dbcc3bdfb7",
     "docs/implemented-six-station-contribution-audit-current.md": "ee8b01f3d9c646ed6cd0d84cd440f4c969934fd1696be3153f4a92e2cfa50175",
     "docs/ink-economy-friction-audit-current.md": "bec03004e7e7f062cca32e352de482a573bd28e13247c34b749a44d3904b1679",
@@ -224,6 +225,7 @@
     "docs/static-manual-authority-audit-current.md": "b40e88ce676b71f2353fa0d2c873b375c4c1df16aeea4be2e03b7eadd01f1b47",
     "docs/station-first-use-reachability-audit-current.md": "39e1a563922923190b196d04a44cc6bebdcde8095d040a87211ae09aa53e306e",
     "docs/station-integration-matrix-current.md": "a7894b1dab11b032bde1a35ea04293e76ca6b325b628a16c19c341cae1aceaf6",
+    "docs/survey-needle-current.md": "9bb3883b13373dddba3f9b4248ed5b01de75bad781559405f467ffa9b9628e57",
     "docs/tannery-system-current.md": "a6544afbb2d77c2369b37922b443cd7d2244ce43bc358d632eeab7b30844499c",
     "docs/tavern-random-companions-current.md": "e7b86a31548089a4a122fba51a1fb1f246d14d84de948300a1873b38ae9648c2",
     "docs/top-down-map-asset-integration-current.md": "60fbd5232a171bdbe2e7f9f162764c5efd71ac820bde4a71caa4d74a298c962a",
@@ -274,7 +276,7 @@
     "docs/writing-tool-progression-current.md": "be17fe07aa89aaaab7117a2faca43d7e1eb1be23202d19106c67c42547b23bb0"
   },
   "outputs": {
-    "generated/wiki-data.json": "002a9572b549659e83ec14ae598f5c5750ca352cb3cc488d330e2357e11a3a6c",
-    "generated/source-registry.json": "a0965cce6a65846412b0ce40503bab198a8567708a7cdfe148ce4784dcf1fea6"
+    "generated/wiki-data.json": "cf7a9ecf2277e9272aa24570a1cc8ddc22fa61a1be8df3503fcf4e0b33be3890",
+    "generated/source-registry.json": "1f9212724e26855b579f8024ea31bf96c8b64a92c4fc07478ae675c9694bf3f7"
   }
 }

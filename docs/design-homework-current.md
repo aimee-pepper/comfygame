@@ -1,8 +1,9 @@
 # Design Homework — Current Contract
 
-**Status:** Initial slice installed in `4ed15ab`; current catalogue has 22 active questions after
-the location-clue batch retired into production; launch trust and phone interaction check remain.
-**Decision date:** 12 August 2026
+**Status:** Initial slice installed in `4ed15ab`; current catalogue has 12 active questions after
+obsolete advance-copy approvals retired into production/play review; launch trust and phone interaction
+check remain.
+**Updated:** 21 August 2026
 **Content authority:** `Sources/Content/Data/design-homework.json`
 
 ## Purpose
@@ -46,35 +47,22 @@ A later authenticated relay may add direct submission, but the UI must not call 
 1. Shatter’s combat effect (`combat-shatter-effect`).
 2. Distiller’s coating effect (`combat-distiller-effect`).
 3. Reforge’s mechanically honest progression (`reforge-progression`).
-4. Isolde's exact three-reply revision (`isolde-dialogue-revision`).
-5. Sabine's exact seven-clue revision (`sabine-clue-revision`).
-6. Rook's exact three-line meeting revision (`rook-meeting-voice-revision`).
-7. Marrick's exact three-line meeting revision (`marrick-meeting-voice-revision`).
-8. Ashe's exact three-line meeting revision (`ashe-meeting-voice-revision`).
-9. Dagg/Lys/Wren/Kestrel/Oda's medium-risk meeting revision batch
-    (`medium-risk-meeting-voice-revision`).
-10. Noll and Auber's differentiated salvage/transformation meeting lines
-    (`noll-auber-meeting-voice-revision`).
-11. Grimmond and Nine's exact terminal-response revisions
-    (`grimmond-nine-terminal-revision`).
-12. Reversible Penmanship Essence/resource comparison profile
-    (`penmanship-price-profile`).
-13. Final player-facing combat retreat name (`combat-retreat-name`).
-14. Bryn/Talin/Nessa's five-line early-hinge voice correction
-    (`early-hinge-meeting-voice-revision`).
-15. Corrin/Fen's three-line material-practice voice correction
-    (`corrin-fen-meeting-voice-revision`).
-16. Named-traveller arrival level and permanent catch-up gap
-    (`named-traveller-arrival-level`).
-17. failed-expedition item-retention agency after stack-independent arithmetic correction
-    (`failure-recovery-agency`).
-18. Named-character stat-growth identity and roster-upkeep trade-off
-    (`named-character-stat-growth`).
-19. Bracken/Maud/Perren's four-line remaining abstract-reply correction
-    (`remaining-meeting-voice-revision`).
-20. Constellation's matched combat/district mastery structure (`constellation-mastery-structure`).
-21. Constellation persistence per campaign save versus account-wide (`constellation-persistence`).
-22. Storehouse/Field Kit capacity compression profile (`capacity-compression-profile`).
+4. Reversible Penmanship Essence/resource comparison profile (`penmanship-price-profile`).
+5. Final player-facing combat retreat name (`combat-retreat-name`).
+6. Named-traveller arrival level and permanent catch-up gap (`named-traveller-arrival-level`).
+7. Failed-expedition item-retention agency after stack-independent arithmetic correction
+   (`failure-recovery-agency`).
+8. Named-character stat-growth identity and roster-upkeep trade-off
+   (`named-character-stat-growth`).
+9. Constellation's matched combat/district mastery structure (`constellation-mastery-structure`).
+10. Constellation persistence per campaign save versus account-wide (`constellation-persistence`).
+11. Storehouse/Field Kit capacity compression profile (`capacity-compression-profile`).
+12. Rare ordinary-creature territory-find frequency and category mix (`territory-find-frequency`).
+
+The eleven Isolde/Sabine/full-cast dialogue approval pages are retired. Coherent meeting and diary copy is
+production-authorized by `full-cast-voice-authority-current.md` and enters the game in campaign order for
+Aimee to review during play. Retiring the bundled questions does not delete frozen historical device answers
+or export records.
 
 The catalogue deliberately mixes held mechanical choices with exact authored-copy reviews. Each can
 be answered asynchronously without blocking unrelated implementation; a question's own authority

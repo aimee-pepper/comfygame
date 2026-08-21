@@ -135,6 +135,7 @@ When two documents disagree:
 | World encounter contact | `world-encounter-contact-current.md` | Typed ordinary/apex/flora/guardian detection and contact rules; safe apex/flora adjacency |
 | Wayfarer's Table flora recognition | `wayfarers-table-flora-recognition-current.md` | Station-owned on-sight practical flora name/defence/yield notes layered onto disclosure-neutral Look consequences |
 | Seamlight portal guidance | `seamlight-current.md` | Fog-neutral, walkable-path guidance toward the nearest usable portal |
+| Survey Needle resource guidance | `survey-needle-current.md` | Home-tuned reusable Field Kit instrument; paid broad path-sector and signal-strength readings without fog/minimap reveal |
 | Equipment inscriptions | `equipment-inscription-system-current.md` | One authored durable instruction per exact Body/Keepsake piece; first effect is collapse-only Seamward |
 | Implemented-six station audit | `implemented-six-station-contribution-audit-current.md` | Evidence-led audit showing five first slices fulfilled and Sela's flora recognition as the one missing promised contribution |
 | Station reachability and first use | `station-first-use-reachability-audit-current.md` | Complete 23-station lifecycle/payoff matrix; Apothecary access/empty-room correction plus Channelworks one-time restoration receipt |
@@ -157,7 +158,8 @@ When two documents disagree:
 | Trading Post economy | `trading-post-recycler-economy-current.md` | Merchant trade bands, rotating stock snapshot, conversion rates and cumulative salvage receipt |
 | Essence continuation economy | `essence-continuation-economy-current.md` | Authored-world continuation invariant, temporary Raw Essence profiles and required runway telemetry |
 | Slot-free harvest reserve foundation | `world-resource-reserve-current.md` | Exact property-bearing harvests are slot-free; current combined category is transitional |
-| Creature ecology and materials | `creature-ecology-and-materials-overhaul-current.md` | Habitat-aware pressure-generated life including deep water; body-derived Creature materials and rare encounter-level territory gear |
+| Creature ecology and materials | `creature-ecology-and-materials-overhaul-current.md` | Habitat-aware pressure-generated life including deep water and body-derived Creature materials |
+| Creature territory finds | `creature-territory-finds-current.md` | One rare encounter-level found-object roll; exact gear/consumable/Cache-Key eligibility, provenance, capacity and disclosure |
 | Earlier loot quality hybrid review | `loot-quality-hybrid-review-current.md` | Historical first candidate; superseded for current review by the crafting-intuition audit |
 | Crafting intuition and quality review | `crafting-intuition-and-quality-review-current.md` | Settled six bands, 70/30 component weighting, no hard station cap and Refitting; exact content now delegated to the component/schematic authority |
 | Crafting components and schematics | `crafting-components-and-schematics-current.md` | Complete World/Creature component profiles, exact 21-Schematic socket lists, contribution scales, migration and Pointed Blade fixture |

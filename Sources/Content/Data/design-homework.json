@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "updated": "12 Aug 2026",
+  "updated": "21 Aug 2026",
   "questions": [
     {
       "id": "combat-shatter-effect",
@@ -77,328 +77,73 @@
       ]
     },
     {
-      "id": "isolde-dialogue-revision",
-      "title": "Approve Isolde's revised replies?",
-      "context": "Her interaction ordering is fixed, but three optional answers still stack unexplained metaphors and do not respond clearly to the question selected. These replacements preserve her severity and dry humour while making each reply intelligible on its own.",
-      "recommendation": "Approve the exact three-line set below. Each stable exchange remains independently selectable and appends in tap order.",
-      "reviewItems": [
-        {
-          "id": "isolde.blank_board",
-          "label": "There's nothing on that board.",
-          "candidate": "“The board is for resistance, not ink.” She draws the line again, slower. “If the hand cannot keep its course here, giving it charcoal only records the mistake.”"
-        },
-        {
-          "id": "isolde.teacher",
-          "label": "You taught this?",
-          "candidate": "“For forty years. Mostly to people who wanted to write faster.” A short laugh. “They had to learn smaller first. Smaller takes longer.”"
-        },
-        {
-          "id": "isolde.charcoal_hand",
-          "label": "I've been writing in charcoal.",
-          "candidate": "She looks at you for the first time. “Then every mark has had to carry too much.” She sets the board down. “Show me your hands.”"
-        }
-      ],
-      "choices": [
-        {
-          "id": "approve-exact-set",
-          "title": "Approve exact set",
-          "detail": "Promote all three replies exactly as shown."
-        },
-        {
-          "id": "revise-set",
-          "title": "Needs another pass",
-          "detail": "Keep the clearer response structure but revise one or more lines; name them below."
-        },
-        {
-          "id": "hold",
-          "title": "Keep current dialogue",
-          "detail": "Make no live prose change yet."
-        }
-      ]
-    },
-    {
-      "id": "sabine-clue-revision",
-      "title": "Approve Sabine's revised clue set?",
-      "context": "Sabine's seven location clues currently tend to state an ethical conclusion before giving the player observable evidence. This complete replacement set starts with ecology, tracks, routines, water access, cover, and calls before Sabine interprets them.",
-      "recommendation": "Review and approve these as one seven-page sequence. Individual lines may be named in the text box if only part of the set needs another pass.",
-      "reviewItems": [
-        {
-          "id": "sabine_where_0",
-          "label": "Page 1",
-          "candidate": "Bite the new shoots down at dusk and they stand above the old cut by morning. This place can answer feeding without pretending nothing was taken."
-        },
-        {
-          "id": "sabine_where_1",
-          "label": "Page 2",
-          "candidate": "Every shelter is occupied, and fresh tracks stop at the entrances before turning away. More creatures live here than one keeper could gather."
-        },
-        {
-          "id": "sabine_where_2",
-          "label": "Page 3",
-          "candidate": "Small grazers crowd the new growth. Larger tracks circle them, and scavengers follow what the hunt leaves behind. Feed one creature here and three others change their route."
-        },
-        {
-          "id": "sabine_where_3",
-          "label": "Page 4",
-          "candidate": "The same hollows are pressed flat each night while nearby ground goes untouched. Return often enough and absence becomes part of the pattern."
-        },
-        {
-          "id": "sabine_where_4",
-          "label": "Page 5",
-          "candidate": "Hoofprints, paws and dragging tails reach the water by different banks. No creature has to pass another's shelter to drink."
-        },
-        {
-          "id": "sabine_where_5",
-          "label": "Page 6",
-          "candidate": "There is open ground enough to approach and cover near enough to refuse. I could work here without making nearness the only safe choice."
-        },
-        {
-          "id": "sabine_where_6",
-          "label": "Page 7",
-          "candidate": "The same calls begin at the same interval, and the same paths fill soon after. They can learn when I return; that does not mean they must come."
-        }
-      ],
-      "choices": [
-        {
-          "id": "approve-exact-set",
-          "title": "Approve exact set",
-          "detail": "Promote all seven clues exactly as shown."
-        },
-        {
-          "id": "revise-set",
-          "title": "Needs another pass",
-          "detail": "Preserve the evidence-first direction but revise named lines."
-        },
-        {
-          "id": "hold",
-          "title": "Keep current clues",
-          "detail": "Make no live prose change yet."
-        }
-      ]
-    },
-    {
-      "id": "rook-meeting-voice-revision",
-      "title": "Approve Rook's revised meeting lines?",
-      "context": "Rook's current scene explains responsibility in several similarly polished maxims. These replacements let the changed boundary, the restrained spear, and one remembered request carry the same ethic.",
-      "recommendation": "Approve the exact three-line set. It makes Rook more physical and immediate without changing the meeting facts or recruitment logic.",
-      "reviewItems": [
-        {
-          "id": "rook.boundary_owner",
-          "label": "Who decides where the boundary goes?",
-          "candidate": "“I keep moving it.” Rook looks from the markers to the only dry passage. “Yesterday a smaller animal went around. Today this one had nowhere else to put its feet. So today the line is mine to answer for.”"
-        },
-        {
-          "id": "rook.stopped_creature",
-          "label": "You stopped it with a spear.",
-          "candidate": "“Yes.” Rook rests the spear point on the ground. The creature shifts; Rook waits, and it does not advance. “There. That was one use for the distance.”"
-        },
-        {
-          "id": "rook.accepted",
-          "label": "Accepted response",
-          "candidate": "Rook snaps the broken marker shorter and plants it where even a low gaze will meet it. “If you stop seeing this one, tell me before I do.”"
-        }
-      ],
-      "choices": [
-        { "id": "approve-exact-set", "title": "Approve exact set", "detail": "Promote all three lines exactly as shown." },
-        { "id": "revise-set", "title": "Needs another pass", "detail": "Keep the physical direction but revise the stable units named below." },
-        { "id": "hold", "title": "Keep current dialogue", "detail": "Make no live Rook prose change yet." }
-      ]
-    },
-    {
-      "id": "marrick-meeting-voice-revision",
-      "title": "Approve Marrick's revised meeting lines?",
-      "context": "Marrick should sound like a practiced leader carrying one specific failure, not an essayist defining collective protection. These lines add a bodily mistake, a direct count, and a visible declined ending.",
-      "recommendation": "Approve the exact three-line set while retaining his existing opening, sixth-marker exchange, offer, accepted response, and scene mechanics.",
-      "reviewItems": [
-        {
-          "id": "marrick.repeated_routine",
-          "label": "Why repeat the route?",
-          "candidate": "“Because frightened people cannot borrow my attention.” He walks the fallback route without looking down, then catches his heel on the untouched marker. “That is also why we practise with the person who breaks the pattern.”"
-        },
-        {
-          "id": "marrick.success_count",
-          "label": "Five came home.",
-          "candidate": "“It did.” Marrick kneels at the sixth place. “Five came home. I said that first for years.” He drags the marker into the formation. “Now say the other number.”"
-        },
-        {
-          "id": "marrick.declined",
-          "label": "Declined response",
-          "candidate": "“Then do not memorize this arrangement.” He overturns the five worn markers and leaves the sixth upright. “It has had enough practice being left out.”"
-        }
-      ],
-      "choices": [
-        { "id": "approve-exact-set", "title": "Approve exact set", "detail": "Promote all three lines exactly as shown." },
-        { "id": "revise-set", "title": "Needs another pass", "detail": "Keep Marrick's practical command voice but revise named lines." },
-        { "id": "hold", "title": "Keep current dialogue", "detail": "Make no live Marrick prose change yet." }
-      ]
-    },
-    {
-      "id": "ashe-meeting-voice-revision",
-      "title": "Approve Ashe's revised meeting lines?",
-      "context": "Ashe's boundaries are important, but the current replies land in the same polished cadence. These replacements preserve every consent boundary while varying length and letting Ashe demonstrate the danger physically.",
-      "recommendation": "Approve the exact three-line set while retaining the opening, warning-distance exchange, offer, accepted response, and mechanics.",
-      "reviewItems": [
-        {
-          "id": "ashe.endurance",
-          "label": "Can you endure it?",
-          "candidate": "“Sometimes.” Ashe starts to answer again, then turns their wrist until the shimmer bends away from you. “There. It changed before it hurt. That is usually the part people miss.”"
-        },
-        {
-          "id": "ashe.helping_others",
-          "label": "Could this help someone else?",
-          "candidate": "“Often.” The heat above their hands tightens, then settles. “Ask me then. Do not turn today's yes into equipment you packed for tomorrow.”"
-        },
-        {
-          "id": "ashe.declined",
-          "label": "Declined response",
-          "candidate": "“All right.” They nudge one marker back into place with their heel. “You can believe the warning and still leave.”"
-        }
-      ],
-      "choices": [
-        { "id": "approve-exact-set", "title": "Approve exact set", "detail": "Promote all three lines exactly as shown." },
-        { "id": "revise-set", "title": "Needs another pass", "detail": "Preserve the consent boundaries but revise the stable units named below." },
-        { "id": "hold", "title": "Keep current dialogue", "detail": "Make no live Ashe prose change yet." }
-      ]
-    },
-    {
-      "id": "medium-risk-meeting-voice-revision",
-      "title": "Approve the next five meeting revisions?",
-      "context": "These five voices are coherent individually but repeatedly end observations as balanced universal principles. The six replacements move their endings into a changed surface, companionship, a live triage choice, voluntary animal behavior, or Oda's particular technical history.",
-      "recommendation": "Approve this exact six-line batch. The characters' other meeting lines and every scene fact remain unchanged.",
-      "reviewItems": [
-        {
-          "id": "dagg.one_strike",
-          "label": "Dagg · one strike",
-          "candidate": "“Because the first moved it.” Dagg tests the lifted edge with his boot. “Hit it again now and I would be practising yesterday's decision.”"
-        },
-        {
-          "id": "lys.accepted",
-          "label": "Lys · accepted response",
-          "candidate": "Lys wraps the records separately, then hands you the lighter bundle. “Good. I dislike carrying both sides of an argument by myself.”"
-        },
-        {
-          "id": "wren.tempo_debt",
-          "label": "Wren · tempo debt",
-          "candidate": "“I can reach the slow one.” Wren circles it with a fingertip, then blocks the narrowing gap with the same finger. “I cannot do that and keep this open. Which problem arrives first?”"
-        },
-        {
-          "id": "kestrel.take_or_leave",
-          "label": "Kestrel · take or leave",
-          "candidate": "“Not yet.” Kestrel eases the arrow off the string. “I have only watched it flee. Ask me after it chooses a route no one forced on it.”"
-        },
-        {
-          "id": "oda.distance",
-          "label": "Oda · distance",
-          "candidate": "“Because I prefer having eyebrows.” Oda checks the cracked marker, then points beyond it. “Now walk the line with me. That is where the conduit stopped. It is not where the heat stopped.”"
-        },
-        {
-          "id": "oda.weapon_history",
-          "label": "Oda · weapon history",
-          "candidate": "“Yes.” Oda closes the damaged housing. “We argued about names after demonstrations because it was easier than arguing before them. This one left as a cutting tool. It came back with the maker's mark filed off.”"
-        }
-      ],
-      "choices": [
-        { "id": "approve-exact-set", "title": "Approve exact set", "detail": "Promote all six lines exactly as shown." },
-        { "id": "revise-set", "title": "Needs another pass", "detail": "Keep the differentiated direction but name any stable units to revise below." },
-        { "id": "hold", "title": "Hold this batch", "detail": "Make no live prose changes from this batch yet." }
-      ]
-    },
-    {
-      "id": "noll-auber-meeting-voice-revision",
-      "title": "Approve Noll and Auber's revised lines?",
-      "context": "Noll should decide between separable uses; Auber should follow matter that refuses a clean ending. These lines make salvage and transformation audibly different while avoiding a hard-coded station name in Auber's offer.",
-      "recommendation": "Approve the exact six-line set. Noll's other meeting lines and Auber's accepted response remain unchanged.",
-      "reviewItems": [
-        {
-          "id": "noll.repair",
-          "label": "Noll · repair",
-          "candidate": "“I could straighten it, bind the corner and sell you the same failure with better posture.” They lift the bowed edge. “Or I can have three sound lengths and four fastenings before supper. Which result do you need?”"
-        },
-        {
-          "id": "auber.fractions",
-          "label": "Auber · fractions",
-          "candidate": "“Both.” Auber touches the clear liquid, then scrapes a grain from the dried ring. “This travelled. This stayed. Tomorrow the answer may reverse.”"
-        },
-        {
-          "id": "auber.essence",
-          "label": "Auber · essence",
-          "candidate": "Auber holds the clear vessel to the light, then points to the ring left beneath it. “Not from nothing. The water, stone and heat already carried it. I can concentrate one part. This is what the other part cost.”"
-        },
-        {
-          "id": "auber.residue",
-          "label": "Auber · residue",
-          "candidate": "“I did throw it away.” He points to an older stain farther down the shelf. “Then I found it eating the label off the next vessel. Now it gets a jar and a date.”"
-        },
-        {
-          "id": "auber.offer",
-          "label": "Auber · offer",
-          "candidate": "“You have a place that makes raw essence spendable. Bring me to it. I can build the work that begins after that.”"
-        },
-        {
-          "id": "auber.declined",
-          "label": "Auber · declined response",
-          "candidate": "He gives you neither vessel. “Leave them until morning. If the clear one clouds, it has saved us an argument.”"
-        }
-      ],
-      "choices": [
-        { "id": "approve-exact-set", "title": "Approve exact set", "detail": "Promote all six lines exactly as shown." },
-        { "id": "revise-set", "title": "Needs another pass", "detail": "Keep their distinct material voices but revise named stable units." },
-        { "id": "hold", "title": "Hold this batch", "detail": "Make no live Noll or Auber prose change yet." }
-      ]
-    },
-    {
-      "id": "grimmond-nine-terminal-revision",
-      "title": "Approve Grimmond and Nine's endings?",
-      "context": "Both meetings have earned their philosophical content before the final response. These four terminal lines stop restating it: Grimmond ends on delayed physical evidence, while Nine gets ordinary present preferences that need no lost-history theory.",
-      "recommendation": "Approve the exact four terminal responses. Their openings, exchanges, offers, and all mechanics remain unchanged.",
-      "reviewItems": [
-        {
-          "id": "grimmond.accepted",
-          "label": "Grimmond · accepted",
-          "candidate": "Grimmond adds your name beside the proposed empty shape. “Before the first pull,” he says, and taps the slate twice. A softer answer returns through the floor. He adds another line."
-        },
-        {
-          "id": "grimmond.declined",
-          "label": "Grimmond · declined",
-          "candidate": "“Leave the brace.” He listens once more. Nothing answers for several breaths; then the wet fissure clicks. Grimmond shifts the support by the width of his thumb."
-        },
-        {
-          "id": "nine.accepted",
-          "label": "Nine · accepted",
-          "candidate": "Nine gives you the blue thread and records the transfer. Then she turns the cup upright again. “I prefer it this way. That does not need an older reason.”"
-        },
-        {
-          "id": "nine.declined",
-          "label": "Nine · declined",
-          "candidate": "“Then the empty place remains empty.” She records the refusal, considers the row, and moves the blue thread beneath the right stone. “That is better. I was tired of the left.”"
-        }
-      ],
-      "choices": [
-        { "id": "approve-exact-set", "title": "Approve exact set", "detail": "Promote all four endings exactly as shown." },
-        { "id": "revise-set", "title": "Needs another pass", "detail": "Keep the physical/preference direction but revise named endings." },
-        { "id": "hold", "title": "Hold this batch", "detail": "Make no live terminal-response changes yet." }
-      ]
-    },
-    {
       "id": "penmanship-price-profile",
       "title": "Which Penmanship prices should we playtest?",
       "context": "The inherited 150-Essence Brush would cost about 4.5 fully explored ordinary worlds by itself, or about 6.4 worlds together with its required Scriptorium, before paying to write any new worlds. It also gates Ink Mixing, compounds, Chaining, and the Fountain Pen.",
       "recommendation": "Use the complete lower comparison profile as reversible playtest tuning: Brush 45, stable table 70, Ink Mixing 40, Compound Assembly 55, Chaining 90, ruling frame 140, and Fountain Pen 220 Essence. Keep the Scriptorium at 60. Judge the route with real continuation telemetry before final tuning.",
       "reviewItems": [
-        { "id": "scriptorium", "label": "Build Scriptorium", "candidate": "60 Essence · unchanged" },
-        { "id": "brush", "label": "Brush", "candidate": "45 Essence · 2 Copper · 6 Fibre · 4 Timber" },
-        { "id": "stable_table", "label": "A table that doesn't rock", "candidate": "70 Essence · 8 Timber · 6 Clay" },
-        { "id": "ink_mixing", "label": "Ink Mixing", "candidate": "40 Essence · 2 Copper · 2 Quartz · 4 Resin" },
-        { "id": "compound_assembly", "label": "Compound Assembly", "candidate": "55 Essence · 4 Pulp · 4 Resin · 2 Quartz" },
-        { "id": "chaining", "label": "Chaining", "candidate": "90 Essence · 2 Mercury · 1 Mote" },
-        { "id": "ruling_frame", "label": "A ruling frame", "candidate": "140 Essence · 6 Quartz · 4 Silver" },
-        { "id": "fountain_pen", "label": "Fountain pen", "candidate": "220 Essence · 4 Quartz · 8 Resin · 6 Silver" }
+        {
+          "id": "scriptorium",
+          "label": "Build Scriptorium",
+          "candidate": "60 Essence · unchanged"
+        },
+        {
+          "id": "brush",
+          "label": "Brush",
+          "candidate": "45 Essence · 2 Copper · 6 Fibre · 4 Timber"
+        },
+        {
+          "id": "stable_table",
+          "label": "A table that doesn't rock",
+          "candidate": "70 Essence · 8 Timber · 6 Clay"
+        },
+        {
+          "id": "ink_mixing",
+          "label": "Ink Mixing",
+          "candidate": "40 Essence · 2 Copper · 2 Quartz · 4 Resin"
+        },
+        {
+          "id": "compound_assembly",
+          "label": "Compound Assembly",
+          "candidate": "55 Essence · 4 Pulp · 4 Resin · 2 Quartz"
+        },
+        {
+          "id": "chaining",
+          "label": "Chaining",
+          "candidate": "90 Essence · 2 Mercury · 1 Mote"
+        },
+        {
+          "id": "ruling_frame",
+          "label": "A ruling frame",
+          "candidate": "140 Essence · 6 Quartz · 4 Silver"
+        },
+        {
+          "id": "fountain_pen",
+          "label": "Fountain pen",
+          "candidate": "220 Essence · 4 Quartz · 8 Resin · 6 Silver"
+        }
       ],
       "choices": [
-        { "id": "full-comparison-profile", "title": "Test the full profile", "detail": "Use all listed comparison costs, then tune from playtest telemetry." },
-        { "id": "brush-only", "title": "Lower only the Brush", "detail": "Use 45 Essence for Brush but retain later costs until their routes are playable." },
-        { "id": "keep-legacy-brush", "title": "Keep Brush at 150", "detail": "Preserve the inherited first-hand cost despite its continuation pressure." },
-        { "id": "hold", "title": "Keep it unresolved", "detail": "Do not choose the native Penmanship tuning profile yet." }
+        {
+          "id": "full-comparison-profile",
+          "title": "Test the full profile",
+          "detail": "Use all listed comparison costs, then tune from playtest telemetry."
+        },
+        {
+          "id": "brush-only",
+          "title": "Lower only the Brush",
+          "detail": "Use 45 Essence for Brush but retain later costs until their routes are playable."
+        },
+        {
+          "id": "keep-legacy-brush",
+          "title": "Keep Brush at 150",
+          "detail": "Preserve the inherited first-hand cost despite its continuation pressure."
+        },
+        {
+          "id": "hold",
+          "title": "Keep it unresolved",
+          "detail": "Do not choose the native Penmanship tuning profile yet."
+        }
       ]
     },
     {
@@ -407,76 +152,26 @@
       "context": "Unbind is already the Binder's signature damage technique. Using the same word for leaving combat would put two unrelated actions in one palette. The current reversible build calls the tactical exit Withdraw and keeps Unbind as damage.",
       "recommendation": "Keep Unbind for the distinctive Binder attack and use Withdraw for leaving the current fight. It describes a deliberate tactical choice without implying panic or ending the expedition.",
       "choices": [
-        { "id": "withdraw", "title": "Use Withdraw", "detail": "Unbind remains the damage technique; Withdraw leaves this encounter for the displayed Stability cost." },
-        { "id": "retreat", "title": "Use Retreat", "detail": "Keep Unbind as damage, but label the encounter exit Retreat." },
-        { "id": "flee", "title": "Use Flee", "detail": "Keep Unbind as damage, but use the more urgent/failure-toned Flee label." },
-        { "id": "rename-damage", "title": "Rename the attack", "detail": "Reserve Unbind for leaving combat and choose a new name for the Binder's damage technique below." }
-      ]
-    },
-    {
-      "id": "early-hinge-meeting-voice-revision",
-      "title": "Approve Bryn, Talin, and Nessa's revised replies?",
-      "context": "Their meeting scenes are strong, but five replies still conclude as polished general definitions. These replacements preserve the ideas while putting them into Bryn's remembered mistake, Talin's visible timing evidence, and Nessa's changed labels and recipient requests.",
-      "recommendation": "Approve this exact five-line batch. Orsa and Vance need no correction here; all unlisted meeting copy remains unchanged.",
-      "reviewItems": [
         {
-          "id": "bryn.protection_debt",
-          "label": "Bryn · protection debt",
-          "candidate": "“Yes.” She looks back at the other exit. “Then I kept explaining why mine was safer until they stopped answering. That was the second danger.”"
+          "id": "withdraw",
+          "title": "Use Withdraw",
+          "detail": "Unbind remains the damage technique; Withdraw leaves this encounter for the displayed Stability cost."
         },
         {
-          "id": "talin.certainty",
-          "label": "Talin · certainty",
-          "candidate": "“I will not.” The seam closes; the creature's back foot settles a beat later. “There. If that foot slips on the next breath, I choose before the plates finish answering.”"
+          "id": "retreat",
+          "title": "Use Retreat",
+          "detail": "Keep Unbind as damage, but label the encounter exit Retreat."
         },
         {
-          "id": "talin.outcome",
-          "label": "Talin · outcome",
-          "candidate": "“Then I clean the blade and write down what I saw before success makes the story kinder.” Talin watches the next breath. “If I was lucky, I need that fact most.”"
+          "id": "flee",
+          "title": "Use Flee",
+          "detail": "Keep Unbind as damage, but use the more urgent/failure-toned Flee label."
         },
         {
-          "id": "nessa.cure_or_poison",
-          "label": "Nessa · cure or poison",
-          "candidate": "Nessa turns the two new labels toward you. “That question is why these bottles used to look identical. Give me the body, amount, route and timing; then either word may earn its ink.”"
-        },
-        {
-          "id": "nessa.result",
-          "label": "Nessa · result",
-          "candidate": "“One improved and asked me to stop. The other worsened and asked me to continue.” She underlines both requests before marking either result. “I wrote this part first.”"
+          "id": "rename-damage",
+          "title": "Rename the attack",
+          "detail": "Reserve Unbind for leaving combat and choose a new name for the Binder's damage technique below."
         }
-      ],
-      "choices": [
-        { "id": "approve-exact-set", "title": "Approve exact set", "detail": "Promote all five replies exactly as shown." },
-        { "id": "revise-set", "title": "Needs another pass", "detail": "Keep the more physical cadence but name any stable units to revise below." },
-        { "id": "hold", "title": "Hold this batch", "detail": "Make no live prose changes from this batch yet." }
-      ]
-    },
-    {
-      "id": "corrin-fen-meeting-voice-revision",
-      "title": "Approve Corrin and Fen's revised replies?",
-      "context": "Their physical meeting identities already work, but three replies end by turning the practice into generalized conclusions. These replacements let an erased source mark, a failed throw, and an intentionally untaken shot carry the same meaning.",
-      "recommendation": "Approve the exact three-line set; retain every other Corrin and Fen meeting line unchanged.",
-      "reviewItems": [
-        {
-          "id": "corrin.nothing_wasted",
-          "label": "Corrin · nothing wasted",
-          "candidate": "“I used to say that while shaving these grain changes flat.” Corrin turns the clean face down again. “Nothing in the bin. Nothing left to tell me which strip failed first. Very efficient mistake.”"
-        },
-        {
-          "id": "fen.path_before_target",
-          "label": "Fen · path before target",
-          "candidate": "“That tuft, eventually.” Fen points across the crosswind, then to a blunt dart in the dirt well short of it. “I aimed correctly the first time too. The path had not agreed.”"
-        },
-        {
-          "id": "fen.weapon_and_hunt",
-          "label": "Fen · weapon and hunt",
-          "candidate": "“Once.” Fen stills the cord. “I spent a week making a shot cross this wind. When the animal stepped into it, I watched it leave. The weapon worked. That was not an instruction.”"
-        }
-      ],
-      "choices": [
-        { "id": "approve-exact-set", "title": "Approve exact set", "detail": "Promote all three replies exactly as shown." },
-        { "id": "revise-set", "title": "Needs another pass", "detail": "Keep the concrete material direction but name any stable units to revise below." },
-        { "id": "hold", "title": "Hold this batch", "detail": "Make no live Corrin or Fen prose change yet." }
       ]
     },
     {
@@ -485,10 +180,26 @@
       "context": "Named travellers currently join at level 1 even late in a long campaign. Active members then earn the same XP, so the gap never closes naturally. Encounter scaling correctly does not lower foe level to protect a recruit, which can leave a late arrival permanently fragile or unusable.",
       "recommendation": "Have each named traveller join at the Binder's current level. Recruitment is already a major earned reward, and immediate parity lets the new person be played instead of parked. Their authored calling lean remains a bonus, while all level-earned combat points arrive unspent so the player chooses the build.",
       "choices": [
-        { "id": "binder-level", "title": "Match Binder level", "detail": "Join immediately usable at the Binder's current level, with level points banked and authored lean preserved." },
-        { "id": "two-behind-catchup", "title": "Two levels behind", "detail": "Join slightly behind and add accelerated XP until the traveller reaches the Binder; more growth texture, but another persistent rule." },
-        { "id": "level-one-catchup", "title": "Level 1 with catch-up", "detail": "Preserve a full growth arc but grant strongly accelerated XP; late recruits may still need to sit out initially." },
-        { "id": "keep-level-one", "title": "Keep level 1", "detail": "Accept that late named travellers begin far behind and require ordinary equal-share XP to advance." }
+        {
+          "id": "binder-level",
+          "title": "Match Binder level",
+          "detail": "Join immediately usable at the Binder's current level, with level points banked and authored lean preserved."
+        },
+        {
+          "id": "two-behind-catchup",
+          "title": "Two levels behind",
+          "detail": "Join slightly behind and add accelerated XP until the traveller reaches the Binder; more growth texture, but another persistent rule."
+        },
+        {
+          "id": "level-one-catchup",
+          "title": "Level 1 with catch-up",
+          "detail": "Preserve a full growth arc but grant strongly accelerated XP; late recruits may still need to sit out initially."
+        },
+        {
+          "id": "keep-level-one",
+          "title": "Keep level 1",
+          "detail": "Accept that late named travellers begin far behind and require ordinary equal-share XP to advance."
+        }
       ]
     },
     {
@@ -497,10 +208,26 @@
       "context": "The current failure rule floors each inventory stack separately, so splitting the same haul across item types can make far more of it disappear. That arithmetic will be corrected regardless of this choice. The remaining design question is whether the game automatically chooses which exact items fit the corrected retention budget or lets you change a deterministic suggested set before confirming.",
       "recommendation": "Let the player choose within the fixed budget. Show a deterministic suggested set first, then allow swaps without changing how many items survive. Bulk world resources remain automatically apportioned, while pages, knowledge, recruited people and pre-departure property keep their existing protection.",
       "choices": [
-        { "id": "player-choice", "title": "Let me choose", "detail": "Show a suggested retained set, then let the player swap exact acquired items within the same fixed budget before confirming." },
-        { "id": "automatic", "title": "Choose automatically", "detail": "Use the corrected total-unit budget but select retained items deterministically from the expedition outcome, with no extra decision screen." },
-        { "id": "automatic-favourites", "title": "Protect favourites first", "detail": "Choose automatically but prioritize items the player marked as favourites; simpler at failure time, but attachment must be predicted before the expedition." },
-        { "id": "hold", "title": "Test arithmetic first", "detail": "Ship only the corrected automatic arithmetic, then revisit player choice after failure recaps are trustworthy." }
+        {
+          "id": "player-choice",
+          "title": "Let me choose",
+          "detail": "Show a suggested retained set, then let the player swap exact acquired items within the same fixed budget before confirming."
+        },
+        {
+          "id": "automatic",
+          "title": "Choose automatically",
+          "detail": "Use the corrected total-unit budget but select retained items deterministically from the expedition outcome, with no extra decision screen."
+        },
+        {
+          "id": "automatic-favourites",
+          "title": "Protect favourites first",
+          "detail": "Choose automatically but prioritize items the player marked as favourites; simpler at failure time, but attachment must be predicted before the expedition."
+        },
+        {
+          "id": "hold",
+          "title": "Test arithmetic first",
+          "detail": "Ship only the corrected automatic arithmetic, then revisit player choice after failure recaps are trustworthy."
+        }
       ]
     },
     {
@@ -509,27 +236,26 @@
       "context": "Every named traveller currently starts with the same all-equal stats. Level-up raises the two currently highest stats, but an equal starting line has no authored tie identity, so distinct callings can converge on the same Might/Finesse build. This is separate from combat-tree lean and from the level a traveller joins at.",
       "recommendation": "Give each named person an authored primary and secondary growth stat, let the Binder choose a pair at new game, and freeze a generated pair for generated companions. Add one point to each per level. This keeps growth legible and identity-specific without asking the player to assign points across a large roster.",
       "choices": [
-        { "id": "authored-fixed-pair", "title": "Authored stat pair", "detail": "Each named person grows two authored stats; Binder chooses and generated companions freeze a generated pair." },
-        { "id": "authored-weighted-rotation", "title": "Weighted rotation", "detail": "Give each character a five-stat order or weighting and rotate two increases per level; more varied, but harder to read." },
-        { "id": "player-assigns-points", "title": "Assign every point", "detail": "Let the player choose both stat increases at every level; strongest control, with substantial roster upkeep." },
-        { "id": "keep-highest-two", "title": "Keep highest two", "detail": "Retain current growth and add only a deterministic tie-breaking rule." }
-      ]
-    },
-    {
-      "id": "remaining-meeting-voice-revision",
-      "title": "Approve Bracken, Maud, and Perren's revised replies?",
-      "context": "These four meeting replies have strong physical scenes but currently end by explaining their theme in generalized language. The candidates keep the settled meaning and let damaged lining, a grip test, and rearranged fragments carry it. Sabine and Orsa were audited and intentionally left unchanged.",
-      "recommendation": "Approve the exact four-line batch. Preserve every unlisted meeting line and all stable exchange IDs.",
-      "reviewItems": [
-        { "id": "bracken.intact_outside", "label": "Bracken · intact outside", "candidate": "“It stopped the point.” Bracken turns the lining over. The hidden buckle has pressed its own shape through every layer beneath it. “Then this struck the wearer instead. Put it back untouched and it will do both again.”" },
-        { "id": "maud.not_weapon_yet", "label": "Maud · not a weapon yet", "candidate": "“Not yet. Pick a reach.” Maud balances the bar on her mark. “Now show me how you mean to recover it after a miss. Until then it is a length of iron and several unmade promises.”" },
-        { "id": "maud.advanced_compromise", "label": "Maud · advanced compromise", "candidate": "“I can tell you exactly what it gives up.” She shifts the balance toward your upper hand. “This grip buys speed with your shoulder. Rare metal only makes the bargain more expensive.”" },
-        { "id": "perren.two_arrangements", "label": "Perren · two arrangements", "candidate": "“Neither is innocent.” Perren moves one outer fragment from the first pattern into the second. “Here it guards the person in the middle. Here it points everyone else at them. The fragment cannot tell us which use its makers meant to survive.”" }
-      ],
-      "choices": [
-        { "id": "approve-exact-set", "title": "Approve exact set", "detail": "Promote all four replies exactly as shown." },
-        { "id": "revise-set", "title": "Needs another pass", "detail": "Keep the object-led direction but name any stable units to revise below." },
-        { "id": "hold", "title": "Hold this batch", "detail": "Make no live Bracken, Maud or Perren prose change yet." }
+        {
+          "id": "authored-fixed-pair",
+          "title": "Authored stat pair",
+          "detail": "Each named person grows two authored stats; Binder chooses and generated companions freeze a generated pair."
+        },
+        {
+          "id": "authored-weighted-rotation",
+          "title": "Weighted rotation",
+          "detail": "Give each character a five-stat order or weighting and rotate two increases per level; more varied, but harder to read."
+        },
+        {
+          "id": "player-assigns-points",
+          "title": "Assign every point",
+          "detail": "Let the player choose both stat increases at every level; strongest control, with substantial roster upkeep."
+        },
+        {
+          "id": "keep-highest-two",
+          "title": "Keep highest two",
+          "detail": "Retain current growth and add only a deterministic tie-breaking rule."
+        }
       ]
     },
     {
@@ -538,9 +264,21 @@
       "context": "The old one-star Constellation only adds one Gambit slot. Your district idea gives the rare Mote currency a broader purpose without taxing every shop: three stars permit depths 4–5 of Offense, Defense, or Fieldcraft across the campaign, and three matching stars permit Tier-2 mastery in Commerce, Makers, or Commons. Every skill point, prerequisite, building, and ordinary upgrade cost still applies.",
       "recommendation": "Use the matched 3+3 mastery structure plus the existing Long Instruction. Charge one Mote per broad permission in initial testing. This makes the three village directions and three combat trees rhyme without charging a Mote per person, node, or shop.",
       "choices": [
-        { "id": "matched-three-plus-three", "title": "Use both mastery trios", "detail": "Offense/Defense/Fieldcraft and Commerce/Makers/Commons each get one broad one-Mote permission; keep Long Instruction separate." },
-        { "id": "combat-trio-only", "title": "Combat mastery only", "detail": "Motes permit depths 4–5 in the three combat trees; building mastery uses only ordinary construction progression." },
-        { "id": "long-instruction-only", "title": "Keep one star only", "detail": "Retain only the existing Gambit-capacity star and find a different role for Motes later." }
+        {
+          "id": "matched-three-plus-three",
+          "title": "Use both mastery trios",
+          "detail": "Offense/Defense/Fieldcraft and Commerce/Makers/Commons each get one broad one-Mote permission; keep Long Instruction separate."
+        },
+        {
+          "id": "combat-trio-only",
+          "title": "Combat mastery only",
+          "detail": "Motes permit depths 4–5 in the three combat trees; building mastery uses only ordinary construction progression."
+        },
+        {
+          "id": "long-instruction-only",
+          "title": "Keep one star only",
+          "detail": "Retain only the existing Gambit-capacity star and find a different role for Motes later."
+        }
       ]
     },
     {
@@ -549,9 +287,21 @@
       "context": "A Constellation permission can persist through any future Great-Work/Base cycle inside one campaign without automatically belonging to every new game. Making it account-wide would change fresh-save balance and make comparative testing less honest, while making it temporary would weaken the permanence fantasy.",
       "recommendation": "Persist Constellation purchases in the individual campaign/save's Reality layer. A genuinely separate New Game begins clean; deleting that save deletes its mastery.",
       "choices": [
-        { "id": "campaign-save", "title": "One campaign/save", "detail": "Mastery survives future cycles inside that campaign but never appears in another save slot." },
-        { "id": "account-wide", "title": "Across every save", "detail": "Once bought, mastery applies to all current and future saves; stronger meta-progression, but fresh starts are no longer fresh." },
-        { "id": "hold-until-endgame", "title": "Decide with endgame", "detail": "Keep the current Long Instruction behavior and hold broader persistence until Great Work cycles are actually designed." }
+        {
+          "id": "campaign-save",
+          "title": "One campaign/save",
+          "detail": "Mastery survives future cycles inside that campaign but never appears in another save slot."
+        },
+        {
+          "id": "account-wide",
+          "title": "Across every save",
+          "detail": "Once bought, mastery applies to all current and future saves; stronger meta-progression, but fresh starts are no longer fresh."
+        },
+        {
+          "id": "hold-until-endgame",
+          "title": "Decide with endgame",
+          "detail": "Keep the current Long Instruction behavior and hold broader persistence until Great Work cycles are actually designed."
+        }
       ]
     },
     {
@@ -560,9 +310,49 @@
       "context": "World Resources and Creature Materials no longer consume item slots, so nine shelving purchases and five +3 satchel rungs are repetitive. Existing saves can be preserved with a decode-only allowance even if the new campaign curve is smaller. This choice affects exact Items, World Pages, and prepared Field Kit families—not bulk resources.",
       "recommendation": "Use Storehouse 16→28→40 and Field Kit 8→11→14→20, with Sela adding a separate +2. Old saves above 40/20 keep the difference as a non-purchasable legacy allowance. This is roomy without restoring a long mandatory capacity tax.",
       "choices": [
-        { "id": "focused-compression", "title": "Use 40 / 20 maxima", "detail": "Two Storehouse upgrades and three pack projects; preserve larger old saves through a hidden legacy allowance." },
-        { "id": "roomy-compression", "title": "Keep old maxima", "detail": "Compress to two/three large upgrades but end at 70 Storehouse and 23 Field Kit before Sela." },
-        { "id": "keep-old-ladders", "title": "Keep every rung", "detail": "Retain nine shelving and five satchel purchases even though bulk resources no longer use those slots." }
+        {
+          "id": "focused-compression",
+          "title": "Use 40 / 20 maxima",
+          "detail": "Two Storehouse upgrades and three pack projects; preserve larger old saves through a hidden legacy allowance."
+        },
+        {
+          "id": "roomy-compression",
+          "title": "Keep old maxima",
+          "detail": "Compress to two/three large upgrades but end at 70 Storehouse and 23 Field Kit before Sela."
+        },
+        {
+          "id": "keep-old-ladders",
+          "title": "Keep every rung",
+          "detail": "Retain nine shelving and five satchel purchases even though bulk resources no longer use those slots."
+        }
+      ]
+    },
+    {
+      "id": "territory-find-frequency",
+      "title": "How often should creature territories contain found objects?",
+      "context": "After an ordinary generated-creature victory, the game can make one rare territory-find roll for an object recovered from a den, nest, wrack or nearby trace. This is separate from guaranteed body-derived Creature materials, happens once per encounter rather than once per animal, and can never produce story objects, authored uniques or apex weapons.",
+      "recommendation": "Start with a 5% total chance: 3% ordinary campaign-banded gear, 1.5% eligible consumable and 0.5% ordinary Cache Key. At most one object appears, Teeming never adds rolls, and no essential progression depends on it.",
+      "choices": [
+        {
+          "id": "rare-mixed-five",
+          "title": "Rare mixed finds · 5%",
+          "detail": "Use 3% gear, 1.5% consumable, 0.5% Cache Key and 95% no find."
+        },
+        {
+          "id": "generous-mixed-eight",
+          "title": "More visible finds · 8%",
+          "detail": "Use 4% gear, 3% consumable, 1% Cache Key and 92% no find."
+        },
+        {
+          "id": "gear-only-three",
+          "title": "Gear only · 3%",
+          "detail": "Keep the rare ordinary-gear find but exclude consumables and Cache Keys from creature territories."
+        },
+        {
+          "id": "hold-no-finds",
+          "title": "Hold territory finds",
+          "detail": "Use only body-derived Creature materials until the wider loot economy has more playtest evidence."
+        }
       ]
     }
   ]

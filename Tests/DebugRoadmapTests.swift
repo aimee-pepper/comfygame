@@ -243,7 +243,7 @@ final class DesignHomeworkTests: XCTestCase {
     func testBundledQuestionsAndChoicesHaveStableUniqueIDs() {
         let catalogue = DesignHomeworkCatalogue.current
         XCTAssertEqual(catalogue.schemaVersion, 1)
-        XCTAssertEqual(catalogue.questions.count, 22)
+        XCTAssertEqual(catalogue.questions.count, 12)
         XCTAssertEqual(Set(catalogue.questions.map(\.id)).count, catalogue.questions.count)
         for question in catalogue.questions {
             XCTAssertFalse(question.choices.isEmpty)
@@ -288,6 +288,39 @@ final class DesignHomeworkTests: XCTestCase {
         XCTAssertNil(store.answer(for: "combat-distiller-effect")?.choiceID)
         XCTAssertEqual(store.answer(for: "combat-distiller-effect")?.customText,
                        "Use two charges, but only after the first Apothecary upgrade.")
+    }
+
+    func testRetiredQuestionAnswerRemainsInExportHistory() throws {
+        let file = FileManager.default.temporaryDirectory
+            .appendingPathComponent("homework-\(UUID().uuidString).json")
+        defer { try? FileManager.default.removeItem(at: file) }
+
+        let retired = DesignHomeworkAnswer(
+            questionID: "isolde-dialogue-revision",
+            choiceID: "approve-exact-set",
+            customText: "",
+            savedAt: Date(timeIntervalSince1970: 1),
+            catalogueUpdated: "12 Aug 2026",
+            questionTitle: "Approve Isolde's revised replies?",
+            choiceTitle: "Approve exact set"
+        )
+        let frozenExport = DesignHomeworkExport(
+            schemaVersion: 1,
+            catalogueUpdated: "12 Aug 2026",
+            answers: [retired]
+        )
+        try JSONEncoder().encode(frozenExport).write(to: file, options: .atomic)
+
+        let store = DesignHomeworkStore(fileURL: file)
+        XCTAssertFalse(store.catalogue.questions.contains { $0.id == retired.questionID })
+        XCTAssertEqual(store.answer(for: retired.questionID), retired)
+
+        let exportURL = try XCTUnwrap(store.exportURL)
+        let exported = try JSONDecoder().decode(
+            DesignHomeworkExport.self,
+            from: Data(contentsOf: exportURL)
+        )
+        XCTAssertEqual(exported.answers, [retired])
     }
 }
 #endif

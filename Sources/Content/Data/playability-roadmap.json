@@ -19,13 +19,13 @@
       "id": "band-2",
       "title": "Band 2 · Opening economy and travellers",
       "reach": "Worlds 2–8 · levels 2–6 · Vance, Noll, Halloway",
-      "itemIDs": ["rune-dictionary", "saved-page-templates", "traveller-world-pacing", "traveller-clue-distribution", "trading-post-stock-breadth", "recycler", "maker-stations", "item-popover", "item-character-identities", "library-collection-accuracy", "library-shelves", "authored-text-first-review", "house-village", "workshop-constellation-role", "creature-ecology-materials", "gear-catalogue-breadth", "return-object-layout", "legacy-token-quirk-cleanup"]
+      "itemIDs": ["rune-dictionary", "saved-page-templates", "traveller-world-pacing", "traveller-clue-distribution", "trading-post-stock-breadth", "recycler", "maker-stations", "item-popover", "item-character-identities", "library-collection-accuracy", "library-shelves", "authored-text-first-review", "house-village", "workshop-constellation-role", "creature-ecology-materials", "gear-catalogue-breadth", "creature-territory-finds", "return-object-layout", "legacy-token-quirk-cleanup"]
     },
     {
       "id": "band-3",
       "title": "Band 3 · Early knowledge and choices",
       "reach": "Worlds 5–15 · levels 4–10 · Mara through Orsa",
-      "itemIDs": ["wild-world-pages", "early-knowledge-stations", "party-character-surface", "combat-tree-opening-choices", "resource-extraction", "refining", "constellation-first-slice", "penmanship-native", "colored-ink-mixing", "equipment-inscriptions"]
+      "itemIDs": ["wild-world-pages", "early-knowledge-stations", "party-character-surface", "combat-tree-opening-choices", "resource-extraction", "survey-needle", "refining", "constellation-first-slice", "penmanship-native", "colored-ink-mixing", "equipment-inscriptions"]
     },
     {
       "id": "band-4",
@@ -878,9 +878,19 @@
       "priority": "B2.13",
       "title": "Habitat-aware life and body-derived Creature materials",
       "status": "queued",
-      "detail": "Persist terrestrial/shore/aquatic/aerial ecology identity after real terrain availability; fish may occupy connected shallow and deep water, with deep occupants non-enterable until they reach shallow water or a later interaction exists. Derive feather, fin, pelt, scale/plate/chitin/shell, weapon, bone and special materials from the visible body. Remove unrelated ordinary-animal world-resource drops. The rare territory-find category mix is reopened in the crafting review so gear/consumable/ordinary-key eligibility is not implemented from the older gear-only rule.",
-      "gate": "Aquatic life remains in connected shallow+deep water; terrestrial life remains off water; pressure-biased feathered/furred/plated forms are deterministic without gameplay RNG change; remains match visible body. Asset must prove the terrestrial/shore/aquatic/aerial and material atlas before native promotion. Do not implement the territory-find table or quality/storage migration before crafting-intuition-and-quality-review-current.md is accepted/revised.",
+      "detail": "Persist terrestrial/shore/aquatic/aerial ecology identity after real terrain availability; fish may occupy connected shallow and deep water, with deep occupants non-enterable until they reach shallow water or a later interaction exists. Derive feather, fin, pelt, scale/plate/chitin/shell, weapon, bone and special materials from the visible body. Remove unrelated ordinary-animal world-resource drops. Rare nearby objects are a separate frozen encounter receipt, never body loot.",
+      "gate": "Aquatic life remains in connected shallow+deep water; terrestrial life remains off water; pressure-biased feathered/furred/plated forms are deterministic without gameplay RNG change; remains match visible body. Asset must prove the terrestrial/shore/aquatic/aerial and material atlas before native promotion. Quality/storage migration follows crafting-components-and-schematics-current.md; territory finds remain independently held by creature-territory-finds-current.md and Homework.",
       "workstream": "engineering",
+      "isPrimary": false
+    },
+    {
+      "id": "creature-territory-finds",
+      "priority": "B2.13c",
+      "title": "Rare objects found in creature territories",
+      "status": "paused",
+      "detail": "After one victorious ordinary generated-creature encounter, freeze at most one nearby-object receipt from an explicit gear, consumable or ordinary Cache Key table. It is per encounter, never per creature; body-derived Creature materials resolve separately. Habitat-compatible den/nest/wrack/silt copy explains provenance without claiming the animal carried or grew the object.",
+      "gate": "Homework territory-find-frequency settles the recommended 3% gear / 1.5% consumable / 0.5% Cache Key mix or an alternative. Then creature-territory-finds-current.md governs exact encounter eligibility, catalogue dispositions, campaign bands, capacity, relaunch determinism, exclusions, DEBUG forcing and return presentation. No implementation before that answer and no progression-critical object uses this route.",
+      "workstream": "design",
       "isPrimary": false
     },
     {
@@ -930,6 +940,16 @@
       "status": "queued",
       "detail": "Known Gold before extraction is deliberate progression. Highest qualifying Field Pick equipped by the departing party supplies rank 0–4; Binder level and Home tools do not. Iron/Salt/Sulfur remain rank 0; Gold/Silver rank 2; later strange/extreme minerals rank 3–4. Known writing warns but does not block; unknown marks do not leak.",
       "gate": "Iron/Gold/Adamant vertical fixtures prove no deadlock, truthful writing warning, no-turn under-equipped refusal, atomic exact harvest and relaunch; then validator covers the complete mineral table. No durability, hidden Mining XP, partial yield or automatic Home tool. Authority: resource-extraction-progression-current.md.",
+      "workstream": "engineering",
+      "isPrimary": false
+    },
+    {
+      "id": "survey-needle",
+      "priority": "B3.13",
+      "title": "Survey Needle resource seeking",
+      "status": "queued",
+      "detail": "Mara's Survey Post teaches one reusable Field Kit instrument tuned at Home to a legitimately known World Resource. One field use spends one world turn and reports only an eight-way shortest-path sector plus faint/steady/strong signal toward the nearest legal interaction position. It does not require extraction capability, so finding Gold can motivate the Field Pick upgrade.",
+      "gate": "Use survey-needle-current.md after resource extraction and adjacent consequence/Look feedback. Prove free exact-instance Home tuning, known-target eligibility, one-turn deterministic readings, path and strength boundaries, missing-capability discovery, no-answer behavior, relaunch, and zero fog/path/coordinate/node-count/minimap disclosure. Keep it distinct from Seamlight and do not expand it into a universal finder.",
       "workstream": "engineering",
       "isPrimary": false
     },

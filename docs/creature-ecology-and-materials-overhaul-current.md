@@ -475,7 +475,8 @@ may add a new creature stat, habitat or drop family.
 3. Implement the exact stack/value/crafting model in `crafting-components-and-schematics-current.md` with
    separate world/creature domains. Do not implement the withdrawn pure-no-grade comparison.
 4. Implement exact remains derivation and remove ordinary unrelated resource/curio drops. Add no rare
-   territory-find category until the current review freezes its gear/consumable/ordinary-key mix.
+   territory-find category until Homework `territory-find-frequency` settles the complete transaction and
+   eligibility authority in `creature-territory-finds-current.md`.
 5. Migrate existing animal `MaterialSample` units losslessly into the settled creature-material stack shape;
    preserve or visibly version-gate saves according to the project's save-compatibility policy.
 6. Split Storehouse/Field/Return presentation into World resources vs Creature materials.

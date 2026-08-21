@@ -1,9 +1,10 @@
 # Binder House, village districts and Library — active AssetLab packet
 
-**Status:** Active Asset Design assignment from the Game Design/Orchestration Lead. Trading Post v0.3, the
-five opening Built/Tier-0 identities, Trading Post/Firepit state continuity, and Binder House v0.1 are accepted
-Game-Design candidates. The only current art checkpoint is the close-up Library; later building families
-remain held. AssetLab only; no native game, Xcode, gameplay schema, roadmap priority or Simulator lifecycle
+**Status:** Checkpoints 1–6 are Game-Design accepted visual candidates: Trading Post v0.3, the five opening
+Built/Tier-0 identities, Trading Post/Firepit state continuity, Binder House v0.1, the runtime-composable
+Library kit and the three runtime opening district roots. Asset pauses at this review boundary; later
+building families, density stress, native packaging and goldens remain held until a separately scheduled
+checkpoint. AssetLab only; no native game, Xcode, gameplay schema, roadmap priority or Simulator lifecycle
 changes.
 **Repository status checked before dispatch:** shared tree reconciled against current status immediately
 before the 21 August assignment; encounter scaling remains the sole Engineering source primary.
@@ -457,11 +458,12 @@ goldens remain unchanged.
 
 ## Review order and stop conditions
 
-Trading Post v0.3 and the Recycler/Blacksmith/Storehouse/Firepit Built/Tier-0 opening identity set are
-Game-Design accepted candidates. Trading Post and Firepit foundation/built/improved/mastered continuity rows,
-independent warm-gold attention overlays, and Binder House v0.1 are also accepted candidates. Current work is
-the close-up Library only. After that review, later buildings proceed in campaign order. Do not batch those
-future milestones merely because their specifications are present in this file.
+Trading Post v0.3, the Recycler/Blacksmith/Storehouse/Firepit Built/Tier-0 opening identity set, Trading Post
+and Firepit foundation/built/improved/mastered continuity rows, independent warm-gold attention overlays,
+Binder House v0.1, the runtime-composable close-up Library kit and the three runtime opening district roots
+are Game-Design accepted candidates. There is no current Asset assignment after checkpoint 6. Do not begin
+later buildings, density stress, native packaging or final zoning merely because their future requirements
+are present in this file.
 
 Stop immediately and report rather than inventing:
 

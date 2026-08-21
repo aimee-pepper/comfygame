@@ -5234,3 +5234,30 @@ overlays in manifest `3c5eb8b8bd9afe5d5fcd09553ac3ed6e4f4cbd7e77ab2f2c10dbe6cd7f
 Empty/early/developed screenshots remain evidence, not state bitmaps. The candidate remains uncommitted,
 unpromoted and `integrationReady:false` until Asset records the checkpoint and Engineering schedules native
 packaging. No broader Library room, top-level Bestiary destination or static shelf snapshots are accepted.
+
+#### Runtime opening district roots v0.1 disposition
+
+**Accepted by Game Design as the production-visual opening Commerce Row, Makers' Row and Commons root
+candidates; native integration remains unaccepted.** Game Design inspected every exact 368×800 opening
+sequence, the combined Binder-House route sheet, all three literal-grayscale developed scenes and the three
+collision/ownership proofs. Commerce reads as an enclosed merchant lane with stable Trading Post and Recycler
+positions; Makers reads as a worn working yard whose opening Blacksmith owns the forge rather than a gray
+placeholder clearing; Commons reads as a brighter shared green with Storehouse and the Built roofless
+communal Firepit. The later roofed Tavern form appears only in the Firepit's already-accepted progression
+state and does not replace the Built hearth identity.
+
+The three 184×300 shells provide environment and fixed runtime slots rather than flattened full-town state
+bitmaps. Accepted building sources remain byte-identical, unknown buildings are literally absent, and each
+state sequence changes only the supplied building/sign/attention regions plus necessary occlusion. Background
+sheds, walls, fences and yard wear remain noninteractive dressing; exact collision proofs give ownership only
+to the supplied buildings and Home return. Districts remain pairwise distinct in literal grayscale, labels
+support rather than rescue the silhouettes, and no walking avatar, route graph, scroll, damage state,
+Workshop or invented station is implied.
+
+The checkpoint manifest is
+`AssetLab/artifacts/opening-district-roots-v0.1/manifest.json`, SHA-256
+`5d3f56d42d08a1d4226d8c82f3be9408e22045c177ac61f47b56172a510889a5`; exact shell hashes and evidence are
+recorded there. This remains a **Game Design candidate only** while uncommitted/unpromoted and
+`integrationReady:false`. It does not authorize native asset packaging, later district density, later
+building states, final zoning or new goldens. Asset pauses at checkpoint 6 until a separate next assignment
+is scheduled.
