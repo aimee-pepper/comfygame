@@ -159,7 +159,8 @@ When two documents disagree:
 | Slot-free harvest reserve foundation | `world-resource-reserve-current.md` | Exact property-bearing harvests are slot-free; current combined category is transitional |
 | Creature ecology and materials | `creature-ecology-and-materials-overhaul-current.md` | Habitat-aware pressure-generated life including deep water; body-derived Creature materials and rare encounter-level territory gear |
 | Earlier loot quality hybrid review | `loot-quality-hybrid-review-current.md` | Historical first candidate; superseded for current review by the crafting-intuition audit |
-| Crafting intuition and quality review | `crafting-intuition-and-quality-review-current.md` | Settled six bands, 70/30 component weighting, no hard station cap and Refitting; complete ComponentProfile/schematic tables still required before implementation |
+| Crafting intuition and quality review | `crafting-intuition-and-quality-review-current.md` | Settled six bands, 70/30 component weighting, no hard station cap and Refitting; exact content now delegated to the component/schematic authority |
+| Crafting components and schematics | `crafting-components-and-schematics-current.md` | Complete World/Creature component profiles, exact 21-Schematic socket lists, contribution scales, migration and Pointed Blade fixture |
 | Library shelves | `library-shelves-current.md` | Close-up Library root, reusable runtime-composed collection assets, habitat/Dictionary volumes and per-diary page→book progression |
 | Internal Game Wiki | `game-wiki-content-contract-current.md` | Required route depth, catalogue/resource taxonomy, stable detail pages and automatic no-placeholder completeness gates |
 | World-resource extraction | `resource-extraction-progression-current.md` | Equipped Field Pick ranks; disclosed Gold progression; complete mineral table and no-deadlock Iron |
