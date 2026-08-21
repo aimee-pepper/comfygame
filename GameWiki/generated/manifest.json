@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "aggregateSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
+  "aggregateSourceHash": "304195e71a2ea6aa7ce28670e1d3e6d8d2e7f618a3b5b943ae653977ebf86208",
   "inputs": {
     "Sources/Content/Data/items.json": "b94b1107229f217e14f1d7fa936d8eea938f9782c06c583be32302f10d432bc9",
     "Sources/Content/Data/playability-roadmap.json": "2ab045a5a59658f9558a347379994a1ec6056d52882d23b04edcf6bb6ed149e4",
@@ -161,7 +161,7 @@
     "docs/full-cast-voice-authority-current.md": "619c9f993853e8d990ef89b85fdf9c39c9dc759a90dd9c74bb865521d2cd8501",
     "docs/gambit-stat-thresholds-current.md": "6549465eed132bc9b7c7dca35df9ce457e9772f583d3290a7c6d26849a0889db",
     "docs/game-design-ux-assessment-current.md": "495980049344c1f8c025e0a6bb6bfd3d464f9ee188fa301473659a5b25f9a931",
-    "docs/game-wiki-content-contract-current.md": "0687f1f9d023ca8a2b94415854e90bd8b9475d514c6599e8f39801f2a4cbb45b",
+    "docs/game-wiki-content-contract-current.md": "c0d712b176fe05d46631d0c8f61caf8c3daa4ad82041ab44eec391a1f379b66a",
     "docs/gear-crafting-families-current.md": "c264201890e85ee5fbebfde27e4edef64e7529218ff24c7e9da660f1b52172fd",
     "docs/generated-companion-arrival-builds-current.md": "1f9c3d35e2a5ffc0a8b472cac33e14f5b9619a6f4c3b09acadd4b2a6e8d354fc",
     "docs/glass-quartz-waystone-audit-current.md": "cddf5ddb222afe5173020d2785c4f94da1287b2df138e2d58900eb8c623bb1f5",
@@ -270,7 +270,7 @@
     "docs/writing-tool-progression-current.md": "be17fe07aa89aaaab7117a2faca43d7e1eb1be23202d19106c67c42547b23bb0"
   },
   "outputs": {
-    "generated/wiki-data.json": "a5d52715f2729ef386dd144796db018bccc9e295f6dc87dec7023ec92193e431",
-    "generated/source-registry.json": "71c4d8c8c283ff8e7aceb2db2c57bfa7db345f9243f7d947edfcd306462dd6f3"
+    "generated/wiki-data.json": "6c672f1cd646d89540959b9bc48c931190bb8cb381c7c352a1d53a0a79dcc298",
+    "generated/source-registry.json": "2898b6620445b830ae456bd99cc40eb1b962c2acfb12c54c707cb2425dde5875"
   }
 }
