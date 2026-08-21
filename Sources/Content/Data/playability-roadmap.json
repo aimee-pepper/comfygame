@@ -1,6 +1,6 @@
 {
   "schemaVersion": 3,
-  "updated": "18 Aug 2026",
+  "updated": "20 Aug 2026",
   "essenceBaseline": "a816113",
   "campaignBands": [
     {
@@ -13,7 +13,7 @@
       "id": "band-1",
       "title": "Band 1 · First world, fight and return",
       "reach": "Worlds 1–3 · Binder + Quill · levels 1–3",
-      "itemIDs": ["encounter-scaling", "field-kit-loadout", "essence", "starter-world-pages", "collapse-hud-truth", "terrain-blocked-feedback", "world-visibility", "location-clue-plain-language", "world-resource-reserve", "field-note-generator", "field-controls", "world-color", "world-contact", "encounter-opening", "return-receipt-authority", "failure-retention-correctness", "combat-affliction-authority"]
+      "itemIDs": ["encounter-scaling", "field-kit-loadout", "essence", "starter-world-pages", "collapse-hud-truth", "terrain-blocked-feedback", "world-visibility", "location-clue-plain-language", "world-resource-reserve", "field-note-generator", "seamlight", "field-controls", "world-color", "world-contact", "encounter-opening", "return-receipt-authority", "failure-retention-correctness", "combat-affliction-authority"]
     },
     {
       "id": "band-2",
@@ -25,7 +25,7 @@
       "id": "band-3",
       "title": "Band 3 · Early knowledge and choices",
       "reach": "Worlds 5–15 · levels 4–10 · Mara through Orsa",
-      "itemIDs": ["wild-world-pages", "early-knowledge-stations", "combat-tree-opening-choices", "refining", "constellation-first-slice", "penmanship-native", "colored-ink-mixing"]
+      "itemIDs": ["wild-world-pages", "early-knowledge-stations", "combat-tree-opening-choices", "refining", "constellation-first-slice", "penmanship-native", "colored-ink-mixing", "equipment-inscriptions"]
     },
     {
       "id": "band-4",
@@ -111,6 +111,26 @@
       "detail": "Source checkpoint 8b32b51 replaces the generic rotating notes with the authored field-note grammar and freezes a truthful local terrain, light/air, growth, water or visible-trace fact from the writing host and its disclosed surroundings.",
       "gate": "Every note stores stable template/fact identity, safe qualitative tokens and final prose; tokens recompute from saved local facts; slow/sight/impassable claims match live rules; no remote POI/resource/person/species/apex or analysis-only fact leaks; repeated notes in one world prefer distinct facts; save/load and anchored revisit preserve exact wording; blank worlds retain a truthful terrain fallback. Authority: field-note-grammar-current.md.",
       "workstream": "engineering",
+      "isPrimary": false
+    },
+    {
+      "id": "seamlight",
+      "priority": "B1.6",
+      "title": "Seamlight portal guidance",
+      "status": "queued",
+      "detail": "Add the approved Field Kit supply that spends one world turn and then shows soft directional arcs along the first step of the shortest currently walkable route to the nearest standing portal. Brightness rises with proximity; it never reveals the portal, route, distance or minimap POI and never returns the party automatically.",
+      "gate": "Use seamlight-current.md. Exact-instance use, duplicate refusal, relaunch, blocked-terrain routing, collapse retargeting, far/near/on-portal feedback, fog/minimap nondisclosure, Trading Post stock and Apothecary Fieldwork recipe pass. It does not extend the Wayfarer's Table or pre-empt active Band 1.3 scaling acceptance.",
+      "workstream": "design",
+      "isPrimary": false
+    },
+    {
+      "id": "equipment-inscriptions",
+      "priority": "B3.4",
+      "title": "Equipment inscriptions and Seamward",
+      "status": "queued",
+      "detail": "Add the Scriptorium-owned authored equipment-enchantment system for one inscription on one exact Body or Keepsake item. The first recipe sacrifices a Seamlight to make Seamward, which wakes only during collapse and provides the same fog-neutral portal guidance without consuming an expedition item or turn.",
+      "gate": "Use equipment-inscription-system-current.md after Seamlight, exact gear identity and Scriptorium Ink preparation are stable. Prove atomic install/erase, slot eligibility, stable-instance persistence, reforge/equip/trade/recycle retention, frozen departure ownership, collapse-only activation, duplicate nonstacking, route retargeting and portal/minimap nondisclosure. Do not infer inscriptions from arbitrary consumables or make Waystone inscribable.",
+      "workstream": "design",
       "isPrimary": false
     },
     {
@@ -268,8 +288,8 @@
       "priority": "B0.2",
       "title": "Start, load and delete saves",
       "status": "readyToTest",
-      "detail": "Checkpointed through b3bc410: post-loading Continue/New/Load chooser, independent autosaves, lossless legacy adoption, safe details/delete/export, Settings return without relaunch, active-slot-first Continue semantics and progression-driven campaign shelves.",
-      "gate": "Existing single save migrates losslessly; new games never overwrite another slot; Continue chooses the persisted active valid slot then falls back to the most recently played valid slot; delete requires explicit confirmation and cannot strand the app; corrupted or incompatible slots fail visibly without harming healthy saves.",
+      "detail": "Save semantics are source-complete through b3bc410: post-loading Continue/New/Load chooser, independent autosaves, lossless legacy adoption, safe details/delete/export and active-slot-first Continue. The Campaign visual is not accepted: the frozen reference, dirty native candidate and current review ledger disagree, so correct persistence must not be reported as an accepted Campaign screen.",
+      "gate": "Reconcile one Campaign shelf where tapping selects, explicit Continue loads the selected healthy campaign, visible Details owns Export/confirmed Delete, and no essential action is long-press-only; then prove existing-save migration, independent New Game slots, corrupt/future visibility, relaunch and exact delete safety on the installed phone build.",
       "workstream": "acceptance",
       "isPrimary": false
     },
@@ -298,8 +318,8 @@
       "priority": "P1",
       "title": "Spatial game hubs",
       "status": "readyToTest",
-      "detail": "Library author-vs-subject indexes, compact Party fit, six-across Storehouse resources and the four-section Base destination board are checkpointed.",
-      "gate": "Full suite plus 368×800 and large-text inspection before the next phone install.",
+      "detail": "Several semantic shells are source-complete, but the first-loop presentation is split across receipts. origin/main is 66f728f; clean branch 2d2e7ce contains later Home/Writing/World/Return work and is the strongest source receipt for phone build 234. Campaign and Writing remain visually unresolved, Home has a queued departure correction, and no screen in the chain is playtest-accepted merely because that branch is installed.",
+      "gate": "Reconcile Campaign, Home departure, Writing projection, World and Return screen by screen under cross-lead-delivery-contract-current.md; integrate one clean shared checkpoint, install it with exact provenance, then pass Campaign → Home → Writing → World → Return without invented mechanics, manufactured scrolling or a visually rejected sibling riding inside a package approval.",
       "workstream": "acceptance",
       "isPrimary": false
     },
@@ -418,10 +438,10 @@
       "priority": "P1",
       "title": "Recognizable item and character tiles",
       "status": "readyToTest",
-      "detail": "This source checkpoint freezes strict generated command/raster validation and carries stable ItemID through Storehouse, loot, equipment, Blacksmith, Trading Post and Recycler. Exact TravellerID selects the immutable map sprite as well as Party and Library cameos; missing, unknown, generated, Binder and Quill identities retain explicit visible fallbacks.",
-      "gate": "Stable authored identity survives Storehouse, loot, equipment, Trading Post and Recycler; named-character identity survives map, Party and Library; rarity, stats and array order never invent identity.",
+      "detail": "Source-complete and parked for acceptance: strict generated command/raster validation carries stable ItemID through Storehouse, loot, equipment, Blacksmith, Trading Post and Recycler. Exact TravellerID selects map, Party and Library cameos; functional placeholder packs remain distinct from final art. No Asset consumer is active merely because this checkpoint awaits review.",
+      "gate": "When its Band-2 acceptance becomes current, prove stable authored identity across Storehouse, loot, equipment, Trading Post and Recycler and named-character identity across map, Party and Library; rarity, stats and array order never invent identity. Until then Asset may be idle.",
       "workstream": "asset",
-      "isPrimary": true
+      "isPrimary": false
     },
     {
       "id": "combat-tree-v2",

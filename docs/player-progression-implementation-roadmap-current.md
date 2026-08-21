@@ -1,7 +1,7 @@
 # Player-progression implementation roadmap — current
 
 **Status:** operational ordering authority beneath Aimee's priority calls  
-**Date:** 14 August 2026  
+**Date:** 20 August 2026
 **Purpose:** order implementation by what a real fresh-save player can reach and test, rather than
 by whichever late dependency is easiest to isolate in code.
 
@@ -9,6 +9,26 @@ This document supersedes any plan that treats “finish all combat nodes,” “
 “clear every implementation-ready design” as one active work item. The machine board remains
 `Sources/Content/Data/playability-roadmap.json`; its sequence and priorities must agree with the
 bands below.
+
+## Current reconciliation — 20 August
+
+- The shared checkout is stale and dirty at `7a8b18c`; `origin/main` is `66f728f`. It is not a safe
+  implementation base until the unrelated Design, AssetLab and Campaign packets are separated.
+- The clean `codex/world-approved-ui` branch at `2d2e7ce` contains later Home, Writing Desk, World
+  and Return Recap work and is the strongest known source for installed phone build 234. The bundle
+  cannot independently disclose its commit, so this remains an install receipt rather than proof
+  of player acceptance.
+- Campaigns is visually unresolved; Home is visually queued with a departure-behavior correction;
+  Writing Desk's latest projection correction remains an isolated AssetLab candidate; World and
+  Return Recap are source/installed candidates awaiting ordinary-play disposition.
+- No Engineering source slice and no Asset consumer are currently active. Asset may remain idle.
+- **Encounter scaling remains the one acceptance primary.** The next product milestone is not a
+  late feature: it is one accepted Campaign → Home → Writing → World → Return chain supporting three
+  fresh-save expeditions.
+
+Receipt meanings and mockup behavior fences are authoritative in
+`cross-lead-delivery-contract-current.md`. A source-complete item parked for a later reachable band
+is not a request for Aimee to test it now.
 
 ## The pipeline rule
 
@@ -257,15 +277,25 @@ missing station, inert progression purchase, placeholder gameplay promise or unr
 
 ## Immediate order from this audit
 
-1. Safely close/checkpoint any already-finished equipment/UI handoff; begin no replacement task.
-2. Install a clean current build containing the already-source-complete Band 0/1 corrections.
-3. Aimee runs the Band 0 card once.
-4. Aimee runs three controlled Band 1 expeditions, beginning with level-1 Normal versus Teeming
-   combat. Engineering diagnoses and corrects only observed Band 1 blockers.
-5. While Aimee tests Band 1, Engineering may work only on missing Band 2 opening-economy/content
-   requirements; Asset supports Band 1/2 recognition; Design prepares Band 3.
-6. Pause blanket combat-v2 work. Resume only the first-three-point consumer set after Band 1 exits.
-7. Do not expand Channelworks, Deep Works, Distillery, Menagerie, late stations, anchoring depth or
+1. Preserve the known installed phone build and separate the shared dirty packets. Do not merge or
+   overwrite AssetLab, Design or held Campaign work merely to make the checkout look clean.
+2. Reconcile the clean `2d2e7ce` UI branch screen by screen against the current visual ledger and
+   `cross-lead-delivery-contract-current.md`. A package-level `integrationReady` flag cannot promote
+   a rejected Campaign or Writing candidate.
+3. Correct and freeze Campaign, Home departure, Writing projection, World presentation and Return
+   Recap as bounded screens; integrate them onto one clean shared line.
+4. Install that exact checkpoint. Aimee runs the Band-0 route once and then the three-expedition
+   Band-1 card. Encounter scaling remains the sole acceptance primary during this pass.
+5. Engineering fixes only failures in that chain. When Aimee is actively testing the installed
+   checkpoint, the only permitted next preparation is a bounded Band-2 opening-economy or opening-
+   traveller dependency that does not overlap the protected UI files.
+6. Asset supports only the named current screen/identity consumer and may be idle. A visually
+   appealing proof for a later system is not substitute work.
+7. Promote completed traveller meetings in reachability order rather than waiting for Atlas
+   preapproval: opening trio, then Band 3, then later bands as the campaign can encounter them.
+8. Pause blanket combat-v2 work. Resume the first-three-point consumer set after Band 1 exits; deeper
+   routes wait for saves that can reach them.
+9. Do not expand Channelworks, Deep Works, Distillery, Menagerie, late stations, anchoring depth or
    late capstones until their bands become current.
 
 Already-built late work is preserved and tested when reached. The correction is about where new
