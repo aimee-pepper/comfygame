@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "sources": [
+    "Sources/Content/Data/stations.json",
+    "docs/station-integration-matrix-current.md",
+    "docs/home-house-and-village-current.md"
+  ],
+  "zones": {
+    "writing_desk": "Binder House",
+    "storehouse": "The Commons",
+    "workshop": "Compatibility-only; destination removed",
+    "party": "Binder House",
+    "essence_spring": "Binder House yard",
+    "constellation": "Role under review",
+    "library": "Binder House",
+    "trading_post": "Commerce Row",
+    "recycler": "Commerce Row",
+    "firepit": "The Commons",
+    "bestiary": "Inside the Library",
+    "wayfarers_table": "The Commons",
+    "anchorage": "The Commons"
+  },
+  "keepers": {
+    "library": "lys",
+    "firepit": "orsa"
+  },
+  "dispositions": {
+    "workshop": "removed",
+    "constellation": "provisional"
+  }
+}

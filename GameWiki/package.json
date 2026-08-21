@@ -1,0 +1,13 @@
+{
+  "name": "bookbinder-internal-wiki",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "generate": "node scripts/generate.mjs",
+    "check": "node scripts/check.mjs",
+    "build": "node scripts/build.mjs",
+    "test": "node scripts/test.mjs",
+    "serve": "node scripts/serve.mjs"
+  }
+}
