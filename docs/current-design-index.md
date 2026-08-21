@@ -161,6 +161,7 @@ When two documents disagree:
 | Essence continuation economy | `essence-continuation-economy-current.md` | Authored-world continuation invariant, temporary Raw Essence profiles and required runway telemetry |
 | Slot-free harvest reserve foundation | `world-resource-reserve-current.md` | Exact property-bearing harvests are slot-free; current combined category is transitional |
 | Creature ecology and materials | `creature-ecology-and-materials-overhaul-current.md` | Habitat-aware pressure-generated life including deep water and body-derived Creature materials |
+| Creature material projection | `creature-material-projection-authority.json` | Exact v1 species→family, capability, quality-input and deterministic quantity machine authority |
 | Creature territory finds | `creature-territory-finds-current.md` | One rare encounter-level found-object roll; exact gear/consumable/Cache-Key eligibility, provenance, capacity and disclosure |
 | Earlier loot quality hybrid review | `loot-quality-hybrid-review-current.md` | Historical first candidate; superseded for current review by the crafting-intuition audit |
 | Crafting intuition and quality review | `crafting-intuition-and-quality-review-current.md` | Settled six bands, 70/30 component weighting, no hard station cap and Refitting; exact content now delegated to the component/schematic authority |

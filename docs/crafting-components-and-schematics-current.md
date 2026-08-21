@@ -97,6 +97,10 @@ in the ecology authority. Freeze:
 Encounter danger uses the same six values above. Quantity remains morphology-derived and deterministic; it
 does not improve quality.
 
+`encounterDanger` is the bound world's frozen source Danger band before party-size/level scaling. Adaptive
+combat pressure, DEBUG profiles, God mode and later party growth never improve or reroll materials from the
+same saved species/world.
+
 ### Score → band
 
 | Score | Band |

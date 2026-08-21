@@ -13,6 +13,10 @@ persistence, placement, movement, combat rewards and migration; Asset Design own
 silhouette proofs; Aimee owns final creature and material art.
 **Updated:** 21 August 2026
 
+Machine authority and freshness gate:
+`creature-material-projection-authority.json` and
+`python3 scripts/validate_creature_material_projection.py`.
+
 ## Player outcome
 
 World pressures grow a small coherent ecosystem rather than recolouring generic land animals. A wet world
@@ -75,13 +79,21 @@ bodyPlan
 cranialFeature
 appendageType
 appendageCount
-coveringFamily
+toxinPotency
+materialProjectionVersion
+materialProjection
 materialProfileVersion
 ```
 
 `habitat`, body/morphology fields and the existing gameplay trait vector are generated once and persisted.
 Rendering, naming, placement, movement, combat and remains all consume that same identity. No consumer
 re-derives a different fish/body/covering interpretation from colour or a display name.
+
+`materialProjection` is the frozen species-level list of eligible material families, their exact
+`partExpression` and deterministic per-specimen quantity. It is derived once from the species trait vector
+under the exact rules below. Cosmetic specimen jitter never changes drops, quality or quantity. Encounter
+danger may change the final quality band through the separately frozen 75/25 formula, but a later balance or
+threshold edit cannot turn an existing saved species' Hide into Plate.
 
 Generation uses its own deterministic species-identity salt and must not consume or reorder gameplay RNG.
 Existing saved species/worlds retain their stored v1 traits/placements. New worlds use the new schema. A
@@ -190,11 +202,12 @@ Creature-material presentation always links back to legitimately learned species
 aggregates by exact `domain + family + qualityBand` (`Fine Feathers ×8`), and detail shows known source records;
 it does not pretend a merged unit retains one exact source. Creature materials never consume item slots.
 
-## Withdrawn pure-no-grade replacement (comparison only; do not implement)
+## Archived rejected pure-no-grade replacement (history only; skip for implementation)
 
-> This section records the fully traced consequences of deleting grade, which is useful when comparing the
-> hybrid candidate. It is no longer current implementation authority. The hybrid review owns the open
-> decision; history remains here until that decision is settled and this section can move to the archive.
+> **Do not implement any passage in this section.** It preserves the rejected no-quality alternative and
+> its consequences so the project's decision history remains readable. The current six-band model above,
+> `crafting-components-and-schematics-current.md`, and the exact derivation below supersede it. Current
+> readers should continue at **Exact frozen material projection**.
 
 Removing `MaterialSample.grade` is not a copy change. The current value also controls construction tier,
 Trading Post price, Distillery potency, Scent Mask eligibility, Recycler defaults and several automatic
@@ -344,83 +357,175 @@ The version transition is accepted only when a fixture covering every old `Mater
 same number of units before and after migration and all grade-dependent live consumers have zero current
 references.
 
-## Exact remains derivation
+## Exact frozen material projection
 
-One defeated ordinary creature produces at most four semantic groups. Every group is derived, never rolled
-from a catalogue drop table.
+One defeated ordinary creature produces the material families frozen on its species ecology identity.
+There is no catalogue drop roll. Teeming and multi-creature encounters aggregate the deterministic result
+once per defeated creature, then present one row per `family + qualityBand` rather than nineteen `+1` rows.
 
-### 1. Covering/appendage group
+All numeric inputs are clamped to `0...100` before comparison. Boundary comparisons below are inclusive
+unless written as `<`. The v1 constants deliberately reuse the current live meaningful-part boundaries
+where those already exist:
 
-Choose the characteristic external material in this order:
+| Constant | Exact v1 value |
+|---|---:|
+| minimum covering coverage | `15` |
+| minimum meaningful armament total | `30` |
+| minimum structural bone density | `20` |
+| minimum emanation strength | `25` |
+| soft/scaleless hardness boundary | `25` |
+| overlapping scale hardness boundary | `35` |
+| hard covering boundary | `55` |
+| plate hardness boundary | `70` |
+| long covering boundary | `45` |
+| dense covering boundary | `50` |
+| Down insulation boundary | `25` |
+| Oil insulation boundary | `45` |
 
-1. feathered appendages → `feather`; also add `down` only when insulation clears the configured threshold;
-2. aquatic habitat or piscine body with sufficient covering → `scale`; a soft/scaleless result may yield
-   `hide` instead;
-3. segmented hard-covered body → `chitin`;
-4. radial hard-covered body → `shell`;
-5. other long hard covering → `quill`;
-6. other very hard/dense covering → `plate`;
-7. other moderately hard overlapping covering → `scale`;
-8. other long dense soft covering → `pelt`;
-9. other sufficient soft covering → `hide`;
-10. insufficient covering → none.
+Derived helper values are exact:
 
-Finned appendages add `fin` when present. A creature may therefore yield Scale + Fin, or Feather + Down,
-but never five near-synonymous covering kinds.
+```text
+armourValue       = covering.hardness × covering.coverage / 100
+insulation        = covering.length × covering.coverage / 100
+flexibility       = clamp((100 - covering.hardness) × (0.5 + covering.length / 200))
+appendageExtent   = clamp(appendageCount / 8 × 100)
+finishLustre      = clamp(finish.shine + finish.schiller)
+toxinPotency      = isToxic
+                     ? clamp(round(0.70 × coloration.patterning + 0.30 × ornament))
+                     : 0
+sizeBand          = clamp(1 + floor(size / 25), 1, 4)
+appendageBand     = clamp(ceil(appendageCount / 2), 1, 4)
+appendageQuantity = clamp(roundHalfUp(0.5 × sizeBand + 0.5 × appendageBand), 1, 4)
+```
 
-### 2. Armament group
+### 1. Primary covering and appendages
 
-If armament clears the existing meaningful-part threshold:
+Resolve one primary covering family in this exact first-match order:
 
-- dominant pierce → `fang`;
-- dominant rend → `claw`;
-- dominant crush with horn cranial feature → `horn`;
-- other dominant crush → `tusk`.
+1. `appendageType == feathered` and `appendageCount > 0` → `feather`;
+2. `(habitat == aquatic || bodyPlan == piscine)` and `covering.coverage >= 15` and
+   `covering.hardness >= 25` → `scale`;
+3. `(habitat == aquatic || bodyPlan == piscine)` and `covering.coverage >= 15` → `hide`;
+4. `bodyPlan == segmented`, `coverage >= 15`, `hardness >= 55` → `chitin`;
+5. `bodyPlan == radial`, `coverage >= 15`, `hardness >= 55` → `shell`;
+6. `coverage >= 15`, `hardness >= 55`, `length >= 45` → `quill`;
+7. `coverage >= 15`, `hardness >= 70` → `plate`;
+8. `coverage >= 15`, `hardness >= 35` → `scale`;
+9. `coverage >= 50`, `length >= 45` → `pelt`;
+10. `coverage >= 15` → `hide`;
+11. otherwise no primary covering material.
 
-### 3. Structural group
+Then add these non-synonymous appendage materials independently:
 
-Add `bone` when bone density clears the structural threshold and the body is not a genuinely unsupported
-amorphous form. Aquatic creatures may still yield bone; being a fish does not imply a boneless skeleton.
+- feathered primary + `insulation >= 25` → add `down`;
+- `appendageType == finned` and `appendageCount > 0` → add `fin`.
 
-### 4. Special group
+The primary result does not also add another primary covering. A feathered hard-bodied species yields its
+characteristic Feathers rather than a second guessed Plate family; its hardness still contributes to the
+Feather quality only where the exact capability table says so.
 
-- toxic/aposematic creature → `venom`;
-- aquatic creature with high insulation/body investment → `oil`;
-- emanation above the existing meaningful-part threshold → `ichor`.
+### 2. Armament
 
-Venom and Ichor are creature materials, not ordinary named world-resource nodes. Migrate/retire any
-ordinary world-node path that produces generic Ichor without a creature source.
+When `armament.total >= 30`, add exactly one armament family:
 
-### Quantity
+- dominant Pierce → `fang`;
+- dominant Rend → `claw`;
+- dominant Crush + `cranialFeature == horns` → `horn`;
+- other dominant Crush → `tusk`.
 
-Quantity is a deterministic size/part bucket, not a quality roll:
+Below `30` yields no armament material. Equal damage values use the live stable dominance order already
+owned by `CreatureTraits`: Pierce, then Crush, then Rend.
 
-- covering/appendage bundles: 1–4 from body size and appendage count;
-- armament parts: 1–2 from the relevant anatomy/count;
-- bone bundles: 1–3 from body size and bone density;
-- oil/venom/ichor: 1–2 from the producing trait strength.
+### 3. Structure
 
-The exact integer curves are tuning data, but identical frozen specimen traits must produce identical
-families/quantities across save/load. No `±1` loot RNG remains.
+When `boneDensity >= 20` and `bodyPlan != amorphous`, add `bone`. Habitat does not decide whether a species
+has bones: aquatic species may yield Bone, while a truly amorphous body never does.
+
+### 4. Special materials
+
+Add every independently true special family; these are distinct tissues, not synonyms:
+
+- `isToxic == true` and `toxinPotency > 0` → `venom`;
+- `habitat == aquatic` and `insulation >= 45` → `oil`;
+- `emanation.strength >= 25` → `ichor`.
+
+This may produce more than one special family on an unusual species. Venom and Ichor are Creature
+materials, never ordinary World-resource nodes. The legacy `world.ichor` route is migration-only and never
+merges with `creature.ichor`.
+
+### 5. Exact part expression and quality input
+
+Each projected family freezes the following two capabilities. `partExpression` is their arithmetic mean,
+rounded half up. This is the missing ecology input consumed by the settled quality formula:
+
+`qualityScore = round(0.75 × partExpression + 0.25 × encounterDanger)`.
+
+Here `encounterDanger` means the bound world's frozen **source Danger band** mapped through the six values
+in the crafting authority. It is captured before party-size/level encounter scaling. God mode, DEBUG tuning,
+party growth, adaptive foe HP/slots and repeating the same anchored world cannot improve material quality.
+
+| Family | Capability A | Capability B |
+|---|---|---|
+| Hide | covering coverage | flexibility |
+| Pelt | insulation | covering coverage |
+| Down | insulation | flexibility |
+| Feather | appendage extent | finish lustre |
+| Fin | appendage extent | flexibility |
+| Bone | bone density | size |
+| Scale | covering hardness | covering coverage |
+| Quill | covering hardness | covering length |
+| Fang | armament Pierce | bone density |
+| Claw | armament Rend | bone density |
+| Oil | insulation | size |
+| Plate | covering hardness | armour value |
+| Chitin | covering hardness | finish Schiller |
+| Shell | covering hardness | armour value |
+| Tusk | armament Crush | bone density |
+| Horn | armament Crush | bone density |
+| Venom | toxin potency | coloration patterning |
+| Ichor | emanation strength | finish lustre |
+
+The six resulting bands and encounter-danger values are exactly those in
+`crafting-components-and-schematics-current.md`. No continuous bar, `max(properties)`, old rarity color or
+catalogue tier becomes a second quality authority.
+
+### 6. Exact quantity
+
+The frozen per-defeated-specimen quantities are:
+
+| Family group | Exact quantity |
+|---|---|
+| primary Hide/Pelt/Scale/Plate/Chitin/Shell/Quill | `sizeBand` (`1...4`) |
+| Feather or Fin | `appendageQuantity` (`1...4`) |
+| Down | `sizeBand` (`1...4`) |
+| Fang/Claw/Tusk/Horn | `2` when `armament.total >= 65`, otherwise `1` |
+| Bone | `clamp(1 + floor(size / 34), 1, 3)` |
+| Oil | `2` when `insulation >= 70`, otherwise `1` |
+| Venom | `2` when `toxinPotency >= 70`, otherwise `1` |
+| Ichor | `2` when `emanation.strength >= 70`, otherwise `1` |
+
+There is no `±1` loot RNG. Same saved species identity plus frozen source-Danger band produces the same family,
+band and quantity receipts across relaunch. Specimen cosmetic jitter never changes the projection.
 
 ## Combat reward correction
 
 For ordinary generated animals:
 
 - remove the unrelated named-world-resource roll from combat victory;
-- remove the generic random curio/key drop;
-- award XP plus morphology-derived creature materials;
-- make one isolated **3% gear roll per victorious encounter**, never per defeated creature.
+- remove every generic per-creature gear/curio/key roll;
+- award XP plus the exact morphology-derived Creature materials above; and
+- keep the optional **one-roll-per-victorious-encounter** territory-find transaction completely separate.
 
-On a successful gear roll, award at most one eligible ordinary gear item from the encounter's current
-campaign/danger band. Present it as equipment recovered from the creature's territory, nest or traces—not as
-a body part and not as something every animal literally carried. It cannot generate a key, quest object,
-authored unique, apex weapon or item above the source cap. Teeming/multi-creature encounters still receive
-one roll. The first slice has no pity timer; DEBUG receipts expose the roll and chosen table.
+`creature-territory-finds-current.md` is the sole authority for that optional transaction. Its current
+recommendation is 3% eligible ordinary gear, 1.5% eligible consumable and 0.5% ordinary Cache Key, pending
+Homework `territory-find-frequency`. It presents the object as **Found nearby** in a den, nest, wrack or
+other persisted habitat-compatible trace. No territory-find implementation begins until that Homework
+choice is saved. Teeming and number of defeated creatures never add rolls.
 
-Named world resources come from resource nodes, flora, sites and authored rewards. Most gear comes from
-sites, Trading Post, crafting, travellers/guardians or another explicit provenance; the rare territory roll
-is the only ordinary-animal exception. An ordinary animal never drops an unidentified key.
+Named World resources come from resource nodes, flora, sites and authored rewards. Most gear and
+consumables come from sites, Trading Post, crafting, travellers/guardians or another explicit provenance;
+the rare territory roll is the only ordinary-animal exception. It can produce only the exact ordinary Cache
+Key route, never a story key, quest object, Anchor Frame, authored unique or unidentified generic key.
 
 Apex encounters retain their separately authored/generated apex trophy/weapon route, plus their actual
 creature materials. A guardian or authored non-animal encounter may retain explicit reward rules, but must

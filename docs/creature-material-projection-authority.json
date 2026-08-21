@@ -1,0 +1,94 @@
+{
+  "schemaVersion": 1,
+  "authorityID": "creature-material-projection-v1",
+  "updated": "2026-08-21",
+  "status": "settled-design-not-live",
+  "scale": { "minimum": 0, "maximum": 100 },
+  "constants": {
+    "minimumCoveringCoverage": 15,
+    "minimumArmamentTotal": 30,
+    "minimumBoneDensity": 20,
+    "minimumEmanationStrength": 25,
+    "softScalelessHardnessBoundary": 25,
+    "scaleHardnessBoundary": 35,
+    "hardCoveringBoundary": 55,
+    "plateHardnessBoundary": 70,
+    "longCoveringBoundary": 45,
+    "denseCoveringBoundary": 50,
+    "downInsulationBoundary": 25,
+    "oilInsulationBoundary": 45,
+    "twoPartArmamentBoundary": 65,
+    "twoUnitSpecialBoundary": 70
+  },
+  "derivedCapabilities": {
+    "armourValue": "covering.hardness * covering.coverage / 100",
+    "insulation": "covering.length * covering.coverage / 100",
+    "flexibility": "clamp((100 - covering.hardness) * (0.5 + covering.length / 200), 0, 100)",
+    "appendageExtent": "clamp(appendageCount / 8 * 100, 0, 100)",
+    "finishLustre": "clamp(finish.shine + finish.schiller, 0, 100)",
+    "toxinPotency": "isToxic ? clamp(roundHalfUp(0.70 * coloration.patterning + 0.30 * ornament), 0, 100) : 0",
+    "sizeBand": "clamp(1 + floor(size / 25), 1, 4)",
+    "appendageBand": "clamp(ceil(appendageCount / 2), 1, 4)",
+    "appendageQuantity": "clamp(roundHalfUp(0.5 * sizeBand + 0.5 * appendageBand), 1, 4)"
+  },
+  "primaryCoveringRules": [
+    { "priority": 1, "id": "feathered", "family": "feather", "when": "appendageType == feathered && appendageCount > 0" },
+    { "priority": 2, "id": "aquatic_scaled", "family": "scale", "when": "(habitat == aquatic || bodyPlan == piscine) && covering.coverage >= 15 && covering.hardness >= 25" },
+    { "priority": 3, "id": "aquatic_soft", "family": "hide", "when": "(habitat == aquatic || bodyPlan == piscine) && covering.coverage >= 15" },
+    { "priority": 4, "id": "segmented_hard", "family": "chitin", "when": "bodyPlan == segmented && covering.coverage >= 15 && covering.hardness >= 55" },
+    { "priority": 5, "id": "radial_hard", "family": "shell", "when": "bodyPlan == radial && covering.coverage >= 15 && covering.hardness >= 55" },
+    { "priority": 6, "id": "long_hard", "family": "quill", "when": "covering.coverage >= 15 && covering.hardness >= 55 && covering.length >= 45" },
+    { "priority": 7, "id": "very_hard", "family": "plate", "when": "covering.coverage >= 15 && covering.hardness >= 70" },
+    { "priority": 8, "id": "overlapping_hard", "family": "scale", "when": "covering.coverage >= 15 && covering.hardness >= 35" },
+    { "priority": 9, "id": "long_dense_soft", "family": "pelt", "when": "covering.coverage >= 50 && covering.length >= 45" },
+    { "priority": 10, "id": "ordinary_covering", "family": "hide", "when": "covering.coverage >= 15" }
+  ],
+  "additionalFamilies": [
+    { "family": "down", "when": "primaryCovering == feather && insulation >= 25" },
+    { "family": "fin", "when": "appendageType == finned && appendageCount > 0" }
+  ],
+  "armamentFamilies": {
+    "minimumTotal": 30,
+    "pierce": "fang",
+    "rend": "claw",
+    "crushWithHorns": "horn",
+    "otherCrush": "tusk",
+    "tieOrder": ["pierce", "crush", "rend"]
+  },
+  "structuralFamily": {
+    "family": "bone",
+    "when": "boneDensity >= 20 && bodyPlan != amorphous"
+  },
+  "specialFamilies": [
+    { "family": "venom", "when": "isToxic && toxinPotency > 0" },
+    { "family": "oil", "when": "habitat == aquatic && insulation >= 45" },
+    { "family": "ichor", "when": "emanation.strength >= 25" }
+  ],
+  "families": [
+    { "id": "hide", "capabilities": ["covering.coverage", "derived.flexibility"], "quantity": "sizeBand" },
+    { "id": "pelt", "capabilities": ["derived.insulation", "covering.coverage"], "quantity": "sizeBand" },
+    { "id": "down", "capabilities": ["derived.insulation", "derived.flexibility"], "quantity": "sizeBand" },
+    { "id": "feather", "capabilities": ["derived.appendageExtent", "derived.finishLustre"], "quantity": "appendageQuantity" },
+    { "id": "fin", "capabilities": ["derived.appendageExtent", "derived.flexibility"], "quantity": "appendageQuantity" },
+    { "id": "bone", "capabilities": ["boneDensity", "size"], "quantity": "clamp(1 + floor(size / 34), 1, 3)" },
+    { "id": "scale", "capabilities": ["covering.hardness", "covering.coverage"], "quantity": "sizeBand" },
+    { "id": "quill", "capabilities": ["covering.hardness", "covering.length"], "quantity": "sizeBand" },
+    { "id": "fang", "capabilities": ["armament.pierce", "boneDensity"], "quantity": "armament.total >= 65 ? 2 : 1" },
+    { "id": "claw", "capabilities": ["armament.rend", "boneDensity"], "quantity": "armament.total >= 65 ? 2 : 1" },
+    { "id": "oil", "capabilities": ["derived.insulation", "size"], "quantity": "derived.insulation >= 70 ? 2 : 1" },
+    { "id": "plate", "capabilities": ["covering.hardness", "derived.armourValue"], "quantity": "sizeBand" },
+    { "id": "chitin", "capabilities": ["covering.hardness", "finish.schiller"], "quantity": "sizeBand" },
+    { "id": "shell", "capabilities": ["covering.hardness", "derived.armourValue"], "quantity": "sizeBand" },
+    { "id": "tusk", "capabilities": ["armament.crush", "boneDensity"], "quantity": "armament.total >= 65 ? 2 : 1" },
+    { "id": "horn", "capabilities": ["armament.crush", "boneDensity"], "quantity": "armament.total >= 65 ? 2 : 1" },
+    { "id": "venom", "capabilities": ["derived.toxinPotency", "coloration.patterning"], "quantity": "derived.toxinPotency >= 70 ? 2 : 1" },
+    { "id": "ichor", "capabilities": ["emanation.strength", "derived.finishLustre"], "quantity": "emanation.strength >= 70 ? 2 : 1" }
+  ],
+  "quality": {
+    "partExpression": "roundHalfUp(average(capabilityA, capabilityB))",
+    "score": "roundHalfUp(0.75 * partExpression + 0.25 * encounterDanger)",
+    "encounterDangerSource": "boundWorld.sourceDangerBandBeforePartyOrDebugScaling",
+    "bandAuthority": "crafting-components-and-schematics-current.md"
+  },
+  "aggregationKey": ["domain", "family", "qualityBand"]
+}
