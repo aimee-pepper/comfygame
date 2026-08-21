@@ -1,8 +1,8 @@
 # Binder House and village districts — current
 
-**Status:** Game Design implementation authority for the House/district topology. The earlier six-hotspot
-destination list is temporarily narrowed by `workshop-constellation-role-audit-current.md`: Workshop and
-Constellation are not final interactive hotspots until Aimee chooses their disposition. This document replaces the opening spatial model in
+**Status:** Game Design implementation authority for the House/district topology. Workshop removal is
+settled by `workshop-constellation-role-audit-current.md`; Constellation alone remains an open interactive
+hotspot pending the Mote-mastery decision. This document replaces the opening spatial model in
 `starting-town-band1-integration-current.md` and the Home-tab presentation in
 `base-destination-board-current.md`. It does not change the rules or internal routes of the destinations
 named here.
@@ -72,15 +72,15 @@ points.
 |---|---|---|
 | Writing study | Writing Desk, paper, writing tools | **Writing Desk** |
 | Library/study | shelves; optional removable star-chart dressing | **Library** |
-| Work area | optional removable workbench dressing | no settled standalone destination while Workshop is under review |
+| Work area | optional noninteractive workbench dressing | no Workshop destination; ordinary making belongs to real village stations |
 | Common/planning room | table, chairs/party tokens | **Party** |
 | Yard | spring basin and restrained runoff/growth | **Essence Spring** |
 
 **Bestiary is inside the Library** as its own shelf, governed by `library-shelves-current.md`; it is not a
-separate house hotspot. The Constellation and Workshop implementations remain preserved, but their current
-single-star/catch-all roles do not justify final House hotspots without Aimee's decision. Asset work may
-reserve removable decorative space and must not label or wire either. If one remains after review, this
-table and the final hotspot manifest are revised before native implementation.
+separate house hotspot. Workshop remains decode-only compatibility and may appear only as noninteractive
+workbench dressing. Constellation's current implementation is preserved while the real Mote-mastery proposal
+is reviewed; Asset may reserve removable star-chart space but may not wire or finalize it. If Constellation
+remains, this table and the final hotspot manifest are revised before native implementation.
 
 The house contains no Storehouse, Firepit, Trading Post, Recycler, Blacksmith or recruit station. The Essence
 Spring is outside in the house's visible yard, never turned into a household sink. Storehouse and Firepit
@@ -219,8 +219,8 @@ space. Any visible value/action must exist in the game-owned adapter.
 
 ## Engineering checkpoint order
 
-1. After the Workshop/Constellation decision, freeze normalized Binder-House/district metadata and the
-   stable hotspot-to-destination map; no native visual replacement before that decision.
+1. Freeze normalized Binder-House/district metadata with Workshop absent. Keep the Constellation hotspot
+   optional/unwired until its Mote role decision; no native visual replacement may imply the open outcome.
 2. Add presentation-event receipts, idempotent creation/clear rules and migration defaults; expose a DEBUG
    injector for the four exact reasons.
 3. Integrate House cutaway behind a DEBUG route using the existing destination navigation; verify no route
@@ -237,7 +237,7 @@ space. Any visible value/action must exist in the game-owned adapter.
 
 1. Fresh launch, load and expedition return land on the full unclipped Binder House/yard scene.
 2. All accepted house/yard hotspots and three arrows route correctly; no generic Study or Make screen is
-   required to find them. Workshop/Constellation are absent unless the role decision explicitly retains one.
+   required to find them. Workshop is absent; Constellation appears only if its role decision retains it.
 3. Party management, Prepare a world and all three districts are reachable without scrolling on 368×800.
 4. Essence Spring is in the house yard; Storehouse and Firepit are in The Commons.
 5. Unknown future stations leak neither name nor silhouette; known buildable stations truthfully explain

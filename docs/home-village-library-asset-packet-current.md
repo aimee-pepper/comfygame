@@ -17,11 +17,12 @@ Asset Design must read and apply these exact current authorities before editing:
 3. `workshop-constellation-role-audit-current.md` — Workshop and Constellation are under active role review;
 4. `asset-questions-decisions.md` — camera, ownership and established AssetLab constraints;
 5. `asset-system-proposal.md` authored-place v0.4 final disposition — accepted station silhouettes;
-6. `AssetLab/artifacts/place-identity-adaptation-proof-v0.4.png` — current place identity contract;
-7. approved UI style snapshot
+6. `asset-production-output-contract-current.md` — reusable pixel products, quality and Chrome-review gate;
+7. `AssetLab/artifacts/place-identity-adaptation-proof-v0.4.png` — current functional identity contract;
+8. approved UI style snapshot
    `AssetLab/reviews/approved-styles/75c4fe58789b8cb16b6587d439a87e5ec5cbed58f211cb8ebc1b0df0416da5a2.css`.
 
-If an older document conflicts, these six current design/decision authorities win. Report the conflict; do
+If an older document conflicts, these current design/decision authorities win. Report the conflict; do
 not blend both versions.
 
 ## Ownership and file boundary
@@ -83,6 +84,17 @@ Reuse the accepted authored-place v0.4 identities. Do not redesign or replace th
 Palette and environmental adaptation may change within the existing grammar. A station's whole-mass
 silhouette, major negative space and functional fixture remain stable. The retired universal damaged state
 must not return: the village will never be damaged.
+
+The functional silhouettes are a semantic starting point, not permission to reuse tiny placeholder props.
+Buildings must be beautiful, material-rich production pixel art recognizable without their sign. For this
+proof, use a coherent 184-pixel logical scene width at 2× display; station façades normally require at least
+64×48 logical pixels and roughly 112–144 displayed width. House and Library are scene sprites/layer kits
+occupying most of the logical canvas. Large flat fields, labelled box diagrams, coloured rectangles standing
+in for books and 48×32 station icons fail visual acceptance even if their manifests/tests are green.
+
+Export exact native-size composites plus 400% nearest-neighbour crops of every current building, House
+interior and Library growth family. The ordinary Chrome HTTP route and standalone lossless contact sheet are
+both required. No candidate becomes integration-ready before Game Design/Aimee accepts the actual art.
 
 ## Exact navigation topology
 

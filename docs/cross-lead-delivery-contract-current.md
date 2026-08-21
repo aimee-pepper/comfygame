@@ -3,7 +3,7 @@
 **Status:** current orchestration and handoff authority  
 **Owner:** Game Design owns player promise and mechanics; Asset Lead owns visual solutions inside
 that promise; Engineering Lead owns the native transaction and integration  
-**Updated:** 20 August 2026
+**Updated:** 21 August 2026
 
 ## Why this exists
 
@@ -72,6 +72,11 @@ Engineering must compare a native candidate against both the frozen visual and t
 Matching pixels while changing the interaction is a failure. Matching behavior while discarding the
 approved hierarchy is also a failure.
 
+All asset candidates also obey `asset-production-output-contract-current.md`. HTML/CSS may host review
+chrome, but production art is a lossless pixel sprite/scene/modular kit with task-appropriate native
+dimensions and a manifest. Deterministic placeholder geometry is still placeholder art and cannot be
+promoted merely because its export is reproducible.
+
 ## Current early-game ambiguity resolutions
 
 These decisions govern the current Campaign → Home → Writing → World → Return chain.
@@ -92,8 +97,10 @@ These decisions govern the current Campaign → Home → Writing → World → R
 
 ### Home and departure
 
-- Home contains exactly the five Band-1 destinations in
-  `starting-town-band1-integration-current.md`; Party is a utility, not a building.
+- Home opens on the Binder House/yard defined by `home-house-and-village-current.md`: Writing Desk,
+  Library, Party and yard Essence Spring are the settled anchors; left/right/down lead to Commerce Row,
+  Makers' Row and The Commons. Storehouse and Firepit are Commons buildings. Workshop is being removed and
+  Constellation remains under explicit role review; neither may be invented from an older five-tile plan.
 - Home's departure shortcut opens Writing Desk directly to **The world** review. It does not spend
   Essence, consume a collected World Page or create a run.
 - The only final **Bind & Depart** commit is inside Writing Desk after a fresh rules-owned preview.
@@ -153,3 +160,18 @@ by affecting tile art, adjacency, minimap or layout before discovery.
 - Every check-in names: visible installed change; waiting acceptance; active source slice; exact next
   slice after acceptance. Test counts and documents are supporting evidence, not the result.
 
+## Proactive lead reporting
+
+Asset and Engineering Leads report directly to the current Game Design/Orchestrator task without waiting
+for Aimee to relay the result or for Game Design to poll them.
+
+- Report immediately when a bounded task becomes source-complete, integrated, installed, visually rejected,
+  blocked or abandoned, before beginning a different task.
+- Name the exact boundary, commit/hash or uncommitted paths, automated evidence, visual/player-visible
+  result, remaining acceptance gap, any decision needed and the next safe action.
+- A green test report may not say “complete” when visual review, native integration, installation or playtest
+  acceptance is still missing; name the exact receipt achieved.
+- A lead who discovers that current repository status conflicts with an assignment stops before editing and
+  reports the conflict. They do not silently follow a stale chat instruction.
+- Routine in-progress narration is optional. Completion/blocker reporting is mandatory and should not
+  require a reminder.

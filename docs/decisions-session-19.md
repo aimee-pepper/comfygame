@@ -113,12 +113,80 @@ Dictionary, Field Notes and World History shelves. Real collection counts derive
 hardcover stages; each traveller diary grows from its own recovered-page count. Exact behavior is in
 `library-shelves-current.md`.
 
-## 292. Hybrid material identity + six-band quality is recommended, not yet settled
+## 292. Hybrid material identity + six-band quality was recommended, then settled by Decision 293
 
 **Date:** 21 August 2026
 
-Game Design recommends material/family identity for capability, six discrete grey/white/green/blue/purple/
-orange bands for yield/object quality and value, and gear item level/output quality derived from recipe,
-inputs and maker cap. Same domain+family+band resources stack. This remains an open Aimee decision under
-`loot-quality-hybrid-review-current.md`; Engineering must not implement the pure-no-grade migration or the
-hybrid until it is settled.
+Game Design recommended material/family identity for capability, six discrete grey/white/green/blue/purple/
+orange bands for yield/object quality and value, and gear item level/output quality derived from recipe and
+inputs. Same domain+family+band resources stack. Decision 293 records Aimee's acceptance and corrections;
+this entry remains the historical proposal boundary.
+
+## 293. Hybrid crafting core is settled: Schematic + material + 70/30 quality
+
+**Date:** 21 August 2026
+
+Aimee accepted the six quality bands, 70% primary/30% secondary component weighting, removal of hard station
+quality caps and Refitting. `Schematic` is the player-facing term for the recipe/object plan; existing
+`PatternID` may remain an internal decode alias. All-Peerless inputs produce Peerless output. Stations control
+available schematics, component complexity and specialist behavior rather than discarding input quality.
+
+Implementation remains held until Game Design authors the complete ComponentProfile and schematic-socket
+tables. The separate territory-find category rates are not accepted by this decision.
+
+## 294. Workshop is removed; Party planning never teaches
+
+**Date:** 21 August 2026
+
+The Workshop is a 54-node catch-all and will be removed as a standalone destination after lossless route and
+entitlement migration. The earlier proposal to move Instruction into Party is withdrawn: Party selects and
+applies people, formation, gear, skills and already-known Gambits; it contains no research, teaching or
+purchase tree.
+
+Workshop knowledge is re-audited by primary source rather than copied into another menu. Recovered writing,
+traveller teaching, sites/caches and bounded specialist instruction own learnable words; physical capacity
+belongs to Storehouse/Tannery. Existing ownership and paid effects are preserved.
+
+## 295. Constellation retirement is reopened for the Mote mastery proposal
+
+**Date:** 21 August 2026
+
+Do not retire or expand Constellation yet. The current review proposes three campaign-wide stars that open
+depths 4–5 of Offense, Defense or Craft for every current/future person while every node still costs its
+ordinary point and prerequisites. Long Instruction may remain as the one universal Gambit-capacity star once
+the duplicate Workshop slot nodes are retired.
+
+Recommended first scope is combat mastery only, not a Mote tax on every shop tier. A later broad masterwork
+permission may be considered after hybrid crafting is live. Prices and whether persistence is campaign-slot
+Reality versus global across separate New Games remain open for Aimee.
+
+## 296. Asset outputs must be production pixel art, not reproducible placeholder shapes
+
+**Date:** 21 August 2026
+
+HTML/CSS may host review controls and overlays, but depicted game objects/places must export as task-appropriate
+lossless pixel products: composite sprites, scene/layer kits, modular component kits or animation sets with
+stable IDs, pivots/attachments and hashes. Technical determinism does not equal visual acceptance.
+
+Candidates must be beautiful and recognizable without labels, work at native size and grayscale, provide an
+ordinary-Chrome HTTP route plus standalone PNG evidence, and remain integration-unready until the actual art
+is approved/frozen. The first deterministic House/village/Library candidate was rejected as placeholder art
+despite its correct manifest/export format.
+
+## 297. Asset and Engineering Leads report completions directly to Orchestration
+
+**Date:** 21 August 2026
+
+Both leads must proactively update the current Game Design/Orchestrator task when a bounded task becomes
+source-complete, integrated, installed, rejected, blocked or abandoned, before starting a different task.
+Reports name exact paths/commit, achieved receipt, evidence, player-visible result, missing acceptance,
+decisions and next safe action. Aimee is not the go-between and Orchestration should not have to poll.
+
+## 298. Territory-find percentages remain an open tuning proposal
+
+**Date:** 21 August 2026
+
+The shorthand `3% / 1.5% / 0.5%` means absolute per-victorious-ordinary-encounter chances for gear,
+eligible consumable and ordinary cache key respectively, with 95% no bonus and at most one result. It is
+equivalent to one 5% find roll followed by 60/30/10 category weights. It is per encounter, not per creature,
+and Teeming does not multiply it. These rates are explained for review, not yet authorized for implementation.
