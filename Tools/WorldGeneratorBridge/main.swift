@@ -20,6 +20,12 @@ struct Count: Encodable {
     var quantity: Int
 }
 
+struct CastCount: Encodable {
+    var id: String
+    var name: String
+    var placements: Int
+}
+
 struct ResourceCount: Encodable {
     var id: String
     var placements: Int
@@ -57,6 +63,9 @@ struct Snapshot: Encodable {
     var resources: [ResourceCount]
     var flora: [Count]
     var mobs: [Count]
+    var generatedCast: [CastCount]
+    var apexes: [Count]
+    var hostileFlora: [Count]
     var pointsOfInterest: [Count]
     var writings: [Count]
     var travellers: [String]
@@ -116,12 +125,21 @@ let resources = resourceTotals.map {
 let floraNamesByID = Dictionary(uniqueKeysWithValues: generated.flora.map { ($0.id, $0.displayName) })
 let floraNames = generated.map.tiles.compactMap { $0.flora }.compactMap { floraNamesByID[$0] }
 let speciesNamesByID = Dictionary(uniqueKeysWithValues: generated.cast.map { ($0.id, $0.displayName) })
-let mobNames = generated.enemies.map { enemy in
-    if enemy.isApex { return "Apex" }
-    if enemy.isSessile { return "Hostile flora" }
+let ordinaryMobNames = generated.enemies.compactMap { enemy -> String? in
+    if enemy.isApex || enemy.isSessile { return nil }
     if let speciesID = enemy.speciesID, let name = speciesNamesByID[speciesID] { return name }
     return "Creature"
 }
+let placementCountBySpecies = Dictionary(grouping: generated.enemies.filter { !$0.isApex && !$0.isSessile }
+    .compactMap(\.speciesID), by: { $0 }).mapValues(\.count)
+let generatedCast = generated.cast.map { species in
+    CastCount(id: species.id.description, name: species.displayName,
+              placements: placementCountBySpecies[species.id, default: 0])
+}.sorted { ($0.name, $0.id) < ($1.name, $1.id) }
+let apexes = counts(generated.enemies.filter(\.isApex).map { _ in "Apex" })
+let hostileFlora = counts(generated.enemies.filter { $0.isSessile && !$0.isApex }.map { enemy in
+    enemy.speciesID.flatMap { speciesNamesByID[$0] } ?? "Hostile flora"
+})
 let poi = cells.compactMap { cell -> String? in
     switch cell.content {
     case let value where value.hasPrefix("portal:"): return value
@@ -146,7 +164,8 @@ let snapshot = Snapshot(
     seed: request.seed, width: generated.map.width, height: generated.map.height,
     entry: generated.map.entry, cells: cells, markers: markers,
     terrain: counts(cells.map(\.ground)), resources: resources,
-    flora: counts(floraNames), mobs: counts(mobNames), pointsOfInterest: counts(poi),
+    flora: counts(floraNames), mobs: counts(ordinaryMobNames), generatedCast: generatedCast,
+    apexes: apexes, hostileFlora: hostileFlora, pointsOfInterest: counts(poi),
     writings: counts(writings), travellers: generated.travellers.map(\.rawValue).sorted(),
     diagnostics: Diagnostics(initialTurnBudget: d.initialTurnBudget,
                              projectedCollapseTurn: d.projectedCollapseTurn,
