@@ -110,9 +110,9 @@ them.
 
 - **Identity:** Keeps moving because destinations imply an obligation to become finished; curious,
   tired and skilled at finding a way through without pretending every route leads somewhere.
-- **Contribution:** **The Wayfarer's Table**, a shared route-and-provisions workspace for fieldcraft,
-  organic yield, flora identification and carrying support. It holds maps, field notes, packs and
-  prepared provisions without trapping Sela behind a counter.
+- **Contribution:** **The Wayfarer's Table**, a shared fieldcraft-and-packing workspace for organic
+  yield, flora identification and carrying support. It holds field guides, sample tins, packs and
+  prepared provisions without becoming a route planner, departure hub or counter.
 - **Teaching:** **Pond**, diary-exclusive.
 - **Diary:** 7 pages—three location, existing Halloway whereabouts and worthwhile-world page, Pond,
   and one route/site or relationship fragment.

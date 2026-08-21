@@ -44,7 +44,7 @@ settled early/mid/late ladder and use resources reachable before each authored o
 | Edren | Reliquary · build | 1 | site record/recovery | live catalogue cost |
 | Halloway | Blacksmith · build | 1 | 8 rigid foundational families + reforge | live catalogue cost |
 | Isolde | Scriptorium · build | 2 | hands, chaining, compounds | live catalogue cost |
-| Sela | Wayfarer's Table · build | 1 | routes/provisions/field practice | live catalogue cost |
+| Sela | Wayfarer's Table · build | 1 | packing, organic yield and visible-flora recognition | live catalogue cost |
 | Orsa | Firepit → Tavern · upgrade | 1 | rotating visitors | 80 essence · 18 Timber · 16 Fibre · 10 Clay |
 | Vance | Trading Post · build (`trading_post`) | 1 | rotating merchant stock, buy/sell identified goods and appraisal | 10 essence (opening placeholder) |
 | Noll *(working)* | Recycler · build | 2 | previewed found/crafted material recovery | 15 essence (opening placeholder) |

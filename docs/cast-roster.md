@@ -39,7 +39,7 @@ Auber and the Distillery’s developed proposal is in `traveller-identity-auber-
 | 4 | **Isolde** ✅ | calligrapher | **The Scriptorium** | **The hands** — Brush, Fountain pen, chaining, compounds, Ink Mixing | **Hush** *(see §3)* | **start of mid** · 2 |
 | 6 | **Orsa** | keeper | **The Tavern** — *upgrades the Firepit* | Visitors · clues · wants satisfied · resting | **Hive** | mid · 3 |
 | 7 | **Vance** | trader | **The Exchange** *(+ Recycler)* | Selling · buying · bulk · recycling | **Amber** | mid · 3 |
-| 8 | **Sela** ✅ | wanderer | **The Wayfarer's Table** | Routes · provisions · organic yields · flora identified on sight · capacity | **Pond** | mid · 3 |
+| 8 | **Sela** ✅ | wanderer | **The Wayfarer's Table** | Packing · organic yields · flora identified on sight · +2 satchel capacity | **Pond** | mid · 3 |
 | 9 | **Corrin** | tanner | **The Tannery** | **Satchel and storehouse capacity** · light armour | **Chitin** | mid · 4 |
 | 10 | **Nessa** | apothecary | **The Apothecary** | Consumables · inks · coatings · cures | **Thorn** | mid · 4 |
 | 11 | **Bracken** | armorer | **The Armoury** | **Higher-tier armour upgrades and recipes** · heavy armour · resistances | **Bone** | mid · 5 |

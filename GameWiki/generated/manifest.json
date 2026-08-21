@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "aggregateSourceHash": "31a9e1d323c4036b5aa6944504423d713f2a716b6c1d6278b9267611e30f5279",
+  "aggregateSourceHash": "78edb89e3c6fa7b76b88dda584755fbedc85c115d0f233d7b7144ccb42e77ec7",
   "inputs": {
     "Sources/Content/Data/items.json": "b94b1107229f217e14f1d7fa936d8eea938f9782c06c583be32302f10d432bc9",
     "Sources/Content/Data/playability-roadmap.json": "2ab045a5a59658f9558a347379994a1ec6056d52882d23b04edcf6bb6ed149e4",
@@ -95,7 +95,7 @@
     "docs/combat-unbind-retreat-name-collision-review-current.md": "0d4a06b1fefd5a2973fc1b395ecf1db0ff242c9f25b90d0f8ffc70ef3820d00e",
     "docs/combat-v2-review-batch-current.md": "518e40c4a5f5f775f20f52fa0229168c9a26e9e47e6bda1ae07fee2d8dc2d1f6",
     "docs/community-party-tavern-current.md": "ed93719d0aea8f8e955016cc0b661940606d44cd629b24a83f0d056ecfe4d133",
-    "docs/companion-worldwork-current.md": "f509690a4d54af469fad8d1e8a00fc0d0f30323a1e4c08b7f4294b2813e1c323",
+    "docs/companion-worldwork-current.md": "b51ae4d69f036bd50560db33fb73b9cc6e65931c0bbae4e4dd5d3a012bbaaf45",
     "docs/compound-assembly-station-trees-current.md": "98414b3caa655ee8fbe7c5afe0e8ce6044d4cf2b5b75cd093d42f08aee2c3486",
     "docs/constellation-first-slice-current.md": "b2ac3d9bcc002482bbb5620c60dd69096717f9466210a0c37ac88c96c74d295a",
     "docs/consumable-economy-field-kit-current.md": "f401f7f0997369f6d0dcc35737d6645555d56262d11729d30512d31753567ad2",
@@ -217,7 +217,7 @@
     "docs/starting-town-band1-integration-current.md": "c2d3d8cc845193d399746e447f7118093764a45cb1b96f27cc6332e7196b42ba",
     "docs/static-manual-authority-audit-current.md": "b40e88ce676b71f2353fa0d2c873b375c4c1df16aeea4be2e03b7eadd01f1b47",
     "docs/station-first-use-reachability-audit-current.md": "39e1a563922923190b196d04a44cc6bebdcde8095d040a87211ae09aa53e306e",
-    "docs/station-integration-matrix-current.md": "114db9a25fec00f786559e4d651522cf95d19dc3456094e9af74ec188792fb12",
+    "docs/station-integration-matrix-current.md": "a7894b1dab11b032bde1a35ea04293e76ca6b325b628a16c19c341cae1aceaf6",
     "docs/tannery-system-current.md": "a6544afbb2d77c2369b37922b443cd7d2244ce43bc358d632eeab7b30844499c",
     "docs/tavern-random-companions-current.md": "e7b86a31548089a4a122fba51a1fb1f246d14d84de948300a1873b38ae9648c2",
     "docs/top-down-map-asset-integration-current.md": "60fbd5232a171bdbe2e7f9f162764c5efd71ac820bde4a71caa4d74a298c962a",
@@ -225,7 +225,7 @@
     "docs/trading-post-recycler-economy-current.md": "297d7917d1f2f7c5ee9b8cdd0280a390761d8aa204e138fcb4328941db7e954e",
     "docs/traveller-arrival-confidence-review-current.md": "39a5e38930eb1227393b893910eeb1d38b7e07cc2acbd8d6d64e41548289f8d5",
     "docs/traveller-clue-distribution-current.md": "428623d92b3f74ba1064e510af4ef02ccb70758141ddf7cabaa64ce3ddf8b752",
-    "docs/traveller-identities-existing-six-current.md": "9c739a35657beb92d7185d3d61f97d880d22ebe8c53c398c0dbd0a07e6f5bb79",
+    "docs/traveller-identities-existing-six-current.md": "c73372b46fa550ca2c95feea4d039bfc60d51593065c2849b229c9a9d8ba1913",
     "docs/traveller-identity-noll-recycler-current.md": "76927a2647b9532ded5ee3fc46c6353e78bf5ae8578fc69ceffae77a6cfed1af",
     "docs/traveller-meeting-content-audit-current.md": "0716fdb622e6b3251adf0d1d3a5bb0b18ed1450e6d1dc69e65569d2eecef851d",
     "docs/traveller-meeting-corpus-plan-current.md": "5e113a178e771da4e43e65e8da78bfc34c572d0d13491337fe9770c1236e71aa",
@@ -268,7 +268,7 @@
     "docs/writing-tool-progression-current.md": "be17fe07aa89aaaab7117a2faca43d7e1eb1be23202d19106c67c42547b23bb0"
   },
   "outputs": {
-    "generated/wiki-data.json": "fa6333d1636b1a262989ebe508aaaa0adf0f0f6689e0f5f798855f3c410871c9",
-    "generated/source-registry.json": "b1bb3f0c7ebbe4de465a4c7ccb6a7a3504cb6417833254986773436c2458580d"
+    "generated/wiki-data.json": "d0eca9e7b40784d62913d24e2aba6defd95516ae03fc65749479b74a0b90999e",
+    "generated/source-registry.json": "b5deca4ed509dce0fc2feedb3547b17641014bc83be2859e8d0b10bb4f7dc48a"
   }
 }

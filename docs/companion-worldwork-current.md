@@ -39,7 +39,7 @@ Working production formula:
 | Edren | 2 | Field sites, ruins and careful recovery |
 | Halloway | 2 | Material judgement and practical making |
 | Isolde | 1 | Capable, but her defining work belongs at the page |
-| Sela | 3 | Routes, provisions, flora recognition and sustained travel |
+| Sela | 3 | Packing, organic yield, flora recognition and sustained travel |
 | Tovin | 3 | Binding, realm failure and anchored-world stewardship |
 
 Generated companions default to 1. A later generator may derive 0–2 from visible traits/calling, but
