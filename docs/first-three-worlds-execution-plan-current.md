@@ -38,14 +38,16 @@ World Pages, visibility, collapse HUD, contextual blockage, field notes, plain-l
 material reserve, Dictionary, Templates, first combat choices, traveller pacing and world color are already
 source-complete/`readyToTest` candidates. **This plan does not order anyone to reimplement them.**
 
-No new packet below may pre-empt scaling. Once it closes, Engineering reconciles current `origin/main`
-against this status paragraph; changed facts replace the paragraph rather than being guessed from it.
+No new packet below may pre-empt the **source implementation** of scaling. Phone playtest/acceptance is not a
+dependency gate: once the rules, receipts, automated matrix and no-known-P0 source checkpoint are green,
+Engineering marks scaling `readyToTest` and advances to the next source checkpoint even if Aimee is not
+currently motivated to test combat. A later playtest finding may reopen scaling at its real severity.
 
 ---
 
 ## Gate A — make the opening survivable and testable
 
-### A1 · Close level-1 encounter scaling
+### A1 · Complete level-1 encounter-scaling source, then leave acceptance nonblocking
 
 **Player result:** Normal Binder + Quill contacts are usually survivable and meaningfully interactive;
 Teeming is visibly disclosed as exceptionally dangerous rather than silently normalized.
@@ -57,13 +59,19 @@ universal HP inflation.
 
 **Asset:** none unless a current danger/foe telegraph is demonstrably unreadable in the phone matrix.
 
-**Acceptance card:** God mode off; fresh Binder + Quill. Two isolated Normal contacts, one ordinary Normal
+**Deferred/nonblocking acceptance card:** God mode off; fresh Binder + Quill. Two isolated Normal contacts, one ordinary Normal
 world with sequential contacts, one disclosed Teeming contact attempted/withdrawn. Record rounds,
 aggregate HP loss, passed-out members, retreat possibility and whether the danger was legible. Then later
 fixtures for parties 3/5 and uneven levels may be source-tested now but phone-accepted when reachable.
 
-**Pass:** Normal isolated fights usually last 2–4 rounds and cost roughly 5–20% aggregate party HP; no
-unavoidable opening Normal composition produces a practical guaranteed defeat. Teeming may exceed that.
+**Source-complete gate:** deterministic automated/simulator fixtures cover fresh Binder+Quill Normal,
+sequential contacts, Teeming disclosure, parties 2/3/5, uneven levels and apex scaling; every encounter
+freezes a truthful receipt; no known generated Normal composition is mathematically unwinnable under the
+intended action model. Build/tests are green. Engineering may then proceed.
+
+**Playtest target, not queue gate:** Normal isolated fights usually last 2–4 rounds and cost roughly 5–20%
+aggregate party HP; Teeming may exceed that. This target remains adjustable when Aimee next feels like combat
+testing.
 
 **Prohibited:** difficulty modes, starter-weapon grants, deeper tree consumers, apex rewards, late party
 balance or God-mode evidence counted as balance.
@@ -107,8 +115,10 @@ receipt. If any candidate is not ancestral/current, stop and report it instead o
 **Prohibited:** visual-polishing the temporary combined resource category, adding tutorials, or accepting all
 seven because the build launched.
 
-**Gate A exit:** Aimee can start one fresh save, use a Starter Page, survive or deliberately avoid a Normal
-contact, understand visibility/collapse/blockage and return with no item-capacity loss from body materials.
+**Gate A source exit:** current main can start one fresh save, use a Starter Page, produce deterministic
+intended Normal/Teeming scaling receipts, understand visibility/collapse/blockage and return with no
+item-capacity loss from body materials. Aimee's phone acceptance cards remain independently `readyToTest` and
+do not block Gate B.
 
 ---
 
@@ -275,24 +285,26 @@ and waiting item/recovery. Exact clear rules; DEBUG injection. No scene art yet.
 
 ### D2 · Binder House cutaway
 
-**Player result:** Base opens on a four-zone house containing Writing Desk; Library/Constellation/Bestiary;
-Workshop/Storehouse; Party.
+**Player result:** Base opens on the Binder House/yard containing Writing Desk; Library/Constellation;
+Workshop; Party; Essence Spring; and left/right/down arrows to Commerce Row, Makers' Row and The Commons.
 
-**Asset:** exact cutaway/hotspot/collision/value packet. **Engineering:** normalized shared art/hotspot adapter,
-measured 368×800 fit, direct existing routes, Prepare a world remains noncommitting. Promote behind reversible
-fallback, then ordinary acceptance.
+**Asset:** exact six-hotspot cutaway/yard plus three-arrow collision/value packet. **Engineering:** normalized
+shared art/hotspot adapter, measured 368×800 fit, direct existing routes, Library-contained Bestiary and
+noncommitting Prepare a world. Promote behind reversible fallback, then ordinary acceptance.
 
 ### D3 · Village exterior
 
-**Player result:** House, Firepit and Essence Spring form the opening village; recruit buildings appear as
+**Player result:** House is its own root screen; Commerce Row, Makers' Row and The Commons hold the village.
+Storehouse/Firepit are in The Commons, Essence Spring is in the house yard, and recruit buildings appear as
 real campaign progress.
 
 **Asset/Engineering:** exact lifecycle unknown/known-buildable/built/improved/attention. Standard pictogram+
 name signs reinforce obscure silhouettes. Town never has damaged/repair states. Add only reachable buildings,
 starting Trading Post → Recycler → Blacksmith.
 
-**Pass:** routes, construction plot, one improvement, all four attention reasons/clear/relaunch, three obscure
-sign identities, no hidden future building, no town damage under defeat/collapse.
+**Pass:** all three district routes/Home returns, Storehouse and Firepit geography, construction plot, one
+improvement, all four attention reasons/clear/relaunch, three obscure sign identities, no duplicate House
+tile, no hidden future building and no town damage under defeat/collapse.
 
 **Gate D exit:** the opening Base reads as house/community and retains every real opening verb.
 
@@ -305,24 +317,19 @@ sign identities, no hidden future building, no town damage under defeat/collapse
 **Player result:** Storehouse/Field Kit/Return distinguish **World resources** from **Creature materials**;
 neither consumes item slots.
 
-**Authority:** `creature-ecology-and-materials-overhaul-current.md`.
+**Authorities:** `creature-ecology-and-materials-overhaul-current.md` and, once Aimee settles it,
+`loot-quality-hybrid-review-current.md`.
 
-**Engineering:** replace the legacy sample value with the authority's shared `CraftMaterialUnit`, while
-keeping `WorldMaterialReserve` and `CreatureMaterialReserve` as distinct storage domains. Bulk `ResourceID`
-nodes remain in the existing world-resource ledger; property-bearing Timber/Fibre/Pulp and future flora
-products use the world-material reserve; body-derived parts use the creature-material reserve. Items remain
-item-capacity objects. Legacy carried/home/spillover material units migrate losslessly.
+**Decision dependency:** Engineering may implement habitat/body-family work before this checkpoint, but may
+not migrate material storage, stacking, crafting, price or power while the hybrid is paused. Once settled,
+World resources and Creature materials use explicit domains; resources stack by exact
+`domain + family/resource + qualityBand`; Items remain capacity objects. Bestiary/World History preserve
+known source records rather than pretending a merged unit still has one exact provenance.
 
-The same contained sequence replaces every grade consumer before the old field is removed: maker progression
-sets construction tier; requirement-specific surplus sets default craft selection; family/capability sets
-Trading Post value; attunement properties set Distillery potency; Scent Mask accepts Hide/Pelt/Down/Oil; and
-Recycler defaults to frozen receipt order. Do not substitute maximum/average properties as a new universal
-quality score.
-
-**Pass:** zero capacity use, exact failure/return/crafting/commerce behavior, every old kind accounted for in
-save migration or clearly versioned incompatibility under policy, and zero current grade-dependent consumer.
-Blacksmith/Tannery/Specialist output tiers, price table, three Distillery formulas, Scent Mask families,
-Recycler order and weakest-valid crafting selection match the authority. No generic quality label remains.
+**Pass:** zero item-capacity use; same-family/same-band stacks merge while different domains/families/bands
+do not; every old unit and Tier1–4 gear instance migrates losslessly or is visibly version-gated; crafting,
+commerce, Distillery, Scent Mask, Recycler, Instrument and reforge consumers match the accepted hybrid. No
+parallel old grade or second player-facing rarity colour remains.
 
 ### E2 · Habitat-aware creature identities
 
@@ -330,14 +337,16 @@ Recycler order and weakest-valid crafting selection match the authority. No gene
 forms occupy plausible terrain while remaining strange pressure-generated creatures.
 
 **Engineering:** persist `CreatureEcologyIdentity`, resolve terrestrial/shore/aquatic/aerial only after terrain
-availability is known, use separate deterministic salt, and constrain spawn/roam tiles. No gameplay RNG
-perturbation or deep-water path rewrite.
+availability is known, use separate deterministic salt, and constrain spawn/roam tiles. Aquatic components
+include shallow and deep water. Deep occupants remain non-enterable until they naturally reach shallow water
+or a later legitimate interaction exists. No gameplay RNG perturbation or land-path rewrite.
 
 **Asset:** ecology sheet crossing four habitats with feathered, finned, furred, plated/scaled and chitinous
 forms; straight top-down world profile and existing Encounter/Bestiary morphology continuity.
 
-**Pass:** aquatic never on land, terrestrial never in water, shore stays shoreline, connected reachable
-habitat, same seed stability, old frozen worlds retain identity.
+**Pass:** aquatic never on land and stays in one connected shallow+deep component; terrestrial never in water;
+shore stays shoreline; a deep-only fish is visible but not falsely enterable; same seed stability; old frozen
+worlds retain identity.
 
 ### E3 · Body-derived creature-material rewards
 
@@ -345,13 +354,15 @@ habitat, same seed stability, old frozen worlds retain identity.
 pelts, chitin, fang/horn/claw/bone/ichor—rather than every animal becoming Hide/Bone quality variants.
 
 **Engineering:** deterministic trait-to-part table and quantities from the authority. Remove random world
-resource, random gear and random curio from ordinary animal rewards. Apex keeps its explicit trophy plus body
-parts. Retune ordinary gear acquisition through sites, merchant and crafting rather than animals.
+resource and curio/key drops. Add one 3% eligible gear roll per victorious ordinary encounter, never per
+creature; source/campaign caps apply and copy frames it as recovered territory gear. Apex keeps its explicit
+trophy plus body parts.
 
 **Asset:** complete creature-material atlas with cross-family collision proof and body→yield specimen cards.
 
-**Pass:** four ecology fixtures produce causally related, stable rewards; no unrelated drop; properties drive
-function without crude/fine/superb ladder; Bestiary previews only legitimately learned possible yields.
+**Pass:** four ecology fixtures produce causally related, stable rewards; 100 failed gear rolls add none and a
+forced success adds exactly one eligible ordinary item regardless of foe count; no resource/key/quest/unique/
+apex leakage; Bestiary previews only legitimately learned possible yields.
 
 **Gate E exit:** early worlds contain ecologically placed varied life and body-derived, slot-free creature
 materials that are visibly distinct from world resources.

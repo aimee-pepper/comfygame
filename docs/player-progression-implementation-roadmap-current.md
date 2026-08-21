@@ -26,8 +26,9 @@ bands below.
   no gameplay may be implemented from the preservation branch itself.
 - The accepted/source-complete Asset and native candidates remain separate receipts. Writing, arrival,
   world visuals and Return are not accepted merely because components exist in AssetLab or on main.
-- **Encounter scaling remains the sole active/acceptance primary according to the live roadmap.** Engineering
-  and Asset were idle at this reconciliation check; no new source task is authorized by these docs alone.
+- **Encounter scaling remains the sole active source primary according to the live roadmap.** Its phone feel
+  card is explicitly nonblocking: once the deterministic rules/receipt/test checkpoint is source-complete,
+  Engineering advances and leaves the card `readyToTest` until Aimee wants to test combat.
 - The next product milestone is still an accepted Campaign → House → Writing → World → Return chain over
   three fresh-save expeditions, now decomposed exactly by `first-three-worlds-execution-plan-current.md`.
 
@@ -63,6 +64,10 @@ A band advances only when:
 3. its rules/persistence/UI focused suites are green;
 4. the build containing it is installed; and
 5. Aimee can perform the band acceptance card without DEBUG state mutation.
+
+Exception: encounter-scaling phone feel/acceptance is not a promotion dependency. Its source checkpoint uses
+the automated/simulator matrix and no-known-P0 rule in `first-three-worlds-execution-plan-current.md`; later
+phone evidence may reopen tuning without invalidating unrelated completed source work.
 
 One failed feel sample may open diagnosis; it does not justify an unrelated feature or a global
 retune. Conversely, a source-green feature is not accepted merely because tests exist.

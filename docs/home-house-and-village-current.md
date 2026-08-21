@@ -1,4 +1,4 @@
-# Binder House and village — current
+# Binder House and village districts — current
 
 **Status:** Game Design implementation authority; replaces the opening spatial model in
 `starting-town-band1-integration-current.md` and the Home-tab presentation in
@@ -13,24 +13,33 @@ layout; Aimee owns final visual acceptance.
 
 ## Product outcome
 
-Home should first read as **the Binder's house**, then as a village growing around it. The player should
-recognize where they write, study, store things, make basic preparations and assemble a party without
-interpreting a categorized list of backend stations.
+Home is **the Binder's house and yard**, with directional exits into three parts of a village growing around
+it. The player should recognize where they write, study, make basic preparations and assemble a party without
+interpreting a categorized list of backend stations. The Storehouse is a separate central village building
+that supplies the whole town rather than a cupboard inside the house.
 
 This is a spatial navigation surface, not a walking simulation. It adds no avatar locomotion, clock,
 upkeep, visitors wandering between rooms or decorative chores.
 
 ## Root information architecture
 
-The Base root has two scene selectors:
+The Base root is always the **Binder House** screen. It is not a tile inside a separate all-village screen.
+From the house, three spatial arrows open fixed village-district screens:
 
-1. **House** — default after launch, load and return.
-2. **Village** — exterior community and recruit-enabled places.
+- **left — Commerce Row:** Trading Post, Recycler and future genuinely commercial/service destinations;
+- **right — Makers' Row:** Blacksmith and the reachable crafting specialists;
+- **down — The Commons:** Storehouse, Firepit and noncommercial/noncraft community or fieldwork places.
 
-Do not keep **Home / Make / Study / Realms** as four equally weighted category tabs on the root. Their
-routes continue to exist behind spatial hotspots and destination-local screens. Anchored Realms remain a
-later dedicated surface reached from an appropriate village destination; they are not painted into the
-opening house.
+**The Commons** is the current recommended district name; it is player-facing and may be renamed later
+without changing the stable district ID `commons`. Do not call it “Other,” “More” or “The Rest.”
+
+Each district has one obvious **Home** arrow that returns to the Binder House. Device Back does the same.
+District-to-district shortcuts may be added only if their visible spatial direction is consistent; no place
+may require navigating a hidden category stack.
+
+Do not keep **Home / Make / Study / Realms** as equally weighted category tabs. Their routes continue to
+exist behind spatial hotspots and destination-local screens. Anchored Realms remain a later dedicated
+surface reached from an appropriate Commons destination; they are not painted into the opening house.
 
 Persistent utilities:
 
@@ -43,33 +52,36 @@ Persistent utilities:
 
 ### Camera and layout
 
-Use one fixed oblique cutaway/dollhouse illustration: the exterior wall facing the player is removed and
-the four functional zones are visible together. This is not the straight top-down explorable-world camera.
+Use one fixed oblique cutaway/dollhouse illustration plus a narrow visible yard: the exterior wall facing the
+player is removed and the functional zones are visible together. This is not the straight top-down
+explorable-world camera.
 Hotspot geometry and art share the same normalized coordinate file and aspect fit. Cropped
 `scaledToFill` art over uncropped coordinates is prohibited.
 
-On a 368×800 ordinary phone, the full house, scene selector and persistent preparation/party affordances
+On a 368×800 ordinary phone, the full house/yard, three direction arrows and persistent preparation affordances
 must fit without vertical scrolling. Derive the art height from the safe region actually remaining after
 the navigation chrome; use `scaledToFit`. If the measured region is exceptionally short, use a compact
-two-by-two room grid made from the same four zones rather than clipping or shrinking tap targets below
-44×44 points.
+room grid plus yard strip made from the same zones rather than clipping or shrinking tap targets below 44×44
+points.
 
 ### Exact zones and hotspots
 
 | Zone | Visual anchors | Exact destinations/actions |
 |---|---|---|
 | Writing study | Writing Desk, paper, writing tools | **Writing Desk** |
-| Library/study | shelves, star chart, specimen cabinet | **Library**, **Constellation**, **Bestiary** as three distinct hotspots |
-| Workshop/store room | workbench, tools, shelves/chest | **Workshop**, **Storehouse** as two distinct hotspots |
+| Library/study | shelves, star chart | **Library**, **Constellation** as distinct hotspots |
+| Workshop | workbench, tools | **Workshop** |
 | Common/planning room | table, chairs/party tokens | **Party** |
+| Yard | spring basin and restrained runoff/growth | **Essence Spring** |
 
-The Library, Constellation and Bestiary may share a room but never share one generic “Study” destination.
-Workshop and Storehouse likewise remain distinct verbs. The room label may support orientation; the actual
-hotspot label and silhouette must identify the destination.
+The Library and Constellation may share a room but never share one generic “Study” destination. **Bestiary
+is inside the Library** as its own shelf, governed by `library-shelves-current.md`; it is not a separate
+house hotspot. Workshop remains its own verb. The room label may support orientation; the actual hotspot
+label and silhouette must identify the destination.
 
-The house contains no Firepit, Essence Spring, Trading Post, Recycler, Blacksmith or recruit station. Those
-are village places. Do not distort the fiction by turning an outdoor spring into a household sink or a
-community fire into a stove merely to preserve the old five-tile Home set.
+The house contains no Storehouse, Firepit, Trading Post, Recycler, Blacksmith or recruit station. The Essence
+Spring is outside in the house's visible yard, never turned into a household sink. Storehouse and Firepit
+belong in The Commons; commercial and craft places belong in their named districts.
 
 ### House change over time
 
@@ -77,18 +89,18 @@ The opening house may gain restrained persistent detail when its real systems im
 a better writing-tool rack, upgraded workshop fixtures or fuller specimen storage. These are visual
 reflections of existing receipts. They are not separate construction projects and grant no extra bonuses.
 
-## Village exterior
+## Village districts
 
-### Opening places
+### Opening geography
 
-The opening village scene contains exactly:
+- Binder House screen: house interior plus yard Essence Spring and three district arrows;
+- Commerce Row: no invented shop; Trading Post appears first, Recycler second, when real rules permit;
+- Makers' Row: Blacksmith is the first reachable maker; later craft buildings appear only with their real
+  owners/construction;
+- The Commons: Storehouse and Firepit are visible opening community buildings.
 
-- the **Binder House** as the stable return landmark and route back to House;
-- **Firepit**;
-- **Essence Spring**.
-
-Recruit-enabled places appear only when their real construction/availability rules permit them. The
-opening sequence remains Trading Post, Recycler, then Blacksmith under its separate campaign authority.
+The Binder House does not appear again as a building tile inside any district. Recruit-enabled places appear
+only when their real construction/availability rules permit them.
 
 ### Place lifecycle
 
@@ -117,9 +129,8 @@ many unfamiliar specialist places, every buildable/built station also receives a
 - redundant with, not a substitute for, the building silhouette;
 - never an invented mechanic (a route-map sign cannot make Wayfarer's Table a route planner).
 
-For dense later villages, spatial districts may be paged with fixed landmarks. Do not shrink every
-building into illegibility, create a free-panning town, or return to a single vertically scrolling station
-list.
+For dense later districts, one district may use fixed sub-areas with landmarks. Do not shrink every building
+into illegibility, create a free-panning town, or return to a single vertically scrolling station list.
 
 ## Attention and “something changed” receipt
 
@@ -182,18 +193,18 @@ availability rule. A rules-owned adapter supplies:
 Tapping an enabled hotspot navigates once. Tapping a disabled known-buildable plot opens its construction
 detail; it does not silently fail. Hidden destinations have no hotspot or accessibility element.
 
-Back from a house destination returns to House at the same scroll/focus state. Back from a village
-destination returns to Village. Diary deep-links are governed by the Party/Library contract and return to
-their originating character.
+Back from a house destination returns to Binder House at the same focus state. Back from a district
+destination returns to its originating district; that district's Home arrow or device Back returns to Binder
+House. Diary deep-links are governed by the Party/Library contract and return to their originating character.
 
 ## Asset Design packet
 
 Asset Design must prove, before native consumption:
 
-1. the ordinary-phone house cutaway with all seven exact hotspots above;
+1. the ordinary-phone house/yard cutaway with all six exact hotspots above and three district arrows;
 2. a collision overlay showing 44×44 minimum targets and no overlap;
 3. color and grayscale/value versions;
-4. Village opening scene with House, Firepit and Essence Spring;
+4. opening Commerce Row, Makers' Row and Commons scenes with no duplicate House tile;
 5. one station in known-buildable, built, improved and attention states—no damaged state;
 6. a six-building identity row proving silhouettes remain distinct before labels;
 7. standardized sign treatment on one obvious and two obscure specialist stations;
@@ -204,15 +215,15 @@ space. Any visible value/action must exist in the game-owned adapter.
 
 ## Engineering checkpoint order
 
-1. Freeze the normalized House/Village scene metadata schema and stable hotspot-to-destination map; no
+1. Freeze normalized Binder-House/district metadata and the stable hotspot-to-destination map; no
    native visual replacement yet.
 2. Add presentation-event receipts, idempotent creation/clear rules and migration defaults; expose a DEBUG
    injector for the four exact reasons.
 3. Integrate House cutaway behind a DEBUG route using the existing destination navigation; verify no route
    duplicates or transactions occur.
-4. Promote House as Base root, retaining a reversible fallback to the current board until ordinary-phone
+4. Promote Binder House as Base root, retaining a reversible fallback to the current board until ordinary-phone
    acceptance.
-5. Integrate Village opening scene and the exact five lifecycle/attention states.
+5. Integrate Commerce Row, Makers' Row and The Commons with the exact five lifecycle/attention states.
 6. Add recruit-station placements in actual campaign order only as each station becomes reachable; do not
    batch-render unimplemented late-game stations into the live village.
 7. Remove native damaged/dormant town presentation and its unreachable assets/tests. This is a UI/state
@@ -220,11 +231,11 @@ space. Any visible value/action must exist in the game-owned adapter.
 
 ## Acceptance
 
-1. Fresh launch, load and expedition return land on the full unclipped House scene.
-2. All seven house hotspots route to the correct existing destinations; no generic Study or Make screen is
+1. Fresh launch, load and expedition return land on the full unclipped Binder House/yard scene.
+2. All six house/yard hotspots and three arrows route correctly; no generic Study or Make screen is
    required to find them.
-3. Party management and Prepare a world are reachable without scrolling on 368×800.
-4. Firepit and Essence Spring exist in Village, not the house.
+3. Party management, Prepare a world and all three districts are reachable without scrolling on 368×800.
+4. Essence Spring is in the house yard; Storehouse and Firepit are in The Commons.
 5. Unknown future stations leak neither name nor silhouette; known buildable stations truthfully explain
    construction.
 6. Each attention reason survives relaunch, clears only on the exact inspection rule and can recur for a
@@ -233,7 +244,7 @@ space. Any visible value/action must exist in the game-owned adapter.
 8. No town damage, repair or rebuilding UI appears under any campaign outcome.
 9. Voice/touch order follows visible room/scene order; this is ordinary structural correctness, not a new
    broad accessibility project.
-10. Physical-phone playtest confirms the Base feels like a house/community rather than a menu and that no
+10. Physical-phone playtest confirms the House/district route feels like a place rather than a menu and no
     real opening verb became harder to find.
 
 ## Explicit exclusions

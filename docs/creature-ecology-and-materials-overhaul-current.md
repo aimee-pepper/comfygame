@@ -1,10 +1,12 @@
 # Creature ecology and creature-material overhaul — current
 
-**Status:** Game Design implementation authority for a versioned creature/ecology correction. Not yet
-implemented. This supersedes the player-facing treatment of animal `MaterialSample.grade` and the current
-ordinary-creature random world-resource/gear/curio drop behavior; it preserves the pressure-budget creature
-generator as the underlying causal model.
-**Priority:** after early encounter-scaling acceptance and before expanding creature-material crafting or
+**Status:** Game Design implementation authority for habitat, body-derived material families and ordinary
+reward provenance. Not yet implemented. The final material-quality/storage migration is reopened under
+`loot-quality-hybrid-review-current.md`; Engineering must not implement either this document's withdrawn
+pure-no-grade comparison or the hybrid until Aimee settles that choice. The pressure-budget creature
+generator remains the underlying causal model.
+**Priority:** after the early encounter-scaling **source checkpoint** and the opening causal field baseline;
+phone combat-feel acceptance is nonblocking. Complete this before expanding creature-material crafting or
 claiming creature/world visual diversity complete.
 **Owner:** Game Design owns ecology, drop semantics and terminology; Engineering owns generation,
 persistence, placement, movement, combat rewards and migration; Asset Design owns functional body/material
@@ -17,7 +19,7 @@ World pressures grow a small coherent ecosystem rather than recolouring generic 
 can generate fish that actually live in water; a windy vertical world can support feathered or membranous
 fliers; a mineral-rich dry world can produce scaled or plated crawlers; an open predatory world can produce
 a large furred quadruped with fangs and claws. Defeating one returns the parts that visibly composed that
-creature—not an unrelated ore roll and not a quality-ranked generic Hide.
+creature—not an unrelated ore roll and not merely a quality-ranked generic Hide.
 
 ## Terminology and storage boundary
 
@@ -28,7 +30,9 @@ The following player-facing nouns are separate and must not be collapsed:
    Toxin, Spore, Reagent, Rift-glass, Raw Essence and Motes where appropriate. They are counted by
    `ResourceID` and never retain a creature source.
 2. **Creature materials** — physical parts derived from a defeated creature's persisted morphology and
-   capabilities. They use the closed family vocabulary below and retain species/world provenance.
+   capabilities. They use the closed family vocabulary below and retain durable knowledge of contributing
+   species/world sources. Exact per-unit provenance versus aggregated family+quality source records is part
+   of the open hybrid-quality decision.
 3. **Items** — gear, consumables, curios and authored trophies. They remain exact catalogue instances and
    use item-capacity rules.
 
@@ -92,26 +96,29 @@ The first live schema contains exactly four habitats:
 |---|---|---|---|
 | `terrestrial` | passable non-water ground | passable non-water ground | no aquatic body requirement |
 | `shore` | shallow water or passable non-water tile cardinally adjacent to water | same shoreline union | amphibious/finned/limbed forms allowed |
-| `aquatic` | shallow `water` only | same connected shallow-water component | piscine, serpentine, radial or amorphous; finned strongly preferred |
+| `aquatic` | shallow or deep water | same connected shallow+deep-water component | piscine, serpentine, radial or amorphous; finned strongly preferred |
 | `aerial` | any passable non-chasm tile except deep water | same current passable set | feathered or membrane appendages required |
 
-Deep-water fauna is intentionally outside the first interactive slice. Deep water is currently
-unsteppable, while encounters begin through deliberate occupied-tile entry; placing combatant fish there
-would make them visible but mechanically unreachable. A later fishing/boat/adjacent-contact feature may
-add a `deepAquatic` interaction, but v1 aquatic creatures live in traversable shallow water.
+Aquatic life may inhabit both shallow and deep water. Its connected habitat component includes cardinally
+connected water of either depth. Because deep water is currently unsteppable, a creature occupying a deep
+tile cannot begin ordinary direct-entry combat there and is not silently pulled onto land for the player's
+convenience. It may become interactable if it naturally moves into connected shallow water. Deep-only fauna
+remains visible ecology until a later fishing, boat or adjacent-contact rule legitimately reaches it.
 
-An aquatic enemy never leaves its connected shallow-water component. Terrestrial enemies never enter
-water. Shore species may cross only the defined shoreline union. Aerial enemies retain the current
-passable-tile movement boundary in v1; this change does not let them cross chasms or deep water.
+An aquatic enemy never leaves its connected water component. Terrestrial enemies never enter water. Shore
+species may cross only the defined shoreline union. Aerial enemies retain the current passable-tile movement
+boundary in v1; this change does not let them cross chasms or deep water.
 
 ### Habitat resolution
 
 Habitat is chosen from both resolved world facts and actual painted terrain availability:
 
 1. Derive `CreatureHabitatAvailability` after terrain painting and entry-connectivity correction:
-   count start-connected non-water tiles, shallow-water tiles, shoreline union and aerial-eligible tiles.
+   count start-connected non-water tiles, connected shallow+deep-water components, shoreline union and
+   aerial-eligible tiles.
 2. Build habitat weights from resolved pressures:
-   - standing/flowing Hydrology and real shallow-water area raise aquatic/shore weight;
+   - standing/flowing Hydrology and real water area raise aquatic weight; shallow-water/land boundary raises
+     shore weight;
    - Relief verticality plus Atmosphere motion raise aerial weight;
    - ordinary dry/open/enclosed ground retains terrestrial weight.
 3. Any habitat with fewer than the minimum legal placement tiles has weight zero. The generator cannot
@@ -157,10 +164,12 @@ New creature materials use these stable families:
 Do not add generic Meat/Flesh in this slice. Food, Tavern cooking and animal husbandry are separate future
 systems and must not be smuggled in through remains.
 
-### No universal quality ladder
+### No return to continuous generic grade as the primary identity
 
-Creature materials do **not** display `crude`, `fine`, `superb`, `monstrous`, rarity colour or a generic
-grade number. Variety is led by the part itself and the animal that produced it.
+Creature variety is led by the part itself and the anatomy that produced it, not by presenting every animal
+as generic Hide/Bone with a continuous grade number. A discrete global quality band may still modify value
+and within-family capability under `loot-quality-hybrid-review-current.md`; that candidate explicitly keeps
+family/material identity authoritative and is not yet settled.
 
 Existing physical properties remain because they make materials function differently:
 
@@ -176,11 +185,17 @@ the relevant capability when useful—**insulating pelt**, **hard scale**, **rea
 claiming one pelt is universally “better.” Recipes require family plus explicit physical capability; they
 never require `grade >= N` after migration.
 
-Creature-material details retain source species, source world/run and the relevant property bars/tags. The
-collection surface aggregates by family (`Feathers ×8`), while the detail surface can filter/select exact
-units for crafting without making each provenance sample consume a slot.
+Creature-material presentation always links back to legitimately learned species/world sources and shows
+the relevant property bars/tags. If the hybrid is accepted, the collection aggregates by exact
+domain+family+quality band (`Fine Feathers ×8`) and detail shows known source records; it does not pretend a
+merged unit retains one exact source. If the hybrid is rejected, the replacement storage rule must be
+settled explicitly before Engineering migrates current exact samples. Neither model may consume item slots.
 
-## Exact replacement for every live grade consumer
+## Withdrawn pure-no-grade replacement (comparison only; do not implement)
+
+> This section records the fully traced consequences of deleting grade, which is useful when comparing the
+> hybrid candidate. It is no longer current implementation authority. The hybrid review owns the open
+> decision; history remains here until that decision is settled and this section can move to the archive.
 
 Removing `MaterialSample.grade` is not a copy change. The current value also controls construction tier,
 Trading Post price, Distillery potency, Scent Mask eligibility, Recycler defaults and several automatic
@@ -394,13 +409,19 @@ families/quantities across save/load. No `±1` loot RNG remains.
 For ordinary generated animals:
 
 - remove the unrelated named-world-resource roll from combat victory;
-- remove the generic random gear drop;
 - remove the generic random curio/key drop;
-- award only XP plus morphology-derived creature materials.
+- award XP plus morphology-derived creature materials;
+- make one isolated **3% gear roll per victorious encounter**, never per defeated creature.
 
-Named world resources come from resource nodes, flora, sites and authored rewards. Gear and curios come
-from sites, Trading Post, crafting, travellers/guardians or another explicit provenance. An ordinary animal
-does not carry a Bent Pick or unidentified key.
+On a successful gear roll, award at most one eligible ordinary gear item from the encounter's current
+campaign/danger band. Present it as equipment recovered from the creature's territory, nest or traces—not as
+a body part and not as something every animal literally carried. It cannot generate a key, quest object,
+authored unique, apex weapon or item above the source cap. Teeming/multi-creature encounters still receive
+one roll. The first slice has no pity timer; DEBUG receipts expose the roll and chosen table.
+
+Named world resources come from resource nodes, flora, sites and authored rewards. Most gear comes from
+sites, Trading Post, crafting, travellers/guardians or another explicit provenance; the rare territory roll
+is the only ordinary-animal exception. An ordinary animal never drops an unidentified key.
 
 Apex encounters retain their separately authored/generated apex trophy/weapon route, plus their actual
 creature materials. A guardian or authored non-animal encounter may retain explicit reward rules, but must
@@ -452,11 +473,12 @@ may add a new creature stat, habitat or drop family.
 1. Add persisted ecology identity and versioned legacy freeze without changing gameplay RNG or existing
    saved enemy positions.
 2. Add habitat availability/resolution and exact spawn/movement eligibility.
-3. Add the shared material-unit value plus separate world/creature reserves and migrate every grade consumer
-   using the exact rules above.
-4. Implement exact remains derivation and remove ordinary unrelated resource/item drops.
-5. Migrate existing animal `MaterialSample` units losslessly into creature-material units; convert old
-   grade-based recipe gates to family/property requirements before deleting their consumer.
+3. After Aimee settles `loot-quality-hybrid-review-current.md`, implement its exact stack/value/crafting
+   model with separate world/creature domains. Do not implement the withdrawn pure-no-grade comparison.
+4. Implement exact remains derivation, remove ordinary unrelated resource/curio drops and add the one-roll
+   3% encounter-level eligible-gear route.
+5. Migrate existing animal `MaterialSample` units losslessly into the settled creature-material stack shape;
+   preserve or visibly version-gate saves according to the accepted quality decision.
 6. Split Storehouse/Field/Return presentation into World resources vs Creature materials.
 7. Integrate functional ecology/material identities and run native phone acceptance.
 
@@ -466,22 +488,24 @@ uses the explicit save-format version boundary approved for this early stage.
 ## Required diagnostics and tests
 
 1. Wet/open-water worlds produce a higher aquatic/shore proportion than dry worlds; no aquatic species
-   generates when the painted map has no legal shallow-water component.
-2. Every aquatic spawn and move remains on its connected shallow-water component; every terrestrial spawn
-   and move remains off water.
+   generates when the painted map has no legal water component.
+2. Every aquatic spawn and move remains on its connected shallow+deep-water component; every terrestrial
+   spawn and move remains off water. A deep-water occupant is not directly enterable until it reaches
+   shallow water or a later legitimate deep-water interaction exists.
 3. Same seed/readings/map/schema produce identical cast, ecology identity, placement and remains.
 4. New morphology consumes no gameplay RNG and does not change existing combat trait budgets.
 5. Feathered, fish-like, armoured/scaled, furred predator and radial/amorphous fixtures produce the exact
    expected material families.
-6. No ordinary animal awards a named world resource, generic gear or curio.
+6. No ordinary animal awards a named world resource or curio; ordinary gear appears only through the single
+   3% eligible encounter-level territory roll.
 7. Apex and authored guardian reward routes remain explicit and do not double-award ordinary gear.
-8. Creature-material families aggregate visually while exact properties/provenance survive crafting,
-   failure partition, return and relaunch.
+8. Creature-material stacks aggregate only by the settled family/quality key while collection-source records,
+   crafting identity, failure partition, return and relaunch remain truthful.
 9. Existing animal samples migrate without count loss; no old item slot remains occupied by them.
-10. No current `grade` field, player-facing `crude/fine/superb/monstrous`, material-grade requirement,
-    grade-derived tier/price/potency or grade-based automatic selection remains.
-11. Blacksmith/Tannery/Specialist construction tiers, weakest-qualifying surplus ordering, family price,
-    Distillery potency, Scent Mask eligibility and Recycler receipt selection match their exact tables.
+10. The settled quality model's current field, six labels/frames, stack key, material capability table and
+    consumer conversions match `loot-quality-hybrid-review-current.md` after Aimee accepts or revises it.
+11. No parallel legacy grade, catalogue rarity colour or synthetic unnamed quality score remains after that
+    migration.
 12. World Generator Web reports habitat counts, species ecology identities, legal placement count and
     material-family projections for rapid review.
 13. Ordinary phone proof shows each reference ecosystem in world, combat, Bestiary, loot and Return
@@ -494,5 +518,5 @@ uses the explicit save-format version boundary approved for this early stage.
 - no deep-water fishing or boats;
 - no item durability;
 - no fixed authored Earth-species catalogue;
-- no creature-quality rarity ladder under another name;
+- no continuous hidden grade or quality-only ladder that erases material/family capability;
 - no late-game station implementation merely because a material may eventually feed it.
