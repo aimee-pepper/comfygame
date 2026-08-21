@@ -329,7 +329,7 @@ route planner, departure hub, world graph, Party screen or supplies shop.
 
 | Form | Player capability | Required physical change |
 |---|---|---|
-| Built · Tier 0 | Existing +2 satchel capacity, +1 organic node yield and exact visible-flora field note | Open weatherproof field shelter centred on one broad map/packing table, field guide, folded cloth, sample tins and provision hooks; no counter |
+| Built · Tier 0 | Existing +2 satchel capacity, +1 organic node yield and exact visible-flora field note | Open weatherproof field shelter centred on one broad packing/work table, field guide, folded cloth, sample tins and provision hooks; no map, route diagram or counter |
 | Improved · Tier 1 — **Sample Ledger** | Sela's note adds a simple expected-yield band and whether this exact visible node has already been harvested; no remote reveal and no numeric biology | Same shelter gains an open species/sample ledger, protected folio cabinet and ordered sample rack |
 | Mastered · Tier 2 — **Preservation Cabinet** | +1 further organic node yield (current tuning) through better field preservation; it adds no satchel rung, route UI or departure verb | Same structure gains a larger sealed field cabinet, drying/sample drawers and a modest second preparation surface; no interactive world map |
 

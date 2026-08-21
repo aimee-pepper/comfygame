@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "aggregateSourceHash": "20ea6a18d3580d70a75dbf09ca0ea9d83ec00f76c9b196d831110c87ff95246d",
+  "aggregateSourceHash": "9187541590ba4203801bdc899ce546b6db9650860043124b56f8617ff67a6e6e",
   "inputs": {
     "Sources/Content/Data/items.json": "b94b1107229f217e14f1d7fa936d8eea938f9782c06c583be32302f10d432bc9",
     "Sources/Content/Data/playability-roadmap.json": "2ab045a5a59658f9558a347379994a1ec6056d52882d23b04edcf6bb6ed149e4",
@@ -250,7 +250,7 @@
     "docs/tutorial-later-system-hooks-current.md": "bf3668755f1a82bdb446c8a169f0f43f6809be529eb055f5db5c684c69593296",
     "docs/tutorial-opening-slices-current.md": "185d4e421c6fbf8dfcabf46006e679621f4b0fb8b53d4a6c1ca477aabe41bb32",
     "docs/tutorial-return-comparison-slices-current.md": "61b1e52691438026cc4e0f49b53addb966875d8e2d9f5841a6bdac1377d7a1e4",
-    "docs/village-progression-and-asset-matrix-current.md": "6ef844ce19bc2012924337b29f535ae2e6d336c479441b464839b459884d55e6",
+    "docs/village-progression-and-asset-matrix-current.md": "1ccb3df2a94babf202cf45222e31f6956156cd9f7184bde5f5b7c0700260427a",
     "docs/void-cap-current.md": "3598aa5a4e2ddbc5441dbb959e5b2b3a615c758759504ce0b96f40243423ad9c",
     "docs/wayfarers-table-flora-recognition-current.md": "01de8b57fba27ce086ac1433890ad42d6d8b740a156dc7c9c685970843e61261",
     "docs/weaponsmith-implementation-current.md": "43a6deed0bfe3a91d82626f22cbd23031d2f664d67ea7627fd5f2a1213fdb0d3",
@@ -268,7 +268,7 @@
     "docs/writing-tool-progression-current.md": "be17fe07aa89aaaab7117a2faca43d7e1eb1be23202d19106c67c42547b23bb0"
   },
   "outputs": {
-    "generated/wiki-data.json": "b3d9d1b5deaceae39fc3d9000cc6ef2fb74497994660d0081361a38d75824556",
-    "generated/source-registry.json": "7a9853a3e1a33ae78486a99b8af9fffa24f7bc0f79452a3b2f5b3e66738ef7a8"
+    "generated/wiki-data.json": "e3145960caaa3f4e483566efbe40afa89ef79740733f4fde7286c80dadfeab94",
+    "generated/source-registry.json": "db7cfd1778e995faa412255f6becf2280f88c9632570177f77bccac8892bc602"
   }
 }
