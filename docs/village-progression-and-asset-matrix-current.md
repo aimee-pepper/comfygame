@@ -351,6 +351,36 @@ route planner, departure hub, world graph, Party screen or supplies shop.
 - No damaged, defended, ruined, repaired or rebuilt sprites.
 - Unknown/absent means no silhouette, sign, hotspot or accessibility element.
 
+### Per-building visual key
+
+The accepted Trading Post style gate establishes final cluster density and shared environmental palette.
+The table below fixes what must remain distinct inside that style. Accent names describe relative palette
+roles, not permission to recolour one generic façade.
+
+| Stable ID | Foundation clue | Built silhouette and value key | Materials / restrained accents | Protected through Improved and Mastered | Must not converge with |
+|---|---|---|---|---|---|
+| `trading_post` | two counter posts, shallow loading apron and hanging-balance bracket | medium-width open frontage; light awning over a darker counter/body | dark walnut, worn honey counter, ochre/cream cloth, brass, cool slate shadow | open counter, primary awning, balance, ledger position | Tavern, bank, resource converter, generic house |
+| `recycler` | long bench footing, vise base and three shallow sorting bins | low open horizontal workshop with an ordered left-to-right parts flow | weathered oak, blue-grey iron, pale bin wood, small copper clamp highlights | separation bench, vise, ordered bins | Blacksmith forge, scrapyard, modern factory |
+| `blacksmith` | stone hearth base, chimney footing and covered anvil stump | tall dark chimney/hood over a bright contained hearth and heavy low anvil | soot slate, clay red-brown, iron charcoal, ember amber | hearth, chimney/hood, anvil, quench trough | Weaponsmith showroom, Armoury, furnace factory |
+| `tannery` | drain/wash-stone edge and one upright stretching frame | airy shed with tall lateral frames and a protected open drying side | pale/medium hide browns, sage wash, linen cream, weathered timber; no gore red | stretching frame, scraping beam, covered drying rack | butcher, stable, Storehouse |
+| `bowyer` | long sill and tillering-tree uprights | longest narrow Makers façade; repeated vertical staves and an outdoor target gap | honey wood, olive cord, pale shavings, tiny muted target-red accent | stave rack, tillering tree, test target/lane | Weaponsmith, gun shop, generic timber shed |
+| `armoury` | broad masonry footing and central fitting-dais plinth | widest/heaviest Makers body; central articulated mannequin against cool light plates | cool stone, blue-grey metal, dark leather, muted indigo padding | armour stand, forming stakes, fitting dais | Blacksmith, Weaponsmith, clothing shop |
+| `weaponsmith` | compact vise plinth and horizontal balance-beam sockets | compact precision shop organized around one long horizontal balance line | dark wood, iron, restrained oxblood grip wrap, pale measure marks | weapon vise, balance beam, grip rack | Blacksmith, Bowyer, weapon retailer |
+| `scriptorium` | pale wall footing, north-window frame and braced table legs | lightest Makers interior; broad steady horizontal table below a cool bright window | lime plaster, walnut, paper cream, charcoal; tiny cyan/magenta/yellow ink-well accents only after unlocked | north window, stable table, brush/tool rack, drying line | Library, printing press, Apothecary |
+| `apothecary` | washable stone work edge, drying-frame posts and burner plinth | small warm workroom with clustered hanging herbs above low vessels | sage/olive plants, amber glass, cream ceramic, copper, warm stone | mortar, ceramic vessels, drying bundles, controlled burner | Distillery, kitchen, potion-shop cliché |
+| `distillery` | circular vessel plinths, cooling-basin edge and receiver shelf | tall repeated vessel/column rhythm with cool negative space and crystal highlights | cool grey stone, clear/cyan quartz, silver braces, small heat-amber receivers | primary column, crystal racks, receiver bowls, fraction marks | Apothecary, brewery, generic alchemy shop |
+| `channelworks` | boundary-plate rectangle, core-cradle base and lever post | compact heavy frame around a deliberately empty containment aperture | charcoal plate, silver braces, ceramic cream, restrained authored core hue | containment bench, core cradle, boundary plates, remote lever | Blacksmith, Distillery, glowing portal room |
+| `storehouse` | broad loading apron, paired threshold stones and hoist socket | broadest Commons façade; two dark door bays beneath a heavy light roofline | grey fieldstone, oak, canvas tan, muted blue-grey doors, rope | double doors/bays, loading apron, manual hoist | merchant shop, house, endless shelf tower |
+| `firepit` | exact central ring of windbreak/hearth stones | low open social silhouette with bright central ember and wide seating arc | fieldstone, aged oak, ember orange, muted teal/rust wool | original hearth stones, kettle hook, seating relationship | forge, shrine, campsite damage state |
+| `survey_post` | two long baseline posts and central mast socket | raised open deck with one tall thin mast and long horizontal measuring beam | weathered oak, brass, pale canvas, desaturated sky blue | observation deck, mast, baseline, lens bench | lighthouse, radio tower, Wayfarer's shelter |
+| `reliquary` | low stone perimeter, central table base and two fragment niches | enclosed low study with a broad pale plan-table plane and repeated wall niches | limestone, walnut, paper cream, muted terracotta fragments | plan table, fragment niches/trays, rubbing wall | Library, shrine, museum treasure room |
+| `wayfarers_table` | four shelter posts and the full packing-table footprint | open weatherproof shelter with one dominant broad table and hanging kit edge | field oak, olive canvas, tin blue-grey, paper cream, folded cloth accents | packing table, field guide, sample tins, provision hooks | route planner, Trading Post, Party screen |
+| `anchorage` | four heavy frame footings around an unfilled central circle | quiet high-braced hall whose darkest structure surrounds a deliberately empty centre | dark oak, deep stone, iron, cream tension rope, restrained Atlas teal | open anchoring frame, empty centre, Atlas lectern, tension braces | portal, Constellation, glowing control room |
+
+For every row, the foundation clue is the only future-function disclosure permitted on a known-buildable
+plot. It may be accompanied by the standard name/pictogram sign and exact construction status, but no stock,
+keeper portrait, completed roofline or later-tier fixture appears early.
+
 ## 6. Binder House and Library exact art direction
 
 ### Binder House/yard
@@ -375,6 +405,12 @@ Mandatory visual zones:
 Forbidden: Workshop hotspot, Storehouse inside the house, Bestiary separate hotspot, modern office, generic
 fantasy wizard tower, empty tan rectangles, labels carrying room identity, clipped yard or invented walking.
 
+Palette/value authority: slate roof and dark exterior timbers frame warmer limewashed rooms; aged oak floors
+and furniture carry mid-values; paper/linen and window light are the brightest non-effect values; faded rust,
+rain-blue and olive textiles create domestic colour without turning rooms into color-coded UI. The yard is
+cooler/desaturated than the interior, with the Essence Spring's restrained blue-green highlight below paper
+brightness. The writing desk, bookcase and common table must remain distinct in literal grayscale.
+
 ### Library destination
 
 Use one close-up floor-to-ceiling timber bookcase. A second adjoining case is permitted only if one cannot
@@ -393,6 +429,11 @@ books. Count stages are folded paper, stitched folio, softbound, hardcover, full
 
 Forbidden: second full-room shot, floor plan, tables/chairs, modern tab bar, five floating cards, fabricated
 titles, unknown names/species, bookshelf rendered as a grid of flat coloured rectangles.
+
+Palette/value authority: honey-to-walnut timber, paper cream, aged leather rust/olive/navy and restrained
+brass labels under warm side light. Shelf interiors are dark enough to separate paper silhouettes but never
+black voids. Section identity comes from physical contents and construction, not five unrelated panel colors;
+all five targets and every paper→folio→book stage remain distinct in literal grayscale.
 
 ## 7. Asset checkpoint order
 
