@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "updatedAt": "2026-08-18T22:01:00.945Z",
+  "updatedAt": "2026-08-18T22:33:31.385Z",
   "reviews": {
     "campaigns": {
       "choice": "no",
@@ -8,7 +8,7 @@
     },
     "home": {
       "choice": "queue",
-      "notes": "Bind and depart should say where it takes you, because bind and depart should actually mean you bind it and go to the world, not just 'go to the writing desk'. ",
+      "notes": "Bind and Depart should say where it takes you and ultimately bind and enter the world, rather than merely opening Writing Desk. Implement this exact Home visual now; queue that departure-outcome correction separately.",
       "designVersion": "draft-0"
     },
     "writing-desk": {
@@ -471,6 +471,27 @@
       "approvedAt": "2026-08-18T21:18:21.000Z",
       "stylePath": "reviews/approved-styles/9233681ef38da5e862baf8536daab1376172ef8870cc3e1487cabc5d6649efb8.css",
       "snapshotSHA256": "d260cc9dff5fc247d6d74e400e1a8c067cd5874a3db14cf92438d81ebb83f12a"
+    },
+    "home": {
+      "screenID": "home",
+      "decision": "queue",
+      "notes": "Bind and Depart should say where it takes you and ultimately bind and enter the world, rather than merely opening Writing Desk. Implement this exact Home visual now; queue that departure-outcome correction separately.",
+      "designVersion": "draft-0",
+      "sourceRevision": "da7308ecf008",
+      "fixtureStates": [
+        "Default",
+        "Selected",
+        "Confirm"
+      ],
+      "htmlByState": {
+        "Default": "<div class=\"\"><div class=\"safe-top\"><span>10:22</span><span>● ◒ ▰</span></div><div class=\"phone-head\"><h3>Base</h3><span class=\"context-purse\">◆ 40 Essence · ✦ 0 Motes · ⚙</span></div><div class=\"phone-content base-content\"><div class=\"town-scene\"><nav class=\"town-tabs\" aria-label=\"Base districts\"><div class=\"tab-row\"><button class=\"tab active\">Home</button><button class=\"tab \">Make</button><button class=\"tab \">Study</button><button class=\"tab \">Realms</button></div></nav><span class=\"town-caption\">Home · five places ready</span><button class=\"hotspot desk\" style=\"--x:17%;--y:25%;--w:20%;--h:7%\" data-route=\"writingDesk\"><span><b>Writing Desk</b><small>compose</small></span></button><button class=\"hotspot work\" style=\"--x:6%;--y:36%;--w:32%;--h:12%\" data-route=\"workshop\"><span><b>Workshop</b><small>make</small></span></button><button class=\"hotspot store\" style=\"--x:59%;--y:26%;--w:34%;--h:12%\" data-route=\"storehouse\"><span><b>Storehouse</b><small>stored goods</small></span></button><button class=\"hotspot spring\" style=\"--x:7%;--y:57%;--w:36%;--h:15%\" data-route=\"essenceSpring\"><span><b>Essence Spring</b><small>refine</small></span></button><button class=\"hotspot fire\" style=\"--x:69%;--y:60%;--w:29%;--h:12%\" data-route=\"firepit\"><span><b>Firepit</b><small>gather</small></span></button></div></div><div class=\"bottom-rail home-actions\"><button class=\"pixel-btn\">Party</button><button class=\"pixel-btn primary\">Bind & Depart</button></div></div>",
+        "Selected": "<div class=\"\"><div class=\"safe-top\"><span>10:22</span><span>● ◒ ▰</span></div><div class=\"phone-head\"><h3>Base</h3><span class=\"context-purse\">◆ 40 Essence · ✦ 0 Motes · ⚙</span></div><div class=\"phone-content base-content\"><div class=\"town-scene\"><nav class=\"town-tabs\" aria-label=\"Base districts\"><div class=\"tab-row\"><button class=\"tab active\">Home</button><button class=\"tab \">Make</button><button class=\"tab \">Study</button><button class=\"tab \">Realms</button></div></nav><span class=\"town-caption\">Home · five places ready</span><button class=\"hotspot desk\" style=\"--x:17%;--y:25%;--w:20%;--h:7%\" data-route=\"writingDesk\"><span><b>Writing Desk</b><small>compose</small></span></button><button class=\"hotspot work\" style=\"--x:6%;--y:36%;--w:32%;--h:12%\" data-route=\"workshop\"><span><b>Workshop</b><small>make</small></span></button><button class=\"hotspot store\" style=\"--x:59%;--y:26%;--w:34%;--h:12%\" data-route=\"storehouse\"><span><b>Storehouse</b><small>stored goods</small></span></button><button class=\"hotspot spring\" style=\"--x:7%;--y:57%;--w:36%;--h:15%\" data-route=\"essenceSpring\"><span><b>Essence Spring</b><small>refine</small></span></button><button class=\"hotspot fire\" style=\"--x:69%;--y:60%;--w:29%;--h:12%\" data-route=\"firepit\"><span><b>Firepit</b><small>gather</small></span></button></div></div><div class=\"bottom-rail home-actions\"><button class=\"pixel-btn\">Party</button><button class=\"pixel-btn primary\">Bind & Depart</button></div></div>",
+        "Confirm": "<div class=\"\"><div class=\"safe-top\"><span>10:22</span><span>● ◒ ▰</span></div><div class=\"phone-head\"><h3>Base</h3><span class=\"context-purse\">◆ 40 Essence · ✦ 0 Motes · ⚙</span></div><div class=\"phone-content base-content\"><div class=\"town-scene\"><nav class=\"town-tabs\" aria-label=\"Base districts\"><div class=\"tab-row\"><button class=\"tab active\">Home</button><button class=\"tab \">Make</button><button class=\"tab \">Study</button><button class=\"tab \">Realms</button></div></nav><span class=\"town-caption\">Home · five places ready</span><button class=\"hotspot desk\" style=\"--x:17%;--y:25%;--w:20%;--h:7%\" data-route=\"writingDesk\"><span><b>Writing Desk</b><small>compose</small></span></button><button class=\"hotspot work\" style=\"--x:6%;--y:36%;--w:32%;--h:12%\" data-route=\"workshop\"><span><b>Workshop</b><small>make</small></span></button><button class=\"hotspot store\" style=\"--x:59%;--y:26%;--w:34%;--h:12%\" data-route=\"storehouse\"><span><b>Storehouse</b><small>stored goods</small></span></button><button class=\"hotspot spring\" style=\"--x:7%;--y:57%;--w:36%;--h:15%\" data-route=\"essenceSpring\"><span><b>Essence Spring</b><small>refine</small></span></button><button class=\"hotspot fire\" style=\"--x:69%;--y:60%;--w:29%;--h:12%\" data-route=\"firepit\"><span><b>Firepit</b><small>gather</small></span></button></div></div><div class=\"bottom-rail home-actions\"><button class=\"pixel-btn\">Party</button><button class=\"pixel-btn primary\">Bind & Depart</button></div></div>"
+      },
+      "styleSHA256": "75c4fe58789b8cb16b6587d439a87e5ec5cbed58f211cb8ebc1b0df0416da5a2",
+      "approvedAt": "2026-08-18T22:33:31.385Z",
+      "stylePath": "reviews/approved-styles/75c4fe58789b8cb16b6587d439a87e5ec5cbed58f211cb8ebc1b0df0416da5a2.css",
+      "snapshotSHA256": "2912cd72155bba6958612d1d11ce0d612bd75031f7ded1e8f3681169eff9a939"
     }
   }
 }

@@ -81,6 +81,12 @@ assert.match(rendered["Pages · Delete Template"],/template-confirmation[\s\S]*D
 
 const world=rendered["The world"];
 assert.match(world,/world-pane/,"The world must have a dedicated projection pane");
+assert.match(world,/world-projection-scroll/,"the complete projection must scroll independently above the fixed departure action");
+assert.match(world,/Ranges · 6 subjects left to chance/,"the projection must disclose which values remain ranges rather than presenting guesses as certainty");
+assert.match(world,/WHAT THIS WORLD WILL BE[\s\S]*No contradictions/,"the projection must retain the rules-owned world description and contradiction disclosure");
+assert.match(world,/projection-stability[\s\S]*holds ~12 turns[\s\S]*Why stability moved/,"the projection must show stability, hold time, and its breakdown");
+assert.match(world,/MAP[\s\S]*11×11[\s\S]*CLEAR SIGHT[\s\S]*7 tiles[\s\S]*DANGER[\s\S]*tier 2[\s\S]*COST[\s\S]*8/,"the projection must preserve all four native headline stats");
+assert.match(world,/EXPECTED HARVEST[\s\S]*LIFE/,"the projection must preserve expected harvest and life forecasts");
 assert.match(world,/bind-and-depart[\s\S]*Bind (?:&amp;|&) Depart/,"Bind & Depart must live in The world");
 assert.doesNotMatch(world,/clear-context-action|target-bin-rail|writing-palette|pages-section-tabs/,"The world must not inherit Write or Pages controls");
 

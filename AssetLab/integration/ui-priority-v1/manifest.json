@@ -1,7 +1,10 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "id": "ui-priority-v1",
-  "integrationReady": true,
+  "integrationReady": false,
+  "readinessScope": "per-screen-only",
+  "packageStatus": "ordered-handoff-index",
+  "deliveryContract": "docs/cross-lead-delivery-contract-current.md",
   "ordinaryPhone": {"width": 368, "height": 800, "contentSize": "ordinary"},
   "typography": {"display": "Jersey 10", "compact": "Tiny5", "prose": "system readable face"},
   "appearance": {
@@ -15,6 +18,15 @@
   "screens": [
     {
       "id": "campaigns",
+      "behaviorAuthority": ["docs/cross-lead-delivery-contract-current.md#campaigns", "Sources/Screens/CampaignStartView.swift", "Tests/CampaignStartPresentationTests.swift"],
+      "receipts": {
+        "designSettled": true,
+        "assetCandidate": true,
+        "visualReview": {"status": "rejected", "decision": "no", "authority": "AssetLab/reviews/ui-gallery-reviews.json"},
+        "assetFrozen": {"status": "historical-baseline", "designVersion": "restored-a5f2512", "snapshotSHA256": "d260cc9dff5fc247d6d74e400e1a8c067cd5874a3db14cf92438d81ebb83f12a", "styleSHA256": "9233681ef38da5e862baf8536daab1376172ef8870cc3e1487cabc5d6649efb8"},
+        "nativeIntegration": {"status": "not-integrated-current-approved-candidate"}
+      },
+      "integrationReady": false,
       "nativeFiles": ["Sources/Screens/CampaignStartView.swift", "Tests/CampaignStartPresentationTests.swift"],
       "states": ["Default", "Selected", "Confirm"],
       "preserve": ["stacked progress-book array", "exact save names and validity", "Continue and separate New Game", "Export unchanged and confirmed Delete"],
@@ -22,6 +34,15 @@
     },
     {
       "id": "home",
+      "behaviorAuthority": ["docs/cross-lead-delivery-contract-current.md#home-and-departure", "docs/starting-town-band1-integration-current.md", "Sources/Screens/BaseView.swift", "Sources/Screens/StartingTownHomeScene.swift"],
+      "receipts": {
+        "designSettled": true,
+        "assetCandidate": true,
+        "visualReview": {"status": "approved-with-queued-change", "decision": "queue", "authority": "AssetLab/reviews/ui-gallery-reviews.json"},
+        "assetFrozen": {"status": "frozen", "designVersion": "draft-0", "snapshotSHA256": "2912cd72155bba6958612d1d11ce0d612bd75031f7ded1e8f3681169eff9a939", "styleSHA256": "75c4fe58789b8cb16b6587d439a87e5ec5cbed58f211cb8ebc1b0df0416da5a2"},
+        "nativeIntegration": {"status": "integrated", "checkpoint": "f4ebf8c", "scope": "approved Home scene chrome; queued departure behavior is not included"}
+      },
+      "integrationReady": true,
       "nativeFiles": ["Sources/Screens/BaseView.swift", "Sources/Screens/StartingTownHomeScene.swift", "Tests/BaseBoardTests.swift", "Tests/StartingTownHomeSceneTests.swift"],
       "states": ["Home", "Make", "Study", "Realms"],
       "preserve": ["authored full-height Home scene", "five exact Home hotspots", "permanent district navigation", "compact Party and Bind & Depart actions"],
@@ -29,6 +50,15 @@
     },
     {
       "id": "writing-desk",
+      "behaviorAuthority": ["docs/cross-lead-delivery-contract-current.md#writing-desk", "Sources/Screens/WritingDeskView.swift", "Tests/PageTests.swift"],
+      "receipts": {
+        "designSettled": true,
+        "assetCandidate": true,
+        "visualReview": {"status": "rejected", "decision": "no", "authority": "AssetLab/reviews/ui-gallery-reviews.json"},
+        "assetFrozen": {"status": "not-frozen"},
+        "nativeIntegration": {"status": "not-integrated"}
+      },
+      "integrationReady": false,
       "nativeFiles": ["Sources/Screens/WritingDeskView.swift", "Tests/PageTests.swift"],
       "states": ["Write", "Runebook", "Pages · Collected", "Pages · Templates", "Pages · Template actions", "Pages · Replace draft", "Pages · Rename Template", "Pages · Overwrite Template", "Pages · Delete Template", "The world", "Collected world", "Born anchored", "Clear Confirm"],
       "preserve": ["page remains the hero", "full-width unboxed vocabulary drawer", "Collected and Templates workflows", "Bind & Depart only in The world", "all destructive confirmations"],
@@ -36,6 +66,15 @@
     },
     {
       "id": "world",
+      "behaviorAuthority": ["docs/cross-lead-delivery-contract-current.md#world-visibility-and-memory", "docs/cross-lead-delivery-contract-current.md#terrain-edges-and-elevation", "Sources/Screens/WorldView.swift", "Tests/WorldTests.swift", "Tests/WorldVisibilityRulesTests.swift"],
+      "receipts": {
+        "designSettled": true,
+        "assetCandidate": true,
+        "visualReview": {"status": "unreviewed-current-candidate", "authority": "AssetLab/reviews/ui-gallery-reviews.json"},
+        "assetFrozen": {"status": "not-frozen"},
+        "nativeIntegration": {"status": "not-integrated-ui-redesign", "note": "landed visibility behavior is a separate native receipt"}
+      },
+      "integrationReady": false,
       "nativeFiles": ["Sources/Screens/WorldView.swift", "Tests/WorldTests.swift", "Tests/WorldVisibilityRulesTests.swift"],
       "states": ["Travel", "Look", "Harvest", "Search", "Portal", "Cache", "Survey & anchor", "Loose page", "Night sight"],
       "preserve": ["fixed-scale map and rules-owned visibility", "stability and collapse truth", "three proportional party health bars", "compact Field Kit strip", "large movement pad beside minimap", "small Look and Interact controls beneath minimap", "opaque icon well and gradient information panel"],
@@ -43,6 +82,15 @@
     },
     {
       "id": "return-recap",
+      "behaviorAuthority": ["docs/cross-lead-delivery-contract-current.md", "Sources/App/RootView.swift", "Tests/ExpeditionOutcomeTests.swift"],
+      "receipts": {
+        "designSettled": true,
+        "assetCandidate": true,
+        "visualReview": {"status": "unreviewed-current-candidate", "authority": "AssetLab/reviews/ui-gallery-reviews.json"},
+        "assetFrozen": {"status": "not-frozen"},
+        "nativeIntegration": {"status": "not-integrated-ui-redesign"}
+      },
+      "integrationReady": false,
       "nativeFiles": ["Sources/App/RootView.swift", "Tests/ExpeditionOutcomeTests.swift"],
       "states": ["Returned", "Collapsed", "Receipt detail"],
       "preserve": ["single comprehensive receipt", "exact recovered and lost identities", "kept writing and travellers", "Essence runway", "one Return to Base action"],
