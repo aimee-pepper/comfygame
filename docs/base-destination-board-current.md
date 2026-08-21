@@ -1,7 +1,8 @@
 # Base destination board — current design
 
-**Status:** native board/schema implemented for the current catalogue; Noll/Recycler and later
-station rows integrate through the same authority, while exact tile art remains Aimee's work.  
+**Status:** current destination-ID/order compatibility authority, but its four-tab board presentation and
+damage lifecycle are superseded by `home-house-and-village-current.md`. Native routes may reuse this
+catalogue beneath House/Village hotspots.
 **Owner:** Game Design; Engineering owns responsive navigation/state; Aimee owns final station
 silhouettes. AssetLab may use labelled functional placeholders for layout/conformance only.  
 **Priority:** P1 spatial-language correction after current blocker checkpoints.
@@ -118,10 +119,12 @@ One stable station ID occupies one board position through its lifecycle:
 2. **Foundation:** keeper recruited and construction available; tile uses the authored foundation
    silhouette and a **Build** badge. Tap opens exact cost, first useful capability and confirmation.
 3. **Built:** tap enters the station. Tier appears as a compact badge only when meaningful.
-4. **Attention:** result/stock/research/delivery is available; a redundant dot/shape and VoiceOver
-   phrase identify it without changing position.
-5. **Damaged/dormant:** existing place remains visible and explains the restoration/reactivation
-   action. It never masquerades as absent.
+4. **Improved:** the same place gains authored functional additions; it does not become a replacement row.
+5. **Attention:** persisted truthful construction/contribution/stock/waiting events overlay the current built
+   state and clear under `home-house-and-village-current.md`.
+
+The village is never damaged. Remove damaged/repair/rebuilding presentation. Anchored-realm dormancy remains
+a separate realm lifecycle and must not be inferred as a village-building state.
 
 Firepit→Tavern changes identity/state in the same Home tile. Library keeper attachment deepens the
 same Study tile. Neither creates a duplicate destination.
@@ -179,10 +182,9 @@ The destination board can show:
 It cannot reveal an unrecruited keeper, future building, unknown recipe, hidden traveller order or
 undiscovered material route. “Make” is navigation language, not a promise that every output is known.
 
-The first scenic implementation is bounded by `starting-town-band1-integration-current.md`: Home
-contains exactly Writing Desk, Storehouse, Firepit, Essence Spring and Workshop; Party remains a
-bottom utility, and Library/Constellation/Bestiary remain separate Study destinations. Scenic
-hotspots and their image must share one coordinate authority, with no unaccounted fill-cropping.
+The current scenic implementation is bounded by `home-house-and-village-current.md`: the Binder House owns
+the writing, study, workshop/storage and Party zones; Firepit and Essence Spring remain in Village. Scenic
+hotspots and their image share one coordinate authority, with no unaccounted fill-cropping.
 
 ## Acceptance gates
 
@@ -198,7 +200,8 @@ hotspots and their image must share one coordinate authority, with no unaccounte
 7. Back navigation restores tab, scroll and accessibility focus; deep links land on the correct tile.
 8. Large Text uses two columns without truncating names/actions; VoiceOver reads section, station,
    lifecycle, tier/attention and action in that order.
-9. Grayscale/High Contrast distinguish foundation, built, attention and damaged/dormant without color.
+9. Grayscale/value distinguish known-buildable, built, improved and attention without color. No village
+   damage/dormancy state exists.
 10. Existing saves migrate without relocking stations or changing purchased tier/keeper/build state.
 11. No tile uses text scaling or a chevron to preserve the grid; long/accessibility names trigger
     the two-column fallback and retain full labels.

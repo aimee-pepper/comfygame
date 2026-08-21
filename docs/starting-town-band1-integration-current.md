@@ -1,10 +1,11 @@
 # Starting town — Band 1 integration boundary
 
-**Status:** implementation/asset correction required before the held town package can land  
+**Status:** superseded opening-scene proposal; retained for history. Current authority is
+`home-house-and-village-current.md`.
 **Date:** 14 August 2026  
 **Priority:** early Home spatial identity; no later-station breadth
 
-## Smallest useful slice
+## Historical slice
 
 Integrate one spatial **Home** scene and keep Make, Study and Realms on their already-functional
 destination grids. Do not make the complete generated-town system a prerequisite for replacing the
@@ -91,4 +92,3 @@ Those are not rejected; they simply cannot keep the opening spatial Home change 
 4. All destinations and bottom actions fit at 368×800 with no ordinary scrolling or clipping.
 5. Missing/malformed scene metadata fails closed to the current station grid.
 6. Existing station lifecycle, tab ordering, first-return focus and save data remain unchanged.
-

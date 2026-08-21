@@ -1,30 +1,35 @@
 # Player-progression implementation roadmap — current
 
 **Status:** operational ordering authority beneath Aimee's priority calls  
-**Date:** 20 August 2026
+**Date:** 21 August 2026
 **Purpose:** order implementation by what a real fresh-save player can reach and test, rather than
 by whichever late dependency is easiest to isolate in code.
+
+For Bands 0–3, exact cross-lead implementation packets, dependencies, prohibited scope and phone cards now
+live in `first-three-worlds-execution-plan-current.md`. This roadmap owns reachability order; that execution
+plan owns how each early item may be handed off. A broad row here is never sufficient implementation
+authority by itself.
 
 This document supersedes any plan that treats “finish all combat nodes,” “finish all stations,” or
 “clear every implementation-ready design” as one active work item. The machine board remains
 `Sources/Content/Data/playability-roadmap.json`; its sequence and priorities must agree with the
 bands below.
 
-## Current reconciliation — 20 August
+## Current reconciliation — 21 August
 
-- The shared checkout is stale and dirty at `7a8b18c`; `origin/main` is `66f728f`. It is not a safe
-  implementation base until the unrelated Design, AssetLab and Campaign packets are separated.
-- The clean `codex/world-approved-ui` branch at `2d2e7ce` contains later Home, Writing Desk, World
-  and Return Recap work and is the strongest known source for installed phone build 234. The bundle
-  cannot independently disclose its commit, so this remains an install receipt rather than proof
-  of player acceptance.
-- Campaigns is visually unresolved; Home is visually queued with a departure-behavior correction;
-  Writing Desk's latest projection correction remains an isolated AssetLab candidate; World and
-  Return Recap are source/installed candidates awaiting ordinary-play disposition.
-- No Engineering source slice and no Asset consumer are currently active. Asset may remain idle.
-- **Encounter scaling remains the one acceptance primary.** The next product milestone is not a
-  late feature: it is one accepted Campaign → Home → Writing → World → Return chain supporting three
-  fresh-save expeditions.
+- Repository reconciliation is complete. `main`/`origin/main` reached docs-only checkpoint `7f61dcd` after
+  preserving the accepted phone-source baseline `2d2e7ce` ancestrally and keeping rejected/unfinished
+  packets outside main. The phone remains build 234 sourced from the accepted baseline; no later source
+  completion is implied installed or accepted.
+- The old shared checkout is clean on its named preservation branch. New Game Design packets in that
+  checkout require one exact docs-only integration into current main before they are dispatch authority;
+  no gameplay may be implemented from the preservation branch itself.
+- The accepted/source-complete Asset and native candidates remain separate receipts. Writing, arrival,
+  world visuals and Return are not accepted merely because components exist in AssetLab or on main.
+- **Encounter scaling remains the sole active/acceptance primary according to the live roadmap.** Engineering
+  and Asset were idle at this reconciliation check; no new source task is authorized by these docs alone.
+- The next product milestone is still an accepted Campaign → House → Writing → World → Return chain over
+  three fresh-save expeditions, now decomposed exactly by `first-three-worlds-execution-plan-current.md`.
 
 Receipt meanings and mockup behavior fences are authoritative in
 `cross-lead-delivery-contract-current.md`. A source-complete item parked for a later reachable band
@@ -105,16 +110,20 @@ save a bug report, all on the phone.
    remains available immediately.
 5. **1.5 World readability:** the full map, bottom border, fog, minimap, route, party, resources,
    portal and controls fit; POIs remain hidden until discovered.
-6. **1.6 Visual diversity:** terrain, flora, resources and world color reflect actual relative
-   world difference while similar worlds remain related.
+6. **1.6 Causal arrival and visual diversity:** a frozen generated image plus concrete description leads
+   into a matching map; terrain, flora, resources and world color reflect actual relative world difference
+   while similar worlds remain related. Hidden sites remain undisclosed pending the explicit splash-site
+   visual decision.
 7. **1.7 Found writing:** every world contains at least one reachable writing; page acquisition and
    the return recap agree exactly.
-8. **1.8 Contact authority:** Look is safe and zero-turn; apex/active flora require direct entry;
-   ordinary creature contact and ambush state are visible and persisted.
+8. **1.8 Contact authority and field consequence:** Look is safe and zero-turn; adjacent known harm/slow
+   cues describe real visible consequences; apex/active flora require direct entry; ordinary creature
+   contact and ambush state are visible and persisted.
 9. **1.9 Basic combat usability:** Attack, starter techniques, target legality, items, flee, HP,
    armour, rank, status and passed-out state remain truthful. No late tree node is required here.
-10. **1.10 Loot and equipment:** all accessible stored/overflow/worn/carried candidates are visible;
-   exact gear identity survives swap, full storage, relaunch and recap; actions stay reachable.
+10. **1.10 Loot and equipment:** all accessible stored/overflow/worn/carried candidates are visible; exact
+   gear identity survives swap, full storage, relaunch and recap; local pickup feedback preserves spatial
+   cause; slot-free harvested samples never displace items.
 11. **1.11 Return/failure truth:** portal, Waystone, collapse, defeat and abandon share the typed
     receipt; partial retention is stack-independent; pages, people, XP and exact loot appear.
 12. **1.12 Complete loop proof:** write or choose a starting World Page → bind → explore → fight or
@@ -150,6 +159,12 @@ emergency return; continuation succeeds and no summary/inventory fact is missing
     reference without revealing an unidentified meaning.
 11. **2.11 Saved Templates:** player-authored pages can be named, restored and edited without
     copying collected pages or bypassing ordinary binding cost.
+12. **2.12 House and opening village:** Base opens on the four-zone Binder House; Village owns Firepit,
+    Essence Spring and the Trading Post → Recycler → Blacksmith growth sequence. Obscure stations use
+    silhouettes plus signs, truthful updates glow until checked, and the town is never damaged.
+13. **2.13 Creature ecology/material domains:** World resources and Creature materials are separate
+    slot-free categories; generated aquatic/shore/terrestrial/aerial forms occupy legal habitat and yield
+    body-derived parts rather than unrelated world resources, gear or curios.
 
 **Exit gate:** a fresh campaign recruits the opening trio in order and completes the entire
 sell/recycle/make/equip/bind loop without DEBUG grants.
@@ -184,6 +199,9 @@ sell/recycle/make/equip/bind loop without DEBUG grants.
     revised from play reports.
 11. **3.11 Wild World Pages:** curated physical pages can be found without displacing guaranteed
     writing; unknown marks enter the Dictionary as `??`, and exact instances consume only on bind.
+12. **3.12 Disclosed extraction progression:** equipped Field Pick rank—not Binder level—controls mineral
+    access. Rank-0 Iron prevents Blacksmith deadlock; known Gold may appear before rank 2 and truthfully
+    motivates the upgrade without blocking binding.
 
 **Exit gate:** one ordinary campaign reaches Isolde, uses Brush and an early mixed ink, owns three
 functional combat choices, and uses Mara/Edren/Sela contributions in real expeditions.
