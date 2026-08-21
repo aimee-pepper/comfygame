@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "aggregateSourceHash": "8c7e93dc3cb04a05c60d64a98e0f672c46d4fe1c260fe8f3a620493f70af5af9",
+  "aggregateSourceHash": "87aead3c02ecd676b3075d6db4a6636d6a4ffcd355b9e91ebde2f98a4a8f3796",
   "inputs": {
     "Sources/Content/Data/items.json": "b94b1107229f217e14f1d7fa936d8eea938f9782c06c583be32302f10d432bc9",
     "Sources/Content/Data/playability-roadmap.json": "d14a3ba9f809ac369898759cfab4d3e4cbf807f3bb0d7ae9ffb6e2e4b00b0d2c",
@@ -9,6 +9,7 @@
     "Sources/Content/Data/symbols.json": "c1ec5dd7b661680b358e21a56124b6080aa28d93db51fd2f6b80214ced1dcb16",
     "Sources/Content/Data/travellers.json": "ae57096a78141052f11f1b8a0baa5246fb00bbf7543394f978fabc8f02944597",
     "Sources/Model/Materials.swift": "8605e290b4c6e0fa369bc47d1a4cbd81a06bcc2ae5716f6edcaeef4592bfe722",
+    "Sources/VisualAdapters/NamedCharacterVisualAdapter.swift": "6037696509384d768ce3e23d0ef441377915bc53b0ba19b9e199ad896495c349",
     "docs/adamant-demand-audit-current.md": "a0607e31cf666d23afb0635ac556039307babb6ed4b076cecde3d7bb9b802cfa",
     "docs/anchorage-portfolio-assignment-current.md": "bec45bd30b70eb93d5a236d265b673132a90122def880e93e1f30c5b2bc97fcd",
     "docs/anchored-realm-production-current.md": "dae8ad64ae75499ef7c07007056afa20c71b994eb6ad2e5e5707322e9656dd69",
@@ -74,7 +75,7 @@
     "docs/base-destination-board-current.md": "ee13bb2e5799d0e5af84bf4cb594125e468403945c31c7be06722ced2dc1439b",
     "docs/binder-quill-generated-visual-identity-current.md": "f1b228e03db2d304ae85cfb56c1f96e6cffd6c5bbe8bee900a0a37bc099f3259",
     "docs/building-staffing-current.md": "bc88ffb0bdfde00219dc18dad7758aa7e9f6b6c3bf503637f1c4ab4907f22e7a",
-    "docs/capacity-progression-current.md": "e9bdb14109da957f9ece07774b5bf286dba68d25f9a5e0cad916e9626e4ab7a0",
+    "docs/capacity-progression-current.md": "3f167c00d825712306a4917ea8d1b1e735efb2d452d52ef286ee8e109e5956fa",
     "docs/catalogue-item-identity-key-treasure-current.md": "4f0ec79eba9ea09e35ec7c00234426fa1e411016205485ee6cd6df1cce9aab05",
     "docs/catalogue-item-identity-tier2-current.md": "5ac4774cfc9cc1983a47e8c10f4ba10496906a21098445977bc292b381b754b0",
     "docs/catalogue-item-identity-tier3-current.md": "5c028d6eb070f6de121791439d6003849430ae80159b98bc52cffcdf805c475d",
@@ -273,7 +274,7 @@
     "docs/writing-tool-progression-current.md": "be17fe07aa89aaaab7117a2faca43d7e1eb1be23202d19106c67c42547b23bb0"
   },
   "outputs": {
-    "generated/wiki-data.json": "25215dce717a4c2261277af033643931ed8dddab7e3bbd725751b8ea7f3655f7",
-    "generated/source-registry.json": "ce82c3a1285b6a4f682080c9877f1455696420867e827545e50e93f5116ddbc6"
+    "generated/wiki-data.json": "002a9572b549659e83ec14ae598f5c5750ca352cb3cc488d330e2357e11a3a6c",
+    "generated/source-registry.json": "a0965cce6a65846412b0ce40503bab198a8567708a7cdfe148ce4784dcf1fea6"
   }
 }

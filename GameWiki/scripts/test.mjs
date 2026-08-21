@@ -26,6 +26,7 @@ const generatorSource = await readFile(join(root, "scripts/generate.mjs"), "utf8
 const stationsAuthority = JSON.parse(await readFile(resolve(root, "../Sources/Content/Data/stations.json"), "utf8"));
 const itemsAuthority = JSON.parse(await readFile(resolve(root, "../Sources/Content/Data/items.json"), "utf8"));
 const resourcesAuthority = JSON.parse(await readFile(resolve(root, "../Sources/Content/Data/resources.json"), "utf8"));
+const travellersAuthority = JSON.parse(await readFile(resolve(root, "../Sources/Content/Data/travellers.json"), "utf8"));
 for (const type of ["station", "traveller", "resource", "creatureMaterial", "gear", "consumable", "curio", "treasure", "key", "rune", "roadmap"]) {
   assert(data.search.some(item => item.type === type), `search lacks ${type}`);
   const example = data.search.find(item => item.type === type);
@@ -50,6 +51,14 @@ assert(data.creatureMaterials.every(item => item.summary && data.routes.includes
 assert(data.search.filter(item => item.type === "creatureMaterial").every(item => item.route.startsWith("creature-material/") && item.category === "creatureMaterial"), "Creature Material search routes must remain exact");
 assert(data.search.filter(item => ["gear", "consumable", "curio", "treasure", "key"].includes(item.type)).every(item => item.route.startsWith("item/") && item.category === item.type), "item search routes and categories must be exact");
 assert(data.search.filter(item => item.type === "resource").every(item => item.route.startsWith("resource/") && ["worldResource", "currencyEssence"].includes(item.category)), "resource search routes and domains must be exact");
+assert(data.travellers.length === 29 && new Set(data.travellers.map(person => person.id)).size === 29, "People must exactly cover the 29 live traveller identities");
+assert(JSON.stringify(data.travellers.map(person => person.id).sort()) === JSON.stringify(travellersAuthority.travellers.map(person => person.id).sort()), "People IDs must exactly match travellers.json");
+assert(data.travellers.map(person => person.authoredOrder).join(",") === Array.from({ length: 29 }, (_, index) => index + 1).join(","), "People index must follow exact authored campaign order");
+assert(data.travellers.every(person => person.calling && person.authoredOrder && person.campaignPhase && person.pageCount > 0 && data.routes.includes(`person/${person.slug}`)), "every traveller needs role, order, phase, diary coverage and a stable detail route");
+assert(data.travellers.every(person => ["live", "authored-not-live", "held"].includes(person.meetingStatus)), "meeting status must use an explicit implementation disposition");
+assert(data.travellers.filter(person => person.meetingStatus === "live").length === travellersAuthority.travellers.filter(person => person.meeting).length, "live meeting status must derive exactly from travellers.json");
+assert(data.travellers.every(person => person.recruitmentStatus && person.visualStatus && person.provenance.sourcePaths.length >= 5), "People detail status/provenance must be complete");
+assert(data.search.filter(item => item.type === "traveller").every(item => item.route.startsWith("person/") && item.category === "traveller"), "traveller search must open exact person detail routes");
 for (const station of data.stations) {
   assert(station.id && station.provenance.stableID === station.id, `station provenance missing: ${station.id}`);
   assert(station.provenance.sourcePaths.length >= 3, `station authority sources missing: ${station.id}`);

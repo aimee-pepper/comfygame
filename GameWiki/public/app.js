@@ -106,7 +106,38 @@ function stationDetail(slug) {
 }
 
 function people() {
-  return header("Authored catalogue", "People", "Stable traveller identities from the live content catalogue.") + `<div class="grid">${data.travellers.map(person => `<article class="card"><h3>${escapeHTML(person.name)}</h3>${badge(person.disposition)}<p>${escapeHTML(person.summary)}</p>${provenance(person)}</article>`).join("")}</div>`;
+  const phases = [...new Set(data.travellers.map(person => person.campaignPhase))];
+  return header("Complete traveller slice", "People", "All 29 stable traveller identities, ordered by authored arrival. Live content and authored-but-not-live meetings remain visibly distinct.")
+    + `<p><label for="people-phase-filter">Campaign phase </label><select id="people-phase-filter"><option value="all">All phases</option>${phases.map(phase => `<option value="${escapeHTML(phase)}">${escapeHTML(titleCase(phase))}</option>`).join("")}</select></p>`
+    + `<div class="grid" id="people-grid">${data.travellers.map(person => `<a class="card" data-person-phase="${escapeHTML(person.campaignPhase)}" href="#/person/${person.slug}"><h3>${escapeHTML(person.authoredOrder)} · ${escapeHTML(person.name)}</h3>${badge(person.meetingStatus)}${badge(person.campaignPhase)}<p><strong>${escapeHTML(person.calling)}</strong></p><p>${escapeHTML(person.summary)}</p><p>${person.pageCount} diary pages · ${person.clueCount} location clues</p></a>`).join("")}</div>`;
+}
+
+function personDetail(slug) {
+  const person = data.travellers.find(candidate => candidate.slug === slug);
+  if (!person) return notFound();
+  const station = person.station
+    ? `${hashLink(`station/${person.station.slug}`, person.station.name)} · ${escapeHTML(person.station.zone)} · ${escapeHTML(titleCase(person.station.destinationKind))}`
+    : "No owned destination in the live station catalogue.";
+  const teaching = person.teaching
+    ? `<code>${escapeHTML(person.teaching.stableID)}</code> from <code>${escapeHTML(person.teaching.pageID)}</code> · ${escapeHTML(titleCase(person.teaching.kind))}`
+    : "No singular diary teaching is authored for this traveller.";
+  const meetingCopy = person.meetingStatus === "live"
+    ? `${person.meetingQuestionCount} stable question/reply exchanges are present in the live traveller catalogue.`
+    : "A reviewed meeting exists in authored review authority, but no meeting object is live in travellers.json yet.";
+  return header(`Traveller ${person.authoredOrder} · ${titleCase(person.campaignPhase)}`, person.name, `${person.calling}. ${person.summary}`)
+    + `<div class="facts">
+      <dl class="fact"><dt>Stable ID</dt><dd>${escapeHTML(person.id)}</dd></dl>
+      <dl class="fact"><dt>Calling / role</dt><dd>${escapeHTML(person.calling)}</dd></dl>
+      <dl class="fact"><dt>Campaign order</dt><dd>${person.authoredOrder} · arrival band ${person.storyArrivalBand}</dd></dl>
+      <dl class="fact"><dt>Phase</dt><dd>${escapeHTML(titleCase(person.campaignPhase))}</dd></dl>
+      <dl class="fact"><dt>Worldwork</dt><dd>${person.worldwork == null ? "Not authored" : escapeHTML(person.worldwork)}</dd></dl>
+      <dl class="fact"><dt>Diary coverage</dt><dd>${person.pageCount} pages · ${person.clueCount} location clues</dd></dl>
+    </div>
+    <h2>Home contribution</h2><div class="card"><p>${station}</p></div>
+    <h2>Diary teaching</h2><div class="card"><p>${teaching}</p></div>
+    <h2>Meeting & recruitment</h2><div class="card">${badge(person.meetingStatus)}${badge(person.recruitmentStatus)}<p>${escapeHTML(meetingCopy)}</p></div>
+    <h2>Visual identity</h2><div class="card">${badge("live")}<p>${escapeHTML(person.visualStatus)}. The wiki does not imply that a final portrait asset exists.</p></div>
+    ${provenance(person)}<p>${hashLink("people", "← All people")}</p>`;
 }
 
 function resources() {
@@ -199,6 +230,7 @@ function render({ resetScroll = false } = {}) {
   else if (root === "village-buildings") content = village();
   else if (root === "station") content = stationDetail(detail);
   else if (root === "people") content = people();
+  else if (root === "person") content = personDetail(detail);
   else if (root === "resources-crafting") content = resources();
   else if (root === "catalogue") content = catalogue(detail);
   else if (root === "item") content = itemDetail(detail);
@@ -222,6 +254,10 @@ function render({ resetScroll = false } = {}) {
   const kindFilter = document.querySelector("#destination-kind-filter");
   kindFilter?.addEventListener("change", () => {
     document.querySelectorAll("[data-destination-kind]").forEach(card => { card.hidden = kindFilter.value !== "all" && card.dataset.destinationKind !== kindFilter.value; });
+  });
+  const phaseFilter = document.querySelector("#people-phase-filter");
+  phaseFilter?.addEventListener("change", () => {
+    document.querySelectorAll("[data-person-phase]").forEach(card => { card.hidden = phaseFilter.value !== "all" && card.dataset.personPhase !== phaseFilter.value; });
   });
   if (resetScroll) resetRouteScroll(window, document.querySelector(".main"));
 }

@@ -15,6 +15,10 @@ const coreInputs = [
   "Sources/Content/Data/symbols.json",
   "Sources/Content/Data/playability-roadmap.json",
   "Sources/Model/Materials.swift",
+  "Sources/VisualAdapters/NamedCharacterVisualAdapter.swift",
+  "docs/authored-text-audit-current.md",
+  "docs/diary-teaching-registry-implementation-audit-current.md",
+  "docs/roster-progression-current.md",
   "docs/crafting-components-and-schematics-current.md",
   "docs/asset-system-proposal.md",
   "docs/current-design-index.md",
@@ -416,7 +420,47 @@ function materialFamilies() {
   ];
 }
 
-const travellers = normalize(travellersJSON.travellers, "traveller", "Sources/Content/Data/travellers.json", travellersJSON._authority.defaultDisposition);
+const travellerPagesByID = Object.groupBy(travellersJSON.pages, page => page.diary);
+const keeperStationByID = Object.fromEntries(stations.filter(station => station.keeperID).map(station => [station.keeperID, station]));
+const teachingFields = ["teachesFocus", "teachesGambit", "teachesPattern", "teachesSchematic"];
+const travellerSources = [
+  "Sources/Content/Data/travellers.json",
+  "Sources/Content/Data/stations.json",
+  "Sources/VisualAdapters/NamedCharacterVisualAdapter.swift",
+  "docs/authored-text-audit-current.md",
+  "docs/diary-teaching-registry-implementation-audit-current.md",
+  "docs/roster-progression-current.md"
+];
+const travellers = travellersJSON.travellers.map(person => {
+  const pages = travellerPagesByID[person.id] ?? [];
+  const clues = pages.filter(page => page.kind === "locationClue");
+  const teachingPage = pages.find(page => teachingFields.some(field => page[field]));
+  const teachingField = teachingFields.find(field => teachingPage?.[field]);
+  const station = keeperStationByID[person.id] ?? null;
+  const meetingStatus = person.meeting ? "live" : "authored-not-live";
+  return {
+    type: "traveller",
+    id: person.id,
+    slug: slug(person.id),
+    name: person.name,
+    calling: person.calling,
+    summary: person.blurb,
+    authoredOrder: person.authoredOrder,
+    storyArrivalBand: person.storyArrivalBand,
+    campaignPhase: person.campaignPhase,
+    worldwork: person.worldwork,
+    station: station ? { id: station.id, slug: station.slug, name: station.name, zone: station.zone, destinationKind: station.destinationKind } : null,
+    pageCount: pages.length,
+    clueCount: clues.length,
+    teaching: teachingPage ? { pageID: teachingPage.id, kind: teachingPage.kind, field: teachingField, stableID: teachingPage[teachingField] } : null,
+    meetingStatus,
+    meetingQuestionCount: person.meeting?.questions?.length ?? 0,
+    recruitmentStatus: "live traveller catalogue / recruitable identity",
+    visualStatus: "live fixed identity adapter with explicit fallback",
+    disposition: travellersJSON._authority.defaultDisposition,
+    provenance: provenance(travellerSources, person.id, travellersJSON._authority.defaultDisposition, hashes, aggregateHash)
+  };
+}).sort((left, right) => left.authoredOrder - right.authoredOrder);
 const resources = resourcesJSON.resources.map(resourceRecord);
 const items = itemsJSON.items.map(itemRecord);
 const creatureMaterials = materialFamilies();
@@ -444,7 +488,7 @@ const routes = [
   "overview", "core-loop", "world-writing", "exploration", "combat", "people",
   "village-buildings", "resources-crafting", "catalogue", "catalogue/gear", "catalogue/consumables",
   "catalogue/curios", "catalogue/treasures", "catalogue/keys", "roadmap", "history", "asset-gallery",
-  ...stations.map(station => `station/${station.slug}`),
+  ...stations.map(station => `station/${station.slug}`), ...travellers.map(person => `person/${person.slug}`),
   ...items.map(item => `item/${item.slug}`), ...resources.map(resource => `resource/${resource.slug}`),
   ...creatureMaterials.map(material => `creature-material/${material.slug}`)
 ];
@@ -454,7 +498,7 @@ const search = [...stations, ...travellers, ...resources, ...creatureMaterials, 
   name: entity.name,
   summary: entity.blurb ?? entity.summary ?? "",
   category: entity.category ?? entity.type,
-  route: entity.type === "station" ? `station/${entity.slug}` : entity.type === "roadmap" ? "roadmap" : entity.type === "traveller" ? "people" : ["gear", "consumable", "curio", "treasure", "key"].includes(entity.type) ? `item/${entity.slug}` : entity.type === "resource" ? `resource/${entity.slug}` : entity.type === "creatureMaterial" ? `creature-material/${entity.slug}` : entity.type === "rune" ? "world-writing" : "overview",
+  route: entity.type === "station" ? `station/${entity.slug}` : entity.type === "roadmap" ? "roadmap" : entity.type === "traveller" ? `person/${entity.slug}` : ["gear", "consumable", "curio", "treasure", "key"].includes(entity.type) ? `item/${entity.slug}` : entity.type === "resource" ? `resource/${entity.slug}` : entity.type === "creatureMaterial" ? `creature-material/${entity.slug}` : entity.type === "rune" ? "world-writing" : "overview",
   disposition: entity.disposition,
   provenance: entity.provenance
 }));
