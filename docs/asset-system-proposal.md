@@ -5115,3 +5115,25 @@ authorize later Trading Post states or promote native integration. Asset checkpo
 as written in `village-progression-and-asset-matrix-current.md`: Recycler, Blacksmith, Storehouse and Firepit
 Built/Tier-0 sprites, reviewed label-free beside the accepted Trading Post in colour and literal grayscale.
 All four must retain their own functional silhouette and must not converge on a recoloured generic façade.
+
+#### Opening Built/Tier-0 identity set v0.1 disposition
+
+**Accepted by Game Design as the opening five production-visual identity set; native integration remains
+unaccepted.** Game Design inspected the label-free five-building colour and literal-grayscale comparisons,
+each 400% crop, and the Commerce/Makers/Commons 368×800 scale placements. Recycler reads as a low ordered
+separation workshop rather than a forge, scrapyard or resource converter; Blacksmith is dominated by its tall
+contained forge hood, hearth and anvil; Storehouse reads as a broad twin-bay warehouse rather than a shop or
+house; Firepit remains a low open communal hearth with seating/kettle and no roof, shrine or damage fiction.
+All four remain distinct from the accepted Trading Post and from each other in grayscale.
+
+The exact logical sources are 96×80 RGBA with binary alpha, bounded palettes and pivot `(48,79)`. The
+checkpoint manifest is `AssetLab/artifacts/opening-identities-built-v0.1/manifest.json`, SHA-256
+`32bad6b6480e356d6c8483cec8f237aca95da6ef9bee2e77c07fa939f42b8245`; its four accepted candidate-source
+hashes are recorded there. This accepts the sprites as **Game Design candidates only** while they remain
+uncommitted/unpromoted and `integrationReady:false`. It does not accept the flat placement backgrounds as
+district art, authorize native packaging, or imply later building states exist.
+
+Asset checkpoint 3 is released exactly as written in the canonical matrix: Trading Post and Firepit
+foundation/built/improved/mastered continuity rows plus independent attention overlays. The two accepted
+Built sources must remain byte-identical while later forms add to the same structure and preserve their
+protected anchors. Recycler, Blacksmith and Storehouse later forms remain held.

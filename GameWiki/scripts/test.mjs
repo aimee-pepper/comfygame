@@ -70,6 +70,11 @@ assert(data.assetGallery.acceptedAssets.length === 0 && data.assetGallery.review
 assert(data.assetGallery.slots.length === 85, "asset gallery must reserve 17×5 stable building/state slots");
 assert(data.assetGallery.slots.find(slot => slot.key === "trading_post.built")?.status === "Game Design accepted candidate / native integration not yet accepted", "Trading Post v0.3 must be distinguished from packaged/native/live art");
 assert(data.assetGallery.slots.find(slot => slot.key === "trading_post.built")?.assetPath === null, "Trading Post acceptance must not invent a packaged asset path");
+for (const id of ["recycler", "blacksmith", "storehouse", "firepit"]) {
+  const slot = data.assetGallery.slots.find(candidate => candidate.key === `${id}.built`);
+  assert(slot?.status === "Game Design accepted candidate / native integration not yet accepted", `${id}.built must preserve the checkpoint-2 candidate/native distinction`);
+  assert(slot?.assetPath === null, `${id}.built must not invent a packaged asset path`);
+}
 assert(data.assetGallery.slots.every(slot => slot.assetPath === null), "no unaccepted art path may enter a stable slot");
 for (const item of data.search) {
   assert(item.provenance.generatedAtSourceHash === data.generatedAtSourceHash, `fact hash missing: ${item.type}/${item.id}`);

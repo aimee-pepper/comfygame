@@ -363,11 +363,12 @@ goldens remain unchanged.
 
 ## Review order and stop conditions
 
-The Trading Post v0.3 style gate is Game-Design accepted. Current work is the opening identity set only:
-Recycler, Blacksmith, Storehouse and Firepit Built/Tier-0, compared label-free with the accepted Trading Post
-in colour and literal grayscale. After that review, the remaining order is: each building's continuity states
-→ Binder House → close-up Library → later buildings in campaign order. Do not batch those future milestones
-merely because their specifications are present in this file.
+Trading Post v0.3 and the Recycler/Blacksmith/Storehouse/Firepit Built/Tier-0 opening identity set are
+Game-Design accepted candidates. Current work is state continuity only: Trading Post and Firepit
+foundation/built/improved/mastered rows plus independent attention overlays, with both accepted Built sources
+preserved byte-identically. After that review, the remaining order is: Binder House → close-up Library → later
+buildings in campaign order. Do not batch those future milestones merely because their specifications are
+present in this file.
 
 Stop immediately and report rather than inventing:
 
