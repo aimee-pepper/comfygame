@@ -13,7 +13,8 @@ final class DebugRoadmapTests: XCTestCase {
                        "roadmap item IDs must remain stable and unique")
         XCTAssertTrue(board.validationErrors().isEmpty)
         XCTAssertTrue(board.currentItems.contains { $0.id == "encounter-scaling" })
-        XCTAssertTrue(board.currentItems.contains { $0.id == "item-character-identities" })
+        XCTAssertFalse(board.currentItems.contains { $0.id == "item-character-identities" },
+                       "a source-complete Asset checkpoint is not active work")
         XCTAssertEqual(board.campaignBands.first?.id, "band-0")
         XCTAssertEqual(board.campaignBands.last?.id, "band-7")
         XCTAssertEqual(Set(board.campaignBands.flatMap(\.itemIDs)),
@@ -82,7 +83,7 @@ final class DebugRoadmapTests: XCTestCase {
         XCTAssertTrue(forward.validationErrors().isEmpty)
         XCTAssertEqual(forward.currentItems.map(\.id), ["field", "asset", "world"])
         XCTAssertEqual(reversed.currentItems.map(\.id), forward.currentItems.map(\.id))
-        XCTAssertTrue(forward.currentWork.contains("Acceptance: Test now · world"))
+        XCTAssertTrue(forward.currentWork.contains("Acceptance: Awaiting acceptance · world"))
     }
 
     func testTwoPrimariesInOneWorkstreamDiagnoseBothIDsRegardlessOfActiveStatus() throws {

@@ -1,6 +1,7 @@
 # Save-slot and start-screen system — current
 
-**Status:** implemented, pushed and installed in `3549863`; phone acceptance pending
+**Status:** save semantics source-complete through `b3bc410`; Campaign presentation reconciliation
+and phone acceptance pending
 **Owner:** Engineering implements; Game Design owns player-facing behavior and safety
 **Purpose:** let Aimee maintain independent campaigns and test states without overwriting the only
 playable save.
@@ -10,18 +11,24 @@ playable save.
 After truthful app loading completes, show a campaign start screen rather than opening the sole save
 implicitly:
 
-- **Continue** opens the most recently played valid slot and names that campaign beneath the action;
+- the most recently active valid slot is selected initially; if it is unavailable, select the most
+  recently played valid slot;
+- tapping a healthy campaign card selects it and changes the explicit **Continue _name_** action;
+  tapping the card does not immediately load or switch saves;
+- **Continue _name_** opens the selected healthy slot;
 - **New Game** creates a distinct slot and never overwrites another campaign;
 - when both are present, Continue and New Game are peer primary actions with identical bordered
   width, height, typography, icon allocation, padding and two-row subtitle reservation; emphasis may
   differ, geometry may not. At Accessibility sizes both reflow to the same full-width stacked frame;
-- **Load Game** exposes every slot as a compact card with campaign name, last-played date, Binder
-  level, current location/state and enough progression context to distinguish test saves;
+- the Campaign shelf exposes every slot as a compact card with campaign name, last-played date,
+  Binder level, current location/state and enough progression context to distinguish test saves;
 - a player-facing **Campaigns** action in Settings safely flushes the active slot and returns to this
   chooser; switching saves must not require force-quitting the app;
 - each slot retains the existing automatic-save behavior while it is active;
-- deleting a slot is a secondary action, requires an explicit confirmation naming the campaign, and
-  returns safely to the remaining save list;
+- every card has a visible Details action. Export and Delete live there; no essential action is
+  long-press-only;
+- deleting a slot is secondary, requires an explicit confirmation naming the campaign, and returns
+  safely to the remaining shelf;
 - an empty installation makes New Game primary and does not show a misleading Continue action.
 
 The initial slot list should be data-driven rather than a fixed number of placeholder boxes. Storage
@@ -62,7 +69,8 @@ this checkpoint. Do not make the splash screen itself interactive: static launch
 
 1. Existing installed campaign migrates and resumes with byte-equivalent meaningful state.
 2. Two newly created campaigns progress independently across relaunch and slot switching.
-3. Continue consistently opens the most recently played valid campaign.
+3. Initial Continue consistently names the active/recent valid campaign; after selecting another
+   card it opens exactly that selected campaign.
 4. Cancelled deletion changes nothing; confirmed deletion removes only the named slot.
 5. Deleting the active, final or a non-active slot always leaves a usable start screen.
 6. A deliberately corrupt slot does not crash launch or hide/load over a healthy slot.

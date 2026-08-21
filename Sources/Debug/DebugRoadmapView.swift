@@ -133,7 +133,7 @@ enum DebugRoadmap {
         var label: String {
             switch self {
             case .complete: "Complete"
-            case .readyToTest: "Test now"
+            case .readyToTest: "Awaiting acceptance"
             case .inProgress: "In progress"
             case .next: "Next"
             case .queued: "Queued"
@@ -157,7 +157,7 @@ enum DebugRoadmap {
         var tint: Color {
             switch self {
             case .complete: .green
-            case .readyToTest: .green
+            case .readyToTest: .orange
             case .inProgress: .blue
             case .next: .blue
             case .queued: .secondary

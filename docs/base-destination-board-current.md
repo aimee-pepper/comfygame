@@ -96,7 +96,9 @@ section/order facts.
 One compact persistent bottom action row remains outside all four tabs:
 
 - **Party** — secondary/neutral action, opening party assembly and equipment;
-- **Bind & Depart** — visually primary blue action, opening world writing/departure.
+- **Bind & Depart** — visually primary blue shortcut to Writing Desk's **The world** review. It
+  commits nothing at Home; only the final action inside Writing Desk spends/consumes and creates a
+  run.
 
 They use ordinary 44-point-or-larger buttons sized to their labels and shared row, not full-width
 screen-height cards. Party is a campaign utility, not a fictional building; it therefore no longer

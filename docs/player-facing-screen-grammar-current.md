@@ -5,7 +5,18 @@ playability-ordered rather than a single broad redesign.
 **Owner:** Game Design; Engineering owns native composition; Asset Design owns functional UI,
 layout and accessibility grammar. Aimee owns final handmade pictorial identities under
 `handmade-art-ownership-current.md`.  
-**Updated:** 10 Aug 2026
+**Updated:** 20 Aug 2026
+
+## Visual approval does not authorize mechanics
+
+All cross-lead UI work follows `cross-lead-delivery-contract-current.md`. Asset candidates may
+rearrange and illustrate only settled data and actions. A screenshot cannot invent currencies,
+health, roles, tabs, route graphs, forecasts, confirmations or navigation destinations, and visual
+approval does not make fixture behavior canonical. Engineering checks both the frozen visual
+hierarchy and the behavior fence; neither may be silently traded for the other.
+
+Multi-screen packages are tracked per screen. “Integration ready” for one screen does not promote a
+rejected or still-dirty sibling screen.
 
 ## Player complaint and audit conclusion
 
@@ -82,6 +93,10 @@ a physical-object tray.
 Primary transaction controls such as **Bind & Depart** use one rules-owned current evaluation for
 both visible availability and commit. If eligibility changes after rendering, activation presents
 the fresh exact refusal in place; it never flashes and silently returns unchanged. See Decision229.
+
+The Home departure shortcut opens Writing Desk's **The world** review and commits nothing. The final
+Bind & Depart inside Writing Desk is the only action that spends Essence, consumes a collected World
+Page or creates a run.
 
 The complete Base board contract is in `base-destination-board-current.md`: Home/Make/Study/Realms
 tabs, three compact place tiles across at ordinary phone width, construction as a tile lifecycle,

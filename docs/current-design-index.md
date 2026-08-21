@@ -2,13 +2,18 @@
 
 ## Current execution and acceptance
 
+- `cross-lead-delivery-contract-current.md` — required delivery receipts, mockup behavior fence and
+  exact Campaign/Home/Writing/World ambiguity resolutions for Design, Asset and Engineering.
+- `game-design-ux-assessment-current.md` — current lead assessment of the playable product, its
+  strongest identity, first-hour weaknesses and progression-ordered product direction.
 - `playability-priority-sequence-current.md` — cross-lead execution order and WIP limits.
 - `feature-completion-priority-audit-current.md` — definition of fully implemented and ordered
   completion tiers.
 - `phase-1-phone-acceptance-card-current.md` — exact phone pass/fail sequence for the active
   playability checkpoint chain.
 
-> **Active scheduling authority:** `playability-first-roadmap-current.md` for goals and gates, with
+> **Active scheduling authority:** `player-progression-implementation-roadmap-current.md` for
+> reachability order and gates, with
 > `Sources/Content/Data/playability-roadmap.json` as the actively updated operational board rendered
 > by DEBUG tools. Aimee is the sole tester for this phase; Essence continuation and early Trading
 > Post/Recycler offloading are hard blockers.
@@ -39,7 +44,7 @@
 > **Launch quality:** `app-launch-loading-current.md` defines immediate static and honest in-app
 > loading surfaces plus timing, accessibility and failure-recovery gates.
 
-**Updated:** 14 Aug 2026
+**Updated:** 20 Aug 2026
 **Purpose:** Fast routing for design, engineering and asset work. Start here instead of inferring
 authority from filename age or chat history.
 
@@ -123,6 +128,8 @@ When two documents disagree:
 | Scent Mask first slice | `scent-mask-first-slice-current.md` | Zero-Essence typed animal-resource recipe, 12-turn field state and exact sensory/contact gates |
 | World encounter contact | `world-encounter-contact-current.md` | Typed ordinary/apex/flora/guardian detection and contact rules; safe apex/flora adjacency |
 | Wayfarer's Table flora recognition | `wayfarers-table-flora-recognition-current.md` | Station-owned on-sight practical flora name/defence/yield notes layered onto disclosure-neutral Look consequences |
+| Seamlight portal guidance | `seamlight-current.md` | Fog-neutral, walkable-path guidance toward the nearest usable portal |
+| Equipment inscriptions | `equipment-inscription-system-current.md` | One authored durable instruction per exact Body/Keepsake piece; first effect is collapse-only Seamward |
 | Implemented-six station audit | `implemented-six-station-contribution-audit-current.md` | Evidence-led audit showing five first slices fulfilled and Sela's flora recognition as the one missing promised contribution |
 | Station reachability and first use | `station-first-use-reachability-audit-current.md` | Complete 23-station lifecycle/payoff matrix; Apothecary access/empty-room correction plus Channelworks one-time restoration receipt |
 | Failure recovery agency | `failure-recovery-agency-recommendation.md` | Review-only player-choice retention with deterministic default and interruptible pending envelope |

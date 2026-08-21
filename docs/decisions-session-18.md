@@ -3536,3 +3536,35 @@ Auber's revision, Isolde's three optional-reply replacements and Sabine's seven-
 Stable IDs, authored order, condition indices, migrations and generator freshness remain mandatory.
 Only genuinely incomplete or internally contradictory copy remains draft-only. A play-found bad line
 is revised in place; it does not justify withholding unrelated completed content.
+
+## 280. Seamlight equipment enchanting is approved in concept; first profile is recommended
+
+**Date:** 18 August 2026
+
+At Aimee's request, Seamlight can become a durable enchantment on armour or an accessory. Game
+Design's recommended implementation calls the system **Inscription** and places it at the
+Scriptorium. One
+authored instruction may be attached to one exact Body or Keepsake item; it follows that stable gear
+instance through equipping, storage, reforging and relaunch. Effects are authored individually rather
+than inferred from every consumable.
+
+The recommended first inscription is **Seamward**. Installing it consumes one Seamlight, one Ash or prepared
+colored-ink application and 10 Essence. The ordinary Seamlight remains an anytime, turn-costing
+expedition consumable. Seamward instead wakes automatically and without a turn only when collapse
+begins, then supplies the same shortest-walkable-path, fog-neutral portal guidance. Duplicate
+Seamwards do not stack, and Waystone cannot become an inscription.
+
+## 281. Cross-lead approvals are separate receipts; mockups cannot invent mechanics
+
+**Date:** 20 August 2026
+
+Game Design now orchestrates the Engineering and Asset leads as well as owning the design. A feature
+has separate Design-settled, Asset-candidate, visual-approved/frozen, source-complete, shared-
+integrated, installed and playtest-accepted receipts. No receipt implies another, and only one
+acceptance item is “test now.”
+
+Asset candidates may present only the data, actions, disclosure and states explicitly authorized by
+the feature contract. A visually approved fixture cannot create currencies, roles, route graphs,
+forecasts, transactions or hidden interactions. Engineering must preserve both the settled behavior
+and approved hierarchy. Current Campaign/Home/Writing/World interpretations and the required handoff
+packet are frozen in `cross-lead-delivery-contract-current.md`.
