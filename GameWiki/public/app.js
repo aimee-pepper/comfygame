@@ -7,7 +7,7 @@ const navItems = [
   ["overview", "Overview"], ["core-loop", "Core Loop"], ["world-writing", "World Writing"],
   ["exploration", "Exploration"], ["combat", "Combat"], ["people", "People"],
   ["village-buildings", "Home & Village"], ["resources-crafting", "Resources & Crafting"],
-  ["items", "Items"], ["roadmap", "Roadmap"], ["history", "Decisions / History"],
+  ["catalogue", "Catalogue"], ["roadmap", "Roadmap"], ["history", "Decisions / History"],
   ["asset-gallery", "Asset Gallery"]
 ];
 
@@ -19,7 +19,7 @@ const authorityLinks = {
   people: "docs/roster-coherence-audit-current.md",
   "village-buildings": "docs/home-house-and-village-current.md",
   "resources-crafting": "docs/crafting-intuition-and-quality-review-current.md",
-  items: "Sources/Content/Data/items.json",
+  catalogue: "Sources/Content/Data/items.json",
   roadmap: "Sources/Content/Data/playability-roadmap.json",
   history: "docs/current-design-index.md",
   "asset-gallery": "docs/asset-production-output-contract-current.md"
@@ -108,11 +108,63 @@ function people() {
 }
 
 function resources() {
-  return header("Authored catalogue", "Resources & Crafting", "Live resource identities. Crafting decisions remain visibly provisional where the roadmap says so.") + `<div class="grid">${data.resources.map(item => `<article class="card"><h3>${escapeHTML(item.name)}</h3>${badge(item.disposition)}<p>${escapeHTML(item.summary)}</p></article>`).join("")}</div>`;
+  const world = data.resources.filter(item => item.domain === "worldResource");
+  const currencies = data.resources.filter(item => item.domain === "currencyEssence");
+  const resourceCards = records => `<div class="grid">${records.map(item => `<a class="card" href="#/resource/${item.slug}"><h3>${escapeHTML(item.name)}</h3>${badge(item.disposition)}${badge(item.tradeBand)}<p>${escapeHTML(item.summary)}</p></a>`).join("")}</div>`;
+  const materialCards = records => `<div class="grid">${records.map(item => `<article class="card"><h3>${escapeHTML(titleCase(item.name))}</h3>${badge(item.status)}<p><code>${escapeHTML(item.familyID)}</code></p>${provenance(item)}</article>`).join("")}</div>`;
+  return header("Source-partitioned catalogue", "Resources & Crafting", "World resources, creature materials and currencies remain separate. Live and proposed material models are never merged.")
+    + `<h2>World Resources · live</h2>${resourceCards(world)}`
+    + `<h2>Creature Materials · current live model</h2>${materialCards(data.creatureMaterials.filter(item => item.disposition === "live"))}`
+    + `<h2>Creature Materials · designed, not yet live</h2><p class="empty">The ecology overhaul is current design authority, not implemented production state.</p>${materialCards(data.creatureMaterials.filter(item => item.disposition === "proposed"))}`
+    + `<h2>Currencies & Essence</h2>${resourceCards(currencies)}`;
 }
 
-function items() {
-  return header("Authored catalogue", "Items", "Live item identities from the source catalogue.") + `<div class="grid">${data.items.map(item => `<article class="card"><h3>${escapeHTML(item.name)}</h3>${badge(item.disposition)}<p>${escapeHTML(item.summary)}</p></article>`).join("")}</div>`;
+const catalogueKinds = { gear: "Gear", consumable: "Consumables", curio: "Curios", treasure: "Treasures", key: "Keys" };
+const slotOrder = ["weapon", "offhand", "head", "armor", "hands", "feet", "tool", "keepsake"];
+
+function itemCards(records) {
+  return `<div class="grid">${records.map(item => {
+    const weaponLine = item.gear?.slot === "weapon"
+      ? `<p><strong>${escapeHTML(titleCase(item.gear.damage))}</strong> damage · ${escapeHTML(titleCase(item.gear.reach))} reach</p>`
+      : "";
+    return `<a class="card" href="#/item/${item.slug}"><h3>${escapeHTML(item.name)}</h3>${badge(item.rarity)}${badge(item.category)}${weaponLine}<p>${escapeHTML(item.summary)}</p></a>`;
+  }).join("")}</div>`;
+}
+
+function catalogue(kind = null) {
+  if (!kind) return header("Live source catalogue", "Catalogue", "Every live item belongs to one exact player-facing family; nothing is flattened into one undifferentiated grid.")
+    + `<div class="grid">${Object.entries(catalogueKinds).map(([id, label]) => { const count = data.items.filter(item => item.category === id).length; const route = id === "gear" ? "gear" : id === "consumable" ? "consumables" : `${id}s`; return `<a class="card" href="#/catalogue/${route}"><h3>${label}</h3><p>${count} live entries</p></a>`; }).join("")}</div>`;
+  const singular = kind === "consumables" ? "consumable" : kind.replace(/s$/, "");
+  const records = data.items.filter(item => item.category === singular);
+  if (singular === "gear") {
+    return header("Live source catalogue", "Gear", "Gear is grouped by exact equipped slot; weapons additionally expose damage kind and reach.")
+      + slotOrder.map(slot => { const group = records.filter(item => item.gear?.slot === slot); return `<h2>${slot === "armor" ? "Body / Armor" : titleCase(slot)} · ${group.length}</h2>${itemCards(group)}`; }).join("");
+  }
+  return header("Live source catalogue", catalogueKinds[singular], `${records.length} exact live ${catalogueKinds[singular].toLowerCase()} entries.`) + itemCards(records);
+}
+
+function itemDetail(slug) {
+  const item = data.items.find(candidate => candidate.slug === slug);
+  if (!item) return notFound();
+  const authoredValue = value => value === undefined || value === null || value === "" ? "None authored in items.json" : Array.isArray(value) ? value.map(titleCase).join(" · ") : titleCase(value);
+  const gear = item.gear ? `<h2>Gear rules</h2><div class="facts">
+    <dl class="fact"><dt>Slot</dt><dd>${escapeHTML(authoredValue(item.gear.slot))}</dd></dl>
+    <dl class="fact"><dt>Tier</dt><dd>${escapeHTML(authoredValue(item.gear.tier))}</dd></dl>
+    <dl class="fact"><dt>Damage</dt><dd>${escapeHTML(authoredValue(item.gear.damage))}</dd></dl>
+    <dl class="fact"><dt>Reach</dt><dd>${escapeHTML(authoredValue(item.gear.reach))}</dd></dl>
+    <dl class="fact"><dt>Wards against</dt><dd>${escapeHTML(authoredValue(item.gear.wardsAgainst))}</dd></dl>
+    <dl class="fact"><dt>Insulation</dt><dd>${escapeHTML(authoredValue(item.gear.insulation))}</dd></dl>
+    <dl class="fact"><dt>Reactivity</dt><dd>${escapeHTML(authoredValue(item.gear.reactivity))}</dd></dl>
+    <dl class="fact"><dt>Break rule</dt><dd>${escapeHTML(authoredValue(item.gear.breaks))}</dd></dl>
+  </div>` : "";
+  const consumable = item.consumable ? `<h2>Consumable rules</h2><div class="facts">${Object.entries(item.consumable).map(([key, value]) => `<dl class="fact"><dt>${escapeHTML(titleCase(key))}</dt><dd>${escapeHTML(value)}</dd></dl>`).join("")}</div>` : "";
+  return header(`${titleCase(item.category)} · live`, item.name, item.summary) + `<div class="facts"><dl class="fact"><dt>Stable ID</dt><dd>${escapeHTML(item.id)}</dd></dl><dl class="fact"><dt>Kind</dt><dd>${escapeHTML(item.category)}</dd></dl><dl class="fact"><dt>Rarity</dt><dd>${escapeHTML(item.rarity)}</dd></dl><dl class="fact"><dt>Trading Post</dt><dd>${escapeHTML(item.tradingPostDisposition)}</dd></dl><dl class="fact"><dt>Recycler</dt><dd>${escapeHTML(item.recyclerDisposition)}</dd></dl></div>${gear}${consumable}${provenance(item)}<p>${hashLink("catalogue", "← Catalogue")}</p>`;
+}
+
+function resourceDetail(slug) {
+  const item = data.resources.find(candidate => candidate.slug === slug);
+  if (!item) return notFound();
+  return header(`${titleCase(item.domain)} · live`, item.name, item.summary) + `<div class="facts"><dl class="fact"><dt>Stable ID</dt><dd>${escapeHTML(item.id)}</dd></dl><dl class="fact"><dt>Driven by</dt><dd>${escapeHTML(item.drivenBy)}</dd></dl><dl class="fact"><dt>Trade band</dt><dd>${escapeHTML(item.tradeBand)}</dd></dl><dl class="fact"><dt>Reality currency</dt><dd>${item.isRealityCurrency ? "Yes" : "No"}</dd></dl></div><h2>Requires</h2><div class="card"><p>${escapeHTML(item.requires.join(" · ") || "No hard generation requirement.")}</p></div><h2>Favours</h2><div class="card"><p>${escapeHTML(item.favours.join(" · ") || "No authored favour condition.")}</p></div><h2>Known live uses</h2><div class="card"><ul>${item.currentUses.map(use => `<li>${escapeHTML(use)}</li>`).join("")}</ul></div>${provenance(item)}<p>${hashLink("resources-crafting", "← Resources & Crafting")}</p>`;
 }
 
 function roadmap() {
@@ -138,7 +190,9 @@ function render() {
   else if (root === "station") content = stationDetail(detail);
   else if (root === "people") content = people();
   else if (root === "resources-crafting") content = resources();
-  else if (root === "items") content = items();
+  else if (root === "catalogue") content = catalogue(detail);
+  else if (root === "item") content = itemDetail(detail);
+  else if (root === "resource") content = resourceDetail(detail);
   else if (root === "roadmap") content = roadmap();
   else if (root === "history") content = history();
   else if (root === "asset-gallery") content = assets();

@@ -24,12 +24,27 @@ assert(before === once && once === twice, "generation is not deterministic");
 const data = JSON.parse(await readFile(dataPath, "utf8"));
 const generatorSource = await readFile(join(root, "scripts/generate.mjs"), "utf8");
 const stationsAuthority = JSON.parse(await readFile(resolve(root, "../Sources/Content/Data/stations.json"), "utf8"));
-for (const type of ["station", "traveller", "resource", "item", "rune", "roadmap"]) {
+const itemsAuthority = JSON.parse(await readFile(resolve(root, "../Sources/Content/Data/items.json"), "utf8"));
+const resourcesAuthority = JSON.parse(await readFile(resolve(root, "../Sources/Content/Data/resources.json"), "utf8"));
+for (const type of ["station", "traveller", "resource", "gear", "consumable", "curio", "treasure", "key", "rune", "roadmap"]) {
   assert(data.search.some(item => item.type === type), `search lacks ${type}`);
   const example = data.search.find(item => item.type === type);
   const query = example.name.toLowerCase();
   assert(data.search.some(item => `${item.name} ${item.id} ${item.summary} ${item.type}`.toLowerCase().includes(query)), `search cannot find representative ${type}`);
 }
+const itemCounts = Object.fromEntries(["gear", "consumable", "curio", "treasure", "key"].map(kind => [kind, data.items.filter(item => item.category === kind).length]));
+assert(JSON.stringify(itemCounts) === JSON.stringify({ gear: 75, consumable: 18, curio: 2, treasure: 5, key: 2 }), "all 102 live items must partition exactly by kind");
+assert(data.items.length === itemsAuthority.items.length && new Set(data.items.map(item => item.id)).size === 102, "item catalogue coverage must be exact and unique");
+const gearSlots = Object.fromEntries(["weapon", "offhand", "head", "armor", "hands", "feet", "tool", "keepsake"].map(slot => [slot, data.items.filter(item => item.gear?.slot === slot).length]));
+assert(JSON.stringify(gearSlots) === JSON.stringify({ weapon: 34, offhand: 6, head: 6, armor: 6, hands: 5, feet: 5, tool: 5, keepsake: 8 }), "gear slots must match the exact live catalogue");
+assert(data.items.filter(item => item.gear?.slot === "weapon").every(item => item.gear.damage && item.gear.reach), "every weapon detail must expose damage and reach");
+assert(data.items.every(item => item.summary && data.routes.includes(`item/${item.slug}`)), "every item needs a nonempty explanation and stable detail route");
+assert(data.resources.length === 23 && data.resources.length === resourcesAuthority.resources.length && new Set(data.resources.map(item => item.id)).size === 23, "all 23 resource IDs must be accounted for exactly once");
+assert(data.resources.every(item => ["worldResource", "currencyEssence"].includes(item.domain) && item.summary && item.currentUses.length && data.routes.includes(`resource/${item.slug}`)), "every resource needs one domain, explanation, uses and stable detail route");
+assert(data.resources.filter(item => item.domain === "worldResource").length + data.resources.filter(item => item.domain === "currencyEssence").length === 23, "resource domains must form an exact partition");
+assert(data.creatureMaterials.some(item => item.status === "live legacy material model") && data.creatureMaterials.some(item => item.status === "current design / not yet live"), "live and designed creature-material families must remain visibly separate");
+assert(data.search.filter(item => ["gear", "consumable", "curio", "treasure", "key"].includes(item.type)).every(item => item.route.startsWith("item/") && item.category === item.type), "item search routes and categories must be exact");
+assert(data.search.filter(item => item.type === "resource").every(item => item.route.startsWith("resource/") && ["worldResource", "currencyEssence"].includes(item.category)), "resource search routes and domains must be exact");
 for (const station of data.stations) {
   assert(station.id && station.provenance.stableID === station.id, `station provenance missing: ${station.id}`);
   assert(station.provenance.sourcePaths.length >= 3, `station authority sources missing: ${station.id}`);
@@ -94,7 +109,7 @@ for (const item of data.search) {
   assert(item.provenance.generatedAtSourceHash === data.generatedAtSourceHash, `fact hash missing: ${item.type}/${item.id}`);
   assert(item.provenance.sourcePaths.length, `fact source missing: ${item.type}/${item.id}`);
 }
-for (const route of ["overview", "core-loop", "world-writing", "exploration", "combat", "people", "village-buildings", "resources-crafting", "items", "roadmap", "history", "asset-gallery"]) {
+for (const route of ["overview", "core-loop", "world-writing", "exploration", "combat", "people", "village-buildings", "resources-crafting", "catalogue", "catalogue/gear", "catalogue/consumables", "catalogue/curios", "catalogue/treasures", "catalogue/keys", "roadmap", "history", "asset-gallery"]) {
   assert(data.routes.includes(route), `required route missing: ${route}`);
 }
 console.log(`Wiki tests passed: ${data.routes.length} routes, ${data.search.length} searchable facts, ${data.stations.length} station pages.`);

@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+  "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
   "current": [
     {
       "path": "docs/adamant-demand-audit-current.md",
@@ -14,7 +14,7 @@
         ],
         "stableID": null,
         "disposition": "Anchor Frame recipe resolved for implementation. Waystone substitution is a reversible",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/adamant-demand-audit-current.md": "a0607e31cf666d23afb0635ac556039307babb6ed4b076cecde3d7bb9b802cfa"
         }
@@ -32,7 +32,7 @@
         ],
         "stableID": null,
         "disposition": "implementation-ready interaction layer over current anchoring and production rules.",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/anchorage-portfolio-assignment-current.md": "bec45bd30b70eb93d5a236d265b673132a90122def880e93e1f30c5b2bc97fcd"
         }
@@ -50,7 +50,7 @@
         ],
         "stableID": null,
         "disposition": "implementation-facing structural design. Rates and storage caps are reversible playtest",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/anchored-realm-production-current.md": "dae8ad64ae75499ef7c07007056afa20c71b994eb6ad2e5e5707322e9656dd69"
         }
@@ -68,7 +68,7 @@
         ],
         "stableID": null,
         "disposition": "implementation-facing current design. This document replaces the superseded tether model",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/anchoring-system-current.md": "c247f9982afa995540082e45c1c7f1d51cdd481d2c8d53b54d4da6bdf18aefc6"
         }
@@ -86,7 +86,7 @@
         ],
         "stableID": null,
         "disposition": "Implementation-facing v1 identity and state contract. Numerical level curves and action",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/animal-companion-combat-current.md": "ad55bad883d0e1ddccea6bb77740935a1a58599f48221b0e5822ab01af9474e6"
         }
@@ -104,7 +104,7 @@
         ],
         "stableID": null,
         "disposition": "implementation-facing first slice. Trust thresholds and the split between patience and",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/animal-taming-menagerie-current.md": "61e22973df56a9e1c914c62689d123732ba23bfce51d785417d2a912e33af997"
         }
@@ -122,7 +122,7 @@
         ],
         "stableID": null,
         "disposition": "Implementation-facing authored affinities with tunable bonus strength. They bias which",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/apex-hunting-affinities-current.md": "565f9cab845c66c617319d00584b7f0a8413abd9ec467308f312e238e368a524"
         }
@@ -140,7 +140,7 @@
         ],
         "stableID": null,
         "disposition": "settled first-slice names, effects and recipes; native correctness patch queued",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/apothecary-coating-identity-current.md": "75574541cd08be29e0b9559690eae105534cfce72c9fb75e70ffc8be28693afa"
         }
@@ -158,7 +158,7 @@
         ],
         "stableID": null,
         "disposition": "**failed physical-device acceptance on 11 Aug**. The production coordinator and progress",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/app-launch-loading-current.md": "1fdc586f41bd6f825d09f4e0065ae9ccc02be76e985714cadabb0c05b7c33b8b"
         }
@@ -176,7 +176,7 @@
         ],
         "stableID": null,
         "disposition": "recommended native playtest profile; values remain DEBUG-tunable after comparable fights",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/armoury-profile-offset-audit-current.md": "b62687ead4cec72f1ed41977b26777c0df8bcff5bb2ca4b5d3ef832889e7beec"
         }
@@ -194,7 +194,7 @@
         ],
         "stableID": null,
         "disposition": "Implemented first specialist rebuild slice. Profile offsets are the recommended initial",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/armoury-rebuild-implementation-current.md": "a9e893f4660b274e35c530ff1228ba232570bc7858442617d81e7eb34c1ecf82"
         }
@@ -212,7 +212,7 @@
         ],
         "stableID": null,
         "disposition": "reversible combat-balance decision. The technique's protective identity is current;",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/ashe-ground-technique-current.md": "14287d7178f1148f4f765e50a7debf15d6f21efb9197181396407057794a161c"
         }
@@ -230,7 +230,7 @@
         ],
         "stableID": null,
         "disposition": "settled cross-lead production rule",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/asset-production-output-contract-current.md": "e9734d8e96290e0e4f79af180624cf5115d4379cf16a52bbb688f1cea34ee675"
         }
@@ -248,7 +248,7 @@
         ],
         "stableID": null,
         "disposition": "current implementation-ready CMY + Depth economy. Color-space coefficients and the",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/authored-color-vocabulary-current.md": "41aa98371136bf274cf0f8160d822d0b8ff84c479882ffbc8c7847ae6a33b58d"
         }
@@ -266,7 +266,7 @@
         ],
         "stableID": null,
         "disposition": "first complete manual corpus pass; production-first playtest policy is current. Reviewed",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/authored-text-audit-current.md": "97c31e4a0564595cc62dbce0920999d648f94208b6f207b903f8cf517bc7b0fa"
         }
@@ -284,7 +284,7 @@
         ],
         "stableID": null,
         "disposition": "implementation contract for Band 6+, deliberately not an opening priority",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/authored-world-blueprints-current.md": "218498315a42ab8a0f63523e586a83f33cdeef7bd9c13fc09dee65d020d736a1"
         }
@@ -302,7 +302,7 @@
         ],
         "stableID": null,
         "disposition": "settled name/identity; canonical severe-Bleed correction queued with affliction authority",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/barbed-edge-apex-identity-current.md": "9d354ddf7b8859e4fdbf3db11e40df63536f71239b005bd293a14ffe68aa2984"
         }
@@ -320,7 +320,7 @@
         ],
         "stableID": null,
         "disposition": "current destination-ID/order compatibility authority, but its four-tab board presentation and",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/base-destination-board-current.md": "ee13bb2e5799d0e5af84bf4cb594125e468403945c31c7be06722ced2dc1439b"
         }
@@ -338,7 +338,7 @@
         ],
         "stableID": null,
         "disposition": "implementation-ready persistence boundary; Binder appearance choices and Quill's exact",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/binder-quill-generated-visual-identity-current.md": "f1b228e03db2d304ae85cfb56c1f96e6cffd6c5bbe8bee900a0a37bc099f3259"
         }
@@ -356,7 +356,7 @@
         ],
         "stableID": null,
         "disposition": "Implementation-facing correction of `building-staffing.md`. Formula values are reversible",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/building-staffing-current.md": "bc88ffb0bdfde00219dc18dad7758aa7e9f6b6c3bf503637f1c4ab4907f22e7a"
         }
@@ -374,7 +374,7 @@
         ],
         "stableID": null,
         "disposition": "handmade-art semantic identity brief for seven uncovered live catalogue IDs.",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/catalogue-item-identity-key-treasure-current.md": "4f0ec79eba9ea09e35ec7c00234426fa1e411016205485ee6cd6df1cce9aab05"
         }
@@ -392,7 +392,7 @@
         ],
         "stableID": null,
         "disposition": "handmade-art semantic brief for the first eleven uncovered catalogue items.",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/catalogue-item-identity-tier2-current.md": "5ac4774cfc9cc1983a47e8c10f4ba10496906a21098445977bc292b381b754b0"
         }
@@ -410,7 +410,7 @@
         ],
         "stableID": null,
         "disposition": "handmade-art semantic brief for the second eleven uncovered catalogue items.",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/catalogue-item-identity-tier3-current.md": "5c028d6eb070f6de121791439d6003849430ae80159b98bc52cffcdf805c475d"
         }
@@ -428,7 +428,7 @@
         ],
         "stableID": null,
         "disposition": "handmade-art semantic identity brief for the eleven ordinary-progression mythic items.",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/catalogue-item-identity-tier4-current.md": "f019a26d8d0d38a61ccf55446a679bbc29674171fcd372e5a4ec565cd38d430b"
         }
@@ -446,7 +446,7 @@
         ],
         "stableID": null,
         "disposition": "handmade-art semantic identity brief for all eight wild-only weapon IDs.",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/catalogue-item-identity-wild-weapons-current.md": "ac64dede60e3cd94c4e4c410797523ce442d1778ef668c5c698f85c82bb41423"
         }
@@ -464,7 +464,7 @@
         ],
         "stableID": null,
         "disposition": "Current design; numerical balance and final item names remain placeholders",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/channelworks-system-current.md": "260f0e395208fb6b8617d2f2ecd13feea81a889c48d4cc84710290739ec786ad"
         }
@@ -482,7 +482,7 @@
         ],
         "stableID": null,
         "disposition": "implementation-ready interaction/presentation correction; combat effects, legality and",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/combat-action-palette-current.md": "5a91dd24a1cb3899066c4034557fe00c2d93647c30a12f12df88296313b691ff"
         }
@@ -500,7 +500,7 @@
         ],
         "stableID": null,
         "disposition": "settled taxonomy; P1 correctness migration ready alongside combat-v2 consumers",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/combat-affliction-authority-current.md": "3f3c8b0cba1e9e3cb5d1fd216521417a5701eeab5b5976d4db0cb8ff2ca66647"
         }
@@ -518,7 +518,7 @@
         ],
         "stableID": null,
         "disposition": "reversible playtest ownership implemented in `ce9b1af`; Aimee's later feel review remains",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/combat-baseline-technique-ownership-review-current.md": "523ed54b011ecd130c4667ca8df6f29cc360efc5b455f82257e8a988ab5a50ad"
         }
@@ -536,7 +536,7 @@
         ],
         "stableID": null,
         "disposition": "handmade-art semantic brief; temporary functional proof only.",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/combat-node-glyph-vocabulary-current.md": "44ab23ae850bb2bc3ea8cc31ddda2d183381f3d9aa2e4f3a1051c8cb9222b99e"
         }
@@ -554,7 +554,7 @@
         ],
         "stableID": null,
         "disposition": "implementation-ready semantic correction; numerical values remain DEBUG/playtest tuning.",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/combat-node-viability-current.md": "ea5eadc6f1fc36d6d823e03226910cf72281d416cbb0a3772c4761975374be56"
         }
@@ -572,7 +572,7 @@
         ],
         "stableID": null,
         "disposition": "Current economy plus implementation-ready graph correction. The live build still uses",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/combat-progression-current.md": "3af809593b2d064a0e47f2068103333dc9b05df9f0eb81d1cb69759e42df4c0d"
         }
@@ -590,7 +590,7 @@
         ],
         "stableID": null,
         "disposition": "implementation-ready Game Design authority for which of the 72 nodes grant an explicit",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/combat-technique-registry-current.md": "a841b5cd1c1c1d2a3cbd52e367850d4365c64e17f5b1ef121fae94c315333d0f"
         }
@@ -608,7 +608,7 @@
         ],
         "stableID": null,
         "disposition": "Design pass complete; implementation and DEBUG playtest remain",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/combat-tree-build-viability-audit-current.md": "9b592972906d23c05aebd38aa85776bc880a72bf5a267550683574cfbf9e9827"
         }
@@ -626,7 +626,7 @@
         ],
         "stableID": null,
         "disposition": "superseded 11 Aug 2026 by `combat-tree-true-graph-current.md`; retained as design history.",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/combat-tree-graph-correction-current.md": "c71834ef4e1a41fe3fd1c4ad3810dda0ee99ddc2685b9d253bff245f7153a873"
         }
@@ -644,7 +644,7 @@
         ],
         "stableID": null,
         "disposition": "implementation-ready player-facing copy authority.",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/combat-tree-node-copy-current.md": "d33ddf802b7620952a997575ede5dd3fffb252ddc6774a89076cf5a5d73cca53"
         }
@@ -662,7 +662,7 @@
         ],
         "stableID": null,
         "disposition": "implementation-ready companion to the graph and node-consumer contracts.",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/combat-tree-progression-experience-current.md": "da21fdb2026926a8e23d6da2d7abf4eed291e932dbcc8f5993a4709fe6e3ac8b"
         }
@@ -680,7 +680,7 @@
         ],
         "stableID": null,
         "disposition": "current Game Design authority; implementation-ready topology and node placement.",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/combat-tree-true-graph-current.md": "89544d5502589962a6e03676b69f6bb2756a1957aa6f79ec504933215961c794"
         }
@@ -698,7 +698,7 @@
         ],
         "stableID": null,
         "disposition": "implementation-enabling sequence; semantics remain owned by",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/combat-tree-v2-consumer-plan-current.md": "6650bf9b13b7a6dadb65c6bc2f54fcf71c6f41ec8a1fdffb4b8b43c0cb44e116"
         }
@@ -716,7 +716,7 @@
         ],
         "stableID": null,
         "disposition": "reversible playtest naming and mechanics implemented in `ce9b1af`; Aimee's later naming",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/combat-unbind-retreat-name-collision-review-current.md": "0d4a06b1fefd5a2973fc1b395ecf1db0ff242c9f25b90d0f8ffc70ef3820d00e"
         }
@@ -734,7 +734,7 @@
         ],
         "stableID": null,
         "disposition": "reversible playtest ownership implemented in `ce9b1af`; Aimee feel review remains open",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/combat-v2-review-batch-current.md": "518e40c4a5f5f775f20f52fa0229168c9a26e9e47e6bda1ae07fee2d8dc2d1f6"
         }
@@ -752,7 +752,7 @@
         ],
         "stableID": null,
         "disposition": "P1 minimum placement safety implemented; stable-ID migration and full screen contract queued.",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/community-party-tavern-current.md": "ed93719d0aea8f8e955016cc0b661940606d44cd629b24a83f0d056ecfe4d133"
         }
@@ -770,7 +770,7 @@
         ],
         "stableID": null,
         "disposition": "implementation-facing first-slice rule. Rating values and level cadence are playtest",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/companion-worldwork-current.md": "b51ae4d69f036bd50560db33fb73b9cc6e65931c0bbae4e4dd5d3a012bbaaf45"
         }
@@ -788,7 +788,7 @@
         ],
         "stableID": null,
         "disposition": "Implementation-ready structural design; costs remain playtest placeholders.",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/compound-assembly-station-trees-current.md": "98414b3caa655ee8fbe7c5afe0e8ce6044d4cf2b5b75cd093d42f08aee2c3486"
         }
@@ -806,7 +806,7 @@
         ],
         "stableID": null,
         "disposition": "implementation-ready presentation/copy correction; future constellation expansion held",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/constellation-first-slice-current.md": "b2ac3d9bcc002482bbb5620c60dd69096717f9466210a0c37ac88c96c74d295a"
         }
@@ -824,7 +824,7 @@
         ],
         "stableID": null,
         "disposition": "implementation-ready packing correction with reversible Recommended cost profile.",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/consumable-economy-field-kit-current.md": "f401f7f0997369f6d0dcc35737d6645555d56262d11729d30512d31753567ad2"
         }
@@ -842,7 +842,7 @@
         ],
         "stableID": null,
         "disposition": "Current boundary and implementation audit. Catalogue-only contradiction and the",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/contradiction-danger-audit-current.md": "d964c2e49c42c41bcd76ab5fd0450d3967a5c6d8d2203a915df1d4acb14dffc5"
         }
@@ -860,7 +860,7 @@
         ],
         "stableID": null,
         "disposition": "Game Design implementation plan; individual slices require their own source, visual,",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/core-loop-causal-presentation-plan-current.md": "3f7ae201e054026cea8cf0503ba7144b02111334e7ea60ce44d0302f23f934f1"
         }
@@ -878,7 +878,7 @@
         ],
         "stableID": null,
         "disposition": "Current semantic and prose design; focus-specific wording is content work.",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/count-description-current.md": "7d600486af7ad5d1b9898bae6470ade91613abd2bfefaa31ab4413f5bb007973"
         }
@@ -896,7 +896,7 @@
         ],
         "stableID": null,
         "disposition": "Implementation-facing migration contract. It specializes",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/crafted-gear-migration-current.md": "f26d9524154672e59c50415b59c2cd3fe745741d9d8bafc136c46333469fa558"
         }
@@ -914,7 +914,7 @@
         ],
         "stableID": null,
         "disposition": "Core model settled by Aimee: six quality bands, 70/30 primary/secondary weighting, no hard",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/crafting-intuition-and-quality-review-current.md": "796ea5dce302a8d3493e7c6323c7ef2dc0d4e305c077bf6a412a40ab1de736df"
         }
@@ -932,7 +932,7 @@
         ],
         "stableID": null,
         "disposition": "Game Design implementation authority for habitat, body-derived material families and ordinary",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/creature-ecology-and-materials-overhaul-current.md": "0dc84a02b6e8b494d8cdded81d7b9bb1114a28a03f0d82cbe111e95c9a86fa3d"
         }
@@ -950,7 +950,7 @@
         ],
         "stableID": null,
         "disposition": "current orchestration and handoff authority",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/cross-lead-delivery-contract-current.md": "af95f3e6668995134aaca7e0a1ac6bacd1e81305696c16734ed859f92fd14b2b"
         }
@@ -968,7 +968,7 @@
         ],
         "stableID": null,
         "disposition": "Current structure; recognition threshold and Storehouse price are playtest values.",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/curio-identification-knowledge-current.md": "31acb95848598b0874e3978a9488f122b8bfee115e16867a5dca9fa1c33986f0"
         }
@@ -978,7 +978,7 @@
       "path": "docs/current-design-index.md",
       "title": "Current Design Index",
       "status": "unlabelled",
-      "hash": "bd8a99a91fc8921ec18f5c837b132cb323cc47226a2e7c2f2cdcb22a14000b22",
+      "hash": "10c32cd58c4e8af393de126ac171d50142fa5de81c7619a3e63d80bd825efe67",
       "current": true,
       "provenance": {
         "sourcePaths": [
@@ -986,9 +986,9 @@
         ],
         "stableID": null,
         "disposition": "unlabelled",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
-          "docs/current-design-index.md": "bd8a99a91fc8921ec18f5c837b132cb323cc47226a2e7c2f2cdcb22a14000b22"
+          "docs/current-design-index.md": "10c32cd58c4e8af393de126ac171d50142fa5de81c7619a3e63d80bd825efe67"
         }
       }
     },
@@ -1004,7 +1004,7 @@
         ],
         "stableID": null,
         "disposition": "Current implementation-facing first slice; period bands and regularity jitter are",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/cycle-system-current.md": "3a472c56d4c78299574f768de122d2ac11e7387eeae8fd723667e73f96fbd598"
         }
@@ -1022,7 +1022,7 @@
         ],
         "stableID": null,
         "disposition": "reversible implementation decision. The identity and teaching direction are current; the",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/dagg-recovery-teaching-current.md": "a6f2e09d574fde643ce524b90c7c76482925010c6d8af53bc327fd4fe3480546"
         }
@@ -1040,7 +1040,7 @@
         ],
         "stableID": null,
         "disposition": "built, pushed and accepted as the DEBUG review surface in commit `9cc0f10` (9 Aug 2026).",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/debug-authored-text-atlas-current.md": "dde26130930d41c60ef958393390774a36c6bf37999a2428420db634df1c7dd2"
         }
@@ -1058,7 +1058,7 @@
         ],
         "stableID": null,
         "disposition": "Current design. The existing first batch is live; the next two batches below are",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/debug-balancing-surface-current.md": "bfa81d5ceb8e8429bb75b50f4acd574bc8ee9a38cbcc8106391917c2d575ba45"
         }
@@ -1076,7 +1076,7 @@
         ],
         "stableID": null,
         "disposition": "DEBUG capture, durable queue/export and receipt-gated HTTPS adapter are implemented;",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/debug-bug-reporting-current.md": "a60bdc71abf4b40bbf66c9707669e3caf3120a47a911f0ac1a8d81353a3cffc0"
         }
@@ -1094,7 +1094,7 @@
         ],
         "stableID": null,
         "disposition": "staged testing surface; Stage A topology/route proof is active, later fixture tooling is",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/debug-combat-tree-route-explorer-current.md": "1a0ad16766a53cea7277042ef48a1c13161e2faee65564d973b5979e5f859184"
         }
@@ -1112,7 +1112,7 @@
         ],
         "stableID": null,
         "disposition": "implementation-ready process/schema correction",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/debug-roadmap-derived-workstreams-current.md": "2b4633671c3a097f48d1a2780cb1ece8c1dc5b258093572cdda65f10214e0f70"
         }
@@ -1130,7 +1130,7 @@
         ],
         "stableID": null,
         "disposition": "implementation-ready acceptance tool for the installed world-grade-2 checkpoint",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/debug-world-color-acceptance-current.md": "79731cfd7e677f5eb1a4a4ce78082321db6e0f35f6d4bec9efa4a4dbbc3f2079"
         }
@@ -1148,7 +1148,7 @@
         ],
         "stableID": null,
         "disposition": "implementation-facing structural design. Site frequency, yields and bracing thresholds",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/deep-works-system-current.md": "7bd0d2bcc38c3c899ba06c8ee1327d03453723438d3684322fc6ccff9b908cdd"
         }
@@ -1166,7 +1166,7 @@
         ],
         "stableID": null,
         "disposition": "Current audit and implementation correction. The five-tier progression is settled; the",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/description-analysis-surface-current.md": "0fb1e025514de28b63b3b905c7e7d3eb6da0c183fa800669e1bec6c73f236f7e"
         }
@@ -1184,7 +1184,7 @@
         ],
         "stableID": null,
         "disposition": "Initial slice installed in `4ed15ab`; current catalogue has 19 active questions after",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/design-homework-current.md": "3293c1c87cb5338e8933a4d4ca30daae47533d66772e127003383787f8960745"
         }
@@ -1202,7 +1202,7 @@
         ],
         "stableID": null,
         "disposition": "resolved coherence-cleanup batch; retained as historical rationale. These items are",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/design-review-batch-next-current.md": "c02163eb9d715c28e0b9d936c9f750d8e4e5919a4b464f2bb7a337c054ec8d9a"
         }
@@ -1220,7 +1220,7 @@
         ],
         "stableID": null,
         "disposition": "approved for live promotion and review through play; Atlas remains a revision tool",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/dialogue-review-first-batch-current.md": "64fe60403e588900acfbe35d835f05fcd4eb993fc517d97b3e10d6708248c210"
         }
@@ -1238,7 +1238,7 @@
         ],
         "stableID": null,
         "disposition": "29 books are structurally complete after Vance's reorder and Noll's reversible six-page",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/diary-corpus-audit-current.md": "57e6e8d8c35666447efd6372a6b749661e3547d96a2b08577688df3a0e4b4f45"
         }
@@ -1256,7 +1256,7 @@
         ],
         "stableID": null,
         "disposition": "approved placeholder mechanical profiles for engineering. Names, owners and conceptual",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/diary-focus-mechanical-profiles-current.md": "4cb49a593d7e1ba99ed159c3beb825561db5ec120aa1a8f16080d1e0e49f2e15"
         }
@@ -1274,7 +1274,7 @@
         ],
         "stableID": null,
         "disposition": "Approved directional placeholders for implementation and debug-menu tuning. These twelve",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/diary-focus-profiles-later-current.md": "04c6d2c7f6166f57f0ea0c844d0a202d8438683946f15b1f4dc2706379f24522"
         }
@@ -1292,7 +1292,7 @@
         ],
         "stableID": null,
         "disposition": "Authoritative ten-page packet; numerical gambit threshold remains player-authored data.",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/diary-packet-marrick-current.md": "656698eea86db8705b0113d8e2434f36a10dbf18a05f206ce0ff592ffac730a1"
         }
@@ -1310,7 +1310,7 @@
         ],
         "stableID": null,
         "disposition": "Authoritative twelve-page late books. Each location page has one signature condition;",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/diary-packets-auber-ashe-current.md": "d63bcc189880abb996ec4e0b7a3ff48d9d2e4dde629e6457aac3c0e844ef7027"
         }
@@ -1328,7 +1328,7 @@
         ],
         "stableID": null,
         "disposition": "implementation-ready for Bryn, Orsa and Talin. Vance's reordered six-page opening packet",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/diary-packets-early-mid-current.md": "2685330ff4733fc54c2dbbbf3a0543c30a3773b676a9bbd275d24bd82eb08cc5"
         }
@@ -1346,7 +1346,7 @@
         ],
         "stableID": null,
         "disposition": "Authoritative authored packets; thresholds inherit",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/diary-packets-five-condition-current.md": "c28c091e53879a10b5711cbafbebd4065dc04c5429f8537c18beae7365a2625c"
         }
@@ -1364,7 +1364,7 @@
         ],
         "stableID": null,
         "disposition": "implementation-ready authored content plan for Nessa, Corrin, Dagg, Rook and Lys.",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/diary-packets-midgame-current.md": "113c3ecd76f1ceb7efddc23ceafbeb9dd846ee4409c7f44fe4fe2610de4b4eba"
         }
@@ -1382,7 +1382,7 @@
         ],
         "stableID": null,
         "disposition": "Authoritative endgame books. Perren has twelve pages; Nine has thirteen. Their longer",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/diary-packets-perren-nine-current.md": "05542d6a8fd20870b8bec21f0e8787ad3d3f021c4f1c1a37cf1b6123882ba471"
         }
@@ -1400,7 +1400,7 @@
         ],
         "stableID": null,
         "disposition": "Authoritative late-game packets. Singular rewards and relationship targets remain strict-ID",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/diary-packets-seven-eight-current.md": "bc0fbd7d8380d26bc3d36a95dfc780fa14a02f6050b5de6fe521294aa06e5383"
         }
@@ -1418,7 +1418,7 @@
         ],
         "stableID": null,
         "disposition": "Authoritative ownership and singular-reward registry for all 29 designed travellers. Tam",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/diary-teaching-registry-current.md": "e69477b94d5d3dc926f72e234741077bfead4758315ac83998c247bcfc178081"
         }
@@ -1436,7 +1436,7 @@
         ],
         "stableID": null,
         "disposition": "Current implementation boundary",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/diary-teaching-registry-implementation-audit-current.md": "6eba96c729ef69d28b3e45ee108c45a95dab72a6174373732f8bdd6d2bf68967"
         }
@@ -1454,7 +1454,7 @@
         ],
         "stableID": null,
         "disposition": "implementation-facing first slice. Recipe costs and potency bands are playtest values.",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/distillery-system-current.md": "c4aa4a4c4a2be2f01d169e41a5002fa6523409d219f24f0ca2ef2dcbd13f9bf9"
         }
@@ -1472,7 +1472,7 @@
         ],
         "stableID": null,
         "disposition": "playtest protocol for DRQ-128; does not change Recommended coefficients.",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/encounter-scaling-phone-test-card-current.md": "7b652c4e5c4eaecd2bcc3959881b231466f4096384a6aadfbe22a523db7037c9"
         }
@@ -1490,7 +1490,7 @@
         ],
         "stableID": null,
         "disposition": "unlabelled",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/encounter-scaling-playtest-current.md": "a953a537fd97c84e60ebcd3176f43e683a7940050f6e1a24e67413d67a503ff5"
         }
@@ -1508,7 +1508,7 @@
         ],
         "stableID": null,
         "disposition": "approved direction, reversible DEBUG/simulation profile rather than final shipped",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/encounter-scaling-simulation-current.md": "23a206e3853ba4f20d9b871ad2624c3a604170ba56ee5313ab2c21608ddc7b5d"
         }
@@ -1526,7 +1526,7 @@
         ],
         "stableID": null,
         "disposition": "enchanting concept requested by Aimee; the first-slice profile below is Game Design's",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/equipment-inscription-system-current.md": "df4e24eadf76c1c1fcbb2ec6a3a4e19f591c33bd27931bf9f7f5b74c30e3db1c"
         }
@@ -1544,7 +1544,7 @@
         ],
         "stableID": null,
         "disposition": "Current invariant; temporary playtest values pending run data",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/essence-continuation-economy-current.md": "b5cc7191630ad1ae7a2d22caac97400cfeac304f4875ec21674e8f2560fe63b4"
         }
@@ -1562,7 +1562,7 @@
         ],
         "stableID": null,
         "disposition": "accepted by Decision 186; retained as rationale and implementation acceptance for",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/essence-refining-progression-audit-current.md": "028dc511bbfcfa391f7cac9290ef1463b7ec2949a1bbec8d14b867c8cdb96be9"
         }
@@ -1580,7 +1580,7 @@
         ],
         "stableID": null,
         "disposition": "settled implementation direction under Decision 186; costs, practice gate and rate are",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/essence-refining-progression-current.md": "81ca55e62651b6cbcb4b014e8d9f488e837faf069a18a1358b0150b9249f984f"
         }
@@ -1598,7 +1598,7 @@
         ],
         "stableID": null,
         "disposition": "accepted reversible playtest profile under Decision 186; implementation queued",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/essence-spring-review-batch-current.md": "f43a89f7f753fe9fa72f4cd7cfc0a901bf25b2b5d5360c70bb91b356ae45d5b3"
         }
@@ -1616,7 +1616,7 @@
         ],
         "stableID": null,
         "disposition": "current safety boundary with reversible 50% partial-haul tuning. This reconciles the",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/expedition-outcomes-current.md": "6405f82e874fd8422d14287d9a6aa85a7eff8cecd0391e61c3f9f0dc45e280dc"
         }
@@ -1634,7 +1634,7 @@
         ],
         "stableID": null,
         "disposition": "implementation-ready correctness consolidation",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/expedition-return-receipt-current.md": "a2048e34054afd8bc23d5808b5413744015d6ca62e349595c7b8fe1aa54afdab"
         }
@@ -1652,7 +1652,7 @@
         ],
         "stableID": null,
         "disposition": "Current scheduling authority beneath Aimee's numbered priority sequence",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/feature-completion-priority-audit-current.md": "bbd222fea99a52cf22217b333fa561b973c342e4ee776230050165861abc4663"
         }
@@ -1670,7 +1670,7 @@
         ],
         "stableID": null,
         "disposition": "awareness/Shadow/Lure foundation committed at `5731aa9`, regression-green and present in",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/field-awareness-avoidance-current.md": "a944726899b6079a9f286a9bea2552653f9b910909cbb1695d4e0b34d4567aa4"
         }
@@ -1688,7 +1688,7 @@
         ],
         "stableID": null,
         "disposition": "Game Design implementation authority for the first explorable-world feedback slice. It",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/field-feedback-and-loot-presentation-current.md": "5a3f14e018198ccd8259824e3a5158cd3219ca26e325230e3e39452d9c90ce79"
         }
@@ -1706,7 +1706,7 @@
         ],
         "stableID": null,
         "disposition": "Checkpoint `8b32b51` is ready for phone variety acceptance; full device/test builds and",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/field-note-grammar-current.md": "9cd1591fedfcc640148037a9227c9830ebde871889683ac8c53245326fd969bb"
         }
@@ -1724,7 +1724,7 @@
         ],
         "stableID": null,
         "disposition": "Cross-lead execution authority beneath `player-progression-implementation-roadmap-current.md`.",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/first-three-worlds-execution-plan-current.md": "d73f41ce22b64509d89a114ce7b2980f70fe82bdc525c9fdddc6873b0dc0a5b2"
         }
@@ -1742,7 +1742,7 @@
         ],
         "stableID": null,
         "disposition": "current content direction; names, magnitudes and acquisition bands are reversible until",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/focus-expansion-85-current.md": "91a72d538c3eb493ab6ff91c3b21dd2b8b2474c2a0dd3b4eb9d24f24499b2d21"
         }
@@ -1760,7 +1760,7 @@
         ],
         "stableID": null,
         "disposition": "Implementation-facing sequencing for the current 62→85 scope. Names, purposes and",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/focus-expansion-implementation-batches-current.md": "651d152c26b2f5dcb89272ebb2a730016fc40c10a83181cf70ca5901ed51ad76"
         }
@@ -1778,7 +1778,7 @@
         ],
         "stableID": null,
         "disposition": "Implementation-facing second slice under `found-writing-system-current.md`. Family",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/found-writing-breadth-current.md": "88bc6f701d1660d96bac54f494d761c115c49409ecef826da1b76dc2b1e9f45b"
         }
@@ -1796,7 +1796,7 @@
         ],
         "stableID": null,
         "disposition": "Current implementation-facing first slice; mix and placement distance are playtest values.",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/found-writing-system-current.md": "9001959badf8fe826dfb65a557c0f6835536867e33c97f3fb712c74b1e0c005b"
         }
@@ -1814,7 +1814,7 @@
         ],
         "stableID": null,
         "disposition": "full-cast meeting and diary voice production is source-complete; all coherent copy is",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/full-cast-voice-authority-current.md": "619c9f993853e8d990ef89b85fdf9c39c9dc759a90dd9c74bb865521d2cd8501"
         }
@@ -1832,7 +1832,7 @@
         ],
         "stableID": null,
         "disposition": "Current implementation boundary; armour marks are reversible playtest values.",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/gambit-stat-thresholds-current.md": "6549465eed132bc9b7c7dca35df9ce457e9772f583d3290a7c6d26849a0889db"
         }
@@ -1850,9 +1850,27 @@
         ],
         "stableID": null,
         "disposition": "lead assessment and product-direction authority; not an implementation queue by itself",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/game-design-ux-assessment-current.md": "495980049344c1f8c025e0a6bb6bfd3d464f9ee188fa301473659a5b25f9a931"
+        }
+      }
+    },
+    {
+      "path": "docs/game-wiki-content-contract-current.md",
+      "title": "Internal Game Wiki — content and completeness contract",
+      "status": "Current Game Design/Orchestration authority for the source-generated internal wiki.",
+      "hash": "0687f1f9d023ca8a2b94415854e90bd8b9475d514c6599e8f39801f2a4cbb45b",
+      "current": true,
+      "provenance": {
+        "sourcePaths": [
+          "docs/game-wiki-content-contract-current.md"
+        ],
+        "stableID": null,
+        "disposition": "Current Game Design/Orchestration authority for the source-generated internal wiki.",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
+        "sourceHashes": {
+          "docs/game-wiki-content-contract-current.md": "0687f1f9d023ca8a2b94415854e90bd8b9475d514c6599e8f39801f2a4cbb45b"
         }
       }
     },
@@ -1868,7 +1886,7 @@
         ],
         "stableID": null,
         "disposition": "Current structural design; thresholds, costs and within-tier bonuses are playtest values.",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/gear-crafting-families-current.md": "c264201890e85ee5fbebfde27e4edef64e7529218ff24c7e9da660f1b52172fd"
         }
@@ -1886,7 +1904,7 @@
         ],
         "stableID": null,
         "disposition": "current implementation-facing rule. This replaces “wild companion” language in the",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/generated-companion-arrival-builds-current.md": "1f9c3d35e2a5ffc0a8b472cac33e14f5b9619a6f4c3b09acadd4b2a6e8d354fc"
         }
@@ -1904,7 +1922,7 @@
         ],
         "stableID": null,
         "disposition": "Current role audit with a reversible Waystone playtest placeholder; no Tam ownership is",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/glass-quartz-waystone-audit-current.md": "cddf5ddb222afe5173020d2785c4f94da1287b2df138e2d58900eb8c623bb1f5"
         }
@@ -1922,7 +1940,7 @@
         ],
         "stableID": null,
         "disposition": "Settled premise and implementation-safe data boundary. Ending structure remains held by",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/great-work-boundary-current.md": "df6a758383e183ae8b52bab8a4ef78f53707edeae4a57722ee2af5a1f4301665"
         }
@@ -1940,7 +1958,7 @@
         ],
         "stableID": null,
         "disposition": "settled project authority · 11 August 2026",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/handmade-art-ownership-current.md": "5273cea105f1e93ace9f44892a474c1eb0edcb3c23fb4654d868ed8d8a01c8ad"
         }
@@ -1958,7 +1976,7 @@
         ],
         "stableID": null,
         "disposition": "Game Design implementation authority for the House/district topology. Workshop removal is",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/home-house-and-village-current.md": "89635da2c3e24b057a79b8d835cede2c506defa17ebac7d6536a19e99503b403"
         }
@@ -1968,7 +1986,7 @@
       "path": "docs/home-village-library-asset-packet-current.md",
       "title": "Binder House, village districts and Library — active AssetLab packet",
       "status": "Active Asset Design assignment from the Game Design/Orchestration Lead. Trading Post v0.3, the",
-      "hash": "892ac848e3a436c719ff9d09cd2bdc293cd21632d5a11835f88daaf6b2019f5c",
+      "hash": "e911a2440ebab5a3d8589bebab4e2d10298b6907738e4023453aae088d1f1bc3",
       "current": true,
       "provenance": {
         "sourcePaths": [
@@ -1976,9 +1994,9 @@
         ],
         "stableID": null,
         "disposition": "Active Asset Design assignment from the Game Design/Orchestration Lead. Trading Post v0.3, the",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
-          "docs/home-village-library-asset-packet-current.md": "892ac848e3a436c719ff9d09cd2bdc293cd21632d5a11835f88daaf6b2019f5c"
+          "docs/home-village-library-asset-packet-current.md": "e911a2440ebab5a3d8589bebab4e2d10298b6907738e4023453aae088d1f1bc3"
         }
       }
     },
@@ -1994,7 +2012,7 @@
         ],
         "stableID": null,
         "disposition": "implementation-facing page plan and authored prose. Existing live pages remain unless",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/implemented-six-diary-packets-current.md": "090aad2a8bf2d6982e7dfc560759e4f6fce12b371a15dd8d6fa6c8dbcc3bdfb7"
         }
@@ -2012,7 +2030,7 @@
         ],
         "stableID": null,
         "disposition": "source-complete; ordinary-phone acceptance remains",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/implemented-six-station-contribution-audit-current.md": "ee8b01f3d9c646ed6cd0d84cd440f4c969934fd1696be3153f4a92e2cfa50175"
         }
@@ -2030,7 +2048,7 @@
         ],
         "stableID": null,
         "disposition": "current role/resource boundary plus reversible first-slice interaction placeholder.",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/ink-economy-friction-audit-current.md": "bec03004e7e7f062cca32e352de482a573bd28e13247c34b749a44d3904b1679"
         }
@@ -2048,7 +2066,7 @@
         ],
         "stableID": null,
         "disposition": "implemented and integrated at `7a798a6` / `de2b71b`; 916-test shared checkpoint green;",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/library-collection-accuracy-current.md": "69e70a8d32a0ef5c34e92f3f01d34dc2d101721086b56f2649d999f2818e1d82"
         }
@@ -2066,7 +2084,7 @@
         ],
         "stableID": null,
         "disposition": "implementation-ready keeper upgrade and recovery-provenance correction.",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/library-lys-catalogue-current.md": "74eea3e3fc7fbdad9b2eb465ebc8b0e286f8e5ef935a56cb8bba3d71674c3a19"
         }
@@ -2084,7 +2102,7 @@
         ],
         "stableID": null,
         "disposition": "implementation-facing authority correction. The Library is an opening Base function;",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/library-lys-progression-current.md": "d569764c1cb4f4544da13c93da30c04397a345d2f9134b9e186394ecaeb767b7"
         }
@@ -2094,7 +2112,7 @@
       "path": "docs/library-shelves-current.md",
       "title": "Library shelves and growing collection — current",
       "status": "Game Design implementation authority for the Library's root spatial surface and collection-growth",
-      "hash": "dd9c940032a6cc3aca52ae4f6bbc0e896183dc310a99df5c4148d0cd040309ed",
+      "hash": "5a50c2c8b3a29d8df666565f2374a64419c4de98a66bf899ece47ee6e81ed6bb",
       "current": true,
       "provenance": {
         "sourcePaths": [
@@ -2102,9 +2120,9 @@
         ],
         "stableID": null,
         "disposition": "Game Design implementation authority for the Library's root spatial surface and collection-growth",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
-          "docs/library-shelves-current.md": "dd9c940032a6cc3aca52ae4f6bbc0e896183dc310a99df5c4148d0cd040309ed"
+          "docs/library-shelves-current.md": "5a50c2c8b3a29d8df666565f2374a64419c4de98a66bf899ece47ee6e81ed6bb"
         }
       }
     },
@@ -2120,7 +2138,7 @@
         ],
         "stableID": null,
         "disposition": "production correction set; 14 Aug 2026",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/location-clue-clarity-audit-current.md": "f1bd14a19b4ef5c39716d7c730b42a5a2fc93edee30a3ba7d66fab36a22d21ac"
         }
@@ -2138,7 +2156,7 @@
         ],
         "stableID": null,
         "disposition": "exact-copy recommendations for Aimee's DEBUG atlas review; no live prose is replaced by",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/location-clue-revision-packet-current.md": "c16f59bc2ce0c0ce5a73343e1aa684444829ba67d1142ea9853e5de1606cc348"
         }
@@ -2156,7 +2174,7 @@
         ],
         "stableID": null,
         "disposition": "Historical first recommendation, superseded for current review by",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/loot-quality-hybrid-review-current.md": "c9bc521b6c3d31b140c2b04d9d5122d5048931fb15a7cdbdbbb140029b010765"
         }
@@ -2174,7 +2192,7 @@
         ],
         "stableID": null,
         "disposition": "implementation-ready shared presentation contract; mechanical recipes and station",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/maker-station-screen-grammar-current.md": "ce08cfaf85aa4acf2f6189cf87a4ba90ea65534eb1d338396ac8fe2e6eccf49e"
         }
@@ -2192,7 +2210,7 @@
         ],
         "stableID": null,
         "disposition": "settled default boundary from Aimee, 9 Aug 2026. Supersedes the earlier “navigation",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/minimap-disclosure-current.md": "82bdfa07b51779bc46523f7088aea9c8b56ce0fc9f0727064ef7cc57fbe4f479"
         }
@@ -2210,7 +2228,7 @@
         ],
         "stableID": null,
         "disposition": "reversible playtest authority; implement in campaign order and review through play",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/named-character-stat-growth-review-current.md": "fdb310ca58e43c88543ca40bdbc364291292ce1f3a9ce45e309c27104ce5e513"
         }
@@ -2228,7 +2246,7 @@
         ],
         "stableID": null,
         "disposition": "reversible playtest authority; implementation authorized in campaign order",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/named-traveller-arrival-level-review-current.md": "a8dc6e2daacd93a8b7ed1a1787d76ed24c9b17ca0d367d59b8315e293d7a0922"
         }
@@ -2246,7 +2264,7 @@
         ],
         "stableID": null,
         "disposition": "reversible playtest identity approved by Game Design; exact prose and diary reward remain",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/noll-opening-review-packet-current.md": "34117d576716b888359d1db19ba6e3f2dca262487f10a331a000f460096b2992"
         }
@@ -2264,7 +2282,7 @@
         ],
         "stableID": null,
         "disposition": "current authored-order decision; Noll/Recycler native playtest promotion is approved by",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/opening-economy-traveller-reorder-current.md": "489e9c13f1acb6c0f668e5ebca0c91998627ecb1f30dfa1c42e13144079fbc65"
         }
@@ -2282,7 +2300,7 @@
         ],
         "stableID": null,
         "disposition": "Noll/Recycler native promotion implemented and pushed at `aaf6280`; signed-phone",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/opening-economy-trio-promotion-audit-current.md": "abbe9c206f633b8e7cfe83764a13d717814f450932b9ea836d61a1dbc1820ae5"
         }
@@ -2300,7 +2318,7 @@
         ],
         "stableID": null,
         "disposition": "Game Design implementation authority for ordinary Party navigation and its combat-tree entry.",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/party-character-surface-current.md": "dd8d04a91f2ba438e03fc10de70355e6011239d5227daa7c5f91065a3a785d1b"
         }
@@ -2318,7 +2336,7 @@
         ],
         "stableID": null,
         "disposition": "implementation-facing migration authority. This unifies the identity boundaries already",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/party-member-identity-progression-current.md": "7804e7961c2161930b1fc479a5f900ebe54398bf16eba15d143733fccb0b32a6"
         }
@@ -2336,7 +2354,7 @@
         ],
         "stableID": null,
         "disposition": "reversible playtest comparison approved by Game Design; Aimee review remains open",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/penmanship-economy-runway-review-current.md": "089fe88062b928c47c0d3014860c6aa05f17bf0e374dc131d15ba8a46978126d"
         }
@@ -2354,7 +2372,7 @@
         ],
         "stableID": null,
         "disposition": "implementation-ready identity/topology migration; economy values remain playtest tuning",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/penmanship-native-migration-current.md": "23a546a9abdb1aa697c31aaca252ac110d80f1709db6cb4181a7b9ffbabc672c"
         }
@@ -2372,7 +2390,7 @@
         ],
         "stableID": null,
         "disposition": "archived execution snapshot; preserved for acceptance/history, not current install or queue",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/phase-1-phone-acceptance-card-current.md": "b4f0b9351ba81697712303de773de6b4a7ea638352a77c3f3d6ed707a2a0e8d9"
         }
@@ -2390,7 +2408,7 @@
         ],
         "stableID": null,
         "disposition": "historical/current system inventory; scheduling is subordinate to",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/playability-first-roadmap-current.md": "d9abebaf24e212c877834d27b43ebad6508f76021e338a6f6a3c9928b2780aa5"
         }
@@ -2408,7 +2426,7 @@
         ],
         "stableID": null,
         "disposition": "archived capture-time ordering; not the current cross-lead execution queue",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/playability-priority-sequence-current.md": "c8967b77975550dd23c3f804ed8b5aa9e8d7b6a7432abd54d891c348843fea25"
         }
@@ -2426,7 +2444,7 @@
         ],
         "stableID": null,
         "disposition": "current UI authority for replacing the “series of lists” presentation; implementation is",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/player-facing-screen-grammar-current.md": "e0e1f9ebb0649305b79b97850a4c6ab45f018a4c85ed0cf42ffac77be32b656f"
         }
@@ -2444,7 +2462,7 @@
         ],
         "stableID": null,
         "disposition": "operational ordering authority beneath Aimee's priority calls",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/player-progression-implementation-roadmap-current.md": "8d2bd7b4a294bb14d52990eb31689a46f66aadcd3a45bae5d0283c2174eef1e7"
         }
@@ -2462,7 +2480,7 @@
         ],
         "stableID": null,
         "disposition": "9 Aug triage snapshot and still-current issue interpretation; it no longer owns live",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/playtest-triage-9-aug-2026-current.md": "b8ad6520e1aa5202510943a9eeb5390618da4fb7aa66fc80c785ad6cd467b3e2"
         }
@@ -2480,7 +2498,7 @@
         ],
         "stableID": null,
         "disposition": "Settled user-request audit; implementation corrections only.",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/playtest-ui-corrections-current.md": "40d9e2bf7f8f690d4034b3d89825baf128734be870b594beaabf609c41450bf8"
         }
@@ -2498,7 +2516,7 @@
         ],
         "stableID": null,
         "disposition": "Current bounded v1 design; thresholds and salvage fraction are playtest values.",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/predation-living-worlds-current.md": "caff78de16ed5386717702e78fc4729271047820efc4d31e42c931e7b86370d5"
         }
@@ -2516,7 +2534,7 @@
         ],
         "stableID": null,
         "disposition": "Generic ladder semantics and connection validity are implementation-ready. Hydrology",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/qualifier-grammar-audit-current.md": "4f597a32d05b367619c38fde83e3581d9f66f455dca16b6a4374735607289b88"
         }
@@ -2534,7 +2552,7 @@
         ],
         "stableID": null,
         "disposition": "settled current boundary. Paired tradeoffs remain a system-wide principle; the separately",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/quirk-pattern-audit-current.md": "22f0c44c87fe4366c786e2e41fccd54a6c45ec9ed1bcc4ff961b4a9dffaf40b5"
         }
@@ -2552,7 +2570,7 @@
         ],
         "stableID": null,
         "disposition": "design correction recommended; requires Aimee review before native revision",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/reforge-progression-audit-current.md": "df0848646f1e67fe7808d3ab441cf6c21a76586a81237985ac2cc538d446a03c"
         }
@@ -2570,7 +2588,7 @@
         ],
         "stableID": null,
         "disposition": "current Game Design audit; implementation order follows the live roadmap rather than this",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/remaining-native-list-surface-audit-current.md": "3bd18a7ec9be5b75c5ecdcf1be169153de6d02dffc5febf6cb229df4f9e816ee"
         }
@@ -2588,7 +2606,7 @@
         ],
         "stableID": null,
         "disposition": "unlabelled",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/research-economy-shape-audit-current.md": "cdeaf76352ba2f590a3cf26c5f2dc16c4c4ed92f62b85e2d40b4ef203fdcf21b"
         }
@@ -2606,7 +2624,7 @@
         ],
         "stableID": null,
         "disposition": "implementation-ready presentation correction; research mechanics/costs are unchanged.",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/research-tree-graph-presentation-current.md": "0309228ad35d6516c3ca96280437a3259d73d6fb115316aa123b02d5ea8f9217"
         }
@@ -2624,7 +2642,7 @@
         ],
         "stableID": null,
         "disposition": "Game Design implementation authority; not yet implemented. Replaces the vague “three-resource",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/resource-extraction-progression-current.md": "42a2f55261992b293b7395ffcc05d46e5d9264eee42117e373491ab1ff1baf85"
         }
@@ -2642,7 +2660,7 @@
         ],
         "stableID": null,
         "disposition": "immediate device-check script; design evidence only, no implementation expansion.",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/resource-sidewall-phone-acceptance-current.md": "59d5a38a59aa6da793d60a4badb0b61cc3edab27a859fe62bfef40a1cd92b1f4"
         }
@@ -2660,7 +2678,7 @@
         ],
         "stableID": null,
         "disposition": "Current design control document",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/roster-coherence-audit-current.md": "955c1c053b33c517cb10bf0833eed51f7ade5bab8e16db2f1bf4c6550e5443bf"
         }
@@ -2678,7 +2696,7 @@
         ],
         "stableID": null,
         "disposition": "implementation-facing order for content planning. The implemented six have settled",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/roster-progression-current.md": "ae0fc8e95537f732f27cde49484758a3dcbfb0d164f58842eb7f1911aa934dc9"
         }
@@ -2696,7 +2714,7 @@
         ],
         "stableID": null,
         "disposition": "Current structure; pity probabilities and floor are playtest placeholders.",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/rune-pacing-library-legibility-current.md": "1c0d4bfbcf5fc2f6ebd7d22b0a4fbcf65f131a89e986ff1f8b3cd62b7f6ed7ac"
         }
@@ -2714,7 +2732,7 @@
         ],
         "stableID": null,
         "disposition": "settled by Aimee",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/save-compatibility-policy-current.md": "91900e268488c866f3402a202e67c65f3ffec2521c7af85f5ae369aaabcc39ba"
         }
@@ -2732,7 +2750,7 @@
         ],
         "stableID": null,
         "disposition": "save semantics source-complete through `b3bc410`; Campaign presentation reconciliation",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/save-slot-system-current.md": "26951d128cb7b26ca4310c721aaf16cee2d5a67158f9f37e101b87b5730a38bd"
         }
@@ -2750,7 +2768,7 @@
         ],
         "stableID": null,
         "disposition": "source-complete through domain/provider `7772df0`, player UI `5e5aa14`, focused fixture",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/scent-mask-first-slice-current.md": "72ec67571c9601c07a71b703827d25b087da1859b5c89a8debff2627ea383fcd"
         }
@@ -2768,7 +2786,7 @@
         ],
         "stableID": null,
         "disposition": "approved concept; implementation-ready but non-preemptive",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/seamlight-current.md": "5bcd1f153dbeb9321725b8837e9d82f9741295322e3867c2c0d77eef6cf6449a"
         }
@@ -2786,7 +2804,7 @@
         ],
         "stableID": null,
         "disposition": "Authoritative first-slice prose for `found-writing-breadth-current.md`. Every line is safe",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/site-fragment-corpus-current.md": "11bfcf64b217e59a85a05c24a646092fc1de64c8f0cb5bfec3d0e3d247307f46"
         }
@@ -2804,7 +2822,7 @@
         ],
         "stableID": null,
         "disposition": "current structural rules plus six implementation-ready content profiles. Conditions,",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/site-system-catalogue-current.md": "eaf27e1857a09815306ad26a8f8cfca5d0c7b6a05f1dca3f7dc1213e88708a49"
         }
@@ -2822,7 +2840,7 @@
         ],
         "stableID": null,
         "disposition": "Live reversible site and diary lead. Exact weight, yields and authored-but-currently",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/spent-emanation-housing-site-current.md": "8a37e64e11591dd1911ae85b905d18666d445ae69dcb9a1b8a48386e62013aba"
         }
@@ -2840,7 +2858,7 @@
         ],
         "stableID": null,
         "disposition": "superseded opening-scene proposal; retained for history. Current authority is",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/starting-town-band1-integration-current.md": "c2d3d8cc845193d399746e447f7118093764a45cb1b96f27cc6332e7196b42ba"
         }
@@ -2858,7 +2876,7 @@
         ],
         "stableID": null,
         "disposition": "active audit; fourth repository pass 11 Aug 2026",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/static-manual-authority-audit-current.md": "b40e88ce676b71f2353fa0d2c873b375c4c1df16aeea4be2e03b7eadd01f1b47"
         }
@@ -2876,7 +2894,7 @@
         ],
         "stableID": null,
         "disposition": "complete 23-station live-catalogue pass; one P1 orphan/dead end and one P2 receipt/copy defect found",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/station-first-use-reachability-audit-current.md": "39e1a563922923190b196d04a44cc6bebdcde8095d040a87211ae09aa53e306e"
         }
@@ -2894,7 +2912,7 @@
         ],
         "stableID": null,
         "disposition": "implementation-facing ownership/dependency authority. Existing live costs remain current;",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/station-integration-matrix-current.md": "a7894b1dab11b032bde1a35ea04293e76ca6b325b628a16c19c341cae1aceaf6"
         }
@@ -2912,7 +2930,7 @@
         ],
         "stableID": null,
         "disposition": "implementation-facing structural design. Costs and late capacity thresholds are",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/tannery-system-current.md": "a6544afbb2d77c2369b37922b443cd7d2244ce43bc358d632eeab7b30844499c"
         }
@@ -2930,7 +2948,7 @@
         ],
         "stableID": null,
         "disposition": "Implementation-facing structure with playtest-placeholder spawn, recurrence and seat",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/tavern-random-companions-current.md": "e7b86a31548089a4a122fba51a1fb1f246d14d84de948300a1873b38ae9648c2"
         }
@@ -2948,7 +2966,7 @@
         ],
         "stableID": null,
         "disposition": "frozen boundary implemented and pushed in native checkpoint `a7a99bc`; retain as the",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/top-down-map-asset-integration-current.md": "60fbd5232a171bdbe2e7f9f162764c5efd71ac820bde4a71caa4d74a298c962a"
         }
@@ -2966,7 +2984,7 @@
         ],
         "stableID": null,
         "disposition": "Sell-first Trading Post and first Recycler rules slices are implemented. The Trading Post's",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/trading-post-recycler-current.md": "28c216a665a3e2231f18293c630fd38a5646dd41ebaa29043ceb0c4f97196ee2"
         }
@@ -2984,7 +3002,7 @@
         ],
         "stableID": null,
         "disposition": "Trading Post and Recycler first rules slices implemented. Prices, stock counts, recovery",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/trading-post-recycler-economy-current.md": "297d7917d1f2f7c5ee9b8cdd0280a390761d8aa204e138fcb4328941db7e954e"
         }
@@ -3002,7 +3020,7 @@
         ],
         "stableID": null,
         "disposition": "settled implementation direction; percentage and near-miss increment remain DEBUG-tunable",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/traveller-arrival-confidence-review-current.md": "39a5e38930eb1227393b893910eeb1d38b7e07cc2acbd8d6d64e41548289f8d5"
         }
@@ -3020,7 +3038,7 @@
         ],
         "stableID": null,
         "disposition": "implementation recommendation downstream of traveller targeting",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/traveller-clue-distribution-current.md": "428623d92b3f74ba1064e510af4ef02ccb70758141ddf7cabaa64ce3ddf8b752"
         }
@@ -3038,7 +3056,7 @@
         ],
         "stableID": null,
         "disposition": "Current authored direction; preserves implemented meetings and voices",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/traveller-identities-existing-six-current.md": "c73372b46fa550ca2c95feea4d039bfc60d51593065c2849b229c9a9d8ba1913"
         }
@@ -3056,7 +3074,7 @@
         ],
         "stableID": null,
         "disposition": "reversible playtest identity approved for native promotion; exact prose and the field-kit",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/traveller-identity-noll-recycler-current.md": "76927a2647b9532ded5ee3fc46c6353e78bf5ae8578fc69ceffae77a6cfed1af"
         }
@@ -3074,7 +3092,7 @@
         ],
         "stableID": null,
         "disposition": "Design coherence pass complete; exact draft prose remains `Draft / needs Aimee review`.",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/traveller-meeting-content-audit-current.md": "0716fdb622e6b3251adf0d1d3a5bb0b18ed1450e6d1dc69e65569d2eecef851d"
         }
@@ -3092,7 +3110,7 @@
         ],
         "stableID": null,
         "disposition": "comprehensive authoring direction for 21 missing-live meetings plus Noll's replacement",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/traveller-meeting-corpus-plan-current.md": "5e113a178e771da4e43e65e8da78bfc34c572d0d13491337fe9770c1236e71aa"
         }
@@ -3110,7 +3128,7 @@
         ],
         "stableID": null,
         "disposition": "implemented and pushed in native checkpoint `95d1778`. Ordered exchanges, explicit stable",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/traveller-meeting-interaction-current.md": "0b88636f0d1d15a1a41a31f728d1a0be0d1c20a6a8cd1f468537416c90fb7a64"
         }
@@ -3128,7 +3146,7 @@
         ],
         "stableID": null,
         "disposition": "independent Design recommendation pass; no draft is promoted or silently rewritten.",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/traveller-meeting-voice-differentiation-audit-current.md": "3b088074486c503e8d1ba3e21e1a1b337782e569c1c88b24445f9aeaf0ba5597"
         }
@@ -3146,7 +3164,7 @@
         ],
         "stableID": null,
         "disposition": "exact-copy recommendation packet for Aimee's DEBUG atlas review; not promoted.",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/traveller-meeting-voice-revision-packet-current.md": "9631467523d6f01ed9402cb9b4aa742da4e6f3df5555c0a2c86f06691bf1f606"
         }
@@ -3164,7 +3182,7 @@
         ],
         "stableID": null,
         "disposition": "exact-copy recommendations for Aimee's DEBUG Homework/atlas review; not promoted",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/traveller-meeting-voice-revision-packet-early-hinge-current.md": "b4d5f4e9de5822570d04090ef9098e36496005fdd435c70e55f23ae6b4050cdf"
         }
@@ -3182,7 +3200,7 @@
         ],
         "stableID": null,
         "disposition": "exact-copy recommendations for Homework/atlas review; not promoted",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/traveller-meeting-voice-revision-packet-material-current.md": "3776b32de3951716d2840264712d708bbbb2ce95cb7712a52467d3fe26ea1440"
         }
@@ -3200,7 +3218,7 @@
         ],
         "stableID": null,
         "disposition": "exact-copy recommendations for a later Homework/atlas review; not promoted",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/traveller-meeting-voice-revision-packet-remaining-current.md": "18cfcfd84622f6e0c5c4a06a154dc674a71f35734e77c2465b809a741355dca0"
         }
@@ -3218,7 +3236,7 @@
         ],
         "stableID": null,
         "disposition": "exact-copy recommendations for Aimee's DEBUG atlas; not promoted",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/traveller-meeting-voice-revision-packet-second-current.md": "83fa046a58a88f1fe078409da24f179f1db6f6bafcc879a5eb1b55087d305bfc"
         }
@@ -3236,7 +3254,7 @@
         ],
         "stableID": null,
         "disposition": "authored-direction profile with playtest thresholds.",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/traveller-signature-marrick-current.md": "c18d5ea14d927aa4365e9973fe6e74857aebc4fabe9f49652d6c3e95452d6ef0"
         }
@@ -3254,7 +3272,7 @@
         ],
         "stableID": null,
         "disposition": "authored-direction profiles with playtest thresholds. Both are late eight-condition hunts;",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/traveller-signatures-auber-ashe-current.md": "796d8642cb70c43e7a59820036e6aa4d86ef13dc5b02822f18aef3cb8d52878f"
         }
@@ -3272,7 +3290,7 @@
         ],
         "stableID": null,
         "disposition": "authored-direction profiles with playtest thresholds. These signatures are deliberately",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/traveller-signatures-early-mid-current.md": "61a064595f7d1aedc10c8856541e9858ce1c23c94e663d9bbc3a6e7669cf6b35"
         }
@@ -3290,7 +3308,7 @@
         ],
         "stableID": null,
         "disposition": "authored-direction profiles with playtest thresholds. This band covers Bracken, Fen, Wren,",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/traveller-signatures-five-condition-current.md": "b7b8ac86e484b047af7bf218c43ba8c70d186609f4bd8d8499b05f2886c38d73"
         }
@@ -3308,7 +3326,7 @@
         ],
         "stableID": null,
         "disposition": "authored-direction profiles with playtest thresholds. This batch covers Nessa, Corrin,",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/traveller-signatures-mid-current.md": "8bf38d1fb8fae2549e1ad3b1b0b94ee0e9d8fcf8a40f2d06fa126b329c0bf963"
         }
@@ -3326,7 +3344,7 @@
         ],
         "stableID": null,
         "disposition": "authored-direction profiles with playtest thresholds. These are interpretive endgame hunts",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/traveller-signatures-perren-nine-current.md": "0ad9fd740f8e189057c71cdea472d0e52e91e7557c4357457149061ed15fbaa4"
         }
@@ -3344,7 +3362,7 @@
         ],
         "stableID": null,
         "disposition": "authored-direction profiles with playtest thresholds. This band covers Sabine, Grimmond",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/traveller-signatures-seven-eight-current.md": "d1ceb4cbf5d78aa069097e0439d0bed85265db39f0705d71f6a9d560b248e4cb"
         }
@@ -3362,7 +3380,7 @@
         ],
         "stableID": null,
         "disposition": "implementation-ready balance/campaign correction; evidence tie weights are DEBUG-tunable",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/traveller-world-pacing-current.md": "8f7a47e76ed953e2a551d883f04d2fde75ace6dee5bddf4c8e0b6cd722f2bd8a"
         }
@@ -3380,7 +3398,7 @@
         ],
         "stableID": null,
         "disposition": "cut from current design; retained here as rationale/history.",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/travellers-token-audit-current.md": "15cdaf98dbbe6eefcc3d72b1b5b401c85f3b7643358ca81ece82f5f4d665f2da"
         }
@@ -3398,7 +3416,7 @@
         ],
         "stableID": null,
         "disposition": "Implementation-ready slice 5 under `tutorial-discoverability-current.md`. Combat safety",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/tutorial-combat-recruit-slice-current.md": "5d31eb9156e48ca3dc592ee9541dd1aa7112a7f522431a32127cd81ea16669ef"
         }
@@ -3416,7 +3434,7 @@
         ],
         "stableID": null,
         "disposition": "implementation-facing structure and copy direction. Exact presentation timing is",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/tutorial-discoverability-current.md": "4ab4bfde5b35a42ffeb31f0c6d66efc22ef893fabc6376c8c7442609bb7742c7"
         }
@@ -3434,7 +3452,7 @@
         ],
         "stableID": null,
         "disposition": "Implementation-ready final tutorial slice. A hook ships only with its owning playable",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/tutorial-later-system-hooks-current.md": "bf3668755f1a82bdb446c8a169f0f43f6809be529eb055f5db5c684c69593296"
         }
@@ -3452,7 +3470,7 @@
         ],
         "stableID": null,
         "disposition": "Implementation-ready slices 1–2. This specializes `tutorial-discoverability-current.md`",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/tutorial-opening-slices-current.md": "185d4e421c6fbf8dfcabf46006e679621f4b0fb8b53d4a6c1ca477aabe41bb32"
         }
@@ -3470,7 +3488,7 @@
         ],
         "stableID": null,
         "disposition": "Implementation-ready slices 3–4 under `tutorial-discoverability-current.md`. Values and",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/tutorial-return-comparison-slices-current.md": "61b1e52691438026cc4e0f49b53addb966875d8e2d9f5841a6bdac1377d7a1e4"
         }
@@ -3480,7 +3498,7 @@
       "path": "docs/village-progression-and-asset-matrix-current.md",
       "title": "Village progression and production-asset matrix — current",
       "status": "implementation and asset authority for destination type, district placement, building",
-      "hash": "1ccb3df2a94babf202cf45222e31f6956156cd9f7184bde5f5b7c0700260427a",
+      "hash": "e808c039dce0d4d2eaff72d36af247922efd81e02f3f167f565516c0e2c0288e",
       "current": true,
       "provenance": {
         "sourcePaths": [
@@ -3488,9 +3506,9 @@
         ],
         "stableID": null,
         "disposition": "implementation and asset authority for destination type, district placement, building",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
-          "docs/village-progression-and-asset-matrix-current.md": "1ccb3df2a94babf202cf45222e31f6956156cd9f7184bde5f5b7c0700260427a"
+          "docs/village-progression-and-asset-matrix-current.md": "e808c039dce0d4d2eaff72d36af247922efd81e02f3f167f565516c0e2c0288e"
         }
       }
     },
@@ -3506,7 +3524,7 @@
         ],
         "stableID": null,
         "disposition": "Current mechanical design; replaces purely subtractive Void behavior.",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/void-cap-current.md": "3598aa5a4e2ddbc5441dbb959e5b2b3a615c758759504ce0b96f40243423ad9c"
         }
@@ -3524,7 +3542,7 @@
         ],
         "stableID": null,
         "disposition": "implementation-ready completion of Sela's settled station contribution",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/wayfarers-table-flora-recognition-current.md": "01de8b57fba27ce086ac1433890ad42d6d8b740a156dc7c9c685970843e61261"
         }
@@ -3542,7 +3560,7 @@
         ],
         "stableID": null,
         "disposition": "implementation-ready with reversible balance values",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/weaponsmith-implementation-current.md": "43a6deed0bfe3a91d82626f22cbd23031d2f664d67ea7627fd5f2a1213fdb0d3"
         }
@@ -3560,7 +3578,7 @@
         ],
         "stableID": null,
         "disposition": "Workshop removal is settled. Knowledge redistribution remains current Game Design work. The",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/workshop-constellation-role-audit-current.md": "35b5961653186b1295f25a076cea0065e399f761fc004f3cc1f5a02346ffbe18"
         }
@@ -3578,7 +3596,7 @@
         ],
         "stableID": null,
         "disposition": "Game Design implementation authority for the native entry splash. Uses the accepted AssetLab",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/world-arrival-causal-reveal-current.md": "81ec8a2f10cd0a2c9f69bdb753e23ad56d59637f5e51cc390407af4f598518be"
         }
@@ -3596,7 +3614,7 @@
         ],
         "stableID": null,
         "disposition": "Current design boundary and priority · 11 August 2026",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/world-color-differentiation-current.md": "0973da16ef6fa03cdb3c74e1cc6ab0b8eb9a842958b337b75e2e9d133d4c518b"
         }
@@ -3614,7 +3632,7 @@
         ],
         "stableID": null,
         "disposition": "settled interaction authority; native stationary-threat code requires correction",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/world-encounter-contact-current.md": "59faf7fe08ce10f50d71f0f68f07e73c7cfbec920b716f12b53540623b5b9dc6"
         }
@@ -3632,7 +3650,7 @@
         ],
         "stableID": null,
         "disposition": "Settled, implementation-ready game-owned contract",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/world-grade-2-bind-adapter-current.md": "7d388adabeefcee5fbe50071c2bc9feed7f3c53658eea26f3e3dbbc812470e11"
         }
@@ -3650,7 +3668,7 @@
         ],
         "stableID": null,
         "disposition": "corrected immutable pack accepted by Game Design for native conformance integration;",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/world-grade-2-pack-design-review-current.md": "78a6ebeb26c445a122dff2c9fb5329771e7dc4362a0045f77f945b8d56aa5089"
         }
@@ -3668,7 +3686,7 @@
         ],
         "stableID": null,
         "disposition": "implementation-ready presentation and interaction correction; analysis mechanics remain",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/world-history-collection-comparison-current.md": "e91954afe761fccbe73c3955b99da2725b229f11241b419959b8a911f3626e6a"
         }
@@ -3686,7 +3704,7 @@
         ],
         "stableID": null,
         "disposition": "P1 layout bug plus approved adjacent-inspection interaction; queued behind Trading Post and",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/world-look-and-control-occlusion-current.md": "d26f685f52c2d905aa7066a43642b4801ae68128ac6278b6a046fc0f53e18012"
         }
@@ -3704,7 +3722,7 @@
         ],
         "stableID": null,
         "disposition": "starter pages are source-complete; Dictionary checkpoint `dc30c6c` is ready for phone",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/world-pages-templates-dictionary-current.md": "d9f5fd76c4dd10f802c37677b97a809b68e6d573637afffc70cc056eebb9f3d7"
         }
@@ -3722,7 +3740,7 @@
         ],
         "stableID": null,
         "disposition": "source-complete slot/correctness foundation; player-facing category and quality semantics are",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/world-resource-reserve-current.md": "d761b07be32a2045664c5b35ac48617c8a3633c2521caafa42cb7eb632f71ad1"
         }
@@ -3740,7 +3758,7 @@
         ],
         "stableID": null,
         "disposition": "Current presentation and migration design. No world mechanics change.",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/writing-palette-vocabulary-migration-current.md": "188ccb34a285cec36bbfdbf27d1fbfdc90315f22d132fe4e56023b46af1a735a"
         }
@@ -3758,7 +3776,7 @@
         ],
         "stableID": null,
         "disposition": "settled progression; implementation-ready naming, capability and migration boundary.",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/writing-tool-progression-current.md": "be17fe07aa89aaaab7117a2faca43d7e1eb1be23202d19106c67c42547b23bb0"
         }
@@ -3777,7 +3795,7 @@
         ],
         "stableID": null,
         "disposition": "history",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/archive/README-HANDOFF.md": "1b7aa6d2da0ca46551a2203b4e8d3cc34f6d6cfbfd4e5df8d4789102017a0509"
         }
@@ -3794,7 +3812,7 @@
         ],
         "stableID": null,
         "disposition": "history",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/archive/README.md": "7c164f552f9671ff470a195561bef542930d4ee0b574762d082da474483c0185"
         }
@@ -3811,7 +3829,7 @@
         ],
         "stableID": null,
         "disposition": "history",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/archive/answers-q21-q34.md": "80067b110fcac89abb856a765c6bfa5e705ec8fafc6116f7dae8cb33c7a924a2"
         }
@@ -3828,7 +3846,7 @@
         ],
         "stableID": null,
         "disposition": "history",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/archive/audit-claude-invented-assumptions.md": "fac49282b071f4569b0d756639ee1c9be48887b0fff41e146068d18e36218528"
         }
@@ -3845,7 +3863,7 @@
         ],
         "stableID": null,
         "disposition": "history",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/archive/audit-what-pressures-actually-do.md": "67e3099bf1b106bd7eeb69c0f8d8b1fb93ecf41c9db4b8d2950529246a3b6a91"
         }
@@ -3862,7 +3880,7 @@
         ],
         "stableID": null,
         "disposition": "history",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/archive/backlog-referrals-worked.md": "28f4c28a9bd2bac19d8215e67fa842184e7d5676337a381285ddad80695baf51"
         }
@@ -3879,7 +3897,7 @@
         ],
         "stableID": null,
         "disposition": "history",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/archive/code-audit-10-and-answers.md": "3de417f3d0976dacac86e6afd6154be6d13b5935e651f29fc4eb98d5c9647f0f"
         }
@@ -3896,7 +3914,7 @@
         ],
         "stableID": null,
         "disposition": "history",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/archive/code-audit-11.md": "b42fbf5bd21fb646f628141cc98ab7f9695775e3124d23b1182d937402359c0b"
         }
@@ -3913,7 +3931,7 @@
         ],
         "stableID": null,
         "disposition": "history",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/archive/code-audit-12.md": "4a73653ce7a51167c7e1bee1433e0437308fb727441a57b2aab1a9b09655884e"
         }
@@ -3930,7 +3948,7 @@
         ],
         "stableID": null,
         "disposition": "history",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/archive/code-audit-2.md": "846d71e25b51fe0b6d6a76558454246a36ffa5818b388b9a9da473f762049724"
         }
@@ -3947,7 +3965,7 @@
         ],
         "stableID": null,
         "disposition": "history",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/archive/code-audit-3.md": "c4dc02191d99c729e78c4d2cae7a7b0b7c9f1b3b4b8aeaf34b94c8535a9f9471"
         }
@@ -3964,7 +3982,7 @@
         ],
         "stableID": null,
         "disposition": "history",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/archive/code-audit-4.md": "62ceb978ab622e844bbc8dbc127e3ee4f6d7464ce59689275de5b05dbcb58d73"
         }
@@ -3981,7 +3999,7 @@
         ],
         "stableID": null,
         "disposition": "history",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/archive/code-audit-5.md": "fd291d2dbd55a004515e4046e1a53a2477d92edb1b93c3425ea30013afb138ec"
         }
@@ -3998,7 +4016,7 @@
         ],
         "stableID": null,
         "disposition": "history",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/archive/code-audit-6.md": "437509c365ac1c2743a0479790646e79c0dbeb9a34c40d7a6e99b06c9e3f7db3"
         }
@@ -4015,7 +4033,7 @@
         ],
         "stableID": null,
         "disposition": "history",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/archive/code-audit-7.md": "aefa1f5376df5a382f3f69d1aacdb2e8b5bea1d7ae7eba48f75d5165b1a26b17"
         }
@@ -4032,7 +4050,7 @@
         ],
         "stableID": null,
         "disposition": "history",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/archive/code-audit-8.md": "596bb540c1ee04ad8c1bf4b1d686339d16f0dd13a61fe4e435fba88a6dd055fa"
         }
@@ -4049,7 +4067,7 @@
         ],
         "stableID": null,
         "disposition": "history",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/archive/code-audit-9-and-answers.md": "3b36f585c23d8e5f5638f07bf5fe8a6c47897217192dd65768e85fe29f2fd50e"
         }
@@ -4066,7 +4084,7 @@
         ],
         "stableID": null,
         "disposition": "history",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/archive/decisions-session-10.md": "d7c710c29da85315e798682295a9e925cbf7c78df95abf94f5aa28819a3eb00f"
         }
@@ -4083,7 +4101,7 @@
         ],
         "stableID": null,
         "disposition": "history",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/archive/decisions-session-11.md": "38663e502e2c0281a0dbe7bbef873ed71dc823a5533b139f76134888dd3a4356"
         }
@@ -4100,7 +4118,7 @@
         ],
         "stableID": null,
         "disposition": "history",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/archive/decisions-session-12.md": "e5ee72cf553e525bbc449e6fbc83912f3111f47344f0916e47e5a349aa7a5a3b"
         }
@@ -4117,7 +4135,7 @@
         ],
         "stableID": null,
         "disposition": "history",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/archive/decisions-session-13.md": "0fccebe3e2b5586e8becc0b84f09113f73790cf9c9d384648f4b3755b9c21ffc"
         }
@@ -4134,7 +4152,7 @@
         ],
         "stableID": null,
         "disposition": "history",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/archive/decisions-session-14.md": "2c97f3c60928d250585442c725dc9f24d95b832b23c4ee254a5ff7361a03f7a4"
         }
@@ -4151,7 +4169,7 @@
         ],
         "stableID": null,
         "disposition": "history",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/archive/decisions-session-15.md": "c6f6073f4b60e69bd5d66e4117835903bd78ea1a4405f0cde5ee1ef7f64a56d2"
         }
@@ -4168,7 +4186,7 @@
         ],
         "stableID": null,
         "disposition": "history",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/archive/decisions-session-4.md": "53d3749390a0b8736520dd7011fe2dc0baf01a4485091d6b18349d9c9c49c7dc"
         }
@@ -4185,7 +4203,7 @@
         ],
         "stableID": null,
         "disposition": "history",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/archive/decisions-session-5.md": "7f1e99e751e2c4e8585be67553c1c150646d592749ba44c2420617c430e6320e"
         }
@@ -4202,7 +4220,7 @@
         ],
         "stableID": null,
         "disposition": "history",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/archive/decisions-session-6.md": "4d66559523b5c364b828777dcf0d086c003361b8af89794ca15db4c504ba521c"
         }
@@ -4219,7 +4237,7 @@
         ],
         "stableID": null,
         "disposition": "history",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/archive/decisions-session-7.md": "f656687f7f048037b6979b99a9208a70f63835e7e8433247e77a5675d942f1c9"
         }
@@ -4236,7 +4254,7 @@
         ],
         "stableID": null,
         "disposition": "history",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/archive/decisions-session-8.md": "74c2bcf4a194da849e17eb605a3f7db6d7eca519f038d2838e468e14efa4f801"
         }
@@ -4253,7 +4271,7 @@
         ],
         "stableID": null,
         "disposition": "history",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/archive/decisions-session-9.md": "36607ced44c7af4ec55f534b8d8ee8be11069bcfa58673de7b910d3edd658fb8"
         }
@@ -4270,7 +4288,7 @@
         ],
         "stableID": null,
         "disposition": "history",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/archive/design-audit-session-5.md": "368abe49e04e07761f58511087c2a2e6ff360ae965e0c2961fe9ee238758e81c"
         }
@@ -4287,7 +4305,7 @@
         ],
         "stableID": null,
         "disposition": "history",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/archive/deviations-audit.md": "f4f765fd8fc75d789431dacc788f9f916d26aaebc8416bb4340e1298af0291eb"
         }
@@ -4304,7 +4322,7 @@
         ],
         "stableID": null,
         "disposition": "history",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/archive/engineering-notes-session-2.md": "9a240a6591d8285250d17caccadf510bbec9c63dba6ab32ce4df750c7c0d2b80"
         }
@@ -4321,7 +4339,7 @@
         ],
         "stableID": null,
         "disposition": "history",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/archive/engineering-notes-session-3.md": "b327f2c06fe416223ada25c12ff92acdef6a6be86a8fa3e50c5c6d81c054849d"
         }
@@ -4338,7 +4356,7 @@
         ],
         "stableID": null,
         "disposition": "history",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/archive/engineering-notes-session-4.md": "f808213c53a4c4e35f4e7e50a74bee9ed3f710e4ff6514a1a4fe48eb181520a1"
         }
@@ -4355,7 +4373,7 @@
         ],
         "stableID": null,
         "disposition": "history",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/archive/full-audit-built-vs-specced.md": "8461307626bd84dec3d6ac310dd1b9f7a70bd6e4518e349de63c11db09e9d138"
         }
@@ -4372,7 +4390,7 @@
         ],
         "stableID": null,
         "disposition": "history",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/archive/hands-and-calligrapher-spec.md": "bc09af4513b05fbd9c76414832fc312ffb49dd8a90ddb215c7f42e44d5d9f708"
         }
@@ -4389,7 +4407,7 @@
         ],
         "stableID": null,
         "disposition": "history",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/archive/jargon-audit.md": "a0c82bbb2e038cc631b7e8463c2d655afa3846dbef00655241f5139ce56f1d5f"
         }
@@ -4406,7 +4424,7 @@
         ],
         "stableID": null,
         "disposition": "history",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/archive/overnight-notes-2026-08-05.md": "f9abd7456bb37bcb6a78feb58dbb3d694001e5ef423ce3fd60f26c343c70d03a"
         }
@@ -4423,7 +4441,7 @@
         ],
         "stableID": null,
         "disposition": "history",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/archive/pressure-model-hydrology.md": "0bf458221a5984f4918b7b923aa9d96e427357d771643c433e7a6f9d9e795c20"
         }
@@ -4440,7 +4458,7 @@
         ],
         "stableID": null,
         "disposition": "history",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/archive/pressure-model-illumination.md": "3a57ae8d662259921f34b76c83ffe7a7e777eb0b001b5128e87baa5f226c07a7"
         }
@@ -4457,7 +4475,7 @@
         ],
         "stableID": null,
         "disposition": "history",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/archive/pressure-model-remaining-five.md": "2010c39318381528e18a8fff14e0ebb30bf7a1015480fd4e2d42df0c79c5a14c"
         }
@@ -4474,7 +4492,7 @@
         ],
         "stableID": null,
         "disposition": "history",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/archive/pressure-model-thermal.md": "e44046a75d487d9e37ed816a448f1a4a6b0fd6905de79ed53d1c69c13c15a448"
         }
@@ -4491,7 +4509,7 @@
         ],
         "stableID": null,
         "disposition": "history",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/archive/questions-for-aimee.md": "8f28d31e74f05a3113b47c044e68af007269722aa74e914655af79a388fc56f7"
         }
@@ -4508,7 +4526,7 @@
         ],
         "stableID": null,
         "disposition": "history",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/archive/world-history-and-feedback-spec.md": "e49c0c9bb2d86e329064d9e9778e19066bd0be02e2c8f962508f3acfe228d143"
         }
@@ -4525,7 +4543,7 @@
         ],
         "stableID": null,
         "disposition": "history",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/decisions-session-16.md": "5a41c893067ed88daae7fa9a1b9b6f9fc6732307905f2b49fcddd65ed6d6feac"
         }
@@ -4542,7 +4560,7 @@
         ],
         "stableID": null,
         "disposition": "history",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/decisions-session-17.md": "7b28543dfc754ae17d3a64183ee948a36df496f8c7e6c3ad3c4adb6b687b1801"
         }
@@ -4559,7 +4577,7 @@
         ],
         "stableID": null,
         "disposition": "history",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/decisions-session-18.md": "4cedf961d49bc0e5f27154bcb8894cf85ada706b174831c9728166f8fbd3d4d6"
         }
@@ -4576,7 +4594,7 @@
         ],
         "stableID": null,
         "disposition": "history",
-        "generatedAtSourceHash": "4a249a8df3008f6418bacdc60de9127f1d4a6e3a61470a72bc1c781ee34a7538",
+        "generatedAtSourceHash": "f6705fe08bca984742f6586c7378e519c5a1810f2ff3701da55694b80fd2d87e",
         "sourceHashes": {
           "docs/decisions-session-19.md": "d160c88379577e0a7a3f83fb255b850b8031209d4dce133b1fb901f91504adef"
         }
