@@ -71,7 +71,7 @@
       "id": "constellation",
       "name": "Constellation",
       "icon": "sparkles.rectangle.stack",
-      "blurb": "Permanent. Survives everything.",
+      "blurb": "Campaign-wide mastery bought with Motes.",
       "sortOrder": 5,
       "homeSection": "study",
       "sectionOrder": 1,
@@ -349,8 +349,8 @@
     {
       "id": "wayfarers_table",
       "name": "The Wayfarer's Table",
-      "icon": "map.fill",
-      "blurb": "Routes, provisions and field notes arranged for whoever is leaving next.",
+      "icon": "backpack.fill",
+      "blurb": "Field notes and packing methods for bringing home more of what the worlds grow.",
       "sortOrder": 12,
       "homeSection": "realms",
       "sectionOrder": 0,
@@ -363,7 +363,7 @@
         "essence": 70,
         "resources": { "timber": 14, "fiber": 12, "pulp": 6 }
       },
-      "buildBlurb": "Sela wants one table for maps and packing lists—not a counter, and not somewhere she is expected to stay."
+      "buildBlurb": "Sela wants one broad table for field guides, samples and careful packing—not a counter, and not somewhere she is expected to stay."
     },
     {
       "id": "distillery",

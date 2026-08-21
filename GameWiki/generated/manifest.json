@@ -1,11 +1,11 @@
 {
   "schemaVersion": 1,
-  "aggregateSourceHash": "9187541590ba4203801bdc899ce546b6db9650860043124b56f8617ff67a6e6e",
+  "aggregateSourceHash": "31a9e1d323c4036b5aa6944504423d713f2a716b6c1d6278b9267611e30f5279",
   "inputs": {
     "Sources/Content/Data/items.json": "b94b1107229f217e14f1d7fa936d8eea938f9782c06c583be32302f10d432bc9",
     "Sources/Content/Data/playability-roadmap.json": "2ab045a5a59658f9558a347379994a1ec6056d52882d23b04edcf6bb6ed149e4",
     "Sources/Content/Data/resources.json": "8eee965ce7df075abfe3f646bb36d416a10ef1d7d194845e30fa0f31b7b23e6f",
-    "Sources/Content/Data/stations.json": "7a791f6c3b4c9462bd5207062506358751b97bec331494e05c4d2dea8b908ca4",
+    "Sources/Content/Data/stations.json": "21b5e9f3bee2d9115acf535ef2ff1db350b87b8ee33755e79a3b3e4584102e2b",
     "Sources/Content/Data/symbols.json": "c1ec5dd7b661680b358e21a56124b6080aa28d93db51fd2f6b80214ced1dcb16",
     "Sources/Content/Data/travellers.json": "ae57096a78141052f11f1b8a0baa5246fb00bbf7543394f978fabc8f02944597",
     "docs/adamant-demand-audit-current.md": "a0607e31cf666d23afb0635ac556039307babb6ed4b076cecde3d7bb9b802cfa",
@@ -268,7 +268,7 @@
     "docs/writing-tool-progression-current.md": "be17fe07aa89aaaab7117a2faca43d7e1eb1be23202d19106c67c42547b23bb0"
   },
   "outputs": {
-    "generated/wiki-data.json": "e3145960caaa3f4e483566efbe40afa89ef79740733f4fde7286c80dadfeab94",
-    "generated/source-registry.json": "db7cfd1778e995faa412255f6becf2280f88c9632570177f77bccac8892bc602"
+    "generated/wiki-data.json": "fa6333d1636b1a262989ebe508aaaa0adf0f0f6689e0f5f798855f3c410871c9",
+    "generated/source-registry.json": "b1bb3f0c7ebbe4de465a4c7ccb6a7a3504cb6417833254986773436c2458580d"
   }
 }
