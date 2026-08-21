@@ -1,9 +1,9 @@
 {
   "schemaVersion": 1,
-  "aggregateSourceHash": "e29cd5cb3bf9b1fdaf689b076345047577811ac1c99d1d470dd8bffcf405a4fa",
+  "aggregateSourceHash": "95862fdb7751fbc439e36d788c6dd8a99a28c87482d04ce80166b769e4c9e9b3",
   "inputs": {
     "Sources/Content/Data/items.json": "b94b1107229f217e14f1d7fa936d8eea938f9782c06c583be32302f10d432bc9",
-    "Sources/Content/Data/playability-roadmap.json": "4790468114d411773e015f74fcbf9c6b51e5a1a68b992498338e64baf37651d7",
+    "Sources/Content/Data/playability-roadmap.json": "478d45b12ee65d0101232742fbfce29162ae6cd62d708e4427ac8930cbcef5b5",
     "Sources/Content/Data/resources.json": "8eee965ce7df075abfe3f646bb36d416a10ef1d7d194845e30fa0f31b7b23e6f",
     "Sources/Content/Data/stations.json": "21b5e9f3bee2d9115acf535ef2ff1db350b87b8ee33755e79a3b3e4584102e2b",
     "Sources/Content/Data/symbols.json": "c1ec5dd7b661680b358e21a56124b6080aa28d93db51fd2f6b80214ced1dcb16",
@@ -68,6 +68,7 @@
     "docs/ashe-ground-technique-current.md": "14287d7178f1148f4f765e50a7debf15d6f21efb9197181396407057794a161c",
     "docs/asset-production-output-contract-current.md": "e9734d8e96290e0e4f79af180624cf5115d4379cf16a52bbb688f1cea34ee675",
     "docs/asset-system-proposal.md": "d98b674c5d154e4c065929b68d22813cc2cf8da20494ef0920fae344803a5d83",
+    "docs/atmospheric-world-presentation-current.md": "5fe4cf16428ed82182bb6bfb8b497e0bb5533ee70c27b819280549bb7cb794a9",
     "docs/authored-color-vocabulary-current.md": "41aa98371136bf274cf0f8160d822d0b8ff84c479882ffbc8c7847ae6a33b58d",
     "docs/authored-text-audit-current.md": "97c31e4a0564595cc62dbce0920999d648f94208b6f207b903f8cf517bc7b0fa",
     "docs/authored-world-blueprints-current.md": "218498315a42ab8a0f63523e586a83f33cdeef7bd9c13fc09dee65d020d736a1",
@@ -112,7 +113,7 @@
     "docs/creature-territory-finds-current.md": "07792ad39d56392aaadc4507520015020a77171b6e6486f22aa3381903027385",
     "docs/cross-lead-delivery-contract-current.md": "af95f3e6668995134aaca7e0a1ac6bacd1e81305696c16734ed859f92fd14b2b",
     "docs/curio-identification-knowledge-current.md": "31acb95848598b0874e3978a9488f122b8bfee115e16867a5dca9fa1c33986f0",
-    "docs/current-design-index.md": "74d2667102215812db560f2c3cae3376e404a812549a0c3a359f45c30314e987",
+    "docs/current-design-index.md": "d66a34cae92619346d440613ac072e83c7f7667d390fb6623309f43a04b3f348",
     "docs/cycle-system-current.md": "3a472c56d4c78299574f768de122d2ac11e7387eeae8fd723667e73f96fbd598",
     "docs/dagg-recovery-teaching-current.md": "a6f2e09d574fde643ce524b90c7c76482925010c6d8af53bc327fd4fe3480546",
     "docs/debug-authored-text-atlas-current.md": "dde26130930d41c60ef958393390774a36c6bf37999a2428420db634df1c7dd2",
@@ -278,7 +279,7 @@
     "docs/writing-tool-progression-current.md": "be17fe07aa89aaaab7117a2faca43d7e1eb1be23202d19106c67c42547b23bb0"
   },
   "outputs": {
-    "generated/wiki-data.json": "33ea8e47fa5844ab59d25a4ab522a51a923842f5bd991c6ba31c38acfd199464",
-    "generated/source-registry.json": "3833b5a0e740ef5a10550fae2e86418598d49a2df4d3d11c12810239affd7abb"
+    "generated/wiki-data.json": "d25120bb5fbdcb3c9de90e30408b3b5d18cfa9baebf264f9dc620c5781e99453",
+    "generated/source-registry.json": "823f2cbee74843ba15ec1a3062ffcf6562fe7fbbcc87f2070932239996d2f7ab"
   }
 }

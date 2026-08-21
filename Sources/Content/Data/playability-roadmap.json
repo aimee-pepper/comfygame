@@ -458,8 +458,8 @@
       "priority": "B1.7c",
       "title": "Atmospheric color, visibility memory and terrain shadows",
       "status": "queued",
-      "detail": "Give actual smoke, airborne ash, snow, fog and rain distinct bounded visual treatments; add elevation-aware environmental shadows; retain explored static terrain/resources while out-of-sight moving creatures disappear. Presentation consumes the current visibility/world receipts and cannot create weather, light, reveal or gameplay consequences.",
-      "gate": "Design freezes color/particle/shadow ownership per actual atmosphere and elevation first. Asset proves color+grayscale near/far fixtures; Engineering consumes only current visible/fringe/remembered state. Unexplored remains opaque black, remembered static objects never disclose a later mutation, moving mobs are absent outside current visibility, and terrain animation remains an independent layer.",
+      "detail": "Design is closed in atmospheric-world-presentation-current.md: new binds freeze one typed dominant Smoke/Airborne Ash/Mist/Miasma layer, independent Rain/Snow/mixed precipitation, motion band, palettes and phase seed; current sight consumes only typed suspended density. Runtime memory is last-seen stationary truth, and only genuine elevation receives a top-down contact shade.",
+      "gate": "Asset next proves the exact reusable native pixel families, density/motion matrix, color+literal-grayscale disclosure boundaries and equal-height/no-sidewall counter-fixture. After visual acceptance, Engineering follows the seven contained receipt→visibility→snapshot→compositor→shade→DEBUG harness→phone slices; encounter scaling remains the sole current Engineering primary. Authority: docs/atmospheric-world-presentation-current.md.",
       "workstream": "asset",
       "isPrimary": false
     },

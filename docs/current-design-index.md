@@ -137,6 +137,7 @@ When two documents disagree:
 | Seamlight portal guidance | `seamlight-current.md` | Fog-neutral, walkable-path guidance toward the nearest usable portal |
 | Survey Needle resource guidance | `survey-needle-current.md` | Home-tuned reusable Field Kit instrument; paid broad path-sector and signal-strength readings without fog/minimap reveal |
 | Earth-like visibility test world | `earthlike-visibility-test-world-current.md` | DEBUG-only fixed live-renderer fixture; eight controlled light/air profiles and zero campaign/economy mutation |
+| Atmospheric world presentation | `atmospheric-world-presentation-current.md` | Typed Smoke/Ash/Mist/Miasma/Rain/Snow/Wind receipt, exact pixel grammar, visibility memory, true elevation shade and cross-lead acceptance |
 | Equipment inscriptions | `equipment-inscription-system-current.md` | One authored durable instruction per exact Body/Keepsake piece; first effect is collapse-only Seamward |
 | Implemented-six station audit | `implemented-six-station-contribution-audit-current.md` | Evidence-led audit showing five first slices fulfilled and Sela's flora recognition as the one missing promised contribution |
 | Station reachability and first use | `station-first-use-reachability-audit-current.md` | Complete 23-station lifecycle/payoff matrix; Apothecary access/empty-room correction plus Channelworks one-time restoration receipt |
