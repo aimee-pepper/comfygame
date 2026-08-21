@@ -6,7 +6,7 @@ const data = await fetch("./generated/wiki-data.json").then(response => {
 const navItems = [
   ["overview", "Overview"], ["core-loop", "Core Loop"], ["world-writing", "World Writing"],
   ["exploration", "Exploration"], ["combat", "Combat"], ["people", "People"],
-  ["village-buildings", "Village & Buildings"], ["resources-crafting", "Resources & Crafting"],
+  ["village-buildings", "Home & Village"], ["resources-crafting", "Resources & Crafting"],
   ["items", "Items"], ["roadmap", "Roadmap"], ["history", "Decisions / History"],
   ["asset-gallery", "Asset Gallery"]
 ];
@@ -26,7 +26,7 @@ const authorityLinks = {
 };
 
 const escapeHTML = value => String(value ?? "").replace(/[&<>'"]/g, character => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#39;", '"': "&quot;" })[character]);
-const titleCase = value => String(value).replace(/[-_]/g, " ").replace(/\b\w/g, letter => letter.toUpperCase());
+const titleCase = value => String(value).replace(/([a-z])([A-Z])/g, "$1 $2").replace(/[-_]/g, " ").replace(/\b\w/g, letter => letter.toUpperCase());
 const badge = value => `<span class="badge ${escapeHTML(String(value).toLowerCase().replace(/[^a-z]+/g, "-"))}">${escapeHTML(value)}</span>`;
 const hashLink = (route, label) => `<a href="#/${route}">${escapeHTML(label)}</a>`;
 
@@ -56,7 +56,7 @@ function header(kicker, title, lede) {
 function overview() {
   const cards = [
     ["core-loop", "Core Loop", "The current causal route from writing through return."],
-    ["village-buildings", `${data.counts.stations} live station records`, "The first complete vertical slice, with honest lifecycle and upgrade gaps."],
+    ["village-buildings", `${data.counts.stations} Home & Village destinations`, "Rooms, interfaces, shelves, progression surfaces, yard features, and village buildings—truthfully distinguished."],
     ["people", `${data.counts.travellers} authored people`, "Stable identities and current source dispositions."],
     ["roadmap", `${data.counts.roadmap} roadmap receipts`, "Operational status without silently promoting provisional work."],
     ["asset-gallery", "Asset evidence", "Accepted work only; missing art stays visibly missing."]
@@ -73,8 +73,10 @@ function authorityPage(route, title, lede) {
 }
 
 function village() {
-  return header("Complete first slice", "Village & Buildings", "Every live station catalogue entry, enriched only by the current lifecycle and Binder House authorities.") +
-    `<div class="grid">${data.stations.map(station => `<a class="card" href="#/station/${station.slug}"><h3>${escapeHTML(station.name)}</h3>${badge(station.disposition)}${badge(station.lifecycle)}<p>${escapeHTML(station.zone)}</p><p>${escapeHTML(station.blurb)}</p></a>`).join("")}</div>`;
+  const kinds = [...new Set(data.stations.map(station => station.destinationKind))];
+  return header("Complete first slice", "Home & Village destinations", "Every live destination catalogue entry, with rooms, interfaces, shelves, progression surfaces, yard features, removed compatibility routes, and actual village buildings kept distinct.") +
+    `<p><label for="destination-kind-filter">Destination kind </label><select id="destination-kind-filter"><option value="all">All destinations</option>${kinds.map(kind => `<option value="${escapeHTML(kind)}">${escapeHTML(titleCase(kind))}</option>`).join("")}</select></p>` +
+    `<div class="grid" id="destination-grid">${data.stations.map(station => `<a class="card" data-destination-kind="${escapeHTML(station.destinationKind)}" href="#/station/${station.slug}"><h3>${escapeHTML(station.name)}</h3>${badge(station.destinationKind)}${badge(station.disposition)}${station.zoneDisposition === "provisional" ? badge("zone provisional") : ""}<p>${escapeHTML(station.zone)}</p><p>${escapeHTML(station.blurb)}</p></a>`).join("")}</div>`;
 }
 
 function stationDetail(slug) {
@@ -84,6 +86,7 @@ function stationDetail(slug) {
   return header("Live station", station.name, station.blurb) +
     `<div class="facts">
       <dl class="fact"><dt>Stable ID</dt><dd>${escapeHTML(station.id)}</dd></dl>
+      <dl class="fact"><dt>Destination kind</dt><dd>${escapeHTML(titleCase(station.destinationKind))}</dd></dl>
       <dl class="fact"><dt>Zone</dt><dd>${escapeHTML(station.zone)}</dd></dl>
       <dl class="fact"><dt>Lifecycle</dt><dd>${escapeHTML(station.lifecycle)}</dd></dl>
       <dl class="fact"><dt>Keeper / builder</dt><dd>${escapeHTML(station.keeper ?? "None authored")}</dd></dl>
@@ -91,9 +94,9 @@ function stationDetail(slug) {
       <dl class="fact"><dt>Disposition</dt><dd>${escapeHTML(station.disposition)}</dd></dl>
     </div>
     <h2>Construction</h2><div class="card">${cost}${station.buildBlurb ? `<p>${escapeHTML(station.buildBlurb)}</p>` : ""}</div>
-    <h2>Upgrade authority</h2><div class="card">${badge("incomplete")}<p>${escapeHTML(station.upgradeNote)}</p></div>
+    <h2>Upgrade authority</h2><div class="card">${badge(station.upgradeAuthorityStatus)}<p>${escapeHTML(station.upgradeNote)}</p>${station.upgradeAuthoritySourcePaths.length ? `<p><code>${station.upgradeAuthoritySourcePaths.map(escapeHTML).join(" · ")}</code></p>` : ""}</div>
     <h2>Sprite evidence</h2><div class="sprite-slots"><div class="sprite-slot">Built sprite<br>not registered</div><div class="sprite-slot">Improved sprite<br>not registered</div></div>
-    ${provenance(station)}<p>${hashLink("village-buildings", "← All stations")}</p>`;
+    ${provenance(station)}<p>${hashLink("village-buildings", "← All destinations")}</p>`;
 }
 
 function people() {
@@ -146,6 +149,10 @@ function render() {
     const matches = data.search.filter(item => `${item.name} ${item.id} ${item.summary} ${item.type}`.toLowerCase().includes(query)).slice(0, 12);
     results.innerHTML = matches.length ? matches.map(item => `<a href="#/${item.route}"><strong>${escapeHTML(item.name)}</strong><small>${escapeHTML(item.type)} · ${escapeHTML(item.id)} · ${escapeHTML(item.disposition)}</small></a>`).join("") : `<a href="#/${root}">No matching generated fact</a>`;
     results.hidden = false;
+  });
+  const kindFilter = document.querySelector("#destination-kind-filter");
+  kindFilter?.addEventListener("change", () => {
+    document.querySelectorAll("[data-destination-kind]").forEach(card => { card.hidden = kindFilter.value !== "all" && card.dataset.destinationKind !== kindFilter.value; });
   });
 }
 

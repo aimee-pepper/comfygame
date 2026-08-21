@@ -78,13 +78,6 @@ function stationLifecycle(station) {
   return "opening infrastructure";
 }
 
-function defaultZone(station) {
-  if (station.homeSection === "make") return "Makers' Row";
-  if (station.homeSection === "study") return "Binder House / study authority";
-  if (station.homeSection === "realms") return "Village / realms authority";
-  return "Binder House / yard authority";
-}
-
 const indexText = await read("docs/current-design-index.md");
 const linkedAuthorities = linkedCurrentAuthorities(indexText);
 const allDocs = await walk("docs");
@@ -121,7 +114,8 @@ const stations = stationsJSON.stations.map(station => {
   const keeperID = stationMap.keepers[station.id] ?? station.builtBy ?? null;
   const keeper = keeperID ? travellersByID[keeperID]?.name ?? keeperID : null;
   const disposition = stationMap.dispositions[station.id] ?? stationsJSON._authority.defaultDisposition;
-  const upgradeComplete = false;
+  const zoneAuthority = stationMap.zones[station.id] ?? null;
+  const upgradeAuthority = stationMap.upgradeAuthority[station.id] ?? { status: "unaudited", sourcePaths: [] };
   return {
     type: "station",
     id: station.id,
@@ -129,7 +123,10 @@ const stations = stationsJSON.stations.map(station => {
     name: station.name,
     blurb: station.blurb,
     route: station.route,
-    zone: stationMap.zones[station.id] ?? defaultZone(station),
+    destinationKind: stationMap.destinationKinds[station.id],
+    zone: zoneAuthority?.label ?? "District not yet assigned",
+    zoneDisposition: zoneAuthority ? disposition : "provisional",
+    zoneSourcePaths: zoneAuthority?.sourcePaths ?? [],
     lifecycle: stationLifecycle(station),
     keeper,
     keeperID,
@@ -139,8 +136,9 @@ const stations = stationsJSON.stations.map(station => {
     buildCost: costParts(station.buildCost),
     buildBlurb: station.buildBlurb ?? null,
     disposition,
-    upgradeAuthority: upgradeComplete ? "authored" : "incomplete",
-    upgradeNote: "Upgrade authority incomplete. Catalogue maxTier is a purchase ceiling, not a promise of visual forms or invented upgrade effects.",
+    upgradeAuthorityStatus: upgradeAuthority.status,
+    upgradeAuthoritySourcePaths: upgradeAuthority.sourcePaths,
+    upgradeNote: upgradeAuthority.status === "unaudited" ? "Upgrade track not yet mapped in wiki." : upgradeAuthority.status === "partial" ? "A named current authority describes part of this track; the wiki does not claim a complete upgrade model." : upgradeAuthority.status === "none" ? "No upgrade track applies under the named current authority." : "A named current authority describes this upgrade track.",
     sprites: { built: null, improved: null },
     provenance: provenance(stationSources, station.id, disposition, hashes, aggregateHash)
   };

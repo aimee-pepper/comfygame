@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
-  "aggregateSourceHash": "b0edd7eff415d59101fb73c0cf3f9d69f1e663438bc6d20664d383e57438235d",
+  "aggregateSourceHash": "484fccc2c46ace320ebf5895d851a9fc9d24514ca6ee50f4b0ee17b32ee5120d",
   "inputs": {
-    "GameWiki/config/station-authority-map.json": "724d8febaa4b8354cc38e00ec89abf14a0601eb589597181416f58c649e4f8c2",
+    "GameWiki/config/station-authority-map.json": "98bacf524d8c3db20061cab692da362d240501cebb4e20185ec9fdbc1a66d259",
     "Sources/Content/Data/items.json": "b94b1107229f217e14f1d7fa936d8eea938f9782c06c583be32302f10d432bc9",
     "Sources/Content/Data/playability-roadmap.json": "c6bd7aae10e0be1a5814d7a069b199f7f9973a99c874db42c773be72a2330228",
     "Sources/Content/Data/resources.json": "8eee965ce7df075abfe3f646bb36d416a10ef1d7d194845e30fa0f31b7b23e6f",
@@ -267,7 +267,7 @@
     "docs/writing-tool-progression-current.md": "be17fe07aa89aaaab7117a2faca43d7e1eb1be23202d19106c67c42547b23bb0"
   },
   "outputs": {
-    "generated/wiki-data.json": "bb7c644aa963b562bd87f0efb243df47cbbce688daa081a9731502f68ce4c434",
-    "generated/source-registry.json": "e1d10169dbdc1fac7a67a09bbb32d16f15c9a10ac2c4932e294a1f8a61459574"
+    "generated/wiki-data.json": "c8ab553df283b19693d3388141841f54fefefbbda3f4f3635d156a9c91b3fd86",
+    "generated/source-registry.json": "eba9dcdbc6038e2f18c2b646f683bba4af69748e2d235fd6588fb2d1ec5335fc"
   }
 }

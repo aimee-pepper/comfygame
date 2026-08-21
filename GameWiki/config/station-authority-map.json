@@ -1,31 +1,44 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "sources": [
     "Sources/Content/Data/stations.json",
     "docs/station-integration-matrix-current.md",
     "docs/home-house-and-village-current.md"
   ],
+  "destinationKinds": {
+    "writing_desk": "houseRoom", "storehouse": "villageBuilding", "workshop": "removedCompatibility",
+    "party": "houseInterface", "essence_spring": "houseYardFeature", "constellation": "progressionSurface",
+    "library": "houseRoom", "trading_post": "villageBuilding", "recycler": "villageBuilding",
+    "blacksmith": "villageBuilding", "tannery": "villageBuilding", "bowyer": "villageBuilding",
+    "armoury": "villageBuilding", "weaponsmith": "villageBuilding", "scriptorium": "villageBuilding",
+    "firepit": "villageBuilding", "bestiary": "libraryShelf", "survey_post": "villageBuilding",
+    "apothecary": "villageBuilding", "reliquary": "villageBuilding", "wayfarers_table": "villageBuilding",
+    "distillery": "villageBuilding", "channelworks": "villageBuilding", "anchorage": "villageBuilding"
+  },
   "zones": {
-    "writing_desk": "Binder House",
-    "storehouse": "The Commons",
-    "workshop": "Compatibility-only; destination removed",
-    "party": "Binder House",
-    "essence_spring": "Binder House yard",
-    "constellation": "Role under review",
-    "library": "Binder House",
-    "trading_post": "Commerce Row",
-    "recycler": "Commerce Row",
-    "firepit": "The Commons",
-    "bestiary": "Inside the Library",
-    "wayfarers_table": "The Commons",
-    "anchorage": "The Commons"
+    "writing_desk": { "label": "Binder House", "sourcePaths": ["docs/home-house-and-village-current.md"] },
+    "storehouse": { "label": "The Commons", "sourcePaths": ["docs/home-house-and-village-current.md"] },
+    "workshop": { "label": "Removed compatibility route", "sourcePaths": ["docs/workshop-constellation-role-audit-current.md"] },
+    "party": { "label": "Binder House", "sourcePaths": ["docs/home-house-and-village-current.md"] },
+    "essence_spring": { "label": "Binder House yard", "sourcePaths": ["docs/home-house-and-village-current.md"] },
+    "constellation": { "label": "Role under review", "sourcePaths": ["docs/workshop-constellation-role-audit-current.md"] },
+    "library": { "label": "Binder House", "sourcePaths": ["docs/home-house-and-village-current.md"] },
+    "trading_post": { "label": "Commerce Row", "sourcePaths": ["docs/home-house-and-village-current.md"] },
+    "recycler": { "label": "Commerce Row", "sourcePaths": ["docs/home-house-and-village-current.md"] },
+    "blacksmith": { "label": "Makers' Row", "sourcePaths": ["docs/home-house-and-village-current.md"] },
+    "firepit": { "label": "The Commons", "sourcePaths": ["docs/home-house-and-village-current.md"] },
+    "bestiary": { "label": "Inside the Library", "sourcePaths": ["docs/home-house-and-village-current.md", "docs/library-shelves-current.md"] }
   },
-  "keepers": {
-    "library": "lys",
-    "firepit": "orsa"
-  },
-  "dispositions": {
-    "workshop": "removed",
-    "constellation": "provisional"
+  "keepers": { "library": "lys", "firepit": "orsa" },
+  "dispositions": { "workshop": "removed", "constellation": "provisional" },
+  "upgradeAuthority": {
+    "firepit": { "status": "authored", "sourcePaths": ["docs/station-integration-matrix-current.md"] },
+    "library": { "status": "partial", "sourcePaths": ["docs/station-integration-matrix-current.md", "docs/library-lys-progression-current.md"] },
+    "writing_desk": { "status": "none", "sourcePaths": ["docs/station-integration-matrix-current.md"] },
+    "workshop": { "status": "none", "sourcePaths": ["docs/workshop-constellation-role-audit-current.md"] },
+    "party": { "status": "none", "sourcePaths": ["docs/home-house-and-village-current.md"] },
+    "constellation": { "status": "none", "sourcePaths": ["docs/workshop-constellation-role-audit-current.md"] },
+    "bestiary": { "status": "none", "sourcePaths": ["docs/station-integration-matrix-current.md"] },
+    "trading_post": { "status": "none", "sourcePaths": ["docs/station-integration-matrix-current.md"] }
   }
 }
