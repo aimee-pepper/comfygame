@@ -262,16 +262,19 @@ transaction and fixture order are authoritative in `resource-extraction-progress
 
 ### Intended experience
 
-Base opens on the Binder House/yard rather than a category board. Its rooms make the recurring verbs spatial:
-Writing Desk; Library/Constellation; Workshop; and Party. Bestiary is a Library shelf. Essence Spring is in
-the yard. Left/right/down arrows open Commerce Row, Makers' Row and The Commons; Storehouse and Firepit are
-Commons buildings. The House is not duplicated as a tile on a village screen.
+Base opens on the Binder House/yard rather than a category board. Its settled opening anchors make the
+recurring verbs spatial: Writing Desk, Library, Party and yard Essence Spring. Bestiary is a Library shelf.
+Left/right/down arrows open Commerce Row, Makers' Row and The Commons; Storehouse and Firepit are Commons
+buildings. The House is not duplicated as a tile on a village screen. Workshop and Constellation are under
+the explicit role audit in `workshop-constellation-role-audit-current.md` and may not be finalized as
+interactive House hotspots until Aimee chooses their disposition.
 
 ### Exact corrections
 
 1. Root is **Binder House**, not House/Village or Home/Make/Study/Realms tabs. Three arrows open the exact
    village districts and every district returns Home directly.
-2. The whole house/yard, six hotspots and three arrows fit on 368×800 without manufactured scrolling.
+2. The whole house/yard, all accepted hotspots and three arrows fit on 368×800 without manufactured
+   scrolling. The current Asset proof uses only the four settled anchors and keeps disputed décor removable.
 3. Essence Spring is in the yard. Trading Post/Recycler belong to Commerce Row; Blacksmith and later makers
    belong to Makers' Row; Storehouse/Firepit and other community places belong to The Commons.
 4. Village lifecycle is unknown/absent → known buildable → built → improved, with a temporary attention

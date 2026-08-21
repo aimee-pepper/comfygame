@@ -1,6 +1,8 @@
 # Binder House and village districts — current
 
-**Status:** Game Design implementation authority; replaces the opening spatial model in
+**Status:** Game Design implementation authority for the House/district topology. The earlier six-hotspot
+destination list is temporarily narrowed by `workshop-constellation-role-audit-current.md`: Workshop and
+Constellation are not final interactive hotspots until Aimee chooses their disposition. This document replaces the opening spatial model in
 `starting-town-band1-integration-current.md` and the Home-tab presentation in
 `base-destination-board-current.md`. It does not change the rules or internal routes of the destinations
 named here.
@@ -64,20 +66,21 @@ the navigation chrome; use `scaledToFit`. If the measured region is exceptionall
 room grid plus yard strip made from the same zones rather than clipping or shrinking tap targets below 44×44
 points.
 
-### Exact zones and hotspots
+### Current settled zones and hotspots
 
 | Zone | Visual anchors | Exact destinations/actions |
 |---|---|---|
 | Writing study | Writing Desk, paper, writing tools | **Writing Desk** |
-| Library/study | shelves, star chart | **Library**, **Constellation** as distinct hotspots |
-| Workshop | workbench, tools | **Workshop** |
+| Library/study | shelves; optional removable star-chart dressing | **Library** |
+| Work area | optional removable workbench dressing | no settled standalone destination while Workshop is under review |
 | Common/planning room | table, chairs/party tokens | **Party** |
 | Yard | spring basin and restrained runoff/growth | **Essence Spring** |
 
-The Library and Constellation may share a room but never share one generic “Study” destination. **Bestiary
-is inside the Library** as its own shelf, governed by `library-shelves-current.md`; it is not a separate
-house hotspot. Workshop remains its own verb. The room label may support orientation; the actual hotspot
-label and silhouette must identify the destination.
+**Bestiary is inside the Library** as its own shelf, governed by `library-shelves-current.md`; it is not a
+separate house hotspot. The Constellation and Workshop implementations remain preserved, but their current
+single-star/catch-all roles do not justify final House hotspots without Aimee's decision. Asset work may
+reserve removable decorative space and must not label or wire either. If one remains after review, this
+table and the final hotspot manifest are revised before native implementation.
 
 The house contains no Storehouse, Firepit, Trading Post, Recycler, Blacksmith or recruit station. The Essence
 Spring is outside in the house's visible yard, never turned into a household sink. Storehouse and Firepit
@@ -86,7 +89,7 @@ belong in The Commons; commercial and craft places belong in their named distric
 ### House change over time
 
 The opening house may gain restrained persistent detail when its real systems improve: more bound books,
-a better writing-tool rack, upgraded workshop fixtures or fuller specimen storage. These are visual
+a better writing-tool rack, upgraded owned-tool fixtures or fuller specimen storage. These are visual
 reflections of existing receipts. They are not separate construction projects and grant no extra bonuses.
 
 ## Village districts
@@ -201,12 +204,13 @@ House. Diary deep-links are governed by the Party/Library contract and return to
 
 Asset Design must prove, before native consumption:
 
-1. the ordinary-phone house/yard cutaway with all six exact hotspots above and three district arrows;
+1. the ordinary-phone house/yard cutaway with the four settled hotspots above and three district arrows;
 2. a collision overlay showing 44×44 minimum targets and no overlap;
 3. color and grayscale/value versions;
 4. opening Commerce Row, Makers' Row and Commons scenes with no duplicate House tile;
 5. one station in known-buildable, built, improved and attention states—no damaged state;
-6. a six-building identity row proving silhouettes remain distinct before labels;
+6. a six-building density row proving accepted station silhouettes remain distinct before labels without
+   assigning unreached stations to final districts;
 7. standardized sign treatment on one obvious and two obscure specialist stations;
 8. attention glow on dark/light adjacent backgrounds, still identifiable with motion disabled.
 
@@ -215,8 +219,8 @@ space. Any visible value/action must exist in the game-owned adapter.
 
 ## Engineering checkpoint order
 
-1. Freeze normalized Binder-House/district metadata and the stable hotspot-to-destination map; no
-   native visual replacement yet.
+1. After the Workshop/Constellation decision, freeze normalized Binder-House/district metadata and the
+   stable hotspot-to-destination map; no native visual replacement before that decision.
 2. Add presentation-event receipts, idempotent creation/clear rules and migration defaults; expose a DEBUG
    injector for the four exact reasons.
 3. Integrate House cutaway behind a DEBUG route using the existing destination navigation; verify no route
@@ -232,8 +236,8 @@ space. Any visible value/action must exist in the game-owned adapter.
 ## Acceptance
 
 1. Fresh launch, load and expedition return land on the full unclipped Binder House/yard scene.
-2. All six house/yard hotspots and three arrows route correctly; no generic Study or Make screen is
-   required to find them.
+2. All accepted house/yard hotspots and three arrows route correctly; no generic Study or Make screen is
+   required to find them. Workshop/Constellation are absent unless the role decision explicitly retains one.
 3. Party management, Prepare a world and all three districts are reachable without scrolling on 368×800.
 4. Essence Spring is in the house yard; Storehouse and Firepit are in The Commons.
 5. Unknown future stations leak neither name nor silhouette; known buildable stations truthfully explain

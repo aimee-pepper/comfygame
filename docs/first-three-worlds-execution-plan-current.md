@@ -285,11 +285,14 @@ and waiting item/recovery. Exact clear rules; DEBUG injection. No scene art yet.
 
 ### D2 · Binder House cutaway
 
-**Player result:** Base opens on the Binder House/yard containing Writing Desk; Library/Constellation;
-Workshop; Party; Essence Spring; and left/right/down arrows to Commerce Row, Makers' Row and The Commons.
+**Player result:** Base opens on the Binder House/yard containing the settled Writing Desk, Library, Party
+and yard Essence Spring anchors plus left/right/down arrows to Commerce Row, Makers' Row and The Commons.
+Workshop and Constellation remain noninteractive/removable in this proof until Aimee settles their role.
 
-**Asset:** exact six-hotspot cutaway/yard plus three-arrow collision/value packet. **Engineering:** normalized
-shared art/hotspot adapter, measured 368×800 fit, direct existing routes, Library-contained Bestiary and
+**Asset:** follow `home-village-library-asset-packet-current.md`: Library first, three districts second, then
+the provisional four-anchor cutaway/yard plus three-arrow collision/value packet. **Engineering:** wait for
+the role decision and accepted proof before freezing the hotspot manifest; then use normalized shared
+art/hotspot adapters, measured 368×800 fit, direct existing routes, Library-contained Bestiary and
 noncommitting Prepare a world. Promote behind reversible fallback, then ordinary acceptance.
 
 ### D3 · Village exterior
@@ -318,7 +321,7 @@ tile, no hidden future building and no town damage under defeat/collapse.
 neither consumes item slots.
 
 **Authorities:** `creature-ecology-and-materials-overhaul-current.md` and, once Aimee settles it,
-`loot-quality-hybrid-review-current.md`.
+`crafting-intuition-and-quality-review-current.md`.
 
 **Decision dependency:** Engineering may implement habitat/body-family work before this checkpoint, but may
 not migrate material storage, stacking, crafting, price or power while the hybrid is paused. Once settled,
@@ -328,7 +331,8 @@ known source records rather than pretending a merged unit still has one exact pr
 
 **Pass:** zero item-capacity use; same-family/same-band stacks merge while different domains/families/bands
 do not; every old unit and Tier1–4 gear instance migrates losslessly or is visibly version-gated; crafting,
-commerce, Distillery, Scent Mask, Recycler, Instrument and reforge consumers match the accepted hybrid. No
+commerce, Distillery, Scent Mask, Recycler, Instrument and refit/legacy-rework consumers match the accepted
+model. No
 parallel old grade or second player-facing rarity colour remains.
 
 ### E2 · Habitat-aware creature identities
