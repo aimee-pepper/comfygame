@@ -1,10 +1,10 @@
 # Creature ecology and creature-material overhaul — current
 
 **Status:** Game Design implementation authority for habitat, body-derived material families and ordinary
-reward provenance. Not yet implemented. The final material-quality/storage migration is reopened under
-`crafting-intuition-and-quality-review-current.md`; Engineering must not implement either this document's withdrawn
-pure-no-grade comparison or the hybrid until Aimee settles that choice. The pressure-budget creature
-generator remains the underlying causal model.
+reward provenance. Not yet implemented. The final six-band material identity, storage, capability and physical
+Schematic rules are settled in `crafting-components-and-schematics-current.md`, which supersedes every open-choice,
+pure-no-grade or continuous-property crafting passage retained below for historical comparison. The pressure-budget
+creature generator remains the underlying causal model.
 **Priority:** after the early encounter-scaling **source checkpoint** and the opening causal field baseline;
 phone combat-feel acceptance is nonblocking. Complete this before expanding creature-material crafting or
 claiming creature/world visual diversity complete.
@@ -30,9 +30,9 @@ The following player-facing nouns are separate and must not be collapsed:
    Toxin, Spore, Reagent, Rift-glass, Raw Essence and Motes where appropriate. They are counted by
    `ResourceID` and never retain a creature source.
 2. **Creature materials** — physical parts derived from a defeated creature's persisted morphology and
-   capabilities. They use the closed family vocabulary below and retain durable knowledge of contributing
-   species/world sources. Exact per-unit provenance versus aggregated family+quality source records is part
-   of the open hybrid-quality decision.
+   capabilities. They use the closed family vocabulary below, stack by `creature.family + qualityBand`, and
+   retain durable aggregate knowledge of contributing species/world sources in Bestiary/World History rather
+   than pretending every merged unit has one exact specimen provenance.
 3. **Items** — gear, consumables, curios and authored trophies. They remain exact catalogue instances and
    use item-capacity rules.
 
@@ -164,12 +164,12 @@ New creature materials use these stable families:
 Do not add generic Meat/Flesh in this slice. Food, Tavern cooking and animal husbandry are separate future
 systems and must not be smuggled in through remains.
 
-### No return to continuous generic grade as the primary identity
+### Material family leads; the settled six-band quality modifies it
 
 Creature variety is led by the part itself and the anatomy that produced it, not by presenting every animal
-as generic Hide/Bone with a continuous grade number. A discrete global quality band may still modify value
-and within-family capability under `loot-quality-hybrid-review-current.md`; that candidate explicitly keeps
-family/material identity authoritative and is not yet settled.
+as generic Hide/Bone with a continuous grade number. The settled discrete Rough / Standard / Fine / Superior /
+Exceptional / Peerless band modifies value and contribution magnitude while family/material identity remains
+authoritative. It never makes one material satisfy another material's physical socket.
 
 Existing physical properties remain because they make materials function differently:
 
@@ -180,16 +180,15 @@ Existing physical properties remain because they make materials function differe
 - lustre;
 - reactivity.
 
-They are deterministic consequences of the creature traits, not random quality rolls. Presentation names
-the relevant capability when useful—**insulating pelt**, **hard scale**, **reactive ichor**—rather than
-claiming one pelt is universally “better.” Recipes require family plus explicit physical capability; they
-never require `grade >= N` after migration.
+They are deterministic consequences of creature traits and feed the frozen band calculation in
+`crafting-components-and-schematics-current.md`; they are not persisted as six independent player-facing bars
+or treated as six competing universal quality scores. Presentation names the relevant contribution when
+useful—**insulating pelt**, **hard scale**, **reactive ichor**. Recipes accept exact closed family aliases;
+quality changes output band and named-effect magnitude after physical eligibility is established.
 
-Creature-material presentation always links back to legitimately learned species/world sources and shows
-the relevant property bars/tags. If the hybrid is accepted, the collection aggregates by exact
-domain+family+quality band (`Fine Feathers ×8`) and detail shows known source records; it does not pretend a
-merged unit retains one exact source. If the hybrid is rejected, the replacement storage rule must be
-settled explicitly before Engineering migrates current exact samples. Neither model may consume item slots.
+Creature-material presentation always links back to legitimately learned species/world sources. The collection
+aggregates by exact `domain + family + qualityBand` (`Fine Feathers ×8`), and detail shows known source records;
+it does not pretend a merged unit retains one exact source. Creature materials never consume item slots.
 
 ## Withdrawn pure-no-grade replacement (comparison only; do not implement)
 
@@ -473,12 +472,12 @@ may add a new creature stat, habitat or drop family.
 1. Add persisted ecology identity and versioned legacy freeze without changing gameplay RNG or existing
    saved enemy positions.
 2. Add habitat availability/resolution and exact spawn/movement eligibility.
-3. After Aimee settles `crafting-intuition-and-quality-review-current.md`, implement its exact stack/value/crafting
-   model with separate world/creature domains. Do not implement the withdrawn pure-no-grade comparison.
+3. Implement the exact stack/value/crafting model in `crafting-components-and-schematics-current.md` with
+   separate world/creature domains. Do not implement the withdrawn pure-no-grade comparison.
 4. Implement exact remains derivation and remove ordinary unrelated resource/curio drops. Add no rare
    territory-find category until the current review freezes its gear/consumable/ordinary-key mix.
 5. Migrate existing animal `MaterialSample` units losslessly into the settled creature-material stack shape;
-   preserve or visibly version-gate saves according to the accepted quality decision.
+   preserve or visibly version-gate saves according to the project's save-compatibility policy.
 6. Split Storehouse/Field/Return presentation into World resources vs Creature materials.
 7. Integrate functional ecology/material identities and run native phone acceptance.
 
@@ -502,8 +501,8 @@ uses the explicit save-format version boundary approved for this early stage.
 8. Creature-material stacks aggregate only by the settled family/quality key while collection-source records,
    crafting identity, failure partition, return and relaunch remain truthful.
 9. Existing animal samples migrate without count loss; no old item slot remains occupied by them.
-10. The settled quality model's current field, six labels/frames, stack key, material capability table and
-    consumer conversions match `crafting-intuition-and-quality-review-current.md` after Aimee accepts or revises it.
+10. The settled quality model's score, six labels/frames, stack key, material aliases and consumer conversions
+    match `crafting-components-and-schematics-current.md` and pass its validator.
 11. No parallel legacy grade, catalogue rarity colour or synthetic unnamed quality score remains after that
     migration.
 12. World Generator Web reports habitat counts, species ecology identities, legal placement count and

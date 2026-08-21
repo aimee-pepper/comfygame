@@ -163,6 +163,8 @@ When two documents disagree:
 | Crafting components and schematics | `crafting-components-and-schematics-current.md` | Complete World/Creature component profiles, exact 21-Schematic socket lists, contribution scales, migration and Pointed Blade fixture |
 | Library shelves | `library-shelves-current.md` | Close-up Library root, reusable runtime-composed collection assets, habitat/Dictionary volumes and per-diary page→book progression |
 | Internal Game Wiki | `game-wiki-content-contract-current.md` | Required route depth, catalogue/resource taxonomy, stable detail pages and automatic no-placeholder completeness gates |
+| Recovered teachings | `recovered-teachings-current.md` | Exact 38-entry replacement catalogue for Workshop knowledge, with plain copy, evidence placement, pacing, pity and migration |
+| Capacity progression | `capacity-progression-current.md` | Exact Storehouse/field-pack projects, ownership, costs, no-auto-pack semantics and lossless legacy credits |
 | World-resource extraction | `resource-extraction-progression-current.md` | Equipped Field Pick ranks; disclosed Gold progression; complete mineral table and no-deadlock Iron |
 | Essence refining progression audit | `essence-refining-progression-audit-current.md` | Review-only correction removing the paid quantity-control toll and earning 3:1 through demonstrated baseline refining |
 | Compound assembly / station trees | `compound-assembly-station-trees-current.md` | Proven-statement receipts, Scriptorium formalization, frozen personal compounds and Penmanship topology |

@@ -119,9 +119,9 @@ Remove their 28 knowledge purchases from the generic research catalogue for new 
 - Specialist buildings may teach a small apparatus-bound capability or one authored anchor word. They may
   not sell long noun lists that compete with discovery.
 
-Game Design must freeze stable recovered-teaching IDs, exact eligibility and pity coverage before Engineering
-removes the live research nodes. Until then the old nodes remain compatibility content, not approved future
-UX.
+Stable recovered-teaching IDs, exact eligibility, placement, copy and pity coverage are frozen in
+`recovered-teachings-current.md`. Engineering still leaves the old nodes as compatibility content until the
+roadmap reaches the ordered migration checkpoint and its reachability fixtures pass.
 
 ### Hold: move and simplify physical upgrades
 
@@ -191,7 +191,8 @@ if Aimee explicitly chooses account-wide meta-progression after seeing the campa
 
 ## Workshop removal and migration sequence
 
-1. Freeze stable replacement acquisition IDs and prove every current knowledge grant remains reachable.
+1. Validate and load the stable replacement catalogue in `recovered-teachings-current.md`; prove every current
+   knowledge grant remains reachable.
 2. Add recovered-teaching records and one Library read/apply transaction; preserve discovery on collapse,
    idempotence and relaunch.
 3. Move Storehouse/Tannery capacity ownership with an equal-or-better legacy entitlement mapping.

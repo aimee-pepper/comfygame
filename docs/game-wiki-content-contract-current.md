@@ -7,6 +7,18 @@ while never presenting proposed or historical material as live behavior.
 page content may provide layout grammar, but entity facts and status are derived rather than copied.
 **Updated:** 21 August 2026
 
+## Current progress
+
+**Checkpoint A — Catalogue + Resources: accepted.** Live browser review at 368×800 proved the exact item
+partition, slot/damage/reach groupings, stable detail routes, World/live-Creature/designed-Creature/currency
+separation and no horizontal overflow. The initial route-scroll defect and fabricated `Table`/`Families`
+material entries were corrected: internal navigation now opens every route at its heading, and the designed
+Creature set derives exactly 18 stable ComponentProfile families.
+
+**Current checkpoint B — People.** Generate the People index and all named-traveller detail routes from the
+canonical 29-person authorities. This is the next source-generated slice; it does not wait for every meeting
+to become live and must label live, authored-not-live and held content honestly.
+
 ## What “complete” means
 
 The existing wiki foundation is technically generated but not content-complete. A route that only names an
@@ -152,9 +164,9 @@ resource subtype, filter persistence, search routing and no horizontal clipping.
 The wiki does not pre-empt a compiling/high-priority gameplay checkpoint. Once a clean GameWiki boundary is
 available, continue without treating each slice as a stop:
 
-1. Catalogue taxonomy + item details;
-2. World Resources / Creature Materials / Currencies + details;
-3. People + traveller details;
+1. Catalogue taxonomy + item details — **accepted**;
+2. World Resources / Creature Materials / Currencies + details — **accepted**;
+3. People + traveller details — **current**;
 4. World Writing + rune details;
 5. Core Loop and Exploration;
 6. Combat;

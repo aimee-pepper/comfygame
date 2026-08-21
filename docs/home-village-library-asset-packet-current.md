@@ -164,7 +164,7 @@ does not solve future zoning by guesswork.
 
 Unknown future buildings are absent, not locked silhouettes, empty named lots or blurred spoilers.
 
-## Current checkpoint 5 — close-up Library root
+## Completed checkpoint 5 — close-up Library root
 
 Build the Library now from the settled contents below. The Trading Post, opening-five, state-continuity and
 Binder House gates are already accepted; this release does not authorize later buildings.
@@ -240,6 +240,83 @@ current volume at 1–2, 3–5 and 6–8.
 
 The Library does not contain a separate top-level Bestiary hotspot elsewhere. Constellation is not one of the
 five shelves.
+
+## Current checkpoint 6 — runtime opening district roots
+
+Build exactly three reusable district shells and one deterministic scene compositor. These are the opening
+Commerce Row, Makers' Row and Commons roots reached from the accepted Binder House exits. They are not a town
+map, walking simulation or static screenshot for each campaign state.
+
+### Shared production contract
+
+- Each empty district shell is exactly **184×300 logical RGBA**, binary alpha, bounded palette, rendered at
+  exact 2× nearest-neighbour inside the 368×800 phone shell.
+- Runtime scenes compose an empty shell + exact accepted building-state sprite + standardized sign + optional
+  independent attention overlay. A whole populated scene bitmap is evidence only.
+- Preserve the accepted Built hashes for Trading Post, Recycler, Blacksmith, Storehouse and Firepit
+  byte-for-byte. Do not redraw, crop, resample or recolour the buildings into the background.
+- Every building slot has one stable normalized anchor and one matching target rectangle. Each target is at
+  least 44×44 points, pairwise non-overlapping and clipped by neither header nor bottom navigation.
+- Unknown/absent means the ordinary environment remains. Do not render a named empty lot, lock, silhouette,
+  question mark or foundation before its real buildable receipt exists.
+- Known buildable uses the building's authored foundation/sign. Built/improved/mastered swap only the exact
+  structure layer. Attention is the accepted independent warm-gold overlay on the current structure.
+- One clear **Home** return is visible in each district and maps to the Binder House. Device Back is identical.
+  No district-to-district shortcut is part of this checkpoint.
+- Short mounted/entrance signs support unfamiliar identities. They do not become full-width cards and never
+  substitute for the accepted functional silhouette.
+
+### Fixed layouts
+
+#### Commerce Row
+
+- Shell identity: narrow timber-and-stone service lane, worn drainage/cobbles, warm ochre shop-front values
+  and cooler slate recesses. It is not a bazaar, tavern street or pile of generic stalls.
+- `trading_post` slot: logical rect `(4, 44, 96, 80)`, first/back position.
+- `recycler` slot: logical rect `(84, 142, 96, 80)`, second/near position.
+- A continuous lane connects both entrances to the visible Home return without drawing a route graph.
+- Fixture sequence: both absent; Trading Post Built/Recycler absent; both Built; Trading Post Improved +
+  Recycler Built; independent attention on each in turn.
+
+#### Makers' Row
+
+- Shell identity: stone working apron, timber braces, dry stacked-fuel/material shelter, soot-dark upper values
+  and contained warm work-light accents. Background may have a drain/trough but no second forge or fake shop.
+- `blacksmith` slot: logical rect `(44, 100, 96, 80)`, central stable position.
+- Remaining space is honest lane/work yard, never labelled future Bowyer/Armoury/Weaponsmith lots.
+- Fixture sequence: absent; known-buildable foundation; Built; independent attention. Do not invent Improved
+  until its accepted state sprite exists.
+
+#### The Commons
+
+- Shell identity: broad packed-earth/shared green, crossing footpaths, low stone edge and restrained communal
+  seating/notice-post dressing. It must read as common village space, not commerce, a farm or a fourth shop row.
+- `storehouse` slot: logical rect `(4, 48, 96, 80)`, broad/back position.
+- `firepit` slot: logical rect `(84, 152, 96, 80)`, low/near position.
+- Preserve the Firepit's open sky and communal hearth ownership; the background never adds a roof over Built.
+- Fixture sequence: both Built opening; Storehouse attention; Firepit attention; Firepit Improved/Mastered
+  continuity using only its accepted state sprites. Storehouse later forms remain absent until authored.
+
+The listed 96-wide rects deliberately overlap in horizontal projection but are separated by at least 18
+logical pixels vertically; their target rectangles themselves must not overlap. If the exact accepted sprite
+alpha extends outside its rect, fail the fixture rather than scaling it.
+
+### Required evidence and gates
+
+1. Exact empty shell, manifest slot/collision sheet and literal-grayscale shell for all three districts.
+2. Exact 368×800 phone fixtures for every sequence above, with headings and Home return inside the viewport.
+3. One composite opening route contact sheet: accepted Binder House with left/right/down selected beside the
+   matching district root; this proves direction, not a new route screen.
+4. Unknown buildings are literally absent and the remaining environment does not preserve their silhouette.
+5. Signs remain readable/supportive at 2×; removing labels still leaves the five accepted building identities
+   pairwise distinguishable in colour and grayscale.
+6. Runtime input order does not change output; changing one building state changes only that structure/sign/
+   attention ownership region and necessary occlusion pixels.
+7. No scrolling, walking avatar, static full-town bitmap, route/map graph, Storehouse inside House, duplicated
+   Binder House, damage state, invented station or district reassignment.
+
+Stop for Game Design visual review after these three opening roots. Do not begin later-building states,
+district density, native packaging or final multi-block zoning from this release.
 
 ## Future reference — opening village districts (after the style gate)
 

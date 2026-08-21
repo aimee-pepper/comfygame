@@ -5198,3 +5198,39 @@ Asset checkpoint 5 is released for the close-up Library only: one floor-to-ceili
 adjoining cases only if honest tap geometry requires it, with exactly five physical clickable shelf regions
 for Diaries, Bestiary, Dictionary, Field Notes and World History. Its contents must grow from real collection
 counts and preserve disclosure; it is not a second full-room scene. Later buildings remain held.
+
+#### Close-up Library runtime kit v0.1 disposition
+
+**Runtime structure accepted in principle; one contained early-diary readability correction is required
+before visual acceptance.** The superseded empty/early/developed bitmap model is correctly retired. The new
+checkpoint has one authoritative empty 184×260 shell, reusable collection objects, stable per-traveller
+spines, an exported deterministic compositor, five physical shelf sockets and non-authoritative evidence
+fixtures generated from runtime-shaped data. Diaries now grow one stable object per traveller from that
+traveller's page count; Bestiary has Land/Shore/Water/Air volume families; Dictionary has exact 1–7, 8–14
+and 15–21 volumes; Field Notes and World History paginate by started groups of eight. The bookcase itself is
+finished, warm pixel art and the developed shelf remains readable in colour and literal grayscale.
+
+At exact 2× phone scale, however, the one-page loose state and early stitched-folio state collapse into tiny
+coloured ticks. They do not yet communicate the requested folded-paper → stitched-folio progression without
+knowing the data. Correct only those reusable early assets and any deterministic grounding required: one
+page must read as an off-white folded paper or small paper packet with a visible fold/corner; two and three
+pages must read as a bound stitched folio with a seam/stitch cue that survives literal grayscale; four pages
+must remain clearly a softbound book. Preserve the shell, sockets, volume rules, stable diary identity,
+ordering, attention overlays and later book forms. Re-review exact 1/2/3/4-page phone counterfactuals before
+promotion. `integrationReady` remains false, and no later asset checkpoint is released yet.
+
+##### Library early-paper correction — accepted
+
+**Accepted as the complete runtime-composable Library visual candidate; native integration remains
+unaccepted.** Game Design inspected exact 1/2/3/4-page 368×800 counterfactuals and the literal-grayscale
+sequence. One page now reads as a grounded off-white folded packet with a visible corner and lower edge;
+pages two and three read as a taller stitched folio, with the third page adding a projecting edge; four pages
+becomes the first upright softbound volume. The progression is legible by silhouette/value without using hue
+as authority and without making a one-page diary look like a complete book.
+
+This acceptance covers the one empty shell, reusable runtime kit, exported compositor, five sockets,
+per-traveller stable growth, Bestiary/Dictionary/Notes/History volume rules and independent attention
+overlays in manifest `3c5eb8b8bd9afe5d5fcd09553ac3ed6e4f4cbd7e77ab2f2c10dbe6cd7f108ef0`.
+Empty/early/developed screenshots remain evidence, not state bitmaps. The candidate remains uncommitted,
+unpromoted and `integrationReady:false` until Asset records the checkpoint and Engineering schedules native
+packaging. No broader Library room, top-level Bestiary destination or static shelf snapshots are accepted.

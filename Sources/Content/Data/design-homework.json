@@ -531,6 +531,39 @@
         { "id": "revise-set", "title": "Needs another pass", "detail": "Keep the object-led direction but name any stable units to revise below." },
         { "id": "hold", "title": "Hold this batch", "detail": "Make no live Bracken, Maud or Perren prose change yet." }
       ]
+    },
+    {
+      "id": "constellation-mastery-structure",
+      "title": "What should Motes unlock in the Constellation?",
+      "context": "The old one-star Constellation only adds one Gambit slot. Your district idea gives the rare Mote currency a broader purpose without taxing every shop: three stars permit depths 4–5 of Offense, Defense, or Fieldcraft across the campaign, and three matching stars permit Tier-2 mastery in Commerce, Makers, or Commons. Every skill point, prerequisite, building, and ordinary upgrade cost still applies.",
+      "recommendation": "Use the matched 3+3 mastery structure plus the existing Long Instruction. Charge one Mote per broad permission in initial testing. This makes the three village directions and three combat trees rhyme without charging a Mote per person, node, or shop.",
+      "choices": [
+        { "id": "matched-three-plus-three", "title": "Use both mastery trios", "detail": "Offense/Defense/Fieldcraft and Commerce/Makers/Commons each get one broad one-Mote permission; keep Long Instruction separate." },
+        { "id": "combat-trio-only", "title": "Combat mastery only", "detail": "Motes permit depths 4–5 in the three combat trees; building mastery uses only ordinary construction progression." },
+        { "id": "long-instruction-only", "title": "Keep one star only", "detail": "Retain only the existing Gambit-capacity star and find a different role for Motes later." }
+      ]
+    },
+    {
+      "id": "constellation-persistence",
+      "title": "Should Constellation mastery cross separate save files?",
+      "context": "A Constellation permission can persist through any future Great-Work/Base cycle inside one campaign without automatically belonging to every new game. Making it account-wide would change fresh-save balance and make comparative testing less honest, while making it temporary would weaken the permanence fantasy.",
+      "recommendation": "Persist Constellation purchases in the individual campaign/save's Reality layer. A genuinely separate New Game begins clean; deleting that save deletes its mastery.",
+      "choices": [
+        { "id": "campaign-save", "title": "One campaign/save", "detail": "Mastery survives future cycles inside that campaign but never appears in another save slot." },
+        { "id": "account-wide", "title": "Across every save", "detail": "Once bought, mastery applies to all current and future saves; stronger meta-progression, but fresh starts are no longer fresh." },
+        { "id": "hold-until-endgame", "title": "Decide with endgame", "detail": "Keep the current Long Instruction behavior and hold broader persistence until Great Work cycles are actually designed." }
+      ]
+    },
+    {
+      "id": "capacity-compression-profile",
+      "title": "How much item and Field Kit capacity should remain after removing Workshop ladders?",
+      "context": "World Resources and Creature Materials no longer consume item slots, so nine shelving purchases and five +3 satchel rungs are repetitive. Existing saves can be preserved with a decode-only allowance even if the new campaign curve is smaller. This choice affects exact Items, World Pages, and prepared Field Kit families—not bulk resources.",
+      "recommendation": "Use Storehouse 16→28→40 and Field Kit 8→11→14→20, with Sela adding a separate +2. Old saves above 40/20 keep the difference as a non-purchasable legacy allowance. This is roomy without restoring a long mandatory capacity tax.",
+      "choices": [
+        { "id": "focused-compression", "title": "Use 40 / 20 maxima", "detail": "Two Storehouse upgrades and three pack projects; preserve larger old saves through a hidden legacy allowance." },
+        { "id": "roomy-compression", "title": "Keep old maxima", "detail": "Compress to two/three large upgrades but end at 70 Storehouse and 23 Field Kit before Sela." },
+        { "id": "keep-old-ladders", "title": "Keep every rung", "detail": "Retain nine shelving and five satchel purchases even though bulk resources no longer use those slots." }
+      ]
     }
   ]
 }

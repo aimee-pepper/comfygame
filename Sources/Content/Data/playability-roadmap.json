@@ -7,7 +7,7 @@
       "id": "band-0",
       "title": "Band 0 · Testable shell",
       "reach": "Before starting or loading a campaign",
-      "itemIDs": ["launch-handoff", "save-slots", "bug-reporter", "godmode-testing", "world-generator-tester", "spatial-ui"]
+      "itemIDs": ["launch-handoff", "save-slots", "bug-reporter", "godmode-testing", "world-generator-tester", "game-wiki", "spatial-ui"]
     },
     {
       "id": "band-1",
@@ -19,7 +19,7 @@
       "id": "band-2",
       "title": "Band 2 · Opening economy and travellers",
       "reach": "Worlds 2–8 · levels 2–6 · Vance, Noll, Halloway",
-      "itemIDs": ["rune-dictionary", "saved-page-templates", "traveller-world-pacing", "traveller-clue-distribution", "trading-post-stock-breadth", "recycler", "maker-stations", "item-popover", "item-character-identities", "library-collection-accuracy", "library-shelves", "authored-text-first-review", "house-village", "workshop-constellation-role", "creature-ecology-materials", "loot-quality-hybrid", "gear-catalogue-breadth", "return-object-layout", "legacy-token-quirk-cleanup"]
+      "itemIDs": ["rune-dictionary", "saved-page-templates", "traveller-world-pacing", "traveller-clue-distribution", "trading-post-stock-breadth", "recycler", "maker-stations", "item-popover", "item-character-identities", "library-collection-accuracy", "library-shelves", "authored-text-first-review", "house-village", "workshop-constellation-role", "creature-ecology-materials", "gear-catalogue-breadth", "return-object-layout", "legacy-token-quirk-cleanup"]
     },
     {
       "id": "band-3",
@@ -848,9 +848,9 @@
       "priority": "B2.11a",
       "title": "Visual Library shelves and growing books",
       "status": "queued",
-      "detail": "The Library is a close-up of one large bookcase, at most two adjoining cases only for honest native targets, with Diaries, Bestiary, Dictionary, Field Notes and World History shelves. Real counts derive empty→folded paper→folio→softbound→hardcover stages. Its art waits behind the single Trading Post style gate so rejected placeholder language is not propagated.",
-      "gate": "First accept trading_post.built under the production-pixel standard. Then fit all five shelves in the first 368×800 viewport; count fixtures 0/1/2/4/7/10 derive exact stages; unknown people/runes/species do not leak; attention/back semantics remain truthful. Authorities: library-shelves-current.md, home-village-library-asset-packet-current.md and village-progression-and-asset-matrix-current.md.",
-      "workstream": "asset",
+      "detail": "Game Design accepted the complete runtime-composable Library candidate: one finished shell, five shelf sockets, stable growing diary object per traveller, Land/Shore/Water/Air Bestiary volumes, exact Dictionary volumes, paginated Field Notes/World History and independent attention. The corrected 1/2/3/4-page sequence reads as folded paper, stitched folio and softbound book in colour and grayscale. It remains unpromoted and not native.",
+      "gate": "Asset records the accepted manifest without changing pixels; Engineering later packages the shell/kit/compositor contract and replaces the live list-first Library only at its roadmap-ordered native checkpoint. Phone acceptance must prove live counts, stable diary growth, volume boundaries, disclosure, attention, Back and five honest targets. Authorities: library-shelves-current.md, home-village-library-asset-packet-current.md and asset-system-proposal.md.",
+      "workstream": "engineering",
       "isPrimary": false
     },
     {
@@ -858,8 +858,8 @@
       "priority": "B2.12",
       "title": "Binder House, yard and three village districts",
       "status": "inProgress",
-      "detail": "The rejected whole-batch candidate is frozen as exporter infrastructure only. Asset now owns exactly one aesthetic checkpoint: a finished label-free 96×80 Tier-0 Trading Post with direct pixel/bitmap source, grayscale and Commerce Row phone placement. Workshop is removed; House/Library/opening-five/upgrades remain paused behind this style gate.",
-      "gate": "Trading Post must read as Vance's merchant/appraisal frontage through counter, awning, balance, ledger, tagged stock and coin drawer without labels, exchange arrows or placeholder slabs at native/400%/grayscale/368×800. Stop for visual acceptance before any other place art. Authorities: village-progression-and-asset-matrix-current.md, home-village-library-asset-packet-current.md and asset-production-output-contract-current.md.",
+      "detail": "Game Design has accepted candidate visual identities for the opening five Built structures, Trading Post/Firepit lifecycle families, Binder House root and runtime Library. They remain unpromoted and not native. Asset checkpoint 6 now owns exactly three runtime-composed opening district shells—Commerce Row, Makers' Row and Commons—using the byte-identical accepted building layers, fixed slots, signs and independent attention.",
+      "gate": "Three exact 184×300 logical shells and deterministic compositor pass empty/absent disclosure, fixed collision-safe slots, 368×800 colour/grayscale state fixtures, Home direction, label-free identity and single-region state-change tests. No walking, scrolling, town map, invented building, damage, later-state work or native packaging. Authorities: village-progression-and-asset-matrix-current.md, home-village-library-asset-packet-current.md, asset-system-proposal.md and asset-production-output-contract-current.md.",
       "workstream": "asset",
       "isPrimary": false
     },
@@ -868,8 +868,8 @@
       "priority": "B2.12a",
       "title": "Remove Workshop; settle recovered teaching and Mote mastery",
       "status": "inProgress",
-      "detail": "Workshop removal and Party's non-teaching role are settled. Capacity moves to Storehouse/Tannery; knowledge moves to attributable recovered, traveller or specialist teachings. Game Design's reversible Constellation recommendation is three combat plus three district mastery permissions and Long Instruction.",
-      "gate": "Game Design still freezes recovered-teaching IDs/eligibility/pity and exact legacy reachability. Aimee reviews the 3+3 mastery structure and one-Mote tuning. Engineering does not remove live Workshop routes until every old entitlement has an equal-or-better migration and every knowledge ID remains reachable. Authorities: workshop-constellation-role-audit-current.md and village-progression-and-asset-matrix-current.md.",
+      "detail": "Workshop removal and Party's non-teaching role are settled. The exact 38-entry recovered-teaching catalogue covers every removed knowledge/automation grant. Capacity ownership and tuning are now exact: Storehouse 16→28→40, field pack 8→11→14→20, Sela +2, with decode-only legacy credits preserving old maxima. Game Design's reversible Constellation recommendation remains three combat plus three district mastery permissions and Long Instruction.",
+      "gate": "Recovered-teaching freshness passes python3 scripts/validate_recovered_teachings.py, and capacity migration passes every old count without loss. Homework holds Aimee's 3+3 mastery, campaign persistence and exact capacity-profile decisions; current recommendations are reversible and do not block unrelated work. Engineering does not remove live Workshop routes until every old entitlement has an equal-or-better migration and every knowledge ID remains reachable. Authorities: recovered-teachings-current.md, capacity-progression-current.md, workshop-constellation-role-audit-current.md and village-progression-and-asset-matrix-current.md.",
       "workstream": "design",
       "isPrimary": false
     },
@@ -887,9 +887,9 @@
       "id": "loot-quality-hybrid",
       "priority": "B2.13a",
       "title": "Material identity plus six-band loot quality",
-      "status": "inProgress",
-      "detail": "Core model settled: grey Rough/vendor-trash through orange Peerless/legendary; material family determines fit/contribution; player-facing Schematic defines object behavior; primary/secondary components weight output quality 70/30; stations have no hard quality cap; Refitting replaces opaque paid ranks. Game Design is authoring the complete ComponentProfile and schematic-socket tables.",
-      "gate": "Validate every live material family, schematic socket, named contribution/trade-off, legacy Tier/reforge migration and the Pointed Blade reference fixture before Engineering begins material/crafting migration or Asset begins quality/modular gear production. The territory-find category mix remains a separate open tuning decision. Authority: crafting-intuition-and-quality-review-current.md.",
+      "status": "complete",
+      "detail": "Design authority is complete: grey Rough/vendor-trash through orange Peerless/legendary; material family determines legal fit and named contribution; the player-facing Schematic defines object behavior; primary/secondary components weight output quality 70/30; stations have no hard quality cap; Refitting replaces opaque paid ranks. Exact ComponentProfiles, sixteen closed physical aliases, twenty-one Schematic socket tables, quality generation, legacy migration and the Pointed Blade fixture are frozen in crafting-components-and-schematics-current.md.",
+      "gate": "Design freshness must pass python3 scripts/validate_crafting_components.py. Engineering implementation remains ordered behind current opening-playability work and must migrate reserve identity, crafting consumers and legacy exact gear without a parallel grade/tier system. Asset may prove one modular Pointed Blade kit only when that implementation checkpoint is scheduled; no bulk gear production ahead of it. The territory-find category mix remains a separate tuning decision.",
       "workstream": "design",
       "isPrimary": false
     },
@@ -897,9 +897,9 @@
       "id": "gear-catalogue-breadth",
       "priority": "B2.13b",
       "title": "Material-responsive full gear catalogue",
-      "status": "paused",
+      "status": "queued",
       "detail": "Expand ordinary gear across the real resource/component pool so Schematic identity survives while selected primary/secondary materials alter the relevant component treatment, named effect and appearance. This includes the directly requested broad catalogue and six-band presentation; it must not infer mechanics from colour or an obsolete continuous-property model.",
-      "gate": "Blocked on complete material ComponentProfile and schematic-socket tables. Then Asset proves one modular Schematic kit across material/quality variants and Engineering proves stable exact-instance component receipts before expanding the catalogue; no bulk final-art production ahead of the rules.",
+      "gate": "The Design content dependency is closed by crafting-components-and-schematics-current.md. Wait for the roadmap-ordered material migration and exact Pointed Blade rules fixture; then Asset proves one modular Pointed Blade kit across material/quality variants and Engineering proves stable exact-instance component receipts before expanding the catalogue. No bulk final-art production ahead of the rules.",
       "workstream": "design",
       "isPrimary": false
     },
@@ -930,6 +930,16 @@
       "status": "queued",
       "detail": "Known Gold before extraction is deliberate progression. Highest qualifying Field Pick equipped by the departing party supplies rank 0–4; Binder level and Home tools do not. Iron/Salt/Sulfur remain rank 0; Gold/Silver rank 2; later strange/extreme minerals rank 3–4. Known writing warns but does not block; unknown marks do not leak.",
       "gate": "Iron/Gold/Adamant vertical fixtures prove no deadlock, truthful writing warning, no-turn under-equipped refusal, atomic exact harvest and relaunch; then validator covers the complete mineral table. No durability, hidden Mining XP, partial yield or automatic Home tool. Authority: resource-extraction-progression-current.md.",
+      "workstream": "engineering",
+      "isPrimary": false
+    },
+    {
+      "id": "game-wiki",
+      "priority": "S1",
+      "title": "Complete source-generated internal Game Wiki",
+      "status": "inProgress",
+      "detail": "Checkpoint A is accepted after live 368×800 re-review: Catalogue separates all five exact item domains and stable details; Resources separates World, live-legacy Creature, exact 18 designed Creature families and currencies. Internal routes reset to their headings and the bogus Table/Families parser artifacts are gone. Current checkpoint B is the source-generated People index and 29 traveller details.",
+      "gate": "People covers exactly 29 canonical travellers with role, concise calling, district/station, authored order/phase, clue/page coverage, diary teaching, meeting/recruitment implementation and accepted/candidate asset status; live/authored-not-live/held are never merged. Then continue World Writing, Core Loop/Exploration, Combat and final overview/history reconciliation. This support tool never becomes sole Engineering primary ahead of player-facing opening work. Authority: game-wiki-content-contract-current.md.",
       "workstream": "engineering",
       "isPrimary": false
     },

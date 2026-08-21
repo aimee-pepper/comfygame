@@ -1,8 +1,9 @@
 # Crafting intuition and loot quality — current review
 
-**Status:** Core model settled by Aimee: six quality bands, 70/30 primary/secondary weighting, no hard
-station quality caps and Refitting. Engineering remains held until Game Design freezes the complete material
-profile and schematic-socket tables. The territory-find mix remains a separate open tuning decision.
+**Status:** Core model and exact physical content authority are settled: six quality bands, 70/30
+primary/secondary weighting, no hard station quality caps, Refitting, complete material profiles and all 21
+physical schematic sockets. Engineering may begin only through the ordered migration after the current
+playability primary permits it. The territory-find mix remains a separate open tuning decision.
 **Supersedes for review:** the continuous six-property player-facing recipe puzzle, the
 `0.6 × weakest + 0.4 × average` output rule, and hard station quality caps in
 `loot-quality-hybrid-review-current.md` and `gear-crafting-families-current.md`.
@@ -114,7 +115,8 @@ previewed result make sense.
 
 ### Required first-table examples
 
-These examples establish the grammar; Game Design still owes the complete live-family table before dispatch:
+These examples establish the grammar; the complete dispatch table is
+`crafting-components-and-schematics-current.md`:
 
 | Material in role | Visible contribution | Trade-off/limit |
 |---|---|---|
@@ -308,13 +310,13 @@ That packet will require:
 
 Settled: 70/30 component weighting, no station quality caps and Refitting.
 
-Before either implementation lead receives the crafting migration packet, Game Design must author and
-validate:
+The required content is now authored in `crafting-components-and-schematics-current.md`. Before migration,
+Engineering validates:
 
-1. the complete live material-family ComponentProfile table;
-2. every current physical schematic's primary/secondary sockets and eligible material tags;
-3. the deterministic material contribution and trade-off copy used by preview/receipts;
-4. legacy Tier/reforge-to-band migration examples with equal effective performance;
-5. the Pointed Blade reference fixture used by rules, UI and multipart sprite assembly.
+1. the complete World/Creature ComponentProfile dispositions;
+2. all 21 physical Schematics and their closed socket lists;
+3. deterministic strongest-once material effects and preview/receipt copy;
+4. legacy Tier/reforge-to-band equal-performance migration;
+5. the Pointed Blade rules/UI/multipart-sprite reference fixture.
 
 The 3%/1.5%/0.5% territory-find proposal remains open and independent of the accepted crafting model.

@@ -1,6 +1,6 @@
 # Design Homework — Current Contract
 
-**Status:** Initial slice installed in `4ed15ab`; current catalogue has 19 active questions after
+**Status:** Initial slice installed in `4ed15ab`; current catalogue has 22 active questions after
 the location-clue batch retired into production; launch trust and phone interaction check remain.
 **Decision date:** 12 August 2026
 **Content authority:** `Sources/Content/Data/design-homework.json`
@@ -72,6 +72,9 @@ A later authenticated relay may add direct submission, but the UI must not call 
     (`named-character-stat-growth`).
 19. Bracken/Maud/Perren's four-line remaining abstract-reply correction
     (`remaining-meeting-voice-revision`).
+20. Constellation's matched combat/district mastery structure (`constellation-mastery-structure`).
+21. Constellation persistence per campaign save versus account-wide (`constellation-persistence`).
+22. Storehouse/Field Kit capacity compression profile (`capacity-compression-profile`).
 
 The catalogue deliberately mixes held mechanical choices with exact authored-copy reviews. Each can
 be answered asynchronously without blocking unrelated implementation; a question's own authority
