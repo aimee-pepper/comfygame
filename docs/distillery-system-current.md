@@ -2,7 +2,8 @@
 
 > **Incoming material-domain correction (21 August 2026):** Blank-core flow, attunements, catalysts,
 > provenance and atomic commit remain authoritative. The universal-grade potency term is superseded by the
-> exact Heat/Caustic/Light property formulas in `creature-ecology-and-materials-overhaul-current.md`.
+> exact Heat/Caustic/Light capability formulas in `loot-quality-hybrid-review-current.md`, if accepted. Keep
+> current behavior until the quality decision is settled.
 
 **Status:** implementation-facing first slice. Recipe costs and potency bands are playtest values.
 This makes the approved direction in `traveller-identity-auber-distillery.md` buildable without

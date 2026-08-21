@@ -262,18 +262,18 @@ transaction and fixture order are authoritative in `resource-extraction-progress
 
 ### Intended experience
 
-Base opens on a cutaway view of the Binder's house rather than a category board. Its rooms make the recurring
-verbs spatial: Writing Desk; Library/Constellation/Bestiary; Workshop/Storehouse; and Party. A separate
-Village exterior contains the Binder House, Firepit and Essence Spring at the opening, then gains real
-recruit-enabled buildings in campaign order.
+Base opens on the Binder House/yard rather than a category board. Its rooms make the recurring verbs spatial:
+Writing Desk; Library/Constellation; Workshop; and Party. Bestiary is a Library shelf. Essence Spring is in
+the yard. Left/right/down arrows open Commerce Row, Makers' Row and The Commons; Storehouse and Firepit are
+Commons buildings. The House is not duplicated as a tile on a village screen.
 
 ### Exact corrections
 
-1. Root scene selectors are **House / Village**, not Home / Make / Study / Realms. Existing routes continue
-   behind exact spatial hotspots.
-2. The whole four-zone house and all recurring actions fit on 368×800 without manufactured scrolling.
-3. Firepit and Essence Spring remain outdoors. Trading Post, Recycler, Blacksmith and later stations appear
-   in Village only when their real availability permits them.
+1. Root is **Binder House**, not House/Village or Home/Make/Study/Realms tabs. Three arrows open the exact
+   village districts and every district returns Home directly.
+2. The whole house/yard, six hotspots and three arrows fit on 368×800 without manufactured scrolling.
+3. Essence Spring is in the yard. Trading Post/Recycler belong to Commerce Row; Blacksmith and later makers
+   belong to Makers' Row; Storehouse/Firepit and other community places belong to The Commons.
 4. Village lifecycle is unknown/absent → known buildable → built → improved, with a temporary attention
    overlay. **The town is never damaged** and has no repair/rebuilding/defence state.
 5. Building silhouettes/functional fixtures own identity. Because many specialist buildings are obscure,
@@ -415,12 +415,13 @@ The earlier phase sketch has been replaced by `first-three-worlds-execution-plan
 defines exact Gates A–G, player results, dependencies, Engineering and Asset boundaries, prohibited scope,
 automated/phone acceptance and the required twelve-field handoff. Its current order is:
 
-1. close early encounter scaling, then add receipt-labelled DEBUG God mode;
+1. finish early encounter-scaling source/test receipts, park phone feel acceptance as nonblocking, then add
+   receipt-labelled DEBUG God mode;
 2. accept already-built Band-1 truth fixes without reimplementing them;
 3. Template reconstruction → Writing projection → frozen arrival receipt → dynamic image+description →
    relative-diversity map;
 4. adjacent consequence cues → local pickup feedback → object-like Return collection;
-5. Binder House cutaway → village signs/lifecycle/attention, with no town damage;
+5. Binder House/yard → Commerce Row/Makers' Row/The Commons → signs/lifecycle/attention, with no town damage;
 6. split World resources from Creature materials → habitat-aware ecology → body-derived rewards;
 7. promote reachable meetings → Party tabs/Diary route → reachable production graph choices;
 8. equipped-tool mineral extraction from Iron/Gold/Adamant fixtures through the full catalogue;

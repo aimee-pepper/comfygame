@@ -1,8 +1,8 @@
 # Consumable economy and Field Kit — current design
 
 > **Incoming material-domain correction (21 August 2026):** Field Kit capacity, packing and consumable
-> transaction rules remain authoritative. Creature materials become their own slot-free domain and no longer
-> carry universal grade under `creature-ecology-and-materials-overhaul-current.md`; older “world-resource
+> transaction rules remain authoritative. Creature materials become their own slot-free domain; final
+> quality/stack semantics wait on `loot-quality-hybrid-review-current.md`. Older “world-resource
 > sample/provenance/grade” wording below describes the implemented transitional model only.
 
 **Status:** implementation-ready packing correction with reversible Recommended cost profile.  

@@ -6,11 +6,10 @@ retuning gates.
 
 **Updated:** 11 Aug 2026
 
-> **Incoming correction (21 August 2026):** Profile requirements, station availability, physical offsets,
-> receipts and atomic rebuild behavior remain authoritative. Universal sample grade, natural tier and
-> below-headline/wasted-grade warnings are superseded for the next material migration by
-> `creature-ecology-and-materials-overhaul-current.md`; Armoury effective tier 0–1 produces Tier 3 and tier
-> 2+ produces Tier 4 once that migration lands.
+> **Quality migration hold (21 August 2026):** Profile requirements, station availability, physical offsets,
+> receipts and atomic rebuild behavior remain authoritative. Grade/natural-tier presentation is under review
+> in `loot-quality-hybrid-review-current.md`. Keep current behavior until Aimee settles it; do not implement
+> the withdrawn pure-no-grade Armoury table.
 
 This specializes `gear-crafting-families-current.md` and `crafted-gear-migration-current.md` for
 Bracken. It adds one deliberate rebuild flow, not durability, fit stats, random affixes or a second

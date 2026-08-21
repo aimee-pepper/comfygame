@@ -155,7 +155,9 @@ When two documents disagree:
 | Trading Post economy | `trading-post-recycler-economy-current.md` | Merchant trade bands, rotating stock snapshot, conversion rates and cumulative salvage receipt |
 | Essence continuation economy | `essence-continuation-economy-current.md` | Authored-world continuation invariant, temporary Raw Essence profiles and required runway telemetry |
 | Slot-free harvest reserve foundation | `world-resource-reserve-current.md` | Exact property-bearing harvests are slot-free; current combined category is transitional |
-| Creature ecology and materials | `creature-ecology-and-materials-overhaul-current.md` | Habitat-aware pressure-generated life; body-derived Creature materials separate from World resources; no generic quality ladder |
+| Creature ecology and materials | `creature-ecology-and-materials-overhaul-current.md` | Habitat-aware pressure-generated life including deep water; body-derived Creature materials and rare encounter-level territory gear |
+| Loot quality hybrid review | `loot-quality-hybrid-review-current.md` | Recommended material-identity + six-band quality model; open decision before material/crafting migration |
+| Library shelves | `library-shelves-current.md` | Library-room root, Bestiary shelf, five growing collections and per-diary folded-page→hardcover progression |
 | World-resource extraction | `resource-extraction-progression-current.md` | Equipped Field Pick ranks; disclosed Gold progression; complete mineral table and no-deadlock Iron |
 | Essence refining progression audit | `essence-refining-progression-audit-current.md` | Review-only correction removing the paid quantity-control toll and earning 3:1 through demonstrated baseline refining |
 | Compound assembly / station trees | `compound-assembly-station-trees-current.md` | Proven-statement receipts, Scriptorium formalization, frozen personal compounds and Penmanship topology |
@@ -184,7 +186,7 @@ When two documents disagree:
 | World History collection / comparison | `world-history-collection-comparison-current.md` | Compact frozen covers, arbitrary two-record comparison, earned disclosure and safe keep/erase behavior |
 | Player-facing screen grammar | `player-facing-screen-grammar-current.md` | Semantic spatial/grid/list rules and ordered correction queue |
 | Remaining native list audit | `remaining-native-list-surface-audit-current.md` | Code-backed classification of three remaining collection/action list failures versus legitimate ordered/detail lists |
-| Base destination catalogue compatibility | `base-destination-board-current.md` | Stable destination IDs/order/routes beneath the current House/Village surface |
+| Base destination catalogue compatibility | `base-destination-board-current.md` | Stable internal destination IDs/routes only; player placement is Binder House + Library shelves + three village districts |
 | Binder House and village | `home-house-and-village-current.md` | Four-zone house cutaway, exterior village, standardized signs, persisted attention and no town damage |
 | Historical starting-town slice | `starting-town-band1-integration-current.md` | Superseded five-hotspot proposal retained for history only |
 | Party and character surface | `party-character-surface-current.md` | Five-person grid; Stats/Gear/Skills/Gambit; Diary deep-link; production graph entry |

@@ -140,12 +140,14 @@ final class DebugRoadmapTests: XCTestCase {
         XCTAssertTrue(item.gate.contains("miniature Tavern"))
     }
 
-    func testCurrentBoardHasAtMostOnePrimaryPerWorkstreamAndScalingSolelyOwnsAcceptance() {
+    func testCurrentBoardHasAtMostOnePrimaryPerWorkstreamAndScalingSolelyOwnsEngineering() {
         let board = DebugRoadmap.current
         let primaries = Dictionary(grouping: board.items.filter(\.isPrimary), by: \.workstream)
         XCTAssertTrue(primaries.values.allSatisfy { $0.count <= 1 },
                       "each workstream may disclose at most one primary")
-        XCTAssertEqual(primaries[.acceptance]?.map(\.id), ["encounter-scaling"])
+        XCTAssertEqual(primaries[.engineering]?.map(\.id), ["encounter-scaling"])
+        XCTAssertNil(primaries[.acceptance],
+                     "phone-feel acceptance must not remain a blocking primary")
     }
 
     func testEncounterScalingRecordsAcceptedPhoneEvidenceAndRemainingMatrix() throws {
@@ -153,15 +155,15 @@ final class DebugRoadmapTests: XCTestCase {
             $0.id == "encounter-scaling"
         })
         XCTAssertEqual(scaling.status, .inProgress)
-        XCTAssertEqual(scaling.workstream, .acceptance)
+        XCTAssertEqual(scaling.workstream, .engineering)
         XCTAssertTrue(scaling.isPrimary)
-        XCTAssertTrue(scaling.detail.contains("fresh level-1"))
-        XCTAssertTrue(scaling.detail.contains("Normal contacts as balanced"))
-        XCTAssertTrue(scaling.detail.contains("Teeming is intentionally overwhelming"))
-        XCTAssertTrue(scaling.detail.contains("damaging flora"))
-        XCTAssertTrue(scaling.gate.contains("player level"))
-        XCTAssertTrue(scaling.gate.contains("party count"))
-        XCTAssertTrue(scaling.gate.contains("party-member levels"))
+        XCTAssertTrue(scaling.detail.contains("deterministic source implementation"))
+        XCTAssertTrue(scaling.detail.contains("Phone feel/balance acceptance is deliberately nonblocking"))
+        XCTAssertTrue(scaling.detail.contains("Teeming remains an intentionally overwhelming disclosed profile"))
+        XCTAssertTrue(scaling.gate.contains("automated/simulator matrices"))
+        XCTAssertTrue(scaling.gate.contains("party sizes 2/3/5"))
+        XCTAssertTrue(scaling.gate.contains("no known P0 source defect"))
+        XCTAssertTrue(scaling.gate.contains("deferred acceptance card"))
     }
 
     func testWorldPageWorkFollowsReachabilityAndDoesNotPreemptScaling() throws {

@@ -1,14 +1,19 @@
 # Property-Bearing Harvest Reserve — storage foundation
 
 **Status:** source-complete slot/correctness foundation; player-facing category and quality semantics are
-superseded by `creature-ecology-and-materials-overhaul-current.md`
+reopened under `creature-ecology-and-materials-overhaul-current.md` and the unaccepted
+`loot-quality-hybrid-review-current.md`
 **Priority:** active Band 1.4e checkpoint, after the landed durable Field Kit; before later crafting,
 station, creature-display, or world-content breadth
 **Supersedes:** the slot-consuming material-bin decision in `decisions-session-16.md` and the open
 stacking question in `materials-crafting-spec.md` §9
-**Preserves:** exact `MaterialSample` properties, source, qualifier and provenance while the creature
-overhaul removes generic quality from primary presentation and splits animal-derived units into a distinct
-Creature-material reserve
+**Preserves:** exact counts/identity through the current reserve while the later accepted migration splits
+animal-derived units into Creature materials and may convert continuous grade/provenance units into discrete
+domain+family+quality stacks.
+
+Do not implement the withdrawn pure-no-grade proposal or the hybrid stack conversion until Aimee settles the
+quality review. The current slot-free behavior remains valid groundwork; final stack key, price, crafting,
+provenance and consumer conversion will come from the accepted quality authority.
 
 ## Player promise
 

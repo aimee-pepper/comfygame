@@ -19,7 +19,7 @@
       "id": "band-2",
       "title": "Band 2 · Opening economy and travellers",
       "reach": "Worlds 2–8 · levels 2–6 · Vance, Noll, Halloway",
-      "itemIDs": ["rune-dictionary", "saved-page-templates", "traveller-world-pacing", "traveller-clue-distribution", "trading-post-stock-breadth", "recycler", "maker-stations", "item-popover", "item-character-identities", "library-collection-accuracy", "authored-text-first-review", "house-village", "creature-ecology-materials", "return-object-layout", "legacy-token-quirk-cleanup"]
+      "itemIDs": ["rune-dictionary", "saved-page-templates", "traveller-world-pacing", "traveller-clue-distribution", "trading-post-stock-breadth", "recycler", "maker-stations", "item-popover", "item-character-identities", "library-collection-accuracy", "library-shelves", "authored-text-first-review", "house-village", "creature-ecology-materials", "loot-quality-hybrid", "return-object-layout", "legacy-token-quirk-cleanup"]
     },
     {
       "id": "band-3",
@@ -318,7 +318,7 @@
       "priority": "P1",
       "title": "Spatial game hubs",
       "status": "readyToTest",
-      "detail": "Repository reconciliation preserved phone-source baseline 2d2e7ce and later source work on current main, but the opening presentation remains split across exact packets. The broad spatial-hubs item is now an umbrella acceptance result rather than authorization for one large implementation: Writing, arrival, field feedback, Return, Binder House/Village and Party each have separate current authorities and receipts.",
+      "detail": "Repository reconciliation preserved phone-source baseline 2d2e7ce and later source work on current main, but the opening presentation remains split across exact packets. The broad spatial-hubs item is now an umbrella acceptance result rather than authorization for one large implementation: Writing, arrival, field feedback, Return, Binder House/yard plus three districts, Library shelves and Party each have separate current authorities and receipts.",
       "gate": "Accept the granular Gate B–F packets in first-three-worlds-execution-plan-current.md, then pass Campaign → House → Writing → generated arrival → matching World → object-like Return without invented mechanics or manufactured scrolling. No screen is accepted because a sibling candidate or cumulative build is green.",
       "workstream": "acceptance",
       "isPrimary": false
@@ -428,9 +428,9 @@
       "priority": "B1.3",
       "title": "Party and apex difficulty",
       "status": "inProgress",
-      "detail": "Aimee's ordinary-phone fresh level-1 play accepts Normal contacts as balanced. Teeming is intentionally overwhelming at that point, especially when damaging flora compounds the encounter; that result is a disclosed danger profile, not a Normal-balance regression. Vitality peak controls cast abundance, authored trophic aspects redistribute one fixed creature budget, and multi-target delivery retains the accepted reversible 50% share.",
-      "gate": "Complete the remaining ordinary-phone matrix across player level, party count and individual party-member levels, recording each frozen scaling receipt and whether decisions and telegraphing remain fair. Keep Normal as the baseline, preserve Teeming as an intentionally overwhelming disclosed profile, and separately exercise later two-/five-person ordinary and apex contacts; automated evidence is not final balance acceptance.",
-      "workstream": "acceptance",
+      "detail": "Finish deterministic source implementation and observability for Normal, Teeming, party-size, uneven-level and apex scaling. Phone feel/balance acceptance is deliberately nonblocking: after the source/test checkpoint is green with no known mathematically unwinnable intended-Normal generation, mark this readyToTest and advance even if Aimee is not currently testing combat. Teeming remains an intentionally overwhelming disclosed profile.",
+      "gate": "Freeze truthful receipts and pass automated/simulator matrices for fresh Binder+Quill Normal, sequential contacts, Teeming disclosure, party sizes 2/3/5, uneven levels and apexes; build/tests green and no known P0 source defect. Then release the primary flag and retain the ordinary-phone 2–4-round/5–20%-HP target as a deferred acceptance card that may reopen tuning later.",
+      "workstream": "engineering",
       "isPrimary": true
     },
     {
@@ -718,7 +718,7 @@
       "priority": "B1.3b",
       "title": "DEBUG God mode for noncombat testing",
       "status": "queued",
-      "detail": "After ordinary level-1 scaling closes, add a DEBUG-only encounter-frozen toggle. Enemy decisions, damage, conditions, cooldowns and logs execute normally, but active party HP cannot fall below 1 and defeat is suppressed. It grants no offense, loot, XP, spawn or retreat benefit and marks receipts/bug reports as invalid balance evidence.",
+      "detail": "After the ordinary level-1 scaling source checkpoint closes (phone acceptance is not required), add a DEBUG-only encounter-frozen toggle. Enemy decisions, damage, conditions, cooldowns and logs execute normally, but active party HP cannot fall below 1 and defeat is suppressed. It grants no offense, loot, XP, spawn or retreat benefit and marks receipts/bug reports as invalid balance evidence.",
       "gate": "Default off; relaunch persistence; newly created encounter only; lethal damage remains fully logged at 1 HP; next encounter with toggle off defeats normally; persistent banner and receipt flag; no mid-encounter ambiguity. Authority: first-three-worlds-execution-plan-current.md Gate A2.",
       "workstream": "engineering",
       "isPrimary": false
@@ -764,12 +764,22 @@
       "isPrimary": false
     },
     {
+      "id": "library-shelves",
+      "priority": "B2.11a",
+      "title": "Visual Library shelves and growing books",
+      "status": "queued",
+      "detail": "Move Bestiary under a visual Library root with Diaries, Bestiary, Dictionary, Field Notes and World History shelves. Real counts derive empty→folded paper→folio→softbound→hardcover stages; every traveller diary grows from its own recovered pages. Shelf attention clears only after exact new content renders.",
+      "gate": "All five shelves fit the first 368×800 viewport; count fixtures 0/1/2/4/7/10 derive exact stages; Bestiary records survive route migration; unknown people/runes/species do not leak; shelf attention/relaunch/back-focus pass. Authority: library-shelves-current.md.",
+      "workstream": "asset",
+      "isPrimary": false
+    },
+    {
       "id": "house-village",
       "priority": "B2.12",
-      "title": "Binder House cutaway and growing village",
+      "title": "Binder House, yard and three village districts",
       "status": "queued",
-      "detail": "Replace the Base category-board root with House/Village. House has four zones and exact Writing, Library/Constellation/Bestiary, Workshop/Storehouse and Party hotspots. Village starts with House, Firepit and Essence Spring, then real reachable buildings with silhouette plus sign. Persist truthful attention until checked. The town is never damaged.",
-      "gate": "Full 368×800 House without manufactured scroll; exact direct routes and noncommitting Prepare a world; buildable/built/improved/attention village states; four idempotent attention reasons and clear rules; opening Trading Post → Recycler → Blacksmith; no hidden station or damage/repair UI. Authority: home-house-and-village-current.md.",
+      "detail": "Replace the Base category-board root with the Binder House/yard: Writing, Library, Constellation, Workshop, Party and Essence Spring, plus left/right/down exits to Commerce Row, Makers' Row and The Commons. Bestiary lives in Library; Storehouse and Firepit live in The Commons; House is not duplicated as a district tile. Persist truthful attention until checked. The town is never damaged.",
+      "gate": "Full 368×800 six-hotspot House/yard plus three arrows without manufactured scroll; Commerce Row/Makers' Row/Commons and direct Home returns; Bestiary nested in Library; Storehouse/Firepit and yard Spring geography; buildable/built/improved/attention states; four idempotent attention reasons; opening Trading Post → Recycler → Blacksmith; no hidden station, duplicate House or damage/repair UI. Authority: home-house-and-village-current.md.",
       "workstream": "asset",
       "isPrimary": false
     },
@@ -778,9 +788,19 @@
       "priority": "B2.13",
       "title": "Habitat-aware life and body-derived Creature materials",
       "status": "queued",
-      "detail": "Separate bulk/provenance-bearing World resources from slot-free Creature materials through one shared material-unit value and two explicit reserves. Persist terrestrial/shore/aquatic/aerial ecology identity after real terrain availability; constrain placement/roaming; derive feather, fin, pelt, scale/plate/chitin/shell, weapon, bone and special materials from the visible body. Remove universal grade and unrelated ordinary-animal world-resource/gear/curio drops. In the same migration, maker progression sets gear tier, requirement surplus sets default selection, family/capability sets price, attunement properties set potency, scent-bearing families gate Scent Mask, and Recycler uses receipt order.",
-      "gate": "Fishlike life remains in connected shallow water; terrestrial life remains off water; pressure-biased feathered/furred/plated forms are deterministic without gameplay RNG change; remains match body and retain properties/provenance; every legacy kind migrates; no ordinary unrelated drop; and no current grade field, label, tier/price/potency formula or automatic grade selection remains. Exact replacement tables pass. Authority: creature-ecology-and-materials-overhaul-current.md.",
+      "detail": "Persist terrestrial/shore/aquatic/aerial ecology identity after real terrain availability; fish may occupy connected shallow and deep water, with deep occupants non-enterable until they reach shallow water or a later interaction exists. Derive feather, fin, pelt, scale/plate/chitin/shell, weapon, bone and special materials from the visible body. Remove unrelated ordinary-animal world-resource/curio drops, but allow one 3% eligible territory-gear roll per victorious encounter. Final stack/quality/crafting migration waits on loot-quality-hybrid.",
+      "gate": "Aquatic life remains in connected shallow+deep water; terrestrial life remains off water; pressure-biased feathered/furred/plated forms are deterministic without gameplay RNG change; remains match body; one gear roll maximum per encounter and no key/quest/unique/apex leakage. Do not implement quality/storage migration before the hybrid decision. Authorities: creature-ecology-and-materials-overhaul-current.md and loot-quality-hybrid-review-current.md.",
       "workstream": "engineering",
+      "isPrimary": false
+    },
+    {
+      "id": "loot-quality-hybrid",
+      "priority": "B2.13a",
+      "title": "Material identity plus six-band loot quality",
+      "status": "paused",
+      "detail": "Decision candidate: material/family owns capability; grey/white/green/blue/purple/orange quality owns within-family strength and value; gear item level/output derives from recipe, input bands and maker cap. Same domain+family+band resources stack, while Bestiary/History preserve known source records. This is a Design decision hold, not implementation work.",
+      "gate": "Aimee accepts or revises loot-quality-hybrid-review-current.md before any material storage/crafting migration. Then the complete family capability table, band generation, current Tier1–4 migration, price multipliers, consumer conversions and save test must be frozen before Engineering starts.",
+      "workstream": "design",
       "isPrimary": false
     },
     {
@@ -788,8 +808,8 @@
       "priority": "B2.14",
       "title": "Object-like expedition Return collection",
       "status": "queued",
-      "detail": "Project the one frozen outcome as six-across World resources, Creature materials, exact Items, Writing recovered and People who came home before concise XP. Quantities aggregate only by legitimate family and anchored detail retains exact provenance/identity without a new full screen.",
-      "gate": "Nineteen Hides once; Hides/Bones separate; distinct same-family property profiles preserved in detail; exact item/page/person and failure/loss receipts; every edge/bottom detail stays on-screen and relaunch agrees. Depends on the creature-material category split. Authority: first-three-worlds-execution-plan-current.md C3.",
+      "detail": "Project the one frozen outcome as six-across World resources, Creature materials, exact Items, Writing recovered and People who came home before concise XP. Resources aggregate by the settled domain+family+quality stack key; collection-source records live in Bestiary/World History rather than fabricated per-unit provenance after merging.",
+      "gate": "Nineteen Hides of one quality once; Hides/Bones and different quality bands separate; exact item/page/person and failure/loss receipts; every edge/bottom detail stays on-screen and relaunch agrees. Depends on the Creature-material category and quality decision. Authority: first-three-worlds-execution-plan-current.md C3 and loot-quality-hybrid-review-current.md.",
       "workstream": "engineering",
       "isPrimary": false
     },

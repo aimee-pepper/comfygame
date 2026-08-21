@@ -1,11 +1,9 @@
 # Gear crafting families — current design
 
-> **Incoming material-system correction (21 August 2026):** Recipe families, property floors, station
-> ownership, construction receipts and specialist trade-offs remain authoritative. Universal sample grade,
-> natural-tier calculation and grade warnings are superseded for the next material migration by
-> `creature-ecology-and-materials-overhaul-current.md`. Future output tier comes from the maker's exact
-> progression table there. This note prevents the implemented old formula below from being mistaken for the
-> target contract while migration is not yet live.
+> **Quality migration hold (21 August 2026):** Recipe families, property requirements, station ownership,
+> receipts and specialist trade-offs remain authoritative. Continuous grade/output presentation is under
+> review in `loot-quality-hybrid-review-current.md`. Keep the implemented formula until Aimee settles the
+> hybrid; do not implement the withdrawn pure-no-grade maker table.
 
 **Status:** Current structural design; thresholds, costs and within-tier bonuses are playtest values.  
 **Scope:** Blacksmith, Tannery, Armoury, Bowyer, Weaponsmith and physical gear instance data.

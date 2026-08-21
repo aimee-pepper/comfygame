@@ -2,9 +2,10 @@
 
 > **Incoming material-domain correction (21 August 2026):** Contact, duration, sensory composition and
 > exact atomic item behavior below remain authoritative. The ingredient is superseded by
-> `creature-ecology-and-materials-overhaul-current.md`: one Hide, Pelt, Down or Oil Creature material, with no
-> universal grade floor. It is no longer an “animal world resource.” The old grade language below describes
-> the currently implemented source checkpoint only until that migration lands.
+> `loot-quality-hybrid-review-current.md`: one Hide, Pelt, Down or Oil Creature material of any accepted
+> quality band. It is no longer an “animal world resource,” and quality does not change the first-slice
+> effect. The old continuous-grade language below describes the implemented source checkpoint until the
+> hybrid decision lands.
 
 **Status:** source-complete through domain/provider `7772df0`, player UI `5e5aa14`, focused fixture
 `2ced55a` and release-content checkpoint `543ddfe`; duration and material floor remain playtest tuning,
