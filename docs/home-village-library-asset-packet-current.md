@@ -1,9 +1,10 @@
 # Binder House, village districts and Library — active AssetLab packet
 
-**Status:** Active Asset Design assignment from the Game Design/Orchestration Lead. The only current art
-checkpoint is the Trading Post Tier-0 style gate defined below. The larger Library/House/village milestones
-remain future work until that gate is accepted. AssetLab only; no native game, Xcode, gameplay schema,
-roadmap priority or Simulator lifecycle changes.
+**Status:** Active Asset Design assignment from the Game Design/Orchestration Lead. Trading Post v0.3, the
+five opening Built/Tier-0 identities, and Trading Post/Firepit state continuity are accepted Game-Design
+candidates. The only current art checkpoint is Binder House; the close-up Library and later building families
+remain held. AssetLab only; no native game, Xcode, gameplay schema, roadmap priority or Simulator lifecycle
+changes.
 **Repository status checked before dispatch:** shared tree reconciled against current status immediately
 before the 21 August assignment; encounter scaling remains the sole Engineering source primary.
 **Player outcome:** Home and Library become recognizable places instead of categories/lists while every
@@ -34,7 +35,7 @@ The current rejected House/Library v0.1 working files remain technical infrastru
 from the **Style gate** in `village-progression-and-asset-matrix-current.md`; do not continue the interrupted
 whole-batch bitmap candidate or infer missing details from it.
 
-## Current checkpoint — Trading Post Tier-0 style gate only
+## Completed checkpoint 1 — Trading Post Tier-0 style gate
 
 Produce one finished label-free `trading_post.built` sprite before drawing any other building, district,
 House room or Library shelf. This is an aesthetic gate, not a request for another complete prototype.
@@ -364,11 +365,11 @@ goldens remain unchanged.
 ## Review order and stop conditions
 
 Trading Post v0.3 and the Recycler/Blacksmith/Storehouse/Firepit Built/Tier-0 opening identity set are
-Game-Design accepted candidates. Current work is state continuity only: Trading Post and Firepit
-foundation/built/improved/mastered rows plus independent attention overlays, with both accepted Built sources
-preserved byte-identically. After that review, the remaining order is: Binder House → close-up Library → later
-buildings in campaign order. Do not batch those future milestones merely because their specifications are
-present in this file.
+Game-Design accepted candidates. Trading Post and Firepit foundation/built/improved/mastered continuity rows
+and independent warm-gold attention overlays are also accepted candidates, with both accepted Built sources
+preserved byte-identically. Current work is Binder House only. After that review, the remaining order is:
+close-up Library → later buildings in campaign order. Do not batch those future milestones merely because
+their specifications are present in this file.
 
 Stop immediately and report rather than inventing:
 

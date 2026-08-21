@@ -5137,3 +5137,32 @@ Asset checkpoint 3 is released exactly as written in the canonical matrix: Tradi
 foundation/built/improved/mastered continuity rows plus independent attention overlays. The two accepted
 Built sources must remain byte-identical while later forms add to the same structure and preserve their
 protected anchors. Recycler, Blacksmith and Storehouse later forms remain held.
+
+#### Opening state-continuity v0.1 disposition
+
+**Accepted by Game Design as Trading Post and Firepit production-visual state families; native integration
+remains unaccepted.** Game Design inspected both label-free foundation/built/improved/mastered rows in colour
+and literal grayscale, protected-anchor overlays, independent attention-overlay comparisons, and exact
+368×800 state and ordinary-versus-attention proofs. Trading Post grows from its foundation into the accepted
+merchant frontage, adds the Commission Board work bay, then the Merchant Network loading/storage bay while
+preserving its counter, balance and primary awning. Firepit grows from its foundation into the accepted open
+communal hearth, then the Tavern hall and Guest Wing while preserving the hearth stones, kettle hook and
+seating arc. Neither family introduces damage, rebuilding, route-planning or an unrelated replacement
+building.
+
+The attention assets are accepted as independent removable warm-gold rims: they remain readable around both
+Built and Mastered silhouettes at ordinary phone scale, are not baked into any state, and do not read as
+danger, fire or building damage. The final phone evidence keeps every district heading inside the 368-point
+canvas. Both previously accepted Built sources remain byte-identical. The checkpoint manifest is
+`AssetLab/artifacts/opening-state-continuity-v0.1/manifest.json`, SHA-256
+`2caf25e0b226ed74d48d2eb184287c472277b119538c7e0f439d6a995a47d100`; its exact source and evidence hashes are
+recorded there.
+
+This accepts eight new state/overlay IDs as **Game Design candidates only** while they remain
+uncommitted/unpromoted and `integrationReady:false`: `trading_post.foundation`,
+`trading_post.improved`, `trading_post.mastered`, `trading_post.attention`, `firepit.foundation`,
+`firepit.improved`, `firepit.mastered` and `firepit.attention`. It does not accept flat district backgrounds,
+authorize native packaging, or release Recycler/Blacksmith/Storehouse later forms. Asset checkpoint 4 is
+released for Binder House only, following the exact cutaway, yard, hotspot and district-exit authority in
+`village-progression-and-asset-matrix-current.md` and `home-village-library-asset-packet-current.md`; the
+close-up Library and later buildings remain held.

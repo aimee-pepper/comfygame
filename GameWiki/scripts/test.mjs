@@ -75,6 +75,16 @@ for (const id of ["recycler", "blacksmith", "storehouse", "firepit"]) {
   assert(slot?.status === "Game Design accepted candidate / native integration not yet accepted", `${id}.built must preserve the checkpoint-2 candidate/native distinction`);
   assert(slot?.assetPath === null, `${id}.built must not invent a packaged asset path`);
 }
+const acceptedContinuityKeys = [
+  "trading_post.foundation", "trading_post.improved", "trading_post.mastered", "trading_post.attention",
+  "firepit.foundation", "firepit.improved", "firepit.mastered", "firepit.attention"
+];
+for (const key of acceptedContinuityKeys) {
+  const slot = data.assetGallery.slots.find(candidate => candidate.key === key);
+  assert(slot?.status === "Game Design accepted candidate / native integration not yet accepted", `${key} must preserve the checkpoint-3 candidate/native distinction`);
+  assert(slot?.assetPath === null, `${key} must not invent a packaged asset path`);
+}
+assert(data.assetGallery.slots.filter(slot => slot.status === "Game Design accepted candidate / native integration not yet accepted").length === 13, "only the five Built candidates and eight checkpoint-3 states may be candidate-accepted");
 assert(data.assetGallery.slots.every(slot => slot.assetPath === null), "no unaccepted art path may enter a stable slot");
 for (const item of data.search) {
   assert(item.provenance.generatedAtSourceHash === data.generatedAtSourceHash, `fact hash missing: ${item.type}/${item.id}`);

@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "aggregateSourceHash": "087128333aa91a1cb2926b8181598f371b41108e1a4371f5ea26d9c61190021a",
+  "aggregateSourceHash": "41aa758c487507204c168270a2a5d623687380e19a66f6d5dafc5d7a521bbaf9",
   "inputs": {
     "Sources/Content/Data/items.json": "b94b1107229f217e14f1d7fa936d8eea938f9782c06c583be32302f10d432bc9",
     "Sources/Content/Data/playability-roadmap.json": "2ab045a5a59658f9558a347379994a1ec6056d52882d23b04edcf6bb6ed149e4",
@@ -65,7 +65,7 @@
     "docs/armoury-rebuild-implementation-current.md": "a9e893f4660b274e35c530ff1228ba232570bc7858442617d81e7eb34c1ecf82",
     "docs/ashe-ground-technique-current.md": "14287d7178f1148f4f765e50a7debf15d6f21efb9197181396407057794a161c",
     "docs/asset-production-output-contract-current.md": "e9734d8e96290e0e4f79af180624cf5115d4379cf16a52bbb688f1cea34ee675",
-    "docs/asset-system-proposal.md": "ba1e1f92b023726f3732a9abaca9a0158562b5d9e08f98263afdd469b18656e5",
+    "docs/asset-system-proposal.md": "7c3196030c0b22b2fe0745ed9181cf1b36e03bd4f91cb001fdeed774e7951492",
     "docs/authored-color-vocabulary-current.md": "41aa98371136bf274cf0f8160d822d0b8ff84c479882ffbc8c7847ae6a33b58d",
     "docs/authored-text-audit-current.md": "97c31e4a0564595cc62dbce0920999d648f94208b6f207b903f8cf517bc7b0fa",
     "docs/authored-world-blueprints-current.md": "218498315a42ab8a0f63523e586a83f33cdeef7bd9c13fc09dee65d020d736a1",
@@ -166,7 +166,7 @@
     "docs/great-work-boundary-current.md": "df6a758383e183ae8b52bab8a4ef78f53707edeae4a57722ee2af5a1f4301665",
     "docs/handmade-art-ownership-current.md": "5273cea105f1e93ace9f44892a474c1eb0edcb3c23fb4654d868ed8d8a01c8ad",
     "docs/home-house-and-village-current.md": "89635da2c3e24b057a79b8d835cede2c506defa17ebac7d6536a19e99503b403",
-    "docs/home-village-library-asset-packet-current.md": "fde381ca4e4f2f69eef940b4f489c0009bdaa3a442eb2f27b512d8a076ae850a",
+    "docs/home-village-library-asset-packet-current.md": "e8b124c27bdda76f1ad199fe0706ed9d02112ee50399d75080c2810894fd7941",
     "docs/implemented-six-diary-packets-current.md": "090aad2a8bf2d6982e7dfc560759e4f6fce12b371a15dd8d6fa6c8dbcc3bdfb7",
     "docs/implemented-six-station-contribution-audit-current.md": "ee8b01f3d9c646ed6cd0d84cd440f4c969934fd1696be3153f4a92e2cfa50175",
     "docs/ink-economy-friction-audit-current.md": "bec03004e7e7f062cca32e352de482a573bd28e13247c34b749a44d3904b1679",
@@ -268,7 +268,7 @@
     "docs/writing-tool-progression-current.md": "be17fe07aa89aaaab7117a2faca43d7e1eb1be23202d19106c67c42547b23bb0"
   },
   "outputs": {
-    "generated/wiki-data.json": "6c2ee4483445cc7e6860f6bb4360b18d98abc9eda7758bf55a0e1b809e5bd01d",
-    "generated/source-registry.json": "1a821fbd2e9bd22cd2eb94907fa3a603689f9f8b2a25e44b49e85bf36fef4a5d"
+    "generated/wiki-data.json": "7d2350b0536ec934be9c3b4c836195c31e39b65439cc11a2cc8edf129ddacad8",
+    "generated/source-registry.json": "6d3c979b20f4a8e36b09f7084416cffe00ffc69b219dacf4557103deec4daf02"
   }
 }

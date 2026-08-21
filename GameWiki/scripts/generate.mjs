@@ -215,10 +215,15 @@ const assetProposalText = contents["docs/asset-system-proposal.md"];
 const tradingPostCandidateRejected = /Trading Post Tier-0 v0\.1 disposition[\s\S]{0,300}Rejected as the production pixel gate/i.test(assetProposalText);
 const tradingPostCandidateAccepted = /Trading Post Tier-0 v0\.3 disposition[\s\S]{0,300}Accepted as the production visual style gate/i.test(assetProposalText);
 const openingIdentitySetAccepted = /Opening Built\/Tier-0 identity set v0\.1 disposition[\s\S]{0,300}Accepted by Game Design/i.test(assetProposalText);
+const openingStateContinuityAccepted = /Opening state-continuity v0\.1 disposition[\s\S]{0,300}Accepted by Game Design/i.test(assetProposalText);
 const acceptedBuiltCandidateIDs = new Set([
   ...(tradingPostCandidateAccepted ? ["trading_post"] : []),
   ...(openingIdentitySetAccepted ? ["recycler", "blacksmith", "storehouse", "firepit"] : [])
 ]);
+const acceptedStateCandidateKeys = new Set(openingStateContinuityAccepted ? [
+  "trading_post.foundation", "trading_post.improved", "trading_post.mastered", "trading_post.attention",
+  "firepit.foundation", "firepit.improved", "firepit.mastered", "firepit.attention"
+] : []);
 
 const travellersByID = Object.fromEntries(travellersJSON.travellers.map(item => [item.id, item]));
 const catalogueIDs = stationsJSON.stations.map(station => station.id).sort();
@@ -269,7 +274,7 @@ const stations = stationsJSON.stations.map(station => {
     assetSlots: buildingAuthority ? ["foundation", "built", "improved", "mastered", "attention"].map(state => ({
       key: `${station.id}.${state}`,
       state,
-      status: state === "built" && acceptedBuiltCandidateIDs.has(station.id)
+      status: (state === "built" && acceptedBuiltCandidateIDs.has(station.id)) || acceptedStateCandidateKeys.has(`${station.id}.${state}`)
         ? "Game Design accepted candidate / native integration not yet accepted"
         : station.id === "trading_post" && state === "built" && tradingPostCandidateRejected
           ? "candidate rejected / no accepted built sprite"
