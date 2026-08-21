@@ -2,7 +2,10 @@
 
 **Status:** current destination-ID/order compatibility authority, but its four-tab board presentation and
 damage lifecycle are superseded by `home-house-and-village-current.md`. Native routes may reuse this
-catalogue beneath House/Village hotspots.
+catalogue beneath Binder House, Library and village-district hotspots. **Do not implement the Home/Make/
+Study/Realms board, the separate Bestiary row, House Storehouse placement or any damage lifecycle from this
+compatibility document.** Current player-facing placement is governed only by
+`home-house-and-village-current.md` and `library-shelves-current.md`.
 **Owner:** Game Design; Engineering owns responsive navigation/state; Aimee owns final station
 silhouettes. AssetLab may use labelled functional placeholders for layout/conformance only.  
 **Priority:** P1 spatial-language correction after current blocker checkpoints.
