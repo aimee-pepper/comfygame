@@ -636,7 +636,8 @@ ordinary gear becomes too scarce; do not restore animal-carried equipment to pat
 Each species page shows:
 
 - habitat;
-- straight top-down world/combat morphology;
+- its 16px straight top-down world identity beside the 48px shallow-side encounter/detail identity,
+  both derived from the same frozen morphology rather than redrawn as unrelated animals;
 - covering/appendage/weapon identity;
 - discovered likely material families only after the player has defeated or legitimately analyzed a
   specimen;
@@ -658,8 +659,10 @@ Asset Design receives two bounded proofs after the schema is frozen:
 
 1. **Ecology contact sheet:** at least one aquatic fish-like, shore/amphibious, feathered aerial, membranous
    aerial, scaled/armoured terrestrial, large furred predator and unusual radial/amorphous species, each at
-   world 16px and encounter 48px in color/grayscale. Every profile stays top-down and shares one persisted
-   identity.
+   world 16px and encounter/detail 48px in color/grayscale. The 16px explorable-map profile is straight
+   top-down. The 48px encounter/detail profile uses the already accepted shallow-side combat camera. Both
+   profiles share one persisted identity; camera changes may reveal structure but may not turn them into
+   unrelated animals.
 2. **Creature-material atlas:** every stable family above as a 32px inventory identity in six-across color
    and literal grayscale, including collisions among Feather/Down/Quill, Scale/Plate/Chitin/Shell,
    Fang/Tusk/Horn/Claw and Oil/Venom/Ichor.
