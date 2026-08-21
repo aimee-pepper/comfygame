@@ -559,6 +559,65 @@ final class EncounterScalingIntegrationTests: XCTestCase {
         for diagnostic in first { print("SCALING_PROGRESSION_COMBAT \(diagnostic)") }
     }
 
+    func testSequentialOrdinaryContactsFreezeIndependentReceiptsAndRemainCompletable() throws {
+        let kind = EncounterScalingProgressionFixtureKind.ordinaryThreePerson
+        let store = try GameStore.makeEncounterScalingProgressionFixture(
+            kind: kind, rootSeed: kind.rootSeed)
+        let first = try XCTUnwrap(GameStore.progressionReceipt(
+            kind: kind, rootSeed: kind.rootSeed, from: store))
+
+        store.mutate("run first sequential opening turns") {
+            CombatRules.runAutomaticTurns(in: &$0)
+        }
+        var firstActions = 0
+        while store.activeEncounter?.outcome == nil, firstActions < 100 {
+            guard let action = store.defaultCombatAction() else { break }
+            store.takeCombatAction(action)
+            firstActions += 1
+        }
+        XCTAssertEqual(store.activeEncounter?.outcome, .victory)
+        store.endEncounterIfFinished()
+        XCTAssertNil(store.activeEncounter)
+
+        store.mutate("stage second disclosed scaling contact") { state in
+            guard var run = state.worlds.activeRun,
+                  let trigger = run.enemies.min(by: {
+                      let lhs = abs($0.position.x - run.playerPosition.x)
+                          + abs($0.position.y - run.playerPosition.y)
+                      let rhs = abs($1.position.x - run.playerPosition.x)
+                          + abs($1.position.y - run.playerPosition.y)
+                      return lhs == rhs ? $0.id.rawValue < $1.id.rawValue : lhs < rhs
+                  }) else { return }
+            for point in run.map.allPoints { run.map[point].isRevealed = true }
+            for index in run.enemies.indices { run.enemies[index].isAwake = true }
+            state.worlds.activeRun = run
+            WorldRules.beginEncounter(triggeredBy: trigger,
+                                      runsAutomaticTurns: false, in: &state)
+            CombatRules.runAutomaticTurns(in: &state)
+        }
+        let second = try XCTUnwrap(GameStore.progressionReceipt(
+            kind: kind, rootSeed: kind.rootSeed, from: store))
+        XCTAssertNotEqual(second.foeIDs, first.foeIDs)
+        XCTAssertEqual(second.scalingRulesVersion, first.scalingRulesVersion)
+        XCTAssertEqual(second.partyLevels, first.partyLevels)
+        XCTAssertEqual(second.healthCaps, first.healthCaps)
+        XCTAssertEqual(second.anchorLevel, first.anchorLevel)
+        XCTAssertEqual(second.cappedPartyPowerBudget, first.cappedPartyPowerBudget,
+                       accuracy: 0.000_000_001)
+        XCTAssertEqual(second.worldLevel, first.worldLevel)
+
+        var secondActions = 0
+        while store.activeEncounter?.outcome == nil, secondActions < 100 {
+            guard let action = store.defaultCombatAction() else { break }
+            store.takeCombatAction(action)
+            secondActions += 1
+        }
+        XCTAssertEqual(store.activeEncounter?.outcome, .victory,
+                       "the second intended-Normal contact must remain completable")
+        XCTAssertGreaterThan(firstActions, 0)
+        XCTAssertGreaterThan(secondActions, 0)
+    }
+
     func testFreshBinderAndQuillNormalVersusTeemingDiagnosticDistribution() throws {
         let roots: [UInt64] = [101, 202, 303, 404, 505, 606, 707, 808, 909, 1_010, 1_111, 1_212]
         let normal = try roots.prefix(6).map { try openingSample(rootSeed: $0, teeming: false) }
