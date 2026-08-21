@@ -573,24 +573,27 @@ final class WorldTests: XCTestCase {
     }
 
     @MainActor
-    func testNativeLiftedTerrainRasterMatchesFrozenAssetLabConformanceFixtures() throws {
-        let root = URL(fileURLWithPath: #filePath).deletingLastPathComponent().deletingLastPathComponent()
-        let data = try Data(contentsOf: root.appendingPathComponent("AssetLab/integration/lifted-terrain-v1/manifest.json"))
-        let json = try XCTUnwrap(JSONSerialization.jsonObject(with: data) as? [String: Any])
-        let outputs = try XCTUnwrap(json["outputs"] as? [[String: Any]])
+    func testNativeLiftedTerrainRasterMatchesAcceptedOpaqueSidewallProfile() {
+        // The AssetLab lifted-terrain-v1 pack predates the accepted native correction that gives
+        // every elevated tile an opaque logical footprint and shades its actual column sidewall.
+        // Pin the resulting native raster here; the structural sidewall/opacity assertions live in
+        // TerrainTransitionRenderingTests and must remain green alongside these exact identities.
+        let expected = [
+            "4feb61edf9dc59743ee4f211bcd4a1872de9d1b2d3ceaf3b6a7af1e2e74b8abc",
+            "ed41707efc3839891bc772a910758bdf342cccfe8624c5e0f87d0824c845f661"
+        ]
         let vectors: [(GroundType, Int, UInt32, Int, WorldGrade, Int, Int, Bool)] = [
             (.soil, 15, 82_734_192, 2, WorldGrade(red: 14, green: 3, blue: -12, value: -4), 2, 1, false),
             (.stone, 6, 305_419_896, 3, WorldGrade(red: -22, green: 22, blue: 22, value: -11), 3, 3, true)
         ]
-        XCTAssertEqual(outputs.count, vectors.count)
-        for (output, vector) in zip(outputs, vectors) {
+        XCTAssertEqual(expected.count, vectors.count)
+        for (expectedHash, vector) in zip(expected, vectors) {
             let pixels = MapAssetTestSupport.terrainPixels(ground: vector.0, adjacency: vector.1,
                                                            featureVariant: vector.3, grade: vector.4,
                                                            elevation: vector.5, cracking: vector.7,
                                                            southExposureLevels: vector.6, seed: vector.2)
             let actual = SHA256.hash(data: Data(pixels)).map { String(format: "%02x", $0) }.joined()
-            XCTAssertEqual(actual, output["decodedRgbaSha256"] as? String,
-                           output["id"] as? String ?? vector.0.rawValue)
+            XCTAssertEqual(actual, expectedHash, vector.0.rawValue)
         }
     }
 
@@ -650,6 +653,9 @@ final class WorldTests: XCTestCase {
         run.enemies = [WorldEnemy(id: InstanceID(rawValue: 77), traits: traits, position: point)]
         XCTAssertNil(MinimapDisclosure.marker(at: point, in: run))
         run.enemies[0].isAwake = true
+        XCTAssertNil(MinimapDisclosure.marker(at: point, in: run),
+                     "Moving mobs outside present LOS must stay off the minimap")
+        run.playerPosition = GridPoint(x: point.x - 1, y: point.y)
         XCTAssertEqual(MinimapDisclosure.marker(at: point, in: run), .encounter)
     }
 
