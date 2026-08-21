@@ -59,61 +59,76 @@ Each shelf hotspot includes:
 Do not render five modern full-width navigation cards over a decorative bookcase. Labels support the object;
 they are not the whole interface.
 
-## Derived shelf growth
+## Runtime-composable shelf growth
 
-Growth stage is derived from the underlying collection count; it is never separately purchased or saved.
-For a collection with count `n`, use:
+The Library is assembled from reusable paper, folio, cover, spine, slip and label sprites. Empty, early and
+developed are **test inputs**, not authoritative baked shelf images. The saved game owns only real knowledge;
+a pure presentation adapter emits stable collection/object IDs and counts, and the renderer deterministically
+composes the bookcase every time. Adding one record changes only its owning object or adds its one new volume.
+It never swaps the whole Library to a separately painted state.
+
+Every individual developing object uses this base grammar:
 
 | Count | Stage | Visual form |
 |---:|---:|---|
-| 0 | 0 | empty labelled space or closed silhouette; no fabricated title |
+| 0 | 0 | absent object; the category's fixed physical label and empty shelf remain |
 | 1 | 1 | one folded paper/loose card |
 | 2–3 | 2 | clipped or stitched folio |
 | 4–6 | 3 | thin softbound volume |
 | 7–9 | 4 | substantial hardcover |
 | 10+ | 5 | full hardcover with additional slips/bookmarks; never thicker indefinitely |
 
-For collections whose natural maximum is below ten, normalize these thresholds against the authored maximum
-while preserving the same five nonempty visual stages. The adapter supplies both current count and authored
-maximum; Asset code does not guess maximum from array length.
+Do not normalize these bands differently per diary. A longer late-game diary can remain a developed book for
+longer without making an earlier diary inflate faster. Reusable variants may change spine width, height,
+binding, hue, wear, bands and small geometric motifs, but every choice is seeded by the stable object ID and
+remains readable in grayscale. Colour never discloses identity or meaning by itself.
 
 ### Diary shelf
 
-Every encountered traveller has one stable diary position ordered by authored campaign order. An
-undiscovered traveller has no named spine or silhouette. For one traveller, recovered page count drives the
-stages above: first page is folded paper; later pages become a folio, softbound book and hardcover volume.
-Longer late-game diaries may reach the full stage without changing earlier travellers' thresholds.
+Every legitimately encountered traveller with at least one recovered page has one stable diary object ordered
+by authored campaign order. An undiscovered or zero-page traveller has no named spine or silhouette. That
+traveller's own recovered-page count alone drives loose page → folio → softbound → hardcover → full hardcover.
+Collecting another page grows the same object; encountering another diary adds another independently seeded
+book. When one row no longer fits, deterministic overflow uses a second tight row/stack inside the Diaries
+region; it never drops an owned diary or adds an undiscovered filler spine.
 
-The shelf may show several developing books simultaneously. Tapping the Diaries shelf opens the existing
-six-across traveller-diary collection; tapping a traveller opens their exact page sequence. Missing pages are
-honest blanks within an encountered diary, not invented teaser prose.
+Tapping the Diaries shelf opens the existing six-across traveller-diary collection; tapping a traveller opens
+their exact page sequence. Missing pages are honest blanks within an encountered diary, not invented teaser
+prose.
 
 ### Bestiary shelf
 
-Bestiary root growth uses number of legitimately encountered species. Inside it, habitat folios—Land, Shore,
-Water and Air—appear only when at least one known species belongs there. Deep-water-only sightings may enter
-Water after legitimate visibility; their inaccessible state does not block recording the sighting.
+Bestiary is a real multi-volume set divided into **Land, Shore, Water and Air** families. A habitat family is
+absent at zero legitimately known species. It adds one physical volume for every started group of eight
+species; within the current volume, 1–2 entries use a thin form, 3–5 a medium form and 6–8 a full form. Volume
+number and habitat are physical spine marks and remain distinguishable without colour. Deep-water-only
+sightings may enter Water after legitimate visibility; their inaccessible state does not block recording the
+sighting.
 
 Species remain silhouette-led tiles. Encountering, fighting, defeating and analyzing remain distinct facts;
 the shelf does not turn a sighting into a specimen or expose undiscovered material yields.
 
 ### Dictionary shelf
 
-Growth uses number of encountered rune identities, while known meanings determine how many indexed entries
-are readable. Unknown encountered runes may contribute visible loose tracings marked `??`; they never reveal
-meaning through shelf title, order, colour or accessibility copy.
+Dictionary is exactly three possible indexed volumes for the current 21-rune catalogue. Volume I owns runes
+1–7 in canonical rune order, Volume II owns 8–14, and Volume III owns 15–21. A volume appears when its first
+rune is encountered; its current thickness uses 1–2 / 3–5 / 6–7 encountered-entry bands. Known meanings
+decide readable entry text, not whether the physical entry exists. Unknown encountered runes use a `??`
+slip/mark and never reveal meaning through shelf title, order, colour, motif or accessibility copy.
 
 ### Field Notes shelf
 
-Growth uses distinct saved Field Notes. Opening groups notes by world thumbnail/identity before individual
-note text. This surface consumes the structured truthful note receipt; it does not regenerate prose and does
-not display the old generic “firmer way” sentence.
+Field Notes adds one worn numbered notebook for each started group of eight distinct saved notes. The current
+last notebook thickens at 1–2 / 3–5 / 6–8 entries. Opening groups notes by world thumbnail/identity before
+individual note text. This surface consumes the structured truthful note receipt; it does not regenerate
+prose and does not display the old generic “firmer way” sentence.
 
 ### World History shelf
 
-Growth uses immutable visited-world records. Opening leads with visual world objects/thumbnails and concrete
-receipts, not a full-width prose ledger. Anchored Realm management remains elsewhere; History records it but
-does not become its control panel.
+World History adds one numbered atlas volume for each started group of eight immutable visited-world records.
+The current last atlas thickens at 1–2 / 3–5 / 6–8 records. Opening leads with visual world
+objects/thumbnails and concrete receipts, not a full-width prose ledger. Anchored Realm management remains
+elsewhere; History records it but does not become its control panel.
 
 ## New-content attention
 
@@ -136,24 +151,32 @@ populated shelf, not over the room before a shelf is chosen.
 
 ## Asset Design packet
 
-1. Ordinary 368×800 Library root with all five shelf hotspots, labels and counts.
-2. Empty, early and developed variants driven by one exact collection receipt set.
-3. One traveller diary shown at folded page, stitched folio, softbound, hardcover and full-volume stages.
-4. Bestiary Water folio with shallow and deep-water sightings, without implying both are reachable combat.
-5. One shelf attention state and checked state in color and grayscale/value.
-6. Collision overlay proving all shelf targets and labels remain distinct.
+1. One empty 184×260 logical bookcase shell with all five fixed shelf hotspots/labels and no fabricated
+   contents.
+2. Reusable loose/folded page, stitched folio, softbound, hardcover, full-hardcover-with-slips and varied
+   spine/volume sprites at native and 400%; stable IDs control variants.
+3. A deterministic compositor/manifest with bounded shelf sockets. Empty, early and developed 368×800 proofs
+   are rendered from input records rather than stored state bitmaps.
+4. Per-traveller Diary fixtures proving one page-count change mutates only that diary and one new traveller
+   adds exactly one independently seeded object.
+5. Bestiary habitat-volume boundaries 8→9 and Dictionary boundary 7→8, including a Water volume with shallow
+   and deep-water sightings without implying both are reachable combat.
+6. Independent shelf attention and checked states in colour and grayscale/value.
+7. Collision/disclosure overlay proving targets, labels, owned objects and empty undiscovered space remain
+   distinct.
 
 Asset Design may not add a sixth shelf, research tree, fabricated book title, undiscovered traveller/species
 or new knowledge type to balance the composition.
 
 ## Engineering checkpoints
 
-1. Add one pure `LibraryShelfPresentation` adapter deriving stable shelf ID, real count, authored maximum,
-   growth stage, attention count and enabled route from current state.
+1. Add one pure `LibraryShelfPresentation` adapter deriving stable shelf and collection-object IDs, canonical
+   order, exact counts/volume numbers, form stage, attention count and enabled route from current state.
 2. Move the Bestiary route under Library while preserving its stable destination, deep links and Back state.
 3. Implement per-traveller Diary growth from recovered-page counts; no separate visual-stage persistence.
 4. Add shelf-level unchecked-content receipts using the shared attention-event semantics.
-5. Integrate the functional close-up bookcase asset behind a reversible DEBUG route, then promote after phone proof.
+5. Integrate the empty bookcase shell, reusable collection sprites and deterministic compositor behind a
+   reversible DEBUG route; do not package empty/early/developed as three state images.
 6. Convert shelf collection children to the settled icon/object grammar without rewriting their domain rules.
 
 ## Acceptance

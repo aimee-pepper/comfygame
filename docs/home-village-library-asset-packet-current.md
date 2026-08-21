@@ -192,34 +192,50 @@ All five identities, labels, counts and 44×44-or-larger ownership regions are v
 viewport. If this composition fails native readability, Asset Lead may submit exactly one alternate fixed
 five-shelf arrangement; it may not add scrolling, tabs or a sixth category.
 
-### Derived growth states
+### Runtime-composable collection kit
 
-Use the exact real-count stages:
+The Library must not ship as separate empty/early/developed shelf snapshots. Produce one empty bookcase shell,
+reusable paper/folio/cover/spine/volume sprites and deterministic placement sockets. Empty, early and developed
+remain review fixtures rendered from input records through that compositor.
+
+Use these exact per-object stages:
 
 | Count | Form |
 |---:|---|
-| 0 | empty labelled space; no fabricated book/title |
+| 0 | object absent; fixed shelf label and empty space remain |
 | 1 | folded page or loose card |
 | 2–3 | stitched/clipped folio |
 | 4–6 | thin softbound volume |
 | 7–9 | substantial hardcover |
 | 10+ | full hardcover with restrained slips/bookmarks |
 
-For an individual Diary, the traveller's own recovered pages drive the form. Total pages from other people
-cannot thicken it. Undiscovered travellers have no name/spine. Late diaries may reach full form without
-changing earlier thresholds.
+For Diaries, one legitimately recovered traveller diary creates one independently stable object in authored
+campaign order. That traveller's own pages grow it through the stages; more diaries add more books. Total
+pages from other people cannot thicken it, and undiscovered/zero-page travellers have no spine. If one row
+fills, use deterministic second-row/stack overflow inside the Diaries region without hiding owned books.
+
+Bestiary is a multi-volume set: separate Land, Shore, Water and Air families, absent at zero; one new volume
+per started group of eight legitimately known species, with the current volume thin at 1–2, medium at 3–5 and
+full at 6–8. Dictionary has exactly three possible volumes covering canonical runes 1–7, 8–14 and 15–21;
+each appears at its first encountered rune and thickens at 1–2, 3–5 and 6–7 entries. Unknown meanings remain
+`??`. Field Notes and World History add one numbered notebook/atlas per started group of eight and thicken the
+current volume at 1–2, 3–5 and 6–8.
 
 ### Required Library fixtures
 
-1. **Empty opening:** all shelf labels visible; no fake collection contents.
-2. **Early:** one traveller folded page; one known creature; two encountered runes including one `??`; one
+1. **Reusable-assets contact sheet:** native/400% page, folio, cover and varied spine/volume pieces; no whole
+   state bitmap presented as integration authority.
+2. **Empty opening:** all shelf labels visible; no fake collection contents.
+3. **Early:** one traveller folded page; one known creature; two encountered runes including one `??`; one
    Field Note; one World History record.
-3. **Developed:** at least five traveller diaries at different page-count stages; populated Land/Water
+4. **Developed:** at least five traveller diaries at different page-count stages; populated habitat
    Bestiary folios; developed Dictionary/Notes/History.
-4. **Attention:** new Diary and Bestiary content create one restrained warm-gold shelf rim/count; entering
+5. **Volume boundaries:** Bestiary 8→9 and Dictionary 7→8 add exactly one volume; input order does not alter
+   canonical output.
+6. **Attention:** new Diary and Bestiary content create one restrained warm-gold shelf rim/count; entering
    the room alone does not show a checked state.
-5. **Grayscale/value:** every shelf and growth form remains distinguishable without hue.
-6. **Disclosure:** unknown rune remains `??`; undiscovered person/species does not appear; deep-water sighting
+7. **Grayscale/value:** every shelf and growth form remains distinguishable without hue.
+8. **Disclosure:** unknown rune remains `??`; undiscovered person/species does not appear; deep-water sighting
    may appear under Water but carries no combat/harvest implication.
 
 The Library does not contain a separate top-level Bestiary hotspot elsewhere. Constellation is not one of the

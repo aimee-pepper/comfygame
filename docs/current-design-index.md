@@ -160,7 +160,8 @@ When two documents disagree:
 | Creature ecology and materials | `creature-ecology-and-materials-overhaul-current.md` | Habitat-aware pressure-generated life including deep water; body-derived Creature materials and rare encounter-level territory gear |
 | Earlier loot quality hybrid review | `loot-quality-hybrid-review-current.md` | Historical first candidate; superseded for current review by the crafting-intuition audit |
 | Crafting intuition and quality review | `crafting-intuition-and-quality-review-current.md` | Settled six bands, 70/30 component weighting, no hard station cap and Refitting; complete ComponentProfile/schematic tables still required before implementation |
-| Library shelves | `library-shelves-current.md` | Library-room root, Bestiary shelf, five growing collections and per-diary folded-page→hardcover progression |
+| Library shelves | `library-shelves-current.md` | Close-up Library root, reusable runtime-composed collection assets, habitat/Dictionary volumes and per-diary page→book progression |
+| Internal Game Wiki | `game-wiki-content-contract-current.md` | Required route depth, catalogue/resource taxonomy, stable detail pages and automatic no-placeholder completeness gates |
 | World-resource extraction | `resource-extraction-progression-current.md` | Equipped Field Pick ranks; disclosed Gold progression; complete mineral table and no-deadlock Iron |
 | Essence refining progression audit | `essence-refining-progression-audit-current.md` | Review-only correction removing the paid quantity-control toll and earning 3:1 through demonstrated baseline refining |
 | Compound assembly / station trees | `compound-assembly-station-trees-current.md` | Proven-statement receipts, Scriptorium formalization, frozen personal compounds and Penmanship topology |
