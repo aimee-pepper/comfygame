@@ -83,19 +83,23 @@ function stationDetail(slug) {
   const station = data.stations.find(item => item.slug === slug);
   if (!station) return notFound();
   const cost = station.buildCost.length ? `<div class="cost">${station.buildCost.map(part => `<span>${escapeHTML(part.quantity)} ${escapeHTML(titleCase(part.id))}</span>`).join("")}</div>` : "No construction charge in the live catalogue.";
+  const progression = station.forms.length ? `<h2>Built, Improved and Mastered</h2><div class="progression-grid">${station.forms.map(form => `<article class="card"><div>${form.authorityLabels.map(badge).join("")}</div><h3>${escapeHTML(titleCase(form.state))} · Tier ${form.tier}${form.name !== titleCase(form.state) ? ` — ${escapeHTML(form.name)}` : ""}</h3><p><strong>Capability:</strong> ${escapeHTML(form.capability)}</p><p><strong>Physical referent:</strong> ${escapeHTML(form.visualReferent)}</p></article>`).join("")}</div>` : station.progressionNote ? `<h2>Destination progression</h2><div class="card">${station.id === "constellation" ? badge("proposed / review-gated") : badge("authored presentation")}<p>${escapeHTML(station.progressionNote)}</p></div>` : "";
+  const constellation = station.constellationProposal.length ? `<h2>Constellation proposal</h2><div class="grid">${station.constellationProposal.map(star => `<article class="card">${badge(star.status)}${badge(star.cluster)}<h3>${escapeHTML(star.name)}</h3><p><code>${escapeHTML(star.id)}</code> · ${escapeHTML(star.cost)}</p><p>${escapeHTML(star.permission)}</p><p><strong>Blocked while:</strong> ${escapeHTML(star.blocker)}</p></article>`).join("")}</div><p class="empty">The six mastery stars are proposed and review-gated, not implemented. Long Instruction remains the existing authored star.</p>` : "";
+  const visualKey = station.visualKey ? `<h2>Production visual key</h2><div class="facts"><dl class="fact"><dt>Foundation clue</dt><dd>${escapeHTML(station.visualKey.foundation)}</dd></dl><dl class="fact"><dt>Built silhouette</dt><dd>${escapeHTML(station.visualKey.builtKey)}</dd></dl><dl class="fact"><dt>Materials / accents</dt><dd>${escapeHTML(station.visualKey.materials)}</dd></dl><dl class="fact"><dt>Protected continuity</dt><dd>${escapeHTML(station.visualKey.protectedFeatures)}</dd></dl><dl class="fact"><dt>Must not converge with</dt><dd>${escapeHTML(station.visualKey.exclusions)}</dd></dl></div>` : "";
   return header("Live station", station.name, station.blurb) +
     `<div class="facts">
       <dl class="fact"><dt>Stable ID</dt><dd>${escapeHTML(station.id)}</dd></dl>
       <dl class="fact"><dt>Destination kind</dt><dd>${escapeHTML(titleCase(station.destinationKind))}</dd></dl>
       <dl class="fact"><dt>Zone</dt><dd>${escapeHTML(station.zone)}</dd></dl>
       <dl class="fact"><dt>Lifecycle</dt><dd>${escapeHTML(station.lifecycle)}</dd></dl>
-      <dl class="fact"><dt>Keeper / builder</dt><dd>${escapeHTML(station.keeper ?? "None authored")}</dd></dl>
-      <dl class="fact"><dt>Catalogue maxTier</dt><dd>${escapeHTML(station.catalogueMaxTier)}</dd></dl>
+      <dl class="fact"><dt>Keeper / build authority</dt><dd>${escapeHTML(station.keeperAuthority)}</dd></dl>
+      <dl class="fact"><dt>Catalogue maxTier</dt><dd>${escapeHTML(station.catalogueMaxTier)} · non-semantic legacy field</dd></dl>
       <dl class="fact"><dt>Disposition</dt><dd>${escapeHTML(station.disposition)}</dd></dl>
     </div>
     <h2>Construction</h2><div class="card">${cost}${station.buildBlurb ? `<p>${escapeHTML(station.buildBlurb)}</p>` : ""}</div>
     <h2>Upgrade authority</h2><div class="card">${badge(station.upgradeAuthorityStatus)}<p>${escapeHTML(station.upgradeNote)}</p>${station.upgradeAuthoritySourcePaths.length ? `<p><code>${station.upgradeAuthoritySourcePaths.map(escapeHTML).join(" · ")}</code></p>` : ""}</div>
-    <h2>Sprite evidence</h2><div class="sprite-slots"><div class="sprite-slot">Built sprite<br>not registered</div><div class="sprite-slot">Improved sprite<br>not registered</div></div>
+    ${progression}${constellation}${visualKey}
+    ${station.assetSlots.length ? `<h2>Stable asset slots</h2><div class="sprite-slots">${station.assetSlots.map(slot => `<div class="sprite-slot"><code>${escapeHTML(slot.key)}</code><br>${escapeHTML(slot.status)}</div>`).join("")}</div>` : ""}
     ${provenance(station)}<p>${hashLink("village-buildings", "← All destinations")}</p>`;
 }
 
@@ -120,7 +124,7 @@ function history() {
 }
 
 function assets() {
-  return header("Evidence only", "Asset Gallery", "Only committed and accepted art may appear as final. Review evidence must be labelled; missing art stays missing.") + `<div class="empty"><strong>No accepted art registered for this slice.</strong><p>${escapeHTML(data.assetGallery.note)}</p></div>`;
+  return header("Evidence only", "Asset Gallery", "Only committed and accepted art may appear as final. Rejected pixels stay absent; stable slots remain inspectable.") + `<div class="empty"><strong>No accepted building art registered.</strong><p>${escapeHTML(data.assetGallery.note)}</p></div><div class="grid">${data.assetGallery.slots.map(slot => `<article class="card"><h3><code>${escapeHTML(slot.key)}</code></h3>${badge(slot.status)}<p>${slot.assetPath ? escapeHTML(slot.assetPath) : "No accepted asset path."}</p></article>`).join("")}</div>`;
 }
 
 function notFound() { return header("404", "Page not found", "This internal route is not registered."); }

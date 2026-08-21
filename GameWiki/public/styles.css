@@ -49,7 +49,8 @@ h3 { margin: 0 0 8px; font-size: 17px; }
 .cost span { padding: 5px 8px; background: #efe0b9; border: 1px solid #c3a26f; }
 .provenance { margin-top: 28px; padding: 14px; color: #5b4b3f; background: #e9dcc0; border-left: 4px solid var(--accent); font-size: 12px; overflow-wrap: anywhere; }
 .empty { padding: 24px; color: var(--muted); background: rgba(255,248,229,.62); border: 2px dashed #aa906b; }
-.sprite-slots { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.progression-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.sprite-slots { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; }
 .sprite-slot { min-height: 130px; display: grid; place-items: center; color: var(--muted); background: #ddd0b2; border: 2px dashed #9c8667; text-align: center; }
 .search-results { margin-top: 12px; background: #171310; border: 1px solid #76644f; }
 .search-results a { display: block; padding: 9px; color: #f5e8c7; text-decoration: none; border-bottom: 1px solid #3e342b; }
@@ -69,6 +70,7 @@ th { background: var(--paper-2); }
   .topline { display: block; }
   .stamp { display: inline-block; margin-top: 14px; }
   .grid { grid-template-columns: 1fr; }
+  .progression-grid { grid-template-columns: 1fr; }
   .sprite-slots { grid-template-columns: 1fr; }
   h1 { font-size: 36px; }
 }

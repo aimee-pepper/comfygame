@@ -14,10 +14,12 @@ const coreInputs = [
   "Sources/Content/Data/items.json",
   "Sources/Content/Data/symbols.json",
   "Sources/Content/Data/playability-roadmap.json",
+  "docs/asset-system-proposal.md",
   "docs/current-design-index.md",
   "docs/station-integration-matrix-current.md",
   "docs/home-house-and-village-current.md",
-  "GameWiki/config/station-authority-map.json"
+  "docs/home-village-library-asset-packet-current.md",
+  "docs/village-progression-and-asset-matrix-current.md"
 ];
 
 const sha = value => createHash("sha256").update(value).digest("hex");
@@ -44,6 +46,101 @@ function titleOf(markdown, fallback) {
 
 function statusOf(markdown) {
   return markdown.match(/^\*\*Status:\*\*\s*(.+)$/m)?.[1]?.trim() ?? "unlabelled";
+}
+
+const cleanMarkdown = value => String(value).replace(/\*\*/g, "").replace(/`/g, "").trim();
+
+function markdownTableAfter(markdown, heading) {
+  const start = markdown.indexOf(heading);
+  if (start < 0) throw new Error(`Missing matrix heading: ${heading}`);
+  const lines = markdown.slice(start + heading.length).split("\n");
+  const rows = [];
+  let inTable = false;
+  for (const line of lines) {
+    if (!line.startsWith("|")) {
+      if (inTable) break;
+      continue;
+    }
+    inTable = true;
+    const cells = line.split("|").slice(1, -1).map(cleanMarkdown);
+    if (cells.every(cell => /^-+$/.test(cell)) || cells[0] === "Stable ID" || cells[0] === "Stable purchase ID" || cells[0] === "Destination" || cells[0] === "Form") continue;
+    rows.push(cells);
+  }
+  return rows;
+}
+
+function destinationKind(raw) {
+  const normalized = raw.toLowerCase().replace(/[–—]/g, "-").trim();
+  const kinds = {
+    "village building": "villageBuilding",
+    "house room": "houseRoom",
+    "house interface": "houseInterface",
+    "house-yard feature": "houseYardFeature",
+    "library shelf": "libraryShelf",
+    "progression surface": "progressionSurface",
+    "removed compatibility": "removedCompatibility"
+  };
+  if (!kinds[normalized]) throw new Error(`Unknown canonical destination kind: ${raw}`);
+  return kinds[normalized];
+}
+
+function parseCanonicalDestinations(markdown) {
+  return markdownTableAfter(markdown, "### Canonical destination register").map(([stableID, playerName, kind, exactPlace, keeperAuthority]) => ({
+    id: stableID,
+    playerName,
+    destinationKind: destinationKind(kind),
+    exactPlace,
+    keeperAuthority
+  }));
+}
+
+function parseBuildingForms(markdown, destination) {
+  const sections = [...markdown.matchAll(/^####\s+(.+)$/gm)].map((match, index, all) => ({
+    heading: cleanMarkdown(match[1]),
+    body: markdown.slice(match.index + match[0].length, all[index + 1]?.index ?? markdown.length)
+  }));
+  const candidateNames = [destination.playerName.split("/")[0].trim(), destination.playerName.split("→")[0].trim()];
+  const section = sections.find(item => candidateNames.some(name => item.heading.toLowerCase().startsWith(name.toLowerCase())));
+  if (!section) throw new Error(`Missing building form section for ${destination.id}`);
+  const purpose = cleanMarkdown(section.body.match(/^\*\*Purpose:\*\*\s*([\s\S]*?)(?=\n\n\| Form)/m)?.[1] ?? "").replace(/\s+/g, " ");
+  const forms = markdownTableAfter(section.body, "| Form | Player capability | Required physical change |").map(([form, capability, visualReferent]) => {
+    const match = form.match(/^(Built|Improved|Mastered) · Tier ([012])(?: — (.+))?$/);
+    if (!match) throw new Error(`Invalid form row for ${destination.id}: ${form}`);
+    const explicitTuning = /\b(recommended|tuning)\b/i.test(capability);
+    return {
+      state: match[1].toLowerCase(),
+      tier: Number(match[2]),
+      name: cleanMarkdown(match[3] ?? match[1]),
+      capability: cleanMarkdown(capability),
+      visualReferent: cleanMarkdown(visualReferent),
+      authorityLabels: explicitTuning ? ["authored", "playtest tuning"] : ["authored"]
+    };
+  });
+  if (forms.length !== 3) throw new Error(`Expected three forms for ${destination.id}; found ${forms.length}`);
+  return { purpose, forms };
+}
+
+function parseVisualKeys(markdown) {
+  return Object.fromEntries(markdownTableAfter(markdown, "### Per-building visual key").map(([stableID, foundation, builtKey, materials, protectedFeatures, exclusions]) => [stableID, {
+    foundation, builtKey, materials, protectedFeatures, exclusions
+  }]));
+}
+
+function parseNonBuildingProgression(markdown) {
+  return Object.fromEntries(markdownTableAfter(markdown, "## 4. Non-building destination progression").map(([name, authority]) => [name.toLowerCase(), authority]));
+}
+
+function parseConstellationProposal(markdown) {
+  const permissions = Object.fromEntries(markdownTableAfter(markdown, "### Recommended Constellation shape").map(([cluster, name, cost, permission]) => [name, { cluster, cost, permission }]));
+  return markdownTableAfter(markdown, "### Stable purchase contract and graph layout").map(([id, name, blocker]) => ({
+    id,
+    name,
+    blocker,
+    cluster: permissions[name]?.cluster ?? "Centre",
+    cost: permissions[name]?.cost ?? "current authored cost",
+    permission: permissions[name]?.permission ?? "+1 Gambit rule capacity; not part of either trio",
+    status: id === "existing stable ID" ? "implemented" : "proposed / review-gated"
+  }));
 }
 
 function linkedCurrentAuthorities(index) {
@@ -88,6 +185,7 @@ const authorityPaths = [...new Set([
   "docs/current-design-index.md",
   "docs/station-integration-matrix-current.md",
   "docs/home-house-and-village-current.md",
+  "docs/village-progression-and-asset-matrix-current.md",
   ...linkedAuthorities
 ])].sort();
 const allInputs = [...new Set([...coreInputs, ...authorityPaths, ...historyPaths])].sort();
@@ -106,16 +204,34 @@ const resourcesJSON = JSON.parse(contents["Sources/Content/Data/resources.json"]
 const itemsJSON = JSON.parse(contents["Sources/Content/Data/items.json"]);
 const symbolsJSON = JSON.parse(contents["Sources/Content/Data/symbols.json"]);
 const roadmapJSON = JSON.parse(contents["Sources/Content/Data/playability-roadmap.json"]);
-const stationMap = JSON.parse(contents["GameWiki/config/station-authority-map.json"]);
+const matrixPath = "docs/village-progression-and-asset-matrix-current.md";
+const matrixText = contents[matrixPath];
+const destinationRegister = parseCanonicalDestinations(matrixText);
+const destinationsByID = Object.fromEntries(destinationRegister.map(destination => [destination.id, destination]));
+const visualKeysByID = parseVisualKeys(matrixText);
+const nonBuildingProgression = parseNonBuildingProgression(matrixText);
+const constellationProposal = parseConstellationProposal(matrixText);
+const assetProposalText = contents["docs/asset-system-proposal.md"];
+const tradingPostCandidateRejected = /Trading Post Tier-0 v0\.1 disposition[\s\S]{0,300}Rejected as the production pixel gate/i.test(assetProposalText);
+const tradingPostCandidateAccepted = /Trading Post Tier-0 v0\.3 disposition[\s\S]{0,300}Accepted as the production visual style gate/i.test(assetProposalText);
 
 const travellersByID = Object.fromEntries(travellersJSON.travellers.map(item => [item.id, item]));
-const stationSources = stationMap.sources;
+const catalogueIDs = stationsJSON.stations.map(station => station.id).sort();
+const registerIDs = destinationRegister.map(destination => destination.id).sort();
+if (JSON.stringify(catalogueIDs) !== JSON.stringify(registerIDs)) throw new Error("Canonical destination register does not exactly cover stations.json");
+const villageBuildingIDs = destinationRegister.filter(destination => destination.destinationKind === "villageBuilding").map(destination => destination.id).sort();
+if (villageBuildingIDs.length !== 17) throw new Error(`Expected 17 canonical village buildings; found ${villageBuildingIDs.length}`);
+if (JSON.stringify(villageBuildingIDs) !== JSON.stringify(Object.keys(visualKeysByID).sort())) throw new Error("Per-building visual-key table does not exactly cover the 17 village buildings");
+
+const stationSources = ["Sources/Content/Data/stations.json", matrixPath, "docs/station-integration-matrix-current.md", "docs/home-house-and-village-current.md"];
 const stations = stationsJSON.stations.map(station => {
-  const keeperID = stationMap.keepers[station.id] ?? station.builtBy ?? null;
+  const destination = destinationsByID[station.id];
+  const keeperID = station.builtBy ?? null;
   const keeper = keeperID ? travellersByID[keeperID]?.name ?? keeperID : null;
-  const disposition = stationMap.dispositions[station.id] ?? stationsJSON._authority.defaultDisposition;
-  const zoneAuthority = stationMap.zones[station.id] ?? null;
-  const upgradeAuthority = stationMap.upgradeAuthority[station.id] ?? { status: "unaudited", sourcePaths: [] };
+  const disposition = destination.destinationKind === "removedCompatibility" ? "removed" : /review-gated/i.test(destination.keeperAuthority) ? "provisional" : stationsJSON._authority.defaultDisposition;
+  const buildingAuthority = destination.destinationKind === "villageBuilding" ? parseBuildingForms(matrixText, destination) : null;
+  const progressionNote = nonBuildingProgression[destination.playerName.toLowerCase()] ?? null;
+  const upgradeAuthorityStatus = buildingAuthority ? "authored" : destination.destinationKind === "progressionSurface" ? "partial" : "none";
   return {
     type: "station",
     id: station.id,
@@ -123,23 +239,38 @@ const stations = stationsJSON.stations.map(station => {
     name: station.name,
     blurb: station.blurb,
     route: station.route,
-    destinationKind: stationMap.destinationKinds[station.id],
-    zone: zoneAuthority?.label ?? "District not yet assigned",
-    zoneDisposition: zoneAuthority ? disposition : "provisional",
-    zoneSourcePaths: zoneAuthority?.sourcePaths ?? [],
+    destinationKind: destination.destinationKind,
+    zone: destination.exactPlace,
+    zoneDisposition: disposition,
+    zoneSourcePaths: [matrixPath],
     lifecycle: stationLifecycle(station),
     keeper,
     keeperID,
+    keeperAuthority: destination.keeperAuthority,
     unlockedAtStart: station.unlockedAtStart,
     startingTier: station.startingTier,
     catalogueMaxTier: station.maxTier,
     buildCost: costParts(station.buildCost),
     buildBlurb: station.buildBlurb ?? null,
     disposition,
-    upgradeAuthorityStatus: upgradeAuthority.status,
-    upgradeAuthoritySourcePaths: upgradeAuthority.sourcePaths,
-    upgradeNote: upgradeAuthority.status === "unaudited" ? "Upgrade track not yet mapped in wiki." : upgradeAuthority.status === "partial" ? "A named current authority describes part of this track; the wiki does not claim a complete upgrade model." : upgradeAuthority.status === "none" ? "No upgrade track applies under the named current authority." : "A named current authority describes this upgrade track.",
-    sprites: { built: null, improved: null },
+    upgradeAuthorityStatus,
+    upgradeAuthoritySourcePaths: upgradeAuthorityStatus === "none" ? [matrixPath] : [matrixPath, ...(destination.destinationKind === "progressionSurface" ? ["docs/workshop-constellation-role-audit-current.md"] : [])],
+    upgradeNote: buildingAuthority ? "Canonical Built, Improved and Mastered forms are authored in the village matrix; explicitly marked numbers remain playtest tuning." : destination.destinationKind === "progressionSurface" ? "The proposed 3+3 mastery-star expansion is review-gated and not implemented; preserve the current route meanwhile." : "No village-building upgrade track applies to this destination kind.",
+    progressionNote,
+    purpose: buildingAuthority?.purpose ?? null,
+    forms: buildingAuthority?.forms ?? [],
+    visualKey: visualKeysByID[station.id] ?? null,
+    constellationProposal: station.id === "constellation" ? constellationProposal : [],
+    assetSlots: buildingAuthority ? ["foundation", "built", "improved", "mastered", "attention"].map(state => ({
+      key: `${station.id}.${state}`,
+      state,
+      status: station.id === "trading_post" && state === "built" && tradingPostCandidateAccepted
+        ? "Game Design accepted candidate / native integration not yet accepted"
+        : station.id === "trading_post" && state === "built" && tradingPostCandidateRejected
+          ? "candidate rejected / no accepted built sprite"
+          : "reserved",
+      assetPath: null
+    })) : [],
     provenance: provenance(stationSources, station.id, disposition, hashes, aggregateHash)
   };
 });
@@ -204,7 +335,8 @@ const wikiData = {
   assetGallery: {
     acceptedAssets: [],
     reviewEvidence: [],
-    note: "No committed asset has been registered for this wiki slice. Rejected or uncommitted House/Library work is intentionally absent."
+    slots: stations.filter(station => station.destinationKind === "villageBuilding").flatMap(station => station.assetSlots),
+    note: "No accepted building pixels are registered. Rejected and uncommitted candidates are not displayed; stable building/state slots remain reserved for reviewed assets."
   }
 };
 const manifest = {
