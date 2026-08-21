@@ -5084,3 +5084,18 @@ opaque RGB colors), no gradient/antialias residue or arbitrary sampled speckle, 
 readability. Remove the chimney/domestic dormer so the commercial awning/frontage dominates in isolation.
 Preserve the accepted composition and palette roles. No second building or later state begins before v0.2
 passes.
+
+#### Trading Post Tier-0 v0.2 disposition
+
+**Logical-pixel contract passed; visual style gate still open.** V0.2 correctly moved production authority
+to an exact 96×80 bitmap with binary alpha and 48 opaque colors, removed the domestic chimney/dormer, and
+preserved the strong merchant frontage. The replacement roof, however, became three broad near-black
+horizontal slabs. It reads like a kiosk cap or UI rectangle instead of constructed village architecture and
+reintroduces the placeholder-mass problem the style gate exists to prevent. Dense background values also
+weaken the balance and ledger in grayscale.
+
+V0.3 must retain the exact logical-pixel contract and merchant composition while replacing the slab with a
+low stepped/pitched slate-and-wood lean-to or shallow hipped roof: visible overhang, limited tile/value
+clusters and support joinery, subordinate to the awning, with no domestic attic/chimney. Quiet the pixels
+behind the balance and ledger enough for both appraiser anchors to read in grayscale. The flat Commerce Row
+placement remains scale evidence only, not accepted district art.

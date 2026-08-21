@@ -3,9 +3,11 @@
 **Status:** implementation and asset authority for destination type, district placement, building
 progression, and the visual identity of the Binder House, Library root, and village stations.
 Numeric costs and capacity values remain debug tuning. The six-star Constellation arrangement is the
-current Game Design recommendation pending Aimee's direct review; every other rule below may proceed
-without depending on that final price/gate choice. In particular, building capabilities and art may proceed;
-the new district-mastery purchase/gating consumer may not ship before that review.
+current Game Design recommendation pending Aimee's direct review. Destination identity, geography, the
+three-form ladder and the checkpointed art plan may proceed without that final price/gate choice. A gameplay
+tier enters Engineering only when its named downstream recipe/action/consumer authority is complete; this
+matrix never turns broad future content into an implementation assignment. The new district-mastery
+purchase/gating consumer may not ship before Aimee's review.
 
 **Owners:** Game Design owns purpose, geography, tiers, state changes and required visual referents;
 Asset Design owns finished pixel execution within this matrix; Engineering owns saved receipts,
@@ -173,7 +175,7 @@ caravan route map or piles of treasure. The player should read “merchant who h
 |---|---|---|
 | Built · Tier 0 | Exact preview and 40% recovery floor/profile route; player chooses among eligible recorded outputs | Open-sided salvage workshop with a long sorting bench, hand vise/separation jig, parts laid in removal order, shallow labelled bins and a rack of intact tools |
 | Improved · Tier 1 — **Fine Separation Bench** | 55% recovery and the diary-taught Field Separation Kit uses this efficiency | Same structure gains a lit precision bench, small clamps, divided drawers and a hanging sequence rack; no industrial conveyor |
-| Mastered · Tier 2 — **Ordered Recovery** | 70% recovery; the preview may prioritize one selected eligible component without changing provenance or exceeding capacity | Same building gains a modest overhead hand hoist, second clean table and more finely divided storage; original bench and vise stay recognizable |
+| Mastered · Tier 2 — **Ordered Recovery** | 70% recovery; selection/provenance/capacity rules remain exactly the same rather than inventing a second priority mode | Same building gains a modest overhead hand hoist, second clean table and more finely divided storage; original bench and vise stay recognizable |
 
 **Never depict:** recycling arrows, trash piles, incinerator, crusher, scrapyard chaos, modern factory,
 smelter or Blacksmith forge. Noll separates and records; they do not melt provenance away.
@@ -196,9 +198,9 @@ smelter or Blacksmith forge. Noll separates and records; they do not melt proven
 
 | Form | Player capability | Required physical change |
 |---|---|---|
-| Built · Tier 0 | Supple coat, working gloves/boots and first post-starter satchel project | Ventilated timber shed with stretching frames, scraping beam, wash tubs, hanging flexible sheets/cords and covered drying rack; clean craft, not gore |
-| Improved · Tier 1 — **Carry Frames** | Second satchel project plus advanced bindings/linings and flexible Storehouse fittings | Same shed gains reinforced stitching table, shaped pack frames, additional covered rack and organized rolls |
-| Mastered · Tier 2 — **Travelling Work** | Final satchel project and masterwork flexible field-gear schematics | Same footprint gains a lofted drying rail, fitted mannequin/pack stand and fine-tool cabinet; materials stay protected from rain |
+| Built · Tier 0 | Supple coat, working gloves/boots and the Wear/Carry/Keep roots; the two early general satchel reinforcements remain available at Storehouse before Corrin | Ventilated timber shed with stretching frames, scraping beam, wash tubs, hanging flexible sheets/cords and covered drying rack; clean craft, not gore |
+| Improved · Tier 1 — **Carry Frames** | The one advanced **Satchel, deepened** project after both early reinforcements, plus advanced bindings/linings and flexible Storehouse fittings | Same shed gains reinforced stitching table, shaped pack frames, additional covered rack and organized rolls |
+| Mastered · Tier 2 — **Travelling Work** | Masterwork flexible field-gear schematics and fit/refitting choices; no fourth satchel rung | Same footprint gains a lofted drying rail, fitted mannequin/pack stand and fine-tool cabinet; materials stay protected from rain |
 
 #### Bowyer — Fen
 
@@ -279,7 +281,7 @@ Creature materials stack in their reserves and never consume item slots.
 
 | Form | Player capability | Required physical change |
 |---|---|---|
-| Built · Tier 0 | 16 item stacks plus ordinary resources/material reserves and Waiting | Timber-and-stone warehouse with broad double doors, visible shelving, sacks/crates, covered loading apron and manual hoist |
+| Built · Tier 0 | 16 item stacks plus ordinary resources/material reserves and Waiting; the first two ordinary satchel-reinforcement projects are available here before Corrin | Timber-and-stone warehouse with broad double doors, visible shelving, sacks/crates, covered loading apron, manual hoist and a small packing bench/roll rack |
 | Improved · Tier 1 — **Ordered Shelving** | Recommended 28 item stacks; exact +12 remains tuning | Same warehouse gains a side shelving bay, taller labelled racks and second loading door |
 | Mastered · Tier 2 — **Receiving Annex** | Recommended 40 item stacks; exact +12 remains tuning | Same structure gains connected annex, stronger hoist and covered receiving bay; not an infinitely taller tower |
 
@@ -294,7 +296,7 @@ No existing save loses capacity.
 |---|---|---|
 | Built · Tier 0 — Firepit | Safe place for recruited people before any keeper building exists | Open communal stone hearth, broad low fire, log/stone benches, kettle hook and windbreak; no tiny altar flame under a roof |
 | Improved · Tier 1 — Tavern | Rotating visitors, ordinary rest and three visitor seats | A timber open hall is constructed around the **same central hearth**, with smoke hood, long table, benches, serving shelf and sheltered sleeping alcove |
-| Mastered · Tier 2 — **Guest Wing** | One additional visitor seat and one visitor may remain through the next expedition refresh; deeper clue/rest benefits remain authored, not random bonuses | Same Tavern gains a side guest room/loft, larger notice board and longer table; central hearth and original windbreak stones remain visible |
+| Mastered · Tier 2 — **Guest Wing** | The settled three-seat limit remains; the player may hold one current visitor through the next expedition refresh. Deeper clue/rest benefits remain authored, not random bonuses | Same Tavern gains a side guest room/loft, larger notice board and longer table; central hearth and original windbreak stones remain visible |
 
 #### Survey Post — Mara
 
@@ -313,7 +315,7 @@ No existing save loses capacity.
 | Form | Player capability | Required physical change |
 |---|---|---|
 | Built · Tier 0 | Catalogue legitimately discovered sites, interpret them and apply the authored site-yield bonus | Low enclosed stone-and-timber study with broad plan table, fragment niches, tagged trays and partial floor-plan rubbings |
-| Improved · Tier 1 — **Provenance Tables** | Revealed sites show their known family and authored likelihood band before use; no remote revelation | Same building gains second plan table, conservation drawers and wall-mounted site rubbings |
+| Improved · Tier 1 — **Provenance Tables** | Once a site type has genuinely been encountered, Writing/World projection may show its unlikely/possible/likely band from authored conditions and weight; it never reads the already-rolled presence in the next world or reveals a remote site | Same building gains second plan table, conservation drawers and wall-mounted site rubbings |
 | Mastered · Tier 2 — **Site Tracing** | After at least half a world's passable tiles are revealed, may mark one broad approximate area containing an unrevealed site; never exact tile/type/reward and never through fog by default | Same structure gains tall map frame, triangulation arms and sealed fragment cabinet; not a shrine, museum treasure room or generic Library |
 
 #### Wayfarer's Table — Sela
@@ -324,17 +326,18 @@ route planner, departure hub, world graph, Party screen or supplies shop.
 | Form | Player capability | Required physical change |
 |---|---|---|
 | Built · Tier 0 | Existing +2 satchel capacity, +1 organic node yield and exact visible-flora field note | Open weatherproof field shelter centred on one broad map/packing table, field guide, folded cloth, sample tins and provision hooks; no counter |
-| Improved · Tier 1 — **Packing Frame** | One ordinary satchel expansion (+3 current tuning) and clearer authored packing shortfalls | Same shelter gains fitted pack frame, hanging kit board and protected folio cabinet |
-| Mastered · Tier 2 — **Shared Field Cabinet** | One further satchel expansion and one additional organic-yield step; it still creates no new route/departure UI | Same structure gains larger field cabinet, drying/sample drawers and second packing surface; no interactive world map |
+| Improved · Tier 1 — **Sample Ledger** | Sela's note adds a simple expected-yield band and whether this exact visible node has already been harvested; no remote reveal and no numeric biology | Same shelter gains an open species/sample ledger, protected folio cabinet and ordered sample rack |
+| Mastered · Tier 2 — **Preservation Cabinet** | +1 further organic node yield (current tuning) through better field preservation; it adds no satchel rung, route UI or departure verb | Same structure gains a larger sealed field cabinet, drying/sample drawers and a modest second preparation surface; no interactive world map |
 
 #### Anchorage — Tovin
 
-**Purpose:** all three anchoring routes, realm portfolio, settlement, assignments and deliveries.
+**Purpose:** all three anchoring routes plus the complete realm portfolio, settlement, Work/People assignments
+and Deliveries. Those are one baseline system, not late tabs withheld as an upgrade.
 
 | Form | Player capability | Required physical change |
 |---|---|---|
-| Built · Tier 0 | Craft Anchor Frames; view/manage the realm portfolio and all legitimately known anchoring routes | Quiet heavy timber/stone hall around one large open anchoring frame, Atlas lectern, tension braces and clear empty centre; not a portal itself |
-| Improved · Tier 1 — **Mooring Gallery** | Work/assignment and Delivery views for anchored realms; no passive/offline production | Same hall gains side mooring frame, assignment board and delivery trays, preserving the original open centre |
+| Built · Tier 0 | Craft Anchor Frames; use Atlas, Work, People, settlement and Deliveries for every legitimately anchored realm and known route | Quiet heavy timber/stone hall around one large open anchoring frame, Atlas lectern, assignment board, delivery trays, tension braces and clear empty centre; not a portal itself |
+| Improved · Tier 1 — **Mooring Gallery** | Each realm's delivery tray can hold one additional completed bundle before pausing (exact capacity remains tuning); no extra work source, worker, passive/offline production or realm cap | Same hall gains a side mooring frame and clearly expanded delivery rack, preserving the original open centre and assignment board |
 | Mastered · Tier 2 — **Deep Mooring** | Allows one realm's next sustain obligation to be prepaid and held visibly; it does not remove sustain, add a realm cap or make worlds permanent for free | Same structure gains reinforced outer brace, sealed sustain chest and second Atlas rail; no glowing multiverse control room |
 
 ## 4. Non-building destination progression
@@ -405,12 +408,12 @@ roles, not permission to recolour one generic façade.
 | `apothecary` | washable stone work edge, drying-frame posts and burner plinth | small warm workroom with clustered hanging herbs above low vessels | sage/olive plants, amber glass, cream ceramic, copper, warm stone | mortar, ceramic vessels, drying bundles, controlled burner | Distillery, kitchen, potion-shop cliché |
 | `distillery` | circular vessel plinths, cooling-basin edge and receiver shelf | tall repeated vessel/column rhythm with cool negative space and crystal highlights | cool grey stone, clear/cyan quartz, silver braces, small heat-amber receivers | primary column, crystal racks, receiver bowls, fraction marks | Apothecary, brewery, generic alchemy shop |
 | `channelworks` | boundary-plate rectangle, core-cradle base and lever post | compact heavy frame around a deliberately empty containment aperture | charcoal plate, silver braces, ceramic cream, restrained authored core hue | containment bench, core cradle, boundary plates, remote lever | Blacksmith, Distillery, glowing portal room |
-| `storehouse` | broad loading apron, paired threshold stones and hoist socket | broadest Commons façade; two dark door bays beneath a heavy light roofline | grey fieldstone, oak, canvas tan, muted blue-grey doors, rope | double doors/bays, loading apron, manual hoist | merchant shop, house, endless shelf tower |
+| `storehouse` | broad loading apron, paired threshold stones and hoist socket | broadest Commons façade; two dark door bays beneath a heavy light roofline | grey fieldstone, oak, canvas tan, muted blue-grey doors, rope | double doors/bays, loading apron, packing bench, manual hoist | merchant shop, house, endless shelf tower |
 | `firepit` | exact central ring of windbreak/hearth stones | low open social silhouette with bright central ember and wide seating arc | fieldstone, aged oak, ember orange, muted teal/rust wool | original hearth stones, kettle hook, seating relationship | forge, shrine, campsite damage state |
 | `survey_post` | two long baseline posts and central mast socket | raised open deck with one tall thin mast and long horizontal measuring beam | weathered oak, brass, pale canvas, desaturated sky blue | observation deck, mast, baseline, lens bench | lighthouse, radio tower, Wayfarer's shelter |
 | `reliquary` | low stone perimeter, central table base and two fragment niches | enclosed low study with a broad pale plan-table plane and repeated wall niches | limestone, walnut, paper cream, muted terracotta fragments | plan table, fragment niches/trays, rubbing wall | Library, shrine, museum treasure room |
 | `wayfarers_table` | four shelter posts and the full packing-table footprint | open weatherproof shelter with one dominant broad table and hanging kit edge | field oak, olive canvas, tin blue-grey, paper cream, folded cloth accents | packing table, field guide, sample tins, provision hooks | route planner, Trading Post, Party screen |
-| `anchorage` | four heavy frame footings around an unfilled central circle | quiet high-braced hall whose darkest structure surrounds a deliberately empty centre | dark oak, deep stone, iron, cream tension rope, restrained Atlas teal | open anchoring frame, empty centre, Atlas lectern, tension braces | portal, Constellation, glowing control room |
+| `anchorage` | four heavy frame footings around an unfilled central circle | quiet high-braced hall whose darkest structure surrounds a deliberately empty centre | dark oak, deep stone, iron, cream tension rope, restrained Atlas teal | open anchoring frame, empty centre, Atlas lectern, assignment board, delivery trays, tension braces | portal, Constellation, glowing control room |
 
 For every row, the foundation clue is the only future-function disclosure permitted on a known-buildable
 plot. It may be accompanied by the standard name/pictogram sign and exact construction status, but no stock,
@@ -501,13 +504,36 @@ requirement not yet met. Technical determinism never substitutes for visual acce
 5. Native art consumes stable building/state keys and must fail to its clearly provisional placeholder when
    a reviewed source is absent; do not silently use another station's façade.
 
+### Capability-readiness boundary
+
+The Wiki must show the matrix beside, not instead of, current implementation truth:
+
+- **Existing/live or source-backed baseline:** Trading Post Tier 0; Recycler 40/55/70 ladder; current maker
+  roots/tiers for Bowyer, Armoury, Weaponsmith and Scriptorium; Storehouse current entitlements; Firepit;
+  Survey Post; Apothecary Tier 0; Wayfarer's Table Tier 0; Distillery first slice. Do not reimplement these
+  merely because the visual ladder is new.
+- **Current authored extension with a named authority:** Blacksmith Refitting; Tannery Wear/Carry/Keep and
+  compressed capacity migration; Firepit→Tavern visitor system; Reliquary known-site likelihood; Anchorage
+  portfolio/assignment/deliveries. These use their named current documents and still follow roadmap order.
+- **Held until its exact content/consumer table exists:** Apothecary Tier-2 dual-purpose recipes, Distillery
+  Tier-2 masterwork cores/retuning limits, Channelworks Tier-2 shaping choices and any maker “masterwork”
+  family not present in the settled schematic/socket catalogue. The building form may be designed, but the
+  gameplay button stays absent rather than letting Engineering or Asset invent the missing content.
+- **Playtest-tuning proposals:** exact Storehouse capacities, Wayfarer's second yield step, Trading Post
+  request/hold frequency, Tavern visitor hold, Anchorage tray/prepayment values and every Mote price. Wiki
+  labels these as tuning and ordinary UI does not promise final numbers.
+
+No row here pre-empts the core playable roadmap. Later tiers remain documented/asset-ready so work is not
+ambiguous when reached, but early combat, Writing, arrival, field cues, return and opening Home integration
+stay ahead of late station gameplay.
+
 ## 9. Decisions still requiring playtest rather than pre-implementation debate
 
 - exact upgrade costs and keeper-level milestones;
 - 16/28/40 Storehouse tuning;
 - Trading Post request/hold frequency and rare-stock band;
 - whether the Tavern Tier-2 visitor hold is useful or administrative;
-- whether Wayfarer's Table's second capacity/yield rung is worthwhile;
+- whether Wayfarer's Table's Tier-2 second organic-yield step is worthwhile;
 - the exact Anchorage prepayment amount and whether it reduces friction enough to keep;
 - whether one Mote per star gives Motes sufficient weight without causing hoarding.
 
