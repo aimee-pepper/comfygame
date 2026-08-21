@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "aggregateSourceHash": "56fdeea87cc0617afbcab1ead56f0839e15a229d6ec1d57bcfb205b8aa49eb13",
+  "aggregateSourceHash": "8c20a8eab0e2d611a7c63fc09fd9395cf3eb8407d076bc9d1f95d2b5c5d891b9",
   "inputs": {
     "Sources/Content/Data/items.json": "b94b1107229f217e14f1d7fa936d8eea938f9782c06c583be32302f10d432bc9",
     "Sources/Content/Data/playability-roadmap.json": "f4887c012db804775b2538fb82784923b4ec92d359dccffe46f799483b0bbfff",
@@ -69,7 +69,7 @@
     "docs/ashe-ground-technique-current.md": "14287d7178f1148f4f765e50a7debf15d6f21efb9197181396407057794a161c",
     "docs/asset-production-output-contract-current.md": "e9734d8e96290e0e4f79af180624cf5115d4379cf16a52bbb688f1cea34ee675",
     "docs/asset-system-proposal.md": "d98b674c5d154e4c065929b68d22813cc2cf8da20494ef0920fae344803a5d83",
-    "docs/atmospheric-world-presentation-current.md": "a032e103326d71195867849767e841c9de45c3af733063c6c3d53fe977febc72",
+    "docs/atmospheric-world-presentation-current.md": "1b23bbf2f4fe8c92df422dc15259c7d8b47363aa81ab8e58a36435113472246c",
     "docs/authored-color-vocabulary-current.md": "41aa98371136bf274cf0f8160d822d0b8ff84c479882ffbc8c7847ae6a33b58d",
     "docs/authored-text-audit-current.md": "97c31e4a0564595cc62dbce0920999d648f94208b6f207b903f8cf517bc7b0fa",
     "docs/authored-world-blueprints-current.md": "218498315a42ab8a0f63523e586a83f33cdeef7bd9c13fc09dee65d020d736a1",
@@ -280,7 +280,7 @@
     "docs/writing-tool-progression-current.md": "be17fe07aa89aaaab7117a2faca43d7e1eb1be23202d19106c67c42547b23bb0"
   },
   "outputs": {
-    "generated/wiki-data.json": "e7a3793cf2135de12f5593aaad4dce1e11a50617f91aa0b32956914c202adb53",
-    "generated/source-registry.json": "1a3399d35f8f5c7948312fc9355c6ac86200bedb858003af6b54c7a38c2da57b"
+    "generated/wiki-data.json": "a3de21ca02aa13be483d3aa7c0af603a0a9365ee9513444ac2583a513fe6d317",
+    "generated/source-registry.json": "869a4d88ab50d0e1627fd97822c0a7346e1eaf4a5a463150159388ea2eb866a6"
   }
 }

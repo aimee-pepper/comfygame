@@ -181,9 +181,9 @@ change the medium's silhouette vocabulary or palette family.
 | Kind | Must read as | Must not become |
 |---|---|---|
 | Clear | no atmosphere overlay | generic beige haze or random "ambience" particles |
-| Smoke | broad broken soft-edged/dithered plumes with slow rolling displacement; default neutral charcoal/warm-grey value family | fire, clouds, black fog, UI blur or a universal dark wash |
+| Smoke | broad irregular plume fragments and curls that join into uneven drifting bodies across neighbouring tiles; slow rolling displacement; default neutral charcoal/warm-grey value family | parallel dash texture, scanlines, fire, clouds, black fog, UI blur or a universal dark wash |
 | Airborne Ash | restrained cool-grey veil plus sparse angular falling/drifting flecks; more particulate and less billowed than Smoke | Snow, sparkles, rain, volcanic fire or a solid grey recolor |
-| Mist/Fog | long contiguous low-contrast bands with soft gaps; trace/light reads Mist and heavy/dense reads Fog | discrete white dots, clouds floating above a horizon or hidden-content silhouettes |
+| Mist/Fog | overlapping low-contrast dithered banks and wisps with a horizontal tendency, staggered lengths/heights and irregular clean pockets across neighbouring tiles; trace/light reads airy Mist, while heavy/dense forms unmistakably broader translucent Fog bodies | repeated scanlines, sparse scratch/dust texture at heavy density, one band copied through every tile, discrete white dots, clouds floating above a horizon or hidden-content silhouettes |
 | Miasma | uneven low pooled curls/tendrils with interrupted boundaries and slower local eddies | default poison green, skulls, bubbles, damage numbers or proof of an undiscovered mechanic |
 | Rain | short narrow directional streaks with sparse truthful ripples only on already-visible water pixels | puddles, Mud, lightning, clouds, screen-long lines or a movement-cost cue |
 | Snow | slower compact flakes with lateral drift; no automatic terrain whitening in v1 | Rain, permanent accumulation, frozen water or a new white ground material |
@@ -193,6 +193,14 @@ Default palette separates families by value, particle shape, spacing and motionâ
 eligible authored atmosphere color tints only the selected medium family. It preserves the family's
 literal-grayscale value ordering and cannot tint terrain, water, flora, actors, fog or precipitation
 from a different source.
+
+The 16Ã—16 tile is an implementation cell, not the visible scale of the atmospheric composition.
+Smoke and Mist/Fog must use stable tile coordinates to form an irregular multi-tile macro-pattern;
+repeating the same horizontal marks once per tile fails this contract even when each isolated cell is
+technically different. Heavy/dense coverage may leave fewer clean pockets, but it must not turn the
+map into a uniformly striped texture. Conversely, avoiding stripes by reducing Fog to scattered
+one-pixel marks also fails: density must change the visible mass/coverage monotonically, and heavy Fog
+must read clearly stronger than light Mist at ordinary phone scale.
 
 Wind has no standalone speed-line overlay because motion is not matter. It changes the drift of an
 existing suspended/precipitation layer. Once the separately accepted terrain-motion contract exists,
