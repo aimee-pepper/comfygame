@@ -112,10 +112,10 @@
     },
     {
       "markID": "common_ore",
-      "visibleScope": "ground",
+      "visibleScope": "resource",
       "contributionKind": "increased",
-      "resultBand": "ordinary-ore:56",
-      "withoutAuthoredBand": "ordinary-ore:18"
+      "resultBand": "present",
+      "withoutAuthoredBand": "present"
     }
   ],
   "entryDisclosure": null,
