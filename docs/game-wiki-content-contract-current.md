@@ -5,7 +5,7 @@
 while never presenting proposed or historical material as live behavior.
 **Implementation:** `GameWiki/**` is generated from registered game data and current authorities. Handwritten
 page content may provide layout grammar, but entity facts and status are derived rather than copied.
-**Updated:** 21 August 2026
+**Updated:** 22 August 2026
 
 ## Current progress
 
@@ -24,6 +24,17 @@ lexemes with disclosure-aware detail routes. Core Loop, Exploration and Combat h
 routes rather than generic authority fallbacks. Overview, Roadmap and History now lead with plain-language
 gameplay/status explanations and retain provenance afterward. Browser acceptance remains part of the final
 integration receipt; this progress statement does not promote any gameplay or roadmap item.
+
+**Current Writing/Terrain reconciliation:** current main now hash-pins and bundles a Writing parchment runtime
+bitmap while its standalone artifact manifest remains a candidate with `integrationReady:false` and
+ordinary-phone acceptance remains the sole current primary; the 4,459-file mark pack remains temporary
+semantic-keyed scaffolding and E5–E7 remain not started. Every verified phone-ready update installs promptly
+in place without uninstall/reset; installation does not authorize auto-launch. Terrain's closed border
+correction is complete. The accepted/frozen `TerrainProductionPack v1` remains `integrationReady:false` and
+absent from shared-line native
+integration while protected isolated Engineering integration is active; the atmosphere candidate remains
+queued and non-native. The wiki must track these source receipts separately: Asset acceptance, committed
+source integration, shared-line native integration and phone acceptance are not synonyms.
 
 ## What “complete” means
 

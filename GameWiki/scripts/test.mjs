@@ -28,6 +28,11 @@ const stationsAuthority = JSON.parse(await readFile(resolve(root, "../Sources/Co
 const itemsAuthority = JSON.parse(await readFile(resolve(root, "../Sources/Content/Data/items.json"), "utf8"));
 const resourcesAuthority = JSON.parse(await readFile(resolve(root, "../Sources/Content/Data/resources.json"), "utf8"));
 const travellersAuthority = JSON.parse(await readFile(resolve(root, "../Sources/Content/Data/travellers.json"), "utf8"));
+const topLevelRoutes = ["overview", "core-loop", "world-writing", "exploration", "combat", "people", "village-buildings", "resources-crafting", "catalogue", "roadmap", "history", "asset-gallery"];
+assert(topLevelRoutes.length === 12 && topLevelRoutes.every(route => data.routes.includes(route)), "all 12 top-level routes must remain registered");
+for (const renderer of ["overview", "coreLoop", "worldWriting", "exploration", "combat", "people", "village", "resources", "catalogue", "roadmap", "history", "assets"]) {
+  assert(appSource.includes(`function ${renderer}(`), `top-level route lacks dedicated renderer: ${renderer}`);
+}
 for (const type of ["station", "traveller", "resource", "creatureMaterial", "gear", "consumable", "curio", "treasure", "key", "rune", "roadmap"]) {
   assert(data.search.some(item => item.type === type), `search lacks ${type}`);
   const example = data.search.find(item => item.type === type);
@@ -63,8 +68,11 @@ assert(data.search.filter(item => item.type === "traveller").every(item => item.
 const lexemeCounts = Object.fromEntries(["target", "source", "qualifier", "compound"].map(kind => [kind, data.symbols.filter(item => item.category === kind).length]));
 assert(JSON.stringify(lexemeCounts) === JSON.stringify({ target: 8, source: 62, qualifier: 17, compound: 21 }), "World Writing must exactly partition all 108 canonical lexemes");
 assert(data.symbols.every(item => item.stableID && item.summary && item.writability && item.disclosure && data.routes.includes(`lexeme/${item.slug}`)), "every lexeme needs typed facts, disclosure state and a stable detail route");
+assert(data.routes.filter(route => route.startsWith("lexeme/")).length === 108, "World Writing must retain exactly 108 lexeme detail routes");
+assert(data.search.filter(item => item.type === "rune").length === 108, "World Writing must retain exactly 108 lexeme search routes");
 assert(data.search.filter(item => item.type === "rune").every(item => item.route.startsWith("lexeme/") && ["target", "source", "qualifier", "compound"].includes(item.category)), "rune search must open exact typed lexeme routes");
 assert(data.roadmap.every(item => item.summary && item.gate && data.routes.includes(`roadmap/${item.slug}`)), "every roadmap receipt needs explanation, gate and detail route");
+assert(data.roadmap.filter(item => item.isPrimary).length === 1 && data.roadmap.find(item => item.isPrimary)?.id === "writing-causal-presentation", "Writing physical-phone acceptance must remain the sole current primary");
 for (const station of data.stations) {
   assert(station.id && station.provenance.stableID === station.id, `station provenance missing: ${station.id}`);
   assert(station.provenance.sourcePaths.length >= 3, `station authority sources missing: ${station.id}`);
@@ -101,7 +109,7 @@ assert(data.stations.every(station => !station.upgradeNote.toLowerCase().include
 assert(stationByID.constellation.upgradeAuthorityStatus === "partial" && stationByID.constellation.constellationProposal.length === 7, "Constellation must expose six proposed mastery stars plus implemented Long Instruction");
 assert(stationByID.constellation.constellationProposal.filter(star => star.status === "proposed / review-gated").length === 6, "Constellation mastery expansion must remain explicitly unimplemented");
 assert(stationByID.constellation.constellationProposal.find(star => star.name === "The Long Instruction")?.status === "implemented", "Long Instruction must remain the implemented star");
-assert(data.assetGallery.acceptedAssets.length === 0 && data.assetGallery.reviewEvidence.length === 0, "rejected or uncommitted pixels entered the gallery");
+assert(data.assetGallery.acceptedAssets.length === 0 && data.assetGallery.reviewEvidence.length === 0, "building candidates or review evidence entered native asset collections");
 assert(data.assetGallery.slots.length === 86, "asset gallery must reserve 17×5 building/state slots plus the manifested Binder House root");
 assert(data.assetGallery.slots.find(slot => slot.key === "trading_post.built")?.status === "Game Design accepted candidate / native integration not yet accepted", "Trading Post v0.3 must be distinguished from packaged/native/live art");
 assert(data.assetGallery.slots.find(slot => slot.key === "trading_post.built")?.assetPath === null, "Trading Post acceptance must not invent a packaged asset path");
@@ -125,6 +133,18 @@ assert(binderHouseRoot?.assetPath === null, "Binder House root must not invent a
 assert(!data.assetGallery.slots.some(slot => slot.key.startsWith("binder_house.") && slot.key !== "binder_house.root"), "Binder House must not invent independent state or attention asset IDs");
 assert(data.assetGallery.slots.filter(slot => slot.status === "Game Design accepted candidate / native integration not yet accepted").length === 14, "only the five Built candidates, eight checkpoint-3 states and Binder House root may be candidate-accepted");
 assert(data.assetGallery.slots.every(slot => slot.assetPath === null), "no unaccepted art path may enter a stable slot");
+assert(data.currentTruth.writing.status === "readyToTest", "Writing must remain source-integrated and pending ordinary-phone acceptance");
+assert(data.currentTruth.writing.isPrimary === true, "Writing physical-phone acceptance must remain primary");
+assert(data.currentTruth.writing.acceptanceGate.includes("Install every verified phone-ready update promptly in place") && data.currentTruth.writing.acceptanceGate.includes("do not auto-launch"), "Writing must retain the corrected default phone-install/no-auto-launch authority");
+assert(data.currentTruth.writing.e5ToE7Status === "not started", "Writing E5-E7 must not be silently promoted");
+assert(data.currentTruth.writing.parchment.nativeSourceIntegrated === true, "accepted Writing parchment must remain hash-pinned in native source and bundle");
+assert(data.currentTruth.writing.parchment.artifactIntegrationReady === false, "the standalone parchment candidate manifest must retain its own non-integration-ready receipt");
+assert(data.currentTruth.writing.markArtStatus.includes("temporary") && data.currentTruth.writing.markArtStatus.includes("not accepted"), "temporary Writing mark art must not be presented as final sigil design");
+assert(data.currentTruth.terrain.borderCorrection.status === "complete", "the closed Terrain border correction must remain complete");
+assert(data.currentTruth.terrain.layeredPresentation.status === "inProgress" && data.currentTruth.terrain.layeredPresentation.nativeStatus.includes("shared-line native integration is absent") && data.currentTruth.terrain.layeredPresentation.nativeStatus.includes("isolated Engineering integration is active"), "accepted layered Terrain pack must retain its active-isolated/non-native boundary");
+assert(data.currentTruth.terrain.atmosphere.status === "queued" && data.currentTruth.terrain.atmosphere.nativeStatus.includes("native integration is queued"), "accepted Atmosphere candidate must not be claimed native");
+assert(data.currentTruth.writing.provenance.sourcePaths.every(path => data.currentTruth.writing.provenance.sourceHashes[path]), "Writing current-truth provenance must hash every registered source");
+assert(data.currentTruth.terrain.provenance.sourcePaths.every(path => data.currentTruth.terrain.provenance.sourceHashes[path]), "Terrain current-truth provenance must hash every registered source");
 for (const item of data.search) {
   assert(item.provenance.generatedAtSourceHash === data.generatedAtSourceHash, `fact hash missing: ${item.type}/${item.id}`);
   assert(item.provenance.sourcePaths.length, `fact source missing: ${item.type}/${item.id}`);

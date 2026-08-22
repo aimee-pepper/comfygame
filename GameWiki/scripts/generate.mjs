@@ -18,7 +18,12 @@ const coreInputs = [
   "Sources/Content/Data/qualifiers.json",
   "Sources/Content/Data/playability-roadmap.json",
   "Sources/Model/Materials.swift",
+  "Sources/Screens/PageGridView.swift",
+  "Sources/Screens/WritingDeskView.swift",
+  "Sources/VisualRuntime/WritingDeskProductionPack.swift",
   "Sources/VisualAdapters/NamedCharacterVisualAdapter.swift",
+  "Bookbinder.xcodeproj/project.pbxproj",
+  "AssetLab/artifacts/writing-parchment-v1/manifest.json",
   "docs/authored-text-audit-current.md",
   "docs/diary-teaching-registry-implementation-audit-current.md",
   "docs/roster-progression-current.md",
@@ -510,7 +515,89 @@ for (const [index, item] of roadmap.entries()) {
   item.band = roadmapJSON.items[index].band ?? "unbanded";
   item.gate = roadmapJSON.items[index].gate ?? "No separate acceptance gate recorded.";
   item.owner = roadmapJSON.items[index].owner ?? roadmapJSON.items[index].workstream;
+  item.isPrimary = Boolean(roadmapJSON.items[index].isPrimary);
 }
+
+function requiredRoadmapItem(id) {
+  const item = roadmap.find(candidate => candidate.id === id);
+  if (!item) throw new Error(`Missing required roadmap truth: ${id}`);
+  return item;
+}
+
+const writingRoadmap = requiredRoadmapItem("writing-causal-presentation");
+const terrainCorrectionRoadmap = requiredRoadmapItem("terrain");
+const terrainLayeringRoadmap = requiredRoadmapItem("terrain-layering-animation");
+const atmosphereRoadmap = requiredRoadmapItem("atmospheric-world-presentation");
+const parchmentManifestPath = "AssetLab/artifacts/writing-parchment-v1/manifest.json";
+const parchmentManifest = JSON.parse(contents[parchmentManifestPath]);
+const writingSourcePaths = [
+  "Sources/Content/Data/playability-roadmap.json",
+  "docs/writing-desk-b1-implementation-packet-current.md",
+  "Sources/Screens/PageGridView.swift",
+  "Sources/Screens/WritingDeskView.swift",
+  "Sources/VisualRuntime/WritingDeskProductionPack.swift",
+  "Bookbinder.xcodeproj/project.pbxproj",
+  parchmentManifestPath
+];
+const parchmentStableKey = parchmentManifest.runtime?.stableKey;
+const parchmentFilename = parchmentManifest.runtime?.path?.split("/").at(-1);
+const nativeParchmentSourceIntegrated = Boolean(
+  parchmentStableKey
+  && parchmentFilename
+  && contents["Sources/VisualRuntime/WritingDeskProductionPack.swift"].includes(`static let parchmentStableKey = "${parchmentStableKey}"`)
+  && contents["Sources/VisualRuntime/WritingDeskProductionPack.swift"].includes(`static let parchmentFilename = "${parchmentFilename}"`)
+  && contents["Sources/Screens/PageGridView.swift"].includes("WritingDeskProductionPack.productionParchmentData()")
+  && contents["Bookbinder.xcodeproj/project.pbxproj"].includes(`${parchmentFilename} in Resources`)
+);
+if (!nativeParchmentSourceIntegrated) throw new Error("Writing parchment manifest, loader, view and native resource bundle no longer agree");
+if (!contents["Sources/Screens/WritingDeskView.swift"].includes("WritingDeskNativeVocabularyLabel")) {
+  throw new Error("Writing vocabulary no longer exposes a native player-readable label seam");
+}
+
+const currentTruth = {
+  writing: {
+    status: writingRoadmap.status,
+    statusLabel: "source-integrated / ordinary-phone acceptance pending",
+    isPrimary: writingRoadmap.isPrimary,
+    roadmapID: writingRoadmap.id,
+    summary: writingRoadmap.summary,
+    acceptanceGate: writingRoadmap.gate,
+    e5ToE7Status: "not started",
+    markArtStatus: "temporary semantic-keyed integration scaffolding; final sigil design is not accepted",
+    vocabularyLabelStatus: "native player-readable text is reserved separately from scaffold glyph pixels",
+    parchment: {
+      stableKey: parchmentStableKey,
+      assetPath: parchmentManifest.runtime.path,
+      pngSHA256: parchmentManifest.runtime.pngSHA256,
+      manifestStatus: parchmentManifest.status,
+      artifactIntegrationReady: parchmentManifest.integrationReady,
+      nativeSourceIntegrated: nativeParchmentSourceIntegrated,
+      status: "hash-pinned native source integration / ordinary-phone acceptance pending"
+    },
+    provenance: provenance(writingSourcePaths, writingRoadmap.id, writingRoadmap.status, hashes, aggregateHash)
+  },
+  terrain: {
+    borderCorrection: {
+      status: terrainCorrectionRoadmap.status,
+      summary: terrainCorrectionRoadmap.summary
+    },
+    layeredPresentation: {
+      status: terrainLayeringRoadmap.status,
+      summary: terrainLayeringRoadmap.summary,
+      nativeStatus: "accepted frozen TerrainProductionPack v1; manifest remains integrationReady:false, shared-line native integration is absent, and protected isolated Engineering integration is active"
+    },
+    atmosphere: {
+      status: atmosphereRoadmap.status,
+      summary: atmosphereRoadmap.summary,
+      nativeStatus: "visually accepted frozen-ready Asset candidate; native integration is queued"
+    },
+    provenance: provenance([
+      "Sources/Content/Data/playability-roadmap.json",
+      "docs/terrain-layering-and-motion-asset-packet-current.md",
+      "docs/atmospheric-world-presentation-current.md"
+    ], terrainLayeringRoadmap.id, terrainLayeringRoadmap.status, hashes, aggregateHash)
+  }
+};
 
 const authorities = await Promise.all(authorityPaths.map(async path => ({
   path,
@@ -553,12 +640,12 @@ const wikiData = {
   generatedAtSourceHash: aggregateHash,
   routes,
   counts: { stations: stations.length, travellers: travellers.length, resources: resources.length, items: items.length, runes: symbols.length, roadmap: roadmap.length },
-  stations, travellers, resources, creatureMaterials, items, symbols, roadmap, authorities, history, search,
+  stations, travellers, resources, creatureMaterials, items, symbols, roadmap, authorities, history, search, currentTruth,
   assetGallery: {
     acceptedAssets: [],
     reviewEvidence: [],
     slots: [...stations.filter(station => station.destinationKind === "villageBuilding").flatMap(station => station.assetSlots), ...binderHouseRootSlot],
-    note: "No accepted building pixels are registered. Rejected and uncommitted candidates are not displayed; stable building/state slots remain reserved for reviewed assets."
+    note: "This gallery currently inventories Home/Village building-state slots only. No building candidate is claimed as a native asset. Writing parchment and queued Terrain presentation have separate current-truth receipts below."
   }
 };
 const manifest = {

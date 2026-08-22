@@ -50,13 +50,14 @@ function overview() {
     ["village-buildings", `${data.counts.stations} Home & Village destinations`, "Rooms, interfaces, shelves, progression surfaces, yard features, and village buildings—truthfully distinguished."],
     ["people", `${data.counts.travellers} authored people`, "Stable identities and current source dispositions."],
     ["roadmap", `${data.counts.roadmap} roadmap receipts`, "Operational status without silently promoting provisional work."],
-    ["asset-gallery", "Asset evidence", "Accepted work only; missing art stays visibly missing."]
+    ["asset-gallery", "Asset evidence", "Acceptance, source integration and native/phone status remain separate receipts."]
   ];
   const liveCount = data.roadmap.filter(item => item.status === "complete" || item.status === "readyToTest").length;
+  const currentPrimary = data.roadmap.find(item => item.isPrimary);
   return header("Private · generated", "What Bookbinder is", "Bookbinder is an expedition game about physically writing worlds, exploring what those words caused, and bringing knowledge and materials home to prepare the next journey.") +
     `<div class="grid">${cards.map(([route, title, text]) => `<a class="card" href="#/${route}"><h3>${escapeHTML(title)}</h3><p>${escapeHTML(text)}</p></a>`).join("")}</div>
-    <h2>What is playable now</h2><div class="card"><p>The installed loop can write on the E4 physical page, bind worlds, explore terrain and encounters, collect objects and Pages, return home, use destinations and grow a party. ${liveCount} roadmap receipts are currently complete or awaiting acceptance. Dedicated Pages/The world Writing panes, the frozen arrival tableau and several presentation rebuilds remain absent or queued.</p></div>
-    <h2>What is actually next</h2><div class="card"><p>There is currently no Engineering primary. Writing E4, encounter scaling and God Mode await phone feedback. E5–E7 are explicitly not started; queued work remains ordered by the operational roadmap rather than by how complete its design document looks.</p></div>
+    <h2>What is playable now</h2><div class="card"><p>The source-complete E4 Write pane is ready for signed in-place phone installation and ordinary-path review; the existing loop can bind worlds, explore terrain and encounters, collect objects and Pages, return home, use destinations and grow a party. ${liveCount} roadmap receipts are currently complete or awaiting acceptance. Dedicated Pages/The world Writing panes, the frozen arrival tableau and several presentation rebuilds remain absent or queued.</p></div>
+    <h2>What is actually next</h2><div class="card"><p>${currentPrimary ? `${escapeHTML(currentPrimary.name)} is the sole current primary and remains ${escapeHTML(currentPrimary.status)}.` : "No sole current primary is registered."} Every verified phone-ready update installs promptly in place without uninstall/reset; installation does not authorize auto-launch. Writing E4 still awaits physical-phone acceptance, and protected isolated Terrain integration does not displace that gate. E5–E7 remain explicitly not started.</p></div>
     <h2>Truth boundary</h2><div class="card"><p>Plain-language summaries lead; provenance follows. Current pages prefer registered <code>*-current.md</code> authorities. Decision logs remain under History and never replace current facts. Proposed, paused and settled-not-live work is labelled where it appears.</p></div>${sourceReceipt(["docs/current-design-index.md", "docs/game-wiki-content-contract-current.md"])}`;
 }
 
@@ -71,6 +72,7 @@ function flow(steps) {
 
 function worldWriting() {
   const groups = ["target", "source", "qualifier", "compound"];
+  const current = data.currentTruth.writing;
   return header("Physical writing system", "World Writing", "A world begins as a physical 6×6 page. Marks occupy space, links turn marks into requests, and a final bind freezes the exact page, costs, field loadout and world receipt.")
     + `<h2>Compose a page</h2>${flow([
       ["Choose a hand", "Rough charcoal writes large crude marks; Brush writes medium plain marks; Fountain pen writes refined one-cell marks. A better hand saves space, not meaning.", "live"],
@@ -79,11 +81,12 @@ function worldWriting() {
       ["Review and bind", "The review surface redacts unread meanings before it forms any text. The same quote is compared inside one atomic mutation before Essence, ink, inventory or a collected page can move.", "partly live"]
     ])}`
     + `<h2>Four Writing Desk states</h2><div class="facts">
-      <dl class="fact"><dt>Write</dt><dd>Live E4: complete paper, Hand/Ink strip and canonical vocabulary palette. Placement, turning and connections remain zero-spend edits.</dd></dl>
+      <dl class="fact"><dt>Write</dt><dd>${escapeHTML(current.statusLabel)}: complete paper, Hand/Ink strip and canonical vocabulary palette. Placement, turning and connections remain zero-spend edits.</dd></dl>
       <dl class="fact"><dt>Pages</dt><dd>Designed, not yet implemented in E5: choose a reusable draft or one exact collected physical page without leaking unread semantics.</dd></dl>
       <dl class="fact"><dt>Templates</dt><dd>Live persistence: saved compositions can be loaded, renamed, overwritten and deleted; a template is not consumed by binding.</dd></dl>
       <dl class="fact"><dt>The world</dt><dd>Designed, not yet implemented in E6/E7: truthful costs, broad unread risk, causal outputs, loadout and final Bind & Depart.</dd></dl>
     </div>`
+    + `<h2>Current visual boundary</h2><div class="card">${badge(current.status)}<p>The current native source bundles and hash-validates <code>${escapeHTML(current.parchment.stableKey)}</code>; that proves source integration, not ordinary-phone acceptance. The standalone artifact still records <code>integrationReady:${escapeHTML(current.parchment.artifactIntegrationReady)}</code>, so the wiki preserves both receipts instead of silently promoting either one.</p><p>${escapeHTML(current.markArtStatus)}. ${escapeHTML(current.vocabularyLabelStatus)}.</p></div>`
     + `<h2>Knowledge and disclosure</h2><div class="card"><p><strong>Known</strong> licenses a readable name and meaning. <strong>Encountered</strong> only proves that the mark was seen and may display <code>??</code>. Targets and writable qualifiers are rules-known; sources and compounds become known through campaign ownership. An unread mark never contributes hidden names, icons, sorting text, accessibility text, ecology claims, sight bands or narrow collapse estimates.</p></div>`
     + `<h2>Page sources and consumption</h2><div class="facts"><dl class="fact"><dt>Draft</dt><dd>Reusable after bind; its revision and frozen page hash participate in the quote.</dd></dl><dl class="fact"><dt>Collected / wild page</dt><dd>One physical instance with a canonical definition hash. Successful bind consumes only that selected instance; stale catalogue identity refuses.</dd></dl><dl class="fact"><dt>Starter pages</dt><dd>Authored World Pages promise a known starting identity, price and seed. Their exact current world receipts remain data-owned.</dd></dl><dl class="fact"><dt>Costs</dt><dd>Essence, exact ink-vial deductions and Field Kit stack moves are frozen in one quote. Any sufficient-but-different wallet, vial or stack state makes it stale.</dd></dl></div>`
     + `<h2>Canonical lexemes · ${data.symbols.length}</h2><p>These are development-facing catalogue identities. Each detail labels what may be disclosed to a player.</p>`
@@ -117,10 +120,12 @@ function coreLoop() {
 }
 
 function exploration() {
+  const terrain = data.currentTruth.terrain;
   return header("Inside a written world", "Exploration", "The map is a limited, remembered place—not a full-board inventory. Visibility controls current disclosure; memory preserves terrain without preserving moving threats.")
     + `<h2>Map actions</h2><div class="facts"><dl class="fact"><dt>Move</dt><dd>Movement spends turns and follows terrain, elevation, obstruction and encounter rules.</dd></dl><dl class="fact"><dt>Look</dt><dd>A zero-turn adjacent preview. It disarms on any non-direction surface or state change and must not reveal facts beyond current knowledge.</dd></dl><dl class="fact"><dt>Use Tile</dt><dd>The stable contextual action for the current tile: harvest, search, inspect, take, contact or use a site. Exhausted nodes must become unavailable truthfully.</dd></dl><dl class="fact"><dt>Field Kit</dt><dd>Carried capacity is finite. Taking a page or object can open an exact swap decision; cancellation and stale choices mutate nothing.</dd></dl></div>`
     + `<h2>Visibility and memory</h2><div class="card"><p><strong>Full</strong> shows terrain and current entities. <strong>Fringe</strong> shows terrain/elevation without flora, objects or moving mobs. <strong>Remembered</strong> shows explored terrain and static learned objects, but not moving mobs. <strong>Hidden</strong> is opaque and carries no terrain payload into disclosure-safe receipts. Atmosphere may soften visibility; it is not a shortcut for the visibility math.</p></div>`
     + `<h2>World contents</h2><div class="progression-grid"><article class="card"><h3>Terrain & hazards</h3><p>Ground, water, elevation and active flora decide passability, movement cost and learned consequence cues. Hazard details appear only when seen or earned.</p>${badge("live")}</article><article class="card"><h3>Resources & objects</h3><p>World resource nodes, loose Essence, items and pages are physical finds. A local pickup is one exact group and inventory transaction.</p>${badge("live")}</article><article class="card"><h3>Sites & people</h3><p>Sites can be inspected or used; traveller presence follows written-world conditions. Hidden sites and identities remain undisclosed.</p>${badge("live")}</article><article class="card"><h3>Creatures</h3><p>Ordinary and apex creatures occupy the world and can initiate combat. The final habitat/material ecology projection is settled design but not yet live.</p>${badge("mixed")}</article></div>`
+    + `<h2>Current Terrain presentation boundary</h2><div class="facts"><dl class="fact"><dt>Closed border correction</dt><dd>${badge(terrain.borderCorrection.status)} ${escapeHTML(terrain.borderCorrection.summary)}</dd></dl><dl class="fact"><dt>Layered shapes & motion</dt><dd>${badge(terrain.layeredPresentation.status)} ${escapeHTML(terrain.layeredPresentation.nativeStatus)}. This changes presentation only.</dd></dl><dl class="fact"><dt>Atmosphere & height shade</dt><dd>${badge(terrain.atmosphere.status)} ${escapeHTML(terrain.atmosphere.nativeStatus)}. It is not current native terrain behavior.</dd></dl></div>`
     + `<h2>Stability, collapse and turns-left</h2><div class="card"><p>Stability is the world’s remaining ability to hold together. “Turns left” is a current estimate derived from the active world, not a second timer. Leaving early, retreating or collapse each produce their own typed return outcome and preservation rules.</p></div>`
     + sourceReceipt(["docs/world-screen-phone-composition-current.md", "docs/field-feedback-and-loot-presentation-current.md", "docs/core-loop-causal-presentation-plan-current.md"]);
 }
@@ -278,7 +283,7 @@ function roadmapDetail(slug) {
   const item = data.roadmap.find(candidate => candidate.slug === slug);
   if (!item) return notFound();
   return header(`${titleCase(item.status)} · ${titleCase(item.workstream)}`, item.name, item.summary)
-    + `<div class="facts"><dl class="fact"><dt>Stable ID</dt><dd>${escapeHTML(item.id)}</dd></dl><dl class="fact"><dt>Band</dt><dd>${escapeHTML(item.band)}</dd></dl><dl class="fact"><dt>Workstream</dt><dd>${escapeHTML(item.workstream)}</dd></dl><dl class="fact"><dt>Owner</dt><dd>${escapeHTML(item.owner)}</dd></dl><dl class="fact"><dt>Status</dt><dd>${escapeHTML(item.status)}</dd></dl></div>`
+    + `<div class="facts"><dl class="fact"><dt>Stable ID</dt><dd>${escapeHTML(item.id)}</dd></dl><dl class="fact"><dt>Band</dt><dd>${escapeHTML(item.band)}</dd></dl><dl class="fact"><dt>Workstream</dt><dd>${escapeHTML(item.workstream)}</dd></dl><dl class="fact"><dt>Owner</dt><dd>${escapeHTML(item.owner)}</dd></dl><dl class="fact"><dt>Status</dt><dd>${escapeHTML(item.status)}</dd></dl><dl class="fact"><dt>Current primary</dt><dd>${item.isPrimary ? "Yes — sole registered primary" : "No"}</dd></dl></div>`
     + `<h2>Acceptance gate</h2><div class="card"><p>${escapeHTML(item.gate)}</p></div>${provenance(item)}<p>${hashLink("roadmap", "← Roadmap")}</p>`;
 }
 
@@ -290,7 +295,11 @@ function history() {
 }
 
 function assets() {
-  return header("Evidence only", "Asset Gallery", "Only committed and accepted art may appear as final. Rejected pixels stay absent; stable slots remain inspectable.") + `<div class="empty"><strong>No accepted building art registered.</strong><p>${escapeHTML(data.assetGallery.note)}</p></div><div class="grid">${data.assetGallery.slots.map(slot => `<article class="card"><h3><code>${escapeHTML(slot.key)}</code></h3>${badge(slot.status)}<p>${slot.assetPath ? escapeHTML(slot.assetPath) : "No accepted asset path."}</p></article>`).join("")}</div>`;
+  const writing = data.currentTruth.writing;
+  const terrain = data.currentTruth.terrain;
+  return header("Evidence only", "Asset Gallery", "Acceptance, committed source integration and native/phone acceptance are separate receipts. Candidate art is never promoted by implication.")
+    + `<h2>Current non-building receipts</h2><div class="facts"><dl class="fact"><dt>Writing parchment</dt><dd>${badge(writing.status)} <code>${escapeHTML(writing.parchment.stableKey)}</code> is hash-pinned in the native source and bundle; ordinary-phone acceptance remains pending.</dd></dl><dl class="fact"><dt>Layered Terrain</dt><dd>${badge(terrain.layeredPresentation.status)} ${escapeHTML(terrain.layeredPresentation.nativeStatus)}. No native asset path is claimed here.</dd></dl></div>`
+    + `<h2>Home & Village slots</h2><div class="empty"><strong>No native-ready building art registered.</strong><p>${escapeHTML(data.assetGallery.note)}</p></div><div class="grid">${data.assetGallery.slots.map(slot => `<article class="card"><h3><code>${escapeHTML(slot.key)}</code></h3>${badge(slot.status)}<p>${slot.assetPath ? escapeHTML(slot.assetPath) : "No accepted native asset path."}</p></article>`).join("")}</div>`;
 }
 
 function notFound() { return header("404", "Page not found", "This internal route is not registered."); }

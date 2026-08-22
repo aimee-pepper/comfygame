@@ -1,7 +1,9 @@
 {
   "schemaVersion": 1,
-  "aggregateSourceHash": "8366ae402659d5776cb354bbd2f2e1017cdcb824c24dae9e7cdfadbde35c9942",
+  "aggregateSourceHash": "0f24c4937cda18ad4da38ba64881d00aded2c65bf98f43a817f62ced5c9e314c",
   "inputs": {
+    "AssetLab/artifacts/writing-parchment-v1/manifest.json": "9ef9c41f8d4f4b12e5bbb725e9f1ea5e52a77a3175de758016bb58cd170c499f",
+    "Bookbinder.xcodeproj/project.pbxproj": "057fa4ebcd51a41b7e1acf33506154bd4d368a727689df7a8eaf3dc1d85460c4",
     "Sources/Content/Data/items.json": "b94b1107229f217e14f1d7fa936d8eea938f9782c06c583be32302f10d432bc9",
     "Sources/Content/Data/playability-roadmap.json": "a8184d9ed17571849363f868375eb8a03f8038f9a3a8f914e2fc10773a97a2af",
     "Sources/Content/Data/pressure_sources.json": "68f7b2271d51613030f2f3b3e573f750af53c9b68fe00d68a599dcd6fc0a9b86",
@@ -12,7 +14,10 @@
     "Sources/Content/Data/symbols.json": "c1ec5dd7b661680b358e21a56124b6080aa28d93db51fd2f6b80214ced1dcb16",
     "Sources/Content/Data/travellers.json": "ae57096a78141052f11f1b8a0baa5246fb00bbf7543394f978fabc8f02944597",
     "Sources/Model/Materials.swift": "8605e290b4c6e0fa369bc47d1a4cbd81a06bcc2ae5716f6edcaeef4592bfe722",
+    "Sources/Screens/PageGridView.swift": "785779360024d5a304633da7ef9de9dbdae86ecdd28102941e6c3e3ea6413cc3",
+    "Sources/Screens/WritingDeskView.swift": "a2a3e3db8d70d063499ac10d1ed21ee4edcdba14ffea42c963c09a157cd9cdb3",
     "Sources/VisualAdapters/NamedCharacterVisualAdapter.swift": "6037696509384d768ce3e23d0ef441377915bc53b0ba19b9e199ad896495c349",
+    "Sources/VisualRuntime/WritingDeskProductionPack.swift": "7ecab9923a402655fed1ecf60e67cb47a77ce47be9642f32a12d243b02144480",
     "docs/adamant-demand-audit-current.md": "a0607e31cf666d23afb0635ac556039307babb6ed4b076cecde3d7bb9b802cfa",
     "docs/anchorage-portfolio-assignment-current.md": "bec45bd30b70eb93d5a236d265b673132a90122def880e93e1f30c5b2bc97fcd",
     "docs/anchored-realm-production-current.md": "dae8ad64ae75499ef7c07007056afa20c71b994eb6ad2e5e5707322e9656dd69",
@@ -174,7 +179,7 @@
     "docs/full-cast-voice-authority-current.md": "619c9f993853e8d990ef89b85fdf9c39c9dc759a90dd9c74bb865521d2cd8501",
     "docs/gambit-stat-thresholds-current.md": "6549465eed132bc9b7c7dca35df9ce457e9772f583d3290a7c6d26849a0889db",
     "docs/game-design-ux-assessment-current.md": "59dbcf7f6c262f068e02f83f995d85fc6e1f436e393fa7a0bbf04fed3baa16d5",
-    "docs/game-wiki-content-contract-current.md": "395442d1aab8d5de63a6e95953bc00ab9efa5f17fc261aff39d8cb56ed85c73b",
+    "docs/game-wiki-content-contract-current.md": "ab7d2ddfd814b577e0247f5065f09e63798e3ecee67687a385e8642fd27a9978",
     "docs/gear-and-weapon-category-brief-current.md": "530e1c0d6f24d3c4b3de411beeabf8aa396b8b8b58e7b17156765133171468dc",
     "docs/gear-catalogue-disposition-current.md": "cc7c7e0918a955fcee8e3699303bb52654fb5caddd9bc63a6b811f34bf9237ca",
     "docs/gear-crafting-families-current.md": "8a80c3a6f1d97c5bb61a15be857b71b3c0dbc2d0f0081b65411809784ddaebe5",
@@ -294,7 +299,7 @@
     "docs/writing-tool-progression-current.md": "be17fe07aa89aaaab7117a2faca43d7e1eb1be23202d19106c67c42547b23bb0"
   },
   "outputs": {
-    "generated/wiki-data.json": "6801abf92a1eb6d3547489408c0aba03cc136c16ae768c1b178707e776dfb359",
-    "generated/source-registry.json": "f7a99bcc91d7a1cef690ffebe7abc62a3e0dcb98befe3b5c8fe76ec55eb6ce0a"
+    "generated/wiki-data.json": "ef1661a008d5cd8cff94a6943d1bcfbec8d82dc57cba6e92c06f4314e9d3d9b7",
+    "generated/source-registry.json": "95e98acd2d5725c4d31d2cb33995e92fd00e58cce4cb742a105552de379b262e"
   }
 }
