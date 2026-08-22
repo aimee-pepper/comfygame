@@ -3,7 +3,7 @@
 **Status:** current orchestration and handoff authority  
 **Owner:** Game Design owns player promise and mechanics; Asset Lead owns visual solutions inside
 that promise; Engineering Lead owns the native transaction and integration  
-**Updated:** 21 August 2026
+**Updated:** 22 August 2026
 
 ## Why this exists
 
@@ -53,6 +53,68 @@ questions. Existing system documents may supply the answers by reference.
 
 If one of these answers would materially change the feature, Game Design resolves it before the
 handoff. Engineering and Asset should reject a handoff that asks them to choose the game design.
+
+## Dispatch evidence gate
+
+Before Game Design assigns or reprioritizes work, it must inspect the current repository and record
+the following in the assignment itself. Memory, an older chat receipt or a plausible roadmap status
+is not sufficient evidence.
+
+1. exact shared HEAD and the exact installed-device revision, when one exists;
+2. current roadmap primary and why this assignment does or does not pre-empt it;
+3. current owner and dirty-file boundary, including any overlap with another lead;
+4. the latest direct Aimee decision that controls scope, permanence or priority, preserved without
+   paraphrasing away a material distinction;
+5. the exact player-visible result and the receipt that would prove it;
+6. explicit exclusions, including nearby work that must not be inferred from the assignment.
+
+If current evidence contradicts the proposed assignment, reconcile the contradiction before sending
+the order. If a new interpretation would materially change scope, priority, permanence or architecture,
+surface it as an inference rather than dispatching it as settled authority.
+
+## Cost and scope-expansion circuit breaker
+
+An approved feature does not automatically authorize an unbounded implementation mechanism. Stop and
+surface the choice before continuing when a bounded task unexpectedly becomes any of the following:
+
+- a new generator, runtime framework, persistence model or cross-screen architecture;
+- hundreds of generated assets or combinations rather than a small directly reviewed family;
+- a substantial implementation whose player-visible result is still temporary or replaceable;
+- work that delays a currently untestable core route, despite not repairing that route;
+- a proof system whose size or complexity exceeds the production consumer it is meant to unblock.
+
+The escalation must state the player-visible benefit, why the expansion is necessary, the smallest
+coherent alternative, what will be final versus temporary, and the acceptance evidence. Deterministic
+generation, green tests or available compute do not by themselves justify the expansion.
+
+## Asset permanence and replacement authority
+
+Every Asset assignment and receipt classifies each output as exactly one of: **final production art**,
+**accepted production candidate**, **temporary integration scaffold**, **test fixture**, or
+**rejected/superseded**. Classification is per surface; one package may not imply that every contained
+surface has the same permanence.
+
+- Temporary art must remain replaceable through stable semantic keys and may not become a design
+  constraint merely because Engineering integrated it.
+- Final production art requires an explicit brief and visual acceptance at its actual phone scale.
+- Asset failure may remove optional presentation, but may not erase canonical player-facing names,
+  disable a legal gameplay action or make a core route unusable.
+- Current Writing Desk truth is intentionally split: Aimee owns the final sigil drawings, so generated
+  sigils are temporary integration scaffolding; the page parchment is final production art and must
+  not be represented by placeholder geometry or a neutral coded substitute.
+
+## Core-route reliability and acceptance
+
+Campaign load, Writing, binding/departure, exploration, return and save continuity are stop-the-line
+routes. A regression that makes one unusable pre-empts documentation, late-game expansion and unrelated
+polish until the intended current implementation is repaired.
+
+For a phone-critical route, build success and Simulator evidence are necessary but not sufficient.
+Acceptance requires the exact signed installed revision to complete the named ordinary-player path.
+Failure-state fixtures must also prove that optional visual content cannot destroy gameplay-owned
+identity or legal actions. Rollback is not inferred from a regression report; repair the intended
+current design unless Aimee explicitly authorizes rollback or the current architecture is proven
+unsafe to retain.
 
 ## Mockup behavior fence
 
