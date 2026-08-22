@@ -13,7 +13,7 @@
       "id": "band-1",
       "title": "Band 1 · First world, fight and return",
       "reach": "Worlds 1–3 · Binder + Quill · levels 1–3",
-      "itemIDs": ["encounter-scaling", "field-kit-loadout", "essence", "starter-world-pages", "collapse-hud-truth", "terrain-blocked-feedback", "world-visibility", "location-clue-plain-language", "world-resource-reserve", "field-note-generator", "writing-causal-presentation", "world-arrival-reveal", "field-consequence-cues", "local-pickup-feedback", "seamlight", "field-controls", "world-screen-presentation", "world-color", "terrain-layering-animation", "atmospheric-world-presentation", "earth-lighting-test-page", "world-contact", "encounter-opening", "return-receipt-authority", "expedition-review-persistence", "failure-retention-correctness", "combat-affliction-authority"]
+      "itemIDs": ["encounter-scaling", "field-kit-loadout", "essence", "starter-world-pages", "collapse-hud-truth", "terrain-blocked-feedback", "world-visibility", "location-clue-plain-language", "world-resource-reserve", "field-note-generator", "writing-causal-presentation", "world-arrival-reveal", "field-consequence-cues", "local-pickup-feedback", "seamlight", "field-controls", "world-screen-presentation", "world-color", "terrain-worldgen-coherence", "terrain-layering-animation", "atmospheric-world-presentation", "earth-lighting-test-page", "world-contact", "encounter-opening", "return-receipt-authority", "expedition-review-persistence", "failure-retention-correctness", "combat-affliction-authority"]
     },
     {
       "id": "band-2",
@@ -444,14 +444,24 @@
       "isPrimary": false
     },
     {
+      "id": "terrain-worldgen-coherence",
+      "priority": "B1.7a",
+      "title": "Connected terrain, hydrology and resource hosts",
+      "status": "queued",
+      "detail": "Design is implementation-ready in world-terrain-and-resource-hosting-current.md with machine authority world-terrain-resource-host-authority.json. Replace independent per-cell material noise with pressure-faithful connected substrate regions; freeze coherent elevation 0...3; make Standing, Flowing, Frozen and Airborne Hydrology produce distinct topology; preserve underlying base ground beneath Growth/Groundcover; add independent Snow and settled-Ash deposits; and place every current mineral/flora/direct Resource only on an exhaustive legal host. This is the rules counterpart required for the accepted dynamic terrain direction to generate places rather than recolored checkerboards.",
+      "gate": "Implement only after the current authority checkpoint is integrated, without waiting for terrain PNG packaging. Same seed/page is byte-identical; quotas preserve pressure proportions without cardinally isolated base cells; adjacent elevation delta is <=1; Standing basins, Flowing channels, Frozen Ice and Airborne no-ground fixtures differ; Snow/Ash can appear separately or together without replacing base ground; all 23 Resource IDs have exact legal dispositions; Resin is a real secondary flora yield; Ichor never becomes an ordinary node; starter receipts and World Arrival production/counterfactual parity stay green; World Generator Web exposes connected-component, topology, deposit and host diagnostics. No new GroundType, Resource ID, combat, traveller, site or economy rebalance.",
+      "workstream": "engineering",
+      "isPrimary": false
+    },
+    {
       "id": "terrain-layering-animation",
       "priority": "B1.7b",
       "title": "Layered terrain shapes and restrained motion",
-      "status": "queued",
-      "detail": "Design is closed and the accepted Terrain Layering + Motion v0.1 candidate is frozen at Asset commit c5eff83b93278d37710f2d958851487e5042048d. It keeps the map straight top-down, proves reviewed 16×16 water/hard/loose/growth composition through shared irregular contours with no equal-height sidewalls, and supplies one restrained map-level motion grammar. No further Asset variants or polish are authorized before native integration and phone review.",
-      "gate": "Hold behind B1.6a World Arrival. Engineering then integrates only the frozen request, logical bitmap kit, complementary edge ownership, Water/Deep-Water and Growth/Groundcover pair rules, shared motion loop and Reduce Motion/static fallback. The native 11×11 proof must preserve rule receipts, omit hidden requests, keep remembered/fringe static, show no equal-height sidewalls and retain route/content/warning ownership in color and grayscale. Any additional Asset breadth waits for this exact slice to be live and phone-reviewed.",
-      "workstream": "engineering",
-      "isPrimary": false
+      "status": "inProgress",
+      "detail": "Aimee directly authorized a complete production-quality dynamic top-down pixel-art terrain system to replace the shipped placeholder grammar. Terrain Layering + Motion v0.1 at Asset commit c5eff83b93278d37710f2d958851487e5042048d remains accepted only as technical request, shared-edge, visibility, no-sidewall and restrained-motion authority; its hash-scattered family textures are not final terrain art. The first v0.2 body 3e100e72eda90be4c16ac1bd8aeb5ab4c0db214b9d000d3b162760112d0b921f was rejected as another flat stamp grammar. The rebuilt v0.2 body bf06e7c0fc8e60c9d5529482f631fff05b420473c9011b253fe81c3643656588 is accepted only as the production visual direction: its six final-grade 64×64 macro families read as connected top-down pixel art and preserve identical semantic-role geometry across three exact WorldGrade2V1 receipts. It is not a complete pack or native handoff.",
+      "gate": "This is an explicit Aimee-authorized exception to the generic system-first Asset hold. Asset now expands the accepted macro grammar without placeholder fallbacks to Sand, Ice, Ash, Rubble, Mud and Chasm plus two independent pressure-recolorable surface-deposit layers: Snow and settled Ash. They share accumulation geometry but resolve white versus grey/charcoal semantic palettes; either or both may be present, combined opacity must leave base terrain legible, and both remain distinct from base Ash ground, Snow precipitation and airborne ash. All twelve grounds and both deposits require native/2×/400%, phone, literal-grayscale, same-material continuity, critical contacts, turn/T/cross and three exact receipt recolors. Preserve hidden-neighbor exclusion, complementary edge ownership, zero equal-height sidewalls and shared-clock motion; correct elevation conformance to 0...3. Only after the consolidated complete-pack visual review may Asset freeze TerrainProductionPack v1. Engineering integration into MapAssetRenderer/WorldView then removes TerrainPixelGrammar, perimeter borders and southExposure walls before phone acceptance.",
+      "workstream": "asset",
+      "isPrimary": true
     },
     {
       "id": "atmospheric-world-presentation",
@@ -879,7 +889,7 @@
       "title": "Habitat-aware life and body-derived Creature materials",
       "status": "queued",
       "detail": "Persist the exact terrestrial/shore/aquatic/aerial availability, pressure/map weights, body constraints, component-bound movement and 65% contact-eligible placement quota in creature-habitat-authority.json; deep-only fish remain visible ecology without consuming most reachable fights. Each species also freezes the exact 18-family material projection, capability inputs and deterministic quantities from creature-material-projection-authority.json.",
-      "gate": "Engineering first passes both creature validators and the crafting validator with functional identities: Aquatic life remains in connected shallow+deep water; terrestrial/shore/aerial movement stays inside its legal component; morphology consumes no gameplay RNG; cosmetic specimen jitter never changes drops; every remains family/quality/quantity matches the frozen species and repeated rows aggregate. Only when the native world/encounter/Bestiary/material consumer is scheduled may Asset prove one representative species per habitat and only the material families those four bodies actually produce. The remaining species and full 18-family art breadth wait until that vertical slice is live and phone-reviewed. Territory finds remain independently held by Homework.",
+      "gate": "Engineering first passes both creature validators and the crafting validator with functional identities: Aquatic life remains in connected shallow+deep water; terrestrial/shore/aerial movement stays inside its legal component; morphology consumes no gameplay RNG; cosmetic specimen jitter never changes drops; every remains family/quality/quantity matches the frozen species and repeated rows aggregate. The first live proof must run the ordinary pressure-driven Creature generator across controlled terrestrial, shore, aquatic and aerial worlds and demonstrate that valid morphology, placement, movement, encounter identity and body-derived materials emerge from the same generator. No species may be hand-authored merely to fill a habitat quota. Asset may then support only the generated bodies/materials in that executable sample; full visual breadth waits until the generator/consumer is phone-reviewed. Territory finds remain independently held by Homework.",
       "workstream": "engineering",
       "isPrimary": false
     },
@@ -899,7 +909,7 @@
       "title": "Material identity plus six-band loot quality",
       "status": "complete",
       "detail": "Design authority is complete: grey Rough/vendor-trash through orange Peerless/legendary; material family determines legal fit and named contribution; the player-facing Schematic defines object behavior; primary/secondary components weight output quality 70/30; stations have no hard quality cap; Refitting replaces opaque paid ranks. Exact ComponentProfiles, sixteen closed physical aliases, twenty-one Schematic socket tables, quality generation, legacy migration and the Pointed Blade fixture are frozen in crafting-components-and-schematics-current.md.",
-      "gate": "Design freshness must pass python3 scripts/validate_crafting_components.py. Engineering implementation remains ordered behind current opening-playability work and must migrate reserve identity, crafting consumers and legacy exact gear without a parallel grade/tier system. Asset may prove one modular Pointed Blade kit only when that implementation checkpoint is scheduled; no bulk gear production ahead of it. The territory-find category mix remains a separate tuning decision.",
+      "gate": "No weapon or protective-gear implementation starts until Aimee has reviewed the complete category-and-component brief in gear-and-weapon-category-brief-current.md. After approval, Design freshness must pass python3 scripts/validate_crafting_components.py. Engineering must migrate reserve identity, crafting consumers and legacy exact gear without a parallel grade/tier system. The first component-crafted weapon implementation uses one approved reference weapon only to prove rules, receipts and modular visuals; it is not permission for bulk gear production. The territory-find category mix remains a separate tuning decision.",
       "workstream": "design",
       "isPrimary": false
     },
@@ -909,7 +919,7 @@
       "title": "Material-responsive full gear catalogue",
       "status": "queued",
       "detail": "Implement the settled 21-Schematic component system and exact 75-Gear disposition: 44 ordinary found identities, 8 apex-only, 12 truthful component/fixed receipts and 11 decode-only placeholders retired from new acquisition. Remove legacy rarity copy and preserve exact instance power while material components and six-band quality remain independent.",
-      "gate": "Design is complete in crafting-components-and-schematics-current.md and gear-catalogue-disposition-authority.json, validated by both content scripts. Wait for the roadmap-ordered material migration and exact Pointed Blade rules fixture; then Asset proves one modular Pointed Blade kit and Engineering proves stable receipts before catalogue expansion. No bulk final-art production ahead of the rules.",
+      "gate": "Implementation remains blocked until Aimee reviews gear-and-weapon-category-brief-current.md, including every weapon/protective/tool category, exact component sockets and the identified keepsake, ammunition and magical-equipment gaps. After approval, use one first component-crafted weapon—not an unexplained internal 'Pointed Blade slice'—to prove the material migration, atomic receipt, save round-trip and modular sprite assembly before catalogue expansion. No bulk final-art production ahead of those live rules.",
       "workstream": "engineering",
       "isPrimary": false
     },
@@ -958,8 +968,8 @@
       "priority": "S1",
       "title": "Complete source-generated internal Game Wiki",
       "status": "inProgress",
-      "detail": "Checkpoint A is accepted after live 368×800 re-review: Catalogue separates all five exact item domains and stable details; Resources separates World, live-legacy Creature, exact 18 designed Creature families and currencies. Internal routes reset to their headings and the bogus Table/Families parser artifacts are gone. Current checkpoint B is the source-generated People index and 29 traveller details.",
-      "gate": "People covers exactly 29 canonical travellers with role, concise calling, district/station, authored order/phase, clue/page coverage, diary teaching, meeting/recruitment implementation and accepted/candidate asset status; live/authored-not-live/held are never merged. Then continue World Writing, Core Loop/Exploration, Combat and final overview/history reconciliation. This support tool never becomes sole Engineering primary ahead of player-facing opening work. Authority: game-wiki-content-contract-current.md.",
+      "detail": "Catalogue/Resources and the exact 29-person People slice are accepted, but the wiki is not complete: World Writing, Core Loop, Exploration and Combat still use generic authority-file landing surfaces, while Overview/Roadmap/History remain too terse for a nontechnical reader. Engineering continuously completes these deep source-generated routes whenever no higher-priority playable implementation is active.",
+      "gate": "World Writing plus every canonical rune detail; Core Loop and Exploration; Combat; and final Overview/Roadmap/History reconciliation each replace their generic authorityPage fallback with plain-language structured truth, exact live-versus-settled disposition and entity accounting. No required top-level route may substitute a path/status badge for an explanation. Deterministic generate/check/test/build plus 368×800 and desktop navigation/search review pass. This support tool remains fallback Engineering work rather than displacing an explicitly active player-facing implementation. Authority: game-wiki-content-contract-current.md.",
       "workstream": "engineering",
       "isPrimary": false
     },

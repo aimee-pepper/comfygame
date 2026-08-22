@@ -50,7 +50,7 @@
 > **Launch quality:** `app-launch-loading-current.md` defines immediate static and honest in-app
 > loading surfaces plus timing, accessibility and failure-recovery gates.
 
-**Updated:** 21 Aug 2026
+**Updated:** 22 Aug 2026
 **Purpose:** Fast routing for design, engineering and asset work. Start here instead of inferring
 authority from filename age or chat history.
 
@@ -169,6 +169,7 @@ When two documents disagree:
 | Earlier loot quality hybrid review | `loot-quality-hybrid-review-current.md` | Historical first candidate; superseded for current review by the crafting-intuition audit |
 | Crafting intuition and quality review | `crafting-intuition-and-quality-review-current.md` | Settled six bands, 70/30 component weighting, no hard station cap and Refitting; exact content now delegated to the component/schematic authority |
 | Crafting components and schematics | `crafting-components-and-schematics-current.md` | Complete World/Creature component profiles, exact 21-Schematic socket lists, contribution scales, migration and Pointed Blade fixture |
+| Weapon and gear category brief | `gear-and-weapon-category-brief-current.md` | Pre-implementation player review of every proposed weapon/protective/tool category, exact component families and unresolved coverage gaps; blocks implementation until Aimee approves it |
 | Gear catalogue disposition | `gear-catalogue-disposition-current.md` + `gear-catalogue-disposition-authority.json` | Exact 75-Gear partition, found/apex/component/decode-only migration, future acquisition eligibility and old-rarity removal |
 | Library shelves | `library-shelves-current.md` | Close-up Library root, reusable runtime-composed collection assets, habitat/Dictionary volumes and per-diary page→book progression |
 | Internal Game Wiki | `game-wiki-content-contract-current.md` | Required route depth, catalogue/resource taxonomy, stable detail pages and automatic no-placeholder completeness gates |
@@ -261,6 +262,9 @@ When two documents disagree:
 | Key/treasure catalogue identities | `catalogue-item-identity-key-treasure-current.md` | Exact lattice/core/fixture/key/frame referents and disclosure gates for seven progression objects |
 | Wild-weapon catalogue identities | `catalogue-item-identity-wild-weapons-current.md` | Exact physical rule referents, retired-rime guard and collision groups for all eight apex weapons |
 | World color differentiation | `world-color-differentiation-current.md` | Relative visual-distance rule; scoped material/ecology/atmosphere/emitter color and world-grade-2 proof gates |
+| Ground and World Resource coverage | `world-ground-and-resource-coverage-audit-current.md` | Current 12-ground/23-resource sufficiency verdict; coherent terrain topology, Snow cover, elevation 0...3, resource host profiles, sink and rune-targetability corrections |
+| World terrain regions and resource hosting | `world-terrain-and-resource-hosting-current.md` | Implementation-ready connected substrate, elevation, standing/flowing/frozen hydrology, independent Snow/Ash deposits and exhaustive 23-resource host rules |
+| World terrain/resource host machine authority | `world-terrain-resource-host-authority.json` | Closed ground/deposit IDs, deterministic topology constants and exhaustive machine-validated placement disposition for every current World Resource |
 | Authored colored ink | `authored-color-vocabulary-current.md` | Ash/open randomness, Isolde's Ink mixing upgrade, CMY+Depth recipes and four-source first-live allowlist |
 | Writing-tool progression | `writing-tool-progression-current.md` | Rough charcoal → Brush → Fountain pen; Brush-gated adjacent Ink Mixing and Pencil migration |
 | Penmanship native migration | `penmanship-native-migration-current.md` | Exact Brush/tier-1 sibling/Fountain graph, stable-ID and capability-set migration gates |

@@ -1,0 +1,146 @@
+{
+  "schemaVersion": 1,
+  "status": "implementationAuthority",
+  "groundIDs": [
+    "stone", "soil", "sand", "ice", "ash", "water", "deepWater", "rubble", "mud",
+    "growth", "chasm", "groundcover"
+  ],
+  "substrateRegionGroundIDs": ["stone", "soil", "sand", "rubble", "ash"],
+  "surfaceDepositIDs": ["snow", "ash"],
+  "surfaceDepositsAreIndependent": true,
+  "surfaceDeposits": [
+    {
+      "id": "snow",
+      "sourceStableID": "snow",
+      "palette": "whiteBlueGrey",
+      "shapeFamily": "settledCover",
+      "eligibleBaseGroundExclusions": ["water", "deepWater", "chasm"]
+    },
+    {
+      "id": "ash",
+      "sourceStableID": "ash",
+      "palette": "greyCharcoal",
+      "shapeFamily": "settledCover",
+      "eligibleBaseGroundExclusions": ["water", "deepWater", "chasm"]
+    }
+  ],
+  "surfaceDepositComposition": {
+    "order": "sourcePageOrder",
+    "variantIdentity": "depositID+sourceStableID+sourcePageOrder+visualSeed",
+    "combinedOpaqueCoverageCeiling": 0.7,
+    "underlyingGroundRemainsMechanicallyAuthoritative": true
+  },
+  "terrainTopology": {
+    "minimumMaterialQuota": 4,
+    "minimumTilesPerRegion": 8,
+    "dispersionBandWidth": 25,
+    "maximumRegionsPerMaterial": 5,
+    "cardinalSameMaterialGrowthWeight": 8,
+    "diagonalSameMaterialGrowthWeight": 2,
+    "elevationMinimum": 0,
+    "elevationMaximum": 3,
+    "maximumAdjacentElevationDelta": 1,
+    "standingWaterMaximumBodies": 7,
+    "flowingWaterMaximumChannels": 4,
+    "surfaceDepositCoverageCeiling": 0.7
+  },
+  "hydrologyForms": {
+    "standing": "connectedBasinBodies",
+    "flowing": "connectedHighToLowChannels",
+    "frozen": "connectedIceFields",
+    "airborne": "noGroundTiles"
+  },
+  "resourceHosts": [
+    {
+      "resourceID": "rubble",
+      "placementKind": "mineralNode",
+      "clauses": [{"baseGroundIDs": ["stone", "rubble"], "minimumElevation": 0, "maximumElevation": 3}]
+    },
+    {
+      "resourceID": "clay",
+      "placementKind": "mineralNode",
+      "clauses": [{"baseGroundIDs": ["soil"], "adjacentAnyGroundIDs": ["water", "deepWater", "mud"], "minimumElevation": 0, "maximumElevation": 1}]
+    },
+    {
+      "resourceID": "ore",
+      "placementKind": "mineralNode",
+      "clauses": [{"baseGroundIDs": ["stone", "rubble"], "minimumElevation": 0, "maximumElevation": 3}]
+    },
+    {
+      "resourceID": "copper",
+      "placementKind": "mineralNode",
+      "clauses": [{"baseGroundIDs": ["stone", "rubble"], "minimumElevation": 0, "maximumElevation": 3}]
+    },
+    {
+      "resourceID": "silver",
+      "placementKind": "mineralNode",
+      "clauses": [{"baseGroundIDs": ["stone", "rubble"], "minimumElevation": 0, "maximumElevation": 3}]
+    },
+    {
+      "resourceID": "gold",
+      "placementKind": "mineralNode",
+      "clauses": [{"baseGroundIDs": ["stone", "rubble"], "minimumElevation": 0, "maximumElevation": 3}]
+    },
+    {
+      "resourceID": "quartz",
+      "placementKind": "mineralNode",
+      "clauses": [{"baseGroundIDs": ["stone", "rubble"], "minimumElevation": 0, "maximumElevation": 3}]
+    },
+    {
+      "resourceID": "obsidian",
+      "placementKind": "mineralNode",
+      "clauses": [
+        {"baseGroundIDs": ["ash"], "minimumElevation": 0, "maximumElevation": 3},
+        {"baseGroundIDs": ["stone", "rubble"], "adjacentAnyGroundIDs": ["ash", "chasm"], "minimumElevation": 0, "maximumElevation": 3}
+      ]
+    },
+    {
+      "resourceID": "salt",
+      "placementKind": "mineralNode",
+      "clauses": [{"baseGroundIDs": ["sand", "soil"], "adjacentAnyGroundIDs": ["water", "deepWater", "mud"], "minimumElevation": 0, "maximumElevation": 1}]
+    },
+    {
+      "resourceID": "sulfur",
+      "placementKind": "mineralNode",
+      "clauses": [
+        {"baseGroundIDs": ["ash"], "minimumElevation": 0, "maximumElevation": 3},
+        {"baseGroundIDs": ["stone", "rubble"], "adjacentAnyGroundIDs": ["ash", "chasm"], "minimumElevation": 0, "maximumElevation": 3}
+      ]
+    },
+    {
+      "resourceID": "mercury",
+      "placementKind": "mineralNode",
+      "clauses": [{"baseGroundIDs": ["stone", "rubble", "ash"], "minimumElevation": 0, "maximumElevation": 3}]
+    },
+    {
+      "resourceID": "adamant",
+      "placementKind": "mineralNode",
+      "clauses": [
+        {"baseGroundIDs": ["stone", "rubble"], "adjacentAnyGroundIDs": ["chasm"], "minimumElevation": 0, "maximumElevation": 3},
+        {"baseGroundIDs": ["stone", "rubble"], "minimumElevation": 2, "maximumElevation": 3}
+      ]
+    },
+    {
+      "resourceID": "rift_glass",
+      "placementKind": "mineralNode",
+      "clauses": [{"baseGroundIDs": ["stone", "rubble", "ash"], "adjacentAnyGroundIDs": ["chasm"], "minimumElevation": 0, "maximumElevation": 3}]
+    },
+    {"resourceID": "fiber", "placementKind": "floraPrimary", "floraRule": "fibrousOrShortWoody"},
+    {"resourceID": "timber", "placementKind": "floraPrimary", "floraRule": "tallWoody"},
+    {"resourceID": "pulp", "placementKind": "floraPrimary", "floraRule": "fleshy"},
+    {"resourceID": "resin", "placementKind": "floraSecondary", "floraRule": "defendedPhotosyntheticWoody"},
+    {"resourceID": "toxin", "placementKind": "floraPrimary", "floraRule": "chemicalDefence"},
+    {"resourceID": "spore", "placementKind": "floraPrimary", "floraRule": "fungalMetabolism"},
+    {"resourceID": "reagent", "placementKind": "floraPrimary", "floraRule": "chemosyntheticMetabolism"},
+    {"resourceID": "ichor", "placementKind": "creatureMaterialOnly", "excludedFromOrdinaryWorldYieldTable": true},
+    {"resourceID": "essence_raw", "placementKind": "directPickup", "hostRule": "reachablePassableEmpty"},
+    {
+      "resourceID": "mote",
+      "placementKind": "realityPickup",
+      "clauses": [
+        {"baseGroundIDs": ["stone", "rubble", "ash"], "adjacentAnyGroundIDs": ["chasm"], "minimumElevation": 0, "maximumElevation": 3},
+        {"baseGroundIDs": ["stone", "rubble", "ash"], "minimumElevation": 2, "maximumElevation": 3}
+      ]
+    }
+  ]
+}

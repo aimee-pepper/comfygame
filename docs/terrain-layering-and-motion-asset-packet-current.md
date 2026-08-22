@@ -1,10 +1,57 @@
 # Terrain layering and motion — Asset production packet
 
-**Status:** Game Design complete; held behind the active World Arrival correction
-**Priority:** B1.7b, after B1.6a visual acceptance; not a native implementation assignment
+**Status:** active Asset visual-production correction; v0.1 mechanics retained, v0.1 family art superseded
+**Priority:** B1.7b; explicit Aimee-authorized Asset exception to the generic system-first hold
 **Owners:** Game Design owns terrain meaning, disclosure and motion limits; Asset owns the isolated logical
 pixel kit and compositor proof; Engineering later owns the native receipt adapter, cache and shared clock
-**Updated:** 21 August 2026
+**Updated:** 22 August 2026
+
+## Current disposition — 22 August 2026
+
+Aimee's direct requirement is a **properly generated, attractive dynamic pixel-art terrain system**, not
+merely removal of the current native sidewall bug. The v0.1 checkpoint remains authoritative for its closed
+request, shared-edge ownership, visibility, palette, motion and no-false-sidewall contracts. Its visual
+terrain-family sources are a technical prototype, not final terrain art: the current implementation builds
+material texture from hash-scattered pixels and small procedural line/rectangle formulas, and its phone proof
+still reads as procedural speckle rather than deliberately drawn organic terrain.
+
+Therefore:
+
+- Asset must not mechanically repackage the v0.1 family pixels as `TerrainProductionPack v1`;
+- Asset first produces a v0.2 visual style gate from new, deliberately authored logical pixel-art parts,
+  using generated composition references only as declared non-production input;
+- that gate proves dynamic assembly and nonrepetition for Stone, Soil, Water/Deep Water and
+  Groundcover/Growth before the remaining six ground families are expanded;
+- all accepted v0.1 mechanical, disclosure and motion invariants below remain mandatory; and
+- Engineering does not replace the native renderer until Game Design/Aimee accepts the v0.2 style, Asset
+  expands it to all twelve grounds and freezes the native-consumable production pack.
+
+The first v0.2 submission at canonical body
+`3e100e72eda90be4c16ac1bd8aeb5ab4c0db214b9d000d3b162760112d0b921f` is **rejected**. Direct phone,
+400% and source review found six flat 16-pixel material fills decorated by repeated small
+clod/ripple/crown stamps, visibly stair-stepped contacts and three hard-coded `current`/`near`/`far` palette
+tables. That remains a cleaner placeholder grammar, not complete production pixel art and not dynamic
+world-pressure recoloring. Its hashes and green tests do not authorize reuse or promotion.
+
+The rebuilt v0.2 style gate at canonical body
+`bf06e7c0fc8e60c9d5529482f631fff05b420473c9011b253fe81c3643656588` and manifest
+`6f50d6e65f4fc1d360892244b3227fc5fa35fc4a3644363e7a310f2d02ec360b` is **accepted as the visual
+direction only** after direct inspection of the 64×64 macro source sheet, semantic role masks, three live
+`WorldGrade2V1` recolors, phone/grayscale maps, turning shore and T/cross contacts. Its six shown families
+now read as deliberately authored, connected top-down pixel-art surfaces and retain identical form geometry
+across pressure palettes. This is not acceptance of a six-family terrain product, runtime pack or native
+integration. `integrationReady` remains false until the same final-grade grammar covers Sand, Ice, Ash,
+Rubble, Mud and Chasm plus the separate Snow/Ash cover and the consolidated twelve-ground review passes.
+
+The corrected gate must use genuine top-down pixel-art source sheets/parts intended for production, not
+ASCII-like stamp masks on solid squares. It must separate shape from colour through frozen semantic palette
+roles and demonstrate the same source/mask bytes recolored by three exact live `WorldVisualReceipt`
+descriptors. Any bounded first review may show only the six critical families, but every shown sprite must be
+final-grade and reusable; after style acceptance the same system expands to all twelve live grounds and the
+separate Snow/Ash surface-cover overlay before native integration.
+
+The representative style gate is a review checkpoint, not permission to ship only six ground families.
+Completion still means one coherent dynamic system covering all twelve live grounds in the actual phone map.
 
 ## Player result
 
@@ -38,8 +85,13 @@ memory, pathfinding, turns or encounter behavior.
   the final logical pixels and publish their exact hashes.
 - Each tile paints every one of its own visible pixels. Layer contours never leave transparent cracks between
   tiles or draw outside the tile's 16×16 ownership rectangle.
-- The accepted `world-grade-2` descriptor recolors reviewed material ramps. This packet does not create a
-  second palette resolver or read raw pressure values.
+- The accepted `world-grade-2` descriptor, frozen from authored and generated world pressures at bind, is the
+  sole recoloring authority. Terrain assets expose semantic roles such as deep shadow, body dark, body,
+  body light, highlight and family accent only where a family genuinely needs them; the renderer resolves
+  those roles through `WorldGrade2V1` and the exact `WorldVisualReceipt`.
+- Asset may never substitute named mock palettes such as `current`, `near` or `far` for that receipt. Evidence
+  uses exact receipt-backed palette descriptors and proves that recoloring changes RGB only—not alpha,
+  collision, form, edge ownership, visibility or gameplay identity.
 
 ## The material stack
 
@@ -148,7 +200,7 @@ The Asset proof accepts exactly one closed request per currently constructed til
 | `featureVariant` | `0...3` | frozen static detail variant |
 | `cardinalNeighbors` | N/E/S/W safe fact | exact disclosed neighbor or `unknown` |
 | `edgeContourIDs` | N/E/S/W `0...3` | canonical shared edge identity |
-| `elevation` | `0...2` | supplied for external contact-shade composition only |
+| `elevation` | `0...3` | supplied for external contact-shade composition only; matches the live generator |
 | `isCrumbled` | Boolean | game-owned missing/unsafe state; static override |
 | `isCracking` | Boolean | game-owned overlay selection; never inferred from texture |
 | `visibility` | `full`, `fringe`, `remembered` | hidden has no request |
@@ -193,7 +245,13 @@ mechanical severity.
 Ice glints are sparse hard-surface reflections, not a collectible sheen, rarity sparkle or hazard warning.
 Only one quarter of Ice tiles are eligible by stable seed; at most one three-pixel event appears in their
 six-second loop. Stone, Soil, Sand, Ash, Rubble, Mud and Chasm are static in v1. Clear air does not invent
-dust; Rain does not create puddles; Snow does not accumulate; Mud does not bubble.
+dust; Rain does not create puddles; Mud does not bubble. Atmosphere/precipitation presentation does not
+invent transient Snow or Ash accumulation. Two independent rules-owned frozen surface-deposit receipts,
+`snow` and `ash`, may select the reviewed shared accumulation geometry while preserving the underlying ground
+and mechanics. Either may be absent or present, and both may coexist when both exact sources resolve. Snow
+resolves white roles; settled Ash resolves grey/charcoal roles. Their combined opaque coverage leaves the
+underlying material legible. Neither is the transient precipitation nor suspended-air layer, and settled Ash
+is distinct from base `GroundType.ash`.
 
 ### Static, memory and accessibility behavior
 
@@ -210,14 +268,19 @@ dust; Rain does not create puddles; Snow does not accumulate; Mud does not bubbl
 
 Asset must deliver reusable logical sources rather than state screenshots:
 
-1. twelve 16×16 terrain-family top-surface kits with four reviewed static detail variants each;
+1. twelve 16×16 terrain-family top-surface kits with four reviewed static detail variants each, built from
+   genuine production-intended pixel-art source parts rather than procedural/hash-scattered filler;
 2. four complementary cardinal contour-mask families and all 16 N/E/S/W adjacency combinations;
 3. explicit Water/Deep-Water depth-contour, Growth/Groundcover height-boundary and Chasm-rim parts;
 4. Water and Deep-Water motion frames, Groundcover and Growth flex frames, and Ice glint overlay frames;
 5. a pure request normalizer and compositor exporting static body and transparent motion overlay separately;
-6. manifest dimensions, pivots, palette slots, layer ownership, phase counts, command/bitmap hashes and
+6. a separate recolorable Snow/Ash cover kit that can lie over legal underlying grounds without changing their
+   identity, passability or adjacency;
+7. semantic palette-role masks and exact conformance to three receipt-backed `WorldGrade2V1` descriptors,
+   with unchanged form/alpha hashes across recolors;
+8. manifest dimensions, pivots, palette slots, layer ownership, phase counts, command/bitmap hashes and
    `integrationReady:false`; and
-7. no static whole-map image as a production source.
+9. no static whole-map image as a production source.
 
 The static body must be cacheable independently of the motion overlay. A native implementation must not
 reraster terrain bodies four times per second. Motion cache identity includes terrain family, palette
@@ -230,11 +293,11 @@ Use one fixed 11×11 top-down phone fixture at 368×800 containing:
 - all twelve ground types in rule-based contacts rather than an alphabetical swatch grid;
 - connected shallow and deep water with a route turning along the deep boundary;
 - Stone/Rubble, Soil/Mud and Groundcover/Growth direct contacts;
-- a Chasm edge, genuine elevations 0/1/2 and equal-height different-material boundaries;
+- a Chasm edge, genuine elevations 0/1/2/3 and equal-height different-material boundaries;
 - party, route, portal, discovered site, world resource, placed flora and one ordinary creature collision;
 - one cracking tile and one already-crumbled tile;
 - full, fringe, remembered and literally hidden regions; and
-- the accepted current palette descriptor plus one near-related and one far-related descriptor applied to
+- three exact live receipt-backed descriptors—including one close relative and one materially opposed world—applied to
   identical geometry.
 
 Evidence must include:
@@ -281,7 +344,9 @@ These are scheduled only after Asset acceptance and the active Engineering prima
 
 ## Explicit exclusions
 
-- no new terrain kind, weather, puddle, snow accumulation, erosion, current, wave hazard or wind rule;
+- no new base terrain kind, weather, puddle, improvised/transient snow or ash accumulation, erosion, current,
+  wave hazard or wind rule; the separately authorized frozen Snow/Ash cover is an orthogonal rules receipt, not
+  Asset-invented weather state;
 - no animated placed flora, creature, resource, site, portal, crack, collapse or village asset;
 - no parallax, isometric lift, perspective camera, sidewall, height extrusion or screen-space shader;
 - no per-world novelty optimizer or forced visual difference between similar worlds;

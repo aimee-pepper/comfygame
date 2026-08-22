@@ -15,9 +15,15 @@ separation and no horizontal overflow. The initial route-scroll defect and fabri
 material entries were corrected: internal navigation now opens every route at its heading, and the designed
 Creature set derives exactly 18 stable ComponentProfile families.
 
-**Current checkpoint B — People.** Generate the People index and all named-traveller detail routes from the
-canonical 29-person authorities. This is the next source-generated slice; it does not wait for every meeting
-to become live and must label live, authored-not-live and held content honestly.
+**Checkpoint B — People: accepted.** The wiki now covers the exact 29-person authored order with stable
+detail routes, concise roles, phase/order, diary/clue coverage, teaching, owned destination, meeting and
+recruitment state, and truthful visual status. Live, authored-not-live and held content remain distinct.
+
+**Current completion run — World Writing through final reconciliation.** World Writing/rune details, Core
+Loop, Exploration and Combat still use generic authority-file surfaces rather than understandable vertical
+slices. Overview, Roadmap and History then require a final nontechnical reconciliation. Engineering performs
+this as continuous fallback work whenever no higher-priority playable implementation is active; each slice
+must satisfy the no-placeholder definition below before it is called complete.
 
 ## What “complete” means
 
@@ -166,8 +172,8 @@ available, continue without treating each slice as a stop:
 
 1. Catalogue taxonomy + item details — **accepted**;
 2. World Resources / Creature Materials / Currencies + details — **accepted**;
-3. People + traveller details — **current**;
-4. World Writing + rune details;
+3. People + traveller details — **accepted**;
+4. World Writing + rune details — **active fallback slice**;
 5. Core Loop and Exploration;
 6. Combat;
 7. Overview reconciliation, Roadmap detail and History supersession links;
