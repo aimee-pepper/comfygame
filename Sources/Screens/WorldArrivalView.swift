@@ -98,7 +98,6 @@ struct WorldArrivalView: View {
                             .font(.custom("Tiny5", size: 10, relativeTo: .caption))
                             .foregroundStyle(PixelUITheme.muted)
                             .frame(maxWidth: .infinity, alignment: .center)
-                            .accessibilityLabel("Temporary World Splash generator preview")
                     }
 
                     Text(receipt.finalDescription)
