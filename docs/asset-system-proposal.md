@@ -5406,9 +5406,9 @@ only the five-path Asset proof boundary and authorizes no native/PBX/golden or f
 
 **Accepted by Game Design as the frozen corrected production-pack candidate; native integration remains
 unaccepted.** Freeze canonical body SHA-256
-`b9b244ee8382e9f0fca0776603202e51330a651d50b0c499af62a50be2be7ce0` and manifest-file SHA-256
-`3a1709f91de0c39c49a854aea9ba6a427fe44bdba31b23e9ea47fc26ce5982e5`, frozen in exact Asset commit
-`b54db384bbedfd07b8a858f309087adb35c660f3`. The pack has 2,146 deduplicated
+`3a9a3f1f854e20b981c26fa98da36bb4219661623cebfee895e4f743b7a62fa6` and manifest-file SHA-256
+`0257bb94d0e180dfa40008f7143a89e75dec49263e4d08e9249eadfe6f232f96`, frozen in exact Asset commit
+`b559d8e09b42d4e61bc09106543365520ab7831b`. The pack has 4,459 deduplicated
 PNGs, exhaustive current authored lookup, exactly five legal tool/ink strips, exact non-drawable fixed-mask
 semantics and exact 28×5/5×28 shared-edge connectors. It contains no personal-compound, wildcard or generic
 fallback key.
@@ -5420,3 +5420,8 @@ The focused deterministic exporter/test independently reproduced the accepted re
 remains false until Engineering's fail-closed native loader passes the exhaustive pack contract; this
 acceptance authorizes only the exact five-path Asset checkpoint and E3 loader work, not E4/native screen or
 golden promotion.
+
+Engineering E3 candidate `19f1e277` consumes that exact runtime pack through a raw-file-hash-pinned,
+route-lazy adapter covering all 1,296 authored quarter-turn rows and 312 overlays. The built product contains
+one runtime folder and no evidence PNGs. Asset `integrationReady:false` remains provenance truth; E4 remains
+blocked until Game Design accepts the native loader checkpoint.

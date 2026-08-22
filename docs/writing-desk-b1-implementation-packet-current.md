@@ -407,10 +407,10 @@ repeat export. This packaging gate changes no accepted pixels or visual semantic
 
 Game Design accepts the corrected production pack as the frozen Asset candidate; native loading and view
 integration remain unaccepted. Freeze canonical body SHA-256
-`b9b244ee8382e9f0fca0776603202e51330a651d50b0c499af62a50be2be7ce0` and manifest-file SHA-256
-`3a1709f91de0c39c49a854aea9ba6a427fe44bdba31b23e9ea47fc26ce5982e5`. Its exact five-path Asset boundary
-is committed as `b54db384bbedfd07b8a858f309087adb35c660f3`. The closed pack contains 2,146
-deduplicated PNGs, exhaustive 108×3 authored mark lookup, all accepted state-footprint and vocabulary
+`3a9a3f1f854e20b981c26fa98da36bb4219661623cebfee895e4f743b7a62fa6` and manifest-file SHA-256
+`0257bb94d0e180dfa40008f7143a89e75dec49263e4d08e9249eadfe6f232f96`. Its exact five-path Asset boundary
+is committed as `b559d8e09b42d4e61bc09106543365520ab7831b`. The closed pack contains 4,459
+deduplicated PNGs, exhaustive 108×3×4 authored mark lookup, all accepted rotated state-footprint and vocabulary
 combinations, exactly six cardinal connectors, and no personal-compound, wildcard or generic fallback key.
 
 The runtime tool-strip table contains exactly five legal states: Charcoal/Ash, Brush/Ash, Brush/mixed,
@@ -426,6 +426,12 @@ multi-cell states, both link orientations, a real two-contact selection and a ru
 exporter/test passed independently and reproduced both hashes. This acceptance authorizes Asset to checkpoint
 only the declared five-path pack boundary and releases only E3 loader/adapter work; E4 remains blocked until
 that native loader is green.
+
+Engineering E3 loader candidate `19f1e277` validates the frozen raw manifest hash before parsing, routes all
+1,296 authored hand/kind/quarter-turn rows and 312 state overlays fail-closed, preserves only the explicit
+personal-compound compatibility route, and lazily hash-checks image bytes on first use. The app packages the
+single `runtime/` folder resource (manifest plus 4,459 assets) and excludes all evidence/contact sheets. E4
+remains blocked pending Game Design code/diff acceptance of this checkpoint.
 
 The pack must not worsen the already-sensitive app launch path. Packaging tests exhaustively validate every
 file, key and hash. Runtime does no pack enumeration, hashing or image decode at app launch; the adapter opens

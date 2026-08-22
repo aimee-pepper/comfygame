@@ -306,12 +306,16 @@ never borrow it. A later Scriptorium/Runebook visual checkpoint replaces that co
 expanding E3 and delaying the first-three-world loop.
 
 The corrected v1 pack is accepted with canonical body
-`b9b244ee8382e9f0fca0776603202e51330a651d50b0c499af62a50be2be7ce0` and manifest-file SHA
-`3a1709f91de0c39c49a854aea9ba6a427fe44bdba31b23e9ea47fc26ce5982e5`, frozen in Asset commit
-`b54db384bbedfd07b8a858f309087adb35c660f3`. Its tool table excludes the
+`3a9a3f1f854e20b981c26fa98da36bb4219661623cebfee895e4f743b7a62fa6` and manifest-file SHA
+`0257bb94d0e180dfa40008f7143a89e75dec49263e4d08e9249eadfe6f232f96`, frozen in Asset commit
+`b559d8e09b42d4e61bc09106543365520ab7831b`. Its tool table excludes the
 impossible Charcoal/mixed state; tint masks replace only their owned base pixels and fixed masks are never
 drawn. Cardinal links are exact 28×5/5×28 centre-spanning assets with frozen shared-edge offsets. This
 releases the fail-closed E3 loader only; E4 stays blocked until that loader passes.
+
+Engineering checkpoint `19f1e277` supplies that loader candidate: raw-file hash pinning, exhaustive
+quarter-turn routes and overlays, route-lazy asset verification, and one runtime-only folder resource with
+evidence excluded. E4 remains blocked until Game Design accepts its code/diff receipt.
 
 ## 306. World Arrival freezes validated draw commands at bind
 
