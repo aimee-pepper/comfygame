@@ -347,6 +347,53 @@ Every production bitmap or command record has a stable ID, native dimensions, pi
 applicable, deterministic source and lossless RGBA output. CSS/div mock shapes, SF Symbols and screenshot-only
 art are evidence aids, not production assets.
 
+### Native production-pack seam
+
+The accepted A1 and A2 JavaScript compositors are Asset authoring tools, not an iOS runtime dependency. The
+native app must not execute JavaScript, copy proof phone PNGs, or reproduce the glyph, footprint, stroke,
+overlay, link, thumbnail or chrome drawing algorithms in Swift. Before native view integration, Asset exports
+one deterministic `WritingDeskProductionPack` v1 from the frozen accepted sources; Engineering consumes that
+pack through one closed, fail-closed adapter.
+
+The v1 pack contains:
+
+- the exact blank 172×172 page, unread marker and three writing-tool silhouettes;
+- one stable-key mark record for every current target, source, qualifier and compound lexeme in Rough
+  Charcoal, Brush and Fountain form — 108 lexemes × three hands at the current catalogue receipt — including
+  its exact cell footprint, bounds and shape identity;
+- explicit tint-role masks for player-mixed ink and separate fixed-detail roles where a hand treatment owns
+  non-tinted dark pixels. Native code supplies only the already-resolved game-owned ink colour to the declared
+  tint role; it does not recolour paper, chrome, state or unread pixels;
+- a complete stable-key map from every distinct hand footprint to each of the six accepted independent state
+  overlays;
+- one horizontal and one vertical cardinal connector in each hand. Runtime links exist only where occupied
+  cells touch cardinally, matching `PageRules.areAdjacent`; A1's long diagonal linked composition is a
+  stroke-style proof, not a legal runtime page. When two multi-cell marks share more than one edge, the
+  renderer chooses one edge by shared-edge midpoint in reading order — top to bottom, then left to right,
+  with the horizontal edge first only if a malformed case produces the same midpoint. The connector uses the
+  coarsest endpoint hand (`Rough Charcoal` before `Brush` before `Fountain`), remains Ash/open neutral, and is
+  drawn above paper but below the two marks so its ends tuck beneath their strokes. Nonadjacent or unresolved
+  contact fails closed. This needs no new `MarkLink` persistence field;
+- every vocabulary-tile combination needed by the live catalogue: lexeme × current hand × known, unknown,
+  unavailable or selected. Semantic names and explanations remain native game text and are never baked into
+  these images;
+- exact tool/ink chrome with declared tint sockets; Collected and Template card shells with a transparent
+  62×62 page-thumbnail socket and an exact nearest-neighbour sampling map from the already-composed page;
+  and the accepted two-, three- and four-row popover shells plus all four pointer variants; and
+- one closed versioned manifest containing stable keys, native dimensions, hashes, role masks, pivots/insets,
+  socket coordinates, thumbnail mapping, accepted A1/A2/A3 source hashes and lookup tables. Unknown versions,
+  duplicate keys, missing files, unexpected files and hash mismatches refuse the adapter rather than falling
+  back to approximate native drawing.
+
+A3 contributes responsive layout geometry, ownership and composition rules; none of its phone screenshots is
+production input. Runtime page thumbnails are composed from the exact current page, so blank/partial/dense
+proof-card screenshots are not shipped as substitutes for player state. The pack exporter proves exhaustive
+108×3 mark lookup, all six cardinal hand/orientation connectors plus deterministic contact-edge selection,
+both one- and multi-cell state coverage, crop/bounds safety,
+mixed-ink containment, representative runtime thumbnail composition, literal grayscale and byte-identical
+repeat export. This packaging gate changes no accepted pixels or visual semantics and remains
+`integrationReady:false` until Game Design reviews the generated pack and Engineering verifies its loader.
+
 ### Ordered Asset checkpoints
 
 Asset works through these gates in order. Passing a later screenshot cannot rescue an earlier unreadable
@@ -786,9 +833,15 @@ work into one unreviewable change.
    the reachable native Enter-world root lands in the same deployable checkpoint; an invisible pending state
    must never strand a bound run. Hidden crop cells carry no terrain/elevation/flora payload. No Writing Desk
    redesign entered E2.
-3. **E3 — accepted Asset adapter: next Engineering slice.** Only after A3 visual/product acceptance, package/import the exact frozen
-   A1/A2/A3 composable parts and map game-owned physical receipts to them. Pin Asset hashes/versions; do not
-   copy proof phone PNGs or reimplement glyph/footprint pixels in Swift.
+3. **E3 — accepted Asset adapter: active Engineering/Asset slice.** Import the exact accepted A1/A2/A3
+   authoring dependencies, then consume the reviewed `WritingDeskProductionPack` v1 described above. Pin the
+   accepted source and production-pack hashes; validate the closed manifest and map game-owned physical
+   receipts to stable pack keys. A schema-agnostic fail-closed loader may land before the final pack, but the
+   adapter cannot claim source completeness until exhaustive 108×3 marks, state-footprint coverage, the
+   cardinal connector/contact-selection contract, dynamic thumbnail composition and missing/hash/version
+   failure fixtures pass. Do not copy
+   proof phone PNGs, execute JavaScript in iOS, reimplement glyph/footprint pixels in Swift or start E4 view
+   integration from proof-subset assets.
 4. **E4 — Write pane.** Replace the legacy page surface/tool/palette layout with the exact responsive Write
    composition. Preserve all current PageRules mutations, connect/disconnect semantics, outside-tap
    cancellation, Template save action and zero-spend editing. Prove 6×6 completeness and three/two-column

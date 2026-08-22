@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "aggregateSourceHash": "dd3831142bbda7757332b1fa6603eadf92182ca3ca1c44e881cd0e233938c076",
+  "aggregateSourceHash": "495b924c3a8ea85169f199235713a51a75c15d8aa5eeefa96eff34aec505d5da",
   "inputs": {
     "Sources/Content/Data/items.json": "b94b1107229f217e14f1d7fa936d8eea938f9782c06c583be32302f10d432bc9",
     "Sources/Content/Data/playability-roadmap.json": "e295f31a823b486a490a95a31d4ec44e9341e50f117b7575de768e9d1ba6ea5d",
@@ -270,9 +270,9 @@
     "docs/wayfarers-table-flora-recognition-current.md": "01de8b57fba27ce086ac1433890ad42d6d8b740a156dc7c9c685970843e61261",
     "docs/weaponsmith-implementation-current.md": "43a6deed0bfe3a91d82626f22cbd23031d2f664d67ea7627fd5f2a1213fdb0d3",
     "docs/workshop-constellation-role-audit-current.md": "ea43a26411c0909a1370a8f10003294020cc2b5c9c14b3fece88c1e9d5b0cbf3",
-    "docs/world-arrival-asset-packet-current.md": "d3c2f267a9885e772849f803b5fb729b34da57b44050a2096da7337cb08069f4",
+    "docs/world-arrival-asset-packet-current.md": "43030e741a552e20ff89f2ef17d9fbdd7f37481e8fe831fd895db170ea6f7451",
     "docs/world-arrival-causal-reveal-current.md": "2a4e05d6174838641b0b586ddcd7f0a86cd68a6707c6c82c5aef6d8bee73d97f",
-    "docs/world-arrival-description-grammar-current.md": "c6d0afa2fa279fda3b171d6033b4b7c174e677ca94d81a8a4bce528411151993",
+    "docs/world-arrival-description-grammar-current.md": "279d594624a791c35cd0b1c90c434869969b76bde8a98eddd59aae5f72480eb3",
     "docs/world-color-differentiation-current.md": "0973da16ef6fa03cdb3c74e1cc6ab0b8eb9a842958b337b75e2e9d133d4c518b",
     "docs/world-encounter-contact-current.md": "59faf7fe08ce10f50d71f0f68f07e73c7cfbec920b716f12b53540623b5b9dc6",
     "docs/world-grade-2-bind-adapter-current.md": "7d388adabeefcee5fbe50071c2bc9feed7f3c53658eea26f3e3dbbc812470e11",
@@ -282,12 +282,12 @@
     "docs/world-pages-templates-dictionary-current.md": "4be614bb5c389466c6c631c62bfea2ed14efb58080f6a6c066107fe0ebf55774",
     "docs/world-resource-reserve-current.md": "d761b07be32a2045664c5b35ac48617c8a3633c2521caafa42cb7eb632f71ad1",
     "docs/world-screen-phone-composition-current.md": "c82b6038d26b730d84440b250473cbbf0a87a6fb2fa58235d4c6bd2633988efc",
-    "docs/writing-desk-b1-implementation-packet-current.md": "72bfff98754673ad194ebb3720ed27d32928839f7400b16c4eb3978324fba579",
+    "docs/writing-desk-b1-implementation-packet-current.md": "0c445c214e635d96ac18271057f8e21feda4f8ab50468cf47818fb18fb418666",
     "docs/writing-palette-vocabulary-migration-current.md": "188ccb34a285cec36bbfdbf27d1fbfdc90315f22d132fe4e56023b46af1a735a",
     "docs/writing-tool-progression-current.md": "be17fe07aa89aaaab7117a2faca43d7e1eb1be23202d19106c67c42547b23bb0"
   },
   "outputs": {
-    "generated/wiki-data.json": "b055f9c9edfbf815f33cd395be968ce84643d1b9a691f1c04f6f06a6997a9260",
-    "generated/source-registry.json": "a404a98dbeac88ff8e52a7c8f02710d635ad078fe2c854e3cf7c1104c5947092"
+    "generated/wiki-data.json": "f1b6b09193bacc9b2cdc4692578b3558b1ce3e3a717326f7e7771811dda293f6",
+    "generated/source-registry.json": "0fe3bbaf0def3091ef2ce18668afc1e9d0402bef38998945b24674c615997829"
   }
 }

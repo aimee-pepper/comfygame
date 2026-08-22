@@ -1,0 +1,495 @@
+{
+  "manifestVersion": 1,
+  "identityKind": "writing-page-a2-vocabulary-card-tool-kit",
+  "integrationReady": false,
+  "productionSource": "deterministic-integer-logical-pixels",
+  "immutableA1": {
+    "canonicalBodySha256": "89ae14e9f0ecfdee5e35ced08df0f9d9ba76e224fc4908be271f50c1bd01a627",
+    "manifestFileSha256": "6a8eff7e038f7789a1839ab7c5537f1847163bd1f4d311cecdc46e983793801d",
+    "lexemeReceiptSha256": "4126428ef7d5f00891a4afc267f42f0db4fe0320cb1088d5d75e40d2512904f3"
+  },
+  "dimensions": {
+    "vocabularyTile": [
+      52,
+      29
+    ],
+    "toolStrip": [
+      172,
+      22
+    ],
+    "pageCard": [
+      82,
+      88
+    ],
+    "thumbnail": [
+      62,
+      62
+    ],
+    "popoverPointer": [
+      5,
+      3
+    ]
+  },
+  "states": {
+    "tile": [
+      "known",
+      "unknown",
+      "unavailable",
+      "selected"
+    ],
+    "card": [
+      "ordinary",
+      "selected",
+      "unavailable"
+    ],
+    "popover": [
+      "aboveLeft",
+      "aboveRight",
+      "belowLeft",
+      "belowRight"
+    ]
+  },
+  "unknown": {
+    "categoryNeutral": true,
+    "glyphUnchanged": true,
+    "noSemanticIcon": true
+  },
+  "cards": {
+    "collected": "consumable-worn-page",
+    "template": "reusable-two-sheet-tracing"
+  },
+  "popover": {
+    "stretchableBody": true,
+    "rowHeightLogical": 22,
+    "rows": [
+      2,
+      3,
+      4
+    ],
+    "phoneEdgeInsetPoints": 16
+  },
+  "forbidden": [
+    "A1-redraw",
+    "A3",
+    "native",
+    "PBX",
+    "golden",
+    "full-screen"
+  ],
+  "outputs": [
+    {
+      "file": "source/tiles/vocabulary.plains.brush.known-52x29.png",
+      "width": 52,
+      "height": 29,
+      "sha256": "ed289f6596f179f4b352cb5534118c1b28139e857cf1a7e19e858882a37a8dd8",
+      "production": true
+    },
+    {
+      "file": "source/tiles/vocabulary.plains.brush.unknown-52x29.png",
+      "width": 52,
+      "height": 29,
+      "sha256": "d6c4c3ff06cb66e3c86864cfaf3b519f4e01266f1d6ea821d25dc83d0e43151d",
+      "production": true
+    },
+    {
+      "file": "source/tiles/vocabulary.plains.brush.unavailable-52x29.png",
+      "width": 52,
+      "height": 29,
+      "sha256": "33f47b777e5381dddd59cea548d7dfcb2312fd45ec6ca25ced78834120f234db",
+      "production": true
+    },
+    {
+      "file": "source/tiles/vocabulary.plains.fountain.known-52x29.png",
+      "width": 52,
+      "height": 29,
+      "sha256": "b44094175cd51ca0d7ba43679146bbf09085cac17a1c66d75dc2ea12ae242491",
+      "production": true
+    },
+    {
+      "file": "source/tiles/vocabulary.plains.fountain.unknown-52x29.png",
+      "width": 52,
+      "height": 29,
+      "sha256": "08421fc59e2d3978e0977a0a305f7dbaa8cb328c34418beaacafca74f055e5f3",
+      "production": true
+    },
+    {
+      "file": "source/tiles/vocabulary.plains.fountain.unavailable-52x29.png",
+      "width": 52,
+      "height": 29,
+      "sha256": "0010b296c7b774f7fe45acb64eb5577f0c6736af7cbe8944332cf161202dc121",
+      "production": true
+    },
+    {
+      "file": "source/tiles/vocabulary.plains.fountain.selected-52x29.png",
+      "width": 52,
+      "height": 29,
+      "sha256": "a0c2cf2b11d7b9550f5d787190d143befd878a568361d6dab699147a3b0b45b2",
+      "production": true
+    },
+    {
+      "file": "evidence/three-across-known-unknown-unavailable-368x74.png",
+      "width": 368,
+      "height": 74,
+      "sha256": "5b7170095588c355e11093a0b16c48abdef179250f701ce4b21b53e1960ffce6",
+      "production": false
+    },
+    {
+      "file": "evidence/three-across-known-unknown-unavailable-grayscale-368x74.png",
+      "width": 368,
+      "height": 74,
+      "sha256": "5f24ff842dd5ccb60871ad4961024477221e0ea18d56eba046ddd2888dc9c4be",
+      "production": false
+    },
+    {
+      "file": "evidence/same-plains-three-hand-tiles-368x74.png",
+      "width": 368,
+      "height": 74,
+      "sha256": "5b08edfef2df0c0dce12b71e1fceae0175bfb279496ac0220352eaf527f7bd85",
+      "production": false
+    },
+    {
+      "file": "evidence/same-plains-three-hand-tiles-grayscale-368x74.png",
+      "width": 368,
+      "height": 74,
+      "sha256": "36e99ec06f827446831ad9525353720e0b14a872bcecfe17eb08a87d7ceabaee",
+      "production": false
+    },
+    {
+      "file": "source/tools/tool-strip-0-charcoal-ash-172x22.png",
+      "width": 172,
+      "height": 22,
+      "sha256": "02bcc52e4d840f7e6b59e6a3713e96b1d46c98ce8efcd6a33019afda6386be90",
+      "production": true
+    },
+    {
+      "file": "source/tools/tool-strip-1-brush-ash-172x22.png",
+      "width": 172,
+      "height": 22,
+      "sha256": "2bf2582e8d32fc193dd1e1f58deeded1e6609799c225f7707823e40b5735b207",
+      "production": true
+    },
+    {
+      "file": "source/tools/tool-strip-2-fountain-ash-172x22.png",
+      "width": 172,
+      "height": 22,
+      "sha256": "523031fd55a7342707f96f85bde63c76d97b17fe368b2faf52bebeea6d699164",
+      "production": true
+    },
+    {
+      "file": "source/tools/tool-strip-3-brush-cool-172x22.png",
+      "width": 172,
+      "height": 22,
+      "sha256": "590f3dfcdd5e75e01a03a31338c6929f0c2f6afa96a9acb3fe7c5b51e726aedc",
+      "production": true
+    },
+    {
+      "file": "source/tools/tool-strip-4-brush-violet-172x22.png",
+      "width": 172,
+      "height": 22,
+      "sha256": "822063c40fc90462e7c640f31fe479526479824706a487415cf5715f4caa7b01",
+      "production": true
+    },
+    {
+      "file": "source/tools/tool-strip-5-brush-green-172x22.png",
+      "width": 172,
+      "height": 22,
+      "sha256": "9b91292fdb130da30d502ecf002405aaa662b0e616b56318c3237a58041d2359",
+      "production": true
+    },
+    {
+      "file": "contact/tool-strip-all-states-344px.png",
+      "width": 344,
+      "height": 264,
+      "sha256": "aebe7c7c66544026a035a6769d2c578624c36ad06bc9581f4d9607a99339fb78",
+      "production": false
+    },
+    {
+      "file": "contact/tool-strip-all-states-grayscale-344px.png",
+      "width": 344,
+      "height": 264,
+      "sha256": "5ff6450ab2d2af7901dcbd3d3c241980b4541053183d7ffc3664784e063d2c12",
+      "production": false
+    },
+    {
+      "file": "source/tools/tool-part-charcoal-20x18.png",
+      "width": 20,
+      "height": 18,
+      "sha256": "5016cbda8dc73db7d692e4be61d656965405819307165f255db06cc441ce7bf2",
+      "production": true
+    },
+    {
+      "file": "source/tools/tool-part-brush-20x18.png",
+      "width": 20,
+      "height": 18,
+      "sha256": "82ab40ea19b0c3fd6ed226ae671c1fcb162c908182052b136c564e683c93d8a1",
+      "production": true
+    },
+    {
+      "file": "source/tools/tool-part-fountain-20x18.png",
+      "width": 20,
+      "height": 18,
+      "sha256": "ab5a8738a7ab33bc59c0ba254227412f8c1a591885fc780378f16d56a4484d09",
+      "production": true
+    },
+    {
+      "file": "contact/tool-parts-three-across-2x.png",
+      "width": 136,
+      "height": 44,
+      "sha256": "68798f2d3beb7f274d65b703a4963ee180d180870c24a2e8802891850109b193",
+      "production": false
+    },
+    {
+      "file": "contact/tool-parts-three-across-grayscale-2x.png",
+      "width": 136,
+      "height": 44,
+      "sha256": "758bf49a4e0f7d79af5312dc47344e2f54df6f29f93da7ba7e690fe2a78ee617",
+      "production": false
+    },
+    {
+      "file": "contact/tool-parts-three-across-400pct.png",
+      "width": 272,
+      "height": 88,
+      "sha256": "ed75623ed41056ee539f2282488b581d980ed0ce9ad0d4440b5c84eadde4db49",
+      "production": false
+    },
+    {
+      "file": "contact/tool-parts-three-across-grayscale-400pct.png",
+      "width": 272,
+      "height": 88,
+      "sha256": "4c12771bbb52d465e1b60b742f12c0131a8a4c317d52e3053f680692ecb49ec1",
+      "production": false
+    },
+    {
+      "file": "source/cards/collected.ordinary.blank-82x88.png",
+      "width": 82,
+      "height": 88,
+      "sha256": "6a222244e419f5dc7de10b93c26e4e4908c75ed42f30e091a0c9de93e75518b9",
+      "production": true
+    },
+    {
+      "file": "source/cards/collected.ordinary.partial-82x88.png",
+      "width": 82,
+      "height": 88,
+      "sha256": "d9f3f0b547012b3e3745c03248dbff70cb9115d7b1ea9eac8e3b49e8d3552150",
+      "production": true
+    },
+    {
+      "file": "source/cards/collected.ordinary.dense-82x88.png",
+      "width": 82,
+      "height": 88,
+      "sha256": "09457af4a097eb4db374f76403ffb06088d7cdf49446cc90a6a2afaa725e7590",
+      "production": true
+    },
+    {
+      "file": "source/cards/collected.selected.blank-82x88.png",
+      "width": 82,
+      "height": 88,
+      "sha256": "320436326f7cd76aebe0295f5e7f0517ec1bf134690b37a56ff739aa152f1546",
+      "production": true
+    },
+    {
+      "file": "source/cards/collected.selected.partial-82x88.png",
+      "width": 82,
+      "height": 88,
+      "sha256": "2de5507a90b0e648e1e351091a57826d62cadb83ec224548947ad723718ccea3",
+      "production": true
+    },
+    {
+      "file": "source/cards/collected.selected.dense-82x88.png",
+      "width": 82,
+      "height": 88,
+      "sha256": "3ae12882ed894a139c3d4e9f05e22fc0bcbaee14e79a934752a6b16f584402cf",
+      "production": true
+    },
+    {
+      "file": "source/cards/collected.unavailable.blank-82x88.png",
+      "width": 82,
+      "height": 88,
+      "sha256": "1d5e14097a0c29e986b88cb7e8fa3e6344814ec9a6bc1fa5ff024ac0d81b35ae",
+      "production": true
+    },
+    {
+      "file": "source/cards/collected.unavailable.partial-82x88.png",
+      "width": 82,
+      "height": 88,
+      "sha256": "27e73aa2a4073f571907687fec6330c31831bbf4fe8d75a5e4a14ed202770ae2",
+      "production": true
+    },
+    {
+      "file": "source/cards/collected.unavailable.dense-82x88.png",
+      "width": 82,
+      "height": 88,
+      "sha256": "e638acb2e875ddb8789e6a7a7ff5f2aee9e3e46b73095e350c41c3e40997a1f3",
+      "production": true
+    },
+    {
+      "file": "source/cards/template.ordinary.blank-82x88.png",
+      "width": 82,
+      "height": 88,
+      "sha256": "9c7c73367948352cbe87b2f1acc45cc2d655e412587d87e18cd2cce29279a105",
+      "production": true
+    },
+    {
+      "file": "source/cards/template.ordinary.partial-82x88.png",
+      "width": 82,
+      "height": 88,
+      "sha256": "8be0cd6a4284508ffae14ab8dbb0065c9b2559b8a0d91a773d8924c2adfae8a3",
+      "production": true
+    },
+    {
+      "file": "source/cards/template.ordinary.dense-82x88.png",
+      "width": 82,
+      "height": 88,
+      "sha256": "6cce29b1403fb780c0caec30e3e42de82f356b485697e7c8578e1dd3b42bc8a0",
+      "production": true
+    },
+    {
+      "file": "source/cards/template.selected.blank-82x88.png",
+      "width": 82,
+      "height": 88,
+      "sha256": "ac1f7957158d82df5daad018cdb19326b89bf0043ac771970a6ce15e821eaab2",
+      "production": true
+    },
+    {
+      "file": "source/cards/template.selected.partial-82x88.png",
+      "width": 82,
+      "height": 88,
+      "sha256": "8c87175d89da9000c51e2b1fc40e3042494b067d2798a9e2f62ff8d2c234a05d",
+      "production": true
+    },
+    {
+      "file": "source/cards/template.selected.dense-82x88.png",
+      "width": 82,
+      "height": 88,
+      "sha256": "4c9086b763f6a48990744898211fd403887b06e79f1feeef139e1efbe70684dc",
+      "production": true
+    },
+    {
+      "file": "source/cards/template.unavailable.blank-82x88.png",
+      "width": 82,
+      "height": 88,
+      "sha256": "4601d5abf67c80fcdd4b2221f928340e0aa5af27d8988743129825b113682ef2",
+      "production": true
+    },
+    {
+      "file": "source/cards/template.unavailable.partial-82x88.png",
+      "width": 82,
+      "height": 88,
+      "sha256": "5dcd97a087d5c284272c08faf7e4092003fd1bb16a8b7815e13cc50674f285ac",
+      "production": true
+    },
+    {
+      "file": "source/cards/template.unavailable.dense-82x88.png",
+      "width": 82,
+      "height": 88,
+      "sha256": "27b49bdf9a7a3917b95e0f749a9f3cf05dc8bd59c551b4ee7b35f98067521218",
+      "production": true
+    },
+    {
+      "file": "evidence/card-runtime-blank-partial-dense-368x552.png",
+      "width": 368,
+      "height": 552,
+      "sha256": "98f9954c6905ab69e49bfa0f5eb80fbc669557f093d697d9d402c83d99485cad",
+      "production": false
+    },
+    {
+      "file": "evidence/card-runtime-blank-partial-dense-grayscale-368x552.png",
+      "width": 368,
+      "height": 552,
+      "sha256": "45397fdee94b628251b1aa0d8da1e0276ff81e32677c36abd0df94c1ea999153",
+      "production": false
+    },
+    {
+      "file": "evidence/two-across-cards-368x200.png",
+      "width": 368,
+      "height": 200,
+      "sha256": "503e5f6534eb551149c2f018c47f3f973c6efde6b82ef0225376d334ff6af56f",
+      "production": false
+    },
+    {
+      "file": "evidence/two-across-cards-grayscale-368x200.png",
+      "width": 368,
+      "height": 200,
+      "sha256": "d5582f7059558269b8b1693af40f54f8ecb6c81ce4da499b90df16225ecb9c2a",
+      "production": false
+    },
+    {
+      "file": "evidence/card-selected-and-stale-368x200.png",
+      "width": 368,
+      "height": 200,
+      "sha256": "10d64f5d6ac7f0231a5559d1b3831fa0f6a452ece936f658451d6ab4eafbeff1",
+      "production": false
+    },
+    {
+      "file": "evidence/card-selected-and-stale-grayscale-368x200.png",
+      "width": 368,
+      "height": 200,
+      "sha256": "adc966549a64146606b9abbbe5c2f323ea39cfb2a327376fc095c452d2ca1fd9",
+      "production": false
+    },
+    {
+      "file": "source/popover/body-2-rows-82x48.png",
+      "width": 82,
+      "height": 48,
+      "sha256": "44c655fec402fcb5df33219e6d70ba837a7109abc932871e3367c016045ecf68",
+      "production": true
+    },
+    {
+      "file": "source/popover/body-3-rows-82x70.png",
+      "width": 82,
+      "height": 70,
+      "sha256": "aac71e783432892b5d768722b9828ba2c0e849d07c246763fd45f52f391fe31e",
+      "production": true
+    },
+    {
+      "file": "source/popover/body-4-rows-82x92.png",
+      "width": 82,
+      "height": 92,
+      "sha256": "fbbe1bfd31345b55f698b285f11f3386743193f9db3e520d0d172691b39693c6",
+      "production": true
+    },
+    {
+      "file": "source/popover/pointer-aboveLeft-5x3.png",
+      "width": 5,
+      "height": 3,
+      "sha256": "fc2c61e3c9ccbe3d2d165d60cbea02b489aa9a8b26c4dbce787713d3fa852649",
+      "production": true
+    },
+    {
+      "file": "source/popover/pointer-aboveRight-5x3.png",
+      "width": 5,
+      "height": 3,
+      "sha256": "7e34ac2ac1554c356ce6cbdb46a2ac47010f6e7a440c7b5eab751dcae5aa47fc",
+      "production": true
+    },
+    {
+      "file": "source/popover/pointer-belowLeft-5x3.png",
+      "width": 5,
+      "height": 3,
+      "sha256": "0c9de1d3189eb81569ad23ffe3289a82382d4992eb4b8bb98bb7431415a89ce3",
+      "production": true
+    },
+    {
+      "file": "source/popover/pointer-belowRight-5x3.png",
+      "width": 5,
+      "height": 3,
+      "sha256": "a8713c11eca737951dfee09ad6f14e5f78ccbfc66018e007b5b2fb0c667e3559",
+      "production": true
+    },
+    {
+      "file": "evidence/popover-four-edge-variants-368x800.png",
+      "width": 368,
+      "height": 800,
+      "sha256": "ee076e844ebfc5b12381f6bbaf7ec186d3298d5e7b4c7fcbd79bfd2d1bf68f6a",
+      "production": false
+    },
+    {
+      "file": "evidence/popover-four-edge-variants-grayscale-368x800.png",
+      "width": 368,
+      "height": 800,
+      "sha256": "38f942017daa0d6e6ab026ec57e104bdfbd7af3c2f5e67512e08097597f7dd73",
+      "production": false
+    }
+  ],
+  "canonicalBodySha256": "19f45f8188fd99a9308ac2b3d29adfde070a5971eb103ea86a8310e754821b90"
+}

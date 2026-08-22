@@ -1,0 +1,348 @@
+{
+  "manifestVersion": 2,
+  "identityKind": "writing-page-and-hand-a1",
+  "integrationReady": false,
+  "productionSource": "deterministic-integer-logical-pixels",
+  "lexemeReceipt": {
+    "file": "../../fixtures/writing-page-a1-v1/lexeme-receipt.json",
+    "sha256": "4126428ef7d5f00891a4afc267f42f0db4fe0320cb1088d5d75e40d2512904f3",
+    "glyphVersion": "writing-glyph-v1",
+    "counts": {
+      "targets": 8,
+      "sources": 62,
+      "qualifiers": 17,
+      "compounds": 21,
+      "total": 108
+    }
+  },
+  "page": {
+    "width": 172,
+    "height": 172,
+    "writingArea": {
+      "x": 5,
+      "y": 5,
+      "width": 162,
+      "height": 162
+    },
+    "sockets": {
+      "columns": 6,
+      "rows": 6,
+      "width": 27,
+      "height": 27,
+      "count": 36
+    }
+  },
+  "hands": {
+    "charcoal": {
+      "ruleHand": "crude",
+      "footprintBand": [
+        4,
+        6
+      ],
+      "strokePixels": [
+        2,
+        3
+      ]
+    },
+    "brush": {
+      "ruleHand": "plain",
+      "footprintBand": [
+        2,
+        3
+      ],
+      "strokePixels": [
+        2,
+        4
+      ]
+    },
+    "fountain": {
+      "ruleHand": "refined",
+      "footprintBand": [
+        1,
+        1
+      ],
+      "strokePixels": [
+        1,
+        2
+      ]
+    }
+  },
+  "inks": {
+    "ash": {
+      "semantic": "world-colour-open",
+      "visual": "#342923"
+    },
+    "mixed": {
+      "ash": "#342923",
+      "cool": "#3f9f9f",
+      "violet": "#6b429e",
+      "green": "#4cb23b"
+    },
+    "scope": "mark-owned-pixels-only"
+  },
+  "states": {
+    "independentOverlays": [
+      "selected",
+      "legal",
+      "illegal",
+      "connectSource",
+      "connectTarget",
+      "disconnect"
+    ],
+    "shapeRedundancy": true
+  },
+  "unknown": {
+    "independent": true,
+    "preservesGlyphPixels": true,
+    "unknownIDsFailClosed": true
+  },
+  "proofLexemes": [
+    "plains",
+    "verdant",
+    "archipelago",
+    "caverns"
+  ],
+  "outputs": [
+    {
+      "file": "source/page/writing.page.blank-172x172.png",
+      "width": 172,
+      "height": 172,
+      "sha256": "4f954bb219e9007fdd92229474fc9d1e45515ae499e49e47f6798bec1236b698"
+    },
+    {
+      "file": "evidence/blank-page-2x.png",
+      "width": 344,
+      "height": 344,
+      "sha256": "c1469cb732d2bc101aee8fba8dc8948e45c552369b65879c78719241096c8d5b"
+    },
+    {
+      "file": "source/hands/writing.hand.charcoal.plains-81x54.png",
+      "width": 81,
+      "height": 54,
+      "sha256": "b72493d49da33ed5a9e4da5435243ec4521c084a07bf677a134b61b58ae1ab91"
+    },
+    {
+      "file": "source/hands/writing.hand.charcoal.verdant-81x54.png",
+      "width": 81,
+      "height": 54,
+      "sha256": "fd92aa70a6bea41749023552f90eecc45aefbbfddf7c8ff89bb2c73c1528a13e"
+    },
+    {
+      "file": "source/hands/writing.hand.charcoal.archipelago-81x54.png",
+      "width": 81,
+      "height": 54,
+      "sha256": "1a88f4e7005902375fe060f694be8d6a4d78a99f49261e3ed02f40304e4f88e9"
+    },
+    {
+      "file": "source/hands/writing.hand.charcoal.caverns-81x54.png",
+      "width": 81,
+      "height": 54,
+      "sha256": "01d478a204fb38510e38c39844e0dc08545cf0e8b6980ab1c5340373817bdff3"
+    },
+    {
+      "file": "source/hands/writing.hand.brush.plains-81x27.png",
+      "width": 81,
+      "height": 27,
+      "sha256": "8ce59dadfe74942780610f3d02e9b9be4d6f0e60eae4b0c8f33bc04034097345"
+    },
+    {
+      "file": "source/hands/writing.hand.brush.verdant-81x27.png",
+      "width": 81,
+      "height": 27,
+      "sha256": "760213b9ac3befe1a1f61786b143ab8ba70f7551fc6e7fcca0c518c4bce5f9b8"
+    },
+    {
+      "file": "source/hands/writing.hand.brush.archipelago-81x27.png",
+      "width": 81,
+      "height": 27,
+      "sha256": "5bd80f1249f596cb8c0ca7e8e36f6e1e1bd3b469803b243e07ea819cacb36cbf"
+    },
+    {
+      "file": "source/hands/writing.hand.brush.caverns-81x27.png",
+      "width": 81,
+      "height": 27,
+      "sha256": "0f3b3678d810bbc2fb87a0dd368f28a3e4f96be367ad3b9455e1e5d3d0aead83"
+    },
+    {
+      "file": "source/hands/writing.hand.fountain.plains-27x27.png",
+      "width": 27,
+      "height": 27,
+      "sha256": "d996990190f986cc82c24ae44e0eca75c1b6853457f4ac2304b90949cd9dab22"
+    },
+    {
+      "file": "source/hands/writing.hand.fountain.verdant-27x27.png",
+      "width": 27,
+      "height": 27,
+      "sha256": "a86173b1985c901fe5e5b627c507ac0ec5fd85aeb4d031f8dcac55f74881f246"
+    },
+    {
+      "file": "source/hands/writing.hand.fountain.archipelago-27x27.png",
+      "width": 27,
+      "height": 27,
+      "sha256": "4b11009748332879ee3fa98e7edc69f45f5363935c807baff016ab5dd6fd1857"
+    },
+    {
+      "file": "source/hands/writing.hand.fountain.caverns-27x27.png",
+      "width": 27,
+      "height": 27,
+      "sha256": "d415366b39656617fbde359805a984f9abc91cfe7214c844c3cb6a3b305b5351"
+    },
+    {
+      "file": "evidence/four-real-runes-charcoal-2x.png",
+      "width": 344,
+      "height": 344,
+      "sha256": "17a6d2412a3d33650bd2572793811f21466c1f85d30118f7d081988572c7eb27"
+    },
+    {
+      "file": "evidence/four-real-runes-charcoal-grayscale-2x.png",
+      "width": 344,
+      "height": 344,
+      "sha256": "00b681dfaf6469112b4a355b27ab64db99e97b0d12bdc9c0427e9c781c5d0f77"
+    },
+    {
+      "file": "evidence/four-real-runes-brush-2x.png",
+      "width": 344,
+      "height": 344,
+      "sha256": "249bb1c39290a439ebafd0d6f08619ca23c2e5c111ccba49df95a0e4dae6e394"
+    },
+    {
+      "file": "evidence/four-real-runes-brush-grayscale-2x.png",
+      "width": 344,
+      "height": 344,
+      "sha256": "8a662dcb19f2b196128d6f66882322c5e9b3393c47f50f5f4aa2206580d31949"
+    },
+    {
+      "file": "evidence/four-real-runes-fountain-2x.png",
+      "width": 344,
+      "height": 344,
+      "sha256": "334cb0e4f9f5f212a43e0bc981ffe29cb7b8a058634f3cc6880f1386d7369fa1"
+    },
+    {
+      "file": "evidence/four-real-runes-fountain-grayscale-2x.png",
+      "width": 344,
+      "height": 344,
+      "sha256": "e721615b533e3843ec91e3378fe48af9e0e5557e85dfcabee7613e44feb2031e"
+    },
+    {
+      "file": "contact/same-plains-three-hand-footprints-2x.png",
+      "width": 1032,
+      "height": 344,
+      "sha256": "55b378bb880eae7ca32f8c5a336035ce9b1d132132b304875447201e9912e58f"
+    },
+    {
+      "file": "contact/same-plains-three-hand-footprints-grayscale-2x.png",
+      "width": 1032,
+      "height": 344,
+      "sha256": "bf8ed0ad6465666bc756bd8283b2710d60996dd0fb08969753abf8d11503e5b7"
+    },
+    {
+      "file": "contact/brush-ash-open-and-three-mixed-2x.png",
+      "width": 1376,
+      "height": 344,
+      "sha256": "ea83327b2701b2ecbbba6562df436ad2c3056d3db1e7dd97cc05286b9354ac2d"
+    },
+    {
+      "file": "contact/brush-ash-open-and-three-mixed-grayscale-2x.png",
+      "width": 1376,
+      "height": 344,
+      "sha256": "9f62fbccf8f107869f598bfce2ba4c56fb9fa8d7704068cc11bf2d785dd456f0"
+    },
+    {
+      "file": "evidence/multi-cell-link-2x.png",
+      "width": 344,
+      "height": 344,
+      "sha256": "bd4e0e2caa5a919ed3b60f70b2093f34f6bff0f218b6906d108e65270052638a"
+    },
+    {
+      "file": "evidence/multi-cell-link-grayscale-2x.png",
+      "width": 344,
+      "height": 344,
+      "sha256": "1c06f686415643d3dcb9bce023974ac50e4bd91095ce8956c6f0b1f5805707d6"
+    },
+    {
+      "file": "source/states/writing.state.selected-81x27.png",
+      "width": 81,
+      "height": 27,
+      "sha256": "23b3172a46c29c86db26970d3c4371b288a3f6bee4160cdef5747b91560e2d8e"
+    },
+    {
+      "file": "source/states/writing.state.legal-81x27.png",
+      "width": 81,
+      "height": 27,
+      "sha256": "e7e1a3179cfa8040f912d8e336040381fc129967473a7c0ca352111f848eb123"
+    },
+    {
+      "file": "source/states/writing.state.illegal-81x27.png",
+      "width": 81,
+      "height": 27,
+      "sha256": "c1495153f663b4d2f84b49eb4552a671475e25ac504ce041cbc9019e939d9630"
+    },
+    {
+      "file": "source/states/writing.state.connectSource-81x27.png",
+      "width": 81,
+      "height": 27,
+      "sha256": "0532d7d41abc857b6b132a64aab783c9d76bc4f469ac3a4c82396e6f5d48c676"
+    },
+    {
+      "file": "source/states/writing.state.connectTarget-81x27.png",
+      "width": 81,
+      "height": 27,
+      "sha256": "ec208ed755bb5ea84bd2a68c075c7915f8ebadf2ba145bd60a52f83a893a6964"
+    },
+    {
+      "file": "source/states/writing.state.disconnect-81x27.png",
+      "width": 81,
+      "height": 27,
+      "sha256": "aa01efa03bc7c7fc6df82f061cae55e238da9eaab2f58b9233ba469f3aac691a"
+    },
+    {
+      "file": "contact/independent-state-overlays-2x.png",
+      "width": 2064,
+      "height": 344,
+      "sha256": "0194c454b22e1faf10ffeddc619497f7c4ccfb56e4ea793b528724f1c1059472"
+    },
+    {
+      "file": "contact/independent-state-overlays-grayscale-2x.png",
+      "width": 2064,
+      "height": 344,
+      "sha256": "db6d2691607ae7d2eaf014be17653bfa7db5e6add388fd2694898d60ebe95fa1"
+    },
+    {
+      "file": "source/disclosure/writing.unread-marker-9x7.png",
+      "width": 9,
+      "height": 7,
+      "sha256": "f9baf508a5337118a630139d0d066c79fa2d3fa74cb9a2e2db883c2b7944c7ac"
+    },
+    {
+      "file": "evidence/known-and-unknown-2x.png",
+      "width": 344,
+      "height": 344,
+      "sha256": "c8f1fa7c08199df307379d3ac648295dc4ece81e41118f38d88bdafb77899bdc"
+    },
+    {
+      "file": "evidence/known-and-unknown-grayscale-2x.png",
+      "width": 344,
+      "height": 344,
+      "sha256": "1c376377646fea76074f4cca5e0b0cd7db4cd3908da5fdcff1c4fae1705d49cc"
+    },
+    {
+      "file": "evidence/dense-first-last-row-2x.png",
+      "width": 344,
+      "height": 344,
+      "sha256": "26a23cc866a2bd36f02b04259836e85a0ca595b0df98a93bbcbad22a7879f2df"
+    },
+    {
+      "file": "evidence/dense-first-last-row-grayscale-2x.png",
+      "width": 344,
+      "height": 344,
+      "sha256": "c949b5e4d86c4b12f6f0311322c42617b2e54b9a912424f3f7be51a520108cfd"
+    },
+    {
+      "file": "evidence/socket-collision-2x.png",
+      "width": 344,
+      "height": 344,
+      "sha256": "b4a28c28e55d42d4bb6ce29dbee89301af8cccb6b754b3c621aedec94b73d7b2"
+    }
+  ],
+  "canonicalBodySha256": "89ae14e9f0ecfdee5e35ced08df0f9d9ba76e224fc4908be271f50c1bd01a627"
+}
