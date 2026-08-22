@@ -1,11 +1,11 @@
 {
   "schemaVersion": 1,
-  "aggregateSourceHash": "fd36a59f5b357db6046608759fa9ca936e6cdfeb3c91578f3ec57b47d2ebef32",
+  "aggregateSourceHash": "9749d5a40d08921a7e7608b99cd1252c65e82083bbc3b20efa1b378821de8280",
   "inputs": {
     "AssetLab/artifacts/writing-parchment-v1/manifest.json": "9ef9c41f8d4f4b12e5bbb725e9f1ea5e52a77a3175de758016bb58cd170c499f",
     "Bookbinder.xcodeproj/project.pbxproj": "01e245dbbc741635a28629f69986c570f71c347b3a9eeef527fe1b021c8c9b7c",
     "Sources/Content/Data/items.json": "b94b1107229f217e14f1d7fa936d8eea938f9782c06c583be32302f10d432bc9",
-    "Sources/Content/Data/playability-roadmap.json": "884fcb425af6fe2beeeccfb7e086f13adcf73f3f44cfb5f8b21a1955270802a3",
+    "Sources/Content/Data/playability-roadmap.json": "b57a27a511f2b22a20aa398e70ddba911df80f39aba7a02f19cfaa592c17751c",
     "Sources/Content/Data/pressure_sources.json": "68f7b2271d51613030f2f3b3e573f750af53c9b68fe00d68a599dcd6fc0a9b86",
     "Sources/Content/Data/pressure_targets.json": "b35cf88512a7e1e2efde12f352a35e1d499376a8a9990daa41a8f285c65e6a42",
     "Sources/Content/Data/qualifiers.json": "35c0f4b00f35fdb8d1d1845ca27988b73283acc623ec3b39c95cb1b921bec120",
@@ -120,7 +120,7 @@
     "docs/crafting-components-and-schematics-current.md": "c95517d88d373eea5be411b019f3893da5cdf948cb569309e4ac9c88cb09ca86",
     "docs/crafting-intuition-and-quality-review-current.md": "7cfe996ccda8bd3cdf150c36cc827bf57d64b72937d183dfe58586fbbf8fef22",
     "docs/creature-ecology-and-materials-overhaul-current.md": "e71a15702256af55de1c34b0269b14f2e657109c32f9dac53acdfae2ea59885f",
-    "docs/creature-ecology-asset-packet-current.md": "04f3495242bf577001c10b1658ff46f8bfbefaa6e42c9220d32ec580fa3b8219",
+    "docs/creature-ecology-asset-packet-current.md": "a347f4426c13ccd6546314e25b0ba4917159627c9931d559dcbb278fe9c120e8",
     "docs/creature-territory-finds-current.md": "07792ad39d56392aaadc4507520015020a77171b6e6486f22aa3381903027385",
     "docs/cross-lead-delivery-contract-current.md": "78176d825b1e0eac091d371f31a7e8ad859bf3a33706449f01900f2db36f73d8",
     "docs/curio-identification-knowledge-current.md": "31acb95848598b0874e3978a9488f122b8bfee115e16867a5dca9fa1c33986f0",
@@ -299,7 +299,7 @@
     "docs/writing-tool-progression-current.md": "be17fe07aa89aaaab7117a2faca43d7e1eb1be23202d19106c67c42547b23bb0"
   },
   "outputs": {
-    "generated/wiki-data.json": "7592f6d81b5055c4b8bbbdf9efcac1b12328a11df22ffbd1dd117f1f7f100281",
-    "generated/source-registry.json": "81000428087321c5cf3a433f7ba346eedc254d3a7484cb44ad845d33da15a83b"
+    "generated/wiki-data.json": "87120ad98e6d6cfe17396f3625896860e9615db9b435ecfc57db1f8297cd5952",
+    "generated/source-registry.json": "0beeb152abd00e4e69bc44c27249a2118574cc04c0f9c78a2f5adb4aa6d9abb1"
   }
 }

@@ -1,11 +1,12 @@
 # Creature ecology and material assets — production packet
 
-**Status:** Future full-family production brief, currently held. Engineering must first implement the
-habitat/material consumer with functional identities. Asset may then receive a separately scheduled
-four-species vertical slice—one terrestrial, shore, aquatic and aerial identity plus only their resulting
-material families. The remaining three references and full eighteen-family atlas wait until that slice is
-live and phone-reviewed. This packet removes visual discretion that would change game semantics; Aimee
-still accepts or rejects the resulting art.
+**Status:** Future dynamic-renderer production brief, currently held. Engineering must first implement the
+pressure-driven habitat/material consumer and persist one functional visual receipt produced by the ordinary
+Creature generator. Asset does **not** receive a one-creature-per-habitat assignment. When separately
+scheduled, Asset builds one reusable dual-camera creature renderer whose modules consume the generated trait
+vector; the seven named receipts below are conformance inputs only, never an authored species catalogue.
+This packet removes visual discretion that would change game semantics; Aimee still accepts or rejects the
+resulting art.
 **Scope:** generated ordinary-creature identity across world/encounter/Bestiary plus the 18 Creature-material
 inventory identities. No native integration, ecology rules or combat tuning are part of the Asset task.
 **Updated:** 21 August 2026
@@ -31,17 +32,28 @@ an Earth-species catalogue or a new gameplay stat.
 
 ## Exact output boundary
 
-The list below is the eventual complete family contract, not one currently authorized Asset task. The first
-scheduled Asset checkpoint is the four-species vertical slice defined in the status above. Do not generate
-the remaining reference species, unused material families or six-band breadth merely because their future
+The list below is the eventual complete family contract, not one currently authorized Asset task. No Asset
+checkpoint begins until Engineering proves that ordinary pressure-driven generation, habitat placement,
+movement, encounter identity and material projection all consume the same persisted species receipt. Do not
+generate fixed habitat mascots, unused material families or six-band breadth merely because future proof
 requirements are documented here.
 
-The first checkpoint produces only:
+The first authorized checkpoint eventually produces only:
 
-- seven reference species, each as one 16×16 straight-top-down world sprite and one 48×48 shallow-side
-  encounter/detail sprite;
-- one integrated world fixture using at least four of those species in their legal habitats;
-- one quiet encounter-stage fixture proving the same identities at 48×48;
+- one deterministic modular renderer/compositor that accepts the exact persisted Creature trait receipt and
+  exports both a 16×16 straight-top-down world sprite and a 48×48 shallow-side encounter/detail sprite;
+- reusable production modules covering all seven current body plans (`quadruped`, `biped`, `serpentine`,
+  `segmented`, `radial`, `piscine`, `amorphous`), all five cranial features (`none`, `longEars`, `horns`,
+  `crest`, `sensoryFan`) and all five appendage types (`none`, `membrane`, `feathered`, `finned`, `limbed`)
+  across legal counts 0...8;
+- deterministic visual handling for size, build, covering hardness/length/coverage, bone density,
+  Pierce/Crush/Rend armament, ornament, CMY/depth/pattern coloration, opacity/shine/schiller finish,
+  toxicity and typed emanation without exposing hidden numbers as UI badges;
+- rendered outputs for all seven frozen receipts below **through that same generic compositor**, plus a
+  deterministic pressure-driven batch containing unseen legal combinations; no species ID may select a
+  bespoke bitmap or species-specific branch;
+- one integrated world fixture using generated species in their legal habitats and one quiet encounter-stage
+  fixture proving the same receipt identities at 48×48;
 - eighteen separate 32×32 transparent Creature-material sprites;
 - a quality-frame kit for Rough/Standard/Fine/Superior/Exceptional/Peerless that surrounds but never redraws
   those material sprites;
@@ -62,10 +74,12 @@ The 48px sprite is not an enlarged 16px sprite, but it also is not a redesign. S
 morphology remain identical. A piscine body cannot become a generic quadruped in combat; a horned silhouette
 cannot lose its horns; a membrane flier cannot acquire feathers merely because they read better.
 
-## Seven closed reference identities
+## Seven closed conformance receipts
 
-These are proof fixtures, not named Earth species and not a new authored bestiary. Asset renders the stated
-facts and nothing more.
+These are proof fixtures, not named Earth species, not new authored Bestiary entries and not stable sprite
+lookup keys. Asset feeds each persisted vector through the same generic renderer used for unseen generated
+species. The fixture ID may label evidence and tests only; it may not select pixels, geometry, palette or a
+species-specific assembly branch.
 
 | Fixture ID | Habitat / body | Required visible structure | Required projected-material read |
 |---|---|---|---|
@@ -97,6 +111,12 @@ The sole machine source for these exact normalized inputs is
 editable fixture catalogue. They are fixed review fixtures, not a replacement for pressure-driven live
 generation. Armament columns are Pierce/Crush/Rend; finish columns are Opacity/Shine/Schiller and sum to 100;
 colour columns are Cyan/Magenta/Yellow, followed by Depth/Patterning.
+
+The renderer must also pass an ordinary-generator batch that is **not** listed in this document. Stable
+trait-receipt equality must yield byte-identical dual-camera outputs; a changed body plan, cranial feature,
+appendage type/count or material-bearing covering axis must change only its owned visual modules. The test
+must fail if fixture ID, habitat label or expected material list changes pixels while the trait vector stays
+identical.
 
 | Fixture | Size | Cover H/L/C | Bone | Body / head | Appendages | Armament P/C/R | Ornament | CMY · depth/pattern | Finish O/S/Sch | Toxic | Emanation |
 |---|---:|---|---:|---|---|---|---:|---|---|---|---|
@@ -220,7 +240,7 @@ Return one consolidated review packet, not a stream of per-sprite approvals:
 
 The checkpoint is rejected if any of these are false:
 
-1. Each species reads as the same individual identity in both camera profiles.
+1. Each generated receipt reads as the same individual identity in both camera profiles.
 2. All explorable-map sprites are straight top-down and all encounter/detail sprites use the accepted
    shallow-side camera consistently.
 3. Habitat placement is truthful, including shallow+deep aquatic continuity and inaccessible deep fauna.
@@ -230,6 +250,8 @@ The checkpoint is rejected if any of these are false:
 6. Quality frames do not mutate material identity or pretend that quality substitutes for family.
 7. No hidden mechanic, remote content, material drop or minimap species identity leaks through the art.
 8. Repeated export is byte-identical and every product is a real logical pixel asset in the required format.
+9. All seven fixture receipts and the unseen pressure-driven batch use one generic compositor; source and
+   tests prove that no fixture/species ID, habitat label or expected-material list selects bespoke art.
 
 Native promotion is a later Engineering checkpoint after the ecology/material schemas are live. Acceptance
 of this packet authorizes freezing Asset outputs; it does not authorize Asset to edit game code.
