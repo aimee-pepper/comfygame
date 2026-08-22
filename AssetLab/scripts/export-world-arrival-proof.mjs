@@ -19,7 +19,7 @@ const shapeCatalogue=Object.fromEntries(JSON.parse(fs.readFileSync(path.join(rep
 const pages = Object.fromEntries(authority.definitions.filter(row=>row.disposition==="starterUnique").map(row=>[row.id,row]));
 const descriptions = {
   starter_open_meadow:"Broad sandy ground runs between shallow pools. Your Plains mark opened the terrain, while your Verdant mark spread low growth farther along the few wet and stony edges.",
-  starter_rainwashed_shore:"Stone shelves break a wide run of shallow and deep water. Your Archipelago mark divided the route, while sparse growth settled on the open stone.",
+  starter_rainwashed_shore:"Stone shelves break a wide run of shallow and deep water. Your Archipelago mark divided the route, while only the ground nearest the entry remained clearly visible.",
   starter_stone_hollow:"Stone closes around narrow paths and wet hollows. Your Caverns mark shaped the enclosure, while your Ore mark made ore more plentiful."
 };
 const useExistingFixtures=process.argv.includes("--use-existing-fixtures");
