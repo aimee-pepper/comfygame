@@ -215,13 +215,13 @@
         "file": "phones/starter_rainwashed_shore-368x800.png",
         "width": 368,
         "height": 800,
-        "sha256": "afae1ae142e8533ccc949a6c9ec2571c1bfb17f9741e597f2df8ac4f944bcfc3"
+        "sha256": "9d5105f60021268017d5dece8a951e0fd37b3b768db1de06c519409a1571fce4"
       },
       "phoneGray": {
         "file": "phones/starter_rainwashed_shore-grayscale-368x800.png",
         "width": 368,
         "height": 800,
-        "sha256": "5651c8523a929e99c85c3af709a6a8e2e2f4bab1df6ff84ed625d947717a3a83"
+        "sha256": "ab7270ebc55215f8961cfb173e9c0603aab3047079ab2349fde9496f66901d8b"
       },
       "mapCrop": {
         "file": "evidence/starter_rainwashed_shore-first-map-crop-90x90.png",
@@ -347,13 +347,13 @@
         "file": "phones/visible_site_candidate-368x800.png",
         "width": 368,
         "height": 800,
-        "sha256": "5b8d8560a3d384bb90db44a4d4306b17b315731f504c5533cd297d031f7a5534"
+        "sha256": "ee13deaa76f227026366338347b1fbfe90daffe381e27e9ddddc6ae778ec8103"
       },
       "phoneGray": {
         "file": "phones/visible_site_candidate-grayscale-368x800.png",
         "width": 368,
         "height": 800,
-        "sha256": "9286b865f62ffd3822e6ab6bd8a40ffdc7e7a72ae695826bd6ac97044d5df973"
+        "sha256": "ad3d1c3078cde76294a11ed3e3e65368f4afd38176e29b218dc48d7b97c96c21"
       },
       "mapCrop": {
         "file": "evidence/visible_site_candidate-first-map-crop-90x90.png",
@@ -400,37 +400,37 @@
     "file": "evidence/starter-phone-continuity-matrix.png",
     "width": 2208,
     "height": 830,
-    "sha256": "a14823d893251ba3982663bcbd454abb687fbfe378eb4a7f6d3e538dc6688ae1"
+    "sha256": "4077dbe1144de94145e3cbdf913669d349175f4b1d953e466784e051508ca872"
   },
   "starterMatrixGray": {
     "file": "evidence/starter-phone-continuity-matrix-grayscale.png",
     "width": 2208,
     "height": 830,
-    "sha256": "5380388b5893fc7217d579611b388f9a0f898d1a76ce6dff0eaec6f9fa527184"
+    "sha256": "19d171afd91ce4158c559ad4f285567267150364b054f8055dce1e33081e9eeb"
   },
   "comparisonMatrix": {
     "file": "evidence/near-far-phone-matrix.png",
     "width": 1472,
     "height": 1660,
-    "sha256": "5913e9bd5157e450f49508fb0a05e6aedce1ebe9525f54b424d024415b4633d2"
+    "sha256": "b10359585c6d17d86c11c8513d4bb1c8b5d3bd09d8218d59f053578bc52bc500"
   },
   "comparisonMatrixGray": {
     "file": "evidence/near-far-phone-matrix-grayscale.png",
     "width": 1472,
     "height": 1660,
-    "sha256": "0fc717c57288399fe9a19df53246a349c7e13345652b4f8bbaa3f146e5e66d3b"
+    "sha256": "3e77340be58c2836b1cadc5df786a13ca564912202516d25a556ad4749206cee"
   },
   "disclosureMatrix": {
     "file": "evidence/disclosure-ash-phone-matrix.png",
     "width": 2208,
     "height": 830,
-    "sha256": "72011e082dc32d156f5c5e4016f3a7419b24582f793c0fb7ca853944b1faf35a"
+    "sha256": "80383aa7c6f79772c2009879c73ee64abddae5eb0ec3b4206d8d70590bb034b1"
   },
   "disclosureMatrixGray": {
     "file": "evidence/disclosure-ash-phone-matrix-grayscale.png",
     "width": 2208,
     "height": 830,
-    "sha256": "778a82e09dade39267eabf614e6306c970357b23a938214f236c29ef8d312099"
+    "sha256": "8e6ad6845d1853f15aa117abf0767c9b66293b74cfe31bee388b2c5524fa426f"
   },
   "nonPromotable": [
     "visible_site_candidate",
@@ -460,5 +460,5 @@
     "loading-progress",
     "native-gameplay"
   ],
-  "exporterSHA256": "f899b67c6c268efd82228003eb5e8bba0731bb7fd12cb05e42a78b5993412c38"
+  "exporterSHA256": "098cd69a949ffde76e7c5f17980f38fdd19f6ba785858a2939e13ac59ccef4fd"
 }
