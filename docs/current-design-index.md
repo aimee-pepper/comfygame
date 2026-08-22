@@ -211,6 +211,7 @@ When two documents disagree:
 | Historical starting-town slice | `starting-town-band1-integration-current.md` | Superseded five-hotspot proposal retained for history only |
 | Party and character surface | `party-character-surface-current.md` | Five-person grid; Stats/Gear/Skills/Gambit; Diary deep-link; production graph entry |
 | Field consequence and pickup feedback | `field-feedback-and-loot-presentation-current.md` | Adjacent harm/slow cues, contextual Look and local 1.5-tile pickup fade |
+| World field and control feedback | `world-field-and-control-feedback-current.md` | Persistent current-place truth, ordered transient event batches, whole-surface actions and exact hazard/site presentation identities |
 | World arrival causal reveal | `world-arrival-causal-reveal-current.md` + `world-arrival-description-grammar-current.md` + `world-arrival-asset-packet-current.md` | Frozen dynamic image plus exact deterministic concrete-copy grammar; exact Asset compositor inputs, starter fixtures and hidden-site-safe lifecycle |
 | Writing Desk B1 | `writing-desk-b1-implementation-packet-current.md` | Exact draft/collected source state, disclosure-safe projection, phone hierarchy and atomic bind handoff |
 | World screen phone composition | `world-screen-phone-composition-current.md` | Complete-row map sizing, fixed controls, non-displacing overlays, Look/Use Tile and minimap disclosure |
