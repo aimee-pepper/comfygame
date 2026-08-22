@@ -1,0 +1,151 @@
+{
+  "acceptedVisual": {
+    "commit": "5bac76a9",
+    "bodySHA256": "2a541033b71b638f1803e5a9477a0197c38f38d96ff199a4864d49bf551608dd",
+    "manifestSHA256": "5e70b17c91c8601ed895455364f2cd8a51e010e2cb2201f09dc2c02c826f3892",
+    "productionAggregateSHA256": "90da0b9ed6092b591bcad83fbda68b0563de9c2ba37127911772c41418657a54"
+  },
+  "assetCount": 110,
+  "caseCount": 149,
+  "layerOrder": [
+    "baseMacro",
+    "cardinalEdges",
+    "motion",
+    "snowDeposit",
+    "ashDeposit"
+  ],
+  "cases": [
+    {
+      "id": "identical-a/stone/base",
+      "rgbaSHA256": "c8fa8e6c6eb6e7755fbf02a86a73963c8bf20d961452aeb75a2c8662f473491e",
+      "orderedLayers": [
+        "baseMacro",
+        "cardinalEdges",
+        "motion",
+        "snowDeposit",
+        "ashDeposit"
+      ]
+    },
+    {
+      "id": "identical-a/soil/base",
+      "rgbaSHA256": "0564944fadf599e47a1cb6abd2a5e6f849d4abe8b9c91e0b43cb1a3ee4251a8a",
+      "orderedLayers": [
+        "baseMacro",
+        "cardinalEdges",
+        "motion",
+        "snowDeposit",
+        "ashDeposit"
+      ]
+    },
+    {
+      "id": "identical-a/sand/base",
+      "rgbaSHA256": "662e5082f7089b5f423d30b5786fa57091e421662863d698836276e6f30f8249",
+      "orderedLayers": [
+        "baseMacro",
+        "cardinalEdges",
+        "motion",
+        "snowDeposit",
+        "ashDeposit"
+      ]
+    },
+    {
+      "id": "identical-a/ice/base",
+      "rgbaSHA256": "15dd07b8da712845933a2004333b4e2f4d1e0f197acc4c13ec17b014a895b5b0",
+      "orderedLayers": [
+        "baseMacro",
+        "cardinalEdges",
+        "motion",
+        "snowDeposit",
+        "ashDeposit"
+      ]
+    },
+    {
+      "id": "identical-a/ash/base",
+      "rgbaSHA256": "440ffdcec0264777bd3e401d816c32c70ba9a9b2a1aca4452d35781324ae4394",
+      "orderedLayers": [
+        "baseMacro",
+        "cardinalEdges",
+        "motion",
+        "snowDeposit",
+        "ashDeposit"
+      ]
+    },
+    {
+      "id": "identical-a/water/base",
+      "rgbaSHA256": "e4300692338a34eb980651380354ba2350f0accea893c04fcd24a9e48492902c",
+      "orderedLayers": [
+        "baseMacro",
+        "cardinalEdges",
+        "motion",
+        "snowDeposit",
+        "ashDeposit"
+      ]
+    },
+    {
+      "id": "identical-a/deepWater/base",
+      "rgbaSHA256": "028d89f4d471c681c40f227f6de055300f7bba0af20860c1012fe2a9dce5c729",
+      "orderedLayers": [
+        "baseMacro",
+        "cardinalEdges",
+        "motion",
+        "snowDeposit",
+        "ashDeposit"
+      ]
+    },
+    {
+      "id": "identical-a/rubble/base",
+      "rgbaSHA256": "b811eaf380465db937b87fe0ee6aa1f72021b6f15c18b246a25aa289c7481c7a",
+      "orderedLayers": [
+        "baseMacro",
+        "cardinalEdges",
+        "motion",
+        "snowDeposit",
+        "ashDeposit"
+      ]
+    },
+    {
+      "id": "identical-a/mud/base",
+      "rgbaSHA256": "272e85052b1c46e9b1be04d9c3eaaf13e5a1fe9fb97eb3afc452f640a881b679",
+      "orderedLayers": [
+        "baseMacro",
+        "cardinalEdges",
+        "motion",
+        "snowDeposit",
+        "ashDeposit"
+      ]
+    },
+    {
+      "id": "identical-a/growth/base",
+      "rgbaSHA256": "f1739ef283801d2c36c6cf38067959d6ac5ea8935103e59754c53a4b469fec92",
+      "orderedLayers": [
+        "baseMacro",
+        "cardinalEdges",
+        "motion",
+        "snowDeposit",
+        "ashDeposit"
+      ]
+    },
+    {
+      "id": "identical-a/chasm/base",
+      "rgbaSHA256": "6f2d38426d388d777263d3a52ef086ccec9b1b7f1b049acef30307141947b170",
+      "orderedLayers": [
+        "baseMacro",
+        "cardinalEdges",
+        "motion",
+        "snowDeposit",
+        "ashDeposit"
+      ]
+    },
+    {
+      "id": "identical-a/groundcover/base",
+      "rgbaSHA256": "569ba6425bfcd74f91be324f1243fc129c02c0ccf78efe34969bf1e8ad3fccb0",
+      "orderedLayers": [
+        "baseMacro",
+        "cardinalEdges",
+        "motion",
+        "snowDeposit",
+        "ashDeposit"
+      ]
+    }
+  ]
+}
