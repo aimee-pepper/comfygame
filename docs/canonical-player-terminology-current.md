@@ -135,6 +135,13 @@ DEBUG terminology exemption.
    Sigil counts derive from the frozen written vocabulary, never internal semantic atom count.
 7. Regenerate GameWiki labels from this machine authority and run a complete human-visible string census.
 
+Step 7 is active in the current checkpoint. The wiki consumes `canonical-game-terminology.json` directly,
+provides one canonical detail route per concept, and keeps retired vocabulary only in invisible exact-search
+aliases. The executable census discovers every Swift source, audits presentation-bearing UI/DEBUG/error/
+accessibility/log contexts, player-facing content JSON fields, rendered wiki fields, and this checkpoint's
+current wiki contract. Ambiguous ordinary language is evaluated by semantic context rather than globally
+banned; any exceptional allowance must name an exact path, literal, alias and rationale.
+
 ### Research and Combat requirement relationship
 
 Research requirements are earlier **Upgrades** and every listed Upgrade is required. Combat requirements

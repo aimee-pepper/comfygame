@@ -63,9 +63,9 @@ struct GambitRule: Codable, Equatable, Identifiable, Sendable {
         if isFoeArmourRule {
             guard let threshold,
                   let mark = FoeArmourGambit.mark(for: threshold) else {
-                return "\(subjectName) · armour mark → \(actionName)"
+                return "Foe · armour threshold → \(actionName)"
             }
-            return "Foe: armour above \(mark) → \(actionName)"
+            return "Foe · Armour threshold \(mark) → \(actionName)"
         }
 
         guard hasCondition,

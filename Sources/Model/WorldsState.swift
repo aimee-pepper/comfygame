@@ -397,7 +397,14 @@ struct RunExitSummary: Codable, Equatable, Identifiable, Sendable {
     var experienceBreakdown = RunExperienceBreakdown()
 
     var id: String { outcomeID.map { "outcome-\($0.rawValue)" } ?? "legacy-run-\(runIndex)" }
-    var departureCopy: String { departureState?.playerCopy ?? reason }
+    var departureCopy: String {
+        if let departureState { return departureState.playerCopy }
+        let normalized = reason.trimmingCharacters(in: .whitespacesAndNewlines)
+        let tautologies = ["You returned through a portal.", "Returned through a portal", ""]
+        return tautologies.contains(normalized)
+            ? "This Expedition record is from an older save, so the world’s departure state was not recorded."
+            : reason
+    }
 
     init(runIndex: Int, outcomeID: ExpeditionOutcomeID? = nil,
          kind: Kind, reason: String, departureState: WorldDepartureState? = nil,
@@ -1272,6 +1279,15 @@ enum StabilityBand: String, Codable, Sendable {
     case hazardous   // ≤ 50 — hazard tiles spawn at map edges
     case crumbling   // ≤ 25 — tiles crumble inward
     case collapsed   // ≤ 0  — run ends, partial haul
+
+    var displayName: String {
+        switch self {
+        case .stable: "Stable"
+        case .hazardous: "Hazardous"
+        case .crumbling: "Crumbling"
+        case .collapsed: "Collapsed"
+        }
+    }
 }
 
 /// A composed, paid-for book. Every slot is resolved here: symbols the player chose plus the

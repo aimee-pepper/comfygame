@@ -144,18 +144,23 @@ final class DebugRoadmapTests: XCTestCase {
         XCTAssertTrue(item.gate.contains("miniature Tavern"))
     }
 
-    func testCurrentBoardPromotesArrivalAfterInstalledWritingAndTerrainCheckpoints() throws {
+    func testCurrentBoardKeepsCanonicalTerminologyPrimaryAfterInstalledWritingTerrainAndArrival() throws {
         let board = DebugRoadmap.current
         let primaries = Dictionary(grouping: board.items.filter(\.isPrimary), by: \.workstream)
         XCTAssertTrue(primaries.values.allSatisfy { $0.count <= 1 },
                       "each workstream may disclose at most one primary")
-        XCTAssertEqual(board.items.filter(\.isPrimary).map(\.id), ["world-arrival-reveal"])
+        XCTAssertEqual(board.items.filter(\.isPrimary).map(\.id), ["canonical-ui-terminology"])
         let engineering = try XCTUnwrap(primaries[.engineering])
         XCTAssertEqual(engineering.count, 1)
-        let arrival = try XCTUnwrap(engineering.first)
-        XCTAssertEqual(arrival.status, .inProgress)
-        XCTAssertTrue(arrival.gate.contains("without waiting for Writing or Terrain phone acceptance"))
-        XCTAssertTrue(arrival.gate.contains("without requesting new Asset invention"))
+        let terminology = try XCTUnwrap(engineering.first)
+        XCTAssertEqual(terminology.status, .inProgress)
+        XCTAssertTrue(terminology.gate.contains("human-visible string census"))
+        XCTAssertTrue(terminology.gate.contains("GameWiki derives canonical labels"))
+
+        let arrival = try XCTUnwrap(board.items.first { $0.id == "world-arrival-reveal" })
+        XCTAssertEqual(arrival.status, .readyToTest)
+        XCTAssertFalse(arrival.isPrimary)
+        XCTAssertTrue(arrival.detail.contains("05b3a5d8"))
 
         let writing = try XCTUnwrap(board.items.first { $0.id == "writing-causal-presentation" })
         XCTAssertEqual(writing.status, .readyToTest)

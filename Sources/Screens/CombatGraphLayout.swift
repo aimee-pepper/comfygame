@@ -94,4 +94,12 @@ enum CombatGraphNodeState: String {
     case owned = "Owned"
     case available = "Available"
     case blocked = "Blocked"
+
+    var playerLabel: String {
+        switch self {
+        case .owned: "Learned"
+        case .available: "Available"
+        case .blocked: "Blocked"
+        }
+    }
 }

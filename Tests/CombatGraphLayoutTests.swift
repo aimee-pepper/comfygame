@@ -104,7 +104,7 @@ final class CombatGraphLayoutTests: XCTestCase {
         XCTAssertTrue(source.contains("previewCombatNodePurchase(node.id, for: member)"))
         XCTAssertTrue(source.contains("purchaseCombatNode(quote, for: member)"))
         XCTAssertTrue(source.contains("node.depth > CombatGraphRules.openingMaximumDepth"))
-        XCTAssertTrue(source.contains("PurchaseRefusal.unavailable.rawValue"))
+        XCTAssertTrue(source.contains("PurchaseRefusal.unavailable.playerCopy"))
         XCTAssertFalse(source.contains("spendPoint(in:"))
         XCTAssertFalse(source.contains("buyNext"))
 

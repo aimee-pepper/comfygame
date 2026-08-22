@@ -62,6 +62,21 @@ final class ExpeditionOutcomeTests: XCTestCase {
             RunExitSummary.self, from: JSONSerialization.data(withJSONObject: object))
         XCTAssertNil(legacy.departureState)
         XCTAssertEqual(legacy.departureCopy, "Saved legacy departure reason.")
+
+        let oldPortal = RunExitSummary(runIndex: 5, kind: .portal,
+                                       reason: "You returned through a portal.",
+                                       turnsTaken: 2, haulKeptFraction: 1)
+        let decodedPortal = try SaveCodec.makeDecoder().decode(
+            RunExitSummary.self, from: SaveCodec.makeEncoder().encode(oldPortal))
+        XCTAssertNil(decodedPortal.departureState)
+        XCTAssertEqual(decodedPortal.departureCopy,
+                       "This Expedition record is from an older save, so the world’s departure state was not recorded.")
+
+        let oldDefeat = RunExitSummary(runIndex: 6, kind: .defeat,
+                                       reason: "Your party was carried home after the Binder fell.",
+                                       turnsTaken: 9, haulKeptFraction: 0.5)
+        XCTAssertEqual(oldDefeat.departureCopy,
+                       "Your party was carried home after the Binder fell.")
     }
 
     func testPermanentGainsPresentationCoversEmptyFullAndMixedFactsExactly() {

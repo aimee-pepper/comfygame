@@ -302,7 +302,7 @@ struct WorldView: View {
             "Picked up \(amount) \(ContentCatalog.shared.resource(resource)?.name.lowercased() ?? "something")."
         case .harvested(let resource, let amount, let exhausted):
             "Harvested \(amount) \(ContentCatalog.shared.resource(resource)?.name.lowercased() ?? "something")."
-                + (exhausted ? " The node is spent." : "")
+                + (exhausted ? " This deposit is depleted." : "")
         case .foundPortal: "A way out."
         case .foundCache: "A cache, locked. The key is somewhere else."
         case .cacheOpened(let what): "The lock gives. \(what)"
@@ -604,7 +604,7 @@ struct WorldView: View {
         if store.naturalAnchorHere != nil {
             return "Atlas Seam · needs Anchorage and \(store.naturalAnchorCost) essence"
         }
-        if store.carriedAnchorFrame != nil { return "Anchor Frame · needs clear ordinary ground" }
+        if store.carriedAnchorFrame != nil { return "Anchor Frame · needs clear open ground" }
         return hint(for: run)
     }
 
@@ -745,15 +745,22 @@ private struct WorldDiagnosticsView: View {
                 Section("Field awareness") {
                     LabeledRow(icon: "figure.walk", label: "Quiet Step / radius reduction",
                                value: "\(concealment.quietStep ? "yes" : "no") / -\(concealment.radiusReduction)")
+                    let alertReason: (WorldEnemy.Awareness.Reason) -> String = { reason in
+                        switch reason {
+                        case .quietStep: "Quiet Step noticed"
+                        case .maskedScent: "masked scent noticed"
+                        case .disturbance: "disturbance noticed"
+                        }
+                    }
                     ForEach(run.enemies) { enemy in
                         let state: String = switch enemy.awareness {
                         case .unaware: "unaware"
                         case .pursuing: "pursuing"
-                        case .alert(_, let reason): "alert · \(reason.rawValue)"
+                        case .alert(_, let reason): "alert · \(alertReason(reason))"
                         }
                         LabeledRow(icon: enemy.isApex ? "crown" : "eye",
                                    label: run.name(of: enemy),
-                                   value: "\(state) · base r\(WorldRules.detectionRadius(of: enemy, in: run)) · quiet used \(enemy.quietStepHesitationUsed ? "yes" : "no")")
+                                   value: "\(state) · normal detection radius \(WorldRules.detectionRadius(of: enemy, in: run)) · Quiet Step hesitation used \(enemy.quietStepHesitationUsed ? "yes" : "no")")
                     }
                 }
                 Section("World duration") {
@@ -776,7 +783,7 @@ private struct WorldDiagnosticsView: View {
                     if nodes.isEmpty { Text("None") }
                     ForEach(nodes.keys.sorted(by: { $0.rawValue < $1.rawValue }), id: \.self) { id in
                         LabeledRow(icon: ContentCatalog.shared.resource(id)?.icon ?? "cube",
-                                   label: ContentCatalog.shared.resource(id)?.name ?? id.rawValue,
+                                   label: ContentCatalog.shared.resource(id)?.name ?? "Unknown resource",
                                    value: "\(nodes[id] ?? 0)")
                     }
                 }
@@ -786,25 +793,32 @@ private struct WorldDiagnosticsView: View {
                                value: "\(report.travellerCandidates.count) / \(report.travellerSignatureMatches.count) / \(report.travellerEligibleMatches.count) / \(report.travellersPlaced.count)")
                     let arrival = report.travellerArrival
                     if let selected = arrival.selectedTraveller {
+                        let selectedName = ContentCatalog.shared.traveller(selected)?.name ?? "Unknown traveller"
                         LabeledRow(icon: "person.crop.circle.badge.questionmark",
-                                   label: "Selected / band / order",
-                                   value: "\(selected.rawValue) / \(arrival.storyArrivalBand.map(String.init) ?? "—") / \(arrival.authoredOrder.map(String.init) ?? "—")")
-                        LabeledRow(icon: "text.book.closed", label: "Clues / causal known / causal all / accidental",
+                                   label: "Selected traveller / band / order",
+                                   value: "\(selectedName) [Internal ID: \(selected.rawValue)] / \(arrival.storyArrivalBand.map(String.init) ?? "—") / \(arrival.authoredOrder.map(String.init) ?? "—")")
+                        LabeledRow(icon: "text.book.closed", label: "Recovered clues / known matching clues / all matching clues / unplanned matches",
                                    value: "\(arrival.recoveredLocationClues) / \(arrival.causallyAuthoredKnownConditions) / \(arrival.causallyAuthoredConditions) / \(arrival.accidentalSatisfiedConditions)")
                         LabeledRow(icon: "dice", label: "Evidence / prior misses / chance / roll",
                                    value: "\(arrival.evidenceScore.formatted(.number.precision(.fractionLength(2)))) / \(arrival.priorNearMisses) / \(arrival.arrivalChance.formatted(.percent.precision(.fractionLength(1)))) / \(arrival.arrivalRoll?.formatted(.number.precision(.fractionLength(4))) ?? "—")")
                     }
+                    let arrivalOutcome: String = switch arrival.outcome {
+                    case .noEligibleMatch: "No eligible traveller"
+                    case .confidenceFailed: "Evidence was not strong enough"
+                    case .placementFailed: "No valid placement"
+                    case .placed: "Traveller placed"
+                    }
                     LabeledRow(icon: "checkmark.seal", label: "Arrival outcome",
-                               value: arrival.outcome.rawValue)
+                               value: arrivalOutcome)
                     if report.travellersPlaced.isEmpty { Text("No travellers placed") }
                     ForEach(report.travellersPlaced, id: \.self) { id in
-                        Text(ContentCatalog.shared.traveller(id)?.name ?? id.rawValue)
+                        Text("\(ContentCatalog.shared.traveller(id)?.name ?? "Unknown traveller") [Internal ID: \(id.rawValue)]")
                     }
                 }
                 if let preview = run.activeEncounter?.scalingPreview {
                     Section("Encounter scaling") {
                         LabeledRow(icon: "number", label: "Scaling rules",
-                                   value: preview.scalingRulesVersion ?? "historical-upper-median")
+                                   value: preview.scalingRulesVersion ?? "Older rules · upper-median scaling")
                         if let ledger = preview.partyPowerLedger {
                             LabeledRow(icon: "person.3", label: "Anchor / party power",
                                        value: "L\(ledger.anchorLevel) · \(ledger.uncappedBudget.formatted(.number.precision(.fractionLength(3)))) → \(ledger.cappedBudget.formatted(.number.precision(.fractionLength(3))))")
@@ -817,16 +831,23 @@ private struct WorldDiagnosticsView: View {
                             LabeledRow(icon: "person.3", label: "Historical party levels / upper median",
                                        value: "\(preview.partyLevels.map(String.init).joined(separator: ", ")) / \(preview.upperMedian)")
                         }
-                        LabeledRow(icon: "pawprint", label: "Visible foe IDs",
-                                   value: preview.foeIDs.map { String($0.rawValue) }.joined(separator: ", "))
-                        LabeledRow(icon: "circle.grid.cross", label: "Grouping radius / reasons",
+                        let foeLabel: (InstanceID) -> String = { id in
+                            let name = run.enemies.first(where: { $0.id == id }).map { run.name(of: $0) }
+                                ?? "Unknown creature"
+                            return "\(name) [Internal ID: \(id.rawValue)]"
+                        }
+                        LabeledRow(icon: "pawprint", label: "Visible foes",
+                                   value: preview.foeIDs.map(foeLabel).joined(separator: ", "))
+                        LabeledRow(icon: "circle.grid.cross", label: "Grouping radius / inclusion reasons",
                                    value: "\(preview.groupingRadius) · " + preview.inclusionReasons.keys.sorted().compactMap { foeID in
-                                       preview.inclusionReasons[foeID].map { reason in "\(foeID): \(reason)" }
+                                       guard let raw = UInt64(foeID) else { return nil }
+                                       return preview.inclusionReasons[foeID].map { reason in "\(foeLabel(InstanceID(rawValue: raw))): \(reason)" }
                                    }.joined(separator: "; "))
                         if let excluded = preview.exclusionReasons, !excluded.isEmpty {
                             LabeledRow(icon: "nosign", label: "Excluded map foes",
                                        value: excluded.keys.sorted().compactMap { foeID in
-                                           excluded[foeID].map { "\(foeID): \($0)" }
+                                           guard let raw = UInt64(foeID) else { return nil }
+                                           return excluded[foeID].map { "\(foeLabel(InstanceID(rawValue: raw))): \($0)" }
                                        }.joined(separator: "; "))
                         }
                         LabeledRow(icon: "chart.bar", label: "Stability / greed level-equivalents",
@@ -862,7 +883,7 @@ private struct WorldDiagnosticsView: View {
                                    value: "L\(preview.apexLevelFloor) · \(preview.apexHPMultiplier.formatted(.number.precision(.fractionLength(2))))× · \(preview.apexOffenceMultiplier.formatted(.number.precision(.fractionLength(2))))× · \(preview.apexActionSlots)")
                         ForEach(preview.finalFoes, id: \.id) { foe in
                             LabeledRow(icon: foe.isApex ? "crown.fill" : "pawprint.fill",
-                                       label: "Foe \(foe.id.rawValue) final",
+                                       label: "\(foeLabel(foe.id)) · final",
                                        value: "L\(foe.level) · HP \(foe.maxHP) · ATK \(foe.attack) · ARM \(foe.armour)")
                         }
                         Text("Projected opening damage and neutral rounds-to-defeat: pending simulation model.")
@@ -893,7 +914,30 @@ private struct WorldDiagnosticsView: View {
 
     private var tuningSnapshot: String {
         let t = run.tuning
-        return "rawProfile=\(t.rawEssenceProfile.rawValue) rawFrequency=\(t.rawEssenceFrequencyMultiplier) rawYield=\(t.rawEssenceYieldMultiplier) nodeDensity=\(t.resourceNodeDensityMultiplier) creatureDensity=\(t.creatureDensityMultiplier) diaryShare=\(t.diaryWritingShare) secondWriting=\(t.additionalPageChance) patience=\(t.diaryPatienceWorlds) travellerWindow=\(t.blindDiscoveryWindow) travellerClueWeight=\(t.travellerClueEvidenceWeight) travellerAuthoredWeight=\(t.travellerAuthoredEvidenceWeight) travellerArrivalFloor=\(t.travellerArrivalChanceFloor) travellerNearMissIncrement=\(t.travellerArrivalNearMissIncrement) stabilityDuration=\(t.stabilityDurationMultiplier) collapseRecovery=\(t.collapseRecoveryFraction) apex=\(t.apexChanceMultiplier) encounterScaling=\(t.encounterScalingProfile.rawValue) vision=\(t.baseVisionRadius) slowExtra=\(t.slowGroundExtraTurns) activeFlora=\(t.activeFloraFrequencyMultiplier) floraSeverity=\(t.floraHazardSeverityMultiplier) opening=\(t.openingEncounterEnvelope.rawValue)"
+        return [
+            "Raw Essence preset: \(t.rawEssenceProfile.displayName)",
+            "Raw Essence frequency: \(t.rawEssenceFrequencyMultiplier)",
+            "Raw Essence yield: \(t.rawEssenceYieldMultiplier)",
+            "Resource-deposit density: \(t.resourceNodeDensityMultiplier)",
+            "Creature density: \(t.creatureDensityMultiplier)",
+            "Diary writing share: \(t.diaryWritingShare)",
+            "Additional writing chance: \(t.additionalPageChance)",
+            "Diary patience: \(t.diaryPatienceWorlds) worlds",
+            "Traveller arrival window: \(t.blindDiscoveryWindow)",
+            "Traveller clue weight: \(t.travellerClueEvidenceWeight)",
+            "Traveller authored-writing weight: \(t.travellerAuthoredEvidenceWeight)",
+            "Traveller arrival floor: \(t.travellerArrivalChanceFloor)",
+            "Traveller near-miss increase: \(t.travellerArrivalNearMissIncrement)",
+            "World duration: \(t.stabilityDurationMultiplier)×",
+            "Collapse recovery: \(t.collapseRecoveryFraction)",
+            "Apex chance: \(t.apexChanceMultiplier)×",
+            "Encounter scaling: \(t.encounterScalingProfile.displayName)",
+            "Starting vision radius: \(t.baseVisionRadius)",
+            "Slow-ground extra turns: \(t.slowGroundExtraTurns)",
+            "Active-flora frequency: \(t.activeFloraFrequencyMultiplier)",
+            "Flora hazard severity: \(t.floraHazardSeverityMultiplier)",
+            "Opening encounter: \(t.openingEncounterEnvelope.displayName)"
+        ].joined(separator: "\n")
     }
 }
 #endif

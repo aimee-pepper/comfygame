@@ -8,6 +8,7 @@ const data = await fetch("./generated/wiki-data.json").then(response => {
 const navItems = [
   ["overview", "Overview"], ["core-loop", "Core Loop"], ["world-writing", "World Writing"],
   ["exploration", "Exploration"], ["combat", "Combat"], ["people", "People"],
+  ["terminology", "Terminology"],
   ["village-buildings", "Home & Village"], ["resources-crafting", "Resources & Crafting"],
   ["catalogue", "Catalogue"], ["roadmap", "Roadmap"], ["history", "Decisions / History"],
   ["asset-gallery", "Asset Gallery"]
@@ -20,7 +21,7 @@ const hashLink = (route, label) => `<a href="#/${route}">${escapeHTML(label)}</a
 
 function provenance(record) {
   const p = record.provenance;
-  return `<div class="provenance"><strong>Source receipt</strong><br>${p.sourcePaths.map(escapeHTML).join(" · ")}<br>${p.stableID ? `Stable ID: ${escapeHTML(p.stableID)} · ` : ""}Disposition: ${escapeHTML(p.disposition)}<br>Generated at source hash: ${escapeHTML(p.generatedAtSourceHash)}</div>`;
+  return `<div class="provenance"><strong>Where this came from</strong><br>${p.sourcePaths.map(escapeHTML).join(" · ")}<br>${p.stableID ? `Stable ID: ${escapeHTML(p.stableID)} · ` : ""}Disposition: ${escapeHTML(p.disposition)}<br>Generated at source hash: ${escapeHTML(p.generatedAtSourceHash)}</div>`;
 }
 
 function layout(route, content) {
@@ -29,7 +30,7 @@ function layout(route, content) {
     <aside class="sidebar">
       <div class="brand"><div class="brand-mark">B</div><div><strong>Bookbinder</strong><small>Internal source wiki</small></div></div>
       <label for="wiki-search">Search facts</label>
-      <input class="search" id="wiki-search" type="search" placeholder="Station, person, rune…" autocomplete="off">
+      <input class="search" id="wiki-search" type="search" placeholder="Station, person, Sigil…" autocomplete="off">
       <div class="search-results" id="search-results" hidden></div>
       <nav class="nav" aria-label="Wiki sections">${nav}</nav>
     </aside>
@@ -44,21 +45,37 @@ function header(kicker, title, lede) {
 function overview() {
   const cards = [
     ["core-loop", "Core Loop", "Write → arrive → explore → return → prepare, with live and not-yet-live steps separated."],
-    ["world-writing", `${data.counts.runes} writing lexemes`, "Physical Pages, three hands, knowledge boundaries, costs and one stable detail route per lexeme."],
+    ["world-writing", `${data.counts.runes} Writing entries`, "Sigils, Subjects, Focuses, Modifiers, Compounds, physical Pages, three hands, knowledge boundaries, costs, and stable details."],
     ["exploration", "Exploration", "Movement, visibility, hazards, discoveries, collapse and return."],
     ["combat", "Combat", "Current scaling, reach, damage, equipment, statuses and God Mode evidence limits."],
+    ["terminology", `${data.terminology.length} canonical concepts`, "The exact player-facing language used across the game, with retired wording searchable but never presented as a parallel concept."],
     ["village-buildings", `${data.counts.stations} Home & Village destinations`, "Rooms, interfaces, shelves, progression surfaces, yard features, and village buildings—truthfully distinguished."],
     ["people", `${data.counts.travellers} authored people`, "Stable identities and current source dispositions."],
-    ["roadmap", `${data.counts.roadmap} roadmap receipts`, "Operational status without silently promoting provisional work."],
-    ["asset-gallery", "Asset evidence", "Acceptance, source integration and native/phone status remain separate receipts."]
+    ["roadmap", `${data.counts.roadmap} roadmap entries`, "Operational status without silently promoting provisional work."],
+    ["asset-gallery", "Asset evidence", "Acceptance, source integration, and native/phone status remain separate records."]
   ];
   const liveCount = data.roadmap.filter(item => item.status === "complete" || item.status === "readyToTest").length;
   const currentPrimary = data.roadmap.find(item => item.isPrimary);
   return header("Private · generated", "What Bookbinder is", "Bookbinder is an expedition game about physically writing worlds, exploring what those words caused, and bringing knowledge and materials home to prepare the next journey.") +
     `<div class="grid">${cards.map(([route, title, text]) => `<a class="card" href="#/${route}"><h3>${escapeHTML(title)}</h3><p>${escapeHTML(text)}</p></a>`).join("")}</div>
-    <h2>What is playable now</h2><div class="card"><p>The source-complete E4 Write pane is ready for signed in-place phone installation and ordinary-path review; the existing loop can bind worlds, explore terrain and encounters, collect objects and Pages, return home, use destinations and grow a party. ${liveCount} roadmap receipts are currently complete or awaiting acceptance. Dedicated Pages/The world Writing panes, the frozen arrival tableau and several presentation rebuilds remain absent or queued.</p></div>
+    <h2>What is playable now</h2><div class="card"><p>The repaired Write pane is installed and still awaits its 368-point visual acceptance; the existing loop can bind worlds, explore terrain and encounters, collect objects and Pages, return home, use destinations and grow a party. ${liveCount} roadmap entries are currently complete or awaiting acceptance. Dedicated Pages/The world Writing panes and several presentation rebuilds remain absent or queued.</p></div>
     <h2>What is actually next</h2><div class="card"><p>${currentPrimary ? `${escapeHTML(currentPrimary.name)} is the sole current primary and remains ${escapeHTML(currentPrimary.status)}.` : "No sole current primary is registered."} Every verified phone-ready update installs promptly in place without uninstall/reset; installation does not authorize auto-launch. Writing E4 still awaits physical-phone acceptance, and protected isolated Terrain integration does not displace that gate. E5–E7 remain explicitly not started.</p></div>
     <h2>Truth boundary</h2><div class="card"><p>Plain-language summaries lead; provenance follows. Current pages prefer registered <code>*-current.md</code> authorities. Decision logs remain under History and never replace current facts. Proposed, paused and settled-not-live work is labelled where it appears.</p></div>${sourceReceipt(["docs/current-design-index.md", "docs/game-wiki-content-contract-current.md"])}`;
+}
+
+function terminology(slug = null) {
+  if (slug) {
+    const term = data.terminology.find(candidate => candidate.slug === slug);
+    if (!term) return notFound();
+    return header(term.domain, term.name, term.summary)
+      + `<h2>Where this appears</h2><div class="card"><p>${escapeHTML(term.whereItAppears)}</p></div>`
+      + `<h2>Internal metadata and provenance</h2><div class="facts"><dl class="fact"><dt>Concept ID</dt><dd><code>${escapeHTML(term.id)}</code></dd></dl><dl class="fact"><dt>Authority status</dt><dd>${escapeHTML(term.disposition)}</dd></dl></div>`
+      + provenance(term) + `<p>${hashLink("terminology", "← Terminology")}</p>`;
+  }
+  const groups = Object.groupBy(data.terminology, term => term.domain);
+  return header("One concept · one player name", "Terminology", "Canonical names lead everywhere in the game. Older wording remains searchable only so an old query reaches the right current concept.")
+    + Object.entries(groups).map(([domain, terms]) => `<h2>${escapeHTML(domain)}</h2><div class="grid">${terms.map(term => `<a class="card" href="#/terminology/${term.slug}"><h3>${escapeHTML(term.name)}</h3><p>${escapeHTML(term.summary)}</p></a>`).join("")}</div>`).join("")
+    + sourceReceipt(["docs/canonical-game-terminology.json", "docs/canonical-player-terminology-current.md"]);
 }
 
 function sourceReceipt(paths) {
@@ -73,10 +90,10 @@ function flow(steps) {
 function worldWriting() {
   const groups = ["target", "source", "qualifier", "compound"];
   const current = data.currentTruth.writing;
-  return header("Physical writing system", "World Writing", "A world begins as a physical 6×6 page. Marks occupy space, links turn marks into requests, and a final bind freezes the exact page, costs, field loadout and world receipt.")
+  return header("Physical writing system", "World Writing", "A world begins as a physical 6×6 Page. Sigils occupy space, links turn Sigils into requests, and a final bind saves the exact Page, costs, field loadout, and world record.")
     + `<h2>Compose a page</h2>${flow([
-      ["Choose a hand", "Rough charcoal writes large crude marks; Brush writes medium plain marks; Fountain pen writes refined one-cell marks. A better hand saves space, not meaning.", "live"],
-      ["Place and connect", "Targets name what a request is about. Sources act only when linked to a target. Qualifiers modify a directly connected source. Compounds are compact self-contained statements.", "live"],
+      ["Choose a hand", "Rough charcoal writes large crude Sigils; Brush writes medium plain Sigils; Fountain pen writes refined one-cell Sigils. A better hand saves space, not meaning.", "live"],
+      ["Place and connect", "Subjects name what a request describes. Focuses act only when linked to a Subject. Modifiers narrow a directly connected Focus. Compounds are compact self-contained statements.", "live"],
       ["Choose ink", "Ash/open leaves colour unspecified. Prepared ink recipes freeze exact CMY/Depth applications when the page is bound; ordinary editing spends nothing.", "live"],
       ["Review and bind", "The review surface redacts unread meanings before it forms any text. The same quote is compared inside one atomic mutation before Essence, ink, inventory or a collected page can move.", "partly live"]
     ])}`
@@ -86,20 +103,21 @@ function worldWriting() {
       <dl class="fact"><dt>Templates</dt><dd>Live persistence: saved compositions can be loaded, renamed, overwritten and deleted; a template is not consumed by binding.</dd></dl>
       <dl class="fact"><dt>The world</dt><dd>Designed, not yet implemented in E6/E7: truthful costs, broad unread risk, causal outputs, loadout and final Bind & Depart.</dd></dl>
     </div>`
-    + `<h2>Current visual boundary</h2><div class="card">${badge(current.status)}<p>The current native source bundles and hash-validates <code>${escapeHTML(current.parchment.stableKey)}</code>; that proves source integration, not ordinary-phone acceptance. The standalone artifact still records <code>integrationReady:${escapeHTML(current.parchment.artifactIntegrationReady)}</code>, so the wiki preserves both receipts instead of silently promoting either one.</p><p>${escapeHTML(current.markArtStatus)}. ${escapeHTML(current.vocabularyLabelStatus)}.</p></div>`
-    + `<h2>Knowledge and disclosure</h2><div class="card"><p><strong>Known</strong> licenses a readable name and meaning. <strong>Encountered</strong> only proves that the mark was seen and may display <code>??</code>. Targets and writable qualifiers are rules-known; sources and compounds become known through campaign ownership. An unread mark never contributes hidden names, icons, sorting text, accessibility text, ecology claims, sight bands or narrow collapse estimates.</p></div>`
-    + `<h2>Page sources and consumption</h2><div class="facts"><dl class="fact"><dt>Draft</dt><dd>Reusable after bind; its revision and frozen page hash participate in the quote.</dd></dl><dl class="fact"><dt>Collected / wild page</dt><dd>One physical instance with a canonical definition hash. Successful bind consumes only that selected instance; stale catalogue identity refuses.</dd></dl><dl class="fact"><dt>Starter pages</dt><dd>Authored World Pages promise a known starting identity, price and seed. Their exact current world receipts remain data-owned.</dd></dl><dl class="fact"><dt>Costs</dt><dd>Essence, exact ink-vial deductions and Field Kit stack moves are frozen in one quote. Any sufficient-but-different wallet, vial or stack state makes it stale.</dd></dl></div>`
-    + `<h2>Canonical lexemes · ${data.symbols.length}</h2><p>These are development-facing catalogue identities. Each detail labels what may be disclosed to a player.</p>`
-    + groups.map(kind => `<h3>${escapeHTML(titleCase(kind))} · ${data.symbols.filter(item => item.category === kind).length}</h3><div class="grid">${data.symbols.filter(item => item.category === kind).map(item => `<a class="card" href="#/lexeme/${item.slug}"><h3>${escapeHTML(item.name)}</h3>${badge(kind)}<p>${escapeHTML(item.summary)}</p><code>${escapeHTML(item.stableID)}</code></a>`).join("")}</div>`).join("")
+    + `<h2>Current visual boundary</h2><div class="card">${badge(current.status)}<p>The current native source bundles and hash-validates <code>${escapeHTML(current.parchment.stableKey)}</code>; that proves source integration, not ordinary-phone acceptance. The standalone artifact still records <code>integrationReady:${escapeHTML(current.parchment.artifactIntegrationReady)}</code>, so the wiki preserves both records instead of silently promoting either one.</p><p>${escapeHTML(current.markArtStatus)}. ${escapeHTML(current.vocabularyLabelStatus)}.</p></div>`
+    + `<h2>Knowledge and disclosure</h2><div class="card"><p><strong>Known</strong> licenses a readable name and meaning. <strong>Encountered</strong> only proves that the Sigil was seen and may display <code>??</code>. Subjects and writable Modifiers are rules-known; Focuses and Compounds become known through campaign ownership. An unread Sigil never contributes hidden names, icons, sorting text, accessibility text, ecology claims, sight bands, or narrow collapse estimates.</p></div>`
+    + `<h2>Page states and consumption</h2><div class="facts"><dl class="fact"><dt>Draft</dt><dd>Reusable after bind; its revision and Page hash saved at the time participate in the quote.</dd></dl><dl class="fact"><dt>Collected / wild Page</dt><dd>One physical instance with a saved definition. Binding consumes only that selected instance; a saved definition that no longer matches refuses safely.</dd></dl><dl class="fact"><dt>Starter Pages</dt><dd>Authored World Pages promise a known starting identity, price, and seed. Their exact current World records remain data-owned.</dd></dl><dl class="fact"><dt>Costs</dt><dd>Essence, exact ink-vial deductions, and Field Kit stack moves are saved in one quote. Any sufficient-but-different wallet, vial, or stack state requires a fresh review.</dd></dl></div>`
+    + `<h2>Canonical Writing entries · ${data.symbols.length}</h2><p>Each detail labels what may be disclosed to a player.</p>`
+    + groups.map(kind => { const playerKind = ({ target: "Subject", source: "Focus", qualifier: "Modifier", compound: "Compound" })[kind]; return `<h3>${playerKind} · ${data.symbols.filter(item => item.category === kind).length}</h3><div class="grid">${data.symbols.filter(item => item.category === kind).map(item => `<a class="card" href="#/lexeme/${item.slug}"><h3>${escapeHTML(item.name)}</h3>${badge(playerKind)}<p>${escapeHTML(item.summary)}</p><code>${escapeHTML(item.stableID)}</code></a>`).join("")}</div>`; }).join("")
     + sourceReceipt(["docs/writing-desk-b1-implementation-packet-current.md", "docs/world-pages-templates-dictionary-current.md"]);
 }
 
 function lexemeDetail(slug) {
   const item = data.symbols.find(candidate => candidate.slug === slug);
   if (!item) return notFound();
-  return header(`${titleCase(item.category)} lexeme · ${item.disposition}`, item.name, item.summary)
-    + `<div class="facts"><dl class="fact"><dt>Stable ID</dt><dd>${escapeHTML(item.stableID)}</dd></dl><dl class="fact"><dt>Identity</dt><dd>${escapeHTML(titleCase(item.category))}</dd></dl><dl class="fact"><dt>Acquisition/source</dt><dd>${escapeHTML(item.acquisition)}</dd></dl><dl class="fact"><dt>Writing cost</dt><dd>${item.essenceCost == null ? "No separate catalogue Essence cost" : `${item.essenceCost} Essence`}</dd></dl><dl class="fact"><dt>Writability</dt><dd>${escapeHTML(item.writability)}</dd></dl><dl class="fact"><dt>Player disclosure</dt><dd>${escapeHTML(item.disclosure)}</dd></dl></div>`
-    + (item.expansion.length ? `<h2>Typed authored effect</h2><div class="card"><ul>${item.expansion.map(value => `<li>${escapeHTML(value)}</li>`).join("")}</ul></div>` : "")
+  const playerKind = ({ target: "Subject", source: "Focus", qualifier: "Modifier", compound: "Compound" })[item.category];
+  return header(`${playerKind} · ${item.disposition}`, item.name, item.summary)
+    + `<div class="facts"><dl class="fact"><dt>Identity</dt><dd>${escapeHTML(playerKind)}</dd></dl><dl class="fact"><dt>How it is learned</dt><dd>${escapeHTML(item.acquisition)}</dd></dl><dl class="fact"><dt>Writing cost</dt><dd>${item.essenceCost == null ? "No separate Essence cost" : `${item.essenceCost} Essence`}</dd></dl><dl class="fact"><dt>Writability</dt><dd>${escapeHTML(item.writability)}</dd></dl><dl class="fact"><dt>Player disclosure</dt><dd>${escapeHTML(item.disclosure)}</dd></dl></div>`
+    + (item.expansion.length ? `<h2>What it affects</h2><div class="card"><ul>${item.expansion.map(value => `<li>${escapeHTML(value)}</li>`).join("")}</ul></div>` : "")
     + (item.attachesTo.length ? `<h2>Legal subjects</h2><div class="card"><p>${escapeHTML(item.attachesTo.join(" · "))}</p></div>` : "")
     + provenance(item) + `<p>${hashLink("world-writing", "← World Writing")}</p>`;
 }
@@ -108,13 +126,13 @@ function coreLoop() {
   return header("Playable expedition cycle", "Core Loop", "Write a world, enter it, bring back evidence, and use that evidence to make the next expedition more deliberate.")
     + flow([
       ["Write", "Compose or choose a physical page. The review shows only meanings the campaign actually knows and freezes exact costs before binding.", "live + installed E4"],
-      ["Arrive", "A successful new bind freezes a world identity and arrival receipt. The dedicated arrival presentation is designed and queued; it must not reroll or reveal hidden content.", "settled-not-live"],
+      ["Arrive", "A successful new bind saves the exact world and Page state before showing arrival. The presentation must not reroll or reveal hidden content.", "live"],
       ["Explore", "Move, Look and Use Tile on a visibility-limited map. Discover terrain, resources, pages, sites and people while stability declines.", "live"],
       ["Collapse or leave", "Returning, retreating and collapse produce typed outcomes. Protected and ordinary carried objects follow different loss rules.", "live"],
-      ["Review", "The return receipt separates recovered, lost and progression facts. The current receipt mechanics are live; the final object-layout screen remains queued.", "partly live"],
+      ["Review", "The Expedition record separates recovered, lost, and XP-earned facts. The current outcome mechanics are live; the final object-layout screen remains queued.", "partly live"],
       ["Prepare at home", "Spend recovered materials and Essence, meet people, build destinations and improve the next written expedition.", "live + expanding"]
     ])
-    + `<h2>What can fail without corrupting a campaign</h2><div class="card"><p>A stale bind quote, missing collected page, changed wallet/vial/Field Kit stack, active run, failed generator or failed visual adapter must refuse before any spend or consumption. Inside a world, retreat remains a real costed choice; collapse resolves through the return receipt rather than silently deleting the expedition.</p></div>`
+    + `<h2>What can fail without corrupting a campaign</h2><div class="card"><p>A changed bind quote, missing collected Page, changed wallet/vial/Field Kit stack, active expedition, failed generator, or failed visual adapter must refuse before any spend or consumption. Inside a world, retreat remains a real costed choice; collapse resolves through the Expedition record rather than silently deleting the expedition.</p></div>`
     + `<h2>First-three-world progression</h2><div class="card"><p>The opening sequence uses authored starter pages to teach writing, arrival, movement, discovery and return one causal step at a time. Open Flats, Rainwashed Shore and Stone Hollow retain distinct world facts; the wiki labels their presentation work separately from live generation.</p></div>`
     + sourceReceipt(["docs/core-loop-causal-presentation-plan-current.md", "docs/first-three-worlds-execution-plan-current.md"]);
 }
@@ -122,20 +140,20 @@ function coreLoop() {
 function exploration() {
   const terrain = data.currentTruth.terrain;
   return header("Inside a written world", "Exploration", "The map is a limited, remembered place—not a full-board inventory. Visibility controls current disclosure; memory preserves terrain without preserving moving threats.")
-    + `<h2>Map actions</h2><div class="facts"><dl class="fact"><dt>Move</dt><dd>Movement spends turns and follows terrain, elevation, obstruction and encounter rules.</dd></dl><dl class="fact"><dt>Look</dt><dd>A zero-turn adjacent preview. It disarms on any non-direction surface or state change and must not reveal facts beyond current knowledge.</dd></dl><dl class="fact"><dt>Use Tile</dt><dd>The stable contextual action for the current tile: harvest, search, inspect, take, contact or use a site. Exhausted nodes must become unavailable truthfully.</dd></dl><dl class="fact"><dt>Field Kit</dt><dd>Carried capacity is finite. Taking a page or object can open an exact swap decision; cancellation and stale choices mutate nothing.</dd></dl></div>`
-    + `<h2>Visibility and memory</h2><div class="card"><p><strong>Full</strong> shows terrain and current entities. <strong>Fringe</strong> shows terrain/elevation without flora, objects or moving mobs. <strong>Remembered</strong> shows explored terrain and static learned objects, but not moving mobs. <strong>Hidden</strong> is opaque and carries no terrain payload into disclosure-safe receipts. Atmosphere may soften visibility; it is not a shortcut for the visibility math.</p></div>`
-    + `<h2>World contents</h2><div class="progression-grid"><article class="card"><h3>Terrain & hazards</h3><p>Ground, water, elevation and active flora decide passability, movement cost and learned consequence cues. Hazard details appear only when seen or earned.</p>${badge("live")}</article><article class="card"><h3>Resources & objects</h3><p>World resource nodes, loose Essence, items and pages are physical finds. A local pickup is one exact group and inventory transaction.</p>${badge("live")}</article><article class="card"><h3>Sites & people</h3><p>Sites can be inspected or used; traveller presence follows written-world conditions. Hidden sites and identities remain undisclosed.</p>${badge("live")}</article><article class="card"><h3>Creatures</h3><p>Ordinary and apex creatures occupy the world and can initiate combat. The final habitat/material ecology projection is settled design but not yet live.</p>${badge("mixed")}</article></div>`
+    + `<h2>Map actions</h2><div class="facts"><dl class="fact"><dt>Move</dt><dd>Movement spends turns and follows terrain, elevation, obstruction, and encounter rules.</dd></dl><dl class="fact"><dt>Look</dt><dd>A zero-turn adjacent preview. It disarms on any non-direction surface or state change and must not reveal facts beyond current knowledge.</dd></dl><dl class="fact"><dt>Use Tile</dt><dd>The stable contextual action for the current tile: harvest, search, inspect, take, contact, or use a site. Exhausted deposits must become unavailable truthfully.</dd></dl><dl class="fact"><dt>Field Kit</dt><dd>Carried capacity is finite. Taking a Page or object can open an exact swap decision; cancellation and changed choices mutate nothing.</dd></dl></div>`
+    + `<h2>Visibility and memory</h2><div class="card"><p><strong>Full</strong> shows terrain and current entities. <strong>Fringe</strong> shows terrain/elevation without flora, objects or moving mobs. <strong>Remembered</strong> shows explored terrain and static learned objects, but not moving mobs. <strong>Hidden</strong> is opaque and stores no terrain data for later presentation. Atmosphere may soften visibility; it is not a shortcut for the visibility math.</p></div>`
+    + `<h2>World contents</h2><div class="progression-grid"><article class="card"><h3>Terrain & hazards</h3><p>Ground, water, elevation, and active flora decide passability, movement cost, and learned consequence cues. Hazard details appear only when seen or earned.</p>${badge("live")}</article><article class="card"><h3>Resources & objects</h3><p>World resource deposits, loose Essence, items, and Pages are physical finds. A local pickup is one exact group and inventory transaction.</p>${badge("live")}</article><article class="card"><h3>Sites & people</h3><p>Sites can be inspected or used; traveller presence follows written-world conditions. Hidden sites and identities remain undisclosed.</p>${badge("live")}</article><article class="card"><h3>Creatures</h3><p>Normal and apex creatures occupy the world and can initiate combat. The final habitat/material ecology model is settled design but not yet live.</p>${badge("mixed")}</article></div>`
     + `<h2>Current Terrain presentation boundary</h2><div class="facts"><dl class="fact"><dt>Closed border correction</dt><dd>${badge(terrain.borderCorrection.status)} ${escapeHTML(terrain.borderCorrection.summary)}</dd></dl><dl class="fact"><dt>Layered shapes & motion</dt><dd>${badge(terrain.layeredPresentation.status)} ${escapeHTML(terrain.layeredPresentation.nativeStatus)}. This changes presentation only.</dd></dl><dl class="fact"><dt>Atmosphere & height shade</dt><dd>${badge(terrain.atmosphere.status)} ${escapeHTML(terrain.atmosphere.nativeStatus)}. It is not current native terrain behavior.</dd></dl></div>`
     + `<h2>Stability, collapse and turns-left</h2><div class="card"><p>Stability is the world’s remaining ability to hold together. “Turns left” is a current estimate derived from the active world, not a second timer. Leaving early, retreating or collapse each produce their own typed return outcome and preservation rules.</p></div>`
     + sourceReceipt(["docs/world-screen-phone-composition-current.md", "docs/field-feedback-and-loot-presentation-current.md", "docs/core-loop-causal-presentation-plan-current.md"]);
 }
 
 function combat() {
-  return header("Turn-based encounters", "Combat", "Combat resolves party position, reach, equipment and conditions against an encounter frozen when contact begins. Scaling source is complete and awaiting ordinary-phone feel review.")
-    + `<h2>How an encounter is formed</h2><div class="facts"><dl class="fact"><dt>Frozen receipt</dt><dd>Difficulty inputs, party state and encounter identity freeze at opening so later UI cannot reinterpret the fight.</dd></dl><dl class="fact"><dt>Party and rank</dt><dd>Party size, individual levels and uneven progression feed the deterministic scaling matrix; ordinary Normal fights target a short victorious curve.</dd></dl><dl class="fact"><dt>Reach</dt><dd>Weapon and action reach decide legal targets and positioning. The Gear catalogue lists exact weapon damage kind and reach.</dd></dl><dl class="fact"><dt>Apex</dt><dd>Apex encounters use their own authored/scaled profile and do not leak ordinary reward or difficulty assumptions.</dd></dl></div>`
-    + `<h2>Damage, defence and statuses</h2><div class="card"><p>Physical damage kinds interact with covering and wards; emanations, conditions, cooldowns and equipment-derived protection remain separate typed rules. Logs record the actual decisions and harm rather than a simplified UI estimate. Equipment changes available actions and protection without silently changing a frozen encounter receipt.</p></div>`
+  return header("Turn-based encounters", "Combat", "Combat resolves party position, reach, equipment, and conditions against encounter state saved when contact begins. Scaling source is complete and awaiting ordinary-phone feel review.")
+    + `<h2>How an encounter is formed</h2><div class="facts"><dl class="fact"><dt>Saved encounter record</dt><dd>Difficulty inputs, party state, and encounter identity are saved when combat opens so later UI cannot reinterpret the fight.</dd></dl><dl class="fact"><dt>Party and rank</dt><dd>Party size, individual levels, and uneven progression feed the deterministic scaling matrix; Normal fights target a short victorious curve.</dd></dl><dl class="fact"><dt>Reach</dt><dd>Weapon and action reach decide legal targets and positioning. Gear pages list exact weapon damage kind and reach.</dd></dl><dl class="fact"><dt>Apex</dt><dd>Apex encounters use their own scaling rules and do not inherit Normal encounter reward or difficulty assumptions.</dd></dl></div>`
+    + `<h2>Damage, defence and statuses</h2><div class="card"><p>Physical damage kinds interact with covering and wards; emanations, conditions, cooldowns, and equipment-derived protection remain separate typed rules. Logs record the actual decisions and harm rather than a simplified UI estimate. Equipment changes available actions and protection without silently changing the saved encounter record.</p></div>`
     + `<h2>God Mode and evidence</h2><div class="card">${badge("readyToTest")}<p>DEBUG God Mode freezes only into newly opened encounters. Enemy choices, incoming damage, conditions, cooldowns and logs remain ordinary; lethal party damage is recorded while active party HP floors at 1 and defeat is suppressed. It grants no offence, loot, XP, spawn or retreat advantage. Bug reports remain valid for UI, crashes, content, worlds and economy; only combat-balance conclusions are marked invalid.</p></div>`
-    + `<h2>Progression status</h2><div class="facts"><dl class="fact"><dt>Current production</dt><dd>Live combat trees, points, prerequisites, skills and current equipment rules continue to drive play.</dd></dl><dl class="fact"><dt>Graph design</dt><dd>A newer graph authority and Constellation mastery proposal exist, but restructuring/capacity choices remain held or queued. The wiki does not present them as unlocked production behavior.</dd></dl><dl class="fact"><dt>Scaling acceptance</dt><dd>Source and automated matrices are green. Phone feel is nonblocking acceptance evidence and may reopen tuning without blocking other source work.</dd></dl></div>`
+    + `<h2>Progression status</h2><div class="facts"><dl class="fact"><dt>Current production</dt><dd>Live combat trees, Combat Points, Skill requirements, Skills, and current equipment rules continue to drive play.</dd></dl><dl class="fact"><dt>Graph design</dt><dd>A newer graph authority and Constellation Mastery proposal exist, but restructuring and capacity choices remain held or queued. The wiki does not present them as unlocked production behavior.</dd></dl><dl class="fact"><dt>Scaling acceptance</dt><dd>Source and automated matrices are green. Phone feel is nonblocking acceptance evidence and may reopen tuning without blocking other source work.</dd></dl></div>`
     + sourceReceipt(["docs/combat-progression-current.md", "docs/core-loop-causal-presentation-plan-current.md"]);
 }
 
@@ -160,7 +178,7 @@ function stationDetail(slug) {
       <dl class="fact"><dt>Zone</dt><dd>${escapeHTML(station.zone)}</dd></dl>
       <dl class="fact"><dt>Lifecycle</dt><dd>${escapeHTML(station.lifecycle)}</dd></dl>
       <dl class="fact"><dt>Keeper / build authority</dt><dd>${escapeHTML(station.keeperAuthority)}</dd></dl>
-      <dl class="fact"><dt>Catalogue maxTier</dt><dd>${escapeHTML(station.catalogueMaxTier)} · non-semantic legacy field</dd></dl>
+      <dl class="fact"><dt>Current live tier limit</dt><dd>${escapeHTML(station.catalogueMaxTier)}. This number does not define a visual upgrade form.</dd></dl>
       <dl class="fact"><dt>Disposition</dt><dd>${escapeHTML(station.disposition)}</dd></dl>
     </div>
     <h2>Construction</h2><div class="card">${cost}${station.buildBlurb ? `<p>${escapeHTML(station.buildBlurb)}</p>` : ""}</div>
@@ -244,7 +262,9 @@ function catalogue(kind = null) {
 function itemDetail(slug) {
   const item = data.items.find(candidate => candidate.slug === slug);
   if (!item) return notFound();
-  const authoredValue = value => value === undefined || value === null || value === "" ? "None authored in items.json" : Array.isArray(value) ? value.map(titleCase).join(" · ") : titleCase(value);
+  const authoredValue = value => value === undefined || value === null || value === "" ? "No value is currently defined." : Array.isArray(value) ? value.map(titleCase).join(" · ") : titleCase(value);
+  const tradingPost = { sellable: "Sold by the Trading Post", protected: "Not sold by the Trading Post" }[item.tradingPostDisposition] ?? "Trading Post availability is not defined.";
+  const recycler = { recyclable: "Accepted by the Recycler", protected: "Protected from the Recycler", notGear: "Not gear" }[item.recyclerDisposition] ?? "Recycler availability is not defined.";
   const gear = item.gear ? `<h2>Gear rules</h2><div class="facts">
     <dl class="fact"><dt>Slot</dt><dd>${escapeHTML(authoredValue(item.gear.slot))}</dd></dl>
     <dl class="fact"><dt>Tier</dt><dd>${escapeHTML(authoredValue(item.gear.tier))}</dd></dl>
@@ -256,13 +276,13 @@ function itemDetail(slug) {
     <dl class="fact"><dt>Break rule</dt><dd>${escapeHTML(authoredValue(item.gear.breaks))}</dd></dl>
   </div>` : "";
   const consumable = item.consumable ? `<h2>Consumable rules</h2><div class="facts">${Object.entries(item.consumable).map(([key, value]) => `<dl class="fact"><dt>${escapeHTML(titleCase(key))}</dt><dd>${escapeHTML(value)}</dd></dl>`).join("")}</div>` : "";
-  return header(`${titleCase(item.category)} · live`, item.name, item.summary) + `<div class="facts"><dl class="fact"><dt>Stable ID</dt><dd>${escapeHTML(item.id)}</dd></dl><dl class="fact"><dt>Kind</dt><dd>${escapeHTML(item.category)}</dd></dl><dl class="fact"><dt>Rarity</dt><dd>${escapeHTML(item.rarity)}</dd></dl><dl class="fact"><dt>Trading Post</dt><dd>${escapeHTML(item.tradingPostDisposition)}</dd></dl><dl class="fact"><dt>Recycler</dt><dd>${escapeHTML(item.recyclerDisposition)}</dd></dl></div>${gear}${consumable}${provenance(item)}<p>${hashLink("catalogue", "← Catalogue")}</p>`;
+  return header(`${titleCase(item.category)} · live`, item.name, item.summary) + `<div class="facts"><dl class="fact"><dt>Kind</dt><dd>${escapeHTML(titleCase(item.category))}</dd></dl><dl class="fact"><dt>Rarity</dt><dd>${escapeHTML(titleCase(item.rarity))}</dd></dl><dl class="fact"><dt>Trading Post</dt><dd>${escapeHTML(tradingPost)}</dd></dl><dl class="fact"><dt>Recycler</dt><dd>${escapeHTML(recycler)}</dd></dl></div>${gear}${consumable}${provenance(item)}<p>${hashLink("catalogue", "← Catalogue")}</p>`;
 }
 
 function resourceDetail(slug) {
   const item = data.resources.find(candidate => candidate.slug === slug);
   if (!item) return notFound();
-  return header(`${titleCase(item.domain)} · live`, item.name, item.summary) + `<div class="facts"><dl class="fact"><dt>Stable ID</dt><dd>${escapeHTML(item.id)}</dd></dl><dl class="fact"><dt>Driven by</dt><dd>${escapeHTML(item.drivenBy)}</dd></dl><dl class="fact"><dt>Trade band</dt><dd>${escapeHTML(item.tradeBand)}</dd></dl><dl class="fact"><dt>Reality currency</dt><dd>${item.isRealityCurrency ? "Yes" : "No"}</dd></dl></div><h2>Requires</h2><div class="card"><p>${escapeHTML(item.requires.join(" · ") || "No hard generation requirement.")}</p></div><h2>Favours</h2><div class="card"><p>${escapeHTML(item.favours.join(" · ") || "No authored favour condition.")}</p></div><h2>Known live uses</h2><div class="card"><ul>${item.currentUses.map(use => `<li>${escapeHTML(use)}</li>`).join("")}</ul></div>${provenance(item)}<p>${hashLink("resources-crafting", "← Resources & Crafting")}</p>`;
+  return header(`${item.domain} · live`, item.name, item.summary) + `<div class="facts"><dl class="fact"><dt>Mostly shaped by</dt><dd>${escapeHTML(item.drivenBy)}</dd></dl><dl class="fact"><dt>Trade band</dt><dd>${escapeHTML(item.tradeBand)}</dd></dl><dl class="fact"><dt>Shared-progress currency</dt><dd>${item.isRealityCurrency ? "Yes" : "No"}</dd></dl></div><h2>Needed conditions</h2><div class="card"><ul>${item.requires.length ? item.requires.map(value => `<li>${escapeHTML(value)}</li>`).join("") : "<li>No special condition is required.</li>"}</ul></div><h2>Helpful conditions</h2><div class="card"><ul>${item.favours.length ? item.favours.map(value => `<li>${escapeHTML(value)}</li>`).join("") : "<li>No additional condition makes this resource more likely.</li>"}</ul></div><h2>Current construction uses</h2><div class="card"><ul>${item.currentUses.map(use => `<li>${escapeHTML(use)}</li>`).join("")}</ul></div>${provenance(item)}<p>${hashLink("resources-crafting", "← Resources & Crafting")}</p>`;
 }
 
 function creatureMaterialDetail(slug) {
@@ -297,8 +317,8 @@ function history() {
 function assets() {
   const writing = data.currentTruth.writing;
   const terrain = data.currentTruth.terrain;
-  return header("Evidence only", "Asset Gallery", "Acceptance, committed source integration and native/phone acceptance are separate receipts. Candidate art is never promoted by implication.")
-    + `<h2>Current non-building receipts</h2><div class="facts"><dl class="fact"><dt>Writing parchment</dt><dd>${badge(writing.status)} <code>${escapeHTML(writing.parchment.stableKey)}</code> is hash-pinned in the native source and bundle; ordinary-phone acceptance remains pending.</dd></dl><dl class="fact"><dt>Layered Terrain</dt><dd>${badge(terrain.layeredPresentation.status)} ${escapeHTML(terrain.layeredPresentation.nativeStatus)}. No native asset path is claimed here.</dd></dl></div>`
+  return header("Evidence only", "Asset Gallery", "Acceptance, committed source integration, and native/phone acceptance are separate records. Candidate art is never promoted by implication.")
+    + `<h2>Current non-building records</h2><div class="facts"><dl class="fact"><dt>Writing parchment</dt><dd>${badge(writing.status)} <code>${escapeHTML(writing.parchment.stableKey)}</code> is hash-pinned in the native source and bundle; ordinary-phone acceptance remains pending.</dd></dl><dl class="fact"><dt>Layered Terrain</dt><dd>${badge(terrain.layeredPresentation.status)} ${escapeHTML(terrain.layeredPresentation.nativeStatus)}</dd></dl></div>`
     + `<h2>Home & Village slots</h2><div class="empty"><strong>No native-ready building art registered.</strong><p>${escapeHTML(data.assetGallery.note)}</p></div><div class="grid">${data.assetGallery.slots.map(slot => `<article class="card"><h3><code>${escapeHTML(slot.key)}</code></h3>${badge(slot.status)}<p>${slot.assetPath ? escapeHTML(slot.assetPath) : "No accepted native asset path."}</p></article>`).join("")}</div>`;
 }
 
@@ -317,6 +337,7 @@ function render({ resetScroll = false } = {}) {
   else if (root === "village-buildings") content = village();
   else if (root === "station") content = stationDetail(detail);
   else if (root === "people") content = people();
+  else if (root === "terminology") content = terminology(detail);
   else if (root === "person") content = personDetail(detail);
   else if (root === "resources-crafting") content = resources();
   else if (root === "catalogue") content = catalogue(detail);
@@ -333,8 +354,10 @@ function render({ resetScroll = false } = {}) {
   input.addEventListener("input", () => {
     const query = input.value.trim().toLowerCase();
     if (!query) { results.hidden = true; results.innerHTML = ""; return; }
-    const matches = data.search.filter(item => `${item.name} ${item.id} ${item.summary} ${item.type}`.toLowerCase().includes(query)).slice(0, 12);
-    results.innerHTML = matches.length ? matches.map(item => `<a href="#/${item.route}"><strong>${escapeHTML(item.name)}</strong><small>${escapeHTML(item.type)} · ${escapeHTML(item.id)} · ${escapeHTML(item.disposition)}</small></a>`).join("") : `<a href="#/${root}">No matching generated fact</a>`;
+    const normalizedQuery = query.replace(/\s+/g, " ");
+    const exactMatches = data.search.filter(item => item.exactSearchTerms.includes(normalizedQuery));
+    const matches = (exactMatches.length ? exactMatches : data.search.filter(item => item.searchText.includes(normalizedQuery))).slice(0, 12);
+    results.innerHTML = matches.length ? matches.map(item => `<a href="#/${item.route}"><strong>${escapeHTML(item.name)}</strong><small>${escapeHTML(item.category)} · ${escapeHTML(item.disposition)}</small></a>`).join("") : `<a href="#/${root}">No matching generated fact</a>`;
     results.hidden = false;
   });
   const kindFilter = document.querySelector("#destination-kind-filter");

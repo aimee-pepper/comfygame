@@ -1,0 +1,1611 @@
+{
+  "schemaVersion": 2,
+  "authority": "docs/canonical-game-terminology.json",
+  "scope": {
+    "swift": "all Sources/**/*.swift discovered; UI/App/DEBUG literals plus display adapters, player content, localized rule copy, accessibility copy, Logger and mutation trails; comments/interpolated identifiers and exact non-visible identifier/icon/tag arguments excluded",
+    "contentJSON": "player-facing name/title/blurb/description/detail/gate/message/promise/provenance fields",
+    "wiki": [
+      "GameWiki/public/app.js",
+      "GameWiki/generated/wiki-data.json"
+    ],
+    "currentDocumentation": [
+      "docs/game-wiki-content-contract-current.md"
+    ],
+    "documentationAuthorityDeclarations": "canonical terminology authority and tables/backticked retired examples excluded",
+    "wikiGeneratedVisibleFields": {
+      "terminology": [
+        "name",
+        "summary",
+        "domain",
+        "whereItAppears"
+      ],
+      "stations": [
+        "name",
+        "blurb",
+        "summary",
+        "purpose"
+      ],
+      "travellers": [
+        "name",
+        "calling",
+        "summary"
+      ],
+      "items": [
+        "name",
+        "blurb",
+        "summary",
+        "description"
+      ],
+      "symbols": [
+        "name",
+        "summary",
+        "playerKind",
+        "acquisition",
+        "writability",
+        "disclosure",
+        "expansion",
+        "attachesTo"
+      ],
+      "resources": [
+        "name",
+        "summary",
+        "drivenBy",
+        "requires",
+        "favours",
+        "currentUses"
+      ],
+      "search": [
+        "name",
+        "category",
+        "disposition"
+      ]
+    },
+    "historicalDocumentation": "archive/session/history documents excluded by path"
+  },
+  "scannedFileCount": 189,
+  "scannedPaths": [
+    "GameWiki/generated/wiki-data.json",
+    "GameWiki/public/app.js",
+    "Sources/App/AppRoute.swift",
+    "Sources/App/BookbinderApp.swift",
+    "Sources/App/CampaignAppCoordinator.swift",
+    "Sources/App/RootView.swift",
+    "Sources/App/Theme.swift",
+    "Sources/Content/CombatGraphModels.swift",
+    "Sources/Content/CombatTreeModels.swift",
+    "Sources/Content/ContentCatalog.swift",
+    "Sources/Content/ContentModels.swift",
+    "Sources/Content/ContradictionModels.swift",
+    "Sources/Content/Data/combat_tree_v2.json",
+    "Sources/Content/Data/combat_trees.json",
+    "Sources/Content/Data/constellation.json",
+    "Sources/Content/Data/contradictions.json",
+    "Sources/Content/Data/creatures.json",
+    "Sources/Content/Data/descriptions.json",
+    "Sources/Content/Data/gambit_components.json",
+    "Sources/Content/Data/gambit_pieces.json",
+    "Sources/Content/Data/items.json",
+    "Sources/Content/Data/playability-roadmap.json",
+    "Sources/Content/Data/pressure_sources.json",
+    "Sources/Content/Data/pressure_targets.json",
+    "Sources/Content/Data/qualifiers.json",
+    "Sources/Content/Data/research.json",
+    "Sources/Content/Data/resources.json",
+    "Sources/Content/Data/rune_shapes.json",
+    "Sources/Content/Data/sites.json",
+    "Sources/Content/Data/skills.json",
+    "Sources/Content/Data/stations.json",
+    "Sources/Content/Data/symbols.json",
+    "Sources/Content/Data/travellers.json",
+    "Sources/Content/Data/upgrades.json",
+    "Sources/Content/DescriptionModels.swift",
+    "Sources/Content/DraftMeetingCorpus.generated.swift",
+    "Sources/Content/PressureModels.swift",
+    "Sources/Content/QualifierModels.swift",
+    "Sources/Content/ResearchModels.swift",
+    "Sources/Content/SiteModels.swift",
+    "Sources/Content/TravellerModels.swift",
+    "Sources/Core/Identifiers.swift",
+    "Sources/Core/SeededRNG.swift",
+    "Sources/Core/WorldArrivalRenderedSceneReceipt.swift",
+    "Sources/Debug/DebugBugReporter.swift",
+    "Sources/Debug/DebugBugReporterView.swift",
+    "Sources/Debug/DebugRoadmapView.swift",
+    "Sources/Debug/HarnessActions.swift",
+    "Sources/Debug/HarnessView.swift",
+    "Sources/Model/BaseState.swift",
+    "Sources/Model/Character.swift",
+    "Sources/Model/Combat.swift",
+    "Sources/Model/CreatureIdentity.swift",
+    "Sources/Model/CreatureTraits.swift",
+    "Sources/Model/Discovery.swift",
+    "Sources/Model/FloraIdentity.swift",
+    "Sources/Model/FloraTraits.swift",
+    "Sources/Model/Gambit.swift",
+    "Sources/Model/GameState.swift",
+    "Sources/Model/Inventory.swift",
+    "Sources/Model/Library.swift",
+    "Sources/Model/Materials.swift",
+    "Sources/Model/Naming.swift",
+    "Sources/Model/Page.swift",
+    "Sources/Model/RealityState.swift",
+    "Sources/Model/Recycler.swift",
+    "Sources/Model/Sigil.swift",
+    "Sources/Model/TradingPost.swift",
+    "Sources/Model/TutorialState.swift",
+    "Sources/Model/WorldArrivalReceipt.swift",
+    "Sources/Model/WorldMap.swift",
+    "Sources/Model/WorldVisualReceipt.swift",
+    "Sources/Model/WorldsState.swift",
+    "Sources/Persistence/GameStore.swift",
+    "Sources/Persistence/Migrations.swift",
+    "Sources/Persistence/SaveFileIO.swift",
+    "Sources/Persistence/SaveSlotCatalogue.swift",
+    "Sources/Persistence/SaveSlotFileIO.swift",
+    "Sources/Persistence/SaveSlotPayloadIO.swift",
+    "Sources/Rules/ApexRules.swift",
+    "Sources/Rules/ArmouryRules.swift",
+    "Sources/Rules/BestiaryRules.swift",
+    "Sources/Rules/BookProjection.swift",
+    "Sources/Rules/BookRules.swift",
+    "Sources/Rules/ButcheryRules.swift",
+    "Sources/Rules/CharacterRules.swift",
+    "Sources/Rules/CombatActionOwnershipRules.swift",
+    "Sources/Rules/CombatDamageRules.swift",
+    "Sources/Rules/CombatDerivedStats.swift",
+    "Sources/Rules/CombatGraphRules.swift",
+    "Sources/Rules/CombatRules.swift",
+    "Sources/Rules/CombatTreeRules.swift",
+    "Sources/Rules/ConsumableCraftingRules.swift",
+    "Sources/Rules/ContradictionRules.swift",
+    "Sources/Rules/DescriptionRules.swift",
+    "Sources/Rules/DistilleryRules.swift",
+    "Sources/Rules/EconomyRules.swift",
+    "Sources/Rules/FloraRules.swift",
+    "Sources/Rules/GambitEngine.swift",
+    "Sources/Rules/GameActions+Combat.swift",
+    "Sources/Rules/GameActions+Economy.swift",
+    "Sources/Rules/GameActions+Recycler.swift",
+    "Sources/Rules/GameActions+TradingPost.swift",
+    "Sources/Rules/GameActions+World.swift",
+    "Sources/Rules/GameActions.swift",
+    "Sources/Rules/GearPresentationCopy.swift",
+    "Sources/Rules/InstrumentCraftingRules.swift",
+    "Sources/Rules/LibraryRules.swift",
+    "Sources/Rules/LifeRules.swift",
+    "Sources/Rules/LivingAnalysisRules.swift",
+    "Sources/Rules/PageRules.swift",
+    "Sources/Rules/PhysicalGearCraftingRules.swift",
+    "Sources/Rules/PressureRules.swift",
+    "Sources/Rules/ProgressionRequirementPresentation.swift",
+    "Sources/Rules/RecyclerRules.swift",
+    "Sources/Rules/SiteRules.swift",
+    "Sources/Rules/SmithRules.swift",
+    "Sources/Rules/StationRunwayRules.swift",
+    "Sources/Rules/StationStaffingRules.swift",
+    "Sources/Rules/TerrainRules.swift",
+    "Sources/Rules/TradingPostRules.swift",
+    "Sources/Rules/TutorialRules.swift",
+    "Sources/Rules/WorldArrivalDescriptionRules.swift",
+    "Sources/Rules/WorldConstraints.swift",
+    "Sources/Rules/WorldGrade2BindAdapter.swift",
+    "Sources/Rules/WorldInspectionRules.swift",
+    "Sources/Rules/WorldRules.swift",
+    "Sources/Rules/WorldVisibilityRules.swift",
+    "Sources/Rules/Worldgen.swift",
+    "Sources/Rules/WritingDeskReviewModel.swift",
+    "Sources/Screens/ApothecaryView.swift",
+    "Sources/Screens/AuthoredTextAtlasView.swift",
+    "Sources/Screens/BaseView.swift",
+    "Sources/Screens/BestiaryView.swift",
+    "Sources/Screens/BlacksmithView.swift",
+    "Sources/Screens/CampaignStartView.swift",
+    "Sources/Screens/CatalogueItemPixelIdentity.swift",
+    "Sources/Screens/CombatGraphLayout.swift",
+    "Sources/Screens/CombatGraphRouteExplorer.swift",
+    "Sources/Screens/CombatTreeView.swift",
+    "Sources/Screens/EncounterView.swift",
+    "Sources/Screens/FirepitView.swift",
+    "Sources/Screens/GambitEditorView.swift",
+    "Sources/Screens/GearView.swift",
+    "Sources/Screens/ItemGrid.swift",
+    "Sources/Screens/LibraryView.swift",
+    "Sources/Screens/LivingAnalysisView.swift",
+    "Sources/Screens/LootDecisionView.swift",
+    "Sources/Screens/MapAssetRenderer.swift",
+    "Sources/Screens/MinimapView.swift",
+    "Sources/Screens/NamedCharacterPixelIdentity.swift",
+    "Sources/Screens/PageGridView.swift",
+    "Sources/Screens/PartyRosterView.swift",
+    "Sources/Screens/PreviewPanel.swift",
+    "Sources/Screens/RecyclerView.swift",
+    "Sources/Screens/ResearchTreeLayout.swift",
+    "Sources/Screens/ResearchViews.swift",
+    "Sources/Screens/RuleBuilderView.swift",
+    "Sources/Screens/RuneGlyph.swift",
+    "Sources/Screens/SettingsView.swift",
+    "Sources/Screens/SpendingViews.swift",
+    "Sources/Screens/StartingTownHomeScene.swift",
+    "Sources/Screens/StationViews.swift",
+    "Sources/Screens/TradingPostView.swift",
+    "Sources/Screens/TravellerMeetingView.swift",
+    "Sources/Screens/TutorialCard.swift",
+    "Sources/Screens/WorldArrivalView.swift",
+    "Sources/Screens/WorldDescriptionPanel.swift",
+    "Sources/Screens/WorldHistoryView.swift",
+    "Sources/Screens/WorldView.swift",
+    "Sources/Screens/WritingDeskView.swift",
+    "Sources/Tuning.swift",
+    "Sources/VisualAdapters/CatalogueItemVisualAdapter.swift",
+    "Sources/VisualAdapters/GeneratedCatalogueItemVisualRegistry.swift",
+    "Sources/VisualAdapters/NamedCharacterVisualAdapter.swift",
+    "Sources/VisualRuntime/CatalogueConsumablesPlaceholderV1Registry.swift",
+    "Sources/VisualRuntime/CreaturePixelIdentity.swift",
+    "Sources/VisualRuntime/MobGearSpriteV1Registry.generated.swift",
+    "Sources/VisualRuntime/NamedCharacterPlaceholderPack.swift",
+    "Sources/VisualRuntime/NativeVisualPack.swift",
+    "Sources/VisualRuntime/PixelCommand.swift",
+    "Sources/VisualRuntime/PixelRaster.swift",
+    "Sources/VisualRuntime/ResourceSpriteV1Registry.generated.swift",
+    "Sources/VisualRuntime/TerrainProductionPack.swift",
+    "Sources/VisualRuntime/TownBuildingVisualRegistry.generated.swift",
+    "Sources/VisualRuntime/WorldArrivalRenderer.swift",
+    "Sources/VisualRuntime/WorldGrade2V1.swift",
+    "Sources/VisualRuntime/WritingDeskProductionPack.swift",
+    "docs/game-wiki-content-contract-current.md"
+  ],
+  "exceptions": [],
+  "concepts": {
+    "writtenWorldSymbol": {
+      "canonicalVisible": 49,
+      "retired": {
+        "semanticAllowed": 5,
+        "approved": 0,
+        "violation": 0
+      }
+    },
+    "pageSubject": {
+      "canonicalVisible": 40,
+      "retired": {
+        "semanticAllowed": 20,
+        "approved": 0,
+        "violation": 0
+      }
+    },
+    "pageFocus": {
+      "canonicalVisible": 229,
+      "retired": {
+        "semanticAllowed": 83,
+        "approved": 0,
+        "violation": 0
+      }
+    },
+    "pageModifier": {
+      "canonicalVisible": 42,
+      "retired": {
+        "semanticAllowed": 4,
+        "approved": 0,
+        "violation": 0
+      }
+    },
+    "assembledSigil": {
+      "canonicalVisible": 110,
+      "retired": {
+        "semanticAllowed": 0,
+        "approved": 0,
+        "violation": 0
+      }
+    },
+    "foundRouteWriting": {
+      "canonicalVisible": 4,
+      "retired": {
+        "semanticAllowed": 0,
+        "approved": 0,
+        "violation": 0
+      }
+    },
+    "worldResourceDeposit": {
+      "canonicalVisible": 3,
+      "retired": {
+        "semanticAllowed": 0,
+        "approved": 0,
+        "violation": 0
+      }
+    },
+    "foeArmourThreshold": {
+      "canonicalVisible": 10,
+      "retired": {
+        "semanticAllowed": 0,
+        "approved": 0,
+        "violation": 0
+      }
+    },
+    "homeHub": {
+      "canonicalVisible": 47,
+      "retired": {
+        "semanticAllowed": 6,
+        "approved": 0,
+        "violation": 0
+      }
+    },
+    "accountPersistentLayer": {
+      "canonicalVisible": 6,
+      "retired": {
+        "semanticAllowed": 1,
+        "approved": 0,
+        "violation": 0
+      }
+    },
+    "predictedWorld": {
+      "canonicalVisible": 6,
+      "retired": {
+        "semanticAllowed": 3,
+        "approved": 0,
+        "violation": 0
+      }
+    },
+    "generatedWorldInput": {
+      "canonicalVisible": 2,
+      "retired": {
+        "semanticAllowed": 0,
+        "approved": 0,
+        "violation": 0
+      }
+    },
+    "ordinaryWorld": {
+      "canonicalVisible": 3,
+      "retired": {
+        "semanticAllowed": 0,
+        "approved": 0,
+        "violation": 0
+      }
+    },
+    "availableEssence": {
+      "canonicalVisible": 8,
+      "retired": {
+        "semanticAllowed": 0,
+        "approved": 0,
+        "violation": 0
+      }
+    },
+    "affordableWorldCount": {
+      "canonicalVisible": 3,
+      "retired": {
+        "semanticAllowed": 0,
+        "approved": 0,
+        "violation": 0
+      }
+    },
+    "playerWrittenWorld": {
+      "canonicalVisible": 2,
+      "retired": {
+        "semanticAllowed": 0,
+        "approved": 0,
+        "violation": 0
+      }
+    },
+    "upgradeGraphEntry": {
+      "canonicalVisible": 44,
+      "retired": {
+        "semanticAllowed": 4,
+        "approved": 0,
+        "violation": 0
+      }
+    },
+    "combatGraphEntry": {
+      "canonicalVisible": 19,
+      "retired": {
+        "semanticAllowed": 4,
+        "approved": 0,
+        "violation": 0
+      }
+    },
+    "constellationMastery": {
+      "canonicalVisible": 13,
+      "retired": {
+        "semanticAllowed": 0,
+        "approved": 0,
+        "violation": 0
+      }
+    },
+    "itemConstructionChoice": {
+      "canonicalVisible": 43,
+      "retired": {
+        "semanticAllowed": 9,
+        "approved": 0,
+        "violation": 0
+      }
+    },
+    "savedOutcomeRecord": {
+      "canonicalVisible": 5,
+      "retired": {
+        "semanticAllowed": 3,
+        "approved": 0,
+        "violation": 0
+      }
+    },
+    "persistedAtEventTime": {
+      "canonicalVisible": 7,
+      "retired": {
+        "semanticAllowed": 11,
+        "approved": 0,
+        "violation": 0
+      }
+    },
+    "olderSaveContent": {
+      "canonicalVisible": 6,
+      "retired": {
+        "semanticAllowed": 2,
+        "approved": 0,
+        "violation": 0
+      }
+    },
+    "recoveredKnowledge": {
+      "canonicalVisible": 5,
+      "retired": {
+        "semanticAllowed": 3,
+        "approved": 0,
+        "violation": 0
+      }
+    },
+    "newCommunityMember": {
+      "canonicalVisible": 6,
+      "retired": {
+        "semanticAllowed": 11,
+        "approved": 0,
+        "violation": 0
+      }
+    },
+    "partyExperience": {
+      "canonicalVisible": 3,
+      "retired": {
+        "semanticAllowed": 18,
+        "approved": 0,
+        "violation": 0
+      }
+    }
+  },
+  "approvedContextFixtures": [
+    {
+      "literal": "Choose a combat target",
+      "alias": "target",
+      "rationale": "Target is ordinary combat language."
+    },
+    {
+      "literal": "Source material: Iron",
+      "alias": "source",
+      "rationale": "Source describes material origin, not a Writing Focus."
+    },
+    {
+      "literal": "The trail mark points north",
+      "alias": "mark",
+      "rationale": "Mark is a physical trail indicator, not a Sigil."
+    },
+    {
+      "literal": "Frozen water blocks the path",
+      "alias": "frozen",
+      "rationale": "Frozen describes water, not persistence."
+    },
+    {
+      "literal": "Shared progress",
+      "alias": "progress",
+      "rationale": "Shared progress is the canonical account-persistent concept."
+    },
+    {
+      "literal": "The returned object is in the Storehouse",
+      "alias": "returned",
+      "rationale": "Returned is an ordinary verb describing an object."
+    }
+  ],
+  "rawValueDisplayAudit": {
+    "policy": "model/combat/catalogue raw values require a player-copy adapter; exact local UI-label enums and secondary Internal ID fields remain allowed",
+    "violations": []
+  },
+  "retiredOccurrences": [
+    {
+      "path": "GameWiki/generated/wiki-data.json",
+      "literal": "Coats one weapon so its next strike dazzles its target.",
+      "alias": "target",
+      "classification": "semanticAllowed"
+    },
+    {
+      "path": "GameWiki/generated/wiki-data.json",
+      "literal": "Complete source-generated internal Game Wiki",
+      "alias": "source",
+      "classification": "semanticAllowed"
+    },
+    {
+      "path": "GameWiki/generated/wiki-data.json",
+      "literal": "DEBUG reset explanations and account-persistent progress descriptions.",
+      "alias": "progress",
+      "classification": "semanticAllowed"
+    },
+    {
+      "path": "GameWiki/generated/wiki-data.json",
+      "literal": "Frozen",
+      "alias": "frozen",
+      "classification": "semanticAllowed"
+    },
+    {
+      "path": "GameWiki/generated/wiki-data.json",
+      "literal": "Frozen",
+      "alias": "frozen",
+      "classification": "semanticAllowed"
+    },
+    {
+      "path": "GameWiki/generated/wiki-data.json",
+      "literal": "Hydrology — Frozen",
+      "alias": "frozen",
+      "classification": "semanticAllowed"
+    },
+    {
+      "path": "GameWiki/generated/wiki-data.json",
+      "literal": "Hydrology — Frozen",
+      "alias": "frozen",
+      "classification": "semanticAllowed"
+    },
+    {
+      "path": "GameWiki/generated/wiki-data.json",
+      "literal": "Hydrology — Frozen",
+      "alias": "frozen",
+      "classification": "semanticAllowed"
+    },
+    {
+      "path": "GameWiki/generated/wiki-data.json",
+      "literal": "Returned light that appears exact while reversing its frame.",
+      "alias": "returned",
+      "classification": "semanticAllowed"
+    },
+    {
+      "path": "GameWiki/generated/wiki-data.json",
+      "literal": "Shared progress",
+      "alias": "progress",
+      "classification": "semanticAllowed"
+    },
+    {
+      "path": "GameWiki/generated/wiki-data.json",
+      "literal": "Shared progress",
+      "alias": "progress",
+      "classification": "semanticAllowed"
+    },
+    {
+      "path": "GameWiki/generated/wiki-data.json",
+      "literal": "The saved account of one expedition’s outcome and returned gains.",
+      "alias": "returned",
+      "classification": "semanticAllowed"
+    },
+    {
+      "path": "GameWiki/generated/wiki-data.json",
+      "literal": "consumable remedies, coatings and preparations from world-grown inputs. Station tier controls preparation permission, not recipe discovery. Finding/inferencing a higher recipe records it normally and may show its name/requirements, but preparation remains blocked by the named bench. Legacy saves retain every already-known/preparable recipe through an explicit grandfathered entitlement.",
+      "alias": "legacy",
+      "classification": "semanticAllowed"
+    },
+    {
+      "path": "GameWiki/generated/wiki-data.json",
+      "literal": "foundational rigid physical gear, repair/reforge and the base for later specialist shops.",
+      "alias": "base",
+      "classification": "semanticAllowed"
+    },
+    {
+      "path": "GameWiki/public/app.js",
+      "literal": " : \"\"}Disposition: ${escapeHTML(p.disposition)}<br>Generated at source hash: ${escapeHTML(p.generatedAtSourceHash)}</div>",
+      "alias": "source",
+      "classification": "semanticAllowed"
+    },
+    {
+      "path": "GameWiki/public/app.js",
+      "literal": "${data.counts.runes} Writing entries",
+      "alias": "runes",
+      "classification": "semanticAllowed"
+    },
+    {
+      "path": "GameWiki/public/app.js",
+      "literal": ").join(\"<br>\")}<br>Generated at source hash: ${escapeHTML(data.generatedAtSourceHash)}</div>",
+      "alias": "source",
+      "classification": "semanticAllowed"
+    },
+    {
+      "path": "GameWiki/public/app.js",
+      "literal": "<div class=\"facts\"><dl class=\"fact\"><dt>Mostly shaped by</dt><dd>${escapeHTML(item.drivenBy)}</dd></dl><dl class=\"fact\"><dt>Trade band</dt><dd>${escapeHTML(item.tradeBand)}</dd></dl><dl class=\"fact\"><dt>Shared-progress currency</dt><dd>${item.isRealityCurrency ? \"Yes\" : \"No\"}</dd></dl></div><h2>Needed conditions</h2><div class=\"card\"><ul>${item.requires.length ? item.requires.map(value => ",
+      "alias": "progress",
+      "classification": "semanticAllowed"
+    },
+    {
+      "path": "GameWiki/public/app.js",
+      "literal": "<div class=\"shell\">\n    <aside class=\"sidebar\">\n      <div class=\"brand\"><div class=\"brand-mark\">B</div><div><strong>Bookbinder</strong><small>Internal source wiki</small></div></div>\n      <label for=\"wiki-search\">Search facts</label>\n      <input class=\"search\" id=\"wiki-search\" type=\"search\" placeholder=\"Station, person, Sigil…\" autocomplete=\"off\">\n      <div class=\"search-results\" id=\"search-results\" hidden></div>\n      <nav class=\"nav\" aria-label=\"Wiki sections\">${nav}</nav>\n    </aside>\n    <main class=\"main\">${content}</main>\n  </div>",
+      "alias": "mark",
+      "classification": "semanticAllowed"
+    },
+    {
+      "path": "GameWiki/public/app.js",
+      "literal": "<div class=\"shell\">\n    <aside class=\"sidebar\">\n      <div class=\"brand\"><div class=\"brand-mark\">B</div><div><strong>Bookbinder</strong><small>Internal source wiki</small></div></div>\n      <label for=\"wiki-search\">Search facts</label>\n      <input class=\"search\" id=\"wiki-search\" type=\"search\" placeholder=\"Station, person, Sigil…\" autocomplete=\"off\">\n      <div class=\"search-results\" id=\"search-results\" hidden></div>\n      <nav class=\"nav\" aria-label=\"Wiki sections\">${nav}</nav>\n    </aside>\n    <main class=\"main\">${content}</main>\n  </div>",
+      "alias": "source",
+      "classification": "semanticAllowed"
+    },
+    {
+      "path": "GameWiki/public/app.js",
+      "literal": "<div class=\"topline\"><div><div class=\"kicker\">${escapeHTML(kicker)}</div><h1>${escapeHTML(title)}</h1><p class=\"lede\">${escapeHTML(lede)}</p></div><div class=\"stamp\">Source ${data.generatedAtSourceHash.slice(0, 12)}</div></div>",
+      "alias": "source",
+      "classification": "semanticAllowed"
+    },
+    {
+      "path": "GameWiki/public/app.js",
+      "literal": "<h2>Current non-building records</h2><div class=\"facts\"><dl class=\"fact\"><dt>Writing parchment</dt><dd>${badge(writing.status)} <code>${escapeHTML(writing.parchment.stableKey)}</code> is hash-pinned in the native source and bundle; ordinary-phone acceptance remains pending.</dd></dl><dl class=\"fact\"><dt>Layered Terrain</dt><dd>${badge(terrain.layeredPresentation.status)} ${escapeHTML(terrain.layeredPresentation.nativeStatus)}</dd></dl></div>",
+      "alias": "source",
+      "classification": "semanticAllowed"
+    },
+    {
+      "path": "GameWiki/public/app.js",
+      "literal": "<h2>Current visual boundary</h2><div class=\"card\">${badge(current.status)}<p>The current native source bundles and hash-validates <code>${escapeHTML(current.parchment.stableKey)}</code>; that proves source integration, not ordinary-phone acceptance. The standalone artifact still records <code>integrationReady:${escapeHTML(current.parchment.artifactIntegrationReady)}</code>, so the wiki preserves both records instead of silently promoting either one.</p><p>${escapeHTML(current.markArtStatus)}. ${escapeHTML(current.vocabularyLabelStatus)}.</p></div>",
+      "alias": "source",
+      "classification": "semanticAllowed"
+    },
+    {
+      "path": "GameWiki/public/app.js",
+      "literal": "<h2>How an encounter is formed</h2><div class=\"facts\"><dl class=\"fact\"><dt>Saved encounter record</dt><dd>Difficulty inputs, party state, and encounter identity are saved when combat opens so later UI cannot reinterpret the fight.</dd></dl><dl class=\"fact\"><dt>Party and rank</dt><dd>Party size, individual levels, and uneven progression feed the deterministic scaling matrix; Normal fights target a short victorious curve.</dd></dl><dl class=\"fact\"><dt>Reach</dt><dd>Weapon and action reach decide legal targets and positioning. Gear pages list exact weapon damage kind and reach.</dd></dl><dl class=\"fact\"><dt>Apex</dt><dd>Apex encounters use their own scaling rules and do not inherit Normal encounter reward or difficulty assumptions.</dd></dl></div>",
+      "alias": "target",
+      "classification": "semanticAllowed"
+    },
+    {
+      "path": "GameWiki/public/app.js",
+      "literal": "<h2>Progression status</h2><div class=\"facts\"><dl class=\"fact\"><dt>Current production</dt><dd>Live combat trees, Combat Points, Skill requirements, Skills, and current equipment rules continue to drive play.</dd></dl><dl class=\"fact\"><dt>Graph design</dt><dd>A newer graph authority and Constellation Mastery proposal exist, but restructuring and capacity choices remain held or queued. The wiki does not present them as unlocked production behavior.</dd></dl><dl class=\"fact\"><dt>Scaling acceptance</dt><dd>Source and automated matrices are green. Phone feel is nonblocking acceptance evidence and may reopen tuning without blocking other source work.</dd></dl></div>",
+      "alias": "source",
+      "classification": "semanticAllowed"
+    },
+    {
+      "path": "GameWiki/public/app.js",
+      "literal": "Acceptance, committed source integration, and native/phone acceptance are separate records. Candidate art is never promoted by implication.",
+      "alias": "source",
+      "classification": "semanticAllowed"
+    },
+    {
+      "path": "GameWiki/public/app.js",
+      "literal": "Acceptance, source integration, and native/phone status remain separate records.",
+      "alias": "source",
+      "classification": "semanticAllowed"
+    },
+    {
+      "path": "GameWiki/public/app.js",
+      "literal": "Combat resolves party position, reach, equipment, and conditions against encounter state saved when contact begins. Scaling source is complete and awaiting ordinary-phone feel review.",
+      "alias": "source",
+      "classification": "semanticAllowed"
+    },
+    {
+      "path": "GameWiki/public/app.js",
+      "literal": "Live source catalogue",
+      "alias": "source",
+      "classification": "semanticAllowed"
+    },
+    {
+      "path": "GameWiki/public/app.js",
+      "literal": "Live source catalogue",
+      "alias": "source",
+      "classification": "semanticAllowed"
+    },
+    {
+      "path": "GameWiki/public/app.js",
+      "literal": "Live source catalogue",
+      "alias": "source",
+      "classification": "semanticAllowed"
+    },
+    {
+      "path": "GameWiki/public/app.js",
+      "literal": "Source-partitioned catalogue",
+      "alias": "source",
+      "classification": "semanticAllowed"
+    },
+    {
+      "path": "GameWiki/public/app.js",
+      "literal": "Stable identities and current source dispositions.",
+      "alias": "source",
+      "classification": "semanticAllowed"
+    },
+    {
+      "path": "GameWiki/public/app.js",
+      "literal": "qualifier",
+      "alias": "qualifier",
+      "classification": "semanticAllowed"
+    },
+    {
+      "path": "GameWiki/public/app.js",
+      "literal": "source",
+      "alias": "source",
+      "classification": "semanticAllowed"
+    },
+    {
+      "path": "GameWiki/public/app.js",
+      "literal": "target",
+      "alias": "target",
+      "classification": "semanticAllowed"
+    },
+    {
+      "path": "Sources/App/BookbinderApp.swift",
+      "literal": "Opening progress",
+      "alias": "progress",
+      "classification": "semanticAllowed"
+    },
+    {
+      "path": "Sources/App/CampaignAppCoordinator.swift",
+      "literal": "campaign phase=\\(phase.accessibilityDescription, privacy: .public) progress=\\(String(describing: phase.progress), privacy: .public) elapsed=\\(LaunchClock.elapsedMilliseconds(), format: .fixed(precision: 1))ms",
+      "alias": "progress",
+      "classification": "semanticAllowed"
+    },
+    {
+      "path": "Sources/App/RootView.swift",
+      "literal": "Source",
+      "alias": "source",
+      "classification": "semanticAllowed"
+    },
+    {
+      "path": "Sources/App/Theme.swift",
+      "literal": "debug.tuning.profile.v1",
+      "alias": "profile",
+      "classification": "semanticAllowed"
+    },
+    {
+      "path": "Sources/Content/Data/combat_tree_v2.json",
+      "literal": "Low Profile",
+      "alias": "profile",
+      "classification": "semanticAllowed"
+    },
+    {
+      "path": "Sources/Content/Data/combat_trees.json",
+      "literal": "Low Profile",
+      "alias": "profile",
+      "classification": "semanticAllowed"
+    },
+    {
+      "path": "Sources/Content/Data/contradictions.json",
+      "literal": "It is frozen, and it takes nothing from the air around it.",
+      "alias": "frozen",
+      "classification": "semanticAllowed"
+    },
+    {
+      "path": "Sources/Content/Data/descriptions.json",
+      "literal": "Frozen over.",
+      "alias": "frozen",
+      "classification": "semanticAllowed"
+    },
+    {
+      "path": "Sources/Content/Data/items.json",
+      "literal": "Coats one weapon so its next strike dazzles its target.",
+      "alias": "target",
+      "classification": "semanticAllowed"
+    },
+    {
+      "path": "Sources/Content/Data/playability-roadmap.json",
+      "literal": "After one reading, a player can accurately paraphrase the relevant world property without seeing its internal target, threshold or required sigil. The clue still leaves the player to infer which known or unknown sigil could create that property. Every revised page retains its stable ID, owner and clue index, and replacement history remains documented.",
+      "alias": "target",
+      "classification": "semanticAllowed"
+    },
+    {
+      "path": "Sources/Content/Data/playability-roadmap.json",
+      "literal": "Aimee opens the installed 366f5ccf build and compares Normal worlds at phone scale: connected same-ground regions read before the grid; all twelve grounds remain distinct; pressure changes recolor shared geometry rather than selecting static world snapshots; Snow and settled Ash can appear independently or together; Water, Deep Water, Growth and Groundcover motion is restrained and globally synchronized; Ice remains static; hidden/fringe/remembered terrain discloses no hidden neighbour or live motion; and authored one-/two-/three-level south walls preserve equal-or-better height, route, occupant and selection readability than the old cue. Equal elevation and hidden/out-of-map south emit no wall, contact shade never substitutes for the wall, and the fail-safe remains until that phone comparison passes. Source/build evidence cannot substitute for this visual acceptance.",
+      "alias": "source",
+      "classification": "semanticAllowed"
+    },
+    {
+      "path": "Sources/Content/Data/playability-roadmap.json",
+      "literal": "Aimee's remaining phone acceptance is one ordinary new bind: confirm the generated arrival image, exact two-sentence description, disclosed Page labels and fixed Enter world action, then verify Enter reaches the matching first map and does not replay after relaunch. Source and install gates are complete; retain readyToTest/non-primary until that review. Authorities: world-arrival-causal-reveal-current.md, world-arrival-description-grammar-current.md and world-arrival-asset-packet-current.md.",
+      "alias": "source",
+      "classification": "semanticAllowed"
+    },
+    {
+      "path": "Sources/Content/Data/playability-roadmap.json",
+      "literal": "Aimee's return-screen playtest exposed inconsistent player language and a duplicated portal sentence. The installed contained slices cover Return, World preview and Writing, Essence affordability, Upgrade and Skill requirements, gear and older-save compatibility, and Compound Assembly. The current completion slice applies the same player language across the game, DEBUG, accessibility, logs, current docs and the complete source-generated GameWiki; raw IDs remain secondary metadata only.",
+      "alias": "source",
+      "classification": "semanticAllowed"
+    },
+    {
+      "path": "Sources/Content/Data/playability-roadmap.json",
+      "literal": "All 72 stable node IDs have scenario-level consumer coverage; migration loses no points; the phone graph preserves every authored prerequisite and exact Effect copy without reverting to buy-next lists. Authority: DRQ-146/150 and combat-tree-v2-consumer-plan-current.md.",
+      "alias": "node",
+      "classification": "semanticAllowed"
+    },
+    {
+      "path": "Sources/Content/Data/playability-roadmap.json",
+      "literal": "Asset proof is accepted and hash-pinned in commit 2d2992bc94224f11ea3901a29a392f45d59b0386 (body a2475bbbc4bab0eb4ee90f0ca562bf04ed2cffd565aa7eaa21e2656f92eaa9c7; manifest aacdd08ed66e80131847873852454b68d3981b46ad7b79696d6cb8675af31375; integrationReady false). Engineering later consumes one committed stepPickup|harvest record with exactly one presentation identity, updates ownership immediately, and raises the source icon locally up to 1.5 tile heights over 450 ms while it fades. Same-identity multi-yield is one ×N; the complete icon+label clamps inside the map; animation is nonblocking and never owns mutation.",
+      "alias": "source",
+      "classification": "semanticAllowed"
+    },
+    {
+      "path": "Sources/Content/Data/playability-roadmap.json",
+      "literal": "Commit 29abf52/build 234 aligns the advancing SwiftUI loader to the static launch screen's safe-area center while preserving truthful progress. The later signed 4ed15ab Homework build is installed; physical launch acceptance remains blocked only by trusting the development profile on-device.",
+      "alias": "profile",
+      "classification": "semanticAllowed"
+    },
+    {
+      "path": "Sources/Content/Data/playability-roadmap.json",
+      "literal": "Commit 29abf52/build 234 aligns the advancing SwiftUI loader to the static launch screen's safe-area center while preserving truthful progress. The later signed 4ed15ab Homework build is installed; physical launch acceptance remains blocked only by trusting the development profile on-device.",
+      "alias": "progress",
+      "classification": "semanticAllowed"
+    },
+    {
+      "path": "Sources/Content/Data/playability-roadmap.json",
+      "literal": "Complete source-generated internal Game Wiki",
+      "alias": "source",
+      "classification": "semanticAllowed"
+    },
+    {
+      "path": "Sources/Content/Data/playability-roadmap.json",
+      "literal": "Design is implementation-ready in world-terrain-and-resource-hosting-current.md with machine authority world-terrain-resource-host-authority.json. Replace independent per-cell material noise with pressure-faithful connected substrate regions; freeze coherent elevation 0...3; make Standing, Flowing, Frozen and Airborne Hydrology produce distinct topology; preserve underlying base ground beneath Growth/Groundcover; add independent Snow and settled-Ash deposits; and place every current mineral/flora/direct Resource only on an exhaustive legal host. This is the rules counterpart required for the accepted dynamic terrain direction to generate places rather than recolored checkerboards.",
+      "alias": "base",
+      "classification": "semanticAllowed"
+    },
+    {
+      "path": "Sources/Content/Data/playability-roadmap.json",
+      "literal": "Design is implementation-ready in world-terrain-and-resource-hosting-current.md with machine authority world-terrain-resource-host-authority.json. Replace independent per-cell material noise with pressure-faithful connected substrate regions; freeze coherent elevation 0...3; make Standing, Flowing, Frozen and Airborne Hydrology produce distinct topology; preserve underlying base ground beneath Growth/Groundcover; add independent Snow and settled-Ash deposits; and place every current mineral/flora/direct Resource only on an exhaustive legal host. This is the rules counterpart required for the accepted dynamic terrain direction to generate places rather than recolored checkerboards.",
+      "alias": "frozen",
+      "classification": "semanticAllowed"
+    },
+    {
+      "path": "Sources/Content/Data/playability-roadmap.json",
+      "literal": "Dynamic Terrain v2 is source-integrated and installed in place from exact revision 366f5ccf2a172a2fed8d9a820f52364b2604a674. The native path consumes the accepted twelve-ground TerrainProductionPack v1, pressure-recolors semantic roles from WorldGrade2, applies independent Snow and settled-Ash deposits, uses safe neighbour facts and one shared 4 Hz clock, and consumes the accepted authored south-wall pack for disclosed elevation drops 1, 2 and 3. Contact shade is supplemental; hidden, equal and out-of-map southern relationships emit no wall. The prior procedural terrain/wall path remains only as a pack-failure and older-save fail-safe, so an unavailable visual pack cannot erase the functional elevation cue. The signed Bookbinder 1.0 build 234 embeds source 366f5ccf and was installed without uninstall, reset or auto-launch. Both Asset manifests remain provenance-labelled integrationReady:false until Aimee accepts the installed presentation; that label no longer means the native consumer is absent.",
+      "alias": "source",
+      "classification": "semanticAllowed"
+    },
+    {
+      "path": "Sources/Content/Data/playability-roadmap.json",
+      "literal": "Five-person 368×800 grid with Rank labels; no Story/ambiguous Combat tab; Diary route round-trip; exact Gear ownership; stable production graph with typed purchases, solid/dashed prerequisites and no Learn-next list. After that source gate, one phone-sized representative graph/character slice may receive Asset refinement; full character or graph breadth waits for live phone review. Authority: party-character-surface-current.md.",
+      "alias": "source",
+      "classification": "semanticAllowed"
+    },
+    {
+      "path": "Sources/Content/Data/playability-roadmap.json",
+      "literal": "Implement only after the current authority checkpoint is integrated, without waiting for terrain PNG packaging. Same seed/page is byte-identical; quotas preserve pressure proportions without cardinally isolated base cells; adjacent elevation delta is <=1; Standing basins, Flowing channels, Frozen Ice and Airborne no-ground tests differ; Snow/Ash can appear separately or together without replacing base ground; all 23 Resource IDs have exact legal dispositions; Resin is a real secondary flora yield; Ichor never becomes an ordinary deposit; starter records and World Arrival production/counterfactual parity stay green; World Generator Web exposes connected-component, topology, deposit and host diagnostics. No new GroundType, Resource ID, combat, traveller, site or economy rebalance.",
+      "alias": "base",
+      "classification": "semanticAllowed"
+    },
+    {
+      "path": "Sources/Content/Data/playability-roadmap.json",
+      "literal": "Implement only after the current authority checkpoint is integrated, without waiting for terrain PNG packaging. Same seed/page is byte-identical; quotas preserve pressure proportions without cardinally isolated base cells; adjacent elevation delta is <=1; Standing basins, Flowing channels, Frozen Ice and Airborne no-ground tests differ; Snow/Ash can appear separately or together without replacing base ground; all 23 Resource IDs have exact legal dispositions; Resin is a real secondary flora yield; Ichor never becomes an ordinary deposit; starter records and World Arrival production/counterfactual parity stay green; World Generator Web exposes connected-component, topology, deposit and host diagnostics. No new GroundType, Resource ID, combat, traveller, site or economy rebalance.",
+      "alias": "frozen",
+      "classification": "semanticAllowed"
+    },
+    {
+      "path": "Sources/Content/Data/playability-roadmap.json",
+      "literal": "Installed from corrected checkpoint 634da20: each new world selects at most one full-signature match through blind frontier, immutable arrival band, causal evidence and stable tie-breaks. The authored-pressure counterfactual rerolls every newly silent target with the same world seed. One saved confidence roll uses saved near-miss protection; failure substitutes nobody. Fresh-save phone acceptance remains.",
+      "alias": "target",
+      "classification": "semanticAllowed"
+    },
+    {
+      "path": "Sources/Content/Data/playability-roadmap.json",
+      "literal": "Keep this as the one current acceptance checkpoint until open → read canonical category and sigil names → select → place → edit succeeds on the exact signed physical-phone build, with pack-present visuals, pack-missing typed Page mutation, light/dark contrast and the accepted parchment all intact. Install every verified phone-ready update promptly in place with no uninstall/reset; defer only on Aimee's explicit hold, and do not auto-launch unless separately requested or already the next normal coordinated step. Record the exact installed revision and obtain Aimee's ordinary-path confirmation before E5–E7 resume; no Asset proof, source test or bundled bitmap substitutes for that native acceptance.",
+      "alias": "source",
+      "classification": "semanticAllowed"
+    },
+    {
+      "path": "Sources/Content/Data/playability-roadmap.json",
+      "literal": "Nineteen hides render once and consume no expedition or Storehouse item slots; hides and bones never enter item swap/spillover; exact properties, source and qualifier survive return/relaunch; failure partitioning, crafting selection and older-save bin migration are deterministic, atomic and lossless. Do not accept the temporary combined player-facing category as final. Authorities: world-resource-reserve-current.md and creature-ecology-and-materials-overhaul-current.md.",
+      "alias": "qualifier",
+      "classification": "semanticAllowed"
+    },
+    {
+      "path": "Sources/Content/Data/playability-roadmap.json",
+      "literal": "Nineteen hides render once and consume no expedition or Storehouse item slots; hides and bones never enter item swap/spillover; exact properties, source and qualifier survive return/relaunch; failure partitioning, crafting selection and older-save bin migration are deterministic, atomic and lossless. Do not accept the temporary combined player-facing category as final. Authorities: world-resource-reserve-current.md and creature-ecology-and-materials-overhaul-current.md.",
+      "alias": "source",
+      "classification": "semanticAllowed"
+    },
+    {
+      "path": "Sources/Content/Data/playability-roadmap.json",
+      "literal": "No new consumer or final graph art until Aimee accepts/revises the six-star structure, one-Mote starting price and campaign-save Reality persistence. Preserve the one-star surface meanwhile. Authorities: village-progression-and-asset-matrix-current.md and workshop-constellation-role-audit-current.md.",
+      "alias": "reality",
+      "classification": "semanticAllowed"
+    },
+    {
+      "path": "Sources/Content/Data/playability-roadmap.json",
+      "literal": "Nonblocking ordinary-phone acceptance remains: review fresh Binder+Quill and the saved progression matrix for feel, including the 2–4-round/5–20%-HP Normal target. A later measured phone result may reopen tuning, but it does not block Engineering progression; no install is implied by this source checkpoint.",
+      "alias": "source",
+      "classification": "semanticAllowed"
+    },
+    {
+      "path": "Sources/Content/Data/playability-roadmap.json",
+      "literal": "Nonblocking ordinary-phone acceptance remains: review fresh Binder+Quill and the saved progression matrix for feel, including the 2–4-round/5–20%-HP Normal target. A later measured phone result may reopen tuning, but it does not block Engineering progression; no install is implied by this source checkpoint.",
+      "alias": "target",
+      "classification": "semanticAllowed"
+    },
+    {
+      "path": "Sources/Content/Data/playability-roadmap.json",
+      "literal": "One seeded all-category run through portal, Waystone, collapse, defeat and abandon proves parity, exact retained/lost typed resource/stackable/unique lines, profile/provenance/identified round-trip, duplicate-label safety, atomic banking, relaunch, old record decode, six-across anchored detail and one constructor seam. Authority: expedition-return-record-current.md and Decision192.",
+      "alias": "profile",
+      "classification": "semanticAllowed"
+    },
+    {
+      "path": "Sources/Content/Data/playability-roadmap.json",
+      "literal": "Ordinary-phone evidence records exact installed commit plus OS static, first SwiftUI, shelf-ready and selected-save-ready timestamps; no black/unowned interval remains; selected-save progress still advances; static, initial and save-loading compositions align; and the slowest phase is safely reduced or truthfully covered.",
+      "alias": "progress",
+      "classification": "semanticAllowed"
+    },
+    {
+      "path": "Sources/Content/Data/playability-roadmap.json",
+      "literal": "Page-first Writing and truthful world projection",
+      "alias": "projection",
+      "classification": "semanticAllowed"
+    },
+    {
+      "path": "Sources/Content/Data/playability-roadmap.json",
+      "literal": "Party fits five identity tiles without oversized full-width cards. Character tabs are exactly Stats, Gear, Skills and Gambit. Diary deep-links to that person's Library record and Back restores the person/tab. Skills is the production combat graph; dashed alternatives are exact OR parents, never an extra cost or free node. Engineering first freezes the native state/action/layout contract with functional identity scaffolding; Asset refinement begins only when that exact vertical slice is scheduled.",
+      "alias": "node",
+      "classification": "semanticAllowed"
+    },
+    {
+      "path": "Sources/Content/Data/playability-roadmap.json",
+      "literal": "Persist the exact terrestrial/shore/aquatic/aerial availability, pressure/map weights, body constraints, component-bound movement and 65% contact-eligible placement quota in creature-habitat-authority.json; deep-only fish remain visible ecology without consuming most reachable fights. Each species also freezes the exact 18-family material projection, capability inputs and deterministic quantities from creature-material-projection-authority.json.",
+      "alias": "projection",
+      "classification": "semanticAllowed"
+    },
+    {
+      "path": "Sources/Content/Data/playability-roadmap.json",
+      "literal": "Phone encounters preserve visible approach versus genuine ambush, Watchful suppresses without reclassifying, concealed actors redirect only while another target exists, and relaunch never rerolls the opening.",
+      "alias": "target",
+      "classification": "semanticAllowed"
+    },
+    {
+      "path": "Sources/Content/Data/playability-roadmap.json",
+      "literal": "Recovered-teaching freshness passes python3 scripts/validate_recovered_teachings.py, and capacity migration passes every old count without loss. Homework holds Aimee's 3+3 mastery, campaign persistence and exact capacity-profile decisions; current recommendations are reversible and do not block unrelated work. Engineering does not remove live Workshop routes until every old entitlement has an equal-or-better migration and every knowledge ID remains reachable. Authorities: recovered-teachings-current.md, capacity-progression-current.md, workshop-constellation-role-audit-current.md and village-progression-and-asset-matrix-current.md.",
+      "alias": "profile",
+      "classification": "semanticAllowed"
+    },
+    {
+      "path": "Sources/Content/Data/playability-roadmap.json",
+      "literal": "Render the immutable outcome through the exact Recovered/Lost/Progress tab model in expedition-return-object-layout-current.md. World resources and Creature materials use separate six-across family/quality stacks; exact items, World Pages, diary bundles, other writing and people use their physical/identity tile grammar; Essence available and party XP are compact causal progress rather than ledger rows.",
+      "alias": "progress",
+      "classification": "semanticAllowed"
+    },
+    {
+      "path": "Sources/Content/Data/playability-roadmap.json",
+      "literal": "Save semantics are source-complete through b3bc410: post-loading Continue/New/Load chooser, independent autosaves, lossless older-save adoption, safe details/delete/export and active-slot-first Continue. The Campaign visual is not accepted: the saved reference, dirty native candidate and current review ledger disagree, so correct persistence must not be reported as an accepted Campaign screen.",
+      "alias": "source",
+      "classification": "semanticAllowed"
+    },
+    {
+      "path": "Sources/Content/Data/playability-roadmap.json",
+      "literal": "Source and deterministic matrix closure is complete through 1465533 and verified on current main: saved Normal/Teeming records, sequential contacts, party sizes 1–5, uneven levels, apexes, deterministic combat, retreat and acceptance-integrity all pass. The intended-Normal six-seed matrix remains victorious in 2–4 rounds with 6–11 of 54 aggregate HP spent; no known source P0 remains. Teeming remains an intentionally overwhelming disclosed profile.",
+      "alias": "profile",
+      "classification": "semanticAllowed"
+    },
+    {
+      "path": "Sources/Content/Data/playability-roadmap.json",
+      "literal": "Source and deterministic matrix closure is complete through 1465533 and verified on current main: saved Normal/Teeming records, sequential contacts, party sizes 1–5, uneven levels, apexes, deterministic combat, retreat and acceptance-integrity all pass. The intended-Normal six-seed matrix remains victorious in 2–4 rounds with 6–11 of 54 aggregate HP spent; no known source P0 remains. Teeming remains an intentionally overwhelming disclosed profile.",
+      "alias": "source",
+      "classification": "semanticAllowed"
+    },
+    {
+      "path": "Sources/Content/Data/playability-roadmap.json",
+      "literal": "Source checkpoint 530a205 replaces inventory-order auto-pack and the rejected one-shot bag with a durable desired-count supply plan. Exact stock moves only inside successful Bind/Revisit; shortages remain visible without erasing the plan.",
+      "alias": "source",
+      "classification": "semanticAllowed"
+    },
+    {
+      "path": "Sources/Content/Data/playability-roadmap.json",
+      "literal": "Source checkpoint 8b32b51 replaces the generic rotating notes with the authored field-note grammar and freezes a truthful local terrain, light/air, growth, water or visible-trace fact from the writing host and its disclosed surroundings.",
+      "alias": "source",
+      "classification": "semanticAllowed"
+    },
+    {
+      "path": "Sources/Content/Data/playability-roadmap.json",
+      "literal": "Source checkpoint 8c6280a completes the slot-free exact-sample storage foundation across acquisition, return, deterministic failure partitioning, crafting, commerce and Storehouse presentation. The current combined Resources label and generic grade-led presentation are transitional; Creature materials must separate from World resources under the ecology overhaul.",
+      "alias": "source",
+      "classification": "semanticAllowed"
+    },
+    {
+      "path": "Sources/Content/Data/playability-roadmap.json",
+      "literal": "Source checkpoint bfd37d1 saves, names, loads, renames and deletes up to 20 exact player-authored page layouts. Loading replaces the editable draft after confirmation but never binds or waives ordinary cost.",
+      "alias": "source",
+      "classification": "semanticAllowed"
+    },
+    {
+      "path": "Sources/Content/Data/playability-roadmap.json",
+      "literal": "Source checkpoint d7a1da6 resolves blocked-step feedback from the exact destination state, distinguishing the map boundary, crumbled ground, deep water, intact chasms and future visible impassable terrain without spending a turn.",
+      "alias": "source",
+      "classification": "semanticAllowed"
+    },
+    {
+      "path": "Sources/Content/Data/playability-roadmap.json",
+      "literal": "Source checkpoint dc30c6c adds a Library grid backed by durable typed encounters: known vocabulary shows its meaning, while a seen but unidentified glyph remains ?? until a legitimate acquisition teaches it.",
+      "alias": "source",
+      "classification": "semanticAllowed"
+    },
+    {
+      "path": "Sources/Content/Data/playability-roadmap.json",
+      "literal": "Source checkpoints 13bb6ec, 825a8a2 and 3932c7e implement the first three earned-point roots and forks with typed ownership, current-companion dispatch and stable migration. Deeper unsupported nodes remain unavailable rather than inert.",
+      "alias": "source",
+      "classification": "semanticAllowed"
+    },
+    {
+      "path": "Sources/Content/Data/playability-roadmap.json",
+      "literal": "Source checkpoints 1625915 and 6eb3988 derive current LOS instead of saving it, persist exploration only for fully visible tiles, and make Illumination plus obscuring Atmosphere control a full-visibility circle and transient terrain-only fringe. Hidden neighbours cannot affect visible edge/sidewall commands; hidden tiles construct no terrain art and render content-neutral opaque black, with softening confined to visible fog boundaries.",
+      "alias": "source",
+      "classification": "semanticAllowed"
+    },
+    {
+      "path": "Sources/Content/Data/playability-roadmap.json",
+      "literal": "Source checkpoints acb8a5f and b40ea6b implement three physical starter pages and their disclosed opening gear. Current Design revalidation replaces only misleading Open Meadow seed 2 with Open Flats seed 67 while preserving stable definition/instance identity and 14/14/16 pricing; Rainwashed Shore 26 and Stone Hollow 23 remain valid. Exact terrain/flora, three-creature, writing, Essence, collapse and reachability records now have a live Worldgen freshness gate.",
+      "alias": "source",
+      "classification": "semanticAllowed"
+    },
+    {
+      "path": "Sources/Content/Data/playability-roadmap.json",
+      "literal": "Source checkpoints fa42fb3 and 16fd25a make the world HUD distinguish turns until collapse, collapse underway and an indefinite steady world without predicting stochastic ejection.",
+      "alias": "source",
+      "classification": "semanticAllowed"
+    },
+    {
+      "path": "Sources/Content/Data/playability-roadmap.json",
+      "literal": "Source-complete and parked for acceptance: strict generated command/raster validation carries stable ItemID through Storehouse, loot, equipment, Blacksmith, Trading Post and Recycler. Exact TravellerID selects map, Party and Library cameos; functional placeholder packs remain distinct from final art. No Asset consumer is active merely because this checkpoint awaits review.",
+      "alias": "source",
+      "classification": "semanticAllowed"
+    },
+    {
+      "path": "Sources/Content/Data/playability-roadmap.json",
+      "literal": "Source-complete in 05b3a5d8f7b94ef574578c8057f015e1c108a2c2: bind freezes one validated disclosure-safe scene plus exact native rect-v1 commands, program/input/command/RGBA hashes and immutable active-run/History record; matching pending presentation owns root ahead of combat/map until zero-turn dismissal. The full 85-case accepted corpus, near/far and starter descriptions, strict schema, relaunch/orphan lifecycle, live World Generator bridge, 368/320/accessibility layouts and generic build are green. Signed Debug build 234 was installed in place on Aimee's iPhone without uninstall, reset or auto-launch.",
+      "alias": "source",
+      "classification": "semanticAllowed"
+    },
+    {
+      "path": "Sources/Content/Data/playability-roadmap.json",
+      "literal": "Source-complete in 07c9aee: every exit uses one rules-owned typed record constructor; resource, stackable, unique gear and each material sample freeze stable identity; compatibility rows derive from typed lines; anti-lock subsidy and final runway are saved atomically.",
+      "alias": "source",
+      "classification": "semanticAllowed"
+    },
+    {
+      "path": "Sources/Content/Data/playability-roadmap.json",
+      "literal": "Source-complete in 13f0c13: Nessa owns a persistent 85-Essence Apothecary build path; construction teaches Lesser Salve without granting an item; partial-stock inference remains; recipe IDs, sustainable Essence costs and the distinct Venom/Briar recipes are corrected.",
+      "alias": "source",
+      "classification": "semanticAllowed"
+    },
+    {
+      "path": "Sources/Content/Data/playability-roadmap.json",
+      "literal": "Source-complete in 16fab7a: Burn, Poison, Dazzle and Bleed share one exact-combatant typed collection; cures and Quench use authored membership; Stonebark consumes only for a meaningful standing application; coatings and Barbed/Bloodletter provenance are canonical; older-save paths adopt once without parallel ticking.",
+      "alias": "source",
+      "classification": "semanticAllowed"
+    },
+    {
+      "path": "Sources/Content/Data/playability-roadmap.json",
+      "literal": "Source-complete in 5825c3a: the obsolete enemyTierDelta schema, all 21 authored keys and the comparison toggle are removed together. Ordinary compounds now affect population through resolved pressures; typed Danger remains the sole authored hostility-tier authority. Focused DangerTests passed 20/20 and the generic simulator test build succeeded.",
+      "alias": "source",
+      "classification": "semanticAllowed"
+    },
+    {
+      "path": "Sources/Content/Data/playability-roadmap.json",
+      "literal": "Source-complete in 9ab833d: persisted refreshes freeze mixed resource, known consumable, exact material-sample and ordinary tier-1 equipment stock; the no-owned-weapon rule limits the first gear offer to a weapon, while weapon-owning campaigns may receive any ordinary tier-1 slot.",
+      "alias": "source",
+      "classification": "semanticAllowed"
+    },
+    {
+      "path": "Sources/Content/Data/playability-roadmap.json",
+      "literal": "Source-complete in f9ec86c: protected starting property is separated first; exposed discrete and resource property use outcome-wide budgets; exact item/material identity survives deterministic selection; resources use stable largest-remainder apportionment. Player-editable recovery remains a later Homework decision.",
+      "alias": "source",
+      "classification": "semanticAllowed"
+    },
+    {
+      "path": "Sources/Content/Data/playability-roadmap.json",
+      "literal": "Source-complete in the shared Design boundary: exact optional CMY+Depth recipes persist on eligible source marks, saved mixtures and a one-shot next-focus choice; 12-application vials atomically process the minimum Copper/Ichor/Sulfur/Obsidian shortfall into Cyan/Magenta/Yellow/Depth, retain excess, and spend one Resin; successful bind consumes one matching application per mixed-ink source and freezes explicit Sun/Smoke/Granite/Bloom color in the immutable world record. Ash remains unlimited/open. The Brush-gated native Ink well has four sliders, presets, shared-conversion swatch/pattern, placed/next-focus actions, Return to Ash, saved mixtures, exact stock quote and confirmation; Ink Mixing is purchasable. Focused rules/persistence tests and generic build-for-testing are green; ordinary-phone acceptance remains.",
+      "alias": "marks",
+      "classification": "semanticAllowed"
+    },
+    {
+      "path": "Sources/Content/Data/playability-roadmap.json",
+      "literal": "Source-complete in the shared Design boundary: exact optional CMY+Depth recipes persist on eligible source marks, saved mixtures and a one-shot next-focus choice; 12-application vials atomically process the minimum Copper/Ichor/Sulfur/Obsidian shortfall into Cyan/Magenta/Yellow/Depth, retain excess, and spend one Resin; successful bind consumes one matching application per mixed-ink source and freezes explicit Sun/Smoke/Granite/Bloom color in the immutable world record. Ash remains unlimited/open. The Brush-gated native Ink well has four sliders, presets, shared-conversion swatch/pattern, placed/next-focus actions, Return to Ash, saved mixtures, exact stock quote and confirmation; Ink Mixing is purchasable. Focused rules/persistence tests and generic build-for-testing are green; ordinary-phone acceptance remains.",
+      "alias": "source",
+      "classification": "semanticAllowed"
+    },
+    {
+      "path": "Sources/Content/Data/playability-roadmap.json",
+      "literal": "Source-complete sensory/transaction foundation in 7772df0, 5e5aa14, 2ced55a and 543ddfe: Nessa tier-0 Scent Mask costs 0 Essence and grants 12 turns of chemo-only hesitation without hiding creatures, affecting apexes or stacking a second Quiet Step hesitation. Its currently implemented grade-25+ animal-world-resource ingredient is transitional, not accepted target semantics; the Creature-material migration replaces it with one exact Hide, Pelt, Down or Oil and no grade floor.",
+      "alias": "source",
+      "classification": "semanticAllowed"
+    },
+    {
+      "path": "Sources/Content/Data/playability-roadmap.json",
+      "literal": "Source-complete sensory/transaction foundation in 7772df0, 5e5aa14, 2ced55a and 543ddfe: Nessa tier-0 Scent Mask costs 0 Essence and grants 12 turns of chemo-only hesitation without hiding creatures, affecting apexes or stacking a second Quiet Step hesitation. Its currently implemented grade-25+ animal-world-resource ingredient is transitional, not accepted target semantics; the Creature-material migration replaces it with one exact Hide, Pelt, Down or Oil and no grade floor.",
+      "alias": "target",
+      "classification": "semanticAllowed"
+    },
+    {
+      "path": "Sources/Content/Data/playability-roadmap.json",
+      "literal": "Source-complete: Brush roots the settled Penmanship fan/fork; Ink Mixing, Compound Assembly and Chaining are independent tier-one capabilities; Chaining leads to the ruling frame and Fountain pen. Older research and diary IDs migrate canonically across persisted campaign/run records, capability grants round-trip independently from research history, exact purchase quotes preserve low-Essence continuation after purchase, and an Isolde-phase fixture proves writable Copper, Fibre and Timber routes. Ordinary-phone graph and lifecycle acceptance remains.",
+      "alias": "source",
+      "classification": "semanticAllowed"
+    },
+    {
+      "path": "Sources/Content/Data/playability-roadmap.json",
+      "literal": "Source-complete: the persistent DEBUG toggle freezes only into newly opened encounters. Enemy decisions, damage, conditions, cooldowns and logs remain ordinary; active party lethal damage is recorded but floors at 1 and defeat is suppressed. It grants no offense, loot, XP, spawn or retreat benefit. The encounter banner, persisted record and bug-report export mark only combat-balance conclusions invalid while retaining all other bug evidence.",
+      "alias": "mark",
+      "classification": "semanticAllowed"
+    },
+    {
+      "path": "Sources/Content/Data/playability-roadmap.json",
+      "literal": "Source-complete: the persistent DEBUG toggle freezes only into newly opened encounters. Enemy decisions, damage, conditions, cooldowns and logs remain ordinary; active party lethal damage is recorded but floors at 1 and defeat is suppressed. It grants no offense, loot, XP, spawn or retreat benefit. The encounter banner, persisted record and bug-report export mark only combat-balance conclusions invalid while retaining all other bug evidence.",
+      "alias": "source",
+      "classification": "semanticAllowed"
+    },
+    {
+      "path": "Sources/Content/Data/playability-roadmap.json",
+      "literal": "Source-green reversible profile: the Essence Spring solely owns exact selected/all conversion at 1 Raw → 2 Essence; Second pass requires 50 lifetime committed Raw plus 80 Essence/10 Quartz and changes future conversion to 1 Raw → 3 Essence; Continuous settling auto-refines only newly retained Raw once per outcome; Deepen remains a parallel dividend branch.",
+      "alias": "profile",
+      "classification": "semanticAllowed"
+    },
+    {
+      "path": "Sources/Content/Data/playability-roadmap.json",
+      "literal": "Source-green reversible profile: the Essence Spring solely owns exact selected/all conversion at 1 Raw → 2 Essence; Second pass requires 50 lifetime committed Raw plus 80 Essence/10 Quartz and changes future conversion to 1 Raw → 3 Essence; Continuous settling auto-refines only newly retained Raw once per outcome; Deepen remains a parallel dividend branch.",
+      "alias": "source",
+      "classification": "semanticAllowed"
+    },
+    {
+      "path": "Sources/Content/Data/playability-roadmap.json",
+      "literal": "The all-category proof and typed fixtures show one Standard Hides ×19 tile, separate Fine Hides/Bone/world-resource groups, distinct same-catalogue item profiles, inspected/uninspected World Pages, grouped exact diary additions, permanent people/knowledge/XP across partial exits, exact Essence available, Recovered/Lost partition, relaunch persistence and every edge/bottom detail on-screen at 368×800. Authority: expedition-return-object-layout-current.md; implementation waits for final Creature-material family/quality projection but not for tutorial or combat phone acceptance.",
+      "alias": "projection",
+      "classification": "semanticAllowed"
+    },
+    {
+      "path": "Sources/Content/Data/playability-roadmap.json",
+      "literal": "The complete current Page representation round-trips; loaded marks receive fresh instance IDs; dirty drafts and overwrite/delete confirm; collected pages cannot be copied; relaunch and ordinary binding remain exact. Ink is added only when its canonical production record exists.",
+      "alias": "marks",
+      "classification": "semanticAllowed"
+    },
+    {
+      "path": "Sources/Content/Data/playability-roadmap.json",
+      "literal": "The comprehensive source-generated Game Wiki is integrated on the current line. All twelve top-level routes are structured; all 108 canonical writing lexemes have typed detail and search routes; catalogue, resources, people, stations, Core Loop, Exploration, Combat, Overview, Roadmap and History distinguish live, settled-not-live, provisional, removed and historical truth. Its generated provenance was reconciled through 8a094a1c and retained by b474be93. Browser review covered 368×800 and desktop navigation/search without placeholder authority pages or horizontal overflow.",
+      "alias": "source",
+      "classification": "semanticAllowed"
+    },
+    {
+      "path": "Sources/Content/Data/playability-roadmap.json",
+      "literal": "The integrated source chain through 8668e1f adds unique and repeatable curated pages as physical expedition finds with provenance, read-only unknown glyphs, collision-safe stable identity and exact-instance consumption.",
+      "alias": "source",
+      "classification": "semanticAllowed"
+    },
+    {
+      "path": "Sources/Content/Data/playability-roadmap.json",
+      "literal": "The opening-economy checkpoint now exposes the real first contribution for Mara through Orsa: Survey Post instruments and field survey, Reliquary site interpretation/yield, Scriptorium Brush and persistent Ink Mixing, Wayfarer's Table packing/organic yield plus exact visible-flora recognition, and Bryn/Orsa's live meetings, diaries, party identities and combat leans. Source evidence includes c917c27, 1f6cfce, 460c2cd and 12c5759; no decorative room or premature Tavern subsystem is implied.",
+      "alias": "source",
+      "classification": "semanticAllowed"
+    },
+    {
+      "path": "Sources/Content/Data/playability-roadmap.json",
+      "literal": "The stop-the-line Writing Desk repair is source-complete through shared revision f7c4fa45. It now uses the exact bundle-relative runtime pack path, keeps game-owned canonical names and legal Page mutation available through the RuneGlyph/PageRules fallback when optional visuals fail, restores readable category states, packages the accepted production parchment bitmap separately from review evidence and reserves a stable native text well beside every temporary sigil. Generated sigils remain temporary replaceable scaffolding owned finally by Aimee; neither their packaging nor the accepted parchment alone is device acceptance.",
+      "alias": "source",
+      "classification": "semanticAllowed"
+    },
+    {
+      "path": "Sources/Content/Data/playability-roadmap.json",
+      "literal": "The truthful one-star source slice is preserved. Current Game Design recommends two matched three-star clusters: Offense/Defense/Fieldcraft permissions for combat depths 4–5 and Commerce/Makers/Commons permissions for Tier-2 building upgrades, plus Long Instruction. A Mote buys a campaign-wide permission, never the underlying skill, building, recipe or ordinary cost.",
+      "alias": "source",
+      "classification": "semanticAllowed"
+    },
+    {
+      "path": "Sources/Content/Data/playability-roadmap.json",
+      "literal": "This is an umbrella outcome, not one implemented screen. Campaign, Binder House/yard, Writing, generated arrival, World, object-like Return, Library and Party each require their own current visual/source/install/phone record. Earlier cumulative prototypes and a green sibling screen cannot satisfy it.",
+      "alias": "source",
+      "classification": "semanticAllowed"
+    },
+    {
+      "path": "Sources/Content/Data/playability-roadmap.json",
+      "literal": "True combat trees and complete node consumers",
+      "alias": "node",
+      "classification": "semanticAllowed"
+    },
+    {
+      "path": "Sources/Content/Data/playability-roadmap.json",
+      "literal": "Use earthlike-visibility-test-world-current.md. The exact fixture and seed never reroll; typed live visibility owns clear/dim/dark/smoke/ash while absent rain/snow/fog consumers say Visual only. Prove all suppressed campaign state byte-equivalent, inert content awards nothing, profile switching preserves coordinates/memory, ordinary phone layout is unchanged, and Release has no route.",
+      "alias": "profile",
+      "classification": "semanticAllowed"
+    },
+    {
+      "path": "Sources/Content/Data/playability-roadmap.json",
+      "literal": "Use survey-needle-current.md after resource extraction and adjacent consequence/Look feedback. Prove free exact-instance Home tuning, known-target eligibility, one-turn deterministic readings, path and strength boundaries, missing-capability discovery, no-answer behavior, relaunch, and zero fog/path/coordinate/node-count/minimap disclosure. Keep it distinct from Seamlight and do not expand it into a universal finder.",
+      "alias": "node",
+      "classification": "semanticAllowed"
+    },
+    {
+      "path": "Sources/Content/Data/playability-roadmap.json",
+      "literal": "Use survey-needle-current.md after resource extraction and adjacent consequence/Look feedback. Prove free exact-instance Home tuning, known-target eligibility, one-turn deterministic readings, path and strength boundaries, missing-capability discovery, no-answer behavior, relaunch, and zero fog/path/coordinate/node-count/minimap disclosure. Keep it distinct from Seamlight and do not expand it into a universal finder.",
+      "alias": "target",
+      "classification": "semanticAllowed"
+    },
+    {
+      "path": "Sources/Content/Data/pressure_sources.json",
+      "literal": "Returned light that appears exact while reversing its frame.",
+      "alias": "returned",
+      "classification": "semanticAllowed"
+    },
+    {
+      "path": "Sources/Content/Data/qualifiers.json",
+      "literal": "Frozen",
+      "alias": "frozen",
+      "classification": "semanticAllowed"
+    },
+    {
+      "path": "Sources/Content/Data/research.json",
+      "literal": "Choosing a target",
+      "alias": "target",
+      "classification": "semanticAllowed"
+    },
+    {
+      "path": "Sources/Content/Data/research.json",
+      "literal": "The faintest mark that a world has a sky at all.",
+      "alias": "mark",
+      "classification": "semanticAllowed"
+    },
+    {
+      "path": "Sources/Debug/DebugBugReporter.swift",
+      "literal": "legacy-person:\\(name)|\\(calling)",
+      "alias": "legacy",
+      "classification": "semanticAllowed"
+    },
+    {
+      "path": "Sources/Debug/DebugRoadmapView.swift",
+      "literal": "In progress",
+      "alias": "progress",
+      "classification": "semanticAllowed"
+    },
+    {
+      "path": "Sources/Debug/HarnessActions.swift",
+      "literal": "compound_phone_unknown_source",
+      "alias": "source",
+      "classification": "semanticAllowed"
+    },
+    {
+      "path": "Sources/Debug/HarnessActions.swift",
+      "literal": "debug_retired_qualifier",
+      "alias": "qualifier",
+      "classification": "semanticAllowed"
+    },
+    {
+      "path": "Sources/Debug/HarnessActions.swift",
+      "literal": "debug_retired_source",
+      "alias": "source",
+      "classification": "semanticAllowed"
+    },
+    {
+      "path": "Sources/Debug/HarnessActions.swift",
+      "literal": "debug_retired_target",
+      "alias": "target",
+      "classification": "semanticAllowed"
+    },
+    {
+      "path": "Sources/Debug/HarnessView.swift",
+      "literal": "Reset Village, keep shared progress",
+      "alias": "progress",
+      "classification": "semanticAllowed"
+    },
+    {
+      "path": "Sources/Debug/HarnessView.swift",
+      "literal": "Returned / lost to collapse",
+      "alias": "returned",
+      "classification": "semanticAllowed"
+    },
+    {
+      "path": "Sources/Debug/HarnessView.swift",
+      "literal": "Shared progress — kept across saves",
+      "alias": "progress",
+      "classification": "semanticAllowed"
+    },
+    {
+      "path": "Sources/Persistence/GameStore.swift",
+      "literal": "reset Village, keep shared progress",
+      "alias": "progress",
+      "classification": "semanticAllowed"
+    },
+    {
+      "path": "Sources/Rules/PageRules.swift",
+      "literal": "A compound can have exactly one target.",
+      "alias": "target",
+      "classification": "semanticAllowed"
+    },
+    {
+      "path": "Sources/Rules/PageRules.swift",
+      "literal": "A compound needs one complete target-and-source statement.",
+      "alias": "source",
+      "classification": "semanticAllowed"
+    },
+    {
+      "path": "Sources/Rules/PageRules.swift",
+      "literal": "A compound needs one complete target-and-source statement.",
+      "alias": "target",
+      "classification": "semanticAllowed"
+    },
+    {
+      "path": "Sources/Rules/TutorialRules.swift",
+      "literal": "Raw essence cannot bind a page. Refine what returned at the Essence Spring.",
+      "alias": "returned",
+      "classification": "semanticAllowed"
+    },
+    {
+      "path": "Sources/Rules/TutorialRules.swift",
+      "literal": "Raw essence cannot bind a page. Refine what returned at the Essence Spring.",
+      "alias": "returned",
+      "classification": "semanticAllowed"
+    },
+    {
+      "path": "Sources/Rules/TutorialRules.swift",
+      "literal": "Something returned without a known name. The Storehouse is where an object can be identified without guessing at its use.",
+      "alias": "returned",
+      "classification": "semanticAllowed"
+    },
+    {
+      "path": "Sources/Screens/ApothecaryView.swift",
+      "literal": "unknown source",
+      "alias": "source",
+      "classification": "semanticAllowed"
+    },
+    {
+      "path": "Sources/Screens/BaseView.swift",
+      "literal": "Follow what returned",
+      "alias": "returned",
+      "classification": "semanticAllowed"
+    },
+    {
+      "path": "Sources/Screens/BaseView.swift",
+      "literal": "preview-base",
+      "alias": "base",
+      "classification": "semanticAllowed"
+    },
+    {
+      "path": "Sources/Screens/CampaignStartView.swift",
+      "literal": "Begin a campaign. Each new game keeps its own progress.",
+      "alias": "progress",
+      "classification": "semanticAllowed"
+    },
+    {
+      "path": "Sources/Screens/CampaignStartView.swift",
+      "literal": "Begin a campaign. Each new game keeps its own progress.",
+      "alias": "progress",
+      "classification": "semanticAllowed"
+    },
+    {
+      "path": "Sources/Screens/EncounterView.swift",
+      "literal": "Choose a target — or tap Attack again to follow your own rules.",
+      "alias": "target",
+      "classification": "semanticAllowed"
+    },
+    {
+      "path": "Sources/Screens/EncounterView.swift",
+      "literal": "Choose a target — or tap Attack again to take the first.",
+      "alias": "target",
+      "classification": "semanticAllowed"
+    },
+    {
+      "path": "Sources/Screens/EncounterView.swift",
+      "literal": "Choose a target — or tap Attack to use \\(pendingSkill.name) on the first.",
+      "alias": "target",
+      "classification": "semanticAllowed"
+    },
+    {
+      "path": "Sources/Screens/EncounterView.swift",
+      "literal": "Final-target dodge inputs",
+      "alias": "target",
+      "classification": "semanticAllowed"
+    },
+    {
+      "path": "Sources/Screens/EncounterView.swift",
+      "literal": "\\(CombatRules.actorName(entry.actor, encounter: encounter)) · base \\(Int(entry.characterEvasion * 100))%\\(footwork > 0 ? ",
+      "alias": "base",
+      "classification": "semanticAllowed"
+    },
+    {
+      "path": "Sources/Screens/SettingsView.swift",
+      "literal": "Installed source",
+      "alias": "source",
+      "classification": "semanticAllowed"
+    },
+    {
+      "path": "Sources/Screens/SettingsView.swift",
+      "literal": "Revision unavailable — this build cannot prove its source.",
+      "alias": "source",
+      "classification": "semanticAllowed"
+    },
+    {
+      "path": "Sources/Screens/SettingsView.swift",
+      "literal": "\\(debugActorName(entry.actor)) · base \\(Int(entry.characterEvasion * 100))%\\(footwork > 0 ? ",
+      "alias": "base",
+      "classification": "semanticAllowed"
+    },
+    {
+      "path": "Sources/Screens/SettingsView.swift",
+      "literal": "band2-dictionary-fixture-receipt",
+      "alias": "receipt",
+      "classification": "semanticAllowed"
+    },
+    {
+      "path": "Sources/Screens/SettingsView.swift",
+      "literal": "band2-templates-fixture-receipt",
+      "alias": "receipt",
+      "classification": "semanticAllowed"
+    },
+    {
+      "path": "Sources/Screens/SettingsView.swift",
+      "literal": "wild-world-pages-fixture-receipt",
+      "alias": "receipt",
+      "classification": "semanticAllowed"
+    },
+    {
+      "path": "Sources/Screens/StationViews.swift",
+      "literal": "Auto-refine newly returned Raw",
+      "alias": "returned",
+      "classification": "semanticAllowed"
+    },
+    {
+      "path": "Sources/Screens/StationViews.swift",
+      "literal": "Edren marks where a world shows signs of habitation. Reaching and searching each place is still fieldwork.",
+      "alias": "marks",
+      "classification": "semanticAllowed"
+    },
+    {
+      "path": "Sources/Screens/StationViews.swift",
+      "literal": "Unknown source",
+      "alias": "source",
+      "classification": "semanticAllowed"
+    },
+    {
+      "path": "Sources/Screens/TradingPostView.swift",
+      "literal": "Qualifier",
+      "alias": "qualifier",
+      "classification": "semanticAllowed"
+    },
+    {
+      "path": "Sources/Screens/TradingPostView.swift",
+      "literal": "Source",
+      "alias": "source",
+      "classification": "semanticAllowed"
+    },
+    {
+      "path": "Sources/Screens/TradingPostView.swift",
+      "literal": "Source unknown",
+      "alias": "source",
+      "classification": "semanticAllowed"
+    },
+    {
+      "path": "Sources/Screens/WorldView.swift",
+      "literal": "Select a supply to inspect its effect and choose a target.",
+      "alias": "target",
+      "classification": "semanticAllowed"
+    },
+    {
+      "path": "Sources/Screens/WritingDeskView.swift",
+      "literal": "Focus returned to Ash. Its world color is open again.",
+      "alias": "returned",
+      "classification": "semanticAllowed"
+    },
+    {
+      "path": "Sources/Screens/WritingDeskView.swift",
+      "literal": "mark_placed",
+      "alias": "mark",
+      "classification": "semanticAllowed"
+    },
+    {
+      "path": "docs/game-wiki-content-contract-current.md",
+      "literal": "## Current progress",
+      "alias": "progress",
+      "classification": "semanticAllowed"
+    },
+    {
+      "path": "docs/game-wiki-content-contract-current.md",
+      "literal": "**Status:** Current Game Design/Orchestration authority for the source-generated internal wiki.",
+      "alias": "source",
+      "classification": "semanticAllowed"
+    },
+    {
+      "path": "docs/game-wiki-content-contract-current.md",
+      "literal": "- **Roadmap entry:** status, band, workstream, dependency/gate, latest record and source; “later” alone is not",
+      "alias": "source",
+      "classification": "semanticAllowed"
+    },
+    {
+      "path": "docs/game-wiki-content-contract-current.md",
+      "literal": "5. has no blank primary explanation and no “see source” substitute for content;",
+      "alias": "source",
+      "classification": "semanticAllowed"
+    },
+    {
+      "path": "docs/game-wiki-content-contract-current.md",
+      "literal": "6. updates when its registered source changes, with tests proving every source entity is accounted for.",
+      "alias": "source",
+      "classification": "semanticAllowed"
+    },
+    {
+      "path": "docs/game-wiki-content-contract-current.md",
+      "literal": "8. generated data is stale against any registered source hash;",
+      "alias": "source",
+      "classification": "semanticAllowed"
+    },
+    {
+      "path": "docs/game-wiki-content-contract-current.md",
+      "literal": "9. a source entity count changes without the derived partition changing with it;",
+      "alias": "source",
+      "classification": "semanticAllowed"
+    },
+    {
+      "path": "docs/game-wiki-content-contract-current.md",
+      "literal": "Context-sensitive ordinary words such as combat target, material source, frozen water, physical trail mark,",
+      "alias": "frozen",
+      "classification": "semanticAllowed"
+    },
+    {
+      "path": "docs/game-wiki-content-contract-current.md",
+      "literal": "Context-sensitive ordinary words such as combat target, material source, frozen water, physical trail mark,",
+      "alias": "mark",
+      "classification": "semanticAllowed"
+    },
+    {
+      "path": "docs/game-wiki-content-contract-current.md",
+      "literal": "Context-sensitive ordinary words such as combat target, material source, frozen water, physical trail mark,",
+      "alias": "source",
+      "classification": "semanticAllowed"
+    },
+    {
+      "path": "docs/game-wiki-content-contract-current.md",
+      "literal": "Context-sensitive ordinary words such as combat target, material source, frozen water, physical trail mark,",
+      "alias": "target",
+      "classification": "semanticAllowed"
+    },
+    {
+      "path": "docs/game-wiki-content-contract-current.md",
+      "literal": "Each slice is source-generated and tested. Completion records say what became useful to Aimee, not merely",
+      "alias": "source",
+      "classification": "semanticAllowed"
+    },
+    {
+      "path": "docs/game-wiki-content-contract-current.md",
+      "literal": "Engineering primary; World Arrival is source-installed and ready for acceptance testing;",
+      "alias": "source",
+      "classification": "semanticAllowed"
+    },
+    {
+      "path": "docs/game-wiki-content-contract-current.md",
+      "literal": "Every generated fact carries source path/hash, stable ID where one exists, implementation disposition and",
+      "alias": "source",
+      "classification": "semanticAllowed"
+    },
+    {
+      "path": "docs/game-wiki-content-contract-current.md",
+      "literal": "Post and Recycler disposition, source status and asset status. Missing optional mechanics say “none authored”;",
+      "alias": "source",
+      "classification": "semanticAllowed"
+    },
+    {
+      "path": "docs/game-wiki-content-contract-current.md",
+      "literal": "The current source catalogue contains 102 items. Tests derive and compare the partition directly to",
+      "alias": "source",
+      "classification": "semanticAllowed"
+    },
+    {
+      "path": "docs/game-wiki-content-contract-current.md",
+      "literal": "must keep Asset acceptance, committed source integration, installed native integration and phone acceptance",
+      "alias": "source",
+      "classification": "semanticAllowed"
+    },
+    {
+      "path": "docs/game-wiki-content-contract-current.md",
+      "literal": "recipe/knowledge source when registered, trade/recycle disposition and implementation status. Coatings and",
+      "alias": "source",
+      "classification": "semanticAllowed"
+    },
+    {
+      "path": "docs/game-wiki-content-contract-current.md",
+      "literal": "remains only as a pack-failure/older-save fail-safe. Canonical UI terminology is the sole in-progress",
+      "alias": "progress",
+      "classification": "semanticAllowed"
+    },
+    {
+      "path": "docs/game-wiki-content-contract-current.md",
+      "literal": "returned objects and Shared progress remain valid through executable semantic counterfixtures.",
+      "alias": "progress",
+      "classification": "semanticAllowed"
+    },
+    {
+      "path": "docs/game-wiki-content-contract-current.md",
+      "literal": "returned objects and Shared progress remain valid through executable semantic counterfixtures.",
+      "alias": "returned",
+      "classification": "semanticAllowed"
+    },
+    {
+      "path": "docs/game-wiki-content-contract-current.md",
+      "literal": "transitional generic Hide/Bone behavior as final. Each family detail shows visible anatomical source,",
+      "alias": "source",
+      "classification": "semanticAllowed"
+    }
+  ],
+  "unapprovedOccurrences": []
+}

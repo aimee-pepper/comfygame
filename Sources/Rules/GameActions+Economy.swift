@@ -336,7 +336,7 @@ extension GameStore {
         guard preview.isAvailable else { return .refused(.unavailable) }
         guard preview.shortfall.isEmpty else { return .refused(.shortfall(preview.shortfall)) }
         var result: EconomyRules.ResearchPurchaseResult = .refused(.stalePreview)
-        mutate("research \(node.id.rawValue)", flush: true) { state in
+        mutate("Research Upgrade: \(node.name) [Internal ID: \(node.id.rawValue)]", flush: true) { state in
             result = EconomyRules.commitResearchPurchase(preview, node: node, in: &state)
         }
         return result
@@ -481,7 +481,7 @@ extension GameStore {
             return false
         }
         var bought = false
-        mutate("constellation: \(node.id.rawValue)", flush: true) { state in
+        mutate("Learn Mastery: \(node.name) [Internal ID: \(node.id.rawValue)]", flush: true) { state in
             guard let cost = EconomyRules.moteCost(of: node, in: state),
                   state.reality.motes >= cost else { return }
             state.reality.motes -= cost
@@ -1093,7 +1093,8 @@ extension GameStore {
             return .refused(.stale)
         }
         var result: CombatGraphRules.PurchaseResult = .refused(.stale)
-        let changed = mutateIf("learn \(quote.nodeID.rawValue)", flush: true) { state in
+        let skillName = ContentCatalog.shared.combatGraph.node(quote.nodeID)?.name ?? "Unknown Skill"
+        let changed = mutateIf("Learn Skill: \(skillName) [Internal ID: \(quote.nodeID.rawValue)]", flush: true) { state in
             var character = state.base.character(member)
             result = CombatGraphRules.commit(quote, for: &character,
                                              catalogue: ContentCatalog.shared.combatGraph)

@@ -124,7 +124,7 @@ struct BaseView: View {
             }
         }
         .background(PixelUITheme.screen)
-        .navigationTitle("Base")
+        .navigationTitle("Village")
         .toolbar(.hidden, for: .navigationBar)
         .safeAreaInset(edge: .bottom, spacing: 0) {
             departure
@@ -149,7 +149,7 @@ struct BaseView: View {
 
     private var contextRow: some View {
         HStack(spacing: 12) {
-            Text("Base")
+            Text("Village")
                 .font(.custom("Jersey 10", size: 26))
                 .accessibilityAddTraits(.isHeader)
             Spacer(minLength: 4)

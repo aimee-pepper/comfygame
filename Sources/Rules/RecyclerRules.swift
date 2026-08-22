@@ -12,7 +12,7 @@ enum RecyclerRules {
             case .favorite: "Favorite pieces are protected. Remove Favorite first."
             case .locked: "Locked pieces are protected. Unlock it first."
             case .equipped: "Worn gear must be taken off before dismantling."
-            case .notGear: "The Recycler accepts eligible gear, not ordinary holdings."
+            case .notGear: "The Recycler accepts eligible gear, not other belongings."
             case .unique: "One-of-a-kind gear cannot be dismantled."
             case .apex: "Apex gear cannot be dismantled."
             case .narrative: "Story items remain intact."

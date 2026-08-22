@@ -12,8 +12,8 @@ enum Band2PhoneFixtureError: Error, LocalizedError {
         switch self {
         case .missingVocabulary: "The authored Sigil Dictionary vocabulary is unavailable."
         case .missingCollectedPage: "No collected World Page is available for inspection."
-        case .persistenceMismatch: "The disposable fixture did not survive its relaunch check."
-        case .couldNotStageTemplate: "The production Template actions could not stage the fixture."
+        case .persistenceMismatch: "The disposable test did not survive its relaunch check."
+        case .couldNotStageTemplate: "The production Template actions could not stage the test."
         }
     }
 }
@@ -87,7 +87,7 @@ enum CompoundAssemblyPhoneFixtureError: Error, LocalizedError {
         case .missingAuthoredVocabulary:
             "The authored Sun / Illumination vocabulary is unavailable."
         case .invalidFixture:
-            "The Compound Assembly fixture did not produce its required ready and refusal states."
+            "The Compound Assembly test did not produce its required ready and refusal states."
         }
     }
 }
@@ -110,7 +110,7 @@ enum StarterWorldPagePhoneFixtureError: Error, LocalizedError {
         case .missingPage: "The authored starter World Page is unavailable."
         case .couldNotBind: "The disposable campaign could not bind that starter World Page."
         case .missingRun: "The starter World Page did not create an expedition."
-        case .missingReceipt: "The expedition did not freeze the exact starter-page receipt."
+        case .missingReceipt: "The test did not save the exact starter Page state."
         case .missingPromisedFind: "The promised starter weapon was not placed exactly once."
         case .unsafePromisedFind:
             "The promised weapon is not revealed and reachable in one or two ordinary steps."
@@ -153,7 +153,7 @@ enum WildWorldPagesPhoneFixtureKind: String, CaseIterable, Identifiable, Sendabl
         switch self {
         case .fieldWithRoom: "Find, inspect and take"
         case .fullSatchel: "Full Field Kit swap"
-        case .failureReceipt: "Failure retention receipt"
+        case .failureReceipt: "Failure retention test"
         case .laterBind: "Later exact-instance bind"
         }
     }
@@ -177,13 +177,13 @@ enum WildWorldPagesPhoneFixtureError: Error, LocalizedError {
 
     var errorDescription: String? {
         switch self {
-        case .couldNotWritePage: "The disposable fixture could not write its controlled Page."
-        case .couldNotBind: "The disposable fixture could not enter a production world."
+        case .couldNotWritePage: "The disposable test could not write its controlled Page."
+        case .couldNotBind: "The disposable test could not enter a production world."
         case .missingRun: "The production departure did not create an expedition."
         case .missingLoosePage: "The guaranteed loose World Page was not placed."
         case .writingWasReplaced: "Loose-page placement displaced the guaranteed writing."
-        case .persistenceMismatch: "The UUID-scoped fixture did not survive its relaunch check."
-        case .invalidReceipt: "The production return did not freeze the required exact receipt."
+        case .persistenceMismatch: "The UUID-scoped test did not survive its relaunch check."
+        case .invalidReceipt: "The return test did not preserve the expected result."
         case .missingCatalogue: "The authored repeatable World Page catalogue is unavailable."
         }
     }
@@ -257,9 +257,9 @@ enum EncounterScalingPhoneFixtureError: Error, LocalizedError {
 
     var errorDescription: String? {
         switch self {
-        case .couldNotWritePage: "The fixture could not write its controlled Page."
-        case .couldNotBind: "The fixture could not bind its controlled world."
-        case .missingRun: "The fixture did not create an expedition."
+        case .couldNotWritePage: "The test could not write its controlled Page."
+        case .couldNotBind: "The test could not bind its controlled world."
+        case .missingRun: "The test did not create an expedition."
         case .missingEnemy: "The controlled world did not contain its expected contact."
         case .invalidEncounter: "The controlled contact did not freeze as one level-one foe."
         }
@@ -293,18 +293,18 @@ enum EncounterScalingProgressionFixtureKind: String, Identifiable, CaseIterable,
         switch self {
         case .freshSolo: "Solo · Binder level 1"
         case .experiencedSolo: "Solo · Binder level 8"
-        case .ordinaryTwoPerson: "Ordinary · 2 people · levels 8 / 8"
-        case .ordinaryThreePerson: "Ordinary · 3 people · levels 8 / 8 / 6"
+        case .ordinaryTwoPerson: "Normal · 2 people · levels 8 / 8"
+        case .ordinaryThreePerson: "Normal · 3 people · levels 8 / 8 / 6"
         case .experiencedParty: "Party · levels 8 / 8 / 6 / 4"
-        case .ordinaryFivePerson: "Ordinary · 5 people · levels 8 / 8 / 6 / 4 / 2"
+        case .ordinaryFivePerson: "Normal · 5 people · levels 8 / 8 / 6 / 4 / 2"
         case .apexParty: "Apex · party levels 8 / 8 / 6 / 4"
         }
     }
     var detail: String {
-        if isApex { return "One disclosed apex contact · fixed root 909 · frozen member levels" }
+        if isApex { return "One disclosed apex contact · internal test seed 909 · member levels saved at encounter start" }
         return memberLevels.isEmpty
-            ? "One disclosed ordinary contact · no equipment · frozen level \(binderLevel)"
-            : "\(memberLevels.count) explicit companion\(memberLevels.count == 1 ? "" : "s") · disclosed ordinary grouping"
+            ? "One disclosed Normal contact · no equipment · Binder level \(binderLevel) saved at encounter start"
+            : "\(memberLevels.count) explicit companion\(memberLevels.count == 1 ? "" : "s") · disclosed Normal grouping"
     }
 }
 
@@ -458,7 +458,7 @@ struct EncounterScalingAcceptanceMeasurement: Codable, Equatable, Sendable {
     var summary: String {
         switch status {
         case .stale:
-            return "Measurement stale · receipt no longer matches the live fixture"
+            return "Saved measurement no longer matches this test"
         case .unfinished, .finished:
             let outcomeText = outcome?.rawValue.capitalized ?? "Unfinished"
             let rounds = roundCount.map(String.init) ?? "—"
@@ -492,7 +492,7 @@ enum EncounterScalingAcceptanceRecordResult: Equatable, Sendable {
         case .unfinished(let measurement):
             "Verdict not recorded · finish this exact encounter first. \(measurement.summary)"
         case .stale(let measurement):
-            "Verdict not recorded · this fixture receipt is stale. \(measurement.summary)"
+            "Verdict not recorded · this saved test no longer matches. \(measurement.summary)"
         }
     }
 }
@@ -707,7 +707,7 @@ extension GameStore {
                 "Production collapse outcome #\(outcomeID.rawValue)",
                 "One shared retention budget · items and repeatable Pages together",
                 "Protected Page kept outside the failure budget",
-                "Exact replay no-op verified · receipt survived UUID relaunch"
+                "Saved result survived relaunch without being applied twice."
             ]))
 
         case .laterBind:

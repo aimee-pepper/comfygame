@@ -51,7 +51,7 @@ struct CombatGraphRouteExplorer: View {
     private var fixtureHeader: some View {
         HStack {
             VStack(alignment: .leading, spacing: 2) {
-                Text("DEBUG fixture · no campaign mutation").font(.caption.weight(.semibold))
+                Text("Temporary test · your campaign is unchanged.").font(.caption.weight(.semibold))
                 Text("\(ProgressionRequirementPresentation.skillsLearned(route.owned.count)) · \(ProgressionRequirementPresentation.pointsReady(pointsRemaining))")
                     .font(.caption2).foregroundStyle(.secondary)
             }
@@ -116,7 +116,7 @@ struct CombatGraphRouteExplorer: View {
                         VStack(alignment: .leading, spacing: 4) {
                             HStack {
                                 Text(placement.node.name).font(.headline)
-                                Spacer(); Text(state(of: placement.node).rawValue).font(.caption.weight(.semibold))
+                                Spacer(); Text(state(of: placement.node).playerLabel).font(.caption.weight(.semibold))
                             }
                             Text("\(placement.discipline.name) · \(roleName(placement.node.role))")
                                 .font(.caption).foregroundStyle(.secondary)
@@ -154,7 +154,7 @@ struct CombatGraphRouteExplorer: View {
         }
         .frame(width: 44, height: 44).contentShape(Rectangle())
         .accessibilityLabel(node.name)
-        .accessibilityValue("\(state.rawValue), \(roleName(node.role))")
+        .accessibilityValue("\(state.playerLabel), \(roleName(node.role))")
         .accessibilityHint("Selects Skill details")
     }
 
@@ -165,7 +165,7 @@ struct CombatGraphRouteExplorer: View {
         return VStack(alignment: .leading, spacing: 8) {
             HStack(alignment: .firstTextBaseline) {
                 Text(node.name).font(.headline); Spacer()
-                Text(nodeState.rawValue).font(.caption.weight(.semibold))
+                Text(nodeState.playerLabel).font(.caption.weight(.semibold))
                     .foregroundStyle(borderColor(nodeState, selected: false))
             }
             Text("\(discipline?.name ?? "Unknown") · \(roleName(node.role))")

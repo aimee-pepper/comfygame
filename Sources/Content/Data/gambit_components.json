@@ -23,7 +23,7 @@
       "kind": "subject",
       "name": "Foe: armour above",
       "icon": "shield.lefthalf.filled",
-      "blurb": "The first living foe whose current armour is strictly above the chosen mark.",
+      "blurb": "The first living foe whose current armour is strictly above the chosen Armour threshold.",
       "selector": "foe.armourAbove"
     },
     {
@@ -121,7 +121,7 @@
       "kind": "comparator",
       "name": "below",
       "icon": "lessthan",
-      "blurb": "Less than the mark.",
+      "blurb": "Less than the threshold.",
       "comparator": "below"
     },
     {
@@ -129,7 +129,7 @@
       "kind": "comparator",
       "name": "above",
       "icon": "greaterthan",
-      "blurb": "More than the mark.",
+      "blurb": "More than the threshold.",
       "comparator": "above"
     },
 
@@ -168,7 +168,7 @@
     {
       "id": "armour_mark_1",
       "kind": "threshold",
-      "name": "Armour mark 1",
+      "name": "Armour threshold 1",
       "icon": "shield",
       "blurb": "Current armour strictly above 1.",
       "value": 1
@@ -176,7 +176,7 @@
     {
       "id": "armour_mark_3",
       "kind": "threshold",
-      "name": "Armour mark 3",
+      "name": "Armour threshold 3",
       "icon": "shield.fill",
       "blurb": "Current armour strictly above 3.",
       "value": 3
@@ -184,7 +184,7 @@
     {
       "id": "armour_mark_5",
       "kind": "threshold",
-      "name": "Armour mark 5",
+      "name": "Armour threshold 5",
       "icon": "checkmark.shield.fill",
       "blurb": "Current armour strictly above 5.",
       "value": 5

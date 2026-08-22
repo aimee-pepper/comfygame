@@ -172,8 +172,8 @@ struct GearView: View {
     /// whether this is any use against the plated thing you keep meeting.
     private func damageLine(_ definition: ItemDef) -> String? {
         guard let gear = definition.gear, let damage = gear.damage else { return nil }
-        let reach = gear.reach == .close ? "" : " · \(gear.reach.rawValue) reach"
-        return "\(damage.rawValue)\(reach)"
+        let reach = gear.reach == .close ? "" : " · \(GearPresentationCopy.reach(gear.reach)) reach"
+        return "\(GearPresentationCopy.damage(damage))\(reach)"
     }
 }
 

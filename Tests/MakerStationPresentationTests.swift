@@ -16,6 +16,15 @@ final class MakerStationPresentationTests: XCTestCase {
         XCTAssertEqual(GearPresentationCopy.physicalProtection(offset: -0.5), "0.5 less physical protection")
         XCTAssertEqual(GearPresentationCopy.physicalProtection(offset: -1), "1 less physical protection")
         XCTAssertEqual(GearPresentationCopy.physicalProtection(offset: 0.5), "0.5 more physical protection")
+        XCTAssertEqual(GearPresentationCopy.rarity(.common), "Common")
+        XCTAssertEqual(GearPresentationCopy.rarity(.uncommon), "Uncommon")
+        XCTAssertEqual(GearPresentationCopy.rarity(.rare), "Rare")
+        XCTAssertEqual(GearPresentationCopy.rarity(.mythic), "Mythic")
+        XCTAssertEqual(GearPresentationCopy.damage(.rend), "Rend")
+        XCTAssertEqual(GearPresentationCopy.damage(.pierce), "Pierce")
+        XCTAssertEqual(GearPresentationCopy.reach(.close), "Close")
+        XCTAssertEqual(GearPresentationCopy.reach(.mid), "Mid")
+        XCTAssertEqual(GearPresentationCopy.reach(.far), "Far")
     }
 
     func testStepFivePlayerCopyAvoidsImplementationTermsOnScopedSurfaces() throws {

@@ -111,7 +111,7 @@
     },
     {
       "id": "armoury_craft",
-      "name": "Defensive Profiles",
+      "name": "Defensive Constructions",
       "icon": "shield.lefthalf.filled",
       "blurb": "Broaden Bracken's defensive choices, then retain the finest stock honestly.",
       "order": 13,
@@ -242,7 +242,7 @@
     {
       "id": "reason_about_targets",
       "branch": "instruction",
-      "name": "Choosing a mark",
+      "name": "Choosing a target",
       "icon": "target",
       "blurb": "Tell a rule which enemy it means.",
       "cost": {
@@ -306,7 +306,7 @@
       "branch": "instruction",
       "name": "Noticing 30%",
       "icon": "circle.bottomhalf.filled",
-      "blurb": "A finer mark than half.",
+      "blurb": "A finer threshold than half.",
       "cost": {
         "essence": 15
       },
@@ -1136,7 +1136,7 @@
       "branch": "penmanship",
       "name": "Compound Assembly",
       "icon": "point.3.connected.trianglepath.dotted",
-      "blurb": "Assemble learned marks without confusing their meaning with their shape.",
+      "blurb": "Assemble learned Sigils without confusing their meaning with their shape.",
       "cost": {
         "essence": 55,
         "resources": { "pulp": 4, "resin": 4, "quartz": 2 }

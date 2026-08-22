@@ -15,6 +15,17 @@ enum CombatGraphRules {
         case illegalParent = "Learn one of the required earlier Skills first."
         case invalidChoice = "That selection is not available for this development."
         case stale = "This character changed. Review the development and try again."
+
+        var playerCopy: String {
+            switch self {
+            case .unavailable: "This Skill is not available yet."
+            case .alreadyOwned: "Already learned."
+            case .missingPoint: "No Combat Point is available."
+            case .illegalParent: "Learn one of the required earlier Skills first."
+            case .invalidChoice: "That choice is not available for this Skill."
+            case .stale: "This character changed. Review this Skill and try again."
+            }
+        }
     }
 
     struct PurchaseQuote: Equatable, Sendable {

@@ -116,7 +116,7 @@ struct WritingDeskView: View {
 
         var shortName: String {
             switch self {
-            case .target(let t): ContentCatalog.shared.pressureTarget(t)?.name ?? t.rawValue
+            case .target(let t): ContentCatalog.shared.pressureTarget(t)?.name ?? "Unknown Subject"
             case .modifiers: "Modifiers"
             case .compounds: "Compounds"
             }
@@ -473,7 +473,7 @@ struct WritingDeskView: View {
             // strings said *target* in one place and *subject* in another
             // (`jargon-audit.md`). Settled: **subject**, so the page reads as a sentence.
             sectionLabel("Subject")
-            chips([Chip(glyph: id.rawValue, name: target?.name ?? id.rawValue, content: .target(id))], columns: columns)
+            chips([Chip(glyph: id.rawValue, name: target?.name ?? "Unknown Subject", content: .target(id))], columns: columns)
             // Only what can be *bound* here. Filtering on "affects this target at all" put rain
             // under Illumination because rain dims light — true, and not something you'd ever write.
             // **Only what you've learned.** Hidden rather than shown-and-locked, matching how the
@@ -682,7 +682,7 @@ struct WritingDeskView: View {
                                         .font(.caption.weight(.semibold))
                                         .foregroundStyle(.primary)
                                 } else if instance.definition.disposition == .starterUnique {
-                                    Text("Legacy page · no known find")
+                                    Text("From an older save · no known find")
                                         .font(.caption)
                                         .foregroundStyle(.secondary)
                                 }
@@ -1256,7 +1256,8 @@ private struct InkWellSheet: View {
             } else {
                 Picker("Focus", selection: $selectedMarkID) {
                     ForEach(eligibleMarks) { mark in
-                        Text(mark.inkEligibleSourceID?.rawValue.capitalized ?? "Focus")
+                        Text(mark.inkEligibleSourceID.flatMap { ContentCatalog.shared.pressureSource($0)?.name }
+                             ?? "Unknown Focus")
                             .tag(Optional(mark.id))
                     }
                 }
@@ -1429,7 +1430,7 @@ private struct InkWellSheet: View {
             return count == 0 ? nil : "\(count) \(base.rawValue.capitalized)"
         }.joined(separator: " · ")
         let resources = quote.resourcesToProcess.map { id, count in
-            "\(count) \(ContentCatalog.shared.resource(id)?.name ?? id.rawValue)"
+            "\(count) \(ContentCatalog.shared.resource(id)?.name ?? "Unknown resource")"
         }.sorted().joined(separator: " · ")
         return [measures, resources.isEmpty ? nil : "process \(resources)", "1 Resin"]
             .compactMap { $0 }.joined(separator: "\n")

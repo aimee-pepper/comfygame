@@ -74,8 +74,21 @@ final class CombatGraphTests: XCTestCase {
     }
 
     func testCanonicalCombatCopyKeepsCapstoneGateSeparateFromOrdinaryParents() {
+        XCTAssertEqual(CombatGraphNodeState.owned.playerLabel, "Learned")
+        XCTAssertEqual(CombatGraphNodeState.available.playerLabel, "Available")
+        XCTAssertEqual(CombatGraphNodeState.blocked.playerLabel, "Blocked")
+        XCTAssertEqual(EncounterState.EvasionAttempt.Resolution.probabilityHit.playerLabel, "Hit")
+        XCTAssertEqual(EncounterState.EvasionAttempt.Resolution.probabilityMiss.playerLabel, "Missed")
+        XCTAssertEqual(EncounterState.EvasionAttempt.Resolution.sidestep.playerLabel, "Sidestepped")
+        XCTAssertEqual(EncounterState.EvasionAttempt.Resolution.ghost.playerLabel, "Avoided with Ghost")
         XCTAssertEqual(CombatGraphRules.PurchaseRefusal.illegalParent.rawValue,
                        "Learn one of the required earlier Skills first.")
+        XCTAssertEqual(CombatGraphRules.PurchaseRefusal.unavailable.playerCopy,
+                       "This Skill is not available yet.")
+        XCTAssertEqual(CombatGraphRules.PurchaseRefusal.invalidChoice.playerCopy,
+                       "That choice is not available for this Skill.")
+        XCTAssertEqual(CombatGraphRules.PurchaseRefusal.stale.playerCopy,
+                       "This character changed. Review this Skill and try again.")
         XCTAssertEqual(ProgressionRequirementPresentation.capstoneRequirement,
                        "Capstone requirement: learn a connected route of 7 earlier Skills in this tree, including this discipline’s Root, one Fundamental, one Development, and one Mastery.")
     }

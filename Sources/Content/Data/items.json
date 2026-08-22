@@ -52,7 +52,7 @@
       "name": "Heat Conduit Fixture",
       "icon": "point.3.connected.trianglepath.dotted",
       "rarity": "rare",
-      "blurb": "Oda's first contained Conduit housing, carrying the receipt of the core inside it.",
+      "blurb": "Oda's first contained Conduit housing, carrying the recorded origin of the core inside it.",
       "kind": "treasure",
       "tradingPostDisposition": "protected",
       "recyclerDisposition": "protected"
@@ -1324,7 +1324,7 @@
     },
     {
       "id": "mote_compass", "name": "Mote Compass", "icon": "sparkles",
-      "rarity": "mythic", "blurb": "A singular compass whose captive Mote points toward changes in Reality, not north.",
+      "rarity": "mythic", "blurb": "A singular compass whose captive Mote points toward changes that persist across the campaign, not north.",
       "kind": "gear", "gear": { "slot": "keepsake", "tier": 4, "visualFamilyID": "keepsake", "materialProfileID": "world:mote" },
       "tradingPostDisposition": "protected", "recyclerDisposition": "protected"
     }

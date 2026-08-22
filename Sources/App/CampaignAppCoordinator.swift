@@ -346,7 +346,7 @@ struct CampaignAppRootView: View {
                     .environmentObject(coordinator)
             case .failed(let message):
                 VStack(spacing: 16) {
-                    Text("The Atlas could not be opened.").font(.title2.bold())
+                    Text("Bookbinder could not finish loading.").font(.title2.bold())
                     Text(message).foregroundStyle(.secondary).multilineTextAlignment(.center)
                     Button("Try again", action: coordinator.retryCatalogue)
                         .buttonStyle(.borderedProminent)

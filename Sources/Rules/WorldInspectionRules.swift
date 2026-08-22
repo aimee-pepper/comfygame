@@ -89,7 +89,7 @@ extension WorldRules {
         switch content {
         case .empty: nil
         case .node(let node):
-            "resource node: \(ContentCatalog.shared.resource(node.resource)?.name ?? "unknown material")"
+            "resource deposit: \(ContentCatalog.shared.resource(node.resource)?.name ?? "unknown material")"
         case .wildDrop(let resource, _):
             "loose \(ContentCatalog.shared.resource(resource)?.name.lowercased() ?? "resource")"
         case .item(let stack):

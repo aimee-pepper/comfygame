@@ -363,6 +363,14 @@ struct EncounterState: Codable, Equatable, Sendable {
     struct EvasionAttempt: Codable, Equatable, Sendable {
         enum Resolution: String, Codable, Equatable, Sendable {
             case sidestep, ghost, probabilityHit, probabilityMiss
+            var playerLabel: String {
+                switch self {
+                case .probabilityHit: "Hit"
+                case .probabilityMiss: "Missed"
+                case .sidestep: "Sidestepped"
+                case .ghost: "Avoided with Ghost"
+                }
+            }
         }
         var actor: Combatant
         var characterEvasion: Double

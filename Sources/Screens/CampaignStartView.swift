@@ -28,7 +28,7 @@ enum CampaignSlotHealth: Equatable, Sendable {
         switch self {
         case .valid: "More"
         case .corrupt: "Recovery details"
-        case .futureIncompatible: "Compatibility details"
+        case .futureIncompatible: "Why this save cannot open"
         }
     }
 }
@@ -80,11 +80,11 @@ struct CampaignSlotSummary: Identifiable, Equatable, Sendable {
             health = .corrupt(message: reason)
         case .futureIncompatible(let schemaVersion):
             health = .futureIncompatible(
-                message: "Save schema \(schemaVersion) needs a newer Bookbinder build."
+                message: "This save was created by a newer version of Bookbinder. Update the app to open it."
             )
         }
         #if DEBUG
-        debugVersion = metadata.map { "save schema \($0.saveSchemaVersion)" }
+        debugVersion = metadata.map { "Internal save version \($0.saveSchemaVersion)" }
         #else
         debugVersion = nil
         #endif

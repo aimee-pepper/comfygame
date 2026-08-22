@@ -482,8 +482,9 @@ struct ContentCatalog: Sendable {
         }
         for (id, mark) in FoeArmourGambit.marks {
             guard let component = gambitComponent(id), component.kind == .threshold,
-                  component.value == Double(mark) else {
-                throw ContentError.danglingReference("Talin's armour mark '\(id)' is not exactly \(mark)")
+                  component.value == Double(mark),
+                  component.name == "Armour threshold \(mark)" else {
+                throw ContentError.danglingReference("Armour threshold \(mark) [Internal ID: \(id)] does not match its authored threshold value")
             }
         }
 

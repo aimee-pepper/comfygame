@@ -94,7 +94,7 @@ struct DebugBugReporterOverlay: View {
     private func context() -> DebugBugReportContext {
         let run = store.state.worlds.activeRun
         return DebugBugReportContext(
-            screen: store.activeEncounter != nil ? "encounter" : (run == nil ? "base" : "world"),
+            screen: store.activeEncounter != nil ? "encounter" : (run == nil ? "village" : "world"),
             route: store.activeEncounter != nil ? AppRoute.encounter.rawValue
                 : (run == nil ? route.rawValue : AppRoute.world.rawValue),
             campaignReference: store.diagnosticCampaignReference,
@@ -250,10 +250,10 @@ private struct DebugBugReportSheet: View {
                         LabeledContent("Encounter", value: "\(encounter)")
                     }
                     if let evidence = draft.context.encounterScalingEvidence {
-                        LabeledContent("Scaling receipt",
+                        LabeledContent("Scaling record",
                                        value: "\(evidence.party.count) party · \(evidence.foes.count) foes · round \(evidence.roundNumber)")
                         if evidence.godModeReceipt != nil {
-                            Label("God mode was frozen into this encounter. Only combat-balance conclusions are invalid; other bug evidence remains usable.",
+                            Label("God mode was saved when this encounter opened. Only combat-balance conclusions are invalid; other bug evidence remains usable.",
                                   systemImage: "exclamationmark.shield.fill")
                                 .font(.caption.bold())
                                 .foregroundStyle(.orange)
@@ -271,9 +271,9 @@ private struct DebugBugReportSheet: View {
                                 .textSelection(.enabled)
                         }
                     }
-                    LabeledContent("Save schema", value: "\(draft.context.saveSchemaVersion)")
+                    LabeledContent("Internal save version", value: "\(draft.context.saveSchemaVersion)")
                     if let run = draft.context.runIndex { LabeledContent("Expedition", value: "\(run)") }
-                    Text("Build, game mode, save schema, expedition identifiers, world position, Stability and most recent saved action. No account data or save contents.")
+                    Text("Build, game mode, internal save version, expedition identifiers, world position, Stability and most recent saved action. No account data or save contents.")
                         .font(.caption).foregroundStyle(.secondary)
                 }
                 if let savedPackage {

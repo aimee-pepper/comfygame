@@ -16,7 +16,7 @@ enum Migrations {
         let found: Int
         let supported: Int
         var description: String {
-            "save schema \(found) requires a newer Bookbinder build (this build supports \(supported))"
+            "This campaign was saved by a newer Bookbinder build. Update Bookbinder to open it."
         }
     }
 

@@ -111,13 +111,13 @@ struct CombatTreeView: View {
                 .font(.caption.bold()).foregroundStyle(state == .owned ? .white : colour)
         }
         .frame(width: 44, height: 44).contentShape(Rectangle())
-        .accessibilityLabel(node.name).accessibilityValue(state.rawValue)
+        .accessibilityLabel(node.name).accessibilityValue(state.playerLabel)
     }
 
     private func detail(_ node: CombatGraphNodeDef) -> some View {
         let state = state(of: node)
         return VStack(alignment: .leading, spacing: 8) {
-            HStack { Text(node.name).font(.headline); Spacer(); Text(state.rawValue).font(.caption.bold()) }
+            HStack { Text(node.name).font(.headline); Spacer(); Text(state.playerLabel).font(.caption.bold()) }
             Text(node.effectCopy).font(.callout)
             Text(parentText(node)).font(.caption).foregroundStyle(.secondary)
             if node.role == .capstone {
@@ -125,7 +125,7 @@ struct CombatTreeView: View {
                     .font(.caption).foregroundStyle(.secondary)
             }
             if node.depth > CombatGraphRules.openingMaximumDepth {
-                Text(CombatGraphRules.PurchaseRefusal.unavailable.rawValue)
+                Text(CombatGraphRules.PurchaseRefusal.unavailable.playerCopy)
                     .font(.caption).foregroundStyle(.secondary)
             } else if state != .owned {
                 Button("Learn \(node.name)") { purchase(node) }
@@ -147,11 +147,11 @@ struct CombatTreeView: View {
 
     private func purchase(_ node: CombatGraphNodeDef) {
         switch store.previewCombatNodePurchase(node.id, for: member) {
-        case .failure(let reason): refusal = reason.rawValue
+        case .failure(let reason): refusal = reason.playerCopy
         case .success(let quote):
             switch store.purchaseCombatNode(quote, for: member) {
             case .committed: refusal = nil
-            case .refused(let reason): refusal = reason.rawValue
+            case .refused(let reason): refusal = reason.playerCopy
             }
         }
     }

@@ -70,7 +70,7 @@ extension FoundWritingRecord.Family {
     var displayName: String {
         switch self {
         case .fieldNote: "Field notes"
-        case .routeMark: "Route marks"
+        case .routeMark: "Route sketches"
         case .siteFragment: "Site fragments"
         case .workingScrap: "Working scraps"
         }
@@ -117,7 +117,7 @@ private enum LibraryTab: String, CaseIterable, Identifiable {
         switch self {
         case .diaries: "Diaries"
         case .people: "People"
-        case .dictionary: "Sigils"
+        case .dictionary: "Dictionary"
         case .notes: "Notes"
         case .history: "History"
         }
@@ -143,7 +143,7 @@ struct LibraryView: View {
         VStack(spacing: 0) {
             Picker("Library collection", selection: $tab) {
                 ForEach(LibraryTab.allCases) {
-                    Text($0.tabLabel).tag($0).accessibilityLabel($0.rawValue)
+                    Text($0.tabLabel).tag($0).accessibilityLabel($0.tabLabel)
                 }
             }
             .pickerStyle(.segmented)
@@ -201,7 +201,7 @@ struct LibraryView: View {
                         OlderLibraryRecordsView(ids: olderRecords)
                     } label: {
                         LibraryTile(icon: "archivebox", title: "Older records",
-                                    subtitle: "Recovered by an earlier catalogue",
+                                    subtitle: "Found in an older version",
                                     count: "\(olderRecords.count) record\(olderRecords.count == 1 ? "" : "s")",
                                     accent: .gray,
                                     wide: dynamicTypeSize.isAccessibilitySize)
@@ -555,11 +555,17 @@ private struct OlderLibraryRecordsView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 10) {
-                Text("These pages remain recovered, but their authored text is not present in the current catalogue. Their IDs are retained so a later migration can restore them.")
+                Text("These Pages remain in your Library, but their writing is not available in this version. Their saved identities are kept in case a later update restores them.")
                     .font(.callout).foregroundStyle(.secondary)
                 ForEach(ids, id: \.self) { id in
-                    Label(id.rawValue, systemImage: "doc.questionmark")
+                    Label {
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text("Page from an older save")
+                            Text("Internal ID: \(id.rawValue)").font(.caption2).foregroundStyle(.secondary)
+                        }
+                    } icon: { Image(systemName: "doc.questionmark") }
                         .font(.caption)
+                        .accessibilityElement(children: .combine)
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .padding(12)
                         .background(Color(.secondarySystemGroupedBackground),

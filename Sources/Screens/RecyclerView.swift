@@ -103,7 +103,7 @@ struct RecyclerView: View {
             Label("No gear to dismantle", systemImage: "shippingbox")
                 .font(.headline)
 
-            Text("Store or recover an eligible ordinary piece, then return here to preview what Noll can salvage.")
+            Text("Store or recover an eligible standard piece of gear, then return here to preview what Noll can salvage.")
                 .font(.callout)
 
             Divider()

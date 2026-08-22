@@ -16,7 +16,7 @@ struct DebugToolsView: View {
                 .tag(Tab.balancing)
 
             AuthoredTextAtlasView()
-                .tabItem { Label("Text Atlas", systemImage: "text.book.closed.fill") }
+                .tabItem { Label("Player text", systemImage: "text.book.closed.fill") }
                 .tag(Tab.textAtlas)
         }
         .navigationTitle(tab.title)
@@ -30,7 +30,7 @@ private extension DebugToolsView.Tab {
         switch self {
         case .roadmap: "Roadmap"
         case .balancing: "Balancing"
-        case .textAtlas: "Text Atlas"
+        case .textAtlas: "Player text"
         }
     }
 }

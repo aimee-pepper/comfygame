@@ -494,12 +494,12 @@ private struct VisitedWorldSheet: View {
                    let clock = world.clockAnalysis {
                     Section {
                         LabeledRow(icon: "clock.arrow.circlepath", label: "Clock", value: clock.band)
-                        LabeledRow(icon: "metronome", label: "Base cycle",
+                        LabeledRow(icon: "metronome", label: "Underlying cycle",
                                    value: clock.isStopped ? "no transition" : "\(clock.basePeriod) turns")
                     } header: {
                         Text("World clock")
                     } footer: {
-                        Text("Irregular worlds vary around the base cycle without reversing time.")
+                        Text("Irregular worlds vary around that cycle without reversing time.")
                     }
                 }
 

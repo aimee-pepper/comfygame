@@ -25,7 +25,8 @@ enum AuthoredTextAtlas {
         var teachingKind: String? {
             guard kind == .diary, let detail else { return nil }
             if detail.contains("Schematic:") { return "Schematic" }
-            for value in ["focus", "gambit", "research", "site"] where detail.contains("\(value) ") { return value.capitalized }
+            for value in ["focus", "gambit", "site"] where detail.contains("\(value) ") { return value.capitalized }
+            if detail.contains("research ") { return "Upgrade" }
             return nil
         }
 
@@ -80,10 +81,16 @@ enum AuthoredTextAtlas {
                 }
                 for (index, page) in catalogue.diary(of: traveller.id).enumerated() {
                     var metadata = [page.kind.displayName, "packet \(index + 1)"]
-                    if let about = page.about { metadata.append("about \(about.rawValue)") }
+                    if let about = page.about {
+                        metadata.append("About: \(ContentCatalog.shared.traveller(about)?.name ?? "Unknown traveller") [Internal ID: \(about.rawValue)]")
+                    }
                     if let clue = page.clueIndex { metadata.append("clue \(clue)") }
-                    if let focus = page.teachesFocus { metadata.append("focus \(focus.rawValue)") }
-                    if let gambit = page.teachesGambit { metadata.append("gambit \(gambit.rawValue)") }
+                    if let focus = page.teachesFocus {
+                        metadata.append("Focus: \(ContentCatalog.shared.pressureSource(focus)?.name ?? "Unknown Focus") [Internal ID: \(focus.rawValue)]")
+                    }
+                    if let gambit = page.teachesGambit {
+                        metadata.append("Gambit part: \(ContentCatalog.shared.gambitComponent(gambit)?.name ?? "Unknown Gambit part") [Internal ID: \(gambit.rawValue)]")
+                    }
                     if let pattern = page.teachesPattern {
                         metadata.append("Schematic: \(WorkshopPatternRegistry.displayName(pattern) ?? "Unknown Schematic")")
                         metadata.append("Internal ID: \(pattern.rawValue)")
@@ -92,8 +99,12 @@ enum AuthoredTextAtlas {
                         metadata.append("Schematic: \(SchematicRegistry.definition(schematic)?.name ?? "Unknown Schematic")")
                         metadata.append("Internal ID: \(schematic.rawValue)")
                     }
-                    if let research = page.researchNode { metadata.append("research \(research.rawValue)") }
-                    if let site = page.site { metadata.append("site \(site.rawValue)") }
+                    if let research = page.researchNode {
+                        metadata.append("Upgrade: \(ContentCatalog.shared.researchNode(research)?.name ?? "Unknown Upgrade") [Internal ID: \(research.rawValue)]")
+                    }
+                    if let site = page.site {
+                        metadata.append("Site: \(ContentCatalog.shared.site(site)?.name ?? "Unknown site") [Internal ID: \(site.rawValue)]")
+                    }
                     if traveller.id == "noll" { metadata.append("Provisional · needs Aimee review") }
                     units.append(Unit(id: "page.\(page.id.rawValue).prose", traveller: traveller.id,
                                       kind: .diary, label: "Page \(index + 1) · \(page.kind.displayName)",
@@ -177,7 +188,7 @@ final class AuthoredTextReviewStore: ObservableObject {
         let decoder = JSONDecoder(); decoder.dateDecodingStrategy = .iso8601
         let imported = try decoder.decode(File.self, from: data)
         guard imported.schemaVersion == file.schemaVersion else {
-            throw CocoaError(.fileReadCorruptFile, userInfo: [NSLocalizedDescriptionKey: "Unsupported review schema \(imported.schemaVersion)"])
+            throw CocoaError(.fileReadCorruptFile, userInfo: [NSLocalizedDescriptionKey: "Unsupported review-file version \(imported.schemaVersion)"])
         }
         var newConflicts: [Conflict] = []
         for (id, incoming) in imported.entries {
@@ -248,7 +259,19 @@ final class AuthoredTextReviewStore: ObservableObject {
 private extension String { var nilIfBlank: String? { trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? nil : self } }
 
 struct AuthoredTextAtlasView: View {
-    private enum ReviewFilter: String, CaseIterable { case all, unreviewed, good, needsRevision, stale, missing }
+    private enum ReviewFilter: String, CaseIterable {
+        case all, unreviewed, good, needsRevision, stale, missing
+        var displayName: String {
+            switch self {
+            case .all: "All"
+            case .unreviewed: "Unreviewed"
+            case .good: "Good"
+            case .needsRevision: "Needs revision"
+            case .stale: "Outdated"
+            case .missing: "Missing"
+            }
+        }
+    }
     @StateObject private var reviews = AuthoredTextReviewStore()
     @State private var search = ""
     @State private var kind: AuthoredTextAtlas.UnitKind?
@@ -269,14 +292,14 @@ struct AuthoredTextAtlasView: View {
                 }
                 Picker("Campaign phase", selection: $phase) {
                     Text("All phases").tag(TravellerDef.CampaignPhase?.none)
-                    ForEach(TravellerDef.CampaignPhase.allCases, id: \.self) { Text($0.rawValue).tag(Optional($0)) }
+                    ForEach(TravellerDef.CampaignPhase.allCases, id: \.self) { Text($0.displayName).tag(Optional($0)) }
                 }
                 Picker("Review status", selection: $reviewFilter) {
-                    ForEach(ReviewFilter.allCases, id: \.self) { Text($0.rawValue.capitalized).tag($0) }
+                    ForEach(ReviewFilter.allCases, id: \.self) { Text($0.displayName).tag($0) }
                 }
                 Picker("Teaching kind", selection: $teachingKind) {
                     Text("All teachings").tag(String?.none)
-                    ForEach(["Focus", "Gambit", "Pattern", "Research", "Site"], id: \.self) { Text($0).tag(Optional($0)) }
+                    ForEach(["Focus", "Gambit", "Schematic", "Upgrade", "Site"], id: \.self) { Text($0).tag(Optional($0)) }
                 }
                 Toggle("Validation issues only", isOn: $validationOnly)
             }
@@ -287,7 +310,7 @@ struct AuthoredTextAtlasView: View {
                     } label: {
                         VStack(alignment: .leading, spacing: 4) {
                             HStack { Text(entry.traveller.name).font(.headline); Spacer(); Text(entry.meetingState).font(.caption) }
-                            Text("\(entry.traveller.calling) · \(entry.traveller.campaignPhase?.rawValue ?? "unphased") · order \(entry.traveller.authoredOrder.map(String.init) ?? "—")")
+                            Text("\(entry.traveller.calling) · \(entry.traveller.campaignPhase?.displayName ?? "Phase not assigned") · Authored order \(entry.traveller.authoredOrder.map(String.init) ?? "—")")
                                 .font(.caption).foregroundStyle(.secondary)
                             Text(summary(entry)).font(.caption2).foregroundStyle(.secondary)
                         }.padding(.vertical, 4)
@@ -320,7 +343,7 @@ struct AuthoredTextAtlasView: View {
             }
         }
         .searchable(text: $search, prompt: "Names, prose, IDs, notes")
-        .navigationTitle("Text Atlas")
+        .navigationTitle("Player text")
         .fileImporter(isPresented: $importing, allowedContentTypes: [.json]) { result in
             do {
                 let url = try result.get()
@@ -367,7 +390,7 @@ struct AuthoredTextAtlasView: View {
         let revise = entry.units.filter { reviews.status(for: $0) == .needsRevision }.count
         let stale = entry.units.filter(reviews.isStale).count
         let unreviewed = entry.units.count - good - revise
-        return "Good \(good) · Revise \(revise) · Unreviewed \(unreviewed) · Stale \(stale)"
+        return "Good \(good) · Revise \(revise) · Unreviewed \(unreviewed) · Outdated \(stale)"
     }
 }
 
@@ -380,7 +403,7 @@ private struct AuthoredTextTravellerView: View {
         ScrollViewReader { proxy in
             ScrollView {
                 LazyVStack(alignment: .leading, spacing: 16) {
-                Text("\(entry.traveller.calling) · \(entry.traveller.campaignPhase?.rawValue ?? "unphased") · authored order \(entry.traveller.authoredOrder.map(String.init) ?? "—")")
+                Text("\(entry.traveller.calling) · \(entry.traveller.campaignPhase?.displayName ?? "Phase not assigned") · Authored order \(entry.traveller.authoredOrder.map(String.init) ?? "—")")
                     .font(.subheadline).foregroundStyle(.secondary)
                 if entry.traveller.meeting == nil {
                     ContentUnavailableView("Meeting missing",
@@ -478,7 +501,7 @@ private struct ReviewUnitCard: View {
                     Text(unit.id).font(.caption2.monospaced()).foregroundStyle(.tertiary)
                 }
                 Spacer()
-                if reviews.isStale(unit) { Text("STALE").font(.caption2.bold()).foregroundStyle(.orange) }
+                if reviews.isStale(unit) { Text("OUTDATED").font(.caption2.bold()).foregroundStyle(.orange) }
             }
             if unit.kind == .diary,
                let pageID = unit.id.split(separator: ".").dropFirst().first.map(String.init),

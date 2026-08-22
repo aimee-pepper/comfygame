@@ -189,7 +189,14 @@ final class AppSettings: ObservableObject {
 struct DebugTuningProfile: Codable, Equatable, Sendable {
     enum RawEssenceProfile: String, Codable, CaseIterable, Sendable {
         case legacy, lean, recommended, generous
-        var displayName: String { rawValue.capitalized }
+        var displayName: String {
+            switch self {
+            case .legacy: "Older rules · low yield"
+            case .lean: "Low yield"
+            case .recommended: "Recommended yield"
+            case .generous: "High yield"
+            }
+        }
         var dropRange: ClosedRange<Int> {
             switch self {
             case .legacy: 2...4
@@ -204,10 +211,10 @@ struct DebugTuningProfile: Codable, Equatable, Sendable {
         case current, reserved, recommended, pressing
         var displayName: String {
             switch self {
-            case .current: "Legacy · level only"
-            case .reserved: "A · Reserved"
-            case .recommended: "B · Recommended start"
-            case .pressing: "C · Pressing"
+            case .current: "Level only · older rules"
+            case .reserved: "Gentler scaling"
+            case .recommended: "Recommended scaling"
+            case .pressing: "Stronger scaling"
             }
         }
         var rules: EncounterScalingRules.Profile? {

@@ -23,21 +23,22 @@ recruitment state, and truthful visual status. Live, authored-not-live and held 
 lexemes with disclosure-aware detail routes. Core Loop, Exploration and Combat have dedicated structured
 routes rather than generic authority fallbacks. Overview, Roadmap and History now lead with plain-language
 gameplay/status explanations and retain provenance afterward. Browser acceptance remains part of the final
-integration receipt; this progress statement does not promote any gameplay or roadmap item.
+integration record; this status statement does not promote any gameplay or roadmap item.
 
 **Current Writing/Terrain/Arrival reconciliation:** current main hash-pins and bundles the production Writing
-parchment while the 4,459-file mark pack remains temporary semantic-keyed scaffolding owned finally by
+parchment while the 4,459-file Sigil pack remains temporary semantic-keyed scaffolding owned finally by
 Aimee's sigils; Writing ordinary-phone acceptance remains open but no longer blocks Engineering. Dynamic
 Terrain v2 is source-integrated and installed from exact revision `366f5ccf`: the native app consumes the
 accepted twelve-ground and authored south-wall runtime packs, while both Asset manifests retain
 `integrationReady:false` until Aimee accepts the installed visual result. The procedural terrain/wall path
-remains only as a pack-failure/legacy-save fail-safe. World Arrival B1.6a is the next Engineering primary;
+remains only as a pack-failure/older-save fail-safe. Canonical UI terminology is the sole in-progress
+Engineering primary; World Arrival is source-installed and ready for acceptance testing;
 its accepted proof and command corpus require no new Asset invention. Every verified phone-ready update
 installs promptly in place without uninstall/reset; installation does not authorize auto-launch. The wiki
 must keep Asset acceptance, committed source integration, installed native integration and phone acceptance
-as separate receipts.
+as separate records.
 
-**Wiki completion receipt:** all twelve required top-level routes, all 108 canonical lexeme details/search
+**Wiki completion record:** all twelve required top-level routes, all 108 canonical Writing-entry details/search
 routes, item/resource/people/station catalogues, Core Loop, Exploration, Combat, Overview, Roadmap and History
 are integrated. The completed Wiki remains generated from registered sources and current authorities; its
 complete status does not promote proposed gameplay or unaccepted visual assets.
@@ -69,17 +70,17 @@ the aggregate generation hash. Dispositions are `live`, `settled-not-live`, `pro
 
 `*-current.md`, current content data and current source rules outrank session/history files. History is
 searchable only under Decisions / History and never silently fills a current field. A conflict renders a
-visible conflict receipt and fails generation when it affects an exact field; the generator does not blend
+visible conflict record and fails generation when it affects an exact field; the generator does not blend
 both answers.
 
 ## Required navigation and route depth
 
 | Route | Required generated content |
 |---|---|
-| **Overview** | premise, playable-loop diagram, build/install receipt, major live/system gaps and links to every section |
-| **Core Loop** | Writing → arrival → exploration → discovery → return → preparation; costs, receipts, failure/continuation and first-three-world progression |
-| **World Writing** | tools/hands, Pages/Templates, 21 runes, known vs encountered meanings, costs, starter/wild World Pages and causal outputs |
-| **Exploration** | map/visibility, movement, terrain/hazards, sites/POIs, resources, creatures, Field actions, collapse/escape and Return receipts |
+| **Overview** | premise, playable-loop diagram, build/install record, major live/system gaps and links to every section |
+| **Core Loop** | Writing → arrival → exploration → discovery → return → preparation; costs, saved state, failure/continuation and first-three-world progression |
+| **World Writing** | tools/hands, Pages/Templates, 108 Writing entries, known vs encountered meanings, costs, starter/wild World Pages and causal outputs |
+| **Exploration** | map/visibility, movement, terrain/hazards, sites/POIs, resources, creatures, Field actions, collapse/escape and Expedition records |
 | **Combat** | scaling, party/rank/reach, damage triangle, statuses, equipment, progression trees and implementation/playtest disposition |
 | **People** | one route per traveller with role, station, campaign phase/order, clue/page coverage, meeting/dialogue state and visual status |
 | **Home & Village** | Binder House, Library, districts and every canonical destination/building with lifecycle/forms/capabilities/assets |
@@ -116,7 +117,7 @@ Treasures show their exact system or crafting role without pretending they are c
 family/provenance they are allowed to open and never group with quest/story keys by visual resemblance alone.
 
 The current source catalogue contains 102 items. Tests derive and compare the partition directly to
-`items.json`; the current expected receipt is 75 Gear, 18 Consumables, 2 Curios, 5 Treasures and 2 Keys. A
+`items.json`; the current expected accounting is 75 Gear, 18 Consumables, 2 Curios, 5 Treasures and 2 Keys. A
 new kind fails generation until it receives an explicit player-facing group and detail renderer.
 
 ## Resource taxonomy
@@ -150,15 +151,15 @@ solely for the wiki.
 
 ## Entity detail requirements
 
-Stable detail routes are required for every item, resource, traveller, rune, destination/building and
+Stable detail routes are required for every item, resource, traveller, Sigil, destination/building and
 roadmap entry. Detail routes retain filters and focus on Back.
 
 - **Traveller:** role, station/district, campaign phase/order, authored clue/page count, meeting/recruitment
   state, diary teachings, concise role description and current asset.
-- **Rune:** canonical identity, encountered/known distinction, writing targets/qualifiers, costs and sources;
+- **Sigil:** canonical identity, encountered/known distinction, Subjects/Modifiers, costs and Focuses;
   no disclosure is inferred from catalogue presence.
 - **Destination:** kind, place, keeper, lifecycle, actions, build cost, three forms, implementation and assets.
-- **Roadmap entry:** status, band, workstream, dependency/gate, latest receipt and source; “later” alone is not
+- **Roadmap entry:** status, band, workstream, dependency/gate, latest record and source; “later” alone is not
   an acceptable schedule.
 
 Search results include domain, subtype, stable ID, disposition and exact detail route. Search never routes an
@@ -170,17 +171,32 @@ Generation/tests fail when:
 
 1. a required top-level route uses generic placeholder/fallback copy;
 2. a required route has no structured facts;
-3. an item/resource/traveller/rune/destination lacks exactly one category and detail route;
+3. an item/resource/traveller/Sigil/destination lacks exactly one category and detail route;
 4. a catalogue kind or gear slot is unknown/unclassified;
 5. a resource has an empty primary explanation;
 6. live and settled-not-live facts are merged without disposition;
 7. candidate art is shown as integrated/final or an unaccepted file is copied into the gallery;
 8. generated data is stale against any registered source hash;
 9. a source entity count changes without the derived partition changing with it;
-10. a current route cites history without an explicit current supersession receipt.
+10. a current route cites history without an explicit current supersession record.
 
 Browser checks cover desktop and 368-point layouts, every top-level route, one detail from every catalogue/
 resource subtype, filter persistence, search routing and no horizontal clipping.
+
+## Canonical terminology and alias contract
+
+The generator registers `docs/canonical-game-terminology.json` as authority. Every unique concept has exactly
+one `terminology/<concept>` route led by its canonical name, plain explanation and where-it-appears guidance.
+Retired words exist only in normalized `searchText`/`exactSearchTerms`; they never become a heading, card,
+category or search-result title. Exact canonical-name or retired-alias matches win before substring matches:
+`mark` reaches **Sigil**, `route mark` reaches **Route sketch**, and `node` returns canonical **Upgrade** and
+**Skill** results without displaying the query as a parallel concept.
+
+The deterministic census is generated at `docs/generated/canonical-player-terminology-census.json`. It scans
+presentation-bearing Swift contexts, player-facing Content/Data fields, rendered wiki fields and this current
+contract, reports each canonical concept and retired occurrence, and requires zero unapproved occurrences.
+Context-sensitive ordinary words such as combat target, material source, frozen water, physical trail mark,
+returned objects and Shared progress remain valid through executable semantic counterfixtures.
 
 ## Implementation order
 
@@ -190,11 +206,11 @@ available, continue without treating each slice as a stop:
 1. Catalogue taxonomy + item details — **accepted**;
 2. World Resources / Creature Materials / Currencies + details — **accepted**;
 3. People + traveller details — **accepted and complete**;
-4. World Writing + rune details — **complete**;
+4. World Writing + Sigil details — **complete**;
 5. Core Loop and Exploration — **complete**;
 6. Combat — **complete**;
 7. Overview reconciliation, Roadmap detail and History supersession links — **complete**;
 8. accepted-asset ingestion when committed asset paths actually exist.
 
-Each slice is source-generated and tested. Completion receipts say what became useful to Aimee, not merely
+Each slice is source-generated and tested. Completion records say what became useful to Aimee, not merely
 how many files or hashes changed.

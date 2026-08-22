@@ -235,7 +235,7 @@ private struct GambitRow: View {
                 }
             }
         } label: {
-            Text(name.map { "Armour mark \($0)" } ?? "Choose armour mark")
+            Text(name.map { "Armour threshold \($0)" } ?? "Choose armour threshold")
                 .font(.caption2.weight(name == nil ? .regular : .medium))
                 .foregroundStyle(name == nil ? Color.secondary : Color.primary)
                 .lineLimit(1)

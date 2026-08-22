@@ -1,0 +1,18 @@
+{
+  "fail": [
+    "Rune Dictionary", "Replace current draft?", "Party total 20 XP",
+    "Choose a construction profile", "Legacy item", "Frozen receipt",
+    "Route mark", "Resource node", "Armour mark", "Constellation node",
+    "Reset Base but keep Reality", "Research node", "Unknown fixture error"
+  ],
+  "pass": ["Internal ID: combat_graph_1", "Atlas Seam", "Heat Conduit Fixture"],
+  "ambiguityPass": [
+    {"literal": "Choose a combat target", "alias": "target", "rationale": "Target is ordinary combat language."},
+    {"literal": "Source material: Iron", "alias": "source", "rationale": "Source describes material origin, not a Writing Focus."},
+    {"literal": "The trail mark points north", "alias": "mark", "rationale": "Mark is a physical trail indicator, not a Sigil."},
+    {"literal": "Frozen water blocks the path", "alias": "frozen", "rationale": "Frozen describes water, not persistence."},
+    {"literal": "Shared progress", "alias": "progress", "rationale": "Shared progress is the canonical account-persistent concept."},
+    {"literal": "The returned object is in the Storehouse", "alias": "returned", "rationale": "Returned is an ordinary verb describing an object."}
+  ],
+  "exceptions": []
+}

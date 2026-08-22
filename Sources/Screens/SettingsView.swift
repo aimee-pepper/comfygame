@@ -93,7 +93,7 @@ struct SettingsView: View {
                     SettingsDestinationRow(
                         icon: "square.stack.3d.up.fill",
                         title: "Compound Assembly acceptance",
-                        subtitle: "Disposable exact-cost proof and refusal fixture"
+                        subtitle: "Disposable exact-cost proof and refusal test"
                     )
                 }
                 .buttonStyle(.plain)
@@ -192,13 +192,13 @@ struct SettingsView: View {
                 templatesFixture = nil
             }
         }
-        .alert("Fixture unavailable", isPresented: Binding(
+        .alert("Test unavailable", isPresented: Binding(
             get: { band2FixtureError != nil },
             set: { if !$0 { band2FixtureError = nil } }
         )) {
             Button("OK", role: .cancel) { band2FixtureError = nil }
         } message: {
-            Text(band2FixtureError ?? "Unknown fixture error")
+            Text(band2FixtureError ?? "Unknown test error")
         }
 #endif
     }
@@ -233,10 +233,10 @@ private struct WildWorldPagesPhoneAcceptanceView: View {
         }
         .navigationTitle("Wild World Pages")
         .navigationBarTitleDisplayMode(.inline)
-        .alert("Fixture unavailable", isPresented: Binding(
+        .alert("Test unavailable", isPresented: Binding(
             get: { errorMessage != nil }, set: { if !$0 { errorMessage = nil } }
         )) { Button("OK", role: .cancel) { errorMessage = nil } } message: {
-            Text(errorMessage ?? "Unknown fixture error")
+            Text(errorMessage ?? "Unknown test error")
         }
         .fullScreenCover(item: $session) { fixture in
             ZStack(alignment: .topTrailing) {
@@ -260,7 +260,7 @@ private struct WildWorldPagesPhoneAcceptanceView: View {
                             .frame(width: 48, height: 48)
                             .contentShape(Rectangle())
                     }
-                    .accessibilityLabel("Close wild World Pages fixture")
+                    .accessibilityLabel("Close wild World Pages test")
                     .padding(.top, 4)
                     .padding(.trailing, 4)
                     .zIndex(20_000)
@@ -339,7 +339,7 @@ private struct Band2FixtureReceiptOverlay: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 2) {
-            Text("Frozen fixture receipt").font(.caption.bold())
+            Text("Saved test record").font(.caption.bold())
             ForEach(lines, id: \.self) { Text($0).font(.caption2.monospacedDigit()) }
         }
         .padding(9)
@@ -382,18 +382,18 @@ private struct StarterWorldPagesPhoneAcceptanceView: View {
                 }
             }
             Section("Acceptance") {
-                Text("Confirm the named weapon is already visible, reachable from the entry in the receipt's one- or two-step route, inspectable before pickup, and collected by walking onto it. Close returns here without changing your selected campaign.")
+                Text("Confirm the named weapon is already visible, reachable from the entry in the saved test’s one- or two-step route, inspectable before pickup, and collected by walking onto it. Close returns here without changing your selected campaign.")
                     .font(.callout)
             }
         }
         .navigationTitle("Starter World Pages")
         .navigationBarTitleDisplayMode(.inline)
-        .alert("Fixture unavailable", isPresented: Binding(
+        .alert("Test unavailable", isPresented: Binding(
             get: { errorMessage != nil }, set: { if !$0 { errorMessage = nil } }
         )) {
             Button("OK", role: .cancel) { errorMessage = nil }
         } message: {
-            Text(errorMessage ?? "Unknown fixture error")
+            Text(errorMessage ?? "Unknown test error")
         }
         .fullScreenCover(item: $session) { fixture in
             ZStack(alignment: .topTrailing) {
@@ -421,7 +421,7 @@ private struct StarterWorldPagesPhoneAcceptanceView: View {
                         .frame(width: 48, height: 48)
                         .contentShape(Rectangle())
                 }
-                .accessibilityLabel("Close starter World Page fixture")
+                .accessibilityLabel("Close starter World Page test")
                 .padding(.top, 4)
                 .padding(.trailing, 4)
                 .zIndex(20_000)
@@ -436,9 +436,9 @@ private struct CompoundAssemblyPhoneAcceptanceView: View {
 
     var body: some View {
         Form {
-            Section("Fixture") {
+            Section("Temporary test") {
                 Text("A disposable campaign with retained Sun + Illumination proof, exact 20 Essence and 4 Pulp, and one deliberately unknown Focus proof that must refuse.")
-                Button("Launch Compound Assembly fixture") {
+                Button("Launch Compound Assembly test") {
                     do { session = try CompoundAssemblyPhoneFixtureSession() }
                     catch { errorMessage = error.localizedDescription }
                 }
@@ -451,10 +451,10 @@ private struct CompoundAssemblyPhoneAcceptanceView: View {
         }
         .navigationTitle("Compound Assembly")
         .navigationBarTitleDisplayMode(.inline)
-        .alert("Fixture unavailable", isPresented: Binding(
+        .alert("Test unavailable", isPresented: Binding(
             get: { errorMessage != nil }, set: { if !$0 { errorMessage = nil } }
         )) { Button("OK", role: .cancel) { errorMessage = nil } } message: {
-            Text(errorMessage ?? "Unknown fixture error")
+            Text(errorMessage ?? "Unknown test error")
         }
         .fullScreenCover(item: $session) { fixture in
             NavigationStack {
@@ -799,14 +799,14 @@ struct BalancingView: View {
             }
 
             Section("Resources") {
-                Picker("Raw essence profile", selection: $settings.debugTuning.rawEssenceProfile) {
+                Picker("Raw Essence preset", selection: $settings.debugTuning.rawEssenceProfile) {
                     ForEach(DebugTuningProfile.RawEssenceProfile.allCases, id: \.self) {
                         Text($0.displayName).tag($0)
                     }
                 }
                 tuningSlider("Raw essence frequency", value: $settings.debugTuning.rawEssenceFrequencyMultiplier)
                 tuningSlider("Raw essence yield", value: $settings.debugTuning.rawEssenceYieldMultiplier)
-                tuningSlider("World-resource node density", value: $settings.debugTuning.resourceNodeDensityMultiplier)
+                tuningSlider("World-resource deposit density", value: $settings.debugTuning.resourceNodeDensityMultiplier)
                 resetSection("Resources") {
                     settings.debugTuning.rawEssenceProfile = .recommended
                     settings.debugTuning.rawEssenceFrequencyMultiplier = 1
@@ -870,7 +870,7 @@ struct BalancingView: View {
                         Text($0.displayName).tag($0)
                     }
                 }
-                Text("Recommended anchors level to the Binder, adds only visible reachable foes, and freezes additive party pressure plus apex tempo when combat opens. Legacy, Reserved and Pressing remain historical DEBUG comparisons.")
+                Text("Recommended scaling matches the current game. Level-only, Gentler, and Stronger scaling remain comparison presets.")
                     .font(.caption).foregroundStyle(.secondary)
 #if DEBUG
                 NavigationLink("Open encounter scaling phone matrix") {
@@ -887,7 +887,7 @@ struct BalancingView: View {
             Section("Testing safety") {
                 Toggle("God mode for new encounters",
                        isOn: $settings.debugTuning.debugGodModeEnabled)
-                Text("Default off. The setting freezes when the next encounter opens. Combat decisions, damage, conditions, cooldowns and logs remain ordinary, but lethal party damage stops at 1 health. Combat-balance evidence is marked invalid; other bug evidence remains usable.")
+                Text("Default off. The setting is saved when the next encounter opens. Combat decisions, damage, conditions, cooldowns, and logs continue normally, but lethal party damage stops at 1 health. Combat-balance evidence is marked invalid; other bug evidence remains usable.")
                     .font(.caption)
                     .foregroundStyle(.secondary)
                 if store.activeEncounter != nil {
@@ -897,11 +897,11 @@ struct BalancingView: View {
                 }
             }
 
-            Section("Combat v2 comparison harness") {
-                NavigationLink("Open native true-graph route explorer") {
+            Section("Combat scaling comparison") {
+                NavigationLink("Open Combat Skill layout test") {
                     CombatGraphRouteExplorer()
                 }
-                Toggle("Use frozen v2 combat inputs", isOn: $settings.debugTuning.debugCombatV2BinderAttackEnabled)
+                Toggle("Use inputs saved when combat opens", isOn: $settings.debugTuning.debugCombatV2BinderAttackEnabled)
                 debugCombatNodeToggle("Heavy Hand · Crush +2",
                                       id: CombatDerivedStatsRules.Node.heavyHand)
                 debugCombatNodeToggle("Keen Eye · Pierce +2",
@@ -939,7 +939,7 @@ struct BalancingView: View {
                 ForEach(store.state.base.activeParty, id: \.self) { index in
                     if store.state.base.roster.indices.contains(index) {
                         let name = store.state.base.roster[index].name
-                        Text("\(name) v2 ownership").font(.subheadline.weight(.semibold))
+                        Text("Skills learned by \(name)").font(.subheadline.weight(.semibold))
                         debugCompanionNodeToggle("Quick Step · +4", index: index,
                                                  id: CombatDerivedStatsRules.Node.quickStep)
                         debugCompanionNodeToggle("Light Frame · +3", index: index,
@@ -992,7 +992,7 @@ struct BalancingView: View {
                         case .companion(let index): (settings.debugTuning.debugCombatV2CompanionNodeIDs[index] ?? []).contains(CombatDerivedStatsRules.Node.ghost)
                         case .foe: false
                         }
-                        Text("\(debugActorName(entry.actor)) · base \(Int(entry.characterEvasion * 100))%\(footwork > 0 ? " + Footwork 6%" : "") = \(Int(entry.total * 100))% · frozen ownership: Ghost \(ghostOwned ? "owned" : "not owned"), Feint \(entry.ownsFeint == true ? "owned" : "not owned"), Untouchable \(entry.ownsUntouchable == true ? "owned" : "not owned")")
+                        Text("\(debugActorName(entry.actor)) · base \(Int(entry.characterEvasion * 100))%\(footwork > 0 ? " + Footwork 6%" : "") = \(Int(entry.total * 100))% · Skills saved when combat opened: Ghost \(ghostOwned ? "learned" : "not learned"), Feint \(entry.ownsFeint == true ? "learned" : "not learned"), Untouchable \(entry.ownsUntouchable == true ? "learned" : "not learned")")
                             .font(.caption.monospacedDigit())
                     }
                     Text("Next encounter Insulation")
@@ -1007,7 +1007,7 @@ struct BalancingView: View {
                         let thickHide = entry.components.first {
                             $0.nodeID == CombatDerivedStatsRules.Node.thickHide
                         }?.amount ?? 0
-                        Text("\(debugActorName(entry.member.combatant)) · ordinary \(entry.ordinaryMaximum) → frozen \(entry.maximum) · \(thickHide == 0 ? "Thick Hide not owned" : "Thick Hide +\(thickHide)")")
+                        Text("\(debugActorName(entry.member.combatant)) · normal \(entry.ordinaryMaximum) → saved for this encounter \(entry.maximum) · \(thickHide == 0 ? "Thick Hide not learned" : "Thick Hide learned · +\(thickHide) maximum HP")")
                             .font(.caption.monospacedDigit())
                     }
                 }
@@ -1032,7 +1032,7 @@ struct BalancingView: View {
                         }
                     }
                 }
-                Text("Explicit DEBUG ownership only. Party totals preview before contact; equal totals remain unresolved until the encounter's saved RNG breaks the tie. Exact inputs and final order freeze when combat opens.")
+                Text("Party totals are previewed before contact; equal totals remain unresolved until the encounter’s saved random result breaks the tie. Exact inputs and final order are saved when combat opens.")
                     .font(.caption)
                     .foregroundStyle(.secondary)
                 Text("Armour formation bonuses are resolved from the saved encounter rank and current consciousness. They intentionally have no single pre-contact total.")
@@ -1047,7 +1047,7 @@ struct BalancingView: View {
                         Text($0.displayName).tag($0)
                     }
                 }
-                Text("Only the first expedition of a fresh campaign. Gentle keeps at most one ordinary mobile enemy in the revealed entry area; Clear approach keeps none. Enemies are relocated, never deleted.")
+                Text("Only the first expedition of a fresh campaign. Gentle keeps at most one Normal enemy in the revealed entry area; Clear approach keeps none. Enemies are relocated, never deleted.")
                     .font(.caption)
                     .foregroundStyle(.secondary)
                 Button("Reset Test Setup") {
@@ -1081,7 +1081,7 @@ struct BalancingView: View {
             }
 
             Section("Navigation") {
-                integerStepper("Base vision radius",
+                integerStepper("Starting vision radius",
                                value: $settings.debugTuning.baseVisionRadius,
                                range: 1...6,
                                suffix: " tiles",
@@ -1121,7 +1121,7 @@ struct BalancingView: View {
                 }
                 .disabled(settings.debugTuning.isDefault)
             } footer: {
-                Text("This profile is stored separately from your game save. Existing worlds never change.")
+                Text("This testing preset is stored separately from your game save. Existing worlds never change.")
             }
         }
         .navigationTitle("Balancing")
@@ -1252,9 +1252,10 @@ struct BalancingView: View {
         let equipment = String(format: "%.1f", breakdown.equipment)
         let components = breakdown.components.map {
             let source = $0.source == actor ? "self" : debugActorName($0.source)
-            return "\($0.nodeID.rawValue.split(separator: ".").last?.replacingOccurrences(of: "_", with: " ").capitalisedSentence ?? $0.nodeID.rawValue) \(source) +\(Int($0.amount))"
+            let name = ContentCatalog.shared.combatGraph.node($0.nodeID)?.name ?? "Unknown Skill"
+            return "\(name) [Internal ID: \($0.nodeID.rawValue)] \(source) +\(Int($0.amount))"
         }
-        let suffix = components.isEmpty ? "no v2 formation bonus" : components.joined(separator: ", ")
+        let suffix = components.isEmpty ? "no formation bonus" : components.joined(separator: ", ")
         return "\(debugActorName(actor)) · equipment×sturdiness \(equipment) · \(suffix) · total \(String(format: "%.1f", breakdown.totalBeforeIgnore))"
     }
 
@@ -1268,7 +1269,10 @@ struct BalancingView: View {
     }
 
     private func debugComponents(_ components: [EncounterState.DebugV2InitiativeReceipt.Component]) -> String {
-        components.map { " + \($0.amount) [\($0.nodeID.rawValue)]" }.joined()
+        components.map {
+            let name = ContentCatalog.shared.combatGraph.node($0.nodeID)?.name ?? "Unknown Skill"
+            return " + \($0.amount) \(name) [Internal ID: \($0.nodeID.rawValue)]"
+        }.joined()
     }
 
     private func debugTieNote(_ entry: EncounterState.DebugV2InitiativeReceipt.Entry,
@@ -1343,7 +1347,7 @@ private struct EncounterScalingPhoneAcceptanceView: View {
     var body: some View {
         List {
             Section("Controlled pair") {
-                Text("Both disposable fixtures use root 101, a fresh level-one Binder and Quill, no equipped weapons, Recommended scaling, full expedition HP and one disclosed level-one grazer. They never read or write a campaign slot.")
+                Text("Both disposable tests use internal test seed 101, a fresh level-one Binder and Quill, no equipped weapons, Recommended scaling, full expedition HP, and one disclosed level-one grazer. They never read or write a campaign slot.")
                     .font(.callout)
                 ForEach(EncounterScalingPhoneFixtureKind.allCases) { kind in
                     Button {
@@ -1359,11 +1363,11 @@ private struct EncounterScalingPhoneAcceptanceView: View {
                 }
             }
             Section("Capture") {
-                Text("Use the red bug button at the opening and again immediately before the finishing action. For the level-one pair, record rounds, aggregate HP lost, readability and whether retreat looked viable. For progression vectors, include the frozen receipt and compare player level, party count, member levels and apex pressure. Close returns here without changing the selected campaign.")
+                Text("Use the red bug button at the opening and again immediately before the finishing action. For the level-one pair, record rounds, aggregate HP lost, readability and whether retreat looked viable. For party progression tests, include the saved scaling record and compare Binder level, party size, member levels, and apex pressure. Close returns here without changing the selected campaign.")
                     .font(.callout)
             }
-            Section("Progression vectors") {
-                Text("Ordinary fixtures keep root 101 and production scaling fixed while only party level and membership change. The apex fixture uses disclosed root 909. All are additive to the accepted level-one pair above.")
+            Section("Party progression") {
+                Text("Normal tests keep internal test seed 101 and production scaling fixed while only party level and membership change. The apex test uses disclosed internal test seed 909. All are additive to the accepted level-one pair above.")
                     .font(.callout)
                 Text("\(acceptance.completionCount) of \(EncounterScalingProgressionFixtureKind.allCases.count) finished progression verdicts recorded")
                     .font(.caption.monospacedDigit())
@@ -1372,14 +1376,14 @@ private struct EncounterScalingPhoneAcceptanceView: View {
                     Button {
                         openProgressionFixture(next)
                     } label: {
-                        Label("Open next unrecorded fixture", systemImage: "arrow.right.circle.fill")
+                        Label("Open next unrecorded test", systemImage: "arrow.right.circle.fill")
                             .font(.headline)
                             .frame(maxWidth: .infinity, minHeight: 50, alignment: .leading)
                     }
                     .buttonStyle(.borderedProminent)
-                    .accessibilityHint("Opens \(next.title), the first incomplete fixture in matrix order")
+                    .accessibilityHint("Opens \(next.title), the first incomplete test in the planned order")
                 } else {
-                    Label("All progression fixtures complete", systemImage: "checkmark.seal.fill")
+                    Label("All progression tests complete", systemImage: "checkmark.seal.fill")
                         .font(.headline)
                         .foregroundStyle(.green)
                         .accessibilityIdentifier("progression-scaling-matrix-complete")
@@ -1395,15 +1399,15 @@ private struct EncounterScalingPhoneAcceptanceView: View {
                                     Text("NEXT")
                                         .font(.caption2.bold())
                                         .foregroundStyle(.tint)
-                                        .accessibilityLabel("Next incomplete fixture")
+                                        .accessibilityLabel("Next incomplete test")
                                 }
                             }
                             Text(kind.detail).font(.caption).foregroundStyle(.secondary)
                             if let record = acceptance.records[kind] {
-                                Text("\(record.verdict.title) · receipt \(record.receiptIdentity)")
+                                Text("\(record.verdict.title) · Internal record ID \(record.receiptIdentity)")
                                     .font(.caption2.monospaced())
                                     .foregroundStyle(record.verdict == .unfair ? .red : .secondary)
-                                Text(record.measurement?.summary ?? "Legacy verdict · no saved measurement")
+                                Text(record.measurement?.summary ?? "From an older version · no saved measurement")
                                     .font(.caption2.monospacedDigit())
                                     .foregroundStyle(record.measurement?.status == .stale ? .orange : .secondary)
                             } else {
@@ -1463,7 +1467,7 @@ private struct EncounterScalingPhoneAcceptanceView: View {
                         .frame(width: 48, height: 48)
                         .contentShape(Rectangle())
                 }
-                .accessibilityLabel("Close scaling fixture")
+                .accessibilityLabel("Close scaling test")
                 .padding(.top, 4)
                 .padding(.trailing, 4)
                 .zIndex(20_000)
@@ -1473,7 +1477,7 @@ private struct EncounterScalingPhoneAcceptanceView: View {
             ZStack(alignment: .topTrailing) {
                 RootView().environmentObject(fixture.store)
                 VStack(alignment: .leading, spacing: 3) {
-                    Text("Frozen scaling receipt").font(.caption.bold())
+                    Text("Saved scaling record").font(.caption.bold())
                     ForEach(fixture.receipt.phoneSummaryLines, id: \.self) { line in
                         Text(line).font(.caption2.monospacedDigit())
                     }
@@ -1525,7 +1529,7 @@ private struct EncounterScalingPhoneAcceptanceView: View {
                         .frame(width: 48, height: 48)
                         .contentShape(Rectangle())
                 }
-                .accessibilityLabel("Close progression scaling fixture")
+                .accessibilityLabel("Close progression scaling test")
                 .padding(.top, 4).padding(.trailing, 4).zIndex(20_000)
             }
         }

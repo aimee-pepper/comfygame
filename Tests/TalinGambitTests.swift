@@ -84,7 +84,19 @@ final class TalinGambitTests: XCTestCase {
         XCTAssertEqual(decoded, rule)
         XCTAssertNil(decoded.property)
         XCTAssertNil(decoded.comparator)
-        XCTAssertTrue(decoded.displayText.contains("armour above 3"))
+        XCTAssertEqual(decoded.displayText, "Foe · Armour threshold 3 → Flee")
+    }
+
+    func testArmourThresholdPresentationPreservesDistinctValuesAndFailsWithoutInventingOne() {
+        let one = GambitRule(id: 701, subject: FoeArmourGambit.subject,
+                             threshold: "armour_mark_1", action: "act_attack")
+        let five = GambitRule(id: 702, subject: FoeArmourGambit.subject,
+                              threshold: "armour_mark_5", action: "act_attack")
+        let invalid = GambitRule(id: 703, subject: FoeArmourGambit.subject,
+                                 threshold: nil, action: "act_attack")
+        XCTAssertEqual(one.displayText, "Foe · Armour threshold 1 → Attack")
+        XCTAssertEqual(five.displayText, "Foe · Armour threshold 5 → Attack")
+        XCTAssertEqual(invalid.displayText, "Foe · armour threshold → Attack")
     }
 
     func testReadingTalinTeachingAtomicallyGrantsUsableSubjectAndFirstMarkOnce() {

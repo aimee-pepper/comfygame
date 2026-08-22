@@ -295,7 +295,7 @@ final class GameStore: ObservableObject {
     /// lines, the layers have leaked into each other. WHAT triggers it and what the payoff is are
     /// open design questions (open-questions.md Q-C) — this is the mechanism only, not the rule.
     func resetBaseKeepingReality() {
-        mutate("reset base, keep reality", flush: true) { state in
+        mutate("reset Village, keep shared progress", flush: true) { state in
             state.base = BaseState.newGame()
             state.worlds = WorldsState.newGame(seeds: &state.worlds.seeds)
         }

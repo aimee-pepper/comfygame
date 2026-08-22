@@ -70,7 +70,7 @@ struct GameState: Codable, Equatable, Sendable {
         }
         if RosterPlacementRules.reconcileLegacyProjections(in: &self) {
 #if DEBUG
-            print("[placement migration] repaired contradictory legacy party/realm assignments")
+            print("[older-save placement update] Repaired conflicting traveller locations between the party and Village.")
 #endif
         }
         // The schematic field postdates its authored page. Recover knowledge from the exact page

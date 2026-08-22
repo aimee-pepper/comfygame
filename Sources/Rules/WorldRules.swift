@@ -1556,8 +1556,8 @@ enum WorldRules {
             switch resolvedOpening {
             case .creatureAmbush:
                 encounter.note(watchfulSuppressed
-                               ? "Watchful: you keep the opening to ordinary order."
-                               : "They strike from cover before the ordinary order begins.")
+                               ? "Watchful: you keep the normal opening order."
+                               : "They strike from cover before normal turn order begins.")
             case .mutualContact where slipperyPrevented:
                 encounter.note("Slippery: the sudden attack becomes mutual contact.")
             default: break

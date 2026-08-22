@@ -17,6 +17,7 @@ const coreInputs = [
   "Sources/Content/Data/pressure_sources.json",
   "Sources/Content/Data/qualifiers.json",
   "Sources/Content/Data/playability-roadmap.json",
+  "docs/canonical-game-terminology.json",
   "Sources/Model/Materials.swift",
   "Sources/Screens/PageGridView.swift",
   "Sources/Screens/WritingDeskView.swift",
@@ -222,6 +223,7 @@ const targetsJSON = JSON.parse(contents["Sources/Content/Data/pressure_targets.j
 const sourcesJSON = JSON.parse(contents["Sources/Content/Data/pressure_sources.json"]);
 const qualifiersJSON = JSON.parse(contents["Sources/Content/Data/qualifiers.json"]);
 const roadmapJSON = JSON.parse(contents["Sources/Content/Data/playability-roadmap.json"]);
+const terminologyAuthority = JSON.parse(contents["docs/canonical-game-terminology.json"]);
 const matrixPath = "docs/village-progression-and-asset-matrix-current.md";
 const matrixText = contents[matrixPath];
 const destinationRegister = parseCanonicalDestinations(matrixText);
@@ -323,12 +325,62 @@ function normalize(collection, type, sourcePath, disposition) {
   }));
 }
 
-function conditionText(condition) {
-  const parts = [condition.target, condition.measure];
-  if (condition.key) parts.push(condition.key);
-  if (condition.minimum != null) parts.push(`at least ${condition.minimum}`);
-  if (condition.maximum != null) parts.push(`at most ${condition.maximum}`);
-  return parts.join(" · ");
+const pressureNames = {
+  atmosphere: "Atmosphere", cycle: "World cycle", hydrology: "Hydrology",
+  illumination: "Illumination", relief: "Relief", substrate: "Substrate",
+  thermal: "Thermal", vitality: "Growth"
+};
+
+function titleWords(value) {
+  return String(value).replace(/[-_]/g, " ").replace(/\b\w/g, letter => letter.toUpperCase());
+}
+
+function resourceConditionSubject(condition) {
+  const exact = {
+    "thermal|tag|geothermal": "Geothermal heat",
+    "hydrology|tag|brine": "Briny water",
+    "atmosphere|tag|toxic": "Toxic air",
+    "substrate|tag|unstable-ground": "Unstable ground",
+    "illumination|tag|sourceless": "Sourceless light",
+    "hydrology|aspect|salinity": "Water salinity",
+    "cycle|tag|arrhythmic": "Irregular World cycle"
+  }[`${condition.target}|${condition.measure}|${condition.key ?? ""}`];
+  if (exact) return exact;
+  const target = pressureNames[condition.target] ?? titleWords(condition.target);
+  if (condition.measure === "peak") return `${target} pressure`;
+  if (condition.measure === "form") return `${titleWords(condition.key)} ${target}`;
+  if (condition.measure === "tag") return `${titleWords(condition.key)} ${target}`;
+  if (condition.measure === "aspect") return condition.target === "atmosphere"
+    ? `Atmospheric ${condition.key}`
+    : `${target} ${titleWords(condition.key).toLowerCase().replace("trophicdepth", "trophic depth")}`;
+  if (condition.measure === "available") return condition.target === "hydrology" ? "Available water" : `Available ${target}`;
+  if (condition.measure === "produced") return `${target} production`;
+  throw new Error(`Unsupported resource condition measure: ${condition.measure}`);
+}
+
+function resourceConditionText(condition, relationship) {
+  const subject = resourceConditionSubject(condition);
+  if (condition.measure === "tag" && condition.minimum === 1 && condition.maximum == null) {
+    return relationship === "requires" ? `${subject} must be present.` : `${subject} helps when present.`;
+  }
+  const minimum = condition.minimum;
+  const maximum = condition.maximum;
+  if (minimum != null && maximum != null) {
+    return relationship === "requires"
+      ? `${subject} must stay between ${minimum}/100 and ${maximum}/100.`
+      : `${subject} helps between ${minimum}/100 and ${maximum}/100.`;
+  }
+  if (minimum != null) {
+    return relationship === "requires"
+      ? `${subject} must reach at least ${minimum}/100.`
+      : `${subject} helps at ${minimum}/100 or more.`;
+  }
+  if (maximum != null) {
+    return relationship === "requires"
+      ? `${subject} must stay at ${maximum}/100 or less.`
+      : `${subject} helps at ${maximum}/100 or less.`;
+  }
+  throw new Error(`Resource condition has no supported bound: ${JSON.stringify(condition)}`);
 }
 
 function itemRecord(item) {
@@ -354,7 +406,12 @@ function itemRecord(item) {
 const constructionUses = Object.fromEntries(resourcesJSON.resources.map(resource => [resource.id, []]));
 for (const station of stationsJSON.stations) {
   for (const id of Object.keys(station.buildCost?.resources ?? {})) {
-    if (constructionUses[id]) constructionUses[id].push(`Construction: ${station.name}`);
+    if (constructionUses[id]) {
+      const sentenceName = /^The\s/.test(station.name)
+        ? `the ${station.name.slice(4)}`
+        : `the ${station.name}`;
+      constructionUses[id].push(`Used to construct ${sentenceName}.`);
+    }
   }
 }
 
@@ -362,22 +419,24 @@ function resourceRecord(resource) {
   const sourcePath = "Sources/Content/Data/resources.json";
   const domain = resource.isRealityCurrency || ["essence_raw", "mote"].includes(resource.id)
     ? "currencyEssence" : "worldResource";
-  const requires = (resource.requires ?? []).map(conditionText);
-  const favours = (resource.favours ?? []).map(conditionText);
-  const pressure = [`Driven by ${resource.drivenBy}.`, requires.length ? `Requires ${requires.join("; ")}.` : "No hard generation requirement.", favours.length ? `Favours ${favours.join("; ")}.` : "No additional authored favour condition."].join(" ");
-  const uses = constructionUses[resource.id]?.length ? constructionUses[resource.id] : ["No station construction use is declared in stations.json."];
+  const requires = (resource.requires ?? []).map(condition => resourceConditionText(condition, "requires"));
+  const favours = (resource.favours ?? []).map(condition => resourceConditionText(condition, "favours"));
+  const drivenBy = pressureNames[resource.drivenBy] ?? titleWords(resource.drivenBy);
+  const pressure = `Mostly shaped by ${drivenBy} pressure.`;
+  const uses = constructionUses[resource.id]?.length ? constructionUses[resource.id] : ["No current Village construction recipe uses this resource."];
   return {
     type: "resource",
     category: domain,
-    domain,
+    domain: domain === "worldResource" ? "World resource" : "Currency & Essence",
     id: resource.id,
     slug: slug(resource.id),
     name: resource.name,
     summary: pressure,
-    drivenBy: resource.drivenBy,
+    drivenBy: `${drivenBy} pressure`,
     requires,
     favours,
-    tradeBand: resource.tradeBand,
+    internalGenerationConditions: { drivenBy: resource.drivenBy, requires: resource.requires ?? [], favours: resource.favours ?? [] },
+    tradeBand: titleWords(resource.tradeBand),
     isRealityCurrency: resource.isRealityCurrency,
     currentUses: uses,
     disposition: resourcesJSON._authority.defaultDisposition,
@@ -476,28 +535,40 @@ const resources = resourcesJSON.resources.map(resourceRecord);
 const items = itemsJSON.items.map(itemRecord);
 const creatureMaterials = materialFamilies();
 function lexemeRecord(kind, item, sourcePath, disposition) {
-  const acquisition = item.acquisition ?? (kind === "target" || kind === "qualifier" ? "rules-owned vocabulary" : "authored catalogue");
+  const playerKinds = { target: "Subject", source: "Focus", qualifier: "Modifier", compound: "Compound" };
   const alwaysWritable = kind === "target" || kind === "qualifier";
+  const acquisitionKey = item.acquisition ?? (alwaysWritable ? "always" : null);
+  const acquisitionNames = {
+    worldDrop: "Found in a world", research: "Learned through an Upgrade",
+    diary: "Learned from diary writing", starter: "Known at the start",
+    always: "Always available vocabulary"
+  };
+  const acquisition = acquisitionNames[acquisitionKey];
+  if (!acquisition) throw new Error(`Unsupported lexeme acquisition: ${acquisitionKey}`);
+  const targetName = id => targetsJSON.targets.find(target => target.id === id)?.name ?? "Unknown Subject";
+  const sourceName = id => sourcesJSON.sources.find(source => source.id === id)?.name ?? "Unknown Focus";
   const expansion = kind === "compound"
-    ? (item.expandsTo ?? []).map(part => `${part.intensity} ${part.source} → ${part.target}`)
+    ? (item.expandsTo ?? []).map(part => `${titleWords(part.intensity)} ${sourceName(part.source)} → ${targetName(part.target)}`)
     : kind === "source"
-      ? (item.contributions ?? []).map(part => `${part.character} ${part.target}`)
+      ? (item.contributions ?? []).map(part => `${targetName(part.target)} — ${titleWords(part.character)}`)
       : [];
   return {
     type: "rune",
     category: kind,
+    playerKind: playerKinds[kind],
     id: `${kind}:${item.id}`,
     stableID: item.id,
     slug: `${kind}-${slug(item.id)}`,
     name: item.name,
     summary: item.blurb ?? (kind === "qualifier" ? `Changes the ${item.ladder} ladder.` : "Authored writing vocabulary."),
     acquisition,
+    internalAcquisition: acquisitionKey,
     essenceCost: item.essenceCost ?? null,
     ladder: item.ladder ?? null,
-    attachesTo: item.attachesTo ?? [],
+    attachesTo: (item.attachesTo ?? []).map(targetName),
     expansion,
-    writability: alwaysWritable ? "available whenever the Writing Desk is available" : `writable only after the campaign owns this ${kind}`,
-    disclosure: alwaysWritable ? "meaning is rules-known" : "catalogue presence is not player knowledge; encountered may display ?? and only ownership discloses meaning",
+    writability: alwaysWritable ? `Writable whenever the Writing Desk is available` : `Writable after this ${playerKinds[kind]} is learned`,
+    disclosure: alwaysWritable ? "Its name and meaning are always visible." : "Seen but not learned Sigils appear as ??. Learn it to reveal its name and meaning.",
     disposition,
     provenance: provenance([sourcePath], item.id, disposition, hashes, aggregateHash)
   };
@@ -510,12 +581,21 @@ const symbols = [
   ...symbolsJSON.symbols.map(item => lexemeRecord("compound", item, "Sources/Content/Data/symbols.json", symbolsJSON._authority.defaultDisposition))
 ];
 const roadmap = normalize(roadmapJSON.items, "roadmap", "Sources/Content/Data/playability-roadmap.json", "operational");
+const roadmapTitleOverrides = {
+  "rune-dictionary": "Known and unknown Sigil Dictionary",
+  "world-screen-presentation": "World screen phone composition record",
+  "combat-tree-v2": "True combat trees and complete Skill consumers",
+  "return-receipt-authority": "One trustworthy Expedition record",
+  "writing-causal-presentation": "Page-first Writing and truthful World preview"
+};
 for (const [index, item] of roadmap.entries()) {
+  item.name = roadmapTitleOverrides[item.id] ?? item.name;
   item.workstream = roadmapJSON.items[index].workstream;
   item.band = roadmapJSON.items[index].band ?? "unbanded";
   item.gate = roadmapJSON.items[index].gate ?? "No separate acceptance gate recorded.";
   item.owner = roadmapJSON.items[index].owner ?? roadmapJSON.items[index].workstream;
   item.isPrimary = Boolean(roadmapJSON.items[index].isPrimary);
+  item.detail = roadmapJSON.items[index].detail ?? item.summary;
 }
 
 function requiredRoadmapItem(id) {
@@ -557,7 +637,7 @@ if (!contents["Sources/Screens/WritingDeskView.swift"].includes("WritingDeskNati
 const currentTruth = {
   writing: {
     status: writingRoadmap.status,
-    statusLabel: "source-integrated / ordinary-phone acceptance pending / nonblocking",
+    statusLabel: "source-integrated / ordinary-phone visual acceptance pending / nonblocking",
     isPrimary: writingRoadmap.isPrimary,
     roadmapID: writingRoadmap.id,
     summary: writingRoadmap.summary,
@@ -584,7 +664,7 @@ const currentTruth = {
     layeredPresentation: {
       status: terrainLayeringRoadmap.status,
       summary: terrainLayeringRoadmap.summary,
-      nativeStatus: "source-integrated and installed from 366f5ccf; accepted terrain and authored-wall manifests remain integrationReady:false until ordinary-phone visual acceptance; procedural terrain/wall remains pack-failure and legacy-save fail-safe"
+      nativeStatus: terrainLayeringRoadmap.detail
     },
     atmosphere: {
       status: atmosphereRoadmap.status,
@@ -598,6 +678,31 @@ const currentTruth = {
     ], terrainLayeringRoadmap.id, terrainLayeringRoadmap.status, hashes, aggregateHash)
   }
 };
+
+const terminologySourcePath = "docs/canonical-game-terminology.json";
+const terminology = terminologyAuthority.terms.map(term => {
+  for (const key of ["concept", "canonical", "domain", "explanation", "whereItAppears"]) {
+    if (!String(term[key] ?? "").trim()) throw new Error(`Terminology entry ${term.concept ?? "unknown"} lacks ${key}`);
+  }
+  if (!Array.isArray(term.retire) || !term.retire.length) throw new Error(`Terminology entry ${term.concept} lacks retired aliases`);
+  const aliases = [...new Set(term.retire.map(value => String(value).trim()).filter(Boolean))];
+  const exactSearchTerms = [...new Set([term.canonical, ...aliases].map(value => value.toLowerCase().replace(/\s+/g, " ").trim()))];
+  return ({
+  type: "terminology",
+  category: "Terminology",
+  id: term.concept,
+  slug: slug(term.concept),
+  name: term.canonical,
+  summary: term.explanation,
+  domain: term.domain,
+  whereItAppears: term.whereItAppears,
+  aliases,
+  exactSearchTerms,
+  searchText: [term.canonical, term.concept, ...term.retire].join(" ").toLowerCase(),
+  disposition: terminologyAuthority.status,
+  provenance: provenance([terminologySourcePath], term.concept, terminologyAuthority.status, hashes, aggregateHash)
+  });
+});
 
 const authorities = await Promise.all(authorityPaths.map(async path => ({
   path,
@@ -616,21 +721,24 @@ const history = historyPaths.map(path => ({
 }));
 
 const routes = [
-  "overview", "core-loop", "world-writing", "exploration", "combat", "people",
+  "overview", "core-loop", "world-writing", "exploration", "combat", "people", "terminology",
   "village-buildings", "resources-crafting", "catalogue", "catalogue/gear", "catalogue/consumables",
   "catalogue/curios", "catalogue/treasures", "catalogue/keys", "roadmap", "history", "asset-gallery",
   ...stations.map(station => `station/${station.slug}`), ...travellers.map(person => `person/${person.slug}`),
   ...items.map(item => `item/${item.slug}`), ...resources.map(resource => `resource/${resource.slug}`),
   ...creatureMaterials.map(material => `creature-material/${material.slug}`),
-  ...symbols.map(symbol => `lexeme/${symbol.slug}`), ...roadmap.map(item => `roadmap/${item.slug}`)
+  ...symbols.map(symbol => `lexeme/${symbol.slug}`), ...roadmap.map(item => `roadmap/${item.slug}`),
+  ...terminology.map(term => `terminology/${term.slug}`)
 ];
-const search = [...stations, ...travellers, ...resources, ...creatureMaterials, ...items, ...symbols, ...roadmap].map(entity => ({
+const search = [...stations, ...travellers, ...resources, ...creatureMaterials, ...items, ...symbols, ...roadmap, ...terminology].map(entity => ({
   type: entity.type,
   id: entity.id,
   name: entity.name,
   summary: entity.blurb ?? entity.summary ?? "",
-  category: entity.category ?? entity.type,
-  route: entity.type === "station" ? `station/${entity.slug}` : entity.type === "roadmap" ? `roadmap/${entity.slug}` : entity.type === "traveller" ? `person/${entity.slug}` : ["gear", "consumable", "curio", "treasure", "key"].includes(entity.type) ? `item/${entity.slug}` : entity.type === "resource" ? `resource/${entity.slug}` : entity.type === "creatureMaterial" ? `creature-material/${entity.slug}` : entity.type === "rune" ? `lexeme/${entity.slug}` : "overview",
+  category: entity.playerKind ?? entity.category ?? entity.type,
+  route: entity.type === "station" ? `station/${entity.slug}` : entity.type === "roadmap" ? `roadmap/${entity.slug}` : entity.type === "traveller" ? `person/${entity.slug}` : ["gear", "consumable", "curio", "treasure", "key"].includes(entity.type) ? `item/${entity.slug}` : entity.type === "resource" ? `resource/${entity.slug}` : entity.type === "creatureMaterial" ? `creature-material/${entity.slug}` : entity.type === "rune" ? `lexeme/${entity.slug}` : entity.type === "terminology" ? `terminology/${entity.slug}` : "overview",
+  searchText: entity.searchText ?? [entity.name, entity.id, entity.blurb ?? entity.summary ?? ""].join(" ").toLowerCase(),
+  exactSearchTerms: entity.exactSearchTerms ?? [entity.name].map(value => String(value).toLowerCase()),
   disposition: entity.disposition,
   provenance: entity.provenance
 }));
@@ -640,7 +748,7 @@ const wikiData = {
   generatedAtSourceHash: aggregateHash,
   routes,
   counts: { stations: stations.length, travellers: travellers.length, resources: resources.length, items: items.length, runes: symbols.length, roadmap: roadmap.length },
-  stations, travellers, resources, creatureMaterials, items, symbols, roadmap, authorities, history, search, currentTruth,
+  stations, travellers, resources, creatureMaterials, items, symbols, roadmap, terminology, authorities, history, search, currentTruth,
   assetGallery: {
     acceptedAssets: [],
     reviewEvidence: [],

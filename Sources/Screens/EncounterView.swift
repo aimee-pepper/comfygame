@@ -83,18 +83,18 @@ struct EncounterView: View {
                                     Text("Baseline \(entry.baseline) · total \(entry.total)")
                                         .font(.subheadline.monospacedDigit())
                                     ForEach(entry.components, id: \.nodeID) { component in
-                                        Text("+\(component.amount) · \(debugInitiativeNodeName(component.nodeID)) [\(component.nodeID.rawValue)]")
+                                        Text("+\(component.amount) · \(debugInitiativeNodeName(component.nodeID)) · Internal ID \(component.nodeID.rawValue)")
                                             .font(.caption.monospacedDigit())
                                     }
                                     if entry.strikesFirst {
-                                        Text("Contact priority places this actor before ordinary initiative totals.")
+                                        Text("Contact priority places this actor before normal turn order.")
                                             .font(.caption).foregroundStyle(.secondary)
                                     }
                                 }
                             }
                         }
                         if let evasion = encounter.debugV2Evasion {
-                            Section("Final-target miss inputs") {
+                            Section("Final-target dodge inputs") {
                                 ForEach(evasion.entries, id: \.actor) { entry in
                                     let footwork = entry.components.first {
                                         $0.nodeID == CombatDerivedStatsRules.Node.footwork
@@ -113,14 +113,14 @@ struct EncounterView: View {
                                     .font(.caption.monospacedDigit())
                                 }
                                 ForEach(Array(encounter.evasionAttempts.suffix(8).enumerated()), id: \.offset) { _, attempt in
-                                    Text("\(CombatRules.actorName(attempt.actor, encounter: encounter)) · \(attempt.resolution.rawValue) · \(Int(attempt.finalChance * 100))%\(attempt.roll.map { " · roll \(String(format: "%.3f", $0))" } ?? " · no RNG")")
+                                    Text("\(CombatRules.actorName(attempt.actor, encounter: encounter)) · \(attempt.resolution.playerLabel) · \(Int(attempt.finalChance * 100))%\(attempt.roll.map { " · roll \(String(format: "%.3f", $0))" } ?? " · no RNG")")
                                         .font(.caption2.monospacedDigit())
                                         .foregroundStyle(.secondary)
                                 }
                             }
                         }
                     }
-                    .navigationTitle("V2 final order")
+                    .navigationTitle("Saved turn order")
                     .navigationBarTitleDisplayMode(.inline)
                     .toolbar { Button("Done") { isShowingDebugV2Order = false } }
                 }
@@ -138,7 +138,7 @@ struct EncounterView: View {
             Spacer()
 #if DEBUG
             if let receipt = encounter.debugV2Initiative {
-                Button("V2 order · \(receipt.entries.count) actors") {
+                Button("Turn order · \(receipt.entries.count) actors") {
                     isShowingDebugV2Order = true
                 }
                     .font(.caption.weight(.semibold))
@@ -340,16 +340,16 @@ struct EncounterView: View {
                 let name: String = switch component.nodeID {
                 case CombatDerivedStatsRules.Node.heavyHand: "Heavy Hand"
                 case CombatDerivedStatsRules.Node.keenEye: "Keen Eye"
-                default: component.nodeID.rawValue
+                default: ContentCatalog.shared.combatGraph.node(component.nodeID)?.name ?? "Unknown Skill"
                 }
-                return "\(name) [\(component.nodeID.rawValue)] +\(component.amount)"
+                return "\(name) · Internal ID \(component.nodeID.rawValue) +\(component.amount)"
             }.joined(separator: " · ")
-            Text("V2 \(preview.lower.finalDamage)–\(preview.upper.finalDamage) · \(contributors.isEmpty ? "no node bonus" : contributors)")
+            Text("\(preview.lower.finalDamage)–\(preview.upper.finalDamage) damage · \(contributors.isEmpty ? "no Skill bonus" : contributors)")
                 .font(.caption2.monospacedDigit())
                 .foregroundStyle(.secondary)
                 .fixedSize(horizontal: false, vertical: true)
         } else {
-            Text("V2 damage preview needs Sight")
+            Text("Damage preview needs Sight")
                 .font(.caption2)
                 .foregroundStyle(.secondary)
         }

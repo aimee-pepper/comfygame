@@ -320,7 +320,7 @@ extension GameStore {
     @discardableResult
     func move(_ mark: InstanceID, to cell: PageCell) -> Bool {
         guard let updated = PageRules.move(mark, to: cell, on: state.base.page) else { return false }
-        mutate("move a mark") { $0.base.page = updated }
+        mutate("move Sigil") { $0.base.page = updated }
         return true
     }
 
@@ -378,7 +378,7 @@ extension GameStore {
         guard let updated = PageRules.connect(a, b, on: state.base.page,
                                               chainingUnlocked: state.base.hasChainingUnlock)
         else { return false }
-        mutate("connect", flush: true) { $0.base.page = updated }
+        mutate("connect Sigils", flush: true) { $0.base.page = updated }
         return true
     }
 
@@ -392,12 +392,12 @@ extension GameStore {
     }
 
     func disconnect(_ a: InstanceID, _ b: InstanceID) {
-        mutate("disconnect", flush: true) { $0.base.page = PageRules.disconnect(a, b, on: $0.base.page) }
+        mutate("disconnect Sigils", flush: true) { $0.base.page = PageRules.disconnect(a, b, on: $0.base.page) }
     }
 
     /// Break every link a mark has, splitting it out of its cluster.
     func disconnectAll(_ mark: InstanceID) {
-        mutate("unlink", flush: true) { state in
+        mutate("remove Sigil link", flush: true) { state in
             state.base.page.links = state.base.page.links.filter { !$0.involves(mark) }
         }
     }
@@ -406,7 +406,7 @@ extension GameStore {
     @discardableResult
     func moveCluster(_ mark: InstanceID, by delta: PageCell) -> Bool {
         guard let updated = PageRules.move(cluster: mark, by: delta, on: state.base.page) else { return false }
-        mutate("move cluster") { $0.base.page = updated }
+        mutate("move linked Sigils") { $0.base.page = updated }
         return true
     }
 
@@ -414,12 +414,12 @@ extension GameStore {
     @discardableResult
     func rotateCluster(_ mark: InstanceID) -> Bool {
         guard let updated = PageRules.rotate(cluster: mark, on: state.base.page) else { return false }
-        mutate("rotate cluster", flush: true) { $0.base.page = updated }
+        mutate("rotate linked Sigils", flush: true) { $0.base.page = updated }
         return true
     }
 
     func erase(_ mark: InstanceID) {
-        mutate("erase mark") { state in
+        mutate("erase Sigil") { state in
             state.base.page.links = state.base.page.links.filter { !$0.involves(mark) }
             state.base.page = PageRules.remove(mark, from: state.base.page)
         }
@@ -552,7 +552,7 @@ extension GameStore {
         else { return .staleMark }
         guard mark.hand != .crude, mark.canCarryInk else { return .ineligibleMark }
         guard mark.inkRecipe != nil else { return .noChange }
-        let changed = mutateIf("return mark to Ash ink") { state in
+        let changed = mutateIf("return Sigil to Ash ink") { state in
             guard let index = state.base.page.runes.firstIndex(where: { $0.id == markID }),
                   state.base.page.runes[index].hand != .crude,
                   state.base.page.runes[index].canCarryInk
@@ -603,7 +603,7 @@ extension GameStore {
 
     func useInkForNextFocus(_ recipe: InkRecipe?) {
         guard state.base.hasCapability("inkMixing") else { return }
-        mutate("choose ink for next focus") { $0.base.nextFocusInkRecipe = recipe }
+        mutate("choose ink for next Focus") { $0.base.nextFocusInkRecipe = recipe }
     }
 
     func inkVialPreparationQuote(_ recipe: InkRecipe) -> InkVialPreparationQuote {
@@ -1029,9 +1029,10 @@ extension GameStore {
                 openColorResolver: openColorResolver)
         } catch {
 #if DEBUG
-            bindError = "This world could not be prepared. Your page and Essence were not changed. Visual receipt: \(error)"
+            bindError = "This world could not be prepared. Your Page and Essence were not changed. Try again; if it keeps happening, report a bug."
+            debugPrint("World preparation error: \(error)")
 #else
-            bindError = "This world could not be prepared. Your page and Essence were not changed."
+            bindError = "This world could not be prepared. Your Page and Essence were not changed. Try again; if it keeps happening, report a bug."
 #endif
             return false
         }

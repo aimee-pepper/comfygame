@@ -30,7 +30,7 @@ struct HarnessView: View {
             .padding(16)
         }
         .background(Color(.systemGroupedBackground))
-        .navigationTitle("Persistence Harness")
+        .navigationTitle("Save & Resume Test")
         .navigationBarTitleDisplayMode(.inline)
     }
 
@@ -38,18 +38,18 @@ struct HarnessView: View {
 
     private var saveStatus: some View {
         Card(title: "Save", icon: "externaldrive.fill") {
-            Row("outcome at launch", store.diagnostics.loadOutcome)
-            Row("mutations in memory", "\(state.meta.mutationCount)")
-            Row("mutations on disk", "\(store.diagnostics.savedMutationCount)")
-            Row("last action", state.meta.lastAction)
-            Row("writes this session", "\(store.diagnostics.writeCount)")
-            Row("file size", store.diagnostics.saveFileByteCount.map { "\($0) bytes" } ?? "—")
+            Row("Loaded as", store.diagnostics.loadOutcome)
+            Row("Changes in memory", "\(state.meta.mutationCount)")
+            Row("Changes saved", "\(store.diagnostics.savedMutationCount)")
+            Row("Last action", state.meta.lastAction)
+            Row("Saves this session", "\(store.diagnostics.writeCount)")
+            Row("Save-file size", store.diagnostics.saveFileByteCount.map { "\($0) bytes" } ?? "—")
 
             HStack(spacing: 8) {
                 Circle()
                     .fill(isInSync ? Color.green : Color.orange)
                     .frame(width: 10, height: 10)
-                Text(isInSync ? "Disk is up to date — safe to kill" : "Write pending…")
+                Text(isInSync ? "Save is up to date — safe to force-quit" : "Saving changes…")
                     .font(.footnote.weight(.medium))
                     .foregroundStyle(isInSync ? .green : .orange)
             }
@@ -76,14 +76,14 @@ struct HarnessView: View {
     // MARK: - Layers
 
     private var realityCard: some View {
-        Card(title: "Reality — survives everything", icon: "sparkles") {
-            Row("motes", "\(state.reality.motes)")
-            Row("creatures encountered", "\(state.reality.discovery.encounteredCreatureCount) of \(ContentCatalog.shared.creatures.count)")
-            Row("resources encountered", "\(state.reality.discovery.encounteredResourceCount) of \(ContentCatalog.shared.resources.count)")
-            Row("runs started", "\(state.reality.lifetime.runsStarted)")
-            Row("banked / collapsed", "\(state.reality.lifetime.runsBankedViaPortal) / \(state.reality.lifetime.runsLostToCollapse)")
-            Row("world turns taken", "\(state.reality.lifetime.worldTurnsTaken)")
-            Row("encounters won", "\(state.reality.lifetime.encountersWon)")
+        Card(title: "Shared progress — kept across saves", icon: "sparkles") {
+            Row("Motes", "\(state.reality.motes)")
+            Row("Creatures discovered", "\(state.reality.discovery.encounteredCreatureCount) of \(ContentCatalog.shared.creatures.count)")
+            Row("Resources discovered", "\(state.reality.discovery.encounteredResourceCount) of \(ContentCatalog.shared.resources.count)")
+            Row("Expeditions started", "\(state.reality.lifetime.runsStarted)")
+            Row("Returned / lost to collapse", "\(state.reality.lifetime.runsBankedViaPortal) / \(state.reality.lifetime.runsLostToCollapse)")
+            Row("World turns", "\(state.reality.lifetime.worldTurnsTaken)")
+            Row("Encounters won", "\(state.reality.lifetime.encountersWon)")
 
             if !state.reality.discovery.creatures.isEmpty {
                 DiscoveryStrip(discovery: state.reality.discovery)
@@ -93,18 +93,18 @@ struct HarnessView: View {
     }
 
     private var baseCard: some View {
-        Card(title: "Base — persists between runs", icon: "house.fill") {
-            Row("essence", "\(state.base.essence)")
-            Row("symbols owned", "\(state.base.ownedSymbols.count)")
-            Row("rule components", "\(state.base.ownedGambitComponents.count) of \(ContentCatalog.shared.gambitComponents.count)")
-            Row("research done", "\(state.base.completedResearch.count) of \(ContentCatalog.shared.researchNodes.count)")
-            Row("inventory", "\(state.base.inventory.stacks.count) / \(state.base.inventory.slots)")
-            Row("stations", "\(state.base.stations.values.count(where: { $0.isUnlocked })) unlocked")
+        Card(title: "Village — kept between expeditions", icon: "house.fill") {
+            Row("Essence", "\(state.base.essence)")
+            Row("Sigils known", "\(state.base.ownedSymbols.count)")
+            Row("Gambit parts known", "\(state.base.ownedGambitComponents.count) of \(ContentCatalog.shared.gambitComponents.count)")
+            Row("Upgrades completed", "\(state.base.completedResearch.count) of \(ContentCatalog.shared.researchNodes.count)")
+            Row("Stored item stacks", "\(state.base.inventory.stacks.count) / \(state.base.inventory.slots)")
+            Row("Destinations unlocked", "\(state.base.stations.values.count(where: { $0.isUnlocked }))")
             if state.base.resources.isEmpty {
-                Row("resources", "—")
+                Row("Resources", "—")
             } else {
                 ForEach(state.base.resources.nonZero, id: \.id) { entry in
-                    Row(ContentCatalog.shared.resource(entry.id)?.name.lowercased() ?? entry.id.rawValue, "\(entry.amount)")
+                    Row(ContentCatalog.shared.resource(entry.id)?.name.lowercased() ?? "Unknown resource", "\(entry.amount)")
                 }
             }
         }
@@ -112,30 +112,37 @@ struct HarnessView: View {
 
     @ViewBuilder
     private var worldsCard: some View {
-        Card(title: "Worlds — instanced runs", icon: "globe.europe.africa.fill") {
+        Card(title: "Current expedition — cleared after return", icon: "globe.europe.africa.fill") {
             if let run = state.worlds.activeRun {
-                Row("run", "#\(run.runIndex)")
-                Row("seed", String(run.mapSeed, radix: 16, uppercase: true))
-                Row("book", run.book.allSymbolIDs.map(\.rawValue).joined(separator: " + "))
-                Row("random-filled", run.book.randomlyFilled.isEmpty
+                Row("Expedition", "#\(run.runIndex)")
+                Row("Internal world seed", String(run.mapSeed, radix: 16, uppercase: true))
+                Row("Page Sigils", run.book.allSymbolIDs.map { id in
+                    ContentCatalog.shared.symbol(id)?.name ?? "Unknown Sigil"
+                }.joined(separator: " + "))
+                Row("Sigils chosen by the world", run.book.randomlyFilled.isEmpty
                     ? "none"
-                    : run.book.randomlyFilled.map(\.rawValue).sorted().joined(separator: ", "))
-                Row("turns taken", "\(run.turnsTaken)")
-                Row("cycle", "\(run.clock.bandName) · base \(run.clock.isStopped ? "—" : "\(run.clock.basePeriod)t")")
-                Row("cycle pressure", "peak \(Int(run.clock.cyclePeak.rounded())) · regularity \(Int(run.clock.regularity.rounded())) · amplitude \(Int(run.clock.amplitude.rounded()))")
-                Row("day phase", run.clock.isStopped
+                    : run.book.randomlyFilled.map { slot in
+                        run.book.symbols[slot].flatMap { ContentCatalog.shared.symbol($0)?.name }
+                            ?? "Unknown Sigil"
+                    }.sorted().joined(separator: ", "))
+                Row("Turns taken", "\(run.turnsTaken)")
+                Row("World cycle", "\(run.clock.bandName) · underlying period \(run.clock.isStopped ? "—" : "\(run.clock.basePeriod) turns")")
+                Row("Light-cycle settings", "peak \(Int(run.clock.cyclePeak.rounded())) · regularity \(Int(run.clock.regularity.rounded())) · amplitude \(Int(run.clock.amplitude.rounded()))")
+                Row("Time of day", run.clock.isStopped
                     ? (run.isNight ? "held dark" : "held day")
                     : run.dayPhase.formatted(.percent.precision(.fractionLength(0))))
                 let transitions = run.nextLightTransitions()
-                Row("next transitions", transitions.isEmpty
+                Row("Next changes", transitions.isEmpty
                     ? "none"
                     : transitions.map { "t\($0.turn) \($0.isNight ? "nightfall" : "daybreak")" }
                         .joined(separator: " · "))
-                Row("life", "\(run.cast.count) species · \(run.enemies.count) instances · \(run.flora.count) flora")
-                Row("apex", run.enemies.contains(where: \.isApex) ? "placed" : "none")
-                Row("writing", "\(run.map.allPoints.count { point in if case .diaryPage = run.map[point].content { true } else { false } }) diary · \(run.foundWritings.count) other")
-                Row("binder HP", "\(run.binderHP) / \(Tuning.Encounter.binderMaxHP)")
-                Row("rng draws", "\(run.rng.drawCount)")
+                Row("Creature species", "\(run.cast.count)")
+                Row("Creature placements", "\(run.enemies.count)")
+                Row("Flora placements", "\(run.flora.count)")
+                Row("Apex", run.enemies.contains(where: \.isApex) ? "placed" : "none")
+                Row("Writing found", "\(run.map.allPoints.count { point in if case .diaryPage = run.map[point].content { true } else { false } }) diary · \(run.foundWritings.count) other")
+                Row("Binder HP", "\(run.binderHP) / \(Tuning.Encounter.binderMaxHP)")
+                Row("Internal random draws", "\(run.rng.drawCount)")
 
                 StabilityBar(stability: run.stability, band: run.stabilityBand)
                     .padding(.vertical, 4)
@@ -144,7 +151,7 @@ struct HarnessView: View {
                     Row("satchel", "empty")
                 } else {
                     ForEach(run.satchel.nonZero, id: \.id) { entry in
-                        Row("satchel · \(ContentCatalog.shared.resource(entry.id)?.name.lowercased() ?? entry.id.rawValue)", "\(entry.amount)")
+                        Row("satchel · \(ContentCatalog.shared.resource(entry.id)?.name.lowercased() ?? "Unknown resource")", "\(entry.amount)")
                     }
                 }
 
@@ -161,10 +168,10 @@ struct HarnessView: View {
                     }
                 }
             } else {
-                Row("status", "at base — no active run")
-                Row("runs so far", "\(state.worlds.runIndex)")
-                Row("next seed", String(state.worlds.seeds.peekNextSeed(), radix: 16, uppercase: true))
-                Row("draft cost", costRange)
+                Row("Status", "At the Village — no active expedition")
+                Row("Expeditions so far", "\(state.worlds.runIndex)")
+                Row("Next world seed · internal", String(state.worlds.seeds.peekNextSeed(), radix: 16, uppercase: true))
+                Row("World preview cost", costRange)
             }
         }
     }
@@ -178,7 +185,7 @@ struct HarnessView: View {
 
     private var actions: some View {
         Card(title: "Actions", icon: "hand.tap.fill") {
-            Text("The world-side actions live on the World screen while a run is active. This screen is reachable only from base.")
+            Text("World actions remain on the World screen during an expedition. This test is available from the Village.")
                 .font(.caption)
                 .foregroundStyle(.secondary)
                 .padding(.bottom, 4)
@@ -198,10 +205,10 @@ struct HarnessView: View {
 
     private var dangerZone: some View {
         Card(title: "Layer separation", icon: "square.3.layers.3d") {
-            Text("Proves the three layers are genuinely separate: this wipes Base and Worlds and leaves Reality (motes, bestiary, lifetime stats) untouched.")
+            Text("This clears village and expedition data but keeps Motes, Bestiary entries, and lifetime statistics shared across saves.")
                 .font(.caption)
                 .foregroundStyle(.secondary)
-            HarnessButton("Reset base, keep reality", icon: "arrow.counterclockwise", role: .destructive) {
+            HarnessButton("Reset Village, keep shared progress", icon: "arrow.counterclockwise", role: .destructive) {
                 store.resetBaseKeepingReality()
             }
             HarnessButton("Wipe the save entirely", icon: "trash.fill", role: .destructive) {
@@ -216,7 +223,7 @@ struct HarnessView: View {
 
     private var footnote: some View {
         VStack(alignment: .leading, spacing: 6) {
-            Text("Kill test")
+            Text("Force-quit test")
                 .font(.footnote.weight(.semibold))
             Text("Note the numbers above, force-quit from the app switcher, relaunch. Everything must match, except **launches**, which goes up by one. Try it mid-encounter.")
                 .font(.caption)
@@ -307,9 +314,9 @@ private struct StabilityBar: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
             HStack {
-                Text("stability").font(.callout).foregroundStyle(.secondary)
+                Text("Stability").font(.callout).foregroundStyle(.secondary)
                 Spacer()
-                Text("\(Int(stability.rounded())) · \(band.rawValue)")
+                Text("\(Int(stability.rounded())) · \(band.displayName)")
                     .font(.system(.callout, design: .monospaced))
                     .foregroundStyle(color)
             }

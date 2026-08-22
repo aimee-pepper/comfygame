@@ -299,7 +299,7 @@ struct ArmouryView: View {
                     if targets.isEmpty {
                         EmptyNote(showLegacy
                                   ? "No eligible protective pieces are stored or worn."
-                                  : "No eligible ordinary protective pieces. Include gear from older saves to see compatible pieces.")
+                                  : "No eligible standard protective gear. Include gear from older saves to see compatible pieces.")
                     } else {
                         SixAcrossItemGrid(data: targets, id: \.id) { target in
                             Button { chosenTarget = target } label: {

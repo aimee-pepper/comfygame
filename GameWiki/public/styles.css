@@ -44,7 +44,7 @@ h3 { margin: 0 0 8px; font-size: 17px; }
 .facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px; margin: 24px 0; }
 .fact { min-height: 92px; padding: 13px; background: var(--panel); border: 1px solid #b89b70; }
 .fact dt { color: var(--muted); font-size: 12px; text-transform: uppercase; }
-.fact dd { margin: 5px 0 0; font-weight: 800; }
+.fact dd { min-width: 0; margin: 5px 0 0; overflow-wrap: anywhere; font-weight: 800; }
 .cost { display: flex; flex-wrap: wrap; gap: 8px; }
 .cost span { padding: 5px 8px; background: #efe0b9; border: 1px solid #c3a26f; }
 .provenance { margin-top: 28px; padding: 14px; color: #5b4b3f; background: #e9dcc0; border-left: 4px solid var(--accent); font-size: 12px; overflow-wrap: anywhere; }

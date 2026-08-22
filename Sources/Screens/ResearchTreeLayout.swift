@@ -354,7 +354,7 @@ private struct ResearchNodeDetail: View {
         var parts: [String] = []
         if paid.essence > 0 { parts.append("\(paid.essence) essence") }
         for (id, amount) in paid.resources.sorted(by: { $0.key.rawValue < $1.key.rawValue }) {
-            parts.append("\(amount) \(ContentCatalog.shared.resource(id)?.name.lowercased() ?? id.rawValue)")
+            parts.append("\(amount) \(ContentCatalog.shared.resource(id)?.name.lowercased() ?? "unknown resource")")
         }
         return parts.isEmpty ? "Free" : parts.joined(separator: " · ")
     }
@@ -395,7 +395,7 @@ enum ResearchWording {
         case .essenceSpringTier: "a deeper spring"
         case .automateSelf: "your own rules, followed without you"
         case .chaining: "more than one main focus per subject"
-        case .finerHand: "a finer instrument — the same runes, in less room"
+        case .finerHand: "a finer instrument — the same Sigils, in less room"
         case .scriptoriumTier: "a better Scriptorium, and what it lets Isolde teach next"
         case .analysisTier: "another tier of the page lens — you can read more off a page before you spend it"
         case .stationTier: "a deeper specialist capability at this station"

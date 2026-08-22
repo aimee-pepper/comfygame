@@ -342,7 +342,7 @@ struct RunExitSummaryView: View {
             .scrollBounceBehavior(.basedOnSize)
 
             VStack {
-                Button("Return to Base", action: dismiss)
+                Button("Return to Village", action: dismiss)
                     .font(.custom("Tiny5", size: 13))
                     .foregroundStyle(Color.white)
                     .frame(maxWidth: .infinity, minHeight: 54)
@@ -498,7 +498,7 @@ struct RunExitSummaryView: View {
         return VStack(alignment: .leading, spacing: 6) {
             Text("PERMANENT GAINS").font(.custom("Tiny5", size: 9))
                 .foregroundStyle(PixelUITheme.muted)
-            Text("Knowledge, people & party").font(.custom("Jersey 10", size: 16))
+            Text("Writing, people & XP").font(.custom("Jersey 10", size: 16))
             LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 4) {
                 ForEach(presentation.cells) { cell in
                     ledgerCell(cell.heading, cell.value, cell.detail)
@@ -562,7 +562,7 @@ struct RunExitSummaryView: View {
     private func sectionSubtitle(_ title: String) -> String {
         switch title {
         case "Recovered": "Resources, items & pages"
-        case "Kept with you": "Writing, travellers & progress"
+        case "Kept with you": "Writing, people & XP"
         case "Lost": "Things left behind"
         default: title
         }

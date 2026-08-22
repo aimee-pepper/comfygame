@@ -226,7 +226,7 @@ struct ConstellationNodeDetail: View {
                         .font(.caption.weight(.semibold)).foregroundStyle(state.tint)
                 }
                 Divider()
-                Text("The Constellation changes Reality itself, rather than one building or one person.")
+                Text("The Constellation changes the whole campaign, rather than one building or one person.")
                     .font(.caption).foregroundStyle(.secondary)
             }
             .padding(16)
@@ -254,13 +254,13 @@ struct ConstellationNodeDetail: View {
                     if store.buy(node) {
                         purchaseFailure = nil
                     } else {
-                        purchaseFailure = "Your Motes or this node's rank changed. Review the current cost before trying again."
+                        purchaseFailure = "Your Motes or this Mastery’s rank changed. Review the current cost before trying again."
                     }
                 }
             }
             Button("Not yet", role: .cancel) {}
         } message: {
-            Text("This permanently changes Reality for the current campaign.")
+            Text("This permanently changes the current campaign.")
         }
         .alert("Constellation not changed", isPresented: Binding(
             get: { purchaseFailure != nil },

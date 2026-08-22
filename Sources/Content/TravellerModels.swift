@@ -18,6 +18,18 @@ struct TravellerDef: Codable, Equatable, Identifiable, Sendable {
         case midLate = "mid-late"
         case late
         case endgame
+
+        var displayName: String {
+            switch self {
+            case .opening: "Opening"
+            case .earlyMid: "Early–mid"
+            case .startOfMid: "Start of midgame"
+            case .mid: "Midgame"
+            case .midLate: "Mid–late"
+            case .late: "Late"
+            case .endgame: "Endgame"
+            }
+        }
     }
 
     var id: TravellerID

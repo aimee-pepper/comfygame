@@ -12,13 +12,13 @@ struct TutorialLessonDefinition: Identifiable, Sendable {
 enum TutorialRules {
     static let definitions: [TutorialLessonDefinition] = [
         .init(id: .writingPageRequest, group: .writing, title: "A page is a request",
-              body: "Choose a word and place its mark—or leave subjects unwritten and let the world decide.",
+              body: "Choose a word and place its Sigil—or leave Subjects unwritten and let the world decide.",
               anchorLabel: "Page grid"),
-        .init(id: .writingPageSpace, group: .writing, title: "Marks take room",
-              body: "The number on a word is its footprint; one page cannot hold every request.",
+        .init(id: .writingPageSpace, group: .writing, title: "Sigils take room",
+              body: "The number on a word is its footprint; one Page cannot hold every request.",
               anchorLabel: "Palette footprint"),
         .init(id: .writingPreview, group: .writing, title: "Reading the preview",
-              body: "Written subjects are described; unwritten subjects remain ranges until binding.",
+              body: "Written Subjects are described; unwritten Subjects remain ranges until binding.",
               anchorLabel: "The world pane"),
         .init(id: .writingBind, group: .writing, title: "Binding an expedition",
               body: "Binding spends the shown essence and opens one expedition. The book and everything you learn remain recorded after the trip ends.",
@@ -36,11 +36,11 @@ enum TutorialRules {
               body: "A portal returns the full haul. If defeat or the collapsing floor carries you home, knowledge stays and only part of what you found may be lost.",
               anchorLabel: "Portal home"),
         .init(id: .returnPersistenceBoundary, group: .worlds, title: "What crossed home",
-              body: "Resources and objects cross into the Base. Writing, discoveries and people are remembered in Reality even when part of a haul was lost.",
+              body: "Recovered resources and objects come home with you. Writing, discoveries, and people stay with you even when part of a haul was lost.",
               anchorLabel: "Expedition recap"),
         .init(id: .baseFirstResultRoute, group: .worlds, title: "Follow what returned",
-              body: "Your first result points to one place at the Base. The route stays the same if you visit it later.",
-              anchorLabel: "Base destination"),
+              body: "Your first result points to one place in the village. The route stays the same if you visit it later.",
+              anchorLabel: "Village destination"),
         .init(id: .libraryFirstWriting, group: .worlds, title: "Reading recovered writing",
               body: "The Library keeps recovered words as written. It does not translate traveller passages into checklists.",
               anchorLabel: "Recovered record"),
@@ -116,7 +116,7 @@ enum TutorialRules {
         case .storehouse: return "Something returned without a known name. The Storehouse is where an object can be identified without guessing at its use."
         case .workshop: return "Raw essence cannot bind a page. Refine what returned at the Essence Spring."
         case .essenceSpring: return "Raw essence cannot bind a page. Refine what returned at the Essence Spring."
-        case .firepit: return "Someone new is at the Base. The Firepit is where you choose who travels; Party holds their stats, gear, rank and gambits."
+        case .firepit: return "Someone new is in the village. The Firepit is where you choose who travels; Party holds their stats, gear, rank and gambits."
         case .writingDesk: return "This journey is now part of World History. Bind again when you want another comparison."
         }
     }
@@ -138,7 +138,7 @@ enum TutorialRules {
         else { return nil }
         return switch writing.family {
         case .fieldNote: "A Field note remembers one truthful relation from the place where it was found. It can help you read worlds, but it is not part of a traveller's location."
-        case .routeMark: "A Route mark preserves one short path from that world. It reveals no destination beyond the marked ground."
+        case .routeMark: "A Route sketch preserves one short path from that world. It reveals no destination beyond the sketched ground."
         case .siteFragment: "A Site fragment records words tied to a place you could already see. It does not reveal what the site contains."
         case .workingScrap: "A Working scrap teaches one ordinary recipe. It grants the knowledge, not the item or the materials to make it."
         }

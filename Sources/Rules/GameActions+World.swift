@@ -1091,7 +1091,7 @@ extension GameStore {
                 }
                 let title: String = switch writing.family {
                 case .fieldNote: "Field note"
-                case .routeMark: "Route mark"
+                case .routeMark: "Route sketch"
                 case .siteFragment: "Site fragment"
                 case .workingScrap: "Working scrap"
                 }

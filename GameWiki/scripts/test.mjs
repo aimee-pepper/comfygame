@@ -28,16 +28,18 @@ const stationsAuthority = JSON.parse(await readFile(resolve(root, "../Sources/Co
 const itemsAuthority = JSON.parse(await readFile(resolve(root, "../Sources/Content/Data/items.json"), "utf8"));
 const resourcesAuthority = JSON.parse(await readFile(resolve(root, "../Sources/Content/Data/resources.json"), "utf8"));
 const travellersAuthority = JSON.parse(await readFile(resolve(root, "../Sources/Content/Data/travellers.json"), "utf8"));
+const terminologyAuthority = JSON.parse(await readFile(resolve(root, "../docs/canonical-game-terminology.json"), "utf8"));
+const roadmapAuthority = JSON.parse(await readFile(resolve(root, "../Sources/Content/Data/playability-roadmap.json"), "utf8"));
 const topLevelRoutes = ["overview", "core-loop", "world-writing", "exploration", "combat", "people", "village-buildings", "resources-crafting", "catalogue", "roadmap", "history", "asset-gallery"];
 assert(topLevelRoutes.length === 12 && topLevelRoutes.every(route => data.routes.includes(route)), "all 12 top-level routes must remain registered");
 for (const renderer of ["overview", "coreLoop", "worldWriting", "exploration", "combat", "people", "village", "resources", "catalogue", "roadmap", "history", "assets"]) {
   assert(appSource.includes(`function ${renderer}(`), `top-level route lacks dedicated renderer: ${renderer}`);
 }
-for (const type of ["station", "traveller", "resource", "creatureMaterial", "gear", "consumable", "curio", "treasure", "key", "rune", "roadmap"]) {
+for (const type of ["station", "traveller", "resource", "creatureMaterial", "gear", "consumable", "curio", "treasure", "key", "rune", "roadmap", "terminology"]) {
   assert(data.search.some(item => item.type === type), `search lacks ${type}`);
   const example = data.search.find(item => item.type === type);
   const query = example.name.toLowerCase();
-  assert(data.search.some(item => `${item.name} ${item.id} ${item.summary} ${item.type}`.toLowerCase().includes(query)), `search cannot find representative ${type}`);
+  assert(data.search.some(item => item.searchText.includes(query)), `search cannot find representative ${type}`);
 }
 const itemCounts = Object.fromEntries(["gear", "consumable", "curio", "treasure", "key"].map(kind => [kind, data.items.filter(item => item.category === kind).length]));
 assert(JSON.stringify(itemCounts) === JSON.stringify({ gear: 75, consumable: 18, curio: 2, treasure: 5, key: 2 }), "all 102 live items must partition exactly by kind");
@@ -46,9 +48,15 @@ const gearSlots = Object.fromEntries(["weapon", "offhand", "head", "armor", "han
 assert(JSON.stringify(gearSlots) === JSON.stringify({ weapon: 34, offhand: 6, head: 6, armor: 6, hands: 5, feet: 5, tool: 5, keepsake: 8 }), "gear slots must match the exact live catalogue");
 assert(data.items.filter(item => item.gear?.slot === "weapon").every(item => item.gear.damage && item.gear.reach), "every weapon detail must expose damage and reach");
 assert(data.items.every(item => item.summary && data.routes.includes(`item/${item.slug}`)), "every item needs a nonempty explanation and stable detail route");
+for (const copy of ["Sold by the Trading Post", "Accepted by the Recycler", "No value is currently defined."]) {
+  assert(appSource.includes(copy), `item detail lacks canonical player copy: ${copy}`);
+}
+for (const leak of ["None authored in items.json", "sellable", "recyclable"]) {
+  assert(!appSource.includes(`\`${leak}`) && !appSource.includes(`\"${leak}\"`), `item detail exposes implementation copy: ${leak}`);
+}
 assert(data.resources.length === 23 && data.resources.length === resourcesAuthority.resources.length && new Set(data.resources.map(item => item.id)).size === 23, "all 23 resource IDs must be accounted for exactly once");
-assert(data.resources.every(item => ["worldResource", "currencyEssence"].includes(item.domain) && item.summary && item.currentUses.length && data.routes.includes(`resource/${item.slug}`)), "every resource needs one domain, explanation, uses and stable detail route");
-assert(data.resources.filter(item => item.domain === "worldResource").length + data.resources.filter(item => item.domain === "currencyEssence").length === 23, "resource domains must form an exact partition");
+assert(data.resources.every(item => ["worldResource", "currencyEssence"].includes(item.category) && ["World resource", "Currency & Essence"].includes(item.domain) && item.summary && item.currentUses.length && data.routes.includes(`resource/${item.slug}`)), "every resource needs one domain, explanation, uses and stable detail route");
+assert(data.resources.filter(item => item.category === "worldResource").length + data.resources.filter(item => item.category === "currencyEssence").length === 23, "resource domains must form an exact partition");
 assert(data.creatureMaterials.some(item => item.status === "live legacy material model") && data.creatureMaterials.some(item => item.status === "current design / not yet live"), "live and designed creature-material families must remain visibly separate");
 const designedCreatureFamilies = data.creatureMaterials.filter(item => item.disposition === "proposed").map(item => item.familyID).sort();
 assert(JSON.stringify(designedCreatureFamilies) === JSON.stringify(["bone", "chitin", "claw", "down", "fang", "feather", "fin", "hide", "horn", "ichor", "oil", "pelt", "plate", "quill", "scale", "shell", "tusk", "venom"]), "designed Creature Materials must be the exact 18-family ComponentProfile register");
@@ -68,11 +76,50 @@ assert(data.search.filter(item => item.type === "traveller").every(item => item.
 const lexemeCounts = Object.fromEntries(["target", "source", "qualifier", "compound"].map(kind => [kind, data.symbols.filter(item => item.category === kind).length]));
 assert(JSON.stringify(lexemeCounts) === JSON.stringify({ target: 8, source: 62, qualifier: 17, compound: 21 }), "World Writing must exactly partition all 108 canonical lexemes");
 assert(data.symbols.every(item => item.stableID && item.summary && item.writability && item.disclosure && data.routes.includes(`lexeme/${item.slug}`)), "every lexeme needs typed facts, disclosure state and a stable detail route");
+assert(data.symbols.filter(item => ["source", "compound"].includes(item.category)).every(item => item.writability === `Writable after this ${item.playerKind} is learned`), "learned Focus and Compound writability must use canonical player kinds");
+assert(data.symbols.every(item => !/campaign owns this|\bsource\b|\bqualifier\b/i.test(item.writability)), "lexeme writability must not expose internal ownership or player-kind names");
+assert(data.symbols.every(item => ["Found in a world", "Learned through an Upgrade", "Learned from diary writing", "Known at the start", "Always available vocabulary"].includes(item.acquisition)), "lexeme acquisition must use the closed player-copy mapping");
+assert(data.symbols.some(item => item.internalAcquisition === "worldDrop" && item.acquisition === "Found in a world") && data.symbols.some(item => item.internalAcquisition === "research" && item.acquisition === "Learned through an Upgrade") && data.symbols.some(item => item.internalAcquisition === "diary" && item.acquisition === "Learned from diary writing") && data.symbols.some(item => item.internalAcquisition === "starter" && item.acquisition === "Known at the start") && data.symbols.some(item => item.internalAcquisition === "always" && item.acquisition === "Always available vocabulary"), "every authored acquisition kind needs exact plain display copy");
 assert(data.routes.filter(route => route.startsWith("lexeme/")).length === 108, "World Writing must retain exactly 108 lexeme detail routes");
 assert(data.search.filter(item => item.type === "rune").length === 108, "World Writing must retain exactly 108 lexeme search routes");
-assert(data.search.filter(item => item.type === "rune").every(item => item.route.startsWith("lexeme/") && ["target", "source", "qualifier", "compound"].includes(item.category)), "rune search must open exact typed lexeme routes");
+assert(data.search.filter(item => item.type === "rune").every(item => item.route.startsWith("lexeme/") && ["Subject", "Focus", "Modifier", "Compound"].includes(item.category)), "Sigil search must open exact player-kind lexeme routes");
+const resourceByID = Object.fromEntries(data.resources.map(item => [item.id, item]));
+assert(resourceByID.ore.summary === "Mostly shaped by Substrate pressure.", "resource detail must lead with a plain pressure explanation");
+assert(resourceByID.ore.favours.includes("Hard Substrate helps at 25/100 or more."), "resource form minimum must be explained plainly");
+assert(resourceByID.silver.favours.includes("Valuable Substrate helps when present."), "resource tag presence must be explained plainly");
+assert(resourceByID.quartz.favours.includes("Atmospheric clarity helps at 70/100 or more."), "resource aspect minimum must be explained plainly");
+assert(resourceByID.clay.favours.includes("Available water helps at 30/100 or more."), "resource available minimum must be explained plainly");
+assert(resourceByID.clay.favours.includes("Hard Substrate helps at 25/100 or less."), "resource maximum must be explained plainly");
+assert(resourceByID.obsidian.favours.some(value => value.startsWith("Geothermal heat")), "geothermal tag needs a closed plain subject");
+assert(resourceByID.salt.favours.some(value => value.startsWith("Briny water")) && resourceByID.salt.favours.some(value => value.startsWith("Water salinity")), "brine and salinity need closed water subjects");
+assert(resourceByID.toxin.favours.some(value => value.startsWith("Toxic air")), "atmosphere toxicity needs a closed plain subject");
+assert(resourceByID.adamant.favours.some(value => value.startsWith("Unstable ground")), "unstable-ground tag needs a closed plain subject");
+assert(resourceByID.ichor.favours.some(value => value.startsWith("Sourceless light")), "sourceless illumination needs a closed plain subject");
+assert(resourceByID.fiber.favours.some(value => value.includes("trophic depth")), "camel-case resource aspects must split into words");
+assert(resourceByID.rift_glass.favours.some(value => value.startsWith("Irregular World cycle")), "arrhythmic cycle needs a closed plain subject");
+assert(data.resources.every(item => ["World resource", "Currency & Essence"].includes(item.domain) && item.tradeBand[0] === item.tradeBand[0].toUpperCase()), "resource domains and trade bands must be readable display values");
+assert(data.resources.some(item => item.currentUses.includes("No current Village construction recipe uses this resource.")), "unused resources need a plain Village construction explanation");
+assert(data.resources.some(item => item.currentUses.includes("Used to construct the Blacksmith.")), "construction uses must read as plain player-facing sentences");
+assert(data.resources.some(item => item.currentUses.includes("Used to construct the Armoury.")), "leading The in a building name must be sentence-cased");
+assert(data.resources.every(item => !item.currentUses.some(value => /Used to construct (?:the The|The)\b/.test(value))), "construction-use formatter left a mid-sentence capital article");
+assert(data.resources.every(item => !item.summary.includes("Driven by") && !item.currentUses.some(value => value.includes("stations.json"))), "resource detail must not lead with raw generator grammar or source filenames");
 assert(data.roadmap.every(item => item.summary && item.gate && data.routes.includes(`roadmap/${item.slug}`)), "every roadmap receipt needs explanation, gate and detail route");
-assert(data.roadmap.filter(item => item.isPrimary).length === 1 && data.roadmap.find(item => item.isPrimary)?.id === "world-arrival-reveal", "World Arrival must be the sole current implementation primary");
+const authorityPrimaries = roadmapAuthority.items.filter(item => item.isPrimary).map(item => item.id).sort();
+const generatedPrimaries = data.roadmap.filter(item => item.isPrimary).map(item => item.id).sort();
+assert(JSON.stringify(generatedPrimaries) === JSON.stringify(authorityPrimaries), "roadmap primary IDs must derive from current data");
+assert(authorityPrimaries.length === 1, "current roadmap authority must declare exactly one primary");
+assert(data.terminology.length === terminologyAuthority.terms.length, "every terminology authority entry must have one generated concept");
+assert(new Set(data.terminology.map(term => term.id)).size === terminologyAuthority.terms.length, "terminology concept IDs must be unique");
+assert(data.terminology.every(term => data.routes.filter(route => route === `terminology/${term.slug}`).length === 1), "every terminology concept needs exactly one detail route");
+for (const authorityTerm of terminologyAuthority.terms) {
+  const term = data.terminology.find(candidate => candidate.id === authorityTerm.concept);
+  assert(term?.name === authorityTerm.canonical, `canonical terminology title mismatch: ${authorityTerm.concept}`);
+  for (const alias of authorityTerm.retire) {
+    const matches = data.search.filter(item => item.searchText.includes(alias.toLowerCase()) && item.route === `terminology/${term.slug}`);
+    assert(matches.length === 1 && matches[0].name === authorityTerm.canonical && matches[0].category === "Terminology", `retired alias must invisibly route to canonical concept: ${authorityTerm.concept}/${alias}`);
+  }
+}
+assert(!data.terminology.some(term => term.aliases.some(alias => alias === term.name)), "retired aliases may not become canonical titles");
 for (const station of data.stations) {
   assert(station.id && station.provenance.stableID === station.id, `station provenance missing: ${station.id}`);
   assert(station.provenance.sourcePaths.length >= 3, `station authority sources missing: ${station.id}`);
@@ -134,14 +181,14 @@ assert(!data.assetGallery.slots.some(slot => slot.key.startsWith("binder_house."
 assert(data.assetGallery.slots.filter(slot => slot.status === "Game Design accepted candidate / native integration not yet accepted").length === 14, "only the five Built candidates, eight checkpoint-3 states and Binder House root may be candidate-accepted");
 assert(data.assetGallery.slots.every(slot => slot.assetPath === null), "no unaccepted art path may enter a stable slot");
 assert(data.currentTruth.writing.status === "readyToTest", "Writing must remain source-integrated and pending ordinary-phone acceptance");
-assert(data.currentTruth.writing.isPrimary === false, "Writing phone acceptance must not block the active World Arrival implementation");
+assert(data.currentTruth.writing.isPrimary === false, "Writing phone acceptance must not block the active canonical terminology work");
 assert(data.currentTruth.writing.acceptanceGate.includes("Install every verified phone-ready update promptly in place") && data.currentTruth.writing.acceptanceGate.includes("do not auto-launch"), "Writing must retain the corrected default phone-install/no-auto-launch authority");
 assert(data.currentTruth.writing.e5ToE7Status === "not started", "Writing E5-E7 must not be silently promoted");
 assert(data.currentTruth.writing.parchment.nativeSourceIntegrated === true, "accepted Writing parchment must remain hash-pinned in native source and bundle");
 assert(data.currentTruth.writing.parchment.artifactIntegrationReady === false, "the standalone parchment candidate manifest must retain its own non-integration-ready receipt");
 assert(data.currentTruth.writing.markArtStatus.includes("temporary") && data.currentTruth.writing.markArtStatus.includes("not accepted"), "temporary Writing mark art must not be presented as final sigil design");
 assert(data.currentTruth.terrain.borderCorrection.status === "complete", "the closed Terrain border correction must remain complete");
-assert(data.currentTruth.terrain.layeredPresentation.status === "readyToTest" && data.currentTruth.terrain.layeredPresentation.nativeStatus.includes("installed from 366f5ccf") && data.currentTruth.terrain.layeredPresentation.nativeStatus.includes("integrationReady:false") && data.currentTruth.terrain.layeredPresentation.nativeStatus.includes("fail-safe"), "layered Terrain must report installed native truth, pending visual acceptance and retained fallback");
+assert(data.currentTruth.terrain.layeredPresentation.status === "readyToTest" && data.currentTruth.terrain.layeredPresentation.nativeStatus.includes("source-integrated and installed") && data.currentTruth.terrain.layeredPresentation.nativeStatus.includes("366f5ccf") && data.currentTruth.terrain.layeredPresentation.nativeStatus.includes("integrationReady:false") && data.currentTruth.terrain.layeredPresentation.nativeStatus.includes("fail-safe"), "layered Terrain must report installed native truth, pending visual acceptance and retained fallback");
 assert(data.currentTruth.terrain.atmosphere.status === "queued" && data.currentTruth.terrain.atmosphere.nativeStatus.includes("native integration is queued"), "accepted Atmosphere candidate must not be claimed native");
 assert(data.currentTruth.writing.provenance.sourcePaths.every(path => data.currentTruth.writing.provenance.sourceHashes[path]), "Writing current-truth provenance must hash every registered source");
 assert(data.currentTruth.terrain.provenance.sourcePaths.every(path => data.currentTruth.terrain.provenance.sourceHashes[path]), "Terrain current-truth provenance must hash every registered source");
@@ -149,7 +196,7 @@ for (const item of data.search) {
   assert(item.provenance.generatedAtSourceHash === data.generatedAtSourceHash, `fact hash missing: ${item.type}/${item.id}`);
   assert(item.provenance.sourcePaths.length, `fact source missing: ${item.type}/${item.id}`);
 }
-for (const route of ["overview", "core-loop", "world-writing", "exploration", "combat", "people", "village-buildings", "resources-crafting", "catalogue", "catalogue/gear", "catalogue/consumables", "catalogue/curios", "catalogue/treasures", "catalogue/keys", "roadmap", "history", "asset-gallery"]) {
+for (const route of ["overview", "core-loop", "world-writing", "exploration", "combat", "people", "terminology", "village-buildings", "resources-crafting", "catalogue", "catalogue/gear", "catalogue/consumables", "catalogue/curios", "catalogue/treasures", "catalogue/keys", "roadmap", "history", "asset-gallery"]) {
   assert(data.routes.includes(route), `required route missing: ${route}`);
 }
 assert(!appSource.includes("function authorityPage") && !appSource.includes("authorityPage("), "required routes must not retain the generic authority fallback");

@@ -171,7 +171,7 @@ struct ChannelworksView: View {
                     Text(store.odaRestoredConduitLocation.map { "The restored fixture is \($0)." }
                          ?? "The restoration is complete. The original fixture is no longer in known Home storage.")
                         .font(.caption).foregroundStyle(.secondary)
-                    Text("Build another conduit by consuming one player-made Heat core and transferring its attunement, potency and origin receipt into a contained fixture.")
+                    Text("Build another conduit by consuming one player-made Heat core and transferring its attunement, potency, and recorded origin into a contained fixture.")
                         .font(.caption).foregroundStyle(.secondary)
 
                     Label(hasHeatCore ? "Heat core ready" : "Requires one Heat core",
@@ -1255,7 +1255,7 @@ private struct CompoundRunebookView: View {
             }
             Button("Keep compound", role: .cancel) { deleting = nil }
         } message: {
-            Text("Placed pages keep their frozen meaning. Only future placement is removed.")
+            Text("Pages already using this Compound keep the meaning they had when written. Only future placement is removed.")
         }
     }
 
@@ -1374,11 +1374,8 @@ enum CompoundRunebookPresentation {
             target: receipt.target, expansion: receipt.atoms, vocabulary: receipt.vocabulary,
             vocabularySchemaVersion: receipt.vocabularySchemaVersion, provenance: "Preview",
             creationOrdinal: 0)
-        let atomic = receipt.vocabulary.compactMap { identity -> Int? in
-            guard let content = identity.markContent else { return nil }
-            return PageRules.shape(for: content, hand: hand)?.footprint
-        }.reduce(0, +)
-        return "\(PageRules.personalCompoundFootprint(temporary, hand: hand)) cells · \(atomic) spelled out"
+        let writtenSigilCount = receipt.vocabulary.count
+        return "\(PageRules.personalCompoundFootprint(temporary, hand: hand)) cells · \(writtenSigilCount) \(writtenSigilCount == 1 ? "Sigil" : "Sigils") written out"
     }
 
     static func message(_ result: CompoundAssemblyResult) -> String {
@@ -1389,7 +1386,7 @@ enum CompoundRunebookPresentation {
         case .ineligible(let issue): ineligibilityMessage(issue)
         case .alreadyFormalized: "This statement is already in the Runebook."
         case .insufficientResources: "Formalization needs more Essence or pulp."
-        case .stale: "The receipt or cost changed. Review it and try again."
+        case .stale: "The statement or cost changed. Review it and try again."
         case .formalized, .renamed, .deleted, .noChange: ""
         }
     }
@@ -1463,7 +1460,7 @@ struct SurveyPostView: View {
                 }
 
                 StationCard(title: "Pack for the next world", icon: "backpack.fill") {
-                    Text("Choose which instruments cross the threshold with you. The selection is frozen for the whole trip.")
+                    Text("Choose which instruments cross the threshold with you. Your choices are saved for the whole trip.")
                         .font(.caption).foregroundStyle(.secondary)
                     if store.state.reality.instruments.isEmpty {
                         Text("Build an instrument below to begin a field kit.")
@@ -1600,7 +1597,7 @@ struct ConstellationView: View {
             .accessibilitySortPriority(2)
             Spacer(minLength: 24)
 
-            Text("The Constellation changes Reality itself, rather than one building or one person.")
+            Text("The Constellation changes the whole campaign, rather than one building or one person.")
                 .font(.callout).foregroundStyle(.secondary)
                 .multilineTextAlignment(.center)
                 .padding(.horizontal, 24)
