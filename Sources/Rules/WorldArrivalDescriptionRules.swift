@@ -45,6 +45,9 @@ enum WorldArrivalDescriptionRules {
             if $0.sourcePageOrder != $1.sourcePageOrder {
                 return $0.sourcePageOrder < $1.sourcePageOrder
             }
+            if $0.candidateMarkID != $1.candidateMarkID {
+                return $0.candidateMarkID.rawValue < $1.candidateMarkID.rawValue
+            }
             return scopeOrder($0.scope) < scopeOrder($1.scope)
         }
         var namedMarks: Set<InstanceID> = []
@@ -294,12 +297,6 @@ enum WorldArrivalDescriptionRules {
             default: break
             }
         }
-        if environment.illuminationBand == "trueDark" {
-            return "only the ground nearest the entry remained clearly visible"
-        }
-        if environment.illuminationBand == "blazing" {
-            return "hard light reached every open surface"
-        }
         if environment.suspendedDensity == "trace" || environment.suspendedDensity == "light" {
             switch environment.suspendedMedium {
             case "smoke": return "thin smoke drifted through the open ground"
@@ -317,8 +314,6 @@ enum WorldArrivalDescriptionRules {
             default: break
             }
         }
-        if environment.illuminationBand == "dim" { return "dim light left the farther ground subdued" }
-        if environment.illuminationBand == "bright" { return "clear light separated the open surfaces" }
         switch (environment.floraCoverageBand, environment.floraHabit) {
         case ("abundant", "spreading"): return "growth spread across most open ground"
         case ("abundant", "clustered"): return "dense growth gathered in broad clusters"
@@ -329,8 +324,17 @@ enum WorldArrivalDescriptionRules {
         case ("sparse", _) where dominantGround == .stone:
             return "sparse growth settled on the open stone"
         case ("sparse", _): return "sparse growth settled across a few open patches"
-        default: return nil
+        default: break
         }
+        if environment.illuminationBand == "trueDark" {
+            return "only the ground nearest the entry remained clearly visible"
+        }
+        if environment.illuminationBand == "blazing" {
+            return "hard light reached every open surface"
+        }
+        if environment.illuminationBand == "dim" { return "dim light left the farther ground subdued" }
+        if environment.illuminationBand == "bright" { return "clear light separated the open surfaces" }
+        return nil
     }
 
     private static func knownDisplayName(_ fact: WorldArrivalReceipt.CausalVisualFact) throws -> String {
@@ -540,13 +544,9 @@ enum WorldArrivalCausalCandidateRules {
         if owns(.water), actualWaterBand != withoutWaterBand {
             facts.append(fact(.water, .reshaped, actualWaterBand, withoutWaterBand))
         } else if owns(.water), actualWater.wet != withoutWater.wet || actualWater.deep != withoutWater.deep {
-            let actualMagnitude = actualWater.wet + actualWater.deep
-            let withoutMagnitude = withoutWater.wet + withoutWater.deep
-            if actualMagnitude != withoutMagnitude {
-                let structural = candidate.semanticKey == "archipelago"
+            if let kind = waterContribution(actual: actualWater, without: withoutWater) {
                 facts.append(fact(.water,
-                                  structural ? .reshaped
-                                    : actualMagnitude > withoutMagnitude ? .increased : .reduced,
+                                  candidate.semanticKey == "archipelago" ? .reshaped : kind,
                                   actualWaterBand, withoutWaterBand))
             }
         }
@@ -602,6 +602,29 @@ enum WorldArrivalCausalCandidateRules {
         let counts = groundCounts(map)
         return ((counts[.water] ?? 0) + (counts[.deepWater] ?? 0), counts[.deepWater] ?? 0)
     }
+    private enum WaterComposition: Equatable { case shallowOnly, deepOnly, mixed }
+    private static func waterComposition(shallow: Int, deep: Int) -> WaterComposition? {
+        if shallow > 0, deep == 0 { return .shallowOnly }
+        if shallow == 0, deep > 0 { return .deepOnly }
+        if shallow > 0, deep > 0 { return .mixed }
+        return nil
+    }
+    static func waterContribution(
+        actual: (wet: Int, deep: Int), without: (wet: Int, deep: Int)
+    ) -> WorldArrivalReceipt.CausalVisualFact.ContributionKind? {
+        let actualShallow = actual.wet - actual.deep
+        let withoutShallow = without.wet - without.deep
+        guard actualShallow >= 0, withoutShallow >= 0 else { return .reshaped }
+        let actualComposition = waterComposition(shallow: actualShallow, deep: actual.deep)
+        let withoutComposition = waterComposition(shallow: withoutShallow, deep: without.deep)
+        guard actualComposition == withoutComposition else { return .reshaped }
+        let shallowDelta = actualShallow - withoutShallow
+        let deepDelta = actual.deep - without.deep
+        if shallowDelta == 0, deepDelta == 0 { return nil }
+        if shallowDelta >= 0, deepDelta >= 0 { return .increased }
+        if shallowDelta <= 0, deepDelta <= 0 { return .reduced }
+        return .reshaped
+    }
     private static func waterBand(_ counts: (wet: Int, deep: Int), in map: WorldMap) throws -> String {
         let nonChasm = map.tiles.count { $0.ground != .chasm }
         guard nonChasm > 0, counts.deep <= counts.wet else {
@@ -620,7 +643,7 @@ enum WorldArrivalCausalCandidateRules {
         let placedSet = Set(placed)
         let identity = summary.flora.filter { placedSet.contains($0.id) }.map { plant in
             let form = plant.traits.metabolism == .fungal ? "fungal" : plant.traits.tissue.dominant.rawValue
-            return "\(plant.id.rawValue)|\(form)|\(plant.traits.habit.rawValue)"
+            return "\(plant.identity.name)|\(form)|\(plant.traits.habit.rawValue)"
         }.sorted()
         let denominator = summary.map.tiles.count { $0.ground != .chasm }
         let band = placed.isEmpty ? "none"

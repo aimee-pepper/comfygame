@@ -545,6 +545,58 @@ final class PageTests: XCTestCase {
         }
     }
 
+    func testArrivalWaterCausalityUsesIndependentShallowAndDeepDeltas() {
+        typealias Kind = WorldArrivalReceipt.CausalVisualFact.ContributionKind
+        func classify(actualShallow: Int, actualDeep: Int,
+                      withoutShallow: Int, withoutDeep: Int) -> Kind? {
+            WorldArrivalCausalCandidateRules.waterContribution(
+                actual: (actualShallow + actualDeep, actualDeep),
+                without: (withoutShallow + withoutDeep, withoutDeep))
+        }
+
+        XCTAssertEqual(classify(actualShallow: 20, actualDeep: 5,
+                                withoutShallow: 25, withoutDeep: 0), .reshaped,
+                       "shallow-only becoming mixed changes composition")
+        XCTAssertEqual(classify(actualShallow: 15, actualDeep: 10,
+                                withoutShallow: 10, withoutDeep: 15), .reshaped,
+                       "equal-total mixed redistribution changes shape")
+        XCTAssertEqual(classify(actualShallow: 15, actualDeep: 10,
+                                withoutShallow: 12, withoutDeep: 8), .increased)
+        XCTAssertEqual(classify(actualShallow: 12, actualDeep: 8,
+                                withoutShallow: 15, withoutDeep: 10), .reduced)
+        XCTAssertEqual(classify(actualShallow: 10, actualDeep: 10,
+                                withoutShallow: 14, withoutDeep: 8), .reshaped,
+                       "opposing deltas must not cancel under the old wet+deep sum")
+    }
+
+    func testArrivalGrammarTieBreaksMalformedPageOrderByStableMarkIDThenScope() throws {
+        let facts: [WorldArrivalReceipt.CausalVisualFact] = [
+            .init(candidateMarkID: .init(rawValue: 30), semanticKey: "verdant",
+                  markDisplayName: "Verdant", sourcePageOrder: 0, scope: .flora,
+                  contributionKind: .increased, resultBand: "present",
+                  withoutAuthoredBand: "sparse"),
+            .init(candidateMarkID: .init(rawValue: 10), semanticKey: "archipelago",
+                  markDisplayName: "Archipelago", sourcePageOrder: 0, scope: .water,
+                  contributionKind: .reshaped, resultBand: "shelves",
+                  withoutAuthoredBand: "channels"),
+            .init(candidateMarkID: .init(rawValue: 20), semanticKey: "plains",
+                  markDisplayName: "Plains", sourcePageOrder: 0, scope: .ground,
+                  contributionKind: .reshaped, resultBand: "sand",
+                  withoutAuthoredBand: "stone")
+        ]
+        let payload = try acceptedArrivalPayload("starter_rainwashed_shore")
+        func copy(_ values: [WorldArrivalReceipt.CausalVisualFact]) throws -> String {
+            try WorldArrivalDescriptionRules.describe(.init(
+                dominantDryGround: payload.dominantGround,
+                terrain: arrivalTerrain("starter_rainwashed_shore"),
+                environment: arrivalEnvironment(payload), causalFacts: values))
+        }
+        let expected = try copy(facts)
+        XCTAssertEqual(try copy([facts[2], facts[0], facts[1]]), expected)
+        XCTAssertEqual(try copy([facts[1], facts[2], facts[0]]), expected)
+        XCTAssertEqual(try copy(Array(facts.reversed())), expected)
+    }
+
     func testCausalInterventionPreservesUnrelatedActualRollsAndUsesEmptyBaselineForNewSilence() throws {
         let authored = [Sigil(id: .init(rawValue: 91), source: "sun",
                               target: "illumination", intensity: .moderate)]
