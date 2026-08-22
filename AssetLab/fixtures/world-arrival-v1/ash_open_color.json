@@ -192,9 +192,6 @@
       {
         "x": 8,
         "y": 0,
-        "ground": "sand",
-        "elevation": 0,
-        "floraStableID": null,
         "visibility": "hidden"
       },
       {
@@ -264,9 +261,6 @@
       {
         "x": 8,
         "y": 1,
-        "ground": "sand",
-        "elevation": 0,
-        "floraStableID": null,
         "visibility": "hidden"
       },
       {
@@ -336,9 +330,6 @@
       {
         "x": 8,
         "y": 2,
-        "ground": "sand",
-        "elevation": 0,
-        "floraStableID": null,
         "visibility": "hidden"
       },
       {
@@ -408,9 +399,6 @@
       {
         "x": 8,
         "y": 3,
-        "ground": "sand",
-        "elevation": 0,
-        "floraStableID": null,
         "visibility": "hidden"
       },
       {
@@ -480,297 +468,186 @@
       {
         "x": 8,
         "y": 4,
-        "ground": "sand",
-        "elevation": 0,
-        "floraStableID": null,
         "visibility": "hidden"
       },
       {
         "x": 0,
         "y": 5,
-        "ground": "sand",
-        "elevation": 0,
-        "floraStableID": null,
         "visibility": "hidden"
       },
       {
         "x": 1,
         "y": 5,
-        "ground": "sand",
-        "elevation": 0,
-        "floraStableID": null,
         "visibility": "hidden"
       },
       {
         "x": 2,
         "y": 5,
-        "ground": "sand",
-        "elevation": 0,
-        "floraStableID": null,
         "visibility": "hidden"
       },
       {
         "x": 3,
         "y": 5,
-        "ground": "sand",
-        "elevation": 0,
-        "floraStableID": null,
         "visibility": "hidden"
       },
       {
         "x": 4,
         "y": 5,
-        "ground": "sand",
-        "elevation": 0,
-        "floraStableID": null,
         "visibility": "hidden"
       },
       {
         "x": 5,
         "y": 5,
-        "ground": "sand",
-        "elevation": 0,
-        "floraStableID": null,
         "visibility": "hidden"
       },
       {
         "x": 6,
         "y": 5,
-        "ground": "sand",
-        "elevation": 0,
-        "floraStableID": null,
         "visibility": "hidden"
       },
       {
         "x": 7,
         "y": 5,
-        "ground": "sand",
-        "elevation": 0,
-        "floraStableID": null,
         "visibility": "hidden"
       },
       {
         "x": 8,
         "y": 5,
-        "ground": "sand",
-        "elevation": 0,
-        "floraStableID": null,
         "visibility": "hidden"
       },
       {
         "x": 0,
         "y": 6,
-        "ground": "sand",
-        "elevation": 0,
-        "floraStableID": null,
         "visibility": "hidden"
       },
       {
         "x": 1,
         "y": 6,
-        "ground": "sand",
-        "elevation": 0,
-        "floraStableID": null,
         "visibility": "hidden"
       },
       {
         "x": 2,
         "y": 6,
-        "ground": "sand",
-        "elevation": 0,
-        "floraStableID": null,
         "visibility": "hidden"
       },
       {
         "x": 3,
         "y": 6,
-        "ground": "sand",
-        "elevation": 0,
-        "floraStableID": null,
         "visibility": "hidden"
       },
       {
         "x": 4,
         "y": 6,
-        "ground": "sand",
-        "elevation": 0,
-        "floraStableID": null,
         "visibility": "hidden"
       },
       {
         "x": 5,
         "y": 6,
-        "ground": "sand",
-        "elevation": 0,
-        "floraStableID": null,
         "visibility": "hidden"
       },
       {
         "x": 6,
         "y": 6,
-        "ground": "sand",
-        "elevation": 0,
-        "floraStableID": null,
         "visibility": "hidden"
       },
       {
         "x": 7,
         "y": 6,
-        "ground": "sand",
-        "elevation": 0,
-        "floraStableID": null,
         "visibility": "hidden"
       },
       {
         "x": 8,
         "y": 6,
-        "ground": "sand",
-        "elevation": 0,
-        "floraStableID": null,
         "visibility": "hidden"
       },
       {
         "x": 0,
         "y": 7,
-        "ground": "sand",
-        "elevation": 0,
-        "floraStableID": null,
         "visibility": "hidden"
       },
       {
         "x": 1,
         "y": 7,
-        "ground": "sand",
-        "elevation": 0,
-        "floraStableID": null,
         "visibility": "hidden"
       },
       {
         "x": 2,
         "y": 7,
-        "ground": "sand",
-        "elevation": 0,
-        "floraStableID": null,
         "visibility": "hidden"
       },
       {
         "x": 3,
         "y": 7,
-        "ground": "sand",
-        "elevation": 0,
-        "floraStableID": null,
         "visibility": "hidden"
       },
       {
         "x": 4,
         "y": 7,
-        "ground": "sand",
-        "elevation": 0,
-        "floraStableID": null,
         "visibility": "hidden"
       },
       {
         "x": 5,
         "y": 7,
-        "ground": "sand",
-        "elevation": 0,
-        "floraStableID": null,
         "visibility": "hidden"
       },
       {
         "x": 6,
         "y": 7,
-        "ground": "sand",
-        "elevation": 0,
-        "floraStableID": null,
         "visibility": "hidden"
       },
       {
         "x": 7,
         "y": 7,
-        "ground": "sand",
-        "elevation": 0,
-        "floraStableID": null,
         "visibility": "hidden"
       },
       {
         "x": 8,
         "y": 7,
-        "ground": "sand",
-        "elevation": 0,
-        "floraStableID": null,
         "visibility": "hidden"
       },
       {
         "x": 0,
         "y": 8,
-        "ground": "sand",
-        "elevation": 0,
-        "floraStableID": null,
         "visibility": "hidden"
       },
       {
         "x": 1,
         "y": 8,
-        "ground": "sand",
-        "elevation": 0,
-        "floraStableID": null,
         "visibility": "hidden"
       },
       {
         "x": 2,
         "y": 8,
-        "ground": "sand",
-        "elevation": 0,
-        "floraStableID": null,
         "visibility": "hidden"
       },
       {
         "x": 3,
         "y": 8,
-        "ground": "sand",
-        "elevation": 0,
-        "floraStableID": null,
         "visibility": "hidden"
       },
       {
         "x": 4,
         "y": 8,
-        "ground": "sand",
-        "elevation": 0,
-        "floraStableID": null,
         "visibility": "hidden"
       },
       {
         "x": 5,
         "y": 8,
-        "ground": "sand",
-        "elevation": 0,
-        "floraStableID": null,
         "visibility": "hidden"
       },
       {
         "x": 6,
         "y": 8,
-        "ground": "sand",
-        "elevation": 0,
-        "floraStableID": null,
         "visibility": "hidden"
       },
       {
         "x": 7,
         "y": 8,
-        "ground": "sand",
-        "elevation": 0,
-        "floraStableID": null,
         "visibility": "hidden"
       },
       {
         "x": 8,
         "y": 8,
-        "ground": "sand",
-        "elevation": 0,
-        "floraStableID": null,
         "visibility": "hidden"
       }
     ]

@@ -112,289 +112,181 @@
       {
         "x": 0,
         "y": 0,
-        "ground": "stone",
-        "elevation": 0,
-        "floraStableID": null,
         "visibility": "hidden"
       },
       {
         "x": 1,
         "y": 0,
-        "ground": "stone",
-        "elevation": 0,
-        "floraStableID": null,
         "visibility": "hidden"
       },
       {
         "x": 2,
         "y": 0,
-        "ground": "stone",
-        "elevation": 0,
-        "floraStableID": null,
         "visibility": "hidden"
       },
       {
         "x": 3,
         "y": 0,
-        "ground": "stone",
-        "elevation": 0,
-        "floraStableID": null,
         "visibility": "hidden"
       },
       {
         "x": 4,
         "y": 0,
-        "ground": "stone",
-        "elevation": 0,
-        "floraStableID": null,
         "visibility": "hidden"
       },
       {
         "x": 5,
         "y": 0,
-        "ground": "stone",
-        "elevation": 0,
-        "floraStableID": null,
         "visibility": "hidden"
       },
       {
         "x": 6,
         "y": 0,
-        "ground": "stone",
-        "elevation": 0,
-        "floraStableID": null,
         "visibility": "hidden"
       },
       {
         "x": 7,
         "y": 0,
-        "ground": "stone",
-        "elevation": 0,
-        "floraStableID": null,
         "visibility": "hidden"
       },
       {
         "x": 8,
         "y": 0,
-        "ground": "stone",
-        "elevation": 0,
-        "floraStableID": null,
         "visibility": "hidden"
       },
       {
         "x": 0,
         "y": 1,
-        "ground": "stone",
-        "elevation": 0,
-        "floraStableID": null,
         "visibility": "hidden"
       },
       {
         "x": 1,
         "y": 1,
-        "ground": "stone",
-        "elevation": 0,
-        "floraStableID": null,
         "visibility": "hidden"
       },
       {
         "x": 2,
         "y": 1,
-        "ground": "stone",
-        "elevation": 0,
-        "floraStableID": null,
         "visibility": "hidden"
       },
       {
         "x": 3,
         "y": 1,
-        "ground": "stone",
-        "elevation": 0,
-        "floraStableID": null,
         "visibility": "hidden"
       },
       {
         "x": 4,
         "y": 1,
-        "ground": "stone",
-        "elevation": 0,
-        "floraStableID": null,
         "visibility": "hidden"
       },
       {
         "x": 5,
         "y": 1,
-        "ground": "stone",
-        "elevation": 0,
-        "floraStableID": null,
         "visibility": "hidden"
       },
       {
         "x": 6,
         "y": 1,
-        "ground": "stone",
-        "elevation": 0,
-        "floraStableID": null,
         "visibility": "hidden"
       },
       {
         "x": 7,
         "y": 1,
-        "ground": "stone",
-        "elevation": 0,
-        "floraStableID": null,
         "visibility": "hidden"
       },
       {
         "x": 8,
         "y": 1,
-        "ground": "stone",
-        "elevation": 0,
-        "floraStableID": null,
         "visibility": "hidden"
       },
       {
         "x": 0,
         "y": 2,
-        "ground": "stone",
-        "elevation": 0,
-        "floraStableID": null,
         "visibility": "hidden"
       },
       {
         "x": 1,
         "y": 2,
-        "ground": "stone",
-        "elevation": 0,
-        "floraStableID": null,
         "visibility": "hidden"
       },
       {
         "x": 2,
         "y": 2,
-        "ground": "stone",
-        "elevation": 0,
-        "floraStableID": null,
         "visibility": "hidden"
       },
       {
         "x": 3,
         "y": 2,
-        "ground": "stone",
-        "elevation": 0,
-        "floraStableID": null,
         "visibility": "hidden"
       },
       {
         "x": 4,
         "y": 2,
-        "ground": "stone",
-        "elevation": 0,
-        "floraStableID": null,
         "visibility": "hidden"
       },
       {
         "x": 5,
         "y": 2,
-        "ground": "stone",
-        "elevation": 0,
-        "floraStableID": null,
         "visibility": "hidden"
       },
       {
         "x": 6,
         "y": 2,
-        "ground": "stone",
-        "elevation": 0,
-        "floraStableID": null,
         "visibility": "hidden"
       },
       {
         "x": 7,
         "y": 2,
-        "ground": "stone",
-        "elevation": 0,
-        "floraStableID": null,
         "visibility": "hidden"
       },
       {
         "x": 8,
         "y": 2,
-        "ground": "stone",
-        "elevation": 0,
-        "floraStableID": null,
         "visibility": "hidden"
       },
       {
         "x": 0,
         "y": 3,
-        "ground": "stone",
-        "elevation": 0,
-        "floraStableID": null,
         "visibility": "hidden"
       },
       {
         "x": 1,
         "y": 3,
-        "ground": "stone",
-        "elevation": 0,
-        "floraStableID": null,
         "visibility": "hidden"
       },
       {
         "x": 2,
         "y": 3,
-        "ground": "stone",
-        "elevation": 0,
-        "floraStableID": null,
         "visibility": "hidden"
       },
       {
         "x": 3,
         "y": 3,
-        "ground": "stone",
-        "elevation": 0,
-        "floraStableID": null,
         "visibility": "hidden"
       },
       {
         "x": 4,
         "y": 3,
-        "ground": "stone",
-        "elevation": 0,
-        "floraStableID": null,
         "visibility": "hidden"
       },
       {
         "x": 5,
         "y": 3,
-        "ground": "stone",
-        "elevation": 0,
-        "floraStableID": null,
         "visibility": "hidden"
       },
       {
         "x": 6,
         "y": 3,
-        "ground": "stone",
-        "elevation": 0,
-        "floraStableID": null,
         "visibility": "hidden"
       },
       {
         "x": 7,
         "y": 3,
-        "ground": "stone",
-        "elevation": 0,
-        "floraStableID": null,
         "visibility": "hidden"
       },
       {
         "x": 8,
         "y": 3,
-        "ground": "stone",
-        "elevation": 0,
-        "floraStableID": null,
         "visibility": "hidden"
       },
       {
