@@ -35,11 +35,16 @@ Show:
 - outcome silhouette/shape, not a giant SF Symbol;
 - exact outcome title: Returned through a portal, Returned by Waystone, Carried home, Lost to the collapsing
   world or Expedition abandoned;
-- plain-language reason;
+- one rules-frozen plain-language statement about the actual world at departure, using
+  `canonical-player-terminology-current.md`; never repeat the outcome title in sentence form;
 - `World {runIndex} · {turnsTaken} turns`;
 - `All physical haul returned` or exact retained fraction language.
 
 Do not repeat separate `Outcome`, `Recovered`, `Lost` and `Kept for good` title cards down one scroll.
+
+The permanent-gains summary uses **Writing found**, **Joined the village** and **XP earned**. It never says
+`marks / current draft`, counts a newly recruited traveller as `returned`, or collapses XP/levels into generic
+`progress / party total`.
 
 ### Tab rules
 

@@ -1,0 +1,43 @@
+{
+  "schemaVersion": 1,
+  "status": "implementationAuthority",
+  "rule": "oneConceptOneNameEverywhere",
+  "surfaces": [
+    "playerUI",
+    "debugUI",
+    "accessibility",
+    "wiki",
+    "tests",
+    "humanReadableLogs",
+    "currentDocumentation"
+  ],
+  "rawIdentifierRule": "secondaryMetadataAfterCanonicalNameOnly",
+  "terms": [
+    {"concept": "writtenWorldSymbol", "canonical": "Sigil", "retire": ["mark", "rune"]},
+    {"concept": "pageSubject", "canonical": "Subject", "retire": ["target"]},
+    {"concept": "pageFocus", "canonical": "Focus", "retire": ["source", "cause"]},
+    {"concept": "pageModifier", "canonical": "Modifier", "retire": ["qualifier"]},
+    {"concept": "assembledSigil", "canonical": "Compound", "retire": ["atom bundle", "precomposed symbol"]},
+    {"concept": "predictedWorld", "canonical": "World preview", "retire": ["projection"]},
+    {"concept": "generatedWorldInput", "canonical": "World pressure", "retire": ["pressure value", "generated input"]},
+    {"concept": "ordinaryWorld", "canonical": "Normal world", "retire": ["ordinary world"]},
+    {"concept": "availableEssence", "canonical": "Essence available", "retire": ["spendable runway", "Essence runway"]},
+    {"concept": "affordableWorldCount", "canonical": "Worlds you can afford", "retire": ["binding runway", "authored binds remaining"]},
+    {"concept": "playerWrittenWorld", "canonical": "World written by you", "retire": ["authored bind"]},
+    {"concept": "upgradeGraphEntry", "canonical": "Upgrade", "retire": ["node"]},
+    {"concept": "combatGraphEntry", "canonical": "Skill", "retire": ["node"]},
+    {"concept": "itemConstructionChoice", "canonical": "Construction", "retire": ["profile"]},
+    {"concept": "savedOutcomeRecord", "canonical": "Expedition record", "retire": ["receipt"]},
+    {"concept": "persistedAtEventTime", "canonical": "Saved at the time", "retire": ["frozen"]},
+    {"concept": "olderSaveContent", "canonical": "From an older save", "retire": ["legacy"]},
+    {"concept": "recoveredKnowledge", "canonical": "Writing found", "retire": ["marks", "current draft"]},
+    {"concept": "newCommunityMember", "canonical": "Joined the village", "retire": ["returned"]},
+    {"concept": "partyExperience", "canonical": "XP earned", "retire": ["progress", "party total"]}
+  ],
+  "returnDepartureStates": [
+    {"id": "holding", "copy": "The world was still holding together when you left."},
+    {"id": "cracking", "copy": "Cracks were spreading when you left."},
+    {"id": "breaking", "copy": "Parts of the world had already fallen away when you left."},
+    {"id": "collapseReachedParty", "copy": "The collapsing ground finally reached the party."}
+  ]
+}

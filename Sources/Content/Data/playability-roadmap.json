@@ -13,7 +13,7 @@
       "id": "band-1",
       "title": "Band 1 · First world, fight and return",
       "reach": "Worlds 1–3 · Binder + Quill · levels 1–3",
-      "itemIDs": ["encounter-scaling", "field-kit-loadout", "essence", "starter-world-pages", "collapse-hud-truth", "terrain-blocked-feedback", "world-visibility", "location-clue-plain-language", "world-resource-reserve", "field-note-generator", "writing-causal-presentation", "world-arrival-reveal", "field-consequence-cues", "local-pickup-feedback", "seamlight", "field-controls", "world-screen-presentation", "world-color", "terrain-worldgen-coherence", "terrain-layering-animation", "atmospheric-world-presentation", "earth-lighting-test-page", "world-contact", "encounter-opening", "return-receipt-authority", "expedition-review-persistence", "failure-retention-correctness", "combat-affliction-authority"]
+      "itemIDs": ["encounter-scaling", "field-kit-loadout", "essence", "starter-world-pages", "collapse-hud-truth", "terrain-blocked-feedback", "world-visibility", "location-clue-plain-language", "world-resource-reserve", "field-note-generator", "writing-causal-presentation", "world-arrival-reveal", "field-consequence-cues", "local-pickup-feedback", "seamlight", "field-controls", "world-screen-presentation", "world-color", "terrain-worldgen-coherence", "terrain-layering-animation", "atmospheric-world-presentation", "earth-lighting-test-page", "world-contact", "encounter-opening", "return-receipt-authority", "canonical-ui-terminology", "expedition-review-persistence", "failure-retention-correctness", "combat-affliction-authority"]
     },
     {
       "id": "band-2",
@@ -457,11 +457,11 @@
       "id": "terrain-layering-animation",
       "priority": "B1.7b",
       "title": "Layered terrain shapes and restrained motion",
-      "status": "inProgress",
-      "detail": "Aimee directly authorized a complete production-quality dynamic top-down pixel-art terrain system to replace the shipped placeholder grammar. Terrain Layering + Motion v0.1 at Asset commit c5eff83b93278d37710f2d958851487e5042048d remains accepted only as technical request, shared-edge, visibility, no-sidewall and restrained-motion authority; its hash-scattered family textures are not final terrain art. The first v0.2 body 3e100e72eda90be4c16ac1bd8aeb5ab4c0db214b9d000d3b162760112d0b921f was rejected as another flat stamp grammar. The rebuilt v0.2 body bf06e7c0fc8e60c9d5529482f631fff05b420473c9011b253fe81c3643656588 is accepted only as the production visual direction: its six final-grade 64×64 macro families read as connected top-down pixel art and preserve identical semantic-role geometry across three exact WorldGrade2V1 receipts. It is not a complete pack or native handoff.",
-      "gate": "This is an explicit Aimee-authorized exception to the generic system-first Asset hold. Asset now expands the accepted macro grammar without placeholder fallbacks to Sand, Ice, Ash, Rubble, Mud and Chasm plus two independent pressure-recolorable surface-deposit layers: Snow and settled Ash. They share accumulation geometry but resolve white versus grey/charcoal semantic palettes; either or both may be present, combined opacity must leave base terrain legible, and both remain distinct from base Ash ground, Snow precipitation and airborne ash. All twelve grounds and both deposits require native/2×/400%, phone, literal-grayscale, same-material continuity, critical contacts, turn/T/cross and three exact receipt recolors. Preserve hidden-neighbor exclusion, complementary edge ownership, zero equal-height sidewalls and shared-clock motion; correct elevation conformance to 0...3. Only after the consolidated complete-pack visual review may Asset freeze TerrainProductionPack v1. Engineering integration into MapAssetRenderer/WorldView then removes TerrainPixelGrammar, perimeter borders and southExposure walls before phone acceptance.",
+      "status": "readyToTest",
+      "detail": "Aimee directly authorized a complete production-quality dynamic top-down pixel-art terrain system to replace the shipped placeholder grammar. The complete twelve-ground Dynamic Terrain v0.2 visual pack plus independent Snow and settled-Ash deposits is frozen at Asset commit 5bac76a9; generated reference imagery is explicitly non-production and its logical macro/role sprites are the production candidates. TerrainProductionPack v1 is mechanically source-complete as a held Asset candidate with 207 content-addressed assets and 97 conformance cases, but is uncommitted, integrationReady:false and not native. The stop-the-line Writing Desk phone repair temporarily pre-empts its review and integration without discarding it.",
+      "gate": "After the Writing Desk core route is restored on the phone, review the held TerrainProductionPack manifest/conformance boundary against accepted commit 5bac76a9 without generating new visual variants. Engineering integration into MapAssetRenderer/WorldView then removes TerrainPixelGrammar, universal/perimeter borders and southExposure walls, uses safe exact neighbour facts and shared edge IDs, applies the one shared motion clock, preserves hidden-neighbour exclusion and genuine-height-only shade, and proves all twelve grounds plus independent Snow/Ash/both on the physical phone. Terrain art remains dynamically recolored by exact WorldGrade2 receipts; it may not become static world snapshots.",
       "workstream": "asset",
-      "isPrimary": true
+      "isPrimary": false
     },
     {
       "id": "atmospheric-world-presentation",
@@ -744,6 +744,16 @@
       "isPrimary": false
     },
     {
+      "id": "canonical-ui-terminology",
+      "priority": "P0",
+      "title": "One canonical name for every game concept",
+      "status": "queued",
+      "detail": "Aimee's return-screen playtest exposed parallel implementation vocabulary in visible UI: marks/current draft, returned, progress/party total, and a duplicated portal sentence. Canonical terminology is now universal across the game, DEBUG, accessibility, wiki, tests, logs and current docs; raw IDs are secondary metadata only. The immediate slice freezes the world's actual departure state in the return record and replaces the permanent-gains categories with Writing found, Joined the village and XP earned. Later contained migrations remove Projection, runway/authored bind, node, generic profile/Identity, receipt/frozen/legacy and atom wherever the canonical concept exists.",
+      "gate": "Implement the Return slice first with one constructor shared by every exit path, tolerant old-save fallback, four forced departure-state fixtures, relaunch identity, and 368×800 proof. Then migrate the named surface groups through shared formatters; do not rename stable Codable/catalogue IDs. A human-visible string census includes DEBUG and accessibility with no terminology exemption. GameWiki derives canonical labels and keeps retired words only as search aliases. Authority: docs/canonical-player-terminology-current.md and docs/canonical-game-terminology.json.",
+      "workstream": "engineering",
+      "isPrimary": false
+    },
+    {
       "id": "expedition-review-persistence",
       "priority": "B1.11a",
       "title": "Return review persists until player dismissal",
@@ -817,11 +827,11 @@
       "id": "writing-causal-presentation",
       "priority": "B1.5a",
       "title": "Page-first Writing and truthful world projection",
-      "status": "readyToTest",
-      "detail": "E1/E2 rules and the E3/E4 loader/Write surface are integrated through 2984b6b9 and installed as version 1.0 build 234 for phone review. The 4,459-file WritingDeskProductionPack is temporary semantic-keyed integration scaffolding for 108 current lexemes across hands, rotations and UI states; Aimee retains final sigil design authority. No further placeholder glyph generation, refinement or pack expansion is authorized. E5 Pages, E6 The world and E7 end-to-end closure have not started.",
-      "gate": "Phone-review E4 before E5 resumes: complete page, tool/bin/palette reachability, exact edit/connect/disconnect/cancellation behavior and no black/unavailable race. Preserve the stable semantic-key replacement seam so Aimee-authored final sprites replace scaffold pixels without rewriting gameplay, layout or interaction. Audit the 108 semantic lexemes separately for gameplay coverage by bin; that audit may add or retire meanings but generates no art. E5–E7 then retain one exact source through Pages/review/arrival/History, keep all non-bind actions zero-spend and make stale quote/generator/adapter failures atomic no-ops. Authorities: writing-desk-b1-implementation-packet-current.md, core-loop-causal-presentation-plan-current.md and first-three-worlds-execution-plan-current.md B1-B3.",
+      "status": "inProgress",
+      "detail": "STOP-THE-LINE PHONE REGRESSION. Installed revision 2984b6b9 makes the core Writing route unusable: the physical build resolves a generic duplicate manifest name instead of the exact runtime pack boundary, replaces every canonical vocabulary tile with Writing assets unavailable, disables selection/placement and renders selected category text without contrast. Engineering is fixing the current E4 architecture in place: exact bundleURL/runtime lookup, gameplay-owned native names, high-contrast category states and a RuneGlyph/PageRules fallback that preserves authoring when optional visuals fail. No rollback is authorized. Generated sigils remain temporary replaceable scaffolding owned finally by Aimee; the parchment is final production art and its rejected placeholder is being corrected as the same contained Asset surface.",
+      "gate": "Do not resume E5 or unrelated Engineering work until the current Write pane completes open → read canonical category and sigil names → select → place → edit on the exact signed physical-phone build. Focused executable tests prove the packaged manifest path, light/dark contrast, pack-present visuals and pack-missing typed Page mutation; one restrained failure notice may appear but gameplay names/details/actions remain. Game Design visually accepts the final parchment candidate at exact phone scale, Engineering integrates only that reviewed page asset, installs in place without reset or auto-launch, and Aimee confirms the ordinary path. Then E5–E7 resume without further placeholder-sigil expansion.",
       "workstream": "engineering",
-      "isPrimary": false
+      "isPrimary": true
     },
     {
       "id": "world-arrival-reveal",
@@ -967,8 +977,8 @@
       "id": "game-wiki",
       "priority": "S1",
       "title": "Complete source-generated internal Game Wiki",
-      "status": "inProgress",
-      "detail": "Catalogue/Resources and the exact 29-person People slice are accepted, but the wiki is not complete: World Writing, Core Loop, Exploration and Combat still use generic authority-file landing surfaces, while Overview/Roadmap/History remain too terse for a nontechnical reader. Engineering continuously completes these deep source-generated routes whenever no higher-priority playable implementation is active.",
+      "status": "paused",
+      "detail": "The comprehensive Wiki completion slice is source-complete and preserved on isolated commit 70a6e8d0: all twelve top-level routes are structured, 108 writing lexemes have typed details, and 368×800/desktop review is green. It is not yet reconciled onto the shared line. The untestable Writing Desk phone regression is a higher-priority playable implementation, so Wiki integration is paused rather than consuming the active Engineering boundary.",
       "gate": "World Writing plus every canonical rune detail; Core Loop and Exploration; Combat; and final Overview/Roadmap/History reconciliation each replace their generic authorityPage fallback with plain-language structured truth, exact live-versus-settled disposition and entity accounting. No required top-level route may substitute a path/status badge for an explanation. Deterministic generate/check/test/build plus 368×800 and desktop navigation/search review pass. This support tool remains fallback Engineering work rather than displacing an explicitly active player-facing implementation. Authority: game-wiki-content-contract-current.md.",
       "workstream": "engineering",
       "isPrimary": false

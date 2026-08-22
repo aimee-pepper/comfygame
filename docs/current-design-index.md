@@ -265,6 +265,7 @@ When two documents disagree:
 | Ground and World Resource coverage | `world-ground-and-resource-coverage-audit-current.md` | Current 12-ground/23-resource sufficiency verdict; coherent terrain topology, Snow cover, elevation 0...3, resource host profiles, sink and rune-targetability corrections |
 | World terrain regions and resource hosting | `world-terrain-and-resource-hosting-current.md` | Implementation-ready connected substrate, elevation, standing/flowing/frozen hydrology, independent Snow/Ash deposits and exhaustive 23-resource host rules |
 | World terrain/resource host machine authority | `world-terrain-resource-host-authority.json` | Closed ground/deposit IDs, deterministic topology constants and exhaustive machine-validated placement disposition for every current World Resource |
+| Canonical game terminology | `canonical-player-terminology-current.md` + `canonical-game-terminology.json` | One concept/one name across game, DEBUG, accessibility, wiki, tests and current docs; return-state and permanent-gains correction |
 | Authored colored ink | `authored-color-vocabulary-current.md` | Ash/open randomness, Isolde's Ink mixing upgrade, CMY+Depth recipes and four-source first-live allowlist |
 | Writing-tool progression | `writing-tool-progression-current.md` | Rough charcoal → Brush → Fountain pen; Brush-gated adjacent Ink Mixing and Pencil migration |
 | Penmanship native migration | `penmanship-native-migration-current.md` | Exact Brush/tier-1 sibling/Fountain graph, stable-ID and capability-set migration gates |
