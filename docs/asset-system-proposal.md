@@ -5401,3 +5401,21 @@ Freeze canonical body SHA-256
 `aacdd08ed66e80131847873852454b68d3981b46ad7b79696d6cb8675af31375`, and exact Asset commit
 `2d2992bc94224f11ea3901a29a392f45d59b0386`. The candidate remains `integrationReady:false`; this accepts
 only the five-path Asset proof boundary and authorizes no native/PBX/golden or follow-on milestone.
+
+#### WritingDeskProductionPack v1 disposition
+
+**Accepted by Game Design as the frozen corrected production-pack candidate; native integration remains
+unaccepted.** Freeze canonical body SHA-256
+`b9b244ee8382e9f0fca0776603202e51330a651d50b0c499af62a50be2be7ce0` and manifest-file SHA-256
+`3a1709f91de0c39c49a854aea9ba6a427fe44bdba31b23e9ea47fc26ce5982e5`. The pack has 2,146 deduplicated
+PNGs, exhaustive current authored lookup, exactly five legal tool/ink strips, exact non-drawable fixed-mask
+semantics and exact 28×5/5×28 shared-edge connectors. It contains no personal-compound, wildcard or generic
+fallback key.
+
+Game Design inspected the corrected native and exact-2× page-grounded colour/grayscale evidence. Mixed
+Fountain fixed detail, all six one-/multi-cell states, both legal mixed-hand link orientations, a real
+two-contact deterministic selection and the runtime card remain legible without crop or caption collision.
+The focused deterministic exporter/test independently reproduced the accepted receipt. `integrationReady`
+remains false until Engineering's fail-closed native loader passes the exhaustive pack contract; this
+acceptance authorizes only the exact five-path Asset checkpoint and E3 loader work, not E4/native screen or
+golden promotion.

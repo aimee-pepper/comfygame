@@ -81,6 +81,53 @@ seed scene geometry.
 The future native adapter must derive the input once, at successful bind, and persist it. The Asset proof
 does not become that adapter merely because its fixture JSON has the same shape.
 
+## Native promotion seam
+
+The accepted `world-arrival-kit.js` compositor is the frozen visual reference, not an iOS runtime dependency
+and not permission for a fresh Swift interpretation. Native promotion uses one mechanically conformant
+command adapter and freezes its result before the successful bind mutates campaign state.
+
+Asset first exports a versioned conformance corpus from the accepted compositor. It contains canonical
+sanitized scene receipts plus the exact ordered output of `arrivalSceneCommands` for:
+
+- every accepted starter, near/far, scope counterfactual, disclosure and 55-word fixture;
+- every closed dominant-ground, water-relationship, illumination, suspended-medium/density,
+  precipitation/intensity, flora-count/habit and entry-disclosure boundary at least once; and
+- a deterministic multi-seed matrix large enough to exercise every seeded placement branch and maximum
+  command count.
+
+The corpus command ABI is closed `rect-v1` only: integer `x`, `y`, `width`, `height`; exact 8-bit RGBA;
+closed scope; and source-order index. Bitmap stamps are expanded by the accepted Asset compositor into those
+run-length rectangles before comparison. Every command must be in the 160×100 scene, positive-sized and
+ordered; unknown ops/scopes, floats, extra keys and out-of-bounds pixels fail closed.
+
+Engineering may then make a line-for-line native adapter from the accepted command compositor, pinned to the
+exact Asset source and latest manifest hashes. Acceptance requires byte-equal canonical command JSON for the
+entire corpus and exact pixel hashes for the frozen proof scenes; approximate visual similarity is not a
+pass. Game rules, receipt banding, disclosure, prose and phone layout remain outside that port.
+
+Before atomic Bind & Depart, the adapter produces and validates one `WorldArrivalRenderedSceneReceipt` v1:
+
+- `canvasWidth: 160`, `canvasHeight: 100`;
+- the canonical SHA-256 of the input `WorldArrivalSceneReceipt`;
+- `visualProgramID: world-arrival-v1` and the exact accepted compositor/manifest hashes;
+- the complete ordered `rect-v1` command list;
+- its canonical command-list SHA-256 and exact rendered RGBA SHA-256.
+
+That rendered receipt is stored with the active run and immutable History arrival receipt. The reveal screen
+renders only the frozen command list at integer nearest-neighbour scale; it never re-reads Worldgen or
+reclassifies the scene. A later art program may replace the current implementation for new binds without
+retaining old generation code, because older worlds retain their already-sanitized draw commands. Commands
+contain no interaction or complete-map facts.
+
+Presentation authority remains disabled until the adapter, persisted rendered receipt, reachable reveal
+root and one centralized pending-arrival action gate land together. Current short-lived saves were created
+while presentation was disabled: migration may materialize a rendered receipt from a valid v2 scene receipt
+before enabling the gate, but a missing/invalid scene receipt cannot synthesize a plausible splash or strand
+the run. Generator/adapter/hash failure still happens before seed spend, page consumption, Field Kit movement
+or History mutation. Player-facing title, two-sentence description, source-page thumbnail, `Enter world`
+button and hit targets remain native game UI; proof phone PNGs are never bundled as runtime scenes.
+
 ## Fixed visual grammar
 
 ### Frame and camera
@@ -159,7 +206,7 @@ flora, encounter, writing, Essence, collapse and reachability receipts are check
 - flora: dull-fungal-bloom identity, 21 placements; no active/hostile flora;
 - description (rules-owned fixture):
   `Stone shelves break a wide run of shallow and deep water. Your Archipelago mark divided the route,
-  while sparse growth settled on the open stone.`
+  while only the ground nearest the entry remained clearly visible.`
 
 ### `starter_stone_hollow` — **Stone Hollow**
 

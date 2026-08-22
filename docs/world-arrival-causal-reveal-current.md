@@ -73,6 +73,13 @@ beside it, but the renderer consumes one versioned byte-stable scene receipt and
 The current pre-UI source prototype with empty causal facts, generic prose and a parallel field shape is not
 presentation-eligible; it must not be promoted merely because it decodes.
 
+Native promotion additionally freezes one `WorldArrivalRenderedSceneReceipt` before the bind mutation. It
+pins the accepted visual program, the sanitized scene-receipt hash, a closed ordered integer `rect-v1`
+command list and the resulting 160×100 RGBA hash. The exact command/conformance contract lives in
+`world-arrival-asset-packet-current.md`. Active run and History retain that rendered receipt with the rich
+arrival receipt, so display never re-runs the visual program and a later visual version need not keep old
+generation code merely to preserve existing worlds.
+
 `sourcePagePhysicalReceipt` contains only page dimensions, mark instance ID, opaque visual-asset key, Hand,
 origin/cells/shape, authored ink, link endpoints and whether the mark was readable at bind. It cannot contain
 `MarkContent`, `Sigil`, personal-compound expansion or a hidden semantic ID exposed as copy. The receipt may
@@ -240,7 +247,7 @@ receive an invisible pending state and be unable to move.
 
 | Current state | Result |
 |---|---|
-| successful new draft/Collected bind | active run, History and pending ID are committed atomically |
+| successful new draft/Collected bind | validated rendered scene, active run, History and pending ID are committed atomically |
 | Born anchored new bind | same new-world reveal behavior; anchoring does not skip it |
 | anchored-realm revisit | no new v1 arrival reveal; the saved realm is not rebound or regenerated |
 | app killed before **Enter world** | matching pending receipt appears again on relaunch |
@@ -300,11 +307,14 @@ new prose under an old receipt ID.
 
 1. Add pure frozen `WorldArrivalReceipt` adapter and persistence; no native visual promotion.
 2. Add rules-owned prose tokens/grammar with snapshot fixtures and prohibited-metaphor validation.
-3. Integrate accepted scene compositor from the frozen receipt in DEBUG and compare to map identities.
-4. Promote native arrival only after all three starter worlds pass ordinary-phone review; the exact starter
+3. Export the accepted compositor's canonical command conformance corpus; mechanically port the command
+   adapter and require byte-equal command JSON plus exact fixture pixels.
+4. Freeze the validated `WorldArrivalRenderedSceneReceipt` on active run and History before the bind
+   mutation; render only its closed command list in the native reveal.
+5. Promote native arrival only after all three starter worlds pass ordinary-phone review; the exact starter
    validation gate is `node Scripts/validate_starter_world_receipts.mjs`.
-5. Add lifecycle resume/dismiss/return outcome tests.
-6. Keep site extension behind a separate named visual decision; do not block checkpoints 1–5.
+6. Add lifecycle resume/dismiss/return outcome tests.
+7. Keep site extension behind a separate named visual decision; do not block checkpoints 1–6.
 
 ## Acceptance
 

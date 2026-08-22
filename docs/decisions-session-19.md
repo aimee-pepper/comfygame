@@ -282,3 +282,48 @@ flora, then routine dim/bright light. Concrete growth therefore beats merely rou
 never conceals a genuinely dark or blazing arrival. Rainwashed Shore's frozen receipt is `trueDark`, so its
 accepted runtime sentence names restricted visibility rather than sparse growth. The no-causal environmental
 fallback keeps its existing priority; this is the narrower one-causal pairing rule.
+
+## 305. Writing Desk ships an exhaustive Asset-built pack; runtime links stay adjacent
+
+**Date:** 21 August 2026
+
+The accepted Writing Desk JavaScript compositors remain Asset authoring tools and never become an iOS
+runtime or a second Swift drawing implementation. Asset exports one exhaustive, hashed
+`WritingDeskProductionPack` v1 covering all current lexemes/hands/states and dynamic card/tool/popover
+composition; Engineering loads it through a closed fail-closed adapter. Proof phone PNGs and proof-subset
+sprites are not runtime substitutes.
+
+Live connections continue to follow `PageRules.areAdjacent`: only cardinally touching occupied cells can be
+joined. A1's long diagonal linked page is retained only as stroke-style evidence. Runtime uses horizontal or
+vertical Asset connectors, selects one shared edge deterministically in reading order, uses the coarsest of
+the two endpoint hands, remains Ash/open neutral and draws below the marks. This avoids a `MarkLink` migration
+and replaces the always-on cluster outline instead of double-encoding the same relationship.
+
+The pack's 108 identities are authored catalogue lexemes, not the unbounded player-created Personal
+Compound namespace. During this early-flow checkpoint, and only for a frozen `personalCompound` snapshot,
+the existing deterministic glyph remains as an explicit save-compatibility route. Missing authored pack keys
+never borrow it. A later Scriptorium/Runebook visual checkpoint replaces that compatibility glyph rather than
+expanding E3 and delaying the first-three-world loop.
+
+The corrected v1 pack is accepted with canonical body
+`b9b244ee8382e9f0fca0776603202e51330a651d50b0c499af62a50be2be7ce0` and manifest-file SHA
+`3a1709f91de0c39c49a854aea9ba6a427fe44bdba31b23e9ea47fc26ce5982e5`. Its tool table excludes the
+impossible Charcoal/mixed state; tint masks replace only their owned base pixels and fixed masks are never
+drawn. Cardinal links are exact 28×5/5×28 centre-spanning assets with frozen shared-edge offsets. This
+releases the fail-closed E3 loader only; E4 stays blocked until that loader passes.
+
+## 306. World Arrival freezes validated draw commands at bind
+
+**Date:** 21 August 2026
+
+The accepted World Arrival JavaScript compositor is the visual reference, not a runtime dependency or an
+invitation to approximate its scenes in Swift. Asset exports a canonical conformance corpus of sanitized
+receipts and ordered integer `rect-v1` commands. Engineering's mechanical native adapter must match the
+entire corpus and frozen scene pixels exactly.
+
+Before successful Bind & Depart mutates the save, the adapter freezes a
+`WorldArrivalRenderedSceneReceipt`: accepted program/source hashes, input scene-receipt hash, the validated
+160×100 command list, command hash and rendered RGBA hash. Active run and History store it. The reveal renders
+only those commands, so existing worlds keep their exact arrival picture while a later visual program can
+replace the current implementation for new binds without retaining old generation logic. Proof phone PNGs
+are never runtime scenes, and a generation/hash failure remains an atomic pre-spend refusal.

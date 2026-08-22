@@ -385,6 +385,15 @@ The v1 pack contains:
   duplicate keys, missing files, unexpected files and hash mismatches refuse the adapter rather than falling
   back to approximate native drawing.
 
+The 108-entry census is the current authored target/source/qualifier/catalogue-compound vocabulary. A
+`PersonalCompoundMarkSnapshot` is an unbounded player-created identity and is deliberately not fabricated as
+an authored pack key during this first-three-world checkpoint. E3 keeps the existing deterministic
+`RuneGlyph` route only for `personalCompound != nil`, labels it internally as
+`compatibility.personalCompound`, and preserves old pages, Templates and History without mutation. This is
+the sole allowed visual fallback: a missing authored lexeme, hand, state, connector or manifest key still
+fails closed. The later Scriptorium/Runebook visual checkpoint replaces this compatibility glyph with its own
+accepted dynamic ligature grammar; it does not block the current early Writing flow or cause E3 scope growth.
+
 A3 contributes responsive layout geometry, ownership and composition rules; none of its phone screenshots is
 production input. Runtime page thumbnails are composed from the exact current page, so blank/partial/dense
 proof-card screenshots are not shipped as substitutes for player state. The pack exporter proves exhaustive
@@ -393,6 +402,35 @@ both one- and multi-cell state coverage, crop/bounds safety,
 mixed-ink containment, representative runtime thumbnail composition, literal grayscale and byte-identical
 repeat export. This packaging gate changes no accepted pixels or visual semantics and remains
 `integrationReady:false` until Game Design reviews the generated pack and Engineering verifies its loader.
+
+#### WritingDeskProductionPack v1 acceptance — 21 August 2026
+
+Game Design accepts the corrected production pack as the frozen Asset candidate; native loading and view
+integration remain unaccepted. Freeze canonical body SHA-256
+`b9b244ee8382e9f0fca0776603202e51330a651d50b0c499af62a50be2be7ce0` and manifest-file SHA-256
+`3a1709f91de0c39c49a854aea9ba6a427fe44bdba31b23e9ea47fc26ce5982e5`. The closed pack contains 2,146
+deduplicated PNGs, exhaustive 108×3 authored mark lookup, all accepted state-footprint and vocabulary
+combinations, exactly six cardinal connectors, and no personal-compound, wildcard or generic fallback key.
+
+The runtime tool-strip table contains exactly five legal states: Charcoal/Ash, Brush/Ash, Brush/mixed,
+Fountain/Ash and Fountain/mixed. Charcoal/mixed is absent and fails closed. Ash returns the exported base RGBA
+byte-identically. Mixed ink replaces only pixels owned by `tintMask`; every other base byte remains unchanged,
+and `fixedMask` is validation-only data that is never drawn or whitened.
+
+Horizontal connectors are exactly 28×5 pixels at `sharedEdge + (-14,-2)`; vertical connectors are exactly
+5×28 at `sharedEdge + (-2,-14)`. They span the two adjacent socket centres, use the deterministic shared-edge
+selection and coarsest-hand rule above, and sit below endpoint marks. Game Design inspected native and exact
+2× page-grounded colour/grayscale evidence for representative marks, mixed Fountain detail, one- and
+multi-cell states, both link orientations, a real two-contact selection and a runtime card. The focused
+exporter/test passed independently and reproduced both hashes. This acceptance authorizes Asset to checkpoint
+only the declared five-path pack boundary and releases only E3 loader/adapter work; E4 remains blocked until
+that native loader is green.
+
+The pack must not worsen the already-sensitive app launch path. Packaging tests exhaustively validate every
+file, key and hash. Runtime does no pack enumeration, hashing or image decode at app launch; the adapter opens
+only on first Writing Desk entry, validates the manifest/source pins, and hash-checks plus caches each required
+asset on first use. A missing, mismatched or unknown required asset fails that Writing surface closed without
+mutating the draft or save. It never silently substitutes native drawing.
 
 ### Ordered Asset checkpoints
 
@@ -839,7 +877,8 @@ work into one unreviewable change.
    receipts to stable pack keys. A schema-agnostic fail-closed loader may land before the final pack, but the
    adapter cannot claim source completeness until exhaustive 108×3 marks, state-footprint coverage, the
    cardinal connector/contact-selection contract, dynamic thumbnail composition and missing/hash/version
-   failure fixtures pass. Do not copy
+   failure fixtures pass. Prove that only a frozen personal compound uses the named compatibility route and
+   that no authored mark can reach it. Do not copy
    proof phone PNGs, execute JavaScript in iOS, reimplement glyph/footprint pixels in Swift or start E4 view
    integration from proof-subset assets.
 4. **E4 — Write pane.** Replace the legacy page surface/tool/palette layout with the exact responsive Write

@@ -391,7 +391,7 @@ The exact current starter receipts must produce:
 1. `Broad sandy ground runs between shallow pools. Your Plains mark opened the terrain, while your Verdant
    mark spread low growth farther along the few wet and stony edges.`
 2. `Stone shelves break a wide run of shallow and deep water. Your Archipelago mark divided the route,
-   while sparse growth settled on the open stone.`
+   while only the ground nearest the entry remained clearly visible.`
 3. `Stone closes around narrow paths and wet hollows. Your Caverns mark shaped the enclosure, while your Ore
    mark made ore more plentiful.`
 
