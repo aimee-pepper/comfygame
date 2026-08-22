@@ -1,0 +1,474 @@
+{
+  "schemaVersion": 1,
+  "identity": "local-pickup-motion-v0.1",
+  "integrationReady": false,
+  "productionSource": "direct-logical-rgba",
+  "identities": {
+    "pickup.resource.quartz": {
+      "stableID": "pickup.resource.quartz",
+      "pivot": {
+        "x": 8,
+        "y": 8
+      },
+      "bounds": {
+        "x": 3,
+        "y": 2,
+        "width": 11,
+        "height": 12
+      },
+      "rgbaSHA256": "ee1fadccafbdc6f168c8a7b3118c4c5fb8f0fc8b049f16f7b0356150c114a53c",
+      "native": {
+        "file": "sources/pickup-resource-quartz-16x16.png",
+        "width": 16,
+        "height": 16,
+        "sha256": "f4ab7b680d4ebbc02e9dc1e8c54004d8ca97685200f664c3f4161cdf5b9798be",
+        "kind": "production-source"
+      },
+      "scale400": {
+        "file": "evidence/pickup-resource-quartz-400pct.png",
+        "width": 64,
+        "height": 64,
+        "sha256": "8f19a331d5505fc51be539c8d6622661c1e9c97c5b25944b639946bcf1da0521",
+        "kind": "review"
+      },
+      "gray400": {
+        "file": "evidence/pickup-resource-quartz-400pct-grayscale.png",
+        "width": 64,
+        "height": 64,
+        "sha256": "209a63401c02e5514137df31206a56a46679a98082fffb19b1693f8a9470bbbc",
+        "kind": "review"
+      }
+    },
+    "pickup.resource.essence_raw": {
+      "stableID": "pickup.resource.essence_raw",
+      "pivot": {
+        "x": 8,
+        "y": 8
+      },
+      "bounds": {
+        "x": 4,
+        "y": 2,
+        "width": 8,
+        "height": 12
+      },
+      "rgbaSHA256": "9b06250bb9870e29585ed07ae4051d50b5e8d582c61c1243e92715a056964a6c",
+      "native": {
+        "file": "sources/pickup-resource-essence_raw-16x16.png",
+        "width": 16,
+        "height": 16,
+        "sha256": "1cd8dbfb62230d08a25f4a6ec59c9f9e577936fe11e604418dd99ff1e5d330a3",
+        "kind": "production-source"
+      },
+      "scale400": {
+        "file": "evidence/pickup-resource-essence_raw-400pct.png",
+        "width": 64,
+        "height": 64,
+        "sha256": "9cf72bc7d5fa87ff4b40e4f9510487955e6e9a3a9c31aebd710a973511c7b928",
+        "kind": "review"
+      },
+      "gray400": {
+        "file": "evidence/pickup-resource-essence_raw-400pct-grayscale.png",
+        "width": 64,
+        "height": 64,
+        "sha256": "db94bf9b78fd5c504d9fe5433ee0c9926eab7d32826891d1e50c192b073a0675",
+        "kind": "review"
+      }
+    },
+    "pickup.item.blade_chipped": {
+      "stableID": "pickup.item.blade_chipped",
+      "pivot": {
+        "x": 8,
+        "y": 8
+      },
+      "bounds": {
+        "x": 4,
+        "y": 1,
+        "width": 8,
+        "height": 15
+      },
+      "rgbaSHA256": "188c5893bcff0a8166e778632b633bebf875bc596a9bf1a594ff478087737b87",
+      "native": {
+        "file": "sources/pickup-item-blade_chipped-16x16.png",
+        "width": 16,
+        "height": 16,
+        "sha256": "c031d6f5691c73d25ab153ea49ad80de4bed51d543c499d57c8ba9db1b70345f",
+        "kind": "production-source"
+      },
+      "scale400": {
+        "file": "evidence/pickup-item-blade_chipped-400pct.png",
+        "width": 64,
+        "height": 64,
+        "sha256": "5b54b5e6b5cdf32736b986cfb34fd2148735992ff4c684eaafa815ec0311d7d5",
+        "kind": "review"
+      },
+      "gray400": {
+        "file": "evidence/pickup-item-blade_chipped-400pct-grayscale.png",
+        "width": 64,
+        "height": 64,
+        "sha256": "f291bd66e847ed118ae8267b3c4811afd183175b3c21c11cdb4ebc7cca6a5cfb",
+        "kind": "review"
+      }
+    },
+    "pickup.writing.page": {
+      "stableID": "pickup.writing.page",
+      "pivot": {
+        "x": 8,
+        "y": 8
+      },
+      "bounds": {
+        "x": 3,
+        "y": 2,
+        "width": 10,
+        "height": 11
+      },
+      "rgbaSHA256": "f5696fd4bc0c2612d0e7056a0ecece5802dc0d59e57b928f20b2d3d7fb987458",
+      "native": {
+        "file": "sources/pickup-writing-page-16x16.png",
+        "width": 16,
+        "height": 16,
+        "sha256": "7534298540712876da09f683f5113824198e3a924402bb7568ad39063de1a89b",
+        "kind": "production-source"
+      },
+      "scale400": {
+        "file": "evidence/pickup-writing-page-400pct.png",
+        "width": 64,
+        "height": 64,
+        "sha256": "28cbe91b7e0e767f4c5181168fd79e7bb885c5a0ea5604c54d2d35cac2b0c1ce",
+        "kind": "review"
+      },
+      "gray400": {
+        "file": "evidence/pickup-writing-page-400pct-grayscale.png",
+        "width": 64,
+        "height": 64,
+        "sha256": "fccd276a5f43712b65ff693c73efb8c7d9d94eac3c45c77601bd9eaaab623025",
+        "kind": "review"
+      }
+    },
+    "pickup.object.unknown": {
+      "stableID": "pickup.object.unknown",
+      "pivot": {
+        "x": 8,
+        "y": 8
+      },
+      "bounds": {
+        "x": 3,
+        "y": 3,
+        "width": 10,
+        "height": 11
+      },
+      "rgbaSHA256": "e2f0bb0f7926a9192068a6cac6b4ef6af4b346c9d59df653dc1a7c8f45b7fa1f",
+      "native": {
+        "file": "sources/pickup-object-unknown-16x16.png",
+        "width": 16,
+        "height": 16,
+        "sha256": "f33ee51acfd51eca425b8221311ff9da53bc0b8e7924348a31398dfb35fc5b80",
+        "kind": "production-source"
+      },
+      "scale400": {
+        "file": "evidence/pickup-object-unknown-400pct.png",
+        "width": 64,
+        "height": 64,
+        "sha256": "f9aa479cbe8af2add5cb1e4a83fcd581b46626627e6272be42cf14c2544bab27",
+        "kind": "review"
+      },
+      "gray400": {
+        "file": "evidence/pickup-object-unknown-400pct-grayscale.png",
+        "width": 64,
+        "height": 64,
+        "sha256": "98d782c96be06d3491f12df7e4a4a754eab8b46dc66b5dc876e05d6a7c650906",
+        "kind": "review"
+      }
+    }
+  },
+  "requestABI": {
+    "version": 1,
+    "fields": [
+      "transactionReceiptID",
+      "worldRunID",
+      "sourceTileCoordinate",
+      "sourcePointInMapViewport",
+      "mapViewportBounds",
+      "reducedMotion",
+      "group"
+    ],
+    "cardinality": "exactly-one-presentation-identity",
+    "transactionReceiptID": {
+      "fields": [
+        "runIndex",
+        "mapSeed",
+        "turnsTakenBeforeAction",
+        "actionKind",
+        "sourceTileCoordinate"
+      ],
+      "actionKinds": [
+        "stepPickup",
+        "harvest"
+      ]
+    }
+  },
+  "motion": {
+    "framesMS": [
+      0,
+      180,
+      450
+    ],
+    "travelTileHeights": [
+      0,
+      0.6,
+      1.5
+    ],
+    "direction": "screen-up",
+    "reducedMotion": {
+      "durationMS": 250,
+      "translation": 0
+    }
+  },
+  "aggregation": {
+    "sameIdentityQuantity": true,
+    "multipleKinds": false
+  },
+  "clip": "entire-icon-and-label-inside-map-viewport",
+  "layerOrder": [
+    "terrain-content-party-cues-selection",
+    "local-pickup-feedback",
+    "look-tutorial-bug-system-overlays"
+  ],
+  "forbidden": [
+    "multi-kind-burst",
+    "+N-kinds",
+    "site-search",
+    "creature-material",
+    "combat-spray",
+    "counter-travel",
+    "particle",
+    "sparkle",
+    "trail",
+    "beam",
+    "bounce",
+    "rotation",
+    "native",
+    "PBX",
+    "golden"
+  ],
+  "fixtureFile": "fixtures/local-pickup-motion-v0.1/proof-fixtures.json",
+  "outputs": [
+    {
+      "file": "sources/pickup-resource-quartz-16x16.png",
+      "width": 16,
+      "height": 16,
+      "sha256": "f4ab7b680d4ebbc02e9dc1e8c54004d8ca97685200f664c3f4161cdf5b9798be",
+      "kind": "production-source"
+    },
+    {
+      "file": "evidence/pickup-resource-quartz-400pct.png",
+      "width": 64,
+      "height": 64,
+      "sha256": "8f19a331d5505fc51be539c8d6622661c1e9c97c5b25944b639946bcf1da0521",
+      "kind": "review"
+    },
+    {
+      "file": "evidence/pickup-resource-quartz-400pct-grayscale.png",
+      "width": 64,
+      "height": 64,
+      "sha256": "209a63401c02e5514137df31206a56a46679a98082fffb19b1693f8a9470bbbc",
+      "kind": "review"
+    },
+    {
+      "file": "sources/pickup-resource-essence_raw-16x16.png",
+      "width": 16,
+      "height": 16,
+      "sha256": "1cd8dbfb62230d08a25f4a6ec59c9f9e577936fe11e604418dd99ff1e5d330a3",
+      "kind": "production-source"
+    },
+    {
+      "file": "evidence/pickup-resource-essence_raw-400pct.png",
+      "width": 64,
+      "height": 64,
+      "sha256": "9cf72bc7d5fa87ff4b40e4f9510487955e6e9a3a9c31aebd710a973511c7b928",
+      "kind": "review"
+    },
+    {
+      "file": "evidence/pickup-resource-essence_raw-400pct-grayscale.png",
+      "width": 64,
+      "height": 64,
+      "sha256": "db94bf9b78fd5c504d9fe5433ee0c9926eab7d32826891d1e50c192b073a0675",
+      "kind": "review"
+    },
+    {
+      "file": "sources/pickup-item-blade_chipped-16x16.png",
+      "width": 16,
+      "height": 16,
+      "sha256": "c031d6f5691c73d25ab153ea49ad80de4bed51d543c499d57c8ba9db1b70345f",
+      "kind": "production-source"
+    },
+    {
+      "file": "evidence/pickup-item-blade_chipped-400pct.png",
+      "width": 64,
+      "height": 64,
+      "sha256": "5b54b5e6b5cdf32736b986cfb34fd2148735992ff4c684eaafa815ec0311d7d5",
+      "kind": "review"
+    },
+    {
+      "file": "evidence/pickup-item-blade_chipped-400pct-grayscale.png",
+      "width": 64,
+      "height": 64,
+      "sha256": "f291bd66e847ed118ae8267b3c4811afd183175b3c21c11cdb4ebc7cca6a5cfb",
+      "kind": "review"
+    },
+    {
+      "file": "sources/pickup-writing-page-16x16.png",
+      "width": 16,
+      "height": 16,
+      "sha256": "7534298540712876da09f683f5113824198e3a924402bb7568ad39063de1a89b",
+      "kind": "production-source"
+    },
+    {
+      "file": "evidence/pickup-writing-page-400pct.png",
+      "width": 64,
+      "height": 64,
+      "sha256": "28cbe91b7e0e767f4c5181168fd79e7bb885c5a0ea5604c54d2d35cac2b0c1ce",
+      "kind": "review"
+    },
+    {
+      "file": "evidence/pickup-writing-page-400pct-grayscale.png",
+      "width": 64,
+      "height": 64,
+      "sha256": "fccd276a5f43712b65ff693c73efb8c7d9d94eac3c45c77601bd9eaaab623025",
+      "kind": "review"
+    },
+    {
+      "file": "sources/pickup-object-unknown-16x16.png",
+      "width": 16,
+      "height": 16,
+      "sha256": "f33ee51acfd51eca425b8221311ff9da53bc0b8e7924348a31398dfb35fc5b80",
+      "kind": "production-source"
+    },
+    {
+      "file": "evidence/pickup-object-unknown-400pct.png",
+      "width": 64,
+      "height": 64,
+      "sha256": "f9aa479cbe8af2add5cb1e4a83fcd581b46626627e6272be42cf14c2544bab27",
+      "kind": "review"
+    },
+    {
+      "file": "evidence/pickup-object-unknown-400pct-grayscale.png",
+      "width": 64,
+      "height": 64,
+      "sha256": "98d782c96be06d3491f12df7e4a4a754eab8b46dc66b5dc876e05d6a7c650906",
+      "kind": "review"
+    },
+    {
+      "file": "evidence/pickup-resource-quartz-ordinary-368x800.png",
+      "width": 368,
+      "height": 800,
+      "sha256": "223d7bda9baa4226927236d07a80d669ffd3445356ac34777dff8678554a5b8e",
+      "kind": "review"
+    },
+    {
+      "file": "evidence/pickup-resource-essence_raw-ordinary-368x800.png",
+      "width": 368,
+      "height": 800,
+      "sha256": "ef179827161ef1fb1026f03297f1753547fcc6e6764a9ace0868ff48382e2f0a",
+      "kind": "review"
+    },
+    {
+      "file": "evidence/pickup-item-blade_chipped-ordinary-368x800.png",
+      "width": 368,
+      "height": 800,
+      "sha256": "97e95ec1bcaa0def076eb8c55908d749902c3b161faed3130fae0a86c7f1924e",
+      "kind": "review"
+    },
+    {
+      "file": "evidence/pickup-writing-page-ordinary-368x800.png",
+      "width": 368,
+      "height": 800,
+      "sha256": "c5099e6af94e481ccb83f4f2243ee0883e926ece1630783aebc9236748926c19",
+      "kind": "review"
+    },
+    {
+      "file": "evidence/pickup-object-unknown-ordinary-368x800.png",
+      "width": 368,
+      "height": 800,
+      "sha256": "bb78ab759a770048472eafc2616f745b98acd21b37f9d3a2708fe22b9c63fe74",
+      "kind": "review"
+    },
+    {
+      "file": "evidence/quartz-x19-368x800.png",
+      "width": 368,
+      "height": 800,
+      "sha256": "503abcde70dd4aa46f8003e318c04c863ef455d0085d66b6250587407a067670",
+      "kind": "review"
+    },
+    {
+      "file": "evidence/ordinary-0ms-368x800.png",
+      "width": 368,
+      "height": 800,
+      "sha256": "109393887d6abea592236e8c448a3fed1326a03507e5ee4fb73bbccf57c3553b",
+      "kind": "review"
+    },
+    {
+      "file": "evidence/ordinary-180ms-368x800.png",
+      "width": 368,
+      "height": 800,
+      "sha256": "60f6df921e2bb7050a95afa349a8a02856f4add24975a2443a622df0d0369ab4",
+      "kind": "review"
+    },
+    {
+      "file": "evidence/ordinary-450ms-368x800.png",
+      "width": 368,
+      "height": 800,
+      "sha256": "5ff3930d946063f991166f4e8866ee6c2c4990d70723232df1bb0fbd80ac8ff4",
+      "kind": "review"
+    },
+    {
+      "file": "evidence/top-edge-x19-0ms-368x800.png",
+      "width": 368,
+      "height": 800,
+      "sha256": "00171ba628e11424281ec8f6ad9ceb807546279dfb2f9b46904172353876330e",
+      "kind": "review"
+    },
+    {
+      "file": "evidence/top-edge-x19-180ms-368x800.png",
+      "width": 368,
+      "height": 800,
+      "sha256": "06317bc8d49520cea4f888150ec0c5a671618c22ce465caedac7dd4731a1870f",
+      "kind": "review"
+    },
+    {
+      "file": "evidence/top-edge-x19-450ms-368x800.png",
+      "width": 368,
+      "height": 800,
+      "sha256": "700641e772ef49303664f64caa0af225665e226337da70840afc08c897e71ebf",
+      "kind": "review"
+    },
+    {
+      "file": "evidence/reduced-motion-368x800.png",
+      "width": 368,
+      "height": 800,
+      "sha256": "f83921c2cc81a3228a20c3073d0d1adc22235ec77a61f994312fc9fe80557c26",
+      "kind": "review"
+    },
+    {
+      "file": "evidence/collision-controls-368x800.png",
+      "width": 368,
+      "height": 800,
+      "sha256": "8feb75a1af1d02cd66261355c3462f2e06e7ea07c10ee0b5d3070870be6d539a",
+      "kind": "review"
+    },
+    {
+      "file": "evidence/collision-controls-368x800-grayscale.png",
+      "width": 368,
+      "height": 800,
+      "sha256": "c923a9dbdac63cd2e22d79a1a2b21a6ebbabef5d2ac98d5fb0384c47326cabe2",
+      "kind": "review"
+    },
+    {
+      "file": "evidence/frame-strip-no-blank-flash.png",
+      "width": 560,
+      "height": 188,
+      "sha256": "d0f859fa95a9765f55d672b73b40c09e7f8244d82e884c5352dccc283b92717e",
+      "kind": "review"
+    }
+  ],
+  "canonicalBodySHA256": "a2475bbbc4bab0eb4ee90f0ca562bf04ed2cffd565aa7eaa21e2656f92eaa9c7"
+}

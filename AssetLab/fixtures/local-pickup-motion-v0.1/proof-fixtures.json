@@ -1,0 +1,7 @@
+{
+  "schemaVersion": 1,
+  "viewport": {"x": 8, "y": 112, "width": 352, "height": 352},
+  "source": {"x": 184, "y": 320},
+  "identities": ["pickup.resource.quartz", "pickup.resource.essence_raw", "pickup.item.blade_chipped", "pickup.writing.page", "pickup.object.unknown"],
+  "frameTimesMS": [0, 180, 450]
+}
