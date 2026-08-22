@@ -104,6 +104,17 @@ cosmetic redesign:
 | World preview | Projection | World preview |
 | Base construction preview | authored bind / runway / binds | world written by you / Essence available / worlds you can afford |
 | Research purchase preview | node prerequisite / authored bind / runway | Requires no earlier upgrade / world written by you / worlds you can afford |
+
+### Essence affordability presentation
+
+Construction, Research, Anchorage settlement and the Return recap use one factual distinction:
+
+- **Essence available now** is refined Essence already held in `BaseState.essence`; convertible Raw Essence is not available now.
+- **Essence after refining Raw Essence** adds the exact currently refinable equivalent and appears only when that equivalent is positive.
+- After-action potential subtracts the exact construction or study cost from the after-refining total. Its label names refining whenever Raw Essence contributes.
+- Affordable-world counts are advisory. They name both the basis and the action: the recent-five median is **Typical cost of a recent world written by you**; Research may fall back to **Current World preview cost**.
+- Advisory potential never changes whether a transaction is currently affordable and never performs refinement automatically.
+- Anchorage states its exact denominator. Return labels its frozen potential total **ESSENCE AVAILABLE**, `{N} after refining`, and **Enough to bind at least one more world**.
 | Combat tree | node prerequisite | Requires no earlier skill |
 | Writing Desk | exact frozen expansion / marks | footprint / Sigils |
 | Gear rebuild | profile / Identity raw catalogue key | Construction / item name; raw key only secondary in DEBUG |

@@ -16,11 +16,12 @@ enum StationRunwayRules {
         var recentMedianBindCost: Double?
         var authoredBindsRemaining: Double?
         var warning: Warning?
+        var affordability: EssenceAffordabilityPresentation
 
         var telemetryLabel: String {
-            let median = recentMedianBindCost.map { String(format: "%.1f", $0) } ?? "none"
-            let binds = authoredBindsRemaining.map { String(format: "%.2f", $0) } ?? "unknown"
-            return "spendableNow=\(spendableNow) rawEquivalent=\(refinableRawEssence) cost=\(constructionEssence) spendableAfter=\(spendableAfter) medianBind=\(median) bindsAfter=\(binds)"
+            let basis = recentMedianBindCost.map { String(format: "%.1f", $0) } ?? "none"
+            let worlds = authoredBindsRemaining.map { String(format: "%.2f", $0) } ?? "unknown"
+            return "Essence available now=\(affordability.essenceAvailableNow) Essence after refining=\(affordability.essenceAfterRefining) construction cost=\(constructionEssence) Essence after construction=\(affordability.essenceAfterAction) typical world cost=\(basis) worlds affordable after construction=\(worlds)"
         }
     }
 
@@ -49,9 +50,13 @@ enum StationRunwayRules {
             if value < 2 { return .low }
             return nil
         }
+        let affordability = EssenceAffordabilityPresentation(
+            action: .construction, essenceAvailableNow: state.base.essence,
+            refinableRawEquivalent: rawEquivalent, actionCost: cost,
+            basis: median == nil ? nil : .recentWorld, basisCost: median)
         return Preview(spendableNow: now, refinableRawEssence: rawEquivalent,
                        constructionEssence: cost, spendableAfter: after,
                        recentMedianBindCost: median, authoredBindsRemaining: remaining,
-                       warning: warning)
+                       warning: warning, affordability: affordability)
     }
 }

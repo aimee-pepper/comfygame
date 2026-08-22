@@ -769,29 +769,26 @@ private struct StationFoundationSheet: View {
                     .foregroundStyle(.secondary)
 
                 let runway = StationRunwayRules.preview(for: station, in: store.state)
+                let affordability = runway.affordability
                 VStack(alignment: .leading, spacing: 5) {
-                    LabeledContent("Spendable Essence now", value: "\(runway.spendableNow)")
-                    LabeledContent("After construction", value: "\(runway.spendableAfter)")
-                    if runway.refinableRawEssence > 0 {
-                        Text("Includes \(runway.refinableRawEssence) Essence currently refinable from Raw Essence.")
+                    LabeledContent("Essence available now", value: "\(affordability.essenceAvailableNow)")
+                    if affordability.includesRefining {
+                        LabeledContent("Essence after refining", value: "\(affordability.essenceAfterRefining)")
                     }
-                    if let median = runway.recentMedianBindCost,
-                       let remaining = runway.authoredBindsRemaining {
-                        LabeledContent("Recent median authored bind", value: median.formatted(.number.precision(.fractionLength(0...1))))
-                        LabeledContent("Estimated runway at that median",
-                                       value: "≈ \(remaining.formatted(.number.precision(.fractionLength(1)))) binds")
+                    LabeledContent(affordability.afterActionLabel,
+                                   value: "\(affordability.essenceAfterAction)")
+                    if let basisLabel = affordability.basisLabel,
+                       let basisCost = affordability.basisCost,
+                       let count = affordability.formattedWorldCount {
+                        LabeledContent(basisLabel,
+                                       value: basisCost.formatted(.number.precision(.fractionLength(0...1))))
+                        LabeledContent(affordability.worldCountLabel, value: count)
                     } else {
-                        Text("A runway estimate appears after an authored world has been bound and recorded.")
+                        Text(affordability.noBasisCopy)
                     }
-                    switch runway.warning {
-                    case .low:
-                        Label("Low writing runway", systemImage: "exclamationmark.triangle")
-                            .foregroundStyle(.orange)
-                    case .belowOne:
-                        Label("This leaves less Essence than your recent authored bind cost.", systemImage: "exclamationmark.triangle.fill")
-                            .foregroundStyle(.red)
-                    case nil:
-                        EmptyView()
+                    if let warning = affordability.warningCopy {
+                        Label(warning, systemImage: "exclamationmark.triangle")
+                            .foregroundStyle((affordability.worldsAffordable ?? 2) < 1 ? .red : .orange)
                     }
                 }
                 .font(.caption.monospacedDigit())

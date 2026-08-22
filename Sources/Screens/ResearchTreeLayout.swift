@@ -300,22 +300,25 @@ private struct ResearchNodeDetail: View {
 
     @ViewBuilder
     private func runway(_ preview: EconomyRules.ResearchPurchasePreview) -> some View {
+        let affordability = preview.affordability
         VStack(alignment: .leading, spacing: 5) {
-            LabeledContent("Spendable Essence now", value: "\(preview.spendableEssenceNow)")
-            LabeledContent("After study", value: "\(preview.spendableEssenceAfter)")
-            if let cost = preview.authoredBindCost,
-               let remaining = preview.authoredBindsRemaining {
-                LabeledContent(preview.bindCostBasis == .recentMedian
-                               ? "Recent median authored bind"
-                               : "Current authored bind preview",
-                               value: cost.formatted(.number.precision(.fractionLength(0...1))))
-                LabeledContent("Ordinary authored binds remaining",
-                               value: "≈ \(remaining.formatted(.number.precision(.fractionLength(1))))")
-            } else {
-                Text("Write an authored page to estimate the remaining binding runway.")
+            LabeledContent("Essence available now", value: "\(affordability.essenceAvailableNow)")
+            if affordability.includesRefining {
+                LabeledContent("Essence after refining", value: "\(affordability.essenceAfterRefining)")
             }
-            if preview.isLowWritingRunway {
-                Label("Low writing runway", systemImage: "exclamationmark.triangle")
+            LabeledContent(affordability.afterActionLabel,
+                           value: "\(affordability.essenceAfterAction)")
+            if let basisLabel = affordability.basisLabel,
+               let basisCost = affordability.basisCost,
+               let count = affordability.formattedWorldCount {
+                LabeledContent(basisLabel,
+                               value: basisCost.formatted(.number.precision(.fractionLength(0...1))))
+                LabeledContent(affordability.worldCountLabel, value: count)
+            } else {
+                Text(affordability.noBasisCopy)
+            }
+            if let warning = affordability.warningCopy {
+                Label(warning, systemImage: "exclamationmark.triangle")
                     .foregroundStyle(.orange)
             }
         }

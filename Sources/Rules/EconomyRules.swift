@@ -1,5 +1,69 @@
 import Foundation
 
+struct EssenceAffordabilityPresentation: Equatable, Sendable {
+    enum Action: Equatable, Sendable { case construction, study }
+    enum Basis: Equatable, Sendable { case recentWorld, currentWorldPreview }
+
+    let action: Action
+    let essenceAvailableNow: Int
+    let refinableRawEquivalent: Int
+    let actionCost: Int
+    let basis: Basis?
+    let basisCost: Double?
+
+    var essenceAfterRefining: Int { essenceAvailableNow + refinableRawEquivalent }
+    var essenceAfterAction: Int { max(0, essenceAfterRefining - actionCost) }
+    var includesRefining: Bool { refinableRawEquivalent > 0 }
+    var worldsAffordable: Double? {
+        guard let basisCost, basisCost > 0 else { return nil }
+        return Double(essenceAfterAction) / basisCost
+    }
+    var afterActionLabel: String {
+        switch (action, includesRefining) {
+        case (.construction, true): "Essence after refining and construction"
+        case (.construction, false): "Essence available after construction"
+        case (.study, true): "Essence after refining and study"
+        case (.study, false): "Essence available after study"
+        }
+    }
+    var worldCountLabel: String {
+        switch (action, includesRefining) {
+        case (.construction, true): "Worlds you can afford after refining and construction"
+        case (.construction, false): "Worlds you can afford after construction"
+        case (.study, true): "Worlds you can afford after refining and study"
+        case (.study, false): "Worlds you can afford after study"
+        }
+    }
+    var basisLabel: String? {
+        switch basis {
+        case .recentWorld: "Typical cost of a recent world written by you"
+        case .currentWorldPreview: "Current World preview cost"
+        case nil: nil
+        }
+    }
+    var noBasisCopy: String {
+        switch action {
+        case .construction:
+            "Bind a world written by you to estimate how many worlds you can afford afterward."
+        case .study:
+            "Write and join at least one Sigil to estimate how many worlds you can afford after this study."
+        }
+    }
+    var warningCopy: String? {
+        guard let worldsAffordable else { return nil }
+        if action == .construction, worldsAffordable < 1 {
+            return "This would leave less Essence than a typical recent world written by you costs."
+        }
+        if worldsAffordable < 2 {
+            return "This would leave Essence for fewer than 2 worlds at the shown cost."
+        }
+        return nil
+    }
+    var formattedWorldCount: String? {
+        worldsAffordable.map { "≈ \($0.formatted(.number.precision(.fractionLength(1))))" }
+    }
+}
+
 /// Spending: refining, buying, identifying, and what a cache pays out.
 ///
 /// One principle runs through it — **a rank is never stored twice.** Every upgrade maps to exactly
@@ -37,6 +101,7 @@ enum EconomyRules {
         var isLowWritingRunway: Bool
         var shortfall: [String]
         var isAvailable: Bool
+        var affordability: EssenceAffordabilityPresentation
     }
 
     // MARK: Refining
@@ -274,6 +339,12 @@ enum EconomyRules {
             : (currentAuthoredCost != nil ? .currentAuthoredPreview : nil)
         let after = max(0, spendableNow - cost.essence)
         let remaining = bindCost.map { $0 > 0 ? Double(after) / $0 : 0 }
+        let rawEquivalent = refine(rawUnits: state.base.resources[Resources.essenceRaw], in: state)
+        let affordability = EssenceAffordabilityPresentation(
+            action: .study, essenceAvailableNow: state.base.essence,
+            refinableRawEquivalent: rawEquivalent, actionCost: cost.essence,
+            basis: median != nil ? .recentWorld : (currentAuthoredCost != nil ? .currentWorldPreview : nil),
+            basisCost: bindCost)
         return ResearchPurchasePreview(
             nodeID: node.id,
             cost: cost,
@@ -284,7 +355,7 @@ enum EconomyRules {
             authoredBindsRemaining: remaining,
             isLowWritingRunway: remaining.map { $0 < 2 } ?? false,
             shortfall: shortfall(cost, in: state),
-            isAvailable: isAvailable(node, in: state)
+            isAvailable: isAvailable(node, in: state), affordability: affordability
         )
     }
 

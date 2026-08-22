@@ -200,7 +200,9 @@ final class ExpeditionOutcomeTests: XCTestCase {
         XCTAssertTrue(source.contains("eyebrow: \"RECOVERED\""))
         XCTAssertTrue(source.contains("keptLedger"))
         XCTAssertTrue(source.contains("eyebrow: \"LOST\""))
-        XCTAssertTrue(source.contains("Text(\"NEXT DEPARTURE\")"))
+        XCTAssertTrue(source.contains("Text(\"ESSENCE AVAILABLE\")"))
+        XCTAssertTrue(source.contains("after refining"))
+        XCTAssertTrue(source.contains("Enough to bind at least one more world"))
         XCTAssertTrue(source.contains(".scrollBounceBehavior(.basedOnSize)"))
         XCTAssertTrue(source.contains("count: 6"))
     }

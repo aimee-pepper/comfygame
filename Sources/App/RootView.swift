@@ -267,7 +267,7 @@ private struct AnchorSettlementView: View {
                         summary("Remaining", remaining)
                     }
                     HStack {
-                        Text("Authored-bind runway: \(bindRunway)")
+                        Text("Worlds you can afford at \(bindCost) Essence each: \(bindRunway)")
                         Spacer()
                         Text("Resting: \(restCount)")
                     }
@@ -530,13 +530,13 @@ struct RunExitSummaryView: View {
     private var essenceRunway: some View {
         HStack {
             VStack(alignment: .leading, spacing: 2) {
-                Text("NEXT DEPARTURE").font(.custom("Tiny5", size: 9))
+                Text("ESSENCE AVAILABLE").font(.custom("Tiny5", size: 9))
                     .foregroundStyle(PixelUITheme.muted)
-                Text("\(summary.essenceEconomy.netRunway) Essence held")
+                Text("\(summary.essenceEconomy.netRunway) after refining")
                     .font(.custom("Tiny5", size: 10))
             }
             Spacer()
-            Text("Enough for the next bind")
+            Text("Enough to bind at least one more world")
                 .font(.custom("Tiny5", size: 9))
         }
         .padding(8)

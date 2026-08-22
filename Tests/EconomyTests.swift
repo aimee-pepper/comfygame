@@ -590,6 +590,12 @@ final class EconomyTests: XCTestCase {
         XCTAssertEqual(preview.authoredBindsRemaining,
                        Double(expectedNow - brush.cost.essence) / 10)
         XCTAssertTrue(preview.isLowWritingRunway)
+        XCTAssertEqual(preview.affordability.essenceAvailableNow, 45)
+        XCTAssertEqual(preview.affordability.essenceAfterRefining, expectedNow)
+        XCTAssertEqual(preview.affordability.afterActionLabel,
+                       "Essence after refining and study")
+        XCTAssertEqual(preview.affordability.basisLabel,
+                       "Typical cost of a recent world written by you")
     }
 
     func testPenmanshipPreviewFallsBackToCurrentAuthoredDraftNotBlankMinimum() throws {
@@ -605,6 +611,7 @@ final class EconomyTests: XCTestCase {
         let preview = EconomyRules.researchPurchasePreview(for: brush, in: state)
 
         XCTAssertEqual(preview.bindCostBasis, .currentAuthoredPreview)
+        XCTAssertEqual(preview.affordability.basisLabel, "Current World preview cost")
         XCTAssertEqual(preview.authoredBindCost,
                        Double(BookRules.resolveBook(page: state.base.page).essencePaid))
 
@@ -613,6 +620,27 @@ final class EconomyTests: XCTestCase {
         XCTAssertNil(blank.authoredBindCost,
                      "the ten-Essence emergency minimum is not an ordinary authored baseline")
         XCTAssertNil(blank.authoredBindsRemaining)
+        XCTAssertEqual(blank.affordability.noBasisCopy,
+                       "Write and join at least one Sigil to estimate how many worlds you can afford after this study.")
+    }
+
+    func testAfterRefiningPotentialDoesNotAuthorizeAnUnaffordableStudy() throws {
+        var state = GameState.newGame()
+        state.base.essence = 0
+        state.base.resources.add(100, of: Resources.essenceRaw)
+        let brush = try node("pen_brush")
+        state.base.stations[Stations.scriptorium] = StationState(isUnlocked: true, tier: 0)
+        for (id, amount) in brush.cost.resources { state.base.resources.add(amount, of: id) }
+        let preview = EconomyRules.researchPurchasePreview(for: brush, in: state)
+        XCTAssertGreaterThanOrEqual(preview.affordability.essenceAfterRefining,
+                                    preview.cost.essence)
+        XCTAssertEqual(preview.affordability.essenceAvailableNow, 0)
+        XCTAssertTrue(preview.shortfall.contains { $0.contains("essence") },
+                      "convertible Raw Essence must not authorize a liquid-Essence payment")
+        let before = state
+        XCTAssertEqual(EconomyRules.commitResearchPurchase(preview, node: brush, in: &state),
+                       .refused(.shortfall(preview.shortfall)))
+        XCTAssertEqual(state, before)
     }
 
     func testPenmanshipQuoteHasExactShortfallAndStaleCommitLosesNothing() throws {
