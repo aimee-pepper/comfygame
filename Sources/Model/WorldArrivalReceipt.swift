@@ -60,6 +60,9 @@ struct WorldArrivalSceneReceipt: Codable, Equatable, Sendable {
     }
     struct CausalVisualFact: Codable, Equatable, Sendable {
         var markID: String
+        /// Frozen bind-time Dictionary/review label. Nil means the mark is unknown and ineligible.
+        var markDisplayName: String?
+        var sourcePageOrder: Int?
         var visibleScope: String
         var contributionKind: String
         var resultBand: String
@@ -231,6 +234,15 @@ struct WorldArrivalReceipt: Codable, Equatable, Sendable {
         var deepWaterTileCount: Int
         var nonChasmTileCount: Int
     }
+    struct EnvironmentSummary: Codable, Equatable, Sendable {
+        var illuminationBand: String
+        var suspendedMedium: String
+        var suspendedDensity: String
+        var precipitation: String
+        var precipitationIntensity: String
+        var floraCoverageBand: String
+        var floraHabit: String
+    }
     struct MapCell: Codable, Equatable, Sendable {
         var point: GridPoint
         /// Hidden cells carry no terrain request. Nil is part of the persisted disclosure boundary,
@@ -255,6 +267,8 @@ struct WorldArrivalReceipt: Codable, Equatable, Sendable {
     var visualSchemaVersion: String
     /// Optional only for receipts decoded from the brief pre-E2 schema.
     var terrainSummary: TerrainSummary?
+    /// Aggregate map-owned grammar state; never inferred from the first flora species.
+    var environmentSummary: EnvironmentSummary?
     var dominantGround: GroundType
     var waterRelationship: String
     var materialDescriptor: WorldGrade2V1.Material
@@ -294,7 +308,7 @@ enum WorldArrivalReceiptFactory {
         let light = BookRules.readings(for: book, seed: generationSeed)["illumination"]
         let lightBand: String = light.peak < 10 ? "trueDark" : light.peak < 35 ? "dim"
             : light.peak < 70 ? "ordinary" : light.peak < 90 ? "bright" : "blazing"
-        let sourceClass = light.floor > 5 ? "constant" : "cyclic"
+        let sourceClass = illuminationSourceClass(light)
         let atmosphere = visualReceipt.descriptor.atmosphere
         let suspended = atmosphere.medium == "none" ? nil : WorldArrivalReceipt.Atmosphere(
             medium: atmosphere.medium, density: atmosphere.density, motion: "calm")
@@ -311,6 +325,20 @@ enum WorldArrivalReceiptFactory {
                          habit: plant.traits.habit.rawValue,
                          resolvedColor: descriptor.resolvedColor.srgb)
         }
+        let placedFloraTiles = map.tiles.count { $0.flora != nil }
+        let aggregateCoverage = placedFloraTiles == 0 ? "none"
+            : placedFloraTiles * 100 < nonChasmTileCount * 8 ? "sparse"
+            : placedFloraTiles * 100 < nonChasmTileCount * 22 ? "present" : "abundant"
+        let habits = Set(flora.compactMap { plant in
+            map.tiles.contains(where: { $0.flora == plant.id }) ? plant.traits.habit.rawValue : nil
+        })
+        let aggregateHabit = habits.count == 1 ? habits.first! : "mixed"
+        let environmentSummary = WorldArrivalReceipt.EnvironmentSummary(
+            illuminationBand: lightBand,
+            suspendedMedium: atmosphere.medium,
+            suspendedDensity: densityBand(atmosphere.density, medium: atmosphere.medium),
+            precipitation: "none", precipitationIntensity: "none",
+            floraCoverageBand: aggregateCoverage, floraHabit: aggregateHabit)
         let physical = WorldArrivalReceipt.SourcePage(
             title: source.title, width: source.pageThumbnail.width, height: source.pageThumbnail.height,
             marks: source.pageThumbnail.marks.map {
@@ -340,6 +368,7 @@ enum WorldArrivalReceiptFactory {
                      visualReceiptID: visualReceipt.canonicalReceiptSHA256,
                      visualSchemaVersion: visualReceipt.adapterVersion,
                      terrainSummary: terrainSummary,
+                     environmentSummary: environmentSummary,
                      dominantGround: dominant, waterRelationship: waterRelationship,
                      materialDescriptor: visualReceipt.descriptor.material,
                      illumination: .init(peak: light.peak, floor: light.floor,
@@ -354,6 +383,10 @@ enum WorldArrivalReceiptFactory {
     }
 
     private static let schemaIdentity = "world-arrival-receipt-v1"
+
+    static func illuminationSourceClass(_ light: PressureReading) -> String {
+        light.has("sourceless") ? "sourceless" : light.floor > 5 ? "constant" : "cyclic"
+    }
 
     static func dominantDryGround(in map: WorldMap) throws -> GroundType {
         let counts = Dictionary(grouping: map.tiles.map(\.ground), by: { $0 }).mapValues(\.count)

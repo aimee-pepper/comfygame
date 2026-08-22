@@ -1,7 +1,10 @@
 import Foundation
 
 enum WorldArrivalDescriptionRules {
-    enum Error: Swift.Error, Equatable { case malformedTerrain, malformedFlora, overlong }
+    enum Error: Swift.Error, Equatable {
+        case malformedTerrain, malformedFlora, malformedEnvironment
+        case unknownGround, unknownScope, unknownContribution, missingKnownLabel, missingPageOrder, overlong
+    }
 
     struct TerrainSummary: Equatable {
         var wetTileCount: Int
@@ -9,13 +12,43 @@ enum WorldArrivalDescriptionRules {
         var nonChasmTileCount: Int
     }
 
+    struct EnvironmentSummary: Equatable {
+        var illuminationBand: String
+        var suspendedMedium: String
+        var suspendedDensity: String
+        var precipitation: String
+        var precipitationIntensity: String
+        var floraCoverageBand: String
+        var floraHabit: String
+    }
+
     static func describe(_ receipt: WorldArrivalSceneReceipt.Payload,
-                         terrain: TerrainSummary? = nil) throws -> String {
-        let ground = groundToken(receipt.dominantGround)
-        let water = try terrain.map(waterBand) ?? waterBand(receipt.waterRelationship)
-        let eligible = receipt.causalVisualFacts.filter {
-            $0.contributionKind != "none"
-                && ["ground", "water", "flora", "light", "atmosphere"].contains($0.visibleScope)
+                         terrain: TerrainSummary,
+                         environment: EnvironmentSummary) throws -> String {
+        let ground = try groundToken(receipt.dominantGround)
+        let water = try waterBand(terrain)
+        try validate(environment)
+        let scoped = try receipt.causalVisualFacts.map { fact -> WorldArrivalSceneReceipt.CausalVisualFact in
+            guard ["none", "increased", "reduced", "reshaped"].contains(fact.contributionKind) else {
+                throw Error.unknownContribution
+            }
+            guard ["ground", "water", "flora", "light", "atmosphere"].contains(fact.visibleScope) else {
+                throw Error.unknownScope
+            }
+            return fact
+        }
+        let eligible = try scoped.filter {
+            guard $0.contributionKind != "none" else { return false }
+            guard $0.markDisplayName?.isEmpty == false else { return false }
+            guard $0.sourcePageOrder != nil else {
+                throw Error.missingPageOrder
+            }
+            return true
+        }.sorted {
+            if $0.sourcePageOrder != $1.sourcePageOrder {
+                return ($0.sourcePageOrder ?? 0) < ($1.sourcePageOrder ?? 0)
+            }
+            return scopeOrder($0.visibleScope) < scopeOrder($1.visibleScope)
         }
         let structural = eligible.first {
             $0.contributionKind == "reshaped"
@@ -24,15 +57,15 @@ enum WorldArrivalDescriptionRules {
         }
         let first = firstSentence(ground: ground, water: water, structuralMark: structural?.markID)
         var selected = Array(eligible.prefix(2))
-        var second = try secondSentence(receipt, selected: selected)
+        var second = try secondSentence(receipt, environment: environment, selected: selected)
         var result = "\(first) \(second)"
         if wordCount(result) > 55, selected.count == 2 {
             selected.removeLast()
-            second = try secondSentence(receipt, selected: selected)
+            second = try secondSentence(receipt, environment: environment, selected: selected)
             result = "\(first) \(second)"
         }
         if wordCount(result) > 55 {
-            second = environmentalSentence(receipt)
+            second = environmentalSentence(environment)
             result = "\(first) \(second)"
         }
         if wordCount(result) < 18 {
@@ -62,18 +95,7 @@ enum WorldArrivalDescriptionRules {
         return .waterDominant
     }
 
-    private static func waterBand(_ relationship: String) -> WaterBand {
-        switch relationship {
-        case "none": .dry
-        case "pools": .scatteredPools(hasDeepWater: false)
-        case "channels": .wetHollows
-        case "shelves": .mixedDepth
-        case "islands": .waterDominant
-        default: .dry
-        }
-    }
-
-    private static func groundToken(_ ground: GroundType) -> String {
+    private static func groundToken(_ ground: GroundType) throws -> String {
         switch ground {
         case .stone: "stone"
         case .soil: "earthen ground"
@@ -84,7 +106,7 @@ enum WorldArrivalDescriptionRules {
         case .mud: "muddy ground"
         case .growth: "tall growth"
         case .groundcover: "low ground cover"
-        case .water, .deepWater, .chasm: "visible ground"
+        case .water, .deepWater, .chasm: throw Error.unknownGround
         }
     }
 
@@ -134,20 +156,21 @@ enum WorldArrivalDescriptionRules {
     }
 
     private static func secondSentence(_ receipt: WorldArrivalSceneReceipt.Payload,
+                                       environment: EnvironmentSummary,
                                        selected: [WorldArrivalSceneReceipt.CausalVisualFact]) throws -> String {
-        guard !selected.isEmpty else { return environmentalSentence(receipt) }
+        guard !selected.isEmpty else { return environmentalSentence(environment) }
         let clauses = try selected.map { fact -> String in
-            "Your \(displayName(fact.markID)) mark \(try verb(fact, receipt: receipt))"
+            "Your \(try knownDisplayName(fact)) mark \(try verb(fact, environment: environment))"
         }
         if clauses.count == 2 {
-            return "\(clauses[0]), while your \(displayName(selected[1].markID)) mark \(try verb(selected[1], receipt: receipt))."
+            return "\(clauses[0]), while your \(try knownDisplayName(selected[1])) mark \(try verb(selected[1], environment: environment))."
         }
-        let environment = environmentalFragment(receipt)
-        return environment.map { "\(clauses[0]), while \($0)." } ?? "\(clauses[0])."
+        let fragment = pairedEnvironmentalFragment(environment, dominantGround: receipt.dominantGround)
+        return fragment.map { "\(clauses[0]), while \($0)." } ?? "\(clauses[0])."
     }
 
     private static func verb(_ fact: WorldArrivalSceneReceipt.CausalVisualFact,
-                             receipt: WorldArrivalSceneReceipt.Payload) throws -> String {
+                             environment: EnvironmentSummary) throws -> String {
         let key = "\(fact.markID)|\(fact.visibleScope)|\(fact.contributionKind)"
         switch key {
         case "plains|ground|reshaped": return "opened the terrain"
@@ -164,22 +187,21 @@ enum WorldArrivalDescriptionRules {
         case ("water", "reshaped"): return "reshaped the water"
         case ("water", "increased"): return "made water more prevalent"
         case ("water", "reduced"): return "made water less prevalent"
-        case ("flora", "reshaped"): return "reshaped \(try floraPhrase(receipt))"
-        case ("flora", "increased"): return "spread \(try floraPhrase(receipt)) farther"
-        case ("flora", "reduced"): return "left less \(try floraPhrase(receipt))"
+        case ("flora", "reshaped"): return "reshaped \(try floraPhrase(environment))"
+        case ("flora", "increased"): return "spread \(try floraPhrase(environment)) farther"
+        case ("flora", "reduced"): return "left less \(try floraPhrase(environment))"
         case ("light", "reshaped"): return "changed the light"
         case ("light", "increased"): return "strengthened the light"
         case ("light", "reduced"): return "subdued the light"
         case ("atmosphere", "reshaped"): return "changed the air"
         case ("atmosphere", "increased"): return "strengthened that condition in the air"
         case ("atmosphere", "reduced"): return "weakened that condition in the air"
-        default: return "changed the visible terrain"
+        default: throw Error.unknownContribution
         }
     }
 
-    private static func floraPhrase(_ receipt: WorldArrivalSceneReceipt.Payload) throws -> String {
-        guard let first = receipt.flora.first else { throw Error.malformedFlora }
-        switch (first.coverage, first.habit) {
+    private static func floraPhrase(_ environment: EnvironmentSummary) throws -> String {
+        switch (environment.floraCoverageBand, environment.floraHabit) {
         case ("sparse", _): return "sparse growth"
         case ("present", "solitary"): return "scattered growth"
         case ("present", "clustered"): return "clustered growth"
@@ -193,10 +215,9 @@ enum WorldArrivalDescriptionRules {
         }
     }
 
-    private static func environmentalSentence(_ receipt: WorldArrivalSceneReceipt.Payload) -> String {
-        let atmosphere = receipt.suspendedAtmosphere
-        if atmosphere.density == "heavy" || atmosphere.density == "dense" {
-            switch atmosphere.medium {
+    private static func environmentalSentence(_ environment: EnvironmentSummary) -> String {
+        if environment.suspendedDensity == "heavy" || environment.suspendedDensity == "dense" {
+            switch environment.suspendedMedium {
             case "smoke": return "Smoke hangs thickly across the farther ground."
             case "airborneAsh": return "Airborne ash forms heavy banks across the farther ground."
             case "mist": return "Mist gathers in broad banks beyond the entry."
@@ -204,27 +225,55 @@ enum WorldArrivalDescriptionRules {
             default: break
             }
         }
-        if receipt.precipitation.intensity == "heavy" {
-            switch receipt.precipitation.medium {
+        if environment.precipitationIntensity == "heavy" {
+            switch environment.precipitation {
             case "rain": return "Heavy rain crosses the open ground."
             case "snow": return "Heavy snow crosses the open ground."
             case "mixedRainSnow": return "Rain and snow cross the open ground together."
             default: break
             }
         }
-        switch receipt.illumination.band {
+        switch environment.illuminationBand {
         case "trueDark": return "Only the ground nearest the entry is clearly visible."
         case "blazing": return "Hard light reaches every open surface."
         default: break
         }
-        if let fragment = environmentalFragment(receipt) { return capitalized(fragment) + "." }
+        if environment.suspendedDensity == "trace" || environment.suspendedDensity == "light" {
+            switch environment.suspendedMedium {
+            case "smoke": return "Thin smoke drifts through the open ground."
+            case "airborneAsh": return "A light fall of ash moves through the air."
+            case "mist": return "Light mist gathers in the lower ground."
+            case "miasma": return "A thin miasma hangs over the lower ground."
+            default: break
+            }
+        }
+        if environment.precipitationIntensity == "trace" || environment.precipitationIntensity == "light" {
+            switch environment.precipitation {
+            case "rain": return "Light rain crosses the open ground."
+            case "snow": return "Light snow crosses the open ground."
+            case "mixedRainSnow": return "Light rain and snow cross the open ground together."
+            default: break
+            }
+        }
+        if environment.illuminationBand == "dim" { return "Dim light leaves the farther ground subdued." }
+        if environment.illuminationBand == "bright" { return "Clear light separates the open surfaces." }
+        switch (environment.floraCoverageBand, environment.floraHabit) {
+        case ("abundant", "spreading"): return "Growth spreads across most open ground."
+        case ("abundant", "clustered"): return "Dense growth gathers in broad clusters."
+        case ("abundant", _): return "Growth occupies most open ground."
+        case ("present", "spreading"): return "Growth spreads through the open ground."
+        case ("present", "clustered"): return "Growth gathers in distinct clusters."
+        case ("present", _): return "Growth is established across the open ground."
+        case ("sparse", _): return "Sparse growth holds to a few open patches."
+        default: break
+        }
         return "No single visible condition dominates the farther ground, which remains open to exploration."
     }
 
-    private static func environmentalFragment(_ receipt: WorldArrivalSceneReceipt.Payload) -> String? {
-        let atmosphere = receipt.suspendedAtmosphere
-        if atmosphere.density == "heavy" || atmosphere.density == "dense" {
-            switch atmosphere.medium {
+    private static func pairedEnvironmentalFragment(_ environment: EnvironmentSummary,
+                                                    dominantGround: GroundType) -> String? {
+        if environment.suspendedDensity == "heavy" || environment.suspendedDensity == "dense" {
+            switch environment.suspendedMedium {
             case "smoke": return "thick smoke hung across the farther ground"
             case "airborneAsh": return "airborne ash formed heavy banks across the farther ground"
             case "mist": return "mist gathered in broad banks beyond the entry"
@@ -232,22 +281,22 @@ enum WorldArrivalDescriptionRules {
             default: break
             }
         }
-        if receipt.precipitation.intensity == "heavy" {
-            switch receipt.precipitation.medium {
+        if environment.precipitationIntensity == "heavy" {
+            switch environment.precipitation {
             case "rain": return "heavy rain crossed the open ground"
             case "snow": return "heavy snow crossed the open ground"
             case "mixedRainSnow": return "rain and snow crossed the open ground together"
             default: break
             }
         }
-        if receipt.illumination.band == "trueDark" {
+        if environment.illuminationBand == "trueDark" {
             return "only the ground nearest the entry remained clearly visible"
         }
-        if receipt.illumination.band == "blazing" {
+        if environment.illuminationBand == "blazing" {
             return "hard light reached every open surface"
         }
-        if atmosphere.density == "trace" || atmosphere.density == "light" {
-            switch atmosphere.medium {
+        if environment.suspendedDensity == "trace" || environment.suspendedDensity == "light" {
+            switch environment.suspendedMedium {
             case "smoke": return "thin smoke drifted through the open ground"
             case "airborneAsh": return "a light fall of ash moved through the air"
             case "mist": return "light mist gathered in the lower ground"
@@ -255,34 +304,47 @@ enum WorldArrivalDescriptionRules {
             default: break
             }
         }
-        if receipt.precipitation.intensity == "trace" || receipt.precipitation.intensity == "light" {
-            switch receipt.precipitation.medium {
+        if environment.precipitationIntensity == "trace" || environment.precipitationIntensity == "light" {
+            switch environment.precipitation {
             case "rain": return "light rain crossed the open ground"
             case "snow": return "light snow crossed the open ground"
             case "mixedRainSnow": return "light rain and snow crossed the open ground together"
             default: break
             }
         }
-        if receipt.illumination.band == "dim" { return "dim light left the farther ground subdued" }
-        if receipt.illumination.band == "bright" { return "clear light separated the open surfaces" }
-        guard let flora = receipt.flora.first else { return nil }
-        switch (flora.coverage, flora.habit) {
+        if environment.illuminationBand == "dim" { return "dim light left the farther ground subdued" }
+        if environment.illuminationBand == "bright" { return "clear light separated the open surfaces" }
+        switch (environment.floraCoverageBand, environment.floraHabit) {
         case ("abundant", "spreading"): return "growth spread across most open ground"
         case ("abundant", "clustered"): return "dense growth gathered in broad clusters"
         case ("abundant", _): return "growth occupied most open ground"
         case ("present", "spreading"): return "growth spread through the open ground"
         case ("present", "clustered"): return "growth gathered in distinct clusters"
         case ("present", _): return "growth established itself across the open ground"
-        case ("sparse", _) where receipt.dominantGround == .stone:
+        case ("sparse", _) where dominantGround == .stone:
             return "sparse growth settled on the open stone"
         case ("sparse", _): return "sparse growth settled across a few open patches"
         default: return nil
         }
     }
 
-    private static func displayName(_ id: String) -> String {
-        if id == "common_ore" { return "Ore" }
-        return id.split(separator: "_").map { capitalized(String($0)) }.joined(separator: " ")
+    private static func knownDisplayName(_ fact: WorldArrivalSceneReceipt.CausalVisualFact) throws -> String {
+        guard let label = fact.markDisplayName, !label.isEmpty else { throw Error.missingKnownLabel }
+        return label
+    }
+    private static func scopeOrder(_ scope: String) -> Int {
+        ["ground", "water", "flora", "light", "atmosphere"].firstIndex(of: scope) ?? .max
+    }
+    private static func validate(_ environment: EnvironmentSummary) throws {
+        guard ["trueDark", "dim", "ordinary", "bright", "blazing"].contains(environment.illuminationBand),
+              ["none", "smoke", "airborneAsh", "mist", "miasma"].contains(environment.suspendedMedium),
+              ["none", "trace", "light", "heavy", "dense"].contains(environment.suspendedDensity),
+              ["none", "rain", "snow", "mixedRainSnow"].contains(environment.precipitation),
+              ["none", "trace", "light", "heavy"].contains(environment.precipitationIntensity),
+              ["none", "sparse", "present", "abundant"].contains(environment.floraCoverageBand),
+              ["solitary", "clustered", "spreading", "mixed"].contains(environment.floraHabit) else {
+            throw Error.malformedEnvironment
+        }
     }
     private static func capitalized(_ value: String) -> String {
         guard let first = value.first else { return value }
