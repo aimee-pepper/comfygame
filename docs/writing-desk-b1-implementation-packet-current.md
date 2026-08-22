@@ -7,6 +7,11 @@ native Writing flow before native world-arrival promotion
 ink and compact projection grammar; Game Design owns disclosure, hierarchy and copy
 **Updated:** 21 August 2026
 
+**Final-art reservation:** Aimee owns final sigil drawing and appearance. The current A1/A2/A3 and
+WritingDeskProductionPack pixels are temporary semantic-keyed integration scaffolding only. They may prove
+lookup, rotation, tint, state and layout plumbing, but authorize no further placeholder-glyph generation,
+refinement or expansion. Final user-authored sprites must replace them without rewriting rules or UI.
+
 ## Player result
 
 The Writing Desk must feel like handling one physical page whose writing becomes one world. The player can

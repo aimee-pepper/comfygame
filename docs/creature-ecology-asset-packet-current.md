@@ -1,8 +1,11 @@
 # Creature ecology and material assets — production packet
 
-**Status:** Game Design production brief; do not begin until the orchestrator explicitly schedules this
-checkpoint after the current atmosphere review. This packet removes visual discretion that would change
-game semantics; Aimee still accepts or rejects the resulting art.
+**Status:** Future full-family production brief, currently held. Engineering must first implement the
+habitat/material consumer with functional identities. Asset may then receive a separately scheduled
+four-species vertical slice—one terrestrial, shore, aquatic and aerial identity plus only their resulting
+material families. The remaining three references and full eighteen-family atlas wait until that slice is
+live and phone-reviewed. This packet removes visual discretion that would change game semantics; Aimee
+still accepts or rejects the resulting art.
 **Scope:** generated ordinary-creature identity across world/encounter/Bestiary plus the 18 Creature-material
 inventory identities. No native integration, ecology rules or combat tuning are part of the Asset task.
 **Updated:** 21 August 2026
@@ -27,6 +30,11 @@ Asset may report a contradiction but may not resolve one by inventing a fifth ha
 an Earth-species catalogue or a new gameplay stat.
 
 ## Exact output boundary
+
+The list below is the eventual complete family contract, not one currently authorized Asset task. The first
+scheduled Asset checkpoint is the four-species vertical slice defined in the status above. Do not generate
+the remaining reference species, unused material families or six-band breadth merely because their future
+requirements are documented here.
 
 The first checkpoint produces only:
 

@@ -1,6 +1,6 @@
 {
   "schemaVersion": 3,
-  "updated": "21 Aug 2026",
+  "updated": "22 Aug 2026",
   "essenceBaseline": "a816113",
   "campaignBands": [
     {
@@ -150,7 +150,7 @@
       "status": "readyToTest",
       "detail": "Source checkpoints 1625915 and 6eb3988 derive current LOS instead of saving it, persist exploration only for fully visible tiles, and make Illumination plus obscuring Atmosphere control a full-visibility circle and transient terrain-only fringe. Hidden neighbours cannot affect visible edge/sidewall commands; hidden tiles construct no terrain art and render content-neutral opaque black, with softening confined to visible fog boundaries.",
       "gate": "Default, low-light and true-black profiles produce distinct rules-owned radii; density and LOS/elevation/cover affect both full and border visibility; only fully visible tiles persist as explored or enter the minimap; fog and partial visibility never disclose hidden content; relaunch derives the same current view from saved world facts; ordinary phone proof remains readable without map-scale changes.",
-      "workstream": "asset",
+      "workstream": "acceptance",
       "isPrimary": false
     },
     {
@@ -448,9 +448,9 @@
       "priority": "B1.7b",
       "title": "Layered terrain shapes and restrained motion",
       "status": "queued",
-      "detail": "Design is closed in terrain-layering-and-motion-asset-packet-current.md. The future Asset slice keeps the map straight top-down and composes reviewed 16×16 water, hard surface, loose surface and growth bitmaps through shared irregular edge contours with no vertical sidewalls. One map-level four-tick clock may animate restrained water ripples, bounded growth flex and rare Ice glints without rerastering static bodies or touching rules.",
-      "gate": "Hold behind corrected B1.6a World Arrival acceptance. Then freeze the exact terrain-layers-v1 request, 12-family logical bitmap kit, complementary edge masks, Water/Deep-Water and Growth/Groundcover pair rules, shared six-second motion loop, per-frame pixel budgets and Reduce Motion/static fallback. The 11×11 proof must preserve all rule receipts, omit hidden requests, keep remembered/fringe static, show no equal-height sidewalls and retain route/content/warning ownership in color and grayscale. No native work before visual acceptance.",
-      "workstream": "asset",
+      "detail": "Design is closed and the accepted Terrain Layering + Motion v0.1 candidate is frozen at Asset commit c5eff83b93278d37710f2d958851487e5042048d. It keeps the map straight top-down, proves reviewed 16×16 water/hard/loose/growth composition through shared irregular contours with no equal-height sidewalls, and supplies one restrained map-level motion grammar. No further Asset variants or polish are authorized before native integration and phone review.",
+      "gate": "Hold behind B1.6a World Arrival. Engineering then integrates only the frozen request, logical bitmap kit, complementary edge ownership, Water/Deep-Water and Growth/Groundcover pair rules, shared motion loop and Reduce Motion/static fallback. The native 11×11 proof must preserve rule receipts, omit hidden requests, keep remembered/fringe static, show no equal-height sidewalls and retain route/content/warning ownership in color and grayscale. Any additional Asset breadth waits for this exact slice to be live and phone-reviewed.",
+      "workstream": "engineering",
       "isPrimary": false
     },
     {
@@ -510,7 +510,7 @@
       "status": "readyToTest",
       "detail": "Source-complete and parked for acceptance: strict generated command/raster validation carries stable ItemID through Storehouse, loot, equipment, Blacksmith, Trading Post and Recycler. Exact TravellerID selects map, Party and Library cameos; functional placeholder packs remain distinct from final art. No Asset consumer is active merely because this checkpoint awaits review.",
       "gate": "When its Band-2 acceptance becomes current, prove stable authored identity across Storehouse, loot, equipment, Trading Post and Recycler and named-character identity across map, Party and Library; rarity, stats and array order never invent identity. Until then Asset may be idle.",
-      "workstream": "asset",
+      "workstream": "acceptance",
       "isPrimary": false
     },
     {
@@ -628,8 +628,8 @@
       "priority": "B7.7",
       "title": "Final stable-system art replacement",
       "status": "paused",
-      "detail": "Functional identity art is replaced broadly only after the systems it depicts stop moving; Band 1/2 readability assets remain allowed now.",
-      "gate": "Every stable system uses an accepted immutable native pack without redoing art for mechanics still under redesign.",
+      "detail": "Functional identity art is replaced broadly only after the systems it depicts are live, phone-reviewed and no longer expected to change structurally. Band 1/2 readability scaffolding is allowed only for the next scheduled native vertical slice; user-authored art reservations remain excluded.",
+      "gate": "Each family begins with one integrated representative slice. Broad final production follows only after its system, state schema, dimensions and replacement seam are accepted on phone, preventing art from being redone for mechanics still under redesign.",
       "workstream": "asset",
       "isPrimary": false
     },
@@ -807,11 +807,11 @@
       "id": "writing-causal-presentation",
       "priority": "B1.5a",
       "title": "Page-first Writing and truthful world projection",
-      "status": "inProgress",
-      "detail": "Correct Write, Pages and The world as one page-owned causal flow using the exact source state, disclosure-safe review model, phone hierarchy and transaction in writing-desk-b1-implementation-packet-current.md. E1/E2 rules are source-complete. The accepted Asset production pack is frozen in b559d8e09b42d4e61bc09106543365520ab7831b at body 3a9a3f1f854e20b981c26fa98da36bb4219661623cebfee895e4f743b7a62fa6 and manifest 0257bb94d0e180dfa40008f7143a89e75dec49263e4d08e9249eadfe6f232f96: 4,459 deduplicated assets, 1,296 authored hand/kind/quarter-turn rows, 312 overlays, five legal tool/ink strips and exact cardinal connectors. E3 loader candidate 19f1e277 is source-complete and awaiting Game Design code/diff acceptance; E4 remains blocked.",
-      "gate": "E3 validates the closed manifest/version/hashes, exhaustive 108x3 lookup, all state footprints, exactly five legal tool/ink strips, tint-only mixed ink with never-drawn fixed masks, 28x5/5x28 deterministic cardinal links, runtime thumbnails, explicit personalCompound compatibility only and missing/unknown refusal. Packaging validation is exhaustive; runtime loading is lazy on first Writing Desk entry and performs no pack enumeration/hash/decode during app launch. Then blank, partial, unread, fully specified, starter and authored-resource fixtures retain one exact source through Write/review/arrival/History; all non-bind actions are zero-spend; stale quote/generator/adapter failures are atomic no-ops; final Bind & Depart consumes the exact collected instance or reuses the frozen draft copy and emits one arrival receipt. Authorities: writing-desk-b1-implementation-packet-current.md, core-loop-causal-presentation-plan-current.md and first-three-worlds-execution-plan-current.md B1-B3.",
+      "status": "readyToTest",
+      "detail": "E1/E2 rules and the E3/E4 loader/Write surface are integrated through 2984b6b9 and installed as version 1.0 build 234 for phone review. The 4,459-file WritingDeskProductionPack is temporary semantic-keyed integration scaffolding for 108 current lexemes across hands, rotations and UI states; Aimee retains final sigil design authority. No further placeholder glyph generation, refinement or pack expansion is authorized. E5 Pages, E6 The world and E7 end-to-end closure have not started.",
+      "gate": "Phone-review E4 before E5 resumes: complete page, tool/bin/palette reachability, exact edit/connect/disconnect/cancellation behavior and no black/unavailable race. Preserve the stable semantic-key replacement seam so Aimee-authored final sprites replace scaffold pixels without rewriting gameplay, layout or interaction. Audit the 108 semantic lexemes separately for gameplay coverage by bin; that audit may add or retire meanings but generates no art. E5–E7 then retain one exact source through Pages/review/arrival/History, keep all non-bind actions zero-spend and make stale quote/generator/adapter failures atomic no-ops. Authorities: writing-desk-b1-implementation-packet-current.md, core-loop-causal-presentation-plan-current.md and first-three-worlds-execution-plan-current.md B1-B3.",
       "workstream": "engineering",
-      "isPrimary": true
+      "isPrimary": false
     },
     {
       "id": "world-arrival-reveal",
@@ -879,7 +879,7 @@
       "title": "Habitat-aware life and body-derived Creature materials",
       "status": "queued",
       "detail": "Persist the exact terrestrial/shore/aquatic/aerial availability, pressure/map weights, body constraints, component-bound movement and 65% contact-eligible placement quota in creature-habitat-authority.json; deep-only fish remain visible ecology without consuming most reachable fights. Each species also freezes the exact 18-family material projection, capability inputs and deterministic quantities from creature-material-projection-authority.json.",
-      "gate": "Pass both creature validators and the crafting validator. Aquatic life remains in connected shallow+deep water; terrestrial/shore/aerial movement stays inside its legal component; morphology consumes no gameplay RNG; cosmetic specimen jitter never changes drops; every remains family/quality/quantity matches the frozen species and repeated rows aggregate. Asset proves all four habitats plus all 18 material families before native promotion. Territory finds remain independently held by Homework.",
+      "gate": "Engineering first passes both creature validators and the crafting validator with functional identities: Aquatic life remains in connected shallow+deep water; terrestrial/shore/aerial movement stays inside its legal component; morphology consumes no gameplay RNG; cosmetic specimen jitter never changes drops; every remains family/quality/quantity matches the frozen species and repeated rows aggregate. Only when the native world/encounter/Bestiary/material consumer is scheduled may Asset prove one representative species per habitat and only the material families those four bodies actually produce. The remaining species and full 18-family art breadth wait until that vertical slice is live and phone-reviewed. Territory finds remain independently held by Homework.",
       "workstream": "engineering",
       "isPrimary": false
     },
@@ -928,8 +928,8 @@
       "priority": "B3.7a",
       "title": "Compact Party and character build surface",
       "status": "queued",
-      "detail": "Party fits five identity tiles without oversized full-width cards. Character tabs are exactly Stats, Gear, Skills and Gambit. Diary deep-links to that person's Library record and Back restores the person/tab. Skills is the production combat graph; dashed alternatives are exact OR parents, never an extra cost or free node. Native behavior is Engineering-owned; the identity/grid/graph presentation requires an Asset proof before promotion.",
-      "gate": "Five-person 368×800 grid with Rank labels; no Story/ambiguous Combat tab; Diary route round-trip; exact Gear ownership; stable production graph with typed purchases, solid/dashed prerequisites and no Learn-next list. Authority: party-character-surface-current.md.",
+      "detail": "Party fits five identity tiles without oversized full-width cards. Character tabs are exactly Stats, Gear, Skills and Gambit. Diary deep-links to that person's Library record and Back restores the person/tab. Skills is the production combat graph; dashed alternatives are exact OR parents, never an extra cost or free node. Engineering first freezes the native state/action/layout contract with functional identity scaffolding; Asset refinement begins only when that exact vertical slice is scheduled.",
+      "gate": "Five-person 368×800 grid with Rank labels; no Story/ambiguous Combat tab; Diary route round-trip; exact Gear ownership; stable production graph with typed purchases, solid/dashed prerequisites and no Learn-next list. After that source gate, one phone-sized representative graph/character slice may receive Asset refinement; full character or graph breadth waits for live phone review. Authority: party-character-surface-current.md.",
       "workstream": "engineering",
       "isPrimary": false
     },
@@ -975,7 +975,8 @@
     }
   ],
   "paused": [
-    "Broad asset and catalogue expansion",
+    "Broad asset and catalogue expansion before one representative native slice is live and phone-reviewed",
+    "Further placeholder sigil generation, refinement or pack expansion; Aimee owns final sigil art",
     "Accessibility-size variants and rare-layout hardening until existing mechanics and ordinary phone UI are coherent, unless Aimee explicitly promotes one",
     "Tutorial content for outside testers",
     "New late-game stations and specialist breadth until existing systems pass completion gates",

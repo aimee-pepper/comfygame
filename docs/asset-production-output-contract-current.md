@@ -15,6 +15,27 @@ Passing deterministic exports, manifests and tests proves technical reproducibil
 art quality. Game Design/Aimee must separately accept that the candidate is recognizable, beautiful,
 coherent with the game's style and detailed enough for its native use.
 
+## System-first scheduling gate
+
+Asset production is not a substitute for implementing the system that will consume it. Before a new Asset
+task starts, all of the following must be true:
+
+1. the player-facing mechanic and disclosure rules are settled enough that the art is unlikely to be redone;
+2. the exact native consumer, dimensions, state inputs and stable identity/replacement seam are known;
+3. the asset is required by the next scheduled native vertical slice, or Aimee explicitly requested an
+   independent visual exploration;
+4. the first delivery is the smallest representative slice that can be integrated and reviewed in the game;
+5. broad family, tier, state or catalogue production waits until that representative slice is live and
+   phone-reviewed.
+
+If any condition is false, Asset pauses or works on a different implementation-ready family. An accepted
+proof already waiting for native integration is an Engineering dependency, not permission to generate more
+variants. Asset may be idle.
+
+Aimee-authored art reservations are hard boundaries. Temporary integration sprites may prove lookup,
+layout, rotation, tint or replacement plumbing, but must be labelled scaffolding, must remain replaceable by
+stable semantic key, and may not expand or receive polish unless Aimee explicitly asks for it.
+
 ## Every task declares its art product
 
 The handoff must explicitly choose one of these products rather than forcing one universal format:

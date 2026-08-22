@@ -1,11 +1,16 @@
 # Asset System Proposal
 
-**Status:** Proposal for review by Aimee, the game-design lead, and the engineering lead  
+**Status:** Long-range visual-system proposal; not a scheduling authority
 **Owner:** Asset lead  
 **Started:** 8 Aug 2026  
 **Scope boundary:** This document and the future standalone asset systems/tools are owned by the
 asset lead. The asset lead does **not** change game code. The engineering lead owns integration into
 the app.
+
+The phases and families below describe possible long-range coverage. They do not authorize Asset work.
+Current scheduling comes only from `Sources/Content/Data/playability-roadmap.json` and every task must pass
+the system-first vertical-slice gate in `asset-production-output-contract-current.md`. An already accepted
+proof awaiting native integration is held; it does not justify more variants or breadth.
 
 ## Purpose
 
