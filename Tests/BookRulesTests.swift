@@ -597,6 +597,25 @@ final class BookRulesTests: XCTestCase {
                        "You are already in an expedition. Return Home before binding another world.")
     }
 
+    @MainActor
+    func testBlankPageWithSufficientEssenceCompletesProductionBindAndArrival() throws {
+        let store = GameStore(io: .temporary(name: "blank-page-production-bind-\(UUID().uuidString)"))
+        store.mutate("test: exact installed regression balance") { state in
+            state.base.page = Page()
+            state.base.essence = 28
+        }
+
+        XCTAssertTrue(store.bindAndDepart())
+        XCTAssertEqual(store.state.base.essence, 18)
+        let run = try XCTUnwrap(store.state.worlds.activeRun)
+        let pending = try XCTUnwrap(store.state.worlds.pendingWorldArrivalReceipt)
+        XCTAssertEqual(store.state.worlds.pendingWorldArrivalReceiptID, pending.id)
+        XCTAssertEqual(run.worldArrivalReceipt, pending)
+        let rendered = try XCTUnwrap(pending.renderedSceneReceipt)
+        XCTAssertTrue(rendered.validates())
+        XCTAssertFalse(rendered.commands.contains { $0.scope == .entryMark })
+    }
+
     /// A half-written page is state like any other: it survives a kill.
     @MainActor
     func testAHalfWrittenPageSurvivesRelaunch() {

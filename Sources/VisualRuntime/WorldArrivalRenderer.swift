@@ -192,11 +192,12 @@ enum WorldArrivalNativeRenderer {
             draft += bitmap(124, 53, ["..aaa..", ".abbba.", "abcccba", "abcccba", ".abbba.", "..aaa.."],
                             ["a": Color("#6c5540"), "b": Color("#d0a66d"), "c": Color("#efe0b9")], .entryDisclosure, 2)
         }
-        guard let entryRune = receipt.sourcePage.marks.first else { throw Error.invalidSceneReceipt }
-        for cell in entryRune.cells {
-            let dx = cell[0], dy = cell[1], x = 77 + dx * 2, y = 77 + dy * 2
-            draft.append(rect(x, y, 2, 1, p[0], .entryMark))
-            draft.append(rect(x + (dy % 2), y - 1, 1, 1, p[2], .entryMark))
+        if let entryRune = receipt.sourcePage.marks.first {
+            for cell in entryRune.cells {
+                let dx = cell[0], dy = cell[1], x = 77 + dx * 2, y = 77 + dy * 2
+                draft.append(rect(x, y, 2, 1, p[0], .entryMark))
+                draft.append(rect(x + (dy % 2), y - 1, 1, 1, p[2], .entryMark))
+            }
         }
         return try draft.enumerated().map { index, command in
             let result = WorldArrivalRenderedSceneReceipt.Command(

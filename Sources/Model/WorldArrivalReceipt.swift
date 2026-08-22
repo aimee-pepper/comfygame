@@ -169,7 +169,7 @@ struct WorldArrivalSceneReceipt: Codable, Equatable, Sendable {
         // this validated value and its canonical typed hash.
         let p = payload
         let words = p.description.split(whereSeparator: \Character.isWhitespace).count
-        let pageValid = !p.sourcePage.id.isEmpty && !p.sourcePage.marks.isEmpty
+        let pageValid = !p.sourcePage.id.isEmpty
             && p.sourcePage.marks.allSatisfy { mark in
                 (0...5).contains(mark.x) && (0...5).contains(mark.y) && !mark.cells.isEmpty
                     && mark.cells.allSatisfy { $0.count == 2

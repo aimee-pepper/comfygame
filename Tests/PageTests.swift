@@ -78,6 +78,17 @@ final class PageTests: XCTestCase {
                        Int((UInt64(UInt32.max) + 41) % 134))
     }
 
+    func testBlankPageSceneIsValidAndRendersWithoutEntryMarkCommands() throws {
+        var payload = try acceptedArrivalPayload("starter_open_meadow")
+        payload.sourcePage.marks = []
+        let scene = WorldArrivalSceneReceipt(payload: payload)
+
+        XCTAssertTrue(scene.validatesSchema())
+        let rendered = try WorldArrivalNativeRenderer.makeRenderedReceipt(scene: scene)
+        XCTAssertTrue(rendered.validates())
+        XCTAssertFalse(rendered.commands.contains { $0.scope == .entryMark })
+    }
+
     func testWorldArrivalOrdinaryPhoneLayoutAndCrispThumbnailGeometry() {
         XCTAssertEqual(WorldArrivalLayout.metrics(width: 368).sceneSize,
                        CGSize(width: 320, height: 200))
