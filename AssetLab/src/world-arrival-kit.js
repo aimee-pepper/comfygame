@@ -17,6 +17,7 @@ const precipitationBands = ["none", "trace", "light", "heavy"];
 const motionBands = ["calm", "moving", "strong"];
 const habits = ["solitary", "clustered", "spreading", "mixed"];
 const visibility = ["full", "fringe", "remembered", "hidden"];
+const cropGroundIDs = [...groundIDs, "water", "deepWater", "chasm"];
 const hasExactKeys = (value, keys) => value && typeof value === "object" && !Array.isArray(value)
   && Object.keys(value).sort().join("|") === [...keys].sort().join("|");
 const finiteRGB = value => Array.isArray(value) && value.length === 3
@@ -74,10 +75,14 @@ export function validateWorldArrivalReceipt(receipt) {
   if (!hasExactKeys(receipt.firstMapCropReceipt, ["width", "height", "cells"])
       || receipt.firstMapCropReceipt.width !== 9 || receipt.firstMapCropReceipt.height !== 9
       || !Array.isArray(receipt.firstMapCropReceipt.cells) || receipt.firstMapCropReceipt.cells.length !== 81
-      || receipt.firstMapCropReceipt.cells.some(cell => !hasExactKeys(cell, ["x", "y", "ground", "elevation", "floraStableID", "visibility"])
-        || !Number.isInteger(cell.x) || !Number.isInteger(cell.y) || typeof cell.ground !== "string"
-        || !Number.isInteger(cell.elevation) || !(cell.floraStableID === null || typeof cell.floraStableID === "string")
-        || !visibility.includes(cell.visibility))) issues.push("invalid-map-crop");
+      || receipt.firstMapCropReceipt.cells.some(cell => {
+        if (!cell || !visibility.includes(cell.visibility) || !Number.isInteger(cell.x) || !Number.isInteger(cell.y)
+            || cell.x < 0 || cell.x >= 9 || cell.y < 0 || cell.y >= 9) return true;
+        if (cell.visibility === "hidden") return !hasExactKeys(cell, ["x", "y", "visibility"]);
+        return !hasExactKeys(cell, ["x", "y", "ground", "elevation", "floraStableID", "visibility"])
+          || !cropGroundIDs.includes(cell.ground) || !Number.isInteger(cell.elevation)
+          || !(cell.floraStableID === null || (cell.visibility === "full" && typeof cell.floraStableID === "string"));
+      }) || new Set(receipt.firstMapCropReceipt.cells.map(cell => `${cell.x},${cell.y}`)).size !== 81) issues.push("invalid-map-crop");
   return issues;
 }
 
