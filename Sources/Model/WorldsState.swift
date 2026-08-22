@@ -643,6 +643,9 @@ struct WorldGenerationDiagnostics: Codable, Equatable, Sendable {
     /// False only when bounded coherent-terrain retries could not satisfy the exact topology.
     /// Bind preparation refuses before spend rather than committing fallback terrain.
     var terrainGenerationSucceeded: Bool = true
+    var reachableTerrainFraction: Double = 1
+    var softenedDeepWaterTiles: Int = 0
+    var filledChasmTiles: Int = 0
     var writingWasGuaranteed: Bool = true
     var selectedDiaryPages: [DiaryPageID] = []
     var selectedOtherWritingCount: Int = 0
@@ -684,6 +687,11 @@ struct WorldGenerationDiagnostics: Codable, Equatable, Sendable {
         let c = try decoder.container(keyedBy: CodingKeys.self)
         terrainGenerationSucceeded = try c.decodeIfPresent(
             Bool.self, forKey: .terrainGenerationSucceeded) ?? true
+        reachableTerrainFraction = try c.decodeIfPresent(
+            Double.self, forKey: .reachableTerrainFraction) ?? 1
+        softenedDeepWaterTiles = try c.decodeIfPresent(
+            Int.self, forKey: .softenedDeepWaterTiles) ?? 0
+        filledChasmTiles = try c.decodeIfPresent(Int.self, forKey: .filledChasmTiles) ?? 0
         writingWasGuaranteed = try c.decodeIfPresent(Bool.self, forKey: .writingWasGuaranteed) ?? true
         selectedDiaryPages = (try c.decodeIfPresent([DiaryPageID].self,
                                                      forKey: .selectedDiaryPages) ?? [])

@@ -6,6 +6,61 @@ import XCTest
 /// unimplementable.
 final class TerrainTests: XCTestCase {
 
+    func testEveryMineralHostClauseMatchesMachineAuthorityExhaustively() throws {
+        struct Authority: Decodable { let resourceHosts: [Host] }
+        struct Host: Decodable {
+            let resourceID: String
+            let placementKind: String
+            let clauses: [Clause]?
+        }
+        struct Clause: Decodable {
+            let baseGroundIDs: [String]
+            let minimumElevation: Int
+            let maximumElevation: Int
+            let adjacentAnyGroundIDs: [String]?
+        }
+        let root = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent().deletingLastPathComponent()
+        let authority = try JSONDecoder().decode(Authority.self, from: Data(contentsOf:
+            root.appending(path: "docs/world-terrain-resource-host-authority.json")))
+        let mineralRows = authority.resourceHosts.filter { $0.placementKind == "mineralNode" }
+        XCTAssertEqual(mineralRows.count, 13)
+        XCTAssertEqual(authority.resourceHosts.count - mineralRows.count, 10,
+                       "a non-mineral disposition entered the 13-row mineral adapter census")
+
+        for row in mineralRows {
+            let clauses = try XCTUnwrap(row.clauses)
+            var exercised = Array(repeating: false, count: clauses.count)
+            for base in GroundType.allCases {
+                for elevation in 0...3 {
+                    for neighbour in [GroundType?](arrayLiteral: nil) + GroundType.allCases.map(Optional.some) {
+                        let expectedClauses = clauses.enumerated().filter { _, clause in
+                            clause.baseGroundIDs.contains(base.rawValue)
+                                && (clause.minimumElevation...clause.maximumElevation).contains(elevation)
+                                && (clause.adjacentAnyGroundIDs?.isEmpty != false
+                                    || neighbour.map { clause.adjacentAnyGroundIDs!.contains($0.rawValue) } == true)
+                        }
+                        expectedClauses.forEach { exercised[$0.offset] = true }
+                        var map = WorldMap(width: 3, height: 3,
+                            tiles: Array(repeating: Tile(), count: 9), entry: .init(x: 1, y: 1))
+                        let point = GridPoint(x: 1, y: 1)
+                        map[point] = Tile(ground: base, baseGround: base, elevation: elevation)
+                        if let neighbour {
+                            let north = GridPoint(x: 1, y: 0)
+                            map[north] = Tile(ground: neighbour, baseGround: neighbour)
+                        }
+                        let actual = Worldgen.resourceHostAllows(
+                            ResourceID(rawValue: row.resourceID), at: point, in: map)
+                        XCTAssertEqual(actual, !expectedClauses.isEmpty,
+                            "host mismatch for \(row.resourceID): base=\(base.rawValue), elevation=\(elevation), neighbour=\(neighbour?.rawValue ?? "none")")
+                    }
+                }
+            }
+            XCTAssertTrue(exercised.allSatisfy { $0 },
+                          "not every machine-authority clause was exercised for \(row.resourceID)")
+        }
+    }
+
     // MARK: Substrate decides what's underfoot
 
     func testHardGroundMakesStoneAndDuctileGroundMakesSand() {
@@ -278,7 +333,12 @@ final class TerrainTests: XCTestCase {
         let liquid = TerrainRules.hydrologyStageForTesting(
             width: 18, height: 18, water: reading(forms: ["standing": 0.6, "flowing": 0.4]),
             freezing: false, seed: 81)
+        let standingProof = TerrainRules.hydrologyStageWithDiagnosticsForTesting(
+            width: 18, height: 18, water: reading(forms: ["standing": 1]),
+            freezing: false, seed: 81)
 
+        XCTAssertTrue(standingProof.diagnostics.succeeded)
+        XCTAssertEqual(wetCount(standing), standingProof.diagnostics.allocated[0])
         XCTAssertGreaterThan(standing.tiles.count { $0.baseGround == .water || $0.baseGround == .deepWater }, 0)
         XCTAssertGreaterThan(frozen.tiles.count { $0.baseGround == .ice }, 0)
         XCTAssertEqual(wetCount(airborne), 0)
@@ -294,6 +354,7 @@ final class TerrainTests: XCTestCase {
         var remainingWater = Set(standing.allPoints.filter {
             standing[$0].baseGround == .water || standing[$0].baseGround == .deepWater
         })
+        var visibleBodies: [Set<GridPoint>] = []
         while let first = remainingWater.sorted(by: { ($0.y, $0.x) < ($1.y, $1.x) }).first {
             var body: Set<GridPoint> = [first], queue = [first]
             remainingWater.remove(first)
@@ -301,6 +362,7 @@ final class TerrainTests: XCTestCase {
                 for next in standing.neighbours(of: point)
                 where remainingWater.remove(next) != nil { body.insert(next); queue.append(next) }
             }
+            visibleBodies.append(body)
             let deep = body.filter { standing[$0].baseGround == .deepWater }
             guard let deepFirst = deep.first else { continue }
             var seen: Set<GridPoint> = [deepFirst], deepQueue = [deepFirst]
@@ -313,6 +375,8 @@ final class TerrainTests: XCTestCase {
                 standing.neighbours(of: point).contains(where: body.contains)
             }, "deep cell was isolated from its owning body")
         }
+        XCTAssertEqual(Set(standingProof.diagnostics.standingBodies.map(Set.init)),
+                       Set(visibleBodies), "authored Standing bodies differed from visible lakes")
     }
 
     func testControlledFlowingWaterRoutesDownhillToBoundary() {
@@ -358,6 +422,17 @@ final class TerrainTests: XCTestCase {
         XCTAssertEqual(flat.map.tiles.count {
             $0.baseGround == .water || $0.baseGround == .deepWater
         }, 12)
+
+        let impossible = TerrainRules.hydrologyStageWithDiagnosticsForTesting(
+            width: 1, height: 1, elevations: [1],
+            water: .init(target: "hydrology", peak: 100, demand: 100, floor: 100,
+                         opposedMagnitude: 0, aspects: ["dispersion": 0],
+                         forms: ["flowing": 1], tags: []),
+            freezing: false, seed: 406)
+        XCTAssertFalse(impossible.diagnostics.succeeded)
+        XCTAssertEqual(impossible.diagnostics.flowingTiles, 0)
+        XCTAssertEqual(impossible.diagnostics.standingTiles, 0,
+                       "failed Flowing quota was silently repainted as Standing")
     }
 
     func testFlowingChannelsCanJoinAndMixedFormsKeepLargestRemainderBudgets() {
@@ -376,6 +451,7 @@ final class TerrainTests: XCTestCase {
         let mixed = TerrainRules.hydrologyStageWithDiagnosticsForTesting(
             width: width, height: height, elevations: flat,
             water: water, freezing: false, seed: 902)
+        XCTAssertTrue(mixed.diagnostics.succeeded)
         XCTAssertEqual(mixed.diagnostics.allocated.reduce(0, +), 146)
         XCTAssertEqual(mixed.diagnostics.allocated, [44, 58, 44])
         XCTAssertEqual(mixed.diagnostics.standingTiles, 44)
@@ -391,9 +467,88 @@ final class TerrainTests: XCTestCase {
     func testYouNeverArriveSomewhereYouCannotStand() {
         for seed in UInt64(1)...40 {
             let world = Worldgen.generate(book: book(["archipelago"]), seed: seed)
+            XCTAssertTrue(world.diagnostics.terrainGenerationSucceeded, "terrain failed, seed \(seed)")
+            XCTAssertGreaterThanOrEqual(world.diagnostics.reachableTerrainFraction,
+                                        Tuning.Terrain.reachableGroundFraction,
+                                        "reachable terrain was too small, seed \(seed)")
             XCTAssertTrue(world.map[world.start].isPassable,
                           "spawned in deep water, seed \(seed)")
+            let reached = TerrainRules.reachable(from: world.start, in: world.map)
+            for point in world.map.allPoints where world.map[point].content != .empty {
+                XCTAssertTrue(reached.contains(point), "content stranded, seed \(seed), \(point)")
+            }
+            for site in world.sites {
+                XCTAssertTrue(reached.contains(site.position), "site stranded, seed \(seed)")
+            }
+            for enemy in world.enemies {
+                XCTAssertTrue(reached.contains(enemy.position), "enemy stranded, seed \(seed)")
+            }
         }
+    }
+
+    func testEntryClearsFloraAndRestoresBothOvergrownGroundKinds() {
+        for overgrown in [GroundType.growth, .groundcover] {
+            let point = GridPoint(x: 0, y: 0)
+            var map = WorldMap(width: 1, height: 1,
+                               tiles: [Tile(ground: overgrown, baseGround: .stone,
+                                            flora: InstanceID(rawValue: 7))], entry: point)
+            TerrainRules.prepareEntry(at: point, in: &map)
+            XCTAssertNil(map[point].flora)
+            XCTAssertEqual(map[point].ground, .stone)
+            XCTAssertEqual(map[point].baseGround, .stone)
+        }
+    }
+
+    func testReachabilityRepairFailsClosedForAnInvalidImpassableStart() {
+        let point = GridPoint(x: 0, y: 0)
+        var map = WorldMap(width: 1, height: 1,
+                           tiles: [Tile(ground: .deepWater)], entry: point)
+        var rng = SeededRNG(seed: 1)
+        let result = TerrainRules.openTheWayWithDiagnostics(from: point, in: &map, rng: &rng)
+        XCTAssertFalse(result.succeeded)
+        XCTAssertEqual(result.reachableFraction, 0)
+        XCTAssertEqual(result.softenedDeepWater, 0)
+        XCTAssertEqual(result.filledChasm, 0)
+    }
+
+    func testReachabilityRepairChangesOnlyOneBlockingDeepWaterOrChasmTile() {
+        for blocker in [GroundType.deepWater, .chasm] {
+            let start = GridPoint(x: 0, y: 0)
+            var map = WorldMap(width: 3, height: 2, tiles: [
+                Tile(ground: .soil), Tile(ground: blocker), Tile(ground: .soil),
+                Tile(ground: .soil), Tile(ground: blocker), Tile(ground: .soil),
+            ], entry: start)
+            let untouched = GridPoint(x: 1, y: 1)
+            let before = map[untouched]
+            var rng = SeededRNG(seed: 4)
+            let result = TerrainRules.openTheWayWithDiagnostics(from: start, in: &map, rng: &rng)
+            XCTAssertTrue(result.succeeded)
+            XCTAssertEqual(result.softenedDeepWater, blocker == .deepWater ? 1 : 0)
+            XCTAssertEqual(result.filledChasm, blocker == .chasm ? 1 : 0)
+            XCTAssertEqual(map[untouched], before, "unrelated basin/barrier tile changed")
+        }
+    }
+
+    func testSeed12StartsInMeaningfulDryTerrainAndKeepsItsApex() {
+        let world = Worldgen.generate(book: book([]), seed: 12)
+        XCTAssertTrue(world.diagnostics.terrainGenerationSucceeded)
+        XCTAssertGreaterThanOrEqual(world.diagnostics.reachableTerrainFraction,
+                                    Tuning.Terrain.reachableGroundFraction)
+        XCTAssertEqual(world.diagnostics.softenedDeepWaterTiles, 0)
+        XCTAssertEqual(world.diagnostics.filledChasmTiles, 0)
+        XCTAssertNotEqual(world.map[world.start].baseGround, .water)
+        let reached = TerrainRules.reachable(from: world.start, in: world.map)
+        let passable = world.map.allPoints.count { world.map[$0].isPassable }
+        XCTAssertEqual(Double(reached.count) / Double(passable),
+                       world.diagnostics.reachableTerrainFraction, accuracy: 0.000_000_1)
+        for point in world.map.allPoints where world.map[point].content != .empty {
+            XCTAssertTrue(reached.contains(point), "content stranded at \(point)")
+        }
+        for site in world.sites { XCTAssertTrue(reached.contains(site.position)) }
+        for enemy in world.enemies { XCTAssertTrue(reached.contains(enemy.position)) }
+        XCTAssertTrue(world.diagnostics.apexRollSucceeded)
+        XCTAssertTrue(world.diagnostics.apexPlaced)
+        XCTAssertEqual(world.enemies.count(where: \.isApex), 1)
     }
 
     func testNothingIsPlacedWhereNobodyCanStand() {

@@ -35,11 +35,21 @@ enum TerrainRules {
     }
 
     struct HydrologyDiagnostics: Equatable {
+        let succeeded: Bool
         let allocated: [Int]
         let standingTiles: Int
         let flowingTiles: Int
         let frozenTiles: Int
         let channels: [FlowingChannelDiagnostics]
+        let standingBodies: [[GridPoint]]
+    }
+
+    struct ReachabilityDiagnostics: Equatable {
+        let reachable: Set<GridPoint>
+        let softenedDeepWater: Int
+        let filledChasm: Int
+        let reachableFraction: Double
+        let succeeded: Bool
     }
 
     static func hydrologyStageForTesting(
@@ -140,7 +150,8 @@ enum TerrainRules {
         let holes = max(chasmCoverage(in: readings),
                         asWritten.map { chasmCoverage(in: $0) } ?? 0)
         paintChasms(&map, coverage: holes, rng: &rng)
-        paintWater(&map, water: water, freezing: freezing, rng: &rng)
+        guard paintWater(&map, water: water, freezing: freezing, rng: &rng).succeeded
+        else { return false }
         paintMud(&map, freezing: freezing)
         paintGrowth(&map, life: life, flora: flora, rng: &rng)
         paintSurfaceDeposits(&map, sigils: resolvedSigils, visualSeed: visualSeed)
@@ -516,7 +527,7 @@ enum TerrainRules {
 
     /// Every square you can actually walk to from where you arrive.
     static func reachable(from start: GridPoint, in map: WorldMap) -> Set<GridPoint> {
-        guard map.contains(start) else { return [] }
+        guard map.contains(start), map[start].isPassable else { return [] }
         var seen: Set<GridPoint> = [start]
         var frontier = [start]
         while let point = frontier.popLast() {
@@ -528,42 +539,161 @@ enum TerrainRules {
         return seen
     }
 
+    /// A world begins in its largest walkable land-and-shallow-water region. The old nearest-firm
+    /// lookup could select a two-tile pocket beside an edge sample while almost the whole map sat
+    /// behind Deep Water. Candidate ordering is canonical before the seeded tie break.
+    static func entryPoint(in map: WorldMap, near preferred: GridPoint,
+                           rng: inout SeededRNG) -> GridPoint? {
+        var unseen = Set(map.allPoints.filter { map[$0].isPassable })
+        var components: [[GridPoint]] = []
+        while let seed = stablePoints(unseen).first {
+            let component = reachable(from: seed, in: map)
+            components.append(stablePoints(component))
+            unseen.subtract(component)
+        }
+        guard let largestSize = components.map(\.count).max() else { return nil }
+        let largest = components.filter { $0.count == largestSize }
+            .sorted {
+                let lhs = stablePoints($0).first!, rhs = stablePoints($1).first!
+                return (lhs.y, lhs.x) < (rhs.y, rhs.x)
+            }
+        guard let component = rng.pick(largest) else { return nil }
+        let edge = component.filter {
+            $0.x == 0 || $0.y == 0 || $0.x == map.width - 1 || $0.y == map.height - 1
+        }
+        let edgePreferred: [GridPoint]
+        if !edge.isEmpty {
+            edgePreferred = edge
+        } else {
+            let nearestEdge = component.map {
+                [$0.x, $0.y, map.width - 1 - $0.x, map.height - 1 - $0.y].min()!
+            }.min()!
+            edgePreferred = component.filter {
+                [$0.x, $0.y, map.width - 1 - $0.x, map.height - 1 - $0.y].min()!
+                    == nearestEdge
+            }
+        }
+        let firm = edgePreferred.filter { map[$0].baseGround != .water }
+        let candidates = firm.isEmpty ? edgePreferred : firm
+        let nearest = candidates.map { $0.chebyshevDistance(to: preferred) }.min()!
+        return rng.pick(stablePoints(candidates.filter {
+            $0.chebyshevDistance(to: preferred) == nearest
+        }))
+    }
+
+    static func prepareEntry(at point: GridPoint, in map: inout WorldMap) {
+        map[point].flora = nil
+        if map[point].ground.isOvergrown {
+            map[point].ground = map[point].baseGround
+        }
+    }
+
     /// **Pathing must still be possible** (Aimee, 7 Aug), so holes are filled back in until it is.
     ///
     /// Carving from several mouths at once can cut a world into islands, and a world you arrive in
     /// one corner of is not the world the book described. This bridges the gaps: chasm squares along
     /// the edge of what you can reach are filled until most of the solid ground is walkable-to.
     ///
-    /// It cannot always finish — a pocket walled off by deep water has no chasm to fill — so the
-    /// generator also refuses to *place* anything outside the reachable region. Between the two,
-    /// nothing a world contains is ever somewhere you can't get to.
+    /// Deep Water remains a real basin/core, but the minimum blocking cells on a route to another
+    /// walkable component may be softened to shallow Water. This preserves bodies while preventing
+    /// a generated two-tile start pocket. Content is placed only after this repair.
     @discardableResult
     static func openTheWay(from start: GridPoint, in map: inout WorldMap,
                            rng: inout SeededRNG) -> Set<GridPoint> {
+        openTheWayWithDiagnostics(from: start, in: &map, rng: &rng).reachable
+    }
+
+    @discardableResult
+    static func openTheWayWithDiagnostics(from start: GridPoint, in map: inout WorldMap,
+                                          rng: inout SeededRNG) -> ReachabilityDiagnostics {
+        _ = rng // The signature preserves the isolated terrain substream boundary.
         var walkable = reachable(from: start, in: map)
-        // Bounded rather than while-true: a world of islands in deep water would otherwise spin.
-        for _ in 0..<Tuning.Terrain.maximumChasmBridges {
+        var softenedDeepWater = 0
+        var filledChasm = 0
+        // Bounded by the map: every successful pass softens at least one blocking tile or joins a
+        // passable component, so this cannot loop indefinitely.
+        for _ in 0..<map.tiles.count {
             let solid = map.allPoints.count { map[$0].isPassable }
             guard solid > 0,
                   Double(walkable.count) / Double(solid) < Tuning.Terrain.reachableGroundFraction
             else { break }
-            // A hole on the edge of what we can reach, with solid ground stranded on its far side.
-            var bridges: [GridPoint] = []
-            for point in walkable {
-                for hole in map.neighbours(of: point) where map[hole].ground == .chasm {
-                    let strands = map.neighbours(of: hole).contains {
-                        map[$0].isPassable && !walkable.contains($0)
-                    }
-                    if strands { bridges.append(hole) }
+            guard let route = minimumBlockingRoute(from: walkable, in: map) else { break }
+            for bridge in route where !map[bridge].isPassable {
+                map[bridge].flora = nil
+                if map[bridge].baseGround == .deepWater {
+                    map[bridge].ground = .water
+                    map[bridge].baseGround = .water
+                    softenedDeepWater += 1
+                } else {
+                    map[bridge].ground = .stone
+                    map[bridge].baseGround = .stone
+                    map[bridge].surfaceDeposits = .init()
+                    filledChasm += 1
                 }
             }
-            bridges.sort { $0.y == $1.y ? $0.x < $1.x : $0.y < $1.y }
-            guard let bridge = rng.pick(bridges) else { break }
-            map[bridge].ground = .stone
-            map[bridge].baseGround = .stone
             walkable = reachable(from: start, in: map)
         }
-        return walkable
+        let passable = map.allPoints.count { map[$0].isPassable }
+        let fraction = passable == 0 ? 0 : Double(walkable.count) / Double(passable)
+        return .init(reachable: walkable, softenedDeepWater: softenedDeepWater,
+                     filledChasm: filledChasm, reachableFraction: fraction,
+                     succeeded: fraction >= Tuning.Terrain.reachableGroundFraction)
+    }
+
+    private static func minimumBlockingRoute(from reached: Set<GridPoint>,
+                                             in map: WorldMap) -> [GridPoint]? {
+        var unseen = Set(map.allPoints.filter { map[$0].isPassable && !reached.contains($0) })
+        var stranded: [[GridPoint]] = []
+        while let seed = stablePoints(unseen).first {
+            let component = reachable(from: seed, in: map).subtracting(reached)
+            stranded.append(stablePoints(component))
+            unseen.subtract(component)
+        }
+        guard let largestSize = stranded.map(\.count).max() else { return nil }
+        let targets = Set(stranded.filter { $0.count == largestSize }.sorted {
+            let lhs = $0.first!, rhs = $1.first!
+            return (lhs.y, lhs.x) < (rhs.y, rhs.x)
+        }.first!)
+        struct Cost: Comparable {
+            let blockers: Int
+            let length: Int
+            static func < (lhs: Cost, rhs: Cost) -> Bool {
+                (lhs.blockers, lhs.length) < (rhs.blockers, rhs.length)
+            }
+        }
+        var distance: [GridPoint: Cost] = [:]
+        var previous: [GridPoint: GridPoint] = [:]
+        var frontier = stablePoints(reached)
+        for point in frontier { distance[point] = .init(blockers: 0, length: 0) }
+        while !frontier.isEmpty {
+            frontier.sort {
+                let maximum = Cost(blockers: .max, length: .max)
+                let ld = distance[$0, default: maximum], rd = distance[$1, default: maximum]
+                return ld == rd ? ($0.y, $0.x) < ($1.y, $1.x) : ld < rd
+            }
+            let point = frontier.removeFirst()
+            if targets.contains(point) {
+                var route = [point]
+                var cursor = point
+                while let parent = previous[cursor] {
+                    route.append(parent)
+                    cursor = parent
+                }
+                return route.reversed()
+            }
+            for next in stablePoints(map.neighbours(of: point)) {
+                let current = distance[point]!
+                let candidate = Cost(blockers: current.blockers + (map[next].isPassable ? 0 : 1),
+                                     length: current.length + 1)
+                let maximum = Cost(blockers: .max, length: .max)
+                if candidate < distance[next, default: maximum] {
+                    distance[next] = candidate
+                    previous[next] = point
+                    frontier.append(next)
+                }
+            }
+        }
+        return nil
     }
 
     /// Water, in whatever form the heat allows.
@@ -583,20 +713,20 @@ enum TerrainRules {
             ("frozen", water.share(of: "frozen")),
         ]
         let surfaceShare = forms.reduce(0) { $0 + max(0, $1.1) }
-        guard surfaceShare > 0 else { return .init(allocated: [0, 0, 0], standingTiles: 0,
-            flowingTiles: 0, frozenTiles: 0, channels: []) }
+        guard surfaceShare > 0 else { return .init(succeeded: true, allocated: [0, 0, 0], standingTiles: 0,
+            flowingTiles: 0, frozenTiles: 0, channels: [], standingBodies: []) }
         let target = min(map.tiles.count, max(0, Int((Double(map.tiles.count)
             * water.peak / 100 * Tuning.Terrain.maximumWaterCoverage * surfaceShare).rounded())))
-        guard target > 0 else { return .init(allocated: [0, 0, 0], standingTiles: 0,
-            flowingTiles: 0, frozenTiles: 0, channels: []) }
+        guard target > 0 else { return .init(succeeded: true, allocated: [0, 0, 0], standingTiles: 0,
+            flowingTiles: 0, frozenTiles: 0, channels: [], standingBodies: []) }
         let quotas = largestRemainder(total: target, weights: forms.map(\.1))
         var occupied: Set<GridPoint> = []
         let standing = paintStandingWater(&map, quota: quotas[0], dispersion: water.aspect("dispersion"),
                                           ground: .water, occupied: &occupied, rng: &rng)
         let channels = paintFlowingWater(&map, quota: quotas[1], dispersion: water.aspect("dispersion"), peak: water.peak,
-                                         outlets: standing, occupied: &occupied, rng: &rng)
+                                         outlets: standing.tiles, occupied: &occupied, rng: &rng)
         let flowingTiles = channels.reduce(0) { $0 + $1.allocatedTiles }
-        let standingTiles = standing.count + max(0, quotas[1] - flowingTiles)
+        let standingTiles = standing.tiles.count
         let frozen = paintStandingWater(&map, quota: quotas[2], dispersion: water.aspect("dispersion"),
                                         ground: .ice, occupied: &occupied, rng: &rng)
         if freezing {
@@ -606,8 +736,13 @@ enum TerrainRules {
                 map[point].baseGround = .ice
             }
         }
-        return .init(allocated: quotas, standingTiles: standingTiles,
-                     flowingTiles: flowingTiles, frozenTiles: frozen.count, channels: channels)
+        let succeeded = standing.tiles.count == quotas[0]
+            && flowingTiles == quotas[1]
+            && frozen.tiles.count == quotas[2]
+            && occupied.count == target
+        return .init(succeeded: succeeded, allocated: quotas, standingTiles: standingTiles,
+                     flowingTiles: flowingTiles, frozenTiles: frozen.tiles.count, channels: channels,
+                     standingBodies: standing.bodies)
     }
 
     private static func largestRemainder(total: Int, weights: [Double]) -> [Int] {
@@ -623,52 +758,109 @@ enum TerrainRules {
         return result
     }
 
-    @discardableResult
+    private struct StandingPaint {
+        let tiles: Set<GridPoint>
+        let bodies: [[GridPoint]]
+    }
+
     private static func paintStandingWater(
         _ map: inout WorldMap, quota: Int, dispersion: Double, ground: GroundType,
         occupied: inout Set<GridPoint>, rng: inout SeededRNG
-    ) -> Set<GridPoint> {
-        guard quota > 0 else { return [] }
-        let bodyCount = min(7, max(1, quota / 8), 1 + Int((max(0, min(100, dispersion)) / 100 * 6).rounded()))
-        let bodyQuotas = largestRemainder(total: quota, weights: Array(repeating: 1, count: bodyCount))
-        var result: Set<GridPoint> = []
-        for bodyQuota in bodyQuotas where bodyQuota > 0 {
-            let candidates = map.allPoints.filter { !occupied.contains($0) }
-            guard let lowest = candidates.map({ map[$0].elevation }).min() else { continue }
-            let low = candidates.filter { map[$0].elevation == lowest }
-            guard let seed = rng.pick(stablePoints(low)) else { continue }
-            var body: Set<GridPoint> = [seed]
-            while body.count < bodyQuota {
-                let frontier = Set(body.flatMap { map.neighbours(of: $0) }).subtracting(occupied).subtracting(body)
-                guard !frontier.isEmpty else { break }
-                let minimum = frontier.map { map[$0].elevation }.min() ?? 0
-                guard let next = rng.pick(stablePoints(frontier.filter {
-                    map[$0].elevation == minimum
-                })) else { break }
-                body.insert(next)
-            }
-            for point in body {
-                map[point].ground = ground; map[point].baseGround = ground; map[point].elevation = 0
-            }
-            if ground == .water, body.count >= 9 {
-                let deepQuota = body.count / 3
-                let centreDistances = body.map { point in
-                    (point, map.neighbours(of: point).filter(body.contains).count)
-                }
-                let best = centreDistances.map(\.1).max() ?? 0
-                if let centre = rng.pick(stablePoints(centreDistances.compactMap {
-                    $0.1 == best ? $0.0 : nil
-                })) {
-                    var deep: Set<GridPoint> = [centre]
-                    while deep.count < deepQuota {
-                        let frontier = Set(deep.flatMap { map.neighbours(of: $0) }).intersection(body).subtracting(deep)
-                        guard let next = rng.pick(stablePoints(frontier)) else { break }
-                        deep.insert(next)
+    ) -> StandingPaint {
+        guard quota > 0 else { return .init(tiles: [], bodies: []) }
+        let requestedBodies = min(7, max(1, quota / 8),
+            1 + Int((max(0, min(100, dispersion)) / 100 * 6).rounded()))
+        let root = rng.next()
+        for bodyCount in stride(from: requestedBodies, through: 1, by: -1) {
+            let bodyQuotas = largestRemainder(
+                total: quota, weights: Array(repeating: 1, count: bodyCount))
+            for attempt in 0..<16 {
+                var attemptRNG = SeededRNG(seed: root).derived(UInt64(bodyCount * 100 + attempt))
+                var planned: [Set<GridPoint>] = []
+                var blocked = occupied
+                var failed = false
+                for bodyQuota in bodyQuotas where bodyQuota > 0 {
+                    let candidates = Set(map.allPoints).subtracting(blocked)
+                    let hosts = cardinalComponents(in: candidates, map: map)
+                        .filter { $0.count >= bodyQuota }
+                        .sorted {
+                            if $0.count != $1.count { return $0.count > $1.count }
+                            let lhs = stablePoints($0).first!, rhs = stablePoints($1).first!
+                            return (lhs.y, lhs.x) < (rhs.y, rhs.x)
+                        }
+                    guard let host = hosts.first else { failed = true; break }
+                    let lowest = host.map { map[$0].elevation }.min() ?? 0
+                    guard let seed = attemptRNG.pick(stablePoints(host.filter {
+                        map[$0].elevation == lowest
+                    })) else { failed = true; break }
+                    var body: Set<GridPoint> = [seed]
+                    while body.count < bodyQuota {
+                        let frontier = Set(body.flatMap { map.neighbours(of: $0) })
+                            .intersection(host).subtracting(body)
+                        guard !frontier.isEmpty else { failed = true; break }
+                        let minimum = frontier.map { map[$0].elevation }.min() ?? 0
+                        guard let next = attemptRNG.pick(stablePoints(frontier.filter {
+                            map[$0].elevation == minimum
+                        })) else { failed = true; break }
+                        body.insert(next)
                     }
-                    for point in deep { map[point].ground = .deepWater; map[point].baseGround = .deepWater }
+                    if failed { break }
+                    planned.append(body)
+                    blocked.formUnion(body)
+                    blocked.formUnion(body.flatMap { map.neighbours(of: $0) })
+                }
+                guard !failed, planned.reduce(0, { $0 + $1.count }) == quota else { continue }
+
+                var result: Set<GridPoint> = []
+                for body in planned {
+                    for point in body {
+                        map[point].ground = ground
+                        map[point].baseGround = ground
+                        map[point].elevation = 0
+                    }
+                    if ground == .water, body.count >= 9 {
+                        let deepQuota = body.count / 3
+                        let centres = body.map { point in
+                            (point, map.neighbours(of: point).filter(body.contains).count)
+                        }
+                        let best = centres.map(\.1).max() ?? 0
+                        if let centre = attemptRNG.pick(stablePoints(centres.compactMap {
+                            $0.1 == best ? $0.0 : nil
+                        })) {
+                            var deep: Set<GridPoint> = [centre]
+                            while deep.count < deepQuota {
+                                let frontier = Set(deep.flatMap { map.neighbours(of: $0) })
+                                    .intersection(body).subtracting(deep)
+                                guard let next = attemptRNG.pick(stablePoints(frontier)) else { break }
+                                deep.insert(next)
+                            }
+                            for point in deep {
+                                map[point].ground = .deepWater
+                                map[point].baseGround = .deepWater
+                            }
+                        }
+                    }
+                    result.formUnion(body)
+                }
+                occupied.formUnion(result)
+                return .init(tiles: result, bodies: planned.map(stablePoints))
+            }
+        }
+        return .init(tiles: [], bodies: [])
+    }
+
+    private static func cardinalComponents(in points: Set<GridPoint>, map: WorldMap) -> [Set<GridPoint>] {
+        var remaining = points
+        var result: [Set<GridPoint>] = []
+        while let start = stablePoints(remaining).first {
+            var component: Set<GridPoint> = [start], queue = [start]
+            remaining.remove(start)
+            while let point = queue.popLast() {
+                for next in map.neighbours(of: point) where remaining.remove(next) != nil {
+                    component.insert(next); queue.append(next)
                 }
             }
-            occupied.formUnion(body); result.formUnion(body)
+            result.append(component)
         }
         return result
     }
@@ -682,7 +874,6 @@ enum TerrainRules {
         let channelCount = min(4, quota, 1 + Int(max(0, min(100, dispersion)) / 34))
         let channelQuotas = largestRemainder(total: quota, weights: Array(repeating: 1, count: channelCount))
         var channels: Set<GridPoint> = []
-        var standingFallback = 0
         var diagnostics: [FlowingChannelDiagnostics] = []
         for channelQuota in channelQuotas where channelQuota > 0 {
             let dry = stablePoints(map.allPoints.filter { !occupied.contains($0) })
@@ -732,7 +923,6 @@ enum TerrainRules {
 #if DEBUG
                 print("[terrain topology] Flowing allocation could not reach a lower boundary or Standing outlet")
 #endif
-                standingFallback += channelQuota
                 continue
             }
             let source = routed[0]
@@ -775,10 +965,6 @@ enum TerrainRules {
                                      allocatedTiles: channel.count,
                                      joinedExistingChannel: joinedExistingChannel,
                                      tiles: stablePoints(channel)))
-        }
-        if standingFallback > 0 {
-            _ = paintStandingWater(&map, quota: standingFallback, dispersion: dispersion,
-                                    ground: .water, occupied: &occupied, rng: &rng)
         }
         return diagnostics
     }

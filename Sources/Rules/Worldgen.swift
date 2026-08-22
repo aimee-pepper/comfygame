@@ -340,22 +340,40 @@ enum Worldgen {
         // 0a. The ground itself, before anything is placed on it. Relief, Substrate, Hydrology,
         //    Thermal and Vitality all write here — this is the surface the pressure model was
         //    missing, and without it Relief had nothing to say.
-        let terrainGenerationSucceeded = TerrainRules.paint(
+        var terrainGenerationSucceeded = TerrainRules.paint(
             &map, readings: readings, asWritten: asWritten, flora: flora,
             resolvedSigils: resolvedSigils, visualSeed: seed, rng: &terrainRNG)
 
         // 1. Where you arrive: a portal on the edge. It works as an exit too, so retreating the
         //    way you came is always possible — it just costs you the turns to walk back.
         //    (Whether that's too forgiving is Q6 in questions-for-aimee.md.)
-        let entry = TerrainRules.firmGround(near: randomEdgePoint(in: map, rng: &layoutRNG), in: map)
+        let preferredEntry = randomEdgePoint(in: map, rng: &layoutRNG)
+        guard let entry = TerrainRules.entryPoint(in: map, near: preferredEntry, rng: &layoutRNG)
+        else {
+            var diagnostics = WorldGenerationDiagnostics()
+            diagnostics.terrainGenerationSucceeded = false
+            return (map, [], [], [], [], nil, [], [], flora, map.entry, diagnostics)
+        }
         map.entry = entry
-        map[entry].content = .portal(isEntry: true)
+        TerrainRules.prepareEntry(at: entry, in: &map)
 
         // 1a. **Nothing may be stranded.** Chasms are carved from several mouths and can cut a world
         //     into islands, so the way is opened until most of the solid ground is walkable-to — and
         //     everything that can't be reached is then treated as occupied, which is the one line
         //     that stops a node, a site, a page or a person being placed somewhere you can't go.
-        let walkable = TerrainRules.openTheWay(from: entry, in: &map, rng: &terrainRNG)
+        let reachability = TerrainRules.openTheWayWithDiagnostics(
+            from: entry, in: &map, rng: &terrainRNG)
+        terrainGenerationSucceeded = terrainGenerationSucceeded && reachability.succeeded
+        guard terrainGenerationSucceeded else {
+            var diagnostics = WorldGenerationDiagnostics()
+            diagnostics.terrainGenerationSucceeded = false
+            diagnostics.reachableTerrainFraction = reachability.reachableFraction
+            diagnostics.softenedDeepWaterTiles = reachability.softenedDeepWater
+            diagnostics.filledChasmTiles = reachability.filledChasm
+            return (map, [], [], [], [], nil, [], [], flora, entry, diagnostics)
+        }
+        map[entry].content = .portal(isEntry: true)
+        let walkable = reachability.reachable
         var occupied: Set<GridPoint> = [entry]
         occupied.formUnion(map.allPoints.filter { !walkable.contains($0) })
 
@@ -544,6 +562,9 @@ enum Worldgen {
         if _counterfactualSummaryOnly {
             var diagnostics = WorldGenerationDiagnostics()
             diagnostics.terrainGenerationSucceeded = terrainGenerationSucceeded
+            diagnostics.reachableTerrainFraction = reachability.reachableFraction
+            diagnostics.softenedDeepWaterTiles = reachability.softenedDeepWater
+            diagnostics.filledChasmTiles = reachability.filledChasm
             diagnostics.selectedDiaryPages = pages
             diagnostics.selectedOtherWritingCount = noteCount
             diagnostics.placedDiaryPages = placedPages
@@ -768,6 +789,9 @@ enum Worldgen {
             : Tuning.World.indefiniteTurns
         var diagnostics = WorldGenerationDiagnostics()
         diagnostics.terrainGenerationSucceeded = terrainGenerationSucceeded
+        diagnostics.reachableTerrainFraction = reachability.reachableFraction
+        diagnostics.softenedDeepWaterTiles = reachability.softenedDeepWater
+        diagnostics.filledChasmTiles = reachability.filledChasm
         diagnostics.selectedDiaryPages = pages
         diagnostics.selectedOtherWritingCount = noteCount
         diagnostics.placedDiaryPages = placedPages

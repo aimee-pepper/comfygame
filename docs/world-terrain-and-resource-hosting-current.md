@@ -133,6 +133,8 @@ allocates the surface quota among Standing, Flowing and Frozen.
 - Bodies of at least nine tiles receive a connected DeepWater core of one-third their quota; smaller ponds are
   shallow Water.
 - Standing water never becomes a repeated random walk with a step-order-defined deep end.
+- Requested bodies remain distinct final cardinal components. Planning deterministically reduces
+  body count when separation and exact quota cannot both be satisfied; it never merges labelled patches.
 
 ### Flowing
 
@@ -143,6 +145,8 @@ allocates the surface quota among Standing, Flowing and Frozen.
   channel. Every selected channel is cardinally connected from source to outlet.
 - Channels are shallow Water by default. At hydrology peak 70 or above, a channel allocated at least sixteen
   tiles may have one connected DeepWater spine; it never scatters isolated deep cells.
+- Flowing must paint its exact allocated channel quota. An unrealizable channel fails terrain generation
+  before placement and spend; it never turns the remainder into a Standing pond.
 
 ### Frozen
 
@@ -154,6 +158,21 @@ allocates the surface quota among Standing, Flowing and Frozen.
 
 Mud is a one-tile connected fringe where liquid Water/DeepWater meets underlying Soil. Frozen fields do not
 create Mud. Growth may later cover Mud while retaining `baseGround = mud` for presentation and host truth.
+
+## Entry and reachability repair
+
+Entry is selected from the largest cardinally connected passable component. Within that component,
+a dry edge tile is preferred. If its only boundary members are shallow Water, generation retains that
+boundary and uses shallow Water. If the component does not touch the boundary, it uses a dry member nearest
+the boundary, then shallow Water as the fallback. Clearing entry flora also restores Growth or Groundcover
+to its frozen base ground before the portal is placed.
+
+After hydrology and chasms, at least 85% of passable terrain must remain connected to entry. Repair
+joins the largest stranded component first, choosing the route by fewest blocking tiles, then shortest
+path, then stable coordinate order. Only Deep Water on that route becomes shallow Water and only Chasm
+on that route becomes Stone. The saved diagnostics record reachable fraction, softened Deep Water, and
+filled Chasm counts. If the threshold still cannot be met, generation fails before content placement,
+Page consumption, or Essence spend.
 
 ## Flora and organic resources
 
@@ -235,7 +254,9 @@ Required executable gates:
 5. DeepWater is connected to its owning liquid body; no isolated deep cell exists.
 6. Snow and settled Ash can appear independently and together, never replace base ground and never inherit
    precipitation/airborne gameplay.
-7. Every placed mineral satisfies its frozen host clause; a zero-host candidate consumes no attempt.
+7. `TerrainTests.testEveryMineralHostClauseMatchesMachineAuthorityExhaustively` proves every mineral
+   host clause against all 12 base grounds, elevations 0...3 and cardinal-neighbour conditions; every
+   placed mineral satisfies that frozen clause and a zero-host candidate consumes no attempt.
 8. Every flora node output matches its exact plant traits; defended photosynthetic Woody flora yields its
    primary plus Resin.
 9. Ichor never enters an ordinary world node; Motes remain absent from ordinary terrain nodes; only the existing cache and Mythic award paths bank them into Reality.

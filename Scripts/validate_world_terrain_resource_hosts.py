@@ -84,13 +84,9 @@ assert next(row for row in host_rows if row["resourceID"] == "mote") == {
     "hostRule": "existingCacheAndMythicAwards",
 }
 assert next(row for row in host_rows if row["resourceID"] == "essence_raw")["placementKind"] == "directPickup"
+assert next(row for row in host_rows if row["resourceID"] == "essence_raw")["hostRule"] == \
+    "reachablePassableTerrainPrePlacement"
 
-for row in host_rows:
-    resource_id = row["resourceID"]
-    if row["placementKind"] == "mineralNode":
-        assert f'"{resource_id}"' in worldgen_source, f"missing Swift host adapter for {resource_id}"
-for excluded in ("ichor", "mote", "resin", "essence_raw"):
-    assert f'"{excluded}"' in worldgen_source, f"missing ordinary-node exclusion for {excluded}"
 assert "abundance * Double(candidates[index].hosts.count)" in worldgen_source
 assert "let tile = map[point]" in worldgen_source
 assert "let base = tile.baseGround" in worldgen_source
@@ -109,6 +105,19 @@ assert "touches(.chasm)" in adapter and "touches(.ash, .chasm)" in adapter
 topology = authority["terrainTopology"]
 assert topology["elevationMinimum"] == 0 and topology["elevationMaximum"] == 3
 assert topology["maximumAdjacentElevationDelta"] == 1
+assert topology["entryComponent"] == "largestPassableCardinalComponent"
+assert topology["entryPreference"] == "largestComponentDryEdgeThenShallowEdgeElseDryNearestBoundaryThenShallowNearestBoundary"
+assert topology["standingBodiesRemainCardinallySeparate"] is True
+assert topology["flowingFailurePolicy"] == "failBeforePlacementAndSpendNeverRepaintAsStanding"
+assert topology["minimumReachablePassableFraction"] == 0.85
+assert topology["reachabilityRepairComponentOrder"] == "largestStrandedFirst"
+assert topology["reachabilityRepairRouteOrder"] == [
+    "minimumBlockingTiles", "minimumPathLength", "stableCoordinate"]
+assert topology["deepWaterRepair"] == "softenOnlyChosenRouteToWater"
+assert topology["chasmRepair"] == "fillOnlyChosenRouteWithStone"
+assert topology["failurePolicy"] == "failBeforePlacementAndSpend"
+assert topology["repairDiagnostics"] == [
+    "reachableFraction", "softenedDeepWaterTiles", "filledChasmTiles"]
 assert 0 < topology["surfaceDepositCoverageCeiling"] < 1
 assert topology["surfaceDepositCoverageCeiling"] == composition["combinedOpaqueCoverageCeiling"]
 

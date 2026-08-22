@@ -1,4 +1,4 @@
-import { cp, mkdir, readdir, stat } from "node:fs/promises";
+import { copyFile, mkdir, readdir, rename, stat, unlink } from "node:fs/promises";
 import { spawn } from "node:child_process";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -72,7 +72,17 @@ export async function ensureWorldgenBridge() {
     }
     const contentRoot = join(repoRoot, "Sources", "Content", "Data");
     for (const name of await readdir(contentRoot)) {
-      if (name.endsWith(".json")) await cp(join(contentRoot, name), join(cacheRoot, name));
+      if (!name.endsWith(".json")) continue;
+      const destination = join(cacheRoot, name);
+      const temporary = join(cacheRoot,
+        `.${name}.${process.pid}.${Date.now()}.${Math.random().toString(16).slice(2)}.tmp`);
+      try {
+        await copyFile(join(contentRoot, name), temporary);
+        await rename(temporary, destination);
+      } catch (error) {
+        await unlink(temporary).catch(() => {});
+        throw error;
+      }
     }
     return executable;
   })();

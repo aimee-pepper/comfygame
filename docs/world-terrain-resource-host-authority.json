@@ -43,8 +43,19 @@
     "elevationMaximum": 3,
     "maximumAdjacentElevationDelta": 1,
     "standingWaterMaximumBodies": 7,
+    "standingBodiesRemainCardinallySeparate": true,
     "flowingWaterMaximumChannels": 4,
-    "surfaceDepositCoverageCeiling": 0.7
+    "flowingFailurePolicy": "failBeforePlacementAndSpendNeverRepaintAsStanding",
+    "surfaceDepositCoverageCeiling": 0.7,
+    "entryComponent": "largestPassableCardinalComponent",
+    "entryPreference": "largestComponentDryEdgeThenShallowEdgeElseDryNearestBoundaryThenShallowNearestBoundary",
+    "minimumReachablePassableFraction": 0.85,
+    "reachabilityRepairComponentOrder": "largestStrandedFirst",
+    "reachabilityRepairRouteOrder": ["minimumBlockingTiles", "minimumPathLength", "stableCoordinate"],
+    "deepWaterRepair": "softenOnlyChosenRouteToWater",
+    "chasmRepair": "fillOnlyChosenRouteWithStone",
+    "failurePolicy": "failBeforePlacementAndSpend",
+    "repairDiagnostics": ["reachableFraction", "softenedDeepWaterTiles", "filledChasmTiles"]
   },
   "hydrologyForms": {
     "standing": "connectedBasinBodies",
@@ -135,7 +146,7 @@
     {"resourceID": "spore", "placementKind": "floraPrimary", "floraRule": "fungalMetabolism"},
     {"resourceID": "reagent", "placementKind": "floraPrimary", "floraRule": "chemosyntheticMetabolism"},
     {"resourceID": "ichor", "placementKind": "creatureMaterialOnly", "excludedFromOrdinaryWorldYieldTable": true},
-    {"resourceID": "essence_raw", "placementKind": "directPickup", "hostRule": "reachablePassableEmpty"},
+    {"resourceID": "essence_raw", "placementKind": "directPickup", "hostRule": "reachablePassableTerrainPrePlacement"},
     {"resourceID": "mote", "placementKind": "realityAwardOnly", "hostRule": "existingCacheAndMythicAwards"}
   ]
 }

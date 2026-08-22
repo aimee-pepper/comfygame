@@ -1,5 +1,7 @@
 import assert from "node:assert/strict";
+import { execFile } from "node:child_process";
 import { readFile } from "node:fs/promises";
+import { promisify } from "node:util";
 import { bridgeSources, generateLiveWorld, liveSymbolCatalogue } from "../src/live-worldgen-bridge.js";
 
 const sources = await bridgeSources();
@@ -15,6 +17,7 @@ const testerApp = await readFile(new URL("../src/world-generator-tester-app.js",
 for (const label of ["Terrain, Water, Deposits &amp; Resource Hosts", "Resource Hosts"])
   assert.match(testerHTML, new RegExp(label));
 for (const label of ["Base material", "Visible ground", "Deep Water cores", "Settled Ash tiles",
+  "Start-connected passable terrain", "Deep Water tiles softened for reachability",
   "Internal ID", "Terrain generation failed"])
   assert.match(testerApp, new RegExp(label));
 for (const id of ["terrain-diagnostics", "terrain-topology", "water-topology",
@@ -26,6 +29,17 @@ const first = await generateLiveWorld(request);
 const repeat = await generateLiveWorld(request);
 assert.deepEqual(first, repeat,
   "two independent bridge processes must emit the same terrain receipt for one book and seed");
+const execFileAsync = promisify(execFile);
+const bridgeModule = new URL("../src/live-worldgen-bridge.js", import.meta.url).href;
+const concurrentScript = `import { generateLiveWorld } from ${JSON.stringify(bridgeModule)};
+process.stdout.write(JSON.stringify(await generateLiveWorld(${JSON.stringify(request)})));`;
+const concurrent = await Promise.all(Array.from({ length: 8 }, () =>
+  execFileAsync(process.execPath, ["--input-type=module", "--eval", concurrentScript], {
+    maxBuffer: 25_000_000,
+  }).then(({ stdout }) => JSON.parse(stdout))));
+assert.equal(concurrent.length, 8);
+assert.ok(concurrent.every(result => JSON.stringify(result) === JSON.stringify(first)),
+  "parallel bridge cache publication exposed partial JSON or changed deterministic output");
 assert.equal(first.width, 18);
 assert.equal(first.height, 18);
 assert.equal(first.cells.length, 324);
@@ -42,6 +56,11 @@ for (const representative of [
   const b = await generateLiveWorld(representative);
   assert.deepEqual(a, b, `independent-process terrain changed for ${JSON.stringify(representative)}`);
   assert.equal(a.diagnostics.terrainGenerationSucceeded, true);
+  assert.ok(a.diagnostics.reachableTerrainFraction >= 0.85);
+  assert.ok(Number.isInteger(a.diagnostics.softenedDeepWaterTiles)
+    && a.diagnostics.softenedDeepWaterTiles >= 0);
+  assert.ok(Number.isInteger(a.diagnostics.filledChasmTiles)
+    && a.diagnostics.filledChasmTiles >= 0);
   assert.ok(Number.isInteger(a.diagnostics.isolatedGroundCells)
     && a.diagnostics.isolatedGroundCells >= 0);
   assert.ok(a.diagnostics.baseMaterialComponents.every(row => row.id && row.quantity > 0));
@@ -87,6 +106,32 @@ assert.equal(first.markers.length,
   + first.apexes.reduce((sum, row) => sum + row.quantity, 0)
   + first.hostileFlora.reduce((sum, row) => sum + row.quantity, 0));
 const apexWorld = await generateLiveWorld({ seed: 12, symbols: [], scale: "ordinary" });
+assert.equal(apexWorld.diagnostics.terrainGenerationSucceeded, true);
+assert.ok(apexWorld.diagnostics.reachableTerrainFraction >= 0.85);
+assert.equal(apexWorld.diagnostics.softenedDeepWaterTiles, 0);
+assert.equal(apexWorld.diagnostics.filledChasmTiles, 0);
+const apexEntry = apexWorld.cells.find(cell => cell.x === apexWorld.entry.x && cell.y === apexWorld.entry.y);
+assert.notEqual(apexEntry.baseGround, "water", "seed 12 prefers dry entry in its largest component");
+const byPoint = new Map(apexWorld.cells.map(cell => [`${cell.x},${cell.y}`, cell]));
+const reachable = new Set([`${apexWorld.entry.x},${apexWorld.entry.y}`]), queue = [apexWorld.entry];
+while (queue.length) {
+  const point = queue.shift();
+  for (const [x,y] of [[point.x-1,point.y],[point.x+1,point.y],[point.x,point.y-1],[point.x,point.y+1]]) {
+    const key=`${x},${y}`, cell=byPoint.get(key);
+    if (cell && !["deepWater","chasm"].includes(cell.ground) && !reachable.has(key)) {
+      reachable.add(key); queue.push({x,y});
+    }
+  }
+}
+const passable = apexWorld.cells.filter(cell => !["deepWater","chasm"].includes(cell.ground));
+assert.equal(reachable.size / passable.length, apexWorld.diagnostics.reachableTerrainFraction);
+for (const cell of apexWorld.cells.filter(cell => cell.content !== "empty"))
+  assert.ok(reachable.has(`${cell.x},${cell.y}`), `seed 12 stranded ${cell.content}`);
+for (const marker of apexWorld.markers)
+  assert.ok(reachable.has(`${marker.x},${marker.y}`), `seed 12 stranded ${marker.kind}`);
+const rawEssenceHost = apexWorld.diagnostics.resourceHosts.find(row => row.internalID === "essence_raw");
+assert.ok(rawEssenceHost.actualPlacements > 0 && rawEssenceHost.eligibleHosts > 0
+  && rawEssenceHost.reachableEligibleHosts > 0);
 assert.equal(apexWorld.apexes.reduce((sum, row) => sum + row.quantity, 0), 1);
 assert.equal(apexWorld.mobs.some(row => row.id === "Apex"), false,
   "apexes must not be collapsed into ordinary mob rows");

@@ -64,6 +64,9 @@ struct Marker: Encodable {
 
 struct Diagnostics: Encodable {
     var terrainGenerationSucceeded: Bool
+    var reachableTerrainFraction: Double
+    var softenedDeepWaterTiles: Int
+    var filledChasmTiles: Int
     var baseMaterialComponents: [Count]
     var visibleGroundComponents: [Count]
     var isolatedGroundCells: Int
@@ -335,7 +338,6 @@ let resourceHosts = hostRows.map { row -> ResourceHostDiagnostic in
     case "directPickup":
         eligible = Set(generated.map.allPoints.filter {
             reachable.contains($0) && generated.map[$0].isPassable
-                && generated.map[$0].content == .empty
         })
     default: eligible = []
     }
@@ -357,7 +359,7 @@ let resourceHosts = hostRows.map { row -> ResourceHostDiagnostic in
     case "chemicalDefence": "Flora with chemical defences"
     case "fungalMetabolism": "Fungal flora"
     case "chemosyntheticMetabolism": "Chemosynthetic flora"
-    case "reachablePassableEmpty": "Reachable, passable, empty ground"
+    case "reachablePassableTerrainPrePlacement": "Reachable, passable terrain before placement"
     case "existingCacheAndMythicAwards": "Existing cache and Mythic award paths"
     case nil where (row["clauses"] as? [[String: Any]])?.isEmpty == false: "Exact terrain-host clauses"
     default: "No terrain host"
@@ -401,6 +403,9 @@ let snapshot = Snapshot(
     apexes: apexes, hostileFlora: hostileFlora, pointsOfInterest: counts(poi),
     writings: counts(writings), travellers: generated.travellers.map(\.rawValue).sorted(),
     diagnostics: Diagnostics(terrainGenerationSucceeded: d.terrainGenerationSucceeded,
+                             reachableTerrainFraction: d.reachableTerrainFraction,
+                             softenedDeepWaterTiles: d.softenedDeepWaterTiles,
+                             filledChasmTiles: d.filledChasmTiles,
                              baseMaterialComponents: baseMaterialComponents,
                              visibleGroundComponents: visibleGroundComponents,
                              isolatedGroundCells: isolatedGroundCells,
