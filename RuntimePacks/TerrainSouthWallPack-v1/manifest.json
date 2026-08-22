@@ -1,0 +1,3947 @@
+{
+  "schemaVersion": "terrain-south-wall-pack-v1",
+  "integrationReady": false,
+  "status": "asset-visual-review",
+  "profile": {
+    "width": 16,
+    "height": 19,
+    "pivot": {
+      "x": 8,
+      "y": 18
+    },
+    "topSurface": {
+      "width": 16,
+      "height": 16
+    },
+    "wallSocket": {
+      "x": 0,
+      "y": 16,
+      "width": 16,
+      "height": 3
+    },
+    "depths": [
+      1,
+      2,
+      3
+    ],
+    "joins": [
+      "span",
+      "leftCap",
+      "rightCap",
+      "isolated"
+    ],
+    "grounds": [
+      "stone",
+      "soil",
+      "sand",
+      "ash",
+      "rubble",
+      "mud"
+    ],
+    "roles": [
+      "deepShadow",
+      "bodyDark",
+      "body",
+      "bodyLight",
+      "highlight"
+    ],
+    "roleIndexEncoding": {
+      "32": "deepShadow",
+      "80": "bodyDark",
+      "128": "body",
+      "176": "bodyLight",
+      "224": "highlight"
+    },
+    "layerOrder": [
+      "topSurface",
+      "southWall",
+      "supplementalContactShade",
+      "crackingAndContent",
+      "actorsAndSelection"
+    ],
+    "equalElevation": "no-wall",
+    "hiddenOrOutOfMap": "no-wall"
+  },
+  "acceptedTerrainPins": {
+    "visualCommit": "5bac76a9",
+    "productionPackCommit": "84e6db50"
+  },
+  "reference": {
+    "productionSource": false,
+    "path": "reference/non-production-composition-reference.png"
+  },
+  "assets": {
+    "mask/stone/d1/span/v0": {
+      "path": "assets/38574ca41666084e3b4562f30ca2b76d36de3f8bb537a56cfbe5c9bb4ee97bd4.png",
+      "sha256": "38574ca41666084e3b4562f30ca2b76d36de3f8bb537a56cfbe5c9bb4ee97bd4",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/stone/d1/span/v1": {
+      "path": "assets/38574ca41666084e3b4562f30ca2b76d36de3f8bb537a56cfbe5c9bb4ee97bd4.png",
+      "sha256": "38574ca41666084e3b4562f30ca2b76d36de3f8bb537a56cfbe5c9bb4ee97bd4",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/stone/d1/span/v2": {
+      "path": "assets/38574ca41666084e3b4562f30ca2b76d36de3f8bb537a56cfbe5c9bb4ee97bd4.png",
+      "sha256": "38574ca41666084e3b4562f30ca2b76d36de3f8bb537a56cfbe5c9bb4ee97bd4",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/stone/d1/span/v3": {
+      "path": "assets/bd7a07c7ef98387e9c395e6752e7b840848af29c5df2a3493b57bef808ff6c43.png",
+      "sha256": "bd7a07c7ef98387e9c395e6752e7b840848af29c5df2a3493b57bef808ff6c43",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/stone/d1/leftCap/v0": {
+      "path": "assets/bc734661e2305e4eef47dd5391c52b6b532708485a3854d2ca171824c3f95d37.png",
+      "sha256": "bc734661e2305e4eef47dd5391c52b6b532708485a3854d2ca171824c3f95d37",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/stone/d1/leftCap/v1": {
+      "path": "assets/bc734661e2305e4eef47dd5391c52b6b532708485a3854d2ca171824c3f95d37.png",
+      "sha256": "bc734661e2305e4eef47dd5391c52b6b532708485a3854d2ca171824c3f95d37",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/stone/d1/leftCap/v2": {
+      "path": "assets/bc734661e2305e4eef47dd5391c52b6b532708485a3854d2ca171824c3f95d37.png",
+      "sha256": "bc734661e2305e4eef47dd5391c52b6b532708485a3854d2ca171824c3f95d37",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/stone/d1/leftCap/v3": {
+      "path": "assets/fe0b878222f2bfb64033a37ed13b71879c6488de3da97f82a275e94d73b6cf75.png",
+      "sha256": "fe0b878222f2bfb64033a37ed13b71879c6488de3da97f82a275e94d73b6cf75",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/stone/d1/rightCap/v0": {
+      "path": "assets/34cf891f7524932c8930e9155e03300db8a489447bfea7dc73855176dea9a1ba.png",
+      "sha256": "34cf891f7524932c8930e9155e03300db8a489447bfea7dc73855176dea9a1ba",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/stone/d1/rightCap/v1": {
+      "path": "assets/34cf891f7524932c8930e9155e03300db8a489447bfea7dc73855176dea9a1ba.png",
+      "sha256": "34cf891f7524932c8930e9155e03300db8a489447bfea7dc73855176dea9a1ba",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/stone/d1/rightCap/v2": {
+      "path": "assets/34cf891f7524932c8930e9155e03300db8a489447bfea7dc73855176dea9a1ba.png",
+      "sha256": "34cf891f7524932c8930e9155e03300db8a489447bfea7dc73855176dea9a1ba",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/stone/d1/rightCap/v3": {
+      "path": "assets/8baec248d986ef4716a4c512123d69d76376a9e2c0dfd7a00fa9bf7f18079f66.png",
+      "sha256": "8baec248d986ef4716a4c512123d69d76376a9e2c0dfd7a00fa9bf7f18079f66",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/stone/d1/isolated/v0": {
+      "path": "assets/5289ce68aa71b50a2890cd017b0bd5c21be01f75bd10a492ec3eb1d8333f0d47.png",
+      "sha256": "5289ce68aa71b50a2890cd017b0bd5c21be01f75bd10a492ec3eb1d8333f0d47",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/stone/d1/isolated/v1": {
+      "path": "assets/5289ce68aa71b50a2890cd017b0bd5c21be01f75bd10a492ec3eb1d8333f0d47.png",
+      "sha256": "5289ce68aa71b50a2890cd017b0bd5c21be01f75bd10a492ec3eb1d8333f0d47",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/stone/d1/isolated/v2": {
+      "path": "assets/5289ce68aa71b50a2890cd017b0bd5c21be01f75bd10a492ec3eb1d8333f0d47.png",
+      "sha256": "5289ce68aa71b50a2890cd017b0bd5c21be01f75bd10a492ec3eb1d8333f0d47",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/stone/d1/isolated/v3": {
+      "path": "assets/0c6859fc71cce26f3514b9a2fcd0c2297fd9bd15a461a5ea22fa84be9f740bf6.png",
+      "sha256": "0c6859fc71cce26f3514b9a2fcd0c2297fd9bd15a461a5ea22fa84be9f740bf6",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/stone/d2/span/v0": {
+      "path": "assets/428e96857f5c9938923ec2d1a61041435e59c5142a55e6cfb0662fdd3c4332db.png",
+      "sha256": "428e96857f5c9938923ec2d1a61041435e59c5142a55e6cfb0662fdd3c4332db",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/stone/d2/span/v1": {
+      "path": "assets/428e96857f5c9938923ec2d1a61041435e59c5142a55e6cfb0662fdd3c4332db.png",
+      "sha256": "428e96857f5c9938923ec2d1a61041435e59c5142a55e6cfb0662fdd3c4332db",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/stone/d2/span/v2": {
+      "path": "assets/428e96857f5c9938923ec2d1a61041435e59c5142a55e6cfb0662fdd3c4332db.png",
+      "sha256": "428e96857f5c9938923ec2d1a61041435e59c5142a55e6cfb0662fdd3c4332db",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/stone/d2/span/v3": {
+      "path": "assets/047d79645f084fa50cfa41df47c4dd2fb84e8c305e306a69bf68f5abedebffb5.png",
+      "sha256": "047d79645f084fa50cfa41df47c4dd2fb84e8c305e306a69bf68f5abedebffb5",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/stone/d2/leftCap/v0": {
+      "path": "assets/89de40ed04ba9fbed7cfa4dca06b0c0e34a8c82a8dbd83d46d6e39c3b6cf26e5.png",
+      "sha256": "89de40ed04ba9fbed7cfa4dca06b0c0e34a8c82a8dbd83d46d6e39c3b6cf26e5",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/stone/d2/leftCap/v1": {
+      "path": "assets/89de40ed04ba9fbed7cfa4dca06b0c0e34a8c82a8dbd83d46d6e39c3b6cf26e5.png",
+      "sha256": "89de40ed04ba9fbed7cfa4dca06b0c0e34a8c82a8dbd83d46d6e39c3b6cf26e5",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/stone/d2/leftCap/v2": {
+      "path": "assets/89de40ed04ba9fbed7cfa4dca06b0c0e34a8c82a8dbd83d46d6e39c3b6cf26e5.png",
+      "sha256": "89de40ed04ba9fbed7cfa4dca06b0c0e34a8c82a8dbd83d46d6e39c3b6cf26e5",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/stone/d2/leftCap/v3": {
+      "path": "assets/d91e7bf3304e2186f32dcee297b40b36c5eb4f3fdc8b058b8aec976667d12bbb.png",
+      "sha256": "d91e7bf3304e2186f32dcee297b40b36c5eb4f3fdc8b058b8aec976667d12bbb",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/stone/d2/rightCap/v0": {
+      "path": "assets/61b882f929f2da00987b94a3131d6ce48010e6d07cf461ee612d89b5a2cb430b.png",
+      "sha256": "61b882f929f2da00987b94a3131d6ce48010e6d07cf461ee612d89b5a2cb430b",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/stone/d2/rightCap/v1": {
+      "path": "assets/61b882f929f2da00987b94a3131d6ce48010e6d07cf461ee612d89b5a2cb430b.png",
+      "sha256": "61b882f929f2da00987b94a3131d6ce48010e6d07cf461ee612d89b5a2cb430b",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/stone/d2/rightCap/v2": {
+      "path": "assets/61b882f929f2da00987b94a3131d6ce48010e6d07cf461ee612d89b5a2cb430b.png",
+      "sha256": "61b882f929f2da00987b94a3131d6ce48010e6d07cf461ee612d89b5a2cb430b",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/stone/d2/rightCap/v3": {
+      "path": "assets/f45573ec2996f2c2b949311219392fe5cf7feaec2250c6d82663a6a4d344e368.png",
+      "sha256": "f45573ec2996f2c2b949311219392fe5cf7feaec2250c6d82663a6a4d344e368",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/stone/d2/isolated/v0": {
+      "path": "assets/6f4a34071d26880f96e01239c0b4439a465e2c06d01dc8b8febae35e9b34ccb3.png",
+      "sha256": "6f4a34071d26880f96e01239c0b4439a465e2c06d01dc8b8febae35e9b34ccb3",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/stone/d2/isolated/v1": {
+      "path": "assets/6f4a34071d26880f96e01239c0b4439a465e2c06d01dc8b8febae35e9b34ccb3.png",
+      "sha256": "6f4a34071d26880f96e01239c0b4439a465e2c06d01dc8b8febae35e9b34ccb3",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/stone/d2/isolated/v2": {
+      "path": "assets/6f4a34071d26880f96e01239c0b4439a465e2c06d01dc8b8febae35e9b34ccb3.png",
+      "sha256": "6f4a34071d26880f96e01239c0b4439a465e2c06d01dc8b8febae35e9b34ccb3",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/stone/d2/isolated/v3": {
+      "path": "assets/b2f1d6736a214ac95c903e6e30666c7bf1aea53eb4a3aade7caddb65c185f2d8.png",
+      "sha256": "b2f1d6736a214ac95c903e6e30666c7bf1aea53eb4a3aade7caddb65c185f2d8",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/stone/d3/span/v0": {
+      "path": "assets/fa42802d6195ead0055ce4646253d2461e3403c906a8c5682c794cd7e90680d7.png",
+      "sha256": "fa42802d6195ead0055ce4646253d2461e3403c906a8c5682c794cd7e90680d7",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/stone/d3/span/v1": {
+      "path": "assets/fa42802d6195ead0055ce4646253d2461e3403c906a8c5682c794cd7e90680d7.png",
+      "sha256": "fa42802d6195ead0055ce4646253d2461e3403c906a8c5682c794cd7e90680d7",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/stone/d3/span/v2": {
+      "path": "assets/fa42802d6195ead0055ce4646253d2461e3403c906a8c5682c794cd7e90680d7.png",
+      "sha256": "fa42802d6195ead0055ce4646253d2461e3403c906a8c5682c794cd7e90680d7",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/stone/d3/span/v3": {
+      "path": "assets/e27a8a4dc62f093e5880e020f5a73da303924b647a955753c329ba8cc3ed3216.png",
+      "sha256": "e27a8a4dc62f093e5880e020f5a73da303924b647a955753c329ba8cc3ed3216",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/stone/d3/leftCap/v0": {
+      "path": "assets/139acf495efbb591c3795d0b3ea12eabc7ce5dfeb76d79a06f6a04c77864d178.png",
+      "sha256": "139acf495efbb591c3795d0b3ea12eabc7ce5dfeb76d79a06f6a04c77864d178",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/stone/d3/leftCap/v1": {
+      "path": "assets/139acf495efbb591c3795d0b3ea12eabc7ce5dfeb76d79a06f6a04c77864d178.png",
+      "sha256": "139acf495efbb591c3795d0b3ea12eabc7ce5dfeb76d79a06f6a04c77864d178",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/stone/d3/leftCap/v2": {
+      "path": "assets/139acf495efbb591c3795d0b3ea12eabc7ce5dfeb76d79a06f6a04c77864d178.png",
+      "sha256": "139acf495efbb591c3795d0b3ea12eabc7ce5dfeb76d79a06f6a04c77864d178",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/stone/d3/leftCap/v3": {
+      "path": "assets/6c4e9c454b5ced83dd41ef2ba986d432f66ff8dcd0c83e7bffd20b10218cd71d.png",
+      "sha256": "6c4e9c454b5ced83dd41ef2ba986d432f66ff8dcd0c83e7bffd20b10218cd71d",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/stone/d3/rightCap/v0": {
+      "path": "assets/ff3624a05084b176ececa2c3cf5a7c48653ecb070b0202d4e1764bc5aaeec126.png",
+      "sha256": "ff3624a05084b176ececa2c3cf5a7c48653ecb070b0202d4e1764bc5aaeec126",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/stone/d3/rightCap/v1": {
+      "path": "assets/ff3624a05084b176ececa2c3cf5a7c48653ecb070b0202d4e1764bc5aaeec126.png",
+      "sha256": "ff3624a05084b176ececa2c3cf5a7c48653ecb070b0202d4e1764bc5aaeec126",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/stone/d3/rightCap/v2": {
+      "path": "assets/ff3624a05084b176ececa2c3cf5a7c48653ecb070b0202d4e1764bc5aaeec126.png",
+      "sha256": "ff3624a05084b176ececa2c3cf5a7c48653ecb070b0202d4e1764bc5aaeec126",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/stone/d3/rightCap/v3": {
+      "path": "assets/d5de775a3f6e29189fdf2e1bcb47a215eb6b28d9acf28da635a4023156299ed4.png",
+      "sha256": "d5de775a3f6e29189fdf2e1bcb47a215eb6b28d9acf28da635a4023156299ed4",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/stone/d3/isolated/v0": {
+      "path": "assets/eda8eeb873aa9bd0fadabd4b8ec9ad0b8789a840c26e8fea13cd6b8a9f537610.png",
+      "sha256": "eda8eeb873aa9bd0fadabd4b8ec9ad0b8789a840c26e8fea13cd6b8a9f537610",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/stone/d3/isolated/v1": {
+      "path": "assets/eda8eeb873aa9bd0fadabd4b8ec9ad0b8789a840c26e8fea13cd6b8a9f537610.png",
+      "sha256": "eda8eeb873aa9bd0fadabd4b8ec9ad0b8789a840c26e8fea13cd6b8a9f537610",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/stone/d3/isolated/v2": {
+      "path": "assets/eda8eeb873aa9bd0fadabd4b8ec9ad0b8789a840c26e8fea13cd6b8a9f537610.png",
+      "sha256": "eda8eeb873aa9bd0fadabd4b8ec9ad0b8789a840c26e8fea13cd6b8a9f537610",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/stone/d3/isolated/v3": {
+      "path": "assets/27237eef9626d4386bc633539bcdda0a06495dc59c9a6d7304e4d10441891762.png",
+      "sha256": "27237eef9626d4386bc633539bcdda0a06495dc59c9a6d7304e4d10441891762",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/soil/d1/span/v0": {
+      "path": "assets/694f6c94aeb81c1cc107475e187cc57e14470efdcfbb15df6c5d5242cad11645.png",
+      "sha256": "694f6c94aeb81c1cc107475e187cc57e14470efdcfbb15df6c5d5242cad11645",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/soil/d1/span/v1": {
+      "path": "assets/694f6c94aeb81c1cc107475e187cc57e14470efdcfbb15df6c5d5242cad11645.png",
+      "sha256": "694f6c94aeb81c1cc107475e187cc57e14470efdcfbb15df6c5d5242cad11645",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/soil/d1/span/v2": {
+      "path": "assets/694f6c94aeb81c1cc107475e187cc57e14470efdcfbb15df6c5d5242cad11645.png",
+      "sha256": "694f6c94aeb81c1cc107475e187cc57e14470efdcfbb15df6c5d5242cad11645",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/soil/d1/span/v3": {
+      "path": "assets/6d0eeca9c1b4628470ea4f1b01778ddde2a8e2f455010cd275875ddc17e24d29.png",
+      "sha256": "6d0eeca9c1b4628470ea4f1b01778ddde2a8e2f455010cd275875ddc17e24d29",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/soil/d1/leftCap/v0": {
+      "path": "assets/4ea3533d64d759e50ae392adfbdbd574bf8e7633e56f5f7af29aaad75d1b1ff5.png",
+      "sha256": "4ea3533d64d759e50ae392adfbdbd574bf8e7633e56f5f7af29aaad75d1b1ff5",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/soil/d1/leftCap/v1": {
+      "path": "assets/4ea3533d64d759e50ae392adfbdbd574bf8e7633e56f5f7af29aaad75d1b1ff5.png",
+      "sha256": "4ea3533d64d759e50ae392adfbdbd574bf8e7633e56f5f7af29aaad75d1b1ff5",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/soil/d1/leftCap/v2": {
+      "path": "assets/4ea3533d64d759e50ae392adfbdbd574bf8e7633e56f5f7af29aaad75d1b1ff5.png",
+      "sha256": "4ea3533d64d759e50ae392adfbdbd574bf8e7633e56f5f7af29aaad75d1b1ff5",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/soil/d1/leftCap/v3": {
+      "path": "assets/1f15ddc1133356d6ef28f7d4882915ef637b01bf859c8eae9204e21ba95fbaa8.png",
+      "sha256": "1f15ddc1133356d6ef28f7d4882915ef637b01bf859c8eae9204e21ba95fbaa8",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/soil/d1/rightCap/v0": {
+      "path": "assets/b6f1f552ade93d77562fc7144b5ec168e322b23a30db1f8dc4e28e9dfa3f5a9f.png",
+      "sha256": "b6f1f552ade93d77562fc7144b5ec168e322b23a30db1f8dc4e28e9dfa3f5a9f",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/soil/d1/rightCap/v1": {
+      "path": "assets/b6f1f552ade93d77562fc7144b5ec168e322b23a30db1f8dc4e28e9dfa3f5a9f.png",
+      "sha256": "b6f1f552ade93d77562fc7144b5ec168e322b23a30db1f8dc4e28e9dfa3f5a9f",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/soil/d1/rightCap/v2": {
+      "path": "assets/b6f1f552ade93d77562fc7144b5ec168e322b23a30db1f8dc4e28e9dfa3f5a9f.png",
+      "sha256": "b6f1f552ade93d77562fc7144b5ec168e322b23a30db1f8dc4e28e9dfa3f5a9f",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/soil/d1/rightCap/v3": {
+      "path": "assets/170f88af332e39e9f48c6b3dd122684c9735aa362777e1fdcee4d50beb032fab.png",
+      "sha256": "170f88af332e39e9f48c6b3dd122684c9735aa362777e1fdcee4d50beb032fab",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/soil/d1/isolated/v0": {
+      "path": "assets/0a6a92afb45f7a02039bc24b90c891b847fd61c91e56dca2cd6872cf0e587b2e.png",
+      "sha256": "0a6a92afb45f7a02039bc24b90c891b847fd61c91e56dca2cd6872cf0e587b2e",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/soil/d1/isolated/v1": {
+      "path": "assets/0a6a92afb45f7a02039bc24b90c891b847fd61c91e56dca2cd6872cf0e587b2e.png",
+      "sha256": "0a6a92afb45f7a02039bc24b90c891b847fd61c91e56dca2cd6872cf0e587b2e",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/soil/d1/isolated/v2": {
+      "path": "assets/0a6a92afb45f7a02039bc24b90c891b847fd61c91e56dca2cd6872cf0e587b2e.png",
+      "sha256": "0a6a92afb45f7a02039bc24b90c891b847fd61c91e56dca2cd6872cf0e587b2e",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/soil/d1/isolated/v3": {
+      "path": "assets/76a7d28878dd2afd92735d45a1a93757cc9aa82fb3952a7f346df0eaa71feaca.png",
+      "sha256": "76a7d28878dd2afd92735d45a1a93757cc9aa82fb3952a7f346df0eaa71feaca",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/soil/d2/span/v0": {
+      "path": "assets/41bf6cc52d821c39b64abd6b322135d241f01e36617350d725e1e4bf526c1a94.png",
+      "sha256": "41bf6cc52d821c39b64abd6b322135d241f01e36617350d725e1e4bf526c1a94",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/soil/d2/span/v1": {
+      "path": "assets/41bf6cc52d821c39b64abd6b322135d241f01e36617350d725e1e4bf526c1a94.png",
+      "sha256": "41bf6cc52d821c39b64abd6b322135d241f01e36617350d725e1e4bf526c1a94",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/soil/d2/span/v2": {
+      "path": "assets/41bf6cc52d821c39b64abd6b322135d241f01e36617350d725e1e4bf526c1a94.png",
+      "sha256": "41bf6cc52d821c39b64abd6b322135d241f01e36617350d725e1e4bf526c1a94",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/soil/d2/span/v3": {
+      "path": "assets/219f558d7ad76dc4517d5a9993fa9b1ecb0027ec8fa4b85608836d38067aabe8.png",
+      "sha256": "219f558d7ad76dc4517d5a9993fa9b1ecb0027ec8fa4b85608836d38067aabe8",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/soil/d2/leftCap/v0": {
+      "path": "assets/e7d47d450e3c61589090e7074d66c80efa1ee6be7e3ace2c6ee5ace24788524f.png",
+      "sha256": "e7d47d450e3c61589090e7074d66c80efa1ee6be7e3ace2c6ee5ace24788524f",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/soil/d2/leftCap/v1": {
+      "path": "assets/e7d47d450e3c61589090e7074d66c80efa1ee6be7e3ace2c6ee5ace24788524f.png",
+      "sha256": "e7d47d450e3c61589090e7074d66c80efa1ee6be7e3ace2c6ee5ace24788524f",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/soil/d2/leftCap/v2": {
+      "path": "assets/e7d47d450e3c61589090e7074d66c80efa1ee6be7e3ace2c6ee5ace24788524f.png",
+      "sha256": "e7d47d450e3c61589090e7074d66c80efa1ee6be7e3ace2c6ee5ace24788524f",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/soil/d2/leftCap/v3": {
+      "path": "assets/80e05f3a9e9e255ec4dabbed61791e003299639f443d58e08ebe303909f04054.png",
+      "sha256": "80e05f3a9e9e255ec4dabbed61791e003299639f443d58e08ebe303909f04054",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/soil/d2/rightCap/v0": {
+      "path": "assets/5b68a9622d40199044554e378f500396dda02143f70b5de404ee088bbcfa0114.png",
+      "sha256": "5b68a9622d40199044554e378f500396dda02143f70b5de404ee088bbcfa0114",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/soil/d2/rightCap/v1": {
+      "path": "assets/5b68a9622d40199044554e378f500396dda02143f70b5de404ee088bbcfa0114.png",
+      "sha256": "5b68a9622d40199044554e378f500396dda02143f70b5de404ee088bbcfa0114",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/soil/d2/rightCap/v2": {
+      "path": "assets/5b68a9622d40199044554e378f500396dda02143f70b5de404ee088bbcfa0114.png",
+      "sha256": "5b68a9622d40199044554e378f500396dda02143f70b5de404ee088bbcfa0114",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/soil/d2/rightCap/v3": {
+      "path": "assets/c56dfc8f45705c27f7e9bfb02a70c077679cbc571c760cdb7d0265fe6945ec4d.png",
+      "sha256": "c56dfc8f45705c27f7e9bfb02a70c077679cbc571c760cdb7d0265fe6945ec4d",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/soil/d2/isolated/v0": {
+      "path": "assets/0fbac731d2e895cd97c80e7afa7452755bade85d6c49d21f728b21ec254819b1.png",
+      "sha256": "0fbac731d2e895cd97c80e7afa7452755bade85d6c49d21f728b21ec254819b1",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/soil/d2/isolated/v1": {
+      "path": "assets/0fbac731d2e895cd97c80e7afa7452755bade85d6c49d21f728b21ec254819b1.png",
+      "sha256": "0fbac731d2e895cd97c80e7afa7452755bade85d6c49d21f728b21ec254819b1",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/soil/d2/isolated/v2": {
+      "path": "assets/0fbac731d2e895cd97c80e7afa7452755bade85d6c49d21f728b21ec254819b1.png",
+      "sha256": "0fbac731d2e895cd97c80e7afa7452755bade85d6c49d21f728b21ec254819b1",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/soil/d2/isolated/v3": {
+      "path": "assets/591cb321e92ff52dd7bfeb911925587fcd249605741758833538f191beceb211.png",
+      "sha256": "591cb321e92ff52dd7bfeb911925587fcd249605741758833538f191beceb211",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/soil/d3/span/v0": {
+      "path": "assets/fbc9b96522e50c793c178c562219a12e3524f433aceeaef912f31f5349fa1b2c.png",
+      "sha256": "fbc9b96522e50c793c178c562219a12e3524f433aceeaef912f31f5349fa1b2c",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/soil/d3/span/v1": {
+      "path": "assets/fbc9b96522e50c793c178c562219a12e3524f433aceeaef912f31f5349fa1b2c.png",
+      "sha256": "fbc9b96522e50c793c178c562219a12e3524f433aceeaef912f31f5349fa1b2c",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/soil/d3/span/v2": {
+      "path": "assets/fbc9b96522e50c793c178c562219a12e3524f433aceeaef912f31f5349fa1b2c.png",
+      "sha256": "fbc9b96522e50c793c178c562219a12e3524f433aceeaef912f31f5349fa1b2c",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/soil/d3/span/v3": {
+      "path": "assets/105f27bc28f4580526ccbe6e89cb74b343f47b05fa0ab81ef2d8a29400acceee.png",
+      "sha256": "105f27bc28f4580526ccbe6e89cb74b343f47b05fa0ab81ef2d8a29400acceee",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/soil/d3/leftCap/v0": {
+      "path": "assets/045cd2f83b6528a4f8375d6e0b7daa2b80430d3c9d32be51de3f88b5a1baa1f8.png",
+      "sha256": "045cd2f83b6528a4f8375d6e0b7daa2b80430d3c9d32be51de3f88b5a1baa1f8",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/soil/d3/leftCap/v1": {
+      "path": "assets/045cd2f83b6528a4f8375d6e0b7daa2b80430d3c9d32be51de3f88b5a1baa1f8.png",
+      "sha256": "045cd2f83b6528a4f8375d6e0b7daa2b80430d3c9d32be51de3f88b5a1baa1f8",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/soil/d3/leftCap/v2": {
+      "path": "assets/045cd2f83b6528a4f8375d6e0b7daa2b80430d3c9d32be51de3f88b5a1baa1f8.png",
+      "sha256": "045cd2f83b6528a4f8375d6e0b7daa2b80430d3c9d32be51de3f88b5a1baa1f8",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/soil/d3/leftCap/v3": {
+      "path": "assets/a1e2230a6ceede559be0c6170c71440fa57f9f6b93b6969dc5115cea58d51610.png",
+      "sha256": "a1e2230a6ceede559be0c6170c71440fa57f9f6b93b6969dc5115cea58d51610",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/soil/d3/rightCap/v0": {
+      "path": "assets/28e242f154960da6850724cb181223998d2fa24afe6a7f136654839bf57f1d12.png",
+      "sha256": "28e242f154960da6850724cb181223998d2fa24afe6a7f136654839bf57f1d12",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/soil/d3/rightCap/v1": {
+      "path": "assets/28e242f154960da6850724cb181223998d2fa24afe6a7f136654839bf57f1d12.png",
+      "sha256": "28e242f154960da6850724cb181223998d2fa24afe6a7f136654839bf57f1d12",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/soil/d3/rightCap/v2": {
+      "path": "assets/28e242f154960da6850724cb181223998d2fa24afe6a7f136654839bf57f1d12.png",
+      "sha256": "28e242f154960da6850724cb181223998d2fa24afe6a7f136654839bf57f1d12",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/soil/d3/rightCap/v3": {
+      "path": "assets/68acc4b32e27d927877e50b8eef8365b001d969adeffe7580955061236ce27c6.png",
+      "sha256": "68acc4b32e27d927877e50b8eef8365b001d969adeffe7580955061236ce27c6",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/soil/d3/isolated/v0": {
+      "path": "assets/2631a6100843f4be541ffe2055058b4e81ceeffa2f2cf5b445a4135ca89d859e.png",
+      "sha256": "2631a6100843f4be541ffe2055058b4e81ceeffa2f2cf5b445a4135ca89d859e",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/soil/d3/isolated/v1": {
+      "path": "assets/2631a6100843f4be541ffe2055058b4e81ceeffa2f2cf5b445a4135ca89d859e.png",
+      "sha256": "2631a6100843f4be541ffe2055058b4e81ceeffa2f2cf5b445a4135ca89d859e",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/soil/d3/isolated/v2": {
+      "path": "assets/2631a6100843f4be541ffe2055058b4e81ceeffa2f2cf5b445a4135ca89d859e.png",
+      "sha256": "2631a6100843f4be541ffe2055058b4e81ceeffa2f2cf5b445a4135ca89d859e",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/soil/d3/isolated/v3": {
+      "path": "assets/09a62c4b95fc81b950bc08eb5a4a65df18e3d4ac04805a43dde6b448dc8f2c7f.png",
+      "sha256": "09a62c4b95fc81b950bc08eb5a4a65df18e3d4ac04805a43dde6b448dc8f2c7f",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/sand/d1/span/v0": {
+      "path": "assets/faddd247651e92e914562bf2e8d5ecc193dc7a3957688b071d815cc42deda76c.png",
+      "sha256": "faddd247651e92e914562bf2e8d5ecc193dc7a3957688b071d815cc42deda76c",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/sand/d1/span/v1": {
+      "path": "assets/faddd247651e92e914562bf2e8d5ecc193dc7a3957688b071d815cc42deda76c.png",
+      "sha256": "faddd247651e92e914562bf2e8d5ecc193dc7a3957688b071d815cc42deda76c",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/sand/d1/span/v2": {
+      "path": "assets/faddd247651e92e914562bf2e8d5ecc193dc7a3957688b071d815cc42deda76c.png",
+      "sha256": "faddd247651e92e914562bf2e8d5ecc193dc7a3957688b071d815cc42deda76c",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/sand/d1/span/v3": {
+      "path": "assets/96ca1a935b8bf3661022157a8e16a4a9166240d823ef42b9f4ec1e77b4845a6c.png",
+      "sha256": "96ca1a935b8bf3661022157a8e16a4a9166240d823ef42b9f4ec1e77b4845a6c",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/sand/d1/leftCap/v0": {
+      "path": "assets/aaf986220af88b3f7c1815eb9841675db18c3a946f618aa272957b506b22c013.png",
+      "sha256": "aaf986220af88b3f7c1815eb9841675db18c3a946f618aa272957b506b22c013",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/sand/d1/leftCap/v1": {
+      "path": "assets/aaf986220af88b3f7c1815eb9841675db18c3a946f618aa272957b506b22c013.png",
+      "sha256": "aaf986220af88b3f7c1815eb9841675db18c3a946f618aa272957b506b22c013",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/sand/d1/leftCap/v2": {
+      "path": "assets/aaf986220af88b3f7c1815eb9841675db18c3a946f618aa272957b506b22c013.png",
+      "sha256": "aaf986220af88b3f7c1815eb9841675db18c3a946f618aa272957b506b22c013",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/sand/d1/leftCap/v3": {
+      "path": "assets/fc51b05c03ee8b4d1472ec251ef6c8bbc099150bf375bc1a2f31e9c849ea1377.png",
+      "sha256": "fc51b05c03ee8b4d1472ec251ef6c8bbc099150bf375bc1a2f31e9c849ea1377",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/sand/d1/rightCap/v0": {
+      "path": "assets/56bd012048f81fb4ba1bb88f91169d10f77333c2541eea0f822589a07787d27c.png",
+      "sha256": "56bd012048f81fb4ba1bb88f91169d10f77333c2541eea0f822589a07787d27c",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/sand/d1/rightCap/v1": {
+      "path": "assets/56bd012048f81fb4ba1bb88f91169d10f77333c2541eea0f822589a07787d27c.png",
+      "sha256": "56bd012048f81fb4ba1bb88f91169d10f77333c2541eea0f822589a07787d27c",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/sand/d1/rightCap/v2": {
+      "path": "assets/56bd012048f81fb4ba1bb88f91169d10f77333c2541eea0f822589a07787d27c.png",
+      "sha256": "56bd012048f81fb4ba1bb88f91169d10f77333c2541eea0f822589a07787d27c",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/sand/d1/rightCap/v3": {
+      "path": "assets/f68ad2449f39c1ae6df9e746057b52cd50f5c27646334484b08d3c12d2431a81.png",
+      "sha256": "f68ad2449f39c1ae6df9e746057b52cd50f5c27646334484b08d3c12d2431a81",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/sand/d1/isolated/v0": {
+      "path": "assets/8004f0d797bade7f3d3d6e9288094350164770820b3b8badd3df713161df8d3e.png",
+      "sha256": "8004f0d797bade7f3d3d6e9288094350164770820b3b8badd3df713161df8d3e",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/sand/d1/isolated/v1": {
+      "path": "assets/8004f0d797bade7f3d3d6e9288094350164770820b3b8badd3df713161df8d3e.png",
+      "sha256": "8004f0d797bade7f3d3d6e9288094350164770820b3b8badd3df713161df8d3e",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/sand/d1/isolated/v2": {
+      "path": "assets/8004f0d797bade7f3d3d6e9288094350164770820b3b8badd3df713161df8d3e.png",
+      "sha256": "8004f0d797bade7f3d3d6e9288094350164770820b3b8badd3df713161df8d3e",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/sand/d1/isolated/v3": {
+      "path": "assets/6a2476dba466dbc8a5f5f10ed5de77c397286729077cfd5598d0b75593ac5181.png",
+      "sha256": "6a2476dba466dbc8a5f5f10ed5de77c397286729077cfd5598d0b75593ac5181",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/sand/d2/span/v0": {
+      "path": "assets/6b733b8a1030440eda091782624aec43d1b51e5f90aaf5985f84895b109481d3.png",
+      "sha256": "6b733b8a1030440eda091782624aec43d1b51e5f90aaf5985f84895b109481d3",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/sand/d2/span/v1": {
+      "path": "assets/6b733b8a1030440eda091782624aec43d1b51e5f90aaf5985f84895b109481d3.png",
+      "sha256": "6b733b8a1030440eda091782624aec43d1b51e5f90aaf5985f84895b109481d3",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/sand/d2/span/v2": {
+      "path": "assets/6b733b8a1030440eda091782624aec43d1b51e5f90aaf5985f84895b109481d3.png",
+      "sha256": "6b733b8a1030440eda091782624aec43d1b51e5f90aaf5985f84895b109481d3",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/sand/d2/span/v3": {
+      "path": "assets/a234d30956c0f1add665c706b171dc221caf2783fd256446c00b6bb0e1125108.png",
+      "sha256": "a234d30956c0f1add665c706b171dc221caf2783fd256446c00b6bb0e1125108",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/sand/d2/leftCap/v0": {
+      "path": "assets/b0aa6ada71c17c02eeb1a07d39ad9045115aabc037d6b7d19c8124c2b2fc00e0.png",
+      "sha256": "b0aa6ada71c17c02eeb1a07d39ad9045115aabc037d6b7d19c8124c2b2fc00e0",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/sand/d2/leftCap/v1": {
+      "path": "assets/b0aa6ada71c17c02eeb1a07d39ad9045115aabc037d6b7d19c8124c2b2fc00e0.png",
+      "sha256": "b0aa6ada71c17c02eeb1a07d39ad9045115aabc037d6b7d19c8124c2b2fc00e0",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/sand/d2/leftCap/v2": {
+      "path": "assets/b0aa6ada71c17c02eeb1a07d39ad9045115aabc037d6b7d19c8124c2b2fc00e0.png",
+      "sha256": "b0aa6ada71c17c02eeb1a07d39ad9045115aabc037d6b7d19c8124c2b2fc00e0",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/sand/d2/leftCap/v3": {
+      "path": "assets/0f19c986cb7dbb979629dae9449f37244e35c1ff784944a98731df7fd6eae3c4.png",
+      "sha256": "0f19c986cb7dbb979629dae9449f37244e35c1ff784944a98731df7fd6eae3c4",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/sand/d2/rightCap/v0": {
+      "path": "assets/3ad1f7be5869d9269d9e7fe17d4376e6a47dd8647978444977a83bd8d8ab8fd3.png",
+      "sha256": "3ad1f7be5869d9269d9e7fe17d4376e6a47dd8647978444977a83bd8d8ab8fd3",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/sand/d2/rightCap/v1": {
+      "path": "assets/3ad1f7be5869d9269d9e7fe17d4376e6a47dd8647978444977a83bd8d8ab8fd3.png",
+      "sha256": "3ad1f7be5869d9269d9e7fe17d4376e6a47dd8647978444977a83bd8d8ab8fd3",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/sand/d2/rightCap/v2": {
+      "path": "assets/3ad1f7be5869d9269d9e7fe17d4376e6a47dd8647978444977a83bd8d8ab8fd3.png",
+      "sha256": "3ad1f7be5869d9269d9e7fe17d4376e6a47dd8647978444977a83bd8d8ab8fd3",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/sand/d2/rightCap/v3": {
+      "path": "assets/187ac650e8c69df2760dafcf059c8b5b2e3b1b28851f2eb4fa60e665cd9ef29e.png",
+      "sha256": "187ac650e8c69df2760dafcf059c8b5b2e3b1b28851f2eb4fa60e665cd9ef29e",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/sand/d2/isolated/v0": {
+      "path": "assets/746078ea07e0979666b072120a04d792ccd6788e3634a3b0eb61977406465516.png",
+      "sha256": "746078ea07e0979666b072120a04d792ccd6788e3634a3b0eb61977406465516",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/sand/d2/isolated/v1": {
+      "path": "assets/746078ea07e0979666b072120a04d792ccd6788e3634a3b0eb61977406465516.png",
+      "sha256": "746078ea07e0979666b072120a04d792ccd6788e3634a3b0eb61977406465516",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/sand/d2/isolated/v2": {
+      "path": "assets/746078ea07e0979666b072120a04d792ccd6788e3634a3b0eb61977406465516.png",
+      "sha256": "746078ea07e0979666b072120a04d792ccd6788e3634a3b0eb61977406465516",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/sand/d2/isolated/v3": {
+      "path": "assets/64ab65e9df9260aaf0f44ccf9bbf9dd65428d88a10a13f4309952bca4c0413b6.png",
+      "sha256": "64ab65e9df9260aaf0f44ccf9bbf9dd65428d88a10a13f4309952bca4c0413b6",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/sand/d3/span/v0": {
+      "path": "assets/2e07d7f36365c13a00b9ec0e3ff2f38243c8117872b87752916201b2c5fb80ff.png",
+      "sha256": "2e07d7f36365c13a00b9ec0e3ff2f38243c8117872b87752916201b2c5fb80ff",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/sand/d3/span/v1": {
+      "path": "assets/2e07d7f36365c13a00b9ec0e3ff2f38243c8117872b87752916201b2c5fb80ff.png",
+      "sha256": "2e07d7f36365c13a00b9ec0e3ff2f38243c8117872b87752916201b2c5fb80ff",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/sand/d3/span/v2": {
+      "path": "assets/2e07d7f36365c13a00b9ec0e3ff2f38243c8117872b87752916201b2c5fb80ff.png",
+      "sha256": "2e07d7f36365c13a00b9ec0e3ff2f38243c8117872b87752916201b2c5fb80ff",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/sand/d3/span/v3": {
+      "path": "assets/b06383b0bae0c17d34bb061877f9534bd6bf956deecc183c4ed7b797158f4578.png",
+      "sha256": "b06383b0bae0c17d34bb061877f9534bd6bf956deecc183c4ed7b797158f4578",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/sand/d3/leftCap/v0": {
+      "path": "assets/c381910544610b956564340ace5960c50cf699288bced83a59272fe24b14ec93.png",
+      "sha256": "c381910544610b956564340ace5960c50cf699288bced83a59272fe24b14ec93",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/sand/d3/leftCap/v1": {
+      "path": "assets/c381910544610b956564340ace5960c50cf699288bced83a59272fe24b14ec93.png",
+      "sha256": "c381910544610b956564340ace5960c50cf699288bced83a59272fe24b14ec93",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/sand/d3/leftCap/v2": {
+      "path": "assets/c381910544610b956564340ace5960c50cf699288bced83a59272fe24b14ec93.png",
+      "sha256": "c381910544610b956564340ace5960c50cf699288bced83a59272fe24b14ec93",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/sand/d3/leftCap/v3": {
+      "path": "assets/932e051a48143f1762fd7db9b414da59e6037ccce56eebaad821fcede3832345.png",
+      "sha256": "932e051a48143f1762fd7db9b414da59e6037ccce56eebaad821fcede3832345",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/sand/d3/rightCap/v0": {
+      "path": "assets/8442906b75e04b0c163ea995305f2f4e3d80fcf48a97678b34e45912a2454276.png",
+      "sha256": "8442906b75e04b0c163ea995305f2f4e3d80fcf48a97678b34e45912a2454276",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/sand/d3/rightCap/v1": {
+      "path": "assets/8442906b75e04b0c163ea995305f2f4e3d80fcf48a97678b34e45912a2454276.png",
+      "sha256": "8442906b75e04b0c163ea995305f2f4e3d80fcf48a97678b34e45912a2454276",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/sand/d3/rightCap/v2": {
+      "path": "assets/8442906b75e04b0c163ea995305f2f4e3d80fcf48a97678b34e45912a2454276.png",
+      "sha256": "8442906b75e04b0c163ea995305f2f4e3d80fcf48a97678b34e45912a2454276",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/sand/d3/rightCap/v3": {
+      "path": "assets/aa5b54b77ff5510860349a7554fa62980bb87bf6b7ec2eea95246f433a4fa6dc.png",
+      "sha256": "aa5b54b77ff5510860349a7554fa62980bb87bf6b7ec2eea95246f433a4fa6dc",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/sand/d3/isolated/v0": {
+      "path": "assets/8646ea98d06349e6313f387b4e48f4f92c25641f59eb34658e12dc51706ee46a.png",
+      "sha256": "8646ea98d06349e6313f387b4e48f4f92c25641f59eb34658e12dc51706ee46a",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/sand/d3/isolated/v1": {
+      "path": "assets/8646ea98d06349e6313f387b4e48f4f92c25641f59eb34658e12dc51706ee46a.png",
+      "sha256": "8646ea98d06349e6313f387b4e48f4f92c25641f59eb34658e12dc51706ee46a",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/sand/d3/isolated/v2": {
+      "path": "assets/8646ea98d06349e6313f387b4e48f4f92c25641f59eb34658e12dc51706ee46a.png",
+      "sha256": "8646ea98d06349e6313f387b4e48f4f92c25641f59eb34658e12dc51706ee46a",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/sand/d3/isolated/v3": {
+      "path": "assets/b86e6242b484a5bae8e0345f5e681186a8625d084c896feab56837c5fdec49c5.png",
+      "sha256": "b86e6242b484a5bae8e0345f5e681186a8625d084c896feab56837c5fdec49c5",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/ash/d1/span/v0": {
+      "path": "assets/d130659139c860ccda54df0959cc4fd01144a3c1958265d48037c4a9f4ff4fe8.png",
+      "sha256": "d130659139c860ccda54df0959cc4fd01144a3c1958265d48037c4a9f4ff4fe8",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/ash/d1/span/v1": {
+      "path": "assets/d130659139c860ccda54df0959cc4fd01144a3c1958265d48037c4a9f4ff4fe8.png",
+      "sha256": "d130659139c860ccda54df0959cc4fd01144a3c1958265d48037c4a9f4ff4fe8",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/ash/d1/span/v2": {
+      "path": "assets/d130659139c860ccda54df0959cc4fd01144a3c1958265d48037c4a9f4ff4fe8.png",
+      "sha256": "d130659139c860ccda54df0959cc4fd01144a3c1958265d48037c4a9f4ff4fe8",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/ash/d1/span/v3": {
+      "path": "assets/076d4a3efb1d207fe8f5afff35266e77a0d5b2c30c501b866aeb99b46e8d4a5b.png",
+      "sha256": "076d4a3efb1d207fe8f5afff35266e77a0d5b2c30c501b866aeb99b46e8d4a5b",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/ash/d1/leftCap/v0": {
+      "path": "assets/ad67591d192efc8edc89297ffdf14fc7469a4ae6b67cc0376757021320f2df23.png",
+      "sha256": "ad67591d192efc8edc89297ffdf14fc7469a4ae6b67cc0376757021320f2df23",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/ash/d1/leftCap/v1": {
+      "path": "assets/ad67591d192efc8edc89297ffdf14fc7469a4ae6b67cc0376757021320f2df23.png",
+      "sha256": "ad67591d192efc8edc89297ffdf14fc7469a4ae6b67cc0376757021320f2df23",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/ash/d1/leftCap/v2": {
+      "path": "assets/ad67591d192efc8edc89297ffdf14fc7469a4ae6b67cc0376757021320f2df23.png",
+      "sha256": "ad67591d192efc8edc89297ffdf14fc7469a4ae6b67cc0376757021320f2df23",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/ash/d1/leftCap/v3": {
+      "path": "assets/70ad10ff16fb1f70f65f493855f8f523d8af4166ae16ae311148ed9776c94eb1.png",
+      "sha256": "70ad10ff16fb1f70f65f493855f8f523d8af4166ae16ae311148ed9776c94eb1",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/ash/d1/rightCap/v0": {
+      "path": "assets/e6d1b8ac32a5ad7c4dd2865f68e1ac796d5991cefa198efe42538ff7c57f8232.png",
+      "sha256": "e6d1b8ac32a5ad7c4dd2865f68e1ac796d5991cefa198efe42538ff7c57f8232",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/ash/d1/rightCap/v1": {
+      "path": "assets/e6d1b8ac32a5ad7c4dd2865f68e1ac796d5991cefa198efe42538ff7c57f8232.png",
+      "sha256": "e6d1b8ac32a5ad7c4dd2865f68e1ac796d5991cefa198efe42538ff7c57f8232",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/ash/d1/rightCap/v2": {
+      "path": "assets/e6d1b8ac32a5ad7c4dd2865f68e1ac796d5991cefa198efe42538ff7c57f8232.png",
+      "sha256": "e6d1b8ac32a5ad7c4dd2865f68e1ac796d5991cefa198efe42538ff7c57f8232",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/ash/d1/rightCap/v3": {
+      "path": "assets/2285ef40e34a20ae39c070efa38a9758f01bd28e6aefdbc932ce0f1d15fca80a.png",
+      "sha256": "2285ef40e34a20ae39c070efa38a9758f01bd28e6aefdbc932ce0f1d15fca80a",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/ash/d1/isolated/v0": {
+      "path": "assets/533a1883612cbebfae73ece8f87db2336911cc049a1f2fff784867e63ae1d667.png",
+      "sha256": "533a1883612cbebfae73ece8f87db2336911cc049a1f2fff784867e63ae1d667",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/ash/d1/isolated/v1": {
+      "path": "assets/533a1883612cbebfae73ece8f87db2336911cc049a1f2fff784867e63ae1d667.png",
+      "sha256": "533a1883612cbebfae73ece8f87db2336911cc049a1f2fff784867e63ae1d667",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/ash/d1/isolated/v2": {
+      "path": "assets/533a1883612cbebfae73ece8f87db2336911cc049a1f2fff784867e63ae1d667.png",
+      "sha256": "533a1883612cbebfae73ece8f87db2336911cc049a1f2fff784867e63ae1d667",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/ash/d1/isolated/v3": {
+      "path": "assets/7e43a6503b0cd454a200692b7d18f816c918cbb8dd1c42efd68783eb4714a99b.png",
+      "sha256": "7e43a6503b0cd454a200692b7d18f816c918cbb8dd1c42efd68783eb4714a99b",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/ash/d2/span/v0": {
+      "path": "assets/dd073fe089b67663e8daeb335a4c7a6df38c312f4e43f0a4981258c9dd5df3e7.png",
+      "sha256": "dd073fe089b67663e8daeb335a4c7a6df38c312f4e43f0a4981258c9dd5df3e7",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/ash/d2/span/v1": {
+      "path": "assets/dd073fe089b67663e8daeb335a4c7a6df38c312f4e43f0a4981258c9dd5df3e7.png",
+      "sha256": "dd073fe089b67663e8daeb335a4c7a6df38c312f4e43f0a4981258c9dd5df3e7",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/ash/d2/span/v2": {
+      "path": "assets/dd073fe089b67663e8daeb335a4c7a6df38c312f4e43f0a4981258c9dd5df3e7.png",
+      "sha256": "dd073fe089b67663e8daeb335a4c7a6df38c312f4e43f0a4981258c9dd5df3e7",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/ash/d2/span/v3": {
+      "path": "assets/72c8340c39acaddefbe97d63117e45487373105dd504d7c332624aef59feda44.png",
+      "sha256": "72c8340c39acaddefbe97d63117e45487373105dd504d7c332624aef59feda44",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/ash/d2/leftCap/v0": {
+      "path": "assets/361c6b07976a0eabc65c62bab6c59489f33ed8bce0c66b7d0a80de43e5b4dee1.png",
+      "sha256": "361c6b07976a0eabc65c62bab6c59489f33ed8bce0c66b7d0a80de43e5b4dee1",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/ash/d2/leftCap/v1": {
+      "path": "assets/361c6b07976a0eabc65c62bab6c59489f33ed8bce0c66b7d0a80de43e5b4dee1.png",
+      "sha256": "361c6b07976a0eabc65c62bab6c59489f33ed8bce0c66b7d0a80de43e5b4dee1",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/ash/d2/leftCap/v2": {
+      "path": "assets/361c6b07976a0eabc65c62bab6c59489f33ed8bce0c66b7d0a80de43e5b4dee1.png",
+      "sha256": "361c6b07976a0eabc65c62bab6c59489f33ed8bce0c66b7d0a80de43e5b4dee1",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/ash/d2/leftCap/v3": {
+      "path": "assets/a43c5bc30a8c6fe88866d884ca93deb3a9107be3e6f937360678ac89cff650f0.png",
+      "sha256": "a43c5bc30a8c6fe88866d884ca93deb3a9107be3e6f937360678ac89cff650f0",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/ash/d2/rightCap/v0": {
+      "path": "assets/cdec87c3f76667a3f3f9ea461eea8830d093dfcccae7bb85051bc323af7b0918.png",
+      "sha256": "cdec87c3f76667a3f3f9ea461eea8830d093dfcccae7bb85051bc323af7b0918",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/ash/d2/rightCap/v1": {
+      "path": "assets/cdec87c3f76667a3f3f9ea461eea8830d093dfcccae7bb85051bc323af7b0918.png",
+      "sha256": "cdec87c3f76667a3f3f9ea461eea8830d093dfcccae7bb85051bc323af7b0918",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/ash/d2/rightCap/v2": {
+      "path": "assets/cdec87c3f76667a3f3f9ea461eea8830d093dfcccae7bb85051bc323af7b0918.png",
+      "sha256": "cdec87c3f76667a3f3f9ea461eea8830d093dfcccae7bb85051bc323af7b0918",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/ash/d2/rightCap/v3": {
+      "path": "assets/9563ac2875209440e1b3f8e5499a58bba45cad1775ea053ac27889c473e07add.png",
+      "sha256": "9563ac2875209440e1b3f8e5499a58bba45cad1775ea053ac27889c473e07add",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/ash/d2/isolated/v0": {
+      "path": "assets/64b58e009900c454f80be90fd1a0872ccd4f07f82b58af7832bf4454e5870bd4.png",
+      "sha256": "64b58e009900c454f80be90fd1a0872ccd4f07f82b58af7832bf4454e5870bd4",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/ash/d2/isolated/v1": {
+      "path": "assets/64b58e009900c454f80be90fd1a0872ccd4f07f82b58af7832bf4454e5870bd4.png",
+      "sha256": "64b58e009900c454f80be90fd1a0872ccd4f07f82b58af7832bf4454e5870bd4",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/ash/d2/isolated/v2": {
+      "path": "assets/64b58e009900c454f80be90fd1a0872ccd4f07f82b58af7832bf4454e5870bd4.png",
+      "sha256": "64b58e009900c454f80be90fd1a0872ccd4f07f82b58af7832bf4454e5870bd4",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/ash/d2/isolated/v3": {
+      "path": "assets/38e5a2d9d222b8506f82e576a168f00e16f605713ae7693533093ea0b4b8da6a.png",
+      "sha256": "38e5a2d9d222b8506f82e576a168f00e16f605713ae7693533093ea0b4b8da6a",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/ash/d3/span/v0": {
+      "path": "assets/01a198c32e700c1e657f8dce42d9bf8eb53881f7a1b0c308459b5ad0f698ada8.png",
+      "sha256": "01a198c32e700c1e657f8dce42d9bf8eb53881f7a1b0c308459b5ad0f698ada8",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/ash/d3/span/v1": {
+      "path": "assets/01a198c32e700c1e657f8dce42d9bf8eb53881f7a1b0c308459b5ad0f698ada8.png",
+      "sha256": "01a198c32e700c1e657f8dce42d9bf8eb53881f7a1b0c308459b5ad0f698ada8",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/ash/d3/span/v2": {
+      "path": "assets/01a198c32e700c1e657f8dce42d9bf8eb53881f7a1b0c308459b5ad0f698ada8.png",
+      "sha256": "01a198c32e700c1e657f8dce42d9bf8eb53881f7a1b0c308459b5ad0f698ada8",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/ash/d3/span/v3": {
+      "path": "assets/4617a7fa506e90769cec8cf571f8f8d20bcfb7a27d362b46debb569e3bcab06c.png",
+      "sha256": "4617a7fa506e90769cec8cf571f8f8d20bcfb7a27d362b46debb569e3bcab06c",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/ash/d3/leftCap/v0": {
+      "path": "assets/7a0e67ed441e858863b0db16ff7cd939cb7656cb731c6afd0397e4deb0c82db5.png",
+      "sha256": "7a0e67ed441e858863b0db16ff7cd939cb7656cb731c6afd0397e4deb0c82db5",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/ash/d3/leftCap/v1": {
+      "path": "assets/7a0e67ed441e858863b0db16ff7cd939cb7656cb731c6afd0397e4deb0c82db5.png",
+      "sha256": "7a0e67ed441e858863b0db16ff7cd939cb7656cb731c6afd0397e4deb0c82db5",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/ash/d3/leftCap/v2": {
+      "path": "assets/7a0e67ed441e858863b0db16ff7cd939cb7656cb731c6afd0397e4deb0c82db5.png",
+      "sha256": "7a0e67ed441e858863b0db16ff7cd939cb7656cb731c6afd0397e4deb0c82db5",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/ash/d3/leftCap/v3": {
+      "path": "assets/8f3cce0ae3f94d56a896affe1ff587d0968fda37ecd25b8b4d49bcc371f8fd40.png",
+      "sha256": "8f3cce0ae3f94d56a896affe1ff587d0968fda37ecd25b8b4d49bcc371f8fd40",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/ash/d3/rightCap/v0": {
+      "path": "assets/30de227c6d6cf49edf2dacededbcad6ea0ec3a42517d99315390afd213dd2ee3.png",
+      "sha256": "30de227c6d6cf49edf2dacededbcad6ea0ec3a42517d99315390afd213dd2ee3",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/ash/d3/rightCap/v1": {
+      "path": "assets/30de227c6d6cf49edf2dacededbcad6ea0ec3a42517d99315390afd213dd2ee3.png",
+      "sha256": "30de227c6d6cf49edf2dacededbcad6ea0ec3a42517d99315390afd213dd2ee3",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/ash/d3/rightCap/v2": {
+      "path": "assets/30de227c6d6cf49edf2dacededbcad6ea0ec3a42517d99315390afd213dd2ee3.png",
+      "sha256": "30de227c6d6cf49edf2dacededbcad6ea0ec3a42517d99315390afd213dd2ee3",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/ash/d3/rightCap/v3": {
+      "path": "assets/86f20b83ff21aabd854af60bd85dfcc68633f871ea8c671fb50dcf2cc5c5d15f.png",
+      "sha256": "86f20b83ff21aabd854af60bd85dfcc68633f871ea8c671fb50dcf2cc5c5d15f",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/ash/d3/isolated/v0": {
+      "path": "assets/d8cc8d1ab0be5a054912d2087ab0289cb03c0c4ce0c1544c0a653f994d772051.png",
+      "sha256": "d8cc8d1ab0be5a054912d2087ab0289cb03c0c4ce0c1544c0a653f994d772051",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/ash/d3/isolated/v1": {
+      "path": "assets/d8cc8d1ab0be5a054912d2087ab0289cb03c0c4ce0c1544c0a653f994d772051.png",
+      "sha256": "d8cc8d1ab0be5a054912d2087ab0289cb03c0c4ce0c1544c0a653f994d772051",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/ash/d3/isolated/v2": {
+      "path": "assets/d8cc8d1ab0be5a054912d2087ab0289cb03c0c4ce0c1544c0a653f994d772051.png",
+      "sha256": "d8cc8d1ab0be5a054912d2087ab0289cb03c0c4ce0c1544c0a653f994d772051",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/ash/d3/isolated/v3": {
+      "path": "assets/292a7f73c0993d6c1e0e62ca0fd72515650271270fb5f5d9c64bba6d4be4ded3.png",
+      "sha256": "292a7f73c0993d6c1e0e62ca0fd72515650271270fb5f5d9c64bba6d4be4ded3",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/rubble/d1/span/v0": {
+      "path": "assets/fcf4bb70036d69df81d951e522dc3e83d3d1da13fa0124336b4c46e806ddc6ae.png",
+      "sha256": "fcf4bb70036d69df81d951e522dc3e83d3d1da13fa0124336b4c46e806ddc6ae",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/rubble/d1/span/v1": {
+      "path": "assets/fcf4bb70036d69df81d951e522dc3e83d3d1da13fa0124336b4c46e806ddc6ae.png",
+      "sha256": "fcf4bb70036d69df81d951e522dc3e83d3d1da13fa0124336b4c46e806ddc6ae",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/rubble/d1/span/v2": {
+      "path": "assets/fcf4bb70036d69df81d951e522dc3e83d3d1da13fa0124336b4c46e806ddc6ae.png",
+      "sha256": "fcf4bb70036d69df81d951e522dc3e83d3d1da13fa0124336b4c46e806ddc6ae",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/rubble/d1/span/v3": {
+      "path": "assets/6051ad976cc3d337d4c83522de120c30b7b24d1b4e9c20f897fec7c68a0323ed.png",
+      "sha256": "6051ad976cc3d337d4c83522de120c30b7b24d1b4e9c20f897fec7c68a0323ed",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/rubble/d1/leftCap/v0": {
+      "path": "assets/fcccd3621c8b651f56bb6c4b826c6fdacfa0cd4c6bf77652cdcdc92884544e99.png",
+      "sha256": "fcccd3621c8b651f56bb6c4b826c6fdacfa0cd4c6bf77652cdcdc92884544e99",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/rubble/d1/leftCap/v1": {
+      "path": "assets/fcccd3621c8b651f56bb6c4b826c6fdacfa0cd4c6bf77652cdcdc92884544e99.png",
+      "sha256": "fcccd3621c8b651f56bb6c4b826c6fdacfa0cd4c6bf77652cdcdc92884544e99",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/rubble/d1/leftCap/v2": {
+      "path": "assets/fcccd3621c8b651f56bb6c4b826c6fdacfa0cd4c6bf77652cdcdc92884544e99.png",
+      "sha256": "fcccd3621c8b651f56bb6c4b826c6fdacfa0cd4c6bf77652cdcdc92884544e99",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/rubble/d1/leftCap/v3": {
+      "path": "assets/9b3569d022dc17fe06844ed1110041d84bcd26c57c81f68af6e92169280cf46f.png",
+      "sha256": "9b3569d022dc17fe06844ed1110041d84bcd26c57c81f68af6e92169280cf46f",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/rubble/d1/rightCap/v0": {
+      "path": "assets/be962e114741b15187519f507f262efd88daa49c43f0d0becd819ee5ac0487ec.png",
+      "sha256": "be962e114741b15187519f507f262efd88daa49c43f0d0becd819ee5ac0487ec",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/rubble/d1/rightCap/v1": {
+      "path": "assets/be962e114741b15187519f507f262efd88daa49c43f0d0becd819ee5ac0487ec.png",
+      "sha256": "be962e114741b15187519f507f262efd88daa49c43f0d0becd819ee5ac0487ec",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/rubble/d1/rightCap/v2": {
+      "path": "assets/be962e114741b15187519f507f262efd88daa49c43f0d0becd819ee5ac0487ec.png",
+      "sha256": "be962e114741b15187519f507f262efd88daa49c43f0d0becd819ee5ac0487ec",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/rubble/d1/rightCap/v3": {
+      "path": "assets/6179f3617ea6270aa2d8135adfb3bbe86286a8357f077d5a2f181db4b60a6beb.png",
+      "sha256": "6179f3617ea6270aa2d8135adfb3bbe86286a8357f077d5a2f181db4b60a6beb",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/rubble/d1/isolated/v0": {
+      "path": "assets/c763427842a57b5e91029a4f8eb9b8e74df60405f016b4bcdd0ab1b320abef22.png",
+      "sha256": "c763427842a57b5e91029a4f8eb9b8e74df60405f016b4bcdd0ab1b320abef22",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/rubble/d1/isolated/v1": {
+      "path": "assets/c763427842a57b5e91029a4f8eb9b8e74df60405f016b4bcdd0ab1b320abef22.png",
+      "sha256": "c763427842a57b5e91029a4f8eb9b8e74df60405f016b4bcdd0ab1b320abef22",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/rubble/d1/isolated/v2": {
+      "path": "assets/c763427842a57b5e91029a4f8eb9b8e74df60405f016b4bcdd0ab1b320abef22.png",
+      "sha256": "c763427842a57b5e91029a4f8eb9b8e74df60405f016b4bcdd0ab1b320abef22",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/rubble/d1/isolated/v3": {
+      "path": "assets/988ba0a826df63e4b5b2b36f3efc7e10a785679e83d19dc41578b9cbdcef14a0.png",
+      "sha256": "988ba0a826df63e4b5b2b36f3efc7e10a785679e83d19dc41578b9cbdcef14a0",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/rubble/d2/span/v0": {
+      "path": "assets/4d8ade7ae1472ef9bcd4fb2dee2edc4fe3301f4e577a30441d931623a6c0c5f9.png",
+      "sha256": "4d8ade7ae1472ef9bcd4fb2dee2edc4fe3301f4e577a30441d931623a6c0c5f9",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/rubble/d2/span/v1": {
+      "path": "assets/4d8ade7ae1472ef9bcd4fb2dee2edc4fe3301f4e577a30441d931623a6c0c5f9.png",
+      "sha256": "4d8ade7ae1472ef9bcd4fb2dee2edc4fe3301f4e577a30441d931623a6c0c5f9",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/rubble/d2/span/v2": {
+      "path": "assets/4d8ade7ae1472ef9bcd4fb2dee2edc4fe3301f4e577a30441d931623a6c0c5f9.png",
+      "sha256": "4d8ade7ae1472ef9bcd4fb2dee2edc4fe3301f4e577a30441d931623a6c0c5f9",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/rubble/d2/span/v3": {
+      "path": "assets/4a1b2cffbcde93fafad6ad07fa59f72e223eeb45dbd4e4b04a0b133efef48531.png",
+      "sha256": "4a1b2cffbcde93fafad6ad07fa59f72e223eeb45dbd4e4b04a0b133efef48531",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/rubble/d2/leftCap/v0": {
+      "path": "assets/16af88191fa9eea8438abf25a3a06bcb6e895d79e7016571f8d9212cfbb83133.png",
+      "sha256": "16af88191fa9eea8438abf25a3a06bcb6e895d79e7016571f8d9212cfbb83133",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/rubble/d2/leftCap/v1": {
+      "path": "assets/16af88191fa9eea8438abf25a3a06bcb6e895d79e7016571f8d9212cfbb83133.png",
+      "sha256": "16af88191fa9eea8438abf25a3a06bcb6e895d79e7016571f8d9212cfbb83133",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/rubble/d2/leftCap/v2": {
+      "path": "assets/16af88191fa9eea8438abf25a3a06bcb6e895d79e7016571f8d9212cfbb83133.png",
+      "sha256": "16af88191fa9eea8438abf25a3a06bcb6e895d79e7016571f8d9212cfbb83133",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/rubble/d2/leftCap/v3": {
+      "path": "assets/8e5dc8bba2b7ee5954e1ec353b9b284fe7db5a7114707e29ffeefdf77a06d774.png",
+      "sha256": "8e5dc8bba2b7ee5954e1ec353b9b284fe7db5a7114707e29ffeefdf77a06d774",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/rubble/d2/rightCap/v0": {
+      "path": "assets/f1bb83c7d25d4f54495492706c946843628b49b4f28786d77e5d0952178a8685.png",
+      "sha256": "f1bb83c7d25d4f54495492706c946843628b49b4f28786d77e5d0952178a8685",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/rubble/d2/rightCap/v1": {
+      "path": "assets/f1bb83c7d25d4f54495492706c946843628b49b4f28786d77e5d0952178a8685.png",
+      "sha256": "f1bb83c7d25d4f54495492706c946843628b49b4f28786d77e5d0952178a8685",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/rubble/d2/rightCap/v2": {
+      "path": "assets/f1bb83c7d25d4f54495492706c946843628b49b4f28786d77e5d0952178a8685.png",
+      "sha256": "f1bb83c7d25d4f54495492706c946843628b49b4f28786d77e5d0952178a8685",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/rubble/d2/rightCap/v3": {
+      "path": "assets/c11b1b95ad46a8e75272385d4c9fed1d03a3c93ecbe9aa3672718a320cdf6b76.png",
+      "sha256": "c11b1b95ad46a8e75272385d4c9fed1d03a3c93ecbe9aa3672718a320cdf6b76",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/rubble/d2/isolated/v0": {
+      "path": "assets/b92166ffb99c5b480a40d916db5a4b91b87a51919f01beb3df9e388a9e665491.png",
+      "sha256": "b92166ffb99c5b480a40d916db5a4b91b87a51919f01beb3df9e388a9e665491",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/rubble/d2/isolated/v1": {
+      "path": "assets/b92166ffb99c5b480a40d916db5a4b91b87a51919f01beb3df9e388a9e665491.png",
+      "sha256": "b92166ffb99c5b480a40d916db5a4b91b87a51919f01beb3df9e388a9e665491",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/rubble/d2/isolated/v2": {
+      "path": "assets/b92166ffb99c5b480a40d916db5a4b91b87a51919f01beb3df9e388a9e665491.png",
+      "sha256": "b92166ffb99c5b480a40d916db5a4b91b87a51919f01beb3df9e388a9e665491",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/rubble/d2/isolated/v3": {
+      "path": "assets/de33e1ed1b160f17b2b12850791e23df033f5be378a89456b5a5f6d75ef633fb.png",
+      "sha256": "de33e1ed1b160f17b2b12850791e23df033f5be378a89456b5a5f6d75ef633fb",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/rubble/d3/span/v0": {
+      "path": "assets/84bebb1b74a192391d1098b811cc9424801bfa37a836f5ed8a63d838285fd659.png",
+      "sha256": "84bebb1b74a192391d1098b811cc9424801bfa37a836f5ed8a63d838285fd659",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/rubble/d3/span/v1": {
+      "path": "assets/84bebb1b74a192391d1098b811cc9424801bfa37a836f5ed8a63d838285fd659.png",
+      "sha256": "84bebb1b74a192391d1098b811cc9424801bfa37a836f5ed8a63d838285fd659",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/rubble/d3/span/v2": {
+      "path": "assets/84bebb1b74a192391d1098b811cc9424801bfa37a836f5ed8a63d838285fd659.png",
+      "sha256": "84bebb1b74a192391d1098b811cc9424801bfa37a836f5ed8a63d838285fd659",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/rubble/d3/span/v3": {
+      "path": "assets/11a296c6c5a13dbddc5ff4adffae9ebb8eee5a4c0c6b829bd55931a57a80e4c1.png",
+      "sha256": "11a296c6c5a13dbddc5ff4adffae9ebb8eee5a4c0c6b829bd55931a57a80e4c1",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/rubble/d3/leftCap/v0": {
+      "path": "assets/be79992294a752a653591a0965ab9dfe73ede96f95bd6a49bd3553fa90bb29c4.png",
+      "sha256": "be79992294a752a653591a0965ab9dfe73ede96f95bd6a49bd3553fa90bb29c4",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/rubble/d3/leftCap/v1": {
+      "path": "assets/be79992294a752a653591a0965ab9dfe73ede96f95bd6a49bd3553fa90bb29c4.png",
+      "sha256": "be79992294a752a653591a0965ab9dfe73ede96f95bd6a49bd3553fa90bb29c4",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/rubble/d3/leftCap/v2": {
+      "path": "assets/be79992294a752a653591a0965ab9dfe73ede96f95bd6a49bd3553fa90bb29c4.png",
+      "sha256": "be79992294a752a653591a0965ab9dfe73ede96f95bd6a49bd3553fa90bb29c4",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/rubble/d3/leftCap/v3": {
+      "path": "assets/693d994c9c927746f25af51e2407dff8a9ce9be4b7f431e527296188448d63cb.png",
+      "sha256": "693d994c9c927746f25af51e2407dff8a9ce9be4b7f431e527296188448d63cb",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/rubble/d3/rightCap/v0": {
+      "path": "assets/934438a21f1058e9fe1b5c1cdf3a707e51b51765649dcfbb47b9f389bf1f6102.png",
+      "sha256": "934438a21f1058e9fe1b5c1cdf3a707e51b51765649dcfbb47b9f389bf1f6102",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/rubble/d3/rightCap/v1": {
+      "path": "assets/934438a21f1058e9fe1b5c1cdf3a707e51b51765649dcfbb47b9f389bf1f6102.png",
+      "sha256": "934438a21f1058e9fe1b5c1cdf3a707e51b51765649dcfbb47b9f389bf1f6102",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/rubble/d3/rightCap/v2": {
+      "path": "assets/934438a21f1058e9fe1b5c1cdf3a707e51b51765649dcfbb47b9f389bf1f6102.png",
+      "sha256": "934438a21f1058e9fe1b5c1cdf3a707e51b51765649dcfbb47b9f389bf1f6102",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/rubble/d3/rightCap/v3": {
+      "path": "assets/72b97511a17cad6167d8950a02610a3e242de62973adef91e31047870eeb462b.png",
+      "sha256": "72b97511a17cad6167d8950a02610a3e242de62973adef91e31047870eeb462b",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/rubble/d3/isolated/v0": {
+      "path": "assets/2c9e0c40a4f61667e1ceae531b5fc57358934ec6794277f1e37fc5e76b50dd71.png",
+      "sha256": "2c9e0c40a4f61667e1ceae531b5fc57358934ec6794277f1e37fc5e76b50dd71",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/rubble/d3/isolated/v1": {
+      "path": "assets/2c9e0c40a4f61667e1ceae531b5fc57358934ec6794277f1e37fc5e76b50dd71.png",
+      "sha256": "2c9e0c40a4f61667e1ceae531b5fc57358934ec6794277f1e37fc5e76b50dd71",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/rubble/d3/isolated/v2": {
+      "path": "assets/2c9e0c40a4f61667e1ceae531b5fc57358934ec6794277f1e37fc5e76b50dd71.png",
+      "sha256": "2c9e0c40a4f61667e1ceae531b5fc57358934ec6794277f1e37fc5e76b50dd71",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/rubble/d3/isolated/v3": {
+      "path": "assets/65ce182c5db8561b47d1ac230890fc9720b542f0b6b9389de63ba28a8598da58.png",
+      "sha256": "65ce182c5db8561b47d1ac230890fc9720b542f0b6b9389de63ba28a8598da58",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/mud/d1/span/v0": {
+      "path": "assets/0f857aec487783937fbb9042e9aafd61aa7d064a2e5f2853ec47aaaa411fd1ee.png",
+      "sha256": "0f857aec487783937fbb9042e9aafd61aa7d064a2e5f2853ec47aaaa411fd1ee",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/mud/d1/span/v1": {
+      "path": "assets/0f857aec487783937fbb9042e9aafd61aa7d064a2e5f2853ec47aaaa411fd1ee.png",
+      "sha256": "0f857aec487783937fbb9042e9aafd61aa7d064a2e5f2853ec47aaaa411fd1ee",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/mud/d1/span/v2": {
+      "path": "assets/0f857aec487783937fbb9042e9aafd61aa7d064a2e5f2853ec47aaaa411fd1ee.png",
+      "sha256": "0f857aec487783937fbb9042e9aafd61aa7d064a2e5f2853ec47aaaa411fd1ee",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/mud/d1/span/v3": {
+      "path": "assets/65f82932cf70a1a54b503a3d2c1417c045dc0574252fd1012a65e74619078039.png",
+      "sha256": "65f82932cf70a1a54b503a3d2c1417c045dc0574252fd1012a65e74619078039",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/mud/d1/leftCap/v0": {
+      "path": "assets/136569fee21bb197abe3d74e78baf0512336fafbacf8822365b6a0c3c089b3f9.png",
+      "sha256": "136569fee21bb197abe3d74e78baf0512336fafbacf8822365b6a0c3c089b3f9",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/mud/d1/leftCap/v1": {
+      "path": "assets/136569fee21bb197abe3d74e78baf0512336fafbacf8822365b6a0c3c089b3f9.png",
+      "sha256": "136569fee21bb197abe3d74e78baf0512336fafbacf8822365b6a0c3c089b3f9",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/mud/d1/leftCap/v2": {
+      "path": "assets/136569fee21bb197abe3d74e78baf0512336fafbacf8822365b6a0c3c089b3f9.png",
+      "sha256": "136569fee21bb197abe3d74e78baf0512336fafbacf8822365b6a0c3c089b3f9",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/mud/d1/leftCap/v3": {
+      "path": "assets/e26d9386c58c38f2bd93cdf6198b8a3847273e27b784d241f6903891ad6eddcd.png",
+      "sha256": "e26d9386c58c38f2bd93cdf6198b8a3847273e27b784d241f6903891ad6eddcd",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/mud/d1/rightCap/v0": {
+      "path": "assets/08a21f20417cf1c28b463436f053ad85a9fae5b6128b2a89b97dfd74a60623bd.png",
+      "sha256": "08a21f20417cf1c28b463436f053ad85a9fae5b6128b2a89b97dfd74a60623bd",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/mud/d1/rightCap/v1": {
+      "path": "assets/08a21f20417cf1c28b463436f053ad85a9fae5b6128b2a89b97dfd74a60623bd.png",
+      "sha256": "08a21f20417cf1c28b463436f053ad85a9fae5b6128b2a89b97dfd74a60623bd",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/mud/d1/rightCap/v2": {
+      "path": "assets/08a21f20417cf1c28b463436f053ad85a9fae5b6128b2a89b97dfd74a60623bd.png",
+      "sha256": "08a21f20417cf1c28b463436f053ad85a9fae5b6128b2a89b97dfd74a60623bd",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/mud/d1/rightCap/v3": {
+      "path": "assets/51bdade0dbe8a3a305c54e979cb26983754e6cf705ec123efb4c508aa88ad06f.png",
+      "sha256": "51bdade0dbe8a3a305c54e979cb26983754e6cf705ec123efb4c508aa88ad06f",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/mud/d1/isolated/v0": {
+      "path": "assets/d0790a28928257151d7e0471171d8e9d2d85d34207ddf36a94a934ca40dfa4aa.png",
+      "sha256": "d0790a28928257151d7e0471171d8e9d2d85d34207ddf36a94a934ca40dfa4aa",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/mud/d1/isolated/v1": {
+      "path": "assets/d0790a28928257151d7e0471171d8e9d2d85d34207ddf36a94a934ca40dfa4aa.png",
+      "sha256": "d0790a28928257151d7e0471171d8e9d2d85d34207ddf36a94a934ca40dfa4aa",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/mud/d1/isolated/v2": {
+      "path": "assets/d0790a28928257151d7e0471171d8e9d2d85d34207ddf36a94a934ca40dfa4aa.png",
+      "sha256": "d0790a28928257151d7e0471171d8e9d2d85d34207ddf36a94a934ca40dfa4aa",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/mud/d1/isolated/v3": {
+      "path": "assets/96c19abed6ee02148ad508bd1c0050244760424fb24d8783f4a174b288fd0b42.png",
+      "sha256": "96c19abed6ee02148ad508bd1c0050244760424fb24d8783f4a174b288fd0b42",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/mud/d2/span/v0": {
+      "path": "assets/5b2fe9be4001039fcc50a11f93762635aadda2209e9046f0dee37f7186f9c63d.png",
+      "sha256": "5b2fe9be4001039fcc50a11f93762635aadda2209e9046f0dee37f7186f9c63d",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/mud/d2/span/v1": {
+      "path": "assets/5b2fe9be4001039fcc50a11f93762635aadda2209e9046f0dee37f7186f9c63d.png",
+      "sha256": "5b2fe9be4001039fcc50a11f93762635aadda2209e9046f0dee37f7186f9c63d",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/mud/d2/span/v2": {
+      "path": "assets/5b2fe9be4001039fcc50a11f93762635aadda2209e9046f0dee37f7186f9c63d.png",
+      "sha256": "5b2fe9be4001039fcc50a11f93762635aadda2209e9046f0dee37f7186f9c63d",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/mud/d2/span/v3": {
+      "path": "assets/ea908bf46456d5669e97610d919eb87f10451d3d8ed9c237934ede2e2484b49b.png",
+      "sha256": "ea908bf46456d5669e97610d919eb87f10451d3d8ed9c237934ede2e2484b49b",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/mud/d2/leftCap/v0": {
+      "path": "assets/64b281789bb9b1b4e2acd1eb2c3aec8c7bbd49442efec24b8082446e0e8b6c27.png",
+      "sha256": "64b281789bb9b1b4e2acd1eb2c3aec8c7bbd49442efec24b8082446e0e8b6c27",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/mud/d2/leftCap/v1": {
+      "path": "assets/64b281789bb9b1b4e2acd1eb2c3aec8c7bbd49442efec24b8082446e0e8b6c27.png",
+      "sha256": "64b281789bb9b1b4e2acd1eb2c3aec8c7bbd49442efec24b8082446e0e8b6c27",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/mud/d2/leftCap/v2": {
+      "path": "assets/64b281789bb9b1b4e2acd1eb2c3aec8c7bbd49442efec24b8082446e0e8b6c27.png",
+      "sha256": "64b281789bb9b1b4e2acd1eb2c3aec8c7bbd49442efec24b8082446e0e8b6c27",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/mud/d2/leftCap/v3": {
+      "path": "assets/3c2ada3e4dd06c2a421edf57df98f64be3bdd45d1a74defa907e54e251139262.png",
+      "sha256": "3c2ada3e4dd06c2a421edf57df98f64be3bdd45d1a74defa907e54e251139262",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/mud/d2/rightCap/v0": {
+      "path": "assets/4aefba756fda22c7ffd6a3d22b348939de29d3ad49546c275b95e486e512067c.png",
+      "sha256": "4aefba756fda22c7ffd6a3d22b348939de29d3ad49546c275b95e486e512067c",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/mud/d2/rightCap/v1": {
+      "path": "assets/4aefba756fda22c7ffd6a3d22b348939de29d3ad49546c275b95e486e512067c.png",
+      "sha256": "4aefba756fda22c7ffd6a3d22b348939de29d3ad49546c275b95e486e512067c",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/mud/d2/rightCap/v2": {
+      "path": "assets/4aefba756fda22c7ffd6a3d22b348939de29d3ad49546c275b95e486e512067c.png",
+      "sha256": "4aefba756fda22c7ffd6a3d22b348939de29d3ad49546c275b95e486e512067c",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/mud/d2/rightCap/v3": {
+      "path": "assets/258ae92ef0ce0afde2a831be5c0e18b424f52c1ab8028fe5dfe8b77b75c4de16.png",
+      "sha256": "258ae92ef0ce0afde2a831be5c0e18b424f52c1ab8028fe5dfe8b77b75c4de16",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/mud/d2/isolated/v0": {
+      "path": "assets/73dd321215bbd4a13df53bdb306b9f10953adc42f4600bec1cc6df771bd1c2da.png",
+      "sha256": "73dd321215bbd4a13df53bdb306b9f10953adc42f4600bec1cc6df771bd1c2da",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/mud/d2/isolated/v1": {
+      "path": "assets/73dd321215bbd4a13df53bdb306b9f10953adc42f4600bec1cc6df771bd1c2da.png",
+      "sha256": "73dd321215bbd4a13df53bdb306b9f10953adc42f4600bec1cc6df771bd1c2da",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/mud/d2/isolated/v2": {
+      "path": "assets/73dd321215bbd4a13df53bdb306b9f10953adc42f4600bec1cc6df771bd1c2da.png",
+      "sha256": "73dd321215bbd4a13df53bdb306b9f10953adc42f4600bec1cc6df771bd1c2da",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/mud/d2/isolated/v3": {
+      "path": "assets/9c36463c80c46f161900df33502d2d957e19a43085e11646ff7cc5e901bbe85a.png",
+      "sha256": "9c36463c80c46f161900df33502d2d957e19a43085e11646ff7cc5e901bbe85a",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/mud/d3/span/v0": {
+      "path": "assets/a6bf09fe9004ec88b7e166c4d3dc61796d5d789ca83ee6cc7ee2cbd8b370ff16.png",
+      "sha256": "a6bf09fe9004ec88b7e166c4d3dc61796d5d789ca83ee6cc7ee2cbd8b370ff16",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/mud/d3/span/v1": {
+      "path": "assets/a6bf09fe9004ec88b7e166c4d3dc61796d5d789ca83ee6cc7ee2cbd8b370ff16.png",
+      "sha256": "a6bf09fe9004ec88b7e166c4d3dc61796d5d789ca83ee6cc7ee2cbd8b370ff16",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/mud/d3/span/v2": {
+      "path": "assets/a6bf09fe9004ec88b7e166c4d3dc61796d5d789ca83ee6cc7ee2cbd8b370ff16.png",
+      "sha256": "a6bf09fe9004ec88b7e166c4d3dc61796d5d789ca83ee6cc7ee2cbd8b370ff16",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/mud/d3/span/v3": {
+      "path": "assets/386fde6e9cfb78085e3b686f86bff9a6f68b6376cb50d457195742c4bbcf97df.png",
+      "sha256": "386fde6e9cfb78085e3b686f86bff9a6f68b6376cb50d457195742c4bbcf97df",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/mud/d3/leftCap/v0": {
+      "path": "assets/af49675f56f972e72c3805b8a69ea15165660e6ea01088fcd9bb9f5e43bf2370.png",
+      "sha256": "af49675f56f972e72c3805b8a69ea15165660e6ea01088fcd9bb9f5e43bf2370",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/mud/d3/leftCap/v1": {
+      "path": "assets/af49675f56f972e72c3805b8a69ea15165660e6ea01088fcd9bb9f5e43bf2370.png",
+      "sha256": "af49675f56f972e72c3805b8a69ea15165660e6ea01088fcd9bb9f5e43bf2370",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/mud/d3/leftCap/v2": {
+      "path": "assets/af49675f56f972e72c3805b8a69ea15165660e6ea01088fcd9bb9f5e43bf2370.png",
+      "sha256": "af49675f56f972e72c3805b8a69ea15165660e6ea01088fcd9bb9f5e43bf2370",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/mud/d3/leftCap/v3": {
+      "path": "assets/e9eb3190694be6d99c737d42c6d8fb24a9f4bd1262e12f032eb266af7c76452e.png",
+      "sha256": "e9eb3190694be6d99c737d42c6d8fb24a9f4bd1262e12f032eb266af7c76452e",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/mud/d3/rightCap/v0": {
+      "path": "assets/65cae02200ab7a14ace3a6b798e2b618ddddf7cc1ade104c85722c4afcfcfecd.png",
+      "sha256": "65cae02200ab7a14ace3a6b798e2b618ddddf7cc1ade104c85722c4afcfcfecd",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/mud/d3/rightCap/v1": {
+      "path": "assets/65cae02200ab7a14ace3a6b798e2b618ddddf7cc1ade104c85722c4afcfcfecd.png",
+      "sha256": "65cae02200ab7a14ace3a6b798e2b618ddddf7cc1ade104c85722c4afcfcfecd",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/mud/d3/rightCap/v2": {
+      "path": "assets/65cae02200ab7a14ace3a6b798e2b618ddddf7cc1ade104c85722c4afcfcfecd.png",
+      "sha256": "65cae02200ab7a14ace3a6b798e2b618ddddf7cc1ade104c85722c4afcfcfecd",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/mud/d3/rightCap/v3": {
+      "path": "assets/9b66a14fdac8d5e98c13c3f438c910c5582dabc63f057134e3e8aa25ac7707c3.png",
+      "sha256": "9b66a14fdac8d5e98c13c3f438c910c5582dabc63f057134e3e8aa25ac7707c3",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/mud/d3/isolated/v0": {
+      "path": "assets/e0feca7199116e6b7568f819d317caf6bdb594dec1bcaeb191922833f6a6e01c.png",
+      "sha256": "e0feca7199116e6b7568f819d317caf6bdb594dec1bcaeb191922833f6a6e01c",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/mud/d3/isolated/v1": {
+      "path": "assets/e0feca7199116e6b7568f819d317caf6bdb594dec1bcaeb191922833f6a6e01c.png",
+      "sha256": "e0feca7199116e6b7568f819d317caf6bdb594dec1bcaeb191922833f6a6e01c",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/mud/d3/isolated/v2": {
+      "path": "assets/e0feca7199116e6b7568f819d317caf6bdb594dec1bcaeb191922833f6a6e01c.png",
+      "sha256": "e0feca7199116e6b7568f819d317caf6bdb594dec1bcaeb191922833f6a6e01c",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    },
+    "mask/mud/d3/isolated/v3": {
+      "path": "assets/1eb32a418cf2dbcad463537f9499f216a5a8fe653ad3a673c94b3dc268a47820.png",
+      "sha256": "1eb32a418cf2dbcad463537f9499f216a5a8fe653ad3a673c94b3dc268a47820",
+      "width": 16,
+      "height": 3,
+      "kind": "semanticRoleIndex"
+    }
+  },
+  "cases": [
+    {
+      "id": "stone/d0/span",
+      "request": {
+        "schemaVersion": "terrain-south-wall-v1",
+        "ground": "stone",
+        "southExposureLevels": 0,
+        "southNeighborDisclosure": "known",
+        "westContinuation": true,
+        "eastContinuation": true,
+        "featureVariant": 0,
+        "worldGradeDescriptorHash": "659e59c58822d20b5ddb7ed6303d15746d666444692bcc52ab21c37e200a5c09"
+      },
+      "roleSHA256": "80a76a18acf8cb64fec3a659ffc4bab4a87cd9a6fde4dab2161a8751d136c9d2",
+      "rgbaByReceipt": {
+        "659e59c58822d20b5ddb7ed6303d15746d666444692bcc52ab21c37e200a5c09": "5d89f056865052bcb89c910d2d62872e029fb273c3db03f8968a52a41593c1b5",
+        "6ac8dd7b70564493296c8fb0ce7ee381db2bc47deceb1a12b08d50bfbc23dc4a": "5d89f056865052bcb89c910d2d62872e029fb273c3db03f8968a52a41593c1b5",
+        "8055360658b09fe04395800c49bd595bf06312b1ee0e6bbe6cdafe82ba5b285e": "5d89f056865052bcb89c910d2d62872e029fb273c3db03f8968a52a41593c1b5"
+      }
+    },
+    {
+      "id": "stone/d0/leftCap",
+      "request": {
+        "schemaVersion": "terrain-south-wall-v1",
+        "ground": "stone",
+        "southExposureLevels": 0,
+        "southNeighborDisclosure": "known",
+        "westContinuation": false,
+        "eastContinuation": true,
+        "featureVariant": 0,
+        "worldGradeDescriptorHash": "659e59c58822d20b5ddb7ed6303d15746d666444692bcc52ab21c37e200a5c09"
+      },
+      "roleSHA256": "80a76a18acf8cb64fec3a659ffc4bab4a87cd9a6fde4dab2161a8751d136c9d2",
+      "rgbaByReceipt": {
+        "659e59c58822d20b5ddb7ed6303d15746d666444692bcc52ab21c37e200a5c09": "5d89f056865052bcb89c910d2d62872e029fb273c3db03f8968a52a41593c1b5",
+        "6ac8dd7b70564493296c8fb0ce7ee381db2bc47deceb1a12b08d50bfbc23dc4a": "5d89f056865052bcb89c910d2d62872e029fb273c3db03f8968a52a41593c1b5",
+        "8055360658b09fe04395800c49bd595bf06312b1ee0e6bbe6cdafe82ba5b285e": "5d89f056865052bcb89c910d2d62872e029fb273c3db03f8968a52a41593c1b5"
+      }
+    },
+    {
+      "id": "stone/d0/rightCap",
+      "request": {
+        "schemaVersion": "terrain-south-wall-v1",
+        "ground": "stone",
+        "southExposureLevels": 0,
+        "southNeighborDisclosure": "known",
+        "westContinuation": true,
+        "eastContinuation": false,
+        "featureVariant": 0,
+        "worldGradeDescriptorHash": "659e59c58822d20b5ddb7ed6303d15746d666444692bcc52ab21c37e200a5c09"
+      },
+      "roleSHA256": "80a76a18acf8cb64fec3a659ffc4bab4a87cd9a6fde4dab2161a8751d136c9d2",
+      "rgbaByReceipt": {
+        "659e59c58822d20b5ddb7ed6303d15746d666444692bcc52ab21c37e200a5c09": "5d89f056865052bcb89c910d2d62872e029fb273c3db03f8968a52a41593c1b5",
+        "6ac8dd7b70564493296c8fb0ce7ee381db2bc47deceb1a12b08d50bfbc23dc4a": "5d89f056865052bcb89c910d2d62872e029fb273c3db03f8968a52a41593c1b5",
+        "8055360658b09fe04395800c49bd595bf06312b1ee0e6bbe6cdafe82ba5b285e": "5d89f056865052bcb89c910d2d62872e029fb273c3db03f8968a52a41593c1b5"
+      }
+    },
+    {
+      "id": "stone/d0/isolated",
+      "request": {
+        "schemaVersion": "terrain-south-wall-v1",
+        "ground": "stone",
+        "southExposureLevels": 0,
+        "southNeighborDisclosure": "known",
+        "westContinuation": false,
+        "eastContinuation": false,
+        "featureVariant": 0,
+        "worldGradeDescriptorHash": "659e59c58822d20b5ddb7ed6303d15746d666444692bcc52ab21c37e200a5c09"
+      },
+      "roleSHA256": "80a76a18acf8cb64fec3a659ffc4bab4a87cd9a6fde4dab2161a8751d136c9d2",
+      "rgbaByReceipt": {
+        "659e59c58822d20b5ddb7ed6303d15746d666444692bcc52ab21c37e200a5c09": "5d89f056865052bcb89c910d2d62872e029fb273c3db03f8968a52a41593c1b5",
+        "6ac8dd7b70564493296c8fb0ce7ee381db2bc47deceb1a12b08d50bfbc23dc4a": "5d89f056865052bcb89c910d2d62872e029fb273c3db03f8968a52a41593c1b5",
+        "8055360658b09fe04395800c49bd595bf06312b1ee0e6bbe6cdafe82ba5b285e": "5d89f056865052bcb89c910d2d62872e029fb273c3db03f8968a52a41593c1b5"
+      }
+    },
+    {
+      "id": "stone/d1/span",
+      "request": {
+        "schemaVersion": "terrain-south-wall-v1",
+        "ground": "stone",
+        "southExposureLevels": 1,
+        "southNeighborDisclosure": "known",
+        "westContinuation": true,
+        "eastContinuation": true,
+        "featureVariant": 0,
+        "worldGradeDescriptorHash": "659e59c58822d20b5ddb7ed6303d15746d666444692bcc52ab21c37e200a5c09"
+      },
+      "roleSHA256": "ca19878b97e1fb15c871d4f2092247f495965ba99d169911588d8b15411e8929",
+      "rgbaByReceipt": {
+        "659e59c58822d20b5ddb7ed6303d15746d666444692bcc52ab21c37e200a5c09": "7ff629c07275fd4d0aa9655bddbb8eefcfeec6593e6cef86cee75952e2b10d1f",
+        "6ac8dd7b70564493296c8fb0ce7ee381db2bc47deceb1a12b08d50bfbc23dc4a": "81dcacff0be247e2e123bddbc1e79a76dc24cab6e7c08d7785ed33c05f7051fe",
+        "8055360658b09fe04395800c49bd595bf06312b1ee0e6bbe6cdafe82ba5b285e": "f8ebd6d630b5b47023f55f26b1427e026cb8486af514888c199def22c30dad0e"
+      }
+    },
+    {
+      "id": "stone/d1/leftCap",
+      "request": {
+        "schemaVersion": "terrain-south-wall-v1",
+        "ground": "stone",
+        "southExposureLevels": 1,
+        "southNeighborDisclosure": "known",
+        "westContinuation": false,
+        "eastContinuation": true,
+        "featureVariant": 0,
+        "worldGradeDescriptorHash": "659e59c58822d20b5ddb7ed6303d15746d666444692bcc52ab21c37e200a5c09"
+      },
+      "roleSHA256": "8109c69acf90404adc5f1479757e1d09586119cd1a85b55e99911d50f0ea206d",
+      "rgbaByReceipt": {
+        "659e59c58822d20b5ddb7ed6303d15746d666444692bcc52ab21c37e200a5c09": "7fdde6f622bae408fda80f41133c5e0a50f57393ac103ebfe15ae1a473001b9f",
+        "6ac8dd7b70564493296c8fb0ce7ee381db2bc47deceb1a12b08d50bfbc23dc4a": "f59ed33c60d90c300832de67fd835080e156ace10d0dbba34018b82d0271e617",
+        "8055360658b09fe04395800c49bd595bf06312b1ee0e6bbe6cdafe82ba5b285e": "1908878d68cc9db10095282fc1a40c96ad952a424078e341dbcd57f008f050ab"
+      }
+    },
+    {
+      "id": "stone/d1/rightCap",
+      "request": {
+        "schemaVersion": "terrain-south-wall-v1",
+        "ground": "stone",
+        "southExposureLevels": 1,
+        "southNeighborDisclosure": "known",
+        "westContinuation": true,
+        "eastContinuation": false,
+        "featureVariant": 0,
+        "worldGradeDescriptorHash": "659e59c58822d20b5ddb7ed6303d15746d666444692bcc52ab21c37e200a5c09"
+      },
+      "roleSHA256": "d1443331033dc07be0ee6b2773a3aaa5b3cf2c96662c95e77d9e59c436785f2b",
+      "rgbaByReceipt": {
+        "659e59c58822d20b5ddb7ed6303d15746d666444692bcc52ab21c37e200a5c09": "f04b66ce8c3d8cdf3320a3557ab93d3ed8cc056a22d92b479947e0f80245943e",
+        "6ac8dd7b70564493296c8fb0ce7ee381db2bc47deceb1a12b08d50bfbc23dc4a": "988a327eaacd15192f450dceb4c259097db92b820aa7d52685d374c0d2ac34ee",
+        "8055360658b09fe04395800c49bd595bf06312b1ee0e6bbe6cdafe82ba5b285e": "bd558d7a9a26c74fe18f6608e7b84659caa9030b1585b828a7ee9efe9c84810e"
+      }
+    },
+    {
+      "id": "stone/d1/isolated",
+      "request": {
+        "schemaVersion": "terrain-south-wall-v1",
+        "ground": "stone",
+        "southExposureLevels": 1,
+        "southNeighborDisclosure": "known",
+        "westContinuation": false,
+        "eastContinuation": false,
+        "featureVariant": 0,
+        "worldGradeDescriptorHash": "659e59c58822d20b5ddb7ed6303d15746d666444692bcc52ab21c37e200a5c09"
+      },
+      "roleSHA256": "d261fe03c8765ce649463e445a275042d0f1c7b0b5a9806652b030c70d1e04f9",
+      "rgbaByReceipt": {
+        "659e59c58822d20b5ddb7ed6303d15746d666444692bcc52ab21c37e200a5c09": "f1338ab4b62dbcfbc4856f1bb7f945543a8991cbbbe188ecb71000110773cbdd",
+        "6ac8dd7b70564493296c8fb0ce7ee381db2bc47deceb1a12b08d50bfbc23dc4a": "4fdcfc794fce89353e4922d55a714e27fe11d72d83dc963c924202a6cbb0b39a",
+        "8055360658b09fe04395800c49bd595bf06312b1ee0e6bbe6cdafe82ba5b285e": "0e248cc556f76858bfa9795dbb0078dc544939834331d8c67b1f301d53e58cff"
+      }
+    },
+    {
+      "id": "stone/d2/span",
+      "request": {
+        "schemaVersion": "terrain-south-wall-v1",
+        "ground": "stone",
+        "southExposureLevels": 2,
+        "southNeighborDisclosure": "known",
+        "westContinuation": true,
+        "eastContinuation": true,
+        "featureVariant": 0,
+        "worldGradeDescriptorHash": "659e59c58822d20b5ddb7ed6303d15746d666444692bcc52ab21c37e200a5c09"
+      },
+      "roleSHA256": "ad973b0ff2e765c546aba870eac42d952efc91b92c435937cf732874fe3174d9",
+      "rgbaByReceipt": {
+        "659e59c58822d20b5ddb7ed6303d15746d666444692bcc52ab21c37e200a5c09": "79d784fcb8ea8a650e78121db45a5b574de554a5f9a82b6a1eaf395c5d5a2f4e",
+        "6ac8dd7b70564493296c8fb0ce7ee381db2bc47deceb1a12b08d50bfbc23dc4a": "1566b47afb4451616b0a1245c5dd71a715627d17f00d35faa4db83776a79baa5",
+        "8055360658b09fe04395800c49bd595bf06312b1ee0e6bbe6cdafe82ba5b285e": "e593fe9ee6a9f0309a9781684a82dd66232ebeaf97a1197488adf38d51b0ae02"
+      }
+    },
+    {
+      "id": "stone/d2/leftCap",
+      "request": {
+        "schemaVersion": "terrain-south-wall-v1",
+        "ground": "stone",
+        "southExposureLevels": 2,
+        "southNeighborDisclosure": "known",
+        "westContinuation": false,
+        "eastContinuation": true,
+        "featureVariant": 0,
+        "worldGradeDescriptorHash": "659e59c58822d20b5ddb7ed6303d15746d666444692bcc52ab21c37e200a5c09"
+      },
+      "roleSHA256": "93f59f88032ab62552f0cc514bf1189a4308c3a75d3a3d3757a95c25c3ae8cd7",
+      "rgbaByReceipt": {
+        "659e59c58822d20b5ddb7ed6303d15746d666444692bcc52ab21c37e200a5c09": "f02980216a38a200ea3033329ea1230948c006f3c1ed6653cb9038c3a80ddd0a",
+        "6ac8dd7b70564493296c8fb0ce7ee381db2bc47deceb1a12b08d50bfbc23dc4a": "c390840663cb15ac4d4ff3aaae9a480803aa2b877b8dbe536dd7047fbf34ce30",
+        "8055360658b09fe04395800c49bd595bf06312b1ee0e6bbe6cdafe82ba5b285e": "1b9bedbfe0fc5747e7237234ec12e47c35e3515b9f8587d9ff6dfca77e86184b"
+      }
+    },
+    {
+      "id": "stone/d2/rightCap",
+      "request": {
+        "schemaVersion": "terrain-south-wall-v1",
+        "ground": "stone",
+        "southExposureLevels": 2,
+        "southNeighborDisclosure": "known",
+        "westContinuation": true,
+        "eastContinuation": false,
+        "featureVariant": 0,
+        "worldGradeDescriptorHash": "659e59c58822d20b5ddb7ed6303d15746d666444692bcc52ab21c37e200a5c09"
+      },
+      "roleSHA256": "9730fba81284e81b830ce28a7de541dd10028a1f83bd69f5f8dbfcadb0e1afb6",
+      "rgbaByReceipt": {
+        "659e59c58822d20b5ddb7ed6303d15746d666444692bcc52ab21c37e200a5c09": "9be37cf594c6caa974799bcedb3cc3563cc98c6fc66ae603fbfaf9306b40698b",
+        "6ac8dd7b70564493296c8fb0ce7ee381db2bc47deceb1a12b08d50bfbc23dc4a": "fd9b8de6afbc02f312986d0f8ab56dddf9b16ea9531e7701f74dc93715204ea2",
+        "8055360658b09fe04395800c49bd595bf06312b1ee0e6bbe6cdafe82ba5b285e": "6f4f28c3c6b3f81bf2797797798ca96ca8db7c820b93a721187eb83c68e39688"
+      }
+    },
+    {
+      "id": "stone/d2/isolated",
+      "request": {
+        "schemaVersion": "terrain-south-wall-v1",
+        "ground": "stone",
+        "southExposureLevels": 2,
+        "southNeighborDisclosure": "known",
+        "westContinuation": false,
+        "eastContinuation": false,
+        "featureVariant": 0,
+        "worldGradeDescriptorHash": "659e59c58822d20b5ddb7ed6303d15746d666444692bcc52ab21c37e200a5c09"
+      },
+      "roleSHA256": "9e088aeb94a932be61fcbea47f8626c604a22183e7e8ee3a7ddab1a252b6030c",
+      "rgbaByReceipt": {
+        "659e59c58822d20b5ddb7ed6303d15746d666444692bcc52ab21c37e200a5c09": "044f1107d42b62db93def689861ab707f25883d5f3137444bb722ea087e6b883",
+        "6ac8dd7b70564493296c8fb0ce7ee381db2bc47deceb1a12b08d50bfbc23dc4a": "6736bbc11784edc5fc5e3937ea323ea721cd2feb41374872e12b9a7f86ef516c",
+        "8055360658b09fe04395800c49bd595bf06312b1ee0e6bbe6cdafe82ba5b285e": "9ab9e0e23075d5b25defe3697d3295188b81573a4bb91b1c7c060dfdcbe9297a"
+      }
+    },
+    {
+      "id": "stone/d3/span",
+      "request": {
+        "schemaVersion": "terrain-south-wall-v1",
+        "ground": "stone",
+        "southExposureLevels": 3,
+        "southNeighborDisclosure": "known",
+        "westContinuation": true,
+        "eastContinuation": true,
+        "featureVariant": 0,
+        "worldGradeDescriptorHash": "659e59c58822d20b5ddb7ed6303d15746d666444692bcc52ab21c37e200a5c09"
+      },
+      "roleSHA256": "c0de6a621ab0f8b956f1227f5a54efc84a6ba80d94cd5682ebca882c2cf59875",
+      "rgbaByReceipt": {
+        "659e59c58822d20b5ddb7ed6303d15746d666444692bcc52ab21c37e200a5c09": "0308d6397bdc95ccf0215d953d70bdb1419424e24f0e85c03efe302176ce5bb7",
+        "6ac8dd7b70564493296c8fb0ce7ee381db2bc47deceb1a12b08d50bfbc23dc4a": "a740bad25ffbc285eac7e9d306208d7ffa4501451240c2835a439e8e0d6ab245",
+        "8055360658b09fe04395800c49bd595bf06312b1ee0e6bbe6cdafe82ba5b285e": "ebe1a263a77bf2aeb1d8a83615d87bba2fa004858bdd4d8c49322c06250d382e"
+      }
+    },
+    {
+      "id": "stone/d3/leftCap",
+      "request": {
+        "schemaVersion": "terrain-south-wall-v1",
+        "ground": "stone",
+        "southExposureLevels": 3,
+        "southNeighborDisclosure": "known",
+        "westContinuation": false,
+        "eastContinuation": true,
+        "featureVariant": 0,
+        "worldGradeDescriptorHash": "659e59c58822d20b5ddb7ed6303d15746d666444692bcc52ab21c37e200a5c09"
+      },
+      "roleSHA256": "f08c798116fa3518f7b92ceb6b4c622f0eca189a53615c3de7c3ffd0f561894f",
+      "rgbaByReceipt": {
+        "659e59c58822d20b5ddb7ed6303d15746d666444692bcc52ab21c37e200a5c09": "df83ecfabc2f523e8260b28ba37a4b9095ed89c9723468297d4b95457111cd59",
+        "6ac8dd7b70564493296c8fb0ce7ee381db2bc47deceb1a12b08d50bfbc23dc4a": "a436da2b89bb6cf408052f906addcec5b6a53caa232a8c3597c2eb59a1256039",
+        "8055360658b09fe04395800c49bd595bf06312b1ee0e6bbe6cdafe82ba5b285e": "c1e96af774d915922b4decc5caf5064153c0e78b702c9ab599ec88c29ac8f283"
+      }
+    },
+    {
+      "id": "stone/d3/rightCap",
+      "request": {
+        "schemaVersion": "terrain-south-wall-v1",
+        "ground": "stone",
+        "southExposureLevels": 3,
+        "southNeighborDisclosure": "known",
+        "westContinuation": true,
+        "eastContinuation": false,
+        "featureVariant": 0,
+        "worldGradeDescriptorHash": "659e59c58822d20b5ddb7ed6303d15746d666444692bcc52ab21c37e200a5c09"
+      },
+      "roleSHA256": "d92163d5dcd6b899022a44c45830058787455768ab8be6a00a91b317b99232cd",
+      "rgbaByReceipt": {
+        "659e59c58822d20b5ddb7ed6303d15746d666444692bcc52ab21c37e200a5c09": "49a32ce6b4891abe91667bbb33c48f9f828f21286c51279e29b59128450b7b8f",
+        "6ac8dd7b70564493296c8fb0ce7ee381db2bc47deceb1a12b08d50bfbc23dc4a": "15f772d507ca9a19aea94a6fec2630e83401764d311012c2eb074bbe17ab2b9a",
+        "8055360658b09fe04395800c49bd595bf06312b1ee0e6bbe6cdafe82ba5b285e": "3b74c506714a54d864a90880d926e0cfd9676c1795d43528f43f84302fcff565"
+      }
+    },
+    {
+      "id": "stone/d3/isolated",
+      "request": {
+        "schemaVersion": "terrain-south-wall-v1",
+        "ground": "stone",
+        "southExposureLevels": 3,
+        "southNeighborDisclosure": "known",
+        "westContinuation": false,
+        "eastContinuation": false,
+        "featureVariant": 0,
+        "worldGradeDescriptorHash": "659e59c58822d20b5ddb7ed6303d15746d666444692bcc52ab21c37e200a5c09"
+      },
+      "roleSHA256": "73dcf89b5592279790dc888a3bf51cc5e1ca8ecbc65bd091f967da4006045832",
+      "rgbaByReceipt": {
+        "659e59c58822d20b5ddb7ed6303d15746d666444692bcc52ab21c37e200a5c09": "26b2adf1a623ab7f8fa807c725350b8b0ec876a9c69ab6582424bf3f9b1515b7",
+        "6ac8dd7b70564493296c8fb0ce7ee381db2bc47deceb1a12b08d50bfbc23dc4a": "fab5b6693d556fe379a25f05e6825dfb3859fccb5e1713aa46dde477d33ebc8e",
+        "8055360658b09fe04395800c49bd595bf06312b1ee0e6bbe6cdafe82ba5b285e": "2dc6f74736a2a2181d83fbff3893df7affb91040fb3dd42b67117bf8174c1b1f"
+      }
+    },
+    {
+      "id": "soil/d0/span",
+      "request": {
+        "schemaVersion": "terrain-south-wall-v1",
+        "ground": "soil",
+        "southExposureLevels": 0,
+        "southNeighborDisclosure": "known",
+        "westContinuation": true,
+        "eastContinuation": true,
+        "featureVariant": 0,
+        "worldGradeDescriptorHash": "659e59c58822d20b5ddb7ed6303d15746d666444692bcc52ab21c37e200a5c09"
+      },
+      "roleSHA256": "80a76a18acf8cb64fec3a659ffc4bab4a87cd9a6fde4dab2161a8751d136c9d2",
+      "rgbaByReceipt": {
+        "659e59c58822d20b5ddb7ed6303d15746d666444692bcc52ab21c37e200a5c09": "5d89f056865052bcb89c910d2d62872e029fb273c3db03f8968a52a41593c1b5",
+        "6ac8dd7b70564493296c8fb0ce7ee381db2bc47deceb1a12b08d50bfbc23dc4a": "5d89f056865052bcb89c910d2d62872e029fb273c3db03f8968a52a41593c1b5",
+        "8055360658b09fe04395800c49bd595bf06312b1ee0e6bbe6cdafe82ba5b285e": "5d89f056865052bcb89c910d2d62872e029fb273c3db03f8968a52a41593c1b5"
+      }
+    },
+    {
+      "id": "soil/d0/leftCap",
+      "request": {
+        "schemaVersion": "terrain-south-wall-v1",
+        "ground": "soil",
+        "southExposureLevels": 0,
+        "southNeighborDisclosure": "known",
+        "westContinuation": false,
+        "eastContinuation": true,
+        "featureVariant": 0,
+        "worldGradeDescriptorHash": "659e59c58822d20b5ddb7ed6303d15746d666444692bcc52ab21c37e200a5c09"
+      },
+      "roleSHA256": "80a76a18acf8cb64fec3a659ffc4bab4a87cd9a6fde4dab2161a8751d136c9d2",
+      "rgbaByReceipt": {
+        "659e59c58822d20b5ddb7ed6303d15746d666444692bcc52ab21c37e200a5c09": "5d89f056865052bcb89c910d2d62872e029fb273c3db03f8968a52a41593c1b5",
+        "6ac8dd7b70564493296c8fb0ce7ee381db2bc47deceb1a12b08d50bfbc23dc4a": "5d89f056865052bcb89c910d2d62872e029fb273c3db03f8968a52a41593c1b5",
+        "8055360658b09fe04395800c49bd595bf06312b1ee0e6bbe6cdafe82ba5b285e": "5d89f056865052bcb89c910d2d62872e029fb273c3db03f8968a52a41593c1b5"
+      }
+    },
+    {
+      "id": "soil/d0/rightCap",
+      "request": {
+        "schemaVersion": "terrain-south-wall-v1",
+        "ground": "soil",
+        "southExposureLevels": 0,
+        "southNeighborDisclosure": "known",
+        "westContinuation": true,
+        "eastContinuation": false,
+        "featureVariant": 0,
+        "worldGradeDescriptorHash": "659e59c58822d20b5ddb7ed6303d15746d666444692bcc52ab21c37e200a5c09"
+      },
+      "roleSHA256": "80a76a18acf8cb64fec3a659ffc4bab4a87cd9a6fde4dab2161a8751d136c9d2",
+      "rgbaByReceipt": {
+        "659e59c58822d20b5ddb7ed6303d15746d666444692bcc52ab21c37e200a5c09": "5d89f056865052bcb89c910d2d62872e029fb273c3db03f8968a52a41593c1b5",
+        "6ac8dd7b70564493296c8fb0ce7ee381db2bc47deceb1a12b08d50bfbc23dc4a": "5d89f056865052bcb89c910d2d62872e029fb273c3db03f8968a52a41593c1b5",
+        "8055360658b09fe04395800c49bd595bf06312b1ee0e6bbe6cdafe82ba5b285e": "5d89f056865052bcb89c910d2d62872e029fb273c3db03f8968a52a41593c1b5"
+      }
+    },
+    {
+      "id": "soil/d0/isolated",
+      "request": {
+        "schemaVersion": "terrain-south-wall-v1",
+        "ground": "soil",
+        "southExposureLevels": 0,
+        "southNeighborDisclosure": "known",
+        "westContinuation": false,
+        "eastContinuation": false,
+        "featureVariant": 0,
+        "worldGradeDescriptorHash": "659e59c58822d20b5ddb7ed6303d15746d666444692bcc52ab21c37e200a5c09"
+      },
+      "roleSHA256": "80a76a18acf8cb64fec3a659ffc4bab4a87cd9a6fde4dab2161a8751d136c9d2",
+      "rgbaByReceipt": {
+        "659e59c58822d20b5ddb7ed6303d15746d666444692bcc52ab21c37e200a5c09": "5d89f056865052bcb89c910d2d62872e029fb273c3db03f8968a52a41593c1b5",
+        "6ac8dd7b70564493296c8fb0ce7ee381db2bc47deceb1a12b08d50bfbc23dc4a": "5d89f056865052bcb89c910d2d62872e029fb273c3db03f8968a52a41593c1b5",
+        "8055360658b09fe04395800c49bd595bf06312b1ee0e6bbe6cdafe82ba5b285e": "5d89f056865052bcb89c910d2d62872e029fb273c3db03f8968a52a41593c1b5"
+      }
+    },
+    {
+      "id": "soil/d1/span",
+      "request": {
+        "schemaVersion": "terrain-south-wall-v1",
+        "ground": "soil",
+        "southExposureLevels": 1,
+        "southNeighborDisclosure": "known",
+        "westContinuation": true,
+        "eastContinuation": true,
+        "featureVariant": 0,
+        "worldGradeDescriptorHash": "659e59c58822d20b5ddb7ed6303d15746d666444692bcc52ab21c37e200a5c09"
+      },
+      "roleSHA256": "da938653085db1464a141ccc5da03c8c0fd9bb315d6cb68be30c57e42fbf4c34",
+      "rgbaByReceipt": {
+        "659e59c58822d20b5ddb7ed6303d15746d666444692bcc52ab21c37e200a5c09": "c2dd9098f7c112c44e1e393c9f8172d132d9f207f7db56efbbfdf3c05b805e17",
+        "6ac8dd7b70564493296c8fb0ce7ee381db2bc47deceb1a12b08d50bfbc23dc4a": "24e58ef9958c02d3d0a1f1c420b4c02f2a9f5bc35ba789cc8f7a1a7b58054865",
+        "8055360658b09fe04395800c49bd595bf06312b1ee0e6bbe6cdafe82ba5b285e": "7144e0c0ffb6d6890dab7754250d13f719374ee2cd7c38aacd6e5285400b248f"
+      }
+    },
+    {
+      "id": "soil/d1/leftCap",
+      "request": {
+        "schemaVersion": "terrain-south-wall-v1",
+        "ground": "soil",
+        "southExposureLevels": 1,
+        "southNeighborDisclosure": "known",
+        "westContinuation": false,
+        "eastContinuation": true,
+        "featureVariant": 0,
+        "worldGradeDescriptorHash": "659e59c58822d20b5ddb7ed6303d15746d666444692bcc52ab21c37e200a5c09"
+      },
+      "roleSHA256": "15a8f6690ee17f31dc8e2d2f2371eb8301eb57611b5dd1b1a9338216566c4dd7",
+      "rgbaByReceipt": {
+        "659e59c58822d20b5ddb7ed6303d15746d666444692bcc52ab21c37e200a5c09": "afa7bc670da663a6dd8882a4285da6e7ea59e266b76abd9dc479cf6f6c60bbfc",
+        "6ac8dd7b70564493296c8fb0ce7ee381db2bc47deceb1a12b08d50bfbc23dc4a": "8a11be512d8709a258e27626c557ece5421a73b28524b711a9f4f77a785b4063",
+        "8055360658b09fe04395800c49bd595bf06312b1ee0e6bbe6cdafe82ba5b285e": "61e8d51ee463ae2fbf65c6444d0e93f69a81544ce0486edc1f0eadc9c78d699d"
+      }
+    },
+    {
+      "id": "soil/d1/rightCap",
+      "request": {
+        "schemaVersion": "terrain-south-wall-v1",
+        "ground": "soil",
+        "southExposureLevels": 1,
+        "southNeighborDisclosure": "known",
+        "westContinuation": true,
+        "eastContinuation": false,
+        "featureVariant": 0,
+        "worldGradeDescriptorHash": "659e59c58822d20b5ddb7ed6303d15746d666444692bcc52ab21c37e200a5c09"
+      },
+      "roleSHA256": "ae9139e3f1e93e0d1df8e120e21eaecaf8e713b08e353971fa06715eba5fc565",
+      "rgbaByReceipt": {
+        "659e59c58822d20b5ddb7ed6303d15746d666444692bcc52ab21c37e200a5c09": "0d8606eaa45697ae2f916a4e71e019a73a85a581b5548731e9e5e12e42bf3f28",
+        "6ac8dd7b70564493296c8fb0ce7ee381db2bc47deceb1a12b08d50bfbc23dc4a": "389ef3d2c4d2e1f98200e162c383a6d1d71a359ea0dba392e3946cfcf9e64f67",
+        "8055360658b09fe04395800c49bd595bf06312b1ee0e6bbe6cdafe82ba5b285e": "20dcaf3ef614f2c0ced2fd1ba61143b65737a58e9f87d851d2da08fdd3817c50"
+      }
+    },
+    {
+      "id": "soil/d1/isolated",
+      "request": {
+        "schemaVersion": "terrain-south-wall-v1",
+        "ground": "soil",
+        "southExposureLevels": 1,
+        "southNeighborDisclosure": "known",
+        "westContinuation": false,
+        "eastContinuation": false,
+        "featureVariant": 0,
+        "worldGradeDescriptorHash": "659e59c58822d20b5ddb7ed6303d15746d666444692bcc52ab21c37e200a5c09"
+      },
+      "roleSHA256": "1cad0a7d2b5f083902e4936f152217c34aaa74aaa49f33bb1bd9d8118b26436e",
+      "rgbaByReceipt": {
+        "659e59c58822d20b5ddb7ed6303d15746d666444692bcc52ab21c37e200a5c09": "71679cb2ade6f08a7708b400b1988452eb47e5052377313c9dffdbe1aebabf15",
+        "6ac8dd7b70564493296c8fb0ce7ee381db2bc47deceb1a12b08d50bfbc23dc4a": "247f9770c7c6c52dc41769f71131ae482d0bbcc2d492f53258d64ead0516405d",
+        "8055360658b09fe04395800c49bd595bf06312b1ee0e6bbe6cdafe82ba5b285e": "57897dbacb10f433fec6c53ea459ee91954d41b85bb653aa81b8ba33b7829b5a"
+      }
+    },
+    {
+      "id": "soil/d2/span",
+      "request": {
+        "schemaVersion": "terrain-south-wall-v1",
+        "ground": "soil",
+        "southExposureLevels": 2,
+        "southNeighborDisclosure": "known",
+        "westContinuation": true,
+        "eastContinuation": true,
+        "featureVariant": 0,
+        "worldGradeDescriptorHash": "659e59c58822d20b5ddb7ed6303d15746d666444692bcc52ab21c37e200a5c09"
+      },
+      "roleSHA256": "d4227d5d6604d18b767bb4289beece41b6d48c810b3f8499fabb1740ac4fa9c9",
+      "rgbaByReceipt": {
+        "659e59c58822d20b5ddb7ed6303d15746d666444692bcc52ab21c37e200a5c09": "2992c1184af32cb580719172f4c27bcaf16db37d6635cd5d101427669c247611",
+        "6ac8dd7b70564493296c8fb0ce7ee381db2bc47deceb1a12b08d50bfbc23dc4a": "d629bce45e06f1568e1bed7a3e980327fba76709aed1e8f88b8779daa51fb436",
+        "8055360658b09fe04395800c49bd595bf06312b1ee0e6bbe6cdafe82ba5b285e": "1f32862786e80d921c694c85b781c66cfb7d9cb6171c71f8e2f959727022edd1"
+      }
+    },
+    {
+      "id": "soil/d2/leftCap",
+      "request": {
+        "schemaVersion": "terrain-south-wall-v1",
+        "ground": "soil",
+        "southExposureLevels": 2,
+        "southNeighborDisclosure": "known",
+        "westContinuation": false,
+        "eastContinuation": true,
+        "featureVariant": 0,
+        "worldGradeDescriptorHash": "659e59c58822d20b5ddb7ed6303d15746d666444692bcc52ab21c37e200a5c09"
+      },
+      "roleSHA256": "1acf7a46380e5249f09aad18477bfb2de9a7e2af4cb4d82cd9bbc412348eb624",
+      "rgbaByReceipt": {
+        "659e59c58822d20b5ddb7ed6303d15746d666444692bcc52ab21c37e200a5c09": "7b0c42fa262d954a3f981e0ea6ffc52b592e739b0711197bbfd90e0e60c5883d",
+        "6ac8dd7b70564493296c8fb0ce7ee381db2bc47deceb1a12b08d50bfbc23dc4a": "de93b8102c19697da7f74aba49f4c9212205df3fb9d899042b7c8fdfc9882db1",
+        "8055360658b09fe04395800c49bd595bf06312b1ee0e6bbe6cdafe82ba5b285e": "8e01b49a7c541efadc74544563220ca2ff5435d1e8c49debb6f6568817ac7632"
+      }
+    },
+    {
+      "id": "soil/d2/rightCap",
+      "request": {
+        "schemaVersion": "terrain-south-wall-v1",
+        "ground": "soil",
+        "southExposureLevels": 2,
+        "southNeighborDisclosure": "known",
+        "westContinuation": true,
+        "eastContinuation": false,
+        "featureVariant": 0,
+        "worldGradeDescriptorHash": "659e59c58822d20b5ddb7ed6303d15746d666444692bcc52ab21c37e200a5c09"
+      },
+      "roleSHA256": "582f0307ebee486c313d5f4643b9c6afef48c50abff17e88760d1b19114ed126",
+      "rgbaByReceipt": {
+        "659e59c58822d20b5ddb7ed6303d15746d666444692bcc52ab21c37e200a5c09": "47da95e796547c3902e5318664dc8c65567156361b9d9e597bfd324410d4d9bc",
+        "6ac8dd7b70564493296c8fb0ce7ee381db2bc47deceb1a12b08d50bfbc23dc4a": "644f4c26571c1c4bca291a2a1971f8d1cd21846c364b45b1b47d35b9e2d729e4",
+        "8055360658b09fe04395800c49bd595bf06312b1ee0e6bbe6cdafe82ba5b285e": "858c55dd3d0bd26311600b2c985a7a384e59add35acac2e57b16f4b0f92792a4"
+      }
+    },
+    {
+      "id": "soil/d2/isolated",
+      "request": {
+        "schemaVersion": "terrain-south-wall-v1",
+        "ground": "soil",
+        "southExposureLevels": 2,
+        "southNeighborDisclosure": "known",
+        "westContinuation": false,
+        "eastContinuation": false,
+        "featureVariant": 0,
+        "worldGradeDescriptorHash": "659e59c58822d20b5ddb7ed6303d15746d666444692bcc52ab21c37e200a5c09"
+      },
+      "roleSHA256": "650b1fb9fcdd47cf6063a65fe74e489b357ced2adb0e2cca6dfefd2a7cca0d79",
+      "rgbaByReceipt": {
+        "659e59c58822d20b5ddb7ed6303d15746d666444692bcc52ab21c37e200a5c09": "3b313b7a33f4f1a342988de5299a1cae63217054502c9a2ff1c6f87680798667",
+        "6ac8dd7b70564493296c8fb0ce7ee381db2bc47deceb1a12b08d50bfbc23dc4a": "02b3a2e4c9d0514590009df730d5ee822bed828324dbe593b4e91fb790b48ea4",
+        "8055360658b09fe04395800c49bd595bf06312b1ee0e6bbe6cdafe82ba5b285e": "7ff95a6b49c60ba072c574bcee76aeefab95b7b92889ef96af147333017ae323"
+      }
+    },
+    {
+      "id": "soil/d3/span",
+      "request": {
+        "schemaVersion": "terrain-south-wall-v1",
+        "ground": "soil",
+        "southExposureLevels": 3,
+        "southNeighborDisclosure": "known",
+        "westContinuation": true,
+        "eastContinuation": true,
+        "featureVariant": 0,
+        "worldGradeDescriptorHash": "659e59c58822d20b5ddb7ed6303d15746d666444692bcc52ab21c37e200a5c09"
+      },
+      "roleSHA256": "9a2fe5f6ec690c83f587283d8d8aee7169bf5ce2e9954bb2449050f8c1db757b",
+      "rgbaByReceipt": {
+        "659e59c58822d20b5ddb7ed6303d15746d666444692bcc52ab21c37e200a5c09": "a99cdc0650e78464264c1e19a36274507615ce58a39b079bc93f89dd77ce7125",
+        "6ac8dd7b70564493296c8fb0ce7ee381db2bc47deceb1a12b08d50bfbc23dc4a": "d18e89ae2ca405c7b1d02b7f839cc22d0ea2d2b33591edd38c57436ac0cdd6a4",
+        "8055360658b09fe04395800c49bd595bf06312b1ee0e6bbe6cdafe82ba5b285e": "e95692c2db666805b6b7bf82584a7ebee365ae599106e7d9196f8aedfb9e4b24"
+      }
+    },
+    {
+      "id": "soil/d3/leftCap",
+      "request": {
+        "schemaVersion": "terrain-south-wall-v1",
+        "ground": "soil",
+        "southExposureLevels": 3,
+        "southNeighborDisclosure": "known",
+        "westContinuation": false,
+        "eastContinuation": true,
+        "featureVariant": 0,
+        "worldGradeDescriptorHash": "659e59c58822d20b5ddb7ed6303d15746d666444692bcc52ab21c37e200a5c09"
+      },
+      "roleSHA256": "6840901c83c3f39c4fd6b02b188e1d3066b40ffd640d744a71545879c093ab58",
+      "rgbaByReceipt": {
+        "659e59c58822d20b5ddb7ed6303d15746d666444692bcc52ab21c37e200a5c09": "77ae9f4b95cc216d7f6e98c06d88f9369715e3e1ec13ed795bcaa8c95606e96b",
+        "6ac8dd7b70564493296c8fb0ce7ee381db2bc47deceb1a12b08d50bfbc23dc4a": "5bd494759b7adf2d5dd443c405fa8d952b7fe9c3ea0209c984eb9496dc8370c8",
+        "8055360658b09fe04395800c49bd595bf06312b1ee0e6bbe6cdafe82ba5b285e": "04f4c45284e602f18859e1f3fa7fb824ada046eeeb2109d4c56f4f0f3ada2f0a"
+      }
+    },
+    {
+      "id": "soil/d3/rightCap",
+      "request": {
+        "schemaVersion": "terrain-south-wall-v1",
+        "ground": "soil",
+        "southExposureLevels": 3,
+        "southNeighborDisclosure": "known",
+        "westContinuation": true,
+        "eastContinuation": false,
+        "featureVariant": 0,
+        "worldGradeDescriptorHash": "659e59c58822d20b5ddb7ed6303d15746d666444692bcc52ab21c37e200a5c09"
+      },
+      "roleSHA256": "b24ce9d18425c9efa74ad97b981569d8589c1a390dd86f0cbae0676a25a9d4e5",
+      "rgbaByReceipt": {
+        "659e59c58822d20b5ddb7ed6303d15746d666444692bcc52ab21c37e200a5c09": "234aa5e1558ed4dfb58eee25f0f16916972da7ca754df20cdc63e528c82dbde2",
+        "6ac8dd7b70564493296c8fb0ce7ee381db2bc47deceb1a12b08d50bfbc23dc4a": "f23cbe03f0740cd317b5c6960e4e1db10a9b66b894734f8a10657b3a5de9e27a",
+        "8055360658b09fe04395800c49bd595bf06312b1ee0e6bbe6cdafe82ba5b285e": "a2f383f540d5d91bbb223f6cba4a0af85b4c8cd9cc2014ea622bf39050c37563"
+      }
+    },
+    {
+      "id": "soil/d3/isolated",
+      "request": {
+        "schemaVersion": "terrain-south-wall-v1",
+        "ground": "soil",
+        "southExposureLevels": 3,
+        "southNeighborDisclosure": "known",
+        "westContinuation": false,
+        "eastContinuation": false,
+        "featureVariant": 0,
+        "worldGradeDescriptorHash": "659e59c58822d20b5ddb7ed6303d15746d666444692bcc52ab21c37e200a5c09"
+      },
+      "roleSHA256": "4bed5f1c1ce4675816ec2c80aea9cedfad2e5928a79ee302fda8bd5923a459f2",
+      "rgbaByReceipt": {
+        "659e59c58822d20b5ddb7ed6303d15746d666444692bcc52ab21c37e200a5c09": "97ce04a0ae6ff02886b9560ca22a7dd6302a9771deb68beed689b00826e24797",
+        "6ac8dd7b70564493296c8fb0ce7ee381db2bc47deceb1a12b08d50bfbc23dc4a": "dceac2c9ca19bcc93a09b227917d96e84e59e4499402fe674a0d5c04a4480ef4",
+        "8055360658b09fe04395800c49bd595bf06312b1ee0e6bbe6cdafe82ba5b285e": "88297cb63f1ae90dd53d453230a4bb70aca3865c35b6e44c29e4318dbe79a44c"
+      }
+    },
+    {
+      "id": "sand/d0/span",
+      "request": {
+        "schemaVersion": "terrain-south-wall-v1",
+        "ground": "sand",
+        "southExposureLevels": 0,
+        "southNeighborDisclosure": "known",
+        "westContinuation": true,
+        "eastContinuation": true,
+        "featureVariant": 0,
+        "worldGradeDescriptorHash": "659e59c58822d20b5ddb7ed6303d15746d666444692bcc52ab21c37e200a5c09"
+      },
+      "roleSHA256": "80a76a18acf8cb64fec3a659ffc4bab4a87cd9a6fde4dab2161a8751d136c9d2",
+      "rgbaByReceipt": {
+        "659e59c58822d20b5ddb7ed6303d15746d666444692bcc52ab21c37e200a5c09": "5d89f056865052bcb89c910d2d62872e029fb273c3db03f8968a52a41593c1b5",
+        "6ac8dd7b70564493296c8fb0ce7ee381db2bc47deceb1a12b08d50bfbc23dc4a": "5d89f056865052bcb89c910d2d62872e029fb273c3db03f8968a52a41593c1b5",
+        "8055360658b09fe04395800c49bd595bf06312b1ee0e6bbe6cdafe82ba5b285e": "5d89f056865052bcb89c910d2d62872e029fb273c3db03f8968a52a41593c1b5"
+      }
+    },
+    {
+      "id": "sand/d0/leftCap",
+      "request": {
+        "schemaVersion": "terrain-south-wall-v1",
+        "ground": "sand",
+        "southExposureLevels": 0,
+        "southNeighborDisclosure": "known",
+        "westContinuation": false,
+        "eastContinuation": true,
+        "featureVariant": 0,
+        "worldGradeDescriptorHash": "659e59c58822d20b5ddb7ed6303d15746d666444692bcc52ab21c37e200a5c09"
+      },
+      "roleSHA256": "80a76a18acf8cb64fec3a659ffc4bab4a87cd9a6fde4dab2161a8751d136c9d2",
+      "rgbaByReceipt": {
+        "659e59c58822d20b5ddb7ed6303d15746d666444692bcc52ab21c37e200a5c09": "5d89f056865052bcb89c910d2d62872e029fb273c3db03f8968a52a41593c1b5",
+        "6ac8dd7b70564493296c8fb0ce7ee381db2bc47deceb1a12b08d50bfbc23dc4a": "5d89f056865052bcb89c910d2d62872e029fb273c3db03f8968a52a41593c1b5",
+        "8055360658b09fe04395800c49bd595bf06312b1ee0e6bbe6cdafe82ba5b285e": "5d89f056865052bcb89c910d2d62872e029fb273c3db03f8968a52a41593c1b5"
+      }
+    },
+    {
+      "id": "sand/d0/rightCap",
+      "request": {
+        "schemaVersion": "terrain-south-wall-v1",
+        "ground": "sand",
+        "southExposureLevels": 0,
+        "southNeighborDisclosure": "known",
+        "westContinuation": true,
+        "eastContinuation": false,
+        "featureVariant": 0,
+        "worldGradeDescriptorHash": "659e59c58822d20b5ddb7ed6303d15746d666444692bcc52ab21c37e200a5c09"
+      },
+      "roleSHA256": "80a76a18acf8cb64fec3a659ffc4bab4a87cd9a6fde4dab2161a8751d136c9d2",
+      "rgbaByReceipt": {
+        "659e59c58822d20b5ddb7ed6303d15746d666444692bcc52ab21c37e200a5c09": "5d89f056865052bcb89c910d2d62872e029fb273c3db03f8968a52a41593c1b5",
+        "6ac8dd7b70564493296c8fb0ce7ee381db2bc47deceb1a12b08d50bfbc23dc4a": "5d89f056865052bcb89c910d2d62872e029fb273c3db03f8968a52a41593c1b5",
+        "8055360658b09fe04395800c49bd595bf06312b1ee0e6bbe6cdafe82ba5b285e": "5d89f056865052bcb89c910d2d62872e029fb273c3db03f8968a52a41593c1b5"
+      }
+    },
+    {
+      "id": "sand/d0/isolated",
+      "request": {
+        "schemaVersion": "terrain-south-wall-v1",
+        "ground": "sand",
+        "southExposureLevels": 0,
+        "southNeighborDisclosure": "known",
+        "westContinuation": false,
+        "eastContinuation": false,
+        "featureVariant": 0,
+        "worldGradeDescriptorHash": "659e59c58822d20b5ddb7ed6303d15746d666444692bcc52ab21c37e200a5c09"
+      },
+      "roleSHA256": "80a76a18acf8cb64fec3a659ffc4bab4a87cd9a6fde4dab2161a8751d136c9d2",
+      "rgbaByReceipt": {
+        "659e59c58822d20b5ddb7ed6303d15746d666444692bcc52ab21c37e200a5c09": "5d89f056865052bcb89c910d2d62872e029fb273c3db03f8968a52a41593c1b5",
+        "6ac8dd7b70564493296c8fb0ce7ee381db2bc47deceb1a12b08d50bfbc23dc4a": "5d89f056865052bcb89c910d2d62872e029fb273c3db03f8968a52a41593c1b5",
+        "8055360658b09fe04395800c49bd595bf06312b1ee0e6bbe6cdafe82ba5b285e": "5d89f056865052bcb89c910d2d62872e029fb273c3db03f8968a52a41593c1b5"
+      }
+    },
+    {
+      "id": "sand/d1/span",
+      "request": {
+        "schemaVersion": "terrain-south-wall-v1",
+        "ground": "sand",
+        "southExposureLevels": 1,
+        "southNeighborDisclosure": "known",
+        "westContinuation": true,
+        "eastContinuation": true,
+        "featureVariant": 0,
+        "worldGradeDescriptorHash": "659e59c58822d20b5ddb7ed6303d15746d666444692bcc52ab21c37e200a5c09"
+      },
+      "roleSHA256": "35ed34b0fa21fbab92efe4ec379c3c3b1901bc8df0ff6c8df39d07a36282696a",
+      "rgbaByReceipt": {
+        "659e59c58822d20b5ddb7ed6303d15746d666444692bcc52ab21c37e200a5c09": "ea41ee7eeff243d1e59ffdcf5b587b76d5a6eb7cffdf01f6259dfd76131dd5d7",
+        "6ac8dd7b70564493296c8fb0ce7ee381db2bc47deceb1a12b08d50bfbc23dc4a": "5e78170c0c6a2df031c105263d54b3ad4a8c1a44e49c951f31dd526bb68b3538",
+        "8055360658b09fe04395800c49bd595bf06312b1ee0e6bbe6cdafe82ba5b285e": "e5c7e85a25091fbe9a7f7b7a6d2f9e35a7ce1a0de00a3236d0ef27b4bdf09be0"
+      }
+    },
+    {
+      "id": "sand/d1/leftCap",
+      "request": {
+        "schemaVersion": "terrain-south-wall-v1",
+        "ground": "sand",
+        "southExposureLevels": 1,
+        "southNeighborDisclosure": "known",
+        "westContinuation": false,
+        "eastContinuation": true,
+        "featureVariant": 0,
+        "worldGradeDescriptorHash": "659e59c58822d20b5ddb7ed6303d15746d666444692bcc52ab21c37e200a5c09"
+      },
+      "roleSHA256": "19cd3506287318d3ecfab41738d9cb295aa6723127306f9d656446bd94aae215",
+      "rgbaByReceipt": {
+        "659e59c58822d20b5ddb7ed6303d15746d666444692bcc52ab21c37e200a5c09": "d4f714e20cb3d61205cb0fca94e2c13a552efe6245d8d09c2e1c6d559e01a1ed",
+        "6ac8dd7b70564493296c8fb0ce7ee381db2bc47deceb1a12b08d50bfbc23dc4a": "957d4d891b3ce636c9a1c073aed9a57ee649ac2722f24db8ddb8725b2cf9687d",
+        "8055360658b09fe04395800c49bd595bf06312b1ee0e6bbe6cdafe82ba5b285e": "7460daeea5bd723d3b596e41610e1c6af078d6fd8dfc310ec60ca16d5505c14a"
+      }
+    },
+    {
+      "id": "sand/d1/rightCap",
+      "request": {
+        "schemaVersion": "terrain-south-wall-v1",
+        "ground": "sand",
+        "southExposureLevels": 1,
+        "southNeighborDisclosure": "known",
+        "westContinuation": true,
+        "eastContinuation": false,
+        "featureVariant": 0,
+        "worldGradeDescriptorHash": "659e59c58822d20b5ddb7ed6303d15746d666444692bcc52ab21c37e200a5c09"
+      },
+      "roleSHA256": "41dd8a8ba191ba1e2659cedc84dc6d6850b7bcb1dc2f5c4dc90b7ac4e7ef349e",
+      "rgbaByReceipt": {
+        "659e59c58822d20b5ddb7ed6303d15746d666444692bcc52ab21c37e200a5c09": "80c1cf817d0bfaa0d6dc4b71fd794d7f03ddea5a9ee23bc79c0c67cceb16be13",
+        "6ac8dd7b70564493296c8fb0ce7ee381db2bc47deceb1a12b08d50bfbc23dc4a": "6a577fb8f42d444d85639680bf27df510ed4b78f9abb6b7da26382f8ff384b42",
+        "8055360658b09fe04395800c49bd595bf06312b1ee0e6bbe6cdafe82ba5b285e": "0875fcef5c764b7d31f87c74c94a5edf7b549e8c1692600a2800c48a5e04b9e9"
+      }
+    },
+    {
+      "id": "sand/d1/isolated",
+      "request": {
+        "schemaVersion": "terrain-south-wall-v1",
+        "ground": "sand",
+        "southExposureLevels": 1,
+        "southNeighborDisclosure": "known",
+        "westContinuation": false,
+        "eastContinuation": false,
+        "featureVariant": 0,
+        "worldGradeDescriptorHash": "659e59c58822d20b5ddb7ed6303d15746d666444692bcc52ab21c37e200a5c09"
+      },
+      "roleSHA256": "4bc3841ced04ebf6654dc3437271bd0b8a6edb9338d9bb8ad8343f142bbe8f44",
+      "rgbaByReceipt": {
+        "659e59c58822d20b5ddb7ed6303d15746d666444692bcc52ab21c37e200a5c09": "6a425fde1b05f86611ecf11bdd103453b70ee1773f844700944ead8b50d351da",
+        "6ac8dd7b70564493296c8fb0ce7ee381db2bc47deceb1a12b08d50bfbc23dc4a": "788ec1db264515d5f47c4215ca485ddf9fa466ba29f45f0183aab91267ef1c3b",
+        "8055360658b09fe04395800c49bd595bf06312b1ee0e6bbe6cdafe82ba5b285e": "06031ce7c52c07aa06b38a76dcb1401a3ce007475e6ca2e0a86ec884b0bea775"
+      }
+    },
+    {
+      "id": "sand/d2/span",
+      "request": {
+        "schemaVersion": "terrain-south-wall-v1",
+        "ground": "sand",
+        "southExposureLevels": 2,
+        "southNeighborDisclosure": "known",
+        "westContinuation": true,
+        "eastContinuation": true,
+        "featureVariant": 0,
+        "worldGradeDescriptorHash": "659e59c58822d20b5ddb7ed6303d15746d666444692bcc52ab21c37e200a5c09"
+      },
+      "roleSHA256": "f3597bbfec4c62d88b6c96e774873b07c01e3de6159095acfdd4b76f21e68a07",
+      "rgbaByReceipt": {
+        "659e59c58822d20b5ddb7ed6303d15746d666444692bcc52ab21c37e200a5c09": "72f77df96573b32e79e11bc9b96785c5eadf1462f92be749e851d3c400f15bf1",
+        "6ac8dd7b70564493296c8fb0ce7ee381db2bc47deceb1a12b08d50bfbc23dc4a": "cb31e10c2c0cd5d7e9ff9220e9586df3261513493b25fc14ee34ae7db8381b6f",
+        "8055360658b09fe04395800c49bd595bf06312b1ee0e6bbe6cdafe82ba5b285e": "8251c32b6e8451dc35a28f78a9e05a76b8216498e8d1de30e64cc324dd2e34ca"
+      }
+    },
+    {
+      "id": "sand/d2/leftCap",
+      "request": {
+        "schemaVersion": "terrain-south-wall-v1",
+        "ground": "sand",
+        "southExposureLevels": 2,
+        "southNeighborDisclosure": "known",
+        "westContinuation": false,
+        "eastContinuation": true,
+        "featureVariant": 0,
+        "worldGradeDescriptorHash": "659e59c58822d20b5ddb7ed6303d15746d666444692bcc52ab21c37e200a5c09"
+      },
+      "roleSHA256": "b928b67fde1b943310b4e0989fa982ba40239e8c03dcba4b4e7df9810943929f",
+      "rgbaByReceipt": {
+        "659e59c58822d20b5ddb7ed6303d15746d666444692bcc52ab21c37e200a5c09": "f3552c635fd882c59eb047a24bc270ef8f343fd064e92d253482ff7b9354d380",
+        "6ac8dd7b70564493296c8fb0ce7ee381db2bc47deceb1a12b08d50bfbc23dc4a": "1c2988bb66b026a955a552b13d253687a6303f13e865d3f7c6d65937c922ed54",
+        "8055360658b09fe04395800c49bd595bf06312b1ee0e6bbe6cdafe82ba5b285e": "851c661d79dfb7c6f53912c094df78f5f9b3f7ac1308edce55b9422c242bc1e1"
+      }
+    },
+    {
+      "id": "sand/d2/rightCap",
+      "request": {
+        "schemaVersion": "terrain-south-wall-v1",
+        "ground": "sand",
+        "southExposureLevels": 2,
+        "southNeighborDisclosure": "known",
+        "westContinuation": true,
+        "eastContinuation": false,
+        "featureVariant": 0,
+        "worldGradeDescriptorHash": "659e59c58822d20b5ddb7ed6303d15746d666444692bcc52ab21c37e200a5c09"
+      },
+      "roleSHA256": "d23799637818cd1cf4071ab2e30e03d2a0c9ad93ca10c0188eb507bae4b8c12a",
+      "rgbaByReceipt": {
+        "659e59c58822d20b5ddb7ed6303d15746d666444692bcc52ab21c37e200a5c09": "31bb5ed18de8c93d19a4151c59fa816cbeb1db492d5b784df4fce599096ecea6",
+        "6ac8dd7b70564493296c8fb0ce7ee381db2bc47deceb1a12b08d50bfbc23dc4a": "797f6fcb2794a99b12a648a688a23726066cf22393e2f5bdef27cfad669d670c",
+        "8055360658b09fe04395800c49bd595bf06312b1ee0e6bbe6cdafe82ba5b285e": "0123e7a88af874f4a9443ab159dc45be8c07c294c7e173f5a851d2e3b45d911c"
+      }
+    },
+    {
+      "id": "sand/d2/isolated",
+      "request": {
+        "schemaVersion": "terrain-south-wall-v1",
+        "ground": "sand",
+        "southExposureLevels": 2,
+        "southNeighborDisclosure": "known",
+        "westContinuation": false,
+        "eastContinuation": false,
+        "featureVariant": 0,
+        "worldGradeDescriptorHash": "659e59c58822d20b5ddb7ed6303d15746d666444692bcc52ab21c37e200a5c09"
+      },
+      "roleSHA256": "0545e571ea71109ef9bafd084115fedad04c0ed755fb830d35949e8bf49d5d34",
+      "rgbaByReceipt": {
+        "659e59c58822d20b5ddb7ed6303d15746d666444692bcc52ab21c37e200a5c09": "6b4e53c08b6542dc613363830d612310bc2fda029f73b99ba6675cc070accceb",
+        "6ac8dd7b70564493296c8fb0ce7ee381db2bc47deceb1a12b08d50bfbc23dc4a": "0e2a882d6e1ea75de29842682399ac732c8463f446759de376a4dfdfe9644657",
+        "8055360658b09fe04395800c49bd595bf06312b1ee0e6bbe6cdafe82ba5b285e": "56eb7a6865a049ff2d4bb1aaa09955d012acc78d1d6c2b72b6f710074a65575a"
+      }
+    },
+    {
+      "id": "sand/d3/span",
+      "request": {
+        "schemaVersion": "terrain-south-wall-v1",
+        "ground": "sand",
+        "southExposureLevels": 3,
+        "southNeighborDisclosure": "known",
+        "westContinuation": true,
+        "eastContinuation": true,
+        "featureVariant": 0,
+        "worldGradeDescriptorHash": "659e59c58822d20b5ddb7ed6303d15746d666444692bcc52ab21c37e200a5c09"
+      },
+      "roleSHA256": "318fb98b85577c9bb1bb95987d91669dff3c35e21b9c30e84bc88e83be9f3812",
+      "rgbaByReceipt": {
+        "659e59c58822d20b5ddb7ed6303d15746d666444692bcc52ab21c37e200a5c09": "50bb4388574dfae06a42895cb91c3e418811b8af750903ca273c2e0999645603",
+        "6ac8dd7b70564493296c8fb0ce7ee381db2bc47deceb1a12b08d50bfbc23dc4a": "14608663be43a48922701d4ff8b4ce9f274c1f773d379736b0ccfcc88a12c6d3",
+        "8055360658b09fe04395800c49bd595bf06312b1ee0e6bbe6cdafe82ba5b285e": "e11f22d4c8a8f92c8d11baf4f7f11ed907bd1df3893dd436137a8d2f2c34578a"
+      }
+    },
+    {
+      "id": "sand/d3/leftCap",
+      "request": {
+        "schemaVersion": "terrain-south-wall-v1",
+        "ground": "sand",
+        "southExposureLevels": 3,
+        "southNeighborDisclosure": "known",
+        "westContinuation": false,
+        "eastContinuation": true,
+        "featureVariant": 0,
+        "worldGradeDescriptorHash": "659e59c58822d20b5ddb7ed6303d15746d666444692bcc52ab21c37e200a5c09"
+      },
+      "roleSHA256": "684e1215475cf33479e22afe5b23e26955339031127106ff973b39e3d9279798",
+      "rgbaByReceipt": {
+        "659e59c58822d20b5ddb7ed6303d15746d666444692bcc52ab21c37e200a5c09": "3794ea77d33ff05cc487d6e8c03de3e4124cd0689d279a4a1ac0e81aa95bd3c6",
+        "6ac8dd7b70564493296c8fb0ce7ee381db2bc47deceb1a12b08d50bfbc23dc4a": "7a422f8915e11698ecc6c8424eeb41f74bff99235f40421701cb3a0a1b5d7852",
+        "8055360658b09fe04395800c49bd595bf06312b1ee0e6bbe6cdafe82ba5b285e": "0fa4cbf249c3176224f548b4ad01bfdc504359954231c2470567c95381d0e19b"
+      }
+    },
+    {
+      "id": "sand/d3/rightCap",
+      "request": {
+        "schemaVersion": "terrain-south-wall-v1",
+        "ground": "sand",
+        "southExposureLevels": 3,
+        "southNeighborDisclosure": "known",
+        "westContinuation": true,
+        "eastContinuation": false,
+        "featureVariant": 0,
+        "worldGradeDescriptorHash": "659e59c58822d20b5ddb7ed6303d15746d666444692bcc52ab21c37e200a5c09"
+      },
+      "roleSHA256": "1983c5657ccb53179bdc48392a1f2ffe6478f287c7fe99527dba0cdd996f440f",
+      "rgbaByReceipt": {
+        "659e59c58822d20b5ddb7ed6303d15746d666444692bcc52ab21c37e200a5c09": "315ec69f011f5bfeeb8be49475fe191233d6a61c2cdfdb0d1ed145eca7cec071",
+        "6ac8dd7b70564493296c8fb0ce7ee381db2bc47deceb1a12b08d50bfbc23dc4a": "fe85c93939cc6c588140eb3adbb0e862402ed47e889fb7bcf6d1baecddb13294",
+        "8055360658b09fe04395800c49bd595bf06312b1ee0e6bbe6cdafe82ba5b285e": "7a5023f235c28ca487665bfc368c06b30121cfc3984287bbf2c15e33f90cd34c"
+      }
+    },
+    {
+      "id": "sand/d3/isolated",
+      "request": {
+        "schemaVersion": "terrain-south-wall-v1",
+        "ground": "sand",
+        "southExposureLevels": 3,
+        "southNeighborDisclosure": "known",
+        "westContinuation": false,
+        "eastContinuation": false,
+        "featureVariant": 0,
+        "worldGradeDescriptorHash": "659e59c58822d20b5ddb7ed6303d15746d666444692bcc52ab21c37e200a5c09"
+      },
+      "roleSHA256": "ce75b4c335769d9d59f72fef14bdd0c645ee4acb04c4079e817adaf92cb0c8ae",
+      "rgbaByReceipt": {
+        "659e59c58822d20b5ddb7ed6303d15746d666444692bcc52ab21c37e200a5c09": "2bc9ebb39ed70108a0b49feeeeee799a1e19483b1e6699332b4e7f6e9364ebda",
+        "6ac8dd7b70564493296c8fb0ce7ee381db2bc47deceb1a12b08d50bfbc23dc4a": "9fec53e57f8f8d638c9a0369588f439790316e948e18a0b3345dda56782f2838",
+        "8055360658b09fe04395800c49bd595bf06312b1ee0e6bbe6cdafe82ba5b285e": "8fb6767ae2dea2c72c23afcce9756375dfa6d9e6795717946bb991a2cbb1b7a1"
+      }
+    },
+    {
+      "id": "ash/d0/span",
+      "request": {
+        "schemaVersion": "terrain-south-wall-v1",
+        "ground": "ash",
+        "southExposureLevels": 0,
+        "southNeighborDisclosure": "known",
+        "westContinuation": true,
+        "eastContinuation": true,
+        "featureVariant": 0,
+        "worldGradeDescriptorHash": "659e59c58822d20b5ddb7ed6303d15746d666444692bcc52ab21c37e200a5c09"
+      },
+      "roleSHA256": "80a76a18acf8cb64fec3a659ffc4bab4a87cd9a6fde4dab2161a8751d136c9d2",
+      "rgbaByReceipt": {
+        "659e59c58822d20b5ddb7ed6303d15746d666444692bcc52ab21c37e200a5c09": "5d89f056865052bcb89c910d2d62872e029fb273c3db03f8968a52a41593c1b5",
+        "6ac8dd7b70564493296c8fb0ce7ee381db2bc47deceb1a12b08d50bfbc23dc4a": "5d89f056865052bcb89c910d2d62872e029fb273c3db03f8968a52a41593c1b5",
+        "8055360658b09fe04395800c49bd595bf06312b1ee0e6bbe6cdafe82ba5b285e": "5d89f056865052bcb89c910d2d62872e029fb273c3db03f8968a52a41593c1b5"
+      }
+    },
+    {
+      "id": "ash/d0/leftCap",
+      "request": {
+        "schemaVersion": "terrain-south-wall-v1",
+        "ground": "ash",
+        "southExposureLevels": 0,
+        "southNeighborDisclosure": "known",
+        "westContinuation": false,
+        "eastContinuation": true,
+        "featureVariant": 0,
+        "worldGradeDescriptorHash": "659e59c58822d20b5ddb7ed6303d15746d666444692bcc52ab21c37e200a5c09"
+      },
+      "roleSHA256": "80a76a18acf8cb64fec3a659ffc4bab4a87cd9a6fde4dab2161a8751d136c9d2",
+      "rgbaByReceipt": {
+        "659e59c58822d20b5ddb7ed6303d15746d666444692bcc52ab21c37e200a5c09": "5d89f056865052bcb89c910d2d62872e029fb273c3db03f8968a52a41593c1b5",
+        "6ac8dd7b70564493296c8fb0ce7ee381db2bc47deceb1a12b08d50bfbc23dc4a": "5d89f056865052bcb89c910d2d62872e029fb273c3db03f8968a52a41593c1b5",
+        "8055360658b09fe04395800c49bd595bf06312b1ee0e6bbe6cdafe82ba5b285e": "5d89f056865052bcb89c910d2d62872e029fb273c3db03f8968a52a41593c1b5"
+      }
+    },
+    {
+      "id": "ash/d0/rightCap",
+      "request": {
+        "schemaVersion": "terrain-south-wall-v1",
+        "ground": "ash",
+        "southExposureLevels": 0,
+        "southNeighborDisclosure": "known",
+        "westContinuation": true,
+        "eastContinuation": false,
+        "featureVariant": 0,
+        "worldGradeDescriptorHash": "659e59c58822d20b5ddb7ed6303d15746d666444692bcc52ab21c37e200a5c09"
+      },
+      "roleSHA256": "80a76a18acf8cb64fec3a659ffc4bab4a87cd9a6fde4dab2161a8751d136c9d2",
+      "rgbaByReceipt": {
+        "659e59c58822d20b5ddb7ed6303d15746d666444692bcc52ab21c37e200a5c09": "5d89f056865052bcb89c910d2d62872e029fb273c3db03f8968a52a41593c1b5",
+        "6ac8dd7b70564493296c8fb0ce7ee381db2bc47deceb1a12b08d50bfbc23dc4a": "5d89f056865052bcb89c910d2d62872e029fb273c3db03f8968a52a41593c1b5",
+        "8055360658b09fe04395800c49bd595bf06312b1ee0e6bbe6cdafe82ba5b285e": "5d89f056865052bcb89c910d2d62872e029fb273c3db03f8968a52a41593c1b5"
+      }
+    },
+    {
+      "id": "ash/d0/isolated",
+      "request": {
+        "schemaVersion": "terrain-south-wall-v1",
+        "ground": "ash",
+        "southExposureLevels": 0,
+        "southNeighborDisclosure": "known",
+        "westContinuation": false,
+        "eastContinuation": false,
+        "featureVariant": 0,
+        "worldGradeDescriptorHash": "659e59c58822d20b5ddb7ed6303d15746d666444692bcc52ab21c37e200a5c09"
+      },
+      "roleSHA256": "80a76a18acf8cb64fec3a659ffc4bab4a87cd9a6fde4dab2161a8751d136c9d2",
+      "rgbaByReceipt": {
+        "659e59c58822d20b5ddb7ed6303d15746d666444692bcc52ab21c37e200a5c09": "5d89f056865052bcb89c910d2d62872e029fb273c3db03f8968a52a41593c1b5",
+        "6ac8dd7b70564493296c8fb0ce7ee381db2bc47deceb1a12b08d50bfbc23dc4a": "5d89f056865052bcb89c910d2d62872e029fb273c3db03f8968a52a41593c1b5",
+        "8055360658b09fe04395800c49bd595bf06312b1ee0e6bbe6cdafe82ba5b285e": "5d89f056865052bcb89c910d2d62872e029fb273c3db03f8968a52a41593c1b5"
+      }
+    },
+    {
+      "id": "ash/d1/span",
+      "request": {
+        "schemaVersion": "terrain-south-wall-v1",
+        "ground": "ash",
+        "southExposureLevels": 1,
+        "southNeighborDisclosure": "known",
+        "westContinuation": true,
+        "eastContinuation": true,
+        "featureVariant": 0,
+        "worldGradeDescriptorHash": "659e59c58822d20b5ddb7ed6303d15746d666444692bcc52ab21c37e200a5c09"
+      },
+      "roleSHA256": "7f06cc21645caf7a645eb68c1d3ba782a62785cd99358530b4b3f8aaa4e7f1ea",
+      "rgbaByReceipt": {
+        "659e59c58822d20b5ddb7ed6303d15746d666444692bcc52ab21c37e200a5c09": "a902fb89096cbc1892c588245f6512595842645f37af1a1baccef097ecf791d2",
+        "6ac8dd7b70564493296c8fb0ce7ee381db2bc47deceb1a12b08d50bfbc23dc4a": "c853cd82075aabe675da2409424a8ff93ceca2e5e573d5692e42da409ef02be8",
+        "8055360658b09fe04395800c49bd595bf06312b1ee0e6bbe6cdafe82ba5b285e": "7c408f496eee2d90cb3e7fb17cae77ad96119f72ec9a555a957e3f0b7920d4ea"
+      }
+    },
+    {
+      "id": "ash/d1/leftCap",
+      "request": {
+        "schemaVersion": "terrain-south-wall-v1",
+        "ground": "ash",
+        "southExposureLevels": 1,
+        "southNeighborDisclosure": "known",
+        "westContinuation": false,
+        "eastContinuation": true,
+        "featureVariant": 0,
+        "worldGradeDescriptorHash": "659e59c58822d20b5ddb7ed6303d15746d666444692bcc52ab21c37e200a5c09"
+      },
+      "roleSHA256": "1a7a29049e8abf039d097ba791d6a9461c2dc17343504111c17465d2bb1ac707",
+      "rgbaByReceipt": {
+        "659e59c58822d20b5ddb7ed6303d15746d666444692bcc52ab21c37e200a5c09": "0d8b896c016c02884a30d560764f98443795aa56bfb61b74d0b25c1f865980ba",
+        "6ac8dd7b70564493296c8fb0ce7ee381db2bc47deceb1a12b08d50bfbc23dc4a": "96105e0407df2566dd53ccdc2db2639afa88fcc39c16839d781657c8b28f92e6",
+        "8055360658b09fe04395800c49bd595bf06312b1ee0e6bbe6cdafe82ba5b285e": "bb0418af340f992493f42a11e4084979857f588354876d7fc4b569f1c0515bbb"
+      }
+    },
+    {
+      "id": "ash/d1/rightCap",
+      "request": {
+        "schemaVersion": "terrain-south-wall-v1",
+        "ground": "ash",
+        "southExposureLevels": 1,
+        "southNeighborDisclosure": "known",
+        "westContinuation": true,
+        "eastContinuation": false,
+        "featureVariant": 0,
+        "worldGradeDescriptorHash": "659e59c58822d20b5ddb7ed6303d15746d666444692bcc52ab21c37e200a5c09"
+      },
+      "roleSHA256": "2551bed44215ee5712c8e89c5f8d28fa038a43f42ec8bd6bb636c92f22d2daee",
+      "rgbaByReceipt": {
+        "659e59c58822d20b5ddb7ed6303d15746d666444692bcc52ab21c37e200a5c09": "fd896a688a43b6c05a6c9032dabb33a00cd11b58ea35b4c7f1d25ab961d6507f",
+        "6ac8dd7b70564493296c8fb0ce7ee381db2bc47deceb1a12b08d50bfbc23dc4a": "9fff5705cf0ce6ca47a074fd36e9c87e2cf4e5accb629ae4a3e9d28b33096165",
+        "8055360658b09fe04395800c49bd595bf06312b1ee0e6bbe6cdafe82ba5b285e": "da88b78116001f1bcf4e7f19170f11042af932239e95669a92573bc91b17542f"
+      }
+    },
+    {
+      "id": "ash/d1/isolated",
+      "request": {
+        "schemaVersion": "terrain-south-wall-v1",
+        "ground": "ash",
+        "southExposureLevels": 1,
+        "southNeighborDisclosure": "known",
+        "westContinuation": false,
+        "eastContinuation": false,
+        "featureVariant": 0,
+        "worldGradeDescriptorHash": "659e59c58822d20b5ddb7ed6303d15746d666444692bcc52ab21c37e200a5c09"
+      },
+      "roleSHA256": "a95211ecc91f8fb2df069ccaf70bfd568b9f3782395e54bf57d24fd7e8f9767b",
+      "rgbaByReceipt": {
+        "659e59c58822d20b5ddb7ed6303d15746d666444692bcc52ab21c37e200a5c09": "6170891c3b6bf3efed2cb0772dd5fa6221332241b703412fa04fde80afb8a1d3",
+        "6ac8dd7b70564493296c8fb0ce7ee381db2bc47deceb1a12b08d50bfbc23dc4a": "ba7f4d9fc2c6c25717235e285cfa2ab1aa6a5ab854b0bcd56613d97d26a176d3",
+        "8055360658b09fe04395800c49bd595bf06312b1ee0e6bbe6cdafe82ba5b285e": "af4d017ead02307b5efecfcc291941afa7e5cd4b7f0624375715342fb6464494"
+      }
+    },
+    {
+      "id": "ash/d2/span",
+      "request": {
+        "schemaVersion": "terrain-south-wall-v1",
+        "ground": "ash",
+        "southExposureLevels": 2,
+        "southNeighborDisclosure": "known",
+        "westContinuation": true,
+        "eastContinuation": true,
+        "featureVariant": 0,
+        "worldGradeDescriptorHash": "659e59c58822d20b5ddb7ed6303d15746d666444692bcc52ab21c37e200a5c09"
+      },
+      "roleSHA256": "f0559cb59f22dbcc6fac1e1fa7917051314fa4bc58c1bbad0952e1dcadc20eb2",
+      "rgbaByReceipt": {
+        "659e59c58822d20b5ddb7ed6303d15746d666444692bcc52ab21c37e200a5c09": "273afab987fc0a4c2e7952172eee4ff3d7f6a4c331c78dc93ee5db4a2bb9aab2",
+        "6ac8dd7b70564493296c8fb0ce7ee381db2bc47deceb1a12b08d50bfbc23dc4a": "70a9a4f5fc5708ccaa113f05715e808fa986c4a8991f4b788275e5669de31695",
+        "8055360658b09fe04395800c49bd595bf06312b1ee0e6bbe6cdafe82ba5b285e": "68aa9b536f7bd3460ecd614192b4175220d118c0afb1231cd352bac459e6c3ee"
+      }
+    },
+    {
+      "id": "ash/d2/leftCap",
+      "request": {
+        "schemaVersion": "terrain-south-wall-v1",
+        "ground": "ash",
+        "southExposureLevels": 2,
+        "southNeighborDisclosure": "known",
+        "westContinuation": false,
+        "eastContinuation": true,
+        "featureVariant": 0,
+        "worldGradeDescriptorHash": "659e59c58822d20b5ddb7ed6303d15746d666444692bcc52ab21c37e200a5c09"
+      },
+      "roleSHA256": "b18f4491734f404457a1487e0120caf7399446d34a52af99a78f3fe0d88d5e3a",
+      "rgbaByReceipt": {
+        "659e59c58822d20b5ddb7ed6303d15746d666444692bcc52ab21c37e200a5c09": "5b685c7c4221b2be9e70797b747696e6c85706e5d46b1634e43c2d236dbfd8ab",
+        "6ac8dd7b70564493296c8fb0ce7ee381db2bc47deceb1a12b08d50bfbc23dc4a": "a9c7238054d9a5e07256f2f09be5590e1dbee63115e8c4e38d37c1e882a65182",
+        "8055360658b09fe04395800c49bd595bf06312b1ee0e6bbe6cdafe82ba5b285e": "d06721534d33e9742a43d1709fd3d58a7a10a3d014141eeb4fb33e9e0386c608"
+      }
+    },
+    {
+      "id": "ash/d2/rightCap",
+      "request": {
+        "schemaVersion": "terrain-south-wall-v1",
+        "ground": "ash",
+        "southExposureLevels": 2,
+        "southNeighborDisclosure": "known",
+        "westContinuation": true,
+        "eastContinuation": false,
+        "featureVariant": 0,
+        "worldGradeDescriptorHash": "659e59c58822d20b5ddb7ed6303d15746d666444692bcc52ab21c37e200a5c09"
+      },
+      "roleSHA256": "3a143c3863fabb8194da86333d416df646bef9f848dfa55c347a0bad80b1a420",
+      "rgbaByReceipt": {
+        "659e59c58822d20b5ddb7ed6303d15746d666444692bcc52ab21c37e200a5c09": "ae54b9bd72f42696748270d22b0704100136e601fcc1a08a3053380e5d57877c",
+        "6ac8dd7b70564493296c8fb0ce7ee381db2bc47deceb1a12b08d50bfbc23dc4a": "9a4a3658b971567665307d0e0c7ea0be6e865edc0586611e25093a538585d278",
+        "8055360658b09fe04395800c49bd595bf06312b1ee0e6bbe6cdafe82ba5b285e": "ba3e3d8f9d499c5f9ceef86f7e45c5f38b25bd6758097f8797dd155c1b69014e"
+      }
+    },
+    {
+      "id": "ash/d2/isolated",
+      "request": {
+        "schemaVersion": "terrain-south-wall-v1",
+        "ground": "ash",
+        "southExposureLevels": 2,
+        "southNeighborDisclosure": "known",
+        "westContinuation": false,
+        "eastContinuation": false,
+        "featureVariant": 0,
+        "worldGradeDescriptorHash": "659e59c58822d20b5ddb7ed6303d15746d666444692bcc52ab21c37e200a5c09"
+      },
+      "roleSHA256": "6df89d5e43fd821c40496c0e5ec7cd1647267d94d359c58a8d69481794a48172",
+      "rgbaByReceipt": {
+        "659e59c58822d20b5ddb7ed6303d15746d666444692bcc52ab21c37e200a5c09": "dbbc930a78da459789db035dbdc3161f714cc015dc46c6ef6a74d1d0912ad7e9",
+        "6ac8dd7b70564493296c8fb0ce7ee381db2bc47deceb1a12b08d50bfbc23dc4a": "332ae1fed4fd45b346cf8a321d24623e094fbdb3a4b5e23c2906bd06225a8bd1",
+        "8055360658b09fe04395800c49bd595bf06312b1ee0e6bbe6cdafe82ba5b285e": "01608538016e4b51043844f7d1bdf7cdd8f8a9b5b450c04ef477fd493a914bc1"
+      }
+    },
+    {
+      "id": "ash/d3/span",
+      "request": {
+        "schemaVersion": "terrain-south-wall-v1",
+        "ground": "ash",
+        "southExposureLevels": 3,
+        "southNeighborDisclosure": "known",
+        "westContinuation": true,
+        "eastContinuation": true,
+        "featureVariant": 0,
+        "worldGradeDescriptorHash": "659e59c58822d20b5ddb7ed6303d15746d666444692bcc52ab21c37e200a5c09"
+      },
+      "roleSHA256": "d1b8af7c6d14c0d9fe7761f3844d938bb9562d9ae27a4e77e7e6bda28d47612d",
+      "rgbaByReceipt": {
+        "659e59c58822d20b5ddb7ed6303d15746d666444692bcc52ab21c37e200a5c09": "f7a35f9d7b54e3d653d889b13b16a83056edb6730d8916e85af963f619e10434",
+        "6ac8dd7b70564493296c8fb0ce7ee381db2bc47deceb1a12b08d50bfbc23dc4a": "62e50397641634e6b50031e29a361a0705dc69157cf1130a537d306d2335b2a7",
+        "8055360658b09fe04395800c49bd595bf06312b1ee0e6bbe6cdafe82ba5b285e": "0b9538ea6c8a5c021d06db74ddc4e443d04d9137a6424d650174fd17e9afb8b5"
+      }
+    },
+    {
+      "id": "ash/d3/leftCap",
+      "request": {
+        "schemaVersion": "terrain-south-wall-v1",
+        "ground": "ash",
+        "southExposureLevels": 3,
+        "southNeighborDisclosure": "known",
+        "westContinuation": false,
+        "eastContinuation": true,
+        "featureVariant": 0,
+        "worldGradeDescriptorHash": "659e59c58822d20b5ddb7ed6303d15746d666444692bcc52ab21c37e200a5c09"
+      },
+      "roleSHA256": "f623a7aad6594159e186eb53c24b3de555e328563e802f2c27aaa254a88341b7",
+      "rgbaByReceipt": {
+        "659e59c58822d20b5ddb7ed6303d15746d666444692bcc52ab21c37e200a5c09": "88fbaf2bbfcb5ca28babd0b5c1d167099981c5c169545953e19fe2195bcd46af",
+        "6ac8dd7b70564493296c8fb0ce7ee381db2bc47deceb1a12b08d50bfbc23dc4a": "aab26a0ab7679be6f4ea7e51e9b5dee8a7daceac9d8b20cb19bbf2cf5361c00e",
+        "8055360658b09fe04395800c49bd595bf06312b1ee0e6bbe6cdafe82ba5b285e": "48f13e155024b77b61cd67ab5b937a5b85fceb913b5cb3501213721bfeea51e2"
+      }
+    },
+    {
+      "id": "ash/d3/rightCap",
+      "request": {
+        "schemaVersion": "terrain-south-wall-v1",
+        "ground": "ash",
+        "southExposureLevels": 3,
+        "southNeighborDisclosure": "known",
+        "westContinuation": true,
+        "eastContinuation": false,
+        "featureVariant": 0,
+        "worldGradeDescriptorHash": "659e59c58822d20b5ddb7ed6303d15746d666444692bcc52ab21c37e200a5c09"
+      },
+      "roleSHA256": "6f676ea77569cee1b862ba9a9dc44984e79d9b561f1f0690ac067273e8a36b73",
+      "rgbaByReceipt": {
+        "659e59c58822d20b5ddb7ed6303d15746d666444692bcc52ab21c37e200a5c09": "f627d25f1a4e08c498033ddd48f0385603d8fa4138f13f19a65e9f60ac3b2678",
+        "6ac8dd7b70564493296c8fb0ce7ee381db2bc47deceb1a12b08d50bfbc23dc4a": "5c32a6f6998f05616a8c20031691da97c03ea5766cb3036ce1c51a00fd4c7654",
+        "8055360658b09fe04395800c49bd595bf06312b1ee0e6bbe6cdafe82ba5b285e": "389c0de77d981b91756f967cf31c80a81822ce5958a69e318ebeeba4b2f63f36"
+      }
+    },
+    {
+      "id": "ash/d3/isolated",
+      "request": {
+        "schemaVersion": "terrain-south-wall-v1",
+        "ground": "ash",
+        "southExposureLevels": 3,
+        "southNeighborDisclosure": "known",
+        "westContinuation": false,
+        "eastContinuation": false,
+        "featureVariant": 0,
+        "worldGradeDescriptorHash": "659e59c58822d20b5ddb7ed6303d15746d666444692bcc52ab21c37e200a5c09"
+      },
+      "roleSHA256": "40ce56ff7c93db6420b95e95aefdb128ca2248cf2123b31ddd61abb63c022ea4",
+      "rgbaByReceipt": {
+        "659e59c58822d20b5ddb7ed6303d15746d666444692bcc52ab21c37e200a5c09": "9551c6671db5c7f2bfa65910f6766e645f379e3fb394b0bcbaf66e2af34ff19e",
+        "6ac8dd7b70564493296c8fb0ce7ee381db2bc47deceb1a12b08d50bfbc23dc4a": "a6a0b7cc5b68401fa45c8392dd2f1e91b061992f1a43c363ad8b27774cb4bd22",
+        "8055360658b09fe04395800c49bd595bf06312b1ee0e6bbe6cdafe82ba5b285e": "ef124ba14f7ba6ff47c233658d6081b1abb9f375ea15b02c196772f8a5204aea"
+      }
+    },
+    {
+      "id": "rubble/d0/span",
+      "request": {
+        "schemaVersion": "terrain-south-wall-v1",
+        "ground": "rubble",
+        "southExposureLevels": 0,
+        "southNeighborDisclosure": "known",
+        "westContinuation": true,
+        "eastContinuation": true,
+        "featureVariant": 0,
+        "worldGradeDescriptorHash": "659e59c58822d20b5ddb7ed6303d15746d666444692bcc52ab21c37e200a5c09"
+      },
+      "roleSHA256": "80a76a18acf8cb64fec3a659ffc4bab4a87cd9a6fde4dab2161a8751d136c9d2",
+      "rgbaByReceipt": {
+        "659e59c58822d20b5ddb7ed6303d15746d666444692bcc52ab21c37e200a5c09": "5d89f056865052bcb89c910d2d62872e029fb273c3db03f8968a52a41593c1b5",
+        "6ac8dd7b70564493296c8fb0ce7ee381db2bc47deceb1a12b08d50bfbc23dc4a": "5d89f056865052bcb89c910d2d62872e029fb273c3db03f8968a52a41593c1b5",
+        "8055360658b09fe04395800c49bd595bf06312b1ee0e6bbe6cdafe82ba5b285e": "5d89f056865052bcb89c910d2d62872e029fb273c3db03f8968a52a41593c1b5"
+      }
+    },
+    {
+      "id": "rubble/d0/leftCap",
+      "request": {
+        "schemaVersion": "terrain-south-wall-v1",
+        "ground": "rubble",
+        "southExposureLevels": 0,
+        "southNeighborDisclosure": "known",
+        "westContinuation": false,
+        "eastContinuation": true,
+        "featureVariant": 0,
+        "worldGradeDescriptorHash": "659e59c58822d20b5ddb7ed6303d15746d666444692bcc52ab21c37e200a5c09"
+      },
+      "roleSHA256": "80a76a18acf8cb64fec3a659ffc4bab4a87cd9a6fde4dab2161a8751d136c9d2",
+      "rgbaByReceipt": {
+        "659e59c58822d20b5ddb7ed6303d15746d666444692bcc52ab21c37e200a5c09": "5d89f056865052bcb89c910d2d62872e029fb273c3db03f8968a52a41593c1b5",
+        "6ac8dd7b70564493296c8fb0ce7ee381db2bc47deceb1a12b08d50bfbc23dc4a": "5d89f056865052bcb89c910d2d62872e029fb273c3db03f8968a52a41593c1b5",
+        "8055360658b09fe04395800c49bd595bf06312b1ee0e6bbe6cdafe82ba5b285e": "5d89f056865052bcb89c910d2d62872e029fb273c3db03f8968a52a41593c1b5"
+      }
+    },
+    {
+      "id": "rubble/d0/rightCap",
+      "request": {
+        "schemaVersion": "terrain-south-wall-v1",
+        "ground": "rubble",
+        "southExposureLevels": 0,
+        "southNeighborDisclosure": "known",
+        "westContinuation": true,
+        "eastContinuation": false,
+        "featureVariant": 0,
+        "worldGradeDescriptorHash": "659e59c58822d20b5ddb7ed6303d15746d666444692bcc52ab21c37e200a5c09"
+      },
+      "roleSHA256": "80a76a18acf8cb64fec3a659ffc4bab4a87cd9a6fde4dab2161a8751d136c9d2",
+      "rgbaByReceipt": {
+        "659e59c58822d20b5ddb7ed6303d15746d666444692bcc52ab21c37e200a5c09": "5d89f056865052bcb89c910d2d62872e029fb273c3db03f8968a52a41593c1b5",
+        "6ac8dd7b70564493296c8fb0ce7ee381db2bc47deceb1a12b08d50bfbc23dc4a": "5d89f056865052bcb89c910d2d62872e029fb273c3db03f8968a52a41593c1b5",
+        "8055360658b09fe04395800c49bd595bf06312b1ee0e6bbe6cdafe82ba5b285e": "5d89f056865052bcb89c910d2d62872e029fb273c3db03f8968a52a41593c1b5"
+      }
+    },
+    {
+      "id": "rubble/d0/isolated",
+      "request": {
+        "schemaVersion": "terrain-south-wall-v1",
+        "ground": "rubble",
+        "southExposureLevels": 0,
+        "southNeighborDisclosure": "known",
+        "westContinuation": false,
+        "eastContinuation": false,
+        "featureVariant": 0,
+        "worldGradeDescriptorHash": "659e59c58822d20b5ddb7ed6303d15746d666444692bcc52ab21c37e200a5c09"
+      },
+      "roleSHA256": "80a76a18acf8cb64fec3a659ffc4bab4a87cd9a6fde4dab2161a8751d136c9d2",
+      "rgbaByReceipt": {
+        "659e59c58822d20b5ddb7ed6303d15746d666444692bcc52ab21c37e200a5c09": "5d89f056865052bcb89c910d2d62872e029fb273c3db03f8968a52a41593c1b5",
+        "6ac8dd7b70564493296c8fb0ce7ee381db2bc47deceb1a12b08d50bfbc23dc4a": "5d89f056865052bcb89c910d2d62872e029fb273c3db03f8968a52a41593c1b5",
+        "8055360658b09fe04395800c49bd595bf06312b1ee0e6bbe6cdafe82ba5b285e": "5d89f056865052bcb89c910d2d62872e029fb273c3db03f8968a52a41593c1b5"
+      }
+    },
+    {
+      "id": "rubble/d1/span",
+      "request": {
+        "schemaVersion": "terrain-south-wall-v1",
+        "ground": "rubble",
+        "southExposureLevels": 1,
+        "southNeighborDisclosure": "known",
+        "westContinuation": true,
+        "eastContinuation": true,
+        "featureVariant": 0,
+        "worldGradeDescriptorHash": "659e59c58822d20b5ddb7ed6303d15746d666444692bcc52ab21c37e200a5c09"
+      },
+      "roleSHA256": "9fd1f7821b535e0d11a0ef5729788d67982e7d341cd93b4fe364345743a8fba8",
+      "rgbaByReceipt": {
+        "659e59c58822d20b5ddb7ed6303d15746d666444692bcc52ab21c37e200a5c09": "cdd01c6087f77b9d71a65207991de645e75c6fdf2ddf13a953964e9f5756127b",
+        "6ac8dd7b70564493296c8fb0ce7ee381db2bc47deceb1a12b08d50bfbc23dc4a": "07654839541f0aa0c48c8cab8f8c2de1a6f12d3b90cc743197e3dbb2b8d894de",
+        "8055360658b09fe04395800c49bd595bf06312b1ee0e6bbe6cdafe82ba5b285e": "fabbd4d6f431b56369721f11f17e980bc7c967774f9f146ed49f46f1ab5a2d4e"
+      }
+    },
+    {
+      "id": "rubble/d1/leftCap",
+      "request": {
+        "schemaVersion": "terrain-south-wall-v1",
+        "ground": "rubble",
+        "southExposureLevels": 1,
+        "southNeighborDisclosure": "known",
+        "westContinuation": false,
+        "eastContinuation": true,
+        "featureVariant": 0,
+        "worldGradeDescriptorHash": "659e59c58822d20b5ddb7ed6303d15746d666444692bcc52ab21c37e200a5c09"
+      },
+      "roleSHA256": "19a2758f4ddb3a38e0306a3edaad487c585bcf37396a27e0d653e9f0bd9b7395",
+      "rgbaByReceipt": {
+        "659e59c58822d20b5ddb7ed6303d15746d666444692bcc52ab21c37e200a5c09": "9bb476240bc233065dc9eec881f838803b512e8ece7a87a0e47ebaaa79535532",
+        "6ac8dd7b70564493296c8fb0ce7ee381db2bc47deceb1a12b08d50bfbc23dc4a": "04c595abd4ffe9202242516a3c30ad1e2c30ddf068dddab86a90403527ab5347",
+        "8055360658b09fe04395800c49bd595bf06312b1ee0e6bbe6cdafe82ba5b285e": "6b9c3610e655a1c6b09da5303943896a6c06c5e43d40f1896fa529ec1f0c0586"
+      }
+    },
+    {
+      "id": "rubble/d1/rightCap",
+      "request": {
+        "schemaVersion": "terrain-south-wall-v1",
+        "ground": "rubble",
+        "southExposureLevels": 1,
+        "southNeighborDisclosure": "known",
+        "westContinuation": true,
+        "eastContinuation": false,
+        "featureVariant": 0,
+        "worldGradeDescriptorHash": "659e59c58822d20b5ddb7ed6303d15746d666444692bcc52ab21c37e200a5c09"
+      },
+      "roleSHA256": "889532038c3dd692b60fda99205cc85206dcd96fc90f6aa262095c36b9818626",
+      "rgbaByReceipt": {
+        "659e59c58822d20b5ddb7ed6303d15746d666444692bcc52ab21c37e200a5c09": "c976598d64ce5e83c39fc70b6cacbb05d6dc1a75c25abbb6efd7d7974ee286d1",
+        "6ac8dd7b70564493296c8fb0ce7ee381db2bc47deceb1a12b08d50bfbc23dc4a": "2782b2093cb410e98f3cf65ad8c6dd69835cab6d903334ad5cfc5acdfb5893e5",
+        "8055360658b09fe04395800c49bd595bf06312b1ee0e6bbe6cdafe82ba5b285e": "9b8fb1eb3c064bb2bfdedcaacdefe46d51130942c3ca75412d2b49510988bd2b"
+      }
+    },
+    {
+      "id": "rubble/d1/isolated",
+      "request": {
+        "schemaVersion": "terrain-south-wall-v1",
+        "ground": "rubble",
+        "southExposureLevels": 1,
+        "southNeighborDisclosure": "known",
+        "westContinuation": false,
+        "eastContinuation": false,
+        "featureVariant": 0,
+        "worldGradeDescriptorHash": "659e59c58822d20b5ddb7ed6303d15746d666444692bcc52ab21c37e200a5c09"
+      },
+      "roleSHA256": "4272da4f4742e61ec446e954e0c1e690ca3bcca2dbf010d8558a5bb6e92fbabc",
+      "rgbaByReceipt": {
+        "659e59c58822d20b5ddb7ed6303d15746d666444692bcc52ab21c37e200a5c09": "7a3b2e34518c2d79b8a597f541de8b0f48ba219075c5d04ff1ef97b8837885f1",
+        "6ac8dd7b70564493296c8fb0ce7ee381db2bc47deceb1a12b08d50bfbc23dc4a": "8a117d293621653e9ae5cb0208b011aae49cdb26010fb9c9ae95170f879d478f",
+        "8055360658b09fe04395800c49bd595bf06312b1ee0e6bbe6cdafe82ba5b285e": "946860ae10452831a03e142f7a603a1dc31dc8dc634698af212a8544761c7985"
+      }
+    },
+    {
+      "id": "rubble/d2/span",
+      "request": {
+        "schemaVersion": "terrain-south-wall-v1",
+        "ground": "rubble",
+        "southExposureLevels": 2,
+        "southNeighborDisclosure": "known",
+        "westContinuation": true,
+        "eastContinuation": true,
+        "featureVariant": 0,
+        "worldGradeDescriptorHash": "659e59c58822d20b5ddb7ed6303d15746d666444692bcc52ab21c37e200a5c09"
+      },
+      "roleSHA256": "e67aa3d52f0415ec65cb928a259c2cb778d530438a771e988a7eb7af4894e005",
+      "rgbaByReceipt": {
+        "659e59c58822d20b5ddb7ed6303d15746d666444692bcc52ab21c37e200a5c09": "e0f46f9d2af99ae08a505c04ee861f14149cb25c86138ca667e1aa86a4979000",
+        "6ac8dd7b70564493296c8fb0ce7ee381db2bc47deceb1a12b08d50bfbc23dc4a": "0dc014dc732db5adc523d6ce0de9539fca0136b88351cc3cfa12c58bd38857a8",
+        "8055360658b09fe04395800c49bd595bf06312b1ee0e6bbe6cdafe82ba5b285e": "99c021a93eb018e7b0de5106a124542e5769451c59cb5eefaab67be264789def"
+      }
+    },
+    {
+      "id": "rubble/d2/leftCap",
+      "request": {
+        "schemaVersion": "terrain-south-wall-v1",
+        "ground": "rubble",
+        "southExposureLevels": 2,
+        "southNeighborDisclosure": "known",
+        "westContinuation": false,
+        "eastContinuation": true,
+        "featureVariant": 0,
+        "worldGradeDescriptorHash": "659e59c58822d20b5ddb7ed6303d15746d666444692bcc52ab21c37e200a5c09"
+      },
+      "roleSHA256": "df2b0453c9c4b71dacee83b1315089a4fd7f02d196f16c532e398b60f2a927e2",
+      "rgbaByReceipt": {
+        "659e59c58822d20b5ddb7ed6303d15746d666444692bcc52ab21c37e200a5c09": "a2a0caf5f12a86f95b5ef821ed0305d3effb80726e1d31162b0240aef27adcb7",
+        "6ac8dd7b70564493296c8fb0ce7ee381db2bc47deceb1a12b08d50bfbc23dc4a": "03c7f5c91d28a3c4c8d9a2450ce9098b092648b4b073cd7ea5870d0cc47da6f3",
+        "8055360658b09fe04395800c49bd595bf06312b1ee0e6bbe6cdafe82ba5b285e": "8e437750635cfc665cd98fdc6d9c4267563d88b389e71a208319f82dc98289a3"
+      }
+    },
+    {
+      "id": "rubble/d2/rightCap",
+      "request": {
+        "schemaVersion": "terrain-south-wall-v1",
+        "ground": "rubble",
+        "southExposureLevels": 2,
+        "southNeighborDisclosure": "known",
+        "westContinuation": true,
+        "eastContinuation": false,
+        "featureVariant": 0,
+        "worldGradeDescriptorHash": "659e59c58822d20b5ddb7ed6303d15746d666444692bcc52ab21c37e200a5c09"
+      },
+      "roleSHA256": "13f315d3febfc925fadb3b9d6dc241ed8ddf9c6dffa9e9fc4493f6de1734b87d",
+      "rgbaByReceipt": {
+        "659e59c58822d20b5ddb7ed6303d15746d666444692bcc52ab21c37e200a5c09": "b95c706cfc300a184b3acae4688869b1484b5f84cc0df35a2aa29b65fa9b4c40",
+        "6ac8dd7b70564493296c8fb0ce7ee381db2bc47deceb1a12b08d50bfbc23dc4a": "28786ccf661b0ba38a0d99999f54983569049d09064a7bce7cbcf052b5ea976c",
+        "8055360658b09fe04395800c49bd595bf06312b1ee0e6bbe6cdafe82ba5b285e": "9d925fc3dfc5601952a954dad1ed5fb22c2077501d9f024a35dfb9c7ffe29490"
+      }
+    },
+    {
+      "id": "rubble/d2/isolated",
+      "request": {
+        "schemaVersion": "terrain-south-wall-v1",
+        "ground": "rubble",
+        "southExposureLevels": 2,
+        "southNeighborDisclosure": "known",
+        "westContinuation": false,
+        "eastContinuation": false,
+        "featureVariant": 0,
+        "worldGradeDescriptorHash": "659e59c58822d20b5ddb7ed6303d15746d666444692bcc52ab21c37e200a5c09"
+      },
+      "roleSHA256": "4aa3a9d8ac23069db1d650e9e0d194559d707377ac5a184b9256ebd5262364a6",
+      "rgbaByReceipt": {
+        "659e59c58822d20b5ddb7ed6303d15746d666444692bcc52ab21c37e200a5c09": "0b41cec64309e8561c2c64351e7bc537abd44fab626113f195655f200b84edbc",
+        "6ac8dd7b70564493296c8fb0ce7ee381db2bc47deceb1a12b08d50bfbc23dc4a": "f74b0bf376351d4212bb46289ab72b4cf38aaf84b72543f34f2e277ad32cece5",
+        "8055360658b09fe04395800c49bd595bf06312b1ee0e6bbe6cdafe82ba5b285e": "826f4765bf022f8620c7c0e6490fc801e3afceca7ef35ffe57fa327549ce0c3b"
+      }
+    },
+    {
+      "id": "rubble/d3/span",
+      "request": {
+        "schemaVersion": "terrain-south-wall-v1",
+        "ground": "rubble",
+        "southExposureLevels": 3,
+        "southNeighborDisclosure": "known",
+        "westContinuation": true,
+        "eastContinuation": true,
+        "featureVariant": 0,
+        "worldGradeDescriptorHash": "659e59c58822d20b5ddb7ed6303d15746d666444692bcc52ab21c37e200a5c09"
+      },
+      "roleSHA256": "14cb018deb2b73f14f9cf862df92a3153193cf5fb6a26f37056f054bb355ecd8",
+      "rgbaByReceipt": {
+        "659e59c58822d20b5ddb7ed6303d15746d666444692bcc52ab21c37e200a5c09": "90a88d7218f6d32479838138c55fbba093a52b2381ffd45a0238698cca043fbe",
+        "6ac8dd7b70564493296c8fb0ce7ee381db2bc47deceb1a12b08d50bfbc23dc4a": "cc265fa0fbb6263b42ffb4fa2bd7ffda7eece4f6a295555a960597daebabf029",
+        "8055360658b09fe04395800c49bd595bf06312b1ee0e6bbe6cdafe82ba5b285e": "797f8f179c6bb93c8267b1694936eb6af7575c5ed9f15a998d3b98d4753237ca"
+      }
+    },
+    {
+      "id": "rubble/d3/leftCap",
+      "request": {
+        "schemaVersion": "terrain-south-wall-v1",
+        "ground": "rubble",
+        "southExposureLevels": 3,
+        "southNeighborDisclosure": "known",
+        "westContinuation": false,
+        "eastContinuation": true,
+        "featureVariant": 0,
+        "worldGradeDescriptorHash": "659e59c58822d20b5ddb7ed6303d15746d666444692bcc52ab21c37e200a5c09"
+      },
+      "roleSHA256": "45bdc0e3149c9c41d246548b7b3f5d145dd550def0a405903cdde31b0123c7f2",
+      "rgbaByReceipt": {
+        "659e59c58822d20b5ddb7ed6303d15746d666444692bcc52ab21c37e200a5c09": "0928ca7b3a74666d2f96031ea31bae795c13d51fb327a7eb908309e31e424362",
+        "6ac8dd7b70564493296c8fb0ce7ee381db2bc47deceb1a12b08d50bfbc23dc4a": "b77f6ea87aa22deac4c10d5f22c4e6768d2e523dcde92fa6812070a13fc58af2",
+        "8055360658b09fe04395800c49bd595bf06312b1ee0e6bbe6cdafe82ba5b285e": "e008a4f31a68b59839bf641fae3c90057439c702ba4f8e3df62f10b7d03bca20"
+      }
+    },
+    {
+      "id": "rubble/d3/rightCap",
+      "request": {
+        "schemaVersion": "terrain-south-wall-v1",
+        "ground": "rubble",
+        "southExposureLevels": 3,
+        "southNeighborDisclosure": "known",
+        "westContinuation": true,
+        "eastContinuation": false,
+        "featureVariant": 0,
+        "worldGradeDescriptorHash": "659e59c58822d20b5ddb7ed6303d15746d666444692bcc52ab21c37e200a5c09"
+      },
+      "roleSHA256": "cc0c66c1b2bc505d5e16985fa36af812aabbfac459be9b5c3a29e51a6b32c3c4",
+      "rgbaByReceipt": {
+        "659e59c58822d20b5ddb7ed6303d15746d666444692bcc52ab21c37e200a5c09": "21e9d3b60f718de6e0f81eb05f630c3e12b7502f065bcfdac4c0e219fe8fe5ba",
+        "6ac8dd7b70564493296c8fb0ce7ee381db2bc47deceb1a12b08d50bfbc23dc4a": "51c8ffd9572cb60598e49d527300aa858127d29fd00c5cd6a4c06d1a3df5b679",
+        "8055360658b09fe04395800c49bd595bf06312b1ee0e6bbe6cdafe82ba5b285e": "3235e4de2459498ce9278cbe46398b3d17cdf0dda63f6eeb9383ac75946e8df7"
+      }
+    },
+    {
+      "id": "rubble/d3/isolated",
+      "request": {
+        "schemaVersion": "terrain-south-wall-v1",
+        "ground": "rubble",
+        "southExposureLevels": 3,
+        "southNeighborDisclosure": "known",
+        "westContinuation": false,
+        "eastContinuation": false,
+        "featureVariant": 0,
+        "worldGradeDescriptorHash": "659e59c58822d20b5ddb7ed6303d15746d666444692bcc52ab21c37e200a5c09"
+      },
+      "roleSHA256": "a50a413b5c5d5f546870b798a967d8aac41d9944a67ae4ab1548342f1d943e32",
+      "rgbaByReceipt": {
+        "659e59c58822d20b5ddb7ed6303d15746d666444692bcc52ab21c37e200a5c09": "2b28f990fadd3209b37255c8ff122511d1b5623ff74d85759c8cc57879121f91",
+        "6ac8dd7b70564493296c8fb0ce7ee381db2bc47deceb1a12b08d50bfbc23dc4a": "f4c53f17b8136c753aab2441eb4cf3f6bbb84ba8aad1e35855a74b38bd735065",
+        "8055360658b09fe04395800c49bd595bf06312b1ee0e6bbe6cdafe82ba5b285e": "1be114c22449fdaaaef4b3a5426bf7fb15447d8a54c48622d5a9cf79eb04aafd"
+      }
+    },
+    {
+      "id": "mud/d0/span",
+      "request": {
+        "schemaVersion": "terrain-south-wall-v1",
+        "ground": "mud",
+        "southExposureLevels": 0,
+        "southNeighborDisclosure": "known",
+        "westContinuation": true,
+        "eastContinuation": true,
+        "featureVariant": 0,
+        "worldGradeDescriptorHash": "659e59c58822d20b5ddb7ed6303d15746d666444692bcc52ab21c37e200a5c09"
+      },
+      "roleSHA256": "80a76a18acf8cb64fec3a659ffc4bab4a87cd9a6fde4dab2161a8751d136c9d2",
+      "rgbaByReceipt": {
+        "659e59c58822d20b5ddb7ed6303d15746d666444692bcc52ab21c37e200a5c09": "5d89f056865052bcb89c910d2d62872e029fb273c3db03f8968a52a41593c1b5",
+        "6ac8dd7b70564493296c8fb0ce7ee381db2bc47deceb1a12b08d50bfbc23dc4a": "5d89f056865052bcb89c910d2d62872e029fb273c3db03f8968a52a41593c1b5",
+        "8055360658b09fe04395800c49bd595bf06312b1ee0e6bbe6cdafe82ba5b285e": "5d89f056865052bcb89c910d2d62872e029fb273c3db03f8968a52a41593c1b5"
+      }
+    },
+    {
+      "id": "mud/d0/leftCap",
+      "request": {
+        "schemaVersion": "terrain-south-wall-v1",
+        "ground": "mud",
+        "southExposureLevels": 0,
+        "southNeighborDisclosure": "known",
+        "westContinuation": false,
+        "eastContinuation": true,
+        "featureVariant": 0,
+        "worldGradeDescriptorHash": "659e59c58822d20b5ddb7ed6303d15746d666444692bcc52ab21c37e200a5c09"
+      },
+      "roleSHA256": "80a76a18acf8cb64fec3a659ffc4bab4a87cd9a6fde4dab2161a8751d136c9d2",
+      "rgbaByReceipt": {
+        "659e59c58822d20b5ddb7ed6303d15746d666444692bcc52ab21c37e200a5c09": "5d89f056865052bcb89c910d2d62872e029fb273c3db03f8968a52a41593c1b5",
+        "6ac8dd7b70564493296c8fb0ce7ee381db2bc47deceb1a12b08d50bfbc23dc4a": "5d89f056865052bcb89c910d2d62872e029fb273c3db03f8968a52a41593c1b5",
+        "8055360658b09fe04395800c49bd595bf06312b1ee0e6bbe6cdafe82ba5b285e": "5d89f056865052bcb89c910d2d62872e029fb273c3db03f8968a52a41593c1b5"
+      }
+    },
+    {
+      "id": "mud/d0/rightCap",
+      "request": {
+        "schemaVersion": "terrain-south-wall-v1",
+        "ground": "mud",
+        "southExposureLevels": 0,
+        "southNeighborDisclosure": "known",
+        "westContinuation": true,
+        "eastContinuation": false,
+        "featureVariant": 0,
+        "worldGradeDescriptorHash": "659e59c58822d20b5ddb7ed6303d15746d666444692bcc52ab21c37e200a5c09"
+      },
+      "roleSHA256": "80a76a18acf8cb64fec3a659ffc4bab4a87cd9a6fde4dab2161a8751d136c9d2",
+      "rgbaByReceipt": {
+        "659e59c58822d20b5ddb7ed6303d15746d666444692bcc52ab21c37e200a5c09": "5d89f056865052bcb89c910d2d62872e029fb273c3db03f8968a52a41593c1b5",
+        "6ac8dd7b70564493296c8fb0ce7ee381db2bc47deceb1a12b08d50bfbc23dc4a": "5d89f056865052bcb89c910d2d62872e029fb273c3db03f8968a52a41593c1b5",
+        "8055360658b09fe04395800c49bd595bf06312b1ee0e6bbe6cdafe82ba5b285e": "5d89f056865052bcb89c910d2d62872e029fb273c3db03f8968a52a41593c1b5"
+      }
+    },
+    {
+      "id": "mud/d0/isolated",
+      "request": {
+        "schemaVersion": "terrain-south-wall-v1",
+        "ground": "mud",
+        "southExposureLevels": 0,
+        "southNeighborDisclosure": "known",
+        "westContinuation": false,
+        "eastContinuation": false,
+        "featureVariant": 0,
+        "worldGradeDescriptorHash": "659e59c58822d20b5ddb7ed6303d15746d666444692bcc52ab21c37e200a5c09"
+      },
+      "roleSHA256": "80a76a18acf8cb64fec3a659ffc4bab4a87cd9a6fde4dab2161a8751d136c9d2",
+      "rgbaByReceipt": {
+        "659e59c58822d20b5ddb7ed6303d15746d666444692bcc52ab21c37e200a5c09": "5d89f056865052bcb89c910d2d62872e029fb273c3db03f8968a52a41593c1b5",
+        "6ac8dd7b70564493296c8fb0ce7ee381db2bc47deceb1a12b08d50bfbc23dc4a": "5d89f056865052bcb89c910d2d62872e029fb273c3db03f8968a52a41593c1b5",
+        "8055360658b09fe04395800c49bd595bf06312b1ee0e6bbe6cdafe82ba5b285e": "5d89f056865052bcb89c910d2d62872e029fb273c3db03f8968a52a41593c1b5"
+      }
+    },
+    {
+      "id": "mud/d1/span",
+      "request": {
+        "schemaVersion": "terrain-south-wall-v1",
+        "ground": "mud",
+        "southExposureLevels": 1,
+        "southNeighborDisclosure": "known",
+        "westContinuation": true,
+        "eastContinuation": true,
+        "featureVariant": 0,
+        "worldGradeDescriptorHash": "659e59c58822d20b5ddb7ed6303d15746d666444692bcc52ab21c37e200a5c09"
+      },
+      "roleSHA256": "26c9dc04f063dee8d19396cd9198f463fa7ba3f6c122355f604a015018316dba",
+      "rgbaByReceipt": {
+        "659e59c58822d20b5ddb7ed6303d15746d666444692bcc52ab21c37e200a5c09": "45f4f766e33d030983330bdd6b83517f3023e7d0dd071578883dde3bbc133a77",
+        "6ac8dd7b70564493296c8fb0ce7ee381db2bc47deceb1a12b08d50bfbc23dc4a": "8e3e76dc8cf1979828db677993022df4143b8e25bd46889ddb57b399a3effbcc",
+        "8055360658b09fe04395800c49bd595bf06312b1ee0e6bbe6cdafe82ba5b285e": "d23daeac52c92d2f6bf687c828b1d744b8a386206cb736fd0d286f0fdcdc004f"
+      }
+    },
+    {
+      "id": "mud/d1/leftCap",
+      "request": {
+        "schemaVersion": "terrain-south-wall-v1",
+        "ground": "mud",
+        "southExposureLevels": 1,
+        "southNeighborDisclosure": "known",
+        "westContinuation": false,
+        "eastContinuation": true,
+        "featureVariant": 0,
+        "worldGradeDescriptorHash": "659e59c58822d20b5ddb7ed6303d15746d666444692bcc52ab21c37e200a5c09"
+      },
+      "roleSHA256": "33917b173b1d6be7b6292633bf12647deda73381951bf313e4bc758f3a449fd5",
+      "rgbaByReceipt": {
+        "659e59c58822d20b5ddb7ed6303d15746d666444692bcc52ab21c37e200a5c09": "ca5cb56047b79bfd2f9a7a4dad2f8e7610a6579e361370627ac094415b63e07b",
+        "6ac8dd7b70564493296c8fb0ce7ee381db2bc47deceb1a12b08d50bfbc23dc4a": "bec5df47731305cf1e4b33c58a88ef04a369f5966d3215150e46a4294ecf0548",
+        "8055360658b09fe04395800c49bd595bf06312b1ee0e6bbe6cdafe82ba5b285e": "07ac1b74a8db2c77a226e7df5128c7593c533c85b805314dc65034e703d7662f"
+      }
+    },
+    {
+      "id": "mud/d1/rightCap",
+      "request": {
+        "schemaVersion": "terrain-south-wall-v1",
+        "ground": "mud",
+        "southExposureLevels": 1,
+        "southNeighborDisclosure": "known",
+        "westContinuation": true,
+        "eastContinuation": false,
+        "featureVariant": 0,
+        "worldGradeDescriptorHash": "659e59c58822d20b5ddb7ed6303d15746d666444692bcc52ab21c37e200a5c09"
+      },
+      "roleSHA256": "38b2f43c8e7a5dfe6ed2b4d212781d6cfe36d5b17b484695379a6d42c7f0ab52",
+      "rgbaByReceipt": {
+        "659e59c58822d20b5ddb7ed6303d15746d666444692bcc52ab21c37e200a5c09": "9f1ab01674e9fac92a52400d58872fa06d60b1b7fe13e0b7826cbc5d43a318e7",
+        "6ac8dd7b70564493296c8fb0ce7ee381db2bc47deceb1a12b08d50bfbc23dc4a": "abd6ca4cf108d019daf350280c203dfdc740005d1eb29c52a150ffd249d9ed1b",
+        "8055360658b09fe04395800c49bd595bf06312b1ee0e6bbe6cdafe82ba5b285e": "9e38ea5073062ca845d81dc0043899a48cb19d114f4e3727cc6b1519ca9c7072"
+      }
+    },
+    {
+      "id": "mud/d1/isolated",
+      "request": {
+        "schemaVersion": "terrain-south-wall-v1",
+        "ground": "mud",
+        "southExposureLevels": 1,
+        "southNeighborDisclosure": "known",
+        "westContinuation": false,
+        "eastContinuation": false,
+        "featureVariant": 0,
+        "worldGradeDescriptorHash": "659e59c58822d20b5ddb7ed6303d15746d666444692bcc52ab21c37e200a5c09"
+      },
+      "roleSHA256": "15f2e5e5083c517e915b997d80c56d38ee9a5bc1e8b50ae542bf623a0c0c1de6",
+      "rgbaByReceipt": {
+        "659e59c58822d20b5ddb7ed6303d15746d666444692bcc52ab21c37e200a5c09": "03677e5bb976b36b6e8dee567b3c5fb293f5b26b0725bf5828607296ec885aeb",
+        "6ac8dd7b70564493296c8fb0ce7ee381db2bc47deceb1a12b08d50bfbc23dc4a": "1536e2dc824f0651e8ad81a41dfa83a60136e033894141dacb48cb27f93eb5ef",
+        "8055360658b09fe04395800c49bd595bf06312b1ee0e6bbe6cdafe82ba5b285e": "787b294670f0dfabdfc5ba9be23d981417d4b1aef0339759d8512d34dd2f2eb6"
+      }
+    },
+    {
+      "id": "mud/d2/span",
+      "request": {
+        "schemaVersion": "terrain-south-wall-v1",
+        "ground": "mud",
+        "southExposureLevels": 2,
+        "southNeighborDisclosure": "known",
+        "westContinuation": true,
+        "eastContinuation": true,
+        "featureVariant": 0,
+        "worldGradeDescriptorHash": "659e59c58822d20b5ddb7ed6303d15746d666444692bcc52ab21c37e200a5c09"
+      },
+      "roleSHA256": "073002b1f4691f881f5e868fe57fa941b9dc1188c5e515ea16cf570d7a47931c",
+      "rgbaByReceipt": {
+        "659e59c58822d20b5ddb7ed6303d15746d666444692bcc52ab21c37e200a5c09": "3a4a7c1331574f8e5d7ab003d62bf79c4821c2ee43c1eaf6764ce87abfb7b4c1",
+        "6ac8dd7b70564493296c8fb0ce7ee381db2bc47deceb1a12b08d50bfbc23dc4a": "02b1b75751fedce4c166739224f27c89e743a5d3e44c074b766c952b249fbeb1",
+        "8055360658b09fe04395800c49bd595bf06312b1ee0e6bbe6cdafe82ba5b285e": "417d74271d9058fc6026a3d1a15dd7de7b7e3b3f3310ba534474ec26236e9c84"
+      }
+    },
+    {
+      "id": "mud/d2/leftCap",
+      "request": {
+        "schemaVersion": "terrain-south-wall-v1",
+        "ground": "mud",
+        "southExposureLevels": 2,
+        "southNeighborDisclosure": "known",
+        "westContinuation": false,
+        "eastContinuation": true,
+        "featureVariant": 0,
+        "worldGradeDescriptorHash": "659e59c58822d20b5ddb7ed6303d15746d666444692bcc52ab21c37e200a5c09"
+      },
+      "roleSHA256": "d6c3a1dc07c72853486c5129e7f43b811db82dd800e710bdfafa9d67dbb0fe39",
+      "rgbaByReceipt": {
+        "659e59c58822d20b5ddb7ed6303d15746d666444692bcc52ab21c37e200a5c09": "609d1d9da8592dd7ca8e78cd8654491d92c6bc849378bc90d09e375f4ff9993e",
+        "6ac8dd7b70564493296c8fb0ce7ee381db2bc47deceb1a12b08d50bfbc23dc4a": "ac78487a3ebf5106c5969f068dbb07194476fe1bde9bec32308884034dd428de",
+        "8055360658b09fe04395800c49bd595bf06312b1ee0e6bbe6cdafe82ba5b285e": "053508f59dbf20f50d8a0ce84436a52789e855fdf18a3c25540d15ee86c4b5d2"
+      }
+    },
+    {
+      "id": "mud/d2/rightCap",
+      "request": {
+        "schemaVersion": "terrain-south-wall-v1",
+        "ground": "mud",
+        "southExposureLevels": 2,
+        "southNeighborDisclosure": "known",
+        "westContinuation": true,
+        "eastContinuation": false,
+        "featureVariant": 0,
+        "worldGradeDescriptorHash": "659e59c58822d20b5ddb7ed6303d15746d666444692bcc52ab21c37e200a5c09"
+      },
+      "roleSHA256": "bf54b9756f4bc0a25df171e1c7223c29ca99c194ad3e89442f1dc0653586d074",
+      "rgbaByReceipt": {
+        "659e59c58822d20b5ddb7ed6303d15746d666444692bcc52ab21c37e200a5c09": "efb1611c5a1e8bbe51b51dbbec8732d0ba1957dc0bd835d5793149fd0779fa45",
+        "6ac8dd7b70564493296c8fb0ce7ee381db2bc47deceb1a12b08d50bfbc23dc4a": "8de1e7399620909639ea8e67905f7483dd3c5abc2cd1ec231c9b520547aea237",
+        "8055360658b09fe04395800c49bd595bf06312b1ee0e6bbe6cdafe82ba5b285e": "c14eebbe8fda8ac940ceeaf621aeacd0850e9d056bf4306bd89bb2b7796775df"
+      }
+    },
+    {
+      "id": "mud/d2/isolated",
+      "request": {
+        "schemaVersion": "terrain-south-wall-v1",
+        "ground": "mud",
+        "southExposureLevels": 2,
+        "southNeighborDisclosure": "known",
+        "westContinuation": false,
+        "eastContinuation": false,
+        "featureVariant": 0,
+        "worldGradeDescriptorHash": "659e59c58822d20b5ddb7ed6303d15746d666444692bcc52ab21c37e200a5c09"
+      },
+      "roleSHA256": "817c8cd66b83b946182f18d55146950c248cafc0fdb9550bb3df0f5ed4e2616a",
+      "rgbaByReceipt": {
+        "659e59c58822d20b5ddb7ed6303d15746d666444692bcc52ab21c37e200a5c09": "7ec428a7f3194f9844a09246e50c2e6217b11619a0832f2b71d408f31c4af961",
+        "6ac8dd7b70564493296c8fb0ce7ee381db2bc47deceb1a12b08d50bfbc23dc4a": "73f2c43c11356f67d2f6e77970e40cf0786ffb3edc7271498c4a94a7dd75d0ed",
+        "8055360658b09fe04395800c49bd595bf06312b1ee0e6bbe6cdafe82ba5b285e": "78bed037b715d6204dcf63b818e0729f2adcfed06ad7a498db431e543e971685"
+      }
+    },
+    {
+      "id": "mud/d3/span",
+      "request": {
+        "schemaVersion": "terrain-south-wall-v1",
+        "ground": "mud",
+        "southExposureLevels": 3,
+        "southNeighborDisclosure": "known",
+        "westContinuation": true,
+        "eastContinuation": true,
+        "featureVariant": 0,
+        "worldGradeDescriptorHash": "659e59c58822d20b5ddb7ed6303d15746d666444692bcc52ab21c37e200a5c09"
+      },
+      "roleSHA256": "79ccae937320ca1ebcfb8570fbedc5003f5a889079bae19d4fc3a52578678156",
+      "rgbaByReceipt": {
+        "659e59c58822d20b5ddb7ed6303d15746d666444692bcc52ab21c37e200a5c09": "f939d60275ce70c4961acd70f1cfecbbadf7355c1c78b48e70d00d7e576076ba",
+        "6ac8dd7b70564493296c8fb0ce7ee381db2bc47deceb1a12b08d50bfbc23dc4a": "f94520de40f96cc2ffdede494a48df8315d3ce37fe037e108e3cf5a0b8b3bbf4",
+        "8055360658b09fe04395800c49bd595bf06312b1ee0e6bbe6cdafe82ba5b285e": "e107e8eb702fedde82b4092ca800187e1e10543e9803bedfa08abd1f532fc105"
+      }
+    },
+    {
+      "id": "mud/d3/leftCap",
+      "request": {
+        "schemaVersion": "terrain-south-wall-v1",
+        "ground": "mud",
+        "southExposureLevels": 3,
+        "southNeighborDisclosure": "known",
+        "westContinuation": false,
+        "eastContinuation": true,
+        "featureVariant": 0,
+        "worldGradeDescriptorHash": "659e59c58822d20b5ddb7ed6303d15746d666444692bcc52ab21c37e200a5c09"
+      },
+      "roleSHA256": "773bf86bb64e770bbccfd09ec1a0e5145235a948c446a247da927f2a7983fb9e",
+      "rgbaByReceipt": {
+        "659e59c58822d20b5ddb7ed6303d15746d666444692bcc52ab21c37e200a5c09": "d92551e99f0db9496b75525b0652b80d4f5a4121ad3b5bdb3b6e6167b2395572",
+        "6ac8dd7b70564493296c8fb0ce7ee381db2bc47deceb1a12b08d50bfbc23dc4a": "3a5994ca79df23e72e78dce4112a0e8f32d55c3927b4aba962a035535727881a",
+        "8055360658b09fe04395800c49bd595bf06312b1ee0e6bbe6cdafe82ba5b285e": "e759da33f8f05e4c5f99251e0796149d0ad370e663421be62109da4b2fb2205d"
+      }
+    },
+    {
+      "id": "mud/d3/rightCap",
+      "request": {
+        "schemaVersion": "terrain-south-wall-v1",
+        "ground": "mud",
+        "southExposureLevels": 3,
+        "southNeighborDisclosure": "known",
+        "westContinuation": true,
+        "eastContinuation": false,
+        "featureVariant": 0,
+        "worldGradeDescriptorHash": "659e59c58822d20b5ddb7ed6303d15746d666444692bcc52ab21c37e200a5c09"
+      },
+      "roleSHA256": "bfa98c795461c445bfa3d1953741c584bdc8c73f1dc557125ad76bc9af7d6043",
+      "rgbaByReceipt": {
+        "659e59c58822d20b5ddb7ed6303d15746d666444692bcc52ab21c37e200a5c09": "66171a2dcc4c0a367c5a7e1229c208cf8d491b39a72b4550d579b0fd01ce1162",
+        "6ac8dd7b70564493296c8fb0ce7ee381db2bc47deceb1a12b08d50bfbc23dc4a": "613f4e4cfac0a163282ea79405e5529d1b5efe20d53552e6304da95b4addcf53",
+        "8055360658b09fe04395800c49bd595bf06312b1ee0e6bbe6cdafe82ba5b285e": "4982c05ba61ce64f713617859323cb7091b8dc9d2704a9878037d481565a1826"
+      }
+    },
+    {
+      "id": "mud/d3/isolated",
+      "request": {
+        "schemaVersion": "terrain-south-wall-v1",
+        "ground": "mud",
+        "southExposureLevels": 3,
+        "southNeighborDisclosure": "known",
+        "westContinuation": false,
+        "eastContinuation": false,
+        "featureVariant": 0,
+        "worldGradeDescriptorHash": "659e59c58822d20b5ddb7ed6303d15746d666444692bcc52ab21c37e200a5c09"
+      },
+      "roleSHA256": "a459ee63c0ccb5ac956fc2488f6186dfa0aada86f6c30a361db40eeba2c09f8c",
+      "rgbaByReceipt": {
+        "659e59c58822d20b5ddb7ed6303d15746d666444692bcc52ab21c37e200a5c09": "f144262fdd4895150b64d23d06722349e8b5f39747ec8948bd8bf4d8c6410371",
+        "6ac8dd7b70564493296c8fb0ce7ee381db2bc47deceb1a12b08d50bfbc23dc4a": "68a7d98855e4b4183faf5d3535549b7805b03ff59ba313b6dbd240f5bdfefb37",
+        "8055360658b09fe04395800c49bd595bf06312b1ee0e6bbe6cdafe82ba5b285e": "7b69c17a98ce22d850cbfe1e9d623a89b8cb988c9155243420fc6f9e3fa03983"
+      }
+    },
+    {
+      "id": "hidden-zero",
+      "request": {
+        "schemaVersion": "terrain-south-wall-v1",
+        "ground": "stone",
+        "southExposureLevels": 0,
+        "southNeighborDisclosure": "hidden",
+        "westContinuation": false,
+        "eastContinuation": false,
+        "featureVariant": 0,
+        "worldGradeDescriptorHash": "659e59c58822d20b5ddb7ed6303d15746d666444692bcc52ab21c37e200a5c09"
+      },
+      "roleSHA256": "80a76a18acf8cb64fec3a659ffc4bab4a87cd9a6fde4dab2161a8751d136c9d2"
+    },
+    {
+      "id": "boundary-zero",
+      "request": {
+        "schemaVersion": "terrain-south-wall-v1",
+        "ground": "stone",
+        "southExposureLevels": 0,
+        "southNeighborDisclosure": "outOfMap",
+        "westContinuation": false,
+        "eastContinuation": false,
+        "featureVariant": 0,
+        "worldGradeDescriptorHash": "659e59c58822d20b5ddb7ed6303d15746d666444692bcc52ab21c37e200a5c09"
+      },
+      "roleSHA256": "80a76a18acf8cb64fec3a659ffc4bab4a87cd9a6fde4dab2161a8751d136c9d2"
+    }
+  ],
+  "assetAggregateSHA256": "95259baa5c6b097fad206f8c8127e745a5670e45ab71b30a28fba0c10cd3c6ca",
+  "canonicalBodySHA256": "cd6309daa96792abb036821d761927ca19f396a7ccea48da81f54fddb6a82f20"
+}

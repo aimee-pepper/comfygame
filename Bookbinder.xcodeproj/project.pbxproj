@@ -92,6 +92,10 @@
 		E30000000000000000000003 /* WritingDeskProductionPackTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E30000000000000000000004 /* WritingDeskProductionPackTests.swift */; };
 		E30000000000000000000005 /* WritingDeskProductionPack-v1 in Resources */ = {isa = PBXBuildFile; fileRef = E30000000000000000000006 /* WritingDeskProductionPack-v1 */; };
 		E30000000000000000000007 /* writing.parchment.handmade-v1-172x172.png in Resources */ = {isa = PBXBuildFile; fileRef = E30000000000000000000008 /* writing.parchment.handmade-v1-172x172.png */; };
+		E40000000000000000000001 /* TerrainProductionPack.swift in Sources */ = {isa = PBXBuildFile; fileRef = E40000000000000000000002 /* TerrainProductionPack.swift */; };
+		E40000000000000000000003 /* TerrainProductionPack-v1 in Resources */ = {isa = PBXBuildFile; fileRef = E40000000000000000000004 /* TerrainProductionPack-v1 */; };
+		E40000000000000000000005 /* TerrainProductionPackTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E40000000000000000000006 /* TerrainProductionPackTests.swift */; };
+		E40000000000000000000007 /* TerrainSouthWallPack-v1 in Resources */ = {isa = PBXBuildFile; fileRef = E40000000000000000000008 /* TerrainSouthWallPack-v1 */; };
 		2AAA4E398F09BD29BAD7816B /* stations.json in Resources */ = {isa = PBXBuildFile; fileRef = 59F1E2A3A08364F9452A684F /* stations.json */; };
 		2C0118338DCCD9231D0DE4D0 /* GambitEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1EEBBF5F9C846FD07202D739 /* GambitEditorView.swift */; };
 		2EB9403AD8A6CC32F54FBFA1 /* upgrades.json in Resources */ = {isa = PBXBuildFile; fileRef = 84E44EC84F5C25D11A62DAC1 /* upgrades.json */; };
@@ -398,6 +402,10 @@
 		E30000000000000000000004 /* WritingDeskProductionPackTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WritingDeskProductionPackTests.swift; sourceTree = "<group>"; };
 		E30000000000000000000006 /* WritingDeskProductionPack-v1 */ = {isa = PBXFileReference; lastKnownFileType = folder; name = "WritingDeskProductionPack-v1"; path = "AssetLab/integration/writing-desk-production-pack-v1/runtime"; sourceTree = SOURCE_ROOT; };
 		E30000000000000000000008 /* writing.parchment.handmade-v1-172x172.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "AssetLab/artifacts/writing-parchment-v1/runtime/writing.parchment.handmade-v1-172x172.png"; sourceTree = SOURCE_ROOT; };
+		E40000000000000000000002 /* TerrainProductionPack.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TerrainProductionPack.swift; sourceTree = "<group>"; };
+		E40000000000000000000004 /* TerrainProductionPack-v1 */ = {isa = PBXFileReference; lastKnownFileType = folder; path = "RuntimePacks/TerrainProductionPack-v1"; sourceTree = SOURCE_ROOT; };
+		E40000000000000000000006 /* TerrainProductionPackTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TerrainProductionPackTests.swift; sourceTree = "<group>"; };
+		E40000000000000000000008 /* TerrainSouthWallPack-v1 */ = {isa = PBXFileReference; lastKnownFileType = folder; path = "RuntimePacks/TerrainSouthWallPack-v1"; sourceTree = SOURCE_ROOT; };
 		3B6F502E8B3B230294A2874A /* PartyRosterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PartyRosterView.swift; sourceTree = "<group>"; };
 		3CD59EA0991C7AFB32B3129C /* BookbinderTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = BookbinderTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		3F7B97CCB3D7660ADA8ED9E5 /* MapAssetRenderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapAssetRenderer.swift; sourceTree = "<group>"; };
@@ -979,6 +987,7 @@
 				B10000000000000000000005 /* NamedCharacterVisualAdapterTests.swift */,
 				8C75616CB8F2F405724D0AEF /* NativeVisualPackTests.swift */,
 				E30000000000000000000004 /* WritingDeskProductionPackTests.swift */,
+				E40000000000000000000006 /* TerrainProductionPackTests.swift */,
 				A75C6362A89F917EE2B2113D /* NollRecyclerPromotionTests.swift */,
 				8DED817BCBD65429BDCD60C9 /* OpeningEconomyContentTests.swift */,
 				FF7811775C7058B692E07EB1 /* PageTests.swift */,
@@ -1025,6 +1034,7 @@
 				B10000000000000000000002 /* NamedCharacterPlaceholderPack.swift */,
 				3B52219A7EE3D04B75EED3BE /* NativeVisualPack.swift */,
 				E30000000000000000000002 /* WritingDeskProductionPack.swift */,
+				E40000000000000000000002 /* TerrainProductionPack.swift */,
 				L20000000000000000000001 /* ResourceSpriteV1Registry.generated.swift */,
 				M20000000000000000000001 /* MobGearSpriteV1Registry.generated.swift */,
 				C60000000000000000000001 /* TownBuildingVisualRegistry.generated.swift */,
@@ -1138,6 +1148,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				E30000000000000000000005 /* WritingDeskProductionPack-v1 in Resources */,
+				E40000000000000000000003 /* TerrainProductionPack-v1 in Resources */,
+				E40000000000000000000007 /* TerrainSouthWallPack-v1 in Resources */,
 				E30000000000000000000007 /* writing.parchment.handmade-v1-172x172.png in Resources */,
 				N10000000000000000000001 /* Jersey10-Regular.ttf in Resources */,
 				N10000000000000000000002 /* Tiny5-Regular.ttf in Resources */,
@@ -1252,6 +1264,7 @@
 				2977BFA154F4613F7B75EF67 /* BlacksmithView.swift in Sources */,
 				776E19C048AB14D539E2ABC3 /* BookProjection.swift in Sources */,
 				A15A5A001A5A5A001A5A5A00 /* WritingDeskReviewModel.swift in Sources */,
+				E40000000000000000000001 /* TerrainProductionPack.swift in Sources */,
 				15B201231C024A3C01DBA20A /* BookRules.swift in Sources */,
 				890774F4FCDF3A9DAE6BEFDD /* BookbinderApp.swift in Sources */,
 				C9ED9DB51CD49A2457B00B7D /* ButcheryRules.swift in Sources */,
@@ -1459,6 +1472,7 @@
 				A10000000000000000000005 /* NamedCharacterVisualAdapterTests.swift in Sources */,
 				E6107723C514EDCB13CD6C2B /* NativeVisualPackTests.swift in Sources */,
 				E30000000000000000000003 /* WritingDeskProductionPackTests.swift in Sources */,
+				E40000000000000000000005 /* TerrainProductionPackTests.swift in Sources */,
 				CA885FA438BFA001D5494194 /* NollRecyclerPromotionTests.swift in Sources */,
 				54E8A6FB039D4B6F7FF4AA92 /* OpeningEconomyContentTests.swift in Sources */,
 				AC3C0F06CB2BD3D9A9917BA1 /* PageTests.swift in Sources */,

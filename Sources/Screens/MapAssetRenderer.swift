@@ -1,17 +1,14 @@
 import SwiftUI
 import UIKit
 
-/// Native, deterministic adapter for AssetLab's frozen lifted-terrain conformance pack.
-/// The game supplies facts; this layer turns them into bottom-anchored 16×19 pixel sprites while
-/// the map retains its logical 16×16 footprint.
+/// Native adapter contract for the accepted TerrainProductionPack-v1.
+/// Gameplay owns facts. The pack owns the reviewed 16×16 semantic terrain layers.
 enum MapAssetContract {
-    static let manifestSHA256 = "dda2412e6c9253087b7dadc80d4626df637a820631f2d0a5cc26aaacccc63c7a"
+    static let manifestSHA256 = TerrainProductionPack.manifestSHA256
     static let seedVersion = "bookbinder-terrain-seed-v1"
-    static let animationVersion = "terrain-animation-v1"
-    /// Placement variation was frozen with map-slice v1.1. The lifted compositor changes pixels,
-    /// not the persisted world's neutral feature choice.
+    static let animationVersion = "terrain-layers-v2"
     static let seedTuple = "1|1|1|1|world-grade-1.0.0|map-slice-1.1.0|rect-compositor-0.2.0|top-down-map-16px-1.0.0"
-    static let rendererTuple = "1|lifted-terrain-adapter-1.0.0|terrain-lifted-1.0.0|world-grade-1.0.0|terrain-16x19-bottom-anchored-1.0.0"
+    static let rendererTuple = "terrain-production-pack-v1|terrain-layers-v2|native-1"
     static let spriteWidth = 16
     static let spriteHeight = 19
     static let logicalSide = 16
@@ -26,13 +23,51 @@ enum MapAssetContract {
 
     static func southExposure(center: Tile, south: Tile?) -> Int {
         guard let south, south.isRevealed else { return 0 }
-        return max(0, resolvedElevation(for: center) - resolvedElevation(for: south))
+        return min(3, max(0, resolvedElevation(for: center) - resolvedElevation(for: south)))
     }
 
     static func terrainSeed(mapSeed: UInt64, point: GridPoint) -> UInt32 {
         let input = "\(seedVersion)|\(mapSeed)|\(point.x)|\(point.y)|\(seedTuple)"
         return input.utf8.reduce(UInt32(0x811c9dc5)) { hash, byte in
             (hash ^ UInt32(byte)) &* 0x01000193
+        }
+    }
+
+    static func edgeContourID(mapSeed: UInt64, point: GridPoint,
+                              direction: TerrainProductionPack.Direction) -> Int {
+        let other: GridPoint = switch direction {
+        case .north: .init(x: point.x, y: point.y - 1)
+        case .east: .init(x: point.x + 1, y: point.y)
+        case .south: .init(x: point.x, y: point.y + 1)
+        case .west: .init(x: point.x - 1, y: point.y)
+        }
+        let first: GridPoint
+        let second: GridPoint
+        if point.y < other.y || (point.y == other.y && point.x <= other.x) {
+            first = point; second = other
+        } else {
+            first = other; second = point
+        }
+        let input = "terrain-edge-v2|\(mapSeed)|\(first.x)|\(first.y)|\(second.x)|\(second.y)"
+        let hash = input.utf8.reduce(UInt32(0x811c9dc5)) {
+            ($0 ^ UInt32($1)) &* 0x01000193
+        }
+        return Int(hash & 3)
+    }
+
+    static func phaseOffset(mapSeed: UInt64, point: GridPoint) -> Int {
+        let input = "terrain-motion-v2|\(mapSeed)|\(point.x)|\(point.y)"
+        let hash = input.utf8.reduce(UInt32(0x811c9dc5)) {
+            ($0 ^ UInt32($1)) &* 0x01000193
+        }
+        return Int(hash % 24)
+    }
+
+    static func motionBand(_ motion: Int) -> TerrainProductionPack.MotionBand {
+        switch min(100, max(0, motion)) {
+        case ...40: .calm
+        case ...65: .moving
+        default: .strong
         }
     }
 }
@@ -72,63 +107,157 @@ struct MapTileArtRequest {
     let point: GridPoint
     let mapSeed: UInt64
     let runIndex: Int
-    let adjacency: Int
-    let southExposureLevels: Int
-    let grade: WorldGrade
+    let cardinalNeighbors: TerrainProductionPack.Cardinal<TerrainProductionPack.Neighbor>
+    let edgeContourIDs: TerrainProductionPack.Cardinal<Int>
+    let contactShadeDepths: TerrainProductionPack.Cardinal<Int>
+    /// Authored wall depth derived only from a disclosed south neighbour. Hidden/equal/out-of-map
+    /// exposure remains zero and never reaches the wall pack.
+    let southWallDepth: Int
+    let wallWestContinuation: Bool
+    let wallEastContinuation: Bool
+    let visibility: TerrainProductionPack.Visibility
+    let surfaceDeposits: TerrainProductionPack.SurfaceDeposits
     let flora: Flora?
     let worldGrade2Descriptor: WorldGrade2V1.Descriptor?
-    /// Already-resolved atmospheric motion. Visual-only: it never advances world RNG or changes
-    /// movement, sight, encounters, or persistence.
     let atmosphereMotion: Int
+    let presentationTick: Int
     let explicitSeed: UInt32?
     let explicitFeatureVariant: Int?
 
-    init(tile: Tile, point: GridPoint, mapSeed: UInt64, runIndex: Int = 0, adjacency: Int,
-         southExposureLevels: Int = 0, grade: WorldGrade,
+    init(tile: Tile, point: GridPoint, mapSeed: UInt64, runIndex: Int = 0,
+         cardinalNeighbors: TerrainProductionPack.Cardinal<TerrainProductionPack.Neighbor>,
+         edgeContourIDs: TerrainProductionPack.Cardinal<Int>,
+         contactShadeDepths: TerrainProductionPack.Cardinal<Int>,
+         southWallDepth: Int = 0,
+         wallWestContinuation: Bool = false,
+         wallEastContinuation: Bool = false,
+         visibility: TerrainProductionPack.Visibility,
+         surfaceDeposits: TerrainProductionPack.SurfaceDeposits = .none,
+         grade: WorldGrade = .neutral,
          flora: Flora?, worldGrade2Descriptor: WorldGrade2V1.Descriptor? = nil,
-         atmosphereMotion: Int = 0,
-         explicitSeed: UInt32? = nil) {
-        self.tile = tile; self.point = point; self.mapSeed = mapSeed; self.runIndex = runIndex; self.adjacency = adjacency
-        self.southExposureLevels = southExposureLevels
-        self.grade = grade; self.flora = flora
+         atmosphereMotion: Int = 0, presentationTick: Int = 0,
+         explicitSeed: UInt32? = nil, explicitFeatureVariant: Int? = nil) {
+        self.tile = tile; self.point = point; self.mapSeed = mapSeed; self.runIndex = runIndex
+        self.cardinalNeighbors = cardinalNeighbors; self.edgeContourIDs = edgeContourIDs
+        self.contactShadeDepths = contactShadeDepths; self.visibility = visibility
+        self.southWallDepth = min(3, max(0, southWallDepth))
+        self.wallWestContinuation = wallWestContinuation
+        self.wallEastContinuation = wallEastContinuation
+        self.surfaceDeposits = surfaceDeposits; self.grade = grade; self.flora = flora
         self.worldGrade2Descriptor = worldGrade2Descriptor
         self.atmosphereMotion = min(100, max(0, atmosphereMotion))
-        self.explicitSeed = explicitSeed
-        self.explicitFeatureVariant = nil
+        self.presentationTick = max(0, presentationTick) % 24
+        self.explicitSeed = explicitSeed; self.explicitFeatureVariant = explicitFeatureVariant
     }
 
-    init(tile: Tile, point: GridPoint, mapSeed: UInt64, runIndex: Int = 0, adjacency: Int,
-         southExposureLevels: Int = 0, grade: WorldGrade,
+    /// Compatibility initializer for the pre-pack renderer and its frozen regression fixtures.
+    /// Runtime v2 requests use the typed cardinal initializer above.
+    init(tile: Tile, point: GridPoint, mapSeed: UInt64, runIndex: Int = 0,
+         adjacency: Int, southExposureLevels: Int = 0, grade: WorldGrade,
          flora: Flora?, worldGrade2Descriptor: WorldGrade2V1.Descriptor? = nil,
-         atmosphereMotion: Int = 0,
-         explicitSeed: UInt32, explicitFeatureVariant: Int) {
-        self.tile=tile; self.point=point; self.mapSeed=mapSeed; self.runIndex=runIndex; self.adjacency=adjacency
-        self.southExposureLevels=southExposureLevels
-        self.grade=grade; self.flora=flora; self.worldGrade2Descriptor=worldGrade2Descriptor
-        self.atmosphereMotion=min(100, max(0, atmosphereMotion))
-        self.explicitSeed=explicitSeed
-        self.explicitFeatureVariant=explicitFeatureVariant
+         atmosphereMotion: Int = 0, explicitSeed: UInt32? = nil,
+         explicitFeatureVariant: Int? = nil) {
+        func neighbor(_ bit: Int) -> TerrainProductionPack.Neighbor {
+            adjacency & bit == 0 ? .unknown : .same
+        }
+        self.init(
+            tile: tile, point: point, mapSeed: mapSeed, runIndex: runIndex,
+            cardinalNeighbors: .init(north: neighbor(1), east: neighbor(2),
+                                     south: neighbor(4), west: neighbor(8)),
+            edgeContourIDs: .init(north: 0, east: 1, south: 2, west: 3),
+            contactShadeDepths: .init(north: 0, east: 0, south: 0, west: 0),
+            southWallDepth: southExposureLevels, visibility: .full, grade: grade,
+            flora: flora, worldGrade2Descriptor: worldGrade2Descriptor,
+            atmosphereMotion: atmosphereMotion, explicitSeed: explicitSeed,
+            explicitFeatureVariant: explicitFeatureVariant)
     }
 
     var seed: UInt32 { explicitSeed ?? MapAssetContract.terrainSeed(mapSeed: mapSeed, point: point) }
     var featureVariant: Int { explicitFeatureVariant ?? Int(seed & 3) }
     var resolvedElevation: Int { MapAssetContract.resolvedElevation(for: tile) }
     var surfaceOffsetY: Int { MapAssetContract.maximumElevation - resolvedElevation }
+    var adjacency: Int {
+        let directions: [(TerrainProductionPack.Direction, Int)] = [
+            (.north, 1), (.east, 2), (.south, 4), (.west, 8),
+        ]
+        return directions.reduce(0) { value, pair in
+            value | (cardinalNeighbors[pair.0] == .same ? pair.1 : 0)
+        }
+    }
+    var southExposureLevels: Int { southWallDepth }
+    fileprivate let grade: WorldGrade
+
+    func terrainRequest(reduceMotion: Bool) throws -> TerrainProductionPack.Request {
+        guard tile.isRevealed, let descriptor = worldGrade2Descriptor else {
+            throw TerrainProductionPack.PackError.invalidRequest
+        }
+        return try TerrainProductionPack.Request(
+            ground: .init(tile.ground), point: point, visualSeed: UInt64(seed),
+            worldGradeDescriptorHash: descriptor.canonicalDescriptorSHA256,
+            featureVariant: featureVariant, cardinalNeighbors: cardinalNeighbors,
+            edgeContourIDs: edgeContourIDs, elevation: resolvedElevation,
+            isCrumbled: tile.isCrumbled, isCracking: tile.isCracking, visibility: visibility,
+            motionBand: MapAssetContract.motionBand(atmosphereMotion),
+            phaseOffset: MapAssetContract.phaseOffset(mapSeed: mapSeed, point: point),
+            presentationTick: presentationTick, reduceMotion: reduceMotion,
+            surfaceDeposits: surfaceDeposits)
+    }
 }
 
 @MainActor enum MapAssetTestSupport {
+    private static let fixtureHash = "659e59c58822d20b5ddb7ed6303d15746d666444692bcc52ab21c37e200a5c09"
+    private static let pack: TerrainProductionPack = {
+        let source = URL(fileURLWithPath: #filePath).deletingLastPathComponent()
+            .deletingLastPathComponent().deletingLastPathComponent()
+        return TerrainProductionPack(rootURL: source.appendingPathComponent(
+            "AssetLab/integration/terrain-production-pack-v1/runtime", isDirectory: true))
+    }()
+
+    static func productionPack() -> TerrainProductionPack { pack }
+
+    static func productionRequest(
+        ground: GroundType, point: GridPoint = .init(x: 0, y: 0), visualSeed: UInt64 = 404,
+        descriptorHash: String = fixtureHash, featureVariant: Int = 0,
+        cardinalNeighbors: TerrainProductionPack.Cardinal<TerrainProductionPack.Neighbor>? = nil,
+        edgeContourIDs: TerrainProductionPack.Cardinal<Int> = .init(
+            north: 0, east: 1, south: 2, west: 3), elevation: Int = 0,
+        crumbled: Bool = false, cracking: Bool = false,
+        visibility: TerrainProductionPack.Visibility = .full,
+        motionBand: TerrainProductionPack.MotionBand = .calm,
+        phaseOffset: Int = 0, presentationTick: Int = 0, reduceMotion: Bool = false,
+        snow: Bool = false, settledAsh: Bool = false
+    ) throws -> TerrainProductionPack.Request {
+        try TerrainProductionPack.Request(
+            ground: .init(ground), point: point, visualSeed: visualSeed,
+            worldGradeDescriptorHash: descriptorHash, featureVariant: featureVariant,
+            cardinalNeighbors: cardinalNeighbors ?? .init(
+                north: .same, east: .same, south: .same, west: .same),
+            edgeContourIDs: edgeContourIDs, elevation: elevation,
+            isCrumbled: crumbled, isCracking: cracking, visibility: visibility,
+            motionBand: motionBand, phaseOffset: phaseOffset,
+            presentationTick: presentationTick, reduceMotion: reduceMotion,
+            surfaceDeposits: .init(snow: snow, settledAsh: settledAsh))
+    }
+
+    static func productionPixels(_ request: TerrainProductionPack.Request,
+                                 descriptor: WorldGrade2V1.Descriptor? = nil) throws -> [UInt8] {
+        try pack.rgba(for: request, descriptor: descriptor)
+    }
+
     static func terrainPixels(ground: GroundType, adjacency: Int = 15, featureVariant: Int = 0,
                               grade: WorldGrade = WorldGrade(red: 0, green: 0, blue: 0, value: 0),
                               elevation: Int = 0, crumbled: Bool = false,
                               cracking: Bool = false, revealed: Bool = true,
                               southExposureLevels: Int = 0,
                               seed: UInt32 = 404) -> [UInt8] {
-        var tile = Tile(ground: ground, elevation: elevation, isRevealed: revealed, isCrumbled: crumbled)
+        var tile = Tile(ground: ground, elevation: elevation, isRevealed: revealed,
+                        isCrumbled: crumbled)
         tile.isCracking = cracking
-        let request = MapTileArtRequest(tile: tile, point: GridPoint(x: 0, y: 0), mapSeed: 0,
-                                        adjacency: adjacency, southExposureLevels: southExposureLevels,
-                                        grade: grade, flora: nil,
-                                        explicitSeed: seed, explicitFeatureVariant: featureVariant)
+        let request = MapTileArtRequest(
+            tile: tile, point: GridPoint(x: 0, y: 0), mapSeed: 0,
+            adjacency: adjacency, southExposureLevels: southExposureLevels,
+            grade: grade, flora: nil, explicitSeed: seed,
+            explicitFeatureVariant: featureVariant)
         return MapPixelRaster.rawPixels(commands: TerrainPixelGrammar.commands(for: request),
                                         width: MapAssetContract.spriteWidth,
                                         height: MapAssetContract.spriteHeight)
@@ -138,18 +267,14 @@ struct MapTileArtRequest {
                                       elevation: Int = 0,
                                       southExposureLevels: Int = 0,
                                       seed: UInt32 = 404) throws -> [UInt8] {
-        let tile = Tile(ground: ground, elevation: elevation)
+        let tile = Tile(ground: ground, elevation: elevation, isRevealed: true)
         let request = MapTileArtRequest(
             tile: tile, point: GridPoint(x: 0, y: 0), mapSeed: 0,
             adjacency: adjacency, southExposureLevels: southExposureLevels,
-            grade: WorldGrade(red: 0, green: 0, blue: 0, value: 0), flora: nil,
-            explicitSeed: seed, explicitFeatureVariant: 0
-        )
+            grade: .neutral, flora: nil, explicitSeed: seed, explicitFeatureVariant: 0)
         return MapPixelRaster.rawPixels(
-            commands: try MapPixelRaster.terrainCommands(for: request),
-            width: MapAssetContract.spriteWidth,
-            height: MapAssetContract.spriteHeight
-        )
+            commands: try MapPixelRaster.legacyTerrainCommandsForTests(request),
+            width: MapAssetContract.spriteWidth, height: MapAssetContract.spriteHeight)
     }
 
     static func floraPixels(_ flora: Flora) -> [UInt8] {
@@ -167,14 +292,13 @@ struct MapTileArtRequest {
     static func gradedTerrainPixels(ground: GroundType, descriptor: WorldGrade2V1.Descriptor,
                                     adjacency: Int = 15, featureVariant: Int = 0,
                                     revealed: Bool = true) throws -> [UInt8] {
-        let tile = Tile(ground: ground, isRevealed: revealed)
-        let request = MapTileArtRequest(tile: tile, point: GridPoint(x: 0, y: 0), mapSeed: 0,
-                                        adjacency: adjacency, grade: .neutral, flora: nil,
-                                        worldGrade2Descriptor: descriptor, explicitSeed: 404,
-                                        explicitFeatureVariant: featureVariant)
-        return MapPixelRaster.rawPixels(commands: try MapPixelRaster.terrainCommands(for: request),
-                                        width: MapAssetContract.spriteWidth,
-                                        height: MapAssetContract.spriteHeight)
+        guard revealed else { return [UInt8](repeating: 0, count: 16 * 19 * 4) }
+        let request = try productionRequest(
+            ground: ground, visualSeed: 404,
+            descriptorHash: descriptor.canonicalDescriptorSHA256,
+            featureVariant: featureVariant, cardinalNeighbors: legacyNeighbors(adjacency))
+        let rgba = try pack.rgba(for: request, descriptor: descriptor)
+        return liftedPixels(rgba, elevation: 0, wallDepth: 0)
     }
 
     static func gradedFloraPixels(_ flora: Flora,
@@ -191,15 +315,21 @@ struct MapTileArtRequest {
         -> (composed: [UInt8], resourceOverlay: [UInt8]) {
         var tile = Tile(ground: .stone, isRevealed: true)
         tile.content = .wildDrop(resource: id, amount: 1)
-        let request = MapTileArtRequest(tile: tile, point: GridPoint(x: 0, y: 0), mapSeed: 0,
-                                        adjacency: 15, grade: .neutral, flora: nil,
-                                        worldGrade2Descriptor: descriptor, explicitSeed: 404,
-                                        explicitFeatureVariant: 0)
+        let request = try productionRequest(
+            ground: .stone, descriptorHash: descriptor.canonicalDescriptorSHA256)
         let resource = ResourceSpriteV1PixelGrammar.commands(for: id, profile: .map).map {
-            PixelCommand(x: $0.x, y: $0.y + request.surfaceOffsetY,
+            PixelCommand(x: $0.x, y: $0.y + MapAssetContract.maximumElevation,
                          width: $0.width, height: $0.height, color: $0.color)
         }
-        let terrain = try MapPixelRaster.terrainCommands(for: request)
+        var terrainRGBA = try pack.rgba(for: request, descriptor: descriptor)
+        MapPixelRaster.applyExternalTerrainTruth(
+            tileGround: tile.ground, isCrumbled: false, isCracking: false,
+            contactShadeDepths: .init(north: 0, east: 0, south: 0, west: 0),
+            to: &terrainRGBA)
+        let terrain = MapPixelRaster.pixelCommands(terrainRGBA).map {
+            PixelCommand(x: $0.x, y: $0.y + MapAssetContract.maximumElevation,
+                         width: $0.width, height: $0.height, color: $0.color)
+        }
         return (MapPixelRaster.rawPixels(commands: terrain + resource,
                                          width: MapAssetContract.spriteWidth,
                                          height: MapAssetContract.spriteHeight),
@@ -247,26 +377,58 @@ struct MapTileArtRequest {
     static func animatedTerrainPixels(ground: GroundType, tick: Int, mapSeed: UInt64 = 71,
                                       point: GridPoint = .init(x: 3, y: 4),
                                       atmosphereMotion: Int = 0) -> [UInt8] {
-        let tile = Tile(ground: ground, isRevealed: true)
-        let request = MapTileArtRequest(
-            tile: tile, point: point, mapSeed: mapSeed, adjacency: 15,
-            grade: .neutral, flora: nil, atmosphereMotion: atmosphereMotion,
-            explicitSeed: MapAssetContract.terrainSeed(mapSeed: mapSeed, point: point),
-            explicitFeatureVariant: 0)
-        let frame = TerrainAnimationGrammar.frame(for: request, tick: tick)
-        return MapPixelRaster.rawPixels(commands: TerrainPixelGrammar.commands(
-            for: request, animationFrame: frame),
-            width: MapAssetContract.spriteWidth, height: MapAssetContract.spriteHeight)
+        let request = try! productionRequest(
+            ground: ground, point: point,
+            visualSeed: UInt64(MapAssetContract.terrainSeed(mapSeed: mapSeed, point: point)),
+            featureVariant: 0, motionBand: MapAssetContract.motionBand(atmosphereMotion),
+            phaseOffset: MapAssetContract.phaseOffset(mapSeed: mapSeed, point: point),
+            presentationTick: tick)
+        return try! pack.rgba(for: request)
     }
 
     static func terrainAnimationFrame(ground: GroundType, tick: Int, mapSeed: UInt64 = 71,
                                       point: GridPoint = .init(x: 3, y: 4),
                                       atmosphereMotion: Int = 0) -> Int? {
-        let request = MapTileArtRequest(
-            tile: Tile(ground: ground, isRevealed: true), point: point, mapSeed: mapSeed,
-            adjacency: 15, grade: .neutral, flora: nil,
-            atmosphereMotion: atmosphereMotion)
-        return TerrainAnimationGrammar.frame(for: request, tick: tick)
+        let packGround = TerrainProductionPack.Ground(ground)
+        guard [.water, .deepWater, .groundcover, .growth].contains(packGround),
+              !(packGround == .groundcover || packGround == .growth)
+                || atmosphereMotion > 40 else { return nil }
+        let step: Int
+        switch (packGround, MapAssetContract.motionBand(atmosphereMotion)) {
+        case (.water, .calm): step = 4
+        case (.water, .moving): step = 2
+        case (.water, .strong): step = 1
+        case (.deepWater, .calm): step = 6
+        case (.deepWater, .moving): step = 3
+        case (.deepWater, .strong): step = 2
+        case (.groundcover, .moving), (.growth, .moving): step = 4
+        case (.groundcover, .strong), (.growth, .strong): step = 2
+        default: return nil
+        }
+        return (MapAssetContract.phaseOffset(mapSeed: mapSeed, point: point)
+                + (tick % 24) / step) % 4
+    }
+
+    private static func legacyNeighbors(_ adjacency: Int)
+        -> TerrainProductionPack.Cardinal<TerrainProductionPack.Neighbor> {
+        .init(north: adjacency & 1 == 0 ? .unknown : .same,
+              east: adjacency & 2 == 0 ? .unknown : .same,
+              south: adjacency & 4 == 0 ? .unknown : .same,
+              west: adjacency & 8 == 0 ? .unknown : .same)
+    }
+
+    private static func liftedPixels(_ rgba: [UInt8], elevation: Int,
+                                     wallDepth: Int) -> [UInt8] {
+        let offset = MapAssetContract.maximumElevation - min(3, max(0, elevation))
+        let top = MapPixelRaster.pixelCommands(rgba).map {
+            PixelCommand(x: $0.x, y: $0.y + offset,
+                         width: $0.width, height: $0.height, color: $0.color)
+        }
+        let wall = MapPixelRaster.externalSouthWallCommands(
+            topSurfaceRGBA: rgba, surfaceOffsetY: offset, depth: wallDepth)
+        return MapPixelRaster.rawPixels(commands: top + wall,
+                                        width: MapAssetContract.spriteWidth,
+                                        height: MapAssetContract.spriteHeight)
     }
 }
 
@@ -315,18 +477,10 @@ struct MapTileArt: View {
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     var body: some View {
-        if request.resourceID == nil && !TerrainAnimationGrammar.isAnimated(request) {
-            image(tick: 0)
-        } else {
-            TimelineView(.periodic(from: .now, by: 0.36)) { context in
-                image(tick: Int(context.date.timeIntervalSinceReferenceDate / 0.36))
-            }
-        }
-    }
-
-    @ViewBuilder private func image(tick: Int) -> some View {
-        if let image = MapPixelRaster.image(for: request, tick: tick, reduceMotion: reduceMotion) {
+        if let image = MapPixelRaster.image(for: request, reduceMotion: reduceMotion) {
             Image(uiImage: image).resizable().interpolation(.none).accessibilityHidden(true)
+        } else {
+            Color.black.accessibilityHidden(true)
         }
     }
 }
@@ -774,7 +928,7 @@ struct RGBA: Equatable {
         self.red = red; self.green = green; self.blue = blue; self.alpha = alpha
     }
 
-    fileprivate init(hex: String) throws {
+    init(hex: String) throws {
         guard hex.range(of: "^#[0-9a-fA-F]{6}$", options: .regularExpression) != nil else {
             throw WorldGrade2V1.ContractError.invalidHexColor
         }
@@ -791,6 +945,14 @@ struct RGBA: Equatable {
 
 @MainActor private enum MapPixelRaster {
     static let cache = NSCache<NSString, UIImage>()
+    static let terrainPack: TerrainProductionPack? = {
+        guard let pack = try? TerrainProductionPack.bundled() else { return nil }
+        do { try pack.open(); return pack } catch { return nil }
+    }()
+    static let southWallPack: TerrainSouthWallPack? = {
+        guard let pack = try? TerrainSouthWallPack.bundled() else { return nil }
+        do { try pack.open(); return pack } catch { return nil }
+    }()
 
     static func resourceIdentityImage(for id: ResourceID,
                                       profile: ResourceSpriteV1Profile = .inventory) -> UIImage? {
@@ -808,27 +970,35 @@ struct RGBA: Equatable {
         return image
     }
 
-    static func image(for request: MapTileArtRequest, tick: Int = 0, reduceMotion: Bool = false) -> UIImage? {
+    static func image(for request: MapTileArtRequest, reduceMotion: Bool = false) -> UIImage? {
         let descriptor = request.flora.map(FloraRenderDescriptor.init)
         let floraKey = descriptor.map(stableFloraKey) ?? "none"
-        let grade2Key = request.worldGrade2Descriptor.flatMap {
-            try? WorldGrade2V1.validatedCacheIdentity($0)
-        } ?? "legacy-v1"
-        let gradeKey = request.worldGrade2Descriptor == nil
-            ? "\(request.grade.red),\(request.grade.green),\(request.grade.blue),\(request.grade.value)"
-            : "v2"
+        guard let grade2 = request.worldGrade2Descriptor,
+              let grade2Key = try? WorldGrade2V1.validatedCacheIdentity(grade2) else { return nil }
         let phase = request.resourceID.map { _ in
             ResourcePixelGrammar.phase(mapSeed: request.mapSeed, runIndex: request.runIndex, point: request.point)
         }
-        let sheenFrame = reduceMotion ? phase.map { _ in 0 } : phase.flatMap { ResourcePixelGrammar.frame(phase: $0, tick: tick) }
-        let terrainFrame = reduceMotion ? nil : TerrainAnimationGrammar.frame(for: request, tick: tick)
+        let sheenFrame = reduceMotion ? nil : phase.flatMap {
+            ResourcePixelGrammar.frame(phase: $0, tick: request.presentationTick)
+        }
         let resourceKey = request.resourceID.map {
             "\(ResourceSpriteV1Registry.packID)-\($0.rawValue)-\(sheenFrame.map(String.init) ?? "rest")"
         } ?? "none"
-        let terrainFrameKey = terrainFrame.map(String.init) ?? "rest"
-        let key = "\(MapAssetContract.rendererTuple)-\(MapAssetContract.animationVersion)-\(grade2Key)-\(request.seed)-\(request.tile.ground.rawValue)-\(request.adjacency)-\(request.southExposureLevels)-\(request.tile.isRevealed)-\(request.tile.isCrumbled)-\(request.tile.isCracking)-\(request.tile.elevation)-\(gradeKey)-\(floraKey)-\(resourceKey)-terrain-\(terrainFrameKey)" as NSString
+        let neighbors = TerrainProductionPack.Direction.allCases.map {
+            request.cardinalNeighbors[$0].rawValue
+        }.joined(separator: ",")
+        let contours = TerrainProductionPack.Direction.allCases.map {
+            String(request.edgeContourIDs[$0])
+        }.joined(separator: ",")
+        let shades = TerrainProductionPack.Direction.allCases.map {
+            String(request.contactShadeDepths[$0])
+        }.joined(separator: ",")
+        let motionTick = reduceMotion || request.visibility != .full ? 0 : request.presentationTick
+        let key = "\(MapAssetContract.rendererTuple)-\(grade2Key)-\(request.seed)-\(request.point.x),\(request.point.y)-\(request.tile.ground.rawValue)-\(neighbors)-\(contours)-\(shades)-wall-\(request.southWallDepth)-\(request.wallWestContinuation)-\(request.wallEastContinuation)-\(request.visibility.rawValue)-\(request.tile.isRevealed)-\(request.tile.isCrumbled)-\(request.tile.isCracking)-\(request.tile.elevation)-\(request.surfaceDeposits.snow)-\(request.surfaceDeposits.settledAsh)-\(request.atmosphereMotion)-\(motionTick)-\(reduceMotion)-\(floraKey)-\(resourceKey)" as NSString
         if let cached = cache.object(forKey: key) { return cached }
-        guard var commands = try? terrainCommands(for: request, animationFrame: terrainFrame) else { return nil }
+        guard var commands = try? terrainCommands(for: request, reduceMotion: reduceMotion) else {
+            return nil
+        }
         if request.tile.isRevealed, !request.tile.isCrumbled, let descriptor {
             guard let floraCommands = try? floraCommands(
                 descriptor, descriptor: request.worldGrade2Descriptor) else { return nil }
@@ -839,9 +1009,10 @@ struct RGBA: Equatable {
         }
         if request.tile.isRevealed, !request.tile.isCrumbled, let resource = request.resourceID {
             let body = ResourceSpriteV1PixelGrammar.commands(for: resource, profile: .map)
-            let shifted = body.map { PixelCommand(x: $0.x, y: $0.y + request.surfaceOffsetY,
-                                                   width: $0.width, height: $0.height, color: $0.color) }
-            commands += shifted
+            commands += body.map {
+                PixelCommand(x: $0.x, y: $0.y + request.surfaceOffsetY,
+                             width: $0.width, height: $0.height, color: $0.color)
+            }
             if let sheenFrame {
                 commands += ResourcePixelGrammar.sheenCommands(body: body, frame: sheenFrame).map {
                     PixelCommand(x: $0.x, y: $0.y + request.surfaceOffsetY,
@@ -856,8 +1027,41 @@ struct RGBA: Equatable {
     }
 
     fileprivate static func terrainCommands(for request: MapTileArtRequest,
-                                             animationFrame: Int? = nil) throws -> [PixelCommand] {
-        let commands = TerrainPixelGrammar.commands(for: request, animationFrame: animationFrame)
+                                             reduceMotion: Bool = false) throws -> [PixelCommand] {
+        guard let terrainPack, let descriptor = request.worldGrade2Descriptor else {
+            return try legacyTerrainCommands(for: request)
+        }
+        let rgbaFromPack: [UInt8]
+        do {
+            let packRequest = try request.terrainRequest(reduceMotion: reduceMotion)
+            rgbaFromPack = try terrainPack.rgba(for: packRequest, descriptor: descriptor)
+        } catch {
+            // The production pack is presentation, never gameplay authority. A missing or corrupt
+            // visual resource must retain the last functional terrain/wall renderer rather than
+            // turning known traversable tiles into black, invisible hit targets.
+            return try legacyTerrainCommands(for: request)
+        }
+        var rgba = rgbaFromPack
+        applyExternalTerrainTruth(
+            tileGround: request.tile.ground, isCrumbled: request.tile.isCrumbled,
+            isCracking: request.tile.isCracking,
+            contactShadeDepths: request.contactShadeDepths, to: &rgba)
+        let top = pixelCommands(rgba).map {
+            PixelCommand(x: $0.x, y: $0.y + request.surfaceOffsetY,
+                         width: $0.width, height: $0.height, color: $0.color)
+        }
+        return top + southWallCommands(for: request, descriptor: descriptor,
+                                       fallbackTopSurfaceRGBA: rgba)
+    }
+
+    fileprivate static func legacyTerrainCommandsForTests(_ request: MapTileArtRequest) throws
+        -> [PixelCommand] {
+        try legacyTerrainCommands(for: request)
+    }
+
+    private static func legacyTerrainCommands(for request: MapTileArtRequest) throws
+        -> [PixelCommand] {
+        let commands = TerrainPixelGrammar.commands(for: request)
         let recolored: [PixelCommand]
         if request.tile.isRevealed, let descriptor = request.worldGrade2Descriptor {
             try WorldGrade2V1.validateDescriptor(descriptor)
@@ -875,6 +1079,126 @@ struct RGBA: Equatable {
             shaded.color.blue = UInt8(Int(shaded.color.blue) * 3 / 4)
             return shaded
         }
+    }
+
+    fileprivate static func pixelCommands(_ rgba: [UInt8]) -> [PixelCommand] {
+        guard rgba.count == 16 * 16 * 4 else { return [] }
+        return (0..<(16 * 16)).map { index in
+            let offset = index * 4
+            return PixelCommand(x: index % 16, y: index / 16, width: 1, height: 1,
+                                color: RGBA(red: rgba[offset], green: rgba[offset + 1],
+                                            blue: rgba[offset + 2], alpha: rgba[offset + 3]))
+        }
+    }
+
+    private static func southWallCommands(
+        for request: MapTileArtRequest, descriptor: WorldGrade2V1.Descriptor,
+        fallbackTopSurfaceRGBA: [UInt8]
+    ) -> [PixelCommand] {
+        guard request.southWallDepth > 0 else { return [] }
+        if let southWallPack,
+           let ground = TerrainProductionPack.Ground(rawValue: request.tile.ground.rawValue),
+           let wallRequest = try? TerrainSouthWallPack.Request(
+                ground: ground, depth: request.southWallDepth,
+                westContinuation: request.wallWestContinuation,
+                eastContinuation: request.wallEastContinuation,
+                featureVariant: request.featureVariant),
+           let rgba = try? southWallPack.rgba(for: wallRequest, descriptor: descriptor) {
+            return pixelCommands(width: 16, height: 3, rgba: rgba).map {
+                PixelCommand(x: $0.x, y: $0.y + request.surfaceOffsetY + 16,
+                             width: $0.width, height: $0.height, color: $0.color)
+            }
+        }
+        // Preserve the proven functional cue if the authored companion pack is unavailable or
+        // corrupt. A visual pack failure may never downgrade real height to contact shade alone.
+        return externalSouthWallCommands(
+            topSurfaceRGBA: fallbackTopSurfaceRGBA, surfaceOffsetY: request.surfaceOffsetY,
+            depth: request.southWallDepth)
+    }
+
+    private static func pixelCommands(width: Int, height: Int, rgba: [UInt8]) -> [PixelCommand] {
+        guard rgba.count == width * height * 4 else { return [] }
+        return (0..<(width * height)).compactMap { index in
+            let offset = index * 4
+            guard rgba[offset + 3] > 0 else { return nil }
+            return PixelCommand(x: index % width, y: index / width, width: 1, height: 1,
+                                color: RGBA(red: rgba[offset], green: rgba[offset + 1],
+                                            blue: rgba[offset + 2], alpha: rgba[offset + 3]))
+        }
+    }
+
+    /// Functional fallback if the separately authored wall pack is absent or corrupt.
+    fileprivate static func externalSouthWallCommands(
+        topSurfaceRGBA: [UInt8], surfaceOffsetY: Int, depth: Int
+    ) -> [PixelCommand] {
+        guard topSurfaceRGBA.count == 16 * 16 * 4 else { return [] }
+        let boundedDepth = min(3, max(0, depth))
+        guard boundedDepth > 0 else { return [] }
+        var result: [PixelCommand] = []
+        for row in 0..<boundedDepth { for x in 0..<16 {
+            let source = (15 * 16 + x) * 4
+            let color = RGBA(
+                red: UInt8(Int(topSurfaceRGBA[source]) * 3 / 4),
+                green: UInt8(Int(topSurfaceRGBA[source + 1]) * 3 / 4),
+                blue: UInt8(Int(topSurfaceRGBA[source + 2]) * 3 / 4), alpha: 255)
+            result.append(PixelCommand(x: x, y: surfaceOffsetY + 16 + row,
+                                       width: 1, height: 1, color: color))
+        }}
+        return result
+    }
+
+    fileprivate static func applyExternalTerrainTruth(
+        tileGround: GroundType, isCrumbled: Bool, isCracking: Bool,
+        contactShadeDepths: TerrainProductionPack.Cardinal<Int>, to rgba: inout [UInt8]
+    ) {
+        guard rgba.count == 16 * 16 * 4 else { return }
+        if isCrumbled {
+            let accepted = rgba
+            for index in 0..<(16 * 16) { write(0x09, 0x09, 0x0c, at: index, to: &rgba) }
+            for y in 0..<2 { for x in 0..<4 { copy(index: y * 16 + x, from: accepted, to: &rgba) } }
+            for y in 14..<16 { for x in 12..<16 { copy(index: y * 16 + x, from: accepted, to: &rgba) } }
+        } else if isCracking {
+            let dark = line(7, 1, 9, 7, 0x171116) + line(9, 7, 5, 14, 0x171116)
+            let glow = line(8, 1, 10, 7, 0xf0a84e) + line(10, 7, 6, 14, 0xf0a84e)
+            for command in dark + glow {
+                for y in max(0, command.y)..<min(16, command.y + command.height) {
+                    for x in max(0, command.x)..<min(16, command.x + command.width) {
+                        let c = command.color
+                        write(c.red, c.green, c.blue, at: y * 16 + x, to: &rgba)
+                    }
+                }
+            }
+        }
+        for direction in TerrainProductionPack.Direction.allCases {
+            let depth = min(2, max(0, contactShadeDepths[direction]))
+            guard depth > 0 else { continue }
+            for y in 0..<16 { for x in 0..<16 {
+                let touches = switch direction {
+                case .north: y < depth
+                case .east: x >= 16 - depth
+                case .south: y >= 16 - depth
+                case .west: x < depth
+                }
+                guard touches else { continue }
+                let offset = (y * 16 + x) * 4
+                rgba[offset] = UInt8(Int(rgba[offset]) * 3 / 4)
+                rgba[offset + 1] = UInt8(Int(rgba[offset + 1]) * 3 / 4)
+                rgba[offset + 2] = UInt8(Int(rgba[offset + 2]) * 3 / 4)
+            }}
+        }
+    }
+
+    private static func write(_ red: UInt8, _ green: UInt8, _ blue: UInt8,
+                              at index: Int, to rgba: inout [UInt8]) {
+        let offset = index * 4
+        rgba[offset] = red; rgba[offset + 1] = green; rgba[offset + 2] = blue
+        rgba[offset + 3] = 255
+    }
+
+    private static func copy(index: Int, from source: [UInt8], to target: inout [UInt8]) {
+        let offset = index * 4
+        target[offset] = source[offset]; target[offset + 1] = source[offset + 1]
+        target[offset + 2] = source[offset + 2]; target[offset + 3] = source[offset + 3]
     }
 
     fileprivate static func floraCommands(_ flora: FloraRenderDescriptor,

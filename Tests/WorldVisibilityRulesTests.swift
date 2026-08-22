@@ -93,10 +93,12 @@ final class WorldVisibilityRulesTests: XCTestCase {
 
         XCTAssertEqual(before.adjacency, after.adjacency)
         XCTAssertEqual(before.southExposureLevels, after.southExposureLevels)
-        // East and south are hidden. Their exact terrain cannot affect visible art, but fog must
-        // suppress the renderer's exposed-edge strips rather than painting dark bars.
-        XCTAssertEqual(before.adjacency, 2 | 4)
-        XCTAssertEqual(before.southExposureLevels, 3)
+        // East and south are hidden. Their exact terrain and elevation cannot affect visible art.
+        XCTAssertEqual(before.cardinalNeighbors.east, .unknown)
+        XCTAssertEqual(before.cardinalNeighbors.south, .unknown)
+        XCTAssertEqual(before.southExposureLevels, 0)
+        XCTAssertFalse(before.wallWestContinuation)
+        XCTAssertFalse(before.wallEastContinuation)
     }
 
     func testVisibleNeighboursParticipateInOrdinaryBoundaryGrammar() throws {
@@ -131,6 +133,41 @@ final class WorldVisibilityRulesTests: XCTestCase {
 
         XCTAssertNotEqual(connected.adjacency, separated.adjacency)
         XCTAssertNotEqual(connected.southExposureLevels, separated.southExposureLevels)
+    }
+
+    func testSouthWallsExposeExactKnownDepthsAndContinuousJoins() throws {
+        let point = GridPoint(x: 2, y: 2)
+        let south = GridPoint(x: 2, y: 3)
+        var map = openMap(width: 5, height: 5, entry: point)
+        for x in 1...3 {
+            map[GridPoint(x: x, y: 2)].ground = .stone
+            map[GridPoint(x: x, y: 2)].elevation = 3
+            map[GridPoint(x: x, y: 3)].ground = .soil
+        }
+        let profile = WorldRules.visibilityProfile(illumination: 45)
+
+        func resolved(_ candidate: WorldMap) throws -> MapTileArtRequest {
+            let run = WorldRun(runIndex: 1, book: BoundBook(written: [], essencePaid: 0),
+                               mapSeed: 79, rng: SeededRNG(seed: 79), map: candidate,
+                               playerPosition: point)
+            return try XCTUnwrap(WorldTileVisibilityPresentation.resolve(
+                run: run, point: point, tile: candidate[point], visibility: .full,
+                profile: profile, grade: .neutral).artRequest)
+        }
+
+        for depth in 1...3 {
+            for x in 1...3 { map[GridPoint(x: x, y: 3)].elevation = 3 - depth }
+            let request = try resolved(map)
+            XCTAssertEqual(request.southWallDepth, depth)
+            XCTAssertTrue(request.wallWestContinuation)
+            XCTAssertTrue(request.wallEastContinuation)
+        }
+
+        map[south].elevation = 3
+        let equal = try resolved(map)
+        XCTAssertEqual(equal.southWallDepth, 0)
+        XCTAssertFalse(equal.wallWestContinuation)
+        XCTAssertFalse(equal.wallEastContinuation)
     }
 
     func testHiddenTerrainProducesIdenticalOpaquePixelsWithoutArtRequest() {

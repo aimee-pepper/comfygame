@@ -1062,6 +1062,24 @@ enum WorldMapLayout {
 /// **The map no longer has to fit one screen** (decisions-session-13 §3) — only the page does, since
 /// you compose on a page and walk through a world. The camera is **clamped follow**: centred on you
 /// until you reach an edge, where it stops rather than showing empty space past the border.
+@MainActor private final class TerrainPresentationClock: ObservableObject {
+    static let shared = TerrainPresentationClock()
+    @Published private(set) var tick = 0
+    private var isRunning = false
+
+    func runWhileActive() async {
+        guard !isRunning else { return }
+        isRunning = true
+        defer { isRunning = false }
+        while !Task.isCancelled {
+            do { try await Task.sleep(nanoseconds: 250_000_000) }
+            catch { return }
+            guard !Task.isCancelled else { return }
+            tick = (tick + 1) % 24
+        }
+    }
+}
+
 private struct MapGrid: View {
     let run: WorldRun
     let maximumWidth: CGFloat
@@ -1069,6 +1087,8 @@ private struct MapGrid: View {
     let viewportRows: Int
     let visibilityProfile: WorldRules.VisibilityProfile
     let onTap: (GridPoint) -> Void
+    @Environment(\.scenePhase) private var scenePhase
+    @StateObject private var terrainClock = TerrainPresentationClock.shared
 #if DEBUG
     @AppStorage("debug.simpleMapRenderer") private var useSimpleRenderer = false
 #endif
@@ -1115,6 +1135,8 @@ private struct MapGrid: View {
                                 run: run, point: point, tile: displayTile, visibility: visibility,
                                 profile: visibilityProfile, grade: grade,
                                 atmosphereMotion: atmosphereMotion,
+                                presentationTick: terrainClock.tick,
+                                isRememberedTerrain: isRememberedTerrain,
                                 showsStationaryContents: showsStationaryContents)
                             TileView(tile: displayTile,
                                      visibility: visibility,
@@ -1149,6 +1171,10 @@ private struct MapGrid: View {
                   blue: Double(WorldMapLayout.backdropRGB[2]) / 255)
         )
         .clipped()
+        .task(id: scenePhase) {
+            guard scenePhase == .active else { return }
+            await terrainClock.runWhileActive()
+        }
     }
 
     private var simpleRenderer: Bool {
@@ -1213,26 +1239,32 @@ struct WorldTileVisibilityPresentation {
                         profile: WorldRules.VisibilityProfile,
                         grade: WorldGrade,
                         atmosphereMotion: Int = 0,
+                        presentationTick: Int = 0,
+                        isRememberedTerrain: Bool = false,
                         showsStationaryContents: Bool = false) -> Self {
         guard visibility != .hidden else {
             return Self(artRequest: nil, fogBoundaryEdges: [])
         }
 
-        let neighbours: [(bit: Int, edge: FogBoundaryEdges, point: GridPoint)] = [
-            (1, .north, GridPoint(x: point.x, y: point.y - 1)),
-            (2, .east, GridPoint(x: point.x + 1, y: point.y)),
-            (4, .south, GridPoint(x: point.x, y: point.y + 1)),
-            (8, .west, GridPoint(x: point.x - 1, y: point.y)),
+        let neighbours: [(direction: TerrainProductionPack.Direction,
+                          edge: FogBoundaryEdges, point: GridPoint)] = [
+            (.north, .north, GridPoint(x: point.x, y: point.y - 1)),
+            (.east, .east, GridPoint(x: point.x + 1, y: point.y)),
+            (.south, .south, GridPoint(x: point.x, y: point.y + 1)),
+            (.west, .west, GridPoint(x: point.x - 1, y: point.y)),
         ]
-        var adjacency = 0
+        var cardinal = TerrainProductionPack.Cardinal<TerrainProductionPack.Neighbor>(
+            north: .unknown, east: .unknown, south: .unknown, west: .unknown)
+        var contours = TerrainProductionPack.Cardinal<Int>(north: 0, east: 0, south: 0, west: 0)
+        var shades = TerrainProductionPack.Cardinal<Int>(north: 0, east: 0, south: 0, west: 0)
+        var southWallDepth = 0
         var fogBoundaryEdges: FogBoundaryEdges = []
-        var visibleSouth: Tile?
-        var southIsUndisclosed = false
 
         for neighbour in neighbours {
+            contours[neighbour.direction] = MapAssetContract.edgeContourID(
+                mapSeed: run.mapSeed, point: point, direction: neighbour.direction)
             guard run.map.contains(neighbour.point) else {
                 fogBoundaryEdges.insert(neighbour.edge)
-                if neighbour.edge == .south { southIsUndisclosed = true }
                 continue
             }
             let currentNeighbourVisibility = WorldRules.visibility(
@@ -1242,32 +1274,67 @@ struct WorldTileVisibilityPresentation {
                 current: currentNeighbourVisibility,
                 wasRevealed: run.map[neighbour.point].isRevealed)
             guard neighbourVisibility != .hidden else {
-                // Fog is not an exposed terrain edge. Suppress the renderer's 2 px perimeter
-                // without sampling the hidden tile's ground or elevation.
-                adjacency |= neighbour.bit
+                // Unknown means no boundary layer and, critically, no hidden fact read.
                 fogBoundaryEdges.insert(neighbour.edge)
-                if neighbour.edge == .south { southIsUndisclosed = true }
                 continue
             }
-            var visibleTile = run.map[neighbour.point]
-            visibleTile.isRevealed = true
-            if visibleTile.ground == tile.ground { adjacency |= neighbour.bit }
-            if neighbour.edge == .south { visibleSouth = visibleTile }
+            let visibleTile = run.map[neighbour.point]
+            cardinal[neighbour.direction] = visibleTile.ground == tile.ground
+                ? .same : .ground(.init(visibleTile.ground))
+            let centreElevation = MapAssetContract.resolvedElevation(for: tile)
+            let neighbourElevation = MapAssetContract.resolvedElevation(for: visibleTile)
+            shades[neighbour.direction] = min(2, max(0, neighbourElevation - centreElevation))
+            if neighbour.direction == .south {
+                southWallDepth = min(3, max(0, centreElevation - neighbourElevation))
+            }
+        }
+
+        func disclosedWallDepth(at higherPoint: GridPoint) -> Int? {
+            let lowerPoint = GridPoint(x: higherPoint.x, y: higherPoint.y + 1)
+            guard run.map.contains(higherPoint), run.map.contains(lowerPoint) else { return nil }
+            func disclosed(_ candidate: GridPoint) -> Bool {
+                let current = WorldRules.visibility(
+                    of: candidate, from: run.playerPosition, in: run.map, profile: profile)
+                return WorldRules.terrainVisibility(
+                    current: current, wasRevealed: run.map[candidate].isRevealed) != .hidden
+            }
+            guard disclosed(higherPoint), disclosed(lowerPoint) else { return nil }
+            let higher = run.map[higherPoint], lower = run.map[lowerPoint]
+            return min(3, max(0, MapAssetContract.resolvedElevation(for: higher)
+                               - MapAssetContract.resolvedElevation(for: lower)))
+        }
+
+        func continuesWall(dx: Int) -> Bool {
+            guard southWallDepth > 0 else { return false }
+            let adjacent = GridPoint(x: point.x + dx, y: point.y)
+            guard run.map.contains(adjacent), run.map[adjacent].ground == tile.ground,
+                  MapAssetContract.resolvedElevation(for: run.map[adjacent])
+                    == MapAssetContract.resolvedElevation(for: tile),
+                  let depth = disclosedWallDepth(at: adjacent) else { return false }
+            return depth > 0
         }
 
         let flora = showsStationaryContents
             ? tile.flora.flatMap { id in run.flora.first { $0.id == id } }
             : nil
-        let southExposure = southIsUndisclosed
-            ? MapAssetContract.resolvedElevation(for: tile)
-            : MapAssetContract.southExposure(center: tile, south: visibleSouth)
+        let packVisibility: TerrainProductionPack.Visibility = if visibility == .full {
+            .full
+        } else if isRememberedTerrain {
+            .remembered
+        } else {
+            .fringe
+        }
         let request = MapTileArtRequest(
             tile: tile, point: point, mapSeed: run.mapSeed, runIndex: run.runIndex,
-            adjacency: adjacency,
-            southExposureLevels: southExposure,
-            grade: grade, flora: flora,
+            cardinalNeighbors: cardinal, edgeContourIDs: contours,
+            contactShadeDepths: shades, southWallDepth: southWallDepth,
+            wallWestContinuation: continuesWall(dx: -1),
+            wallEastContinuation: continuesWall(dx: 1),
+            visibility: packVisibility,
+            grade: grade,
+            flora: flora,
             worldGrade2Descriptor: run.worldVisualReceipt?.descriptor,
-            atmosphereMotion: atmosphereMotion)
+            atmosphereMotion: atmosphereMotion, presentationTick: presentationTick)
         return Self(artRequest: request, fogBoundaryEdges: fogBoundaryEdges)
     }
 
@@ -1438,7 +1505,8 @@ private struct TileView: View {
 
     private var surfaceLift: CGFloat {
         guard !useSimpleRenderer, let artRequest else { return 0 }
-        return -side * CGFloat(artRequest.resolvedElevation) / CGFloat(MapAssetContract.logicalSide)
+        return -side * CGFloat(artRequest.resolvedElevation)
+            / CGFloat(MapAssetContract.logicalSide)
     }
 
     private var symbol: String? {

@@ -26,6 +26,12 @@ targets:
       - path: Sources
       - path: Support/LaunchScreen.storyboard
         buildPhase: resources
+      - path: RuntimePacks/TerrainProductionPack-v1
+        buildPhase: resources
+        type: folder
+      - path: RuntimePacks/TerrainSouthWallPack-v1
+        buildPhase: resources
+        type: folder
     preBuildScripts:
       - name: Verify generated combat-v2 authority
         basedOnDependencyAnalysis: false
