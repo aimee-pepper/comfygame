@@ -196,8 +196,8 @@ flora, encounter, writing, Essence, collapse and reachability receipts are check
 - dominant structure: broad sand/soil flats with a few shallow pools and little stone;
 - flora: low pithy-succulent identity, 21 placements; no active/hostile flora;
 - description (rules-owned fixture):
-  `Broad sandy ground runs between shallow pools. Your Plains mark opened the terrain, while your Verdant
-  mark spread low growth farther along the few wet and stony edges.`
+  `Broad sandy ground runs between shallow pools. Your Plains Sigil opened the terrain, while your Verdant
+  Sigil spread low growth farther along the few wet and stony edges.`
 
 ### `starter_rainwashed_shore` — **Rainwashed Shore**
 
@@ -205,7 +205,7 @@ flora, encounter, writing, Essence, collapse and reachability receipts are check
 - dominant structure: stone shelves/islands separated by shallow and deep water;
 - flora: dull-fungal-bloom identity, 21 placements; no active/hostile flora;
 - description (rules-owned fixture):
-  `Stone shelves break a wide run of shallow and deep water. Your Archipelago mark divided the route,
+  `Stone shelves break a wide run of shallow and deep water. Your Archipelago Sigil divided the route,
   while only the ground nearest the entry remained clearly visible.`
 
 ### `starter_stone_hollow` — **Stone Hollow**
@@ -214,8 +214,8 @@ flora, encounter, writing, Essence, collapse and reachability receipts are check
 - dominant structure: enclosed stone, narrow soil paths and wet hollows;
 - flora: pithy-succulent identity, 19 placements; no active/hostile flora;
 - description (rules-owned fixture):
-  `Stone closes around narrow paths and wet hollows. Your Caverns mark shaped the enclosure, while your Ore
-  mark made ore more plentiful.`
+  `Stone closes around narrow paths and wet hollows. Your Caverns Sigil shaped the enclosure, while your Ore
+  Sigil made ore more plentiful.`
 
 Sites, portals, traveller candidates, ordinary creature identities and exact resource positions are absent
 from all three entry pictures unless a separate sanitized `entryDisclosure` field legitimately supplies
@@ -376,6 +376,16 @@ Freeze exact Asset commit `72b840d3e1de2b8c32aebfc0e876d61c69448a92`, manifest-f
 part and first-map-crop PNGs remain byte-identical under aggregate
 `4eb1076eb8d4640a5467d3343167f55eed3b1c74ca2cefec5727cb5b5bda9184`; only text-bearing evidence changed.
 `integrationReady` remains false and no scene/art/camera/disclosure authority changed.
+
+### World Arrival Sigil terminology receipt — accepted 22 August 2026
+
+Game Design accepted the refreshed 368×800 longest-copy and Open Flats proofs using **Sigil** for the
+player-facing written object. Freeze Asset commit `5e251daf0a0abab3c6396b6614f1a104c48d9b32`, manifest-file SHA-256
+`b603ee57022f31f51a044335dabe4e2c385f6ea4f6fd56e80a5d96232d7ffc68`, command-corpus body SHA-256
+`d2783de992abb183a9d9372d60af67251b9e43d14830806bcbabc7781a9448fc` and command-corpus file SHA-256
+`7d9e961bb7a835bb7080fee4bc131aa735a657ed5622ed7e7a6dda1c1af169c2`. The rect-v1 command aggregate,
+85-case RGBA aggregate and production scene/part/first-map aggregate remain byte-identical. Internal receipt
+fields, stable IDs and runtime keys are unchanged; `integrationReady:false` remains provenance state.
 
 ## Explicit supersessions
 

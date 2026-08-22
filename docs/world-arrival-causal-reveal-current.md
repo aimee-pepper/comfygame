@@ -157,7 +157,7 @@ evidence,” or “innocence.”
 ### Authored causality
 
 When a resolved fact was causally changed by a known mark, the description uses the frozen contribution
-kind: `reshaped`, `increased`, `reduced` or `none`. An increase may say `Your Verdant mark spread low growth
+kind: `reshaped`, `increased`, `reduced` or `none`. An increase may say `Your Verdant Sigil spread low growth
 farther`; it may not say the mark created or drew in a family that the same seed already supplied. Unknown
 marks never reveal their meaning. When a dimension was left open, say so only if the uncertainty affects
 preparation or is central to the reveal; do not list every random dimension.
@@ -215,9 +215,12 @@ receipt; changing Worldgen requires revalidating both the receipt and this copy.
 
 | Page | Frozen request | Disclosed description fixture |
 |---|---|---|
-| Open Flats | seed 67 · Plains + Verdant | Broad sandy ground runs between shallow pools. Your Plains mark opened the terrain, while your Verdant mark spread low growth farther along the few wet and stony edges. |
-| Rainwashed Shore | seed 26 · Archipelago | Stone shelves break a wide run of shallow and deep water. Your Archipelago mark divided the route, while only the ground nearest the entry remained clearly visible. |
-| Stone Hollow | seed 23 · Caverns + Ore | Stone closes around narrow paths and wet hollows. Your Caverns mark shaped the enclosure, while your Ore mark made ore more plentiful. |
+| Open Flats | seed 67 · Plains + Verdant | Broad sandy ground runs between shallow pools. Your Plains Sigil opened the terrain, while your Verdant Sigil spread low growth farther along the few wet and stony edges. |
+| Rainwashed Shore | seed 26 · Archipelago | Stone shelves break a wide run of shallow and deep water. Your Archipelago Sigil divided the route, while only the ground nearest the entry remained clearly visible. |
+| Stone Hollow | seed 23 · Caverns + Ore | Stone closes around narrow paths and wet hollows. Your Caverns Sigil shaped the enclosure, while your Ore Sigil made ore more plentiful. |
+
+The player-facing causal noun is **Sigil**. This copy-only correction does not rename receipt fields,
+candidate IDs or compositor command keys.
 
 The image may depict the matching flora shapes but these descriptions do not name creature identities,
 resources other than the causally increased Ore relationship, hidden sites, portal locations or traveller

@@ -10,7 +10,7 @@ struct WorldArrivalRenderedSceneReceipt: Codable, Equatable, Sendable {
     static let visualProgramID = "world-arrival-v1"
     static let visualProgramSHA256 = "5352cafa83ad6982aaaceafd24db66b5db002d5b5f1f6ceaf375b7cea738b882"
     static let visualProgramCommit = "9b60e8516f08806d40c38ed2a4307746c13d1c8c"
-    static let acceptedManifestSHA256 = "f041c81a41c45ac88dada40b0c173ab63c6e93c2984f232a23be67892df4a65b"
+    static let acceptedManifestSHA256 = "b603ee57022f31f51a044335dabe4e2c385f6ea4f6fd56e80a5d96232d7ffc68"
 
     struct Command: Codable, Equatable, Sendable {
         enum Scope: String, Codable, CaseIterable, Sendable {

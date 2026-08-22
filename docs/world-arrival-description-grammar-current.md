@@ -136,8 +136,11 @@ Candidate ownership follows the physical source page; it is not reconstructed fr
    target/source cluster, each connected **source** mark is one candidate. Target anchors and qualifier marks
    are never separately named causal candidates.
 3. A qualifier's effect belongs to the source mark it modifies. Removing that source for the counterfactual
-   also removes its attached qualifier effect. This prevents copy such as “your Sun mark strengthened the
-   light, while your Great mark strengthened the light.”
+   also removes its attached qualifier effect. This prevents copy such as “your Sun Sigil strengthened the
+   light, while your Great Sigil strengthened the light.”
+
+Player-facing causal attribution names the written object **Sigil**. Internal candidate/mark IDs and the
+frozen five-field scene ABI retain their existing names.
 4. Unjoined/inert marks, clusters without a target, and marks that resolve to no live pressure are not
    candidates. Candidate construction uses the same speaking-cluster authority as bind.
 5. A candidate is meaning-known only when every lexeme needed to name it is known in the exact bind-time
@@ -272,11 +275,11 @@ Starter fragments are exact reviewed overrides, keyed by stable symbol ID rather
 | caverns | reshaped ground | `shaped the enclosure` |
 | common_ore | increased resource expression | `made ore more plentiful` |
 
-One fact: `Your {mark} mark {verb phrase}.`
-Two facts: `Your {first mark} mark {first verb phrase}, while your {second mark} mark {second verb phrase}.`
+One fact: `Your {Sigil label} Sigil {verb phrase}.`
+Two facts: `Your {first Sigil label} Sigil {first verb phrase}, while your {second Sigil label} Sigil {second verb phrase}.`
 
 When exactly one causal fact exists, pair it with the strongest meaningful environmental fragment if one
-exists: `Your {mark} mark {verb phrase}, while {environment fragment}.` Environmental fragments use the
+exists: `Your {Sigil label} Sigil {verb phrase}, while {environment fragment}.` Environmental fragments use the
 following exact paired priority and the lower-case past-tense table below: heavy/dense suspended medium;
 heavy precipitation; true darkness/blazing light; trace/light suspended medium; trace/light precipitation;
 abundant/present/sparse flora; dim/bright ordinary-range light. This differs deliberately from the no-causal
@@ -388,12 +391,12 @@ Coverage bands derive from actual placed flora tiles divided by non-Chasm tiles:
 
 The exact current starter receipts must produce:
 
-1. `Broad sandy ground runs between shallow pools. Your Plains mark opened the terrain, while your Verdant
-   mark spread low growth farther along the few wet and stony edges.`
-2. `Stone shelves break a wide run of shallow and deep water. Your Archipelago mark divided the route,
+1. `Broad sandy ground runs between shallow pools. Your Plains Sigil opened the terrain, while your Verdant
+   Sigil spread low growth farther along the few wet and stony edges.`
+2. `Stone shelves break a wide run of shallow and deep water. Your Archipelago Sigil divided the route,
    while only the ground nearest the entry remained clearly visible.`
-3. `Stone closes around narrow paths and wet hollows. Your Caverns mark shaped the enclosure, while your Ore
-   mark made ore more plentiful.`
+3. `Stone closes around narrow paths and wet hollows. Your Caverns Sigil shaped the enclosure, while your Ore
+   Sigil made ore more plentiful.`
 
 These are outputs of the ordinary rules: structural selection, generic one/two-fact assembly and
 environmental fallback. There is no starter-ID prose branch. If a generator change alters the underlying
@@ -409,8 +412,8 @@ channelled water; an `Archipelago` reshaping contribution; a `Verdant` increased
 growth on damp edges and comparatively bare high exposed ground. Its exact frozen string is:
 
 `Broad stone shelves rise above narrow soil paths and connected pools of shallow water, with deep channels
-cutting between the largest dry crossings. Your Archipelago mark divided the route into separate shelves,
-while your Verdant mark spread dense low growth across the dampest edges and left the higher exposed ground
+cutting between the largest dry crossings. Your Archipelago Sigil divided the route into separate shelves,
+while your Verdant Sigil spread dense low growth across the dampest edges and left the higher exposed ground
 comparatively bare near the entry.`
 
 The string is exactly 55 whitespace-delimited words and two sentences. It is a typography and disclosure

@@ -34,6 +34,12 @@ final class StationRunwayRulesTests: XCTestCase {
                        "Worlds you can afford after refining and construction")
         XCTAssertEqual(preview.affordability.basisLabel,
                        "Typical cost of a recent world written by you")
+        XCTAssertTrue(preview.telemetryLabel.contains("Essence after refining and construction="))
+        XCTAssertTrue(preview.telemetryLabel.contains(
+            "Worlds you can afford after refining and construction="))
+        XCTAssertTrue(preview.telemetryLabel.contains(
+            "Typical cost of a recent world written by you="))
+        XCTAssertFalse(preview.telemetryLabel.contains("spendableNow"))
     }
 
     func testRunwayExcludesBlankZeroAndLegacyUnknownCosts() throws {
@@ -48,6 +54,10 @@ final class StationRunwayRulesTests: XCTestCase {
         XCTAssertEqual(preview.recentMedianBindCost, 12)
         XCTAssertEqual(preview.authoredBindsRemaining, 40.0 / 12.0)
         XCTAssertNil(preview.warning)
+        XCTAssertTrue(preview.telemetryLabel.contains("Essence available after construction="))
+        XCTAssertTrue(preview.telemetryLabel.contains("Worlds you can afford after construction="))
+        XCTAssertFalse(preview.telemetryLabel.contains("after refining and construction"))
+        XCTAssertFalse(preview.telemetryLabel.contains("Essence after refining="))
     }
 
     func testVisitedWorldBindCostIsTolerantAndRoundTrips() throws {

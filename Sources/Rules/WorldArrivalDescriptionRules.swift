@@ -165,10 +165,10 @@ enum WorldArrivalDescriptionRules {
                                        selected: [WorldArrivalReceipt.CausalVisualFact]) throws -> String {
         guard !selected.isEmpty else { return environmentalSentence(environment) }
         let clauses = try selected.map { fact -> String in
-            "Your \(try knownDisplayName(fact)) mark \(try verb(fact, environment: environment))"
+            "Your \(try knownDisplayName(fact)) Sigil \(try verb(fact, environment: environment))"
         }
         if clauses.count == 2 {
-            return "\(clauses[0]), while your \(try knownDisplayName(selected[1])) mark \(try verb(selected[1], environment: environment))."
+            return "\(clauses[0]), while your \(try knownDisplayName(selected[1])) Sigil \(try verb(selected[1], environment: environment))."
         }
         let fragment = pairedEnvironmentalFragment(environment, dominantGround: dominantGround)
         return fragment.map { "\(clauses[0]), while \($0)." } ?? "\(clauses[0])."

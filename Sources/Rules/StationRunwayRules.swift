@@ -21,7 +21,16 @@ enum StationRunwayRules {
         var telemetryLabel: String {
             let basis = recentMedianBindCost.map { String(format: "%.1f", $0) } ?? "none"
             let worlds = authoredBindsRemaining.map { String(format: "%.2f", $0) } ?? "unknown"
-            return "Essence available now=\(affordability.essenceAvailableNow) Essence after refining=\(affordability.essenceAfterRefining) construction cost=\(constructionEssence) Essence after construction=\(affordability.essenceAfterAction) typical world cost=\(basis) worlds affordable after construction=\(worlds)"
+            let basisLabel = affordability.basisLabel ?? "Typical cost of a recent world written by you"
+            var fields = ["Essence available now=\(affordability.essenceAvailableNow)"]
+            if affordability.includesRefining {
+                fields.append("Essence after refining=\(affordability.essenceAfterRefining)")
+            }
+            fields += ["construction cost=\(constructionEssence)",
+                       "\(affordability.afterActionLabel)=\(affordability.essenceAfterAction)",
+                       "\(basisLabel)=\(basis)",
+                       "\(affordability.worldCountLabel)=\(worlds)"]
+            return fields.joined(separator: " ")
         }
     }
 

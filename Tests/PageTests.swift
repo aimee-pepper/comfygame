@@ -41,7 +41,7 @@ final class PageTests: XCTestCase {
         let corpus = try JSONDecoder().decode(Corpus.self, from: data)
         XCTAssertEqual(corpus.identity, "world-arrival-command-corpus-v1")
         XCTAssertFalse(corpus.integrationReady)
-        XCTAssertEqual(corpus.canonicalBodySHA256, "840026c5b6f4da538e2edac390c65f5c9cd03a61bfb71d1b5af95dd6cc9bb635")
+        XCTAssertEqual(corpus.canonicalBodySHA256, "d2783de992abb183a9d9372d60af67251b9e43d14830806bcbabc7781a9448fc")
         XCTAssertEqual(corpus.canvas.width, 160); XCTAssertEqual(corpus.canvas.height, 100)
         XCTAssertEqual(corpus.commandABI.op, "rect-v1")
         XCTAssertEqual(corpus.commandABI.fields, ["op","x","y","width","height","rgba","scope","sourceOrder"])
@@ -97,7 +97,7 @@ final class PageTests: XCTestCase {
         XCTAssertTrue(store.bindAndDepart(
             worldPageInstanceID: WorldPageCatalog.earthlikeTestInstance.id))
         var receipt = try XCTUnwrap(store.state.worlds.pendingWorldArrivalReceipt)
-        receipt.finalDescription = "Broad stone shelves rise above narrow soil paths and connected pools of shallow water, with deep channels cutting between the largest dry crossings. Your Archipelago mark divided the route into separate shelves, while your Verdant mark spread dense low growth across the dampest edges and left the higher exposed ground comparatively bare near the entry."
+        receipt.finalDescription = "Broad stone shelves rise above narrow soil paths and connected pools of shallow water, with deep channels cutting between the largest dry crossings. Your Archipelago Sigil divided the route into separate shelves, while your Verdant Sigil spread dense low growth across the dampest edges and left the higher exposed ground comparatively bare near the entry."
         XCTAssertEqual(receipt.finalDescription.split(whereSeparator: \.isWhitespace).count, 55)
         if !receipt.sourcePagePhysicalReceipt.marks.isEmpty {
             receipt.sourcePagePhysicalReceipt.marks[0].isReadable = false
@@ -423,9 +423,9 @@ final class PageTests: XCTestCase {
     @MainActor
     func testStarterBindFactoryFreezesExactAcceptedDescriptionsAndClosedCausalBands() throws {
         let expected = [
-            "starter_open_meadow": "Broad sandy ground runs between shallow pools. Your Plains mark opened the terrain, while your Verdant mark spread low growth farther along the few wet and stony edges.",
-            "starter_rainwashed_shore": "Stone shelves break a wide run of shallow and deep water. Your Archipelago mark divided the route, while only the ground nearest the entry remained clearly visible.",
-            "starter_stone_hollow": "Stone closes around narrow paths and wet hollows. Your Caverns mark shaped the enclosure, while your Ore mark made ore more plentiful."
+            "starter_open_meadow": "Broad sandy ground runs between shallow pools. Your Plains Sigil opened the terrain, while your Verdant Sigil spread low growth farther along the few wet and stony edges.",
+            "starter_rainwashed_shore": "Stone shelves break a wide run of shallow and deep water. Your Archipelago Sigil divided the route, while only the ground nearest the entry remained clearly visible.",
+            "starter_stone_hollow": "Stone closes around narrow paths and wet hollows. Your Caverns Sigil shaped the enclosure, while your Ore Sigil made ore more plentiful."
         ]
         let closed: [WorldArrivalReceipt.CausalVisualFact.Scope: Set<String>] = [
             .ground: Set(GroundType.allCases.map(\.rawValue)),
@@ -546,9 +546,9 @@ final class PageTests: XCTestCase {
 
     func testAcceptedStarterArrivalReceiptsProduceExactRulesOwnedDescriptions() throws {
         let expected = [
-            "starter_open_meadow": "Broad sandy ground runs between shallow pools. Your Plains mark opened the terrain, while your Verdant mark spread low growth farther along the few wet and stony edges.",
-            "starter_rainwashed_shore": "Stone shelves break a wide run of shallow and deep water. Your Archipelago mark divided the route, while only the ground nearest the entry remained clearly visible.",
-            "starter_stone_hollow": "Stone closes around narrow paths and wet hollows. Your Caverns mark shaped the enclosure, while your Ore mark made ore more plentiful."
+            "starter_open_meadow": "Broad sandy ground runs between shallow pools. Your Plains Sigil opened the terrain, while your Verdant Sigil spread low growth farther along the few wet and stony edges.",
+            "starter_rainwashed_shore": "Stone shelves break a wide run of shallow and deep water. Your Archipelago Sigil divided the route, while only the ground nearest the entry remained clearly visible.",
+            "starter_stone_hollow": "Stone closes around narrow paths and wet hollows. Your Caverns Sigil shaped the enclosure, while your Ore Sigil made ore more plentiful."
         ]
         let root = URL(fileURLWithPath: #filePath).deletingLastPathComponent()
             .deletingLastPathComponent()
@@ -616,7 +616,7 @@ final class PageTests: XCTestCase {
     }
 
     func testDesignOwnedFiftyFiveWordSpecimenIsValidationOnly() {
-        let specimen = "Broad stone shelves rise above narrow soil paths and connected pools of shallow water, with deep channels cutting between the largest dry crossings. Your Archipelago mark divided the route into separate shelves, while your Verdant mark spread dense low growth across the dampest edges and left the higher exposed ground comparatively bare near the entry."
+        let specimen = "Broad stone shelves rise above narrow soil paths and connected pools of shallow water, with deep channels cutting between the largest dry crossings. Your Archipelago Sigil divided the route into separate shelves, while your Verdant Sigil spread dense low growth across the dampest edges and left the higher exposed ground comparatively bare near the entry."
         XCTAssertEqual(specimen.split(whereSeparator: \.isWhitespace).count, 55)
         XCTAssertEqual(specimen.filter { ".!?".contains($0) }.count, 2)
         let root = URL(fileURLWithPath: #filePath).deletingLastPathComponent()
@@ -698,7 +698,7 @@ final class PageTests: XCTestCase {
             .init(dominantDryGround: payload.dominantGround,
                   terrain: arrivalTerrain("starter_open_meadow"),
                   environment: arrivalEnvironment(payload), causalFacts: Array(facts)))
-        XCTAssertTrue(copy.contains("Your Plains mark opened the terrain, while your Verdant mark"))
+        XCTAssertTrue(copy.contains("Your Plains Sigil opened the terrain, while your Verdant Sigil"))
 
         facts[0].markDisplayName = nil
         let redacted = try WorldArrivalDescriptionRules.describe(
