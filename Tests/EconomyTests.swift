@@ -24,12 +24,22 @@ final class EconomyTests: XCTestCase {
         XCTAssertEqual(review.unreadMarkCount, 1)
         XCTAssertEqual(review.visibleMarks[0].displayName, "??")
         XCTAssertEqual(review.visibleMarks[0].accessibilityName, "Unknown mark")
+        XCTAssertEqual(review.pageThumbnail.marks[0].id, legacy.id)
+        XCTAssertEqual(review.pageThumbnail.marks[0].cells, legacy.cells)
         XCTAssertTrue(review.knownRequests.isEmpty,
                       "a known target must not disclose the unknown source half")
         XCTAssertNil(review.openSubjects)
         XCTAssertEqual(review.stabilityRange, 0...100)
         XCTAssertEqual(review.sightDisclosure, review.dangerDisclosure)
         XCTAssertFalse(review.uncertaintyReason.localizedCaseInsensitiveContains("sun"))
+        let playerFacing = [review.visibleMarks[0].displayName,
+                            review.visibleMarks[0].accessibilityName,
+                            review.uncertaintyReason,
+                            review.sightDisclosure,
+                            review.dangerDisclosure,
+                            review.ecologyDisclosure].joined(separator: " ")
+        XCTAssertFalse(playerFacing.localizedCaseInsensitiveContains("sun"),
+                       "the opaque rendererAssetKey is never a string/accessibility source")
     }
 
     func testUnreadCollectedPagesUseSameBroadForecastDespiteDifferentHiddenSemantics() throws {
@@ -57,8 +67,35 @@ final class EconomyTests: XCTestCase {
         XCTAssertEqual(first.collapseDisclosure.copy, second.collapseDisclosure.copy)
         XCTAssertEqual(first.sightDisclosure, second.sightDisclosure)
         XCTAssertEqual(first.dangerDisclosure, second.dangerDisclosure)
+        XCTAssertEqual(first.ecologyDisclosure, second.ecologyDisclosure)
         XCTAssertNil(first.openSubjects)
         XCTAssertNil(second.openSubjects)
+    }
+
+    func testUnreadVitalityAndNonVitalityMeaningsCannotChangeAnyForecastCopy() throws {
+        func review(target: PressureTargetID) throws -> WritingDeskReviewModel {
+            let store = GameStore(io: .temporary(name: "desk-hidden-\(target.rawValue)-\(UUID().uuidString)"))
+            let mark = PlacedRune(
+                id: .init(rawValue: 700),
+                sigil: Sigil(id: .init(rawValue: 701), source: "sun", target: target),
+                hand: .plain, origin: .init(column: 0, row: 0), shapeID: "refined_dot")
+            store.mutate("install unread legacy meaning") { state in
+                state.base.ownedSources.remove("sun")
+                state.base.page = Page(runes: [mark])
+                state.reality.encounteredLexemes.formUnion(mark.content.encounteredLexemes)
+            }
+            return try XCTUnwrap(store.writingDeskReviewModel())
+        }
+
+        let vitality = try review(target: "vitality")
+        let illumination = try review(target: "illumination")
+        XCTAssertEqual(vitality.ecologyDisclosure, illumination.ecologyDisclosure)
+        XCTAssertEqual(vitality.sightDisclosure, illumination.sightDisclosure)
+        XCTAssertEqual(vitality.dangerDisclosure, illumination.dangerDisclosure)
+        XCTAssertEqual(vitality.uncertaintyReason, illumination.uncertaintyReason)
+        XCTAssertEqual(vitality.openSubjects, illumination.openSubjects)
+        XCTAssertEqual(vitality.stabilityRange, illumination.stabilityRange)
+        XCTAssertEqual(vitality.collapseDisclosure, illumination.collapseDisclosure)
     }
 
     func testCollectedReviewNeverFallsBackToDraftWhenCanonicalSnapshotChanges() throws {
@@ -71,6 +108,78 @@ final class EconomyTests: XCTestCase {
         XCTAssertNil(store.writingDeskReviewModel(selectedWorldPageID: page.id))
         XCTAssertNotNil(store.writingDeskReviewModel(),
                         "the draft remains available only when explicitly selected")
+    }
+
+    func testWritingDeskBindQuoteFreezesSourceSeedCostInkAndFieldKit() throws {
+        let store = GameStore(io: .temporary(name: "desk-bind-quote-\(UUID().uuidString)"))
+        store.mutate("make quote available") { state in
+            state.base.essence = 100
+            state.base.preparationLoadout = []
+            state.base.preparationLoadoutNeedsReview = false
+        }
+        let original = try XCTUnwrap(store.writingDeskBindQuote())
+        XCTAssertEqual(original.sourceKey,
+                       store.writingDeskReviewModel()?.sourceKey)
+        XCTAssertEqual(original.reservedCampaignSeed,
+                       store.state.worlds.seeds.peekNextSeed())
+        XCTAssertEqual(original.totalCost, original.pageCost)
+        XCTAssertEqual(original.fieldKitReceipt, .allowed(.init(
+            packed: Inventory(slots: store.state.base.satchelCapacity),
+            remainingInventory: store.state.base.inventory,
+            shortages: [])))
+
+        store.mutate("make staged quote stale") { state in
+            _ = state.worlds.seeds.nextSeed()
+        }
+        let changed = try XCTUnwrap(store.writingDeskBindQuote())
+        XCTAssertNotEqual(changed, original)
+        XCTAssertNotEqual(changed.reservedCampaignSeed, original.reservedCampaignSeed)
+    }
+
+    func testRedactedRequestsRequireReadableConnectedStatementsAndPreservePageOrder() throws {
+        let store = GameStore(io: .temporary(name: "desk-requests-\(UUID().uuidString)"))
+        let illumination = PlacedRune(id: .init(rawValue: 40), content: .target("illumination"),
+                                      hand: .plain, origin: .init(column: 0, row: 0), shapeID: "refined_dot")
+        let sun = PlacedRune(id: .init(rawValue: 41), content: .source("sun"),
+                             hand: .plain, origin: .init(column: 1, row: 0), shapeID: "refined_dot")
+        let vitality = PlacedRune(id: .init(rawValue: 10), content: .target("vitality"),
+                                  hand: .plain, origin: .init(column: 0, row: 2), shapeID: "refined_dot")
+        let bloom = PlacedRune(id: .init(rawValue: 11), content: .source("bloom"),
+                               hand: .plain, origin: .init(column: 1, row: 2), shapeID: "refined_dot")
+        store.mutate("install two ordered requests") { state in
+            state.base.ownedSources.formUnion(["sun", "bloom"])
+            // Insertion order intentionally disagrees with target/name and stable-ID order.
+            state.base.page = Page(
+                runes: [illumination, sun, vitality, bloom],
+                links: [MarkLink(illumination.id, sun.id), MarkLink(vitality.id, bloom.id)])
+        }
+        let joined = try XCTUnwrap(store.writingDeskReviewModel())
+        XCTAssertEqual(joined.knownRequests.map(\.subject), ["Illumination", "Vitality"])
+        XCTAssertEqual(joined.knownRequests.map { $0.focuses.map(\.name) }, [["Sun"], ["Bloom"]])
+        XCTAssertEqual(joined.silentMarkCount, 0)
+
+        store.mutate("disconnect every mark") { $0.base.page.links = [] }
+        let disconnected = try XCTUnwrap(store.writingDeskReviewModel())
+        XCTAssertTrue(disconnected.knownRequests.isEmpty)
+        XCTAssertEqual(disconnected.silentMarkCount, 4)
+    }
+
+    func testUnreadClusterMemberSuppressesRelationWithoutCallingReadableMarksRequests() throws {
+        let store = GameStore(io: .temporary(name: "desk-unread-cluster-\(UUID().uuidString)"))
+        let target = PlacedRune(id: .init(rawValue: 1), content: .target("illumination"),
+                                hand: .plain, origin: .init(column: 0, row: 0), shapeID: "refined_dot")
+        let source = PlacedRune(id: .init(rawValue: 2), content: .source("sun"),
+                                hand: .plain, origin: .init(column: 1, row: 0), shapeID: "refined_dot")
+        store.mutate("install partly unread cluster") { state in
+            state.base.ownedSources.remove("sun")
+            state.base.page = Page(runes: [target, source], links: [MarkLink(target.id, source.id)])
+            state.reality.encounteredLexemes.insert(.source("sun"))
+        }
+        let review = try XCTUnwrap(store.writingDeskReviewModel())
+        XCTAssertTrue(review.knownRequests.isEmpty)
+        XCTAssertEqual(review.unreadMarkCount, 1)
+        XCTAssertEqual(review.silentMarkCount, 1)
+        XCTAssertFalse(review.uncertaintyReason.localizedCaseInsensitiveContains("illumination"))
     }
 
     func testWritingDeskWritePaneReturnsToDraftWithoutConsumingCollectedSelection() {

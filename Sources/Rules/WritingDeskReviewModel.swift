@@ -13,10 +13,39 @@ enum WritingDeskSourceKey: Equatable, Sendable {
 }
 
 struct WritingDeskVisibleMark: Equatable, Sendable {
-    var glyphID: String
+    /// Opaque visual lookup only. Never legal for copy, ordering or accessibility.
+    var rendererAssetKey: String
+    var id: InstanceID
+    var hand: Hand
+    var origin: PageCell
+    var shapeID: String
+    var cells: [PageCell]
+    var inkRecipe: InkRecipe?
     var displayName: String
     var accessibilityName: String
     var isReadable: Bool
+}
+
+struct WritingDeskVisibleLink: Equatable, Sendable {
+    var firstMarkID: InstanceID
+    var secondMarkID: InstanceID
+}
+
+/// Physical page receipt with no canonical semantic content.
+struct WritingDeskVisiblePage: Equatable, Sendable {
+    var width: Int
+    var height: Int
+    var marks: [WritingDeskVisibleMark]
+    var links: [WritingDeskVisibleLink]
+}
+
+struct WritingDeskKnownRequest: Equatable, Sendable {
+    struct Focus: Equatable, Sendable {
+        var name: String
+        var qualifiers: [String]
+    }
+    var subject: String
+    var focuses: [Focus]
 }
 
 /// Pure, disclosure-safe input for every Writing Desk pane.
@@ -45,10 +74,11 @@ struct WritingDeskReviewModel: Equatable, Sendable {
     var sourceKey: WritingDeskSourceKey
     var sourceKind: SourceKind
     var title: String
-    var pageThumbnail: Page
+    var pageThumbnail: WritingDeskVisiblePage
     var visibleMarks: [WritingDeskVisibleMark]
     var unreadMarkCount: Int
-    var knownRequests: [String]
+    var knownRequests: [WritingDeskKnownRequest]
+    var silentMarkCount: Int
     var openSubjects: [String]?
     var uncertaintyReason: String
     var stabilityRange: ClosedRange<Int>
@@ -108,7 +138,13 @@ enum WritingDeskReviewModelFactory {
             let entries = identities.compactMap { dictionary[$0] }
             let readable = entries.count == identities.count && entries.allSatisfy(\.isKnown)
             return WritingDeskVisibleMark(
-                glyphID: mark.glyphID,
+                rendererAssetKey: mark.glyphID,
+                id: mark.id,
+                hand: mark.hand,
+                origin: mark.origin,
+                shapeID: mark.shapeID,
+                cells: mark.cells,
+                inkRecipe: mark.inkRecipe,
                 displayName: readable ? entries.map(\.displayName).joined(separator: " + ") : "??",
                 accessibilityName: readable
                     ? entries.map(\.accessibilityName).joined(separator: ", ")
@@ -116,6 +152,8 @@ enum WritingDeskReviewModelFactory {
                 isReadable: readable)
         }
         let unreadCount = visibleMarks.filter { !$0.isReadable }.count
+        let requestProjection = redactedRequests(
+            page: source.page, visibleMarks: visibleMarks, dictionary: dictionary)
         let projection = BookProjection.project(
             page: source.page, seed: source.seed,
             analysisTier: state.reality.analysisTier,
@@ -154,10 +192,18 @@ enum WritingDeskReviewModelFactory {
             sourceKey: source.key,
             sourceKind: source.kind,
             title: source.title,
-            pageThumbnail: source.page,
+            pageThumbnail: WritingDeskVisiblePage(
+                width: source.page.width,
+                height: source.page.height,
+                marks: visibleMarks,
+                links: source.page.links.sorted {
+                    $0.a.rawValue != $1.a.rawValue
+                        ? $0.a.rawValue < $1.a.rawValue : $0.b.rawValue < $1.b.rawValue
+                }.map { .init(firstMarkID: $0.a, secondMarkID: $0.b) }),
             visibleMarks: visibleMarks,
             unreadMarkCount: unreadCount,
-            knownRequests: visibleMarks.filter(\.isReadable).map(\.displayName),
+            knownRequests: requestProjection.requests,
+            silentMarkCount: requestProjection.silentMarkCount,
             openSubjects: openSubjects,
             uncertaintyReason: uncertainty,
             stabilityRange: stabilityRange,
@@ -166,7 +212,9 @@ enum WritingDeskReviewModelFactory {
                 : "Sight remains open until the world is bound.",
             dangerDisclosure: unreadCount > 0 ? unreadForecast
                 : "Danger remains within the page's disclosed range.",
-            ecologyDisclosure: projection.canDescribeLife
+            ecologyDisclosure: unreadCount > 0
+                ? "Some of this page is unread; life remains open."
+                : projection.canDescribeLife
                 ? "Readable Vitality writing shapes what may live here."
                 : "Life remains open to the world.",
             costQuote: source.cost,
@@ -174,11 +222,207 @@ enum WritingDeskReviewModelFactory {
             bindAvailability: bindAvailability)
     }
 
-    private static func canonicalHash<T: Encodable>(_ value: T) -> String? {
+    static func canonicalHash<T: Encodable>(_ value: T) -> String? {
         let encoder = JSONEncoder()
         encoder.outputFormatting = [.sortedKeys]
         guard let data = try? encoder.encode(value) else { return nil }
         return SHA256.hash(data: data).map { String(format: "%02x", $0) }.joined()
+    }
+
+    private static func redactedRequests(
+        page: Page,
+        visibleMarks: [WritingDeskVisibleMark],
+        dictionary: [LexemeIdentity: LibraryRules.DictionaryEntry]
+    ) -> (requests: [WritingDeskKnownRequest], silentMarkCount: Int) {
+        let visibleByID = Dictionary(uniqueKeysWithValues: visibleMarks.map { ($0.id, $0) })
+        var visited: Set<InstanceID> = []
+        var represented: Set<InstanceID> = []
+        var requests: [WritingDeskKnownRequest] = []
+
+        func knownName(_ identity: LexemeIdentity) -> String? {
+            guard let entry = dictionary[identity], entry.isKnown else { return nil }
+            return entry.name
+        }
+
+        // Page insertion order is the authored reading order. Cluster membership comes only from
+        // physical links; no canonical chain/effect projection is exposed here.
+        for first in page.runes where !visited.contains(first.id) {
+            let cluster = PageRules.cluster(containing: first.id, on: page)
+            cluster.forEach { visited.insert($0.id) }
+            guard cluster.allSatisfy({ visibleByID[$0.id]?.isReadable == true }) else { continue }
+
+            if cluster.count == 1, let mark = cluster.first {
+                switch mark.content {
+                case .rune(let sigil):
+                    guard let subject = knownName(.target(sigil.target)),
+                          let focus = knownName(.source(sigil.source)) else { continue }
+                    requests.append(.init(subject: subject,
+                                          focuses: [.init(name: focus, qualifiers: [])]))
+                    represented.insert(mark.id)
+                    continue
+                case .compound(let id):
+                    guard let name = knownName(.compound(id)) else { continue }
+                    requests.append(.init(subject: name, focuses: []))
+                    represented.insert(mark.id)
+                    continue
+                default: break
+                }
+            }
+
+            guard let targetMark = cluster.first(where: { $0.targetID != nil }),
+                  let targetID = targetMark.targetID,
+                  let subject = knownName(.target(targetID)) else { continue }
+            let sourceMarks = cluster.filter { $0.sourceID != nil }
+            guard !sourceMarks.isEmpty else { continue }
+            var focuses: [WritingDeskKnownRequest.Focus] = []
+            for sourceMark in sourceMarks {
+                guard let sourceID = sourceMark.sourceID,
+                      let name = knownName(.source(sourceID)) else { focuses = []; break }
+                let qualifierNames = page.links.compactMap { $0.other(than: sourceMark.id) }
+                    .compactMap { id in cluster.first { $0.id == id } }
+                    .compactMap(\.qualifierID)
+                    .compactMap { knownName(.qualifier($0)) }
+                focuses.append(.init(name: name, qualifiers: qualifierNames))
+            }
+            guard focuses.count == sourceMarks.count else { continue }
+            requests.append(.init(subject: subject, focuses: focuses))
+            cluster.forEach { represented.insert($0.id) }
+        }
+        let silent = page.runes.filter {
+            visibleByID[$0.id]?.isReadable == true && !represented.contains($0.id)
+        }.count
+        return (requests, silent)
+    }
+}
+
+struct WritingDeskPreparedInkApplication: Equatable, Sendable {
+    var vialID: UInt64
+    var recipe: InkRecipe
+    var before: Int
+    var spend: Int
+    var after: Int
+}
+
+struct WritingDeskAnchorageReceipt: Equatable, Sendable {
+    var bornAnchored: Bool
+    var isUnlocked: Bool
+    var stationTier: Int
+    var premium: Int
+}
+
+private struct WritingDeskFieldKitRevision: Encodable {
+    var entries: [FieldKitPreparationEntry]
+    var capacity: Int
+    var needsReview: Bool
+    var sourceInventory: Inventory
+}
+
+/// The complete staged authority shown by the fixed Bind bar and revalidated by commit.
+struct WritingDeskBindQuote: Equatable, Sendable {
+    static let currentVersion = "writing-bind-quote-v1"
+
+    var quoteVersion: String
+    var sourceKey: WritingDeskSourceKey
+    var frozenPageHash: String
+    var reservedCampaignSeed: UInt64
+    var generationSeed: UInt64
+    var pageCost: Int
+    var anchorageReceipt: WritingDeskAnchorageReceipt
+    var preparedInkReceipt: [WritingDeskPreparedInkApplication]
+    var fieldKitLoadoutHash: String
+    var fieldKitReceipt: FieldKitDepartureEvaluation
+    var availability: BindAvailability
+
+    var totalCost: Int { pageCost + anchorageReceipt.premium }
+}
+
+enum WritingDeskBindQuoteFactory {
+    @MainActor
+    static func make(state: GameState, selectedWorldPageID: InstanceID? = nil,
+                     bornAnchored: Bool = false) -> WritingDeskBindQuote? {
+        let page: Page
+        let pageCost: Int
+        let generationSeed: UInt64
+        let sourceKey: WritingDeskSourceKey
+        if let selectedWorldPageID {
+            let matches = state.base.collectedWorldPages.filter { $0.id == selectedWorldPageID }
+            guard matches.count == 1, let instance = matches.first,
+                  let canonical = WorldPageCatalog.definition(instance.definition.id),
+                  canonical == instance.definition,
+                  let hash = WritingDeskReviewModelFactory.canonicalHash(canonical) else { return nil }
+            page = instance.definition.page
+            pageCost = instance.definition.worldPageCost
+            generationSeed = instance.definition.seed
+            sourceKey = .collected(instanceID: instance.id,
+                                   definitionID: instance.definition.id,
+                                   canonicalDefinitionHash: hash)
+        } else {
+            page = state.base.page
+            pageCost = BookRules.resolveBook(page: page).essencePaid
+            generationSeed = state.worlds.seeds.peekNextSeed()
+            guard let revision = WritingDeskReviewModelFactory.canonicalHash(page) else { return nil }
+            sourceKey = .draft(pageRevisionID: revision)
+        }
+        let fieldKit = GameStore.fieldKitDepartureQuote(in: state)
+        let anchorPremium = bornAnchored
+            ? GameStore.bornAnchoredPremium(forBookCost: pageCost) : 0
+        let total = pageCost + anchorPremium
+        let availability: BindAvailability
+        if state.worlds.activeRun != nil {
+            availability = .activeExpedition
+        } else if case .refused(let reason) = fieldKit {
+            availability = .fieldKit(reason)
+        } else if bornAnchored && !state.base.station(Stations.anchorage).isUnlocked {
+            availability = .anchorageLocked
+        } else if state.base.essence < total {
+            availability = .insufficientEssence(available: state.base.essence, required: total)
+        } else if let reason = GameStore.inkDepartureRefusal(page: page, in: state.base) {
+            availability = .unavailable(reason)
+        } else {
+            availability = .ready(totalCost: total)
+        }
+
+        let requirements = GameStore.inkRequirements(on: page)
+        var inkReceipt: [WritingDeskPreparedInkApplication] = []
+        for recipe in requirements.keys.sorted(by: inkRecipeOrder) {
+            var remaining = requirements[recipe] ?? 0
+            for vial in state.base.preparedInkVials
+                .filter({ $0.recipe == recipe }).sorted(by: { $0.id < $1.id }) where remaining > 0 {
+                let spend = min(remaining, vial.remainingApplications)
+                inkReceipt.append(.init(vialID: vial.id, recipe: recipe,
+                                        before: vial.remainingApplications,
+                                        spend: spend,
+                                        after: vial.remainingApplications - spend))
+                remaining -= spend
+            }
+        }
+        let station = state.base.station(Stations.anchorage)
+        let loadoutHash = WritingDeskReviewModelFactory.canonicalHash(
+            WritingDeskFieldKitRevision(
+                entries: GameStore.canonicalFieldKitEntries(state.base.preparationLoadout ?? []),
+                capacity: state.base.satchelCapacity,
+                needsReview: state.base.preparationLoadoutNeedsReview,
+                sourceInventory: state.base.inventory)) ?? ""
+        guard let frozenPageHash = WritingDeskReviewModelFactory.canonicalHash(page) else { return nil }
+        return .init(quoteVersion: WritingDeskBindQuote.currentVersion,
+                     sourceKey: sourceKey,
+                     frozenPageHash: frozenPageHash,
+                     reservedCampaignSeed: state.worlds.seeds.peekNextSeed(),
+                     generationSeed: generationSeed,
+                     pageCost: pageCost,
+                     anchorageReceipt: .init(bornAnchored: bornAnchored,
+                                             isUnlocked: station.isUnlocked,
+                                             stationTier: station.tier,
+                                             premium: anchorPremium),
+                     preparedInkReceipt: inkReceipt,
+                     fieldKitLoadoutHash: loadoutHash,
+                     fieldKitReceipt: fieldKit,
+                     availability: availability)
+    }
+
+    private static func inkRecipeOrder(_ lhs: InkRecipe, _ rhs: InkRecipe) -> Bool {
+        [lhs.cyan, lhs.magenta, lhs.yellow, lhs.depth]
+            .lexicographicallyPrecedes([rhs.cyan, rhs.magenta, rhs.yellow, rhs.depth])
     }
 }
 
@@ -194,5 +438,12 @@ extension GameStore {
             state: state, selectedWorldPageID: selectedWorldPageID,
             bornAnchored: bornAnchored, bindAvailability: availability,
             tuning: DebugTuningProfile.active)
+    }
+
+    func writingDeskBindQuote(selectedWorldPageID: InstanceID? = nil,
+                              bornAnchored: Bool = false) -> WritingDeskBindQuote? {
+        WritingDeskBindQuoteFactory.make(
+            state: state, selectedWorldPageID: selectedWorldPageID,
+            bornAnchored: bornAnchored)
     }
 }

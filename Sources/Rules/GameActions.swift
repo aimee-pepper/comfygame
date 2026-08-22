@@ -862,14 +862,14 @@ extension GameStore {
         return .ready(totalCost: total)
     }
 
-    nonisolated private static func inkRequirements(on page: Page) -> [InkRecipe: Int] {
+    nonisolated static func inkRequirements(on page: Page) -> [InkRecipe: Int] {
         page.runes.reduce(into: [:]) { result, mark in
             guard mark.canCarryInk, let recipe = mark.inkRecipe else { return }
             result[recipe, default: 0] += 1
         }
     }
 
-    nonisolated private static func inkDepartureRefusal(page: Page, in base: BaseState) -> String? {
+    nonisolated static func inkDepartureRefusal(page: Page, in base: BaseState) -> String? {
         if page.runes.contains(where: { mark in
             mark.inkRecipe != nil
                 && mark.inkEligibleSourceID.map(InkEconomyRules.supportedSourceIDs.contains) != true
@@ -893,10 +893,17 @@ extension GameStore {
     ) -> Bool {
         let requirements = inkRequirements(on: page)
         guard inkDepartureRefusal(page: page, in: base) == nil else { return false }
-        for (recipe, required) in requirements {
+        let recipes = requirements.keys.sorted {
+            [$0.cyan, $0.magenta, $0.yellow, $0.depth]
+                .lexicographicallyPrecedes([$1.cyan, $1.magenta, $1.yellow, $1.depth])
+        }
+        for recipe in recipes {
+            let required = requirements[recipe] ?? 0
             var remaining = required
-            for index in base.preparedInkVials.indices
-                where base.preparedInkVials[index].recipe == recipe && remaining > 0 {
+            let indices = base.preparedInkVials.indices
+                .filter { base.preparedInkVials[$0].recipe == recipe }
+                .sorted { base.preparedInkVials[$0].id < base.preparedInkVials[$1].id }
+            for index in indices where remaining > 0 {
                 let consumed = min(remaining, base.preparedInkVials[index].remainingApplications)
                 base.preparedInkVials[index].remainingApplications -= consumed
                 remaining -= consumed
@@ -958,14 +965,18 @@ extension GameStore {
             bindError = availability.refusalMessage
             return false
         }
-        let pageCost = selectedWorldPage?.definition.worldPageCost ?? bookProjection.cost
-        let anchorPremium = bornAnchored ? Self.bornAnchoredPremium(forBookCost: pageCost) : 0
+        guard let stagedBindQuote = writingDeskBindQuote(
+            selectedWorldPageID: worldPageInstanceID, bornAnchored: bornAnchored) else {
+            bindError = "The binding changed before departure. Nothing was spent."
+            return false
+        }
+        let anchorPremium = stagedBindQuote.anchorageReceipt.premium
 
         // Build the complete world and its immutable visual authority before the commitment
         // mutation. A bad future adapter/schema can therefore spend no Essence, consume no seed,
         // change no page/history fact and create no half-world.
-        let reservedCampaignSeed = state.worlds.seeds.peekNextSeed()
-        let generationSeed = selectedWorldPage?.definition.seed ?? reservedCampaignSeed
+        let reservedCampaignSeed = stagedBindQuote.reservedCampaignSeed
+        let generationSeed = stagedBindQuote.generationSeed
         let sourcePage = selectedWorldPage?.definition.page ?? state.base.page
         var book = selectedWorldPage.map(BookRules.resolveBook(worldPage:))
             ?? BookRules.resolveBook(page: sourcePage)
@@ -1018,6 +1029,9 @@ extension GameStore {
         }
 
         let didCommit = mutateIf("bind book & depart", flush: true) { state in
+            guard WritingDeskBindQuoteFactory.make(
+                state: state, selectedWorldPageID: worldPageInstanceID,
+                bornAnchored: bornAnchored) == stagedBindQuote else { return false }
             guard state.worlds.activeRun == nil,
                   state.base.essence >= book.essencePaid + anchorPremium,
                   !bornAnchored || state.base.station(Stations.anchorage).isUnlocked else { return false }
