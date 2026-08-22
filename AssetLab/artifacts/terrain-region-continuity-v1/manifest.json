@@ -1,0 +1,303 @@
+{
+  "schemaVersion": "terrain-region-continuity-v1",
+  "status": "candidate-not-approved",
+  "integrationReady": false,
+  "baseline": "ae12dd5f",
+  "acceptedPins": {
+    "terrainProductionPackBody": "ecb748ba46582bd432e7eba7cfc5494fd8ea8badcf3a8652d24c7a533d8e8336",
+    "dynamicTerrainBody": "2a541033b71b638f1803e5a9477a0197c38f38d96ff199a4864d49bf551608dd",
+    "dynamicTerrainManifestSHA256": "5e70b17c91c8601ed895455364f2cd8a51e010e2cb2201f09dc2c02c826f3892",
+    "productionAggregateSHA256": "90da0b9ed6092b591bcad83fbda68b0563de9c2ba37127911772c41418657a54",
+    "southWallCommit": "ae12dd5f",
+    "southWallManifestSHA256": "ee635278fe03b04304b46e47673596723df58827819e79580c40cc697d5fd9bb"
+  },
+  "contract": {
+    "boundaryRole": "materialBoundary",
+    "macro": [
+      64,
+      64
+    ],
+    "tile": [
+      16,
+      16
+    ],
+    "smallAccents": "inset 3...12",
+    "sameMaterial": "no seam/no boundary",
+    "differentMaterial": "single-owner complementary contour",
+    "motion": "world-coordinate phase",
+    "visibility": "external; hidden no request",
+    "elevation": "south-wall-v1 external and preserved",
+    "fog": "external atmosphere owner"
+  },
+  "outputs": [
+    {
+      "name": "evidence/cluster-stone-native.png",
+      "width": 80,
+      "height": 80,
+      "sha256": "131bf8ef7b42ea2c40cd48438f130fb7284348472d46b0d6650efc5f2fd53ac6"
+    },
+    {
+      "name": "evidence/cluster-stone-2x.png",
+      "width": 160,
+      "height": 160,
+      "sha256": "cbc3857446b2bf7556d34cab58ec205d1c750ad013a3c7c41b8b5cffe600d04d"
+    },
+    {
+      "name": "evidence/cluster-stone-400pct.png",
+      "width": 320,
+      "height": 320,
+      "sha256": "a55bec3e210f18ac32511272d6f77d4f36f21e5fe8ff4229160f843526486af3"
+    },
+    {
+      "name": "evidence/cluster-stone-grayscale-400pct.png",
+      "width": 320,
+      "height": 320,
+      "sha256": "17eedc11fddc8fbf21974599ff01920e95bc6978b98284e755535234f4044a5d"
+    },
+    {
+      "name": "evidence/cluster-soil-native.png",
+      "width": 80,
+      "height": 80,
+      "sha256": "23ba7f03a0bb2ba2dc95a80498dcafe90fb34841722dff1ff886204a8d369cfe"
+    },
+    {
+      "name": "evidence/cluster-soil-2x.png",
+      "width": 160,
+      "height": 160,
+      "sha256": "3b9c698c54056b917b665046c393a10ed6b852bc6a53a5a47ec621cc9836d2c2"
+    },
+    {
+      "name": "evidence/cluster-soil-400pct.png",
+      "width": 320,
+      "height": 320,
+      "sha256": "cb95b7c4778e8fe78564435b95a100e900237df688dba908546657c28c71efc3"
+    },
+    {
+      "name": "evidence/cluster-soil-grayscale-400pct.png",
+      "width": 320,
+      "height": 320,
+      "sha256": "69a0d35f637e0311e10dc6963014672f7fde9aa405949d52bc9ea11b8a1eaa0d"
+    },
+    {
+      "name": "evidence/cluster-growth-native.png",
+      "width": 80,
+      "height": 80,
+      "sha256": "2cdb317b16cd17b7bb05ce7fc84ab575c88cb95376bad093e091093262ade0c5"
+    },
+    {
+      "name": "evidence/cluster-growth-2x.png",
+      "width": 160,
+      "height": 160,
+      "sha256": "9d9f5c361b16a6781a3eca4a5312117183ccb5ac29f15cbbdda35742ce455697"
+    },
+    {
+      "name": "evidence/cluster-growth-400pct.png",
+      "width": 320,
+      "height": 320,
+      "sha256": "8dca48f8adb8e487b2877a0944bc88cae3f7cd8516b6855d07bc38c372e6c35e"
+    },
+    {
+      "name": "evidence/cluster-growth-grayscale-400pct.png",
+      "width": 320,
+      "height": 320,
+      "sha256": "4a8e014c7a8b248abe08e98b5adaf8792cc3f68e916649186683df7370669f55"
+    },
+    {
+      "name": "evidence/cluster-water-native.png",
+      "width": 80,
+      "height": 80,
+      "sha256": "8b9682ba2343c6af82fa14c2d76aa6aca2fcf6b6dc311c8ef60be9b2b0fc6db1"
+    },
+    {
+      "name": "evidence/cluster-water-2x.png",
+      "width": 160,
+      "height": 160,
+      "sha256": "9b03c04dc4ca568e929c956c2ec01c81c31be4c1761cb1606cb4eabb13156cf2"
+    },
+    {
+      "name": "evidence/cluster-water-400pct.png",
+      "width": 320,
+      "height": 320,
+      "sha256": "f88f15f47c01eb8937daaafa59ec4c96fc79229b94b1ee373ab4783387d1934f"
+    },
+    {
+      "name": "evidence/cluster-water-grayscale-400pct.png",
+      "width": 320,
+      "height": 320,
+      "sha256": "c32245b911ebc9a7a2a6c3141ded66e8adab7b86f73f6bae64ab40dc952a382c"
+    },
+    {
+      "name": "evidence/corridor-1-native.png",
+      "width": 112,
+      "height": 80,
+      "sha256": "16cab8c1723bd4f5062a7679802ffde812c3fde4b0b1e19b165c8f62bcf9d69a"
+    },
+    {
+      "name": "evidence/corridor-1-2x.png",
+      "width": 224,
+      "height": 160,
+      "sha256": "917be3c4e00d70b659227f0269fe359794c9dbfc633bf11493c450c83c9592b0"
+    },
+    {
+      "name": "evidence/corridor-1-400pct.png",
+      "width": 448,
+      "height": 320,
+      "sha256": "5296027a5b56ea569cc4dbdf7b1fa7a99ec34b5f29717d89ed90dc15b4b23f09"
+    },
+    {
+      "name": "evidence/corridor-1-grayscale-400pct.png",
+      "width": 448,
+      "height": 320,
+      "sha256": "a1fde0101c937a40ba3a7db6af38a149418837d26951d29ddb92ea90a5a4a4c1"
+    },
+    {
+      "name": "evidence/corridor-2-native.png",
+      "width": 128,
+      "height": 96,
+      "sha256": "bd2a12986d3bf3b866f4ab9caf8e172449c632f53872786052d77f7ab61994a2"
+    },
+    {
+      "name": "evidence/corridor-2-2x.png",
+      "width": 256,
+      "height": 192,
+      "sha256": "7abb0021c775ca04a0840197708380a2397af149942434ade06d32d2482190de"
+    },
+    {
+      "name": "evidence/corridor-2-400pct.png",
+      "width": 512,
+      "height": 384,
+      "sha256": "54b5a9e216ccf8501cf58d8609f4fcc1fcbd51078d49fce64ce25edb770920e9"
+    },
+    {
+      "name": "evidence/corridor-2-grayscale-400pct.png",
+      "width": 512,
+      "height": 384,
+      "sha256": "d0b2b0d562c774a4cf38b4fbf388fb61fe674e0414f396f306a9c255df89c91b"
+    },
+    {
+      "name": "evidence/pool-deep-native.png",
+      "width": 144,
+      "height": 112,
+      "sha256": "b37d6c465dbc19ab1954cf85f044b8ab370a455d465436939f1de690beeba4c3"
+    },
+    {
+      "name": "evidence/pool-deep-2x.png",
+      "width": 288,
+      "height": 224,
+      "sha256": "061fa91a27f3b9f571d61c08723a47656088efd7349a843239d7064cedea9351"
+    },
+    {
+      "name": "evidence/pool-deep-400pct.png",
+      "width": 576,
+      "height": 448,
+      "sha256": "fe8c901168a7956eff46f67db001cd495d44f3fca693f790211d16529026339a"
+    },
+    {
+      "name": "evidence/pool-deep-grayscale-400pct.png",
+      "width": 576,
+      "height": 448,
+      "sha256": "73f03b8e75f30e3987e7f23bf497af8852c114199cca4d03ae7b46161f249fa9"
+    },
+    {
+      "name": "evidence/junction-t-cross-native.png",
+      "width": 112,
+      "height": 112,
+      "sha256": "f7d5017725070861d8993f5df616c0195d2312ca811b83850fb4275956b0b056"
+    },
+    {
+      "name": "evidence/junction-t-cross-2x.png",
+      "width": 224,
+      "height": 224,
+      "sha256": "7bf81e06f79ac9466ec2f582ec9c5234155fdb6723d12da05bd369981f21f8e4"
+    },
+    {
+      "name": "evidence/junction-t-cross-400pct.png",
+      "width": 448,
+      "height": 448,
+      "sha256": "adb41f055886fb0e6c7bf5cab91d6261678d32cc2417821f57597f4ac5e3642d"
+    },
+    {
+      "name": "evidence/junction-t-cross-grayscale-400pct.png",
+      "width": 448,
+      "height": 448,
+      "sha256": "dd4e0a4d60afca507fb3d4b86ce63ab31083246fb79c61392ee552b8bc449c85"
+    },
+    {
+      "name": "evidence/stone-rubble-native.png",
+      "width": 128,
+      "height": 96,
+      "sha256": "a8b90d68267956d8d0ff3eb5c8e654b1b4ac48c3d5e83e0edd260b7631377d79"
+    },
+    {
+      "name": "evidence/stone-rubble-2x.png",
+      "width": 256,
+      "height": 192,
+      "sha256": "eb156a8b6c6dd187b9a2883a25fc8481469e09281eb5f3fd7247bf646a064ae9"
+    },
+    {
+      "name": "evidence/stone-rubble-400pct.png",
+      "width": 512,
+      "height": 384,
+      "sha256": "ef01d3f36ddba0d215b0fe7c13bb56f54425d810b92201a975db939463de7f43"
+    },
+    {
+      "name": "evidence/stone-rubble-grayscale-400pct.png",
+      "width": 512,
+      "height": 384,
+      "sha256": "fad944bfd53c9ed8ec13afa0908ba86674eb02a532033e1533a41f6c750a9f7d"
+    },
+    {
+      "name": "evidence/macro-11x11-redraw-a-2x.png",
+      "width": 352,
+      "height": 352,
+      "sha256": "88270d061fb9480e6df1684cf77710c50765004777a8388b9583f04457c68b82"
+    },
+    {
+      "name": "evidence/macro-11x11-redraw-b-2x.png",
+      "width": 352,
+      "height": 352,
+      "sha256": "88270d061fb9480e6df1684cf77710c50765004777a8388b9583f04457c68b82"
+    },
+    {
+      "name": "evidence/phone-old-current-corrected-368x800.png",
+      "width": 368,
+      "height": 800,
+      "sha256": "2078f521a1c933a52e05f2a0cfbc017c37edb479b598495f29e37520e521acda"
+    },
+    {
+      "name": "evidence/phone-old-current-corrected-grayscale-368x800.png",
+      "width": 368,
+      "height": 800,
+      "sha256": "cdd6e5be6a707c256f8c443fb6312d3335eb32816df5e7bcdb96c6e4b12ea8a1"
+    },
+    {
+      "name": "evidence/phone-visibility-368x800.png",
+      "width": 368,
+      "height": 800,
+      "sha256": "06ba9c05989c58ad7e4202a518a643a0b76fa44c238e3dcd5cedc3d80f0898f2"
+    },
+    {
+      "name": "evidence/equal-height-vs-south-wall-400pct.png",
+      "width": 900,
+      "height": 360,
+      "sha256": "450f90a656628744635266dc99cf38552835d5e81dbb633c383b77999e8d26af"
+    },
+    {
+      "name": "evidence/equal-height-vs-south-wall-grayscale-400pct.png",
+      "width": 900,
+      "height": 360,
+      "sha256": "e43b77a51d8bdc4c59e39a9e318b41934b21ac25d59bfe0c248eae7557ee4796"
+    }
+  ],
+  "contactSheet": {
+    "path": "review-contact-sheet.png",
+    "width": 1800,
+    "height": 2200,
+    "sha256": "bb7d60addeb02589af635489f737a5a99d1ed8fe566c573ce5e43d9346799fc2"
+  },
+  "corpus": {
+    "path": "native-adapter-conformance.json",
+    "caseCount": 121
+  },
+  "canonicalBodySHA256": "9d901944a851aa1eaeee09a5ebdb6465a0606070cd2149ac6b97a33ed7730283"
+}

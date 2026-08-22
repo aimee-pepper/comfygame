@@ -1,0 +1,5228 @@
+{
+  "schemaVersion": "terrain-region-continuity-v1",
+  "hidden": "no-request",
+  "macroSampling": {
+    "size": [
+      64,
+      64
+    ],
+    "coordinates": "world-coordinate",
+    "redrawStable": true
+  },
+  "boundary": {
+    "role": "materialBoundary",
+    "owner": "lower canonical ground rank",
+    "complementaryEdgeID": true,
+    "equalGround": "none",
+    "unknownNeighbor": "none"
+  },
+  "southWall": {
+    "authority": "terrain-south-wall-v1",
+    "preserved": true
+  },
+  "cases": [
+    {
+      "id": "macro/0/0",
+      "request": {
+        "schemaVersion": "terrain-region-continuity-v1",
+        "ground": "stone",
+        "point": {
+          "x": 0,
+          "y": 0
+        },
+        "visualSeed": 442,
+        "featureVariant": 0,
+        "cardinalNeighbors": {
+          "north": "unknown",
+          "east": "same",
+          "south": "same",
+          "west": "unknown"
+        },
+        "edgeContourIDs": {
+          "north": 0,
+          "east": 0,
+          "south": 2,
+          "west": 2
+        },
+        "visibility": "full",
+        "motionPhase": 0
+      },
+      "baseRoleSHA256": "389aa091a5aa18016be87715302993bc1aceb414a9bbfbd03597ee663850905c",
+      "materialBoundarySHA256": "5341e6b2646979a70e57653007a1f310169421ec9bdd9f1a5648f75ade005af1",
+      "rgbaSHA256": "82f5fada2ff3a9978cf02f4a26b192af36b7e234a8e0340058dd89e669a8cf1e",
+      "accent": {
+        "x": 10,
+        "y": 3
+      },
+      "layerOrder": [
+        "acceptedBase",
+        "eligibleMotion",
+        "materialBoundary",
+        "southWallExternal",
+        "content",
+        "selection",
+        "visibilityExternal"
+      ]
+    },
+    {
+      "id": "macro/1/0",
+      "request": {
+        "schemaVersion": "terrain-region-continuity-v1",
+        "ground": "stone",
+        "point": {
+          "x": 1,
+          "y": 0
+        },
+        "visualSeed": 442,
+        "featureVariant": 0,
+        "cardinalNeighbors": {
+          "north": "unknown",
+          "east": "same",
+          "south": "same",
+          "west": "same"
+        },
+        "edgeContourIDs": {
+          "north": 0,
+          "east": 2,
+          "south": 2,
+          "west": 0
+        },
+        "visibility": "full",
+        "motionPhase": 1
+      },
+      "baseRoleSHA256": "289a518d8aca1cac47ff27071d003b9d38cf453626f04f00b629ddf860b2a2c5",
+      "materialBoundarySHA256": "5341e6b2646979a70e57653007a1f310169421ec9bdd9f1a5648f75ade005af1",
+      "rgbaSHA256": "eab5b43e76e62be81203ee35d81eb58b41fe44b03ffeff38dd109a061ce8c548",
+      "accent": {
+        "x": 3,
+        "y": 11
+      },
+      "layerOrder": [
+        "acceptedBase",
+        "eligibleMotion",
+        "materialBoundary",
+        "southWallExternal",
+        "content",
+        "selection",
+        "visibilityExternal"
+      ]
+    },
+    {
+      "id": "macro/2/0",
+      "request": {
+        "schemaVersion": "terrain-region-continuity-v1",
+        "ground": "stone",
+        "point": {
+          "x": 2,
+          "y": 0
+        },
+        "visualSeed": 442,
+        "featureVariant": 0,
+        "cardinalNeighbors": {
+          "north": "unknown",
+          "east": "soil",
+          "south": "same",
+          "west": "same"
+        },
+        "edgeContourIDs": {
+          "north": 0,
+          "east": 0,
+          "south": 2,
+          "west": 2
+        },
+        "visibility": "full",
+        "motionPhase": 2
+      },
+      "baseRoleSHA256": "7c3a4302d9dca5262eb82e771e6efd4897364ed187bf54f774d62c26ecab9e0a",
+      "materialBoundarySHA256": "7f946d8b6b2b0ec12a1da90a9f0ec31894e720ef76367831079f64d27ac2a79a",
+      "rgbaSHA256": "261875be7f951ec9d13eeb8ce5b855eb88828646d77df4dfcc56e32ce264f4fe",
+      "accent": {
+        "x": 4,
+        "y": 5
+      },
+      "layerOrder": [
+        "acceptedBase",
+        "eligibleMotion",
+        "materialBoundary",
+        "southWallExternal",
+        "content",
+        "selection",
+        "visibilityExternal"
+      ]
+    },
+    {
+      "id": "macro/3/0",
+      "request": {
+        "schemaVersion": "terrain-region-continuity-v1",
+        "ground": "soil",
+        "point": {
+          "x": 3,
+          "y": 0
+        },
+        "visualSeed": 442,
+        "featureVariant": 0,
+        "cardinalNeighbors": {
+          "north": "unknown",
+          "east": "same",
+          "south": "same",
+          "west": "stone"
+        },
+        "edgeContourIDs": {
+          "north": 0,
+          "east": 2,
+          "south": 2,
+          "west": 0
+        },
+        "visibility": "full",
+        "motionPhase": 3
+      },
+      "baseRoleSHA256": "9201dd9f1b8cfd01b9c55d49b5585d261fb7dc8d5c6954d3a2a4575df8f91dfa",
+      "materialBoundarySHA256": "5341e6b2646979a70e57653007a1f310169421ec9bdd9f1a5648f75ade005af1",
+      "rgbaSHA256": "b98c9170de4c7cc97d64bab41b386134711f5cecb14ea3b61b78b96d4d547c1e",
+      "accent": {
+        "x": 10,
+        "y": 8
+      },
+      "layerOrder": [
+        "acceptedBase",
+        "eligibleMotion",
+        "materialBoundary",
+        "southWallExternal",
+        "content",
+        "selection",
+        "visibilityExternal"
+      ]
+    },
+    {
+      "id": "macro/4/0",
+      "request": {
+        "schemaVersion": "terrain-region-continuity-v1",
+        "ground": "soil",
+        "point": {
+          "x": 4,
+          "y": 0
+        },
+        "visualSeed": 442,
+        "featureVariant": 0,
+        "cardinalNeighbors": {
+          "north": "unknown",
+          "east": "rubble",
+          "south": "rubble",
+          "west": "same"
+        },
+        "edgeContourIDs": {
+          "north": 0,
+          "east": 0,
+          "south": 2,
+          "west": 2
+        },
+        "visibility": "full",
+        "motionPhase": 0
+      },
+      "baseRoleSHA256": "ae9047cb9f3da27899e35ae6fe8f8c2b389f6b89a5626ff0544c00cf5cbfeba5",
+      "materialBoundarySHA256": "552fa46a33da9c9fb46b4dcd5fe996900e96ddf1db31a08a6ffa1e1aa4838fa0",
+      "rgbaSHA256": "8e8e5298fadcc5caf3c2397f3e165b98c952d9ca2937f3ad4d1fd03f14466316",
+      "accent": {
+        "x": 6,
+        "y": 6
+      },
+      "layerOrder": [
+        "acceptedBase",
+        "eligibleMotion",
+        "materialBoundary",
+        "southWallExternal",
+        "content",
+        "selection",
+        "visibilityExternal"
+      ]
+    },
+    {
+      "id": "macro/5/0",
+      "request": {
+        "schemaVersion": "terrain-region-continuity-v1",
+        "ground": "rubble",
+        "point": {
+          "x": 5,
+          "y": 0
+        },
+        "visualSeed": 442,
+        "featureVariant": 0,
+        "cardinalNeighbors": {
+          "north": "unknown",
+          "east": "soil",
+          "south": "soil",
+          "west": "soil"
+        },
+        "edgeContourIDs": {
+          "north": 0,
+          "east": 2,
+          "south": 2,
+          "west": 0
+        },
+        "visibility": "full",
+        "motionPhase": 1
+      },
+      "baseRoleSHA256": "df04a061f1fcc8328829628a59bfba11d0e35495a9316631d5c5c9c9be1772c8",
+      "materialBoundarySHA256": "5341e6b2646979a70e57653007a1f310169421ec9bdd9f1a5648f75ade005af1",
+      "rgbaSHA256": "79c983d5c7fead5e178765f8154b2b8de6a274eee77ab0b733d9adb2a39dd45e",
+      "accent": {
+        "x": 6,
+        "y": 5
+      },
+      "layerOrder": [
+        "acceptedBase",
+        "eligibleMotion",
+        "materialBoundary",
+        "southWallExternal",
+        "content",
+        "selection",
+        "visibilityExternal"
+      ]
+    },
+    {
+      "id": "macro/6/0",
+      "request": {
+        "schemaVersion": "terrain-region-continuity-v1",
+        "ground": "soil",
+        "point": {
+          "x": 6,
+          "y": 0
+        },
+        "visualSeed": 442,
+        "featureVariant": 0,
+        "cardinalNeighbors": {
+          "north": "unknown",
+          "east": "same",
+          "south": "same",
+          "west": "rubble"
+        },
+        "edgeContourIDs": {
+          "north": 0,
+          "east": 0,
+          "south": 2,
+          "west": 2
+        },
+        "visibility": "full",
+        "motionPhase": 2
+      },
+      "baseRoleSHA256": "06ead40f5c4331fad10f0d98f8f569ef8ebb88cf9b1f226560b08ebe8a289d82",
+      "materialBoundarySHA256": "d9e86b71b75da2a381e0cf2143bca4b7fddf48ea7762f9305a3f58db4a91ebf1",
+      "rgbaSHA256": "b05167b04ba91b3be6a9b09f66c1702bbefaf4272e1dcb8e76a64df039a033ea",
+      "accent": {
+        "x": 10,
+        "y": 4
+      },
+      "layerOrder": [
+        "acceptedBase",
+        "eligibleMotion",
+        "materialBoundary",
+        "southWallExternal",
+        "content",
+        "selection",
+        "visibilityExternal"
+      ]
+    },
+    {
+      "id": "macro/7/0",
+      "request": {
+        "schemaVersion": "terrain-region-continuity-v1",
+        "ground": "soil",
+        "point": {
+          "x": 7,
+          "y": 0
+        },
+        "visualSeed": 442,
+        "featureVariant": 0,
+        "cardinalNeighbors": {
+          "north": "unknown",
+          "east": "same",
+          "south": "same",
+          "west": "same"
+        },
+        "edgeContourIDs": {
+          "north": 0,
+          "east": 2,
+          "south": 2,
+          "west": 0
+        },
+        "visibility": "full",
+        "motionPhase": 3
+      },
+      "baseRoleSHA256": "18a33ac5b789d008aa72dfbe55c41a69b289f55e4d9ae9262a65274549eb6bd0",
+      "materialBoundarySHA256": "5341e6b2646979a70e57653007a1f310169421ec9bdd9f1a5648f75ade005af1",
+      "rgbaSHA256": "fb7a2b9acbeb43c29b9490f194fb69f8589246924a07c273a82a1adf07bc3c95",
+      "accent": {
+        "x": 9,
+        "y": 8
+      },
+      "layerOrder": [
+        "acceptedBase",
+        "eligibleMotion",
+        "materialBoundary",
+        "southWallExternal",
+        "content",
+        "selection",
+        "visibilityExternal"
+      ]
+    },
+    {
+      "id": "macro/8/0",
+      "request": {
+        "schemaVersion": "terrain-region-continuity-v1",
+        "ground": "soil",
+        "point": {
+          "x": 8,
+          "y": 0
+        },
+        "visualSeed": 442,
+        "featureVariant": 0,
+        "cardinalNeighbors": {
+          "north": "unknown",
+          "east": "same",
+          "south": "same",
+          "west": "same"
+        },
+        "edgeContourIDs": {
+          "north": 0,
+          "east": 0,
+          "south": 2,
+          "west": 2
+        },
+        "visibility": "full",
+        "motionPhase": 0
+      },
+      "baseRoleSHA256": "1196a645a1801afe5847f48d4fcba39169d4a7cc341f56e2778996b6eaaf7080",
+      "materialBoundarySHA256": "5341e6b2646979a70e57653007a1f310169421ec9bdd9f1a5648f75ade005af1",
+      "rgbaSHA256": "fd185819738b81fadb47af9803ebd7787b817c08701866cddd30002c454d1cf0",
+      "accent": {
+        "x": 9,
+        "y": 6
+      },
+      "layerOrder": [
+        "acceptedBase",
+        "eligibleMotion",
+        "materialBoundary",
+        "southWallExternal",
+        "content",
+        "selection",
+        "visibilityExternal"
+      ]
+    },
+    {
+      "id": "macro/9/0",
+      "request": {
+        "schemaVersion": "terrain-region-continuity-v1",
+        "ground": "soil",
+        "point": {
+          "x": 9,
+          "y": 0
+        },
+        "visualSeed": 442,
+        "featureVariant": 0,
+        "cardinalNeighbors": {
+          "north": "unknown",
+          "east": "rubble",
+          "south": "rubble",
+          "west": "same"
+        },
+        "edgeContourIDs": {
+          "north": 0,
+          "east": 2,
+          "south": 2,
+          "west": 0
+        },
+        "visibility": "full",
+        "motionPhase": 1
+      },
+      "baseRoleSHA256": "83cb9d94307be090cf9e9357c9616d5cda0e8ca01f5b83df051ff27403e2693a",
+      "materialBoundarySHA256": "dbbb0c9c5e402fa283ea7e0676b9b435fe31b113c3d796c7bc3edf251503f958",
+      "rgbaSHA256": "5b6a0d17db72d3667aa76de17a108a261de0583486c67af0b85a1ffd5d9fb409",
+      "accent": {
+        "x": 3,
+        "y": 10
+      },
+      "layerOrder": [
+        "acceptedBase",
+        "eligibleMotion",
+        "materialBoundary",
+        "southWallExternal",
+        "content",
+        "selection",
+        "visibilityExternal"
+      ]
+    },
+    {
+      "id": "macro/10/0",
+      "request": {
+        "schemaVersion": "terrain-region-continuity-v1",
+        "ground": "rubble",
+        "point": {
+          "x": 10,
+          "y": 0
+        },
+        "visualSeed": 442,
+        "featureVariant": 0,
+        "cardinalNeighbors": {
+          "north": "unknown",
+          "east": "unknown",
+          "south": "soil",
+          "west": "soil"
+        },
+        "edgeContourIDs": {
+          "north": 0,
+          "east": 0,
+          "south": 2,
+          "west": 2
+        },
+        "visibility": "full",
+        "motionPhase": 2
+      },
+      "baseRoleSHA256": "de738a68e2a571a8d81efbf9cb946b5b8ccbd48d93fa03d6c7e01952febbff19",
+      "materialBoundarySHA256": "5341e6b2646979a70e57653007a1f310169421ec9bdd9f1a5648f75ade005af1",
+      "rgbaSHA256": "9304fe4c7aca4cf1d0fc2ed8f9352d63717fac1c573425ae15bfbb89c345ff0f",
+      "accent": {
+        "x": 7,
+        "y": 11
+      },
+      "layerOrder": [
+        "acceptedBase",
+        "eligibleMotion",
+        "materialBoundary",
+        "southWallExternal",
+        "content",
+        "selection",
+        "visibilityExternal"
+      ]
+    },
+    {
+      "id": "macro/0/1",
+      "request": {
+        "schemaVersion": "terrain-region-continuity-v1",
+        "ground": "stone",
+        "point": {
+          "x": 0,
+          "y": 1
+        },
+        "visualSeed": 442,
+        "featureVariant": 0,
+        "cardinalNeighbors": {
+          "north": "same",
+          "east": "same",
+          "south": "same",
+          "west": "unknown"
+        },
+        "edgeContourIDs": {
+          "north": 2,
+          "east": 0,
+          "south": 0,
+          "west": 2
+        },
+        "visibility": "full",
+        "motionPhase": 1
+      },
+      "baseRoleSHA256": "521081b483e5e8c854d8e3b87365cd21a148deeac7364407297037508724d5ed",
+      "materialBoundarySHA256": "5341e6b2646979a70e57653007a1f310169421ec9bdd9f1a5648f75ade005af1",
+      "rgbaSHA256": "b95ae45115a2f3672af41912cc2acb509be4df86630cce63c6f197a92d958958",
+      "accent": {
+        "x": 7,
+        "y": 7
+      },
+      "layerOrder": [
+        "acceptedBase",
+        "eligibleMotion",
+        "materialBoundary",
+        "southWallExternal",
+        "content",
+        "selection",
+        "visibilityExternal"
+      ]
+    },
+    {
+      "id": "macro/1/1",
+      "request": {
+        "schemaVersion": "terrain-region-continuity-v1",
+        "ground": "stone",
+        "point": {
+          "x": 1,
+          "y": 1
+        },
+        "visualSeed": 442,
+        "featureVariant": 0,
+        "cardinalNeighbors": {
+          "north": "same",
+          "east": "same",
+          "south": "same",
+          "west": "same"
+        },
+        "edgeContourIDs": {
+          "north": 2,
+          "east": 2,
+          "south": 0,
+          "west": 0
+        },
+        "visibility": "full",
+        "motionPhase": 2
+      },
+      "baseRoleSHA256": "14a481e3603fe22e27afe3868e817feb79ae43cccfd708788826b2f5647fa85f",
+      "materialBoundarySHA256": "5341e6b2646979a70e57653007a1f310169421ec9bdd9f1a5648f75ade005af1",
+      "rgbaSHA256": "891e3e669f803e02c63c173ffc1f132d6841bff50b54584dca47112dd351c1fe",
+      "accent": {
+        "x": 11,
+        "y": 11
+      },
+      "layerOrder": [
+        "acceptedBase",
+        "eligibleMotion",
+        "materialBoundary",
+        "southWallExternal",
+        "content",
+        "selection",
+        "visibilityExternal"
+      ]
+    },
+    {
+      "id": "macro/2/1",
+      "request": {
+        "schemaVersion": "terrain-region-continuity-v1",
+        "ground": "stone",
+        "point": {
+          "x": 2,
+          "y": 1
+        },
+        "visualSeed": 442,
+        "featureVariant": 0,
+        "cardinalNeighbors": {
+          "north": "same",
+          "east": "soil",
+          "south": "same",
+          "west": "same"
+        },
+        "edgeContourIDs": {
+          "north": 2,
+          "east": 0,
+          "south": 0,
+          "west": 2
+        },
+        "visibility": "full",
+        "motionPhase": 3
+      },
+      "baseRoleSHA256": "381e06349d1d256d0c2ac4c12afdb781d6aa37587733fe1c05eadba4e892f25b",
+      "materialBoundarySHA256": "0400a45202caba4d673ac446a907a1b4c06df98dcc72be365f5ff888ccafc63e",
+      "rgbaSHA256": "0b7a86bada2821851e4cfe83ad77bda7db0099899067e6d4e00e747374f18167",
+      "accent": {
+        "x": 10,
+        "y": 6
+      },
+      "layerOrder": [
+        "acceptedBase",
+        "eligibleMotion",
+        "materialBoundary",
+        "southWallExternal",
+        "content",
+        "selection",
+        "visibilityExternal"
+      ]
+    },
+    {
+      "id": "macro/3/1",
+      "request": {
+        "schemaVersion": "terrain-region-continuity-v1",
+        "ground": "soil",
+        "point": {
+          "x": 3,
+          "y": 1
+        },
+        "visualSeed": 442,
+        "featureVariant": 0,
+        "cardinalNeighbors": {
+          "north": "same",
+          "east": "rubble",
+          "south": "rubble",
+          "west": "stone"
+        },
+        "edgeContourIDs": {
+          "north": 2,
+          "east": 2,
+          "south": 0,
+          "west": 0
+        },
+        "visibility": "full",
+        "motionPhase": 0
+      },
+      "baseRoleSHA256": "4b1d09c52b4797b2c737470137866375783ae56d2db67468a98397577f55f945",
+      "materialBoundarySHA256": "ad9fc0bb8b170cb30a2a9eaa09f9f9cabb07d6b71d474a256a12c5cd3089b239",
+      "rgbaSHA256": "e604307be24c3a48102455ab59a3a58fc87dd618670c9e8a2475fda3f4080ebb",
+      "accent": {
+        "x": 8,
+        "y": 9
+      },
+      "layerOrder": [
+        "acceptedBase",
+        "eligibleMotion",
+        "materialBoundary",
+        "southWallExternal",
+        "content",
+        "selection",
+        "visibilityExternal"
+      ]
+    },
+    {
+      "id": "macro/4/1",
+      "request": {
+        "schemaVersion": "terrain-region-continuity-v1",
+        "ground": "rubble",
+        "point": {
+          "x": 4,
+          "y": 1
+        },
+        "visualSeed": 442,
+        "featureVariant": 0,
+        "cardinalNeighbors": {
+          "north": "soil",
+          "east": "soil",
+          "south": "soil",
+          "west": "soil"
+        },
+        "edgeContourIDs": {
+          "north": 2,
+          "east": 0,
+          "south": 0,
+          "west": 2
+        },
+        "visibility": "full",
+        "motionPhase": 1
+      },
+      "baseRoleSHA256": "4180693cc499d3be154625f496850b1423403d81e1aaf8b1fcb23fdaff9f00dc",
+      "materialBoundarySHA256": "5341e6b2646979a70e57653007a1f310169421ec9bdd9f1a5648f75ade005af1",
+      "rgbaSHA256": "03a717aee4abcfdbd80c7fda052beae9930452b543975b9c8a0cedb7cc897da8",
+      "accent": {
+        "x": 3,
+        "y": 8
+      },
+      "layerOrder": [
+        "acceptedBase",
+        "eligibleMotion",
+        "materialBoundary",
+        "southWallExternal",
+        "content",
+        "selection",
+        "visibilityExternal"
+      ]
+    },
+    {
+      "id": "macro/5/1",
+      "request": {
+        "schemaVersion": "terrain-region-continuity-v1",
+        "ground": "soil",
+        "point": {
+          "x": 5,
+          "y": 1
+        },
+        "visualSeed": 442,
+        "featureVariant": 0,
+        "cardinalNeighbors": {
+          "north": "rubble",
+          "east": "same",
+          "south": "same",
+          "west": "rubble"
+        },
+        "edgeContourIDs": {
+          "north": 2,
+          "east": 2,
+          "south": 0,
+          "west": 0
+        },
+        "visibility": "full",
+        "motionPhase": 2
+      },
+      "baseRoleSHA256": "c224f94fe033722bf26ee45786cc91c24f1f01bae377bb127534118f3876a830",
+      "materialBoundarySHA256": "7d803a7c7230dd215b03babc99889df3b6f33f87c0eb217c5c18a1e343ac5a07",
+      "rgbaSHA256": "33d3e22a456a7e8b15a9d412c1bd46052c8d701e37c823005d3b01e9baa54f10",
+      "accent": {
+        "x": 4,
+        "y": 5
+      },
+      "layerOrder": [
+        "acceptedBase",
+        "eligibleMotion",
+        "materialBoundary",
+        "southWallExternal",
+        "content",
+        "selection",
+        "visibilityExternal"
+      ]
+    },
+    {
+      "id": "macro/6/1",
+      "request": {
+        "schemaVersion": "terrain-region-continuity-v1",
+        "ground": "soil",
+        "point": {
+          "x": 6,
+          "y": 1
+        },
+        "visualSeed": 442,
+        "featureVariant": 0,
+        "cardinalNeighbors": {
+          "north": "same",
+          "east": "same",
+          "south": "same",
+          "west": "same"
+        },
+        "edgeContourIDs": {
+          "north": 2,
+          "east": 0,
+          "south": 0,
+          "west": 2
+        },
+        "visibility": "full",
+        "motionPhase": 3
+      },
+      "baseRoleSHA256": "5c4d68e47402e35de8bfc49dfd992ebcd7d96c9e8cd61bc94a9d4e1ccc173fbb",
+      "materialBoundarySHA256": "5341e6b2646979a70e57653007a1f310169421ec9bdd9f1a5648f75ade005af1",
+      "rgbaSHA256": "fc0d48efca2c9ecef6b1681d1076a3325c36ecce483895c14364fee11f860474",
+      "accent": {
+        "x": 7,
+        "y": 3
+      },
+      "layerOrder": [
+        "acceptedBase",
+        "eligibleMotion",
+        "materialBoundary",
+        "southWallExternal",
+        "content",
+        "selection",
+        "visibilityExternal"
+      ]
+    },
+    {
+      "id": "macro/7/1",
+      "request": {
+        "schemaVersion": "terrain-region-continuity-v1",
+        "ground": "soil",
+        "point": {
+          "x": 7,
+          "y": 1
+        },
+        "visualSeed": 442,
+        "featureVariant": 0,
+        "cardinalNeighbors": {
+          "north": "same",
+          "east": "same",
+          "south": "same",
+          "west": "same"
+        },
+        "edgeContourIDs": {
+          "north": 2,
+          "east": 2,
+          "south": 0,
+          "west": 0
+        },
+        "visibility": "full",
+        "motionPhase": 0
+      },
+      "baseRoleSHA256": "515697f6ede421d483d83d6acab771e3b1f38bb1441d8a186950cd71603a6cc7",
+      "materialBoundarySHA256": "5341e6b2646979a70e57653007a1f310169421ec9bdd9f1a5648f75ade005af1",
+      "rgbaSHA256": "db6237f46036aff9994c8e48e7160c1b90a5fcd8a08af2ce55c2c04f75a52918",
+      "accent": {
+        "x": 5,
+        "y": 5
+      },
+      "layerOrder": [
+        "acceptedBase",
+        "eligibleMotion",
+        "materialBoundary",
+        "southWallExternal",
+        "content",
+        "selection",
+        "visibilityExternal"
+      ]
+    },
+    {
+      "id": "macro/8/1",
+      "request": {
+        "schemaVersion": "terrain-region-continuity-v1",
+        "ground": "soil",
+        "point": {
+          "x": 8,
+          "y": 1
+        },
+        "visualSeed": 442,
+        "featureVariant": 0,
+        "cardinalNeighbors": {
+          "north": "same",
+          "east": "rubble",
+          "south": "rubble",
+          "west": "same"
+        },
+        "edgeContourIDs": {
+          "north": 2,
+          "east": 0,
+          "south": 0,
+          "west": 2
+        },
+        "visibility": "full",
+        "motionPhase": 1
+      },
+      "baseRoleSHA256": "a71c953be9f9c1a05971c3d505ce08824202db5efbb9f174d031c9f6ebd34332",
+      "materialBoundarySHA256": "89c81435de5ba178a9951b3704aa8914c97db1537c06488bf54392802e4d1566",
+      "rgbaSHA256": "93e8c16796cab1ecd2c01ffc8ae96bedc9f124a2f0780f04817fc7f9066b18cb",
+      "accent": {
+        "x": 9,
+        "y": 11
+      },
+      "layerOrder": [
+        "acceptedBase",
+        "eligibleMotion",
+        "materialBoundary",
+        "southWallExternal",
+        "content",
+        "selection",
+        "visibilityExternal"
+      ]
+    },
+    {
+      "id": "macro/9/1",
+      "request": {
+        "schemaVersion": "terrain-region-continuity-v1",
+        "ground": "rubble",
+        "point": {
+          "x": 9,
+          "y": 1
+        },
+        "visualSeed": 442,
+        "featureVariant": 0,
+        "cardinalNeighbors": {
+          "north": "soil",
+          "east": "soil",
+          "south": "soil",
+          "west": "soil"
+        },
+        "edgeContourIDs": {
+          "north": 2,
+          "east": 2,
+          "south": 0,
+          "west": 0
+        },
+        "visibility": "full",
+        "motionPhase": 2
+      },
+      "baseRoleSHA256": "6bbbd8eb52d945d3b20b1bd1a8c39d193de38f7d7d3bc61ee6fef652a40a9949",
+      "materialBoundarySHA256": "5341e6b2646979a70e57653007a1f310169421ec9bdd9f1a5648f75ade005af1",
+      "rgbaSHA256": "a68e9d943a83d1b64e099dd436db7fdf1da7c33538cc2825146a244c7c1f6e7c",
+      "accent": {
+        "x": 3,
+        "y": 9
+      },
+      "layerOrder": [
+        "acceptedBase",
+        "eligibleMotion",
+        "materialBoundary",
+        "southWallExternal",
+        "content",
+        "selection",
+        "visibilityExternal"
+      ]
+    },
+    {
+      "id": "macro/10/1",
+      "request": {
+        "schemaVersion": "terrain-region-continuity-v1",
+        "ground": "soil",
+        "point": {
+          "x": 10,
+          "y": 1
+        },
+        "visualSeed": 442,
+        "featureVariant": 0,
+        "cardinalNeighbors": {
+          "north": "rubble",
+          "east": "unknown",
+          "south": "same",
+          "west": "rubble"
+        },
+        "edgeContourIDs": {
+          "north": 2,
+          "east": 0,
+          "south": 0,
+          "west": 2
+        },
+        "visibility": "full",
+        "motionPhase": 3
+      },
+      "baseRoleSHA256": "d04bdb2a6b9887578d9e1660a0902052c19d2f05c11a3196fa0b532322847862",
+      "materialBoundarySHA256": "0855d1a98f4554053367ff079ef38861f0a307466275b5206216a6efc62a38cf",
+      "rgbaSHA256": "984ea8db6e6a369e4ddf92cc50f7efdd9c13f3a74d85c1e6534e028c557d51ff",
+      "accent": {
+        "x": 10,
+        "y": 3
+      },
+      "layerOrder": [
+        "acceptedBase",
+        "eligibleMotion",
+        "materialBoundary",
+        "southWallExternal",
+        "content",
+        "selection",
+        "visibilityExternal"
+      ]
+    },
+    {
+      "id": "macro/0/2",
+      "request": {
+        "schemaVersion": "terrain-region-continuity-v1",
+        "ground": "stone",
+        "point": {
+          "x": 0,
+          "y": 2
+        },
+        "visualSeed": 442,
+        "featureVariant": 0,
+        "cardinalNeighbors": {
+          "north": "same",
+          "east": "same",
+          "south": "same",
+          "west": "unknown"
+        },
+        "edgeContourIDs": {
+          "north": 0,
+          "east": 0,
+          "south": 2,
+          "west": 2
+        },
+        "visibility": "full",
+        "motionPhase": 2
+      },
+      "baseRoleSHA256": "4af46aa4861139118ccd8ede17c749f51f9a4b3916ad7201c8c64335bfb21d58",
+      "materialBoundarySHA256": "5341e6b2646979a70e57653007a1f310169421ec9bdd9f1a5648f75ade005af1",
+      "rgbaSHA256": "19d51652c51a415c01727a2dd57334abfc1c3c656fa61bbeb2f6271c7e200a03",
+      "accent": {
+        "x": 7,
+        "y": 10
+      },
+      "layerOrder": [
+        "acceptedBase",
+        "eligibleMotion",
+        "materialBoundary",
+        "southWallExternal",
+        "content",
+        "selection",
+        "visibilityExternal"
+      ]
+    },
+    {
+      "id": "macro/1/2",
+      "request": {
+        "schemaVersion": "terrain-region-continuity-v1",
+        "ground": "stone",
+        "point": {
+          "x": 1,
+          "y": 2
+        },
+        "visualSeed": 442,
+        "featureVariant": 0,
+        "cardinalNeighbors": {
+          "north": "same",
+          "east": "same",
+          "south": "same",
+          "west": "same"
+        },
+        "edgeContourIDs": {
+          "north": 0,
+          "east": 2,
+          "south": 2,
+          "west": 0
+        },
+        "visibility": "full",
+        "motionPhase": 3
+      },
+      "baseRoleSHA256": "2e7f598b45f7a1eedb12648c01d51d7b9710236edc6d6ef0d35f50fc3414b2c5",
+      "materialBoundarySHA256": "5341e6b2646979a70e57653007a1f310169421ec9bdd9f1a5648f75ade005af1",
+      "rgbaSHA256": "71392dabd613ae5e5a8999c5953bc99fb927a83cdeb1a5f3507eb5520ac6cb57",
+      "accent": {
+        "x": 5,
+        "y": 4
+      },
+      "layerOrder": [
+        "acceptedBase",
+        "eligibleMotion",
+        "materialBoundary",
+        "southWallExternal",
+        "content",
+        "selection",
+        "visibilityExternal"
+      ]
+    },
+    {
+      "id": "macro/2/2",
+      "request": {
+        "schemaVersion": "terrain-region-continuity-v1",
+        "ground": "stone",
+        "point": {
+          "x": 2,
+          "y": 2
+        },
+        "visualSeed": 442,
+        "featureVariant": 0,
+        "cardinalNeighbors": {
+          "north": "same",
+          "east": "rubble",
+          "south": "same",
+          "west": "same"
+        },
+        "edgeContourIDs": {
+          "north": 0,
+          "east": 0,
+          "south": 2,
+          "west": 2
+        },
+        "visibility": "full",
+        "motionPhase": 0
+      },
+      "baseRoleSHA256": "296c438bd6e9bd6aa5b84752ce57e9e068ea1a82211331753bd5928e235f372d",
+      "materialBoundarySHA256": "053199b629fe9cbd7d46906a9ebf66bd4225874361cfe4a8cc3ba2447e395958",
+      "rgbaSHA256": "52900d91c59d0a7f14e754a346ad5268ef52786b5b79abbe4355e001bec90819",
+      "accent": {
+        "x": 7,
+        "y": 4
+      },
+      "layerOrder": [
+        "acceptedBase",
+        "eligibleMotion",
+        "materialBoundary",
+        "southWallExternal",
+        "content",
+        "selection",
+        "visibilityExternal"
+      ]
+    },
+    {
+      "id": "macro/3/2",
+      "request": {
+        "schemaVersion": "terrain-region-continuity-v1",
+        "ground": "rubble",
+        "point": {
+          "x": 3,
+          "y": 2
+        },
+        "visualSeed": 442,
+        "featureVariant": 0,
+        "cardinalNeighbors": {
+          "north": "soil",
+          "east": "soil",
+          "south": "soil",
+          "west": "stone"
+        },
+        "edgeContourIDs": {
+          "north": 0,
+          "east": 2,
+          "south": 2,
+          "west": 0
+        },
+        "visibility": "full",
+        "motionPhase": 1
+      },
+      "baseRoleSHA256": "645038f077d2cd06e51b964e2cbeb06a3c359af0b9c1f9337cedb05f5a0a8a51",
+      "materialBoundarySHA256": "5341e6b2646979a70e57653007a1f310169421ec9bdd9f1a5648f75ade005af1",
+      "rgbaSHA256": "714f5772acb05d1a651d22735a9571c3246cdf63f4aefbf2f9a1d557c96fae9e",
+      "accent": {
+        "x": 10,
+        "y": 3
+      },
+      "layerOrder": [
+        "acceptedBase",
+        "eligibleMotion",
+        "materialBoundary",
+        "southWallExternal",
+        "content",
+        "selection",
+        "visibilityExternal"
+      ]
+    },
+    {
+      "id": "macro/4/2",
+      "request": {
+        "schemaVersion": "terrain-region-continuity-v1",
+        "ground": "soil",
+        "point": {
+          "x": 4,
+          "y": 2
+        },
+        "visualSeed": 442,
+        "featureVariant": 0,
+        "cardinalNeighbors": {
+          "north": "rubble",
+          "east": "same",
+          "south": "water",
+          "west": "rubble"
+        },
+        "edgeContourIDs": {
+          "north": 0,
+          "east": 0,
+          "south": 2,
+          "west": 2
+        },
+        "visibility": "full",
+        "motionPhase": 2
+      },
+      "baseRoleSHA256": "2734f71d8558d6b35d2b5c8f9b43e19f39dc2877d5a35b8b6bbc6c0fec8acc50",
+      "materialBoundarySHA256": "448bcc229243f86364ddfa57dea60b52f0af1e9b139c3477dce37e74f45c9f79",
+      "rgbaSHA256": "5cd3f15015d879cf9acf9182042719d7bf88f3eb7a05ae88ac2efc8038afe3f5",
+      "accent": {
+        "x": 3,
+        "y": 12
+      },
+      "layerOrder": [
+        "acceptedBase",
+        "eligibleMotion",
+        "materialBoundary",
+        "southWallExternal",
+        "content",
+        "selection",
+        "visibilityExternal"
+      ]
+    },
+    {
+      "id": "macro/5/2",
+      "request": {
+        "schemaVersion": "terrain-region-continuity-v1",
+        "ground": "soil",
+        "point": {
+          "x": 5,
+          "y": 2
+        },
+        "visualSeed": 442,
+        "featureVariant": 0,
+        "cardinalNeighbors": {
+          "north": "same",
+          "east": "same",
+          "south": "deepWater",
+          "west": "same"
+        },
+        "edgeContourIDs": {
+          "north": 0,
+          "east": 2,
+          "south": 2,
+          "west": 0
+        },
+        "visibility": "full",
+        "motionPhase": 3
+      },
+      "baseRoleSHA256": "d54c76215a9307a7d61500b6880f37b2c598e3f4ea54ec47edffab5d2754118b",
+      "materialBoundarySHA256": "3dce66058f093b471fb0e553c60841145dcf501805fe6373c29164f027daf8a7",
+      "rgbaSHA256": "3bb6fbf41dbec92c53b2c1c8806705ada1e962ebfe14804e8321ab1d6ab701f2",
+      "accent": {
+        "x": 9,
+        "y": 9
+      },
+      "layerOrder": [
+        "acceptedBase",
+        "eligibleMotion",
+        "materialBoundary",
+        "southWallExternal",
+        "content",
+        "selection",
+        "visibilityExternal"
+      ]
+    },
+    {
+      "id": "macro/6/2",
+      "request": {
+        "schemaVersion": "terrain-region-continuity-v1",
+        "ground": "soil",
+        "point": {
+          "x": 6,
+          "y": 2
+        },
+        "visualSeed": 442,
+        "featureVariant": 0,
+        "cardinalNeighbors": {
+          "north": "same",
+          "east": "same",
+          "south": "deepWater",
+          "west": "same"
+        },
+        "edgeContourIDs": {
+          "north": 0,
+          "east": 0,
+          "south": 2,
+          "west": 2
+        },
+        "visibility": "full",
+        "motionPhase": 0
+      },
+      "baseRoleSHA256": "c7a3f6471b2d1d899811e3b5e81dac138ad3742333e5f996f747d1cecbbd794b",
+      "materialBoundarySHA256": "d7972dc7f3fe20b4517f4a1b057742fb854e272dc45fd9f2eef1781b3fec8385",
+      "rgbaSHA256": "03cb54720eb64f62af20db1520013684844e7324d3476455a4b4e2f7957d93a3",
+      "accent": {
+        "x": 9,
+        "y": 9
+      },
+      "layerOrder": [
+        "acceptedBase",
+        "eligibleMotion",
+        "materialBoundary",
+        "southWallExternal",
+        "content",
+        "selection",
+        "visibilityExternal"
+      ]
+    },
+    {
+      "id": "macro/7/2",
+      "request": {
+        "schemaVersion": "terrain-region-continuity-v1",
+        "ground": "soil",
+        "point": {
+          "x": 7,
+          "y": 2
+        },
+        "visualSeed": 442,
+        "featureVariant": 0,
+        "cardinalNeighbors": {
+          "north": "same",
+          "east": "rubble",
+          "south": "rubble",
+          "west": "same"
+        },
+        "edgeContourIDs": {
+          "north": 0,
+          "east": 2,
+          "south": 2,
+          "west": 0
+        },
+        "visibility": "full",
+        "motionPhase": 1
+      },
+      "baseRoleSHA256": "c7e173cf9f345ab9ebc14c769e61252be1d46957555bf387f2989d327a5a0849",
+      "materialBoundarySHA256": "dbbb0c9c5e402fa283ea7e0676b9b435fe31b113c3d796c7bc3edf251503f958",
+      "rgbaSHA256": "ca445f920630628a76fc49fc015e41e352046e48fd16e9e05448d7e2ed6aaf63",
+      "accent": {
+        "x": 7,
+        "y": 11
+      },
+      "layerOrder": [
+        "acceptedBase",
+        "eligibleMotion",
+        "materialBoundary",
+        "southWallExternal",
+        "content",
+        "selection",
+        "visibilityExternal"
+      ]
+    },
+    {
+      "id": "macro/8/2",
+      "request": {
+        "schemaVersion": "terrain-region-continuity-v1",
+        "ground": "rubble",
+        "point": {
+          "x": 8,
+          "y": 2
+        },
+        "visualSeed": 442,
+        "featureVariant": 0,
+        "cardinalNeighbors": {
+          "north": "soil",
+          "east": "soil",
+          "south": "soil",
+          "west": "soil"
+        },
+        "edgeContourIDs": {
+          "north": 0,
+          "east": 0,
+          "south": 2,
+          "west": 2
+        },
+        "visibility": "full",
+        "motionPhase": 2
+      },
+      "baseRoleSHA256": "cc3a8da929259159d7b18a908990ea7d04654d14c89c7d86e2bd8666b3853c09",
+      "materialBoundarySHA256": "5341e6b2646979a70e57653007a1f310169421ec9bdd9f1a5648f75ade005af1",
+      "rgbaSHA256": "a53188fb609ee411449419879e894a236f47e446518576eeca492c8576b18aeb",
+      "accent": {
+        "x": 11,
+        "y": 4
+      },
+      "layerOrder": [
+        "acceptedBase",
+        "eligibleMotion",
+        "materialBoundary",
+        "southWallExternal",
+        "content",
+        "selection",
+        "visibilityExternal"
+      ]
+    },
+    {
+      "id": "macro/9/2",
+      "request": {
+        "schemaVersion": "terrain-region-continuity-v1",
+        "ground": "soil",
+        "point": {
+          "x": 9,
+          "y": 2
+        },
+        "visualSeed": 442,
+        "featureVariant": 0,
+        "cardinalNeighbors": {
+          "north": "rubble",
+          "east": "same",
+          "south": "same",
+          "west": "rubble"
+        },
+        "edgeContourIDs": {
+          "north": 0,
+          "east": 2,
+          "south": 2,
+          "west": 0
+        },
+        "visibility": "full",
+        "motionPhase": 3
+      },
+      "baseRoleSHA256": "fa76fc52544c46f14b2bfbf26a2fe0c52eb5d1153a511c892995b1df76d5c5c2",
+      "materialBoundarySHA256": "926a1d071317b97ce84ee95c1c58b75d82a3831221520858c4280e64511fd1aa",
+      "rgbaSHA256": "4bd324d44d2d53ba0d9d8b8977eba201e0d5d9675a99932960e404adc3ea17d8",
+      "accent": {
+        "x": 11,
+        "y": 5
+      },
+      "layerOrder": [
+        "acceptedBase",
+        "eligibleMotion",
+        "materialBoundary",
+        "southWallExternal",
+        "content",
+        "selection",
+        "visibilityExternal"
+      ]
+    },
+    {
+      "id": "macro/10/2",
+      "request": {
+        "schemaVersion": "terrain-region-continuity-v1",
+        "ground": "soil",
+        "point": {
+          "x": 10,
+          "y": 2
+        },
+        "visualSeed": 442,
+        "featureVariant": 0,
+        "cardinalNeighbors": {
+          "north": "same",
+          "east": "unknown",
+          "south": "same",
+          "west": "same"
+        },
+        "edgeContourIDs": {
+          "north": 0,
+          "east": 0,
+          "south": 2,
+          "west": 2
+        },
+        "visibility": "full",
+        "motionPhase": 0
+      },
+      "baseRoleSHA256": "6a966ec121dc17c4297bcb9dc5d33e96404e682c225b0ad175aefc9f4162205c",
+      "materialBoundarySHA256": "5341e6b2646979a70e57653007a1f310169421ec9bdd9f1a5648f75ade005af1",
+      "rgbaSHA256": "dac81969331d032036af396a4060d68807b8c81ff85974059d798653e83d7ef6",
+      "accent": {
+        "x": 9,
+        "y": 4
+      },
+      "layerOrder": [
+        "acceptedBase",
+        "eligibleMotion",
+        "materialBoundary",
+        "southWallExternal",
+        "content",
+        "selection",
+        "visibilityExternal"
+      ]
+    },
+    {
+      "id": "macro/0/3",
+      "request": {
+        "schemaVersion": "terrain-region-continuity-v1",
+        "ground": "stone",
+        "point": {
+          "x": 0,
+          "y": 3
+        },
+        "visualSeed": 442,
+        "featureVariant": 0,
+        "cardinalNeighbors": {
+          "north": "same",
+          "east": "same",
+          "south": "same",
+          "west": "unknown"
+        },
+        "edgeContourIDs": {
+          "north": 2,
+          "east": 0,
+          "south": 0,
+          "west": 2
+        },
+        "visibility": "full",
+        "motionPhase": 3
+      },
+      "baseRoleSHA256": "1536236dc4dede476b26d9a3b7eb7f1787359d4e703048d579a4f77489b06a2c",
+      "materialBoundarySHA256": "5341e6b2646979a70e57653007a1f310169421ec9bdd9f1a5648f75ade005af1",
+      "rgbaSHA256": "e3d50b5516b2805b478ff4d6550675f673f38c8d0db8147ef2aab0ae7b7ebf77",
+      "accent": {
+        "x": 5,
+        "y": 11
+      },
+      "layerOrder": [
+        "acceptedBase",
+        "eligibleMotion",
+        "materialBoundary",
+        "southWallExternal",
+        "content",
+        "selection",
+        "visibilityExternal"
+      ]
+    },
+    {
+      "id": "macro/1/3",
+      "request": {
+        "schemaVersion": "terrain-region-continuity-v1",
+        "ground": "stone",
+        "point": {
+          "x": 1,
+          "y": 3
+        },
+        "visualSeed": 442,
+        "featureVariant": 0,
+        "cardinalNeighbors": {
+          "north": "same",
+          "east": "same",
+          "south": "same",
+          "west": "same"
+        },
+        "edgeContourIDs": {
+          "north": 2,
+          "east": 2,
+          "south": 0,
+          "west": 0
+        },
+        "visibility": "full",
+        "motionPhase": 0
+      },
+      "baseRoleSHA256": "5b4608d21ac609fc4465881feb944c41c6cdd6dd3c954a1b88a349b958688e2e",
+      "materialBoundarySHA256": "5341e6b2646979a70e57653007a1f310169421ec9bdd9f1a5648f75ade005af1",
+      "rgbaSHA256": "626e6829188cfa0cb30f5b5fc6424b7d298ef228ab3e29941d9f0f7ae21777a2",
+      "accent": {
+        "x": 6,
+        "y": 5
+      },
+      "layerOrder": [
+        "acceptedBase",
+        "eligibleMotion",
+        "materialBoundary",
+        "southWallExternal",
+        "content",
+        "selection",
+        "visibilityExternal"
+      ]
+    },
+    {
+      "id": "macro/2/3",
+      "request": {
+        "schemaVersion": "terrain-region-continuity-v1",
+        "ground": "stone",
+        "point": {
+          "x": 2,
+          "y": 3
+        },
+        "visualSeed": 442,
+        "featureVariant": 0,
+        "cardinalNeighbors": {
+          "north": "same",
+          "east": "soil",
+          "south": "same",
+          "west": "same"
+        },
+        "edgeContourIDs": {
+          "north": 2,
+          "east": 0,
+          "south": 0,
+          "west": 2
+        },
+        "visibility": "full",
+        "motionPhase": 1
+      },
+      "baseRoleSHA256": "845034e4f83bf9e226d0d6164e28dec05864a001b99d685f1986b9fca87ab5a7",
+      "materialBoundarySHA256": "fab3baf4bcc9bc651218e43686d9969aa7511c2094667935347b0e503c086a42",
+      "rgbaSHA256": "fcc1fceaa9f55641b2fd18d73dfbe412057958bd208934f82b2923686a81f681",
+      "accent": {
+        "x": 8,
+        "y": 4
+      },
+      "layerOrder": [
+        "acceptedBase",
+        "eligibleMotion",
+        "materialBoundary",
+        "southWallExternal",
+        "content",
+        "selection",
+        "visibilityExternal"
+      ]
+    },
+    {
+      "id": "macro/3/3",
+      "request": {
+        "schemaVersion": "terrain-region-continuity-v1",
+        "ground": "soil",
+        "point": {
+          "x": 3,
+          "y": 3
+        },
+        "visualSeed": 442,
+        "featureVariant": 0,
+        "cardinalNeighbors": {
+          "north": "rubble",
+          "east": "water",
+          "south": "water",
+          "west": "stone"
+        },
+        "edgeContourIDs": {
+          "north": 2,
+          "east": 2,
+          "south": 0,
+          "west": 0
+        },
+        "visibility": "full",
+        "motionPhase": 2
+      },
+      "baseRoleSHA256": "888b5e99a97f48f7e001b0e6595479da1f3717f709ae77406a8e5e3cc7d6682c",
+      "materialBoundarySHA256": "0065469cc2544377f3a4f5ac4f236d5178a7af65fee7082fc4ea5a7ad973100f",
+      "rgbaSHA256": "ba056d3771abdf6a054ab0f8e383a32af69e8a0b7bf47c28ae9f1bf5abe1f6ae",
+      "accent": {
+        "x": 8,
+        "y": 10
+      },
+      "layerOrder": [
+        "acceptedBase",
+        "eligibleMotion",
+        "materialBoundary",
+        "southWallExternal",
+        "content",
+        "selection",
+        "visibilityExternal"
+      ]
+    },
+    {
+      "id": "macro/4/3",
+      "request": {
+        "schemaVersion": "terrain-region-continuity-v1",
+        "ground": "water",
+        "point": {
+          "x": 4,
+          "y": 3
+        },
+        "visualSeed": 442,
+        "featureVariant": 0,
+        "cardinalNeighbors": {
+          "north": "soil",
+          "east": "deepWater",
+          "south": "same",
+          "west": "soil"
+        },
+        "edgeContourIDs": {
+          "north": 2,
+          "east": 0,
+          "south": 0,
+          "west": 2
+        },
+        "visibility": "full",
+        "motionPhase": 3
+      },
+      "baseRoleSHA256": "6535a4131dfb1720c852a9420ebdc45e1cb53a85162795ad69fe384d88df4f1b",
+      "materialBoundarySHA256": "0400a45202caba4d673ac446a907a1b4c06df98dcc72be365f5ff888ccafc63e",
+      "rgbaSHA256": "65b123fd9f52ade51cc2416853213a9cf70828004feebb2b761d590f392594ce",
+      "accent": {
+        "x": 6,
+        "y": 8
+      },
+      "layerOrder": [
+        "acceptedBase",
+        "eligibleMotion",
+        "materialBoundary",
+        "southWallExternal",
+        "content",
+        "selection",
+        "visibilityExternal"
+      ]
+    },
+    {
+      "id": "macro/5/3",
+      "request": {
+        "schemaVersion": "terrain-region-continuity-v1",
+        "ground": "deepWater",
+        "point": {
+          "x": 5,
+          "y": 3
+        },
+        "visualSeed": 442,
+        "featureVariant": 0,
+        "cardinalNeighbors": {
+          "north": "soil",
+          "east": "same",
+          "south": "same",
+          "west": "water"
+        },
+        "edgeContourIDs": {
+          "north": 2,
+          "east": 2,
+          "south": 0,
+          "west": 0
+        },
+        "visibility": "full",
+        "motionPhase": 0
+      },
+      "baseRoleSHA256": "f3c3230edceed3ebc4d6b31e5119d1175c4028c6830bdf81dad9e46e175c9763",
+      "materialBoundarySHA256": "5341e6b2646979a70e57653007a1f310169421ec9bdd9f1a5648f75ade005af1",
+      "rgbaSHA256": "f68610f7052bd7f438b75ae53c8ff321b69a8a724566c0d89ff32b4447fe6326",
+      "accent": {
+        "x": 9,
+        "y": 10
+      },
+      "layerOrder": [
+        "acceptedBase",
+        "eligibleMotion",
+        "materialBoundary",
+        "southWallExternal",
+        "content",
+        "selection",
+        "visibilityExternal"
+      ]
+    },
+    {
+      "id": "macro/6/3",
+      "request": {
+        "schemaVersion": "terrain-region-continuity-v1",
+        "ground": "deepWater",
+        "point": {
+          "x": 6,
+          "y": 3
+        },
+        "visualSeed": 442,
+        "featureVariant": 0,
+        "cardinalNeighbors": {
+          "north": "soil",
+          "east": "rubble",
+          "south": "same",
+          "west": "same"
+        },
+        "edgeContourIDs": {
+          "north": 2,
+          "east": 0,
+          "south": 0,
+          "west": 2
+        },
+        "visibility": "full",
+        "motionPhase": 1
+      },
+      "baseRoleSHA256": "491e25a5d5f912c6f9dabca50e801feda113107fd7f429778ec452df1c39f85d",
+      "materialBoundarySHA256": "fab3baf4bcc9bc651218e43686d9969aa7511c2094667935347b0e503c086a42",
+      "rgbaSHA256": "4adc01641f4862ed1f43cbbd4f4732994de6f897628f06af71068aaab9d4115a",
+      "accent": {
+        "x": 6,
+        "y": 7
+      },
+      "layerOrder": [
+        "acceptedBase",
+        "eligibleMotion",
+        "materialBoundary",
+        "southWallExternal",
+        "content",
+        "selection",
+        "visibilityExternal"
+      ]
+    },
+    {
+      "id": "macro/7/3",
+      "request": {
+        "schemaVersion": "terrain-region-continuity-v1",
+        "ground": "rubble",
+        "point": {
+          "x": 7,
+          "y": 3
+        },
+        "visualSeed": 442,
+        "featureVariant": 0,
+        "cardinalNeighbors": {
+          "north": "soil",
+          "east": "soil",
+          "south": "deepWater",
+          "west": "deepWater"
+        },
+        "edgeContourIDs": {
+          "north": 2,
+          "east": 2,
+          "south": 0,
+          "west": 0
+        },
+        "visibility": "full",
+        "motionPhase": 2
+      },
+      "baseRoleSHA256": "58d132356308bf7eaa2452dd1ad9f03db75d640a3f0b136e4d9589ad0cb2418c",
+      "materialBoundarySHA256": "5341e6b2646979a70e57653007a1f310169421ec9bdd9f1a5648f75ade005af1",
+      "rgbaSHA256": "d7e811184c424646147bc74c721205513b21b44241caa06163fce73cd57f96ff",
+      "accent": {
+        "x": 11,
+        "y": 5
+      },
+      "layerOrder": [
+        "acceptedBase",
+        "eligibleMotion",
+        "materialBoundary",
+        "southWallExternal",
+        "content",
+        "selection",
+        "visibilityExternal"
+      ]
+    },
+    {
+      "id": "macro/8/3",
+      "request": {
+        "schemaVersion": "terrain-region-continuity-v1",
+        "ground": "soil",
+        "point": {
+          "x": 8,
+          "y": 3
+        },
+        "visualSeed": 442,
+        "featureVariant": 0,
+        "cardinalNeighbors": {
+          "north": "rubble",
+          "east": "same",
+          "south": "same",
+          "west": "rubble"
+        },
+        "edgeContourIDs": {
+          "north": 2,
+          "east": 0,
+          "south": 0,
+          "west": 2
+        },
+        "visibility": "full",
+        "motionPhase": 3
+      },
+      "baseRoleSHA256": "96e87889e1c8afa44866a923ec17b974bfc97bf46585062e708eb7240d0d602b",
+      "materialBoundarySHA256": "0855d1a98f4554053367ff079ef38861f0a307466275b5206216a6efc62a38cf",
+      "rgbaSHA256": "29b89f5b996df7774952e2c02b8c60f9ac8c5a62f41636923c278ab4e25be5e8",
+      "accent": {
+        "x": 3,
+        "y": 6
+      },
+      "layerOrder": [
+        "acceptedBase",
+        "eligibleMotion",
+        "materialBoundary",
+        "southWallExternal",
+        "content",
+        "selection",
+        "visibilityExternal"
+      ]
+    },
+    {
+      "id": "macro/9/3",
+      "request": {
+        "schemaVersion": "terrain-region-continuity-v1",
+        "ground": "soil",
+        "point": {
+          "x": 9,
+          "y": 3
+        },
+        "visualSeed": 442,
+        "featureVariant": 0,
+        "cardinalNeighbors": {
+          "north": "same",
+          "east": "same",
+          "south": "same",
+          "west": "same"
+        },
+        "edgeContourIDs": {
+          "north": 2,
+          "east": 2,
+          "south": 0,
+          "west": 0
+        },
+        "visibility": "full",
+        "motionPhase": 0
+      },
+      "baseRoleSHA256": "2f4798f439c529df8ed417d268e55860fccbd78d19ef675f5499e8729107bd14",
+      "materialBoundarySHA256": "5341e6b2646979a70e57653007a1f310169421ec9bdd9f1a5648f75ade005af1",
+      "rgbaSHA256": "28f01fae6fed8386e5a869ef5b6e0580e5e1e2284fa7413ff64e97e7e3b85bc4",
+      "accent": {
+        "x": 9,
+        "y": 10
+      },
+      "layerOrder": [
+        "acceptedBase",
+        "eligibleMotion",
+        "materialBoundary",
+        "southWallExternal",
+        "content",
+        "selection",
+        "visibilityExternal"
+      ]
+    },
+    {
+      "id": "macro/10/3",
+      "request": {
+        "schemaVersion": "terrain-region-continuity-v1",
+        "ground": "soil",
+        "point": {
+          "x": 10,
+          "y": 3
+        },
+        "visualSeed": 442,
+        "featureVariant": 0,
+        "cardinalNeighbors": {
+          "north": "same",
+          "east": "unknown",
+          "south": "same",
+          "west": "same"
+        },
+        "edgeContourIDs": {
+          "north": 2,
+          "east": 0,
+          "south": 0,
+          "west": 2
+        },
+        "visibility": "full",
+        "motionPhase": 1
+      },
+      "baseRoleSHA256": "0f1a86cd66795ccef9e111d16a05cc4e49ce00808a0d71af08979d0f8afa20dd",
+      "materialBoundarySHA256": "5341e6b2646979a70e57653007a1f310169421ec9bdd9f1a5648f75ade005af1",
+      "rgbaSHA256": "884024aa32ff0ff7c66e0ba533678f1f01f51341f04c2b046fee4705a8afb2a7",
+      "accent": {
+        "x": 10,
+        "y": 9
+      },
+      "layerOrder": [
+        "acceptedBase",
+        "eligibleMotion",
+        "materialBoundary",
+        "southWallExternal",
+        "content",
+        "selection",
+        "visibilityExternal"
+      ]
+    },
+    {
+      "id": "macro/0/4",
+      "request": {
+        "schemaVersion": "terrain-region-continuity-v1",
+        "ground": "stone",
+        "point": {
+          "x": 0,
+          "y": 4
+        },
+        "visualSeed": 442,
+        "featureVariant": 0,
+        "cardinalNeighbors": {
+          "north": "same",
+          "east": "same",
+          "south": "same",
+          "west": "unknown"
+        },
+        "edgeContourIDs": {
+          "north": 0,
+          "east": 0,
+          "south": 2,
+          "west": 2
+        },
+        "visibility": "full",
+        "motionPhase": 0
+      },
+      "baseRoleSHA256": "2aa42f1fea2a6ce0109eb3ff8b8b4461b273e6a6853b0ba64aa0220b4fae1dd7",
+      "materialBoundarySHA256": "5341e6b2646979a70e57653007a1f310169421ec9bdd9f1a5648f75ade005af1",
+      "rgbaSHA256": "c733a5240c9eb3a72c28ba1938f67a77732c4ae3de71ad44dc6d05e6729b9470",
+      "accent": {
+        "x": 9,
+        "y": 4
+      },
+      "layerOrder": [
+        "acceptedBase",
+        "eligibleMotion",
+        "materialBoundary",
+        "southWallExternal",
+        "content",
+        "selection",
+        "visibilityExternal"
+      ]
+    },
+    {
+      "id": "macro/1/4",
+      "request": {
+        "schemaVersion": "terrain-region-continuity-v1",
+        "ground": "stone",
+        "point": {
+          "x": 1,
+          "y": 4
+        },
+        "visualSeed": 442,
+        "featureVariant": 0,
+        "cardinalNeighbors": {
+          "north": "same",
+          "east": "same",
+          "south": "same",
+          "west": "same"
+        },
+        "edgeContourIDs": {
+          "north": 0,
+          "east": 2,
+          "south": 2,
+          "west": 0
+        },
+        "visibility": "full",
+        "motionPhase": 1
+      },
+      "baseRoleSHA256": "a2067d1424473fe0d7e59ec875205876bf1a974d7cdf07b19578b67b2157dc2d",
+      "materialBoundarySHA256": "5341e6b2646979a70e57653007a1f310169421ec9bdd9f1a5648f75ade005af1",
+      "rgbaSHA256": "422dcabb9a41793f656511be2407625ef48dcc8dc655b2f6e10862ef4e625ccc",
+      "accent": {
+        "x": 6,
+        "y": 11
+      },
+      "layerOrder": [
+        "acceptedBase",
+        "eligibleMotion",
+        "materialBoundary",
+        "southWallExternal",
+        "content",
+        "selection",
+        "visibilityExternal"
+      ]
+    },
+    {
+      "id": "macro/2/4",
+      "request": {
+        "schemaVersion": "terrain-region-continuity-v1",
+        "ground": "stone",
+        "point": {
+          "x": 2,
+          "y": 4
+        },
+        "visualSeed": 442,
+        "featureVariant": 0,
+        "cardinalNeighbors": {
+          "north": "same",
+          "east": "water",
+          "south": "same",
+          "west": "same"
+        },
+        "edgeContourIDs": {
+          "north": 0,
+          "east": 0,
+          "south": 2,
+          "west": 2
+        },
+        "visibility": "full",
+        "motionPhase": 2
+      },
+      "baseRoleSHA256": "4daccfa6cd2f57bacc3a5726d91b71cc69705687eac2cfa99bd76f9bddfdd1a5",
+      "materialBoundarySHA256": "7f946d8b6b2b0ec12a1da90a9f0ec31894e720ef76367831079f64d27ac2a79a",
+      "rgbaSHA256": "d3886aaaeef20551243a100151f2d276094cec74435143376ff9102229bddda0",
+      "accent": {
+        "x": 12,
+        "y": 3
+      },
+      "layerOrder": [
+        "acceptedBase",
+        "eligibleMotion",
+        "materialBoundary",
+        "southWallExternal",
+        "content",
+        "selection",
+        "visibilityExternal"
+      ]
+    },
+    {
+      "id": "macro/3/4",
+      "request": {
+        "schemaVersion": "terrain-region-continuity-v1",
+        "ground": "water",
+        "point": {
+          "x": 3,
+          "y": 4
+        },
+        "visualSeed": 442,
+        "featureVariant": 0,
+        "cardinalNeighbors": {
+          "north": "soil",
+          "east": "same",
+          "south": "same",
+          "west": "stone"
+        },
+        "edgeContourIDs": {
+          "north": 0,
+          "east": 2,
+          "south": 2,
+          "west": 0
+        },
+        "visibility": "full",
+        "motionPhase": 3
+      },
+      "baseRoleSHA256": "41f42ce3d0b5ac1623fa0ef6f5658123b2dcc9a7a0a6de1a395851f88ac96b54",
+      "materialBoundarySHA256": "5341e6b2646979a70e57653007a1f310169421ec9bdd9f1a5648f75ade005af1",
+      "rgbaSHA256": "e11df4b7cc73aa84f23e61ed2f873fd797fc4783335bc640920b69d5024af1e8",
+      "accent": {
+        "x": 11,
+        "y": 10
+      },
+      "layerOrder": [
+        "acceptedBase",
+        "eligibleMotion",
+        "materialBoundary",
+        "southWallExternal",
+        "content",
+        "selection",
+        "visibilityExternal"
+      ]
+    },
+    {
+      "id": "macro/4/4",
+      "request": {
+        "schemaVersion": "terrain-region-continuity-v1",
+        "ground": "water",
+        "point": {
+          "x": 4,
+          "y": 4
+        },
+        "visualSeed": 442,
+        "featureVariant": 0,
+        "cardinalNeighbors": {
+          "north": "same",
+          "east": "deepWater",
+          "south": "same",
+          "west": "same"
+        },
+        "edgeContourIDs": {
+          "north": 0,
+          "east": 0,
+          "south": 2,
+          "west": 2
+        },
+        "visibility": "full",
+        "motionPhase": 0
+      },
+      "baseRoleSHA256": "9c9a8f92b97cd4d47cacd353c41c5ee08e27de5b6c8b5f76fbd37bea00725bba",
+      "materialBoundarySHA256": "053199b629fe9cbd7d46906a9ebf66bd4225874361cfe4a8cc3ba2447e395958",
+      "rgbaSHA256": "67580672a5209abbabb9106dcb3cd9a520bd8813d7b0278bed5e1573e1a73e54",
+      "accent": {
+        "x": 4,
+        "y": 10
+      },
+      "layerOrder": [
+        "acceptedBase",
+        "eligibleMotion",
+        "materialBoundary",
+        "southWallExternal",
+        "content",
+        "selection",
+        "visibilityExternal"
+      ]
+    },
+    {
+      "id": "macro/5/4",
+      "request": {
+        "schemaVersion": "terrain-region-continuity-v1",
+        "ground": "deepWater",
+        "point": {
+          "x": 5,
+          "y": 4
+        },
+        "visualSeed": 442,
+        "featureVariant": 0,
+        "cardinalNeighbors": {
+          "north": "same",
+          "east": "same",
+          "south": "same",
+          "west": "water"
+        },
+        "edgeContourIDs": {
+          "north": 0,
+          "east": 2,
+          "south": 2,
+          "west": 0
+        },
+        "visibility": "full",
+        "motionPhase": 1
+      },
+      "baseRoleSHA256": "5c6e3ffe657f27c5783e8210b0744a9d57a990e695c398fff53ee52dc038341e",
+      "materialBoundarySHA256": "5341e6b2646979a70e57653007a1f310169421ec9bdd9f1a5648f75ade005af1",
+      "rgbaSHA256": "65cd0a13743327662e2836432a18d0e3816f8a02307edeb4df106704d4d68057",
+      "accent": {
+        "x": 4,
+        "y": 5
+      },
+      "layerOrder": [
+        "acceptedBase",
+        "eligibleMotion",
+        "materialBoundary",
+        "southWallExternal",
+        "content",
+        "selection",
+        "visibilityExternal"
+      ]
+    },
+    {
+      "id": "macro/6/4",
+      "request": {
+        "schemaVersion": "terrain-region-continuity-v1",
+        "ground": "deepWater",
+        "point": {
+          "x": 6,
+          "y": 4
+        },
+        "visualSeed": 442,
+        "featureVariant": 0,
+        "cardinalNeighbors": {
+          "north": "same",
+          "east": "same",
+          "south": "same",
+          "west": "same"
+        },
+        "edgeContourIDs": {
+          "north": 0,
+          "east": 0,
+          "south": 2,
+          "west": 2
+        },
+        "visibility": "full",
+        "motionPhase": 2
+      },
+      "baseRoleSHA256": "6b6575114498cf3e945388d5b69f84535e1182e37b048cb556b06ddd01693f9e",
+      "materialBoundarySHA256": "5341e6b2646979a70e57653007a1f310169421ec9bdd9f1a5648f75ade005af1",
+      "rgbaSHA256": "2af4d520efceb607428b6a08b156fc1bbe7ca0321296eec7f8f111eefe23b207",
+      "accent": {
+        "x": 11,
+        "y": 12
+      },
+      "layerOrder": [
+        "acceptedBase",
+        "eligibleMotion",
+        "materialBoundary",
+        "southWallExternal",
+        "content",
+        "selection",
+        "visibilityExternal"
+      ]
+    },
+    {
+      "id": "macro/7/4",
+      "request": {
+        "schemaVersion": "terrain-region-continuity-v1",
+        "ground": "deepWater",
+        "point": {
+          "x": 7,
+          "y": 4
+        },
+        "visualSeed": 442,
+        "featureVariant": 0,
+        "cardinalNeighbors": {
+          "north": "rubble",
+          "east": "soil",
+          "south": "same",
+          "west": "same"
+        },
+        "edgeContourIDs": {
+          "north": 0,
+          "east": 2,
+          "south": 2,
+          "west": 0
+        },
+        "visibility": "full",
+        "motionPhase": 3
+      },
+      "baseRoleSHA256": "7b4bbe9e9f703809d5adc0c1c7858a5541b3c5b501c5654cb1d464a289c3ea0f",
+      "materialBoundarySHA256": "0f36569d059f4e89e80f065b57d00d81d24c9ff71ad41d5af27ea84ffd701769",
+      "rgbaSHA256": "6584d2980d505be9cf4790f6966c73930f903fbcdbf8f1a25c18cf55dfd3fe5b",
+      "accent": {
+        "x": 12,
+        "y": 6
+      },
+      "layerOrder": [
+        "acceptedBase",
+        "eligibleMotion",
+        "materialBoundary",
+        "southWallExternal",
+        "content",
+        "selection",
+        "visibilityExternal"
+      ]
+    },
+    {
+      "id": "macro/8/4",
+      "request": {
+        "schemaVersion": "terrain-region-continuity-v1",
+        "ground": "soil",
+        "point": {
+          "x": 8,
+          "y": 4
+        },
+        "visualSeed": 442,
+        "featureVariant": 0,
+        "cardinalNeighbors": {
+          "north": "same",
+          "east": "same",
+          "south": "same",
+          "west": "deepWater"
+        },
+        "edgeContourIDs": {
+          "north": 0,
+          "east": 0,
+          "south": 2,
+          "west": 2
+        },
+        "visibility": "full",
+        "motionPhase": 0
+      },
+      "baseRoleSHA256": "265414577dbc913a320ec571c2bb3ea1f443c9fe5dd969acb9695469f296631b",
+      "materialBoundarySHA256": "df3f8131a3a5892321f758749ffc8c1ad76a2cd1302a3d3537018dd0bfe06574",
+      "rgbaSHA256": "a5fe522177ab985e1003c749fcc928ba844b85f4218d9961f415f5d658107489",
+      "accent": {
+        "x": 9,
+        "y": 5
+      },
+      "layerOrder": [
+        "acceptedBase",
+        "eligibleMotion",
+        "materialBoundary",
+        "southWallExternal",
+        "content",
+        "selection",
+        "visibilityExternal"
+      ]
+    },
+    {
+      "id": "macro/9/4",
+      "request": {
+        "schemaVersion": "terrain-region-continuity-v1",
+        "ground": "soil",
+        "point": {
+          "x": 9,
+          "y": 4
+        },
+        "visualSeed": 442,
+        "featureVariant": 0,
+        "cardinalNeighbors": {
+          "north": "same",
+          "east": "same",
+          "south": "same",
+          "west": "same"
+        },
+        "edgeContourIDs": {
+          "north": 0,
+          "east": 2,
+          "south": 2,
+          "west": 0
+        },
+        "visibility": "full",
+        "motionPhase": 1
+      },
+      "baseRoleSHA256": "abad7ab097240d10bdba66e64c26240d1cdac80943cbdf2849994148ae7212a5",
+      "materialBoundarySHA256": "5341e6b2646979a70e57653007a1f310169421ec9bdd9f1a5648f75ade005af1",
+      "rgbaSHA256": "8698af92dc79352139bf75c4d4d9815722701f093d484497146afafe96c6610b",
+      "accent": {
+        "x": 3,
+        "y": 7
+      },
+      "layerOrder": [
+        "acceptedBase",
+        "eligibleMotion",
+        "materialBoundary",
+        "southWallExternal",
+        "content",
+        "selection",
+        "visibilityExternal"
+      ]
+    },
+    {
+      "id": "macro/10/4",
+      "request": {
+        "schemaVersion": "terrain-region-continuity-v1",
+        "ground": "soil",
+        "point": {
+          "x": 10,
+          "y": 4
+        },
+        "visualSeed": 442,
+        "featureVariant": 0,
+        "cardinalNeighbors": {
+          "north": "same",
+          "east": "unknown",
+          "south": "rubble",
+          "west": "same"
+        },
+        "edgeContourIDs": {
+          "north": 0,
+          "east": 0,
+          "south": 2,
+          "west": 2
+        },
+        "visibility": "full",
+        "motionPhase": 2
+      },
+      "baseRoleSHA256": "76ed15f75f9ce5aeee24a232f833e1bc3319deadf7bcc4873a5c3884eb9f5c94",
+      "materialBoundarySHA256": "0004ecf11603c76982630525eec30498078d6f1f1395067007a14e3c6b9e02d9",
+      "rgbaSHA256": "67d3427466fa31efbedf58fe20593aa80bb83bd4a0e713039841520e1678be64",
+      "accent": {
+        "x": 3,
+        "y": 3
+      },
+      "layerOrder": [
+        "acceptedBase",
+        "eligibleMotion",
+        "materialBoundary",
+        "southWallExternal",
+        "content",
+        "selection",
+        "visibilityExternal"
+      ]
+    },
+    {
+      "id": "macro/0/5",
+      "request": {
+        "schemaVersion": "terrain-region-continuity-v1",
+        "ground": "stone",
+        "point": {
+          "x": 0,
+          "y": 5
+        },
+        "visualSeed": 442,
+        "featureVariant": 0,
+        "cardinalNeighbors": {
+          "north": "same",
+          "east": "same",
+          "south": "same",
+          "west": "unknown"
+        },
+        "edgeContourIDs": {
+          "north": 2,
+          "east": 0,
+          "south": 0,
+          "west": 2
+        },
+        "visibility": "full",
+        "motionPhase": 1
+      },
+      "baseRoleSHA256": "6ea3f0497cdb09b2656522dd4eac761702e0a5c29999b5c7e17f28dd0160c99f",
+      "materialBoundarySHA256": "5341e6b2646979a70e57653007a1f310169421ec9bdd9f1a5648f75ade005af1",
+      "rgbaSHA256": "b8c942e85cb437888238604573717c045827c5c058fd1dc8cfcbab46797a3392",
+      "accent": {
+        "x": 7,
+        "y": 11
+      },
+      "layerOrder": [
+        "acceptedBase",
+        "eligibleMotion",
+        "materialBoundary",
+        "southWallExternal",
+        "content",
+        "selection",
+        "visibilityExternal"
+      ]
+    },
+    {
+      "id": "macro/1/5",
+      "request": {
+        "schemaVersion": "terrain-region-continuity-v1",
+        "ground": "stone",
+        "point": {
+          "x": 1,
+          "y": 5
+        },
+        "visualSeed": 442,
+        "featureVariant": 0,
+        "cardinalNeighbors": {
+          "north": "same",
+          "east": "same",
+          "south": "same",
+          "west": "same"
+        },
+        "edgeContourIDs": {
+          "north": 2,
+          "east": 2,
+          "south": 0,
+          "west": 0
+        },
+        "visibility": "full",
+        "motionPhase": 2
+      },
+      "baseRoleSHA256": "437dc1ef1cf73956f85c8eaf3d83543f969a47be0d09cc8b010d7c56c47f9bbd",
+      "materialBoundarySHA256": "5341e6b2646979a70e57653007a1f310169421ec9bdd9f1a5648f75ade005af1",
+      "rgbaSHA256": "a1fead38eaeba10789d043278060db758f2a39f9f7bf86bdbec0aa0ce4f9889d",
+      "accent": {
+        "x": 4,
+        "y": 11
+      },
+      "layerOrder": [
+        "acceptedBase",
+        "eligibleMotion",
+        "materialBoundary",
+        "southWallExternal",
+        "content",
+        "selection",
+        "visibilityExternal"
+      ]
+    },
+    {
+      "id": "macro/2/5",
+      "request": {
+        "schemaVersion": "terrain-region-continuity-v1",
+        "ground": "stone",
+        "point": {
+          "x": 2,
+          "y": 5
+        },
+        "visualSeed": 442,
+        "featureVariant": 0,
+        "cardinalNeighbors": {
+          "north": "same",
+          "east": "water",
+          "south": "same",
+          "west": "same"
+        },
+        "edgeContourIDs": {
+          "north": 2,
+          "east": 0,
+          "south": 0,
+          "west": 2
+        },
+        "visibility": "full",
+        "motionPhase": 3
+      },
+      "baseRoleSHA256": "2833a57442c238bcb899026f7557c7d85671b61b45724e1411632a1ce8c12031",
+      "materialBoundarySHA256": "0400a45202caba4d673ac446a907a1b4c06df98dcc72be365f5ff888ccafc63e",
+      "rgbaSHA256": "1fb0f57915166f87978392fe9605303edfb91a65b0d7b7b3d408101dfd963925",
+      "accent": {
+        "x": 4,
+        "y": 11
+      },
+      "layerOrder": [
+        "acceptedBase",
+        "eligibleMotion",
+        "materialBoundary",
+        "southWallExternal",
+        "content",
+        "selection",
+        "visibilityExternal"
+      ]
+    },
+    {
+      "id": "macro/3/5",
+      "request": {
+        "schemaVersion": "terrain-region-continuity-v1",
+        "ground": "water",
+        "point": {
+          "x": 3,
+          "y": 5
+        },
+        "visualSeed": 442,
+        "featureVariant": 0,
+        "cardinalNeighbors": {
+          "north": "same",
+          "east": "same",
+          "south": "same",
+          "west": "stone"
+        },
+        "edgeContourIDs": {
+          "north": 2,
+          "east": 2,
+          "south": 0,
+          "west": 0
+        },
+        "visibility": "full",
+        "motionPhase": 0
+      },
+      "baseRoleSHA256": "5f00930960431863d8114579c65c2127c2dc440f5143df71b7c8f696862ee287",
+      "materialBoundarySHA256": "5341e6b2646979a70e57653007a1f310169421ec9bdd9f1a5648f75ade005af1",
+      "rgbaSHA256": "bd46888f3604a6ee60e4867345f5220a255b56fd2a0a90493480a60e72f12b1e",
+      "accent": {
+        "x": 5,
+        "y": 3
+      },
+      "layerOrder": [
+        "acceptedBase",
+        "eligibleMotion",
+        "materialBoundary",
+        "southWallExternal",
+        "content",
+        "selection",
+        "visibilityExternal"
+      ]
+    },
+    {
+      "id": "macro/4/5",
+      "request": {
+        "schemaVersion": "terrain-region-continuity-v1",
+        "ground": "water",
+        "point": {
+          "x": 4,
+          "y": 5
+        },
+        "visualSeed": 442,
+        "featureVariant": 0,
+        "cardinalNeighbors": {
+          "north": "same",
+          "east": "deepWater",
+          "south": "same",
+          "west": "same"
+        },
+        "edgeContourIDs": {
+          "north": 2,
+          "east": 0,
+          "south": 0,
+          "west": 2
+        },
+        "visibility": "full",
+        "motionPhase": 1
+      },
+      "baseRoleSHA256": "f4b68b31f2f5139f2e5987207de81e31a917bf904926f8b92b51756cbedad037",
+      "materialBoundarySHA256": "fab3baf4bcc9bc651218e43686d9969aa7511c2094667935347b0e503c086a42",
+      "rgbaSHA256": "c7be0f6bfc9204aac13c2433f23118d23775e1206da0c9934c82b318560e0d82",
+      "accent": {
+        "x": 4,
+        "y": 3
+      },
+      "layerOrder": [
+        "acceptedBase",
+        "eligibleMotion",
+        "materialBoundary",
+        "southWallExternal",
+        "content",
+        "selection",
+        "visibilityExternal"
+      ]
+    },
+    {
+      "id": "macro/5/5",
+      "request": {
+        "schemaVersion": "terrain-region-continuity-v1",
+        "ground": "deepWater",
+        "point": {
+          "x": 5,
+          "y": 5
+        },
+        "visualSeed": 442,
+        "featureVariant": 0,
+        "cardinalNeighbors": {
+          "north": "same",
+          "east": "same",
+          "south": "same",
+          "west": "water"
+        },
+        "edgeContourIDs": {
+          "north": 2,
+          "east": 2,
+          "south": 0,
+          "west": 0
+        },
+        "visibility": "full",
+        "motionPhase": 2
+      },
+      "baseRoleSHA256": "8bd7124d8dd99e3e0f3c78b033fe24b4be284c005e3826cb14ec374052270dee",
+      "materialBoundarySHA256": "5341e6b2646979a70e57653007a1f310169421ec9bdd9f1a5648f75ade005af1",
+      "rgbaSHA256": "a96c92736a582db442982ed4da2b31de42cba1852fa23513609a615192efeef0",
+      "accent": {
+        "x": 4,
+        "y": 7
+      },
+      "layerOrder": [
+        "acceptedBase",
+        "eligibleMotion",
+        "materialBoundary",
+        "southWallExternal",
+        "content",
+        "selection",
+        "visibilityExternal"
+      ]
+    },
+    {
+      "id": "macro/6/5",
+      "request": {
+        "schemaVersion": "terrain-region-continuity-v1",
+        "ground": "deepWater",
+        "point": {
+          "x": 6,
+          "y": 5
+        },
+        "visualSeed": 442,
+        "featureVariant": 0,
+        "cardinalNeighbors": {
+          "north": "same",
+          "east": "same",
+          "south": "same",
+          "west": "same"
+        },
+        "edgeContourIDs": {
+          "north": 2,
+          "east": 0,
+          "south": 0,
+          "west": 2
+        },
+        "visibility": "full",
+        "motionPhase": 3
+      },
+      "baseRoleSHA256": "3d376f6b36ece54fb8b5fa19feb644d9da9e8e7f7b80b5b2353f750174d53046",
+      "materialBoundarySHA256": "5341e6b2646979a70e57653007a1f310169421ec9bdd9f1a5648f75ade005af1",
+      "rgbaSHA256": "83ad2da1e1d9c2cde158f82c32171c70de00b360d31c97407f1098a2e118a1f4",
+      "accent": {
+        "x": 8,
+        "y": 6
+      },
+      "layerOrder": [
+        "acceptedBase",
+        "eligibleMotion",
+        "materialBoundary",
+        "southWallExternal",
+        "content",
+        "selection",
+        "visibilityExternal"
+      ]
+    },
+    {
+      "id": "macro/7/5",
+      "request": {
+        "schemaVersion": "terrain-region-continuity-v1",
+        "ground": "deepWater",
+        "point": {
+          "x": 7,
+          "y": 5
+        },
+        "visualSeed": 442,
+        "featureVariant": 0,
+        "cardinalNeighbors": {
+          "north": "same",
+          "east": "soil",
+          "south": "same",
+          "west": "same"
+        },
+        "edgeContourIDs": {
+          "north": 2,
+          "east": 2,
+          "south": 0,
+          "west": 0
+        },
+        "visibility": "full",
+        "motionPhase": 0
+      },
+      "baseRoleSHA256": "d3a6f76b071a1059210b00cab0f97a56232ad9135ac6389b2db921559b1a8900",
+      "materialBoundarySHA256": "5341e6b2646979a70e57653007a1f310169421ec9bdd9f1a5648f75ade005af1",
+      "rgbaSHA256": "76c44a975d0ca360f6db89f0c69fc710438730caa01878a75a5c1e0e4836a0dd",
+      "accent": {
+        "x": 12,
+        "y": 9
+      },
+      "layerOrder": [
+        "acceptedBase",
+        "eligibleMotion",
+        "materialBoundary",
+        "southWallExternal",
+        "content",
+        "selection",
+        "visibilityExternal"
+      ]
+    },
+    {
+      "id": "macro/8/5",
+      "request": {
+        "schemaVersion": "terrain-region-continuity-v1",
+        "ground": "soil",
+        "point": {
+          "x": 8,
+          "y": 5
+        },
+        "visualSeed": 442,
+        "featureVariant": 0,
+        "cardinalNeighbors": {
+          "north": "same",
+          "east": "same",
+          "south": "same",
+          "west": "deepWater"
+        },
+        "edgeContourIDs": {
+          "north": 2,
+          "east": 0,
+          "south": 0,
+          "west": 2
+        },
+        "visibility": "full",
+        "motionPhase": 1
+      },
+      "baseRoleSHA256": "9626ff8b6e054043f99f3fba1a482e4213e82c2853156bc6c362b76be51e15ac",
+      "materialBoundarySHA256": "098c546f7b98b61e4d50c7645bb3216a4da1d544dbdb9ab74a3862e92029dd99",
+      "rgbaSHA256": "9dda81965ecb0d531e2282a9e3eacabda18b927d9cf4ea558bb43da4a8fc623d",
+      "accent": {
+        "x": 8,
+        "y": 10
+      },
+      "layerOrder": [
+        "acceptedBase",
+        "eligibleMotion",
+        "materialBoundary",
+        "southWallExternal",
+        "content",
+        "selection",
+        "visibilityExternal"
+      ]
+    },
+    {
+      "id": "macro/9/5",
+      "request": {
+        "schemaVersion": "terrain-region-continuity-v1",
+        "ground": "soil",
+        "point": {
+          "x": 9,
+          "y": 5
+        },
+        "visualSeed": 442,
+        "featureVariant": 0,
+        "cardinalNeighbors": {
+          "north": "same",
+          "east": "rubble",
+          "south": "rubble",
+          "west": "same"
+        },
+        "edgeContourIDs": {
+          "north": 2,
+          "east": 2,
+          "south": 0,
+          "west": 0
+        },
+        "visibility": "full",
+        "motionPhase": 2
+      },
+      "baseRoleSHA256": "a1686f86ffd0c6d51e2e05548297003b412f7349b1c87e2462894980eb5f9895",
+      "materialBoundarySHA256": "3182c50c0e689a44408fa75a80bbb5a8afe5aa7a366de4b84a63a62c6fc54f2a",
+      "rgbaSHA256": "fbcd6429928d7a00569f4bb777366d85aba905d9d2a0d8fa894c5203b55c0eb7",
+      "accent": {
+        "x": 9,
+        "y": 3
+      },
+      "layerOrder": [
+        "acceptedBase",
+        "eligibleMotion",
+        "materialBoundary",
+        "southWallExternal",
+        "content",
+        "selection",
+        "visibilityExternal"
+      ]
+    },
+    {
+      "id": "macro/10/5",
+      "request": {
+        "schemaVersion": "terrain-region-continuity-v1",
+        "ground": "rubble",
+        "point": {
+          "x": 10,
+          "y": 5
+        },
+        "visualSeed": 442,
+        "featureVariant": 0,
+        "cardinalNeighbors": {
+          "north": "soil",
+          "east": "unknown",
+          "south": "soil",
+          "west": "soil"
+        },
+        "edgeContourIDs": {
+          "north": 2,
+          "east": 0,
+          "south": 0,
+          "west": 2
+        },
+        "visibility": "full",
+        "motionPhase": 3
+      },
+      "baseRoleSHA256": "a03bcdbf4d72f1fef1751ec792d1869ada815ecc668896dcbbf81152602c99aa",
+      "materialBoundarySHA256": "5341e6b2646979a70e57653007a1f310169421ec9bdd9f1a5648f75ade005af1",
+      "rgbaSHA256": "a1f7e2fb3fa166dc3fdf64e55ffb734a44a22623ecf8634c51cd666e4bf506ef",
+      "accent": {
+        "x": 11,
+        "y": 9
+      },
+      "layerOrder": [
+        "acceptedBase",
+        "eligibleMotion",
+        "materialBoundary",
+        "southWallExternal",
+        "content",
+        "selection",
+        "visibilityExternal"
+      ]
+    },
+    {
+      "id": "macro/0/6",
+      "request": {
+        "schemaVersion": "terrain-region-continuity-v1",
+        "ground": "stone",
+        "point": {
+          "x": 0,
+          "y": 6
+        },
+        "visualSeed": 442,
+        "featureVariant": 0,
+        "cardinalNeighbors": {
+          "north": "same",
+          "east": "same",
+          "south": "same",
+          "west": "unknown"
+        },
+        "edgeContourIDs": {
+          "north": 0,
+          "east": 0,
+          "south": 2,
+          "west": 2
+        },
+        "visibility": "full",
+        "motionPhase": 2
+      },
+      "baseRoleSHA256": "bfbc4ce1cc340bb42679074c20d66146bad8c3e9a6966ec508af0f33e3d878c3",
+      "materialBoundarySHA256": "5341e6b2646979a70e57653007a1f310169421ec9bdd9f1a5648f75ade005af1",
+      "rgbaSHA256": "238b089fd8f8d7d7680781e0810c11c1be05d943d67a072a3cb47f443f579648",
+      "accent": {
+        "x": 9,
+        "y": 5
+      },
+      "layerOrder": [
+        "acceptedBase",
+        "eligibleMotion",
+        "materialBoundary",
+        "southWallExternal",
+        "content",
+        "selection",
+        "visibilityExternal"
+      ]
+    },
+    {
+      "id": "macro/1/6",
+      "request": {
+        "schemaVersion": "terrain-region-continuity-v1",
+        "ground": "stone",
+        "point": {
+          "x": 1,
+          "y": 6
+        },
+        "visualSeed": 442,
+        "featureVariant": 0,
+        "cardinalNeighbors": {
+          "north": "same",
+          "east": "same",
+          "south": "same",
+          "west": "same"
+        },
+        "edgeContourIDs": {
+          "north": 0,
+          "east": 2,
+          "south": 2,
+          "west": 0
+        },
+        "visibility": "full",
+        "motionPhase": 3
+      },
+      "baseRoleSHA256": "a57c6679c5005bd6e6c978c42ba8ddd7b7a29f189b102f0d40ff9d04ecd8a101",
+      "materialBoundarySHA256": "5341e6b2646979a70e57653007a1f310169421ec9bdd9f1a5648f75ade005af1",
+      "rgbaSHA256": "0ce823870b5e0c4b2155462f2e68dce43f43f5b3efd161bfefaea850b3d128a2",
+      "accent": {
+        "x": 3,
+        "y": 4
+      },
+      "layerOrder": [
+        "acceptedBase",
+        "eligibleMotion",
+        "materialBoundary",
+        "southWallExternal",
+        "content",
+        "selection",
+        "visibilityExternal"
+      ]
+    },
+    {
+      "id": "macro/2/6",
+      "request": {
+        "schemaVersion": "terrain-region-continuity-v1",
+        "ground": "stone",
+        "point": {
+          "x": 2,
+          "y": 6
+        },
+        "visualSeed": 442,
+        "featureVariant": 0,
+        "cardinalNeighbors": {
+          "north": "same",
+          "east": "water",
+          "south": "same",
+          "west": "same"
+        },
+        "edgeContourIDs": {
+          "north": 0,
+          "east": 0,
+          "south": 2,
+          "west": 2
+        },
+        "visibility": "full",
+        "motionPhase": 0
+      },
+      "baseRoleSHA256": "36ed6a0d85c3a9c1bd65e39ac22cd0819e405f47e83ed56b1212cffb09dd11f3",
+      "materialBoundarySHA256": "053199b629fe9cbd7d46906a9ebf66bd4225874361cfe4a8cc3ba2447e395958",
+      "rgbaSHA256": "f0796f87e313307ff4501b37e485d78fa4a14eafde9e9ce8aaec1813bb42b914",
+      "accent": {
+        "x": 12,
+        "y": 5
+      },
+      "layerOrder": [
+        "acceptedBase",
+        "eligibleMotion",
+        "materialBoundary",
+        "southWallExternal",
+        "content",
+        "selection",
+        "visibilityExternal"
+      ]
+    },
+    {
+      "id": "macro/3/6",
+      "request": {
+        "schemaVersion": "terrain-region-continuity-v1",
+        "ground": "water",
+        "point": {
+          "x": 3,
+          "y": 6
+        },
+        "visualSeed": 442,
+        "featureVariant": 0,
+        "cardinalNeighbors": {
+          "north": "same",
+          "east": "same",
+          "south": "rubble",
+          "west": "stone"
+        },
+        "edgeContourIDs": {
+          "north": 0,
+          "east": 2,
+          "south": 2,
+          "west": 0
+        },
+        "visibility": "full",
+        "motionPhase": 1
+      },
+      "baseRoleSHA256": "270d3f2bc8a160cc55563360547432e6de3af7b0562d12a012af4c0c432cb0ed",
+      "materialBoundarySHA256": "f9314550e3d8a58b7b3fc811c4a1ba4c512eee64f8cf839c66b1d0498d99a980",
+      "rgbaSHA256": "43ca781f96081b381f60b4aba27e441808d11078f5cae67a38d06906dca18f3b",
+      "accent": {
+        "x": 6,
+        "y": 8
+      },
+      "layerOrder": [
+        "acceptedBase",
+        "eligibleMotion",
+        "materialBoundary",
+        "southWallExternal",
+        "content",
+        "selection",
+        "visibilityExternal"
+      ]
+    },
+    {
+      "id": "macro/4/6",
+      "request": {
+        "schemaVersion": "terrain-region-continuity-v1",
+        "ground": "water",
+        "point": {
+          "x": 4,
+          "y": 6
+        },
+        "visualSeed": 442,
+        "featureVariant": 0,
+        "cardinalNeighbors": {
+          "north": "same",
+          "east": "deepWater",
+          "south": "same",
+          "west": "same"
+        },
+        "edgeContourIDs": {
+          "north": 0,
+          "east": 0,
+          "south": 2,
+          "west": 2
+        },
+        "visibility": "full",
+        "motionPhase": 2
+      },
+      "baseRoleSHA256": "733193fc9c2b988b7b8e37fba3415e1940a32ca58ea8fddcec579acd4c792ab5",
+      "materialBoundarySHA256": "7f946d8b6b2b0ec12a1da90a9f0ec31894e720ef76367831079f64d27ac2a79a",
+      "rgbaSHA256": "3d88ab43e9bd17f539504571fe6d46b4518d46da7ebdd3106994ef7ebebc7b75",
+      "accent": {
+        "x": 4,
+        "y": 7
+      },
+      "layerOrder": [
+        "acceptedBase",
+        "eligibleMotion",
+        "materialBoundary",
+        "southWallExternal",
+        "content",
+        "selection",
+        "visibilityExternal"
+      ]
+    },
+    {
+      "id": "macro/5/6",
+      "request": {
+        "schemaVersion": "terrain-region-continuity-v1",
+        "ground": "deepWater",
+        "point": {
+          "x": 5,
+          "y": 6
+        },
+        "visualSeed": 442,
+        "featureVariant": 0,
+        "cardinalNeighbors": {
+          "north": "same",
+          "east": "same",
+          "south": "same",
+          "west": "water"
+        },
+        "edgeContourIDs": {
+          "north": 0,
+          "east": 2,
+          "south": 2,
+          "west": 0
+        },
+        "visibility": "full",
+        "motionPhase": 3
+      },
+      "baseRoleSHA256": "e542ac09c4de6ff0b86ebb5ff0d8b3519d01decc881445843df7c0b2fe106b41",
+      "materialBoundarySHA256": "5341e6b2646979a70e57653007a1f310169421ec9bdd9f1a5648f75ade005af1",
+      "rgbaSHA256": "88e68c21ff82bfe3265667b752ccb45d1960d2c6a29b77a6378642bb783f3430",
+      "accent": {
+        "x": 11,
+        "y": 7
+      },
+      "layerOrder": [
+        "acceptedBase",
+        "eligibleMotion",
+        "materialBoundary",
+        "southWallExternal",
+        "content",
+        "selection",
+        "visibilityExternal"
+      ]
+    },
+    {
+      "id": "macro/6/6",
+      "request": {
+        "schemaVersion": "terrain-region-continuity-v1",
+        "ground": "deepWater",
+        "point": {
+          "x": 6,
+          "y": 6
+        },
+        "visualSeed": 442,
+        "featureVariant": 0,
+        "cardinalNeighbors": {
+          "north": "same",
+          "east": "same",
+          "south": "same",
+          "west": "same"
+        },
+        "edgeContourIDs": {
+          "north": 0,
+          "east": 0,
+          "south": 2,
+          "west": 2
+        },
+        "visibility": "full",
+        "motionPhase": 0
+      },
+      "baseRoleSHA256": "d237197f78b289ac97de39fe38304bc4032ba5df70d0615f8ab1add591067709",
+      "materialBoundarySHA256": "5341e6b2646979a70e57653007a1f310169421ec9bdd9f1a5648f75ade005af1",
+      "rgbaSHA256": "8907261ecbe134a5b072318f8015f8c2cf82e6941021fc4d0268e7b8d6a2fed2",
+      "accent": {
+        "x": 10,
+        "y": 4
+      },
+      "layerOrder": [
+        "acceptedBase",
+        "eligibleMotion",
+        "materialBoundary",
+        "southWallExternal",
+        "content",
+        "selection",
+        "visibilityExternal"
+      ]
+    },
+    {
+      "id": "macro/7/6",
+      "request": {
+        "schemaVersion": "terrain-region-continuity-v1",
+        "ground": "deepWater",
+        "point": {
+          "x": 7,
+          "y": 6
+        },
+        "visualSeed": 442,
+        "featureVariant": 0,
+        "cardinalNeighbors": {
+          "north": "same",
+          "east": "soil",
+          "south": "soil",
+          "west": "same"
+        },
+        "edgeContourIDs": {
+          "north": 0,
+          "east": 2,
+          "south": 2,
+          "west": 0
+        },
+        "visibility": "full",
+        "motionPhase": 1
+      },
+      "baseRoleSHA256": "3db83d6a32a3e9d945947429e5eb5b195c442cace5467cdb25ab2894ed45cfc0",
+      "materialBoundarySHA256": "5341e6b2646979a70e57653007a1f310169421ec9bdd9f1a5648f75ade005af1",
+      "rgbaSHA256": "8c2a55a2bddcc65afa07e20b0131ab9415d30ef49d9484e53429afdab6df839f",
+      "accent": {
+        "x": 5,
+        "y": 7
+      },
+      "layerOrder": [
+        "acceptedBase",
+        "eligibleMotion",
+        "materialBoundary",
+        "southWallExternal",
+        "content",
+        "selection",
+        "visibilityExternal"
+      ]
+    },
+    {
+      "id": "macro/8/6",
+      "request": {
+        "schemaVersion": "terrain-region-continuity-v1",
+        "ground": "soil",
+        "point": {
+          "x": 8,
+          "y": 6
+        },
+        "visualSeed": 442,
+        "featureVariant": 0,
+        "cardinalNeighbors": {
+          "north": "same",
+          "east": "rubble",
+          "south": "rubble",
+          "west": "deepWater"
+        },
+        "edgeContourIDs": {
+          "north": 0,
+          "east": 0,
+          "south": 2,
+          "west": 2
+        },
+        "visibility": "full",
+        "motionPhase": 2
+      },
+      "baseRoleSHA256": "b26281b7a311625fdc70b2076880d7941ffc1989f636960c62846acb5f3bc15b",
+      "materialBoundarySHA256": "f997bcdae6c991589b312173de0158135a60836953d60cc6b134f4c5eec209c9",
+      "rgbaSHA256": "26730b52aeaa7ebaacbc6d3c7ffb9acf76894d8608ab941b2b2e807801d60419",
+      "accent": {
+        "x": 8,
+        "y": 12
+      },
+      "layerOrder": [
+        "acceptedBase",
+        "eligibleMotion",
+        "materialBoundary",
+        "southWallExternal",
+        "content",
+        "selection",
+        "visibilityExternal"
+      ]
+    },
+    {
+      "id": "macro/9/6",
+      "request": {
+        "schemaVersion": "terrain-region-continuity-v1",
+        "ground": "rubble",
+        "point": {
+          "x": 9,
+          "y": 6
+        },
+        "visualSeed": 442,
+        "featureVariant": 0,
+        "cardinalNeighbors": {
+          "north": "soil",
+          "east": "soil",
+          "south": "soil",
+          "west": "soil"
+        },
+        "edgeContourIDs": {
+          "north": 0,
+          "east": 2,
+          "south": 2,
+          "west": 0
+        },
+        "visibility": "full",
+        "motionPhase": 3
+      },
+      "baseRoleSHA256": "1a5a970d9c8554a77e6b05f9950d7ae918bfebf8647d5fbd311d89f6be051b66",
+      "materialBoundarySHA256": "5341e6b2646979a70e57653007a1f310169421ec9bdd9f1a5648f75ade005af1",
+      "rgbaSHA256": "5512217e4da57f0d3ad3466159f6fa653bdce7213fb16b5f3ca359cd9d125a40",
+      "accent": {
+        "x": 3,
+        "y": 9
+      },
+      "layerOrder": [
+        "acceptedBase",
+        "eligibleMotion",
+        "materialBoundary",
+        "southWallExternal",
+        "content",
+        "selection",
+        "visibilityExternal"
+      ]
+    },
+    {
+      "id": "macro/10/6",
+      "request": {
+        "schemaVersion": "terrain-region-continuity-v1",
+        "ground": "soil",
+        "point": {
+          "x": 10,
+          "y": 6
+        },
+        "visualSeed": 442,
+        "featureVariant": 0,
+        "cardinalNeighbors": {
+          "north": "rubble",
+          "east": "unknown",
+          "south": "same",
+          "west": "rubble"
+        },
+        "edgeContourIDs": {
+          "north": 0,
+          "east": 0,
+          "south": 2,
+          "west": 2
+        },
+        "visibility": "full",
+        "motionPhase": 0
+      },
+      "baseRoleSHA256": "1c6245d5f66f2ad9d84d264c5cee55111663bc8f1b2203e6c2410cfff359760f",
+      "materialBoundarySHA256": "06404163e06d6cf8113c00dcd5a0bfc39a4545aa8aa7ee5716885c98986c2c0c",
+      "rgbaSHA256": "1422a4b5aff2475a50191cd76b6406e9368e63d5b9329621973de320618f71eb",
+      "accent": {
+        "x": 11,
+        "y": 3
+      },
+      "layerOrder": [
+        "acceptedBase",
+        "eligibleMotion",
+        "materialBoundary",
+        "southWallExternal",
+        "content",
+        "selection",
+        "visibilityExternal"
+      ]
+    },
+    {
+      "id": "macro/0/7",
+      "request": {
+        "schemaVersion": "terrain-region-continuity-v1",
+        "ground": "stone",
+        "point": {
+          "x": 0,
+          "y": 7
+        },
+        "visualSeed": 442,
+        "featureVariant": 0,
+        "cardinalNeighbors": {
+          "north": "same",
+          "east": "same",
+          "south": "same",
+          "west": "unknown"
+        },
+        "edgeContourIDs": {
+          "north": 2,
+          "east": 0,
+          "south": 0,
+          "west": 2
+        },
+        "visibility": "full",
+        "motionPhase": 3
+      },
+      "baseRoleSHA256": "41e67da9dc1b3e4da6f80420b910fe2b73085fd6d5de845bc11ae97a23c6f4f8",
+      "materialBoundarySHA256": "5341e6b2646979a70e57653007a1f310169421ec9bdd9f1a5648f75ade005af1",
+      "rgbaSHA256": "7c590bbb694342b451cc775cfff4e8c139a8eda6eca66a53ec32e028757f24c8",
+      "accent": {
+        "x": 11,
+        "y": 8
+      },
+      "layerOrder": [
+        "acceptedBase",
+        "eligibleMotion",
+        "materialBoundary",
+        "southWallExternal",
+        "content",
+        "selection",
+        "visibilityExternal"
+      ]
+    },
+    {
+      "id": "macro/1/7",
+      "request": {
+        "schemaVersion": "terrain-region-continuity-v1",
+        "ground": "stone",
+        "point": {
+          "x": 1,
+          "y": 7
+        },
+        "visualSeed": 442,
+        "featureVariant": 0,
+        "cardinalNeighbors": {
+          "north": "same",
+          "east": "same",
+          "south": "same",
+          "west": "same"
+        },
+        "edgeContourIDs": {
+          "north": 2,
+          "east": 2,
+          "south": 0,
+          "west": 0
+        },
+        "visibility": "full",
+        "motionPhase": 0
+      },
+      "baseRoleSHA256": "5ee6fa4f25361dba500c7ce19485b994c790fdf883d4fd5d4ad2a642881d66ee",
+      "materialBoundarySHA256": "5341e6b2646979a70e57653007a1f310169421ec9bdd9f1a5648f75ade005af1",
+      "rgbaSHA256": "a667fdb1c78d843a7f912ea5330a30138c1aea1e4a4fc05fe741cebba124a13f",
+      "accent": {
+        "x": 9,
+        "y": 10
+      },
+      "layerOrder": [
+        "acceptedBase",
+        "eligibleMotion",
+        "materialBoundary",
+        "southWallExternal",
+        "content",
+        "selection",
+        "visibilityExternal"
+      ]
+    },
+    {
+      "id": "macro/2/7",
+      "request": {
+        "schemaVersion": "terrain-region-continuity-v1",
+        "ground": "stone",
+        "point": {
+          "x": 2,
+          "y": 7
+        },
+        "visualSeed": 442,
+        "featureVariant": 0,
+        "cardinalNeighbors": {
+          "north": "same",
+          "east": "rubble",
+          "south": "same",
+          "west": "same"
+        },
+        "edgeContourIDs": {
+          "north": 2,
+          "east": 0,
+          "south": 0,
+          "west": 2
+        },
+        "visibility": "full",
+        "motionPhase": 1
+      },
+      "baseRoleSHA256": "ced32874d092c8c3b21e1ef60d22ffeef44a2183f3c721c3e4cb474356448334",
+      "materialBoundarySHA256": "fab3baf4bcc9bc651218e43686d9969aa7511c2094667935347b0e503c086a42",
+      "rgbaSHA256": "f738b0b007fc31ef6d1e14625e557629517a07248905fd4f89dfe74ca42e9507",
+      "accent": {
+        "x": 9,
+        "y": 7
+      },
+      "layerOrder": [
+        "acceptedBase",
+        "eligibleMotion",
+        "materialBoundary",
+        "southWallExternal",
+        "content",
+        "selection",
+        "visibilityExternal"
+      ]
+    },
+    {
+      "id": "macro/3/7",
+      "request": {
+        "schemaVersion": "terrain-region-continuity-v1",
+        "ground": "rubble",
+        "point": {
+          "x": 3,
+          "y": 7
+        },
+        "visualSeed": 442,
+        "featureVariant": 0,
+        "cardinalNeighbors": {
+          "north": "water",
+          "east": "water",
+          "south": "growth",
+          "west": "stone"
+        },
+        "edgeContourIDs": {
+          "north": 2,
+          "east": 2,
+          "south": 0,
+          "west": 0
+        },
+        "visibility": "full",
+        "motionPhase": 2
+      },
+      "baseRoleSHA256": "579a24c1badc5781a348d199152542927ec97581e416bbe75e71bceb7095fd2f",
+      "materialBoundarySHA256": "17c0b9f4a1aa048b4a980636d904cf9306530597a14adbb2cfcbac756cf0310a",
+      "rgbaSHA256": "5390e595f5784ab75cf4b4b2854db295f5388649c26344af0c858e942b7d93e1",
+      "accent": {
+        "x": 5,
+        "y": 9
+      },
+      "layerOrder": [
+        "acceptedBase",
+        "eligibleMotion",
+        "materialBoundary",
+        "southWallExternal",
+        "content",
+        "selection",
+        "visibilityExternal"
+      ]
+    },
+    {
+      "id": "macro/4/7",
+      "request": {
+        "schemaVersion": "terrain-region-continuity-v1",
+        "ground": "water",
+        "point": {
+          "x": 4,
+          "y": 7
+        },
+        "visualSeed": 442,
+        "featureVariant": 0,
+        "cardinalNeighbors": {
+          "north": "same",
+          "east": "deepWater",
+          "south": "growth",
+          "west": "rubble"
+        },
+        "edgeContourIDs": {
+          "north": 2,
+          "east": 0,
+          "south": 0,
+          "west": 2
+        },
+        "visibility": "full",
+        "motionPhase": 3
+      },
+      "baseRoleSHA256": "5125c4125d884754c388dac8222549f6e0bb0d5ada79152db109d41188c262af",
+      "materialBoundarySHA256": "8396ac15115163eea04a1d9d4a657d5b0f95bfbd58cf759220be8e6af40fe1e4",
+      "rgbaSHA256": "3537f134df3006bf0a2176bd019fd7f5dad268e3c522ae87b2aecac557b1e83b",
+      "accent": {
+        "x": 7,
+        "y": 4
+      },
+      "layerOrder": [
+        "acceptedBase",
+        "eligibleMotion",
+        "materialBoundary",
+        "southWallExternal",
+        "content",
+        "selection",
+        "visibilityExternal"
+      ]
+    },
+    {
+      "id": "macro/5/7",
+      "request": {
+        "schemaVersion": "terrain-region-continuity-v1",
+        "ground": "deepWater",
+        "point": {
+          "x": 5,
+          "y": 7
+        },
+        "visualSeed": 442,
+        "featureVariant": 0,
+        "cardinalNeighbors": {
+          "north": "same",
+          "east": "same",
+          "south": "growth",
+          "west": "water"
+        },
+        "edgeContourIDs": {
+          "north": 2,
+          "east": 2,
+          "south": 0,
+          "west": 0
+        },
+        "visibility": "full",
+        "motionPhase": 0
+      },
+      "baseRoleSHA256": "5a27b78f6d59934817a3a08b83ee60a414f5bde7ebcf13757f40a78eb3080719",
+      "materialBoundarySHA256": "9f30d9e270cad8f5b3ff560d1a17f97b5d3c32dc5941f4c8b339a255d7066cb4",
+      "rgbaSHA256": "a890c12add8a47017d28b19b2f14702ce39a655e25ebc5bcb43313b33332d071",
+      "accent": {
+        "x": 10,
+        "y": 8
+      },
+      "layerOrder": [
+        "acceptedBase",
+        "eligibleMotion",
+        "materialBoundary",
+        "southWallExternal",
+        "content",
+        "selection",
+        "visibilityExternal"
+      ]
+    },
+    {
+      "id": "macro/6/7",
+      "request": {
+        "schemaVersion": "terrain-region-continuity-v1",
+        "ground": "deepWater",
+        "point": {
+          "x": 6,
+          "y": 7
+        },
+        "visualSeed": 442,
+        "featureVariant": 0,
+        "cardinalNeighbors": {
+          "north": "same",
+          "east": "soil",
+          "south": "growth",
+          "west": "same"
+        },
+        "edgeContourIDs": {
+          "north": 2,
+          "east": 0,
+          "south": 0,
+          "west": 2
+        },
+        "visibility": "full",
+        "motionPhase": 1
+      },
+      "baseRoleSHA256": "8e6f969414c556cddce29d22f290ce25e5a20ffb0dafe55e9d0ae34b025f68de",
+      "materialBoundarySHA256": "f98211d88fc1355393f0f65c5c579fec12fb355873a858d097351330b43f4213",
+      "rgbaSHA256": "75aaa08ff691a0184e383f74985bfceb193764ae106668dbd524124127dcb3ba",
+      "accent": {
+        "x": 8,
+        "y": 3
+      },
+      "layerOrder": [
+        "acceptedBase",
+        "eligibleMotion",
+        "materialBoundary",
+        "southWallExternal",
+        "content",
+        "selection",
+        "visibilityExternal"
+      ]
+    },
+    {
+      "id": "macro/7/7",
+      "request": {
+        "schemaVersion": "terrain-region-continuity-v1",
+        "ground": "soil",
+        "point": {
+          "x": 7,
+          "y": 7
+        },
+        "visualSeed": 442,
+        "featureVariant": 0,
+        "cardinalNeighbors": {
+          "north": "deepWater",
+          "east": "rubble",
+          "south": "growth",
+          "west": "deepWater"
+        },
+        "edgeContourIDs": {
+          "north": 2,
+          "east": 2,
+          "south": 0,
+          "west": 0
+        },
+        "visibility": "full",
+        "motionPhase": 2
+      },
+      "baseRoleSHA256": "714975e96907f89c327cef31382ee26de814fd17750f0bf59c1319b7e677ca92",
+      "materialBoundarySHA256": "719eb9eb1578ed8b86f9b07abd6f25ee1cd416a71faa2f69bdabaa461d5a0a5d",
+      "rgbaSHA256": "f8df730829dc9f55cf2c6c6750a0b8cf775a1b3171718ae3ed2b274851e5ad7e",
+      "accent": {
+        "x": 11,
+        "y": 4
+      },
+      "layerOrder": [
+        "acceptedBase",
+        "eligibleMotion",
+        "materialBoundary",
+        "southWallExternal",
+        "content",
+        "selection",
+        "visibilityExternal"
+      ]
+    },
+    {
+      "id": "macro/8/7",
+      "request": {
+        "schemaVersion": "terrain-region-continuity-v1",
+        "ground": "rubble",
+        "point": {
+          "x": 8,
+          "y": 7
+        },
+        "visualSeed": 442,
+        "featureVariant": 0,
+        "cardinalNeighbors": {
+          "north": "soil",
+          "east": "soil",
+          "south": "growth",
+          "west": "soil"
+        },
+        "edgeContourIDs": {
+          "north": 2,
+          "east": 0,
+          "south": 0,
+          "west": 2
+        },
+        "visibility": "full",
+        "motionPhase": 3
+      },
+      "baseRoleSHA256": "030b369f435220af2b041885e173505566c4dd8be25a6150da8d51126cb9dcce",
+      "materialBoundarySHA256": "bd1d4ba4bd63869a975bc84c5506b9e3b2705f96b6c12addca3474694e383d76",
+      "rgbaSHA256": "1e59d2ab6c63a75b777fc8e38e2a355a858df0206607a4083530efef860b2482",
+      "accent": {
+        "x": 8,
+        "y": 8
+      },
+      "layerOrder": [
+        "acceptedBase",
+        "eligibleMotion",
+        "materialBoundary",
+        "southWallExternal",
+        "content",
+        "selection",
+        "visibilityExternal"
+      ]
+    },
+    {
+      "id": "macro/9/7",
+      "request": {
+        "schemaVersion": "terrain-region-continuity-v1",
+        "ground": "soil",
+        "point": {
+          "x": 9,
+          "y": 7
+        },
+        "visualSeed": 442,
+        "featureVariant": 0,
+        "cardinalNeighbors": {
+          "north": "rubble",
+          "east": "same",
+          "south": "growth",
+          "west": "rubble"
+        },
+        "edgeContourIDs": {
+          "north": 2,
+          "east": 2,
+          "south": 0,
+          "west": 0
+        },
+        "visibility": "full",
+        "motionPhase": 0
+      },
+      "baseRoleSHA256": "c83734e57aba5be67533f124ebeec763e018d8da423738e1b9681edf0b8dd099",
+      "materialBoundarySHA256": "f1bf01da7be0c626453d57722e8b4609d482025a4aa5d5186250b3be51a0fbfc",
+      "rgbaSHA256": "4bcca801abadcc0db686a5c98a742c1c5a1e8a834a56bf44f03a5ccc8a923180",
+      "accent": {
+        "x": 11,
+        "y": 4
+      },
+      "layerOrder": [
+        "acceptedBase",
+        "eligibleMotion",
+        "materialBoundary",
+        "southWallExternal",
+        "content",
+        "selection",
+        "visibilityExternal"
+      ]
+    },
+    {
+      "id": "macro/10/7",
+      "request": {
+        "schemaVersion": "terrain-region-continuity-v1",
+        "ground": "soil",
+        "point": {
+          "x": 10,
+          "y": 7
+        },
+        "visualSeed": 442,
+        "featureVariant": 0,
+        "cardinalNeighbors": {
+          "north": "same",
+          "east": "unknown",
+          "south": "growth",
+          "west": "same"
+        },
+        "edgeContourIDs": {
+          "north": 2,
+          "east": 0,
+          "south": 0,
+          "west": 2
+        },
+        "visibility": "full",
+        "motionPhase": 1
+      },
+      "baseRoleSHA256": "df2ca8629c297ae8e9880601d7e0f2712c9073e8b32745ddbbd3a1ad2d8dd1e9",
+      "materialBoundarySHA256": "f98211d88fc1355393f0f65c5c579fec12fb355873a858d097351330b43f4213",
+      "rgbaSHA256": "844cf9f3911d90e9a6841b0f338d19d5be3e55658aedd78ad6e27ac57be653b2",
+      "accent": {
+        "x": 12,
+        "y": 11
+      },
+      "layerOrder": [
+        "acceptedBase",
+        "eligibleMotion",
+        "materialBoundary",
+        "southWallExternal",
+        "content",
+        "selection",
+        "visibilityExternal"
+      ]
+    },
+    {
+      "id": "macro/0/8",
+      "request": {
+        "schemaVersion": "terrain-region-continuity-v1",
+        "ground": "stone",
+        "point": {
+          "x": 0,
+          "y": 8
+        },
+        "visualSeed": 442,
+        "featureVariant": 0,
+        "cardinalNeighbors": {
+          "north": "same",
+          "east": "same",
+          "south": "same",
+          "west": "unknown"
+        },
+        "edgeContourIDs": {
+          "north": 0,
+          "east": 0,
+          "south": 2,
+          "west": 2
+        },
+        "visibility": "full",
+        "motionPhase": 0
+      },
+      "baseRoleSHA256": "389aa091a5aa18016be87715302993bc1aceb414a9bbfbd03597ee663850905c",
+      "materialBoundarySHA256": "5341e6b2646979a70e57653007a1f310169421ec9bdd9f1a5648f75ade005af1",
+      "rgbaSHA256": "82f5fada2ff3a9978cf02f4a26b192af36b7e234a8e0340058dd89e669a8cf1e",
+      "accent": {
+        "x": 10,
+        "y": 12
+      },
+      "layerOrder": [
+        "acceptedBase",
+        "eligibleMotion",
+        "materialBoundary",
+        "southWallExternal",
+        "content",
+        "selection",
+        "visibilityExternal"
+      ]
+    },
+    {
+      "id": "macro/1/8",
+      "request": {
+        "schemaVersion": "terrain-region-continuity-v1",
+        "ground": "stone",
+        "point": {
+          "x": 1,
+          "y": 8
+        },
+        "visualSeed": 442,
+        "featureVariant": 0,
+        "cardinalNeighbors": {
+          "north": "same",
+          "east": "same",
+          "south": "same",
+          "west": "same"
+        },
+        "edgeContourIDs": {
+          "north": 0,
+          "east": 2,
+          "south": 2,
+          "west": 0
+        },
+        "visibility": "full",
+        "motionPhase": 1
+      },
+      "baseRoleSHA256": "289a518d8aca1cac47ff27071d003b9d38cf453626f04f00b629ddf860b2a2c5",
+      "materialBoundarySHA256": "5341e6b2646979a70e57653007a1f310169421ec9bdd9f1a5648f75ade005af1",
+      "rgbaSHA256": "eab5b43e76e62be81203ee35d81eb58b41fe44b03ffeff38dd109a061ce8c548",
+      "accent": {
+        "x": 6,
+        "y": 8
+      },
+      "layerOrder": [
+        "acceptedBase",
+        "eligibleMotion",
+        "materialBoundary",
+        "southWallExternal",
+        "content",
+        "selection",
+        "visibilityExternal"
+      ]
+    },
+    {
+      "id": "macro/2/8",
+      "request": {
+        "schemaVersion": "terrain-region-continuity-v1",
+        "ground": "stone",
+        "point": {
+          "x": 2,
+          "y": 8
+        },
+        "visualSeed": 442,
+        "featureVariant": 0,
+        "cardinalNeighbors": {
+          "north": "same",
+          "east": "growth",
+          "south": "same",
+          "west": "same"
+        },
+        "edgeContourIDs": {
+          "north": 0,
+          "east": 0,
+          "south": 2,
+          "west": 2
+        },
+        "visibility": "full",
+        "motionPhase": 2
+      },
+      "baseRoleSHA256": "7c3a4302d9dca5262eb82e771e6efd4897364ed187bf54f774d62c26ecab9e0a",
+      "materialBoundarySHA256": "7f946d8b6b2b0ec12a1da90a9f0ec31894e720ef76367831079f64d27ac2a79a",
+      "rgbaSHA256": "261875be7f951ec9d13eeb8ce5b855eb88828646d77df4dfcc56e32ce264f4fe",
+      "accent": {
+        "x": 6,
+        "y": 8
+      },
+      "layerOrder": [
+        "acceptedBase",
+        "eligibleMotion",
+        "materialBoundary",
+        "southWallExternal",
+        "content",
+        "selection",
+        "visibilityExternal"
+      ]
+    },
+    {
+      "id": "macro/3/8",
+      "request": {
+        "schemaVersion": "terrain-region-continuity-v1",
+        "ground": "growth",
+        "point": {
+          "x": 3,
+          "y": 8
+        },
+        "visualSeed": 442,
+        "featureVariant": 0,
+        "cardinalNeighbors": {
+          "north": "rubble",
+          "east": "same",
+          "south": "same",
+          "west": "stone"
+        },
+        "edgeContourIDs": {
+          "north": 0,
+          "east": 2,
+          "south": 2,
+          "west": 0
+        },
+        "visibility": "full",
+        "motionPhase": 3
+      },
+      "baseRoleSHA256": "0d291f0af2a1e9daf66f3f8763ce4a2fcc6e50cc2ac9cf382caad290b36823a8",
+      "materialBoundarySHA256": "5341e6b2646979a70e57653007a1f310169421ec9bdd9f1a5648f75ade005af1",
+      "rgbaSHA256": "e0e2b7ff318f7b41a939c2e08af4a5462f901d8e520993324816fd56eac0e215",
+      "accent": {
+        "x": 4,
+        "y": 12
+      },
+      "layerOrder": [
+        "acceptedBase",
+        "eligibleMotion",
+        "materialBoundary",
+        "southWallExternal",
+        "content",
+        "selection",
+        "visibilityExternal"
+      ]
+    },
+    {
+      "id": "macro/4/8",
+      "request": {
+        "schemaVersion": "terrain-region-continuity-v1",
+        "ground": "growth",
+        "point": {
+          "x": 4,
+          "y": 8
+        },
+        "visualSeed": 442,
+        "featureVariant": 0,
+        "cardinalNeighbors": {
+          "north": "water",
+          "east": "same",
+          "south": "same",
+          "west": "same"
+        },
+        "edgeContourIDs": {
+          "north": 0,
+          "east": 0,
+          "south": 2,
+          "west": 2
+        },
+        "visibility": "full",
+        "motionPhase": 0
+      },
+      "baseRoleSHA256": "d4d953040edb67377d606c23628b5bc4ca1efddb7b1a7aaffa6e13d45d02b0a6",
+      "materialBoundarySHA256": "5341e6b2646979a70e57653007a1f310169421ec9bdd9f1a5648f75ade005af1",
+      "rgbaSHA256": "a956100d848f28299e6f886f01bf17b9f5c44e92c261d2c819b9aedebe5e0dbf",
+      "accent": {
+        "x": 4,
+        "y": 8
+      },
+      "layerOrder": [
+        "acceptedBase",
+        "eligibleMotion",
+        "materialBoundary",
+        "southWallExternal",
+        "content",
+        "selection",
+        "visibilityExternal"
+      ]
+    },
+    {
+      "id": "macro/5/8",
+      "request": {
+        "schemaVersion": "terrain-region-continuity-v1",
+        "ground": "growth",
+        "point": {
+          "x": 5,
+          "y": 8
+        },
+        "visualSeed": 442,
+        "featureVariant": 0,
+        "cardinalNeighbors": {
+          "north": "deepWater",
+          "east": "same",
+          "south": "same",
+          "west": "same"
+        },
+        "edgeContourIDs": {
+          "north": 0,
+          "east": 2,
+          "south": 2,
+          "west": 0
+        },
+        "visibility": "full",
+        "motionPhase": 1
+      },
+      "baseRoleSHA256": "36b17e79d0257643baf07e95f220eb28df224f051ceabc47be788dfb00bb9050",
+      "materialBoundarySHA256": "5341e6b2646979a70e57653007a1f310169421ec9bdd9f1a5648f75ade005af1",
+      "rgbaSHA256": "b06974fecef080c0ecae278f6dfda9d41bd035f488ed3e186cd05c857430ffda",
+      "accent": {
+        "x": 7,
+        "y": 4
+      },
+      "layerOrder": [
+        "acceptedBase",
+        "eligibleMotion",
+        "materialBoundary",
+        "southWallExternal",
+        "content",
+        "selection",
+        "visibilityExternal"
+      ]
+    },
+    {
+      "id": "macro/6/8",
+      "request": {
+        "schemaVersion": "terrain-region-continuity-v1",
+        "ground": "growth",
+        "point": {
+          "x": 6,
+          "y": 8
+        },
+        "visualSeed": 442,
+        "featureVariant": 0,
+        "cardinalNeighbors": {
+          "north": "deepWater",
+          "east": "same",
+          "south": "same",
+          "west": "same"
+        },
+        "edgeContourIDs": {
+          "north": 0,
+          "east": 0,
+          "south": 2,
+          "west": 2
+        },
+        "visibility": "full",
+        "motionPhase": 2
+      },
+      "baseRoleSHA256": "6e019e4c4fa85b36250e4a4619aea90587bb8fb434f8ae60474a830857b61b68",
+      "materialBoundarySHA256": "5341e6b2646979a70e57653007a1f310169421ec9bdd9f1a5648f75ade005af1",
+      "rgbaSHA256": "f9ed664c116170cc938e92c1ad18211ca5986df306d9b1f1acb38703589b8113",
+      "accent": {
+        "x": 4,
+        "y": 3
+      },
+      "layerOrder": [
+        "acceptedBase",
+        "eligibleMotion",
+        "materialBoundary",
+        "southWallExternal",
+        "content",
+        "selection",
+        "visibilityExternal"
+      ]
+    },
+    {
+      "id": "macro/7/8",
+      "request": {
+        "schemaVersion": "terrain-region-continuity-v1",
+        "ground": "growth",
+        "point": {
+          "x": 7,
+          "y": 8
+        },
+        "visualSeed": 442,
+        "featureVariant": 0,
+        "cardinalNeighbors": {
+          "north": "soil",
+          "east": "same",
+          "south": "same",
+          "west": "same"
+        },
+        "edgeContourIDs": {
+          "north": 0,
+          "east": 2,
+          "south": 2,
+          "west": 0
+        },
+        "visibility": "full",
+        "motionPhase": 3
+      },
+      "baseRoleSHA256": "5b76058b97c6b7fa121257410bac415dc135f18a559b4971d5ca9dc3a460c448",
+      "materialBoundarySHA256": "5341e6b2646979a70e57653007a1f310169421ec9bdd9f1a5648f75ade005af1",
+      "rgbaSHA256": "0352c41b6c0ff4bec17c562573d7234799663342b12c334320876aeec71c0847",
+      "accent": {
+        "x": 4,
+        "y": 8
+      },
+      "layerOrder": [
+        "acceptedBase",
+        "eligibleMotion",
+        "materialBoundary",
+        "southWallExternal",
+        "content",
+        "selection",
+        "visibilityExternal"
+      ]
+    },
+    {
+      "id": "macro/8/8",
+      "request": {
+        "schemaVersion": "terrain-region-continuity-v1",
+        "ground": "growth",
+        "point": {
+          "x": 8,
+          "y": 8
+        },
+        "visualSeed": 442,
+        "featureVariant": 0,
+        "cardinalNeighbors": {
+          "north": "rubble",
+          "east": "same",
+          "south": "same",
+          "west": "same"
+        },
+        "edgeContourIDs": {
+          "north": 0,
+          "east": 0,
+          "south": 2,
+          "west": 2
+        },
+        "visibility": "full",
+        "motionPhase": 0
+      },
+      "baseRoleSHA256": "c66da4a4c229583f420bd4e09db13b4339e74c6ea11084418c8c6dc03374bfe5",
+      "materialBoundarySHA256": "5341e6b2646979a70e57653007a1f310169421ec9bdd9f1a5648f75ade005af1",
+      "rgbaSHA256": "3774964b88e34262c7eb133ee7d1ff3f9ab594c9054e8da17173062ec3991d94",
+      "accent": {
+        "x": 11,
+        "y": 7
+      },
+      "layerOrder": [
+        "acceptedBase",
+        "eligibleMotion",
+        "materialBoundary",
+        "southWallExternal",
+        "content",
+        "selection",
+        "visibilityExternal"
+      ]
+    },
+    {
+      "id": "macro/9/8",
+      "request": {
+        "schemaVersion": "terrain-region-continuity-v1",
+        "ground": "growth",
+        "point": {
+          "x": 9,
+          "y": 8
+        },
+        "visualSeed": 442,
+        "featureVariant": 0,
+        "cardinalNeighbors": {
+          "north": "soil",
+          "east": "same",
+          "south": "same",
+          "west": "same"
+        },
+        "edgeContourIDs": {
+          "north": 0,
+          "east": 2,
+          "south": 2,
+          "west": 0
+        },
+        "visibility": "full",
+        "motionPhase": 1
+      },
+      "baseRoleSHA256": "1037d811366ceb75ea4b717a65355cd27d56b41a71b3561927e987daf67c4235",
+      "materialBoundarySHA256": "5341e6b2646979a70e57653007a1f310169421ec9bdd9f1a5648f75ade005af1",
+      "rgbaSHA256": "ff846eca22536bbad00cf955e9d04472f69c21daa9cce147169d79e41e4661a4",
+      "accent": {
+        "x": 8,
+        "y": 3
+      },
+      "layerOrder": [
+        "acceptedBase",
+        "eligibleMotion",
+        "materialBoundary",
+        "southWallExternal",
+        "content",
+        "selection",
+        "visibilityExternal"
+      ]
+    },
+    {
+      "id": "macro/10/8",
+      "request": {
+        "schemaVersion": "terrain-region-continuity-v1",
+        "ground": "growth",
+        "point": {
+          "x": 10,
+          "y": 8
+        },
+        "visualSeed": 442,
+        "featureVariant": 0,
+        "cardinalNeighbors": {
+          "north": "soil",
+          "east": "unknown",
+          "south": "same",
+          "west": "same"
+        },
+        "edgeContourIDs": {
+          "north": 0,
+          "east": 0,
+          "south": 2,
+          "west": 2
+        },
+        "visibility": "full",
+        "motionPhase": 2
+      },
+      "baseRoleSHA256": "0df90fd934ec187b6becc55f45b87169774687478741fc5d14baee60f27dbe6b",
+      "materialBoundarySHA256": "5341e6b2646979a70e57653007a1f310169421ec9bdd9f1a5648f75ade005af1",
+      "rgbaSHA256": "53a69a55c09014e1cf21fdf1b649cb429425d145c7ba32644c99b8dda3242d92",
+      "accent": {
+        "x": 7,
+        "y": 11
+      },
+      "layerOrder": [
+        "acceptedBase",
+        "eligibleMotion",
+        "materialBoundary",
+        "southWallExternal",
+        "content",
+        "selection",
+        "visibilityExternal"
+      ]
+    },
+    {
+      "id": "macro/0/9",
+      "request": {
+        "schemaVersion": "terrain-region-continuity-v1",
+        "ground": "stone",
+        "point": {
+          "x": 0,
+          "y": 9
+        },
+        "visualSeed": 442,
+        "featureVariant": 0,
+        "cardinalNeighbors": {
+          "north": "same",
+          "east": "same",
+          "south": "same",
+          "west": "unknown"
+        },
+        "edgeContourIDs": {
+          "north": 2,
+          "east": 0,
+          "south": 0,
+          "west": 2
+        },
+        "visibility": "full",
+        "motionPhase": 1
+      },
+      "baseRoleSHA256": "521081b483e5e8c854d8e3b87365cd21a148deeac7364407297037508724d5ed",
+      "materialBoundarySHA256": "5341e6b2646979a70e57653007a1f310169421ec9bdd9f1a5648f75ade005af1",
+      "rgbaSHA256": "b95ae45115a2f3672af41912cc2acb509be4df86630cce63c6f197a92d958958",
+      "accent": {
+        "x": 9,
+        "y": 6
+      },
+      "layerOrder": [
+        "acceptedBase",
+        "eligibleMotion",
+        "materialBoundary",
+        "southWallExternal",
+        "content",
+        "selection",
+        "visibilityExternal"
+      ]
+    },
+    {
+      "id": "macro/1/9",
+      "request": {
+        "schemaVersion": "terrain-region-continuity-v1",
+        "ground": "stone",
+        "point": {
+          "x": 1,
+          "y": 9
+        },
+        "visualSeed": 442,
+        "featureVariant": 0,
+        "cardinalNeighbors": {
+          "north": "same",
+          "east": "same",
+          "south": "same",
+          "west": "same"
+        },
+        "edgeContourIDs": {
+          "north": 2,
+          "east": 2,
+          "south": 0,
+          "west": 0
+        },
+        "visibility": "full",
+        "motionPhase": 2
+      },
+      "baseRoleSHA256": "14a481e3603fe22e27afe3868e817feb79ae43cccfd708788826b2f5647fa85f",
+      "materialBoundarySHA256": "5341e6b2646979a70e57653007a1f310169421ec9bdd9f1a5648f75ade005af1",
+      "rgbaSHA256": "891e3e669f803e02c63c173ffc1f132d6841bff50b54584dca47112dd351c1fe",
+      "accent": {
+        "x": 3,
+        "y": 10
+      },
+      "layerOrder": [
+        "acceptedBase",
+        "eligibleMotion",
+        "materialBoundary",
+        "southWallExternal",
+        "content",
+        "selection",
+        "visibilityExternal"
+      ]
+    },
+    {
+      "id": "macro/2/9",
+      "request": {
+        "schemaVersion": "terrain-region-continuity-v1",
+        "ground": "stone",
+        "point": {
+          "x": 2,
+          "y": 9
+        },
+        "visualSeed": 442,
+        "featureVariant": 0,
+        "cardinalNeighbors": {
+          "north": "same",
+          "east": "growth",
+          "south": "same",
+          "west": "same"
+        },
+        "edgeContourIDs": {
+          "north": 2,
+          "east": 0,
+          "south": 0,
+          "west": 2
+        },
+        "visibility": "full",
+        "motionPhase": 3
+      },
+      "baseRoleSHA256": "381e06349d1d256d0c2ac4c12afdb781d6aa37587733fe1c05eadba4e892f25b",
+      "materialBoundarySHA256": "0400a45202caba4d673ac446a907a1b4c06df98dcc72be365f5ff888ccafc63e",
+      "rgbaSHA256": "0b7a86bada2821851e4cfe83ad77bda7db0099899067e6d4e00e747374f18167",
+      "accent": {
+        "x": 12,
+        "y": 8
+      },
+      "layerOrder": [
+        "acceptedBase",
+        "eligibleMotion",
+        "materialBoundary",
+        "southWallExternal",
+        "content",
+        "selection",
+        "visibilityExternal"
+      ]
+    },
+    {
+      "id": "macro/3/9",
+      "request": {
+        "schemaVersion": "terrain-region-continuity-v1",
+        "ground": "growth",
+        "point": {
+          "x": 3,
+          "y": 9
+        },
+        "visualSeed": 442,
+        "featureVariant": 0,
+        "cardinalNeighbors": {
+          "north": "same",
+          "east": "same",
+          "south": "same",
+          "west": "stone"
+        },
+        "edgeContourIDs": {
+          "north": 2,
+          "east": 2,
+          "south": 0,
+          "west": 0
+        },
+        "visibility": "full",
+        "motionPhase": 0
+      },
+      "baseRoleSHA256": "dc6965b540567e49cbd06dc261130f1bf65475e2c2bfb84703a9ed06073ee930",
+      "materialBoundarySHA256": "5341e6b2646979a70e57653007a1f310169421ec9bdd9f1a5648f75ade005af1",
+      "rgbaSHA256": "03b3618442a6bc80da37f16d4a5665202456179a3345eacc07f066ad2247996a",
+      "accent": {
+        "x": 9,
+        "y": 9
+      },
+      "layerOrder": [
+        "acceptedBase",
+        "eligibleMotion",
+        "materialBoundary",
+        "southWallExternal",
+        "content",
+        "selection",
+        "visibilityExternal"
+      ]
+    },
+    {
+      "id": "macro/4/9",
+      "request": {
+        "schemaVersion": "terrain-region-continuity-v1",
+        "ground": "growth",
+        "point": {
+          "x": 4,
+          "y": 9
+        },
+        "visualSeed": 442,
+        "featureVariant": 0,
+        "cardinalNeighbors": {
+          "north": "same",
+          "east": "same",
+          "south": "same",
+          "west": "same"
+        },
+        "edgeContourIDs": {
+          "north": 2,
+          "east": 0,
+          "south": 0,
+          "west": 2
+        },
+        "visibility": "full",
+        "motionPhase": 1
+      },
+      "baseRoleSHA256": "5f7b7334eec98c7bb6bd008491f246a8febba43fe6070a9573597a6e55ccfa1c",
+      "materialBoundarySHA256": "5341e6b2646979a70e57653007a1f310169421ec9bdd9f1a5648f75ade005af1",
+      "rgbaSHA256": "74c75825cc869e6c8cb82055acfd82aed42b2349db7647f78e231036c9f3d250",
+      "accent": {
+        "x": 5,
+        "y": 4
+      },
+      "layerOrder": [
+        "acceptedBase",
+        "eligibleMotion",
+        "materialBoundary",
+        "southWallExternal",
+        "content",
+        "selection",
+        "visibilityExternal"
+      ]
+    },
+    {
+      "id": "macro/5/9",
+      "request": {
+        "schemaVersion": "terrain-region-continuity-v1",
+        "ground": "growth",
+        "point": {
+          "x": 5,
+          "y": 9
+        },
+        "visualSeed": 442,
+        "featureVariant": 0,
+        "cardinalNeighbors": {
+          "north": "same",
+          "east": "same",
+          "south": "same",
+          "west": "same"
+        },
+        "edgeContourIDs": {
+          "north": 2,
+          "east": 2,
+          "south": 0,
+          "west": 0
+        },
+        "visibility": "full",
+        "motionPhase": 2
+      },
+      "baseRoleSHA256": "2107be7482c3b9e50a8e5622091f5bdf1c63edd40c509707c69adf9e12927642",
+      "materialBoundarySHA256": "5341e6b2646979a70e57653007a1f310169421ec9bdd9f1a5648f75ade005af1",
+      "rgbaSHA256": "98a0fc002915dfb06442243280fc5c34f5a4865ee0b4c11bf3c9ec45dd9d23d4",
+      "accent": {
+        "x": 3,
+        "y": 9
+      },
+      "layerOrder": [
+        "acceptedBase",
+        "eligibleMotion",
+        "materialBoundary",
+        "southWallExternal",
+        "content",
+        "selection",
+        "visibilityExternal"
+      ]
+    },
+    {
+      "id": "macro/6/9",
+      "request": {
+        "schemaVersion": "terrain-region-continuity-v1",
+        "ground": "growth",
+        "point": {
+          "x": 6,
+          "y": 9
+        },
+        "visualSeed": 442,
+        "featureVariant": 0,
+        "cardinalNeighbors": {
+          "north": "same",
+          "east": "same",
+          "south": "same",
+          "west": "same"
+        },
+        "edgeContourIDs": {
+          "north": 2,
+          "east": 0,
+          "south": 0,
+          "west": 2
+        },
+        "visibility": "full",
+        "motionPhase": 3
+      },
+      "baseRoleSHA256": "6b05d8fb528a53091b22b4d8703a83f378183983f3d0352108b58556c7313494",
+      "materialBoundarySHA256": "5341e6b2646979a70e57653007a1f310169421ec9bdd9f1a5648f75ade005af1",
+      "rgbaSHA256": "da6bee387171dccc6cb260e923b2fd4d0faf1e1912dd9f6c5402432f2199323b",
+      "accent": {
+        "x": 11,
+        "y": 3
+      },
+      "layerOrder": [
+        "acceptedBase",
+        "eligibleMotion",
+        "materialBoundary",
+        "southWallExternal",
+        "content",
+        "selection",
+        "visibilityExternal"
+      ]
+    },
+    {
+      "id": "macro/7/9",
+      "request": {
+        "schemaVersion": "terrain-region-continuity-v1",
+        "ground": "growth",
+        "point": {
+          "x": 7,
+          "y": 9
+        },
+        "visualSeed": 442,
+        "featureVariant": 0,
+        "cardinalNeighbors": {
+          "north": "same",
+          "east": "same",
+          "south": "same",
+          "west": "same"
+        },
+        "edgeContourIDs": {
+          "north": 2,
+          "east": 2,
+          "south": 0,
+          "west": 0
+        },
+        "visibility": "full",
+        "motionPhase": 0
+      },
+      "baseRoleSHA256": "f958a7f8987f7908cba5310ec8e17dfc9cc3393f219b40b84c734b9114fa5c3f",
+      "materialBoundarySHA256": "5341e6b2646979a70e57653007a1f310169421ec9bdd9f1a5648f75ade005af1",
+      "rgbaSHA256": "67a999053485638a2494661a6a811f589a66ce0204abe330e11f6bac51f233d1",
+      "accent": {
+        "x": 4,
+        "y": 4
+      },
+      "layerOrder": [
+        "acceptedBase",
+        "eligibleMotion",
+        "materialBoundary",
+        "southWallExternal",
+        "content",
+        "selection",
+        "visibilityExternal"
+      ]
+    },
+    {
+      "id": "macro/8/9",
+      "request": {
+        "schemaVersion": "terrain-region-continuity-v1",
+        "ground": "growth",
+        "point": {
+          "x": 8,
+          "y": 9
+        },
+        "visualSeed": 442,
+        "featureVariant": 0,
+        "cardinalNeighbors": {
+          "north": "same",
+          "east": "same",
+          "south": "same",
+          "west": "same"
+        },
+        "edgeContourIDs": {
+          "north": 2,
+          "east": 0,
+          "south": 0,
+          "west": 2
+        },
+        "visibility": "full",
+        "motionPhase": 1
+      },
+      "baseRoleSHA256": "27bb8e19ca10d092986484dd3ed03c37ebd77dc5799e9496cff526477e5d2825",
+      "materialBoundarySHA256": "5341e6b2646979a70e57653007a1f310169421ec9bdd9f1a5648f75ade005af1",
+      "rgbaSHA256": "1c63f9e978f16428f6044d8a95a104817b8cba96643e06726e99a9189678cc79",
+      "accent": {
+        "x": 12,
+        "y": 6
+      },
+      "layerOrder": [
+        "acceptedBase",
+        "eligibleMotion",
+        "materialBoundary",
+        "southWallExternal",
+        "content",
+        "selection",
+        "visibilityExternal"
+      ]
+    },
+    {
+      "id": "macro/9/9",
+      "request": {
+        "schemaVersion": "terrain-region-continuity-v1",
+        "ground": "growth",
+        "point": {
+          "x": 9,
+          "y": 9
+        },
+        "visualSeed": 442,
+        "featureVariant": 0,
+        "cardinalNeighbors": {
+          "north": "same",
+          "east": "same",
+          "south": "same",
+          "west": "same"
+        },
+        "edgeContourIDs": {
+          "north": 2,
+          "east": 2,
+          "south": 0,
+          "west": 0
+        },
+        "visibility": "full",
+        "motionPhase": 2
+      },
+      "baseRoleSHA256": "41ad5734df501176240af805040991d10157328071401b20b6359a3d2138d86f",
+      "materialBoundarySHA256": "5341e6b2646979a70e57653007a1f310169421ec9bdd9f1a5648f75ade005af1",
+      "rgbaSHA256": "bc42e90f22ed9fd0022daeb87327b942e4212a74a6599ae0c12231786504c409",
+      "accent": {
+        "x": 4,
+        "y": 4
+      },
+      "layerOrder": [
+        "acceptedBase",
+        "eligibleMotion",
+        "materialBoundary",
+        "southWallExternal",
+        "content",
+        "selection",
+        "visibilityExternal"
+      ]
+    },
+    {
+      "id": "macro/10/9",
+      "request": {
+        "schemaVersion": "terrain-region-continuity-v1",
+        "ground": "growth",
+        "point": {
+          "x": 10,
+          "y": 9
+        },
+        "visualSeed": 442,
+        "featureVariant": 0,
+        "cardinalNeighbors": {
+          "north": "same",
+          "east": "unknown",
+          "south": "same",
+          "west": "same"
+        },
+        "edgeContourIDs": {
+          "north": 2,
+          "east": 0,
+          "south": 0,
+          "west": 2
+        },
+        "visibility": "full",
+        "motionPhase": 3
+      },
+      "baseRoleSHA256": "16c2a1d2120c6003f145d7abbb4a9f46f3c9dba1556d7fb646497cb2acc271b3",
+      "materialBoundarySHA256": "5341e6b2646979a70e57653007a1f310169421ec9bdd9f1a5648f75ade005af1",
+      "rgbaSHA256": "63e91d6470baa04abcce98f0cc5cb14412bfcac18364185e243acb88ad62f721",
+      "accent": {
+        "x": 6,
+        "y": 5
+      },
+      "layerOrder": [
+        "acceptedBase",
+        "eligibleMotion",
+        "materialBoundary",
+        "southWallExternal",
+        "content",
+        "selection",
+        "visibilityExternal"
+      ]
+    },
+    {
+      "id": "macro/0/10",
+      "request": {
+        "schemaVersion": "terrain-region-continuity-v1",
+        "ground": "stone",
+        "point": {
+          "x": 0,
+          "y": 10
+        },
+        "visualSeed": 442,
+        "featureVariant": 0,
+        "cardinalNeighbors": {
+          "north": "same",
+          "east": "same",
+          "south": "unknown",
+          "west": "unknown"
+        },
+        "edgeContourIDs": {
+          "north": 0,
+          "east": 0,
+          "south": 2,
+          "west": 2
+        },
+        "visibility": "full",
+        "motionPhase": 2
+      },
+      "baseRoleSHA256": "4af46aa4861139118ccd8ede17c749f51f9a4b3916ad7201c8c64335bfb21d58",
+      "materialBoundarySHA256": "5341e6b2646979a70e57653007a1f310169421ec9bdd9f1a5648f75ade005af1",
+      "rgbaSHA256": "19d51652c51a415c01727a2dd57334abfc1c3c656fa61bbeb2f6271c7e200a03",
+      "accent": {
+        "x": 5,
+        "y": 10
+      },
+      "layerOrder": [
+        "acceptedBase",
+        "eligibleMotion",
+        "materialBoundary",
+        "southWallExternal",
+        "content",
+        "selection",
+        "visibilityExternal"
+      ]
+    },
+    {
+      "id": "macro/1/10",
+      "request": {
+        "schemaVersion": "terrain-region-continuity-v1",
+        "ground": "stone",
+        "point": {
+          "x": 1,
+          "y": 10
+        },
+        "visualSeed": 442,
+        "featureVariant": 0,
+        "cardinalNeighbors": {
+          "north": "same",
+          "east": "same",
+          "south": "unknown",
+          "west": "same"
+        },
+        "edgeContourIDs": {
+          "north": 0,
+          "east": 2,
+          "south": 2,
+          "west": 0
+        },
+        "visibility": "full",
+        "motionPhase": 3
+      },
+      "baseRoleSHA256": "2e7f598b45f7a1eedb12648c01d51d7b9710236edc6d6ef0d35f50fc3414b2c5",
+      "materialBoundarySHA256": "5341e6b2646979a70e57653007a1f310169421ec9bdd9f1a5648f75ade005af1",
+      "rgbaSHA256": "71392dabd613ae5e5a8999c5953bc99fb927a83cdeb1a5f3507eb5520ac6cb57",
+      "accent": {
+        "x": 12,
+        "y": 8
+      },
+      "layerOrder": [
+        "acceptedBase",
+        "eligibleMotion",
+        "materialBoundary",
+        "southWallExternal",
+        "content",
+        "selection",
+        "visibilityExternal"
+      ]
+    },
+    {
+      "id": "macro/2/10",
+      "request": {
+        "schemaVersion": "terrain-region-continuity-v1",
+        "ground": "stone",
+        "point": {
+          "x": 2,
+          "y": 10
+        },
+        "visualSeed": 442,
+        "featureVariant": 0,
+        "cardinalNeighbors": {
+          "north": "same",
+          "east": "growth",
+          "south": "unknown",
+          "west": "same"
+        },
+        "edgeContourIDs": {
+          "north": 0,
+          "east": 0,
+          "south": 2,
+          "west": 2
+        },
+        "visibility": "full",
+        "motionPhase": 0
+      },
+      "baseRoleSHA256": "296c438bd6e9bd6aa5b84752ce57e9e068ea1a82211331753bd5928e235f372d",
+      "materialBoundarySHA256": "053199b629fe9cbd7d46906a9ebf66bd4225874361cfe4a8cc3ba2447e395958",
+      "rgbaSHA256": "52900d91c59d0a7f14e754a346ad5268ef52786b5b79abbe4355e001bec90819",
+      "accent": {
+        "x": 9,
+        "y": 9
+      },
+      "layerOrder": [
+        "acceptedBase",
+        "eligibleMotion",
+        "materialBoundary",
+        "southWallExternal",
+        "content",
+        "selection",
+        "visibilityExternal"
+      ]
+    },
+    {
+      "id": "macro/3/10",
+      "request": {
+        "schemaVersion": "terrain-region-continuity-v1",
+        "ground": "growth",
+        "point": {
+          "x": 3,
+          "y": 10
+        },
+        "visualSeed": 442,
+        "featureVariant": 0,
+        "cardinalNeighbors": {
+          "north": "same",
+          "east": "same",
+          "south": "unknown",
+          "west": "stone"
+        },
+        "edgeContourIDs": {
+          "north": 0,
+          "east": 2,
+          "south": 2,
+          "west": 0
+        },
+        "visibility": "full",
+        "motionPhase": 1
+      },
+      "baseRoleSHA256": "1550f9f59c04c98eb944a14f683157205865455111c8eef0847567cfd96bea8e",
+      "materialBoundarySHA256": "5341e6b2646979a70e57653007a1f310169421ec9bdd9f1a5648f75ade005af1",
+      "rgbaSHA256": "e4243c26ca209adbb9328a58bec69e169fa8adc975cd2d59b52a2a0fd8ccf063",
+      "accent": {
+        "x": 9,
+        "y": 8
+      },
+      "layerOrder": [
+        "acceptedBase",
+        "eligibleMotion",
+        "materialBoundary",
+        "southWallExternal",
+        "content",
+        "selection",
+        "visibilityExternal"
+      ]
+    },
+    {
+      "id": "macro/4/10",
+      "request": {
+        "schemaVersion": "terrain-region-continuity-v1",
+        "ground": "growth",
+        "point": {
+          "x": 4,
+          "y": 10
+        },
+        "visualSeed": 442,
+        "featureVariant": 0,
+        "cardinalNeighbors": {
+          "north": "same",
+          "east": "same",
+          "south": "unknown",
+          "west": "same"
+        },
+        "edgeContourIDs": {
+          "north": 0,
+          "east": 0,
+          "south": 2,
+          "west": 2
+        },
+        "visibility": "full",
+        "motionPhase": 2
+      },
+      "baseRoleSHA256": "7ed0b23e7144d46baeae8d4682d254277b424517345dcef6efa9c400379512d0",
+      "materialBoundarySHA256": "5341e6b2646979a70e57653007a1f310169421ec9bdd9f1a5648f75ade005af1",
+      "rgbaSHA256": "734f65b94d58df365e4d05bae23972db1fe84abc69081d23c591086c40ac7c0d",
+      "accent": {
+        "x": 7,
+        "y": 3
+      },
+      "layerOrder": [
+        "acceptedBase",
+        "eligibleMotion",
+        "materialBoundary",
+        "southWallExternal",
+        "content",
+        "selection",
+        "visibilityExternal"
+      ]
+    },
+    {
+      "id": "macro/5/10",
+      "request": {
+        "schemaVersion": "terrain-region-continuity-v1",
+        "ground": "growth",
+        "point": {
+          "x": 5,
+          "y": 10
+        },
+        "visualSeed": 442,
+        "featureVariant": 0,
+        "cardinalNeighbors": {
+          "north": "same",
+          "east": "same",
+          "south": "unknown",
+          "west": "same"
+        },
+        "edgeContourIDs": {
+          "north": 0,
+          "east": 2,
+          "south": 2,
+          "west": 0
+        },
+        "visibility": "full",
+        "motionPhase": 3
+      },
+      "baseRoleSHA256": "0aa80b34e8e6315e478ccc2e47740cc1d0a904da80671763d76bd8707e7ecb62",
+      "materialBoundarySHA256": "5341e6b2646979a70e57653007a1f310169421ec9bdd9f1a5648f75ade005af1",
+      "rgbaSHA256": "32c6df6efd2ef078f06c6e0fbce49c828313d12a32d4db3d3fe87ea4f6f4bd04",
+      "accent": {
+        "x": 12,
+        "y": 9
+      },
+      "layerOrder": [
+        "acceptedBase",
+        "eligibleMotion",
+        "materialBoundary",
+        "southWallExternal",
+        "content",
+        "selection",
+        "visibilityExternal"
+      ]
+    },
+    {
+      "id": "macro/6/10",
+      "request": {
+        "schemaVersion": "terrain-region-continuity-v1",
+        "ground": "growth",
+        "point": {
+          "x": 6,
+          "y": 10
+        },
+        "visualSeed": 442,
+        "featureVariant": 0,
+        "cardinalNeighbors": {
+          "north": "same",
+          "east": "same",
+          "south": "unknown",
+          "west": "same"
+        },
+        "edgeContourIDs": {
+          "north": 0,
+          "east": 0,
+          "south": 2,
+          "west": 2
+        },
+        "visibility": "full",
+        "motionPhase": 0
+      },
+      "baseRoleSHA256": "b7177152d092c65e0c84db78905063dd5dc26813c368caa2a5d7a2a23deac87f",
+      "materialBoundarySHA256": "5341e6b2646979a70e57653007a1f310169421ec9bdd9f1a5648f75ade005af1",
+      "rgbaSHA256": "663642055b0177e4110a9c4f4708701daee5b00955edb2762529ada960776048",
+      "accent": {
+        "x": 5,
+        "y": 6
+      },
+      "layerOrder": [
+        "acceptedBase",
+        "eligibleMotion",
+        "materialBoundary",
+        "southWallExternal",
+        "content",
+        "selection",
+        "visibilityExternal"
+      ]
+    },
+    {
+      "id": "macro/7/10",
+      "request": {
+        "schemaVersion": "terrain-region-continuity-v1",
+        "ground": "growth",
+        "point": {
+          "x": 7,
+          "y": 10
+        },
+        "visualSeed": 442,
+        "featureVariant": 0,
+        "cardinalNeighbors": {
+          "north": "same",
+          "east": "same",
+          "south": "unknown",
+          "west": "same"
+        },
+        "edgeContourIDs": {
+          "north": 0,
+          "east": 2,
+          "south": 2,
+          "west": 0
+        },
+        "visibility": "full",
+        "motionPhase": 1
+      },
+      "baseRoleSHA256": "cc6a5716a5a0232e9fff37f3fcb0e0ee4e4cceaabf4e669a1cfc0b7879aa6241",
+      "materialBoundarySHA256": "5341e6b2646979a70e57653007a1f310169421ec9bdd9f1a5648f75ade005af1",
+      "rgbaSHA256": "21f70edd3de5ba3327f7ad1a07a8ca89159267a775d7473109c91533aff7eb8d",
+      "accent": {
+        "x": 8,
+        "y": 12
+      },
+      "layerOrder": [
+        "acceptedBase",
+        "eligibleMotion",
+        "materialBoundary",
+        "southWallExternal",
+        "content",
+        "selection",
+        "visibilityExternal"
+      ]
+    },
+    {
+      "id": "macro/8/10",
+      "request": {
+        "schemaVersion": "terrain-region-continuity-v1",
+        "ground": "growth",
+        "point": {
+          "x": 8,
+          "y": 10
+        },
+        "visualSeed": 442,
+        "featureVariant": 0,
+        "cardinalNeighbors": {
+          "north": "same",
+          "east": "same",
+          "south": "unknown",
+          "west": "same"
+        },
+        "edgeContourIDs": {
+          "north": 0,
+          "east": 0,
+          "south": 2,
+          "west": 2
+        },
+        "visibility": "full",
+        "motionPhase": 2
+      },
+      "baseRoleSHA256": "e029af15744362a3b75f721294f894b6c5ad0ac9db549ce6f2ff9b3b32b493d4",
+      "materialBoundarySHA256": "5341e6b2646979a70e57653007a1f310169421ec9bdd9f1a5648f75ade005af1",
+      "rgbaSHA256": "93176a820e40c85310d5c1e53f5a3d6251d8ffaee33a464235f9ad09116e1b81",
+      "accent": {
+        "x": 6,
+        "y": 7
+      },
+      "layerOrder": [
+        "acceptedBase",
+        "eligibleMotion",
+        "materialBoundary",
+        "southWallExternal",
+        "content",
+        "selection",
+        "visibilityExternal"
+      ]
+    },
+    {
+      "id": "macro/9/10",
+      "request": {
+        "schemaVersion": "terrain-region-continuity-v1",
+        "ground": "growth",
+        "point": {
+          "x": 9,
+          "y": 10
+        },
+        "visualSeed": 442,
+        "featureVariant": 0,
+        "cardinalNeighbors": {
+          "north": "same",
+          "east": "same",
+          "south": "unknown",
+          "west": "same"
+        },
+        "edgeContourIDs": {
+          "north": 0,
+          "east": 2,
+          "south": 2,
+          "west": 0
+        },
+        "visibility": "full",
+        "motionPhase": 3
+      },
+      "baseRoleSHA256": "046eed0ffe1232f87c9863266ce71d8be9eafd2f41bcf714aa0022afa0492ea4",
+      "materialBoundarySHA256": "5341e6b2646979a70e57653007a1f310169421ec9bdd9f1a5648f75ade005af1",
+      "rgbaSHA256": "f14d8e950760d4c76c055d72f73535899041fd30c0059b4a24a3a820a62417f0",
+      "accent": {
+        "x": 9,
+        "y": 12
+      },
+      "layerOrder": [
+        "acceptedBase",
+        "eligibleMotion",
+        "materialBoundary",
+        "southWallExternal",
+        "content",
+        "selection",
+        "visibilityExternal"
+      ]
+    },
+    {
+      "id": "macro/10/10",
+      "request": {
+        "schemaVersion": "terrain-region-continuity-v1",
+        "ground": "growth",
+        "point": {
+          "x": 10,
+          "y": 10
+        },
+        "visualSeed": 442,
+        "featureVariant": 0,
+        "cardinalNeighbors": {
+          "north": "same",
+          "east": "unknown",
+          "south": "unknown",
+          "west": "same"
+        },
+        "edgeContourIDs": {
+          "north": 0,
+          "east": 0,
+          "south": 2,
+          "west": 2
+        },
+        "visibility": "full",
+        "motionPhase": 0
+      },
+      "baseRoleSHA256": "5aeef45b3db43cf7840b32e53fc1175a12af46b6d3c3f445138251976b598931",
+      "materialBoundarySHA256": "5341e6b2646979a70e57653007a1f310169421ec9bdd9f1a5648f75ade005af1",
+      "rgbaSHA256": "75fcfe9325908696b9e2aac1028fc4e45ce20d4d53ffa7ec1707d1df57537aa0",
+      "accent": {
+        "x": 7,
+        "y": 7
+      },
+      "layerOrder": [
+        "acceptedBase",
+        "eligibleMotion",
+        "materialBoundary",
+        "southWallExternal",
+        "content",
+        "selection",
+        "visibilityExternal"
+      ]
+    }
+  ]
+}
