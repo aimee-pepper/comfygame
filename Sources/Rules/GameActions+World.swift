@@ -414,8 +414,7 @@ extension GameStore {
 
     /// A single step onto an adjacent tile.
     func step(to point: GridPoint) {
-        guard state.worlds.pendingWorldArrivalReceipt == nil,
-              activeRun?.activeEncounter == nil else { return }
+        guard activeRun?.activeEncounter == nil else { return }
         var events: [WorldRules.Event] = []
         mutate("step") { state in
             events = WorldRules.step(to: point, in: &state)

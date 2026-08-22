@@ -103,14 +103,16 @@ final class PageTests: XCTestCase {
     }
 
     @MainActor
-    func testNewBindFreezesOneArrivalReceiptAcrossRunPendingAndHistory() throws {
+    func testNewBindFreezesOneArrivalReceiptAcrossRunAndHistoryWithoutPrematurePending() throws {
         let store = GameStore(io: .temporary(name: "arrival-receipt-\(UUID().uuidString)"))
         let earth = WorldPageCatalog.earthlikeTestInstance
         XCTAssertTrue(store.bindAndDepart(worldPageInstanceID: earth.id))
 
         let runReceipt = try XCTUnwrap(store.activeRun?.worldArrivalReceipt)
-        XCTAssertEqual(store.state.worlds.pendingWorldArrivalReceiptID, runReceipt.id)
-        XCTAssertEqual(store.state.worlds.pendingWorldArrivalReceipt, runReceipt)
+        XCTAssertFalse(WorldArrivalPresentationAuthority.isNativePresentationEnabled)
+        XCTAssertNil(store.state.worlds.pendingWorldArrivalReceiptID,
+                     "receipt persistence must not strand players before the native root exists")
+        XCTAssertNil(store.state.worlds.pendingWorldArrivalReceipt)
         XCTAssertEqual(store.state.reality.library.visitedWorlds.last?.worldArrivalReceipt,
                        runReceipt)
         XCTAssertEqual(runReceipt.generationSeed, earth.definition.seed)
@@ -125,18 +127,18 @@ final class PageTests: XCTestCase {
         let worldsRoundTrip = try JSONDecoder().decode(
             WorldsState.self, from: JSONEncoder().encode(store.state.worlds))
         XCTAssertEqual(worldsRoundTrip.activeRun?.worldArrivalReceipt, runReceipt)
-        XCTAssertEqual(worldsRoundTrip.pendingWorldArrivalReceiptID, runReceipt.id)
+        XCTAssertNil(worldsRoundTrip.pendingWorldArrivalReceiptID)
 
         let positionBeforeEnter = try XCTUnwrap(store.activeRun?.playerPosition)
         let turnBeforeEnter = try XCTUnwrap(store.activeRun?.turnsTaken)
-        if let adjacent = store.activeRun?.map.neighbours(of: positionBeforeEnter).first {
+        if let adjacent = store.activeRun?.map.neighbours(of: positionBeforeEnter).first(where: {
+            store.activeRun?.map[$0].ground.isPassable == true
+        }) {
             store.step(to: adjacent)
-            XCTAssertEqual(store.activeRun?.playerPosition, positionBeforeEnter)
-            XCTAssertEqual(store.activeRun?.turnsTaken, turnBeforeEnter)
+            XCTAssertNotEqual(store.activeRun?.playerPosition, positionBeforeEnter,
+                              "disabled native presentation must not block world movement")
+            XCTAssertGreaterThan(store.activeRun?.turnsTaken ?? 0, turnBeforeEnter)
         }
-
-        XCTAssertTrue(store.enterPendingWorld(arrivalReceiptID: runReceipt.id))
-        XCTAssertNil(store.state.worlds.pendingWorldArrivalReceiptID)
         XCTAssertEqual(store.activeRun?.worldArrivalReceipt, runReceipt)
         XCTAssertEqual(store.state.reality.library.visitedWorlds.last?.worldArrivalReceipt,
                        runReceipt)
@@ -149,6 +151,28 @@ final class PageTests: XCTestCase {
         }
         XCTAssertFalse(store.enterPendingWorld(arrivalReceiptID: orphan))
         XCTAssertNil(store.state.worlds.pendingWorldArrivalReceiptID)
+    }
+
+    func testHiddenArrivalCropCellsSerializeWithoutTerrainPayload() throws {
+        let entry = GridPoint(x: 4, y: 4)
+        func crop(hiddenGround: GroundType) -> WorldArrivalReceipt.FirstMapCrop {
+            var tiles = Array(repeating: Tile(ground: .soil), count: 81)
+            tiles[0] = Tile(ground: hiddenGround, flora: .init(rawValue: 999), elevation: 3,
+                            isRevealed: false)
+            let map = WorldMap(width: 9, height: 9, tiles: tiles, entry: entry)
+            return WorldArrivalReceiptFactory.firstCrop(map: map, flora: [])
+        }
+        let stone = crop(hiddenGround: .stone).cells.first { $0.point == .init(x: 0, y: 0) }
+        let deepWater = crop(hiddenGround: .deepWater).cells.first { $0.point == .init(x: 0, y: 0) }
+        let stoneCell = try XCTUnwrap(stone)
+        let waterCell = try XCTUnwrap(deepWater)
+        XCTAssertEqual(stoneCell, waterCell)
+        XCTAssertEqual(stoneCell.visibility, "hidden")
+        XCTAssertNil(stoneCell.ground)
+        XCTAssertNil(stoneCell.elevation)
+        XCTAssertNil(stoneCell.floraStableID)
+        XCTAssertEqual(try JSONEncoder().encode(stoneCell),
+                       try JSONEncoder().encode(waterCell))
     }
 
     func testLegacyAndOrphanArrivalStateDecodeWithoutInventingAReveal() throws {

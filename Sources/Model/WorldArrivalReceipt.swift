@@ -6,6 +6,13 @@ struct WorldArrivalReceiptID: RawRepresentable, Codable, Equatable, Hashable, Se
     init(rawValue: String) { self.rawValue = rawValue }
 }
 
+/// Pending arrival ownership is intentionally disabled until the accepted native B1.6a root and
+/// its single centralized world-action gate are integrated. Receipt persistence is independently
+/// live now; placeholder receipt fields must never become player-facing presentation.
+enum WorldArrivalPresentationAuthority {
+    static let isNativePresentationEnabled = false
+}
+
 /// Immutable, disclosure-safe evidence for one newly bound world's arrival presentation.
 /// Rendering and History consume this value; neither is allowed to reconstruct it from the run.
 struct WorldArrivalReceipt: Codable, Equatable, Sendable {
@@ -70,8 +77,10 @@ struct WorldArrivalReceipt: Codable, Equatable, Sendable {
     }
     struct MapCell: Codable, Equatable, Sendable {
         var point: GridPoint
-        var ground: GroundType
-        var elevation: Int
+        /// Hidden cells carry no terrain request. Nil is part of the persisted disclosure boundary,
+        /// not a visual mask applied after decoding real terrain.
+        var ground: GroundType?
+        var elevation: Int?
         var floraStableID: String?
         var visibility: String
     }
@@ -182,15 +191,19 @@ enum WorldArrivalReceiptFactory {
         }
     }
 
-    private static func firstCrop(map: WorldMap, flora: [Flora]) -> WorldArrivalReceipt.FirstMapCrop {
+    static func firstCrop(map: WorldMap, flora: [Flora]) -> WorldArrivalReceipt.FirstMapCrop {
         let ids = Set(flora.map(\.id))
         let cells = (-4...4).flatMap { dy in (-4...4).map { dx -> WorldArrivalReceipt.MapCell in
             let point = GridPoint(x: map.entry.x + dx, y: map.entry.y + dy)
             guard map.contains(point) else {
-                return .init(point: point, ground: .chasm, elevation: 0,
+                return .init(point: point, ground: nil, elevation: nil,
                              floraStableID: nil, visibility: "hidden")
             }
             let tile = map[point]
+            guard tile.isRevealed else {
+                return .init(point: point, ground: nil, elevation: nil,
+                             floraStableID: nil, visibility: "hidden")
+            }
             let floraID = tile.flora.flatMap { ids.contains($0) ? "flora-\($0.rawValue)" : nil }
             return .init(point: point, ground: tile.ground, elevation: tile.elevation,
                          floraStableID: floraID,

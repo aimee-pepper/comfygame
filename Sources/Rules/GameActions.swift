@@ -1179,7 +1179,9 @@ extension GameStore {
                 worldArrivalReceipt: arrivalReceipt
             )
             state.worlds.activeRun = departingRun
-            state.worlds.pendingWorldArrivalReceiptID = arrivalReceipt.id
+            if WorldArrivalPresentationAuthority.isNativePresentationEnabled {
+                state.worlds.pendingWorldArrivalReceiptID = arrivalReceipt.id
+            }
             state.tutorial.complete(.writingPageRequest, fact: "first_bind")
             state.tutorial.complete(.writingPreview, fact: "world_pane_opened")
             state.tutorial.complete(.writingBind, fact: "first_run_created")
