@@ -13,6 +13,26 @@ struct Cell: Encodable {
     var elevation: Int
     var floraID: UInt64?
     var content: String
+    var isRevealed: Bool
+}
+
+struct EntryEnvironment: Encodable {
+    var illuminationPeak: Double
+    var illuminationFloor: Double
+    var suspendedMedium: String
+    var suspendedDensity: Double
+    var precipitation: String
+    var precipitationIntensity: Double
+    var atmosphereMotion: String
+}
+
+struct FloraVisual: Encodable {
+    var stableID: String
+    var formID: Int
+    var stature: Double
+    var habit: String
+    var resolvedColor: [Int]
+    var placements: Int
 }
 
 struct Count: Encodable {
@@ -70,6 +90,9 @@ struct Snapshot: Encodable {
     var writings: [Count]
     var travellers: [String]
     var diagnostics: Diagnostics
+    var worldVisualReceipt: WorldVisualReceipt
+    var entryEnvironment: EntryEnvironment
+    var floraVisuals: [FloraVisual]
     var splash: String?
 }
 
@@ -103,7 +126,7 @@ let cells = generated.map.allPoints.map { point in
     let tile = generated.map[point]
     return Cell(x: point.x, y: point.y, ground: tile.ground.rawValue,
                 elevation: tile.elevation, floraID: tile.flora?.rawValue,
-                content: label(tile.content))
+                content: label(tile.content), isRevealed: tile.isRevealed)
 }
 var resourceTotals: [String: (placements: Int, quantity: Int)] = [:]
 for point in generated.map.allPoints {
@@ -160,6 +183,19 @@ let markers = generated.enemies.map { enemy in
            label: enemy.isApex ? "Apex" : (enemy.speciesID.flatMap { speciesNamesByID[$0] } ?? "Creature"))
 }
 let d = generated.diagnostics
+let visualReceipt = try WorldGrade2BindAdapter.makeReceipt(
+    book: book, mapSeed: request.seed, map: generated.map, flora: generated.flora)
+let illumination = BookRules.readings(for: book, seed: request.seed)["illumination"]
+let floraDescriptorByID = Dictionary(uniqueKeysWithValues:
+    visualReceipt.descriptor.flora.cast.map { ($0.speciesID, $0) })
+let floraVisuals = generated.flora.compactMap { flora -> FloraVisual? in
+    let key = "flora-\(flora.id.rawValue)"
+    guard let descriptor = floraDescriptorByID[key] else { return nil }
+    return FloraVisual(stableID: key, formID: descriptor.formID,
+                       stature: descriptor.stature, habit: flora.traits.habit.rawValue,
+                       resolvedColor: descriptor.resolvedColor.srgb,
+                       placements: generated.map.tiles.count { $0.flora == flora.id })
+}.sorted { $0.stableID < $1.stableID }
 let snapshot = Snapshot(
     seed: request.seed, width: generated.map.width, height: generated.map.height,
     entry: generated.map.entry, cells: cells, markers: markers,
@@ -176,6 +212,13 @@ let snapshot = Snapshot(
                              floraInstancesPlaced: d.floraInstancesPlaced,
                              activeFloraPlaced: d.activeFloraPlaced,
                              apexChance: d.apexChance, apexPlaced: d.apexPlaced),
+    worldVisualReceipt: visualReceipt,
+    entryEnvironment: EntryEnvironment(
+        illuminationPeak: illumination.peak, illuminationFloor: illumination.floor,
+        suspendedMedium: visualReceipt.descriptor.atmosphere.medium,
+        suspendedDensity: visualReceipt.descriptor.atmosphere.density,
+        precipitation: "none", precipitationIntensity: 0, atmosphereMotion: "calm"),
+    floraVisuals: floraVisuals,
     splash: nil
 )
 let encoder = JSONEncoder()

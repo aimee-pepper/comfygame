@@ -18,6 +18,22 @@ assert.equal(first.width, 18);
 assert.equal(first.height, 18);
 assert.equal(first.cells.length, 324);
 assert.equal(first.cells.every(cell => typeof cell.ground === "string"), true);
+assert.equal(first.cells.every(cell => typeof cell.isRevealed === "boolean"), true);
+assert.ok(first.cells.some(cell => cell.isRevealed), "bridge must expose the rules-owned entry reveal crop");
+assert.equal(first.worldVisualReceipt.descriptorHash,
+  first.worldVisualReceipt.descriptor.canonicalDescriptorSHA256);
+assert.ok(Number.isFinite(first.entryEnvironment.illuminationPeak));
+assert.ok(Number.isFinite(first.entryEnvironment.illuminationFloor));
+assert.equal(first.entryEnvironment.suspendedMedium,
+  first.worldVisualReceipt.descriptor.atmosphere.medium);
+assert.equal(first.entryEnvironment.suspendedDensity,
+  first.worldVisualReceipt.descriptor.atmosphere.density);
+assert.equal(first.entryEnvironment.precipitation, "none",
+  "suspended atmosphere and precipitation must remain separate bridge channels");
+assert.equal(first.floraVisuals.length, first.diagnostics.floraSpeciesCount);
+assert.ok(first.floraVisuals.every(row => row.stableID && Number.isInteger(row.formID)
+  && Number.isFinite(row.stature) && row.habit && row.resolvedColor.length === 3
+  && Number.isInteger(row.placements) && row.placements > 0));
 assert.equal(first.resources.every(row => row.placements > 0 && row.quantity > 0), true);
 assert.equal(first.flora.reduce((sum, row) => sum + row.quantity, 0),
   first.cells.filter(cell => cell.floraID !== undefined).length);
