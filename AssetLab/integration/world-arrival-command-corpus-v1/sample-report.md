@@ -5,7 +5,7 @@
 - Seeded material widths exercised: 1, 2, 3, 4
 - Seeded Stone Hollow path jitters exercised: -1, 0, 1, 2
 - Unique seeded placement signatures: 32
-- Canonical body: 840026c5b6f4da538e2edac390c65f5c9cd03a61bfb71d1b5af95dd6cc9bb635
+- Canonical body: d2783de992abb183a9d9372d60af67251b9e43d14830806bcbabc7781a9448fc
 
 ## Scope-contained counterfactuals
 

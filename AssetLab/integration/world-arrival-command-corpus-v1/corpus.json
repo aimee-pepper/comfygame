@@ -24,7 +24,7 @@
     "compositorSHA256": "5352cafa83ad6982aaaceafd24db66b5db002d5b5f1f6ceaf375b7cea738b882",
     "compositorCommit": "9b60e8516f08806d40c38ed2a4307746c13d1c8c",
     "acceptedManifestFile": "AssetLab/artifacts/world-arrival-v0.1/manifest.json",
-    "acceptedManifestSHA256": "f041c81a41c45ac88dada40b0c173ab63c6e93c2984f232a23be67892df4a65b",
+    "acceptedManifestSHA256": "b603ee57022f31f51a044335dabe4e2c385f6ea4f6fd56e80a5d96232d7ffc68",
     "latestReceiptCommit": "72b840d3e1de2b8c32aebfc0e876d61c69448a92"
   },
   "coverage": {
@@ -276,8 +276,8 @@
         "fixtureID": "ash_open_color"
       },
       "sceneReceiptVersion": 2,
-      "inputReceiptSHA256": "4ba88b6d51419400cd9bdf80176fff61c0ed4903063bb4b53cbff9c2b670cfcb",
-      "inputPayloadSHA256": "db11422cb739330a756c7a36cd8375db95c0264f8f74027568103f186f51478b",
+      "inputReceiptSHA256": "3412a447e7c4a9818e27a7ff4b44dc24863e79c93e759f243bc660f9962ed95e",
+      "inputPayloadSHA256": "d73b2a8c92cab16e71acb70ca118858b97a86f8dd64d41f2f1ea6dd346065cb1",
       "commandListSHA256": "4399b77c750d85006f4d8474039d27e01ebfee1a877ff3cb3e7c33a56756e3d4",
       "renderedRGBA8SHA256": "a87e3fecdcd41a0d38abc64c4d1212dd5ec6b3ebff7187e1258dc1b45b615a25",
       "receipt": {
@@ -290,7 +290,7 @@
             "withoutAuthoredBand": "clear-air"
           }
         ],
-        "description": "Ash-covered ground runs between scattered shallow pools. Your Ashen mark changed the air, while sparse growth settled on the open ground.",
+        "description": "Ash-covered ground runs between scattered shallow pools. Your Ashen Sigil changed the air, while sparse growth settled on the open ground.",
         "dominantGround": "ash",
         "entryDisclosure": null,
         "firstMapCropReceipt": {
@@ -5805,8 +5805,8 @@
         "fixtureID": "longest_copy"
       },
       "sceneReceiptVersion": 2,
-      "inputReceiptSHA256": "73f1482c6055fe335faa3e8f5ef4f14270c5eccfdcd40abaec8eef5cfcfca4e2",
-      "inputPayloadSHA256": "adfc98e3618c7b0fae84e31a1082590ea0b9b9fe824186272c87c79e4cab2776",
+      "inputReceiptSHA256": "b336a8d5dadb5be43a6ea26e4786b283a5e3f33e1e836943f1db56a74ebc9c53",
+      "inputPayloadSHA256": "13e5e2fef1f37b6284008be694071cf9afad4ce552eb445d09775e9d78fce2cb",
       "commandListSHA256": "8fc91557b46b3caafe7934ef1b53206754e4fd563356706ce616eaa01979fcb3",
       "renderedRGBA8SHA256": "1982f2e8ff8a686943dc447b60b8c343049569419e06de1877aa28446e19a99f",
       "receipt": {
@@ -5826,7 +5826,7 @@
             "withoutAuthoredBand": "sparser-growth-damp-edges"
           }
         ],
-        "description": "Broad stone shelves rise above narrow soil paths and connected pools of shallow water, with deep channels cutting between the largest dry crossings. Your Archipelago mark divided the route into separate shelves, while your Verdant mark spread dense low growth across the dampest edges and left the higher exposed ground comparatively bare near the entry.",
+        "description": "Broad stone shelves rise above narrow soil paths and connected pools of shallow water, with deep channels cutting between the largest dry crossings. Your Archipelago Sigil divided the route into separate shelves, while your Verdant Sigil spread dense low growth across the dampest edges and left the higher exposed ground comparatively bare near the entry.",
         "dominantGround": "stone",
         "entryDisclosure": null,
         "firstMapCropReceipt": {
@@ -17363,8 +17363,8 @@
         "fixtureID": "near_flora"
       },
       "sceneReceiptVersion": 2,
-      "inputReceiptSHA256": "09aae5f252c15d78f9a52d86dd0f77b91592c85c19f1d250ffee1ef1d1cee413",
-      "inputPayloadSHA256": "ad7bf482909e51d0fd02b8f2cd7421ad9ee7fe7ba482b3c7a52e280dd3647461",
+      "inputReceiptSHA256": "4dbfcc018ceb3efdf715d165d7310240a6ea2e9ea16774fd1a95ebd6f6084367",
+      "inputPayloadSHA256": "ce9d97e6751afa4a4d75ff1da83df24f28ca3010648a660caf50dd81f40cfd9a",
       "commandListSHA256": "fcd6dcb07f46a19f79bc202cb899645c10741bbc01b68b6ee0070f3edc14e980",
       "renderedRGBA8SHA256": "3cdde7485b968f98046daeb1bbb486d9a01d79d2c35bddbe93cdb1d26d358740",
       "receipt": {
@@ -17384,7 +17384,7 @@
             "withoutAuthoredBand": "pithy-succulent:15"
           }
         ],
-        "description": "Broad sandy ground runs between shallow pools. Your Plains mark opened the terrain, while your Verdant mark spread low growth farther along the few wet and stony edges.",
+        "description": "Broad sandy ground runs between shallow pools. Your Plains Sigil opened the terrain, while your Verdant Sigil spread low growth farther along the few wet and stony edges.",
         "dominantGround": "sand",
         "entryDisclosure": null,
         "firstMapCropReceipt": {
@@ -24680,8 +24680,8 @@
         "fixtureID": "starter_open_meadow"
       },
       "sceneReceiptVersion": 2,
-      "inputReceiptSHA256": "049c67bb430ac715dbaca57230e0b45b57f8d9a3f5faa364ece16e51493784d2",
-      "inputPayloadSHA256": "2441dc49a1ffba44357d18b13c81b556e254e07c341b819615a440b33ddc0475",
+      "inputReceiptSHA256": "bccff1bd4c9a050230b34acfde4b242da6e3cd48ecbbb071cb165d293fc0a726",
+      "inputPayloadSHA256": "091ece03753e95cc7e9f41b5c103de2fcb9e11a31d6e16b07d5540dc8a767dfa",
       "commandListSHA256": "ef4e25765ff3651a1311af9667fe26671fb8dcd91e019a20845daa80b1e69261",
       "renderedRGBA8SHA256": "d4cdd93744dfc2c56e29fe50ef0203087c0cc470eea906df52c38b0aef5c3310",
       "receipt": {
@@ -24701,7 +24701,7 @@
             "withoutAuthoredBand": "pithy-succulent:15"
           }
         ],
-        "description": "Broad sandy ground runs between shallow pools. Your Plains mark opened the terrain, while your Verdant mark spread low growth farther along the few wet and stony edges.",
+        "description": "Broad sandy ground runs between shallow pools. Your Plains Sigil opened the terrain, while your Verdant Sigil spread low growth farther along the few wet and stony edges.",
         "dominantGround": "sand",
         "entryDisclosure": null,
         "firstMapCropReceipt": {
@@ -30077,8 +30077,8 @@
         "fixtureID": "starter_rainwashed_shore"
       },
       "sceneReceiptVersion": 2,
-      "inputReceiptSHA256": "70a2fa74d10d1be9b3a5071a1c246d343fbf9975aab084abe2d44a1acd2b7e0d",
-      "inputPayloadSHA256": "c0de1274923b8599c6fd259095abe4261c596ae65e28f1a8b28519ca9ad88966",
+      "inputReceiptSHA256": "cb92d84e73fc258bdf3d248b3d374740056cb9c269de307f19ae469092862bee",
+      "inputPayloadSHA256": "5a146811b44257a22e165e313ba61d1420a606d15d87086ce569ac2f48321014",
       "commandListSHA256": "290d18be1cde96410098d5c936c269d41bc02efee290449cb70906f827f71bf7",
       "renderedRGBA8SHA256": "93f23f1dc5182216ff2a9d027431e9d331db3d7c6927dc12e0065c704a882fec",
       "receipt": {
@@ -30091,7 +30091,7 @@
             "withoutAuthoredBand": "ash-rubble-different-water"
           }
         ],
-        "description": "Stone shelves break a wide run of shallow and deep water. Your Archipelago mark divided the route, while only the ground nearest the entry remained clearly visible.",
+        "description": "Stone shelves break a wide run of shallow and deep water. Your Archipelago Sigil divided the route, while only the ground nearest the entry remained clearly visible.",
         "dominantGround": "stone",
         "entryDisclosure": null,
         "firstMapCropReceipt": {
@@ -37732,8 +37732,8 @@
         "fixtureID": "starter_stone_hollow"
       },
       "sceneReceiptVersion": 2,
-      "inputReceiptSHA256": "0dae186477283ae39fc2b74875a8f5d9f19c00af60c86d32a3282fa97620ad34",
-      "inputPayloadSHA256": "ea78d1a7e217615cd80931c19d88effecba4437f7551ab4f587dd80cdb5a9d18",
+      "inputReceiptSHA256": "84357187892d757abfc9f73d57560a3c6eeb4c37c6588d580dc01d91593686ce",
+      "inputPayloadSHA256": "e3a6a8ca868df84af24e020a9ad902f2fb182e66de097800fee285f01eb03dec",
       "commandListSHA256": "07aa9ba139dd4aa99e33cad4ebb787e5b47dcddb7e812935782587416349c9a1",
       "renderedRGBA8SHA256": "b115cbe097e9432672203c9a9ea03dffaf313dab28d0c74bcba75028e940cf7d",
       "receipt": {
@@ -37753,7 +37753,7 @@
             "withoutAuthoredBand": "present"
           }
         ],
-        "description": "Stone closes around narrow paths and wet hollows. Your Caverns mark shaped the enclosure, while your Ore mark made ore more plentiful.",
+        "description": "Stone closes around narrow paths and wet hollows. Your Caverns Sigil shaped the enclosure, while your Ore Sigil made ore more plentiful.",
         "dominantGround": "stone",
         "entryDisclosure": null,
         "firstMapCropReceipt": {
@@ -47370,8 +47370,8 @@
         "fixtureID": "visible_site_candidate"
       },
       "sceneReceiptVersion": 2,
-      "inputReceiptSHA256": "4ee51b4996d1b2387e30aa6dbfa5691d68457a732eaf8f67cb7d941afd831928",
-      "inputPayloadSHA256": "54f11fd9e440c7a9f09ea8bcec49dafc75dc11cc63e48ba16acdab342d86aa25",
+      "inputReceiptSHA256": "7e9aa0ada9ca7f776a98a441b04cb43ead298feb28408d2872d4997ef0c59de6",
+      "inputPayloadSHA256": "a4cb0cbb961ba46f55c990fbe84d8a54d8f06373471f10483e271e38d0f8503e",
       "commandListSHA256": "9b48f7ddf6eb3a61440b4318f388b9bbb8fc8944a2cb4238398a1f184cbe1a5d",
       "renderedRGBA8SHA256": "e6009d1ab7dfa652202999687b3bbb981dc1cf5894cfe02035928c4d1f9c39d5",
       "receipt": {
@@ -47384,7 +47384,7 @@
             "withoutAuthoredBand": "ash-rubble-different-water"
           }
         ],
-        "description": "Stone shelves break a wide run of shallow and deep water. Your Archipelago mark divided the route, while only the ground nearest the entry remained clearly visible.",
+        "description": "Stone shelves break a wide run of shallow and deep water. Your Archipelago Sigil divided the route, while only the ground nearest the entry remained clearly visible.",
         "dominantGround": "stone",
         "entryDisclosure": {
           "siteProfile": "signal_cairn",
@@ -55299,8 +55299,8 @@
         "scope": "atmosphere"
       },
       "sceneReceiptVersion": 2,
-      "inputReceiptSHA256": "4f5e4a642f8abde745018e0787ee28e7884c40ab7ec505941b9d308302603166",
-      "inputPayloadSHA256": "3d71de443f5c7d28f96948406b525cf1a872ab9a564b6693e15f34765b5a79ee",
+      "inputReceiptSHA256": "a77436c32f4e9da9795ff3c5022d2698dc6c561e12412fd80fc7fd96cac2d64d",
+      "inputPayloadSHA256": "6cacfae18f332cdc2904f5b76713da3e0a1140425b3fc75b364936892062c262",
       "commandListSHA256": "8523cd245d9960ce37126fbc312d4faa7450c21ec0cc505194717418b33d0671",
       "renderedRGBA8SHA256": "b8da1ed0cafc3d307fd93260de0601dca71709a153ae973ec13d784af8a70072",
       "receipt": {
@@ -55313,7 +55313,7 @@
             "withoutAuthoredBand": "baseline"
           }
         ],
-        "description": "Broad sandy ground runs between shallow pools. Your Plains mark opened the terrain, while your Verdant mark spread low growth farther along the few wet and stony edges.",
+        "description": "Broad sandy ground runs between shallow pools. Your Plains Sigil opened the terrain, while your Verdant Sigil spread low growth farther along the few wet and stony edges.",
         "dominantGround": "sand",
         "entryDisclosure": null,
         "firstMapCropReceipt": {
@@ -60690,8 +60690,8 @@
         "scope": "flora"
       },
       "sceneReceiptVersion": 2,
-      "inputReceiptSHA256": "537fcb1d265f7726093cab915fda51415ce93e989d183638375a569976ac96b3",
-      "inputPayloadSHA256": "7bc2f706813c151b47ba93463be9e5683d30bd50c056a7f9ffbad36d89a6b2e0",
+      "inputReceiptSHA256": "47c193429ac84b5374f15b9c36f2c1ecc6f8184e36faa1041a67d594ab1b8f56",
+      "inputPayloadSHA256": "db75ccb47cb40dfad7d3dde6a89452e6bdb52cde21678c985f47850289643140",
       "commandListSHA256": "72613ef7a1d4dc7e197e3a91144f5d235c11835bc7f8f5959a7f7595b77c6aee",
       "renderedRGBA8SHA256": "67d156a068e8af756bb5e55a7e644b595215d72f1767437e1b91617c2b0cc8ab",
       "receipt": {
@@ -60704,7 +60704,7 @@
             "withoutAuthoredBand": "baseline"
           }
         ],
-        "description": "Broad sandy ground runs between shallow pools. Your Plains mark opened the terrain, while your Verdant mark spread low growth farther along the few wet and stony edges.",
+        "description": "Broad sandy ground runs between shallow pools. Your Plains Sigil opened the terrain, while your Verdant Sigil spread low growth farther along the few wet and stony edges.",
         "dominantGround": "sand",
         "entryDisclosure": null,
         "firstMapCropReceipt": {
@@ -66081,8 +66081,8 @@
         "scope": "ground"
       },
       "sceneReceiptVersion": 2,
-      "inputReceiptSHA256": "3325652399e198baef06bfb3f796f5cf2a02440a5cd4a2ea5835efbb1d6051ac",
-      "inputPayloadSHA256": "4681c6a3627dfa25c39a5eab04840927a9e484d6b23254329bd5c884cc73f491",
+      "inputReceiptSHA256": "340d1035c10dd9ff6869d9d8e7cfd90ee931b5fb7012b9a06dc9c6ef40c6e3ae",
+      "inputPayloadSHA256": "6e1d7156b0fc48857ad840f5402b4e9539bb0bb8b6a6148a56e1efd4451e36e5",
       "commandListSHA256": "bffbbdc20818b822932662fb7a13363d6aca56925dd2385d348f7c9b246aaf3d",
       "renderedRGBA8SHA256": "c076ade6c6d33b56c45885bcb3a6d8e75c22abbd9c8b45c1671b1e390067baa0",
       "receipt": {
@@ -66095,7 +66095,7 @@
             "withoutAuthoredBand": "baseline"
           }
         ],
-        "description": "Broad sandy ground runs between shallow pools. Your Plains mark opened the terrain, while your Verdant mark spread low growth farther along the few wet and stony edges.",
+        "description": "Broad sandy ground runs between shallow pools. Your Plains Sigil opened the terrain, while your Verdant Sigil spread low growth farther along the few wet and stony edges.",
         "dominantGround": "sand",
         "entryDisclosure": null,
         "firstMapCropReceipt": {
@@ -71472,8 +71472,8 @@
         "scope": "light"
       },
       "sceneReceiptVersion": 2,
-      "inputReceiptSHA256": "13dfeb7c34862fe557be68f03c9446615f30a54af49e80b2dc379fe2e52b1d25",
-      "inputPayloadSHA256": "aeed01382573ce7dc009c5e23f25d7872b36935803a412b5398ed8fe20bfc498",
+      "inputReceiptSHA256": "b6248bbb33e15921b6cbb95163f1bab81c71e872da4689a65cf82a1ad13bb0bb",
+      "inputPayloadSHA256": "42c91f2ef0108f9ee30d0f8f0a2e8938b0514b0e2538e0c01aaf6eac31eade5a",
       "commandListSHA256": "905d3ccef6586075743f48b7fcece32a336e17002e80a745ae11e136e49286ad",
       "renderedRGBA8SHA256": "0bfacd4ef387f55159a3a83ebf43a8d5a45482b453db48bababb94530a373be7",
       "receipt": {
@@ -71486,7 +71486,7 @@
             "withoutAuthoredBand": "baseline"
           }
         ],
-        "description": "Broad sandy ground runs between shallow pools. Your Plains mark opened the terrain, while your Verdant mark spread low growth farther along the few wet and stony edges.",
+        "description": "Broad sandy ground runs between shallow pools. Your Plains Sigil opened the terrain, while your Verdant Sigil spread low growth farther along the few wet and stony edges.",
         "dominantGround": "sand",
         "entryDisclosure": null,
         "firstMapCropReceipt": {
@@ -76863,8 +76863,8 @@
         "scope": "resource"
       },
       "sceneReceiptVersion": 2,
-      "inputReceiptSHA256": "415f69ed9a292ea02321460582718c4652c6a31b868778170b3e050d95eb073a",
-      "inputPayloadSHA256": "c5d0ab21b394dca600d0ffc00b54088eddd638aa3798556aad3d5d29163b489d",
+      "inputReceiptSHA256": "c76876503c36e6f05862b470e8c3d61791783c71b30cb877226ea6f00fbfb729",
+      "inputPayloadSHA256": "60154b5be6594c37c1ab6572c0abdab316141af8656200faea8428371655235d",
       "commandListSHA256": "a20b6e48911c13cb0b809d47278a037baed66e8942b8c8c1e9d29bb78c269c2b",
       "renderedRGBA8SHA256": "4c6b8a13a23185a1695dd9a4bd875a1fdb64fb0756631e309a16c4ed6f57d7d5",
       "receipt": {
@@ -76877,7 +76877,7 @@
             "withoutAuthoredBand": "present"
           }
         ],
-        "description": "Broad sandy ground runs between shallow pools. Your Plains mark opened the terrain, while your Verdant mark spread low growth farther along the few wet and stony edges.",
+        "description": "Broad sandy ground runs between shallow pools. Your Plains Sigil opened the terrain, while your Verdant Sigil spread low growth farther along the few wet and stony edges.",
         "dominantGround": "sand",
         "entryDisclosure": null,
         "firstMapCropReceipt": {
@@ -82254,8 +82254,8 @@
         "scope": "water"
       },
       "sceneReceiptVersion": 2,
-      "inputReceiptSHA256": "4dbb4c13991a66476ff69bfc501c4b7d949f4a4d8b17975f0900aecd507521e0",
-      "inputPayloadSHA256": "a844c422740b664ae20dba052aa1173ff03e2fce3e187c16b8ac15c15163199c",
+      "inputReceiptSHA256": "c9a6764302122f25fa3b64f5c96e818a0a0199fcdbe2c66faf6306c705dc4206",
+      "inputPayloadSHA256": "4e8b722b43e734ab68fd3fe398d8e86d5f170efcb586d4f55a103ade6a674aab",
       "commandListSHA256": "1790710f3f1d0c8ea0fb6a024694f8c283c63b6704636dbf51796ad2767e39d9",
       "renderedRGBA8SHA256": "dad71a00d52ce6d68f61c0e05a3ca78c17e0986f51c4b54eed02e45bb37a8f9b",
       "receipt": {
@@ -82268,7 +82268,7 @@
             "withoutAuthoredBand": "baseline"
           }
         ],
-        "description": "Broad sandy ground runs between shallow pools. Your Plains mark opened the terrain, while your Verdant mark spread low growth farther along the few wet and stony edges.",
+        "description": "Broad sandy ground runs between shallow pools. Your Plains Sigil opened the terrain, while your Verdant Sigil spread low growth farther along the few wet and stony edges.",
         "dominantGround": "sand",
         "entryDisclosure": null,
         "firstMapCropReceipt": {
@@ -87644,8 +87644,8 @@
         "ground": "ash"
       },
       "sceneReceiptVersion": 2,
-      "inputReceiptSHA256": "d714fb427a398a5d1d2982844a0f105c7852e14ce7d3bfe4d927d2843d48e258",
-      "inputPayloadSHA256": "74064f120bfef218ceca35c1530b1279ef4f3f222fbd743744f810048149ca25",
+      "inputReceiptSHA256": "43f6445e8b4963cc8215e699913dfa446db84db48c263ece72c8ce6273056568",
+      "inputPayloadSHA256": "ccc1667f78c754c2eec8f1deb5ef5d9a532b1a23d5bda410416e025470ae18ef",
       "commandListSHA256": "15d31a67ac6832fbe18ca07e8621a038561e08a335cab5d1225f80702bdf21e7",
       "renderedRGBA8SHA256": "44fd378a1f60f6864f4596f17fc2a82dfdc24b05db1beb2072c3f6929d03d686",
       "receipt": {
@@ -87665,7 +87665,7 @@
             "withoutAuthoredBand": "pithy-succulent:15"
           }
         ],
-        "description": "Broad sandy ground runs between shallow pools. Your Plains mark opened the terrain, while your Verdant mark spread low growth farther along the few wet and stony edges.",
+        "description": "Broad sandy ground runs between shallow pools. Your Plains Sigil opened the terrain, while your Verdant Sigil spread low growth farther along the few wet and stony edges.",
         "dominantGround": "ash",
         "entryDisclosure": null,
         "firstMapCropReceipt": {
@@ -93041,8 +93041,8 @@
         "ground": "groundcover"
       },
       "sceneReceiptVersion": 2,
-      "inputReceiptSHA256": "da04120c80b9fc2e4484e85d41b90223f24a0448d04b42a688eda914514bb583",
-      "inputPayloadSHA256": "711acc9e3f460eae11a13d4caa6c003aad1d4ffb0cd7f52e6dc38c1754cdf85e",
+      "inputReceiptSHA256": "4062aa6fa16e929082dce37e87922dcf9792ab9ea1021cc5e09c6139d9855da7",
+      "inputPayloadSHA256": "bfc74764db821fd069103befce626cd687c8a5f1e32370c18d3410d0fc140aba",
       "commandListSHA256": "757af7f2c87639f8832be0006ed14cfcbce330f40a439cbf9b65fedcd2cc8cff",
       "renderedRGBA8SHA256": "548f147d6183ee5466b29c0e626ae90f379b8a0723b7c0c867305639d04504c9",
       "receipt": {
@@ -93062,7 +93062,7 @@
             "withoutAuthoredBand": "pithy-succulent:15"
           }
         ],
-        "description": "Broad sandy ground runs between shallow pools. Your Plains mark opened the terrain, while your Verdant mark spread low growth farther along the few wet and stony edges.",
+        "description": "Broad sandy ground runs between shallow pools. Your Plains Sigil opened the terrain, while your Verdant Sigil spread low growth farther along the few wet and stony edges.",
         "dominantGround": "groundcover",
         "entryDisclosure": null,
         "firstMapCropReceipt": {
@@ -98438,8 +98438,8 @@
         "ground": "growth"
       },
       "sceneReceiptVersion": 2,
-      "inputReceiptSHA256": "54e8833fd2927c8cb9b65707fcd479c74de285a788fb665e206eaab55399feb4",
-      "inputPayloadSHA256": "e12febf237429a3d969534fa5e14b96debe3dc170014ddb14c3b24cc0bd4b674",
+      "inputReceiptSHA256": "b50bf945c17a0660f65db871ec0223e072f8c1cb1115a9e4def77c3305c33fc9",
+      "inputPayloadSHA256": "f5bc2be350f74f8aac7cff012b80bcd4131d99fed3dbf73d6546e65999cc4553",
       "commandListSHA256": "e8b659920b2bb06429ce9f1a3782c8d90bf0281735774b73b12a32c7a7e2b1ee",
       "renderedRGBA8SHA256": "bae0c86a3466b1de26dd7a18dae6ea893744bd0dafd3a64c2883c55c6113cb98",
       "receipt": {
@@ -98459,7 +98459,7 @@
             "withoutAuthoredBand": "pithy-succulent:15"
           }
         ],
-        "description": "Broad sandy ground runs between shallow pools. Your Plains mark opened the terrain, while your Verdant mark spread low growth farther along the few wet and stony edges.",
+        "description": "Broad sandy ground runs between shallow pools. Your Plains Sigil opened the terrain, while your Verdant Sigil spread low growth farther along the few wet and stony edges.",
         "dominantGround": "growth",
         "entryDisclosure": null,
         "firstMapCropReceipt": {
@@ -103835,8 +103835,8 @@
         "ground": "ice"
       },
       "sceneReceiptVersion": 2,
-      "inputReceiptSHA256": "59d514625e3414d061fee063c650fa1a7713fc4a381039eb5e13c53e0dfd7d7a",
-      "inputPayloadSHA256": "2c6851242707f4cfb4c33cc4b622e9d1e80451b525bcd45dfd5b0dcd8a034128",
+      "inputReceiptSHA256": "5ec91eac7608d908dbc0b57f9b1a86e8a818eb4ad821009031ec7efdb88930bb",
+      "inputPayloadSHA256": "281afe6735a28cabd9c3600edfce9014e706b20fcdd3ff5dc00edfc0bd8c5503",
       "commandListSHA256": "712a7b610fcddcbe8f5ef82cdc0a6cdb2b39fb46cf51dc07161c51b542c5950f",
       "renderedRGBA8SHA256": "814d6fdc6abb9158ae58015a404e684d7b8df074fd3c408f8457c51a6373ca09",
       "receipt": {
@@ -103856,7 +103856,7 @@
             "withoutAuthoredBand": "pithy-succulent:15"
           }
         ],
-        "description": "Broad sandy ground runs between shallow pools. Your Plains mark opened the terrain, while your Verdant mark spread low growth farther along the few wet and stony edges.",
+        "description": "Broad sandy ground runs between shallow pools. Your Plains Sigil opened the terrain, while your Verdant Sigil spread low growth farther along the few wet and stony edges.",
         "dominantGround": "ice",
         "entryDisclosure": null,
         "firstMapCropReceipt": {
@@ -109232,8 +109232,8 @@
         "ground": "mud"
       },
       "sceneReceiptVersion": 2,
-      "inputReceiptSHA256": "c3b9e487eda79cb323a2dbee43e31bad63ee4e7eaca144335a371510714f0448",
-      "inputPayloadSHA256": "c1b4d0a3b786389a1dee59d51b0e129d578bb8dbfe37194fb735c6b1841494db",
+      "inputReceiptSHA256": "d88aba03c6b81cf105c22c7b35ecbae7c718aa6be1e6a0d259b65b08446194f6",
+      "inputPayloadSHA256": "5c21bb918ae23b63c870c53ae2e91c2a233874cce4367239eff33c87ce430238",
       "commandListSHA256": "2b21bd44f15c59f9795edc284ccbc351bd6b043d6ee64e9a97092ac1df402b38",
       "renderedRGBA8SHA256": "9ea50867ba843edd6fe3c551f0132929b034eccbcf467c2696feacd3442a8dd1",
       "receipt": {
@@ -109253,7 +109253,7 @@
             "withoutAuthoredBand": "pithy-succulent:15"
           }
         ],
-        "description": "Broad sandy ground runs between shallow pools. Your Plains mark opened the terrain, while your Verdant mark spread low growth farther along the few wet and stony edges.",
+        "description": "Broad sandy ground runs between shallow pools. Your Plains Sigil opened the terrain, while your Verdant Sigil spread low growth farther along the few wet and stony edges.",
         "dominantGround": "mud",
         "entryDisclosure": null,
         "firstMapCropReceipt": {
@@ -114629,8 +114629,8 @@
         "ground": "rubble"
       },
       "sceneReceiptVersion": 2,
-      "inputReceiptSHA256": "f5521b648c73c1805809f2fb6046885eb6927375abb8ed551dd6ac6a6d59e706",
-      "inputPayloadSHA256": "cf6cca981ca2ff0067d8d7b35ec85b4c54d02687ce12384e2b5766261367819b",
+      "inputReceiptSHA256": "92a77ef6a4a04cd9ab388a4259752f363b4a75a97dcfe3aa64d5cdd7c01ae646",
+      "inputPayloadSHA256": "59e793ccf67328f287317d5ca214fc06310fcaa089a873404300cc87e2c92717",
       "commandListSHA256": "441309bee33189792700d37ddc7bf542581abfb0ef9dc5bf309b0dc66f3352dd",
       "renderedRGBA8SHA256": "e42b0261efeeef39d5cd313b65ab0ce15253de414664b4962281da3b7a0443ee",
       "receipt": {
@@ -114650,7 +114650,7 @@
             "withoutAuthoredBand": "pithy-succulent:15"
           }
         ],
-        "description": "Broad sandy ground runs between shallow pools. Your Plains mark opened the terrain, while your Verdant mark spread low growth farther along the few wet and stony edges.",
+        "description": "Broad sandy ground runs between shallow pools. Your Plains Sigil opened the terrain, while your Verdant Sigil spread low growth farther along the few wet and stony edges.",
         "dominantGround": "rubble",
         "entryDisclosure": null,
         "firstMapCropReceipt": {
@@ -120026,8 +120026,8 @@
         "ground": "sand"
       },
       "sceneReceiptVersion": 2,
-      "inputReceiptSHA256": "af584a017fa3bd406750403b246a487d984070a5664585ee3ceb35f6abca1ba4",
-      "inputPayloadSHA256": "1c5ac8ebff0e7e7f7540d6337ce02433e746d1731755cb29f0445990cc30c504",
+      "inputReceiptSHA256": "fdb6a32f491756df5c9e3760454d1234af4244a4c061f25be873a16bf9075d67",
+      "inputPayloadSHA256": "367b4e2b903c81aa29343d5004eb63e8239e7f2b3c8348733895d4d63d35edb5",
       "commandListSHA256": "e280876e1a70e94d338bb93d25b991d6c3a8d9df8f9d34f634f79f4dfd4937d3",
       "renderedRGBA8SHA256": "48e4a33dae5e8e972dcd8d6ce00c156fab5101c46155d493660e1b2390d7508b",
       "receipt": {
@@ -120047,7 +120047,7 @@
             "withoutAuthoredBand": "pithy-succulent:15"
           }
         ],
-        "description": "Broad sandy ground runs between shallow pools. Your Plains mark opened the terrain, while your Verdant mark spread low growth farther along the few wet and stony edges.",
+        "description": "Broad sandy ground runs between shallow pools. Your Plains Sigil opened the terrain, while your Verdant Sigil spread low growth farther along the few wet and stony edges.",
         "dominantGround": "sand",
         "entryDisclosure": null,
         "firstMapCropReceipt": {
@@ -125423,8 +125423,8 @@
         "ground": "soil"
       },
       "sceneReceiptVersion": 2,
-      "inputReceiptSHA256": "e8f692f932f57f0fb7b1717ac40d55550b5b64c536c5c93d7279a60ac445718d",
-      "inputPayloadSHA256": "da4d58db59e7073a06ed945e340b690cbce5b593676f45b19b62d6b048753f08",
+      "inputReceiptSHA256": "3a3ed80768f0579260bf0664b444f3beede1a07ae9be6488ea0744f2d742c822",
+      "inputPayloadSHA256": "5b8bc287c264629dd7a2a643fc1bd549e57461d989cfe3a618ff2a77ea9ec33f",
       "commandListSHA256": "f7e70c7f91d4fd334d796c4e9c65b7e11434aca816ef26210013f816ef18b4e0",
       "renderedRGBA8SHA256": "da9ffa61aac6511da9a576a118209ba20b5107956ebe074744ddfac2e18d44a1",
       "receipt": {
@@ -125444,7 +125444,7 @@
             "withoutAuthoredBand": "pithy-succulent:15"
           }
         ],
-        "description": "Broad sandy ground runs between shallow pools. Your Plains mark opened the terrain, while your Verdant mark spread low growth farther along the few wet and stony edges.",
+        "description": "Broad sandy ground runs between shallow pools. Your Plains Sigil opened the terrain, while your Verdant Sigil spread low growth farther along the few wet and stony edges.",
         "dominantGround": "soil",
         "entryDisclosure": null,
         "firstMapCropReceipt": {
@@ -130820,8 +130820,8 @@
         "ground": "stone"
       },
       "sceneReceiptVersion": 2,
-      "inputReceiptSHA256": "79530cefd4bb5205c9ae0bc599ff7597f1f728cd98ead46349143b71366d3694",
-      "inputPayloadSHA256": "5b29613f4fedc576ed9a21f2be9b8279e99caf3a5e0a9286a92cf5a0ac5cc954",
+      "inputReceiptSHA256": "daafaabf5dd470bc8c941b680748d80f3b7bdc79477c7924d187506b32310b6f",
+      "inputPayloadSHA256": "3ef423e79869fe12ea908ac188e64940b8b80e94e15498fd16302fc580916767",
       "commandListSHA256": "dd45b4d96b189f21a601524fcf2b92366373b6b6efe17a1498df7c4d958e8081",
       "renderedRGBA8SHA256": "2c94ec9e4cda0442c3ca705ebfb261ca0a2673a486f202ce20d79596dcdce2a3",
       "receipt": {
@@ -130841,7 +130841,7 @@
             "withoutAuthoredBand": "pithy-succulent:15"
           }
         ],
-        "description": "Broad sandy ground runs between shallow pools. Your Plains mark opened the terrain, while your Verdant mark spread low growth farther along the few wet and stony edges.",
+        "description": "Broad sandy ground runs between shallow pools. Your Plains Sigil opened the terrain, while your Verdant Sigil spread low growth farther along the few wet and stony edges.",
         "dominantGround": "stone",
         "entryDisclosure": null,
         "firstMapCropReceipt": {
@@ -140387,8 +140387,8 @@
         "family": "entry-disclosure"
       },
       "sceneReceiptVersion": 2,
-      "inputReceiptSHA256": "e18f03b5a2c94010bcd98556f39fa52b53a2deb6681928be86f0c7d7e858e12e",
-      "inputPayloadSHA256": "4c27e4ba41e3db3ac355aadce99f2c9d56b8236b6b261db4945587e16b2dfc60",
+      "inputReceiptSHA256": "084aed18a5076bdcc2fa1ff270122af39143d5ddcb368a0d2f3058da7f4086ba",
+      "inputPayloadSHA256": "43d867f6694fa250d064ae5d0842381cf0117fb6be25d630920e6c60e4d963c6",
       "commandListSHA256": "d1963ef8a6b28e6df5fecdcadb14dfce8c646ceb1696496565fb30908f69b4c8",
       "renderedRGBA8SHA256": "20d5cc29e445a0d002382d687933cbdb089bab59124a1deaa744f383595f352b",
       "receipt": {
@@ -140408,7 +140408,7 @@
             "withoutAuthoredBand": "pithy-succulent:15"
           }
         ],
-        "description": "Broad sandy ground runs between shallow pools. Your Plains mark opened the terrain, while your Verdant mark spread low growth farther along the few wet and stony edges.",
+        "description": "Broad sandy ground runs between shallow pools. Your Plains Sigil opened the terrain, while your Verdant Sigil spread low growth farther along the few wet and stony edges.",
         "dominantGround": "sand",
         "entryDisclosure": null,
         "firstMapCropReceipt": {
@@ -145784,8 +145784,8 @@
         "family": "entry-disclosure"
       },
       "sceneReceiptVersion": 2,
-      "inputReceiptSHA256": "32e4b4934ad241a1e77a10771b752ad8ffe9b00a1da28448505be9cef26abd48",
-      "inputPayloadSHA256": "22f658811eaaac98c5d6cbde9aff0b3f379d2765e1fd832a2258465871995f23",
+      "inputReceiptSHA256": "dae5e15fc046e0991af1b31edf6062712257f24861235358f246318f7648d70b",
+      "inputPayloadSHA256": "1d9f2205c835c133e275770cb73c1188c65768b9ce76aabc85d190342d42811c",
       "commandListSHA256": "50cdb97f7e062c9623b9f42f48b6532c578d3e68795be802ce5ea472f247d49c",
       "renderedRGBA8SHA256": "75dd3e4a665b3bec85d775a9d5257bb2768c91a4db8b40ebef092f521e5d5073",
       "receipt": {
@@ -145805,7 +145805,7 @@
             "withoutAuthoredBand": "pithy-succulent:15"
           }
         ],
-        "description": "Broad sandy ground runs between shallow pools. Your Plains mark opened the terrain, while your Verdant mark spread low growth farther along the few wet and stony edges.",
+        "description": "Broad sandy ground runs between shallow pools. Your Plains Sigil opened the terrain, while your Verdant Sigil spread low growth farther along the few wet and stony edges.",
         "dominantGround": "sand",
         "entryDisclosure": {
           "siteProfile": "settled-entry-site",
@@ -151455,8 +151455,8 @@
         "habits": []
       },
       "sceneReceiptVersion": 2,
-      "inputReceiptSHA256": "454a3733b8ce6f64401588ea1c2f9f67b8964508bcea05fa601861968fbf786c",
-      "inputPayloadSHA256": "c645c84626d82020a2a73528c2928c625fa6763ddb8a7178222054f4bcc719e2",
+      "inputReceiptSHA256": "64769de20aa17c59ac402d17fc53d757c9bd6d5d24634e9696c1395399d4092d",
+      "inputPayloadSHA256": "951f889379addde8660d9aa190f8450fad16519f20d9ae44e694db684ae62369",
       "commandListSHA256": "bb9c45b3e0ec4b46466cae7e841393dd0138c14a4755e460a93c84268ebabd77",
       "renderedRGBA8SHA256": "400d8cea1b40110125e4c6367b7c114dcde0750966ec86ee217e32b15c892dad",
       "receipt": {
@@ -151476,7 +151476,7 @@
             "withoutAuthoredBand": "pithy-succulent:15"
           }
         ],
-        "description": "Broad sandy ground runs between shallow pools. Your Plains mark opened the terrain, while your Verdant mark spread low growth farther along the few wet and stony edges.",
+        "description": "Broad sandy ground runs between shallow pools. Your Plains Sigil opened the terrain, while your Verdant Sigil spread low growth farther along the few wet and stony edges.",
         "dominantGround": "sand",
         "entryDisclosure": null,
         "firstMapCropReceipt": {
@@ -155883,8 +155883,8 @@
         ]
       },
       "sceneReceiptVersion": 2,
-      "inputReceiptSHA256": "5f435bbfb98844c0a998bbe2d37563c7aade4b83c71e4952c3ee1f2ebf0b172f",
-      "inputPayloadSHA256": "796191a9d7a5c9b7067a43f4a15afe7d3ec0157f311475e0d40be1b5c9f6de53",
+      "inputReceiptSHA256": "7f8d73037d02eeda5b348ac12772087a60428435d47a677ff1ae2918060cb26d",
+      "inputPayloadSHA256": "1e070683f496fdc7c3430c8217937bd95af2ef19d7fa7bb8954b7c1331101301",
       "commandListSHA256": "03b0f5a9cf09b929ec5ff75337fd010f345e9f5296e39a64e8be790aa68586fe",
       "renderedRGBA8SHA256": "9fbfb0163229a71ab1ea54d5a02463e4dccd5ea1410171c0cd56411b0399dc49",
       "receipt": {
@@ -155904,7 +155904,7 @@
             "withoutAuthoredBand": "pithy-succulent:15"
           }
         ],
-        "description": "Broad sandy ground runs between shallow pools. Your Plains mark opened the terrain, while your Verdant mark spread low growth farther along the few wet and stony edges.",
+        "description": "Broad sandy ground runs between shallow pools. Your Plains Sigil opened the terrain, while your Verdant Sigil spread low growth farther along the few wet and stony edges.",
         "dominantGround": "sand",
         "entryDisclosure": null,
         "firstMapCropReceipt": {
@@ -161284,8 +161284,8 @@
         ]
       },
       "sceneReceiptVersion": 2,
-      "inputReceiptSHA256": "e08b6a2d1a978926e8013b86c5505954661a6e41ee28d45d9b85f37b3fd9b648",
-      "inputPayloadSHA256": "446d7b21f9c0e2efe906acb5d710bfa911457c22995d4f9f7cf405c6baecdc58",
+      "inputReceiptSHA256": "898dd1a3b5e058984c6b25c38cae68cc6a81f39c3a3c8eaf298b45be6f5e0f82",
+      "inputPayloadSHA256": "bfc398da64e83c9b6f9c0da20f6caf13b96c4f034476d7eddf502a2e613c7f86",
       "commandListSHA256": "8fcb34f271c3d05da76b9572e23dc7f00febe3ff959622289e5876e627a76c8a",
       "renderedRGBA8SHA256": "6901d0281728061deeb03d5d27f6c214e5ae30a699c50caa4d9c278054e68d53",
       "receipt": {
@@ -161305,7 +161305,7 @@
             "withoutAuthoredBand": "pithy-succulent:15"
           }
         ],
-        "description": "Broad sandy ground runs between shallow pools. Your Plains mark opened the terrain, while your Verdant mark spread low growth farther along the few wet and stony edges.",
+        "description": "Broad sandy ground runs between shallow pools. Your Plains Sigil opened the terrain, while your Verdant Sigil spread low growth farther along the few wet and stony edges.",
         "dominantGround": "sand",
         "entryDisclosure": null,
         "firstMapCropReceipt": {
@@ -168617,8 +168617,8 @@
         ]
       },
       "sceneReceiptVersion": 2,
-      "inputReceiptSHA256": "05ff2233a6e7359459a25545ec12e015ffe0935a39b92bf212026c1b16151eec",
-      "inputPayloadSHA256": "86edc2d7f8a9dd71b16cb78b4e5f4d8a284dbf68932ed098ddab5ec311ce7c24",
+      "inputReceiptSHA256": "2c2cc41c5668cac9f1867377b4c49e452fb02617c9e833108d26ae516fcc52aa",
+      "inputPayloadSHA256": "5772d39f43b30b4596896615c5682c64e55643a1a465cc177f576bd898a46fa7",
       "commandListSHA256": "d4ed149d6f64eb47ffdbdde876f1098d50c90d7d49528737c7eb54dc20c4c294",
       "renderedRGBA8SHA256": "9b47036a2db6e50b504885eafc76420a543e470120a3a541e228032a14a17da4",
       "receipt": {
@@ -168638,7 +168638,7 @@
             "withoutAuthoredBand": "pithy-succulent:15"
           }
         ],
-        "description": "Broad sandy ground runs between shallow pools. Your Plains mark opened the terrain, while your Verdant mark spread low growth farther along the few wet and stony edges.",
+        "description": "Broad sandy ground runs between shallow pools. Your Plains Sigil opened the terrain, while your Verdant Sigil spread low growth farther along the few wet and stony edges.",
         "dominantGround": "sand",
         "entryDisclosure": null,
         "firstMapCropReceipt": {
@@ -178842,8 +178842,8 @@
         ]
       },
       "sceneReceiptVersion": 2,
-      "inputReceiptSHA256": "88727b3c5e4bf80b2160fc6d1fc1dcd5cd441d260d41f8f0cb4d50a35b19d8d1",
-      "inputPayloadSHA256": "4e1da39cdb5ba84eeaffb4e8311d0725d516b85ac49461cd1f77f248f37986d1",
+      "inputReceiptSHA256": "c000a2ce381583b2d5b61e2d0f9fdbd415ae438e055e1768c5ae1bfe3da91299",
+      "inputPayloadSHA256": "6f11d606feccc944522b5911b89cb47af2b13d89f8a046f019ea36d68c39ff72",
       "commandListSHA256": "a9f395c534700c0008e0e76fd5af897b8fa99be20557c41bfc72f87af5f8787e",
       "renderedRGBA8SHA256": "93c550f31960fb24331450cbeb362beb32f943b39e4d016ea784581502ff7f39",
       "receipt": {
@@ -178863,7 +178863,7 @@
             "withoutAuthoredBand": "pithy-succulent:15"
           }
         ],
-        "description": "Broad sandy ground runs between shallow pools. Your Plains mark opened the terrain, while your Verdant mark spread low growth farther along the few wet and stony edges.",
+        "description": "Broad sandy ground runs between shallow pools. Your Plains Sigil opened the terrain, while your Verdant Sigil spread low growth farther along the few wet and stony edges.",
         "dominantGround": "sand",
         "entryDisclosure": null,
         "firstMapCropReceipt": {
@@ -190993,8 +190993,8 @@
         "sourceClass": "cyclic"
       },
       "sceneReceiptVersion": 2,
-      "inputReceiptSHA256": "39a5bdceb88bf1cf7dbecf281afd973fef88b72c09f7ee8113b9dae7fc65b877",
-      "inputPayloadSHA256": "cf96c0881fc16b677f05869130e6d1167ec953feb08d491ce0d3366a75a7a352",
+      "inputReceiptSHA256": "07f6d356ae45aa94fe3763f579341d4f9d743aea30feaebc523f1350a5889e0e",
+      "inputPayloadSHA256": "539976d8cfd66707566cb270f5c8bcbc7dae58e72e7c79b8d1a1f12841368517",
       "commandListSHA256": "d03c9b52e107fc9b131cf4e110f0a5a83ea6640af94b08239f797648afe3c12e",
       "renderedRGBA8SHA256": "a076366253b160b107d5cbd6c0ca089431f2ebe6ef431bb621cd4377e0c2a89d",
       "receipt": {
@@ -191014,7 +191014,7 @@
             "withoutAuthoredBand": "pithy-succulent:15"
           }
         ],
-        "description": "Broad sandy ground runs between shallow pools. Your Plains mark opened the terrain, while your Verdant mark spread low growth farther along the few wet and stony edges.",
+        "description": "Broad sandy ground runs between shallow pools. Your Plains Sigil opened the terrain, while your Verdant Sigil spread low growth farther along the few wet and stony edges.",
         "dominantGround": "sand",
         "entryDisclosure": null,
         "firstMapCropReceipt": {
@@ -196391,8 +196391,8 @@
         "sourceClass": "sourceless"
       },
       "sceneReceiptVersion": 2,
-      "inputReceiptSHA256": "6318aa1d9205e014db29d53e1132956d4ae740fa608fb7f1412c23933ec44e76",
-      "inputPayloadSHA256": "83c904d0d3c39eed19ecf28e76392499dbc32d1d9be9ee5ffae1d3ee45926c19",
+      "inputReceiptSHA256": "b6f12fcf5508cd937086223ce487ca67fc652b3830c4a452a8ba98e549f70b6d",
+      "inputPayloadSHA256": "3316ea792f292c64a139110300480a715cd6c14fa4624af50190665be12b0acf",
       "commandListSHA256": "b5e00370070ef45a4e52a950e295dfa84820994679af6616f9d9b3f11c87333c",
       "renderedRGBA8SHA256": "62adb8f666efd088fe6286a2c8860d2089cae2390248995e9732d4264790ca98",
       "receipt": {
@@ -196412,7 +196412,7 @@
             "withoutAuthoredBand": "pithy-succulent:15"
           }
         ],
-        "description": "Broad sandy ground runs between shallow pools. Your Plains mark opened the terrain, while your Verdant mark spread low growth farther along the few wet and stony edges.",
+        "description": "Broad sandy ground runs between shallow pools. Your Plains Sigil opened the terrain, while your Verdant Sigil spread low growth farther along the few wet and stony edges.",
         "dominantGround": "sand",
         "entryDisclosure": null,
         "firstMapCropReceipt": {
@@ -201789,8 +201789,8 @@
         "sourceClass": "cyclic"
       },
       "sceneReceiptVersion": 2,
-      "inputReceiptSHA256": "7349c44358dea40a0671d265e5ff047674193939468efc480547eb78caa178ec",
-      "inputPayloadSHA256": "6932b0a87756e865c661b6eca1d29441da7646cc5c261d2a9fae97b4e0bd0397",
+      "inputReceiptSHA256": "9c122f6eeb9bf583ab71e8c057e33effc85d76ac2bad61a8c784a6da0361916f",
+      "inputPayloadSHA256": "71bd3da9ad6f9279802f5702b9974cdb4d8ae3d5babc21ffbc8e19e83baeb770",
       "commandListSHA256": "0b822e4afca89c473b05f9dde009c0405789c4cb73d7997a2d534b13837a32f8",
       "renderedRGBA8SHA256": "f3d9608e6a1970b35a2d5f74950b928308d982f450320556cc07dec602248b8c",
       "receipt": {
@@ -201810,7 +201810,7 @@
             "withoutAuthoredBand": "pithy-succulent:15"
           }
         ],
-        "description": "Broad sandy ground runs between shallow pools. Your Plains mark opened the terrain, while your Verdant mark spread low growth farther along the few wet and stony edges.",
+        "description": "Broad sandy ground runs between shallow pools. Your Plains Sigil opened the terrain, while your Verdant Sigil spread low growth farther along the few wet and stony edges.",
         "dominantGround": "sand",
         "entryDisclosure": null,
         "firstMapCropReceipt": {
@@ -207187,8 +207187,8 @@
         "sourceClass": "constant"
       },
       "sceneReceiptVersion": 2,
-      "inputReceiptSHA256": "83698a209cf8ca3f7a0d2b4c84754a459bc9d26cced55f66cbb88c9720e990e3",
-      "inputPayloadSHA256": "07ad5a5ef0a68eeeb7518c14f0ec22da7420b710f0a0926779140407f8645324",
+      "inputReceiptSHA256": "7027c166fce89c0fddd08cbcec266f0e19196e7b5b64e2458b225e2a84a4e6a4",
+      "inputPayloadSHA256": "940aa433d105b9c9fc03974164f36bfd66aafcdad1f6b44b5fc441e7c1f58464",
       "commandListSHA256": "a8b55e6b11bbadd288564c9daf79fc47a1a794dfc9a22689b3d5effd3fe7d49b",
       "renderedRGBA8SHA256": "d80b702e4b70c05c2c9ebb0a83d789ba695d7eecdf9d1237e6f8bc45a8d872b4",
       "receipt": {
@@ -207208,7 +207208,7 @@
             "withoutAuthoredBand": "pithy-succulent:15"
           }
         ],
-        "description": "Broad sandy ground runs between shallow pools. Your Plains mark opened the terrain, while your Verdant mark spread low growth farther along the few wet and stony edges.",
+        "description": "Broad sandy ground runs between shallow pools. Your Plains Sigil opened the terrain, while your Verdant Sigil spread low growth farther along the few wet and stony edges.",
         "dominantGround": "sand",
         "entryDisclosure": null,
         "firstMapCropReceipt": {
@@ -212585,8 +212585,8 @@
         "sourceClass": "sourceless"
       },
       "sceneReceiptVersion": 2,
-      "inputReceiptSHA256": "2b87d5e473aa0c1a2e70a5fcb8670219746b24fa6dd8bac1432d475fab5a3371",
-      "inputPayloadSHA256": "08f629bfdcfdcc1e9093712a87738d4f8e937492ea8dcecfe394508a483e9772",
+      "inputReceiptSHA256": "86e1249965bc239a17c919d97ea6dce87742611655399f074af0c2bfbdf28ff1",
+      "inputPayloadSHA256": "ad73f83c2ac528fed25e2e0fb306d5facb78eb4b91d0f562be6931abd468f756",
       "commandListSHA256": "9772f8a7df2ad5a05db91e3ccc2f728f53c4c96979306723480a6970e9970dd4",
       "renderedRGBA8SHA256": "2a978062daf8d6fbcee08c3860ae8e5ee96f87ebb5399a40a0d24cd31604caf2",
       "receipt": {
@@ -212606,7 +212606,7 @@
             "withoutAuthoredBand": "pithy-succulent:15"
           }
         ],
-        "description": "Broad sandy ground runs between shallow pools. Your Plains mark opened the terrain, while your Verdant mark spread low growth farther along the few wet and stony edges.",
+        "description": "Broad sandy ground runs between shallow pools. Your Plains Sigil opened the terrain, while your Verdant Sigil spread low growth farther along the few wet and stony edges.",
         "dominantGround": "sand",
         "entryDisclosure": null,
         "firstMapCropReceipt": {
@@ -217984,8 +217984,8 @@
         "motion": "calm"
       },
       "sceneReceiptVersion": 2,
-      "inputReceiptSHA256": "3ff5b79757745c054d93a38964305223c949870ae6dc6823fa09b3d129854927",
-      "inputPayloadSHA256": "80c53bb4c0cfe36b8c82cf025e9ee35436cc752e9c731d84b7d6396656d2c308",
+      "inputReceiptSHA256": "0ab63cf235e5b31a145faeeec866ce7f89ad3b111ec38bdc953ea3f1ddda683b",
+      "inputPayloadSHA256": "163a094a1cd6df4ad8823b9cfc2ce7d48972e30e7760f4aebf4c52984da26efd",
       "commandListSHA256": "bb24f1542836781ee832370d6d17524c2442e9bbb04e25d3c433262562cd0090",
       "renderedRGBA8SHA256": "fd9a03478a9cf6ef1d516916a49d36632100d54e382a0ff7ef5731c0bbf0a305",
       "receipt": {
@@ -218005,7 +218005,7 @@
             "withoutAuthoredBand": "pithy-succulent:15"
           }
         ],
-        "description": "Broad sandy ground runs between shallow pools. Your Plains mark opened the terrain, while your Verdant mark spread low growth farther along the few wet and stony edges.",
+        "description": "Broad sandy ground runs between shallow pools. Your Plains Sigil opened the terrain, while your Verdant Sigil spread low growth farther along the few wet and stony edges.",
         "dominantGround": "sand",
         "entryDisclosure": null,
         "firstMapCropReceipt": {
@@ -223743,8 +223743,8 @@
         "motion": "calm"
       },
       "sceneReceiptVersion": 2,
-      "inputReceiptSHA256": "96e1cf3ea4a610ef15de116c3779150e6753b6df2f4d5b51e10bfe7f2602e935",
-      "inputPayloadSHA256": "9a8ae58436a6bf00e909352e7ab03de60cd3ce03e4a42da789443f93e36983b9",
+      "inputReceiptSHA256": "de3e03db466ef6d0414fd217b92620a356f97bcbd28f5e942567acb13d50b1fa",
+      "inputPayloadSHA256": "ad362b4ec7e3ddbe7af6165b55caa8897c71c0ca66df172b0011b808a9379a67",
       "commandListSHA256": "124a5acde41c8ea929fbc5bea1d31895c2efb4b19d0e06d76e937fb3ad23fa00",
       "renderedRGBA8SHA256": "db9873f50dcc495cf58f32ac2ec0e6eb83c966d10b1967e5247739c796ade60d",
       "receipt": {
@@ -223764,7 +223764,7 @@
             "withoutAuthoredBand": "pithy-succulent:15"
           }
         ],
-        "description": "Broad sandy ground runs between shallow pools. Your Plains mark opened the terrain, while your Verdant mark spread low growth farther along the few wet and stony edges.",
+        "description": "Broad sandy ground runs between shallow pools. Your Plains Sigil opened the terrain, while your Verdant Sigil spread low growth farther along the few wet and stony edges.",
         "dominantGround": "sand",
         "entryDisclosure": null,
         "firstMapCropReceipt": {
@@ -229142,8 +229142,8 @@
         "motion": "moving"
       },
       "sceneReceiptVersion": 2,
-      "inputReceiptSHA256": "655d6c065a53da526935186c2715212a15b8b671b6193d1faa08af04bb8d9336",
-      "inputPayloadSHA256": "99723d84d23518f4b81a9a05a272d3750008af77d2e8d81bc8cecfd393abf984",
+      "inputReceiptSHA256": "d5520870f178dda08413388909b5198c17994bfda24143b91e738cc6c874ce58",
+      "inputPayloadSHA256": "4ea0864426929940c87ebc97ce48717b4c77484ff7bb246e64be0550dfa1eb23",
       "commandListSHA256": "db9717f50af4a8e3fc7651f968e3dad765ebf5a3d2ea62107091e8e1e86fbc62",
       "renderedRGBA8SHA256": "9660848b82c74a1b9fadb9ae4bc7e0b30589a46fb710e90de1473391fb4d8dfe",
       "receipt": {
@@ -229163,7 +229163,7 @@
             "withoutAuthoredBand": "pithy-succulent:15"
           }
         ],
-        "description": "Broad sandy ground runs between shallow pools. Your Plains mark opened the terrain, while your Verdant mark spread low growth farther along the few wet and stony edges.",
+        "description": "Broad sandy ground runs between shallow pools. Your Plains Sigil opened the terrain, while your Verdant Sigil spread low growth farther along the few wet and stony edges.",
         "dominantGround": "sand",
         "entryDisclosure": null,
         "firstMapCropReceipt": {
@@ -234661,8 +234661,8 @@
         "motion": "strong"
       },
       "sceneReceiptVersion": 2,
-      "inputReceiptSHA256": "1c49a659a761019fd889bab751bd9e20bd638a640847cc588219f75f144a646e",
-      "inputPayloadSHA256": "20ea3910c451cfa40bfcc1178c45ce731d50f5659f6ac2ebc02be543b8ce4489",
+      "inputReceiptSHA256": "1be760068e349303a5ae82559e0dd95f7484625c2efebcf62c18b736c0d2ff25",
+      "inputPayloadSHA256": "e0c54d16c4d5b1dee033d30f12a31747be438cee0e9e755bbeff24483bcd6a2e",
       "commandListSHA256": "eb21e81618059035a7f6abd4e96f37288adde756c50a126dc9ac0fd846dc64e7",
       "renderedRGBA8SHA256": "ff4a4c41ce7f0a95151b0d7d5e523548d6cd2a0bd0acd9235f561778d5c8d0d6",
       "receipt": {
@@ -234682,7 +234682,7 @@
             "withoutAuthoredBand": "pithy-succulent:15"
           }
         ],
-        "description": "Broad sandy ground runs between shallow pools. Your Plains mark opened the terrain, while your Verdant mark spread low growth farther along the few wet and stony edges.",
+        "description": "Broad sandy ground runs between shallow pools. Your Plains Sigil opened the terrain, while your Verdant Sigil spread low growth farther along the few wet and stony edges.",
         "dominantGround": "sand",
         "entryDisclosure": null,
         "firstMapCropReceipt": {
@@ -240270,8 +240270,8 @@
         "family": "scope-counterfactual"
       },
       "sceneReceiptVersion": 2,
-      "inputReceiptSHA256": "6c8f798b78eefca9d2a1757d60a3af4a6fa4111c2ec51c2a5abd25f50589f456",
-      "inputPayloadSHA256": "cd64d47183c0872b31c95179fcb236bef7fb2a6c3a71f67d05d352d7a2dcd516",
+      "inputReceiptSHA256": "b53b9333509601ff20976c94eca2527bf8f18f50430006c092e010896798666e",
+      "inputPayloadSHA256": "6831385e96d9123861c2283bbfecf9ab6e9bc28c6a0d37495fd207d52b86b73f",
       "commandListSHA256": "a91df020629c23500598e63683f65615e1f1b59b44bf0297421504ae0541d8fc",
       "renderedRGBA8SHA256": "905ddb600d2e6e172ac77fe1a6fb5501901da6f5f9f015754eb84273a2743525",
       "receipt": {
@@ -240291,7 +240291,7 @@
             "withoutAuthoredBand": "pithy-succulent:15"
           }
         ],
-        "description": "Broad sandy ground runs between shallow pools. Your Plains mark opened the terrain, while your Verdant mark spread low growth farther along the few wet and stony edges.",
+        "description": "Broad sandy ground runs between shallow pools. Your Plains Sigil opened the terrain, while your Verdant Sigil spread low growth farther along the few wet and stony edges.",
         "dominantGround": "sand",
         "entryDisclosure": null,
         "firstMapCropReceipt": {
@@ -245669,8 +245669,8 @@
         "family": "scope-counterfactual"
       },
       "sceneReceiptVersion": 2,
-      "inputReceiptSHA256": "532293629c371cbb412adcf3de1f36bb4bd7079a7c0d0114ab5b4f675a5b8012",
-      "inputPayloadSHA256": "e0bc80b4837be925152623d9c769cf9f1884d4fa908bd692e4564ca66c97bfe2",
+      "inputReceiptSHA256": "48d812c8991eeaca39c68dc030c42b257a7144ab79ec2181a3ba1c4ddab9eabc",
+      "inputPayloadSHA256": "e2088db75e71af1be9fd346076d9c441244cceb141527cf1f7122f019f5357e0",
       "commandListSHA256": "fb2fb7676544248e6f4322bd0918ec669f24b849385ccd50af3afbe76d766303",
       "renderedRGBA8SHA256": "9dc39aee39c8ed035dc87d05d8234ef3b17cef16cbe95c4c38dfd99a34348e53",
       "receipt": {
@@ -245690,7 +245690,7 @@
             "withoutAuthoredBand": "pithy-succulent:15"
           }
         ],
-        "description": "Broad sandy ground runs between shallow pools. Your Plains mark opened the terrain, while your Verdant mark spread low growth farther along the few wet and stony edges.",
+        "description": "Broad sandy ground runs between shallow pools. Your Plains Sigil opened the terrain, while your Verdant Sigil spread low growth farther along the few wet and stony edges.",
         "dominantGround": "sand",
         "entryDisclosure": null,
         "firstMapCropReceipt": {
@@ -251186,8 +251186,8 @@
         "family": "scope-counterfactual"
       },
       "sceneReceiptVersion": 2,
-      "inputReceiptSHA256": "12313441f778d6e54d447695daa2e49436f6f3ba44863c757379b7663b050b39",
-      "inputPayloadSHA256": "0ae33d6e3829c32819635de3302bcb1ab61e31f023ef5e5b780b3fc618d00aef",
+      "inputReceiptSHA256": "fcdba7727347483fd22d6d5a685d9892fe818e4139937cad9a825b5ba29c1230",
+      "inputPayloadSHA256": "edccdaa4c9e024c2887a9ee8717809c47ad558667170d23f6d676d705334f5a6",
       "commandListSHA256": "ef4e25765ff3651a1311af9667fe26671fb8dcd91e019a20845daa80b1e69261",
       "renderedRGBA8SHA256": "d4cdd93744dfc2c56e29fe50ef0203087c0cc470eea906df52c38b0aef5c3310",
       "receipt": {
@@ -251200,7 +251200,7 @@
             "withoutAuthoredBand": "absent"
           }
         ],
-        "description": "Broad sandy ground runs between shallow pools. Your Plains mark opened the terrain, while your Verdant mark spread low growth farther along the few wet and stony edges.",
+        "description": "Broad sandy ground runs between shallow pools. Your Plains Sigil opened the terrain, while your Verdant Sigil spread low growth farther along the few wet and stony edges.",
         "dominantGround": "sand",
         "entryDisclosure": null,
         "firstMapCropReceipt": {
@@ -256578,8 +256578,8 @@
         "family": "scope-counterfactual"
       },
       "sceneReceiptVersion": 2,
-      "inputReceiptSHA256": "c139c626598a0b49405a5879659893d232001def82fc866f6d11e946334b0a27",
-      "inputPayloadSHA256": "fd2be0c0deaca96517d083666cb7a134282c9dec7aecac6424635eae8fe81742",
+      "inputReceiptSHA256": "c93811af5785108c4b347298a1e8948ff8016556931cb4f4b356e244dd249f88",
+      "inputPayloadSHA256": "2531226449c7fea0f9984c0b458b103a6a644660bf345053efcaaf82d88941de",
       "commandListSHA256": "51a0ec3f527d1920b5adf2cb34e80050b021dc8731f9b087e77d9c330c46517e",
       "renderedRGBA8SHA256": "791431dcd35a920b4901d72b01a5679c4097c63098660f3ce97e5e4688c6ada0",
       "receipt": {
@@ -256599,7 +256599,7 @@
             "withoutAuthoredBand": "pithy-succulent:15"
           }
         ],
-        "description": "Broad sandy ground runs between shallow pools. Your Plains mark opened the terrain, while your Verdant mark spread low growth farther along the few wet and stony edges.",
+        "description": "Broad sandy ground runs between shallow pools. Your Plains Sigil opened the terrain, while your Verdant Sigil spread low growth farther along the few wet and stony edges.",
         "dominantGround": "sand",
         "entryDisclosure": null,
         "firstMapCropReceipt": {
@@ -262050,8 +262050,8 @@
         "family": "scope-counterfactual"
       },
       "sceneReceiptVersion": 2,
-      "inputReceiptSHA256": "84b4a130d5f43d836bde2527f8e00e012d87717725aaa5b714a31e8c4830c0aa",
-      "inputPayloadSHA256": "4672e5581d9e0ef4fa73479b420be1c72b938844e09ffbb8cbd526ed3d2318b8",
+      "inputReceiptSHA256": "a607956d4899c8c82f06b26993364095178030900077f6e1ce050797791fe54c",
+      "inputPayloadSHA256": "d58dae0f2ea998b6d8c630959006e1539fa8ba2c761121c18a2b32722e4de5c0",
       "commandListSHA256": "ef4e25765ff3651a1311af9667fe26671fb8dcd91e019a20845daa80b1e69261",
       "renderedRGBA8SHA256": "d4cdd93744dfc2c56e29fe50ef0203087c0cc470eea906df52c38b0aef5c3310",
       "receipt": {
@@ -262071,7 +262071,7 @@
             "withoutAuthoredBand": "pithy-succulent:15"
           }
         ],
-        "description": "Broad sandy ground runs between shallow pools. Your Plains mark opened the terrain, while your Verdant mark spread low growth farther along the few wet and stony edges.",
+        "description": "Broad sandy ground runs between shallow pools. Your Plains Sigil opened the terrain, while your Verdant Sigil spread low growth farther along the few wet and stony edges.",
         "dominantGround": "sand",
         "entryDisclosure": null,
         "firstMapCropReceipt": {
@@ -267448,8 +267448,8 @@
         "seed": 0
       },
       "sceneReceiptVersion": 2,
-      "inputReceiptSHA256": "fb0e6894b2316c1bf9065386b54af4ec130bff98d84420ac93d08fcb44c2d272",
-      "inputPayloadSHA256": "3ffc23a45cf8967367a1be9caaa181a4d2ac159fc0910ba301a937d73a5cade2",
+      "inputReceiptSHA256": "a6d3b1c9a6fb3dbec9c3ac6cef641f35d061bf788fa4fd241357ec838aafdcc7",
+      "inputPayloadSHA256": "55faf05c45e62229630b97e87265914559144bd8912f5b8b0623620ca8f93c22",
       "commandListSHA256": "51ba4e37d8c4721d8f122934e21e4677dbbb5d3b00210856bb8c314a26cad2aa",
       "renderedRGBA8SHA256": "20fb471483de3fb760fbc11d75bc445bcbf52f4a56ba688c0ef85cd82c0c7490",
       "receipt": {
@@ -267469,7 +267469,7 @@
             "withoutAuthoredBand": "present"
           }
         ],
-        "description": "Stone closes around narrow paths and wet hollows. Your Caverns mark shaped the enclosure, while your Ore mark made ore more plentiful.",
+        "description": "Stone closes around narrow paths and wet hollows. Your Caverns Sigil shaped the enclosure, while your Ore Sigil made ore more plentiful.",
         "dominantGround": "stone",
         "entryDisclosure": {
           "siteProfile": "settled-entry-site",
@@ -288643,8 +288643,8 @@
         "seed": 1
       },
       "sceneReceiptVersion": 2,
-      "inputReceiptSHA256": "f4202d666cf63800baa96f854375dc50a80725c1ccbc15b850ca84eba0b3afeb",
-      "inputPayloadSHA256": "8ff9b3b6665fcf05821de49f89af98afcf9dab5f4c04bd16c65d016782d3c06a",
+      "inputReceiptSHA256": "32fb415899381452a66a506cd377684caa8f3464eda162c85924b047e3af11a0",
+      "inputPayloadSHA256": "eabff36b04a6d4ec5ca7a88be63c540bfd51b81c81bcaba74c87bcc2116bcec5",
       "commandListSHA256": "9432ee2d5d6071a555185489a3fa558811afd6a5298dabb87033abbb42e0c68f",
       "renderedRGBA8SHA256": "a0e6dd217af83ad30d166097c8f20b2fcacddd949e550afe9c1dab8807974f9e",
       "receipt": {
@@ -288664,7 +288664,7 @@
             "withoutAuthoredBand": "present"
           }
         ],
-        "description": "Stone closes around narrow paths and wet hollows. Your Caverns mark shaped the enclosure, while your Ore mark made ore more plentiful.",
+        "description": "Stone closes around narrow paths and wet hollows. Your Caverns Sigil shaped the enclosure, while your Ore Sigil made ore more plentiful.",
         "dominantGround": "stone",
         "entryDisclosure": {
           "siteProfile": "settled-entry-site",
@@ -309838,8 +309838,8 @@
         "seed": 2
       },
       "sceneReceiptVersion": 2,
-      "inputReceiptSHA256": "01d06712e61f31863de1687aef3beb39ce005dd3cf1e4b1c7ef071ee50bd20b5",
-      "inputPayloadSHA256": "2923abf2522d12c86f83a0f3aa072a725fbface0547f547fda529f1fe7ec58f1",
+      "inputReceiptSHA256": "6b2fb79416db6ff149a35ba630c4b3f1031102ffb8f475e7bfff43854fd42b76",
+      "inputPayloadSHA256": "0c92db50576baf31dd9170168bca697120e0f7e9cb954577db38f241ab52e7ad",
       "commandListSHA256": "f9f36e5b44c266969832c19de85ee728b02685fdb62a80d05c74f8fcb5453f3e",
       "renderedRGBA8SHA256": "901d6c235874d88b6dfc7b48065a6c41095ff884a93acad3368334dbd0056290",
       "receipt": {
@@ -309859,7 +309859,7 @@
             "withoutAuthoredBand": "present"
           }
         ],
-        "description": "Stone closes around narrow paths and wet hollows. Your Caverns mark shaped the enclosure, while your Ore mark made ore more plentiful.",
+        "description": "Stone closes around narrow paths and wet hollows. Your Caverns Sigil shaped the enclosure, while your Ore Sigil made ore more plentiful.",
         "dominantGround": "stone",
         "entryDisclosure": {
           "siteProfile": "settled-entry-site",
@@ -331033,8 +331033,8 @@
         "seed": 3
       },
       "sceneReceiptVersion": 2,
-      "inputReceiptSHA256": "ca5e6264efe604a3b70d05d01898ecc2fc2aab0aa5e8599d5cedf7819152fa03",
-      "inputPayloadSHA256": "c444b6468a124de0bcede9d3e0d2959082ef003b8f4eeb0b9727e4878bd705cd",
+      "inputReceiptSHA256": "45e41219ad4de915cf5bb273e0c36d4cd9cefbd8c50196e79698fdb24e4d93c7",
+      "inputPayloadSHA256": "69fb09e9f734ca07f74a0233136c908e01db6f4fc11af5cb1589c2f2def51415",
       "commandListSHA256": "5af662d440ad07cb54e8aee9e352c7cd8c0367bd2a753e9c33eb8d2314903dce",
       "renderedRGBA8SHA256": "ce9546e211ff59c0891b3d120b1a3e6fe74d04b98cc262f02abc57a379395d3b",
       "receipt": {
@@ -331054,7 +331054,7 @@
             "withoutAuthoredBand": "present"
           }
         ],
-        "description": "Stone closes around narrow paths and wet hollows. Your Caverns mark shaped the enclosure, while your Ore mark made ore more plentiful.",
+        "description": "Stone closes around narrow paths and wet hollows. Your Caverns Sigil shaped the enclosure, while your Ore Sigil made ore more plentiful.",
         "dominantGround": "stone",
         "entryDisclosure": {
           "siteProfile": "settled-entry-site",
@@ -352228,8 +352228,8 @@
         "seed": 4
       },
       "sceneReceiptVersion": 2,
-      "inputReceiptSHA256": "2e9cdfade3360eb6f5b5c214838f0fe36288c474318bab2990d72aad52d25f2f",
-      "inputPayloadSHA256": "2fdecf76f3899adbef1b6d38d5d45395386c0786ea16e13e2518818e9f8055f4",
+      "inputReceiptSHA256": "597f32b317d8ae7506c74c69dc9e2975f283cab9eadd1d0d64cabc791e4a87b5",
+      "inputPayloadSHA256": "16c9b7722d9a81cefe2c1c847fffec347e4c72ebb0d9ce0d00cf257bee800583",
       "commandListSHA256": "6e00c438404f322ce560197bf92d54b0e8a9f7c8da7ea46b7c791f06a411f9b5",
       "renderedRGBA8SHA256": "4f775dc57ee8f910348c3d3f86f56b57ead16b7b9cfab78949fa4d82ca8a6c88",
       "receipt": {
@@ -352249,7 +352249,7 @@
             "withoutAuthoredBand": "present"
           }
         ],
-        "description": "Stone closes around narrow paths and wet hollows. Your Caverns mark shaped the enclosure, while your Ore mark made ore more plentiful.",
+        "description": "Stone closes around narrow paths and wet hollows. Your Caverns Sigil shaped the enclosure, while your Ore Sigil made ore more plentiful.",
         "dominantGround": "stone",
         "entryDisclosure": {
           "siteProfile": "settled-entry-site",
@@ -373423,8 +373423,8 @@
         "seed": 5
       },
       "sceneReceiptVersion": 2,
-      "inputReceiptSHA256": "aefbf63df9f6a863e998470e32128f7be97414d473f0a0ba7055afc4206a240a",
-      "inputPayloadSHA256": "9d7ac95cfd05a60a38d07ad626cc52ffb6075ffa3577bdf9289df688f39d1ade",
+      "inputReceiptSHA256": "fd08f92c8dff41927ce23f15e996026259feff8b487c08188c641675429b090a",
+      "inputPayloadSHA256": "7a08829cc2abe121ea3d51133c5f8307084f59150ba0459959b3f96e360905bc",
       "commandListSHA256": "45bca25465321584509aaaa05ff53725c90b07b7f39a3265b30120da5247d158",
       "renderedRGBA8SHA256": "b1aa473eceb19c4c6eba9bee45d9afaa207ce9a15519ce4aee2c2f7be4137f1a",
       "receipt": {
@@ -373444,7 +373444,7 @@
             "withoutAuthoredBand": "present"
           }
         ],
-        "description": "Stone closes around narrow paths and wet hollows. Your Caverns mark shaped the enclosure, while your Ore mark made ore more plentiful.",
+        "description": "Stone closes around narrow paths and wet hollows. Your Caverns Sigil shaped the enclosure, while your Ore Sigil made ore more plentiful.",
         "dominantGround": "stone",
         "entryDisclosure": {
           "siteProfile": "settled-entry-site",
@@ -394618,8 +394618,8 @@
         "seed": 6
       },
       "sceneReceiptVersion": 2,
-      "inputReceiptSHA256": "3c48280ae460c2eb248f99c4cdcbe74f595cba24132e4cb0373df0745de08388",
-      "inputPayloadSHA256": "a3035e57967036d36d6d0df8035e182af2dac9f270e985bc5e2c50e3db711293",
+      "inputReceiptSHA256": "7ca24f4b87195be94e42448bb1c287cba725736e97aaf946eb9ba117f8f19fb1",
+      "inputPayloadSHA256": "20f57970252944182f4ae38d46af426476863becffb4a7e8274c66f575587254",
       "commandListSHA256": "5c32d6ef892d4dfcce5bfd2481ee6ca1c094223d43703a8479a43e99e82295ec",
       "renderedRGBA8SHA256": "b033c70b186f0d7a681b78de23bd38ae5cdb12017ec1543381e828e6c5b8e61d",
       "receipt": {
@@ -394639,7 +394639,7 @@
             "withoutAuthoredBand": "present"
           }
         ],
-        "description": "Stone closes around narrow paths and wet hollows. Your Caverns mark shaped the enclosure, while your Ore mark made ore more plentiful.",
+        "description": "Stone closes around narrow paths and wet hollows. Your Caverns Sigil shaped the enclosure, while your Ore Sigil made ore more plentiful.",
         "dominantGround": "stone",
         "entryDisclosure": {
           "siteProfile": "settled-entry-site",
@@ -415813,8 +415813,8 @@
         "seed": 7
       },
       "sceneReceiptVersion": 2,
-      "inputReceiptSHA256": "5a93e8098d92676ffa6d9b55a2ef317dd254dde1fa45d78b5d1053687fa92130",
-      "inputPayloadSHA256": "9b34c6de89e1ea4be8589812a128fa7dd57c7695cc316f7d89049f06b1344805",
+      "inputReceiptSHA256": "6063d9eb8c067e942cabf3d6a726afefacc4ba0af4c29d7f9abf82fd9bfb52da",
+      "inputPayloadSHA256": "89788fb567496bbc1057674c017b122759247a5a05a068caf39724595ee0772a",
       "commandListSHA256": "426339d33480e4c0de62a5db3ec6cbb8907203c04f2ebf82c1a17b664c4f67fa",
       "renderedRGBA8SHA256": "b96ed3a20ec8b8991c7c40d6674c68603a1b91c92100f0d2f6338ebfb7d60cfe",
       "receipt": {
@@ -415834,7 +415834,7 @@
             "withoutAuthoredBand": "present"
           }
         ],
-        "description": "Stone closes around narrow paths and wet hollows. Your Caverns mark shaped the enclosure, while your Ore mark made ore more plentiful.",
+        "description": "Stone closes around narrow paths and wet hollows. Your Caverns Sigil shaped the enclosure, while your Ore Sigil made ore more plentiful.",
         "dominantGround": "stone",
         "entryDisclosure": {
           "siteProfile": "settled-entry-site",
@@ -437008,8 +437008,8 @@
         "seed": 8
       },
       "sceneReceiptVersion": 2,
-      "inputReceiptSHA256": "e275f7f019eb49d233f5bf7a9f56f174acd62d6a02c3ccd19233dfd9ce930a91",
-      "inputPayloadSHA256": "71644ee78800a2359c0464ebf22a489348b23d60c11c43c61c045f0faa825ff8",
+      "inputReceiptSHA256": "236b5ea5a666931bb1aace7cb3c7f87d057d230d3e18ee4c59058b8ffce07d51",
+      "inputPayloadSHA256": "740a3028b9d0b8ba8b666385955b782d2734cf7d1c2804277c994a1669819280",
       "commandListSHA256": "c5c2ff0c4490ab37a8b66914393e636b9a7019fcbb185df50257f9242999a7e4",
       "renderedRGBA8SHA256": "196b7862049bb2f49ad43b38006682481a8af3db49e32193b048cb96d8fb1cb9",
       "receipt": {
@@ -437029,7 +437029,7 @@
             "withoutAuthoredBand": "present"
           }
         ],
-        "description": "Stone closes around narrow paths and wet hollows. Your Caverns mark shaped the enclosure, while your Ore mark made ore more plentiful.",
+        "description": "Stone closes around narrow paths and wet hollows. Your Caverns Sigil shaped the enclosure, while your Ore Sigil made ore more plentiful.",
         "dominantGround": "stone",
         "entryDisclosure": {
           "siteProfile": "settled-entry-site",
@@ -458203,8 +458203,8 @@
         "seed": 9
       },
       "sceneReceiptVersion": 2,
-      "inputReceiptSHA256": "e40f6dd1fdc470e074d4032517dee628b92a3c5d3f4dc9af91332714ee6c14ae",
-      "inputPayloadSHA256": "e3a709e9c4dd25e1cebfc06f1ec97f8a3d5dbebb9c4fba861f2b782bdc14288e",
+      "inputReceiptSHA256": "aa0731830abc692739f6d0b88e2f1a25083f8e1a895cd25a441cab9590291abc",
+      "inputPayloadSHA256": "8750a8e2810e0aa5fc8ec5b8aa3671ab064fa32ffcac7405c449de43b0c51ba5",
       "commandListSHA256": "77dd404121c75934fff35e26117e0b13f0347c65b50f2b16b000ccbec5620ee5",
       "renderedRGBA8SHA256": "349c6911e1b8467c4dff8c7ec4a551635f08649741969f06f4d04a4c116d803e",
       "receipt": {
@@ -458224,7 +458224,7 @@
             "withoutAuthoredBand": "present"
           }
         ],
-        "description": "Stone closes around narrow paths and wet hollows. Your Caverns mark shaped the enclosure, while your Ore mark made ore more plentiful.",
+        "description": "Stone closes around narrow paths and wet hollows. Your Caverns Sigil shaped the enclosure, while your Ore Sigil made ore more plentiful.",
         "dominantGround": "stone",
         "entryDisclosure": {
           "siteProfile": "settled-entry-site",
@@ -479398,8 +479398,8 @@
         "seed": 10
       },
       "sceneReceiptVersion": 2,
-      "inputReceiptSHA256": "4c68972f462a0299465ab02e73c3d170dd7998264f62cce95f73c0949b8d0e77",
-      "inputPayloadSHA256": "73aead45d4a6c87cea8df823fab01c926e218601a46882f96ff3876b6baeacfe",
+      "inputReceiptSHA256": "bf9a0a2bcaaa11c8da676e5482696695af96945eccc9af1e71a491511ccd6451",
+      "inputPayloadSHA256": "7df6e9935264c262f38c7dc49e1722a3dc5e61bc519fbe2e60abd27fc2b9bd7e",
       "commandListSHA256": "4550d531c11d960b22c20c24f23e08ee48e4d866e6fd270ee3271859a0725298",
       "renderedRGBA8SHA256": "bf8d822cd6e979558e4ced21a9aeb342e7efc7bf25fa8a0bb7d903e1c77bea36",
       "receipt": {
@@ -479419,7 +479419,7 @@
             "withoutAuthoredBand": "present"
           }
         ],
-        "description": "Stone closes around narrow paths and wet hollows. Your Caverns mark shaped the enclosure, while your Ore mark made ore more plentiful.",
+        "description": "Stone closes around narrow paths and wet hollows. Your Caverns Sigil shaped the enclosure, while your Ore Sigil made ore more plentiful.",
         "dominantGround": "stone",
         "entryDisclosure": {
           "siteProfile": "settled-entry-site",
@@ -500593,8 +500593,8 @@
         "seed": 11
       },
       "sceneReceiptVersion": 2,
-      "inputReceiptSHA256": "4a8c53181fc94e8bd539764ce73a51f271f2c81eac780b38abb625be472bf0e9",
-      "inputPayloadSHA256": "3bb17fc97458ed561464f1bec5f8e91e3e5b63df9d45fc2527a8e7e19208cdb0",
+      "inputReceiptSHA256": "998ee877641f28c301db87bca489943793d789a655f93dc1f49c8188fe9a5dca",
+      "inputPayloadSHA256": "665ed7de2937cbb1412a6a1352016d83e0e78cdef43c0f23bae0e7764e05c420",
       "commandListSHA256": "f7917fbd1e553269c7b053704b79615bdccd29417e3bb5b6061c9814a274975f",
       "renderedRGBA8SHA256": "2fc2c36e878802af3181167bc19c78ea22804bdd15ce280b53e5ef9ffa5a09c1",
       "receipt": {
@@ -500614,7 +500614,7 @@
             "withoutAuthoredBand": "present"
           }
         ],
-        "description": "Stone closes around narrow paths and wet hollows. Your Caverns mark shaped the enclosure, while your Ore mark made ore more plentiful.",
+        "description": "Stone closes around narrow paths and wet hollows. Your Caverns Sigil shaped the enclosure, while your Ore Sigil made ore more plentiful.",
         "dominantGround": "stone",
         "entryDisclosure": {
           "siteProfile": "settled-entry-site",
@@ -521788,8 +521788,8 @@
         "seed": 12
       },
       "sceneReceiptVersion": 2,
-      "inputReceiptSHA256": "2f965efddd90740c1c19b512ae1e2ef321dbecbaabfa7f9bab988868617b9735",
-      "inputPayloadSHA256": "2bd97fda65bcb7042b54e07af1128982b206b6d10714ebac7ac0f3e9ec3ae1a1",
+      "inputReceiptSHA256": "b0d0a27bcebbd289a82169e5196c459e8b21d2836dd4a40848283b7782551af9",
+      "inputPayloadSHA256": "79a14916b4cf1bfd18c09a9a22564917df6cd8e1747c833d6360d7c0e2b23f8f",
       "commandListSHA256": "6a8afa656904f41b61210a63846edaa3242d3b58a1ae7cf344087d78a8e21351",
       "renderedRGBA8SHA256": "a9104e3a3033625559184c5b6511b4dfdbeb3453fc34102e6c30714c9feb0c95",
       "receipt": {
@@ -521809,7 +521809,7 @@
             "withoutAuthoredBand": "present"
           }
         ],
-        "description": "Stone closes around narrow paths and wet hollows. Your Caverns mark shaped the enclosure, while your Ore mark made ore more plentiful.",
+        "description": "Stone closes around narrow paths and wet hollows. Your Caverns Sigil shaped the enclosure, while your Ore Sigil made ore more plentiful.",
         "dominantGround": "stone",
         "entryDisclosure": {
           "siteProfile": "settled-entry-site",
@@ -542983,8 +542983,8 @@
         "seed": 13
       },
       "sceneReceiptVersion": 2,
-      "inputReceiptSHA256": "76c856f8fb0c1bcf45e49ec9566d44435727ce233bb5e8b36449a22a1728c994",
-      "inputPayloadSHA256": "0e81eccb05be08cef0c967762740e9d6443eaeb2fd72575db4cc52fd02619793",
+      "inputReceiptSHA256": "af1b5bd3135437ec7a4d37e220878c09e5153ac1c628707d46deeb7a7e3567f3",
+      "inputPayloadSHA256": "7f08cc9ccf4a7526c38409c910f39e55c1c12183ace8802673f706155c7a6ba9",
       "commandListSHA256": "85adb57e0750035ed48a20aea1a4ca72e42d9683a0f4e5b43b0d59b9df16537e",
       "renderedRGBA8SHA256": "5072b5712d51d378f99f7b9c800cdf09079b7d5257af3995f1e8692cf54f3411",
       "receipt": {
@@ -543004,7 +543004,7 @@
             "withoutAuthoredBand": "present"
           }
         ],
-        "description": "Stone closes around narrow paths and wet hollows. Your Caverns mark shaped the enclosure, while your Ore mark made ore more plentiful.",
+        "description": "Stone closes around narrow paths and wet hollows. Your Caverns Sigil shaped the enclosure, while your Ore Sigil made ore more plentiful.",
         "dominantGround": "stone",
         "entryDisclosure": {
           "siteProfile": "settled-entry-site",
@@ -564178,8 +564178,8 @@
         "seed": 14
       },
       "sceneReceiptVersion": 2,
-      "inputReceiptSHA256": "24067509828f573bcfcb8630f5dce0fb000a65f8bc80349d06c73c14a0e70be3",
-      "inputPayloadSHA256": "2b1b3fa742bb61bb6503c1534c7fa6730149c2f3578051a5b5fe6d902d815e30",
+      "inputReceiptSHA256": "6afea3549bc5759994d9ff650fa8a25f861bf14e6443d1c511c83e64c3694040",
+      "inputPayloadSHA256": "f1fa9ef3dbdca048fdeb3f95dd73b3b7b037a7ec8a3b440ad7f416e4cc1195f2",
       "commandListSHA256": "c4397f2caaa79a63994cf33709838b0bf49e16567665280444a696f750fa31d8",
       "renderedRGBA8SHA256": "8dcdd79c7b562f7faa8cf2a20158054520ebd6440f136c2f86ef58adda540888",
       "receipt": {
@@ -564199,7 +564199,7 @@
             "withoutAuthoredBand": "present"
           }
         ],
-        "description": "Stone closes around narrow paths and wet hollows. Your Caverns mark shaped the enclosure, while your Ore mark made ore more plentiful.",
+        "description": "Stone closes around narrow paths and wet hollows. Your Caverns Sigil shaped the enclosure, while your Ore Sigil made ore more plentiful.",
         "dominantGround": "stone",
         "entryDisclosure": {
           "siteProfile": "settled-entry-site",
@@ -585373,8 +585373,8 @@
         "seed": 15
       },
       "sceneReceiptVersion": 2,
-      "inputReceiptSHA256": "5ea72c158a402319f2e2654bf7c3256e5819d9853b7d65423229ab58096d5e6d",
-      "inputPayloadSHA256": "916a7b28dad7ab59ac9a740d872df0fcaab15d8314db7fbe7f56314a4b0ddbd7",
+      "inputReceiptSHA256": "2283e0af1c2e0e30ef58db43c4059a3d4a6c9aee6a974fc5ad77bf8ea965ce84",
+      "inputPayloadSHA256": "69b1391d1fbae07f093b80b234f1c6f489672f8b309452e223e617959f0de0a0",
       "commandListSHA256": "1840a59bdef6b858301ff9aaf89891479c47ee285b06a8973f4fdf5fd09b4717",
       "renderedRGBA8SHA256": "d86265d11496420aaa868e1006286436de09dff1474f0b0959def2b70aee9990",
       "receipt": {
@@ -585394,7 +585394,7 @@
             "withoutAuthoredBand": "present"
           }
         ],
-        "description": "Stone closes around narrow paths and wet hollows. Your Caverns mark shaped the enclosure, while your Ore mark made ore more plentiful.",
+        "description": "Stone closes around narrow paths and wet hollows. Your Caverns Sigil shaped the enclosure, while your Ore Sigil made ore more plentiful.",
         "dominantGround": "stone",
         "entryDisclosure": {
           "siteProfile": "settled-entry-site",
@@ -606568,8 +606568,8 @@
         "seed": 16
       },
       "sceneReceiptVersion": 2,
-      "inputReceiptSHA256": "23234169af7f6c4feb61b4eeeee2c2437dad8a56a442a6a851cf17fa52126cfb",
-      "inputPayloadSHA256": "55f6c02fc193db6ae6a64c9ddb36fb5e6c4ece86d6717e360b16e869991ddda6",
+      "inputReceiptSHA256": "05e08846d9db8d93a973e65fc941246209629529efb567099da9f960587a918f",
+      "inputPayloadSHA256": "0cf9e00e35614ea3ab7de6f8ab96c6220c5c3e96ad436b98357b95babe3ae35d",
       "commandListSHA256": "f0e499bab807b59f78f4d6728532b68190bff673e9a254f125fd1a0731309536",
       "renderedRGBA8SHA256": "7fd069a68976e80787bb5d6fce5cfde2c19824c995c4ca7083e4d2f48c575146",
       "receipt": {
@@ -606589,7 +606589,7 @@
             "withoutAuthoredBand": "present"
           }
         ],
-        "description": "Stone closes around narrow paths and wet hollows. Your Caverns mark shaped the enclosure, while your Ore mark made ore more plentiful.",
+        "description": "Stone closes around narrow paths and wet hollows. Your Caverns Sigil shaped the enclosure, while your Ore Sigil made ore more plentiful.",
         "dominantGround": "stone",
         "entryDisclosure": {
           "siteProfile": "settled-entry-site",
@@ -627763,8 +627763,8 @@
         "seed": 17
       },
       "sceneReceiptVersion": 2,
-      "inputReceiptSHA256": "e33db6a351d9d501166be8c9782576ddc4a575a398b5e2dc88efebb7e4b52424",
-      "inputPayloadSHA256": "bdbd424a149c0879b8cf081152414ab0ae7ea406409ff8eab5ba3037e726eb6c",
+      "inputReceiptSHA256": "911fcf777e17b9e95a803331d5db025c7b944f657b7e29a2c5dedce4ea399589",
+      "inputPayloadSHA256": "7f6c438be88184edc6a541b4fa2925554082e6c02719ea4c2267667e96d39ae8",
       "commandListSHA256": "bacc1fc56a3e6839614c057606c04ab6b8366bdf87eb0b93129116337df23fd7",
       "renderedRGBA8SHA256": "38bb879773b7c007a50307a32541398e7f1c2cc9018240538b11cd1013aea6f5",
       "receipt": {
@@ -627784,7 +627784,7 @@
             "withoutAuthoredBand": "present"
           }
         ],
-        "description": "Stone closes around narrow paths and wet hollows. Your Caverns mark shaped the enclosure, while your Ore mark made ore more plentiful.",
+        "description": "Stone closes around narrow paths and wet hollows. Your Caverns Sigil shaped the enclosure, while your Ore Sigil made ore more plentiful.",
         "dominantGround": "stone",
         "entryDisclosure": {
           "siteProfile": "settled-entry-site",
@@ -648958,8 +648958,8 @@
         "seed": 18
       },
       "sceneReceiptVersion": 2,
-      "inputReceiptSHA256": "4b0123ec7ddd9f9ace90bb9382ca9a7a28ee9338852aa8683ac0362653a6aece",
-      "inputPayloadSHA256": "45f5a93eb8de924954a85206668932c996a8fd187c64016ad0cd68f332c9c369",
+      "inputReceiptSHA256": "6db7ba98f07b5e4d1958e14ed401c49fcf29de2dca280ead10ae48b641d1fc24",
+      "inputPayloadSHA256": "266d4b44670496273abbb6323a66e34542f37549632c3f14d0022cd51c67cb89",
       "commandListSHA256": "4481aa69b2ff33d517f833b828cfdf290d3c438623441297c2e36a0f01c7ab24",
       "renderedRGBA8SHA256": "9898a8745c2424e804ae678ce8874a5b3d455e396bbd827c161156d552cd2e8d",
       "receipt": {
@@ -648979,7 +648979,7 @@
             "withoutAuthoredBand": "present"
           }
         ],
-        "description": "Stone closes around narrow paths and wet hollows. Your Caverns mark shaped the enclosure, while your Ore mark made ore more plentiful.",
+        "description": "Stone closes around narrow paths and wet hollows. Your Caverns Sigil shaped the enclosure, while your Ore Sigil made ore more plentiful.",
         "dominantGround": "stone",
         "entryDisclosure": {
           "siteProfile": "settled-entry-site",
@@ -670153,8 +670153,8 @@
         "seed": 19
       },
       "sceneReceiptVersion": 2,
-      "inputReceiptSHA256": "0c4e239434ec80e2319e006c85efbfd66c8c95a77c3330b12dbac0205139ce8c",
-      "inputPayloadSHA256": "f70eb054828e0aef9664a9c0be634466f4564b2aeea47f56cac9622be924b913",
+      "inputReceiptSHA256": "4a2b637ea0c462fa6e4d1755ab462228901edf84e74509d36ca6ef959dc9b423",
+      "inputPayloadSHA256": "6f24e5cd960a37c11f68ae75416feb843d39518523a1fc975da1c0f1a1cba8ad",
       "commandListSHA256": "212963ab531c23293b659faf88cc6196d506cd4b016568f2ac105a6d9236fe5d",
       "renderedRGBA8SHA256": "b3814bacd16cbc013060bc8f052b0ba2250b5fd2449b92625c25bef9172878d1",
       "receipt": {
@@ -670174,7 +670174,7 @@
             "withoutAuthoredBand": "present"
           }
         ],
-        "description": "Stone closes around narrow paths and wet hollows. Your Caverns mark shaped the enclosure, while your Ore mark made ore more plentiful.",
+        "description": "Stone closes around narrow paths and wet hollows. Your Caverns Sigil shaped the enclosure, while your Ore Sigil made ore more plentiful.",
         "dominantGround": "stone",
         "entryDisclosure": {
           "siteProfile": "settled-entry-site",
@@ -691348,8 +691348,8 @@
         "seed": 20
       },
       "sceneReceiptVersion": 2,
-      "inputReceiptSHA256": "720150532d19521dc3b63500dd6165c2e827f228bfbbdbb8c9193c1936278b3f",
-      "inputPayloadSHA256": "9c66dc2df0e54b45b129c039a91bfc86d2e431d1a199e94b9e1632442cc7fc5c",
+      "inputReceiptSHA256": "9dc3a1fc7afac7c324824e23d4672028d46cf1c0bdd250567161aab7201b208c",
+      "inputPayloadSHA256": "272f0420ec882e16d42aa00ef486122a83349302350ee73eb08d9623e48048c5",
       "commandListSHA256": "b04249bf020486177e365effbe673af3c74039c18296264d9944e6071a96cd25",
       "renderedRGBA8SHA256": "33cd588123c04abe270b4d40e92f26b188389658773cb85fe4ee1b2651bffa49",
       "receipt": {
@@ -691369,7 +691369,7 @@
             "withoutAuthoredBand": "present"
           }
         ],
-        "description": "Stone closes around narrow paths and wet hollows. Your Caverns mark shaped the enclosure, while your Ore mark made ore more plentiful.",
+        "description": "Stone closes around narrow paths and wet hollows. Your Caverns Sigil shaped the enclosure, while your Ore Sigil made ore more plentiful.",
         "dominantGround": "stone",
         "entryDisclosure": {
           "siteProfile": "settled-entry-site",
@@ -712543,8 +712543,8 @@
         "seed": 21
       },
       "sceneReceiptVersion": 2,
-      "inputReceiptSHA256": "7bf80d4f3b3db4e4ca52b5bda57094bdf347ef488b4f033bf3213854e32659c1",
-      "inputPayloadSHA256": "2aaeae7b92b8d0f9cd7506fccbe4b45813746afe1f7a42677fc067e94947c1bd",
+      "inputReceiptSHA256": "ececdbfa0dd2181c3e040715f96a74612588505bdfb3cf1391a2a89eed8b235c",
+      "inputPayloadSHA256": "f808db407e719d9bd1ea9d3751bdfe9e0159dcc03755d6494eccd039dca0af53",
       "commandListSHA256": "5ebe77e0b864bac3fd6c334b283c8e58b5cd3f65974518cca165b06ae06f59ca",
       "renderedRGBA8SHA256": "c7f5bbeb5b2956868ee6a03afcbce340966e4a845021657d91dcf5a0dd617fb1",
       "receipt": {
@@ -712564,7 +712564,7 @@
             "withoutAuthoredBand": "present"
           }
         ],
-        "description": "Stone closes around narrow paths and wet hollows. Your Caverns mark shaped the enclosure, while your Ore mark made ore more plentiful.",
+        "description": "Stone closes around narrow paths and wet hollows. Your Caverns Sigil shaped the enclosure, while your Ore Sigil made ore more plentiful.",
         "dominantGround": "stone",
         "entryDisclosure": {
           "siteProfile": "settled-entry-site",
@@ -733738,8 +733738,8 @@
         "seed": 22
       },
       "sceneReceiptVersion": 2,
-      "inputReceiptSHA256": "0d5618a103984fe202796ac000d9d0a803a379b83c8290925aafbc06bbee2a28",
-      "inputPayloadSHA256": "a3937b2140fe13f5b1e9a505e1583117a9f99df6a68a7ea92acb33e208c29c64",
+      "inputReceiptSHA256": "9f3b39c43948da8cc589d2f911173039ee22e122639eb2f07b41da63e02ed39f",
+      "inputPayloadSHA256": "3181f0f8df3215a1ad5e4d05aaf96971db0b538b7a3f497cd3d1a9da0c472851",
       "commandListSHA256": "ff7a4e31470641368ca4a2bbe6b1ee226b182bd7600e10c112e1030ec019c8f8",
       "renderedRGBA8SHA256": "b062b2fa7b9d5650c8e14aa80d8c96947b9a9203168315268fd5d953e2d76d3b",
       "receipt": {
@@ -733759,7 +733759,7 @@
             "withoutAuthoredBand": "present"
           }
         ],
-        "description": "Stone closes around narrow paths and wet hollows. Your Caverns mark shaped the enclosure, while your Ore mark made ore more plentiful.",
+        "description": "Stone closes around narrow paths and wet hollows. Your Caverns Sigil shaped the enclosure, while your Ore Sigil made ore more plentiful.",
         "dominantGround": "stone",
         "entryDisclosure": {
           "siteProfile": "settled-entry-site",
@@ -754933,8 +754933,8 @@
         "seed": 23
       },
       "sceneReceiptVersion": 2,
-      "inputReceiptSHA256": "e2d8e630b47b939d4c94723e84a813e97cf6ef793ac20ba8410fd225fb664c28",
-      "inputPayloadSHA256": "564f574f736ba10f7f08476a2f43ff23697bae2a3dc2b776801b5bdc3b2c7333",
+      "inputReceiptSHA256": "3cee1a5986fde077b30c96d33f86bc2527cfe659f9eeed1b2c3bac812193a2bb",
+      "inputPayloadSHA256": "836be441b28b671ae32a486adff07cbd8deaa4d02753eed60856b6444efa0bc9",
       "commandListSHA256": "2dc43338331ac73f057d340fc0f3fe3c880a86b34e2feb6332ad8bff552ce5f4",
       "renderedRGBA8SHA256": "4bcde10d70add53735179b2a641d73c49b753c365185e1b203934db900e39f1e",
       "receipt": {
@@ -754954,7 +754954,7 @@
             "withoutAuthoredBand": "present"
           }
         ],
-        "description": "Stone closes around narrow paths and wet hollows. Your Caverns mark shaped the enclosure, while your Ore mark made ore more plentiful.",
+        "description": "Stone closes around narrow paths and wet hollows. Your Caverns Sigil shaped the enclosure, while your Ore Sigil made ore more plentiful.",
         "dominantGround": "stone",
         "entryDisclosure": {
           "siteProfile": "settled-entry-site",
@@ -776128,8 +776128,8 @@
         "seed": 24
       },
       "sceneReceiptVersion": 2,
-      "inputReceiptSHA256": "bf62646796df409374b861692f6612a8538eced6a1901e965437ec77fbf65419",
-      "inputPayloadSHA256": "7221f975f70f77a9e6b7cef88a0f83662cb8a16f1ce0f9a542234d9db4a25e6b",
+      "inputReceiptSHA256": "486d54eb294acace53c1eb2a56bc071f770f48d95f5366075add0b17453fc003",
+      "inputPayloadSHA256": "0c9f912b5f0e0f2a00a025530cd9c658846cb920c043011c7ad6939c98b6202c",
       "commandListSHA256": "2252e4de8871b07b255294af3815e442edd9ec7f4737e1b7c7c41cb179f80acd",
       "renderedRGBA8SHA256": "46e529a8ced98723ce5cddf0f6e86ef2aac799da34d45e82938405fe3c0201ba",
       "receipt": {
@@ -776149,7 +776149,7 @@
             "withoutAuthoredBand": "present"
           }
         ],
-        "description": "Stone closes around narrow paths and wet hollows. Your Caverns mark shaped the enclosure, while your Ore mark made ore more plentiful.",
+        "description": "Stone closes around narrow paths and wet hollows. Your Caverns Sigil shaped the enclosure, while your Ore Sigil made ore more plentiful.",
         "dominantGround": "stone",
         "entryDisclosure": {
           "siteProfile": "settled-entry-site",
@@ -797323,8 +797323,8 @@
         "seed": 25
       },
       "sceneReceiptVersion": 2,
-      "inputReceiptSHA256": "fe907aeee21dfcf09caa073e93de1b079e534c8f6672e5572203aadcedd63f8f",
-      "inputPayloadSHA256": "02749c5c94f89f522e8c9dee00be4560a02cad2b4116f3d19a47514002a07324",
+      "inputReceiptSHA256": "a691d66c460130147dcf53ebb7b8caabf8d413be5e6c5877d49052d647615c6a",
+      "inputPayloadSHA256": "9f3d3acc94e5adfda37f061191cf1a0fa23528925a1291c4a8b417c90302b136",
       "commandListSHA256": "019cefbe89c1a67d48fbee8e8b9320d2410d7b08ffce897094756cbb7131ee68",
       "renderedRGBA8SHA256": "005cbbaa2de46d57212aae661348611870deccdc42d0e62918ccc0e550d4fbd1",
       "receipt": {
@@ -797344,7 +797344,7 @@
             "withoutAuthoredBand": "present"
           }
         ],
-        "description": "Stone closes around narrow paths and wet hollows. Your Caverns mark shaped the enclosure, while your Ore mark made ore more plentiful.",
+        "description": "Stone closes around narrow paths and wet hollows. Your Caverns Sigil shaped the enclosure, while your Ore Sigil made ore more plentiful.",
         "dominantGround": "stone",
         "entryDisclosure": {
           "siteProfile": "settled-entry-site",
@@ -818518,8 +818518,8 @@
         "seed": 26
       },
       "sceneReceiptVersion": 2,
-      "inputReceiptSHA256": "5ee82069310fdf0bbfb8f8a90821cc2f5a23d89747334dcc9babf1279b8071ed",
-      "inputPayloadSHA256": "fbe80de55ff94e13fe3c3f561bef12df757f923a9495848a2743267dcc3879b2",
+      "inputReceiptSHA256": "8c94e752bf95fbcfe4a5b4963370cf11f50dd166412b422247bd9a393ed7962d",
+      "inputPayloadSHA256": "2fa8f24ad898ab70530bee28ca72b29ef50138b61e8deeea7eba729bc99c1c52",
       "commandListSHA256": "64b86d9d34c3b14eecae2ec00a507c13cefa574e05b41003bd9d5eb663e18010",
       "renderedRGBA8SHA256": "2c36a5d5267de330ce8130cdeca0b6922fb8cfc05c515abae125909c4277540a",
       "receipt": {
@@ -818539,7 +818539,7 @@
             "withoutAuthoredBand": "present"
           }
         ],
-        "description": "Stone closes around narrow paths and wet hollows. Your Caverns mark shaped the enclosure, while your Ore mark made ore more plentiful.",
+        "description": "Stone closes around narrow paths and wet hollows. Your Caverns Sigil shaped the enclosure, while your Ore Sigil made ore more plentiful.",
         "dominantGround": "stone",
         "entryDisclosure": {
           "siteProfile": "settled-entry-site",
@@ -839713,8 +839713,8 @@
         "seed": 27
       },
       "sceneReceiptVersion": 2,
-      "inputReceiptSHA256": "14d70e1723b8b19c6aedd735bcfd4d4ccb35a2739c94f3fd8bf2113885d8daab",
-      "inputPayloadSHA256": "0303dfb25d4808690ea815792bf6b91559f68cd1f8b555db2063cd4c5fd5290b",
+      "inputReceiptSHA256": "20ad591f9fc21d16824a305b6742e13d5b3bc40c18252058d1c19fe301bc92e2",
+      "inputPayloadSHA256": "d194ebbc2e06b33d13a2ab83d2e7ff35a0ea80d747ea7d42cec4d44edecc3270",
       "commandListSHA256": "d96d5ba6f830fad03ef0f0efcf341710381b360f9236fc3b825e4e74feac9ec9",
       "renderedRGBA8SHA256": "b8a79d179ffd82b3439e4ae6d994f7963967c97fdddcac3d5d49e1972ee8d83f",
       "receipt": {
@@ -839734,7 +839734,7 @@
             "withoutAuthoredBand": "present"
           }
         ],
-        "description": "Stone closes around narrow paths and wet hollows. Your Caverns mark shaped the enclosure, while your Ore mark made ore more plentiful.",
+        "description": "Stone closes around narrow paths and wet hollows. Your Caverns Sigil shaped the enclosure, while your Ore Sigil made ore more plentiful.",
         "dominantGround": "stone",
         "entryDisclosure": {
           "siteProfile": "settled-entry-site",
@@ -860908,8 +860908,8 @@
         "seed": 28
       },
       "sceneReceiptVersion": 2,
-      "inputReceiptSHA256": "0d4d3c939b4a16c1d8ec568797198f13ef2ae05b70c447859ed881a49d30f561",
-      "inputPayloadSHA256": "e8dc236d278005c2b4c72208ff5a36ca769265e5d620140d3d51d835826d06c7",
+      "inputReceiptSHA256": "11b36252b804ba122c08a050febae7ad9409e72ef7901d1f9a95ae74d5b6157c",
+      "inputPayloadSHA256": "ca39de8ab86d07ee3f2ad7d6e3d285ac16792f5069742114aaf22d830e406870",
       "commandListSHA256": "c05a9c1a31b0201980db63ccaf284043e84c6c5a69556762d1557aa0e5ae44fb",
       "renderedRGBA8SHA256": "6a7bc5e5d52114cde9a12621fe4725b3892861b2e233e8c4649c76dab8b02f79",
       "receipt": {
@@ -860929,7 +860929,7 @@
             "withoutAuthoredBand": "present"
           }
         ],
-        "description": "Stone closes around narrow paths and wet hollows. Your Caverns mark shaped the enclosure, while your Ore mark made ore more plentiful.",
+        "description": "Stone closes around narrow paths and wet hollows. Your Caverns Sigil shaped the enclosure, while your Ore Sigil made ore more plentiful.",
         "dominantGround": "stone",
         "entryDisclosure": {
           "siteProfile": "settled-entry-site",
@@ -882103,8 +882103,8 @@
         "seed": 29
       },
       "sceneReceiptVersion": 2,
-      "inputReceiptSHA256": "4874803d185704def93ed9a021cf6c8b3d4bc9d511985e4f081b871e7307139d",
-      "inputPayloadSHA256": "79ff504d85c9848e80c8eb7f2f771b95cc820bfe86641915052a9327c652dbb4",
+      "inputReceiptSHA256": "3ab8f5e2003aef24f37a39bfbf3fe310cc68f62fc3ad3230c8b06fb30f4e7a7a",
+      "inputPayloadSHA256": "4d4899809095cfcfee58560b264b78fd44e55ff37eecd36da9e4208bb3ffa72f",
       "commandListSHA256": "513246dba53c2190729be0f495a6e133600ab9421361f4db4e5ccad6b7ac48db",
       "renderedRGBA8SHA256": "9b5f042aa67fd198b3c1a8b03f337d90cf9ad037fef8293f5f8e85ad70758542",
       "receipt": {
@@ -882124,7 +882124,7 @@
             "withoutAuthoredBand": "present"
           }
         ],
-        "description": "Stone closes around narrow paths and wet hollows. Your Caverns mark shaped the enclosure, while your Ore mark made ore more plentiful.",
+        "description": "Stone closes around narrow paths and wet hollows. Your Caverns Sigil shaped the enclosure, while your Ore Sigil made ore more plentiful.",
         "dominantGround": "stone",
         "entryDisclosure": {
           "siteProfile": "settled-entry-site",
@@ -903298,8 +903298,8 @@
         "seed": 30
       },
       "sceneReceiptVersion": 2,
-      "inputReceiptSHA256": "bf8e38cba01dcad7d44ce177489e787858bf560a8f1d42f83799fa5a8c7cc8dc",
-      "inputPayloadSHA256": "fad425949497c8a78b199dadd023f39f04159cf89ec5496bbd79edad573c13c0",
+      "inputReceiptSHA256": "f1430fcf82958ec80fbec198964dcd6f116024e8077ad50b3fa1c94a0fd3b370",
+      "inputPayloadSHA256": "46c766c30b151b07a67989d4eda107a49a4a42f8e458809d8c66978a8e8da466",
       "commandListSHA256": "5bd323c521dfd59a8462299d2cc9c61fb93f556a941645a31f5858e5dc8337b7",
       "renderedRGBA8SHA256": "5b393c02bb0af22f842bbe3e437d9b6015dfb42bf5884d3a388d0547fb4dec4f",
       "receipt": {
@@ -903319,7 +903319,7 @@
             "withoutAuthoredBand": "present"
           }
         ],
-        "description": "Stone closes around narrow paths and wet hollows. Your Caverns mark shaped the enclosure, while your Ore mark made ore more plentiful.",
+        "description": "Stone closes around narrow paths and wet hollows. Your Caverns Sigil shaped the enclosure, while your Ore Sigil made ore more plentiful.",
         "dominantGround": "stone",
         "entryDisclosure": {
           "siteProfile": "settled-entry-site",
@@ -924493,8 +924493,8 @@
         "seed": 31
       },
       "sceneReceiptVersion": 2,
-      "inputReceiptSHA256": "4e54242825bf66874772b0c355ea5abb0432bf12e90e96fdb4173365b1b71901",
-      "inputPayloadSHA256": "f9750f9d6135a3298df567400f13a266a28bb4339589e09e625e48f47f22f2f8",
+      "inputReceiptSHA256": "a8bd7079e9fb68eaeddbb4a6c3a91970e771c84c1b54923dd029bcba1584e2d9",
+      "inputPayloadSHA256": "aa46d2c0a3e0dbd76cd8d928642c0b09c234f22ae0552163823be7aef516f0bc",
       "commandListSHA256": "6fe9ec01432cd5044b71fd40b90fb70d7585027d16ff6f0103635763b766e6b2",
       "renderedRGBA8SHA256": "6bce7270ab5e3a8a7f16535c38ed0b03b033f191fc7a9ec162de81e4a477bf39",
       "receipt": {
@@ -924514,7 +924514,7 @@
             "withoutAuthoredBand": "present"
           }
         ],
-        "description": "Stone closes around narrow paths and wet hollows. Your Caverns mark shaped the enclosure, while your Ore mark made ore more plentiful.",
+        "description": "Stone closes around narrow paths and wet hollows. Your Caverns Sigil shaped the enclosure, while your Ore Sigil made ore more plentiful.",
         "dominantGround": "stone",
         "entryDisclosure": {
           "siteProfile": "settled-entry-site",
@@ -945689,8 +945689,8 @@
         "motion": "strong"
       },
       "sceneReceiptVersion": 2,
-      "inputReceiptSHA256": "1f0cb3818287daf3786d8fc2bad8db512353bbdb049f1ade15fd550c31749e42",
-      "inputPayloadSHA256": "3925243ce70ba6e59e311af0485cf97befe12c312426bef9f1e86663ed7905f5",
+      "inputReceiptSHA256": "863a767bc82d2d50052a1fd5c6937ba0923106fc2dc7f415a647234e52f912a1",
+      "inputPayloadSHA256": "63431fcabcb4cf03790195e42404fb8f48eafca4e8cc7e515a2f00b18eeab7af",
       "commandListSHA256": "94938fe434ab00ab2b46bc8eb35a07706ad774ba0d6e9ce28ab9a06add92ca4e",
       "renderedRGBA8SHA256": "f941eafd65d56f10224c4543bda4c7c0ff96d45f2264511b2b559d525143587a",
       "receipt": {
@@ -945710,7 +945710,7 @@
             "withoutAuthoredBand": "pithy-succulent:15"
           }
         ],
-        "description": "Broad sandy ground runs between shallow pools. Your Plains mark opened the terrain, while your Verdant mark spread low growth farther along the few wet and stony edges.",
+        "description": "Broad sandy ground runs between shallow pools. Your Plains Sigil opened the terrain, while your Verdant Sigil spread low growth farther along the few wet and stony edges.",
         "dominantGround": "sand",
         "entryDisclosure": null,
         "firstMapCropReceipt": {
@@ -951223,8 +951223,8 @@
         "motion": "moving"
       },
       "sceneReceiptVersion": 2,
-      "inputReceiptSHA256": "9ceabf4cb6ecf97aa3b8ddbb246ce3f6e04e93df2fd9f18463e4684a133fde93",
-      "inputPayloadSHA256": "3a038b28d515cfbbc0fbe2c51c0b0647bc4be444dd203f84c263874947ea6064",
+      "inputReceiptSHA256": "150c84eef453b5a6c24a59ad6c7284488d887a8b6f87122dff928a666585f4e0",
+      "inputPayloadSHA256": "eec20c4e7241eb7d77ff47c88cba97e7cb5052d06ffc115133a13f9979b720be",
       "commandListSHA256": "14d9de7ba71be7a25ffb1743816a1fd31f5f4ed0c93f1a6da615ef05ce20c6b7",
       "renderedRGBA8SHA256": "7a173575970a79954f47ff90051f6a80756f3c24898e06545b9cf3c6b4c6e325",
       "receipt": {
@@ -951244,7 +951244,7 @@
             "withoutAuthoredBand": "pithy-succulent:15"
           }
         ],
-        "description": "Broad sandy ground runs between shallow pools. Your Plains mark opened the terrain, while your Verdant mark spread low growth farther along the few wet and stony edges.",
+        "description": "Broad sandy ground runs between shallow pools. Your Plains Sigil opened the terrain, while your Verdant Sigil spread low growth farther along the few wet and stony edges.",
         "dominantGround": "sand",
         "entryDisclosure": null,
         "firstMapCropReceipt": {
@@ -956952,8 +956952,8 @@
         "motion": "calm"
       },
       "sceneReceiptVersion": 2,
-      "inputReceiptSHA256": "7340a3b0d74bd8b21f078b56e8eef2218e73db1ea74c1c42a39a09a1beff4dd0",
-      "inputPayloadSHA256": "58cd053f23f77b4e47405fddeb7e34f5ed368028eb91f4f3d3c3e2a83b97cd3f",
+      "inputReceiptSHA256": "e39926e69b9838803542a86b84159defcc91497a4b7d2d9c6458243e4d3f8a8d",
+      "inputPayloadSHA256": "d231dde07485865e98f6eb9c49b7b316f6c88458c55d57fb7841c958e5923876",
       "commandListSHA256": "8015531469444214dda983bc55b518fa98f9621c3e2ecfed943a74620550a8e2",
       "renderedRGBA8SHA256": "8e1877a693749e996f9e9818fcc6aeeee5cf9c2a265abbdbc9a7fa9c5be354ba",
       "receipt": {
@@ -956973,7 +956973,7 @@
             "withoutAuthoredBand": "pithy-succulent:15"
           }
         ],
-        "description": "Broad sandy ground runs between shallow pools. Your Plains mark opened the terrain, while your Verdant mark spread low growth farther along the few wet and stony edges.",
+        "description": "Broad sandy ground runs between shallow pools. Your Plains Sigil opened the terrain, while your Verdant Sigil spread low growth farther along the few wet and stony edges.",
         "dominantGround": "sand",
         "entryDisclosure": null,
         "firstMapCropReceipt": {
@@ -962576,8 +962576,8 @@
         "motion": "calm"
       },
       "sceneReceiptVersion": 2,
-      "inputReceiptSHA256": "96e1cf3ea4a610ef15de116c3779150e6753b6df2f4d5b51e10bfe7f2602e935",
-      "inputPayloadSHA256": "9a8ae58436a6bf00e909352e7ab03de60cd3ce03e4a42da789443f93e36983b9",
+      "inputReceiptSHA256": "de3e03db466ef6d0414fd217b92620a356f97bcbd28f5e942567acb13d50b1fa",
+      "inputPayloadSHA256": "ad362b4ec7e3ddbe7af6165b55caa8897c71c0ca66df172b0011b808a9379a67",
       "commandListSHA256": "124a5acde41c8ea929fbc5bea1d31895c2efb4b19d0e06d76e937fb3ad23fa00",
       "renderedRGBA8SHA256": "db9873f50dcc495cf58f32ac2ec0e6eb83c966d10b1967e5247739c796ade60d",
       "receipt": {
@@ -962597,7 +962597,7 @@
             "withoutAuthoredBand": "pithy-succulent:15"
           }
         ],
-        "description": "Broad sandy ground runs between shallow pools. Your Plains mark opened the terrain, while your Verdant mark spread low growth farther along the few wet and stony edges.",
+        "description": "Broad sandy ground runs between shallow pools. Your Plains Sigil opened the terrain, while your Verdant Sigil spread low growth farther along the few wet and stony edges.",
         "dominantGround": "sand",
         "entryDisclosure": null,
         "firstMapCropReceipt": {
@@ -967975,8 +967975,8 @@
         "motion": "moving"
       },
       "sceneReceiptVersion": 2,
-      "inputReceiptSHA256": "45c492d3e2af406763ebac45919c8f7e17b8635e458bc0682f43f0f79fef819d",
-      "inputPayloadSHA256": "7d8fb6adc5ae5dde455c620a88a46c54b6dd073faf586ef6ee26d258b71cc915",
+      "inputReceiptSHA256": "d6e1bdd4ddcfecfce7ace0e9401fa6a8439f0f56c9093b531ac5c46e49c38c33",
+      "inputPayloadSHA256": "db76a5cab2d8f3601dc8f36a98a7ff7811e0627f81349c869b5c1be7d6fd4a66",
       "commandListSHA256": "ab044e4142c814890141d5b1ecfa180b17bb89fc55f1a05f11f982929ad95854",
       "renderedRGBA8SHA256": "98db635392a3880db6c5ee1e68c1f66f50060d941cab6f31f0b826d98567b02f",
       "receipt": {
@@ -967996,7 +967996,7 @@
             "withoutAuthoredBand": "pithy-succulent:15"
           }
         ],
-        "description": "Broad sandy ground runs between shallow pools. Your Plains mark opened the terrain, while your Verdant mark spread low growth farther along the few wet and stony edges.",
+        "description": "Broad sandy ground runs between shallow pools. Your Plains Sigil opened the terrain, while your Verdant Sigil spread low growth farther along the few wet and stony edges.",
         "dominantGround": "sand",
         "entryDisclosure": null,
         "firstMapCropReceipt": {
@@ -973447,8 +973447,8 @@
         "relationship": "channels"
       },
       "sceneReceiptVersion": 2,
-      "inputReceiptSHA256": "e82b8c91a00265949733a5f7b50a0476c2f93c946834682d7ad179c29b68527c",
-      "inputPayloadSHA256": "678e86a9c46411dcbcfac66890d915778a1963e27fba3d021d4939a60d757636",
+      "inputReceiptSHA256": "a01e076bf3dd50649d0387fe5f8e49e095e98336d9ca789a37af713856853101",
+      "inputPayloadSHA256": "166ba439e7109ba0d08038a776c785909fbd913b63d53eda240aff756f1f94b9",
       "commandListSHA256": "b661071d59842e13926c8440b948e70c8aa7633deb90c403a2102960fb269ec2",
       "renderedRGBA8SHA256": "c5c77b68145b1977182cee471abcf2955ed7d58575b1c24e3b74cef20e589e4b",
       "receipt": {
@@ -973468,7 +973468,7 @@
             "withoutAuthoredBand": "pithy-succulent:15"
           }
         ],
-        "description": "Broad sandy ground runs between shallow pools. Your Plains mark opened the terrain, while your Verdant mark spread low growth farther along the few wet and stony edges.",
+        "description": "Broad sandy ground runs between shallow pools. Your Plains Sigil opened the terrain, while your Verdant Sigil spread low growth farther along the few wet and stony edges.",
         "dominantGround": "sand",
         "entryDisclosure": null,
         "firstMapCropReceipt": {
@@ -978904,8 +978904,8 @@
         "relationship": "islands"
       },
       "sceneReceiptVersion": 2,
-      "inputReceiptSHA256": "326959f4049cd20851d95d2c9825ddb5efd4c1651a00c44e0eaa6e225cde9444",
-      "inputPayloadSHA256": "8a7ad2fbb9f6ac0f6f7011876ed2043d1a8c08bd47e6b7c22cf5617fa68644db",
+      "inputReceiptSHA256": "9298561412cb26f89f45df4fb6e97b424f12bf076b09e112ca187aa4efe30e04",
+      "inputPayloadSHA256": "3b36592a750f2f4d7f1e833a1e9efd5c645999a8af33795c78904a892ea212a5",
       "commandListSHA256": "2d38df879eab76e31e2063284e0b547357202da0c6d2b1710e8fd2e46fd60712",
       "renderedRGBA8SHA256": "85b95bf05e45204e7d0674530c8a9f345b290b6c2860fbeb6244d1998b6ac49d",
       "receipt": {
@@ -978925,7 +978925,7 @@
             "withoutAuthoredBand": "pithy-succulent:15"
           }
         ],
-        "description": "Broad sandy ground runs between shallow pools. Your Plains mark opened the terrain, while your Verdant mark spread low growth farther along the few wet and stony edges.",
+        "description": "Broad sandy ground runs between shallow pools. Your Plains Sigil opened the terrain, while your Verdant Sigil spread low growth farther along the few wet and stony edges.",
         "dominantGround": "sand",
         "entryDisclosure": null,
         "firstMapCropReceipt": {
@@ -985606,8 +985606,8 @@
         "relationship": "none"
       },
       "sceneReceiptVersion": 2,
-      "inputReceiptSHA256": "0f8e0ec3a79409f1b3ab28dce8dd685f0a74756582dc187708de74288523bbff",
-      "inputPayloadSHA256": "8a8f57e364488f90e73c7edb9f5502ac5c6105223c5533b9f8a0c14a4c3efece",
+      "inputReceiptSHA256": "ec076664563641f1b4fb8e3b9188d0e8cb89c88f80c8991bfb29e3acf81cb525",
+      "inputPayloadSHA256": "69750e856d4d2e4d6a278fc6985b182a7478313520a731b83d55db128836d56d",
       "commandListSHA256": "3b73bae2362d018f66af58343cbdfd942cc6c6e9e576462697ab8bf61d425dae",
       "renderedRGBA8SHA256": "6c908b7e3592bab65de565e4c1ae512382b7b69a1d9821ea323f5a1727e88400",
       "receipt": {
@@ -985627,7 +985627,7 @@
             "withoutAuthoredBand": "pithy-succulent:15"
           }
         ],
-        "description": "Broad sandy ground runs between shallow pools. Your Plains mark opened the terrain, while your Verdant mark spread low growth farther along the few wet and stony edges.",
+        "description": "Broad sandy ground runs between shallow pools. Your Plains Sigil opened the terrain, while your Verdant Sigil spread low growth farther along the few wet and stony edges.",
         "dominantGround": "sand",
         "entryDisclosure": null,
         "firstMapCropReceipt": {
@@ -989968,8 +989968,8 @@
         "relationship": "pools"
       },
       "sceneReceiptVersion": 2,
-      "inputReceiptSHA256": "2fd1b09b6f80d12a2f2a0152a6b9c47760ba2dc111a0502aff3469371b5f15fc",
-      "inputPayloadSHA256": "44cedbfaef2a858365f424aff5865d83e22ec31b75717a30819e8355a7ee5586",
+      "inputReceiptSHA256": "ca1e4dad039eaf0fa88ae915cb2d42dfb7fb8cd476e8e8bd3d120ce06aec9543",
+      "inputPayloadSHA256": "c7c4d7a1a3aea79afd72e993e626da20f925bfbdc53234197636c4dd5a106dfc",
       "commandListSHA256": "f7b35238b62ddb50183709bbaf03cf40869c6c07f00a34ed1dec7c86167ec27e",
       "renderedRGBA8SHA256": "f374c037e377ead955a13df496e8dc6e77dbbaa05aeb653a8879fec9d5493578",
       "receipt": {
@@ -989989,7 +989989,7 @@
             "withoutAuthoredBand": "pithy-succulent:15"
           }
         ],
-        "description": "Broad sandy ground runs between shallow pools. Your Plains mark opened the terrain, while your Verdant mark spread low growth farther along the few wet and stony edges.",
+        "description": "Broad sandy ground runs between shallow pools. Your Plains Sigil opened the terrain, while your Verdant Sigil spread low growth farther along the few wet and stony edges.",
         "dominantGround": "sand",
         "entryDisclosure": null,
         "firstMapCropReceipt": {
@@ -995365,8 +995365,8 @@
         "relationship": "shelves"
       },
       "sceneReceiptVersion": 2,
-      "inputReceiptSHA256": "2aa7d52a10e05db0fcecb6c41cef4d67a47bbc4744905f669f084e109e370321",
-      "inputPayloadSHA256": "8731ca3d7fe9d593fe52cef90a9f549d60a98f60aa9f0dbbdc604afb82dae7b2",
+      "inputReceiptSHA256": "d936924ea927fdd420aebe5eabecf028d6f390b2bae932f1deda8d8eb29a358f",
+      "inputPayloadSHA256": "b8f5d46c8a589c23e5b8fa42a8918a3ba1a518f369f26b1fa3185defa880bbc7",
       "commandListSHA256": "8b9e0a1c0bf73b2774c97a5ea3e7ca9f708f15fb5f90c83211ce234151dac32f",
       "renderedRGBA8SHA256": "577b8a42208ff21df74341cfce12b3b45c285d4fb4d59698590f5afc5b303775",
       "receipt": {
@@ -995386,7 +995386,7 @@
             "withoutAuthoredBand": "pithy-succulent:15"
           }
         ],
-        "description": "Broad sandy ground runs between shallow pools. Your Plains mark opened the terrain, while your Verdant mark spread low growth farther along the few wet and stony edges.",
+        "description": "Broad sandy ground runs between shallow pools. Your Plains Sigil opened the terrain, while your Verdant Sigil spread low growth farther along the few wet and stony edges.",
         "dominantGround": "sand",
         "entryDisclosure": null,
         "firstMapCropReceipt": {
@@ -1002061,5 +1002061,5 @@
       ]
     }
   ],
-  "canonicalBodySHA256": "840026c5b6f4da538e2edac390c65f5c9cd03a61bfb71d1b5af95dd6cc9bb635"
+  "canonicalBodySHA256": "d2783de992abb183a9d9372d60af67251b9e43d14830806bcbabc7781a9448fc"
 }
