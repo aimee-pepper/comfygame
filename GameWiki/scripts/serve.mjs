@@ -5,6 +5,7 @@ import { fileURLToPath } from "node:url";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..", "dist");
 const types = { ".html": "text/html; charset=utf-8", ".css": "text/css; charset=utf-8", ".js": "text/javascript; charset=utf-8", ".json": "application/json; charset=utf-8" };
+const port = Number(process.env.GAMEWIKI_PORT ?? 4178);
 createServer(async (request, response) => {
   try {
     const pathname = decodeURIComponent(new URL(request.url, "http://localhost").pathname);
@@ -19,4 +20,4 @@ createServer(async (request, response) => {
     response.writeHead(404, { "content-type": "text/plain" });
     response.end("Not found");
   }
-}).listen(4178, "127.0.0.1", () => console.log("Bookbinder Internal Wiki: http://127.0.0.1:4178"));
+}).listen(port, "127.0.0.1", () => console.log(`Bookbinder Internal Wiki: http://127.0.0.1:${port}`));

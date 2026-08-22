@@ -15,9 +15,14 @@ separation and no horizontal overflow. The initial route-scroll defect and fabri
 material entries were corrected: internal navigation now opens every route at its heading, and the designed
 Creature set derives exactly 18 stable ComponentProfile families.
 
-**Current checkpoint B — People.** Generate the People index and all named-traveller detail routes from the
-canonical 29-person authorities. This is the next source-generated slice; it does not wait for every meeting
-to become live and must label live, authored-not-live and held content honestly.
+**Checkpoint B — People: complete.** The People index and 29 stable detail routes derive campaign order,
+calling, destination, diary/clue coverage, meeting status and visual disposition from current authorities.
+
+**Checkpoint C — explanatory systems: complete in the wiki.** World Writing now accounts for all 108 typed
+lexemes with disclosure-aware detail routes. Core Loop, Exploration and Combat have dedicated structured
+routes rather than generic authority fallbacks. Overview, Roadmap and History now lead with plain-language
+gameplay/status explanations and retain provenance afterward. Browser acceptance remains part of the final
+integration receipt; this progress statement does not promote any gameplay or roadmap item.
 
 ## What “complete” means
 
@@ -166,11 +171,11 @@ available, continue without treating each slice as a stop:
 
 1. Catalogue taxonomy + item details — **accepted**;
 2. World Resources / Creature Materials / Currencies + details — **accepted**;
-3. People + traveller details — **current**;
-4. World Writing + rune details;
-5. Core Loop and Exploration;
-6. Combat;
-7. Overview reconciliation, Roadmap detail and History supersession links;
+3. People + traveller details — **complete**;
+4. World Writing + rune details — **complete**;
+5. Core Loop and Exploration — **complete**;
+6. Combat — **complete**;
+7. Overview reconciliation, Roadmap detail and History supersession links — **complete**;
 8. accepted-asset ingestion when committed asset paths actually exist.
 
 Each slice is source-generated and tested. Completion receipts say what became useful to Aimee, not merely

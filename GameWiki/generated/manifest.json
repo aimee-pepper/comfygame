@@ -1,9 +1,12 @@
 {
   "schemaVersion": 1,
-  "aggregateSourceHash": "75b87b97b38c94f6f0b1c121f3cbe6bbdcf0bd7de418f00c5fa607dbffb1fb89",
+  "aggregateSourceHash": "7458ef1d39057dda68cdbb4984dc20020d6247409a972838769b28a9f4644e6f",
   "inputs": {
     "Sources/Content/Data/items.json": "b94b1107229f217e14f1d7fa936d8eea938f9782c06c583be32302f10d432bc9",
     "Sources/Content/Data/playability-roadmap.json": "4c791489ce20b803f1f54f626f1de7ce94f5cbe01cb68aa6337f7ca4601bc680",
+    "Sources/Content/Data/pressure_sources.json": "68f7b2271d51613030f2f3b3e573f750af53c9b68fe00d68a599dcd6fc0a9b86",
+    "Sources/Content/Data/pressure_targets.json": "b35cf88512a7e1e2efde12f352a35e1d499376a8a9990daa41a8f285c65e6a42",
+    "Sources/Content/Data/qualifiers.json": "35c0f4b00f35fdb8d1d1845ca27988b73283acc623ec3b39c95cb1b921bec120",
     "Sources/Content/Data/resources.json": "8eee965ce7df075abfe3f646bb36d416a10ef1d7d194845e30fa0f31b7b23e6f",
     "Sources/Content/Data/stations.json": "21b5e9f3bee2d9115acf535ef2ff1db350b87b8ee33755e79a3b3e4584102e2b",
     "Sources/Content/Data/symbols.json": "c1ec5dd7b661680b358e21a56124b6080aa28d93db51fd2f6b80214ced1dcb16",
@@ -170,7 +173,7 @@
     "docs/full-cast-voice-authority-current.md": "619c9f993853e8d990ef89b85fdf9c39c9dc759a90dd9c74bb865521d2cd8501",
     "docs/gambit-stat-thresholds-current.md": "6549465eed132bc9b7c7dca35df9ce457e9772f583d3290a7c6d26849a0889db",
     "docs/game-design-ux-assessment-current.md": "59dbcf7f6c262f068e02f83f995d85fc6e1f436e393fa7a0bbf04fed3baa16d5",
-    "docs/game-wiki-content-contract-current.md": "44df634863caef57bc46b29c8c8a9517f8136e103886d150ce32c03e0aaa00dd",
+    "docs/game-wiki-content-contract-current.md": "f1cfb6edf25c26c9b1ea5bad8ebd81f8f0ceca89d6c5cd73af622540e329e96a",
     "docs/gear-catalogue-disposition-current.md": "cc7c7e0918a955fcee8e3699303bb52654fb5caddd9bc63a6b811f34bf9237ca",
     "docs/gear-crafting-families-current.md": "8a80c3a6f1d97c5bb61a15be857b71b3c0dbc2d0f0081b65411809784ddaebe5",
     "docs/generated-companion-arrival-builds-current.md": "1f9c3d35e2a5ffc0a8b472cac33e14f5b9619a6f4c3b09acadd4b2a6e8d354fc",
@@ -287,7 +290,7 @@
     "docs/writing-tool-progression-current.md": "be17fe07aa89aaaab7117a2faca43d7e1eb1be23202d19106c67c42547b23bb0"
   },
   "outputs": {
-    "generated/wiki-data.json": "eafbefb72bab9f064336c89bf75e6a5591ad0366648a9a568c33f72fd996a0e8",
-    "generated/source-registry.json": "4fe43cdbbcc9689c069f18dbbe928217814935dc4d534a7911928d4f9dd1c8b9"
+    "generated/wiki-data.json": "615445b8749767b8bd6e7b07d5c36a8799e53b5d8060fee2d447a5eefaf5dc1a",
+    "generated/source-registry.json": "07fe68addb3097302e224b3bbda639a7be2dea89777f5bbf0e10e18ff0b9d79d"
   }
 }
