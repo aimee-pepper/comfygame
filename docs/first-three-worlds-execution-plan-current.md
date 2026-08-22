@@ -182,7 +182,8 @@ spoiling it.
 
 **Engineering:** persist the pure `WorldArrivalReceipt`; implement the exact deterministic two-sentence,
 18–55 word grammar from `world-arrival-description-grammar-current.md` and exact disclosed facts. Validate
-prohibited riddle register, causal necessity and no unknown-mark/site/entity leak.
+prohibited riddle register, reshaped/increased/reduced/none causal contribution and no
+unknown-mark/site/entity leak.
 No visual promotion yet.
 
 **Pass:** Open Flats, Rainwashed Shore, Stone Hollow; near/far world pairs; relaunch identity; unknown mark;

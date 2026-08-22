@@ -64,7 +64,7 @@ read complete Worldgen state or choose what is safe to disclose.
 | `suspendedAtmosphere` | exact medium/density/motion | accepted Smoke/Ash/Mist/Miasma layer | inferring weather from colour |
 | `precipitation` | exact none/rain/snow/mixed plus intensity/motion | accepted precipitation layer | changing terrain or movement rules |
 | `flora` | 0–4 visible species render identities, coverage, habits | same silhouette/palette grammar as map | names, metabolism or defence labels |
-| `authoredKnownScopes` | known mark IDs and legitimately caused visible scope IDs | one restrained causal clause | hidden mark semantics |
+| `causalVisualFacts` | known mark ID, visible scope, `none/increased/reduced/reshaped`, result band and same-seed-without-mark band | no image authority; final description is rules-owned | hidden mark semantics, authorship inferred from presence, or creation claims for mere increases |
 | `entryDisclosure` | only already visible site profile or disclosed apex-location mark | optional v1 extension fixture | any hidden complete-world POI/entity fact |
 | `description` | rules-owned final 18–55 word string from `world-arrival-description-grammar-current.md` | body copy only | Asset-authored substitutions |
 | `firstMapCropReceipt` | exact disclosed entry crop render inputs | continuity evidence only | revealing cells beyond current sight |
@@ -144,7 +144,7 @@ flora, encounter, writing, Essence, collapse and reachability receipts are check
 - flora: low pithy-succulent identity, 21 placements; no active/hostile flora;
 - description (rules-owned fixture):
   `Broad sandy ground runs between shallow pools. Your Plains mark opened the terrain, while your Verdant
-  mark gathered low growth along the few wet and stony edges.`
+  mark spread low growth farther along the few wet and stony edges.`
 
 ### `starter_rainwashed_shore` — **Rainwashed Shore**
 
@@ -162,7 +162,7 @@ flora, encounter, writing, Essence, collapse and reachability receipts are check
 - flora: pithy-succulent identity, 19 placements; no active/hostile flora;
 - description (rules-owned fixture):
   `Stone closes around narrow paths and wet hollows. Your Caverns mark shaped the enclosure, while your Ore
-  mark drew ore through it.`
+  mark made ore more plentiful.`
 
 Sites, portals, traveller candidates, ordinary creature identities and exact resource positions are absent
 from all three entry pictures unless a separate sanitized `entryDisclosure` field legitimately supplies

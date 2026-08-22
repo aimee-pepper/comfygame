@@ -51,7 +51,8 @@ CausalVisualFact[]
   sourcePageOrder: Int
   scope: ground | water | flora | light | atmosphere
   resultBand: closed scope-owned band
-  wasNecessary: Bool                // result would not hold without the actual authored contribution
+  contributionKind: none | increased | reduced | reshaped
+  withoutAuthoredBand: closed scope-owned band
 
 EnvironmentSummary
   illuminationBand: trueDark | dim | ordinary | bright | blazing
@@ -68,10 +69,27 @@ EnvironmentSummary
 `stone, soil, sand, ice, ash, rubble, mud, growth, groundcover`. Empty/all-water malformed input fails; it
 does not fabricate “ordinary ground.”
 
-`wasNecessary` is a causal receipt, not `wasWritten`. Compare the exact resolved visible band with the same
-world roll after removing that authored mark's contribution. A known mark that merely agrees with what the
-seed already supplied does not earn “Your mark made…” wording. Removing marks for this comparison cannot
-reroll the world or alter any unrelated random stream.
+`contributionKind` is a causal receipt, not `wasWritten`. Compare the exact visible result with the same
+world roll after removing that authored mark's contribution. Use `reshaped` when the visible band/form
+changes, `increased` or `reduced` when the same visible family remains but its exact quantity/magnitude
+changes, and `none` when the visible result is unchanged. A known mark that merely agrees with what the seed
+already supplied earns no causal wording. An increase never permits “created” wording, and a decrease never
+permits “removed” wording. Removing marks for this comparison cannot reroll the world or alter any unrelated
+random stream.
+
+### Starter counterfactual receipts
+
+These receipts freeze why the three current starter descriptions use their exact verbs. They are evidence
+for the causal classifier, not starter-only prose branches:
+
+| World | Same-seed mark removal | Accepted causal reading |
+|---|---|---|
+| Open Flats 67 | Removing Plains changes the world from broad sand/soil to a stone-heavy, wetter form. Removing Verdant leaves the same pithy-succulent family but lowers its placed coverage from 21 to 15 tiles. | Plains `reshaped`; Verdant `increased`, so it “spread low growth farther” and did not create it. |
+| Rainwashed Shore 26 | Removing Archipelago replaces the stone-shelf water structure with an ash/rubble-heavy form and a different water balance. | Archipelago `reshaped`. |
+| Stone Hollow 23 | Removing Caverns produces chasms, much more sand and far less stone. Removing Ore leaves the same ore family but lowers ore placement from 56 to 18. | Caverns `reshaped`; Ore `increased`, so it “made ore more plentiful” and did not create it. |
+
+Revalidation must compare the same generator version, seed and ordered random stream. If a generator change
+invalidates one of these receipts, the starter copy and receipt must be reaccepted together.
 
 ## Sentence 1: ground and water
 
@@ -107,10 +125,10 @@ names a portal or says which water is traversable.
 
 ### Structural template selection
 
-Select at most one **necessary, known** structural fact in source-page order, with scope order
-`ground → water`. The current starter structural names have these exact templates:
+Select at most one **known `reshaped`** structural fact in source-page order, with scope order `ground →
+water`. The current starter structural names have these exact templates:
 
-| Known necessary mark | Template |
+| Known reshaping mark | Template |
 |---|---|
 | Plains | `Broad {ground} {waterEnding}` |
 | Archipelago | `{groundCap} shelves {waterEnding}` |
@@ -126,7 +144,7 @@ Select at most one **necessary, known** structural fact in source-page order, wi
 | mixedDepth | `runs between shallow and deep water.` | `break a wide run of shallow and deep water.` | `narrow paths and wet hollows.` |
 | waterDominant | `forms a few broad islands.` | `rise as islands from shallow and deep water.` | `forms chambers above shallow and deep water.` |
 
-If no necessary known structural mark owns Sentence 1, use the actual classifier fallback:
+If no known reshaping structural mark owns Sentence 1, use the actual classifier fallback:
 
 | Water band | Fallback |
 |---|---|
@@ -144,30 +162,32 @@ Eligible facts must all be:
 
 - from the source page;
 - meaning-known to the player at bind time;
-- `wasNecessary == true` for the named visible result;
-- not already consumed solely to choose Sentence 1, unless the clause names a different scope;
+- `contributionKind != none` for the named visible result;
 - one of `ground, water, flora, light, atmosphere`.
+
+A structural fact may also appear in Sentence 2: Sentence 1 describes the place; Sentence 2 explains the
+player's causal contribution. This is deliberate, not duplicate receipt data.
 
 Sort eligible facts by source-page order, then scope order `ground, water, flora, light, atmosphere`. Use at
 most two different marks. The generic clause fragments are:
 
-| Scope | Verb phrase |
+| Scope | `reshaped` verb phrase | `increased` verb phrase | `reduced` verb phrase |
 |---|---|
-| ground | `shaped the ground` |
-| water | `shaped the water` |
-| flora | `gathered {floraPhrase}` |
-| light | `set the light` |
-| atmosphere | `changed the air` |
+| ground | `reshaped the ground` | `made that ground more prevalent` | `made that ground less prevalent` |
+| water | `reshaped the water` | `made water more prevalent` | `made water less prevalent` |
+| flora | `reshaped {floraPhrase}` | `spread {floraPhrase} farther` | `left less {floraPhrase}` |
+| light | `changed the light` | `strengthened the light` | `subdued the light` |
+| atmosphere | `changed the air` | `strengthened that condition in the air` | `weakened that condition in the air` |
 
 Starter fragments are exact reviewed overrides, keyed by stable symbol ID rather than display text:
 
-| Symbol ID | Scope | Verb phrase |
+| Symbol ID | Contribution | Verb phrase |
 |---|---|---|
-| plains | ground | `opened the terrain` |
-| verdant | flora | `gathered low growth along the few wet and stony edges` |
-| archipelago | water | `divided the route` |
-| caverns | ground | `shaped the enclosure` |
-| common_ore | ground | `drew ore through it` |
+| plains | reshaped ground | `opened the terrain` |
+| verdant | increased flora | `spread low growth farther along the few wet and stony edges` |
+| archipelago | reshaped water | `divided the route` |
+| caverns | reshaped ground | `shaped the enclosure` |
+| common_ore | increased ground/resource expression | `made ore more plentiful` |
 
 One fact: `Your {mark} mark {verb phrase}.`
 Two facts: `Your {first mark} mark {first verb phrase}, while your {second mark} mark {second verb phrase}.`
@@ -179,7 +199,7 @@ the open stone`, `heavy rain crossed the open ground`, `thin smoke drifted throu
 environmental state is ordinary fallback, use the one-fact sentence instead.
 
 Do not name a symbol that is unknown even if its visible result is obvious. Do not treat a matching random
-result as authorship.
+result as authorship. `increased` phrasing must acknowledge strengthening rather than imply creation.
 
 ### Environmental fallback
 
@@ -249,11 +269,11 @@ Coverage bands derive from actual placed flora tiles divided by non-Chasm tiles:
 The exact current starter receipts must produce:
 
 1. `Broad sandy ground runs between shallow pools. Your Plains mark opened the terrain, while your Verdant
-   mark gathered low growth along the few wet and stony edges.`
+   mark spread low growth farther along the few wet and stony edges.`
 2. `Stone shelves break a wide run of shallow and deep water. Your Archipelago mark divided the route,
    while sparse growth settled on the open stone.`
 3. `Stone closes around narrow paths and wet hollows. Your Caverns mark shaped the enclosure, while your Ore
-   mark drew ore through it.`
+   mark made ore more plentiful.`
 
 These are outputs of the ordinary rules: structural selection, generic one/two-fact assembly and
 environmental fallback. There is no starter-ID prose branch. If a generator change alters the underlying
@@ -293,18 +313,19 @@ uses the safe two-sentence actual-ground + ordinary fallback grammar; Release ne
 
 1. three starter exact strings and 18–55 word bounds;
 2. no authored marks → environmental fallback;
-3. authored mark agrees by chance → no causal claim;
-4. one necessary known mark → one causal fragment;
-5. two necessary known marks → stable page order;
-6. necessary unknown mark → omitted without meaning leak;
-7. hidden site/resource/traveller/apex mutation → identical string;
-8. every water classifier boundary;
-9. every ground token and malformed all-water failure;
-10. every atmosphere medium at light and heavy density;
-11. flora coverage boundaries at 0, 7.99, 8, 21.99 and 22 percent;
-12. banned-register corpus;
-13. key-order and relaunch determinism;
-14. grammar-version migration preserving frozen old output.
+3. authored mark leaves exact visible output unchanged → no causal claim;
+4. authored mark strengthens an existing result → increased, never created, phrasing;
+5. one reshaping known mark → one causal fragment;
+6. two contributing known marks → stable page order;
+7. contributing unknown mark → omitted without meaning leak;
+8. hidden site/resource/traveller/apex mutation → identical string;
+9. every water classifier boundary;
+10. every ground token and malformed all-water failure;
+11. every atmosphere medium at light and heavy density;
+12. flora coverage boundaries at 0, 7.99, 8, 21.99 and 22 percent;
+13. banned-register corpus;
+14. key-order and relaunch determinism;
+15. grammar-version migration preserving frozen old output.
 
 ## Out of scope
 

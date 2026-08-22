@@ -62,11 +62,11 @@ entry-visible only, distant non-identifying silhouette, or explicitly authored W
 
 ## Generated description
 
-Exact deterministic selection, thresholds, causal-necessity rules, copy tables and prohibited register are
+Exact deterministic selection, thresholds, causal-contribution rules, copy tables and prohibited register are
 owned by `world-arrival-description-grammar-current.md`. The summary below is subordinate to that grammar.
 
 Generate exactly **two short sentences** in v1, 18–55 words total, from structured facts. The first sentence
-grounds the place; the second names either necessary known authorship or one material environmental
+grounds the place; the second names either contributing known authorship or one material environmental
 relationship. A third tension sentence is held until the two-sentence surface proves insufficient in play.
 
 ### Clause order
@@ -78,7 +78,7 @@ relationship. A third tension sentence is held until the two-sentence surface pr
 Examples of the intended register:
 
 > Low grassland spreads between shallow pools. Clear light reaches clustered silver-leaf growth along the
-> wet edges. The page left the deeper ground uncertain.
+> wet edges.
 
 > Broken stone shelves close around narrow paths. Warm ash hangs in still air, and sparse rosettes gather
 > wherever the floor opens.
@@ -89,10 +89,11 @@ evidence,” or “innocence.”
 
 ### Authored causality
 
-When a resolved fact was causally authored by a known mark, the description may use restrained causal
-wording: `Your Verdant mark drew clustered growth into the open ground.` Unknown marks never reveal their
-meaning. When a dimension was left open, say so only if the uncertainty affects preparation or is central
-to the reveal; do not list every random dimension.
+When a resolved fact was causally changed by a known mark, the description uses the frozen contribution
+kind: `reshaped`, `increased`, `reduced` or `none`. An increase may say `Your Verdant mark spread low growth
+farther`; it may not say the mark created or drew in a family that the same seed already supplied. Unknown
+marks never reveal their meaning. When a dimension was left open, say so only if the uncertainty affects
+preparation or is central to the reveal; do not list every random dimension.
 
 ### Starter receipt fixtures
 
@@ -102,12 +103,12 @@ receipt; changing Worldgen requires revalidating both the receipt and this copy.
 
 | Page | Frozen request | Disclosed description fixture |
 |---|---|---|
-| Open Flats | seed 67 · Plains + Verdant | Broad sandy ground runs between shallow pools. Your Plains mark opened the terrain, while your Verdant mark gathered low growth along the few wet and stony edges. |
+| Open Flats | seed 67 · Plains + Verdant | Broad sandy ground runs between shallow pools. Your Plains mark opened the terrain, while your Verdant mark spread low growth farther along the few wet and stony edges. |
 | Rainwashed Shore | seed 26 · Archipelago | Stone shelves break a wide run of shallow and deep water. Your Archipelago mark divided the route, while sparse growth settled on the open stone. |
-| Stone Hollow | seed 23 · Caverns + Ore | Stone closes around narrow paths and wet hollows. Your Caverns mark shaped the enclosure, while your Ore mark drew ore through it. |
+| Stone Hollow | seed 23 · Caverns + Ore | Stone closes around narrow paths and wet hollows. Your Caverns mark shaped the enclosure, while your Ore mark made ore more plentiful. |
 
 The image may depict the matching flora shapes but these descriptions do not name creature identities,
-resources other than the causally authored Ore relationship, hidden sites, portal locations or traveller
+resources other than the causally increased Ore relationship, hidden sites, portal locations or traveller
 candidates. None of the starter sites is visible merely because Worldgen placed it elsewhere on the map.
 
 ## Lifecycle and loading boundary
