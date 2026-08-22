@@ -74,20 +74,27 @@ reversible where play evidence may change quantity, cost, drop rate or UI arrang
 
 The first content pass should teach comparison through identity rather than prose:
 
-1. **Open Meadow** — `Plains + Verdant`; 12 charcoal cells; 21 Essence if copied by hand, **14** on
-   its pre-inscribed World Page. Calm, traversable, visibly living and modestly resourced.
+1. **Open Flats** — `Plains + Verdant`; 12 charcoal cells; 21 Essence if copied by hand, **14** on
+   its pre-inscribed World Page. Broad passable flats, low growth and shallow water with strong
+   continuation runway.
 2. **Rainwashed Shore** — `Archipelago`; 6 charcoal cells; 18 Essence if copied, **14** pre-inscribed.
    Water/relief contrast and a different route shape without opening lethality.
 3. **Stone Hollow** — `Caverns + Ore`; 10 charcoal cells; 22 Essence if copied, **16** pre-inscribed.
    Substrate/relief and ordinary ore, still within the accepted level-one combat envelope.
 
 Exact spatial layouts and frozen starter seeds are authored in `world-pages-authority.json`:
-Open Meadow uses seed 2, Rainwashed Shore seed 26 and Stone Hollow seed 23. Each sampled world has
-three ordinary encounters, guaranteed writing, 11–16 obtainable Raw Essence, no apex, full content
-reachability and at least 45 projected collapse turns. They were resampled after commit `51d5bee`
-corrected creature budgets, and the post-scaling evidence is recorded in `world-pages-authority.json`.
-Phone play remains the acceptance gate. The pages must not carry hidden bespoke
-enemy nerfs; the accepted Band-1 encounter envelope remains the only opening protection.
+Open Flats uses seed 67, Rainwashed Shore seed 26 and Stone Hollow seed 23. A live bridge revalidation
+on 21 August 2026 froze each page's terrain/flora receipt. Each has exactly three ordinary creatures,
+one piece of writing, 11–18 obtainable Raw Essence, no apex, no hostile flora, full passable-tile
+reachability and at least 644 projected collapse turns (Rainwashed Shore has no projected collapse).
+`python3 Scripts/validate_world_pages.py` checks the authored contract and
+`node Scripts/validate_starter_world_receipts.mjs` fails when current Worldgen no longer reproduces it.
+
+This replaces the old Open Meadow seed 2, which remained technically reachable but had become a mixed
+ash/stone/rubble world and no longer matched its title or opening promise. The stable definition ID remains
+`starter_open_meadow` for save compatibility; already frozen physical pages and History receipts retain
+their old title/seed, while newly granted pages use Open Flats. Phone play remains the acceptance gate. The
+pages carry no bespoke enemy nerfs; the accepted Band-1 encounter envelope is the only opening protection.
 
 ### Collected World Pages
 

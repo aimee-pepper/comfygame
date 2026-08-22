@@ -90,6 +90,22 @@ wording: `Your Verdant mark drew clustered growth into the open ground.` Unknown
 meaning. When a dimension was left open, say so only if the uncertainty affects preparation or is central
 to the reveal; do not list every random dimension.
 
+### Starter receipt fixtures
+
+These are exact expected outputs of the ordinary grammar for the three current-generator starter receipts,
+not hand-authored runtime exceptions. The same fact-selection and clause rules must produce them from the
+receipt; changing Worldgen requires revalidating both the receipt and this copy.
+
+| Page | Frozen request | Disclosed description fixture |
+|---|---|---|
+| Open Flats | seed 67 · Plains + Verdant | Broad sandy flats run between shallow pools. Your Plains mark opened the terrain, while Verdant gathered low growth along the few wet and stony edges. |
+| Rainwashed Shore | seed 26 · Archipelago | Stone shelves break a wide run of shallow and deep water. The Archipelago mark divided the route, while dull fungal growth settled on the larger islands. |
+| Stone Hollow | seed 23 · Caverns + Ore | Stone closes around narrow soil paths and wet hollows. Caverns shaped the enclosure, while Ore ran through it and pithy growth held to the open patches. |
+
+The image may depict the matching flora shapes but these descriptions do not name creature identities,
+resources other than the causally authored Ore relationship, hidden sites, portal locations or traveller
+candidates. None of the starter sites is visible merely because Worldgen placed it elsewhere on the map.
+
 ## Lifecycle and loading boundary
 
 App launch shows a separate correctly aligned functional loading surface. After selecting a save, load
@@ -102,7 +118,7 @@ Exit/return may reuse the scene with actual outcome treatment, but cannot rewrit
 
 ## Asset Design packet
 
-1. Open Meadow, Rainwashed Shore and Stone Hollow from their exact selected seeds, with image and concrete
+1. Open Flats, Rainwashed Shore and Stone Hollow from their exact selected seeds and receipt fixtures, with image and concrete
    generated-description region together at 368×800.
 2. One near-pair and one far-pair proving relative visual diversity.
 3. One ash/open-color world proving ash does not turn the world black.
@@ -116,7 +132,8 @@ Exit/return may reuse the scene with actual outcome treatment, but cannot rewrit
 1. Add pure frozen `WorldArrivalReceipt` adapter and persistence; no native visual promotion.
 2. Add rules-owned prose tokens/grammar with snapshot fixtures and prohibited-metaphor validation.
 3. Integrate accepted scene compositor from the frozen receipt in DEBUG and compare to map identities.
-4. Promote native arrival only after all three starter worlds pass ordinary-phone review.
+4. Promote native arrival only after all three starter worlds pass ordinary-phone review; the exact starter
+   validation gate is `node Scripts/validate_starter_world_receipts.mjs`.
 5. Add lifecycle resume/dismiss/return outcome tests.
 6. Keep site extension behind a separate named visual decision; do not block checkpoints 1–5.
 

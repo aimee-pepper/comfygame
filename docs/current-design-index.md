@@ -209,7 +209,7 @@ When two documents disagree:
 | Historical starting-town slice | `starting-town-band1-integration-current.md` | Superseded five-hotspot proposal retained for history only |
 | Party and character surface | `party-character-surface-current.md` | Five-person grid; Stats/Gear/Skills/Gambit; Diary deep-link; production graph entry |
 | Field consequence and pickup feedback | `field-feedback-and-loot-presentation-current.md` | Adjacent harm/slow cues, contextual Look and local 1.5-tile pickup fade |
-| World arrival causal reveal | `world-arrival-causal-reveal-current.md` | Frozen dynamic image plus concrete description; hidden-site-safe lifecycle |
+| World arrival causal reveal | `world-arrival-causal-reveal-current.md` + `world-arrival-asset-packet-current.md` | Frozen dynamic image plus concrete description; exact Asset compositor inputs, starter fixtures and hidden-site-safe lifecycle |
 | Maker-station screens | `maker-station-screen-grammar-current.md` | Shared recipe/profile grids, exact-object stock trays, persistent preview/commit flow and Blacksmith-first checkpoint |
 | Playtest UI corrections | `playtest-ui-corrections-current.md` | Party Stats-tab cleanup, minimap placement and disclosure boundary |
 | World Look / control occlusion | `world-look-and-control-occlusion-current.md` | Adjacent no-turn inspection and measured fixed-control scroll inset |

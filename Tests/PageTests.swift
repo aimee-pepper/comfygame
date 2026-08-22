@@ -360,10 +360,10 @@ final class PageTests: XCTestCase {
         XCTAssertEqual(definitions.map(\.id), ["starter_open_meadow", "starter_rainwashed_shore",
                                                 "starter_stone_hollow"])
         XCTAssertEqual(definitions.map(\.disposition), [.starterUnique, .starterUnique, .starterUnique])
-        XCTAssertEqual(definitions.map(\.seed), [2, 26, 23])
+        XCTAssertEqual(definitions.map(\.seed), [67, 26, 23])
         XCTAssertEqual(definitions.map(\.copiedCost), [21, 18, 22])
         XCTAssertEqual(definitions.map(\.worldPageCost), [14, 14, 16])
-        XCTAssertEqual(definitions.map(\.title), ["Open Meadow", "Rainwashed Shore", "Stone Hollow"])
+        XCTAssertEqual(definitions.map(\.title), ["Open Flats", "Rainwashed Shore", "Stone Hollow"])
         XCTAssertEqual(definitions.map(\.knownFind), ["field_maul", "bone_awl", "blade_chipped"])
         XCTAssertEqual(definitions.map(\.provenance), [
             "A clean practice page, already written in rough charcoal.",
@@ -371,7 +371,7 @@ final class PageTests: XCTestCase {
             "A clean practice page with charcoal rubbed into the grain."
         ])
         XCTAssertEqual(definitions.map(\.promise), [
-            "Open, living, modestly resourced and safe enough to learn the opening loop.",
+            "Broad passable flats, low growth and shallow water with three ordinary creatures and strong continuation runway.",
             "A readable water-and-relief contrast without an opening lethality spike.",
             "Stone, enclosure and ordinary ore within the accepted level-one envelope."
         ])

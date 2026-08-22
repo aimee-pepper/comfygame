@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "status": "designAuthority",
-  "updated": "14 Aug 2026",
+  "updated": "21 Aug 2026",
   "pageSize": { "width": 6, "height": 6 },
   "pricing": {
     "worldPageRule": "resolvedBookCostMinusCellInkCost",
@@ -20,7 +20,7 @@
   "definitions": [
     {
       "id": "starter_open_meadow",
-      "title": "Open Meadow",
+      "title": "Open Flats",
       "disposition": "starterUnique",
       "provenance": "A clean practice page, already written in rough charcoal.",
       "hand": "crude",
@@ -30,10 +30,30 @@
       ],
       "copiedCost": 21,
       "worldPageCost": 14,
-      "seed": 2,
-      "seedStatus": "sampledCandidate",
+      "seed": 67,
+      "seedStatus": "revalidatedCurrentGenerator",
+      "validationReceipt": {
+        "profile": "ordinary",
+        "terrain": {
+          "groundcover": 21,
+          "mud": 5,
+          "sand": 165,
+          "soil": 94,
+          "stone": 29,
+          "water": 10
+        },
+        "flora": { "pithy succulent": 21 },
+        "ordinaryCreatureCount": 3,
+        "apexCount": 0,
+        "hostileFloraCount": 0,
+        "writingCount": 1,
+        "rawEssenceObtainable": 18,
+        "projectedCollapseTurn": 644,
+        "passableTiles": 324,
+        "reachablePassableTiles": 324
+      },
       "knownFind": "field_maul",
-      "promise": "Open, living, modestly resourced and safe enough to learn the opening loop."
+      "promise": "Broad passable flats, low growth and shallow water with three ordinary creatures and strong continuation runway."
     },
     {
       "id": "starter_rainwashed_shore",
@@ -47,7 +67,29 @@
       "copiedCost": 18,
       "worldPageCost": 14,
       "seed": 26,
-      "seedStatus": "sampledCandidate",
+      "seedStatus": "revalidatedCurrentGenerator",
+      "validationReceipt": {
+        "profile": "ordinary",
+        "terrain": {
+          "deepWater": 23,
+          "groundcover": 21,
+          "mud": 9,
+          "rubble": 11,
+          "sand": 7,
+          "soil": 59,
+          "stone": 154,
+          "water": 40
+        },
+        "flora": { "dull fungal bloom": 21 },
+        "ordinaryCreatureCount": 3,
+        "apexCount": 0,
+        "hostileFloraCount": 0,
+        "writingCount": 1,
+        "rawEssenceObtainable": 11,
+        "projectedCollapseTurn": 9999,
+        "passableTiles": 301,
+        "reachablePassableTiles": 301
+      },
       "knownFind": "bone_awl",
       "promise": "A readable water-and-relief contrast without an opening lethality spike."
     },
@@ -64,7 +106,29 @@
       "copiedCost": 22,
       "worldPageCost": 16,
       "seed": 23,
-      "seedStatus": "sampledCandidate",
+      "seedStatus": "revalidatedCurrentGenerator",
+      "validationReceipt": {
+        "profile": "ordinary",
+        "terrain": {
+          "deepWater": 11,
+          "growth": 19,
+          "mud": 10,
+          "rubble": 16,
+          "sand": 20,
+          "soil": 62,
+          "stone": 147,
+          "water": 39
+        },
+        "flora": { "pithy succulent": 19 },
+        "ordinaryCreatureCount": 3,
+        "apexCount": 0,
+        "hostileFloraCount": 0,
+        "writingCount": 1,
+        "rawEssenceObtainable": 16,
+        "projectedCollapseTurn": 644,
+        "passableTiles": 313,
+        "reachablePassableTiles": 313
+      },
       "knownFind": "blade_chipped",
       "promise": "Stone, enclosure and ordinary ore within the accepted level-one envelope."
     },

@@ -49,7 +49,7 @@ final class LibraryTests: XCTestCase {
 
         XCTAssertEqual(record.worldPageUseReceipt, book.worldPageUseReceipt)
         XCTAssertEqual(record.worldPageUseReceipt?.instanceID, instance.id)
-        XCTAssertEqual(record.worldPageUseReceipt?.definition.title, "Open Meadow")
+        XCTAssertEqual(record.worldPageUseReceipt?.definition.title, "Open Flats")
         XCTAssertEqual(record.worldPageUseReceipt?.essencePaid, 14)
 
         let data = try SaveCodec.makeEncoder().encode(record)

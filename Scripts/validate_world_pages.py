@@ -119,8 +119,37 @@ def main() -> None:
     for starter in starters:
         if not isinstance(starter.get("seed"), int):
             errors.append(f"{starter['id']}: starter seed must be frozen as an integer")
-        if starter.get("seedStatus") != "sampledCandidate":
-            errors.append(f"{starter['id']}: starter seed lacks sampled-candidate receipt")
+        if starter.get("seedStatus") != "revalidatedCurrentGenerator":
+            errors.append(f"{starter['id']}: starter seed lacks current-generator receipt")
+        receipt = starter.get("validationReceipt")
+        if not isinstance(receipt, dict):
+            errors.append(f"{starter['id']}: starter lacks a structured validation receipt")
+        else:
+            required_receipt = {
+                "profile", "terrain", "flora", "ordinaryCreatureCount", "apexCount",
+                "hostileFloraCount", "writingCount", "rawEssenceObtainable",
+                "projectedCollapseTurn", "passableTiles", "reachablePassableTiles",
+            }
+            if set(receipt) != required_receipt:
+                errors.append(f"{starter['id']}: validation receipt fields are not exact")
+            if receipt.get("profile") != "ordinary":
+                errors.append(f"{starter['id']}: starter validation profile must be ordinary")
+            if not isinstance(receipt.get("terrain"), dict) or not receipt.get("terrain"):
+                errors.append(f"{starter['id']}: validation receipt lacks terrain counts")
+            if not isinstance(receipt.get("flora"), dict):
+                errors.append(f"{starter['id']}: validation receipt lacks flora counts")
+            if receipt.get("ordinaryCreatureCount") != 3:
+                errors.append(f"{starter['id']}: starter must freeze exactly three ordinary creatures")
+            if receipt.get("apexCount") != 0 or receipt.get("hostileFloraCount") != 0:
+                errors.append(f"{starter['id']}: starter receipt contains opening spike content")
+            if receipt.get("writingCount", 0) < 1:
+                errors.append(f"{starter['id']}: starter receipt lacks guaranteed writing")
+            if receipt.get("rawEssenceObtainable", 0) < 10:
+                errors.append(f"{starter['id']}: starter receipt lacks continuation Essence")
+            if receipt.get("projectedCollapseTurn", 0) < 45:
+                errors.append(f"{starter['id']}: starter receipt lacks collapse runway")
+            if receipt.get("passableTiles") != receipt.get("reachablePassableTiles"):
+                errors.append(f"{starter['id']}: not every passable tile is reachable")
         if any(symbols[mark["id"]]["acquisition"] != "starter" for mark in starter["symbols"]):
             errors.append(f"{starter['id']}: starter page contains non-starter vocabulary")
 
@@ -129,7 +158,7 @@ def main() -> None:
 
     print(
         f"World Page authority valid: {len(definition_ids)} definitions, "
-        f"{len(starters)} sampled starters, {width}x{height} layouts."
+        f"{len(starters)} current-generator starters, {width}x{height} layouts."
     )
 
 

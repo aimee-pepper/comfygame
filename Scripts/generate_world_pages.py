@@ -45,8 +45,10 @@ def load_and_validate() -> tuple[dict, list[dict], list[dict], str]:
         missing = required - entry.keys()
         if missing:
             fail(f"{entry.get('id')} missing fields: {sorted(missing)}")
-        if entry["seedStatus"] != "sampledCandidate" or entry["hand"] != "crude":
-            fail(f"{entry['id']} must be a sampledCandidate written in crude hand")
+        if entry["seedStatus"] != "revalidatedCurrentGenerator" or entry["hand"] != "crude":
+            fail(f"{entry['id']} must have a current-generator receipt and use crude hand")
+        if not isinstance(entry.get("validationReceipt"), dict):
+            fail(f"{entry['id']} must include its structured validation receipt")
         if not isinstance(entry["knownFind"], str) or not entry["knownFind"]:
             fail(f"{entry['id']} must name one known find")
         if not all(isinstance(entry[key], str) and entry[key] for key in

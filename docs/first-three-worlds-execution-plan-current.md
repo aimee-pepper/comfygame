@@ -184,7 +184,7 @@ spoiling it.
 grammar from exact disclosed facts. Validate prohibited riddle register and no unknown-mark/site/entity leak.
 No visual promotion yet.
 
-**Pass:** Open Meadow, Rainwashed Shore, Stone Hollow; near/far world pairs; relaunch identity; unknown mark;
+**Pass:** Open Flats, Rainwashed Shore, Stone Hollow; near/far world pairs; relaunch identity; unknown mark;
 hidden site/apex/resource; missing optional fact.
 
 ### B4 · Native dynamic arrival reveal
@@ -192,7 +192,8 @@ hidden site/apex/resource; missing optional fact.
 **Player result:** dynamic generated image plus concrete description visibly connects the written page to the
 map before exploration.
 
-**Asset:** exact B3 receipt adapter into accepted lifecycle-splash grammar. Prove the three starter seeds,
+**Asset:** exact B3 receipt adapter into accepted lifecycle-splash grammar. Prove the three starter seeds
+(Open Flats 67, Rainwashed Shore 26, Stone Hollow 23),
 near/far pairs, first-map continuity and the still-open entry-visible-site candidate. Site candidate is a
 review pin; base v1 cannot reveal a hidden site and does not wait on this decision.
 

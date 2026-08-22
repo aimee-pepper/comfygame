@@ -772,7 +772,7 @@ struct WorldPageUseReceipt: Codable, Equatable, Sendable {
 
 enum WorldPageCatalog {
     // BEGIN GENERATED STARTER WORLD PAGES — Scripts/generate_world_pages.py
-    static let authoritySHA256 = "4190cd068463d3f5954d387987c726371da45c4989dbee149e686393045aa320"
+    static let authoritySHA256 = "c1e53cde4b5574f9bc8a7aa0f5132a6f18ef23e330423eb9ba8ddfd34f361395"
     static let openMeadowID: WorldPageDefinitionID = "starter_open_meadow"
     static let rainwashedShoreID: WorldPageDefinitionID = "starter_rainwashed_shore"
     static let stoneHollowID: WorldPageDefinitionID = "starter_stone_hollow"
@@ -787,12 +787,12 @@ enum WorldPageCatalog {
     ).map { WorldPageInstance(id: $0.0, definition: $0.1) }
 
     static let starterDefinitions: [WorldPageDefinition] = [
-        definition(id: openMeadowID, title: "Open Meadow",
+        definition(id: openMeadowID, title: "Open Flats",
                    provenance: "A clean practice page, already written in rough charcoal.",
                    marks: [("plains", 1, "crude_smear", 0, 0),
                            ("verdant", 2, "crude_smear", 3, 3)],
-                   copiedCost: 21, worldPageCost: 14, seed: 2, knownFind: "field_maul",
-                   promise: "Open, living, modestly resourced and safe enough to learn the opening loop."),
+                   copiedCost: 21, worldPageCost: 14, seed: 67, knownFind: "field_maul",
+                   promise: "Broad passable flats, low growth and shallow water with three ordinary creatures and strong continuation runway."),
         definition(id: rainwashedShoreID, title: "Rainwashed Shore",
                    provenance: "A clean practice page with one broad charcoal mark.",
                    marks: [("archipelago", 1, "crude_smear", 1, 2)],
