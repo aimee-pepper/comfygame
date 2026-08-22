@@ -1,9 +1,9 @@
 {
   "schemaVersion": 1,
-  "aggregateSourceHash": "30b8882b4f2ed272d17ae2c7cac800c1d455422c890d78f3448b4721e8c468a6",
+  "aggregateSourceHash": "9713eca04193be71a8fc9a8614433096de2b6049798b51b5bfa1e76e5f94a8c3",
   "inputs": {
     "Sources/Content/Data/items.json": "b94b1107229f217e14f1d7fa936d8eea938f9782c06c583be32302f10d432bc9",
-    "Sources/Content/Data/playability-roadmap.json": "eb70d1ae6ecdb787ca6bf648ccde230cb01328abbe0b155807c801d49bf38606",
+    "Sources/Content/Data/playability-roadmap.json": "eccf735dbca558024f9825fd59dd68666bd8daa799eb994c5b023414b94cecfd",
     "Sources/Content/Data/resources.json": "8eee965ce7df075abfe3f646bb36d416a10ef1d7d194845e30fa0f31b7b23e6f",
     "Sources/Content/Data/stations.json": "21b5e9f3bee2d9115acf535ef2ff1db350b87b8ee33755e79a3b3e4584102e2b",
     "Sources/Content/Data/symbols.json": "c1ec5dd7b661680b358e21a56124b6080aa28d93db51fd2f6b80214ced1dcb16",
@@ -287,7 +287,7 @@
     "docs/writing-tool-progression-current.md": "be17fe07aa89aaaab7117a2faca43d7e1eb1be23202d19106c67c42547b23bb0"
   },
   "outputs": {
-    "generated/wiki-data.json": "662a0fc46a03cbe95a8776fdfb537e799ea076641db7844245abfc3af8e9c08f",
-    "generated/source-registry.json": "790e97c4eaa7e218bf7dfe1d9e17e68fbe5e88e6052c43a8957d801bccb5160e"
+    "generated/wiki-data.json": "7c1af42d8f32b1c83915d4dd940411f8c47de627d287855e940fd72c73e18603",
+    "generated/source-registry.json": "8e0917bf47d099c126bfaeeddbfff97f127a02d93914cf01eb11f8c416bed834"
   }
 }

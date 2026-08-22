@@ -497,11 +497,11 @@
       "id": "encounter-scaling",
       "priority": "B1.3",
       "title": "Party and apex difficulty",
-      "status": "inProgress",
-      "detail": "Finish deterministic source implementation and observability for Normal, Teeming, party-size, uneven-level and apex scaling. Phone feel/balance acceptance is deliberately nonblocking: after the source/test checkpoint is green with no known mathematically unwinnable intended-Normal generation, mark this readyToTest and advance even if Aimee is not currently testing combat. Teeming remains an intentionally overwhelming disclosed profile.",
-      "gate": "Freeze truthful receipts and pass automated/simulator matrices for fresh Binder+Quill Normal, sequential contacts, Teeming disclosure, party sizes 2/3/5, uneven levels and apexes; build/tests green and no known P0 source defect. Then release the primary flag and retain the ordinary-phone 2–4-round/5–20%-HP target as a deferred acceptance card that may reopen tuning later.",
+      "status": "readyToTest",
+      "detail": "Source and deterministic matrix closure is complete through 1465533 and verified on current main: frozen Normal/Teeming receipts, sequential contacts, party sizes 1–5, uneven levels, apexes, deterministic combat, retreat and acceptance-integrity all pass. The intended-Normal six-seed matrix remains victorious in 2–4 rounds with 6–11 of 54 aggregate HP spent; no known source P0 remains. Teeming remains an intentionally overwhelming disclosed profile.",
+      "gate": "Nonblocking ordinary-phone acceptance remains: review fresh Binder+Quill and the saved progression matrix for feel, including the 2–4-round/5–20%-HP Normal target. A later measured phone result may reopen tuning, but it does not block Engineering progression; no install is implied by this source checkpoint.",
       "workstream": "engineering",
-      "isPrimary": true
+      "isPrimary": false
     },
     {
       "id": "item-character-identities",

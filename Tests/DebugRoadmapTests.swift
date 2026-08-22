@@ -12,7 +12,7 @@ final class DebugRoadmapTests: XCTestCase {
         XCTAssertEqual(Set(board.items.map(\.id)).count, board.items.count,
                        "roadmap item IDs must remain stable and unique")
         XCTAssertTrue(board.validationErrors().isEmpty)
-        XCTAssertTrue(board.currentItems.contains { $0.id == "encounter-scaling" })
+        XCTAssertEqual(board.items.first { $0.id == "encounter-scaling" }?.status, .readyToTest)
         XCTAssertFalse(board.currentItems.contains { $0.id == "item-character-identities" },
                        "a source-complete Asset checkpoint is not active work")
         XCTAssertEqual(board.campaignBands.first?.id, "band-0")
@@ -56,14 +56,14 @@ final class DebugRoadmapTests: XCTestCase {
             let item = try XCTUnwrap(byID[id])
             XCTAssertEqual(item.status, .readyToTest,
                            "\(id) is committed and awaits ordinary-phone acceptance")
-            XCTAssertFalse(item.isPrimary, "\(id) must not displace encounter scaling")
+            XCTAssertFalse(item.isPrimary, "\(id) must not become an Engineering primary")
         }
     }
 
     func testScentMaskAwaitsHonestPhoneAcceptance() throws {
         let item = try XCTUnwrap(DebugRoadmap.current.items.first { $0.id == "scent-mask" })
         XCTAssertEqual(item.status, .readyToTest)
-        XCTAssertFalse(item.isPrimary, "Scent Mask must not displace encounter scaling")
+        XCTAssertFalse(item.isPrimary, "Scent Mask must not become an Engineering primary")
         for checkpoint in ["7772df0", "5e5aa14", "2ced55a", "543ddfe"] {
             XCTAssertTrue(item.detail.contains(checkpoint), "missing Scent Mask evidence \(checkpoint)")
         }
@@ -109,8 +109,8 @@ final class DebugRoadmapTests: XCTestCase {
     func testCurrentBoardParksWholeTreeAndOrdersScalingBeforeOpeningNodes() throws {
         let board = DebugRoadmap.current
         let byID = Dictionary(uniqueKeysWithValues: board.items.map { ($0.id, $0) })
-        XCTAssertEqual(try XCTUnwrap(byID["encounter-scaling"]).status, .inProgress)
-        XCTAssertTrue(try XCTUnwrap(byID["encounter-scaling"]).isPrimary)
+        XCTAssertEqual(try XCTUnwrap(byID["encounter-scaling"]).status, .readyToTest)
+        XCTAssertFalse(try XCTUnwrap(byID["encounter-scaling"]).isPrimary)
         let opening = try XCTUnwrap(byID["combat-tree-opening-choices"])
         XCTAssertEqual(opening.status, .readyToTest)
         XCTAssertFalse(opening.isPrimary)
@@ -140,12 +140,13 @@ final class DebugRoadmapTests: XCTestCase {
         XCTAssertTrue(item.gate.contains("miniature Tavern"))
     }
 
-    func testCurrentBoardHasAtMostOnePrimaryPerWorkstreamAndScalingSolelyOwnsEngineering() {
+    func testCurrentBoardHasAtMostOnePrimaryPerWorkstreamAndClosedScalingReleasesEngineering() {
         let board = DebugRoadmap.current
         let primaries = Dictionary(grouping: board.items.filter(\.isPrimary), by: \.workstream)
         XCTAssertTrue(primaries.values.allSatisfy { $0.count <= 1 },
                       "each workstream may disclose at most one primary")
-        XCTAssertEqual(primaries[.engineering]?.map(\.id), ["encounter-scaling"])
+        XCTAssertNil(primaries[.engineering],
+                     "source-complete scaling must release the Engineering primary")
         XCTAssertNil(primaries[.acceptance],
                      "phone-feel acceptance must not remain a blocking primary")
     }
@@ -154,16 +155,15 @@ final class DebugRoadmapTests: XCTestCase {
         let scaling = try XCTUnwrap(DebugRoadmap.current.items.first {
             $0.id == "encounter-scaling"
         })
-        XCTAssertEqual(scaling.status, .inProgress)
+        XCTAssertEqual(scaling.status, .readyToTest)
         XCTAssertEqual(scaling.workstream, .engineering)
-        XCTAssertTrue(scaling.isPrimary)
-        XCTAssertTrue(scaling.detail.contains("deterministic source implementation"))
-        XCTAssertTrue(scaling.detail.contains("Phone feel/balance acceptance is deliberately nonblocking"))
+        XCTAssertFalse(scaling.isPrimary)
+        XCTAssertTrue(scaling.detail.contains("Source and deterministic matrix closure is complete"))
+        XCTAssertTrue(scaling.detail.contains("no known source P0 remains"))
         XCTAssertTrue(scaling.detail.contains("Teeming remains an intentionally overwhelming disclosed profile"))
-        XCTAssertTrue(scaling.gate.contains("automated/simulator matrices"))
-        XCTAssertTrue(scaling.gate.contains("party sizes 2/3/5"))
-        XCTAssertTrue(scaling.gate.contains("no known P0 source defect"))
-        XCTAssertTrue(scaling.gate.contains("deferred acceptance card"))
+        XCTAssertTrue(scaling.gate.contains("Nonblocking ordinary-phone acceptance"))
+        XCTAssertTrue(scaling.gate.contains("2–4-round/5–20%-HP Normal target"))
+        XCTAssertTrue(scaling.gate.contains("does not block Engineering progression"))
     }
 
     func testWorldPageWorkFollowsReachabilityAndDoesNotPreemptScaling() throws {
