@@ -103,6 +103,64 @@ final class PageTests: XCTestCase {
     }
 
     @MainActor
+    func testNewBindFreezesOneArrivalReceiptAcrossRunPendingAndHistory() throws {
+        let store = GameStore(io: .temporary(name: "arrival-receipt-\(UUID().uuidString)"))
+        let earth = WorldPageCatalog.earthlikeTestInstance
+        XCTAssertTrue(store.bindAndDepart(worldPageInstanceID: earth.id))
+
+        let runReceipt = try XCTUnwrap(store.activeRun?.worldArrivalReceipt)
+        XCTAssertEqual(store.state.worlds.pendingWorldArrivalReceiptID, runReceipt.id)
+        XCTAssertEqual(store.state.worlds.pendingWorldArrivalReceipt, runReceipt)
+        XCTAssertEqual(store.state.reality.library.visitedWorlds.last?.worldArrivalReceipt,
+                       runReceipt)
+        XCTAssertEqual(runReceipt.generationSeed, earth.definition.seed)
+        XCTAssertEqual(runReceipt.sourcePagePhysicalReceipt.marks.count,
+                       earth.definition.page.runes.count)
+        XCTAssertFalse(String(describing: runReceipt.sourcePagePhysicalReceipt)
+            .contains("MarkContent"))
+        XCTAssertEqual(runReceipt.finalDescription.filter { ".!?".contains($0) }.count, 2)
+        let wordCount = runReceipt.finalDescription.split(whereSeparator: \.isWhitespace).count
+        XCTAssertTrue((18...55).contains(wordCount), runReceipt.finalDescription)
+
+        let worldsRoundTrip = try JSONDecoder().decode(
+            WorldsState.self, from: JSONEncoder().encode(store.state.worlds))
+        XCTAssertEqual(worldsRoundTrip.activeRun?.worldArrivalReceipt, runReceipt)
+        XCTAssertEqual(worldsRoundTrip.pendingWorldArrivalReceiptID, runReceipt.id)
+
+        let positionBeforeEnter = try XCTUnwrap(store.activeRun?.playerPosition)
+        let turnBeforeEnter = try XCTUnwrap(store.activeRun?.turnsTaken)
+        if let adjacent = store.activeRun?.map.neighbours(of: positionBeforeEnter).first {
+            store.step(to: adjacent)
+            XCTAssertEqual(store.activeRun?.playerPosition, positionBeforeEnter)
+            XCTAssertEqual(store.activeRun?.turnsTaken, turnBeforeEnter)
+        }
+
+        XCTAssertTrue(store.enterPendingWorld(arrivalReceiptID: runReceipt.id))
+        XCTAssertNil(store.state.worlds.pendingWorldArrivalReceiptID)
+        XCTAssertEqual(store.activeRun?.worldArrivalReceipt, runReceipt)
+        XCTAssertEqual(store.state.reality.library.visitedWorlds.last?.worldArrivalReceipt,
+                       runReceipt)
+        XCTAssertFalse(store.enterPendingWorld(arrivalReceiptID: runReceipt.id),
+                       "double dismissal must be a typed no-op")
+
+        let orphan = WorldArrivalReceiptID(rawValue: "orphan")
+        store.mutate("stage orphan arrival ID") {
+            $0.worlds.pendingWorldArrivalReceiptID = orphan
+        }
+        XCTAssertFalse(store.enterPendingWorld(arrivalReceiptID: orphan))
+        XCTAssertNil(store.state.worlds.pendingWorldArrivalReceiptID)
+    }
+
+    func testLegacyAndOrphanArrivalStateDecodeWithoutInventingAReveal() throws {
+        var seeds = SeedSequence.newGame()
+        let legacy = WorldsState.newGame(seeds: &seeds)
+        let decoded = try JSONDecoder().decode(WorldsState.self,
+                                               from: JSONEncoder().encode(legacy))
+        XCTAssertNil(decoded.pendingWorldArrivalReceiptID)
+        XCTAssertNil(decoded.pendingWorldArrivalReceipt)
+    }
+
+    @MainActor
     func testBand2TemplatesPhoneFixtureRelaunchesNearCapWithDirtyLegalDraftAndStableIDs() throws {
         let fixture = try GameStore.makeBand2TemplatesPhoneFixture()
         let receipt = fixture.receipt

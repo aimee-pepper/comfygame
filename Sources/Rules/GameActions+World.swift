@@ -414,7 +414,8 @@ extension GameStore {
 
     /// A single step onto an adjacent tile.
     func step(to point: GridPoint) {
-        guard activeRun?.activeEncounter == nil else { return }
+        guard state.worlds.pendingWorldArrivalReceipt == nil,
+              activeRun?.activeEncounter == nil else { return }
         var events: [WorldRules.Event] = []
         mutate("step") { state in
             events = WorldRules.step(to: point, in: &state)
@@ -655,6 +656,7 @@ extension GameStore {
                 state.worlds.lastSpringOutcomeID = outcomeID
             }
             state.worlds.activeRun = nil
+            state.worlds.pendingWorldArrivalReceiptID = nil
             let subsidy = GameStore.applyDepartureSubsidy(in: &state)
             state.worlds.lastExit = GameStore.makeReturnReceipt(
                 run: run, outcomeID: outcomeID, kind: kind, reason: reason, fraction: 1,
@@ -693,6 +695,7 @@ extension GameStore {
                 state.worlds.lastSpringOutcomeID = outcomeID
             }
             state.worlds.activeRun = nil
+            state.worlds.pendingWorldArrivalReceiptID = nil
             let subsidy = GameStore.applyDepartureSubsidy(in: &state)
             state.worlds.lastExit = GameStore.makeReturnReceipt(
                 run: run, outcomeID: outcomeID, kind: kind, reason: reason, fraction: fraction,

@@ -15,6 +15,8 @@ struct WorldsState: Codable, Equatable, Sendable {
     /// The run in progress, or `nil` when the player is at base. Saving this whole struct is what
     /// makes "force-quit mid-run, even mid-encounter" resume exactly (pillar 2).
     var activeRun: WorldRun?
+    /// Matching arrival reveal still awaiting the player's zero-turn Enter action.
+    var pendingWorldArrivalReceiptID: WorldArrivalReceiptID?
     /// Monotonic run counter. Stamps discovery records — a turn/run count, never a date.
     var runIndex: Int = 0
     /// Monotonic receipt source for completed expeditions. Never derived from a world's identity.
@@ -43,14 +45,22 @@ struct WorldsState: Codable, Equatable, Sendable {
 
     var isInRun: Bool { activeRun != nil }
 
+    var pendingWorldArrivalReceipt: WorldArrivalReceipt? {
+        guard let receipt = activeRun?.worldArrivalReceipt,
+              pendingWorldArrivalReceiptID == receipt.id else { return nil }
+        return receipt
+    }
+
     init(activeRun: WorldRun?, runIndex: Int, seeds: SeedSequence, lastExit: RunExitSummary? = nil,
          anchoredRealms: [AnchoredRealm] = [], pendingAnchorSettlement: Bool = false,
+         pendingWorldArrivalReceiptID: WorldArrivalReceiptID? = nil,
          outcomeSequence: UInt64 = 0,
          pendingAnchorSettlementOutcomeID: ExpeditionOutcomeID? = nil,
          lastSpringOutcomeID: ExpeditionOutcomeID? = nil,
          randomWorldPageDrought: Int = 0,
          worldPageBankedOutcomeIDs: Set<ExpeditionOutcomeID> = []) {
         self.activeRun = activeRun
+        self.pendingWorldArrivalReceiptID = pendingWorldArrivalReceiptID
         self.runIndex = runIndex
         self.outcomeSequence = outcomeSequence
         self.seeds = seeds
@@ -66,6 +76,11 @@ struct WorldsState: Codable, Equatable, Sendable {
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         activeRun = try container.decodeIfPresent(WorldRun.self, forKey: .activeRun)
+        pendingWorldArrivalReceiptID = try container.decodeIfPresent(
+            WorldArrivalReceiptID.self, forKey: .pendingWorldArrivalReceiptID)
+        if pendingWorldArrivalReceiptID != activeRun?.worldArrivalReceipt?.id {
+            pendingWorldArrivalReceiptID = nil
+        }
         runIndex = try container.decodeIfPresent(Int.self, forKey: .runIndex) ?? 0
         outcomeSequence = try container.decodeIfPresent(UInt64.self, forKey: .outcomeSequence) ?? 0
         seeds = try container.decodeIfPresent(SeedSequence.self, forKey: .seeds) ?? SeedSequence.newGame()
@@ -795,6 +810,8 @@ struct WorldRun: Codable, Equatable, Sendable {
     /// Optional frozen visual receipt for the accepted world-grade-2 renderer. Worlds bound
     /// before that contract omit it and retain the v1 appearance; it is never inferred on load.
     var worldVisualReceipt: WorldVisualReceipt?
+    /// Frozen arrival facts and prose. Legacy runs omit this and never synthesize a reveal.
+    var worldArrivalReceipt: WorldArrivalReceipt?
     var generationDiagnostics: WorldGenerationDiagnostics
     /// The resolved Cycle pressure made operational. Stored with the run so phase scheduling is
     /// deterministic across saves and anchored revisits, while old runs can preserve their phase
@@ -990,13 +1007,15 @@ struct WorldRun: Codable, Equatable, Sendable {
          resolvedStabilityScore: Int? = nil,
          generationDiagnostics: WorldGenerationDiagnostics = WorldGenerationDiagnostics(),
          tuning: DebugTuningProfile = .defaults,
-         worldVisualReceipt: WorldVisualReceipt? = nil) {
+         worldVisualReceipt: WorldVisualReceipt? = nil,
+         worldArrivalReceipt: WorldArrivalReceipt? = nil) {
         self.runIndex = runIndex
         self.book = book
         self.mapSeed = mapSeed
         self.rng = rng
         self.tuning = tuning
         self.worldVisualReceipt = worldVisualReceipt
+        self.worldArrivalReceipt = worldArrivalReceipt
         self.generationDiagnostics = generationDiagnostics
         self.clock = WorldClock(book: book, seed: mapSeed)
         self.map = map
@@ -1079,6 +1098,8 @@ struct WorldRun: Codable, Equatable, Sendable {
         worldVisualReceipt = try container.decodeIfPresent(WorldVisualReceipt.self,
                                                             forKey: .worldVisualReceipt)
         try worldVisualReceipt?.validate()
+        worldArrivalReceipt = try container.decodeIfPresent(WorldArrivalReceipt.self,
+                                                             forKey: .worldArrivalReceipt)
         generationDiagnostics = try container.decodeIfPresent(WorldGenerationDiagnostics.self,
                                                                 forKey: .generationDiagnostics)
             ?? WorldGenerationDiagnostics()

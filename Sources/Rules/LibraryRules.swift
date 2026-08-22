@@ -439,7 +439,8 @@ enum LibraryRules {
     /// can't see at the time and most wants to read later.
     static func record(book: BoundBook, page: Page, seed: UInt64, runIndex: Int,
                        travellers: [TravellerID],
-                       worldVisualReceipt: WorldVisualReceipt? = nil) -> VisitedWorld {
+                       worldVisualReceipt: WorldVisualReceipt? = nil,
+                       worldArrivalReceipt: WorldArrivalReceipt? = nil) -> VisitedWorld {
         let sigils = BookRules.sigils(for: book)
         let written = Set(sigils.map(\.target))
         let readings = BookRules.readings(for: book, seed: seed)
@@ -486,6 +487,7 @@ enum LibraryRules {
             semanticRequests: TutorialRules.semanticRequests(on: page),
             bindEssencePaid: book.essencePaid,
             worldVisualReceipt: worldVisualReceipt,
+            worldArrivalReceipt: worldArrivalReceipt,
             worldPageUseReceipt: book.worldPageUseReceipt
         )
         record.livingAnalysis = LivingAnalysisRules.analyze(readings)

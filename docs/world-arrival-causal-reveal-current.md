@@ -30,6 +30,46 @@ relaunch. It contains, by stable ID/value rather than display text:
 The splash consumes no new RNG and cannot select facts by rerunning Worldgen. If a field is absent or
 unknown, omit its layer/sentence clause rather than substituting an invented generic fact.
 
+### Exact persisted receipt
+
+The v1 persisted object freezes:
+
+```text
+WorldArrivalReceipt
+  schemaVersion
+  receiptID
+  runIndex + generationSeed
+  sourcePagePhysicalReceipt
+  visualReceiptID + visualSchemaVersion
+  dominantGround + waterRelationship + materialDescriptor
+  illumination
+  suspendedAtmosphere?
+  precipitation?
+  flora[]
+  causalVisualFacts[]
+  entryDisclosure?
+  firstMapCropReceipt
+  descriptionGrammarVersion
+  finalDescription
+  sceneCompositorVersion
+```
+
+`receiptID` is a deterministic stable hash/typed identity over the run, source-page revision/definition,
+generation seed and receipt schema; it is not another RNG draw. `finalDescription` is frozen beside the
+structured facts so later copy-table or catalogue changes cannot rewrite what the player actually saw.
+Versions are persisted independently: schema migration, prose grammar and scene compositor are not treated
+as one global version.
+
+`sourcePagePhysicalReceipt` contains only page dimensions, mark instance ID, opaque visual-asset key, Hand,
+origin/cells/shape, authored ink, link endpoints and whether the mark was readable at bind. It cannot contain
+`MarkContent`, `Sigil`, personal-compound expansion or a hidden semantic ID exposed as copy. The receipt may
+freeze the legitimately visible page title and mark label/`??` exactly as shown at bind. Later Dictionary
+learning does not retroactively change this historical arrival.
+
+The exact same receipt identity and byte-equivalent object is stored on the active `WorldRun` and its
+immutable Library History record. One side may not regenerate or summarize the other. The run is the live
+presentation owner; History is the permanent provenance owner after the run ends.
+
 ## Dynamic image
 
 Use the accepted framed book-illustration/tableau composition and the same canonical asset identities as
@@ -120,6 +160,33 @@ ready; it cannot conceal unbounded work behind a fake completed bar.
 Dismissal enters the exact saved map. Relaunch during the reveal reproduces it; relaunch after dismissal
 does not force it again unless current lifecycle authority explicitly resumes the pending transition.
 Exit/return may reuse the scene with actual outcome treatment, but cannot rewrite entry history.
+
+### Pending-reveal state machine
+
+`WorldsState` stores an optional typed `pendingWorldArrivalReceiptID`, not a free Boolean and not a second
+receipt copy.
+
+| Current state | Result |
+|---|---|
+| successful new draft/Collected bind | active run, History and pending ID are committed atomically |
+| Born anchored new bind | same new-world reveal behavior; anchoring does not skip it |
+| anchored-realm revisit | no new v1 arrival reveal; the saved realm is not rebound or regenerated |
+| app killed before **Enter world** | matching pending receipt appears again on relaunch |
+| **Enter world** succeeds | clear only the matching pending ID, then show the already-saved map |
+| app killed after dismissal | active map resumes; arrival does not replay |
+| double dismissal / stale UI action | idempotent no-op after the first matching clear |
+| pending ID does not match the active run receipt | clear/reconcile the orphan; never show another run's receipt |
+| return/defeat state has no active run | clear any orphaned pending ID; History receipt remains immutable |
+| legacy active run decodes with no arrival receipt | preserve the run and enter its map; do not invent or replay an arrival |
+
+World movement/use/combat actions are unavailable while the matching reveal owns the root presentation;
+**Enter world** is the only action that dismisses it. Dismissal spends no world turn and mutates no map,
+receipt, History, RNG, page or resource. It only clears the matching pending ID in a flushed save mutation.
+
+The legacy decode policy deliberately prefers a missing reveal over reconstructing one from a map the player
+may already have explored or collapsed. New binds always require the complete receipt. A future schema that
+cannot decode a new receipt follows the explicit save-version policy; it never falls back to plausible art or
+new prose under an old receipt ID.
 
 ## Asset Design packet
 

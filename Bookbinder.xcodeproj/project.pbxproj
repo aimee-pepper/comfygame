@@ -161,6 +161,7 @@
 		775AE6000342CB171692D813 /* CombatActionOwnershipRules.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA1B15D9DC143422A9003F7B /* CombatActionOwnershipRules.swift */; };
 		776E19C048AB14D539E2ABC3 /* BookProjection.swift in Sources */ = {isa = PBXBuildFile; fileRef = B022088C9636578892397C50 /* BookProjection.swift */; };
 		A15A5A001A5A5A001A5A5A00 /* WritingDeskReviewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A15A5A011A5A5A011A5A5A01 /* WritingDeskReviewModel.swift */; };
+		A16A6A001A6A6A001A6A6A00 /* WorldArrivalReceipt.swift in Sources */ = {isa = PBXBuildFile; fileRef = A16A6A011A6A6A011A6A6A01 /* WorldArrivalReceipt.swift */; };
 		783A945A7FB200C6BBF03CFA /* CatalogueItemVisualAdapter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 193E41B61927927E78865C30 /* CatalogueItemVisualAdapter.swift */; };
 		7B005A0A9F5BCD6EA2A4E072 /* SaveSlotCatalogue.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D7771DA99D436A50C77B512 /* SaveSlotCatalogue.swift */; };
 		7C72DAD4C55C0D916064E912 /* ContradictionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F43DADDF1091E89318A12B0D /* ContradictionTests.swift */; };
@@ -509,6 +510,7 @@
 		AF9F316970B5ECF902615BC3 /* FloraRules.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FloraRules.swift; sourceTree = "<group>"; };
 		B022088C9636578892397C50 /* BookProjection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookProjection.swift; sourceTree = "<group>"; };
 		A15A5A011A5A5A011A5A5A01 /* WritingDeskReviewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WritingDeskReviewModel.swift; sourceTree = "<group>"; };
+		A16A6A011A6A6A011A6A6A01 /* WorldArrivalReceipt.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorldArrivalReceipt.swift; sourceTree = "<group>"; };
 		B07ACB016173BA0637D5B85C /* SaveSlotTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SaveSlotTests.swift; sourceTree = "<group>"; };
 		B213D165D2239B2A934DB263 /* CombatTreeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CombatTreeView.swift; sourceTree = "<group>"; };
 		B23878A2219B30C376009246 /* PressuresDriveGenerationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PressuresDriveGenerationTests.swift; sourceTree = "<group>"; };
@@ -826,6 +828,7 @@
 				7B20DAF90C2684826A3C3F21 /* WorldMap.swift */,
 				4FF0BDCB9C9FD9D726EB1BA9 /* WorldsState.swift */,
 				249A4AAED67D3F96D5B91988 /* WorldVisualReceipt.swift */,
+				A16A6A011A6A6A011A6A6A01 /* WorldArrivalReceipt.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -1373,6 +1376,7 @@
 				I10000000000000000000001 /* WorldVisibilityRules.swift in Sources */,
 				635C2692AD380102590270C3 /* WorldView.swift in Sources */,
 				F7A590456D85D35640519E0C /* WorldVisualReceipt.swift in Sources */,
+				A16A6A001A6A6A001A6A6A00 /* WorldArrivalReceipt.swift in Sources */,
 				56C2C67D2033B74FFD18EE24 /* Worldgen.swift in Sources */,
 				3F6C7DB75723783F90E7E5F8 /* WorldsState.swift in Sources */,
 				3E24E2D2D2BEAD60ADE93D0A /* WritingDeskView.swift in Sources */,

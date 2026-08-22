@@ -974,6 +974,11 @@ extension GameStore {
             return false
         }
         let anchorPremium = stagedBindQuote.anchorageReceipt.premium
+        guard let reviewModel = writingDeskReviewModel(
+            selectedWorldPageID: worldPageInstanceID, bornAnchored: bornAnchored) else {
+            bindError = "The binding changed before departure. Nothing was spent."
+            return false
+        }
 
         // Build the complete world and its immutable visual authority before the commitment
         // mutation. A bad future adapter/schema can therefore spend no Essence, consume no seed,
@@ -1030,6 +1035,14 @@ extension GameStore {
 #endif
             return false
         }
+        let arrivalReceipt = WorldArrivalReceiptFactory.make(
+            runIndex: state.worlds.runIndex + 1,
+            generationSeed: generationSeed,
+            source: reviewModel,
+            book: book,
+            map: world.map,
+            flora: world.flora,
+            visualReceipt: visualReceipt)
 
         let didCommit = mutateIf("bind book & depart", flush: true) { state in
             guard WritingDeskBindQuoteFactory.make(
@@ -1077,7 +1090,8 @@ extension GameStore {
             let historyRecord = LibraryRules.record(book: book, page: sourcePage, seed: generationSeed,
                                                     runIndex: state.worlds.runIndex + 1,
                                                     travellers: world.travellers,
-                                                    worldVisualReceipt: visualReceipt)
+                                                    worldVisualReceipt: visualReceipt,
+                                                    worldArrivalReceipt: arrivalReceipt)
             state.reality.library.record(world: historyRecord)
             for receipt in book.provenStatementReceipts
                 where !state.base.provenStatementReceipts.contains(where: {
@@ -1161,9 +1175,11 @@ extension GameStore {
                 foundTravellersAtStart: state.reality.library.foundTravellers,
                 generationDiagnostics: world.diagnostics,
                 tuning: tuning,
-                worldVisualReceipt: visualReceipt
+                worldVisualReceipt: visualReceipt,
+                worldArrivalReceipt: arrivalReceipt
             )
             state.worlds.activeRun = departingRun
+            state.worlds.pendingWorldArrivalReceiptID = arrivalReceipt.id
             state.tutorial.complete(.writingPageRequest, fact: "first_bind")
             state.tutorial.complete(.writingPreview, fact: "world_pane_opened")
             state.tutorial.complete(.writingBind, fact: "first_run_created")
@@ -1189,6 +1205,30 @@ extension GameStore {
             }
         }
         return didCommit
+    }
+
+    /// Acknowledges only the exact arrival currently owning presentation. It spends no turn and
+    /// is idempotent for stale/double actions.
+    @discardableResult
+    func enterPendingWorld(arrivalReceiptID: WorldArrivalReceiptID) -> Bool {
+        if state.worlds.pendingWorldArrivalReceiptID != nil,
+           state.worlds.pendingWorldArrivalReceipt == nil {
+            _ = mutateIf("reconcile orphan arrival reveal", flush: true) { state in
+                guard state.worlds.pendingWorldArrivalReceiptID != nil,
+                      state.worlds.pendingWorldArrivalReceipt == nil else { return false }
+                state.worlds.pendingWorldArrivalReceiptID = nil
+                return true
+            }
+            return false
+        }
+        return mutateIf("enter pending world", flush: true) { state in
+            guard state.worlds.pendingWorldArrivalReceiptID == arrivalReceiptID,
+                  state.worlds.activeRun?.worldArrivalReceipt?.id == arrivalReceiptID else {
+                return false
+            }
+            state.worlds.pendingWorldArrivalReceiptID = nil
+            return true
+        }
     }
 
     // MARK: - Essence Spring
