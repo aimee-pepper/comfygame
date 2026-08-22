@@ -5407,7 +5407,8 @@ only the five-path Asset proof boundary and authorizes no native/PBX/golden or f
 **Accepted by Game Design as the frozen corrected production-pack candidate; native integration remains
 unaccepted.** Freeze canonical body SHA-256
 `b9b244ee8382e9f0fca0776603202e51330a651d50b0c499af62a50be2be7ce0` and manifest-file SHA-256
-`3a1709f91de0c39c49a854aea9ba6a427fe44bdba31b23e9ea47fc26ce5982e5`. The pack has 2,146 deduplicated
+`3a1709f91de0c39c49a854aea9ba6a427fe44bdba31b23e9ea47fc26ce5982e5`, frozen in exact Asset commit
+`b54db384bbedfd07b8a858f309087adb35c660f3`. The pack has 2,146 deduplicated
 PNGs, exhaustive current authored lookup, exactly five legal tool/ink strips, exact non-drawable fixed-mask
 semantics and exact 28×5/5×28 shared-edge connectors. It contains no personal-compound, wildcard or generic
 fallback key.

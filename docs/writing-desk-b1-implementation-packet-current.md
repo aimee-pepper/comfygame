@@ -408,7 +408,8 @@ repeat export. This packaging gate changes no accepted pixels or visual semantic
 Game Design accepts the corrected production pack as the frozen Asset candidate; native loading and view
 integration remain unaccepted. Freeze canonical body SHA-256
 `b9b244ee8382e9f0fca0776603202e51330a651d50b0c499af62a50be2be7ce0` and manifest-file SHA-256
-`3a1709f91de0c39c49a854aea9ba6a427fe44bdba31b23e9ea47fc26ce5982e5`. The closed pack contains 2,146
+`3a1709f91de0c39c49a854aea9ba6a427fe44bdba31b23e9ea47fc26ce5982e5`. Its exact five-path Asset boundary
+is committed as `b54db384bbedfd07b8a858f309087adb35c660f3`. The closed pack contains 2,146
 deduplicated PNGs, exhaustive 108×3 authored mark lookup, all accepted state-footprint and vocabulary
 combinations, exactly six cardinal connectors, and no personal-compound, wildcard or generic fallback key.
 

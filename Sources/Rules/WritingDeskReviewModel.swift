@@ -13,8 +13,14 @@ enum WritingDeskSourceKey: Equatable, Sendable {
 }
 
 struct WritingDeskVisibleMark: Equatable, Sendable {
+    enum AuthoredKind: String, Equatable, Sendable { case target, source, qualifier, compound }
+    enum VisualRoute: Equatable, Sendable {
+        case authored(AuthoredKind)
+        case personalCompoundCompatibility
+    }
     /// Opaque visual lookup only. Never legal for copy, ordering or accessibility.
     var rendererAssetKey: String
+    var visualRoute: VisualRoute
     var id: InstanceID
     var hand: Hand
     var origin: PageCell
@@ -139,6 +145,7 @@ enum WritingDeskReviewModelFactory {
             let readable = entries.count == identities.count && entries.allSatisfy(\.isKnown)
             return WritingDeskVisibleMark(
                 rendererAssetKey: mark.glyphID,
+                visualRoute: visualRoute(for: mark),
                 id: mark.id,
                 hand: mark.hand,
                 origin: mark.origin,
@@ -220,6 +227,16 @@ enum WritingDeskReviewModelFactory {
             costQuote: source.cost,
             fieldKitSummary: bindAvailability.refusalMessage ?? "Field Kit ready.",
             bindAvailability: bindAvailability)
+    }
+
+    private static func visualRoute(for mark: PlacedRune) -> WritingDeskVisibleMark.VisualRoute {
+        if mark.personalCompound != nil { return .personalCompoundCompatibility }
+        return switch mark.content {
+        case .target: .authored(.target)
+        case .source, .rune: .authored(.source)
+        case .qualifier: .authored(.qualifier)
+        case .compound: .authored(.compound)
+        }
     }
 
     static func canonicalHash<T: Encodable>(_ value: T) -> String? {

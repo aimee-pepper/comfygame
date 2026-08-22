@@ -530,7 +530,9 @@ final class PageTests: XCTestCase {
         let definition = try XCTUnwrap(WorldPageCatalog.definition("starter_stone_hollow"))
         let page = definition.page
         let visible = page.runes.map { mark in
-            WritingDeskVisibleMark(rendererAssetKey: mark.glyphID, id: mark.id, hand: mark.hand,
+            WritingDeskVisibleMark(rendererAssetKey: mark.glyphID,
+                                   visualRoute: mark.personalCompound == nil ? .authored(.source) : .personalCompoundCompatibility,
+                                   id: mark.id, hand: mark.hand,
                                    origin: mark.origin, shapeID: mark.shapeID, cells: mark.cells,
                                    inkRecipe: mark.inkRecipe, displayName: mark.displayName,
                                    accessibilityName: mark.displayName, isReadable: true)

@@ -307,7 +307,8 @@ expanding E3 and delaying the first-three-world loop.
 
 The corrected v1 pack is accepted with canonical body
 `b9b244ee8382e9f0fca0776603202e51330a651d50b0c499af62a50be2be7ce0` and manifest-file SHA
-`3a1709f91de0c39c49a854aea9ba6a427fe44bdba31b23e9ea47fc26ce5982e5`. Its tool table excludes the
+`3a1709f91de0c39c49a854aea9ba6a427fe44bdba31b23e9ea47fc26ce5982e5`, frozen in Asset commit
+`b54db384bbedfd07b8a858f309087adb35c660f3`. Its tool table excludes the
 impossible Charcoal/mixed state; tint masks replace only their owned base pixels and fixed masks are never
 drawn. Cardinal links are exact 28×5/5×28 centre-spanning assets with frozen shared-edge offsets. This
 releases the fail-closed E3 loader only; E4 stays blocked until that loader passes.
