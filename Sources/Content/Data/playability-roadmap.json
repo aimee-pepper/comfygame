@@ -818,7 +818,7 @@
       "priority": "B1.6a",
       "title": "Generated world image and concrete arrival description",
       "status": "queued",
-      "detail": "Integrate accepted Asset checkpoint 8ae1e88 and persist one bind-time arrival receipt that drives the frozen v0.3 book tableau plus exactly two concrete 18–55 word sentences from actual ground/water and causally contributing known authorship or the strongest actual air/light/growth relationship. The grammar distinguishes reshaping from increasing/reducing an existing result and consumes no new RNG. Creature ambience is omitted; hidden sites remain absent. Asset manifest 2066ba1009ee22d74af495f75753e8c8075ded8fe297cb5ce38335554fd1e6b4 is frozen and must not be reinterpreted.",
+      "detail": "Integrate the accepted World Arrival Asset chain through 72b840d3e1de2b8c32aebfc0e876d61c69448a92 and persist one bind-time arrival receipt that drives the frozen v0.3 book tableau plus exactly two concrete 18–55 word sentences from actual ground/water and causally contributing known authorship or the strongest actual air/light/growth relationship. The grammar distinguishes reshaping from increasing/reducing an existing result and consumes no new RNG. Creature ambience is omitted; hidden sites remain absent. Latest manifest f041c81a41c45ac88dada40b0c173ab63c6e93c2984f232a23be67892df4a65b and unchanged production aggregate 4eb1076eb8d4640a5467d3343167f55eed3b1c74ca2cefec5727cb5b5bda9184 are frozen and must not be reinterpreted.",
       "gate": "Native Open Flats 67, Rainwashed Shore 26 and Stone Hollow 23 plus near/far pairs agree among page, image, description and first map at 368×800; the live starter-receipt validator, exact two-sentence grammar and accepted Asset hashes pass; matching-by-chance writing earns no causal claim, strengthening uses increased rather than created copy, and relaunch preserves the frozen receipt/string; unknown marks and hidden site/resource/traveller/apex identities do not leak; loading remains a separate honest surface. Authorities: world-arrival-causal-reveal-current.md, world-arrival-description-grammar-current.md and world-arrival-asset-packet-current.md.",
       "workstream": "engineering",
       "isPrimary": false
@@ -838,9 +838,9 @@
       "priority": "B1.10a",
       "title": "Local rising pickup feedback",
       "status": "queued",
-      "detail": "After a successful field transaction, update ownership immediately and raise the source icon locally 1.5 tile heights over 450 ms while it fades. Do not fly it toward a counter. Same-kind multi-yield is one ×N; clamp at map edges; animation is nonblocking and never owns mutation.",
-      "gate": "Ordinary/top-edge, ×19, multi-kind, cancellation, duplicate-tap and reduced-motion fixtures; no animation on refusal; exact ownership survives navigation/relaunch. Authority: field-feedback-and-loot-presentation-current.md.",
-      "workstream": "asset",
+      "detail": "Asset proof is accepted and frozen in commit 2d2992bc94224f11ea3901a29a392f45d59b0386 (body a2475bbbc4bab0eb4ee90f0ca562bf04ed2cffd565aa7eaa21e2656f92eaa9c7; manifest aacdd08ed66e80131847873852454b68d3981b46ad7b79696d6cb8675af31375; integrationReady false). Engineering later consumes one committed stepPickup|harvest receipt with exactly one presentation identity, updates ownership immediately, and raises the source icon locally up to 1.5 tile heights over 450 ms while it fades. Same-identity multi-yield is one ×N; the complete icon+label clamps inside the map; animation is nonblocking and never owns mutation.",
+      "gate": "Ordinary and top-edge 0/180/450 ms, ×19, cancellation, duplicate receipt, refusal, navigation/relaunch and Reduced Motion fixtures; v1 has no multi-kind burst; no hidden/fringe request; accepted Asset hashes remain exact; committed ownership survives every animation outcome. Authority: field-feedback-and-loot-presentation-current.md.",
+      "workstream": "engineering",
       "isPrimary": false
     },
     {

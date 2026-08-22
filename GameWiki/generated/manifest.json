@@ -1,9 +1,9 @@
 {
   "schemaVersion": 1,
-  "aggregateSourceHash": "434bef64ab1608a97444cfc94ec7bfdec8c911089997aa2f4ab17aa81e06a08c",
+  "aggregateSourceHash": "dd3831142bbda7757332b1fa6603eadf92182ca3ca1c44e881cd0e233938c076",
   "inputs": {
     "Sources/Content/Data/items.json": "b94b1107229f217e14f1d7fa936d8eea938f9782c06c583be32302f10d432bc9",
-    "Sources/Content/Data/playability-roadmap.json": "fdd4ac55e1920d744af53035ce3c90fb1c6ccf53b5a4ed82e69533de07705099",
+    "Sources/Content/Data/playability-roadmap.json": "e295f31a823b486a490a95a31d4ec44e9341e50f117b7575de768e9d1ba6ea5d",
     "Sources/Content/Data/resources.json": "8eee965ce7df075abfe3f646bb36d416a10ef1d7d194845e30fa0f31b7b23e6f",
     "Sources/Content/Data/stations.json": "21b5e9f3bee2d9115acf535ef2ff1db350b87b8ee33755e79a3b3e4584102e2b",
     "Sources/Content/Data/symbols.json": "c1ec5dd7b661680b358e21a56124b6080aa28d93db51fd2f6b80214ced1dcb16",
@@ -68,7 +68,7 @@
     "docs/armoury-rebuild-implementation-current.md": "a9e893f4660b274e35c530ff1228ba232570bc7858442617d81e7eb34c1ecf82",
     "docs/ashe-ground-technique-current.md": "14287d7178f1148f4f765e50a7debf15d6f21efb9197181396407057794a161c",
     "docs/asset-production-output-contract-current.md": "e9734d8e96290e0e4f79af180624cf5115d4379cf16a52bbb688f1cea34ee675",
-    "docs/asset-system-proposal.md": "f44b3b116c45babda98460972e8396b55dcf2acc53b6698f1884eedc57ab2cbb",
+    "docs/asset-system-proposal.md": "82347dc99ee3a7515fded1967c7689143eefa7a25e75988499db2e124180d81c",
     "docs/atmospheric-world-presentation-current.md": "1b23bbf2f4fe8c92df422dc15259c7d8b47363aa81ab8e58a36435113472246c",
     "docs/authored-color-vocabulary-current.md": "41aa98371136bf274cf0f8160d822d0b8ff84c479882ffbc8c7847ae6a33b58d",
     "docs/authored-text-audit-current.md": "97c31e4a0564595cc62dbce0920999d648f94208b6f207b903f8cf517bc7b0fa",
@@ -127,7 +127,7 @@
     "docs/decisions-session-16.md": "5a41c893067ed88daae7fa9a1b9b6f9fc6732307905f2b49fcddd65ed6d6feac",
     "docs/decisions-session-17.md": "7b28543dfc754ae17d3a64183ee948a36df496f8c7e6c3ad3c4adb6b687b1801",
     "docs/decisions-session-18.md": "4cedf961d49bc0e5f27154bcb8894cf85ada706b174831c9728166f8fbd3d4d6",
-    "docs/decisions-session-19.md": "d160c88379577e0a7a3f83fb255b850b8031209d4dce133b1fb901f91504adef",
+    "docs/decisions-session-19.md": "2a195965e0a3096844d2b78b1ba2f62aae452507b492d4382ae69a5617f0079a",
     "docs/deep-works-system-current.md": "7bd0d2bcc38c3c899ba06c8ee1327d03453723438d3684322fc6ccff9b908cdd",
     "docs/description-analysis-surface-current.md": "0fb1e025514de28b63b3b905c7e7d3eb6da0c183fa800669e1bec6c73f236f7e",
     "docs/design-homework-current.md": "e95fe461c6e883977b5cdaf0415d20c66b9583e96f85f06d357a2f706381f831",
@@ -160,7 +160,7 @@
     "docs/expedition-return-receipt-current.md": "a2048e34054afd8bc23d5808b5413744015d6ca62e349595c7b8fe1aa54afdab",
     "docs/feature-completion-priority-audit-current.md": "bbd222fea99a52cf22217b333fa561b973c342e4ee776230050165861abc4663",
     "docs/field-awareness-avoidance-current.md": "a944726899b6079a9f286a9bea2552653f9b910909cbb1695d4e0b34d4567aa4",
-    "docs/field-feedback-and-loot-presentation-current.md": "5a3f14e018198ccd8259824e3a5158cd3219ca26e325230e3e39452d9c90ce79",
+    "docs/field-feedback-and-loot-presentation-current.md": "8bdeb421dc17609f9ccd522d6108f647404ce232dc37f4e4aaebf10826728c29",
     "docs/field-note-grammar-current.md": "9cd1591fedfcc640148037a9227c9830ebde871889683ac8c53245326fd969bb",
     "docs/first-three-worlds-execution-plan-current.md": "d91070d0facc02fe0891ec7da7e3330e2f07501b5605b3b40075d6a414f8b084",
     "docs/focus-expansion-85-current.md": "91a72d538c3eb493ab6ff91c3b21dd2b8b2474c2a0dd3b4eb9d24f24499b2d21",
@@ -270,9 +270,9 @@
     "docs/wayfarers-table-flora-recognition-current.md": "01de8b57fba27ce086ac1433890ad42d6d8b740a156dc7c9c685970843e61261",
     "docs/weaponsmith-implementation-current.md": "43a6deed0bfe3a91d82626f22cbd23031d2f664d67ea7627fd5f2a1213fdb0d3",
     "docs/workshop-constellation-role-audit-current.md": "ea43a26411c0909a1370a8f10003294020cc2b5c9c14b3fece88c1e9d5b0cbf3",
-    "docs/world-arrival-asset-packet-current.md": "7516a35bb1ff67016ec8288e5169c1e3331f475991b81ca03e0f06441d7fea35",
-    "docs/world-arrival-causal-reveal-current.md": "fbc3aae0ad2f2cba6e926e6ac2d50479b9bbfa2dafa91719311a0d9b6c206539",
-    "docs/world-arrival-description-grammar-current.md": "cba2d4190fd9be84e0ec181a2e231e36b20e3f49c0a57047f7bd66e75f07792f",
+    "docs/world-arrival-asset-packet-current.md": "d3c2f267a9885e772849f803b5fb729b34da57b44050a2096da7337cb08069f4",
+    "docs/world-arrival-causal-reveal-current.md": "2a4e05d6174838641b0b586ddcd7f0a86cd68a6707c6c82c5aef6d8bee73d97f",
+    "docs/world-arrival-description-grammar-current.md": "c6d0afa2fa279fda3b171d6033b4b7c174e677ca94d81a8a4bce528411151993",
     "docs/world-color-differentiation-current.md": "0973da16ef6fa03cdb3c74e1cc6ab0b8eb9a842958b337b75e2e9d133d4c518b",
     "docs/world-encounter-contact-current.md": "59faf7fe08ce10f50d71f0f68f07e73c7cfbec920b716f12b53540623b5b9dc6",
     "docs/world-grade-2-bind-adapter-current.md": "7d388adabeefcee5fbe50071c2bc9feed7f3c53658eea26f3e3dbbc812470e11",
@@ -282,12 +282,12 @@
     "docs/world-pages-templates-dictionary-current.md": "4be614bb5c389466c6c631c62bfea2ed14efb58080f6a6c066107fe0ebf55774",
     "docs/world-resource-reserve-current.md": "d761b07be32a2045664c5b35ac48617c8a3633c2521caafa42cb7eb632f71ad1",
     "docs/world-screen-phone-composition-current.md": "c82b6038d26b730d84440b250473cbbf0a87a6fb2fa58235d4c6bd2633988efc",
-    "docs/writing-desk-b1-implementation-packet-current.md": "648f7a781b4d0a7627d65557b30abfa8b0501d437e27b902994bedf774b6540f",
+    "docs/writing-desk-b1-implementation-packet-current.md": "72bfff98754673ad194ebb3720ed27d32928839f7400b16c4eb3978324fba579",
     "docs/writing-palette-vocabulary-migration-current.md": "188ccb34a285cec36bbfdbf27d1fbfdc90315f22d132fe4e56023b46af1a735a",
     "docs/writing-tool-progression-current.md": "be17fe07aa89aaaab7117a2faca43d7e1eb1be23202d19106c67c42547b23bb0"
   },
   "outputs": {
-    "generated/wiki-data.json": "831c658d0817e2cfe64ccb3eebc0904f5c5a949c582dfae79a7770b4aaa4cecd",
-    "generated/source-registry.json": "ad0c6febba181d8cd91754bafa44ae46adc37b10aef9a3cf4256e0252365ffcf"
+    "generated/wiki-data.json": "b055f9c9edfbf815f33cd395be968ce84643d1b9a691f1c04f6f06a6997a9260",
+    "generated/source-registry.json": "a404a98dbeac88ff8e52a7c8f02710d635ad078fe2c854e3cf7c1104c5947092"
   }
 }

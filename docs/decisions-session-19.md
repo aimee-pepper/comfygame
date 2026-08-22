@@ -239,3 +239,46 @@ grayscale and phone-placement review before the opening-five set, upgrade forms,
 Library proceeds. This prevents another technically complete batch from propagating an unaccepted visual
 language. Exact pixel dimensions, physical referents and forbidden readings live in
 `home-village-library-asset-packet-current.md` and `village-progression-and-asset-matrix-current.md`.
+
+## 302. Adjacent consequence cues are learned, current and rules-owned
+
+**Date:** 21 August 2026
+
+The accepted field cue grammar places a shallow red harm crescent and/or exactly three disconnected grey
+slow rays at the party-cell edge corresponding to each adjacent direction. Slow footing is visible for
+current mud/tall growth; rubble is not slow under current movement rules. Flora harm appears only after the
+campaign truthfully learns that exact world-seed/flora-ID/defence key through actual contact, an actual
+sessile-flora encounter, or a narrow earned recognition contribution. Current full visibility and a fresh
+rules-owned four-direction preview are required; remembered/fringe/hidden cells reveal nothing.
+
+Look consumes the same preview and uses exact contextual copy for boundary, crumbled ground, deep water,
+chasm, turn cost and learned flora consequence. It does not reuse the current trait-leaking inspection
+helper. The frozen Asset cue-only checkpoint is commit
+`e448553c1c1f095a01b4274aea812faa76955110`; it remains `integrationReady:false` until native rules and
+composition are implemented and accepted.
+
+## 303. Local field pickup rises; Creature materials do not spray from combat
+
+**Date:** 21 August 2026
+
+A committed direct field pickup immediately updates ownership, then raises one exact source icon locally
+up to 1.5 tile heights over 450 ms and fades it. Same-identity yield aggregates (`×19` is one icon), top-edge
+travel clamps inside the map viewport, Reduced Motion uses a stationary fade, and animation never owns or
+delays mutation.
+
+Creature materials are a different presentation boundary. Combat result and Expedition Return aggregate
+them by exact family+quality; the world map does not spray Hide/Bone/Feather icons after a fight. The first
+Asset pickup proof therefore covers Quartz, Raw Essence, Chipped Blade, recovered writing and the legitimate
+unknown parcel only. Missing known-object pickup art skips optional animation with a diagnostic rather than
+borrowing an unrelated silhouette.
+
+## 304. Arrival causality pairs dramatic light before flora, but routine light after it
+
+**Date:** 21 August 2026
+
+When one causally authored mark already owns World Arrival Sentence 2, the paired environmental fragment
+uses heavy air, heavy precipitation, true darkness/blazing light, light air, light precipitation, concrete
+flora, then routine dim/bright light. Concrete growth therefore beats merely routine dim/bright light, but
+never conceals a genuinely dark or blazing arrival. Rainwashed Shore's frozen receipt is `trueDark`, so its
+accepted runtime sentence names restricted visibility rather than sparse growth. The no-causal environmental
+fallback keeps its existing priority; this is the narrower one-causal pairing rule.

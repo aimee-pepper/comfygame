@@ -5344,3 +5344,60 @@ overlaid, the ordinary live bridge, ordinary exporter, focused test and full Ass
 the fixture-only bypass. Regenerated fixtures and the entire artifact tree were byte-identical to the frozen
 candidate, leaving the manifest unchanged. The exact accepted boundary is frozen in Asset commit `8ae1e88`
 for future Engineering integration; no native/PBX/golden work is authorized by this disposition.
+
+##### Causal resource-scope correction — accepted
+
+The accepted causal ABI is corrected without any visual drift: `resource` joins the closed
+`ground|water|flora|resource|light|atmosphere` scopes, Stone Hollow Ore is
+`resource/increased/present/present`, and resource bands remain prose/receipt evidence only. All four valid
+`absent|present` before/after pairs produce identical scene commands and no resource icon or deposit.
+
+Freeze exact Asset commit `a95b44f70ed7995812f7960b4f1248ceb2d8da1c`, corrected manifest SHA-256
+`03d21961eec0eca3cf9374d3a2320f988b75b3ba20f7568b19d272c6ed25f991`, and the unchanged 62-PNG
+aggregate receipt `e14c8e9622ffdfeb3a1ffeecd1e540632f7ca27c8704cd874313c32fc2f5f283`.
+`integrationReady` remains false; this authorizes no native/golden promotion or new Asset checkpoint.
+
+##### Rainwashed true-dark receipt reconciliation — accepted
+
+The accepted scene art remains byte-identical, but the rules-owned Rainwashed Shore description now follows
+E2's executable `trueDark` receipt: “while only the ground nearest the entry remained clearly visible.” The
+corrected 368×800 colour/grayscale proof wraps cleanly without clipping. Freeze exact Asset commit
+`72b840d3e1de2b8c32aebfc0e876d61c69448a92`, latest manifest-file SHA-256
+`f041c81a41c45ac88dada40b0c173ab63c6e93c2984f232a23be67892df4a65b`, and unchanged 38-production-PNG
+aggregate `4eb1076eb8d4640a5467d3343167f55eed3b1c74ca2cefec5727cb5b5bda9184`. This is receipt-text reconciliation
+only; `integrationReady` remains false.
+
+#### Field Consequence Cues v0.1 disposition
+
+**Accepted by Game Design as the frozen cue-only visual candidate; native integration remains
+unaccepted.** The accepted harm cue is a shallow connected stepped crescent; the accepted slow cue is
+exactly three disconnected three-pixel rays. Cardinal rotations, mixed states and the legal four-direction
+stress state remain readable in colour and literal grayscale without covering the central party identity,
+painting neighbouring cells, forming a continuous frame or appearing in fringe/hidden visibility.
+
+Freeze canonical body SHA-256
+`1d648b34d10e015e8e49f1dbc1bc7b90327f15b092f317431c50572769e272d2` and manifest-file SHA-256
+`793d74eff6b16f426c2fa163ba4dbca56237ddecc8734bd6a88e0136dd75f519`. The exact accepted Asset boundary is
+frozen in commit `e448553c1c1f095a01b4274aea812faa76955110`. The candidate remains
+`integrationReady:false`; Asset may checkpoint only its declared five-path boundary, then pauses. No
+pickup-motion, native/PBX/golden or follow-on milestone is authorized by this disposition.
+
+#### Local Pickup Motion v0.1 disposition
+
+**Accepted by Game Design as the frozen local-pickup Asset candidate; native integration remains
+unaccepted.** Game Design inspected the five native/400% identities, ordinary `0/180/450 ms` phone motion,
+Quartz `×19`, Reduced Motion, no-blank-flash and consequence-cue/control collision in colour and literal
+grayscale. Quartz, Raw Essence, Chipped Blade, recovered-page and unidentified-parcel forms remain
+production-reusable first-slice identities, and same-identity quantity aggregation is the right
+presentation.
+
+The corrected request contains exactly one aggregated `group`; the fabricated three-/four-kind burst ABI
+and evidence are retired. At the top map edge the compositor clamps the complete 2× icon-plus-live-label
+rectangle inside the map at `0/180/450 ms`. When no upward travel is safe, it truthfully shortens to a
+stationary local fade rather than clipping, entering the HUD, reversing or sliding sideways.
+
+Freeze canonical body SHA-256
+`a2475bbbc4bab0eb4ee90f0ca562bf04ed2cffd565aa7eaa21e2656f92eaa9c7`, manifest-file SHA-256
+`aacdd08ed66e80131847873852454b68d3981b46ad7b79696d6cb8675af31375`, and exact Asset commit
+`2d2992bc94224f11ea3901a29a392f45d59b0386`. The candidate remains `integrationReady:false`; this accepts
+only the five-path Asset proof boundary and authorizes no native/PBX/golden or follow-on milestone.

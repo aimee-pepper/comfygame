@@ -46,24 +46,33 @@ TerrainSummary
   nonChasmTileCount: Int
 
 CausalVisualFact[]
-  markInstanceID: stable page mark identity
+  candidateMarkID: stable page mark identity
+  semanticKey: String?              // known stable content key for registered overrides/families
   markDisplayName: String?          // nil when the player does not know it
   sourcePageOrder: Int
-  scope: ground | water | flora | light | atmosphere
+  scope: ground | water | flora | resource | light | atmosphere
   resultBand: closed scope-owned band
   contributionKind: none | increased | reduced | reshaped
   withoutAuthoredBand: closed scope-owned band
 
 EnvironmentSummary
   illuminationBand: trueDark | dim | ordinary | bright | blazing
+  illuminationSourceClass: sourceless | cyclic | constant
   suspendedMedium: none | smoke | airborneAsh | mist | miasma
   suspendedDensity: none | trace | light | heavy | dense
   precipitation: none | rain | snow | mixedRainSnow
   precipitationIntensity: none | trace | light | heavy
   atmosphereMotion: calm | moving | strong
   floraCoverageBand: none | sparse | present | abundant
-  floraHabit: solitary | clustered | spreading | mixed
+  floraHabit: none | solitary | clustered | spreading | mixed
 ```
+
+`illuminationSourceClass` is `sourceless` when the frozen illumination reading has the `sourceless` tag.
+Otherwise it is `cyclic` only when the frozen Cycle reading exceeds
+`Tuning.DayNight.stoppedMaximumPeak` **and** illumination range exceeds
+`Tuning.Pressure.wideRangeThreshold`, matching `WorldRun.hasDayAndNight`; every other non-sourceless reading
+is `constant`. It is never inferred from illumination floor alone. This class affects the scene's
+visible-source treatment but does not add speculative source prose in v1.
 
 `dominantDryGroundID` excludes `water`, `deepWater` and `chasm`; ties use this exact order:
 `stone, soil, sand, ice, ash, rubble, mud, growth, groundcover`. Empty/all-water malformed input fails; it
@@ -76,6 +85,73 @@ changes, and `none` when the visible result is unchanged. A known mark that mere
 already supplied earns no causal wording. An increase never permits “created” wording, and a decrease never
 permits “removed” wording. Removing marks for this comparison cannot reroll the world or alter any unrelated
 random stream.
+
+The sanitized `resultBand` is not the causal calculator. Rich rules provenance compares the exact
+scope-owned form and quantity first, then freezes only its closed presentation band. Consequently an exact
+increase may legitimately have the same before/after presentation band. Resource facts use only a resource
+family explicitly registered to the speaking mark. Rich comparison uses that family's exact total obtainable
+world quantity (node remaining harvests × yield plus matching world drops) while its sanitized band is only
+`absent | present`; ordinary item placements, starter guarantees and creature loot are excluded. A random
+unrequested resource family is never named or promoted into a causal fact merely because it spawned in the
+same world.
+
+For current Compound marks, the non-Reality resource IDs already authored as that symbol's
+`yieldModifiers` keys are v1's registration set; those keys identify which family may be compared but do not
+become a second spawn multiplier in Worldgen. An atomic source, legacy rune or personal Compound without an
+explicit registered family emits no `resource` fact, even if its broader pressure incidentally changes
+several resource weights. This conservative omission is preferable to guessing that “substrate” means Ore.
+
+The player-facing mark name is the exact bind-time `markDisplayName` supplied by the canonical Dictionary /
+Writing Desk knowledge projection. Grammar never creates copy by splitting, capitalizing or otherwise
+guessing from a stable symbol ID. Facts with a nil display name are ineligible. `semanticKey` is present only
+when that known candidate has a legitimate stable content key and is used only for registered verb/template
+or resource-family overrides; it is never copy. `sourcePageOrder` and then the frozen scope order control
+selection even if a serialized array arrives in a different key/order representation.
+
+These display/order fields belong to the rich rules receipt that generates the final frozen description.
+The sanitized Asset scene keeps its already accepted five-field `causalVisualFacts` ABI (`markID`, scope,
+contribution, result band and without-authored band) because those facts own no pixels. For a known authored
+catalogue mark, scene `markID` is its safe `semanticKey`; for a known personal mark without one it is an
+opaque candidate key. Unknown/ineligible facts do not enter the scene payload. Asset does not reconstruct
+selection, names or prose from this reduced record.
+
+`floraCoverageBand` is computed from total placed flora tiles across all species, divided by non-Chasm
+tiles. It is not copied from the first species' per-species coverage. The environment's habit band is a
+separate aggregate (`none`, `solitary`, `clustered`, `spreading`, or `mixed`) and must agree with that total. Unknown
+ground, water, scope, contribution, resource, light, atmosphere, precipitation, coverage or habit values fail the
+receipt; they never become plausible generic prose.
+
+Cross-field combinations are closed rather than merely enum-valid: suspended medium is `none` if and only
+if suspended density is `none`; precipitation is `none` if and only if precipitation intensity is `none`;
+flora coverage is `none` if and only if flora habit is `none`. Nonempty flora with one placed habit uses that
+habit; more than one uses `mixed`. Any impossible pairing fails before copy selection.
+
+### Causal candidate construction
+
+Candidate ownership follows the physical source page; it is not reconstructed from sorted pressure output:
+
+1. `sourcePageOrder` is the mark's index in the frozen `Page.runes` insertion array. Stable mark ID breaks a
+   malformed duplicate-order tie but never replaces insertion order.
+2. A self-contained Compound, personal Compound or legacy whole-rune mark is one candidate. In an atomic
+   target/source cluster, each connected **source** mark is one candidate. Target anchors and qualifier marks
+   are never separately named causal candidates.
+3. A qualifier's effect belongs to the source mark it modifies. Removing that source for the counterfactual
+   also removes its attached qualifier effect. This prevents copy such as “your Sun mark strengthened the
+   light, while your Great mark strengthened the light.”
+4. Unjoined/inert marks, clusters without a target, and marks that resolve to no live pressure are not
+   candidates. Candidate construction uses the same speaking-cluster authority as bind.
+5. A candidate is meaning-known only when every lexeme needed to name it is known in the exact bind-time
+   Dictionary projection. Its display label is frozen at bind (`source name`, Compound name or personal
+   nickname); legacy whole-rune copy uses its existing legitimate display text. Any missing label makes the
+   fact ineligible rather than exposing a stable ID.
+6. Build the counterfactual by removing the complete candidate mark from the frozen page. Retain every exact
+   actual rolled sigil for subjects that were already unwritten. If a subject becomes newly silent only
+   because of this removal, give it the target-keyed sigil from the one full-empty-page baseline roll for the
+   same seed. Resolve that combined set with the same generator version. Never call the current skipping
+   `rollUnwritten(after: remaining)` path, because omitting an earlier target would advance unrelated rolls.
+7. One candidate may affect several scopes. Freeze one fact per changed scope, but sentence selection may
+   name that candidate only once: retain its earliest fact in the exact scope order
+   `ground, water, flora, resource, light, atmosphere`.
 
 ### Starter counterfactual receipts
 
@@ -167,19 +243,22 @@ Eligible facts must all be:
 - from the source page;
 - meaning-known to the player at bind time;
 - `contributionKind != none` for the named visible result;
-- one of `ground, water, flora, light, atmosphere`.
+- one of `ground, water, flora, resource, light, atmosphere`.
 
 A structural fact may also appear in Sentence 2: Sentence 1 describes the place; Sentence 2 explains the
 player's causal contribution. This is deliberate, not duplicate receipt data.
 
-Sort eligible facts by source-page order, then scope order `ground, water, flora, light, atmosphere`. Use at
-most two different marks. The generic clause fragments are:
+Sort eligible facts by source-page order. A malformed duplicate page-order tie breaks by stable candidate
+mark ID; facts belonging to that candidate then use scope order
+`ground, water, flora, resource, light, atmosphere`. Use at most two different marks. The generic clause
+fragments are:
 
 | Scope | `reshaped` verb phrase | `increased` verb phrase | `reduced` verb phrase |
 |---|---|
 | ground | `reshaped the ground` | `made that ground more prevalent` | `made that ground less prevalent` |
 | water | `reshaped the water` | `made water more prevalent` | `made water less prevalent` |
 | flora | `reshaped {floraPhrase}` | `spread {floraPhrase} farther` | `left less {floraPhrase}` |
+| resource | `changed the material deposits` | `made those deposits more plentiful` | `made those deposits scarcer` |
 | light | `changed the light` | `strengthened the light` | `subdued the light` |
 | atmosphere | `changed the air` | `strengthened that condition in the air` | `weakened that condition in the air` |
 
@@ -191,16 +270,20 @@ Starter fragments are exact reviewed overrides, keyed by stable symbol ID rather
 | verdant | increased flora | `spread low growth farther along the few wet and stony edges` |
 | archipelago | reshaped water | `divided the route` |
 | caverns | reshaped ground | `shaped the enclosure` |
-| common_ore | increased ground/resource expression | `made ore more plentiful` |
+| common_ore | increased resource expression | `made ore more plentiful` |
 
 One fact: `Your {mark} mark {verb phrase}.`
 Two facts: `Your {first mark} mark {first verb phrase}, while your {second mark} mark {second verb phrase}.`
 
 When exactly one causal fact exists, pair it with the strongest meaningful environmental fragment if one
 exists: `Your {mark} mark {verb phrase}, while {environment fragment}.` Environmental fragments use the
-same fallback priority below and this exact lower-case past-tense table. `{ground}` is the dominant ground
-token without an article. If the only environmental state is ordinary fallback, use the one-fact sentence
-instead; never append an empty or generic clause.
+following exact paired priority and the lower-case past-tense table below: heavy/dense suspended medium;
+heavy precipitation; true darkness/blazing light; trace/light suspended medium; trace/light precipitation;
+abundant/present/sparse flora; dim/bright ordinary-range light. This differs deliberately from the no-causal
+fallback only at the last two steps: once one authored cause already owns the sentence, concrete growth is
+more place-specific than routine dim/bright illumination, but it never suppresses true darkness or blazing
+light. `{ground}` is the dominant ground token without an article. If the only environmental state is
+ordinary fallback, use the one-fact sentence instead; never append an empty or generic clause.
 
 | Environmental fact | Exact paired fragment |
 |---|---|
@@ -220,8 +303,6 @@ instead; never append an empty or generic clause.
 | trace/light rain | `light rain crossed the open ground` |
 | trace/light snow | `light snow crossed the open ground` |
 | trace/light mixed rain/snow | `light rain and snow crossed the open ground together` |
-| dim | `dim light left the farther ground subdued` |
-| bright | `clear light separated the open surfaces` |
 | abundant spreading flora | `growth spread across most open ground` |
 | abundant clustered flora | `dense growth gathered in broad clusters` |
 | abundant other flora | `growth occupied most open ground` |
@@ -230,6 +311,8 @@ instead; never append an empty or generic clause.
 | present other flora | `growth established itself across the open ground` |
 | sparse flora + dominant stone | `sparse growth settled on the open stone` |
 | sparse flora + any other ground | `sparse growth settled across a few open patches` |
+| dim | `dim light left the farther ground subdued` |
+| bright | `clear light separated the open surfaces` |
 
 Do not name a symbol that is unknown even if its visible result is obvious. Do not treat a matching random
 result as authorship. `increased` phrasing must acknowledge strengthening rather than imply creation.
@@ -275,6 +358,10 @@ If no eligible causal fact remains, select exactly one relationship in this orde
 | present other flora | `Growth is established across the open ground.` |
 | sparse flora | `Sparse growth holds to a few open patches.` |
 | ordinary fallback | `No single visible condition dominates the farther ground, which remains open to exploration.` |
+
+These present-tense sentences are independent authored tokens. Do not obtain them by capitalizing the
+past-tense paired-fragment table; `Thin smoke drifts…` and `thin smoke drifted…` deliberately serve different
+sentence structures.
 
 Motion affects atmosphere animation, not this sentence in v1. Do not add generic wind prose without a typed
 atmosphere medium to carry it.
@@ -380,6 +467,16 @@ uses the safe two-sentence actual-ground + ordinary fallback grammar; Release ne
 15. grammar-version migration preserving frozen old output;
 16. exact two-sentence Design-owned 55-word stress specimen accepted by the copy validator, without adding a
     runtime starter/synthetic branch or permitting truncation, clipping or Asset-authored substitution.
+17. atomic target + source + qualifier attributes causality only to the known source mark; removing the sole
+    source invokes its target-keyed empty-page baseline roll, two later already-unwritten target readings stay
+    byte-equivalent to the actual world, and qualifier/target marks never receive duplicate clauses;
+18. Stone Hollow freezes Ore as typed `resource/increased`, plus generic registered-resource reshaped,
+    increased and reduced clauses; random unrequested resources remain ineligible;
+19. illumination source class covers stopped/moving Cycle × narrow/wide light with sourceless precedence;
+    incoherent none/non-none atmosphere, precipitation and flora pairs fail closed.
+20. the actual generator and counterfactual classifier call one shared deterministic stage extraction; the
+    summary path creates no playable/persisted world, stops after its last required flora/resource result and
+    changes automatically when production stage logic changes.
 
 ## Out of scope
 

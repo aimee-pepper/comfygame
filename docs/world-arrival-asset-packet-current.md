@@ -64,13 +64,19 @@ read complete Worldgen state or choose what is safe to disclose.
 | `suspendedAtmosphere` | exact medium/density/motion | accepted Smoke/Ash/Mist/Miasma layer | inferring weather from colour |
 | `precipitation` | exact none/rain/snow/mixed plus intensity/motion | accepted precipitation layer | changing terrain or movement rules |
 | `flora` | 0–4 visible species render identities, coverage, habits | same silhouette/palette grammar as map | names, metabolism or defence labels |
-| `causalVisualFacts` | known mark ID, visible scope, `none/increased/reduced/reshaped`, result band and same-seed-without-mark band | no image authority; final description is rules-owned | hidden mark semantics, authorship inferred from presence, or creation claims for mere increases |
+| `causalVisualFacts` | safe known/opaque mark key, typed `ground/water/flora/resource/light/atmosphere` scope, `none/increased/reduced/reshaped`, result band and same-seed-without-mark band | no image authority; final description is rules-owned | hidden mark semantics, names reconstructed from IDs, authorship inferred from presence, or creation claims for mere increases |
 | `entryDisclosure` | only already visible site profile or disclosed apex-location mark | optional v1 extension fixture | any hidden complete-world POI/entity fact |
 | `description` | rules-owned final 18–55 word string from `world-arrival-description-grammar-current.md` | body copy only | Asset-authored substitutions |
 | `firstMapCropReceipt` | exact disclosed entry crop render inputs | continuity evidence only | revealing cells beyond current sight |
 
-Missing optional fields omit their layer. Unknown enum values and extra fields fail visibly in the lab; no
-fallback may produce plausible scenery. Title and description never seed scene geometry.
+Missing optional facts omit their **visual layer**, but the version-2 serialized ABI is normalized rather
+than left to a host language's optional encoding. `entryDisclosure` is always present as its typed object or
+explicit `null`. Full/fringe/remembered crop cells carry the exact terrain keys; `floraStableID` is `null`
+when that visibility cannot disclose flora. Hidden cells carry exactly `x`, `y`, `visibility` and no ground,
+elevation or flora keys. The frozen canonical hash covers that exact shape. `dominantGround` is always the
+rules-owned dominant dry ground (never water, deep water or chasm). Unknown enum values, wrong key sets and
+extra fields fail visibly in the lab; no fallback may produce plausible scenery. Title and description never
+seed scene geometry.
 
 The future native adapter must derive the input once, at successful bind, and persist it. The Asset proof
 does not become that adapter merely because its fixture JSON has the same shape.
@@ -293,6 +299,36 @@ test and full Asset regression all passed without `--use-existing-fixtures`; reg
 complete artifact tree were byte-identical to the frozen candidate, and the manifest remained unchanged.
 This accepts the Asset candidate, checkpointed exactly as Asset commit `8ae1e88`. No native packaging, PBX
 edit or golden promotion begins here; native integration remains a later Engineering checkpoint.
+
+### Causal resource-scope correction — accepted 21 August 2026
+
+The accepted scene ABI now recognizes the closed causal scopes `ground`, `water`, `flora`, `resource`,
+`light` and `atmosphere`. Stone Hollow's Ore fact is correctly typed as
+`resource/increased/present/present`; its exact description remains “made ore more plentiful.” Resource
+result bands are disclosure-neutral `absent|present` values. They have no scene-command authority: changing
+any valid resource before/after pair draws no deposit, icon or other pixels.
+
+This is a contract correction with **zero visual change**, frozen in exact Asset commit
+`a95b44f70ed7995812f7960b4f1248ceb2d8da1c`. The corrected manifest file SHA-256 is
+`03d21961eec0eca3cf9374d3a2320f988b75b3ba20f7568b19d272c6ed25f991`; all 62 accepted PNGs remain
+byte-identical under aggregate receipt
+`e14c8e9622ffdfeb3a1ffeecd1e540632f7ca27c8704cd874313c32fc2f5f283`. The checkpoint remains
+`integrationReady:false`; it authorizes no native, PBX, golden or subsequent Asset milestone work.
+
+### Rainwashed Shore true-dark receipt reconciliation — accepted 21 August 2026
+
+E2's executable production receipt proves Rainwashed Shore is `trueDark`. Its exact Sentence 2 therefore
+ends “while only the ground nearest the entry remained clearly visible,” superseding the older sparse-growth
+pair in newly bound worlds. Game Design inspected the corrected 368×800 colour and literal-grayscale phone;
+the complete copy wraps to three lines without clipping.
+
+Freeze exact Asset commit `72b840d3e1de2b8c32aebfc0e876d61c69448a92`, manifest-file SHA-256
+`f041c81a41c45ac88dada40b0c173ab63c6e93c2984f232a23be67892df4a65b`, starter fixture SHA-256
+`9ef496e9ce2143fb953c68a1a11278f8e3878d9b291d6bb7a560c74a60bf8cb0`, and visible-site fixture SHA-256
+`1957bb456b21499df2686d6579842c4f1b142be3fc2409065fae500d5ad80c8f`. All 38 production scene, reusable-
+part and first-map-crop PNGs remain byte-identical under aggregate
+`4eb1076eb8d4640a5467d3343167f55eed3b1c74ca2cefec5727cb5b5bda9184`; only text-bearing evidence changed.
+`integrationReady` remains false and no scene/art/camera/disclosure authority changed.
 
 ## Explicit supersessions
 
