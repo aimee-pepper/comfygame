@@ -75,10 +75,16 @@ final class WritingDeskProductionPack: @unchecked Sendable {
 
     /// Locates the single preserved runtime folder only when the Writing Desk route asks for it.
     static func bundled(in bundle: Bundle = .main) throws -> WritingDeskProductionPack {
-        guard let manifest = bundle.url(forResource: "manifest", withExtension: "json",
-                                        subdirectory: "runtime")
-        else { throw PackError.unavailable }
-        return .init(rootURL: manifest.deletingLastPathComponent())
+        // This is deliberately an exact bundle-relative path rather than a resource-index query.
+        // The app also ships unrelated files named manifest.json; on a physical build,
+        // Bundle.url(forResource:subdirectory:) can resolve through that flattened resource index
+        // instead of the preserved folder resource. Xcode copies this pack as runtime/**.
+        let root = bundle.bundleURL.appendingPathComponent("runtime", isDirectory: true)
+        let manifest = root.appendingPathComponent("manifest.json", isDirectory: false)
+        guard FileManager.default.isReadableFile(atPath: manifest.path) else {
+            throw PackError.unavailable
+        }
+        return .init(rootURL: root)
     }
 
     /// Opens the metadata on demand. It deliberately does not enumerate or decode PNG files.

@@ -80,6 +80,11 @@ enum PixelUITheme {
     static let surfaceInset = adaptive(\.surfaceInset)
     static let edge = adaptive(\.edge)
     static let edgeDark = adaptive(\.edgeDark)
+    /// High-contrast text specifically for the darkest selection/chrome role.
+    static let textOnEdgeDark = Color(uiColor: UIColor { traits in
+        let value = traits.userInterfaceStyle == .dark ? dark.text : light.screen
+        return UIColor(red: value.red, green: value.green, blue: value.blue, alpha: 1)
+    })
     static let text = adaptive(\.text)
     static let muted = adaptive(\.muted)
     static let neutral = adaptive(\.neutral)

@@ -283,6 +283,21 @@ struct WritingDeskView: View {
                     }, assetFailure: writingPackFailed)
                     .offset(x: -8, y: 44)
                     .zIndex(100)
+            } else if showsPageActions {
+                WritingDeskNativePageActions(
+                    canAct: !state.base.page.runes.isEmpty,
+                    clearLabel: clearPageActionLabel,
+                    save: {
+                        showsPageActions = false
+                        templateName = ""
+                        isNamingTemplate = true
+                    },
+                    clear: {
+                        showsPageActions = false
+                        isConfirmingClear = true
+                    })
+                    .offset(x: -8, y: 44)
+                    .zIndex(100)
             }
         }
         .zIndex(showsPageActions ? 100 : 1)
@@ -342,6 +357,17 @@ struct WritingDeskView: View {
             .padding(.vertical, 10)
             .background(WritingDeskWoodBackground())
         }
+        .overlay(alignment: .top) {
+            if writingPackUnavailable {
+                Text("Writing visuals could not load; writing is still available.")
+                    .font(.caption2.weight(.medium))
+                    .foregroundStyle(PixelUITheme.text)
+                    .padding(.horizontal, 8).padding(.vertical, 4)
+                    .background(PixelUITheme.surface.opacity(0.94))
+                    .overlay(Rectangle().stroke(PixelUITheme.edge, lineWidth: 1))
+                    .allowsHitTesting(false)
+            }
+        }
     }
 
     private func cancelPageInteraction(_ trigger: WritingDeskInteractionCancellation.Trigger) {
@@ -364,7 +390,8 @@ struct WritingDeskView: View {
 
     private func writingPackFailed() {
         productionPack = nil
-        writingAssetsReady = false
+        // Visual failure must never disable the gameplay-owned writing surface.
+        writingAssetsReady = true
         writingPackUnavailable = true
         cancelPageInteraction(.outsidePage)
     }
@@ -383,8 +410,18 @@ struct WritingDeskView: View {
                         presentedSheet = .inkWell
                     }, failed: writingPackFailed)
             } else {
-                Text("Writing assets unavailable").font(.caption2)
+                Button {
+                    cancelPageInteraction(.handOrInk)
+                    if unlocked { presentedSheet = .inkWell }
+                } label: {
+                    VStack(alignment: .leading, spacing: 1) {
+                        Text(state.base.bestHand.displayName).font(.caption.weight(.semibold))
+                        Text("Ash ink · color open").font(.caption2)
+                    }
                     .frame(maxWidth: .infinity, alignment: .leading)
+                }
+                .buttonStyle(.plain)
+                .disabled(!unlocked)
             }
         }
         .frame(maxWidth: .infinity).frame(height: 44)
@@ -411,7 +448,7 @@ struct WritingDeskView: View {
                         }
                         .frame(width: 76, height: 44)
                         .background(bin == entry ? PixelUITheme.edgeDark : PixelUITheme.surfaceRaised)
-                        .foregroundStyle(bin == entry ? PixelUITheme.screen : PixelUITheme.text)
+                        .foregroundStyle(bin == entry ? PixelUITheme.textOnEdgeDark : PixelUITheme.text)
                         .overlay(Rectangle().stroke(PixelUITheme.edge, lineWidth: 1))
                         .contentShape(Rectangle())
                     }
@@ -758,7 +795,19 @@ struct WritingDeskView: View {
                             action: { selectPaletteItem(item, pack: productionPack) },
                             failed: writingPackFailed)
                     } else {
-                        Text("Writing assets unavailable").font(.caption2)
+                        Button {
+                            cancelPageInteraction(.outsidePage)
+                            ghost = WritingDeskFallbackSelection.arm(
+                                glyph: item.glyph, content: item.content,
+                                origin: firstFreeOrigin(for: item.content))
+                        } label: {
+                            WritingDeskNativeVocabularyLabel(
+                                title: item.name,
+                                detail: item.blockedBy != nil ? "taken" : paletteDetail(item),
+                                unavailable: true)
+                        }
+                        .buttonStyle(.plain)
+                        .disabled(!fits)
                     }
                 }
                 .foregroundStyle(PixelUITheme.text)
@@ -771,8 +820,9 @@ struct WritingDeskView: View {
     }
 
     private func selectPaletteItem(_ item: Chip, pack: WritingDeskProductionPack) {
-        let candidate = GhostRune(glyph: item.glyph, content: item.content,
-                                  origin: firstFreeOrigin(for: item.content))
+        let candidate = WritingDeskFallbackSelection.arm(
+            glyph: item.glyph, content: item.content,
+            origin: firstFreeOrigin(for: item.content))
         guard let shape = PageRules.shape(for: item.content, hand: state.base.bestHand) else { return }
         let visualKind: WritingDeskVisibleMark.AuthoredKind = switch item.content {
         case .target: .target
@@ -984,6 +1034,12 @@ struct WritingDeskView: View {
         case .staleTemplate:
             templateError = "That Template changed or was removed before the action completed."
         }
+    }
+}
+
+enum WritingDeskFallbackSelection {
+    static func arm(glyph: String, content: MarkContent, origin: PageCell) -> GhostRune {
+        GhostRune(glyph: glyph, content: content, origin: origin)
     }
 }
 
@@ -1648,11 +1704,10 @@ private struct WritingDeskPackVocabularyTile: View {
         Button(action: action) {
             ZStack(alignment: .bottomLeading) {
                 if let image { Image(uiImage: image).interpolation(.none).resizable() }
-                VStack(alignment: .leading, spacing: 1) {
-                    Text(title).font(.custom("Tiny5", size: 11)).lineLimit(1)
-                    Text(detail).font(.custom("Tiny5", size: 9)).lineLimit(1)
-                }
-                .padding(.horizontal, 6).padding(.bottom, 4)
+                // Player-facing identity is native text, never information encoded only in a
+                // temporary sprite. It remains present during loading and in refusal states.
+                WritingDeskNativeVocabularyLabel(
+                    title: title, detail: detail, unavailable: image == nil)
             }
         }
         .buttonStyle(.plain)
@@ -1668,6 +1723,44 @@ private struct WritingDeskPackVocabularyTile: View {
             else { throw WritingDeskProductionPack.PackError.corruptAsset(asset.sha256) }
             image = loaded
         } catch { image = nil; failed() }
+    }
+}
+
+private struct WritingDeskNativeVocabularyLabel: View {
+    let title: String
+    let detail: String
+    let unavailable: Bool
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 1) {
+            Text(title).font(.custom("Tiny5", size: 11)).lineLimit(1)
+            Text(detail).font(.custom("Tiny5", size: 9)).lineLimit(1)
+        }
+        .foregroundStyle(PixelUITheme.text)
+        .padding(.horizontal, 6).padding(.bottom, 4)
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottomLeading)
+        .background(unavailable ? PixelUITheme.surfaceRaised : Color.clear)
+    }
+}
+
+private struct WritingDeskNativePageActions: View {
+    let canAct: Bool
+    let clearLabel: String
+    let save: () -> Void
+    let clear: () -> Void
+
+    var body: some View {
+        VStack(spacing: 0) {
+            Button("Save Template", action: save).disabled(!canAct)
+                .frame(width: 164, height: 44)
+            Button(clearLabel, action: clear).disabled(!canAct)
+                .foregroundStyle(PixelUITheme.danger)
+                .frame(width: 164, height: 44)
+        }
+        .buttonStyle(.plain)
+        .padding(4)
+        .background(PixelUITheme.surface)
+        .overlay(Rectangle().stroke(PixelUITheme.edge, lineWidth: 2))
     }
 }
 

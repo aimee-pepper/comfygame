@@ -1437,6 +1437,44 @@ final class PageTests: XCTestCase {
         XCTAssertTrue(grid.contains("WritingDeskPackLinkArtwork"))
     }
 
+    func testWritingDeskVocabularyNamesAndCategoryContrastDoNotDependOnPackArt() throws {
+        let root = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent().deletingLastPathComponent()
+        let source = try String(
+            contentsOf: root.appending(path: "Sources/Screens/WritingDeskView.swift"),
+            encoding: .utf8)
+
+        XCTAssertTrue(source.contains("WritingDeskNativeVocabularyLabel("))
+        XCTAssertTrue(source.contains("title: item.name"),
+                      "Canonical candidate identity must remain native text without pack art.")
+        XCTAssertFalse(source.contains("bin == entry ? PixelUITheme.screen"),
+                       "The dark screen role is unreadable on the selected dark category.")
+        XCTAssertGreaterThanOrEqual(
+            PixelUITheme.contrastRatio(PixelUITheme.light.screen, PixelUITheme.light.edgeDark), 4.5)
+        XCTAssertGreaterThanOrEqual(
+            PixelUITheme.contrastRatio(PixelUITheme.dark.text, PixelUITheme.dark.edgeDark), 4.5)
+    }
+
+    @MainActor
+    func testMissingVisualPackStillArmsAndPlacesCanonicalWriting() throws {
+        let store = GameStore(io: .temporary(name: "writing-fallback-\(UUID().uuidString)"))
+        let before = try SaveCodec.makeEncoder().encode(store.state.base.page)
+        let candidate = WritingDeskFallbackSelection.arm(
+            glyph: "illumination", content: .target("illumination"),
+            origin: .init(column: 0, row: 0))
+
+        XCTAssertEqual(candidate.glyph, "illumination")
+        XCTAssertEqual(candidate.content, .target("illumination"))
+        XCTAssertTrue(store.write(candidate.content, glyph: candidate.glyph, at: candidate.origin))
+        XCTAssertEqual(store.state.base.page.runes.count, 1)
+        XCTAssertEqual(store.state.base.page.runes[0].displayName, "Illumination")
+        XCTAssertNotEqual(try SaveCodec.makeEncoder().encode(store.state.base.page), before)
+        XCTAssertEqual(store.state.base.page.runes[0].cells,
+                       PageRules.shape(for: candidate.content, hand: store.state.base.bestHand)?
+                        .offsets.map { PageCell(column: candidate.origin.column + $0.column,
+                                                row: candidate.origin.row + $0.row) })
+    }
+
     func testWritingDeskCancellationClearsGhostAndPageSessionWithoutMutatingPage() {
         let original = Page()
         var ghost: GhostRune? = .init(glyph: "sun", content: .source("sun"),

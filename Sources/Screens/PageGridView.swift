@@ -96,6 +96,11 @@ struct PageGridView: View {
                     .interpolation(.none)
                     .resizable()
                     .frame(width: outerPageSize.width, height: outerPageSize.height)
+            } else {
+                Rectangle()
+                    .fill(PixelUITheme.surface)
+                    .overlay(Rectangle().stroke(PixelUITheme.edge, lineWidth: 2))
+                    .frame(width: outerPageSize.width, height: outerPageSize.height)
             }
             ZStack(alignment: .topLeading) {
                 gridBackground.opacity(0.001)
@@ -132,7 +137,7 @@ struct PageGridView: View {
             }
             .frame(width: pageSize.width, height: pageSize.height)
             .offset(x: pageInset, y: pageInset)
-            if !assetsReady {
+            if !assetsReady && productionPack != nil {
                 Text("Writing assets unavailable")
                     .font(.caption.weight(.semibold))
                     .padding(10)
@@ -141,12 +146,16 @@ struct PageGridView: View {
             }
         }
         .frame(width: outerPageSize.width, height: outerPageSize.height, alignment: .topLeading)
-        .allowsHitTesting(assetsReady)
+        .allowsHitTesting(assetsReady || productionPack == nil)
         .onChange(of: dismissalToken) { _, _ in interaction.cancel() }
         .onChange(of: pageInteractionIdentity) { _, _ in interaction.cancel() }
         .onDisappear { interaction.cancel() }
         .task(id: pageLoadIdentity) {
-            guard let productionPack else { return }
+            guard let productionPack else {
+                blankPageImage = nil
+                assetsReady = true
+                return
+            }
             assetsReady = false
             do {
                 let blank = try productionPack.blankPageSpec().asset
@@ -403,6 +412,18 @@ struct PageGridView: View {
                     width: CGFloat(shape?.width ?? 1) * side,
                     height: CGFloat(shape?.height ?? 1) * side,
                     failed: markPackUnavailable)
+            } else {
+                cells(of: shape, side: side) { cell in
+                    Rectangle().fill(tint.opacity(0.16))
+                        .overlay(Rectangle().stroke(tint.opacity(0.55), lineWidth: 1))
+                        .frame(width: side, height: side)
+                        .offset(x: CGFloat(cell.column) * side, y: CGFloat(cell.row) * side)
+                }
+                RuneGlyph(id: mark.glyphID, lineWidth: max(1.5, side * 0.07))
+                    .frame(width: side, height: side)
+                    .foregroundStyle(tint)
+                    .offset(x: CGFloat(glyphCell(shape).column) * side,
+                            y: CGFloat(glyphCell(shape).row) * side)
             }
         }
         .frame(width: CGFloat(shape?.width ?? 1) * side,
@@ -630,6 +651,18 @@ struct PageGridView: View {
                     width: CGFloat(shape?.width ?? 1) * side,
                     height: CGFloat(shape?.height ?? 1) * side,
                     failed: markPackUnavailable)
+            } else {
+                cells(of: shape, side: side) { cell in
+                    Rectangle().fill((ok ? Color.accentColor : Color.red).opacity(0.16))
+                        .overlay(Rectangle().stroke(ok ? Color.accentColor : Color.red, lineWidth: 1))
+                        .frame(width: side, height: side)
+                        .offset(x: CGFloat(cell.column) * side, y: CGFloat(cell.row) * side)
+                }
+                RuneGlyph(id: ghost.glyph, lineWidth: max(1.5, side * 0.07))
+                    .frame(width: side, height: side)
+                    .foregroundStyle(ok ? Color.accentColor : Color.red)
+                    .offset(x: CGFloat(glyphCell(shape).column) * side,
+                            y: CGFloat(glyphCell(shape).row) * side)
             }
         }
         .frame(width: CGFloat(shape?.width ?? 1) * side,

@@ -226,4 +226,15 @@ final class WritingDeskProductionPackTests: XCTestCase {
         XCTAssertFalse(contents.contains { $0.lowercased().contains("evidence") })
         XCTAssertFalse(contents.contains { $0.contains("contact-sheet") })
     }
+
+    func testBundledLocatorUsesExactPhysicalProductPathNotResourceIndex() throws {
+        let source = try String(contentsOf: packRoot.deletingLastPathComponent()
+            .deletingLastPathComponent().deletingLastPathComponent()
+            .deletingLastPathComponent()
+            .appendingPathComponent("Sources/VisualRuntime/WritingDeskProductionPack.swift"),
+                                encoding: .utf8)
+        XCTAssertTrue(source.contains("bundle.bundleURL.appendingPathComponent(\"runtime\""))
+        XCTAssertTrue(source.contains("root.appendingPathComponent(\"manifest.json\""))
+        XCTAssertFalse(source.contains("url(forResource: \"manifest\""))
+    }
 }
