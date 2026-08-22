@@ -5126,7 +5126,8 @@ final class CombatTests: XCTestCase {
         XCTAssertEqual(store.activeEncounter?.debugGodMode?.preventedLethalDamageCount, 3,
                        "the Binder's remaining Burn tick and the companion's Poison stay ordinary lethal events")
         XCTAssertTrue(store.activeEncounter?.log.contains {
-            $0.contains("God mode records lethal damage") && $0.contains("Balance evidence is invalid")
+            $0.contains("God mode records lethal damage")
+                && $0.contains("Combat-balance evidence for this encounter is invalid")
         } == true)
         let resumed = try JSONDecoder().decode(GameState.self,
                                                 from: JSONEncoder().encode(store.state))

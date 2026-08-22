@@ -887,7 +887,7 @@ struct BalancingView: View {
             Section("Testing safety") {
                 Toggle("God mode for new encounters",
                        isOn: $settings.debugTuning.debugGodModeEnabled)
-                Text("Default off. The setting freezes when the next encounter opens. Combat decisions, damage, conditions, cooldowns and logs remain ordinary, but lethal party damage stops at 1 health and all balance evidence is marked invalid.")
+                Text("Default off. The setting freezes when the next encounter opens. Combat decisions, damage, conditions, cooldowns and logs remain ordinary, but lethal party damage stops at 1 health. Combat-balance evidence is marked invalid; other bug evidence remains usable.")
                     .font(.caption)
                     .foregroundStyle(.secondary)
                 if store.activeEncounter != nil {

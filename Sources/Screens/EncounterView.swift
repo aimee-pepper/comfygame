@@ -31,7 +31,7 @@ struct EncounterView: View {
                 header(encounter)
 #if DEBUG
                 if encounter.debugGodMode != nil {
-                    Label("GOD MODE · BALANCE EVIDENCE INVALID", systemImage: "exclamationmark.shield.fill")
+                    Label("GOD MODE · COMBAT-BALANCE EVIDENCE INVALID", systemImage: "exclamationmark.shield.fill")
                         .font(.caption.bold())
                         .foregroundStyle(.black)
                         .frame(maxWidth: .infinity)

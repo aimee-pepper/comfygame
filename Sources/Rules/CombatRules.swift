@@ -2394,7 +2394,7 @@ enum CombatRules {
 #if DEBUG
         if godModePreventsDefeat {
             encounter.debugGodMode?.preventedLethalDamageCount += 1
-            encounter.note("God mode records lethal damage but keeps \(actorName(target, encounter: encounter).lowercased()) at 1 health. Balance evidence is invalid.")
+            encounter.note("God mode records lethal damage but keeps \(actorName(target, encounter: encounter).lowercased()) at 1 health. Combat-balance evidence for this encounter is invalid.")
         }
 #endif
     }
