@@ -448,8 +448,8 @@
       "priority": "B1.7b",
       "title": "Layered terrain shapes and restrained motion",
       "status": "queued",
-      "detail": "Future joint visual/source slice: render recolourable terrain as ordered material layers with irregular rounded boundaries rather than a dominant square grid, then add continuous water motion, rare ice glints and wind-driven grass motion without changing passability, visibility or generation RNG. The closed false-sidewall fix remains a separate receipt.",
-      "gate": "First freeze an AssetLab material-stack contract (water below rock below dirt below grass), adjacency and elevation ownership, motion phase/seed inputs and reduced/static fallback. Then prove terrain identity and collision stay bit-for-bit rules-equivalent, hidden tiles disclose nothing, similar worlds remain visually related, and animation does not move gameplay state. Village/House/Library proof is the current Asset assignment; this waits behind it.",
+      "detail": "Design is closed in terrain-layering-and-motion-asset-packet-current.md. The future Asset slice keeps the map straight top-down and composes reviewed 16×16 water, hard surface, loose surface and growth bitmaps through shared irregular edge contours with no vertical sidewalls. One map-level four-tick clock may animate restrained water ripples, bounded growth flex and rare Ice glints without rerastering static bodies or touching rules.",
+      "gate": "Hold behind corrected B1.6a World Arrival acceptance. Then freeze the exact terrain-layers-v1 request, 12-family logical bitmap kit, complementary edge masks, Water/Deep-Water and Growth/Groundcover pair rules, shared six-second motion loop, per-frame pixel budgets and Reduce Motion/static fallback. The 11×11 proof must preserve all rule receipts, omit hidden requests, keep remembered/fringe static, show no equal-height sidewalls and retain route/content/warning ownership in color and grayscale. No native work before visual acceptance.",
       "workstream": "asset",
       "isPrimary": false
     },
