@@ -428,17 +428,6 @@
         { "condition": { "target": "atmosphere", "measure": "peak", "minimum": 62 }, "passage": "The air becomes unusually dense and heavy at its peak. Everyone breathes harder in it, including the person standing first." }
       ],
       "leansToward": ["locationClue", "gambit"],
-      "meeting": {
-        "opening": "Bryn braces one shoulder against a buckling sheet of stone. Behind her, three travellers are already carrying their bedrolls through another exit. “They found a safer way,” she says. “I'm keeping this one open until they're clear.”",
-        "questions": [
-          { "id": "bryn.held_route", "ask": "What are you holding it open for?", "reply": "“In case someone has to come back.” She adjusts her footing. “A safe retreat is still useful when nobody chooses the original route.”" },
-          { "id": "bryn.protection_debt", "ask": "You still saved them.", "reply": "“I helped. They don't owe me their next decision.” She checks the other exit. “Frightened people agree too quickly. I try not to collect those promises.”" },
-          { "id": "bryn.chosen_exit", "ask": "Which way will they go?", "reply": "“The other one, by the look of it.” One corner of her mouth lifts. “Good. I was getting tired of arguing with a wall on their behalf.”" }
-        ],
-        "offer": "Come with me. My party needs someone who can spot danger early, hold it off, and still let people choose their own way out.",
-        "accepted": "“Then help me move this brace before my shoulder becomes part of the architecture.” She waits for the last traveller to clear the other exit before stepping away.",
-        "declined": "“Fair.” Bryn settles her shoulder again. “If you pass them, tell them I heard the answer this time.”"
-      },
       "lean": { "protection": 1, "fortitude": 1 }
     },
     {
@@ -451,17 +440,6 @@
         { "condition": { "target": "atmosphere", "measure": "aspect", "key": "motion", "maximum": 20 }, "passage": "The air remains almost completely still, and smoke rises straight upward. A fire could be placed without its smoke crossing every bedroll." }
       ],
       "leansToward": ["whereabouts", "ruin"],
-      "meeting": {
-        "opening": "Orsa has made a shallow shelter comfortable without closing it in. A lamp faces away from the sleeping mat, every seat can see an exit, and bright cloth marks one private corner. “Try the stool,” she says. “I repaired it, but I don't trust its opinion of taller guests.”",
-        "questions": [
-          { "id": "orsa.room_test", "ask": "What am I testing?", "reply": "“Whether you can sit without staring at the door, mostly. Also the repair.” She tests the stool with one foot. “Comfort usually has a very boring explanation.”" },
-          { "id": "orsa.disclosed_risk", "ask": "Why mark that corner?", "reply": "“It means ask before entering. The last guest wanted one place nobody would approach unexpectedly.” Orsa smooths the cloth. “Simple rule. Worked beautifully.”" },
-          { "id": "orsa.strangers", "ask": "Do you trust everyone who stays here?", "reply": "“Certainly not.” She glances around the separate spaces. “But we can share soup and dry ground without pretending we're lifelong friends. One night is allowed to be only one night.”" }
-        ],
-        "offer": "Come home with me. Help me make the Firepit comfortable for travellers—good food, clear exits, and room for people who aren't ready to call us family.",
-        "accepted": "“Good. We begin with the chairs.” Orsa lifts the lamp. “People confess all sorts of things when furniture leaves them nowhere comfortable to look.”",
-        "declined": "“Then sit as long as you like.” She turns the lamp down. “The stool doesn't require a long-term commitment.”"
-      },
       "lean": { "fortitude": 1, "kindling": 1 }
     },
     {
@@ -472,17 +450,6 @@
         { "condition": { "target": "relief", "measure": "aspect", "key": "openness", "minimum": 68 }, "passage": "The land is broad and open, with few barriers between one horizon and the next. A loaded cart could cross without the ground inventing a toll." }
       ],
       "leansToward": ["worldWorthWriting", "whereabouts"],
-      "meeting": {
-        "opening": "Vance turns a repaired kettle over in his hands. Three ownership marks cross its base; a fourth has been filed away, but not deeply enough. Beside it lies a neat price card with the number still blank. “It boils,” he says. “Good start. Not much of a sales pitch.”",
-        "questions": [
-          { "id": "vance.repairs", "ask": "What do the repairs tell you?", "reply": "“One owner carried it by the lid. One patched it with excellent metal and terrible judgment. One needed the handle on the left.” He points to each repair. “People record how they use a thing, whether they intend to or not.”" },
-          { "id": "vance.missing_mark", "ask": "Why was that mark removed?", "reply": "“Someone wanted the previous owner forgotten.” His thumb rests over the scar. “I could ignore it and sell the kettle faster. I won't. The buyer gets to know what they are carrying.”" },
-          { "id": "vance.price", "ask": "So what is it worth?", "reply": "“Depends who needs it and what else they have.” He taps the blank card. “Unfortunately, the Trading Post requires a number rather than a philosophical crisis. Give me a minute.”" }
-        ],
-        "offer": "Come home with me. I bring back more useful things than we can keep. Run a Trading Post where I can sell the extras and buy what we actually need.",
-        "accepted": "Vance writes a price, then adds the missing ownership mark beneath it. “There. Honest, useful, and slightly harder to sell. A respectable compromise.”",
-        "declined": "“All right.” He turns the blank card face down. “If you change your mind, I will still have the kettle. I may even have decided what it costs.”"
-      },
       "lean": { "precision": 1, "kindling": 1 }
     },
     {
@@ -517,17 +484,6 @@
         { "condition": { "target": "illumination", "measure": "peak", "minimum": 65 }, "passage": "At the brightest interval every edge separates from the surface behind it. A visible opening can still close while you consider it." }
       ],
       "leansToward": ["locationClue", "gambit"],
-      "meeting": {
-        "opening": "Talin crouches near a plated creature that has not noticed her. The point of her blade follows a seam that appears whenever it inhales. “Wait,” she whispers. “The gap closes before I can recover.”",
-        "questions": [
-          { "id": "talin.opening", "ask": "What are you waiting for?", "reply": "“A gap wide enough to strike and get my hand back.” The seam closes. “There. Too short again.”" },
-          { "id": "talin.certainty", "ask": "How will you know it is the right moment?", "reply": "“I won't be certain.” Her grip stays loose. “I'll know I have enough time. That's the standard I can actually use.”" },
-          { "id": "talin.outcome", "ask": "And if the strike works?", "reply": "“Then I judged this one correctly.” Talin watches the next breath. “If I get lucky, I still want to know it was luck.”" }
-        ],
-        "offer": "Come with me. Teach my party how to recognize a real opening, use it, and recover before the enemy answers.",
-        "accepted": "The seam opens. Talin lowers the blade instead of striking. “Good. This one no longer needs to become proof.” She backs away with you.",
-        "declined": "“Then leave before it breathes again.” Her attention returns to the seam. “A decision can be sound without becoming permanent.”"
-      },
       "lean": { "precision": 1, "swiftness": 1 }
     },
     {
@@ -541,17 +497,6 @@
         { "condition": { "target": "substrate", "measure": "form", "key": "volatile", "minimum": 35 }, "passage": "Much of the exposed ground reacts to moisture by changing colour, venting or shifting. I need to test which reactions are dangerous." }
       ],
       "leansToward": ["locationClue", "focus"],
-      "meeting": {
-        "opening": "Nessa scrapes the names from two identical blue vials and replaces them with longer labels. One gets a pawprint, a quantity and a time; the other gets a hand and half the dose. “Same mixture,” she says. “Different instructions. The old labels nearly made that expensive.”",
-        "questions": [
-          { "id": "nessa.same_substance", "ask": "They contain the same thing?", "reply": "“Yes. One was swallowed by a person; one went on an animal's wound. Same mixture, different dose and route.” She caps both vials." },
-          { "id": "nessa.cure_or_poison", "ask": "Is it medicine or poison?", "reply": "“Tell me who is taking it, how much, and when. Then I'll answer.” Nessa holds up the old label. “Anyone who answers faster is selling confidence.”" },
-          { "id": "nessa.result", "ask": "Did either one work?", "reply": "“The smaller dose helped. The larger one made the animal ill.” She sets the vials apart. “Both survived. I'd prefer not to repeat the experiment.”" }
-        ],
-        "offer": "Come home with me. I'll bring you ingredients and tell you whose body, which route and what moment they are meant for. Make us remedies, coatings and tools that say what they are for.",
-        "accepted": "“Then we begin with labels before bottles.” Nessa hands you the scraped-off names. “Keep these. Confidence should leave evidence when it was wrong.”",
-        "declined": "“Do not take either vial.” She finishes the new labels. “Refusing an unknown dose is also competent fieldwork.”"
-      },
       "lean": { "venom": 1, "protection": 1 }
     },
     {
@@ -565,17 +510,6 @@
         { "condition": { "target": "hydrology", "measure": "aspect", "key": "dispersion", "minimum": 70 }, "passage": "Films, puddles and shallow crossings spread water across nearly the whole route. Leather fastenings would swell repeatedly here." }
       ],
       "leansToward": ["locationClue", "focus"],
-      "meeting": {
-        "opening": "Corrin has a broad strap looped around a smooth stone. She pulls it through, marks the place it catches, then works only that thumb-width of material until the fibres warm and darken. “The strap is fine,” she says. “The shoulder that has to meet it eight hundred times is less theoretical.”",
-        "questions": [
-          { "id": "corrin.wear_point", "ask": "Why work only that spot?", "reply": "“Because comfort fails locally.” She folds the strap where it rubbed. “A material can be strong everywhere and cruel in one repeated place.”" },
-          { "id": "corrin.source_marks", "ask": "What was it made from?", "reply": "Corrin turns the clean face down and shows you three changes in the grain. “Three hides. Whoever finished it tried to make them look identical. They aren't, and one stretches badly.”" },
-          { "id": "corrin.nothing_wasted", "ask": "At least none of it was wasted.", "reply": "“That's good, but it doesn't tell me whether it was worth taking.” She tests the softened section. “Use every piece. Ask the other question first.”" }
-        ],
-        "offer": "Come home with me. Make us bindings, capacity goods and protection that expects bodies to move. I'll bring what I know about each material's source too.",
-        "accepted": "“Good. Wear this for ten steps.” Corrin hands you the unfinished strap. “If you tell me it feels fine after one, I will make you walk nine more.”",
-        "declined": "“Then leave the strap.” She returns to the worn place. “Finishing something is not the same as knowing where it belongs.”"
-      },
       "lean": { "evasion": 1, "fortitude": 1 }
     },
     {
@@ -589,17 +523,6 @@
         { "condition": { "target": "atmosphere", "measure": "aspect", "key": "motion", "minimum": 58 }, "passage": "Strong gusts move through the world, then briefly fall still. Swinging is not different because the weapon has a name." }
       ],
       "leansToward": ["locationClue", "gambit"],
-      "meeting": {
-        "opening": "Dagg drives a heavy practice head into the ground once. The blow is controlled and unimpressive until a buried slab shifts half a handspan. He does not strike again. He measures the new footing, clears a space behind his heel, and waits for his breath to become ordinary.",
-        "questions": [
-          { "id": "dagg.one_strike", "ask": "Why only one?", "reply": "“Because I moved the slab.” He braces a boot against its new edge. “A second swing from the same stance would be practice for a situation that no longer exists.”" },
-          { "id": "dagg.recovery_space", "ask": "What are you measuring now?", "reply": "“Whether I can step back without falling over.” Dagg marks the distance behind him. “The impressive part of a swing is useless if the recovery gets you killed.”" },
-          { "id": "dagg.cost_of_waiting", "ask": "What if someone cannot wait for the best moment?", "reply": "“Then I hit sooner.” His expression tightens. “Perfect timing that arrives after somebody gets hurt is just late.”" }
-        ],
-        "offer": "Come with me. My party meets weight that punishes hurry and danger that punishes delay. Teach us to see commitment, impact and recovery as one action.",
-        "accepted": "Dagg shoulders the practice head. “Then we start by moving this slab, not proving I can move it twice.”",
-        "declined": "“Do not mistake my staying for certainty.” He checks the shifted ground again. “I am still deciding what this place can bear.”"
-      },
       "lean": { "force": 1, "fortitude": 1 }
     },
     {
@@ -613,17 +536,6 @@
         { "condition": { "target": "atmosphere", "measure": "aspect", "key": "motion", "maximum": 20 }, "passage": "Grass tips remain still enough to show the smallest disturbance. Distance speaks before the person crossing it does." }
       ],
       "leansToward": ["locationClue", "gambit"],
-      "meeting": {
-        "opening": "Rook removes a row of pale distance markers and plants it farther from a narrow crossing. The last marker is split. Beyond it, something large has stopped short of the crossing but within Rook's spear reach. “It saw the line,” they say. “It could not know what the line meant. That failure is mine.”",
-        "questions": [
-          { "id": "rook.moved_line", "ask": "Why move the markers?", "reply": "“A warning must arrive before the consequence.” Rook sights along the new row. “The old distance was clear to someone already trained to fear a spear.”" },
-          { "id": "rook.boundary_owner", "ask": "Is this your boundary?", "reply": "“I maintain the markers. I didn't choose where the only dry path would be.” They glance toward the crossing. “If the line blocks the road, it needs a better reason than my convenience.”" },
-          { "id": "rook.stopped_creature", "ask": "You could reach it from here.", "reply": "“Yes, and it can't reach me.” Rook lowers the spear. “That gives me time to warn it, move, or strike. I prefer having three choices.”" }
-        ],
-        "offer": "Come with me. My party should know where contact becomes inevitable while there is still room to warn, answer or turn away.",
-        "accepted": "Rook snaps the broken marker shorter and plants it where even a low gaze will meet it. “Then this line remains until the crossing changes—not merely until I grow used to it.”",
-        "declined": "“You have not crossed.” They step aside from the passage. “A boundary that permits only agreement is not offering a choice.”"
-      },
       "lean": { "precision": 1, "protection": 1 }
     },
     {
@@ -637,17 +549,6 @@
         { "condition": { "target": "atmosphere", "measure": "aspect", "key": "motion", "maximum": 20 }, "passage": "The air is so still that a loose page remains open to the same line. Any movement on the page can be attributed to something nearby." }
       ],
       "leansToward": ["locationClue", "focus"],
-      "meeting": {
-        "opening": "Lys has laid two weathered records beside each other. Their margins name the same three places, but between the second and third she has left a clean rectangle of bare ground. “Nothing was lost from either page,” she says. “Only the account of how one became the other.”",
-        "questions": [
-          { "id": "lys.missing_relation", "ask": "What belongs in the empty space?", "reply": "“A note explaining what changed between these records.” Lys keeps the gap open. “It might be a correction, a disagreement, or somebody asking not to be included. I don't know yet.”" },
-          { "id": "lys.two_accounts", "ask": "Which record is right?", "reply": "“Neither is reliable by itself.” She taps the same sentence on both pages. “They copied each other here. Over there, both writers were present and disagree. I want the disagreement preserved.”" },
-          { "id": "lys.living_subject", "ask": "Can you preserve the full context?", "reply": "“No. I can record where a statement came from, what surrounded it, and who disputed it.” Lys looks up. “That makes misuse harder. It doesn't make my copy complete.”" }
-        ],
-        "offer": "Come home with me. My Library is collecting fragments. Make their relationships searchable without pretending the gaps are solved, and keep the disagreements visible too.",
-        "accepted": "Lys wraps the two records separately. “Good. They travel together, but neither becomes the other's correction.”",
-        "declined": "“Then remember the space.” She leaves the bare rectangle undisturbed. “An uncatalogued absence is still easier to notice than a confident invention.”"
-      },
       "lean": { "kindling": 1, "precision": 1 }
     },
     {
@@ -662,17 +563,6 @@
         { "condition": { "target": "atmosphere", "measure": "peak", "minimum": 62 }, "passage": "The air is dense enough to press against every seam and gap. The body underneath will not call a weak join negligible." }
       ],
       "leansToward": ["locationClue", "focus"],
-      "meeting": {
-        "opening": "Bracken is cutting apart a breastplate that looks almost untouched. He asks you to hold an edge, then moves your hand away from a buckle hidden underneath. The inner padding has been crushed to a hard crescent. “The outside retained its shape,” he says. “The wearer was less fortunate.”",
-        "questions": [
-          { "id": "bracken.intact_outside", "ask": "Why ruin armour that still works?", "reply": "“Because it doesn't.” Bracken lifts the flattened lining. “The point stayed out. The force went straight through the padding and into the wearer.”" },
-          { "id": "bracken.wearer", "ask": "Who wore it?", "reply": "“Someone who twisted left after the blow, breathed shallowly and kept the lower strap too tight.” He studies the marks. “That is what the object proves. A name would be something I added.”" },
-          { "id": "bracken.impenetrable", "ask": "Can you make something nothing gets through?", "reply": "“If the wearer promises not to turn, breathe deeply, overheat, or leave in a hurry.” He lets the hidden buckle catch. “So no. I can make armour that handles the harm we expect.”" }
-        ],
-        "offer": "Come home with me. Halloway's forge makes strong work. Build what comes after it: armour chosen for the expected harm and the cost a particular wearer can carry.",
-        "accepted": "“Is Halloway still there?” At your answer, Bracken gathers the separated layers. “Good. She will object precisely enough to be useful.”",
-        "declined": "“Then do not put this plate back together.” He sets the intact outer shell aside. “A convincing surface is how the same failure gets another wearer.”"
-      },
       "lean": { "fortitude": 1, "protection": 1 }
     },
     {
@@ -687,17 +577,6 @@
         { "condition": { "target": "cycle", "measure": "aspect", "key": "regularity", "minimum": 82 }, "passage": "Light, wind and other world changes return on a predictable schedule. Repeating a shot under the same interval could produce a useful comparison." }
       ],
       "leansToward": ["locationClue", "focus"],
-      "meeting": {
-        "opening": "Fen has tied six cords between two stones. They pluck one, wait for the wind to pass, then cut it down. “Pitch dropped,” they say. “It stretched. Fine for a sling, poor for a bow.”",
-        "questions": [
-          { "id": "fen.hundred_draws", "ask": "Are you making a bow?", "reply": "“Testing bowstrings.” Fen coils the rejected cord. “A string that stretches on the hundredth draw changes every shot after it. This one can become a sling.”" },
-          { "id": "fen.path_before_target", "ask": "What are you aiming at?", "reply": "“Nothing yet.” They watch loose fibres lift in the crosswind. “First I learn what the wind will do. Then I choose a weapon and target that make sense in it.”" },
-          { "id": "fen.weapon_and_hunt", "ask": "Did you hunt with what you made?", "reply": "“Sometimes.” Fen stills the next cord. “I make things that can reach a target. I still decide whether the target should be hit.”" }
-        ],
-        "offer": "Come with me. I have materials worth testing and journeys where distance matters. Make us bows, launchers and thrown weapons that account for the whole physical path.",
-        "accepted": "Fen cuts down the remaining cords in order and labels each coil. “Then they come too. Rejected for one use is not the same as useless.”",
-        "declined": "“All right.” They pluck the next cord. “Stand downwind if you're staying. Your coat is making the test louder than the string.”"
-      },
       "lean": { "precision": 1, "swiftness": 1 }
     },
     {
@@ -712,17 +591,6 @@
         { "condition": { "target": "cycle", "measure": "aspect", "key": "amplitude", "minimum": 62 }, "passage": "The quiet and the rush demand different routes through the same ground. Remembering only the dramatic one is how exits disappear." }
       ],
       "leansToward": ["locationClue", "gambit"],
-      "meeting": {
-        "opening": "Wren stands beyond three circling threats, shifting pebbles on a flat stone to track their routes. One pebble marks a slower traveller whose exit is narrowing. “I can get out,” he says. “They can't. So we're using their route first.”",
-        "questions": [
-          { "id": "wren.open_exit", "ask": "Where is the exit?", "reply": "“I have four.” Wren taps the lone slow pebble. “They have one, and I pulled a creature across half of it. I'm fixing that.”" },
-          { "id": "wren.threat_pattern", "ask": "Will the creatures fight each other?", "reply": "“For a moment. Then the smaller one gives ground and blocks this gap.” He moves two pebbles together. “Useful distraction, terrible long-term plan.”" },
-          { "id": "wren.tempo_debt", "ask": "Can you reach them in time?", "reply": "“Yes, if I move now.” He rolls his shoulders. “Ask the next question while we're running.”" }
-        ],
-        "offer": "Come with me. My party meets crowds that make the current arrangement unsafe. Help us keep exits open and count the recovery after a burst as honestly as the burst itself.",
-        "accepted": "Wren scatters the three threat pebbles with one sweep and moves toward the closing gap. “Good. We take their exit first. Mine will still be mine if I planned this correctly.”",
-        "declined": "“Then take the high route.” He points without looking away from the pattern. “It is not my fastest exit, which is why it may remain available to you.”"
-      },
       "lean": { "evasion": 1, "swiftness": 1 }
     },
     {
@@ -738,17 +606,6 @@
         { "condition": { "target": "atmosphere", "measure": "aspect", "key": "clarity", "minimum": 76 }, "passage": "Fine disturbance stays visible at range. Observation becomes easier; interpretation does not." }
       ],
       "leansToward": ["locationClue", "gambit"],
-      "meeting": {
-        "opening": "Kestrel watches an animal return to feeding after a pursuit she did not join. Only when its ears settle and its route becomes ordinary does she lower her bow. She writes three lines, crosses out the second, and continues watching. “The chase taught me what it does while chased,” she says. “That is not yet the animal.”",
-        "questions": [
-          { "id": "kestrel.ordinary_behavior", "ask": "What changed when it calmed?", "reply": "“Its left leg still bears weight. It feeds uphill. It chooses cover near water but not the water itself.” Kestrel closes the notebook. “Facts that pursuit had hidden under fear.”" },
-          { "id": "kestrel.take_or_leave", "ask": "Are you going to kill it?", "reply": "“I haven't decided.” She lowers the bow. “I know I could make the shot. That isn't a reason to take it.”" },
-          { "id": "kestrel.trace_limit", "ask": "What did you cross out?", "reply": "“I wrote that it travelled alone.” She points to an older second track. “All I actually knew was that its companion passed earlier. 'Alone' was me improving the story.”" }
-        ],
-        "offer": "Come with me. Teach my party to recognize an animal before reducing it to threat or material—and to waste less when taking one is the decision we actually make.",
-        "accepted": "Kestrel waits until the animal chooses another route before standing. “Good. We leave by the path that does not turn this conversation into another pursuit.”",
-        "declined": "“Then circle downwind.” She marks the corrected track. “Learning where it is does not entitle either of us to make it move.”"
-      },
       "lean": { "precision": 1, "force": 1 }
     },
     {
@@ -763,17 +620,6 @@
         { "condition": { "target": "cycle", "measure": "aspect", "key": "regularity", "minimum": 85 }, "passage": "The same light and weather conditions return at a highly predictable time. I can test each alteration under matching conditions." }
       ],
       "leansToward": ["locationClue", "whereabouts"],
-      "meeting": {
-        "opening": "Maud hands you a plain iron bar before introducing herself. She turns your wrist, moves your lower hand half a span, then takes the bar back and marks where your grip settled—not its centre. “There,” she says. “That is the first measurement the metal could not give me.”",
-        "questions": [
-          { "id": "maud.not_weapon_yet", "ask": "Is that a weapon?", "reply": "“It's an iron bar.” Maud balances it on her mark. “Give it a reach, balance, grip and intended use. Then we can call it a weapon and judge whether it's a good one.”" },
-          { "id": "maud.advanced_compromise", "ask": "What makes a weapon advanced?", "reply": "“Better materials, better construction, and a clear answer about who will use it.” She shifts the balance toward your upper hand. “Rare metal doesn't make a bad fit impressive.”" },
-          { "id": "maud.halloway", "ask": "Did Halloway teach you?", "reply": "“She taught me what metal says under force.” Maud adds a second mark. “Other teachers showed me what shoulders and wrists say. I listen to both.”" }
-        ],
-        "offer": "Halloway keeps the forge. Come build the work that needs a hand beside hers: near enough to share heat, far enough not to share an anvil.",
-        "accepted": "“Beside will do, with those measurements.” Maud gives the marked bar back. “Bring it. You return to that grip when surprised, and I want the weapon to know before you need it.”",
-        "declined": "“Keep the bar.” She closes your hands around the marked positions. “Notice how quickly fear puts them there without asking either of us.”"
-      },
       "lean": { "force": 1, "precision": 1, "fortitude": 1 }
     },
     {
@@ -789,17 +635,6 @@
         { "condition": { "target": "hydrology", "measure": "available", "minimum": 60 }, "passage": "There is water along the route. No one person must carry enough for everyone, which is how a provision becomes part of the formation." }
       ],
       "leansToward": ["locationClue", "gambit"],
-      "meeting": {
-        "opening": "Marrick resets six formation markers around a defended space. Five are worn smooth by repeated footing. The sixth lies beyond the line, untouched. “Five people knew exactly where to stand,” he says. “The sixth couldn't reach their place. We kept calling that a successful formation.”",
-        "questions": [
-          { "id": "marrick.sixth_marker", "ask": "Who was the sixth place for?", "reply": "“Anyone slower, injured, or new to the formation.” Marrick moves it within reach of two others. “Which means it belonged to the person most likely to need help reaching it.”" },
-          { "id": "marrick.repeated_routine", "ask": "Why repeat a formation?", "reply": "“So everyone can use it while frightened and tired.” He walks the fallback route without looking down. “But repetition also hides bad assumptions. That's why we test every position.”" },
-          { "id": "marrick.success_count", "ask": "But it protected five people.", "reply": "“It did, and we keep what worked.” Marrick moves the sixth marker inside the line. “Then we fix the part that left one person out.”" }
-        ],
-        "offer": "Come with me. My party needs routines that still work when nobody has attention left to spare. Build them with us, beginning with the person who cannot use them.",
-        "accepted": "Marrick scuffs all six markers and asks you to take the least convenient position. “Good. A shared routine starts when someone besides its designer can correct it.”",
-        "declined": "“Then do not memorize this arrangement.” He overturns the five worn markers. “A plan should not survive longer than the people it no longer serves.”"
-      },
       "lean": { "protection": 1, "fortitude": 1 }
     },
     {
@@ -816,17 +651,6 @@
         { "condition": { "target": "cycle", "measure": "aspect", "key": "regularity", "minimum": 85 }, "passage": "The same calls begin at the same interval, and the same paths fill soon after. They can learn when I return; that does not mean they must come." }
       ],
       "leansToward": ["locationClue", "focus"],
-      "meeting": {
-        "opening": "Sabine is repairing a braided lead while its owner watches from well outside arm's reach. Tracks circle her camp, stopping at a low boundary of loose twigs. She notices your boot crossing it and waves you back. “Sorry. The twigs are doing excellent work, but they are terrible at introductions.”",
-        "questions": [
-          { "id": "sabine.nearby_animals", "ask": "Where are the animals?", "reply": "“Watching us, mostly.” Sabine points out fresh prints beside an untouched bowl. “The small one wants the food. The large one wants to know why I want it to want the food. We are negotiating.”" },
-          { "id": "sabine.ownership", "ask": "Do they belong to you?", "reply": "“No. I keep the water clean, treat injuries when they let me, and take responsibility for every foolish fence I build.” She holds up the unattached lead. “This belongs to me. At present, nobody is impressed by it.”" },
-          { "id": "sabine.survival_route", "ask": "Did they show you how to survive here?", "reply": "“One showed me water. Another stole supper. A third led a predator directly past my bedroll.” Sabine grins. “Useful colleagues. Mixed references.”" }
-        ],
-        "offer": "There is a base. Come inspect it, and help me make room where animals can stay, work beside people and still communicate refusal. You needn't promise it on anyone else's behalf.",
-        "accepted": "Sabine shoulders the unused lead. “I'll inspect it. If I hate the place, you'll get a very thorough list. If I like it, you'll still get the list.”",
-        "declined": "“Fair enough. And don't follow the clearest tracks out.” She replaces the crossed twig. “Those belong to the heavy one. It dislikes surprises and has dreadful manners.”"
-      },
       "lean": { "protection": 1, "precision": 1, "evasion": 1 }
     },
     {
@@ -843,17 +667,6 @@
         { "condition": { "target": "atmosphere", "measure": "peak", "maximum": 30 }, "passage": "Breath thins before stone yields. A body is the first support the plan spends." }
       ],
       "leansToward": ["locationClue", "focus"],
-      "meeting": {
-        "opening": "Grimmond braces a dark seam before touching his pick. He taps three points, waits, then adds another support. On his slate, the planned empty space is drawn more carefully than the ore. “Pretty seam,” he says. “It'll still crush you.”",
-        "questions": [
-          { "id": "grimmond.delayed_answer", "ask": "What were you waiting to hear?", "reply": "“The weight shifting.” Grimmond marks a line beyond the seam. “First knock tells me what I hit. The echo tells me what I annoyed.”" },
-          { "id": "grimmond.unclaimed_depth", "ask": "Has anyone worked this place before?", "reply": "“No tool marks.” He presses a thumb to a wet fissure. “Water's been busy. So has the pressure. A place doesn't wait for a miner before it starts changing.”" },
-          { "id": "grimmond.needed_material", "ask": "What if people need what is in the seam?", "reply": "“Then we count the need, the supports, and the bodies under them.” He tightens the brace. “Need doesn't hold a roof up. Timber does.”" }
-        ],
-        "offer": "Come home with me. Open Deep Works that count removal, altered load and what remains supported—not merely how much valuable material returns.",
-        "accepted": "Grimmond adds your name beside the proposed empty shape. “Good. We measure before we dig. Measuring afterward is called an inquest.”",
-        "declined": "“Leave the brace.” He listens once more. “I've already bothered the ceiling. No sense making it vindictive.”"
-      },
       "lean": { "force": 1, "fortitude": 1 }
     },
     {
@@ -871,17 +684,6 @@
         { "condition": { "target": "cycle", "measure": "aspect", "key": "regularity", "minimum": 85 }, "passage": "Light, weather and other world changes return on a highly predictable schedule. Repeating a test under the same interval can distinguish containment from luck." }
       ],
       "leansToward": ["locationClue", "whereabouts"],
-      "meeting": {
-        "opening": "A pale line crosses the clearing before you see Oda. The last of four stone markers splits; everything beyond it remains untouched. She lowers a damaged conduit and checks a slate. “Approach corridor held. Marker four did not. Please stand exactly where you are while I determine which result matters.”",
-        "questions": [
-          { "id": "oda.carried_force", "ask": "What was that?", "reply": "“A heat charge in a ceramic carrier with a cracked outer housing.” Oda opens the shell without touching its core. “The heat behaved to specification. The housing did not. I built the housing.”" },
-          { "id": "oda.distance", "ask": "Why test it from so far away?", "reply": "“At this distance, a primary rupture misses me by two strides.” She checks behind the target. “A secondary discharge reaches this marker. That is why you may not take another step.”" },
-          { "id": "oda.weapon_history", "ask": "Did you make weapons before the Sundering?", "reply": "“Yes. Contained heat, projected caustic charge, several failed light housings.” Oda marks the split seam. “Calling them tools did not alter their damage profile. Calling them weapons did not describe their other uses.”" }
-        ],
-        "offer": "Come home with me, and bring that intact core. I'll give you walls behind the targets; build Channelworks that make containment, reach and stopping visible.",
-        "accepted": "Oda asks what the target wall is made from, how thick it is, and what stands behind it. “Insufficient answers. Acceptable starting data.” She packs the intact inner assembly.",
-        "declined": "“Understood. Do not take the conduit.” She grounds the core. “The outer housing has failed. The remaining boundaries have not volunteered for demonstration.”"
-      },
       "lean": { "precision": 1, "kindling": 1, "fortitude": 1 }
     },
     {
@@ -901,15 +703,15 @@
       "leansToward": ["locationClue", "focus"],
       "lean": { "precision": 1, "kindling": 1, "fortitude": 1 },
       "meeting": {
-        "opening": "Auber has arranged shallow vessels beneath a mineral drip. He lifts the clear fraction, smells it, then tastes one drop from the handle of a spoon. “Too hot, slightly metallic, and almost useful.” He slides the cloudy residue toward you. “This is the interesting half. Nobody asks to taste this one.”",
+        "opening": "Auber moves the nearly empty vessel rather than the full one, then marks where its last ring dried.",
         "questions": [
-          { "id": "auber.fractions", "ask": "What are you collecting?", "reply": "“Clear liquid for immediate use; coloured sediment for a slower extraction.” Auber swirls each vessel. “The first is sharp and clean. The second smells appalling and contains more than it admits.”" },
-          { "id": "auber.essence", "ask": "Can you make essence here?", "reply": "“A little, badly.” He angles the vessel toward the light. “The heat wanders, the carrier is impure, and the finish tastes of stone. Give me proper glass and I can improve all three.”" },
-          { "id": "auber.residue", "ask": "Why save the residue?", "reply": "“Because it still contains useful material.” Auber labels the cloudy vessel. “Also because pouring it downhill would be rude to everyone downhill. Practicality and manners occasionally agree.”" }
+          { "id": "auber.fractions", "ask": "What are you collecting?", "reply": "Both fractions. What leaves, and what remains when everyone stops looking." },
+          { "id": "auber.essence", "ask": "Can you make essence here?", "reply": "Essence is already here. The question is what form you are willing to pay to keep it in." },
+          { "id": "auber.residue", "ask": "Why save the residue?", "reply": "Throwing something away only changes who must encounter it next." }
         ],
-        "offer": "There is a refinery at the base. Come home with me and build the work it cannot do: crystallisation, attunement and separation that keep carrier and remainder in the same record.",
-        "accepted": "“First, show me the refinery and its drain.” Auber gathers both vessels. “Then tea. I need to know whether your water is merely hard or actively argumentative.”",
-        "declined": "“A pity.” He gives you neither vessel. “They need another hour to settle, and you have already supplied enough dust for one experiment.”"
+        "offer": "There is a refinery at the base. Come build the work it cannot do.",
+        "accepted": "Then we will label the shelves before we fill them.",
+        "declined": "The vessels will still be settling if you return."
       }
     },
     {
@@ -927,17 +729,6 @@
         { "condition": { "target": "cycle", "measure": "aspect", "key": "amplitude", "minimum": 65 }, "passage": "Heat, light, wind and other conditions swing between mild and extreme states. Even a predictable return to the extreme is a burden on the body." }
       ],
       "leansToward": ["locationClue", "gambit"],
-      "meeting": {
-        "opening": "Ashe has marked a wide ring around themself with dark stones and placed warning strips where the wind can carry heat toward an approach. Nothing burns, but the air above their forearms bends. “You may come closer,” they say. “That is permission for this moment, from that direction.”",
-        "questions": [
-          { "id": "ashe.warning_distance", "ask": "Are the markers protecting me or you?", "reply": "“Both.” Ashe tests the air beyond one strip. “You get room to notice the heat. I get to see you coming. Neither of us has to guess.”" },
-          { "id": "ashe.endurance", "ask": "Does it hurt?", "reply": "“Today? A little. Yesterday, badly. Sometimes not at all.” They meet your eyes. “Please don't wait for me to perform agony before you believe the warning.”" },
-          { "id": "ashe.helping_others", "ask": "Can you protect someone from it?", "reply": "“Often, yes.” The heat above their hands tightens, then settles. “Ask me when it happens. I may say yes quickly. I may also be busy keeping myself alive.”" }
-        ],
-        "offer": "Come with me. My party will meet emanations before our instruments or eyes can name them. Help us recognize, receive and ground that pressure when you choose the cost.",
-        "accepted": "Ashe removes one warning strip and leaves the others. “Walk beside me through this gap. And leave the stones. The next person deserves the same warning you got.”",
-        "declined": "“All right.” They straighten the marker displaced by your approach. “Step back through the gap, please. Then we're square.”"
-      },
       "lean": { "fortitude": 1, "kindling": 1 }
     },
     {
@@ -956,17 +747,6 @@
         { "condition": { "target": "hydrology", "measure": "aspect", "key": "salinity", "minimum": 45 }, "passage": "Retreating water leaves a bright white mineral line along every bank. It looks inevitable after it appears; the water remembers otherwise." }
       ],
       "leansToward": ["locationClue", "focus"],
-      "meeting": {
-        "opening": "Perren has arranged fragments from the same ruined rite in two nearly identical patterns. In one, a protected place is formed around a central participant. In the other, the same pieces turn every outer participant toward the centre. “The repeated form is genuine,” he says. “So is the decision about which relationship the repetition is allowed to prove.”",
-        "questions": [
-          { "id": "perren.two_arrangements", "ask": "Which arrangement is correct?", "reply": "“Both can be made from what remains.” Perren leaves the pieces separate. “The question is what each makes difficult to ask once its shape feels inevitable.”" },
-          { "id": "perren.sundering_lesson", "ask": "What did the rite teach?", "reply": "“That difference was the wound and correspondence the cure.” He turns one mirrored piece over. “We built choices whose alternatives were missing, then called the chosen answer revelation.”" },
-          { "id": "perren.trust", "ask": "Do you believe any shared account now?", "reply": "“Sometimes.” The admission costs more than suspicion. “Distrusting every frame lets me remain its only interpreter. That can reproduce the control I claim to have escaped.”" }
-        ],
-        "offer": "Come with me. I am writing worlds with inherited words. Help me keep absent alternatives and reversed images visible; I won't ask you to certify which account is true.",
-        "accepted": "Perren mixes the two arrangements into one labelled cloth rather than choosing between them. “Then keep the questions with the fragments. An answer stored alone becomes instruction very quickly.”",
-        "declined": "“Do not copy either arrangement as a diagram.” He leaves a space between the pieces. “A reproducible frame can travel farther than the warning attached to it.”"
-      },
       "lean": { "precision": 1, "shadow": 1 }
     },
     {
@@ -985,17 +765,6 @@
         { "condition": { "target": "atmosphere", "measure": "aspect", "key": "motion", "maximum": 20 }, "passage": "A loose marker remains where I placed it. I trust the choice again when I see it, even if I cannot recover making it." }
       ],
       "leansToward": ["locationClue", "whereabouts"],
-      "meeting": {
-        "opening": "Nine checks a row of objects against a note written in her own hand: cup upright, blue thread beneath the left stone, one empty place left at the end. She moves nothing until each relation is verified. Then she turns the cup over and adds the change to the note. “The arrangement was mine,” she says. “So is the revision.”",
-        "questions": [
-          { "id": "nine.verified_arrangement", "ask": "Do you remember placing these?", "reply": "“No. I recognize the hand, verify the relationships and decide whether to trust them now.” Nine touches the empty place last. “Continuity can be evidence without pretending to be recollection.”" },
-          { "id": "nine.changed_promise", "ask": "Why turn the cup over?", "reply": "“The old note says it marked water safe to drink. The water changed.” She writes beside rather than over the earlier line. “A promise that survives memory must also survive honest revision.”" },
-          { "id": "nine.missing_origin", "ask": "Would knowing who you were make this easier?", "reply": "“Some things.” Nine considers the question without flinching. “It would not make that person more entitled to my next choice than the person checking the cup now.”" }
-        ],
-        "offer": "Come with me. My journeys depend on marks, returns and promises carried across change. Help me keep those continuities without letting an unknown origin overrule your present.",
-        "accepted": "Nine gives you the blue thread and makes a new note naming that transfer. “Tomorrow I will know you did not steal it. More importantly, tomorrow I may decide the agreement still fits.”",
-        "declined": "“Then the empty place remains empty.” She writes the refusal into the arrangement. “Continuity includes choices that do not become relationships.”"
-      },
       "lean": { "precision": 1, "fortitude": 1 }
     }
   ],

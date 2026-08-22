@@ -1,13 +1,13 @@
 {
   "schemaVersion": 1,
-  "aggregateSourceHash": "77a9bf2f01505b3704fe3c82524c71767d188cbb428ea5fca87b86b10140b77c",
+  "aggregateSourceHash": "30b8882b4f2ed272d17ae2c7cac800c1d455422c890d78f3448b4721e8c468a6",
   "inputs": {
     "Sources/Content/Data/items.json": "b94b1107229f217e14f1d7fa936d8eea938f9782c06c583be32302f10d432bc9",
     "Sources/Content/Data/playability-roadmap.json": "eb70d1ae6ecdb787ca6bf648ccde230cb01328abbe0b155807c801d49bf38606",
     "Sources/Content/Data/resources.json": "8eee965ce7df075abfe3f646bb36d416a10ef1d7d194845e30fa0f31b7b23e6f",
     "Sources/Content/Data/stations.json": "21b5e9f3bee2d9115acf535ef2ff1db350b87b8ee33755e79a3b3e4584102e2b",
     "Sources/Content/Data/symbols.json": "c1ec5dd7b661680b358e21a56124b6080aa28d93db51fd2f6b80214ced1dcb16",
-    "Sources/Content/Data/travellers.json": "3a5bb0676cb13f65d170d7c6ae23cc4144ed258c6008241b4739fb3f9fa56786",
+    "Sources/Content/Data/travellers.json": "ae57096a78141052f11f1b8a0baa5246fb00bbf7543394f978fabc8f02944597",
     "Sources/Model/Materials.swift": "8605e290b4c6e0fa369bc47d1a4cbd81a06bcc2ae5716f6edcaeef4592bfe722",
     "Sources/VisualAdapters/NamedCharacterVisualAdapter.swift": "6037696509384d768ce3e23d0ef441377915bc53b0ba19b9e199ad896495c349",
     "docs/adamant-demand-audit-current.md": "a0607e31cf666d23afb0635ac556039307babb6ed4b076cecde3d7bb9b802cfa",
@@ -234,7 +234,7 @@
     "docs/survey-needle-current.md": "ff08c6a7c51f7aaa7d40982e2af545d3c74630ce72fa968e8531983b67101d75",
     "docs/tannery-system-current.md": "a6544afbb2d77c2369b37922b443cd7d2244ce43bc358d632eeab7b30844499c",
     "docs/tavern-random-companions-current.md": "e7b86a31548089a4a122fba51a1fb1f246d14d84de948300a1873b38ae9648c2",
-    "docs/terrain-layering-and-motion-asset-packet-current.md": "f96094b3e5e898c4ba3969e332532c045a6f3ea2b8aea4bc1d3c62d7b175a6a2",
+    "docs/terrain-layering-and-motion-asset-packet-current.md": "2774589237777b5598ed6c003252b7afe873ff1d776cdc52af2f654d4d5175d4",
     "docs/top-down-map-asset-integration-current.md": "60fbd5232a171bdbe2e7f9f162764c5efd71ac820bde4a71caa4d74a298c962a",
     "docs/trading-post-recycler-current.md": "28c216a665a3e2231f18293c630fd38a5646dd41ebaa29043ceb0c4f97196ee2",
     "docs/trading-post-recycler-economy-current.md": "297d7917d1f2f7c5ee9b8cdd0280a390761d8aa204e138fcb4328941db7e954e",
@@ -287,7 +287,7 @@
     "docs/writing-tool-progression-current.md": "be17fe07aa89aaaab7117a2faca43d7e1eb1be23202d19106c67c42547b23bb0"
   },
   "outputs": {
-    "generated/wiki-data.json": "60f09389095be4c3cf74f9a42c33cf8e7119497557d99c1cb7835a1a580b49d3",
-    "generated/source-registry.json": "9e2770691f820d685685c05fddaf5d61174efd64a3b428de59c7c34e9b3c9595"
+    "generated/wiki-data.json": "662a0fc46a03cbe95a8776fdfb537e799ea076641db7844245abfc3af8e9c08f",
+    "generated/source-registry.json": "790e97c4eaa7e218bf7dfe1d9e17e68fbe5e88e6052c43a8957d801bccb5160e"
   }
 }
