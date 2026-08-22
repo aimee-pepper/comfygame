@@ -90,6 +90,7 @@
 		29B3C3CAADACAFAFCD2D213B /* NativeVisualPack.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3B52219A7EE3D04B75EED3BE /* NativeVisualPack.swift */; };
 		E30000000000000000000001 /* WritingDeskProductionPack.swift in Sources */ = {isa = PBXBuildFile; fileRef = E30000000000000000000002 /* WritingDeskProductionPack.swift */; };
 		E30000000000000000000003 /* WritingDeskProductionPackTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E30000000000000000000004 /* WritingDeskProductionPackTests.swift */; };
+		E30000000000000000000005 /* WritingDeskProductionPack-v1 in Resources */ = {isa = PBXBuildFile; fileRef = E30000000000000000000006 /* WritingDeskProductionPack-v1 */; };
 		2AAA4E398F09BD29BAD7816B /* stations.json in Resources */ = {isa = PBXBuildFile; fileRef = 59F1E2A3A08364F9452A684F /* stations.json */; };
 		2C0118338DCCD9231D0DE4D0 /* GambitEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1EEBBF5F9C846FD07202D739 /* GambitEditorView.swift */; };
 		2EB9403AD8A6CC32F54FBFA1 /* upgrades.json in Resources */ = {isa = PBXBuildFile; fileRef = 84E44EC84F5C25D11A62DAC1 /* upgrades.json */; };
@@ -394,6 +395,7 @@
 		3B52219A7EE3D04B75EED3BE /* NativeVisualPack.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NativeVisualPack.swift; sourceTree = "<group>"; };
 		E30000000000000000000002 /* WritingDeskProductionPack.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WritingDeskProductionPack.swift; sourceTree = "<group>"; };
 		E30000000000000000000004 /* WritingDeskProductionPackTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WritingDeskProductionPackTests.swift; sourceTree = "<group>"; };
+		E30000000000000000000006 /* WritingDeskProductionPack-v1 */ = {isa = PBXFileReference; lastKnownFileType = folder; name = "WritingDeskProductionPack-v1"; path = "AssetLab/integration/writing-desk-production-pack-v1/runtime"; sourceTree = SOURCE_ROOT; };
 		3B6F502E8B3B230294A2874A /* PartyRosterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PartyRosterView.swift; sourceTree = "<group>"; };
 		3CD59EA0991C7AFB32B3129C /* BookbinderTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = BookbinderTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		3F7B97CCB3D7660ADA8ED9E5 /* MapAssetRenderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapAssetRenderer.swift; sourceTree = "<group>"; };
@@ -1133,6 +1135,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E30000000000000000000005 /* WritingDeskProductionPack-v1 in Resources */,
 				N10000000000000000000001 /* Jersey10-Regular.ttf in Resources */,
 				N10000000000000000000002 /* Tiny5-Regular.ttf in Resources */,
 				C10000000000000000000001 /* town-empty-v1.png in Resources */,

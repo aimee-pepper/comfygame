@@ -5,7 +5,7 @@ import XCTest
 final class WritingDeskProductionPackTests: XCTestCase {
     private var packRoot: URL {
         URL(fileURLWithPath: #filePath).deletingLastPathComponent().deletingLastPathComponent()
-            .appendingPathComponent("AssetLab/integration/writing-desk-production-pack-v1")
+            .appendingPathComponent("AssetLab/integration/writing-desk-production-pack-v1/runtime")
     }
 
     private func mark(key: String, hand: Hand, shape: String, cells: [PageCell],
@@ -47,7 +47,7 @@ final class WritingDeskProductionPackTests: XCTestCase {
         XCTAssertEqual(try pack.route(for: mark(key: "archipelago", hand: .refined,
                                                 shape: "refined_dot",
                                                 cells: [.init(column: 0, row: 0)])),
-                       .authored(key: "mark/compound/archipelago/fountain"))
+                       .authored(key: "mark/compound/archipelago/fountain/0"))
         XCTAssertEqual(try pack.route(for: mark(key: "personal-compound-12", hand: .plain,
                                                 shape: "anything",
                                                 cells: [.init(column: 0, row: 0)])),
@@ -61,17 +61,24 @@ final class WritingDeskProductionPackTests: XCTestCase {
         XCTAssertThrowsError(try pack.route(for: forged))
     }
 
-    func testMarkFootprintNormalizesAbsoluteCellsAndRotationFailsClosed() throws {
+    func testMarkFootprintNormalizesAbsoluteCellsAndAllQuarterTurnsResolve() throws {
         let pack = WritingDeskProductionPack(rootURL: packRoot)
         var translated = mark(key: "archipelago", hand: .refined, shape: "refined_dot",
                               cells: [.init(column: 4, row: 3)])
         translated.origin = .init(column: 4, row: 3)
         XCTAssertEqual(try pack.route(for: translated),
-                       .authored(key: "mark/compound/archipelago/fountain"))
-        translated.shapeID = "refined_dot@90"
-        XCTAssertThrowsError(try pack.route(for: translated)) { error in
-            XCTAssertEqual(error as? WritingDeskProductionPack.PackError,
-                           .rotatedAuthoredShapeRequiresPack("refined_dot@90"))
+                       .authored(key: "mark/compound/archipelago/fountain/0"))
+        for (angle, cells) in [(90, [PageCell(column: 0, row: 0)]),
+                               (180, [PageCell(column: 0, row: 0)]),
+                               (270, [PageCell(column: 0, row: 0)])] {
+            translated.shapeID = "refined_dot@\(angle)"; translated.cells = cells
+            translated.origin = .init(column: 0, row: 0)
+            XCTAssertEqual(try pack.route(for: translated),
+                           .authored(key: "mark/compound/archipelago/fountain/\(angle)"))
+        }
+        for invalid in ["refined_dot@45", "refined_dot@", "refined_dot@90@180"] {
+            translated.shapeID = invalid
+            XCTAssertThrowsError(try pack.route(for: translated))
         }
     }
 
@@ -129,7 +136,7 @@ final class WritingDeskProductionPackTests: XCTestCase {
 
     func testTypedAdaptersResolveEveryRuntimeSurface() throws {
         let pack = WritingDeskProductionPack(rootURL: packRoot)
-        let mark = try pack.markAssets(for: "mark/compound/archipelago/fountain")
+        let mark = try pack.markAssets(for: "mark/compound/archipelago/fountain/90")
         XCTAssertEqual(mark.rgba.width, 27); XCTAssertEqual(mark.tintMask.width, 27)
         XCTAssertEqual(try pack.overlayAsset(shapeID: "refined_dot", state: "selected").width, 27)
         XCTAssertEqual(try pack.vocabularyAsset(kind: "compound", id: "archipelago",
@@ -159,11 +166,64 @@ final class WritingDeskProductionPackTests: XCTestCase {
         let data = try Data(contentsOf: packRoot.appendingPathComponent("manifest.json"))
         let manifest = try JSONSerialization.jsonObject(with: data) as! [String: Any]
         let rows = manifest["assets"] as! [[String: Any]]
-        XCTAssertEqual(rows.count, 2_146)
-        XCTAssertEqual(Set(rows.compactMap { $0["sha256"] as? String }).count, 2_146)
+        XCTAssertEqual(rows.count, 4_459)
+        XCTAssertEqual(Set(rows.compactMap { $0["sha256"] as? String }).count, 4_459)
         let disk = try FileManager.default.contentsOfDirectory(
             at: packRoot.appendingPathComponent("assets"), includingPropertiesForKeys: nil)
         XCTAssertEqual(Set(disk.map(\.lastPathComponent)),
                        Set(rows.compactMap { ($0["file"] as? String).map(URL.init(fileURLWithPath:))?.lastPathComponent }))
+    }
+
+    func testEveryAuthoredRotationAndOverlayRoutesExactly() throws {
+        let data = try Data(contentsOf: packRoot.appendingPathComponent("manifest.json"))
+        let manifest = try JSONSerialization.jsonObject(with: data) as! [String: Any]
+        let lookups = manifest["lookups"] as! [String: Any]
+        let rows = lookups["marks"] as! [String: [String: Any]]
+        let pack = WritingDeskProductionPack(rootURL: packRoot)
+        XCTAssertEqual(rows.count, 1_296)
+        for (key, row) in rows {
+            let kind = WritingDeskVisibleMark.AuthoredKind(rawValue: row["kind"] as! String)!
+            let hand: Hand = switch row["hand"] as! String {
+            case "charcoal": .crude; case "brush": .plain; default: .refined
+            }
+            let origin = PageCell(column: 3, row: 4)
+            let cells = (row["cells"] as! [[Int]]).map {
+                PageCell(column: $0[0] + origin.column, row: $0[1] + origin.row)
+            }
+            let visible = WritingDeskVisibleMark(
+                rendererAssetKey: row["id"] as! String, visualRoute: .authored(kind),
+                id: .init(rawValue: 1), hand: hand, origin: origin,
+                shapeID: row["shapeID"] as! String, cells: cells, inkRecipe: nil,
+                displayName: "visible", accessibilityName: "visible", isReadable: true)
+            XCTAssertEqual(try pack.route(for: visible), .authored(key: key))
+            _ = try pack.markAssets(for: key)
+        }
+        let overlays = lookups["overlays"] as! [String: [String: Any]]
+        XCTAssertEqual(overlays.count, 312)
+        for row in overlays.values {
+            _ = try pack.overlayAsset(shapeID: row["shapeID"] as! String,
+                                      state: row["state"] as! String)
+        }
+    }
+
+    func testBundleBoundaryIsOneRuntimeFolderAndExcludesEvidence() throws {
+        let project = try String(contentsOf: packRoot
+            .deletingLastPathComponent().deletingLastPathComponent().deletingLastPathComponent()
+            .deletingLastPathComponent()
+            .appendingPathComponent("Bookbinder.xcodeproj/project.pbxproj"), encoding: .utf8)
+        XCTAssertEqual(project.components(separatedBy: "WritingDeskProductionPack-v1 in Resources").count - 1, 2)
+        XCTAssertTrue(project.contains("lastKnownFileType = folder"))
+        XCTAssertFalse(project.contains("writing-desk-production-pack-v1/evidence"))
+    }
+
+    func testBuiltProductContainsExactRuntimeSubdirectoryAndNoEvidence() throws {
+        let root = Bundle.main.bundleURL.appendingPathComponent("runtime", isDirectory: true)
+        XCTAssertTrue(FileManager.default.fileExists(atPath: root.appendingPathComponent("manifest.json").path))
+        let pack = try WritingDeskProductionPack.bundled(in: .main)
+        try pack.open()
+        let contents = try FileManager.default.subpathsOfDirectory(atPath: Bundle.main.bundlePath)
+        XCTAssertEqual(contents.filter { $0 == "runtime/manifest.json" }.count, 1)
+        XCTAssertFalse(contents.contains { $0.lowercased().contains("evidence") })
+        XCTAssertFalse(contents.contains { $0.contains("contact-sheet") })
     }
 }

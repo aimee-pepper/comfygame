@@ -7,8 +7,8 @@ import Foundation
 /// closed manifest, and indexes metadata only. PNG bytes are read and hashed only when requested.
 final class WritingDeskProductionPack: @unchecked Sendable {
     static let identity = "WritingDeskProductionPack-v1"
-    static let bodySHA256 = "b9b244ee8382e9f0fca0776603202e51330a651d50b0c499af62a50be2be7ce0"
-    static let manifestSHA256 = "3a1709f91de0c39c49a854aea9ba6a427fe44bdba31b23e9ea47fc26ce5982e5"
+    static let bodySHA256 = "3a9a3f1f854e20b981c26fa98da36bb4219661623cebfee895e4f743b7a62fa6"
+    static let manifestSHA256 = "0257bb94d0e180dfa40008f7143a89e75dec49263e4d08e9249eadfe6f232f96"
 
     enum PackError: Error, Equatable {
         case unavailable
@@ -20,7 +20,7 @@ final class WritingDeskProductionPack: @unchecked Sendable {
         case invalidLink
         case missingAsset(String)
         case corruptAsset(String)
-        case rotatedAuthoredShapeRequiresPack(String)
+        case invalidAuthoredRotation(String)
     }
 
     enum MarkRoute: Equatable {
@@ -73,6 +73,14 @@ final class WritingDeskProductionPack: @unchecked Sendable {
         self.read = read
     }
 
+    /// Locates the single preserved runtime folder only when the Writing Desk route asks for it.
+    static func bundled(in bundle: Bundle = .main) throws -> WritingDeskProductionPack {
+        guard let manifest = bundle.url(forResource: "manifest", withExtension: "json",
+                                        subdirectory: "runtime")
+        else { throw PackError.unavailable }
+        return .init(rootURL: manifest.deletingLastPathComponent())
+    }
+
     /// Opens the metadata on demand. It deliberately does not enumerate or decode PNG files.
     func open() throws {
         lock.lock(); defer { lock.unlock() }
@@ -84,7 +92,7 @@ final class WritingDeskProductionPack: @unchecked Sendable {
         guard let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
               Set(json.keys) == Set(["schemaVersion", "identity", "integrationReady", "acceptedSources",
                                     "sourceSemantics", "authoredLexemeScope", "tintRoles", "lookups",
-                                    "parts", "legalToolInkCombinations", "linkContract", "coverage",
+                                    "parts", "legalToolInkCombinations", "linkContract", "rotationContract", "coverage",
                                     "failClosed", "excluded", "evidence", "assets", "canonicalBodySHA256"]),
               json["schemaVersion"] as? Int == 1,
               json["identity"] as? String == Self.identity,
@@ -92,19 +100,26 @@ final class WritingDeskProductionPack: @unchecked Sendable {
               json["integrationReady"] as? Bool == false,
               let coverage = json["coverage"] as? [String: Any],
               coverage["lexemes"] as? Int == 108,
-              coverage["markLookups"] as? Int == 324,
+              coverage["rotations"] as? Int == 4,
+              coverage["markLookups"] as? Int == 1296,
               coverage["tileLookups"] as? Int == 1296,
-              coverage["distinctOverlayLookups"] as? Int == 78,
+              coverage["distinctOverlayLookups"] as? Int == 312,
               coverage["linkLookups"] as? Int == 6,
               let lookups = json["lookups"] as? [String: Any],
-              let marks = lookups["marks"] as? [String: [String: Any]], marks.count == 324,
-              let overlays = lookups["overlays"] as? [String: [String: Any]], overlays.count == 78,
+              let rotation = json["rotationContract"] as? [String: Any],
+              rotation["angles"] as? [Int] == [0, 90, 180, 270],
+              rotation["key"] as? String == "mark/<kind>/<stableID>/<hand>/<angle>",
+              rotation["invalidAnglesFailClosed"] as? Bool == true,
+              let failClosed = json["failClosed"] as? [String: Any],
+              failClosed["invalidRotationAngle"] as? Bool == true,
+              let marks = lookups["marks"] as? [String: [String: Any]], marks.count == 1296,
+              let overlays = lookups["overlays"] as? [String: [String: Any]], overlays.count == 312,
               let links = lookups["links"] as? [String: [String: Any]], links.count == 6,
               let vocabularyTiles = lookups["vocabularyTiles"] as? [String: [String: Any]], vocabularyTiles.count == 1296,
               let parts = json["parts"] as? [String: Any],
               let toolStrips = parts["toolStrips"] as? [String: [String: Any]],
               Set(toolStrips.keys) == Set(Self.legalToolStripKeys),
-              let assetRows = json["assets"] as? [[String: Any]], assetRows.count == 2146
+              let assetRows = json["assets"] as? [[String: Any]], assetRows.count == 4459
         else { throw PackError.invalidManifest }
         var assetIndex: [String: Asset] = [:]
         for row in assetRows {
@@ -125,12 +140,12 @@ final class WritingDeskProductionPack: @unchecked Sendable {
         if mark.visualRoute == .personalCompoundCompatibility {
             return .compatibilityPersonalCompound
         }
-        if mark.shapeID.contains("@") { throw PackError.rotatedAuthoredShapeRequiresPack(mark.shapeID) }
+        let angle = try Self.rotationAngle(in: mark.shapeID)
         let hand = Self.packHand(mark.hand)
         guard case let .authored(kind) = mark.visualRoute else {
             throw PackError.unknownAuthoredMark(mark.rendererAssetKey)
         }
-        let key = "mark/\(kind.rawValue)/\(mark.rendererAssetKey)/\(hand)"
+        let key = "mark/\(kind.rawValue)/\(mark.rendererAssetKey)/\(hand)/\(angle)"
         guard let row = marks[key],
               row["shapeID"] as? String == mark.shapeID,
               Self.cells(row["cells"]) == (mark.cells.map {
@@ -328,6 +343,14 @@ final class WritingDeskProductionPack: @unchecked Sendable {
                                      "tool-strip/fountain/mixed"]
     private static func packHand(_ hand: Hand) -> String {
         switch hand { case .crude: "charcoal"; case .plain: "brush"; case .refined: "fountain" }
+    }
+    private static func rotationAngle(in shapeID: String) throws -> Int {
+        let pieces = shapeID.split(separator: "@", omittingEmptySubsequences: false)
+        if pieces.count == 1, !pieces[0].isEmpty { return 0 }
+        guard pieces.count == 2, !pieces[0].isEmpty,
+              let angle = Int(pieces[1]), [90, 180, 270].contains(angle)
+        else { throw PackError.invalidAuthoredRotation(shapeID) }
+        return angle
     }
     private static func cells(_ value: Any?) -> [Point]? {
         guard let rows = value as? [[Int]] else { return nil }
