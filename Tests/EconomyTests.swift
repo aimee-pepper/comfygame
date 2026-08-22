@@ -5,6 +5,74 @@ import XCTest
 @MainActor
 final class EconomyTests: XCTestCase {
 
+    func testWritingDeskReviewRedactsUnknownHalfOfLegacyRuneBeforeAnyStringsExist() throws {
+        let store = GameStore(io: .temporary(name: "desk-redaction-\(UUID().uuidString)"))
+        let source: PressureSourceID = "sun"
+        let legacy = PlacedRune(
+            id: .init(rawValue: 991),
+            sigil: Sigil(id: .init(rawValue: 992), source: source, target: "illumination"),
+            hand: .plain, origin: .init(column: 0, row: 0), shapeID: "refined_dot")
+        store.mutate("install partially known legacy mark") { state in
+            state.base.ownedSources.remove(source)
+            state.base.page = Page(runes: [legacy])
+            state.reality.encounteredLexemes.formUnion(legacy.content.encounteredLexemes)
+        }
+
+        let review = try XCTUnwrap(store.writingDeskReviewModel())
+
+        XCTAssertEqual(review.visibleMarkCount, 1)
+        XCTAssertEqual(review.unreadMarkCount, 1)
+        XCTAssertEqual(review.visibleMarks[0].displayName, "??")
+        XCTAssertEqual(review.visibleMarks[0].accessibilityName, "Unknown mark")
+        XCTAssertTrue(review.knownRequests.isEmpty,
+                      "a known target must not disclose the unknown source half")
+        XCTAssertNil(review.openSubjects)
+        XCTAssertEqual(review.stabilityRange, 0...100)
+        XCTAssertEqual(review.sightDisclosure, review.dangerDisclosure)
+        XCTAssertFalse(review.uncertaintyReason.localizedCaseInsensitiveContains("sun"))
+    }
+
+    func testUnreadCollectedPagesUseSameBroadForecastDespiteDifferentHiddenSemantics() throws {
+        let store = GameStore(io: .temporary(name: "desk-unread-pages-\(UUID().uuidString)"))
+        let pages = Array(store.state.base.collectedWorldPages.prefix(2))
+        XCTAssertEqual(pages.count, 2)
+        XCTAssertNotEqual(pages[0].definition.page, pages[1].definition.page)
+        XCTAssertEqual(pages[0].definition.worldPageCost, pages[1].definition.worldPageCost)
+        store.mutate("conceal collected semantics") { state in
+            state.base.ownedSources = []
+            state.base.ownedSymbols = []
+            state.reality.encounteredLexemes = []
+        }
+
+        let first = try XCTUnwrap(store.writingDeskReviewModel(
+            selectedWorldPageID: pages[0].id))
+        let second = try XCTUnwrap(store.writingDeskReviewModel(
+            selectedWorldPageID: pages[1].id))
+
+        XCTAssertGreaterThan(first.unreadMarkCount, 0)
+        XCTAssertGreaterThan(second.unreadMarkCount, 0)
+        XCTAssertEqual(first.stabilityRange, 0...100)
+        XCTAssertEqual(second.stabilityRange, 0...100)
+        XCTAssertEqual(first.collapseDisclosure, second.collapseDisclosure)
+        XCTAssertEqual(first.collapseDisclosure.copy, second.collapseDisclosure.copy)
+        XCTAssertEqual(first.sightDisclosure, second.sightDisclosure)
+        XCTAssertEqual(first.dangerDisclosure, second.dangerDisclosure)
+        XCTAssertNil(first.openSubjects)
+        XCTAssertNil(second.openSubjects)
+    }
+
+    func testCollectedReviewNeverFallsBackToDraftWhenCanonicalSnapshotChanges() throws {
+        let store = GameStore(io: .temporary(name: "desk-stale-source-\(UUID().uuidString)"))
+        let page = try XCTUnwrap(store.state.base.collectedWorldPages.first)
+        store.mutate("stale collected definition") {
+            $0.base.collectedWorldPages[0].definition.seed &+= 1
+        }
+
+        XCTAssertNil(store.writingDeskReviewModel(selectedWorldPageID: page.id))
+        XCTAssertNotNil(store.writingDeskReviewModel(),
+                        "the draft remains available only when explicitly selected")
+    }
+
     func testWritingDeskWritePaneReturnsToDraftWithoutConsumingCollectedSelection() {
         let selected = WorldPageCatalog.starterInstances[0].id
         XCTAssertNil(WritingDeskSourceRules.selectedPage(afterEnteringWrite: true,

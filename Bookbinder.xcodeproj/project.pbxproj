@@ -160,6 +160,7 @@
 		76A613E66EED132AC7896A82 /* CombatGraphLayoutTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F06DDF5073DF537BC555BB06 /* CombatGraphLayoutTests.swift */; };
 		775AE6000342CB171692D813 /* CombatActionOwnershipRules.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA1B15D9DC143422A9003F7B /* CombatActionOwnershipRules.swift */; };
 		776E19C048AB14D539E2ABC3 /* BookProjection.swift in Sources */ = {isa = PBXBuildFile; fileRef = B022088C9636578892397C50 /* BookProjection.swift */; };
+		A15A5A001A5A5A001A5A5A00 /* WritingDeskReviewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A15A5A011A5A5A011A5A5A01 /* WritingDeskReviewModel.swift */; };
 		783A945A7FB200C6BBF03CFA /* CatalogueItemVisualAdapter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 193E41B61927927E78865C30 /* CatalogueItemVisualAdapter.swift */; };
 		7B005A0A9F5BCD6EA2A4E072 /* SaveSlotCatalogue.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D7771DA99D436A50C77B512 /* SaveSlotCatalogue.swift */; };
 		7C72DAD4C55C0D916064E912 /* ContradictionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F43DADDF1091E89318A12B0D /* ContradictionTests.swift */; };
@@ -507,6 +508,7 @@
 		AF13E2576281E76FA92CD685 /* StationStaffingRules.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StationStaffingRules.swift; sourceTree = "<group>"; };
 		AF9F316970B5ECF902615BC3 /* FloraRules.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FloraRules.swift; sourceTree = "<group>"; };
 		B022088C9636578892397C50 /* BookProjection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookProjection.swift; sourceTree = "<group>"; };
+		A15A5A011A5A5A011A5A5A01 /* WritingDeskReviewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WritingDeskReviewModel.swift; sourceTree = "<group>"; };
 		B07ACB016173BA0637D5B85C /* SaveSlotTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SaveSlotTests.swift; sourceTree = "<group>"; };
 		B213D165D2239B2A934DB263 /* CombatTreeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CombatTreeView.swift; sourceTree = "<group>"; };
 		B23878A2219B30C376009246 /* PressuresDriveGenerationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PressuresDriveGenerationTests.swift; sourceTree = "<group>"; };
@@ -607,6 +609,7 @@
 				CAAE51E0323DDA3AA3015D22 /* ArmouryRules.swift */,
 				A588AFCFC47B584CE07F3B4E /* BestiaryRules.swift */,
 				B022088C9636578892397C50 /* BookProjection.swift */,
+				A15A5A011A5A5A011A5A5A01 /* WritingDeskReviewModel.swift */,
 				C3CC1BB415696E2B7417C43D /* BookRules.swift */,
 				DD1FD369C1CCCC28B0A42FC7 /* ButcheryRules.swift */,
 				5AB1CD7D6C91CDD187B2410F /* CharacterRules.swift */,
@@ -1230,6 +1233,7 @@
 				3F566ECFBA89D9C89BF6CD76 /* BestiaryView.swift in Sources */,
 				2977BFA154F4613F7B75EF67 /* BlacksmithView.swift in Sources */,
 				776E19C048AB14D539E2ABC3 /* BookProjection.swift in Sources */,
+				A15A5A001A5A5A001A5A5A00 /* WritingDeskReviewModel.swift in Sources */,
 				15B201231C024A3C01DBA20A /* BookRules.swift in Sources */,
 				890774F4FCDF3A9DAE6BEFDD /* BookbinderApp.swift in Sources */,
 				C9ED9DB51CD49A2457B00B7D /* ButcheryRules.swift in Sources */,
