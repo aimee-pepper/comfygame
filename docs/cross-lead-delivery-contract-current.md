@@ -72,6 +72,25 @@ If current evidence contradicts the proposed assignment, reconcile the contradic
 the order. If a new interpretation would materially change scope, priority, permanence or architecture,
 surface it as an inference rather than dispatching it as settled authority.
 
+### Established-lead ownership
+
+Game Design orchestrates the established **Engineering Lead** and **Asset Lead** tasks; it does not
+silently replace either lead with a newly spawned substitute agent. Work inside an established lead's
+discipline is handed to that lead's existing task, including the exact authority, priority, branch or
+preserved worktree, dirty boundary, evidence and exclusions.
+
+- A helper agent may perform only a bounded, explicitly named support task that does not assume lead
+  ownership, such as a read-only census or an isolated verifier. Its result returns to the established
+  lead for review and adoption.
+- Game Design may not dispatch overlapping implementation or art production to a substitute while the
+  established lead is available, merely to gain parallelism.
+- If a lead's task is temporarily unreachable, preserve the boundary and retry or route the handoff
+  through the other established lead's coordination channel. Do not reinterpret temporary transport
+  failure as permission to create a replacement lead.
+- Preserved substitute work is untrusted input. The established lead audits it line by line and adopts
+  only the parts that satisfy current authority; its existence never transfers ownership or proves
+  completion.
+
 ## Cost and scope-expansion circuit breaker
 
 An approved feature does not automatically authorize an unbounded implementation mechanism. Stop and
