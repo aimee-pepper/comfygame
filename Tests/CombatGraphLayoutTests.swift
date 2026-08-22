@@ -107,5 +107,29 @@ final class CombatGraphLayoutTests: XCTestCase {
         XCTAssertTrue(source.contains("PurchaseRefusal.unavailable.rawValue"))
         XCTAssertFalse(source.contains("spendPoint(in:"))
         XCTAssertFalse(source.contains("buyNext"))
+
+        let debugSource = try String(contentsOf: URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent().deletingLastPathComponent()
+            .appendingPathComponent("Sources/Screens/CombatGraphRouteExplorer.swift"), encoding: .utf8)
+        for retired in ["No node prerequisite", "prerequisite detail", "V2 route explorer",
+                        " own discipline", "hybrid alternative", " OR "] {
+            XCTAssertFalse(source.contains(retired), retired)
+            XCTAssertFalse(debugSource.contains(retired), retired)
+        }
+        XCTAssertTrue(source.contains("ProgressionRequirementPresentation.requirement"))
+        XCTAssertTrue(debugSource.contains("ProgressionRequirementPresentation.requirement"))
+        XCTAssertTrue(source.contains("ProgressionRequirementPresentation.capstoneRequirement"))
+        XCTAssertTrue(debugSource.contains("ProgressionRequirementPresentation.capstoneRequirement"))
+        XCTAssertTrue(source.contains("ProgressionConnectorKey()"))
+        XCTAssertTrue(debugSource.contains("ProgressionConnectorKey()"))
+        XCTAssertTrue(source.contains("fixedSize(horizontal: false, vertical: true)"))
+        XCTAssertTrue(source.contains("fixedSize(horizontal: true, vertical: false)"))
+        XCTAssertFalse(source.contains("\\(owned.count) learned"))
+
+        let researchSource = try String(contentsOf: URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent().deletingLastPathComponent()
+            .appendingPathComponent("Sources/Screens/ResearchTreeLayout.swift"), encoding: .utf8)
+        XCTAssertTrue(researchSource.contains(".accessibilityHint(requirement)"))
+        XCTAssertTrue(researchSource.contains("? \"Complete\" : \"Still required\""))
     }
 }

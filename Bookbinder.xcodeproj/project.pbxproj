@@ -183,6 +183,7 @@
 		859010F2D3881FC03F57205F /* ContentCatalog.swift in Sources */ = {isa = PBXBuildFile; fileRef = D12B3DBAA05B509156F44C42 /* ContentCatalog.swift */; };
 		85DA337F9E2EA55653336600 /* RecyclerRules.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E17B23F244C182A99CD9DB7 /* RecyclerRules.swift */; };
 		85E86B9A5614E6F585425104 /* CombatGraphRules.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6801BC62F5B1EF81C4253C6 /* CombatGraphRules.swift */; };
+		A1B2C3D4E5F60718293A4B5C /* ProgressionRequirementPresentation.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1C2D3E4F5061728394A5B6C /* ProgressionRequirementPresentation.swift */; };
 		867F278950814C3D859CEAFD /* ContentTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7691C0625AD4AACD2BA46A20 /* ContentTests.swift */; };
 		8725C08D01F1574C306CFC5D /* resources.json in Resources */ = {isa = PBXBuildFile; fileRef = 0486776A4EED6E508F843FB3 /* resources.json */; };
 		87DF0AB9EB7842560291C8A3 /* PressureModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7042744B96D260184BBE32F3 /* PressureModels.swift */; };
@@ -594,6 +595,7 @@
 		E5F6F843AB65D2D26E6F5A56 /* FirepitView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirepitView.swift; sourceTree = "<group>"; };
 		E615DD7D8BEAA7A4E5EB939E /* ResourceSpreadTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResourceSpreadTests.swift; sourceTree = "<group>"; };
 		E6801BC62F5B1EF81C4253C6 /* CombatGraphRules.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CombatGraphRules.swift; sourceTree = "<group>"; };
+		B1C2D3E4F5061728394A5B6C /* ProgressionRequirementPresentation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressionRequirementPresentation.swift; sourceTree = "<group>"; };
 		E87D049B2DF2A90A21B3729E /* ReachableContentTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReachableContentTests.swift; sourceTree = "<group>"; };
 		EB15ACCA73C26252DA8A2E39 /* ItemGridTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ItemGridTests.swift; sourceTree = "<group>"; };
 		EBBCA040726518A6C0907256 /* WorldGrade2MapIntegrationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorldGrade2MapIntegrationTests.swift; sourceTree = "<group>"; };
@@ -644,6 +646,7 @@
 				13670D6FD1A95328A0EF06A3 /* CombatDamageRules.swift */,
 				2EC7108D31E9422C701DCEDD /* CombatDerivedStats.swift */,
 				E6801BC62F5B1EF81C4253C6 /* CombatGraphRules.swift */,
+				B1C2D3E4F5061728394A5B6C /* ProgressionRequirementPresentation.swift */,
 				99D023496EC834EA78E9BE63 /* CombatRules.swift */,
 				72CF1DBF72334A81AE35B198 /* CombatTreeRules.swift */,
 				51B3BDF8FB0EE8418DD8EC80 /* ConsumableCraftingRules.swift */,
@@ -1291,6 +1294,7 @@
 				277FD4073B21D49D8ACBB905 /* CombatGraphModels.swift in Sources */,
 				AA2D2059F9D661241D17CCC2 /* CombatGraphRouteExplorer.swift in Sources */,
 				85E86B9A5614E6F585425104 /* CombatGraphRules.swift in Sources */,
+				A1B2C3D4E5F60718293A4B5C /* ProgressionRequirementPresentation.swift in Sources */,
 				BE5D3BC36C9F1D8030CFEE81 /* CombatRules.swift in Sources */,
 				E0C67C543BF911F3F58A0C80 /* CombatTreeModels.swift in Sources */,
 				3333DDA45D780B04AC00F1C2 /* CombatTreeRules.swift in Sources */,

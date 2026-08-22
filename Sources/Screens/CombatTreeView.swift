@@ -55,7 +55,7 @@ struct CombatTreeView: View {
         HStack {
             VStack(alignment: .leading, spacing: 1) {
                 Text(store.name(of: member)).font(.callout.weight(.semibold))
-                Text("Level \(character.level) · \(owned.count) learned")
+                Text("Level \(character.level) · \(ProgressionRequirementPresentation.skillsLearned(owned.count))")
                     .font(.caption2).foregroundStyle(.secondary)
             }
             Spacer()
@@ -66,12 +66,7 @@ struct CombatTreeView: View {
     }
 
     private var connectorKey: some View {
-        HStack(spacing: 14) {
-            Label("own discipline", systemImage: "minus")
-            Label("hybrid alternative", systemImage: "ellipsis")
-        }
-        .font(.caption2).foregroundStyle(.secondary)
-        .accessibilityElement(children: .combine)
+        ProgressionConnectorKey()
     }
 
     private var graphCanvas: some View {
@@ -125,6 +120,10 @@ struct CombatTreeView: View {
             HStack { Text(node.name).font(.headline); Spacer(); Text(state.rawValue).font(.caption.bold()) }
             Text(node.effectCopy).font(.callout)
             Text(parentText(node)).font(.caption).foregroundStyle(.secondary)
+            if node.role == .capstone {
+                Text(ProgressionRequirementPresentation.capstoneRequirement)
+                    .font(.caption).foregroundStyle(.secondary)
+            }
             if node.depth > CombatGraphRules.openingMaximumDepth {
                 Text(CombatGraphRules.PurchaseRefusal.unavailable.rawValue)
                     .font(.caption).foregroundStyle(.secondary)
@@ -158,8 +157,29 @@ struct CombatTreeView: View {
     }
 
     private func parentText(_ node: CombatGraphNodeDef) -> String {
+        let ids = node.ordinaryParentAlternatives.map(\.rawValue)
         let names = node.ordinaryParentAlternatives.compactMap { catalogue.node($0)?.name }
-        return names.isEmpty ? "No node prerequisite" : "Requires " + names.joined(separator: " OR ")
+        return ProgressionRequirementPresentation.requirement(
+            noun: .skill, relationship: .any, requiredIDs: ids, resolvedNames: names)
+    }
+}
+
+struct ProgressionConnectorKey: View {
+    var body: some View {
+        ViewThatFits(in: .horizontal) {
+            HStack(spacing: 14) { rows }
+                .fixedSize(horizontal: true, vertical: false)
+            VStack(alignment: .leading, spacing: 4) { rows }
+        }
+        .font(.caption2).foregroundStyle(.secondary)
+        .fixedSize(horizontal: false, vertical: true)
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel("A solid line connects Skills in the same discipline. A dashed line shows an alternate route from another discipline.")
+    }
+
+    @ViewBuilder private var rows: some View {
+        Label("same-discipline route", systemImage: "minus")
+        Label("alternate route from another discipline", systemImage: "ellipsis")
     }
 }
 

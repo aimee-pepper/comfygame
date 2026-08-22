@@ -57,6 +57,29 @@ final class CombatGraphTests: XCTestCase {
         }
     }
 
+    func testEveryCombatRequirementResolvesAndHybridCopyPreservesAnyOneSemantics() throws {
+        XCTAssertTrue(graph.nodes.flatMap(\.ordinaryParentAlternatives)
+            .allSatisfy { graph.node($0) != nil })
+        let hybrid = try XCTUnwrap(graph.nodes.first { $0.ordinaryParentAlternatives.count > 1 })
+        let names = hybrid.ordinaryParentAlternatives.compactMap { graph.node($0)?.name }
+        XCTAssertEqual(ProgressionRequirementPresentation.requirement(
+            noun: .skill, relationship: .any,
+            requiredIDs: hybrid.ordinaryParentAlternatives.map(\.rawValue), resolvedNames: names),
+            names.count == 2
+                ? "Requires any one of: \(names[0]) or \(names[1])."
+                : "Requires any one of: \(names.dropLast().joined(separator: ", ")), or \(names.last!).")
+        for parent in hybrid.ordinaryParentAlternatives {
+            XCTAssertTrue(CombatGraphRules.canPurchase(hybrid, owned: [parent], catalogue: graph))
+        }
+    }
+
+    func testCanonicalCombatCopyKeepsCapstoneGateSeparateFromOrdinaryParents() {
+        XCTAssertEqual(CombatGraphRules.PurchaseRefusal.illegalParent.rawValue,
+                       "Learn one of the required earlier Skills first.")
+        XCTAssertEqual(ProgressionRequirementPresentation.capstoneRequirement,
+                       "Capstone requirement: learn a connected route of 7 earlier Skills in this tree, including this discipline’s Root, one Fundamental, one Development, and one Mastery.")
+    }
+
     func testEveryTreeHasAtLeastThirtyDistinctEightPointCapstoneRoutes() {
         for tree in graph.trees {
             var states: Set<Set<CombatNodeID>> = [[]]

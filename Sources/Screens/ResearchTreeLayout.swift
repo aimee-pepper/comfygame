@@ -216,8 +216,9 @@ private struct ResearchNodeTile: View {
     }
 
     private var prerequisiteLabel: String {
-        let names = node.requires.compactMap { ContentCatalog.shared.researchNode($0)?.name }
-        return names.isEmpty ? "No node prerequisite" : "Requires \(names.joined(separator: " and "))"
+        ProgressionRequirementPresentation.requirement(
+            noun: .upgrade, relationship: .all, requiredIDs: node.requires.map(\.rawValue),
+            resolvedNames: node.requires.compactMap { ContentCatalog.shared.researchNode($0)?.name })
     }
 }
 
@@ -252,8 +253,9 @@ private struct ResearchAccessibleNode: View {
         return "Locked"
     }
     private var prerequisiteLabel: String {
-        let names = node.requires.compactMap { ContentCatalog.shared.researchNode($0)?.name }
-        return names.isEmpty ? "No node prerequisite." : "Requires \(names.joined(separator: " and "))."
+        ProgressionRequirementPresentation.requirement(
+            noun: .upgrade, relationship: .all, requiredIDs: node.requires.map(\.rawValue),
+            resolvedNames: node.requires.compactMap { ContentCatalog.shared.researchNode($0)?.name })
     }
 }
 
@@ -328,13 +330,21 @@ private struct ResearchNodeDetail: View {
 
     private var prerequisites: some View {
         let parents = node.requires.compactMap { ContentCatalog.shared.researchNode($0) }
+        let requirement = ProgressionRequirementPresentation.requirement(
+            noun: .upgrade, relationship: .all, requiredIDs: node.requires.map(\.rawValue),
+            resolvedNames: parents.map(\.name))
         return VStack(alignment: .leading, spacing: 5) {
-            Text("Prerequisites").font(.caption.weight(.semibold)).foregroundStyle(.secondary)
-            if parents.isEmpty { Text("No node prerequisite.") }
+            Text("Earlier Upgrades")
+                .font(.caption.weight(.semibold)).foregroundStyle(.secondary)
+                .accessibilityLabel("Earlier Upgrades")
+                .accessibilityHint(requirement)
+            if parents.isEmpty { Text(requirement) }
             ForEach(parents) { parent in
                 Label(parent.name,
                       systemImage: store.isComplete(parent) || store.isSuppliedByKeeper(parent)
                       ? "checkmark.circle.fill" : "circle.dashed")
+                    .accessibilityValue(store.isComplete(parent) || store.isSuppliedByKeeper(parent)
+                                        ? "Complete" : "Still required")
             }
         }
     }

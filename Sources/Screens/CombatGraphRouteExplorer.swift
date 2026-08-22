@@ -40,7 +40,7 @@ struct CombatGraphRouteExplorer: View {
             }
         }
         .background(Color(.systemGroupedBackground))
-        .navigationTitle("V2 route explorer")
+        .navigationTitle("Skill route review")
         .navigationBarTitleDisplayMode(.inline)
         .preference(key: DebugBugReporterSuppressedPreferenceKey.self, value: true)
         .onChange(of: tree.id) { _, id in
@@ -52,7 +52,7 @@ struct CombatGraphRouteExplorer: View {
         HStack {
             VStack(alignment: .leading, spacing: 2) {
                 Text("DEBUG fixture · no campaign mutation").font(.caption.weight(.semibold))
-                Text("\(route.owned.count) owned · \(pointsRemaining) points ready")
+                Text("\(ProgressionRequirementPresentation.skillsLearned(route.owned.count)) · \(ProgressionRequirementPresentation.pointsReady(pointsRemaining))")
                     .font(.caption2).foregroundStyle(.secondary)
             }
             Spacer()
@@ -76,22 +76,7 @@ struct CombatGraphRouteExplorer: View {
     }
 
     private var connectorKey: some View {
-        HStack(spacing: 14) {
-            HStack(spacing: 5) {
-                Rectangle().frame(width: 24, height: 2)
-                Text("own discipline")
-            }
-            HStack(spacing: 5) {
-                HStack(spacing: 3) {
-                    Rectangle().frame(width: 7, height: 2)
-                    Rectangle().frame(width: 7, height: 2)
-                }
-                Text("hybrid alternative")
-            }
-        }
-        .font(.caption2).foregroundStyle(.secondary)
-        .accessibilityElement(children: .combine)
-        .accessibilityLabel("Solid line own discipline. Dashed line authored hybrid alternative.")
+        ProgressionConnectorKey()
     }
 
     private var graphCanvas: some View {
@@ -142,7 +127,7 @@ struct CombatGraphRouteExplorer: View {
                         .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 12))
                     }
                     .buttonStyle(.plain).accessibilityElement(children: .combine)
-                    .accessibilityHint("Opens exact node detail")
+                    .accessibilityHint("Opens Skill details")
                 }
             }
         }
@@ -170,7 +155,7 @@ struct CombatGraphRouteExplorer: View {
         .frame(width: 44, height: 44).contentShape(Rectangle())
         .accessibilityLabel(node.name)
         .accessibilityValue("\(state.rawValue), \(roleName(node.role))")
-        .accessibilityHint("Selects exact Effect and prerequisite detail")
+        .accessibilityHint("Selects Skill details")
     }
 
     private func detail(_ node: CombatGraphNodeDef) -> some View {
@@ -206,12 +191,14 @@ struct CombatGraphRouteExplorer: View {
     }
 
     private func parentText(_ node: CombatGraphNodeDef) -> String {
+        let ids = node.ordinaryParentAlternatives.map(\.rawValue)
         let names = node.ordinaryParentAlternatives.compactMap { catalogue.node($0)?.name }
-        return names.isEmpty ? "No node prerequisite" : "Requires " + names.joined(separator: " OR ")
+        return ProgressionRequirementPresentation.requirement(
+            noun: .skill, relationship: .any, requiredIDs: ids, resolvedNames: names)
     }
 
     private var capstoneGateText: String {
-        "Gate · own root, fundamental, development and mastery · 5 in this discipline including capstone · 7 connected prior nodes · earliest point 8"
+        ProgressionRequirementPresentation.capstoneRequirement
     }
 
     private func roleName(_ role: CombatGraphRole) -> String {

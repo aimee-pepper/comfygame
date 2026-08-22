@@ -12,7 +12,7 @@ enum CombatGraphRules {
         case unavailable = "This development is not implemented yet."
         case alreadyOwned = "Already learned."
         case missingPoint = "No combat point is available."
-        case illegalParent = "Learn one of this development's exact prerequisites first."
+        case illegalParent = "Learn one of the required earlier Skills first."
         case invalidChoice = "That selection is not available for this development."
         case stale = "This character changed. Review the development and try again."
     }

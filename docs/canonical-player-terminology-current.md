@@ -130,6 +130,17 @@ DEBUG terminology exemption.
 2. Migrate World preview and Writing Desk terminology together so page composition uses one vocabulary.
 3. Migrate all Essence affordability presentations through one shared formatter.
 4. Migrate Research and Combat prerequisites through one shared `Requires …` formatter.
+
+### Research and Combat requirement relationship
+
+Research requirements are earlier **Upgrades** and every listed Upgrade is required. Combat requirements
+are earlier **Skills** and any one listed alternative is sufficient. Both surfaces, their accessibility copy
+and DEBUG acceptance routes use the same rules-owned formatter; an unresolved authored ID fails closed as
+unavailable requirement information rather than appearing to have no earlier requirement.
+
+Research details are headed `Earlier Upgrades`. Combat Capstones retain their additional connected-route
+gate and state it separately: `Capstone requirement: learn a connected route of 7 earlier Skills in this
+tree, including this discipline’s Root, one Fundamental, one Development, and one Mastery.`
 5. Migrate gear and compatibility detail surfaces; never expose a raw key as the primary value.
 6. Regenerate GameWiki labels from this machine authority and run a complete human-visible string census.
 
