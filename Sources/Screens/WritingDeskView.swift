@@ -1732,13 +1732,20 @@ private struct WritingDeskNativeVocabularyLabel: View {
     let unavailable: Bool
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 1) {
-            Text(title).font(.custom("Tiny5", size: 11)).lineLimit(1)
-            Text(detail).font(.custom("Tiny5", size: 9)).lineLimit(1)
+        HStack(spacing: 0) {
+            // The pack reserves an 18x21 logical glyph well at the left (36x42 at 2x).
+            // Player identity text owns the remaining region and can never cross those pixels.
+            Color.clear.frame(width: 38)
+            VStack(alignment: .leading, spacing: 1) {
+                Text(title).font(.custom("Tiny5", size: 10)).lineLimit(2)
+                Text(detail).font(.custom("Tiny5", size: 8)).lineLimit(1)
+            }
+            .padding(.horizontal, 3).padding(.vertical, 3)
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottomLeading)
+            .background(PixelUITheme.surface.opacity(0.94))
         }
         .foregroundStyle(PixelUITheme.text)
-        .padding(.horizontal, 6).padding(.bottom, 4)
-        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottomLeading)
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(unavailable ? PixelUITheme.surfaceRaised : Color.clear)
     }
 }

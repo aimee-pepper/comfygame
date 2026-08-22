@@ -1447,6 +1447,10 @@ final class PageTests: XCTestCase {
         XCTAssertTrue(source.contains("WritingDeskNativeVocabularyLabel("))
         XCTAssertTrue(source.contains("title: item.name"),
                       "Canonical candidate identity must remain native text without pack art.")
+        XCTAssertTrue(source.contains("Color.clear.frame(width: 38)"),
+                      "Native names must stay outside the temporary glyph well.")
+        XCTAssertTrue(source.contains("PixelUITheme.surface.opacity(0.94)"),
+                      "The reserved text region needs a stable semantic backing.")
         XCTAssertFalse(source.contains("bin == entry ? PixelUITheme.screen"),
                        "The dark screen role is unreadable on the selected dark category.")
         XCTAssertGreaterThanOrEqual(
