@@ -258,7 +258,7 @@
       "priority": "P1",
       "title": "Noll and the player-facing Recycler",
       "status": "readyToTest",
-      "detail": "Implemented and green: Noll is the 29th live traveller; the 15-Essence Recycler has a distinct Make route and atomic receipt-first recovery screen; station runway preview and corrected Sela/Halloway review IDs are included. Field Separation Kit remains held. Signed phone installation is waiting for Aimee's active fresh-save traveller test to finish.",
+      "detail": "Implemented and green: Noll is the 29th live traveller; the 15-Essence Recycler has a distinct Make route and atomic receipt-first recovery screen; station runway preview and corrected Sela/Halloway review IDs are included. Field Separation Kit remains held. Install any verified signed phone-ready update in place promptly without uninstall/reset; do not wait for Aimee's active fresh-save traveller test to finish unless she explicitly asks for an installation hold, and do not auto-launch solely because installation completed.",
       "gate": "Use opening-economy-trio-promotion-audit-current.md: 29-live catalogue, Noll band0/order2/signature, 15-Essence build, dormant old-state migration, atomic Recycler phone route, no Field Kit, corrected Sela/Halloway exchange IDs and complete sell→recycle→make→bind runway proof.",
       "workstream": "acceptance",
       "isPrimary": false
@@ -829,7 +829,7 @@
       "title": "Page-first Writing and truthful world projection",
       "status": "readyToTest",
       "detail": "The stop-the-line Writing Desk repair is source-complete through shared revision f7c4fa45. It now uses the exact bundle-relative runtime pack path, keeps game-owned canonical names and legal Page mutation available through the RuneGlyph/PageRules fallback when optional visuals fail, restores readable category states, packages the accepted production parchment bitmap separately from review evidence and reserves a stable native text well beside every temporary sigil. Generated sigils remain temporary replaceable scaffolding owned finally by Aimee; neither their packaging nor the accepted parchment alone is device acceptance.",
-      "gate": "Keep this as the one current acceptance checkpoint until open → read canonical category and sigil names → select → place → edit succeeds on the exact signed physical-phone build, with pack-present visuals, pack-missing typed Page mutation, light/dark contrast and the accepted parchment all intact. Record the installed revision without reset or auto-launch and obtain Aimee's ordinary-path confirmation before E5–E7 resume; no Asset proof, source test or bundled bitmap substitutes for that native acceptance.",
+      "gate": "Keep this as the one current acceptance checkpoint until open → read canonical category and sigil names → select → place → edit succeeds on the exact signed physical-phone build, with pack-present visuals, pack-missing typed Page mutation, light/dark contrast and the accepted parchment all intact. Install every verified phone-ready update promptly in place with no uninstall/reset; defer only on Aimee's explicit hold, and do not auto-launch unless separately requested or already the next normal coordinated step. Record the exact installed revision and obtain Aimee's ordinary-path confirmation before E5–E7 resume; no Asset proof, source test or bundled bitmap substitutes for that native acceptance.",
       "workstream": "acceptance",
       "isPrimary": true
     },

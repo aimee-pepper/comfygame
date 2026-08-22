@@ -1,9 +1,9 @@
 {
   "schemaVersion": 1,
-  "aggregateSourceHash": "57d6d0af5d31c070d54391788abd083ad4f618fcbd5d7f3417159abfd4c99edc",
+  "aggregateSourceHash": "914c8dda4401775d8f7d727bf4a4fb01585dca181f9e6a976d28eefae88b7eb3",
   "inputs": {
     "Sources/Content/Data/items.json": "b94b1107229f217e14f1d7fa936d8eea938f9782c06c583be32302f10d432bc9",
-    "Sources/Content/Data/playability-roadmap.json": "88c75734db4103eef80f8f04d0be73f13fcd05909fffc2219c695109612e8f60",
+    "Sources/Content/Data/playability-roadmap.json": "a8184d9ed17571849363f868375eb8a03f8038f9a3a8f914e2fc10773a97a2af",
     "Sources/Content/Data/resources.json": "8eee965ce7df075abfe3f646bb36d416a10ef1d7d194845e30fa0f31b7b23e6f",
     "Sources/Content/Data/stations.json": "21b5e9f3bee2d9115acf535ef2ff1db350b87b8ee33755e79a3b3e4584102e2b",
     "Sources/Content/Data/symbols.json": "c1ec5dd7b661680b358e21a56124b6080aa28d93db51fd2f6b80214ced1dcb16",
@@ -114,7 +114,7 @@
     "docs/creature-ecology-and-materials-overhaul-current.md": "e71a15702256af55de1c34b0269b14f2e657109c32f9dac53acdfae2ea59885f",
     "docs/creature-ecology-asset-packet-current.md": "04f3495242bf577001c10b1658ff46f8bfbefaa6e42c9220d32ec580fa3b8219",
     "docs/creature-territory-finds-current.md": "07792ad39d56392aaadc4507520015020a77171b6e6486f22aa3381903027385",
-    "docs/cross-lead-delivery-contract-current.md": "26f78980dbb1ef30350a2a6031f4c1620a6b7727cedbdfcd6c971ddfbbfaefd2",
+    "docs/cross-lead-delivery-contract-current.md": "086429d5da89ee9b318e8e0aeb9145f03b34846d29db3e36f2349b7d8b2cce92",
     "docs/curio-identification-knowledge-current.md": "31acb95848598b0874e3978a9488f122b8bfee115e16867a5dca9fa1c33986f0",
     "docs/current-design-index.md": "192720ec09aa5185048edbd2ca45454559b8144bb3e39dd1a2242c5ee0a59b4c",
     "docs/cycle-system-current.md": "3a472c56d4c78299574f768de122d2ac11e7387eeae8fd723667e73f96fbd598",
@@ -291,7 +291,7 @@
     "docs/writing-tool-progression-current.md": "be17fe07aa89aaaab7117a2faca43d7e1eb1be23202d19106c67c42547b23bb0"
   },
   "outputs": {
-    "generated/wiki-data.json": "b3f02b3cecc3416cf4bc60a3ed2c3621f5ea5f769b04db72919bcbc37a7ffcdb",
-    "generated/source-registry.json": "95c22292c0a7c1cb069cff901aa186ab25a7c4a02969dec414ebaff4d78e7fd5"
+    "generated/wiki-data.json": "000b6c3c4e119772517a3b9bfa9b1a2ca2ae28c5b0d1ca4d83aad43a6c335c8a",
+    "generated/source-registry.json": "0258380bf8c99fcb7c1f4a5987fcccff7ce360730d8470863ca8e99d0d91e3ba"
   }
 }

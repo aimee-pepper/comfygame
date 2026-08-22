@@ -116,6 +116,18 @@ identity or legal actions. Rollback is not inferred from a regression report; re
 current design unless Aimee explicitly authorizes rollback or the current architecture is proven
 unsafe to retain.
 
+### Phone update installation default
+
+Once a signed update is verified phone-ready, install it in place promptly by default. An ongoing Aimee
+test does not imply an installation hold, and no lead waits for that test to finish before installing the
+available update. Preserve the existing app and campaign data: do not uninstall the app, reset it, delete
+saves or substitute a clean install. Defer installation only when Aimee explicitly asks for a hold.
+
+Installation does not by itself authorize launching the app. Do not auto-launch after installation unless
+Aimee separately requests it or launch is already the next normal coordinated step in the requested work.
+The installation receipt still names the exact revision; later acceptance names the exact installed
+revision actually tested.
+
 ## Mockup behavior fence
 
 An Asset mockup may rearrange, group, illustrate and visually prioritize only the data and actions in
