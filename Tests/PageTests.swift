@@ -116,6 +116,28 @@ final class PageTests: XCTestCase {
         XCTAssertEqual(store.state.reality.library.visitedWorlds.last?.worldArrivalReceipt,
                        runReceipt)
         XCTAssertEqual(runReceipt.generationSeed, earth.definition.seed)
+        let scene = try XCTUnwrap(runReceipt.sceneReceipt)
+        XCTAssertEqual(scene.version, WorldArrivalSceneReceipt.schemaVersion)
+        XCTAssertTrue(scene.validatesCanonicalHash())
+        XCTAssertEqual(scene.payload.worldSeed, String(earth.definition.seed))
+        XCTAssertFalse(scene.payload.illumination.band.isEmpty)
+        XCTAssertFalse(scene.payload.suspendedAtmosphere.density.isEmpty)
+        XCTAssertEqual(scene.payload.precipitation.medium, "none")
+        XCTAssertEqual(scene.payload.precipitation.intensity, "none")
+        let sceneData = try JSONEncoder().encode(scene)
+        let sceneObject = try XCTUnwrap(
+            JSONSerialization.jsonObject(with: sceneData) as? [String: Any])
+        XCTAssertEqual(Set(sceneObject.keys), ["version", "payload", "canonicalSHA256"])
+        let payloadObject = try XCTUnwrap(sceneObject["payload"] as? [String: Any])
+        XCTAssertEqual(Set(payloadObject.keys), [
+            "receiptID", "worldSeed", "sourcePage", "dominantGround", "waterRelationship",
+            "materialDescriptor", "illumination", "suspendedAtmosphere", "precipitation",
+            "flora", "causalVisualFacts", "description", "firstMapCropReceipt"
+        ], "nil entryDisclosure must be omitted from the sanitized payload")
+        let suspendedObject = try XCTUnwrap(
+            payloadObject["suspendedAtmosphere"] as? [String: Any])
+        XCTAssertTrue(suspendedObject["density"] is String,
+                      "scene receipt must freeze a band, never expose raw density")
         XCTAssertEqual(runReceipt.sourcePagePhysicalReceipt.marks.count,
                        earth.definition.page.runes.count)
         XCTAssertFalse(String(describing: runReceipt.sourcePagePhysicalReceipt)
@@ -173,6 +195,13 @@ final class PageTests: XCTestCase {
         XCTAssertNil(stoneCell.floraStableID)
         XCTAssertEqual(try JSONEncoder().encode(stoneCell),
                        try JSONEncoder().encode(waterCell))
+
+        let data = try JSONEncoder().encode(stoneCell)
+        let object = try XCTUnwrap(JSONSerialization.jsonObject(with: data) as? [String: Any])
+        XCTAssertEqual(object["visibility"] as? String, "hidden")
+        XCTAssertNil(object["ground"])
+        XCTAssertNil(object["elevation"])
+        XCTAssertNil(object["floraStableID"])
     }
 
     func testLegacyAndOrphanArrivalStateDecodeWithoutInventingAReveal() throws {

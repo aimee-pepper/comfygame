@@ -13,6 +13,118 @@ enum WorldArrivalPresentationAuthority {
     static let isNativePresentationEnabled = false
 }
 
+/// Versioned, immutable input for the accepted arrival compositor. The nested payload deliberately
+/// mirrors the Asset contract while v2 removes all hidden-cell terrain payloads. Native rendering
+/// may consume only this object after presentation authority is enabled; it must not re-band the
+/// richer rules receipt at display time.
+struct WorldArrivalSceneReceipt: Codable, Equatable, Sendable {
+    static let schemaVersion = 2
+
+    struct SourcePage: Codable, Equatable, Sendable {
+        struct Mark: Codable, Equatable, Sendable {
+            var x: Int
+            var y: Int
+            /// Cell offsets relative to x/y, matching the compositor contract.
+            var cells: [[Int]]
+        }
+        var id: String
+        var title: String
+        var marks: [Mark]
+    }
+    struct MaterialDescriptor: Codable, Equatable, Sendable {
+        var identity: String
+        var paletteFamilyID: String
+        var transform: WorldGrade2V1.Transform
+        var resolvedColor: [Int]?
+    }
+    struct Illumination: Codable, Equatable, Sendable {
+        var band: String
+        var sourceClass: String
+    }
+    struct SuspendedAtmosphere: Codable, Equatable, Sendable {
+        var medium: String
+        var density: String
+        var motion: String
+    }
+    struct Precipitation: Codable, Equatable, Sendable {
+        var medium: String
+        var intensity: String
+        var motion: String
+    }
+    struct Flora: Codable, Equatable, Sendable {
+        var stableID: String
+        var formID: Int
+        var coverage: String
+        var habit: String
+        var color: [Int]
+    }
+    struct CausalVisualFact: Codable, Equatable, Sendable {
+        var markID: String
+        var visibleScope: String
+        var contributionKind: String
+        var resultBand: String
+        var withoutAuthoredBand: String
+    }
+    struct EntryDisclosure: Codable, Equatable, Sendable {
+        var siteProfile: String
+        var status: String
+    }
+    struct CropCell: Codable, Equatable, Sendable {
+        var x: Int
+        var y: Int
+        var ground: GroundType?
+        var elevation: Int?
+        var floraStableID: String?
+        var visibility: String
+    }
+    struct FirstMapCrop: Codable, Equatable, Sendable {
+        var width: Int
+        var height: Int
+        var cells: [CropCell]
+    }
+    struct Payload: Codable, Equatable, Sendable {
+        var receiptID: String
+        var worldSeed: String
+        var sourcePage: SourcePage
+        var dominantGround: GroundType
+        var waterRelationship: String
+        var materialDescriptor: MaterialDescriptor
+        var illumination: Illumination
+        var suspendedAtmosphere: SuspendedAtmosphere
+        var precipitation: Precipitation
+        var flora: [Flora]
+        var causalVisualFacts: [CausalVisualFact]
+        var entryDisclosure: EntryDisclosure?
+        var description: String
+        var firstMapCropReceipt: FirstMapCrop
+    }
+
+    var version: Int
+    var payload: Payload
+    var canonicalSHA256: String
+
+    init(payload: Payload) {
+        self.version = Self.schemaVersion
+        self.payload = payload
+        self.canonicalSHA256 = Self.canonicalHash(version: Self.schemaVersion, payload: payload)
+    }
+
+    func validatesCanonicalHash() -> Bool {
+        version == Self.schemaVersion
+            && canonicalSHA256 == Self.canonicalHash(version: version, payload: payload)
+    }
+
+    private struct Canonical: Encodable { var version: Int; var payload: Payload }
+    private static func canonicalHash(version: Int, payload: Payload) -> String {
+        let encoder = JSONEncoder()
+        encoder.outputFormatting = [.sortedKeys, .withoutEscapingSlashes]
+        guard let data = try? encoder.encode(Canonical(version: version, payload: payload)) else {
+            preconditionFailure("World arrival scene receipt must remain canonically encodable")
+        }
+        return SHA256.hash(data: data).map { String(format: "%02x", $0) }.joined()
+    }
+}
+
 /// Immutable, disclosure-safe evidence for one newly bound world's arrival presentation.
 /// Rendering and History consume this value; neither is allowed to reconstruct it from the run.
 struct WorldArrivalReceipt: Codable, Equatable, Sendable {
@@ -110,6 +222,8 @@ struct WorldArrivalReceipt: Codable, Equatable, Sendable {
     var proseVersion: String
     var finalDescription: String
     var compositorVersion: String
+    /// Nil only for the short-lived pre-scene schema; never synthesized during decode.
+    var sceneReceipt: WorldArrivalSceneReceipt?
 }
 
 enum WorldArrivalReceiptFactory {
@@ -164,8 +278,15 @@ enum WorldArrivalReceiptFactory {
                                       lightBand: lightBand, atmosphere: suspended)
         let canonical = "\(Self.schemaIdentity)|\(runIndex)|\(generationSeed)|\(sourceIdentity(source.sourceKey))|\(visualReceipt.canonicalReceiptSHA256)"
         let id = SHA256.hash(data: Data(canonical.utf8)).map { String(format: "%02x", $0) }.joined()
+        let receiptID = WorldArrivalReceiptID(rawValue: id)
+        let scenePayload = scenePayload(
+            receiptID: receiptID, generationSeed: generationSeed, source: source,
+            dominant: dominant, waterRelationship: waterRelationship,
+            visualReceipt: visualReceipt, lightBand: lightBand, sourceClass: sourceClass,
+            atmosphere: atmosphere, flora: floraSummaries, crop: crop,
+            description: description)
         return .init(version: WorldArrivalReceipt.schemaVersion,
-                     id: .init(rawValue: id), runIndex: runIndex, generationSeed: generationSeed,
+                     id: receiptID, runIndex: runIndex, generationSeed: generationSeed,
                      sourcePagePhysicalReceipt: physical,
                      visualReceiptID: visualReceipt.canonicalReceiptSHA256,
                      visualSchemaVersion: visualReceipt.adapterVersion,
@@ -178,10 +299,67 @@ enum WorldArrivalReceiptFactory {
                      firstMapCropReceipt: crop,
                      proseVersion: WorldArrivalReceipt.descriptionGrammarVersion,
                      finalDescription: description,
-                     compositorVersion: WorldArrivalReceipt.sceneCompositorVersion)
+                     compositorVersion: WorldArrivalReceipt.sceneCompositorVersion,
+                     sceneReceipt: WorldArrivalSceneReceipt(payload: scenePayload))
     }
 
     private static let schemaIdentity = "world-arrival-receipt-v1"
+
+    private static func scenePayload(
+        receiptID: WorldArrivalReceiptID, generationSeed: UInt64,
+        source: WritingDeskReviewModel, dominant: GroundType, waterRelationship: String,
+        visualReceipt: WorldVisualReceipt, lightBand: String, sourceClass: String,
+        atmosphere: WorldGrade2V1.Atmosphere,
+        flora: [WorldArrivalReceipt.FloraSummary],
+        crop: WorldArrivalReceipt.FirstMapCrop, description: String
+    ) -> WorldArrivalSceneReceipt.Payload {
+        let sourceID: String
+        switch source.sourceKey {
+        case .draft(let revision): sourceID = "draft-\(revision)"
+        case .collected(_, let definitionID, _): sourceID = definitionID.rawValue
+        }
+        let density = densityBand(atmosphere.density, medium: atmosphere.medium)
+        let page = WorldArrivalSceneReceipt.SourcePage(
+            id: sourceID, title: source.title,
+            marks: source.pageThumbnail.marks.map { mark in
+                .init(x: mark.origin.column, y: mark.origin.row,
+                      cells: mark.cells.map {
+                          [$0.column - mark.origin.column, $0.row - mark.origin.row]
+                      })
+            })
+        let material = visualReceipt.descriptor.material
+        let sceneCrop = WorldArrivalSceneReceipt.FirstMapCrop(
+            width: crop.width, height: crop.height,
+            cells: crop.cells.enumerated().map { index, cell in
+                .init(x: index % crop.width, y: index / crop.width,
+                      ground: cell.ground, elevation: cell.elevation,
+                      floraStableID: cell.floraStableID, visibility: cell.visibility)
+            })
+        return .init(
+            receiptID: receiptID.rawValue, worldSeed: String(generationSeed), sourcePage: page,
+            dominantGround: dominant, waterRelationship: waterRelationship,
+            materialDescriptor: .init(
+                identity: material.identity, paletteFamilyID: material.paletteFamilyID,
+                transform: material.transform,
+                resolvedColor: visualReceipt.descriptor.resolvedColors.material?.srgb),
+            illumination: .init(band: lightBand, sourceClass: sourceClass),
+            suspendedAtmosphere: .init(medium: atmosphere.medium, density: density, motion: "calm"),
+            precipitation: .init(medium: "none", intensity: "none", motion: "calm"),
+            flora: flora.map {
+                .init(stableID: $0.stableID, formID: $0.formID, coverage: $0.coverage,
+                      habit: $0.habit, color: $0.resolvedColor)
+            },
+            causalVisualFacts: [], entryDisclosure: nil, description: description,
+            firstMapCropReceipt: sceneCrop)
+    }
+
+    private static func densityBand(_ density: Double, medium: String) -> String {
+        guard medium != "none", density > 0 else { return "none" }
+        if density < 0.12 { return "trace" }
+        if density < 0.35 { return "light" }
+        if density < 0.7 { return "heavy" }
+        return "dense"
+    }
 
     private static func sourceIdentity(_ source: WritingDeskSourceKey) -> String {
         switch source {
