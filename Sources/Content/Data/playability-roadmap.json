@@ -388,8 +388,8 @@
       "priority": "B1.8b",
       "title": "World screen phone composition receipt",
       "status": "queued",
-      "detail": "Close the directly reported World-screen presentation contract as its own receipt: square complete tiles at the correct viewport scale; no clipped bottom row or map/control gap; readable dynamic event text in a transparent/non-displacing panel; a clear minimap border; fixed controls that never cover the Field Kit/resources; and tutorial messages presented only as overlays.",
-      "gate": "Fresh/loaded/long-event/tutorial fixtures at 368×800 show the full map edge, party strip, D-pad, minimap, Look/Interact, event text and Field Kit without geometry changes between overlays. Tapped-out controls are visibly disabled; edge pull-down cannot expose fake blank space; minimap unexplored space stays black and all POIs remain disclosure-gated.",
+      "detail": "Implement the one measured phone composition in world-screen-phone-composition-current.md: fixed status, flexible complete-row map viewport, fixed carried/navigation controls, stable Use Tile/Look verbs, disclosure-safe minimap and a transient overlay stack that never participates in layout. Long object prose routes to detail instead of covering the map, and Look/off-mode cancellation uses the current adjacent rules preview.",
+      "gate": "The DEBUG layout receipt and 12 fixtures prove integer-pixel complete map rows, fixed frames unchanged by tutorial/event/decision overlays, no Field Kit/resource/control collision, Look zero-turn/cancellation truth, stable Use Tile action, map-edge clamps and default minimap POI nondisclosure. One uncropped 368×800 phone capture shows status, complete bottom grid line, carried strip, D-pad, minimap, Use Tile and Look together. Authority: world-screen-phone-composition-current.md.",
       "workstream": "engineering",
       "isPrimary": false
     },
