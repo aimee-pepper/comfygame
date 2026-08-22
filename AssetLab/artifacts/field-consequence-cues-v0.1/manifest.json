@@ -1,0 +1,589 @@
+{
+  "schemaVersion": 1,
+  "identity": "field-consequence-cues-v0.1",
+  "integrationReady": false,
+  "productionSource": "direct-logical-rgba",
+  "tile": {
+    "width": 16,
+    "height": 16,
+    "pivot": {
+      "x": 8,
+      "y": 8
+    },
+    "clip": "party-tile-only",
+    "centralReservation": {
+      "x": 5,
+      "y": 5,
+      "width": 6,
+      "height": 6
+    }
+  },
+  "palette": {
+    "harmBody": [
+      216,
+      107,
+      92,
+      255
+    ],
+    "harmHighlight": [
+      244,
+      165,
+      139,
+      255
+    ],
+    "slowOuter": [
+      76,
+      86,
+      92,
+      255
+    ],
+    "slowInner": [
+      132,
+      142,
+      145,
+      255
+    ]
+  },
+  "directions": [
+    "north",
+    "east",
+    "south",
+    "west"
+  ],
+  "kinds": [
+    "known-harm",
+    "slow"
+  ],
+  "sources": {
+    "known-harm": {
+      "north": {
+        "stableID": "field-cue.known-harm.north",
+        "direction": "north",
+        "pivot": {
+          "x": 8,
+          "y": 8
+        },
+        "tileBounds": {
+          "x": 0,
+          "y": 0,
+          "width": 16,
+          "height": 16
+        },
+        "centralReservation": {
+          "x": 5,
+          "y": 5,
+          "width": 6,
+          "height": 6
+        },
+        "rgbaSHA256": "d74db8090ebb915230f3c9f2cc2d90669809c3b3269ad920d42d4b3af8a01f12",
+        "native": {
+          "file": "sources/known-harm-north-16x16.png",
+          "width": 16,
+          "height": 16,
+          "sha256": "78d408c78a3551fc63743086890bab20fdf83bbd96ea693c3cb77ff2bd2033e9",
+          "kind": "production-source"
+        },
+        "scale400": {
+          "file": "evidence/known-harm-north-400pct.png",
+          "width": 64,
+          "height": 64,
+          "sha256": "ec6cb5adc12a79d115bcaf73996dafa9b474eefddb325c4a259ac635daacecb8",
+          "kind": "review"
+        }
+      },
+      "east": {
+        "stableID": "field-cue.known-harm.east",
+        "direction": "east",
+        "pivot": {
+          "x": 8,
+          "y": 8
+        },
+        "tileBounds": {
+          "x": 0,
+          "y": 0,
+          "width": 16,
+          "height": 16
+        },
+        "centralReservation": {
+          "x": 5,
+          "y": 5,
+          "width": 6,
+          "height": 6
+        },
+        "rgbaSHA256": "f577132e8a353cb36d95b13f0602832d79ffa4715927647ac4c4c91e6f8147b1",
+        "native": {
+          "file": "sources/known-harm-east-16x16.png",
+          "width": 16,
+          "height": 16,
+          "sha256": "bf404b3c4b0db62a4fdbde3d07e31773b81bbbfba573ced2908ef0ab0685bdc8",
+          "kind": "production-source"
+        },
+        "scale400": {
+          "file": "evidence/known-harm-east-400pct.png",
+          "width": 64,
+          "height": 64,
+          "sha256": "624cb29bb09be420f4ec0797c3c28223158184dff9293aeb0ec081832916a49b",
+          "kind": "review"
+        }
+      },
+      "south": {
+        "stableID": "field-cue.known-harm.south",
+        "direction": "south",
+        "pivot": {
+          "x": 8,
+          "y": 8
+        },
+        "tileBounds": {
+          "x": 0,
+          "y": 0,
+          "width": 16,
+          "height": 16
+        },
+        "centralReservation": {
+          "x": 5,
+          "y": 5,
+          "width": 6,
+          "height": 6
+        },
+        "rgbaSHA256": "400b571049c45953be9ba189ba7278f4dba37f3633d53b49b83289f846014680",
+        "native": {
+          "file": "sources/known-harm-south-16x16.png",
+          "width": 16,
+          "height": 16,
+          "sha256": "5f389d2702595d8d1ba37051363758926bdcfe765807473ecdabe61fd6ffa0bb",
+          "kind": "production-source"
+        },
+        "scale400": {
+          "file": "evidence/known-harm-south-400pct.png",
+          "width": 64,
+          "height": 64,
+          "sha256": "826e2d8178f32e0c01b8d26309de9a8a4e8c6ca4d4c83fd724724bc268c84665",
+          "kind": "review"
+        }
+      },
+      "west": {
+        "stableID": "field-cue.known-harm.west",
+        "direction": "west",
+        "pivot": {
+          "x": 8,
+          "y": 8
+        },
+        "tileBounds": {
+          "x": 0,
+          "y": 0,
+          "width": 16,
+          "height": 16
+        },
+        "centralReservation": {
+          "x": 5,
+          "y": 5,
+          "width": 6,
+          "height": 6
+        },
+        "rgbaSHA256": "82b85f3638d217d3b9dc5be1c3fa2063ea9dbe3f4aab1bc46c12f1c1ac9971d0",
+        "native": {
+          "file": "sources/known-harm-west-16x16.png",
+          "width": 16,
+          "height": 16,
+          "sha256": "73341d475dc68bd1d3b85932156f3718286759f5e6bba606264b14c4888cfed9",
+          "kind": "production-source"
+        },
+        "scale400": {
+          "file": "evidence/known-harm-west-400pct.png",
+          "width": 64,
+          "height": 64,
+          "sha256": "f1e6c1755c0e414f83e75b141554997ef0513810bc6f87bf0cc5e5b8c5558882",
+          "kind": "review"
+        }
+      }
+    },
+    "slow": {
+      "north": {
+        "stableID": "field-cue.slow.north",
+        "direction": "north",
+        "pivot": {
+          "x": 8,
+          "y": 8
+        },
+        "tileBounds": {
+          "x": 0,
+          "y": 0,
+          "width": 16,
+          "height": 16
+        },
+        "centralReservation": {
+          "x": 5,
+          "y": 5,
+          "width": 6,
+          "height": 6
+        },
+        "rgbaSHA256": "e1729b1ba2eddde95164ba03579d94fe5b46434cd5f1bda3d0b37208a6947e46",
+        "native": {
+          "file": "sources/slow-north-16x16.png",
+          "width": 16,
+          "height": 16,
+          "sha256": "d8141adf8b29d144d396cef6f4d1a9641f9885fe5d4ef5d47c8549fbfc6e57a1",
+          "kind": "production-source"
+        },
+        "scale400": {
+          "file": "evidence/slow-north-400pct.png",
+          "width": 64,
+          "height": 64,
+          "sha256": "fb4234b6e9e108dc175e090ae25e640dd35b2691e4f53770ed4b2087435efcec",
+          "kind": "review"
+        }
+      },
+      "east": {
+        "stableID": "field-cue.slow.east",
+        "direction": "east",
+        "pivot": {
+          "x": 8,
+          "y": 8
+        },
+        "tileBounds": {
+          "x": 0,
+          "y": 0,
+          "width": 16,
+          "height": 16
+        },
+        "centralReservation": {
+          "x": 5,
+          "y": 5,
+          "width": 6,
+          "height": 6
+        },
+        "rgbaSHA256": "c3af171cd11d81067cc036a8a9f1b3315473db51a0b9a7c1e3f96e70e6664c70",
+        "native": {
+          "file": "sources/slow-east-16x16.png",
+          "width": 16,
+          "height": 16,
+          "sha256": "3495a4a76bc821d4efddb41cee89640b4068ed51b69bda1004bf7c36b651891d",
+          "kind": "production-source"
+        },
+        "scale400": {
+          "file": "evidence/slow-east-400pct.png",
+          "width": 64,
+          "height": 64,
+          "sha256": "03cf294e9d61b5b446791569028941d369a4ca37daa5f59d38b288aea6ce5576",
+          "kind": "review"
+        }
+      },
+      "south": {
+        "stableID": "field-cue.slow.south",
+        "direction": "south",
+        "pivot": {
+          "x": 8,
+          "y": 8
+        },
+        "tileBounds": {
+          "x": 0,
+          "y": 0,
+          "width": 16,
+          "height": 16
+        },
+        "centralReservation": {
+          "x": 5,
+          "y": 5,
+          "width": 6,
+          "height": 6
+        },
+        "rgbaSHA256": "b94ec67fe2445fedd05ab7678dc56d59309ace08bca38f73aeae05e2a267cfdb",
+        "native": {
+          "file": "sources/slow-south-16x16.png",
+          "width": 16,
+          "height": 16,
+          "sha256": "ed13a8cbdaa72790bce2de984f33409e2fe2ef5a03801a866d1f8af55a18a120",
+          "kind": "production-source"
+        },
+        "scale400": {
+          "file": "evidence/slow-south-400pct.png",
+          "width": 64,
+          "height": 64,
+          "sha256": "4e1aa9f71076e63d1cd53f5da84c5fc800d6eb982bb3b32af8662cf851109ea1",
+          "kind": "review"
+        }
+      },
+      "west": {
+        "stableID": "field-cue.slow.west",
+        "direction": "west",
+        "pivot": {
+          "x": 8,
+          "y": 8
+        },
+        "tileBounds": {
+          "x": 0,
+          "y": 0,
+          "width": 16,
+          "height": 16
+        },
+        "centralReservation": {
+          "x": 5,
+          "y": 5,
+          "width": 6,
+          "height": 6
+        },
+        "rgbaSHA256": "677b954683869adb8a3ca26b3a51a562a7caf9165c96bad7dd6aff3e1afed01f",
+        "native": {
+          "file": "sources/slow-west-16x16.png",
+          "width": 16,
+          "height": 16,
+          "sha256": "26e31fa2592db15ac80815ea47939d82239e4422f92ba31a691659418399bf58",
+          "kind": "production-source"
+        },
+        "scale400": {
+          "file": "evidence/slow-west-400pct.png",
+          "width": 64,
+          "height": 64,
+          "sha256": "6c8b138002b94b1c812eb01b1977a031adac4434a751cc4aa743f3d29af15ebb",
+          "kind": "review"
+        }
+      }
+    }
+  },
+  "combinedStates": {
+    "authoredBitmap": false,
+    "rule": "composite unchanged component sources"
+  },
+  "layerOrder": [
+    "terrain-flora",
+    "party-disc-identity",
+    "consequence-cues",
+    "selection-interaction-outline"
+  ],
+  "visibility": {
+    "eligible": [
+      "full"
+    ],
+    "cueFree": [
+      "fringe",
+      "hidden"
+    ]
+  },
+  "runtime": {
+    "integerRotation": true,
+    "filters": false,
+    "subpixel": false,
+    "vectors": false,
+    "pulse": false
+  },
+  "forbidden": [
+    "pickup-animation",
+    "pickup-icons",
+    "native",
+    "PBX",
+    "golden",
+    "arrow",
+    "text",
+    "skull",
+    "plant",
+    "damage-number",
+    "terrain-adaptive-palette"
+  ],
+  "fixtureFile": "fixtures/field-consequence-cues-v0.1/proof-fixtures.json",
+  "outputs": [
+    {
+      "file": "sources/known-harm-north-16x16.png",
+      "width": 16,
+      "height": 16,
+      "sha256": "78d408c78a3551fc63743086890bab20fdf83bbd96ea693c3cb77ff2bd2033e9",
+      "kind": "production-source"
+    },
+    {
+      "file": "evidence/known-harm-north-400pct.png",
+      "width": 64,
+      "height": 64,
+      "sha256": "ec6cb5adc12a79d115bcaf73996dafa9b474eefddb325c4a259ac635daacecb8",
+      "kind": "review"
+    },
+    {
+      "file": "sources/known-harm-east-16x16.png",
+      "width": 16,
+      "height": 16,
+      "sha256": "bf404b3c4b0db62a4fdbde3d07e31773b81bbbfba573ced2908ef0ab0685bdc8",
+      "kind": "production-source"
+    },
+    {
+      "file": "evidence/known-harm-east-400pct.png",
+      "width": 64,
+      "height": 64,
+      "sha256": "624cb29bb09be420f4ec0797c3c28223158184dff9293aeb0ec081832916a49b",
+      "kind": "review"
+    },
+    {
+      "file": "sources/known-harm-south-16x16.png",
+      "width": 16,
+      "height": 16,
+      "sha256": "5f389d2702595d8d1ba37051363758926bdcfe765807473ecdabe61fd6ffa0bb",
+      "kind": "production-source"
+    },
+    {
+      "file": "evidence/known-harm-south-400pct.png",
+      "width": 64,
+      "height": 64,
+      "sha256": "826e2d8178f32e0c01b8d26309de9a8a4e8c6ca4d4c83fd724724bc268c84665",
+      "kind": "review"
+    },
+    {
+      "file": "sources/known-harm-west-16x16.png",
+      "width": 16,
+      "height": 16,
+      "sha256": "73341d475dc68bd1d3b85932156f3718286759f5e6bba606264b14c4888cfed9",
+      "kind": "production-source"
+    },
+    {
+      "file": "evidence/known-harm-west-400pct.png",
+      "width": 64,
+      "height": 64,
+      "sha256": "f1e6c1755c0e414f83e75b141554997ef0513810bc6f87bf0cc5e5b8c5558882",
+      "kind": "review"
+    },
+    {
+      "file": "sources/slow-north-16x16.png",
+      "width": 16,
+      "height": 16,
+      "sha256": "d8141adf8b29d144d396cef6f4d1a9641f9885fe5d4ef5d47c8549fbfc6e57a1",
+      "kind": "production-source"
+    },
+    {
+      "file": "evidence/slow-north-400pct.png",
+      "width": 64,
+      "height": 64,
+      "sha256": "fb4234b6e9e108dc175e090ae25e640dd35b2691e4f53770ed4b2087435efcec",
+      "kind": "review"
+    },
+    {
+      "file": "sources/slow-east-16x16.png",
+      "width": 16,
+      "height": 16,
+      "sha256": "3495a4a76bc821d4efddb41cee89640b4068ed51b69bda1004bf7c36b651891d",
+      "kind": "production-source"
+    },
+    {
+      "file": "evidence/slow-east-400pct.png",
+      "width": 64,
+      "height": 64,
+      "sha256": "03cf294e9d61b5b446791569028941d369a4ca37daa5f59d38b288aea6ce5576",
+      "kind": "review"
+    },
+    {
+      "file": "sources/slow-south-16x16.png",
+      "width": 16,
+      "height": 16,
+      "sha256": "ed13a8cbdaa72790bce2de984f33409e2fe2ef5a03801a866d1f8af55a18a120",
+      "kind": "production-source"
+    },
+    {
+      "file": "evidence/slow-south-400pct.png",
+      "width": 64,
+      "height": 64,
+      "sha256": "4e1aa9f71076e63d1cd53f5da84c5fc800d6eb982bb3b32af8662cf851109ea1",
+      "kind": "review"
+    },
+    {
+      "file": "sources/slow-west-16x16.png",
+      "width": 16,
+      "height": 16,
+      "sha256": "26e31fa2592db15ac80815ea47939d82239e4422f92ba31a691659418399bf58",
+      "kind": "production-source"
+    },
+    {
+      "file": "evidence/slow-west-400pct.png",
+      "width": 64,
+      "height": 64,
+      "sha256": "6c8b138002b94b1c812eb01b1977a031adac4434a751cc4aa743f3d29af15ebb",
+      "kind": "review"
+    },
+    {
+      "file": "evidence/cardinal-cues-native.png",
+      "width": 368,
+      "height": 90,
+      "sha256": "c3bca09bf49af042d0aab50e130905ba36d47a63e7f30194409c83457cd25919",
+      "kind": "review"
+    },
+    {
+      "file": "evidence/cardinal-cues-native-grayscale.png",
+      "width": 368,
+      "height": 90,
+      "sha256": "7a436e7fa7aa4374416ae42f480cb970b7865a7dd1c5d82a3951dbb18226e545",
+      "kind": "review"
+    },
+    {
+      "file": "evidence/cardinal-cues-400pct.png",
+      "width": 368,
+      "height": 178,
+      "sha256": "ce4397eb1859f1975110ede8c42d4899a0d9ce067a6f01bad30851347d450f2c",
+      "kind": "review"
+    },
+    {
+      "file": "evidence/cardinal-cues-400pct-grayscale.png",
+      "width": 368,
+      "height": 178,
+      "sha256": "d5e4b0a459781ac8ac89865bb2e76c51ca0554db32b34bb8d0a0ee05b08abd99",
+      "kind": "review"
+    },
+    {
+      "file": "evidence/two-and-four-direction-states.png",
+      "width": 520,
+      "height": 190,
+      "sha256": "ac749c777a5ac8679ad5d03b7fdad9a29a303a447828b7b9dad3c559eefa96da",
+      "kind": "review"
+    },
+    {
+      "file": "evidence/two-and-four-direction-states-grayscale.png",
+      "width": 520,
+      "height": 190,
+      "sha256": "0442c8cba38f48a3960d16ad7f46ad2fc25c63caf1cb84f7908757a8dd6644e0",
+      "kind": "review"
+    },
+    {
+      "file": "evidence/background-matrix.png",
+      "width": 640,
+      "height": 190,
+      "sha256": "cc046f6487174b25d844b9c55bb1f9fdd4e64ee30c135330f4491585a1005a36",
+      "kind": "review"
+    },
+    {
+      "file": "evidence/background-matrix-grayscale.png",
+      "width": 640,
+      "height": 190,
+      "sha256": "6f248fac9e7f0911b2c930a3d86599ce97c3fae09281d03cf5b599193c129fb7",
+      "kind": "review"
+    },
+    {
+      "file": "evidence/visibility-matrix.png",
+      "width": 480,
+      "height": 190,
+      "sha256": "b16d49bcff48747ed440d85dab3a2b6f8756c263d75a5ae78c100e10c59efa9b",
+      "kind": "review"
+    },
+    {
+      "file": "evidence/visibility-matrix-grayscale.png",
+      "width": 480,
+      "height": 190,
+      "sha256": "d26227af9bd170887a2aeaef1dbdbb4adbda7685c90751418c34c64ea32cd6a0",
+      "kind": "review"
+    },
+    {
+      "file": "evidence/collision-bounds.png",
+      "width": 384,
+      "height": 192,
+      "sha256": "9749f0476458cbaa48d1305ad3ede53897f901fab7acbaeeab0849dd09912586",
+      "kind": "review"
+    },
+    {
+      "file": "evidence/ordinary-phone-368x800.png",
+      "width": 368,
+      "height": 800,
+      "sha256": "8c768a219130ba041c56d2d7ab7a27a180c85cfaeba342374a96c935a5bd96c5",
+      "kind": "review"
+    },
+    {
+      "file": "evidence/ordinary-phone-368x800-grayscale.png",
+      "width": 368,
+      "height": 800,
+      "sha256": "877eb0620b882a82cc5a7b882668b17421b322dbfdb83fa9b330d711a1b6411e",
+      "kind": "review"
+    }
+  ],
+  "canonicalBodySHA256": "1d648b34d10e015e8e49f1dbc1bc7b90327f15b092f317431c50572769e272d2"
+}

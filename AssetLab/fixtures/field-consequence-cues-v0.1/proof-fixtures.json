@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "tileSize": 16,
+  "centralReservation": { "x": 5, "y": 5, "width": 6, "height": 6 },
+  "backgrounds": ["darkStone", "lightSand", "shallowWater", "denseGrowth"],
+  "directions": ["north", "east", "south", "west"],
+  "states": {
+    "twoDirectionMixed": {
+      "north": ["known-harm"],
+      "east": ["slow"]
+    },
+    "fourDirectionCombined": {
+      "north": ["known-harm", "slow"],
+      "east": ["known-harm", "slow"],
+      "south": ["known-harm", "slow"],
+      "west": ["known-harm", "slow"]
+    }
+  },
+  "visibility": ["full", "fringe", "hidden"]
+}
