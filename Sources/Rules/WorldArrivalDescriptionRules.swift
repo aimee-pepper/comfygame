@@ -377,6 +377,7 @@ enum WorldArrivalCausalCandidateRules {
         var displayLabel: String
         var sourcePageOrder: Int
         var registeredResourceFamilies: [ResourceID]
+        var registeredScopes: [WorldArrivalReceipt.CausalVisualFact.Scope] = []
     }
 
     static func candidates(page: Page, review: WritingDeskReviewModel) -> [Candidate] {
@@ -415,9 +416,44 @@ enum WorldArrivalCausalCandidateRules {
                 families = []
             }
             let semanticKey = mark.personalCompound == nil ? mark.glyphID : nil
+            let speakingSigils: [Sigil]
+            if mark.sourceID != nil {
+                speakingSigils = PageRules.clusterSigils(of: page).filter { $0.id == mark.id }
+            } else {
+                speakingSigils = mark.sigils
+            }
+            var scopes = speakingSigils.compactMap {
+                visibleScope(for: $0.target, hasRegisteredResource: !families.isEmpty)
+            }
+            if !families.isEmpty { scopes.append(.resource) }
+            scopes = WorldArrivalReceipt.CausalVisualFact.Scope.allCases.filter(scopes.contains)
+            // These are the registered structural/resource templates whose player-facing scope
+            // is narrower than every secondary pressure in their compound expansion.
+            switch semanticKey {
+            case "plains", "caverns": scopes = [.ground]
+            case "archipelago": scopes = [.water]
+            case "common_ore": scopes = [.resource]
+            default: break
+            }
             return .init(markID: mark.id, semanticKey: semanticKey,
                          displayLabel: display.displayName, sourcePageOrder: order,
-                         registeredResourceFamilies: families)
+                         registeredResourceFamilies: families, registeredScopes: scopes)
+        }
+    }
+
+    private static func visibleScope(
+        for target: PressureTargetID, hasRegisteredResource: Bool
+    ) -> WorldArrivalReceipt.CausalVisualFact.Scope? {
+        switch target.rawValue {
+        case "relief": return .ground
+        case "hydrology": return .water
+        case "vitality": return .flora
+        case "illumination": return .light
+        case "atmosphere": return .atmosphere
+        // A resource-speaking mark owns its registered family rather than disguising the
+        // resource result as a generic substrate/ground change.
+        case "substrate": return hasRegisteredResource ? nil : .ground
+        default: return nil
         }
     }
 
@@ -467,7 +503,9 @@ enum WorldArrivalCausalCandidateRules {
                              actual: Worldgen.ArrivalCausalSummary,
                              withoutCandidate: Worldgen.ArrivalCausalSummary,
                              actualReadings: PressureReadings,
-                             withoutReadings: PressureReadings)
+                             withoutReadings: PressureReadings,
+                             actualAtmosphere: WorldGrade2V1.Atmosphere,
+                             withoutAtmosphere: WorldGrade2V1.Atmosphere) throws
         -> [WorldArrivalReceipt.CausalVisualFact] {
         var facts: [WorldArrivalReceipt.CausalVisualFact] = []
         func fact(_ scope: WorldArrivalReceipt.CausalVisualFact.Scope,
@@ -479,39 +517,80 @@ enum WorldArrivalCausalCandidateRules {
                   contributionKind: kind, resultBand: result,
                   withoutAuthoredBand: without)
         }
-        let actualGround = groundCounts(actual.map)
-        let withoutGround = groundCounts(withoutCandidate.map)
-        if actualGround != withoutGround {
-            facts.append(fact(.ground, .reshaped, groundBand(actualGround),
-                              groundBand(withoutGround)))
+        func owns(_ scope: WorldArrivalReceipt.CausalVisualFact.Scope) -> Bool {
+            candidate.registeredScopes.contains(scope)
+        }
+        let actualGround = try WorldArrivalReceiptFactory.dominantDryGround(in: actual.map)
+        let withoutGround = try WorldArrivalReceiptFactory.dominantDryGround(in: withoutCandidate.map)
+        let actualGroundCount = actual.map.tiles.count { $0.ground == actualGround }
+        let withoutGroundCount = withoutCandidate.map.tiles.count { $0.ground == withoutGround }
+        if owns(.ground), actualGround != withoutGround {
+            facts.append(fact(.ground, .reshaped, actualGround.rawValue, withoutGround.rawValue))
+        } else if owns(.ground), actualGroundCount != withoutGroundCount {
+            let structural = ["plains", "caverns"].contains(candidate.semanticKey)
+            facts.append(fact(.ground,
+                              structural ? .reshaped
+                                : actualGroundCount > withoutGroundCount ? .increased : .reduced,
+                              actualGround.rawValue, withoutGround.rawValue))
         }
         let actualWater = waterCounts(actual.map)
         let withoutWater = waterCounts(withoutCandidate.map)
-        if actualWater.wet != withoutWater.wet || actualWater.deep != withoutWater.deep {
-            facts.append(fact(.water, .reshaped,
-                              "wet:\(actualWater.wet);deep:\(actualWater.deep)",
-                              "wet:\(withoutWater.wet);deep:\(withoutWater.deep)"))
+        let actualWaterBand = try waterBand(actualWater, in: actual.map)
+        let withoutWaterBand = try waterBand(withoutWater, in: withoutCandidate.map)
+        if owns(.water), actualWaterBand != withoutWaterBand {
+            facts.append(fact(.water, .reshaped, actualWaterBand, withoutWaterBand))
+        } else if owns(.water), actualWater.wet != withoutWater.wet || actualWater.deep != withoutWater.deep {
+            let actualMagnitude = actualWater.wet + actualWater.deep
+            let withoutMagnitude = withoutWater.wet + withoutWater.deep
+            if actualMagnitude != withoutMagnitude {
+                let structural = candidate.semanticKey == "archipelago"
+                facts.append(fact(.water,
+                                  structural ? .reshaped
+                                    : actualMagnitude > withoutMagnitude ? .increased : .reduced,
+                                  actualWaterBand, withoutWaterBand))
+            }
         }
-        let actualFlora = actual.map.tiles.count { $0.flora != nil }
-        let withoutFlora = withoutCandidate.map.tiles.count { $0.flora != nil }
-        if actualFlora != withoutFlora {
-            facts.append(fact(.flora, actualFlora > withoutFlora ? .increased : .reduced,
-                              "tiles:\(actualFlora)", "tiles:\(withoutFlora)"))
+        let actualFlora = floraResult(actual)
+        let withoutFlora = floraResult(withoutCandidate)
+        if owns(.flora), actualFlora.identity != withoutFlora.identity {
+            facts.append(fact(.flora, .reshaped, actualFlora.band, withoutFlora.band))
+        } else if owns(.flora), actualFlora.count != withoutFlora.count {
+            facts.append(fact(.flora, actualFlora.count > withoutFlora.count ? .increased : .reduced,
+                              actualFlora.band, withoutFlora.band))
         }
-        facts.append(contentsOf: resourceFacts(candidate: candidate, actual: actual.map,
-                                               withoutCandidate: withoutCandidate.map))
+        if owns(.resource) {
+            facts.append(contentsOf: resourceFacts(candidate: candidate, actual: actual.map,
+                                                   withoutCandidate: withoutCandidate.map))
+        }
         let actualLight = actualReadings["illumination"]
         let withoutLight = withoutReadings["illumination"]
-        if actualLight != withoutLight {
+        let actualLightBand = WorldArrivalReceiptFactory.illuminationBand(actualLight)
+        let withoutLightBand = WorldArrivalReceiptFactory.illuminationBand(withoutLight)
+        let actualSource = WorldArrivalReceiptFactory.illuminationSourceClass(
+            light: actualLight, cycle: actualReadings["cycle"])
+        let withoutSource = WorldArrivalReceiptFactory.illuminationSourceClass(
+            light: withoutLight, cycle: withoutReadings["cycle"])
+        if owns(.light), actualLightBand != withoutLightBand || actualSource != withoutSource {
+            facts.append(fact(.light, .reshaped, actualLightBand, withoutLightBand))
+        } else if owns(.light), actualLight != withoutLight {
             let kind: WorldArrivalReceipt.CausalVisualFact.ContributionKind
             if actualLight.peak >= withoutLight.peak && actualLight.floor >= withoutLight.floor {
                 kind = .increased
             } else if actualLight.peak <= withoutLight.peak && actualLight.floor <= withoutLight.floor {
                 kind = .reduced
             } else { kind = .reshaped }
-            facts.append(fact(.light, kind,
-                              "peak:\(actualLight.peak);floor:\(actualLight.floor)",
-                              "peak:\(withoutLight.peak);floor:\(withoutLight.floor)"))
+            facts.append(fact(.light, kind, actualLightBand, withoutLightBand))
+        }
+        let actualAtmosphereBand = atmosphereBand(actualAtmosphere)
+        let withoutAtmosphereBand = atmosphereBand(withoutAtmosphere)
+        if owns(.atmosphere), actualAtmosphere.medium != withoutAtmosphere.medium {
+            facts.append(fact(.atmosphere, .reshaped,
+                              actualAtmosphereBand, withoutAtmosphereBand))
+        } else if owns(.atmosphere), actualAtmosphere.density != withoutAtmosphere.density {
+            facts.append(fact(.atmosphere,
+                              actualAtmosphere.density > withoutAtmosphere.density
+                                ? .increased : .reduced,
+                              actualAtmosphereBand, withoutAtmosphereBand))
         }
         return facts
     }
@@ -519,12 +598,43 @@ enum WorldArrivalCausalCandidateRules {
     private static func groundCounts(_ map: WorldMap) -> [GroundType: Int] {
         Dictionary(grouping: map.tiles.map(\.ground), by: { $0 }).mapValues(\.count)
     }
-    private static func groundBand(_ counts: [GroundType: Int]) -> String {
-        counts.sorted { $0.key.rawValue < $1.key.rawValue }
-            .map { "\($0.key.rawValue):\($0.value)" }.joined(separator: ",")
-    }
     private static func waterCounts(_ map: WorldMap) -> (wet: Int, deep: Int) {
         let counts = groundCounts(map)
         return ((counts[.water] ?? 0) + (counts[.deepWater] ?? 0), counts[.deepWater] ?? 0)
+    }
+    private static func waterBand(_ counts: (wet: Int, deep: Int), in map: WorldMap) throws -> String {
+        let nonChasm = map.tiles.count { $0.ground != .chasm }
+        guard nonChasm > 0, counts.deep <= counts.wet else {
+            throw WorldArrivalDescriptionRules.Error.malformedTerrain
+        }
+        guard counts.wet > 0 else { return "none" }
+        let wetShare = Double(counts.wet) / Double(nonChasm)
+        let deepShare = Double(counts.deep) / Double(counts.wet)
+        if wetShare <= 0.08 { return "pools" }
+        if wetShare <= 0.35 { return deepShare < 0.25 ? "channels" : "shelves" }
+        return "islands"
+    }
+    private static func floraResult(_ summary: Worldgen.ArrivalCausalSummary)
+        -> (identity: [String], count: Int, band: String) {
+        let placed = summary.map.tiles.compactMap(\.flora)
+        let placedSet = Set(placed)
+        let identity = summary.flora.filter { placedSet.contains($0.id) }.map { plant in
+            let form = plant.traits.metabolism == .fungal ? "fungal" : plant.traits.tissue.dominant.rawValue
+            return "\(plant.id.rawValue)|\(form)|\(plant.traits.habit.rawValue)"
+        }.sorted()
+        let denominator = summary.map.tiles.count { $0.ground != .chasm }
+        let band = placed.isEmpty ? "none"
+            : placed.count * 100 < denominator * 8 ? "sparse"
+            : placed.count * 100 < denominator * 22 ? "present" : "abundant"
+        return (identity, placed.count, band)
+    }
+    private static func atmosphereBand(_ atmosphere: WorldGrade2V1.Atmosphere) -> String {
+        let density: String
+        if atmosphere.medium == "none" || atmosphere.density <= 0 { density = "none" }
+        else if atmosphere.density < 0.12 { density = "trace" }
+        else if atmosphere.density < 0.35 { density = "light" }
+        else if atmosphere.density < 0.7 { density = "heavy" }
+        else { density = "dense" }
+        return atmosphere.medium == "none" ? "none" : "\(atmosphere.medium):\(density)"
     }
 }

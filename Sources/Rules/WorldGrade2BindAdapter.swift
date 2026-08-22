@@ -181,6 +181,14 @@ enum WorldGrade2BindAdapter {
             selectedSourceByScope: selected.mapValues(\.sigil.id))
     }
 
+    /// Pure rules-owned atmosphere projection for causal counterfactual evidence. The caller
+    /// supplies already-resolved sigils so this never rerolls or shifts an unwritten stream.
+    static func atmosphereDescriptor(sigils: [Sigil]) throws -> WorldGrade2V1.Atmosphere {
+        let scoped = try candidates(in: sigils, explicit: [:])
+        return try atmosphere(sigils: sigils,
+                              smokeSelected: scoped.contains { $0.scope == .atmosphere })
+    }
+
     private static func candidates(in sigils: [Sigil],
                                    explicit: [InstanceID: WorldGrade2V1.ResolvedColor]) throws -> [Candidate] {
         let ownership: [(WorldVisualScope, PressureSourceID, PressureTargetID)] = [

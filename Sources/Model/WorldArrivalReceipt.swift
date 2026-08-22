@@ -280,8 +280,6 @@ struct WorldArrivalReceipt: Codable, Equatable, Sendable {
     var precipitation: Precipitation?
     var flora: [FloraSummary]
     var causalVisualFacts: [CausalVisualFact]
-    var counterfactualPassCount: Int?
-    var counterfactualElapsedMilliseconds: Double?
     var entryDisclosure: String?
     var firstMapCropReceipt: FirstMapCrop
     var proseVersion: String
@@ -317,8 +315,7 @@ enum WorldArrivalReceiptFactory {
         let readings = BookRules.readings(for: book, seed: generationSeed)
         let light = readings["illumination"]
         let cycle = readings["cycle"]
-        let lightBand: String = light.peak < 10 ? "trueDark" : light.peak < 35 ? "dim"
-            : light.peak < 70 ? "ordinary" : light.peak < 90 ? "bright" : "blazing"
+        let lightBand = illuminationBand(light)
         let sourceClass = illuminationSourceClass(light: light, cycle: cycle)
         let atmosphere = visualReceipt.descriptor.atmosphere
         let suspended = atmosphere.medium == "none" ? nil : WorldArrivalReceipt.Atmosphere(
@@ -351,7 +348,9 @@ enum WorldArrivalReceiptFactory {
             precipitation: "none", precipitationIntensity: "none",
             floraCoverageBand: aggregateCoverage, floraHabit: aggregateHabit)
 
-        let started = Date()
+#if DEBUG
+        let counterfactualStarted = Date()
+#endif
         let actualAuthored = BookRules.sigils(for: book)
         let actualReadings = BookRules.readings(for: book, seed: generationSeed)
         let actualSummary = Worldgen.ArrivalCausalSummary(map: map, flora: flora)
@@ -382,10 +381,19 @@ enum WorldArrivalReceiptFactory {
                 summaryCache[fingerprint] = summary
                 counterfactualPassCount += 1
             }
-            causalFacts.append(contentsOf: WorldArrivalCausalCandidateRules.summaryFacts(
+            let counterfactualAtmosphere = try WorldGrade2BindAdapter.atmosphereDescriptor(
+                sigils: intervention.counterfactualSigils)
+            causalFacts.append(contentsOf: try WorldArrivalCausalCandidateRules.summaryFacts(
                 candidate: candidate, actual: actualSummary, withoutCandidate: summary,
-                actualReadings: actualReadings, withoutReadings: intervention.readings))
+                actualReadings: actualReadings, withoutReadings: intervention.readings,
+                actualAtmosphere: visualReceipt.descriptor.atmosphere,
+                withoutAtmosphere: counterfactualAtmosphere))
         }
+#if DEBUG
+        let elapsed = Date().timeIntervalSince(counterfactualStarted) * 1_000
+        let elapsedText = String(format: "%.2f", elapsed)
+        print("World arrival causal diagnostics: \(counterfactualPassCount) summary passes in \(elapsedText) ms")
+#endif
         let physical = WorldArrivalReceipt.SourcePage(
             title: source.title, width: source.pageThumbnail.width, height: source.pageThumbnail.height,
             marks: source.pageThumbnail.marks.map {
@@ -434,8 +442,6 @@ enum WorldArrivalReceiptFactory {
                                          band: lightBand, sourceClass: sourceClass),
                      suspendedAtmosphere: suspended, precipitation: nil,
                      flora: floraSummaries, causalVisualFacts: causalFacts,
-                     counterfactualPassCount: counterfactualPassCount,
-                     counterfactualElapsedMilliseconds: Date().timeIntervalSince(started) * 1_000,
                      entryDisclosure: nil,
                      firstMapCropReceipt: crop,
                      proseVersion: WorldArrivalReceipt.descriptionGrammarVersion,
@@ -450,6 +456,11 @@ enum WorldArrivalReceiptFactory {
         if light.has("sourceless") { return "sourceless" }
         return cycle.peak > Tuning.DayNight.stoppedMaximumPeak
             && light.range > Tuning.Pressure.wideRangeThreshold ? "cyclic" : "constant"
+    }
+
+    static func illuminationBand(_ light: PressureReading) -> String {
+        light.peak < 10 ? "trueDark" : light.peak < 35 ? "dim"
+            : light.peak < 70 ? "ordinary" : light.peak < 90 ? "bright" : "blazing"
     }
 
     static func dominantDryGround(in map: WorldMap) throws -> GroundType {

@@ -151,6 +151,11 @@ final class PageTests: XCTestCase {
             WorldsState.self, from: JSONEncoder().encode(store.state.worlds))
         XCTAssertEqual(worldsRoundTrip.activeRun?.worldArrivalReceipt, runReceipt)
         XCTAssertNil(worldsRoundTrip.pendingWorldArrivalReceiptID)
+        let persistedReceipt = try XCTUnwrap(JSONSerialization.jsonObject(
+            with: JSONEncoder().encode(runReceipt)) as? [String: Any])
+        XCTAssertNil(persistedReceipt["counterfactualPassCount"])
+        XCTAssertNil(persistedReceipt["counterfactualElapsedMilliseconds"],
+                     "wall-clock diagnostics must never enter frozen receipt bytes")
 
         let positionBeforeEnter = try XCTUnwrap(store.activeRun?.playerPosition)
         let turnBeforeEnter = try XCTUnwrap(store.activeRun?.turnsTaken)
@@ -174,6 +179,40 @@ final class PageTests: XCTestCase {
         }
         XCTAssertFalse(store.enterPendingWorld(arrivalReceiptID: orphan))
         XCTAssertNil(store.state.worlds.pendingWorldArrivalReceiptID)
+    }
+
+    @MainActor
+    func testStarterBindFactoryFreezesExactAcceptedDescriptionsAndClosedCausalBands() throws {
+        let expected = [
+            "starter_open_meadow": "Broad sandy ground runs between shallow pools. Your Plains mark opened the terrain, while your Verdant mark spread low growth farther along the few wet and stony edges.",
+            "starter_rainwashed_shore": "Stone shelves break a wide run of shallow and deep water. Your Archipelago mark divided the route, while sparse growth settled on the open stone.",
+            "starter_stone_hollow": "Stone closes around narrow paths and wet hollows. Your Caverns mark shaped the enclosure, while your Ore mark made ore more plentiful."
+        ]
+        let closed: [WorldArrivalReceipt.CausalVisualFact.Scope: Set<String>] = [
+            .ground: Set(GroundType.allCases.map(\.rawValue)),
+            .water: ["none", "pools", "channels", "shelves", "islands"],
+            .flora: ["none", "sparse", "present", "abundant"],
+            .resource: ["absent", "present"],
+            .light: ["trueDark", "dim", "ordinary", "bright", "blazing"],
+            .atmosphere: Set(["smoke", "airborneAsh", "mist", "miasma"].flatMap { medium in
+                ["trace", "light", "heavy", "dense"].map { "\(medium):\($0)" }
+            }).union(["none"])
+        ]
+        for instance in WorldPageCatalog.starterInstances {
+            let fixture = try GameStore.makeStarterWorldPagePhoneFixture(
+                definitionID: instance.definition.id)
+            let receipt = try XCTUnwrap(fixture.store.activeRun?.worldArrivalReceipt)
+            XCTAssertEqual(receipt.finalDescription, expected[instance.definition.id.rawValue],
+                           instance.definition.id.rawValue)
+            for fact in receipt.causalVisualFacts {
+                XCTAssertTrue(closed[fact.scope, default: []].contains(fact.resultBand),
+                              "open result band \(fact.resultBand)")
+                XCTAssertTrue(closed[fact.scope, default: []].contains(fact.withoutAuthoredBand),
+                              "open counterfactual band \(fact.withoutAuthoredBand)")
+                XCTAssertFalse(fact.resultBand.contains(":" ) && fact.scope != .atmosphere)
+                XCTAssertFalse(fact.resultBand.contains(";"))
+            }
+        }
     }
 
     func testHiddenArrivalCropCellsSerializeWithoutTerrainPayload() throws {
