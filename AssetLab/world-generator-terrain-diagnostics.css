@@ -1,0 +1,31 @@
+.terrain-diagnostic-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+.terrain-diagnostic-grid article,
+.host-table-wrap {
+  border: 1px solid rgba(255,255,255,.1);
+  border-radius: 10px;
+  padding: 12px;
+}
+.terrain-diagnostic-grid h3,
+.host-table-wrap h3 { margin: 0 0 10px; }
+.host-table { display: grid; overflow: auto; }
+.host-header,
+.host-row {
+  display: grid;
+  grid-template-columns: minmax(140px,1fr) minmax(180px,1.4fr) minmax(105px,.7fr) minmax(155px,1fr) minmax(100px,.7fr);
+  gap: 10px;
+  padding: 9px;
+  border-bottom: 1px solid rgba(255,255,255,.08);
+  min-width: 780px;
+}
+.host-row span,
+.host-row small { display: block; }
+.host-row small { opacity: .62; margin-top: 3px; }
+.host-header { font-size: .78rem; opacity: .75; }
+.host-table-wrap { margin-top: 14px; }
+@media(max-width:900px) {
+  .terrain-diagnostic-grid { grid-template-columns: 1fr; }
+}

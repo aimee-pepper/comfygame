@@ -476,6 +476,8 @@ enum WorldArrivalCausalCandidateRules {
             switch tile.content {
             case .node(let node) where node.resource == family:
                 total += max(0, node.remainingHarvests) * max(0, node.yieldPerHarvest)
+            case .node(let node) where node.secondaryResource == family:
+                total += max(0, node.remainingHarvests) * max(0, node.secondaryYieldPerHarvest)
             case .wildDrop(let resource, let amount) where resource == family:
                 total += max(0, amount)
             default:

@@ -1013,6 +1013,10 @@ extension GameStore {
                                       isFreshFirstExpedition: state.worlds.runIndex == 0,
                                       wildPageSelection: wildSelection,
                                       wildPageOriginRunIndex: state.worlds.runIndex + 1)
+        guard world.diagnostics.terrainGenerationSucceeded else {
+            bindError = "This world could not be prepared. Your Page and Essence were not changed. Try again; if it keeps happening, report a bug."
+            return false
+        }
         let visualReceipt: WorldVisualReceipt
         do {
             let authoredInkPairs: [(InstanceID, InkRecipe)] = sourcePage.runes.compactMap { mark in

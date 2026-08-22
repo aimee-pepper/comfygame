@@ -640,6 +640,9 @@ struct WorldClock: Codable, Equatable, Sendable {
 /// Facts captured while a world is made. These are observations, not inputs: diagnostics must
 /// never reconstruct a generation decision from mutable tiles or by consuming the world's RNG.
 struct WorldGenerationDiagnostics: Codable, Equatable, Sendable {
+    /// False only when bounded coherent-terrain retries could not satisfy the exact topology.
+    /// Bind preparation refuses before spend rather than committing fallback terrain.
+    var terrainGenerationSucceeded: Bool = true
     var writingWasGuaranteed: Bool = true
     var selectedDiaryPages: [DiaryPageID] = []
     var selectedOtherWritingCount: Int = 0
@@ -679,6 +682,8 @@ struct WorldGenerationDiagnostics: Codable, Equatable, Sendable {
 
     init(from decoder: Decoder) throws {
         let c = try decoder.container(keyedBy: CodingKeys.self)
+        terrainGenerationSucceeded = try c.decodeIfPresent(
+            Bool.self, forKey: .terrainGenerationSucceeded) ?? true
         writingWasGuaranteed = try c.decodeIfPresent(Bool.self, forKey: .writingWasGuaranteed) ?? true
         selectedDiaryPages = (try c.decodeIfPresent([DiaryPageID].self,
                                                      forKey: .selectedDiaryPages) ?? [])

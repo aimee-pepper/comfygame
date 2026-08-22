@@ -26,7 +26,7 @@ Newly generated tiles freeze four separate facts:
 
 1. `baseGround`: the material before growth or surface deposits;
 2. `ground`: the effective live ground used by current passability, movement and sight rules;
-3. `surfaceDeposits`: independent persisted Snow and settled-Ash presence/coverage; and
+3. `surfaceDeposits`: exact independent persisted `snow` and `settledAsh` booleans; and
 4. `flora`: the exact generated plant identity where growth exists.
 
 `baseGround` uses only existing ground IDs. Growth and Groundcover retain the substrate they covered. Snow and
@@ -35,14 +35,16 @@ resource identity or collection. `GroundType.ash` remains terrain made primarily
 deposit over another ground. Airborne Ash remains transient atmosphere.
 
 Snow and settled Ash are independent: a world may contain neither, either, or both. They share the accepted
-accumulation-shape family but have distinct semantic palettes and contributor receipts. Each receipt's own
-stable visual seed selects a deterministic variant/phase; a tile carrying both must visibly contain both, not
-stack two identical masks so one hides the other. Composite them in frozen source-page order. Their combined
-opaque coverage may never exceed 70% of a tile, so the underlying material remains identifiable before color.
+accumulation-shape family but have distinct semantic palettes. Composite them in the fixed accepted order Snow
+then settled Ash. Variant geometry derives from the existing world visual seed, tile coordinate, deposit ID and
+phase. Their combined opaque coverage may never exceed 70% of a tile, so the underlying material remains
+identifiable before color.
 Precipitating Snow does not automatically accumulate; only the exact resolved `snow` source contributes the
 Snow deposit. Likewise only the resolved `ash` source contributes settled Ash. Authored and unwritten resolved
-sources use the same rule. Each contribution freezes its stable source ID, source order, density and visual
-seed at bind.
+sources use the same rule. Their existing PressureRules intensity/Scale/Count amplitude sums by deposit family;
+map coverage is `amplitude × Tuning.Terrain.surfaceDepositCoveragePerAmplitude` (currently 0.12), clamped to
+the eligible map. Multiple same-family sources increase aggregate coverage before deterministic placement.
+Only the realized two booleans persist. The 70% ceiling is a per-tile visual-mask rule, not map coverage.
 
 ### Save compatibility
 
@@ -135,7 +137,7 @@ allocates the surface quota among Standing, Flowing and Frozen.
 ### Flowing
 
 - Generates one to `1 + floor(dispersion / 34)` channels, capped at four.
-- A channel begins in the highest available elevation quartile and ends at a lower boundary tile or an
+- A channel begins in the highest available elevation quartile and ends at a boundary at or below the source or an
   existing Standing body.
 - Its pathfinder strongly penalizes uphill movement, mildly penalizes turns and rewards joining an existing
   channel. Every selected channel is cardinally connected from source to outlet.
@@ -190,8 +192,8 @@ Key physical rules:
 - Adamant requires high hard ground or a Chasm margin.
 - Rift-glass occurs only on a passable Chasm rim.
 - Raw Essence remains a direct reachable pickup and never needs a tool.
-- Motes are direct Reality pickups on high or Chasm-adjacent hard/volatile ground, never ordinary mineral
-  nodes and never Base resources.
+- Motes remain Reality-layer awards from the existing cache/Mythic paths, never ordinary terrain deposits,
+  nodes or Village resources. A future terrain pickup requires explicit frequency authority.
 - Ichor is excluded from the ordinary World Resource table at generation time; the creature-material
   overhaul owns real creature Ichor.
 
@@ -236,7 +238,7 @@ Required executable gates:
 7. Every placed mineral satisfies its frozen host clause; a zero-host candidate consumes no attempt.
 8. Every flora node output matches its exact plant traits; defended photosynthetic Woody flora yields its
    primary plus Resin.
-9. Ichor never enters an ordinary world node; Motes bank directly into Reality.
+9. Ichor never enters an ordinary world node; Motes remain absent from ordinary terrain nodes; only the existing cache and Mythic award paths bank them into Reality.
 10. Existing starter seeds are revalidated. Any intentional topology-driven seed replacement preserves the
     stable World Page definition/instance identity and goes through the existing starter receipt validator.
 11. World Arrival actual/counterfactual summaries use production stages and remain deterministic.

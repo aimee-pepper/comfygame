@@ -266,8 +266,13 @@ enum Worldgen {
         var flora: [Flora]
     }
 
+    struct CounterfactualTerrainOverride {
+        let readings: PressureReadings
+        let resolvedSigils: [Sigil]
+    }
+
     static func arrivalCausalSummary(
-        book: BoundBook, seed: UInt64, readings: PressureReadings,
+        book: BoundBook, seed: UInt64, terrain: CounterfactualTerrainOverride,
         library: LibraryState, tuning: DebugTuningProfile,
         isFreshFirstExpedition: Bool,
         wildPageSelection: WildWorldPageSelectionRules.Selection?,
@@ -279,7 +284,7 @@ enum Worldgen {
             wildPageSelection: wildPageSelection,
             wildPageOriginRunIndex: wildPageOriginRunIndex,
             _counterfactualSummaryOnly: true,
-            _counterfactualReadings: readings)
+            _counterfactualTerrain: terrain)
         return .init(map: result.map, flora: result.flora)
     }
 
@@ -289,7 +294,7 @@ enum Worldgen {
                          wildPageSelection: WildWorldPageSelectionRules.Selection? = nil,
                          wildPageOriginRunIndex: Int? = nil,
                          _counterfactualSummaryOnly: Bool = false,
-                         _counterfactualReadings: PressureReadings? = nil)
+                         _counterfactualTerrain: CounterfactualTerrainOverride? = nil)
         -> (map: WorldMap, enemies: [WorldEnemy], sites: [PlacedSite],
             pages: [DiaryPageID], writings: [FoundWritingRecord], wildPage: WorldPageInstance?,
             travellers: [TravellerID], cast: [Species], flora: [Flora],
@@ -318,7 +323,8 @@ enum Worldgen {
         // in it now come from the eight targets rather than from flat per-symbol tables.
         let sigils = BookRules.sigils(for: book)
         let pressurePair = travellerCausalityReadings(authoredSigils: sigils, seed: seed)
-        let readings = _counterfactualReadings ?? pressurePair.actual
+        let readings = _counterfactualTerrain?.readings ?? pressurePair.actual
+        let resolvedSigils = _counterfactualTerrain?.resolvedSigils ?? pressurePair.actualSigils
         let withoutAuthoredPressure = pressurePair.withoutAuthoredPressure
         let resolvedStabilityScore = BookRules.resolvedStabilityScore(of: book, seed: seed)
         // The same world with nothing rolled into it. Chasms read this as a floor, and the exit rule
@@ -334,8 +340,9 @@ enum Worldgen {
         // 0a. The ground itself, before anything is placed on it. Relief, Substrate, Hydrology,
         //    Thermal and Vitality all write here — this is the surface the pressure model was
         //    missing, and without it Relief had nothing to say.
-        TerrainRules.paint(&map, readings: readings, asWritten: asWritten, flora: flora,
-                           rng: &terrainRNG)
+        let terrainGenerationSucceeded = TerrainRules.paint(
+            &map, readings: readings, asWritten: asWritten, flora: flora,
+            resolvedSigils: resolvedSigils, visualSeed: seed, rng: &terrainRNG)
 
         // 1. Where you arrive: a portal on the edge. It works as an exit too, so retreating the
         //    way you came is always possible — it just costs you the turns to walk back.
@@ -445,25 +452,57 @@ enum Worldgen {
         //    a thicket of woody stuff is timber, and the same thicket somewhere toxic is poison. The
         //    table still decides *whether* this world holds a given resource at all; the flora
         //    decides which of them this particular node is.
-        let yieldTable = BookRules.yieldTable(from: readings)
         let nodeCount = nodeCount(for: readings, multiplier: tuning.resourceNodeDensityMultiplier,
                                   rng: &nodeRNG)
         let floraByID = Dictionary(uniqueKeysWithValues: flora.map { ($0.id, $0) })
-        for _ in 0..<nodeCount {
-            guard var resource = nodeRNG.pickWeighted(yieldTable) else { continue }
-            let organic = FloraRules.isFloraResource(resource)
-            guard let point = randomFreePoint(in: map, avoiding: occupied,
-                                              preferringGrowth: organic, rng: &nodeRNG)
-            else { continue }
-            // Standing in it, or standing next to it — a thicket is harvested from its edge as
-            // readily as from inside.
-            let plant = organic ? growth(nearest: point, in: map, from: floraByID) : nil
-            if organic {
-                // Nothing grows on this square, so nothing organic comes off it. Better a slightly
-                // thinner world than timber lying on bare rock.
-                guard let plant else { continue }
-                resource = FloraRules.yield(of: plant.traits)
+        struct NodeCandidate {
+            var resource: ResourceID
+            var plantID: InstanceID?
+            var abundance: Double
+            var hosts: [GridPoint]
+        }
+        let ordinaryTable = BookRules.yieldTable(from: readings).filter {
+            !FloraRules.isFloraResource($0.value)
+                && !["ichor", "mote", "resin", "essence_raw"].contains($0.value.rawValue)
+        }
+        var candidates: [NodeCandidate] = ordinaryTable.compactMap { row in
+            let hosts = map.allPoints.filter { point in
+                !occupied.contains(point) && map[point].content == .empty && map[point].isPassable
+                    && resourceHostAllows(row.value, at: point, in: map)
             }
+            return hosts.isEmpty ? nil : .init(resource: row.value, plantID: nil,
+                                                abundance: row.weight, hosts: hosts)
+        }
+        for plant in flora {
+            let primary = FloraRules.yield(of: plant.traits)
+            let abundance = ContentCatalog.shared.resource(primary)?.abundance(in: readings) ?? 0
+            let hosts = map.allPoints.filter { point in
+                !occupied.contains(point) && map[point].content == .empty
+                    && map[point].flora == plant.id && map[point].ground.isOvergrown
+            }
+            if abundance > 0, !hosts.isEmpty {
+                candidates.append(.init(resource: primary, plantID: plant.id,
+                                        abundance: abundance, hosts: hosts))
+            }
+        }
+        candidates.sort {
+            if $0.resource != $1.resource { return $0.resource.rawValue < $1.resource.rawValue }
+            return ($0.plantID?.rawValue ?? 0) < ($1.plantID?.rawValue ?? 0)
+        }
+        for _ in 0..<nodeCount {
+            candidates = candidates.compactMap { candidate in
+                var copy = candidate
+                copy.hosts.removeAll { occupied.contains($0) || map[$0].content != .empty }
+                return copy.hosts.isEmpty ? nil : copy
+            }
+            let weighted = candidates.indices.map { index in
+                (value: index, weight: candidates[index].abundance * Double(candidates[index].hosts.count))
+            }
+            guard let candidateIndex = nodeRNG.pickWeighted(weighted),
+                  let point = nodeRNG.pick(candidates[candidateIndex].hosts) else { break }
+            let candidate = candidates[candidateIndex]
+            let resource = candidate.resource
+            let plant = candidate.plantID.flatMap { floraByID[$0] }
             map[point].content = .node(ResourceNode(
                 resource: resource,
                 remainingHarvests: nodeRNG.int(in: Tuning.World.harvestTurnsRange),
@@ -471,7 +510,11 @@ enum Worldgen {
                 // substrate's concentration decides, as it always has.
                 yieldPerHarvest: plant.map { FloraRules.harvestQuantity(of: $0.traits) }
                     ?? nodeYield(dispersion: readings["substrate"].aspect("dispersion"),
-                                 rng: &nodeRNG)
+                                 rng: &nodeRNG),
+                secondaryResource: plant.map { FloraRules.yieldsSecondaryResin($0.traits) }
+                    == true ? Resources.resin : nil,
+                secondaryYieldPerHarvest: plant.map { FloraRules.yieldsSecondaryResin($0.traits) }
+                    == true ? 1 : 0
             ))
             occupied.insert(point)
         }
@@ -500,6 +543,7 @@ enum Worldgen {
         // it deliberately skips caches, hazards, sites, creatures and travellers.
         if _counterfactualSummaryOnly {
             var diagnostics = WorldGenerationDiagnostics()
+            diagnostics.terrainGenerationSucceeded = terrainGenerationSucceeded
             diagnostics.selectedDiaryPages = pages
             diagnostics.selectedOtherWritingCount = noteCount
             diagnostics.placedDiaryPages = placedPages
@@ -723,6 +767,7 @@ enum Worldgen {
             ? Int(ceil(Tuning.World.startingStability / decay))
             : Tuning.World.indefiniteTurns
         var diagnostics = WorldGenerationDiagnostics()
+        diagnostics.terrainGenerationSucceeded = terrainGenerationSucceeded
         diagnostics.selectedDiaryPages = pages
         diagnostics.selectedOtherWritingCount = noteCount
         diagnostics.placedDiaryPages = placedPages
@@ -757,18 +802,48 @@ enum Worldgen {
                 diagnostics)
     }
 
+    /// Closed machine-authority host adapter. Base ground remains authoritative under Growth and
+    /// Groundcover, and adjacency is cardinal. Flora families are checked against their actual
+    /// placed plant separately above.
+    static func resourceHostAllows(_ resource: ResourceID, at point: GridPoint,
+                                   in map: WorldMap) -> Bool {
+        let tile = map[point]
+        let base = tile.baseGround
+        let neighbours = Set(map.neighbours(of: point).map { map[$0].baseGround })
+        func baseIs(_ values: GroundType...) -> Bool { values.contains(base) }
+        func touches(_ values: GroundType...) -> Bool { !neighbours.isDisjoint(with: values) }
+        let low = tile.elevation <= 1
+        switch resource.rawValue {
+        case "rubble", "ore", "copper", "silver", "gold", "quartz":
+            return baseIs(.stone, .rubble)
+        case "clay": return baseIs(.soil) && low && touches(.water, .deepWater, .mud)
+        case "obsidian", "sulfur":
+            return base == .ash || (baseIs(.stone, .rubble) && touches(.ash, .chasm))
+        case "salt": return baseIs(.sand, .soil) && low && touches(.water, .deepWater, .mud)
+        case "mercury": return baseIs(.stone, .rubble, .ash)
+        case "adamant":
+            return baseIs(.stone, .rubble) && (tile.elevation >= 2 || touches(.chasm))
+        case "rift_glass": return baseIs(.stone, .rubble, .ash) && touches(.chasm)
+        case "fiber", "timber", "pulp", "toxin", "spore", "reagent":
+            return tile.flora != nil && tile.ground.isOvergrown
+        default: return false
+        }
+    }
+
     /// The actual world and the same seed with the player's pressure removed.
     ///
     /// Removing authored pressure makes those targets silent again, so they must participate in
     /// the ordinary unwritten roll. Reusing only the actual world's already-rolled sigils would
     /// leave the newly silent targets empty and falsely credit every authored target as causal.
     static func travellerCausalityReadings(authoredSigils: [Sigil], seed: UInt64)
-        -> (actual: PressureReadings, withoutAuthoredPressure: PressureReadings) {
+        -> (actual: PressureReadings, withoutAuthoredPressure: PressureReadings,
+            actualSigils: [Sigil]) {
         let actualRolled = PressureRules.rollUnwritten(after: authoredSigils, seed: seed)
         let counterfactualRolled = PressureRules.rollUnwritten(after: [], seed: seed)
         return (
             PressureRules.resolve(authoredSigils + actualRolled),
-            PressureRules.resolve(counterfactualRolled)
+            PressureRules.resolve(counterfactualRolled),
+            authoredSigils + actualRolled
         )
     }
 

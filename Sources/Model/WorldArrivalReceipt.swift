@@ -460,7 +460,9 @@ enum WorldArrivalReceiptFactory {
                 summary = cached
             } else {
                 summary = Worldgen.arrivalCausalSummary(
-                    book: removedBook, seed: generationSeed, readings: intervention.readings,
+                    book: removedBook, seed: generationSeed,
+                    terrain: .init(readings: intervention.readings,
+                                   resolvedSigils: intervention.counterfactualSigils),
                     library: library, tuning: tuning,
                     isFreshFirstExpedition: isFreshFirstExpedition,
                     wildPageSelection: wildPageSelection,

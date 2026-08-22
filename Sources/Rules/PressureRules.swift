@@ -115,6 +115,22 @@ enum PressureRules {
         return pow(Double(sigil.count), Tuning.Pressure.countExponent)
     }
 
+    static func resolvedAmplitude(_ sigil: Sigil, for target: PressureTargetID) -> Double {
+        guard let definition = ContentCatalog.shared.pressureTarget(target) else { return 0 }
+        return sigil.intensity.multiplier * scaleMultiplier(sigil, target: definition)
+            * countMultiplier(sigil)
+    }
+
+    /// A realized surface layer has spatial coverage even when its target treats Scale as an
+    /// extent aspect. Preserve the authored Minute→Small→Large→Vast ordering while reusing the
+    /// same Intensity, Scale-rung and Count arithmetic as pressure resolution.
+    static func resolvedSurfaceCoverageAmplitude(_ sigil: Sigil) -> Double {
+        let scale = sigil.scale > 0
+            ? max(0.2, 1 + scaleOffset(sigil.scale) * Tuning.Pressure.magnitudePerScaleRung)
+            : 1
+        return sigil.intensity.multiplier * scale * countMultiplier(sigil)
+    }
+
     /// How far toward *scattered* this sigil pushes a subject's extent. Scale spreads, and so does
     /// Count — many small springs are dispersed in a way one great lake is not.
     static func extentPush(_ sigil: Sigil) -> Double {

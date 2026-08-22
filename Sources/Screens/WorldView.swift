@@ -709,6 +709,9 @@ private struct WorldDiagnosticsView: View {
         run.map.tiles.reduce(into: [:]) { result, tile in
             if case .node(let node) = tile.content {
                 result[node.resource, default: 0] += node.remainingHarvests * node.yieldPerHarvest
+                if let secondary = node.secondaryResource {
+                    result[secondary, default: 0] += node.remainingHarvests * node.secondaryYieldPerHarvest
+                }
             }
         }
     }
@@ -1376,6 +1379,9 @@ struct WorldTileVisibilityPresentation {
             wallWestContinuation: continuesWall(dx: -1),
             wallEastContinuation: continuesWall(dx: 1),
             visibility: packVisibility,
+            surfaceDeposits: .init(
+                snow: tile.surfaceDeposits.snow,
+                settledAsh: tile.surfaceDeposits.settledAsh),
             grade: grade,
             flora: flora,
             worldGrade2Descriptor: run.worldVisualReceipt?.descriptor,

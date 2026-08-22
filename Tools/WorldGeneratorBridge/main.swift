@@ -10,6 +10,9 @@ struct Cell: Encodable {
     var x: Int
     var y: Int
     var ground: String
+    var baseGround: String
+    var snow: Bool
+    var settledAsh: Bool
     var elevation: Int
     var floraID: UInt64?
     var content: String
@@ -60,6 +63,22 @@ struct Marker: Encodable {
 }
 
 struct Diagnostics: Encodable {
+    var terrainGenerationSucceeded: Bool
+    var baseMaterialComponents: [Count]
+    var visibleGroundComponents: [Count]
+    var isolatedGroundCells: Int
+    var elevationHistogram: [Count]
+    var maximumCardinalElevationDelta: Int
+    var surfaceWaterTiles: Int
+    var frozenWaterTiles: Int
+    var shallowLiquidBodies: Int
+    var deepLiquidCores: Int
+    var iceFields: Int
+    var isolatedDeepViolations: Int
+    var snowTiles: Int
+    var settledAshTiles: Int
+    var resourceHostViolations: [String]
+    var resourceHosts: [ResourceHostDiagnostic]
     var initialTurnBudget: Int
     var projectedCollapseTurn: Int
     var rawEssenceObtainable: Int
@@ -70,6 +89,24 @@ struct Diagnostics: Encodable {
     var activeFloraPlaced: Int
     var apexChance: Double
     var apexPlaced: Bool
+}
+
+struct ResourceHostDiagnostic: Encodable {
+    var name: String
+    var internalID: String
+    var placementKind: String
+    var hostRule: String
+    var eligibleHosts: Int
+    var reachableEligibleHosts: Int
+    var extractionState: String
+    var extractionRank: String
+    var actualPlacements: Int
+    var violations: Int
+}
+
+enum BridgeFailure: Error, CustomStringConvertible {
+    case terrainGenerationFailed
+    var description: String { "Terrain generation failed; no default-soil world was emitted." }
 }
 
 struct Snapshot: Encodable {
@@ -125,6 +162,9 @@ let generated = Worldgen.generate(book: book, seed: request.seed)
 let cells = generated.map.allPoints.map { point in
     let tile = generated.map[point]
     return Cell(x: point.x, y: point.y, ground: tile.ground.rawValue,
+                baseGround: tile.baseGround.rawValue,
+                snow: tile.surfaceDeposits.snow,
+                settledAsh: tile.surfaceDeposits.settledAsh,
                 elevation: tile.elevation, floraID: tile.flora?.rawValue,
                 content: label(tile.content), isRevealed: tile.isRevealed)
 }
@@ -135,6 +175,12 @@ for point in generated.map.allPoints {
         let id = node.resource.rawValue
         resourceTotals[id, default: (0, 0)].placements += 1
         resourceTotals[id, default: (0, 0)].quantity += node.remainingHarvests * node.yieldPerHarvest
+        if let secondary = node.secondaryResource {
+            let secondaryID = secondary.rawValue
+            resourceTotals[secondaryID, default: (0, 0)].placements += 1
+            resourceTotals[secondaryID, default: (0, 0)].quantity +=
+                node.remainingHarvests * node.secondaryYieldPerHarvest
+        }
     case .wildDrop(let resource, let amount):
         let id = resource.rawValue
         resourceTotals[id, default: (0, 0)].placements += 1
@@ -183,6 +229,157 @@ let markers = generated.enemies.map { enemy in
            label: enemy.isApex ? "Apex" : (enemy.speciesID.flatMap { speciesNamesByID[$0] } ?? "Creature"))
 }
 let d = generated.diagnostics
+guard d.terrainGenerationSucceeded else { throw BridgeFailure.terrainGenerationFailed }
+var remaining = Set(generated.map.allPoints)
+var groundComponentCounts: [String: Int] = [:]
+while let start = remaining.sorted(by: { ($0.y, $0.x) < ($1.y, $1.x) }).first {
+    let ground = generated.map[start].baseGround.rawValue
+    var queue = [start]
+    remaining.remove(start)
+    while let point = queue.popLast() {
+        for next in generated.map.neighbours(of: point)
+        where remaining.contains(next) && generated.map[next].baseGround.rawValue == ground {
+            remaining.remove(next); queue.append(next)
+        }
+    }
+    groundComponentCounts[ground, default: 0] += 1
+}
+let baseMaterialComponents = groundComponentCounts.map { Count(id: $0.key, quantity: $0.value) }
+    .sorted { $0.id < $1.id }
+var visibleRemaining = Set(generated.map.allPoints)
+var visibleComponentCounts: [String: Int] = [:]
+while let start = visibleRemaining.sorted(by: { ($0.y, $0.x) < ($1.y, $1.x) }).first {
+    let ground = generated.map[start].ground.rawValue
+    var queue = [start]
+    visibleRemaining.remove(start)
+    while let point = queue.popLast() {
+        for next in generated.map.neighbours(of: point)
+        where visibleRemaining.contains(next) && generated.map[next].ground.rawValue == ground {
+            visibleRemaining.remove(next); queue.append(next)
+        }
+    }
+    visibleComponentCounts[ground, default: 0] += 1
+}
+let visibleGroundComponents = visibleComponentCounts.map { Count(id: $0.key, quantity: $0.value) }
+    .sorted { $0.id < $1.id }
+let isolatedGroundCells = generated.map.allPoints.count { point in
+    !generated.map.neighbours(of: point).contains {
+        generated.map[$0].baseGround == generated.map[point].baseGround
+    }
+}
+let elevationHistogram = counts(generated.map.tiles.map { String($0.elevation) })
+let maximumCardinalElevationDelta = generated.map.allPoints.flatMap { point in
+    generated.map.neighbours(of: point).map {
+        abs(generated.map[point].elevation - generated.map[$0].elevation)
+    }
+}.max() ?? 0
+let resourceHostViolations = generated.map.allPoints.compactMap { point -> String? in
+    guard case .node(let node) = generated.map[point].content,
+          !Worldgen.resourceHostAllows(node.resource, at: point, in: generated.map) else { return nil }
+    let name = ContentCatalog.shared.resource(node.resource)?.name ?? "Unknown resource"
+    return "\(name) [Internal ID: \(node.resource.rawValue)]"
+}.sorted()
+func components(in points: Set<GridPoint>) -> [Set<GridPoint>] {
+    var remaining = points, result: [Set<GridPoint>] = []
+    while let start = remaining.sorted(by: { ($0.y, $0.x) < ($1.y, $1.x) }).first {
+        var body: Set<GridPoint> = [start], queue = [start]
+        remaining.remove(start)
+        while let point = queue.popLast() {
+            for next in generated.map.neighbours(of: point) where remaining.remove(next) != nil {
+                body.insert(next); queue.append(next)
+            }
+        }
+        result.append(body)
+    }
+    return result
+}
+let liquid = Set(generated.map.allPoints.filter {
+    generated.map[$0].baseGround == .water || generated.map[$0].baseGround == .deepWater
+})
+let liquidBodies = components(in: liquid)
+let deepLiquidCores = liquidBodies.reduce(0) { count, body in
+    count + components(in: Set(body.filter { generated.map[$0].baseGround == .deepWater })).count
+}
+let isolatedDeepViolations = liquidBodies.reduce(0) { count, body in
+    let deep = Set(body.filter { generated.map[$0].baseGround == .deepWater })
+    let isolated = deep.count { point in !generated.map.neighbours(of: point).contains(where: body.contains) }
+    return count + isolated
+}
+let reachable = TerrainRules.reachable(from: generated.map.entry, in: generated.map)
+let generatedFloraByID = Dictionary(uniqueKeysWithValues: generated.flora.map { ($0.id, $0) })
+let authorityData = try Data(contentsOf: URL(fileURLWithPath: FileManager.default.currentDirectoryPath)
+    .appendingPathComponent("docs/world-terrain-resource-host-authority.json"))
+let authority = try JSONSerialization.jsonObject(with: authorityData) as! [String: Any]
+let hostRows = authority["resourceHosts"] as! [[String: Any]]
+let resourceHosts = hostRows.map { row -> ResourceHostDiagnostic in
+    let id = ResourceID(rawValue: row["resourceID"] as! String)
+    let kind = row["placementKind"] as! String
+    let eligible: Set<GridPoint>
+    switch kind {
+    case "mineralNode":
+        eligible = Set(generated.map.allPoints.filter {
+            generated.map[$0].isPassable && Worldgen.resourceHostAllows(id, at: $0, in: generated.map)
+        })
+    case "floraPrimary":
+        eligible = Set(generated.map.allPoints.filter { point in
+            generated.map[point].flora.flatMap { generatedFloraByID[$0] }.map {
+                FloraRules.yield(of: $0.traits) == id
+            } ?? false
+        })
+    case "floraSecondary":
+        eligible = Set(generated.map.allPoints.filter { point in
+            generated.map[point].flora.flatMap { generatedFloraByID[$0] }.map {
+                FloraRules.yieldsSecondaryResin($0.traits)
+            } ?? false
+        })
+    case "directPickup":
+        eligible = Set(generated.map.allPoints.filter {
+            reachable.contains($0) && generated.map[$0].isPassable
+                && generated.map[$0].content == .empty
+        })
+    default: eligible = []
+    }
+    let placementLabel: String = switch kind {
+    case "mineralNode": "Mineral deposit"
+    case "floraPrimary": "Primary flora yield"
+    case "floraSecondary": "Secondary flora yield"
+    case "creatureMaterialOnly": "Creature material only"
+    case "directPickup": "Direct world pickup"
+    case "realityAwardOnly": "Existing cache or Mythic award only"
+    default: "Unknown placement"
+    }
+    let rawHostRule = (row["floraRule"] as? String) ?? (row["hostRule"] as? String)
+    let hostRule: String = switch rawHostRule {
+    case "fibrousOrShortWoody": "Fibrous or short woody flora"
+    case "tallWoody": "Tall woody flora"
+    case "fleshy": "Fleshy flora"
+    case "defendedPhotosyntheticWoody": "Defended photosynthetic woody flora"
+    case "chemicalDefence": "Flora with chemical defences"
+    case "fungalMetabolism": "Fungal flora"
+    case "chemosyntheticMetabolism": "Chemosynthetic flora"
+    case "reachablePassableEmpty": "Reachable, passable, empty ground"
+    case "existingCacheAndMythicAwards": "Existing cache and Mythic award paths"
+    case nil where (row["clauses"] as? [[String: Any]])?.isEmpty == false: "Exact terrain-host clauses"
+    default: "No terrain host"
+    }
+    let actual = resourceTotals[id.rawValue]?.placements ?? 0
+    let violationCount = generated.map.allPoints.reduce(0) { count, point in
+        guard case .node(let node) = generated.map[point].content else { return count }
+        if kind == "floraSecondary", node.secondaryResource == id {
+            return count + (eligible.contains(point) && node.secondaryYieldPerHarvest == 1 ? 0 : 1)
+        }
+        guard node.resource == id else { return count }
+        if kind == "mineralNode" || kind == "floraPrimary" {
+            return count + (eligible.contains(point) ? 0 : 1)
+        }
+        return count + 1
+    }
+    return .init(name: ContentCatalog.shared.resource(id)?.name ?? "Unknown resource",
+                 internalID: id.rawValue, placementKind: placementLabel, hostRule: hostRule,
+                 eligibleHosts: eligible.count, reachableEligibleHosts: eligible.intersection(reachable).count,
+                 extractionState: "Current harvest rules", extractionRank: "No rank gate is live",
+                 actualPlacements: actual, violations: violationCount)
+}.sorted { ($0.name, $0.internalID) < ($1.name, $1.internalID) }
 let visualReceipt = try WorldGrade2BindAdapter.makeReceipt(
     book: book, mapSeed: request.seed, map: generated.map, flora: generated.flora)
 let illumination = BookRules.readings(for: book, seed: request.seed)["illumination"]
@@ -203,7 +400,25 @@ let snapshot = Snapshot(
     flora: counts(floraNames), mobs: counts(ordinaryMobNames), generatedCast: generatedCast,
     apexes: apexes, hostileFlora: hostileFlora, pointsOfInterest: counts(poi),
     writings: counts(writings), travellers: generated.travellers.map(\.rawValue).sorted(),
-    diagnostics: Diagnostics(initialTurnBudget: d.initialTurnBudget,
+    diagnostics: Diagnostics(terrainGenerationSucceeded: d.terrainGenerationSucceeded,
+                             baseMaterialComponents: baseMaterialComponents,
+                             visibleGroundComponents: visibleGroundComponents,
+                             isolatedGroundCells: isolatedGroundCells,
+                             elevationHistogram: elevationHistogram,
+                             maximumCardinalElevationDelta: maximumCardinalElevationDelta,
+                             surfaceWaterTiles: generated.map.tiles.count {
+                                $0.baseGround == .water || $0.baseGround == .deepWater },
+                             frozenWaterTiles: generated.map.tiles.count { $0.baseGround == .ice },
+                             shallowLiquidBodies: liquidBodies.count,
+                             deepLiquidCores: deepLiquidCores,
+                             iceFields: components(in: Set(generated.map.allPoints.filter {
+                                generated.map[$0].baseGround == .ice })).count,
+                             isolatedDeepViolations: isolatedDeepViolations,
+                             snowTiles: generated.map.tiles.count { $0.surfaceDeposits.snow },
+                             settledAshTiles: generated.map.tiles.count { $0.surfaceDeposits.settledAsh },
+                             resourceHostViolations: resourceHostViolations,
+                             resourceHosts: resourceHosts,
+                             initialTurnBudget: d.initialTurnBudget,
                              projectedCollapseTurn: d.projectedCollapseTurn,
                              rawEssenceObtainable: d.rawEssenceObtainable,
                              creatureSpeciesCount: d.creatureSpeciesCount,

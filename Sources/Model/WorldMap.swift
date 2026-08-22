@@ -97,10 +97,21 @@ enum GroundType: String, Codable, CaseIterable, Sendable {
     }
 }
 
+struct SurfaceDeposits: Codable, Equatable, Sendable {
+    var snow: Bool = false
+    var settledAsh: Bool = false
+
+    static let none = SurfaceDeposits()
+}
+
 struct Tile: Codable, Equatable, Sendable {
     var content: TileContent = .empty
     /// What this square is made of.
     var ground: GroundType = .soil
+    /// The mechanically authoritative ground beneath Growth/Groundcover.
+    var baseGround: GroundType = .soil
+    /// Independent settled layers; Snow and settled Ash may coexist.
+    var surfaceDeposits: SurfaceDeposits = .none
     /// **Which of the world's plants is growing here.**
     ///
     /// Points into the run's flora cast. Without it a growth tile is anonymous, and three separate
@@ -117,11 +128,14 @@ struct Tile: Codable, Equatable, Sendable {
     /// A one-turn warning. A tile must crack on an earlier world turn before it may disappear.
     var isCracking: Bool = false
 
-    init(content: TileContent = .empty, ground: GroundType = .soil, flora: InstanceID? = nil,
+    init(content: TileContent = .empty, ground: GroundType = .soil,
+         baseGround: GroundType? = nil, surfaceDeposits: SurfaceDeposits = .none, flora: InstanceID? = nil,
          elevation: Int = 0, isRevealed: Bool = false, isCrumbled: Bool = false,
          isCracking: Bool = false) {
         self.content = content
         self.ground = ground
+        self.baseGround = baseGround ?? ground
+        self.surfaceDeposits = surfaceDeposits
         self.flora = flora
         self.elevation = elevation
         self.isRevealed = isRevealed
@@ -135,6 +149,9 @@ struct Tile: Codable, Equatable, Sendable {
         let c = try decoder.container(keyedBy: CodingKeys.self)
         content = try c.decodeIfPresent(TileContent.self, forKey: .content) ?? .empty
         ground = try c.decodeIfPresent(GroundType.self, forKey: .ground) ?? .soil
+        baseGround = try c.decodeIfPresent(GroundType.self, forKey: .baseGround)
+            ?? (ground.isOvergrown ? .soil : ground)
+        surfaceDeposits = try c.decodeIfPresent(SurfaceDeposits.self, forKey: .surfaceDeposits) ?? .none
         flora = try c.decodeIfPresent(InstanceID.self, forKey: .flora)
         elevation = try c.decodeIfPresent(Int.self, forKey: .elevation) ?? 0
         isRevealed = try c.decodeIfPresent(Bool.self, forKey: .isRevealed) ?? false
@@ -193,6 +210,28 @@ struct ResourceNode: Codable, Equatable, Sendable {
     var resource: ResourceID
     var remainingHarvests: Int
     var yieldPerHarvest: Int
+    /// A second output from the same flora host. Resin supplements woody harvest; it is never an
+    /// independently scattered ordinary deposit.
+    var secondaryResource: ResourceID?
+    var secondaryYieldPerHarvest: Int
+
+    init(resource: ResourceID, remainingHarvests: Int, yieldPerHarvest: Int,
+         secondaryResource: ResourceID? = nil, secondaryYieldPerHarvest: Int = 0) {
+        self.resource = resource
+        self.remainingHarvests = remainingHarvests
+        self.yieldPerHarvest = yieldPerHarvest
+        self.secondaryResource = secondaryResource
+        self.secondaryYieldPerHarvest = secondaryYieldPerHarvest
+    }
+
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        resource = try c.decode(ResourceID.self, forKey: .resource)
+        remainingHarvests = try c.decode(Int.self, forKey: .remainingHarvests)
+        yieldPerHarvest = try c.decode(Int.self, forKey: .yieldPerHarvest)
+        secondaryResource = try c.decodeIfPresent(ResourceID.self, forKey: .secondaryResource)
+        secondaryYieldPerHarvest = try c.decodeIfPresent(Int.self, forKey: .secondaryYieldPerHarvest) ?? 0
+    }
 
     var isExhausted: Bool { remainingHarvests <= 0 }
 }

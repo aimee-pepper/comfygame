@@ -301,6 +301,11 @@ enum FloraRules {
 
     static func isFloraResource(_ id: ResourceID) -> Bool { floraResources.contains(id) }
 
+    static func yieldsSecondaryResin(_ traits: FloraTraits) -> Bool {
+        traits.metabolism == .photosynthetic && traits.tissue.dominant == .woody
+            && traits.isDefended
+    }
+
     /// **How much a node of this is worth**, before the world's own concentration bonus. Quantity
     /// from stature, exactly as creature quantity comes from size.
     static func harvestQuantity(of traits: FloraTraits) -> Int {

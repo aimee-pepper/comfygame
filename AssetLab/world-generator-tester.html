@@ -6,6 +6,7 @@
   <title>Bookbinder World Generator Tester</title>
   <link rel="stylesheet" href="styles.css">
   <link rel="stylesheet" href="world-generator-tester.css">
+  <link rel="stylesheet" href="world-generator-terrain-diagnostics.css">
 </head>
 <body>
   <nav class="tool-nav" aria-label="AssetLab tools"><a href="index.html">Creatures</a><a href="world.html">World &amp; Flora</a><a href="world-generator-tester.html">World Generator</a><a href="ui-gallery.html">UI Gallery</a><a href="places.html">Places</a><a href="characters.html">Characters</a><a href="full-cast.html">Full Cast</a><a href="resources.html">Resources</a><a href="equipment.html">Items</a><a href="trading.html">Trading Post</a><a href="reporter.html">Bug Reporter</a><a href="noll.html">Noll Review</a><a href="bridge.html">Economy Bridge</a><a href="combat.html">Combat</a><a href="combat-ui.html">Combat UI</a><a href="campaigns.html">Campaigns</a><a href="launch.html">App Launch</a><a href="splashes.html">Splashes</a><a href="regression.html">Golden Review</a></nav>
@@ -39,6 +40,17 @@
             <article class="splash-slot" id="splash-slot"><p class="eyebrow">Entry splash</p><h3>Awaiting generated-shot pipeline</h3><p>The live world snapshot is ready. When the entry-shot generator is complete, its output will appear here for the same seed and sigils.</p></article>
           </div>
         </div>
+      </section>
+
+      <section class="panel terrain-diagnostics" id="terrain-diagnostics" hidden>
+        <div class="panel-heading"><div><p class="eyebrow">Rules-owned diagnostics</p><h2>Terrain, Water, Deposits &amp; Resource Hosts</h2></div><span id="terrain-generation-status"></span></div>
+        <p id="terrain-failure" class="status error" hidden></p>
+        <div class="terrain-diagnostic-grid">
+          <article><h3>Terrain</h3><div id="terrain-topology"></div></article>
+          <article><h3>Water</h3><div id="water-topology"></div></article>
+          <article><h3>Deposits</h3><div id="deposit-topology"></div></article>
+        </div>
+        <article class="host-table-wrap"><h3>Resource Hosts</h3><div id="resource-host-table"></div></article>
       </section>
 
       <section class="panel batch-panel" id="batch-panel" hidden>

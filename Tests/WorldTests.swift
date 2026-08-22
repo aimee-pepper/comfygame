@@ -220,9 +220,12 @@ final class WorldTests: XCTestCase {
         ]
         for (composition, seed) in cases {
             let produced = Worldgen.generate(book: composition, seed: seed)
+            let resolved = Worldgen.travellerCausalityReadings(
+                authoredSigils: BookRules.sigils(for: composition), seed: seed)
             let summary = Worldgen.arrivalCausalSummary(
                 book: composition, seed: seed,
-                readings: BookRules.readings(for: composition, seed: seed),
+                terrain: .init(readings: resolved.actual,
+                               resolvedSigils: resolved.actualSigils),
                 library: .init(), tuning: .defaults,
                 isFreshFirstExpedition: false,
                 wildPageSelection: nil, wildPageOriginRunIndex: nil)
@@ -231,6 +234,10 @@ final class WorldTests: XCTestCase {
             XCTAssertEqual(summary.map.entry, produced.map.entry, "entry stage drifted for seed \(seed)")
             XCTAssertEqual(summary.map.tiles.map(\.ground), produced.map.tiles.map(\.ground),
                            "terrain stage drifted for seed \(seed)")
+            XCTAssertEqual(summary.map.tiles.map(\.baseGround), produced.map.tiles.map(\.baseGround),
+                           "base terrain stage drifted for seed \(seed)")
+            XCTAssertEqual(summary.map.tiles.map(\.surfaceDeposits), produced.map.tiles.map(\.surfaceDeposits),
+                           "surface deposit stage drifted for seed \(seed)")
             XCTAssertEqual(summary.map.tiles.map(\.elevation), produced.map.tiles.map(\.elevation),
                            "elevation stage drifted for seed \(seed)")
             XCTAssertEqual(summary.map.tiles.map(\.flora), produced.map.tiles.map(\.flora),
@@ -244,7 +251,7 @@ final class WorldTests: XCTestCase {
         map.tiles.enumerated().compactMap { index, tile in
             switch tile.content {
             case .node(let node):
-                return "\(index)|node|\(node.resource.rawValue)|\(node.remainingHarvests)|\(node.yieldPerHarvest)"
+                return "\(index)|node|\(node.resource.rawValue)|\(node.remainingHarvests)|\(node.yieldPerHarvest)|\(node.secondaryResource?.rawValue ?? "-")|\(node.secondaryYieldPerHarvest)"
             case .wildDrop(let resource, let amount):
                 return "\(index)|drop|\(resource.rawValue)|\(amount)"
             default:
@@ -1263,6 +1270,24 @@ final class WorldTests: XCTestCase {
         XCTAssertEqual(state.worlds.activeRun?.satchel[Resources.fiber], 6)
         XCTAssertEqual(state.worlds.activeRun?.map[state.worlds.activeRun!.playerPosition].content, .empty,
                        "A spent node clears itself off the map")
+    }
+
+    func testFloraHarvestCommitsPrimaryAndExactSecondaryResinAtomically() throws {
+        var state = startedRun(book(["bounty": "teeming_life"]), seed: 99)
+        var run = try XCTUnwrap(state.worlds.activeRun)
+        run.map[run.playerPosition].content = .node(ResourceNode(
+            resource: Resources.timber, remainingHarvests: 1, yieldPerHarvest: 3,
+            secondaryResource: Resources.resin, secondaryYieldPerHarvest: 1))
+        state.worlds.activeRun = run
+
+        let events = WorldRules.harvest(in: &state)
+        XCTAssertEqual(state.worlds.activeRun?.satchel[Resources.timber], 3)
+        XCTAssertEqual(state.worlds.activeRun?.satchel[Resources.resin], 1)
+        XCTAssertTrue(state.reality.discovery.hasEncountered(resource: Resources.timber))
+        XCTAssertTrue(state.reality.discovery.hasEncountered(resource: Resources.resin))
+        XCTAssertEqual(events.filter {
+            if case .harvested = $0 { return true }; return false
+        }.count, 2)
     }
 
     func testWayfarersTableImprovesOrganicHarvestAndPacking() throws {

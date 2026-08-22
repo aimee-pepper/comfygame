@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import json
+import re
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -7,11 +8,13 @@ AUTH = ROOT / "docs/world-terrain-resource-host-authority.json"
 RESOURCES = ROOT / "Sources/Content/Data/resources.json"
 TERRAIN_MANIFEST = ROOT / "AssetLab/integration/terrain-production-pack-v1/runtime/manifest.json"
 NATIVE_PACK = ROOT / "Sources/VisualRuntime/TerrainProductionPack.swift"
+WORLDGEN = ROOT / "Sources/Rules/Worldgen.swift"
 
 authority = json.loads(AUTH.read_text())
 resources = json.loads(RESOURCES.read_text())
 terrain_manifest = json.loads(TERRAIN_MANIFEST.read_text())
 native_pack_source = NATIVE_PACK.read_text()
+worldgen_source = WORLDGEN.read_text()
 
 expected_grounds = {
     "stone", "soil", "sand", "ice", "ash", "water", "deepWater", "rubble", "mud",
@@ -28,8 +31,10 @@ assert {row["shapeFamily"] for row in deposits} == {"settledCover"}
 assert len({row["palette"] for row in deposits}) == 2
 assert all(set(row["eligibleBaseGroundExclusions"]) == {"water", "deepWater", "chasm"} for row in deposits)
 composition = authority["surfaceDepositComposition"]
-assert composition["order"] == "sourcePageOrder"
-assert composition["variantIdentity"] == "depositID+sourceStableID+sourcePageOrder+visualSeed"
+assert composition["order"] == ["snow", "settledAsh"]
+assert composition["variantIdentity"] == "worldVisualSeed+tileCoordinate+depositID+phase"
+assert composition["persistedShape"] == {"snow": "boolean", "settledAsh": "boolean"}
+assert composition["coveragePerResolvedAmplitude"] == 0.12
 assert composition["underlyingGroundRemainsMechanicallyAuthoritative"] is True
 
 # The rules authority, accepted terrain-layers-v2 runtime ABI and native request
@@ -55,7 +60,7 @@ assert set(host_ids) == catalogue_ids, (
 
 valid_kinds = {
     "mineralNode", "floraPrimary", "floraSecondary", "creatureMaterialOnly",
-    "directPickup", "realityPickup",
+    "directPickup", "realityAwardOnly",
 }
 for row in host_rows:
     assert row["placementKind"] in valid_kinds, row
@@ -74,8 +79,32 @@ for row in host_rows:
 
 assert next(row for row in host_rows if row["resourceID"] == "resin")["placementKind"] == "floraSecondary"
 assert next(row for row in host_rows if row["resourceID"] == "ichor")["excludedFromOrdinaryWorldYieldTable"] is True
-assert next(row for row in host_rows if row["resourceID"] == "mote")["placementKind"] == "realityPickup"
+assert next(row for row in host_rows if row["resourceID"] == "mote") == {
+    "resourceID": "mote", "placementKind": "realityAwardOnly",
+    "hostRule": "existingCacheAndMythicAwards",
+}
 assert next(row for row in host_rows if row["resourceID"] == "essence_raw")["placementKind"] == "directPickup"
+
+for row in host_rows:
+    resource_id = row["resourceID"]
+    if row["placementKind"] == "mineralNode":
+        assert f'"{resource_id}"' in worldgen_source, f"missing Swift host adapter for {resource_id}"
+for excluded in ("ichor", "mote", "resin", "essence_raw"):
+    assert f'"{excluded}"' in worldgen_source, f"missing ordinary-node exclusion for {excluded}"
+assert "abundance * Double(candidates[index].hosts.count)" in worldgen_source
+assert "let tile = map[point]" in worldgen_source
+assert "let base = tile.baseGround" in worldgen_source
+assert "switch resource.rawValue" in worldgen_source
+adapter = worldgen_source.split("static func resourceHostAllows", 1)[1].split(
+    "static func travellerCausalityReadings", 1)[0]
+covered_ids = set(re.findall(r'"([a-z0-9_]+)"', "\n".join(
+    line for line in adapter.splitlines() if line.lstrip().startswith("case ")
+)))
+mineral_ids = {row["resourceID"] for row in host_rows if row["placementKind"] == "mineralNode"}
+assert mineral_ids <= covered_ids, f"Swift host adapter omits {sorted(mineral_ids - covered_ids)}"
+assert "baseIs(.soil) && low && touches(.water, .deepWater, .mud)" in adapter
+assert "tile.elevation >= 2 || touches(.chasm)" in adapter
+assert "touches(.chasm)" in adapter and "touches(.ash, .chasm)" in adapter
 
 topology = authority["terrainTopology"]
 assert topology["elevationMinimum"] == 0 and topology["elevationMaximum"] == 3

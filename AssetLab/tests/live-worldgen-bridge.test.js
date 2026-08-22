@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { readFile } from "node:fs/promises";
 import { bridgeSources, generateLiveWorld, liveSymbolCatalogue } from "../src/live-worldgen-bridge.js";
 
 const sources = await bridgeSources();
@@ -9,16 +10,51 @@ assert.equal(sources.some(path => path.includes("GameActions")), false,
 const catalogue = await liveSymbolCatalogue();
 assert.ok(catalogue.length > 10);
 assert.ok(catalogue.every(symbol => symbol.id && symbol.name));
+const testerHTML = await readFile(new URL("../world-generator-tester.html", import.meta.url), "utf8");
+const testerApp = await readFile(new URL("../src/world-generator-tester-app.js", import.meta.url), "utf8");
+for (const label of ["Terrain, Water, Deposits &amp; Resource Hosts", "Resource Hosts"])
+  assert.match(testerHTML, new RegExp(label));
+for (const label of ["Base material", "Visible ground", "Deep Water cores", "Settled Ash tiles",
+  "Internal ID", "Terrain generation failed"])
+  assert.match(testerApp, new RegExp(label));
+for (const id of ["terrain-diagnostics", "terrain-topology", "water-topology",
+  "deposit-topology", "resource-host-table"])
+  assert.match(testerHTML, new RegExp(`id="${id}"`));
 
 const request = { seed: 42, symbols: [], scale: "ordinary" };
 const first = await generateLiveWorld(request);
 const repeat = await generateLiveWorld(request);
-assert.deepEqual(first, repeat, "the same live book and seed must produce the same snapshot");
+assert.deepEqual(first, repeat,
+  "two independent bridge processes must emit the same terrain receipt for one book and seed");
 assert.equal(first.width, 18);
 assert.equal(first.height, 18);
 assert.equal(first.cells.length, 324);
 assert.equal(first.cells.every(cell => typeof cell.ground === "string"), true);
+assert.equal(first.cells.every(cell => typeof cell.baseGround === "string"
+  && typeof cell.snow === "boolean" && typeof cell.settledAsh === "boolean"), true);
 assert.equal(first.cells.every(cell => typeof cell.isRevealed === "boolean"), true);
+for (const representative of [
+  { seed: 7, symbols: ["plains"], scale: "small" },
+  { seed: 42, symbols: ["frostbound"], scale: "ordinary" },
+  { seed: 91, symbols: ["ashen", "frostbound"], scale: "large" },
+]) {
+  const a = await generateLiveWorld(representative);
+  const b = await generateLiveWorld(representative);
+  assert.deepEqual(a, b, `independent-process terrain changed for ${JSON.stringify(representative)}`);
+  assert.equal(a.diagnostics.terrainGenerationSucceeded, true);
+  assert.ok(Number.isInteger(a.diagnostics.isolatedGroundCells)
+    && a.diagnostics.isolatedGroundCells >= 0);
+  assert.ok(a.diagnostics.baseMaterialComponents.every(row => row.id && row.quantity > 0));
+  assert.ok(a.diagnostics.visibleGroundComponents.every(row => row.id && row.quantity > 0));
+  assert.ok(a.diagnostics.elevationHistogram.every(row => Number.isInteger(Number(row.id))));
+  assert.ok(a.diagnostics.maximumCardinalElevationDelta <= 1);
+  assert.equal(a.diagnostics.resourceHostViolations.length, 0);
+  assert.equal(a.diagnostics.resourceHosts.length, 23);
+  assert.equal(a.diagnostics.resourceHosts.every(row => row.name && row.internalID
+    && row.placementKind && row.hostRule && row.violations === 0), true);
+  for (const key of ["surfaceWaterTiles", "frozenWaterTiles", "snowTiles", "settledAshTiles"])
+    assert.ok(Number.isInteger(a.diagnostics[key]) && a.diagnostics[key] >= 0);
+}
 assert.ok(first.cells.some(cell => cell.isRevealed), "bridge must expose the rules-owned entry reveal crop");
 assert.equal(first.worldVisualReceipt.descriptorHash,
   first.worldVisualReceipt.descriptor.canonicalDescriptorSHA256);

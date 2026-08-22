@@ -514,9 +514,17 @@ enum WorldRules {
         let harvested = node.yieldPerHarvest + fieldcraftBonus
         run.satchel.add(harvested, of: node.resource)
         state.reality.discovery.recordResource(node.resource, runIndex: run.runIndex)
+        if let secondary = node.secondaryResource, node.secondaryYieldPerHarvest > 0 {
+            run.satchel.add(node.secondaryYieldPerHarvest, of: secondary)
+            state.reality.discovery.recordResource(secondary, runIndex: run.runIndex)
+        }
         run.map[run.playerPosition].content = node.isExhausted ? .empty : .node(node)
 
         var events: [Event] = [.harvested(node.resource, amount: harvested, exhausted: node.isExhausted)]
+        if let secondary = node.secondaryResource, node.secondaryYieldPerHarvest > 0 {
+            events.append(.harvested(secondary, amount: node.secondaryYieldPerHarvest,
+                                     exhausted: node.isExhausted))
+        }
         state.worlds.activeRun = run
         events.append(contentsOf: advanceTurn(in: &state))
         return events

@@ -697,6 +697,10 @@ enum Tuning {
     }
 
     enum Terrain {
+        /// Map-coverage fraction contributed by one resolved deposit source at amplitude 1.
+        /// Intensity, Scale and Count use PressureRules' existing amplitude; multiple matching
+        /// sources add before coverage is clamped to the map.
+        static let surfaceDepositCoveragePerAmplitude: Double = 0.12
         /// The most of a world that water can cover, at full saturation.
         static let maximumWaterCoverage: Double = 0.45
         /// How many separate bodies fully-pervasive water breaks into.
