@@ -49,6 +49,114 @@ enum WorldArrivalNativeRenderer {
     ]
     private static let water = [Color("#173849"), Color("#2d6378"), Color("#5b94a2")]
 
+    /// Functional v3 proof renderer. It deliberately uses primitive semantic blocks rather than
+    /// pretending to be final Asset art, but every owned receipt scope visibly affects the scene.
+    static func placeholderImage(for receipt: WorldSplashReceiptV3) -> UIImage? {
+        guard receipt.validates() else { return nil }
+        let size = CGSize(width: 320, height: 200)
+        return UIGraphicsImageRenderer(size: size).image { renderer in
+            drawPlaceholder(receipt, in: renderer.cgContext, size: size)
+        }
+    }
+
+    private static func drawPlaceholder(_ receipt: WorldSplashReceiptV3,
+                                        in context: CGContext, size: CGSize) {
+        context.interpolationQuality = .none
+        context.setFillColor(UIColor(red: 0.04, green: 0.07, blue: 0.08, alpha: 1).cgColor)
+        context.fill(CGRect(origin: .zero, size: size))
+        let scene = CGRect(x: 8, y: 8, width: 304, height: 184)
+        context.setFillColor(UIColor(red: 0.10, green: 0.15, blue: 0.17, alpha: 1).cgColor)
+        context.fill(scene)
+        let cellWidth = scene.width / CGFloat(WorldSplashReceiptV3.regionColumns)
+        let cellHeight = scene.height / CGFloat(WorldSplashReceiptV3.regionRows)
+        for region in receipt.terrain.regions {
+            let rect = CGRect(x: scene.minX + CGFloat(region.column) * cellWidth,
+                              y: scene.minY + CGFloat(region.row) * cellHeight,
+                              width: cellWidth + 0.5, height: cellHeight + 0.5)
+            drawPlaceholderRegion(region, receipt: receipt, in: context, rect: rect)
+        }
+        context.setStrokeColor(UIColor(red: 0.85, green: 0.73, blue: 0.48, alpha: 1).cgColor)
+        context.setLineWidth(4)
+        context.stroke(scene)
+    }
+
+    private static func drawPlaceholderRegion(_ region: WorldSplashReceiptV3.Region,
+                                              receipt: WorldSplashReceiptV3,
+                                              in context: CGContext, rect: CGRect) {
+                let groundID = region.groundShares
+                    .filter { $0.band != .none }
+                    .max { splashWeight($0.band) < splashWeight($1.band) }?.id
+                let ground = groundID.flatMap { GroundType(rawValue: $0) }
+                    ?? receipt.terrain.dominantDryGround
+                context.setFillColor(splashGroundColor(ground, material: receipt.terrain.material).cgColor)
+                context.fill(rect)
+
+                let shallow = region.waterShares.first { $0.id == "shallow" }?.band ?? .none
+                let deep = region.waterShares.first { $0.id == "deep" }?.band ?? .none
+                let frozen = region.waterShares.first { $0.id == "frozen" }?.band ?? .none
+                if shallow != .none || deep != .none || frozen != .none {
+                    let band = max(splashWeight(shallow), splashWeight(deep), splashWeight(frozen))
+                    let waterHeight = max(5, rect.height * CGFloat(band) / 6)
+                    let color = frozen != .none ? UIColor(red: 0.55, green: 0.78, blue: 0.82, alpha: 0.92)
+                        : deep != .none ? UIColor(red: 0.08, green: 0.25, blue: 0.36, alpha: 0.92)
+                        : UIColor(red: 0.16, green: 0.43, blue: 0.57, alpha: 0.88)
+                    context.setFillColor(color.cgColor)
+                    context.fill(CGRect(x: rect.minX, y: rect.maxY - waterHeight,
+                                        width: rect.width, height: waterHeight))
+                }
+                let elevation = region.elevationShares.enumerated().max {
+                    splashWeight($0.element.band) < splashWeight($1.element.band)
+                }?.offset ?? 0
+                if elevation > 0 {
+                    context.setFillColor(UIColor.black.withAlphaComponent(0.14 * CGFloat(elevation)).cgColor)
+                    context.fill(CGRect(x: rect.minX, y: rect.maxY - CGFloat(elevation * 3),
+                                        width: rect.width, height: CGFloat(elevation * 3)))
+                }
+                for (depositIndex, deposit) in region.depositShares.enumerated() where deposit.band != .none {
+                    let depositColor = deposit.id == "snow" ? UIColor(white: 0.94, alpha: 0.72)
+                        : UIColor(red: 0.34, green: 0.29, blue: 0.31, alpha: 0.72)
+                    context.setFillColor(depositColor.cgColor)
+                    let count = max(1, splashWeight(deposit.band))
+                    for index in 0..<count {
+                        let x = rect.minX + 8 + CGFloat((index * 19 + depositIndex * 11 + region.column * 7) % max(1, Int(rect.width - 16)))
+                        let y = rect.minY + 7 + CGFloat((index * 13 + region.row * 9) % max(1, Int(rect.height - 14)))
+                        context.fill(CGRect(x: x, y: y, width: 5, height: 3))
+                    }
+                }
+                for (speciesIndex, species) in receipt.flora.species.enumerated() {
+                    let band = species.regionShares[region.row * WorldSplashReceiptV3.regionColumns + region.column]
+                    guard band != .none else { continue }
+                    let rgb = species.renderIdentity.resolvedColor.srgb
+                    guard rgb.count == 3 else { continue }
+                    context.setFillColor(UIColor(red: CGFloat(rgb[0]) / 255,
+                                                 green: CGFloat(rgb[1]) / 255,
+                                                 blue: CGFloat(rgb[2]) / 255, alpha: 0.96).cgColor)
+                    for index in 0..<max(1, splashWeight(band)) {
+                        let x = rect.minX + 5 + CGFloat((index * 17 + speciesIndex * 23 + region.row * 5) % max(1, Int(rect.width - 10)))
+                        let y = rect.minY + 8 + CGFloat((index * 11 + speciesIndex * 7 + region.column * 13) % max(1, Int(rect.height - 16)))
+                        let extent: CGFloat = species.habit == "spreading" ? 8 : species.habit == "clustered" ? 6 : 4
+                        context.fill(CGRect(x: x, y: y, width: extent, height: extent))
+                    }
+                }
+            }
+
+    private static func splashWeight(_ band: WorldSplashReceiptV3.CoverageBand) -> Int {
+        WorldSplashReceiptV3.CoverageBand.allCases.firstIndex(of: band) ?? 0
+    }
+
+    private static func splashGroundColor(_ ground: GroundType,
+                                          material: WorldGrade2V1.Material) -> UIColor {
+        let base: [Int] = switch ground {
+        case .stone: [112, 116, 112]; case .soil: [123, 89, 57]; case .sand: [189, 158, 92]
+        case .ice: [147, 196, 201]; case .ash: [105, 92, 96]; case .water: [42, 105, 132]
+        case .deepWater: [24, 61, 83]; case .rubble: [121, 108, 92]; case .mud: [91, 68, 45]
+        case .growth: [55, 104, 55]; case .chasm: [25, 23, 27]; case .groundcover: [78, 124, 66]
+        }
+        let shift = Int((material.transform.hue * 31).rounded())
+        return UIColor(red: CGFloat(max(0, min(255, base[0] + shift))) / 255,
+                       green: CGFloat(base[1]) / 255, blue: CGFloat(base[2]) / 255, alpha: 1)
+    }
+
     static func makeRenderedReceipt(
         scene: WorldArrivalSceneReceipt
     ) throws -> WorldArrivalRenderedSceneReceipt {

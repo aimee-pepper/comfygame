@@ -13,6 +13,149 @@ enum WorldArrivalPresentationAuthority {
     static let isNativePresentationEnabled = true
 }
 
+/// Complete, disclosure-safe input for the World Splash. This is deliberately separate from the
+/// accepted v2 compositor receipt: old receipts remain byte-stable while new binds freeze the
+/// generated world's visible terrain, water, relief, deposits and every placed flora identity.
+struct WorldSplashReceiptV3: Codable, Equatable, Sendable {
+    static let schemaVersion = "world-splash-v3"
+    static let regionColumns = 4
+    static let regionRows = 3
+
+    enum CoverageBand: String, Codable, CaseIterable, Sendable {
+        case none, trace, sparse, present, abundant, dominant
+    }
+    enum WaterTopology: String, Codable, CaseIterable, Sendable {
+        case standing, flowing, pool, lake, channel, shelf, island, broken
+    }
+    enum ReliefShape: String, Codable, CaseIterable, Sendable {
+        case flat, rolling, ridge, basin, shelf, enclosed, broken
+    }
+    struct Share: Codable, Equatable, Sendable {
+        var id: String
+        var band: CoverageBand
+    }
+    struct Region: Codable, Equatable, Sendable {
+        var column: Int
+        var row: Int
+        var groundShares: [Share]
+        var waterShares: [Share]
+        var elevationShares: [Share]
+        var depositShares: [Share]
+        var floraShares: [Share]
+    }
+    struct GroundCensus: Codable, Equatable, Sendable {
+        var ground: GroundType
+        var exactCount: Int
+        var coverage: CoverageBand
+    }
+    struct TerrainProfile: Codable, Equatable, Sendable {
+        var width: Int
+        var height: Int
+        var nonChasmTileCount: Int
+        var grounds: [GroundCensus]
+        var dominantDryGround: GroundType
+        var secondaryVisibleGrounds: [GroundType]
+        var material: WorldGrade2V1.Material
+        var regions: [Region]
+    }
+    struct WaterProfile: Codable, Equatable, Sendable {
+        var shallowCount: Int
+        var deepCount: Int
+        var frozenCount: Int
+        var coverage: CoverageBand
+        var connectedBodyCountBand: CoverageBand
+        var dominantTopology: WaterTopology?
+        var topologyFlags: [WaterTopology]
+    }
+    struct ReliefProfile: Codable, Equatable, Sendable {
+        var elevationCounts: [Int]
+        var maximumElevation: Int
+        var southContactCounts: [Int]
+        var shapeFlags: [ReliefShape]
+    }
+    struct FloraSpecies: Codable, Equatable, Sendable {
+        var stableID: String
+        var renderIdentity: WorldGrade2V1.FloraSpecies
+        var placedTileCount: Int
+        var coverage: CoverageBand
+        var habit: String
+        var eligibleGrounds: [GroundType]
+        var regionShares: [CoverageBand]
+    }
+    struct FloraProfile: Codable, Equatable, Sendable {
+        var placedIdentityCount: Int
+        var occupiedTileCount: Int
+        var aggregateCoverage: CoverageBand
+        var species: [FloraSpecies]
+    }
+    struct DepositProfile: Codable, Equatable, Sendable {
+        var snowCount: Int
+        var snowCoverage: CoverageBand
+        var settledAshCount: Int
+        var settledAshCoverage: CoverageBand
+    }
+    struct EnvironmentProfile: Codable, Equatable, Sendable {
+        var illuminationBand: String
+        var illuminationSourceClass: String
+        var suspendedMedium: String
+        var suspendedDensity: String
+        var suspendedMotion: String
+        var precipitationMedium: String
+        var precipitationIntensity: String
+        var precipitationMotion: String
+    }
+
+    var version: String
+    var receiptID: WorldArrivalReceiptID
+    var worldSeed: UInt64
+    var worldVisualReceiptSHA256: String
+    var sourcePagePhysicalReceipt: WorldArrivalReceipt.SourcePage
+    var descriptionGrammarVersion: String
+    var finalDescription: String
+    var terrain: TerrainProfile
+    var water: WaterProfile
+    var relief: ReliefProfile
+    var deposits: DepositProfile
+    var flora: FloraProfile
+    var environment: EnvironmentProfile
+    var causalVisualFacts: [WorldArrivalReceipt.CausalVisualFact]
+    var firstMapCropReceipt: WorldArrivalReceipt.FirstMapCrop
+    var canonicalReceiptSHA256: String
+
+    func validates() -> Bool {
+        guard version == Self.schemaVersion,
+              !receiptID.rawValue.isEmpty,
+              !worldVisualReceiptSHA256.isEmpty,
+              terrain.width > 0, terrain.height > 0,
+              terrain.grounds.map(\.ground) == GroundType.allCases,
+              terrain.grounds.allSatisfy({ $0.exactCount >= 0 }),
+              terrain.grounds.reduce(0, { $0 + $1.exactCount }) == terrain.width * terrain.height,
+              terrain.regions.count == Self.regionColumns * Self.regionRows,
+              relief.elevationCounts.count == 4,
+              relief.southContactCounts.count == 3,
+              water.shallowCount >= 0, water.deepCount >= 0, water.frozenCount >= 0,
+              deposits.snowCount >= 0, deposits.settledAshCount >= 0,
+              flora.occupiedTileCount == flora.species.reduce(0, { $0 + $1.placedTileCount }),
+              flora.placedIdentityCount == flora.species.count,
+              flora.species.allSatisfy({ $0.placedTileCount > 0 && $0.regionShares.count == terrain.regions.count }),
+              Set(flora.species.map(\.stableID)).count == flora.species.count,
+              flora.species == flora.species.sorted(by: {
+                  $0.placedTileCount == $1.placedTileCount
+                    ? $0.stableID < $1.stableID : $0.placedTileCount > $1.placedTileCount
+              }),
+              canonicalReceiptSHA256 == computedCanonicalSHA256() else { return false }
+        return true
+    }
+
+    mutating func seal() { canonicalReceiptSHA256 = computedCanonicalSHA256() }
+
+    private func computedCanonicalSHA256() -> String {
+        var copy = self
+        copy.canonicalReceiptSHA256 = ""
+        return (try? WorldGrade2V1.canonicalSHA256(copy)) ?? ""
+    }
+}
+
 /// Versioned, immutable input for the accepted arrival compositor. The nested payload deliberately
 /// mirrors the Asset contract while v2 removes all hidden-cell terrain payloads. Native rendering
 /// may consume only this object after presentation authority is enabled; it must not re-band the
@@ -366,12 +509,63 @@ struct WorldArrivalReceipt: Codable, Equatable, Sendable {
     var sceneReceipt: WorldArrivalSceneReceipt?
     /// Nil for legacy/pre-B1.6a worlds. New binds freeze the exact validated rect-v1 replay.
     var renderedSceneReceipt: WorldArrivalRenderedSceneReceipt? = nil
+    /// Nil for legacy v1/v2 arrivals. New binds persist the comprehensive disclosure-safe input.
+    var worldSplashReceiptV3: WorldSplashReceiptV3? = nil
+
+    fileprivate enum CodingKeys: String, CodingKey {
+        case version, id, runIndex, generationSeed, sourcePagePhysicalReceipt, visualReceiptID
+        case visualSchemaVersion, terrainSummary, environmentSummary, dominantGround
+        case waterRelationship, materialDescriptor, illumination, suspendedAtmosphere
+        case precipitation, flora, causalVisualFacts, entryDisclosure, firstMapCropReceipt
+        case proseVersion, finalDescription, compositorVersion, sceneReceipt, renderedSceneReceipt
+        case worldSplashReceiptV3
+    }
 
     var isNativePresentationEligible: Bool {
         guard let sceneReceipt, sceneReceipt.validatesCanonicalHash(), sceneReceipt.validatesSchema(),
               let renderedSceneReceipt, renderedSceneReceipt.validates() else { return false }
         return renderedSceneReceipt.inputSceneReceiptSHA256 == sceneReceipt.canonicalSHA256
             && finalDescription == sceneReceipt.payload.description
+    }
+}
+
+extension WorldArrivalReceipt {
+    /// v3 is an optional presentation receipt. A malformed future/partial v3 value must not
+    /// quarantine a playable v1/v2 run; it closes to the legacy text-first Splash instead.
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        version = try c.decode(Int.self, forKey: .version)
+        id = try c.decode(WorldArrivalReceiptID.self, forKey: .id)
+        runIndex = try c.decode(Int.self, forKey: .runIndex)
+        generationSeed = try c.decode(UInt64.self, forKey: .generationSeed)
+        sourcePagePhysicalReceipt = try c.decode(SourcePage.self, forKey: .sourcePagePhysicalReceipt)
+        visualReceiptID = try c.decode(String.self, forKey: .visualReceiptID)
+        visualSchemaVersion = try c.decode(String.self, forKey: .visualSchemaVersion)
+        terrainSummary = try c.decodeIfPresent(TerrainSummary.self, forKey: .terrainSummary)
+        environmentSummary = try c.decodeIfPresent(EnvironmentSummary.self, forKey: .environmentSummary)
+        dominantGround = try c.decode(GroundType.self, forKey: .dominantGround)
+        waterRelationship = try c.decode(String.self, forKey: .waterRelationship)
+        materialDescriptor = try c.decode(WorldGrade2V1.Material.self, forKey: .materialDescriptor)
+        illumination = try c.decode(Illumination.self, forKey: .illumination)
+        suspendedAtmosphere = try c.decodeIfPresent(Atmosphere.self, forKey: .suspendedAtmosphere)
+        precipitation = try c.decodeIfPresent(Precipitation.self, forKey: .precipitation)
+        flora = try c.decode([FloraSummary].self, forKey: .flora)
+        causalVisualFacts = try c.decode([CausalVisualFact].self, forKey: .causalVisualFacts)
+        entryDisclosure = try c.decodeIfPresent(String.self, forKey: .entryDisclosure)
+        firstMapCropReceipt = try c.decode(FirstMapCrop.self, forKey: .firstMapCropReceipt)
+        proseVersion = try c.decode(String.self, forKey: .proseVersion)
+        finalDescription = try c.decode(String.self, forKey: .finalDescription)
+        compositorVersion = try c.decode(String.self, forKey: .compositorVersion)
+        sceneReceipt = try c.decodeIfPresent(WorldArrivalSceneReceipt.self, forKey: .sceneReceipt)
+        renderedSceneReceipt = try c.decodeIfPresent(
+            WorldArrivalRenderedSceneReceipt.self, forKey: .renderedSceneReceipt)
+        if let decoded = try? c.decodeIfPresent(WorldSplashReceiptV3.self,
+                                                forKey: .worldSplashReceiptV3),
+           decoded.validates() {
+            worldSplashReceiptV3 = decoded
+        } else {
+            worldSplashReceiptV3 = nil
+        }
     }
 }
 
@@ -519,7 +713,7 @@ enum WorldArrivalReceiptFactory {
             atmosphere: atmosphere, flora: floraSummaries, crop: crop,
             causalFacts: causalFacts, description: description)
         let sceneReceipt = WorldArrivalSceneReceipt(payload: scenePayload)
-        return .init(version: WorldArrivalReceipt.schemaVersion,
+        var result = WorldArrivalReceipt(version: WorldArrivalReceipt.schemaVersion,
                      id: receiptID, runIndex: runIndex, generationSeed: generationSeed,
                      sourcePagePhysicalReceipt: physical,
                      visualReceiptID: visualReceipt.canonicalReceiptSHA256,
@@ -538,6 +732,168 @@ enum WorldArrivalReceiptFactory {
                      finalDescription: description,
                      compositorVersion: WorldArrivalReceipt.sceneCompositorVersion,
                      sceneReceipt: sceneReceipt, renderedSceneReceipt: nil)
+        result.worldSplashReceiptV3 = makeSplashV3(
+            receiptID: receiptID, generationSeed: generationSeed, sourcePage: physical,
+            visualReceipt: visualReceipt, map: map, flora: flora,
+            environment: environmentSummary, illuminationSourceClass: sourceClass,
+            causalFacts: causalFacts, crop: crop,
+            description: description)
+        guard result.worldSplashReceiptV3?.validates() == true else { throw Error.noDryGround }
+        return result
+    }
+
+    static func makeSplashV3(
+        receiptID: WorldArrivalReceiptID, generationSeed: UInt64,
+        sourcePage: WorldArrivalReceipt.SourcePage, visualReceipt: WorldVisualReceipt,
+        map: WorldMap, flora: [Flora], environment: WorldArrivalReceipt.EnvironmentSummary,
+        illuminationSourceClass: String,
+        causalFacts: [WorldArrivalReceipt.CausalVisualFact], crop: WorldArrivalReceipt.FirstMapCrop,
+        description: String
+    ) -> WorldSplashReceiptV3 {
+        let tileCount = max(1, map.tiles.count)
+        let nonChasm = map.tiles.count { $0.ground != .chasm }
+        let counts = GroundType.allCases.map { ground in
+            let count = map.tiles.count { $0.ground == ground }
+            return WorldSplashReceiptV3.GroundCensus(
+                ground: ground, exactCount: count, coverage: splashBand(count, of: tileCount))
+        }
+        let dryOrder: [GroundType] = [.stone, .soil, .sand, .ice, .ash, .rubble, .mud, .growth, .groundcover]
+        let orderedDry = dryOrder.sorted { leftGround, rightGround in
+            let left = counts.first { $0.ground == leftGround }?.exactCount ?? 0
+            let right = counts.first { $0.ground == rightGround }?.exactCount ?? 0
+            return left == right
+                ? dryOrder.firstIndex(of: leftGround)! < dryOrder.firstIndex(of: rightGround)!
+                : left > right
+        }
+        // Avoid Dictionary order in the persisted receipt. Regions and every share are closed and sorted.
+        let regionPoints: [[GridPoint]] = (0..<(WorldSplashReceiptV3.regionRows * WorldSplashReceiptV3.regionColumns)).map { region in
+            let column = region % WorldSplashReceiptV3.regionColumns
+            let row = region / WorldSplashReceiptV3.regionColumns
+            return map.allPoints.filter {
+                min(WorldSplashReceiptV3.regionColumns - 1, $0.x * WorldSplashReceiptV3.regionColumns / map.width) == column
+                    && min(WorldSplashReceiptV3.regionRows - 1, $0.y * WorldSplashReceiptV3.regionRows / map.height) == row
+            }
+        }
+        let descriptorByID = Dictionary(uniqueKeysWithValues: visualReceipt.descriptor.flora.cast.map { ($0.speciesID, $0) })
+        let floraByID = Dictionary(uniqueKeysWithValues: flora.map { ($0.id, $0) })
+        let placedIDs = Set(map.tiles.compactMap(\.flora))
+        let species = placedIDs.compactMap { id -> WorldSplashReceiptV3.FloraSpecies? in
+            let stableID = "flora-\(id.rawValue)"
+            guard let plant = floraByID[id], let descriptor = descriptorByID[stableID] else { return nil }
+            let placed = map.tiles.count { $0.flora == id }
+            let eligible = Set(map.allPoints.compactMap { point in map[point].flora == id ? map[point].baseGround : nil })
+                .sorted { $0.rawValue < $1.rawValue }
+            return .init(stableID: stableID, renderIdentity: descriptor,
+                         placedTileCount: placed, coverage: splashBand(placed, of: nonChasm),
+                         habit: plant.traits.habit.rawValue, eligibleGrounds: eligible,
+                         regionShares: regionPoints.map { points in
+                             splashBand(points.count { map[$0].flora == id }, of: max(1, points.count))
+                         })
+        }.sorted { $0.placedTileCount == $1.placedTileCount
+            ? $0.stableID < $1.stableID : $0.placedTileCount > $1.placedTileCount }
+        let regions = regionPoints.enumerated().map { index, points in
+            let total = max(1, points.count)
+            func shares(_ pairs: [(String, (Tile) -> Bool)]) -> [WorldSplashReceiptV3.Share] {
+                pairs.map { id, owns in .init(id: id, band: splashBand(points.count { owns(map[$0]) }, of: total)) }
+            }
+            return WorldSplashReceiptV3.Region(
+                column: index % WorldSplashReceiptV3.regionColumns,
+                row: index / WorldSplashReceiptV3.regionColumns,
+                groundShares: shares(GroundType.allCases.map { ground in (ground.rawValue, { $0.ground == ground }) }),
+                waterShares: shares([("shallow", { $0.ground == .water }), ("deep", { $0.ground == .deepWater }), ("frozen", { $0.ground == .ice })]),
+                elevationShares: shares((0...3).map { elevation in (String(elevation), { $0.elevation == elevation }) }),
+                depositShares: shares([("snow", { $0.surfaceDeposits.snow }), ("settledAsh", { $0.surfaceDeposits.settledAsh })]),
+                floraShares: species.map { item in .init(id: item.stableID, band: item.regionShares[index]) })
+        }
+        let shallow = map.tiles.count { $0.ground == .water }
+        let deep = map.tiles.count { $0.ground == .deepWater }
+        let frozen = map.tiles.count { $0.ground == .ice }
+        let wetPoints = Set(map.allPoints.filter { [.water, .deepWater, .ice].contains(map[$0].ground) })
+        let bodies = splashComponents(points: wetPoints, map: map)
+        var topology: [WorldSplashReceiptV3.WaterTopology] = []
+        if !bodies.isEmpty { topology.append(bodies.contains { $0.count >= 9 } ? .lake : .pool) }
+        if bodies.contains(where: { component in
+            let xs = component.map(\.x), ys = component.map(\.y)
+            return (xs.max()! - xs.min()! >= 2 * max(1, ys.max()! - ys.min()!))
+                || (ys.max()! - ys.min()! >= 2 * max(1, xs.max()! - xs.min()!))
+        }) { topology.append(.channel) }
+        if shallow > 0 { topology.append(.standing) }
+        if topology.contains(.channel) { topology.append(.flowing) }
+        if deep > 0 { topology.append(.shelf) }
+        let elevationCounts = (0...3).map { level in map.tiles.count { $0.elevation == level } }
+        let contacts = (1...3).map { depth in
+            map.allPoints.count { point in
+                let south = GridPoint(x: point.x, y: point.y + 1)
+                return map.contains(south) && map[point].elevation - map[south].elevation == depth
+            }
+        }
+        let maxElevation = map.tiles.map(\.elevation).max() ?? 0
+        let reliefFlags: [WorldSplashReceiptV3.ReliefShape] = maxElevation == 0 ? [.flat]
+            : contacts.reduce(0, +) > 0 ? [.rolling, .ridge] : [.rolling]
+        let snow = map.tiles.count { $0.surfaceDeposits.snow }
+        let ash = map.tiles.count { $0.surfaceDeposits.settledAsh }
+        var receipt = WorldSplashReceiptV3(
+            version: WorldSplashReceiptV3.schemaVersion, receiptID: receiptID,
+            worldSeed: generationSeed, worldVisualReceiptSHA256: visualReceipt.canonicalReceiptSHA256,
+            sourcePagePhysicalReceipt: sourcePage,
+            descriptionGrammarVersion: WorldArrivalReceipt.descriptionGrammarVersion,
+            finalDescription: description,
+            terrain: .init(width: map.width, height: map.height, nonChasmTileCount: nonChasm,
+                           grounds: counts, dominantDryGround: orderedDry.first ?? .soil,
+                           secondaryVisibleGrounds: Array(orderedDry.dropFirst().filter { ground in
+                               counts.first(where: { $0.ground == ground })?.exactCount ?? 0 > 0
+                           }), material: visualReceipt.descriptor.material, regions: regions),
+            water: .init(shallowCount: shallow, deepCount: deep, frozenCount: frozen,
+                         coverage: splashBand(shallow + deep + frozen, of: tileCount),
+                         connectedBodyCountBand: splashBand(bodies.count, of: 6),
+                         dominantTopology: topology.first, topologyFlags: topology),
+            relief: .init(elevationCounts: elevationCounts, maximumElevation: maxElevation,
+                          southContactCounts: contacts, shapeFlags: reliefFlags),
+            deposits: .init(snowCount: snow, snowCoverage: splashBand(snow, of: tileCount),
+                            settledAshCount: ash, settledAshCoverage: splashBand(ash, of: tileCount)),
+            flora: .init(placedIdentityCount: placedIDs.count,
+                         occupiedTileCount: species.reduce(0) { $0 + $1.placedTileCount },
+                         aggregateCoverage: splashBand(species.reduce(0) { $0 + $1.placedTileCount }, of: nonChasm),
+                         species: species),
+            environment: .init(illuminationBand: environment.illuminationBand,
+                               illuminationSourceClass: illuminationSourceClass,
+                               suspendedMedium: environment.suspendedMedium,
+                               suspendedDensity: environment.suspendedDensity,
+                               suspendedMotion: "calm", precipitationMedium: environment.precipitation,
+                               precipitationIntensity: environment.precipitationIntensity,
+                               precipitationMotion: "calm"),
+            causalVisualFacts: causalFacts, firstMapCropReceipt: crop,
+            canonicalReceiptSHA256: "")
+        receipt.seal()
+        return receipt
+    }
+
+    private static func splashBand(_ count: Int, of total: Int) -> WorldSplashReceiptV3.CoverageBand {
+        guard count > 0, total > 0 else { return .none }
+        let percent = count * 100 / total
+        if percent < 3 { return .trace }
+        if percent < 10 { return .sparse }
+        if percent < 25 { return .present }
+        if percent < 50 { return .abundant }
+        return .dominant
+    }
+
+    private static func splashComponents(points: Set<GridPoint>, map: WorldMap) -> [Set<GridPoint>] {
+        var unseen = points
+        var result: [Set<GridPoint>] = []
+        while let start = unseen.min(by: { ($0.y, $0.x) < ($1.y, $1.x) }) {
+            var component: Set<GridPoint> = [start]
+            var queue = [start]
+            unseen.remove(start)
+            while !queue.isEmpty {
+                let point = queue.removeFirst()
+                for next in map.neighbours(of: point).filter(unseen.contains) {
+                    unseen.remove(next); component.insert(next); queue.append(next)
+                }
+            }
+            result.append(component)
+        }
+        return result
     }
 
     private static let schemaIdentity = "world-arrival-receipt-v1"

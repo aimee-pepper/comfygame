@@ -286,6 +286,22 @@ final class PageTests: XCTestCase {
         XCTAssertEqual(store.state.worlds.pendingWorldArrivalReceipt, runReceipt)
         XCTAssertTrue(runReceipt.isNativePresentationEligible)
         XCTAssertNotNil(runReceipt.renderedSceneReceipt)
+        let splash = try XCTUnwrap(runReceipt.worldSplashReceiptV3)
+        XCTAssertTrue(splash.validates())
+        XCTAssertEqual(splash.version, WorldSplashReceiptV3.schemaVersion)
+        XCTAssertEqual(splash.worldSeed, earth.definition.seed)
+        XCTAssertEqual(splash.worldVisualReceiptSHA256,
+                       store.activeRun?.worldVisualReceipt?.canonicalReceiptSHA256)
+        XCTAssertEqual(splash.terrain.grounds.map(\.ground), GroundType.allCases)
+        XCTAssertEqual(splash.terrain.grounds.reduce(0) { $0 + $1.exactCount },
+                       splash.terrain.width * splash.terrain.height)
+        XCTAssertEqual(splash.terrain.regions.count, 12)
+        XCTAssertEqual(splash.flora.species.count,
+                       Set(store.activeRun?.map.tiles.compactMap(\.flora) ?? []).count,
+                       "every placed flora identity must survive; no prefix-four truncation")
+        XCTAssertEqual(splash.flora.species.map(\.placedTileCount).reduce(0, +),
+                       store.activeRun?.map.tiles.count { $0.flora != nil })
+        XCTAssertNotNil(WorldArrivalNativeRenderer.placeholderImage(for: splash))
         XCTAssertEqual(store.state.reality.library.visitedWorlds.last?.worldArrivalReceipt,
                        runReceipt)
         XCTAssertEqual(runReceipt.generationSeed, earth.definition.seed)
@@ -325,11 +341,20 @@ final class PageTests: XCTestCase {
         XCTAssertEqual(worldsRoundTrip.activeRun?.worldArrivalReceipt, runReceipt)
         XCTAssertEqual(worldsRoundTrip.pendingWorldArrivalReceiptID, runReceipt.id)
         XCTAssertEqual(worldsRoundTrip.pendingWorldArrivalReceipt, runReceipt)
+        XCTAssertEqual(worldsRoundTrip.activeRun?.worldArrivalReceipt?.worldSplashReceiptV3, splash)
         let persistedReceipt = try XCTUnwrap(JSONSerialization.jsonObject(
             with: JSONEncoder().encode(runReceipt)) as? [String: Any])
         XCTAssertNil(persistedReceipt["counterfactualPassCount"])
         XCTAssertNil(persistedReceipt["counterfactualElapsedMilliseconds"],
                      "wall-clock diagnostics must never enter frozen receipt bytes")
+        var invalidObject = persistedReceipt
+        var invalidSplash = try XCTUnwrap(invalidObject["worldSplashReceiptV3"] as? [String: Any])
+        invalidSplash["canonicalReceiptSHA256"] = "tampered"
+        invalidObject["worldSplashReceiptV3"] = invalidSplash
+        let tolerant = try JSONDecoder().decode(WorldArrivalReceipt.self,
+            from: JSONSerialization.data(withJSONObject: invalidObject, options: [.sortedKeys]))
+        XCTAssertNil(tolerant.worldSplashReceiptV3,
+                     "invalid optional v3 presentation data must not quarantine the playable run")
 
         let positionBeforeEnter = try XCTUnwrap(store.activeRun?.playerPosition)
         let turnBeforeEnter = try XCTUnwrap(store.activeRun?.turnsTaken)

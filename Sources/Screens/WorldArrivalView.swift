@@ -25,7 +25,9 @@ struct WorldArrivalView: View {
 
     private var rendered: WorldArrivalRenderedSceneReceipt? { receipt.renderedSceneReceipt }
     private var sceneImage: UIImage? {
-        rendered.flatMap(WorldArrivalNativeRenderer.image(for:))
+        if let splash = receipt.worldSplashReceiptV3,
+           let image = WorldArrivalNativeRenderer.placeholderImage(for: splash) { return image }
+        return rendered.flatMap(WorldArrivalNativeRenderer.image(for:))
     }
     private var disclosedMarkLabels: [String] {
         receipt.sourcePagePhysicalReceipt.marks.map {
@@ -90,6 +92,14 @@ struct WorldArrivalView: View {
                     .frame(maxWidth: .infinity)
                     .accessibilityElement(children: .ignore)
                     .accessibilityLabel("Generated view of \(receipt.sourcePagePhysicalReceipt.title)")
+
+                    if receipt.worldSplashReceiptV3 != nil {
+                        Text("TEMPORARY GENERATOR PREVIEW")
+                            .font(.custom("Tiny5", size: 10, relativeTo: .caption))
+                            .foregroundStyle(PixelUITheme.muted)
+                            .frame(maxWidth: .infinity, alignment: .center)
+                            .accessibilityLabel("Temporary World Splash generator preview")
+                    }
 
                     Text(receipt.finalDescription)
                         .font(.custom("Tiny5", size: 13, relativeTo: .body))
