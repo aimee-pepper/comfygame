@@ -34,8 +34,8 @@ h3 { margin: 0 0 8px; font-size: 17px; }
 .kicker { color: var(--accent); font-weight: 900; letter-spacing: .12em; text-transform: uppercase; }
 .lede { max-width: 760px; font-size: 18px; color: #4b3c30; }
 .stamp { flex: none; padding: 8px 10px; color: var(--muted); background: var(--paper-2); border: 1px solid #ad8e64; font-size: 12px; }
-.grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 16px; margin-top: 24px; }
-.card { display: block; padding: 18px; background: rgba(255,248,229,.92); border: 1px solid #b89b70; border-bottom-width: 4px; box-shadow: var(--shadow); text-decoration: none; }
+.grid { min-width: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 16px; margin-top: 24px; }
+.card { min-width: 0; display: block; padding: 18px; overflow-wrap: anywhere; background: rgba(255,248,229,.92); border: 1px solid #b89b70; border-bottom-width: 4px; box-shadow: var(--shadow); text-decoration: none; }
 .card:hover { transform: translateY(-2px); border-color: var(--accent); }
 .card p { color: var(--muted); }
 .badge { display: inline-block; margin: 2px 5px 2px 0; padding: 3px 7px; border-radius: 999px; color: #173b40; background: var(--accent-soft); font-size: 12px; font-weight: 800; text-transform: uppercase; }
@@ -69,7 +69,7 @@ th { background: var(--paper-2); }
   .main { padding: 24px 16px 56px; }
   .topline { display: block; }
   .stamp { display: inline-block; margin-top: 14px; }
-  .grid { grid-template-columns: 1fr; }
+  .grid { grid-template-columns: minmax(0, 1fr); }
   .progression-grid { grid-template-columns: 1fr; }
   .sprite-slots { grid-template-columns: 1fr; }
   h1 { font-size: 36px; }

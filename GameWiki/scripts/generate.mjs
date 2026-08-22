@@ -13,6 +13,9 @@ const coreInputs = [
   "Sources/Content/Data/resources.json",
   "Sources/Content/Data/items.json",
   "Sources/Content/Data/symbols.json",
+  "Sources/Content/Data/pressure_targets.json",
+  "Sources/Content/Data/pressure_sources.json",
+  "Sources/Content/Data/qualifiers.json",
   "Sources/Content/Data/playability-roadmap.json",
   "Sources/Model/Materials.swift",
   "Sources/VisualAdapters/NamedCharacterVisualAdapter.swift",
@@ -210,6 +213,9 @@ const travellersJSON = JSON.parse(contents["Sources/Content/Data/travellers.json
 const resourcesJSON = JSON.parse(contents["Sources/Content/Data/resources.json"]);
 const itemsJSON = JSON.parse(contents["Sources/Content/Data/items.json"]);
 const symbolsJSON = JSON.parse(contents["Sources/Content/Data/symbols.json"]);
+const targetsJSON = JSON.parse(contents["Sources/Content/Data/pressure_targets.json"]);
+const sourcesJSON = JSON.parse(contents["Sources/Content/Data/pressure_sources.json"]);
+const qualifiersJSON = JSON.parse(contents["Sources/Content/Data/qualifiers.json"]);
 const roadmapJSON = JSON.parse(contents["Sources/Content/Data/playability-roadmap.json"]);
 const matrixPath = "docs/village-progression-and-asset-matrix-current.md";
 const matrixText = contents[matrixPath];
@@ -464,9 +470,47 @@ const travellers = travellersJSON.travellers.map(person => {
 const resources = resourcesJSON.resources.map(resourceRecord);
 const items = itemsJSON.items.map(itemRecord);
 const creatureMaterials = materialFamilies();
-const symbols = normalize(symbolsJSON.symbols, "rune", "Sources/Content/Data/symbols.json", symbolsJSON._authority.defaultDisposition);
+function lexemeRecord(kind, item, sourcePath, disposition) {
+  const acquisition = item.acquisition ?? (kind === "target" || kind === "qualifier" ? "rules-owned vocabulary" : "authored catalogue");
+  const alwaysWritable = kind === "target" || kind === "qualifier";
+  const expansion = kind === "compound"
+    ? (item.expandsTo ?? []).map(part => `${part.intensity} ${part.source} → ${part.target}`)
+    : kind === "source"
+      ? (item.contributions ?? []).map(part => `${part.character} ${part.target}`)
+      : [];
+  return {
+    type: "rune",
+    category: kind,
+    id: `${kind}:${item.id}`,
+    stableID: item.id,
+    slug: `${kind}-${slug(item.id)}`,
+    name: item.name,
+    summary: item.blurb ?? (kind === "qualifier" ? `Changes the ${item.ladder} ladder.` : "Authored writing vocabulary."),
+    acquisition,
+    essenceCost: item.essenceCost ?? null,
+    ladder: item.ladder ?? null,
+    attachesTo: item.attachesTo ?? [],
+    expansion,
+    writability: alwaysWritable ? "available whenever the Writing Desk is available" : `writable only after the campaign owns this ${kind}`,
+    disclosure: alwaysWritable ? "meaning is rules-known" : "catalogue presence is not player knowledge; encountered may display ?? and only ownership discloses meaning",
+    disposition,
+    provenance: provenance([sourcePath], item.id, disposition, hashes, aggregateHash)
+  };
+}
+
+const symbols = [
+  ...targetsJSON.targets.map(item => lexemeRecord("target", item, "Sources/Content/Data/pressure_targets.json", targetsJSON._authority.defaultDisposition)),
+  ...sourcesJSON.sources.map(item => lexemeRecord("source", item, "Sources/Content/Data/pressure_sources.json", sourcesJSON._authority.defaultDisposition)),
+  ...qualifiersJSON.qualifiers.map(item => lexemeRecord("qualifier", item, "Sources/Content/Data/qualifiers.json", qualifiersJSON._authority?.defaultDisposition ?? "live")),
+  ...symbolsJSON.symbols.map(item => lexemeRecord("compound", item, "Sources/Content/Data/symbols.json", symbolsJSON._authority.defaultDisposition))
+];
 const roadmap = normalize(roadmapJSON.items, "roadmap", "Sources/Content/Data/playability-roadmap.json", "operational");
-for (const [index, item] of roadmap.entries()) roadmap[index].workstream = roadmapJSON.items[index].workstream;
+for (const [index, item] of roadmap.entries()) {
+  item.workstream = roadmapJSON.items[index].workstream;
+  item.band = roadmapJSON.items[index].band ?? "unbanded";
+  item.gate = roadmapJSON.items[index].gate ?? "No separate acceptance gate recorded.";
+  item.owner = roadmapJSON.items[index].owner ?? roadmapJSON.items[index].workstream;
+}
 
 const authorities = await Promise.all(authorityPaths.map(async path => ({
   path,
@@ -490,7 +534,8 @@ const routes = [
   "catalogue/curios", "catalogue/treasures", "catalogue/keys", "roadmap", "history", "asset-gallery",
   ...stations.map(station => `station/${station.slug}`), ...travellers.map(person => `person/${person.slug}`),
   ...items.map(item => `item/${item.slug}`), ...resources.map(resource => `resource/${resource.slug}`),
-  ...creatureMaterials.map(material => `creature-material/${material.slug}`)
+  ...creatureMaterials.map(material => `creature-material/${material.slug}`),
+  ...symbols.map(symbol => `lexeme/${symbol.slug}`), ...roadmap.map(item => `roadmap/${item.slug}`)
 ];
 const search = [...stations, ...travellers, ...resources, ...creatureMaterials, ...items, ...symbols, ...roadmap].map(entity => ({
   type: entity.type,
@@ -498,7 +543,7 @@ const search = [...stations, ...travellers, ...resources, ...creatureMaterials, 
   name: entity.name,
   summary: entity.blurb ?? entity.summary ?? "",
   category: entity.category ?? entity.type,
-  route: entity.type === "station" ? `station/${entity.slug}` : entity.type === "roadmap" ? "roadmap" : entity.type === "traveller" ? `person/${entity.slug}` : ["gear", "consumable", "curio", "treasure", "key"].includes(entity.type) ? `item/${entity.slug}` : entity.type === "resource" ? `resource/${entity.slug}` : entity.type === "creatureMaterial" ? `creature-material/${entity.slug}` : entity.type === "rune" ? "world-writing" : "overview",
+  route: entity.type === "station" ? `station/${entity.slug}` : entity.type === "roadmap" ? `roadmap/${entity.slug}` : entity.type === "traveller" ? `person/${entity.slug}` : ["gear", "consumable", "curio", "treasure", "key"].includes(entity.type) ? `item/${entity.slug}` : entity.type === "resource" ? `resource/${entity.slug}` : entity.type === "creatureMaterial" ? `creature-material/${entity.slug}` : entity.type === "rune" ? `lexeme/${entity.slug}` : "overview",
   disposition: entity.disposition,
   provenance: entity.provenance
 }));

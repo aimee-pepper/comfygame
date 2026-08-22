@@ -23,6 +23,7 @@ assert(before === once && once === twice, "generation is not deterministic");
 
 const data = JSON.parse(await readFile(dataPath, "utf8"));
 const generatorSource = await readFile(join(root, "scripts/generate.mjs"), "utf8");
+const appSource = await readFile(join(root, "public/app.js"), "utf8");
 const stationsAuthority = JSON.parse(await readFile(resolve(root, "../Sources/Content/Data/stations.json"), "utf8"));
 const itemsAuthority = JSON.parse(await readFile(resolve(root, "../Sources/Content/Data/items.json"), "utf8"));
 const resourcesAuthority = JSON.parse(await readFile(resolve(root, "../Sources/Content/Data/resources.json"), "utf8"));
@@ -59,6 +60,11 @@ assert(data.travellers.every(person => ["live", "authored-not-live", "held"].inc
 assert(data.travellers.filter(person => person.meetingStatus === "live").length === travellersAuthority.travellers.filter(person => person.meeting).length, "live meeting status must derive exactly from travellers.json");
 assert(data.travellers.every(person => person.recruitmentStatus && person.visualStatus && person.provenance.sourcePaths.length >= 5), "People detail status/provenance must be complete");
 assert(data.search.filter(item => item.type === "traveller").every(item => item.route.startsWith("person/") && item.category === "traveller"), "traveller search must open exact person detail routes");
+const lexemeCounts = Object.fromEntries(["target", "source", "qualifier", "compound"].map(kind => [kind, data.symbols.filter(item => item.category === kind).length]));
+assert(JSON.stringify(lexemeCounts) === JSON.stringify({ target: 8, source: 62, qualifier: 17, compound: 21 }), "World Writing must exactly partition all 108 canonical lexemes");
+assert(data.symbols.every(item => item.stableID && item.summary && item.writability && item.disclosure && data.routes.includes(`lexeme/${item.slug}`)), "every lexeme needs typed facts, disclosure state and a stable detail route");
+assert(data.search.filter(item => item.type === "rune").every(item => item.route.startsWith("lexeme/") && ["target", "source", "qualifier", "compound"].includes(item.category)), "rune search must open exact typed lexeme routes");
+assert(data.roadmap.every(item => item.summary && item.gate && data.routes.includes(`roadmap/${item.slug}`)), "every roadmap receipt needs explanation, gate and detail route");
 for (const station of data.stations) {
   assert(station.id && station.provenance.stableID === station.id, `station provenance missing: ${station.id}`);
   assert(station.provenance.sourcePaths.length >= 3, `station authority sources missing: ${station.id}`);
@@ -125,6 +131,10 @@ for (const item of data.search) {
 }
 for (const route of ["overview", "core-loop", "world-writing", "exploration", "combat", "people", "village-buildings", "resources-crafting", "catalogue", "catalogue/gear", "catalogue/consumables", "catalogue/curios", "catalogue/treasures", "catalogue/keys", "roadmap", "history", "asset-gallery"]) {
   assert(data.routes.includes(route), `required route missing: ${route}`);
+}
+assert(!appSource.includes("function authorityPage") && !appSource.includes("authorityPage("), "required routes must not retain the generic authority fallback");
+for (const renderer of ["worldWriting", "coreLoop", "exploration", "combat", "roadmapDetail", "lexemeDetail"]) {
+  assert(appSource.includes(`function ${renderer}(`), `missing dedicated renderer: ${renderer}`);
 }
 const { resetRouteScroll } = await import("../public/route-scroll.js");
 const scrollCalls = [];

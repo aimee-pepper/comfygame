@@ -1,9 +1,12 @@
 {
   "schemaVersion": 1,
-  "aggregateSourceHash": "914c8dda4401775d8f7d727bf4a4fb01585dca181f9e6a976d28eefae88b7eb3",
+  "aggregateSourceHash": "8366ae402659d5776cb354bbd2f2e1017cdcb824c24dae9e7cdfadbde35c9942",
   "inputs": {
     "Sources/Content/Data/items.json": "b94b1107229f217e14f1d7fa936d8eea938f9782c06c583be32302f10d432bc9",
     "Sources/Content/Data/playability-roadmap.json": "a8184d9ed17571849363f868375eb8a03f8038f9a3a8f914e2fc10773a97a2af",
+    "Sources/Content/Data/pressure_sources.json": "68f7b2271d51613030f2f3b3e573f750af53c9b68fe00d68a599dcd6fc0a9b86",
+    "Sources/Content/Data/pressure_targets.json": "b35cf88512a7e1e2efde12f352a35e1d499376a8a9990daa41a8f285c65e6a42",
+    "Sources/Content/Data/qualifiers.json": "35c0f4b00f35fdb8d1d1845ca27988b73283acc623ec3b39c95cb1b921bec120",
     "Sources/Content/Data/resources.json": "8eee965ce7df075abfe3f646bb36d416a10ef1d7d194845e30fa0f31b7b23e6f",
     "Sources/Content/Data/stations.json": "21b5e9f3bee2d9115acf535ef2ff1db350b87b8ee33755e79a3b3e4584102e2b",
     "Sources/Content/Data/symbols.json": "c1ec5dd7b661680b358e21a56124b6080aa28d93db51fd2f6b80214ced1dcb16",
@@ -171,7 +174,7 @@
     "docs/full-cast-voice-authority-current.md": "619c9f993853e8d990ef89b85fdf9c39c9dc759a90dd9c74bb865521d2cd8501",
     "docs/gambit-stat-thresholds-current.md": "6549465eed132bc9b7c7dca35df9ce457e9772f583d3290a7c6d26849a0889db",
     "docs/game-design-ux-assessment-current.md": "59dbcf7f6c262f068e02f83f995d85fc6e1f436e393fa7a0bbf04fed3baa16d5",
-    "docs/game-wiki-content-contract-current.md": "f59367fe890550ae221cc07059563ccc3ff94f8903b8345deb2a8f8425925f0d",
+    "docs/game-wiki-content-contract-current.md": "395442d1aab8d5de63a6e95953bc00ab9efa5f17fc261aff39d8cb56ed85c73b",
     "docs/gear-and-weapon-category-brief-current.md": "530e1c0d6f24d3c4b3de411beeabf8aa396b8b8b58e7b17156765133171468dc",
     "docs/gear-catalogue-disposition-current.md": "cc7c7e0918a955fcee8e3699303bb52654fb5caddd9bc63a6b811f34bf9237ca",
     "docs/gear-crafting-families-current.md": "8a80c3a6f1d97c5bb61a15be857b71b3c0dbc2d0f0081b65411809784ddaebe5",
@@ -291,7 +294,7 @@
     "docs/writing-tool-progression-current.md": "be17fe07aa89aaaab7117a2faca43d7e1eb1be23202d19106c67c42547b23bb0"
   },
   "outputs": {
-    "generated/wiki-data.json": "000b6c3c4e119772517a3b9bfa9b1a2ca2ae28c5b0d1ca4d83aad43a6c335c8a",
-    "generated/source-registry.json": "0258380bf8c99fcb7c1f4a5987fcccff7ce360730d8470863ca8e99d0d91e3ba"
+    "generated/wiki-data.json": "6801abf92a1eb6d3547489408c0aba03cc136c16ae768c1b178707e776dfb359",
+    "generated/source-registry.json": "f7a99bcc91d7a1cef690ffebe7abc62a3e0dcb98befe3b5c8fe76ec55eb6ce0a"
   }
 }

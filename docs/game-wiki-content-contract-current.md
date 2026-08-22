@@ -15,15 +15,15 @@ separation and no horizontal overflow. The initial route-scroll defect and fabri
 material entries were corrected: internal navigation now opens every route at its heading, and the designed
 Creature set derives exactly 18 stable ComponentProfile families.
 
-**Checkpoint B — People: accepted.** The wiki now covers the exact 29-person authored order with stable
+**Checkpoint B — People: accepted and complete.** The wiki now covers the exact 29-person authored order with stable
 detail routes, concise roles, phase/order, diary/clue coverage, teaching, owned destination, meeting and
 recruitment state, and truthful visual status. Live, authored-not-live and held content remain distinct.
 
-**Current completion run — World Writing through final reconciliation.** World Writing/rune details, Core
-Loop, Exploration and Combat still use generic authority-file surfaces rather than understandable vertical
-slices. Overview, Roadmap and History then require a final nontechnical reconciliation. Engineering performs
-this as continuous fallback work whenever no higher-priority playable implementation is active; each slice
-must satisfy the no-placeholder definition below before it is called complete.
+**Checkpoint C — explanatory systems: complete in the wiki.** World Writing now accounts for all 108 typed
+lexemes with disclosure-aware detail routes. Core Loop, Exploration and Combat have dedicated structured
+routes rather than generic authority fallbacks. Overview, Roadmap and History now lead with plain-language
+gameplay/status explanations and retain provenance afterward. Browser acceptance remains part of the final
+integration receipt; this progress statement does not promote any gameplay or roadmap item.
 
 ## What “complete” means
 
@@ -172,11 +172,11 @@ available, continue without treating each slice as a stop:
 
 1. Catalogue taxonomy + item details — **accepted**;
 2. World Resources / Creature Materials / Currencies + details — **accepted**;
-3. People + traveller details — **accepted**;
-4. World Writing + rune details — **active fallback slice**;
-5. Core Loop and Exploration;
-6. Combat;
-7. Overview reconciliation, Roadmap detail and History supersession links;
+3. People + traveller details — **accepted and complete**;
+4. World Writing + rune details — **complete**;
+5. Core Loop and Exploration — **complete**;
+6. Combat — **complete**;
+7. Overview reconciliation, Roadmap detail and History supersession links — **complete**;
 8. accepted-asset ingestion when committed asset paths actually exist.
 
 Each slice is source-generated and tested. Completion receipts say what became useful to Aimee, not merely
