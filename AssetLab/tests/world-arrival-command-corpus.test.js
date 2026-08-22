@@ -23,7 +23,7 @@ assert.deepEqual(fs.readFileSync(corpusPath), first, "corpus export must be byte
 assert.equal(corpus.integrationReady, false);
 assert.deepEqual(corpus.canvas, { width: 160, height: 100 });
 assert.equal(corpus.pins.compositorSHA256, "5352cafa83ad6982aaaceafd24db66b5db002d5b5f1f6ceaf375b7cea738b882");
-assert.equal(corpus.pins.acceptedManifestSHA256, "f041c81a41c45ac88dada40b0c173ab63c6e93c2984f232a23be67892df4a65b");
+assert.equal(corpus.pins.acceptedManifestSHA256, "b603ee57022f31f51a044335dabe4e2c385f6ea4f6fd56e80a5d96232d7ffc68");
 assert.equal(corpus.pins.compositorCommit, "9b60e8516f08806d40c38ed2a4307746c13d1c8c");
 assert.equal(corpus.pins.latestReceiptCommit, "72b840d3e1de2b8c32aebfc0e876d61c69448a92");
 assert.equal(corpus.canonicalBodySHA256, canonicalSHA256(Object.fromEntries(Object.entries(corpus).filter(([key]) => key !== "canonicalBodySHA256"))));
@@ -38,6 +38,10 @@ assert.equal(corpus.coverage.seedMatrix.maxCommandCount, Math.max(...corpus.case
 assert.ok(corpus.coverage.seedMatrix.maxCases.every(id => id.startsWith("seed-matrix/")));
 
 const byID = new Map(corpus.cases.map(row => [row.id, row]));
+const aggregate = key => crypto.createHash("sha256").update(corpus.cases.map(row=>`${row.id}:${row[key]}`).sort().join("\n")).digest("hex");
+assert.equal(aggregate("commandListSHA256"),"bca575a7e2efb12fc10728b1683f4dd1ded0da910dbda8bd8a346d603bbd5f6d","ordered rect-v1 command ABI remains byte-identical");
+assert.equal(aggregate("renderedRGBA8SHA256"),"f4227b306c9d1474a4b05d68a38d37bd6baa20666ca1a673cbc06eed75067564","all 85 replayed scene RGBA outputs remain byte-identical");
+for(const record of corpus.cases)assert.equal(/\b(?:Your|your)\s+[^.]+?\s+mark\b/.test(record.receipt.description),false,`${record.id} finalDescription cannot call a page symbol mark`);
 for (const id of ["starter_open_meadow", "starter_rainwashed_shore", "starter_stone_hollow", "near_flora", "ash_open_color", "longest_copy", "visible_site_candidate"]) assert.ok(byID.has(`accepted/${id}`));
 for (const record of corpus.cases) {
   assert.equal(record.sceneReceiptVersion, 2, record.id);
