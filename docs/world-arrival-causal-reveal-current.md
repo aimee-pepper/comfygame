@@ -23,7 +23,6 @@ relaunch. It contains, by stable ID/value rather than display text:
 - actual resolved ground/material and water relationship;
 - actual illumination and atmosphere medium/density;
 - actual 1–4 flora species identities plus coverage/habit summaries;
-- actual creature cast silhouette classes that are legitimate non-spoiling entry ambience;
 - actual authored-vs-open provenance for eligible visual dimensions;
 - entry-region visible facts;
 - lifecycle outcome variant when reused on exit/return.
@@ -39,8 +38,10 @@ the map:
 1. ground/water establish the scene;
 2. light/atmosphere grade it;
 3. flora coverage and silhouettes establish ecology;
-4. non-identifying creature ambience is optional and subordinate;
-5. source Page thumbnail, title and action frame the reveal.
+4. source Page thumbnail, title and action frame the reveal.
+
+Creature ambience is omitted from native v1. A later extension may accept a separately sanitized visible
+anatomy class, but complete generated cast identity is not part of the base receipt.
 
 The scene is deterministic for the receipt. Two worlds similar in resolved visual facts must remain
 visual relatives; opposed facts should separate proportionally. Do not add a novelty recolor because the
@@ -61,9 +62,12 @@ entry-visible only, distant non-identifying silhouette, or explicitly authored W
 
 ## Generated description
 
-Generate **two or three short sentences**, 18–55 words total, from structured facts. The first sentence
-grounds the place; the second names one material environmental relationship; an optional third names a
-truthful opening uncertainty/tension.
+Exact deterministic selection, thresholds, causal-necessity rules, copy tables and prohibited register are
+owned by `world-arrival-description-grammar-current.md`. The summary below is subordinate to that grammar.
+
+Generate exactly **two short sentences** in v1, 18–55 words total, from structured facts. The first sentence
+grounds the place; the second names either necessary known authorship or one material environmental
+relationship. A third tension sentence is held until the two-sentence surface proves insufficient in play.
 
 ### Clause order
 
@@ -98,9 +102,9 @@ receipt; changing Worldgen requires revalidating both the receipt and this copy.
 
 | Page | Frozen request | Disclosed description fixture |
 |---|---|---|
-| Open Flats | seed 67 · Plains + Verdant | Broad sandy flats run between shallow pools. Your Plains mark opened the terrain, while Verdant gathered low growth along the few wet and stony edges. |
-| Rainwashed Shore | seed 26 · Archipelago | Stone shelves break a wide run of shallow and deep water. The Archipelago mark divided the route, while dull fungal growth settled on the larger islands. |
-| Stone Hollow | seed 23 · Caverns + Ore | Stone closes around narrow soil paths and wet hollows. Caverns shaped the enclosure, while Ore ran through it and pithy growth held to the open patches. |
+| Open Flats | seed 67 · Plains + Verdant | Broad sandy ground runs between shallow pools. Your Plains mark opened the terrain, while your Verdant mark gathered low growth along the few wet and stony edges. |
+| Rainwashed Shore | seed 26 · Archipelago | Stone shelves break a wide run of shallow and deep water. Your Archipelago mark divided the route, while sparse growth settled on the open stone. |
+| Stone Hollow | seed 23 · Caverns + Ore | Stone closes around narrow paths and wet hollows. Your Caverns mark shaped the enclosure, while your Ore mark drew ore through it. |
 
 The image may depict the matching flora shapes but these descriptions do not name creature identities,
 resources other than the causally authored Ore relationship, hidden sites, portal locations or traveller

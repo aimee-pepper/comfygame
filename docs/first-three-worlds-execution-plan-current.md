@@ -180,8 +180,9 @@ spoiling it.
 
 **Authority:** `world-arrival-causal-reveal-current.md`.
 
-**Engineering:** persist the pure `WorldArrivalReceipt`; implement deterministic 2–3 sentence, 18–55 word
-grammar from exact disclosed facts. Validate prohibited riddle register and no unknown-mark/site/entity leak.
+**Engineering:** persist the pure `WorldArrivalReceipt`; implement the exact deterministic two-sentence,
+18–55 word grammar from `world-arrival-description-grammar-current.md` and exact disclosed facts. Validate
+prohibited riddle register, causal necessity and no unknown-mark/site/entity leak.
 No visual promotion yet.
 
 **Pass:** Open Flats, Rainwashed Shore, Stone Hollow; near/far world pairs; relaunch identity; unknown mark;

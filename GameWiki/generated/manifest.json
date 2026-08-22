@@ -1,9 +1,9 @@
 {
   "schemaVersion": 1,
-  "aggregateSourceHash": "b7151335447d9ba2eeeee58916dd6d90694db99bedd40ee59e597feac80a7471",
+  "aggregateSourceHash": "2af87018029d9e1abb7974ef86eec1312639084994de893a58f04dc8a7e344d3",
   "inputs": {
     "Sources/Content/Data/items.json": "b94b1107229f217e14f1d7fa936d8eea938f9782c06c583be32302f10d432bc9",
-    "Sources/Content/Data/playability-roadmap.json": "9d1bea96d2bc78c856453fe67c833697a128ccb22885c34489bd880212a5f277",
+    "Sources/Content/Data/playability-roadmap.json": "5e21bb3008dc4005c7993a8b06680fe4df879a7fb71410caaaaa20213a4bcf25",
     "Sources/Content/Data/resources.json": "8eee965ce7df075abfe3f646bb36d416a10ef1d7d194845e30fa0f31b7b23e6f",
     "Sources/Content/Data/stations.json": "21b5e9f3bee2d9115acf535ef2ff1db350b87b8ee33755e79a3b3e4584102e2b",
     "Sources/Content/Data/symbols.json": "c1ec5dd7b661680b358e21a56124b6080aa28d93db51fd2f6b80214ced1dcb16",
@@ -105,7 +105,7 @@
     "docs/constellation-first-slice-current.md": "b2ac3d9bcc002482bbb5620c60dd69096717f9466210a0c37ac88c96c74d295a",
     "docs/consumable-economy-field-kit-current.md": "f401f7f0997369f6d0dcc35737d6645555d56262d11729d30512d31753567ad2",
     "docs/contradiction-danger-audit-current.md": "d964c2e49c42c41bcd76ab5fd0450d3967a5c6d8d2203a915df1d4acb14dffc5",
-    "docs/core-loop-causal-presentation-plan-current.md": "3f7ae201e054026cea8cf0503ba7144b02111334e7ea60ce44d0302f23f934f1",
+    "docs/core-loop-causal-presentation-plan-current.md": "b89fd101f372309e168d501682785f4f45f0273eb889f801c6e41dc5213316dd",
     "docs/count-description-current.md": "7d600486af7ad5d1b9898bae6470ade91613abd2bfefaa31ab4413f5bb007973",
     "docs/crafted-gear-migration-current.md": "f26d9524154672e59c50415b59c2cd3fe745741d9d8bafc136c46333469fa558",
     "docs/crafting-components-and-schematics-current.md": "c95517d88d373eea5be411b019f3893da5cdf948cb569309e4ac9c88cb09ca86",
@@ -115,7 +115,7 @@
     "docs/creature-territory-finds-current.md": "07792ad39d56392aaadc4507520015020a77171b6e6486f22aa3381903027385",
     "docs/cross-lead-delivery-contract-current.md": "af95f3e6668995134aaca7e0a1ac6bacd1e81305696c16734ed859f92fd14b2b",
     "docs/curio-identification-knowledge-current.md": "31acb95848598b0874e3978a9488f122b8bfee115e16867a5dca9fa1c33986f0",
-    "docs/current-design-index.md": "c15664cf2275966df75a366e1d06cd656072ffdb0d5167b937c0a60844dac255",
+    "docs/current-design-index.md": "35ef2e2a135e160522ffe76e7d630aa218325adee65b337fe9b3c461ae71132a",
     "docs/cycle-system-current.md": "3a472c56d4c78299574f768de122d2ac11e7387eeae8fd723667e73f96fbd598",
     "docs/dagg-recovery-teaching-current.md": "a6f2e09d574fde643ce524b90c7c76482925010c6d8af53bc327fd4fe3480546",
     "docs/debug-authored-text-atlas-current.md": "dde26130930d41c60ef958393390774a36c6bf37999a2428420db634df1c7dd2",
@@ -161,7 +161,7 @@
     "docs/field-awareness-avoidance-current.md": "a944726899b6079a9f286a9bea2552653f9b910909cbb1695d4e0b34d4567aa4",
     "docs/field-feedback-and-loot-presentation-current.md": "5a3f14e018198ccd8259824e3a5158cd3219ca26e325230e3e39452d9c90ce79",
     "docs/field-note-grammar-current.md": "9cd1591fedfcc640148037a9227c9830ebde871889683ac8c53245326fd969bb",
-    "docs/first-three-worlds-execution-plan-current.md": "75fb1c547b3a4feb2450a8889254397e7fdcc7481076eab52d6b8375a2dc4aca",
+    "docs/first-three-worlds-execution-plan-current.md": "d3aadb8bce8fdb4632bb4fa1e1175caa01598ced8f7992f3d01de683e3152163",
     "docs/focus-expansion-85-current.md": "91a72d538c3eb493ab6ff91c3b21dd2b8b2474c2a0dd3b4eb9d24f24499b2d21",
     "docs/focus-expansion-implementation-batches-current.md": "651d152c26b2f5dcb89272ebb2a730016fc40c10a83181cf70ca5901ed51ad76",
     "docs/found-writing-breadth-current.md": "88bc6f701d1660d96bac54f494d761c115c49409ecef826da1b76dc2b1e9f45b",
@@ -268,8 +268,9 @@
     "docs/wayfarers-table-flora-recognition-current.md": "01de8b57fba27ce086ac1433890ad42d6d8b740a156dc7c9c685970843e61261",
     "docs/weaponsmith-implementation-current.md": "43a6deed0bfe3a91d82626f22cbd23031d2f664d67ea7627fd5f2a1213fdb0d3",
     "docs/workshop-constellation-role-audit-current.md": "ea43a26411c0909a1370a8f10003294020cc2b5c9c14b3fece88c1e9d5b0cbf3",
-    "docs/world-arrival-asset-packet-current.md": "ee89e29f12520cdf0bd631ad74c38f97c91678206511c0a72348b299c8b95967",
-    "docs/world-arrival-causal-reveal-current.md": "ce7d483904af345d81982a8831eb1bef42010479d63f0cc3898dd5283a98f554",
+    "docs/world-arrival-asset-packet-current.md": "ffb9a544925bfbffb6b33070d8b070aa36ea12788e00c70fa649c620e23f4398",
+    "docs/world-arrival-causal-reveal-current.md": "6249af397c7e12a60ae4aee303fa6f46732727343c6e0cc8fec34e3ee697a854",
+    "docs/world-arrival-description-grammar-current.md": "2d0b3777aa07a8334dc660c262b3134e681c0466f692d70d88d7aab28988322d",
     "docs/world-color-differentiation-current.md": "0973da16ef6fa03cdb3c74e1cc6ab0b8eb9a842958b337b75e2e9d133d4c518b",
     "docs/world-encounter-contact-current.md": "59faf7fe08ce10f50d71f0f68f07e73c7cfbec920b716f12b53540623b5b9dc6",
     "docs/world-grade-2-bind-adapter-current.md": "7d388adabeefcee5fbe50071c2bc9feed7f3c53658eea26f3e3dbbc812470e11",
@@ -282,7 +283,7 @@
     "docs/writing-tool-progression-current.md": "be17fe07aa89aaaab7117a2faca43d7e1eb1be23202d19106c67c42547b23bb0"
   },
   "outputs": {
-    "generated/wiki-data.json": "37ab7579d43a7715ba88f63ddeebe96792e6b362debbd1cf3dfe73d569c9648e",
-    "generated/source-registry.json": "5bc9b835a657e4bc944cd2767d43a7c63a211bc429a7884c8326b19afe11a3f8"
+    "generated/wiki-data.json": "b1977103e1aca008a13f254d2c43009dfded6b54cdc2fd90dbfa778d41bd5234",
+    "generated/source-registry.json": "f14c1d85512b2c8968b864f967c32524214913df0d839eaae441f789e28695e1"
   }
 }

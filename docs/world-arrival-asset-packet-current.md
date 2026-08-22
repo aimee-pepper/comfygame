@@ -12,7 +12,7 @@ second world model, write runtime prose, change Worldgen, or reinterpret the acc
 ## Player-facing result
 
 After binding succeeds and the world is ready, the player sees one framed, dynamically composed pixel-art
-view of that exact world and a concrete two- or three-sentence description. It should feel like the written
+view of that exact world and a concrete two-sentence description. It should feel like the written
 page opening into a place, not like a parameter receipt, map screenshot, loading screen or generic landscape
 with a different tint.
 
@@ -61,11 +61,12 @@ read complete Worldgen state or choose what is safe to disclose.
 | `waterRelationship` | none, pools, channels, shelves, islands | silhouette and depth-band layout | showing a hidden route or portal |
 | `materialDescriptor` | exact current world-visual material receipt | palette/texture transform | a second material classifier |
 | `illumination` | entry current band plus visible-source class | scene value and sky/light layer | exposing numeric pressure |
-| `atmosphere` | exact current medium/density/motion | accepted typed atmosphere layer | inferring weather from colour |
+| `suspendedAtmosphere` | exact medium/density/motion | accepted Smoke/Ash/Mist/Miasma layer | inferring weather from colour |
+| `precipitation` | exact none/rain/snow/mixed plus intensity/motion | accepted precipitation layer | changing terrain or movement rules |
 | `flora` | 0–4 visible species render identities, coverage, habits | same silhouette/palette grammar as map | names, metabolism or defence labels |
 | `authoredKnownScopes` | known mark IDs and legitimately caused visible scope IDs | one restrained causal clause | hidden mark semantics |
 | `entryDisclosure` | only already visible site profile or disclosed apex-location mark | optional v1 extension fixture | any hidden complete-world POI/entity fact |
-| `description` | rules-owned final 18–55 word string | body copy only | Asset-authored substitutions |
+| `description` | rules-owned final 18–55 word string from `world-arrival-description-grammar-current.md` | body copy only | Asset-authored substitutions |
 | `firstMapCropReceipt` | exact disclosed entry crop render inputs | continuity evidence only | revealing cells beyond current sight |
 
 Missing optional fields omit their layer. Unknown enum values and extra fields fail visibly in the lab; no
@@ -142,8 +143,8 @@ flora, encounter, writing, Essence, collapse and reachability receipts are check
 - dominant structure: broad sand/soil flats with a few shallow pools and little stone;
 - flora: low pithy-succulent identity, 21 placements; no active/hostile flora;
 - description (rules-owned fixture):
-  `Broad sandy flats run between shallow pools. Your Plains mark opened the terrain, while Verdant
-  gathered low growth along the few wet and stony edges.`
+  `Broad sandy ground runs between shallow pools. Your Plains mark opened the terrain, while your Verdant
+  mark gathered low growth along the few wet and stony edges.`
 
 ### `starter_rainwashed_shore` — **Rainwashed Shore**
 
@@ -151,8 +152,8 @@ flora, encounter, writing, Essence, collapse and reachability receipts are check
 - dominant structure: stone shelves/islands separated by shallow and deep water;
 - flora: dull-fungal-bloom identity, 21 placements; no active/hostile flora;
 - description (rules-owned fixture):
-  `Stone shelves break a wide run of shallow and deep water. The Archipelago mark divided the route,
-  while dull fungal growth settled on the larger islands.`
+  `Stone shelves break a wide run of shallow and deep water. Your Archipelago mark divided the route,
+  while sparse growth settled on the open stone.`
 
 ### `starter_stone_hollow` — **Stone Hollow**
 
@@ -160,8 +161,8 @@ flora, encounter, writing, Essence, collapse and reachability receipts are check
 - dominant structure: enclosed stone, narrow soil paths and wet hollows;
 - flora: pithy-succulent identity, 19 placements; no active/hostile flora;
 - description (rules-owned fixture):
-  `Stone closes around narrow soil paths and wet hollows. Caverns shaped the enclosure, while Ore ran
-  through it and pithy growth held to the open patches.`
+  `Stone closes around narrow paths and wet hollows. Your Caverns mark shaped the enclosure, while your Ore
+  mark drew ore through it.`
 
 Sites, portals, traveller candidates, ordinary creature identities and exact resource positions are absent
 from all three entry pictures unless a separate sanitized `entryDisclosure` field legitimately supplies

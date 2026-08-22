@@ -91,7 +91,7 @@ emotional and visual answer to “what did this writing make?” before presenti
 3. Compose only legitimate entry knowledge: dominant terrain/material, current light, actual atmosphere
    and non-spoiling ecological silhouettes. Do not reveal an undiscovered resource, site, traveller or
    identifiable rare/apex creature.
-4. Pair the generated image with two or three concrete generated sentences (18–55 words total) derived from
+4. Pair the generated image with exactly two concrete generated sentences in v1 (18–55 words total) derived from
    the same frozen receipt: ground/water form first, consequential light/air second, then ecology or an
    authored/open tension when useful. These are readily parseable descriptions, not riddles, aphorisms or a
    generated lore monologue. Unknown marks never disclose their meaning.
