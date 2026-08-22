@@ -1,6 +1,6 @@
 # Terrain layering and motion — Asset production packet
 
-**Status:** complete v0.2 visual pack accepted; native-consumable production-pack correction active
+**Status:** complete v0.2 visual pack and TerrainProductionPack v1 accepted; native integration active; final wall/cliff asset addition required
 **Priority:** B1.7b; explicit Aimee-authorized Asset exception to the generic system-first hold
 **Owners:** Game Design owns terrain meaning, disclosure and motion limits; Asset owns the isolated logical
 pixel kit and compositor proof; Engineering later owns the native receipt adapter, cache and shared clock
@@ -8,9 +8,10 @@ pixel kit and compositor proof; Engineering later owns the native receipt adapte
 
 ## Current disposition — 22 August 2026
 
-Aimee's direct requirement is a **properly generated, attractive dynamic pixel-art terrain system**, not
-merely removal of the current native sidewall bug. The v0.1 checkpoint remains authoritative for its closed
-request, shared-edge ownership, visibility, palette, motion and no-false-sidewall contracts. Its visual
+Aimee's direct requirement is a **properly generated, attractive dynamic pixel-art terrain system**, not a
+top-surface reskin and not permission to discard the current genuine-height cue. The v0.1 checkpoint remains
+authoritative for its closed request, shared-edge ownership, visibility, palette, motion and
+no-**false**-sidewall contracts. Its visual
 terrain-family sources are a technical prototype, not final terrain art: the current implementation builds
 material texture from hash-scattered pixels and small procedural line/rectangle formulas, and its phone proof
 still reads as procedural speckle rather than deliberately drawn organic terrain.
@@ -53,19 +54,28 @@ separate Snow/Ash surface-cover overlay before native integration.
 The representative style gate is a review checkpoint, not permission to ship only six ground families.
 Completion still means one coherent dynamic system covering all twelve live grounds in the actual phone map.
 
-That complete v0.2 system is now visually accepted at canonical body
+That complete v0.2 top-surface system is now visually accepted at canonical body
 `2a541033b71b638f1803e5a9477a0197c38f38d96ff199a4864d49bf551608dd`, manifest-file SHA
 `5e70b17c91c8601ed895455364f2cd8a51e010e2cb2201f09dc2c02c826f3892` and production aggregate
 `90da0b9ed6092b591bcad83fbda68b0563de9c2ba37127911772c41418657a54`. It covers all twelve grounds
-plus independent Snow and settled-Ash surface deposits. Asset work is now limited to packaging those frozen
-pixels and exact conformance receipts for native consumption; it must not generate another terrain style.
+plus independent Snow and settled-Ash surface deposits. The complete visual pack is preserved at accepted
+Asset commit `5bac76a9`; TerrainProductionPack v1 is accepted and preserved at Asset commit `84e6db50`, but
+its manifest remains `integrationReady:false` and it is not native or integrated on the current shared line.
+
+Those acceptances cover the new top surfaces, contours, deposits and motion. They do **not** prove a
+functional replacement for the existing native south-facing wall/cliff presentation. The current
+`southExposureLevels`/`southExposure` cue remains in the initial native integration until a final authored,
+terrain-consistent wall/cliff family covers genuinely exposed levels 1, 2 and 3 and proves equal-or-better
+readability and function on the 368×800 physical phone. Asset must add that bounded family without
+regenerating or restyling the accepted top-surface system.
 
 ## Player result
 
 The explorable map remains a straight top-down, tile-addressable world, but it should no longer read first as
 a spreadsheet of individually filled squares. Ground materials meet through irregular top-surface contours;
-water, rock, loose ground and growth have an obvious physical order; and a few surfaces move gently enough
-to make the world feel present without changing, hiding or predicting a single rule.
+real southern elevation drops retain a compact wall/cliff read; water, rock, loose ground and growth have an
+obvious physical order; and a few surfaces move gently enough to make the world feel present without
+changing, hiding or predicting a single rule.
 
 The player must still be able to identify, before color:
 
@@ -82,16 +92,22 @@ memory, pathfinding, turns or encounter behavior.
 
 ## Absolute camera and format rules
 
-- Every explorable-map terrain source is **straight top-down**. No horizon, front wall, side face, isometric
-  lift or shallow tableau camera is permitted.
-- One game tile remains exactly **16×16 logical RGBA pixels** before integer nearest-neighbour scaling.
+- Every explorable-map terrain source keeps a **straight top-down footprint**. No horizon, isometric x-offset,
+  perspective convergence or shallow tableau camera is permitted. The sole vertical-face exception is the
+  compact south-facing wall/cliff required by a genuinely exposed elevation delta; it remains subordinate to
+  the translated top surface and never turns the map into a side view.
+- One logical game/hit tile and its complete top plane remain exactly **16×16 logical RGBA pixels** before
+  integer nearest-neighbour scaling. Genuine height keeps the existing `terrain-lifted-1.0.0` 16×19
+  bottom-anchored composition profile, pivot `(8,18)`, one riser pixel per exposed level and an unchanged
+  16×16 hit footprint; a versioned successor is required before any dimension or pivot changes.
 - Production sources are exact bounded-palette logical pixel bitmaps or reviewed binary masks. HTML, CSS,
   SVG, antialiased canvas paths and procedurally drawn rectangles may present evidence but are not production
   art.
 - Generated or painted composition references are `productionSource:false`. Asset must deliberately author
   the final logical pixels and publish their exact hashes.
-- Each tile paints every one of its own visible pixels. Layer contours never leave transparent cracks between
-  tiles or draw outside the tile's 16×16 ownership rectangle.
+- Each top plane paints every one of its own visible pixels. Material contours never leave transparent cracks
+  between tiles or draw outside their 16×16 ownership rectangles. Only the height profile may use its
+  declared transparent top overflow and south-face rows; that overflow does not change logical ownership.
 - The accepted `world-grade-2` descriptor, frozen from authored and generated world pressures at bind, is the
   sole recoloring authority. Terrain assets expose semantic roles such as deep shadow, body dark, body,
   body light, highlight and family accent only where a family genuinely needs them; the renderer resolves
@@ -113,13 +129,15 @@ Back-to-front top-surface ownership is:
 4. loose surfaces: Soil, Sand, Ash and Mud;
 5. low and tall growth terrain bodies;
 6. static material detail and the permitted motion overlay;
-7. genuine elevation contact shade from the separate accepted atmosphere contract;
-8. cracking/crumbled truth, route and stationary visible flora/resource decoration;
-9. atmosphere, precipitation, actors, content and field-feedback layers in their already-settled order.
+7. the genuinely exposed south-facing elevation wall/cliff owned by the higher terrain;
+8. supplemental elevation contact shade from the separate accepted atmosphere contract;
+9. cracking/crumbled truth, route and stationary visible flora/resource decoration;
+10. atmosphere, precipitation, actors, content and field-feedback layers in their already-settled order.
 
 Priority resolves a boundary's visual overlap; it does not change either tile's ground identity. A higher
 layer may intrude at most two pixels into the lower-priority tile's side of a shared contour, using its own
-**top-surface** colors. It may never add a dark vertical strip or exposed sidewall.
+**top-surface** colors. A material boundary at equal elevation may never add a dark vertical strip or exposed
+sidewall. This material-overlap rule does not suppress the separate genuine-height wall/cliff layer.
 
 ## Exact ground-family grammar
 
@@ -180,18 +198,27 @@ Rules for important pairs are closed:
 Diagonal neighbors do not enter the v1 request. Corner rounding comes from the two incident cardinal
 contours and their shared contour IDs. Asset cannot sample complete map state to improve a corner.
 
-## Elevation and false-sidewall prohibition
+## Elevation, required south cliffs and false-sidewall prohibition
 
 Material boundaries and height are independent.
 
 - Equal-elevation neighbors produce **no** contact shadow, wall or vertical face regardless of color,
   palette, material, water depth or edge contour.
-- Different elevations retain the already-accepted one- or two-pixel contact shade on the **lower tile**
-  only. That shade is composed after terrain and is not part of these material bitmaps.
+- A genuinely exposed southern drop retains a south-facing wall/cliff whose height is the exact safe
+  `southExposureLevels` value, 1, 2 or 3. The higher tile owns the face; its authored material and
+  `WorldGrade2V1` roles own the color. No generic dirt, timber, universal dark band or repeated stake may
+  substitute for terrain-consistent wall pixels.
+- The already-accepted contact shade may ground the wall/cliff on the **lower tile**, but it is supplemental
+  only. Shade alone is not functionally equivalent to the wall/cliff and cannot replace its elevation read.
 - Terrain animation cannot move, widen or recolor the elevation shade.
-- An elevation difference does not authorize a side-view cliff face. The world map stays top-down.
-- The former `southExposure` lifted-wall grammar is outside this production contract and must not be copied
-  into new Asset sources.
+- The world map stays top-down: only the exact south-facing exposed delta receives a compact face. No
+  equal-height face, north/east/west false extrusion, horizon or unearned cliff is authorized.
+- A hidden or otherwise undisclosed south neighbor resolves `southExposureLevels` to zero and contributes no
+  ground, palette or elevation fact. A map boundary likewise exposes zero in this contract. Asset never
+  samples the hidden neighbor to improve the face.
+- The existing native `southExposure` presentation remains active through the initial top-surface integration.
+  It may be removed only after a final authored replacement has proved equal-or-better elevation readability,
+  route/occupant function and unclipped composition in an exact old/new 368×800 physical-phone comparison.
 
 ## Frozen render request
 
@@ -207,7 +234,7 @@ The Asset proof accepts exactly one closed request per currently constructed til
 | `featureVariant` | `0...3` | frozen static detail variant |
 | `cardinalNeighbors` | N/E/S/W safe fact | exact disclosed neighbor or `unknown` |
 | `edgeContourIDs` | N/E/S/W `0...3` | canonical shared edge identity |
-| `elevation` | `0...3` | supplied for external contact-shade composition only; matches the live generator |
+| `elevation` | `0...3` | game-owned resolved centre elevation; supplied for external height/contact-shade composition and never inferred from pixels |
 | `isCrumbled` | Boolean | game-owned missing/unsafe state; static override |
 | `isCracking` | Boolean | game-owned overlay selection; never inferred from texture |
 | `visibility` | `full`, `fringe`, `remembered` | hidden has no request |
@@ -219,6 +246,14 @@ The Asset proof accepts exactly one closed request per currently constructed til
 
 No pressure numbers, passability booleans, resource/site/entity facts or prose enter Asset. Asset does not
 infer a mechanic from pixels; the game continues to own labels, Look text, hit testing and pathing.
+
+`terrain-layers-v2` remains byte/schema-stable and does not silently absorb southern-neighbor elevation. The
+separate existing lifted-height companion retains its required game-owned `southExposureLevels: 0 | 1 | 2 |
+3` fact under `lifted-terrain-adapter-1.0.0`/`terrain-lifted-1.0.0` (or an explicitly versioned successor for
+the final authored assets). Game code derives it as
+`max(0, resolvedCentreElevation - resolvedSouthElevation)` only when the southern neighbor is legitimately
+disclosed. Hidden, unknown, crumbled, forced-flat and map-boundary cases supply `0`; the value cannot exceed
+the resolved centre elevation. Asset consumes the closed delta and never receives or infers hidden geometry.
 
 ## Restrained motion contract
 
@@ -285,9 +320,13 @@ Asset must deliver reusable logical sources rather than state screenshots:
    identity, passability or adjacency;
 7. semantic palette-role masks and exact conformance to three receipt-backed `WorldGrade2V1` descriptors,
    with unchanged form/alpha hashes across recolors;
-8. manifest dimensions, pivots, palette slots, layer ownership, phase counts, command/bitmap hashes and
-   `integrationReady:false`; and
-9. no static whole-map image as a production source.
+8. final terrain-consistent south-facing wall/cliff sources for every ground/substrate family that can legally
+   own elevated terrain, including exact one-, two- and three-level faces plus continuous spans, caps and
+   corner/end joins. These are authored material pixels using the higher surface's semantic palette roles,
+   not stretched bands, generic shade, repeated stakes or procedural filler;
+9. manifest dimensions, bottom pivots/overflow, palette slots, layer ownership, phase counts,
+   command/bitmap hashes and `integrationReady:false`; and
+10. no static whole-map image as a production source.
 
 The static body must be cacheable independently of the motion overlay. A native implementation must not
 reraster terrain bodies four times per second. Motion cache identity includes terrain family, palette
@@ -314,12 +353,16 @@ Evidence must include:
 3. exact color and literal-grayscale 368×800 static phones;
 4. calm/moving/strong frame strips and an exported short lossless loop at exact phone scale;
 5. Reduce Motion/static phone beside the animated representative frame;
-6. equal-elevation material A/B proving zero wall/shade and genuine-height A/B proving only accepted contact
-   shade;
-7. hidden-neighbor mutation and remembered-remote-mutation byte-identity proofs;
-8. same receipt/tick, copied object and shuffled-key determinism;
-9. rule receipt hashes proving geometry, passability, movement, sight and content are unchanged; and
-10. a frame-difference report enforcing every per-surface pixel budget.
+6. equal-elevation material A/B proving zero wall/shade and genuine southern exposure 1/2/3 fixtures proving
+   the exact authored wall/cliff plus supplemental contact shade;
+7. an exact 368×800 physical-phone old/new comparison proving the replacement is equal-or-better for
+   elevation readability, legal route continuity, seated occupants/overlays, row occlusion and bottom-edge
+   containment before the old cue is removed;
+8. hidden-south-neighbor, map-boundary and remembered-remote mutation byte-identity proofs, with zero safe
+   exposure and no leaked height or material;
+9. same receipt/tick, copied object and shuffled-key determinism;
+10. rule receipt hashes proving geometry, passability, movement, sight and content are unchanged; and
+11. a frame-difference report enforcing every per-surface pixel budget.
 
 ## Game Design visual acceptance
 
@@ -327,7 +370,10 @@ At native phone size and without debug labels:
 
 - the map reads as connected material regions before it reads as a square grid;
 - every rules-critical ground comparison remains immediate in literal grayscale;
-- no material change creates a sidewall or false height;
+- no equal-elevation material change creates a sidewall or false height;
+- genuine southern exposures at levels 1, 2 and 3 retain an immediate wall/cliff read, with contact shade
+  visibly supplemental rather than the sole height cue;
+- no accepted placeholder or current function has been replaced by a lower-effort or lower-function version;
 - shallow/deep water and Groundcover/Growth remain distinct during every motion frame;
 - motion feels alive but does not resemble loot sparkle, damage, route guidance or a warning;
 - route, content, cracks, party and adjacent-consequence cues retain first-read ownership;
@@ -341,13 +387,18 @@ Design/Aimee review.
 
 These are scheduled only after Asset acceptance and the active Engineering primary releases:
 
-1. pin the immutable Asset pack and reproduce its normalizer/bitmap hashes;
-2. add a pure game-owned safe-neighbor/edge-contour adapter with hidden-neighbor exclusion;
-3. port static terrain layering behind a DEBUG comparison while preserving the current renderer;
-4. port transparent motion overlays and one shared pausable presentation clock;
-5. compose current-full motion, static fringe, static remembered and no hidden request;
-6. prove cache separation, redraw determinism and no gameplay-state mutation; and
-7. capture ordinary phone, Reduce Motion, grayscale and performance evidence before native promotion.
+1. pin the immutable accepted top-surface Asset pack and reproduce its normalizer/bitmap hashes;
+2. add a pure game-owned safe-neighbor/edge-contour adapter with hidden-neighbor exclusion and required
+   `southExposureLevels` closure;
+3. port static terrain layering behind a DEBUG comparison while preserving the current renderer and its
+   functioning south-facing wall/cliff presentation;
+4. integrate the final authored one-/two-/three-level wall/cliff family without changing the game-owned
+   elevation, hit, route, occupant or visibility facts;
+5. port transparent motion overlays and one shared pausable presentation clock;
+6. compose current-full motion, static fringe, static remembered and no hidden request;
+7. prove cache separation, redraw determinism and no gameplay-state mutation; and
+8. capture exact old/new 368×800 physical-phone, Reduce Motion, grayscale and performance evidence. Remove
+   the prior wall cue only after the candidate proves equal-or-better readability and function.
 
 ## Explicit exclusions
 
@@ -355,7 +406,8 @@ These are scheduled only after Asset acceptance and the active Engineering prima
   wave hazard or wind rule; the separately authorized frozen Snow/Ash cover is an orthogonal rules receipt, not
   Asset-invented weather state;
 - no animated placed flora, creature, resource, site, portal, crack, collapse or village asset;
-- no parallax, isometric lift, perspective camera, sidewall, height extrusion or screen-space shader;
+- no parallax, isometric x-offset, perspective camera, **false** sidewall, unearned height extrusion or
+  screen-space shader; the required genuine south-facing 1...3-level wall/cliff is not an exclusion;
 - no per-world novelty optimizer or forced visual difference between similar worlds;
 - no tutorial, accessibility-layout redesign, broad UI restyle or final-art claim; and
 - no native/PBX/gameplay edit inside the Asset checkpoint.

@@ -1,11 +1,11 @@
 {
   "schemaVersion": 1,
-  "aggregateSourceHash": "0f24c4937cda18ad4da38ba64881d00aded2c65bf98f43a817f62ced5c9e314c",
+  "aggregateSourceHash": "294b60aaa8fe61237d357b86d75cbe9cd8a5116f8429dc688a431790825564b6",
   "inputs": {
     "AssetLab/artifacts/writing-parchment-v1/manifest.json": "9ef9c41f8d4f4b12e5bbb725e9f1ea5e52a77a3175de758016bb58cd170c499f",
     "Bookbinder.xcodeproj/project.pbxproj": "057fa4ebcd51a41b7e1acf33506154bd4d368a727689df7a8eaf3dc1d85460c4",
     "Sources/Content/Data/items.json": "b94b1107229f217e14f1d7fa936d8eea938f9782c06c583be32302f10d432bc9",
-    "Sources/Content/Data/playability-roadmap.json": "a8184d9ed17571849363f868375eb8a03f8038f9a3a8f914e2fc10773a97a2af",
+    "Sources/Content/Data/playability-roadmap.json": "f3f76a9edb2980c711ec662921587c6fc4550107fe02aebf3ea4386ec3882138",
     "Sources/Content/Data/pressure_sources.json": "68f7b2271d51613030f2f3b3e573f750af53c9b68fe00d68a599dcd6fc0a9b86",
     "Sources/Content/Data/pressure_targets.json": "b35cf88512a7e1e2efde12f352a35e1d499376a8a9990daa41a8f285c65e6a42",
     "Sources/Content/Data/qualifiers.json": "35c0f4b00f35fdb8d1d1845ca27988b73283acc623ec3b39c95cb1b921bec120",
@@ -122,7 +122,7 @@
     "docs/creature-ecology-and-materials-overhaul-current.md": "e71a15702256af55de1c34b0269b14f2e657109c32f9dac53acdfae2ea59885f",
     "docs/creature-ecology-asset-packet-current.md": "04f3495242bf577001c10b1658ff46f8bfbefaa6e42c9220d32ec580fa3b8219",
     "docs/creature-territory-finds-current.md": "07792ad39d56392aaadc4507520015020a77171b6e6486f22aa3381903027385",
-    "docs/cross-lead-delivery-contract-current.md": "086429d5da89ee9b318e8e0aeb9145f03b34846d29db3e36f2349b7d8b2cce92",
+    "docs/cross-lead-delivery-contract-current.md": "85a45a29ff3eaed576e879f247ea9d575832a8c0105fbc65c7a71d20518c8e17",
     "docs/curio-identification-knowledge-current.md": "31acb95848598b0874e3978a9488f122b8bfee115e16867a5dca9fa1c33986f0",
     "docs/current-design-index.md": "192720ec09aa5185048edbd2ca45454559b8144bb3e39dd1a2242c5ee0a59b4c",
     "docs/cycle-system-current.md": "3a472c56d4c78299574f768de122d2ac11e7387eeae8fd723667e73f96fbd598",
@@ -244,7 +244,7 @@
     "docs/survey-needle-current.md": "ff08c6a7c51f7aaa7d40982e2af545d3c74630ce72fa968e8531983b67101d75",
     "docs/tannery-system-current.md": "a6544afbb2d77c2369b37922b443cd7d2244ce43bc358d632eeab7b30844499c",
     "docs/tavern-random-companions-current.md": "e7b86a31548089a4a122fba51a1fb1f246d14d84de948300a1873b38ae9648c2",
-    "docs/terrain-layering-and-motion-asset-packet-current.md": "b37bac3adb30ae054953517bad841ba9b6352941eab75af7ae7e7f06ed221969",
+    "docs/terrain-layering-and-motion-asset-packet-current.md": "4581f90da35f21f00ccc4e4ade556bec733605ff9e444f08a6ce40ae2b9dfd22",
     "docs/top-down-map-asset-integration-current.md": "60fbd5232a171bdbe2e7f9f162764c5efd71ac820bde4a71caa4d74a298c962a",
     "docs/trading-post-recycler-current.md": "28c216a665a3e2231f18293c630fd38a5646dd41ebaa29043ceb0c4f97196ee2",
     "docs/trading-post-recycler-economy-current.md": "297d7917d1f2f7c5ee9b8cdd0280a390761d8aa204e138fcb4328941db7e954e",
@@ -299,7 +299,7 @@
     "docs/writing-tool-progression-current.md": "be17fe07aa89aaaab7117a2faca43d7e1eb1be23202d19106c67c42547b23bb0"
   },
   "outputs": {
-    "generated/wiki-data.json": "ef1661a008d5cd8cff94a6943d1bcfbec8d82dc57cba6e92c06f4314e9d3d9b7",
-    "generated/source-registry.json": "95e98acd2d5725c4d31d2cb33995e92fd00e58cce4cb742a105552de379b262e"
+    "generated/wiki-data.json": "2a31e7b9313930a1a8f6566db5e9d574313fd8acae13562c01bbf9e3a3322a44",
+    "generated/source-registry.json": "9e9b2017a626ad683293c3b29cd41c745037321b08baac77ddd15428d5855111"
   }
 }

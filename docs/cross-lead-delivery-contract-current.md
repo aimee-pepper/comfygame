@@ -97,6 +97,11 @@ surface has the same permanence.
 - Temporary art must remain replaceable through stable semantic keys and may not become a design
   constraint merely because Engineering integrated it.
 - Final production art requires an explicit brief and visual acceptance at its actual phone scale.
+- A `placeholder`, scaffold or current coded surface can still carry required player-facing function.
+  No lead may replace one with a lower-effort or lower-function candidate merely because the candidate is
+  labelled production, final, generated or accepted elsewhere. Inventory the current function first and
+  retain it until an exact old/new comparison proves equal-or-better readability and function on the actual
+  368×800 physical phone. Green tests, stable hashes and an Asset acceptance do not waive this removal gate.
 - Asset failure may remove optional presentation, but may not erase canonical player-facing names,
   disable a legal gameplay action or make a core route unusable.
 - Current Writing Desk truth is intentionally split: Aimee owns the final sigil drawings, so generated
@@ -213,12 +218,20 @@ by affecting tile art, adjacency, minimap or layout before discovery.
 
 - A **material boundary** is two tiles at equal elevation with different ground or colour. It is
   flat and never produces a riser, wall or dark vertical band.
-- A **genuine elevation edge** is a real height difference. It may use a restrained,
-  material-matched southern riser or contour, but must still read as a top-down surface.
+- A **genuine elevation edge** is a real height difference. Its functioning south-facing wall/cliff read
+  remains in the initial native terrain integration for exact exposed deltas 1, 2 and 3; contact shade is
+  supplemental only and is not a functional replacement. The final replacement must be an authored,
+  terrain-consistent face owned by the higher terrain/substrate, with continuous spans and safe joins, while
+  the translated top still reads as a top-down surface.
 - A **fog boundary** is disclosure, not geometry. Hidden neighbours cannot contribute their ground,
-  colour or elevation to a visible tile.
+  colour or elevation to a visible tile. A hidden/unknown south neighbour supplies zero safe exposure and
+  cannot change a visible wall/cliff; equal resolved elevation likewise supplies zero and draws no wall.
 - A **map boundary** cannot clip a bottom row or fabricate a sidewall. Transparent lifted-sprite
   padding composites over the game-owned terrain/fog field.
+- Do not remove the current south-wall cue until the final one-/two-/three-level asset family proves
+  equal-or-better height readability, route/occupant function and unclipped row composition in an exact
+  old/new 368×800 physical-phone comparison. A shade-only, generic-band, stretched or otherwise
+  lower-effort/lower-function substitute fails this gate.
 - The acceptance vocabulary in `resource-sidewall-phone-acceptance-current.md` is canonical.
 
 ## Package and checkpoint rules
