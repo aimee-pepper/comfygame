@@ -6,6 +6,14 @@ enum WritingDeskSourceRules {
     }
 }
 
+enum WritingDeskInteractionCancellation {
+    enum Trigger: CaseIterable { case outsidePage, bin, handOrInk, pane, back, pageActions }
+    static func cancel(_ trigger: Trigger, ghost: inout GhostRune?, dismissalToken: inout Int) {
+        ghost = nil
+        dismissalToken &+= 1
+    }
+}
+
 enum WritingDeskLayout {
     /// Three readable palette identities across an ordinary 368pt phone. Four technically fit,
     /// but authored names such as Frostbound and Archipelago collapse into ellipses.
@@ -13,6 +21,27 @@ enum WritingDeskLayout {
 
     static func paletteColumnCount(containerWidth: CGFloat, spacing: CGFloat = 6) -> Int {
         max(1, Int((containerWidth + spacing) / (paletteChipMinimumWidth + spacing)))
+    }
+
+    struct WritePaneMetrics: Equatable {
+        var pageOuterSide: CGFloat
+        var pageInset: CGFloat
+        var cellSide: CGFloat
+        var paletteColumns: Int
+    }
+
+    static func writePaneMetrics(containerWidth: CGFloat, containerHeight: CGFloat,
+                                 displayScale: CGFloat = 2) -> WritePaneMetrics {
+        let horizontalRoom = min(344, floor(containerWidth - 24))
+        let fixedBelowPage: CGFloat = 8 + 44 + 6 + 44 + 6 + 58
+        let heightRoom = max(128, floor(containerHeight - fixedBelowPage))
+        let proposed = min(horizontalRoom, heightRoom)
+        let scale = max(1, displayScale)
+        let cell = max(18, floor((proposed * 162 / 172 / 6) * scale) / scale)
+        let page = proposed
+        let inset = (page - cell * 6) / 2
+        return .init(pageOuterSide: page, pageInset: inset, cellSide: cell,
+                     paletteColumns: containerWidth >= 344 ? 3 : 2)
     }
 }
 
@@ -34,6 +63,7 @@ private enum WritingDeskSheet: String, Identifiable {
 struct WritingDeskView: View {
     @EnvironmentObject private var store: GameStore
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.displayScale) private var displayScale
     /// The rune picked from the palette and now hovering over the page, waiting to be dragged into
     /// place. Owned here so choosing from the scrolling list and placing on the fixed page are the
     /// same act.
@@ -44,6 +74,7 @@ struct WritingDeskView: View {
     @State private var tutorialLesson: TutorialLessonID?
     @State private var pageInteractionDismissalToken = 0
     @State private var isConfirmingClear = false
+    @State private var showsPageActions = false
     @State private var pagesSection: PagesSection = .collected
     @State private var isNamingTemplate = false
     @State private var templateName = ""
@@ -55,6 +86,9 @@ struct WritingDeskView: View {
     @State private var presentedSheet: WritingDeskSheet?
     @State private var selectedPersonalCompoundID: PersonalCompoundID?
     @State private var personalCompoundMessage: String?
+    @State private var writingAssetsReady = false
+    @State private var productionPack: WritingDeskProductionPack?
+    @State private var writingPackUnavailable = false
 
     @State private var bin: Bin = .compounds
 
@@ -133,7 +167,7 @@ struct WritingDeskView: View {
             titleVisibility: .visible
         ) {
             Button(clearPageActionLabel, role: .destructive) {
-                dismissPageInteraction()
+                cancelPageInteraction(.pageActions)
                 store.clearPage()
                 ghost = nil
             }
@@ -172,8 +206,9 @@ struct WritingDeskView: View {
         .onAppear {
             store.reconcileStarterWorldPageBundle()
             presentWritingRequestIfNeeded()
+            openWritingProductionPack()
         }
-        .onDisappear { dismissPageInteraction() }
+        .onDisappear { cancelPageInteraction(.back) }
         .onChange(of: ghost?.glyph) { _, glyph in
             guard glyph != nil else { return }
             present(.writingPageSpace)
@@ -182,7 +217,7 @@ struct WritingDeskView: View {
             if count > 0 { store.completeTutorial(.writingPageSpace, fact: "mark_placed") }
         }
         .onChange(of: pane) { _, pane in
-            dismissPageInteraction()
+            cancelPageInteraction(.pane)
             selectedWorldPageID = WritingDeskSourceRules.selectedPage(
                 afterEnteringWrite: pane == .write, current: selectedWorldPageID)
             guard pane == .world else { return }
@@ -190,12 +225,13 @@ struct WritingDeskView: View {
             store.completeTutorial(.writingPreview, fact: "world_pane_opened")
             store.openedComparisonPreview()
         }
-        .onChange(of: bin) { _, _ in dismissPageInteraction() }
+        .onChange(of: bin) { _, _ in cancelPageInteraction(.bin) }
+        .onChange(of: state.base.bestHand) { _, _ in cancelPageInteraction(.handOrInk) }
     }
 
     private var writingHeader: some View {
         HStack(spacing: 8) {
-            Button { dismiss() } label: {
+            Button { cancelPageInteraction(.back); dismiss() } label: {
                 Image(systemName: "chevron.left")
                     .font(.system(size: 13, weight: .bold))
                     .frame(width: 32, height: 44)
@@ -207,13 +243,18 @@ struct WritingDeskView: View {
                 .font(.custom("Jersey 10", size: 21))
                 .accessibilityAddTraits(.isHeader)
             Spacer(minLength: 8)
-            Text(state.base.hasCapability("inkMixing") ? "Brush · Ink" : "Brush · Ash")
-                .font(.custom("Tiny5", size: 8))
-                .foregroundStyle(PixelUITheme.muted)
-                .padding(.horizontal, 8)
-                .frame(height: 28)
-                .background(PixelUITheme.surfaceInset)
-                .overlay(Rectangle().stroke(PixelUITheme.edge, lineWidth: 1))
+            if pane == .write {
+                Button {
+                    cancelPageInteraction(.pageActions)
+                    showsPageActions = true
+                } label: {
+                    Image(systemName: "ellipsis")
+                        .frame(width: 44, height: 44)
+                }
+                .buttonStyle(.plain)
+                .disabled(!writingAssetsReady)
+                .accessibilityLabel("Page actions")
+            }
         }
         .foregroundStyle(PixelUITheme.text)
         .padding(.horizontal, 8)
@@ -225,6 +266,26 @@ struct WritingDeskView: View {
         .overlay(alignment: .bottom) {
             Rectangle().fill(PixelUITheme.edge).frame(height: 2)
         }
+        .overlay(alignment: .topTrailing) {
+            if showsPageActions, let productionPack {
+                WritingDeskPageActionsPopover(
+                    pack: productionPack,
+                    canAct: writingAssetsReady && !state.base.page.runes.isEmpty,
+                    clearLabel: clearPageActionLabel,
+                    save: {
+                        showsPageActions = false
+                        templateName = ""
+                        isNamingTemplate = true
+                    },
+                    clear: {
+                        showsPageActions = false
+                        isConfirmingClear = true
+                    }, assetFailure: writingPackFailed)
+                    .offset(x: -8, y: 44)
+                    .zIndex(100)
+            }
+        }
+        .zIndex(showsPageActions ? 100 : 1)
     }
 
     private var clearPageActionLabel: String {
@@ -257,31 +318,25 @@ struct WritingDeskView: View {
     /// squeezed by the scroll view underneath it.
     private var writePane: some View {
         GeometryReader { proxy in
-            let available = proxy.size.width - 24
-            let byWidth = available / CGFloat(state.base.page.width)
-            let byHeight = (proxy.size.height * 0.46) / CGFloat(state.base.page.height)
-            let side = floor(min(byWidth, byHeight))
+            let metrics = WritingDeskLayout.writePaneMetrics(
+                containerWidth: proxy.size.width, containerHeight: proxy.size.height,
+                displayScale: displayScale)
 
             VStack(spacing: 6) {
-                ZStack(alignment: .topTrailing) {
-                    PageGridView(ghost: $ghost, side: side,
-                                 dismissalToken: pageInteractionDismissalToken)
-                        .padding(10)
-                        .background(PixelUITheme.surface)
-                        .overlay(Rectangle().inset(by: 7).stroke(PixelUITheme.edge.opacity(0.45), lineWidth: 1))
-                        .overlay(Rectangle().stroke(PixelUITheme.edgeDark, lineWidth: 3))
-                        .background {
-                            Rectangle().fill(PixelUITheme.shadow).offset(x: 6, y: 6)
-                        }
-                    writingContextTools
-                        .padding(8)
-                }
+                PageGridView(ghost: $ghost, assetsReady: $writingAssetsReady,
+                             productionPack: productionPack,
+                             assetFailure: writingPackFailed,
+                             side: metrics.cellSide, pageInset: metrics.pageInset,
+                             dismissalToken: pageInteractionDismissalToken)
+                    .frame(width: metrics.pageOuterSide, height: metrics.pageOuterSide)
+                    .background { Rectangle().fill(PixelUITheme.shadow).offset(x: 4, y: 4) }
                 inkWellBar
                 binTabs
-                    .simultaneousGesture(TapGesture().onEnded { dismissPageInteraction() })
-                ScrollView { binContents.padding(.bottom, 8) }
+                ScrollView { binContents(columns: metrics.paletteColumns).padding(.bottom, 8) }
                     .contentShape(Rectangle())
-                    .simultaneousGesture(TapGesture().onEnded { dismissPageInteraction() })
+                    .background(Color.clear.contentShape(Rectangle()).onTapGesture {
+                        cancelPageInteraction(.outsidePage)
+                    })
             }
             .padding(.horizontal, 12)
             .padding(.vertical, 10)
@@ -289,70 +344,53 @@ struct WritingDeskView: View {
         }
     }
 
-    private var writingContextTools: some View {
-        HStack(spacing: 4) {
-            Button {
-                templateName = ""
-                isNamingTemplate = true
-            } label: {
-                Text("Save Template")
-                    .padding(.horizontal, 6)
-                    .frame(minHeight: 44)
-                    .background(PixelUITheme.surfaceInset)
-                    .overlay(Rectangle().stroke(PixelUITheme.edge, lineWidth: 1))
-            }
-            .disabled(state.base.page.runes.isEmpty)
-            .accessibilityLabel("Save Template")
-
-            Button {
-                isConfirmingClear = true
-            } label: {
-                Text(clearPageActionLabel)
-                    .padding(.horizontal, 6)
-                    .frame(minHeight: 44)
-                    .background(PixelUITheme.surfaceInset)
-                    .overlay(Rectangle().stroke(PixelUITheme.edge, lineWidth: 1))
-            }
-            .disabled(state.base.page.runes.isEmpty)
-            .foregroundStyle(state.base.page.runes.isEmpty ? PixelUITheme.muted : PixelUITheme.danger)
-        }
-        .font(.custom("Tiny5", size: 8))
-        .buttonStyle(.plain)
+    private func cancelPageInteraction(_ trigger: WritingDeskInteractionCancellation.Trigger) {
+        WritingDeskInteractionCancellation.cancel(trigger,
+            ghost: &ghost, dismissalToken: &pageInteractionDismissalToken)
+        showsPageActions = false
     }
 
-    private func dismissPageInteraction() {
-        pageInteractionDismissalToken &+= 1
+    private func openWritingProductionPack() {
+        guard productionPack == nil, !writingPackUnavailable else { return }
+        do {
+            let pack = try WritingDeskProductionPack.bundled()
+            try pack.open()
+            productionPack = pack
+            // Manifest validity is not presentation readiness. PageGrid promotes readiness only
+            // after its currently interactive blank/mark/link surface has loaded successfully.
+            writingAssetsReady = false
+        } catch { writingPackFailed() }
+    }
+
+    private func writingPackFailed() {
+        productionPack = nil
+        writingAssetsReady = false
+        writingPackUnavailable = true
+        cancelPageInteraction(.outsidePage)
     }
 
     private var inkWellBar: some View {
         let unlocked = state.base.hasCapability("inkMixing")
         let mixedCount = state.base.page.runes.filter { $0.inkRecipe != nil }.count
-        return Button {
-            if unlocked { presentedSheet = .inkWell }
-        } label: {
-            HStack(spacing: 8) {
-                Image(systemName: unlocked ? "eyedropper.halffull" : "pencil.and.scribble")
-                VStack(alignment: .leading, spacing: 1) {
-                    Text(unlocked ? "Ink well" : "Ash ink")
-                        .font(.caption.weight(.semibold))
-                    Text(unlocked
-                         ? (mixedCount == 0 ? "Color left open" : "\(mixedCount) mixed focus\(mixedCount == 1 ? "" : "es")")
-                         : "Color left open · Ink Mixing not learned")
-                        .font(.caption2)
-                        .foregroundStyle(.secondary)
-                }
-                Spacer()
-                if unlocked { Image(systemName: "chevron.up.chevron.down").font(.caption2) }
+        return Group {
+            if let productionPack {
+                WritingDeskPackToolStrip(
+                    pack: productionPack, hand: state.base.bestHand,
+                    title: state.base.bestHand.displayName,
+                    subtitle: "Ash ink · color open", isEnabled: unlocked,
+                    action: {
+                        cancelPageInteraction(.handOrInk)
+                        presentedSheet = .inkWell
+                    }, failed: writingPackFailed)
+            } else {
+                Text("Writing assets unavailable").font(.caption2)
+                    .frame(maxWidth: .infinity, alignment: .leading)
             }
-            .frame(maxWidth: .infinity)
-            .padding(.horizontal, 10)
-            .frame(height: 38)
-            .foregroundStyle(PixelUITheme.text)
-            .background(PixelUITheme.surfaceInset)
-            .overlay(Rectangle().stroke(PixelUITheme.edge, lineWidth: 2))
         }
-        .buttonStyle(.plain)
-        .disabled(!unlocked)
+        .frame(maxWidth: .infinity).frame(height: 44)
+        .foregroundStyle(PixelUITheme.text)
+        .background(PixelUITheme.surfaceInset)
+        .overlay(Rectangle().stroke(PixelUITheme.edge, lineWidth: 2))
         .accessibilityLabel(unlocked ? "Ink well, \(mixedCount) mixed focuses"
                                     : "Ash ink, color left open, Ink Mixing not learned")
     }
@@ -364,7 +402,7 @@ struct WritingDeskView: View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: 3) {
                 ForEach(Bin.all) { entry in
-                    Button { bin = entry } label: {
+                    Button { cancelPageInteraction(.bin); bin = entry } label: {
                         VStack(spacing: 2) {
                             Image(systemName: entry.icon).font(.footnote)
                             Text(entry.shortName)
@@ -382,14 +420,14 @@ struct WritingDeskView: View {
             }
             .padding(.horizontal, 4)
         }
-        .frame(height: 50)
+        .frame(height: 44)
         .background(PixelUITheme.surfaceInset)
         .overlay(Rectangle().stroke(PixelUITheme.edge, lineWidth: 2))
     }
 
     /// What's in the open bin.
     @ViewBuilder
-    private var binContents: some View {
+    private func binContents(columns: Int) -> some View {
         switch bin {
         case .target(let id):
             let target = ContentCatalog.shared.pressureTarget(id)
@@ -398,7 +436,7 @@ struct WritingDeskView: View {
             // strings said *target* in one place and *subject* in another
             // (`jargon-audit.md`). Settled: **subject**, so the page reads as a sentence.
             sectionLabel("Subject")
-            chips([Chip(glyph: id.rawValue, name: target?.name ?? id.rawValue, content: .target(id))])
+            chips([Chip(glyph: id.rawValue, name: target?.name ?? id.rawValue, content: .target(id))], columns: columns)
             // Only what can be *bound* here. Filtering on "affects this target at all" put rain
             // under Illumination because rain dims light — true, and not something you'd ever write.
             // **Only what you've learned.** Hidden rather than shown-and-locked, matching how the
@@ -416,12 +454,12 @@ struct WritingDeskView: View {
                 chips(sources.map {
                     Chip(glyph: $0.id.rawValue, name: $0.name, content: .source($0.id),
                          stability: store.stabilityOfWriting($0.id, on: id))
-                })
+                }, columns: columns)
             }
             let narrow = PageRules.writableQualifiers(for: id).filter { !$0.isGeneric }
             if !narrow.isEmpty {
                 sectionLabel("Modifiers, only here")
-                chips(narrow.map { Chip(glyph: $0.id.rawValue, name: $0.name, content: .qualifier($0.id)) })
+                chips(narrow.map { Chip(glyph: $0.id.rawValue, name: $0.name, content: .qualifier($0.id)) }, columns: columns)
             }
 
         case .modifiers:
@@ -432,14 +470,14 @@ struct WritingDeskView: View {
                 let rungs = PageRules.writableQualifiers().filter { $0.ladder == ladder && $0.isGeneric }
                 if !rungs.isEmpty {
                     sectionLabel(ladder.displayName)
-                    chips(rungs.map { Chip(glyph: $0.id.rawValue, name: $0.name, content: .qualifier($0.id)) })
+                    chips(rungs.map { Chip(glyph: $0.id.rawValue, name: $0.name, content: .qualifier($0.id)) }, columns: columns)
                 }
             }
 
         case .compounds:
             if !state.base.personalCompounds.isEmpty {
                 sectionLabel("My Runebook")
-                personalCompoundPalette
+                personalCompoundPalette(columns: columns)
                 if let record = selectedPersonalCompound {
                     personalCompoundDetail(record)
                 }
@@ -453,7 +491,7 @@ struct WritingDeskView: View {
                     Chip(glyph: $0.id.rawValue, name: $0.name, content: .compound($0.id),
                          blockedBy: store.blockingPrimary(for: $0.id)?.name,
                          stability: BookRules.stabilityDelta(ofSymbolAlone: $0.id))
-                })
+                }, columns: columns)
             }
         }
     }
@@ -462,8 +500,8 @@ struct WritingDeskView: View {
         state.base.personalCompounds.first { $0.id == selectedPersonalCompoundID }
     }
 
-    private var personalCompoundPalette: some View {
-        LazyVGrid(columns: chipColumns, spacing: 6) {
+    private func personalCompoundPalette(columns: Int) -> some View {
+        LazyVGrid(columns: chipColumns(columns), spacing: 8) {
             ForEach(state.base.personalCompounds.sorted(by: {
                 $0.creationOrdinal < $1.creationOrdinal
             })) { record in
@@ -526,7 +564,7 @@ struct WritingDeskView: View {
         }
         store.mutate("place personal compound") { $0.base.page = updated }
         personalCompoundMessage = nil
-        dismissPageInteraction()
+        cancelPageInteraction(.outsidePage)
     }
 
     private func sectionLabel(_ text: String) -> some View {
@@ -701,60 +739,84 @@ struct WritingDeskView: View {
         var id: String { glyph }
     }
 
-    private func chips(_ items: [Chip]) -> some View {
+    private func chips(_ items: [Chip], columns: Int) -> some View {
         // Small tiles, four or five to a row. These were list rows with two lines of prose each,
         // which meant six sigils filled the screen — for a vocabulary of forty-one sources that is
         // a scrolling chore rather than a palette. Still a 44pt-plus target.
-        LazyVGrid(columns: chipColumns, spacing: 6) {
+        LazyVGrid(columns: chipColumns(columns), spacing: 8) {
             ForEach(items) { item in
                 let fits = item.blockedBy == nil && store.canWrite(item.content)
-                Button {
-                    ghost = GhostRune(glyph: item.glyph, content: item.content,
-                                      origin: firstFreeOrigin(for: item.content))
-                } label: {
-                    VStack(spacing: 1) {
-                        RuneGlyph(id: item.glyph)
-                            .frame(width: 22, height: 22)
-                        Text(item.name)
-                            .font(.caption.weight(.medium))
-                            .lineLimit(1)
-                        // Two bare numbers: what it costs in space, and what it does to the meter.
-                        // The words were repeated forty times down the screen to say what the
-                        // numbers already say.
-                        if let blocked = item.blockedBy, !blocked.isEmpty {
-                            Text("taken")
-                                .font(.caption2)
-                                .foregroundStyle(.secondary)
-                        } else {
-                            HStack(spacing: 4) {
-                                Text("\(store.footprint(item.content))")
-                                    .foregroundStyle(.secondary)
-                                if let stability = item.stability, stability != 0 {
-                                    Text(stability > 0 ? "+\(stability)" : "\(stability)")
-                                        .foregroundStyle(stability > 0 ? Color.green : Color.orange)
-                                }
-                            }
-                            .font(.caption2.monospacedDigit())
-                        }
+                Group {
+                    if let productionPack {
+                        WritingDeskPackVocabularyTile(
+                            pack: productionPack, kind: packKind(item.content), id: item.glyph,
+                            hand: state.base.bestHand,
+                            state: !fits ? "unavailable" : (ghost?.glyph == item.glyph ? "selected" : "known"),
+                            title: item.name,
+                            detail: item.blockedBy != nil ? "taken" : paletteDetail(item),
+                            isEnabled: fits && writingAssetsReady,
+                            action: { selectPaletteItem(item, pack: productionPack) },
+                            failed: writingPackFailed)
+                    } else {
+                        Text("Writing assets unavailable").font(.caption2)
                     }
-                    .frame(maxWidth: .infinity)
-                    .frame(minHeight: 58)
-                    .contentShape(Rectangle())
                 }
-                .buttonStyle(.plain)
                 .foregroundStyle(PixelUITheme.text)
-                .background(ghost?.glyph == item.glyph
-                            ? PixelUITheme.primaryHighlight.opacity(0.72)
-                            : PixelUITheme.surface)
-                .overlay(Rectangle().stroke(PixelUITheme.edge, lineWidth: 1))
                 .opacity(fits ? 1 : 0.4)
-                .disabled(!fits)
             }
+        }
+        .frame(width: CGFloat(columns) * WritingDeskLayout.paletteChipMinimumWidth
+                     + CGFloat(max(0, columns - 1)) * 8)
+        .frame(maxWidth: .infinity)
+    }
+
+    private func selectPaletteItem(_ item: Chip, pack: WritingDeskProductionPack) {
+        let candidate = GhostRune(glyph: item.glyph, content: item.content,
+                                  origin: firstFreeOrigin(for: item.content))
+        guard let shape = PageRules.shape(for: item.content, hand: state.base.bestHand) else { return }
+        let visualKind: WritingDeskVisibleMark.AuthoredKind = switch item.content {
+        case .target: .target
+        case .source, .rune: .source
+        case .qualifier: .qualifier
+        case .compound: .compound
+        }
+        let visible = WritingDeskVisibleMark(
+            rendererAssetKey: item.glyph,
+            visualRoute: .authored(visualKind), id: .init(rawValue: 0), hand: state.base.bestHand,
+            origin: candidate.origin, shapeID: shape.id,
+            cells: shape.offsets.map { .init(column: candidate.origin.column + $0.column,
+                                             row: candidate.origin.row + $0.row) },
+            inkRecipe: nil, displayName: "", accessibilityName: "", isReadable: true)
+        do {
+            guard case let .authored(key) = try pack.route(for: visible) else { return }
+            let roles = try pack.markAssets(for: key)
+            _ = try pack.assetData(sha256: roles.rgba.sha256)
+            for state in ["legal", "illegal"] {
+                let overlay = try pack.overlayAsset(shapeID: shape.id, state: state)
+                _ = try pack.assetData(sha256: overlay.sha256)
+            }
+            cancelPageInteraction(.outsidePage)
+            ghost = candidate
+        } catch { writingPackFailed() }
+    }
+
+    private func chipColumns(_ count: Int) -> [GridItem] {
+        Array(repeating: GridItem(.fixed(WritingDeskLayout.paletteChipMinimumWidth), spacing: 8), count: count)
+    }
+
+    private func packKind(_ content: MarkContent) -> String {
+        switch content {
+        case .target: "target"
+        case .source, .rune: "source"
+        case .qualifier: "qualifier"
+        case .compound: "compound"
         }
     }
 
-    private var chipColumns: [GridItem] {
-        [GridItem(.adaptive(minimum: WritingDeskLayout.paletteChipMinimumWidth), spacing: 6)]
+    private func paletteDetail(_ item: Chip) -> String {
+        let footprint = "\(store.footprint(item.content))"
+        guard let stability = item.stability, stability != 0 else { return footprint }
+        return "\(footprint) · \(stability > 0 ? "+" : "")\(stability)"
     }
 
     private func firstFreeOrigin(for content: MarkContent) -> PageCell {
@@ -903,7 +965,7 @@ struct WritingDeskView: View {
         let result = store.loadPageTemplate(id)
         reportTemplateResult(result)
         guard result.succeeded else { return }
-        dismissPageInteraction()
+        cancelPageInteraction(.pane)
         ghost = nil
         selectedWorldPageID = nil
         pane = .write
@@ -1454,6 +1516,158 @@ struct StabilityTag: View {
         case (-20)...(-1): .orange
         default: .red
         }
+    }
+}
+
+/// Pack-owned two-row chrome with native text/actions. It is loaded only when Write's trailing
+/// page-actions button opens; no production-pack I/O occurs during app launch.
+private struct WritingDeskPageActionsPopover: View {
+    let pack: WritingDeskProductionPack
+    let canAct: Bool
+    let clearLabel: String
+    let save: () -> Void
+    let clear: () -> Void
+    let assetFailure: () -> Void
+    @State private var bodyImage: UIImage?
+    @State private var pointerImage: UIImage?
+    @State private var failed = false
+
+    var body: some View {
+        ZStack(alignment: .topTrailing) {
+            if let bodyImage {
+                Image(uiImage: bodyImage)
+                    .interpolation(.none)
+                    .resizable(capInsets: EdgeInsets(top: 4, leading: 4, bottom: 4, trailing: 4))
+                    .frame(width: 164, height: 96)
+            }
+            if bodyImage != nil, pointerImage != nil {
+                VStack(spacing: 0) {
+                    Button("Save Template", action: save)
+                        .disabled(!canAct)
+                        .frame(width: 164, height: 44)
+                    Button(clearLabel, action: clear)
+                        .disabled(!canAct)
+                        .foregroundStyle(PixelUITheme.danger)
+                        .frame(width: 164, height: 44)
+                }
+                .padding(.top, 4)
+            } else if failed {
+                Text("Writing assets unavailable")
+                    .font(.caption2)
+                    .frame(width: 164, height: 96)
+                    .background(PixelUITheme.surface)
+            } else {
+                ProgressView().frame(width: 164, height: 96)
+            }
+            if let pointerImage {
+                Image(uiImage: pointerImage)
+                    .interpolation(.none)
+                    .resizable()
+                    .frame(width: 10, height: 6)
+                    .offset(x: -14, y: -6)
+            }
+        }
+        .frame(width: 164, height: 96)
+        .buttonStyle(.plain)
+        .task { loadPackChrome() }
+    }
+
+    private func loadPackChrome() {
+        guard bodyImage == nil else { return }
+        do {
+            let body = try pack.popoverBody(rows: 2).asset
+            let pointer = try pack.popoverPointer(variant: "aboveRight")
+            bodyImage = UIImage(data: try pack.assetData(sha256: body.sha256))
+            pointerImage = UIImage(data: try pack.assetData(sha256: pointer.sha256))
+        } catch {
+            bodyImage = nil
+            pointerImage = nil
+            failed = true
+            assetFailure()
+        }
+    }
+}
+
+private struct WritingDeskPackToolStrip: View {
+    let pack: WritingDeskProductionPack
+    let hand: Hand
+    let title: String
+    let subtitle: String
+    let isEnabled: Bool
+    let action: () -> Void
+    let failed: () -> Void
+    @State private var image: UIImage?
+    @State private var reserve: WritingDeskProductionPack.Rect?
+
+    var body: some View {
+        Button(action: action) {
+            ZStack(alignment: .topLeading) {
+                if let image { Image(uiImage: image).interpolation(.none).resizable() }
+                if let reserve {
+                    VStack(alignment: .leading, spacing: 0) {
+                        Text(title).font(.custom("Tiny5", size: 11)).lineLimit(1)
+                        Text(subtitle).font(.custom("Tiny5", size: 9)).lineLimit(1)
+                    }
+                    .frame(width: CGFloat(reserve.width) * 2, height: CGFloat(reserve.height) * 2,
+                           alignment: .leading)
+                    .offset(x: CGFloat(reserve.x) * 2, y: CGFloat(reserve.y) * 2)
+                }
+            }
+        }
+        .buttonStyle(.plain)
+        .disabled(image == nil || !isEnabled)
+        .frame(height: 44)
+        .task(id: hand) { load() }
+    }
+
+    private func load() {
+        do {
+            let spec = try pack.toolStripSpec(hand: hand, usesMixedInk: false)
+            guard let loaded = UIImage(data: try pack.assetData(sha256: spec.assets.rgba.sha256))
+            else { throw WritingDeskProductionPack.PackError.corruptAsset(spec.assets.rgba.sha256) }
+            image = loaded
+            reserve = spec.runtimeTextReserve
+        } catch { image = nil; reserve = nil; failed() }
+    }
+}
+
+private struct WritingDeskPackVocabularyTile: View {
+    let pack: WritingDeskProductionPack
+    let kind: String
+    let id: String
+    let hand: Hand
+    let state: String
+    let title: String
+    let detail: String
+    let isEnabled: Bool
+    let action: () -> Void
+    let failed: () -> Void
+    @State private var image: UIImage?
+
+    var body: some View {
+        Button(action: action) {
+            ZStack(alignment: .bottomLeading) {
+                if let image { Image(uiImage: image).interpolation(.none).resizable() }
+                VStack(alignment: .leading, spacing: 1) {
+                    Text(title).font(.custom("Tiny5", size: 11)).lineLimit(1)
+                    Text(detail).font(.custom("Tiny5", size: 9)).lineLimit(1)
+                }
+                .padding(.horizontal, 6).padding(.bottom, 4)
+            }
+        }
+        .buttonStyle(.plain)
+        .disabled(image == nil || !isEnabled)
+        .frame(height: 58)
+        .task(id: "\(kind)-\(id)-\(hand)-\(state)") { load() }
+    }
+
+    private func load() {
+        do {
+            let asset = try pack.vocabularyAsset(kind: kind, id: id, hand: hand, state: state)
+            guard let loaded = UIImage(data: try pack.assetData(sha256: asset.sha256))
+            else { throw WritingDeskProductionPack.PackError.corruptAsset(asset.sha256) }
+            image = loaded
+        } catch { image = nil; failed() }
     }
 }
 

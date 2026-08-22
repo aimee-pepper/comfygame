@@ -17,12 +17,16 @@ struct PageGridView: View {
     @EnvironmentObject private var store: GameStore
     /// The rune chosen but not yet written, and where its origin currently sits.
     @Binding var ghost: GhostRune?
+    @Binding var assetsReady: Bool
+    let productionPack: WritingDeskProductionPack?
+    let assetFailure: () -> Void
     /// Cell size, computed by the pane that owns the layout.
     ///
     /// Passed in rather than derived here on purpose: the page shares a screen with a scroll view,
     /// and a scroll view is greedy — left to negotiate, it squeezed the grid to two-thirds of the
     /// width available and the page came out small and off-centre.
     let side: CGFloat
+    let pageInset: CGFloat
     /// Incremented by the owning screen whenever an off-page interaction or navigation transition
     /// occurs. It is a signal, not persisted state, so the same tap can continue to its ordinary
     /// destination after dismissing the modal page tool.
@@ -48,6 +52,8 @@ struct PageGridView: View {
     private var dragging: InstanceID? { drag?.id }
     /// Connecting or disconnecting. Entered from a sigil's menu, left by tapping bare page.
     @State private var interaction = PageInteractionSession()
+    @State private var blankPageImage: UIImage?
+    @State private var actionChromeReady = false
     /// The sigil the mode is anchored on — what the next tap joins to or unjoins from.
     /// The mark you're holding, whose actions are showing in the footer.
     ///
@@ -73,58 +79,142 @@ struct PageGridView: View {
 
 
     private var page: Page { store.state.base.page }
+    private var visibleMarksByID: [InstanceID: WritingDeskVisibleMark] {
+        Dictionary(uniqueKeysWithValues: (store.writingDeskReviewModel()?.visibleMarks ?? []).map { ($0.id, $0) })
+    }
     private var pageSize: CGSize {
         CGSize(width: side * CGFloat(page.width), height: side * CGFloat(page.height))
     }
+    private var outerPageSize: CGSize {
+        CGSize(width: pageSize.width + pageInset * 2, height: pageSize.height + pageInset * 2)
+    }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 6) {
+        ZStack(alignment: .topLeading) {
+            if let blankPageImage {
+                Image(uiImage: blankPageImage)
+                    .interpolation(.none)
+                    .resizable()
+                    .frame(width: outerPageSize.width, height: outerPageSize.height)
+            }
             ZStack(alignment: .topLeading) {
-                gridBackground
-                // **Each joined group gets its own coloured outline** (session 14 §2). Drawn under
-                // the marks so the border reads as around the whole piece. Without this a page's
-                // meaning lives in an invisible adjacency graph: two clusters touching look exactly
-                // like one cluster, and there is no way to tell what you've actually written.
-                ForEach(page.runes) { mark in
-                    markView(mark, side: side, pageSize: pageSize)
-                }
-                // **Each joined group gets its own coloured outline** (session 14 §2). Drawn over
-                // the marks rather than under them — underneath, their own borders hid almost all
-                // of it, which defeats the point. Never hit-testable, so it costs no touches.
-                ForEach(Array(PageRules.clusters(on: page).enumerated()), id: \.offset) { _, group in
-                    if group.count > 1 {
-                        clusterOutline(group, side: side)
-                            .offset(x: dragOffset(for: group[0]).width,
-                                    y: dragOffset(for: group[0]).height)
+                gridBackground.opacity(0.001)
+                if let productionPack {
+                    ForEach(Array(page.links).sorted {
+                        ($0.a.rawValue, $0.b.rawValue) < ($1.a.rawValue, $1.b.rawValue)
+                    }, id: \.self) { link in
+                        if let first = visibleMarksByID[link.a], let second = visibleMarksByID[link.b] {
+                            WritingDeskPackLinkArtwork(pack: productionPack, first: first, second: second,
+                                                       cellSide: side, failed: markPackUnavailable)
+                        }
                     }
                 }
+                ForEach(page.runes) { mark in markView(mark, side: side, pageSize: pageSize) }
                 if let ghost { ghostView(ghost, side: side) }
+                if let held, let mark = page.runes.first(where: { $0.id == held }),
+                   let productionPack {
+                    rootActionPopover(for: mark, pack: productionPack).zIndex(100)
+                }
+                if let message = containedStatusMessage {
+                    Text(message)
+                        .font(.caption2.weight(.medium))
+                        .foregroundStyle(footerTint)
+                        .lineLimit(2)
+                        .padding(.horizontal, 8)
+                        .frame(maxWidth: pageSize.width - 12, minHeight: 28, maxHeight: 36)
+                        .background(.ultraThinMaterial)
+                        .overlay(Rectangle().stroke(footerTint.opacity(0.65), lineWidth: 1))
+                        .frame(maxWidth: pageSize.width, maxHeight: pageSize.height, alignment: .bottom)
+                        .padding(.bottom, 6)
+                        .allowsHitTesting(false)
+                        .zIndex(20)
+                }
             }
-            .frame(width: pageSize.width, height: pageSize.height, alignment: .topLeading)
-            // Only speaks when there's something to say — an always-present instruction strip is a
-            // permanent tax on the page for a sentence you read once.
-            // Always present, even when it says nothing. Making it conditional saved a strip of
-            // space and cost the page a stable size — the card grew and shrank as you placed and
-            // moved sigils, which is intolerable on the one surface you're trying to arrange things
-            // on.
-            footer.foregroundStyle(held == nil ? footerTint : Color.primary)
-                // **Pinned to the page's own width.** The footer's text and buttons are wider than
-                // the grid, and a leading-aligned VStack takes the width of its widest child — so
-                // the card grew sideways and shifted the whole page across the moment a ghost
-                // appeared or a mode started. The one surface you arrange things on has to hold
-                // still.
-                .frame(width: pageSize.width, alignment: .leading)
+            .frame(width: pageSize.width, height: pageSize.height)
+            .offset(x: pageInset, y: pageInset)
+            if !assetsReady {
+                Text("Writing assets unavailable")
+                    .font(.caption.weight(.semibold))
+                    .padding(10)
+                    .background(.ultraThinMaterial)
+                    .frame(width: outerPageSize.width, height: outerPageSize.height)
+            }
         }
-        .frame(width: pageSize.width, alignment: .leading)
-        .padding(8)
-        .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 12))
+        .frame(width: outerPageSize.width, height: outerPageSize.height, alignment: .topLeading)
+        .allowsHitTesting(assetsReady)
         .onChange(of: dismissalToken) { _, _ in interaction.cancel() }
         .onChange(of: pageInteractionIdentity) { _, _ in interaction.cancel() }
         .onDisappear { interaction.cancel() }
+        .task(id: pageInteractionIdentity) {
+            guard let productionPack else { return }
+            assetsReady = false
+            do {
+                let blank = try productionPack.blankPageSpec().asset
+                guard let image = UIImage(data: try productionPack.assetData(sha256: blank.sha256))
+                else { throw WritingDeskProductionPack.PackError.corruptAsset(blank.sha256) }
+                for mark in visibleMarksByID.values where mark.visualRoute != .personalCompoundCompatibility {
+                    guard case let .authored(key) = try productionPack.route(for: mark) else { continue }
+                    let roles = try productionPack.markAssets(for: key)
+                    guard UIImage(data: try productionPack.assetData(sha256: roles.rgba.sha256)) != nil
+                    else { throw WritingDeskProductionPack.PackError.corruptAsset(roles.rgba.sha256) }
+                }
+                for link in page.links {
+                    guard let first = visibleMarksByID[link.a], let second = visibleMarksByID[link.b]
+                    else { continue }
+                    let placement = try productionPack.link(between: first, and: second)
+                    guard UIImage(data: try productionPack.assetData(sha256: placement.asset.sha256)) != nil
+                    else { throw WritingDeskProductionPack.PackError.corruptAsset(placement.asset.sha256) }
+                }
+                blankPageImage = image
+                assetsReady = true
+            } catch {
+                blankPageImage = nil
+                assetsReady = false
+                ghost = nil
+                interaction.cancel()
+                assetFailure()
+            }
+        }
     }
 
     private var pageInteractionIdentity: PageInteractionIdentity {
         PageInteractionIdentity(width: page.width, height: page.height, runeIDs: page.runes.map(\.id))
+    }
+
+    @ViewBuilder
+    private func rootActionPopover(for mark: PlacedRune,
+                                   pack: WritingDeskProductionPack) -> some View {
+        let rows = 1 + (page.links.contains(where: { $0.involves(mark.id) }) ? 1 : 0)
+            + (PageRules.rotate(cluster: mark.id, on: page) != nil ? 1 : 0)
+        let height = CGFloat(rows * 44 + 8)
+        let anchorX = CGFloat(mark.origin.column) * side
+        let anchorY = CGFloat(mark.origin.row) * side
+        let markWidth = CGFloat(mark.shape?.width ?? 1) * side
+        let markHeight = CGFloat(mark.shape?.height ?? 1) * side
+        let placeBelow = anchorY + markHeight + height <= pageSize.height
+        let alignRight = anchorX + 164 > pageSize.width
+        let x = alignRight ? max(0, anchorX + markWidth - 164) : anchorX
+        let y = placeBelow ? anchorY + markHeight : max(0, anchorY - height)
+        let variant = "\(placeBelow ? "above" : "below")\(alignRight ? "Right" : "Left")"
+
+        ZStack {
+            WritingDeskPackPopoverChrome(pack: pack, rows: rows, pointerVariant: variant,
+                                          isReady: $actionChromeReady,
+                                          failed: markPackUnavailable)
+            if actionChromeReady {
+                VStack(spacing: 0) { actions(for: mark) }.buttonStyle(.plain)
+            }
+        }
+        .frame(width: 164, height: height)
+        .offset(x: x, y: y)
+        .onDisappear { actionChromeReady = false }
+    }
+
+    private func markPackUnavailable() {
+        assetsReady = false
+        ghost = nil
+        interaction.cancel()
+        assetFailure()
     }
 
     // MARK: Chrome
@@ -164,6 +254,19 @@ struct PageGridView: View {
         if mode != .off { return mode.tint }
         guard ghost == nil, dragging == nil else { return .secondary }
         return isWrittenButSilent || inert != nil || grammarWarning != nil ? .orange : .secondary
+    }
+
+    private var containedStatusMessage: String? {
+        if let error = connectionError { return error }
+        if let hint = mode.hint { return hint }
+        if let ghost { return fits(ghost) ? "Drag into place, then let go" : "Won't fit there" }
+        if dragging != nil { return "Drag off the page to erase" }
+        if let inert {
+            return "\(inert.qualifier.name) says nothing about \(inert.target.name)."
+        }
+        if let grammarWarning { return "Loaded writing: \(grammarWarning)" }
+        if isWrittenButSilent { return "Not joined — hold a mark to Connect." }
+        return nil
     }
 
     private var footer: some View {
@@ -279,37 +382,24 @@ struct PageGridView: View {
         let isDragging = dragging == mark.id
         let discarding = willDiscard(mark, side: side, pageSize: pageSize)
         let tint = discarding ? Color.red : Color.accentColor
-        // Inside a cluster the individual borders step back, so the outline around the whole thing
-        // is what you read. Adjacent-and-joined has to look unmistakably unlike adjacent-and-not.
-        let inCluster = PageRules.cluster(containing: mark.id, on: page).count > 1
         let isAnchor = (anchor == mark.id && mode != .off) || held == mark.id
         let actionable = isActionable(mark)
 
         return ZStack(alignment: .topLeading) {
-            cells(of: shape, side: side) { cell in
-                RoundedRectangle(cornerRadius: inCluster ? 0 : side * 0.12)
-                    .fill(tint.opacity(isDragging ? 0.45 : 0.28))
-                    .overlay(RoundedRectangle(cornerRadius: inCluster ? 0 : side * 0.12)
-                        .stroke(tint.opacity(isDragging ? 1 : (inCluster ? 0.06 : 0.65)),
-                                lineWidth: isDragging ? 2 : 1))
-                    // What the mode is anchored on, and what it can reach from there.
-                    .overlay(RoundedRectangle(cornerRadius: inCluster ? 0 : side * 0.12)
-                        // Held with no mode running still has to show which one you're holding, and
-                        // `.off` has no tint of its own.
-                        .stroke(mode == .off ? Color.accentColor : mode.tint,
-                                lineWidth: isAnchor ? 3 : (actionable ? 2 : 0))
-                        .opacity(isAnchor ? 1 : (actionable ? 0.85 : 0)))
+            if mark.personalCompound != nil {
+                RuneGlyph(id: mark.glyphID, lineWidth: max(1.5, side * 0.07))
                     .frame(width: side, height: side)
-                    .offset(x: CGFloat(cell.column) * side, y: CGFloat(cell.row) * side)
+                    .foregroundStyle(tint)
+                    .offset(x: CGFloat(glyphCell(shape).column) * side,
+                            y: CGFloat(glyphCell(shape).row) * side)
+            } else if let productionPack, let visible = visibleMarksByID[mark.id] {
+                WritingDeskPackMarkArtwork(
+                    pack: productionPack, mark: visible,
+                    overlayState: isAnchor ? "selected" : (actionable ? "legal" : nil),
+                    width: CGFloat(shape?.width ?? 1) * side,
+                    height: CGFloat(shape?.height ?? 1) * side,
+                    failed: markPackUnavailable)
             }
-            // Drawn in a cell the shape actually occupies. A plus-shaped footprint doesn't cover
-            // its own bounding-box corner, so anchoring the glyph at the origin left it floating
-            // outside its own rune.
-            RuneGlyph(id: mark.glyphID, lineWidth: max(1.5, side * 0.07))
-                .frame(width: side, height: side)
-                .foregroundStyle(tint)
-                .offset(x: CGFloat(glyphCell(shape).column) * side,
-                        y: CGFloat(glyphCell(shape).row) * side)
         }
         .frame(width: CGFloat(shape?.width ?? 1) * side,
                height: CGFloat(shape?.height ?? 1) * side,
@@ -365,26 +455,30 @@ struct PageGridView: View {
     /// floating menu that covers the page you're trying to read.
     @ViewBuilder
     private func actions(for mark: PlacedRune) -> some View {
-        iconButton("link", "Connect") {
+        Button("Connect") {
             mode = .connecting
             anchor = mark.id
             held = nil
         }
+        .frame(minWidth: 152, minHeight: 44)
 
         if page.links.contains(where: { $0.involves(mark.id) }) {
             // **One tap severs.** Entering the mode is only so you can keep going down a chain.
-            iconButton("scissors", "Disconnect", tint: .red) {
+            Button("Disconnect") {
                 mode = .disconnecting
                 anchor = nil
                 held = nil
             }
+            .foregroundStyle(.red)
+            .frame(minWidth: 152, minHeight: 44)
         }
 
         if PageRules.rotate(cluster: mark.id, on: page) != nil {
-            iconButton("rotate.right", "Turn") {
+            Button("Turn") {
                 store.rotateCluster(mark.id)
                 held = nil
             }
+            .frame(minWidth: 152, minHeight: 44)
         }
     }
 
@@ -523,22 +617,16 @@ struct PageGridView: View {
     private func ghostView(_ ghost: GhostRune, side: CGFloat) -> some View {
         let shape = shape(of: ghost)
         let ok = fits(ghost)
-        let tint = ok ? Color.accentColor : Color.red
 
         return ZStack(alignment: .topLeading) {
-            cells(of: shape, side: side) { cell in
-                RoundedRectangle(cornerRadius: side * 0.12)
-                    .fill(tint.opacity(0.22))
-                    .overlay(RoundedRectangle(cornerRadius: side * 0.12)
-                        .strokeBorder(tint, style: StrokeStyle(lineWidth: 2, dash: [4, 3])))
-                    .frame(width: side, height: side)
-                    .offset(x: CGFloat(cell.column) * side, y: CGFloat(cell.row) * side)
+            if let productionPack, let visible = visibleGhost(ghost) {
+                WritingDeskPackMarkArtwork(
+                    pack: productionPack, mark: visible,
+                    overlayState: ok ? "legal" : "illegal",
+                    width: CGFloat(shape?.width ?? 1) * side,
+                    height: CGFloat(shape?.height ?? 1) * side,
+                    failed: markPackUnavailable)
             }
-            RuneGlyph(id: ghost.glyph, lineWidth: max(1.5, side * 0.07))
-                .frame(width: side, height: side)
-                .foregroundStyle(tint)
-                .offset(x: CGFloat(glyphCell(shape).column) * side,
-                        y: CGFloat(glyphCell(shape).row) * side)
         }
         .frame(width: CGFloat(shape?.width ?? 1) * side,
                height: CGFloat(shape?.height ?? 1) * side,
@@ -597,9 +685,151 @@ struct PageGridView: View {
         PageRules.shape(for: ghost.content, hand: store.state.base.bestHand)
     }
 
+    private func visibleGhost(_ ghost: GhostRune) -> WritingDeskVisibleMark? {
+        guard let shape = shape(of: ghost) else { return nil }
+        let route: WritingDeskVisibleMark.VisualRoute = switch ghost.content {
+        case .target: .authored(.target)
+        case .source, .rune: .authored(.source)
+        case .qualifier: .authored(.qualifier)
+        case .compound: .authored(.compound)
+        }
+        return .init(rendererAssetKey: ghost.glyph, visualRoute: route,
+                     id: .init(rawValue: 0), hand: store.state.base.bestHand,
+                     origin: ghost.origin, shapeID: shape.id,
+                     cells: shape.offsets.map {
+                         PageCell(column: ghost.origin.column + $0.column,
+                                  row: ghost.origin.row + $0.row)
+                     }, inkRecipe: nil, displayName: "", accessibilityName: "", isReadable: true)
+    }
+
     private func fits(_ ghost: GhostRune) -> Bool {
         guard let shape = shape(of: ghost) else { return false }
         return PageRules.canPlace(shape: shape, at: ghost.origin, on: page)
+    }
+
+}
+
+private struct WritingDeskPackPopoverChrome: View {
+    let pack: WritingDeskProductionPack
+    let rows: Int
+    let pointerVariant: String
+    @Binding var isReady: Bool
+    let failed: () -> Void
+    @State private var image: UIImage?
+    @State private var pointer: UIImage?
+
+    var body: some View {
+        ZStack(alignment: pointerVariant.hasSuffix("Right") ? .topTrailing : .topLeading) {
+            if let image {
+                Image(uiImage: image)
+                    .interpolation(.none)
+                    .resizable(capInsets: EdgeInsets(top: 4, leading: 4, bottom: 4, trailing: 4))
+            }
+            if let pointer {
+                Image(uiImage: pointer).interpolation(.none).resizable()
+                    .frame(width: 10, height: 6)
+                    .offset(x: pointerVariant.hasSuffix("Right") ? -14 : 14,
+                            y: pointerVariant.hasPrefix("above") ? -6 : 0)
+            }
+        }
+        .task(id: "\(rows)-\(pointerVariant)") {
+            do {
+                let asset = try pack.popoverBody(rows: rows).asset
+                let pointerAsset = try pack.popoverPointer(variant: pointerVariant)
+                guard let body = UIImage(data: try pack.assetData(sha256: asset.sha256)),
+                      let tip = UIImage(data: try pack.assetData(sha256: pointerAsset.sha256))
+                else { throw WritingDeskProductionPack.PackError.corruptAsset(asset.sha256) }
+                image = body; pointer = tip; isReady = true
+            } catch { image = nil; pointer = nil; isReady = false; failed() }
+        }
+    }
+}
+
+private struct WritingDeskPackMarkArtwork: View {
+    let pack: WritingDeskProductionPack
+    let mark: WritingDeskVisibleMark
+    let overlayState: String?
+    let width: CGFloat
+    let height: CGFloat
+    let failed: () -> Void
+    @State private var rgba: UIImage?
+    @State private var tintMask: UIImage?
+    @State private var overlay: UIImage?
+
+    var body: some View {
+        ZStack {
+            if let rgba {
+                Image(uiImage: rgba).interpolation(.none).resizable()
+            }
+            if let tintMask, let recipe = mark.inkRecipe {
+                let rgb = recipe.resolvedSRGB
+                Color(red: Double(rgb[0]) / 255, green: Double(rgb[1]) / 255,
+                      blue: Double(rgb[2]) / 255)
+                    .mask(Image(uiImage: tintMask).interpolation(.none).resizable())
+            }
+            if let overlay {
+                Image(uiImage: overlay).interpolation(.none).resizable()
+            }
+        }
+        .frame(width: width, height: height)
+        .allowsHitTesting(false)
+        .task(id: "\(mark.shapeID)-\(overlayState ?? "none")") { load() }
+    }
+
+    private func load() {
+        do {
+            guard case let .authored(key) = try pack.route(for: mark) else { return }
+            let assets = try pack.markAssets(for: key)
+            rgba = UIImage(data: try pack.assetData(sha256: assets.rgba.sha256))
+            tintMask = mark.inkRecipe == nil ? nil
+                : UIImage(data: try pack.assetData(sha256: assets.tintMask.sha256))
+            if let overlayState {
+                let asset = try pack.overlayAsset(shapeID: mark.shapeID, state: overlayState)
+                overlay = UIImage(data: try pack.assetData(sha256: asset.sha256))
+            } else { overlay = nil }
+        } catch {
+            rgba = nil; tintMask = nil; overlay = nil
+            failed()
+        }
+    }
+}
+
+private struct WritingDeskPackLinkArtwork: View {
+    let pack: WritingDeskProductionPack
+    let first: WritingDeskVisibleMark
+    let second: WritingDeskVisibleMark
+    let cellSide: CGFloat
+    let failed: () -> Void
+    @State private var image: UIImage?
+    @State private var placement: WritingDeskProductionPack.LinkPlacement?
+
+    var body: some View {
+        Group {
+            if let image, let placement {
+                Image(uiImage: image)
+                    .interpolation(.none)
+                    .resizable()
+                    .frame(width: CGFloat(placement.width) * cellSide / 27,
+                           height: CGFloat(placement.height) * cellSide / 27)
+                    .offset(x: CGFloat(placement.topLeft.x - 5) * cellSide / 27,
+                            y: CGFloat(placement.topLeft.y - 5) * cellSide / 27)
+            }
+        }
+        .allowsHitTesting(false)
+        .task(id: geometryIdentity) {
+            do {
+                let value = try pack.link(between: first, and: second)
+                placement = value
+                image = UIImage(data: try pack.assetData(sha256: value.asset.sha256))
+            } catch { image = nil; placement = nil; failed() }
+        }
+    }
+
+    private var geometryIdentity: String {
+        [first.shapeID, second.shapeID, first.hand.rawValue, second.hand.rawValue,
+         first.cells.map { "\($0.column),\($0.row)" }.joined(separator: ";"),
+         second.cells.map { "\($0.column),\($0.row)" }.joined(separator: ";")]
+            .joined(separator: "|")
     }
 }
 
@@ -685,7 +915,7 @@ enum PageMode: Equatable {
     }
 }
 
-struct PageInteractionIdentity: Equatable {
+struct PageInteractionIdentity: Equatable, Hashable {
     let width: Int
     let height: Int
     let runeIDs: [InstanceID]

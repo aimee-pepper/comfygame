@@ -1398,7 +1398,7 @@ final class PageTests: XCTestCase {
             encoding: .utf8
         )
 
-        XCTAssertTrue(source.contains("private var writingContextTools"))
+        XCTAssertTrue(source.contains("WritingDeskPageActionsPopover("))
         XCTAssertTrue(source.contains("Text(clearPageActionLabel)"))
         XCTAssertTrue(source.contains("isConfirmingClear = true"))
         XCTAssertTrue(source.contains("\"Clear this page?\""))
@@ -1428,6 +1428,50 @@ final class PageTests: XCTestCase {
         XCTAssertTrue(source.contains("store.bindAndDepart"))
         XCTAssertTrue(source.contains("store.savePageTemplate"))
         XCTAssertTrue(source.contains("store.clearPage()"))
+        XCTAssertFalse(source.contains("private var writingContextTools"))
+        XCTAssertFalse(source.contains(".popover(isPresented: $showsPageActions"))
+        XCTAssertTrue(source.contains("try WritingDeskProductionPack.bundled()"))
+        XCTAssertTrue(source.contains("WritingDeskPackMarkArtwork"))
+        XCTAssertTrue(source.contains("WritingDeskPackLinkArtwork"))
+    }
+
+    func testWritingDeskCancellationClearsGhostAndPageSessionWithoutMutatingPage() {
+        let original = Page()
+        var ghost: GhostRune? = .init(glyph: "sun", content: .source("sun"),
+                                      origin: .init(column: 1, row: 1))
+        var token = 4
+        var session = PageInteractionSession(mode: .connecting,
+                                             anchor: .init(rawValue: 1),
+                                             held: .init(rawValue: 2),
+                                             connectionError: "still active")
+
+        let encoded = try! JSONEncoder().encode(original)
+        for trigger in WritingDeskInteractionCancellation.Trigger.allCases {
+            ghost = .init(glyph: "sun", content: .source("sun"), origin: .init(column: 1, row: 1))
+            session = .init(mode: .connecting, anchor: .init(rawValue: 1),
+                            held: .init(rawValue: 2), connectionError: "still active")
+            let before = token
+            WritingDeskInteractionCancellation.cancel(trigger, ghost: &ghost, dismissalToken: &token)
+            session.cancel()
+            XCTAssertNil(ghost, "\(trigger)")
+            XCTAssertEqual(token, before + 1, "\(trigger)")
+            XCTAssertEqual(session, PageInteractionSession(), "\(trigger)")
+            XCTAssertEqual(try! JSONEncoder().encode(original), encoded, "\(trigger)")
+        }
+    }
+
+    func testEveryRequiredWriteCancellationTriggerUsesTheOneCancellationFunction() throws {
+        let root = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent().deletingLastPathComponent()
+        let source = try String(contentsOf: root.appending(path: "Sources/Screens/WritingDeskView.swift"),
+                                encoding: .utf8)
+        XCTAssertTrue(source.contains("Button { cancelPageInteraction(); dismiss() }"))
+        XCTAssertTrue(source.contains(".onChange(of: pane)"))
+        XCTAssertTrue(source.contains(".onChange(of: bin)"))
+        XCTAssertTrue(source.contains(".onChange(of: state.base.bestHand)"))
+        XCTAssertTrue(source.contains("if unlocked { presentedSheet = .inkWell }"))
+        XCTAssertTrue(source.contains("showsPageActions = true"))
+        XCTAssertTrue(source.contains("background(Color.clear.contentShape(Rectangle()).onTapGesture"))
     }
 
     func testWritingDeskPersonalCompoundPaletteUsesFrozenPlacementAuthorityAndAnchoredDetail() throws {

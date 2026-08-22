@@ -427,6 +427,25 @@ final class EconomyTests: XCTestCase {
         XCTAssertEqual(WritingDeskLayout.paletteChipMinimumWidth, 104)
         XCTAssertEqual(WritingDeskLayout.paletteColumnCount(containerWidth: 344), 3)
         XCTAssertEqual(WritingDeskLayout.paletteColumnCount(containerWidth: 320), 2)
+        let ordinary = WritingDeskLayout.writePaneMetrics(containerWidth: 368, containerHeight: 600)
+        XCTAssertEqual(ordinary.pageOuterSide, 344)
+        XCTAssertEqual(ordinary.cellSide, 54)
+        XCTAssertEqual(ordinary.pageInset, 10)
+        XCTAssertEqual(ordinary.paletteColumns, 3)
+        XCTAssertEqual(CGFloat(ordinary.paletteColumns) * 104
+                       + CGFloat(ordinary.paletteColumns - 1) * 8, 328)
+        XCTAssertEqual(ordinary.cellSide * 6 + ordinary.pageInset * 2, ordinary.pageOuterSide)
+        let fallback = WritingDeskLayout.writePaneMetrics(containerWidth: 320, containerHeight: 600)
+        XCTAssertEqual(fallback.pageOuterSide, 296)
+        XCTAssertEqual(fallback.cellSide, 46.5)
+        XCTAssertEqual(fallback.pageInset, 8.5)
+        XCTAssertEqual(fallback.paletteColumns, 2)
+        XCTAssertEqual(CGFloat(fallback.paletteColumns) * 104
+                       + CGFloat(fallback.paletteColumns - 1) * 8, 216)
+        XCTAssertEqual(fallback.cellSide * 6 + fallback.pageInset * 2, fallback.pageOuterSide)
+        let threeX = WritingDeskLayout.writePaneMetrics(
+            containerWidth: 320, containerHeight: 600, displayScale: 3)
+        XCTAssertEqual((threeX.cellSide * 3).rounded(), threeX.cellSide * 3)
     }
 
     func testGambitEditorUsesPlayerInstructionsInsteadOfSchemaPlaceholders() {
