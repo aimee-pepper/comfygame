@@ -278,15 +278,17 @@ enum WritingDeskReviewModelFactory {
             for sourceMark in sourceMarks {
                 guard let sourceID = sourceMark.sourceID,
                       let name = knownName(.source(sourceID)) else { focuses = []; break }
-                let qualifierNames = page.links.compactMap { $0.other(than: sourceMark.id) }
-                    .compactMap { id in cluster.first { $0.id == id } }
-                    .compactMap(\.qualifierID)
+                let qualifierMarks = page.links.compactMap { $0.other(than: sourceMark.id) }
+                    .compactMap { id in cluster.first { $0.id == id && $0.qualifierID != nil } }
+                let qualifierNames = qualifierMarks.compactMap(\.qualifierID)
                     .compactMap { knownName(.qualifier($0)) }
                 focuses.append(.init(name: name, qualifiers: qualifierNames))
+                represented.insert(sourceMark.id)
+                qualifierMarks.forEach { represented.insert($0.id) }
             }
             guard focuses.count == sourceMarks.count else { continue }
             requests.append(.init(subject: subject, focuses: focuses))
-            cluster.forEach { represented.insert($0.id) }
+            represented.insert(targetMark.id)
         }
         let silent = page.runes.filter {
             visibleByID[$0.id]?.isReadable == true && !represented.contains($0.id)
@@ -327,6 +329,8 @@ struct WritingDeskBindQuote: Equatable, Sendable {
     var reservedCampaignSeed: UInt64
     var generationSeed: UInt64
     var pageCost: Int
+    var availableEssence: Int
+    var essenceAfter: Int
     var anchorageReceipt: WritingDeskAnchorageReceipt
     var preparedInkReceipt: [WritingDeskPreparedInkApplication]
     var fieldKitLoadoutHash: String
@@ -410,6 +414,8 @@ enum WritingDeskBindQuoteFactory {
                      reservedCampaignSeed: state.worlds.seeds.peekNextSeed(),
                      generationSeed: generationSeed,
                      pageCost: pageCost,
+                     availableEssence: state.base.essence,
+                     essenceAfter: state.base.essence - total,
                      anchorageReceipt: .init(bornAnchored: bornAnchored,
                                              isUnlocked: station.isUnlocked,
                                              stationTier: station.tier,
@@ -421,8 +427,11 @@ enum WritingDeskBindQuoteFactory {
     }
 
     private static func inkRecipeOrder(_ lhs: InkRecipe, _ rhs: InkRecipe) -> Bool {
-        [lhs.cyan, lhs.magenta, lhs.yellow, lhs.depth]
-            .lexicographicallyPrecedes([rhs.cyan, rhs.magenta, rhs.yellow, rhs.depth])
+        let left = [lhs.cyan, lhs.magenta, lhs.yellow, lhs.depth]
+        let right = [rhs.cyan, rhs.magenta, rhs.yellow, rhs.depth]
+        return left == right
+            ? lhs.conversionVersion < rhs.conversionVersion
+            : left.lexicographicallyPrecedes(right)
     }
 }
 

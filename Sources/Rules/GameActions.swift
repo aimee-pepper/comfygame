@@ -894,8 +894,11 @@ extension GameStore {
         let requirements = inkRequirements(on: page)
         guard inkDepartureRefusal(page: page, in: base) == nil else { return false }
         let recipes = requirements.keys.sorted {
-            [$0.cyan, $0.magenta, $0.yellow, $0.depth]
-                .lexicographicallyPrecedes([$1.cyan, $1.magenta, $1.yellow, $1.depth])
+            let left = [$0.cyan, $0.magenta, $0.yellow, $0.depth]
+            let right = [$1.cyan, $1.magenta, $1.yellow, $1.depth]
+            return left == right
+                ? $0.conversionVersion < $1.conversionVersion
+                : left.lexicographicallyPrecedes(right)
         }
         for recipe in recipes {
             let required = requirements[recipe] ?? 0

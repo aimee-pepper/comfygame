@@ -123,6 +123,8 @@ final class EconomyTests: XCTestCase {
         XCTAssertEqual(original.reservedCampaignSeed,
                        store.state.worlds.seeds.peekNextSeed())
         XCTAssertEqual(original.totalCost, original.pageCost)
+        XCTAssertEqual(original.availableEssence, 100)
+        XCTAssertEqual(original.essenceAfter, 100 - original.totalCost)
         XCTAssertEqual(original.fieldKitReceipt, .allowed(.init(
             packed: Inventory(slots: store.state.base.satchelCapacity),
             remainingInventory: store.state.base.inventory,
@@ -134,6 +136,61 @@ final class EconomyTests: XCTestCase {
         let changed = try XCTUnwrap(store.writingDeskBindQuote())
         XCTAssertNotEqual(changed, original)
         XCTAssertNotEqual(changed.reservedCampaignSeed, original.reservedCampaignSeed)
+    }
+
+    func testWritingDeskBindQuoteStalesOnStillSufficientWalletChange() throws {
+        let store = GameStore(io: .temporary(name: "desk-wallet-stale-\(UUID().uuidString)"))
+        store.mutate("prepare exact wallet quote") { state in
+            state.base.essence = 100
+            state.base.preparationLoadout = []
+            state.base.preparationLoadoutNeedsReview = false
+        }
+        var interfered = false
+        let committed = store.bindAndDepart(openColorResolver: { scope, sigil, seed in
+            if !interfered {
+                store.mutate("change wallet without making bind unaffordable") {
+                    $0.base.essence = 99
+                }
+                interfered = true
+            }
+            return try WorldGrade2BindAdapter.openColor(
+                scope: scope, selectedSigilID: sigil.id, mapSeed: seed)
+        })
+        XCTAssertTrue(interfered)
+        XCTAssertFalse(committed)
+        XCTAssertEqual(store.state.base.essence, 99)
+        XCTAssertNil(store.state.worlds.activeRun)
+    }
+
+    func testInkReceiptOrdersEqualChannelsByConversionVersionThenStableVialID() throws {
+        let old = InkRecipe(cyan: 25, magenta: 25, yellow: 25, depth: 25,
+                            conversionVersion: "a-version")
+        let new = InkRecipe(cyan: 25, magenta: 25, yellow: 25, depth: 25,
+                            conversionVersion: "z-version")
+        func quote(reversed: Bool) throws -> WritingDeskBindQuote {
+            let store = GameStore(io: .temporary(name: "desk-ink-order-\(UUID().uuidString)"))
+            let first = PlacedRune(id: .init(rawValue: 1), content: .source("sun"), hand: .plain,
+                                   origin: .init(column: 0, row: 0), shapeID: "refined_dot",
+                                   inkRecipe: old)
+            let second = PlacedRune(id: .init(rawValue: 2), content: .source("sun"), hand: .plain,
+                                    origin: .init(column: 1, row: 0), shapeID: "refined_dot",
+                                    inkRecipe: new)
+            let vials = [PreparedInkVial(id: 20, recipe: old, remainingApplications: 2),
+                         PreparedInkVial(id: 10, recipe: new, remainingApplications: 2)]
+            store.mutate("prepare versioned ink quote") { state in
+                state.base.essence = 100
+                state.base.page = Page(runes: [first, second])
+                state.base.preparedInkVials = reversed ? Array(vials.reversed()) : vials
+                state.base.preparationLoadout = []
+                state.base.preparationLoadoutNeedsReview = false
+            }
+            return try XCTUnwrap(store.writingDeskBindQuote())
+        }
+        let forward = try quote(reversed: false)
+        let reversed = try quote(reversed: true)
+        XCTAssertEqual(forward.preparedInkReceipt, reversed.preparedInkReceipt)
+        XCTAssertEqual(forward.preparedInkReceipt.map(\.recipe.conversionVersion),
+                       ["a-version", "z-version"])
     }
 
     func testRedactedRequestsRequireReadableConnectedStatementsAndPreservePageOrder() throws {
@@ -180,6 +237,32 @@ final class EconomyTests: XCTestCase {
         XCTAssertEqual(review.unreadMarkCount, 1)
         XCTAssertEqual(review.silentMarkCount, 1)
         XCTAssertFalse(review.uncertaintyReason.localizedCaseInsensitiveContains("illumination"))
+    }
+
+    func testMalformedExtraTargetAndMisattachedQualifierRemainSilent() throws {
+        let store = GameStore(io: .temporary(name: "desk-malformed-request-\(UUID().uuidString)"))
+        let target = PlacedRune(id: .init(rawValue: 1), content: .target("illumination"),
+                                hand: .plain, origin: .init(column: 0, row: 0), shapeID: "refined_dot")
+        let source = PlacedRune(id: .init(rawValue: 2), content: .source("sun"),
+                                hand: .plain, origin: .init(column: 1, row: 0), shapeID: "refined_dot")
+        let extraTarget = PlacedRune(id: .init(rawValue: 3), content: .target("vitality"),
+                                     hand: .plain, origin: .init(column: 2, row: 0), shapeID: "refined_dot")
+        let wrongQualifier = PlacedRune(id: .init(rawValue: 4), content: .qualifier("great"),
+                                        hand: .plain, origin: .init(column: 0, row: 1), shapeID: "refined_dot")
+        store.mutate("install malformed connected cluster") { state in
+            state.base.ownedSources.insert("sun")
+            state.base.page = Page(
+                runes: [target, source, extraTarget, wrongQualifier],
+                links: [MarkLink(target.id, source.id),
+                        MarkLink(source.id, extraTarget.id),
+                        MarkLink(target.id, wrongQualifier.id)])
+        }
+        let review = try XCTUnwrap(store.writingDeskReviewModel())
+        XCTAssertEqual(review.knownRequests.count, 1)
+        XCTAssertEqual(review.knownRequests[0].subject, "Illumination")
+        XCTAssertEqual(review.knownRequests[0].focuses[0].qualifiers, [])
+        XCTAssertEqual(review.silentMarkCount, 2,
+                       "the unused target and target-attached qualifier remain visible as inert")
     }
 
     func testWritingDeskWritePaneReturnsToDraftWithoutConsumingCollectedSelection() {
