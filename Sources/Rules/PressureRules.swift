@@ -59,6 +59,35 @@ enum PressureRules {
         return rolled
     }
 
+    struct CausalIntervention: Equatable {
+        var actualRolled: [Sigil]
+        var baselineByTarget: [PressureTargetID: Sigil]
+        var counterfactualSigils: [Sigil]
+        var readings: PressureReadings
+    }
+
+    /// Removes one complete speaking candidate without shifting any unrelated unwritten roll.
+    /// This is a pure evidence seam; live generation continues using its existing roll stream.
+    static func causalIntervention(actualAuthored: [Sigil], remainingAuthored: [Sigil],
+                                   seed: UInt64) -> CausalIntervention {
+        let actualRolled = rollUnwritten(after: actualAuthored, seed: seed)
+        let baseline = rollUnwritten(after: [], seed: seed)
+        let baselineByTarget = Dictionary(uniqueKeysWithValues: baseline.map { ($0.target, $0) })
+        func writtenTargets(_ sigils: [Sigil]) -> Set<PressureTargetID> {
+            Set(sigils.flatMap { ContentCatalog.shared.pressureSource($0.source)?.targets ?? [] })
+        }
+        let actualWritten = writtenTargets(actualAuthored)
+        let remainingWritten = writtenTargets(remainingAuthored)
+        let retainedActual = actualRolled.filter { !actualWritten.contains($0.target) }
+        let newlySilent = actualWritten.subtracting(remainingWritten)
+        let replacement = ContentCatalog.shared.pressureTargetsInOrder.compactMap { target in
+            newlySilent.contains(target.id) ? baselineByTarget[target.id] : nil
+        }
+        let sigils = remainingAuthored + retainedActual + replacement
+        return .init(actualRolled: actualRolled, baselineByTarget: baselineByTarget,
+                     counterfactualSigils: sigils, readings: resolve(sigils))
+    }
+
     /// Raw resolution, before the targets are allowed to argue with each other. Exposed for tests
     /// that need to see a single target's arithmetic in isolation.
     /// The aspect Scale and Count push on, for subjects that have one.

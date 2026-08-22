@@ -60,9 +60,6 @@ struct WorldArrivalSceneReceipt: Codable, Equatable, Sendable {
     }
     struct CausalVisualFact: Codable, Equatable, Sendable {
         var markID: String
-        /// Frozen bind-time Dictionary/review label. Nil means the mark is unknown and ineligible.
-        var markDisplayName: String?
-        var sourcePageOrder: Int?
         var visibleScope: String
         var contributionKind: String
         var resultBand: String
@@ -220,9 +217,15 @@ struct WorldArrivalReceipt: Codable, Equatable, Sendable {
         var resolvedColor: [Int]
     }
     struct CausalVisualFact: Codable, Equatable, Sendable {
+        enum Scope: String, Codable, CaseIterable, Sendable {
+            case ground, water, flora, resource, light, atmosphere
+        }
         enum ContributionKind: String, Codable, Sendable { case none, increased, reduced, reshaped }
-        var markID: InstanceID
-        var visibleScope: String
+        var candidateMarkID: InstanceID
+        var semanticKey: String?
+        var markDisplayName: String?
+        var sourcePageOrder: Int
+        var scope: Scope
         var contributionKind: ContributionKind
         var resultBand: String
         var withoutAuthoredBand: String
@@ -277,6 +280,8 @@ struct WorldArrivalReceipt: Codable, Equatable, Sendable {
     var precipitation: Precipitation?
     var flora: [FloraSummary]
     var causalVisualFacts: [CausalVisualFact]
+    var counterfactualPassCount: Int?
+    var counterfactualElapsedMilliseconds: Double?
     var entryDisclosure: String?
     var firstMapCropReceipt: FirstMapCrop
     var proseVersion: String
@@ -291,9 +296,13 @@ enum WorldArrivalReceiptFactory {
 
     static func make(runIndex: Int, generationSeed: UInt64,
                      source: WritingDeskReviewModel,
-                     book: BoundBook, map: WorldMap, flora: [Flora],
+                     sourcePage: Page, book: BoundBook, map: WorldMap, flora: [Flora],
                      visualReceipt: WorldVisualReceipt,
-                     visibilityProfile: WorldRules.VisibilityProfile) throws -> WorldArrivalReceipt {
+                     visibilityProfile: WorldRules.VisibilityProfile,
+                     library: LibraryState, tuning: DebugTuningProfile,
+                     isFreshFirstExpedition: Bool,
+                     wildPageSelection: WildWorldPageSelectionRules.Selection?,
+                     wildPageOriginRunIndex: Int?) throws -> WorldArrivalReceipt {
         let dominant = try dominantDryGround(in: map)
         let counts = Dictionary(grouping: map.tiles.map(\.ground), by: { $0 }).mapValues(\.count)
         let wetTileCount = (counts[.water] ?? 0) + (counts[.deepWater] ?? 0)
@@ -305,10 +314,12 @@ enum WorldArrivalReceiptFactory {
             nonChasmTileCount: nonChasmTileCount)
         let waterRelationship = try waterRelationship(for: terrainSummary)
 
-        let light = BookRules.readings(for: book, seed: generationSeed)["illumination"]
+        let readings = BookRules.readings(for: book, seed: generationSeed)
+        let light = readings["illumination"]
+        let cycle = readings["cycle"]
         let lightBand: String = light.peak < 10 ? "trueDark" : light.peak < 35 ? "dim"
             : light.peak < 70 ? "ordinary" : light.peak < 90 ? "bright" : "blazing"
-        let sourceClass = illuminationSourceClass(light)
+        let sourceClass = illuminationSourceClass(light: light, cycle: cycle)
         let atmosphere = visualReceipt.descriptor.atmosphere
         let suspended = atmosphere.medium == "none" ? nil : WorldArrivalReceipt.Atmosphere(
             medium: atmosphere.medium, density: atmosphere.density, motion: "calm")
@@ -332,13 +343,49 @@ enum WorldArrivalReceiptFactory {
         let habits = Set(flora.compactMap { plant in
             map.tiles.contains(where: { $0.flora == plant.id }) ? plant.traits.habit.rawValue : nil
         })
-        let aggregateHabit = habits.count == 1 ? habits.first! : "mixed"
+        let aggregateHabit = habits.isEmpty ? "none" : habits.count == 1 ? habits.first! : "mixed"
         let environmentSummary = WorldArrivalReceipt.EnvironmentSummary(
             illuminationBand: lightBand,
             suspendedMedium: atmosphere.medium,
             suspendedDensity: densityBand(atmosphere.density, medium: atmosphere.medium),
             precipitation: "none", precipitationIntensity: "none",
             floraCoverageBand: aggregateCoverage, floraHabit: aggregateHabit)
+
+        let started = Date()
+        let actualAuthored = BookRules.sigils(for: book)
+        let actualReadings = BookRules.readings(for: book, seed: generationSeed)
+        let actualSummary = Worldgen.ArrivalCausalSummary(map: map, flora: flora)
+        var summaryCache: [String: Worldgen.ArrivalCausalSummary] = [:]
+        var counterfactualPassCount = 0
+        var causalFacts: [WorldArrivalReceipt.CausalVisualFact] = []
+        for candidate in WorldArrivalCausalCandidateRules.candidates(page: sourcePage, review: source) {
+            guard let removedPage = WorldArrivalCausalCandidateRules.removing(candidate, from: sourcePage),
+                  let fingerprint = WritingDeskReviewModelFactory.canonicalHash(removedPage) else {
+                throw Error.noDryGround
+            }
+            var removedBook = BookRules.resolveBook(page: removedPage)
+            removedBook.worldPageUseReceipt = book.worldPageUseReceipt
+            let remainingAuthored = BookRules.sigils(for: removedBook)
+            let intervention = PressureRules.causalIntervention(
+                actualAuthored: actualAuthored, remainingAuthored: remainingAuthored,
+                seed: generationSeed)
+            let summary: Worldgen.ArrivalCausalSummary
+            if let cached = summaryCache[fingerprint] {
+                summary = cached
+            } else {
+                summary = Worldgen.arrivalCausalSummary(
+                    book: removedBook, seed: generationSeed, readings: intervention.readings,
+                    library: library, tuning: tuning,
+                    isFreshFirstExpedition: isFreshFirstExpedition,
+                    wildPageSelection: wildPageSelection,
+                    wildPageOriginRunIndex: wildPageOriginRunIndex)
+                summaryCache[fingerprint] = summary
+                counterfactualPassCount += 1
+            }
+            causalFacts.append(contentsOf: WorldArrivalCausalCandidateRules.summaryFacts(
+                candidate: candidate, actual: actualSummary, withoutCandidate: summary,
+                actualReadings: actualReadings, withoutReadings: intervention.readings))
+        }
         let physical = WorldArrivalReceipt.SourcePage(
             title: source.title, width: source.pageThumbnail.width, height: source.pageThumbnail.height,
             marks: source.pageThumbnail.marks.map {
@@ -351,8 +398,20 @@ enum WorldArrivalReceiptFactory {
                 .init(firstMarkID: $0.firstMarkID, secondMarkID: $0.secondMarkID)
             })
         let crop = firstCrop(map: map, flora: flora, profile: visibilityProfile)
-        let description = description(dominant: dominant, water: waterRelationship,
-                                      lightBand: lightBand, atmosphere: suspended)
+        let grammarInput = WorldArrivalDescriptionRules.Input(
+            dominantDryGround: dominant,
+            terrain: .init(wetTileCount: wetTileCount, deepWaterTileCount: deepWaterTileCount,
+                           nonChasmTileCount: nonChasmTileCount),
+            environment: .init(
+                illuminationBand: environmentSummary.illuminationBand,
+                suspendedMedium: environmentSummary.suspendedMedium,
+                suspendedDensity: environmentSummary.suspendedDensity,
+                precipitation: environmentSummary.precipitation,
+                precipitationIntensity: environmentSummary.precipitationIntensity,
+                floraCoverageBand: environmentSummary.floraCoverageBand,
+                floraHabit: environmentSummary.floraHabit),
+            causalFacts: causalFacts)
+        let description = try WorldArrivalDescriptionRules.describe(grammarInput)
         let canonical = "\(Self.schemaIdentity)|\(runIndex)|\(generationSeed)|\(sourceIdentity(source.sourceKey))|\(visualReceipt.canonicalReceiptSHA256)"
         let id = SHA256.hash(data: Data(canonical.utf8)).map { String(format: "%02x", $0) }.joined()
         let receiptID = WorldArrivalReceiptID(rawValue: id)
@@ -361,7 +420,7 @@ enum WorldArrivalReceiptFactory {
             dominant: dominant, waterRelationship: waterRelationship,
             visualReceipt: visualReceipt, lightBand: lightBand, sourceClass: sourceClass,
             atmosphere: atmosphere, flora: floraSummaries, crop: crop,
-            description: description)
+            causalFacts: causalFacts, description: description)
         return .init(version: WorldArrivalReceipt.schemaVersion,
                      id: receiptID, runIndex: runIndex, generationSeed: generationSeed,
                      sourcePagePhysicalReceipt: physical,
@@ -374,7 +433,10 @@ enum WorldArrivalReceiptFactory {
                      illumination: .init(peak: light.peak, floor: light.floor,
                                          band: lightBand, sourceClass: sourceClass),
                      suspendedAtmosphere: suspended, precipitation: nil,
-                     flora: floraSummaries, causalVisualFacts: [], entryDisclosure: nil,
+                     flora: floraSummaries, causalVisualFacts: causalFacts,
+                     counterfactualPassCount: counterfactualPassCount,
+                     counterfactualElapsedMilliseconds: Date().timeIntervalSince(started) * 1_000,
+                     entryDisclosure: nil,
                      firstMapCropReceipt: crop,
                      proseVersion: WorldArrivalReceipt.descriptionGrammarVersion,
                      finalDescription: description,
@@ -384,8 +446,10 @@ enum WorldArrivalReceiptFactory {
 
     private static let schemaIdentity = "world-arrival-receipt-v1"
 
-    static func illuminationSourceClass(_ light: PressureReading) -> String {
-        light.has("sourceless") ? "sourceless" : light.floor > 5 ? "constant" : "cyclic"
+    static func illuminationSourceClass(light: PressureReading, cycle: PressureReading) -> String {
+        if light.has("sourceless") { return "sourceless" }
+        return cycle.peak > Tuning.DayNight.stoppedMaximumPeak
+            && light.range > Tuning.Pressure.wideRangeThreshold ? "cyclic" : "constant"
     }
 
     static func dominantDryGround(in map: WorldMap) throws -> GroundType {
@@ -424,7 +488,8 @@ enum WorldArrivalReceiptFactory {
         visualReceipt: WorldVisualReceipt, lightBand: String, sourceClass: String,
         atmosphere: WorldGrade2V1.Atmosphere,
         flora: [WorldArrivalReceipt.FloraSummary],
-        crop: WorldArrivalReceipt.FirstMapCrop, description: String
+        crop: WorldArrivalReceipt.FirstMapCrop,
+        causalFacts: [WorldArrivalReceipt.CausalVisualFact], description: String
     ) -> WorldArrivalSceneReceipt.Payload {
         let sourceID: String
         switch source.sourceKey {
@@ -462,7 +527,13 @@ enum WorldArrivalReceiptFactory {
                 .init(stableID: $0.stableID, formID: $0.formID, coverage: $0.coverage,
                       habit: $0.habit, color: $0.resolvedColor)
             },
-            causalVisualFacts: [], entryDisclosure: nil, description: description,
+            causalVisualFacts: causalFacts.filter { $0.markDisplayName?.isEmpty == false }.map {
+                .init(markID: $0.semanticKey ?? "candidate-\($0.candidateMarkID.rawValue)",
+                      visibleScope: $0.scope.rawValue,
+                      contributionKind: $0.contributionKind.rawValue,
+                      resultBand: $0.resultBand,
+                      withoutAuthoredBand: $0.withoutAuthoredBand)
+            }, entryDisclosure: nil, description: description,
             firstMapCropReceipt: sceneCrop)
     }
 

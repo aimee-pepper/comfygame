@@ -261,11 +261,35 @@ enum Worldgen {
         static let travellerArrival: UInt64 = 0x7A4E2
     }
 
+    struct ArrivalCausalSummary: Equatable {
+        var map: WorldMap
+        var flora: [Flora]
+    }
+
+    static func arrivalCausalSummary(
+        book: BoundBook, seed: UInt64, readings: PressureReadings,
+        library: LibraryState, tuning: DebugTuningProfile,
+        isFreshFirstExpedition: Bool,
+        wildPageSelection: WildWorldPageSelectionRules.Selection?,
+        wildPageOriginRunIndex: Int?
+    ) -> ArrivalCausalSummary {
+        let result = generate(
+            book: book, seed: seed, library: library, tuning: tuning,
+            isFreshFirstExpedition: isFreshFirstExpedition,
+            wildPageSelection: wildPageSelection,
+            wildPageOriginRunIndex: wildPageOriginRunIndex,
+            _counterfactualSummaryOnly: true,
+            _counterfactualReadings: readings)
+        return .init(map: result.map, flora: result.flora)
+    }
+
     static func generate(book: BoundBook, seed: UInt64, library: LibraryState = LibraryState(),
                          tuning: DebugTuningProfile = .defaults,
                          isFreshFirstExpedition: Bool = false,
                          wildPageSelection: WildWorldPageSelectionRules.Selection? = nil,
-                         wildPageOriginRunIndex: Int? = nil)
+                         wildPageOriginRunIndex: Int? = nil,
+                         _counterfactualSummaryOnly: Bool = false,
+                         _counterfactualReadings: PressureReadings? = nil)
         -> (map: WorldMap, enemies: [WorldEnemy], sites: [PlacedSite],
             pages: [DiaryPageID], writings: [FoundWritingRecord], wildPage: WorldPageInstance?,
             travellers: [TravellerID], cast: [Species], flora: [Flora],
@@ -294,7 +318,7 @@ enum Worldgen {
         // in it now come from the eight targets rather than from flat per-symbol tables.
         let sigils = BookRules.sigils(for: book)
         let pressurePair = travellerCausalityReadings(authoredSigils: sigils, seed: seed)
-        let readings = pressurePair.actual
+        let readings = _counterfactualReadings ?? pressurePair.actual
         let withoutAuthoredPressure = pressurePair.withoutAuthoredPressure
         let resolvedStabilityScore = BookRules.resolvedStabilityScore(of: book, seed: seed)
         // The same world with nothing rolled into it. Chasms read this as a floor, and the exit rule
@@ -469,6 +493,24 @@ enum Worldgen {
             occupied.insert(point)
             rawEssenceDropsPlaced += 1
             rawEssenceObtainable += amount
+        }
+
+        // Arrival causality reuses the exact production stages and derived RNG salts through the
+        // resource-result boundary. This internal stop never creates a WorldRun or mutates state;
+        // it deliberately skips caches, hazards, sites, creatures and travellers.
+        if _counterfactualSummaryOnly {
+            var diagnostics = WorldGenerationDiagnostics()
+            diagnostics.selectedDiaryPages = pages
+            diagnostics.selectedOtherWritingCount = noteCount
+            diagnostics.placedDiaryPages = placedPages
+            diagnostics.placedOtherWritings = foundWritings.map(\.id)
+            diagnostics.secondWritingRollSucceeded = secondWritingRollSucceeded
+            diagnostics.rawEssenceEligibleTiles = rawEssenceEligibleTiles
+            diagnostics.rawEssencePlacementAttempts = wildCount
+            diagnostics.rawEssenceDropsPlaced = rawEssenceDropsPlaced
+            diagnostics.rawEssenceObtainable = rawEssenceObtainable
+            return (map, [], [], placedPages, foundWritings, wildPage, [], [], flora, entry,
+                    diagnostics)
         }
 
         // 5. A locked cache, sometimes. It can only be opened with a key found in a *different*

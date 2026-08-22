@@ -1041,6 +1041,7 @@ extension GameStore {
                 runIndex: state.worlds.runIndex + 1,
                 generationSeed: generationSeed,
                 source: reviewModel,
+                sourcePage: sourcePage,
                 book: book,
                 map: world.map,
                 flora: world.flora,
@@ -1048,7 +1049,12 @@ extension GameStore {
                 visibilityProfile: WorldRules.visibilityProfile(
                     book: book, mapSeed: generationSeed, tuning: tuning,
                     worldVisualReceipt: visualReceipt,
-                    party: WorldRules.sightBonus(in: state)))
+                    party: WorldRules.sightBonus(in: state)),
+                library: state.reality.library,
+                tuning: tuning,
+                isFreshFirstExpedition: state.worlds.runIndex == 0,
+                wildPageSelection: wildSelection,
+                wildPageOriginRunIndex: state.worlds.runIndex + 1)
         } catch {
             bindError = "This world could not be prepared. Your page and Essence were not changed."
             return false

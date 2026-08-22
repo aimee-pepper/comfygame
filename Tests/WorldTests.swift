@@ -211,6 +211,48 @@ final class WorldTests: XCTestCase {
         }
     }
 
+    func testArrivalCausalSummaryUsesProductionStagesThroughExactResourceBoundary() throws {
+        let cases: [(BoundBook, UInt64)] = [
+            (BookRules.resolveBook(worldPage: try XCTUnwrap(
+                WorldPageCatalog.starterInstances.first)),
+             try XCTUnwrap(WorldPageCatalog.starterInstances.first).definition.seed),
+            (book(["terrain": "plains", "bounty": "teeming_life"]), 8_675_309)
+        ]
+        for (composition, seed) in cases {
+            let produced = Worldgen.generate(book: composition, seed: seed)
+            let summary = Worldgen.arrivalCausalSummary(
+                book: composition, seed: seed,
+                readings: BookRules.readings(for: composition, seed: seed),
+                library: .init(), tuning: .defaults,
+                isFreshFirstExpedition: false,
+                wildPageSelection: nil, wildPageOriginRunIndex: nil)
+
+            XCTAssertEqual(summary.flora, produced.flora, "flora stage drifted for seed \(seed)")
+            XCTAssertEqual(summary.map.entry, produced.map.entry, "entry stage drifted for seed \(seed)")
+            XCTAssertEqual(summary.map.tiles.map(\.ground), produced.map.tiles.map(\.ground),
+                           "terrain stage drifted for seed \(seed)")
+            XCTAssertEqual(summary.map.tiles.map(\.elevation), produced.map.tiles.map(\.elevation),
+                           "elevation stage drifted for seed \(seed)")
+            XCTAssertEqual(summary.map.tiles.map(\.flora), produced.map.tiles.map(\.flora),
+                           "flora placement drifted for seed \(seed)")
+            XCTAssertEqual(resourceBoundary(in: summary.map), resourceBoundary(in: produced.map),
+                           "resource stages drifted for seed \(seed)")
+        }
+    }
+
+    private func resourceBoundary(in map: WorldMap) -> [String] {
+        map.tiles.enumerated().compactMap { index, tile in
+            switch tile.content {
+            case .node(let node):
+                return "\(index)|node|\(node.resource.rawValue)|\(node.remainingHarvests)|\(node.yieldPerHarvest)"
+            case .wildDrop(let resource, let amount):
+                return "\(index)|drop|\(resource.rawValue)|\(amount)"
+            default:
+                return nil
+            }
+        }
+    }
+
     func testKnownFindPickupIsAtomicAndLeavesExactItemWhenSatchelIsFull() throws {
         let destination = GridPoint(x: 1, y: 0)
         let promised = ItemStack(id: InstanceID(rawValue: 4_444), catalogID: "field_maul")
