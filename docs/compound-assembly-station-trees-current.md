@@ -52,8 +52,8 @@ Writing the same statement in another arrangement/hand satisfies the same receip
 those differences are immaterial.
 
 At the Scriptorium's **Runebook · Formalize** tab, the player chooses one eligible proven statement,
-sees its full reading, atomic and compressed footprints in each owned hand, exact effect equivalence
-and cost, then names and confirms it. The player cannot select arbitrary atoms here to create an
+sees its full Subject-and-Focus reading, written and compressed footprints in each owned hand, exact
+effect equivalence and cost, then names and confirms it. The player cannot select arbitrary Sigils here to create an
 unproven compressed statement. They experiment by spelling that statement out on a page and binding
 it first.
 
@@ -137,7 +137,7 @@ infrastructure. It is not a duplicate catalogue of everything every specialist k
    absent until its root is legitimately known rather than exposing future secret content.
 2. Formalize lists proven eligible statements as three-column glyph/reading tiles, not full-width
    prose rows. Selection opens one contained detail with expansion, footprints, name, cost and confirm.
-3. Statements with unknown atoms, nested compounds, more than five atoms or no complete target/source
+3. Statements with unknown Sigils, nested Compounds, more than five Sigils or no complete Subject/Focus
    reading explain the exact ineligibility and cannot spend resources.
 4. Confirmation is one atomic action over receipt fingerprint, cost quote and chosen nickname.
    Stale/missing receipt or stock rejects with zero mutation and refreshes the preview.
@@ -145,5 +145,9 @@ infrastructure. It is not a duplicate catalogue of everything every specialist k
    committed compound; it never charges twice or creates two IDs.
 6. Renaming is free and updates only the Runebook label. Historical page/bound-book provenance remains
    inspectable and its frozen semantic expansion never changes.
-7. Dynamic Type, VoiceOver and grayscale distinguish atomic expansion, compressed footprint,
+7. Dynamic Type, VoiceOver and grayscale distinguish written Sigil expansion, compressed footprint,
    eligibility, selected statement and destructive deletion without relying on color alone.
+
+The player-facing Sigil count is exactly `receipt.vocabulary.count`: the frozen written Subject, Focus and
+Modifier identities. Semantic atoms remain internal persisted mechanics for effect equivalence and
+footprint calculation and never drive that displayed count.

@@ -1211,14 +1211,15 @@ private struct CompoundRunebookView: View {
                                     RuneGlyph(id: receipt.target.rawValue).frame(width: 24, height: 24)
                                     Text(CompoundRunebookPresentation.targetName(receipt))
                                         .font(.caption.weight(.semibold)).lineLimit(1)
-                                    Text("\(receipt.atoms.count) atoms")
+                                    Text(CompoundRunebookPresentation.sigilCount(receipt))
                                         .font(.caption2).foregroundStyle(.secondary)
+                                        .fixedSize(horizontal: false, vertical: true)
                                 }
                                 .frame(maxWidth: .infinity, minHeight: 64)
                             }
                             .buttonStyle(.bordered)
                             .tint(selectedFingerprint == receipt.fingerprint ? .accentColor : .secondary)
-                            .accessibilityValue(CompoundRunebookPresentation.reading(receipt))
+                            .accessibilityLabel(CompoundRunebookPresentation.accessibilityLabel(receipt))
                         }
                     }
                 }
@@ -1343,7 +1344,16 @@ private struct CompoundRunebookView: View {
 
 enum CompoundRunebookPresentation {
     static func targetName(_ receipt: ProvenStatementReceipt) -> String {
-        ContentCatalog.shared.pressureTarget(receipt.target)?.name ?? "Unknown subject"
+        ContentCatalog.shared.pressureTarget(receipt.target)?.name ?? "Unknown Subject"
+    }
+
+    static func sigilCount(_ receipt: ProvenStatementReceipt) -> String {
+        let count = receipt.vocabulary.count
+        return "\(count) \(count == 1 ? "Sigil" : "Sigils") in this Compound"
+    }
+
+    static func accessibilityLabel(_ receipt: ProvenStatementReceipt) -> String {
+        "\(sigilCount(receipt)). \(reading(receipt))"
     }
 
     static func reading(_ receipt: ProvenStatementReceipt) -> String {
@@ -1376,7 +1386,7 @@ enum CompoundRunebookPresentation {
         case .locked: "Learn Compound Assembly first."
         case .awayFromBase: "Return to the Scriptorium before changing the Runebook."
         case .missingReceipt: "That proven statement is no longer available."
-        case .ineligible(let issue): issue.rawValue
+        case .ineligible(let issue): ineligibilityMessage(issue)
         case .alreadyFormalized: "This statement is already in the Runebook."
         case .insufficientResources: "Formalization needs more Essence or pulp."
         case .stale: "The receipt or cost changed. Review it and try again."
@@ -1384,8 +1394,19 @@ enum CompoundRunebookPresentation {
         }
     }
 
+    static func ineligibilityMessage(_ issue: PageRules.CompoundEligibilityIssue) -> String {
+        switch issue {
+        case .incomplete: "A Compound needs one complete Subject-and-Focus statement."
+        case .multipleTargets: "A Compound can have exactly one Subject."
+        case .tooFewAtoms: "A Compound needs at least two Sigils."
+        case .tooManyAtoms: "A Compound can contain at most five Sigils."
+        case .nestedCompound: "A Compound cannot contain another Compound."
+        case .unknownAtom: "Every Sigil must be known before this statement can be formalized."
+        }
+    }
+
     private static func atomDescription(_ atom: CompoundSemanticAtom) -> String {
-        let source = ContentCatalog.shared.pressureSource(atom.source)?.name ?? "Unknown focus"
+        let source = ContentCatalog.shared.pressureSource(atom.source)?.name ?? "Unknown Focus"
         return "\(atom.intensity.displayName) \(source) ×\(atom.count)"
     }
 }

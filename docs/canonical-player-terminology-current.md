@@ -131,7 +131,9 @@ DEBUG terminology exemption.
 3. Migrate all Essence affordability presentations through one shared formatter.
 4. Migrate Research and Combat prerequisites through one shared `Requires …` formatter.
 5. Migrate gear and compatibility detail surfaces; never expose a raw key as the primary value.
-6. Regenerate GameWiki labels from this machine authority and run a complete human-visible string census.
+6. Migrate Compound Assembly to player-facing **Sigil**, **Subject** and **Focus** copy; displayed
+   Sigil counts derive from the frozen written vocabulary, never internal semantic atom count.
+7. Regenerate GameWiki labels from this machine authority and run a complete human-visible string census.
 
 ### Research and Combat requirement relationship
 
@@ -151,6 +153,14 @@ tree, including this discipline’s Root, one Fundamental, one Development, and 
 - Recycler routes say whether they return recorded construction stock or standard salvage.
 - Maud teaches the **Fitted Polearm Schematic** while the persisted pattern wire identity remains unchanged.
 - Item and resource detail leads with the canonical name and does not expose raw catalogue keys.
+
+### Compound Assembly terminology
+
+Compound Assembly presents the written vocabulary as **Sigils in this Compound**. The count comes from
+the receipt's frozen Subject, Focus and Modifier vocabulary. Semantic atoms remain internal persisted
+mechanics for expansion, equivalence and footprint calculations; atom count never drives player copy.
+Eligibility explanations use Subject, Focus and Sigil while their existing internal Codable cases remain
+unchanged.
 
 Do not rewrite model symbols, Codable keys or historical archives merely to make a grep count reach zero.
 Do make every newly rendered label, accessibility string, DEBUG label, wiki heading, current test fixture and

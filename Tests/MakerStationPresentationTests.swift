@@ -97,12 +97,74 @@ final class MakerStationPresentationTests: XCTestCase {
 
         XCTAssertTrue(CompoundRunebookPresentation.reading(receipt).contains("Illumination"))
         XCTAssertTrue(CompoundRunebookPresentation.reading(receipt).contains("Moderate"))
+        XCTAssertEqual(CompoundRunebookPresentation.sigilCount(receipt), "2 Sigils in this Compound")
+        XCTAssertTrue(CompoundRunebookPresentation.accessibilityLabel(receipt).hasPrefix(
+            "2 Sigils in this Compound. Illumination:"))
         XCTAssertTrue(CompoundRunebookPresentation.footprint(receipt, hand: .crude)
             .contains("spelled out"))
         XCTAssertEqual(CompoundRunebookPresentation.message(.ineligible(.nestedCompound)),
-                       PageRules.CompoundEligibilityIssue.nestedCompound.rawValue)
+                       "A Compound cannot contain another Compound.")
         XCTAssertEqual(CompoundRunebookPresentation.message(.insufficientResources),
                        "Formalization needs more Essence or pulp.")
+    }
+
+    func testCompoundSigilCountUsesFrozenVocabularyNotSemanticAtomMultiplicity() throws {
+        let source = try XCTUnwrap(ContentCatalog.shared.pressureSources.first).id
+        var atom = CompoundSemanticAtom(Sigil(id: .init(rawValue: 1), source: source,
+                                               target: "illumination"))
+        func receipt(_ vocabulary: [LexemeIdentity]) -> ProvenStatementReceipt {
+            ProvenStatementReceipt(fingerprint: "fixture", target: "illumination", atoms: [atom],
+                                   vocabulary: vocabulary,
+                                   vocabularySchemaVersion: ProvenStatementReceipt.currentVocabularySchemaVersion,
+                                   firstBoundRunIndex: 1)
+        }
+        XCTAssertEqual(CompoundRunebookPresentation.sigilCount(receipt([])), "0 Sigils in this Compound")
+        XCTAssertEqual(CompoundRunebookPresentation.sigilCount(receipt([.target("illumination")])),
+                       "1 Sigil in this Compound")
+        let basic = receipt([.target("illumination"), .source(source)])
+        XCTAssertEqual(atom.count, 1)
+        XCTAssertEqual(CompoundRunebookPresentation.sigilCount(basic), "2 Sigils in this Compound")
+        XCTAssertEqual(CompoundRunebookPresentation.sigilCount(
+            receipt([.target("illumination"), .source(source), .qualifier("great")])),
+            "3 Sigils in this Compound")
+        atom.count = 17
+        let multiplied = receipt([.target("illumination"), .source(source)])
+        XCTAssertNotEqual(multiplied.atoms, basic.atoms)
+        XCTAssertEqual(CompoundRunebookPresentation.sigilCount(multiplied),
+                       CompoundRunebookPresentation.sigilCount(basic))
+    }
+
+    func testCompoundEligibilityIssuesHaveExactPlayerCopyWithoutChangingRawCompatibility() {
+        let expected: [(PageRules.CompoundEligibilityIssue, String)] = [
+            (.incomplete, "A Compound needs one complete Subject-and-Focus statement."),
+            (.multipleTargets, "A Compound can have exactly one Subject."),
+            (.tooFewAtoms, "A Compound needs at least two Sigils."),
+            (.tooManyAtoms, "A Compound can contain at most five Sigils."),
+            (.nestedCompound, "A Compound cannot contain another Compound."),
+            (.unknownAtom, "Every Sigil must be known before this statement can be formalized.")
+        ]
+        for (issue, copy) in expected {
+            XCTAssertEqual(CompoundRunebookPresentation.message(.ineligible(issue)), copy)
+            XCTAssertFalse(issue.rawValue.isEmpty)
+        }
+        XCTAssertEqual(PageRules.CompoundEligibilityIssue.tooFewAtoms.rawValue,
+                       "A compound needs at least two atomic Sigils.")
+    }
+
+    func testCompoundAssemblyVisibleStringsDoNotExposeAtomTerminologyAndCountCanWrap() throws {
+        let root = URL(fileURLWithPath: #filePath).deletingLastPathComponent().deletingLastPathComponent()
+        let source = try String(contentsOf: root.appending(path: "Sources/Screens/StationViews.swift"), encoding: .utf8)
+        let pattern = try NSRegularExpression(pattern: #"\"(?:[^\"\\]|\\.)*\""#)
+        let strings = pattern.matches(in: source, range: NSRange(source.startIndex..., in: source))
+            .compactMap { Range($0.range, in: source).map { String(source[$0]) } }
+        XCTAssertFalse(strings.contains { value in
+            let playerCopy = value.replacingOccurrences(of: #"\\\([^)]*\)"#, with: "", options: .regularExpression)
+            return playerCopy.range(of: #"\batom(?:ic|s)?\b"#, options: [.regularExpression, .caseInsensitive]) != nil
+        })
+        XCTAssertTrue(source.contains("CompoundRunebookPresentation.sigilCount(receipt)"))
+        XCTAssertTrue(source.contains(".fixedSize(horizontal: false, vertical: true)"))
+        XCTAssertTrue(source.contains(".accessibilityLabel(CompoundRunebookPresentation.accessibilityLabel(receipt))"))
+        XCTAssertFalse(source.contains("Text(\"\\(receipt.atoms.count) atoms\")"))
     }
 
     func testStationResourceNamesUseCatalogueAndNeverExposeUnknownIDs() throws {
