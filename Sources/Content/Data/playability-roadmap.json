@@ -747,11 +747,11 @@
       "id": "canonical-ui-terminology",
       "priority": "P0",
       "title": "One canonical name for every game concept",
-      "status": "queued",
+      "status": "inProgress",
       "detail": "Aimee's return-screen playtest exposed parallel implementation vocabulary in visible UI: marks/current draft, returned, progress/party total, and a duplicated portal sentence. Canonical terminology is now universal across the game, DEBUG, accessibility, wiki, tests, logs and current docs; raw IDs are secondary metadata only. The immediate slice freezes the world's actual departure state in the return record and replaces the permanent-gains categories with Writing found, Joined the village and XP earned. Later contained migrations remove Projection, runway/authored bind, node, generic profile/Identity, receipt/frozen/legacy and atom wherever the canonical concept exists.",
       "gate": "Implement the Return slice first with one constructor shared by every exit path, tolerant old-save fallback, four forced departure-state fixtures, relaunch identity, and 368×800 proof. Then migrate the named surface groups through shared formatters; do not rename stable Codable/catalogue IDs. A human-visible string census includes DEBUG and accessibility with no terminology exemption. GameWiki derives canonical labels and keeps retired words only as search aliases. Authority: docs/canonical-player-terminology-current.md and docs/canonical-game-terminology.json.",
       "workstream": "engineering",
-      "isPrimary": false
+      "isPrimary": true
     },
     {
       "id": "expedition-review-persistence",
@@ -837,11 +837,11 @@
       "id": "world-arrival-reveal",
       "priority": "B1.6a",
       "title": "Generated world image and concrete arrival description",
-      "status": "inProgress",
-      "detail": "Integrate the accepted World Arrival Asset chain through 72b840d3e1de2b8c32aebfc0e876d61c69448a92 and persist one bind-time arrival receipt that drives the frozen v0.3 book tableau plus exactly two concrete 18–55 word sentences from actual ground/water and causally contributing known authorship or the strongest actual air/light/growth relationship. The accepted JavaScript compositor is reference authority rather than an iOS dependency: an exact command conformance corpus gates a mechanical native adapter, and successful bind freezes its validated ordered rect-v1 commands, program/input/command hashes and 160×100 RGBA hash on active run plus History. The grammar distinguishes reshaping from increasing/reducing an existing result and consumes no new RNG. Creature ambience is omitted; hidden sites remain absent. Latest manifest f041c81a41c45ac88dada40b0c173ab63c6e93c2984f232a23be67892df4a65b and unchanged production aggregate 4eb1076eb8d4640a5467d3343167f55eed3b1c74ca2cefec5727cb5b5bda9184 are frozen and must not be reinterpreted.",
-      "gate": "Implement now without waiting for Writing or Terrain phone acceptance and without requesting new Asset invention. Native Open Flats 67, Rainwashed Shore 26 and Stone Hollow 23 plus near/far pairs agree among page, image, description and first map at 368×800; the live starter-receipt validator, exact two-sentence grammar, accepted Asset hashes, full canonical command corpus and exact native fixture pixels pass; bind/relaunch preserves one frozen rendered-scene receipt and display replays only its validated commands; matching-by-chance writing earns no causal claim, strengthening uses increased rather than created copy; unknown marks and hidden site/resource/traveller/apex identities do not leak; loading remains a separate honest surface. Install the first verified phone-ready checkpoint in place without uninstall/reset or automatic launch. Authorities: world-arrival-causal-reveal-current.md, world-arrival-description-grammar-current.md and world-arrival-asset-packet-current.md.",
-      "workstream": "engineering",
-      "isPrimary": true
+      "status": "readyToTest",
+      "detail": "Source-complete in 05b3a5d8f7b94ef574578c8057f015e1c108a2c2: bind freezes one validated disclosure-safe scene plus exact native rect-v1 commands, program/input/command/RGBA hashes and immutable active-run/History receipt; matching pending presentation owns root ahead of combat/map until zero-turn dismissal. The full 85-case accepted corpus, near/far and starter descriptions, strict schema, relaunch/orphan lifecycle, live World Generator bridge, 368/320/accessibility layouts and generic build are green. Signed Debug build 234 was installed in place on Aimee's iPhone without uninstall, reset or auto-launch.",
+      "gate": "Aimee's remaining phone acceptance is one ordinary new bind: confirm the generated arrival image, exact two-sentence description, disclosed Page labels and fixed Enter world action, then verify Enter reaches the matching first map and does not replay after relaunch. Source and install gates are complete; retain readyToTest/non-primary until that review. Authorities: world-arrival-causal-reveal-current.md, world-arrival-description-grammar-current.md and world-arrival-asset-packet-current.md.",
+      "workstream": "acceptance",
+      "isPrimary": false
     },
     {
       "id": "field-consequence-cues",

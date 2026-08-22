@@ -5,6 +5,176 @@ import XCTest
 
 @MainActor
 final class ExpeditionOutcomeTests: XCTestCase {
+    private func departureRun(player: GridPoint = .init(x: 0, y: 0),
+                              tiles: [Tile] = Array(repeating: Tile(), count: 4),
+                              collapsedOnTurn: Int? = nil) -> WorldRun {
+        var run = WorldRun(
+            runIndex: 9, book: BoundBook(symbols: [:], randomlyFilled: [], essencePaid: 0),
+            mapSeed: 90, rng: SeededRNG(seed: 90),
+            map: WorldMap(width: 2, height: 2, tiles: tiles,
+                          entry: GridPoint(x: 0, y: 0)),
+            playerPosition: player
+        )
+        run.collapsedOnTurn = collapsedOnTurn
+        return run
+    }
+
+    func testWorldDepartureStateUsesExactPreClearPhysicalClassificationAndCorruptionFallback() {
+        XCTAssertEqual(WorldDepartureState.capture(from: departureRun()), .holding)
+
+        var cracking = Array(repeating: Tile(), count: 4)
+        cracking[3].isCracking = true
+        XCTAssertEqual(WorldDepartureState.capture(from: departureRun(tiles: cracking,
+                                                                       collapsedOnTurn: 12)),
+                       .cracking)
+
+        var breaking = cracking
+        breaking[2].isCrumbled = true
+        XCTAssertEqual(WorldDepartureState.capture(from: departureRun(tiles: breaking,
+                                                                       collapsedOnTurn: 12)),
+                       .breaking)
+
+        var reached = breaking
+        reached[0].isCrumbled = true
+        XCTAssertEqual(WorldDepartureState.capture(from: departureRun(tiles: reached,
+                                                                       collapsedOnTurn: 12)),
+                       .collapseReachedParty)
+
+        XCTAssertNil(WorldDepartureState.capture(from: departureRun(collapsedOnTurn: 12)),
+                     "collapse metadata without physical evidence must retain the saved reason")
+        XCTAssertNil(WorldDepartureState.capture(from: departureRun(
+            player: GridPoint(x: 99, y: 99))), "corrupt coordinates must fail closed")
+    }
+
+    func testDepartureStatePersistsByteEquivalentlyAndOldSaveKeepsItsReason() throws {
+        let summary = RunExitSummary(
+            runIndex: 4, kind: .portal, reason: "Saved legacy departure reason.",
+            departureState: .cracking, turnsTaken: 7, haulKeptFraction: 1
+        )
+        let encoded = try SaveCodec.makeEncoder().encode(summary)
+        let restored = try SaveCodec.makeDecoder().decode(RunExitSummary.self, from: encoded)
+        XCTAssertEqual(restored, summary)
+        XCTAssertEqual(restored.departureCopy, "Cracks were spreading when you left.")
+
+        var object = try XCTUnwrap(JSONSerialization.jsonObject(with: encoded) as? [String: Any])
+        object.removeValue(forKey: "departureState")
+        let legacy = try SaveCodec.makeDecoder().decode(
+            RunExitSummary.self, from: JSONSerialization.data(withJSONObject: object))
+        XCTAssertNil(legacy.departureState)
+        XCTAssertEqual(legacy.departureCopy, "Saved legacy departure reason.")
+    }
+
+    func testPermanentGainsPresentationCoversEmptyFullAndMixedFactsExactly() {
+        let empty = RunExitPermanentGainsPresentation(summary: RunExitSummary(
+            runIndex: 1, kind: .portal, reason: "done", turnsTaken: 1, haulKeptFraction: 1))
+        XCTAssertEqual(empty.cells.map(\.id), ["people"])
+        XCTAssertEqual(empty.cells.first?.value, "No one joined the village")
+        XCTAssertNil(empty.cells.first?.detail)
+
+        let full = RunExitSummary(
+            runIndex: 2, kind: .portal, reason: "done", turnsTaken: 3, haulKeptFraction: 1,
+            progress: [
+                .init(member: .binder, name: "Binder", experience: 7, levels: 1, finalLevel: 2),
+                .init(member: .member(0), name: "Mara", experience: 7, levels: 0, finalLevel: 1)
+            ], pages: ["mara_where_0"], recruitedTravellers: ["mara"]
+        )
+        let fullCells = RunExitPermanentGainsPresentation(summary: full).cells
+        XCTAssertEqual(fullCells.map(\.id), ["writing", "people", "xp", "levels"])
+        XCTAssertEqual(fullCells[0].value, "1 piece of writing found")
+        XCTAssertEqual(fullCells[1].value, "1 person joined the village")
+        XCTAssertEqual(fullCells[2].value, "+7 XP each")
+        XCTAssertEqual(fullCells[2].detail, "Binder · Mara")
+        XCTAssertEqual(fullCells[3].value, "1 level-up across the party")
+        XCTAssertNil(fullCells[3].detail)
+
+        let mixed = RunExitSummary(
+            runIndex: 3, kind: .defeat, reason: "done", turnsTaken: 9, haulKeptFraction: 0.5,
+            progress: [
+                .init(member: .binder, name: "Binder", experience: 9, levels: 1, finalLevel: 4),
+                .init(member: .member(0), name: "Mara", experience: 7, levels: 1, finalLevel: 3),
+                .init(member: .member(1), name: "Edren", experience: 5, levels: 0, finalLevel: 2),
+                .init(member: .member(2), name: "Sela", experience: 3, levels: 0, finalLevel: 2),
+                .init(member: .member(3), name: "Tovin", experience: 1, levels: 0, finalLevel: 1)
+            ], pages: ["mara_where_0"],
+            writings: [.init(id: "writing-two", kind: .fieldNote, title: "Two", prose: "Two")],
+            recruitedTravellers: ["mara", "edren"]
+        )
+        let mixedCells = RunExitPermanentGainsPresentation(summary: mixed).cells
+        XCTAssertEqual(mixedCells[0].value, "2 pieces of writing found")
+        XCTAssertEqual(mixedCells[1].value, "2 people joined the village")
+        XCTAssertEqual(mixedCells[2].value, "Party earned XP")
+        XCTAssertEqual(mixedCells[2].detail,
+                       "Binder +9 XP · Mara +7 XP · Edren +5 XP · Sela +3 XP · Tovin +1 XP")
+        XCTAssertEqual(mixedCells[3].value, "2 level-ups across the party")
+    }
+
+    func testLiveReturnPathsFreezeDepartureBeforeClearingAndConstructorCoversAbandon() throws {
+        func store(with run: WorldRun, name: String) -> GameStore {
+            let store = GameStore(io: .temporary(name: "departure-\(name)-\(UUID().uuidString)"))
+            store.mutate("fixture: departure path") { state in state.worlds.activeRun = run }
+            return store
+        }
+
+        var portalRun = departureRun()
+        portalRun.map.tiles[0].content = .portal(isEntry: true)
+        let portal = store(with: portalRun, name: "portal")
+        portal.portalHome()
+        XCTAssertEqual(portal.state.worlds.lastExit?.kind, .portal)
+        XCTAssertEqual(portal.state.worlds.lastExit?.departureState, .holding)
+        XCTAssertNil(portal.state.worlds.activeRun)
+
+        var waystoneRun = departureRun()
+        waystoneRun.map.tiles[2].isCracking = true
+        let waystoneStack = ItemStack(id: InstanceID(rawValue: 400), catalogID: "waystone")
+        waystoneRun.satchelItems.stacks = [waystoneStack]
+        let waystone = store(with: waystoneRun, name: "waystone")
+        waystone.useItemInWorld(waystoneStack, on: .binder)
+        XCTAssertEqual(waystone.state.worlds.lastExit?.kind, .waystone)
+        XCTAssertEqual(waystone.state.worlds.lastExit?.departureState, .cracking)
+
+        var defeatRun = departureRun(collapsedOnTurn: 8)
+        defeatRun.map.tiles[2].isCrumbled = true
+        let defeat = store(with: defeatRun, name: "defeat")
+        defeat.endRunWithPartialHaul(reason: "defeat", kind: .defeat)
+        XCTAssertEqual(defeat.state.worlds.lastExit?.departureState, .breaking)
+
+        var collapseRun = departureRun(collapsedOnTurn: 8)
+        collapseRun.map.tiles[0].isCrumbled = true
+        let collapse = store(with: collapseRun, name: "collapse")
+        collapse.endRunWithPartialHaul(reason: "collapse", kind: .collapse)
+        XCTAssertEqual(collapse.state.worlds.lastExit?.departureState, .collapseReachedParty)
+
+        let emptyBank = GameStore.BankedHaul(
+            resources: [], items: [], lostResources: [], lostItems: [],
+            recoveredLines: [], lostLines: [], unidentifiedItemIDs: [], returnedRawEssence: false)
+        for kind in [RunExitSummary.Kind.portal, .waystone, .defeat, .collapse, .abandon] {
+            let receipt = GameStore.makeReturnReceipt(
+                run: portalRun, outcomeID: 900, kind: kind, reason: "fallback", fraction: 1,
+                banked: emptyBank, departureState: .holding,
+                autoRefinedRaw: 0, autoRefinedEssence: 0, springYield: 0,
+                state: portal.state)
+            XCTAssertEqual(receipt.kind, kind)
+            XCTAssertEqual(receipt.departureState, .holding)
+        }
+        XCTAssertNil(portal.state.worlds.activeRun,
+                     "portal proves capture survived the destructive clear transaction")
+    }
+
+    func testReturnVisibleStringCensusUsesCanonicalPermanentGainTerms() throws {
+        let root = URL(fileURLWithPath: #filePath).deletingLastPathComponent()
+            .deletingLastPathComponent()
+        let source = try String(contentsOf: root.appending(path: "Sources/App/RootView.swift"),
+                                encoding: .utf8)
+        XCTAssertTrue(source.contains("Text(\"PERMANENT GAINS\")"))
+        XCTAssertTrue(source.contains("Text(\"Knowledge, people & party\")"))
+        XCTAssertTrue(source.contains("heading: \"Joined the village\""))
+        XCTAssertTrue(source.contains("heading: \"XP earned\""))
+        for retired in ["KEPT WITH YOU", "Writing & travellers", "current draft",
+                        "People who came home", "Party progress", "party total"] {
+            XCTAssertFalse(source.contains("Text(\"\(retired)"), retired)
+        }
+    }
+
     func testReturnRecapCanOnlyCloseThroughItsExplicitContinueAction() throws {
         let root = URL(fileURLWithPath: #filePath).deletingLastPathComponent()
             .deletingLastPathComponent()
@@ -42,6 +212,7 @@ final class ExpeditionOutcomeTests: XCTestCase {
             runIndex: 12, kind: kind,
             reason: kind == .collapse ? "The world ended before every carried thing crossed over."
                                       : "The Atlas released the party at Base.",
+            departureState: kind == .collapse ? .collapseReachedParty : .holding,
             turnsTaken: 24, haulKeptFraction: kind == .collapse ? 0.45 : 1,
             resources: [RunExitGain(name: "Resin", icon: "leaf", count: 4),
                         RunExitGain(name: "Copper", icon: "diamond", count: 2)],
@@ -58,6 +229,20 @@ final class ExpeditionOutcomeTests: XCTestCase {
         }
         let returned = fixture(kind: .portal)
         let collapsed = fixture(kind: .collapse)
+        var mixed = returned
+        mixed.pages = ["mara_where_0"]
+        mixed.writings = [
+            .init(id: "fixture-writing-two", kind: .fieldNote,
+                  title: "A second piece", prose: "A second permanent piece of writing.")
+        ]
+        mixed.recruitedTravellers = ["mara", "edren"]
+        mixed.progress = [
+            .init(member: .binder, name: "Binder", experience: 11, levels: 1, finalLevel: 5),
+            .init(member: .member(0), name: "Mara", experience: 9, levels: 1, finalLevel: 4),
+            .init(member: .member(1), name: "Edren", experience: 7, levels: 0, finalLevel: 3),
+            .init(member: .member(2), name: "Sela", experience: 5, levels: 0, finalLevel: 2),
+            .init(member: .member(3), name: "Tovin", experience: 3, levels: 0, finalLevel: 2)
+        ]
         store.mutate("fixture: approved return recap") { state in
             for lesson in TutorialLessonID.allCases {
                 state.tutorial.complete(lesson, fact: "visual_fixture")
@@ -68,6 +253,7 @@ final class ExpeditionOutcomeTests: XCTestCase {
                       detail: RunExitSummary.ReceiptLine?)] = [
             ("returned", returned, nil),
             ("collapsed", collapsed, nil),
+            ("longest-mixed", mixed, nil),
             ("receipt-detail", returned, returned.recoveredLines.first)
         ]
         for state in states {

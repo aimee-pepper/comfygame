@@ -39,6 +39,63 @@ enum RunExitRecapPresentation {
     }
 }
 
+struct RunExitPermanentGainsPresentation: Equatable {
+    struct Cell: Equatable, Identifiable {
+        let id: String
+        let heading: String
+        let value: String
+        let detail: String?
+    }
+
+    let cells: [Cell]
+
+    init(summary: RunExitSummary, catalogue: ContentCatalog = .shared) {
+        var cells: [Cell] = []
+        let writingCount = summary.pages.count + summary.writings.count
+        if writingCount > 0 {
+            cells.append(.init(
+                id: "writing", heading: "Writing found",
+                value: "\(writingCount) \(writingCount == 1 ? "piece" : "pieces") of writing found",
+                detail: "Added to the Library"
+            ))
+        }
+
+        let names = summary.recruitedTravellers.compactMap { catalogue.traveller($0)?.name }
+        let peopleCount = summary.recruitedTravellers.count
+        cells.append(.init(
+            id: "people", heading: "Joined the village",
+            value: peopleCount == 0
+                ? "No one joined the village"
+                : peopleCount == 1
+                    ? "1 person joined the village"
+                    : "\(peopleCount) people joined the village",
+            detail: names.isEmpty ? nil : names.joined(separator: " · ")
+        ))
+
+        if !summary.progress.isEmpty {
+            let experience = Set(summary.progress.map(\.experience))
+            let equal = experience.count == 1
+            cells.append(.init(
+                id: "xp", heading: "XP earned",
+                value: equal ? "+\(experience.first ?? 0) XP each" : "Party earned XP",
+                detail: equal
+                    ? summary.progress.map(\.name).joined(separator: " · ")
+                    : summary.progress.map { "\($0.name) +\($0.experience) XP" }.joined(separator: " · ")
+            ))
+        }
+
+        let levelUps = summary.progress.reduce(0) { $0 + $1.levels }
+        if levelUps > 0 {
+            cells.append(.init(
+                id: "levels", heading: "Level-ups",
+                value: "\(levelUps) \(levelUps == 1 ? "level-up" : "level-ups") across the party",
+                detail: nil
+            ))
+        }
+        self.cells = cells
+    }
+}
+
 /// Top-level routing.
 ///
 /// Being inside a world is a *state*, not a navigation destination: if a run is active, that's the
@@ -332,7 +389,7 @@ struct RunExitSummaryView: View {
             Text("Expedition return")
                 .font(.custom("Jersey 10", size: 25))
             Spacer()
-            Text("World \(summary.runIndex) · \(summary.kind == .collapse ? "collapsed" : "returned")")
+            Text("World \(summary.runIndex) · complete")
                 .font(.custom("Tiny5", size: 10))
                 .foregroundStyle(PixelUITheme.muted)
         }
@@ -355,7 +412,7 @@ struct RunExitSummaryView: View {
                     .foregroundStyle(PixelUITheme.muted)
                 Text(summary.kind.title)
                     .font(.custom("Jersey 10", size: 18))
-                Text(summary.reason)
+                Text(summary.departureCopy)
                     .font(.system(size: 12))
                     .lineLimit(2)
             }
@@ -437,14 +494,15 @@ struct RunExitSummaryView: View {
     }
 
     private var keptLedger: some View {
-        VStack(alignment: .leading, spacing: 6) {
-            Text("KEPT WITH YOU").font(.custom("Tiny5", size: 9))
+        let presentation = RunExitPermanentGainsPresentation(summary: summary)
+        return VStack(alignment: .leading, spacing: 6) {
+            Text("PERMANENT GAINS").font(.custom("Tiny5", size: 9))
                 .foregroundStyle(PixelUITheme.muted)
-            Text("Writing & travellers").font(.custom("Jersey 10", size: 16))
-            HStack(spacing: 4) {
-                ledgerCell("\(summary.pages.count + summary.writings.count) marks", "current draft")
-                ledgerCell("\(summary.recruitedTravellers.count) returned", travellerNames)
-                ledgerCell("+\(summary.progress.reduce(0) { $0 + $1.levels }) progress", "party total")
+            Text("Knowledge, people & party").font(.custom("Jersey 10", size: 16))
+            LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 4) {
+                ForEach(presentation.cells) { cell in
+                    ledgerCell(cell.heading, cell.value, cell.detail)
+                }
             }
         }
         .padding(8)
@@ -452,16 +510,16 @@ struct RunExitSummaryView: View {
         .overlay(Rectangle().stroke(PixelUITheme.edge, lineWidth: 2))
     }
 
-    private var travellerNames: String {
-        let names = summary.recruitedTravellers.compactMap { ContentCatalog.shared.traveller($0)?.name }
-        return names.isEmpty ? "none" : names.joined(separator: " · ")
-    }
-
-    private func ledgerCell(_ value: String, _ detail: String) -> some View {
+    private func ledgerCell(_ heading: String, _ value: String, _ detail: String?) -> some View {
         VStack(alignment: .leading, spacing: 3) {
-            Text(value).font(.custom("Tiny5", size: 10)).lineLimit(1)
-            Text(detail).font(.custom("Tiny5", size: 8)).lineLimit(1)
+            Text(heading.uppercased()).font(.custom("Tiny5", size: 8))
                 .foregroundStyle(PixelUITheme.muted)
+            Text(value).font(.custom("Tiny5", size: 10)).fixedSize(horizontal: false, vertical: true)
+            if let detail, !detail.isEmpty {
+                Text(detail).font(.custom("Tiny5", size: 8))
+                    .fixedSize(horizontal: false, vertical: true)
+                    .foregroundStyle(PixelUITheme.muted)
+            }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(5)
@@ -691,60 +749,6 @@ struct RunExitSummaryView: View {
         .recapPanel()
     }
 
-    private var travellersSection: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            Text("People who came home").font(.custom("Tiny5", size: 10))
-            if summary.recruitedTravellers.isEmpty {
-                Text("None this trip.").foregroundStyle(.secondary)
-            } else {
-                ForEach(summary.recruitedTravellers, id: \.self) { id in
-                    HStack {
-                        Image(systemName: "person.crop.circle.badge.checkmark")
-                            .foregroundStyle(.tint).frame(width: 22)
-                        Text(ContentCatalog.shared.traveller(id)?.name ?? id.rawValue)
-                    }
-                }
-            }
-        }
-        .recapPanel()
-    }
-
-    private var partyProgressSection: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text("Party progress").font(.custom("Tiny5", size: 10))
-            if summary.progress.isEmpty {
-                Text("No progress recorded for this run.").foregroundStyle(PixelUITheme.muted)
-            } else {
-                if !experienceSources.isEmpty {
-                    Text("Each active party member earned")
-                        .font(.caption.weight(.semibold))
-                        .foregroundStyle(PixelUITheme.muted)
-                    ViewThatFits(in: .horizontal) {
-                        HStack(spacing: 12) { experienceSourceLabels }
-                        VStack(alignment: .leading, spacing: 4) { experienceSourceLabels }
-                    }
-                    Divider()
-                }
-                ForEach(summary.progress) { gain in
-                    HStack {
-                        Image(systemName: gain.member == .binder ? "person.fill" : "person.2.fill")
-                            .foregroundStyle(PixelUITheme.primary)
-                        Text(gain.name)
-                        Spacer()
-                        VStack(alignment: .trailing, spacing: 2) {
-                            Text("+\(gain.experience) XP").monospacedDigit()
-                            if gain.levels > 0 {
-                                Text("Level \(gain.finalLevel) · +\(gain.levels)")
-                                    .font(.caption.weight(.semibold))
-                                    .foregroundStyle(.green)
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        .recapPanel()
-    }
 }
 
 private extension View {

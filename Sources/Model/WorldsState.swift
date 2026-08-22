@@ -173,6 +173,32 @@ struct RunExperienceBreakdown: Codable, Equatable, Sendable {
     }
 }
 
+/// The world as it physically stood at the instant an expedition ended. This is saved with the
+/// outcome before the active run is cleared; presentation never reconstructs it later.
+enum WorldDepartureState: String, Codable, Equatable, Sendable {
+    case holding, cracking, breaking, collapseReachedParty
+
+    static func capture(from run: WorldRun) -> Self? {
+        guard run.map.contains(run.playerPosition) else { return nil }
+        let playerIndex = run.map.index(of: run.playerPosition)
+        guard run.map.tiles.indices.contains(playerIndex) else { return nil }
+        if run.map.tiles[playerIndex].isCrumbled { return .collapseReachedParty }
+        if run.map.tiles.contains(where: \.isCrumbled) { return .breaking }
+        if run.map.tiles.contains(where: \.isCracking) { return .cracking }
+        if run.collapsedOnTurn == nil { return .holding }
+        return nil
+    }
+
+    var playerCopy: String {
+        switch self {
+        case .holding: "The world was still holding together when you left."
+        case .cracking: "Cracks were spreading when you left."
+        case .breaking: "Parts of the world had already fallen away when you left."
+        case .collapseReachedParty: "The collapsing ground finally reached the party."
+        }
+    }
+}
+
 struct RunExitSummary: Codable, Equatable, Identifiable, Sendable {
     /// Frozen, typed receipt authority. The older name/icon/count arrays remain compatibility
     /// projections for existing presentation; they are never used to reconstruct identity.
@@ -352,6 +378,7 @@ struct RunExitSummary: Codable, Equatable, Identifiable, Sendable {
     var outcomeID: ExpeditionOutcomeID?
     var kind: Kind
     var reason: String
+    var departureState: WorldDepartureState?
     var turnsTaken: Int
     var haulKeptFraction: Double
     private(set) var resources: [RunExitGain] = []
@@ -370,9 +397,11 @@ struct RunExitSummary: Codable, Equatable, Identifiable, Sendable {
     var experienceBreakdown = RunExperienceBreakdown()
 
     var id: String { outcomeID.map { "outcome-\($0.rawValue)" } ?? "legacy-run-\(runIndex)" }
+    var departureCopy: String { departureState?.playerCopy ?? reason }
 
     init(runIndex: Int, outcomeID: ExpeditionOutcomeID? = nil,
-         kind: Kind, reason: String, turnsTaken: Int, haulKeptFraction: Double,
+         kind: Kind, reason: String, departureState: WorldDepartureState? = nil,
+         turnsTaken: Int, haulKeptFraction: Double,
          resources: [RunExitGain] = [], items: [RunExitGain] = [],
          lostResources: [RunExitGain] = [], lostItems: [RunExitGain] = [],
          recoveredLines: [ReceiptLine]? = nil, lostLines: [ReceiptLine]? = nil,
@@ -386,6 +415,7 @@ struct RunExitSummary: Codable, Equatable, Identifiable, Sendable {
         self.outcomeID = outcomeID
         self.kind = kind
         self.reason = reason
+        self.departureState = departureState
         self.turnsTaken = turnsTaken
         self.haulKeptFraction = haulKeptFraction
         self.recoveredLines = recoveredLines
@@ -425,6 +455,8 @@ struct RunExitSummary: Codable, Equatable, Identifiable, Sendable {
         let fraction = try c.decode(Double.self, forKey: .haulKeptFraction)
         kind = try c.decodeIfPresent(Kind.self, forKey: .kind) ?? (fraction >= 1 ? .portal : .collapse)
         reason = try c.decode(String.self, forKey: .reason)
+        departureState = try c.decodeIfPresent(WorldDepartureState.self,
+                                                forKey: .departureState)
         turnsTaken = try c.decode(Int.self, forKey: .turnsTaken)
         haulKeptFraction = fraction
         let decodedResources = try c.decodeIfPresent([RunExitGain].self, forKey: .resources) ?? []

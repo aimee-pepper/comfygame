@@ -631,6 +631,7 @@ extension GameStore {
                                         consuming stackID: InstanceID? = nil) {
         mutate("return home", flush: true, scope: .expedition) { state in
             guard var run = state.worlds.activeRun else { return }
+            let departureState = WorldDepartureState.capture(from: run)
             if let stackID {
                 guard let index = run.satchelItems.stacks.firstIndex(where: { $0.id == stackID })
                 else { return }
@@ -659,7 +660,8 @@ extension GameStore {
             let subsidy = GameStore.applyDepartureSubsidy(in: &state)
             state.worlds.lastExit = GameStore.makeReturnReceipt(
                 run: run, outcomeID: outcomeID, kind: kind, reason: reason, fraction: 1,
-                banked: banked, autoRefinedRaw: automatic?.rawSpent ?? 0,
+                banked: banked, departureState: departureState,
+                autoRefinedRaw: automatic?.rawSpent ?? 0,
                 autoRefinedEssence: automatic?.essenceGained ?? 0,
                 springYield: springYield, antiLockSubsidy: subsidy, state: state)
             TutorialRules.freezeFirstReturnContext(run: run, banked: banked, in: &state)
@@ -675,6 +677,7 @@ extension GameStore {
         guard activeRun != nil else { return }
         mutate("run ended: \(reason)", flush: true, scope: .expedition) { state in
             guard var run = state.worlds.activeRun else { return }
+            let departureState = WorldDepartureState.capture(from: run)
             let outcomeID = state.worlds.mintOutcomeID()
             state.reality.library.attachOutcome(outcomeID,
                                                 toWorld: InstanceID(rawValue: run.mapSeed))
@@ -698,7 +701,8 @@ extension GameStore {
             let subsidy = GameStore.applyDepartureSubsidy(in: &state)
             state.worlds.lastExit = GameStore.makeReturnReceipt(
                 run: run, outcomeID: outcomeID, kind: kind, reason: reason, fraction: fraction,
-                banked: banked, autoRefinedRaw: automatic?.rawSpent ?? 0,
+                banked: banked, departureState: departureState,
+                autoRefinedRaw: automatic?.rawSpent ?? 0,
                 autoRefinedEssence: automatic?.essenceGained ?? 0,
                 springYield: springYield, antiLockSubsidy: subsidy, state: state)
             TutorialRules.freezeFirstReturnContext(run: run, banked: banked, in: &state)
@@ -846,11 +850,13 @@ extension GameStore {
     nonisolated static func makeReturnReceipt(
         run: WorldRun, outcomeID: ExpeditionOutcomeID, kind: RunExitSummary.Kind,
         reason: String, fraction: Double, banked: BankedHaul,
+        departureState: WorldDepartureState? = nil,
         autoRefinedRaw: Int, autoRefinedEssence: Int, springYield: Int,
         antiLockSubsidy: Int = 0, state: GameState
     ) -> RunExitSummary {
         RunExitSummary(
             runIndex: run.runIndex, outcomeID: outcomeID, kind: kind, reason: reason,
+            departureState: departureState,
             turnsTaken: run.turnsTaken, haulKeptFraction: fraction,
             resources: banked.resources, items: banked.items,
             lostResources: banked.lostResources, lostItems: banked.lostItems,
