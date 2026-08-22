@@ -145,7 +145,7 @@ struct PageGridView: View {
         .onChange(of: dismissalToken) { _, _ in interaction.cancel() }
         .onChange(of: pageInteractionIdentity) { _, _ in interaction.cancel() }
         .onDisappear { interaction.cancel() }
-        .task(id: pageInteractionIdentity) {
+        .task(id: pageLoadIdentity) {
             guard let productionPack else { return }
             assetsReady = false
             do {
@@ -179,6 +179,10 @@ struct PageGridView: View {
 
     private var pageInteractionIdentity: PageInteractionIdentity {
         PageInteractionIdentity(width: page.width, height: page.height, runeIDs: page.runes.map(\.id))
+    }
+
+    private var pageLoadIdentity: PageGridLoadIdentity {
+        .init(page: pageInteractionIdentity, packAvailable: productionPack != nil)
     }
 
     @ViewBuilder
@@ -919,6 +923,11 @@ struct PageInteractionIdentity: Equatable, Hashable {
     let width: Int
     let height: Int
     let runeIDs: [InstanceID]
+}
+
+struct PageGridLoadIdentity: Equatable, Hashable {
+    var page: PageInteractionIdentity
+    var packAvailable: Bool
 }
 
 struct PageInteractionSession: Equatable {

@@ -37,7 +37,7 @@ enum WritingDeskLayout {
         let heightRoom = max(128, floor(containerHeight - fixedBelowPage))
         let proposed = min(horizontalRoom, heightRoom)
         let scale = max(1, displayScale)
-        let cell = max(18, floor((proposed * 162 / 172 / 6) * scale) / scale)
+        let cell = max(18, ((proposed * 162 / 172 / 6) * scale).rounded() / scale)
         let page = proposed
         let inset = (page - cell * 6) / 2
         return .init(pageOuterSide: page, pageInset: inset, cellSide: cell,

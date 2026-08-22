@@ -1399,7 +1399,7 @@ final class PageTests: XCTestCase {
         )
 
         XCTAssertTrue(source.contains("WritingDeskPageActionsPopover("))
-        XCTAssertTrue(source.contains("Text(clearPageActionLabel)"))
+        XCTAssertTrue(source.contains("Button(clearLabel, action: clear)"))
         XCTAssertTrue(source.contains("isConfirmingClear = true"))
         XCTAssertTrue(source.contains("\"Clear this page?\""))
         XCTAssertTrue(source.contains("Button(clearPageActionLabel, role: .destructive)"))
@@ -1431,8 +1431,10 @@ final class PageTests: XCTestCase {
         XCTAssertFalse(source.contains("private var writingContextTools"))
         XCTAssertFalse(source.contains(".popover(isPresented: $showsPageActions"))
         XCTAssertTrue(source.contains("try WritingDeskProductionPack.bundled()"))
-        XCTAssertTrue(source.contains("WritingDeskPackMarkArtwork"))
-        XCTAssertTrue(source.contains("WritingDeskPackLinkArtwork"))
+        let grid = try String(
+            contentsOf: root.appending(path: "Sources/Screens/PageGridView.swift"), encoding: .utf8)
+        XCTAssertTrue(grid.contains("WritingDeskPackMarkArtwork"))
+        XCTAssertTrue(grid.contains("WritingDeskPackLinkArtwork"))
     }
 
     func testWritingDeskCancellationClearsGhostAndPageSessionWithoutMutatingPage() {
@@ -1445,7 +1447,9 @@ final class PageTests: XCTestCase {
                                              held: .init(rawValue: 2),
                                              connectionError: "still active")
 
-        let encoded = try! JSONEncoder().encode(original)
+        let encoder = JSONEncoder()
+        encoder.outputFormatting = [.sortedKeys]
+        let encoded = try! encoder.encode(original)
         for trigger in WritingDeskInteractionCancellation.Trigger.allCases {
             ghost = .init(glyph: "sun", content: .source("sun"), origin: .init(column: 1, row: 1))
             session = .init(mode: .connecting, anchor: .init(rawValue: 1),
@@ -1456,8 +1460,14 @@ final class PageTests: XCTestCase {
             XCTAssertNil(ghost, "\(trigger)")
             XCTAssertEqual(token, before + 1, "\(trigger)")
             XCTAssertEqual(session, PageInteractionSession(), "\(trigger)")
-            XCTAssertEqual(try! JSONEncoder().encode(original), encoded, "\(trigger)")
+            XCTAssertEqual(try! encoder.encode(original), encoded, "\(trigger)")
         }
+    }
+
+    func testPageGridLoadIdentityChangesWhenRoutePackBecomesAvailable() {
+        let page = PageInteractionIdentity(width: 6, height: 6, runeIDs: [])
+        XCTAssertNotEqual(PageGridLoadIdentity(page: page, packAvailable: false),
+                          PageGridLoadIdentity(page: page, packAvailable: true))
     }
 
     func testEveryRequiredWriteCancellationTriggerUsesTheOneCancellationFunction() throws {
@@ -1465,13 +1475,11 @@ final class PageTests: XCTestCase {
             .deletingLastPathComponent().deletingLastPathComponent()
         let source = try String(contentsOf: root.appending(path: "Sources/Screens/WritingDeskView.swift"),
                                 encoding: .utf8)
-        XCTAssertTrue(source.contains("Button { cancelPageInteraction(); dismiss() }"))
-        XCTAssertTrue(source.contains(".onChange(of: pane)"))
-        XCTAssertTrue(source.contains(".onChange(of: bin)"))
-        XCTAssertTrue(source.contains(".onChange(of: state.base.bestHand)"))
-        XCTAssertTrue(source.contains("if unlocked { presentedSheet = .inkWell }"))
-        XCTAssertTrue(source.contains("showsPageActions = true"))
-        XCTAssertTrue(source.contains("background(Color.clear.contentShape(Rectangle()).onTapGesture"))
+        for call in ["cancelPageInteraction(.back)", "cancelPageInteraction(.pane)",
+                     "cancelPageInteraction(.bin)", "cancelPageInteraction(.handOrInk)",
+                     "cancelPageInteraction(.pageActions)", "cancelPageInteraction(.outsidePage)"] {
+            XCTAssertTrue(source.contains(call), "missing typed cancellation call \(call)")
+        }
     }
 
     func testWritingDeskPersonalCompoundPaletteUsesFrozenPlacementAuthorityAndAnchoredDetail() throws {
@@ -1508,7 +1516,7 @@ final class PageTests: XCTestCase {
         XCTAssertTrue(source.contains("\"Delete this Template?\""))
         XCTAssertTrue(source.contains("PageTemplateRules.capacity) Templates"),
                       "the bounded shelf must disclose current usage and its cap")
-        XCTAssertTrue(source.contains("Button(\"Save Template\")")
+        XCTAssertTrue(source.contains("Button(\"Save Template\", action: save)")
                       || source.contains(".accessibilityLabel(\"Save Template\")"))
     }
 
@@ -1518,8 +1526,7 @@ final class PageTests: XCTestCase {
         let source = try String(
             contentsOf: root.appending(path: "Sources/Screens/WritingDeskView.swift"),
             encoding: .utf8)
-        XCTAssertTrue(source.contains("Ash ink"))
-        XCTAssertTrue(source.contains("Color left open"))
+        XCTAssertTrue(source.contains("Ash ink · color open"))
         XCTAssertTrue(source.contains("InkChannelSlider(name: \"Cyan\""))
         XCTAssertTrue(source.contains("InkChannelSlider(name: \"Magenta\""))
         XCTAssertTrue(source.contains("InkChannelSlider(name: \"Yellow\""))
