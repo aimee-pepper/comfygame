@@ -1,0 +1,759 @@
+{
+  "receiptID": "arrival.starter_rainwashed_shore.v1",
+  "worldSeed": "26",
+  "sourcePage": {
+    "id": "starter_rainwashed_shore",
+    "title": "Rainwashed Shore",
+    "marks": [
+      {
+        "x": 1,
+        "y": 2,
+        "cells": [
+          [
+            0,
+            0
+          ],
+          [
+            1,
+            0
+          ],
+          [
+            2,
+            0
+          ],
+          [
+            0,
+            1
+          ],
+          [
+            1,
+            1
+          ],
+          [
+            2,
+            1
+          ]
+        ]
+      }
+    ]
+  },
+  "dominantGround": "stone",
+  "waterRelationship": "shelves",
+  "materialDescriptor": {
+    "identity": "granite",
+    "paletteFamilyID": "paleNeutral",
+    "transform": {
+      "hue": -3,
+      "saturation": 0.936512,
+      "value": -10
+    },
+    "resolvedColor": [
+      140,
+      49,
+      94
+    ]
+  },
+  "illumination": {
+    "band": "trueDark",
+    "sourceClass": "cyclic"
+  },
+  "suspendedAtmosphere": {
+    "medium": "none",
+    "density": "none",
+    "motion": "calm"
+  },
+  "precipitation": {
+    "medium": "none",
+    "intensity": "none",
+    "motion": "calm"
+  },
+  "flora": [
+    {
+      "stableID": "flora-18175417967354178962",
+      "formID": 3,
+      "coverage": "sparse",
+      "habit": "spreading",
+      "color": [
+        68,
+        123,
+        151
+      ]
+    },
+    {
+      "stableID": "flora-5043446477382928831",
+      "formID": 3,
+      "coverage": "sparse",
+      "habit": "spreading",
+      "color": [
+        63,
+        157,
+        74
+      ]
+    }
+  ],
+  "causalVisualFacts": [
+    {
+      "markID": "archipelago",
+      "visibleScope": "water",
+      "contributionKind": "reshaped",
+      "resultBand": "stone-shelves-mixed-depth",
+      "withoutAuthoredBand": "ash-rubble-different-water"
+    }
+  ],
+  "entryDisclosure": null,
+  "description": "Stone shelves break a wide run of shallow and deep water. Your Archipelago mark divided the route, while sparse growth settled on the open stone.",
+  "firstMapCropReceipt": {
+    "width": 9,
+    "height": 9,
+    "cells": [
+      {
+        "x": 0,
+        "y": 0,
+        "ground": "stone",
+        "elevation": 0,
+        "floraStableID": null,
+        "visibility": "hidden"
+      },
+      {
+        "x": 1,
+        "y": 0,
+        "ground": "stone",
+        "elevation": 0,
+        "floraStableID": null,
+        "visibility": "hidden"
+      },
+      {
+        "x": 2,
+        "y": 0,
+        "ground": "stone",
+        "elevation": 0,
+        "floraStableID": null,
+        "visibility": "hidden"
+      },
+      {
+        "x": 3,
+        "y": 0,
+        "ground": "stone",
+        "elevation": 0,
+        "floraStableID": null,
+        "visibility": "hidden"
+      },
+      {
+        "x": 4,
+        "y": 0,
+        "ground": "stone",
+        "elevation": 0,
+        "floraStableID": null,
+        "visibility": "hidden"
+      },
+      {
+        "x": 5,
+        "y": 0,
+        "ground": "stone",
+        "elevation": 0,
+        "floraStableID": null,
+        "visibility": "hidden"
+      },
+      {
+        "x": 6,
+        "y": 0,
+        "ground": "stone",
+        "elevation": 0,
+        "floraStableID": null,
+        "visibility": "hidden"
+      },
+      {
+        "x": 7,
+        "y": 0,
+        "ground": "stone",
+        "elevation": 0,
+        "floraStableID": null,
+        "visibility": "hidden"
+      },
+      {
+        "x": 8,
+        "y": 0,
+        "ground": "stone",
+        "elevation": 0,
+        "floraStableID": null,
+        "visibility": "hidden"
+      },
+      {
+        "x": 0,
+        "y": 1,
+        "ground": "stone",
+        "elevation": 0,
+        "floraStableID": null,
+        "visibility": "hidden"
+      },
+      {
+        "x": 1,
+        "y": 1,
+        "ground": "stone",
+        "elevation": 0,
+        "floraStableID": null,
+        "visibility": "hidden"
+      },
+      {
+        "x": 2,
+        "y": 1,
+        "ground": "stone",
+        "elevation": 0,
+        "floraStableID": null,
+        "visibility": "hidden"
+      },
+      {
+        "x": 3,
+        "y": 1,
+        "ground": "stone",
+        "elevation": 0,
+        "floraStableID": null,
+        "visibility": "hidden"
+      },
+      {
+        "x": 4,
+        "y": 1,
+        "ground": "stone",
+        "elevation": 0,
+        "floraStableID": null,
+        "visibility": "hidden"
+      },
+      {
+        "x": 5,
+        "y": 1,
+        "ground": "stone",
+        "elevation": 0,
+        "floraStableID": null,
+        "visibility": "hidden"
+      },
+      {
+        "x": 6,
+        "y": 1,
+        "ground": "stone",
+        "elevation": 0,
+        "floraStableID": null,
+        "visibility": "hidden"
+      },
+      {
+        "x": 7,
+        "y": 1,
+        "ground": "stone",
+        "elevation": 0,
+        "floraStableID": null,
+        "visibility": "hidden"
+      },
+      {
+        "x": 8,
+        "y": 1,
+        "ground": "stone",
+        "elevation": 0,
+        "floraStableID": null,
+        "visibility": "hidden"
+      },
+      {
+        "x": 0,
+        "y": 2,
+        "ground": "stone",
+        "elevation": 0,
+        "floraStableID": null,
+        "visibility": "hidden"
+      },
+      {
+        "x": 1,
+        "y": 2,
+        "ground": "stone",
+        "elevation": 0,
+        "floraStableID": null,
+        "visibility": "hidden"
+      },
+      {
+        "x": 2,
+        "y": 2,
+        "ground": "stone",
+        "elevation": 0,
+        "floraStableID": null,
+        "visibility": "hidden"
+      },
+      {
+        "x": 3,
+        "y": 2,
+        "ground": "stone",
+        "elevation": 0,
+        "floraStableID": null,
+        "visibility": "hidden"
+      },
+      {
+        "x": 4,
+        "y": 2,
+        "ground": "stone",
+        "elevation": 0,
+        "floraStableID": null,
+        "visibility": "hidden"
+      },
+      {
+        "x": 5,
+        "y": 2,
+        "ground": "stone",
+        "elevation": 0,
+        "floraStableID": null,
+        "visibility": "hidden"
+      },
+      {
+        "x": 6,
+        "y": 2,
+        "ground": "stone",
+        "elevation": 0,
+        "floraStableID": null,
+        "visibility": "hidden"
+      },
+      {
+        "x": 7,
+        "y": 2,
+        "ground": "stone",
+        "elevation": 0,
+        "floraStableID": null,
+        "visibility": "hidden"
+      },
+      {
+        "x": 8,
+        "y": 2,
+        "ground": "stone",
+        "elevation": 0,
+        "floraStableID": null,
+        "visibility": "hidden"
+      },
+      {
+        "x": 0,
+        "y": 3,
+        "ground": "stone",
+        "elevation": 0,
+        "floraStableID": null,
+        "visibility": "hidden"
+      },
+      {
+        "x": 1,
+        "y": 3,
+        "ground": "stone",
+        "elevation": 0,
+        "floraStableID": null,
+        "visibility": "hidden"
+      },
+      {
+        "x": 2,
+        "y": 3,
+        "ground": "stone",
+        "elevation": 0,
+        "floraStableID": null,
+        "visibility": "hidden"
+      },
+      {
+        "x": 3,
+        "y": 3,
+        "ground": "stone",
+        "elevation": 0,
+        "floraStableID": null,
+        "visibility": "hidden"
+      },
+      {
+        "x": 4,
+        "y": 3,
+        "ground": "stone",
+        "elevation": 0,
+        "floraStableID": null,
+        "visibility": "hidden"
+      },
+      {
+        "x": 5,
+        "y": 3,
+        "ground": "stone",
+        "elevation": 0,
+        "floraStableID": null,
+        "visibility": "hidden"
+      },
+      {
+        "x": 6,
+        "y": 3,
+        "ground": "stone",
+        "elevation": 0,
+        "floraStableID": null,
+        "visibility": "hidden"
+      },
+      {
+        "x": 7,
+        "y": 3,
+        "ground": "stone",
+        "elevation": 0,
+        "floraStableID": null,
+        "visibility": "hidden"
+      },
+      {
+        "x": 8,
+        "y": 3,
+        "ground": "stone",
+        "elevation": 0,
+        "floraStableID": null,
+        "visibility": "hidden"
+      },
+      {
+        "x": 0,
+        "y": 4,
+        "ground": "stone",
+        "elevation": 0,
+        "floraStableID": null,
+        "visibility": "full"
+      },
+      {
+        "x": 1,
+        "y": 4,
+        "ground": "soil",
+        "elevation": 0,
+        "floraStableID": null,
+        "visibility": "full"
+      },
+      {
+        "x": 2,
+        "y": 4,
+        "ground": "rubble",
+        "elevation": 0,
+        "floraStableID": null,
+        "visibility": "full"
+      },
+      {
+        "x": 3,
+        "y": 4,
+        "ground": "stone",
+        "elevation": 0,
+        "floraStableID": null,
+        "visibility": "full"
+      },
+      {
+        "x": 4,
+        "y": 4,
+        "ground": "soil",
+        "elevation": 0,
+        "floraStableID": null,
+        "visibility": "full"
+      },
+      {
+        "x": 5,
+        "y": 4,
+        "ground": "stone",
+        "elevation": 0,
+        "floraStableID": null,
+        "visibility": "full"
+      },
+      {
+        "x": 6,
+        "y": 4,
+        "ground": "sand",
+        "elevation": 0,
+        "floraStableID": null,
+        "visibility": "full"
+      },
+      {
+        "x": 7,
+        "y": 4,
+        "ground": "stone",
+        "elevation": 0,
+        "floraStableID": null,
+        "visibility": "full"
+      },
+      {
+        "x": 8,
+        "y": 4,
+        "ground": "stone",
+        "elevation": 0,
+        "floraStableID": null,
+        "visibility": "full"
+      },
+      {
+        "x": 0,
+        "y": 5,
+        "ground": "stone",
+        "elevation": 3,
+        "floraStableID": null,
+        "visibility": "full"
+      },
+      {
+        "x": 1,
+        "y": 5,
+        "ground": "soil",
+        "elevation": 0,
+        "floraStableID": null,
+        "visibility": "full"
+      },
+      {
+        "x": 2,
+        "y": 5,
+        "ground": "rubble",
+        "elevation": 0,
+        "floraStableID": null,
+        "visibility": "full"
+      },
+      {
+        "x": 3,
+        "y": 5,
+        "ground": "stone",
+        "elevation": 0,
+        "floraStableID": null,
+        "visibility": "full"
+      },
+      {
+        "x": 4,
+        "y": 5,
+        "ground": "soil",
+        "elevation": 0,
+        "floraStableID": null,
+        "visibility": "full"
+      },
+      {
+        "x": 5,
+        "y": 5,
+        "ground": "stone",
+        "elevation": 0,
+        "floraStableID": null,
+        "visibility": "full"
+      },
+      {
+        "x": 6,
+        "y": 5,
+        "ground": "soil",
+        "elevation": 0,
+        "floraStableID": null,
+        "visibility": "full"
+      },
+      {
+        "x": 7,
+        "y": 5,
+        "ground": "stone",
+        "elevation": 0,
+        "floraStableID": null,
+        "visibility": "full"
+      },
+      {
+        "x": 8,
+        "y": 5,
+        "ground": "soil",
+        "elevation": 0,
+        "floraStableID": null,
+        "visibility": "full"
+      },
+      {
+        "x": 0,
+        "y": 6,
+        "ground": "stone",
+        "elevation": 0,
+        "floraStableID": null,
+        "visibility": "full"
+      },
+      {
+        "x": 1,
+        "y": 6,
+        "ground": "rubble",
+        "elevation": 0,
+        "floraStableID": null,
+        "visibility": "full"
+      },
+      {
+        "x": 2,
+        "y": 6,
+        "ground": "soil",
+        "elevation": 0,
+        "floraStableID": null,
+        "visibility": "full"
+      },
+      {
+        "x": 3,
+        "y": 6,
+        "ground": "soil",
+        "elevation": 0,
+        "floraStableID": null,
+        "visibility": "full"
+      },
+      {
+        "x": 4,
+        "y": 6,
+        "ground": "groundcover",
+        "elevation": 0,
+        "floraStableID": "flora-5043446477382928000",
+        "visibility": "full"
+      },
+      {
+        "x": 5,
+        "y": 6,
+        "ground": "soil",
+        "elevation": 0,
+        "floraStableID": null,
+        "visibility": "full"
+      },
+      {
+        "x": 6,
+        "y": 6,
+        "ground": "stone",
+        "elevation": 0,
+        "floraStableID": null,
+        "visibility": "full"
+      },
+      {
+        "x": 7,
+        "y": 6,
+        "ground": "stone",
+        "elevation": 1,
+        "floraStableID": null,
+        "visibility": "full"
+      },
+      {
+        "x": 8,
+        "y": 6,
+        "ground": "stone",
+        "elevation": 0,
+        "floraStableID": null,
+        "visibility": "full"
+      },
+      {
+        "x": 0,
+        "y": 7,
+        "ground": "stone",
+        "elevation": 0,
+        "floraStableID": null,
+        "visibility": "full"
+      },
+      {
+        "x": 1,
+        "y": 7,
+        "ground": "soil",
+        "elevation": 0,
+        "floraStableID": null,
+        "visibility": "full"
+      },
+      {
+        "x": 2,
+        "y": 7,
+        "ground": "soil",
+        "elevation": 0,
+        "floraStableID": null,
+        "visibility": "full"
+      },
+      {
+        "x": 3,
+        "y": 7,
+        "ground": "stone",
+        "elevation": 0,
+        "floraStableID": null,
+        "visibility": "full"
+      },
+      {
+        "x": 4,
+        "y": 7,
+        "ground": "stone",
+        "elevation": 0,
+        "floraStableID": null,
+        "visibility": "full"
+      },
+      {
+        "x": 5,
+        "y": 7,
+        "ground": "stone",
+        "elevation": 0,
+        "floraStableID": null,
+        "visibility": "full"
+      },
+      {
+        "x": 6,
+        "y": 7,
+        "ground": "stone",
+        "elevation": 2,
+        "floraStableID": null,
+        "visibility": "full"
+      },
+      {
+        "x": 7,
+        "y": 7,
+        "ground": "stone",
+        "elevation": 0,
+        "floraStableID": null,
+        "visibility": "full"
+      },
+      {
+        "x": 8,
+        "y": 7,
+        "ground": "soil",
+        "elevation": 0,
+        "floraStableID": null,
+        "visibility": "full"
+      },
+      {
+        "x": 0,
+        "y": 8,
+        "ground": "water",
+        "elevation": 0,
+        "floraStableID": null,
+        "visibility": "full"
+      },
+      {
+        "x": 1,
+        "y": 8,
+        "ground": "stone",
+        "elevation": 0,
+        "floraStableID": null,
+        "visibility": "full"
+      },
+      {
+        "x": 2,
+        "y": 8,
+        "ground": "stone",
+        "elevation": 0,
+        "floraStableID": null,
+        "visibility": "full"
+      },
+      {
+        "x": 3,
+        "y": 8,
+        "ground": "stone",
+        "elevation": 0,
+        "floraStableID": null,
+        "visibility": "full"
+      },
+      {
+        "x": 4,
+        "y": 8,
+        "ground": "stone",
+        "elevation": 0,
+        "floraStableID": null,
+        "visibility": "full"
+      },
+      {
+        "x": 5,
+        "y": 8,
+        "ground": "water",
+        "elevation": 0,
+        "floraStableID": null,
+        "visibility": "full"
+      },
+      {
+        "x": 6,
+        "y": 8,
+        "ground": "water",
+        "elevation": 0,
+        "floraStableID": null,
+        "visibility": "full"
+      },
+      {
+        "x": 7,
+        "y": 8,
+        "ground": "mud",
+        "elevation": 0,
+        "floraStableID": null,
+        "visibility": "full"
+      },
+      {
+        "x": 8,
+        "y": 8,
+        "ground": "stone",
+        "elevation": 3,
+        "floraStableID": null,
+        "visibility": "full"
+      }
+    ]
+  }
+}

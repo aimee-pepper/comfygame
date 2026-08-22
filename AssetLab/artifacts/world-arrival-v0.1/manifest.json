@@ -1,0 +1,464 @@
+{
+  "schemaVersion": 1,
+  "identity": "world-arrival-v1-asset-proof",
+  "integrationReady": false,
+  "logicalScene": {
+    "width": 160,
+    "height": 100
+  },
+  "phone": {
+    "width": 368,
+    "height": 800
+  },
+  "lifecycleDependency": {
+    "source": "src/splash-kit.js",
+    "mode": "imported-frame-and-entry-mark",
+    "modified": false
+  },
+  "bridgeInputs": {
+    "worldVisualReceipt": true,
+    "pressureOwnedEntryLight": true,
+    "currentRevealCrop": true,
+    "creatureAmbience": false,
+    "suspendedAndPrecipitationSeparate": true
+  },
+  "fixtureFiles": [
+    "fixtures/world-arrival-v1/starter_open_meadow.json",
+    "fixtures/world-arrival-v1/starter_rainwashed_shore.json",
+    "fixtures/world-arrival-v1/starter_stone_hollow.json",
+    "fixtures/world-arrival-v1/near_flora.json",
+    "fixtures/world-arrival-v1/ash_open_color.json",
+    "fixtures/world-arrival-v1/visible_site_candidate.json",
+    "fixtures/world-arrival-v1/longest_copy.json"
+  ],
+  "pixelParts": {
+    "rock-cluster": {
+      "native": {
+        "file": "parts/rock-cluster-native.png",
+        "width": 8,
+        "height": 6,
+        "sha256": "f355e2d35409162d2931333329eb3bc2c8fb3d6d962a35d09ffba8284c616c68"
+      },
+      "scale400": {
+        "file": "parts/rock-cluster-400pct.png",
+        "width": 32,
+        "height": 24,
+        "sha256": "5917f229aafec2ecd328e0b0887048bf16ed0a534329bd60500e69e602d43c0b"
+      }
+    },
+    "succulent-crown": {
+      "native": {
+        "file": "parts/succulent-crown-native.png",
+        "width": 7,
+        "height": 6,
+        "sha256": "53c8a81635b950b53bfe6c43934db846090ce4333a21a5faa110bd6e184222d4"
+      },
+      "scale400": {
+        "file": "parts/succulent-crown-400pct.png",
+        "width": 28,
+        "height": 24,
+        "sha256": "24e8ec92392ddcad8ca6c186dbdd8557cf24245f27940f62ff92aeb804d15bc3"
+      }
+    },
+    "organic-pool-bank": {
+      "native": {
+        "file": "parts/organic-pool-bank-native.png",
+        "width": 14,
+        "height": 7,
+        "sha256": "5d60dd0f2b56cc4b22aeb3344896409f5fd4fd93785456518a185245505411a3"
+      },
+      "scale400": {
+        "file": "parts/organic-pool-bank-400pct.png",
+        "width": 56,
+        "height": 28,
+        "sha256": "355418033c905c5d602fb7c0287872794089c1f2e08d5b8a802e880bca897c05"
+      }
+    },
+    "broken-stone-shelf": {
+      "native": {
+        "file": "parts/broken-stone-shelf-native.png",
+        "width": 15,
+        "height": 7,
+        "sha256": "a86dbb5e64bca77e8974ab65b039302b64c549c073e4027ba2e1a55ff1ebf45d"
+      },
+      "scale400": {
+        "file": "parts/broken-stone-shelf-400pct.png",
+        "width": 60,
+        "height": 28,
+        "sha256": "4e6491ba30a3072628f910f6864f593d145a604ee48bca93bbb9c675d611ed49"
+      }
+    }
+  },
+  "pixelPartsContactSheet": {
+    "file": "evidence/pixel-parts-native-and-400pct.png",
+    "width": 640,
+    "height": 150,
+    "sha256": "ab06831968c4c62bf8f1e17730dbd506b760f59c2b870e2cb695190569a13ba2"
+  },
+  "parts": {
+    "frame": {
+      "file": "parts/frame-logical-160x100.png",
+      "width": 160,
+      "height": 100,
+      "sha256": "941fa475e198446b356c06596707bf736dc50c3dd1297581538f049b01b6f845"
+    },
+    "illumination": {
+      "file": "parts/illumination-logical-160x100.png",
+      "width": 160,
+      "height": 100,
+      "sha256": "9fba08f3d9be2003aa42cf6b6ee3bd010f131b1cedf3678ee3150aeb62f2076f"
+    },
+    "ground": {
+      "file": "parts/ground-logical-160x100.png",
+      "width": 160,
+      "height": 100,
+      "sha256": "3467373a1780c64979501af23903a97726162988d494ef75cc0da82ccdbff845"
+    },
+    "water": {
+      "file": "parts/water-logical-160x100.png",
+      "width": 160,
+      "height": 100,
+      "sha256": "b13eca6917831f8758ef83833236e26cd65745fca59b70667e6990c47015c9a8"
+    },
+    "material": {
+      "file": "parts/material-logical-160x100.png",
+      "width": 160,
+      "height": 100,
+      "sha256": "3522dbc89e87edbb73afda25e819f0f48fb2f3095ee60bbf5eea622f009064e2"
+    },
+    "flora": {
+      "file": "parts/flora-logical-160x100.png",
+      "width": 160,
+      "height": 100,
+      "sha256": "d04f8d4e6b281605dcdf8e377c81d4b439b14a1f5cbf3911c5d309155ab9b233"
+    },
+    "suspended": {
+      "file": "parts/suspended-logical-160x100.png",
+      "width": 160,
+      "height": 100,
+      "sha256": "7c4ac9fbe8724559bfa6e00ab194b1f3a8346f9e96e5f6ff3e66519687cf73f8"
+    },
+    "precipitation": {
+      "file": "parts/precipitation-logical-160x100.png",
+      "width": 160,
+      "height": 100,
+      "sha256": "c82c879cc93ec9c50b99d3bed6a73512aa2743e7b9e2c89c1ad66a2b222fe366"
+    },
+    "entryMark": {
+      "file": "parts/entryMark-logical-160x100.png",
+      "width": 160,
+      "height": 100,
+      "sha256": "7ab3fda82e8b85dde6c327f8b78771d36d1623a4ca022c3d91266bf23ae3d9f5"
+    }
+  },
+  "partsContactSheetNative": {
+    "file": "evidence/runtime-parts-contact-sheet-native.png",
+    "width": 516,
+    "height": 378,
+    "sha256": "953e722bb31f74d7bd4b4e8ccf9db38aa76aaf4005b893beab59a3edc5998fae"
+  },
+  "partsContactSheet": {
+    "file": "evidence/runtime-parts-contact-sheet-400pct.png",
+    "width": 1956,
+    "height": 1278,
+    "sha256": "cadf4326794fcfa8d61ea9f19f71667c995842d8fca13aa4b780dc88c5e2a6c6"
+  },
+  "records": {
+    "starter_open_meadow": {
+      "promotable": true,
+      "scene": {
+        "file": "scenes/starter_open_meadow-logical-160x100.png",
+        "width": 160,
+        "height": 100,
+        "sha256": "b724a13a6d9fb19d8a3154963ea60d31f88e10c95c445784bf8adca02a6a3025"
+      },
+      "sceneGray": {
+        "file": "scenes/starter_open_meadow-grayscale-logical-160x100.png",
+        "width": 160,
+        "height": 100,
+        "sha256": "60e86a638017afe589d8cb1b3bad53b5f053a6323d8ec900c6e04c6a833cd087"
+      },
+      "phone": {
+        "file": "phones/starter_open_meadow-368x800.png",
+        "width": 368,
+        "height": 800,
+        "sha256": "4b4bc996eb8c534321724d10276192055140054ad8acafc4621b69eac844f82f"
+      },
+      "phoneGray": {
+        "file": "phones/starter_open_meadow-grayscale-368x800.png",
+        "width": 368,
+        "height": 800,
+        "sha256": "1769d2aa0d57096210b0f365c6f4c5c6e9225a11d4aa01f5aeee7fe53e76e178"
+      },
+      "mapCrop": {
+        "file": "evidence/starter_open_meadow-first-map-crop-90x90.png",
+        "width": 90,
+        "height": 90,
+        "sha256": "05c17c2fe45ea0c497f2a6aa4cd27b35ae8fab31fe46e4cb7fff8ae5db7a51f8"
+      }
+    },
+    "starter_rainwashed_shore": {
+      "promotable": true,
+      "scene": {
+        "file": "scenes/starter_rainwashed_shore-logical-160x100.png",
+        "width": 160,
+        "height": 100,
+        "sha256": "6ac72422b3dbb2a4725daf4f5738a41b7c3da8cfa0123fe84e69fcc4254dc535"
+      },
+      "sceneGray": {
+        "file": "scenes/starter_rainwashed_shore-grayscale-logical-160x100.png",
+        "width": 160,
+        "height": 100,
+        "sha256": "0627922a14fbba549afd5035027b0fb97f99e55207933fb43142e8606f9b1e11"
+      },
+      "phone": {
+        "file": "phones/starter_rainwashed_shore-368x800.png",
+        "width": 368,
+        "height": 800,
+        "sha256": "afae1ae142e8533ccc949a6c9ec2571c1bfb17f9741e597f2df8ac4f944bcfc3"
+      },
+      "phoneGray": {
+        "file": "phones/starter_rainwashed_shore-grayscale-368x800.png",
+        "width": 368,
+        "height": 800,
+        "sha256": "5651c8523a929e99c85c3af709a6a8e2e2f4bab1df6ff84ed625d947717a3a83"
+      },
+      "mapCrop": {
+        "file": "evidence/starter_rainwashed_shore-first-map-crop-90x90.png",
+        "width": 90,
+        "height": 90,
+        "sha256": "822dcb683bbcc02504cd7b4dd1c947ff5bf2574dc6b78450c1e04fb5dc4808ce"
+      }
+    },
+    "starter_stone_hollow": {
+      "promotable": true,
+      "scene": {
+        "file": "scenes/starter_stone_hollow-logical-160x100.png",
+        "width": 160,
+        "height": 100,
+        "sha256": "4f6b3aa2f5acef18ee74e2f61ee9e0716995bf3e8e4ab4ab54520a722225469d"
+      },
+      "sceneGray": {
+        "file": "scenes/starter_stone_hollow-grayscale-logical-160x100.png",
+        "width": 160,
+        "height": 100,
+        "sha256": "3dfdf594913989486630b1261ef22899fb1c65332fb8dedd673aa4b2e8f7cf30"
+      },
+      "phone": {
+        "file": "phones/starter_stone_hollow-368x800.png",
+        "width": 368,
+        "height": 800,
+        "sha256": "78335aefc1e13a81af53a44164c81cc21f541fae6b1a706807edfcb91fc9d342"
+      },
+      "phoneGray": {
+        "file": "phones/starter_stone_hollow-grayscale-368x800.png",
+        "width": 368,
+        "height": 800,
+        "sha256": "89751647f0f5684014b027c6809adbeb89cd5049e58e82d30c1bc3b8ad40e43a"
+      },
+      "mapCrop": {
+        "file": "evidence/starter_stone_hollow-first-map-crop-90x90.png",
+        "width": 90,
+        "height": 90,
+        "sha256": "1a213e81ba33487310759ec75347e72809578c33b1300cfaacdc1471baf4ef64"
+      }
+    },
+    "near_flora": {
+      "promotable": true,
+      "scene": {
+        "file": "scenes/near_flora-logical-160x100.png",
+        "width": 160,
+        "height": 100,
+        "sha256": "311ae8cbc96f1f44130dc4529f3173b8f21ca46b0c72bfab6413c1225c7487d5"
+      },
+      "sceneGray": {
+        "file": "scenes/near_flora-grayscale-logical-160x100.png",
+        "width": 160,
+        "height": 100,
+        "sha256": "37f972f66918276f952438bdf6294ed309fc79e6ee53f02985c8634eaaba6090"
+      },
+      "phone": {
+        "file": "phones/near_flora-368x800.png",
+        "width": 368,
+        "height": 800,
+        "sha256": "3432cde2f9ae53f6b577f1d9e930ecf2e97f089b87eec83ae50722e7e2f27945"
+      },
+      "phoneGray": {
+        "file": "phones/near_flora-grayscale-368x800.png",
+        "width": 368,
+        "height": 800,
+        "sha256": "38944c840ee7337e8344c8a9df6b99c44e0cb52ddc05b60db809929210893b4f"
+      },
+      "mapCrop": {
+        "file": "evidence/near_flora-first-map-crop-90x90.png",
+        "width": 90,
+        "height": 90,
+        "sha256": "05c17c2fe45ea0c497f2a6aa4cd27b35ae8fab31fe46e4cb7fff8ae5db7a51f8"
+      }
+    },
+    "ash_open_color": {
+      "promotable": true,
+      "scene": {
+        "file": "scenes/ash_open_color-logical-160x100.png",
+        "width": 160,
+        "height": 100,
+        "sha256": "f99b794b33cca8045a658036a6bffe623cf308f97976cc7d48f3004292fc67e9"
+      },
+      "sceneGray": {
+        "file": "scenes/ash_open_color-grayscale-logical-160x100.png",
+        "width": 160,
+        "height": 100,
+        "sha256": "f24b41b1918d7535317416d58bf0c77aeb03350222fb959e62504354cf23edde"
+      },
+      "phone": {
+        "file": "phones/ash_open_color-368x800.png",
+        "width": 368,
+        "height": 800,
+        "sha256": "6b11a5d9ec5785b375da90f2b362f4191a961f5c99b1946b9fcdc944481800c6"
+      },
+      "phoneGray": {
+        "file": "phones/ash_open_color-grayscale-368x800.png",
+        "width": 368,
+        "height": 800,
+        "sha256": "96052471cdce0a9db13b70819c74216b67a3311454ae5b718467a63a20178d2a"
+      },
+      "mapCrop": {
+        "file": "evidence/ash_open_color-first-map-crop-90x90.png",
+        "width": 90,
+        "height": 90,
+        "sha256": "05c17c2fe45ea0c497f2a6aa4cd27b35ae8fab31fe46e4cb7fff8ae5db7a51f8"
+      }
+    },
+    "visible_site_candidate": {
+      "promotable": false,
+      "scene": {
+        "file": "scenes/visible_site_candidate-logical-160x100.png",
+        "width": 160,
+        "height": 100,
+        "sha256": "4b919709b407258518e7285c91f2c7a68e98006905ff3dc1cb9d328d7e567872"
+      },
+      "sceneGray": {
+        "file": "scenes/visible_site_candidate-grayscale-logical-160x100.png",
+        "width": 160,
+        "height": 100,
+        "sha256": "8d96ee35e49363c27f734690bb9d74743d2ac68e6892d9c17e4b3b2bc68b88e3"
+      },
+      "phone": {
+        "file": "phones/visible_site_candidate-368x800.png",
+        "width": 368,
+        "height": 800,
+        "sha256": "5b8d8560a3d384bb90db44a4d4306b17b315731f504c5533cd297d031f7a5534"
+      },
+      "phoneGray": {
+        "file": "phones/visible_site_candidate-grayscale-368x800.png",
+        "width": 368,
+        "height": 800,
+        "sha256": "9286b865f62ffd3822e6ab6bd8a40ffdc7e7a72ae695826bd6ac97044d5df973"
+      },
+      "mapCrop": {
+        "file": "evidence/visible_site_candidate-first-map-crop-90x90.png",
+        "width": 90,
+        "height": 90,
+        "sha256": "822dcb683bbcc02504cd7b4dd1c947ff5bf2574dc6b78450c1e04fb5dc4808ce"
+      }
+    },
+    "longest_copy": {
+      "promotable": false,
+      "scene": {
+        "file": "scenes/longest_copy-logical-160x100.png",
+        "width": 160,
+        "height": 100,
+        "sha256": "3cd8161b05c91ed956b221ecea5046ad92f00a29f29920890e6a51bbe7986cb4"
+      },
+      "sceneGray": {
+        "file": "scenes/longest_copy-grayscale-logical-160x100.png",
+        "width": 160,
+        "height": 100,
+        "sha256": "2ad021ca460c70a8cb3d0d0d0e1f64b8fc8cf1b629724c280a0e8a49348e771d"
+      },
+      "phone": {
+        "file": "phones/longest_copy-368x800.png",
+        "width": 368,
+        "height": 800,
+        "sha256": "a1260dce25d387d3f627382a8f5b918b36c7096bdf56c6c4242a6ea8f5e6843c"
+      },
+      "phoneGray": {
+        "file": "phones/longest_copy-grayscale-368x800.png",
+        "width": 368,
+        "height": 800,
+        "sha256": "df9f9fb7cf724e02bf478be47a9a57915d416944308ecd4ef3f0f5daae9377a3"
+      },
+      "mapCrop": {
+        "file": "evidence/longest_copy-first-map-crop-90x90.png",
+        "width": 90,
+        "height": 90,
+        "sha256": "1a213e81ba33487310759ec75347e72809578c33b1300cfaacdc1471baf4ef64"
+      }
+    }
+  },
+  "starterMatrix": {
+    "file": "evidence/starter-phone-continuity-matrix.png",
+    "width": 2208,
+    "height": 830,
+    "sha256": "a14823d893251ba3982663bcbd454abb687fbfe378eb4a7f6d3e538dc6688ae1"
+  },
+  "starterMatrixGray": {
+    "file": "evidence/starter-phone-continuity-matrix-grayscale.png",
+    "width": 2208,
+    "height": 830,
+    "sha256": "5380388b5893fc7217d579611b388f9a0f898d1a76ce6dff0eaec6f9fa527184"
+  },
+  "comparisonMatrix": {
+    "file": "evidence/near-far-phone-matrix.png",
+    "width": 1472,
+    "height": 1660,
+    "sha256": "5913e9bd5157e450f49508fb0a05e6aedce1ebe9525f54b424d024415b4633d2"
+  },
+  "comparisonMatrixGray": {
+    "file": "evidence/near-far-phone-matrix-grayscale.png",
+    "width": 1472,
+    "height": 1660,
+    "sha256": "0fc717c57288399fe9a19df53246a349c7e13345652b4f8bbaa3f146e5e66d3b"
+  },
+  "disclosureMatrix": {
+    "file": "evidence/disclosure-ash-phone-matrix.png",
+    "width": 2208,
+    "height": 830,
+    "sha256": "72011e082dc32d156f5c5e4016f3a7419b24582f793c0fb7ca853944b1faf35a"
+  },
+  "disclosureMatrixGray": {
+    "file": "evidence/disclosure-ash-phone-matrix-grayscale.png",
+    "width": 2208,
+    "height": 830,
+    "sha256": "778a82e09dade39267eabf614e6306c970357b23a938214f236c29ef8d312099"
+  },
+  "nonPromotable": [
+    "visible_site_candidate",
+    "longest_copy"
+  ],
+  "compositionReference": {
+    "file": "references/composition-reference-v0.2.png",
+    "productionSource": false,
+    "sha256": "c3a4ea8464ea46f339a9c68fef7909613618e4b827169ea0bc3afff41977c1d0"
+  },
+  "productionAuthority": [
+    "pixelParts",
+    "parts",
+    "compositor",
+    "strict-sanitized-receipt"
+  ],
+  "forbidden": [
+    "static-starter-production",
+    "second-generator",
+    "creature-ambience",
+    "hidden-site",
+    "hidden-resource",
+    "hidden-traveller",
+    "hidden-apex",
+    "unknown-mark",
+    "clouds",
+    "loading-progress",
+    "native-gameplay"
+  ],
+  "exporterSHA256": "f899b67c6c268efd82228003eb5e8bba0731bb7fd12cb05e42a78b5993412c38"
+}

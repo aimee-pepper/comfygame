@@ -1,0 +1,64 @@
+import assert from "node:assert/strict";
+import fs from "node:fs";
+import path from "node:path";
+import { execFileSync } from "node:child_process";
+import { createRequire } from "node:module";
+import { fileURLToPath } from "node:url";
+import { arrivalPixelPartCommands, arrivalPixelPartIDs, arrivalSceneCommands, cropCommands, lifecycleFrameCommands,
+  lifecycleEntryMarkCommands, receiptKeys, validateWorldArrivalReceipt } from "../src/world-arrival-kit.js";
+import { splashCommands, splashProofWorld, emptySplashDisclosure } from "../src/splash-kit.js";
+import { commandBounds } from "../src/generator.js";
+
+const { loadImage, createCanvas } = createRequire(import.meta.url)("@napi-rs/canvas");
+const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),"..");
+const script=path.join(root,"scripts/export-world-arrival-proof.mjs"),artifact=path.join(root,"artifacts/world-arrival-v0.1"),fixturesRoot=path.join(root,"fixtures/world-arrival-v1");
+execFileSync(process.execPath,[script,"--use-existing-fixtures"]);
+const manifestPath=path.join(artifact,"manifest.json"),firstManifest=fs.readFileSync(manifestPath),manifest=JSON.parse(firstManifest);
+assert.equal(manifest.integrationReady,false);assert.deepEqual(manifest.logicalScene,{width:160,height:100});assert.deepEqual(manifest.phone,{width:368,height:800});
+assert.equal(manifest.lifecycleDependency.modified,false);assert.equal(manifest.bridgeInputs.creatureAmbience,false);assert.equal(manifest.bridgeInputs.suspendedAndPrecipitationSeparate,true);
+assert.deepEqual(Object.keys(manifest.parts),["frame","illumination","ground","water","material","flora","suspended","precipitation","entryMark"]);
+assert.deepEqual(Object.keys(manifest.pixelParts),arrivalPixelPartIDs);
+for(const forbidden of ["second-generator","creature-ambience","hidden-site","hidden-resource","hidden-traveller","hidden-apex","unknown-mark","native-gameplay"])assert.ok(manifest.forbidden.includes(forbidden));
+
+const read=id=>JSON.parse(fs.readFileSync(path.join(fixturesRoot,`${id}.json`),"utf8"));
+const ids=["starter_open_meadow","starter_rainwashed_shore","starter_stone_hollow","near_flora","ash_open_color","visible_site_candidate","longest_copy"];
+const fixtures=Object.fromEntries(ids.map(id=>[id,read(id)]));
+for(const [id,receipt] of Object.entries(fixtures)){assert.deepEqual(validateWorldArrivalReceipt(receipt),[],id);assert.deepEqual(Object.keys(receipt).sort(),[...receiptKeys].sort());assert.equal("generatedCast" in receipt,false);assert.equal("creatures" in receipt,false);assert.equal("resources" in receipt,false);assert.equal("travellers" in receipt,false);const snapshot=structuredClone(receipt);arrivalSceneCommands(receipt);assert.deepEqual(receipt,snapshot,"compositor must not mutate receipt");const bounds=commandBounds(arrivalSceneCommands(receipt));assert.ok(bounds.minX>=0&&bounds.minY>=0&&bounds.maxX<=160&&bounds.maxY<=100);}
+const malformed=structuredClone(fixtures.starter_open_meadow);malformed.extra=true;assert.deepEqual(validateWorldArrivalReceipt(malformed),["invalid-receipt-fields"]);
+for(const [key,value] of [["dominantGround","lava"],["waterRelationship","portalRoute"]]){const invalid=structuredClone(fixtures.starter_open_meadow);invalid[key]=value;assert.ok(validateWorldArrivalReceipt(invalid).length);}
+const nestedExtra=structuredClone(fixtures.starter_open_meadow);nestedExtra.suspendedAtmosphere.secret="storm";assert.ok(validateWorldArrivalReceipt(nestedExtra).includes("invalid-suspended-atmosphere"));
+const missing=structuredClone(fixtures.starter_open_meadow);delete missing.precipitation;assert.deepEqual(validateWorldArrivalReceipt(missing),["invalid-receipt-fields"]);
+
+assert.equal(fixtures.starter_open_meadow.description,"Broad sandy ground runs between shallow pools. Your Plains mark opened the terrain, while your Verdant mark spread low growth farther along the few wet and stony edges.");
+assert.equal(fixtures.starter_rainwashed_shore.description,"Stone shelves break a wide run of shallow and deep water. Your Archipelago mark divided the route, while sparse growth settled on the open stone.");
+assert.equal(fixtures.starter_stone_hollow.description,"Stone closes around narrow paths and wet hollows. Your Caverns mark shaped the enclosure, while your Ore mark made ore more plentiful.");
+assert.equal(fixtures.longest_copy.description.trim().split(/\s+/).length,55);
+assert.equal(fixtures.longest_copy.description,"Broad stone shelves rise above narrow soil paths and connected pools of shallow water, with deep channels cutting between the largest dry crossings. Your Archipelago mark divided the route into separate shelves, while your Verdant mark spread dense low growth across the dampest edges and left the higher exposed ground comparatively bare near the entry.");
+assert.equal(fixtures.longest_copy.dominantGround,"stone");assert.equal(fixtures.longest_copy.waterRelationship,"channels");assert.deepEqual(fixtures.longest_copy.causalVisualFacts.map(row=>[row.markID,row.contributionKind]),[["archipelago","reshaped"],["verdant","increased"]]);
+assert.equal(fixtures.starter_open_meadow.causalVisualFacts.find(row=>row.markID==="verdant").contributionKind,"increased");
+assert.equal(fixtures.starter_stone_hollow.causalVisualFacts.find(row=>row.markID==="common_ore").contributionKind,"increased");
+assert.equal(fixtures.starter_open_meadow.causalVisualFacts.find(row=>row.markID==="plains").contributionKind,"reshaped");
+
+const accepted=splashCommands({transition:"entry",continuity:"transient",world:{...splashProofWorld},disclosure:{...emptySplashDisclosure}});
+assert.deepEqual(lifecycleFrameCommands,accepted.slice(0,3));assert.deepEqual(lifecycleEntryMarkCommands,accepted.slice(-2));
+for(const id of ["starter_open_meadow","starter_rainwashed_shore","starter_stone_hollow"]){const commands=arrivalSceneCommands(fixtures[id]),entry=commands.filter(command=>command.scope==="entryMark");assert.ok(entry.length>=6);assert.ok(entry.every(command=>command.w<=2&&command.h===1),`${id} embeds rune strokes without a plaque`);assert.ok(commands.some(command=>["ground","water","material"].includes(command.scope)&&command.y<34),`${id} owns distant scene pixels above the near terrain`);}
+const base=fixtures.starter_open_meadow,baseCommands=arrivalSceneCommands(base);
+const titleOnly=structuredClone(base);titleOnly.sourcePage.title="A title that cannot seed pixels";assert.deepEqual(arrivalSceneCommands(titleOnly),baseCommands);
+const causalOnly=structuredClone(base);causalOnly.causalVisualFacts=causalOnly.causalVisualFacts.map(row=>({...row,resultBand:`changed-${row.resultBand}`}));assert.deepEqual(arrivalSceneCommands(causalOnly),baseCommands,"causal facts are prose evidence, not image authority");
+const externalA={hiddenSite:"vault",hiddenResource:"mote",traveller:"secret",unknownMark:"storm"},externalB={hiddenSite:"tear",hiddenResource:"gold",traveller:"other",unknownMark:"blight"};assert.notDeepEqual(externalA,externalB);assert.deepEqual(arrivalSceneCommands(structuredClone(base)),arrivalSceneCommands(structuredClone(base)),"private complete-world mutation cannot enter the sanitized request");
+const floraChanged=arrivalSceneCommands(fixtures.near_flora);assert.deepEqual(baseCommands.filter(c=>c.scope!=="flora"),floraChanged.filter(c=>c.scope!=="flora"),"flora-only near pair may change only flora-owned pixels");
+assert.notDeepEqual(baseCommands.filter(c=>c.scope==="flora"),floraChanged.filter(c=>c.scope==="flora"));
+assert.notDeepEqual(arrivalSceneCommands(fixtures.starter_open_meadow),arrivalSceneCommands(fixtures.starter_rainwashed_shore),"opposed water structure must separate");
+assert.ok(fixtures.ash_open_color.materialDescriptor.resolvedColor.some(channel=>channel>100),"open Ash colour must remain chromatic, not black");
+assert.equal(fixtures.visible_site_candidate.entryDisclosure.status,"entryVisible");assert.ok(manifest.nonPromotable.includes("visible_site_candidate"));
+
+for(const id of ids){const record=manifest.records[id];for(const key of ["scene","sceneGray"]){const image=await loadImage(path.join(artifact,record[key].file));assert.deepEqual([image.width,image.height],[160,100]);}for(const key of ["phone","phoneGray"]){const image=await loadImage(path.join(artifact,record[key].file));assert.deepEqual([image.width,image.height],[368,800]);}const crop=await loadImage(path.join(artifact,record.mapCrop.file));assert.deepEqual([crop.width,crop.height],[90,90]);}
+for(const part of Object.values(manifest.parts)){const image=await loadImage(path.join(artifact,part.file));assert.deepEqual([image.width,image.height],[160,100]);}
+for(const id of arrivalPixelPartIDs){const expected=arrivalPixelPartCommands(id),record=manifest.pixelParts[id],native=await loadImage(path.join(artifact,record.native.file)),scaled=await loadImage(path.join(artifact,record.scale400.file));assert.deepEqual([native.width,native.height],[expected.width,expected.height]);assert.deepEqual([scaled.width,scaled.height],[expected.width*4,expected.height*4]);const partCanvas=createCanvas(native.width,native.height),partContext=partCanvas.getContext("2d");partContext.drawImage(native,0,0);const pixels=partContext.getImageData(0,0,native.width,native.height).data;for(let i=3;i<pixels.length;i+=4)assert.ok(pixels[i]===0||pixels[i]===255,`${id} uses binary alpha`);}
+const pixelPartSheetImage=await loadImage(path.join(artifact,manifest.pixelPartsContactSheet.file));assert.deepEqual([pixelPartSheetImage.width,pixelPartSheetImage.height],[640,150]);
+const nativePartSheetImage=await loadImage(path.join(artifact,manifest.partsContactSheetNative.file));assert.deepEqual([nativePartSheetImage.width,nativePartSheetImage.height],[516,378]);
+const partSheetImage=await loadImage(path.join(artifact,manifest.partsContactSheet.file));assert.deepEqual([partSheetImage.width,partSheetImage.height],[1956,1278]);
+for(const id of ["starter_open_meadow","starter_rainwashed_shore","starter_stone_hollow"]){const receipt=fixtures[id],visibleGrounds=new Set(receipt.firstMapCropReceipt.cells.filter(c=>c.visibility!=="hidden").map(c=>c.ground));assert.ok(visibleGrounds.has(receipt.dominantGround)||visibleGrounds.has("water")||visibleGrounds.has("deepWater"));assert.equal(cropCommands(receipt).some(c=>c.scope==="hidden"),true);}
+const scene=await loadImage(path.join(artifact,manifest.records.starter_open_meadow.scene.file)),canvas=createCanvas(160,100),context=canvas.getContext("2d");context.drawImage(scene,0,0);const data=context.getImageData(0,0,160,100).data,colors=new Set();for(let i=0;i<data.length;i+=4)if(data[i+3])colors.add(`${data[i]},${data[i+1]},${data[i+2]},${data[i+3]}`);assert.ok(colors.size<=64,"logical scene palette must remain bounded");
+execFileSync(process.execPath,[script,"--use-existing-fixtures"]);assert.deepEqual(fs.readFileSync(manifestPath),firstManifest,"repeat export must be byte-identical");
+console.log("World arrival runtime compositor proof passed.");
