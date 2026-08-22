@@ -1,0 +1,66 @@
+{
+  "schemaVersion": "writing-parchment-v1",
+  "integrationReady": false,
+  "status": "final-art-candidate-review-v0.2",
+  "productionSource": {
+    "kind": "logical-rgba-bitmap",
+    "reference": "reference/generated-parchment-reference.png",
+    "referenceProductionSource": false
+  },
+  "runtime": {
+    "stableKey": "writing.parchment.handmade-v1",
+    "path": "runtime/writing.parchment.handmade-v1-172x172.png",
+    "width": 172,
+    "height": 172,
+    "rgbaSHA256": "8428917aebca073dbf0c66493d5541cce0909a6e0228907950e37e72a97d2259",
+    "pngSHA256": "01d6d596c147f2787a1d9f5199740e7444f236402f3567e81242681b5076ce48",
+    "paletteCount": 10,
+    "alphaValues": [
+      0,
+      255
+    ],
+    "pivot": {
+      "x": 0,
+      "y": 0
+    },
+    "writingArea": {
+      "x": 5,
+      "y": 5,
+      "width": 162,
+      "height": 162
+    },
+    "socket": {
+      "columns": 6,
+      "rows": 6,
+      "width": 27,
+      "height": 27
+    },
+    "guideCoordinates": [
+      32,
+      59,
+      86,
+      113,
+      140
+    ]
+  },
+  "constraints": {
+    "runesChanged": false,
+    "uiChanged": false,
+    "gameplayChanged": false,
+    "woodBakedIn": false,
+    "proceduralNoise": false,
+    "nearestNeighbor": true
+  },
+  "evidence": [
+    "parchment-2x-344x344.png",
+    "parchment-400pct-688x688.png",
+    "parchment-dark-empty-writing-desk-368x800.png",
+    "parchment-dark-ink-state-writing-desk-368x800.png",
+    "parchment-empty-writing-desk-368x800.png",
+    "parchment-grayscale-2x-344x344.png",
+    "parchment-native-172x172.png",
+    "parchment-phone-368x800.png",
+    "parchment-phone-grayscale-368x800.png"
+  ],
+  "canonicalBodySHA256": "e7b1c7244a0959ce5889f8dce49ee2fe56f1c04ff7eb37436069dae1fd089792"
+}
