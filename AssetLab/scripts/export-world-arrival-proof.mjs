@@ -33,7 +33,7 @@ const causalFacts={
   ],
   starter_stone_hollow:[
     {markID:"caverns",visibleScope:"ground",contributionKind:"reshaped",resultBand:"enclosed-stone-wet-hollows",withoutAuthoredBand:"chasm-sand-low-stone"},
-    {markID:"common_ore",visibleScope:"ground",contributionKind:"increased",resultBand:"ordinary-ore:56",withoutAuthoredBand:"ordinary-ore:18"}
+    {markID:"common_ore",visibleScope:"resource",contributionKind:"increased",resultBand:"present",withoutAuthoredBand:"present"}
   ]
 };
 const dominantOrder=["stone","soil","sand","ice","ash","rubble","mud","growth","groundcover"];

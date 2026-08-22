@@ -61,10 +61,12 @@ export function validateWorldArrivalReceipt(receipt) {
     || !habits.includes(row.habit) || !finiteRGB(row.color))) issues.push("invalid-flora");
   if (!Array.isArray(receipt.causalVisualFacts) || receipt.causalVisualFacts.some(row =>
     !hasExactKeys(row, ["markID", "visibleScope", "contributionKind", "resultBand", "withoutAuthoredBand"])
-    || typeof row.markID !== "string" || !["ground", "water", "flora", "light", "atmosphere"].includes(row.visibleScope)
+    || typeof row.markID !== "string" || !["ground", "water", "flora", "resource", "light", "atmosphere"].includes(row.visibleScope)
     || !["none", "increased", "reduced", "reshaped"].includes(row.contributionKind)
     || typeof row.resultBand !== "string" || !row.resultBand
-    || typeof row.withoutAuthoredBand !== "string" || !row.withoutAuthoredBand)) issues.push("invalid-causal-visual-facts");
+    || typeof row.withoutAuthoredBand !== "string" || !row.withoutAuthoredBand
+    || (row.visibleScope === "resource" && (!["absent", "present"].includes(row.resultBand)
+      || !["absent", "present"].includes(row.withoutAuthoredBand))))) issues.push("invalid-causal-visual-facts");
   if (!(receipt.entryDisclosure === null || (hasExactKeys(receipt.entryDisclosure, ["siteProfile", "status"])
       && typeof receipt.entryDisclosure.siteProfile === "string" && receipt.entryDisclosure.status === "entryVisible"))) issues.push("invalid-entry-disclosure");
   const words = typeof receipt.description === "string" ? receipt.description.trim().split(/\s+/).length : 0;

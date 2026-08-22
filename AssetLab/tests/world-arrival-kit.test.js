@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import crypto from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
 import { execFileSync } from "node:child_process";
@@ -14,6 +15,7 @@ const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),"..");
 const script=path.join(root,"scripts/export-world-arrival-proof.mjs"),artifact=path.join(root,"artifacts/world-arrival-v0.1"),fixturesRoot=path.join(root,"fixtures/world-arrival-v1");
 execFileSync(process.execPath,[script,"--use-existing-fixtures"]);
 const manifestPath=path.join(artifact,"manifest.json"),firstManifest=fs.readFileSync(manifestPath),manifest=JSON.parse(firstManifest);
+const pngFiles=[];const collectPNGs=folder=>{for(const name of fs.readdirSync(folder)){const file=path.join(folder,name),stat=fs.statSync(file);if(stat.isDirectory())collectPNGs(file);else if(name.endsWith(".png"))pngFiles.push(file)}};collectPNGs(artifact);pngFiles.sort();const pngBundleReceipt=pngFiles.map(file=>`${path.relative(artifact,file)}:${crypto.createHash("sha256").update(fs.readFileSync(file)).digest("hex")}`).join("\n");assert.equal(pngFiles.length,62);assert.equal(crypto.createHash("sha256").update(pngBundleReceipt).digest("hex"),"e14c8e9622ffdfeb3a1ffeecd1e540632f7ca27c8704cd874313c32fc2f5f283","accepted production/evidence PNG bytes must not drift for the causal ABI correction");
 assert.equal(manifest.integrationReady,false);assert.deepEqual(manifest.logicalScene,{width:160,height:100});assert.deepEqual(manifest.phone,{width:368,height:800});
 assert.equal(manifest.lifecycleDependency.modified,false);assert.equal(manifest.bridgeInputs.creatureAmbience,false);assert.equal(manifest.bridgeInputs.suspendedAndPrecipitationSeparate,true);
 assert.deepEqual(Object.keys(manifest.parts),["frame","illumination","ground","water","material","flora","suspended","precipitation","entryMark"]);
@@ -36,7 +38,7 @@ assert.equal(fixtures.longest_copy.description.trim().split(/\s+/).length,55);
 assert.equal(fixtures.longest_copy.description,"Broad stone shelves rise above narrow soil paths and connected pools of shallow water, with deep channels cutting between the largest dry crossings. Your Archipelago mark divided the route into separate shelves, while your Verdant mark spread dense low growth across the dampest edges and left the higher exposed ground comparatively bare near the entry.");
 assert.equal(fixtures.longest_copy.dominantGround,"stone");assert.equal(fixtures.longest_copy.waterRelationship,"channels");assert.deepEqual(fixtures.longest_copy.causalVisualFacts.map(row=>[row.markID,row.contributionKind]),[["archipelago","reshaped"],["verdant","increased"]]);
 assert.equal(fixtures.starter_open_meadow.causalVisualFacts.find(row=>row.markID==="verdant").contributionKind,"increased");
-assert.equal(fixtures.starter_stone_hollow.causalVisualFacts.find(row=>row.markID==="common_ore").contributionKind,"increased");
+const oreFact=fixtures.starter_stone_hollow.causalVisualFacts.find(row=>row.markID==="common_ore");assert.deepEqual(oreFact,{markID:"common_ore",visibleScope:"resource",contributionKind:"increased",resultBand:"present",withoutAuthoredBand:"present"});
 assert.equal(fixtures.starter_open_meadow.causalVisualFacts.find(row=>row.markID==="plains").contributionKind,"reshaped");
 
 const accepted=splashCommands({transition:"entry",continuity:"transient",world:{...splashProofWorld},disclosure:{...emptySplashDisclosure}});
@@ -45,6 +47,10 @@ for(const id of ["starter_open_meadow","starter_rainwashed_shore","starter_stone
 const base=fixtures.starter_open_meadow,baseCommands=arrivalSceneCommands(base);
 const titleOnly=structuredClone(base);titleOnly.sourcePage.title="A title that cannot seed pixels";assert.deepEqual(arrivalSceneCommands(titleOnly),baseCommands);
 const causalOnly=structuredClone(base);causalOnly.causalVisualFacts=causalOnly.causalVisualFacts.map(row=>({...row,resultBand:`changed-${row.resultBand}`}));assert.deepEqual(arrivalSceneCommands(causalOnly),baseCommands,"causal facts are prose evidence, not image authority");
+const stone=fixtures.starter_stone_hollow,stoneCommands=arrivalSceneCommands(stone);for(const resultBand of ["absent","present"])for(const withoutAuthoredBand of ["absent","present"]){const oreBands=structuredClone(stone),ore=oreBands.causalVisualFacts.find(row=>row.markID==="common_ore");ore.resultBand=resultBand;ore.withoutAuthoredBand=withoutAuthoredBand;assert.deepEqual(validateWorldArrivalReceipt(oreBands),[]);assert.deepEqual(arrivalSceneCommands(oreBands),stoneCommands,`resource bands ${resultBand}/${withoutAuthoredBand} have no image authority`)}assert.equal(stoneCommands.some(command=>command.scope==="resource"),false,"arrival scene draws no resource icon or deposit");
+for(const visibleScope of ["ground","water","flora","resource","light","atmosphere"]){const scoped=structuredClone(stone),fact=scoped.causalVisualFacts[0];fact.visibleScope=visibleScope;if(visibleScope==="resource")fact.resultBand=fact.withoutAuthoredBand="present";assert.deepEqual(validateWorldArrivalReceipt(scoped),[],`${visibleScope} is a frozen Asset ABI scope`)}
+const unknownScope=structuredClone(stone);unknownScope.causalVisualFacts[0].visibleScope="candidate";assert.ok(validateWorldArrivalReceipt(unknownScope).includes("invalid-causal-visual-facts"),"unknown causal scopes fail closed");
+const invalidResourceBand=structuredClone(stone);invalidResourceBand.causalVisualFacts.find(row=>row.markID==="common_ore").resultBand="ordinary-ore:56";assert.ok(validateWorldArrivalReceipt(invalidResourceBand).includes("invalid-causal-visual-facts"),"resource bands stay disclosure-neutral absent/present");
 const externalA={hiddenSite:"vault",hiddenResource:"mote",traveller:"secret",unknownMark:"storm"},externalB={hiddenSite:"tear",hiddenResource:"gold",traveller:"other",unknownMark:"blight"};assert.notDeepEqual(externalA,externalB);assert.deepEqual(arrivalSceneCommands(structuredClone(base)),arrivalSceneCommands(structuredClone(base)),"private complete-world mutation cannot enter the sanitized request");
 const floraChanged=arrivalSceneCommands(fixtures.near_flora);assert.deepEqual(baseCommands.filter(c=>c.scope!=="flora"),floraChanged.filter(c=>c.scope!=="flora"),"flora-only near pair may change only flora-owned pixels");
 assert.notDeepEqual(baseCommands.filter(c=>c.scope==="flora"),floraChanged.filter(c=>c.scope==="flora"));
