@@ -179,7 +179,8 @@ one. Complete bridge state is not permission to render it.
 6. one explicitly labelled **open extension** with a legitimately entry-visible site profile; never include
    it in the promotable v1 set;
 7. unknown-mark A/B: hidden mark identity cannot enter the accepted request or alter text;
-8. longest 55-word description at 368×800;
+8. longest 55-word description at 368×800, using the exact Design/rules-owned synthetic receipt and
+   string in `world-arrival-description-grammar-current.md`; no temporary or Asset-authored replacement;
 9. all above in literal grayscale.
 
 ## Automated gates

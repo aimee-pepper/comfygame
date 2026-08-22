@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "aggregateSourceHash": "1ab08228bd97d7124d2ab06525ce2bca601f0ba04d27a3117b0e3bb3426a85ad",
+  "aggregateSourceHash": "36c3c2605d79ddd0e78cb91a60ec92a4928b2c5baeb2df329d1001cee36ffc79",
   "inputs": {
     "Sources/Content/Data/items.json": "b94b1107229f217e14f1d7fa936d8eea938f9782c06c583be32302f10d432bc9",
     "Sources/Content/Data/playability-roadmap.json": "2c1a512f4d9b914931a5e71e23698996d405d01dded12070125a488a00f1c9f7",
@@ -269,9 +269,9 @@
     "docs/wayfarers-table-flora-recognition-current.md": "01de8b57fba27ce086ac1433890ad42d6d8b740a156dc7c9c685970843e61261",
     "docs/weaponsmith-implementation-current.md": "43a6deed0bfe3a91d82626f22cbd23031d2f664d67ea7627fd5f2a1213fdb0d3",
     "docs/workshop-constellation-role-audit-current.md": "ea43a26411c0909a1370a8f10003294020cc2b5c9c14b3fece88c1e9d5b0cbf3",
-    "docs/world-arrival-asset-packet-current.md": "a1bcddb54075abe3c8206a36166d45ebdb5ddfa4d2a3c65fc9e77861280c4db6",
+    "docs/world-arrival-asset-packet-current.md": "04fe1c524f56655a2d69ab1b6c28611e76c16fe22ece4c139df5bff548539a12",
     "docs/world-arrival-causal-reveal-current.md": "fbc3aae0ad2f2cba6e926e6ac2d50479b9bbfa2dafa91719311a0d9b6c206539",
-    "docs/world-arrival-description-grammar-current.md": "ca5ff09b13ab4256fa919a509646a3a92d1cdd26b5d3e6bd7e183052aefe13bf",
+    "docs/world-arrival-description-grammar-current.md": "cba2d4190fd9be84e0ec181a2e231e36b20e3f49c0a57047f7bd66e75f07792f",
     "docs/world-color-differentiation-current.md": "0973da16ef6fa03cdb3c74e1cc6ab0b8eb9a842958b337b75e2e9d133d4c518b",
     "docs/world-encounter-contact-current.md": "59faf7fe08ce10f50d71f0f68f07e73c7cfbec920b716f12b53540623b5b9dc6",
     "docs/world-grade-2-bind-adapter-current.md": "7d388adabeefcee5fbe50071c2bc9feed7f3c53658eea26f3e3dbbc812470e11",
@@ -286,7 +286,7 @@
     "docs/writing-tool-progression-current.md": "be17fe07aa89aaaab7117a2faca43d7e1eb1be23202d19106c67c42547b23bb0"
   },
   "outputs": {
-    "generated/wiki-data.json": "e1c87d88c62c86dd54a5a24cb27a52a854c1f99c4403791233506927f292b0da",
-    "generated/source-registry.json": "29542ed16b3d2e3e93c5992cdca25c70f03caec6b72806c65deb5f75fd4099ef"
+    "generated/wiki-data.json": "ccaa2f562b7907eb7ac27543fd75f98af30a1cc28d4786642ad1cff64f3ad717",
+    "generated/source-registry.json": "56f0c49021c2c9205135b23d884ad9ff3c08e06444a24cccf825af876dde83a1"
   }
 }

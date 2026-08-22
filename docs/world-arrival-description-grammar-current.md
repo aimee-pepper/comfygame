@@ -280,6 +280,22 @@ environmental fallback. There is no starter-ID prose branch. If a generator chan
 receipt, the ordinary grammar produces a different truthful string and the pinned acceptance fixture fails
 until reviewed.
 
+## Exact 55-word layout-stress fixture
+
+This synthetic receipt exists only to prove the maximum valid copy length. It uses ordinary grammar and
+sanitized facts rather than starter-specific prose: dominant Stone with secondary Soil; mixed shallow and
+deep channelled water; an `Archipelago` reshaping contribution; a `Verdant` increased-growth contribution;
+dense growth on damp edges and comparatively bare high exposed ground. Its exact rules-owned output is:
+
+`Broad stone shelves rise above narrow soil paths and connected pools of shallow water, with deep channels
+cutting between the largest dry crossings. Your Archipelago mark divided the route into separate shelves,
+while your Verdant mark spread dense low growth across the dampest edges and left the higher exposed ground
+comparatively bare near the entry.`
+
+The string is exactly 55 whitespace-delimited words and two sentences. It is a typography and disclosure
+fixture, not an authored World Page or a runtime special case. Asset may use this exact string only with the
+matching sanitized synthetic receipt above and may not substitute its own stress prose.
+
 ## Register and prohibited language
 
 This surface is plain field description. Reject generated output containing, case-insensitively:
@@ -325,7 +341,8 @@ uses the safe two-sentence actual-ground + ordinary fallback grammar; Release ne
 12. flora coverage boundaries at 0, 7.99, 8, 21.99 and 22 percent;
 13. banned-register corpus;
 14. key-order and relaunch determinism;
-15. grammar-version migration preserving frozen old output.
+15. grammar-version migration preserving frozen old output;
+16. exact two-sentence 55-word stress fixture without truncation, clipping or Asset-authored substitution.
 
 ## Out of scope
 
