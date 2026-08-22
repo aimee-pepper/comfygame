@@ -144,15 +144,28 @@ final class DebugRoadmapTests: XCTestCase {
         XCTAssertTrue(item.gate.contains("miniature Tavern"))
     }
 
-    func testCurrentBoardHasAtMostOnePrimaryPerWorkstreamAndGodModeReleasesEngineering() {
+    func testCurrentBoardHasExactlyOneAcceptancePrimaryAfterWritingRepair() throws {
         let board = DebugRoadmap.current
         let primaries = Dictionary(grouping: board.items.filter(\.isPrimary), by: \.workstream)
         XCTAssertTrue(primaries.values.allSatisfy { $0.count <= 1 },
                       "each workstream may disclose at most one primary")
+        XCTAssertEqual(board.items.filter(\.isPrimary).map(\.id), ["writing-causal-presentation"])
         XCTAssertNil(primaries[.engineering],
-                     "source-complete God mode must release the Engineering primary")
-        XCTAssertNil(primaries[.acceptance],
-                     "phone-feel acceptance must not remain a blocking primary")
+                     "source-complete Writing repair must release the Engineering primary")
+        let acceptance = try XCTUnwrap(primaries[.acceptance])
+        XCTAssertEqual(acceptance.count, 1)
+        let writing = try XCTUnwrap(acceptance.first)
+        XCTAssertEqual(writing.status, .readyToTest)
+        XCTAssertTrue(writing.detail.contains("source-complete through shared revision f7c4fa45"))
+        XCTAssertTrue(writing.gate.contains("exact signed physical-phone build"))
+
+        let terrain = try XCTUnwrap(board.items.first { $0.id == "terrain-layering-animation" })
+        XCTAssertEqual(terrain.status, .inProgress)
+        XCTAssertFalse(terrain.isPrimary)
+        XCTAssertTrue(terrain.detail.contains("84e6db50"))
+        XCTAssertTrue(terrain.detail.contains("integrationReady:false"))
+        XCTAssertTrue(terrain.detail.contains("not native"))
+        XCTAssertTrue(terrain.gate.contains("static Ice in the initial integration"))
     }
 
     func testEncounterScalingRecordsAcceptedPhoneEvidenceAndRemainingMatrix() throws {

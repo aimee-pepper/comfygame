@@ -1,9 +1,9 @@
 {
   "schemaVersion": 1,
-  "aggregateSourceHash": "ea3ea50ca26cbdbc5cf2731196e1275a5fa7f89c9bdd68bec2f1e6b4afce5482",
+  "aggregateSourceHash": "57d6d0af5d31c070d54391788abd083ad4f618fcbd5d7f3417159abfd4c99edc",
   "inputs": {
     "Sources/Content/Data/items.json": "b94b1107229f217e14f1d7fa936d8eea938f9782c06c583be32302f10d432bc9",
-    "Sources/Content/Data/playability-roadmap.json": "61e5b82c3ea859d5c1d4db42138887876132c7aa29e5e6e270828e7dab36c390",
+    "Sources/Content/Data/playability-roadmap.json": "88c75734db4103eef80f8f04d0be73f13fcd05909fffc2219c695109612e8f60",
     "Sources/Content/Data/resources.json": "8eee965ce7df075abfe3f646bb36d416a10ef1d7d194845e30fa0f31b7b23e6f",
     "Sources/Content/Data/stations.json": "21b5e9f3bee2d9115acf535ef2ff1db350b87b8ee33755e79a3b3e4584102e2b",
     "Sources/Content/Data/symbols.json": "c1ec5dd7b661680b358e21a56124b6080aa28d93db51fd2f6b80214ced1dcb16",
@@ -77,6 +77,7 @@
     "docs/base-destination-board-current.md": "ee13bb2e5799d0e5af84bf4cb594125e468403945c31c7be06722ced2dc1439b",
     "docs/binder-quill-generated-visual-identity-current.md": "f1b228e03db2d304ae85cfb56c1f96e6cffd6c5bbe8bee900a0a37bc099f3259",
     "docs/building-staffing-current.md": "bc88ffb0bdfde00219dc18dad7758aa7e9f6b6c3bf503637f1c4ab4907f22e7a",
+    "docs/canonical-player-terminology-current.md": "1cf39c0fe92b7e9149069bafcde70065c73192046374994e86ea649853d383c1",
     "docs/capacity-progression-current.md": "3f167c00d825712306a4917ea8d1b1e735efb2d452d52ef286ee8e109e5956fa",
     "docs/catalogue-item-identity-key-treasure-current.md": "4f0ec79eba9ea09e35ec7c00234426fa1e411016205485ee6cd6df1cce9aab05",
     "docs/catalogue-item-identity-tier2-current.md": "5ac4774cfc9cc1983a47e8c10f4ba10496906a21098445977bc292b381b754b0",
@@ -113,9 +114,9 @@
     "docs/creature-ecology-and-materials-overhaul-current.md": "e71a15702256af55de1c34b0269b14f2e657109c32f9dac53acdfae2ea59885f",
     "docs/creature-ecology-asset-packet-current.md": "04f3495242bf577001c10b1658ff46f8bfbefaa6e42c9220d32ec580fa3b8219",
     "docs/creature-territory-finds-current.md": "07792ad39d56392aaadc4507520015020a77171b6e6486f22aa3381903027385",
-    "docs/cross-lead-delivery-contract-current.md": "af95f3e6668995134aaca7e0a1ac6bacd1e81305696c16734ed859f92fd14b2b",
+    "docs/cross-lead-delivery-contract-current.md": "26f78980dbb1ef30350a2a6031f4c1620a6b7727cedbdfcd6c971ddfbbfaefd2",
     "docs/curio-identification-knowledge-current.md": "31acb95848598b0874e3978a9488f122b8bfee115e16867a5dca9fa1c33986f0",
-    "docs/current-design-index.md": "f3089b4e9e0efdaebb02cf42cc3fe9c579201eeb026959ccbab3dffee514ebb7",
+    "docs/current-design-index.md": "192720ec09aa5185048edbd2ca45454559b8144bb3e39dd1a2242c5ee0a59b4c",
     "docs/cycle-system-current.md": "3a472c56d4c78299574f768de122d2ac11e7387eeae8fd723667e73f96fbd598",
     "docs/dagg-recovery-teaching-current.md": "a6f2e09d574fde643ce524b90c7c76482925010c6d8af53bc327fd4fe3480546",
     "docs/debug-authored-text-atlas-current.md": "dde26130930d41c60ef958393390774a36c6bf37999a2428420db634df1c7dd2",
@@ -156,7 +157,7 @@
     "docs/essence-refining-progression-current.md": "81ca55e62651b6cbcb4b014e8d9f488e837faf069a18a1358b0150b9249f984f",
     "docs/essence-spring-review-batch-current.md": "f43a89f7f753fe9fa72f4cd7cfc0a901bf25b2b5d5360c70bb91b356ae45d5b3",
     "docs/expedition-outcomes-current.md": "6405f82e874fd8422d14287d9a6aa85a7eff8cecd0391e61c3f9f0dc45e280dc",
-    "docs/expedition-return-object-layout-current.md": "a45fccbc266219586cb400abad56b252e6ea62567dbe6e165944af92758e73ae",
+    "docs/expedition-return-object-layout-current.md": "0484a59c0581fefdf0bcb6cc69252842c357222f27fc86c1e8f41523a46bdbd8",
     "docs/expedition-return-receipt-current.md": "a2048e34054afd8bc23d5808b5413744015d6ca62e349595c7b8fe1aa54afdab",
     "docs/feature-completion-priority-audit-current.md": "bbd222fea99a52cf22217b333fa561b973c342e4ee776230050165861abc4663",
     "docs/field-awareness-avoidance-current.md": "a944726899b6079a9f286a9bea2552653f9b910909cbb1695d4e0b34d4567aa4",
@@ -235,7 +236,7 @@
     "docs/survey-needle-current.md": "ff08c6a7c51f7aaa7d40982e2af545d3c74630ce72fa968e8531983b67101d75",
     "docs/tannery-system-current.md": "a6544afbb2d77c2369b37922b443cd7d2244ce43bc358d632eeab7b30844499c",
     "docs/tavern-random-companions-current.md": "e7b86a31548089a4a122fba51a1fb1f246d14d84de948300a1873b38ae9648c2",
-    "docs/terrain-layering-and-motion-asset-packet-current.md": "4a3bc9520044e9b8db559fb558ff33054f79ee8e0063dc7360ed6178f1724c76",
+    "docs/terrain-layering-and-motion-asset-packet-current.md": "b37bac3adb30ae054953517bad841ba9b6352941eab75af7ae7e7f06ed221969",
     "docs/top-down-map-asset-integration-current.md": "60fbd5232a171bdbe2e7f9f162764c5efd71ac820bde4a71caa4d74a298c962a",
     "docs/trading-post-recycler-current.md": "28c216a665a3e2231f18293c630fd38a5646dd41ebaa29043ceb0c4f97196ee2",
     "docs/trading-post-recycler-economy-current.md": "297d7917d1f2f7c5ee9b8cdd0280a390761d8aa204e138fcb4328941db7e954e",
@@ -290,7 +291,7 @@
     "docs/writing-tool-progression-current.md": "be17fe07aa89aaaab7117a2faca43d7e1eb1be23202d19106c67c42547b23bb0"
   },
   "outputs": {
-    "generated/wiki-data.json": "f621e1991a2bdc0e9ce2ef79951f18ab12c33efd69f5f55a3a6e06c7eae3952a",
-    "generated/source-registry.json": "d3ad149d4673970d050b1b6110f04f9d7fb2199bdf6a0190db62a29943ab932d"
+    "generated/wiki-data.json": "b3f02b3cecc3416cf4bc60a3ed2c3621f5ea5f769b04db72919bcbc37a7ffcdb",
+    "generated/source-registry.json": "95c22292c0a7c1cb069cff901aa186ab25a7c4a02969dec414ebaff4d78e7fd5"
   }
 }
