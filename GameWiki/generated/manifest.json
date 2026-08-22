@@ -1,9 +1,9 @@
 {
   "schemaVersion": 1,
-  "aggregateSourceHash": "bda2784fd19080e4b095d6ad1510a8de13d6a5e187f4921fb223dd15d26e6bf1",
+  "aggregateSourceHash": "1ab08228bd97d7124d2ab06525ce2bca601f0ba04d27a3117b0e3bb3426a85ad",
   "inputs": {
     "Sources/Content/Data/items.json": "b94b1107229f217e14f1d7fa936d8eea938f9782c06c583be32302f10d432bc9",
-    "Sources/Content/Data/playability-roadmap.json": "c16291a49fea935393c291fcae6542fde71b6c7e2d798fbb8022ddcec778aad8",
+    "Sources/Content/Data/playability-roadmap.json": "2c1a512f4d9b914931a5e71e23698996d405d01dded12070125a488a00f1c9f7",
     "Sources/Content/Data/resources.json": "8eee965ce7df075abfe3f646bb36d416a10ef1d7d194845e30fa0f31b7b23e6f",
     "Sources/Content/Data/stations.json": "21b5e9f3bee2d9115acf535ef2ff1db350b87b8ee33755e79a3b3e4584102e2b",
     "Sources/Content/Data/symbols.json": "c1ec5dd7b661680b358e21a56124b6080aa28d93db51fd2f6b80214ced1dcb16",
@@ -115,7 +115,7 @@
     "docs/creature-territory-finds-current.md": "07792ad39d56392aaadc4507520015020a77171b6e6486f22aa3381903027385",
     "docs/cross-lead-delivery-contract-current.md": "af95f3e6668995134aaca7e0a1ac6bacd1e81305696c16734ed859f92fd14b2b",
     "docs/curio-identification-knowledge-current.md": "31acb95848598b0874e3978a9488f122b8bfee115e16867a5dca9fa1c33986f0",
-    "docs/current-design-index.md": "d1f671c0c6ed131181a8daac3d71ed9e77106bddd4a1b5de19f8c33970969edf",
+    "docs/current-design-index.md": "cdf1cfa39ca6e92cbbbcc842a53f6a7a0b84319e1b8679999afcb910e0e95423",
     "docs/cycle-system-current.md": "3a472c56d4c78299574f768de122d2ac11e7387eeae8fd723667e73f96fbd598",
     "docs/dagg-recovery-teaching-current.md": "a6f2e09d574fde643ce524b90c7c76482925010c6d8af53bc327fd4fe3480546",
     "docs/debug-authored-text-atlas-current.md": "dde26130930d41c60ef958393390774a36c6bf37999a2428420db634df1c7dd2",
@@ -156,6 +156,7 @@
     "docs/essence-refining-progression-current.md": "81ca55e62651b6cbcb4b014e8d9f488e837faf069a18a1358b0150b9249f984f",
     "docs/essence-spring-review-batch-current.md": "f43a89f7f753fe9fa72f4cd7cfc0a901bf25b2b5d5360c70bb91b356ae45d5b3",
     "docs/expedition-outcomes-current.md": "6405f82e874fd8422d14287d9a6aa85a7eff8cecd0391e61c3f9f0dc45e280dc",
+    "docs/expedition-return-object-layout-current.md": "a45fccbc266219586cb400abad56b252e6ea62567dbe6e165944af92758e73ae",
     "docs/expedition-return-receipt-current.md": "a2048e34054afd8bc23d5808b5413744015d6ca62e349595c7b8fe1aa54afdab",
     "docs/feature-completion-priority-audit-current.md": "bbd222fea99a52cf22217b333fa561b973c342e4ee776230050165861abc4663",
     "docs/field-awareness-avoidance-current.md": "a944726899b6079a9f286a9bea2552653f9b910909cbb1695d4e0b34d4567aa4",
@@ -285,7 +286,7 @@
     "docs/writing-tool-progression-current.md": "be17fe07aa89aaaab7117a2faca43d7e1eb1be23202d19106c67c42547b23bb0"
   },
   "outputs": {
-    "generated/wiki-data.json": "3e7ef4fd39cc548c9ba388c0a40a37802836554cd99d1880fc5997e6c5a2d9e2",
-    "generated/source-registry.json": "505fc5766949949f8bedda4cbd5f264c5538a0a5912a08cc7af6fbfb9f1cbcf2"
+    "generated/wiki-data.json": "e1c87d88c62c86dd54a5a24cb27a52a854c1f99c4403791233506927f292b0da",
+    "generated/source-registry.json": "29542ed16b3d2e3e93c5992cdca25c70f03caec6b72806c65deb5f75fd4099ef"
   }
 }

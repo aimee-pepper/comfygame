@@ -212,6 +212,7 @@ When two documents disagree:
 | World arrival causal reveal | `world-arrival-causal-reveal-current.md` + `world-arrival-description-grammar-current.md` + `world-arrival-asset-packet-current.md` | Frozen dynamic image plus exact deterministic concrete-copy grammar; exact Asset compositor inputs, starter fixtures and hidden-site-safe lifecycle |
 | Writing Desk B1 | `writing-desk-b1-implementation-packet-current.md` | Exact draft/collected source state, disclosure-safe projection, phone hierarchy and atomic bind handoff |
 | World screen phone composition | `world-screen-phone-composition-current.md` | Complete-row map sizing, fixed controls, non-displacing overlays, Look/Use Tile and minimap disclosure |
+| Expedition Return object layout | `expedition-return-object-layout-current.md` | Receipt-only Recovered/Lost/Progress tabs with domain-correct object grids, writing bundles and party progress |
 | Maker-station screens | `maker-station-screen-grammar-current.md` | Shared recipe/profile grids, exact-object stock trays, persistent preview/commit flow and Blacksmith-first checkpoint |
 | Playtest UI corrections | `playtest-ui-corrections-current.md` | Party Stats-tab cleanup, minimap placement and disclosure boundary |
 | World Look / control occlusion | `world-look-and-control-occlusion-current.md` | Adjacent no-turn inspection and measured fixed-control scroll inset |
