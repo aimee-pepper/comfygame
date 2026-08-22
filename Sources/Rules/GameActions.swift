@@ -1035,7 +1035,7 @@ extension GameStore {
 #endif
             return false
         }
-        let arrivalReceipt: WorldArrivalReceipt
+        var arrivalReceipt: WorldArrivalReceipt
         do {
             arrivalReceipt = try WorldArrivalReceiptFactory.make(
                 runIndex: state.worlds.runIndex + 1,
@@ -1055,6 +1055,14 @@ extension GameStore {
                 isFreshFirstExpedition: state.worlds.runIndex == 0,
                 wildPageSelection: wildSelection,
                 wildPageOriginRunIndex: state.worlds.runIndex + 1)
+            guard let scene = arrivalReceipt.sceneReceipt else {
+                throw WorldArrivalNativeRenderer.Error.invalidSceneReceipt
+            }
+            arrivalReceipt.renderedSceneReceipt = try WorldArrivalNativeRenderer.makeRenderedReceipt(
+                scene: scene)
+            guard arrivalReceipt.isNativePresentationEligible else {
+                throw WorldArrivalNativeRenderer.Error.invalidRenderedReceipt
+            }
         } catch {
             bindError = "This world could not be prepared. Your page and Essence were not changed."
             return false
@@ -1231,7 +1239,8 @@ extension GameStore {
     func enterPendingWorld(arrivalReceiptID: WorldArrivalReceiptID) -> Bool {
         if state.worlds.pendingWorldArrivalReceiptID != nil,
            state.worlds.pendingWorldArrivalReceipt == nil {
-            _ = mutateIf("reconcile orphan arrival reveal", flush: true) { state in
+            _ = mutateIf("reconcile orphan arrival reveal", flush: true,
+                         scope: .arrivalLifecycle) { state in
                 guard state.worlds.pendingWorldArrivalReceiptID != nil,
                       state.worlds.pendingWorldArrivalReceipt == nil else { return false }
                 state.worlds.pendingWorldArrivalReceiptID = nil
@@ -1239,11 +1248,34 @@ extension GameStore {
             }
             return false
         }
-        return mutateIf("enter pending world", flush: true) { state in
+        return mutateIf("enter pending world", flush: true, scope: .arrivalLifecycle) { state in
             guard state.worlds.pendingWorldArrivalReceiptID == arrivalReceiptID,
                   state.worlds.activeRun?.worldArrivalReceipt?.id == arrivalReceiptID else {
                 return false
             }
+            state.worlds.pendingWorldArrivalReceiptID = nil
+            return true
+        }
+    }
+
+    /// Launch/root reconciliation for an ID that cannot resolve to the exact validated receipt.
+    /// The root fails open to the saved map immediately; this synchronous flush only removes the
+    /// orphan ownership token and never invents presentation state.
+    @discardableResult
+    func reconcileOrphanWorldArrival() -> Bool {
+        mutateIf("reconcile orphan arrival reveal", flush: true, scope: .arrivalLifecycle) { state in
+            guard state.worlds.pendingWorldArrivalReceiptID != nil,
+                  state.worlds.pendingWorldArrivalReceipt == nil else { return false }
+            state.worlds.pendingWorldArrivalReceiptID = nil
+            return true
+        }
+    }
+
+    @discardableResult
+    func reconcileUnrenderableWorldArrival(_ id: WorldArrivalReceiptID) -> Bool {
+        mutateIf("reconcile unrenderable arrival reveal", flush: true,
+                 scope: .arrivalLifecycle) { state in
+            guard state.worlds.pendingWorldArrivalReceiptID == id else { return false }
             state.worlds.pendingWorldArrivalReceiptID = nil
             return true
         }

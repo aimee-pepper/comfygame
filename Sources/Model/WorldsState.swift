@@ -47,7 +47,8 @@ struct WorldsState: Codable, Equatable, Sendable {
 
     var pendingWorldArrivalReceipt: WorldArrivalReceipt? {
         guard let receipt = activeRun?.worldArrivalReceipt,
-              pendingWorldArrivalReceiptID == receipt.id else { return nil }
+              pendingWorldArrivalReceiptID == receipt.id,
+              receipt.isNativePresentationEligible else { return nil }
         return receipt
     }
 
@@ -78,9 +79,6 @@ struct WorldsState: Codable, Equatable, Sendable {
         activeRun = try container.decodeIfPresent(WorldRun.self, forKey: .activeRun)
         pendingWorldArrivalReceiptID = try container.decodeIfPresent(
             WorldArrivalReceiptID.self, forKey: .pendingWorldArrivalReceiptID)
-        if pendingWorldArrivalReceiptID != activeRun?.worldArrivalReceipt?.id {
-            pendingWorldArrivalReceiptID = nil
-        }
         runIndex = try container.decodeIfPresent(Int.self, forKey: .runIndex) ?? 0
         outcomeSequence = try container.decodeIfPresent(UInt64.self, forKey: .outcomeSequence) ?? 0
         seeds = try container.decodeIfPresent(SeedSequence.self, forKey: .seeds) ?? SeedSequence.newGame()

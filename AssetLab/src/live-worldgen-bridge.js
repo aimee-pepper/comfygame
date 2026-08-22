@@ -68,7 +68,7 @@ export async function ensureWorldgenBridge() {
     const sourceTimes = await Promise.all(sources.map(path => stat(path).then(value => value.mtimeMs)));
     if (!binaryTime || sourceTimes.some(time => time > binaryTime)) {
       await run("xcrun", ["swiftc", "-module-cache-path", join(cacheRoot, "module-cache"),
-        "-Onone", "-o", executable, ...sources]);
+        "-Onone", "-DWORLD_GENERATOR_BRIDGE", "-o", executable, ...sources]);
     }
     const contentRoot = join(repoRoot, "Sources", "Content", "Data");
     for (const name of await readdir(contentRoot)) {

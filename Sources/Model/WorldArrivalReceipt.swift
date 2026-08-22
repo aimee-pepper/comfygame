@@ -10,7 +10,7 @@ struct WorldArrivalReceiptID: RawRepresentable, Codable, Equatable, Hashable, Se
 /// its single centralized world-action gate are integrated. Receipt persistence is independently
 /// live now; placeholder receipt fields must never become player-facing presentation.
 enum WorldArrivalPresentationAuthority {
-    static let isNativePresentationEnabled = false
+    static let isNativePresentationEnabled = true
 }
 
 /// Versioned, immutable input for the accepted arrival compositor. The nested payload deliberately
@@ -36,6 +36,17 @@ struct WorldArrivalSceneReceipt: Codable, Equatable, Sendable {
         var paletteFamilyID: String
         var transform: WorldGrade2V1.Transform
         var resolvedColor: [Int]?
+
+        private enum CodingKeys: String, CodingKey {
+            case identity, paletteFamilyID, transform, resolvedColor
+        }
+        func encode(to encoder: Encoder) throws {
+            var c = encoder.container(keyedBy: CodingKeys.self)
+            try c.encode(identity, forKey: .identity)
+            try c.encode(paletteFamilyID, forKey: .paletteFamilyID)
+            try c.encode(transform, forKey: .transform)
+            try c.encode(resolvedColor, forKey: .resolvedColor)
+        }
     }
     struct Illumination: Codable, Equatable, Sendable {
         var band: String
@@ -149,6 +160,72 @@ struct WorldArrivalSceneReceipt: Codable, Equatable, Sendable {
     func validatesCanonicalHash() -> Bool {
         version == Self.schemaVersion
             && canonicalSHA256 == Self.canonicalHash(version: version, payload: payload)
+    }
+
+    func validatesSchema() -> Bool {
+        // Persistence and the bundled corpus decode into this closed typed value before eligibility.
+        // Swift's decoder may discard an unknown JSON member, but no discarded member can reach
+        // copy, command generation, hashing, or replay; eligibility is recomputed exclusively from
+        // this validated value and its canonical typed hash.
+        let p = payload
+        let words = p.description.split(whereSeparator: \Character.isWhitespace).count
+        let pageValid = !p.sourcePage.id.isEmpty && !p.sourcePage.marks.isEmpty
+            && p.sourcePage.marks.allSatisfy { mark in
+                (0...5).contains(mark.x) && (0...5).contains(mark.y) && !mark.cells.isEmpty
+                    && mark.cells.allSatisfy { $0.count == 2
+                        && (0...5).contains(mark.x + $0[0]) && (0...5).contains(mark.y + $0[1]) }
+            }
+        let material = p.materialDescriptor
+        let materialValid = !material.identity.isEmpty && !material.paletteFamilyID.isEmpty
+            && material.transform.hue.isFinite && material.transform.saturation.isFinite
+            && material.transform.value.isFinite
+            && (material.resolvedColor == nil || Self.validRGB(material.resolvedColor!))
+        let floraValid = p.flora.count <= 4 && p.flora.allSatisfy {
+            !$0.stableID.isEmpty && ["sparse","present","abundant"].contains($0.coverage)
+                && ["solitary","clustered","spreading","mixed"].contains($0.habit)
+                && Self.validRGB($0.color)
+        }
+        let factsValid = p.causalVisualFacts.allSatisfy {
+            return !$0.markID.isEmpty && ["ground","water","flora","resource","light","atmosphere"].contains($0.visibleScope)
+                && ["none","increased","reduced","reshaped"].contains($0.contributionKind)
+                && !$0.resultBand.isEmpty && !$0.withoutAuthoredBand.isEmpty
+                && ($0.visibleScope != "resource" || (["absent","present"].contains($0.resultBand)
+                    && ["absent","present"].contains($0.withoutAuthoredBand)))
+        }
+        let crop = p.firstMapCropReceipt
+        let cropValid = crop.width == 9 && crop.height == 9 && crop.cells.count == 81
+            && Set(crop.cells.map { "\($0.x),\($0.y)" }).count == 81
+            && crop.cells.allSatisfy { cell in
+                guard (0..<9).contains(cell.x), (0..<9).contains(cell.y),
+                      ["full","fringe","remembered","hidden"].contains(cell.visibility) else { return false }
+                if cell.visibility == "hidden" {
+                    return cell.ground == nil && cell.elevation == nil && cell.floraStableID == nil
+                }
+                return cell.ground != nil && cell.elevation != nil
+                    && (cell.floraStableID == nil || cell.visibility == "full")
+            }
+        return !p.receiptID.isEmpty && UInt64(p.worldSeed) != nil && pageValid && materialValid
+            && ["stone","soil","sand","ice","ash","rubble","mud","growth","groundcover"].contains(p.dominantGround.rawValue)
+            && ["none","pools","channels","shelves","islands"].contains(p.waterRelationship)
+            && ["trueDark","dim","ordinary","bright","blazing"].contains(p.illumination.band)
+            && ["sourceless","cyclic","constant"].contains(p.illumination.sourceClass)
+            && ["none","smoke","airborneAsh","mist","miasma"].contains(p.suspendedAtmosphere.medium)
+            && ["none","trace","light","heavy","dense"].contains(p.suspendedAtmosphere.density)
+            && ["calm","moving","strong"].contains(p.suspendedAtmosphere.motion)
+            && (p.suspendedAtmosphere.medium == "none") == (p.suspendedAtmosphere.density == "none")
+            && ["none","rain","snow","mixedRainSnow"].contains(p.precipitation.medium)
+            && ["none","trace","light","heavy"].contains(p.precipitation.intensity)
+            && ["calm","moving","strong"].contains(p.precipitation.motion)
+            && (p.precipitation.medium == "none") == (p.precipitation.intensity == "none")
+            && floraValid && factsValid
+            && (p.entryDisclosure == nil || (!p.entryDisclosure!.siteProfile.isEmpty
+                && p.entryDisclosure!.status == "entryVisible"))
+            && words >= 18 && words <= 55
+            && p.description.filter { ".!?".contains($0) }.count == 2 && cropValid
+    }
+
+    private static func validRGB(_ value: [Int]) -> Bool {
+        value.count == 3 && value.allSatisfy { (0...255).contains($0) }
     }
 
     private struct Canonical: Encodable { var version: Int; var payload: Payload }
@@ -287,8 +364,18 @@ struct WorldArrivalReceipt: Codable, Equatable, Sendable {
     var compositorVersion: String
     /// Nil only for the short-lived pre-scene schema; never synthesized during decode.
     var sceneReceipt: WorldArrivalSceneReceipt?
+    /// Nil for legacy/pre-B1.6a worlds. New binds freeze the exact validated rect-v1 replay.
+    var renderedSceneReceipt: WorldArrivalRenderedSceneReceipt? = nil
+
+    var isNativePresentationEligible: Bool {
+        guard let sceneReceipt, sceneReceipt.validatesCanonicalHash(), sceneReceipt.validatesSchema(),
+              let renderedSceneReceipt, renderedSceneReceipt.validates() else { return false }
+        return renderedSceneReceipt.inputSceneReceiptSHA256 == sceneReceipt.canonicalSHA256
+            && finalDescription == sceneReceipt.payload.description
+    }
 }
 
+#if !WORLD_GENERATOR_BRIDGE
 enum WorldArrivalReceiptFactory {
     enum Error: Swift.Error, Equatable { case noDryGround }
 
@@ -429,6 +516,7 @@ enum WorldArrivalReceiptFactory {
             visualReceipt: visualReceipt, lightBand: lightBand, sourceClass: sourceClass,
             atmosphere: atmosphere, flora: floraSummaries, crop: crop,
             causalFacts: causalFacts, description: description)
+        let sceneReceipt = WorldArrivalSceneReceipt(payload: scenePayload)
         return .init(version: WorldArrivalReceipt.schemaVersion,
                      id: receiptID, runIndex: runIndex, generationSeed: generationSeed,
                      sourcePagePhysicalReceipt: physical,
@@ -447,7 +535,7 @@ enum WorldArrivalReceiptFactory {
                      proseVersion: WorldArrivalReceipt.descriptionGrammarVersion,
                      finalDescription: description,
                      compositorVersion: WorldArrivalReceipt.sceneCompositorVersion,
-                     sceneReceipt: WorldArrivalSceneReceipt(payload: scenePayload))
+                     sceneReceipt: sceneReceipt, renderedSceneReceipt: nil)
     }
 
     private static let schemaIdentity = "world-arrival-receipt-v1"
@@ -604,3 +692,4 @@ enum WorldArrivalReceiptFactory {
         return "\(first) \(second)"
     }
 }
+#endif

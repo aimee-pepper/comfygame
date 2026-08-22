@@ -10,6 +10,167 @@ import XCTest
 /// sits never changes what it says — and **refinement is literacy, not power** — a better hand lets
 /// you say the same thing in less space and never unlocks a meaning.
 final class PageTests: XCTestCase {
+    func testNativeWorldArrivalRendererMatchesAllAcceptedCorpusCasesByteForByte() throws {
+        struct Corpus: Decodable {
+            struct Canvas: Decodable { var width: Int; var height: Int }
+            struct ABI: Decodable { var op: String; var fields: [String] }
+            struct Pins: Decodable {
+                var compositorFile: String
+                var compositorSHA256: String; var compositorCommit: String
+                var acceptedManifestFile: String
+                var acceptedManifestSHA256: String
+                var latestReceiptCommit: String
+            }
+            var identity: String; var integrationReady: Bool; var canvas: Canvas
+            var commandABI: ABI; var pins: Pins; var canonicalBodySHA256: String
+            var cases: [Case]
+        }
+        struct Case: Decodable {
+            var id: String
+            var sceneReceiptVersion: Int
+            var inputReceiptSHA256: String
+            var inputPayloadSHA256: String
+            var commandListSHA256: String
+            var renderedRGBA8SHA256: String
+            var receipt: WorldArrivalSceneReceipt.Payload
+            var arrivalSceneCommands: [WorldArrivalRenderedSceneReceipt.Command]
+        }
+        let root = URL(fileURLWithPath: #filePath).deletingLastPathComponent().deletingLastPathComponent()
+        let data = try Data(contentsOf: root.appendingPathComponent(
+            "AssetLab/integration/world-arrival-command-corpus-v1/corpus.json"))
+        let corpus = try JSONDecoder().decode(Corpus.self, from: data)
+        XCTAssertEqual(corpus.identity, "world-arrival-command-corpus-v1")
+        XCTAssertFalse(corpus.integrationReady)
+        XCTAssertEqual(corpus.canonicalBodySHA256, "840026c5b6f4da538e2edac390c65f5c9cd03a61bfb71d1b5af95dd6cc9bb635")
+        XCTAssertEqual(corpus.canvas.width, 160); XCTAssertEqual(corpus.canvas.height, 100)
+        XCTAssertEqual(corpus.commandABI.op, "rect-v1")
+        XCTAssertEqual(corpus.commandABI.fields, ["op","x","y","width","height","rgba","scope","sourceOrder"])
+        XCTAssertEqual(corpus.pins.compositorFile, "AssetLab/src/world-arrival-kit.js")
+        XCTAssertEqual(corpus.pins.acceptedManifestFile,
+                       "AssetLab/artifacts/world-arrival-v0.1/manifest.json")
+        XCTAssertEqual(corpus.pins.latestReceiptCommit,
+                       "72b840d3e1de2b8c32aebfc0e876d61c69448a92")
+        XCTAssertEqual(corpus.pins.compositorSHA256, WorldArrivalRenderedSceneReceipt.visualProgramSHA256)
+        XCTAssertEqual(corpus.pins.compositorCommit, WorldArrivalRenderedSceneReceipt.visualProgramCommit)
+        XCTAssertEqual(corpus.pins.acceptedManifestSHA256, WorldArrivalRenderedSceneReceipt.acceptedManifestSHA256)
+        XCTAssertEqual(corpus.cases.count, 85)
+        var maximum = 0
+        for fixture in corpus.cases {
+            let scene = WorldArrivalSceneReceipt(payload: fixture.receipt)
+            XCTAssertEqual(scene.version, fixture.sceneReceiptVersion, fixture.id)
+            XCTAssertEqual(scene.canonicalSHA256, fixture.inputReceiptSHA256, fixture.id)
+            XCTAssertEqual(WorldArrivalRenderedSceneReceipt.canonicalSHA256(fixture.receipt),
+                           fixture.inputPayloadSHA256, fixture.id)
+            let rendered = try WorldArrivalNativeRenderer.makeRenderedReceipt(scene: scene)
+            XCTAssertEqual(rendered.commands, fixture.arrivalSceneCommands, fixture.id)
+            XCTAssertEqual(rendered.commandListSHA256, fixture.commandListSHA256, fixture.id)
+            XCTAssertEqual(rendered.renderedRGBA8SHA256, fixture.renderedRGBA8SHA256, fixture.id)
+            XCTAssertEqual(rendered.visualProgramSHA256, corpus.pins.compositorSHA256)
+            XCTAssertEqual(rendered.visualProgramCommit, corpus.pins.compositorCommit)
+            XCTAssertEqual(rendered.acceptedManifestSHA256, corpus.pins.acceptedManifestSHA256)
+            maximum = max(maximum, rendered.commands.count)
+        }
+        XCTAssertEqual(maximum, 1365)
+    }
+
+    func testWorldArrivalJavaScriptArithmeticDoesNotWrapAfterHashing() {
+        XCTAssertEqual(WorldArrivalNativeRenderer.jsModulo(.max, add: 41, modulus: 134),
+                       Int((UInt64(UInt32.max) + 41) % 134))
+    }
+
+    func testWorldArrivalOrdinaryPhoneLayoutAndCrispThumbnailGeometry() {
+        XCTAssertEqual(WorldArrivalLayout.metrics(width: 368).sceneSize,
+                       CGSize(width: 320, height: 200))
+        XCTAssertEqual(WorldArrivalLayout.metrics(width: 320).sceneSize,
+                       CGSize(width: 296, height: 185))
+        let cell = floor(54.0 / 6.0)
+        XCTAssertEqual(cell, 9)
+        XCTAssertEqual((54 - cell * 6) / 2, 0)
+        XCTAssertEqual(WorldArrivalLayout.enterFrame(height: 800), 728...786)
+        XCTAssertEqual(RootPresentationRules.surface(
+            hasArrival: true, hasEncounter: true, isInRun: true), .arrival)
+    }
+
+    @MainActor
+    func testWorldArrivalRendersOrdinaryAndAccessibilityPhoneLayouts() throws {
+        let store = GameStore(io: .temporary(name: "arrival-layout-\(UUID().uuidString)"))
+        XCTAssertTrue(store.bindAndDepart(
+            worldPageInstanceID: WorldPageCatalog.earthlikeTestInstance.id))
+        var receipt = try XCTUnwrap(store.state.worlds.pendingWorldArrivalReceipt)
+        receipt.finalDescription = "Broad stone shelves rise above narrow soil paths and connected pools of shallow water, with deep channels cutting between the largest dry crossings. Your Archipelago mark divided the route into separate shelves, while your Verdant mark spread dense low growth across the dampest edges and left the higher exposed ground comparatively bare near the entry."
+        XCTAssertEqual(receipt.finalDescription.split(whereSeparator: \.isWhitespace).count, 55)
+        if !receipt.sourcePagePhysicalReceipt.marks.isEmpty {
+            receipt.sourcePagePhysicalReceipt.marks[0].isReadable = false
+            receipt.sourcePagePhysicalReceipt.marks[0].visibleLabel = "hidden-semantic-name"
+        }
+
+        for (width, typeSize, expectedScroll) in [
+            (CGFloat(368), DynamicTypeSize.large, false),
+            (CGFloat(320), DynamicTypeSize.large, false),
+            (CGFloat(368), DynamicTypeSize.accessibility3, true)
+        ] {
+            let host = UIHostingController(rootView:
+                WorldArrivalView(receipt: receipt)
+                    .environmentObject(store)
+                    .environment(\.dynamicTypeSize, typeSize)
+                    .frame(width: width, height: 800))
+            let window = UIWindow(frame: CGRect(x: 0, y: 0, width: width, height: 800))
+            window.rootViewController = host
+            window.makeKeyAndVisible()
+            host.view.frame = window.bounds
+            host.view.layoutIfNeeded()
+            RunLoop.main.run(until: Date().addingTimeInterval(0.05))
+            let scrolls = arrivalDescendants(of: host.view).compactMap { $0 as? UIScrollView }
+            XCTAssertEqual(!scrolls.isEmpty, expectedScroll)
+            let image = UIGraphicsImageRenderer(size: window.bounds.size).image { _ in
+                host.view.drawHierarchy(in: host.view.bounds, afterScreenUpdates: true)
+            }
+            XCTAssertEqual(image.size, CGSize(width: width, height: 800))
+            let attachment = XCTAttachment(image: image)
+            attachment.name = "world-arrival-\(Int(width))-\(typeSize)"
+            attachment.lifetime = .keepAlways
+            add(attachment)
+            window.isHidden = true
+        }
+    }
+
+    private func arrivalDescendants(of view: UIView) -> [UIView] {
+        [view] + view.subviews.flatMap(arrivalDescendants)
+    }
+
+    func testArrivalSceneSchemaRejectsClosedBoundaryViolations() throws {
+        let accepted = try acceptedArrivalPayload("starter_open_meadow")
+        func rejects(_ edit: (inout WorldArrivalSceneReceipt.Payload) -> Void,
+                     file: StaticString = #filePath, line: UInt = #line) {
+            var payload = accepted
+            edit(&payload)
+            XCTAssertFalse(WorldArrivalSceneReceipt(payload: payload).validatesSchema(),
+                           file: file, line: line)
+        }
+        rejects { $0.dominantGround = .water }
+        rejects { $0.waterRelationship = "ocean" }
+        rejects { $0.materialDescriptor.resolvedColor = [0, 0, 256] }
+        rejects { $0.illumination.band = "unknown" }
+        rejects { $0.suspendedAtmosphere.medium = "none"; $0.suspendedAtmosphere.density = "light" }
+        rejects { $0.precipitation.medium = "none"; $0.precipitation.intensity = "heavy" }
+        rejects { $0.precipitation.motion = "diagonal" }
+        rejects { $0.suspendedAtmosphere.motion = "diagonal" }
+        rejects { $0.flora[0].coverage = "unknown" }
+        rejects { $0.flora[0].habit = "unknown" }
+        rejects { $0.flora[0].color = [1, 2] }
+        rejects { $0.causalVisualFacts[0].visibleScope = "site" }
+        rejects { $0.causalVisualFacts[0].visibleScope = "resource"; $0.causalVisualFacts[0].resultBand = "raw:17" }
+        rejects { $0.entryDisclosure = .init(siteProfile: "", status: "entryVisible") }
+        rejects { $0.entryDisclosure = .init(siteProfile: "site", status: "hidden") }
+        rejects { $0.sourcePage.marks[0].x = 6 }
+        rejects { $0.sourcePage.marks[0].cells[0] = [0] }
+        rejects { $0.firstMapCropReceipt.cells[0].visibility = "hidden"; $0.firstMapCropReceipt.cells[0].ground = .stone }
+        rejects { $0.firstMapCropReceipt.cells[1].x = $0.firstMapCropReceipt.cells[0].x; $0.firstMapCropReceipt.cells[1].y = $0.firstMapCropReceipt.cells[0].y }
+        rejects { $0.firstMapCropReceipt.cells[0].x = 9 }
+        rejects { $0.firstMapCropReceipt.cells[0].ground = nil }
+        rejects { $0.firstMapCropReceipt.cells[0].visibility = "fringe"; $0.firstMapCropReceipt.cells[0].floraStableID = "flora" }
+    }
+
     @MainActor
     func testWritingDeskRendersAtApprovedOrdinaryPhoneSize() throws {
         let store = GameStore(io: .temporary(name: "writing-render-\(UUID().uuidString)"))
@@ -103,16 +264,17 @@ final class PageTests: XCTestCase {
     }
 
     @MainActor
-    func testNewBindFreezesOneArrivalReceiptAcrossRunAndHistoryWithoutPrematurePending() throws {
+    func testNewBindFreezesOneArrivalReceiptAcrossRunAndHistoryAndOwnsPendingRoot() throws {
         let store = GameStore(io: .temporary(name: "arrival-receipt-\(UUID().uuidString)"))
         let earth = WorldPageCatalog.earthlikeTestInstance
         XCTAssertTrue(store.bindAndDepart(worldPageInstanceID: earth.id))
 
         let runReceipt = try XCTUnwrap(store.activeRun?.worldArrivalReceipt)
-        XCTAssertFalse(WorldArrivalPresentationAuthority.isNativePresentationEnabled)
-        XCTAssertNil(store.state.worlds.pendingWorldArrivalReceiptID,
-                     "receipt persistence must not strand players before the native root exists")
-        XCTAssertNil(store.state.worlds.pendingWorldArrivalReceipt)
+        XCTAssertTrue(WorldArrivalPresentationAuthority.isNativePresentationEnabled)
+        XCTAssertEqual(store.state.worlds.pendingWorldArrivalReceiptID, runReceipt.id)
+        XCTAssertEqual(store.state.worlds.pendingWorldArrivalReceipt, runReceipt)
+        XCTAssertTrue(runReceipt.isNativePresentationEligible)
+        XCTAssertNotNil(runReceipt.renderedSceneReceipt)
         XCTAssertEqual(store.state.reality.library.visitedWorlds.last?.worldArrivalReceipt,
                        runReceipt)
         XCTAssertEqual(runReceipt.generationSeed, earth.definition.seed)
@@ -150,7 +312,8 @@ final class PageTests: XCTestCase {
         let worldsRoundTrip = try JSONDecoder().decode(
             WorldsState.self, from: JSONEncoder().encode(store.state.worlds))
         XCTAssertEqual(worldsRoundTrip.activeRun?.worldArrivalReceipt, runReceipt)
-        XCTAssertNil(worldsRoundTrip.pendingWorldArrivalReceiptID)
+        XCTAssertEqual(worldsRoundTrip.pendingWorldArrivalReceiptID, runReceipt.id)
+        XCTAssertEqual(worldsRoundTrip.pendingWorldArrivalReceipt, runReceipt)
         let persistedReceipt = try XCTUnwrap(JSONSerialization.jsonObject(
             with: JSONEncoder().encode(runReceipt)) as? [String: Any])
         XCTAssertNil(persistedReceipt["counterfactualPassCount"])
@@ -163,13 +326,20 @@ final class PageTests: XCTestCase {
             store.activeRun?.map[$0].ground.isPassable == true
         }) {
             store.step(to: adjacent)
-            XCTAssertNotEqual(store.activeRun?.playerPosition, positionBeforeEnter,
-                              "disabled native presentation must not block world movement")
-            XCTAssertGreaterThan(store.activeRun?.turnsTaken ?? 0, turnBeforeEnter)
+            XCTAssertEqual(store.activeRun?.playerPosition, positionBeforeEnter)
+            XCTAssertEqual(store.activeRun?.turnsTaken, turnBeforeEnter)
         }
+        store.endRunWithPartialHaul(reason: "blocked fixture", kind: .defeat)
+        XCTAssertNotNil(store.activeRun, "arrival ownership must block defeat/return mutation")
+        XCTAssertEqual(store.state.worlds.pendingWorldArrivalReceiptID, runReceipt.id)
         XCTAssertEqual(store.activeRun?.worldArrivalReceipt, runReceipt)
         XCTAssertEqual(store.state.reality.library.visitedWorlds.last?.worldArrivalReceipt,
                        runReceipt)
+        XCTAssertTrue(store.enterPendingWorld(arrivalReceiptID: runReceipt.id))
+        XCTAssertNil(store.state.worlds.pendingWorldArrivalReceiptID)
+        XCTAssertEqual(store.activeRun?.turnsTaken, turnBeforeEnter)
+        XCTAssertEqual(store.activeRun?.playerPosition, positionBeforeEnter)
+        XCTAssertEqual(store.activeRun?.worldArrivalReceipt, runReceipt)
         XCTAssertFalse(store.enterPendingWorld(arrivalReceiptID: runReceipt.id),
                        "double dismissal must be a typed no-op")
 
@@ -177,8 +347,77 @@ final class PageTests: XCTestCase {
         store.mutate("stage orphan arrival ID") {
             $0.worlds.pendingWorldArrivalReceiptID = orphan
         }
-        XCTAssertFalse(store.enterPendingWorld(arrivalReceiptID: orphan))
+        XCTAssertTrue(store.reconcileOrphanWorldArrival())
         XCTAssertNil(store.state.worlds.pendingWorldArrivalReceiptID)
+    }
+
+    @MainActor
+    func testWorldArrivalPendingLifecycleSurvivesRelaunchAndEnterIsZeroMutation() throws {
+        let io = SaveFileIO.temporary(name: "arrival-relaunch-\(UUID().uuidString)")
+        var store: GameStore? = GameStore(io: io)
+        let page = WorldPageCatalog.earthlikeTestInstance
+        XCTAssertTrue(store?.bindAndDepart(worldPageInstanceID: page.id) == true)
+        let receipt = try XCTUnwrap(store?.activeRun?.worldArrivalReceipt)
+        let runBefore = store?.activeRun
+        let historyBefore = store?.state.reality.library.visitedWorlds
+        store = nil
+
+        let beforeEnter = GameStore(io: io)
+        XCTAssertEqual(beforeEnter.state.worlds.pendingWorldArrivalReceipt, receipt,
+                       "a kill/relaunch before Enter must replay the exact frozen receipt")
+        XCTAssertEqual(beforeEnter.activeRun, runBefore)
+        XCTAssertTrue(beforeEnter.enterPendingWorld(arrivalReceiptID: receipt.id))
+        XCTAssertEqual(beforeEnter.activeRun, runBefore)
+        XCTAssertEqual(beforeEnter.state.reality.library.visitedWorlds, historyBefore)
+        XCTAssertFalse(beforeEnter.enterPendingWorld(arrivalReceiptID: receipt.id))
+
+        let afterEnter = GameStore(io: io)
+        XCTAssertNil(afterEnter.state.worlds.pendingWorldArrivalReceiptID,
+                     "a kill/relaunch after Enter must not replay arrival")
+        XCTAssertEqual(afterEnter.activeRun, runBefore)
+        XCTAssertEqual(afterEnter.state.reality.library.visitedWorlds, historyBefore)
+    }
+
+    @MainActor
+    func testArrivalOrphansFailOpenDurablyAndRunExitClearsOwnership() throws {
+        let io = SaveFileIO.temporary(name: "arrival-orphan-\(UUID().uuidString)")
+        var store: GameStore? = GameStore(io: io)
+        XCTAssertTrue(store?.bindAndDepart(
+            worldPageInstanceID: WorldPageCatalog.earthlikeTestInstance.id) == true)
+        store?.mutate("stage mismatched arrival", flush: true, scope: .arrivalLifecycle) {
+            $0.worlds.pendingWorldArrivalReceiptID = .init(rawValue: "mismatch")
+        }
+        store = nil
+        let firstRelaunch = GameStore(io: io)
+        XCTAssertEqual(firstRelaunch.state.worlds.pendingWorldArrivalReceiptID?.rawValue,
+                       "mismatch")
+        XCTAssertNotNil(firstRelaunch.activeRun, "orphan reconciliation must fail open to map")
+        XCTAssertTrue(firstRelaunch.reconcileOrphanWorldArrival())
+        let secondRelaunch = GameStore(io: io)
+        XCTAssertNil(secondRelaunch.state.worlds.pendingWorldArrivalReceiptID,
+                     "orphan clearing must remain durable")
+
+        secondRelaunch.mutate("stage exit orphan", flush: true, scope: .arrivalLifecycle) {
+            $0.worlds.pendingWorldArrivalReceiptID = .init(rawValue: "exit-orphan")
+        }
+        secondRelaunch.endRunWithPartialHaul(reason: "Fixture", kind: .defeat)
+        XCTAssertNil(secondRelaunch.activeRun)
+        XCTAssertNil(secondRelaunch.state.worlds.pendingWorldArrivalReceiptID)
+
+        let invalidIO = SaveFileIO.temporary(name: "arrival-invalid-\(UUID().uuidString)")
+        var invalidStore: GameStore? = GameStore(io: invalidIO)
+        XCTAssertTrue(invalidStore?.bindAndDepart(
+            worldPageInstanceID: WorldPageCatalog.earthlikeTestInstance.id) == true)
+        invalidStore?.mutate("corrupt persisted arrival", flush: true,
+                             scope: .arrivalLifecycle) { state in
+            state.worlds.activeRun?.worldArrivalReceipt?.sceneReceipt?.canonicalSHA256 = "bad"
+        }
+        invalidStore = nil
+        let invalidRelaunch = GameStore(io: invalidIO)
+        XCTAssertNil(invalidRelaunch.state.worlds.pendingWorldArrivalReceipt)
+        XCTAssertNotNil(invalidRelaunch.activeRun)
+        XCTAssertTrue(invalidRelaunch.reconcileOrphanWorldArrival())
+        XCTAssertNil(GameStore(io: invalidIO).state.worlds.pendingWorldArrivalReceiptID)
     }
 
     @MainActor

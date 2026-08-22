@@ -18,6 +18,7 @@ import OSLog
 ///  - Writes go through one serial queue, so they land in the order they were made.
 @MainActor
 final class GameStore: ObservableObject {
+    enum MutationScope: Sendable { case ordinary, expedition, arrivalLifecycle }
     enum PreparationError: Error, Equatable {
         case unrecoverableSave(String)
     }
@@ -180,7 +181,9 @@ final class GameStore: ObservableObject {
     ///     player was last doing — and the kill-test can prove which action survived.
     ///   - flush: `true` for commitment points (binding a book, entering/resolving an encounter,
     ///     banking a haul) where losing even the debounce window would be a real loss.
-    func mutate(_ label: String, flush: Bool = false, _ body: (inout GameState) -> Void) {
+    func mutate(_ label: String, flush: Bool = false, scope: MutationScope = .ordinary,
+                _ body: (inout GameState) -> Void) {
+        guard permitsMutationWhileArrivalOwnsRoot(scope) else { return }
         body(&state)
         state.meta.mutationCount += 1
         state.meta.recordSemanticAction(label)
@@ -196,8 +199,9 @@ final class GameStore: ObservableObject {
     /// Atomic commitment variant. Rules stage against a value copy and publish it only when every
     /// stale-quote guard succeeds; refusal records no action and schedules no save.
     @discardableResult
-    func mutateIf(_ label: String, flush: Bool = false,
+    func mutateIf(_ label: String, flush: Bool = false, scope: MutationScope = .ordinary,
                   _ body: (inout GameState) -> Bool) -> Bool {
+        guard permitsMutationWhileArrivalOwnsRoot(scope) else { return false }
         var candidate = state
         guard body(&candidate) else { return false }
         state = candidate
@@ -206,6 +210,13 @@ final class GameStore: ObservableObject {
         state.meta.lastSavedAt = Date()
         if flush { flushNow() } else { scheduleSave() }
         return true
+    }
+
+    /// One centralized gate covers every stale/debug action path while the arrival owns root
+    /// presentation. Only the exact idempotent dismissal or orphan reconciliation may mutate.
+    private func permitsMutationWhileArrivalOwnsRoot(_ scope: MutationScope) -> Bool {
+        guard state.worlds.pendingWorldArrivalReceipt != nil else { return true }
+        return scope == .arrivalLifecycle
     }
 
     /// Cancels any pending debounce and writes now, blocking until the bytes are handed to the

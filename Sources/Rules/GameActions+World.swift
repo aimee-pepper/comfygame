@@ -148,7 +148,7 @@ extension GameStore {
               !realm.isDormant else { return false }
 
         var didCommit = false
-        mutate("revisit anchored realm", flush: true) { state in
+        mutate("revisit anchored realm", flush: true, scope: .expedition) { state in
             guard case .allowed(let fieldKit) = Self.fieldKitDepartureQuote(in: state) else { return }
             guard let realm = state.worlds.anchoredRealms.first(where: { $0.id == id }),
                   !realm.isDormant else { return }
@@ -206,7 +206,7 @@ extension GameStore {
 
     func setInstrument(_ target: PressureTargetID, carried: Bool) {
         guard state.reality.instruments.contains(target), activeRun == nil else { return }
-        mutate("change field kit", flush: true) { state in
+        mutate("change field kit", flush: true, scope: .expedition) { state in
             if !state.base.hasConfiguredInstrumentLoadout {
                 state.base.instrumentLoadout = state.reality.instruments
                 state.base.hasConfiguredInstrumentLoadout = true
@@ -235,7 +235,7 @@ extension GameStore {
     func inspectOfferedWorldPage(_ quote: WildWorldPageFieldRules.Quote)
         -> WildWorldPageFieldRules.Result {
         var result: WildWorldPageFieldRules.Result = .stale
-        mutate("inspect loose World Page", flush: true) { state in
+        mutate("inspect loose World Page", flush: true, scope: .expedition) { state in
             guard var run = state.worlds.activeRun else { return }
             result = WildWorldPageFieldRules.inspect(quote, in: &run)
             guard case .inspected(let page) = result else { return }
@@ -249,7 +249,7 @@ extension GameStore {
     func takeOfferedWorldPage(_ quote: WildWorldPageFieldRules.Quote)
         -> WildWorldPageFieldRules.Result {
         var result: WildWorldPageFieldRules.Result = .stale
-        mutate("take loose World Page", flush: true) { state in
+        mutate("take loose World Page", flush: true, scope: .expedition) { state in
             guard var run = state.worlds.activeRun else { return }
             result = WildWorldPageFieldRules.take(quote, in: &run)
             guard case .taken = result else { return }
@@ -263,7 +263,7 @@ extension GameStore {
                               discarding occupant: WildWorldPageFieldRules.SlotOccupant)
         -> WildWorldPageFieldRules.Result {
         var result: WildWorldPageFieldRules.Result = .stale
-        mutate("swap loose World Page", flush: true) { state in
+        mutate("swap loose World Page", flush: true, scope: .expedition) { state in
             guard var run = state.worlds.activeRun else { return }
             result = WildWorldPageFieldRules.swap(quote, discarding: occupant, in: &run)
             guard case .swapped = result else { return }
@@ -316,7 +316,7 @@ extension GameStore {
     func anchorAtNaturalPoint() -> Bool {
         guard canUseNaturalAnchor else { return false }
         let cost = naturalAnchorCost
-        mutate("anchor realm at natural point", flush: true) { state in
+        mutate("anchor realm at natural point", flush: true, scope: .expedition) { state in
             guard let run = state.worlds.activeRun,
                   !state.worlds.anchoredRealms.contains(where: { $0.runIndex == run.runIndex }),
                   state.base.essence >= cost else { return }
@@ -373,7 +373,7 @@ extension GameStore {
             return .refused("The satchel changed. Review the current items and try again.")
         }
         var committed = false
-        mutate("swap loot", flush: true) { state in
+        mutate("swap loot", flush: true, scope: .expedition) { state in
             guard var run = state.worlds.activeRun,
                   run.offeredItems.contains(quote.offered),
                   run.satchelItems.stacks.contains(quote.carried) else { return }
@@ -396,7 +396,7 @@ extension GameStore {
     }
 
     func leaveOffered(_ offered: ItemStack) {
-        mutate("leave loot behind", flush: true) { state in
+        mutate("leave loot behind", flush: true, scope: .expedition) { state in
             state.worlds.activeRun?.offeredItems.removeAll { $0.id == offered.id }
         }
     }
@@ -416,7 +416,7 @@ extension GameStore {
     func step(to point: GridPoint) {
         guard activeRun?.activeEncounter == nil else { return }
         var events: [WorldRules.Event] = []
-        mutate("step") { state in
+        mutate("step", scope: .expedition) { state in
             events = WorldRules.step(to: point, in: &state)
         }
         finishTurn(events)
@@ -455,7 +455,7 @@ extension GameStore {
 
     func placeAnchorFrame() -> Bool {
         guard canPlaceAnchorFrame, let frame = carriedAnchorFrame else { return false }
-        mutate("place Anchor Frame", flush: true) { state in
+        mutate("place Anchor Frame", flush: true, scope: .expedition) { state in
             guard var run = state.worlds.activeRun,
                   run.map[run.playerPosition].content == .empty,
                   !run.map[run.playerPosition].isCrumbled,
@@ -484,7 +484,7 @@ extension GameStore {
               ContentCatalog.shared.item(solvent.catalogID)?.consumable?.effect == .identifyCurio
         else { return }
         var events: [WorldRules.Event] = []
-        mutate("use solvent", flush: true) { state in
+        mutate("use solvent", flush: true, scope: .expedition) { state in
             guard var run = state.worlds.activeRun,
                   let revealed = EconomyRules.identification(of: curio),
                   run.satchelItems.stacks.contains(where: { $0.id == solvent.id }),
@@ -523,7 +523,7 @@ extension GameStore {
             return
         }
         var events: [WorldRules.Event] = []
-        mutate("use \(stack.catalogID.rawValue)", flush: true) { state in
+        mutate("use \(stack.catalogID.rawValue)", flush: true, scope: .expedition) { state in
             events = WorldRules.useItem(stack.id, on: member, in: &state)
         }
         finishTurn(events)
@@ -539,7 +539,7 @@ extension GameStore {
     /// Talk them into coming home. The only thing that marks somebody found (Aimee, 6 Aug).
     func recruit(_ id: TravellerID) {
         var events: [WorldRules.Event] = []
-        mutate("recruit \(id.rawValue)", flush: true) { state in
+        mutate("recruit \(id.rawValue)", flush: true, scope: .expedition) { state in
             events = WorldRules.recruit(id, in: &state)
         }
         recentEvents = events
@@ -559,7 +559,7 @@ extension GameStore {
         }
 
         var events: [WorldRules.Event] = []
-        mutate("travel") { state in
+        mutate("travel", scope: .expedition) { state in
             for next in route {
                 if let current = state.worlds.activeRun,
                    WorldRules.automaticTravelMustStop(before: next, in: current,
@@ -589,7 +589,7 @@ extension GameStore {
     func harvest() {
         guard harvestableHere != nil, activeRun?.activeEncounter == nil else { return }
         var events: [WorldRules.Event] = []
-        mutate("harvest", flush: true) { state in
+        mutate("harvest", flush: true, scope: .expedition) { state in
             events = WorldRules.harvest(in: &state)
         }
         finishTurn(events)
@@ -599,7 +599,7 @@ extension GameStore {
     func searchSite() {
         guard searchableHere != nil, activeRun?.activeEncounter == nil else { return }
         var events: [WorldRules.Event] = []
-        mutate("search site", flush: true) { state in
+        mutate("search site", flush: true, scope: .expedition) { state in
             events = WorldRules.searchSite(in: &state)
         }
         finishTurn(events)
@@ -612,7 +612,7 @@ extension GameStore {
     func survey() {
         guard canSurvey else { return }
         var events: [WorldRules.Event] = []
-        mutate("survey world", flush: true) { state in
+        mutate("survey world", flush: true, scope: .expedition) { state in
             events = WorldRules.survey(in: &state)
         }
         finishTurn(events)
@@ -629,7 +629,7 @@ extension GameStore {
     /// while the party remains stranded in the world.
     private func returnHomeWithFullHaul(reason: String, kind: RunExitSummary.Kind,
                                         consuming stackID: InstanceID? = nil) {
-        mutate("return home", flush: true) { state in
+        mutate("return home", flush: true, scope: .expedition) { state in
             guard var run = state.worlds.activeRun else { return }
             if let stackID {
                 guard let index = run.satchelItems.stacks.firstIndex(where: { $0.id == stackID })
@@ -673,7 +673,7 @@ extension GameStore {
     /// Caught by the collapse (or carried out unconscious): keep a fraction, chosen at random.
     func endRunWithPartialHaul(reason: String, kind: RunExitSummary.Kind = .collapse) {
         guard activeRun != nil else { return }
-        mutate("run ended: \(reason)", flush: true) { state in
+        mutate("run ended: \(reason)", flush: true, scope: .expedition) { state in
             guard var run = state.worlds.activeRun else { return }
             let outcomeID = state.worlds.mintOutcomeID()
             state.reality.library.attachOutcome(outcomeID,
@@ -710,7 +710,9 @@ extension GameStore {
     }
 
     func dismissRunExitSummary() {
-        mutate("dismiss run summary", flush: true) { $0.worlds.lastExit = nil }
+        mutate("dismiss run summary", flush: true, scope: .expedition) {
+            $0.worlds.lastExit = nil
+        }
     }
 
     nonisolated static func sustainObligation(forExistingRealmCount count: Int) -> Int {
@@ -745,7 +747,7 @@ extension GameStore {
             .filter { payingIDs.contains($0.id) }
             .reduce(0) { $0 + $1.projectedShortfall }
         guard due <= state.base.essence else { return false }
-        mutate("settle anchored realms", flush: true) { state in
+        mutate("settle anchored realms", flush: true, scope: .expedition) { state in
             state.base.essence -= due
             for index in state.worlds.anchoredRealms.indices {
                 guard state.worlds.anchoredRealms[index].projectedShortfall > 0,
@@ -768,7 +770,7 @@ extension GameStore {
         }
         let cost = max(Tuning.Anchoring.minimumReactivationCost, realm.projectedShortfall)
         guard state.base.essence >= cost else { return false }
-        mutate("reactivate anchored realm", flush: true) { state in
+        mutate("reactivate anchored realm", flush: true, scope: .expedition) { state in
             guard let index = state.worlds.anchoredRealms.firstIndex(where: { $0.id == id }) else { return }
             state.base.essence -= cost
             state.worlds.anchoredRealms[index].isDormant = false
@@ -781,7 +783,7 @@ extension GameStore {
               state.worlds.anchoredRealms.contains(where: { $0.id == id && !$0.isDormant }) else {
             return false
         }
-        mutate("assign companion to anchored realm", flush: true) { state in
+        mutate("assign companion to anchored realm", flush: true, scope: .expedition) { state in
             state.base.activeParty.removeAll { $0 == companion }
             for index in state.worlds.anchoredRealms.indices {
                 state.worlds.anchoredRealms[index].assignedCompanions.removeAll { $0 == companion }
@@ -794,7 +796,7 @@ extension GameStore {
     }
 
     func unassignCompanion(_ companion: Int, fromAnchoredRealm id: Int) {
-        mutate("return companion from anchored realm", flush: true) { state in
+        mutate("return companion from anchored realm", flush: true, scope: .expedition) { state in
             guard let target = state.worlds.anchoredRealms.firstIndex(where: { $0.id == id }) else { return }
             state.worlds.anchoredRealms[target].assignedCompanions.removeAll { $0 == companion }
             Self.recalculateAnchorProduction(in: &state)

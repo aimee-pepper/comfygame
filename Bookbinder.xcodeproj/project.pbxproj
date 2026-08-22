@@ -171,6 +171,9 @@
 		A15A5A001A5A5A001A5A5A00 /* WritingDeskReviewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A15A5A011A5A5A011A5A5A01 /* WritingDeskReviewModel.swift */; };
 		A16A6A001A6A6A001A6A6A00 /* WorldArrivalReceipt.swift in Sources */ = {isa = PBXBuildFile; fileRef = A16A6A011A6A6A011A6A6A01 /* WorldArrivalReceipt.swift */; };
 		A17A7A001A7A7A001A7A7A00 /* WorldArrivalDescriptionRules.swift in Sources */ = {isa = PBXBuildFile; fileRef = A17A7A011A7A7A011A7A7A01 /* WorldArrivalDescriptionRules.swift */; };
+		A18A8A001A8A8A001A8A8A00 /* WorldArrivalRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = A18A8A011A8A8A011A8A8A01 /* WorldArrivalRenderer.swift */; };
+		A19A9A001A9A9A001A9A9A00 /* WorldArrivalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A19A9A011A9A9A011A9A9A01 /* WorldArrivalView.swift */; };
+		A20A0A001A0A0A001A0A0A00 /* WorldArrivalRenderedSceneReceipt.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20A0A011A0A0A011A0A0A01 /* WorldArrivalRenderedSceneReceipt.swift */; };
 		783A945A7FB200C6BBF03CFA /* CatalogueItemVisualAdapter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 193E41B61927927E78865C30 /* CatalogueItemVisualAdapter.swift */; };
 		7B005A0A9F5BCD6EA2A4E072 /* SaveSlotCatalogue.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D7771DA99D436A50C77B512 /* SaveSlotCatalogue.swift */; };
 		7C72DAD4C55C0D916064E912 /* ContradictionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F43DADDF1091E89318A12B0D /* ContradictionTests.swift */; };
@@ -529,6 +532,9 @@
 		A15A5A011A5A5A011A5A5A01 /* WritingDeskReviewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WritingDeskReviewModel.swift; sourceTree = "<group>"; };
 		A16A6A011A6A6A011A6A6A01 /* WorldArrivalReceipt.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorldArrivalReceipt.swift; sourceTree = "<group>"; };
 		A17A7A011A7A7A011A7A7A01 /* WorldArrivalDescriptionRules.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorldArrivalDescriptionRules.swift; sourceTree = "<group>"; };
+		A18A8A011A8A8A011A8A8A01 /* WorldArrivalRenderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorldArrivalRenderer.swift; sourceTree = "<group>"; };
+		A19A9A011A9A9A011A9A9A01 /* WorldArrivalView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorldArrivalView.swift; sourceTree = "<group>"; };
+		A20A0A011A0A0A011A0A0A01 /* WorldArrivalRenderedSceneReceipt.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorldArrivalRenderedSceneReceipt.swift; sourceTree = "<group>"; };
 		B07ACB016173BA0637D5B85C /* SaveSlotTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SaveSlotTests.swift; sourceTree = "<group>"; };
 		B213D165D2239B2A934DB263 /* CombatTreeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CombatTreeView.swift; sourceTree = "<group>"; };
 		B23878A2219B30C376009246 /* PressuresDriveGenerationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PressuresDriveGenerationTests.swift; sourceTree = "<group>"; };
@@ -773,6 +779,7 @@
 				F04D876D78710D8DC1CAB2BE /* TutorialCard.swift */,
 				0212875D2B95EA338E16F0B2 /* WorldDescriptionPanel.swift */,
 				A51F4BCA8A3D72D7B108E2E1 /* WorldHistoryView.swift */,
+				A19A9A011A9A9A011A9A9A01 /* WorldArrivalView.swift */,
 				D9311ACC91B2E555993A3297 /* WorldView.swift */,
 				C82ADF2ABC4F75679DADCCBB /* WritingDeskView.swift */,
 			);
@@ -887,6 +894,7 @@
 			children = (
 				E19DC1448710810CD318671E /* Identifiers.swift */,
 				7294A9FAF1EE19D44BD7C56D /* SeededRNG.swift */,
+				A20A0A011A0A0A011A0A0A01 /* WorldArrivalRenderedSceneReceipt.swift */,
 			);
 			path = Core;
 			sourceTree = "<group>";
@@ -1035,6 +1043,7 @@
 				3B52219A7EE3D04B75EED3BE /* NativeVisualPack.swift */,
 				E30000000000000000000002 /* WritingDeskProductionPack.swift */,
 				E40000000000000000000002 /* TerrainProductionPack.swift */,
+				A18A8A011A8A8A011A8A8A01 /* WorldArrivalRenderer.swift */,
 				L20000000000000000000001 /* ResourceSpriteV1Registry.generated.swift */,
 				M20000000000000000000001 /* MobGearSpriteV1Registry.generated.swift */,
 				C60000000000000000000001 /* TownBuildingVisualRegistry.generated.swift */,
@@ -1407,6 +1416,9 @@
 				F7A590456D85D35640519E0C /* WorldVisualReceipt.swift in Sources */,
 				A16A6A001A6A6A001A6A6A00 /* WorldArrivalReceipt.swift in Sources */,
 				A17A7A001A7A7A001A7A7A00 /* WorldArrivalDescriptionRules.swift in Sources */,
+				A18A8A001A8A8A001A8A8A00 /* WorldArrivalRenderer.swift in Sources */,
+				A19A9A001A9A9A001A9A9A00 /* WorldArrivalView.swift in Sources */,
+				A20A0A001A0A0A001A0A0A00 /* WorldArrivalRenderedSceneReceipt.swift in Sources */,
 				56C2C67D2033B74FFD18EE24 /* Worldgen.swift in Sources */,
 				3F6C7DB75723783F90E7E5F8 /* WorldsState.swift in Sources */,
 				3E24E2D2D2BEAD60ADE93D0A /* WritingDeskView.swift in Sources */,

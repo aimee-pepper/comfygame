@@ -206,7 +206,7 @@ extension GameStore {
             actor = nil
         }
         guard let actor else { return }
-        mutate("combat: \(label(for: action))", flush: true) { state in
+        mutate("combat: \(label(for: action))", flush: true, scope: .expedition) { state in
             let before = state.worlds.activeRun?.activeEncounter
             CombatRules.perform(action, by: actor, in: &state)
             // A stale exact selection is a refusal, not permission to let the rest of the fight
@@ -225,7 +225,7 @@ extension GameStore {
     /// quietly undo that.
     func toggleCompanionOverride() {
         guard activeEncounter?.outcome == nil else { return }
-        mutate("companion override", flush: true) { state in
+        mutate("companion override", flush: true, scope: .expedition) { state in
             state.worlds.activeRun?.activeEncounter?.isCompanionOverridden.toggle()
         }
     }
@@ -235,7 +235,7 @@ extension GameStore {
         guard let encounter = activeEncounter, let outcome = encounter.outcome else { return }
 
         var events: [WorldRules.Event] = []
-        mutate("encounter \(outcome.rawValue)", flush: true) { state in
+        mutate("encounter \(outcome.rawValue)", flush: true, scope: .expedition) { state in
             events = CombatRules.conclude(in: &state)
         }
         if !events.isEmpty { recentEvents = events }
@@ -297,19 +297,21 @@ extension GameStore {
 
     func moveGambit(from source: IndexSet, to destination: Int, for owner: Combatant = .companion(0)) {
         guard canEditGambits else { return }
-        mutate("reorder rules", flush: true, withGambits(owner) { $0.move(fromOffsets: source, toOffset: destination) })
+        mutate("reorder rules", flush: true, scope: .expedition,
+               withGambits(owner) { $0.move(fromOffsets: source, toOffset: destination) })
     }
 
     func removeGambit(at offsets: IndexSet, for owner: Combatant = .companion(0)) {
         guard canEditGambits else { return }
-        mutate("remove rule", withGambits(owner) { $0.remove(atOffsets: offsets) })
+        mutate("remove rule", scope: .expedition,
+               withGambits(owner) { $0.remove(atOffsets: offsets) })
     }
 
     /// Change one segment of a rule in place. The whole point of the editor is that you never
     /// leave the list to do this.
     func setGambitPart(_ ruleID: InstanceID, kind: GambitComponentDef.Kind,
                        to component: GambitComponentID?, for owner: Combatant = .companion(0)) {
-        mutate("edit rule", flush: true, withGambits(owner) { rules in
+        mutate("edit rule", flush: true, scope: .expedition, withGambits(owner) { rules in
             guard let index = rules.firstIndex(where: { $0.id == ruleID }) else { return }
             switch kind {
             case .subject: if let component { rules[index].subject = component }
@@ -323,7 +325,7 @@ extension GameStore {
 
     /// Switch a rule off without losing it, so an order can be tested rather than rebuilt.
     func setGambitEnabled(_ ruleID: InstanceID, _ isEnabled: Bool, for owner: Combatant = .companion(0)) {
-        mutate("toggle rule", flush: true, withGambits(owner) { rules in
+        mutate("toggle rule", flush: true, scope: .expedition, withGambits(owner) { rules in
             guard let index = rules.firstIndex(where: { $0.id == ruleID }) else { return }
             rules[index].isEnabled = isEnabled
         })
@@ -347,7 +349,7 @@ extension GameStore {
     @discardableResult
     func addGambit(_ rule: GambitRule, for owner: Combatant = .companion(0)) -> Bool {
         guard canEditGambits, rule.isWritable(with: state.base.ownedGambitComponents) else { return false }
-        mutate("write a rule", flush: true, withGambits(owner) { list in
+        mutate("write a rule", flush: true, scope: .expedition, withGambits(owner) { list in
             var written = rule
             written.id = InstanceID(rawValue: UInt64(list.count + 1) &* 2_654_435_761 &+ UInt64(list.count))
             list.append(written)

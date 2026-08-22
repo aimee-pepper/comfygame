@@ -1,5 +1,15 @@
 import SwiftUI
 
+enum RootPresentationRules {
+    enum Surface: Equatable { case arrival, encounter, world, base }
+    static func surface(hasArrival: Bool, hasEncounter: Bool, isInRun: Bool) -> Surface {
+        if hasArrival { return .arrival }
+        if hasEncounter { return .encounter }
+        if isInRun { return .world }
+        return .base
+    }
+}
+
 enum RootNavigationRules {
     static func homePath(afterRunTransitionFrom wasInRun: Bool, to isInRun: Bool,
                          current: [AppRoute]) -> [AppRoute] {
@@ -56,12 +66,23 @@ struct RootView: View {
     }()
 
     var body: some View {
-        Group {
-            if store.activeEncounter != nil {
+        let receipt = store.state.worlds.pendingWorldArrivalReceipt
+        let validArrival = receipt.flatMap { receipt in
+            receipt.renderedSceneReceipt.flatMap { WorldArrivalNativeRenderer.image(for: $0) }
+        } != nil
+        return Group {
+            switch RootPresentationRules.surface(hasArrival: validArrival,
+                                                 hasEncounter: store.activeEncounter != nil,
+                                                 isInRun: store.state.worlds.isInRun) {
+            case .arrival:
+                if let receipt {
+                WorldArrivalView(receipt: receipt)
+                }
+            case .encounter:
                 EncounterView()
-            } else if store.state.worlds.isInRun {
+            case .world:
                 WorldView()
-            } else {
+            case .base:
                 NavigationStack(path: $debugAuditPath) {
                     BaseView()
                         .navigationDestination(for: AppRoute.self) { route in
@@ -71,6 +92,10 @@ struct RootView: View {
                         }
                 }
             }
+        }
+        .onAppear { reconcileArrivalPresentation() }
+        .onChange(of: store.state.worlds.pendingWorldArrivalReceiptID) {
+            reconcileArrivalPresentation()
         }
         .sheet(item: Binding(get: { store.state.worlds.lastExit }, set: { _ in
             // The WorldView -> BaseView identity transition can ask the presentation host to
@@ -105,6 +130,16 @@ struct RootView: View {
             }
         }
 #endif
+    }
+
+    private func reconcileArrivalPresentation() {
+        if let receipt = store.state.worlds.pendingWorldArrivalReceipt,
+           let rendered = receipt.renderedSceneReceipt,
+           WorldArrivalNativeRenderer.image(for: rendered) == nil {
+            _ = store.reconcileUnrenderableWorldArrival(receipt.id)
+        } else {
+            _ = store.reconcileOrphanWorldArrival()
+        }
     }
 }
 
