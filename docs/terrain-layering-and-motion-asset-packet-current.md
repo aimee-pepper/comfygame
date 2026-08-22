@@ -1,6 +1,6 @@
 # Terrain layering and motion — Asset production packet
 
-**Status:** active Asset visual-production correction; v0.1 mechanics retained, v0.1 family art superseded
+**Status:** complete v0.2 visual pack accepted; native-consumable production-pack correction active
 **Priority:** B1.7b; explicit Aimee-authorized Asset exception to the generic system-first hold
 **Owners:** Game Design owns terrain meaning, disclosure and motion limits; Asset owns the isolated logical
 pixel kit and compositor proof; Engineering later owns the native receipt adapter, cache and shared clock
@@ -52,6 +52,13 @@ separate Snow/Ash surface-cover overlay before native integration.
 
 The representative style gate is a review checkpoint, not permission to ship only six ground families.
 Completion still means one coherent dynamic system covering all twelve live grounds in the actual phone map.
+
+That complete v0.2 system is now visually accepted at canonical body
+`2a541033b71b638f1803e5a9477a0197c38f38d96ff199a4864d49bf551608dd`, manifest-file SHA
+`5e70b17c91c8601ed895455364f2cd8a51e010e2cb2201f09dc2c02c826f3892` and production aggregate
+`90da0b9ed6092b591bcad83fbda68b0563de9c2ba37127911772c41418657a54`. It covers all twelve grounds
+plus independent Snow and settled-Ash surface deposits. Asset work is now limited to packaging those frozen
+pixels and exact conformance receipts for native consumption; it must not generate another terrain style.
 
 ## Player result
 
@@ -192,7 +199,7 @@ The Asset proof accepts exactly one closed request per currently constructed til
 
 | Field | Type | Owner and use |
 |---|---|---|
-| `schemaVersion` | literal `terrain-layers-v1` | fail closed on another version |
+| `schemaVersion` | literal `terrain-layers-v2` | v2 adds only the two rules-owned surface-deposit flags; fail closed on another version |
 | `ground` | exact 12-value `GroundType` | game rules; chooses reviewed terrain family |
 | `point` | integer x/y | edge and phase identity only; never display |
 | `visualSeed` | unsigned frozen value | deterministic detail, contour and phase offsets; no gameplay RNG |
@@ -208,6 +215,7 @@ The Asset proof accepts exactly one closed request per currently constructed til
 | `phaseOffset` | `0...23` | frozen from seed, point and terrain family |
 | `presentationTick` | nonnegative integer | shared UI clock input; never persisted or used by rules |
 | `reduceMotion` | Boolean | current presentation policy, not campaign state |
+| `surfaceDeposits` | exact `{ snow: Boolean, settledAsh: Boolean }` | independent frozen presentation receipts; neither changes base ground or mechanics |
 
 No pressure numbers, passability booleans, resource/site/entity facts or prose enter Asset. Asset does not
 infer a mechanic from pixels; the game continues to own labels, Look text, hit testing and pathing.
@@ -247,7 +255,7 @@ Only one quarter of Ice tiles are eligible by stable seed; at most one three-pix
 six-second loop. Stone, Soil, Sand, Ash, Rubble, Mud and Chasm are static in v1. Clear air does not invent
 dust; Rain does not create puddles; Mud does not bubble. Atmosphere/precipitation presentation does not
 invent transient Snow or Ash accumulation. Two independent rules-owned frozen surface-deposit receipts,
-`snow` and `ash`, may select the reviewed shared accumulation geometry while preserving the underlying ground
+`snow` and `settledAsh`, may select the reviewed shared accumulation geometry while preserving the underlying ground
 and mechanics. Either may be absent or present, and both may coexist when both exact sources resolve. Snow
 resolves white roles; settled Ash resolves grey/charcoal roles. Their combined opaque coverage leaves the
 underlying material legible. Neither is the transient precipitation nor suspended-air layer, and settled Ash
@@ -274,7 +282,7 @@ Asset must deliver reusable logical sources rather than state screenshots:
 3. explicit Water/Deep-Water depth-contour, Growth/Groundcover height-boundary and Chasm-rim parts;
 4. Water and Deep-Water motion frames, Groundcover and Growth flex frames, and Ice glint overlay frames;
 5. a pure request normalizer and compositor exporting static body and transparent motion overlay separately;
-6. a separate recolorable Snow/Ash cover kit that can lie over legal underlying grounds without changing their
+6. a separate recolorable Snow/settled-Ash cover kit that can lie over legal underlying grounds without changing their
    identity, passability or adjacency;
 7. semantic palette-role masks and exact conformance to three receipt-backed `WorldGrade2V1` descriptors,
    with unchanged form/alpha hashes across recolors;
