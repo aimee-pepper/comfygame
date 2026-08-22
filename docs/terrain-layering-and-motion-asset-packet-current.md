@@ -128,7 +128,7 @@ layer may intrude at most two pixels into the lower-priority tile's side of a sh
 | Stone | ordinary hard ground | joined plates, fine irregular seams, sparse chips | none | Ore, richness or raised blocks |
 | Soil | ordinary worked/earthen ground | small clods, shallow value pockets, soft broken edge | none | Mud slow, furrows or a guaranteed crop |
 | Sand | ordinary loose ground | low ripples and granular pockets with an irregular dry edge | none | quicksand, wind hazard or treasure |
-| Ice | solid passable surface | continuous hard sheet, restrained cracks trapped inside the surface | rare glint only | shallow/deep water or slipperiness not owned by rules |
+| Ice | solid passable surface | continuous hard sheet, restrained cracks trapped inside the surface | none in the first native v2 integration | shallow/deep water or slipperiness not owned by rules |
 | Ash | ordinary passable deposit | soft uneven drifts and sparse flecks | none | Smoke, heat, toxicity or black global tint |
 | Water | traversable shallow water | continuous surface, visible bank/bed relationship and short ripple accents | continuous restrained ripple | hidden surcharge, route strip or deep water |
 | Deep water | impassable depth | continuous darker body with a depth contour on the deep side | slower restrained ripple | Chasm or traversable water |
@@ -240,7 +240,6 @@ world seed, and never enters combat, movement, visibility or generated content.
 | Deep Water | one step per 6 ticks | per 3 ticks | per 2 ticks | at most 8 pixels; depth body/contour fixed |
 | Groundcover | representative static flex | one step per 4 ticks | per 2 ticks | at most 6 pixels; occupied envelope fixed |
 | Growth | representative static flex | one step per 4 ticks | per 2 ticks | at most 8 pixels; blocking envelope fixed |
-| Ice | one rare glint event per eligible six-second loop | same | same | at most 3 pixels on the eligible 25% of Ice tiles |
 
 Water motion changes short internal ripple/highlight pixels only. It cannot change the shoreline, depth
 contour, route read or a tile's apparent passability. Adjacent water tiles use their shared edge identity
@@ -250,10 +249,10 @@ Groundcover and Growth flex within one pixel of a fixed top-down cluster. Their 
 far edge and visible content aperture remain fixed. Strong motion changes cadence, not pixel count or
 mechanical severity.
 
-Ice glints are sparse hard-surface reflections, not a collectible sheen, rarity sparkle or hazard warning.
-Only one quarter of Ice tiles are eligible by stable seed; at most one three-pixel event appears in their
-six-second loop. Stone, Soil, Sand, Ash, Rubble, Mud and Chasm are static in v1. Clear air does not invent
-dust; Rain does not create puddles; Mud does not bubble. Atmosphere/precipitation presentation does not
+Ice remains static in the first native v2 integration. A later phone-reviewed polish slice may test the
+previously proposed sparse three-pixel hard-surface glint, but it is not part of this production-pack or
+native-integration gate. Stone, Soil, Sand, Ice, Ash, Rubble, Mud and Chasm are static in v2. Clear air does
+not invent dust; Rain does not create puddles; Mud does not bubble. Atmosphere/precipitation presentation does not
 invent transient Snow or Ash accumulation. Two independent rules-owned frozen surface-deposit receipts,
 `snow` and `settledAsh`, may select the reviewed shared accumulation geometry while preserving the underlying ground
 and mechanics. Either may be absent or present, and both may coexist when both exact sources resolve. Snow
@@ -280,7 +279,7 @@ Asset must deliver reusable logical sources rather than state screenshots:
    genuine production-intended pixel-art source parts rather than procedural/hash-scattered filler;
 2. four complementary cardinal contour-mask families and all 16 N/E/S/W adjacency combinations;
 3. explicit Water/Deep-Water depth-contour, Growth/Groundcover height-boundary and Chasm-rim parts;
-4. Water and Deep-Water motion frames, Groundcover and Growth flex frames, and Ice glint overlay frames;
+4. Water and Deep-Water motion frames plus Groundcover and Growth flex frames;
 5. a pure request normalizer and compositor exporting static body and transparent motion overlay separately;
 6. a separate recolorable Snow/settled-Ash cover kit that can lie over legal underlying grounds without changing their
    identity, passability or adjacency;
