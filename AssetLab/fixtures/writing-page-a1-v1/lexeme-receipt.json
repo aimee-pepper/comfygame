@@ -1,0 +1,8417 @@
+{
+  "schemaVersion": 1,
+  "glyphVersion": "writing-glyph-v1",
+  "catalogueCounts": {
+    "targets": 8,
+    "sources": 62,
+    "qualifiers": 17,
+    "compounds": 21,
+    "total": 108
+  },
+  "entries": [
+    {
+      "kind": "compound",
+      "id": "archipelago",
+      "glyph": {
+        "version": "writing-glyph-v1",
+        "salt": 0,
+        "width": 7,
+        "height": 7,
+        "bitmap": "0001000010100001111100001110000110000011000111000"
+      },
+      "hands": {
+        "charcoal": {
+          "ruleHand": "crude",
+          "shapeID": "crude_smear",
+          "cells": [
+            [
+              0,
+              0
+            ],
+            [
+              1,
+              0
+            ],
+            [
+              2,
+              0
+            ],
+            [
+              0,
+              1
+            ],
+            [
+              1,
+              1
+            ],
+            [
+              2,
+              1
+            ]
+          ],
+          "bounds": {
+            "width": 3,
+            "height": 2
+          },
+          "footprint": 6
+        },
+        "brush": {
+          "ruleHand": "plain",
+          "shapeID": "plain_bar",
+          "cells": [
+            [
+              0,
+              0
+            ],
+            [
+              1,
+              0
+            ],
+            [
+              2,
+              0
+            ]
+          ],
+          "bounds": {
+            "width": 3,
+            "height": 1
+          },
+          "footprint": 3
+        },
+        "fountain": {
+          "ruleHand": "refined",
+          "shapeID": "refined_dot",
+          "cells": [
+            [
+              0,
+              0
+            ]
+          ],
+          "bounds": {
+            "width": 1,
+            "height": 1
+          },
+          "footprint": 1
+        }
+      }
+    },
+    {
+      "kind": "compound",
+      "id": "ashen",
+      "glyph": {
+        "version": "writing-glyph-v1",
+        "salt": 0,
+        "width": 7,
+        "height": 7,
+        "bitmap": "0001000001100001010000111110000100000010100001010"
+      },
+      "hands": {
+        "charcoal": {
+          "ruleHand": "crude",
+          "shapeID": "crude_cross",
+          "cells": [
+            [
+              1,
+              0
+            ],
+            [
+              0,
+              1
+            ],
+            [
+              1,
+              1
+            ],
+            [
+              2,
+              1
+            ],
+            [
+              1,
+              2
+            ]
+          ],
+          "bounds": {
+            "width": 3,
+            "height": 3
+          },
+          "footprint": 5
+        },
+        "brush": {
+          "ruleHand": "plain",
+          "shapeID": "plain_bar",
+          "cells": [
+            [
+              0,
+              0
+            ],
+            [
+              1,
+              0
+            ],
+            [
+              2,
+              0
+            ]
+          ],
+          "bounds": {
+            "width": 3,
+            "height": 1
+          },
+          "footprint": 3
+        },
+        "fountain": {
+          "ruleHand": "refined",
+          "shapeID": "refined_dot",
+          "cells": [
+            [
+              0,
+              0
+            ]
+          ],
+          "bounds": {
+            "width": 1,
+            "height": 1
+          },
+          "footprint": 1
+        }
+      }
+    },
+    {
+      "kind": "compound",
+      "id": "blight",
+      "glyph": {
+        "version": "writing-glyph-v1",
+        "salt": 0,
+        "width": 7,
+        "height": 7,
+        "bitmap": "0001000011100000110000001100011111000110000011000"
+      },
+      "hands": {
+        "charcoal": {
+          "ruleHand": "crude",
+          "shapeID": "crude_cross",
+          "cells": [
+            [
+              1,
+              0
+            ],
+            [
+              0,
+              1
+            ],
+            [
+              1,
+              1
+            ],
+            [
+              2,
+              1
+            ],
+            [
+              1,
+              2
+            ]
+          ],
+          "bounds": {
+            "width": 3,
+            "height": 3
+          },
+          "footprint": 5
+        },
+        "brush": {
+          "ruleHand": "plain",
+          "shapeID": "plain_bar",
+          "cells": [
+            [
+              0,
+              0
+            ],
+            [
+              1,
+              0
+            ],
+            [
+              2,
+              0
+            ]
+          ],
+          "bounds": {
+            "width": 3,
+            "height": 1
+          },
+          "footprint": 3
+        },
+        "fountain": {
+          "ruleHand": "refined",
+          "shapeID": "refined_dot",
+          "cells": [
+            [
+              0,
+              0
+            ]
+          ],
+          "bounds": {
+            "width": 1,
+            "height": 1
+          },
+          "footprint": 1
+        }
+      }
+    },
+    {
+      "kind": "compound",
+      "id": "caverns",
+      "glyph": {
+        "version": "writing-glyph-v1",
+        "salt": 0,
+        "width": 7,
+        "height": 7,
+        "bitmap": "0001000000110000011000001100001100000110000001010"
+      },
+      "hands": {
+        "charcoal": {
+          "ruleHand": "crude",
+          "shapeID": "crude_smear",
+          "cells": [
+            [
+              0,
+              0
+            ],
+            [
+              1,
+              0
+            ],
+            [
+              2,
+              0
+            ],
+            [
+              0,
+              1
+            ],
+            [
+              1,
+              1
+            ],
+            [
+              2,
+              1
+            ]
+          ],
+          "bounds": {
+            "width": 3,
+            "height": 2
+          },
+          "footprint": 6
+        },
+        "brush": {
+          "ruleHand": "plain",
+          "shapeID": "plain_bar",
+          "cells": [
+            [
+              0,
+              0
+            ],
+            [
+              1,
+              0
+            ],
+            [
+              2,
+              0
+            ]
+          ],
+          "bounds": {
+            "width": 3,
+            "height": 1
+          },
+          "footprint": 3
+        },
+        "fountain": {
+          "ruleHand": "refined",
+          "shapeID": "refined_dot",
+          "cells": [
+            [
+              0,
+              0
+            ]
+          ],
+          "bounds": {
+            "width": 1,
+            "height": 1
+          },
+          "footprint": 1
+        }
+      }
+    },
+    {
+      "kind": "compound",
+      "id": "common_ore",
+      "glyph": {
+        "version": "writing-glyph-v1",
+        "salt": 0,
+        "width": 7,
+        "height": 7,
+        "bitmap": "0001000000101000010110101000001101000011000111000"
+      },
+      "hands": {
+        "charcoal": {
+          "ruleHand": "crude",
+          "shapeID": "crude_block",
+          "cells": [
+            [
+              0,
+              0
+            ],
+            [
+              1,
+              0
+            ],
+            [
+              0,
+              1
+            ],
+            [
+              1,
+              1
+            ]
+          ],
+          "bounds": {
+            "width": 2,
+            "height": 2
+          },
+          "footprint": 4
+        },
+        "brush": {
+          "ruleHand": "plain",
+          "shapeID": "plain_pair",
+          "cells": [
+            [
+              0,
+              0
+            ],
+            [
+              1,
+              0
+            ]
+          ],
+          "bounds": {
+            "width": 2,
+            "height": 1
+          },
+          "footprint": 2
+        },
+        "fountain": {
+          "ruleHand": "refined",
+          "shapeID": "refined_dot",
+          "cells": [
+            [
+              0,
+              0
+            ]
+          ],
+          "bounds": {
+            "width": 1,
+            "height": 1
+          },
+          "footprint": 1
+        }
+      }
+    },
+    {
+      "kind": "compound",
+      "id": "dim_sky",
+      "glyph": {
+        "version": "writing-glyph-v1",
+        "salt": 0,
+        "width": 7,
+        "height": 7,
+        "bitmap": "0001000110100000110000111100000111000110000101000"
+      },
+      "hands": {
+        "charcoal": {
+          "ruleHand": "crude",
+          "shapeID": "crude_block",
+          "cells": [
+            [
+              0,
+              0
+            ],
+            [
+              1,
+              0
+            ],
+            [
+              0,
+              1
+            ],
+            [
+              1,
+              1
+            ]
+          ],
+          "bounds": {
+            "width": 2,
+            "height": 2
+          },
+          "footprint": 4
+        },
+        "brush": {
+          "ruleHand": "plain",
+          "shapeID": "plain_pair",
+          "cells": [
+            [
+              0,
+              0
+            ],
+            [
+              1,
+              0
+            ]
+          ],
+          "bounds": {
+            "width": 2,
+            "height": 1
+          },
+          "footprint": 2
+        },
+        "fountain": {
+          "ruleHand": "refined",
+          "shapeID": "refined_dot",
+          "cells": [
+            [
+              0,
+              0
+            ]
+          ],
+          "bounds": {
+            "width": 1,
+            "height": 1
+          },
+          "footprint": 1
+        }
+      }
+    },
+    {
+      "kind": "compound",
+      "id": "frostbound",
+      "glyph": {
+        "version": "writing-glyph-v1",
+        "salt": 0,
+        "width": 7,
+        "height": 7,
+        "bitmap": "0001000010100001110000111000001100000110000001010"
+      },
+      "hands": {
+        "charcoal": {
+          "ruleHand": "crude",
+          "shapeID": "crude_smear",
+          "cells": [
+            [
+              0,
+              0
+            ],
+            [
+              1,
+              0
+            ],
+            [
+              2,
+              0
+            ],
+            [
+              0,
+              1
+            ],
+            [
+              1,
+              1
+            ],
+            [
+              2,
+              1
+            ]
+          ],
+          "bounds": {
+            "width": 3,
+            "height": 2
+          },
+          "footprint": 6
+        },
+        "brush": {
+          "ruleHand": "plain",
+          "shapeID": "plain_bar",
+          "cells": [
+            [
+              0,
+              0
+            ],
+            [
+              1,
+              0
+            ],
+            [
+              2,
+              0
+            ]
+          ],
+          "bounds": {
+            "width": 3,
+            "height": 1
+          },
+          "footprint": 3
+        },
+        "fountain": {
+          "ruleHand": "refined",
+          "shapeID": "refined_dot",
+          "cells": [
+            [
+              0,
+              0
+            ]
+          ],
+          "bounds": {
+            "width": 1,
+            "height": 1
+          },
+          "footprint": 1
+        }
+      }
+    },
+    {
+      "kind": "compound",
+      "id": "gilded_veins",
+      "glyph": {
+        "version": "writing-glyph-v1",
+        "salt": 0,
+        "width": 7,
+        "height": 7,
+        "bitmap": "0001000001100000011100001000011100000011100111110"
+      },
+      "hands": {
+        "charcoal": {
+          "ruleHand": "crude",
+          "shapeID": "crude_cross",
+          "cells": [
+            [
+              1,
+              0
+            ],
+            [
+              0,
+              1
+            ],
+            [
+              1,
+              1
+            ],
+            [
+              2,
+              1
+            ],
+            [
+              1,
+              2
+            ]
+          ],
+          "bounds": {
+            "width": 3,
+            "height": 3
+          },
+          "footprint": 5
+        },
+        "brush": {
+          "ruleHand": "plain",
+          "shapeID": "plain_bar",
+          "cells": [
+            [
+              0,
+              0
+            ],
+            [
+              1,
+              0
+            ],
+            [
+              2,
+              0
+            ]
+          ],
+          "bounds": {
+            "width": 3,
+            "height": 1
+          },
+          "footprint": 3
+        },
+        "fountain": {
+          "ruleHand": "refined",
+          "shapeID": "refined_dot",
+          "cells": [
+            [
+              0,
+              0
+            ]
+          ],
+          "bounds": {
+            "width": 1,
+            "height": 1
+          },
+          "footprint": 1
+        }
+      }
+    },
+    {
+      "kind": "compound",
+      "id": "miasma_rune",
+      "glyph": {
+        "version": "writing-glyph-v1",
+        "salt": 0,
+        "width": 7,
+        "height": 7,
+        "bitmap": "0001000011110000011100001011000111000110000011000"
+      },
+      "hands": {
+        "charcoal": {
+          "ruleHand": "crude",
+          "shapeID": "crude_block",
+          "cells": [
+            [
+              0,
+              0
+            ],
+            [
+              1,
+              0
+            ],
+            [
+              0,
+              1
+            ],
+            [
+              1,
+              1
+            ]
+          ],
+          "bounds": {
+            "width": 2,
+            "height": 2
+          },
+          "footprint": 4
+        },
+        "brush": {
+          "ruleHand": "plain",
+          "shapeID": "plain_pair",
+          "cells": [
+            [
+              0,
+              0
+            ],
+            [
+              1,
+              0
+            ]
+          ],
+          "bounds": {
+            "width": 2,
+            "height": 1
+          },
+          "footprint": 2
+        },
+        "fountain": {
+          "ruleHand": "refined",
+          "shapeID": "refined_dot",
+          "cells": [
+            [
+              0,
+              0
+            ]
+          ],
+          "bounds": {
+            "width": 1,
+            "height": 1
+          },
+          "footprint": 1
+        }
+      }
+    },
+    {
+      "kind": "compound",
+      "id": "mote_vein",
+      "glyph": {
+        "version": "writing-glyph-v1",
+        "salt": 0,
+        "width": 7,
+        "height": 7,
+        "bitmap": "0001000010110000011100111000001100000010000001011"
+      },
+      "hands": {
+        "charcoal": {
+          "ruleHand": "crude",
+          "shapeID": "crude_cross",
+          "cells": [
+            [
+              1,
+              0
+            ],
+            [
+              0,
+              1
+            ],
+            [
+              1,
+              1
+            ],
+            [
+              2,
+              1
+            ],
+            [
+              1,
+              2
+            ]
+          ],
+          "bounds": {
+            "width": 3,
+            "height": 3
+          },
+          "footprint": 5
+        },
+        "brush": {
+          "ruleHand": "plain",
+          "shapeID": "plain_bar",
+          "cells": [
+            [
+              0,
+              0
+            ],
+            [
+              1,
+              0
+            ],
+            [
+              2,
+              0
+            ]
+          ],
+          "bounds": {
+            "width": 3,
+            "height": 1
+          },
+          "footprint": 3
+        },
+        "fountain": {
+          "ruleHand": "refined",
+          "shapeID": "refined_dot",
+          "cells": [
+            [
+              0,
+              0
+            ]
+          ],
+          "bounds": {
+            "width": 1,
+            "height": 1
+          },
+          "footprint": 1
+        }
+      }
+    },
+    {
+      "kind": "compound",
+      "id": "peace",
+      "glyph": {
+        "version": "writing-glyph-v1",
+        "salt": 0,
+        "width": 7,
+        "height": 7,
+        "bitmap": "0001000000110000011100001011001100000110000101000"
+      },
+      "hands": {
+        "charcoal": {
+          "ruleHand": "crude",
+          "shapeID": "crude_smear",
+          "cells": [
+            [
+              0,
+              0
+            ],
+            [
+              1,
+              0
+            ],
+            [
+              2,
+              0
+            ],
+            [
+              0,
+              1
+            ],
+            [
+              1,
+              1
+            ],
+            [
+              2,
+              1
+            ]
+          ],
+          "bounds": {
+            "width": 3,
+            "height": 2
+          },
+          "footprint": 6
+        },
+        "brush": {
+          "ruleHand": "plain",
+          "shapeID": "plain_bar",
+          "cells": [
+            [
+              0,
+              0
+            ],
+            [
+              1,
+              0
+            ],
+            [
+              2,
+              0
+            ]
+          ],
+          "bounds": {
+            "width": 3,
+            "height": 1
+          },
+          "footprint": 3
+        },
+        "fountain": {
+          "ruleHand": "refined",
+          "shapeID": "refined_dot",
+          "cells": [
+            [
+              0,
+              0
+            ]
+          ],
+          "bounds": {
+            "width": 1,
+            "height": 1
+          },
+          "footprint": 1
+        }
+      }
+    },
+    {
+      "kind": "compound",
+      "id": "plains",
+      "glyph": {
+        "version": "writing-glyph-v1",
+        "salt": 0,
+        "width": 7,
+        "height": 7,
+        "bitmap": "0001000000111000110000011000011100001010000011000"
+      },
+      "hands": {
+        "charcoal": {
+          "ruleHand": "crude",
+          "shapeID": "crude_smear",
+          "cells": [
+            [
+              0,
+              0
+            ],
+            [
+              1,
+              0
+            ],
+            [
+              2,
+              0
+            ],
+            [
+              0,
+              1
+            ],
+            [
+              1,
+              1
+            ],
+            [
+              2,
+              1
+            ]
+          ],
+          "bounds": {
+            "width": 3,
+            "height": 2
+          },
+          "footprint": 6
+        },
+        "brush": {
+          "ruleHand": "plain",
+          "shapeID": "plain_bar",
+          "cells": [
+            [
+              0,
+              0
+            ],
+            [
+              1,
+              0
+            ],
+            [
+              2,
+              0
+            ]
+          ],
+          "bounds": {
+            "width": 3,
+            "height": 1
+          },
+          "footprint": 3
+        },
+        "fountain": {
+          "ruleHand": "refined",
+          "shapeID": "refined_dot",
+          "cells": [
+            [
+              0,
+              0
+            ]
+          ],
+          "bounds": {
+            "width": 1,
+            "height": 1
+          },
+          "footprint": 1
+        }
+      }
+    },
+    {
+      "kind": "compound",
+      "id": "predation",
+      "glyph": {
+        "version": "writing-glyph-v1",
+        "salt": 0,
+        "width": 7,
+        "height": 7,
+        "bitmap": "0001000000111000011000111010000110000011000001000"
+      },
+      "hands": {
+        "charcoal": {
+          "ruleHand": "crude",
+          "shapeID": "crude_block",
+          "cells": [
+            [
+              0,
+              0
+            ],
+            [
+              1,
+              0
+            ],
+            [
+              0,
+              1
+            ],
+            [
+              1,
+              1
+            ]
+          ],
+          "bounds": {
+            "width": 2,
+            "height": 2
+          },
+          "footprint": 4
+        },
+        "brush": {
+          "ruleHand": "plain",
+          "shapeID": "plain_pair",
+          "cells": [
+            [
+              0,
+              0
+            ],
+            [
+              1,
+              0
+            ]
+          ],
+          "bounds": {
+            "width": 2,
+            "height": 1
+          },
+          "footprint": 2
+        },
+        "fountain": {
+          "ruleHand": "refined",
+          "shapeID": "refined_dot",
+          "cells": [
+            [
+              0,
+              0
+            ]
+          ],
+          "bounds": {
+            "width": 1,
+            "height": 1
+          },
+          "footprint": 1
+        }
+      }
+    },
+    {
+      "kind": "compound",
+      "id": "rich_ore",
+      "glyph": {
+        "version": "writing-glyph-v1",
+        "salt": 0,
+        "width": 7,
+        "height": 7,
+        "bitmap": "0001000000110001110000011000001111001010000111000"
+      },
+      "hands": {
+        "charcoal": {
+          "ruleHand": "crude",
+          "shapeID": "crude_smear",
+          "cells": [
+            [
+              0,
+              0
+            ],
+            [
+              1,
+              0
+            ],
+            [
+              2,
+              0
+            ],
+            [
+              0,
+              1
+            ],
+            [
+              1,
+              1
+            ],
+            [
+              2,
+              1
+            ]
+          ],
+          "bounds": {
+            "width": 3,
+            "height": 2
+          },
+          "footprint": 6
+        },
+        "brush": {
+          "ruleHand": "plain",
+          "shapeID": "plain_bar",
+          "cells": [
+            [
+              0,
+              0
+            ],
+            [
+              1,
+              0
+            ],
+            [
+              2,
+              0
+            ]
+          ],
+          "bounds": {
+            "width": 3,
+            "height": 1
+          },
+          "footprint": 3
+        },
+        "fountain": {
+          "ruleHand": "refined",
+          "shapeID": "refined_dot",
+          "cells": [
+            [
+              0,
+              0
+            ]
+          ],
+          "bounds": {
+            "width": 1,
+            "height": 1
+          },
+          "footprint": 1
+        }
+      }
+    },
+    {
+      "kind": "compound",
+      "id": "sparse_ore",
+      "glyph": {
+        "version": "writing-glyph-v1",
+        "salt": 0,
+        "width": 7,
+        "height": 7,
+        "bitmap": "0001110000110001110001101000000110000011000001100"
+      },
+      "hands": {
+        "charcoal": {
+          "ruleHand": "crude",
+          "shapeID": "crude_block",
+          "cells": [
+            [
+              0,
+              0
+            ],
+            [
+              1,
+              0
+            ],
+            [
+              0,
+              1
+            ],
+            [
+              1,
+              1
+            ]
+          ],
+          "bounds": {
+            "width": 2,
+            "height": 2
+          },
+          "footprint": 4
+        },
+        "brush": {
+          "ruleHand": "plain",
+          "shapeID": "plain_pair",
+          "cells": [
+            [
+              0,
+              0
+            ],
+            [
+              1,
+              0
+            ]
+          ],
+          "bounds": {
+            "width": 2,
+            "height": 1
+          },
+          "footprint": 2
+        },
+        "fountain": {
+          "ruleHand": "refined",
+          "shapeID": "refined_dot",
+          "cells": [
+            [
+              0,
+              0
+            ]
+          ],
+          "bounds": {
+            "width": 1,
+            "height": 1
+          },
+          "footprint": 1
+        }
+      }
+    },
+    {
+      "kind": "compound",
+      "id": "storm",
+      "glyph": {
+        "version": "writing-glyph-v1",
+        "salt": 0,
+        "width": 7,
+        "height": 7,
+        "bitmap": "0001000011100001110000001110000110001110000001000"
+      },
+      "hands": {
+        "charcoal": {
+          "ruleHand": "crude",
+          "shapeID": "crude_smear",
+          "cells": [
+            [
+              0,
+              0
+            ],
+            [
+              1,
+              0
+            ],
+            [
+              2,
+              0
+            ],
+            [
+              0,
+              1
+            ],
+            [
+              1,
+              1
+            ],
+            [
+              2,
+              1
+            ]
+          ],
+          "bounds": {
+            "width": 3,
+            "height": 2
+          },
+          "footprint": 6
+        },
+        "brush": {
+          "ruleHand": "plain",
+          "shapeID": "plain_bar",
+          "cells": [
+            [
+              0,
+              0
+            ],
+            [
+              1,
+              0
+            ],
+            [
+              2,
+              0
+            ]
+          ],
+          "bounds": {
+            "width": 3,
+            "height": 1
+          },
+          "footprint": 3
+        },
+        "fountain": {
+          "ruleHand": "refined",
+          "shapeID": "refined_dot",
+          "cells": [
+            [
+              0,
+              0
+            ]
+          ],
+          "bounds": {
+            "width": 1,
+            "height": 1
+          },
+          "footprint": 1
+        }
+      }
+    },
+    {
+      "kind": "compound",
+      "id": "swarm_rune",
+      "glyph": {
+        "version": "writing-glyph-v1",
+        "salt": 0,
+        "width": 7,
+        "height": 7,
+        "bitmap": "0001000110100001110000001110011100000110000111000"
+      },
+      "hands": {
+        "charcoal": {
+          "ruleHand": "crude",
+          "shapeID": "crude_block",
+          "cells": [
+            [
+              0,
+              0
+            ],
+            [
+              1,
+              0
+            ],
+            [
+              0,
+              1
+            ],
+            [
+              1,
+              1
+            ]
+          ],
+          "bounds": {
+            "width": 2,
+            "height": 2
+          },
+          "footprint": 4
+        },
+        "brush": {
+          "ruleHand": "plain",
+          "shapeID": "plain_pair",
+          "cells": [
+            [
+              0,
+              0
+            ],
+            [
+              1,
+              0
+            ]
+          ],
+          "bounds": {
+            "width": 2,
+            "height": 1
+          },
+          "footprint": 2
+        },
+        "fountain": {
+          "ruleHand": "refined",
+          "shapeID": "refined_dot",
+          "cells": [
+            [
+              0,
+              0
+            ]
+          ],
+          "bounds": {
+            "width": 1,
+            "height": 1
+          },
+          "footprint": 1
+        }
+      }
+    },
+    {
+      "kind": "compound",
+      "id": "teeming_life",
+      "glyph": {
+        "version": "writing-glyph-v1",
+        "salt": 0,
+        "width": 7,
+        "height": 7,
+        "bitmap": "0001000001111000010000001100000110000011000001011"
+      },
+      "hands": {
+        "charcoal": {
+          "ruleHand": "crude",
+          "shapeID": "crude_smear",
+          "cells": [
+            [
+              0,
+              0
+            ],
+            [
+              1,
+              0
+            ],
+            [
+              2,
+              0
+            ],
+            [
+              0,
+              1
+            ],
+            [
+              1,
+              1
+            ],
+            [
+              2,
+              1
+            ]
+          ],
+          "bounds": {
+            "width": 3,
+            "height": 2
+          },
+          "footprint": 6
+        },
+        "brush": {
+          "ruleHand": "plain",
+          "shapeID": "plain_bar",
+          "cells": [
+            [
+              0,
+              0
+            ],
+            [
+              1,
+              0
+            ],
+            [
+              2,
+              0
+            ]
+          ],
+          "bounds": {
+            "width": 3,
+            "height": 1
+          },
+          "footprint": 3
+        },
+        "fountain": {
+          "ruleHand": "refined",
+          "shapeID": "refined_dot",
+          "cells": [
+            [
+              0,
+              0
+            ]
+          ],
+          "bounds": {
+            "width": 1,
+            "height": 1
+          },
+          "footprint": 1
+        }
+      }
+    },
+    {
+      "kind": "compound",
+      "id": "tremor",
+      "glyph": {
+        "version": "writing-glyph-v1",
+        "salt": 0,
+        "width": 7,
+        "height": 7,
+        "bitmap": "0001000001100000110000011011000101000011000111000"
+      },
+      "hands": {
+        "charcoal": {
+          "ruleHand": "crude",
+          "shapeID": "crude_smear",
+          "cells": [
+            [
+              0,
+              0
+            ],
+            [
+              1,
+              0
+            ],
+            [
+              2,
+              0
+            ],
+            [
+              0,
+              1
+            ],
+            [
+              1,
+              1
+            ],
+            [
+              2,
+              1
+            ]
+          ],
+          "bounds": {
+            "width": 3,
+            "height": 2
+          },
+          "footprint": 6
+        },
+        "brush": {
+          "ruleHand": "plain",
+          "shapeID": "plain_bar",
+          "cells": [
+            [
+              0,
+              0
+            ],
+            [
+              1,
+              0
+            ],
+            [
+              2,
+              0
+            ]
+          ],
+          "bounds": {
+            "width": 3,
+            "height": 1
+          },
+          "footprint": 3
+        },
+        "fountain": {
+          "ruleHand": "refined",
+          "shapeID": "refined_dot",
+          "cells": [
+            [
+              0,
+              0
+            ]
+          ],
+          "bounds": {
+            "width": 1,
+            "height": 1
+          },
+          "footprint": 1
+        }
+      }
+    },
+    {
+      "kind": "compound",
+      "id": "verdant",
+      "glyph": {
+        "version": "writing-glyph-v1",
+        "salt": 0,
+        "width": 7,
+        "height": 7,
+        "bitmap": "0001000011100000110000001010010110001010001101000"
+      },
+      "hands": {
+        "charcoal": {
+          "ruleHand": "crude",
+          "shapeID": "crude_smear",
+          "cells": [
+            [
+              0,
+              0
+            ],
+            [
+              1,
+              0
+            ],
+            [
+              2,
+              0
+            ],
+            [
+              0,
+              1
+            ],
+            [
+              1,
+              1
+            ],
+            [
+              2,
+              1
+            ]
+          ],
+          "bounds": {
+            "width": 3,
+            "height": 2
+          },
+          "footprint": 6
+        },
+        "brush": {
+          "ruleHand": "plain",
+          "shapeID": "plain_bar",
+          "cells": [
+            [
+              0,
+              0
+            ],
+            [
+              1,
+              0
+            ],
+            [
+              2,
+              0
+            ]
+          ],
+          "bounds": {
+            "width": 3,
+            "height": 1
+          },
+          "footprint": 3
+        },
+        "fountain": {
+          "ruleHand": "refined",
+          "shapeID": "refined_dot",
+          "cells": [
+            [
+              0,
+              0
+            ]
+          ],
+          "bounds": {
+            "width": 1,
+            "height": 1
+          },
+          "footprint": 1
+        }
+      }
+    },
+    {
+      "kind": "compound",
+      "id": "verdigris_bloom",
+      "glyph": {
+        "version": "writing-glyph-v1",
+        "salt": 0,
+        "width": 7,
+        "height": 7,
+        "bitmap": "0101110000111001110000001010000111001110000101000"
+      },
+      "hands": {
+        "charcoal": {
+          "ruleHand": "crude",
+          "shapeID": "crude_smear",
+          "cells": [
+            [
+              0,
+              0
+            ],
+            [
+              1,
+              0
+            ],
+            [
+              2,
+              0
+            ],
+            [
+              0,
+              1
+            ],
+            [
+              1,
+              1
+            ],
+            [
+              2,
+              1
+            ]
+          ],
+          "bounds": {
+            "width": 3,
+            "height": 2
+          },
+          "footprint": 6
+        },
+        "brush": {
+          "ruleHand": "plain",
+          "shapeID": "plain_bar",
+          "cells": [
+            [
+              0,
+              0
+            ],
+            [
+              1,
+              0
+            ],
+            [
+              2,
+              0
+            ]
+          ],
+          "bounds": {
+            "width": 3,
+            "height": 1
+          },
+          "footprint": 3
+        },
+        "fountain": {
+          "ruleHand": "refined",
+          "shapeID": "refined_dot",
+          "cells": [
+            [
+              0,
+              0
+            ]
+          ],
+          "bounds": {
+            "width": 1,
+            "height": 1
+          },
+          "footprint": 1
+        }
+      }
+    },
+    {
+      "kind": "qualifier",
+      "id": "countless",
+      "glyph": {
+        "version": "writing-glyph-v1",
+        "salt": 0,
+        "width": 7,
+        "height": 7,
+        "bitmap": "0001000000111001010000111110001100001110000001011"
+      },
+      "hands": {
+        "charcoal": {
+          "ruleHand": "crude",
+          "shapeID": "crude_cross",
+          "cells": [
+            [
+              1,
+              0
+            ],
+            [
+              0,
+              1
+            ],
+            [
+              1,
+              1
+            ],
+            [
+              2,
+              1
+            ],
+            [
+              1,
+              2
+            ]
+          ],
+          "bounds": {
+            "width": 3,
+            "height": 3
+          },
+          "footprint": 5
+        },
+        "brush": {
+          "ruleHand": "plain",
+          "shapeID": "plain_column",
+          "cells": [
+            [
+              0,
+              0
+            ],
+            [
+              0,
+              1
+            ],
+            [
+              0,
+              2
+            ]
+          ],
+          "bounds": {
+            "width": 1,
+            "height": 3
+          },
+          "footprint": 3
+        },
+        "fountain": {
+          "ruleHand": "refined",
+          "shapeID": "refined_dot",
+          "cells": [
+            [
+              0,
+              0
+            ]
+          ],
+          "bounds": {
+            "width": 1,
+            "height": 1
+          },
+          "footprint": 1
+        }
+      }
+    },
+    {
+      "kind": "qualifier",
+      "id": "faint",
+      "glyph": {
+        "version": "writing-glyph-v1",
+        "salt": 0,
+        "width": 7,
+        "height": 7,
+        "bitmap": "0001000011100001111000011000110100001010000001100"
+      },
+      "hands": {
+        "charcoal": {
+          "ruleHand": "crude",
+          "shapeID": "crude_ess",
+          "cells": [
+            [
+              1,
+              0
+            ],
+            [
+              2,
+              0
+            ],
+            [
+              0,
+              1
+            ],
+            [
+              1,
+              1
+            ]
+          ],
+          "bounds": {
+            "width": 3,
+            "height": 2
+          },
+          "footprint": 4
+        },
+        "brush": {
+          "ruleHand": "plain",
+          "shapeID": "plain_corner",
+          "cells": [
+            [
+              0,
+              0
+            ],
+            [
+              1,
+              0
+            ],
+            [
+              0,
+              1
+            ]
+          ],
+          "bounds": {
+            "width": 2,
+            "height": 2
+          },
+          "footprint": 3
+        },
+        "fountain": {
+          "ruleHand": "refined",
+          "shapeID": "refined_dot",
+          "cells": [
+            [
+              0,
+              0
+            ]
+          ],
+          "bounds": {
+            "width": 1,
+            "height": 1
+          },
+          "footprint": 1
+        }
+      }
+    },
+    {
+      "kind": "qualifier",
+      "id": "few",
+      "glyph": {
+        "version": "writing-glyph-v1",
+        "salt": 0,
+        "width": 7,
+        "height": 7,
+        "bitmap": "0001000011100000011000001110011110000011000011000"
+      },
+      "hands": {
+        "charcoal": {
+          "ruleHand": "crude",
+          "shapeID": "crude_tee",
+          "cells": [
+            [
+              0,
+              0
+            ],
+            [
+              1,
+              0
+            ],
+            [
+              2,
+              0
+            ],
+            [
+              1,
+              1
+            ]
+          ],
+          "bounds": {
+            "width": 3,
+            "height": 2
+          },
+          "footprint": 4
+        },
+        "brush": {
+          "ruleHand": "plain",
+          "shapeID": "plain_stack",
+          "cells": [
+            [
+              0,
+              0
+            ],
+            [
+              0,
+              1
+            ]
+          ],
+          "bounds": {
+            "width": 1,
+            "height": 2
+          },
+          "footprint": 2
+        },
+        "fountain": {
+          "ruleHand": "refined",
+          "shapeID": "refined_dot",
+          "cells": [
+            [
+              0,
+              0
+            ]
+          ],
+          "bounds": {
+            "width": 1,
+            "height": 1
+          },
+          "footprint": 1
+        }
+      }
+    },
+    {
+      "kind": "qualifier",
+      "id": "frozen",
+      "glyph": {
+        "version": "writing-glyph-v1",
+        "salt": 0,
+        "width": 7,
+        "height": 7,
+        "bitmap": "0001000000110001110000001110000100000011100001110"
+      },
+      "hands": {
+        "charcoal": {
+          "ruleHand": "crude",
+          "shapeID": "crude_sprawl",
+          "cells": [
+            [
+              0,
+              0
+            ],
+            [
+              1,
+              0
+            ],
+            [
+              1,
+              1
+            ],
+            [
+              2,
+              1
+            ],
+            [
+              2,
+              2
+            ]
+          ],
+          "bounds": {
+            "width": 3,
+            "height": 3
+          },
+          "footprint": 5
+        },
+        "brush": {
+          "ruleHand": "plain",
+          "shapeID": "plain_pair",
+          "cells": [
+            [
+              0,
+              0
+            ],
+            [
+              1,
+              0
+            ]
+          ],
+          "bounds": {
+            "width": 2,
+            "height": 1
+          },
+          "footprint": 2
+        },
+        "fountain": {
+          "ruleHand": "refined",
+          "shapeID": "refined_dot",
+          "cells": [
+            [
+              0,
+              0
+            ]
+          ],
+          "bounds": {
+            "width": 1,
+            "height": 1
+          },
+          "footprint": 1
+        }
+      }
+    },
+    {
+      "kind": "qualifier",
+      "id": "great",
+      "glyph": {
+        "version": "writing-glyph-v1",
+        "salt": 0,
+        "width": 7,
+        "height": 7,
+        "bitmap": "0001000011100001010000001100001111000011100001100"
+      },
+      "hands": {
+        "charcoal": {
+          "ruleHand": "crude",
+          "shapeID": "crude_smear",
+          "cells": [
+            [
+              0,
+              0
+            ],
+            [
+              1,
+              0
+            ],
+            [
+              2,
+              0
+            ],
+            [
+              0,
+              1
+            ],
+            [
+              1,
+              1
+            ],
+            [
+              2,
+              1
+            ]
+          ],
+          "bounds": {
+            "width": 3,
+            "height": 2
+          },
+          "footprint": 6
+        },
+        "brush": {
+          "ruleHand": "plain",
+          "shapeID": "plain_pair",
+          "cells": [
+            [
+              0,
+              0
+            ],
+            [
+              1,
+              0
+            ]
+          ],
+          "bounds": {
+            "width": 2,
+            "height": 1
+          },
+          "footprint": 2
+        },
+        "fountain": {
+          "ruleHand": "refined",
+          "shapeID": "refined_dot",
+          "cells": [
+            [
+              0,
+              0
+            ]
+          ],
+          "bounds": {
+            "width": 1,
+            "height": 1
+          },
+          "footprint": 1
+        }
+      }
+    },
+    {
+      "kind": "qualifier",
+      "id": "large",
+      "glyph": {
+        "version": "writing-glyph-v1",
+        "salt": 0,
+        "width": 7,
+        "height": 7,
+        "bitmap": "0001000001100000011100011000001100000110000101100"
+      },
+      "hands": {
+        "charcoal": {
+          "ruleHand": "crude",
+          "shapeID": "crude_smear",
+          "cells": [
+            [
+              0,
+              0
+            ],
+            [
+              1,
+              0
+            ],
+            [
+              2,
+              0
+            ],
+            [
+              0,
+              1
+            ],
+            [
+              1,
+              1
+            ],
+            [
+              2,
+              1
+            ]
+          ],
+          "bounds": {
+            "width": 3,
+            "height": 2
+          },
+          "footprint": 6
+        },
+        "brush": {
+          "ruleHand": "plain",
+          "shapeID": "plain_corner",
+          "cells": [
+            [
+              0,
+              0
+            ],
+            [
+              1,
+              0
+            ],
+            [
+              0,
+              1
+            ]
+          ],
+          "bounds": {
+            "width": 2,
+            "height": 2
+          },
+          "footprint": 3
+        },
+        "fountain": {
+          "ruleHand": "refined",
+          "shapeID": "refined_dot",
+          "cells": [
+            [
+              0,
+              0
+            ]
+          ],
+          "bounds": {
+            "width": 1,
+            "height": 1
+          },
+          "footprint": 1
+        }
+      }
+    },
+    {
+      "kind": "qualifier",
+      "id": "liquid",
+      "glyph": {
+        "version": "writing-glyph-v1",
+        "salt": 0,
+        "width": 7,
+        "height": 7,
+        "bitmap": "0001000001100000011100001011001111001110000011000"
+      },
+      "hands": {
+        "charcoal": {
+          "ruleHand": "crude",
+          "shapeID": "crude_block",
+          "cells": [
+            [
+              0,
+              0
+            ],
+            [
+              1,
+              0
+            ],
+            [
+              0,
+              1
+            ],
+            [
+              1,
+              1
+            ]
+          ],
+          "bounds": {
+            "width": 2,
+            "height": 2
+          },
+          "footprint": 4
+        },
+        "brush": {
+          "ruleHand": "plain",
+          "shapeID": "plain_pair",
+          "cells": [
+            [
+              0,
+              0
+            ],
+            [
+              1,
+              0
+            ]
+          ],
+          "bounds": {
+            "width": 2,
+            "height": 1
+          },
+          "footprint": 2
+        },
+        "fountain": {
+          "ruleHand": "refined",
+          "shapeID": "refined_dot",
+          "cells": [
+            [
+              0,
+              0
+            ]
+          ],
+          "bounds": {
+            "width": 1,
+            "height": 1
+          },
+          "footprint": 1
+        }
+      }
+    },
+    {
+      "kind": "qualifier",
+      "id": "many",
+      "glyph": {
+        "version": "writing-glyph-v1",
+        "salt": 0,
+        "width": 7,
+        "height": 7,
+        "bitmap": "0001000110100001111110001100000101101110000001100"
+      },
+      "hands": {
+        "charcoal": {
+          "ruleHand": "crude",
+          "shapeID": "crude_cross",
+          "cells": [
+            [
+              1,
+              0
+            ],
+            [
+              0,
+              1
+            ],
+            [
+              1,
+              1
+            ],
+            [
+              2,
+              1
+            ],
+            [
+              1,
+              2
+            ]
+          ],
+          "bounds": {
+            "width": 3,
+            "height": 3
+          },
+          "footprint": 5
+        },
+        "brush": {
+          "ruleHand": "plain",
+          "shapeID": "plain_bar",
+          "cells": [
+            [
+              0,
+              0
+            ],
+            [
+              1,
+              0
+            ],
+            [
+              2,
+              0
+            ]
+          ],
+          "bounds": {
+            "width": 3,
+            "height": 1
+          },
+          "footprint": 3
+        },
+        "fountain": {
+          "ruleHand": "refined",
+          "shapeID": "refined_dot",
+          "cells": [
+            [
+              0,
+              0
+            ]
+          ],
+          "bounds": {
+            "width": 1,
+            "height": 1
+          },
+          "footprint": 1
+        }
+      }
+    },
+    {
+      "kind": "qualifier",
+      "id": "minute",
+      "glyph": {
+        "version": "writing-glyph-v1",
+        "salt": 0,
+        "width": 7,
+        "height": 7,
+        "bitmap": "0001000001100001110000101000110100001111000101000"
+      },
+      "hands": {
+        "charcoal": {
+          "ruleHand": "crude",
+          "shapeID": "crude_ess",
+          "cells": [
+            [
+              1,
+              0
+            ],
+            [
+              2,
+              0
+            ],
+            [
+              0,
+              1
+            ],
+            [
+              1,
+              1
+            ]
+          ],
+          "bounds": {
+            "width": 3,
+            "height": 2
+          },
+          "footprint": 4
+        },
+        "brush": {
+          "ruleHand": "plain",
+          "shapeID": "plain_stack",
+          "cells": [
+            [
+              0,
+              0
+            ],
+            [
+              0,
+              1
+            ]
+          ],
+          "bounds": {
+            "width": 1,
+            "height": 2
+          },
+          "footprint": 2
+        },
+        "fountain": {
+          "ruleHand": "refined",
+          "shapeID": "refined_dot",
+          "cells": [
+            [
+              0,
+              0
+            ]
+          ],
+          "bounds": {
+            "width": 1,
+            "height": 1
+          },
+          "footprint": 1
+        }
+      }
+    },
+    {
+      "kind": "qualifier",
+      "id": "moderate",
+      "glyph": {
+        "version": "writing-glyph-v1",
+        "salt": 0,
+        "width": 7,
+        "height": 7,
+        "bitmap": "0001000011100000011000111000011100001110000001100"
+      },
+      "hands": {
+        "charcoal": {
+          "ruleHand": "crude",
+          "shapeID": "crude_ess",
+          "cells": [
+            [
+              1,
+              0
+            ],
+            [
+              2,
+              0
+            ],
+            [
+              0,
+              1
+            ],
+            [
+              1,
+              1
+            ]
+          ],
+          "bounds": {
+            "width": 3,
+            "height": 2
+          },
+          "footprint": 4
+        },
+        "brush": {
+          "ruleHand": "plain",
+          "shapeID": "plain_column",
+          "cells": [
+            [
+              0,
+              0
+            ],
+            [
+              0,
+              1
+            ],
+            [
+              0,
+              2
+            ]
+          ],
+          "bounds": {
+            "width": 1,
+            "height": 3
+          },
+          "footprint": 3
+        },
+        "fountain": {
+          "ruleHand": "refined",
+          "shapeID": "refined_dot",
+          "cells": [
+            [
+              0,
+              0
+            ]
+          ],
+          "bounds": {
+            "width": 1,
+            "height": 1
+          },
+          "footprint": 1
+        }
+      }
+    },
+    {
+      "kind": "qualifier",
+      "id": "overwhelming",
+      "glyph": {
+        "version": "writing-glyph-v1",
+        "salt": 0,
+        "width": 7,
+        "height": 7,
+        "bitmap": "0001000011101001010000011000001100000110000101000"
+      },
+      "hands": {
+        "charcoal": {
+          "ruleHand": "crude",
+          "shapeID": "crude_tee",
+          "cells": [
+            [
+              0,
+              0
+            ],
+            [
+              1,
+              0
+            ],
+            [
+              2,
+              0
+            ],
+            [
+              1,
+              1
+            ]
+          ],
+          "bounds": {
+            "width": 3,
+            "height": 2
+          },
+          "footprint": 4
+        },
+        "brush": {
+          "ruleHand": "plain",
+          "shapeID": "plain_pair",
+          "cells": [
+            [
+              0,
+              0
+            ],
+            [
+              1,
+              0
+            ]
+          ],
+          "bounds": {
+            "width": 2,
+            "height": 1
+          },
+          "footprint": 2
+        },
+        "fountain": {
+          "ruleHand": "refined",
+          "shapeID": "refined_dot",
+          "cells": [
+            [
+              0,
+              0
+            ]
+          ],
+          "bounds": {
+            "width": 1,
+            "height": 1
+          },
+          "footprint": 1
+        }
+      }
+    },
+    {
+      "kind": "qualifier",
+      "id": "pair",
+      "glyph": {
+        "version": "writing-glyph-v1",
+        "salt": 0,
+        "width": 7,
+        "height": 7,
+        "bitmap": "0001000011110000110000001110011100000011000111000"
+      },
+      "hands": {
+        "charcoal": {
+          "ruleHand": "crude",
+          "shapeID": "crude_tee",
+          "cells": [
+            [
+              0,
+              0
+            ],
+            [
+              1,
+              0
+            ],
+            [
+              2,
+              0
+            ],
+            [
+              1,
+              1
+            ]
+          ],
+          "bounds": {
+            "width": 3,
+            "height": 2
+          },
+          "footprint": 4
+        },
+        "brush": {
+          "ruleHand": "plain",
+          "shapeID": "plain_corner",
+          "cells": [
+            [
+              0,
+              0
+            ],
+            [
+              1,
+              0
+            ],
+            [
+              0,
+              1
+            ]
+          ],
+          "bounds": {
+            "width": 2,
+            "height": 2
+          },
+          "footprint": 3
+        },
+        "fountain": {
+          "ruleHand": "refined",
+          "shapeID": "refined_dot",
+          "cells": [
+            [
+              0,
+              0
+            ]
+          ],
+          "bounds": {
+            "width": 1,
+            "height": 1
+          },
+          "footprint": 1
+        }
+      }
+    },
+    {
+      "kind": "qualifier",
+      "id": "single",
+      "glyph": {
+        "version": "writing-glyph-v1",
+        "salt": 0,
+        "width": 7,
+        "height": 7,
+        "bitmap": "0001000000111000011001111100001100001010001101000"
+      },
+      "hands": {
+        "charcoal": {
+          "ruleHand": "crude",
+          "shapeID": "crude_block",
+          "cells": [
+            [
+              0,
+              0
+            ],
+            [
+              1,
+              0
+            ],
+            [
+              0,
+              1
+            ],
+            [
+              1,
+              1
+            ]
+          ],
+          "bounds": {
+            "width": 2,
+            "height": 2
+          },
+          "footprint": 4
+        },
+        "brush": {
+          "ruleHand": "plain",
+          "shapeID": "plain_column",
+          "cells": [
+            [
+              0,
+              0
+            ],
+            [
+              0,
+              1
+            ],
+            [
+              0,
+              2
+            ]
+          ],
+          "bounds": {
+            "width": 1,
+            "height": 3
+          },
+          "footprint": 3
+        },
+        "fountain": {
+          "ruleHand": "refined",
+          "shapeID": "refined_dot",
+          "cells": [
+            [
+              0,
+              0
+            ]
+          ],
+          "bounds": {
+            "width": 1,
+            "height": 1
+          },
+          "footprint": 1
+        }
+      }
+    },
+    {
+      "kind": "qualifier",
+      "id": "small",
+      "glyph": {
+        "version": "writing-glyph-v1",
+        "salt": 0,
+        "width": 7,
+        "height": 7,
+        "bitmap": "0001000001100000110000001110001100001111100001100"
+      },
+      "hands": {
+        "charcoal": {
+          "ruleHand": "crude",
+          "shapeID": "crude_tee",
+          "cells": [
+            [
+              0,
+              0
+            ],
+            [
+              1,
+              0
+            ],
+            [
+              2,
+              0
+            ],
+            [
+              1,
+              1
+            ]
+          ],
+          "bounds": {
+            "width": 3,
+            "height": 2
+          },
+          "footprint": 4
+        },
+        "brush": {
+          "ruleHand": "plain",
+          "shapeID": "plain_stack",
+          "cells": [
+            [
+              0,
+              0
+            ],
+            [
+              0,
+              1
+            ]
+          ],
+          "bounds": {
+            "width": 1,
+            "height": 2
+          },
+          "footprint": 2
+        },
+        "fountain": {
+          "ruleHand": "refined",
+          "shapeID": "refined_dot",
+          "cells": [
+            [
+              0,
+              0
+            ]
+          ],
+          "bounds": {
+            "width": 1,
+            "height": 1
+          },
+          "footprint": 1
+        }
+      }
+    },
+    {
+      "kind": "qualifier",
+      "id": "solid",
+      "glyph": {
+        "version": "writing-glyph-v1",
+        "salt": 0,
+        "width": 7,
+        "height": 7,
+        "bitmap": "0001000000101100111100001011011100000010100001010"
+      },
+      "hands": {
+        "charcoal": {
+          "ruleHand": "crude",
+          "shapeID": "crude_block",
+          "cells": [
+            [
+              0,
+              0
+            ],
+            [
+              1,
+              0
+            ],
+            [
+              0,
+              1
+            ],
+            [
+              1,
+              1
+            ]
+          ],
+          "bounds": {
+            "width": 2,
+            "height": 2
+          },
+          "footprint": 4
+        },
+        "brush": {
+          "ruleHand": "plain",
+          "shapeID": "plain_corner",
+          "cells": [
+            [
+              0,
+              0
+            ],
+            [
+              1,
+              0
+            ],
+            [
+              0,
+              1
+            ]
+          ],
+          "bounds": {
+            "width": 2,
+            "height": 2
+          },
+          "footprint": 3
+        },
+        "fountain": {
+          "ruleHand": "refined",
+          "shapeID": "refined_dot",
+          "cells": [
+            [
+              0,
+              0
+            ]
+          ],
+          "bounds": {
+            "width": 1,
+            "height": 1
+          },
+          "footprint": 1
+        }
+      }
+    },
+    {
+      "kind": "qualifier",
+      "id": "vaporous",
+      "glyph": {
+        "version": "writing-glyph-v1",
+        "salt": 0,
+        "width": 7,
+        "height": 7,
+        "bitmap": "0001000011100000011000001110000110011010000001100"
+      },
+      "hands": {
+        "charcoal": {
+          "ruleHand": "crude",
+          "shapeID": "crude_tee",
+          "cells": [
+            [
+              0,
+              0
+            ],
+            [
+              1,
+              0
+            ],
+            [
+              2,
+              0
+            ],
+            [
+              1,
+              1
+            ]
+          ],
+          "bounds": {
+            "width": 3,
+            "height": 2
+          },
+          "footprint": 4
+        },
+        "brush": {
+          "ruleHand": "plain",
+          "shapeID": "plain_bar",
+          "cells": [
+            [
+              0,
+              0
+            ],
+            [
+              1,
+              0
+            ],
+            [
+              2,
+              0
+            ]
+          ],
+          "bounds": {
+            "width": 3,
+            "height": 1
+          },
+          "footprint": 3
+        },
+        "fountain": {
+          "ruleHand": "refined",
+          "shapeID": "refined_dot",
+          "cells": [
+            [
+              0,
+              0
+            ]
+          ],
+          "bounds": {
+            "width": 1,
+            "height": 1
+          },
+          "footprint": 1
+        }
+      }
+    },
+    {
+      "kind": "qualifier",
+      "id": "vast",
+      "glyph": {
+        "version": "writing-glyph-v1",
+        "salt": 0,
+        "width": 7,
+        "height": 7,
+        "bitmap": "0001000011100000010110001000000110000010110101000"
+      },
+      "hands": {
+        "charcoal": {
+          "ruleHand": "crude",
+          "shapeID": "crude_ess",
+          "cells": [
+            [
+              1,
+              0
+            ],
+            [
+              2,
+              0
+            ],
+            [
+              0,
+              1
+            ],
+            [
+              1,
+              1
+            ]
+          ],
+          "bounds": {
+            "width": 3,
+            "height": 2
+          },
+          "footprint": 4
+        },
+        "brush": {
+          "ruleHand": "plain",
+          "shapeID": "plain_corner",
+          "cells": [
+            [
+              0,
+              0
+            ],
+            [
+              1,
+              0
+            ],
+            [
+              0,
+              1
+            ]
+          ],
+          "bounds": {
+            "width": 2,
+            "height": 2
+          },
+          "footprint": 3
+        },
+        "fountain": {
+          "ruleHand": "refined",
+          "shapeID": "refined_dot",
+          "cells": [
+            [
+              0,
+              0
+            ]
+          ],
+          "bounds": {
+            "width": 1,
+            "height": 1
+          },
+          "footprint": 1
+        }
+      }
+    },
+    {
+      "kind": "source",
+      "id": "amber",
+      "glyph": {
+        "version": "writing-glyph-v1",
+        "salt": 0,
+        "width": 7,
+        "height": 7,
+        "bitmap": "0001000000101100011100011000000110000010100111110"
+      },
+      "hands": {
+        "charcoal": {
+          "ruleHand": "crude",
+          "shapeID": "crude_block",
+          "cells": [
+            [
+              0,
+              0
+            ],
+            [
+              1,
+              0
+            ],
+            [
+              0,
+              1
+            ],
+            [
+              1,
+              1
+            ]
+          ],
+          "bounds": {
+            "width": 2,
+            "height": 2
+          },
+          "footprint": 4
+        },
+        "brush": {
+          "ruleHand": "plain",
+          "shapeID": "plain_corner",
+          "cells": [
+            [
+              0,
+              0
+            ],
+            [
+              1,
+              0
+            ],
+            [
+              0,
+              1
+            ]
+          ],
+          "bounds": {
+            "width": 2,
+            "height": 2
+          },
+          "footprint": 3
+        },
+        "fountain": {
+          "ruleHand": "refined",
+          "shapeID": "refined_dot",
+          "cells": [
+            [
+              0,
+              0
+            ]
+          ],
+          "bounds": {
+            "width": 1,
+            "height": 1
+          },
+          "footprint": 1
+        }
+      }
+    },
+    {
+      "kind": "source",
+      "id": "ash",
+      "glyph": {
+        "version": "writing-glyph-v1",
+        "salt": 0,
+        "width": 7,
+        "height": 7,
+        "bitmap": "0001000010100000111100001010000111000110000001100"
+      },
+      "hands": {
+        "charcoal": {
+          "ruleHand": "crude",
+          "shapeID": "crude_block",
+          "cells": [
+            [
+              0,
+              0
+            ],
+            [
+              1,
+              0
+            ],
+            [
+              0,
+              1
+            ],
+            [
+              1,
+              1
+            ]
+          ],
+          "bounds": {
+            "width": 2,
+            "height": 2
+          },
+          "footprint": 4
+        },
+        "brush": {
+          "ruleHand": "plain",
+          "shapeID": "plain_bar",
+          "cells": [
+            [
+              0,
+              0
+            ],
+            [
+              1,
+              0
+            ],
+            [
+              2,
+              0
+            ]
+          ],
+          "bounds": {
+            "width": 3,
+            "height": 1
+          },
+          "footprint": 3
+        },
+        "fountain": {
+          "ruleHand": "refined",
+          "shapeID": "refined_dot",
+          "cells": [
+            [
+              0,
+              0
+            ]
+          ],
+          "bounds": {
+            "width": 1,
+            "height": 1
+          },
+          "footprint": 1
+        }
+      }
+    },
+    {
+      "kind": "source",
+      "id": "aurora",
+      "glyph": {
+        "version": "writing-glyph-v1",
+        "salt": 0,
+        "width": 7,
+        "height": 7,
+        "bitmap": "0001000001100001010000011000011110000110000001010"
+      },
+      "hands": {
+        "charcoal": {
+          "ruleHand": "crude",
+          "shapeID": "crude_ess",
+          "cells": [
+            [
+              1,
+              0
+            ],
+            [
+              2,
+              0
+            ],
+            [
+              0,
+              1
+            ],
+            [
+              1,
+              1
+            ]
+          ],
+          "bounds": {
+            "width": 3,
+            "height": 2
+          },
+          "footprint": 4
+        },
+        "brush": {
+          "ruleHand": "plain",
+          "shapeID": "plain_pair",
+          "cells": [
+            [
+              0,
+              0
+            ],
+            [
+              1,
+              0
+            ]
+          ],
+          "bounds": {
+            "width": 2,
+            "height": 1
+          },
+          "footprint": 2
+        },
+        "fountain": {
+          "ruleHand": "refined",
+          "shapeID": "refined_dot",
+          "cells": [
+            [
+              0,
+              0
+            ]
+          ],
+          "bounds": {
+            "width": 1,
+            "height": 1
+          },
+          "footprint": 1
+        }
+      }
+    },
+    {
+      "kind": "source",
+      "id": "bloom",
+      "glyph": {
+        "version": "writing-glyph-v1",
+        "salt": 0,
+        "width": 7,
+        "height": 7,
+        "bitmap": "0001000000110000010000111000001100000111100111000"
+      },
+      "hands": {
+        "charcoal": {
+          "ruleHand": "crude",
+          "shapeID": "crude_smear",
+          "cells": [
+            [
+              0,
+              0
+            ],
+            [
+              1,
+              0
+            ],
+            [
+              2,
+              0
+            ],
+            [
+              0,
+              1
+            ],
+            [
+              1,
+              1
+            ],
+            [
+              2,
+              1
+            ]
+          ],
+          "bounds": {
+            "width": 3,
+            "height": 2
+          },
+          "footprint": 6
+        },
+        "brush": {
+          "ruleHand": "plain",
+          "shapeID": "plain_column",
+          "cells": [
+            [
+              0,
+              0
+            ],
+            [
+              0,
+              1
+            ],
+            [
+              0,
+              2
+            ]
+          ],
+          "bounds": {
+            "width": 1,
+            "height": 3
+          },
+          "footprint": 3
+        },
+        "fountain": {
+          "ruleHand": "refined",
+          "shapeID": "refined_dot",
+          "cells": [
+            [
+              0,
+              0
+            ]
+          ],
+          "bounds": {
+            "width": 1,
+            "height": 1
+          },
+          "footprint": 1
+        }
+      }
+    },
+    {
+      "kind": "source",
+      "id": "bone",
+      "glyph": {
+        "version": "writing-glyph-v1",
+        "salt": 0,
+        "width": 7,
+        "height": 7,
+        "bitmap": "0001000000100000011100001100001100000010100001110"
+      },
+      "hands": {
+        "charcoal": {
+          "ruleHand": "crude",
+          "shapeID": "crude_smear",
+          "cells": [
+            [
+              0,
+              0
+            ],
+            [
+              1,
+              0
+            ],
+            [
+              2,
+              0
+            ],
+            [
+              0,
+              1
+            ],
+            [
+              1,
+              1
+            ],
+            [
+              2,
+              1
+            ]
+          ],
+          "bounds": {
+            "width": 3,
+            "height": 2
+          },
+          "footprint": 6
+        },
+        "brush": {
+          "ruleHand": "plain",
+          "shapeID": "plain_column",
+          "cells": [
+            [
+              0,
+              0
+            ],
+            [
+              0,
+              1
+            ],
+            [
+              0,
+              2
+            ]
+          ],
+          "bounds": {
+            "width": 1,
+            "height": 3
+          },
+          "footprint": 3
+        },
+        "fountain": {
+          "ruleHand": "refined",
+          "shapeID": "refined_dot",
+          "cells": [
+            [
+              0,
+              0
+            ]
+          ],
+          "bounds": {
+            "width": 1,
+            "height": 1
+          },
+          "footprint": 1
+        }
+      }
+    },
+    {
+      "kind": "source",
+      "id": "brine",
+      "glyph": {
+        "version": "writing-glyph-v1",
+        "salt": 0,
+        "width": 7,
+        "height": 7,
+        "bitmap": "0111110011100001110000111000110100000011100111000"
+      },
+      "hands": {
+        "charcoal": {
+          "ruleHand": "crude",
+          "shapeID": "crude_ell",
+          "cells": [
+            [
+              0,
+              0
+            ],
+            [
+              0,
+              1
+            ],
+            [
+              0,
+              2
+            ],
+            [
+              1,
+              2
+            ]
+          ],
+          "bounds": {
+            "width": 2,
+            "height": 3
+          },
+          "footprint": 4
+        },
+        "brush": {
+          "ruleHand": "plain",
+          "shapeID": "plain_column",
+          "cells": [
+            [
+              0,
+              0
+            ],
+            [
+              0,
+              1
+            ],
+            [
+              0,
+              2
+            ]
+          ],
+          "bounds": {
+            "width": 1,
+            "height": 3
+          },
+          "footprint": 3
+        },
+        "fountain": {
+          "ruleHand": "refined",
+          "shapeID": "refined_dot",
+          "cells": [
+            [
+              0,
+              0
+            ]
+          ],
+          "bounds": {
+            "width": 1,
+            "height": 1
+          },
+          "footprint": 1
+        }
+      }
+    },
+    {
+      "kind": "source",
+      "id": "canopy",
+      "glyph": {
+        "version": "writing-glyph-v1",
+        "salt": 0,
+        "width": 7,
+        "height": 7,
+        "bitmap": "0001000000110011010000111010001100001110000101000"
+      },
+      "hands": {
+        "charcoal": {
+          "ruleHand": "crude",
+          "shapeID": "crude_ell",
+          "cells": [
+            [
+              0,
+              0
+            ],
+            [
+              0,
+              1
+            ],
+            [
+              0,
+              2
+            ],
+            [
+              1,
+              2
+            ]
+          ],
+          "bounds": {
+            "width": 2,
+            "height": 3
+          },
+          "footprint": 4
+        },
+        "brush": {
+          "ruleHand": "plain",
+          "shapeID": "plain_stack",
+          "cells": [
+            [
+              0,
+              0
+            ],
+            [
+              0,
+              1
+            ]
+          ],
+          "bounds": {
+            "width": 1,
+            "height": 2
+          },
+          "footprint": 2
+        },
+        "fountain": {
+          "ruleHand": "refined",
+          "shapeID": "refined_dot",
+          "cells": [
+            [
+              0,
+              0
+            ]
+          ],
+          "bounds": {
+            "width": 1,
+            "height": 1
+          },
+          "footprint": 1
+        }
+      }
+    },
+    {
+      "kind": "source",
+      "id": "chasm",
+      "glyph": {
+        "version": "writing-glyph-v1",
+        "salt": 0,
+        "width": 7,
+        "height": 7,
+        "bitmap": "0001000000100000111100001100000111000010110111000"
+      },
+      "hands": {
+        "charcoal": {
+          "ruleHand": "crude",
+          "shapeID": "crude_sprawl",
+          "cells": [
+            [
+              0,
+              0
+            ],
+            [
+              1,
+              0
+            ],
+            [
+              1,
+              1
+            ],
+            [
+              2,
+              1
+            ],
+            [
+              2,
+              2
+            ]
+          ],
+          "bounds": {
+            "width": 3,
+            "height": 3
+          },
+          "footprint": 5
+        },
+        "brush": {
+          "ruleHand": "plain",
+          "shapeID": "plain_bar",
+          "cells": [
+            [
+              0,
+              0
+            ],
+            [
+              1,
+              0
+            ],
+            [
+              2,
+              0
+            ]
+          ],
+          "bounds": {
+            "width": 3,
+            "height": 1
+          },
+          "footprint": 3
+        },
+        "fountain": {
+          "ruleHand": "refined",
+          "shapeID": "refined_dot",
+          "cells": [
+            [
+              0,
+              0
+            ]
+          ],
+          "bounds": {
+            "width": 1,
+            "height": 1
+          },
+          "footprint": 1
+        }
+      }
+    },
+    {
+      "kind": "source",
+      "id": "chitin",
+      "glyph": {
+        "version": "writing-glyph-v1",
+        "salt": 0,
+        "width": 7,
+        "height": 7,
+        "bitmap": "0001000011111011010000001010000100000011001101000"
+      },
+      "hands": {
+        "charcoal": {
+          "ruleHand": "crude",
+          "shapeID": "crude_smear",
+          "cells": [
+            [
+              0,
+              0
+            ],
+            [
+              1,
+              0
+            ],
+            [
+              2,
+              0
+            ],
+            [
+              0,
+              1
+            ],
+            [
+              1,
+              1
+            ],
+            [
+              2,
+              1
+            ]
+          ],
+          "bounds": {
+            "width": 3,
+            "height": 2
+          },
+          "footprint": 6
+        },
+        "brush": {
+          "ruleHand": "plain",
+          "shapeID": "plain_pair",
+          "cells": [
+            [
+              0,
+              0
+            ],
+            [
+              1,
+              0
+            ]
+          ],
+          "bounds": {
+            "width": 2,
+            "height": 1
+          },
+          "footprint": 2
+        },
+        "fountain": {
+          "ruleHand": "refined",
+          "shapeID": "refined_dot",
+          "cells": [
+            [
+              0,
+              0
+            ]
+          ],
+          "bounds": {
+            "width": 1,
+            "height": 1
+          },
+          "footprint": 1
+        }
+      }
+    },
+    {
+      "kind": "source",
+      "id": "cloud",
+      "glyph": {
+        "version": "writing-glyph-v1",
+        "salt": 0,
+        "width": 7,
+        "height": 7,
+        "bitmap": "0001000010111000010000101000010100000010000011000"
+      },
+      "hands": {
+        "charcoal": {
+          "ruleHand": "crude",
+          "shapeID": "crude_cross",
+          "cells": [
+            [
+              1,
+              0
+            ],
+            [
+              0,
+              1
+            ],
+            [
+              1,
+              1
+            ],
+            [
+              2,
+              1
+            ],
+            [
+              1,
+              2
+            ]
+          ],
+          "bounds": {
+            "width": 3,
+            "height": 3
+          },
+          "footprint": 5
+        },
+        "brush": {
+          "ruleHand": "plain",
+          "shapeID": "plain_pair",
+          "cells": [
+            [
+              0,
+              0
+            ],
+            [
+              1,
+              0
+            ]
+          ],
+          "bounds": {
+            "width": 2,
+            "height": 1
+          },
+          "footprint": 2
+        },
+        "fountain": {
+          "ruleHand": "refined",
+          "shapeID": "refined_dot",
+          "cells": [
+            [
+              0,
+              0
+            ]
+          ],
+          "bounds": {
+            "width": 1,
+            "height": 1
+          },
+          "footprint": 1
+        }
+      }
+    },
+    {
+      "kind": "source",
+      "id": "coral",
+      "glyph": {
+        "version": "writing-glyph-v1",
+        "salt": 0,
+        "width": 7,
+        "height": 7,
+        "bitmap": "0001000000100000110000011100000110000010110001000"
+      },
+      "hands": {
+        "charcoal": {
+          "ruleHand": "crude",
+          "shapeID": "crude_block",
+          "cells": [
+            [
+              0,
+              0
+            ],
+            [
+              1,
+              0
+            ],
+            [
+              0,
+              1
+            ],
+            [
+              1,
+              1
+            ]
+          ],
+          "bounds": {
+            "width": 2,
+            "height": 2
+          },
+          "footprint": 4
+        },
+        "brush": {
+          "ruleHand": "plain",
+          "shapeID": "plain_bar",
+          "cells": [
+            [
+              0,
+              0
+            ],
+            [
+              1,
+              0
+            ],
+            [
+              2,
+              0
+            ]
+          ],
+          "bounds": {
+            "width": 3,
+            "height": 1
+          },
+          "footprint": 3
+        },
+        "fountain": {
+          "ruleHand": "refined",
+          "shapeID": "refined_dot",
+          "cells": [
+            [
+              0,
+              0
+            ]
+          ],
+          "bounds": {
+            "width": 1,
+            "height": 1
+          },
+          "footprint": 1
+        }
+      }
+    },
+    {
+      "kind": "source",
+      "id": "crystal",
+      "glyph": {
+        "version": "writing-glyph-v1",
+        "salt": 0,
+        "width": 7,
+        "height": 7,
+        "bitmap": "0001000001110000011000111000011100000011000001000"
+      },
+      "hands": {
+        "charcoal": {
+          "ruleHand": "crude",
+          "shapeID": "crude_block",
+          "cells": [
+            [
+              0,
+              0
+            ],
+            [
+              1,
+              0
+            ],
+            [
+              0,
+              1
+            ],
+            [
+              1,
+              1
+            ]
+          ],
+          "bounds": {
+            "width": 2,
+            "height": 2
+          },
+          "footprint": 4
+        },
+        "brush": {
+          "ruleHand": "plain",
+          "shapeID": "plain_column",
+          "cells": [
+            [
+              0,
+              0
+            ],
+            [
+              0,
+              1
+            ],
+            [
+              0,
+              2
+            ]
+          ],
+          "bounds": {
+            "width": 1,
+            "height": 3
+          },
+          "footprint": 3
+        },
+        "fountain": {
+          "ruleHand": "refined",
+          "shapeID": "refined_dot",
+          "cells": [
+            [
+              0,
+              0
+            ]
+          ],
+          "bounds": {
+            "width": 1,
+            "height": 1
+          },
+          "footprint": 1
+        }
+      }
+    },
+    {
+      "kind": "source",
+      "id": "dream",
+      "glyph": {
+        "version": "writing-glyph-v1",
+        "salt": 0,
+        "width": 7,
+        "height": 7,
+        "bitmap": "0001000000111001111000001010011100000110000111000"
+      },
+      "hands": {
+        "charcoal": {
+          "ruleHand": "crude",
+          "shapeID": "crude_tee",
+          "cells": [
+            [
+              0,
+              0
+            ],
+            [
+              1,
+              0
+            ],
+            [
+              2,
+              0
+            ],
+            [
+              1,
+              1
+            ]
+          ],
+          "bounds": {
+            "width": 3,
+            "height": 2
+          },
+          "footprint": 4
+        },
+        "brush": {
+          "ruleHand": "plain",
+          "shapeID": "plain_bar",
+          "cells": [
+            [
+              0,
+              0
+            ],
+            [
+              1,
+              0
+            ],
+            [
+              2,
+              0
+            ]
+          ],
+          "bounds": {
+            "width": 3,
+            "height": 1
+          },
+          "footprint": 3
+        },
+        "fountain": {
+          "ruleHand": "refined",
+          "shapeID": "refined_dot",
+          "cells": [
+            [
+              0,
+              0
+            ]
+          ],
+          "bounds": {
+            "width": 1,
+            "height": 1
+          },
+          "footprint": 1
+        }
+      }
+    },
+    {
+      "kind": "source",
+      "id": "drift",
+      "glyph": {
+        "version": "writing-glyph-v1",
+        "salt": 0,
+        "width": 7,
+        "height": 7,
+        "bitmap": "0001000000110000110001111010001100001010000001110"
+      },
+      "hands": {
+        "charcoal": {
+          "ruleHand": "crude",
+          "shapeID": "crude_sprawl",
+          "cells": [
+            [
+              0,
+              0
+            ],
+            [
+              1,
+              0
+            ],
+            [
+              1,
+              1
+            ],
+            [
+              2,
+              1
+            ],
+            [
+              2,
+              2
+            ]
+          ],
+          "bounds": {
+            "width": 3,
+            "height": 3
+          },
+          "footprint": 5
+        },
+        "brush": {
+          "ruleHand": "plain",
+          "shapeID": "plain_column",
+          "cells": [
+            [
+              0,
+              0
+            ],
+            [
+              0,
+              1
+            ],
+            [
+              0,
+              2
+            ]
+          ],
+          "bounds": {
+            "width": 1,
+            "height": 3
+          },
+          "footprint": 3
+        },
+        "fountain": {
+          "ruleHand": "refined",
+          "shapeID": "refined_dot",
+          "cells": [
+            [
+              0,
+              0
+            ]
+          ],
+          "bounds": {
+            "width": 1,
+            "height": 1
+          },
+          "footprint": 1
+        }
+      }
+    },
+    {
+      "kind": "source",
+      "id": "echo",
+      "glyph": {
+        "version": "writing-glyph-v1",
+        "salt": 0,
+        "width": 7,
+        "height": 7,
+        "bitmap": "0001000000111000010110001011001101000110000001011"
+      },
+      "hands": {
+        "charcoal": {
+          "ruleHand": "crude",
+          "shapeID": "crude_cross",
+          "cells": [
+            [
+              1,
+              0
+            ],
+            [
+              0,
+              1
+            ],
+            [
+              1,
+              1
+            ],
+            [
+              2,
+              1
+            ],
+            [
+              1,
+              2
+            ]
+          ],
+          "bounds": {
+            "width": 3,
+            "height": 3
+          },
+          "footprint": 5
+        },
+        "brush": {
+          "ruleHand": "plain",
+          "shapeID": "plain_pair",
+          "cells": [
+            [
+              0,
+              0
+            ],
+            [
+              1,
+              0
+            ]
+          ],
+          "bounds": {
+            "width": 2,
+            "height": 1
+          },
+          "footprint": 2
+        },
+        "fountain": {
+          "ruleHand": "refined",
+          "shapeID": "refined_dot",
+          "cells": [
+            [
+              0,
+              0
+            ]
+          ],
+          "bounds": {
+            "width": 1,
+            "height": 1
+          },
+          "footprint": 1
+        }
+      }
+    },
+    {
+      "kind": "source",
+      "id": "fungus",
+      "glyph": {
+        "version": "writing-glyph-v1",
+        "salt": 0,
+        "width": 7,
+        "height": 7,
+        "bitmap": "0001000000101100011001101000011100000011000011111"
+      },
+      "hands": {
+        "charcoal": {
+          "ruleHand": "crude",
+          "shapeID": "crude_sprawl",
+          "cells": [
+            [
+              0,
+              0
+            ],
+            [
+              1,
+              0
+            ],
+            [
+              1,
+              1
+            ],
+            [
+              2,
+              1
+            ],
+            [
+              2,
+              2
+            ]
+          ],
+          "bounds": {
+            "width": 3,
+            "height": 3
+          },
+          "footprint": 5
+        },
+        "brush": {
+          "ruleHand": "plain",
+          "shapeID": "plain_column",
+          "cells": [
+            [
+              0,
+              0
+            ],
+            [
+              0,
+              1
+            ],
+            [
+              0,
+              2
+            ]
+          ],
+          "bounds": {
+            "width": 1,
+            "height": 3
+          },
+          "footprint": 3
+        },
+        "fountain": {
+          "ruleHand": "refined",
+          "shapeID": "refined_dot",
+          "cells": [
+            [
+              0,
+              0
+            ]
+          ],
+          "bounds": {
+            "width": 1,
+            "height": 1
+          },
+          "footprint": 1
+        }
+      }
+    },
+    {
+      "kind": "source",
+      "id": "geyser",
+      "glyph": {
+        "version": "writing-glyph-v1",
+        "salt": 0,
+        "width": 7,
+        "height": 7,
+        "bitmap": "0101000010100000110000001010000101100010110101000"
+      },
+      "hands": {
+        "charcoal": {
+          "ruleHand": "crude",
+          "shapeID": "crude_smear",
+          "cells": [
+            [
+              0,
+              0
+            ],
+            [
+              1,
+              0
+            ],
+            [
+              2,
+              0
+            ],
+            [
+              0,
+              1
+            ],
+            [
+              1,
+              1
+            ],
+            [
+              2,
+              1
+            ]
+          ],
+          "bounds": {
+            "width": 3,
+            "height": 2
+          },
+          "footprint": 6
+        },
+        "brush": {
+          "ruleHand": "plain",
+          "shapeID": "plain_pair",
+          "cells": [
+            [
+              0,
+              0
+            ],
+            [
+              1,
+              0
+            ]
+          ],
+          "bounds": {
+            "width": 2,
+            "height": 1
+          },
+          "footprint": 2
+        },
+        "fountain": {
+          "ruleHand": "refined",
+          "shapeID": "refined_dot",
+          "cells": [
+            [
+              0,
+              0
+            ]
+          ],
+          "bounds": {
+            "width": 1,
+            "height": 1
+          },
+          "footprint": 1
+        }
+      }
+    },
+    {
+      "kind": "source",
+      "id": "glacier",
+      "glyph": {
+        "version": "writing-glyph-v1",
+        "salt": 0,
+        "width": 7,
+        "height": 7,
+        "bitmap": "0101110000100001010000001011010100000110000011000"
+      },
+      "hands": {
+        "charcoal": {
+          "ruleHand": "crude",
+          "shapeID": "crude_ess",
+          "cells": [
+            [
+              1,
+              0
+            ],
+            [
+              2,
+              0
+            ],
+            [
+              0,
+              1
+            ],
+            [
+              1,
+              1
+            ]
+          ],
+          "bounds": {
+            "width": 3,
+            "height": 2
+          },
+          "footprint": 4
+        },
+        "brush": {
+          "ruleHand": "plain",
+          "shapeID": "plain_pair",
+          "cells": [
+            [
+              0,
+              0
+            ],
+            [
+              1,
+              0
+            ]
+          ],
+          "bounds": {
+            "width": 2,
+            "height": 1
+          },
+          "footprint": 2
+        },
+        "fountain": {
+          "ruleHand": "refined",
+          "shapeID": "refined_dot",
+          "cells": [
+            [
+              0,
+              0
+            ]
+          ],
+          "bounds": {
+            "width": 1,
+            "height": 1
+          },
+          "footprint": 1
+        }
+      }
+    },
+    {
+      "kind": "source",
+      "id": "gold",
+      "glyph": {
+        "version": "writing-glyph-v1",
+        "salt": 0,
+        "width": 7,
+        "height": 7,
+        "bitmap": "0001000001100000110000101000000110000010001101000"
+      },
+      "hands": {
+        "charcoal": {
+          "ruleHand": "crude",
+          "shapeID": "crude_block",
+          "cells": [
+            [
+              0,
+              0
+            ],
+            [
+              1,
+              0
+            ],
+            [
+              0,
+              1
+            ],
+            [
+              1,
+              1
+            ]
+          ],
+          "bounds": {
+            "width": 2,
+            "height": 2
+          },
+          "footprint": 4
+        },
+        "brush": {
+          "ruleHand": "plain",
+          "shapeID": "plain_bar",
+          "cells": [
+            [
+              0,
+              0
+            ],
+            [
+              1,
+              0
+            ],
+            [
+              2,
+              0
+            ]
+          ],
+          "bounds": {
+            "width": 3,
+            "height": 1
+          },
+          "footprint": 3
+        },
+        "fountain": {
+          "ruleHand": "refined",
+          "shapeID": "refined_dot",
+          "cells": [
+            [
+              0,
+              0
+            ]
+          ],
+          "bounds": {
+            "width": 1,
+            "height": 1
+          },
+          "footprint": 1
+        }
+      }
+    },
+    {
+      "kind": "source",
+      "id": "gold_ore",
+      "glyph": {
+        "version": "writing-glyph-v1",
+        "salt": 0,
+        "width": 7,
+        "height": 7,
+        "bitmap": "0001000000111000110000011000000100011010000001011"
+      },
+      "hands": {
+        "charcoal": {
+          "ruleHand": "crude",
+          "shapeID": "crude_sprawl",
+          "cells": [
+            [
+              0,
+              0
+            ],
+            [
+              1,
+              0
+            ],
+            [
+              1,
+              1
+            ],
+            [
+              2,
+              1
+            ],
+            [
+              2,
+              2
+            ]
+          ],
+          "bounds": {
+            "width": 3,
+            "height": 3
+          },
+          "footprint": 5
+        },
+        "brush": {
+          "ruleHand": "plain",
+          "shapeID": "plain_bar",
+          "cells": [
+            [
+              0,
+              0
+            ],
+            [
+              1,
+              0
+            ],
+            [
+              2,
+              0
+            ]
+          ],
+          "bounds": {
+            "width": 3,
+            "height": 1
+          },
+          "footprint": 3
+        },
+        "fountain": {
+          "ruleHand": "refined",
+          "shapeID": "refined_dot",
+          "cells": [
+            [
+              0,
+              0
+            ]
+          ],
+          "bounds": {
+            "width": 1,
+            "height": 1
+          },
+          "footprint": 1
+        }
+      }
+    },
+    {
+      "kind": "source",
+      "id": "granite",
+      "glyph": {
+        "version": "writing-glyph-v1",
+        "salt": 0,
+        "width": 7,
+        "height": 7,
+        "bitmap": "0011000011100000010100011000010100000011000001100"
+      },
+      "hands": {
+        "charcoal": {
+          "ruleHand": "crude",
+          "shapeID": "crude_tee",
+          "cells": [
+            [
+              0,
+              0
+            ],
+            [
+              1,
+              0
+            ],
+            [
+              2,
+              0
+            ],
+            [
+              1,
+              1
+            ]
+          ],
+          "bounds": {
+            "width": 3,
+            "height": 2
+          },
+          "footprint": 4
+        },
+        "brush": {
+          "ruleHand": "plain",
+          "shapeID": "plain_bar",
+          "cells": [
+            [
+              0,
+              0
+            ],
+            [
+              1,
+              0
+            ],
+            [
+              2,
+              0
+            ]
+          ],
+          "bounds": {
+            "width": 3,
+            "height": 1
+          },
+          "footprint": 3
+        },
+        "fountain": {
+          "ruleHand": "refined",
+          "shapeID": "refined_dot",
+          "cells": [
+            [
+              0,
+              0
+            ]
+          ],
+          "bounds": {
+            "width": 1,
+            "height": 1
+          },
+          "footprint": 1
+        }
+      }
+    },
+    {
+      "kind": "source",
+      "id": "herd",
+      "glyph": {
+        "version": "writing-glyph-v1",
+        "salt": 0,
+        "width": 7,
+        "height": 7,
+        "bitmap": "0001000110100000110000001110000110000011000101000"
+      },
+      "hands": {
+        "charcoal": {
+          "ruleHand": "crude",
+          "shapeID": "crude_ess",
+          "cells": [
+            [
+              1,
+              0
+            ],
+            [
+              2,
+              0
+            ],
+            [
+              0,
+              1
+            ],
+            [
+              1,
+              1
+            ]
+          ],
+          "bounds": {
+            "width": 3,
+            "height": 2
+          },
+          "footprint": 4
+        },
+        "brush": {
+          "ruleHand": "plain",
+          "shapeID": "plain_stack",
+          "cells": [
+            [
+              0,
+              0
+            ],
+            [
+              0,
+              1
+            ]
+          ],
+          "bounds": {
+            "width": 1,
+            "height": 2
+          },
+          "footprint": 2
+        },
+        "fountain": {
+          "ruleHand": "refined",
+          "shapeID": "refined_dot",
+          "cells": [
+            [
+              0,
+              0
+            ]
+          ],
+          "bounds": {
+            "width": 1,
+            "height": 1
+          },
+          "footprint": 1
+        }
+      }
+    },
+    {
+      "kind": "source",
+      "id": "hive",
+      "glyph": {
+        "version": "writing-glyph-v1",
+        "salt": 0,
+        "width": 7,
+        "height": 7,
+        "bitmap": "0001000000110000011000011000000110000110000111100"
+      },
+      "hands": {
+        "charcoal": {
+          "ruleHand": "crude",
+          "shapeID": "crude_ess",
+          "cells": [
+            [
+              1,
+              0
+            ],
+            [
+              2,
+              0
+            ],
+            [
+              0,
+              1
+            ],
+            [
+              1,
+              1
+            ]
+          ],
+          "bounds": {
+            "width": 3,
+            "height": 2
+          },
+          "footprint": 4
+        },
+        "brush": {
+          "ruleHand": "plain",
+          "shapeID": "plain_corner",
+          "cells": [
+            [
+              0,
+              0
+            ],
+            [
+              1,
+              0
+            ],
+            [
+              0,
+              1
+            ]
+          ],
+          "bounds": {
+            "width": 2,
+            "height": 2
+          },
+          "footprint": 3
+        },
+        "fountain": {
+          "ruleHand": "refined",
+          "shapeID": "refined_dot",
+          "cells": [
+            [
+              0,
+              0
+            ]
+          ],
+          "bounds": {
+            "width": 1,
+            "height": 1
+          },
+          "footprint": 1
+        }
+      }
+    },
+    {
+      "kind": "source",
+      "id": "hush",
+      "glyph": {
+        "version": "writing-glyph-v1",
+        "salt": 0,
+        "width": 7,
+        "height": 7,
+        "bitmap": "0001000011100001110000001011000111000010100111000"
+      },
+      "hands": {
+        "charcoal": {
+          "ruleHand": "crude",
+          "shapeID": "crude_ess",
+          "cells": [
+            [
+              1,
+              0
+            ],
+            [
+              2,
+              0
+            ],
+            [
+              0,
+              1
+            ],
+            [
+              1,
+              1
+            ]
+          ],
+          "bounds": {
+            "width": 3,
+            "height": 2
+          },
+          "footprint": 4
+        },
+        "brush": {
+          "ruleHand": "plain",
+          "shapeID": "plain_pair",
+          "cells": [
+            [
+              0,
+              0
+            ],
+            [
+              1,
+              0
+            ]
+          ],
+          "bounds": {
+            "width": 2,
+            "height": 1
+          },
+          "footprint": 2
+        },
+        "fountain": {
+          "ruleHand": "refined",
+          "shapeID": "refined_dot",
+          "cells": [
+            [
+              0,
+              0
+            ]
+          ],
+          "bounds": {
+            "width": 1,
+            "height": 1
+          },
+          "footprint": 1
+        }
+      }
+    },
+    {
+      "kind": "source",
+      "id": "ice",
+      "glyph": {
+        "version": "writing-glyph-v1",
+        "salt": 0,
+        "width": 7,
+        "height": 7,
+        "bitmap": "0101000000100000110000001011110100000010110001000"
+      },
+      "hands": {
+        "charcoal": {
+          "ruleHand": "crude",
+          "shapeID": "crude_sprawl",
+          "cells": [
+            [
+              0,
+              0
+            ],
+            [
+              1,
+              0
+            ],
+            [
+              1,
+              1
+            ],
+            [
+              2,
+              1
+            ],
+            [
+              2,
+              2
+            ]
+          ],
+          "bounds": {
+            "width": 3,
+            "height": 3
+          },
+          "footprint": 5
+        },
+        "brush": {
+          "ruleHand": "plain",
+          "shapeID": "plain_column",
+          "cells": [
+            [
+              0,
+              0
+            ],
+            [
+              0,
+              1
+            ],
+            [
+              0,
+              2
+            ]
+          ],
+          "bounds": {
+            "width": 1,
+            "height": 3
+          },
+          "footprint": 3
+        },
+        "fountain": {
+          "ruleHand": "refined",
+          "shapeID": "refined_dot",
+          "cells": [
+            [
+              0,
+              0
+            ]
+          ],
+          "bounds": {
+            "width": 1,
+            "height": 1
+          },
+          "footprint": 1
+        }
+      }
+    },
+    {
+      "kind": "source",
+      "id": "iron",
+      "glyph": {
+        "version": "writing-glyph-v1",
+        "salt": 0,
+        "width": 7,
+        "height": 7,
+        "bitmap": "0001000110100000110000111000011111011010000001000"
+      },
+      "hands": {
+        "charcoal": {
+          "ruleHand": "crude",
+          "shapeID": "crude_sprawl",
+          "cells": [
+            [
+              0,
+              0
+            ],
+            [
+              1,
+              0
+            ],
+            [
+              1,
+              1
+            ],
+            [
+              2,
+              1
+            ],
+            [
+              2,
+              2
+            ]
+          ],
+          "bounds": {
+            "width": 3,
+            "height": 3
+          },
+          "footprint": 5
+        },
+        "brush": {
+          "ruleHand": "plain",
+          "shapeID": "plain_column",
+          "cells": [
+            [
+              0,
+              0
+            ],
+            [
+              0,
+              1
+            ],
+            [
+              0,
+              2
+            ]
+          ],
+          "bounds": {
+            "width": 1,
+            "height": 3
+          },
+          "footprint": 3
+        },
+        "fountain": {
+          "ruleHand": "refined",
+          "shapeID": "refined_dot",
+          "cells": [
+            [
+              0,
+              0
+            ]
+          ],
+          "bounds": {
+            "width": 1,
+            "height": 1
+          },
+          "footprint": 1
+        }
+      }
+    },
+    {
+      "kind": "source",
+      "id": "lake",
+      "glyph": {
+        "version": "writing-glyph-v1",
+        "salt": 0,
+        "width": 7,
+        "height": 7,
+        "bitmap": "0001000000100000011001101110000100000011100011000"
+      },
+      "hands": {
+        "charcoal": {
+          "ruleHand": "crude",
+          "shapeID": "crude_ell",
+          "cells": [
+            [
+              0,
+              0
+            ],
+            [
+              0,
+              1
+            ],
+            [
+              0,
+              2
+            ],
+            [
+              1,
+              2
+            ]
+          ],
+          "bounds": {
+            "width": 2,
+            "height": 3
+          },
+          "footprint": 4
+        },
+        "brush": {
+          "ruleHand": "plain",
+          "shapeID": "plain_column",
+          "cells": [
+            [
+              0,
+              0
+            ],
+            [
+              0,
+              1
+            ],
+            [
+              0,
+              2
+            ]
+          ],
+          "bounds": {
+            "width": 1,
+            "height": 3
+          },
+          "footprint": 3
+        },
+        "fountain": {
+          "ruleHand": "refined",
+          "shapeID": "refined_dot",
+          "cells": [
+            [
+              0,
+              0
+            ]
+          ],
+          "bounds": {
+            "width": 1,
+            "height": 1
+          },
+          "footprint": 1
+        }
+      }
+    },
+    {
+      "kind": "source",
+      "id": "magma",
+      "glyph": {
+        "version": "writing-glyph-v1",
+        "salt": 0,
+        "width": 7,
+        "height": 7,
+        "bitmap": "0001000001111000010111101000110100001110000001011"
+      },
+      "hands": {
+        "charcoal": {
+          "ruleHand": "crude",
+          "shapeID": "crude_cross",
+          "cells": [
+            [
+              1,
+              0
+            ],
+            [
+              0,
+              1
+            ],
+            [
+              1,
+              1
+            ],
+            [
+              2,
+              1
+            ],
+            [
+              1,
+              2
+            ]
+          ],
+          "bounds": {
+            "width": 3,
+            "height": 3
+          },
+          "footprint": 5
+        },
+        "brush": {
+          "ruleHand": "plain",
+          "shapeID": "plain_column",
+          "cells": [
+            [
+              0,
+              0
+            ],
+            [
+              0,
+              1
+            ],
+            [
+              0,
+              2
+            ]
+          ],
+          "bounds": {
+            "width": 1,
+            "height": 3
+          },
+          "footprint": 3
+        },
+        "fountain": {
+          "ruleHand": "refined",
+          "shapeID": "refined_dot",
+          "cells": [
+            [
+              0,
+              0
+            ]
+          ],
+          "bounds": {
+            "width": 1,
+            "height": 1
+          },
+          "footprint": 1
+        }
+      }
+    },
+    {
+      "kind": "source",
+      "id": "marsh",
+      "glyph": {
+        "version": "writing-glyph-v1",
+        "salt": 0,
+        "width": 7,
+        "height": 7,
+        "bitmap": "0001000001100000011000001110011110000011000111000"
+      },
+      "hands": {
+        "charcoal": {
+          "ruleHand": "crude",
+          "shapeID": "crude_smear",
+          "cells": [
+            [
+              0,
+              0
+            ],
+            [
+              1,
+              0
+            ],
+            [
+              2,
+              0
+            ],
+            [
+              0,
+              1
+            ],
+            [
+              1,
+              1
+            ],
+            [
+              2,
+              1
+            ]
+          ],
+          "bounds": {
+            "width": 3,
+            "height": 2
+          },
+          "footprint": 6
+        },
+        "brush": {
+          "ruleHand": "plain",
+          "shapeID": "plain_stack",
+          "cells": [
+            [
+              0,
+              0
+            ],
+            [
+              0,
+              1
+            ]
+          ],
+          "bounds": {
+            "width": 1,
+            "height": 2
+          },
+          "footprint": 2
+        },
+        "fountain": {
+          "ruleHand": "refined",
+          "shapeID": "refined_dot",
+          "cells": [
+            [
+              0,
+              0
+            ]
+          ],
+          "bounds": {
+            "width": 1,
+            "height": 1
+          },
+          "footprint": 1
+        }
+      }
+    },
+    {
+      "kind": "source",
+      "id": "mercury",
+      "glyph": {
+        "version": "writing-glyph-v1",
+        "salt": 0,
+        "width": 7,
+        "height": 7,
+        "bitmap": "0001000001100000011100001110000101101111000011000"
+      },
+      "hands": {
+        "charcoal": {
+          "ruleHand": "crude",
+          "shapeID": "crude_ess",
+          "cells": [
+            [
+              1,
+              0
+            ],
+            [
+              2,
+              0
+            ],
+            [
+              0,
+              1
+            ],
+            [
+              1,
+              1
+            ]
+          ],
+          "bounds": {
+            "width": 3,
+            "height": 2
+          },
+          "footprint": 4
+        },
+        "brush": {
+          "ruleHand": "plain",
+          "shapeID": "plain_corner",
+          "cells": [
+            [
+              0,
+              0
+            ],
+            [
+              1,
+              0
+            ],
+            [
+              0,
+              1
+            ]
+          ],
+          "bounds": {
+            "width": 2,
+            "height": 2
+          },
+          "footprint": 3
+        },
+        "fountain": {
+          "ruleHand": "refined",
+          "shapeID": "refined_dot",
+          "cells": [
+            [
+              0,
+              0
+            ]
+          ],
+          "bounds": {
+            "width": 1,
+            "height": 1
+          },
+          "footprint": 1
+        }
+      }
+    },
+    {
+      "kind": "source",
+      "id": "meteor",
+      "glyph": {
+        "version": "writing-glyph-v1",
+        "salt": 0,
+        "width": 7,
+        "height": 7,
+        "bitmap": "0001000000110000011100001100011100001011000001100"
+      },
+      "hands": {
+        "charcoal": {
+          "ruleHand": "crude",
+          "shapeID": "crude_smear",
+          "cells": [
+            [
+              0,
+              0
+            ],
+            [
+              1,
+              0
+            ],
+            [
+              2,
+              0
+            ],
+            [
+              0,
+              1
+            ],
+            [
+              1,
+              1
+            ],
+            [
+              2,
+              1
+            ]
+          ],
+          "bounds": {
+            "width": 3,
+            "height": 2
+          },
+          "footprint": 6
+        },
+        "brush": {
+          "ruleHand": "plain",
+          "shapeID": "plain_column",
+          "cells": [
+            [
+              0,
+              0
+            ],
+            [
+              0,
+              1
+            ],
+            [
+              0,
+              2
+            ]
+          ],
+          "bounds": {
+            "width": 1,
+            "height": 3
+          },
+          "footprint": 3
+        },
+        "fountain": {
+          "ruleHand": "refined",
+          "shapeID": "refined_dot",
+          "cells": [
+            [
+              0,
+              0
+            ]
+          ],
+          "bounds": {
+            "width": 1,
+            "height": 1
+          },
+          "footprint": 1
+        }
+      }
+    },
+    {
+      "kind": "source",
+      "id": "miasma",
+      "glyph": {
+        "version": "writing-glyph-v1",
+        "salt": 0,
+        "width": 7,
+        "height": 7,
+        "bitmap": "0001000010100000011000011110010100001010000001110"
+      },
+      "hands": {
+        "charcoal": {
+          "ruleHand": "crude",
+          "shapeID": "crude_ess",
+          "cells": [
+            [
+              1,
+              0
+            ],
+            [
+              2,
+              0
+            ],
+            [
+              0,
+              1
+            ],
+            [
+              1,
+              1
+            ]
+          ],
+          "bounds": {
+            "width": 3,
+            "height": 2
+          },
+          "footprint": 4
+        },
+        "brush": {
+          "ruleHand": "plain",
+          "shapeID": "plain_bar",
+          "cells": [
+            [
+              0,
+              0
+            ],
+            [
+              1,
+              0
+            ],
+            [
+              2,
+              0
+            ]
+          ],
+          "bounds": {
+            "width": 3,
+            "height": 1
+          },
+          "footprint": 3
+        },
+        "fountain": {
+          "ruleHand": "refined",
+          "shapeID": "refined_dot",
+          "cells": [
+            [
+              0,
+              0
+            ]
+          ],
+          "bounds": {
+            "width": 1,
+            "height": 1
+          },
+          "footprint": 1
+        }
+      }
+    },
+    {
+      "kind": "source",
+      "id": "mirror",
+      "glyph": {
+        "version": "writing-glyph-v1",
+        "salt": 0,
+        "width": 7,
+        "height": 7,
+        "bitmap": "0001000000111000011100111000110100000010111101000"
+      },
+      "hands": {
+        "charcoal": {
+          "ruleHand": "crude",
+          "shapeID": "crude_cross",
+          "cells": [
+            [
+              1,
+              0
+            ],
+            [
+              0,
+              1
+            ],
+            [
+              1,
+              1
+            ],
+            [
+              2,
+              1
+            ],
+            [
+              1,
+              2
+            ]
+          ],
+          "bounds": {
+            "width": 3,
+            "height": 3
+          },
+          "footprint": 5
+        },
+        "brush": {
+          "ruleHand": "plain",
+          "shapeID": "plain_corner",
+          "cells": [
+            [
+              0,
+              0
+            ],
+            [
+              1,
+              0
+            ],
+            [
+              0,
+              1
+            ]
+          ],
+          "bounds": {
+            "width": 2,
+            "height": 2
+          },
+          "footprint": 3
+        },
+        "fountain": {
+          "ruleHand": "refined",
+          "shapeID": "refined_dot",
+          "cells": [
+            [
+              0,
+              0
+            ]
+          ],
+          "bounds": {
+            "width": 1,
+            "height": 1
+          },
+          "footprint": 1
+        }
+      }
+    },
+    {
+      "kind": "source",
+      "id": "mist",
+      "glyph": {
+        "version": "writing-glyph-v1",
+        "salt": 0,
+        "width": 7,
+        "height": 7,
+        "bitmap": "0001000000100001111100011000010100000011100001000"
+      },
+      "hands": {
+        "charcoal": {
+          "ruleHand": "crude",
+          "shapeID": "crude_smear",
+          "cells": [
+            [
+              0,
+              0
+            ],
+            [
+              1,
+              0
+            ],
+            [
+              2,
+              0
+            ],
+            [
+              0,
+              1
+            ],
+            [
+              1,
+              1
+            ],
+            [
+              2,
+              1
+            ]
+          ],
+          "bounds": {
+            "width": 3,
+            "height": 2
+          },
+          "footprint": 6
+        },
+        "brush": {
+          "ruleHand": "plain",
+          "shapeID": "plain_stack",
+          "cells": [
+            [
+              0,
+              0
+            ],
+            [
+              0,
+              1
+            ]
+          ],
+          "bounds": {
+            "width": 1,
+            "height": 2
+          },
+          "footprint": 2
+        },
+        "fountain": {
+          "ruleHand": "refined",
+          "shapeID": "refined_dot",
+          "cells": [
+            [
+              0,
+              0
+            ]
+          ],
+          "bounds": {
+            "width": 1,
+            "height": 1
+          },
+          "footprint": 1
+        }
+      }
+    },
+    {
+      "kind": "source",
+      "id": "moon",
+      "glyph": {
+        "version": "writing-glyph-v1",
+        "salt": 0,
+        "width": 7,
+        "height": 7,
+        "bitmap": "0111110000101100110000101000000101100011000101000"
+      },
+      "hands": {
+        "charcoal": {
+          "ruleHand": "crude",
+          "shapeID": "crude_ell",
+          "cells": [
+            [
+              0,
+              0
+            ],
+            [
+              0,
+              1
+            ],
+            [
+              0,
+              2
+            ],
+            [
+              1,
+              2
+            ]
+          ],
+          "bounds": {
+            "width": 2,
+            "height": 3
+          },
+          "footprint": 4
+        },
+        "brush": {
+          "ruleHand": "plain",
+          "shapeID": "plain_bar",
+          "cells": [
+            [
+              0,
+              0
+            ],
+            [
+              1,
+              0
+            ],
+            [
+              2,
+              0
+            ]
+          ],
+          "bounds": {
+            "width": 3,
+            "height": 1
+          },
+          "footprint": 3
+        },
+        "fountain": {
+          "ruleHand": "refined",
+          "shapeID": "refined_dot",
+          "cells": [
+            [
+              0,
+              0
+            ]
+          ],
+          "bounds": {
+            "width": 1,
+            "height": 1
+          },
+          "footprint": 1
+        }
+      }
+    },
+    {
+      "kind": "source",
+      "id": "orrery",
+      "glyph": {
+        "version": "writing-glyph-v1",
+        "salt": 0,
+        "width": 7,
+        "height": 7,
+        "bitmap": "0111110001100001110000011000000110001110000001110"
+      },
+      "hands": {
+        "charcoal": {
+          "ruleHand": "crude",
+          "shapeID": "crude_block",
+          "cells": [
+            [
+              0,
+              0
+            ],
+            [
+              1,
+              0
+            ],
+            [
+              0,
+              1
+            ],
+            [
+              1,
+              1
+            ]
+          ],
+          "bounds": {
+            "width": 2,
+            "height": 2
+          },
+          "footprint": 4
+        },
+        "brush": {
+          "ruleHand": "plain",
+          "shapeID": "plain_bar",
+          "cells": [
+            [
+              0,
+              0
+            ],
+            [
+              1,
+              0
+            ],
+            [
+              2,
+              0
+            ]
+          ],
+          "bounds": {
+            "width": 3,
+            "height": 1
+          },
+          "footprint": 3
+        },
+        "fountain": {
+          "ruleHand": "refined",
+          "shapeID": "refined_dot",
+          "cells": [
+            [
+              0,
+              0
+            ]
+          ],
+          "bounds": {
+            "width": 1,
+            "height": 1
+          },
+          "footprint": 1
+        }
+      }
+    },
+    {
+      "kind": "source",
+      "id": "pond",
+      "glyph": {
+        "version": "writing-glyph-v1",
+        "salt": 0,
+        "width": 7,
+        "height": 7,
+        "bitmap": "0001000001100001110100001100000110000011001101000"
+      },
+      "hands": {
+        "charcoal": {
+          "ruleHand": "crude",
+          "shapeID": "crude_cross",
+          "cells": [
+            [
+              1,
+              0
+            ],
+            [
+              0,
+              1
+            ],
+            [
+              1,
+              1
+            ],
+            [
+              2,
+              1
+            ],
+            [
+              1,
+              2
+            ]
+          ],
+          "bounds": {
+            "width": 3,
+            "height": 3
+          },
+          "footprint": 5
+        },
+        "brush": {
+          "ruleHand": "plain",
+          "shapeID": "plain_pair",
+          "cells": [
+            [
+              0,
+              0
+            ],
+            [
+              1,
+              0
+            ]
+          ],
+          "bounds": {
+            "width": 2,
+            "height": 1
+          },
+          "footprint": 2
+        },
+        "fountain": {
+          "ruleHand": "refined",
+          "shapeID": "refined_dot",
+          "cells": [
+            [
+              0,
+              0
+            ]
+          ],
+          "bounds": {
+            "width": 1,
+            "height": 1
+          },
+          "footprint": 1
+        }
+      }
+    },
+    {
+      "kind": "source",
+      "id": "rain",
+      "glyph": {
+        "version": "writing-glyph-v1",
+        "salt": 0,
+        "width": 7,
+        "height": 7,
+        "bitmap": "0001000000101000011100001100010100011010000001011"
+      },
+      "hands": {
+        "charcoal": {
+          "ruleHand": "crude",
+          "shapeID": "crude_ess",
+          "cells": [
+            [
+              1,
+              0
+            ],
+            [
+              2,
+              0
+            ],
+            [
+              0,
+              1
+            ],
+            [
+              1,
+              1
+            ]
+          ],
+          "bounds": {
+            "width": 3,
+            "height": 2
+          },
+          "footprint": 4
+        },
+        "brush": {
+          "ruleHand": "plain",
+          "shapeID": "plain_bar",
+          "cells": [
+            [
+              0,
+              0
+            ],
+            [
+              1,
+              0
+            ],
+            [
+              2,
+              0
+            ]
+          ],
+          "bounds": {
+            "width": 3,
+            "height": 1
+          },
+          "footprint": 3
+        },
+        "fountain": {
+          "ruleHand": "refined",
+          "shapeID": "refined_dot",
+          "cells": [
+            [
+              0,
+              0
+            ]
+          ],
+          "bounds": {
+            "width": 1,
+            "height": 1
+          },
+          "footprint": 1
+        }
+      }
+    },
+    {
+      "kind": "source",
+      "id": "river",
+      "glyph": {
+        "version": "writing-glyph-v1",
+        "salt": 0,
+        "width": 7,
+        "height": 7,
+        "bitmap": "0001000001100000011000111000000110001110100101000"
+      },
+      "hands": {
+        "charcoal": {
+          "ruleHand": "crude",
+          "shapeID": "crude_block",
+          "cells": [
+            [
+              0,
+              0
+            ],
+            [
+              1,
+              0
+            ],
+            [
+              0,
+              1
+            ],
+            [
+              1,
+              1
+            ]
+          ],
+          "bounds": {
+            "width": 2,
+            "height": 2
+          },
+          "footprint": 4
+        },
+        "brush": {
+          "ruleHand": "plain",
+          "shapeID": "plain_bar",
+          "cells": [
+            [
+              0,
+              0
+            ],
+            [
+              1,
+              0
+            ],
+            [
+              2,
+              0
+            ]
+          ],
+          "bounds": {
+            "width": 3,
+            "height": 1
+          },
+          "footprint": 3
+        },
+        "fountain": {
+          "ruleHand": "refined",
+          "shapeID": "refined_dot",
+          "cells": [
+            [
+              0,
+              0
+            ]
+          ],
+          "bounds": {
+            "width": 1,
+            "height": 1
+          },
+          "footprint": 1
+        }
+      }
+    },
+    {
+      "kind": "source",
+      "id": "root",
+      "glyph": {
+        "version": "writing-glyph-v1",
+        "salt": 0,
+        "width": 7,
+        "height": 7,
+        "bitmap": "0001000001111000011001101000000110000011000111000"
+      },
+      "hands": {
+        "charcoal": {
+          "ruleHand": "crude",
+          "shapeID": "crude_smear",
+          "cells": [
+            [
+              0,
+              0
+            ],
+            [
+              1,
+              0
+            ],
+            [
+              2,
+              0
+            ],
+            [
+              0,
+              1
+            ],
+            [
+              1,
+              1
+            ],
+            [
+              2,
+              1
+            ]
+          ],
+          "bounds": {
+            "width": 3,
+            "height": 2
+          },
+          "footprint": 6
+        },
+        "brush": {
+          "ruleHand": "plain",
+          "shapeID": "plain_column",
+          "cells": [
+            [
+              0,
+              0
+            ],
+            [
+              0,
+              1
+            ],
+            [
+              0,
+              2
+            ]
+          ],
+          "bounds": {
+            "width": 1,
+            "height": 3
+          },
+          "footprint": 3
+        },
+        "fountain": {
+          "ruleHand": "refined",
+          "shapeID": "refined_dot",
+          "cells": [
+            [
+              0,
+              0
+            ]
+          ],
+          "bounds": {
+            "width": 1,
+            "height": 1
+          },
+          "footprint": 1
+        }
+      }
+    },
+    {
+      "kind": "source",
+      "id": "rot",
+      "glyph": {
+        "version": "writing-glyph-v1",
+        "salt": 0,
+        "width": 7,
+        "height": 7,
+        "bitmap": "0001000000110000110000011000001100000011101101110"
+      },
+      "hands": {
+        "charcoal": {
+          "ruleHand": "crude",
+          "shapeID": "crude_ess",
+          "cells": [
+            [
+              1,
+              0
+            ],
+            [
+              2,
+              0
+            ],
+            [
+              0,
+              1
+            ],
+            [
+              1,
+              1
+            ]
+          ],
+          "bounds": {
+            "width": 3,
+            "height": 2
+          },
+          "footprint": 4
+        },
+        "brush": {
+          "ruleHand": "plain",
+          "shapeID": "plain_stack",
+          "cells": [
+            [
+              0,
+              0
+            ],
+            [
+              0,
+              1
+            ]
+          ],
+          "bounds": {
+            "width": 1,
+            "height": 2
+          },
+          "footprint": 2
+        },
+        "fountain": {
+          "ruleHand": "refined",
+          "shapeID": "refined_dot",
+          "cells": [
+            [
+              0,
+              0
+            ]
+          ],
+          "bounds": {
+            "width": 1,
+            "height": 1
+          },
+          "footprint": 1
+        }
+      }
+    },
+    {
+      "kind": "source",
+      "id": "ruin",
+      "glyph": {
+        "version": "writing-glyph-v1",
+        "salt": 0,
+        "width": 7,
+        "height": 7,
+        "bitmap": "0001000110100000110000111010000110000010100101000"
+      },
+      "hands": {
+        "charcoal": {
+          "ruleHand": "crude",
+          "shapeID": "crude_ell",
+          "cells": [
+            [
+              0,
+              0
+            ],
+            [
+              0,
+              1
+            ],
+            [
+              0,
+              2
+            ],
+            [
+              1,
+              2
+            ]
+          ],
+          "bounds": {
+            "width": 2,
+            "height": 3
+          },
+          "footprint": 4
+        },
+        "brush": {
+          "ruleHand": "plain",
+          "shapeID": "plain_corner",
+          "cells": [
+            [
+              0,
+              0
+            ],
+            [
+              1,
+              0
+            ],
+            [
+              0,
+              1
+            ]
+          ],
+          "bounds": {
+            "width": 2,
+            "height": 2
+          },
+          "footprint": 3
+        },
+        "fountain": {
+          "ruleHand": "refined",
+          "shapeID": "refined_dot",
+          "cells": [
+            [
+              0,
+              0
+            ]
+          ],
+          "bounds": {
+            "width": 1,
+            "height": 1
+          },
+          "footprint": 1
+        }
+      }
+    },
+    {
+      "kind": "source",
+      "id": "salt",
+      "glyph": {
+        "version": "writing-glyph-v1",
+        "salt": 0,
+        "width": 7,
+        "height": 7,
+        "bitmap": "0001000000101000011000111010011100001110000001100"
+      },
+      "hands": {
+        "charcoal": {
+          "ruleHand": "crude",
+          "shapeID": "crude_tee",
+          "cells": [
+            [
+              0,
+              0
+            ],
+            [
+              1,
+              0
+            ],
+            [
+              2,
+              0
+            ],
+            [
+              1,
+              1
+            ]
+          ],
+          "bounds": {
+            "width": 3,
+            "height": 2
+          },
+          "footprint": 4
+        },
+        "brush": {
+          "ruleHand": "plain",
+          "shapeID": "plain_stack",
+          "cells": [
+            [
+              0,
+              0
+            ],
+            [
+              0,
+              1
+            ]
+          ],
+          "bounds": {
+            "width": 1,
+            "height": 2
+          },
+          "footprint": 2
+        },
+        "fountain": {
+          "ruleHand": "refined",
+          "shapeID": "refined_dot",
+          "cells": [
+            [
+              0,
+              0
+            ]
+          ],
+          "bounds": {
+            "width": 1,
+            "height": 1
+          },
+          "footprint": 1
+        }
+      }
+    },
+    {
+      "kind": "source",
+      "id": "sand",
+      "glyph": {
+        "version": "writing-glyph-v1",
+        "salt": 0,
+        "width": 7,
+        "height": 7,
+        "bitmap": "0001000000111000011100001000000111001011100111000"
+      },
+      "hands": {
+        "charcoal": {
+          "ruleHand": "crude",
+          "shapeID": "crude_ell",
+          "cells": [
+            [
+              0,
+              0
+            ],
+            [
+              0,
+              1
+            ],
+            [
+              0,
+              2
+            ],
+            [
+              1,
+              2
+            ]
+          ],
+          "bounds": {
+            "width": 2,
+            "height": 3
+          },
+          "footprint": 4
+        },
+        "brush": {
+          "ruleHand": "plain",
+          "shapeID": "plain_bar",
+          "cells": [
+            [
+              0,
+              0
+            ],
+            [
+              1,
+              0
+            ],
+            [
+              2,
+              0
+            ]
+          ],
+          "bounds": {
+            "width": 3,
+            "height": 1
+          },
+          "footprint": 3
+        },
+        "fountain": {
+          "ruleHand": "refined",
+          "shapeID": "refined_dot",
+          "cells": [
+            [
+              0,
+              0
+            ]
+          ],
+          "bounds": {
+            "width": 1,
+            "height": 1
+          },
+          "footprint": 1
+        }
+      }
+    },
+    {
+      "kind": "source",
+      "id": "scarp",
+      "glyph": {
+        "version": "writing-glyph-v1",
+        "salt": 0,
+        "width": 7,
+        "height": 7,
+        "bitmap": "0111100000101000010100011000010100000010110101000"
+      },
+      "hands": {
+        "charcoal": {
+          "ruleHand": "crude",
+          "shapeID": "crude_ess",
+          "cells": [
+            [
+              1,
+              0
+            ],
+            [
+              2,
+              0
+            ],
+            [
+              0,
+              1
+            ],
+            [
+              1,
+              1
+            ]
+          ],
+          "bounds": {
+            "width": 3,
+            "height": 2
+          },
+          "footprint": 4
+        },
+        "brush": {
+          "ruleHand": "plain",
+          "shapeID": "plain_corner",
+          "cells": [
+            [
+              0,
+              0
+            ],
+            [
+              1,
+              0
+            ],
+            [
+              0,
+              1
+            ]
+          ],
+          "bounds": {
+            "width": 2,
+            "height": 2
+          },
+          "footprint": 3
+        },
+        "fountain": {
+          "ruleHand": "refined",
+          "shapeID": "refined_dot",
+          "cells": [
+            [
+              0,
+              0
+            ]
+          ],
+          "bounds": {
+            "width": 1,
+            "height": 1
+          },
+          "footprint": 1
+        }
+      }
+    },
+    {
+      "kind": "source",
+      "id": "sea",
+      "glyph": {
+        "version": "writing-glyph-v1",
+        "salt": 0,
+        "width": 7,
+        "height": 7,
+        "bitmap": "0001000110100000011100011110000100000011100001010"
+      },
+      "hands": {
+        "charcoal": {
+          "ruleHand": "crude",
+          "shapeID": "crude_sprawl",
+          "cells": [
+            [
+              0,
+              0
+            ],
+            [
+              1,
+              0
+            ],
+            [
+              1,
+              1
+            ],
+            [
+              2,
+              1
+            ],
+            [
+              2,
+              2
+            ]
+          ],
+          "bounds": {
+            "width": 3,
+            "height": 3
+          },
+          "footprint": 5
+        },
+        "brush": {
+          "ruleHand": "plain",
+          "shapeID": "plain_bar",
+          "cells": [
+            [
+              0,
+              0
+            ],
+            [
+              1,
+              0
+            ],
+            [
+              2,
+              0
+            ]
+          ],
+          "bounds": {
+            "width": 3,
+            "height": 1
+          },
+          "footprint": 3
+        },
+        "fountain": {
+          "ruleHand": "refined",
+          "shapeID": "refined_dot",
+          "cells": [
+            [
+              0,
+              0
+            ]
+          ],
+          "bounds": {
+            "width": 1,
+            "height": 1
+          },
+          "footprint": 1
+        }
+      }
+    },
+    {
+      "kind": "source",
+      "id": "silk",
+      "glyph": {
+        "version": "writing-glyph-v1",
+        "salt": 0,
+        "width": 7,
+        "height": 7,
+        "bitmap": "0001000001100000011000001000011110000011000111000"
+      },
+      "hands": {
+        "charcoal": {
+          "ruleHand": "crude",
+          "shapeID": "crude_block",
+          "cells": [
+            [
+              0,
+              0
+            ],
+            [
+              1,
+              0
+            ],
+            [
+              0,
+              1
+            ],
+            [
+              1,
+              1
+            ]
+          ],
+          "bounds": {
+            "width": 2,
+            "height": 2
+          },
+          "footprint": 4
+        },
+        "brush": {
+          "ruleHand": "plain",
+          "shapeID": "plain_stack",
+          "cells": [
+            [
+              0,
+              0
+            ],
+            [
+              0,
+              1
+            ]
+          ],
+          "bounds": {
+            "width": 1,
+            "height": 2
+          },
+          "footprint": 2
+        },
+        "fountain": {
+          "ruleHand": "refined",
+          "shapeID": "refined_dot",
+          "cells": [
+            [
+              0,
+              0
+            ]
+          ],
+          "bounds": {
+            "width": 1,
+            "height": 1
+          },
+          "footprint": 1
+        }
+      }
+    },
+    {
+      "kind": "source",
+      "id": "silt",
+      "glyph": {
+        "version": "writing-glyph-v1",
+        "salt": 0,
+        "width": 7,
+        "height": 7,
+        "bitmap": "0001000110100001110000111010110100000011000101000"
+      },
+      "hands": {
+        "charcoal": {
+          "ruleHand": "crude",
+          "shapeID": "crude_block",
+          "cells": [
+            [
+              0,
+              0
+            ],
+            [
+              1,
+              0
+            ],
+            [
+              0,
+              1
+            ],
+            [
+              1,
+              1
+            ]
+          ],
+          "bounds": {
+            "width": 2,
+            "height": 2
+          },
+          "footprint": 4
+        },
+        "brush": {
+          "ruleHand": "plain",
+          "shapeID": "plain_bar",
+          "cells": [
+            [
+              0,
+              0
+            ],
+            [
+              1,
+              0
+            ],
+            [
+              2,
+              0
+            ]
+          ],
+          "bounds": {
+            "width": 3,
+            "height": 1
+          },
+          "footprint": 3
+        },
+        "fountain": {
+          "ruleHand": "refined",
+          "shapeID": "refined_dot",
+          "cells": [
+            [
+              0,
+              0
+            ]
+          ],
+          "bounds": {
+            "width": 1,
+            "height": 1
+          },
+          "footprint": 1
+        }
+      }
+    },
+    {
+      "kind": "source",
+      "id": "smoke",
+      "glyph": {
+        "version": "writing-glyph-v1",
+        "salt": 0,
+        "width": 7,
+        "height": 7,
+        "bitmap": "0001000000110000011000001000011110000110000001000"
+      },
+      "hands": {
+        "charcoal": {
+          "ruleHand": "crude",
+          "shapeID": "crude_smear",
+          "cells": [
+            [
+              0,
+              0
+            ],
+            [
+              1,
+              0
+            ],
+            [
+              2,
+              0
+            ],
+            [
+              0,
+              1
+            ],
+            [
+              1,
+              1
+            ],
+            [
+              2,
+              1
+            ]
+          ],
+          "bounds": {
+            "width": 3,
+            "height": 2
+          },
+          "footprint": 6
+        },
+        "brush": {
+          "ruleHand": "plain",
+          "shapeID": "plain_pair",
+          "cells": [
+            [
+              0,
+              0
+            ],
+            [
+              1,
+              0
+            ]
+          ],
+          "bounds": {
+            "width": 2,
+            "height": 1
+          },
+          "footprint": 2
+        },
+        "fountain": {
+          "ruleHand": "refined",
+          "shapeID": "refined_dot",
+          "cells": [
+            [
+              0,
+              0
+            ]
+          ],
+          "bounds": {
+            "width": 1,
+            "height": 1
+          },
+          "footprint": 1
+        }
+      }
+    },
+    {
+      "kind": "source",
+      "id": "snow",
+      "glyph": {
+        "version": "writing-glyph-v1",
+        "salt": 0,
+        "width": 7,
+        "height": 7,
+        "bitmap": "0001000110100000011000001111000100000011000001011"
+      },
+      "hands": {
+        "charcoal": {
+          "ruleHand": "crude",
+          "shapeID": "crude_sprawl",
+          "cells": [
+            [
+              0,
+              0
+            ],
+            [
+              1,
+              0
+            ],
+            [
+              1,
+              1
+            ],
+            [
+              2,
+              1
+            ],
+            [
+              2,
+              2
+            ]
+          ],
+          "bounds": {
+            "width": 3,
+            "height": 3
+          },
+          "footprint": 5
+        },
+        "brush": {
+          "ruleHand": "plain",
+          "shapeID": "plain_stack",
+          "cells": [
+            [
+              0,
+              0
+            ],
+            [
+              0,
+              1
+            ]
+          ],
+          "bounds": {
+            "width": 1,
+            "height": 2
+          },
+          "footprint": 2
+        },
+        "fountain": {
+          "ruleHand": "refined",
+          "shapeID": "refined_dot",
+          "cells": [
+            [
+              0,
+              0
+            ]
+          ],
+          "bounds": {
+            "width": 1,
+            "height": 1
+          },
+          "footprint": 1
+        }
+      }
+    },
+    {
+      "kind": "source",
+      "id": "stars",
+      "glyph": {
+        "version": "writing-glyph-v1",
+        "salt": 0,
+        "width": 7,
+        "height": 7,
+        "bitmap": "0001000000111011010000001000000110000010000001110"
+      },
+      "hands": {
+        "charcoal": {
+          "ruleHand": "crude",
+          "shapeID": "crude_ell",
+          "cells": [
+            [
+              0,
+              0
+            ],
+            [
+              0,
+              1
+            ],
+            [
+              0,
+              2
+            ],
+            [
+              1,
+              2
+            ]
+          ],
+          "bounds": {
+            "width": 2,
+            "height": 3
+          },
+          "footprint": 4
+        },
+        "brush": {
+          "ruleHand": "plain",
+          "shapeID": "plain_column",
+          "cells": [
+            [
+              0,
+              0
+            ],
+            [
+              0,
+              1
+            ],
+            [
+              0,
+              2
+            ]
+          ],
+          "bounds": {
+            "width": 1,
+            "height": 3
+          },
+          "footprint": 3
+        },
+        "fountain": {
+          "ruleHand": "refined",
+          "shapeID": "refined_dot",
+          "cells": [
+            [
+              0,
+              0
+            ]
+          ],
+          "bounds": {
+            "width": 1,
+            "height": 1
+          },
+          "footprint": 1
+        }
+      }
+    },
+    {
+      "kind": "source",
+      "id": "stillness",
+      "glyph": {
+        "version": "writing-glyph-v1",
+        "salt": 0,
+        "width": 7,
+        "height": 7,
+        "bitmap": "0001000001100000011000011110000111000011000001100"
+      },
+      "hands": {
+        "charcoal": {
+          "ruleHand": "crude",
+          "shapeID": "crude_tee",
+          "cells": [
+            [
+              0,
+              0
+            ],
+            [
+              1,
+              0
+            ],
+            [
+              2,
+              0
+            ],
+            [
+              1,
+              1
+            ]
+          ],
+          "bounds": {
+            "width": 3,
+            "height": 2
+          },
+          "footprint": 4
+        },
+        "brush": {
+          "ruleHand": "plain",
+          "shapeID": "plain_bar",
+          "cells": [
+            [
+              0,
+              0
+            ],
+            [
+              1,
+              0
+            ],
+            [
+              2,
+              0
+            ]
+          ],
+          "bounds": {
+            "width": 3,
+            "height": 1
+          },
+          "footprint": 3
+        },
+        "fountain": {
+          "ruleHand": "refined",
+          "shapeID": "refined_dot",
+          "cells": [
+            [
+              0,
+              0
+            ]
+          ],
+          "bounds": {
+            "width": 1,
+            "height": 1
+          },
+          "footprint": 1
+        }
+      }
+    },
+    {
+      "kind": "source",
+      "id": "sulfur",
+      "glyph": {
+        "version": "writing-glyph-v1",
+        "salt": 0,
+        "width": 7,
+        "height": 7,
+        "bitmap": "0001000011100000010000001110001100001010000101000"
+      },
+      "hands": {
+        "charcoal": {
+          "ruleHand": "crude",
+          "shapeID": "crude_cross",
+          "cells": [
+            [
+              1,
+              0
+            ],
+            [
+              0,
+              1
+            ],
+            [
+              1,
+              1
+            ],
+            [
+              2,
+              1
+            ],
+            [
+              1,
+              2
+            ]
+          ],
+          "bounds": {
+            "width": 3,
+            "height": 3
+          },
+          "footprint": 5
+        },
+        "brush": {
+          "ruleHand": "plain",
+          "shapeID": "plain_stack",
+          "cells": [
+            [
+              0,
+              0
+            ],
+            [
+              0,
+              1
+            ]
+          ],
+          "bounds": {
+            "width": 1,
+            "height": 2
+          },
+          "footprint": 2
+        },
+        "fountain": {
+          "ruleHand": "refined",
+          "shapeID": "refined_dot",
+          "cells": [
+            [
+              0,
+              0
+            ]
+          ],
+          "bounds": {
+            "width": 1,
+            "height": 1
+          },
+          "footprint": 1
+        }
+      }
+    },
+    {
+      "kind": "source",
+      "id": "sun",
+      "glyph": {
+        "version": "writing-glyph-v1",
+        "salt": 0,
+        "width": 7,
+        "height": 7,
+        "bitmap": "0001000001110000010001101000000110000011000111000"
+      },
+      "hands": {
+        "charcoal": {
+          "ruleHand": "crude",
+          "shapeID": "crude_sprawl",
+          "cells": [
+            [
+              0,
+              0
+            ],
+            [
+              1,
+              0
+            ],
+            [
+              1,
+              1
+            ],
+            [
+              2,
+              1
+            ],
+            [
+              2,
+              2
+            ]
+          ],
+          "bounds": {
+            "width": 3,
+            "height": 3
+          },
+          "footprint": 5
+        },
+        "brush": {
+          "ruleHand": "plain",
+          "shapeID": "plain_pair",
+          "cells": [
+            [
+              0,
+              0
+            ],
+            [
+              1,
+              0
+            ]
+          ],
+          "bounds": {
+            "width": 2,
+            "height": 1
+          },
+          "footprint": 2
+        },
+        "fountain": {
+          "ruleHand": "refined",
+          "shapeID": "refined_dot",
+          "cells": [
+            [
+              0,
+              0
+            ]
+          ],
+          "bounds": {
+            "width": 1,
+            "height": 1
+          },
+          "footprint": 1
+        }
+      }
+    },
+    {
+      "kind": "source",
+      "id": "swarm",
+      "glyph": {
+        "version": "writing-glyph-v1",
+        "salt": 0,
+        "width": 7,
+        "height": 7,
+        "bitmap": "0011110001100011010000001000000110000011000011000"
+      },
+      "hands": {
+        "charcoal": {
+          "ruleHand": "crude",
+          "shapeID": "crude_tee",
+          "cells": [
+            [
+              0,
+              0
+            ],
+            [
+              1,
+              0
+            ],
+            [
+              2,
+              0
+            ],
+            [
+              1,
+              1
+            ]
+          ],
+          "bounds": {
+            "width": 3,
+            "height": 2
+          },
+          "footprint": 4
+        },
+        "brush": {
+          "ruleHand": "plain",
+          "shapeID": "plain_corner",
+          "cells": [
+            [
+              0,
+              0
+            ],
+            [
+              1,
+              0
+            ],
+            [
+              0,
+              1
+            ]
+          ],
+          "bounds": {
+            "width": 2,
+            "height": 2
+          },
+          "footprint": 3
+        },
+        "fountain": {
+          "ruleHand": "refined",
+          "shapeID": "refined_dot",
+          "cells": [
+            [
+              0,
+              0
+            ]
+          ],
+          "bounds": {
+            "width": 1,
+            "height": 1
+          },
+          "footprint": 1
+        }
+      }
+    },
+    {
+      "kind": "source",
+      "id": "thin_air",
+      "glyph": {
+        "version": "writing-glyph-v1",
+        "salt": 0,
+        "width": 7,
+        "height": 7,
+        "bitmap": "0001000000100001110100001110001100000011100011000"
+      },
+      "hands": {
+        "charcoal": {
+          "ruleHand": "crude",
+          "shapeID": "crude_ess",
+          "cells": [
+            [
+              1,
+              0
+            ],
+            [
+              2,
+              0
+            ],
+            [
+              0,
+              1
+            ],
+            [
+              1,
+              1
+            ]
+          ],
+          "bounds": {
+            "width": 3,
+            "height": 2
+          },
+          "footprint": 4
+        },
+        "brush": {
+          "ruleHand": "plain",
+          "shapeID": "plain_pair",
+          "cells": [
+            [
+              0,
+              0
+            ],
+            [
+              1,
+              0
+            ]
+          ],
+          "bounds": {
+            "width": 2,
+            "height": 1
+          },
+          "footprint": 2
+        },
+        "fountain": {
+          "ruleHand": "refined",
+          "shapeID": "refined_dot",
+          "cells": [
+            [
+              0,
+              0
+            ]
+          ],
+          "bounds": {
+            "width": 1,
+            "height": 1
+          },
+          "footprint": 1
+        }
+      }
+    },
+    {
+      "kind": "source",
+      "id": "thorn",
+      "glyph": {
+        "version": "writing-glyph-v1",
+        "salt": 0,
+        "width": 7,
+        "height": 7,
+        "bitmap": "0001000000110000011000011000000110000011000101000"
+      },
+      "hands": {
+        "charcoal": {
+          "ruleHand": "crude",
+          "shapeID": "crude_tee",
+          "cells": [
+            [
+              0,
+              0
+            ],
+            [
+              1,
+              0
+            ],
+            [
+              2,
+              0
+            ],
+            [
+              1,
+              1
+            ]
+          ],
+          "bounds": {
+            "width": 3,
+            "height": 2
+          },
+          "footprint": 4
+        },
+        "brush": {
+          "ruleHand": "plain",
+          "shapeID": "plain_column",
+          "cells": [
+            [
+              0,
+              0
+            ],
+            [
+              0,
+              1
+            ],
+            [
+              0,
+              2
+            ]
+          ],
+          "bounds": {
+            "width": 1,
+            "height": 3
+          },
+          "footprint": 3
+        },
+        "fountain": {
+          "ruleHand": "refined",
+          "shapeID": "refined_dot",
+          "cells": [
+            [
+              0,
+              0
+            ]
+          ],
+          "bounds": {
+            "width": 1,
+            "height": 1
+          },
+          "footprint": 1
+        }
+      }
+    },
+    {
+      "kind": "source",
+      "id": "tide",
+      "glyph": {
+        "version": "writing-glyph-v1",
+        "salt": 0,
+        "width": 7,
+        "height": 7,
+        "bitmap": "0001000001100000010110001110010110011010000011000"
+      },
+      "hands": {
+        "charcoal": {
+          "ruleHand": "crude",
+          "shapeID": "crude_cross",
+          "cells": [
+            [
+              1,
+              0
+            ],
+            [
+              0,
+              1
+            ],
+            [
+              1,
+              1
+            ],
+            [
+              2,
+              1
+            ],
+            [
+              1,
+              2
+            ]
+          ],
+          "bounds": {
+            "width": 3,
+            "height": 3
+          },
+          "footprint": 5
+        },
+        "brush": {
+          "ruleHand": "plain",
+          "shapeID": "plain_corner",
+          "cells": [
+            [
+              0,
+              0
+            ],
+            [
+              1,
+              0
+            ],
+            [
+              0,
+              1
+            ]
+          ],
+          "bounds": {
+            "width": 2,
+            "height": 2
+          },
+          "footprint": 3
+        },
+        "fountain": {
+          "ruleHand": "refined",
+          "shapeID": "refined_dot",
+          "cells": [
+            [
+              0,
+              0
+            ]
+          ],
+          "bounds": {
+            "width": 1,
+            "height": 1
+          },
+          "footprint": 1
+        }
+      }
+    },
+    {
+      "kind": "source",
+      "id": "void",
+      "glyph": {
+        "version": "writing-glyph-v1",
+        "salt": 0,
+        "width": 7,
+        "height": 7,
+        "bitmap": "0111110110100000010100011000000110000011000111000"
+      },
+      "hands": {
+        "charcoal": {
+          "ruleHand": "crude",
+          "shapeID": "crude_sprawl",
+          "cells": [
+            [
+              0,
+              0
+            ],
+            [
+              1,
+              0
+            ],
+            [
+              1,
+              1
+            ],
+            [
+              2,
+              1
+            ],
+            [
+              2,
+              2
+            ]
+          ],
+          "bounds": {
+            "width": 3,
+            "height": 3
+          },
+          "footprint": 5
+        },
+        "brush": {
+          "ruleHand": "plain",
+          "shapeID": "plain_corner",
+          "cells": [
+            [
+              0,
+              0
+            ],
+            [
+              1,
+              0
+            ],
+            [
+              0,
+              1
+            ]
+          ],
+          "bounds": {
+            "width": 2,
+            "height": 2
+          },
+          "footprint": 3
+        },
+        "fountain": {
+          "ruleHand": "refined",
+          "shapeID": "refined_dot",
+          "cells": [
+            [
+              0,
+              0
+            ]
+          ],
+          "bounds": {
+            "width": 1,
+            "height": 1
+          },
+          "footprint": 1
+        }
+      }
+    },
+    {
+      "kind": "source",
+      "id": "volcano",
+      "glyph": {
+        "version": "writing-glyph-v1",
+        "salt": 0,
+        "width": 7,
+        "height": 7,
+        "bitmap": "0111010000100000011100101000000111000010100001100"
+      },
+      "hands": {
+        "charcoal": {
+          "ruleHand": "crude",
+          "shapeID": "crude_sprawl",
+          "cells": [
+            [
+              0,
+              0
+            ],
+            [
+              1,
+              0
+            ],
+            [
+              1,
+              1
+            ],
+            [
+              2,
+              1
+            ],
+            [
+              2,
+              2
+            ]
+          ],
+          "bounds": {
+            "width": 3,
+            "height": 3
+          },
+          "footprint": 5
+        },
+        "brush": {
+          "ruleHand": "plain",
+          "shapeID": "plain_pair",
+          "cells": [
+            [
+              0,
+              0
+            ],
+            [
+              1,
+              0
+            ]
+          ],
+          "bounds": {
+            "width": 2,
+            "height": 1
+          },
+          "footprint": 2
+        },
+        "fountain": {
+          "ruleHand": "refined",
+          "shapeID": "refined_dot",
+          "cells": [
+            [
+              0,
+              0
+            ]
+          ],
+          "bounds": {
+            "width": 1,
+            "height": 1
+          },
+          "footprint": 1
+        }
+      }
+    },
+    {
+      "kind": "source",
+      "id": "wildfire",
+      "glyph": {
+        "version": "writing-glyph-v1",
+        "salt": 0,
+        "width": 7,
+        "height": 7,
+        "bitmap": "0001000000100011010001101000010100000011000011100"
+      },
+      "hands": {
+        "charcoal": {
+          "ruleHand": "crude",
+          "shapeID": "crude_ell",
+          "cells": [
+            [
+              0,
+              0
+            ],
+            [
+              0,
+              1
+            ],
+            [
+              0,
+              2
+            ],
+            [
+              1,
+              2
+            ]
+          ],
+          "bounds": {
+            "width": 2,
+            "height": 3
+          },
+          "footprint": 4
+        },
+        "brush": {
+          "ruleHand": "plain",
+          "shapeID": "plain_pair",
+          "cells": [
+            [
+              0,
+              0
+            ],
+            [
+              1,
+              0
+            ]
+          ],
+          "bounds": {
+            "width": 2,
+            "height": 1
+          },
+          "footprint": 2
+        },
+        "fountain": {
+          "ruleHand": "refined",
+          "shapeID": "refined_dot",
+          "cells": [
+            [
+              0,
+              0
+            ]
+          ],
+          "bounds": {
+            "width": 1,
+            "height": 1
+          },
+          "footprint": 1
+        }
+      }
+    },
+    {
+      "kind": "source",
+      "id": "wind",
+      "glyph": {
+        "version": "writing-glyph-v1",
+        "salt": 0,
+        "width": 7,
+        "height": 7,
+        "bitmap": "0001000000100001110000001011000101100011000011000"
+      },
+      "hands": {
+        "charcoal": {
+          "ruleHand": "crude",
+          "shapeID": "crude_smear",
+          "cells": [
+            [
+              0,
+              0
+            ],
+            [
+              1,
+              0
+            ],
+            [
+              2,
+              0
+            ],
+            [
+              0,
+              1
+            ],
+            [
+              1,
+              1
+            ],
+            [
+              2,
+              1
+            ]
+          ],
+          "bounds": {
+            "width": 3,
+            "height": 2
+          },
+          "footprint": 6
+        },
+        "brush": {
+          "ruleHand": "plain",
+          "shapeID": "plain_stack",
+          "cells": [
+            [
+              0,
+              0
+            ],
+            [
+              0,
+              1
+            ]
+          ],
+          "bounds": {
+            "width": 1,
+            "height": 2
+          },
+          "footprint": 2
+        },
+        "fountain": {
+          "ruleHand": "refined",
+          "shapeID": "refined_dot",
+          "cells": [
+            [
+              0,
+              0
+            ]
+          ],
+          "bounds": {
+            "width": 1,
+            "height": 1
+          },
+          "footprint": 1
+        }
+      }
+    },
+    {
+      "kind": "target",
+      "id": "atmosphere",
+      "glyph": {
+        "version": "writing-glyph-v1",
+        "salt": 0,
+        "width": 7,
+        "height": 7,
+        "bitmap": "0001000001100000110000011000001100000110000111100"
+      },
+      "hands": {
+        "charcoal": {
+          "ruleHand": "crude",
+          "shapeID": "refined_dot",
+          "cells": [
+            [
+              0,
+              0
+            ]
+          ],
+          "bounds": {
+            "width": 1,
+            "height": 1
+          },
+          "footprint": 1
+        },
+        "brush": {
+          "ruleHand": "plain",
+          "shapeID": "refined_dot",
+          "cells": [
+            [
+              0,
+              0
+            ]
+          ],
+          "bounds": {
+            "width": 1,
+            "height": 1
+          },
+          "footprint": 1
+        },
+        "fountain": {
+          "ruleHand": "refined",
+          "shapeID": "refined_dot",
+          "cells": [
+            [
+              0,
+              0
+            ]
+          ],
+          "bounds": {
+            "width": 1,
+            "height": 1
+          },
+          "footprint": 1
+        }
+      }
+    },
+    {
+      "kind": "target",
+      "id": "cycle",
+      "glyph": {
+        "version": "writing-glyph-v1",
+        "salt": 0,
+        "width": 7,
+        "height": 7,
+        "bitmap": "0001000110100001110000011000000100001111100011000"
+      },
+      "hands": {
+        "charcoal": {
+          "ruleHand": "crude",
+          "shapeID": "refined_dot",
+          "cells": [
+            [
+              0,
+              0
+            ]
+          ],
+          "bounds": {
+            "width": 1,
+            "height": 1
+          },
+          "footprint": 1
+        },
+        "brush": {
+          "ruleHand": "plain",
+          "shapeID": "refined_dot",
+          "cells": [
+            [
+              0,
+              0
+            ]
+          ],
+          "bounds": {
+            "width": 1,
+            "height": 1
+          },
+          "footprint": 1
+        },
+        "fountain": {
+          "ruleHand": "refined",
+          "shapeID": "refined_dot",
+          "cells": [
+            [
+              0,
+              0
+            ]
+          ],
+          "bounds": {
+            "width": 1,
+            "height": 1
+          },
+          "footprint": 1
+        }
+      }
+    },
+    {
+      "kind": "target",
+      "id": "hydrology",
+      "glyph": {
+        "version": "writing-glyph-v1",
+        "salt": 0,
+        "width": 7,
+        "height": 7,
+        "bitmap": "0001000000110000011000111000011100000111100001000"
+      },
+      "hands": {
+        "charcoal": {
+          "ruleHand": "crude",
+          "shapeID": "refined_dot",
+          "cells": [
+            [
+              0,
+              0
+            ]
+          ],
+          "bounds": {
+            "width": 1,
+            "height": 1
+          },
+          "footprint": 1
+        },
+        "brush": {
+          "ruleHand": "plain",
+          "shapeID": "refined_dot",
+          "cells": [
+            [
+              0,
+              0
+            ]
+          ],
+          "bounds": {
+            "width": 1,
+            "height": 1
+          },
+          "footprint": 1
+        },
+        "fountain": {
+          "ruleHand": "refined",
+          "shapeID": "refined_dot",
+          "cells": [
+            [
+              0,
+              0
+            ]
+          ],
+          "bounds": {
+            "width": 1,
+            "height": 1
+          },
+          "footprint": 1
+        }
+      }
+    },
+    {
+      "kind": "target",
+      "id": "illumination",
+      "glyph": {
+        "version": "writing-glyph-v1",
+        "salt": 0,
+        "width": 7,
+        "height": 7,
+        "bitmap": "0001000001100000011101101000000100000011000011000"
+      },
+      "hands": {
+        "charcoal": {
+          "ruleHand": "crude",
+          "shapeID": "refined_dot",
+          "cells": [
+            [
+              0,
+              0
+            ]
+          ],
+          "bounds": {
+            "width": 1,
+            "height": 1
+          },
+          "footprint": 1
+        },
+        "brush": {
+          "ruleHand": "plain",
+          "shapeID": "refined_dot",
+          "cells": [
+            [
+              0,
+              0
+            ]
+          ],
+          "bounds": {
+            "width": 1,
+            "height": 1
+          },
+          "footprint": 1
+        },
+        "fountain": {
+          "ruleHand": "refined",
+          "shapeID": "refined_dot",
+          "cells": [
+            [
+              0,
+              0
+            ]
+          ],
+          "bounds": {
+            "width": 1,
+            "height": 1
+          },
+          "footprint": 1
+        }
+      }
+    },
+    {
+      "kind": "target",
+      "id": "relief",
+      "glyph": {
+        "version": "writing-glyph-v1",
+        "salt": 0,
+        "width": 7,
+        "height": 7,
+        "bitmap": "0001000001100001010000001110110100000110000001110"
+      },
+      "hands": {
+        "charcoal": {
+          "ruleHand": "crude",
+          "shapeID": "refined_dot",
+          "cells": [
+            [
+              0,
+              0
+            ]
+          ],
+          "bounds": {
+            "width": 1,
+            "height": 1
+          },
+          "footprint": 1
+        },
+        "brush": {
+          "ruleHand": "plain",
+          "shapeID": "refined_dot",
+          "cells": [
+            [
+              0,
+              0
+            ]
+          ],
+          "bounds": {
+            "width": 1,
+            "height": 1
+          },
+          "footprint": 1
+        },
+        "fountain": {
+          "ruleHand": "refined",
+          "shapeID": "refined_dot",
+          "cells": [
+            [
+              0,
+              0
+            ]
+          ],
+          "bounds": {
+            "width": 1,
+            "height": 1
+          },
+          "footprint": 1
+        }
+      }
+    },
+    {
+      "kind": "target",
+      "id": "substrate",
+      "glyph": {
+        "version": "writing-glyph-v1",
+        "salt": 0,
+        "width": 7,
+        "height": 7,
+        "bitmap": "0001000011100000011000001011000101101110001101000"
+      },
+      "hands": {
+        "charcoal": {
+          "ruleHand": "crude",
+          "shapeID": "refined_dot",
+          "cells": [
+            [
+              0,
+              0
+            ]
+          ],
+          "bounds": {
+            "width": 1,
+            "height": 1
+          },
+          "footprint": 1
+        },
+        "brush": {
+          "ruleHand": "plain",
+          "shapeID": "refined_dot",
+          "cells": [
+            [
+              0,
+              0
+            ]
+          ],
+          "bounds": {
+            "width": 1,
+            "height": 1
+          },
+          "footprint": 1
+        },
+        "fountain": {
+          "ruleHand": "refined",
+          "shapeID": "refined_dot",
+          "cells": [
+            [
+              0,
+              0
+            ]
+          ],
+          "bounds": {
+            "width": 1,
+            "height": 1
+          },
+          "footprint": 1
+        }
+      }
+    },
+    {
+      "kind": "target",
+      "id": "thermal",
+      "glyph": {
+        "version": "writing-glyph-v1",
+        "salt": 0,
+        "width": 7,
+        "height": 7,
+        "bitmap": "0001000011111001110000001100000101000110000111000"
+      },
+      "hands": {
+        "charcoal": {
+          "ruleHand": "crude",
+          "shapeID": "refined_dot",
+          "cells": [
+            [
+              0,
+              0
+            ]
+          ],
+          "bounds": {
+            "width": 1,
+            "height": 1
+          },
+          "footprint": 1
+        },
+        "brush": {
+          "ruleHand": "plain",
+          "shapeID": "refined_dot",
+          "cells": [
+            [
+              0,
+              0
+            ]
+          ],
+          "bounds": {
+            "width": 1,
+            "height": 1
+          },
+          "footprint": 1
+        },
+        "fountain": {
+          "ruleHand": "refined",
+          "shapeID": "refined_dot",
+          "cells": [
+            [
+              0,
+              0
+            ]
+          ],
+          "bounds": {
+            "width": 1,
+            "height": 1
+          },
+          "footprint": 1
+        }
+      }
+    },
+    {
+      "kind": "target",
+      "id": "vitality",
+      "glyph": {
+        "version": "writing-glyph-v1",
+        "salt": 0,
+        "width": 7,
+        "height": 7,
+        "bitmap": "0001010000101000010110001100001100001110000001100"
+      },
+      "hands": {
+        "charcoal": {
+          "ruleHand": "crude",
+          "shapeID": "refined_dot",
+          "cells": [
+            [
+              0,
+              0
+            ]
+          ],
+          "bounds": {
+            "width": 1,
+            "height": 1
+          },
+          "footprint": 1
+        },
+        "brush": {
+          "ruleHand": "plain",
+          "shapeID": "refined_dot",
+          "cells": [
+            [
+              0,
+              0
+            ]
+          ],
+          "bounds": {
+            "width": 1,
+            "height": 1
+          },
+          "footprint": 1
+        },
+        "fountain": {
+          "ruleHand": "refined",
+          "shapeID": "refined_dot",
+          "cells": [
+            [
+              0,
+              0
+            ]
+          ],
+          "bounds": {
+            "width": 1,
+            "height": 1
+          },
+          "footprint": 1
+        }
+      }
+    }
+  ]
+}
