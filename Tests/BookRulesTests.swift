@@ -614,6 +614,29 @@ final class BookRulesTests: XCTestCase {
         let rendered = try XCTUnwrap(pending.renderedSceneReceipt)
         XCTAssertTrue(rendered.validates())
         XCTAssertFalse(rendered.commands.contains { $0.scope == .entryMark })
+
+        XCTAssertTrue(store.enterPendingWorld(arrivalReceiptID: pending.id),
+                      "the exact prepared World Splash must enter without another mutation")
+        XCTAssertNil(store.state.worlds.pendingWorldArrivalReceiptID)
+
+        let entry = run.map.entry
+        let destination = try XCTUnwrap(
+            run.map.neighbours(of: entry).first { run.map[$0].isPassable },
+            "a successfully prepared world must have a legal first move")
+        store.step(to: destination)
+        XCTAssertEqual(store.state.worlds.activeRun?.playerPosition, destination)
+
+        store.step(to: entry)
+        XCTAssertEqual(store.state.worlds.activeRun?.playerPosition, entry)
+        XCTAssertTrue(store.canPortalHere)
+        store.portalHome()
+        XCTAssertNil(store.state.worlds.activeRun)
+        let exit = try XCTUnwrap(store.state.worlds.lastExit)
+        XCTAssertEqual(exit.kind.title, "Returned through a portal")
+        XCTAssertEqual(exit.departureCopy,
+                       "The world was still holding together when you left.")
+        XCTAssertEqual(RunExitPermanentGainsPresentation(summary: exit).cells.map(\.heading),
+                       ["Joined the village", "XP earned"])
     }
 
     /// A half-written page is state like any other: it survives a kill.

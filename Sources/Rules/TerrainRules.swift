@@ -152,6 +152,7 @@ enum TerrainRules {
         paintChasms(&map, coverage: holes, rng: &rng)
         guard paintWater(&map, water: water, freezing: freezing, rng: &rng).succeeded
         else { return false }
+        relaxCardinalElevation(&map)
         paintMud(&map, freezing: freezing)
         paintGrowth(&map, life: life, flora: flora, rng: &rng)
         paintSurfaceDeposits(&map, sigils: resolvedSigils, visualSeed: visualSeed)
@@ -159,6 +160,22 @@ enum TerrainRules {
     }
 
     private static let substrateTieOrder: [GroundType] = [.stone, .soil, .sand, .rubble, .ash]
+
+    /// Chasm and hydrology overlays may lower a tile after the authored relief pass. Reconcile only
+    /// those resulting cliffs so the final persisted map retains the cardinal elevation contract.
+    private static func relaxCardinalElevation(_ map: inout WorldMap) {
+        var changed = true
+        while changed {
+            changed = false
+            for point in stablePoints(map.allPoints) {
+                let allowed = (map.neighbours(of: point).map { map[$0].elevation }.min() ?? 0) + 1
+                if map[point].elevation > allowed {
+                    map[point].elevation = max(0, allowed)
+                    changed = true
+                }
+            }
+        }
+    }
 
     struct SubstrateDiagnostics: Equatable {
         let quotas: [GroundType: Int]
@@ -252,9 +269,11 @@ enum TerrainRules {
             let regionCounts = Dictionary(uniqueKeysWithValues: quotas.compactMap { material, quota, _ in
                 quota > 0 ? (material, min(max(1, desiredRegions - reduction), max(1, quota / 8))) : nil
             })
-            // Thirty derived substreams total across region-count reductions keeps generation
-            // bounded on the largest live map while still giving each authored topology retries.
-            let attemptsForReduction = max(1, 30 / desiredRegions)
+            // Equal five-material live maps have named reproducible traps once topology reduces to
+            // one region per material. Give only that least-constrained final topology the accepted
+            // bounded retry budget; multi-region shapes retain the smaller shared budget.
+            let attemptsForReduction = reduction == desiredRegions - 1
+                ? 32 : max(1, 30 / desiredRegions)
             for attempt in 0..<attemptsForReduction {
                 var attemptRNG = SeededRNG(seed: attemptRoot)
                     .derived(UInt64(reduction * attemptsForReduction + attempt + 1))
@@ -301,7 +320,19 @@ enum TerrainRules {
         for index in regions.indices { owner[regions[index].points.first!] = index }
         while owner.count < map.tiles.count {
             var advanced = false
-            for index in regions.indices where regions[index].points.count < regions[index].quota {
+            let unfinished = regions.indices.filter {
+                regions[$0].points.count < regions[$0].quota
+            }.sorted { lhs, rhs in
+                let lhsFrontier = Set(regions[lhs].points.flatMap { map.neighbours(of: $0) })
+                    .count { owner[$0] == nil }
+                let rhsFrontier = Set(regions[rhs].points.flatMap { map.neighbours(of: $0) })
+                    .count { owner[$0] == nil }
+                if lhsFrontier != rhsFrontier { return lhsFrontier < rhsFrontier }
+                let lhsRemaining = regions[lhs].quota - regions[lhs].points.count
+                let rhsRemaining = regions[rhs].quota - regions[rhs].points.count
+                return lhsRemaining == rhsRemaining ? lhs < rhs : lhsRemaining > rhsRemaining
+            }
+            for index in unfinished where regions[index].points.count < regions[index].quota {
                 let frontier = Set(regions[index].points.flatMap { map.neighbours(of: $0) })
                     .filter { owner[$0] == nil }
                 let scored = stablePoints(frontier).map { point -> (GridPoint, Int) in
@@ -367,6 +398,19 @@ enum TerrainRules {
                 }
             }
             componentSizes.append(size)
+        }
+        for componentIndex in componentSizes.indices {
+            let componentPoints = componentByPoint.compactMap {
+                $0.value == componentIndex ? $0.key : nil
+            }
+            let adjacentRegions = Set(componentPoints.flatMap { map.neighbours(of: $0) }
+                .compactMap { owner[$0] }
+                .filter { regions[$0].points.count < regions[$0].quota })
+            guard !adjacentRegions.isEmpty else { return false }
+            if adjacentRegions.count == 1, let region = adjacentRegions.first {
+                let remaining = regions[region].quota - regions[region].points.count
+                if componentSizes[componentIndex] > remaining { return false }
+            }
         }
         for index in regions.indices where regions[index].points.count < regions[index].quota {
             let adjacentComponents = Set(regions[index].points.flatMap { map.neighbours(of: $0) }

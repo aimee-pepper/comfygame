@@ -424,7 +424,7 @@ final class TerrainTests: XCTestCase {
         }, 12)
 
         let impossible = TerrainRules.hydrologyStageWithDiagnosticsForTesting(
-            width: 1, height: 1, elevations: [1],
+            width: 2, height: 1, elevations: [1, 1],
             water: .init(target: "hydrology", peak: 100, demand: 100, floor: 100,
                          opposedMagnitude: 0, aspects: ["dispersion": 0],
                          forms: ["flowing": 1], tags: []),
@@ -482,6 +482,39 @@ final class TerrainTests: XCTestCase {
             }
             for enemy in world.enemies {
                 XCTAssertTrue(reached.contains(enemy.position), "enemy stranded, seed \(seed)")
+            }
+        }
+    }
+
+    func testWaterHeavyAndBrokenWorldsAlwaysLeaveTheEntryPortalAPlayableRoute() {
+        let pages: [[SymbolID]] = [
+            ["archipelago"],
+            ["archipelago", "caverns"],
+            ["archipelago", "glacier", "caverns"],
+        ]
+        for symbols in pages {
+            for seed in [UInt64(1), 2, 7, 12, 19, 31] {
+                let world = Worldgen.generate(book: book(symbols), seed: seed)
+                XCTAssertTrue(world.diagnostics.terrainGenerationSucceeded,
+                              "terrain failed for \(symbols), seed \(seed)")
+                let entry = world.start
+                XCTAssertTrue(world.map[entry].content.isPortal)
+                let legalSteps = world.map.neighbours(of: entry).filter { world.map[$0].isPassable }
+                XCTAssertFalse(legalSteps.isEmpty,
+                               "entry had no legal step for \(symbols), seed \(seed)")
+                let reached = TerrainRules.reachable(from: entry, in: world.map)
+                XCTAssertGreaterThan(reached.count, 1,
+                                     "entry had no route into the world for \(symbols), seed \(seed)")
+                let passable = world.map.allPoints.count { world.map[$0].isPassable }
+                XCTAssertEqual(Double(reached.count) / Double(passable),
+                               world.diagnostics.reachableTerrainFraction, accuracy: 0.000_000_1)
+                XCTAssertGreaterThanOrEqual(world.diagnostics.reachableTerrainFraction,
+                                            Tuning.Terrain.reachableGroundFraction)
+                for point in world.map.allPoints where world.map[point].content != .empty {
+                    XCTAssertTrue(reached.contains(point), "content stranded at \(point)")
+                }
+                for site in world.sites { XCTAssertTrue(reached.contains(site.position)) }
+                for enemy in world.enemies { XCTAssertTrue(reached.contains(enemy.position)) }
             }
         }
     }
