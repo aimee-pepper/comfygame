@@ -72,7 +72,7 @@ assert(data.routes.filter(route => route.startsWith("lexeme/")).length === 108, 
 assert(data.search.filter(item => item.type === "rune").length === 108, "World Writing must retain exactly 108 lexeme search routes");
 assert(data.search.filter(item => item.type === "rune").every(item => item.route.startsWith("lexeme/") && ["target", "source", "qualifier", "compound"].includes(item.category)), "rune search must open exact typed lexeme routes");
 assert(data.roadmap.every(item => item.summary && item.gate && data.routes.includes(`roadmap/${item.slug}`)), "every roadmap receipt needs explanation, gate and detail route");
-assert(data.roadmap.filter(item => item.isPrimary).length === 1 && data.roadmap.find(item => item.isPrimary)?.id === "writing-causal-presentation", "Writing physical-phone acceptance must remain the sole current primary");
+assert(data.roadmap.filter(item => item.isPrimary).length === 1 && data.roadmap.find(item => item.isPrimary)?.id === "world-arrival-reveal", "World Arrival must be the sole current implementation primary");
 for (const station of data.stations) {
   assert(station.id && station.provenance.stableID === station.id, `station provenance missing: ${station.id}`);
   assert(station.provenance.sourcePaths.length >= 3, `station authority sources missing: ${station.id}`);
@@ -134,14 +134,14 @@ assert(!data.assetGallery.slots.some(slot => slot.key.startsWith("binder_house."
 assert(data.assetGallery.slots.filter(slot => slot.status === "Game Design accepted candidate / native integration not yet accepted").length === 14, "only the five Built candidates, eight checkpoint-3 states and Binder House root may be candidate-accepted");
 assert(data.assetGallery.slots.every(slot => slot.assetPath === null), "no unaccepted art path may enter a stable slot");
 assert(data.currentTruth.writing.status === "readyToTest", "Writing must remain source-integrated and pending ordinary-phone acceptance");
-assert(data.currentTruth.writing.isPrimary === true, "Writing physical-phone acceptance must remain primary");
+assert(data.currentTruth.writing.isPrimary === false, "Writing phone acceptance must not block the active World Arrival implementation");
 assert(data.currentTruth.writing.acceptanceGate.includes("Install every verified phone-ready update promptly in place") && data.currentTruth.writing.acceptanceGate.includes("do not auto-launch"), "Writing must retain the corrected default phone-install/no-auto-launch authority");
 assert(data.currentTruth.writing.e5ToE7Status === "not started", "Writing E5-E7 must not be silently promoted");
 assert(data.currentTruth.writing.parchment.nativeSourceIntegrated === true, "accepted Writing parchment must remain hash-pinned in native source and bundle");
 assert(data.currentTruth.writing.parchment.artifactIntegrationReady === false, "the standalone parchment candidate manifest must retain its own non-integration-ready receipt");
 assert(data.currentTruth.writing.markArtStatus.includes("temporary") && data.currentTruth.writing.markArtStatus.includes("not accepted"), "temporary Writing mark art must not be presented as final sigil design");
 assert(data.currentTruth.terrain.borderCorrection.status === "complete", "the closed Terrain border correction must remain complete");
-assert(data.currentTruth.terrain.layeredPresentation.status === "inProgress" && data.currentTruth.terrain.layeredPresentation.nativeStatus.includes("shared-line native integration is absent") && data.currentTruth.terrain.layeredPresentation.nativeStatus.includes("isolated Engineering integration is active"), "accepted layered Terrain pack must retain its active-isolated/non-native boundary");
+assert(data.currentTruth.terrain.layeredPresentation.status === "readyToTest" && data.currentTruth.terrain.layeredPresentation.nativeStatus.includes("installed from 366f5ccf") && data.currentTruth.terrain.layeredPresentation.nativeStatus.includes("integrationReady:false") && data.currentTruth.terrain.layeredPresentation.nativeStatus.includes("fail-safe"), "layered Terrain must report installed native truth, pending visual acceptance and retained fallback");
 assert(data.currentTruth.terrain.atmosphere.status === "queued" && data.currentTruth.terrain.atmosphere.nativeStatus.includes("native integration is queued"), "accepted Atmosphere candidate must not be claimed native");
 assert(data.currentTruth.writing.provenance.sourcePaths.every(path => data.currentTruth.writing.provenance.sourceHashes[path]), "Writing current-truth provenance must hash every registered source");
 assert(data.currentTruth.terrain.provenance.sourcePaths.every(path => data.currentTruth.terrain.provenance.sourceHashes[path]), "Terrain current-truth provenance must hash every registered source");

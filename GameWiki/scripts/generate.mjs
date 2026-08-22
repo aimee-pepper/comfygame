@@ -557,7 +557,7 @@ if (!contents["Sources/Screens/WritingDeskView.swift"].includes("WritingDeskNati
 const currentTruth = {
   writing: {
     status: writingRoadmap.status,
-    statusLabel: "source-integrated / ordinary-phone acceptance pending",
+    statusLabel: "source-integrated / ordinary-phone acceptance pending / nonblocking",
     isPrimary: writingRoadmap.isPrimary,
     roadmapID: writingRoadmap.id,
     summary: writingRoadmap.summary,
@@ -584,7 +584,7 @@ const currentTruth = {
     layeredPresentation: {
       status: terrainLayeringRoadmap.status,
       summary: terrainLayeringRoadmap.summary,
-      nativeStatus: "accepted frozen TerrainProductionPack v1; manifest remains integrationReady:false, shared-line native integration is absent, and protected isolated Engineering integration is active"
+      nativeStatus: "source-integrated and installed from 366f5ccf; accepted terrain and authored-wall manifests remain integrationReady:false until ordinary-phone visual acceptance; procedural terrain/wall remains pack-failure and legacy-save fail-safe"
     },
     atmosphere: {
       status: atmosphereRoadmap.status,

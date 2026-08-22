@@ -1,11 +1,11 @@
 {
   "schemaVersion": 1,
-  "aggregateSourceHash": "38e7cbfda48bf743d040f0f026a5f0111be95839a36bfd6164d5c9e3f22b7c2b",
+  "aggregateSourceHash": "fd36a59f5b357db6046608759fa9ca936e6cdfeb3c91578f3ec57b47d2ebef32",
   "inputs": {
     "AssetLab/artifacts/writing-parchment-v1/manifest.json": "9ef9c41f8d4f4b12e5bbb725e9f1ea5e52a77a3175de758016bb58cd170c499f",
-    "Bookbinder.xcodeproj/project.pbxproj": "057fa4ebcd51a41b7e1acf33506154bd4d368a727689df7a8eaf3dc1d85460c4",
+    "Bookbinder.xcodeproj/project.pbxproj": "01e245dbbc741635a28629f69986c570f71c347b3a9eeef527fe1b021c8c9b7c",
     "Sources/Content/Data/items.json": "b94b1107229f217e14f1d7fa936d8eea938f9782c06c583be32302f10d432bc9",
-    "Sources/Content/Data/playability-roadmap.json": "f3f76a9edb2980c711ec662921587c6fc4550107fe02aebf3ea4386ec3882138",
+    "Sources/Content/Data/playability-roadmap.json": "884fcb425af6fe2beeeccfb7e086f13adcf73f3f44cfb5f8b21a1955270802a3",
     "Sources/Content/Data/pressure_sources.json": "68f7b2271d51613030f2f3b3e573f750af53c9b68fe00d68a599dcd6fc0a9b86",
     "Sources/Content/Data/pressure_targets.json": "b35cf88512a7e1e2efde12f352a35e1d499376a8a9990daa41a8f285c65e6a42",
     "Sources/Content/Data/qualifiers.json": "35c0f4b00f35fdb8d1d1845ca27988b73283acc623ec3b39c95cb1b921bec120",
@@ -179,7 +179,7 @@
     "docs/full-cast-voice-authority-current.md": "619c9f993853e8d990ef89b85fdf9c39c9dc759a90dd9c74bb865521d2cd8501",
     "docs/gambit-stat-thresholds-current.md": "6549465eed132bc9b7c7dca35df9ce457e9772f583d3290a7c6d26849a0889db",
     "docs/game-design-ux-assessment-current.md": "59dbcf7f6c262f068e02f83f995d85fc6e1f436e393fa7a0bbf04fed3baa16d5",
-    "docs/game-wiki-content-contract-current.md": "ab7d2ddfd814b577e0247f5065f09e63798e3ecee67687a385e8642fd27a9978",
+    "docs/game-wiki-content-contract-current.md": "f4db9100601a6c8c50c16babbdd952e3107bb7cd30929e491195d82d6fc5f5fc",
     "docs/gear-and-weapon-category-brief-current.md": "530e1c0d6f24d3c4b3de411beeabf8aa396b8b8b58e7b17156765133171468dc",
     "docs/gear-catalogue-disposition-current.md": "cc7c7e0918a955fcee8e3699303bb52654fb5caddd9bc63a6b811f34bf9237ca",
     "docs/gear-crafting-families-current.md": "8a80c3a6f1d97c5bb61a15be857b71b3c0dbc2d0f0081b65411809784ddaebe5",
@@ -244,7 +244,7 @@
     "docs/survey-needle-current.md": "ff08c6a7c51f7aaa7d40982e2af545d3c74630ce72fa968e8531983b67101d75",
     "docs/tannery-system-current.md": "a6544afbb2d77c2369b37922b443cd7d2244ce43bc358d632eeab7b30844499c",
     "docs/tavern-random-companions-current.md": "e7b86a31548089a4a122fba51a1fb1f246d14d84de948300a1873b38ae9648c2",
-    "docs/terrain-layering-and-motion-asset-packet-current.md": "4581f90da35f21f00ccc4e4ade556bec733605ff9e444f08a6ce40ae2b9dfd22",
+    "docs/terrain-layering-and-motion-asset-packet-current.md": "f59e9480a489d67d6935473bddde32bbe4ee41d25318ee637abe1ca93906f4b0",
     "docs/top-down-map-asset-integration-current.md": "60fbd5232a171bdbe2e7f9f162764c5efd71ac820bde4a71caa4d74a298c962a",
     "docs/trading-post-recycler-current.md": "28c216a665a3e2231f18293c630fd38a5646dd41ebaa29043ceb0c4f97196ee2",
     "docs/trading-post-recycler-economy-current.md": "297d7917d1f2f7c5ee9b8cdd0280a390761d8aa204e138fcb4328941db7e954e",
@@ -299,7 +299,7 @@
     "docs/writing-tool-progression-current.md": "be17fe07aa89aaaab7117a2faca43d7e1eb1be23202d19106c67c42547b23bb0"
   },
   "outputs": {
-    "generated/wiki-data.json": "5ba2156f9ec25e076c2c09def34cb8e3ed4367b05178ac22da6574f08a71a429",
-    "generated/source-registry.json": "a19f69ee898648e81256940314e7b185de9a5249e2a5182e7c33c51401e20765"
+    "generated/wiki-data.json": "7592f6d81b5055c4b8bbbdf9efcac1b12328a11df22ffbd1dd117f1f7f100281",
+    "generated/source-registry.json": "81000428087321c5cf3a433f7ba346eedc254d3a7484cb44ad845d33da15a83b"
   }
 }

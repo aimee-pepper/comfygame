@@ -144,28 +144,37 @@ final class DebugRoadmapTests: XCTestCase {
         XCTAssertTrue(item.gate.contains("miniature Tavern"))
     }
 
-    func testCurrentBoardHasExactlyOneAcceptancePrimaryAfterWritingRepair() throws {
+    func testCurrentBoardPromotesArrivalAfterInstalledWritingAndTerrainCheckpoints() throws {
         let board = DebugRoadmap.current
         let primaries = Dictionary(grouping: board.items.filter(\.isPrimary), by: \.workstream)
         XCTAssertTrue(primaries.values.allSatisfy { $0.count <= 1 },
                       "each workstream may disclose at most one primary")
-        XCTAssertEqual(board.items.filter(\.isPrimary).map(\.id), ["writing-causal-presentation"])
-        XCTAssertNil(primaries[.engineering],
-                     "source-complete Writing repair must release the Engineering primary")
-        let acceptance = try XCTUnwrap(primaries[.acceptance])
-        XCTAssertEqual(acceptance.count, 1)
-        let writing = try XCTUnwrap(acceptance.first)
+        XCTAssertEqual(board.items.filter(\.isPrimary).map(\.id), ["world-arrival-reveal"])
+        let engineering = try XCTUnwrap(primaries[.engineering])
+        XCTAssertEqual(engineering.count, 1)
+        let arrival = try XCTUnwrap(engineering.first)
+        XCTAssertEqual(arrival.status, .inProgress)
+        XCTAssertTrue(arrival.gate.contains("without waiting for Writing or Terrain phone acceptance"))
+        XCTAssertTrue(arrival.gate.contains("without requesting new Asset invention"))
+
+        let writing = try XCTUnwrap(board.items.first { $0.id == "writing-causal-presentation" })
         XCTAssertEqual(writing.status, .readyToTest)
+        XCTAssertFalse(writing.isPrimary)
         XCTAssertTrue(writing.detail.contains("source-complete through shared revision f7c4fa45"))
         XCTAssertTrue(writing.gate.contains("exact signed physical-phone build"))
 
         let terrain = try XCTUnwrap(board.items.first { $0.id == "terrain-layering-animation" })
-        XCTAssertEqual(terrain.status, .inProgress)
+        XCTAssertEqual(terrain.status, .readyToTest)
         XCTAssertFalse(terrain.isPrimary)
-        XCTAssertTrue(terrain.detail.contains("84e6db50"))
+        XCTAssertTrue(terrain.detail.contains("366f5ccf"))
         XCTAssertTrue(terrain.detail.contains("integrationReady:false"))
-        XCTAssertTrue(terrain.detail.contains("not native"))
-        XCTAssertTrue(terrain.gate.contains("static Ice in the initial integration"))
+        XCTAssertTrue(terrain.detail.contains("installed in place"))
+        XCTAssertTrue(terrain.gate.contains("Ice remains static"))
+        XCTAssertTrue(terrain.gate.contains("contact shade never substitutes for the wall"))
+
+        let wiki = try XCTUnwrap(board.items.first { $0.id == "game-wiki" })
+        XCTAssertEqual(wiki.status, .complete)
+        XCTAssertTrue(wiki.detail.contains("all 108 canonical writing lexemes"))
     }
 
     func testEncounterScalingRecordsAcceptedPhoneEvidenceAndRemainingMatrix() throws {

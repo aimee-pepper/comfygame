@@ -1,9 +1,9 @@
 # Terrain layering and motion — Asset production packet
 
-**Status:** complete v0.2 visual pack and TerrainProductionPack v1 accepted; native integration active; final wall/cliff asset addition required
+**Status:** complete visual and runtime packs accepted; native source integrated and installed; physical-phone visual acceptance pending
 **Priority:** B1.7b; explicit Aimee-authorized Asset exception to the generic system-first hold
 **Owners:** Game Design owns terrain meaning, disclosure and motion limits; Asset owns the isolated logical
-pixel kit and compositor proof; Engineering later owns the native receipt adapter, cache and shared clock
+pixel kit and compositor proof; Engineering owns the native receipt adapter, cache and shared clock
 **Updated:** 22 August 2026
 
 ## Current disposition — 22 August 2026
@@ -60,7 +60,7 @@ That complete v0.2 top-surface system is now visually accepted at canonical body
 `90da0b9ed6092b591bcad83fbda68b0563de9c2ba37127911772c41418657a54`. It covers all twelve grounds
 plus independent Snow and settled-Ash surface deposits. The complete visual pack is preserved at accepted
 Asset commit `5bac76a9`; TerrainProductionPack v1 is accepted and preserved at Asset commit `84e6db50`, but
-its manifest remains `integrationReady:false` and it is not native or integrated on the current shared line.
+its manifest remains `integrationReady:false` as Asset provenance.
 
 Those acceptances cover the new top surfaces, contours, deposits and motion. They do **not** prove a
 functional replacement for the existing native south-facing wall/cliff presentation. The current
@@ -68,6 +68,25 @@ functional replacement for the existing native south-facing wall/cliff presentat
 terrain-consistent wall/cliff family covers genuinely exposed levels 1, 2 and 3 and proves equal-or-better
 readability and function on the 368×800 physical phone. Asset must add that bounded family without
 regenerating or restyling the accepted top-surface system.
+
+That bounded authored wall family is now accepted at Asset source commit
+`ae12dd5f9b4603c0e1f3fa39d762d38dda5641fb`, canonical body
+`cd6309daa96792abb036821d761927ca19f396a7ccea48da81f54fddb6a82f20` and manifest SHA
+`ee635278fe03b04304b46e47673596723df58827819e79580c40cc697d5fd9bb`. It supplies pressure-role wall
+pixels for legal elevated grounds at exact depths 1/2/3 with span, left-cap, right-cap and isolated routes.
+
+Engineering integrated both runtime packs at exact revision
+`366f5ccf2a172a2fed8d9a820f52364b2604a674`. The signed Bookbinder 1.0 build 234 embeds that revision and
+was installed in place on Aimee's phone without uninstall, reset or automatic launch. Native now owns safe
+neighbour facts, WorldGrade2 recoloring, independent Snow/settled-Ash deposits, one shared 4 Hz terrain
+clock, authored disclosed-depth walls and supplemental contact shade. Hidden, equal and out-of-map southern
+relationships emit no wall. The prior procedural terrain/wall path remains only as a pack-failure and
+legacy-save fail-safe, so optional presentation failure cannot erase the functioning height cue.
+
+This is source/build/install completion, not visual acceptance. The Asset manifests remain labelled
+`integrationReady:false` until Aimee verifies the ordinary installed phone presentation is equal-or-better.
+No further terrain Asset generation is authorized by this checkpoint; corrections must be driven by an
+exact installed-phone defect.
 
 ## Player result
 

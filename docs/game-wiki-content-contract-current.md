@@ -25,16 +25,22 @@ routes rather than generic authority fallbacks. Overview, Roadmap and History no
 gameplay/status explanations and retain provenance afterward. Browser acceptance remains part of the final
 integration receipt; this progress statement does not promote any gameplay or roadmap item.
 
-**Current Writing/Terrain reconciliation:** current main now hash-pins and bundles a Writing parchment runtime
-bitmap while its standalone artifact manifest remains a candidate with `integrationReady:false` and
-ordinary-phone acceptance remains the sole current primary; the 4,459-file mark pack remains temporary
-semantic-keyed scaffolding and E5–E7 remain not started. Every verified phone-ready update installs promptly
-in place without uninstall/reset; installation does not authorize auto-launch. Terrain's closed border
-correction is complete. The accepted/frozen `TerrainProductionPack v1` remains `integrationReady:false` and
-absent from shared-line native
-integration while protected isolated Engineering integration is active; the atmosphere candidate remains
-queued and non-native. The wiki must track these source receipts separately: Asset acceptance, committed
-source integration, shared-line native integration and phone acceptance are not synonyms.
+**Current Writing/Terrain/Arrival reconciliation:** current main hash-pins and bundles the production Writing
+parchment while the 4,459-file mark pack remains temporary semantic-keyed scaffolding owned finally by
+Aimee's sigils; Writing ordinary-phone acceptance remains open but no longer blocks Engineering. Dynamic
+Terrain v2 is source-integrated and installed from exact revision `366f5ccf`: the native app consumes the
+accepted twelve-ground and authored south-wall runtime packs, while both Asset manifests retain
+`integrationReady:false` until Aimee accepts the installed visual result. The procedural terrain/wall path
+remains only as a pack-failure/legacy-save fail-safe. World Arrival B1.6a is the next Engineering primary;
+its accepted proof and command corpus require no new Asset invention. Every verified phone-ready update
+installs promptly in place without uninstall/reset; installation does not authorize auto-launch. The wiki
+must keep Asset acceptance, committed source integration, installed native integration and phone acceptance
+as separate receipts.
+
+**Wiki completion receipt:** all twelve required top-level routes, all 108 canonical lexeme details/search
+routes, item/resource/people/station catalogues, Core Loop, Exploration, Combat, Overview, Roadmap and History
+are integrated. The completed Wiki remains generated from registered sources and current authorities; its
+complete status does not promote proposed gameplay or unaccepted visual assets.
 
 ## What “complete” means
 
