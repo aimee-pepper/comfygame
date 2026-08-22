@@ -807,20 +807,20 @@
       "id": "writing-causal-presentation",
       "priority": "B1.5a",
       "title": "Page-first Writing and truthful world projection",
-      "status": "queued",
+      "status": "inProgress",
       "detail": "Correct Write, Pages and The world as one page-owned causal flow using the exact source state, disclosure-safe review model, phone hierarchy and transaction in writing-desk-b1-implementation-packet-current.md. The paper and placed marks dominate; compact trays avoid parameter-list UI; Template loading instantly rebuilds the draft but never binds or waives cost. Canonical simulation truth and player disclosure remain separate so unread World-Page marks cannot leak through projection or accessibility.",
       "gate": "Blank, partial, unread, fully specified, starter and authored-resource fixtures retain one exact source through Write/review/arrival/History; entering Write clears only ephemeral collected selection; prediction fields obey per-field disclosure even when the next seed is internally known; all non-bind actions are zero-spend; stale quote/generator/adapter failures are atomic no-ops; final Bind & Depart consumes the exact collected instance or reuses the frozen draft copy and emits one arrival receipt. Authorities: writing-desk-b1-implementation-packet-current.md, core-loop-causal-presentation-plan-current.md and first-three-worlds-execution-plan-current.md B1–B3.",
       "workstream": "engineering",
-      "isPrimary": false
+      "isPrimary": true
     },
     {
       "id": "world-arrival-reveal",
       "priority": "B1.6a",
       "title": "Generated world image and concrete arrival description",
       "status": "queued",
-      "detail": "Persist one bind-time arrival receipt and render the accepted book-tableau grammar plus exactly two concrete 18–55 word sentences from actual ground/water and causally contributing known authorship or the strongest actual air/light/growth relationship. The closed deterministic grammar distinguishes reshaping from increasing or reducing an existing result and consumes no new RNG. Creature ambience is omitted from v1. Site appearance remains a pinned later visual choice; v1 cannot reveal a hidden site.",
-      "gate": "Open Flats 67, Rainwashed Shore 26 and Stone Hollow 23 plus near/far pairs agree among page, image, description and first map; the live starter-receipt validator and exact two-sentence grammar fixtures pass; matching-by-chance writing earns no causal claim, and strengthening uses increased rather than created copy; relaunch is deterministic; unknown marks and hidden site/resource/traveller/apex identities do not leak; loading remains a separate honest surface. Authorities: world-arrival-causal-reveal-current.md, world-arrival-description-grammar-current.md and world-arrival-asset-packet-current.md.",
-      "workstream": "asset",
+      "detail": "Integrate accepted Asset checkpoint 8ae1e88 and persist one bind-time arrival receipt that drives the frozen v0.3 book tableau plus exactly two concrete 18–55 word sentences from actual ground/water and causally contributing known authorship or the strongest actual air/light/growth relationship. The grammar distinguishes reshaping from increasing/reducing an existing result and consumes no new RNG. Creature ambience is omitted; hidden sites remain absent. Asset manifest 2066ba1009ee22d74af495f75753e8c8075ded8fe297cb5ce38335554fd1e6b4 is frozen and must not be reinterpreted.",
+      "gate": "Native Open Flats 67, Rainwashed Shore 26 and Stone Hollow 23 plus near/far pairs agree among page, image, description and first map at 368×800; the live starter-receipt validator, exact two-sentence grammar and accepted Asset hashes pass; matching-by-chance writing earns no causal claim, strengthening uses increased rather than created copy, and relaunch preserves the frozen receipt/string; unknown marks and hidden site/resource/traveller/apex identities do not leak; loading remains a separate honest surface. Authorities: world-arrival-causal-reveal-current.md, world-arrival-description-grammar-current.md and world-arrival-asset-packet-current.md.",
+      "workstream": "engineering",
       "isPrimary": false
     },
     {

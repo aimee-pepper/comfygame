@@ -1,6 +1,6 @@
 # World arrival image — Asset production packet
 
-**Status:** receipt/compositor scaffold source-complete; v0.1 scene art rejected for one contained visual correction
+**Status:** v0.3 visually and technically accepted as a frozen Asset candidate; native integration remains queued
 **Priority:** B1.6a; parallel Asset proof, not native promotion
 **Owners:** Game Design owns legitimate facts and reveal hierarchy; Asset owns the isolated deterministic
 compositor; Engineering later owns the frozen native adapter/lifecycle
@@ -246,6 +246,53 @@ The flora-only near pair must still change only flora, but that change must be v
 far pair must remain immediately distinct in literal grayscale. Asset must show the individual native and
 400% pixel parts plus the three exact 368×800 starter phones before re-review. No native integration or
 next Asset checkpoint is released.
+
+## v0.2 visual disposition — 21 August 2026
+
+The organic pool banks, broken shelves, rock clusters, succulent crowns, actual bound-page mark footprint
+and distinct Stone Hollow enclosure materially correct the v0.1 placeholder grammar. Open Flats,
+Rainwashed Shore and Stone Hollow now have different landform identities in colour and literal grayscale,
+and the flora-only counterfactual remains both scope-exact and visible. Retain those parts and every existing
+receipt, disclosure, determinism, causal-fact and 55-word gate.
+
+Visual acceptance remains held for exactly two contained corrections:
+
+1. The upper third to half of every 160×100 tableau is still a nearly uniform dark rectangle. It makes the
+   image read as a narrow terrain strip below empty void rather than a generated world shot. Fill that space
+   with receipt-valid, environment-specific distant material, atmosphere or enclosing-rock silhouettes.
+   Preserve the shallow-depth page-tableau fiction and 8-pixel calm edge; do not introduce a literal second
+   navigable camera, hidden entities or concealed content.
+2. The entry rune still reads as a solid square UI plaque. Render the disclosed rune footprint directly into
+   the ground, shelf or path material with no solid square background. Use restrained outline/value contrast
+   so the surrounding material remains visible through the mark's negative space.
+
+No other scene family, rule, UI or future Asset checkpoint is opened by this disposition. Asset stops after
+the corrected exact phone/grayscale evidence. Technical acceptance also waits for Engineering to remove the
+duplicate traveller-meeting promotion and for the ordinary live bridge/full regression to run green; the
+fixture-only bypass is iteration support and never promotable evidence.
+
+## v0.3 visual disposition — 21 August 2026
+
+**Accepted as the frozen-ready visual candidate.** Game Design inspected the exact 368×800 colour and
+literal-grayscale starter matrices for manifest
+`2066ba1009ee22d74af495f75753e8c8075ded8fe297cb5ce38335554fd1e6b4`, frozen in Asset commit
+`8ae1e88`. Open Flats now reads as
+staggered sandy distance and open living ground, Rainwashed Shore as layered broken wet shelves, and Stone
+Hollow as an enclosed rock volume. Their silhouettes remain distinct without labels and preserve relative
+similarity where receipt facts overlap.
+
+Environment-specific distant material now occupies the former empty upper field without adding a literal
+second gameplay camera, entity, POI or hidden fact. The first disclosed rune is rendered as restrained
+material strokes directly in the ground, shelf or path; no solid plaque remains. The page thumbnail retains
+the actual disclosed bound-mark layout, and the accepted v0.2 organic pool, shelf, rock and succulent parts
+remain intact.
+
+Freeze these exact bytes. The post-repair verification used an isolated clean `7e3ddc0` baseline plus only
+the frozen Asset boundary and permitted bridge seam. The ordinary live bridge, ordinary exporter, focused
+test and full Asset regression all passed without `--use-existing-fixtures`; regenerated fixtures and the
+complete artifact tree were byte-identical to the frozen candidate, and the manifest remained unchanged.
+This accepts the Asset candidate, checkpointed exactly as Asset commit `8ae1e88`. No native packaging, PBX
+edit or golden promotion begins here; native integration remains a later Engineering checkpoint.
 
 ## Explicit supersessions
 

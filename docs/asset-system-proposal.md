@@ -5305,3 +5305,42 @@ parts with irregular material contours, readable water depth/banks, world-specif
 phone-legible flora. Exact correction requirements live in
 `world-arrival-asset-packet-current.md`. No commit, promotion, native integration or next Asset milestone is
 authorized until the corrected three starter tableaux pass visual review without labels.
+
+#### Dynamic World Arrival v0.2 disposition
+
+**Landform correction accepted; final scene presentation still held.** The revised organic pool banks,
+broken shelf silhouettes, rock clusters, succulent crowns and enclosed Stone Hollow identity now distinguish
+the three starters in colour and literal grayscale. The bound-page thumbnail also uses the actual disclosed
+mark footprint, and the flora-only counterfactual remains visually meaningful without leaking another scope.
+
+Two exact visual failures remain. A large nearly uniform dark upper field still makes each 160×100 tableau
+look like a thin strip of terrain under empty void rather than a generated world image. That space must gain
+receipt-valid environment-specific distant material, atmosphere or enclosing-rock silhouettes while
+preserving the shallow-depth page-tableau fiction and calm frame edge. The entry rune also remains a solid
+square plaque; its disclosed footprint must instead be drawn directly into the local terrain material with
+no opaque UI-tile background.
+
+This is one contained v0.2 correction, not permission to redesign the compositor or start another Asset
+milestone. Promotion also remains blocked until the ordinary live bridge and full regression pass after the
+unrelated duplicate traveller-meeting integration is corrected; fixture-only export is not acceptance
+evidence.
+
+#### Dynamic World Arrival v0.3 disposition
+
+**Accepted by Game Design as the frozen-ready visual candidate; technical verification is complete.** Game
+Design inspected the exact 368×800 colour and literal-grayscale starter matrices. Open Flats reads as
+staggered sandy distance/open living ground, Rainwashed Shore as layered broken wet shelves, and Stone Hollow
+as an enclosed rock volume. The three remain distinct without labels while retaining relative similarity
+where their receipt facts overlap.
+
+The former empty upper field now contains environment-owned distant material without introducing a second
+gameplay camera, entity, POI or hidden fact. The disclosed entry rune is drawn directly into the terrain as
+restrained 1–2-pixel strokes with material visible through its negative space; the solid plaque is gone. The
+actual disclosed bound-mark layout remains visible on the preserved source-page thumbnail.
+
+Freeze exact manifest `2066ba1009ee22d74af495f75753e8c8075ded8fe297cb5ce38335554fd1e6b4`.
+On an isolated clean `7e3ddc0` baseline with only the frozen Asset boundary and permitted bridge seam
+overlaid, the ordinary live bridge, ordinary exporter, focused test and full Asset regression passed without
+the fixture-only bypass. Regenerated fixtures and the entire artifact tree were byte-identical to the frozen
+candidate, leaving the manifest unchanged. The exact accepted boundary is frozen in Asset commit `8ae1e88`
+for future Engineering integration; no native/PBX/golden work is authorized by this disposition.

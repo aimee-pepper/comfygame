@@ -115,15 +115,17 @@ points produce a visible fork with different tactics, not merely different numbe
 quickly answer: who is threatened, what can reach whom, what changed, and why did this world produce
 this opponent?
 
-### 4. Too much authored breadth is not live content
+### 4. Authored character breadth must stay reachable
 
-The live catalogue has 29 recruitable travellers and 240 page records, but only eight travellers
-currently have live meeting objects. Review drafts and voice authorities exist, yet the player cannot
-meet most of that work. This is a more important content gap than another late station backend.
+The live catalogue now resolves one meeting for all 29 recruitable travellers through the retained
+eight-meeting catalogue baseline plus the 23-entry generated authored corpus, with Noll and Auber as
+intentional replacements. This closes the former missing-live-content gap without making advance Atlas
+approval a release gate.
 
-**Correction:** promote completed coherent meetings in progression bands without waiting for
-preapproval. Aimee reviews them in play. Finish Vance/Noll/Halloway first, then the Band-3 cast, and
-continue in reachability order. Preserve stable IDs and revise exact copy after reports.
+**Current correction:** preserve campaign reachability and review these meetings in play. Encounter order,
+signature eligibility and at-most-one traveller per world—not missing meeting data—now determine when Aimee
+sees the content. Preserve stable IDs and revise exact copy after reports rather than reopening a separate
+promotion project.
 
 ### 5. Voice and clue clarity still threaten player trust
 
