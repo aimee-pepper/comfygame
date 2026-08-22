@@ -132,6 +132,7 @@ final class DebugBugReporterTests: XCTestCase {
         object.removeValue(forKey: "roadmapCheckpoint")
         object.removeValue(forKey: "debugTuningSnapshot")
         object.removeValue(forKey: "encounterScalingEvidence")
+        object.removeValue(forKey: "validCombatBalanceEvidence")
         let decoder = JSONDecoder(); decoder.dateDecodingStrategy = .iso8601
         let decoded = try decoder.decode(DebugBugReport.self,
                                          from: JSONSerialization.data(withJSONObject: object))
@@ -139,6 +140,7 @@ final class DebugBugReporterTests: XCTestCase {
         XCTAssertNil(decoded.legacyRoadmapCheckpointClaim)
         XCTAssertNil(decoded.debugTuningSnapshot)
         XCTAssertNil(decoded.encounterScalingEvidence)
+        XCTAssertNil(decoded.validCombatBalanceEvidence)
     }
 
     func testLegacyRoadmapCheckpointDecodesOnlyAsHistoricalClaim() throws {
@@ -191,11 +193,20 @@ final class DebugBugReporterTests: XCTestCase {
         XCTAssertEqual(evidence.turnSlots, store.activeEncounter?.turnSlots)
         XCTAssertEqual(evidence.currentTurnSlot, store.activeEncounter?.currentTurnSlot)
 
+        store.mutate("freeze invalid balance evidence") {
+            $0.worlds.activeRun?.activeEncounter?.debugGodMode =
+                .init(preventedLethalDamageCount: 1)
+        }
+        let invalidEvidence = try XCTUnwrap(DebugEncounterScalingEvidence.capture(from: store.state))
+        XCTAssertEqual(invalidEvidence.godModeReceipt?.preventedLethalDamageCount, 1)
+
         var report = fixtureReport()
-        report.encounterScalingEvidence = evidence
+        report.encounterScalingEvidence = invalidEvidence
+        report.validCombatBalanceEvidence = false
         let decoded = try JSONDecoder().decode(DebugBugReport.self,
                                                 from: JSONEncoder().encode(report))
-        XCTAssertEqual(decoded.encounterScalingEvidence, evidence)
+        XCTAssertEqual(decoded.encounterScalingEvidence, invalidEvidence)
+        XCTAssertEqual(decoded.validCombatBalanceEvidence, false)
     }
 
     func testReportPreservesReproducibleDebugTuningSnapshot() throws {

@@ -2365,7 +2365,15 @@ enum CombatRules {
         let canSpendUnyielding = target.isParty && before.current > 0
             && before.current - reduced <= 0 && ownsUnyielding
             && encounter.unyieldingSpent?.contains(target) == false
-        let finalHP = canSpendUnyielding ? 1 : max(0, before.current - reduced)
+#if DEBUG
+        let godModePreventsDefeat = target.isParty && before.current > 0
+            && before.current - reduced <= 0 && !canSpendUnyielding
+            && encounter.debugGodMode != nil
+#else
+        let godModePreventsDefeat = false
+#endif
+        let finalHP = (canSpendUnyielding || godModePreventsDefeat)
+            ? 1 : max(0, before.current - reduced)
         switch target {
         case .binder: run.binderHP = finalHP
         case .companion(let index):
@@ -2383,6 +2391,12 @@ enum CombatRules {
             encounter.unyieldingSpent?.insert(target)
             encounter.note("Unyielding leaves \(actorName(target, encounter: encounter).lowercased()) at 1 health.")
         }
+#if DEBUG
+        if godModePreventsDefeat {
+            encounter.debugGodMode?.preventedLethalDamageCount += 1
+            encounter.note("God mode records lethal damage but keeps \(actorName(target, encounter: encounter).lowercased()) at 1 health. Balance evidence is invalid.")
+        }
+#endif
     }
 
     private static func heal(_ ally: Combatant,

@@ -146,6 +146,8 @@ final class EncounterScalingRulesTests: XCTestCase {
 
     func testNewAndMissingPreferencesUseRecommendedButFrozenLegacyDecodeStaysLegacy() throws {
         XCTAssertEqual(DebugTuningProfile.defaults.encounterScalingProfile, .recommended)
+        XCTAssertFalse(DebugTuningProfile.defaults.debugGodModeEnabled,
+                       "God mode must always be opt-in")
         XCTAssertEqual(DebugTuningProfile.defaults.encounterScalingProfileSchemaVersion, 2)
         XCTAssertEqual(DebugTuningProfile.legacyFrozenRunDefaults.encounterScalingProfile, .current)
         XCTAssertEqual(DebugTuningProfile.legacyFrozenRunDefaults.encounterScalingProfileSchemaVersion, 1)
@@ -154,6 +156,7 @@ final class EncounterScalingRulesTests: XCTestCase {
                                                      from: Data("{}".utf8))
         XCTAssertEqual(frozenLegacy.encounterScalingProfile, .current)
         XCTAssertEqual(frozenLegacy.encounterScalingProfileSchemaVersion, 1)
+        XCTAssertFalse(frozenLegacy.debugGodModeEnabled)
 
         let suite = "encounter-scaling-\(UUID().uuidString)"
         let defaults = try XCTUnwrap(UserDefaults(suiteName: suite))

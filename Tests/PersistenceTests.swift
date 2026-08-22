@@ -272,6 +272,7 @@ final class PersistenceTests: XCTestCase {
         )
         encounter.turnIndex = 1
         encounter.roundNumber = 3
+        encounter.debugGodMode = .init(preventedLethalDamageCount: 2)
         run.activeEncounter = encounter
         state.worlds.activeRun = run
 
@@ -281,6 +282,7 @@ final class PersistenceTests: XCTestCase {
         let restored = try XCTUnwrap(reloaded.worlds.activeRun)
         XCTAssertEqual(restored.activeEncounter?.roundNumber, 3)
         XCTAssertEqual(restored.activeEncounter?.foes.first?.currentHP, 9)
+        XCTAssertEqual(restored.activeEncounter?.debugGodMode?.preventedLethalDamageCount, 2)
         XCTAssertEqual(restored.stability, 61.5)
         XCTAssertEqual(restored.book.randomlyFilled, ["biome"])
         XCTAssertEqual(reloaded, state)

@@ -252,6 +252,12 @@ private struct DebugBugReportSheet: View {
                     if let evidence = draft.context.encounterScalingEvidence {
                         LabeledContent("Scaling receipt",
                                        value: "\(evidence.party.count) party · \(evidence.foes.count) foes · round \(evidence.roundNumber)")
+                        if evidence.godModeReceipt != nil {
+                            Label("God mode was frozen into this encounter. Only combat-balance conclusions are invalid; other bug evidence remains usable.",
+                                  systemImage: "exclamationmark.shield.fill")
+                                .font(.caption.bold())
+                                .foregroundStyle(.orange)
+                        }
                     }
                     if let tuning = draft.context.debugTuningSnapshot {
                         LabeledContent("DEBUG tuning") {
@@ -320,6 +326,9 @@ private struct DebugBugReportSheet: View {
         report.campaignReference = draft.context.campaignReference
         report.encounterID = draft.context.encounterID
         report.encounterScalingEvidence = draft.context.encounterScalingEvidence
+        report.validCombatBalanceEvidence = draft.context.encounterScalingEvidence.map {
+            $0.godModeReceipt == nil
+        }
         report.debugTuningSnapshot = draft.context.debugTuningSnapshot
         report.semanticActionTrail = draft.context.semanticActionTrail
         report.bundledRoadmapClaim = DebugRoadmap.current.bundledCheckpointClaim

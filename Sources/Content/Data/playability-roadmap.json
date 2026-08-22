@@ -797,8 +797,8 @@
       "id": "godmode-testing",
       "priority": "B1.3b",
       "title": "DEBUG God mode for noncombat testing",
-      "status": "queued",
-      "detail": "After the ordinary level-1 scaling source checkpoint closes (phone acceptance is not required), add a DEBUG-only encounter-frozen toggle. Enemy decisions, damage, conditions, cooldowns and logs execute normally, but active party HP cannot fall below 1 and defeat is suppressed. It grants no offense, loot, XP, spawn or retreat benefit and marks receipts/bug reports as invalid balance evidence.",
+      "status": "readyToTest",
+      "detail": "Source-complete: the persistent DEBUG toggle freezes only into newly opened encounters. Enemy decisions, damage, conditions, cooldowns and logs remain ordinary; active party lethal damage is recorded but floors at 1 and defeat is suppressed. It grants no offense, loot, XP, spawn or retreat benefit. The encounter banner, persisted receipt and bug-report export mark only combat-balance conclusions invalid while retaining all other bug evidence.",
       "gate": "Default off; relaunch persistence; newly created encounter only; lethal damage remains fully logged at 1 HP; next encounter with toggle off defeats normally; persistent banner and receipt flag; no mid-encounter ambiguity. Authority: first-three-worlds-execution-plan-current.md Gate A2.",
       "workstream": "engineering",
       "isPrimary": false

@@ -29,6 +29,17 @@ struct EncounterView: View {
         VStack(spacing: 0) {
             if let run, let encounter {
                 header(encounter)
+#if DEBUG
+                if encounter.debugGodMode != nil {
+                    Label("GOD MODE · BALANCE EVIDENCE INVALID", systemImage: "exclamationmark.shield.fill")
+                        .font(.caption.bold())
+                        .foregroundStyle(.black)
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 5)
+                        .background(Color.orange)
+                        .accessibilityIdentifier("encounter-god-mode-banner")
+                }
+#endif
                 combatants(run, encounter)
                 // Log sits directly under the fight it describes; the slack goes below it, so the
                 // action bar still lands in the thumb zone without stranding the text mid-screen.

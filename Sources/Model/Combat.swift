@@ -270,6 +270,11 @@ struct FoeState: Codable, Equatable, Identifiable, Sendable {
 /// A fight in progress. Saved in full — being mid-encounter is the hardest resume case in the game,
 /// and the one the acceptance criteria call out by name.
 struct EncounterState: Codable, Equatable, Sendable {
+    struct DebugGodModeReceipt: Codable, Equatable, Sendable {
+        static let schemaVersion = 1
+        var version = schemaVersion
+        var preventedLethalDamageCount = 0
+    }
     enum PersonalExpansionSource: String, Codable, Equatable, Sendable {
         case quicken, blur, legacy
     }
@@ -489,6 +494,9 @@ struct EncounterState: Codable, Equatable, Sendable {
     var partyNames: [Int: String] = [:]
     /// Frozen DEBUG comparison inputs/results. Existing encounters decode without it.
     var scalingPreview: EncounterScalingRules.Preview?
+    /// Non-nil only when DEBUG God mode was enabled as this encounter opened. Persisted so
+    /// relaunch, the banner, and bug evidence all retain the same frozen testing truth.
+    var debugGodMode: DebugGodModeReceipt?
     /// Binder-only DEBUG harness receipt. It is frozen at encounter entry and never inferred from
     /// legacy branch depth. Release encounters and old saves have no receipt.
     var debugV2BinderAttack: DebugV2BinderAttackReceipt?
@@ -715,6 +723,7 @@ struct EncounterState: Codable, Equatable, Sendable {
         self.debugV2Armour = debugV2Armour
         self.debugV2Evasion = debugV2Evasion
         self.debugV2Resistance = debugV2Resistance
+        self.debugGodMode = nil
         self.ghostEvasionAvailable = ghostEvasionAvailable
         self.debugV2OwnedNodeIDs = debugV2OwnedNodeIDs
         self.wardReceipts = debugV2OwnedNodeIDs == nil ? nil : [:]
@@ -746,6 +755,7 @@ struct EncounterState: Codable, Equatable, Sendable {
         foes = try c.decodeIfPresent([FoeState].self, forKey: .foes) ?? []
         partyNames = try c.decodeIfPresent([Int: String].self, forKey: .partyNames) ?? [:]
         scalingPreview = try c.decodeIfPresent(EncounterScalingRules.Preview.self, forKey: .scalingPreview)
+        debugGodMode = try c.decodeIfPresent(DebugGodModeReceipt.self, forKey: .debugGodMode)
         debugV2BinderAttack = try c.decodeIfPresent(DebugV2BinderAttackReceipt.self,
                                                      forKey: .debugV2BinderAttack)
         debugV2Initiative = try c.decodeIfPresent(DebugV2InitiativeReceipt.self,

@@ -13,6 +13,8 @@ final class DebugRoadmapTests: XCTestCase {
                        "roadmap item IDs must remain stable and unique")
         XCTAssertTrue(board.validationErrors().isEmpty)
         XCTAssertEqual(board.items.first { $0.id == "encounter-scaling" }?.status, .readyToTest)
+        XCTAssertEqual(board.items.first { $0.id == "godmode-testing" }?.status, .readyToTest)
+        XCTAssertFalse(board.items.first { $0.id == "godmode-testing" }?.isPrimary == true)
         XCTAssertFalse(board.currentItems.contains { $0.id == "item-character-identities" },
                        "a source-complete Asset checkpoint is not active work")
         XCTAssertEqual(board.campaignBands.first?.id, "band-0")
@@ -111,6 +113,8 @@ final class DebugRoadmapTests: XCTestCase {
         let byID = Dictionary(uniqueKeysWithValues: board.items.map { ($0.id, $0) })
         XCTAssertEqual(try XCTUnwrap(byID["encounter-scaling"]).status, .readyToTest)
         XCTAssertFalse(try XCTUnwrap(byID["encounter-scaling"]).isPrimary)
+        XCTAssertEqual(try XCTUnwrap(byID["godmode-testing"]).status, .readyToTest)
+        XCTAssertFalse(try XCTUnwrap(byID["godmode-testing"]).isPrimary)
         let opening = try XCTUnwrap(byID["combat-tree-opening-choices"])
         XCTAssertEqual(opening.status, .readyToTest)
         XCTAssertFalse(opening.isPrimary)
@@ -140,13 +144,13 @@ final class DebugRoadmapTests: XCTestCase {
         XCTAssertTrue(item.gate.contains("miniature Tavern"))
     }
 
-    func testCurrentBoardHasAtMostOnePrimaryPerWorkstreamAndClosedScalingReleasesEngineering() {
+    func testCurrentBoardHasAtMostOnePrimaryPerWorkstreamAndGodModeReleasesEngineering() {
         let board = DebugRoadmap.current
         let primaries = Dictionary(grouping: board.items.filter(\.isPrimary), by: \.workstream)
         XCTAssertTrue(primaries.values.allSatisfy { $0.count <= 1 },
                       "each workstream may disclose at most one primary")
         XCTAssertNil(primaries[.engineering],
-                     "source-complete scaling must release the Engineering primary")
+                     "source-complete God mode must release the Engineering primary")
         XCTAssertNil(primaries[.acceptance],
                      "phone-feel acceptance must not remain a blocking primary")
     }

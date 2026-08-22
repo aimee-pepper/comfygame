@@ -5090,6 +5090,70 @@ final class CombatTests: XCTestCase {
         XCTAssertEqual(encounter.unyieldingSpent, [.binder])
     }
 
+    func testDebugGodModeFreezesAtEncounterOpenAndOnlyPreventsPartyDefeat() throws {
+        let store = GameStore(io: .temporary(name: "god-mode-\(UUID().uuidString)"))
+        store.write("plains")
+        store.bindAndDepart()
+        store.mutate("open God mode encounter") { state in
+            guard var run = state.worlds.activeRun else { return }
+            let enemy = WorldEnemy(id: .init(rawValue: 908_001), creatureID: "paper_moth",
+                                   position: run.playerPosition, isAwake: true)
+            run.enemies = [enemy]
+            state.worlds.activeRun = run
+            WorldRules.beginEncounter(triggeredBy: enemy, runsAutomaticTurns: false,
+                                      debugGodModeEnabled: true, in: &state)
+            guard var liveRun = state.worlds.activeRun,
+                  var encounter = liveRun.activeEncounter else { return }
+            liveRun.binderHP = 2
+            _ = CombatRules.applyAffliction(.burn, to: .binder,
+                source: .foe(enemy.id), provenance: .direct, damage: 8, ticks: 2,
+                targetIsStanding: true, encounter: &encounter)
+            CombatRules.tickAfflictions(run: &liveRun, encounter: &encounter)
+            if encounter.order.contains(.companion(0)) {
+                liveRun.companionHP[0] = 2
+                _ = CombatRules.applyAffliction(.poison, to: .companion(0),
+                    source: .foe(enemy.id), provenance: .direct, damage: 8, ticks: 1,
+                    targetIsStanding: true, encounter: &encounter)
+                CombatRules.tickAfflictions(run: &liveRun, encounter: &encounter)
+            }
+            liveRun.activeEncounter = encounter
+            state.worlds.activeRun = liveRun
+        }
+
+        XCTAssertEqual(store.activeRun?.binderHP, 1)
+        XCTAssertEqual(store.activeRun?.companionHP[0], 1)
+        XCTAssertNil(store.activeEncounter?.outcome)
+        XCTAssertEqual(store.activeEncounter?.debugGodMode?.preventedLethalDamageCount, 3,
+                       "the Binder's remaining Burn tick and the companion's Poison stay ordinary lethal events")
+        XCTAssertTrue(store.activeEncounter?.log.contains {
+            $0.contains("God mode records lethal damage") && $0.contains("Balance evidence is invalid")
+        } == true)
+        let resumed = try JSONDecoder().decode(GameState.self,
+                                                from: JSONEncoder().encode(store.state))
+        XCTAssertEqual(resumed.worlds.activeRun?.activeEncounter?.debugGodMode,
+                       store.activeEncounter?.debugGodMode)
+    }
+
+    func testDebugGodModeOffLeavesNextEncounterOrdinarilyDefeatable() throws {
+        let store = inFight()
+        store.mutate("stage ordinary lethal damage") { state in
+            guard var run = state.worlds.activeRun, var encounter = run.activeEncounter else { return }
+            encounter.debugGodMode = nil
+            encounter.debugV2OwnedNodeIDs = [.binder: []]
+            encounter.unyieldingSpent = []
+            run.binderHP = 2
+            _ = CombatRules.applyAffliction(.burn, to: .binder,
+                source: .foe(encounter.foes[0].id), provenance: .direct, damage: 8, ticks: 1,
+                targetIsStanding: true, encounter: &encounter)
+            CombatRules.tickAfflictions(run: &run, encounter: &encounter)
+            run.activeEncounter = encounter
+            state.worlds.activeRun = run
+            CombatRules.checkOutcome(in: &state)
+        }
+        XCTAssertEqual(store.activeRun?.binderHP, 0)
+        XCTAssertEqual(store.activeEncounter?.outcome, .defeated)
+    }
+
     func testSurvivalNodesAreExactOwnerAndEnabledEmptyParity() throws {
         var encounter = try XCTUnwrap(inFight().activeEncounter)
         encounter.debugV2OwnedNodeIDs = [.binder: [], .companion(0): []]
@@ -5599,7 +5663,8 @@ final class CombatTests: XCTestCase {
             encounter.debugV2OwnedNodeIDs = [.companion(0): [CombatDerivedStatsRules.Node.interpose]]
             encounter.interposeReceipts = [.init(owner: .companion(0), activationSequence: 7)]
             encounter.nextInterposeActivationSequence = 8
-            encounter.taunts[foeID] = 2
+            encounter.drawOffReceipts = [foeID: .init(owner: .binder, activationRound: 1,
+                                                       expiresBeforeRound: 3)]
             encounter.concealed[.companion(0)] = 2
             encounter.ghostEvasionAvailable = [.companion(0)]
             encounter.order = [.foe(foeID), .binder, .companion(0)]

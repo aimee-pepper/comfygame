@@ -1248,6 +1248,7 @@ enum WorldRules {
     static func beginEncounter(triggeredBy enemy: WorldEnemy,
                                preContact suppliedSnapshot: PreContactSnapshot? = nil,
                                runsAutomaticTurns: Bool = true,
+                               debugGodModeEnabled suppliedDebugGodMode: Bool? = nil,
                                in state: inout GameState) {
         guard var run = state.worlds.activeRun, run.activeEncounter == nil else { return }
         // Just fled? You get a moment before anything else can catch you.
@@ -1525,6 +1526,11 @@ enum WorldRules {
                                                         partyRanks: partyRanks,
                                                         rng: &run.rng)
         run.activeEncounter?.scalingPreview = scalingPreview
+#if DEBUG
+        if suppliedDebugGodMode ?? DebugTuningProfile.active.debugGodModeEnabled {
+            run.activeEncounter?.debugGodMode = .init()
+        }
+#endif
         if var encounter = run.activeEncounter {
             let pending: [InstanceID]
             if resolvedOpening == .creatureAmbush, !watchfulSuppressed {

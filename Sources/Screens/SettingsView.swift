@@ -884,6 +884,19 @@ struct BalancingView: View {
                 }
             }
 
+            Section("Testing safety") {
+                Toggle("God mode for new encounters",
+                       isOn: $settings.debugTuning.debugGodModeEnabled)
+                Text("Default off. The setting freezes when the next encounter opens. Combat decisions, damage, conditions, cooldowns and logs remain ordinary, but lethal party damage stops at 1 health and all balance evidence is marked invalid.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                if store.activeEncounter != nil {
+                    Text("The current encounter is unchanged.")
+                        .font(.caption.weight(.semibold))
+                        .foregroundStyle(.orange)
+                }
+            }
+
             Section("Combat v2 comparison harness") {
                 NavigationLink("Open native true-graph route explorer") {
                     CombatGraphRouteExplorer()

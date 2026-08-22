@@ -39,6 +39,9 @@ struct DebugBugReport: Codable, Equatable, Identifiable, Sendable {
     var outcomeID: UInt64?
     /// Exact saved encounter evidence. Absent outside combat and in reports written before v1.
     var encounterScalingEvidence: DebugEncounterScalingEvidence? = nil
+    /// False means DEBUG survival changed defeat handling. The report remains fully usable for
+    /// crashes, UI, content, world and economy defects; only combat-balance conclusions are barred.
+    var validCombatBalanceEvidence: Bool? = nil
     var transportState: TransportState = .unsent
     var remoteReference: String?
 
@@ -50,7 +53,7 @@ struct DebugBugReport: Codable, Equatable, Identifiable, Sendable {
         case screen, route, campaignReference, encounterID, debugTuningSnapshot
         case saveSchemaVersion, mutationCount, lastAction, semanticActionTrail
         case runIndex, mapSeed, playerX, playerY, stability, outcomeID
-        case encounterScalingEvidence, transportState, remoteReference
+        case encounterScalingEvidence, validCombatBalanceEvidence, transportState, remoteReference
     }
 }
 
@@ -82,6 +85,7 @@ struct DebugEncounterScalingEvidence: Codable, Equatable, Sendable {
     var turnIndex: Int
     var currentTurnSlot: EncounterState.TurnSlot
     var turnSlots: [EncounterState.TurnSlot]
+    var godModeReceipt: EncounterState.DebugGodModeReceipt?
 
     static func capture(from state: GameState) -> Self? {
         guard let run = state.worlds.activeRun,
@@ -130,7 +134,8 @@ struct DebugEncounterScalingEvidence: Codable, Equatable, Sendable {
             roundNumber: encounter.roundNumber,
             turnIndex: encounter.turnIndex,
             currentTurnSlot: encounter.currentTurnSlot,
-            turnSlots: encounter.turnSlots
+            turnSlots: encounter.turnSlots,
+            godModeReceipt: encounter.debugGodMode
         )
     }
 
