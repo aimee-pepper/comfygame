@@ -101,13 +101,15 @@ deepShare = deepWaterTileCount / max(1, wetTileCount)
 
 dry             wetShare == 0
 scatteredPools  0 < wetShare <= 0.08
-wetHollows      wetShare > 0.08 and deepShare < 0.25
+wetHollows      0.08 < wetShare <= 0.35 and deepShare < 0.25
 mixedDepth      0.08 < wetShare <= 0.35 and deepShare >= 0.25
 waterDominant   wetShare > 0.35
 ```
 
 The classifier describes material relationship, not literal routes or every connected component. It never
-names a portal or says which water is traversable.
+names a portal or says which water is traversable. For `scatteredPools`, `{scatteredWater}` is `shallow
+pools` when `deepWaterTileCount == 0`, otherwise `scattered pools of shallow and deep water`; no template may
+call a known deep-water tile shallow.
 
 ### Ground tokens
 
@@ -125,8 +127,10 @@ names a portal or says which water is traversable.
 
 ### Structural template selection
 
-Select at most one **known `reshaped`** structural fact in source-page order, with scope order `ground →
-water`. The current starter structural names have these exact templates:
+Select at most one **known `reshaped`** structural fact that has a registered template below, in source-page
+order with scope order `ground → water`. A different reshaping mark does not inherit the nearest template;
+Sentence 1 uses the actual classifier fallback until Design registers its own structural template. The
+current registered structural names are:
 
 | Known reshaping mark | Template |
 |---|---|
@@ -139,7 +143,7 @@ water`. The current starter structural names have these exact templates:
 | Water band | Plains | Archipelago | Caverns |
 |---|---|---|---|
 | dry | `stretches into the distance.` | `break across the visible ground.` | `narrow paths.` |
-| scatteredPools | `runs between shallow pools.` | `break around scattered shallow pools.` | `narrow paths and shallow pools.` |
+| scatteredPools | `runs between {scatteredWater}.` | `break around {scatteredWater}.` | `narrow paths and {scatteredWater}.` |
 | wetHollows | `runs around wet hollows.` | `break around wet hollows.` | `narrow paths and wet hollows.` |
 | mixedDepth | `runs between shallow and deep water.` | `break a wide run of shallow and deep water.` | `narrow paths and wet hollows.` |
 | waterDominant | `forms a few broad islands.` | `rise as islands from shallow and deep water.` | `forms chambers above shallow and deep water.` |
@@ -149,7 +153,7 @@ If no known reshaping structural mark owns Sentence 1, use the actual classifier
 | Water band | Fallback |
 |---|---|
 | dry | `{groundCap} stretches across the visible ground.` |
-| scatteredPools | `{groundCap} runs between scattered shallow pools.` |
+| scatteredPools | `{groundCap} runs between {scatteredWater}.` |
 | wetHollows | `{groundCap} borders a series of wet hollows.` |
 | mixedDepth | `{groundCap} breaks around shallow and deep water.` |
 | waterDominant | `Patches of {ground} rise among shallow and deep water.` |
@@ -194,9 +198,38 @@ Two facts: `Your {first mark} mark {first verb phrase}, while your {second mark}
 
 When exactly one causal fact exists, pair it with the strongest meaningful environmental fragment if one
 exists: `Your {mark} mark {verb phrase}, while {environment fragment}.` Environmental fragments use the
-same fallback priority below, rendered as a lower-case material clause. Examples: `sparse growth settled on
-the open stone`, `heavy rain crossed the open ground`, `thin smoke drifted through the hollows`. If the only
-environmental state is ordinary fallback, use the one-fact sentence instead.
+same fallback priority below and this exact lower-case past-tense table. `{ground}` is the dominant ground
+token without an article. If the only environmental state is ordinary fallback, use the one-fact sentence
+instead; never append an empty or generic clause.
+
+| Environmental fact | Exact paired fragment |
+|---|---|
+| heavy/dense smoke | `thick smoke hung across the farther ground` |
+| heavy/dense airborne ash | `airborne ash formed heavy banks across the farther ground` |
+| heavy/dense mist | `mist gathered in broad banks beyond the entry` |
+| heavy/dense miasma | `miasma lay heavily over the farther ground` |
+| heavy rain | `heavy rain crossed the open ground` |
+| heavy snow | `heavy snow crossed the open ground` |
+| heavy mixed rain/snow | `rain and snow crossed the open ground together` |
+| trueDark | `only the ground nearest the entry remained clearly visible` |
+| blazing | `hard light reached every open surface` |
+| trace/light smoke | `thin smoke drifted through the open ground` |
+| trace/light airborne ash | `a light fall of ash moved through the air` |
+| trace/light mist | `light mist gathered in the lower ground` |
+| trace/light miasma | `a thin miasma hung over the lower ground` |
+| trace/light rain | `light rain crossed the open ground` |
+| trace/light snow | `light snow crossed the open ground` |
+| trace/light mixed rain/snow | `light rain and snow crossed the open ground together` |
+| dim | `dim light left the farther ground subdued` |
+| bright | `clear light separated the open surfaces` |
+| abundant spreading flora | `growth spread across most open ground` |
+| abundant clustered flora | `dense growth gathered in broad clusters` |
+| abundant other flora | `growth occupied most open ground` |
+| present spreading flora | `growth spread through the open ground` |
+| present clustered flora | `growth gathered in distinct clusters` |
+| present other flora | `growth established itself across the open ground` |
+| sparse flora + dominant stone | `sparse growth settled on the open stone` |
+| sparse flora + any other ground | `sparse growth settled across a few open patches` |
 
 Do not name a symbol that is unknown even if its visible result is obvious. Do not treat a matching random
 result as authorship. `increased` phrasing must acknowledge strengthening rather than imply creation.
@@ -282,10 +315,11 @@ until reviewed.
 
 ## Exact 55-word layout-stress fixture
 
-This synthetic receipt exists only to prove the maximum valid copy length. It uses ordinary grammar and
-sanitized facts rather than starter-specific prose: dominant Stone with secondary Soil; mixed shallow and
-deep channelled water; an `Archipelago` reshaping contribution; a `Verdant` increased-growth contribution;
-dense growth on damp edges and comparatively bare high exposed ground. Its exact rules-owned output is:
+This synthetic receipt exists only to prove the maximum valid copy length. It is a Design-authored,
+rules-owned **typography stress string**, not an output the ordinary runtime template selector is required to
+invent. Its matching sanitized facts are dominant Stone with secondary Soil; mixed shallow and deep
+channelled water; an `Archipelago` reshaping contribution; a `Verdant` increased-growth contribution; dense
+growth on damp edges and comparatively bare high exposed ground. Its exact frozen string is:
 
 `Broad stone shelves rise above narrow soil paths and connected pools of shallow water, with deep channels
 cutting between the largest dry crossings. Your Archipelago mark divided the route into separate shelves,
@@ -293,8 +327,10 @@ while your Verdant mark spread dense low growth across the dampest edges and lef
 comparatively bare near the entry.`
 
 The string is exactly 55 whitespace-delimited words and two sentences. It is a typography and disclosure
-fixture, not an authored World Page or a runtime special case. Asset may use this exact string only with the
-matching sanitized synthetic receipt above and may not substitute its own stress prose.
+fixture, not an authored World Page, a runtime template branch or a promise that ordinary generation will
+produce this exact combination. Runtime grammar tests prove every ordinary output stays within the same
+18–55-word envelope; the layout test uses this explicit upper-bound specimen. Asset may use this exact
+string only with the matching sanitized synthetic receipt above and may not substitute its own stress prose.
 
 ## Register and prohibited language
 
@@ -342,7 +378,8 @@ uses the safe two-sentence actual-ground + ordinary fallback grammar; Release ne
 13. banned-register corpus;
 14. key-order and relaunch determinism;
 15. grammar-version migration preserving frozen old output;
-16. exact two-sentence 55-word stress fixture without truncation, clipping or Asset-authored substitution.
+16. exact two-sentence Design-owned 55-word stress specimen accepted by the copy validator, without adding a
+    runtime starter/synthetic branch or permitting truncation, clipping or Asset-authored substitution.
 
 ## Out of scope
 

@@ -1035,14 +1035,24 @@ extension GameStore {
 #endif
             return false
         }
-        let arrivalReceipt = WorldArrivalReceiptFactory.make(
-            runIndex: state.worlds.runIndex + 1,
-            generationSeed: generationSeed,
-            source: reviewModel,
-            book: book,
-            map: world.map,
-            flora: world.flora,
-            visualReceipt: visualReceipt)
+        let arrivalReceipt: WorldArrivalReceipt
+        do {
+            arrivalReceipt = try WorldArrivalReceiptFactory.make(
+                runIndex: state.worlds.runIndex + 1,
+                generationSeed: generationSeed,
+                source: reviewModel,
+                book: book,
+                map: world.map,
+                flora: world.flora,
+                visualReceipt: visualReceipt,
+                visibilityProfile: WorldRules.visibilityProfile(
+                    book: book, mapSeed: generationSeed, tuning: tuning,
+                    worldVisualReceipt: visualReceipt,
+                    party: WorldRules.sightBonus(in: state)))
+        } catch {
+            bindError = "This world could not be prepared. Your page and Essence were not changed."
+            return false
+        }
 
         let didCommit = mutateIf("bind book & depart", flush: true) { state in
             guard WritingDeskBindQuoteFactory.make(

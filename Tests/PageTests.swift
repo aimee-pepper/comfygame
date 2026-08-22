@@ -132,8 +132,9 @@ final class PageTests: XCTestCase {
         XCTAssertEqual(Set(payloadObject.keys), [
             "receiptID", "worldSeed", "sourcePage", "dominantGround", "waterRelationship",
             "materialDescriptor", "illumination", "suspendedAtmosphere", "precipitation",
-            "flora", "causalVisualFacts", "description", "firstMapCropReceipt"
-        ], "nil entryDisclosure must be omitted from the sanitized payload")
+            "flora", "causalVisualFacts", "entryDisclosure", "description", "firstMapCropReceipt"
+        ])
+        XCTAssertTrue(payloadObject["entryDisclosure"] is NSNull)
         let suspendedObject = try XCTUnwrap(
             payloadObject["suspendedAtmosphere"] as? [String: Any])
         XCTAssertTrue(suspendedObject["density"] is String,
@@ -182,7 +183,9 @@ final class PageTests: XCTestCase {
             tiles[0] = Tile(ground: hiddenGround, flora: .init(rawValue: 999), elevation: 3,
                             isRevealed: false)
             let map = WorldMap(width: 9, height: 9, tiles: tiles, entry: entry)
-            return WorldArrivalReceiptFactory.firstCrop(map: map, flora: [])
+            return WorldArrivalReceiptFactory.firstCrop(
+                map: map, flora: [],
+                profile: WorldRules.visibilityProfile(illumination: 0, baseRadius: 1))
         }
         let stone = crop(hiddenGround: .stone).cells.first { $0.point == .init(x: 0, y: 0) }
         let deepWater = crop(hiddenGround: .deepWater).cells.first { $0.point == .init(x: 0, y: 0) }
@@ -202,6 +205,142 @@ final class PageTests: XCTestCase {
         XCTAssertNil(object["ground"])
         XCTAssertNil(object["elevation"])
         XCTAssertNil(object["floraStableID"])
+    }
+
+    func testArrivalCropUsesPartyAwareCurrentVisibilityWithoutPersistingFringe() {
+        let entry = GridPoint(x: 4, y: 4)
+        let tiles = Array(repeating: Tile(ground: .soil, isRevealed: false), count: 81)
+        let map = WorldMap(width: 9, height: 9, tiles: tiles, entry: entry)
+        let ordinary = WorldArrivalReceiptFactory.firstCrop(
+            map: map, flora: [],
+            profile: WorldRules.visibilityProfile(illumination: 100, baseRadius: 1))
+        let perceptive = WorldArrivalReceiptFactory.firstCrop(
+            map: map, flora: [],
+            profile: WorldRules.visibilityProfile(illumination: 100, baseRadius: 1, sightBonus: 2))
+        XCTAssertGreaterThan(perceptive.cells.count { $0.visibility == "full" },
+                             ordinary.cells.count { $0.visibility == "full" })
+        XCTAssertGreaterThan(ordinary.cells.count { $0.visibility == "fringe" }, 0)
+        XCTAssertTrue(map.tiles.allSatisfy { !$0.isRevealed },
+                      "arrival fringe is transient and must not become terrain memory")
+    }
+
+    func testSceneV2SerializesVisibilitySpecificCropKeys() throws {
+        func keys(_ cell: WorldArrivalSceneReceipt.CropCell) throws -> Set<String> {
+            let object = try XCTUnwrap(JSONSerialization.jsonObject(
+                with: JSONEncoder().encode(cell)) as? [String: Any])
+            return Set(object.keys)
+        }
+        let full = WorldArrivalSceneReceipt.CropCell(
+            x: 1, y: 2, ground: .stone, elevation: 1, floraStableID: nil, visibility: "full")
+        let fringe = WorldArrivalSceneReceipt.CropCell(
+            x: 2, y: 2, ground: .soil, elevation: 0, floraStableID: nil, visibility: "fringe")
+        let remembered = WorldArrivalSceneReceipt.CropCell(
+            x: 3, y: 2, ground: .sand, elevation: 2, floraStableID: nil, visibility: "remembered")
+        let hidden = WorldArrivalSceneReceipt.CropCell(
+            x: 4, y: 2, ground: nil, elevation: nil, floraStableID: nil, visibility: "hidden")
+        let disclosed: Set<String> = ["x", "y", "ground", "elevation", "floraStableID", "visibility"]
+        XCTAssertEqual(try keys(full), disclosed)
+        XCTAssertEqual(try keys(fringe), disclosed)
+        XCTAssertEqual(try keys(remembered), disclosed)
+        XCTAssertEqual(try keys(hidden), ["x", "y", "visibility"])
+    }
+
+    func testDominantArrivalGroundExcludesWetAndUsesFrozenTieOrder() throws {
+        let entry = GridPoint(x: 0, y: 0)
+        let tied = WorldMap(width: 2, height: 2,
+                            tiles: [Tile(ground: .sand), Tile(ground: .stone),
+                                    Tile(ground: .water), Tile(ground: .deepWater)], entry: entry)
+        XCTAssertEqual(try WorldArrivalReceiptFactory.dominantDryGround(in: tied), .stone)
+        let wet = WorldMap(width: 2, height: 1,
+                           tiles: [Tile(ground: .water), Tile(ground: .deepWater)], entry: entry)
+        XCTAssertThrowsError(try WorldArrivalReceiptFactory.dominantDryGround(in: wet)) {
+            XCTAssertEqual($0 as? WorldArrivalReceiptFactory.Error, .noDryGround)
+        }
+    }
+
+    func testAcceptedStarterArrivalReceiptsProduceExactRulesOwnedDescriptions() throws {
+        let expected = [
+            "starter_open_meadow": "Broad sandy ground runs between shallow pools. Your Plains mark opened the terrain, while your Verdant mark spread low growth farther along the few wet and stony edges.",
+            "starter_rainwashed_shore": "Stone shelves break a wide run of shallow and deep water. Your Archipelago mark divided the route, while sparse growth settled on the open stone.",
+            "starter_stone_hollow": "Stone closes around narrow paths and wet hollows. Your Caverns mark shaped the enclosure, while your Ore mark made ore more plentiful."
+        ]
+        let root = URL(fileURLWithPath: #filePath).deletingLastPathComponent()
+            .deletingLastPathComponent()
+        let decoder = JSONDecoder()
+        for (id, copy) in expected {
+            let url = root.appendingPathComponent("AssetLab/fixtures/world-arrival-v1/\(id).json")
+            let payload = try decoder.decode(WorldArrivalSceneReceipt.Payload.self,
+                                             from: Data(contentsOf: url))
+            XCTAssertEqual(try WorldArrivalDescriptionRules.describe(payload), copy, id)
+            XCTAssertEqual(payload.description, copy, "accepted Asset receipt drifted from authority")
+            let words = copy.split(whereSeparator: \.isWhitespace).count
+            XCTAssertTrue((18...55).contains(words), "\(id): \(words) words")
+        }
+    }
+
+    func testArrivalWaterBandsAreMutuallyExclusiveAtExactBoundaries() throws {
+        let payload = try acceptedArrivalPayload("starter_open_meadow")
+        func copy(_ wet: Int, _ deep: Int, _ total: Int = 100) throws -> String {
+            try WorldArrivalDescriptionRules.describe(
+                payload,
+                terrain: .init(wetTileCount: wet, deepWaterTileCount: deep,
+                               nonChasmTileCount: total))
+        }
+        XCTAssertTrue(try copy(0, 0).hasPrefix("Broad sandy ground stretches"))
+        XCTAssertTrue(try copy(8, 0).hasPrefix("Broad sandy ground runs between shallow pools"))
+        XCTAssertTrue(try copy(8, 1).hasPrefix(
+            "Broad sandy ground runs between scattered pools of shallow and deep water"))
+        XCTAssertTrue(try copy(9, 2).hasPrefix("Broad sandy ground runs around wet hollows"))
+        XCTAssertTrue(try copy(35, 8).hasPrefix("Broad sandy ground runs around wet hollows"))
+        XCTAssertTrue(try copy(35, 9).hasPrefix(
+            "Broad sandy ground runs between shallow and deep water"))
+        XCTAssertTrue(try copy(36, 0).hasPrefix("Broad sandy ground forms a few broad islands"))
+    }
+
+    func testOnlyRegisteredReshapingMarksOwnStructuralSentence() throws {
+        var payload = try acceptedArrivalPayload("starter_open_meadow")
+        payload.causalVisualFacts = [
+            .init(markID: "unregistered_shape", visibleScope: "ground",
+                  contributionKind: "reshaped", resultBand: "broad",
+                  withoutAuthoredBand: "broken")
+        ]
+        let copy = try WorldArrivalDescriptionRules.describe(
+            payload,
+            terrain: .init(wetTileCount: 0, deepWaterTileCount: 0, nonChasmTileCount: 100))
+        XCTAssertTrue(copy.hasPrefix("Sandy ground stretches across the visible ground."))
+        XCTAssertFalse(copy.hasPrefix("Broad sandy ground"))
+    }
+
+    func testOneCausalFactUsesExactPastTenseEnvironmentalFragment() throws {
+        var payload = try acceptedArrivalPayload("starter_rainwashed_shore")
+        payload.causalVisualFacts = [
+            .init(markID: "archipelago", visibleScope: "water",
+                  contributionKind: "reshaped", resultBand: "shelves",
+                  withoutAuthoredBand: "broken")
+        ]
+        XCTAssertTrue(try WorldArrivalDescriptionRules.describe(payload).contains(
+            "while sparse growth settled on the open stone."))
+    }
+
+    func testDesignOwnedFiftyFiveWordSpecimenIsValidationOnly() {
+        let specimen = "Broad stone shelves rise above narrow soil paths and connected pools of shallow water, with deep channels cutting between the largest dry crossings. Your Archipelago mark divided the route into separate shelves, while your Verdant mark spread dense low growth across the dampest edges and left the higher exposed ground comparatively bare near the entry."
+        XCTAssertEqual(specimen.split(whereSeparator: \.isWhitespace).count, 55)
+        XCTAssertEqual(specimen.filter { ".!?".contains($0) }.count, 2)
+        let root = URL(fileURLWithPath: #filePath).deletingLastPathComponent()
+            .deletingLastPathComponent()
+        let source = try? String(contentsOf: root.appendingPathComponent(
+            "Sources/Rules/WorldArrivalDescriptionRules.swift"))
+        XCTAssertFalse(source?.contains("Broad stone shelves rise above narrow soil paths") == true,
+                       "typography specimen must not become a runtime selector branch")
+    }
+
+    private func acceptedArrivalPayload(_ id: String) throws -> WorldArrivalSceneReceipt.Payload {
+        let root = URL(fileURLWithPath: #filePath).deletingLastPathComponent()
+            .deletingLastPathComponent()
+        return try JSONDecoder().decode(
+            WorldArrivalSceneReceipt.Payload.self,
+            from: Data(contentsOf: root.appendingPathComponent(
+                "AssetLab/fixtures/world-arrival-v1/\(id).json")))
     }
 
     func testLegacyAndOrphanArrivalStateDecodeWithoutInventingAReveal() throws {

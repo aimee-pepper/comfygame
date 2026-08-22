@@ -69,18 +69,30 @@ extension WorldRules {
     }
 
     static func visibilityProfile(in run: WorldRun, party: Int = 0) -> VisibilityProfile {
-        let light = BookRules.readings(for: run.book, seed: run.mapSeed)["illumination"]
-        let currentLight = run.isNight ? light.floor : light.peak
-        let symbolDelta = run.book.allSymbolIDs.reduce(0) {
+        visibilityProfile(book: run.book, mapSeed: run.mapSeed, tuning: run.tuning,
+                          worldVisualReceipt: run.worldVisualReceipt, party: party,
+                          torchBonus: run.torchVisionBonus, isNight: run.isNight)
+    }
+
+    static func visibilityProfile(book: BoundBook, mapSeed: UInt64,
+                                  tuning: DebugTuningProfile,
+                                  worldVisualReceipt: WorldVisualReceipt?,
+                                  party: Int = 0, torchBonus: Int = 0,
+                                  isNight: Bool = false) -> VisibilityProfile {
+        let light = BookRules.readings(for: book, seed: mapSeed)["illumination"]
+        let currentLight = isNight ? light.floor : light.peak
+        let symbolDelta = book.allSymbolIDs.reduce(0) {
             $0 + (ContentCatalog.shared.symbol($1)?.visionDelta ?? 0)
         }
-        let atmosphere = run.worldVisualReceipt?.request.atmosphere
-        let isObscurant = atmosphere?.medium == "smoke" || atmosphere?.medium == "ash"
+        let atmosphere = worldVisualReceipt?.request.atmosphere
+        let isObscurant = atmosphere.map {
+            ["smoke", "ash", "airborneAsh"].contains($0.medium)
+        } ?? false
         let obscurantDensity = isObscurant ? atmosphere?.density ?? 0 : 0
         return visibilityProfile(illumination: currentLight,
-                                 baseRadius: run.tuning.baseVisionRadius + symbolDelta,
+                                 baseRadius: tuning.baseVisionRadius + symbolDelta,
                                  sightBonus: party,
-                                 torchBonus: run.torchVisionBonus,
+                                 torchBonus: torchBonus,
                                  obscurantDensity: obscurantDensity)
     }
 

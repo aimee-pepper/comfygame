@@ -76,6 +76,20 @@ struct WorldArrivalSceneReceipt: Codable, Equatable, Sendable {
         var elevation: Int?
         var floraStableID: String?
         var visibility: String
+
+        private enum CodingKeys: String, CodingKey {
+            case x, y, ground, elevation, floraStableID, visibility
+        }
+        func encode(to encoder: Encoder) throws {
+            var c = encoder.container(keyedBy: CodingKeys.self)
+            try c.encode(x, forKey: .x)
+            try c.encode(y, forKey: .y)
+            try c.encode(visibility, forKey: .visibility)
+            guard visibility != "hidden" else { return }
+            try c.encode(ground, forKey: .ground)
+            try c.encode(elevation, forKey: .elevation)
+            try c.encode(floraStableID, forKey: .floraStableID)
+        }
     }
     struct FirstMapCrop: Codable, Equatable, Sendable {
         var width: Int
@@ -97,6 +111,29 @@ struct WorldArrivalSceneReceipt: Codable, Equatable, Sendable {
         var entryDisclosure: EntryDisclosure?
         var description: String
         var firstMapCropReceipt: FirstMapCrop
+
+        private enum CodingKeys: String, CodingKey {
+            case receiptID, worldSeed, sourcePage, dominantGround, waterRelationship
+            case materialDescriptor, illumination, suspendedAtmosphere, precipitation, flora
+            case causalVisualFacts, entryDisclosure, description, firstMapCropReceipt
+        }
+        func encode(to encoder: Encoder) throws {
+            var c = encoder.container(keyedBy: CodingKeys.self)
+            try c.encode(receiptID, forKey: .receiptID)
+            try c.encode(worldSeed, forKey: .worldSeed)
+            try c.encode(sourcePage, forKey: .sourcePage)
+            try c.encode(dominantGround, forKey: .dominantGround)
+            try c.encode(waterRelationship, forKey: .waterRelationship)
+            try c.encode(materialDescriptor, forKey: .materialDescriptor)
+            try c.encode(illumination, forKey: .illumination)
+            try c.encode(suspendedAtmosphere, forKey: .suspendedAtmosphere)
+            try c.encode(precipitation, forKey: .precipitation)
+            try c.encode(flora, forKey: .flora)
+            try c.encode(causalVisualFacts, forKey: .causalVisualFacts)
+            try c.encode(entryDisclosure, forKey: .entryDisclosure)
+            try c.encode(description, forKey: .description)
+            try c.encode(firstMapCropReceipt, forKey: .firstMapCropReceipt)
+        }
     }
 
     var version: Int
@@ -187,6 +224,13 @@ struct WorldArrivalReceipt: Codable, Equatable, Sendable {
         var resultBand: String
         var withoutAuthoredBand: String
     }
+    struct TerrainSummary: Codable, Equatable, Sendable {
+        var countByGroundID: [GroundType: Int]
+        var dominantDryGroundID: GroundType
+        var wetTileCount: Int
+        var deepWaterTileCount: Int
+        var nonChasmTileCount: Int
+    }
     struct MapCell: Codable, Equatable, Sendable {
         var point: GridPoint
         /// Hidden cells carry no terrain request. Nil is part of the persisted disclosure boundary,
@@ -209,6 +253,8 @@ struct WorldArrivalReceipt: Codable, Equatable, Sendable {
     var sourcePagePhysicalReceipt: SourcePage
     var visualReceiptID: String
     var visualSchemaVersion: String
+    /// Optional only for receipts decoded from the brief pre-E2 schema.
+    var terrainSummary: TerrainSummary?
     var dominantGround: GroundType
     var waterRelationship: String
     var materialDescriptor: WorldGrade2V1.Material
@@ -227,20 +273,23 @@ struct WorldArrivalReceipt: Codable, Equatable, Sendable {
 }
 
 enum WorldArrivalReceiptFactory {
+    enum Error: Swift.Error, Equatable { case noDryGround }
+
     static func make(runIndex: Int, generationSeed: UInt64,
                      source: WritingDeskReviewModel,
                      book: BoundBook, map: WorldMap, flora: [Flora],
-                     visualReceipt: WorldVisualReceipt) -> WorldArrivalReceipt {
+                     visualReceipt: WorldVisualReceipt,
+                     visibilityProfile: WorldRules.VisibilityProfile) throws -> WorldArrivalReceipt {
+        let dominant = try dominantDryGround(in: map)
         let counts = Dictionary(grouping: map.tiles.map(\.ground), by: { $0 }).mapValues(\.count)
-        let dominant = counts.max {
-            ($0.value, $0.key.rawValue) < ($1.value, $1.key.rawValue)
-        }?.key ?? .soil
-        let waterCount = (counts[.water] ?? 0) + (counts[.deepWater] ?? 0)
-        let waterRelationship: String
-        if waterCount == 0 { waterRelationship = "none" }
-        else if waterCount * 5 < map.tiles.count { waterRelationship = "pools" }
-        else if waterCount * 2 < map.tiles.count { waterRelationship = "channels" }
-        else { waterRelationship = "shelves" }
+        let wetTileCount = (counts[.water] ?? 0) + (counts[.deepWater] ?? 0)
+        let deepWaterTileCount = counts[.deepWater] ?? 0
+        let nonChasmTileCount = map.tiles.count - (counts[.chasm] ?? 0)
+        let terrainSummary = WorldArrivalReceipt.TerrainSummary(
+            countByGroundID: counts, dominantDryGroundID: dominant,
+            wetTileCount: wetTileCount, deepWaterTileCount: deepWaterTileCount,
+            nonChasmTileCount: nonChasmTileCount)
+        let waterRelationship = try waterRelationship(for: terrainSummary)
 
         let light = BookRules.readings(for: book, seed: generationSeed)["illumination"]
         let lightBand: String = light.peak < 10 ? "trueDark" : light.peak < 35 ? "dim"
@@ -256,8 +305,8 @@ enum WorldArrivalReceiptFactory {
             let stableID = "flora-\(plant.id.rawValue)"
             guard let descriptor = descriptorByID[stableID] else { return nil }
             let placements = map.tiles.count { $0.flora == plant.id }
-            let coverage = placements * 20 < map.tiles.count ? "sparse"
-                : placements * 5 < map.tiles.count ? "present" : "abundant"
+            let coverage = placements * 100 < nonChasmTileCount * 8 ? "sparse"
+                : placements * 100 < nonChasmTileCount * 22 ? "present" : "abundant"
             return .init(stableID: stableID, formID: descriptor.formID, coverage: coverage,
                          habit: plant.traits.habit.rawValue,
                          resolvedColor: descriptor.resolvedColor.srgb)
@@ -273,7 +322,7 @@ enum WorldArrivalReceiptFactory {
             links: source.pageThumbnail.links.map {
                 .init(firstMarkID: $0.firstMarkID, secondMarkID: $0.secondMarkID)
             })
-        let crop = firstCrop(map: map, flora: flora)
+        let crop = firstCrop(map: map, flora: flora, profile: visibilityProfile)
         let description = description(dominant: dominant, water: waterRelationship,
                                       lightBand: lightBand, atmosphere: suspended)
         let canonical = "\(Self.schemaIdentity)|\(runIndex)|\(generationSeed)|\(sourceIdentity(source.sourceKey))|\(visualReceipt.canonicalReceiptSHA256)"
@@ -290,6 +339,7 @@ enum WorldArrivalReceiptFactory {
                      sourcePagePhysicalReceipt: physical,
                      visualReceiptID: visualReceipt.canonicalReceiptSHA256,
                      visualSchemaVersion: visualReceipt.adapterVersion,
+                     terrainSummary: terrainSummary,
                      dominantGround: dominant, waterRelationship: waterRelationship,
                      materialDescriptor: visualReceipt.descriptor.material,
                      illumination: .init(peak: light.peak, floor: light.floor,
@@ -304,6 +354,36 @@ enum WorldArrivalReceiptFactory {
     }
 
     private static let schemaIdentity = "world-arrival-receipt-v1"
+
+    static func dominantDryGround(in map: WorldMap) throws -> GroundType {
+        let counts = Dictionary(grouping: map.tiles.map(\.ground), by: { $0 }).mapValues(\.count)
+        let dryOrder: [GroundType] = [
+            .stone, .soil, .sand, .ice, .ash, .rubble, .mud, .growth, .groundcover
+        ]
+        guard let dominant = dryOrder.enumerated().max(by: { lhs, rhs in
+            let left = counts[lhs.element] ?? 0
+            let right = counts[rhs.element] ?? 0
+            return left == right ? lhs.offset > rhs.offset : left < right
+        }).flatMap({ (counts[$0.element] ?? 0) > 0 ? $0.element : nil }) else {
+            throw Error.noDryGround
+        }
+        return dominant
+    }
+
+    private static func waterRelationship(
+        for summary: WorldArrivalReceipt.TerrainSummary
+    ) throws -> String {
+        guard summary.nonChasmTileCount > 0,
+              summary.deepWaterTileCount <= summary.wetTileCount else {
+            throw Error.noDryGround
+        }
+        guard summary.wetTileCount > 0 else { return "none" }
+        let wetShare = Double(summary.wetTileCount) / Double(summary.nonChasmTileCount)
+        let deepShare = Double(summary.deepWaterTileCount) / Double(summary.wetTileCount)
+        if wetShare <= 0.08 { return "pools" }
+        if wetShare <= 0.35 { return deepShare < 0.25 ? "channels" : "shelves" }
+        return "islands"
+    }
 
     private static func scenePayload(
         receiptID: WorldArrivalReceiptID, generationSeed: UInt64,
@@ -369,7 +449,8 @@ enum WorldArrivalReceiptFactory {
         }
     }
 
-    static func firstCrop(map: WorldMap, flora: [Flora]) -> WorldArrivalReceipt.FirstMapCrop {
+    static func firstCrop(map: WorldMap, flora: [Flora],
+                          profile: WorldRules.VisibilityProfile) -> WorldArrivalReceipt.FirstMapCrop {
         let ids = Set(flora.map(\.id))
         let cells = (-4...4).flatMap { dy in (-4...4).map { dx -> WorldArrivalReceipt.MapCell in
             let point = GridPoint(x: map.entry.x + dx, y: map.entry.y + dy)
@@ -378,14 +459,22 @@ enum WorldArrivalReceiptFactory {
                              floraStableID: nil, visibility: "hidden")
             }
             let tile = map[point]
-            guard tile.isRevealed else {
+            let current = WorldRules.visibility(of: point, from: map.entry, in: map, profile: profile)
+            let terrain = WorldRules.terrainVisibility(current: current, wasRevealed: tile.isRevealed)
+            guard terrain != .hidden else {
                 return .init(point: point, ground: nil, elevation: nil,
                              floraStableID: nil, visibility: "hidden")
             }
-            let floraID = tile.flora.flatMap { ids.contains($0) ? "flora-\($0.rawValue)" : nil }
+            let visibility: String
+            if current == .full { visibility = "full" }
+            else if current == .fringe { visibility = "fringe" }
+            else { visibility = "remembered" }
+            let floraID = current == .full
+                ? tile.flora.flatMap { ids.contains($0) ? "flora-\($0.rawValue)" : nil }
+                : nil
             return .init(point: point, ground: tile.ground, elevation: tile.elevation,
                          floraStableID: floraID,
-                         visibility: tile.isRevealed ? "full" : "hidden")
+                         visibility: visibility)
         }}
         return .init(width: 9, height: 9, cells: cells)
     }
