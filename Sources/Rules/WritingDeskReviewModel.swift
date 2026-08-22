@@ -155,7 +155,7 @@ enum WritingDeskReviewModelFactory {
                 displayName: readable ? entries.map(\.displayName).joined(separator: " + ") : "??",
                 accessibilityName: readable
                     ? entries.map(\.accessibilityName).joined(separator: ", ")
-                    : "Unknown mark",
+                    : "Unknown Sigil",
                 isReadable: readable)
         }
         let unreadCount = visibleMarks.filter { !$0.isReadable }.count

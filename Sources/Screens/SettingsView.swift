@@ -129,7 +129,7 @@ struct SettingsView: View {
                 } label: {
                     SettingsDestinationRow(
                         icon: "character.book.closed.fill",
-                        title: "Rune Dictionary acceptance",
+                        title: "Sigil Dictionary acceptance",
                         subtitle: "Disposable known, unknown and inspection proof"
                     )
                 }
@@ -227,7 +227,7 @@ private struct WildWorldPagesPhoneAcceptanceView: View {
                 }
             }
             Section("Order") {
-                Text("First inspect before taking: the loose Page must say Unknown until the exact open records its marks. In the full-kit path, cancel once and confirm nothing changes, then reopen and swap an exact occupant. Read the failure recap before continuing. Finally bind either collected copy and confirm only its physical ID leaves the folio.")
+                Text("First inspect before taking: the loose Page must say Unknown until the exact open records its Sigils. In the full-kit path, cancel once and confirm nothing changes, then reopen and swap an exact occupant. Read the failure recap before continuing. Finally bind either collected copy and confirm only its physical ID leaves the folio.")
                     .font(.callout)
             }
         }
@@ -284,7 +284,7 @@ private struct Band2DictionaryPhoneAcceptanceView: View {
         NavigationStack {
             List {
                 Section("Production surfaces") {
-                    NavigationLink("Open Rune Dictionary") {
+                    NavigationLink("Open Sigil Dictionary") {
                         LibraryView().environmentObject(session.store)
                     }
                     NavigationLink("Inspect the collected World Page") {
@@ -292,10 +292,10 @@ private struct Band2DictionaryPhoneAcceptanceView: View {
                     }
                 }
                 Section("Acceptance path") {
-                    Text("In Library, choose Runes and open one named and one unknown glyph in every category. In the Writing Desk, choose Pages → Collected, open the page, then return to Runes and confirm its exact marks were added without teaching unknown meanings.")
+                    Text("In Library, choose Sigils and open one named and one unknown glyph in every category. In the Writing Desk, choose Pages → Collected, open the page, then return to Sigils and confirm its exact Sigils were added without teaching unknown meanings.")
                 }
             }
-            .navigationTitle("Rune Dictionary")
+            .navigationTitle("Sigil Dictionary")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar { ToolbarItem(placement: .topBarTrailing) { Button("Close", action: close) } }
         }
@@ -437,7 +437,7 @@ private struct CompoundAssemblyPhoneAcceptanceView: View {
     var body: some View {
         Form {
             Section("Fixture") {
-                Text("A disposable campaign with retained Sun + Illumination proof, exact 20 Essence and 4 Pulp, and one deliberately unknown-source proof that must refuse.")
+                Text("A disposable campaign with retained Sun + Illumination proof, exact 20 Essence and 4 Pulp, and one deliberately unknown Focus proof that must refuse.")
                 Button("Launch Compound Assembly fixture") {
                     do { session = try CompoundAssemblyPhoneFixtureSession() }
                     catch { errorMessage = error.localizedDescription }
@@ -445,7 +445,7 @@ private struct CompoundAssemblyPhoneAcceptanceView: View {
                 .accessibilityIdentifier("compound-assembly-acceptance.launch")
             }
             Section("Acceptance") {
-                Text("Formalize Sunward shorthand, place it at the Writing Desk, rename it, then delete it. Its placed mark must remain frozen. The second proof must refuse and no resources may move.")
+                Text("Formalize Sunward shorthand, place it at the Writing Desk, rename it, then delete it. Its placed Sigil must retain the exact meaning saved at the time. The second proof must refuse and no resources may move.")
                     .font(.callout)
             }
         }

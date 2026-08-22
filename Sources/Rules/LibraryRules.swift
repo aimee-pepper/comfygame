@@ -1,5 +1,14 @@
 import Foundation
 
+enum PlayerSigilCopy {
+    static let singular = "Sigil"
+    static let plural = "Sigils"
+
+    static func count(_ count: Int) -> String {
+        "\(count) \(count == 1 ? singular : plural)"
+    }
+}
+
 /// Finding people, and finding the pages that say where they are.
 ///
 /// The two are deliberately independent. **Pages are a guide, never a gate**: a traveller is simply
@@ -31,8 +40,8 @@ enum LibraryRules {
 
         var id: LexemeIdentity { identity }
         var glyphID: String { identity.glyphID }
-        var displayName: String { isKnown ? (name ?? "Unknown mark") : "??" }
-        var accessibilityName: String { isKnown ? (name ?? "Unknown mark") : "Unknown mark" }
+        var displayName: String { isKnown ? (name ?? "Unknown Sigil") : "??" }
+        var accessibilityName: String { isKnown ? (name ?? "Unknown Sigil") : "Unknown Sigil" }
     }
 
     /// Projects the Dictionary from durable sightings plus the canonical authorities that license

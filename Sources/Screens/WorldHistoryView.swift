@@ -203,7 +203,7 @@ struct WorldHistoryView: View {
         case ..<Tuning.Analysis.targetsTier:
             "You can read back what you wrote and what each world felt like. Better instruments will show you the numbers underneath, and which of them you never wrote at all."
         case ..<Tuning.Analysis.sigilAttributionTier:
-            "You can read the numbers now. Attribution — which of your marks did what — comes later."
+            "You can read the numbers now. Attribution — which of your Sigils did what — comes later."
         default:
             "You can trace the effects you have learned to measure, including what the world decided for itself."
         }

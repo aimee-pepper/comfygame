@@ -281,7 +281,7 @@ struct PageGridView: View {
             return "\(inert.qualifier.name) says nothing about \(inert.target.name)."
         }
         if let grammarWarning { return "Loaded writing: \(grammarWarning)" }
-        if isWrittenButSilent { return "Not joined — hold a mark to Connect." }
+        if isWrittenButSilent { return "Not joined — hold a Sigil to Connect." }
         return nil
     }
 
@@ -309,7 +309,7 @@ struct PageGridView: View {
                 actions(for: mark)
                 // **An icon, not the word.** "Cancel" was being squeezed to "Ca n…" beside three
                 // icons on a page-width row (Aimee, 6 Aug).
-                iconButton("xmark", "Done with this sigil") { self.held = nil }
+                iconButton("xmark", "Done with this Sigil") { self.held = nil }
             }
             else if let hint = connectionError ?? mode.hint {
                 Image(systemName: mode.icon).font(.caption2)
@@ -449,7 +449,7 @@ struct PageGridView: View {
             anchor = nil
         }
         .gesture(markDrag(mark, side: side, pageSize: pageSize))
-        .accessibilityLabel("\(mark.displayName), \(mark.cells.count) cells. Drag to move, or off the page to erase.")
+        .accessibilityLabel("\(mark.displayName), Sigil, \(mark.cells.count) cells. Drag to move, or off the page to erase.")
     }
 
     /// A cluster drags as one, so every mark in it follows the one under the finger.
@@ -553,7 +553,7 @@ struct PageGridView: View {
                 connectionError = nil
             } else {
                 connectionError = store.connectionIssue(from, mark.id)?.message
-                    ?? "Those marks cannot be joined."
+                    ?? "Those Sigils cannot be joined."
             }
         case .disconnecting:
             store.disconnectAll(mark.id)

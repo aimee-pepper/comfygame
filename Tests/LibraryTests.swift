@@ -1387,7 +1387,7 @@ final class LibraryTests: XCTestCase {
             reality: state.reality, base: state.base).first { $0.identity == .source(source.id) })
         XCTAssertFalse(entry.isKnown)
         XCTAssertEqual(entry.displayName, "??")
-        XCTAssertEqual(entry.accessibilityName, "Unknown mark")
+        XCTAssertEqual(entry.accessibilityName, "Unknown Sigil")
         XCTAssertNil(entry.name)
         XCTAssertNil(entry.explanation)
         XCTAssertFalse(state.base.ownedSources.contains(source.id))
@@ -1452,7 +1452,7 @@ final class LibraryTests: XCTestCase {
             })
         XCTAssertFalse(entry.isKnown)
         XCTAssertEqual(entry.displayName, "??")
-        XCTAssertEqual(entry.accessibilityName, "Unknown mark")
+        XCTAssertEqual(entry.accessibilityName, "Unknown Sigil")
         XCTAssertNil(entry.name)
     }
 

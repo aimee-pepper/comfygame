@@ -463,7 +463,7 @@ struct BaseView: View {
         if marks == 0 {
             return "Nothing written — the world will be entirely what it decides."
         }
-        let written = marks == 1 ? "One mark speaking" : "\(marks) marks speaking"
+        let written = marks == 1 ? "One Sigil speaking" : "\(marks) Sigils speaking"
         if rolled == 0 {
             return "\(written), and nothing left to chance. Waiting at the desk."
         }

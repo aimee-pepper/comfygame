@@ -173,7 +173,7 @@ struct WritingDeskView: View {
             }
             Button("Keep writing", role: .cancel) {}
         } message: {
-            Text("Every placed mark and connection on this page will be removed.")
+            Text("Every placed Sigil and connection on this page will be removed.")
         }
         .modifier(TemplatePresentationModifier(
             markCount: state.base.page.runes.count,
@@ -305,7 +305,7 @@ struct WritingDeskView: View {
 
     private var clearPageActionLabel: String {
         let count = state.base.page.runes.count
-        return "Clear \(count) \(count == 1 ? "mark" : "marks")"
+        return "Clear \(PlayerSigilCopy.count(count))"
     }
 
     private var writingPaneTabs: some View {
@@ -578,7 +578,7 @@ struct WritingDeskView: View {
                     .disabled(!canPlace)
                     .frame(minHeight: 44)
             }
-            Text("\(state.base.bestHand.displayName) · \(footprint) cells · exact frozen expansion")
+            Text("\(state.base.bestHand.displayName) · \(footprint) cells · Sigils saved at the time")
                 .font(.caption2.monospacedDigit()).foregroundStyle(.secondary)
             if let personalCompoundMessage {
                 Text(personalCompoundMessage).font(.caption2).foregroundStyle(.orange)
@@ -982,7 +982,7 @@ struct WritingDeskView: View {
                 let raw = state.base.resources[Resources.essenceRaw]
                 return "You have \(state.base.essence) essence and \(raw) raw. Refine it at the Essence Spring — raw essence can't be written with."
             }
-            return "You have \(state.base.essence) essence; this binding costs \(totalCost). Erase a mark or bind it without anchoring."
+            return "You have \(state.base.essence) essence; this binding costs \(totalCost). Erase a Sigil or bind it without anchoring."
         }
         return "Costs \(totalCost) essence of your \(state.base.essence)."
     }
@@ -1026,9 +1026,9 @@ struct WritingDeskView: View {
         case .saved, .updated, .deleted, .loaded, .noChange:
             break
         case .emptyDraft:
-            templateError = "Write at least one mark before saving or overwriting a Template."
+            templateError = "Write at least one Sigil before saving or overwriting a Template."
         case .invalidDraft:
-            templateError = "This page contains a mark or connection that can no longer be copied safely."
+            templateError = "This page contains a Sigil or connection that can no longer be copied safely."
         case .capacityReached(let limit):
             templateError = "You can keep up to \(limit) Templates. Delete one before saving another."
         case .staleTemplate:
@@ -1065,7 +1065,7 @@ private struct TemplatePresentationModifier: ViewModifier {
                 Button("Save") { save(name) }
                 Button("Cancel", role: .cancel) {}
             } message: {
-                Text("Save this \(markCount)-mark page as a reusable layout.")
+                Text("Save this page with \(PlayerSigilCopy.count(markCount)) as a reusable layout.")
             }
             .alert("Rename Template", isPresented: optionalBinding($renamingID)) {
                 TextField("Template name", text: $name)
@@ -1079,13 +1079,13 @@ private struct TemplatePresentationModifier: ViewModifier {
                 "Replace the current page?", isPresented: optionalBinding($loadingID),
                 titleVisibility: .visible
             ) {
-                Button("Replace \(markCount) marks", role: .destructive) {
+                Button("Replace \(PlayerSigilCopy.count(markCount))", role: .destructive) {
                     if let id = loadingID { load(id) }
                     loadingID = nil
                 }
                 Button("Keep current page", role: .cancel) { loadingID = nil }
             } message: {
-                Text("Loading this Template replaces every mark and connection in the current draft.")
+                Text("Loading this Template replaces every Sigil and connection on the current page.")
             }
             .confirmationDialog(
                 "Overwrite this Template?", isPresented: optionalBinding($overwritingID),
@@ -1145,7 +1145,7 @@ private struct SavedPageTemplateCard: View {
                     .font(.headline)
                     .foregroundStyle(.primary)
                     .lineLimit(1)
-                Text("\(template.page.runes.count) \(template.page.runes.count == 1 ? "mark" : "marks")")
+                Text(PlayerSigilCopy.count(template.page.runes.count))
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }
@@ -1154,7 +1154,7 @@ private struct SavedPageTemplateCard: View {
                         in: RoundedRectangle(cornerRadius: 12))
         }
         .buttonStyle(.plain)
-        .accessibilityLabel("\(template.name), Template, \(template.page.runes.count) marks")
+        .accessibilityLabel("\(template.name), Template, \(PlayerSigilCopy.count(template.page.runes.count))")
         .popover(isPresented: $showsActions, arrowEdge: .top) {
             VStack(alignment: .leading, spacing: 4) {
                 Text(template.name).font(.headline).padding(.bottom, 4)

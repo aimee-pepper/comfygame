@@ -117,7 +117,7 @@ private enum LibraryTab: String, CaseIterable, Identifiable {
         switch self {
         case .diaries: "Diaries"
         case .people: "People"
-        case .dictionary: "Runes"
+        case .dictionary: "Sigils"
         case .notes: "Notes"
         case .history: "History"
         }
@@ -290,7 +290,7 @@ struct LibraryView: View {
             reality: store.state.reality, base: store.state.base)
         if entries.isEmpty {
             EmptyCollection(icon: "character.book.closed",
-                            text: "Runes you can write or have inspected will gather here.")
+                            text: "Sigils you can write or have inspected will gather here.")
         } else {
             VStack(alignment: .leading, spacing: 18) {
                 ForEach(LibraryRules.DictionaryCategory.allCases) { category in
@@ -407,7 +407,7 @@ private struct DictionaryGlyphCell: View {
                 HStack(spacing: 10) {
                     RuneGlyph(id: entry.glyphID)
                         .frame(width: 44, height: 44)
-                    Text(entry.isKnown ? (entry.name ?? "Unknown mark") : "Unknown mark")
+                    Text(entry.isKnown ? (entry.name ?? "Unknown Sigil") : "Unknown Sigil")
                         .font(.headline)
                 }
                 if entry.isKnown, let explanation = entry.explanation {

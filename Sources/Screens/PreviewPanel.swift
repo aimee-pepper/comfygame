@@ -30,7 +30,7 @@ struct PreviewPanel: View {
                 stabilityBreakdown
             }
             if projection.dangerCapShortfall > 0, projection.worldDescription.showsAttribution {
-                Text("Danger runes can only buy so much time: −\(projection.dangerCapShortfall) of what they offer.")
+                Text("Danger Sigils can only buy so much time: −\(projection.dangerCapShortfall) of what they offer.")
                     .font(.caption)
                     .foregroundStyle(.orange)
                     .fixedSize(horizontal: false, vertical: true)
@@ -67,7 +67,7 @@ struct PreviewPanel: View {
 
     private var header: some View {
         HStack {
-            Label("Projection", systemImage: "eye")
+            Label("World preview", systemImage: "eye")
                 .font(.caption.weight(.semibold))
                 .foregroundStyle(.secondary)
             Spacer()

@@ -23,7 +23,7 @@ final class EconomyTests: XCTestCase {
         XCTAssertEqual(review.visibleMarkCount, 1)
         XCTAssertEqual(review.unreadMarkCount, 1)
         XCTAssertEqual(review.visibleMarks[0].displayName, "??")
-        XCTAssertEqual(review.visibleMarks[0].accessibilityName, "Unknown mark")
+        XCTAssertEqual(review.visibleMarks[0].accessibilityName, "Unknown Sigil")
         XCTAssertEqual(review.pageThumbnail.marks[0].id, legacy.id)
         XCTAssertEqual(review.pageThumbnail.marks[0].cells, legacy.cells)
         XCTAssertTrue(review.knownRequests.isEmpty,

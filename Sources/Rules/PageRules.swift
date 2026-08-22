@@ -244,10 +244,10 @@ extension PageRules {
     enum CompoundEligibilityIssue: String, Codable, Equatable, Sendable {
         case incomplete = "A compound needs one complete target-and-source statement."
         case multipleTargets = "A compound can have exactly one target."
-        case tooFewAtoms = "A compound needs at least two atomic marks."
-        case tooManyAtoms = "A compound can contain at most five atomic marks."
+        case tooFewAtoms = "A compound needs at least two atomic Sigils."
+        case tooManyAtoms = "A compound can contain at most five atomic Sigils."
         case nestedCompound = "A personal compound cannot contain another compound."
-        case unknownAtom = "Every atomic mark must be known before this statement can be formalized."
+        case unknownAtom = "Every atomic Sigil must be known before this statement can be formalized."
     }
 
     struct CompoundStatementAssessment: Equatable, Sendable {
@@ -399,9 +399,9 @@ extension PageRules {
 
         var message: String {
             switch self {
-            case .unavailable: "Those marks cannot be joined."
-            case .notAdjacent: "Move the marks next to each other before joining them."
-            case .completeStatement: "That mark is already a complete statement."
+            case .unavailable: "Those Sigils cannot be joined."
+            case .notAdjacent: "Move the Sigils next to each other before joining them."
+            case .completeStatement: "That Sigil is already a complete statement."
             case .multipleTargets: "A statement can have exactly one subject."
             case .incompatibleFocus: "That focus cannot be written on this subject."
             case .chainingRequired: "Learn Chaining before joining more than one focus."

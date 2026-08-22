@@ -1643,7 +1643,7 @@ final class PageTests: XCTestCase {
         XCTAssertTrue(source.contains("\"Clear this page?\""))
         XCTAssertTrue(source.contains("Button(clearPageActionLabel, role: .destructive)"))
         XCTAssertTrue(source.contains("Button(\"Keep writing\", role: .cancel)"))
-        XCTAssertTrue(source.contains("Every placed mark and connection on this page will be removed."))
+        XCTAssertTrue(source.contains("Every placed Sigil and connection on this page will be removed."))
         XCTAssertEqual(source.components(separatedBy: "store.clearPage()").count - 1, 1,
                        "Only the confirmed destructive action may clear the page.")
     }
@@ -1776,7 +1776,7 @@ final class PageTests: XCTestCase {
         XCTAssertTrue(source.contains("Text(record.provenance)"))
         XCTAssertTrue(source.contains("PageRules.place(record, hand: state.base.bestHand"))
         XCTAssertTrue(source.contains("store.mutate(\"place personal compound\")"))
-        XCTAssertTrue(source.contains("exact frozen expansion"))
+        XCTAssertTrue(source.contains("Sigils saved at the time"))
         XCTAssertFalse(source.contains("formalizePersonalCompound"),
                        "The Writing Desk places saved notation; it must not mint or charge for it")
     }
@@ -2141,5 +2141,43 @@ final class PageTests: XCTestCase {
         XCTAssertEqual(resumed.state.base.page.symbolIDs, ["plains", "frostbound"])
         XCTAssertEqual(resumed.state.base.page.runes.map(\.origin),
                        resumed.state.base.page.runes.map(\.origin))
+    }
+
+    func testCanonicalSigilPlayerCopyIsSharedAndExact() {
+        XCTAssertEqual(PlayerSigilCopy.count(0), "0 Sigils")
+        XCTAssertEqual(PlayerSigilCopy.count(1), "1 Sigil")
+        XCTAssertEqual(PlayerSigilCopy.count(2), "2 Sigils")
+    }
+
+    func testCanonicalTerminologyCensusForWorldPreviewWritingAndDictionary() throws {
+        let root = URL(fileURLWithPath: #filePath).deletingLastPathComponent()
+            .deletingLastPathComponent()
+        let paths = [
+            "Sources/Screens/PreviewPanel.swift",
+            "Sources/Screens/WritingDeskView.swift",
+            "Sources/Screens/PageGridView.swift",
+            "Sources/Screens/LibraryView.swift",
+            "Sources/Screens/SettingsView.swift",
+            "Sources/Screens/BaseView.swift",
+            "Sources/Screens/WorldHistoryView.swift",
+            "Sources/Rules/PageRules.swift",
+            "Sources/Debug/HarnessActions.swift"
+        ]
+        let source = try paths.map {
+            try String(contentsOf: root.appending(path: $0), encoding: .utf8)
+        }.joined(separator: "\n")
+
+        for required in ["World preview", "Danger Sigils", "Clear ", "Unknown Sigil",
+                         "Sigil Dictionary", "Sigils saved at the time",
+                         "Those Sigils cannot be joined.", "One Sigil speaking",
+                         "which of your Sigils did what", "Move the Sigils"] {
+            XCTAssertTrue(source.contains(required), required)
+        }
+        for retired in ["\"Projection\"", "Danger runes", "Unknown mark",
+                        "current draft", "exact frozen expansion", "Rune Dictionary",
+                        "choose Runes", "Those marks cannot be joined.",
+                        "unknown-source", "placed mark must remain frozen"] {
+            XCTAssertFalse(source.contains(retired), retired)
+        }
     }
 }

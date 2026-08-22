@@ -10,7 +10,7 @@ enum Band2PhoneFixtureError: Error, LocalizedError {
 
     var errorDescription: String? {
         switch self {
-        case .missingVocabulary: "The authored Rune Dictionary vocabulary is unavailable."
+        case .missingVocabulary: "The authored Sigil Dictionary vocabulary is unavailable."
         case .missingCollectedPage: "No collected World Page is available for inspection."
         case .persistenceMismatch: "The disposable fixture did not survive its relaunch check."
         case .couldNotStageTemplate: "The production Template actions could not stage the fixture."
@@ -45,7 +45,7 @@ struct Band2TemplatesPhoneFixtureReceipt: Equatable, Sendable {
         let ids = stableTemplateIDs.prefix(3).map { "T\($0.rawValue)" }.joined(separator: " · ")
         return [
             "Relaunched disposable save · no campaign slot",
-            "\(templateCount) of \(capacity) Templates · \(currentDraftMarkCount)-mark dirty draft",
+            "\(templateCount) of \(capacity) Templates · current page has \(PlayerSigilCopy.count(currentDraftMarkCount))",
             "Stable IDs \(ids)\(stableTemplateIDs.count > 3 ? " …" : "")",
             "Use the cards to load, rename, overwrite and delete"
         ]
