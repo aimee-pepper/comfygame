@@ -185,7 +185,7 @@ final class PageTests: XCTestCase {
     func testStarterBindFactoryFreezesExactAcceptedDescriptionsAndClosedCausalBands() throws {
         let expected = [
             "starter_open_meadow": "Broad sandy ground runs between shallow pools. Your Plains mark opened the terrain, while your Verdant mark spread low growth farther along the few wet and stony edges.",
-            "starter_rainwashed_shore": "Stone shelves break a wide run of shallow and deep water. Your Archipelago mark divided the route, while sparse growth settled on the open stone.",
+            "starter_rainwashed_shore": "Stone shelves break a wide run of shallow and deep water. Your Archipelago mark divided the route, while only the ground nearest the entry remained clearly visible.",
             "starter_stone_hollow": "Stone closes around narrow paths and wet hollows. Your Caverns mark shaped the enclosure, while your Ore mark made ore more plentiful."
         ]
         let closed: [WorldArrivalReceipt.CausalVisualFact.Scope: Set<String>] = [
@@ -308,7 +308,7 @@ final class PageTests: XCTestCase {
     func testAcceptedStarterArrivalReceiptsProduceExactRulesOwnedDescriptions() throws {
         let expected = [
             "starter_open_meadow": "Broad sandy ground runs between shallow pools. Your Plains mark opened the terrain, while your Verdant mark spread low growth farther along the few wet and stony edges.",
-            "starter_rainwashed_shore": "Stone shelves break a wide run of shallow and deep water. Your Archipelago mark divided the route, while sparse growth settled on the open stone.",
+            "starter_rainwashed_shore": "Stone shelves break a wide run of shallow and deep water. Your Archipelago mark divided the route, while only the ground nearest the entry remained clearly visible.",
             "starter_stone_hollow": "Stone closes around narrow paths and wet hollows. Your Caverns mark shaped the enclosure, while your Ore mark made ore more plentiful."
         ]
         let root = URL(fileURLWithPath: #filePath).deletingLastPathComponent()
@@ -320,7 +320,12 @@ final class PageTests: XCTestCase {
                                              from: Data(contentsOf: url))
             XCTAssertEqual(try WorldArrivalDescriptionRules.describe(
                 arrivalInput(payload, terrain: arrivalTerrain(id))), copy, id)
-            XCTAssertEqual(payload.description, copy, "accepted Asset receipt drifted from authority")
+            if id == "starter_rainwashed_shore" {
+                XCTAssertNotEqual(payload.description, copy,
+                    "the frozen v0.3 proof predates the later trueDark priority correction")
+            } else {
+                XCTAssertEqual(payload.description, copy, "accepted Asset receipt drifted from authority")
+            }
             let words = copy.split(whereSeparator: \.isWhitespace).count
             XCTAssertTrue((18...55).contains(words), "\(id): \(words) words")
         }
@@ -410,6 +415,41 @@ final class PageTests: XCTestCase {
         XCTAssertTrue(try copy(condition).contains("Growth spreads through the open ground."))
         condition = base; condition.floraCoverageBand = "abundant"; condition.floraHabit = "clustered"
         XCTAssertTrue(try copy(condition).contains("Dense growth gathers in broad clusters."))
+    }
+
+    func testArrivalPairedFragmentUsesFrozenConditionPriority() throws {
+        let payload = try acceptedArrivalPayload("starter_open_meadow")
+        let fact = try XCTUnwrap(arrivalFacts(payload).first)
+        let base = WorldArrivalDescriptionRules.EnvironmentSummary(
+            illuminationBand: "ordinary", suspendedMedium: "none", suspendedDensity: "none",
+            precipitation: "none", precipitationIntensity: "none",
+            floraCoverageBand: "sparse", floraHabit: "spreading")
+        func copy(_ environment: WorldArrivalDescriptionRules.EnvironmentSummary) throws -> String {
+            try WorldArrivalDescriptionRules.describe(.init(
+                dominantDryGround: payload.dominantGround,
+                terrain: arrivalTerrain("starter_open_meadow"),
+                environment: environment, causalFacts: [fact]))
+        }
+
+        var condition = base
+        condition.illuminationBand = "trueDark"
+        XCTAssertTrue(try copy(condition).contains(
+            "only the ground nearest the entry remained clearly visible"))
+        condition.illuminationBand = "blazing"
+        XCTAssertTrue(try copy(condition).contains("hard light reached every open surface"))
+        condition.illuminationBand = "dim"
+        XCTAssertTrue(try copy(condition).contains("sparse growth settled"))
+        XCTAssertFalse(try copy(condition).contains("dim light"))
+        condition.illuminationBand = "bright"
+        XCTAssertTrue(try copy(condition).contains("sparse growth settled"))
+        XCTAssertFalse(try copy(condition).contains("clear light"))
+
+        condition = base
+        condition.suspendedMedium = "smoke"; condition.suspendedDensity = "light"
+        XCTAssertTrue(try copy(condition).contains("thin smoke drifted"))
+        condition = base
+        condition.precipitation = "rain"; condition.precipitationIntensity = "light"
+        XCTAssertTrue(try copy(condition).contains("light rain crossed"))
     }
 
     func testArrivalCausalCopyUsesFrozenLabelsAndExplicitPageOrder() throws {

@@ -297,6 +297,12 @@ enum WorldArrivalDescriptionRules {
             default: break
             }
         }
+        if environment.illuminationBand == "trueDark" {
+            return "only the ground nearest the entry remained clearly visible"
+        }
+        if environment.illuminationBand == "blazing" {
+            return "hard light reached every open surface"
+        }
         if environment.suspendedDensity == "trace" || environment.suspendedDensity == "light" {
             switch environment.suspendedMedium {
             case "smoke": return "thin smoke drifted through the open ground"
@@ -325,12 +331,6 @@ enum WorldArrivalDescriptionRules {
             return "sparse growth settled on the open stone"
         case ("sparse", _): return "sparse growth settled across a few open patches"
         default: break
-        }
-        if environment.illuminationBand == "trueDark" {
-            return "only the ground nearest the entry remained clearly visible"
-        }
-        if environment.illuminationBand == "blazing" {
-            return "hard light reached every open surface"
         }
         if environment.illuminationBand == "dim" { return "dim light left the farther ground subdued" }
         if environment.illuminationBand == "bright" { return "clear light separated the open surfaces" }
