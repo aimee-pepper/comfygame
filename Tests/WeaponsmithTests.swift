@@ -31,8 +31,32 @@ final class WeaponsmithTests: XCTestCase {
     func testWeaponsmithPatternAuthorityIsTyped() {
         let pattern: WorkshopPatternID = PhysicalGearCraftingRules.maudFittingPattern
         XCTAssertEqual(pattern.rawValue, "maud_fitting_pattern")
-        XCTAssertNotNil(WorkshopPatternRegistry.definition(pattern))
+        XCTAssertEqual(WorkshopPatternRegistry.displayName(pattern), "Fitted Polearm Schematic")
+        XCTAssertNil(WorkshopPatternRegistry.displayName("unknown_pattern"))
+        XCTAssertEqual(DiaryPageDef.Kind.pattern.displayName, "A Schematic")
+        XCTAssertEqual(DiaryPageDef.Kind.schematic.displayName, "A Schematic")
+        XCTAssertEqual(DiaryPageDef.Kind.symbol.displayName, "A Sigil")
+        XCTAssertEqual(SchematicPresentation.learnedEvent(pattern: pattern),
+                       "A Schematic you didn't have: Fitted Polearm Schematic.")
+        XCTAssertEqual(SchematicPresentation.learnedEvent(pattern: "unknown_pattern"),
+                       "A Schematic you didn't have.")
+        XCTAssertEqual(SchematicPresentation.learnedEvent(schematic: "unknown_schematic"),
+                       "A Schematic you didn't have.")
     }
+
+#if DEBUG
+    func testAuthoredAtlasClassifiesBothWireKindsAsSchematicAndKeepsInternalIDSecondary() throws {
+        let units = AuthoredTextAtlas.inventory().flatMap(\.units)
+        let pattern = try XCTUnwrap(units.first { $0.id.contains("maud_fitting_pattern") })
+        let schematic = try XCTUnwrap(units.first { $0.id.contains("oda_emanation_housing") })
+        XCTAssertEqual(pattern.teachingKind, "Schematic")
+        XCTAssertEqual(schematic.teachingKind, "Schematic")
+        XCTAssertTrue(try XCTUnwrap(pattern.detail).contains(
+            "Schematic: Fitted Polearm Schematic · Internal ID: maud_fitting_pattern"))
+        XCTAssertTrue(try XCTUnwrap(schematic.detail).contains("Schematic:"))
+        XCTAssertTrue(try XCTUnwrap(schematic.detail).contains("Internal ID: emanation_housing"))
+    }
+#endif
     private func state(tier: Int = 0, grade: Double = 70, pattern: Bool = false) -> GameState {
         var state = GameState.newGame()
         state.base.stations[Stations.weaponsmith] = StationState(isUnlocked: true, tier: tier)

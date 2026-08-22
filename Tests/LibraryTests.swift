@@ -71,7 +71,7 @@ final class LibraryTests: XCTestCase {
 
     func testWorkshopPatternRegistryRejectsDuplicateIDsRegardlessOfOrder() {
         let maud = WorkshopPatternRegistry.Definition(
-            id: "maud_fitting_pattern", name: "Maud's fitting pattern")
+            id: "maud_fitting_pattern", name: "Fitted Polearm Schematic")
         let duplicate = WorkshopPatternRegistry.Definition(
             id: "maud_fitting_pattern", name: "Renamed duplicate")
         let other = WorkshopPatternRegistry.Definition(id: "other_pattern", name: "Other")
@@ -104,7 +104,7 @@ final class LibraryTests: XCTestCase {
         let page = try XCTUnwrap(ContentCatalog.shared.diaryPage("maud_fitting_pattern"))
         XCTAssertEqual(page.teachesPattern, "maud_fitting_pattern")
         XCTAssertEqual(WorkshopPatternRegistry.definition(try XCTUnwrap(page.teachesPattern))?.name,
-                       "Maud's fitting pattern")
+                       "Fitted Polearm Schematic")
         var state = GameState.newGame()
 
         let first = WorldRules.readPage(page.id, in: &state)

@@ -334,9 +334,10 @@ struct WorldView: View {
             "A word you didn't have: \(ContentCatalog.shared.pressureSource(focus)?.name ?? "something new")."
         case .learnedGambit(let component):
             "A gambit phrase you didn't have: \(ContentCatalog.shared.gambitComponent(component)?.name ?? "something new")."
-        case .learnedPattern: "A workshop pattern you didn't have."
+        case .learnedPattern(let pattern):
+            SchematicPresentation.learnedEvent(pattern: pattern)
         case .learnedSchematic(let schematic):
-            "A schematic you didn't have: \(SchematicRegistry.definition(schematic)?.name ?? schematic.rawValue)."
+            SchematicPresentation.learnedEvent(schematic: schematic)
         case .gainedEssence(let amount): "\(amount) essence, banked."
         case .pickedUpItem(let what): "\(what) You can't tell what it is."
         case .satchelFull(let what): "No room in your satchel — \(what.lowercased()) is waiting on you."

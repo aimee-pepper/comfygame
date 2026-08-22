@@ -245,11 +245,10 @@ struct DiaryPageDef: Codable, Equatable, Identifiable, Sendable {
             case .account: "An account"
             case .turn: "A turn"
             case .ruin: "Somewhere built"
-            case .symbol: "A rune"
+            case .symbol: "A Sigil"
             case .focus: "A focus"
             case .gambit: "A gambit phrase"
-            case .pattern: "A workshop pattern"
-            case .schematic: "A schematic"
+            case .pattern, .schematic: "A Schematic"
             case .researchLead: "A line of study"
             }
         }
@@ -265,11 +264,15 @@ enum WorkshopPatternRegistry {
     }
 
     static let definitions: [Definition] = [
-        Definition(id: "maud_fitting_pattern", name: "Maud's fitting pattern")
+        Definition(id: "maud_fitting_pattern", name: "Fitted Polearm Schematic")
     ]
 
     static func definition(_ id: WorkshopPatternID) -> Definition? {
         definitions.first { $0.id == id }
+    }
+
+    static func displayName(_ id: WorkshopPatternID) -> String? {
+        definition(id)?.name
     }
 
     static func validate(_ definitions: [Definition]) throws {
@@ -312,5 +315,19 @@ enum SchematicRegistry {
                     "schematic '\(definition.id.rawValue)'")
             }
         }
+    }
+}
+
+enum SchematicPresentation {
+    static func learnedEvent(pattern id: WorkshopPatternID) -> String {
+        WorkshopPatternRegistry.displayName(id)
+            .map { "A Schematic you didn't have: \($0)." }
+            ?? "A Schematic you didn't have."
+    }
+
+    static func learnedEvent(schematic id: SchematicID) -> String {
+        SchematicRegistry.definition(id)
+            .map { "A Schematic you didn't have: \($0.name)." }
+            ?? "A Schematic you didn't have."
     }
 }

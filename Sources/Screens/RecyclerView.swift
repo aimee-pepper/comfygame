@@ -108,7 +108,7 @@ struct RecyclerView: View {
 
             Divider()
 
-            Label("Favorites, locked pieces, unique work and gear without recorded provenance stay protected.",
+            Label("Favorites, locked pieces, one-of-a-kind gear, and gear without recorded construction stock or standard salvage stay protected.",
                   systemImage: "lock.shield")
                 .font(.caption)
                 .foregroundStyle(.secondary)
@@ -217,8 +217,8 @@ private struct RecyclerPreviewSheet: View {
 
     private var routeName: String {
         switch preview.route {
-        case .constructionReceipt: "Recorded construction receipt"
-        case .authoredSalvage: "Authored salvage profile"
+        case .constructionReceipt: "Returns recorded construction stock"
+        case .authoredSalvage: "Returns standard salvage"
         }
     }
 

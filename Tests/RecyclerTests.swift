@@ -151,6 +151,17 @@ final class TradingPostMaterialReserveRoutingTests: XCTestCase {
 }
 
 final class RecyclerTests: XCTestCase {
+    func testRecyclerIneligibilityUsesCanonicalPlayerReasons() {
+        XCTAssertEqual(RecyclerRules.Ineligibility.unique.explanation, "One-of-a-kind gear cannot be dismantled.")
+        XCTAssertEqual(RecyclerRules.Ineligibility.apex.explanation, "Apex gear cannot be dismantled.")
+        XCTAssertEqual(RecyclerRules.Ineligibility.narrative.explanation, "Story items remain intact.")
+        XCTAssertEqual(RecyclerRules.Ineligibility.channelworks.explanation, "This belongs at Channelworks and cannot be dismantled here.")
+        XCTAssertEqual(RecyclerRules.Ineligibility.legacyCredit.explanation,
+                       "Gear with power carried forward from an older save stays protected until you rebuild it at the Armoury.")
+        XCTAssertEqual(RecyclerRules.Ineligibility.noRecoveryProfile.explanation,
+                       "This piece has no recorded construction stock or standard salvage.")
+    }
+
     func testRecoveryPreviewKeepsDestructiveActionOutsideScrollableDetails() throws {
         let root = URL(fileURLWithPath: #filePath)
             .deletingLastPathComponent().deletingLastPathComponent()
@@ -162,7 +173,7 @@ final class RecyclerTests: XCTestCase {
         XCTAssertTrue(source.contains(".safeAreaInset(edge: .bottom, spacing: 0) { dismantleActionBar }"))
         XCTAssertTrue(source.contains("private var recyclerEmptyState: some View"))
         XCTAssertTrue(source.contains("No gear to dismantle"))
-        XCTAssertTrue(source.contains("gear without recorded provenance stay protected"))
+        XCTAssertTrue(source.contains("gear without recorded construction stock or standard salvage stay protected"))
         XCTAssertTrue(source.contains("ItemIconTile(icon: preview.snapshot.icon"))
         XCTAssertTrue(source.contains("NamedCharacterPixelIdentity("))
         XCTAssertTrue(source.contains("travellerID: person?.id"))

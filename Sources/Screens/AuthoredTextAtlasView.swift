@@ -24,7 +24,8 @@ enum AuthoredTextAtlas {
 
         var teachingKind: String? {
             guard kind == .diary, let detail else { return nil }
-            for value in ["focus", "gambit", "pattern", "research", "site"] where detail.contains("\(value) ") { return value.capitalized }
+            if detail.contains("Schematic:") { return "Schematic" }
+            for value in ["focus", "gambit", "research", "site"] where detail.contains("\(value) ") { return value.capitalized }
             return nil
         }
 
@@ -83,7 +84,14 @@ enum AuthoredTextAtlas {
                     if let clue = page.clueIndex { metadata.append("clue \(clue)") }
                     if let focus = page.teachesFocus { metadata.append("focus \(focus.rawValue)") }
                     if let gambit = page.teachesGambit { metadata.append("gambit \(gambit.rawValue)") }
-                    if let pattern = page.teachesPattern { metadata.append("pattern \(pattern)") }
+                    if let pattern = page.teachesPattern {
+                        metadata.append("Schematic: \(WorkshopPatternRegistry.displayName(pattern) ?? "Unknown Schematic")")
+                        metadata.append("Internal ID: \(pattern.rawValue)")
+                    }
+                    if let schematic = page.teachesSchematic {
+                        metadata.append("Schematic: \(SchematicRegistry.definition(schematic)?.name ?? "Unknown Schematic")")
+                        metadata.append("Internal ID: \(schematic.rawValue)")
+                    }
                     if let research = page.researchNode { metadata.append("research \(research.rawValue)") }
                     if let site = page.site { metadata.append("site \(site.rawValue)") }
                     if traveller.id == "noll" { metadata.append("Provisional · needs Aimee review") }
@@ -93,7 +101,7 @@ enum AuthoredTextAtlas {
                 }
                 if traveller.id == "noll" {
                     units.append(Unit(id: "held.page.noll_field_separation_kit.prose", traveller: traveller.id,
-                                      kind: .diary, label: "Held page · Pattern",
+                                      kind: .diary, label: "Held page · Schematic",
                                       text: "A travelling kit should open one object and then be spent. If the tool survives every separation, the thing being consumed is somewhere you have chosen not to record.",
                                       detail: "Provisional · DEBUG review only · not findable · no live Field Separation Kit reward"))
                 }

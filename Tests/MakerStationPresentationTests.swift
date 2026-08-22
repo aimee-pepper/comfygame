@@ -2,6 +2,67 @@ import XCTest
 @testable import Bookbinder
 
 final class MakerStationPresentationTests: XCTestCase {
+    func testGearPresentationCopyUsesNaturalStockCountsAndOlderSaveCopy() {
+        XCTAssertEqual(GearPresentationCopy.piecesOfStock(0), "0 pieces of stock")
+        XCTAssertEqual(GearPresentationCopy.piecesOfStock(1), "1 piece of stock")
+        XCTAssertEqual(GearPresentationCopy.piecesOfStock(4), "4 pieces of stock")
+        XCTAssertEqual(GearPresentationCopy.moreQualifyingPiecesOfStock(1),
+                       "1 more qualifying piece of stock")
+        XCTAssertEqual(GearPresentationCopy.moreQualifyingPiecesOfStock(3),
+                       "3 more qualifying pieces of stock")
+        XCTAssertEqual(GearPresentationCopy.olderSaveArtUnavailable,
+                       "From an older save. Detailed item art is unavailable.")
+        XCTAssertEqual(GearPresentationCopy.physicalProtection(offset: 0), "full physical protection")
+        XCTAssertEqual(GearPresentationCopy.physicalProtection(offset: -0.5), "0.5 less physical protection")
+        XCTAssertEqual(GearPresentationCopy.physicalProtection(offset: -1), "1 less physical protection")
+        XCTAssertEqual(GearPresentationCopy.physicalProtection(offset: 0.5), "0.5 more physical protection")
+    }
+
+    func testStepFivePlayerCopyAvoidsImplementationTermsOnScopedSurfaces() throws {
+        let root = URL(fileURLWithPath: #filePath).deletingLastPathComponent().deletingLastPathComponent()
+        let paths = [
+            "Sources/App/RootView.swift", "Sources/Screens/BlacksmithView.swift",
+            "Sources/Screens/RecyclerView.swift", "Sources/Screens/TradingPostView.swift",
+            "Sources/Screens/AuthoredTextAtlasView.swift", "Sources/Screens/WorldView.swift",
+            "Sources/Rules/RecyclerRules.swift"
+        ]
+        let visibleStringPattern = try NSRegularExpression(pattern: #"\"(?:[^\"\\]|\\.)*\""#)
+        let strings = try paths.flatMap { path -> [String] in
+            let source = try String(contentsOf: root.appending(path: path), encoding: .utf8)
+            let range = NSRange(source.startIndex..., in: source)
+            return visibleStringPattern.matches(in: source, range: range).compactMap {
+                Range($0.range, in: source).map { String(source[$0]).lowercased() }
+            }
+        }.joined(separator: "\n")
+        for retired in ["receipt detail", "legacy receipt", "legacy masterwork",
+                        "construction profile", "authored salvage profile", "provenance",
+                        "workshop pattern", "a rune"] {
+            XCTAssertFalse(strings.contains(retired), "retired player copy: \(retired)")
+        }
+        let blacksmith = try String(contentsOf: root.appending(path: "Sources/Screens/BlacksmithView.swift"), encoding: .utf8)
+        let blacksmithStrings = visibleStringPattern.matches(
+            in: blacksmith, range: NSRange(blacksmith.startIndex..., in: blacksmith)
+        ).compactMap { Range($0.range, in: blacksmith).map { String(blacksmith[$0]) } }
+        XCTAssertFalse(blacksmithStrings.contains {
+            let playerCopy = $0.replacingOccurrences(of: #"\\\([^)]*\)"#, with: "", options: .regularExpression)
+            return playerCopy.range(of: #"\bsamples?\b"#, options: .regularExpression) != nil
+        })
+    }
+
+    func testReturnDetailsLeadWithCanonicalNameAndHideRawKeys() throws {
+        let root = URL(fileURLWithPath: #filePath).deletingLastPathComponent().deletingLastPathComponent()
+        let source = try String(contentsOf: root.appending(path: "Sources/App/RootView.swift"), encoding: .utf8)
+        let start = try XCTUnwrap(source.range(of: "private func receiptDetail("))
+        let end = try XCTUnwrap(source.range(of: "private func receiptDetailOverlay("))
+        let detail = String(source[start.lowerBound..<end.lowerBound])
+        XCTAssertTrue(detail.contains("Text(line.compatibilityGain.name)"))
+        XCTAssertTrue(detail.contains("GearPresentationCopy.olderSaveArtUnavailable"))
+        XCTAssertFalse(detail.contains("resource.id.rawValue"))
+        XCTAssertFalse(detail.contains("item.snapshot.catalogID.rawValue"))
+        XCTAssertFalse(detail.contains("LabeledContent(\"Identity\""))
+        XCTAssertTrue(source.contains("Text(\"DETAILS\")"))
+    }
+
     func testScriptoriumExposesOnlyRealHandsInksRunebookCapabilitiesAndFrozenTransactions() throws {
         let root = URL(fileURLWithPath: #filePath)
             .deletingLastPathComponent().deletingLastPathComponent()
@@ -63,7 +124,7 @@ final class MakerStationPresentationTests: XCTestCase {
     func testConstructionRowsDescribeRequirementsRatherThanClaimingASelection() throws {
         let root = URL(fileURLWithPath: #filePath).deletingLastPathComponent().deletingLastPathComponent()
         let source = try String(contentsOf: root.appending(path: "Sources/Screens/BlacksmithView.swift"), encoding: .utf8)
-        XCTAssertTrue(source.contains("Needs \\(recipe.requirements.count) samples"))
+        XCTAssertTrue(source.contains("GearPresentationCopy.piecesOfStock(recipe.requirements.count)"))
         XCTAssertFalse(source.contains("\\(recipe.requirements.count) selected samples"))
     }
 
@@ -119,7 +180,7 @@ final class MakerStationPresentationTests: XCTestCase {
         XCTAssertTrue(armoury.contains(".presentationDragIndicator(.visible)"))
         XCTAssertTrue(armoury.contains("if targets.isEmpty"))
         XCTAssertTrue(armoury.contains("No eligible protective pieces are stored or worn."))
-        XCTAssertTrue(armoury.contains("No eligible ordinary protective pieces. Show legacy masterworks to include them."))
+        XCTAssertTrue(armoury.contains("No eligible ordinary protective pieces. Include gear from older saves to see compatible pieces."))
         XCTAssertFalse(armoury.contains("Image(systemName: \"chevron.right\")"))
     }
     func testPlayerFacingReforgeLabelsUseRulesOwnedMaximum() throws {

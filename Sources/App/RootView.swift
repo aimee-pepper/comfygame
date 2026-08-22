@@ -659,10 +659,8 @@ struct RunExitSummaryView: View {
             switch line {
             case .resource(let resource):
                 LabeledContent("Quantity", value: "\(resource.quantity)")
-                LabeledContent("Resource", value: resource.id.rawValue)
             case .stackableItem(let item), .uniqueItem(let item):
                 LabeledContent("Quantity", value: "\(item.quantity)")
-                LabeledContent("Identity", value: item.snapshot.catalogID.rawValue)
                 LabeledContent("State", value: item.snapshot.identified ? "Identified" : "Unidentified")
             case .materialSample(let material):
                 LabeledContent("Kind", value: material.sample.kind.displayName)
@@ -670,7 +668,7 @@ struct RunExitSummaryView: View {
                 LabeledContent("Source", value: material.sample.source)
             case .legacy(let legacy):
                 LabeledContent("Quantity", value: "\(legacy.quantity)")
-                Text("Legacy receipt · visual identity unavailable")
+                Text(GearPresentationCopy.olderSaveArtUnavailable)
                     .font(.caption).foregroundStyle(.secondary)
             }
         }
@@ -683,7 +681,7 @@ struct RunExitSummaryView: View {
                 .onTapGesture { selectedReceipt = nil }
             VStack(alignment: .leading, spacing: 8) {
                 HStack {
-                    Text("RECEIPT DETAIL")
+                    Text("DETAILS")
                         .font(.custom("Tiny5", size: 10))
                         .foregroundStyle(PixelUITheme.muted)
                     Spacer()

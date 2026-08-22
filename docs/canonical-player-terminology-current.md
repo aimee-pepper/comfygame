@@ -130,6 +130,8 @@ DEBUG terminology exemption.
 2. Migrate World preview and Writing Desk terminology together so page composition uses one vocabulary.
 3. Migrate all Essence affordability presentations through one shared formatter.
 4. Migrate Research and Combat prerequisites through one shared `Requires …` formatter.
+5. Migrate gear and compatibility detail surfaces; never expose a raw key as the primary value.
+6. Regenerate GameWiki labels from this machine authority and run a complete human-visible string census.
 
 ### Research and Combat requirement relationship
 
@@ -141,8 +143,14 @@ unavailable requirement information rather than appearing to have no earlier req
 Research details are headed `Earlier Upgrades`. Combat Capstones retain their additional connected-route
 gate and state it separately: `Capstone requirement: learn a connected route of 7 earlier Skills in this
 tree, including this discipline’s Root, one Fundamental, one Development, and one Mastery.`
-5. Migrate gear and compatibility detail surfaces; never expose a raw key as the primary value.
-6. Regenerate GameWiki labels from this machine authority and run a complete human-visible string census.
+### Gear, maker stock and compatibility detail
+
+- Maker inputs are **stock** and naturally pluralized **piece(s) of stock**.
+- **Construction** names the rebuild choice while internal profile identifiers remain unchanged.
+- Older-save compatibility is named plainly and never exposed as legacy/masterwork implementation jargon.
+- Recycler routes say whether they return recorded construction stock or standard salvage.
+- Maud teaches the **Fitted Polearm Schematic** while the persisted pattern wire identity remains unchanged.
+- Item and resource detail leads with the canonical name and does not expose raw catalogue keys.
 
 Do not rewrite model symbols, Codable keys or historical archives merely to make a grep count reach zero.
 Do make every newly rendered label, accessibility string, DEBUG label, wiki heading, current test fixture and

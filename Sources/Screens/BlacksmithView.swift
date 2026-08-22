@@ -222,7 +222,7 @@ private struct ConstructionRow: View {
     }
 
     private var summary: String {
-        "Needs \(recipe.requirements.count) samples · Tier 1–\(PhysicalGearCraftingRules.constructionCap(for: recipe, in: store.state))"
+        "Needs \(GearPresentationCopy.piecesOfStock(recipe.requirements.count)) · Tier 1–\(PhysicalGearCraftingRules.constructionCap(for: recipe, in: store.state))"
     }
 
     @ViewBuilder private var status: some View {
@@ -290,16 +290,16 @@ struct ArmouryView: View {
         ScrollView {
             VStack(spacing: 16) {
                 StationCard(title: "Rebuild protection", icon: "shield.lefthalf.filled") {
-                    Text("Choose one familiar protective piece. Bracken keeps its identity, slot and wearer while rebuilding what its construction does.")
+                    Text("Choose one familiar protective piece. Bracken keeps its name, equipment slot, and current wearer while rebuilding what its Construction does.")
                         .font(.caption).foregroundStyle(.secondary)
                 }
                 StationCard(title: "Protective pieces", icon: "shield") {
-                    Toggle("Show legacy masterworks", isOn: $showLegacy)
+                    Toggle("Include gear from older saves", isOn: $showLegacy)
                     let targets = ArmouryRules.targets(in: store.state, includeLegacy: showLegacy)
                     if targets.isEmpty {
                         EmptyNote(showLegacy
                                   ? "No eligible protective pieces are stored or worn."
-                                  : "No eligible ordinary protective pieces. Show legacy masterworks to include them.")
+                                  : "No eligible ordinary protective pieces. Include gear from older saves to see compatible pieces.")
                     } else {
                         SixAcrossItemGrid(data: targets, id: \.id) { target in
                             Button { chosenTarget = target } label: {
@@ -315,7 +315,7 @@ struct ArmouryView: View {
                             }
                             .buttonStyle(.plain)
                         }
-                        Text("Tap a stored or worn piece to choose its rebuild profile.")
+                        Text("Tap a stored or worn piece to choose its Construction.")
                             .font(.caption)
                             .foregroundStyle(.secondary)
                     }
@@ -399,7 +399,7 @@ struct WeaponsmithView: View {
                             }.buttonStyle(.plain)
                         }
                     } else {
-                        EmptyNote("A fitting pattern in Maud's diary completes this form.")
+                        EmptyNote("The Fitted Polearm Schematic is recorded in Maud’s diary.")
                     }
                 }
                 StationCard(title: "Maud's work", icon: "point.3.connected.trianglepath.dotted") {
@@ -462,7 +462,7 @@ private struct ArmouryTargetSheet: View {
                         .disabled(!available)
                     }
                     }
-                    Text("Choose a construction profile. Exact stock and the final comparison follow without leaving this rebuild.")
+                    Text("Choose a Construction. Exact stock and the final comparison follow without leaving this rebuild.")
                         .font(.caption)
                         .foregroundStyle(.secondary)
                 }
@@ -479,8 +479,8 @@ private struct ArmouryTargetSheet: View {
     }
 
     private func profileSummary(_ profile: ArmouryRules.Profile) -> String {
-        let physical = profile.physicalOffset == 0 ? "full physical" : "\(profile.physicalOffset) physical"
-        return "\(profile.requirements.count) selected samples · \(physical)"
+        let physical = GearPresentationCopy.physicalProtection(offset: profile.physicalOffset)
+        return "\(GearPresentationCopy.piecesOfStock(profile.requirements.count)) · \(physical)"
     }
 
     private var profileColumns: [GridItem] {
@@ -536,7 +536,7 @@ private struct ArmouryRebuildSheet: View {
                                   systemImage: "exclamationmark.triangle").font(.caption).foregroundStyle(.orange)
                         }
                         if target.hasReforgeWork {
-                            Label("Reforged rank \(target.reforgeRank) will reset to 0.",
+                            Label("Reforge \(target.reforgeRank) will reset to 0.",
                                   systemImage: "arrow.counterclockwise")
                                 .font(.caption).foregroundStyle(.secondary)
                         }
@@ -556,7 +556,7 @@ private struct ArmouryRebuildSheet: View {
                         }
                     }
                 } else {
-                    Section { EmptyNote("You do not have four distinct qualifying samples for this profile.") }
+                    Section { EmptyNote("You do not have four distinct qualifying pieces of stock for this Construction.") }
                 }
             }
             .safeAreaInset(edge: .bottom, spacing: 0) {
@@ -569,15 +569,15 @@ private struct ArmouryRebuildSheet: View {
                 Button("Cancel", role: .cancel) {}
                 Button("Rebuild") { if let preview { commit(preview, allowLegacy: false) } }
             } message: { Text("The shown tier and essence cost are final. Selected stock will be consumed.") }
-            .alert("Remove legacy work?", isPresented: $confirmingLegacy) {
+            .alert("Replace upgrade from older save?", isPresented: $confirmingLegacy) {
                 Button("Cancel", role: .cancel) {}
                 Button("Rebuild", role: .destructive) { if let preview { commit(preview, allowLegacy: true) } }
             } message: {
                 if let preview {
                     let reforge = target.hasReforgeWork
-                        ? " and resets Reforged rank \(target.reforgeRank) to 0"
+                        ? " and resets Reforge \(target.reforgeRank) to 0"
                         : ""
-                    Text("This rebuild removes Legacy masterwork +\(target.legacyPowerCredit)\(reforge). Physical \(String(format: "%.1f", preview.currentPhysical)) → \(String(format: "%.1f", preview.rebuiltPhysical)); insulation \(Int(preview.currentInsulation)) → \(Int(preview.insulation)). This cannot be undone.")
+                    Text("This rebuild removes +\(target.legacyPowerCredit) power carried forward from an older save\(reforge). Physical \(String(format: "%.1f", preview.currentPhysical)) → \(String(format: "%.1f", preview.rebuiltPhysical)); insulation \(Int(preview.currentInsulation)) → \(Int(preview.insulation)). This cannot be undone.")
                 }
             }
         }
@@ -718,7 +718,7 @@ private struct ConstructionSheet: View {
                     candidateTray
                 } else {
                     Section {
-                        EmptyNote("You do not yet have a distinct qualifying sample for every part of this piece.")
+                        EmptyNote("You do not yet have a distinct qualifying piece of stock for every part of this piece.")
                     }
                     requirementSockets([])
                     candidateTray
@@ -781,7 +781,7 @@ private struct ConstructionSheet: View {
         if store.state.base.essence < preview.essence {
             return "Needs \(preview.essence - store.state.base.essence) more essence."
         }
-        return "One persistent piece. Its selected samples and origins stay with it."
+        return "One persistent piece. Its selected stock and origins stay with it."
     }
 
     private func constructionActionHasFailure(_ preview: PhysicalGearCraftingRules.Preview) -> Bool {
@@ -840,7 +840,7 @@ private struct ConstructionSheet: View {
             let rejected = assessments.filter { !$0.isEligible }
             Section {
                 if eligible.isEmpty {
-                    EmptyNote("No stored sample currently satisfies this socket.")
+                    EmptyNote("No stored piece of stock currently satisfies this part.")
                 } else {
                     SixAcrossItemGrid(data: eligible, id: \.id) { assessment in
                         AnchoredItemDetailButton(item: assessment, selection: $openedCandidate) {
@@ -860,7 +860,7 @@ private struct ConstructionSheet: View {
                     }
                 }
                 if !rejected.isEmpty {
-                    DisclosureGroup("Why \(rejected.count) other samples do not fit") {
+                    DisclosureGroup("Why \(rejected.count) other pieces of stock do not fit") {
                         ForEach(rejected.prefix(8)) { assessment in
                             VStack(alignment: .leading, spacing: 2) {
                                 Text(assessment.selection.sample.displayName).font(.caption.weight(.medium))
@@ -874,7 +874,7 @@ private struct ConstructionSheet: View {
             } header: {
                 Text("Stock · \(requirement.displayName)")
             } footer: {
-                Text("Each icon is one exact stored sample. Opening it changes nothing until you choose Use.")
+                Text("Each icon is one exact stored piece of stock. Opening it changes nothing until you choose Use.")
             }
         }
     }
@@ -904,7 +904,7 @@ private struct CandidateStockDetail: View {
                       systemImage: assessment.selection.sample.kind.icon)
                     .font(.headline)
                 if !assessment.selection.sample.source.isEmpty {
-                    LabeledContent("Provenance", value: assessment.selection.sample.source)
+                    LabeledContent("History", value: assessment.selection.sample.source)
                 }
                 LabeledContent("Grade", value: String(format: "%.1f", assessment.selection.sample.grade))
                 Text(requirement.summary).font(.caption).foregroundStyle(.secondary)
@@ -952,7 +952,7 @@ private struct SamplePicker: View {
                         }
                     }
                 }
-                Text("Samples already selected for another part are unavailable.")
+                Text("Pieces of stock already selected for another part are unavailable.")
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }
@@ -982,7 +982,7 @@ private struct ArmourySampleDetail: View {
                 Label(candidate.sample.displayName, systemImage: candidate.sample.kind.icon)
                     .font(.headline)
                 if !candidate.sample.source.isEmpty {
-                    LabeledContent("Provenance", value: candidate.sample.source)
+                    LabeledContent("History", value: candidate.sample.source)
                 }
                 LabeledContent("Grade", value: String(format: "%.1f", candidate.sample.grade))
                 ForEach(requirement.floors, id: \.property) { floor in
@@ -1156,7 +1156,7 @@ private struct ReforgeSheet: View {
                                         .font(.callout)
                                         .foregroundStyle(candidate.sample.rarity.tint)
                                     if !candidate.sample.source.isEmpty {
-                                        Text("off a \(candidate.sample.source)")
+                                        Text("From \(candidate.sample.source)")
                                             .font(.caption2).foregroundStyle(.secondary)
                                     }
                                 }
@@ -1214,7 +1214,7 @@ private struct ReforgeSheet: View {
             return "This piece is already fully reforged."
         case .needsMaterials(let have, let need):
             let missing = max(0, need - have)
-            return "Needs \(missing) more qualifying stock \(missing == 1 ? "sample" : "samples")."
+            return "Needs \(GearPresentationCopy.moreQualifyingPiecesOfStock(missing))."
         case .needsEssence(let have, let need):
             return "Needs \(max(0, need - have)) more essence."
         }

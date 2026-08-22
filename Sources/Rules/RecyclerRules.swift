@@ -13,12 +13,12 @@ enum RecyclerRules {
             case .locked: "Locked pieces are protected. Unlock it first."
             case .equipped: "Worn gear must be taken off before dismantling."
             case .notGear: "The Recycler accepts eligible gear, not ordinary holdings."
-            case .unique: "Singular authored gear cannot be dismantled."
-            case .apex: "Apex gear keeps its rule and cannot be dismantled."
-            case .narrative: "Narrative objects remain intact."
-            case .channelworks: "Channelworks objects use their own receipt and cannot be dismantled here."
-            case .legacyCredit: "Legacy masterwork credit is protected from irreversible loss."
-            case .noRecoveryProfile: "No honest recovery profile or construction receipt exists for this piece."
+            case .unique: "One-of-a-kind gear cannot be dismantled."
+            case .apex: "Apex gear cannot be dismantled."
+            case .narrative: "Story items remain intact."
+            case .channelworks: "This belongs at Channelworks and cannot be dismantled here."
+            case .legacyCredit: "Gear with power carried forward from an older save stays protected until you rebuild it at the Armoury."
+            case .noRecoveryProfile: "This piece has no recorded construction stock or standard salvage."
             }
         }
     }

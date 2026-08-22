@@ -394,7 +394,7 @@ private struct TradingPostListingSheet: View {
                             LabeledContent("Construction tier", value: "\(profile.constructionTier)")
                             LabeledContent("Reforge", value: "\(profile.reforgeRank) of \(SmithRules.maximumReforgeLevel)")
                             if let provenance = profile.displayProvenance {
-                                LabeledContent("Provenance", value: provenance)
+                                LabeledContent("History", value: provenance)
                             }
                         } else if let definition = ContentCatalog.shared.item(stack.catalogID),
                                   !definition.blurb.isEmpty {
