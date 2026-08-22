@@ -1,5 +1,6 @@
 import CryptoKit
 import Foundation
+import ImageIO
 
 /// Route-lazy access to the frozen WritingDeskProductionPack-v1.
 ///
@@ -9,6 +10,10 @@ final class WritingDeskProductionPack: @unchecked Sendable {
     static let identity = "WritingDeskProductionPack-v1"
     static let bodySHA256 = "3a9a3f1f854e20b981c26fa98da36bb4219661623cebfee895e4f743b7a62fa6"
     static let manifestSHA256 = "0257bb94d0e180dfa40008f7143a89e75dec49263e4d08e9249eadfe6f232f96"
+    static let parchmentStableKey = "writing.parchment.handmade-v1"
+    static let parchmentFilename = "writing.parchment.handmade-v1-172x172.png"
+    static let parchmentSHA256 = "01d6d596c147f2787a1d9f5199740e7444f236402f3567e81242681b5076ce48"
+    static let parchmentRGBASHA256 = "8428917aebca073dbf0c66493d5541cce0909a6e0228907950e37e72a97d2259"
 
     enum PackError: Error, Equatable {
         case unavailable
@@ -85,6 +90,42 @@ final class WritingDeskProductionPack: @unchecked Sendable {
             throw PackError.unavailable
         }
         return .init(rootURL: root)
+    }
+
+    /// The accepted production parchment is deliberately a separate, single bundled bitmap.
+    /// Proof sheets, references and exporter evidence remain outside the app bundle.
+    static func productionParchmentData(in bundle: Bundle = .main) throws -> Data {
+        let url = bundle.bundleURL.appendingPathComponent(parchmentFilename, isDirectory: false)
+        guard let data = try? Data(contentsOf: url),
+              let rgba = try? decodedParchmentRGBA(data),
+              sha256(rgba) == parchmentRGBASHA256 else {
+            throw PackError.unavailable
+        }
+        return data
+    }
+
+    /// Normalizes any harmless Xcode PNG-container rewrite to the accepted 8-bit sRGB RGBA pixels.
+    static func decodedParchmentRGBA(_ data: Data) throws -> Data {
+        guard let source = CGImageSourceCreateWithData(data as CFData, nil),
+              let image = CGImageSourceCreateImageAtIndex(source, 0, nil),
+              image.width == 172, image.height == 172,
+              let colorSpace = CGColorSpace(name: CGColorSpace.sRGB)
+        else { throw PackError.corruptAsset(parchmentStableKey) }
+        var bytes = Data(count: 172 * 172 * 4)
+        let drew = bytes.withUnsafeMutableBytes { buffer -> Bool in
+            guard let base = buffer.baseAddress,
+                  let context = CGContext(data: base, width: 172, height: 172,
+                                          bitsPerComponent: 8, bytesPerRow: 172 * 4,
+                                          space: colorSpace,
+                                          bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue
+                                            | CGBitmapInfo.byteOrder32Big.rawValue)
+            else { return false }
+            context.interpolationQuality = .none
+            context.draw(image, in: CGRect(x: 0, y: 0, width: 172, height: 172))
+            return true
+        }
+        guard drew else { throw PackError.corruptAsset(parchmentStableKey) }
+        return bytes
     }
 
     /// Opens the metadata on demand. It deliberately does not enumerate or decode PNG files.

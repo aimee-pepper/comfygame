@@ -158,9 +158,12 @@ struct PageGridView: View {
             }
             assetsReady = false
             do {
-                let blank = try productionPack.blankPageSpec().asset
-                guard let image = UIImage(data: try productionPack.assetData(sha256: blank.sha256))
-                else { throw WritingDeskProductionPack.PackError.corruptAsset(blank.sha256) }
+                let blank = try productionPack.blankPageSpec()
+                guard blank.writingArea == .init(x: 5, y: 5, width: 162, height: 162),
+                      let image = UIImage(data: try WritingDeskProductionPack.productionParchmentData()),
+                      image.size == CGSize(width: 172, height: 172)
+                else { throw WritingDeskProductionPack.PackError.corruptAsset(
+                    WritingDeskProductionPack.parchmentSHA256) }
                 for mark in visibleMarksByID.values where mark.visualRoute != .personalCompoundCompatibility {
                     guard case let .authored(key) = try productionPack.route(for: mark) else { continue }
                     let roles = try productionPack.markAssets(for: key)

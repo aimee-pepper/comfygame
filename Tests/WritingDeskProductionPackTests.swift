@@ -225,6 +225,17 @@ final class WritingDeskProductionPackTests: XCTestCase {
         XCTAssertEqual(contents.filter { $0 == "runtime/manifest.json" }.count, 1)
         XCTAssertFalse(contents.contains { $0.lowercased().contains("evidence") })
         XCTAssertFalse(contents.contains { $0.contains("contact-sheet") })
+        let parchment = Bundle.main.bundleURL
+            .appendingPathComponent(WritingDeskProductionPack.parchmentFilename)
+        let bundled = try WritingDeskProductionPack.productionParchmentData(in: .main)
+        XCTAssertEqual(try WritingDeskProductionPack.decodedParchmentRGBA(bundled).count,
+                       172 * 172 * 4)
+        XCTAssertFalse(try Data(contentsOf: parchment).isEmpty)
+        XCTAssertEqual(contents.filter {
+            $0 == WritingDeskProductionPack.parchmentFilename
+        }.count, 1)
+        XCTAssertFalse(contents.contains { $0.contains("writing-parchment-v1/evidence") })
+        XCTAssertFalse(contents.contains { $0.contains("generated-parchment-reference") })
     }
 
     func testBundledLocatorUsesExactPhysicalProductPathNotResourceIndex() throws {
