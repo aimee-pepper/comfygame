@@ -1,11 +1,11 @@
 {
   "schemaVersion": 1,
-  "aggregateSourceHash": "b742ded556b95f9895e92530a67c85a920f86c32d3d9839eed1eb15b93a90276",
+  "aggregateSourceHash": "84032250ddf894ff03c24cc8446e9bffe37c914a13eff25e058865e7abf28a3c",
   "inputs": {
     "AssetLab/artifacts/writing-parchment-v1/manifest.json": "9ef9c41f8d4f4b12e5bbb725e9f1ea5e52a77a3175de758016bb58cd170c499f",
     "Bookbinder.xcodeproj/project.pbxproj": "23df6b0dafa49aa167fd0397f0c2eec0de96b25088ac417fb0a7e0adf72b8173",
     "Sources/Content/Data/items.json": "eff94c1448caa323599c32f267a3fff4d32434140ba026f1ebd72abc4acc59a5",
-    "Sources/Content/Data/playability-roadmap.json": "82b8ece216473caf757f4f67162a1712ca636a04555ccbf4522b5b83bce582f0",
+    "Sources/Content/Data/playability-roadmap.json": "1de5dfb68a731315129109f104838e4e34359a845c95941e6cbcb04a017beed4",
     "Sources/Content/Data/pressure_sources.json": "68f7b2271d51613030f2f3b3e573f750af53c9b68fe00d68a599dcd6fc0a9b86",
     "Sources/Content/Data/pressure_targets.json": "b35cf88512a7e1e2efde12f352a35e1d499376a8a9990daa41a8f285c65e6a42",
     "Sources/Content/Data/qualifiers.json": "35c0f4b00f35fdb8d1d1845ca27988b73283acc623ec3b39c95cb1b921bec120",
@@ -294,13 +294,13 @@
     "docs/world-pages-templates-dictionary-current.md": "4be614bb5c389466c6c631c62bfea2ed14efb58080f6a6c066107fe0ebf55774",
     "docs/world-resource-reserve-current.md": "d761b07be32a2045664c5b35ac48617c8a3633c2521caafa42cb7eb632f71ad1",
     "docs/world-screen-phone-composition-current.md": "c82b6038d26b730d84440b250473cbbf0a87a6fb2fa58235d4c6bd2633988efc",
-    "docs/world-terrain-and-resource-hosting-current.md": "f0829ae12912a728ed7b74b90e3f0dc2cf7c2de5bbd8880abacdb7df7f1e6fed",
+    "docs/world-terrain-and-resource-hosting-current.md": "cdf791141144a9a4adf9899382a6dcdead464a99c0d02490f1295b5181cc9d14",
     "docs/writing-desk-b1-implementation-packet-current.md": "d90ded70c5177968e5b7a6aaeef05f274d29f65a7054a2ca4fc135e24f760305",
     "docs/writing-palette-vocabulary-migration-current.md": "188ccb34a285cec36bbfdbf27d1fbfdc90315f22d132fe4e56023b46af1a735a",
     "docs/writing-tool-progression-current.md": "be17fe07aa89aaaab7117a2faca43d7e1eb1be23202d19106c67c42547b23bb0"
   },
   "outputs": {
-    "generated/wiki-data.json": "4fcf721d01d796cfcf2eb9ade2f4373da3f13515d2d84e211cf023e543b613d8",
-    "generated/source-registry.json": "aa31b0dd685fc15812401b5371c701bc87a90b7aa863a8928395876c66a98815"
+    "generated/wiki-data.json": "571d9aa4717aed094a2e8bd477c0b6da0f2f35839345bb4d79299a47f91b0d8f",
+    "generated/source-registry.json": "80f75d27bce5e0b13d35053061d1ddacab8a17a93dbe0e4c5424dd2676de3bbb"
   }
 }

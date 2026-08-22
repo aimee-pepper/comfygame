@@ -275,7 +275,7 @@
     "pageFocus": {
       "canonicalVisible": 229,
       "retired": {
-        "semanticAllowed": 83,
+        "semanticAllowed": 84,
         "approved": 0,
         "violation": 0
       }
@@ -289,7 +289,7 @@
       }
     },
     "assembledSigil": {
-      "canonicalVisible": 110,
+      "canonicalVisible": 109,
       "retired": {
         "semanticAllowed": 0,
         "approved": 0,
@@ -337,7 +337,7 @@
       }
     },
     "predictedWorld": {
-      "canonicalVisible": 6,
+      "canonicalVisible": 5,
       "retired": {
         "semanticAllowed": 3,
         "approved": 0,
@@ -385,7 +385,7 @@
       }
     },
     "upgradeGraphEntry": {
-      "canonicalVisible": 44,
+      "canonicalVisible": 43,
       "retired": {
         "semanticAllowed": 4,
         "approved": 0,
@@ -393,7 +393,7 @@
       }
     },
     "combatGraphEntry": {
-      "canonicalVisible": 19,
+      "canonicalVisible": 18,
       "retired": {
         "semanticAllowed": 4,
         "approved": 0,
@@ -786,13 +786,13 @@
     },
     {
       "path": "Sources/Content/Data/playability-roadmap.json",
-      "literal": "Aimee's remaining phone acceptance is one ordinary new bind: confirm the generated arrival image, exact two-sentence description, disclosed Page labels and fixed Enter world action, then verify Enter reaches the matching first map and does not replay after relaunch. Source and install gates are complete; retain readyToTest/non-primary until that review. Authorities: world-arrival-causal-reveal-current.md, world-arrival-description-grammar-current.md and world-arrival-asset-packet-current.md.",
+      "literal": "Aimee reviews build 241 on phone for ordinary player, accessibility and DEBUG terminology consistency. Keep the source-complete slice acceptance-owned and non-primary; reopen implementation only for an exact visible contradiction. Authorities: docs/canonical-player-terminology-current.md, docs/canonical-game-terminology.json and docs/generated/canonical-player-terminology-census.json.",
       "alias": "source",
       "classification": "semanticAllowed"
     },
     {
       "path": "Sources/Content/Data/playability-roadmap.json",
-      "literal": "Aimee's return-screen playtest exposed inconsistent player language and a duplicated portal sentence. The installed contained slices cover Return, World preview and Writing, Essence affordability, Upgrade and Skill requirements, gear and older-save compatibility, and Compound Assembly. The current completion slice applies the same player language across the game, DEBUG, accessibility, logs, current docs and the complete source-generated GameWiki; raw IDs remain secondary metadata only.",
+      "literal": "Aimee's remaining phone acceptance is one ordinary new bind: confirm the generated arrival image, exact two-sentence description, disclosed Page labels and fixed Enter world action, then verify Enter reaches the matching first map and does not replay after relaunch. Source and install gates are complete; retain readyToTest/non-primary until that review. Authorities: world-arrival-causal-reveal-current.md, world-arrival-description-grammar-current.md and world-arrival-asset-packet-current.md.",
       "alias": "source",
       "classification": "semanticAllowed"
     },
@@ -1027,6 +1027,12 @@
     {
       "path": "Sources/Content/Data/playability-roadmap.json",
       "literal": "Source checkpoints fa42fb3 and 16fd25a make the world HUD distinguish turns until collapse, collapse underway and an indefinite steady world without predicting stochastic ejection.",
+      "alias": "source",
+      "classification": "semanticAllowed"
+    },
+    {
+      "path": "Sources/Content/Data/playability-roadmap.json",
+      "literal": "Source-complete and installed in place in 7607c7ba, Bookbinder 1.0 build 241. The authority-driven census covers 26 concepts across 189 current presentation files with 0 exceptions and 0 unapproved occurrences. The complete GameWiki has 453 routes and 435 searchable facts; deterministic generator/check/test/build, 368×800 and desktop browser review, generic native build, signed build and device readback passed.",
       "alias": "source",
       "classification": "semanticAllowed"
     },

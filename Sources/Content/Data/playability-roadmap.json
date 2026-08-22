@@ -447,11 +447,11 @@
       "id": "terrain-worldgen-coherence",
       "priority": "B1.7a",
       "title": "Connected terrain, hydrology and resource hosts",
-      "status": "queued",
+      "status": "inProgress",
       "detail": "Design is implementation-ready in world-terrain-and-resource-hosting-current.md with machine authority world-terrain-resource-host-authority.json. Replace independent per-cell material noise with pressure-faithful connected substrate regions; freeze coherent elevation 0...3; make Standing, Flowing, Frozen and Airborne Hydrology produce distinct topology; preserve underlying base ground beneath Growth/Groundcover; add independent Snow and settled-Ash deposits; and place every current mineral/flora/direct Resource only on an exhaustive legal host. This is the rules counterpart required for the accepted dynamic terrain direction to generate places rather than recolored checkerboards.",
       "gate": "Implement only after the current authority checkpoint is integrated, without waiting for terrain PNG packaging. Same seed/page is byte-identical; quotas preserve pressure proportions without cardinally isolated base cells; adjacent elevation delta is <=1; Standing basins, Flowing channels, Frozen Ice and Airborne no-ground tests differ; Snow/Ash can appear separately or together without replacing base ground; all 23 Resource IDs have exact legal dispositions; Resin is a real secondary flora yield; Ichor never becomes an ordinary deposit; starter records and World Arrival production/counterfactual parity stay green; World Generator Web exposes connected-component, topology, deposit and host diagnostics. No new GroundType, Resource ID, combat, traveller, site or economy rebalance.",
       "workstream": "engineering",
-      "isPrimary": false
+      "isPrimary": true
     },
     {
       "id": "terrain-layering-animation",
@@ -747,11 +747,11 @@
       "id": "canonical-ui-terminology",
       "priority": "P0",
       "title": "One canonical name for every game concept",
-      "status": "inProgress",
-      "detail": "Aimee's return-screen playtest exposed inconsistent player language and a duplicated portal sentence. The installed contained slices cover Return, World preview and Writing, Essence affordability, Upgrade and Skill requirements, gear and older-save compatibility, and Compound Assembly. The current completion slice applies the same player language across the game, DEBUG, accessibility, logs, current docs and the complete source-generated GameWiki; raw IDs remain secondary metadata only.",
-      "gate": "The authority-driven census scans presentation Swift, propagated player errors, human-readable logs, player-facing content data and every rendered GameWiki field with context-aware ambiguity rules and zero unapproved occurrences. GameWiki retains all twelve original top-level routes plus Terminology, all 108 canonical Writing entries and exact entity routes; retired aliases remain search-only and resolve to canonical titles. Deterministic generator/check/test/build, 368×800 and desktop browser review, generic native build and a signed in-place phone update complete the slice. Authority: docs/canonical-player-terminology-current.md and docs/canonical-game-terminology.json.",
-      "workstream": "engineering",
-      "isPrimary": true
+      "status": "readyToTest",
+      "detail": "Source-complete and installed in place in 7607c7ba, Bookbinder 1.0 build 241. The authority-driven census covers 26 concepts across 189 current presentation files with 0 exceptions and 0 unapproved occurrences. The complete GameWiki has 453 routes and 435 searchable facts; deterministic generator/check/test/build, 368×800 and desktop browser review, generic native build, signed build and device readback passed.",
+      "gate": "Aimee reviews build 241 on phone for ordinary player, accessibility and DEBUG terminology consistency. Keep the source-complete slice acceptance-owned and non-primary; reopen implementation only for an exact visible contradiction. Authorities: docs/canonical-player-terminology-current.md, docs/canonical-game-terminology.json and docs/generated/canonical-player-terminology-census.json.",
+      "workstream": "acceptance",
+      "isPrimary": false
     },
     {
       "id": "expedition-review-persistence",

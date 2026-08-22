@@ -1,7 +1,8 @@
 # World terrain regions and resource hosting — current
 
-**Status:** Game Design implementation authority; ready for Engineering after this authority checkpoint is
-integrated and safe to implement while Asset completes the twelve-ground terrain pack
+**Status:** Game Design implementation authority; accepted Dynamic Terrain v2 and south-wall packs are
+source-integrated and installed. This checkpoint supplies their production world-generation topology;
+installed-phone visual acceptance remains separate.
 **Priority:** B1.7a; part of the current terrain/world-generation correction
 **Owners:** Game Design owns pressure meaning and host legality; Engineering owns deterministic generation,
 persistence and tests; Asset owns only the already-separated visual terrain/deposit grammar
@@ -107,8 +108,11 @@ The current ruggedness formula remains the tuning baseline:
   quota is spent.
 - A relaxation pass guarantees every cardinal neighbour differs by at most one elevation level.
 
-Elevation remains exactly 0...3. Equal elevation creates no wall or shade. A genuine difference permits only
-the separately accepted lower-tile contact shade; no generated data asks the renderer for sidewalls.
+Elevation remains exactly 0...3. Presentation derives a south-facing exposure of 1, 2 or 3 from known
+neighbouring elevation and draws the installed authored terrain/material wall family. Contact shade is
+supplemental only. Equal elevation and hidden, unknown or out-of-map south yield no wall. This rules checkpoint
+does not persist a separate wall type or request and does not edit the native renderer; it must preserve the
+already-installed functional wall cue.
 
 ## Hydrology forms
 

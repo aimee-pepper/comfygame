@@ -5,9 +5,13 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 AUTH = ROOT / "docs/world-terrain-resource-host-authority.json"
 RESOURCES = ROOT / "Sources/Content/Data/resources.json"
+TERRAIN_MANIFEST = ROOT / "AssetLab/integration/terrain-production-pack-v1/runtime/manifest.json"
+NATIVE_PACK = ROOT / "Sources/VisualRuntime/TerrainProductionPack.swift"
 
 authority = json.loads(AUTH.read_text())
 resources = json.loads(RESOURCES.read_text())
+terrain_manifest = json.loads(TERRAIN_MANIFEST.read_text())
+native_pack_source = NATIVE_PACK.read_text()
 
 expected_grounds = {
     "stone", "soil", "sand", "ice", "ash", "water", "deepWater", "rubble", "mud",
@@ -16,7 +20,7 @@ expected_grounds = {
 assert authority["schemaVersion"] == 1
 assert set(authority["groundIDs"]) == expected_grounds
 assert len(authority["groundIDs"]) == len(expected_grounds)
-assert authority["surfaceDepositIDs"] == ["snow", "ash"]
+assert authority["surfaceDepositIDs"] == ["snow", "settledAsh"]
 assert authority["surfaceDepositsAreIndependent"] is True
 deposits = authority["surfaceDeposits"]
 assert [row["id"] for row in deposits] == authority["surfaceDepositIDs"]
@@ -27,6 +31,18 @@ composition = authority["surfaceDepositComposition"]
 assert composition["order"] == "sourcePageOrder"
 assert composition["variantIdentity"] == "depositID+sourceStableID+sourcePageOrder+visualSeed"
 assert composition["underlyingGroundRemainsMechanicallyAuthoritative"] is True
+
+# The rules authority, accepted terrain-layers-v2 runtime ABI and native request
+# adapter must use one exact pair of field names. `ash` remains the authored
+# source Stable ID and base GroundType; it is never the settled deposit ABI ID.
+runtime_deposits = terrain_manifest["runtimeContract"]["surfaceDeposits"]
+assert terrain_manifest["runtimeContract"]["requestSchemaVersion"] == "terrain-layers-v2"
+assert runtime_deposits["keys"] == authority["surfaceDepositIDs"]
+assert runtime_deposits["order"] == authority["surfaceDepositIDs"]
+assert "var snow: Bool" in native_pack_source
+assert "var settledAsh: Bool" in native_pack_source
+assert 'exactKeys(deposits, ["snow", "settledAsh"])' in native_pack_source
+assert 'deposits["ash"]' not in native_pack_source
 
 catalogue_ids = {entry["id"] for entry in resources["resources"]}
 host_rows = authority["resourceHosts"]

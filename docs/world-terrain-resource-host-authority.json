@@ -6,7 +6,7 @@
     "growth", "chasm", "groundcover"
   ],
   "substrateRegionGroundIDs": ["stone", "soil", "sand", "rubble", "ash"],
-  "surfaceDepositIDs": ["snow", "ash"],
+  "surfaceDepositIDs": ["snow", "settledAsh"],
   "surfaceDepositsAreIndependent": true,
   "surfaceDeposits": [
     {
@@ -17,7 +17,7 @@
       "eligibleBaseGroundExclusions": ["water", "deepWater", "chasm"]
     },
     {
-      "id": "ash",
+      "id": "settledAsh",
       "sourceStableID": "ash",
       "palette": "greyCharcoal",
       "shapeFamily": "settledCover",
