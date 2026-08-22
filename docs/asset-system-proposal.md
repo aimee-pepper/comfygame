@@ -5285,3 +5285,23 @@ The accepted candidate manifest is
 atmosphere exporter, focused test and `atmosphere-presentation-v0.1` artifact tree. It remains uncommitted,
 unpromoted and `integrationReady:false`; this disposition authorizes Asset to checkpoint/freeze that exact
 candidate, not to edit native gameplay, promote goldens or begin another Asset milestone without assignment.
+
+#### Dynamic World Arrival v0.1 disposition
+
+**Receipt/compositor scaffold accepted for continued iteration; visual candidate rejected.** Game Design
+inspected the starter color and grayscale phone matrices, near/far and Ash/disclosure matrices, exact
+55-word phone, first-map crops and native/400% layer sheets. The sanitized receipt, exact starter copy,
+causal contribution facts, separate air/precipitation channels, hidden-information exclusions,
+counterfactual containment and deterministic 160×100 compositor are the correct foundation.
+
+The current tableaux are not production-ready pixel art. Long horizontal rectangles, square shelf slabs,
+flat water bands and flora dots make the three worlds read as placeholder diagrams distinguished mainly by
+palette. Open Flats does not yet read as an organic sandy plain, Rainwashed Shore as broken wet shelves, or
+Stone Hollow as an enclosed rock place. The entry mark reads as a pasted square, and the page thumbnail does
+not yet communicate the actual disclosed bound-mark layout.
+
+Asset must retain the scaffold and correct this exact checkpoint using authored/generated logical pixel-art
+parts with irregular material contours, readable water depth/banks, world-specific landform silhouettes and
+phone-legible flora. Exact correction requirements live in
+`world-arrival-asset-packet-current.md`. No commit, promotion, native integration or next Asset milestone is
+authorized until the corrected three starter tableaux pass visual review without labels.

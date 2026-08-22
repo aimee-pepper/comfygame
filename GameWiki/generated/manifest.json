@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "aggregateSourceHash": "ee4f93f13ce9db0b2d29c60177e5f6723685a2f5172035c1caf4689ff626ef7d",
+  "aggregateSourceHash": "48cc64fda194ed0894f54601ff8ceb4975a153d7f9a43100a532e633536817e4",
   "inputs": {
     "Sources/Content/Data/items.json": "b94b1107229f217e14f1d7fa936d8eea938f9782c06c583be32302f10d432bc9",
     "Sources/Content/Data/playability-roadmap.json": "2c1a512f4d9b914931a5e71e23698996d405d01dded12070125a488a00f1c9f7",
@@ -68,7 +68,7 @@
     "docs/armoury-rebuild-implementation-current.md": "a9e893f4660b274e35c530ff1228ba232570bc7858442617d81e7eb34c1ecf82",
     "docs/ashe-ground-technique-current.md": "14287d7178f1148f4f765e50a7debf15d6f21efb9197181396407057794a161c",
     "docs/asset-production-output-contract-current.md": "e9734d8e96290e0e4f79af180624cf5115d4379cf16a52bbb688f1cea34ee675",
-    "docs/asset-system-proposal.md": "f14e842c3c82da82275ffbb2bf08572997923e5117885ea9a95bff3ed90e4cdc",
+    "docs/asset-system-proposal.md": "09244b128f418c1a1f0e28dfbaa246be329e5fd24e47b2345c56866d05f7b12a",
     "docs/atmospheric-world-presentation-current.md": "1b23bbf2f4fe8c92df422dc15259c7d8b47363aa81ab8e58a36435113472246c",
     "docs/authored-color-vocabulary-current.md": "41aa98371136bf274cf0f8160d822d0b8ff84c479882ffbc8c7847ae6a33b58d",
     "docs/authored-text-audit-current.md": "97c31e4a0564595cc62dbce0920999d648f94208b6f207b903f8cf517bc7b0fa",
@@ -269,7 +269,7 @@
     "docs/wayfarers-table-flora-recognition-current.md": "01de8b57fba27ce086ac1433890ad42d6d8b740a156dc7c9c685970843e61261",
     "docs/weaponsmith-implementation-current.md": "43a6deed0bfe3a91d82626f22cbd23031d2f664d67ea7627fd5f2a1213fdb0d3",
     "docs/workshop-constellation-role-audit-current.md": "ea43a26411c0909a1370a8f10003294020cc2b5c9c14b3fece88c1e9d5b0cbf3",
-    "docs/world-arrival-asset-packet-current.md": "04fe1c524f56655a2d69ab1b6c28611e76c16fe22ece4c139df5bff548539a12",
+    "docs/world-arrival-asset-packet-current.md": "44f8170fd64bc59b7ca4c9d1b16ae5b3adaf321e79e9f5554d9b7e87f305c547",
     "docs/world-arrival-causal-reveal-current.md": "fbc3aae0ad2f2cba6e926e6ac2d50479b9bbfa2dafa91719311a0d9b6c206539",
     "docs/world-arrival-description-grammar-current.md": "cba2d4190fd9be84e0ec181a2e231e36b20e3f49c0a57047f7bd66e75f07792f",
     "docs/world-color-differentiation-current.md": "0973da16ef6fa03cdb3c74e1cc6ab0b8eb9a842958b337b75e2e9d133d4c518b",
@@ -286,7 +286,7 @@
     "docs/writing-tool-progression-current.md": "be17fe07aa89aaaab7117a2faca43d7e1eb1be23202d19106c67c42547b23bb0"
   },
   "outputs": {
-    "generated/wiki-data.json": "d8bec10c5112bab3c80e2d36424159b1ce21fc9cc3aeece6a6895901bb653a54",
-    "generated/source-registry.json": "c36ba2eeeb9bfa63930a4d4b3d25fc508b6955cf0f28f2925cecf343db7852d9"
+    "generated/wiki-data.json": "d07389f7850973cf0186393514b0ee883ddca5f0617aad8f3f8732e6650d76fa",
+    "generated/source-registry.json": "506fa55f1f8fa30496ca055dea5b38fdb84e749bb1316697f3c1865d715ccead"
   }
 }

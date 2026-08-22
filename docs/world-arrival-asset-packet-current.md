@@ -1,6 +1,6 @@
 # World arrival image — Asset production packet
 
-**Status:** implementation-ready Asset brief once the Open Flats starter correction is integrated on main
+**Status:** receipt/compositor scaffold source-complete; v0.1 scene art rejected for one contained visual correction
 **Priority:** B1.6a; parallel Asset proof, not native promotion
 **Owners:** Game Design owns legitimate facts and reveal hierarchy; Asset owns the isolated deterministic
 compositor; Engineering later owns the frozen native adapter/lifecycle
@@ -214,6 +214,38 @@ Game Design must be able to answer yes, without reading debug labels:
 
 Passing tests alone does not authorize promotion. Asset stops after consolidated visual evidence and waits
 for Game Design/Aimee review. Native integration remains a later Engineering checkpoint.
+
+## v0.1 visual disposition — 21 August 2026
+
+**Receipt, disclosure, determinism and compositor structure pass; the scene art does not.** Retain the
+strict sanitized receipt, 160×100 layer compositor, causal facts, exact starter strings, 55-word fixture,
+near/far counterfactuals, Ash/open-colour behavior, disclosure exclusions and first-map continuity gates.
+Do not promote or checkpoint the current visual candidate.
+
+The three phone tableaux still read as stacked horizontal rectangles, square slabs, flat water bands and
+one- or two-pixel flora specks. They differ mainly by palette and block arrangement rather than reading as
+flat living ground, broken wet shelves and enclosed stone. This fails visual gates 1, 3, 4 and 6 even though
+the automated gates pass.
+
+Correct the same checkpoint with production-ready logical pixel-art parts or bitmaps, not more web-shape
+geometry:
+
+- Open Flats needs an irregular long sandy plain, organic shallow-pool banks, wet/dry edge pixels, a few
+  stony interruptions and readable low succulent clusters concentrated at wet or stony margins.
+- Rainwashed Shore needs broken stone-shelf contours, shallow water crossing ledges, deep channels and
+  sparse growth rooted at shelf edges; rectangular floating platforms are prohibited.
+- Stone Hollow needs an enclosed rock/cave volume, narrow soil approach and wet depressions that cannot be
+  mistaken for Shore recoloured. Exact ore positions remain undisclosed.
+- ground and water boundaries use irregular material silhouettes and texture rather than long unbroken
+  horizontal bars; flora reads as plant crowns or patches at exact 2× phone scale rather than dots;
+- the entry mark belongs to the scene material rather than resembling a pasted UI square; and
+- the source-page thumbnail depicts the actual disclosed bound-mark layout, preserving unknown-mark
+  redaction, rather than a generic near-blank card.
+
+The flora-only near pair must still change only flora, but that change must be visible without labels. The
+far pair must remain immediately distinct in literal grayscale. Asset must show the individual native and
+400% pixel parts plus the three exact 368×800 starter phones before re-review. No native integration or
+next Asset checkpoint is released.
 
 ## Explicit supersessions
 
