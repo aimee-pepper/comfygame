@@ -1,0 +1,559 @@
+{
+  "manifestVersion": 1,
+  "identityKind": "writing-desk-a3-integrated-proof",
+  "integrationReady": false,
+  "productionSource": "pure-A1-A2-compositor",
+  "immutableInputs": {
+    "a1CanonicalBodySha256": "89ae14e9f0ecfdee5e35ced08df0f9d9ba76e224fc4908be271f50c1bd01a627",
+    "a1ManifestFileSha256": "6a8eff7e038f7789a1839ab7c5537f1847163bd1f4d311cecdc46e983793801d",
+    "a2CanonicalBodySha256": "19f45f8188fd99a9308ac2b3d29adfde070a5971eb103ea86a8310e754821b90",
+    "a2ManifestFileSha256": "9e7c00c5fda50eeb0c7ecc7ccbe3538a962987e6fbc797d9b5af1abc0af6e1bf"
+  },
+  "phone": {
+    "width": 184,
+    "height": 400,
+    "displayWidth": 368,
+    "displayHeight": 800
+  },
+  "fallback": {
+    "width": 160,
+    "height": 400,
+    "displayWidth": 320,
+    "displayHeight": 800
+  },
+  "fixtureIDs": [
+    "blank-charcoal",
+    "open-flats-unread",
+    "template-action-popover",
+    "loaded-template",
+    "loaded-template-edited",
+    "full-fountain-mixed",
+    "illegal-connect-cancel",
+    "page-actions-after-cancel",
+    "collected-starter-pages",
+    "insufficient-essence",
+    "gold-extraction-unmet",
+    "gold-extraction-met",
+    "collected-consumption",
+    "reusable-draft",
+    "long-copy-anchored"
+  ],
+  "fixtureAuthority": {
+    "runtimeExact": [
+      "blank-charcoal",
+      "open-flats-unread",
+      "template-action-popover",
+      "loaded-template",
+      "loaded-template-edited",
+      "full-fountain-mixed",
+      "illegal-connect-cancel",
+      "page-actions-after-cancel",
+      "collected-starter-pages"
+    ],
+    "typographyOnly": [
+      "insufficient-essence",
+      "gold-extraction-unmet",
+      "gold-extraction-met",
+      "collected-consumption",
+      "reusable-draft",
+      "long-copy-anchored"
+    ],
+    "sources": {
+      "blank-charcoal": "WritingDeskReviewModel empty draft",
+      "open-flats-unread": "starter_open_meadow counterfactual: Verdant unread",
+      "template-action-popover": "Template action contract",
+      "loaded-template": "loaded Template provenance before first edit",
+      "loaded-template-edited": "same reconstructed draft after one edited mark; provenance cleared",
+      "full-fountain-mixed": "physical page receipt only",
+      "illegal-connect-cancel": "Writing Desk interaction contract",
+      "page-actions-after-cancel": "Write page-actions cancellation contract",
+      "collected-starter-pages": "world-pages-authority.json authored order, physical identities and prices",
+      "insufficient-essence": "length-matched refusal layout receipt; nonsemantic",
+      "gold-extraction-unmet": "length-matched Extraction refusal receipt; nonsemantic",
+      "gold-extraction-met": "length-matched Extraction ready receipt; nonsemantic",
+      "collected-consumption": "Rainwashed Shore collected source/title/Archipelago/14e are exact; remaining review copy is neutral nonsemantic layout receipt",
+      "reusable-draft": "same Rainwashed Shore composition as Draft uses exact 18e; remaining review copy is neutral nonsemantic layout receipt",
+      "long-copy-anchored": "length-matched long-title/request/refusal receipt; nonsemantic"
+    }
+  },
+  "exactStarterPrices": {
+    "collected": {
+      "Open Flats": 14,
+      "Rainwashed Shore": 14,
+      "Stone Hollow": 16
+    },
+    "draft": {
+      "Open Flats": 21,
+      "Rainwashed Shore": 18,
+      "Stone Hollow": 22
+    }
+  },
+  "composition": {
+    "ordinaryPagePoints": 344,
+    "fallbackPagePoints": 296,
+    "screenMarginPoints": 12,
+    "toolAndBinPoints": {
+      "ordinary": 344,
+      "fallback": 296
+    },
+    "paletteColumns": {
+      "ordinary": 3,
+      "fallback": 2
+    },
+    "pageCardColumns": {
+      "ordinary": 2,
+      "fallback": 1
+    },
+    "bodyTextMinimumPoints": 13,
+    "secondaryTextMinimumPoints": 12,
+    "sectionHeadingMinimumPoints": 12,
+    "titleMinimumPoints": 15,
+    "bindTextMinimumPoints": 15,
+    "worldTextWrap": "measured with exact render font; no truncation",
+    "worldRequestTile": "44pt minimum; paired rows share expanded 18pt-line height",
+    "worldLongCopyProof": {
+      "top": "evidence/color/long-copy-anchored-368x800.png",
+      "scrolled": null,
+      "maxScrollLogicalPixels": 0
+    }
+  },
+  "vocabulary": {
+    "binOrder": [
+      "Illumination",
+      "Thermal",
+      "Hydrology",
+      "Substrate",
+      "Relief",
+      "Vitality",
+      "Atmosphere",
+      "Cycle",
+      "Modifiers",
+      "Compounds"
+    ],
+    "selectedBin": "Compounds",
+    "visibleEnd": [
+      "Cycle",
+      "Modifiers",
+      "Compounds"
+    ],
+    "compoundDisplayNames": [
+      "Plains",
+      "Verdant",
+      "Archipelago",
+      "Caverns"
+    ]
+  },
+  "toolText": {
+    "hands": [
+      "Rough charcoal",
+      "Brush",
+      "Fountain pen"
+    ],
+    "ash": "Ash ink · color open",
+    "mixedState": "Mixed ink · cool",
+    "mixedReceipt": {
+      "cyan": 82,
+      "magenta": 18,
+      "yellow": 8,
+      "depth": 24
+    }
+  },
+  "sourceThumbnail": {
+    "draft": "single current A1 page",
+    "collected": "worn single physical page",
+    "template": "never a bind source"
+  },
+  "ownership": {
+    "navigation": [
+      "back",
+      "write-pages-world",
+      "page-actions-on-Write-only"
+    ],
+    "write": [
+      "page",
+      "tool-ink",
+      "bins",
+      "palette"
+    ],
+    "pages": [
+      "collected-templates",
+      "cards",
+      "anchored-popover"
+    ],
+    "world": [
+      "source",
+      "requests",
+      "open",
+      "risk",
+      "preparation",
+      "further-reading",
+      "fixed-bind"
+    ]
+  },
+  "forbidden": [
+    "native",
+    "PBX",
+    "golden",
+    "A1-redraw",
+    "A2-redraw",
+    "gameplay-default",
+    "seed",
+    "risk-calculation",
+    "bind-mutation",
+    "full-phone-production-asset",
+    "Asset-authored-semantic-copy"
+  ],
+  "outputs": [
+    {
+      "file": "evidence/color/blank-charcoal-368x800.png",
+      "width": 368,
+      "height": 800,
+      "sha256": "b9ed8d8d852e16db561adeb5f1509c9694dff8795636d5c12d5167b5861afb34",
+      "kind": "evidence"
+    },
+    {
+      "file": "evidence/grayscale/blank-charcoal-368x800.png",
+      "width": 368,
+      "height": 800,
+      "sha256": "6c1da62356da1ba80ae819615be8ea11e64c9939308db56cab0d192a873d7e28",
+      "kind": "evidence"
+    },
+    {
+      "file": "evidence/collision/blank-charcoal-368x800.png",
+      "width": 368,
+      "height": 800,
+      "sha256": "267818d35de14eb9e5ea099380025fa3bb4ca1f5d8d57620e0b41da4d49dad42",
+      "kind": "evidence"
+    },
+    {
+      "file": "evidence/color/open-flats-unread-368x800.png",
+      "width": 368,
+      "height": 800,
+      "sha256": "c426b0b600af2f5e21030d079eaad27e9710fa12526d0c26781e110aeb6ce26d",
+      "kind": "evidence"
+    },
+    {
+      "file": "evidence/grayscale/open-flats-unread-368x800.png",
+      "width": 368,
+      "height": 800,
+      "sha256": "c84751d47f8c13b8586eb55ec3c81bda054d314cfe870ba17e55b25069e7dab2",
+      "kind": "evidence"
+    },
+    {
+      "file": "evidence/collision/open-flats-unread-368x800.png",
+      "width": 368,
+      "height": 800,
+      "sha256": "2c31903e8b37c6cb4cd9b8f44e3dd8914215820d2e9db08fc1a3c55a93f047d8",
+      "kind": "evidence"
+    },
+    {
+      "file": "evidence/color/template-action-popover-368x800.png",
+      "width": 368,
+      "height": 800,
+      "sha256": "54465ff4a1bc93add7557282877053a7bbc13a0feaa0e4e868bb795002759659",
+      "kind": "evidence"
+    },
+    {
+      "file": "evidence/grayscale/template-action-popover-368x800.png",
+      "width": 368,
+      "height": 800,
+      "sha256": "73eed2ce42b41323dcdeae7d3aa28c409bd6faef33a1156cc0a30d6a211db8fe",
+      "kind": "evidence"
+    },
+    {
+      "file": "evidence/collision/template-action-popover-368x800.png",
+      "width": 368,
+      "height": 800,
+      "sha256": "aa4ce1a84ff51e3715ed21cd116b88869f6a08e942e820123ec859b406bb045e",
+      "kind": "evidence"
+    },
+    {
+      "file": "evidence/color/loaded-template-368x800.png",
+      "width": 368,
+      "height": 800,
+      "sha256": "12052566cccc1ccd25547fbc1b690980a08311f35c3f03547d0729377bde40f9",
+      "kind": "evidence"
+    },
+    {
+      "file": "evidence/grayscale/loaded-template-368x800.png",
+      "width": 368,
+      "height": 800,
+      "sha256": "eb50c207edf03878bd4f9976cee019c2d780ad84062bd50c2e664b1b038ee6a9",
+      "kind": "evidence"
+    },
+    {
+      "file": "evidence/collision/loaded-template-368x800.png",
+      "width": 368,
+      "height": 800,
+      "sha256": "d0ecf5a2be388eda91cf038b6a1eec3b69ee7b24107e2d8fe9375e465d9b444a",
+      "kind": "evidence"
+    },
+    {
+      "file": "evidence/color/loaded-template-edited-368x800.png",
+      "width": 368,
+      "height": 800,
+      "sha256": "829d2c220b431b86b7f942a61c3f32c497b1df1baf9987adf2a788560043230c",
+      "kind": "evidence"
+    },
+    {
+      "file": "evidence/grayscale/loaded-template-edited-368x800.png",
+      "width": 368,
+      "height": 800,
+      "sha256": "a6d885a92096207cacb6bb8e9b86f688581b34102a09702fe9225258ae7f6711",
+      "kind": "evidence"
+    },
+    {
+      "file": "evidence/collision/loaded-template-edited-368x800.png",
+      "width": 368,
+      "height": 800,
+      "sha256": "554642c97cadb84d6cc88cceb249fd18203be97ae7490ea72b703e9c69a85978",
+      "kind": "evidence"
+    },
+    {
+      "file": "evidence/color/full-fountain-mixed-368x800.png",
+      "width": 368,
+      "height": 800,
+      "sha256": "8d507ad20ed718ba1e1cc18ea17ecf1e884115d1d48e74fe2e42a19ae59aa17d",
+      "kind": "evidence"
+    },
+    {
+      "file": "evidence/grayscale/full-fountain-mixed-368x800.png",
+      "width": 368,
+      "height": 800,
+      "sha256": "41b3f1a9e4e2fb9c49c5db5b400f87bf18dddc5edafa761683edae2a44d38570",
+      "kind": "evidence"
+    },
+    {
+      "file": "evidence/collision/full-fountain-mixed-368x800.png",
+      "width": 368,
+      "height": 800,
+      "sha256": "5724dc98d30ca428b32bea6d8cc133efab0077a0d47b682ae08b14bc2815d4e5",
+      "kind": "evidence"
+    },
+    {
+      "file": "evidence/color/illegal-connect-cancel-368x800.png",
+      "width": 368,
+      "height": 800,
+      "sha256": "e7ab4db25ad49e835d042e98857376e632b7643ae0e1566eaf66b383c876af1f",
+      "kind": "evidence"
+    },
+    {
+      "file": "evidence/grayscale/illegal-connect-cancel-368x800.png",
+      "width": 368,
+      "height": 800,
+      "sha256": "82b5dc24504e60922231d0db472d12155cdaf474e430d132f40ebeaccb25adfa",
+      "kind": "evidence"
+    },
+    {
+      "file": "evidence/collision/illegal-connect-cancel-368x800.png",
+      "width": 368,
+      "height": 800,
+      "sha256": "a7a31e42ad0d5d5ded31a47feec61340ddc4b38e578c3a366b30ee1075b53c31",
+      "kind": "evidence"
+    },
+    {
+      "file": "evidence/color/page-actions-after-cancel-368x800.png",
+      "width": 368,
+      "height": 800,
+      "sha256": "53d641e87412d51c5ddf87763f5047a72f3b2f5d1ed8d4cb3abd19da6f839f27",
+      "kind": "evidence"
+    },
+    {
+      "file": "evidence/grayscale/page-actions-after-cancel-368x800.png",
+      "width": 368,
+      "height": 800,
+      "sha256": "36efa2562b7057877a1cc52ffe9f399479d6109ad00f812d2f1df1cd896aca4e",
+      "kind": "evidence"
+    },
+    {
+      "file": "evidence/collision/page-actions-after-cancel-368x800.png",
+      "width": 368,
+      "height": 800,
+      "sha256": "3137d712cc3cbaf49c2a0d53511fa1978d9b84a3c04491bf862bae444b29b1df",
+      "kind": "evidence"
+    },
+    {
+      "file": "evidence/color/collected-starter-pages-368x800.png",
+      "width": 368,
+      "height": 800,
+      "sha256": "eb8cabded840c4a778dbb17a1fc5ac48bd62f4442ca2ff891470efc74b3984f9",
+      "kind": "evidence"
+    },
+    {
+      "file": "evidence/grayscale/collected-starter-pages-368x800.png",
+      "width": 368,
+      "height": 800,
+      "sha256": "a4c4112a297f1141ac7344631795ac5cfd1096152655db0925a8fcd52d228634",
+      "kind": "evidence"
+    },
+    {
+      "file": "evidence/collision/collected-starter-pages-368x800.png",
+      "width": 368,
+      "height": 800,
+      "sha256": "850e14234fcbca457bf464d246faf1243db15a635024e281d0a9ab29ed30a57d",
+      "kind": "evidence"
+    },
+    {
+      "file": "evidence/color/insufficient-essence-368x800.png",
+      "width": 368,
+      "height": 800,
+      "sha256": "d7c179ed55e47a2bd505e43da777c4fbfcbb86b796e4520991bc1672880efdee",
+      "kind": "evidence"
+    },
+    {
+      "file": "evidence/grayscale/insufficient-essence-368x800.png",
+      "width": 368,
+      "height": 800,
+      "sha256": "2589f5f606d9d9639ad936b89fd2261288c828609c7e05cd83014638127f4d47",
+      "kind": "evidence"
+    },
+    {
+      "file": "evidence/collision/insufficient-essence-368x800.png",
+      "width": 368,
+      "height": 800,
+      "sha256": "49e6b80a090012778959788d1608dfdfeffac0e44a593d314eec1e1955793512",
+      "kind": "evidence"
+    },
+    {
+      "file": "evidence/color/gold-extraction-unmet-368x800.png",
+      "width": 368,
+      "height": 800,
+      "sha256": "5f946fe0fe98f2ca65b614b68cff742dfde1348e2f0d868ff9b4013fa9eb7fc9",
+      "kind": "evidence"
+    },
+    {
+      "file": "evidence/grayscale/gold-extraction-unmet-368x800.png",
+      "width": 368,
+      "height": 800,
+      "sha256": "2096198fb10c9603a3d4bb84e999e2a14fd3aa713b8fd2870ee2e57f5406b70d",
+      "kind": "evidence"
+    },
+    {
+      "file": "evidence/collision/gold-extraction-unmet-368x800.png",
+      "width": 368,
+      "height": 800,
+      "sha256": "ff7d831929f567d33b1598eced7e83496de57cd82fb220a22b156d7d56ec9dd2",
+      "kind": "evidence"
+    },
+    {
+      "file": "evidence/color/gold-extraction-met-368x800.png",
+      "width": 368,
+      "height": 800,
+      "sha256": "db7c3d1601e17b81aeb693aa5bf9e276f2d351df03328bdb8b8bb6b149b91e4b",
+      "kind": "evidence"
+    },
+    {
+      "file": "evidence/grayscale/gold-extraction-met-368x800.png",
+      "width": 368,
+      "height": 800,
+      "sha256": "44e8e800173ab7cd404823dfb4d7e3c4895cb98a09f84f1d3ac23554fcb40c26",
+      "kind": "evidence"
+    },
+    {
+      "file": "evidence/collision/gold-extraction-met-368x800.png",
+      "width": 368,
+      "height": 800,
+      "sha256": "600557079efba217e4e00824de08ac3b02f4e932f3a04cbe77a7d8e53beaf2ae",
+      "kind": "evidence"
+    },
+    {
+      "file": "evidence/color/collected-consumption-368x800.png",
+      "width": 368,
+      "height": 800,
+      "sha256": "5729601b6cca408d0fe80fe79b3c8e4aca7770113402b5a227d7cbfff465ed9b",
+      "kind": "evidence"
+    },
+    {
+      "file": "evidence/grayscale/collected-consumption-368x800.png",
+      "width": 368,
+      "height": 800,
+      "sha256": "bcf3c9cab280abfdf457267e95ab1dc3f246db148e720efb22516c6f429159a6",
+      "kind": "evidence"
+    },
+    {
+      "file": "evidence/collision/collected-consumption-368x800.png",
+      "width": 368,
+      "height": 800,
+      "sha256": "aaf78a77e3611cd6e054393ac54479adcfeb87260cabf617fecc472efc1d534e",
+      "kind": "evidence"
+    },
+    {
+      "file": "evidence/color/reusable-draft-368x800.png",
+      "width": 368,
+      "height": 800,
+      "sha256": "c3b28e5056ad2060a490f698b7c413948aa659b53e76b5913d86c0b068bbff37",
+      "kind": "evidence"
+    },
+    {
+      "file": "evidence/grayscale/reusable-draft-368x800.png",
+      "width": 368,
+      "height": 800,
+      "sha256": "2b97f71a56569721a495d61ca7def9edfcb1a1ea8568af4597106a0a5d660b59",
+      "kind": "evidence"
+    },
+    {
+      "file": "evidence/collision/reusable-draft-368x800.png",
+      "width": 368,
+      "height": 800,
+      "sha256": "849e8a9cb1555f7c0b761cc7b8abc87c244ffd6931ba47c8ef3cb4e77dc888d3",
+      "kind": "evidence"
+    },
+    {
+      "file": "evidence/color/long-copy-anchored-368x800.png",
+      "width": 368,
+      "height": 800,
+      "sha256": "eb650834789a8b9d269942705fc0c30290e372636f0cedb92c5aebe78657695d",
+      "kind": "evidence"
+    },
+    {
+      "file": "evidence/grayscale/long-copy-anchored-368x800.png",
+      "width": 368,
+      "height": 800,
+      "sha256": "3db161ee7b6029a414e70edbde8a6819322ba3c60dee95b830c34ee42896c2aa",
+      "kind": "evidence"
+    },
+    {
+      "file": "evidence/collision/long-copy-anchored-368x800.png",
+      "width": 368,
+      "height": 800,
+      "sha256": "42c6177927ccf2260f98918937e88e98aa40cde05fdb5e2337bb4acd005781b7",
+      "kind": "evidence"
+    },
+    {
+      "file": "evidence/fallback/fallback-write-320x800.png",
+      "width": 320,
+      "height": 800,
+      "sha256": "d1b08198aea7e8c09fb7c14f045939d418bcc83cf23907edc8eef46916addbdd",
+      "kind": "evidence"
+    },
+    {
+      "file": "evidence/fallback/fallback-pages-320x800.png",
+      "width": 320,
+      "height": 800,
+      "sha256": "fc3356215e095091f573def9292740e430ffcb4537f6e2b4e15d1e8acc984081",
+      "kind": "evidence"
+    },
+    {
+      "file": "contact/connect-cancel-before-after-736x800.png",
+      "width": 736,
+      "height": 800,
+      "sha256": "3e6fc40e8387b46cb49d985130200d15d2847a250e57edc2239ebda906cf7b9f",
+      "kind": "evidence"
+    },
+    {
+      "file": "contact/template-load-edit-before-after-736x800.png",
+      "width": 736,
+      "height": 800,
+      "sha256": "eaed999bfd2fdb6563d40ab8747bea5cb04106fae78e014604d3743850c0064b",
+      "kind": "evidence"
+    },
+    {
+      "file": "contact/write-pages-world-refusal-736x1600.png",
+      "width": 736,
+      "height": 1600,
+      "sha256": "92419c56b7766bf89e6cbd169342920eba74e30b3b6d124b14b59949087c23bd",
+      "kind": "evidence"
+    }
+  ],
+  "canonicalBodySha256": "54340469ed3f0fe308532470c8cc38716f38581cb3d7f0cb544836c8b7536c8c"
+}
