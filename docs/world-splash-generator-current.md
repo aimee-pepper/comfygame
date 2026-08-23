@@ -142,18 +142,27 @@ palette or expose numeric pressures.
 
 ### Exploration-opportunity profile
 
-The pre-exploration Splash truthfully reveals that generated sites and harvestable resource opportunities
-exist. This is an invitation to explore, not prior discovery and not a solved map.
+The pre-exploration Splash truthfully reveals that generated sites exist and may call out exceptional
+harvestable resource opportunities. This is an invitation to explore, not prior discovery and not a solved
+map.
 
 - `sites` contains every actually placed site profile with its exact placed-instance count, ordered by stable
-  site-profile ID;
-- `resources` contains every resource family with at least one actually placed resource-bearing map source
-  and its exact source count, ordered by stable resource ID;
+  site-profile ID. A world with one or more sites always emits site-opportunity commands and visibly
+  represents at least one site opportunity;
+- `resources` is optional. A resource family is eligible only when it has at least one actually obtainable
+  placed source and an existing rules-owned predicate classifies that opportunity as unusually rare/special
+  or unusually abundant. Rows retain exact eligible-source counts and are ordered by stable resource ID;
+- the current catalogue's authored `tradeBand == rare` or `tradeBand == precious` is the only exact v3
+  rare/special predicate. `nontradeable` is not a rarity synonym. No current rule defines an unusually
+  abundant world-relative resource threshold, so v3 emits no abundance-selected resource row. The branch is
+  deferred and non-required until rules freeze its expectation and threshold; node-count tuning, total map
+  share and ad hoc coverage bands may not substitute;
 - the profile contains no tile coordinate, placed-instance ID, route, key, site contents, per-source yield,
   remaining-harvest count or search result;
 - entry/exit portals are navigation infrastructure, not site opportunities, and do not enter this profile;
 - deterministic placeholder commands and pixels must visibly respond to added/removed site profiles and
-  resource families. Their composition is representative and makes no claim about exact map location;
+  eligible resource families. Ordinary resource families do not enter the Splash merely because a node or
+  drop exists. Opportunity composition is representative and makes no claim about exact map location;
 - relocating the same site/resource opportunities while preserving their stable profiles/families and counts
   leaves this aggregate profile and its placeholder output byte-identical.
 
@@ -181,8 +190,8 @@ The receipt and placeholder generator must not contain, count, silhouette, name 
 - flora mechanics beyond visible form, color, coverage and habit.
 
 For site/resource opportunities, only exact coordinates, placed-instance identity, routes/keys, site contents,
-source yields and remaining-harvest state are excluded. Stable aggregate site profiles, resource families and
-their placed source counts are intentionally revealed before exploration.
+source yields and remaining-harvest state are excluded. Stable aggregate site profiles and eligible exceptional
+resource families with their placed source counts are intentionally revealed before exploration.
 
 Changing any excluded fact while legal v3 fields remain identical must produce a byte-identical receipt,
 placeholder command list and rendered scene.
@@ -267,8 +276,9 @@ horizontally scrollable.
 | E01 | illumination matrix | Environment-owned value changes only |
 | E02 | existing atmosphere/precipitation matrix | Existing facts represented; no weather generation |
 | O01 | add/remove one generated site profile at fixed terrain | Only site-opportunity receipt/commands and legitimate occlusion pixels change; profile/count is retained |
-| O02 | add/remove one generated resource family at fixed terrain | Only resource-opportunity receipt/commands and legitimate occlusion pixels change; family/count is retained |
-| O03 | relocate identical site/resource opportunities | Receipt, commands and pixels byte-identical; no coordinate is persisted or implied |
+| O02 | add/remove one obtainable authored rare/precious resource family at fixed terrain | Only resource-opportunity receipt/commands and legitimate occlusion pixels change; family/count is retained |
+| O03 | add/remove an ordinary, non-qualifying resource family | Receipt, commands and pixels remain byte-identical; ordinary presence alone is not a Splash hook |
+| O04 | relocate identical site/resource opportunities | Receipt, commands and pixels byte-identical; no coordinate is persisted or implied |
 | D01 | mutate traveller/apex or excluded site/resource details | Receipt, commands and pixels byte-identical |
 | D02 | hidden crop terrain/flora mutation | Hidden cells remain coordinate/visibility only |
 | C01 | exact first-map crop | Identity/palette parity for every disclosed cell |
