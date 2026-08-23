@@ -155,18 +155,20 @@ map.
   of those differences;
 - `resources` is optional. A resource family is eligible only when it has at least one actually obtainable
   placed source and either the catalogue authors it as `tradeBand == rare` or `tradeBand == precious`, or an
-  existing bind-time `causalVisualFact(scope: resource)` proves that a known source-Page Sigil increased,
-  reduced or reshaped that registered family against the same-seed no-Sigil generation. `nontradeable` is not
-  a rarity synonym;
+  existing bind-time `causalVisualFact(scope: resource)` and per-family counterfactual prove that a known
+  source-Page Sigil increased that registered family's exact obtainable quantity above the same-seed no-Sigil
+  generation. A reduction, equality or rearrangement does not make an ordinary family an abundance hook;
+  `nontradeable` is not a rarity synonym;
 - each eligible resource row retains stable resource ID, exact placed source count, exact obtainable quantity
   and the canonically ordered causal mark IDs that genuinely own that family. A causal mark cross-links only
   through its existing registered resource-family receipt; display must not infer family from prose or name;
-- family ownership is frozen at the existing per-family actual-versus-no-Sigil quantity comparison. When one
-  Sigil registers multiple resource families, a changed family does not assign that mark to its unchanged
-  siblings; implementation may not expand one generic causal fact across every registered family;
+- family ownership is frozen at the existing per-family actual-greater-than-no-Sigil quantity comparison.
+  When one Sigil registers multiple resource families, an increased family does not assign that mark to its
+  equal, reduced or rearranged siblings; implementation may not expand one generic causal fact across every
+  registered family;
 - the same-seed causal intervention is the rules-owned expectation for authored abundance. No new qualitative
   threshold, node-count cutoff, total-map share or ad hoc coverage band is introduced. A family with no
-  rare/precious authorship and no resource causal fact remains absent from the Splash;
+  rare/precious authorship and no positive resource causal owner remains absent from the Splash;
 - the profile contains no tile coordinate, placed-instance ID, route, key, site contents, per-source yield,
   remaining-harvest count or search result;
 - entry/exit portals are navigation infrastructure, not site opportunities, and do not enter this profile;
@@ -298,7 +300,7 @@ horizontally scrollable.
 | O02 | add/remove one obtainable authored rare/precious resource family at fixed terrain | Only resource-opportunity receipt/commands and legitimate occlusion pixels change; family/source count/quantity is retained |
 | O03 | change nonzero site count/category/identity/arrangement/location | Site-presence receipt field, site command and site-owned RGBA remain byte-identical |
 | O04 | add/remove an ordinary, non-qualifying resource family | Receipt, commands and pixels remain byte-identical; ordinary presence alone is not a Splash hook |
-| O05 | same-seed Ore-driving Sigil actual vs no-Sigil counterfactual | Only Ore resource-opportunity commands and legitimate occlusion pixels change; actual source count/quantity and causal owner agree; greater actual quantity owns greater resource pixels |
+| O05 | same-seed Ore-increasing Sigil actual vs no-Sigil counterfactual | Only Ore resource-opportunity commands and legitimate occlusion pixels change; actual source count/quantity and positive causal owner agree; greater actual quantity owns greater resource pixels; a reduced/equal/rearranged ordinary Ore result does not qualify |
 | O06 | same-seed vitality/verdancy Sigil actual vs no-Sigil counterfactual | Only flora identity/distribution commands and legitimate occlusion pixels change; actual placed profile agrees; greater actual growth owns greater flora pixels |
 | O07 | coordinate permutation preserving opportunity/flora aggregate facts | Receipt, commands and pixels byte-identical; no exact coordinate is persisted or implied |
 | D01 | mutate traveller/apex or excluded site/resource details | Receipt, commands and pixels byte-identical |
