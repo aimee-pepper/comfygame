@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Exploration Loose Items v1</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    :root { color-scheme:dark; background:#0e1618; color:#efe3c4; font-family:system-ui,sans-serif; }
+    * { box-sizing:border-box; }
+    html, body { width:100%; max-width:100%; overflow-x:hidden; }
+    body { margin:0; background:#0e1618; }
+    main { display:block; width:min(1500px,100%); max-width:100vw; min-width:0; min-height:0; margin:auto; padding:24px; }
+    h1 { margin:0 0 8px; font-size:28px; }
+    h2 { margin:38px 0 12px; font-size:21px; }
+    p { color:#b8c6bd; max-width:84ch; line-height:1.45; }
+    .candidate { display:inline-block; padding:7px 10px; border:1px solid #bd765d; color:#f0b59c; background:#2a1d1a; }
+    .phones { display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,368px)); gap:18px; align-items:start; }
+    .phones img { width:100%; max-width:368px; image-rendering:pixelated; border:1px solid #52625e; }
+    .sheet { width:100%; height:auto; image-rendering:pixelated; border:1px solid #52625e; background:#101719; }
+    .links { display:flex; gap:10px; flex-wrap:wrap; }
+    a { color:#9fd9d0; }
+    code { color:#d8c692; }
+    @media(max-width:520px) { main { padding:12px; } h1 { font-size:23px; } .phones { grid-template-columns:minmax(0,1fr); } p,h1,h2 { overflow-wrap:anywhere; } }
+  </style>
+</head>
+<body>
+<nav class="tool-nav" aria-label="AssetLab tools"><a href="index.html">Creatures</a><a href="world.html">World &amp; Flora</a><a href="world-generator-tester.html">World Generator</a><a href="ui-gallery.html">UI Gallery</a><a href="places.html">Places</a><a href="characters.html">Characters</a><a href="full-cast.html">Full Cast</a><a href="resources.html">Resources</a><a href="equipment.html">Items</a><a href="trading.html">Trading Post</a><a href="reporter.html">Bug Reporter</a><a href="noll.html">Noll Review</a><a href="bridge.html">Economy Bridge</a><a href="combat.html">Combat</a><a href="combat-ui.html">Combat UI</a><a href="campaigns.html">Campaigns</a><a href="launch.html">App Launch</a><a href="splashes.html">Splashes</a><a href="regression.html">Golden Review</a></nav>
+<main>
+  <h1>Exploration Loose Items v1</h1>
+  <div class="candidate">candidate-unapproved · integrationReady:false</div>
+  <p>Every one of the 75 catalogue-gear identities backed by accepted final <code>mob-gear-sprites-v1</code> art now has a complete premade 16×19 map asset. The exporter performs the adaptation offline; runtime receives only stable lookup keys and content-addressed PNGs.</p>
+  <p>Consumables, travellers, and creature encounters remain excluded because their current visual sources explicitly identify themselves as placeholders. This candidate does not promote them or substitute generic art.</p>
+
+  <h2>Applied 368×800 catalogue census</h2>
+  <div class="phones">
+    <img src="integration/exploration-loose-items-v1/evidence/applied-map-catalogue-1-368x800.png" alt="Applied loose catalogue items page 1">
+    <img src="integration/exploration-loose-items-v1/evidence/applied-map-catalogue-2-368x800.png" alt="Applied loose catalogue items page 2">
+    <img src="integration/exploration-loose-items-v1/evidence/applied-map-catalogue-3-368x800.png" alt="Applied loose catalogue items page 3">
+    <img src="integration/exploration-loose-items-v1/evidence/applied-map-catalogue-4-368x800.png" alt="Applied loose catalogue items page 4">
+    <img src="integration/exploration-loose-items-v1/evidence/applied-map-catalogue-5-368x800.png" alt="Applied loose catalogue items page 5">
+  </div>
+
+  <h2>Accepted source → premade map profile</h2>
+  <img class="sheet" src="integration/exploration-loose-items-v1/evidence/accepted-source-to-map-native-800pct.png" alt="All 75 accepted source sprites beside native and 800 percent map sprites">
+  <h2>Literal grayscale</h2>
+  <img class="sheet" src="integration/exploration-loose-items-v1/evidence/accepted-source-to-map-native-800pct-grayscale.png" alt="All 75 source and map sprites in literal grayscale">
+  <h2>Visibility and minimap disclosure</h2>
+  <img class="sheet" src="integration/exploration-loose-items-v1/evidence/visibility-full-remembered-hidden-800pct.png" alt="Full remembered and hidden item visibility proof">
+  <img class="sheet" src="integration/exploration-loose-items-v1/evidence/minimap-item-native-1600pct.png" alt="Premade generic minimap item category">
+
+  <div class="links">
+    <a href="integration/exploration-loose-items-v1/runtime/manifest.json">Runtime manifest</a>
+    <a href="integration/exploration-loose-items-v1/evidence/applied-map-catalogue-1-grayscale-368x800.png">Phone grayscale 1</a>
+    <a href="integration/exploration-loose-items-v1/evidence/applied-map-catalogue-2-grayscale-368x800.png">Phone grayscale 2</a>
+    <a href="integration/exploration-loose-items-v1/evidence/applied-map-catalogue-3-grayscale-368x800.png">Phone grayscale 3</a>
+    <a href="integration/exploration-loose-items-v1/evidence/applied-map-catalogue-4-grayscale-368x800.png">Phone grayscale 4</a>
+    <a href="integration/exploration-loose-items-v1/evidence/applied-map-catalogue-5-grayscale-368x800.png">Phone grayscale 5</a>
+    <a href="integration/exploration-loose-items-v1/evidence/visibility-full-remembered-hidden-800pct-grayscale.png">Visibility grayscale</a>
+    <a href="integration/exploration-loose-items-v1/evidence/minimap-item-native-1600pct-grayscale.png">Minimap grayscale</a>
+  </div>
+</main>
+</body>
+</html>
