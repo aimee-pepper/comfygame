@@ -427,11 +427,12 @@ extension GameStore {
     /// A single step onto an adjacent tile.
     func step(to point: GridPoint) {
         guard activeRun?.activeEncounter == nil else { return }
+        guard let attempt = beginWorldFieldAttempt(.step) else { return }
         var events: [WorldRules.Event] = []
         mutate("step", scope: .expedition) { state in
             events = WorldRules.step(to: point, in: &state)
         }
-        finishTurn(events)
+        finishTurn(events, attempt: attempt)
     }
 
     /// What's in the satchel that could be used right now, out in the world.
@@ -495,6 +496,7 @@ extension GameStore {
         guard activeRun?.activeEncounter == nil,
               ContentCatalog.shared.item(solvent.catalogID)?.consumable?.effect == .identifyCurio
         else { return }
+        guard let attempt = beginWorldFieldAttempt(.useItem) else { return }
         var events: [WorldRules.Event] = []
         mutate("use solvent", flush: true, scope: .expedition) { state in
             guard var run = state.worlds.activeRun,
@@ -521,7 +523,7 @@ extension GameStore {
             events = [.usedItem("Solvent", on: .binder)]
             events.append(contentsOf: WorldRules.advanceTurn(in: &state))
         }
-        finishTurn(events)
+        finishTurn(events, attempt: attempt)
     }
 
     /// Use something out here. Costs a turn, like everything else the world charges for.
@@ -534,11 +536,12 @@ extension GameStore {
                 consuming: stack.id)
             return
         }
+        guard let attempt = beginWorldFieldAttempt(.useItem) else { return }
         var events: [WorldRules.Event] = []
         mutate("use \(stack.catalogID.rawValue)", flush: true, scope: .expedition) { state in
             events = WorldRules.useItem(stack.id, on: member, in: &state)
         }
-        finishTurn(events)
+        finishTurn(events, attempt: attempt)
     }
 
     /// **Whoever you're standing on**, so the world screen can open the scene.
@@ -550,11 +553,14 @@ extension GameStore {
 
     /// Talk them into coming home. The only thing that marks somebody found (Aimee, 6 Aug).
     func recruit(_ id: TravellerID) {
+        guard let attempt = beginWorldFieldAttempt(.interact) else { return }
         var events: [WorldRules.Event] = []
         mutate("recruit \(id.rawValue)", flush: true, scope: .expedition) { state in
             events = WorldRules.recruit(id, in: &state)
         }
         recentEvents = events
+        submitWorldFieldEvents(events, for: attempt)
+        refreshWorldFieldContext()
     }
 
     /// Tap-to-path: walk toward a tile turn by turn, stopping the moment anything happens worth
@@ -562,11 +568,14 @@ extension GameStore {
     func travel(to destination: GridPoint) {
         guard let run = activeRun, run.activeEncounter == nil else { return }
         guard destination != run.playerPosition else { return }
+        guard let attempt = beginWorldFieldAttempt(.travel) else { return }
 
         let route = WorldRules.path(from: run.playerPosition, to: destination, in: run.map,
                                     slowGroundExtraTurns: run.tuning.slowGroundExtraTurns)
         guard !route.isEmpty else {
-            recentEvents = [.blocked("No way through.")]
+            let events: [WorldRules.Event] = [.blocked("No way through.")]
+            recentEvents = events
+            submitWorldFieldEvents(events, for: attempt)
             return
         }
 
@@ -594,27 +603,29 @@ extension GameStore {
                 if state.worlds.activeRun == nil { break }
             }
         }
-        finishTurn(events)
+        finishTurn(events, attempt: attempt)
     }
 
     /// One pull from the node underfoot.
     func harvest() {
         guard harvestableHere != nil, activeRun?.activeEncounter == nil else { return }
+        guard let attempt = beginWorldFieldAttempt(.harvest) else { return }
         var events: [WorldRules.Event] = []
         mutate("harvest", flush: true, scope: .expedition) { state in
             events = WorldRules.harvest(in: &state)
         }
-        finishTurn(events)
+        finishTurn(events, attempt: attempt)
     }
 
     /// One turn of searching the site underfoot. Contents land on the turn it completes.
     func searchSite() {
         guard searchableHere != nil, activeRun?.activeEncounter == nil else { return }
+        guard let attempt = beginWorldFieldAttempt(.searchSite) else { return }
         var events: [WorldRules.Event] = []
         mutate("search site", flush: true, scope: .expedition) { state in
             events = WorldRules.searchSite(in: &state)
         }
-        finishTurn(events)
+        finishTurn(events, attempt: attempt)
     }
 
     var canSurvey: Bool {
@@ -623,11 +634,12 @@ extension GameStore {
 
     func survey() {
         guard canSurvey else { return }
+        guard let attempt = beginWorldFieldAttempt(.survey) else { return }
         var events: [WorldRules.Event] = []
         mutate("survey world", flush: true, scope: .expedition) { state in
             events = WorldRules.survey(in: &state)
         }
-        finishTurn(events)
+        finishTurn(events, attempt: attempt)
     }
 
     /// Leave through a portal, keeping the whole haul. The good ending.
@@ -688,6 +700,8 @@ extension GameStore {
             Self.prepareAnchorSettlement(for: outcomeID, in: &state)
         }
         recentEvents = []
+        clearWorldFieldFeedback()
+        refreshWorldFieldContext()
     }
 
     /// Caught by the collapse (or carried out unconscious): keep a fraction, chosen at random.
@@ -729,6 +743,8 @@ extension GameStore {
             Self.prepareAnchorSettlement(for: outcomeID, in: &state)
         }
         recentEvents = []
+        clearWorldFieldFeedback()
+        refreshWorldFieldContext()
     }
 
     func dismissRunExitSummary() {
@@ -832,8 +848,15 @@ extension GameStore {
     // MARK: - Turn bookkeeping
 
     /// Applies the consequences a turn's events imply, and hands the rest to the UI.
-    private func finishTurn(_ events: [WorldRules.Event]) {
+    private func finishTurn(_ events: [WorldRules.Event], attempt: WorldFieldAttempt) {
+        // Capture the complete rules array before the legacy suffix retained for current callers.
+        submitWorldFieldEvents(events, for: attempt)
         recentEvents = Array(events.suffix(GameStore.eventLimit))
+        refreshWorldFieldContext()
+
+        if events.contains(.encounterBegan) {
+            clearWorldFieldFeedback()
+        }
 
         // **Only the floor going out from under you ends a run.** The meter emptying is the world
         // beginning to come apart — you can keep working, and reaching a portal before the

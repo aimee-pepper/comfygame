@@ -501,6 +501,7 @@ extension GameStore {
     @discardableResult
     func openCacheHere() -> EconomyRules.CacheReward? {
         guard isOnLockedCache, let key = carriedCacheKey, activeEncounter == nil else { return nil }
+        guard let attempt = beginWorldFieldAttempt(.interact) else { return nil }
 
         var reward: EconomyRules.CacheReward?
         var bonusName: String?
@@ -522,7 +523,10 @@ extension GameStore {
         }
         if let reward {
             let bonus = bonusName.map { " A wild weapon was tucked beside it: \($0)." } ?? ""
-            recentEvents = [.cacheOpened(EconomyRules.describe(reward) + bonus)]
+            let events: [WorldRules.Event] = [.cacheOpened(EconomyRules.describe(reward) + bonus)]
+            recentEvents = events
+            submitWorldFieldEvents(events, for: attempt)
+            refreshWorldFieldContext()
         }
         return reward
     }

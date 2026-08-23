@@ -1,6 +1,258 @@
 import Foundation
 import SwiftUI
 import OSLog
+import CryptoKit
+
+struct WorldFieldContextReceiptV1: Equatable, Sendable {
+    enum ContentSummary: Equatable, Sendable {
+        case none
+        case node(name: String)
+        case item(name: String)
+        case genericHazard
+        case portal
+        case lockedCache
+        case site(name: String)
+        case writing
+        case traveller(name: String)
+    }
+
+    enum Interaction: String, Equatable, Sendable {
+        case none, harvest, searchSite, enterPortal, openCache, takePage, survey, useAnchor, placeAnchor
+    }
+
+    enum InteractionState: Equatable, Sendable {
+        case available
+        case unavailable(reason: String)
+    }
+
+    let worldRunID: String
+    let position: GridPoint
+    let groundID: GroundType
+    let groundName: String
+    let elevation: Int
+    let surfaceDeposits: SurfaceDeposits
+    let stabilitySurfaceState: String
+    let floraStableID: InstanceID?
+    let floraDisplayName: String?
+    let contentSummary: ContentSummary
+    let interaction: Interaction
+    let interactionState: InteractionState
+    let inputStateHash: String
+
+    static func make(from state: GameState) -> Self? {
+        guard let run = state.worlds.activeRun, run.map.contains(run.playerPosition) else { return nil }
+        let tile = run.map[run.playerPosition]
+        let content: ContentSummary
+        let interaction: Interaction
+        let interactionState: InteractionState
+        let encounterBlocksInteraction = run.activeEncounter != nil
+        let offeredPages = run.offeredWorldPages.filter {
+            $0.fieldProvenance?.position == run.playerPosition
+        }
+        if offeredPages.count == 1, let page = offeredPages.first {
+            content = .writing
+            interaction = .takePage
+            interactionState = encounterBlocksInteraction
+                ? .unavailable(reason: "Finish the encounter first.")
+                : .available
+        } else { switch tile.content {
+        case .empty:
+            content = .none
+            let frame = run.satchelItems.stacks.first { $0.catalogID == Items.anchorFrame && $0.count > 0 }
+            let canPlace = !encounterBlocksInteraction && frame != nil
+                && state.base.station(Stations.anchorage).isUnlocked
+                && !state.worlds.anchoredRealms.contains { $0.runIndex == run.runIndex }
+                && !tile.isCrumbled
+            if canPlace {
+                interaction = .placeAnchor
+                interactionState = .available
+            } else if !run.carriedInstruments.isEmpty && !encounterBlocksInteraction {
+                interaction = .survey
+                interactionState = .available
+            } else {
+                interaction = .none
+                interactionState = .unavailable(reason: encounterBlocksInteraction
+                    ? "Finish the encounter first." : "Nothing to use here.")
+            }
+        case .node(let node):
+            content = .node(name: ContentCatalog.shared.resource(node.resource)?.name ?? "Unknown resource")
+            interaction = .harvest
+            interactionState = encounterBlocksInteraction ? .unavailable(reason: "Finish the encounter first.")
+                : node.isExhausted ? .unavailable(reason: "This resource is depleted.") : .available
+        case .wildDrop(let resource, _):
+            content = .item(name: ContentCatalog.shared.resource(resource)?.name ?? "Unknown resource")
+            interaction = .none
+            interactionState = .unavailable(reason: "Step here to collect it.")
+        case .item(let item):
+            content = .item(name: item.displayName)
+            interaction = .none
+            interactionState = .unavailable(reason: "Step here to collect it.")
+        case .hazard:
+            content = .genericHazard
+            interaction = .none
+            interactionState = .unavailable(reason: "This ground is dangerous.")
+        case .portal:
+            content = .portal
+            interaction = .enterPortal
+            interactionState = encounterBlocksInteraction
+                ? .unavailable(reason: "Finish the encounter first.") : .available
+        case .lockedCache:
+            content = .lockedCache
+            interaction = .openCache
+            let hasKey = state.base.inventory.stacks.contains {
+                $0.identified && ContentCatalog.shared.item($0.catalogID)?.kind == .key
+            }
+            interactionState = encounterBlocksInteraction ? .unavailable(reason: "Finish the encounter first.")
+                : hasKey ? .available : .unavailable(reason: "A key is required.")
+        case .site(let id):
+            let site = run.sites.first { $0.id == id }
+            content = .site(name: site?.definition?.name ?? "Unknown site")
+            let isNaturalAnchor = site?.definition?.providesNaturalAnchor == true
+            interaction = isNaturalAnchor ? .useAnchor : .searchSite
+            let guarded = run.enemies.contains { $0.position == run.playerPosition }
+            let premium = GameStore.bornAnchoredPremium(forBookCost: run.book.essencePaid)
+            let anchorCost = max(Tuning.Anchoring.naturalAnchorMinimumCost,
+                (premium + Tuning.Anchoring.naturalAnchorPremiumDivisor - 1)
+                    / Tuning.Anchoring.naturalAnchorPremiumDivisor)
+            if encounterBlocksInteraction || guarded {
+                interactionState = .unavailable(reason: "Not while something is standing over you.")
+            } else if isNaturalAnchor && !state.base.station(Stations.anchorage).isUnlocked {
+                interactionState = .unavailable(reason: "Unlock the Anchorage first.")
+            } else if isNaturalAnchor && state.base.essence < anchorCost {
+                interactionState = .unavailable(reason: "You need \(anchorCost) essence.")
+            } else if isNaturalAnchor && state.worlds.anchoredRealms.contains(where: { $0.runIndex == run.runIndex }) {
+                interactionState = .unavailable(reason: "This world is already anchored.")
+            } else if site?.isLooted == true {
+                interactionState = .unavailable(reason: "Nothing remains here.")
+            } else {
+                interactionState = .available
+            }
+        case .diaryPage, .foundWriting:
+            content = .writing
+            interaction = .takePage
+            interactionState = encounterBlocksInteraction
+                ? .unavailable(reason: "Finish the encounter first.") : .available
+        case .traveller(let id):
+            content = .traveller(name: ContentCatalog.shared.traveller(id)?.name ?? "Unknown traveller")
+            interaction = .none
+            interactionState = .unavailable(reason: "Speak with this traveller.")
+        }}
+        let floraName = tile.flora.flatMap { run.floraNames[$0]?.name }
+        let payload = Self.canonicalFields([
+            "world=\(run.runIndex):\(run.mapSeed)", "x=\(run.playerPosition.x)",
+            "y=\(run.playerPosition.y)", "ground=\(tile.ground.rawValue)",
+            "elevation=\(tile.elevation)", "snow=\(tile.surfaceDeposits.snow)",
+            "settledAsh=\(tile.surfaceDeposits.settledAsh)", "cracking=\(tile.isCracking)",
+            "floraID=\(tile.flora?.description ?? "none")", "floraName=\(floraName ?? "none")",
+            "content=\(String(reflecting: content))",
+            "interaction=\(interaction.rawValue)", "state=\(String(reflecting: interactionState))",
+        ])
+        return Self(
+            worldRunID: "\(run.runIndex):\(run.mapSeed)", position: run.playerPosition,
+            groundID: tile.ground, groundName: tile.ground.displayName.capitalized,
+            elevation: tile.elevation, surfaceDeposits: tile.surfaceDeposits,
+            stabilitySurfaceState: tile.isCracking ? "cracking" : "ordinary",
+            floraStableID: tile.flora, floraDisplayName: floraName,
+            contentSummary: content, interaction: interaction,
+            interactionState: interactionState, inputStateHash: Self.sha256(payload))
+    }
+
+    private static func sha256(_ value: String) -> String {
+        SHA256.hash(data: Data(value.utf8)).map { String(format: "%02x", $0) }.joined()
+    }
+
+    private static func canonicalFields(_ fields: [String]) -> String {
+        fields.map { "\($0.utf8.count):\($0)" }.joined()
+    }
+}
+
+struct WorldFieldEventBatchV1: Equatable {
+    enum SourceAction: String, Equatable, Sendable {
+        case step, travel, harvest, searchSite, interact, useItem, survey, otherWorldAction
+    }
+
+    let batchID: String
+    let worldRunID: String
+    let attemptID: UInt64
+    let sourceAction: SourceAction
+    let turnBefore: Int
+    let turnAfter: Int
+    let orderedEvents: [WorldRules.Event]
+    let orderedNarrations: [String]
+    let createdAtMonotonicTime: UInt64
+}
+
+enum WorldFieldNarration {
+    static func text(for event: WorldRules.Event) -> String? {
+        switch event {
+        case .moved, .encounterBegan: nil
+        case .enteredSlowGround(let ground): "Crossing \(ground) took an extra turn."
+        case .blocked(let why): why
+        case .pickedUp(let resource, let amount):
+            "Picked up \(amount) \(ContentCatalog.shared.resource(resource)?.name.lowercased() ?? "something")."
+        case .harvested(let resource, let amount, let exhausted):
+            "Harvested \(amount) \(ContentCatalog.shared.resource(resource)?.name.lowercased() ?? "something")."
+                + (exhausted ? " This deposit is depleted." : "")
+        case .foundPortal: "A way out."
+        case .foundCache: "A cache, locked. The key is somewhere else."
+        case .cacheOpened(let what): "The lock gives. \(what)"
+        case .readPage(let id):
+            ContentCatalog.shared.diaryPage(id).map { "A page, in somebody's hand. \"\($0.prose)\"" }
+                ?? "A page from someone's diary."
+        case .readFoundWriting(_, let prose): "A weathered field note. \"\(prose)\""
+        case .foundTraveller(let id):
+            ContentCatalog.shared.traveller(id).map { "\($0.name) is coming with you." }
+                ?? "They're coming with you."
+        case .usedItem(let what, let member):
+            "\(what). \(member == .binder ? "You feel" : "They feel") better."
+        case .surveyed(let readings):
+            "Surveyed: " + readings.map { "\($0.name) \($0.text)" }.joined(separator: ", ") + "."
+        case .metTraveller(let id):
+            ContentCatalog.shared.traveller(id).map { "\($0.name), \($0.calling). \($0.blurb)" }
+                ?? "Someone is here."
+        case .nightfall: "The light goes. You can see less of this than you could."
+        case .daybreak: "It comes back around. You can see again."
+        case .foundSite(let site):
+            ContentCatalog.shared.site(site).map { "\($0.name). \($0.blurb)" } ?? "Something built."
+        case .searchedSite(_, let remaining):
+            "Searching. \(remaining) more turn\(remaining == 1 ? "" : "s")."
+        case .siteOpened(let site):
+            "You've had everything \(ContentCatalog.shared.site(site)?.name.lowercased() ?? "it") has."
+        case .learnedSymbol(let symbol):
+            "You can write \(ContentCatalog.shared.symbol(symbol)?.name ?? "something new") now."
+        case .learnedFocus(let focus):
+            "A word you didn't have: \(ContentCatalog.shared.pressureSource(focus)?.name ?? "something new")."
+        case .learnedGambit(let component):
+            "A gambit phrase you didn't have: \(ContentCatalog.shared.gambitComponent(component)?.name ?? "something new")."
+        case .learnedPattern(let pattern): SchematicPresentation.learnedEvent(pattern: pattern)
+        case .learnedSchematic(let schematic): SchematicPresentation.learnedEvent(schematic: schematic)
+        case .gainedEssence(let amount): "\(amount) essence, banked."
+        case .pickedUpItem(let what): "\(what) You can't tell what it is."
+        case .satchelFull(let what): "No room in your satchel — \(what.lowercased()) is waiting on you."
+        case .hazardHit(let damage): "The ground turns on you — \(damage) damage."
+        case .scratchedByGrowth(let name, let damage, let lingers):
+            lingers ? "You push through the \(name). \(damage) damage, and it's still working."
+                : "The \(name) tears at you — \(damage) damage."
+        case .poisonWorking(let damage): "Whatever that was is still in you — \(damage) damage."
+        case .enemySighted(let name): "A \(name) has noticed you."
+        case .enemyAlerted(let name): "A \(name) pauses, alert to your movement."
+        case .crossedThreshold(let band):
+            switch band {
+            case .stable: nil
+            case .hazardous: "The edges are starting to go."
+            case .crumbling: "The world is crumbling inward."
+            case .collapsed: "The world is coming apart. Get to a portal while there's floor."
+            }
+        case .tilesCrumbled(let count): count > 0 ? "\(count) tiles gone." : nil
+        case .lostToCrumbling(let count):
+            count == 1 ? "Something you hadn't taken went with it."
+                : "\(count) things you hadn't taken went with it."
+        case .collapsed: "The world is coming apart. Get to a portal."
+        case .floorGaveWay: "The ground goes out from under you."
+        case .ejected(let reason): reason
+        }
+    }
+}
 
 /// The single owner of game state, and the only thing that writes the save.
 ///
@@ -58,6 +310,8 @@ final class GameStore: ObservableObject {
     /// Deliberately *not* in the save: a resumed run should show you where you are, not replay how
     /// you got there. Losing this to a force-quit costs nothing.
     @Published var recentEvents: [WorldRules.Event] = []
+    @Published private(set) var worldFieldContext: WorldFieldContextReceiptV1?
+    @Published private(set) var worldFieldEventQueue: [WorldFieldEventBatchV1] = []
     /// Recoverable player-facing failure from the bind preview/receipt commitment boundary.
     /// It is deliberately outside the save: a failed bind changes no campaign fact.
     @Published var bindError: String?
@@ -65,6 +319,9 @@ final class GameStore: ObservableObject {
     private let io: any GamePersistenceIO
     private let writeQueue = DispatchQueue(label: "com.aimeepepper.bookbinder.save", qos: .userInitiated)
     private var debounceTask: Task<Void, Never>?
+    private var nextWorldFieldAttemptID: UInt64 = 1
+    private var seenWorldFieldBatchIDs: Set<String> = []
+    private var visibleWorldFieldBatchSince: UInt64?
 
     var diagnosticCampaignReference: String? { io.diagnosticCampaignReference }
 
@@ -96,6 +353,123 @@ final class GameStore: ObservableObject {
             saveURL: io.saveURL
         )
         self.diagnostics.saveFileByteCount = prepared.saveFileByteCount
+        self.worldFieldContext = WorldFieldContextReceiptV1.make(from: prepared.state)
+    }
+
+    var currentWorldFieldEventBatch: WorldFieldEventBatchV1? { worldFieldEventQueue.first }
+
+    struct WorldFieldAttempt: Equatable, Sendable {
+        let id: UInt64
+        let sourceAction: WorldFieldEventBatchV1.SourceAction
+        let worldRunID: String
+        let turnBefore: Int
+    }
+
+    func beginWorldFieldAttempt(_ sourceAction: WorldFieldEventBatchV1.SourceAction) -> WorldFieldAttempt? {
+        guard let run = activeRun else { return nil }
+        let attempt = WorldFieldAttempt(
+            id: nextWorldFieldAttemptID, sourceAction: sourceAction,
+            worldRunID: "\(run.runIndex):\(run.mapSeed)", turnBefore: run.turnsTaken)
+        nextWorldFieldAttemptID &+= 1
+        return attempt
+    }
+
+    func submitWorldFieldEvents(_ events: [WorldRules.Event], for attempt: WorldFieldAttempt,
+                                now: UInt64 = DispatchTime.now().uptimeNanoseconds) {
+        let narrations = events.compactMap(WorldFieldNarration.text)
+        guard !narrations.isEmpty else { return }
+        let turnAfter = activeRun?.turnsTaken ?? attempt.turnBefore
+        let canonicalFields = ([
+            "v1", attempt.worldRunID, String(attempt.id), attempt.sourceAction.rawValue,
+            String(attempt.turnBefore), String(turnAfter),
+        ] + events.map(Self.canonicalWorldFieldEvent))
+        let canonical = canonicalFields.map { "\($0.utf8.count):\($0)" }.joined()
+        let hash = SHA256.hash(data: Data(canonical.utf8)).map { String(format: "%02x", $0) }.joined()
+        let batch = WorldFieldEventBatchV1(
+            batchID: "\(attempt.id):\(hash)", worldRunID: attempt.worldRunID,
+            attemptID: attempt.id, sourceAction: attempt.sourceAction,
+            turnBefore: attempt.turnBefore, turnAfter: turnAfter,
+            orderedEvents: events, orderedNarrations: narrations,
+            createdAtMonotonicTime: now)
+        enqueueWorldFieldBatch(batch, now: now)
+    }
+
+    func enqueueWorldFieldBatch(_ batch: WorldFieldEventBatchV1,
+                                now: UInt64 = DispatchTime.now().uptimeNanoseconds) {
+        guard seenWorldFieldBatchIDs.insert(batch.batchID).inserted else { return }
+        let wasEmpty = worldFieldEventQueue.isEmpty
+        worldFieldEventQueue.append(batch)
+        if wasEmpty { visibleWorldFieldBatchSince = now }
+    }
+
+    func dismissWorldFieldFeedback(expectedBatchID: String,
+                                   now: UInt64 = DispatchTime.now().uptimeNanoseconds) {
+        guard worldFieldEventQueue.first?.batchID == expectedBatchID else { return }
+        worldFieldEventQueue.removeFirst()
+        visibleWorldFieldBatchSince = worldFieldEventQueue.isEmpty ? nil : now
+    }
+
+    func expireWorldFieldFeedback(ifCurrent batchID: String,
+                                  now: UInt64 = DispatchTime.now().uptimeNanoseconds) {
+        guard currentWorldFieldEventBatch?.batchID == batchID,
+              let visibleWorldFieldBatchSince,
+              now >= visibleWorldFieldBatchSince + 4_000_000_000 else { return }
+        dismissWorldFieldFeedback(expectedBatchID: batchID, now: now)
+    }
+
+    func clearWorldFieldFeedback() {
+        worldFieldEventQueue.removeAll()
+        seenWorldFieldBatchIDs.removeAll()
+        visibleWorldFieldBatchSince = nil
+    }
+
+    func refreshWorldFieldContext() {
+        worldFieldContext = WorldFieldContextReceiptV1.make(from: state)
+    }
+
+    private static func canonicalWorldFieldEvent(_ event: WorldRules.Event) -> String {
+        switch event {
+        case .moved(let point): "moved:\(point.x),\(point.y)"
+        case .enteredSlowGround(let ground): "slow:\(ground)"
+        case .blocked(let reason): "blocked:\(reason)"
+        case .pickedUp(let id, let amount): "pickup:\(id.rawValue):\(amount)"
+        case .harvested(let id, let amount, let exhausted): "harvest:\(id.rawValue):\(amount):\(exhausted)"
+        case .foundPortal: "portal"
+        case .foundCache: "cache"
+        case .cacheOpened(let copy): "cache-open:\(copy)"
+        case .foundSite(let id): "site:\(id.rawValue)"
+        case .readPage(let id): "page:\(id.rawValue)"
+        case .readFoundWriting(let id, let prose): "writing:\(id.rawValue):\(prose)"
+        case .foundTraveller(let id): "traveller:\(id.rawValue)"
+        case .metTraveller(let id): "met:\(id.rawValue)"
+        case .usedItem(let name, let member): "use:\(name):\(member)"
+        case .surveyed(let readings):
+            "survey:" + readings.map { "\($0.target.rawValue):\($0.name):\($0.text)" }.joined(separator: ";")
+        case .searchedSite(let id, let turns): "search:\(id.rawValue):\(turns)"
+        case .siteOpened(let id): "site-open:\(id.rawValue)"
+        case .learnedSymbol(let id): "symbol:\(id.rawValue)"
+        case .learnedFocus(let id): "focus:\(id.rawValue)"
+        case .learnedGambit(let id): "gambit:\(id.rawValue)"
+        case .learnedPattern(let id): "pattern:\(id.rawValue)"
+        case .learnedSchematic(let id): "schematic:\(id.rawValue)"
+        case .gainedEssence(let amount): "essence:\(amount)"
+        case .pickedUpItem(let copy): "item:\(copy)"
+        case .satchelFull(let copy): "full:\(copy)"
+        case .hazardHit(let damage): "hazard:\(damage)"
+        case .scratchedByGrowth(let name, let damage, let lingers): "flora:\(name):\(damage):\(lingers)"
+        case .poisonWorking(let damage): "poison:\(damage)"
+        case .enemySighted(let name): "sighted:\(name)"
+        case .enemyAlerted(let name): "alerted:\(name)"
+        case .encounterBegan: "encounter"
+        case .crossedThreshold(let band): "threshold:\(band)"
+        case .nightfall: "nightfall"
+        case .daybreak: "daybreak"
+        case .tilesCrumbled(let count): "crumbled:\(count)"
+        case .lostToCrumbling(let count): "lost:\(count)"
+        case .collapsed: "collapsed"
+        case .floorGaveWay: "floor"
+        case .ejected(let reason): "ejected:\(reason)"
+        }
     }
 
     /// All disk, decoding, catalogue reconciliation and the launch commitment can run before the
