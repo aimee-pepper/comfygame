@@ -180,25 +180,63 @@ import XCTest
                                          south: .same, west: .same),
                 reduceMotion: true, snow: true, settledAsh: true),
         ]
-        let boundaryColors: Set<[UInt8]> = [[37, 43, 42, 255], [173, 164, 126, 255]]
         for request in orderingCases {
-            let before = try pack.regionContinuityPreBoundaryRGBAForTesting(for: request)
-            let after = try pack.regionContinuousRGBA(for: request)
+            let descriptor = try identicalDescriptor()
+            let after = try pack.regionContinuousRGBA(for: request, descriptor: descriptor)
             let mask = TerrainProductionPack.materialBoundaryMask(request)
+            let role = try TerrainProductionPack.resolvedGroundPalette(
+                request.ground, descriptor: descriptor)[1]
+            let bodyDark = [role.red, role.green, role.blue, role.alpha]
             XCTAssertTrue(mask.contains { $0 > 0 })
             for index in mask.indices {
                 let offset = index * 4, pixel = Array(after[offset..<(offset + 4)])
                 if mask[index] == 0 {
-                    XCTAssertEqual(pixel, Array(before[offset..<(offset + 4)]))
+                    let descriptorBefore = try pack.regionContinuityPreBoundaryRGBAForTesting(
+                        for: request, descriptor: descriptor)
+                    XCTAssertEqual(pixel, Array(descriptorBefore[offset..<(offset + 4)]))
                 } else {
-                    XCTAssertTrue(boundaryColors.contains(pixel),
-                                  "boundary did not compose after motion/deposits")
+                    XCTAssertEqual(pixel, bodyDark,
+                                   "boundary did not use owning material bodyDark")
                 }
             }
             var fringe = request; fringe.visibility = .fringe
             XCTAssertFalse(TerrainProductionPack.materialBoundaryMask(fringe).contains { $0 > 0 })
             XCTAssertEqual(try pack.regionContinuousRGBA(for: fringe),
                            try pack.regionContinuityPreBoundaryRGBAForTesting(for: fringe))
+        }
+    }
+
+    func testMaterialBoundaryUsesEveryOwningGroundBodyDarkAcrossWorldGrades() throws {
+        let pack = MapAssetTestSupport.productionPack()
+        let descriptors = try [identicalDescriptor(), warmDescriptor()]
+        let grounds = TerrainProductionPack.Ground.allCases
+        for descriptor in descriptors {
+            for ground in grounds {
+                let role = try TerrainProductionPack.resolvedGroundPalette(
+                    ground, descriptor: descriptor)[1]
+                XCTAssertEqual(role.alpha, 255, ground.rawValue)
+            }
+            for (index, owner) in grounds.enumerated() {
+                let higher = grounds.dropFirst(index + 1).first ?? grounds.last!
+                if owner == higher { continue }
+                let request = try MapAssetTestSupport.productionRequest(
+                    ground: GroundType(rawValue: owner.rawValue)!,
+                    point: .init(x: 5, y: 7),
+                    descriptorHash: descriptor.canonicalDescriptorSHA256,
+                    cardinalNeighbors: .init(north: .same, east: .ground(higher),
+                                             south: .same, west: .unknown))
+                let mask = TerrainProductionPack.materialBoundaryMask(request)
+                let output = try pack.regionContinuousRGBA(for: request, descriptor: descriptor)
+                let role = try TerrainProductionPack.resolvedGroundPalette(
+                    owner, descriptor: descriptor)[1]
+                let expected = [role.red, role.green, role.blue, role.alpha]
+                XCTAssertTrue(mask.contains { $0 > 0 }, owner.rawValue)
+                for pixel in mask.indices where mask[pixel] != 0 {
+                    let offset = pixel * 4
+                    XCTAssertEqual(Array(output[offset..<(offset + 4)]), expected,
+                                   owner.rawValue)
+                }
+            }
         }
     }
 
@@ -880,6 +918,20 @@ import XCTest
         return try WorldGrade2V1.resolve(.init(
             material: .init(identity: "mixedMineral", paletteFamilyID: "paleNeutral",
                             transform: .init(hue: 0, saturation: 1, value: 0)),
+            atmosphere: .init(medium: "none", density: 0, paletteFamilyID: "clear"),
+            flora: .init(coveragePercent: 40, paletteRichness: 50,
+                         cast: [.init(speciesID: "flora-a", formID: 0, stature: 35,
+                                      resolvedColor: green)]),
+            resolvedColors: .init()))
+    }
+
+    private func warmDescriptor() throws -> WorldGrade2V1.Descriptor {
+        let green = WorldGrade2V1.ResolvedColor(
+            srgb: [62, 122, 86], resolutionVersion: "resolved-color-1.0.0",
+            provenance: "bindRandom")
+        return try WorldGrade2V1.resolve(.init(
+            material: .init(identity: "mixedMineral", paletteFamilyID: "paleNeutral",
+                            transform: .init(hue: 28, saturation: 1, value: 0)),
             atmosphere: .init(medium: "none", density: 0, paletteFamilyID: "clear"),
             flora: .init(coveragePercent: 40, paletteRichness: 50,
                          cast: [.init(speciesID: "flora-a", formID: 0, stature: 35,

@@ -406,12 +406,9 @@ final class TerrainProductionPack: @unchecked Sendable {
 
         if applyingBoundary {
             let boundary = Self.materialBoundaryMask(request)
+            let bodyDark = try Self.groundPalette(request.ground.rawValue, in: palette)[1]
             for index in boundary.indices {
-                switch boundary[index] {
-                case 1: rgba.replace(at: index, with: Self.materialBoundaryPalette[0])
-                case 2: rgba.replace(at: index, with: Self.materialBoundaryPalette[1])
-                default: break
-                }
+                if boundary[index] != 0 { rgba.replace(at: index, with: bodyDark) }
             }
         }
         return rgba
