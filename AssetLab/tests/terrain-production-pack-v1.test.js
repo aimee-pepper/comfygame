@@ -2,13 +2,15 @@ import assert from "node:assert/strict";
 import fs from "node:fs";
 import path from "node:path";
 import {spawnSync} from "node:child_process";
-import {normalizeRuntimeRequest,layerOrder,depositKeys} from "../src/terrain-production-pack-v1.js";
+import {createRequire} from "node:module";
+import {normalizeRuntimeRequest,layerOrder,depositKeys,rgba8,sha256} from "../src/terrain-production-pack-v1.js";
+const {createCanvas,loadImage}=createRequire(import.meta.url)("@napi-rs/canvas");
 
 const root=path.resolve(import.meta.dirname,".."),out=path.join(root,"integration/terrain-production-pack-v1"),manifestPath=path.join(out,"runtime/manifest.json");
 const run=()=>spawnSync(process.execPath,[path.join(root,"scripts/export-terrain-production-pack-v1.mjs")],{encoding:"utf8"});
 let r=run();assert.equal(r.status,0,r.stderr);const first=fs.readFileSync(manifestPath);r=run();assert.equal(r.status,0,r.stderr);assert.deepEqual(fs.readFileSync(manifestPath),first);
 const m=JSON.parse(first),assetKeys=Object.keys(m.assets),cases=m.cases;
-assert.equal(m.integrationReady,false);assert.equal(m.acceptedVisual.bodySHA256,"2a541033b71b638f1803e5a9477a0197c38f38d96ff199a4864d49bf551608dd");assert.equal(m.acceptedVisual.manifestSHA256,"5e70b17c91c8601ed895455364f2cd8a51e010e2cb2201f09dc2c02c826f3892");
+assert.equal(m.integrationReady,false);assert.equal(m.authorityRevision,"motion-rgba-correction-v1.1");assert.equal(m.status,"corrected-asset-authority-review");assert.equal(m.acceptedVisual.bodySHA256,"2a541033b71b638f1803e5a9477a0197c38f38d96ff199a4864d49bf551608dd");assert.equal(m.acceptedVisual.manifestSHA256,"5e70b17c91c8601ed895455364f2cd8a51e010e2cb2201f09dc2c02c826f3892");
 assert.equal(m.runtimeContract.requestSchemaVersion,"terrain-layers-v2");assert.deepEqual(m.runtimeContract.layerOrder,layerOrder);assert.equal(m.runtimeContract.grounds.length,12);assert.deepEqual(m.runtimeContract.elevation,[0,3]);assert.deepEqual(m.runtimeContract.surfaceDeposits.keys,depositKeys);assert.equal(m.runtimeContract.surfaceDeposits.independent,true);assert.equal(m.runtimeContract.placeholderFallback,false);
 assert.deepEqual(fs.readdirSync(out).sort(),["evidence","runtime"]);assert.deepEqual(fs.readdirSync(path.join(out,"runtime")).sort(),["assets","manifest.json"]);
 const listed=new Set(Object.values(m.assets).map(x=>path.basename(x.path))),files=fs.readdirSync(path.join(out,"runtime/assets"));assert.equal(files.length,listed.size);assert.deepEqual(new Set(files),listed);
@@ -23,4 +25,9 @@ const activeVisibility=cases.filter(x=>x.id.startsWith("visibility-active/")),ac
 const elevations=cases.filter(x=>x.id.startsWith("external/elevation/"));assert.equal(elevations.length,4);assert.equal(new Set(elevations.map(x=>x.rgbaSHA256)).size,1);
 for(const ground of ["water","deepWater","groundcover","growth"]){for(const band of ["calm","moving","strong"])assert.equal(cases.filter(x=>x.id.startsWith(`motion/${ground}/${band}/`)).length,4);const reduced=cases.filter(x=>x.id.startsWith(`motion/${ground}/reduced/`));assert.equal(reduced.length,2);assert.equal(reduced[0].motionSHA256,reduced[1].motionSHA256);assert.equal(reduced[0].rgbaSHA256,reduced[1].rgbaSHA256);}
 assert.equal(Object.keys(m.pressurePalettes.rows).length,3);assert.ok(cases.every(x=>m.pressurePalettes.rows[x.request.worldGradeDescriptorHash]));
+assert.deepEqual(rgba8("#91c8bd"),[145,200,189,255]);assert.deepEqual(rgba8([145,200,189]),[145,200,189,255]);assert.throws(()=>rgba8("#bad"));assert.throws(()=>rgba8([0,0,999]));
+const receipt=JSON.parse(fs.readFileSync(path.join(out,"evidence/motion-rgba-correction-receipt.json")));assert.equal(receipt.schemaVersion,"terrain-motion-rgba-correction-v1.1");assert.equal(receipt.status,"candidate-not-approved");assert.equal(receipt.assetAggregateSHA256,"8fb84f80a3eb82c84c0baa285800cad51fc1107c93ec748a23c1f0f6eb489272");assert.equal(receipt.changedCaseCount,64);assert.equal(receipt.unchangedCaseCount,85);assert.equal(receipt.representatives.length,4);assert.ok(receipt.representatives.every(row=>row.motionCoordinates.length>0&&row.motionCoordinates.every(pixel=>pixel.before[3]<16&&pixel.after[3]===255&&JSON.stringify(pixel.before)!==JSON.stringify(pixel.after))));
+const water=receipt.representatives.find(x=>x.ground==="water");assert.deepEqual(water.motionCoordinates.map(x=>[x.x,x.y]),[[2,5],[3,5],[8,11],[9,11]]);assert.equal(water.beforeSHA256,"e4300692338a34eb980651380354ba2350f0accea893c04fcd24a9e48492902c");
+const waterMotionRow=m.assets["accepted/motion/water-phase-0-16x16.png"],waterMotionImage=await loadImage(path.join(out,"runtime",waterMotionRow.path)),waterMotionCanvas=createCanvas(16,16),waterMotionContext=waterMotionCanvas.getContext("2d");waterMotionContext.drawImage(waterMotionImage,0,0);const waterMotionRGBA=waterMotionContext.getImageData(0,0,16,16).data,waterMotionCoordinates=[];for(let i=0;i<256;i++)if(waterMotionRGBA[i*4+3]>0)waterMotionCoordinates.push([i%16,Math.floor(i/16)]);assert.deepEqual(waterMotionCoordinates,[[2,5],[3,5],[8,11],[9,11]]);
+for(const name of ["motion-rgba-correction-368x800.png","motion-rgba-correction-grayscale-368x800.png"]){const bytes=fs.readFileSync(path.join(out,"evidence",name));assert.equal(bytes.readUInt32BE(16),368);assert.equal(bytes.readUInt32BE(20),800);assert.match(sha256(bytes),/^[a-f0-9]{64}$/);}
 console.log(`terrain production pack v1 passed: ${assetKeys.length} assets, ${cases.length} cases, ${m.canonicalBodySHA256}`);
