@@ -145,13 +145,19 @@ extension GameStore {
         guard fieldKitDepartureRefusal == nil,
               state.worlds.activeRun == nil,
               let realm = state.worlds.anchoredRealms.first(where: { $0.id == id }),
-              !realm.isDormant else { return false }
+              !realm.isDormant,
+              realm.world.generationDiagnostics.playableEntry?.isAccepted != false,
+              WorldRules.canReachAPortal(from: realm.world.playerPosition,
+                                         in: realm.world.map) else { return false }
 
         var didCommit = false
         mutate("revisit anchored realm", flush: true, scope: .expedition) { state in
-            guard case .allowed(let fieldKit) = Self.fieldKitDepartureQuote(in: state) else { return }
             guard let realm = state.worlds.anchoredRealms.first(where: { $0.id == id }),
-                  !realm.isDormant else { return }
+                  !realm.isDormant,
+                  realm.world.generationDiagnostics.playableEntry?.isAccepted != false,
+                  WorldRules.canReachAPortal(from: realm.world.playerPosition,
+                                             in: realm.world.map),
+                  case .allowed(let fieldKit) = Self.fieldKitDepartureQuote(in: state) else { return }
             var run = realm.world
             run.activeEncounter = nil
             run.offeredItems = []
@@ -289,6 +295,12 @@ extension GameStore {
     }
 
     var canPortalHere: Bool { tileUnderPlayer?.content.isPortal ?? false }
+    var canLeaveMalformedOlderWorld: Bool {
+        guard let run = activeRun, run.activeEncounter == nil,
+              run.generationDiagnostics.playableEntry == nil,
+              run.collapsedOnTurn == nil else { return false }
+        return !WorldRules.canReachAPortal(from: run.playerPosition, in: run.map)
+    }
 
     var naturalAnchorHere: PlacedSite? {
         guard let run = activeRun,
@@ -622,6 +634,12 @@ extension GameStore {
     func portalHome(reason: String = "You returned through a portal.") {
         guard canPortalHere, activeRun?.activeEncounter == nil else { return }
         returnHomeWithFullHaul(reason: reason, kind: .portal)
+    }
+
+    func leaveMalformedOlderWorld() {
+        guard canLeaveMalformedOlderWorld else { return }
+        returnHomeWithFullHaul(
+            reason: "This older world had no traversable way home.", kind: .abandon)
     }
 
     /// Banks a successful return as one save transaction. Waystones can call this away from a

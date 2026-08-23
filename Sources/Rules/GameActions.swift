@@ -953,7 +953,8 @@ extension GameStore {
     @discardableResult
     func bindAndDepart(
         worldPageInstanceID: InstanceID?, bornAnchored: Bool = false,
-        openColorResolver: WorldGrade2BindAdapter.OpenColorResolver
+        openColorResolver: WorldGrade2BindAdapter.OpenColorResolver,
+        forcePlayableEntryRefusalForTesting: Bool = false
     ) -> Bool {
         bindError = nil
         let selectedWorldPage = worldPageInstanceID.flatMap { collectedWorldPage($0) }
@@ -1008,11 +1009,16 @@ extension GameStore {
                     for: book, seed: generationSeed),
                 suppressesRandomPage: false,
                 occupiedInstanceIDs: occupiedPhysicalIDs))
-        let world = Worldgen.generate(book: book, seed: generationSeed, library: state.reality.library,
+        var world = Worldgen.generate(book: book, seed: generationSeed, library: state.reality.library,
                                       tuning: tuning,
                                       isFreshFirstExpedition: state.worlds.runIndex == 0,
                                       wildPageSelection: wildSelection,
                                       wildPageOriginRunIndex: state.worlds.runIndex + 1)
+#if DEBUG
+        if forcePlayableEntryRefusalForTesting {
+            world.diagnostics.terrainGenerationSucceeded = false
+        }
+#endif
         guard world.diagnostics.terrainGenerationSucceeded else {
             bindError = "This world could not be prepared. Your Page and Essence were not changed. Try again; if it keeps happening, report a bug."
             return false

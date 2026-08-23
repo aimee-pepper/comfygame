@@ -578,6 +578,7 @@ struct WorldView: View {
 
     private var canInteract: Bool {
         store.harvestableHere != nil || store.searchableHere != nil || store.canPortalHere
+            || store.canLeaveMalformedOlderWorld
             || (store.isOnLockedCache && store.carriedCacheKey != nil)
             || store.canUseNaturalAnchor || store.canPlaceAnchorFrame || store.canSurvey
             || store.offeredWorldPageHere != nil
@@ -595,6 +596,7 @@ struct WorldView: View {
             return "Search \(definition.name) · \(site.searchTurnsRemaining) turns left"
         }
         if store.canPortalHere { return "Portal home · keep everything" }
+        if store.canLeaveMalformedOlderWorld { return "Leave this world · keep everything · no turn" }
         if store.isOnLockedCache {
             return store.carriedCacheKey == nil ? "Locked cache · needs a key" : "Open cache · spends your key"
         }
@@ -628,6 +630,8 @@ struct WorldView: View {
         } else if store.canPortalHere {
             store.completeTutorial(.worldReturn, fact: "first_expedition_outcome")
             store.portalHome()
+        } else if store.canLeaveMalformedOlderWorld {
+            store.leaveMalformedOlderWorld()
         } else if store.isOnLockedCache, store.carriedCacheKey != nil {
             completeInteraction(); store.openCacheHere()
         } else if store.canUseNaturalAnchor {

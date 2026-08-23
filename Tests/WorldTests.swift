@@ -693,6 +693,9 @@ final class WorldTests: XCTestCase {
         let store = GameStore(io: .temporary(name: "minimap-crypsis-\(UUID().uuidString)"))
         store.write("plains")
         store.bindAndDepart()
+        if let id = store.state.worlds.pendingWorldArrivalReceiptID {
+            XCTAssertTrue(store.enterPendingWorld(arrivalReceiptID: id))
+        }
         var run = store.state.worlds.activeRun!
         var traits = CreatureTraits()
         traits.defence = .crypsis
@@ -2078,10 +2081,146 @@ final class WorldTests: XCTestCase {
     // MARK: Banking
 
     @MainActor
+    func testPlayableEntryRefusalLeavesTheEntireCampaignByteIdentical() throws {
+        let store = GameStore(io: .temporary(name: "entry-refusal-\(UUID().uuidString)"))
+        store.mutate("prepare nontrivial refusal state") { state in
+            state.base.essence = 1_000
+            if let salve = ContentCatalog.shared.item("salve") {
+                state.base.inventory.add(ItemStack(id: InstanceID(rawValue: 7_701),
+                                                   catalogID: salve.id, count: 1))
+                state.base.preparationLoadout = [
+                    .init(itemID: salve.id, desiredCount: 1, order: 0)
+                ]
+                state.base.preparationLoadoutNeedsReview = false
+            }
+        }
+        XCTAssertTrue(store.bindAndDepart())
+        if let id = store.state.worlds.pendingWorldArrivalReceiptID {
+            XCTAssertTrue(store.enterPendingWorld(arrivalReceiptID: id))
+        }
+        store.portalHome()
+        XCTAssertFalse(store.state.reality.library.visitedWorlds.isEmpty)
+        store.write("plains")
+        let heldPage = try XCTUnwrap(WorldPageCatalog.starterInstances.first)
+        store.mutate("hold a consumable World Page") {
+            $0.base.collectedWorldPages = [heldPage]
+        }
+        let pageBefore = store.state.base.page
+        let essenceBefore = store.state.base.essence
+        let seedBefore = store.state.worlds.seeds
+        let historyBefore = store.state.reality.library
+        let fieldKitBefore = store.state.base.inventory
+        let before = try SaveCodec.encode(store.state)
+        let didBind = store.bindAndDepart(
+            worldPageInstanceID: heldPage.id,
+            openColorResolver: { scope, sigil, seed in
+                try WorldGrade2BindAdapter.openColor(
+                    scope: scope, selectedSigilID: sigil.id, mapSeed: seed)
+            },
+            forcePlayableEntryRefusalForTesting: true)
+        XCTAssertFalse(didBind)
+        XCTAssertEqual(try SaveCodec.encode(store.state), before)
+        XCTAssertEqual(store.state.base.page, pageBefore)
+        XCTAssertEqual(store.state.base.essence, essenceBefore)
+        XCTAssertEqual(store.state.worlds.seeds, seedBefore)
+        XCTAssertEqual(store.state.reality.library, historyBefore)
+        XCTAssertEqual(store.state.base.inventory, fieldKitBefore)
+        XCTAssertEqual(store.state.base.collectedWorldPages, [heldPage])
+        XCTAssertNil(store.state.worlds.activeRun)
+    }
+
+    @MainActor
+    func testAcceptedPlayableEntryRunRelaunchesByteIdentically() throws {
+        let io = SaveFileIO.temporary(name: "entry-relaunch-\(UUID().uuidString)")
+        defer { io.deleteEverything() }
+        let first = GameStore(io: io)
+        first.write("plains")
+        XCTAssertTrue(first.bindAndDepart())
+        if let id = first.state.worlds.pendingWorldArrivalReceiptID {
+            XCTAssertTrue(first.enterPendingWorld(arrivalReceiptID: id))
+        }
+        XCTAssertEqual(first.state.worlds.activeRun?.generationDiagnostics.playableEntry?.isAccepted,
+                       true)
+        first.flushNow()
+        let before = try XCTUnwrap(first.state.worlds.activeRun)
+        let mapBytes = try SaveCodec.makeEncoder().encode(before.map)
+        let diagnosticsBytes = try SaveCodec.makeEncoder().encode(before.generationDiagnostics)
+        let history = first.state.reality.library.visitedWorlds
+        let second = GameStore(io: io)
+        let after = try XCTUnwrap(second.state.worlds.activeRun)
+        XCTAssertEqual(after, before)
+        XCTAssertEqual(try SaveCodec.makeEncoder().encode(after.map), mapBytes)
+        XCTAssertEqual(try SaveCodec.makeEncoder().encode(after.generationDiagnostics), diagnosticsBytes)
+        XCTAssertEqual(after.worldArrivalReceipt, before.worldArrivalReceipt)
+        XCTAssertEqual(second.state.reality.library.visitedWorlds, history)
+        XCTAssertEqual(second.state.worlds.activeRun, first.state.worlds.activeRun)
+    }
+
+    @MainActor
+    func testInvalidAnchoredSnapshotRefusesBeforeFieldKitMutationAndRemainsStored() throws {
+        let io = SaveFileIO.temporary(name: "invalid-anchor-\(UUID().uuidString)")
+        defer { io.deleteEverything() }
+        let store = GameStore(io: io)
+        store.mutate("prepare anchorage") { state in
+            state.base.stations[Stations.anchorage] = StationState(isUnlocked: true, tier: 0)
+            state.base.essence = 1_000
+            state.worlds.seeds = SeedSequence(rootSeed: 1)
+        }
+        XCTAssertTrue(store.bindAndDepart(bornAnchored: true))
+        if let id = store.state.worlds.pendingWorldArrivalReceiptID {
+            XCTAssertTrue(store.enterPendingWorld(arrivalReceiptID: id))
+        }
+        let realmID = try XCTUnwrap(store.state.worlds.anchoredRealms.first?.id)
+        store.mutate("make anchored snapshot invalid") { state in
+            state.worlds.activeRun = nil
+            state.worlds.anchoredRealms[0].world.generationDiagnostics.playableEntry = nil
+            for point in state.worlds.anchoredRealms[0].world.map.allPoints
+                where state.worlds.anchoredRealms[0].world.map[point].content.isPortal {
+                state.worlds.anchoredRealms[0].world.map[point].content = .empty
+            }
+        }
+        let before = try XCTUnwrap(store.state.worlds.anchoredRealms.first)
+        XCTAssertFalse(store.revisitAnchoredRealm(realmID))
+        XCTAssertEqual(store.state.worlds.anchoredRealms.first, before)
+        XCTAssertNil(store.state.worlds.activeRun)
+        XCTAssertEqual(store.state.worlds.anchoredRealms.first?.id, realmID)
+        store.flushNow()
+        let relaunched = GameStore(io: io)
+        XCTAssertFalse(relaunched.revisitAnchoredRealm(realmID))
+        XCTAssertEqual(relaunched.state.worlds.anchoredRealms.first, before)
+        XCTAssertEqual(relaunched.state.worlds.anchoredRealms.first?.id, realmID)
+    }
+
+    @MainActor
+    func testLegacyAnchoredSnapshotWithoutReceiptRemainsRevisitableWhenPortalReachable() throws {
+        let store = GameStore(io: .temporary(name: "legacy-anchor-\(UUID().uuidString)"))
+        store.mutate("prepare anchorage") { state in
+            state.base.stations[Stations.anchorage] = StationState(isUnlocked: true, tier: 0)
+            state.base.essence = 1_000
+            state.worlds.seeds = SeedSequence(rootSeed: 1)
+        }
+        XCTAssertTrue(store.bindAndDepart(bornAnchored: true))
+        if let id = store.state.worlds.pendingWorldArrivalReceiptID {
+            XCTAssertTrue(store.enterPendingWorld(arrivalReceiptID: id))
+        }
+        let realmID = try XCTUnwrap(store.state.worlds.anchoredRealms.first?.id)
+        store.mutate("make anchored snapshot legacy") { state in
+            state.worlds.activeRun = nil
+            state.worlds.anchoredRealms[0].world.generationDiagnostics.playableEntry = nil
+        }
+        XCTAssertTrue(store.revisitAnchoredRealm(realmID))
+        XCTAssertEqual(store.state.worlds.activeRun?.runIndex,
+                       store.state.worlds.anchoredRealms.first?.runIndex)
+    }
+
+    @MainActor
     func testPortalHomeKeepsEverything() {
         let store = GameStore(io: .temporary(name: "portal-\(UUID().uuidString)"))
         store.write("plains")
         store.bindAndDepart()
+        if let id = store.state.worlds.pendingWorldArrivalReceiptID {
+            XCTAssertTrue(store.enterPendingWorld(arrivalReceiptID: id))
+        }
         store.mutate("stock the satchel") { $0.worlds.activeRun?.satchel.add(9, of: Resources.ore) }
 
         XCTAssertTrue(store.canPortalHere)
@@ -2093,10 +2232,133 @@ final class WorldTests: XCTestCase {
     }
 
     @MainActor
+    func testReportedIsolatedEntryPortalOffersOrdinaryPortalHomeOnly() {
+        let store = GameStore(io: .temporary(name: "isolated-entry-portal-\(UUID().uuidString)"))
+        store.write("plains")
+        XCTAssertTrue(store.bindAndDepart())
+        if let id = store.state.worlds.pendingWorldArrivalReceiptID {
+            XCTAssertTrue(store.enterPendingWorld(arrivalReceiptID: id))
+        }
+        store.mutate("reproduce older isolated entry frame") { state in
+            guard var run = state.worlds.activeRun else { return }
+            let entry = run.map.entry
+            run.playerPosition = entry
+            run.generationDiagnostics.playableEntry = nil
+            for neighbour in run.map.neighbours(of: entry) {
+                run.map[neighbour].ground = .deepWater
+                run.map[neighbour].baseGround = .deepWater
+            }
+            run.satchel.add(4, of: Resources.ore)
+            state.worlds.activeRun = run
+        }
+        let turns = store.state.worlds.activeRun?.turnsTaken
+        XCTAssertTrue(store.canPortalHere)
+        XCTAssertFalse(store.canLeaveMalformedOlderWorld)
+        store.portalHome()
+        XCTAssertNil(store.state.worlds.activeRun)
+        XCTAssertEqual(store.state.base.resources[Resources.ore], 4)
+        XCTAssertEqual(store.state.worlds.lastExit?.kind, .portal)
+        XCTAssertEqual(store.state.worlds.lastExit?.haulKeptFraction, 1)
+        XCTAssertEqual(store.state.worlds.lastExit?.turnsTaken, turns)
+    }
+
+    @MainActor
+    func testLegacyLeaveIsOnlyAvailableWithoutAReachablePortalAndKeepsFullHaul() throws {
+        let io = SaveFileIO.temporary(name: "legacy-leave-\(UUID().uuidString)")
+        defer { io.deleteEverything() }
+        let store = GameStore(io: io)
+        store.mutate("avoid recovery subsidy") { $0.base.essence = 1_000 }
+        store.write("plains")
+        store.bindAndDepart()
+        if let id = store.state.worlds.pendingWorldArrivalReceiptID {
+            XCTAssertTrue(store.enterPendingWorld(arrivalReceiptID: id))
+        }
+        store.mutate("make malformed legacy run") { state in
+            guard var run = state.worlds.activeRun else { return }
+            run.generationDiagnostics.playableEntry = nil
+            for point in run.map.allPoints where run.map[point].content.isPortal {
+                run.map[point].content = .empty
+            }
+            run.satchel.add(9, of: Resources.ore)
+            state.worlds.activeRun = run
+        }
+        XCTAssertNil(store.state.worlds.activeRun?.generationDiagnostics.playableEntry)
+        XCTAssertNil(store.state.worlds.activeRun?.collapsedOnTurn)
+        XCTAssertNil(store.state.worlds.activeRun?.activeEncounter)
+        XCTAssertFalse(store.state.worlds.activeRun!.map.allPoints.contains {
+            store.state.worlds.activeRun!.map[$0].content.isPortal
+        })
+        XCTAssertFalse(WorldRules.canReachAPortal(
+            from: store.state.worlds.activeRun!.playerPosition,
+            in: store.state.worlds.activeRun!.map))
+        XCTAssertTrue(store.canLeaveMalformedOlderWorld)
+        let trappedRun = try XCTUnwrap(store.state.worlds.activeRun)
+        let arrivalReceipt = trappedRun.worldArrivalReceipt
+        let historyRecord = try XCTUnwrap(store.state.reality.library.visitedWorlds.last)
+        XCTAssertEqual(historyRecord.worldArrivalReceipt, arrivalReceipt)
+        let campaignSeed = store.state.worlds.seeds
+        let essence = store.state.base.essence
+        store.flushNow()
+        let cancelledMapBytes = try SaveCodec.makeEncoder().encode(trappedRun.map)
+        let relaunched = GameStore(io: io)
+        XCTAssertEqual(relaunched.state.worlds.activeRun, trappedRun,
+                       "cancelling recovery and relaunching must not repaint or reroll")
+        XCTAssertEqual(try SaveCodec.makeEncoder().encode(try XCTUnwrap(
+            relaunched.state.worlds.activeRun).map), cancelledMapBytes,
+                       "the persisted terrain grid must remain byte-identical")
+        XCTAssertEqual(relaunched.state.worlds.activeRun?.map, trappedRun.map)
+        XCTAssertEqual(relaunched.state.worlds.activeRun?.worldArrivalReceipt, arrivalReceipt)
+        XCTAssertEqual(relaunched.state.reality.library.visitedWorlds.last, historyRecord)
+        XCTAssertEqual(relaunched.state.worlds.seeds, campaignSeed)
+        XCTAssertEqual(relaunched.state.base.essence, essence)
+        XCTAssertTrue(relaunched.canLeaveMalformedOlderWorld)
+        relaunched.leaveMalformedOlderWorld()
+        XCTAssertNil(relaunched.state.worlds.activeRun)
+        XCTAssertEqual(relaunched.state.base.resources[Resources.ore], 9)
+        XCTAssertEqual(relaunched.state.worlds.lastExit?.kind, .abandon)
+        XCTAssertEqual(relaunched.state.worlds.lastExit?.haulKeptFraction, 1)
+        XCTAssertEqual(relaunched.state.worlds.lastExit?.essenceEconomy.bindCostPaid,
+                       trappedRun.book.essencePaid)
+        let economy = try XCTUnwrap(relaunched.state.worlds.lastExit?.essenceEconomy)
+        XCTAssertEqual(economy.antiLockSubsidy, 0, "recovery must not receive a special subsidy")
+        XCTAssertEqual(relaunched.state.base.essence,
+                       essence + economy.automaticallyRefinedEssence + economy.springYield,
+                       "only the ordinary full-return settlement may change Essence")
+        XCTAssertEqual(relaunched.state.worlds.seeds, campaignSeed, "recovery must not reroll a world")
+        XCTAssertEqual(relaunched.state.reality.library.visitedWorlds.last, historyRecord)
+    }
+
+    @MainActor
+    func testLegacyLeaveIsSuppressedForReachablePortalAndCurrentCollapse() {
+        let store = GameStore(io: .temporary(name: "legacy-leave-negative-\(UUID().uuidString)"))
+        store.write("plains")
+        store.bindAndDepart()
+        if let id = store.state.worlds.pendingWorldArrivalReceiptID {
+            XCTAssertTrue(store.enterPendingWorld(arrivalReceiptID: id))
+        }
+        store.mutate("mark legacy") { $0.worlds.activeRun?.generationDiagnostics.playableEntry = nil }
+        XCTAssertTrue(store.canPortalHere)
+        XCTAssertFalse(store.canLeaveMalformedOlderWorld)
+
+        store.mutate("collapse without portal") { state in
+            guard var run = state.worlds.activeRun else { return }
+            for point in run.map.allPoints where run.map[point].content.isPortal {
+                run.map[point].content = .empty
+            }
+            run.collapsedOnTurn = run.turnsTaken
+            state.worlds.activeRun = run
+        }
+        XCTAssertFalse(store.canLeaveMalformedOlderWorld)
+    }
+
+    @MainActor
     func testCollapseKeepsOnlyAFractionAndBanksMotesToReality() {
         let store = GameStore(io: .temporary(name: "collapse-\(UUID().uuidString)"))
         store.write("plains")
         store.bindAndDepart()
+        if let id = store.state.worlds.pendingWorldArrivalReceiptID {
+            XCTAssertTrue(store.enterPendingWorld(arrivalReceiptID: id))
+        }
         store.mutate("stock the satchel") { state in
             state.worlds.activeRun?.satchel.add(10, of: Resources.ore)
             state.worlds.activeRun?.satchel.add(4, of: Resources.mote)
@@ -2120,6 +2382,9 @@ final class WorldTests: XCTestCase {
         let store = GameStore(io: .temporary(name: "collapse-tuning-\(UUID().uuidString)"))
         store.write("plains")
         store.bindAndDepart()
+        if let id = store.state.worlds.pendingWorldArrivalReceiptID {
+            XCTAssertTrue(store.enterPendingWorld(arrivalReceiptID: id))
+        }
         store.mutate("tune this fixture") { state in
             state.worlds.activeRun?.tuning.collapseRecoveryFraction = 1
             state.worlds.activeRun?.satchel.add(10, of: Resources.ore)
@@ -2137,6 +2402,9 @@ final class WorldTests: XCTestCase {
         let store = GameStore(io: .temporary(name: "defeat-outcome-\(UUID().uuidString)"))
         store.write("plains")
         store.bindAndDepart()
+        if let id = store.state.worlds.pendingWorldArrivalReceiptID {
+            XCTAssertTrue(store.enterPendingWorld(arrivalReceiptID: id))
+        }
 
         store.endRunWithPartialHaul(reason: "You were carried home.", kind: .defeat)
 

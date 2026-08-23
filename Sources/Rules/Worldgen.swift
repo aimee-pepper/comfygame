@@ -102,6 +102,7 @@ enum StarterKnownFindPlacementRules {
         occupied.insert(point)
         return point
     }
+
 }
 
 enum WildWorldPageFieldRules {
@@ -348,21 +349,20 @@ enum Worldgen {
         //    way you came is always possible — it just costs you the turns to walk back.
         //    (Whether that's too forgiving is Q6 in questions-for-aimee.md.)
         let preferredEntry = randomEdgePoint(in: map, rng: &layoutRNG)
-        guard let entry = TerrainRules.entryPoint(in: map, near: preferredEntry, rng: &layoutRNG)
+        guard let initialEntry = TerrainRules.entryPoint(in: map, near: preferredEntry, rng: &layoutRNG)
         else {
             var diagnostics = WorldGenerationDiagnostics()
             diagnostics.terrainGenerationSucceeded = false
             return (map, [], [], [], [], nil, [], [], flora, map.entry, diagnostics)
         }
-        map.entry = entry
-        TerrainRules.prepareEntry(at: entry, in: &map)
+        map.entry = initialEntry
 
         // 1a. **Nothing may be stranded.** Chasms are carved from several mouths and can cut a world
         //     into islands, so the way is opened until most of the solid ground is walkable-to — and
         //     everything that can't be reached is then treated as occupied, which is the one line
         //     that stops a node, a site, a page or a person being placed somewhere you can't go.
         let reachability = TerrainRules.openTheWayWithDiagnostics(
-            from: entry, in: &map, rng: &terrainRNG)
+            from: initialEntry, in: &map, rng: &terrainRNG)
         terrainGenerationSucceeded = terrainGenerationSucceeded && reachability.succeeded
         guard terrainGenerationSucceeded else {
             var diagnostics = WorldGenerationDiagnostics()
@@ -370,10 +370,43 @@ enum Worldgen {
             diagnostics.reachableTerrainFraction = reachability.reachableFraction
             diagnostics.softenedDeepWaterTiles = reachability.softenedDeepWater
             diagnostics.filledChasmTiles = reachability.filledChasm
-            return (map, [], [], [], [], nil, [], [], flora, entry, diagnostics)
+            return (map, [], [], [], [], nil, [], [], flora, initialEntry, diagnostics)
         }
-        map[entry].content = .portal(isEntry: true)
         let walkable = reachability.reachable
+        let isRiven = TerrainRules.isRiven(asWritten: asWritten)
+        let needsStarterFind = book.worldPageUseReceipt?.definition.knownFind != nil
+        let exitCount = isRiven ? 0 : layoutRNG.int(in: Tuning.World.exitPortalCountRange)
+        let postExitCountLayoutRNG = layoutRNG
+        var selected: (entry: GridPoint, exits: [GridPoint], rng: SeededRNG)?
+        for candidate in playableEntryCandidates(in: map, component: walkable,
+                                                 preferred: preferredEntry, initial: initialEntry) {
+            var probe = postExitCountLayoutRNG
+            if let exits = openingReservation(at: candidate, in: map, component: walkable,
+                                              exitCount: exitCount,
+                                              needsStarterFind: needsStarterFind, rng: &probe) {
+                selected = (candidate, exits, probe)
+                break
+            }
+        }
+        guard let selected else {
+            var diagnostics = WorldGenerationDiagnostics()
+            diagnostics.terrainGenerationSucceeded = false
+            diagnostics.reachableTerrainFraction = reachability.reachableFraction
+            diagnostics.softenedDeepWaterTiles = reachability.softenedDeepWater
+            diagnostics.filledChasmTiles = reachability.filledChasm
+            diagnostics.writingWasGuaranteed = false
+            diagnostics.playableEntry = PlayableEntryReceipt(
+                hasCardinalFirstMove: false, ordinaryWritingPlaced: false,
+                promisedStarterFindPlaced: !needsStarterFind, requiredExitPlaced: isRiven,
+                requiredExitPortalCount: exitCount, placedExitPortalCount: 0,
+                allPlacedFactsReachable: false)
+            return (map, [], [], [], [], nil, [], [], flora, initialEntry, diagnostics)
+        }
+        let entry = selected.entry
+        layoutRNG = selected.rng
+        map.entry = entry
+        TerrainRules.prepareEntry(at: entry, in: &map)
+        map[entry].content = .portal(isEntry: true)
         var occupied: Set<GridPoint> = [entry]
         occupied.formUnion(map.allPoints.filter { !walkable.contains($0) })
 
@@ -381,12 +414,7 @@ enum Worldgen {
         //    world is so full of empty holes that the only way out is the way you came in (Aimee, 7
         //    Aug). That world is not a trap: the entry has always worked as an exit. It just costs
         //    you the whole walk back, which is what writing a world that riven is worth.
-        let exitCount = TerrainRules.isRiven(asWritten: asWritten)
-            ? 0 : layoutRNG.int(in: Tuning.World.exitPortalCountRange)
-        for _ in 0..<exitCount {
-            guard let point = randomFreePoint(in: map, avoiding: occupied, minimumDistanceFrom: entry,
-                                              distance: Tuning.World.minimumExitPortalDistance, rng: &layoutRNG)
-            else { continue }
+        for point in selected.exits {
             map[point].content = .portal(isEntry: false)
             occupied.insert(point)
         }
@@ -448,8 +476,8 @@ enum Worldgen {
 
         // Starter pages disclose one ordinary opening weapon before Bind. Its exact physical
         // identity and safe near-entry host are frozen before any optional content is placed.
-        if let receipt = book.worldPageUseReceipt {
-            StarterKnownFindPlacementRules.place(receipt: receipt, in: &map, avoiding: &occupied)
+        let starterFindPoint = book.worldPageUseReceipt.flatMap {
+            StarterKnownFindPlacementRules.place(receipt: $0, in: &map, avoiding: &occupied)
         }
 
         // The loose World Page reserves an already reachable empty host only after ordinary
@@ -569,6 +597,7 @@ enum Worldgen {
             diagnostics.selectedOtherWritingCount = noteCount
             diagnostics.placedDiaryPages = placedPages
             diagnostics.placedOtherWritings = foundWritings.map(\.id)
+            diagnostics.writingWasGuaranteed = !placedPages.isEmpty || !foundWritings.isEmpty
             diagnostics.secondWritingRollSucceeded = secondWritingRollSucceeded
             diagnostics.rawEssenceEligibleTiles = rawEssenceEligibleTiles
             diagnostics.rawEssencePlacementAttempts = wildCount
@@ -788,7 +817,13 @@ enum Worldgen {
             ? Int(ceil(Tuning.World.startingStability / decay))
             : Tuning.World.indefiniteTurns
         var diagnostics = WorldGenerationDiagnostics()
+        let playableEntry = playableEntryReceipt(
+            map: map, entry: entry, pages: placedPages, writings: foundWritings,
+            starterReceipt: book.worldPageUseReceipt, starterPoint: starterFindPoint,
+            requiredExitPortalCount: exitCount, sites: sites, enemies: enemies)
+        terrainGenerationSucceeded = terrainGenerationSucceeded && playableEntry.isAccepted
         diagnostics.terrainGenerationSucceeded = terrainGenerationSucceeded
+        diagnostics.playableEntry = playableEntry
         diagnostics.reachableTerrainFraction = reachability.reachableFraction
         diagnostics.softenedDeepWaterTiles = reachability.softenedDeepWater
         diagnostics.filledChasmTiles = reachability.filledChasm
@@ -796,6 +831,7 @@ enum Worldgen {
         diagnostics.selectedOtherWritingCount = noteCount
         diagnostics.placedDiaryPages = placedPages
         diagnostics.placedOtherWritings = foundWritings.map(\.id)
+        diagnostics.writingWasGuaranteed = !placedPages.isEmpty || !foundWritings.isEmpty
         diagnostics.secondWritingRollSucceeded = secondWritingRollSucceeded
         diagnostics.rawEssenceEligibleTiles = rawEssenceEligibleTiles
         diagnostics.rawEssencePlacementAttempts = wildCount
@@ -824,6 +860,243 @@ enum Worldgen {
         return (map, enemies, sites, placedPages, foundWritings, wildPage, placedTravellers,
                 cast, flora, entry,
                 diagnostics)
+    }
+
+    private static func playableEntryCandidates(in map: WorldMap, component: Set<GridPoint>,
+                                                preferred: GridPoint,
+                                                initial: GridPoint) -> [GridPoint] {
+        let alternatives = component.filter { $0 != initial }.sorted {
+            let left = (map.ring(of: $0) == 0 ? 0 : 1,
+                        map[$0].ground == .water ? 1 : 0,
+                        $0.chebyshevDistance(to: preferred), $0.y, $0.x)
+            let right = (map.ring(of: $1) == 0 ? 0 : 1,
+                         map[$1].ground == .water ? 1 : 0,
+                         $1.chebyshevDistance(to: preferred), $1.y, $1.x)
+            return left < right
+        }
+        return component.contains(initial) ? [initial] + alternatives : alternatives
+    }
+
+    private static func openingReservation(at entry: GridPoint, in map: WorldMap,
+                                           component: Set<GridPoint>, exitCount: Int,
+                                           needsStarterFind: Bool,
+                                           rng: inout SeededRNG) -> [GridPoint]? {
+        guard map.neighbours(of: entry).contains(where: component.contains) else { return nil }
+        let unavailable = Set(map.allPoints.filter { !component.contains($0) }).union([entry])
+        var starterDistances: [GridPoint: Int] = [entry: 0]
+        var queue = [entry]
+        while let point = queue.first {
+            queue.removeFirst()
+            let distance = starterDistances[point, default: 0]
+            guard distance < 2 else { continue }
+            for next in map.neighbours(of: point) where starterDistances[next] == nil {
+                let tile = map[next]
+                guard component.contains(next), tile.ground.movementCost == 1,
+                      abs(tile.elevation - map[point].elevation) <= 1 else { continue }
+                starterDistances[next] = distance + 1
+                queue.append(next)
+            }
+        }
+        let writingHosts = component.filter {
+            !unavailable.contains($0) && $0.chebyshevDistance(to: entry) > 2
+                && map[$0].content == .empty
+        }.sorted { ($0.y, $0.x) < ($1.y, $1.x) }
+        let starterHosts: [GridPoint?] = needsStarterFind
+            ? starterDistances.compactMap { point, distance in
+                (1...2).contains(distance) && !unavailable.contains(point)
+                    && map[point].content == .empty ? point : nil
+            }.sorted { ($0.y, $0.x) < ($1.y, $1.x) }.map(Optional.some)
+            : [nil]
+        func obligationsRemain(avoiding occupied: Set<GridPoint>) -> Bool {
+            guard writingHosts.contains(where: { !occupied.contains($0) }) else { return false }
+            return !needsStarterFind || starterHosts.compactMap { $0 }.contains {
+                !occupied.contains($0)
+            }
+        }
+
+        // Preserve the pre-gate layout stream byte-for-byte whenever its original exit draw leaves
+        // both mandatory host classes available. Search is only a conflict fallback.
+        var fastProbe = rng
+        var fastOccupied = unavailable
+        var fastExits: [GridPoint] = []
+        for _ in 0..<exitCount {
+            guard let point = randomFreePoint(
+                in: map, avoiding: fastOccupied, minimumDistanceFrom: entry,
+                distance: Tuning.World.minimumExitPortalDistance, rng: &fastProbe)
+            else { fastExits.removeAll(); break }
+            fastExits.append(point)
+            fastOccupied.insert(point)
+        }
+        if fastExits.count == exitCount, obligationsRemain(avoiding: fastOccupied) {
+            rng = fastProbe
+            return fastExits
+        }
+
+        for writing in writingHosts {
+            for starter in starterHosts where starter != writing {
+                var probe = rng
+                var occupied = unavailable.union([writing])
+                if let starter { occupied.insert(starter) }
+                var exits: [GridPoint] = []
+                for _ in 0..<exitCount {
+                    guard let point = randomFreePoint(
+                        in: map, avoiding: occupied, minimumDistanceFrom: entry,
+                        distance: Tuning.World.minimumExitPortalDistance, rng: &probe)
+                    else { exits.removeAll(); break }
+                    exits.append(point)
+                    occupied.insert(point)
+                }
+                if exits.count == exitCount {
+                    rng = probe
+                    return exits
+                }
+            }
+        }
+        return nil
+    }
+
+    static func openingCapacityForTesting(at entry: GridPoint, in map: WorldMap,
+                                          component: Set<GridPoint>, needsStarterFind: Bool,
+                                          exitCount: Int) -> Bool {
+        var rng = SeededRNG(seed: 1)
+        return openingReservation(at: entry, in: map, component: component,
+                                  exitCount: exitCount, needsStarterFind: needsStarterFind,
+                                  rng: &rng) != nil
+    }
+
+    static func openingExitReservationForTesting(
+        at entry: GridPoint, in map: WorldMap, component: Set<GridPoint>,
+        needsStarterFind: Bool, exitCount: Int, seed: UInt64 = 1
+    ) -> [GridPoint]? {
+        var rng = SeededRNG(seed: seed)
+        return openingReservation(at: entry, in: map, component: component,
+                                  exitCount: exitCount, needsStarterFind: needsStarterFind,
+                                  rng: &rng)
+    }
+
+    static func openingReservationStateForTesting(
+        at entry: GridPoint, in map: WorldMap, component: Set<GridPoint>,
+        needsStarterFind: Bool, exitCount: Int, seed: UInt64 = 1
+    ) -> (exits: [GridPoint], rng: SeededRNG)? {
+        var rng = SeededRNG(seed: seed)
+        guard let exits = openingReservation(at: entry, in: map, component: component,
+                                             exitCount: exitCount,
+                                             needsStarterFind: needsStarterFind, rng: &rng)
+        else { return nil }
+        return (exits, rng)
+    }
+
+    static func originalExitDrawForTesting(
+        at entry: GridPoint, in map: WorldMap, component: Set<GridPoint>,
+        exitCount: Int, seed: UInt64 = 1
+    ) -> (exits: [GridPoint], rng: SeededRNG)? {
+        var rng = SeededRNG(seed: seed)
+        var occupied = Set(map.allPoints.filter { !component.contains($0) }).union([entry])
+        var exits: [GridPoint] = []
+        for _ in 0..<exitCount {
+            guard let point = randomFreePoint(
+                in: map, avoiding: occupied, minimumDistanceFrom: entry,
+                distance: Tuning.World.minimumExitPortalDistance, rng: &rng)
+            else { return nil }
+            exits.append(point)
+            occupied.insert(point)
+        }
+        return (exits, rng)
+    }
+
+    static func openingMandatoryPlacementSequenceForTesting(
+        map: inout WorldMap, exits: [GridPoint], receipt: WorldPageUseReceipt,
+        seed: UInt64 = 1
+    ) -> (writing: GridPoint, starter: GridPoint)? {
+        let entry = map.entry
+        var occupied: Set<GridPoint> = [entry]
+        for point in exits {
+            map[point].content = .portal(isEntry: false)
+            occupied.insert(point)
+        }
+        var rng = SeededRNG(seed: seed)
+        guard let writing = writingPoint(in: map, from: entry, avoiding: occupied, rng: &rng)
+        else { return nil }
+        map[writing].content = .foundWriting(FoundWritingID(rawValue: "reservation_fixture"))
+        occupied.insert(writing)
+        guard let starter = StarterKnownFindPlacementRules.place(
+            receipt: receipt, in: &map, avoiding: &occupied)
+        else { return nil }
+        return (writing, starter)
+    }
+
+    static func selectedPlayableEntryForTesting(
+        in map: WorldMap, component: Set<GridPoint>, preferred: GridPoint,
+        initial: GridPoint, needsStarterFind: Bool, exitCount: Int, seed: UInt64 = 1
+    ) -> GridPoint? {
+        let candidates = playableEntryCandidates(in: map, component: component,
+                                                 preferred: preferred, initial: initial)
+        for candidate in candidates {
+            var rng = SeededRNG(seed: seed)
+            if openingReservation(at: candidate, in: map, component: component,
+                                  exitCount: exitCount, needsStarterFind: needsStarterFind,
+                                  rng: &rng) != nil { return candidate }
+        }
+        return nil
+    }
+
+    private static func playableEntryReceipt(
+        map: WorldMap, entry: GridPoint, pages: [DiaryPageID],
+        writings: [FoundWritingRecord], starterReceipt: WorldPageUseReceipt?,
+        starterPoint: GridPoint?, requiredExitPortalCount: Int,
+        sites: [PlacedSite], enemies: [WorldEnemy]
+    ) -> PlayableEntryReceipt {
+        let reached = TerrainRules.reachable(from: entry, in: map)
+        let entryIsPortal: Bool
+        if map[entry].isPassable, case .portal(isEntry: true) = map[entry].content {
+            entryIsPortal = true
+        } else {
+            entryIsPortal = false
+        }
+        let hasMove = entryIsPortal && map.neighbours(of: entry).contains { reached.contains($0) }
+        let ordinaryWriting = map.allPoints.contains { point in
+            guard reached.contains(point), point.chebyshevDistance(to: entry) > 2 else { return false }
+            switch map[point].content {
+            case .diaryPage, .foundWriting: return true
+            default: return false
+            }
+        } && (!pages.isEmpty || !writings.isEmpty)
+        let promised: Bool
+        if let starterReceipt, let promisedItemID = starterReceipt.definition.knownFind,
+           let starterPoint, reached.contains(starterPoint),
+           case .item(let stack) = map[starterPoint].content {
+            promised = stack.catalogID == promisedItemID
+                && stack.id == StarterKnownFindPlacementRules.stableInstanceID(for: starterReceipt)
+        } else {
+            promised = starterReceipt?.definition.knownFind == nil
+        }
+        let placedExitPortalCount = map.allPoints.count {
+            $0 != entry && reached.contains($0) && map[$0].content.isPortal
+        }
+        let exit = placedExitPortalCount == requiredExitPortalCount
+        let contentReachable = map.allPoints.allSatisfy {
+            map[$0].content == .empty || reached.contains($0)
+        }
+        let factsReachable = contentReachable
+            && sites.allSatisfy { reached.contains($0.position) }
+            && enemies.allSatisfy { reached.contains($0.position) }
+        return PlayableEntryReceipt(hasCardinalFirstMove: hasMove,
+                                    ordinaryWritingPlaced: ordinaryWriting,
+                                    promisedStarterFindPlaced: promised,
+                                    requiredExitPlaced: exit,
+                                    requiredExitPortalCount: requiredExitPortalCount,
+                                    placedExitPortalCount: placedExitPortalCount,
+                                    allPlacedFactsReachable: factsReachable)
+    }
+
+    static func playableEntryReceiptForTesting(
+        map: WorldMap, entry: GridPoint, starterReceipt: WorldPageUseReceipt?,
+        starterPoint: GridPoint?, requiredExitPortalCount: Int
+    ) -> PlayableEntryReceipt {
+        playableEntryReceipt(map: map, entry: entry, pages: [], writings: [],
+                             starterReceipt: starterReceipt, starterPoint: starterPoint,
+                             requiredExitPortalCount: requiredExitPortalCount,
+                             sites: [], enemies: [])
     }
 
     /// Closed machine-authority host adapter. Base ground remains authoritative under Growth and

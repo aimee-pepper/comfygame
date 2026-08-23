@@ -646,6 +646,9 @@ struct WorldGenerationDiagnostics: Codable, Equatable, Sendable {
     var reachableTerrainFraction: Double = 1
     var softenedDeepWaterTiles: Int = 0
     var filledChasmTiles: Int = 0
+    /// Closed bind-time proof that reachability also had the mandatory opening capacity.
+    /// Nil identifies a run saved before this receipt existed; legacy runs are never regenerated.
+    var playableEntry: PlayableEntryReceipt?
     var writingWasGuaranteed: Bool = true
     var selectedDiaryPages: [DiaryPageID] = []
     var selectedOtherWritingCount: Int = 0
@@ -692,6 +695,7 @@ struct WorldGenerationDiagnostics: Codable, Equatable, Sendable {
         softenedDeepWaterTiles = try c.decodeIfPresent(
             Int.self, forKey: .softenedDeepWaterTiles) ?? 0
         filledChasmTiles = try c.decodeIfPresent(Int.self, forKey: .filledChasmTiles) ?? 0
+        playableEntry = try c.decodeIfPresent(PlayableEntryReceipt.self, forKey: .playableEntry)
         writingWasGuaranteed = try c.decodeIfPresent(Bool.self, forKey: .writingWasGuaranteed) ?? true
         selectedDiaryPages = (try c.decodeIfPresent([DiaryPageID].self,
                                                      forKey: .selectedDiaryPages) ?? [])
@@ -730,6 +734,51 @@ struct WorldGenerationDiagnostics: Codable, Equatable, Sendable {
                                                           forKey: .openingEnvelopeRequested) ?? .natural
         openingEnvelopeApplied = try c.decodeIfPresent(Bool.self, forKey: .openingEnvelopeApplied) ?? false
         openingEnemiesRelocated = try c.decodeIfPresent(Int.self, forKey: .openingEnemiesRelocated) ?? 0
+    }
+}
+
+struct PlayableEntryReceipt: Codable, Equatable, Sendable {
+    static let schemaVersion = 1
+    var version: Int = Self.schemaVersion
+    var hasCardinalFirstMove: Bool
+    var ordinaryWritingPlaced: Bool
+    var promisedStarterFindPlaced: Bool
+    var requiredExitPlaced: Bool
+    var requiredExitPortalCount: Int = 0
+    var placedExitPortalCount: Int = 0
+    var allPlacedFactsReachable: Bool
+
+    var isAccepted: Bool {
+        version == Self.schemaVersion && hasCardinalFirstMove && ordinaryWritingPlaced
+            && promisedStarterFindPlaced && requiredExitPlaced
+            && requiredExitPortalCount == placedExitPortalCount && allPlacedFactsReachable
+    }
+
+    init(hasCardinalFirstMove: Bool, ordinaryWritingPlaced: Bool,
+         promisedStarterFindPlaced: Bool, requiredExitPlaced: Bool,
+         requiredExitPortalCount: Int = 0, placedExitPortalCount: Int = 0,
+         allPlacedFactsReachable: Bool) {
+        self.hasCardinalFirstMove = hasCardinalFirstMove
+        self.ordinaryWritingPlaced = ordinaryWritingPlaced
+        self.promisedStarterFindPlaced = promisedStarterFindPlaced
+        self.requiredExitPlaced = requiredExitPlaced
+        self.requiredExitPortalCount = requiredExitPortalCount
+        self.placedExitPortalCount = placedExitPortalCount
+        self.allPlacedFactsReachable = allPlacedFactsReachable
+    }
+
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        version = try c.decodeIfPresent(Int.self, forKey: .version) ?? Self.schemaVersion
+        hasCardinalFirstMove = try c.decode(Bool.self, forKey: .hasCardinalFirstMove)
+        ordinaryWritingPlaced = try c.decode(Bool.self, forKey: .ordinaryWritingPlaced)
+        promisedStarterFindPlaced = try c.decode(Bool.self, forKey: .promisedStarterFindPlaced)
+        requiredExitPlaced = try c.decode(Bool.self, forKey: .requiredExitPlaced)
+        requiredExitPortalCount = try c.decodeIfPresent(Int.self,
+                                                        forKey: .requiredExitPortalCount) ?? 0
+        placedExitPortalCount = try c.decodeIfPresent(Int.self,
+                                                      forKey: .placedExitPortalCount) ?? 0
+        allPlacedFactsReachable = try c.decode(Bool.self, forKey: .allPlacedFactsReachable)
     }
 }
 

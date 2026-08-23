@@ -464,10 +464,408 @@ final class TerrainTests: XCTestCase {
 
     // MARK: The ground has to be liveable
 
+    func testPlayableEntryCapacityRejectsDegenerateAndMissingMandatoryHosts() {
+        func line(_ grounds: [GroundType]) -> WorldMap {
+            WorldMap(width: grounds.count, height: 1,
+                     tiles: grounds.map { Tile(ground: $0) },
+                     entry: GridPoint(x: 0, y: 0))
+        }
+        for grounds in [[GroundType.soil], [.soil, .soil], [.soil, .soil, .soil]] {
+            let map = line(grounds)
+            XCTAssertFalse(Worldgen.openingCapacityForTesting(
+                at: map.entry, in: map, component: Set(map.allPoints),
+                needsStarterFind: false, exitCount: 1))
+        }
+
+        let noStarterRoute = line([.soil, .mud, .mud, .soil, .soil, .soil, .soil])
+        XCTAssertFalse(Worldgen.openingCapacityForTesting(
+            at: noStarterRoute.entry, in: noStarterRoute,
+            component: Set(noStarterRoute.allPoints), needsStarterFind: true, exitCount: 1))
+
+        let capable = line(Array(repeating: .soil, count: 8))
+        XCTAssertTrue(Worldgen.openingCapacityForTesting(
+            at: capable.entry, in: capable, component: Set(capable.allPoints),
+            needsStarterFind: false, exitCount: 1))
+        XCTAssertTrue(Worldgen.openingCapacityForTesting(
+            at: capable.entry, in: capable, component: Set(capable.allPoints),
+            needsStarterFind: true, exitCount: 1))
+    }
+
+    func testPlayableEntryGate13EnumeratesAdversarialReservationShapes() {
+        func map(_ width: Int, _ height: Int = 1,
+                 blocked: Set<GridPoint> = []) -> WorldMap {
+            let points = (0..<height).flatMap { y in (0..<width).map { GridPoint(x: $0, y: y) } }
+            return WorldMap(width: width, height: height,
+                tiles: points.map { Tile(ground: blocked.contains($0) ? .deepWater : .soil) },
+                entry: .init(x: 0, y: 0))
+        }
+        struct Case { let name: String; let map: WorldMap; let entry: GridPoint; let starter: Bool; let exits: Int; let accepted: Bool }
+        let cases: [Case] = [
+            .init(name: "singleton", map: map(1), entry: .init(x: 0, y: 0), starter: false, exits: 1, accepted: false),
+            .init(name: "two-tile", map: map(2), entry: .init(x: 0, y: 0), starter: false, exits: 1, accepted: false),
+            .init(name: "fully-reachable-no-writing-host", map: map(3), entry: .init(x: 0, y: 0), starter: false, exits: 1, accepted: false),
+            .init(name: "capable-component-member", map: map(8), entry: .init(x: 0, y: 0), starter: false, exits: 1, accepted: true),
+            .init(name: "interior-capable", map: map(9, 3), entry: .init(x: 4, y: 1), starter: false, exits: 1, accepted: true),
+            .init(name: "riven-zero-exit", map: map(5), entry: .init(x: 0, y: 0), starter: false, exits: 0, accepted: true),
+            .init(name: "non-riven-insufficient-distinct-reservations", map: map(4), entry: .init(x: 0, y: 0), starter: true, exits: 2, accepted: false),
+        ]
+        for fixture in cases {
+            let component = Set(fixture.map.allPoints.filter { fixture.map[$0].isPassable })
+            XCTAssertEqual(Worldgen.openingCapacityForTesting(
+                at: fixture.entry, in: fixture.map, component: component,
+                needsStarterFind: fixture.starter, exitCount: fixture.exits), fixture.accepted,
+                fixture.name)
+        }
+
+        var alternateMap = map(8)
+        for point in [GridPoint(x: 0, y: 0), .init(x: 6, y: 0), .init(x: 7, y: 0)] {
+            alternateMap[point].content = .portal(isEntry: false)
+        }
+        let rejectedInitial = GridPoint(x: 3, y: 0)
+        let selected = Worldgen.selectedPlayableEntryForTesting(
+            in: alternateMap, component: Set(alternateMap.allPoints), preferred: .init(x: 0, y: 0),
+            initial: rejectedInitial, needsStarterFind: false, exitCount: 1)
+        XCTAssertNotEqual(selected, rejectedInitial)
+        XCTAssertNotNil(selected, "a capable alternate must be selected when the original fails")
+
+        var tied = map(9, 3, blocked: Set((0..<3).map { GridPoint(x: 4, y: $0) }))
+        var tiedRNG1 = SeededRNG(seed: 77), tiedRNG2 = SeededRNG(seed: 77)
+        let tiedEntry1 = TerrainRules.entryPoint(in: tied, near: .init(x: 4, y: 0), rng: &tiedRNG1)
+        let tiedEntry2 = TerrainRules.entryPoint(in: tied, near: .init(x: 4, y: 0), rng: &tiedRNG2)
+        let left = TerrainRules.reachable(from: .init(x: 0, y: 0), in: tied)
+        let right = TerrainRules.reachable(from: .init(x: 8, y: 0), in: tied)
+        XCTAssertTrue(left.isDisjoint(with: right))
+        XCTAssertEqual(left.count, right.count)
+        XCTAssertEqual(tiedEntry1, tiedEntry2, "equal largest components must resolve deterministically")
+        XCTAssertEqual(tiedEntry1, GridPoint(x: 3, y: 0))
+        let reversedSet = Set(tied.allPoints.reversed().filter { tied[$0].isPassable })
+        XCTAssertEqual(Worldgen.selectedPlayableEntryForTesting(
+            in: tied, component: left, preferred: .init(x: 4, y: 0),
+            initial: .init(x: 0, y: 0), needsStarterFind: false, exitCount: 1, seed: 33),
+            Worldgen.selectedPlayableEntryForTesting(
+                in: tied, component: reversedSet.intersection(left), preferred: .init(x: 4, y: 0),
+                initial: .init(x: 0, y: 0), needsStarterFind: false, exitCount: 1, seed: 33))
+
+        let interiorPassable = Set((2...8).flatMap { y in (2...8).map { GridPoint(x: $0, y: y) } })
+        tied = map(11, 11, blocked: Set((0..<11).flatMap { y in (0..<11).compactMap { x in
+            let point = GridPoint(x: x, y: y)
+            return interiorPassable.contains(point) ? nil : point
+        }}))
+        var interiorRNG = SeededRNG(seed: 8)
+        let interior = try? XCTUnwrap(TerrainRules.entryPoint(
+            in: tied, near: .init(x: 0, y: 0), rng: &interiorRNG))
+        XCTAssertNotNil(interior)
+        if let interior {
+            XCTAssertNotEqual(tied.ring(of: interior), 0)
+            XCTAssertTrue(Worldgen.openingCapacityForTesting(
+                at: interior, in: tied, component: interiorPassable,
+                needsStarterFind: true, exitCount: 2))
+        }
+    }
+
+    func testExitReservationPrefersFarHostsFallsBackNearAndCannotConsumeWritingHost() throws {
+        func line(_ count: Int) -> WorldMap {
+            WorldMap(width: count, height: 1, tiles: Array(repeating: Tile(ground: .soil), count: count),
+                     entry: .init(x: 0, y: 0))
+        }
+        let farMap = line(10)
+        let far = try XCTUnwrap(Worldgen.openingExitReservationForTesting(
+            at: farMap.entry, in: farMap, component: Set(farMap.allPoints),
+            needsStarterFind: false, exitCount: 1))
+        XCTAssertGreaterThanOrEqual(try XCTUnwrap(far.first).chebyshevDistance(to: farMap.entry),
+                                    Tuning.World.minimumExitPortalDistance)
+
+        let nearMap = line(5)
+        let near = try XCTUnwrap(Worldgen.openingExitReservationForTesting(
+            at: nearMap.entry, in: nearMap, component: Set(nearMap.allPoints),
+            needsStarterFind: false, exitCount: 1))
+        XCTAssertLessThan(try XCTUnwrap(near.first).chebyshevDistance(to: nearMap.entry),
+                          Tuning.World.minimumExitPortalDistance)
+
+        let collisionMap = line(4)
+        let collisionSafe = try XCTUnwrap(Worldgen.openingExitReservationForTesting(
+            at: collisionMap.entry, in: collisionMap, component: Set(collisionMap.allPoints),
+            needsStarterFind: false, exitCount: 1))
+        XCTAssertNotEqual(collisionSafe, [GridPoint(x: 3, y: 0)],
+                          "the exit may not consume the sole ordinary-writing host")
+
+        var farWouldConsumeWriting = line(7)
+        for x in 3...5 { farWouldConsumeWriting[GridPoint(x: x, y: 0)].content = .portal(isEntry: false) }
+        let nearOnlyValid = try XCTUnwrap(Worldgen.openingExitReservationForTesting(
+            at: farWouldConsumeWriting.entry, in: farWouldConsumeWriting,
+            component: Set(farWouldConsumeWriting.allPoints), needsStarterFind: false,
+            exitCount: 1, seed: 9))
+        XCTAssertLessThan(try XCTUnwrap(nearOnlyValid.first).chebyshevDistance(
+            to: farWouldConsumeWriting.entry), Tuning.World.minimumExitPortalDistance,
+            "near fallback is legal only after every far joint plan consumes the sole writing host")
+
+        let healthy = line(10)
+        let original = try XCTUnwrap(Worldgen.originalExitDrawForTesting(
+            at: healthy.entry, in: healthy, component: Set(healthy.allPoints),
+            exitCount: 2, seed: 41))
+        let reserved = try XCTUnwrap(Worldgen.openingReservationStateForTesting(
+            at: healthy.entry, in: healthy, component: Set(healthy.allPoints),
+            needsStarterFind: true, exitCount: 2, seed: 41))
+        XCTAssertEqual(reserved.exits, original.exits,
+                       "a healthy original exit draw must not drift through fallback planning")
+        var expectedRNG = original.rng
+        let expectedNext = expectedRNG.next()
+        var actualRNG = reserved.rng
+        XCTAssertEqual(actualRNG.next(), expectedNext,
+                       "the healthy fast path must preserve the exact advanced layout stream")
+        let forwardComponent = Set(healthy.allPoints)
+        var reversedComponent = Set<GridPoint>()
+        for point in healthy.allPoints.reversed() { reversedComponent.insert(point) }
+        XCTAssertEqual(Worldgen.openingExitReservationForTesting(
+            at: healthy.entry, in: healthy, component: forwardComponent,
+            needsStarterFind: true, exitCount: 2, seed: 41),
+            Worldgen.openingExitReservationForTesting(
+                at: healthy.entry, in: healthy, component: reversedComponent,
+                needsStarterFind: true, exitCount: 2, seed: 41),
+            "Set insertion order must not alter the exact reservation")
+
+        var sequenceMap = line(5)
+        let starterBook = BookRules.resolveBook(worldPage: try XCTUnwrap(
+            WorldPageCatalog.starterInstances.first))
+        let starterReceipt = try XCTUnwrap(starterBook.worldPageUseReceipt)
+        let sequenceExits = try XCTUnwrap(Worldgen.openingExitReservationForTesting(
+            at: sequenceMap.entry, in: sequenceMap, component: Set(sequenceMap.allPoints),
+            needsStarterFind: true, exitCount: 1, seed: 7))
+        let placed = try XCTUnwrap(Worldgen.openingMandatoryPlacementSequenceForTesting(
+            map: &sequenceMap, exits: sequenceExits, receipt: starterReceipt, seed: 7))
+        XCTAssertGreaterThan(placed.writing.chebyshevDistance(to: sequenceMap.entry), 2)
+        XCTAssertTrue((1...2).contains(placed.starter.chebyshevDistance(to: sequenceMap.entry)))
+        XCTAssertNotEqual(placed.writing, placed.starter)
+        guard case .foundWriting = sequenceMap[placed.writing].content else {
+            return XCTFail("the reserved ordinary-writing class must remain available")
+        }
+        guard case .item(let stack) = sequenceMap[placed.starter].content else {
+            return XCTFail("the starter must survive the actual post-exit writing-first sequence")
+        }
+        XCTAssertEqual(stack.id, StarterKnownFindPlacementRules.stableInstanceID(for: starterReceipt))
+    }
+
+    func testHealthyOriginalEntryIsRetainedAndRejectedCandidateIsNotPrepared() throws {
+        var healthy = WorldMap(width: 9, height: 2,
+            tiles: Array(repeating: Tile(ground: .soil), count: 18), entry: .init(x: 0, y: 0))
+        let initial = GridPoint(x: 0, y: 0)
+        let before = healthy.tiles
+        XCTAssertEqual(Worldgen.selectedPlayableEntryForTesting(
+            in: healthy, component: Set(healthy.allPoints), preferred: .init(x: 8, y: 1),
+            initial: initial, needsStarterFind: false, exitCount: 1), initial)
+        XCTAssertEqual(healthy.tiles, before, "selection must not prepare or alter any candidate")
+
+        let rejected = GridPoint(x: 0, y: 0)
+        var firstEdgeFailure = WorldMap(width: 8, height: 1, tiles: [
+            Tile(ground: .growth, baseGround: .soil, flora: InstanceID(rawValue: 99)),
+            Tile(ground: .mud), Tile(ground: .soil), Tile(ground: .soil),
+            Tile(ground: .soil), Tile(ground: .soil), Tile(ground: .soil), Tile(ground: .soil),
+        ], entry: rejected)
+        let rejectedBefore = firstEdgeFailure[rejected]
+        XCTAssertFalse(Worldgen.openingCapacityForTesting(
+            at: rejected, in: firstEdgeFailure, component: Set(firstEdgeFailure.allPoints),
+            needsStarterFind: true, exitCount: 1))
+        let alternate = Worldgen.selectedPlayableEntryForTesting(
+            in: firstEdgeFailure, component: Set(firstEdgeFailure.allPoints),
+            preferred: rejected, initial: rejected, needsStarterFind: true, exitCount: 1)
+        XCTAssertNotNil(alternate)
+        XCTAssertNotEqual(alternate, rejected)
+        XCTAssertEqual(firstEdgeFailure[rejected], rejectedBefore,
+                       "a rejected entry candidate must retain ground and flora byte-for-byte")
+    }
+
+    func testPlayableEntryReceiptCertifiesFinalEntryPortalAndExactStarterIdentity() throws {
+        var map = WorldMap(width: 5, height: 1,
+                           tiles: Array(repeating: Tile(ground: .soil), count: 5),
+                           entry: GridPoint(x: 0, y: 0))
+        map[map.entry].content = .portal(isEntry: true)
+        let starterBook = BookRules.resolveBook(worldPage: try XCTUnwrap(
+            WorldPageCatalog.starterInstances.first))
+        let receipt = try XCTUnwrap(starterBook.worldPageUseReceipt)
+        var occupied: Set<GridPoint> = [map.entry]
+        let starter = try XCTUnwrap(StarterKnownFindPlacementRules.place(
+            receipt: receipt, in: &map, avoiding: &occupied))
+
+        var certified = Worldgen.playableEntryReceiptForTesting(
+            map: map, entry: map.entry, starterReceipt: receipt, starterPoint: starter,
+            requiredExitPortalCount: 0)
+        XCTAssertTrue(certified.hasCardinalFirstMove)
+        XCTAssertTrue(certified.promisedStarterFindPlaced)
+
+        let exactStack = map[starter].content
+        map[starter].content = .empty
+        certified = Worldgen.playableEntryReceiptForTesting(
+            map: map, entry: map.entry, starterReceipt: receipt, starterPoint: starter,
+            requiredExitPortalCount: 0)
+        XCTAssertFalse(certified.promisedStarterFindPlaced,
+                       "a reachable planned point cannot certify an absent final item")
+
+        let promisedID = try XCTUnwrap(receipt.definition.knownFind)
+        map[starter].content = .item(ItemStack(id: InstanceID(rawValue: 999), catalogID: promisedID))
+        certified = Worldgen.playableEntryReceiptForTesting(
+            map: map, entry: map.entry, starterReceipt: receipt, starterPoint: starter,
+            requiredExitPortalCount: 0)
+        XCTAssertFalse(certified.promisedStarterFindPlaced,
+                       "the promised definition with the wrong physical instance is not exact")
+
+        map[starter].content = exactStack
+        map[map.entry].content = .empty
+        certified = Worldgen.playableEntryReceiptForTesting(
+            map: map, entry: map.entry, starterReceipt: receipt, starterPoint: starter,
+            requiredExitPortalCount: 0)
+        XCTAssertFalse(certified.hasCardinalFirstMove,
+                       "a passable entry coordinate without the entry Portal cannot certify playability")
+
+        map[map.entry].content = .portal(isEntry: false)
+        certified = Worldgen.playableEntryReceiptForTesting(
+            map: map, entry: map.entry, starterReceipt: receipt, starterPoint: starter,
+            requiredExitPortalCount: 0)
+        XCTAssertFalse(certified.hasCardinalFirstMove,
+                       "a non-entry Portal cannot stand in for the arrival Portal")
+    }
+
+    func testPlayableEntryGate14CoversEveryLiveScaleAndExtremeProfileDeterministically() {
+        XCTAssertEqual(WorldScale.allCases.map(\.gridSide), [12, 15, 18, 23, 28])
+        let water = Sigil(id: .init(rawValue: 1), source: "sea", target: "hydrology",
+                          intensity: .overwhelming, scale: 5, count: 5)
+        let chasm = Sigil(id: .init(rawValue: 2), source: "chasm", target: "substrate",
+                          intensity: .overwhelming, scale: 5, count: 5)
+        let profiles: [(name: String, composition: [Sigil])] = [
+            ("ordinary", []), ("maximum-water", [water]),
+            ("maximum-chasm", [chasm]), ("combined-extremes", [water, chasm])
+        ]
+        let maximumWater = PressureRules.resolve([water])["hydrology"]
+        XCTAssertEqual(maximumWater.peak, Tuning.Pressure.scaleMaximum)
+        XCTAssertEqual(maximumWater.peak / Tuning.Pressure.scaleMaximum
+            * Tuning.Terrain.maximumWaterCoverage, Tuning.Terrain.maximumWaterCoverage)
+        XCTAssertEqual(TerrainRules.chasmCoverage(in: PressureRules.resolve([chasm])),
+                       Tuning.Terrain.chasmCoverageCeiling)
+        let seeds: [UInt64] = [1, 12, 31]
+        for scale in WorldScale.allCases {
+            for profile in profiles {
+                for seed in seeds {
+                    let resolved = BoundBook(written: [], composition: profile.composition,
+                                             scale: scale, essencePaid: 0)
+                    let first = Worldgen.generate(book: resolved, seed: seed)
+                    let second = Worldgen.generate(book: resolved, seed: seed)
+                    let permuted = BoundBook(written: [], composition: Array(profile.composition.reversed()),
+                                             scale: scale, essencePaid: 0)
+                    let reordered = Worldgen.generate(book: permuted, seed: seed)
+                    let label = "scale=\(scale.rawValue) profile=\(profile.name) seed=\(seed)"
+                    XCTAssertTrue(first.diagnostics.terrainGenerationSucceeded, label)
+                    XCTAssertEqual(first.diagnostics.playableEntry?.isAccepted, true, label)
+                    XCTAssertEqual(first.map, second.map, "same-seed map drift: \(label)")
+                    XCTAssertEqual(first.start, second.start, "same-seed entry drift: \(label)")
+                    XCTAssertEqual(first.diagnostics, second.diagnostics, "diagnostic drift: \(label)")
+                    XCTAssertEqual(first.map, reordered.map, "input-order drift: \(label)")
+                    XCTAssertEqual(first.start, reordered.start, "input-order entry drift: \(label)")
+                    XCTAssertEqual(first.diagnostics, reordered.diagnostics,
+                                   "input-order diagnostic drift: \(label)")
+                    XCTAssertEqual(first.enemies, second.enemies, label)
+                    XCTAssertEqual(first.sites, second.sites, label)
+                    XCTAssertEqual(first.pages, second.pages, label)
+                    XCTAssertEqual(first.writings, second.writings, label)
+                    XCTAssertEqual(first.wildPage, second.wildPage, label)
+                    XCTAssertEqual(first.travellers, second.travellers, label)
+                    XCTAssertEqual(first.cast, second.cast, label)
+                    XCTAssertEqual(first.flora, second.flora, label)
+                    XCTAssertEqual(first.enemies, reordered.enemies, "input-order enemy drift: \(label)")
+                    XCTAssertEqual(first.sites, reordered.sites, "input-order site drift: \(label)")
+                    XCTAssertEqual(first.pages, reordered.pages, "input-order page drift: \(label)")
+                    XCTAssertEqual(first.writings, reordered.writings, "input-order writing drift: \(label)")
+                    XCTAssertEqual(first.wildPage, reordered.wildPage, "input-order World Page drift: \(label)")
+                    XCTAssertEqual(first.travellers, reordered.travellers, "input-order traveller drift: \(label)")
+                    XCTAssertEqual(first.cast, reordered.cast, "input-order species drift: \(label)")
+                    XCTAssertEqual(first.flora, reordered.flora, "input-order flora drift: \(label)")
+                    XCTAssertEqual(first.map.width, scale.gridSide, label)
+                    XCTAssertEqual(first.map.height, scale.gridSide, label)
+                    let reached = TerrainRules.reachable(from: first.start, in: first.map)
+                    let step = first.map.neighbours(of: first.start).first {
+                        reached.contains($0) && WorldRules.canEnter($0, in: first.map)
+                    }
+                    XCTAssertNotNil(step, label)
+                    if let step {
+                        XCTAssertEqual(WorldRules.path(from: first.start, to: step, in: first.map),
+                                       [step], "the first move must be executable: \(label)")
+                        XCTAssertEqual(WorldRules.path(from: step, to: first.start, in: first.map),
+                                       [first.start], "the portal return must be executable: \(label)")
+                    }
+                    XCTAssertGreaterThanOrEqual(first.diagnostics.reachableTerrainFraction,
+                                                Tuning.Terrain.reachableGroundFraction, label)
+                    XCTAssertTrue(first.map.allPoints.allSatisfy {
+                        first.map[$0].content == .empty || reached.contains($0)
+                    }, label)
+                    XCTAssertTrue(first.sites.allSatisfy { reached.contains($0.position) }, label)
+                    XCTAssertTrue(first.enemies.allSatisfy { reached.contains($0.position) }, label)
+                    let exits = first.map.allPoints.filter {
+                        $0 != first.start && first.map[$0].content.isPortal
+                    }
+                    let receipt = first.diagnostics.playableEntry!
+                    XCTAssertEqual(exits.count, receipt.requiredExitPortalCount, label)
+                    XCTAssertEqual(exits.count, receipt.placedExitPortalCount, label)
+                    let riven = TerrainRules.isRiven(asWritten: PressureRules.resolve(profile.composition))
+                    if riven {
+                        XCTAssertEqual(exits.count, 0, label)
+                        XCTAssertEqual(receipt.requiredExitPortalCount, 0, label)
+                        XCTAssertEqual(receipt.placedExitPortalCount, 0, label)
+                    } else {
+                        XCTAssertGreaterThan(exits.count, 0, label)
+                        XCTAssertTrue(Tuning.World.exitPortalCountRange.contains(exits.count), label)
+                        XCTAssertTrue(Tuning.World.exitPortalCountRange.contains(
+                            receipt.requiredExitPortalCount), label)
+                    }
+                    XCTAssertTrue(first.map.allPoints.contains { point in
+                        guard reached.contains(point), point.chebyshevDistance(to: first.start) > 2 else { return false }
+                        switch first.map[point].content {
+                        case .diaryPage, .foundWriting: return true
+                        default: return false
+                        }
+                    }, "ordinary writing missing: \(label)")
+                }
+            }
+        }
+    }
+
+    func testPlayableEntryGate14PlacesExactPromisedStarterFindAtEveryLiveScale() throws {
+        for scale in WorldScale.allCases {
+            for instance in WorldPageCatalog.starterInstances {
+                var resolved = BookRules.resolveBook(worldPage: instance)
+                resolved.scale = scale
+                let generated = Worldgen.generate(book: resolved, seed: instance.definition.seed)
+                let receipt = try XCTUnwrap(resolved.worldPageUseReceipt)
+                let expectedID = StarterKnownFindPlacementRules.stableInstanceID(for: receipt)
+                let found = generated.map.allPoints.compactMap { point -> (GridPoint, ItemStack)? in
+                    guard case .item(let stack) = generated.map[point].content,
+                          stack.id == expectedID else { return nil }
+                    return (point, stack)
+                }
+                XCTAssertEqual(found.count, 1, "scale=\(scale.rawValue), page=\(instance.id)")
+                let placed = try XCTUnwrap(found.first)
+                XCTAssertEqual(placed.1.catalogID, instance.definition.knownFind)
+                let reached = TerrainRules.reachable(from: generated.start, in: generated.map)
+                XCTAssertTrue(reached.contains(placed.0))
+                var distances: [GridPoint: Int] = [generated.start: 0]
+                var queue = [generated.start]
+                while !queue.isEmpty, distances[placed.0] == nil {
+                    let point = queue.removeFirst()
+                    for next in generated.map.neighbours(of: point)
+                    where distances[next] == nil && WorldRules.canEnter(next, in: generated.map) {
+                        distances[next] = distances[point, default: 0] + 1
+                        queue.append(next)
+                    }
+                }
+                XCTAssertTrue((1...2).contains(try XCTUnwrap(distances[placed.0])))
+                XCTAssertEqual(generated.diagnostics.playableEntry?.promisedStarterFindPlaced, true)
+            }
+        }
+    }
+
     func testYouNeverArriveSomewhereYouCannotStand() {
         for seed in UInt64(1)...40 {
             let world = Worldgen.generate(book: book(["archipelago"]), seed: seed)
             XCTAssertTrue(world.diagnostics.terrainGenerationSucceeded, "terrain failed, seed \(seed)")
+            XCTAssertEqual(world.diagnostics.playableEntry?.isAccepted, true,
+                           "playable-entry receipt failed, seed \(seed)")
             XCTAssertGreaterThanOrEqual(world.diagnostics.reachableTerrainFraction,
                                         Tuning.Terrain.reachableGroundFraction,
                                         "reachable terrain was too small, seed \(seed)")
@@ -497,6 +895,7 @@ final class TerrainTests: XCTestCase {
                 let world = Worldgen.generate(book: book(symbols), seed: seed)
                 XCTAssertTrue(world.diagnostics.terrainGenerationSucceeded,
                               "terrain failed for \(symbols), seed \(seed)")
+                XCTAssertEqual(world.diagnostics.playableEntry?.isAccepted, true)
                 let entry = world.start
                 XCTAssertTrue(world.map[entry].content.isPortal)
                 let legalSteps = world.map.neighbours(of: entry).filter { world.map[$0].isPassable }
