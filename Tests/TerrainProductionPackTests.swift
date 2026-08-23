@@ -82,6 +82,47 @@ import XCTest
 
     func testRegionBoundaryIsAdditiveToAcceptedSpecialEdgeGrammar() throws {
         let pack = MapAssetTestSupport.productionPack()
+        let priority: [TerrainProductionPack.Ground: Int] = [
+            .chasm: 0, .deepWater: 1, .water: 2, .stone: 3, .ice: 3, .rubble: 3,
+            .soil: 4, .sand: 4, .ash: 4, .mud: 4, .groundcover: 5, .growth: 6,
+        ]
+        func legacySource(_ request: TerrainProductionPack.Request, x: Int, y: Int) -> GridPoint {
+            let blockX = request.point.x / 4, blockY = request.point.y / 4
+            let macroX = request.point.x % 4, macroY = request.point.y % 4
+            let flipX = (blockX + request.featureVariant) % 2 == 1
+            let flipY = (blockY + (request.featureVariant >> 1)) % 2 == 1
+            return .init(x: flipX ? 63 - (macroX * 16 + x) : macroX * 16 + x,
+                         y: flipY ? 63 - (macroY * 16 + y) : macroY * 16 + y)
+        }
+        func expectedRoles(_ request: TerrainProductionPack.Request) throws -> [Int8] {
+            let base = try pack.regionContinuityRoleMapForTesting(request.ground)
+            var expected = [Int8](repeating: 0, count: 256)
+            for y in 0..<16 { for x in 0..<16 {
+                let source = TerrainProductionPack.regionContinuousMacroSourceCoordinate(
+                    point: request.point, x: x, y: y, featureVariant: request.featureVariant)
+                expected[y * 16 + x] = base[source.y * 64 + source.x]
+            }}
+            for direction in TerrainProductionPack.Direction.allCases {
+                guard case .ground(let neighbor) = request.cardinalNeighbors[direction],
+                      neighbor != request.ground else { continue }
+                let depth = request.ground == .deepWater && neighbor == .water
+                let owns = request.ground == .groundcover && neighbor == .growth
+                    || priority[neighbor, default: 0] > priority[request.ground, default: 0]
+                guard depth || owns else { continue }
+                let neighborMap = try pack.regionContinuityRoleMapForTesting(neighbor)
+                let mask = try pack.regionContinuityEdgeMaskForTesting(
+                    direction: direction, contour: request.edgeContourIDs[direction])
+                for y in 0..<16 { for x in 0..<16 where mask[y * 16 + x] {
+                    let index = y * 16 + x
+                    let source = TerrainProductionPack.regionContinuousMacroSourceCoordinate(
+                        point: request.point, x: x, y: y,
+                        featureVariant: request.featureVariant)
+                    let neighborRole = neighborMap[source.y * 64 + source.x]
+                    expected[index] = depth ? max(3, expected[index]) : neighborRole
+                }}
+            }
+            return expected
+        }
         let pairs: [(GroundType, TerrainProductionPack.Ground)] = [
             (.deepWater, .water), (.groundcover, .growth), (.stone, .soil),
         ]
@@ -100,15 +141,64 @@ import XCTest
                               "accepted edge grammar must be exercised for "
                                 + "\(ground.rawValue)/\(neighbor.rawValue)")
 
+            XCTAssertEqual(try pack.regionContinuousRolesForTesting(for: request),
+                           try expectedRoles(request),
+                           "independent corrected-coordinate role oracle failed for "
+                            + "\(ground.rawValue)/\(neighbor.rawValue)")
             let final = try pack.regionContinuousRGBA(for: request)
+            let preBoundary = try pack.regionContinuityPreBoundaryRGBAForTesting(for: request)
             let boundary = TerrainProductionPack.materialBoundaryMask(request)
             for index in boundary.indices where boundary[index] == 0 {
                 let offset = index * 4
                 XCTAssertEqual(Array(final[offset..<(offset + 4)]),
-                               Array(installed[offset..<(offset + 4)]),
-                               "new contour changed accepted non-boundary pixels for "
-                                + "\(ground.rawValue)/\(neighbor.rawValue) at \(index)")
+                               Array(preBoundary[offset..<(offset + 4)]),
+                               "material boundary escaped its mask at \(index)")
             }
+            for index in boundary.indices {
+                let offset = index * 4
+                guard Array(preBoundary[offset..<(offset + 4)])
+                        != Array(installed[offset..<(offset + 4)]) else { continue }
+                let x = index % 16, y = index / 16
+                XCTAssertNotEqual(
+                    TerrainProductionPack.regionContinuousMacroSourceCoordinate(
+                        point: request.point, x: x, y: y,
+                        featureVariant: request.featureVariant),
+                    legacySource(request, x: x, y: y),
+                    "non-boundary semantic difference was not caused by sampler coordinates")
+            }
+        }
+
+        let orderingCases = [
+            try MapAssetTestSupport.productionRequest(
+                ground: .water, point: .init(x: 2, y: 3), featureVariant: 1,
+                cardinalNeighbors: .init(north: .same, east: .ground(.deepWater),
+                                         south: .same, west: .same),
+                motionBand: .moving, phaseOffset: 3, presentationTick: 11),
+            try MapAssetTestSupport.productionRequest(
+                ground: .soil, point: .init(x: 2, y: 3), featureVariant: 1,
+                cardinalNeighbors: .init(north: .same, east: .ground(.growth),
+                                         south: .same, west: .same),
+                reduceMotion: true, snow: true, settledAsh: true),
+        ]
+        let boundaryColors: Set<[UInt8]> = [[37, 43, 42, 255], [173, 164, 126, 255]]
+        for request in orderingCases {
+            let before = try pack.regionContinuityPreBoundaryRGBAForTesting(for: request)
+            let after = try pack.regionContinuousRGBA(for: request)
+            let mask = TerrainProductionPack.materialBoundaryMask(request)
+            XCTAssertTrue(mask.contains { $0 > 0 })
+            for index in mask.indices {
+                let offset = index * 4, pixel = Array(after[offset..<(offset + 4)])
+                if mask[index] == 0 {
+                    XCTAssertEqual(pixel, Array(before[offset..<(offset + 4)]))
+                } else {
+                    XCTAssertTrue(boundaryColors.contains(pixel),
+                                  "boundary did not compose after motion/deposits")
+                }
+            }
+            var fringe = request; fringe.visibility = .fringe
+            XCTAssertFalse(TerrainProductionPack.materialBoundaryMask(fringe).contains { $0 > 0 })
+            XCTAssertEqual(try pack.regionContinuousRGBA(for: fringe),
+                           try pack.regionContinuityPreBoundaryRGBAForTesting(for: fringe))
         }
     }
 
@@ -120,6 +210,87 @@ import XCTest
         XCTAssertEqual(MapAssetContract.edgeContourID(mapSeed: 9041, point: point, direction: .east),
                        MapAssetContract.edgeContourID(
                         mapSeed: 9041, point: .init(x: 8, y: 9), direction: .west))
+    }
+
+    func testWorldContinuousMacroSamplerUsesOnlyTheAuthoredInterior() {
+        func sourceX(_ logicalX: Int, variant: Int) -> Int {
+            let point = GridPoint(x: Int(floor(Double(logicalX) / 16.0)), y: 0)
+            let local = ((logicalX % 16) + 16) % 16
+            return TerrainProductionPack.regionContinuousMacroSourceCoordinate(
+                point: point, x: local, y: 0, featureVariant: variant).x
+        }
+
+        for variant in 0...3 {
+            let samples = (-256...256).map { sourceX($0, variant: variant) }
+            XCTAssertTrue(samples.allSatisfy { (0...62).contains($0) })
+            XCTAssertFalse(samples.contains(63), "outer guard column became map content")
+            for pair in zip(samples, samples.dropFirst()) {
+                XCTAssertEqual(abs(pair.1 - pair.0), 1,
+                               "adjacent world pixels must advance exactly one source pixel")
+            }
+        }
+
+        XCTAssertEqual((60...65).map { sourceX($0, variant: 0) }, [60, 61, 62, 61, 60, 59])
+        XCTAssertEqual(sourceX(63, variant: 0), 61)
+        XCTAssertEqual(sourceX(64, variant: 0), 60)
+    }
+
+    func testDenseSameMaterialWaterAndSoilNeverSampleGuardRowsOrAddBoundaries() throws {
+        for ground in [GroundType.water, .soil] {
+            var firstRender: [[UInt8]] = []
+            for y in 0..<9 { for x in 0..<9 {
+                let point = GridPoint(x: x, y: y)
+                for py in 0..<16 { for px in 0..<16 {
+                    let source = TerrainProductionPack.regionContinuousMacroSourceCoordinate(
+                        point: point, x: px, y: py, featureVariant: 1)
+                    XCTAssertTrue((0...62).contains(source.x), "\(ground.rawValue) x guard")
+                    XCTAssertTrue((0...62).contains(source.y), "\(ground.rawValue) y guard")
+                }}
+                let request = try MapAssetTestSupport.productionRequest(
+                    ground: ground, point: point, visualSeed: 9041, featureVariant: 1,
+                    cardinalNeighbors: .init(
+                        north: .same, east: .same, south: .same, west: .same),
+                    reduceMotion: true)
+                XCTAssertFalse(TerrainProductionPack.materialBoundaryMask(request).contains { $0 > 0 })
+                firstRender.append(try MapAssetTestSupport.productionPack()
+                    .regionContinuousRGBA(for: request))
+            }}
+            var secondRender: [[UInt8]] = []
+            for y in 0..<9 { for x in 0..<9 {
+                let request = try MapAssetTestSupport.productionRequest(
+                    ground: ground, point: .init(x: x, y: y), visualSeed: 9041,
+                    featureVariant: 1, cardinalNeighbors: .init(
+                        north: .same, east: .same, south: .same, west: .same),
+                    reduceMotion: true)
+                secondRender.append(try MapAssetTestSupport.productionPack()
+                    .regionContinuousRGBA(for: request))
+            }}
+            XCTAssertEqual(firstRender, secondRender, "\(ground.rawValue) redraw drifted")
+        }
+    }
+
+    func testWorldContinuousMacroSamplerIsSeedCoordinateAndPhaseDeterministic() {
+        for seed in [UInt64(0), 1, 9041, .max] {
+            let variant = MapAssetContract.regionFeatureVariant(mapSeed: seed)
+            for point in [GridPoint(x: -7, y: -5), .init(x: 0, y: 0), .init(x: 17, y: 23)] {
+                let first = TerrainProductionPack.regionContinuousMacroSourceCoordinate(
+                    point: point, x: 9, y: 12, featureVariant: variant)
+                let second = TerrainProductionPack.regionContinuousMacroSourceCoordinate(
+                    point: point, x: 9, y: 12, featureVariant: variant)
+                XCTAssertEqual(first, second)
+                XCTAssertTrue((0...62).contains(first.x))
+                XCTAssertTrue((0...62).contains(first.y))
+            }
+        }
+        let origin = TerrainProductionPack.regionContinuousMacroSourceCoordinate(
+            point: .init(x: 0, y: 0), x: 0, y: 0, featureVariant: 0)
+        let xPhase = TerrainProductionPack.regionContinuousMacroSourceCoordinate(
+            point: .init(x: 0, y: 0), x: 0, y: 0, featureVariant: 1)
+        let yPhase = TerrainProductionPack.regionContinuousMacroSourceCoordinate(
+            point: .init(x: 0, y: 0), x: 0, y: 0, featureVariant: 2)
+        XCTAssertEqual(origin, .init(x: 0, y: 0))
+        XCTAssertEqual(xPhase, .init(x: 16, y: 0))
+        XCTAssertEqual(yPhase, .init(x: 0, y: 16))
     }
 
     func testNativeRegionContinuityPhoneEvidence() throws {
@@ -141,6 +312,22 @@ import XCTest
             ("terrain-region-continuity-visibility-grayscale-368x800", visibilityGray),
             ("terrain-region-continuity-wall-layer-order-368x800", wall),
             ("terrain-region-continuity-wall-layer-order-grayscale-368x800", wallGray),
+        ] {
+            let attachment = XCTAttachment(image: image)
+            attachment.name = name
+            attachment.lifetime = .keepAlways
+            add(attachment)
+        }
+    }
+
+    func testSameMaterialMacroSamplerPhoneEvidence() throws {
+        let evidence = try sameMaterialMacroSamplerEvidence()
+        let grayscale = try XCTUnwrap(Self.literalGrayscale(evidence))
+        XCTAssertEqual(evidence.size, CGSize(width: 368, height: 800))
+        XCTAssertEqual(grayscale.size, CGSize(width: 368, height: 800))
+        for (name, image) in [
+            ("same-material-macro-sampler-368x800", evidence),
+            ("same-material-macro-sampler-grayscale-368x800", grayscale),
         ] {
             let attachment = XCTAttachment(image: image)
             attachment.name = name
@@ -451,6 +638,32 @@ import XCTest
                                             width: panel.1.size.width * scale,
                                             height: panel.1.size.height * scale))
                 }
+            }
+    }
+
+    private func sameMaterialMacroSamplerEvidence() throws -> UIImage {
+        let water = try nativeGridImage(
+            Array(repeating: Array(repeating: GroundType.water, count: 9), count: 9))
+        let soil = try nativeGridImage(
+            Array(repeating: Array(repeating: GroundType.soil, count: 9), count: 9))
+        let format = UIGraphicsImageRendererFormat(); format.scale = 1
+        return UIGraphicsImageRenderer(size: CGSize(width: 368, height: 800), format: format)
+            .image { output in
+                UIColor(red: 0.055, green: 0.085, blue: 0.084, alpha: 1).setFill()
+                output.cgContext.fill(CGRect(x: 0, y: 0, width: 368, height: 800))
+                func text(_ value: String, _ y: CGFloat, _ size: CGFloat = 11) {
+                    (value as NSString).draw(at: .init(x: 14, y: y), withAttributes: [
+                        .font: UIFont.monospacedSystemFont(ofSize: size, weight: .semibold),
+                        .foregroundColor: UIColor(white: 0.9, alpha: 1),
+                    ])
+                }
+                text("SAME-MATERIAL MACRO SAMPLER", 16, 17)
+                text("WATER · 9×9 · ACTUAL MAPASSETRENDERER", 54)
+                output.cgContext.interpolationQuality = .none
+                water.draw(in: CGRect(x: 40, y: 80, width: 288, height: 294))
+                text("SOIL · 9×9 · ACTUAL MAPASSETRENDERER", 412)
+                soil.draw(in: CGRect(x: 40, y: 438, width: 288, height: 294))
+                text("NO MATERIAL CONTACTS · NO ELEVATION WALLS", 760, 10)
             }
     }
 

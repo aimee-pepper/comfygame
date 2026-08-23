@@ -348,12 +348,25 @@ final class TerrainProductionPack: @unchecked Sendable {
     /// is a new compositor seam over the same immutable role maps and palettes.
     func regionContinuousRGBA(for request: Request,
                               descriptor: WorldGrade2V1.Descriptor? = nil) throws -> [UInt8] {
+        try regionContinuousRGBA(for: request, descriptor: descriptor, applyingBoundary: true)
+    }
+
+    func regionContinuityPreBoundaryRGBAForTesting(
+        for request: Request, descriptor: WorldGrade2V1.Descriptor? = nil
+    ) throws -> [UInt8] {
+        try regionContinuousRGBA(for: request, descriptor: descriptor, applyingBoundary: false)
+    }
+
+    private func regionContinuousRGBA(for request: Request,
+                                      descriptor: WorldGrade2V1.Descriptor?,
+                                      applyingBoundary: Bool) throws -> [UInt8] {
         try open()
         lock.lock(); defer { lock.unlock() }
         guard let state else { throw PackError.unavailable }
         let palette = try Self.palette(for: request, descriptor: descriptor, rows: state.palettes)
         let roles = try Self.composeRoles(request, roleMaps: state.roleMaps,
-                                          edgeMasks: state.edgeMasks)
+                                          edgeMasks: state.edgeMasks,
+                                          worldContinuous: true)
         var rgba = Self.recolor(roles,
                                 palette: try Self.groundPalette(request.ground.rawValue, in: palette))
 
@@ -380,7 +393,8 @@ final class TerrainProductionPack: @unchecked Sendable {
                 for y in 0..<16 { for x in 0..<16 {
                     let index = y * 16 + x
                     let role = Self.macroRole(depositRoles, point: request.point, x: x, y: y,
-                                              featureVariant: request.featureVariant + variantOffset)
+                                              featureVariant: request.featureVariant + variantOffset,
+                                              worldContinuous: true)
                     guard role >= 0, !occupied[index], count < limit else { continue }
                     rgba.replace(at: index, with: colors[Int(role)])
                     occupied[index] = true; count += 1
@@ -390,12 +404,14 @@ final class TerrainProductionPack: @unchecked Sendable {
             try apply(request.surfaceDeposits.settledAsh, variantOffset: 1, paletteKey: "coverAsh")
         }
 
-        let boundary = Self.materialBoundaryMask(request)
-        for index in boundary.indices {
-            switch boundary[index] {
-            case 1: rgba.replace(at: index, with: Self.materialBoundaryPalette[0])
-            case 2: rgba.replace(at: index, with: Self.materialBoundaryPalette[1])
-            default: break
+        if applyingBoundary {
+            let boundary = Self.materialBoundaryMask(request)
+            for index in boundary.indices {
+                switch boundary[index] {
+                case 1: rgba.replace(at: index, with: Self.materialBoundaryPalette[0])
+                case 2: rgba.replace(at: index, with: Self.materialBoundaryPalette[1])
+                default: break
+                }
             }
         }
         return rgba
@@ -435,6 +451,31 @@ final class TerrainProductionPack: @unchecked Sendable {
             }
         }
         return rgba
+    }
+
+    func regionContinuousRolesForTesting(for request: Request) throws -> [Int8] {
+        try open()
+        lock.lock(); defer { lock.unlock() }
+        guard let state else { throw PackError.unavailable }
+        return try Self.composeRoles(request, roleMaps: state.roleMaps,
+                                     edgeMasks: state.edgeMasks, worldContinuous: true)
+    }
+
+    func regionContinuityRoleMapForTesting(_ ground: Ground) throws -> [Int8] {
+        try open()
+        lock.lock(); defer { lock.unlock() }
+        guard let state, let roles = state.roleMaps[ground.rawValue] else {
+            throw PackError.invalidSemanticMask(ground.rawValue)
+        }
+        return roles
+    }
+
+    func regionContinuityEdgeMaskForTesting(direction: Direction, contour: Int) throws -> [Bool] {
+        try open()
+        lock.lock(); defer { lock.unlock() }
+        let key = "edge/\(direction.rawValue)/\(contour)"
+        guard let state, let mask = state.edgeMasks[key] else { throw PackError.missingAsset(key) }
+        return mask
     }
 
     static func materialBoundaryMask(_ request: Request) -> [UInt8] {
@@ -710,14 +751,16 @@ final class TerrainProductionPack: @unchecked Sendable {
     }
 
     private static func composeRoles(_ request: Request, roleMaps: [String: [Int8]],
-                                     edgeMasks: [String: [Bool]]) throws -> [Int8] {
+                                     edgeMasks: [String: [Bool]],
+                                     worldContinuous: Bool = false) throws -> [Int8] {
         guard let base = roleMaps[request.ground.rawValue] else {
             throw PackError.invalidSemanticMask(request.ground.rawValue)
         }
         var result = [Int8](repeating: 0, count: 256)
         for y in 0..<16 { for x in 0..<16 {
             result[y * 16 + x] = macroRole(base, point: request.point, x: x, y: y,
-                                           featureVariant: request.featureVariant)
+                                           featureVariant: request.featureVariant,
+                                           worldContinuous: worldContinuous)
         }}
         for direction in Direction.allCases {
             guard case .ground(let neighbor) = request.cardinalNeighbors[direction],
@@ -733,7 +776,8 @@ final class TerrainProductionPack: @unchecked Sendable {
                 let index = y * 16 + x
                 guard mask[index] else { continue }
                 let role = macroRole(neighborRoles, point: request.point, x: x, y: y,
-                                     featureVariant: request.featureVariant)
+                                     featureVariant: request.featureVariant,
+                                     worldContinuous: worldContinuous)
                 result[index] = depthContour ? max(3, result[index]) : role
             }}
         }
@@ -765,7 +809,12 @@ final class TerrainProductionPack: @unchecked Sendable {
     }
 
     private static func macroRole(_ map: [Int8], point: GridPoint, x: Int, y: Int,
-                                  featureVariant: Int) -> Int8 {
+                                  featureVariant: Int, worldContinuous: Bool = false) -> Int8 {
+        if worldContinuous {
+            let source = regionContinuousMacroSourceCoordinate(
+                point: point, x: x, y: y, featureVariant: featureVariant)
+            return map[source.y * 64 + source.x]
+        }
         let blockX = floorDivision(point.x, 4), blockY = floorDivision(point.y, 4)
         let macroX = positiveModulo(point.x, 4), macroY = positiveModulo(point.y, 4)
         let flipX = positiveModulo(blockX + featureVariant, 2) == 1
@@ -773,6 +822,17 @@ final class TerrainProductionPack: @unchecked Sendable {
         let sourceX = flipX ? 63 - (macroX * 16 + x) : macroX * 16 + x
         let sourceY = flipY ? 63 - (macroY * 16 + y) : macroY * 16 + y
         return map[sourceY * 64 + sourceX]
+    }
+
+    static func regionContinuousMacroSourceCoordinate(point: GridPoint, x: Int, y: Int,
+                                                      featureVariant: Int) -> GridPoint {
+        func interiorPingPong(_ value: Int) -> Int {
+            let phase = positiveModulo(value, 124)
+            return phase <= 62 ? phase : 124 - phase
+        }
+        return GridPoint(
+            x: interiorPingPong(point.x * 16 + x + (featureVariant & 1) * 16),
+            y: interiorPingPong(point.y * 16 + y + ((featureVariant >> 1) & 1) * 16))
     }
 
     private static func palette(for request: Request, descriptor: WorldGrade2V1.Descriptor?,
