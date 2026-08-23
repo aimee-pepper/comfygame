@@ -174,6 +174,74 @@ on that route becomes Stone. The saved diagnostics record reachable fraction, so
 filled Chasm counts. If the threshold still cannot be met, generation fails before content placement,
 Page consumption, or Essence spend.
 
+### Playable-entry invariant
+
+The percentage is necessary but not sufficient. A candidate is prepared successfully only when the final
+repaired map and its actual movement rules satisfy every condition below:
+
+1. Entry is a standing, passable entry Portal in the selected largest cardinal component. At least one
+   cardinal neighbour is passable, so the party can spend a movement turn away from the Portal and walk
+   back. Diagonal contact, a visually open edge or a nearby tile across Deep Water does not count.
+2. That component contains at least 85% of all currently passable tiles **and** has the functional capacity
+   to reserve all mandatory opening hosts before optional placement. There is no substitute fixed rectangle,
+   open-area score or neighbour-count heuristic.
+3. One distinct reachable host satisfies the existing ordinary-writing rule: it is reached by the real
+   movement graph, is more than two Chebyshev tiles from entry and can receive the guaranteed Diary Page or
+   field writing. At least one piece of ordinary writing must actually be placed. A default-true diagnostic
+   is not evidence.
+4. When the consumed pre-inscribed World Page promises a known opening find, one distinct reachable
+   one-turn-ground host exists one or two legal steps from entry and the exact promised object is actually
+   placed there.
+5. A non-riven world actually places at least one distinct exit Portal in the same component, using the
+   existing distance preference and fallback. A rules-owned riven world may intentionally have only the
+   entry Portal, which remains a full-haul exit.
+6. Every object that is placed on the map, every site and every enemy belongs to the entry component.
+   Optional content may be absent only under its own settled eligibility/placement rule; its absence cannot
+   be used to make a failed mandatory reservation look playable.
+
+This is a capability predicate, not a demand that every world have the same shape. A long coast, narrow
+pass, island chain or cavern remains legal when it satisfies the real movement and reservation rules. A
+one- or two-tile pocket fails even if it happens to contain 100% of that candidate's passable terrain.
+
+### Selection, rejection and deterministic retries
+
+- Keep the accepted pressure readings, material/hydrology quotas, Deep Water meaning and map seed.
+- If the selected largest repaired component is capable but the first tile-specific entry choice cannot
+  satisfy the first-step or near-entry promised-find reservation, select another eligible entry in that same
+  component using canonical ordering and the existing seeded layout stream. This is entry reselection, not
+  terrain regeneration.
+- A terrain stage may use only its already-bounded same-seed topology attempts. Each attempt derives from a
+  frozen attempt index and must preserve the same pressure outputs and exact quotas. Do not advance the
+  campaign seed, reroll unwritten pressures, repin an authored starter seed or progressively erase Deep Water
+  until a candidate passes.
+- After the accepted minimum-blocking repair and bounded terrain-stage attempts, a map with no qualifying
+  entry/component is rejected. `terrainGenerationSucceeded` and the new playable-entry receipt are false;
+  the bind returns the existing preparation refusal before Page consumption, Essence spend, History write or
+  active-run creation. Repeating the same unchanged bind is deterministic, not another hidden roll.
+
+### Persistence and legacy runs
+
+An accepted run persists the final map, entry and versioned playable-entry diagnostics. Relaunch uses those
+saved bytes; it does not regenerate, reselect entry or rerun repair. Mutable expedition facts such as
+collected content and crumbled terrain are not rejudged against the bind-time reservation predicate.
+
+An older active run also keeps its exact saved terrain, pressure identity, arrival receipt and immutable History
+record. Evaluate recovery against its saved current player component, not against a regenerated map:
+
+- when a surviving Portal is reachable, retain the existing rules. If the party is already standing on that
+  Portal—as in the reported isolated-entry shape—`canPortalHere`/`portalHome` already supplies the truthful
+  zero-turn, full-haul return and no new recovery action appears;
+- only when no surviving Portal is reachable, expose one explicit zero-turn **Leave this world** recovery. It
+  uses the existing `abandon` outcome with the truthful reason that this older world has no traversable way
+  home, preserves already carried haul through the ordinary full-return transaction, grants no extra reward or
+  bind-cost refund, keeps the original arrival/History receipt, and ends the malformed active expedition; and
+- decoding or merely viewing the run never triggers the recovery. The player explicitly chooses it.
+
+Do not silently move the party, soften water, fill Chasms or regenerate the map during decode. Kept/anchored
+worlds are not active expeditions: an invalid anchored snapshot remains stored, named and otherwise unchanged,
+but a new revisit must refuse before Field Kit or active-run mutation until a separately accepted lossless
+migration exists. It is never silently rebuilt from its book and seed.
+
 ## Flora and organic resources
 
 Growth placement remains generated from actual flora identities, habits and stature, but it retains the
@@ -265,6 +333,21 @@ Required executable gates:
 11. World Arrival actual/counterfactual summaries use production stages and remain deterministic.
 12. World Generator Web exposes per-ground connected-component counts, hydrology topology, deposits, resource
     host clause and eligible/reachable/extractable counts for rapid review.
+13. Adversarial handcrafted maps prove the playable-entry predicate: one dry tile in Deep Water; two dry
+    tiles; a 100%-reachable component with no writing host beyond two tiles; a capable component whose first
+    edge choice lacks the promised-find route; tied largest components; an interior capable component; a
+    riven one-Portal world; and a non-riven world with no second-Portal host. Only the fully capable cases pass.
+14. For every live scale (12, 15, 18, 23 and 28), ordinary, maximum surface-water, maximum Chasm and combined
+    water/Chasm pressure fixtures across a fixed seed matrix prove: legal first step and return; at least one
+    actual ordinary writing; exact promised starter find where applicable; required exit Portal disposition;
+    all placed content/sites/enemies reachable; and the 85% floor. Input-array/set ordering permutations and
+    a second generation produce byte-identical entry, map, repairs, reservations and diagnostics.
+15. Atomic-bind tests prove a rejected candidate consumes no Page, Essence, campaign seed, History identity or
+    Field Kit and creates no active run. Relaunch tests prove an accepted run is byte-identical, a trapped
+    legacy run is not repainted or rerolled; the reported isolated-entry fixture exposes only ordinary
+    `portalHome`; an off-Portal/no-reachable-Portal fixture exposes only explicit `abandon` recovery, retains
+    exact carried haul and frozen arrival/History receipts with no refund or bonus; cancel/relaunch changes
+    nothing; and an invalid anchored snapshot remains stored but refuses revisit before mutation.
 
 ## Explicit exclusions
 
