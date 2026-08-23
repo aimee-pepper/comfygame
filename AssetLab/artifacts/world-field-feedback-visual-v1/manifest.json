@@ -1,0 +1,95 @@
+{
+  "schemaVersion": "world-field-feedback-visual-v1",
+  "status": "candidate-not-approved",
+  "integrationReady": false,
+  "baseline": "ae12dd5f",
+  "accessibilityDeferral": "Accessibility work is postponed until after final release.",
+  "scope": "field-feedback-only",
+  "splitContract": {
+    "ordinary": {
+      "contextFraction": 0.25,
+      "eventFraction": 0.75,
+      "axis": "horizontal"
+    },
+    "paneOpacity": 0.25,
+    "textScrimOpacity": 0.72,
+    "mapMustRemainLegible": true
+  },
+  "eventPresenceTokens": {
+    "enter": "rise 4px + opacity 0→1",
+    "hold": "primary event fixed; queue receipt updates in place",
+    "advance": "crossfade text inside same event pane",
+    "exit": "opacity 1→0; context pane persists",
+    "simultaneous": "one primary + one next preview + remaining count; never stack panes"
+  },
+  "queueStates": [
+    "single",
+    "preview",
+    "counted"
+  ],
+  "acceptedInput": {
+    "terrain": "artifacts/dynamic-terrain-style-v0.2/evidence/phone-opposed-cool-368x800.png"
+  },
+  "outputs": [
+    {
+      "path": "evidence/world-feedback-dark-368x800.png",
+      "width": 368,
+      "height": 800,
+      "sha256": "7ddc0e95e72677f3d247eb16615377a775b1b7fce8844f1e0686eba113dbfc73"
+    },
+    {
+      "path": "evidence/world-feedback-light-368x800.png",
+      "width": 368,
+      "height": 800,
+      "sha256": "6d9bb4ed22bb1a0b2edba5e03051728b1359cfb39326fc0e062eea22c7b44ac0"
+    },
+    {
+      "path": "evidence/world-feedback-grayscale-368x800.png",
+      "width": 368,
+      "height": 800,
+      "sha256": "44c27e858d642a64877a2b789471d12ab4a677a9708c6dce1035185072026307"
+    },
+    {
+      "path": "evidence/world-feedback-context-only-368x800.png",
+      "width": 368,
+      "height": 800,
+      "sha256": "b13f9d787a105c7c4e3c866426e0bd7bfd7bcc4d818745f8092c3d0b31a06778"
+    }
+  ],
+  "contactSheet": {
+    "path": "review-contact-sheet.png",
+    "width": 1600,
+    "height": 930,
+    "sha256": "fd33271f2357b54112e1d67be88b4bc40b6352b5af706378957c54014948fe60"
+  },
+  "nativeHandoff": {
+    "replacementForMissingEventNarrationCallSite": true,
+    "neverRestoreOldOpaqueMapLog": true,
+    "persistentContext": true,
+    "transientEvent": true,
+    "paneBackgroundOpacity": 0.25,
+    "ordinarySplit": [
+      0.25,
+      0.75
+    ],
+    "textScrimOpacity": 0.72,
+    "eventQueue": "one primary + one next preview + remaining count",
+    "featureLocalAction": "Dismiss",
+    "dismissesEventPaneOnly": true
+  },
+  "deferred": [
+    "broad-button-responsiveness",
+    "pressed-loading-accepted-refused-system",
+    "hazard-site-production-art"
+  ],
+  "forbidden": [
+    "gameplay-change",
+    "event-semantic-change",
+    "native",
+    "PBX",
+    "broad-control-migration",
+    "hazard-art-generation",
+    "site-art-generation"
+  ],
+  "canonicalBodySHA256": "ae0b5209a8d1efd85811e9fab38405d2baaf8c114358200a628ea2f311d76c5d"
+}
