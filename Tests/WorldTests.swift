@@ -560,12 +560,17 @@ final class WorldTests: XCTestCase {
 
     func testNativeMapPinsCorrectedCanonicalManifest() throws {
         let root = URL(fileURLWithPath: #filePath).deletingLastPathComponent().deletingLastPathComponent()
-        let data = try Data(contentsOf: root.appendingPathComponent("AssetLab/integration/lifted-terrain-v1/manifest.json"))
+        let data = try Data(contentsOf: root.appendingPathComponent(
+            "AssetLab/integration/terrain-production-pack-v1/runtime/manifest.json"))
+        let manifestSHA256 = SHA256.hash(data: data).map { String(format: "%02x", $0) }.joined()
+        XCTAssertEqual(manifestSHA256, MapAssetContract.manifestSHA256)
         let json = try XCTUnwrap(JSONSerialization.jsonObject(with: data) as? [String: Any])
-        XCTAssertEqual(json["canonicalManifestSha256"] as? String, MapAssetContract.manifestSHA256)
-        let profile = try XCTUnwrap(json["profile"] as? [String: Any])
-        XCTAssertEqual(profile["pixelWidth"] as? Int, MapAssetContract.spriteWidth)
-        XCTAssertEqual(profile["pixelHeight"] as? Int, MapAssetContract.spriteHeight)
+        XCTAssertEqual(json["canonicalBodySHA256"] as? String, TerrainProductionPack.bodySHA256)
+        XCTAssertEqual(json["assetAggregateSHA256"] as? String,
+                       TerrainProductionPack.assetAggregateSHA256)
+        let runtime = try XCTUnwrap(json["runtimeContract"] as? [String: Any])
+        XCTAssertEqual(runtime["tile"] as? [Int],
+                       [MapAssetContract.logicalSide, MapAssetContract.logicalSide])
     }
 
     @MainActor
