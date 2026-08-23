@@ -6,10 +6,16 @@
   "accessibilityDeferral": "Accessibility work is postponed until after final release.",
   "scope": "field-feedback-only",
   "splitContract": {
-    "ordinary": {
+    "preferred": {
       "contextFraction": 0.25,
       "eventFraction": 0.75,
       "axis": "horizontal"
+    },
+    "ordinary": {
+      "contextFraction": 0.5,
+      "eventFraction": 0.5,
+      "axis": "horizontal",
+      "reason": "complete approved-size context and event copy cannot fit the 86px quarter"
     },
     "paneOpacity": 0.25,
     "textScrimOpacity": 0.72,
@@ -27,6 +33,13 @@
     "preview",
     "counted"
   ],
+  "typeFloors": {
+    "nameAction": 16,
+    "body": 17,
+    "supporting": 15,
+    "completeLabels": true,
+    "noShrink": true
+  },
   "acceptedInput": {
     "terrain": "artifacts/dynamic-terrain-style-v0.2/evidence/phone-opposed-cool-368x800.png"
   },
@@ -35,32 +48,32 @@
       "path": "evidence/world-feedback-dark-368x800.png",
       "width": 368,
       "height": 800,
-      "sha256": "7ddc0e95e72677f3d247eb16615377a775b1b7fce8844f1e0686eba113dbfc73"
+      "sha256": "0639badbc63a08543556a3357a186312154fe4b6b9ea00ab1f91d6e1932894b3"
     },
     {
       "path": "evidence/world-feedback-light-368x800.png",
       "width": 368,
       "height": 800,
-      "sha256": "6d9bb4ed22bb1a0b2edba5e03051728b1359cfb39326fc0e062eea22c7b44ac0"
+      "sha256": "b260773d5eb27bf758dd3a376c64195e0a205866ac64a343d57ae819b1cae4af"
     },
     {
       "path": "evidence/world-feedback-grayscale-368x800.png",
       "width": 368,
       "height": 800,
-      "sha256": "44c27e858d642a64877a2b789471d12ab4a677a9708c6dce1035185072026307"
+      "sha256": "5246acbf4a9d165e405c81d9854732519538bd6dc6ed8dcaff55e4bbcce3daf7"
     },
     {
       "path": "evidence/world-feedback-context-only-368x800.png",
       "width": 368,
       "height": 800,
-      "sha256": "b13f9d787a105c7c4e3c866426e0bd7bfd7bcc4d818745f8092c3d0b31a06778"
+      "sha256": "c593b20832d0f55cb0fd3aa80a9c3df027a728e24e2be4dc0d5974ea92e0a385"
     }
   ],
   "contactSheet": {
     "path": "review-contact-sheet.png",
     "width": 1600,
     "height": 930,
-    "sha256": "fd33271f2357b54112e1d67be88b4bc40b6352b5af706378957c54014948fe60"
+    "sha256": "35a6ccdbb8c3a75001e8cac266b966e6844bc6d638d0b11ff32850c366bc5140"
   },
   "nativeHandoff": {
     "replacementForMissingEventNarrationCallSite": true,
@@ -68,10 +81,15 @@
     "persistentContext": true,
     "transientEvent": true,
     "paneBackgroundOpacity": 0.25,
-    "ordinarySplit": [
+    "preferredSplit": [
       0.25,
       0.75
     ],
+    "ordinarySplit": [
+      0.5,
+      0.5
+    ],
+    "fallbackReason": "complete approved-size context and event copy cannot fit the 86px quarter",
     "textScrimOpacity": 0.72,
     "eventQueue": "one primary + one next preview + remaining count",
     "featureLocalAction": "Dismiss",
@@ -91,5 +109,5 @@
     "hazard-art-generation",
     "site-art-generation"
   ],
-  "canonicalBodySHA256": "ae0b5209a8d1efd85811e9fab38405d2baaf8c114358200a628ea2f311d76c5d"
+  "canonicalBodySHA256": "a54fb5fa4a515c7915dd960076126f086d6f6dca65e5452142ea801b31836f72"
 }
