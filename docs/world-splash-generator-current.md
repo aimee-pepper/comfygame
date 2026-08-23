@@ -161,6 +161,9 @@ map.
 - each eligible resource row retains stable resource ID, exact placed source count, exact obtainable quantity
   and the canonically ordered causal mark IDs that genuinely own that family. A causal mark cross-links only
   through its existing registered resource-family receipt; display must not infer family from prose or name;
+- family ownership is frozen at the existing per-family actual-versus-no-Sigil quantity comparison. When one
+  Sigil registers multiple resource families, a changed family does not assign that mark to its unchanged
+  siblings; implementation may not expand one generic causal fact across every registered family;
 - the same-seed causal intervention is the rules-owned expectation for authored abundance. No new qualitative
   threshold, node-count cutoff, total-map share or ad hoc coverage band is introduced. A family with no
   rare/precious authorship and no resource causal fact remains absent from the Splash;
