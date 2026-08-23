@@ -146,9 +146,13 @@ The pre-exploration Splash truthfully reveals that generated sites exist and may
 harvestable resource opportunities. This is an invitation to explore, not prior discovery and not a solved
 map.
 
-- `sites` contains every actually placed site profile with its exact placed-instance count, ordered by stable
-  site-profile ID. A world with one or more sites always emits site-opportunity commands and visibly
-  represents at least one site opportunity;
+- `hasGeneratedSiteOpportunity` is the single site projection. It is `true` when the generated world contains
+  one or more actually placed sites and `false` otherwise. `true` always emits exactly one constant
+  site-opportunity command and one visible presence cue;
+- the Splash does not retain site count, profile/category, stable or placed identity, multiplicity,
+  arrangement, coordinate, route, contents or relative placement. Any two generated worlds whose site count
+  is nonzero have an identical site-opportunity field, command and cue before legitimate occlusion, regardless
+  of those differences;
 - `resources` is optional. A resource family is eligible only when it has at least one actually obtainable
   placed source and an existing rules-owned predicate classifies that opportunity as unusually rare/special
   or unusually abundant. Rows retain exact eligible-source counts and are ordered by stable resource ID;
@@ -160,11 +164,13 @@ map.
 - the profile contains no tile coordinate, placed-instance ID, route, key, site contents, per-source yield,
   remaining-harvest count or search result;
 - entry/exit portals are navigation infrastructure, not site opportunities, and do not enter this profile;
-- deterministic placeholder commands and pixels must visibly respond to added/removed site profiles and
-  eligible resource families. Ordinary resource families do not enter the Splash merely because a node or
-  drop exists. Opportunity composition is representative and makes no claim about exact map location;
-- relocating the same site/resource opportunities while preserving their stable profiles/families and counts
-  leaves this aggregate profile and its placeholder output byte-identical.
+- deterministic placeholder commands and pixels must visibly respond when site presence changes between zero
+  and nonzero, and when eligible resource families are added or removed. Ordinary resource families do not
+  enter the Splash merely because a node or drop exists. Opportunity composition is representative and makes
+  no claim about exact map location;
+- changing site coordinate/count/category while preserving zero-versus-nonzero presence leaves the site cue
+  and its commands/RGBA byte-identical. Relocating eligible resource opportunities while preserving their
+  families and source counts likewise leaves their profile and placeholder output byte-identical.
 
 The final Asset system will consume these same semantic opportunity requests after the generator is accepted;
 Asset does not infer their identities or mechanics.
@@ -189,9 +195,10 @@ The receipt and placeholder generator must not contain, count, silhouette, name 
 - quest state, hidden hazards or undiscovered Sigils;
 - flora mechanics beyond visible form, color, coverage and habit.
 
-For site/resource opportunities, only exact coordinates, placed-instance identity, routes/keys, site contents,
-source yields and remaining-harvest state are excluded. Stable aggregate site profiles and eligible exceptional
-resource families with their placed source counts are intentionally revealed before exploration.
+For site opportunities, everything except zero-versus-nonzero generated presence is excluded. For eligible
+resource opportunities, exact coordinates, placed-instance identity, source yields and remaining-harvest state
+are excluded; exceptional resource families and their placed source counts are intentionally revealed before
+exploration.
 
 Changing any excluded fact while legal v3 fields remain identical must produce a byte-identical receipt,
 placeholder command list and rendered scene.
@@ -275,10 +282,11 @@ horizontally scrollable.
 | R01 | flat vs generated depth 1/2/3 relief | Every final cell participates; exact height counts, elevated-component sizes, south-facing exposure depths, first-map elevations and regional commands agree; undefined shape labels are neither emitted nor required |
 | E01 | illumination matrix | Environment-owned value changes only |
 | E02 | existing atmosphere/precipitation matrix | Existing facts represented; no weather generation |
-| O01 | add/remove one generated site profile at fixed terrain | Only site-opportunity receipt/commands and legitimate occlusion pixels change; profile/count is retained |
+| O01 | zero generated sites vs one-or-more generated sites at fixed terrain | Only the boolean site-presence receipt, one constant site-opportunity command and legitimate occlusion pixels change |
 | O02 | add/remove one obtainable authored rare/precious resource family at fixed terrain | Only resource-opportunity receipt/commands and legitimate occlusion pixels change; family/count is retained |
-| O03 | add/remove an ordinary, non-qualifying resource family | Receipt, commands and pixels remain byte-identical; ordinary presence alone is not a Splash hook |
-| O04 | relocate identical site/resource opportunities | Receipt, commands and pixels byte-identical; no coordinate is persisted or implied |
+| O03 | change nonzero site count/category/identity/arrangement/location | Site-presence receipt field, site command and site-owned RGBA remain byte-identical |
+| O04 | add/remove an ordinary, non-qualifying resource family | Receipt, commands and pixels remain byte-identical; ordinary presence alone is not a Splash hook |
+| O05 | relocate identical eligible resource opportunities | Receipt, commands and pixels byte-identical; no coordinate is persisted or implied |
 | D01 | mutate traveller/apex or excluded site/resource details | Receipt, commands and pixels byte-identical |
 | D02 | hidden crop terrain/flora mutation | Hidden cells remain coordinate/visibility only |
 | C01 | exact first-map crop | Identity/palette parity for every disclosed cell |
