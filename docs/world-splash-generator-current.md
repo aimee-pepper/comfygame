@@ -140,6 +140,26 @@ medium/density/motion and precipitation medium/intensity/motion.
 These are already-resolved presentation bands. The Splash does not create weather, advance it, infer it from
 palette or expose numeric pressures.
 
+### Exploration-opportunity profile
+
+The pre-exploration Splash truthfully reveals that generated sites and harvestable resource opportunities
+exist. This is an invitation to explore, not prior discovery and not a solved map.
+
+- `sites` contains every actually placed site profile with its exact placed-instance count, ordered by stable
+  site-profile ID;
+- `resources` contains every resource family with at least one actually placed resource-bearing map source
+  and its exact source count, ordered by stable resource ID;
+- the profile contains no tile coordinate, placed-instance ID, route, key, site contents, per-source yield,
+  remaining-harvest count or search result;
+- entry/exit portals are navigation infrastructure, not site opportunities, and do not enter this profile;
+- deterministic placeholder commands and pixels must visibly respond to added/removed site profiles and
+  resource families. Their composition is representative and makes no claim about exact map location;
+- relocating the same site/resource opportunities while preserving their stable profiles/families and counts
+  leaves this aggregate profile and its placeholder output byte-identical.
+
+The final Asset system will consume these same semantic opportunity requests after the generator is accepted;
+Asset does not infer their identities or mechanics.
+
 ### Causal, entry and continuity data
 
 - causalVisualFacts retain the existing known-only typed contract and own rules prose, not hidden map facts;
@@ -148,18 +168,21 @@ palette or expose numeric pressures.
   footprint/material treatment; an empty Page has no entryMark;
 - firstMapCropReceipt preserves the exact party-aware 9 by 9 disclosure boundary and the same terrain/flora
   render identities used above;
-- v3 base Splash has no site layer. A future visible-site extension requires separate authority.
+- site/resource opportunities use only the aggregate pre-exploration profile above; the first-map crop does
+  not acquire their hidden coordinates.
 
 ## Explicit disclosure exclusions
 
 The receipt and placeholder generator must not contain, count, silhouette, name or position:
 
-- undiscovered sites, portals, keys or routes;
-- harvestable resource deposits or yields;
 - travellers, meetings or recruitment;
 - ordinary creatures, apexes, combat groups or loot;
 - quest state, hidden hazards or undiscovered Sigils;
 - flora mechanics beyond visible form, color, coverage and habit.
+
+For site/resource opportunities, only exact coordinates, placed-instance identity, routes/keys, site contents,
+source yields and remaining-harvest state are excluded. Stable aggregate site profiles, resource families and
+their placed source counts are intentionally revealed before exploration.
 
 Changing any excluded fact while legal v3 fields remain identical must produce a byte-identical receipt,
 placeholder command list and rendered scene.
@@ -243,7 +266,10 @@ horizontally scrollable.
 | R01 | flat vs generated depth 1/2/3 relief | Every final cell participates; exact height counts, elevated-component sizes, south-facing exposure depths, first-map elevations and regional commands agree; undefined shape labels are neither emitted nor required |
 | E01 | illumination matrix | Environment-owned value changes only |
 | E02 | existing atmosphere/precipitation matrix | Existing facts represented; no weather generation |
-| D01 | mutate hidden site/resource/traveller/apex | Receipt, commands and pixels byte-identical |
+| O01 | add/remove one generated site profile at fixed terrain | Only site-opportunity receipt/commands and legitimate occlusion pixels change; profile/count is retained |
+| O02 | add/remove one generated resource family at fixed terrain | Only resource-opportunity receipt/commands and legitimate occlusion pixels change; family/count is retained |
+| O03 | relocate identical site/resource opportunities | Receipt, commands and pixels byte-identical; no coordinate is persisted or implied |
+| D01 | mutate traveller/apex or excluded site/resource details | Receipt, commands and pixels byte-identical |
 | D02 | hidden crop terrain/flora mutation | Hidden cells remain coordinate/visibility only |
 | C01 | exact first-map crop | Identity/palette parity for every disclosed cell |
 | C02 | same receipt twice | Receipt, commands and RGBA byte-identical |
