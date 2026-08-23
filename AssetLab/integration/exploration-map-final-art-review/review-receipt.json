@@ -1,0 +1,53 @@
+{
+  "schemaVersion": "exploration-map-final-art-review-v1",
+  "status": "candidate-unapproved",
+  "integrationReady": false,
+  "runtimeMerge": false,
+  "candidatePacks": {
+    "exploration-map-identities-v1": {
+      "canonicalBodySHA256": "f28a55db110b92b9b0e82b8faca28392322551aac0fd8caa588ee3b283127c67",
+      "manifestSHA256": "e0d926e86128def14a1bdc488311d9d0e65ab60464d16126bfb44b9514d83b80",
+      "runtimeAssetAggregateSHA256": "32ada00ca207d6eac6d8eee1de4917cfb6da03cc968d218a0b2b3b4ff197e990",
+      "stableKeys": 50,
+      "runtimePNGs": 50
+    },
+    "exploration-loose-items-v1": {
+      "canonicalBodySHA256": "6491f2954f2a4593a5d8f1e566410ec7acd9300627e6a7dcd780d6a9b18764c2",
+      "manifestSHA256": "a0c8251adde90797a64d43ef87668af65d235b93b16a1aecb13f8aeb235ae48d",
+      "runtimeAssetAggregateSHA256": "475680934cd1318ec9ad3789def022c77bf139412329462d576084c4774786b5",
+      "stableKeys": 76,
+      "runtimePNGs": 63
+    },
+    "exploration-catalogue-objects-v1": {
+      "canonicalBodySHA256": "b3478c3dcf6d6e43fbdfdf5c6e90bc877fdbd287231c03516eccd0df1e2beeaf",
+      "manifestSHA256": "71dcb608dae62dc6503f9333f0114ac6b9d75871f39a1c3f222b9645d027e239",
+      "runtimeAssetAggregateSHA256": "9731e732f698580965faf8ecf9bdc0494b21d68746b4b19ec0f432cf4c6ad70a",
+      "stableKeys": 28,
+      "runtimePNGs": 28
+    }
+  },
+  "coverage": {
+    "catalogueItemIDs": 102,
+    "catalogueGearIDs": 75,
+    "catalogueTreasureCurioConsumableKeyIDs": 27,
+    "reviewStableKeys": 154,
+    "reviewRuntimePNGs": 141
+  },
+  "blockedFinalFamilies": [
+    {
+      "family": "named-travellers",
+      "source": "AssetLab/integration/named-character-placeholders-v1/manifest.json",
+      "reason": "source explicitly declares finalArt:false"
+    },
+    {
+      "family": "ordinary-and-apex-creatures",
+      "source": "docs/design-implementation-conformance-audit-current.md",
+      "reason": "final creature art and exploration-map identity consumer remain outstanding"
+    },
+    {
+      "family": "Binder-and-Quill",
+      "source": "docs/asset-questions-decisions.md",
+      "reason": "no accepted persisted appearance model; noncanonical proof templates are forbidden as adapter fallbacks"
+    }
+  ]
+}

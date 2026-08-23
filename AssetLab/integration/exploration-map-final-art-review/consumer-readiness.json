@@ -1,0 +1,149 @@
+{
+  "schemaVersion": "exploration-map-final-art-consumer-readiness-v1",
+  "status": "candidate-unapproved",
+  "integrationReady": false,
+  "ordinaryMapConsumer": {
+    "logicalCanvas": [16, 19],
+    "pivot": [8, 18],
+    "tileSurface": [16, 16],
+    "filtering": "nearest-neighbour",
+    "runtimePolicy": "stable lookup of complete premade PNG only",
+    "layerOrder": [
+      "terrain-and-south-wall",
+      "stationary-content",
+      "party-identity-and-consequence-cues",
+      "selection-and-interaction",
+      "alerts-and-HUD"
+    ]
+  },
+  "currentWorldSymbolReplacements": [
+    {
+      "nativeConsumer": "TileView.isPlayer / figure.stand",
+      "visibleIdentity": "Binder",
+      "status": "blocked",
+      "reason": "no accepted persisted Binder appearance model"
+    },
+    {
+      "nativeConsumer": "TileView.enemy.icon",
+      "visibleIdentity": "ordinary creature or apex",
+      "status": "blocked",
+      "reason": "final generic creature trait-renderer art and exploration consumer are not accepted"
+    },
+    {
+      "nativeConsumer": "TileView.hasLooseWorldPage / doc.text.fill",
+      "visibleIdentity": "loose World Page",
+      "status": "candidate",
+      "stableKey": "loose_world_page/ordinary/frame-0",
+      "presentation": "static"
+    },
+    {
+      "nativeConsumer": "TileContent.item / catalogue icon or shippingbox.fill fallback",
+      "visibleIdentity": "all 102 current catalogue items",
+      "status": "candidate",
+      "stableKeyRule": "catalogue-item/<exact catalogueID>[/identified]",
+      "presentation": "static",
+      "disclosure": "only the two curio IDs may resolve catalogue-item/unknown-curio while unidentified"
+    },
+    {
+      "nativeConsumer": "TileContent.node and wildDrop / cube or sparkle simple fallback",
+      "visibleIdentity": "resource node or loose raw resource",
+      "status": "accepted-existing",
+      "pack": "resource-sprites-v1",
+      "presentation": "premade map body with existing truthful sheen clock on full visibility only"
+    },
+    {
+      "nativeConsumer": "TileContent.hazard / exclamationmark.triangle.fill",
+      "visibleIdentity": "generic persisted hazard",
+      "status": "candidate",
+      "stableKeyRule": "hazard/ordinary/frame-<0...2>",
+      "presentation": "three premade ambient-instability frames; no damage/spread/extinguish implication"
+    },
+    {
+      "nativeConsumer": "TileContent.portal(isEntry:true) / arrow.down.left.circle",
+      "visibleIdentity": "entry portal",
+      "status": "candidate",
+      "stableKeyRule": "entry_portal/ordinary/frame-<0...2>",
+      "presentation": "three premade ambient inward-seam frames"
+    },
+    {
+      "nativeConsumer": "TileContent.portal(isEntry:false) / circle.circle",
+      "visibleIdentity": "return portal",
+      "status": "candidate",
+      "stableKeyRule": "exit_portal/ordinary/frame-<0...2>",
+      "presentation": "three premade ambient outward-seam frames"
+    },
+    {
+      "nativeConsumer": "TileContent.lockedCache / lock.fill",
+      "visibleIdentity": "locked cache",
+      "status": "candidate",
+      "stableKey": "locked_cache/ordinary/frame-0",
+      "presentation": "static; no fabricated opened state"
+    },
+    {
+      "nativeConsumer": "TileContent.diaryPage / doc.text",
+      "visibleIdentity": "diary page",
+      "status": "candidate",
+      "stableKey": "diary_page/ordinary/frame-0",
+      "presentation": "static"
+    },
+    {
+      "nativeConsumer": "TileContent.foundWriting / note.text",
+      "visibleIdentity": "found writing",
+      "status": "candidate",
+      "stableKey": "found_writing/ordinary/frame-0",
+      "presentation": "static"
+    },
+    {
+      "nativeConsumer": "TileContent.site / SiteDef.icon or building.columns fallback",
+      "visibleIdentity": "all nine live SiteID values",
+      "status": "candidate",
+      "stableKeyRule": "<exact SiteID>/<ordinary|unlooted|looted>/frame-<authorized frame>",
+      "presentation": "eight searchable sites use persisted PlacedSite.isLooted; natural_anchor stays ordinary"
+    },
+    {
+      "nativeConsumer": "TileContent.traveller / named-character placeholder pack",
+      "visibleIdentity": "named traveller",
+      "status": "blocked",
+      "reason": "named-character-placeholders-v1 declares finalArt:false"
+    }
+  ],
+  "currentMinimapSymbolReplacements": [
+    { "marker": "portal", "status": "candidate", "stableKey": "minimap/portal/ordinary", "disclosure": "generic portal" },
+    { "marker": "page", "status": "candidate", "stableKey": "minimap/page/ordinary", "disclosure": "generic writing" },
+    { "marker": "site", "status": "candidate", "stableKey": "minimap/site/ordinary", "disclosure": "generic site; no SiteID/state" },
+    { "marker": "resource", "status": "candidate", "stableKey": "minimap/resource/ordinary", "disclosure": "accepted generic resource grammar; no resource ID/state" },
+    { "marker": "item", "status": "candidate", "stableKey": "minimap/item", "disclosure": "generic item; no catalogue ID" },
+    { "marker": "cache", "status": "candidate", "stableKey": "minimap/cache/ordinary", "disclosure": "generic locked cache" },
+    { "marker": "hazard", "status": "candidate", "stableKey": "minimap/hazard/ordinary", "disclosure": "generic known hazard" },
+    { "marker": "traveller", "status": "blocked", "reason": "final traveller art unavailable" },
+    { "marker": "encounter", "status": "blocked", "reason": "final generic creature art unavailable" },
+    { "marker": "apex", "status": "blocked", "reason": "final generic creature/apex art unavailable" }
+  ],
+  "animationIndex": {
+    "animatedPremade": [
+      "entry_portal:3",
+      "exit_portal:3",
+      "hazard:3",
+      "crystal_cavern:2-per-state",
+      "geyser_basin:3-per-state",
+      "brood_warren:2-per-state",
+      "the_tear:3-per-state",
+      "natural_anchor:3"
+    ],
+    "staticPremade": [
+      "locked_cache",
+      "loose_world_page",
+      "diary_page",
+      "found_writing",
+      "wayfarers_camp:unlooted+looted",
+      "binders_workshop:unlooted+looted",
+      "glacial_vault:unlooted+looted",
+      "spent_emanation_housing:unlooted+looted",
+      "all-102-catalogue-items",
+      "all-minimap-categories"
+    ],
+    "selection": "existing shared presentationTick modulo frame count on current full visibility only",
+    "remembered": "frame 0 only",
+    "hidden": "no lookup and no draw"
+  }
+}

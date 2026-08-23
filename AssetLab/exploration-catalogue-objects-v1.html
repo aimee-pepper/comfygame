@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Exploration Catalogue Objects v1</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    :root { color-scheme:dark; background:#0e1618; color:#efe3c4; font-family:system-ui,sans-serif; }
+    * { box-sizing:border-box; }
+    html, body { width:100%; max-width:100%; overflow-x:hidden; }
+    body { margin:0; background:#0e1618; }
+    main { display:block; width:100%; max-width:1500px; min-width:0; margin:auto; padding:24px; }
+    h1 { margin:0 0 8px; font-size:28px; }
+    h2 { margin:38px 0 12px; font-size:21px; }
+    p { color:#b8c6bd; max-width:86ch; line-height:1.45; }
+    .candidate { display:inline-block; padding:7px 10px; border:1px solid #bd765d; color:#f0b59c; background:#2a1d1a; }
+    .phones { display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,368px)); gap:18px; align-items:start; }
+    .phones img { width:100%; max-width:368px; image-rendering:pixelated; border:1px solid #52625e; }
+    .sheet { width:100%; height:auto; image-rendering:pixelated; border:1px solid #52625e; background:#101719; }
+    .links { display:flex; gap:10px; flex-wrap:wrap; }
+    a { color:#9fd9d0; }
+    code { color:#d8c692; }
+    @media(max-width:520px) { main { padding:12px; } h1 { font-size:23px; } .phones { grid-template-columns:minmax(0,1fr); } p,h1,h2 { overflow-wrap:anywhere; } }
+  </style>
+</head>
+<body>
+<nav class="tool-nav" aria-label="AssetLab tools"><a href="index.html">Creatures</a><a href="world.html">World &amp; Flora</a><a href="world-generator-tester.html">World Generator</a><a href="ui-gallery.html">UI Gallery</a><a href="places.html">Places</a><a href="characters.html">Characters</a><a href="resources.html">Resources</a><a href="equipment.html">Items</a><a href="reporter.html">Bug Reporter</a></nav>
+<main>
+  <h1>Exploration Catalogue Objects v1</h1>
+  <div class="candidate">candidate-unapproved · integrationReady:false</div>
+  <p>Final premade map-pixel candidates for the 27 current treasure, curio, consumable, and key identities not covered by the accepted gear-source pack. Runtime receives complete content-addressed 16×19 PNGs and performs stable lookup only—no image generation, silhouette construction, or procedural drawing.</p>
+  <p>All objects are static because the current mechanics persist no active presentation state for a loose item. Unidentified curios use the accepted opaque parcel; remembered reuses the exact visible bytes; hidden fails closed. The minimap remains the settled generic item category so it does not leak a catalogue subtype.</p>
+
+  <h2>Applied ordinary-phone census</h2>
+  <div class="phones">
+    <img src="integration/exploration-catalogue-objects-v1/evidence/applied-map-objects-1-368x800.png" alt="Applied catalogue objects page 1">
+    <img src="integration/exploration-catalogue-objects-v1/evidence/applied-map-objects-2-368x800.png" alt="Applied catalogue objects page 2">
+    <img src="integration/exploration-catalogue-objects-v1/evidence/applied-map-objects-3-368x800.png" alt="Applied catalogue objects page 3">
+  </div>
+
+  <h2>Exact native and true 800% assets</h2>
+  <img class="sheet" src="integration/exploration-catalogue-objects-v1/evidence/production-objects-native-800pct.png" alt="All 27 premade catalogue object sprites and the unknown parcel at native and 800 percent">
+  <h2>Literal grayscale</h2>
+  <img class="sheet" src="integration/exploration-catalogue-objects-v1/evidence/production-objects-native-800pct-grayscale.png" alt="All catalogue object sprites in literal grayscale">
+  <h2>Curio disclosure and hidden behavior</h2>
+  <img class="sheet" src="integration/exploration-catalogue-objects-v1/evidence/curio-disclosure-and-visibility-800pct.png" alt="Known, unknown, remembered, and hidden curio behavior">
+
+  <div class="links">
+    <a href="integration/exploration-catalogue-objects-v1/runtime/manifest.json">Runtime manifest</a>
+    <a href="integration/exploration-catalogue-objects-v1/evidence/applied-map-objects-1-grayscale-368x800.png">Phone grayscale 1</a>
+    <a href="integration/exploration-catalogue-objects-v1/evidence/applied-map-objects-2-grayscale-368x800.png">Phone grayscale 2</a>
+    <a href="integration/exploration-catalogue-objects-v1/evidence/applied-map-objects-3-grayscale-368x800.png">Phone grayscale 3</a>
+    <a href="integration/exploration-catalogue-objects-v1/evidence/curio-disclosure-and-visibility-800pct-grayscale.png">Disclosure grayscale</a>
+  </div>
+</main>
+</body>
+</html>

@@ -1,0 +1,923 @@
+{
+  "schemaVersion": "exploration-catalogue-objects-v1",
+  "status": "candidate-unapproved",
+  "integrationReady": false,
+  "baselineCommit": "14d2582a2470d843f6b1a40798db29e83f440e02",
+  "sourceAuthority": {
+    "cataloguePath": "Sources/Content/Data/items.json",
+    "catalogueSHA256": "eff94c1448caa323599c32f267a3fff4d32434140ba026f1ebd72abc4acc59a5",
+    "exactStableIDs": [
+      "essence_crystal",
+      "heat_core",
+      "caustic_core",
+      "light_core",
+      "conduit_fixture",
+      "curio_humming_shard",
+      "curio_bound_knot",
+      "salve_lesser",
+      "salve",
+      "salve_greater",
+      "draught_clearing",
+      "draught_quenching",
+      "antidote_broad",
+      "stonebark_tonic",
+      "venom",
+      "firebrand",
+      "briar_oil",
+      "flashsalt",
+      "solvent",
+      "lure",
+      "scent_mask",
+      "stillwater",
+      "waystone",
+      "torch",
+      "farsight_draught",
+      "cache_key",
+      "anchor_frame"
+    ]
+  },
+  "sourceReferences": {
+    "treasuresCuriosKeys": {
+      "path": "AssetLab/fixtures/exploration-catalogue-objects-v1/treasures-curios-keys-reference.png",
+      "sha256": "74a2e1ad388f27080b7281d829728c7d2cde28a5c6bb4bfa00dad7708adb37da",
+      "productionSource": false
+    },
+    "consumablesA": {
+      "path": "AssetLab/fixtures/exploration-catalogue-objects-v1/consumables-a-reference.png",
+      "sha256": "69d5feb4f002d006f64dd862b0aeca4d021d1799cb75351039587425f5370b3b",
+      "productionSource": false
+    },
+    "consumablesB": {
+      "path": "AssetLab/fixtures/exploration-catalogue-objects-v1/consumables-b-reference.png",
+      "sha256": "89d555697da8373f6759d7b62e1b9c7e169821976f4a743a77979a1e3b888791",
+      "productionSource": false
+    },
+    "unknownCurio": {
+      "path": "AssetLab/fixtures/exploration-catalogue-objects-v1/pickup-object-unknown-16x16.png",
+      "sha256": "f33ee51acfd51eca425b8221311ff9da53bc0b8e7924348a31398dfb35fc5b80",
+      "productionSource": true,
+      "acceptedIdentity": "pickup.object.unknown"
+    }
+  },
+  "production": {
+    "map": {
+      "logicalSize": [
+        16,
+        19
+      ],
+      "pivot": [
+        8,
+        18
+      ],
+      "tileConsumer": [
+        16,
+        16
+      ],
+      "filtering": "nearest-neighbour",
+      "premadeOnly": true
+    },
+    "runtimeContents": [
+      "manifest.json",
+      "assets"
+    ],
+    "runtimeGeneration": false
+  },
+  "animationContract": {
+    "classification": "static",
+    "reason": "loose physical items have no persisted active state and ambient movement would imply use, opening, burning, depletion, or activation",
+    "framesPerIdentity": 1
+  },
+  "visibilityContract": {
+    "full": "exact identified sprite or accepted opaque unknown parcel",
+    "remembered": "same exact static bytes",
+    "hidden": "no lookup and no draw"
+  },
+  "layerContract": [
+    "terrain",
+    "southWall",
+    "stationaryLooseObject",
+    "party",
+    "selectionAndInteraction",
+    "alerts"
+  ],
+  "requestABI": {
+    "exactKeys": [
+      "catalogueID",
+      "identified",
+      "visibility"
+    ],
+    "catalogueIDs": [
+      "essence_crystal",
+      "heat_core",
+      "caustic_core",
+      "light_core",
+      "conduit_fixture",
+      "curio_humming_shard",
+      "curio_bound_knot",
+      "salve_lesser",
+      "salve",
+      "salve_greater",
+      "draught_clearing",
+      "draught_quenching",
+      "antidote_broad",
+      "stonebark_tonic",
+      "venom",
+      "firebrand",
+      "briar_oil",
+      "flashsalt",
+      "solvent",
+      "lure",
+      "scent_mask",
+      "stillwater",
+      "waystone",
+      "torch",
+      "farsight_draught",
+      "cache_key",
+      "anchor_frame"
+    ],
+    "identified": [
+      true,
+      false
+    ],
+    "visibility": [
+      "full",
+      "remembered",
+      "hidden"
+    ],
+    "unidentifiedAllowedOnlyFor": [
+      "curio_humming_shard",
+      "curio_bound_knot"
+    ],
+    "failClosed": [
+      "unknownCatalogueID",
+      "invalidIdentifiedState",
+      "unknownVisibility",
+      "extraField",
+      "hidden"
+    ]
+  },
+  "inheritedMinimap": {
+    "key": "minimap/item",
+    "packID": "exploration-loose-items-v1",
+    "reason": "current disclosure is category-only; do not duplicate or leak catalogue subtype"
+  },
+  "blockedFamilies": [
+    {
+      "family": "travellers",
+      "reason": "named-character source pack finalArt:false"
+    },
+    {
+      "family": "creatures-and-apex",
+      "reason": "no accepted generic trait-renderer sprites"
+    }
+  ],
+  "assetsByKey": {
+    "catalogue-item/essence_crystal/identified": {
+      "path": "assets/478f94342cdee30d8e20be97e89c83e0cd0e3cb597cd6059fbee70334c45f93d.png",
+      "width": 16,
+      "height": 19,
+      "pivot": [
+        8,
+        18
+      ],
+      "bounds": {
+        "minX": 3,
+        "minY": 8,
+        "maxX": 11,
+        "maxY": 17,
+        "width": 9,
+        "height": 10
+      },
+      "sha256": "478f94342cdee30d8e20be97e89c83e0cd0e3cb597cd6059fbee70334c45f93d",
+      "rgbaSHA256": "842ebb2159f1585a2ae2b4753b7a4241331215ee202f415dc7ff858593b28171",
+      "catalogueID": "essence_crystal",
+      "identified": true,
+      "kind": "treasure",
+      "animation": "static",
+      "authoring": "manual-logical-pixel-translation-from-generated-reference"
+    },
+    "catalogue-item/heat_core/identified": {
+      "path": "assets/529913f31f198fb57a79d002c55cec818b875b7ef10387e3b9dfa089a1cf8eca.png",
+      "width": 16,
+      "height": 19,
+      "pivot": [
+        8,
+        18
+      ],
+      "bounds": {
+        "minX": 3,
+        "minY": 8,
+        "maxX": 11,
+        "maxY": 17,
+        "width": 9,
+        "height": 10
+      },
+      "sha256": "529913f31f198fb57a79d002c55cec818b875b7ef10387e3b9dfa089a1cf8eca",
+      "rgbaSHA256": "215f7d13fb70f956be6a71df1808170a8789cb3c88f14a6bd1607303ab3d575c",
+      "catalogueID": "heat_core",
+      "identified": true,
+      "kind": "treasure",
+      "animation": "static",
+      "authoring": "manual-logical-pixel-translation-from-generated-reference"
+    },
+    "catalogue-item/caustic_core/identified": {
+      "path": "assets/04c8c719c3173af4ea0fd4e7d85314bb0df2525f3e80c03920970d21359545b1.png",
+      "width": 16,
+      "height": 19,
+      "pivot": [
+        8,
+        18
+      ],
+      "bounds": {
+        "minX": 3,
+        "minY": 8,
+        "maxX": 12,
+        "maxY": 17,
+        "width": 10,
+        "height": 10
+      },
+      "sha256": "04c8c719c3173af4ea0fd4e7d85314bb0df2525f3e80c03920970d21359545b1",
+      "rgbaSHA256": "09e4638b102546262cfc7dd5988d804d73a2dcd9cbbcc76a5ec4a6297546f92e",
+      "catalogueID": "caustic_core",
+      "identified": true,
+      "kind": "treasure",
+      "animation": "static",
+      "authoring": "manual-logical-pixel-translation-from-generated-reference"
+    },
+    "catalogue-item/light_core/identified": {
+      "path": "assets/bb02fa81da1da14e2ecd43c083cfafa6406b7446f71366b6ccb5c844d3b366d7.png",
+      "width": 16,
+      "height": 19,
+      "pivot": [
+        8,
+        18
+      ],
+      "bounds": {
+        "minX": 2,
+        "minY": 7,
+        "maxX": 12,
+        "maxY": 17,
+        "width": 11,
+        "height": 11
+      },
+      "sha256": "bb02fa81da1da14e2ecd43c083cfafa6406b7446f71366b6ccb5c844d3b366d7",
+      "rgbaSHA256": "d97f7bdcdde57b02600182198feea652f576a654b03f8fe8e74216d51d549901",
+      "catalogueID": "light_core",
+      "identified": true,
+      "kind": "treasure",
+      "animation": "static",
+      "authoring": "manual-logical-pixel-translation-from-generated-reference"
+    },
+    "catalogue-item/conduit_fixture/identified": {
+      "path": "assets/6ee5f6a7c91b058686dbec50e4c94494db9f0a97c1795c3147d2f41fa2c2359f.png",
+      "width": 16,
+      "height": 19,
+      "pivot": [
+        8,
+        18
+      ],
+      "bounds": {
+        "minX": 3,
+        "minY": 9,
+        "maxX": 12,
+        "maxY": 17,
+        "width": 10,
+        "height": 9
+      },
+      "sha256": "6ee5f6a7c91b058686dbec50e4c94494db9f0a97c1795c3147d2f41fa2c2359f",
+      "rgbaSHA256": "d3199e2a50d18b36ada071e9716b7c33c4996d165b375aa3adcc46ab3cde6dce",
+      "catalogueID": "conduit_fixture",
+      "identified": true,
+      "kind": "treasure",
+      "animation": "static",
+      "authoring": "manual-logical-pixel-translation-from-generated-reference"
+    },
+    "catalogue-item/curio_humming_shard/identified": {
+      "path": "assets/bf83ce972adfc9de6078d000bd63ac93708e57388e604deb94f14fdf9865794a.png",
+      "width": 16,
+      "height": 19,
+      "pivot": [
+        8,
+        18
+      ],
+      "bounds": {
+        "minX": 3,
+        "minY": 9,
+        "maxX": 11,
+        "maxY": 17,
+        "width": 9,
+        "height": 9
+      },
+      "sha256": "bf83ce972adfc9de6078d000bd63ac93708e57388e604deb94f14fdf9865794a",
+      "rgbaSHA256": "07de64a7639c5c2407c467205af27085404385bce095df8ecaff01384701e634",
+      "catalogueID": "curio_humming_shard",
+      "identified": true,
+      "kind": "curio",
+      "animation": "static",
+      "authoring": "manual-logical-pixel-translation-from-generated-reference"
+    },
+    "catalogue-item/curio_bound_knot/identified": {
+      "path": "assets/2da4ddea0b8bebfc486a670a08e85ccfb3780ae4d8023878782faa322085017e.png",
+      "width": 16,
+      "height": 19,
+      "pivot": [
+        8,
+        18
+      ],
+      "bounds": {
+        "minX": 2,
+        "minY": 8,
+        "maxX": 12,
+        "maxY": 17,
+        "width": 11,
+        "height": 10
+      },
+      "sha256": "2da4ddea0b8bebfc486a670a08e85ccfb3780ae4d8023878782faa322085017e",
+      "rgbaSHA256": "b1dd2f3e043e828f3ff10b3e4a614d188e2c3384638634fe8899a4ca5f7a9ce0",
+      "catalogueID": "curio_bound_knot",
+      "identified": true,
+      "kind": "curio",
+      "animation": "static",
+      "authoring": "manual-logical-pixel-translation-from-generated-reference"
+    },
+    "catalogue-item/salve_lesser/identified": {
+      "path": "assets/bced63d3dcc7a567fe1495f6d5ae9372617100dab57e0a7bc96c410bafdbf587.png",
+      "width": 16,
+      "height": 19,
+      "pivot": [
+        8,
+        18
+      ],
+      "bounds": {
+        "minX": 5,
+        "minY": 9,
+        "maxX": 10,
+        "maxY": 17,
+        "width": 6,
+        "height": 9
+      },
+      "sha256": "bced63d3dcc7a567fe1495f6d5ae9372617100dab57e0a7bc96c410bafdbf587",
+      "rgbaSHA256": "24dc4a9c100ed628346e391228c1e95368689c7325a27749805b8ecddb5a325f",
+      "catalogueID": "salve_lesser",
+      "identified": true,
+      "kind": "consumable",
+      "animation": "static",
+      "authoring": "manual-logical-pixel-translation-from-generated-reference"
+    },
+    "catalogue-item/salve/identified": {
+      "path": "assets/7f3d871c5704832964ffe42ece69e570431c40e6077308a5de72f9a364653173.png",
+      "width": 16,
+      "height": 19,
+      "pivot": [
+        8,
+        18
+      ],
+      "bounds": {
+        "minX": 4,
+        "minY": 9,
+        "maxX": 11,
+        "maxY": 17,
+        "width": 8,
+        "height": 9
+      },
+      "sha256": "7f3d871c5704832964ffe42ece69e570431c40e6077308a5de72f9a364653173",
+      "rgbaSHA256": "bdc31c77e8f2d523705b51a61091faa5fb6a2fecee10a55ce7aadfaf08a3148d",
+      "catalogueID": "salve",
+      "identified": true,
+      "kind": "consumable",
+      "animation": "static",
+      "authoring": "manual-logical-pixel-translation-from-generated-reference"
+    },
+    "catalogue-item/salve_greater/identified": {
+      "path": "assets/731776805e1f114622ed28829fe604163b115ac3214f237526aa674287c83e4e.png",
+      "width": 16,
+      "height": 19,
+      "pivot": [
+        8,
+        18
+      ],
+      "bounds": {
+        "minX": 4,
+        "minY": 7,
+        "maxX": 11,
+        "maxY": 17,
+        "width": 8,
+        "height": 11
+      },
+      "sha256": "731776805e1f114622ed28829fe604163b115ac3214f237526aa674287c83e4e",
+      "rgbaSHA256": "d202d8119708ebbf396eb43b21e2c7292698fbe7b8ee69115548e50efec03e9c",
+      "catalogueID": "salve_greater",
+      "identified": true,
+      "kind": "consumable",
+      "animation": "static",
+      "authoring": "manual-logical-pixel-translation-from-generated-reference"
+    },
+    "catalogue-item/draught_clearing/identified": {
+      "path": "assets/d904930624bec61b8c527e41283e568b4c872fc31caa1820bef0c11cbbd6891b.png",
+      "width": 16,
+      "height": 19,
+      "pivot": [
+        8,
+        18
+      ],
+      "bounds": {
+        "minX": 4,
+        "minY": 8,
+        "maxX": 11,
+        "maxY": 17,
+        "width": 8,
+        "height": 10
+      },
+      "sha256": "d904930624bec61b8c527e41283e568b4c872fc31caa1820bef0c11cbbd6891b",
+      "rgbaSHA256": "1abe14eec954ae1046290a21fb6575ebba138095e5d21d29cf06f6c05fcd223a",
+      "catalogueID": "draught_clearing",
+      "identified": true,
+      "kind": "consumable",
+      "animation": "static",
+      "authoring": "manual-logical-pixel-translation-from-generated-reference"
+    },
+    "catalogue-item/draught_quenching/identified": {
+      "path": "assets/fba2391500a149251d6ef5e3a3286d171f3e3493aa7527dd2ea649a912b13ca3.png",
+      "width": 16,
+      "height": 19,
+      "pivot": [
+        8,
+        18
+      ],
+      "bounds": {
+        "minX": 4,
+        "minY": 9,
+        "maxX": 11,
+        "maxY": 17,
+        "width": 8,
+        "height": 9
+      },
+      "sha256": "fba2391500a149251d6ef5e3a3286d171f3e3493aa7527dd2ea649a912b13ca3",
+      "rgbaSHA256": "f1f9de91779900a3336cc3a5ba5267ef3afa1f808a9b6c726876e45a6db9ea10",
+      "catalogueID": "draught_quenching",
+      "identified": true,
+      "kind": "consumable",
+      "animation": "static",
+      "authoring": "manual-logical-pixel-translation-from-generated-reference"
+    },
+    "catalogue-item/antidote_broad/identified": {
+      "path": "assets/fb3a2180d2cf08642eebd55a042adb4e22f2686a01bdcef592b2f7cba68b19c4.png",
+      "width": 16,
+      "height": 19,
+      "pivot": [
+        8,
+        18
+      ],
+      "bounds": {
+        "minX": 4,
+        "minY": 7,
+        "maxX": 11,
+        "maxY": 17,
+        "width": 8,
+        "height": 11
+      },
+      "sha256": "fb3a2180d2cf08642eebd55a042adb4e22f2686a01bdcef592b2f7cba68b19c4",
+      "rgbaSHA256": "cd6df82af2d5d847e026a9209e4277e9310a3bdc120064b8d67235b45744a361",
+      "catalogueID": "antidote_broad",
+      "identified": true,
+      "kind": "consumable",
+      "animation": "static",
+      "authoring": "manual-logical-pixel-translation-from-generated-reference"
+    },
+    "catalogue-item/stonebark_tonic/identified": {
+      "path": "assets/43bc78a2f2e9d129349c51d62c6667ea342825a7de7af1bfb9dee61ced425944.png",
+      "width": 16,
+      "height": 19,
+      "pivot": [
+        8,
+        18
+      ],
+      "bounds": {
+        "minX": 4,
+        "minY": 8,
+        "maxX": 11,
+        "maxY": 17,
+        "width": 8,
+        "height": 10
+      },
+      "sha256": "43bc78a2f2e9d129349c51d62c6667ea342825a7de7af1bfb9dee61ced425944",
+      "rgbaSHA256": "099928a999f326e2d37b280f846023e05d54b85aac96b894540ceb2704286468",
+      "catalogueID": "stonebark_tonic",
+      "identified": true,
+      "kind": "consumable",
+      "animation": "static",
+      "authoring": "manual-logical-pixel-translation-from-generated-reference"
+    },
+    "catalogue-item/venom/identified": {
+      "path": "assets/3d2ae594f0d979a1bc61aab4a036c259ef04a687e49eedb18d7a616f8edb3d5a.png",
+      "width": 16,
+      "height": 19,
+      "pivot": [
+        8,
+        18
+      ],
+      "bounds": {
+        "minX": 5,
+        "minY": 9,
+        "maxX": 9,
+        "maxY": 17,
+        "width": 5,
+        "height": 9
+      },
+      "sha256": "3d2ae594f0d979a1bc61aab4a036c259ef04a687e49eedb18d7a616f8edb3d5a",
+      "rgbaSHA256": "1c8186ea8779d33edbdabb8040bb6d66ff50b390a2c7a3130b584ccca618013a",
+      "catalogueID": "venom",
+      "identified": true,
+      "kind": "consumable",
+      "animation": "static",
+      "authoring": "manual-logical-pixel-translation-from-generated-reference"
+    },
+    "catalogue-item/firebrand/identified": {
+      "path": "assets/96352427671fcd7885ec7987e0175c26b0a3ac137de1b551842d36d347bdab85.png",
+      "width": 16,
+      "height": 19,
+      "pivot": [
+        8,
+        18
+      ],
+      "bounds": {
+        "minX": 5,
+        "minY": 8,
+        "maxX": 9,
+        "maxY": 17,
+        "width": 5,
+        "height": 10
+      },
+      "sha256": "96352427671fcd7885ec7987e0175c26b0a3ac137de1b551842d36d347bdab85",
+      "rgbaSHA256": "5e557b31b913aa57656aedfa3073a37ef5fddfde2dd5ea76f976b743773832eb",
+      "catalogueID": "firebrand",
+      "identified": true,
+      "kind": "consumable",
+      "animation": "static",
+      "authoring": "manual-logical-pixel-translation-from-generated-reference"
+    },
+    "catalogue-item/briar_oil/identified": {
+      "path": "assets/89c533e6f9d7f98da2729f93b179aa036e7eb3254fdc15881321a30501445bc6.png",
+      "width": 16,
+      "height": 19,
+      "pivot": [
+        8,
+        18
+      ],
+      "bounds": {
+        "minX": 3,
+        "minY": 9,
+        "maxX": 12,
+        "maxY": 17,
+        "width": 10,
+        "height": 9
+      },
+      "sha256": "89c533e6f9d7f98da2729f93b179aa036e7eb3254fdc15881321a30501445bc6",
+      "rgbaSHA256": "0c030d26818631bcf09fee75426c6e17555732d442170416c2603cf548b4f7e0",
+      "catalogueID": "briar_oil",
+      "identified": true,
+      "kind": "consumable",
+      "animation": "static",
+      "authoring": "manual-logical-pixel-translation-from-generated-reference"
+    },
+    "catalogue-item/flashsalt/identified": {
+      "path": "assets/d6e6eda2b752d6c32ebad218b1a092cc5ef6d2c81536a1d12c19b42c50481af2.png",
+      "width": 16,
+      "height": 19,
+      "pivot": [
+        8,
+        18
+      ],
+      "bounds": {
+        "minX": 3,
+        "minY": 9,
+        "maxX": 10,
+        "maxY": 17,
+        "width": 8,
+        "height": 9
+      },
+      "sha256": "d6e6eda2b752d6c32ebad218b1a092cc5ef6d2c81536a1d12c19b42c50481af2",
+      "rgbaSHA256": "a4eab49fb63499d59190b2b18aaecbf9c3ef79c32ec0bc43ef67f8189c35bb6f",
+      "catalogueID": "flashsalt",
+      "identified": true,
+      "kind": "consumable",
+      "animation": "static",
+      "authoring": "manual-logical-pixel-translation-from-generated-reference"
+    },
+    "catalogue-item/solvent/identified": {
+      "path": "assets/3dfafe9934c2682ff4e2c37bd0562494c7210fa7c6b5ae937f6ea6774cc42d1c.png",
+      "width": 16,
+      "height": 19,
+      "pivot": [
+        8,
+        18
+      ],
+      "bounds": {
+        "minX": 6,
+        "minY": 8,
+        "maxX": 9,
+        "maxY": 17,
+        "width": 4,
+        "height": 10
+      },
+      "sha256": "3dfafe9934c2682ff4e2c37bd0562494c7210fa7c6b5ae937f6ea6774cc42d1c",
+      "rgbaSHA256": "32b549076419c8d997045f278b5b7976dc8d047ea24afb90cfc340d6aa8a78d4",
+      "catalogueID": "solvent",
+      "identified": true,
+      "kind": "consumable",
+      "animation": "static",
+      "authoring": "manual-logical-pixel-translation-from-generated-reference"
+    },
+    "catalogue-item/lure/identified": {
+      "path": "assets/53dfdda29ff70bf34262f08c48cee5e66553a18763a35e8da2eb7ed8aa26cbc8.png",
+      "width": 16,
+      "height": 19,
+      "pivot": [
+        8,
+        18
+      ],
+      "bounds": {
+        "minX": 4,
+        "minY": 8,
+        "maxX": 11,
+        "maxY": 17,
+        "width": 8,
+        "height": 10
+      },
+      "sha256": "53dfdda29ff70bf34262f08c48cee5e66553a18763a35e8da2eb7ed8aa26cbc8",
+      "rgbaSHA256": "74885660a45a93d051c2661975355349863bb3235e0c64b3421e3762ff752583",
+      "catalogueID": "lure",
+      "identified": true,
+      "kind": "consumable",
+      "animation": "static",
+      "authoring": "manual-logical-pixel-translation-from-generated-reference"
+    },
+    "catalogue-item/scent_mask/identified": {
+      "path": "assets/2f9634b459359015a36ed90471dc47f89b09f48951fdb5db7258a62c127a8dc1.png",
+      "width": 16,
+      "height": 19,
+      "pivot": [
+        8,
+        18
+      ],
+      "bounds": {
+        "minX": 3,
+        "minY": 8,
+        "maxX": 12,
+        "maxY": 17,
+        "width": 10,
+        "height": 10
+      },
+      "sha256": "2f9634b459359015a36ed90471dc47f89b09f48951fdb5db7258a62c127a8dc1",
+      "rgbaSHA256": "592aa21e346bbd76306b3442810b4abdf71f9b29f0d846471570e798b22aef17",
+      "catalogueID": "scent_mask",
+      "identified": true,
+      "kind": "consumable",
+      "animation": "static",
+      "authoring": "manual-logical-pixel-translation-from-generated-reference"
+    },
+    "catalogue-item/stillwater/identified": {
+      "path": "assets/6a30fcb8c7e52f16408fba82155580f036c4117e7cbd100cf7fb10bf2a1b5629.png",
+      "width": 16,
+      "height": 19,
+      "pivot": [
+        8,
+        18
+      ],
+      "bounds": {
+        "minX": 3,
+        "minY": 8,
+        "maxX": 12,
+        "maxY": 17,
+        "width": 10,
+        "height": 10
+      },
+      "sha256": "6a30fcb8c7e52f16408fba82155580f036c4117e7cbd100cf7fb10bf2a1b5629",
+      "rgbaSHA256": "61d192470f0f5044add8e1eb7a1e612397397ecc337cbf30b7dd825baa706a1b",
+      "catalogueID": "stillwater",
+      "identified": true,
+      "kind": "consumable",
+      "animation": "static",
+      "authoring": "manual-logical-pixel-translation-from-generated-reference"
+    },
+    "catalogue-item/waystone/identified": {
+      "path": "assets/ecaeff9a60774aa1251f3b207a596074dfbe2bc4fa4948e5ebf1a915a708816d.png",
+      "width": 16,
+      "height": 19,
+      "pivot": [
+        8,
+        18
+      ],
+      "bounds": {
+        "minX": 3,
+        "minY": 8,
+        "maxX": 11,
+        "maxY": 17,
+        "width": 9,
+        "height": 10
+      },
+      "sha256": "ecaeff9a60774aa1251f3b207a596074dfbe2bc4fa4948e5ebf1a915a708816d",
+      "rgbaSHA256": "1d4a0d25e52568cdbe1a4cd8890b75c017ca1224d87280278f2b4ae9315b0f49",
+      "catalogueID": "waystone",
+      "identified": true,
+      "kind": "consumable",
+      "animation": "static",
+      "authoring": "manual-logical-pixel-translation-from-generated-reference"
+    },
+    "catalogue-item/torch/identified": {
+      "path": "assets/8500a93489656b0f9ebcdb8753690ff30ac2692a648fe7e260929856b0b596fa.png",
+      "width": 16,
+      "height": 19,
+      "pivot": [
+        8,
+        18
+      ],
+      "bounds": {
+        "minX": 5,
+        "minY": 8,
+        "maxX": 9,
+        "maxY": 17,
+        "width": 5,
+        "height": 10
+      },
+      "sha256": "8500a93489656b0f9ebcdb8753690ff30ac2692a648fe7e260929856b0b596fa",
+      "rgbaSHA256": "90509257282a85404432ef44cdca0307969335b961900dad9246b849988c3d9e",
+      "catalogueID": "torch",
+      "identified": true,
+      "kind": "consumable",
+      "animation": "static",
+      "authoring": "manual-logical-pixel-translation-from-generated-reference"
+    },
+    "catalogue-item/farsight_draught/identified": {
+      "path": "assets/de9695f9dc7ea269246611ee52458b90f0a903446e4c7b9d2617d6baba0b07b1.png",
+      "width": 16,
+      "height": 19,
+      "pivot": [
+        8,
+        18
+      ],
+      "bounds": {
+        "minX": 3,
+        "minY": 8,
+        "maxX": 12,
+        "maxY": 17,
+        "width": 10,
+        "height": 10
+      },
+      "sha256": "de9695f9dc7ea269246611ee52458b90f0a903446e4c7b9d2617d6baba0b07b1",
+      "rgbaSHA256": "f813c7b0c875f1a8389983395e9c5d1a26c000482686c9cd634bfc90ff01d7c6",
+      "catalogueID": "farsight_draught",
+      "identified": true,
+      "kind": "consumable",
+      "animation": "static",
+      "authoring": "manual-logical-pixel-translation-from-generated-reference"
+    },
+    "catalogue-item/cache_key/identified": {
+      "path": "assets/49396e2ea357d6484afac8f29a533533ec604cfccdbcc15bc0b19da9916783ca.png",
+      "width": 16,
+      "height": 19,
+      "pivot": [
+        8,
+        18
+      ],
+      "bounds": {
+        "minX": 3,
+        "minY": 9,
+        "maxX": 11,
+        "maxY": 17,
+        "width": 9,
+        "height": 9
+      },
+      "sha256": "49396e2ea357d6484afac8f29a533533ec604cfccdbcc15bc0b19da9916783ca",
+      "rgbaSHA256": "4baba1d7a8e6b61239e20fb6fce4c334c0bf87a5e76be1ac2c2d56c4ba3e2c2c",
+      "catalogueID": "cache_key",
+      "identified": true,
+      "kind": "key",
+      "animation": "static",
+      "authoring": "manual-logical-pixel-translation-from-generated-reference"
+    },
+    "catalogue-item/anchor_frame/identified": {
+      "path": "assets/397ff6c3c387379060b454211a099d9dbd7119cb24d8e0d2bf38fe6f07c70658.png",
+      "width": 16,
+      "height": 19,
+      "pivot": [
+        8,
+        18
+      ],
+      "bounds": {
+        "minX": 3,
+        "minY": 8,
+        "maxX": 11,
+        "maxY": 17,
+        "width": 9,
+        "height": 10
+      },
+      "sha256": "397ff6c3c387379060b454211a099d9dbd7119cb24d8e0d2bf38fe6f07c70658",
+      "rgbaSHA256": "10f4e8e5d35ee526051cca552b0abc31801dc918357c50cf15a89091283d0393",
+      "catalogueID": "anchor_frame",
+      "identified": true,
+      "kind": "key",
+      "animation": "static",
+      "authoring": "manual-logical-pixel-translation-from-generated-reference"
+    },
+    "catalogue-item/unknown-curio": {
+      "path": "assets/dc80346ddcbed62baac4c6aeb7012e8d3bc18347b2e9d264e89a3fbe322a4dff.png",
+      "width": 16,
+      "height": 19,
+      "pivot": [
+        8,
+        18
+      ],
+      "bounds": {
+        "minX": 3,
+        "minY": 7,
+        "maxX": 12,
+        "maxY": 17,
+        "width": 10,
+        "height": 11
+      },
+      "sha256": "dc80346ddcbed62baac4c6aeb7012e8d3bc18347b2e9d264e89a3fbe322a4dff",
+      "rgbaSHA256": "075bf5ec91b27055fb4e7829999bff5142a834233b36063fc8d243d15b96baa9",
+      "catalogueID": null,
+      "identified": false,
+      "kind": "curio",
+      "animation": "static",
+      "authoring": "byte-preserved-accepted-opaque-unknown-parcel"
+    }
+  },
+  "evidence": {
+    "production-objects-native-800pct": {
+      "path": "evidence/production-objects-native-800pct.png",
+      "sha256": "d70a56b359ad1491ab221ec42b83be0e0f0387bd541f689b13fc2d6eb58b5634",
+      "width": 1080,
+      "height": 2532
+    },
+    "production-objects-native-800pct-grayscale": {
+      "path": "evidence/production-objects-native-800pct-grayscale.png",
+      "sha256": "069e8213a63010af9b07f1983fbbf395f6dbafc7ef2fa44cd770b6bb30c03bad",
+      "width": 1080,
+      "height": 2532
+    },
+    "applied-map-objects-1-368x800": {
+      "path": "evidence/applied-map-objects-1-368x800.png",
+      "sha256": "8e289680c07d314486f8ea1dc67b1b55d93e78bad6b72c1c25a1220196bccc4e",
+      "width": 368,
+      "height": 800
+    },
+    "applied-map-objects-1-grayscale-368x800": {
+      "path": "evidence/applied-map-objects-1-grayscale-368x800.png",
+      "sha256": "ad2652b41ecd1bfdcafbdd8a3c94c5d9d72cf215b2422d8391512d437f2721f4",
+      "width": 368,
+      "height": 800
+    },
+    "applied-map-objects-2-368x800": {
+      "path": "evidence/applied-map-objects-2-368x800.png",
+      "sha256": "c3c958227436ad5b1c8b3b08260ff841eafe1dcca7e054622d85c1eacbd711e0",
+      "width": 368,
+      "height": 800
+    },
+    "applied-map-objects-2-grayscale-368x800": {
+      "path": "evidence/applied-map-objects-2-grayscale-368x800.png",
+      "sha256": "1418cb88ee55440e41ac0c80d871144d1f5f3cbd5b6ca38eb3784b25490bd9d9",
+      "width": 368,
+      "height": 800
+    },
+    "applied-map-objects-3-368x800": {
+      "path": "evidence/applied-map-objects-3-368x800.png",
+      "sha256": "096c0f175dbcac6510fcd6c67904277a8fea2c2c73a2a29263ca82c7abc022dc",
+      "width": 368,
+      "height": 800
+    },
+    "applied-map-objects-3-grayscale-368x800": {
+      "path": "evidence/applied-map-objects-3-grayscale-368x800.png",
+      "sha256": "6c900a48851174107393921a9337889b33ffc554c1381d90256f49906db43e0e",
+      "width": 368,
+      "height": 800
+    },
+    "curio-disclosure-and-visibility-800pct": {
+      "path": "evidence/curio-disclosure-and-visibility-800pct.png",
+      "sha256": "23b8dfba69f3c5223475a6d4064396bd6be69fc60738060066972c3cb1166b25",
+      "width": 1040,
+      "height": 450
+    },
+    "curio-disclosure-and-visibility-800pct-grayscale": {
+      "path": "evidence/curio-disclosure-and-visibility-800pct-grayscale.png",
+      "sha256": "b9b00e21b2a62205630f5be8f20809f174dfa48c8583924f90bbf01718f16d38",
+      "width": 1040,
+      "height": 450
+    }
+  },
+  "coverage": {
+    "catalogueIDs": 27,
+    "identifiedAssets": 27,
+    "unknownDisclosureAssets": 1,
+    "stableKeys": 28,
+    "runtimePNGs": 28,
+    "treasures": 5,
+    "curios": 2,
+    "consumables": 18,
+    "keys": 2
+  },
+  "runtimeAssetAggregateSHA256": "9731e732f698580965faf8ecf9bdc0494b21d68746b4b19ec0f432cf4c6ad70a",
+  "canonicalBodySHA256": "b3478c3dcf6d6e43fbdfdf5c6e90bc877fdbd287231c03516eccd0df1e2beeaf"
+}
