@@ -694,26 +694,39 @@ final class WorldTests: XCTestCase {
         XCTAssertEqual(MinimapDisclosure.marker(for: Tile(isRevealed: true), enemy: apex), .apex)
     }
 
-    @MainActor func testMinimapDoesNotLeakSleepingCrypsisOnRevealedTerrain() {
-        let store = GameStore(io: .temporary(name: "minimap-crypsis-\(UUID().uuidString)"))
-        store.write("plains")
-        store.bindAndDepart()
-        if let id = store.state.worlds.pendingWorldArrivalReceiptID {
-            XCTAssertTrue(store.enterPendingWorld(arrivalReceiptID: id))
-        }
-        var run = store.state.worlds.activeRun!
+    func testMinimapDoesNotLeakSleepingCrypsisOnRevealedTerrain() {
+        let player = GridPoint(x: 1, y: 1)
+        let distant = GridPoint(x: 5, y: 1)
+        let adjacent = GridPoint(x: 2, y: 1)
+        var map = WorldMap(width: 7, height: 3,
+                           tiles: Array(repeating: Tile(ground: .soil, isRevealed: true), count: 21),
+                           entry: player)
+        map[player].content = .portal(isEntry: true)
+        var tuning = DebugTuningProfile.defaults
+        tuning.baseVisionRadius = 1
         var traits = CreatureTraits()
         traits.defence = .crypsis
-        let point = GridPoint(x: run.playerPosition.x + 4, y: run.playerPosition.y)
-        run.map[point].content = .empty
-        run.map[point].isRevealed = true
-        run.enemies = [WorldEnemy(id: InstanceID(rawValue: 77), traits: traits, position: point)]
-        XCTAssertNil(MinimapDisclosure.marker(at: point, in: run))
-        run.enemies[0].isAwake = true
-        XCTAssertNil(MinimapDisclosure.marker(at: point, in: run),
-                     "Moving mobs outside present LOS must stay off the minimap")
-        run.playerPosition = GridPoint(x: point.x - 1, y: point.y)
-        XCTAssertEqual(MinimapDisclosure.marker(at: point, in: run), .encounter)
+        var subject = WorldEnemy(id: InstanceID(rawValue: 77), traits: traits, position: distant)
+        let unrelated = WorldEnemy(id: InstanceID(rawValue: 88), position: GridPoint(x: 6, y: 2))
+
+        func run(enemies: [WorldEnemy]) -> WorldRun {
+            WorldRun(runIndex: 1, book: book([:]), mapSeed: 1, rng: SeededRNG(seed: 1),
+                     map: map, playerPosition: player, enemies: enemies, tuning: tuning)
+        }
+        func assertMarker(_ expected: MinimapDisclosure.Marker?, subject: WorldEnemy,
+                          file: StaticString = #filePath, line: UInt = #line) {
+            for enemies in [[subject, unrelated], [unrelated, subject]] {
+                XCTAssertEqual(MinimapDisclosure.marker(at: subject.position, in: run(enemies: enemies)),
+                               expected, "enemy order must not alter disclosure", file: file, line: line)
+            }
+        }
+
+        assertMarker(nil, subject: subject)
+        XCTAssertEqual(subject.awareness, .unaware)
+        subject.isAwake = true
+        assertMarker(nil, subject: subject)
+        subject.position = adjacent
+        assertMarker(.encounter, subject: subject)
     }
 
     /// Acceptance criterion: two books with different symbols must produce visibly different worlds.
