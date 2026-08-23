@@ -116,6 +116,7 @@ enum TerrainRules {
     static func paint(_ map: inout WorldMap, readings: PressureReadings,
                       asWritten: PressureReadings? = nil, flora: [Flora] = [],
                       resolvedSigils: [Sigil] = [], visualSeed: UInt64 = 0,
+                      hydrologyObserver: ((HydrologyDiagnostics) -> Void)? = nil,
                       rng: inout SeededRNG) -> Bool {
         let substrate = readings["substrate"]
         let water = readings["hydrology"]
@@ -150,8 +151,9 @@ enum TerrainRules {
         let holes = max(chasmCoverage(in: readings),
                         asWritten.map { chasmCoverage(in: $0) } ?? 0)
         paintChasms(&map, coverage: holes, rng: &rng)
-        guard paintWater(&map, water: water, freezing: freezing, rng: &rng).succeeded
-        else { return false }
+        let hydrology = paintWater(&map, water: water, freezing: freezing, rng: &rng)
+        hydrologyObserver?(hydrology)
+        guard hydrology.succeeded else { return false }
         relaxCardinalElevation(&map)
         paintMud(&map, freezing: freezing)
         paintGrowth(&map, life: life, flora: flora, rng: &rng)

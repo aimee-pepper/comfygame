@@ -341,9 +341,11 @@ enum Worldgen {
         // 0a. The ground itself, before anything is placed on it. Relief, Substrate, Hydrology,
         //    Thermal and Vitality all write here — this is the surface the pressure model was
         //    missing, and without it Relief had nothing to say.
+        var hydrologyDiagnostics: TerrainRules.HydrologyDiagnostics?
         var terrainGenerationSucceeded = TerrainRules.paint(
             &map, readings: readings, asWritten: asWritten, flora: flora,
-            resolvedSigils: resolvedSigils, visualSeed: seed, rng: &terrainRNG)
+            resolvedSigils: resolvedSigils, visualSeed: seed,
+            hydrologyObserver: { hydrologyDiagnostics = $0 }, rng: &terrainRNG)
 
         // 1. Where you arrive: a portal on the edge. It works as an exit too, so retreating the
         //    way you came is always possible — it just costs you the turns to walk back.
@@ -827,6 +829,9 @@ enum Worldgen {
         diagnostics.reachableTerrainFraction = reachability.reachableFraction
         diagnostics.softenedDeepWaterTiles = reachability.softenedDeepWater
         diagnostics.filledChasmTiles = reachability.filledChasm
+        diagnostics.hydrologyTopology = hydrologyDiagnostics.flatMap {
+            hydrologyTopologyObservation($0, finalMap: map)
+        }
         diagnostics.selectedDiaryPages = pages
         diagnostics.selectedOtherWritingCount = noteCount
         diagnostics.placedDiaryPages = placedPages
@@ -860,6 +865,68 @@ enum Worldgen {
         return (map, enemies, sites, placedPages, foundWritings, wildPage, placedTravellers,
                 cast, flora, entry,
                 diagnostics)
+    }
+
+    private static func hydrologyTopologyObservation(
+        _ hydrology: TerrainRules.HydrologyDiagnostics, finalMap map: WorldMap
+    ) -> WorldHydrologyTopologyObservation? {
+        guard hydrology.succeeded else { return nil }
+        let regionColumns = 4
+        let regionRows = 3
+        let regionCount = regionRows * regionColumns
+        func regionIndex(_ point: GridPoint) -> Int {
+            let column = min(regionColumns - 1, point.x * regionColumns / map.width)
+            let row = min(regionRows - 1, point.y * regionRows / map.height)
+            return row * regionColumns + column
+        }
+        func counts<S: Sequence>(_ points: S) -> [Int] where S.Element == GridPoint {
+            points.reduce(into: Array(repeating: 0, count: regionCount)) {
+                $0[regionIndex($1)] += 1
+            }
+        }
+        let isLiquid: (GridPoint) -> Bool = {
+            map[$0].ground == .water || map[$0].ground == .deepWater
+        }
+        let standingBodies = hydrology.standingBodies.map { $0.filter(isLiquid) }.filter { !$0.isEmpty }
+        let flowingChannels = hydrology.channels.map { $0.tiles.filter(isLiquid) }.filter { !$0.isEmpty }
+        let standing = standingBodies.flatMap { $0 }
+        let flowing = flowingChannels.flatMap { $0 }
+        let frozen = map.allPoints.filter { map[$0].ground == .ice }
+        let standingSet = Set(standing)
+        let flowingSet = Set(flowing)
+        let liquidSet = Set(map.allPoints.filter(isLiquid))
+        guard standingSet.isDisjoint(with: flowingSet),
+              standingSet.union(flowingSet) == liquidSet else { return nil }
+        return WorldHydrologyTopologyObservation(
+            standingTiles: standing.count,
+            flowingTiles: flowing.count,
+            frozenTiles: frozen.count,
+            standingDeepTiles: standing.count { map[$0].ground == .deepWater },
+            flowingDeepTiles: flowing.count { map[$0].ground == .deepWater },
+            standingBodySizes: standingBodies.map(\.count).sorted(),
+            flowingChannelSizes: flowingChannels.map(\.count).sorted(),
+            frozenBodySizes: componentSizes(of: Set(frozen), in: map),
+            standingRegionCounts: counts(standing),
+            flowingRegionCounts: counts(flowing),
+            frozenRegionCounts: counts(frozen))
+    }
+
+    private static func componentSizes(of points: Set<GridPoint>, in map: WorldMap) -> [Int] {
+        var remaining = points
+        var result: [Int] = []
+        while let start = remaining.min(by: { ($0.y, $0.x) < ($1.y, $1.x) }) {
+            var count = 0
+            var queue = [start]
+            remaining.remove(start)
+            while let point = queue.popLast() {
+                count += 1
+                for next in map.neighbours(of: point) where remaining.remove(next) != nil {
+                    queue.append(next)
+                }
+            }
+            result.append(count)
+        }
+        return result.sorted()
     }
 
     private static func playableEntryCandidates(in map: WorldMap, component: Set<GridPoint>,

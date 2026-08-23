@@ -90,10 +90,8 @@ final class PageTests: XCTestCase {
     }
 
     func testWorldArrivalOrdinaryPhoneLayoutAndCrispThumbnailGeometry() {
-        XCTAssertEqual(WorldArrivalLayout.metrics(width: 368).sceneSize,
-                       CGSize(width: 320, height: 200))
-        XCTAssertEqual(WorldArrivalLayout.metrics(width: 320).sceneSize,
-                       CGSize(width: 296, height: 185))
+        XCTAssertEqual(WorldArrivalLayout.metrics(width: 368).sceneWidth, 320)
+        XCTAssertEqual(WorldArrivalLayout.metrics(width: 320).sceneWidth, 296)
         let cell = floor(54.0 / 6.0)
         XCTAssertEqual(cell, 9)
         XCTAssertEqual((54 - cell * 6) / 2, 0)
@@ -103,27 +101,122 @@ final class PageTests: XCTestCase {
     }
 
     @MainActor
-    func testWorldArrivalRendersOrdinaryAndAccessibilityPhoneLayouts() throws {
+    func testWorldArrivalRendersOrdinaryPhoneLayoutsInLightAndDark() throws {
+        func pixels(_ image: UIImage) throws -> (data: Data, width: Int, height: Int, row: Int) {
+            let cg = try XCTUnwrap(image.cgImage)
+            let row = cg.width * 4
+            var bytes = [UInt8](repeating: 0, count: row * cg.height)
+            try bytes.withUnsafeMutableBytes { storage in
+                let context = try XCTUnwrap(CGContext(
+                    data: storage.baseAddress, width: cg.width, height: cg.height,
+                    bitsPerComponent: 8, bytesPerRow: row,
+                    space: CGColorSpaceCreateDeviceRGB(),
+                    bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue))
+                context.translateBy(x: 0, y: CGFloat(cg.height))
+                context.scaleBy(x: 1, y: -1)
+                context.interpolationQuality = .none
+                context.draw(cg, in: CGRect(x: 0, y: 0, width: cg.width, height: cg.height))
+            }
+            return (Data(bytes), cg.width, cg.height, row)
+        }
+        func largestNonBackgroundBounds(in mounted: UIImage) throws -> CGRect {
+            let whole = try pixels(mounted)
+            let background = (0..<3).map { whole.data[$0] }
+            let limitY = min(620, whole.height)
+            var visible = Array(repeating: false, count: whole.width * limitY)
+            for y in 0..<limitY {
+                for x in 0..<whole.width {
+                    let offset = y * whole.row + x * 4
+                    visible[y * whole.width + x] = (0..<3).contains {
+                        abs(Int(whole.data[offset + $0]) - Int(background[$0])) > 8
+                    }
+                }
+            }
+            var visited = Array(repeating: false, count: visible.count)
+            var best = CGRect.zero
+            for start in visible.indices where visible[start] && !visited[start] {
+                var queue = [start]
+                visited[start] = true
+                var cursor = 0
+                var minX = whole.width, maxX = 0, minY = limitY, maxY = 0
+                while cursor < queue.count {
+                    let current = queue[cursor]; cursor += 1
+                    let x = current % whole.width, y = current / whole.width
+                    minX = min(minX, x); maxX = max(maxX, x)
+                    minY = min(minY, y); maxY = max(maxY, y)
+                    for next in [current - (x > 0 ? 1 : 0), current + (x + 1 < whole.width ? 1 : 0),
+                                 current - (y > 0 ? whole.width : 0),
+                                 current + (y + 1 < limitY ? whole.width : 0)]
+                    where next != current && visible[next] && !visited[next] {
+                        visited[next] = true
+                        queue.append(next)
+                    }
+                }
+                let bounds = CGRect(x: minX, y: minY,
+                                    width: maxX - minX + 1, height: maxY - minY + 1)
+                if bounds.width * bounds.height > best.width * best.height { best = bounds }
+            }
+            return best
+        }
+        func mountedSceneInteriorMatch(mounted: UIImage, scene: UIImage) throws -> Double {
+            let whole = try pixels(mounted)
+            let source = try pixels(scene)
+            var best = 0.0
+            for originY in 0...min(440, whole.height - source.height) {
+                var matched = 0
+                var sampled = 0
+                for y in stride(from: 8, to: source.height - 8, by: 8) {
+                    for x in stride(from: 8, to: source.width - 8, by: 8) {
+                        let lhs = y * source.row + x * 4
+                        let rhs = (originY + y) * whole.row + (24 + x) * 4
+                        if (0..<3).allSatisfy({
+                            abs(Int(source.data[lhs + $0]) - Int(whole.data[rhs + $0])) <= 8
+                        }) { matched += 1 }
+                        sampled += 1
+                    }
+                }
+                best = max(best, Double(matched) / Double(sampled))
+            }
+            return best
+        }
+        func snapshot(_ view: UIView, size: CGSize) -> UIImage {
+            let format = UIGraphicsImageRendererFormat()
+            format.scale = 1
+            format.opaque = true
+            return UIGraphicsImageRenderer(size: size, format: format).image { _ in
+                view.drawHierarchy(in: view.bounds, afterScreenUpdates: true)
+            }
+        }
         let store = GameStore(io: .temporary(name: "arrival-layout-\(UUID().uuidString)"))
         XCTAssertTrue(store.bindAndDepart(
             worldPageInstanceID: WorldPageCatalog.earthlikeTestInstance.id))
         var receipt = try XCTUnwrap(store.state.worlds.pendingWorldArrivalReceipt)
+        receipt.sourcePagePhysicalReceipt.title =
+            "The Exceptionally Long Chronicle of the Rain-Washed Archipelago Beyond the Stone Horizon"
         receipt.finalDescription = "Broad stone shelves rise above narrow soil paths and connected pools of shallow water, with deep channels cutting between the largest dry crossings. Your Archipelago Sigil divided the route into separate shelves, while your Verdant Sigil spread dense low growth across the dampest edges and left the higher exposed ground comparatively bare near the entry."
         XCTAssertEqual(receipt.finalDescription.split(whereSeparator: \.isWhitespace).count, 55)
-        if !receipt.sourcePagePhysicalReceipt.marks.isEmpty {
-            receipt.sourcePagePhysicalReceipt.marks[0].isReadable = false
-            receipt.sourcePagePhysicalReceipt.marks[0].visibleLabel = "hidden-semantic-name"
+        if let template = receipt.sourcePagePhysicalReceipt.marks.first {
+            receipt.sourcePagePhysicalReceipt.marks = (0..<36).map { index in
+                var mark = template
+                mark.id = .init(rawValue: UInt64(90_000 + index))
+                mark.origin = .init(column: index % 6, row: index / 6)
+                mark.cells = [mark.origin]
+                mark.isReadable = true
+                mark.visibleLabel = "Disclosed Sigil \(index + 1)"
+                return mark
+            }
         }
 
-        for (width, typeSize, expectedScroll) in [
-            (CGFloat(368), DynamicTypeSize.large, false),
-            (CGFloat(320), DynamicTypeSize.large, false),
-            (CGFloat(368), DynamicTypeSize.accessibility3, true)
+        for (width, scheme, name) in [
+            (CGFloat(368), ColorScheme.dark, "dark-368"),
+            (CGFloat(368), ColorScheme.light, "light-368"),
+            (CGFloat(320), ColorScheme.dark, "dark-320")
         ] {
             let host = UIHostingController(rootView:
                 WorldArrivalView(receipt: receipt)
                     .environmentObject(store)
-                    .environment(\.dynamicTypeSize, typeSize)
+                    .environment(\.dynamicTypeSize, .large)
+                    .environment(\.colorScheme, scheme)
                     .frame(width: width, height: 800))
             let window = UIWindow(frame: CGRect(x: 0, y: 0, width: width, height: 800))
             window.rootViewController = host
@@ -132,20 +225,54 @@ final class PageTests: XCTestCase {
             host.view.layoutIfNeeded()
             RunLoop.main.run(until: Date().addingTimeInterval(0.05))
             let scrolls = arrivalDescendants(of: host.view).compactMap { $0 as? UIScrollView }
-            XCTAssertEqual(!scrolls.isEmpty, expectedScroll)
-            let image = UIGraphicsImageRenderer(size: window.bounds.size).image { _ in
-                host.view.drawHierarchy(in: host.view.bounds, afterScreenUpdates: true)
-            }
+            XCTAssertFalse(scrolls.isEmpty)
+            let scroll = try XCTUnwrap(scrolls.max(by: { $0.bounds.width < $1.bounds.width }))
+            let scrollFrame = scroll.convert(scroll.bounds, to: host.view)
+            XCTAssertGreaterThan(scroll.contentSize.height, scroll.bounds.height,
+                "longest legal copy and full disclosed-Sigil list must remain scroll-reachable")
+            let image = snapshot(host.view, size: window.bounds.size)
             XCTAssertEqual(image.size, CGSize(width: width, height: 800))
+            XCTAssertEqual(scrollFrame.maxY,
+                WorldArrivalLayout.enterFrame(height: 800).lowerBound, accuracy: 1,
+                "decision content must end exactly adjacent to the fixed Enter World action")
+            if width == 368 {
+                let splash = try XCTUnwrap(receipt.worldSplashReceiptV3)
+                let scene = try XCTUnwrap(WorldArrivalNativeRenderer.placeholderImage(
+                    for: splash, size: .init(width: 320, height: 360)))
+                XCTAssertEqual(scene.cgImage?.width, 320)
+                XCTAssertEqual(scene.cgImage?.height, 360)
+                XCTAssertGreaterThan(try mountedSceneInteriorMatch(mounted: image, scene: scene), 0.90,
+                    "mounted scene interior must retain the direct renderer's full raster")
+                let occupied = try largestNonBackgroundBounds(in: image)
+                XCTAssertGreaterThanOrEqual(occupied.width, 310,
+                    "mounted scene must not collapse to a narrow theme/width-dependent strip")
+                XCTAssertGreaterThanOrEqual(occupied.height, 348,
+                    "mounted scene must retain materially full 320x360 occupied raster")
+            }
             let attachment = XCTAttachment(image: image)
-            attachment.name = "world-arrival-\(Int(width))-\(typeSize)"
+            attachment.name = "world-arrival-\(name)"
             attachment.lifetime = .keepAlways
             add(attachment)
+            let maximumOffset = max(0, scroll.contentSize.height - scroll.bounds.height)
+            scroll.setContentOffset(CGPoint(x: 0, y: maximumOffset), animated: false)
+            host.view.layoutIfNeeded()
+            RunLoop.main.run(until: Date().addingTimeInterval(0.02))
+            XCTAssertEqual(scroll.contentOffset.y, maximumOffset, accuracy: 1)
+            XCTAssertEqual(scroll.contentSize.height - scroll.contentOffset.y,
+                           scroll.bounds.height, accuracy: 1,
+                           "the final provenance/Sigil content boundary must be reachable above the action")
+            let bottom = snapshot(host.view, size: window.bounds.size)
+            XCTAssertNotEqual(try pixels(image).data, try pixels(bottom).data,
+                "the complete provenance/Sigil content must be reachable above the fixed action")
+            let bottomAttachment = XCTAttachment(image: bottom)
+            bottomAttachment.name = "world-arrival-\(name)-provenance"
+            bottomAttachment.lifetime = .keepAlways
+            add(bottomAttachment)
             window.isHidden = true
         }
     }
 
-    private func arrivalDescendants(of view: UIView) -> [UIView] {
+    @MainActor private func arrivalDescendants(of view: UIView) -> [UIView] {
         [view] + view.subviews.flatMap(arrivalDescendants)
     }
 
@@ -302,6 +429,29 @@ final class PageTests: XCTestCase {
         XCTAssertEqual(splash.flora.species.map(\.placedTileCount).reduce(0, +),
                        store.activeRun?.map.tiles.count { $0.flora != nil })
         XCTAssertNotNil(WorldArrivalNativeRenderer.placeholderImage(for: splash))
+        let splashCommands = try XCTUnwrap(WorldArrivalNativeRenderer.splashCommands(for: splash))
+        let materialCommand = try XCTUnwrap(splashCommands.first {
+            $0.scope == .terrainMass && $0.semanticID == "material-presentation"
+        })
+        let materialDescriptor = try splash.terrain.materialPresentation.resolvedDescriptor()
+        for cell in splash.firstMapCropReceipt.cells where cell.visibility != "hidden" {
+            let ground = try XCTUnwrap(cell.ground)
+            let packGround = try XCTUnwrap(TerrainProductionPack.Ground(rawValue: ground.rawValue))
+            let palette = try TerrainProductionPack.resolvedGroundPalette(
+                packGround, descriptor: materialDescriptor)
+            let encoded = ground.rawValue + "=" + palette.map {
+                "\($0.red),\($0.green),\($0.blue),\($0.alpha)"
+            }.joined(separator: "/")
+            XCTAssertTrue(materialCommand.values.contains(encoded))
+            if let floraID = cell.floraStableID {
+                let species = try XCTUnwrap(splash.flora.species.first { $0.stableID == floraID })
+                let identityCommand = try XCTUnwrap(splashCommands.first {
+                    $0.scope == .floraIdentity && $0.semanticID == floraID
+                })
+                XCTAssertTrue(identityCommand.values.contains(species.renderIdentity.speciesID))
+                XCTAssertEqual(species.renderIdentity.resolvedColor.srgb.count, 3)
+            }
+        }
         XCTAssertEqual(store.state.reality.library.visitedWorlds.last?.worldArrivalReceipt,
                        runReceipt)
         XCTAssertEqual(runReceipt.generationSeed, earth.definition.seed)
@@ -388,6 +538,1518 @@ final class PageTests: XCTestCase {
     }
 
     @MainActor
+    func testWorldSplashV3MalformedOptionalPayloadsFailClosedWithoutQuarantiningRun() throws {
+        let store = GameStore(io: .temporary(name: "splash-v3-fail-closed-\(UUID().uuidString)"))
+        XCTAssertTrue(store.bindAndDepart(
+            worldPageInstanceID: WorldPageCatalog.earthlikeTestInstance.id))
+        let accepted = try XCTUnwrap(store.activeRun?.worldArrivalReceipt)
+        let splash = try XCTUnwrap(accepted.worldSplashReceiptV3)
+
+        func decodeWith(_ malformed: WorldSplashReceiptV3,
+                        file: StaticString = #filePath, line: UInt = #line) throws {
+            var outer = accepted
+            outer.worldSplashReceiptV3 = malformed
+            let decoded = try JSONDecoder().decode(
+                WorldArrivalReceipt.self, from: JSONEncoder().encode(outer))
+            XCTAssertNil(decoded.worldSplashReceiptV3, file: file, line: line)
+            XCTAssertEqual(decoded.id, accepted.id, file: file, line: line)
+            XCTAssertEqual(decoded.finalDescription, accepted.finalDescription, file: file, line: line)
+        }
+
+        var duplicateGround = splash
+        duplicateGround.terrain.grounds[1].ground = duplicateGround.terrain.grounds[0].ground
+        duplicateGround.seal()
+        XCTAssertFalse(duplicateGround.validates())
+        try decodeWith(duplicateGround)
+
+        var oversizedDimensions = splash
+        oversizedDimensions.terrain.width = Int.max
+        oversizedDimensions.terrain.height = Int.max
+        oversizedDimensions.seal()
+        XCTAssertFalse(oversizedDimensions.validates())
+        try decodeWith(oversizedDimensions)
+
+        var oversizedCount = splash
+        oversizedCount.terrain.grounds[0].exactCount = Int.max
+        oversizedCount.seal()
+        XCTAssertFalse(oversizedCount.validates())
+        try decodeWith(oversizedCount)
+
+        var inconsistentRegionBand = splash
+        inconsistentRegionBand.terrain.regions[0].groundShares[0].band =
+            inconsistentRegionBand.terrain.regions[0].groundShares[0].band == .dominant
+                ? .none : .dominant
+        inconsistentRegionBand.seal()
+        XCTAssertFalse(inconsistentRegionBand.validates())
+        try decodeWith(inconsistentRegionBand)
+
+        if splash.relief.elevatedComponentSizes.count > 1 {
+            var unsortedComponents = splash
+            unsortedComponents.relief.elevatedComponentSizes.reverse()
+            unsortedComponents.seal()
+            XCTAssertFalse(unsortedComponents.validates())
+            try decodeWith(unsortedComponents)
+        }
+
+        var inconsistentEnvironment = splash
+        inconsistentEnvironment.environment.precipitationMedium = "none"
+        inconsistentEnvironment.environment.precipitationIntensity = "heavy"
+        inconsistentEnvironment.seal()
+        XCTAssertFalse(inconsistentEnvironment.validates())
+        try decodeWith(inconsistentEnvironment)
+
+        var impossibleSouthContacts = splash
+        impossibleSouthContacts.relief.southContactCounts[0] = Int.max
+        impossibleSouthContacts.seal()
+        XCTAssertFalse(impossibleSouthContacts.validates())
+        try decodeWith(impossibleSouthContacts)
+
+        var emptyOpportunityID = splash
+        emptyOpportunityID.explorationOpportunities.resources = [
+            .init(stableID: "", sourceCount: 1, obtainableQuantity: 1, causalMarkIDs: [])
+        ]
+        emptyOpportunityID.seal()
+        XCTAssertFalse(emptyOpportunityID.validates())
+        try decodeWith(emptyOpportunityID)
+
+        var zeroOpportunity = splash
+        zeroOpportunity.explorationOpportunities.resources = [
+            .init(stableID: "silver", sourceCount: 0, obtainableQuantity: 1, causalMarkIDs: [])
+        ]
+        zeroOpportunity.seal()
+        XCTAssertFalse(zeroOpportunity.validates())
+        try decodeWith(zeroOpportunity)
+
+        for (kind, stableID) in [("resource", "not_a_catalogue_resource")] {
+            var unknown = splash
+            let row = WorldSplashReceiptV3.ExplorationOpportunityRow(
+                stableID: stableID, sourceCount: 1, obtainableQuantity: 1, causalMarkIDs: [])
+            unknown.explorationOpportunities.resources = [row]
+            unknown.seal()
+            XCTAssertFalse(unknown.validates(), "unknown \(kind) must fail closed")
+            try decodeWith(unknown)
+        }
+
+        for stableID in ["ore", "essence_raw"] {
+            var ineligible = splash
+            ineligible.explorationOpportunities.resources = [
+                .init(stableID: stableID, sourceCount: 1,
+                      obtainableQuantity: 1, causalMarkIDs: [])
+            ]
+            ineligible.seal()
+            XCTAssertFalse(ineligible.validates(), "\(stableID) is not rare/precious")
+            try decodeWith(ineligible)
+        }
+
+        var crossFamilyOwner = splash
+        let wrongOwner = WorldArrivalReceipt.CausalVisualFact(
+            candidateMarkID: .init(rawValue: 987_654), semanticKey: "verdant",
+            markDisplayName: "Verdant", sourcePageOrder: 0, scope: .resource,
+            contributionKind: .increased, resultBand: "present", withoutAuthoredBand: "absent")
+        crossFamilyOwner.causalVisualFacts.append(wrongOwner)
+        crossFamilyOwner.explorationOpportunities.resources = [
+            .init(stableID: "ore", sourceCount: 1, obtainableQuantity: 1,
+                  causalMarkIDs: [wrongOwner.candidateMarkID])
+        ]
+        crossFamilyOwner.seal()
+        XCTAssertFalse(crossFamilyOwner.validates(),
+                       "a valid resource fact cannot own a family its symbol does not register")
+        try decodeWith(crossFamilyOwner)
+
+        var nonIncreasingOwner = splash
+        let reducedOre = WorldArrivalReceipt.CausalVisualFact(
+            candidateMarkID: .init(rawValue: 987_655), semanticKey: "common_ore",
+            markDisplayName: "Ore", sourcePageOrder: 0, scope: .resource,
+            contributionKind: .reduced, resultBand: "present", withoutAuthoredBand: "present")
+        nonIncreasingOwner.causalVisualFacts.append(reducedOre)
+        nonIncreasingOwner.explorationOpportunities.resources = [
+            .init(stableID: "ore", sourceCount: 1, obtainableQuantity: 1,
+                  causalMarkIDs: [reducedOre.candidateMarkID])
+        ]
+        nonIncreasingOwner.seal()
+        XCTAssertFalse(nonIncreasingOwner.validates(),
+                       "ordinary Ore requires a positive same-seed causal quantity delta")
+        try decodeWith(nonIncreasingOwner)
+
+        var unsortedOpportunities = splash
+        unsortedOpportunities.explorationOpportunities.resources = [
+            .init(stableID: "silver", sourceCount: 1, obtainableQuantity: 1, causalMarkIDs: []),
+            .init(stableID: "gold", sourceCount: 1, obtainableQuantity: 1, causalMarkIDs: [])
+        ]
+        unsortedOpportunities.seal()
+        XCTAssertFalse(unsortedOpportunities.validates())
+        try decodeWith(unsortedOpportunities)
+
+        var overCapacityOpportunities = splash
+        let opportunityTileCount = splash.terrain.width * splash.terrain.height
+        overCapacityOpportunities.explorationOpportunities.resources =
+            ["adamant", "gold", "mercury", "silver"].map {
+                .init(stableID: $0, sourceCount: opportunityTileCount,
+                      obtainableQuantity: opportunityTileCount
+                        * WorldSplashReceiptV3.maximumObtainableQuantityPerSource,
+                      causalMarkIDs: [])
+            }
+        overCapacityOpportunities.seal()
+        XCTAssertFalse(overCapacityOpportunities.validates())
+        XCTAssertNil(WorldArrivalNativeRenderer.placeholderImage(
+            for: overCapacityOpportunities, size: .init(width: 320, height: 360)))
+        try decodeWith(overCapacityOpportunities)
+
+        var duplicateCropPoint = splash
+        duplicateCropPoint.firstMapCropReceipt.cells[1].point =
+            duplicateCropPoint.firstMapCropReceipt.cells[0].point
+        duplicateCropPoint.seal()
+        XCTAssertFalse(duplicateCropPoint.validates())
+        try decodeWith(duplicateCropPoint)
+
+        var hiddenPayload = splash
+        hiddenPayload.firstMapCropReceipt.cells[0].visibility = "hidden"
+        hiddenPayload.firstMapCropReceipt.cells[0].ground = .stone
+        hiddenPayload.firstMapCropReceipt.cells[0].elevation = 0
+        hiddenPayload.seal()
+        XCTAssertFalse(hiddenPayload.validates())
+        try decodeWith(hiddenPayload)
+
+        var fringeFlora = splash
+        fringeFlora.firstMapCropReceipt.cells[0].visibility = "fringe"
+        fringeFlora.firstMapCropReceipt.cells[0].ground = .stone
+        fringeFlora.firstMapCropReceipt.cells[0].elevation = 0
+        fringeFlora.firstMapCropReceipt.cells[0].floraStableID = "flora-1"
+        fringeFlora.seal()
+        XCTAssertFalse(fringeFlora.validates())
+        try decodeWith(fringeFlora)
+
+        var unknownFlora = splash
+        unknownFlora.firstMapCropReceipt.cells[0].visibility = "full"
+        unknownFlora.firstMapCropReceipt.cells[0].ground = .stone
+        unknownFlora.firstMapCropReceipt.cells[0].elevation = 0
+        unknownFlora.firstMapCropReceipt.cells[0].floraStableID = "flora-18446744073709551615"
+        unknownFlora.seal()
+        XCTAssertFalse(unknownFlora.validates())
+        try decodeWith(unknownFlora)
+
+        var elevationFour = splash
+        elevationFour.firstMapCropReceipt.cells[0].visibility = "full"
+        elevationFour.firstMapCropReceipt.cells[0].ground = .stone
+        elevationFour.firstMapCropReceipt.cells[0].elevation = 4
+        elevationFour.firstMapCropReceipt.cells[0].floraStableID = nil
+        elevationFour.seal()
+        XCTAssertFalse(elevationFour.validates())
+        try decodeWith(elevationFour)
+
+        var foreignValid = splash
+        foreignValid.receiptID = .init(rawValue: splash.receiptID.rawValue + "-foreign")
+        foreignValid.seal()
+        XCTAssertTrue(foreignValid.validates())
+        try decodeWith(foreignValid)
+
+        var divergentDescription = splash
+        divergentDescription.finalDescription += " "
+        divergentDescription.seal()
+        XCTAssertTrue(divergentDescription.validates())
+        try decodeWith(divergentDescription)
+
+        if var mark = splash.entryMark, let first = mark.cells.first {
+            mark.cells.append(first)
+            var duplicateCell = splash
+            duplicateCell.entryMark = mark
+            duplicateCell.seal()
+            XCTAssertFalse(duplicateCell.validates())
+            try decodeWith(duplicateCell)
+        }
+    }
+
+    func testWorldSplashWaterTopologyUsesAuthoredOwnershipAndFinalConnectedGeometry() throws {
+        func map(wet: [GridPoint: GroundType], width: Int = 12, height: Int = 12) -> WorldMap {
+            var result = WorldMap(width: width, height: height,
+                tiles: Array(repeating: Tile(ground: .soil), count: width * height),
+                entry: .init(x: 0, y: 0))
+            for (point, ground) in wet { result[point] = Tile(ground: ground) }
+            return result
+        }
+        func regions(_ points: Set<GridPoint>, width: Int = 12, height: Int = 12) -> [Int] {
+            (0..<12).map { region in
+                let column = region % 4, row = region / 4
+                return points.count { point in
+                    min(3, point.x * 4 / width) == column && min(2, point.y * 3 / height) == row
+                }
+            }
+        }
+        func observation(standing: Set<GridPoint> = [], flowing: Set<GridPoint> = [],
+                         frozen: Set<GridPoint> = [], standingBodies: [Int] = [],
+                         channels: [Int] = [], frozenBodies: [Int] = [],
+                         standingDeep: Int = 0, flowingDeep: Int = 0) -> WorldHydrologyTopologyObservation {
+            .init(standingTiles: standing.count, flowingTiles: flowing.count, frozenTiles: frozen.count,
+                  standingDeepTiles: standingDeep, flowingDeepTiles: flowingDeep,
+                  standingBodySizes: standingBodies, flowingChannelSizes: channels,
+                  frozenBodySizes: frozenBodies, standingRegionCounts: regions(standing),
+                  flowingRegionCounts: regions(flowing), frozenRegionCounts: regions(frozen))
+        }
+
+        let pond = Set([GridPoint(x: 1, y: 1), .init(x: 1, y: 2), .init(x: 2, y: 1), .init(x: 2, y: 2)])
+        let lake = Set((7...9).flatMap { y in (7...9).map { GridPoint(x: $0, y: y) } })
+        var standingGrounds = Dictionary(uniqueKeysWithValues: pond.union(lake).map { ($0, GroundType.water) })
+        let deep = GridPoint(x: 8, y: 8); standingGrounds[deep] = .deepWater
+        let mixedStanding = try XCTUnwrap(WorldArrivalReceiptFactory.splashWaterProfile(
+            map: map(wet: standingGrounds), observation: observation(
+                standing: pond.union(lake), standingBodies: [4, 9], standingDeep: 1)))
+        XCTAssertTrue(mixedStanding.topologyFlags.contains(.pool))
+        XCTAssertTrue(mixedStanding.topologyFlags.contains(.lake))
+        XCTAssertTrue(mixedStanding.topologyFlags.contains(.shelf))
+        XCTAssertEqual(mixedStanding.dominantTopology, .standing)
+
+        let channel = Set((2...8).map { GridPoint(x: $0, y: 5) })
+        var channelGrounds = Dictionary(uniqueKeysWithValues: channel.map { ($0, GroundType.water) })
+        channelGrounds[.init(x: 5, y: 5)] = .deepWater
+        let flowing = try XCTUnwrap(WorldArrivalReceiptFactory.splashWaterProfile(
+            map: map(wet: channelGrounds), observation: observation(
+                flowing: channel, channels: [channel.count], flowingDeep: 1)))
+        XCTAssertEqual(flowing.dominantTopology, .flowing)
+        XCTAssertTrue(flowing.topologyFlags.contains(.channel))
+        XCTAssertFalse(flowing.topologyFlags.contains(.shelf),
+                       "flowing depth stays visibly deep without becoming a Standing shelf")
+
+        let ring = Set([GridPoint(x: 4, y: 4), .init(x: 5, y: 4), .init(x: 6, y: 4),
+                        .init(x: 4, y: 5), .init(x: 6, y: 5),
+                        .init(x: 4, y: 6), .init(x: 5, y: 6), .init(x: 6, y: 6)])
+        let frozenIsland = try XCTUnwrap(WorldArrivalReceiptFactory.splashWaterProfile(
+            map: map(wet: Dictionary(uniqueKeysWithValues: ring.map { ($0, GroundType.ice) })),
+            observation: observation(frozen: ring, frozenBodies: [ring.count])))
+        XCTAssertNil(frozenIsland.dominantTopology)
+        XCTAssertTrue(frozenIsland.topologyFlags.contains(.island))
+        XCTAssertTrue(frozenIsland.topologyFlags.contains(.broken))
+
+        let twoPonds: Set<GridPoint> = [.init(x: 2, y: 2), .init(x: 9, y: 9)]
+        let ordinaryPonds = try XCTUnwrap(WorldArrivalReceiptFactory.splashWaterProfile(
+            map: map(wet: Dictionary(uniqueKeysWithValues: twoPonds.map { ($0, GroundType.water) })),
+            observation: observation(standing: twoPonds, standingBodies: [1, 1])))
+        XCTAssertFalse(ordinaryPonds.topologyFlags.contains(.broken),
+                       "separate ordinary Standing ponds are not broken water structure")
+
+        let standingMass: Set<GridPoint> = [.init(x: 2, y: 2), .init(x: 3, y: 2),
+                                             .init(x: 2, y: 3), .init(x: 3, y: 3)]
+        let joinedFlow: Set<GridPoint> = [.init(x: 4, y: 3), .init(x: 5, y: 3), .init(x: 6, y: 3)]
+        let joinedWet = Dictionary(uniqueKeysWithValues:
+            standingMass.union(joinedFlow).map { ($0, GroundType.water) })
+        let standingDominant = try XCTUnwrap(WorldArrivalReceiptFactory.splashWaterProfile(
+            map: map(wet: joinedWet), observation: observation(
+                standing: standingMass, flowing: joinedFlow,
+                standingBodies: [standingMass.count], channels: [joinedFlow.count])))
+        XCTAssertEqual(standingDominant.dominantTopology, .standing)
+        XCTAssertEqual(standingDominant.finalConnectedBodyCount, 1,
+                       "a joined channel/body is one final wet component")
+
+        let tiedFlow: Set<GridPoint> = joinedFlow.union([.init(x: 7, y: 3)])
+        let tied = try XCTUnwrap(WorldArrivalReceiptFactory.splashWaterProfile(
+            map: map(wet: Dictionary(uniqueKeysWithValues:
+                standingMass.union(tiedFlow).map { ($0, GroundType.water) })),
+            observation: observation(standing: standingMass, flowing: tiedFlow,
+                standingBodies: [standingMass.count], channels: [tiedFlow.count])))
+        XCTAssertEqual(tied.dominantTopology, .standing,
+                       "Standing wins the exact final-owned-tile tie deterministically")
+
+        let flowingMass = tiedFlow.union([.init(x: 8, y: 3)])
+        let flowingDominant = try XCTUnwrap(WorldArrivalReceiptFactory.splashWaterProfile(
+            map: map(wet: Dictionary(uniqueKeysWithValues:
+                standingMass.union(flowingMass).map { ($0, GroundType.water) })),
+            observation: observation(standing: standingMass, flowing: flowingMass,
+                standingBodies: [standingMass.count], channels: [flowingMass.count])))
+        XCTAssertEqual(flowingDominant.dominantTopology, .flowing)
+
+        let remoteFlow: Set<GridPoint> = [.init(x: 9, y: 8), .init(x: 9, y: 9)]
+        let disconnected = try XCTUnwrap(WorldArrivalReceiptFactory.splashWaterProfile(
+            map: map(wet: Dictionary(uniqueKeysWithValues:
+                standingMass.union(remoteFlow).map { ($0, GroundType.water) })),
+            observation: observation(standing: standingMass, flowing: remoteFlow,
+                standingBodies: [standingMass.count], channels: [remoteFlow.count])))
+        XCTAssertEqual(disconnected.finalConnectedBodyCount, 2,
+                       "final disconnected wet components, not authored record count, own the exact receipt")
+    }
+
+    @MainActor
+    func testWorldSplashPlaceholderIsCanonicalOneXAndRetainsMixedRegionalFacts() throws {
+        let store = GameStore(io: .temporary(name: "splash-v3-pixels-\(UUID().uuidString)"))
+        XCTAssertTrue(store.bindAndDepart(
+            worldPageInstanceID: WorldPageCatalog.earthlikeTestInstance.id))
+        let run = try XCTUnwrap(store.activeRun)
+        let outer = try XCTUnwrap(run.worldArrivalReceipt)
+        let original = try XCTUnwrap(outer.worldSplashReceiptV3)
+        let environment = try XCTUnwrap(outer.environmentSummary)
+        let visual = try XCTUnwrap(run.worldVisualReceipt)
+
+        // O05/O06 use the real bind-time same-seed causal intervention, not a fabricated fact.
+        let oreStore = GameStore(io: .temporary(name: "splash-v3-o05-\(UUID().uuidString)"))
+        let stoneHollow = try XCTUnwrap(WorldPageCatalog.starterInstances.first {
+            $0.definition.id == WorldPageCatalog.stoneHollowID
+        })
+        XCTAssertTrue(oreStore.bindAndDepart(worldPageInstanceID: stoneHollow.id))
+        let oreRun = try XCTUnwrap(oreStore.activeRun)
+        let oreOuter = try XCTUnwrap(oreRun.worldArrivalReceipt)
+        let oreSplash = try XCTUnwrap(oreOuter.worldSplashReceiptV3)
+        let productionOreFact = oreOuter.causalVisualFacts.first {
+            $0.scope == .resource && $0.semanticKey == "common_ore"
+                && $0.contributionKind == .increased
+        }
+        let productionOreRow = oreSplash.explorationOpportunities.resources.first {
+            $0.stableID == Resources.ore.rawValue
+        }
+        let definition = stoneHollow.definition
+        let visibleMarks = definition.page.runes.map { mark in
+            WritingDeskVisibleMark(rendererAssetKey: mark.glyphID,
+                visualRoute: mark.personalCompound == nil ? .authored(.source)
+                    : .personalCompoundCompatibility,
+                id: mark.id, hand: mark.hand, origin: mark.origin, shapeID: mark.shapeID,
+                cells: mark.cells, inkRecipe: mark.inkRecipe, displayName: mark.displayName,
+                accessibilityName: mark.displayName, isReadable: true)
+        }
+        let candidates = WorldArrivalCausalCandidateRules.candidates(
+            page: definition.page, visibleMarks: visibleMarks)
+        func counterfactual(_ semanticKey: String) throws -> Worldgen.ArrivalCausalSummary {
+            let candidate = try XCTUnwrap(candidates.first { $0.semanticKey == semanticKey })
+            let removed = try XCTUnwrap(WorldArrivalCausalCandidateRules.removing(
+                candidate, from: definition.page))
+            var removedBook = BookRules.resolveBook(page: removed)
+            removedBook.worldPageUseReceipt = oreRun.book.worldPageUseReceipt
+            let intervention = PressureRules.causalIntervention(
+                actualAuthored: BookRules.sigils(for: oreRun.book),
+                remainingAuthored: BookRules.sigils(for: removedBook), seed: oreRun.mapSeed)
+            return Worldgen.arrivalCausalSummary(
+                book: removedBook, seed: oreRun.mapSeed,
+                terrain: .init(readings: intervention.readings,
+                               resolvedSigils: intervention.counterfactualSigils),
+                library: oreStore.state.reality.library, tuning: oreRun.tuning,
+                isFreshFirstExpedition: true, wildPageSelection: nil,
+                wildPageOriginRunIndex: oreRun.runIndex)
+        }
+        let withoutOre = try counterfactual("common_ore")
+        let withoutOreQuantity = WorldArrivalCausalCandidateRules.resourceQuantity(
+            Resources.ore, in: withoutOre.map)
+        let actualOreQuantity = WorldArrivalCausalCandidateRules.resourceQuantity(
+            Resources.ore, in: oreRun.map)
+        if actualOreQuantity > withoutOreQuantity {
+            let fact = try XCTUnwrap(productionOreFact)
+            let row = try XCTUnwrap(productionOreRow)
+            XCTAssertTrue(row.causalMarkIDs.contains(fact.candidateMarkID))
+            XCTAssertEqual(row.obtainableQuantity, actualOreQuantity)
+        } else {
+            XCTAssertNil(productionOreFact)
+            XCTAssertNil(productionOreRow,
+                         "ordinary Ore without positive same-seed causality stays absent")
+        }
+
+        let floraStore = GameStore(io: .temporary(name: "splash-v3-o06-\(UUID().uuidString)"))
+        let openMeadow = try XCTUnwrap(WorldPageCatalog.starterInstances.first {
+            $0.definition.id == WorldPageCatalog.openMeadowID
+        })
+        XCTAssertTrue(floraStore.bindAndDepart(worldPageInstanceID: openMeadow.id))
+        let floraRun = try XCTUnwrap(floraStore.activeRun)
+        let floraOuter = try XCTUnwrap(floraRun.worldArrivalReceipt)
+        let floraSplash = try XCTUnwrap(floraOuter.worldSplashReceiptV3)
+        let productionFloraFact = try XCTUnwrap(floraOuter.causalVisualFacts.first {
+            $0.scope == .flora && $0.semanticKey == "verdant"
+        })
+        XCTAssertEqual(floraSplash.flora.occupiedTileCount,
+                       floraRun.map.tiles.count { $0.flora != nil })
+        let meadowDefinition = openMeadow.definition
+        let meadowCandidate = try XCTUnwrap(WorldArrivalCausalCandidateRules.candidates(
+            page: meadowDefinition.page,
+            visibleMarks: meadowDefinition.page.runes.map { mark in
+                WritingDeskVisibleMark(rendererAssetKey: mark.glyphID,
+                    visualRoute: mark.personalCompound == nil ? .authored(.source)
+                        : .personalCompoundCompatibility, id: mark.id, hand: mark.hand,
+                    origin: mark.origin, shapeID: mark.shapeID, cells: mark.cells,
+                    inkRecipe: mark.inkRecipe, displayName: mark.displayName,
+                    accessibilityName: mark.displayName, isReadable: true)
+            }).first { $0.semanticKey == "verdant" })
+        let meadowRemoved = try XCTUnwrap(WorldArrivalCausalCandidateRules.removing(
+            meadowCandidate, from: meadowDefinition.page))
+        var meadowBook = BookRules.resolveBook(page: meadowRemoved)
+        meadowBook.worldPageUseReceipt = floraRun.book.worldPageUseReceipt
+        let meadowIntervention = PressureRules.causalIntervention(
+            actualAuthored: BookRules.sigils(for: floraRun.book),
+            remainingAuthored: BookRules.sigils(for: meadowBook), seed: floraRun.mapSeed)
+        let withoutVerdant = Worldgen.arrivalCausalSummary(
+            book: meadowBook, seed: floraRun.mapSeed,
+            terrain: .init(readings: meadowIntervention.readings,
+                           resolvedSigils: meadowIntervention.counterfactualSigils),
+            library: floraStore.state.reality.library, tuning: floraRun.tuning,
+            isFreshFirstExpedition: true, wildPageSelection: nil,
+            wildPageOriginRunIndex: floraRun.runIndex)
+        let withoutVerdantCount = withoutVerdant.map.tiles.count { $0.flora != nil }
+        if productionFloraFact.contributionKind == .increased {
+            XCTAssertGreaterThan(floraSplash.flora.occupiedTileCount, withoutVerdantCount)
+        } else if productionFloraFact.contributionKind == .reduced {
+            XCTAssertLessThan(floraSplash.flora.occupiedTileCount, withoutVerdantCount)
+        } else {
+            XCTAssertNotEqual(floraSplash.flora.occupiedTileCount, withoutVerdantCount)
+        }
+        var withoutFloraCue = floraSplash
+        withoutFloraCue.flora = .init(placedIdentityCount: 0, occupiedTileCount: 0,
+                                      aggregateCoverage: .none, species: [])
+        for index in withoutFloraCue.terrain.regions.indices {
+            withoutFloraCue.terrain.regions[index].floraShares = []
+        }
+        for index in withoutFloraCue.firstMapCropReceipt.cells.indices {
+            withoutFloraCue.firstMapCropReceipt.cells[index].floraStableID = nil
+        }
+        withoutFloraCue.seal()
+        XCTAssertTrue(withoutFloraCue.validates())
+        let floraScopes: Set<WorldArrivalNativeRenderer.SplashCommand.Scope> = [
+            .floraIdentity, .floraDistribution
+        ]
+        let floraCommands = try XCTUnwrap(WorldArrivalNativeRenderer.splashCommands(for: floraSplash))
+        let noFloraCommands = try XCTUnwrap(WorldArrivalNativeRenderer.splashCommands(for: withoutFloraCue))
+        XCTAssertEqual(floraCommands.filter { !floraScopes.contains($0.scope) },
+                       noFloraCommands.filter { !floraScopes.contains($0.scope) },
+                       "O06 the production Verdant delta owns only flora command scopes")
+        let withoutVerdantVisual = try WorldGrade2BindAdapter.makeReceipt(
+            book: meadowBook, mapSeed: floraRun.mapSeed,
+            map: withoutVerdant.map, flora: withoutVerdant.flora)
+        let withoutVerdantHydrology = try XCTUnwrap(
+            floraRun.generationDiagnostics.hydrologyTopology)
+        XCTAssertNotNil(WorldArrivalReceiptFactory.splashWaterProfile(
+            map: withoutVerdant.map, observation: withoutVerdantHydrology))
+        var withoutVerdantCrop = floraOuter.firstMapCropReceipt
+        for index in withoutVerdantCrop.cells.indices {
+            let point = withoutVerdantCrop.cells[index].point
+            guard withoutVerdantCrop.cells[index].visibility != "hidden" else { continue }
+            withoutVerdantCrop.cells[index].ground = withoutVerdant.map[point].ground
+            withoutVerdantCrop.cells[index].elevation = withoutVerdant.map[point].elevation
+            withoutVerdantCrop.cells[index].floraStableID =
+                withoutVerdantCrop.cells[index].visibility == "full"
+                ? withoutVerdant.map[point].flora.map { "flora-\($0.rawValue)" } : nil
+        }
+        let factoryWithoutVerdant = try XCTUnwrap(WorldArrivalReceiptFactory.makeSplashV3(
+            receiptID: floraOuter.id, generationSeed: floraRun.mapSeed,
+            sourcePage: floraOuter.sourcePagePhysicalReceipt,
+            visualReceipt: withoutVerdantVisual, map: withoutVerdant.map,
+            flora: withoutVerdant.flora,
+            hydrologyTopology: withoutVerdantHydrology,
+            environment: try XCTUnwrap(floraOuter.environmentSummary),
+            illuminationSourceClass: floraOuter.illumination.sourceClass,
+            motionBand: floraSplash.environment.suspendedMotion,
+            causalFacts: floraOuter.causalVisualFacts, crop: withoutVerdantCrop,
+            description: floraOuter.finalDescription))
+        var withoutVerdantSplash = floraSplash
+        withoutVerdantSplash.flora = factoryWithoutVerdant.flora
+        for region in withoutVerdantSplash.terrain.regions.indices {
+            withoutVerdantSplash.terrain.regions[region].floraShares =
+                factoryWithoutVerdant.terrain.regions[region].floraShares
+        }
+        for index in withoutVerdantSplash.firstMapCropReceipt.cells.indices {
+            withoutVerdantSplash.firstMapCropReceipt.cells[index].floraStableID =
+                factoryWithoutVerdant.firstMapCropReceipt.cells[index].floraStableID
+        }
+        withoutVerdantSplash.seal()
+        XCTAssertTrue(withoutVerdantSplash.validates())
+        let withoutVerdantCommands = try XCTUnwrap(
+            WorldArrivalNativeRenderer.splashCommands(for: withoutVerdantSplash))
+        XCTAssertEqual(floraCommands.filter { !floraScopes.contains($0.scope) },
+                       withoutVerdantCommands.filter { !floraScopes.contains($0.scope) })
+        if productionFloraFact.contributionKind == .increased {
+            let actualPixels = try rgba(try XCTUnwrap(WorldArrivalNativeRenderer.placeholderImage(
+                for: floraSplash, size: .init(width: 320, height: 360))))
+            let withoutPixels = try rgba(try XCTUnwrap(WorldArrivalNativeRenderer.placeholderImage(
+                for: withoutVerdantSplash, size: .init(width: 320, height: 360))))
+            let barePixels = try rgba(try XCTUnwrap(WorldArrivalNativeRenderer.placeholderImage(
+                for: withoutFloraCue, size: .init(width: 320, height: 360))))
+            XCTAssertGreaterThan(changedPixels(actualPixels, barePixels).count,
+                                 changedPixels(withoutPixels, barePixels).count,
+                                 "real Open Meadow Verdant must own strictly more flora pixels")
+        }
+
+        func regionalCounts(_ points: Set<GridPoint>, width: Int, height: Int) -> [Int] {
+            (0..<12).map { region in points.count { point in
+                min(3, point.x * 4 / width) == region % 4
+                    && min(2, point.y * 3 / height) == region / 4
+            } }
+        }
+        func make(_ map: WorldMap, standing: Set<GridPoint>, flowing: Set<GridPoint>,
+                  frozen: Set<GridPoint>, standingBodies: [Int], channels: [Int],
+                  frozenBodies: [Int], standingDeep: Int, flowingDeep: Int,
+                  flora: [Flora] = [], sites: [PlacedSite] = [],
+                  causalFacts: [WorldArrivalReceipt.CausalVisualFact]? = nil,
+                  causalResourceOwners: [ResourceID: [InstanceID]] = [:]) throws
+            -> WorldSplashReceiptV3 {
+            let observation = WorldHydrologyTopologyObservation(
+                standingTiles: standing.count, flowingTiles: flowing.count, frozenTiles: frozen.count,
+                standingDeepTiles: standingDeep, flowingDeepTiles: flowingDeep,
+                standingBodySizes: standingBodies, flowingChannelSizes: channels,
+                frozenBodySizes: frozenBodies,
+                standingRegionCounts: regionalCounts(standing, width: map.width, height: map.height),
+                flowingRegionCounts: regionalCounts(flowing, width: map.width, height: map.height),
+                frozenRegionCounts: regionalCounts(frozen, width: map.width, height: map.height))
+            let usedVisual = flora.isEmpty ? visual : try WorldGrade2BindAdapter.makeReceipt(
+                book: run.book, mapSeed: run.mapSeed, map: map, flora: flora)
+            let crop = WorldArrivalReceiptFactory.firstCrop(
+                map: map, flora: flora,
+                profile: WorldRules.visibilityProfile(illumination: 100, baseRadius: 8))
+            return try XCTUnwrap(WorldArrivalReceiptFactory.makeSplashV3(
+                receiptID: outer.id, generationSeed: outer.generationSeed,
+                sourcePage: outer.sourcePagePhysicalReceipt, visualReceipt: usedVisual,
+                map: map, flora: flora, sites: sites, hydrologyTopology: observation,
+                environment: environment,
+                illuminationSourceClass: original.environment.illuminationSourceClass,
+                motionBand: original.environment.suspendedMotion,
+                causalFacts: causalFacts ?? outer.causalVisualFacts,
+                causalResourceOwners: causalResourceOwners, crop: crop,
+                description: outer.finalDescription))
+        }
+        func rgba(_ image: UIImage) throws -> Data {
+            let cg = try XCTUnwrap(image.cgImage)
+            return try XCTUnwrap(cg.dataProvider?.data) as Data
+        }
+        func changedPixels(_ lhs: Data, _ rhs: Data) -> Set<Int> {
+            precondition(lhs.count == rhs.count)
+            return Set(stride(from: 0, to: lhs.count, by: 4).compactMap { offset in
+                lhs[offset..<(offset + 4)] == rhs[offset..<(offset + 4)] ? nil : offset / 4
+            })
+        }
+        func containsRGB(_ data: Data, _ rgb: [Int], tolerance: Int = 1) -> Bool {
+            guard rgb.count == 3 else { return false }
+            func close(_ lhs: Int, _ rhs: Int) -> Bool { abs(lhs - rhs) <= tolerance }
+            for offset in stride(from: 0, to: data.count, by: 4) {
+                let first = Int(data[offset]), middle = Int(data[offset + 1])
+                let third = Int(data[offset + 2])
+                if (close(first, rgb[0]) && close(middle, rgb[1]) && close(third, rgb[2]))
+                    || (close(first, rgb[2]) && close(middle, rgb[1]) && close(third, rgb[0])) {
+                    return true
+                }
+            }
+            return false
+        }
+
+        let repeatedA = try XCTUnwrap(WorldArrivalNativeRenderer.placeholderImage(
+            for: original, size: .init(width: 320, height: 360)))
+        let repeatedB = try XCTUnwrap(WorldArrivalNativeRenderer.placeholderImage(
+            for: original, size: .init(width: 320, height: 360)))
+        XCTAssertEqual(repeatedA.cgImage?.width, 320)
+        XCTAssertEqual(repeatedA.cgImage?.height, 360)
+        XCTAssertEqual(try rgba(repeatedA), try rgba(repeatedB))
+
+        var map = WorldMap(width: 12, height: 12,
+            tiles: Array(repeating: Tile(ground: .soil), count: 144), entry: .init(x: 0, y: 0))
+        // One region deliberately owns dry majority plus shallow, deep and frozen water together.
+        let standing: Set<GridPoint> = [.init(x: 0, y: 0), .init(x: 1, y: 0)]
+        let flowing: Set<GridPoint> = [.init(x: 2, y: 0)]
+        let frozen: Set<GridPoint> = [.init(x: 0, y: 1)]
+        map[.init(x: 0, y: 0)] = Tile(ground: .water)
+        map[.init(x: 1, y: 0)] = Tile(ground: .deepWater)
+        map[.init(x: 2, y: 0)] = Tile(ground: .water)
+        map[.init(x: 0, y: 1)] = Tile(ground: .ice)
+        map[.init(x: 1, y: 1)] = Tile(ground: .stone)
+        let mixed = try make(map, standing: standing, flowing: flowing, frozen: frozen,
+                             standingBodies: [2], channels: [1], frozenBodies: [1],
+                             standingDeep: 1, flowingDeep: 0)
+        let mixedRepeat = try make(map, standing: standing, flowing: flowing, frozen: frozen,
+                                   standingBodies: [2], channels: [1], frozenBodies: [1],
+                                   standingDeep: 1, flowingDeep: 0)
+        XCTAssertEqual(mixed, mixedRepeat, "C02 identical factory inputs must freeze one receipt")
+        XCTAssertEqual(WorldArrivalNativeRenderer.splashCommands(for: mixed),
+                       WorldArrivalNativeRenderer.splashCommands(for: mixedRepeat))
+        let firstRegion = mixed.terrain.regions[0]
+        XCTAssertGreaterThan(firstRegion.groundShares.first { $0.id == "soil" }!.exactCount,
+                             firstRegion.waterShares.reduce(0) { $0 + $1.exactCount })
+        XCTAssertEqual(firstRegion.waterShares.map(\.exactCount), [2, 1, 1])
+        XCTAssertEqual(Set(firstRegion.elevationShares.filter { $0.exactCount > 0 }.map(\.id)), ["0"])
+        let mixedImage = try XCTUnwrap(WorldArrivalNativeRenderer.placeholderImage(
+            for: mixed, size: .init(width: 320, height: 360)))
+        let mixedPixels = try rgba(mixedImage)
+        let mixedDescriptor = try mixed.terrain.materialPresentation.resolvedDescriptor()
+        func paletteRGBs(_ ground: TerrainProductionPack.Ground) throws -> [[Int]] {
+            try TerrainProductionPack.resolvedGroundPalette(ground, descriptor: mixedDescriptor)
+                .map { [Int($0.red), Int($0.green), Int($0.blue)] }
+        }
+        XCTAssertTrue(try paletteRGBs(.stone).contains { containsRGB(mixedPixels, $0) },
+                      "T01 represented secondary Stone mass must survive in pixels")
+        XCTAssertTrue(try paletteRGBs(.water).contains { containsRGB(mixedPixels, $0) },
+                      "W03 shallow Water palette ownership must survive in mixed pixels")
+        XCTAssertTrue(try paletteRGBs(.deepWater).contains { containsRGB(mixedPixels, $0) },
+                      "W03 DeepWater palette ownership must survive in mixed pixels")
+        XCTAssertTrue(try paletteRGBs(.ice).contains { containsRGB(mixedPixels, $0) },
+                      "W04 frozen Water palette ownership must survive in mixed pixels")
+        XCTAssertEqual(try rgba(mixedImage),
+                       try rgba(try XCTUnwrap(WorldArrivalNativeRenderer.placeholderImage(
+                        for: mixedRepeat, size: .init(width: 320, height: 360)))))
+        XCTAssertNotEqual(try rgba(mixedImage), try rgba(repeatedA))
+
+        // W01-W04: the same liquid census retains authored Standing versus Flowing geometry;
+        // shallow/deep/frozen remain separately visible rather than collapsing into one fill.
+        let allLiquid = standing.union(flowing)
+        let allStanding = try make(map, standing: allLiquid, flowing: [], frozen: frozen,
+                                   standingBodies: [allLiquid.count], channels: [], frozenBodies: [1],
+                                   standingDeep: 1, flowingDeep: 0)
+        let allFlowing = try make(map, standing: [], flowing: allLiquid, frozen: frozen,
+                                  standingBodies: [], channels: [allLiquid.count], frozenBodies: [1],
+                                  standingDeep: 0, flowingDeep: 1)
+        let standingCommands = try XCTUnwrap(WorldArrivalNativeRenderer.splashCommands(for: allStanding))
+        let flowingCommands = try XCTUnwrap(WorldArrivalNativeRenderer.splashCommands(for: allFlowing))
+        XCTAssertNotEqual(standingCommands.filter { $0.scope == .waterStructure },
+                          flowingCommands.filter { $0.scope == .waterStructure })
+        XCTAssertEqual(standingCommands.filter { $0.scope != .waterStructure },
+                       flowingCommands.filter { $0.scope != .waterStructure })
+        XCTAssertNotEqual(try rgba(try XCTUnwrap(WorldArrivalNativeRenderer.placeholderImage(
+            for: allStanding, size: .init(width: 320, height: 360)))),
+                          try rgba(try XCTUnwrap(WorldArrivalNativeRenderer.placeholderImage(
+            for: allFlowing, size: .init(width: 320, height: 360)))))
+        let waterValues = standingCommands.filter { $0.scope == .waterStructure }.flatMap(\.values)
+        XCTAssertTrue(waterValues.contains { $0.contains("shallow=2") })
+        XCTAssertTrue(waterValues.contains { $0.contains("deep=1") })
+        XCTAssertTrue(waterValues.contains { $0.contains("frozen=1") })
+
+        var thawedMap = map
+        thawedMap[.init(x: 0, y: 1)] = Tile(ground: .water)
+        let thawedStanding = allLiquid.union([.init(x: 0, y: 1)])
+        let thawed = try make(thawedMap, standing: thawedStanding, flowing: [], frozen: [],
+                              standingBodies: [thawedStanding.count], channels: [], frozenBodies: [],
+                              standingDeep: 1, flowingDeep: 0)
+        XCTAssertNotEqual(try rgba(try XCTUnwrap(WorldArrivalNativeRenderer.placeholderImage(
+            for: allStanding, size: .init(width: 320, height: 360)))),
+                          try rgba(try XCTUnwrap(WorldArrivalNativeRenderer.placeholderImage(
+            for: thawed, size: .init(width: 320, height: 360)))),
+                          "frozen structure must remain visibly distinct from moving liquid water")
+
+        // D01: generated sites/resources own coordinate-free reasons to explore. Exact identity,
+        // yield and position remain excluded, as do traveller/apex facts.
+        let emptyOpportunities = try make(map, standing: standing, flowing: flowing, frozen: frozen,
+                                          standingBodies: [2], channels: [1], frozenBodies: [1],
+                                          standingDeep: 1, flowingDeep: 0)
+        var resourceA = map, resourceYield = map, resourceMoved = map
+        resourceA[.init(x: 11, y: 11)].content = .wildDrop(
+            resource: ResourceID(rawValue: "silver"), amount: 1)
+        resourceYield[.init(x: 11, y: 11)].content = .wildDrop(
+            resource: ResourceID(rawValue: "silver"), amount: 2)
+        resourceMoved[.init(x: 10, y: 11)].content = .wildDrop(
+            resource: ResourceID(rawValue: "silver"), amount: 1)
+        var resourceOther = map
+        resourceOther[.init(x: 11, y: 11)].content = .wildDrop(
+            resource: ResourceID(rawValue: "gold"), amount: 1)
+        var ordinaryResource = map
+        ordinaryResource[.init(x: 11, y: 11)].content = .wildDrop(
+            resource: ResourceID(rawValue: "ore"), amount: 1)
+        var nontradeableResource = map
+        nontradeableResource[.init(x: 11, y: 11)].content = .wildDrop(
+            resource: ResourceID(rawValue: "essence_raw"), amount: 1)
+        var resourceSources = map
+        resourceSources[.init(x: 11, y: 11)].content = .node(.init(
+            resource: .init(rawValue: "silver"), remainingHarvests: 2, yieldPerHarvest: 1,
+            secondaryResource: .init(rawValue: "gold"), secondaryYieldPerHarvest: 1))
+        resourceSources[.init(x: 10, y: 11)].content = .wildDrop(
+            resource: .init(rawValue: "silver"), amount: 1)
+        var resourceSourcesPermuted = map
+        resourceSourcesPermuted[.init(x: 1, y: 10)].content = resourceSources[.init(x: 10, y: 11)].content
+        resourceSourcesPermuted[.init(x: 2, y: 10)].content = resourceSources[.init(x: 11, y: 11)].content
+        var exhaustedSources = map
+        exhaustedSources[.init(x: 11, y: 11)].content = .node(.init(
+            resource: .init(rawValue: "silver"), remainingHarvests: 0, yieldPerHarvest: 9,
+            secondaryResource: .init(rawValue: "gold"), secondaryYieldPerHarvest: 9))
+        exhaustedSources[.init(x: 10, y: 11)].content = .node(.init(
+            resource: .init(rawValue: "silver"), remainingHarvests: 2, yieldPerHarvest: 0,
+            secondaryResource: .init(rawValue: "gold"), secondaryYieldPerHarvest: 0))
+        exhaustedSources[.init(x: 9, y: 11)].content = .wildDrop(
+            resource: .init(rawValue: "silver"), amount: 0)
+        var siteA = map, siteB = map, siteOther = map, siteMany = map
+        siteA[.init(x: 11, y: 11)].content = .site(.init(rawValue: 88_001))
+        siteB[.init(x: 10, y: 11)].content = .site(.init(rawValue: 99_002))
+        siteOther[.init(x: 11, y: 11)].content = .site(.init(rawValue: 77_003))
+        siteMany[.init(x: 2, y: 9)].content = .site(.init(rawValue: 66_004))
+        siteMany[.init(x: 9, y: 2)].content = .site(.init(rawValue: 55_005))
+        let placedSiteA = PlacedSite(id: .init(rawValue: 88_001),
+            siteID: .init(rawValue: "crystal_cavern"), position: .init(x: 11, y: 11),
+            searchTurnsRemaining: 3)
+        let placedSiteB = PlacedSite(id: .init(rawValue: 99_002),
+            siteID: .init(rawValue: "crystal_cavern"), position: .init(x: 10, y: 11),
+            searchTurnsRemaining: 3)
+        let placedSiteOther = PlacedSite(id: .init(rawValue: 77_003),
+            siteID: .init(rawValue: "geyser_basin"), position: .init(x: 11, y: 11),
+            searchTurnsRemaining: 2)
+        let placedSiteMany = [
+            PlacedSite(id: .init(rawValue: 66_004), siteID: .init(rawValue: "geyser_basin"),
+                       position: .init(x: 2, y: 9), searchTurnsRemaining: 1),
+            PlacedSite(id: .init(rawValue: 55_005), siteID: .init(rawValue: "crystal_cavern"),
+                       position: .init(x: 9, y: 2), searchTurnsRemaining: 4)
+        ]
+        var travellerMap = map
+        travellerMap[.init(x: 11, y: 11)].content = .traveller(.init(rawValue: "hidden-person"))
+        func opportunityReceipt(_ source: WorldMap, sites: [PlacedSite] = [],
+                                causalFacts: [WorldArrivalReceipt.CausalVisualFact]? = nil) throws
+            -> WorldSplashReceiptV3 {
+            try make(source, standing: standing, flowing: flowing, frozen: frozen,
+                     standingBodies: [2], channels: [1], frozenBodies: [1],
+                     standingDeep: 1, flowingDeep: 0, sites: sites,
+                     causalFacts: causalFacts)
+        }
+        let resourceReceipt = try opportunityReceipt(resourceA)
+        let resourceYieldReceipt = try opportunityReceipt(resourceYield)
+        let resourceCoordinate = try opportunityReceipt(resourceMoved)
+        let resourceOtherReceipt = try opportunityReceipt(resourceOther)
+        let ordinaryResourceReceipt = try opportunityReceipt(ordinaryResource, causalFacts: [])
+        let emptyNoncausalOpportunities = try opportunityReceipt(map, causalFacts: [])
+        let nontradeableResourceReceipt = try opportunityReceipt(nontradeableResource)
+        let resourceSourcesReceipt = try opportunityReceipt(resourceSources)
+        let resourceSourcesPermutedReceipt = try opportunityReceipt(resourceSourcesPermuted)
+        let exhaustedSourcesReceipt = try opportunityReceipt(exhaustedSources)
+        let siteReceipt = try opportunityReceipt(siteA, sites: [placedSiteA])
+        let siteIdentityCoordinate = try opportunityReceipt(siteB, sites: [placedSiteB])
+        let siteOtherReceipt = try opportunityReceipt(siteOther, sites: [placedSiteOther])
+        let siteManyReceipt = try opportunityReceipt(siteMany, sites: placedSiteMany.reversed())
+        let richOreFact = WorldArrivalReceipt.CausalVisualFact(
+            candidateMarkID: .init(rawValue: 456_789), semanticKey: "rich_ore",
+            markDisplayName: "Rich Ore", sourcePageOrder: 0, scope: .resource,
+            contributionKind: .increased, resultBand: "present", withoutAuthoredBand: "absent")
+        let orePressureReceipt = try make(
+            ordinaryResource, standing: standing, flowing: flowing, frozen: frozen,
+            standingBodies: [2], channels: [1], frozenBodies: [1],
+            standingDeep: 1, flowingDeep: 0, causalFacts: [richOreFact],
+            causalResourceOwners: [Resources.ore: [.init(rawValue: 456_789)]])
+        var ordinaryResourceMoved = map
+        ordinaryResourceMoved[.init(x: 3, y: 8)].content = ordinaryResource[.init(x: 11, y: 11)].content
+        let orePressureMovedReceipt = try make(
+            ordinaryResourceMoved, standing: standing, flowing: flowing, frozen: frozen,
+            standingBodies: [2], channels: [1], frozenBodies: [1],
+            standingDeep: 1, flowingDeep: 0, causalFacts: [richOreFact],
+            causalResourceOwners: [Resources.ore: [.init(rawValue: 456_789)]])
+        let travellerReceipt = try opportunityReceipt(travellerMap)
+        XCTAssertEqual(resourceReceipt.explorationOpportunities.resources,
+                       [.init(stableID: "silver", sourceCount: 1,
+                              obtainableQuantity: 1, causalMarkIDs: [])])
+        XCTAssertTrue(siteReceipt.explorationOpportunities.hasGeneratedSiteOpportunity)
+        XCTAssertEqual(resourceSourcesReceipt.explorationOpportunities.resources, [
+            .init(stableID: "gold", sourceCount: 1, obtainableQuantity: 2, causalMarkIDs: []),
+            .init(stableID: "silver", sourceCount: 2, obtainableQuantity: 3, causalMarkIDs: [])
+        ], "primary and positive secondary source families aggregate once per tile")
+        XCTAssertEqual(resourceSourcesReceipt, resourceSourcesPermutedReceipt,
+                       "O03 keyed rows are canonical across placement/input permutation")
+        XCTAssertEqual(exhaustedSourcesReceipt, emptyOpportunities,
+                       "zero-yield, exhausted and zero-amount sources are not advertised")
+        XCTAssertEqual(ordinaryResourceReceipt.explorationOpportunities,
+                       emptyNoncausalOpportunities.explorationOpportunities,
+                       "ordinary noncausal resources are not Splash opportunities")
+        XCTAssertEqual(orePressureReceipt.explorationOpportunities.resources,
+                       [.init(stableID: "ore", sourceCount: 1, obtainableQuantity: 1,
+                              causalMarkIDs: [.init(rawValue: 456_789)])],
+                       "an existing Rich Ore causal receipt owns its actually placed Ore cue")
+        XCTAssertEqual(orePressureReceipt, orePressureMovedReceipt,
+                       "pressure-owned Ore remains coordinate-free")
+        XCTAssertNotEqual(WorldArrivalNativeRenderer.splashCommands(for: orePressureReceipt),
+                          WorldArrivalNativeRenderer.splashCommands(for: ordinaryResourceReceipt))
+        XCTAssertNotEqual(try rgba(try XCTUnwrap(WorldArrivalNativeRenderer.placeholderImage(
+            for: orePressureReceipt, size: .init(width: 320, height: 360)))),
+                          try rgba(try XCTUnwrap(WorldArrivalNativeRenderer.placeholderImage(
+            for: ordinaryResourceReceipt, size: .init(width: 320, height: 360)))))
+        XCTAssertEqual(nontradeableResourceReceipt, emptyOpportunities,
+                       "nontradeable is not a rarity synonym")
+        XCTAssertNotEqual(resourceReceipt, emptyOpportunities)
+        XCTAssertNotEqual(siteReceipt, emptyOpportunities)
+        XCTAssertNotEqual(resourceReceipt, resourceYieldReceipt,
+                          "O05 exact obtainable quantity remains truthful")
+        let resourcePixels = try rgba(try XCTUnwrap(WorldArrivalNativeRenderer.placeholderImage(
+            for: resourceReceipt, size: .init(width: 320, height: 360))))
+        let resourceYieldPixels = try rgba(try XCTUnwrap(WorldArrivalNativeRenderer.placeholderImage(
+            for: resourceYieldReceipt, size: .init(width: 320, height: 360))))
+        XCTAssertGreaterThan(changedPixels(resourceYieldPixels,
+                                           try rgba(try XCTUnwrap(WorldArrivalNativeRenderer.placeholderImage(
+                                            for: emptyOpportunities,
+                                            size: .init(width: 320, height: 360))))).count,
+                             changedPixels(resourcePixels,
+                                           try rgba(try XCTUnwrap(WorldArrivalNativeRenderer.placeholderImage(
+                                            for: emptyOpportunities,
+                                            size: .init(width: 320, height: 360))))).count)
+        let opportunityBaselinePixels = try rgba(try XCTUnwrap(
+            WorldArrivalNativeRenderer.placeholderImage(
+                for: emptyOpportunities, size: .init(width: 320, height: 360))))
+        var priorResourceOwnedPixels = Set<Int>()
+        for quantity in 1...WorldSplashReceiptV3.maximumObtainableQuantityPerSource {
+            var exact = emptyOpportunities
+            exact.explorationOpportunities.resources = [
+                .init(stableID: "silver", sourceCount: 1,
+                      obtainableQuantity: quantity, causalMarkIDs: [])
+            ]
+            exact.seal()
+            XCTAssertTrue(exact.validates())
+            let owned = changedPixels(try rgba(try XCTUnwrap(
+                WorldArrivalNativeRenderer.placeholderImage(
+                    for: exact, size: .init(width: 320, height: 360)))),
+                opportunityBaselinePixels)
+            XCTAssertTrue(priorResourceOwnedPixels.isSubset(of: owned))
+            XCTAssertGreaterThan(owned.count, priorResourceOwnedPixels.count,
+                                 "q→q+1 must add collision-free resource-owned pixels")
+            priorResourceOwnedPixels = owned
+        }
+        let opportunityTileCount = emptyOpportunities.terrain.width
+            * emptyOpportunities.terrain.height
+        let maximumAggregateQuantity = opportunityTileCount
+            * WorldSplashReceiptV3.maximumObtainableQuantityPerSource
+        let maximumAggregateMarks = opportunityTileCount + maximumAggregateQuantity
+        XCTAssertEqual(
+            WorldArrivalNativeRenderer.resourceOpportunitySlotCapacity(
+                for: .init(width: 320, height: 360)),
+            WorldSplashReceiptV3.maximumResourceOpportunityMarks)
+        XCTAssertGreaterThanOrEqual(
+            WorldArrivalNativeRenderer.resourceOpportunitySlotCapacity(
+                for: .init(width: 320, height: 360)),
+            max(maximumAggregateMarks,
+                28 * 28 * (WorldSplashReceiptV3.maximumObtainableQuantityPerSource + 1)),
+            "the canonical scene must have a collision-free slot for every legal generated mark")
+
+        func resourceOwned(sourceCount: Int, quantity: Int) throws -> Set<Int> {
+            var exact = emptyOpportunities
+            exact.explorationOpportunities.resources = [
+                .init(stableID: "silver", sourceCount: sourceCount,
+                      obtainableQuantity: quantity, causalMarkIDs: [])
+            ]
+            exact.seal()
+            XCTAssertTrue(exact.validates())
+            return changedPixels(try rgba(try XCTUnwrap(
+                WorldArrivalNativeRenderer.placeholderImage(
+                    for: exact, size: .init(width: 320, height: 360)))),
+                opportunityBaselinePixels)
+        }
+        let fewerSources = try resourceOwned(sourceCount: opportunityTileCount - 1, quantity: 1)
+        let moreSources = try resourceOwned(sourceCount: opportunityTileCount, quantity: 1)
+        XCTAssertTrue(fewerSources.isSubset(of: moreSources))
+        XCTAssertGreaterThan(moreSources.count, fewerSources.count,
+                             "n→n+1 sources must add collision-free ownership")
+        let nearMaximum = try resourceOwned(sourceCount: opportunityTileCount,
+                                            quantity: maximumAggregateQuantity - 1)
+        let maximum = try resourceOwned(sourceCount: opportunityTileCount,
+                                        quantity: maximumAggregateQuantity)
+        XCTAssertTrue(nearMaximum.isSubset(of: maximum))
+        XCTAssertGreaterThan(maximum.count, nearMaximum.count,
+                             "q→q+1 at the legal aggregate maximum must remain distinct")
+        XCTAssertEqual(resourceReceipt, resourceCoordinate,
+                       "O03 relocating the same resource-family aggregate is byte-identical")
+        XCTAssertEqual(siteReceipt, siteIdentityCoordinate,
+                       "O04 relocating a site is byte-identical")
+        XCTAssertEqual(siteReceipt, siteOtherReceipt,
+                       "site category and instance identity remain undisclosed")
+        XCTAssertEqual(siteReceipt, siteManyReceipt,
+                       "one versus many sites and ordering remain byte-identical")
+        XCTAssertNotEqual(resourceReceipt, resourceOtherReceipt,
+                          "O02 stable resource-family identity must remain truthful")
+        XCTAssertEqual(travellerReceipt, emptyOpportunities,
+                       "D01 traveller identity remains excluded")
+        let emptyCommands = try XCTUnwrap(WorldArrivalNativeRenderer.splashCommands(
+            for: emptyOpportunities))
+        let resourceCommands = try XCTUnwrap(WorldArrivalNativeRenderer.splashCommands(
+            for: resourceReceipt))
+        let siteCommands = try XCTUnwrap(WorldArrivalNativeRenderer.splashCommands(
+            for: siteReceipt))
+        XCTAssertNotEqual(emptyCommands, resourceCommands)
+        XCTAssertNotEqual(emptyCommands, siteCommands)
+        let nonOpportunity: (WorldArrivalNativeRenderer.SplashCommand) -> Bool = {
+            $0.scope != .siteOpportunity && $0.scope != .resourceOpportunity
+        }
+        XCTAssertEqual(emptyCommands.filter(nonOpportunity),
+                       resourceCommands.filter(nonOpportunity),
+                       "O02 add/remove resource changes only its opportunity commands")
+        XCTAssertEqual(emptyCommands.filter(nonOpportunity),
+                       siteCommands.filter(nonOpportunity),
+                       "O01 add/remove site changes only its opportunity commands")
+        XCTAssertNotEqual(try rgba(try XCTUnwrap(WorldArrivalNativeRenderer.placeholderImage(
+            for: emptyOpportunities, size: .init(width: 320, height: 360)))),
+                          try rgba(try XCTUnwrap(WorldArrivalNativeRenderer.placeholderImage(
+            for: resourceReceipt, size: .init(width: 320, height: 360)))))
+        XCTAssertNotEqual(try rgba(try XCTUnwrap(WorldArrivalNativeRenderer.placeholderImage(
+            for: emptyOpportunities, size: .init(width: 320, height: 360)))),
+                          try rgba(try XCTUnwrap(WorldArrivalNativeRenderer.placeholderImage(
+            for: siteReceipt, size: .init(width: 320, height: 360)))))
+        XCTAssertNotEqual(try rgba(try XCTUnwrap(WorldArrivalNativeRenderer.placeholderImage(
+            for: resourceReceipt, size: .init(width: 320, height: 360)))),
+                          try rgba(try XCTUnwrap(WorldArrivalNativeRenderer.placeholderImage(
+            for: resourceOtherReceipt, size: .init(width: 320, height: 360)))),
+                          "O02 resource identities own deterministic distinct placeholder pixels")
+        XCTAssertEqual(try rgba(try XCTUnwrap(WorldArrivalNativeRenderer.placeholderImage(
+            for: siteReceipt, size: .init(width: 320, height: 360)))),
+                         try rgba(try XCTUnwrap(WorldArrivalNativeRenderer.placeholderImage(
+            for: siteManyReceipt, size: .init(width: 320, height: 360)))),
+                         "site multiplicity/category/location own one constant visible cue")
+        let encodedData = try JSONEncoder().encode(resourceReceipt)
+        let encodedObject = try XCTUnwrap(JSONSerialization.jsonObject(with: encodedData)
+            as? [String: Any])
+        let opportunityObject = try XCTUnwrap(encodedObject["explorationOpportunities"]
+            as? [String: Any])
+        XCTAssertEqual(Set(opportunityObject.keys), ["hasGeneratedSiteOpportunity", "resources"])
+        let encodedSplash = String(decoding: encodedData, as: UTF8.self)
+        for forbidden in ["traveller", "apex", "yieldPerHarvest", "remainingHarvests",
+                          "resourceID", "siteID", "coordinates"] {
+            XCTAssertFalse(encodedSplash.localizedCaseInsensitiveContains(forbidden),
+                           "D01 exact/identity runtime scope leaked into the aggregate receipt")
+        }
+
+        // C03: corrected prose/title never perturbs the frozen visual command or RGBA stream.
+        var correctedCopy = mixed
+        correctedCopy.finalDescription = "Corrected two-sentence world description. The scene facts remain unchanged."
+        correctedCopy.sourcePagePhysicalReceipt.title += " — corrected"
+        correctedCopy.seal()
+        XCTAssertTrue(correctedCopy.validates())
+        XCTAssertEqual(WorldArrivalNativeRenderer.splashCommands(for: mixed),
+                       WorldArrivalNativeRenderer.splashCommands(for: correctedCopy))
+        XCTAssertEqual(try rgba(mixedImage),
+                       try rgba(try XCTUnwrap(WorldArrivalNativeRenderer.placeholderImage(
+            for: correctedCopy, size: .init(width: 320, height: 360)))))
+
+        var reliefMap = map
+        reliefMap[.init(x: 1, y: 1)].elevation = 1
+        reliefMap[.init(x: 2, y: 1)].elevation = 2
+        reliefMap[.init(x: 2, y: 2)].elevation = 3
+        let mixedRelief = try make(reliefMap, standing: standing, flowing: flowing, frozen: frozen,
+                                   standingBodies: [2], channels: [1], frozenBodies: [1],
+                                   standingDeep: 1, flowingDeep: 0)
+        XCTAssertEqual(Set(mixedRelief.terrain.regions[0].elevationShares
+            .filter { $0.exactCount > 0 }.map(\.id)), ["0", "1", "2", "3"])
+        XCTAssertEqual(mixedRelief.relief.maximumElevation, 3)
+        XCTAssertEqual(mixedRelief.relief.elevatedComponentSizes, [3])
+        XCTAssertEqual(mixedRelief.relief.southContactCounts, [1, 0, 1])
+        XCTAssertTrue(mixedRelief.relief.shapeFlags.isEmpty)
+        let reliefCommands = try XCTUnwrap(WorldArrivalNativeRenderer.splashCommands(
+            for: mixedRelief)).filter { $0.scope == .relief }
+        XCTAssertTrue(reliefCommands.contains { $0.semanticID == "shape"
+            && $0.values.contains("elevated-components=3") })
+        for deferred in ["rolling", "ridge", "basin", "shelf", "enclosed", "broken"] {
+            XCTAssertFalse(reliefCommands.flatMap(\.values).contains(deferred))
+        }
+        for cell in mixedRelief.firstMapCropReceipt.cells where cell.visibility != "hidden" {
+            XCTAssertEqual(cell.elevation, reliefMap[cell.point].elevation)
+        }
+        XCTAssertNotEqual(try rgba(try XCTUnwrap(WorldArrivalNativeRenderer.placeholderImage(
+            for: mixedRelief, size: .init(width: 320, height: 360)))), try rgba(mixedImage))
+
+        // F04/F05: density and habit own distribution geometry independently of identity/color.
+        var plantTraits = FloraTraits()
+        plantTraits.stature = 48
+        plantTraits.habit = .clustered
+        let plant = Flora(id: InstanceID(rawValue: 7001), traits: plantTraits,
+                          worldSeed: run.mapSeed)
+        let available = map.allPoints.filter { map[$0].ground != .chasm }
+        func floraReceipt(count: Int, habit: Habit) throws -> WorldSplashReceiptV3 {
+            var floraMap = map
+            for point in floraMap.allPoints { floraMap[point].flora = nil }
+            for point in available.prefix(count) { floraMap[point].flora = plant.id }
+            var traits = plant.traits
+            traits.habit = habit
+            let changedPlant = Flora(id: plant.id, traits: traits, worldSeed: plant.worldSeed)
+            return try make(floraMap, standing: standing, flowing: flowing, frozen: frozen,
+                            standingBodies: [2], channels: [1], frozenBodies: [1],
+                            standingDeep: 1, flowingDeep: 0, flora: [changedPlant])
+        }
+        func floraPermutationReceipt(_ points: [GridPoint]) throws -> WorldSplashReceiptV3 {
+            var floraMap = map
+            for point in floraMap.allPoints { floraMap[point].flora = nil }
+            for point in points { floraMap[point].flora = plant.id }
+            return try make(floraMap, standing: standing, flowing: flowing, frozen: frozen,
+                            standingBodies: [2], channels: [1], frozenBodies: [1],
+                            standingDeep: 1, flowingDeep: 0, flora: [plant])
+        }
+        let floraCoordinatesA = try floraPermutationReceipt([
+            .init(x: 9, y: 9), .init(x: 10, y: 9)
+        ])
+        let floraCoordinatesB = try floraPermutationReceipt([
+            .init(x: 9, y: 10), .init(x: 10, y: 10)
+        ])
+        XCTAssertEqual(floraCoordinatesA, floraCoordinatesB,
+                       "O07 coordinate permutation preserving region/identity/count is undisclosed")
+        XCTAssertEqual(WorldArrivalNativeRenderer.splashCommands(for: floraCoordinatesA),
+                       WorldArrivalNativeRenderer.splashCommands(for: floraCoordinatesB))
+        XCTAssertEqual(try rgba(try XCTUnwrap(WorldArrivalNativeRenderer.placeholderImage(
+            for: floraCoordinatesA, size: .init(width: 320, height: 360)))),
+                       try rgba(try XCTUnwrap(WorldArrivalNativeRenderer.placeholderImage(
+            for: floraCoordinatesB, size: .init(width: 320, height: 360)))))
+        let sparse = try floraReceipt(count: 2, habit: .clustered)
+        let abundant = try floraReceipt(count: 40, habit: .clustered)
+        let spreading = try floraReceipt(count: 40, habit: .spreading)
+        var pinkDominant = abundant
+        pinkDominant.flora.species[0].renderIdentity.resolvedColor.srgb = [242, 72, 188]
+        pinkDominant.seal()
+        XCTAssertTrue(pinkDominant.validates())
+        XCTAssertEqual(pinkDominant.flora.species[0].coverage, .abundant)
+        XCTAssertTrue(pinkDominant.firstMapCropReceipt.cells.contains {
+            $0.floraStableID == pinkDominant.flora.species[0].stableID
+        }, "F01 high-coverage pink flora must remain present in the disclosed crop")
+        let pinkPixels = try rgba(try XCTUnwrap(WorldArrivalNativeRenderer.placeholderImage(
+            for: pinkDominant, size: .init(width: 320, height: 360))))
+        XCTAssertTrue(containsRGB(pinkPixels, [242, 72, 188], tolerance: 16),
+                      "F01 the high-coverage pink identity must own scene pixels")
+        func withoutFlora(_ source: WorldSplashReceiptV3) -> WorldSplashReceiptV3 {
+            var copy = source
+            copy.flora.species = []
+            copy.flora.placedIdentityCount = 0
+            copy.flora.occupiedTileCount = 0
+            copy.flora.aggregateCoverage = .none
+            for index in copy.terrain.regions.indices { copy.terrain.regions[index].floraShares = [] }
+            for index in copy.firstMapCropReceipt.cells.indices {
+                copy.firstMapCropReceipt.cells[index].floraStableID = nil
+            }
+            copy.seal()
+            return copy
+        }
+        let firstRegionHosts = available.filter {
+            $0.x * WorldSplashReceiptV3.regionColumns / map.width == 0
+                && $0.y * WorldSplashReceiptV3.regionRows / map.height == 0
+        }
+        var priorExactFloraPixels = Set<Int>()
+        for exactCount in 1...firstRegionHosts.count {
+            let exactReceipt = try floraPermutationReceipt(
+                Array(firstRegionHosts.prefix(exactCount)))
+            let exactPixels = try rgba(try XCTUnwrap(
+                WorldArrivalNativeRenderer.placeholderImage(
+                    for: exactReceipt, size: .init(width: 320, height: 360))))
+            let exactBarePixels = try rgba(try XCTUnwrap(
+                WorldArrivalNativeRenderer.placeholderImage(
+                    for: withoutFlora(exactReceipt), size: .init(width: 320, height: 360))))
+            let owned = changedPixels(exactPixels, exactBarePixels)
+            XCTAssertTrue(priorExactFloraPixels.isSubset(of: owned))
+            XCTAssertGreaterThan(owned.count, priorExactFloraPixels.count,
+                                 "each legal q→q+1 regional flora count must add ownership")
+            priorExactFloraPixels = owned
+        }
+        var pinkSparse = sparse
+        pinkSparse.flora.species[0].renderIdentity.resolvedColor.srgb = [242, 72, 188]
+        pinkSparse.seal()
+        let pinkSparsePixels = try rgba(try XCTUnwrap(WorldArrivalNativeRenderer.placeholderImage(
+            for: pinkSparse, size: .init(width: 320, height: 360))))
+        let abundantBarePixels = try rgba(try XCTUnwrap(WorldArrivalNativeRenderer.placeholderImage(
+            for: withoutFlora(pinkDominant), size: .init(width: 320, height: 360))))
+        let sparseBarePixels = try rgba(try XCTUnwrap(WorldArrivalNativeRenderer.placeholderImage(
+            for: withoutFlora(pinkSparse), size: .init(width: 320, height: 360))))
+        XCTAssertGreaterThan(changedPixels(pinkPixels, abundantBarePixels).count,
+                             changedPixels(pinkSparsePixels, sparseBarePixels).count,
+                             "F01 abundant identity must own more geometry than sparse identity")
+        for region in pinkDominant.terrain.regions where
+            region.floraShares.first?.exactCount ?? 0 > 0 {
+            let minX = 8 + region.column * 76
+            let maxX = region.column == 3 ? 312 : minX + 76
+            let minY = 8 + Int(floor(Double(region.row) * 344.0 / 3.0))
+            let maxY = region.row == 2 ? 352
+                : 8 + Int(ceil(Double(region.row + 1) * 344.0 / 3.0))
+            let ownsPink = (minY..<maxY).contains { y in
+                (minX..<maxX).contains { x in
+                    let offset = (y * 320 + x) * 4
+                    let pixel = Data(pinkPixels[offset..<(offset + 4)])
+                    return containsRGB(pixel, [242, 72, 188], tolerance: 16)
+                }
+            }
+            XCTAssertTrue(ownsPink, "F01 every nonempty flora region must visibly retain pink ownership")
+        }
+        let fullPinkCrop = pinkDominant.firstMapCropReceipt.cells.filter {
+            $0.visibility == "full" && $0.floraStableID != nil
+        }
+        XCTAssertFalse(fullPinkCrop.isEmpty)
+        XCTAssertTrue(fullPinkCrop.allSatisfy {
+            $0.floraStableID == pinkDominant.flora.species[0].stableID
+                && pinkDominant.flora.species[0].renderIdentity.resolvedColor.srgb == [242, 72, 188]
+        }, "F01 full-visible crop cells retain the same stable identity/color request")
+        XCTAssertNotEqual(WorldArrivalNativeRenderer.splashCommands(for: sparse),
+                          WorldArrivalNativeRenderer.splashCommands(for: abundant))
+        XCTAssertNotEqual(try rgba(try XCTUnwrap(WorldArrivalNativeRenderer.placeholderImage(
+            for: sparse, size: .init(width: 320, height: 360)))),
+                          try rgba(try XCTUnwrap(WorldArrivalNativeRenderer.placeholderImage(
+            for: abundant, size: .init(width: 320, height: 360)))))
+        XCTAssertNotEqual(WorldArrivalNativeRenderer.splashCommands(for: abundant),
+                          WorldArrivalNativeRenderer.splashCommands(for: spreading))
+        XCTAssertNotEqual(try rgba(try XCTUnwrap(WorldArrivalNativeRenderer.placeholderImage(
+            for: abundant, size: .init(width: 320, height: 360)))),
+                          try rgba(try XCTUnwrap(WorldArrivalNativeRenderer.placeholderImage(
+            for: spreading, size: .init(width: 320, height: 360)))))
+
+        // F06: Splash itself has no prefix-four truncation, even though current WorldGrade
+        // generation remains correctly limited to four realized species.
+        func localBand(_ count: Int, _ total: Int) -> WorldSplashReceiptV3.CoverageBand {
+            guard count > 0 else { return .none }
+            let ratio = Double(count) / Double(total)
+            if ratio < 0.03 { return .trace }
+            if ratio < 0.10 { return .sparse }
+            if ratio < 0.25 { return .present }
+            if ratio < 0.50 { return .abundant }
+            return .dominant
+        }
+        let templateSpecies = try XCTUnwrap(abundant.flora.species.first)
+        var six = abundant
+        six.flora.species = (0..<6).map { index in
+            var species = templateSpecies
+            species.stableID = "flora-\(7001 + index)"
+            species.renderIdentity.speciesID = species.stableID
+            species.renderIdentity.resolvedColor.srgb = [40 + index * 20, 90 + index * 10, 70 + index * 8]
+            species.placedTileCount = 1
+            species.coverage = localBand(1, six.terrain.nonChasmTileCount)
+            species.regionShares = (0..<12).map { region in
+                localBand(region == index ? 1 : 0,
+                          six.terrain.regions[region].groundShares.reduce(0) { $0 + $1.exactCount })
+            }
+            return species
+        }
+        for regionIndex in six.terrain.regions.indices {
+            let regionTotal = six.terrain.regions[regionIndex].groundShares
+                .reduce(0) { $0 + $1.exactCount }
+            six.terrain.regions[regionIndex].floraShares = six.flora.species.enumerated().map {
+                speciesIndex, species in
+                let exact = speciesIndex == regionIndex ? 1 : 0
+                return .init(id: species.stableID, exactCount: exact,
+                             band: localBand(exact, regionTotal))
+            }
+        }
+        six.flora.placedIdentityCount = 6
+        six.flora.occupiedTileCount = 6
+        six.flora.aggregateCoverage = localBand(6, six.terrain.nonChasmTileCount)
+        six.seal()
+        XCTAssertTrue(six.validates())
+        let sixCommands = try XCTUnwrap(WorldArrivalNativeRenderer.splashCommands(for: six))
+        XCTAssertEqual(sixCommands.count { $0.scope == .floraIdentity }, 6)
+        XCTAssertEqual(sixCommands.count { $0.scope == .floraDistribution }, 6)
+        var five = six
+        let removed = five.flora.species.removeLast()
+        for regionIndex in five.terrain.regions.indices {
+            five.terrain.regions[regionIndex].floraShares.removeAll { $0.id == removed.stableID }
+        }
+        five.flora.placedIdentityCount = 5
+        five.flora.occupiedTileCount = 5
+        five.flora.aggregateCoverage = localBand(5, five.terrain.nonChasmTileCount)
+        five.seal()
+        XCTAssertTrue(five.validates())
+        let fiveCommands = try XCTUnwrap(WorldArrivalNativeRenderer.splashCommands(for: five))
+        XCTAssertNotEqual(sixCommands, fiveCommands)
+        let nonFlora: (WorldArrivalNativeRenderer.SplashCommand) -> Bool = {
+            $0.scope != .floraIdentity && $0.scope != .floraDistribution
+        }
+        XCTAssertEqual(sixCommands.filter(nonFlora), fiveCommands.filter(nonFlora),
+                       "F02 removal changes only flora-owned commands")
+        let retainedIDs = Set(five.flora.species.map(\.stableID))
+        XCTAssertEqual(sixCommands.filter { ($0.scope == .floraIdentity
+            || $0.scope == .floraDistribution) && retainedIDs.contains($0.semanticID) },
+                       fiveCommands.filter { $0.scope == .floraIdentity
+            || $0.scope == .floraDistribution },
+                       "F02 must preserve every retained species command byte-for-byte")
+        XCTAssertNotEqual(try rgba(try XCTUnwrap(WorldArrivalNativeRenderer.placeholderImage(
+            for: six, size: .init(width: 320, height: 360)))),
+                          try rgba(try XCTUnwrap(WorldArrivalNativeRenderer.placeholderImage(
+            for: five, size: .init(width: 320, height: 360)))))
+
+        var recolored = six
+        recolored.flora.species[0].renderIdentity.resolvedColor.srgb = [242, 72, 188]
+        recolored.seal()
+        XCTAssertTrue(recolored.validates())
+        let recoloredCommands = try XCTUnwrap(
+            WorldArrivalNativeRenderer.splashCommands(for: recolored))
+        XCTAssertEqual(sixCommands.filter(nonFlora), recoloredCommands.filter(nonFlora))
+        XCTAssertNotEqual(sixCommands.filter { $0.scope == .floraIdentity },
+                          recoloredCommands.filter { $0.scope == .floraIdentity })
+        XCTAssertEqual(sixCommands.filter { $0.scope == .floraDistribution },
+                       recoloredCommands.filter { $0.scope == .floraDistribution },
+                       "F03 color-only changes must preserve distribution commands byte-for-byte")
+        XCTAssertNotEqual(try rgba(try XCTUnwrap(WorldArrivalNativeRenderer.placeholderImage(
+            for: six, size: .init(width: 320, height: 360)))),
+                          try rgba(try XCTUnwrap(WorldArrivalNativeRenderer.placeholderImage(
+            for: recolored, size: .init(width: 320, height: 360)))))
+
+        var bare = six
+        bare.flora.species = []
+        bare.flora.placedIdentityCount = 0
+        bare.flora.occupiedTileCount = 0
+        bare.flora.aggregateCoverage = .none
+        for index in bare.terrain.regions.indices { bare.terrain.regions[index].floraShares = [] }
+        for index in bare.firstMapCropReceipt.cells.indices {
+            bare.firstMapCropReceipt.cells[index].floraStableID = nil
+        }
+        bare.seal()
+        XCTAssertTrue(bare.validates())
+        let bareBytes = try rgba(try XCTUnwrap(WorldArrivalNativeRenderer.placeholderImage(
+            for: bare, size: .init(width: 320, height: 360))))
+        let sixBytes = try rgba(try XCTUnwrap(WorldArrivalNativeRenderer.placeholderImage(
+            for: six, size: .init(width: 320, height: 360))))
+        let recoloredBytes = try rgba(try XCTUnwrap(WorldArrivalNativeRenderer.placeholderImage(
+            for: recolored, size: .init(width: 320, height: 360))))
+        XCTAssertEqual(changedPixels(sixBytes, bareBytes), changedPixels(recoloredBytes, bareBytes),
+                       "F03 color-only changes must retain the exact flora-owned pixel geometry")
+
+        var reformed = six
+        reformed.flora.species[0].renderIdentity.formID =
+            (reformed.flora.species[0].renderIdentity.formID + 1) % 4
+        reformed.seal()
+        XCTAssertTrue(reformed.validates())
+        XCTAssertNotEqual(try rgba(try XCTUnwrap(WorldArrivalNativeRenderer.placeholderImage(
+            for: six, size: .init(width: 320, height: 360)))),
+                          try rgba(try XCTUnwrap(WorldArrivalNativeRenderer.placeholderImage(
+            for: reformed, size: .init(width: 320, height: 360)))))
+
+        var permuted = six
+        permuted.flora.species.reverse()
+        for index in permuted.terrain.regions.indices {
+            permuted.terrain.regions[index].floraShares.reverse()
+        }
+        permuted.seal()
+        XCTAssertFalse(permuted.validates(), "persisted species order is canonical, never Set order")
+
+        // F07: source catalogue order is canonicalized before the receipt, commands, and pixels.
+        var secondTraits = plant.traits
+        secondTraits.stature = min(100, secondTraits.stature + 20)
+        let secondPlant = Flora(id: .init(rawValue: 7002), traits: secondTraits,
+                                worldSeed: plant.worldSeed)
+        var orderedMap = map
+        orderedMap[.init(x: 4, y: 4)].flora = plant.id
+        orderedMap[.init(x: 5, y: 4)].flora = secondPlant.id
+        let forward = try make(orderedMap, standing: standing, flowing: flowing, frozen: frozen,
+                               standingBodies: [2], channels: [1], frozenBodies: [1],
+                               standingDeep: 1, flowingDeep: 0, flora: [plant, secondPlant])
+        let reverse = try make(orderedMap, standing: standing, flowing: flowing, frozen: frozen,
+                               standingBodies: [2], channels: [1], frozenBodies: [1],
+                               standingDeep: 1, flowingDeep: 0, flora: [secondPlant, plant])
+        XCTAssertEqual(forward, reverse)
+        XCTAssertEqual(WorldArrivalNativeRenderer.splashCommands(for: forward),
+                       WorldArrivalNativeRenderer.splashCommands(for: reverse))
+        XCTAssertEqual(try rgba(try XCTUnwrap(WorldArrivalNativeRenderer.placeholderImage(
+            for: forward, size: .init(width: 320, height: 360)))),
+                       try rgba(try XCTUnwrap(WorldArrivalNativeRenderer.placeholderImage(
+            for: reverse, size: .init(width: 320, height: 360)))))
+    }
+
+    @MainActor
+    func testWorldSplashSemanticDepositPalettesRemainDistinctAndDescriptorOwned() throws {
+        func descriptor(hue: Double, atmosphere: WorldGrade2V1.Atmosphere = .init(
+            medium: "none", density: 0, paletteFamilyID: "clear"),
+            atmosphereColor: WorldGrade2V1.ResolvedColor? = nil) throws
+            -> WorldGrade2V1.Descriptor {
+            try WorldGrade2V1.resolve(.init(
+                material: .init(identity: "mixedMineral", paletteFamilyID: "paleNeutral",
+                                transform: .init(hue: hue, saturation: 1, value: 0)),
+                atmosphere: atmosphere,
+                flora: .init(coveragePercent: 0, paletteRichness: 0, cast: []),
+                resolvedColors: .init(atmosphere: atmosphereColor)))
+        }
+        let neutral = try descriptor(hue: 0)
+        let opposed = try descriptor(hue: 28, atmosphere: .init(
+            medium: "smoke", density: 55, paletteFamilyID: "neutralSmoke"),
+            atmosphereColor: .init(srgb: [130, 76, 166],
+                resolutionVersion: "resolved-color-1.0.0", provenance: "bindRandom"))
+        let neutralSnow = try TerrainProductionPack.resolvedSurfaceDepositPalette(
+            .snow, descriptor: neutral)
+        let neutralAsh = try TerrainProductionPack.resolvedSurfaceDepositPalette(
+            .settledAsh, descriptor: neutral)
+        let opposedSnow = try TerrainProductionPack.resolvedSurfaceDepositPalette(
+            .snow, descriptor: opposed)
+        let opposedAsh = try TerrainProductionPack.resolvedSurfaceDepositPalette(
+            .settledAsh, descriptor: opposed)
+        XCTAssertNotEqual(neutralSnow, neutralAsh)
+        XCTAssertNotEqual(neutralSnow, opposedSnow)
+        XCTAssertNotEqual(neutralAsh, opposedAsh)
+        XCTAssertEqual(neutralSnow.count, 5)
+        XCTAssertEqual(neutralAsh.count, 5)
+
+        let store = GameStore(io: .temporary(name: "splash-deposit-palette-\(UUID().uuidString)"))
+        XCTAssertTrue(store.bindAndDepart(
+            worldPageInstanceID: WorldPageCatalog.earthlikeTestInstance.id))
+        var neutralReceipt = try XCTUnwrap(
+            store.activeRun?.worldArrivalReceipt?.worldSplashReceiptV3)
+        func band(_ count: Int, _ total: Int) -> WorldSplashReceiptV3.CoverageBand {
+            guard count > 0 else { return .none }
+            let ratio = Double(count) / Double(total)
+            if ratio < 0.03 { return .trace }
+            if ratio < 0.10 { return .sparse }
+            if ratio < 0.25 { return .present }
+            if ratio < 0.50 { return .abundant }
+            return .dominant
+        }
+        let total = neutralReceipt.terrain.width * neutralReceipt.terrain.height
+        neutralReceipt.deposits.snowCount = 1
+        neutralReceipt.deposits.settledAshCount = 1
+        neutralReceipt.deposits.snowCoverage = band(1, total)
+        neutralReceipt.deposits.settledAshCoverage = band(1, total)
+        for index in neutralReceipt.terrain.regions.indices {
+            neutralReceipt.terrain.regions[index].depositShares[0].exactCount = 0
+            neutralReceipt.terrain.regions[index].depositShares[0].band = .none
+            neutralReceipt.terrain.regions[index].depositShares[1].exactCount = 0
+            neutralReceipt.terrain.regions[index].depositShares[1].band = .none
+        }
+        let regionTotal = neutralReceipt.terrain.regions[0].groundShares
+            .reduce(0) { $0 + $1.exactCount }
+        neutralReceipt.terrain.regions[0].depositShares[0].exactCount = 1
+        neutralReceipt.terrain.regions[0].depositShares[0].band = band(1, regionTotal)
+        neutralReceipt.terrain.regions[0].depositShares[1].exactCount = 1
+        neutralReceipt.terrain.regions[0].depositShares[1].band = band(1, regionTotal)
+        neutralReceipt.terrain.materialPresentation = try XCTUnwrap(
+            WorldSplashReceiptV3.MaterialPresentationDescriptor.make(from: neutral))
+        neutralReceipt.seal()
+        XCTAssertTrue(neutralReceipt.validates())
+        func deposits(_ snow: Int, _ ash: Int) -> WorldSplashReceiptV3 {
+            var copy = neutralReceipt
+            copy.deposits.snowCount = snow
+            copy.deposits.settledAshCount = ash
+            copy.deposits.snowCoverage = band(snow, total)
+            copy.deposits.settledAshCoverage = band(ash, total)
+            for index in copy.terrain.regions.indices {
+                copy.terrain.regions[index].depositShares[0].exactCount = index == 0 ? snow : 0
+                copy.terrain.regions[index].depositShares[0].band = index == 0 ? band(snow, regionTotal) : .none
+                copy.terrain.regions[index].depositShares[1].exactCount = index == 0 ? ash : 0
+                copy.terrain.regions[index].depositShares[1].band = index == 0 ? band(ash, regionTotal) : .none
+            }
+            copy.seal()
+            return copy
+        }
+        let depositVariants = [deposits(0, 0), deposits(1, 0), deposits(0, 1), deposits(1, 1)]
+        XCTAssertTrue(depositVariants.allSatisfy { $0.validates() })
+        let depositCommands = depositVariants.map {
+            WorldArrivalNativeRenderer.splashCommands(for: $0)!
+        }
+        let withoutDeposits: (WorldArrivalNativeRenderer.SplashCommand) -> Bool = {
+            $0.scope != .surfaceDeposit
+        }
+        XCTAssertTrue(depositCommands.dropFirst().allSatisfy {
+            $0.filter(withoutDeposits) == depositCommands[0].filter(withoutDeposits)
+        }, "T03 deposit variants may change only deposit-owned commands")
+        let depositPixels = try depositVariants.map { receipt -> Data in
+            let image = try XCTUnwrap(WorldArrivalNativeRenderer.placeholderImage(
+                for: receipt, size: .init(width: 320, height: 360)))
+            return try XCTUnwrap(image.cgImage?.dataProvider?.data) as Data
+        }
+        XCTAssertEqual(Set(depositPixels).count, 4,
+                       "T03 none, snow, Ash, and both must all remain visibly distinct")
+        var opposedReceipt = neutralReceipt
+        opposedReceipt.terrain.materialPresentation = try XCTUnwrap(
+            WorldSplashReceiptV3.MaterialPresentationDescriptor.make(from: opposed))
+        opposedReceipt.seal()
+        XCTAssertTrue(opposedReceipt.validates())
+        let neutralCommands = try XCTUnwrap(
+            WorldArrivalNativeRenderer.splashCommands(for: neutralReceipt))
+        let opposedCommands = try XCTUnwrap(
+            WorldArrivalNativeRenderer.splashCommands(for: opposedReceipt))
+        XCTAssertNotEqual(neutralCommands, opposedCommands)
+        let descriptorIndependent: (WorldArrivalNativeRenderer.SplashCommand) -> Bool = {
+            !($0.scope == .terrainMass && $0.semanticID == "material-presentation")
+        }
+        XCTAssertEqual(neutralCommands.filter(descriptorIndependent),
+                       opposedCommands.filter(descriptorIndependent),
+                       "T02 descriptor-only recolor preserves exact geometry and role ownership")
+        let neutralImage = try XCTUnwrap(WorldArrivalNativeRenderer.placeholderImage(
+            for: neutralReceipt, size: .init(width: 320, height: 360)))
+        let opposedImage = try XCTUnwrap(WorldArrivalNativeRenderer.placeholderImage(
+            for: opposedReceipt, size: .init(width: 320, height: 360)))
+        XCTAssertNotEqual(neutralImage.cgImage?.dataProvider?.data as Data?,
+                          opposedImage.cgImage?.dataProvider?.data as Data?)
+    }
+
+    @MainActor
+    func testWorldSplashEnvironmentStatesOwnDistinctCommandsAndPixels() throws {
+        let store = GameStore(io: .temporary(name: "splash-environment-\(UUID().uuidString)"))
+        XCTAssertTrue(store.bindAndDepart(
+            worldPageInstanceID: WorldPageCatalog.earthlikeTestInstance.id))
+        let base = try XCTUnwrap(store.activeRun?.worldArrivalReceipt?.worldSplashReceiptV3)
+        func variant(_ edit: (inout WorldSplashReceiptV3.EnvironmentProfile) -> Void)
+            throws -> WorldSplashReceiptV3 {
+            var copy = base
+            edit(&copy.environment)
+            copy.seal()
+            XCTAssertTrue(copy.validates())
+            return copy
+        }
+        func bytes(_ receipt: WorldSplashReceiptV3) throws -> Data {
+            let image = try XCTUnwrap(WorldArrivalNativeRenderer.placeholderImage(
+                for: receipt, size: .init(width: 320, height: 360)))
+            return try XCTUnwrap(image.cgImage?.dataProvider?.data) as Data
+        }
+        let dimConstant = try variant {
+            $0.illuminationBand = "dim"; $0.illuminationSourceClass = "constant"
+        }
+        let dimCyclic = try variant {
+            $0.illuminationBand = "dim"; $0.illuminationSourceClass = "cyclic"
+        }
+        XCTAssertNotEqual(WorldArrivalNativeRenderer.splashCommands(for: dimConstant),
+                          WorldArrivalNativeRenderer.splashCommands(for: dimCyclic))
+        XCTAssertNotEqual(try bytes(dimConstant), try bytes(dimCyclic))
+
+        let smokeTrace = try variant {
+            $0.suspendedMedium = "smoke"; $0.suspendedDensity = "trace"; $0.suspendedMotion = "calm"
+        }
+        let mistStrong = try variant {
+            $0.suspendedMedium = "mist"; $0.suspendedDensity = "dense"; $0.suspendedMotion = "strong"
+        }
+        XCTAssertNotEqual(WorldArrivalNativeRenderer.splashCommands(for: smokeTrace),
+                          WorldArrivalNativeRenderer.splashCommands(for: mistStrong))
+        XCTAssertNotEqual(try bytes(smokeTrace), try bytes(mistStrong))
+
+        let rain = try variant {
+            $0.precipitationMedium = "rain"; $0.precipitationIntensity = "heavy"
+            $0.precipitationMotion = "moving"
+        }
+        let snow = try variant {
+            $0.precipitationMedium = "snow"; $0.precipitationIntensity = "heavy"
+            $0.precipitationMotion = "moving"
+        }
+        let mixed = try variant {
+            $0.precipitationMedium = "mixedRainSnow"; $0.precipitationIntensity = "heavy"
+            $0.precipitationMotion = "strong"
+        }
+        XCTAssertNotEqual(try bytes(rain), try bytes(snow))
+        XCTAssertNotEqual(try bytes(snow), try bytes(mixed))
+        XCTAssertNotEqual(WorldArrivalNativeRenderer.splashCommands(for: rain),
+                          WorldArrivalNativeRenderer.splashCommands(for: snow))
+
+        let noPrecipitation = try variant {
+            $0.precipitationMedium = "none"; $0.precipitationIntensity = "none"
+            $0.precipitationMotion = "strong"
+        }
+        let strongSnow = try variant {
+            $0.precipitationMedium = "snow"; $0.precipitationIntensity = "heavy"
+            $0.precipitationMotion = "strong"
+        }
+        let noPrecipitationBytes = try bytes(noPrecipitation)
+        let strongSnowBytes = try bytes(strongSnow)
+        let changed = stride(from: 0, to: strongSnowBytes.count, by: 4).compactMap { offset -> Int? in
+            strongSnowBytes[offset..<(offset + 4)] == noPrecipitationBytes[offset..<(offset + 4)]
+                ? nil : offset / 4
+        }
+        XCTAssertFalse(changed.isEmpty)
+        XCTAssertTrue(changed.allSatisfy { pixel in
+            let x = pixel % 320, y = pixel / 320
+            return x >= 8 && x < 312 && y >= 8 && y < 352
+        }, "E02 strong precipitation must remain clipped to the framed scene")
+
+        func assertDistinct(_ receipts: [WorldSplashReceiptV3], label: String,
+                            file: StaticString = #filePath, line: UInt = #line) throws {
+            let commands = receipts.map { WorldArrivalNativeRenderer.splashCommands(for: $0) }
+            let commandBytes = try commands.map { try JSONEncoder().encode(try XCTUnwrap($0)) }
+            XCTAssertEqual(Set(commandBytes).count, receipts.count,
+                           "\(label) commands collapsed", file: file, line: line)
+            let images = try receipts.map(bytes)
+            XCTAssertEqual(Set(images).count, receipts.count,
+                           "\(label) pixels collapsed", file: file, line: line)
+        }
+        var illuminationStates: [WorldSplashReceiptV3] = []
+        for band in ["trueDark", "dim", "ordinary", "bright", "blazing"] {
+            for source in ["sourceless", "constant", "cyclic"] {
+                illuminationStates.append(try variant {
+                    $0.illuminationBand = band; $0.illuminationSourceClass = source
+                })
+            }
+        }
+        try assertDistinct(illuminationStates, label: "E01 illumination band/source")
+
+        var suspendedStates: [WorldSplashReceiptV3] = []
+        for medium in ["smoke", "airborneAsh", "mist", "miasma"] {
+            for density in ["trace", "light", "heavy", "dense"] {
+                for motion in ["calm", "moving", "strong"] {
+                    suspendedStates.append(try variant {
+                        $0.suspendedMedium = medium; $0.suspendedDensity = density
+                        $0.suspendedMotion = motion
+                    })
+                }
+            }
+        }
+        try assertDistinct(suspendedStates, label: "E02 suspended medium/density/motion")
+
+        var precipitationStates: [WorldSplashReceiptV3] = []
+        for medium in ["rain", "snow", "mixedRainSnow"] {
+            for intensity in ["trace", "light", "heavy"] {
+                for motion in ["calm", "moving", "strong"] {
+                    precipitationStates.append(try variant {
+                        $0.precipitationMedium = medium; $0.precipitationIntensity = intensity
+                        $0.precipitationMotion = motion
+                    })
+                }
+            }
+        }
+        try assertDistinct(precipitationStates, label: "E02 precipitation medium/intensity/motion")
+    }
+
+    @MainActor
     func testWorldArrivalPendingLifecycleSurvivesRelaunchAndEnterIsZeroMutation() throws {
         let io = SaveFileIO.temporary(name: "arrival-relaunch-\(UUID().uuidString)")
         var store: GameStore? = GameStore(io: io)
@@ -459,9 +2121,9 @@ final class PageTests: XCTestCase {
     @MainActor
     func testStarterBindFactoryFreezesExactAcceptedDescriptionsAndClosedCausalBands() throws {
         let expected = [
-            "starter_open_meadow": "Broad sandy ground runs between shallow pools. Your Plains Sigil opened the terrain, while your Verdant Sigil spread low growth farther along the few wet and stony edges.",
-            "starter_rainwashed_shore": "Stone shelves break a wide run of shallow and deep water. Your Archipelago Sigil divided the route, while only the ground nearest the entry remained clearly visible.",
-            "starter_stone_hollow": "Stone closes around narrow paths and wet hollows. Your Caverns Sigil shaped the enclosure, while your Ore Sigil made ore more plentiful."
+            "starter_open_meadow": "Broad sandy ground stretches into the distance. Your Plains Sigil opened the terrain, while your Verdant Sigil spread low growth farther along the few wet and stony edges.",
+            "starter_rainwashed_shore": "Stone shelves rise as islands from shallow and deep water. Your Archipelago Sigil divided the route, while only the ground nearest the entry remained clearly visible.",
+            "starter_stone_hollow": "Stone closes around narrow paths and wet hollows. Your Caverns Sigil shaped the enclosure, while sparse growth settled on the open stone."
         ]
         let closed: [WorldArrivalReceipt.CausalVisualFact.Scope: Set<String>] = [
             .ground: Set(GroundType.allCases.map(\.rawValue)),
@@ -479,6 +2141,51 @@ final class PageTests: XCTestCase {
             let receipt = try XCTUnwrap(fixture.store.activeRun?.worldArrivalReceipt)
             XCTAssertEqual(receipt.finalDescription, expected[instance.definition.id.rawValue],
                            instance.definition.id.rawValue)
+            let splash = try XCTUnwrap(receipt.worldSplashReceiptV3)
+            switch instance.definition.id.rawValue {
+            case "starter_open_meadow":
+                XCTAssertEqual(splash.terrain.dominantDryGround, .sand)
+                XCTAssertEqual(splash.water.shallowCount + splash.water.deepCount, 0)
+                XCTAssertEqual(splash.flora.species.map(\.placedTileCount), [22])
+                XCTAssertEqual(splash.relief.elevationCounts, [308, 16, 0, 0])
+            case "starter_rainwashed_shore":
+                XCTAssertEqual(splash.water.shallowCount, 84)
+                XCTAssertEqual(splash.water.deepCount, 40)
+                XCTAssertEqual(splash.water.topologyFlags.map(\.rawValue),
+                               ["standing", "lake", "shelf", "island", "broken"])
+                XCTAssertTrue(receipt.finalDescription.contains(
+                    "only the ground nearest the entry remained clearly visible"))
+                XCTAssertEqual(splash.relief.elevationCounts, [265, 59, 0, 0])
+            case "starter_stone_hollow":
+                XCTAssertEqual(splash.terrain.dominantDryGround, .stone)
+                XCTAssertEqual(splash.relief.elevationCounts, [268, 56, 0, 0])
+                XCTAssertEqual(splash.relief.elevatedComponentSizes, [13, 43])
+                XCTAssertEqual(splash.relief.southContactCounts, [12, 0, 0])
+                let commands = try XCTUnwrap(WorldArrivalNativeRenderer.splashCommands(for: splash))
+                let positiveOreOwner = receipt.causalVisualFacts.first {
+                    $0.scope == .resource && $0.semanticKey == "common_ore"
+                        && $0.contributionKind == .increased
+                }
+                let oreRow = splash.explorationOpportunities.resources.first {
+                    $0.stableID == Resources.ore.rawValue
+                }
+                if let positiveOreOwner {
+                    XCTAssertEqual(oreRow?.causalMarkIDs, [positiveOreOwner.candidateMarkID])
+                    XCTAssertTrue(commands.contains {
+                        $0.scope == .resourceOpportunity && $0.semanticID == Resources.ore.rawValue
+                    }, "positive same-seed Ore causality must own the S03 opportunity")
+                } else {
+                    XCTAssertNil(oreRow, "ordinary Ore without positive causality stays undisclosed")
+                }
+            default: XCTFail("unregistered starter matrix row")
+            }
+            XCTAssertTrue(splash.validates())
+            XCTAssertEqual(splash.firstMapCropReceipt, receipt.firstMapCropReceipt)
+            XCTAssertNotNil(WorldArrivalNativeRenderer.splashCommands(for: splash))
+            XCTAssertNotNil(WorldArrivalNativeRenderer.placeholderImage(
+                for: splash, size: .init(width: 320, height: 360)))
+            XCTAssertEqual(fixture.store.state.reality.library.visitedWorlds.last?
+                .worldArrivalReceipt?.worldSplashReceiptV3, splash)
             for fact in receipt.causalVisualFacts {
                 XCTAssertTrue(closed[fact.scope, default: []].contains(fact.resultBand),
                               "open result band \(fact.resultBand)")

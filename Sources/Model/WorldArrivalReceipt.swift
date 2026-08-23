@@ -20,6 +20,14 @@ struct WorldSplashReceiptV3: Codable, Equatable, Sendable {
     static let schemaVersion = "world-splash-v3"
     static let regionColumns = 4
     static let regionRows = 3
+    /// One generated source occupies one tile. The richest legal source is a concentrated
+    /// substrate node: 3 harvests × 7 units. Raw drops and flora nodes are lower.
+    static let maximumObtainableQuantityPerSource = 21
+    /// Collision-free opportunity slots in the canonical 320×360 proof scene (8pt inset,
+    /// two logical pixels per slot). Persisted receipts exceeding this fail closed.
+    // Canonical 320×360 proof scene: the inset 296×336 interior owns a
+    // collision-free 2×2 opportunity ledger (148×168 slots).
+    static let maximumResourceOpportunityMarks = 24_864
 
     enum CoverageBand: String, Codable, CaseIterable, Sendable {
         case none, trace, sparse, present, abundant, dominant
@@ -27,11 +35,10 @@ struct WorldSplashReceiptV3: Codable, Equatable, Sendable {
     enum WaterTopology: String, Codable, CaseIterable, Sendable {
         case standing, flowing, pool, lake, channel, shelf, island, broken
     }
-    enum ReliefShape: String, Codable, CaseIterable, Sendable {
-        case flat, rolling, ridge, basin, shelf, enclosed, broken
-    }
+    enum ReliefShape: String, Codable, CaseIterable, Sendable { case flat }
     struct Share: Codable, Equatable, Sendable {
         var id: String
+        var exactCount: Int
         var band: CoverageBand
     }
     struct Region: Codable, Equatable, Sendable {
@@ -48,6 +55,43 @@ struct WorldSplashReceiptV3: Codable, Equatable, Sendable {
         var exactCount: Int
         var coverage: CoverageBand
     }
+    /// The exact immutable subset of WorldGrade2 needed to reproduce material-owned map palettes.
+    /// Flora is intentionally absent: zero-placement species cannot leak into the Splash receipt.
+    struct MaterialPresentationDescriptor: Codable, Equatable, Sendable {
+        var versions: WorldGrade2V1.Versions
+        var material: WorldGrade2V1.Material
+        var atmosphere: WorldGrade2V1.Atmosphere
+        var resolvedMaterialColor: WorldGrade2V1.ResolvedColor?
+        var resolvedAtmosphereColor: WorldGrade2V1.ResolvedColor?
+        var canonicalPresentationSHA256: String
+
+        func resolvedDescriptor() throws -> WorldGrade2V1.Descriptor {
+            try WorldGrade2V1.resolve(.init(
+                versions: versions, material: material, atmosphere: atmosphere,
+                flora: .init(coveragePercent: 0, paletteRichness: 0, cast: []),
+                resolvedColors: .init(material: resolvedMaterialColor,
+                                      atmosphere: resolvedAtmosphereColor)))
+        }
+
+        func validates() -> Bool {
+            var copy = self
+            copy.canonicalPresentationSHA256 = ""
+            guard canonicalPresentationSHA256 == (try? WorldGrade2V1.canonicalSHA256(copy)),
+                  (try? resolvedDescriptor()) != nil else { return false }
+            return true
+        }
+
+        static func make(from descriptor: WorldGrade2V1.Descriptor) -> Self? {
+            var result = Self(
+                versions: descriptor.versions, material: descriptor.material,
+                atmosphere: descriptor.atmosphere,
+                resolvedMaterialColor: descriptor.resolvedColors.material,
+                resolvedAtmosphereColor: descriptor.resolvedColors.atmosphere,
+                canonicalPresentationSHA256: "")
+            result.canonicalPresentationSHA256 = (try? WorldGrade2V1.canonicalSHA256(result)) ?? ""
+            return result.validates() ? result : nil
+        }
+    }
     struct TerrainProfile: Codable, Equatable, Sendable {
         var width: Int
         var height: Int
@@ -55,15 +99,24 @@ struct WorldSplashReceiptV3: Codable, Equatable, Sendable {
         var grounds: [GroundCensus]
         var dominantDryGround: GroundType
         var secondaryVisibleGrounds: [GroundType]
-        var material: WorldGrade2V1.Material
+        var materialPresentation: MaterialPresentationDescriptor
         var regions: [Region]
     }
     struct WaterProfile: Codable, Equatable, Sendable {
         var shallowCount: Int
         var deepCount: Int
         var frozenCount: Int
+        var standingOwnedCount: Int
+        var flowingOwnedCount: Int
+        var standingDeepCount: Int
+        var flowingDeepCount: Int
+        var standingBodySizes: [Int]
+        var flowingChannelSizes: [Int]
+        var finalConnectedBodyCount: Int
+        var dryComponentCount: Int
+        var nonChasmComponentCount: Int
+        var enclosedDryComponentCount: Int
         var coverage: CoverageBand
-        var connectedBodyCountBand: CoverageBand
         var dominantTopology: WaterTopology?
         var topologyFlags: [WaterTopology]
     }
@@ -71,6 +124,7 @@ struct WorldSplashReceiptV3: Codable, Equatable, Sendable {
         var elevationCounts: [Int]
         var maximumElevation: Int
         var southContactCounts: [Int]
+        var elevatedComponentSizes: [Int]
         var shapeFlags: [ReliefShape]
     }
     struct FloraSpecies: Codable, Equatable, Sendable {
@@ -104,6 +158,27 @@ struct WorldSplashReceiptV3: Codable, Equatable, Sendable {
         var precipitationIntensity: String
         var precipitationMotion: String
     }
+    struct ExplorationOpportunityRow: Codable, Equatable, Sendable {
+        var stableID: String
+        var sourceCount: Int
+        var obtainableQuantity: Int
+        var causalMarkIDs: [InstanceID]
+    }
+    /// Coordinate-free reasons to explore. Sites disclose presence only; rare/precious resource
+    /// families retain exact obtainable-source counts. InstanceIDs, contents and positions do not.
+    struct ExplorationOpportunityProfile: Codable, Equatable, Sendable {
+        var hasGeneratedSiteOpportunity: Bool
+        var resources: [ExplorationOpportunityRow]
+    }
+    struct EntryMark: Codable, Equatable, Sendable {
+        var markID: InstanceID
+        var rendererAssetKey: String
+        var hand: Hand
+        var origin: PageCell
+        var shapeID: String
+        var cells: [PageCell]
+        var inkRecipe: InkRecipe?
+    }
 
     var version: String
     var receiptID: WorldArrivalReceiptID
@@ -117,34 +192,284 @@ struct WorldSplashReceiptV3: Codable, Equatable, Sendable {
     var relief: ReliefProfile
     var deposits: DepositProfile
     var flora: FloraProfile
+    var explorationOpportunities: ExplorationOpportunityProfile
     var environment: EnvironmentProfile
     var causalVisualFacts: [WorldArrivalReceipt.CausalVisualFact]
+    var entryMark: EntryMark?
     var firstMapCropReceipt: WorldArrivalReceipt.FirstMapCrop
     var canonicalReceiptSHA256: String
 
     func validates() -> Bool {
+        var registeredResourcesByCausalMark: [InstanceID: Set<ResourceID>] = [:]
+        for fact in causalVisualFacts
+        where fact.scope == .resource && fact.contributionKind == .increased {
+            guard let semanticKey = fact.semanticKey,
+                  let symbol = ContentCatalog.shared.symbol(.init(rawValue: semanticKey))
+            else { continue }
+            registeredResourcesByCausalMark[fact.candidateMarkID, default: []]
+                .formUnion(symbol.yieldModifiers.keys)
+        }
         guard version == Self.schemaVersion,
               !receiptID.rawValue.isEmpty,
               !worldVisualReceiptSHA256.isEmpty,
-              terrain.width > 0, terrain.height > 0,
-              terrain.grounds.map(\.ground) == GroundType.allCases,
-              terrain.grounds.allSatisfy({ $0.exactCount >= 0 }),
-              terrain.grounds.reduce(0, { $0 + $1.exactCount }) == terrain.width * terrain.height,
-              terrain.regions.count == Self.regionColumns * Self.regionRows,
-              relief.elevationCounts.count == 4,
+              (1...128).contains(sourcePagePhysicalReceipt.width),
+              (1...128).contains(sourcePagePhysicalReceipt.height),
+              (1...128).contains(terrain.width), (1...128).contains(terrain.height),
+              terrain.width == terrain.height,
+              WorldScale.allCases.map(\.gridSide).contains(terrain.width),
+              terrain.grounds.map(\.ground) == GroundType.allCases else { return false }
+        let multiplied = terrain.width.multipliedReportingOverflow(by: terrain.height)
+        guard !multiplied.overflow, multiplied.partialValue > 0 else { return false }
+        let tileCount = multiplied.partialValue
+        var totalResourceMarks = 0
+        for row in explorationOpportunities.resources {
+            let rowMarks = row.sourceCount.addingReportingOverflow(row.obtainableQuantity)
+            guard !rowMarks.overflow else { return false }
+            let total = totalResourceMarks.addingReportingOverflow(rowMarks.partialValue)
+            guard !total.overflow else { return false }
+            totalResourceMarks = total.partialValue
+        }
+        guard totalResourceMarks <= Self.maximumResourceOpportunityMarks else { return false }
+        guard relief.elevationCounts.count == 4,
               relief.southContactCounts.count == 3,
+              terrain.regions.count == Self.regionColumns * Self.regionRows else { return false }
+        let groundCounts = Dictionary(uniqueKeysWithValues:
+            terrain.grounds.map { ($0.ground, $0.exactCount) })
+        guard [water.shallowCount, water.deepCount, water.frozenCount,
+               water.standingOwnedCount, water.flowingOwnedCount,
+               water.standingDeepCount, water.flowingDeepCount,
+               water.finalConnectedBodyCount, water.dryComponentCount,
+               water.nonChasmComponentCount, water.enclosedDryComponentCount]
+            .allSatisfy({ (0...tileCount).contains($0) }),
+              water.standingBodySizes.count <= tileCount,
+              water.flowingChannelSizes.count <= tileCount,
+              water.standingBodySizes.allSatisfy({ (1...tileCount).contains($0) }),
+              water.flowingChannelSizes.allSatisfy({ (1...tileCount).contains($0) }) else { return false }
+        var expectedWaterFlags: [WaterTopology] = []
+        if water.standingOwnedCount > 0 {
+            expectedWaterFlags.append(.standing)
+            if water.standingBodySizes.contains(where: { $0 < 9 }) { expectedWaterFlags.append(.pool) }
+            if water.standingBodySizes.contains(where: { $0 >= 9 }) { expectedWaterFlags.append(.lake) }
+            if water.standingDeepCount > 0 { expectedWaterFlags.append(.shelf) }
+        }
+        if water.flowingOwnedCount > 0 { expectedWaterFlags += [.flowing, .channel] }
+        if water.enclosedDryComponentCount > 0 { expectedWaterFlags.append(.island) }
+        if water.dryComponentCount > water.nonChasmComponentCount { expectedWaterFlags.append(.broken) }
+        let dryOrder: [GroundType] = [.stone, .soil, .sand, .ice, .ash, .rubble, .mud, .growth, .groundcover]
+        let canonicalDry = dryOrder.filter { groundCounts[$0, default: 0] > 0 }.sorted { left, right in
+            let leftCount = groundCounts[left, default: 0], rightCount = groundCounts[right, default: 0]
+            return leftCount == rightCount
+                ? dryOrder.firstIndex(of: left)! < dryOrder.firstIndex(of: right)!
+                : leftCount > rightCount
+        }
+        let firstPhysicalMark = sourcePagePhysicalReceipt.marks.first
+        let entryValid = entryMark.map { mark in
+            guard !mark.rendererAssetKey.isEmpty, !mark.shapeID.isEmpty, !mark.cells.isEmpty,
+                  Set(mark.cells).count == mark.cells.count,
+                  (0..<sourcePagePhysicalReceipt.width).contains(mark.origin.column),
+                  (0..<sourcePagePhysicalReceipt.height).contains(mark.origin.row),
+                  mark == firstPhysicalMark.map({ EntryMark(markID: $0.id,
+                      rendererAssetKey: $0.rendererAssetKey, hand: $0.hand, origin: $0.origin,
+                      shapeID: $0.shapeID, cells: $0.cells, inkRecipe: $0.inkRecipe) }) else { return false }
+            return mark.cells.allSatisfy { cell in
+                cell.column >= 0 && cell.row >= 0
+                    && cell.column < sourcePagePhysicalReceipt.width
+                    && cell.row < sourcePagePhysicalReceipt.height
+            }
+        } ?? (firstPhysicalMark == nil)
+        let crop = firstMapCropReceipt
+        let cropPoints = crop.cells.map(\.point)
+        let cropXs = Set(cropPoints.map(\.x)), cropYs = Set(cropPoints.map(\.y))
+        let floraIDs = Set(flora.species.map(\.stableID))
+        let cropValid = crop.width == 9 && crop.height == 9 && crop.cells.count == 81
+            && Set(cropPoints).count == 81 && cropXs.count == 9 && cropYs.count == 9
+            && cropXs.max().map({ $0 - (cropXs.min() ?? $0) == 8 }) == true
+            && cropYs.max().map({ $0 - (cropYs.min() ?? $0) == 8 }) == true
+            && crop.cells.allSatisfy { cell in
+                guard ["full", "fringe", "remembered", "hidden"].contains(cell.visibility)
+                else { return false }
+                if cell.visibility == "hidden" {
+                    return cell.ground == nil && cell.elevation == nil && cell.floraStableID == nil
+                }
+                guard let ground = cell.ground, let elevation = cell.elevation,
+                      groundCounts[ground, default: 0] > 0,
+                      (0...3).contains(elevation), relief.elevationCounts[elevation] > 0
+                else { return false }
+                guard cell.visibility == "full" || cell.floraStableID == nil else { return false }
+                return cell.floraStableID.map { floraIDs.contains($0) } ?? true
+            }
+        let canonicalRegions = terrain.regions.enumerated().allSatisfy { index, region in
+            region.column == index % Self.regionColumns && region.row == index / Self.regionColumns
+        }
+        guard
+              terrain.grounds.allSatisfy({ (0...tileCount).contains($0.exactCount) }),
+              terrain.grounds.allSatisfy({ $0.coverage == Self.coverageBand($0.exactCount, of: tileCount) }),
+              terrain.grounds.reduce(0, { $0 + $1.exactCount }) == tileCount,
+              terrain.nonChasmTileCount == tileCount - groundCounts[.chasm, default: 0],
+              terrain.dominantDryGround == canonicalDry.first,
+              terrain.secondaryVisibleGrounds == Array(canonicalDry.dropFirst()),
+              terrain.materialPresentation.validates(),
+              cropValid,
+              canonicalRegions,
+              Set(terrain.regions.map { "\($0.column),\($0.row)" }).count == terrain.regions.count,
+              terrain.regions.allSatisfy({ region in
+                  guard (0..<Self.regionColumns).contains(region.column),
+                        (0..<Self.regionRows).contains(region.row) else { return false }
+                  let regionTotal = Self.regionCellCount(column: region.column, row: region.row,
+                                                         width: terrain.width, height: terrain.height)
+                  let allShares = region.groundShares + region.waterShares + region.elevationShares
+                    + region.depositShares + region.floraShares
+                  return
+                    allShares.allSatisfy({ (0...regionTotal).contains($0.exactCount)
+                        && $0.band == Self.coverageBand($0.exactCount, of: regionTotal) })
+                    && (0..<Self.regionRows).contains(region.row)
+                    && region.groundShares.map(\.id) == GroundType.allCases.map(\.rawValue)
+                    && region.groundShares.reduce(0, { $0 + $1.exactCount }) == regionTotal
+                    && region.waterShares.map(\.id) == ["shallow", "deep", "frozen"]
+                    && region.waterShares.map(\.exactCount) == [
+                        region.groundShares.first(where: { $0.id == GroundType.water.rawValue })?.exactCount ?? -1,
+                        region.groundShares.first(where: { $0.id == GroundType.deepWater.rawValue })?.exactCount ?? -1,
+                        region.groundShares.first(where: { $0.id == GroundType.ice.rawValue })?.exactCount ?? -1]
+                    && region.elevationShares.map(\.id) == ["0", "1", "2", "3"]
+                    && region.elevationShares.reduce(0, { $0 + $1.exactCount }) == regionTotal
+                    && region.depositShares.map(\.id) == ["snow", "settledAsh"]
+                    && region.depositShares.allSatisfy({ $0.exactCount <= regionTotal })
+                    && region.floraShares.map(\.id) == flora.species.map(\.stableID)
+                    && region.floraShares.reduce(0, { $0 + $1.exactCount }) <= regionTotal
+              }),
+              GroundType.allCases.enumerated().allSatisfy({ index, ground in
+                  terrain.regions.reduce(0) { $0 + $1.groundShares[index].exactCount }
+                    == groundCounts[ground, default: 0]
+              }),
+              (0...3).allSatisfy({ level in
+                  terrain.regions.reduce(0) { $0 + $1.elevationShares[level].exactCount }
+                    == relief.elevationCounts[level]
+              }),
+              terrain.regions.reduce(0, { $0 + $1.depositShares[0].exactCount }) == deposits.snowCount,
+              terrain.regions.reduce(0, { $0 + $1.depositShares[1].exactCount }) == deposits.settledAshCount,
+              relief.elevationCounts.count == 4,
+              relief.elevationCounts.allSatisfy({ (0...tileCount).contains($0) }),
+              relief.elevationCounts.reduce(0, +) == tileCount,
+              relief.maximumElevation == (relief.elevationCounts.lastIndex(where: { $0 > 0 }) ?? 0),
+              relief.southContactCounts.count == 3,
+              relief.southContactCounts.allSatisfy({ (0...tileCount).contains($0) }),
+              relief.elevatedComponentSizes.count <= tileCount,
+              relief.elevatedComponentSizes.allSatisfy({ (1...tileCount).contains($0) }),
+              relief.elevatedComponentSizes == relief.elevatedComponentSizes.sorted(),
+              relief.elevatedComponentSizes.reduce(0, +) == relief.elevationCounts.dropFirst().reduce(0, +),
+              relief.shapeFlags == (relief.maximumElevation == 0 ? [.flat] : []),
               water.shallowCount >= 0, water.deepCount >= 0, water.frozenCount >= 0,
+              water.shallowCount == groundCounts[.water, default: 0],
+              water.deepCount == groundCounts[.deepWater, default: 0],
+              water.frozenCount == groundCounts[.ice, default: 0],
+              water.standingOwnedCount + water.flowingOwnedCount == water.shallowCount + water.deepCount,
+              water.standingDeepCount + water.flowingDeepCount == water.deepCount,
+              water.standingBodySizes == water.standingBodySizes.sorted(),
+              water.flowingChannelSizes == water.flowingChannelSizes.sorted(),
+              water.standingBodySizes.reduce(0, +) == water.standingOwnedCount,
+              water.flowingChannelSizes.reduce(0, +) == water.flowingOwnedCount,
+              water.enclosedDryComponentCount <= water.dryComponentCount,
+              water.coverage == Self.coverageBand(water.shallowCount + water.deepCount + water.frozenCount,
+                                                  of: tileCount),
+              water.topologyFlags == expectedWaterFlags,
+              water.topologyFlags.contains(.standing) || water.topologyFlags.contains(.flowing)
+                ? (water.dominantTopology == .standing || water.dominantTopology == .flowing)
+                    && water.dominantTopology == (water.standingOwnedCount >= water.flowingOwnedCount
+                        ? .standing : .flowing)
+                : water.dominantTopology == nil,
               deposits.snowCount >= 0, deposits.settledAshCount >= 0,
+              deposits.snowCount <= tileCount, deposits.settledAshCount <= tileCount,
+              deposits.snowCoverage == Self.coverageBand(deposits.snowCount, of: tileCount),
+              deposits.settledAshCoverage == Self.coverageBand(deposits.settledAshCount, of: tileCount),
+              explorationOpportunities.resources == explorationOpportunities.resources.sorted(by: {
+                $0.stableID < $1.stableID
+              }),
+              Set(explorationOpportunities.resources.map(\.stableID)).count
+                == explorationOpportunities.resources.count,
+              explorationOpportunities.resources.allSatisfy({ row in
+                let resourceID = ResourceID(rawValue: row.stableID)
+                let maximumQuantity = row.sourceCount.multipliedReportingOverflow(
+                    by: Self.maximumObtainableQuantityPerSource)
+                return !maximumQuantity.overflow && !row.stableID.isEmpty
+                    && (1...tileCount).contains(row.sourceCount)
+                    && (1...maximumQuantity.partialValue).contains(row.obtainableQuantity)
+                    && row.causalMarkIDs == row.causalMarkIDs.sorted { $0.rawValue < $1.rawValue }
+                    && Set(row.causalMarkIDs).count == row.causalMarkIDs.count
+                    && row.causalMarkIDs.allSatisfy {
+                        registeredResourcesByCausalMark[$0]?.contains(resourceID) == true
+                    }
+                    && ContentCatalog.shared.resource(resourceID).map {
+                        $0.tradeBand == .rare || $0.tradeBand == .precious
+                            || !row.causalMarkIDs.isEmpty
+                    } == true
+              }),
+              flora.species.count <= tileCount,
+              flora.species.allSatisfy({ (1...terrain.nonChasmTileCount).contains($0.placedTileCount) }),
+              flora.species.allSatisfy({ species in
+                  let color = species.renderIdentity.resolvedColor
+                  let suffix = String(species.stableID.dropFirst("flora-".count))
+                  let canonicalInstanceID = species.stableID.hasPrefix("flora-")
+                    && UInt64(suffix).map(String.init) == suffix
+                  return species.stableID == species.renderIdentity.speciesID
+                    && canonicalInstanceID
+                    && (0...3).contains(species.renderIdentity.formID)
+                    && species.renderIdentity.stature.isFinite
+                    && (0...100).contains(species.renderIdentity.stature)
+                    && color.srgb.count == 3 && color.srgb.allSatisfy({ (0...255).contains($0) })
+                    && color.resolutionVersion == "resolved-color-1.0.0"
+                    && ["authoredMix", "bindRandom"].contains(color.provenance)
+                    && Habit.allCases.map(\.rawValue).contains(species.habit)
+                    && species.eligibleGrounds == GroundType.allCases.filter {
+                        $0.isPassable && $0 != .water && !$0.isOvergrown
+                    }
+              }),
               flora.occupiedTileCount == flora.species.reduce(0, { $0 + $1.placedTileCount }),
+              flora.occupiedTileCount <= terrain.nonChasmTileCount,
               flora.placedIdentityCount == flora.species.count,
-              flora.species.allSatisfy({ $0.placedTileCount > 0 && $0.regionShares.count == terrain.regions.count }),
+              flora.aggregateCoverage == Self.coverageBand(flora.occupiedTileCount,
+                                                           of: terrain.nonChasmTileCount),
+              flora.species.allSatisfy({ $0.placedTileCount > 0
+                  && $0.coverage == Self.coverageBand($0.placedTileCount, of: terrain.nonChasmTileCount)
+                  && $0.regionShares.count == terrain.regions.count }),
+              flora.species.enumerated().allSatisfy({ speciesIndex, species in
+                  let shares = terrain.regions.map { $0.floraShares[speciesIndex] }
+                  return shares.reduce(0, { $0 + $1.exactCount }) == species.placedTileCount
+                    && shares.map(\.band) == species.regionShares
+              }),
               Set(flora.species.map(\.stableID)).count == flora.species.count,
+              ["none", "smoke", "airborneAsh", "mist", "miasma"].contains(environment.suspendedMedium),
+              ["trueDark", "dim", "ordinary", "bright", "blazing"].contains(environment.illuminationBand),
+              ["sourceless", "constant", "cyclic"].contains(environment.illuminationSourceClass),
+              ["none", "trace", "light", "heavy", "dense"].contains(environment.suspendedDensity),
+              ["calm", "moving", "strong"].contains(environment.suspendedMotion),
+              ["none", "rain", "snow", "mixedRainSnow"].contains(environment.precipitationMedium),
+              ["none", "trace", "light", "heavy"].contains(environment.precipitationIntensity),
+              ["calm", "moving", "strong"].contains(environment.precipitationMotion),
+              (environment.suspendedMedium == "none") == (environment.suspendedDensity == "none"),
+              (environment.precipitationMedium == "none") == (environment.precipitationIntensity == "none"),
+              entryValid,
               flora.species == flora.species.sorted(by: {
                   $0.placedTileCount == $1.placedTileCount
                     ? $0.stableID < $1.stableID : $0.placedTileCount > $1.placedTileCount
               }),
               canonicalReceiptSHA256 == computedCanonicalSHA256() else { return false }
         return true
+    }
+
+    private static func coverageBand(_ count: Int, of total: Int) -> CoverageBand {
+        guard count > 0, total > 0 else { return .none }
+        let ratio = Double(count) / Double(total)
+        if ratio < 0.03 { return .trace }
+        if ratio < 0.10 { return .sparse }
+        if ratio < 0.25 { return .present }
+        if ratio < 0.50 { return .abundant }
+        return .dominant
+    }
+
+    private static func regionCellCount(column: Int, row: Int, width: Int, height: Int) -> Int {
+        let columns = (0..<width).count { min(regionColumns - 1, $0 * regionColumns / width) == column }
+        let rows = (0..<height).count { min(regionRows - 1, $0 * regionRows / height) == row }
+        return columns * rows
     }
 
     mutating func seal() { canonicalReceiptSHA256 = computedCanonicalSHA256() }
@@ -561,7 +886,15 @@ extension WorldArrivalReceipt {
             WorldArrivalRenderedSceneReceipt.self, forKey: .renderedSceneReceipt)
         if let decoded = try? c.decodeIfPresent(WorldSplashReceiptV3.self,
                                                 forKey: .worldSplashReceiptV3),
-           decoded.validates() {
+           decoded.validates(),
+           decoded.receiptID == id,
+           decoded.worldSeed == generationSeed,
+           decoded.worldVisualReceiptSHA256 == visualReceiptID,
+           decoded.sourcePagePhysicalReceipt == sourcePagePhysicalReceipt,
+           decoded.descriptionGrammarVersion == proseVersion,
+           decoded.finalDescription == finalDescription,
+           decoded.causalVisualFacts == causalVisualFacts,
+           decoded.firstMapCropReceipt == firstMapCropReceipt {
             worldSplashReceiptV3 = decoded
         } else {
             worldSplashReceiptV3 = nil
@@ -576,6 +909,8 @@ enum WorldArrivalReceiptFactory {
     static func make(runIndex: Int, generationSeed: UInt64,
                      source: WritingDeskReviewModel,
                      sourcePage: Page, book: BoundBook, map: WorldMap, flora: [Flora],
+                     sites: [PlacedSite] = [],
+                     generationDiagnostics: WorldGenerationDiagnostics,
                      visualReceipt: WorldVisualReceipt,
                      visibilityProfile: WorldRules.VisibilityProfile,
                      library: LibraryState, tuning: DebugTuningProfile,
@@ -599,6 +934,9 @@ enum WorldArrivalReceiptFactory {
         let lightBand = illuminationBand(light)
         let sourceClass = illuminationSourceClass(light: light, cycle: cycle)
         let atmosphere = visualReceipt.descriptor.atmosphere
+        let resolvedMotion = Int(readings["atmosphere"].aspect("motion")
+            .rounded(.toNearestOrAwayFromZero))
+        let motionBand = resolvedMotion <= 40 ? "calm" : resolvedMotion <= 65 ? "moving" : "strong"
         let suspended = atmosphere.medium == "none" ? nil : WorldArrivalReceipt.Atmosphere(
             medium: atmosphere.medium, density: atmosphere.density, motion: "calm")
 
@@ -638,6 +976,7 @@ enum WorldArrivalReceiptFactory {
         var summaryCache: [String: Worldgen.ArrivalCausalSummary] = [:]
         var counterfactualPassCount = 0
         var causalFacts: [WorldArrivalReceipt.CausalVisualFact] = []
+        var causalResourceOwners: [ResourceID: Set<InstanceID>] = [:]
         for candidate in WorldArrivalCausalCandidateRules.candidates(page: sourcePage, review: source) {
             guard let removedPage = WorldArrivalCausalCandidateRules.removing(candidate, from: sourcePage),
                   let fingerprint = WritingDeskReviewModelFactory.canonicalHash(removedPage) else {
@@ -666,6 +1005,11 @@ enum WorldArrivalReceiptFactory {
             }
             let counterfactualAtmosphere = try WorldGrade2BindAdapter.atmosphereDescriptor(
                 sigils: intervention.counterfactualSigils)
+            for resourceID in candidate.registeredResourceFamilies where
+                WorldArrivalCausalCandidateRules.resourceQuantity(resourceID, in: actualSummary.map)
+                    > WorldArrivalCausalCandidateRules.resourceQuantity(resourceID, in: summary.map) {
+                causalResourceOwners[resourceID, default: []].insert(candidate.markID)
+            }
             causalFacts.append(contentsOf: try WorldArrivalCausalCandidateRules.summaryFacts(
                 candidate: candidate, actual: actualSummary, withoutCandidate: summary,
                 actualReadings: actualReadings, withoutReadings: intervention.readings,
@@ -734,9 +1078,14 @@ enum WorldArrivalReceiptFactory {
                      sceneReceipt: sceneReceipt, renderedSceneReceipt: nil)
         result.worldSplashReceiptV3 = makeSplashV3(
             receiptID: receiptID, generationSeed: generationSeed, sourcePage: physical,
-            visualReceipt: visualReceipt, map: map, flora: flora,
+            visualReceipt: visualReceipt, map: map, flora: flora, sites: sites,
+            hydrologyTopology: generationDiagnostics.hydrologyTopology,
             environment: environmentSummary, illuminationSourceClass: sourceClass,
-            causalFacts: causalFacts, crop: crop,
+            motionBand: motionBand,
+            causalFacts: causalFacts,
+            causalResourceOwners: causalResourceOwners.mapValues {
+                $0.sorted { $0.rawValue < $1.rawValue }
+            }, crop: crop,
             description: description)
         guard result.worldSplashReceiptV3?.validates() == true else { throw Error.noDryGround }
         return result
@@ -745,11 +1094,17 @@ enum WorldArrivalReceiptFactory {
     static func makeSplashV3(
         receiptID: WorldArrivalReceiptID, generationSeed: UInt64,
         sourcePage: WorldArrivalReceipt.SourcePage, visualReceipt: WorldVisualReceipt,
-        map: WorldMap, flora: [Flora], environment: WorldArrivalReceipt.EnvironmentSummary,
-        illuminationSourceClass: String,
-        causalFacts: [WorldArrivalReceipt.CausalVisualFact], crop: WorldArrivalReceipt.FirstMapCrop,
+        map: WorldMap, flora: [Flora], sites: [PlacedSite] = [],
+        hydrologyTopology: WorldHydrologyTopologyObservation?,
+        environment: WorldArrivalReceipt.EnvironmentSummary,
+        illuminationSourceClass: String, motionBand: String,
+        causalFacts: [WorldArrivalReceipt.CausalVisualFact],
+        causalResourceOwners: [ResourceID: [InstanceID]] = [:],
+        crop: WorldArrivalReceipt.FirstMapCrop,
         description: String
-    ) -> WorldSplashReceiptV3 {
+    ) -> WorldSplashReceiptV3? {
+        guard let materialPresentation = WorldSplashReceiptV3.MaterialPresentationDescriptor.make(
+            from: visualReceipt.descriptor) else { return nil }
         let tileCount = max(1, map.tiles.count)
         let nonChasm = map.tiles.count { $0.ground != .chasm }
         let counts = GroundType.allCases.map { ground in
@@ -781,8 +1136,11 @@ enum WorldArrivalReceiptFactory {
             let stableID = "flora-\(id.rawValue)"
             guard let plant = floraByID[id], let descriptor = descriptorByID[stableID] else { return nil }
             let placed = map.tiles.count { $0.flora == id }
-            let eligible = Set(map.allPoints.compactMap { point in map[point].flora == id ? map[point].baseGround : nil })
-                .sorted { $0.rawValue < $1.rawValue }
+            // This is the closed TerrainRules.paintGrowth host predicate, not a census of where
+            // this particular seeded patch happened to land.
+            let eligible = GroundType.allCases.filter {
+                $0.isPassable && $0 != .water && !$0.isOvergrown
+            }
             return .init(stableID: stableID, renderIdentity: descriptor,
                          placedTileCount: placed, coverage: splashBand(placed, of: nonChasm),
                          habit: plant.traits.habit.rawValue, eligibleGrounds: eligible,
@@ -794,7 +1152,11 @@ enum WorldArrivalReceiptFactory {
         let regions = regionPoints.enumerated().map { index, points in
             let total = max(1, points.count)
             func shares(_ pairs: [(String, (Tile) -> Bool)]) -> [WorldSplashReceiptV3.Share] {
-                pairs.map { id, owns in .init(id: id, band: splashBand(points.count { owns(map[$0]) }, of: total)) }
+                pairs.map { id, owns in
+                    let exactCount = points.count { owns(map[$0]) }
+                    return .init(id: id, exactCount: exactCount,
+                                 band: splashBand(exactCount, of: total))
+                }
             }
             return WorldSplashReceiptV3.Region(
                 column: index % WorldSplashReceiptV3.regionColumns,
@@ -803,23 +1165,17 @@ enum WorldArrivalReceiptFactory {
                 waterShares: shares([("shallow", { $0.ground == .water }), ("deep", { $0.ground == .deepWater }), ("frozen", { $0.ground == .ice })]),
                 elevationShares: shares((0...3).map { elevation in (String(elevation), { $0.elevation == elevation }) }),
                 depositShares: shares([("snow", { $0.surfaceDeposits.snow }), ("settledAsh", { $0.surfaceDeposits.settledAsh })]),
-                floraShares: species.map { item in .init(id: item.stableID, band: item.regionShares[index]) })
+                floraShares: species.map { item in
+                    let exactCount = points.count { point in
+                        map[point].flora.map { "flora-\($0.rawValue)" } == item.stableID
+                    }
+                    return .init(id: item.stableID, exactCount: exactCount,
+                                 band: splashBand(exactCount, of: total))
+                })
         }
-        let shallow = map.tiles.count { $0.ground == .water }
-        let deep = map.tiles.count { $0.ground == .deepWater }
-        let frozen = map.tiles.count { $0.ground == .ice }
-        let wetPoints = Set(map.allPoints.filter { [.water, .deepWater, .ice].contains(map[$0].ground) })
-        let bodies = splashComponents(points: wetPoints, map: map)
-        var topology: [WorldSplashReceiptV3.WaterTopology] = []
-        if !bodies.isEmpty { topology.append(bodies.contains { $0.count >= 9 } ? .lake : .pool) }
-        if bodies.contains(where: { component in
-            let xs = component.map(\.x), ys = component.map(\.y)
-            return (xs.max()! - xs.min()! >= 2 * max(1, ys.max()! - ys.min()!))
-                || (ys.max()! - ys.min()! >= 2 * max(1, xs.max()! - xs.min()!))
-        }) { topology.append(.channel) }
-        if shallow > 0 { topology.append(.standing) }
-        if topology.contains(.channel) { topology.append(.flowing) }
-        if deep > 0 { topology.append(.shelf) }
+        guard let hydrologyTopology,
+              let waterProfile = splashWaterProfile(map: map, observation: hydrologyTopology)
+        else { return nil }
         let elevationCounts = (0...3).map { level in map.tiles.count { $0.elevation == level } }
         let contacts = (1...3).map { depth in
             map.allPoints.count { point in
@@ -828,10 +1184,50 @@ enum WorldArrivalReceiptFactory {
             }
         }
         let maxElevation = map.tiles.map(\.elevation).max() ?? 0
-        let reliefFlags: [WorldSplashReceiptV3.ReliefShape] = maxElevation == 0 ? [.flat]
-            : contacts.reduce(0, +) > 0 ? [.rolling, .ridge] : [.rolling]
+        let elevatedComponents = splashComponents(
+            points: Set(map.allPoints.filter { map[$0].elevation > 0 }), map: map)
+            .map(\.count).sorted()
         let snow = map.tiles.count { $0.surfaceDeposits.snow }
         let ash = map.tiles.count { $0.surfaceDeposits.settledAsh }
+        let placedSites = sites.filter { site in
+            guard map.contains(site.position), case .site(let instanceID) = map[site.position].content
+            else { return false }
+            return instanceID == site.id
+        }
+        var resourceSources: [ResourceID: Int] = [:]
+        var resourceQuantities: [ResourceID: Int] = [:]
+        for tile in map.tiles {
+            var amounts: [ResourceID: Int] = [:]
+            switch tile.content {
+            case .node(let node) where node.remainingHarvests > 0:
+                if node.yieldPerHarvest > 0 {
+                    amounts[node.resource] = node.remainingHarvests * node.yieldPerHarvest
+                }
+                if let secondary = node.secondaryResource,
+                   node.secondaryYieldPerHarvest > 0, amounts[secondary] == nil {
+                    amounts[secondary] = node.remainingHarvests * node.secondaryYieldPerHarvest
+                }
+            case .wildDrop(let resource, let amount) where amount > 0:
+                amounts[resource] = amount
+            default: break
+            }
+            for (family, amount) in amounts {
+                resourceSources[family, default: 0] += 1
+                resourceQuantities[family, default: 0] += amount
+            }
+        }
+        let resourceRows: [WorldSplashReceiptV3.ExplorationOpportunityRow] =
+            resourceSources.compactMap { element in
+            let (resourceID, sourceCount) = element
+            let marks = causalResourceOwners[resourceID] ?? []
+            guard let definition = ContentCatalog.shared.resource(resourceID),
+                  definition.tradeBand == .rare || definition.tradeBand == .precious
+                    || !marks.isEmpty
+            else { return nil }
+            return WorldSplashReceiptV3.ExplorationOpportunityRow(
+                stableID: resourceID.rawValue, sourceCount: sourceCount,
+                obtainableQuantity: resourceQuantities[resourceID] ?? 0, causalMarkIDs: marks)
+        }.sorted { $0.stableID < $1.stableID }
         var receipt = WorldSplashReceiptV3(
             version: WorldSplashReceiptV3.schemaVersion, receiptID: receiptID,
             worldSeed: generationSeed, worldVisualReceiptSHA256: visualReceipt.canonicalReceiptSHA256,
@@ -842,27 +1238,35 @@ enum WorldArrivalReceiptFactory {
                            grounds: counts, dominantDryGround: orderedDry.first ?? .soil,
                            secondaryVisibleGrounds: Array(orderedDry.dropFirst().filter { ground in
                                counts.first(where: { $0.ground == ground })?.exactCount ?? 0 > 0
-                           }), material: visualReceipt.descriptor.material, regions: regions),
-            water: .init(shallowCount: shallow, deepCount: deep, frozenCount: frozen,
-                         coverage: splashBand(shallow + deep + frozen, of: tileCount),
-                         connectedBodyCountBand: splashBand(bodies.count, of: 6),
-                         dominantTopology: topology.first, topologyFlags: topology),
+                           }), materialPresentation: materialPresentation, regions: regions),
+            water: waterProfile,
             relief: .init(elevationCounts: elevationCounts, maximumElevation: maxElevation,
-                          southContactCounts: contacts, shapeFlags: reliefFlags),
+                          southContactCounts: contacts,
+                          elevatedComponentSizes: elevatedComponents,
+                          shapeFlags: maxElevation == 0 ? [.flat] : []),
             deposits: .init(snowCount: snow, snowCoverage: splashBand(snow, of: tileCount),
                             settledAshCount: ash, settledAshCoverage: splashBand(ash, of: tileCount)),
             flora: .init(placedIdentityCount: placedIDs.count,
                          occupiedTileCount: species.reduce(0) { $0 + $1.placedTileCount },
                          aggregateCoverage: splashBand(species.reduce(0) { $0 + $1.placedTileCount }, of: nonChasm),
                          species: species),
+            explorationOpportunities: .init(
+                hasGeneratedSiteOpportunity: !placedSites.isEmpty, resources: resourceRows),
             environment: .init(illuminationBand: environment.illuminationBand,
                                illuminationSourceClass: illuminationSourceClass,
                                suspendedMedium: environment.suspendedMedium,
                                suspendedDensity: environment.suspendedDensity,
-                               suspendedMotion: "calm", precipitationMedium: environment.precipitation,
+                               suspendedMotion: motionBand,
+                               precipitationMedium: environment.precipitation,
                                precipitationIntensity: environment.precipitationIntensity,
-                               precipitationMotion: "calm"),
-            causalVisualFacts: causalFacts, firstMapCropReceipt: crop,
+                               precipitationMotion: motionBand),
+            causalVisualFacts: causalFacts,
+            entryMark: sourcePage.marks.first.map {
+                .init(markID: $0.id, rendererAssetKey: $0.rendererAssetKey, hand: $0.hand,
+                      origin: $0.origin,
+                      shapeID: $0.shapeID, cells: $0.cells, inkRecipe: $0.inkRecipe)
+            },
+            firstMapCropReceipt: crop,
             canonicalReceiptSHA256: "")
         receipt.seal()
         return receipt
@@ -876,6 +1280,68 @@ enum WorldArrivalReceiptFactory {
         if percent < 25 { return .present }
         if percent < 50 { return .abundant }
         return .dominant
+    }
+
+    static func splashWaterProfile(
+        map: WorldMap, observation: WorldHydrologyTopologyObservation
+    ) -> WorldSplashReceiptV3.WaterProfile? {
+        let shallow = map.tiles.count { $0.ground == .water }
+        let deep = map.tiles.count { $0.ground == .deepWater }
+        let frozen = map.tiles.count { $0.ground == .ice }
+        guard observation.standingTiles + observation.flowingTiles == shallow + deep,
+              observation.frozenTiles == frozen,
+              observation.standingDeepTiles + observation.flowingDeepTiles == deep,
+              observation.standingBodySizes.reduce(0, +) == observation.standingTiles,
+              observation.flowingChannelSizes.reduce(0, +) == observation.flowingTiles,
+              observation.frozenBodySizes.reduce(0, +) == observation.frozenTiles,
+              [observation.standingRegionCounts, observation.flowingRegionCounts,
+               observation.frozenRegionCounts].allSatisfy({
+                   $0.count == WorldSplashReceiptV3.regionColumns * WorldSplashReceiptV3.regionRows
+               }),
+              observation.standingRegionCounts.reduce(0, +) == observation.standingTiles,
+              observation.flowingRegionCounts.reduce(0, +) == observation.flowingTiles,
+              observation.frozenRegionCounts.reduce(0, +) == observation.frozenTiles else { return nil }
+        var topology: [WorldSplashReceiptV3.WaterTopology] = []
+        if observation.standingTiles > 0 {
+            topology.append(.standing)
+            if observation.standingBodySizes.contains(where: { $0 < 9 }) { topology.append(.pool) }
+            if observation.standingBodySizes.contains(where: { $0 >= 9 }) { topology.append(.lake) }
+            if observation.standingDeepTiles > 0 { topology.append(.shelf) }
+        }
+        if observation.flowingTiles > 0 { topology += [.flowing, .channel] }
+        let wet = Set(map.allPoints.filter { [.water, .deepWater, .ice].contains(map[$0].ground) })
+        let wetComponents = splashComponents(points: wet, map: map)
+        let dryComponents = splashComponents(points: Set(map.allPoints.filter {
+            map[$0].ground != .chasm && !wet.contains($0)
+        }), map: map)
+        let nonChasmComponents = splashComponents(points: Set(map.allPoints.filter {
+            map[$0].ground != .chasm
+        }), map: map)
+        let enclosedDryCount = dryComponents.count(where: { component in
+            !component.contains(where: { $0.x == 0 || $0.y == 0
+                || $0.x == map.width - 1 || $0.y == map.height - 1 })
+                && component.allSatisfy { point in
+                    map.neighbours(of: point).allSatisfy { component.contains($0) || wet.contains($0) }
+                }
+        })
+        if enclosedDryCount > 0 { topology.append(.island) }
+        if dryComponents.count > nonChasmComponents.count { topology.append(.broken) }
+        let dominant: WorldSplashReceiptV3.WaterTopology? =
+            observation.standingTiles == 0 && observation.flowingTiles == 0 ? nil
+            : observation.standingTiles >= observation.flowingTiles ? .standing : .flowing
+        return .init(shallowCount: shallow, deepCount: deep, frozenCount: frozen,
+                     standingOwnedCount: observation.standingTiles,
+                     flowingOwnedCount: observation.flowingTiles,
+                     standingDeepCount: observation.standingDeepTiles,
+                     flowingDeepCount: observation.flowingDeepTiles,
+                     standingBodySizes: observation.standingBodySizes.sorted(),
+                     flowingChannelSizes: observation.flowingChannelSizes.sorted(),
+                     finalConnectedBodyCount: wetComponents.count,
+                     dryComponentCount: dryComponents.count,
+                     nonChasmComponentCount: nonChasmComponents.count,
+                     enclosedDryComponentCount: enclosedDryCount,
+                     coverage: splashBand(shallow + deep + frozen, of: map.tiles.count),
+                     dominantTopology: dominant, topologyFlags: topology)
     }
 
     private static func splashComponents(points: Set<GridPoint>, map: WorldMap) -> [Set<GridPoint>] {

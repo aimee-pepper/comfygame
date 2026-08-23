@@ -639,6 +639,20 @@ struct WorldClock: Codable, Equatable, Sendable {
 
 /// Facts captured while a world is made. These are observations, not inputs: diagnostics must
 /// never reconstruct a generation decision from mutable tiles or by consuming the world's RNG.
+struct WorldHydrologyTopologyObservation: Codable, Equatable, Sendable {
+    var standingTiles: Int
+    var flowingTiles: Int
+    var frozenTiles: Int
+    var standingDeepTiles: Int
+    var flowingDeepTiles: Int
+    var standingBodySizes: [Int]
+    var flowingChannelSizes: [Int]
+    var frozenBodySizes: [Int]
+    var standingRegionCounts: [Int]
+    var flowingRegionCounts: [Int]
+    var frozenRegionCounts: [Int]
+}
+
 struct WorldGenerationDiagnostics: Codable, Equatable, Sendable {
     /// False only when bounded coherent-terrain retries could not satisfy the exact topology.
     /// Bind preparation refuses before spend rather than committing fallback terrain.
@@ -646,6 +660,7 @@ struct WorldGenerationDiagnostics: Codable, Equatable, Sendable {
     var reachableTerrainFraction: Double = 1
     var softenedDeepWaterTiles: Int = 0
     var filledChasmTiles: Int = 0
+    var hydrologyTopology: WorldHydrologyTopologyObservation?
     /// Closed bind-time proof that reachability also had the mandatory opening capacity.
     /// Nil identifies a run saved before this receipt existed; legacy runs are never regenerated.
     var playableEntry: PlayableEntryReceipt?
@@ -695,6 +710,8 @@ struct WorldGenerationDiagnostics: Codable, Equatable, Sendable {
         softenedDeepWaterTiles = try c.decodeIfPresent(
             Int.self, forKey: .softenedDeepWaterTiles) ?? 0
         filledChasmTiles = try c.decodeIfPresent(Int.self, forKey: .filledChasmTiles) ?? 0
+        hydrologyTopology = try c.decodeIfPresent(
+            WorldHydrologyTopologyObservation.self, forKey: .hydrologyTopology)
         playableEntry = try c.decodeIfPresent(PlayableEntryReceipt.self, forKey: .playableEntry)
         writingWasGuaranteed = try c.decodeIfPresent(Bool.self, forKey: .writingWasGuaranteed) ?? true
         selectedDiaryPages = (try c.decodeIfPresent([DiaryPageID].self,

@@ -521,6 +521,28 @@ final class TerrainProductionPack: @unchecked Sendable {
         }
     }
 
+    enum SurfaceDeposit: String, CaseIterable, Sendable {
+        case snow
+        case settledAsh = "coverAsh"
+
+        fileprivate var materialOwner: Ground {
+            switch self { case .snow: .ice; case .settledAsh: .ash }
+        }
+    }
+
+    /// Resolves the accepted semantic deposit role family without changing its authored geometry.
+    static func resolvedSurfaceDepositPalette(
+        _ deposit: SurfaceDeposit, descriptor: WorldGrade2V1.Descriptor
+    ) throws -> [RGBA] {
+        try WorldGrade2V1.validateDescriptor(descriptor)
+        guard let colors = baseRoleColors[deposit.rawValue] else { throw PackError.invalidRequest }
+        return try colors.map {
+            try RGBA(hex: WorldGrade2V1.color($0, descriptor: descriptor,
+                                             scope: .material,
+                                             groundType: deposit.materialOwner.rawValue))
+        }
+    }
+
     private static func validateRoot(_ root: [String: Any]) throws {
         let exact = ["schemaVersion", "integrationReady", "status", "authorityRevision",
                      "acceptedVisual",

@@ -4,7 +4,7 @@ struct WorldArrivalLayout: Equatable {
     static let enterHeight: CGFloat = 58
     static let enterBottomInset: CGFloat = 14
     let sideInset: CGFloat
-    let sceneSize: CGSize
+    let sceneWidth: CGFloat
 
     static func enterFrame(height: CGFloat) -> ClosedRange<CGFloat> {
         (height - enterBottomInset - enterHeight)...(height - enterBottomInset)
@@ -13,8 +13,7 @@ struct WorldArrivalLayout: Equatable {
     static func metrics(width: CGFloat) -> Self {
         let inset: CGFloat = width >= 368 ? 24 : 12
         let sceneWidth = min(320, width - inset * 2)
-        return .init(sideInset: inset,
-                     sceneSize: CGSize(width: sceneWidth, height: sceneWidth * 0.625))
+        return .init(sideInset: inset, sceneWidth: sceneWidth)
     }
 }
 
@@ -24,9 +23,9 @@ struct WorldArrivalView: View {
     let receipt: WorldArrivalReceipt
 
     private var rendered: WorldArrivalRenderedSceneReceipt? { receipt.renderedSceneReceipt }
-    private var sceneImage: UIImage? {
+    private func sceneImage(size: CGSize) -> UIImage? {
         if let splash = receipt.worldSplashReceiptV3,
-           let image = WorldArrivalNativeRenderer.placeholderImage(for: splash) { return image }
+           let image = WorldArrivalNativeRenderer.placeholderImage(for: splash, size: size) { return image }
         return rendered.flatMap(WorldArrivalNativeRenderer.image(for:))
     }
     private var disclosedMarkLabels: [String] {
@@ -39,25 +38,27 @@ struct WorldArrivalView: View {
     var body: some View {
         GeometryReader { proxy in
             let metrics = WorldArrivalLayout.metrics(width: proxy.size.width)
+            let mountedHeight = proxy.size.height - proxy.safeAreaInsets.top
+                - proxy.safeAreaInsets.bottom
+            let decisionHeight = max(200, mountedHeight - WorldArrivalLayout.enterHeight
+                - WorldArrivalLayout.enterBottomInset - proxy.frame(in: .global).minY)
             VStack(spacing: 0) {
-                Group {
-                    if dynamicTypeSize.isAccessibilitySize {
-                        ScrollView { arrivalContent(sceneSize: metrics.sceneSize) }
-                    } else {
-                        arrivalContent(sceneSize: metrics.sceneSize)
-                    }
+                ScrollView {
+                    arrivalContent(sceneWidth: metrics.sceneWidth)
+                        .padding(.horizontal, metrics.sideInset)
+                        .padding(.top, 18)
+                        .padding(.bottom, 18)
                 }
-                .padding(.horizontal, metrics.sideInset)
-                .padding(.top, 18)
+                .frame(maxWidth: .infinity)
+                .frame(height: decisionHeight)
 
-                Spacer(minLength: 12)
-
-                Button("Enter world") {
+                Button("Enter World") {
                     _ = store.enterPendingWorld(arrivalReceiptID: receipt.id)
                 }
                 .font(.custom("Tiny5", size: 15, relativeTo: .headline))
                 .foregroundStyle(Color.white)
-                .frame(maxWidth: .infinity, minHeight: WorldArrivalLayout.enterHeight)
+                .frame(maxWidth: .infinity)
+                .frame(height: WorldArrivalLayout.enterHeight)
                 .background(PixelUITheme.primary)
                 .overlay(Rectangle().stroke(PixelUITheme.edgeDark, lineWidth: 3))
                 .buttonStyle(.plain)
@@ -72,33 +73,27 @@ struct WorldArrivalView: View {
     }
 
     @ViewBuilder
-    private func arrivalContent(sceneSize: CGSize) -> some View {
+    private func arrivalContent(sceneWidth: CGFloat) -> some View {
         VStack(alignment: .leading, spacing: 14) {
                     Text(receipt.sourcePagePhysicalReceipt.title)
                         .font(.custom("Tiny5", size: 25, relativeTo: .title))
                         .foregroundStyle(PixelUITheme.text)
-                        .lineLimit(2)
-                        .minimumScaleFactor(0.8)
+                        .fixedSize(horizontal: false, vertical: true)
 
                     Group {
-                        if let sceneImage {
+                        let targetSize = CGSize(width: max(320, sceneWidth), height: 360)
+                        if let sceneImage = sceneImage(size: targetSize) {
                             Image(uiImage: sceneImage)
                                 .resizable()
                                 .interpolation(.none)
+                                .frame(width: sceneWidth, height: 360)
                         } else { EmptyView() }
                     }
-                    .frame(width: sceneSize.width, height: sceneSize.height)
+                    .frame(width: sceneWidth, height: 360)
                     .overlay(Rectangle().stroke(PixelUITheme.edgeDark, lineWidth: 3))
-                    .frame(maxWidth: .infinity)
+                    .frame(maxWidth: .infinity, alignment: .center)
                     .accessibilityElement(children: .ignore)
                     .accessibilityLabel("Generated view of \(receipt.sourcePagePhysicalReceipt.title)")
-
-                    if receipt.worldSplashReceiptV3 != nil {
-                        Text("TEMPORARY GENERATOR PREVIEW")
-                            .font(.custom("Tiny5", size: 10, relativeTo: .caption))
-                            .foregroundStyle(PixelUITheme.muted)
-                            .frame(maxWidth: .infinity, alignment: .center)
-                    }
 
                     Text(receipt.finalDescription)
                         .font(.custom("Tiny5", size: 13, relativeTo: .body))
@@ -116,11 +111,11 @@ struct WorldArrivalView: View {
                             Text(receipt.sourcePagePhysicalReceipt.title)
                                 .font(.custom("Tiny5", size: 12, relativeTo: .callout))
                                 .foregroundStyle(PixelUITheme.text)
-                                .lineLimit(2)
+                                .fixedSize(horizontal: false, vertical: true)
                             Text(disclosedMarkLabels.joined(separator: " · "))
                                 .font(.custom("Tiny5", size: 10, relativeTo: .caption))
                                 .foregroundStyle(PixelUITheme.muted)
-                                .lineLimit(2)
+                                .fixedSize(horizontal: false, vertical: true)
                         }
                     }
                     .accessibilityElement(children: .ignore)

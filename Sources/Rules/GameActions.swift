@@ -1056,6 +1056,8 @@ extension GameStore {
                 book: book,
                 map: world.map,
                 flora: world.flora,
+                sites: world.sites,
+                generationDiagnostics: world.diagnostics,
                 visualReceipt: visualReceipt,
                 visibilityProfile: WorldRules.visibilityProfile(
                     book: book, mapSeed: generationSeed, tuning: tuning,
