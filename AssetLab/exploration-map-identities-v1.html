@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Exploration Map Identities v1</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    :root { color-scheme: dark; background:#0e1618; color:#efe3c4; font-family:system-ui,sans-serif; }
+    * { box-sizing:border-box; }
+    body { margin:0; background:#0e1618; }
+    main { width:min(1480px,100%); margin:auto; padding:24px; }
+    h1 { margin:0 0 6px; font-size:28px; }
+    h2 { margin:38px 0 12px; font-size:21px; }
+    p { color:#b8c6bd; max-width:80ch; line-height:1.45; }
+    .status { display:inline-block; padding:7px 10px; border:1px solid #bd765d; color:#f0b59c; background:#2a1d1a; }
+    .phones { display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,368px)); gap:18px; align-items:start; }
+    .phones img { width:100%; max-width:368px; image-rendering:pixelated; border:1px solid #52625e; }
+    .sheet { width:100%; height:auto; image-rendering:pixelated; border:1px solid #52625e; background:#101719; }
+    .links { display:flex; gap:10px; flex-wrap:wrap; }
+    a { color:#9fd9d0; }
+    code { color:#d8c692; }
+    @media (max-width:520px) { main { padding:12px; } h1 { font-size:23px; } }
+  </style>
+</head>
+<body>
+<nav class="tool-nav" aria-label="AssetLab tools"><a href="index.html">Creatures</a><a href="world.html">World &amp; Flora</a><a href="world-generator-tester.html">World Generator</a><a href="ui-gallery.html">UI Gallery</a><a href="places.html">Places</a><a href="characters.html">Characters</a><a href="full-cast.html">Full Cast</a><a href="resources.html">Resources</a><a href="equipment.html">Items</a><a href="trading.html">Trading Post</a><a href="reporter.html">Bug Reporter</a><a href="noll.html">Noll Review</a><a href="bridge.html">Economy Bridge</a><a href="combat.html">Combat</a><a href="combat-ui.html">Combat UI</a><a href="campaigns.html">Campaigns</a><a href="launch.html">App Launch</a><a href="splashes.html">Splashes</a><a href="regression.html">Golden Review</a></nav>
+<main>
+  <h1>Exploration Map Identities v1</h1>
+  <div class="status">candidate-unapproved · integrationReady:false</div>
+  <p>Production-art slices now shown together: entry/return portals, locked cache, three physical writing identities, one truthful generic placed-hazard identity, and all nine live sites. Every map sprite is a premade 16×19 bottom-anchored PNG. Ambient motion is baked into enumerated frames; runtime lookup never generates imagery.</p>
+
+  <h2>Ordinary 368×800 map proof</h2>
+  <div class="phones">
+    <img src="integration/exploration-map-identities-v1/evidence/applied-map-full-368x800.png" alt="Full visibility map sprite proof">
+    <img src="integration/exploration-map-identities-v1/evidence/applied-map-remembered-368x800.png" alt="Remembered static map sprite proof">
+    <img src="integration/exploration-map-identities-v1/evidence/applied-map-hidden-368x800.png" alt="Hidden nondisclosure proof">
+    <img src="integration/exploration-map-identities-v1/evidence/applied-map-full-grayscale-368x800.png" alt="Full visibility grayscale proof">
+  </div>
+
+  <h2>Final logical sprites</h2>
+  <img class="sheet" src="integration/exploration-map-identities-v1/evidence/production-sprites-native-400pct.png" alt="Native and 400 percent logical sprite sheet">
+  <h2>Premade ambient frames</h2>
+  <img class="sheet" src="integration/exploration-map-identities-v1/evidence/ambient-animation-strips-800pct.png" alt="Premade ambient animation frames">
+  <h2>Literal grayscale</h2>
+  <img class="sheet" src="integration/exploration-map-identities-v1/evidence/production-sprites-native-400pct-grayscale.png" alt="Grayscale logical sprite sheet">
+  <h2>Current minimap disclosure</h2>
+  <img class="sheet" src="integration/exploration-map-identities-v1/evidence/minimap-category-sprites-native-1600pct.png" alt="Generic portal, page, cache, site, hazard, and resource minimap sprites">
+  <p>The live minimap discloses generic <code>portal</code>, <code>page</code>, <code>cache</code>, <code>site</code>, <code>hazard</code>, and <code>resource</code> categories. The resource mark is the accepted category-safe resource grammar baked as a premade sprite. No site, writing, or resource subtype is introduced.</p>
+  <h2>Source references</h2>
+  <img class="sheet" src="integration/exploration-map-identities-v1/evidence/generated-source-contact-sheet.png" alt="Generated composition source references">
+  <p>These composition references are non-runtime. The 16×19 sprites above are the manually normalized production candidates.</p>
+  <div class="links">
+    <a href="integration/exploration-map-identities-v1/runtime/manifest.json">Runtime manifest</a>
+    <a href="integration/exploration-map-identities-v1/evidence/ambient-animation-strips-800pct-grayscale.png">Animation grayscale</a>
+    <a href="integration/exploration-map-identities-v1/evidence/minimap-category-sprites-native-1600pct-grayscale.png">Minimap grayscale</a>
+  </div>
+</main>
+</body>
+</html>
