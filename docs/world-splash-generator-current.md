@@ -154,13 +154,16 @@ map.
   is nonzero have an identical site-opportunity field, command and cue before legitimate occlusion, regardless
   of those differences;
 - `resources` is optional. A resource family is eligible only when it has at least one actually obtainable
-  placed source and an existing rules-owned predicate classifies that opportunity as unusually rare/special
-  or unusually abundant. Rows retain exact eligible-source counts and are ordered by stable resource ID;
-- the current catalogue's authored `tradeBand == rare` or `tradeBand == precious` is the only exact v3
-  rare/special predicate. `nontradeable` is not a rarity synonym. No current rule defines an unusually
-  abundant world-relative resource threshold, so v3 emits no abundance-selected resource row. The branch is
-  deferred and non-required until rules freeze its expectation and threshold; node-count tuning, total map
-  share and ad hoc coverage bands may not substitute;
+  placed source and either the catalogue authors it as `tradeBand == rare` or `tradeBand == precious`, or an
+  existing bind-time `causalVisualFact(scope: resource)` proves that a known source-Page Sigil increased,
+  reduced or reshaped that registered family against the same-seed no-Sigil generation. `nontradeable` is not
+  a rarity synonym;
+- each eligible resource row retains stable resource ID, exact placed source count, exact obtainable quantity
+  and the canonically ordered causal mark IDs that genuinely own that family. A causal mark cross-links only
+  through its existing registered resource-family receipt; display must not infer family from prose or name;
+- the same-seed causal intervention is the rules-owned expectation for authored abundance. No new qualitative
+  threshold, node-count cutoff, total-map share or ad hoc coverage band is introduced. A family with no
+  rare/precious authorship and no resource causal fact remains absent from the Splash;
 - the profile contains no tile coordinate, placed-instance ID, route, key, site contents, per-source yield,
   remaining-harvest count or search result;
 - entry/exit portals are navigation infrastructure, not site opportunities, and do not enter this profile;
@@ -170,7 +173,13 @@ map.
   no claim about exact map location;
 - changing site coordinate/count/category while preserving zero-versus-nonzero presence leaves the site cue
   and its commands/RGBA byte-identical. Relocating eligible resource opportunities while preserving their
-  families and source counts likewise leaves their profile and placeholder output byte-identical.
+  families, source counts, obtainable quantities and causal owners likewise leaves their profile and
+  placeholder output byte-identical;
+- resource placeholder ownership changes monotonically with exact source count/obtainable quantity; it may
+  not collapse different causal aggregates through an invented sparse/present/abundant threshold;
+- flora uses the complete placed profile above. When an existing flora causal fact says a vitality/verdancy
+  Sigil changed the generated flora, the actual identity/count/region/habit receipt—not the fact's prose or a
+  second classifier—owns the visible change. Greater actual placed growth owns greater flora pixels.
 
 The final Asset system will consume these same semantic opportunity requests after the generator is accepted;
 Asset does not infer their identities or mechanics.
@@ -283,10 +292,12 @@ horizontally scrollable.
 | E01 | illumination matrix | Environment-owned value changes only |
 | E02 | existing atmosphere/precipitation matrix | Existing facts represented; no weather generation |
 | O01 | zero generated sites vs one-or-more generated sites at fixed terrain | Only the boolean site-presence receipt, one constant site-opportunity command and legitimate occlusion pixels change |
-| O02 | add/remove one obtainable authored rare/precious resource family at fixed terrain | Only resource-opportunity receipt/commands and legitimate occlusion pixels change; family/count is retained |
+| O02 | add/remove one obtainable authored rare/precious resource family at fixed terrain | Only resource-opportunity receipt/commands and legitimate occlusion pixels change; family/source count/quantity is retained |
 | O03 | change nonzero site count/category/identity/arrangement/location | Site-presence receipt field, site command and site-owned RGBA remain byte-identical |
 | O04 | add/remove an ordinary, non-qualifying resource family | Receipt, commands and pixels remain byte-identical; ordinary presence alone is not a Splash hook |
-| O05 | relocate identical eligible resource opportunities | Receipt, commands and pixels byte-identical; no coordinate is persisted or implied |
+| O05 | same-seed Ore-driving Sigil actual vs no-Sigil counterfactual | Only Ore resource-opportunity commands and legitimate occlusion pixels change; actual source count/quantity and causal owner agree; greater actual quantity owns greater resource pixels |
+| O06 | same-seed vitality/verdancy Sigil actual vs no-Sigil counterfactual | Only flora identity/distribution commands and legitimate occlusion pixels change; actual placed profile agrees; greater actual growth owns greater flora pixels |
+| O07 | coordinate permutation preserving opportunity/flora aggregate facts | Receipt, commands and pixels byte-identical; no exact coordinate is persisted or implied |
 | D01 | mutate traveller/apex or excluded site/resource details | Receipt, commands and pixels byte-identical |
 | D02 | hidden crop terrain/flora mutation | Hidden cells remain coordinate/visibility only |
 | C01 | exact first-map crop | Identity/palette parity for every disclosed cell |
