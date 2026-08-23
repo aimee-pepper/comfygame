@@ -8,6 +8,7 @@ import SwiftUI
 /// to walk.
 struct MinimapView: View {
     let run: WorldRun
+    @Environment(\.colorScheme) private var colorScheme
 
     var body: some View {
         Canvas { context, size in
@@ -21,7 +22,9 @@ struct MinimapView: View {
                 let rect = CGRect(x: inset.x + CGFloat(point.x) * side,
                                   y: inset.y + CGFloat(point.y) * side,
                                   width: side, height: side)
-                context.fill(Path(rect), with: .color(colour(for: tile)))
+                let appearance: MinimapTerrainStyle.Appearance = colorScheme == .dark ? .dark : .light
+                context.fill(Path(rect), with: .color(
+                    MinimapTerrainStyle.resolve(tile: tile, appearance: appearance).fill.color))
             }
 
             // Where you are. Landmark glyphs draw over this marker so the entry portal remains
@@ -75,26 +78,76 @@ struct MinimapView: View {
         context.draw(marker, at: centre)
     }
 
-    private func colour(for tile: Tile) -> Color {
-        guard tile.isRevealed else { return .black }                    // unexplored
-        if tile.isCrumbled { return .clear }                            // gone
-        switch tile.content {
-        case .empty:
-            // Explored and empty — but *what* it's made of still matters when you're deciding
-            // where to walk, so water and cover read differently from bare ground.
-            return switch tile.ground {
-            case .deepWater, .water, .ice: Color.blue.opacity(0.35)
-            // Cover you can't see past reads stronger than cover you can — on a minimap, "where
-            // are my sightlines" is most of what you're asking.
-            case .growth, .rubble: Color.green.opacity(0.30)
-            case .groundcover: Color.green.opacity(0.15)
-            case .mud: Color.brown.opacity(0.40)
-            default: Palette.mapFloor.opacity(0.3)
-            }
-        case .hazard: return .orange.opacity(0.7)
-        case .portal: return .blue.opacity(0.8)
-        default: return Palette.mapFloor.opacity(0.95)                  // explored, something here
+}
+
+/// Pure minimap terrain presentation. Gameplay and disclosure own whether a tile is remembered;
+/// this resolver only turns that already-sanitized fact into an opaque symbolic fill.
+enum MinimapTerrainStyle {
+    enum Appearance: CaseIterable { case light, dark }
+    enum TerrainClass: CaseIterable {
+        case hidden, crumbled, firmGround, looseGround, shallowWater, deepWater, ice, lowCover,
+             tallGrowth, chasm
+    }
+
+    struct Fill: Equatable {
+        let red: UInt8
+        let green: UInt8
+        let blue: UInt8
+        let alpha: UInt8
+
+        var color: Color {
+            Color(red: Double(red) / 255, green: Double(green) / 255,
+                  blue: Double(blue) / 255, opacity: Double(alpha) / 255)
         }
+
+        var luminance: Int { (Int(red) * 54 + Int(green) * 183 + Int(blue) * 19) / 256 }
+    }
+
+    struct Resolution: Equatable {
+        let terrainClass: TerrainClass
+        let fill: Fill
+    }
+
+    static func resolve(tile: Tile, appearance: Appearance) -> Resolution {
+        guard tile.isRevealed else { return resolution(.hidden, appearance: appearance) }
+        guard !tile.isCrumbled else { return resolution(.crumbled, appearance: appearance) }
+        let terrainClass: TerrainClass = switch tile.ground {
+        case .stone, .rubble: .firmGround
+        case .soil, .sand, .ash, .mud: .looseGround
+        case .water: .shallowWater
+        case .deepWater: .deepWater
+        case .ice: .ice
+        case .groundcover: .lowCover
+        case .growth: .tallGrowth
+        case .chasm: .chasm
+        }
+        return resolution(terrainClass, appearance: appearance)
+    }
+
+    private static func resolution(_ terrainClass: TerrainClass,
+                                   appearance: Appearance) -> Resolution {
+        let fill: Fill = switch (terrainClass, appearance) {
+        case (.hidden, _): .init(red: 0, green: 0, blue: 0, alpha: 255)
+        case (.crumbled, .dark): .init(red: 79, green: 74, blue: 84, alpha: 255)
+        case (.crumbled, .light): .init(red: 133, green: 128, blue: 139, alpha: 255)
+        case (.firmGround, .dark): .init(red: 82, green: 87, blue: 88, alpha: 255)
+        case (.firmGround, .light): .init(red: 166, green: 169, blue: 165, alpha: 255)
+        case (.looseGround, .dark): .init(red: 105, green: 78, blue: 56, alpha: 255)
+        case (.looseGround, .light): .init(red: 181, green: 148, blue: 105, alpha: 255)
+        case (.shallowWater, .dark): .init(red: 43, green: 105, blue: 119, alpha: 255)
+        case (.shallowWater, .light): .init(red: 91, green: 157, blue: 169, alpha: 255)
+        case (.deepWater, .dark): .init(red: 24, green: 67, blue: 88, alpha: 255)
+        case (.deepWater, .light): .init(red: 56, green: 112, blue: 139, alpha: 255)
+        case (.ice, .dark): .init(red: 91, green: 139, blue: 151, alpha: 255)
+        case (.ice, .light): .init(red: 170, green: 211, blue: 215, alpha: 255)
+        case (.lowCover, .dark): .init(red: 65, green: 104, blue: 61, alpha: 255)
+        case (.lowCover, .light): .init(red: 124, green: 163, blue: 99, alpha: 255)
+        case (.tallGrowth, .dark): .init(red: 39, green: 82, blue: 49, alpha: 255)
+        case (.tallGrowth, .light): .init(red: 82, green: 137, blue: 77, alpha: 255)
+        case (.chasm, .dark): .init(red: 30, green: 34, blue: 47, alpha: 255)
+        case (.chasm, .light): .init(red: 91, green: 96, blue: 112, alpha: 255)
+        }
+        return Resolution(terrainClass: terrainClass, fill: fill)
     }
 }
 

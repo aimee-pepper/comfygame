@@ -694,6 +694,116 @@ final class WorldTests: XCTestCase {
         XCTAssertEqual(MinimapDisclosure.marker(for: Tile(isRevealed: true), enemy: apex), .apex)
     }
 
+    func testMinimapTerrainStyleIsOpaqueNonblackAndIndependentOfRememberedContent() {
+        for appearance in MinimapTerrainStyle.Appearance.allCases {
+            var classes = Set<String>()
+            for ground in GroundType.allCases {
+                let hiddenA = MinimapTerrainStyle.resolve(
+                    tile: Tile(content: .hazard, ground: ground, isRevealed: false),
+                    appearance: appearance)
+                let hiddenB = MinimapTerrainStyle.resolve(
+                    tile: Tile(content: .lockedCache, ground: ground, isRevealed: false),
+                    appearance: appearance)
+                XCTAssertEqual(hiddenA, hiddenB, "hidden facts must not alter minimap output")
+                XCTAssertEqual(hiddenA.terrainClass, .hidden)
+                XCTAssertEqual(hiddenA.fill, .init(red: 0, green: 0, blue: 0, alpha: 255))
+
+                let empty = MinimapTerrainStyle.resolve(
+                    tile: Tile(content: .empty, ground: ground, isRevealed: true),
+                    appearance: appearance)
+                let occupied = MinimapTerrainStyle.resolve(
+                    tile: Tile(content: .hazard, ground: ground, isRevealed: true),
+                    appearance: appearance)
+                XCTAssertEqual(empty, occupied,
+                               "terrain fill must not encode a disclosed POI's identity")
+                XCTAssertEqual(empty.fill.alpha, 255)
+                XCTAssertGreaterThan(empty.fill.luminance, 20,
+                                     "remembered \(ground.rawValue) must remain visibly nonblack")
+                classes.insert(String(describing: empty.terrainClass))
+            }
+            XCTAssertEqual(classes.count, 8, "all semantic ground families must remain represented")
+
+            var crumbled = Tile(ground: .soil, isRevealed: true, isCrumbled: true)
+            crumbled.content = .hazard
+            let void = MinimapTerrainStyle.resolve(tile: crumbled, appearance: appearance)
+            XCTAssertEqual(void.terrainClass, .crumbled)
+            XCTAssertEqual(void.fill.alpha, 255)
+            XCTAssertGreaterThan(void.fill.luminance, 20)
+            XCTAssertNotEqual(void, MinimapTerrainStyle.resolve(
+                tile: Tile(ground: .soil, isRevealed: true), appearance: appearance))
+        }
+    }
+
+    func testMinimapFringeHiddenMutationAndRelaunchRemainDisclosureSafe() throws {
+        let player = GridPoint(x: 1, y: 1)
+        let fringe = GridPoint(x: 3, y: 1)
+        var map = WorldMap(width: 5, height: 3,
+                           tiles: Array(repeating: Tile(ground: .soil), count: 15), entry: player)
+        map[player].isRevealed = true
+        let profile = WorldRules.VisibilityProfile(
+            illumination: 100, fullRadius: 1, fringeWidth: 2, fringeOpacity: 0.5,
+            atmosphericBlurPoints: 0, obscurantDensity: 0)
+        XCTAssertEqual(WorldRules.visibility(of: fringe, from: player, in: map, profile: profile),
+                       .fringe)
+        XCTAssertFalse(map[fringe].isRevealed)
+
+        let before = MinimapTerrainStyle.resolve(tile: map[fringe], appearance: .dark)
+        map[fringe].ground = .deepWater
+        map[fringe].content = .hazard
+        map[fringe].isCrumbled = true
+        let after = MinimapTerrainStyle.resolve(tile: map[fringe], appearance: .dark)
+        XCTAssertEqual(before, after)
+        XCTAssertEqual(after.terrainClass, .hidden)
+        XCTAssertNil(MinimapDisclosure.marker(for: map[fringe], enemy: nil))
+
+        map[GridPoint(x: 0, y: 0)] = Tile(content: .hazard, ground: .growth, isRevealed: true)
+        let run = WorldRun(runIndex: 1, book: book([:]), mapSeed: 44, rng: SeededRNG(seed: 44),
+                           map: map, playerPosition: player)
+        let data = try SaveCodec.makeEncoder().encode(run)
+        let restored = try SaveCodec.makeDecoder().decode(WorldRun.self, from: data)
+        XCTAssertEqual(try SaveCodec.makeEncoder().encode(restored), data)
+        for appearance in MinimapTerrainStyle.Appearance.allCases {
+            XCTAssertEqual(
+                run.map.allPoints.map { MinimapTerrainStyle.resolve(
+                    tile: run.map[$0], appearance: appearance) },
+                restored.map.allPoints.map { MinimapTerrainStyle.resolve(
+                    tile: restored.map[$0], appearance: appearance) })
+        }
+        XCTAssertEqual(MinimapDisclosure.marker(at: GridPoint(x: 0, y: 0), in: restored), .hazard)
+        XCTAssertNil(MinimapDisclosure.marker(at: fringe, in: restored))
+    }
+
+    @MainActor
+    func testMinimapOpaqueTerrainNativePhoneEvidence() throws {
+        let run = minimapEvidenceRun()
+        let darkCrop = minimapImage(run: run, scheme: .dark, size: CGSize(width: 96, height: 96))
+        let lightCrop = minimapImage(run: run, scheme: .light, size: CGSize(width: 96, height: 96))
+        let darkPhone = minimapPhoneEvidence(run: run, scheme: .dark)
+        let lightPhone = minimapPhoneEvidence(run: run, scheme: .light)
+        let grayscale = try XCTUnwrap(literalGrayscale(darkPhone))
+        let enlarged = nearestNeighbor(darkCrop, size: CGSize(width: 384, height: 384))
+        XCTAssertEqual(darkCrop.pngData(), minimapImage(
+            run: run, scheme: .dark, size: CGSize(width: 96, height: 96)).pngData(),
+                       "identical minimap facts must redraw byte-identically")
+        XCTAssertEqual(darkPhone.size, CGSize(width: 368, height: 800))
+        XCTAssertEqual(lightPhone.size, CGSize(width: 368, height: 800))
+        XCTAssertEqual(grayscale.size, CGSize(width: 368, height: 800))
+        XCTAssertEqual(enlarged.size, CGSize(width: 384, height: 384))
+        for (name, image) in [
+            ("minimap-opaque-terrain-dark-368x800", darkPhone),
+            ("minimap-opaque-terrain-grayscale-368x800", grayscale),
+            ("minimap-opaque-terrain-light-368x800", lightPhone),
+            ("minimap-opaque-terrain-native-96x96", darkCrop),
+            ("minimap-opaque-terrain-light-native-96x96", lightCrop),
+            ("minimap-opaque-terrain-400-percent", enlarged),
+        ] {
+            let attachment = XCTAttachment(image: image)
+            attachment.name = name
+            attachment.lifetime = .keepAlways
+            add(attachment)
+        }
+    }
+
     func testMinimapDoesNotLeakSleepingCrypsisOnRevealedTerrain() {
         let player = GridPoint(x: 1, y: 1)
         let distant = GridPoint(x: 5, y: 1)
@@ -3005,5 +3115,100 @@ final class WorldTests: XCTestCase {
                        "lowest stable realm ID wins a contradictory posting")
         XCTAssertTrue(decoded.worlds.anchoredRealms[2].assignedCompanions.isEmpty)
         XCTAssertEqual(decoded.worlds.anchoredRealms[1].productionContribution, 4)
+    }
+
+    private func minimapEvidenceRun() -> WorldRun {
+        let grounds = GroundType.allCases
+        var tiles = (0..<16).map { index in
+            Tile(ground: grounds[index % grounds.count], isRevealed: true)
+        }
+        tiles[0] = Tile(content: .hazard, ground: .growth, isRevealed: false)
+        tiles[1] = Tile(ground: .soil, isRevealed: true, isCrumbled: true)
+        tiles[2].content = .hazard
+        tiles[3].content = .site(InstanceID(rawValue: 600))
+        tiles[4].content = .portal(isEntry: true)
+        let map = WorldMap(width: 4, height: 4, tiles: tiles, entry: GridPoint(x: 0, y: 1))
+        return WorldRun(runIndex: 1, book: book([:]), mapSeed: 600,
+                        rng: SeededRNG(seed: 600), map: map,
+                        playerPosition: GridPoint(x: 0, y: 1))
+    }
+
+    @MainActor
+    private func minimapImage(run: WorldRun, scheme: ColorScheme, size: CGSize) -> UIImage {
+        let controller = UIHostingController(rootView:
+            MinimapView(run: run).environment(\.colorScheme, scheme)
+                .frame(width: size.width, height: size.height))
+        let window = UIWindow(frame: CGRect(origin: .zero, size: size))
+        window.rootViewController = controller
+        window.makeKeyAndVisible()
+        controller.view.frame = window.bounds
+        controller.view.layoutIfNeeded()
+        RunLoop.main.run(until: Date().addingTimeInterval(0.05))
+        let format = UIGraphicsImageRendererFormat(); format.scale = 1
+        let image = UIGraphicsImageRenderer(size: size, format: format).image { _ in
+            controller.view.drawHierarchy(in: controller.view.bounds, afterScreenUpdates: true)
+        }
+        window.isHidden = true
+        return image
+    }
+
+    @MainActor
+    private func minimapPhoneEvidence(run: WorldRun, scheme: ColorScheme) -> UIImage {
+        let view = ZStack {
+            (scheme == .dark ? Color(red: 0.05, green: 0.09, blue: 0.09) : Color(white: 0.92))
+            VStack(alignment: .leading, spacing: 18) {
+                Text("Minimap terrain memory")
+                    .font(.system(size: 22, weight: .bold, design: .rounded))
+                MinimapView(run: run).frame(width: 320, height: 320)
+                Text("Hidden · remembered terrain · crumbled · disclosed markers")
+                    .font(.system(size: 16, weight: .semibold, design: .rounded))
+                Spacer()
+            }
+            .foregroundStyle(scheme == .dark ? Color.white : Color.black)
+            .padding(.top, 70)
+        }
+        .environment(\.colorScheme, scheme)
+        .frame(width: 368, height: 800)
+        let controller = UIHostingController(rootView: view)
+        let window = UIWindow(frame: CGRect(x: 0, y: 0, width: 368, height: 800))
+        window.rootViewController = controller
+        window.makeKeyAndVisible()
+        controller.view.frame = window.bounds
+        controller.view.layoutIfNeeded()
+        RunLoop.main.run(until: Date().addingTimeInterval(0.05))
+        let format = UIGraphicsImageRendererFormat(); format.scale = 1
+        let image = UIGraphicsImageRenderer(size: window.bounds.size, format: format).image { _ in
+            controller.view.drawHierarchy(in: controller.view.bounds, afterScreenUpdates: true)
+        }
+        window.isHidden = true
+        return image
+    }
+
+    private func nearestNeighbor(_ source: UIImage, size: CGSize) -> UIImage {
+        let format = UIGraphicsImageRendererFormat(); format.scale = 1
+        return UIGraphicsImageRenderer(size: size, format: format).image { output in
+            output.cgContext.interpolationQuality = .none
+            source.draw(in: CGRect(origin: .zero, size: size))
+        }
+    }
+
+    private func literalGrayscale(_ source: UIImage) -> UIImage? {
+        guard let cgImage = source.cgImage else { return nil }
+        let width = cgImage.width, height = cgImage.height
+        var bytes = [UInt8](repeating: 0, count: width * height * 4)
+        guard let context = CGContext(data: &bytes, width: width, height: height,
+                                      bitsPerComponent: 8, bytesPerRow: width * 4,
+                                      space: CGColorSpaceCreateDeviceRGB(),
+                                      bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue) else {
+            return nil
+        }
+        context.draw(cgImage, in: CGRect(x: 0, y: 0, width: width, height: height))
+        for index in stride(from: 0, to: bytes.count, by: 4) {
+            let value = UInt8((Int(bytes[index]) * 54 + Int(bytes[index + 1]) * 183
+                               + Int(bytes[index + 2]) * 19) / 256)
+            bytes[index] = value; bytes[index + 1] = value; bytes[index + 2] = value
+        }
+        guard let result = context.makeImage() else { return nil }
+        return UIImage(cgImage: result)
     }
 }
