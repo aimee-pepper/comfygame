@@ -9,6 +9,7 @@ enum MapAssetContract {
     static let animationVersion = "terrain-layers-v2"
     static let seedTuple = "1|1|1|1|world-grade-1.0.0|map-slice-1.1.0|rect-compositor-0.2.0|top-down-map-16px-1.0.0"
     static let rendererTuple = "terrain-production-pack-v1|terrain-layers-v2|native-1"
+    static let regionContinuityVersion = "terrain-region-continuity-v1"
     static let spriteWidth = 16
     static let spriteHeight = 19
     static let logicalSide = 16
@@ -31,6 +32,11 @@ enum MapAssetContract {
         return input.utf8.reduce(UInt32(0x811c9dc5)) { hash, byte in
             (hash ^ UInt32(byte)) &* 0x01000193
         }
+    }
+
+    /// Structural macro orientation belongs to the world, never to an individual tile.
+    static func regionFeatureVariant(mapSeed: UInt64) -> Int {
+        Int(mapSeed & 3)
     }
 
     static func edgeContourID(mapSeed: UInt64, point: GridPoint,
@@ -194,7 +200,9 @@ struct MapTileArtRequest {
         return try TerrainProductionPack.Request(
             ground: .init(tile.ground), point: point, visualSeed: UInt64(seed),
             worldGradeDescriptorHash: descriptor.canonicalDescriptorSHA256,
-            featureVariant: featureVariant, cardinalNeighbors: cardinalNeighbors,
+            featureVariant: explicitFeatureVariant
+                ?? MapAssetContract.regionFeatureVariant(mapSeed: mapSeed),
+            cardinalNeighbors: cardinalNeighbors,
             edgeContourIDs: edgeContourIDs, elevation: resolvedElevation,
             isCrumbled: tile.isCrumbled, isCracking: tile.isCracking, visibility: visibility,
             motionBand: MapAssetContract.motionBand(atmosphereMotion),
@@ -242,6 +250,10 @@ struct MapTileArtRequest {
     static func productionPixels(_ request: TerrainProductionPack.Request,
                                  descriptor: WorldGrade2V1.Descriptor? = nil) throws -> [UInt8] {
         try pack.rgba(for: request, descriptor: descriptor)
+    }
+
+    static func nativeRenderedImage(_ request: MapTileArtRequest) -> UIImage? {
+        MapPixelRaster.image(for: request, reduceMotion: true)
     }
 
     static func terrainPixels(ground: GroundType, adjacency: Int = 15, featureVariant: Int = 0,
@@ -1034,7 +1046,8 @@ struct RGBA: Equatable {
         let rgbaFromPack: [UInt8]
         do {
             let packRequest = try request.terrainRequest(reduceMotion: reduceMotion)
-            rgbaFromPack = try terrainPack.rgba(for: packRequest, descriptor: descriptor)
+            rgbaFromPack = try terrainPack.regionContinuousRGBA(for: packRequest,
+                                                                 descriptor: descriptor)
         } catch {
             // The production pack is presentation, never gameplay authority. A missing or corrupt
             // visual resource must retain the last functional terrain/wall renderer rather than

@@ -9,8 +9,8 @@ import ImageIO
 /// own terrain facts, visibility, elevation, deposits, and the shared presentation tick.
 final class TerrainProductionPack: @unchecked Sendable {
     static let identity = "TerrainProductionPack-v1"
-    static let manifestSHA256 = "332cfc692758564e01ed7c134334c9f46c76156388e6dccc9722c7cdcad3e20f"
-    static let bodySHA256 = "ecb748ba46582bd432e7eba7cfc5494fd8ea8badcf3a8652d24c7a533d8e8336"
+    static let manifestSHA256 = "1c23fad456c62bd09944b175b9a7a7f55fcf976b763f44a8ff6632f5bb67a682"
+    static let bodySHA256 = "677542ff364dd6738d3f09fa879aff22eb59b47a16890b5e121f8a61c68b4659"
     static let assetAggregateSHA256 = "8fb84f80a3eb82c84c0baa285800cad51fc1107c93ec748a23c1f0f6eb489272"
     static let acceptedVisualCommit = "5bac76a9"
     static let acceptedVisualBodySHA256 = "2a541033b71b638f1803e5a9477a0197c38f38d96ff199a4864d49bf551608dd"
@@ -343,6 +343,134 @@ final class TerrainProductionPack: @unchecked Sendable {
         return rgba
     }
 
+    /// Native integration of the accepted Terrain Region Continuity v1 contract. This deliberately
+    /// leaves `rgba(for:)` byte-stable for the installed terrain-pack corpus: the continuity layer
+    /// is a new compositor seam over the same immutable role maps and palettes.
+    func regionContinuousRGBA(for request: Request,
+                              descriptor: WorldGrade2V1.Descriptor? = nil) throws -> [UInt8] {
+        try open()
+        lock.lock(); defer { lock.unlock() }
+        guard let state else { throw PackError.unavailable }
+        let palette = try Self.palette(for: request, descriptor: descriptor, rows: state.palettes)
+        let roles = try Self.composeRoles(request, roleMaps: state.roleMaps,
+                                          edgeMasks: state.edgeMasks)
+        var rgba = Self.recolor(roles,
+                                palette: try Self.groundPalette(request.ground.rawValue, in: palette))
+
+        let step = Self.motionStep(ground: request.ground, band: request.motionBand)
+        if request.visibility == .full, !request.reduceMotion, step > 0 {
+            let phase = (request.phaseOffset + (request.presentationTick % 24) / step
+                         + request.featureVariant) % 4
+            let key = "accepted/motion/\(request.ground.rawValue)-phase-\(phase)-16x16.png"
+            guard let mask = state.motionMasks[key] else { throw PackError.missingAsset(key) }
+            let highlight = try Self.groundPalette(request.ground.rawValue, in: palette)[4]
+            for index in mask.indices where mask[index] { rgba.replace(at: index, with: highlight) }
+        }
+
+        if ![Ground.water, .deepWater, .chasm].contains(request.ground) {
+            guard let depositRoles = state.roleMaps["snow"] else {
+                throw PackError.invalidSemanticMask("snow")
+            }
+            var occupied = [Bool](repeating: false, count: 256)
+            var count = 0
+            let limit = 179
+            func apply(_ enabled: Bool, variantOffset: Int, paletteKey: String) throws {
+                guard enabled else { return }
+                let colors = try Self.groundPalette(paletteKey, in: palette)
+                for y in 0..<16 { for x in 0..<16 {
+                    let index = y * 16 + x
+                    let role = Self.macroRole(depositRoles, point: request.point, x: x, y: y,
+                                              featureVariant: request.featureVariant + variantOffset)
+                    guard role >= 0, !occupied[index], count < limit else { continue }
+                    rgba.replace(at: index, with: colors[Int(role)])
+                    occupied[index] = true; count += 1
+                }}
+            }
+            try apply(request.surfaceDeposits.snow, variantOffset: 0, paletteKey: "snow")
+            try apply(request.surfaceDeposits.settledAsh, variantOffset: 1, paletteKey: "coverAsh")
+        }
+
+        let boundary = Self.materialBoundaryMask(request)
+        for index in boundary.indices {
+            switch boundary[index] {
+            case 1: rgba.replace(at: index, with: Self.materialBoundaryPalette[0])
+            case 2: rgba.replace(at: index, with: Self.materialBoundaryPalette[1])
+            default: break
+            }
+        }
+        return rgba
+    }
+
+    func regionContinuityBaseRoles(for request: Request) throws -> [UInt8] {
+        try open()
+        lock.lock(); defer { lock.unlock() }
+        guard let state else { throw PackError.unavailable }
+        return try Self.baseRoles(request, roleMaps: state.roleMaps).map(UInt8.init)
+    }
+
+    /// The accepted pre-continuity production composition. Kept as an explicit test seam so the
+    /// new material boundary can be proven additive rather than a replacement for depth/contact
+    /// grammar already owned by TerrainProductionPack v1.
+    func regionContinuityAcceptedRGBA(for request: Request,
+                                      descriptor: WorldGrade2V1.Descriptor? = nil) throws
+        -> [UInt8] {
+        try rgba(for: request, descriptor: descriptor)
+    }
+
+    /// Exact neutral-palette adapter used by the accepted cross-platform corpus. Production uses
+    /// `regionContinuousRGBA`, which preserves the world's pressure-derived palette.
+    func regionContinuityConformanceRGBA(for request: Request) throws -> [UInt8] {
+        let roles = try regionContinuityBaseRoles(for: request)
+        guard let colors = Self.baseRoleColors[request.ground.rawValue] else {
+            throw PackError.invalidSemanticMask(request.ground.rawValue)
+        }
+        let palette = try colors.map(RGBA.init(hex:))
+        var rgba = Self.recolor(roles.map(Int8.init), palette: palette)
+        let boundary = Self.materialBoundaryMask(request)
+        for index in boundary.indices {
+            switch boundary[index] {
+            case 1: rgba.replace(at: index, with: Self.materialBoundaryPalette[0])
+            case 2: rgba.replace(at: index, with: Self.materialBoundaryPalette[1])
+            default: break
+            }
+        }
+        return rgba
+    }
+
+    static func materialBoundaryMask(_ request: Request) -> [UInt8] {
+        var result = [UInt8](repeating: 0, count: 256)
+        guard request.visibility == .full else { return result }
+        for direction in Direction.allCases {
+            guard case .ground(let neighbor) = request.cardinalNeighbors[direction],
+                  neighbor != request.ground,
+                  groundRank[request.ground, default: Int.max]
+                    < groundRank[neighbor, default: Int.max] else { continue }
+            let contour = request.edgeContourIDs[direction]
+            for y in 0..<16 { for x in 0..<16 {
+                guard inMaterialBoundary(direction: direction, x: x, y: y,
+                                         contour: contour) else { continue }
+                result[y * 16 + x] = (x + y + request.point.x + request.point.y) & 3 == 0 ? 2 : 1
+                let inward = switch direction {
+                case .north: y + 1
+                case .south: y - 1
+                case .west: x + 1
+                case .east: x - 1
+                }
+                if (0..<16).contains(inward), (x * 3 + y * 5 + contour) & 7 == 0 {
+                    let innerX = direction == .west || direction == .east ? inward : x
+                    let innerY = direction == .north || direction == .south ? inward : y
+                    result[innerY * 16 + innerX] = 1
+                }
+            }}
+        }
+        return result
+    }
+
+    static func smallAccentPoint(point: GridPoint, visualSeed: UInt64) -> GridPoint {
+        let bytes = Array(SHA256.hash(data: Data("\(visualSeed):\(point.x):\(point.y)".utf8)))
+        return GridPoint(x: 3 + Int(bytes[0]) % 10, y: 3 + Int(bytes[1]) % 10)
+    }
+
     static func resolvedGroundPalette(_ ground: Ground,
                                       descriptor: WorldGrade2V1.Descriptor) throws -> [RGBA] {
         try WorldGrade2V1.validateDescriptor(descriptor)
@@ -356,13 +484,15 @@ final class TerrainProductionPack: @unchecked Sendable {
     }
 
     private static func validateRoot(_ root: [String: Any]) throws {
-        let exact = ["schemaVersion", "integrationReady", "status", "acceptedVisual",
+        let exact = ["schemaVersion", "integrationReady", "status", "authorityRevision",
+                     "acceptedVisual",
                      "runtimeContract", "pressurePalettes", "assets", "cases",
                      "assetAggregateSHA256", "canonicalBodySHA256"]
         guard Set(root.keys) == Set(exact),
               root["schemaVersion"] as? String == "terrain-production-pack-v1",
               root["integrationReady"] as? Bool == false,
-              root["status"] as? String == "mechanical-pack-review",
+              root["status"] as? String == "corrected-asset-authority-review",
+              root["authorityRevision"] as? String == "motion-rgba-correction-v1.1",
               root["canonicalBodySHA256"] as? String == bodySHA256,
               root["assetAggregateSHA256"] as? String == assetAggregateSHA256,
               let accepted = root["acceptedVisual"] as? [String: Any],
@@ -538,11 +668,7 @@ final class TerrainProductionPack: @unchecked Sendable {
                     throw PackError.missingAsset(key)
                 }
                 let decoded = try alphaMask(bytes, width: 16, height: 16, key: key)
-                // CGImage drawing uses Quartz's lower-left image space for these transparent
-                // overlays. Normalize motion assets to the pack's top-left logical raster.
-                result[key] = (0..<16).flatMap { y in
-                    Array(decoded[((15 - y) * 16)..<((16 - y) * 16)])
-                }
+                result[key] = decoded
             }
         }
         return result
@@ -612,6 +738,30 @@ final class TerrainProductionPack: @unchecked Sendable {
             }}
         }
         return result
+    }
+
+    private static func baseRoles(_ request: Request, roleMaps: [String: [Int8]]) throws -> [Int8] {
+        guard let base = roleMaps[request.ground.rawValue] else {
+            throw PackError.invalidSemanticMask(request.ground.rawValue)
+        }
+        return (0..<16).flatMap { y in
+            (0..<16).map { x in
+                macroRole(base, point: request.point, x: x, y: y,
+                          featureVariant: request.featureVariant)
+            }
+        }
+    }
+
+    private static func inMaterialBoundary(direction: Direction, x: Int, y: Int,
+                                           contour: Int) -> Bool {
+        let profileIndex = direction == .north || direction == .south ? x : y
+        let depth = 1 + contourProfiles[contour][profileIndex]
+        return switch direction {
+        case .north: y < depth
+        case .east: x >= 16 - depth
+        case .south: y >= 16 - depth
+        case .west: x < depth
+        }
     }
 
     private static func macroRole(_ map: [Int8], point: GridPoint, x: Int, y: Int,
@@ -685,6 +835,18 @@ final class TerrainProductionPack: @unchecked Sendable {
     }
 
     private static let semanticRoles = ["deepShadow", "bodyDark", "body", "bodyLight", "highlight"]
+    private static let contourProfiles = [
+        [0, 0, 1, 1, 2, 2, 1, 0, 0, 1, 2, 1, 1, 0, 0, 0],
+        [1, 2, 2, 1, 0, 0, 1, 2, 1, 0, 0, 1, 2, 2, 1, 0],
+        [0, 1, 2, 2, 1, 0, 0, 0, 1, 1, 2, 2, 1, 0, 0, 1],
+        [2, 1, 0, 0, 1, 2, 2, 1, 0, 0, 1, 2, 1, 0, 1, 2],
+    ]
+    private static let groundRank = Dictionary(uniqueKeysWithValues:
+        Ground.allCases.enumerated().map { ($0.element, $0.offset) })
+    private static let materialBoundaryPalette = [
+        RGBA(red: 37, green: 43, blue: 42, alpha: 255),
+        RGBA(red: 173, green: 164, blue: 126, alpha: 255),
+    ]
     private static let layerOrder = ["baseMacro", "cardinalEdges", "motion", "snowDeposit", "ashDeposit"]
     private static let priority: [Ground: Int] = [
         .chasm: 0, .deepWater: 1, .water: 2, .stone: 3, .ice: 3, .rubble: 3,
