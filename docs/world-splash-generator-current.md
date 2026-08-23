@@ -77,8 +77,13 @@ generated cells and preserves broad masses while omitting exact hidden interacta
 
 ### Water profile
 
-The water profile contains shallow, deep and frozen counts; coverage band; connected-body count band;
-dominant topology; closed topology flags; and shallow/deep/frozen share bands by coarse region.
+The water profile contains shallow, deep and frozen counts; coverage band; exact final connected-body
+count; dominant topology; closed topology flags; and shallow/deep/frozen share bands by coarse region.
+
+`connectedBodyCountBand` is undefined and deferred for v3. No rules-owned denominator or thresholds exist,
+so the receipt, command generator, proof matrix and implementation must not emit or require a qualitative
+band for the exact connected-body count. This does not relax water coverage: the exact count, coarse-region
+shares, supported topology flags, semantic commands and all W01 through W04 evidence remain mandatory.
 
 Legal topology flags include standing, flowing, pool, lake, channel, shelf, island and broken. They derive
 from actual connected ground geometry, not color or prose. Ponds/lakes and channels/rivers are all legal when
