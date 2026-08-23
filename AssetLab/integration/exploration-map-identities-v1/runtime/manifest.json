@@ -1,0 +1,1372 @@
+{
+  "schemaVersion": "exploration-map-identities-v1",
+  "status": "candidate-unapproved",
+  "integrationReady": false,
+  "baselineCommit": "14d2582a2470d843f6b1a40798db29e83f440e02",
+  "authorityPins": {
+    "Sources/Model/WorldMap.swift": "7a42213d75f3772a02ff34799d5d557adcc12db93513176238697f5bc0df202c",
+    "Sources/Content/Data/sites.json": "f930f7418bef45294e0e617ea084834f87718536687097ae3b0ad90f2c221ab2",
+    "Sources/Screens/WorldView.swift": "7aba5e32eb1b57b3a64dc264e755d109d43115e939e4552c06477389f41cdacd",
+    "Sources/Screens/MinimapView.swift": "e15b1ad97c8aeeba823c37460c10a8e623332b59ad51f248e3832197cf930424",
+    "src/resource-kit.js": "03bfe41d3baca0fda830c023499d7bb481add8198f349b055a8f9cbedc8f87a8",
+    "integration/resource-sprites-v1/manifest.json": "a3e3134b51225f2b4dad61380e2e425780571a099e97e1572f7164589f307c11"
+  },
+  "acceptedTerrainReference": {
+    "path": "AssetLab/artifacts/terrain-region-continuity-v1/evidence/macro-11x11-redraw-a-2x.png",
+    "sha256": "88270d061fb9480e6df1684cf77710c50765004777a8388b9583f04457c68b82"
+  },
+  "production": {
+    "map": {
+      "logicalSize": [
+        16,
+        19
+      ],
+      "pivot": [
+        8,
+        18
+      ],
+      "tileConsumer": [
+        16,
+        16
+      ],
+      "filtering": "nearest-neighbour",
+      "premadeOnly": true
+    },
+    "minimap": {
+      "logicalSize": [
+        7,
+        7
+      ],
+      "categories": [
+        "portal",
+        "page",
+        "cache",
+        "site",
+        "hazard",
+        "resource"
+      ],
+      "subtypeDisclosure": false,
+      "premadeOnly": true
+    },
+    "runtimeDirectory": "runtime",
+    "runtimeContents": [
+      "manifest.json",
+      "assets"
+    ],
+    "noRuntimeGeneration": true
+  },
+  "visibilityContract": {
+    "full": "lookup persisted identity/state; shared presentation clock may select a premade ambient frame",
+    "remembered": "lookup persisted identity/state at frame 0 only",
+    "hidden": "no lookup and no draw"
+  },
+  "layerContract": [
+    "terrain",
+    "southWall",
+    "siteOrHazard",
+    "party",
+    "selectionAndInteraction",
+    "alerts"
+  ],
+  "animationContract": {
+    "clock": "existing shared presentation clock",
+    "selection": "presentationTick modulo frameCount for full visibility only",
+    "reduceMotion": "frame 0",
+    "forbiddenImplications": [
+      "damage",
+      "searching",
+      "opening",
+      "depletion",
+      "spread",
+      "extinguishing"
+    ],
+    "assetsArePremade": true
+  },
+  "identities": [
+    {
+      "id": "entry_portal",
+      "kind": "portal",
+      "title": "Entry Portal",
+      "searchable": false,
+      "animation": "ambient-inward-seam",
+      "frames": 3,
+      "states": [
+        "ordinary"
+      ],
+      "lootedStateAuthority": null
+    },
+    {
+      "id": "exit_portal",
+      "kind": "portal",
+      "title": "Return Portal",
+      "searchable": false,
+      "animation": "ambient-outward-seam",
+      "frames": 3,
+      "states": [
+        "ordinary"
+      ],
+      "lootedStateAuthority": null
+    },
+    {
+      "id": "locked_cache",
+      "kind": "cache",
+      "title": "Locked Cache",
+      "searchable": false,
+      "animation": "static",
+      "frames": 1,
+      "states": [
+        "ordinary"
+      ],
+      "lootedStateAuthority": null
+    },
+    {
+      "id": "loose_world_page",
+      "kind": "writing",
+      "title": "Loose World Page",
+      "searchable": false,
+      "animation": "static",
+      "frames": 1,
+      "states": [
+        "ordinary"
+      ],
+      "lootedStateAuthority": null
+    },
+    {
+      "id": "diary_page",
+      "kind": "writing",
+      "title": "Diary Page",
+      "searchable": false,
+      "animation": "static",
+      "frames": 1,
+      "states": [
+        "ordinary"
+      ],
+      "lootedStateAuthority": null
+    },
+    {
+      "id": "found_writing",
+      "kind": "writing",
+      "title": "Found Writing",
+      "searchable": false,
+      "animation": "static",
+      "frames": 1,
+      "states": [
+        "ordinary"
+      ],
+      "lootedStateAuthority": null
+    },
+    {
+      "id": "hazard",
+      "kind": "hazard",
+      "title": "Known hazard",
+      "searchable": false,
+      "animation": "ambient-instability",
+      "frames": 3,
+      "states": [
+        "ordinary"
+      ],
+      "lootedStateAuthority": null
+    },
+    {
+      "id": "wayfarers_camp",
+      "kind": "site",
+      "title": "Wayfarer's Camp",
+      "searchable": true,
+      "animation": "static",
+      "frames": 1,
+      "states": [
+        "unlooted",
+        "looted"
+      ],
+      "lootedStateAuthority": "PlacedSite.isLooted"
+    },
+    {
+      "id": "binders_workshop",
+      "kind": "site",
+      "title": "Binder's Workshop",
+      "searchable": true,
+      "animation": "static",
+      "frames": 1,
+      "states": [
+        "unlooted",
+        "looted"
+      ],
+      "lootedStateAuthority": "PlacedSite.isLooted"
+    },
+    {
+      "id": "glacial_vault",
+      "kind": "site",
+      "title": "Glacial Vault",
+      "searchable": true,
+      "animation": "static",
+      "frames": 1,
+      "states": [
+        "unlooted",
+        "looted"
+      ],
+      "lootedStateAuthority": "PlacedSite.isLooted"
+    },
+    {
+      "id": "spent_emanation_housing",
+      "kind": "site",
+      "title": "Spent Emanation Housing",
+      "searchable": true,
+      "animation": "static",
+      "frames": 1,
+      "states": [
+        "unlooted",
+        "looted"
+      ],
+      "lootedStateAuthority": "PlacedSite.isLooted"
+    },
+    {
+      "id": "crystal_cavern",
+      "kind": "site",
+      "title": "Crystal Cavern",
+      "searchable": true,
+      "animation": "ambient-glint",
+      "frames": 2,
+      "states": [
+        "unlooted",
+        "looted"
+      ],
+      "lootedStateAuthority": "PlacedSite.isLooted"
+    },
+    {
+      "id": "geyser_basin",
+      "kind": "site",
+      "title": "Geyser Basin",
+      "searchable": true,
+      "animation": "ambient-steam",
+      "frames": 3,
+      "states": [
+        "unlooted",
+        "looted"
+      ],
+      "lootedStateAuthority": "PlacedSite.isLooted"
+    },
+    {
+      "id": "brood_warren",
+      "kind": "site",
+      "title": "Brood Warren",
+      "searchable": true,
+      "animation": "ambient-living",
+      "frames": 2,
+      "states": [
+        "unlooted",
+        "looted"
+      ],
+      "lootedStateAuthority": "PlacedSite.isLooted"
+    },
+    {
+      "id": "the_tear",
+      "kind": "site",
+      "title": "The Tear",
+      "searchable": true,
+      "animation": "ambient-energy",
+      "frames": 3,
+      "states": [
+        "unlooted",
+        "looted"
+      ],
+      "lootedStateAuthority": "PlacedSite.isLooted"
+    },
+    {
+      "id": "natural_anchor",
+      "kind": "site",
+      "title": "Atlas Seam",
+      "searchable": false,
+      "animation": "ambient-seam",
+      "frames": 3,
+      "states": [
+        "ordinary"
+      ],
+      "lootedStateAuthority": null
+    }
+  ],
+  "requestABI": {
+    "exactKeys": [
+      "identity",
+      "state",
+      "visibility",
+      "presentationTick",
+      "reduceMotion"
+    ],
+    "identity": [
+      "entry_portal",
+      "exit_portal",
+      "locked_cache",
+      "loose_world_page",
+      "diary_page",
+      "found_writing",
+      "hazard",
+      "wayfarers_camp",
+      "binders_workshop",
+      "glacial_vault",
+      "spent_emanation_housing",
+      "crystal_cavern",
+      "geyser_basin",
+      "brood_warren",
+      "the_tear",
+      "natural_anchor"
+    ],
+    "state": [
+      "ordinary",
+      "unlooted",
+      "looted"
+    ],
+    "visibility": [
+      "full",
+      "remembered",
+      "hidden"
+    ],
+    "failClosed": [
+      "unknownIdentity",
+      "unknownState",
+      "unknownVisibility",
+      "extraField",
+      "unsafePresentationTick",
+      "hidden"
+    ]
+  },
+  "assetsByKey": {
+    "entry_portal/ordinary/frame-0": {
+      "path": "assets/0494d29f0cb31a3de2eda6831e6e1c18f928134a3f18f688fbda4461dffa4e36.png",
+      "sha256": "0494d29f0cb31a3de2eda6831e6e1c18f928134a3f18f688fbda4461dffa4e36",
+      "rgbaSHA256": "a830a3a8e95c2d907008289bd99cc6124b88922cbb72b534e300e65af89f9ac4",
+      "width": 16,
+      "height": 19,
+      "pivot": {
+        "x": 8,
+        "y": 18
+      },
+      "identity": "entry_portal",
+      "kind": "portal",
+      "state": "ordinary",
+      "frame": 0,
+      "frameCount": 3,
+      "animation": "ambient-inward-seam"
+    },
+    "entry_portal/ordinary/frame-1": {
+      "path": "assets/5ed72409442ce4ad0464377c0d06b675cad628aee56fa073687127e9113e944b.png",
+      "sha256": "5ed72409442ce4ad0464377c0d06b675cad628aee56fa073687127e9113e944b",
+      "rgbaSHA256": "905fa15ea3ec9c89bbb450d3425691913d9e596204b11feb5950956fe034a457",
+      "width": 16,
+      "height": 19,
+      "pivot": {
+        "x": 8,
+        "y": 18
+      },
+      "identity": "entry_portal",
+      "kind": "portal",
+      "state": "ordinary",
+      "frame": 1,
+      "frameCount": 3,
+      "animation": "ambient-inward-seam"
+    },
+    "entry_portal/ordinary/frame-2": {
+      "path": "assets/e0ec9e724e2f546e387e7b4fc1eec4c16609699adc926a8258f2185a460bf1f4.png",
+      "sha256": "e0ec9e724e2f546e387e7b4fc1eec4c16609699adc926a8258f2185a460bf1f4",
+      "rgbaSHA256": "06b981a912f64856a38264c59adcec1bc6564beb569e0d228b728ef9ab441cd6",
+      "width": 16,
+      "height": 19,
+      "pivot": {
+        "x": 8,
+        "y": 18
+      },
+      "identity": "entry_portal",
+      "kind": "portal",
+      "state": "ordinary",
+      "frame": 2,
+      "frameCount": 3,
+      "animation": "ambient-inward-seam"
+    },
+    "exit_portal/ordinary/frame-0": {
+      "path": "assets/c8d38a2aacd87ea0621319ef9c52d0c03cd28127004f1469f7261745c193198c.png",
+      "sha256": "c8d38a2aacd87ea0621319ef9c52d0c03cd28127004f1469f7261745c193198c",
+      "rgbaSHA256": "03b69cc93681f7b4d6e5522ecc04d39fe68a7ffd9b472e77e282771ca9c37541",
+      "width": 16,
+      "height": 19,
+      "pivot": {
+        "x": 8,
+        "y": 18
+      },
+      "identity": "exit_portal",
+      "kind": "portal",
+      "state": "ordinary",
+      "frame": 0,
+      "frameCount": 3,
+      "animation": "ambient-outward-seam"
+    },
+    "exit_portal/ordinary/frame-1": {
+      "path": "assets/1ee7806afd47d0d45502904de3bfc271af05920f27336c24108dcf6412065cb8.png",
+      "sha256": "1ee7806afd47d0d45502904de3bfc271af05920f27336c24108dcf6412065cb8",
+      "rgbaSHA256": "f2aa4e3406ca62a6b36f1b994586bdf677c0b7673dd74d965c26ad93132e3757",
+      "width": 16,
+      "height": 19,
+      "pivot": {
+        "x": 8,
+        "y": 18
+      },
+      "identity": "exit_portal",
+      "kind": "portal",
+      "state": "ordinary",
+      "frame": 1,
+      "frameCount": 3,
+      "animation": "ambient-outward-seam"
+    },
+    "exit_portal/ordinary/frame-2": {
+      "path": "assets/327e15d29cd42fdaa822aa8206019c02943ff516755eea3137dcf9c3897d7969.png",
+      "sha256": "327e15d29cd42fdaa822aa8206019c02943ff516755eea3137dcf9c3897d7969",
+      "rgbaSHA256": "03729094a7917216ca731b07f9670a260bdd5de8ea97c8410cb9122d0557a364",
+      "width": 16,
+      "height": 19,
+      "pivot": {
+        "x": 8,
+        "y": 18
+      },
+      "identity": "exit_portal",
+      "kind": "portal",
+      "state": "ordinary",
+      "frame": 2,
+      "frameCount": 3,
+      "animation": "ambient-outward-seam"
+    },
+    "locked_cache/ordinary/frame-0": {
+      "path": "assets/3d4f21610edb658f04b74085a4fcb4b0b243ede122fa0074deb9570e75f1a6c8.png",
+      "sha256": "3d4f21610edb658f04b74085a4fcb4b0b243ede122fa0074deb9570e75f1a6c8",
+      "rgbaSHA256": "dadcb933812347ccca6d706f2028203384ec65d9b6bae1af596ed41a12c3ab99",
+      "width": 16,
+      "height": 19,
+      "pivot": {
+        "x": 8,
+        "y": 18
+      },
+      "identity": "locked_cache",
+      "kind": "cache",
+      "state": "ordinary",
+      "frame": 0,
+      "frameCount": 1,
+      "animation": "static"
+    },
+    "loose_world_page/ordinary/frame-0": {
+      "path": "assets/63ade8207da25c590ca41232e5b8c94e5a5a42ccb799f3fabf1b308d360aa668.png",
+      "sha256": "63ade8207da25c590ca41232e5b8c94e5a5a42ccb799f3fabf1b308d360aa668",
+      "rgbaSHA256": "b09d7bda4c6bff322a238616935cef1d69a0f81fdd16d8d2eee5fe306019d8a7",
+      "width": 16,
+      "height": 19,
+      "pivot": {
+        "x": 8,
+        "y": 18
+      },
+      "identity": "loose_world_page",
+      "kind": "writing",
+      "state": "ordinary",
+      "frame": 0,
+      "frameCount": 1,
+      "animation": "static"
+    },
+    "diary_page/ordinary/frame-0": {
+      "path": "assets/486c2a3b517729375ee9886eebd3d293ae8b8dba56e45421cc473a04a73d69ca.png",
+      "sha256": "486c2a3b517729375ee9886eebd3d293ae8b8dba56e45421cc473a04a73d69ca",
+      "rgbaSHA256": "1b5ff259feac02e4dd30fbbad90619146c26a8db05150e6e7d7e198b0c65bf01",
+      "width": 16,
+      "height": 19,
+      "pivot": {
+        "x": 8,
+        "y": 18
+      },
+      "identity": "diary_page",
+      "kind": "writing",
+      "state": "ordinary",
+      "frame": 0,
+      "frameCount": 1,
+      "animation": "static"
+    },
+    "found_writing/ordinary/frame-0": {
+      "path": "assets/5869e2189151813d957050b6a469c4c2e2bd22801191f7641d443e95416c8830.png",
+      "sha256": "5869e2189151813d957050b6a469c4c2e2bd22801191f7641d443e95416c8830",
+      "rgbaSHA256": "03bc13c12532265697ea4b66b572fd75faa26b395537dc219b4d212ead12798a",
+      "width": 16,
+      "height": 19,
+      "pivot": {
+        "x": 8,
+        "y": 18
+      },
+      "identity": "found_writing",
+      "kind": "writing",
+      "state": "ordinary",
+      "frame": 0,
+      "frameCount": 1,
+      "animation": "static"
+    },
+    "hazard/ordinary/frame-0": {
+      "path": "assets/b484f458dd674f7fc6e17e270f1a3b889422f576fcdf561f200a9f0c4e530809.png",
+      "sha256": "b484f458dd674f7fc6e17e270f1a3b889422f576fcdf561f200a9f0c4e530809",
+      "rgbaSHA256": "2de8b486d4aa9a578b3c5d32cce988f27d316b13ce87eadcd0168cf1f433747b",
+      "width": 16,
+      "height": 19,
+      "pivot": {
+        "x": 8,
+        "y": 18
+      },
+      "identity": "hazard",
+      "kind": "hazard",
+      "state": "ordinary",
+      "frame": 0,
+      "frameCount": 3,
+      "animation": "ambient-instability"
+    },
+    "hazard/ordinary/frame-1": {
+      "path": "assets/5954655f564e35ee5c933ce03ef62c2dc6ded37f658ebea24aee8f222ceac04b.png",
+      "sha256": "5954655f564e35ee5c933ce03ef62c2dc6ded37f658ebea24aee8f222ceac04b",
+      "rgbaSHA256": "4958851b8d7238b86eda1bd9ccfa3093c90425f9e1b8d5a91c4a372acb501cf6",
+      "width": 16,
+      "height": 19,
+      "pivot": {
+        "x": 8,
+        "y": 18
+      },
+      "identity": "hazard",
+      "kind": "hazard",
+      "state": "ordinary",
+      "frame": 1,
+      "frameCount": 3,
+      "animation": "ambient-instability"
+    },
+    "hazard/ordinary/frame-2": {
+      "path": "assets/e4b3b6f011ba798d34d3bce7e8dd99b59c3eb46c244e41805699e0123c1c6c18.png",
+      "sha256": "e4b3b6f011ba798d34d3bce7e8dd99b59c3eb46c244e41805699e0123c1c6c18",
+      "rgbaSHA256": "4e06c59a2132c9280fde7e901c3465dc64069bfad3d31a13cb356773d892a674",
+      "width": 16,
+      "height": 19,
+      "pivot": {
+        "x": 8,
+        "y": 18
+      },
+      "identity": "hazard",
+      "kind": "hazard",
+      "state": "ordinary",
+      "frame": 2,
+      "frameCount": 3,
+      "animation": "ambient-instability"
+    },
+    "wayfarers_camp/unlooted/frame-0": {
+      "path": "assets/25a90625a5eb896ad1e71d9035560d57dc3feb4805821eaa3a06e76c7c36d8f8.png",
+      "sha256": "25a90625a5eb896ad1e71d9035560d57dc3feb4805821eaa3a06e76c7c36d8f8",
+      "rgbaSHA256": "7d56bf03edf15d9392d1a6911a974723394d06367d0cb5647df55b3130faf120",
+      "width": 16,
+      "height": 19,
+      "pivot": {
+        "x": 8,
+        "y": 18
+      },
+      "identity": "wayfarers_camp",
+      "kind": "site",
+      "state": "unlooted",
+      "frame": 0,
+      "frameCount": 1,
+      "animation": "static"
+    },
+    "wayfarers_camp/looted/frame-0": {
+      "path": "assets/ef502c98f11a1fdc71928b9a06f7f5fe50e4603e0068d9bda955e79aef1f4aa3.png",
+      "sha256": "ef502c98f11a1fdc71928b9a06f7f5fe50e4603e0068d9bda955e79aef1f4aa3",
+      "rgbaSHA256": "1a5f5e94cc071fdc09d3f49a0f4ee73b310831f8dd62a72424475d8000599ef9",
+      "width": 16,
+      "height": 19,
+      "pivot": {
+        "x": 8,
+        "y": 18
+      },
+      "identity": "wayfarers_camp",
+      "kind": "site",
+      "state": "looted",
+      "frame": 0,
+      "frameCount": 1,
+      "animation": "static"
+    },
+    "binders_workshop/unlooted/frame-0": {
+      "path": "assets/c6e0a02ae08bc6711126160878c0eb60c94a50df8f4c4b199b3eee61bf351bb7.png",
+      "sha256": "c6e0a02ae08bc6711126160878c0eb60c94a50df8f4c4b199b3eee61bf351bb7",
+      "rgbaSHA256": "013c35eac6da177e9847c73e6b371ee60cb2464884f7a277bfb4f917449a8451",
+      "width": 16,
+      "height": 19,
+      "pivot": {
+        "x": 8,
+        "y": 18
+      },
+      "identity": "binders_workshop",
+      "kind": "site",
+      "state": "unlooted",
+      "frame": 0,
+      "frameCount": 1,
+      "animation": "static"
+    },
+    "binders_workshop/looted/frame-0": {
+      "path": "assets/35e3f5b48c2e17961cc25920ef6f67eb14e2b6eb977e8b1b1d94a5039051cf9f.png",
+      "sha256": "35e3f5b48c2e17961cc25920ef6f67eb14e2b6eb977e8b1b1d94a5039051cf9f",
+      "rgbaSHA256": "49665228fcc060ae23994bb9cafc5f87fccf627590fc7e84c771349a506bd487",
+      "width": 16,
+      "height": 19,
+      "pivot": {
+        "x": 8,
+        "y": 18
+      },
+      "identity": "binders_workshop",
+      "kind": "site",
+      "state": "looted",
+      "frame": 0,
+      "frameCount": 1,
+      "animation": "static"
+    },
+    "glacial_vault/unlooted/frame-0": {
+      "path": "assets/8d287c9f0569f6a8c3bac4b10ab3edec2b16297e89b891cb02379d818856b73e.png",
+      "sha256": "8d287c9f0569f6a8c3bac4b10ab3edec2b16297e89b891cb02379d818856b73e",
+      "rgbaSHA256": "f7dadd697b3ea06c002df52edc78033256d893049515246c9326087bc4f8cb61",
+      "width": 16,
+      "height": 19,
+      "pivot": {
+        "x": 8,
+        "y": 18
+      },
+      "identity": "glacial_vault",
+      "kind": "site",
+      "state": "unlooted",
+      "frame": 0,
+      "frameCount": 1,
+      "animation": "static"
+    },
+    "glacial_vault/looted/frame-0": {
+      "path": "assets/02cd8a63a16f530c2865253ad4c05fa122281edc1cc8a2947e26997f360222ae.png",
+      "sha256": "02cd8a63a16f530c2865253ad4c05fa122281edc1cc8a2947e26997f360222ae",
+      "rgbaSHA256": "aef05bde1041a68f8b92e438bcbb8e5e12830d50bb1e02b1a667f98214084899",
+      "width": 16,
+      "height": 19,
+      "pivot": {
+        "x": 8,
+        "y": 18
+      },
+      "identity": "glacial_vault",
+      "kind": "site",
+      "state": "looted",
+      "frame": 0,
+      "frameCount": 1,
+      "animation": "static"
+    },
+    "spent_emanation_housing/unlooted/frame-0": {
+      "path": "assets/e5a4aea868ef95d16a31838a7b622b0dbed8ccab9e453f5acea14ededc3c2fb7.png",
+      "sha256": "e5a4aea868ef95d16a31838a7b622b0dbed8ccab9e453f5acea14ededc3c2fb7",
+      "rgbaSHA256": "b03b2deca940a0411237a6aa2b1bd19413dfdc518659095874cf31c11dd43925",
+      "width": 16,
+      "height": 19,
+      "pivot": {
+        "x": 8,
+        "y": 18
+      },
+      "identity": "spent_emanation_housing",
+      "kind": "site",
+      "state": "unlooted",
+      "frame": 0,
+      "frameCount": 1,
+      "animation": "static"
+    },
+    "spent_emanation_housing/looted/frame-0": {
+      "path": "assets/6689c980c5ee29923fc8b5ba7d3a2168b4653cd88692638c6d92f63e72f158b2.png",
+      "sha256": "6689c980c5ee29923fc8b5ba7d3a2168b4653cd88692638c6d92f63e72f158b2",
+      "rgbaSHA256": "9a820439e63071b48e0e463048f08ca66a16bf6950a71749b38f4ab0b9d6f445",
+      "width": 16,
+      "height": 19,
+      "pivot": {
+        "x": 8,
+        "y": 18
+      },
+      "identity": "spent_emanation_housing",
+      "kind": "site",
+      "state": "looted",
+      "frame": 0,
+      "frameCount": 1,
+      "animation": "static"
+    },
+    "crystal_cavern/unlooted/frame-0": {
+      "path": "assets/91d51c0f5bbd27f803cab1521c9f73d496f4698b50a86eaff8461e57d3b553a8.png",
+      "sha256": "91d51c0f5bbd27f803cab1521c9f73d496f4698b50a86eaff8461e57d3b553a8",
+      "rgbaSHA256": "e1951572c5f7a8776d5afae550c31857cc9849e2c47b7bd5fef5f13b6b586c7d",
+      "width": 16,
+      "height": 19,
+      "pivot": {
+        "x": 8,
+        "y": 18
+      },
+      "identity": "crystal_cavern",
+      "kind": "site",
+      "state": "unlooted",
+      "frame": 0,
+      "frameCount": 2,
+      "animation": "ambient-glint"
+    },
+    "crystal_cavern/unlooted/frame-1": {
+      "path": "assets/49b20c7b4bc9c4f7308373eca7821f1c52912c6569d32675d70c531d02801a66.png",
+      "sha256": "49b20c7b4bc9c4f7308373eca7821f1c52912c6569d32675d70c531d02801a66",
+      "rgbaSHA256": "246d9b281555408f58fa82648c0372161b88a04ec363dd7c0c27ae9888f52d10",
+      "width": 16,
+      "height": 19,
+      "pivot": {
+        "x": 8,
+        "y": 18
+      },
+      "identity": "crystal_cavern",
+      "kind": "site",
+      "state": "unlooted",
+      "frame": 1,
+      "frameCount": 2,
+      "animation": "ambient-glint"
+    },
+    "crystal_cavern/looted/frame-0": {
+      "path": "assets/e8df60dba8de453c2b9c70fa3180f869b9efd296a38f3bf541b913cd0c8b0fd8.png",
+      "sha256": "e8df60dba8de453c2b9c70fa3180f869b9efd296a38f3bf541b913cd0c8b0fd8",
+      "rgbaSHA256": "a0b53e18dd8858bad50e3c7feb681a7d55665cbfb0b891d393fc19df5290ab83",
+      "width": 16,
+      "height": 19,
+      "pivot": {
+        "x": 8,
+        "y": 18
+      },
+      "identity": "crystal_cavern",
+      "kind": "site",
+      "state": "looted",
+      "frame": 0,
+      "frameCount": 2,
+      "animation": "ambient-glint"
+    },
+    "crystal_cavern/looted/frame-1": {
+      "path": "assets/e52bc55a8e5e57bb969f19f4dbae16d758abe020ae0afcaf5c2453c3265a4208.png",
+      "sha256": "e52bc55a8e5e57bb969f19f4dbae16d758abe020ae0afcaf5c2453c3265a4208",
+      "rgbaSHA256": "9897812ab54b121e2bc7170e5cb9e925ea1500e827334f1f65e9be1a0c476cca",
+      "width": 16,
+      "height": 19,
+      "pivot": {
+        "x": 8,
+        "y": 18
+      },
+      "identity": "crystal_cavern",
+      "kind": "site",
+      "state": "looted",
+      "frame": 1,
+      "frameCount": 2,
+      "animation": "ambient-glint"
+    },
+    "geyser_basin/unlooted/frame-0": {
+      "path": "assets/10c554a4cd080cd4c7b3b21fe7ccbb1e2682084168a72c87db2333a8eca714b2.png",
+      "sha256": "10c554a4cd080cd4c7b3b21fe7ccbb1e2682084168a72c87db2333a8eca714b2",
+      "rgbaSHA256": "19cece968159d9ead35efb33f09ff294293373082408041aca69619143ba1874",
+      "width": 16,
+      "height": 19,
+      "pivot": {
+        "x": 8,
+        "y": 18
+      },
+      "identity": "geyser_basin",
+      "kind": "site",
+      "state": "unlooted",
+      "frame": 0,
+      "frameCount": 3,
+      "animation": "ambient-steam"
+    },
+    "geyser_basin/unlooted/frame-1": {
+      "path": "assets/88de3671b8d5f0da0e361afa8baf6eef7e8045eead9587dc579a722adb8f878e.png",
+      "sha256": "88de3671b8d5f0da0e361afa8baf6eef7e8045eead9587dc579a722adb8f878e",
+      "rgbaSHA256": "6661e54f7a018394bff96f8c778da2713d3c6d245362acee490143c240f3a5bd",
+      "width": 16,
+      "height": 19,
+      "pivot": {
+        "x": 8,
+        "y": 18
+      },
+      "identity": "geyser_basin",
+      "kind": "site",
+      "state": "unlooted",
+      "frame": 1,
+      "frameCount": 3,
+      "animation": "ambient-steam"
+    },
+    "geyser_basin/unlooted/frame-2": {
+      "path": "assets/797e2fcb7520452f77dcdbe97985acb0ebb04d1461c7da36b0abb1590a85b6d9.png",
+      "sha256": "797e2fcb7520452f77dcdbe97985acb0ebb04d1461c7da36b0abb1590a85b6d9",
+      "rgbaSHA256": "080116b2785e984199f86c8902c7d5e0cbf55302f053b1dbb4cf114036d794ce",
+      "width": 16,
+      "height": 19,
+      "pivot": {
+        "x": 8,
+        "y": 18
+      },
+      "identity": "geyser_basin",
+      "kind": "site",
+      "state": "unlooted",
+      "frame": 2,
+      "frameCount": 3,
+      "animation": "ambient-steam"
+    },
+    "geyser_basin/looted/frame-0": {
+      "path": "assets/88afe5b3bf8f8d7dc0cdba172bc7cb622aef970f5fd0a4f55d64fc17c63d3520.png",
+      "sha256": "88afe5b3bf8f8d7dc0cdba172bc7cb622aef970f5fd0a4f55d64fc17c63d3520",
+      "rgbaSHA256": "39e78fd947fd33c3f273f86da7d753e937d3aac26278ea440978ec343161d4da",
+      "width": 16,
+      "height": 19,
+      "pivot": {
+        "x": 8,
+        "y": 18
+      },
+      "identity": "geyser_basin",
+      "kind": "site",
+      "state": "looted",
+      "frame": 0,
+      "frameCount": 3,
+      "animation": "ambient-steam"
+    },
+    "geyser_basin/looted/frame-1": {
+      "path": "assets/4d04b8faed4691ec8670da17be5a74271f087478f7107ed5e435816d8b2c80bb.png",
+      "sha256": "4d04b8faed4691ec8670da17be5a74271f087478f7107ed5e435816d8b2c80bb",
+      "rgbaSHA256": "c5a91d302d7ce62922385f8837f3ee5c08b1f2be56afdf4bc0795506f4a02e88",
+      "width": 16,
+      "height": 19,
+      "pivot": {
+        "x": 8,
+        "y": 18
+      },
+      "identity": "geyser_basin",
+      "kind": "site",
+      "state": "looted",
+      "frame": 1,
+      "frameCount": 3,
+      "animation": "ambient-steam"
+    },
+    "geyser_basin/looted/frame-2": {
+      "path": "assets/6bcb2c2748e4e97e947a6cbc35cfb42e5288ee03aff333ba3fac353507888669.png",
+      "sha256": "6bcb2c2748e4e97e947a6cbc35cfb42e5288ee03aff333ba3fac353507888669",
+      "rgbaSHA256": "029cdc544c2c8df73161d3d006147941a9f70edecb785b2e11fc257e9c6a0080",
+      "width": 16,
+      "height": 19,
+      "pivot": {
+        "x": 8,
+        "y": 18
+      },
+      "identity": "geyser_basin",
+      "kind": "site",
+      "state": "looted",
+      "frame": 2,
+      "frameCount": 3,
+      "animation": "ambient-steam"
+    },
+    "brood_warren/unlooted/frame-0": {
+      "path": "assets/6f0713a88b8e83946907ccbaa15494867059c84c9f8c0228572e348c7c5b6656.png",
+      "sha256": "6f0713a88b8e83946907ccbaa15494867059c84c9f8c0228572e348c7c5b6656",
+      "rgbaSHA256": "b8451d83e92df88bdc51ab4d99a86737ee016c502a9cdca565c795ee1be203bc",
+      "width": 16,
+      "height": 19,
+      "pivot": {
+        "x": 8,
+        "y": 18
+      },
+      "identity": "brood_warren",
+      "kind": "site",
+      "state": "unlooted",
+      "frame": 0,
+      "frameCount": 2,
+      "animation": "ambient-living"
+    },
+    "brood_warren/unlooted/frame-1": {
+      "path": "assets/fae84b221fb698705096d8aaaf9b2d8b112d733456b22a35da8f3830194e2cd8.png",
+      "sha256": "fae84b221fb698705096d8aaaf9b2d8b112d733456b22a35da8f3830194e2cd8",
+      "rgbaSHA256": "2731d8788d91dda8b6348a7218528f42a70c7b9d1c40b77f565d67576ca348d5",
+      "width": 16,
+      "height": 19,
+      "pivot": {
+        "x": 8,
+        "y": 18
+      },
+      "identity": "brood_warren",
+      "kind": "site",
+      "state": "unlooted",
+      "frame": 1,
+      "frameCount": 2,
+      "animation": "ambient-living"
+    },
+    "brood_warren/looted/frame-0": {
+      "path": "assets/0b762b3b8f3c32565c89c1d1e5be5cef23953d61bf982b2e0832b9e55a4bffa8.png",
+      "sha256": "0b762b3b8f3c32565c89c1d1e5be5cef23953d61bf982b2e0832b9e55a4bffa8",
+      "rgbaSHA256": "3ac81b60050c8375cf2ece3010ce7ab4b6a68fa2250c7b007fc9637cd38b9856",
+      "width": 16,
+      "height": 19,
+      "pivot": {
+        "x": 8,
+        "y": 18
+      },
+      "identity": "brood_warren",
+      "kind": "site",
+      "state": "looted",
+      "frame": 0,
+      "frameCount": 2,
+      "animation": "ambient-living"
+    },
+    "brood_warren/looted/frame-1": {
+      "path": "assets/b9600e2ec5aa2e3b98e0606ce07249ec1e8eecafc799bdfe69cf00657c3e2bd8.png",
+      "sha256": "b9600e2ec5aa2e3b98e0606ce07249ec1e8eecafc799bdfe69cf00657c3e2bd8",
+      "rgbaSHA256": "b08f89934a88bec4932f9e3b7dd25408ff7f95b0939a0344ff4a8af39c1cce89",
+      "width": 16,
+      "height": 19,
+      "pivot": {
+        "x": 8,
+        "y": 18
+      },
+      "identity": "brood_warren",
+      "kind": "site",
+      "state": "looted",
+      "frame": 1,
+      "frameCount": 2,
+      "animation": "ambient-living"
+    },
+    "the_tear/unlooted/frame-0": {
+      "path": "assets/ebbd4a781480e603154e262482e283914a0aa5d6c6a320ce8d1d43e7be681c32.png",
+      "sha256": "ebbd4a781480e603154e262482e283914a0aa5d6c6a320ce8d1d43e7be681c32",
+      "rgbaSHA256": "3583b2452fff48fe51b5106feaff7e15433f03a660dd32f21813768853e46e73",
+      "width": 16,
+      "height": 19,
+      "pivot": {
+        "x": 8,
+        "y": 18
+      },
+      "identity": "the_tear",
+      "kind": "site",
+      "state": "unlooted",
+      "frame": 0,
+      "frameCount": 3,
+      "animation": "ambient-energy"
+    },
+    "the_tear/unlooted/frame-1": {
+      "path": "assets/a7b39dc187bc09ab384dd1b97bb188527e870e86eff89ba7e964da770b96d38d.png",
+      "sha256": "a7b39dc187bc09ab384dd1b97bb188527e870e86eff89ba7e964da770b96d38d",
+      "rgbaSHA256": "5d200dcedf94dfee142e69728fc723f8153243c72c19cf8e323a35ae3e405177",
+      "width": 16,
+      "height": 19,
+      "pivot": {
+        "x": 8,
+        "y": 18
+      },
+      "identity": "the_tear",
+      "kind": "site",
+      "state": "unlooted",
+      "frame": 1,
+      "frameCount": 3,
+      "animation": "ambient-energy"
+    },
+    "the_tear/unlooted/frame-2": {
+      "path": "assets/65e4cfce3ef74162b598a86125b67679cc2b99702c1fe65e58ddd16f15bd1a4d.png",
+      "sha256": "65e4cfce3ef74162b598a86125b67679cc2b99702c1fe65e58ddd16f15bd1a4d",
+      "rgbaSHA256": "2338b1c1e740c1af52f7a2205567446c4f7d55624b59f309ef1265f276476a49",
+      "width": 16,
+      "height": 19,
+      "pivot": {
+        "x": 8,
+        "y": 18
+      },
+      "identity": "the_tear",
+      "kind": "site",
+      "state": "unlooted",
+      "frame": 2,
+      "frameCount": 3,
+      "animation": "ambient-energy"
+    },
+    "the_tear/looted/frame-0": {
+      "path": "assets/e94a1a64887d28d1cf4273a522cbdee11c5491faf1528dfc6877344346da506d.png",
+      "sha256": "e94a1a64887d28d1cf4273a522cbdee11c5491faf1528dfc6877344346da506d",
+      "rgbaSHA256": "53d470d866d77c5e91fd41f57fcd5dc90ee486c9ec7739e8ca7b49226f7bc8c6",
+      "width": 16,
+      "height": 19,
+      "pivot": {
+        "x": 8,
+        "y": 18
+      },
+      "identity": "the_tear",
+      "kind": "site",
+      "state": "looted",
+      "frame": 0,
+      "frameCount": 3,
+      "animation": "ambient-energy"
+    },
+    "the_tear/looted/frame-1": {
+      "path": "assets/1b7ad85c8cb94010fd3c52a1d35ef6dbe9473159e2c964c3d1d2e9465940826f.png",
+      "sha256": "1b7ad85c8cb94010fd3c52a1d35ef6dbe9473159e2c964c3d1d2e9465940826f",
+      "rgbaSHA256": "459e3ff4ecf8011cfe441c4b4321a517b65b8f44b455528e25a464968ea41324",
+      "width": 16,
+      "height": 19,
+      "pivot": {
+        "x": 8,
+        "y": 18
+      },
+      "identity": "the_tear",
+      "kind": "site",
+      "state": "looted",
+      "frame": 1,
+      "frameCount": 3,
+      "animation": "ambient-energy"
+    },
+    "the_tear/looted/frame-2": {
+      "path": "assets/694c278ecb1aeb07148effb79a0610b02841b1f75421a0196f52ab52daf939cd.png",
+      "sha256": "694c278ecb1aeb07148effb79a0610b02841b1f75421a0196f52ab52daf939cd",
+      "rgbaSHA256": "b3a38b537b969b685eae4eba966da44654856817ff4fa191ed39c0db05462f75",
+      "width": 16,
+      "height": 19,
+      "pivot": {
+        "x": 8,
+        "y": 18
+      },
+      "identity": "the_tear",
+      "kind": "site",
+      "state": "looted",
+      "frame": 2,
+      "frameCount": 3,
+      "animation": "ambient-energy"
+    },
+    "natural_anchor/ordinary/frame-0": {
+      "path": "assets/2e26d52712b6d49fc9f16b9c1d9d88263962aa94d447d28989975b583e4a5ec2.png",
+      "sha256": "2e26d52712b6d49fc9f16b9c1d9d88263962aa94d447d28989975b583e4a5ec2",
+      "rgbaSHA256": "b8b44c6a54d09e6de1d4439e1c531d3f6c5847b0f79e167b22864f6ecb714ecc",
+      "width": 16,
+      "height": 19,
+      "pivot": {
+        "x": 8,
+        "y": 18
+      },
+      "identity": "natural_anchor",
+      "kind": "site",
+      "state": "ordinary",
+      "frame": 0,
+      "frameCount": 3,
+      "animation": "ambient-seam"
+    },
+    "natural_anchor/ordinary/frame-1": {
+      "path": "assets/bdbd0b106c4652959a09f87dc44f8374e7a26a6aa0667af7d18298ecba7054b5.png",
+      "sha256": "bdbd0b106c4652959a09f87dc44f8374e7a26a6aa0667af7d18298ecba7054b5",
+      "rgbaSHA256": "b7ab5bbd224b28e862775bd8be77ecc2765f9f0ffb08484dc360fad233fbffd6",
+      "width": 16,
+      "height": 19,
+      "pivot": {
+        "x": 8,
+        "y": 18
+      },
+      "identity": "natural_anchor",
+      "kind": "site",
+      "state": "ordinary",
+      "frame": 1,
+      "frameCount": 3,
+      "animation": "ambient-seam"
+    },
+    "natural_anchor/ordinary/frame-2": {
+      "path": "assets/ebe834a380afbecd34b02beef61dbea3bea00668b2edbdd6c414add412921645.png",
+      "sha256": "ebe834a380afbecd34b02beef61dbea3bea00668b2edbdd6c414add412921645",
+      "rgbaSHA256": "428dc667725d6b9c74c68ce2ec19516c5770aef28148c93e282ea8d0a265da86",
+      "width": 16,
+      "height": 19,
+      "pivot": {
+        "x": 8,
+        "y": 18
+      },
+      "identity": "natural_anchor",
+      "kind": "site",
+      "state": "ordinary",
+      "frame": 2,
+      "frameCount": 3,
+      "animation": "ambient-seam"
+    },
+    "minimap/portal/ordinary": {
+      "path": "assets/a49d792621afd36e136b131e5a1b643dd08f7b5e26f473c10e6e0ba79355e5f8.png",
+      "sha256": "a49d792621afd36e136b131e5a1b643dd08f7b5e26f473c10e6e0ba79355e5f8",
+      "rgbaSHA256": "b4c0b2e6beab396e403a9af0f543b5871d5afd1325a2ecd169bcc104db5ee1a7",
+      "width": 7,
+      "height": 7,
+      "pivot": {
+        "x": 3,
+        "y": 3
+      },
+      "identity": "portal",
+      "kind": "minimap",
+      "state": "ordinary",
+      "frame": 0,
+      "frameCount": 1,
+      "animation": "static"
+    },
+    "minimap/page/ordinary": {
+      "path": "assets/6818fd39e967570740507e97a2b7bc5835e31dcd4233a20cd4daade1f99753de.png",
+      "sha256": "6818fd39e967570740507e97a2b7bc5835e31dcd4233a20cd4daade1f99753de",
+      "rgbaSHA256": "308d80988bface5f08577abd4338061b5b3ab93e4acbd6b87c70f0dc351e2995",
+      "width": 7,
+      "height": 7,
+      "pivot": {
+        "x": 3,
+        "y": 3
+      },
+      "identity": "page",
+      "kind": "minimap",
+      "state": "ordinary",
+      "frame": 0,
+      "frameCount": 1,
+      "animation": "static"
+    },
+    "minimap/cache/ordinary": {
+      "path": "assets/3571e7488fc02fa7e3669e70d298bb923441715223ca0df36129a3105643b1e6.png",
+      "sha256": "3571e7488fc02fa7e3669e70d298bb923441715223ca0df36129a3105643b1e6",
+      "rgbaSHA256": "384ad7bd5921a0c6c7f54ede2055e515e7c3f97447ec1f62fae2085bbbca5843",
+      "width": 7,
+      "height": 7,
+      "pivot": {
+        "x": 3,
+        "y": 3
+      },
+      "identity": "cache",
+      "kind": "minimap",
+      "state": "ordinary",
+      "frame": 0,
+      "frameCount": 1,
+      "animation": "static"
+    },
+    "minimap/hazard/ordinary": {
+      "path": "assets/59d851aa64a8b243ce2fc29d01a55cf724149b0941954ea5b525791dcdcdc23c.png",
+      "sha256": "59d851aa64a8b243ce2fc29d01a55cf724149b0941954ea5b525791dcdcdc23c",
+      "rgbaSHA256": "ebf6ea2e671ef61795a42f6a77e33efadb48f536d75df896be6710a860ffcb7d",
+      "width": 7,
+      "height": 7,
+      "pivot": {
+        "x": 3,
+        "y": 3
+      },
+      "identity": "hazard",
+      "kind": "minimap",
+      "state": "ordinary",
+      "frame": 0,
+      "frameCount": 1,
+      "animation": "static"
+    },
+    "minimap/site/ordinary": {
+      "path": "assets/6831b72b50b621db290b1f54cd3efa3fccd323d55567a48818a5862f59c82034.png",
+      "sha256": "6831b72b50b621db290b1f54cd3efa3fccd323d55567a48818a5862f59c82034",
+      "rgbaSHA256": "9f616a061d331ea192f10bf7871e6f9f0162e813617ff32ef354e715880fa0d3",
+      "width": 7,
+      "height": 7,
+      "pivot": {
+        "x": 3,
+        "y": 3
+      },
+      "identity": "site",
+      "kind": "minimap",
+      "state": "ordinary",
+      "frame": 0,
+      "frameCount": 1,
+      "animation": "static"
+    },
+    "minimap/resource/ordinary": {
+      "path": "assets/a53aa4b5cf13b9c43c14cb8d674ebb517f2c04accd208c21e378fd4ac100548d.png",
+      "sha256": "a53aa4b5cf13b9c43c14cb8d674ebb517f2c04accd208c21e378fd4ac100548d",
+      "rgbaSHA256": "6f38a60546f9433da8a2b23344f812e21162bba6665e873afe3b9e51e1390040",
+      "width": 7,
+      "height": 7,
+      "pivot": {
+        "x": 3,
+        "y": 3
+      },
+      "identity": "resource",
+      "kind": "minimap",
+      "state": "ordinary",
+      "frame": 0,
+      "frameCount": 1,
+      "animation": "static"
+    }
+  },
+  "sourceReferences": {
+    "binders_workshop": {
+      "path": "source-generated/binders_workshop.png",
+      "sha256": "aa41be1f83c36bef1e1af4cd191bae5574a8b46e074c88482d51c8dfc9a34aa4",
+      "productionSource": false,
+      "purpose": "built-in image-generation composition reference; manually normalized logical sprite is the runtime authority"
+    },
+    "brood_warren": {
+      "path": "source-generated/brood_warren.png",
+      "sha256": "e4e41864caa1cbe02d657a596b9cd788eca9b9635327ac846645fc6b96b92576",
+      "productionSource": false,
+      "purpose": "built-in image-generation composition reference; manually normalized logical sprite is the runtime authority"
+    },
+    "crystal_cavern": {
+      "path": "source-generated/crystal_cavern.png",
+      "sha256": "c3cc4ba96bd3f6314584b7e42df13118e81868efb62bd7052da8752fbf82a7bd",
+      "productionSource": false,
+      "purpose": "built-in image-generation composition reference; manually normalized logical sprite is the runtime authority"
+    },
+    "diary_page": {
+      "path": "source-generated/diary_page.png",
+      "sha256": "3fcd5f297d9fdd4f2059def317ecc0468b5c30d681d457183313bdc73671703d",
+      "productionSource": false,
+      "purpose": "built-in image-generation composition reference; manually normalized logical sprite is the runtime authority"
+    },
+    "entry_portal": {
+      "path": "source-generated/entry_portal.png",
+      "sha256": "52a464b7dff63f58afd5329950a600f47dfb7aca36863cd3a8861217c634cb79",
+      "productionSource": false,
+      "purpose": "built-in image-generation composition reference; manually normalized logical sprite is the runtime authority"
+    },
+    "exit_portal": {
+      "path": "source-generated/exit_portal.png",
+      "sha256": "9a61ef8d405f8a1aaa7306c0173e688f7e9a8509cf257668936ce8d15cc12350",
+      "productionSource": false,
+      "purpose": "built-in image-generation composition reference; manually normalized logical sprite is the runtime authority"
+    },
+    "found_writing": {
+      "path": "source-generated/found_writing.png",
+      "sha256": "be9a4276d162f685c8a0e1365e896c857729a89d975fcd42931a8d37705573bd",
+      "productionSource": false,
+      "purpose": "built-in image-generation composition reference; manually normalized logical sprite is the runtime authority"
+    },
+    "geyser_basin": {
+      "path": "source-generated/geyser_basin.png",
+      "sha256": "0235f9047f750ef6877edd83cb7924add6204b7d18e2df8208359dc0abe55bd8",
+      "productionSource": false,
+      "purpose": "built-in image-generation composition reference; manually normalized logical sprite is the runtime authority"
+    },
+    "glacial_vault": {
+      "path": "source-generated/glacial_vault.png",
+      "sha256": "4a622bc09cf7321c012c051237e425f32e9766654083569ee3749f35e0ed3cad",
+      "productionSource": false,
+      "purpose": "built-in image-generation composition reference; manually normalized logical sprite is the runtime authority"
+    },
+    "hazard": {
+      "path": "source-generated/hazard.png",
+      "sha256": "999b397362d209a04ce6d54d3f2890ecc2529774ee5531aae824fe43ab72f879",
+      "productionSource": false,
+      "purpose": "built-in image-generation composition reference; manually normalized logical sprite is the runtime authority"
+    },
+    "locked_cache": {
+      "path": "source-generated/locked_cache.png",
+      "sha256": "be1eb1a1995d072a5f00a2713505a34eabafffa43270248a2ff7183567e5f1c6",
+      "productionSource": false,
+      "purpose": "built-in image-generation composition reference; manually normalized logical sprite is the runtime authority"
+    },
+    "loose_world_page": {
+      "path": "source-generated/loose_world_page.png",
+      "sha256": "1872ff77110f36f2cd0e72ac093c5077e2d2463f4de0150aeea15aba1c2254a2",
+      "productionSource": false,
+      "purpose": "built-in image-generation composition reference; manually normalized logical sprite is the runtime authority"
+    },
+    "natural_anchor": {
+      "path": "source-generated/natural_anchor.png",
+      "sha256": "da236fe48fcb6c7061bc99f9518cde790cf00fbf12c7b4ef706d9cceddea8bfc",
+      "productionSource": false,
+      "purpose": "built-in image-generation composition reference; manually normalized logical sprite is the runtime authority"
+    },
+    "spent_emanation_housing": {
+      "path": "source-generated/spent_emanation_housing.png",
+      "sha256": "44bb3eb9a7cbdce4eaac22304f91b6a0330daa46988ed9c379608a34e8a818c1",
+      "productionSource": false,
+      "purpose": "built-in image-generation composition reference; manually normalized logical sprite is the runtime authority"
+    },
+    "the_tear": {
+      "path": "source-generated/the_tear.png",
+      "sha256": "684a277f9cf42afdf699ae4f1ea9271b455923998cdbc56890b3bbf7b00be920",
+      "productionSource": false,
+      "purpose": "built-in image-generation composition reference; manually normalized logical sprite is the runtime authority"
+    },
+    "wayfarers_camp": {
+      "path": "source-generated/wayfarers_camp.png",
+      "sha256": "6859970d5738f8eb3429ef5088d3823922de210a46f2b16136bea96bc8a4fb69",
+      "productionSource": false,
+      "purpose": "built-in image-generation composition reference; manually normalized logical sprite is the runtime authority"
+    }
+  },
+  "evidence": {
+    "generated-source-contact-sheet": {
+      "path": "evidence/generated-source-contact-sheet.png",
+      "sha256": "1b4b82b489971339a60de79923f17bf73733a57359efcee1299c88e1befab44d",
+      "width": 1200,
+      "height": 2160
+    },
+    "production-sprites-native-400pct": {
+      "path": "evidence/production-sprites-native-400pct.png",
+      "sha256": "7247accecafdbdda55e1e71fbf3e13618804dae3d6a8388011b485ce6e3ca3e3",
+      "width": 1280,
+      "height": 1920
+    },
+    "production-sprites-native-400pct-grayscale": {
+      "path": "evidence/production-sprites-native-400pct-grayscale.png",
+      "sha256": "b840d5740a15c636547738c7aabd6299f55af432d77043fdc582554c46d60817",
+      "width": 1280,
+      "height": 1920
+    },
+    "ambient-animation-strips-800pct": {
+      "path": "evidence/ambient-animation-strips-800pct.png",
+      "sha256": "8bb6b202b8d60c85af8bf22e795d31ecbee965b9248dcb89daa8fcc93f79f158",
+      "width": 1200,
+      "height": 1400
+    },
+    "ambient-animation-strips-800pct-grayscale": {
+      "path": "evidence/ambient-animation-strips-800pct-grayscale.png",
+      "sha256": "c9dc2ede299a26dff30942991757b5a8d77ddd3cbe9e570750ad4f9f73c6567c",
+      "width": 1200,
+      "height": 1400
+    },
+    "applied-map-full-368x800": {
+      "path": "evidence/applied-map-full-368x800.png",
+      "sha256": "1e11a8b0094cec03a8e8d9f9aec4b373433568e9e35d01b4fea1e7b1a805eefd",
+      "width": 368,
+      "height": 800
+    },
+    "applied-map-full-grayscale-368x800": {
+      "path": "evidence/applied-map-full-grayscale-368x800.png",
+      "sha256": "b8a5257eb22e496d735f5c651d6f05eb59cb2973fc5ab1e23b60b5fb37bd056f",
+      "width": 368,
+      "height": 800
+    },
+    "applied-map-remembered-368x800": {
+      "path": "evidence/applied-map-remembered-368x800.png",
+      "sha256": "5a1df42d1fd1b00a1c77a0a4a9af9b6977b37b1aac904dd121ce064eab0d9ca9",
+      "width": 368,
+      "height": 800
+    },
+    "applied-map-remembered-grayscale-368x800": {
+      "path": "evidence/applied-map-remembered-grayscale-368x800.png",
+      "sha256": "84248cd75a23226eb3670d9db3d4a12ce0f92de6220f479bb0acf7faa611ebc6",
+      "width": 368,
+      "height": 800
+    },
+    "applied-map-hidden-368x800": {
+      "path": "evidence/applied-map-hidden-368x800.png",
+      "sha256": "0e45977b8436e526d9976a2c54e8045d1db9da254c365ed8897c083efd6ff130",
+      "width": 368,
+      "height": 800
+    },
+    "applied-map-hidden-grayscale-368x800": {
+      "path": "evidence/applied-map-hidden-grayscale-368x800.png",
+      "sha256": "65a420ac1fde53b85080a394afb5929f569301988d576a900e6586cfc8c8d14d",
+      "width": 368,
+      "height": 800
+    },
+    "minimap-category-sprites-native-1600pct": {
+      "path": "evidence/minimap-category-sprites-native-1600pct.png",
+      "sha256": "1f536f2ea4130b090c175d1c8545a1891fe51b59148065226d70ceba6f143fc6",
+      "width": 1440,
+      "height": 420
+    },
+    "minimap-category-sprites-native-1600pct-grayscale": {
+      "path": "evidence/minimap-category-sprites-native-1600pct-grayscale.png",
+      "sha256": "3d65d3fa0aaf5b18b24c335673963d940b05e3ba6c7f8a77361b704b869b477f",
+      "width": 1440,
+      "height": 420
+    }
+  },
+  "coverage": {
+    "mapStableKeys": 44,
+    "minimapStableKeys": 6,
+    "stableKeys": 50,
+    "runtimePNGs": 50,
+    "staticIdentityCount": 8,
+    "animatedIdentityCount": 8
+  },
+  "runtimeAssetAggregateSHA256": "32ada00ca207d6eac6d8eee1de4917cfb6da03cc968d218a0b2b3b4ff197e990",
+  "canonicalBodySHA256": "f28a55db110b92b9b0e82b8faca28392322551aac0fd8caa588ee3b283127c67"
+}
