@@ -1,4 +1,24 @@
 import SwiftUI
+#if DEBUG
+import UIKit
+#endif
+
+#if DEBUG
+@MainActor enum WorldMapStageMeasurement {
+    static var latestFrame: CGRect = .zero
+}
+
+private struct WorldMapStageProbe: UIViewRepresentable {
+    final class ProbeView: UIView {
+        override func layoutSubviews() {
+            super.layoutSubviews()
+            WorldMapStageMeasurement.latestFrame = convert(bounds, to: nil)
+        }
+    }
+    func makeUIView(context: Context) -> ProbeView { ProbeView(frame: .zero) }
+    func updateUIView(_ uiView: ProbeView, context: Context) {}
+}
+#endif
 
 enum WorldDurationPresentation {
     static func status(stability: Double, decayPerTurn: Double,
@@ -62,25 +82,59 @@ private struct WorldActionRow<Interact: View, Look: View>: View {
 }
 
 enum WorldFieldFeedbackLayout {
-    static let height: CGFloat = 184
+    /// Exact build-247 place-information footprint: 30 top + 40 content + 8 bottom.
+    /// This is an overlay inside the square map stage and therefore reserves no sibling height.
+    static let compactHeight: CGFloat = 78
     static let spacing: CGFloat = 4
-    static func paneWidth(total: CGFloat) -> CGFloat { max(0, (total - spacing) / 2) }
+    static let contextFraction: CGFloat = 0.25
+    static let expandedEventMaximumHeight: CGFloat = 260
+    static func paneWidths(total: CGFloat) -> (context: CGFloat, event: CGFloat) {
+        let usable = max(0, total - spacing)
+        let context = floor(usable * contextFraction)
+        return (context, max(0, usable - context))
+    }
 }
 
-private struct WorldFieldFeedbackRow: View {
+struct WorldFieldFeedbackRow: View {
+    private enum Expansion: Hashable { case context, events(String) }
+    private struct ExpiryTask: Hashable { let batchID: String?; let isHeld: Bool }
     @EnvironmentObject private var store: GameStore
+    @State private var expansion: Expansion?
+
+    init(initiallyExpandedBatchID: String? = nil) {
+        _expansion = State(initialValue: initiallyExpandedBatchID.map(Expansion.events))
+    }
 
     var body: some View {
-        HStack(alignment: .top, spacing: WorldFieldFeedbackLayout.spacing) {
-            contextPane.frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
-            eventPane.frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+        GeometryReader { proxy in
+            let widths = WorldFieldFeedbackLayout.paneWidths(total: proxy.size.width)
+            ZStack(alignment: .bottomTrailing) {
+                HStack(alignment: .top, spacing: WorldFieldFeedbackLayout.spacing) {
+                    contextPane.frame(width: widths.context)
+                        .frame(maxHeight: .infinity, alignment: .topLeading)
+                    compactEventPane.frame(width: widths.event)
+                        .frame(maxHeight: .infinity, alignment: .topLeading)
+                }
+                if expansion == .context, let context = store.worldFieldContext {
+                    expandedContextPane(context)
+                        .frame(width: proxy.size.width)
+                        .frame(maxHeight: WorldFieldFeedbackLayout.expandedEventMaximumHeight)
+                        .offset(y: -WorldFieldFeedbackLayout.compactHeight)
+                        .zIndex(3)
+                } else if let batch = store.currentWorldFieldEventBatch,
+                          expansion == .events(batch.batchID) {
+                    expandedEventPane(batch).frame(width: widths.event)
+                        .frame(maxHeight: WorldFieldFeedbackLayout.expandedEventMaximumHeight)
+                        .offset(y: -WorldFieldFeedbackLayout.compactHeight)
+                        .zIndex(3)
+                }
+            }
         }
-        .frame(height: WorldFieldFeedbackLayout.height)
-        .padding(.horizontal, 12)
-        .padding(.vertical, 6)
-        .background(PixelUITheme.surfaceInset)
-        .overlay(alignment: .top) { Rectangle().fill(PixelUITheme.edge).frame(height: 2) }
-        .task(id: store.currentWorldFieldEventBatch?.batchID) {
+        .frame(height: WorldFieldFeedbackLayout.compactHeight)
+        .background(PixelUITheme.surfaceInset.opacity(0.82))
+        .task(id: ExpiryTask(batchID: store.currentWorldFieldEventBatch?.batchID,
+                             isHeld: expansion != nil)) {
+            guard expansion == nil else { return }
             guard let batchID = store.currentWorldFieldEventBatch?.batchID else { return }
             try? await Task.sleep(nanoseconds: 4_000_000_000)
             guard !Task.isCancelled else { return }
@@ -90,63 +144,114 @@ private struct WorldFieldFeedbackRow: View {
 
     @ViewBuilder private var contextPane: some View {
         if let context = store.worldFieldContext {
-            VStack(alignment: .leading, spacing: 7) {
-                Text("AT THIS PLACE")
-                    .font(.custom("Tiny5", size: 16)).foregroundStyle(PixelUITheme.muted)
-                Text(context.groundName)
-                    .font(.custom("Jersey 10", size: 24)).foregroundStyle(PixelUITheme.text)
-                Text(contextLine(context))
-                    .font(.system(size: 17)).foregroundStyle(PixelUITheme.text)
-                    .fixedSize(horizontal: false, vertical: true)
-                Text(interactionLine(context))
-                    .font(.custom("Tiny5", size: 15)).foregroundStyle(PixelUITheme.muted)
-                    .fixedSize(horizontal: false, vertical: true)
+            Button { expansion = .context } label: {
+                VStack(alignment: .leading, spacing: 1) {
+                    Text("AT THIS PLACE")
+                        .font(.custom("Tiny5", size: 10)).foregroundStyle(PixelUITheme.muted)
+                    Text(context.groundName)
+                        .font(.custom("Jersey 10", size: 20)).foregroundStyle(PixelUITheme.text)
+                        .lineLimit(1)
+                    Text(contextLine(context))
+                        .font(.custom("Tiny5", size: 10)).foregroundStyle(PixelUITheme.muted)
+                        .lineLimit(2)
+                }
+                .padding(7)
+                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+                .contentShape(Rectangle())
             }
-            .padding(9)
+            .buttonStyle(.plain)
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
-            .background(PixelUITheme.edgeDark.opacity(0.72))
+            .background(PixelUITheme.edgeDark.opacity(0.76))
             .overlay(Rectangle().stroke(PixelUITheme.edge, lineWidth: 2))
         } else {
             Color.clear
         }
     }
 
-    @ViewBuilder private var eventPane: some View {
+    @ViewBuilder private var compactEventPane: some View {
         if let batch = store.currentWorldFieldEventBatch {
-            VStack(alignment: .leading, spacing: 5) {
-                ScrollView {
-                    VStack(alignment: .leading, spacing: 6) {
-                        ForEach(Array(batch.orderedNarrations.enumerated()), id: \.offset) { index, line in
-                            Text(index == 0 ? line : index == 1 ? "NEXT · \(line)" : line)
-                                .font(index == 0 ? .system(size: 17) : .custom("Tiny5", size: 15))
-                                .foregroundStyle(index == 0 ? PixelUITheme.text : PixelUITheme.muted)
-                                .fixedSize(horizontal: false, vertical: true)
-                                .frame(maxWidth: .infinity, alignment: .leading)
+            VStack(alignment: .leading, spacing: 2) {
+                Text(batch.orderedNarrations[0])
+                    .font(.system(size: 16)).foregroundStyle(PixelUITheme.text)
+                    .lineLimit(2).frame(maxWidth: .infinity, alignment: .leading)
+                HStack(spacing: 6) {
+                    if batch.orderedNarrations.count > 1 {
+                        Button("Read all \(batch.orderedNarrations.count)") {
+                            expansion = .events(batch.batchID)
                         }
+                        .frame(maxWidth: .infinity, minHeight: 28)
+                        .contentShape(Rectangle())
+                        .background(PixelUITheme.surfaceRaised.opacity(0.9))
                     }
+                    Button("Dismiss") {
+                        expansion = nil
+                        store.dismissWorldFieldFeedback(expectedBatchID: batch.batchID)
+                    }
+                    .frame(maxWidth: .infinity, minHeight: 28)
+                    .contentShape(Rectangle())
+                    .background(PixelUITheme.surfaceRaised.opacity(0.9))
                 }
-                if batch.orderedNarrations.count > 2 {
-                    Text("+\(batch.orderedNarrations.count - 2) more in this event")
-                        .font(.custom("Tiny5", size: 15)).foregroundStyle(PixelUITheme.muted)
-                }
-                Button {
-                    store.dismissWorldFieldFeedback(expectedBatchID: batch.batchID)
-                } label: {
-                    Text("Dismiss").font(.custom("Tiny5", size: 16))
-                        .frame(maxWidth: .infinity, minHeight: 40)
-                }
+                .font(.custom("Tiny5", size: 13))
                 .buttonStyle(.plain)
-                .contentShape(Rectangle())
-                .background(PixelUITheme.surfaceRaised.opacity(0.94))
-                .overlay(Rectangle().stroke(PixelUITheme.edge, lineWidth: 2))
             }
-            .padding(8)
+            .padding(7)
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
             .background(PixelUITheme.edgeDark.opacity(0.72))
             .overlay(Rectangle().stroke(PixelUITheme.edge, lineWidth: 2))
         } else {
             Color.clear.overlay(Rectangle().stroke(PixelUITheme.edge.opacity(0.35), lineWidth: 1))
         }
+    }
+
+    private func expandedContextPane(_ context: WorldFieldContextReceiptV1) -> some View {
+        VStack(alignment: .leading, spacing: 6) {
+            Text("AT THIS PLACE · \(context.groundName)")
+                .font(.custom("Jersey 10", size: 22)).foregroundStyle(PixelUITheme.text)
+            Text(contextLine(context))
+                .font(.system(size: 16)).foregroundStyle(PixelUITheme.text)
+                .fixedSize(horizontal: false, vertical: true)
+            Text(interactionLine(context))
+                .font(.custom("Tiny5", size: 15)).foregroundStyle(PixelUITheme.muted)
+                .fixedSize(horizontal: false, vertical: true)
+            Button("Close") { expansion = nil }
+                .font(.custom("Tiny5", size: 15))
+                .frame(maxWidth: .infinity, minHeight: 40)
+                .contentShape(Rectangle())
+                .background(PixelUITheme.surfaceRaised.opacity(0.94))
+        }
+        .padding(10)
+        .background(PixelUITheme.edgeDark.opacity(0.96))
+        .overlay(Rectangle().stroke(PixelUITheme.edge, lineWidth: 2))
+    }
+
+    private func expandedEventPane(_ batch: WorldFieldEventBatchV1) -> some View {
+        VStack(alignment: .leading, spacing: 6) {
+            ScrollView {
+                VStack(alignment: .leading, spacing: 8) {
+                    ForEach(Array(batch.orderedNarrations.enumerated()), id: \.offset) { index, line in
+                        Text(index == 0 ? line : "NEXT · \(line)")
+                            .font(index == 0 ? .system(size: 17) : .custom("Tiny5", size: 15))
+                            .foregroundStyle(index == 0 ? PixelUITheme.text : PixelUITheme.muted)
+                            .fixedSize(horizontal: false, vertical: true)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                    }
+                }
+            }
+            HStack {
+                Button("Close") { expansion = nil }
+                    .frame(maxWidth: .infinity, minHeight: 40).contentShape(Rectangle())
+                Spacer()
+                Button("Dismiss") {
+                    expansion = nil
+                    store.dismissWorldFieldFeedback(expectedBatchID: batch.batchID)
+                }
+                .frame(maxWidth: .infinity, minHeight: 40).contentShape(Rectangle())
+            }
+            .font(.custom("Tiny5", size: 15)).buttonStyle(.plain)
+        }
+        .padding(10)
+        .background(PixelUITheme.edgeDark.opacity(0.96))
+        .overlay(Rectangle().stroke(PixelUITheme.edge, lineWidth: 2))
     }
 
     private func contextLine(_ context: WorldFieldContextReceiptV1) -> String {
@@ -239,6 +344,9 @@ struct WorldView: View {
                         ) { point in
                             tapped(point, in: run)
                         }
+                        .overlay(alignment: .bottom) {
+                            WorldFieldFeedbackRow().environmentObject(store)
+                        }
                     }
                     .overlay(alignment: .top) {
                         LootDecisionCard()
@@ -246,9 +354,12 @@ struct WorldView: View {
                     }
                 }
                 .aspectRatio(1, contentMode: .fit)
+                .background {
+#if DEBUG
+                    WorldMapStageProbe()
+#endif
+                }
                 .clipped()
-
-                WorldFieldFeedbackRow().environmentObject(store)
 
                 VStack(spacing: 0) {
                     satchel(run)

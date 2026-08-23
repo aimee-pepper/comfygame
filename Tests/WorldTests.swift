@@ -63,6 +63,14 @@ final class WorldTests: XCTestCase {
         let window = UIWindow(frame: CGRect(x: 0, y: 0, width: 368, height: 800))
         window.rootViewController = controller; window.makeKeyAndVisible()
         controller.view.frame = window.bounds; controller.view.layoutIfNeeded()
+        RunLoop.main.run(until: Date().addingTimeInterval(0.08))
+        let mapFrameBefore = WorldMapStageMeasurement.latestFrame
+        XCTAssertEqual(mapFrameBefore.width, 368, accuracy: 0.5)
+        XCTAssertEqual(mapFrameBefore.height, 368, accuracy: 0.5,
+                       "the hotfix must retain build 247's square map stage")
+        XCTAssertEqual(WorldFieldFeedbackLayout.compactHeight, 78)
+        XCTAssertEqual(WorldFieldFeedbackLayout.paneWidths(total: 368).context, 91)
+        XCTAssertEqual(WorldFieldFeedbackLayout.paneWidths(total: 368).event, 273)
         func image() -> UIImage {
             UIGraphicsImageRenderer(size: window.bounds.size).image { _ in
                 controller.view.drawHierarchy(in: controller.view.bounds, afterScreenUpdates: true)
@@ -77,13 +85,51 @@ final class WorldTests: XCTestCase {
         ], for: attempt, now: 10)
         RunLoop.main.run(until: Date().addingTimeInterval(0.08))
         controller.view.layoutIfNeeded()
+        let mapFrameAfter = WorldMapStageMeasurement.latestFrame
         let after = image()
         XCTAssertNotEqual(before.pngData(), after.pngData(),
                           "the mounted consumer must visibly react to its queue")
         XCTAssertEqual(try SaveCodec.encode(store.state), frozen)
+        XCTAssertEqual(mapFrameAfter.size, mapFrameBefore.size,
+                       "enqueueing feedback must not steal a point from the map")
         XCTAssertEqual(store.currentWorldFieldEventBatch?.orderedNarrations.count, 3)
+        let beforeAttachment = XCTAttachment(image: before)
+        beforeAttachment.name = "world-field-feedback-map-height-before-368x800"
+        beforeAttachment.lifetime = .keepAlways; add(beforeAttachment)
         let attachment = XCTAttachment(image: after)
         attachment.name = "world-field-feedback-three-lines-368x800"
+        attachment.lifetime = .keepAlways; add(attachment)
+        window.isHidden = true
+    }
+
+    @MainActor
+    func testExpandedWorldFieldBatchHoldsExpiryAndKeepsEveryNarrationReachable() throws {
+        let store = GameStore(io: .temporary(name: "field-feedback-expanded-\(UUID().uuidString)"))
+        store.mutate("test: expanded feedback") { $0 = startedRun(book([:]), seed: 906) }
+        let frozen = try SaveCodec.encode(store.state)
+        let attempt = try XCTUnwrap(store.beginWorldFieldAttempt(.step))
+        store.submitWorldFieldEvents([
+            .blocked("First complete narration."), .hazardHit(damage: 2),
+            .poisonWorking(damage: 1),
+        ], for: attempt, now: 10)
+        let batch = try XCTUnwrap(store.currentWorldFieldEventBatch)
+        let controller = UIHostingController(rootView:
+            WorldFieldFeedbackRow(initiallyExpandedBatchID: batch.batchID)
+                .environmentObject(store).frame(width: 368, height: 300))
+        let window = UIWindow(frame: CGRect(x: 0, y: 0, width: 368, height: 300))
+        window.rootViewController = controller; window.makeKeyAndVisible()
+        controller.view.frame = window.bounds; controller.view.layoutIfNeeded()
+        RunLoop.main.run(until: Date().addingTimeInterval(4.05))
+        XCTAssertEqual(store.currentWorldFieldEventBatch?.batchID, batch.batchID,
+                       "reading the expanded receipt must hold its expiry")
+        XCTAssertEqual(store.currentWorldFieldEventBatch?.orderedNarrations,
+                       batch.orderedNarrations)
+        XCTAssertEqual(try SaveCodec.encode(store.state), frozen)
+        let image = UIGraphicsImageRenderer(size: window.bounds.size).image { _ in
+            controller.view.drawHierarchy(in: controller.view.bounds, afterScreenUpdates: true)
+        }
+        let attachment = XCTAttachment(image: image)
+        attachment.name = "world-field-feedback-expanded-three-lines"
         attachment.lifetime = .keepAlways; add(attachment)
         window.isHidden = true
     }
