@@ -72,7 +72,7 @@
     },
     {
       "id": "identical-a/water/base",
-      "rgbaSHA256": "e4300692338a34eb980651380354ba2350f0accea893c04fcd24a9e48492902c",
+      "rgbaSHA256": "4005cc30e7cf173365cec6bb1e7f3df2608caccd1e90ec7a1468f31543bab41b",
       "orderedLayers": [
         "baseMacro",
         "cardinalEdges",
@@ -83,7 +83,7 @@
     },
     {
       "id": "identical-a/deepWater/base",
-      "rgbaSHA256": "028d89f4d471c681c40f227f6de055300f7bba0af20860c1012fe2a9dce5c729",
+      "rgbaSHA256": "6bd968ea7b1a0ae2f97757105733d8bce1c0b424e7039fcf6536ad70083cfcbe",
       "orderedLayers": [
         "baseMacro",
         "cardinalEdges",
@@ -116,7 +116,7 @@
     },
     {
       "id": "identical-a/growth/base",
-      "rgbaSHA256": "f1739ef283801d2c36c6cf38067959d6ac5ea8935103e59754c53a4b469fec92",
+      "rgbaSHA256": "757355e9dcee512ec7a44fff8fb85e2279d0c6797e7a1b22886de393bbbcf061",
       "orderedLayers": [
         "baseMacro",
         "cardinalEdges",
@@ -138,7 +138,7 @@
     },
     {
       "id": "identical-a/groundcover/base",
-      "rgbaSHA256": "569ba6425bfcd74f91be324f1243fc129c02c0ccf78efe34969bf1e8ad3fccb0",
+      "rgbaSHA256": "bf1620af0c34777f761daba758088750345e9bd3c52fd68b3509697055b665e3",
       "orderedLayers": [
         "baseMacro",
         "cardinalEdges",
