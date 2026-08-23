@@ -8,6 +8,184 @@ import XCTest
 final class WorldTests: XCTestCase {
 
     @MainActor
+    func testWorldFieldFeedbackFIFOExpiryAndIdentityDismissal() throws {
+        let store = GameStore(io: .temporary(name: "field-feedback-fifo-\(UUID().uuidString)"))
+        store.mutate("test: start field feedback") { $0 = startedRun(book([:]), seed: 901) }
+        let first = try XCTUnwrap(store.beginWorldFieldAttempt(.step))
+        let duplicateEvents: [WorldRules.Event] = [.blocked("Still blocked."), .blocked("Still blocked.")]
+        store.submitWorldFieldEvents(duplicateEvents, for: first, now: 100)
+        store.submitWorldFieldEvents(duplicateEvents, for: first, now: 200)
+        XCTAssertEqual(store.worldFieldEventQueue.count, 1, "batchID is the only dedupe key")
+        XCTAssertEqual(store.worldFieldEventQueue[0].orderedEvents, duplicateEvents)
+        XCTAssertEqual(store.worldFieldEventQueue[0].orderedNarrations.count, 2)
+
+        let second = try XCTUnwrap(store.beginWorldFieldAttempt(.step))
+        store.submitWorldFieldEvents([.blocked("Still blocked.")], for: second, now: 300)
+        let third = try XCTUnwrap(store.beginWorldFieldAttempt(.step))
+        store.submitWorldFieldEvents([.blocked("Third batch.")], for: third, now: 400)
+        XCTAssertEqual(store.worldFieldEventQueue.count, 3,
+                       "equal narration in a later attempt must remain queued")
+        let frozenState = try SaveCodec.encode(store.state)
+        let frozenContext = store.worldFieldContext
+        let firstID = try XCTUnwrap(store.currentWorldFieldEventBatch?.batchID)
+        store.expireWorldFieldFeedback(ifCurrent: firstID, now: 4_000_000_099)
+        XCTAssertEqual(store.currentWorldFieldEventBatch?.batchID, firstID)
+        store.expireWorldFieldFeedback(ifCurrent: firstID, now: 4_000_000_100)
+        let secondID = try XCTUnwrap(store.currentWorldFieldEventBatch?.batchID)
+        XCTAssertNotEqual(secondID, firstID)
+        store.dismissWorldFieldFeedback(expectedBatchID: secondID, now: 5_000_000_000)
+        store.dismissWorldFieldFeedback(expectedBatchID: secondID, now: 5_000_000_001)
+        XCTAssertEqual(store.currentWorldFieldEventBatch?.orderedNarrations, ["Third batch."])
+        XCTAssertEqual(try SaveCodec.encode(store.state), frozenState)
+        XCTAssertEqual(store.worldFieldContext, frozenContext)
+    }
+
+    @MainActor
+    func testWorldFieldFeedbackCanonicalAssociatedValuesCannotCollide() throws {
+        let store = GameStore(io: .temporary(name: "field-feedback-hash-\(UUID().uuidString)"))
+        store.mutate("test: start field feedback") { $0 = startedRun(book([:]), seed: 902) }
+        let first = try XCTUnwrap(store.beginWorldFieldAttempt(.interact))
+        store.submitWorldFieldEvents(
+            [.readFoundWriting(FoundWritingID(rawValue: "a:b"), "c;d")], for: first, now: 1)
+        let second = try XCTUnwrap(store.beginWorldFieldAttempt(.interact))
+        store.submitWorldFieldEvents(
+            [.readFoundWriting(FoundWritingID(rawValue: "a"), "b:c;d")], for: second, now: 2)
+        XCTAssertEqual(store.worldFieldEventQueue.count, 2)
+        XCTAssertNotEqual(store.worldFieldEventQueue[0].batchID,
+                          store.worldFieldEventQueue[1].batchID)
+    }
+    @MainActor
+    func testWorldFieldFeedbackMountedConsumerChangesPhoneRenderWithoutGameplayMutation() throws {
+        let store = GameStore(io: .temporary(name: "field-feedback-render-\(UUID().uuidString)"))
+        store.mutate("test: mounted feedback") { $0 = startedRun(book([:]), seed: 903) }
+        let controller = UIHostingController(rootView:
+            WorldView().environmentObject(store).frame(width: 368, height: 800))
+        let window = UIWindow(frame: CGRect(x: 0, y: 0, width: 368, height: 800))
+        window.rootViewController = controller; window.makeKeyAndVisible()
+        controller.view.frame = window.bounds; controller.view.layoutIfNeeded()
+        func image() -> UIImage {
+            UIGraphicsImageRenderer(size: window.bounds.size).image { _ in
+                controller.view.drawHierarchy(in: controller.view.bounds, afterScreenUpdates: true)
+            }
+        }
+        let before = image()
+        let frozen = try SaveCodec.encode(store.state)
+        let attempt = try XCTUnwrap(store.beginWorldFieldAttempt(.step))
+        store.submitWorldFieldEvents([
+            .blocked("First complete narration."), .hazardHit(damage: 2),
+            .poisonWorking(damage: 1),
+        ], for: attempt, now: 10)
+        RunLoop.main.run(until: Date().addingTimeInterval(0.08))
+        controller.view.layoutIfNeeded()
+        let after = image()
+        XCTAssertNotEqual(before.pngData(), after.pngData(),
+                          "the mounted consumer must visibly react to its queue")
+        XCTAssertEqual(try SaveCodec.encode(store.state), frozen)
+        XCTAssertEqual(store.currentWorldFieldEventBatch?.orderedNarrations.count, 3)
+        let attachment = XCTAttachment(image: after)
+        attachment.name = "world-field-feedback-three-lines-368x800"
+        attachment.lifetime = .keepAlways; add(attachment)
+        window.isHidden = true
+    }
+
+    @MainActor
+    func testWorldFieldFeedbackIsTransientAcrossColdRelaunch() throws {
+        let io = SaveFileIO.temporary(name: "field-feedback-relaunch-\(UUID().uuidString)")
+        let first = GameStore(io: io)
+        first.mutate("test: persisted run", flush: true) { $0 = startedRun(book([:]), seed: 904) }
+        let attempt = try XCTUnwrap(first.beginWorldFieldAttempt(.step))
+        first.submitWorldFieldEvents([.blocked("Visible now.")], for: attempt, now: 1)
+        XCTAssertFalse(first.worldFieldEventQueue.isEmpty)
+        let expectedContext = WorldFieldContextReceiptV1.make(from: first.state)
+        let relaunched = GameStore(io: io)
+        XCTAssertTrue(relaunched.worldFieldEventQueue.isEmpty)
+        XCTAssertEqual(relaunched.worldFieldContext, expectedContext)
+    }
+
+    @MainActor
+    func testSuccessfulBindPublishesInitialContextAndRefusalPreservesIt() throws {
+        let success = GameStore(io: .temporary(
+            name: "field-feedback-bind-success-\(UUID().uuidString)"))
+        success.mutate("test: bind balance") {
+            $0.base.page = Page()
+            $0.base.essence = 28
+        }
+        XCTAssertTrue(success.bindAndDepart())
+        let run = try XCTUnwrap(success.activeRun)
+        let context = try XCTUnwrap(success.worldFieldContext)
+        XCTAssertEqual(context.position, run.playerPosition)
+        XCTAssertEqual(context.inputStateHash,
+                       WorldFieldContextReceiptV1.make(from: success.state)?.inputStateHash)
+
+        let refusal = GameStore(io: .temporary(
+            name: "field-feedback-bind-refusal-\(UUID().uuidString)"))
+        refusal.mutate("test: insufficient bind balance") { $0.base.essence = 0 }
+        refusal.refreshWorldFieldContext()
+        let beforeState = try SaveCodec.encode(refusal.state)
+        let beforeContext = refusal.worldFieldContext
+        XCTAssertFalse(refusal.bindAndDepart())
+        XCTAssertEqual(try SaveCodec.encode(refusal.state), beforeState)
+        XCTAssertEqual(refusal.worldFieldContext, beforeContext)
+    }
+
+    @MainActor
+    func testLoosePageMutationRefreshesContextAndRefusalDoesNot() throws {
+        let definition = try XCTUnwrap(WorldPageCatalog.definition("wild_storm_coast"))
+        let point = GridPoint(x: 1, y: 1)
+        let page = WorldPageInstance(
+            id: InstanceID(rawValue: 991), definition: definition,
+            fieldProvenance: .init(originRunIndex: 3, originWorldSeed: 44,
+                                   generationSeed: 55, position: point))
+        var run = wildPageRun(seed: 44); run.playerPosition = point
+        run.map[point].isRevealed = true
+        run.offeredWorldPages = [page]; run.satchelItems.slots = 2
+        let store = GameStore(io: .temporary(name: "field-feedback-page-\(UUID().uuidString)"))
+        store.mutate("test: offer page") { $0.worlds.activeRun = run }
+        store.refreshWorldFieldContext()
+        let offered = try XCTUnwrap(store.worldFieldContext)
+        XCTAssertEqual(offered.interaction, .takePage)
+        let quote = try XCTUnwrap(store.offeredWorldPageQuote(page.id))
+        guard case .taken = store.takeOfferedWorldPage(quote) else { return XCTFail("take failed") }
+        let taken = try XCTUnwrap(store.worldFieldContext)
+        XCTAssertNotEqual(taken.inputStateHash, offered.inputStateHash)
+        XCTAssertNotEqual(taken.interaction, .takePage)
+        let frozen = taken
+        XCTAssertEqual(store.takeOfferedWorldPage(quote), .stale)
+        XCTAssertEqual(store.worldFieldContext, frozen)
+    }
+
+    @MainActor
+    func testEncounterAndReturnAcceptTransientFeedbackOwnership() throws {
+        let encounterStore = GameStore(io: .temporary(
+            name: "field-feedback-encounter-\(UUID().uuidString)"))
+        var encounterState = startedRun(book(["terrain": "plains"]), seed: 62)
+        var encounterRun = try XCTUnwrap(encounterState.worlds.activeRun)
+        let target = try XCTUnwrap(encounterRun.map.neighbours(of: encounterRun.playerPosition)
+            .first { WorldRules.canEnter($0, in: encounterRun.map) })
+        encounterRun.enemies = [WorldEnemy(id: InstanceID(rawValue: 7),
+            creatureID: "ink_hound", position: target, isAwake: true)]
+        encounterState.worlds.activeRun = encounterRun
+        encounterStore.mutate("test: encounter ownership") { $0 = encounterState }
+        let queued = try XCTUnwrap(encounterStore.beginWorldFieldAttempt(.interact))
+        encounterStore.submitWorldFieldEvents([.blocked("Old feedback.")], for: queued, now: 1)
+        encounterStore.step(to: target)
+        XCTAssertNotNil(encounterStore.activeRun?.activeEncounter)
+        XCTAssertTrue(encounterStore.worldFieldEventQueue.isEmpty)
+
+        let returnStore = GameStore(io: .temporary(
+            name: "field-feedback-return-\(UUID().uuidString)"))
+        returnStore.mutate("test: return ownership") {
+            $0 = startedRun(book(["terrain": "plains"]), seed: 63)
+        }
+        let returnAttempt = try XCTUnwrap(returnStore.beginWorldFieldAttempt(.interact))
+        returnStore.submitWorldFieldEvents([.blocked("Old feedback.")], for: returnAttempt, now: 1)
+        XCTAssertTrue(returnStore.canPortalHere)
+        returnStore.portalHome()
+        XCTAssertNil(returnStore.activeRun)
+        XCTAssertTrue(returnStore.worldFieldEventQueue.isEmpty)
+    }
+
+    @MainActor
     func testWorldTravelRendersAtApprovedOrdinaryPhoneSize() throws {
         let store = GameStore(io: .temporary(name: "world-render-\(UUID().uuidString)"))
         let state = startedRun(book(["terrain": "plains"]), seed: 101)
@@ -2857,13 +3035,20 @@ final class WorldTests: XCTestCase {
         }
 
         XCTAssertNotNil(store.naturalAnchorHere)
+        store.refreshWorldFieldContext()
+        let beforeContext = try XCTUnwrap(store.worldFieldContext)
         let cost = store.naturalAnchorCost
         XCTAssertEqual(cost, 25, "a blank book's 100-essence born premium makes a 25-essence seam")
         XCTAssertTrue(store.anchorAtNaturalPoint())
         XCTAssertEqual(store.state.base.essence, 100 - cost)
         XCTAssertEqual(store.state.worlds.anchoredRealms.first?.route, .naturalPoint)
         XCTAssertEqual(store.state.worlds.anchoredRealms.first?.world.map, seeded.map)
+        let anchoredContext = try XCTUnwrap(store.worldFieldContext)
+        XCTAssertNotEqual(anchoredContext.inputStateHash, beforeContext.inputStateHash)
+        XCTAssertEqual(anchoredContext.interactionState,
+                       .unavailable(reason: "This world is already anchored."))
         XCTAssertFalse(store.anchorAtNaturalPoint(), "one realm cannot be paid for twice")
+        XCTAssertEqual(store.worldFieldContext, anchoredContext)
     }
 
     @MainActor
@@ -2887,11 +3072,14 @@ final class WorldTests: XCTestCase {
         XCTAssertFalse(store.placeAnchorFrame(), "a portal is not a valid placement tile")
         XCTAssertNotNil(store.carriedAnchorFrame, "an invalid attempt must not consume the frame")
         store.mutate("step onto clear ground") { $0.worlds.activeRun?.playerPosition = clear }
+        store.refreshWorldFieldContext()
+        let beforeContext = try XCTUnwrap(store.worldFieldContext)
 
         XCTAssertTrue(store.placeAnchorFrame())
         XCTAssertNil(store.carriedAnchorFrame)
         XCTAssertEqual(store.state.base.essence, 63, "the crafted frame has no second essence cost")
         XCTAssertEqual(store.state.worlds.anchoredRealms.first?.route, .craftedFrame)
+        XCTAssertNotEqual(store.worldFieldContext?.inputStateHash, beforeContext.inputStateHash)
     }
 
     @MainActor

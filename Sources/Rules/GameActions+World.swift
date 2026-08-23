@@ -261,6 +261,7 @@ extension GameStore {
             guard case .taken = result else { return }
             state.worlds.activeRun = run
         }
+        if case .taken = result { refreshWorldFieldContext() }
         return result
     }
 
@@ -275,6 +276,7 @@ extension GameStore {
             guard case .swapped = result else { return }
             state.worlds.activeRun = run
         }
+        if case .swapped = result { refreshWorldFieldContext() }
         return result
     }
 
@@ -341,6 +343,7 @@ extension GameStore {
                               world: run.anchoredSnapshot)
             )
         }
+        refreshWorldFieldContext()
         return true
     }
 
@@ -486,6 +489,7 @@ extension GameStore {
             )
             state.worlds.activeRun = run
         }
+        refreshWorldFieldContext()
         return true
     }
 

@@ -49,7 +49,7 @@ struct WorldFieldContextReceiptV1: Equatable, Sendable {
         let offeredPages = run.offeredWorldPages.filter {
             $0.fieldProvenance?.position == run.playerPosition
         }
-        if offeredPages.count == 1, let page = offeredPages.first {
+        if offeredPages.count == 1, offeredPages.first != nil {
             content = .writing
             interaction = .takePage
             interactionState = encounterBlocksInteraction
@@ -122,7 +122,7 @@ struct WorldFieldContextReceiptV1: Equatable, Sendable {
                 interactionState = .unavailable(reason: "You need \(anchorCost) essence.")
             } else if isNaturalAnchor && state.worlds.anchoredRealms.contains(where: { $0.runIndex == run.runIndex }) {
                 interactionState = .unavailable(reason: "This world is already anchored.")
-            } else if site?.isLooted == true {
+            } else if !isNaturalAnchor && site?.isLooted == true {
                 interactionState = .unavailable(reason: "Nothing remains here.")
             } else {
                 interactionState = .available
@@ -144,8 +144,9 @@ struct WorldFieldContextReceiptV1: Equatable, Sendable {
             "elevation=\(tile.elevation)", "snow=\(tile.surfaceDeposits.snow)",
             "settledAsh=\(tile.surfaceDeposits.settledAsh)", "cracking=\(tile.isCracking)",
             "floraID=\(tile.flora?.description ?? "none")", "floraName=\(floraName ?? "none")",
-            "content=\(String(reflecting: content))",
-            "interaction=\(interaction.rawValue)", "state=\(String(reflecting: interactionState))",
+            "content=\(canonicalContent(content, tile: tile, offeredPage: offeredPages.first))",
+            "interaction=\(interaction.rawValue)",
+            "state=\(canonicalInteractionState(interactionState))",
         ])
         return Self(
             worldRunID: "\(run.runIndex):\(run.mapSeed)", position: run.playerPosition,
@@ -163,6 +164,51 @@ struct WorldFieldContextReceiptV1: Equatable, Sendable {
 
     private static func canonicalFields(_ fields: [String]) -> String {
         fields.map { "\($0.utf8.count):\($0)" }.joined()
+    }
+
+    private static func canonicalContent(_ summary: ContentSummary, tile: Tile,
+                                         offeredPage: WorldPageInstance?) -> String {
+        func fields(_ values: [String]) -> String { canonicalFields(values) }
+        switch summary {
+        case .none: return fields(["none"])
+        case .node(let name):
+            let id = if case .node(let node) = tile.content { node.resource.rawValue } else { "unknown" }
+            return fields(["node", id, name])
+        case .item(let name):
+            let id: String = switch tile.content {
+            case .item(let item): item.catalogID.rawValue
+            case .wildDrop(let resource, _): resource.rawValue
+            default: "unknown"
+            }
+            return fields(["item", id, name])
+        case .genericHazard: return fields(["genericHazard"])
+        case .portal: return fields(["portal"])
+        case .lockedCache: return fields(["lockedCache"])
+        case .site(let name):
+            let id = if case .site(let siteID) = tile.content { siteID.description } else { "unknown" }
+            return fields(["site", id, name])
+        case .writing:
+            let id: String = if let offeredPage { offeredPage.id.description } else {
+                switch tile.content {
+                case .diaryPage(let page): page.rawValue
+                case .foundWriting(let writing): writing.rawValue
+                default: "unknown"
+                }
+            }
+            return fields(["writing", id])
+        case .traveller(let name):
+            let id = if case .traveller(let travellerID) = tile.content {
+                travellerID.rawValue
+            } else { "unknown" }
+            return fields(["traveller", id, name])
+        }
+    }
+
+    private static func canonicalInteractionState(_ state: InteractionState) -> String {
+        switch state {
+        case .available: canonicalFields(["available"])
+        case .unavailable(let reason): canonicalFields(["unavailable", reason])
+        }
     }
 }
 
@@ -184,7 +230,7 @@ struct WorldFieldEventBatchV1: Equatable {
 
 enum WorldFieldNarration {
     static func text(for event: WorldRules.Event) -> String? {
-        switch event {
+        return switch event {
         case .moved, .encounterBegan: nil
         case .enteredSlowGround(let ground): "Crossing \(ground) took an extra turn."
         case .blocked(let why): why
@@ -424,51 +470,63 @@ final class GameStore: ObservableObject {
     }
 
     func refreshWorldFieldContext() {
-        worldFieldContext = WorldFieldContextReceiptV1.make(from: state)
+        let refreshed = WorldFieldContextReceiptV1.make(from: state)
+        guard refreshed != worldFieldContext else { return }
+        worldFieldContext = refreshed
     }
 
     private static func canonicalWorldFieldEvent(_ event: WorldRules.Event) -> String {
-        switch event {
-        case .moved(let point): "moved:\(point.x),\(point.y)"
-        case .enteredSlowGround(let ground): "slow:\(ground)"
-        case .blocked(let reason): "blocked:\(reason)"
-        case .pickedUp(let id, let amount): "pickup:\(id.rawValue):\(amount)"
-        case .harvested(let id, let amount, let exhausted): "harvest:\(id.rawValue):\(amount):\(exhausted)"
-        case .foundPortal: "portal"
-        case .foundCache: "cache"
-        case .cacheOpened(let copy): "cache-open:\(copy)"
-        case .foundSite(let id): "site:\(id.rawValue)"
-        case .readPage(let id): "page:\(id.rawValue)"
-        case .readFoundWriting(let id, let prose): "writing:\(id.rawValue):\(prose)"
-        case .foundTraveller(let id): "traveller:\(id.rawValue)"
-        case .metTraveller(let id): "met:\(id.rawValue)"
-        case .usedItem(let name, let member): "use:\(name):\(member)"
+        func encoded(_ fields: [String]) -> String {
+            fields.map { "\($0.utf8.count):\($0)" }.joined()
+        }
+        func tagged(_ tag: String, _ values: String...) -> String {
+            encoded([tag] + values)
+        }
+        return switch event {
+        case .moved(let point): tagged("moved", String(point.x), String(point.y))
+        case .enteredSlowGround(let ground): tagged("slow", ground)
+        case .blocked(let reason): tagged("blocked", reason)
+        case .pickedUp(let id, let amount): tagged("pickup", id.rawValue, String(amount))
+        case .harvested(let id, let amount, let exhausted):
+            tagged("harvest", id.rawValue, String(amount), String(exhausted))
+        case .foundPortal: tagged("portal")
+        case .foundCache: tagged("cache")
+        case .cacheOpened(let copy): tagged("cache-open", copy)
+        case .foundSite(let id): tagged("site", id.rawValue)
+        case .readPage(let id): tagged("page", id.rawValue)
+        case .readFoundWriting(let id, let prose): tagged("writing", id.rawValue, prose)
+        case .foundTraveller(let id): tagged("traveller", id.rawValue)
+        case .metTraveller(let id): tagged("met", id.rawValue)
+        case .usedItem(let name, let member): tagged("use", name, member.id)
         case .surveyed(let readings):
-            "survey:" + readings.map { "\($0.target.rawValue):\($0.name):\($0.text)" }.joined(separator: ";")
-        case .searchedSite(let id, let turns): "search:\(id.rawValue):\(turns)"
-        case .siteOpened(let id): "site-open:\(id.rawValue)"
-        case .learnedSymbol(let id): "symbol:\(id.rawValue)"
-        case .learnedFocus(let id): "focus:\(id.rawValue)"
-        case .learnedGambit(let id): "gambit:\(id.rawValue)"
-        case .learnedPattern(let id): "pattern:\(id.rawValue)"
-        case .learnedSchematic(let id): "schematic:\(id.rawValue)"
-        case .gainedEssence(let amount): "essence:\(amount)"
-        case .pickedUpItem(let copy): "item:\(copy)"
-        case .satchelFull(let copy): "full:\(copy)"
-        case .hazardHit(let damage): "hazard:\(damage)"
-        case .scratchedByGrowth(let name, let damage, let lingers): "flora:\(name):\(damage):\(lingers)"
-        case .poisonWorking(let damage): "poison:\(damage)"
-        case .enemySighted(let name): "sighted:\(name)"
-        case .enemyAlerted(let name): "alerted:\(name)"
-        case .encounterBegan: "encounter"
-        case .crossedThreshold(let band): "threshold:\(band)"
-        case .nightfall: "nightfall"
-        case .daybreak: "daybreak"
-        case .tilesCrumbled(let count): "crumbled:\(count)"
-        case .lostToCrumbling(let count): "lost:\(count)"
-        case .collapsed: "collapsed"
-        case .floorGaveWay: "floor"
-        case .ejected(let reason): "ejected:\(reason)"
+            tagged("survey", readings.map {
+                encoded([$0.target.rawValue, $0.name, $0.text])
+            }.joined())
+        case .searchedSite(let id, let turns): tagged("search", id.rawValue, String(turns))
+        case .siteOpened(let id): tagged("site-open", id.rawValue)
+        case .learnedSymbol(let id): tagged("symbol", id.rawValue)
+        case .learnedFocus(let id): tagged("focus", id.rawValue)
+        case .learnedGambit(let id): tagged("gambit", id.rawValue)
+        case .learnedPattern(let id): tagged("pattern", id.rawValue)
+        case .learnedSchematic(let id): tagged("schematic", id.rawValue)
+        case .gainedEssence(let amount): tagged("essence", String(amount))
+        case .pickedUpItem(let copy): tagged("item", copy)
+        case .satchelFull(let copy): tagged("full", copy)
+        case .hazardHit(let damage): tagged("hazard", String(damage))
+        case .scratchedByGrowth(let name, let damage, let lingers):
+            tagged("flora", name, String(damage), String(lingers))
+        case .poisonWorking(let damage): tagged("poison", String(damage))
+        case .enemySighted(let name): tagged("sighted", name)
+        case .enemyAlerted(let name): tagged("alerted", name)
+        case .encounterBegan: tagged("encounter")
+        case .crossedThreshold(let band): tagged("threshold", band.rawValue)
+        case .nightfall: tagged("nightfall")
+        case .daybreak: tagged("daybreak")
+        case .tilesCrumbled(let count): tagged("crumbled", String(count))
+        case .lostToCrumbling(let count): tagged("lost", String(count))
+        case .collapsed: tagged("collapsed")
+        case .floorGaveWay: tagged("floor")
+        case .ejected(let reason): tagged("ejected", reason)
         }
     }
 

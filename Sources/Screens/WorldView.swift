@@ -61,6 +61,128 @@ private struct WorldActionRow<Interact: View, Look: View>: View {
     }
 }
 
+enum WorldFieldFeedbackLayout {
+    static let height: CGFloat = 184
+    static let spacing: CGFloat = 4
+    static func paneWidth(total: CGFloat) -> CGFloat { max(0, (total - spacing) / 2) }
+}
+
+private struct WorldFieldFeedbackRow: View {
+    @EnvironmentObject private var store: GameStore
+
+    var body: some View {
+        HStack(alignment: .top, spacing: WorldFieldFeedbackLayout.spacing) {
+            contextPane.frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+            eventPane.frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+        }
+        .frame(height: WorldFieldFeedbackLayout.height)
+        .padding(.horizontal, 12)
+        .padding(.vertical, 6)
+        .background(PixelUITheme.surfaceInset)
+        .overlay(alignment: .top) { Rectangle().fill(PixelUITheme.edge).frame(height: 2) }
+        .task(id: store.currentWorldFieldEventBatch?.batchID) {
+            guard let batchID = store.currentWorldFieldEventBatch?.batchID else { return }
+            try? await Task.sleep(nanoseconds: 4_000_000_000)
+            guard !Task.isCancelled else { return }
+            store.expireWorldFieldFeedback(ifCurrent: batchID)
+        }
+    }
+
+    @ViewBuilder private var contextPane: some View {
+        if let context = store.worldFieldContext {
+            VStack(alignment: .leading, spacing: 7) {
+                Text("AT THIS PLACE")
+                    .font(.custom("Tiny5", size: 16)).foregroundStyle(PixelUITheme.muted)
+                Text(context.groundName)
+                    .font(.custom("Jersey 10", size: 24)).foregroundStyle(PixelUITheme.text)
+                Text(contextLine(context))
+                    .font(.system(size: 17)).foregroundStyle(PixelUITheme.text)
+                    .fixedSize(horizontal: false, vertical: true)
+                Text(interactionLine(context))
+                    .font(.custom("Tiny5", size: 15)).foregroundStyle(PixelUITheme.muted)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+            .padding(9)
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+            .background(PixelUITheme.edgeDark.opacity(0.72))
+            .overlay(Rectangle().stroke(PixelUITheme.edge, lineWidth: 2))
+        } else {
+            Color.clear
+        }
+    }
+
+    @ViewBuilder private var eventPane: some View {
+        if let batch = store.currentWorldFieldEventBatch {
+            VStack(alignment: .leading, spacing: 5) {
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 6) {
+                        ForEach(Array(batch.orderedNarrations.enumerated()), id: \.offset) { index, line in
+                            Text(index == 0 ? line : index == 1 ? "NEXT · \(line)" : line)
+                                .font(index == 0 ? .system(size: 17) : .custom("Tiny5", size: 15))
+                                .foregroundStyle(index == 0 ? PixelUITheme.text : PixelUITheme.muted)
+                                .fixedSize(horizontal: false, vertical: true)
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                        }
+                    }
+                }
+                if batch.orderedNarrations.count > 2 {
+                    Text("+\(batch.orderedNarrations.count - 2) more in this event")
+                        .font(.custom("Tiny5", size: 15)).foregroundStyle(PixelUITheme.muted)
+                }
+                Button {
+                    store.dismissWorldFieldFeedback(expectedBatchID: batch.batchID)
+                } label: {
+                    Text("Dismiss").font(.custom("Tiny5", size: 16))
+                        .frame(maxWidth: .infinity, minHeight: 40)
+                }
+                .buttonStyle(.plain)
+                .contentShape(Rectangle())
+                .background(PixelUITheme.surfaceRaised.opacity(0.94))
+                .overlay(Rectangle().stroke(PixelUITheme.edge, lineWidth: 2))
+            }
+            .padding(8)
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+            .background(PixelUITheme.edgeDark.opacity(0.72))
+            .overlay(Rectangle().stroke(PixelUITheme.edge, lineWidth: 2))
+        } else {
+            Color.clear.overlay(Rectangle().stroke(PixelUITheme.edge.opacity(0.35), lineWidth: 1))
+        }
+    }
+
+    private func contextLine(_ context: WorldFieldContextReceiptV1) -> String {
+        var parts: [String] = []
+        if context.elevation > 0 { parts.append("Elevation \(context.elevation)") }
+        if context.surfaceDeposits.snow { parts.append("Snow") }
+        if context.surfaceDeposits.settledAsh { parts.append("Settled Ash") }
+        if context.stabilitySurfaceState == "cracking" { parts.append("Cracking") }
+        if let flora = context.floraDisplayName { parts.append(flora) }
+        switch context.contentSummary {
+        case .none: break
+        case .node(let name), .item(let name), .site(let name), .traveller(let name): parts.append(name)
+        case .genericHazard: parts.append("Hazard")
+        case .portal: parts.append("Portal")
+        case .lockedCache: parts.append("Locked cache")
+        case .writing: parts.append("Loose page")
+        }
+        return parts.isEmpty ? "Open ground" : parts.joined(separator: " · ")
+    }
+
+    private func interactionLine(_ context: WorldFieldContextReceiptV1) -> String {
+        if case .unavailable(let reason) = context.interactionState { return reason }
+        return switch context.interaction {
+        case .none: "Nothing to use here"
+        case .harvest: "Harvest"
+        case .searchSite: "Search site"
+        case .enterPortal: "Portal home"
+        case .openCache: "Open cache"
+        case .takePage: "Take page"
+        case .survey: "Survey"
+        case .useAnchor: "Use Atlas Seam"
+        case .placeAnchor: "Place Anchor Frame"
+        }
+    }
+}
+
 /// The world: stability at the top, the grid in the middle, your hands at the bottom.
 ///
 /// Ergonomics note. A 14×14 grid can't give every tile a 44pt target on a 402pt-wide phone — that
@@ -117,9 +239,6 @@ struct WorldView: View {
                         ) { point in
                             tapped(point, in: run)
                         }
-                        .overlay(alignment: .bottom) {
-                            placeInformation(run)
-                        }
                     }
                     .overlay(alignment: .top) {
                         LootDecisionCard()
@@ -128,6 +247,8 @@ struct WorldView: View {
                 }
                 .aspectRatio(1, contentMode: .fit)
                 .clipped()
+
+                WorldFieldFeedbackRow().environmentObject(store)
 
                 VStack(spacing: 0) {
                     satchel(run)
@@ -253,137 +374,7 @@ struct WorldView: View {
         }
     }
 
-    // MARK: Narration
-
-    /// Only the events worth saying out loud. Several — moving, the encounter opening — are better
-    /// shown than narrated, so the log stays quiet rather than rendering an empty box.
-    private var narratedEvents: [(line: String, colour: Color)] {
-        store.recentEvents.compactMap { event in
-            narrate(event).map { (line: $0, colour: colour(for: event)) }
-        }
-    }
-
-    @ViewBuilder
-    private var eventLog: some View {
-        let lines = Array(narratedEvents.suffix(3))
-        if !lines.isEmpty {
-            VStack(alignment: .leading, spacing: 2) {
-                ForEach(Array(lines.enumerated()), id: \.offset) { _, entry in
-                    Text(entry.line)
-                        .font(.caption)
-                        .foregroundStyle(entry.colour)
-                        // Wraps rather than demanding a line's worth of width. Same hazard the
-                        // haul row had: inside a scrolling `VStack`, a child that wants to be wide
-                        // makes every sibling wide, and the map is the sibling that suffers.
-                        .fixedSize(horizontal: false, vertical: true)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                }
-            }
-            .padding(10)
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .background(
-                LinearGradient(colors: [PixelUITheme.surfaceInset.opacity(0.36),
-                                        PixelUITheme.surfaceInset.opacity(0.88)],
-                               startPoint: .top, endPoint: .bottom)
-            )
-            .overlay {
-                Rectangle().stroke(PixelUITheme.edge, lineWidth: 2)
-            }
-            .allowsHitTesting(false)
-        }
-    }
-
-    private func narrate(_ event: WorldRules.Event) -> String? {
-        switch event {
-        case .moved: nil // the map already says where you are
-        case .enteredSlowGround(let ground): "Crossing \(ground) took an extra turn."
-        case .blocked(let why): why
-        case .pickedUp(let resource, let amount):
-            "Picked up \(amount) \(ContentCatalog.shared.resource(resource)?.name.lowercased() ?? "something")."
-        case .harvested(let resource, let amount, let exhausted):
-            "Harvested \(amount) \(ContentCatalog.shared.resource(resource)?.name.lowercased() ?? "something")."
-                + (exhausted ? " This deposit is depleted." : "")
-        case .foundPortal: "A way out."
-        case .foundCache: "A cache, locked. The key is somewhere else."
-        case .cacheOpened(let what): "The lock gives. \(what)"
-        case .readPage(let id):
-            ContentCatalog.shared.diaryPage(id).map { "A page, in somebody's hand. \"\($0.prose)\"" }
-                ?? "A page from someone's diary."
-        case .readFoundWriting(_, let prose): "A weathered field note. \"\(prose)\""
-        case .foundTraveller(let id):
-            ContentCatalog.shared.traveller(id).map { "\($0.name) is coming with you." }
-                ?? "They're coming with you."
-        case .usedItem(let what, let member):
-            "\(what). \(member == .binder ? "You feel" : "They feel") better."
-        case .surveyed(let readings):
-            "Surveyed: " + readings.map { "\($0.name) \($0.text)" }.joined(separator: ", ") + "."
-        case .metTraveller(let id):
-            ContentCatalog.shared.traveller(id).map { "\($0.name), \($0.calling). \($0.blurb)" }
-                ?? "Someone is here."
-        case .nightfall: "The light goes. You can see less of this than you could."
-        case .daybreak: "It comes back around. You can see again."
-        case .foundSite(let site):
-            ContentCatalog.shared.site(site).map { "\($0.name). \($0.blurb)" } ?? "Something built."
-        case .searchedSite(_, let remaining):
-            "Searching. \(remaining) more turn\(remaining == 1 ? "" : "s")."
-        case .siteOpened(let site):
-            "You've had everything \(ContentCatalog.shared.site(site)?.name.lowercased() ?? "it") has."
-        case .learnedSymbol(let symbol):
-            "You can write \(ContentCatalog.shared.symbol(symbol)?.name ?? "something new") now."
-        case .learnedFocus(let focus):
-            "A word you didn't have: \(ContentCatalog.shared.pressureSource(focus)?.name ?? "something new")."
-        case .learnedGambit(let component):
-            "A gambit phrase you didn't have: \(ContentCatalog.shared.gambitComponent(component)?.name ?? "something new")."
-        case .learnedPattern(let pattern):
-            SchematicPresentation.learnedEvent(pattern: pattern)
-        case .learnedSchematic(let schematic):
-            SchematicPresentation.learnedEvent(schematic: schematic)
-        case .gainedEssence(let amount): "\(amount) essence, banked."
-        case .pickedUpItem(let what): "\(what) You can't tell what it is."
-        case .satchelFull(let what): "No room in your satchel — \(what.lowercased()) is waiting on you."
-        case .hazardHit(let damage): "The ground turns on you — \(damage) damage."
-        case .scratchedByGrowth(let name, let damage, let lingers):
-            lingers
-                ? "You push through the \(name). \(damage) damage, and it's still working."
-                : "The \(name) tears at you — \(damage) damage."
-        case .poisonWorking(let damage): "Whatever that was is still in you — \(damage) damage."
-        case .enemySighted(let name): "A \(name) has noticed you."
-        case .enemyAlerted(let name): "A \(name) pauses, alert to your movement."
-        case .encounterBegan: nil // the encounter bar takes over
-        case .crossedThreshold(let band):
-            switch band {
-            case .stable: nil
-            case .hazardous: "The edges are starting to go."
-            case .crumbling: "The world is crumbling inward."
-            case .collapsed: "The world is coming apart. Get to a portal while there's floor."
-            }
-        case .tilesCrumbled(let count): count > 0 ? "\(count) tiles gone." : nil
-        case .lostToCrumbling(let count):
-            count == 1 ? "Something you hadn't taken went with it." : "\(count) things you hadn't taken went with it."
-        case .collapsed: "The world is coming apart. Get to a portal."
-        case .floorGaveWay: "The ground goes out from under you."
-        case .ejected(let reason): reason
-        }
-    }
-
-    private func colour(for event: WorldRules.Event) -> Color {
-        switch event {
-        case .pickedUp, .harvested, .foundPortal, .pickedUpItem, .searchedSite, .siteOpened: .primary
-        case .foundSite, .learnedSymbol, .learnedFocus, .learnedGambit, .learnedPattern,
-             .learnedSchematic, .gainedEssence: .primary
-        case .readPage, .foundTraveller, .metTraveller: .primary
-        case .usedItem, .surveyed: .green
-        case .enteredSlowGround: .orange
-        case .nightfall, .daybreak: .secondary
-        case .cacheOpened: .purple
-        case .satchelFull: .orange
-        case .hazardHit, .collapsed, .floorGaveWay, .ejected, .lostToCrumbling: .red
-        case .scratchedByGrowth, .poisonWorking: .red
-        case .enemySighted, .enemyAlerted, .crossedThreshold, .blocked: .orange
-        default: .secondary
-        }
-    }
-
+    // Event copy is single-sourced by WorldFieldNarration and consumed by WorldFieldFeedbackRow.
     // MARK: Satchel
 
     private func placeInformation(_ run: WorldRun) -> some View {

@@ -1240,6 +1240,9 @@ extension GameStore {
             } else {
                 bindError = "The binding changed before departure. Nothing was spent."
             }
+        } else {
+            clearWorldFieldFeedback()
+            refreshWorldFieldContext()
         }
         return didCommit
     }
