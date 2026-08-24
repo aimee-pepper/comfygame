@@ -900,13 +900,12 @@ struct WorldView: View {
                                     fallbackSystemIcon: ContentCatalog.shared.resource(entry.id)?.icon ?? "cube"
                                 )
                                 .frame(width: 8, height: 8)
-                                .anchorPreference(key: MiningAnchorReceiptKey.self,
-                                                  value: .center) {
-                                    MiningAnchorReceipt(destinations: [entry.id: $0])
-                                }
                                 Text("\(entry.amount)")
                             }
                             .fixedSize()
+                            .modifier(ResourceMiningCounterPulse(
+                                resourceID: entry.id,
+                                presentations: store.worldMiningFeedbackPresentations))
                         }
                     }
                     .padding(.trailing, 4)
@@ -1745,6 +1744,7 @@ private struct MapGrid: View {
                                 isRememberedTerrain: isRememberedTerrain,
                                 showsStationaryContents: showsStationaryContents)
                             TileView(tile: displayTile,
+                                     point: point,
                                      visibility: visibility,
                                      isRememberedTerrain: isRememberedTerrain,
                                      usesRememberedStationaryIdentity:
@@ -1797,6 +1797,10 @@ private struct MapGrid: View {
                   blue: Double(WorldMapLayout.backdropRGB[2]) / 255)
         )
         .clipped()
+        .anchorPreference(key: MiningAnchorReceiptKey.self, value: .bounds) {
+            MiningAnchorReceipt(mapViewport: $0,
+                                sourceUnitFrames: miningSourceUnitFrames)
+        }
         .task(id: scenePhase) {
             guard scenePhase == .active else { return }
             await terrainClock.runWhileActive()
@@ -1809,6 +1813,25 @@ private struct MapGrid: View {
 #else
         false
 #endif
+    }
+
+    /// Exact logical tile frames inside the rendered, edge-clamped MapGrid viewport. The root
+    /// resolves these normalized frames through the map's own bounds anchor, so mining feedback
+    /// never guesses a screen coordinate or depends on a sibling toolbar layout.
+    private var miningSourceUnitFrames: [GridPoint: CGRect] {
+        var result: [GridPoint: CGRect] = [:]
+        let width = CGFloat(viewportColumns)
+        let height = CGFloat(viewportRows)
+        for y in origin.y..<(origin.y + viewportRows) {
+            for x in origin.x..<(origin.x + viewportColumns) {
+                let point = GridPoint(x: x, y: y)
+                result[point] = CGRect(
+                    x: CGFloat(x - origin.x) / width,
+                    y: CGFloat(y - origin.y) / height,
+                    width: 1 / width, height: 1 / height)
+            }
+        }
+        return result
     }
 
     private func displayTile(at point: GridPoint,
@@ -2021,6 +2044,7 @@ struct UnexploredFringeGradient: Equatable {
 
 private struct TileView: View {
     let tile: Tile
+    let point: GridPoint
     let visibility: WorldRules.TileVisibility
     let isRememberedTerrain: Bool
     let usesRememberedStationaryIdentity: Bool
@@ -2067,10 +2091,6 @@ private struct TileView: View {
                     Circle()
                         .fill(Color.accentColor)
                         .padding(side * 0.14)
-                        .anchorPreference(key: MiningAnchorReceiptKey.self,
-                                          value: .center) {
-                            MiningAnchorReceipt(origin: $0, originEmissionCount: 1)
-                        }
                 }
                 if let enemy, case .alert = enemy.awareness {
                     Circle()
@@ -2251,7 +2271,7 @@ private struct TileView: View {
         let tile = Tile(content: content, ground: .soil, isRevealed: revealed)
         return AnyView(
             TileView(
-                tile: tile, visibility: visibility,
+                tile: tile, point: GridPoint(x: 0, y: 0), visibility: visibility,
                 isRememberedTerrain: visibility != .full,
                 usesRememberedStationaryIdentity: visibility != .full,
                 unexploredFringeGradient: nil,

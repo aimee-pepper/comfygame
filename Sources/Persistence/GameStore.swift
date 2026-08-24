@@ -232,6 +232,7 @@ struct WorldMiningFeedbackGroupV1: Equatable {
     struct Subject: Equatable { let resourceID: ResourceID; let amount: Int }
     let batchID: String
     let worldRunID: String
+    let sourcePoint: GridPoint
     let subjects: [Subject]
     let startedAtMonotonicTime: UInt64
 }
@@ -408,8 +409,7 @@ final class GameStore: ObservableObject {
     @Published var recentEvents: [WorldRules.Event] = []
     @Published private(set) var worldFieldContext: WorldFieldContextReceiptV1?
     @Published private(set) var worldFieldEventQueue: [WorldFieldEventBatchV1] = []
-    @Published private(set) var worldMiningFeedback: WorldMiningFeedbackGroupV1?
-    @Published private(set) var worldMiningFeedbackQueue: [WorldMiningFeedbackGroupV1] = []
+    @Published private(set) var worldMiningFeedbackPresentations: [WorldMiningFeedbackGroupV1] = []
     @Published private(set) var worldTravellerSpeech: WorldTravellerSpeechBubbleV1?
     @Published private(set) var worldTravellerSpeechQueue: [WorldTravellerSpeechBubbleV1] = []
     /// Recoverable player-facing failure from the bind preview/receipt commitment boundary.
@@ -536,29 +536,23 @@ final class GameStore: ObservableObject {
                   ResourceSpriteV1Registry.asset(for: id, profile: .field) != nil else { return nil }
             return .init(resourceID: id, amount: amount)
         }
-        guard !subjects.isEmpty else { return }
+        // Aimee's restored local-rise authority has no approved multi-kind spatial composition.
+        // Preserve the complete committed reward/narration, but fail the optional animation closed.
+        guard subjects.count == 1 else { return }
         let group = WorldMiningFeedbackGroupV1(
-            batchID: batch.batchID, worldRunID: batch.worldRunID, subjects: subjects,
-            startedAtMonotonicTime: worldMiningFeedback == nil ? now : 0)
-        if worldMiningFeedback == nil { worldMiningFeedback = group }
-        else { worldMiningFeedbackQueue.append(group) }
+            batchID: batch.batchID, worldRunID: batch.worldRunID,
+            sourcePoint: run.playerPosition, subjects: subjects,
+            startedAtMonotonicTime: now)
+        worldMiningFeedbackPresentations.append(group)
     }
 
-    func finishWorldMiningFeedback(expectedBatchID: String,
-        now: UInt64 = DispatchTime.now().uptimeNanoseconds) {
-        guard worldMiningFeedback?.batchID == expectedBatchID else { return }
-        if worldMiningFeedbackQueue.isEmpty { worldMiningFeedback = nil }
-        else {
-            let next = worldMiningFeedbackQueue.removeFirst()
-            worldMiningFeedback = .init(batchID: next.batchID, worldRunID: next.worldRunID,
-                subjects: next.subjects, startedAtMonotonicTime: now)
-        }
+    func finishWorldMiningFeedback(expectedBatchID: String) {
+        worldMiningFeedbackPresentations.removeAll { $0.batchID == expectedBatchID }
     }
 
     func dismissWorldFieldFeedback(expectedBatchID: String,
                                    now: UInt64 = DispatchTime.now().uptimeNanoseconds) {
         guard worldFieldEventQueue.first?.batchID == expectedBatchID else { return }
-        finishWorldMiningFeedback(expectedBatchID: expectedBatchID, now: now)
         worldFieldEventQueue.removeFirst()
         visibleWorldFieldBatchSince = worldFieldEventQueue.isEmpty ? nil : now
     }
@@ -575,8 +569,7 @@ final class GameStore: ObservableObject {
         worldFieldEventQueue.removeAll()
         seenWorldFieldBatchIDs.removeAll()
         visibleWorldFieldBatchSince = nil
-        worldMiningFeedback = nil
-        worldMiningFeedbackQueue.removeAll()
+        worldMiningFeedbackPresentations.removeAll()
         seenWorldMiningBatchIDs.removeAll()
         clearWorldTravellerSpeechSession()
     }

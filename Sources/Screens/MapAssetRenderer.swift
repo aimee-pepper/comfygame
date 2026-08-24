@@ -649,76 +649,175 @@ struct ResourceMiningFeedbackV1: Equatable {
         return Self(batchID: group.batchID, subjects: subjects)
     }
 
-    static func subjectProgress(elapsedMilliseconds: Double, index: Int) -> CGFloat {
-        min(1, max(0, CGFloat((elapsedMilliseconds - Double(index) * 130) / 760)))
+    static let durationMilliseconds: Double = 450
+    static let fullOpacityMilliseconds: Double = 180
+
+    static func progress(elapsedMilliseconds: Double) -> CGFloat {
+        min(1, max(0, CGFloat(elapsedMilliseconds / durationMilliseconds)))
     }
 
-    var durationMilliseconds: Double { 760 + 130 * Double(max(0, subjects.count - 1)) }
+    static func opacity(elapsedMilliseconds: Double) -> CGFloat {
+        guard elapsedMilliseconds > fullOpacityMilliseconds else { return 1 }
+        return min(1, max(0, CGFloat(
+            1 - (elapsedMilliseconds - fullOpacityMilliseconds)
+                / (durationMilliseconds - fullOpacityMilliseconds))))
+    }
 
-    static func anchorIsVisible(_ point: CGPoint, in bounds: CGRect,
-                                targetSide: CGFloat = 8) -> Bool {
-        bounds.contains(CGRect(x: point.x - targetSide / 2, y: point.y - targetSide / 2,
-                               width: targetSide, height: targetSide))
+    static func riseDistance(tileHeight: CGFloat, sourceCenterY: CGFloat,
+                             mapMinY: CGFloat, contentHeight: CGFloat) -> CGFloat {
+        max(0, min(tileHeight * 1.5,
+                   sourceCenterY - mapMinY - contentHeight / 2))
+    }
+
+    static func center(sourceTile: CGRect, mapViewport: CGRect,
+                       contentHeight: CGFloat, elapsedMilliseconds: Double) -> CGPoint {
+        let rise = riseDistance(tileHeight: sourceTile.height,
+                                sourceCenterY: sourceTile.midY,
+                                mapMinY: mapViewport.minY,
+                                contentHeight: contentHeight)
+        return CGPoint(x: sourceTile.midX,
+                       y: sourceTile.midY - rise * progress(
+                        elapsedMilliseconds: elapsedMilliseconds))
+    }
+
+    static func quantityLabelCenterX(iconCenterX: CGFloat, iconWidth: CGFloat,
+                                     labelWidth: CGFloat, mapViewport: CGRect,
+                                     gap: CGFloat = 3) -> CGFloat {
+        let right = iconCenterX + iconWidth / 2 + gap + labelWidth / 2
+        if right + labelWidth / 2 <= mapViewport.maxX { return right }
+        let left = iconCenterX - iconWidth / 2 - gap - labelWidth / 2
+        return max(mapViewport.minX + labelWidth / 2,
+                   min(mapViewport.maxX - labelWidth / 2, left))
+    }
+
+    static func counterPulseOpacity(elapsedMilliseconds: Double) -> CGFloat {
+        guard elapsedMilliseconds >= 0, elapsedMilliseconds < fullOpacityMilliseconds else { return 0 }
+        let normalized = CGFloat(elapsedMilliseconds / fullOpacityMilliseconds)
+        return 1 - abs(normalized * 2 - 1)
+    }
+}
+
+private struct ResourceMiningSubjectLayout: Layout {
+    let iconCenter: CGPoint
+    let mapViewport: CGRect
+
+    func sizeThatFits(proposal: ProposedViewSize, subviews: Subviews,
+                      cache: inout ()) -> CGSize {
+        proposal.replacingUnspecifiedDimensions(
+            by: CGSize(width: mapViewport.maxX, height: mapViewport.maxY))
+    }
+
+    func placeSubviews(in bounds: CGRect, proposal: ProposedViewSize,
+                       subviews: Subviews, cache: inout ()) {
+        guard let icon = subviews.first else { return }
+        let iconSize = icon.sizeThatFits(.unspecified)
+        icon.place(at: iconCenter, anchor: .center,
+                   proposal: ProposedViewSize(iconSize))
+        guard subviews.count > 1 else { return }
+        let label = subviews[1]
+        let labelSize = label.sizeThatFits(.unspecified)
+        let labelX = ResourceMiningFeedbackV1.quantityLabelCenterX(
+            iconCenterX: iconCenter.x, iconWidth: iconSize.width,
+            labelWidth: labelSize.width, mapViewport: mapViewport)
+        label.place(at: CGPoint(x: labelX, y: iconCenter.y), anchor: .center,
+                    proposal: ProposedViewSize(labelSize))
+    }
+}
+
+@MainActor
+struct ResourceMiningFeedbackFrame: View {
+    let presentation: ResourceMiningFeedbackV1
+    let sourceTile: CGRect
+    let mapViewport: CGRect
+    let elapsedMilliseconds: Double
+
+    private static let contentHeight: CGFloat = 28
+
+    var body: some View {
+        let center = ResourceMiningFeedbackV1.center(
+            sourceTile: sourceTile, mapViewport: mapViewport,
+            contentHeight: Self.contentHeight, elapsedMilliseconds: elapsedMilliseconds)
+        GeometryReader { geometry in
+            ZStack {
+              ForEach(presentation.subjects) { subject in
+                  ResourceMiningSubjectLayout(iconCenter: center, mapViewport: mapViewport) {
+                      ResourceFieldMarkerIdentity(id: subject.resourceID, fallbackSystemIcon: "")
+                          .frame(width: 16, height: 16)
+                      if subject.amount > 1 {
+                          Text("×\(subject.amount)")
+                              .font(.custom("Tiny5", size: 13))
+                              .foregroundStyle(PixelUITheme.textOnEdgeDark)
+                              .padding(.horizontal, 3)
+                              .background(PixelUITheme.edgeDark.opacity(0.9))
+                      }
+                  }
+                  .frame(width: geometry.size.width, height: geometry.size.height)
+                  .opacity(ResourceMiningFeedbackV1.opacity(
+                    elapsedMilliseconds: elapsedMilliseconds))
+              }
+            }
+            .frame(width: geometry.size.width, height: geometry.size.height)
+        }
+        .allowsHitTesting(false)
     }
 }
 
 @MainActor
 struct ResourceMiningFeedbackOverlay: View {
     let presentation: ResourceMiningFeedbackV1
-    let start: CGPoint
-    let destination: (ResourceID) -> CGPoint
+    let sourceTile: CGRect
+    let mapViewport: CGRect
     let startedAtMonotonicTime: UInt64
     let onFinished: () -> Void
 
     var body: some View {
         TimelineView(.animation(minimumInterval: 1.0 / 60.0)) { _ in
-          let now = DispatchTime.now().uptimeNanoseconds
-          let elapsed = Double(now &- min(now, startedAtMonotonicTime)) / 1_000_000
-          ZStack {
-            ForEach(Array(presentation.subjects.enumerated()), id: \.element.id) { index, subject in
-                let local = ResourceMiningFeedbackV1.subjectProgress(
-                    elapsedMilliseconds: elapsed, index: index)
-                let end = destination(subject.resourceID)
-                let control = CGPoint(x: (start.x + end.x) / 2,
-                                      y: min(start.y, end.y) - 54)
-                let point = quadratic(from: start, control: control, to: end, t: local)
-                VStack(spacing: 2) {
-                    ResourceFieldMarkerIdentity(id: subject.resourceID, fallbackSystemIcon: "")
-                        .frame(width: 8, height: 8)
-                        .scaleEffect(2 - local)
-                    Text("+\(subject.amount)")
-                        .font(.custom("Tiny5", size: 13))
-                        .foregroundStyle(PixelUITheme.text)
-                        .padding(.horizontal, 3)
-                        .background(PixelUITheme.edgeDark.opacity(0.9))
-                }
-                .position(point)
-                .opacity(local >= 1 ? 0 : 1)
-            }
-          }
+            let now = DispatchTime.now().uptimeNanoseconds
+            let elapsed = Double(now &- min(now, startedAtMonotonicTime)) / 1_000_000
+            ResourceMiningFeedbackFrame(
+                presentation: presentation, sourceTile: sourceTile,
+                mapViewport: mapViewport, elapsedMilliseconds: elapsed)
         }
         .allowsHitTesting(false)
         .task(id: presentation.batchID) {
             let now = DispatchTime.now().uptimeNanoseconds
             let elapsed = Double(now &- min(now, startedAtMonotonicTime)) / 1_000_000
-            let remaining = max(0, presentation.durationMilliseconds - elapsed)
+            let remaining = max(0, ResourceMiningFeedbackV1.durationMilliseconds - elapsed)
             try? await Task.sleep(nanoseconds: UInt64(remaining * 1_000_000))
             guard !Task.isCancelled else { return }
             onFinished()
         }
     }
 
-    private func quadratic(from: CGPoint, control: CGPoint, to: CGPoint, t: CGFloat) -> CGPoint {
-        let u = 1 - t
-        return CGPoint(x: u * u * from.x + 2 * u * t * control.x + t * t * to.x,
-                       y: u * u * from.y + 2 * u * t * control.y + t * t * to.y)
+}
+
+struct ResourceMiningCounterPulse: ViewModifier {
+    let resourceID: ResourceID
+    let presentations: [WorldMiningFeedbackGroupV1]
+
+    func body(content: Content) -> some View {
+        TimelineView(.animation(minimumInterval: 1.0 / 60.0)) { _ in
+            let now = DispatchTime.now().uptimeNanoseconds
+            let opacity = presentations.reduce(CGFloat.zero) { result, group in
+                guard group.subjects.contains(where: { $0.resourceID == resourceID }) else {
+                    return result
+                }
+                let elapsed = Double(now &- min(now, group.startedAtMonotonicTime)) / 1_000_000
+                return max(result, ResourceMiningFeedbackV1.counterPulseOpacity(
+                    elapsedMilliseconds: elapsed))
+            }
+            content.overlay {
+                Rectangle()
+                    .stroke(PixelUITheme.primaryHighlight, lineWidth: 2)
+                    .opacity(opacity)
+            }
+        }
     }
 }
 
 struct MiningAnchorReceipt {
-    var origin: Anchor<CGPoint>?
-    var originEmissionCount = 0
-    var destinations: [ResourceID: Anchor<CGPoint>] = [:]
+    var mapViewport: Anchor<CGRect>?
+    var sourceUnitFrames: [GridPoint: CGRect] = [:]
 }
 
 struct MiningAnchorReceiptKey: PreferenceKey {
@@ -726,11 +825,19 @@ struct MiningAnchorReceiptKey: PreferenceKey {
     static func reduce(value: inout MiningAnchorReceipt,
                        nextValue: () -> MiningAnchorReceipt) {
         let next = nextValue()
-        value.origin = value.origin ?? next.origin
-        value.originEmissionCount += next.originEmissionCount
-        value.destinations.merge(next.destinations, uniquingKeysWith: { first, _ in first })
+        value.mapViewport = value.mapViewport ?? next.mapViewport
+        value.sourceUnitFrames.merge(next.sourceUnitFrames,
+                                     uniquingKeysWith: { first, _ in first })
     }
 }
+
+#if DEBUG
+@MainActor enum MiningFeedbackLayoutMeasurement {
+    static var latestBatchID: String?
+    static var latestSourceTile: CGRect?
+    static var latestMapViewport: CGRect?
+}
+#endif
 
 @MainActor
 struct WorldMiningFeedbackPresentationModifier: ViewModifier {
@@ -739,33 +846,48 @@ struct WorldMiningFeedbackPresentationModifier: ViewModifier {
     func body(content: Content) -> some View {
         content.overlayPreferenceValue(MiningAnchorReceiptKey.self) { anchors in
             GeometryReader { proxy in
-                if let group = store.worldMiningFeedback,
-                   let presentation = ResourceMiningFeedbackV1.make(from: group),
-                   anchors.originEmissionCount == 1,
-                   let origin = anchors.origin {
-                    let bounds = CGRect(origin: .zero, size: proxy.size)
-                    let start = proxy[origin]
-                    let allDestinationsVisible = presentation.subjects.allSatisfy { subject in
-                        guard let anchor = anchors.destinations[subject.resourceID] else {
-                            return false
-                        }
-                        return ResourceMiningFeedbackV1.anchorIsVisible(proxy[anchor], in: bounds)
-                    }
-                    if ResourceMiningFeedbackV1.anchorIsVisible(start, in: bounds),
-                       allDestinationsVisible {
+                ZStack {
+                    ForEach(store.worldMiningFeedbackPresentations, id: \.batchID) { group in
+                      if let presentation = ResourceMiningFeedbackV1.make(from: group),
+                         let viewportAnchor = anchors.mapViewport,
+                         let sourceUnitFrame = anchors.sourceUnitFrames[group.sourcePoint] {
+                        let viewport = proxy[viewportAnchor]
+                        let source = CGRect(
+                            x: viewport.minX + sourceUnitFrame.minX * viewport.width,
+                            y: viewport.minY + sourceUnitFrame.minY * viewport.height,
+                            width: sourceUnitFrame.width * viewport.width,
+                            height: sourceUnitFrame.height * viewport.height)
                         ResourceMiningFeedbackOverlay(
                             presentation: presentation,
-                            start: start,
-                            destination: { proxy[anchors.destinations[$0]!] },
+                            sourceTile: source,
+                            mapViewport: viewport,
                             startedAtMonotonicTime: group.startedAtMonotonicTime,
                             onFinished: {
                                 store.finishWorldMiningFeedback(expectedBatchID: group.batchID)
                             }
                         )
-                    } else {
+#if DEBUG
+                        .onAppear {
+                            MiningFeedbackLayoutMeasurement.latestBatchID = group.batchID
+                            MiningFeedbackLayoutMeasurement.latestSourceTile = source
+                            MiningFeedbackLayoutMeasurement.latestMapViewport = viewport
+                        }
+#endif
+                      } else {
                         Color.clear.task(id: group.batchID) {
+                            // Missing geometry owns no fallback coordinate and draws nothing. Keep
+                            // the transient receipt alive for its ordinary local lifetime so an
+                            // initial empty SwiftUI preference pass cannot consume it before map
+                            // layout publishes the source tile; genuinely missing geometry simply
+                            // remains invisible and expires normally.
+                            let now = DispatchTime.now().uptimeNanoseconds
+                            let elapsed = Double(now &- min(now, group.startedAtMonotonicTime)) / 1_000_000
+                            let remaining = max(0, ResourceMiningFeedbackV1.durationMilliseconds - elapsed)
+                            try? await Task.sleep(nanoseconds: UInt64(remaining * 1_000_000))
+                            guard !Task.isCancelled else { return }
                             store.finishWorldMiningFeedback(expectedBatchID: group.batchID)
                         }
+                      }
                     }
                 }
             }
