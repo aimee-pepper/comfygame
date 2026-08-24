@@ -69,7 +69,9 @@ struct WorldArrivalView: View {
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .background(PixelUITheme.screen.ignoresSafeArea())
         }
+#if DEBUG
         .preference(key: DebugBugReporterSuppressedPreferenceKey.self, value: true)
+#endif
     }
 
     @ViewBuilder
