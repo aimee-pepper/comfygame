@@ -1,6 +1,108 @@
 import SwiftUI
 import UIKit
 
+/// Lookup-only adapter for the promoted complete exploration-map PNG identities.
+/// Geometry and animation frames are authored in the bundles; native code selects keys only.
+@MainActor
+enum ExplorationMapIdentityPack {
+    private struct Manifest: Decodable {
+        struct Asset: Decodable { let path: String; let width: Int; let height: Int; let frameCount: Int? }
+        let assetsByKey: [String: Asset]
+    }
+
+    private struct Pack {
+        let root: URL
+        let assets: [String: Manifest.Asset]
+    }
+
+    private static let packs: [Pack] = [
+        "ExplorationMapIdentities-v1", "ExplorationLooseItems-v1", "ExplorationCatalogueObjects-v1"
+    ].compactMap { name in
+        guard let root = Bundle.main.url(forResource: name, withExtension: nil),
+              let data = try? Data(contentsOf: root.appendingPathComponent("manifest.json")),
+              let manifest = try? JSONDecoder().decode(Manifest.self, from: data) else { return nil }
+        return Pack(root: root, assets: manifest.assetsByKey)
+    }
+    private static let cache = NSCache<NSString, UIImage>()
+
+    static var allKeys: [String] { packs.flatMap(\.assets.keys).sorted() }
+
+    static func image(key: String) -> UIImage? {
+        if let cached = cache.object(forKey: key as NSString) { return cached }
+        for pack in packs {
+            guard let entry = pack.assets[key], entry.width > 0, entry.height > 0,
+                  let image = UIImage(contentsOfFile: pack.root.appendingPathComponent(entry.path).path)
+            else { continue }
+            cache.setObject(image, forKey: key as NSString)
+            return image
+        }
+        return nil
+    }
+
+    static func frameKey(identity: String, state: String = "ordinary", tick: Int,
+                         remembered: Bool) -> String? {
+        let prefix = "\(identity)/\(state)/frame-"
+        let keys = allKeys.filter { $0.hasPrefix(prefix) }
+        guard !keys.isEmpty else { return nil }
+        return keys[remembered ? 0 : abs(tick) % keys.count]
+    }
+}
+
+/// Pure key adapter. It never manufactures pixels and returns nil for every unpromoted identity.
+@MainActor
+enum ExplorationMapIdentityResolver {
+    static func key(tile: Tile, site: SiteDef?, siteLooted: Bool?, hasLooseWorldPage: Bool,
+                    tick: Int, disclosed: Bool, remembered: Bool) -> String? {
+        guard disclosed else { return nil }
+        if hasLooseWorldPage { return "loose_world_page/ordinary/frame-0" }
+        switch tile.content {
+        case .item(let stack):
+            let id = stack.catalogID.rawValue
+            let candidates = stack.identified
+                ? ["catalogue-item/\(id)/identified", "catalogue-item/\(id)"]
+                : ["catalogue-item/unknown-curio", "catalogue-item/\(id)"]
+            return candidates.first { ExplorationMapIdentityPack.image(key: $0) != nil }
+        case .hazard:
+            return ExplorationMapIdentityPack.frameKey(identity: "hazard", tick: tick,
+                                                       remembered: remembered)
+        case .portal(let isEntry):
+            return ExplorationMapIdentityPack.frameKey(
+                identity: isEntry ? "entry_portal" : "exit_portal", tick: tick,
+                remembered: remembered)
+        case .lockedCache: return "locked_cache/ordinary/frame-0"
+        case .diaryPage: return "diary_page/ordinary/frame-0"
+        case .foundWriting: return "found_writing/ordinary/frame-0"
+        case .site:
+            guard let site else { return nil }
+            let state = site.id.rawValue == "natural_anchor"
+                ? "ordinary" : (siteLooted == true ? "looted" : "unlooted")
+            return ExplorationMapIdentityPack.frameKey(identity: site.id.rawValue, state: state,
+                                                       tick: tick, remembered: remembered)
+        default: return nil
+        }
+    }
+}
+
+enum ExplorationMapIdentityLayout {
+    static let mapCanvas = CGSize(width: 16, height: 19)
+    static let mapPivot = CGPoint(x: 8, y: 18)
+    static let minimapCanvas = CGSize(width: 7, height: 7)
+
+    static func mapAssetSize(tileSide: CGFloat) -> CGSize {
+        CGSize(width: tileSide, height: tileSide * mapCanvas.height / mapCanvas.width)
+    }
+}
+
+struct ExplorationMapPixelIdentity: View {
+    let key: String
+    var body: some View {
+        if let image = ExplorationMapIdentityPack.image(key: key) {
+            Image(uiImage: image).resizable().interpolation(.none).antialiased(false)
+                .accessibilityHidden(true)
+        }
+    }
+}
+
 /// Native adapter contract for the accepted TerrainProductionPack-v1.
 /// Gameplay owns facts. The pack owns the reviewed 16×16 semantic terrain layers.
 enum MapAssetContract {
@@ -222,6 +324,26 @@ struct MapTileArtRequest {
     }()
 
     static func productionPack() -> TerrainProductionPack { pack }
+
+    static var explorationMapAssetKeys: [String] { ExplorationMapIdentityPack.allKeys }
+
+    static func explorationMapImage(_ key: String) -> UIImage? {
+        ExplorationMapIdentityPack.image(key: key)
+    }
+
+    static func explorationMapFrameKey(identity: String, state: String = "ordinary",
+                                       tick: Int, remembered: Bool) -> String? {
+        ExplorationMapIdentityPack.frameKey(identity: identity, state: state, tick: tick,
+                                            remembered: remembered)
+    }
+
+    static func explorationMapKey(tile: Tile, site: SiteDef? = nil, siteLooted: Bool? = nil,
+                                  hasLooseWorldPage: Bool = false, tick: Int = 0,
+                                  disclosed: Bool = true, remembered: Bool = false) -> String? {
+        ExplorationMapIdentityResolver.key(tile: tile, site: site, siteLooted: siteLooted,
+                                           hasLooseWorldPage: hasLooseWorldPage, tick: tick,
+                                           disclosed: disclosed, remembered: remembered)
+    }
 
     static func productionRequest(
         ground: GroundType, point: GridPoint = .init(x: 0, y: 0), visualSeed: UInt64 = 404,

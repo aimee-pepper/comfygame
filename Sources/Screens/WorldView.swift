@@ -1660,12 +1660,14 @@ private struct MapGrid: View {
                                      fogBoundaryEdges: presentation.fogBoundaryEdges,
                                      enemy: enemy(at: point, visibility: currentVisibility),
                                      site: showsStationaryContents ? site(at: point) : nil,
+									 siteLooted: showsStationaryContents ? placedSite(at: point)?.isLooted : nil,
                                      hasLooseWorldPage: showsStationaryContents
                                         && run.offeredWorldPages.contains {
                                             $0.fieldProvenance?.position == point
                                         },
                                      isPlayer: point == run.playerPosition,
                                      side: side,
+									 presentationTick: terrainClock.tick,
                                      useSimpleRenderer: simpleRenderer)
                                 .onTapGesture { onTap(point) }
                         }
@@ -1731,6 +1733,10 @@ private struct MapGrid: View {
 
     private func site(at point: GridPoint) -> SiteDef? {
         run.sites.first { $0.position == point }?.definition
+    }
+
+    private func placedSite(at point: GridPoint) -> PlacedSite? {
+        run.sites.first { $0.position == point }
     }
 }
 
@@ -1914,9 +1920,11 @@ private struct TileView: View {
     /// Resolved by the caller: the tile only stores an instance id, and the grid is the one place
     /// that has the run to look it up in.
     let site: SiteDef?
+	let siteLooted: Bool?
     let hasLooseWorldPage: Bool
     let isPlayer: Bool
     let side: CGFloat
+	let presentationTick: Int
     let useSimpleRenderer: Bool
 
     var body: some View {
@@ -1963,9 +1971,16 @@ private struct TileView: View {
                     )
                     .frame(width: side * 0.72, height: side * 0.72)
                 } else if let symbol {
-                    Image(systemName: symbol)
-                        .font(.system(size: side * (isPlayer ? 0.46 : 0.54), weight: isPlayer ? .bold : .regular))
-                        .foregroundStyle(tint)
+					if let assetKey, let image = ExplorationMapIdentityPack.image(key: assetKey) {
+						let assetSize = ExplorationMapIdentityLayout.mapAssetSize(tileSide: side)
+						Image(uiImage: image).resizable().interpolation(.none).antialiased(false)
+							.frame(width: assetSize.width, height: assetSize.height)
+							.frame(width: side, height: side, alignment: .bottom)
+					} else {
+						Image(systemName: symbol)
+							.font(.system(size: side * (isPlayer ? 0.46 : 0.54), weight: isPlayer ? .bold : .regular))
+							.foregroundStyle(tint)
+					}
                 }
             }
             .frame(width: side, height: side)
@@ -2044,6 +2059,14 @@ private struct TileView: View {
         case .traveller: return nil
         }
     }
+
+	private var assetKey: String? {
+		guard !isPlayer, enemy == nil, showsStationaryContents else { return nil }
+		return ExplorationMapIdentityResolver.key(
+			tile: tile, site: site, siteLooted: siteLooted,
+			hasLooseWorldPage: hasLooseWorldPage, tick: presentationTick,
+			disclosed: showsStationaryContents, remembered: isRememberedTerrain)
+	}
 
     private var tint: Color {
         if isPlayer { return Palette.mapFloor }

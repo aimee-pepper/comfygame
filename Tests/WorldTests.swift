@@ -699,6 +699,70 @@ final class WorldTests: XCTestCase {
         }
     }
 
+    @MainActor
+    func testExplorationMapFinalArtNative368Evidence() throws {
+        let store = GameStore(io: .temporary(name: "exploration-art-\(UUID().uuidString)"))
+        for lesson in TutorialLessonID.allCases {
+            store.completeTutorial(lesson, fact: "visual_fixture")
+        }
+        XCTAssertTrue(store.bindAndDepart(
+            worldPageInstanceID: WorldPageCatalog.earthlikeTestInstance.id),
+            "evidence must exercise a real bound world with its production terrain receipt")
+        store.mutate("test: exploration final art") { saved in
+            guard var run = saved.worlds.activeRun else { return }
+            let center = GridPoint(x: run.map.width / 2, y: run.map.height / 2)
+            run.playerPosition = center
+            run.tuning.baseVisionRadius = max(run.map.width, run.map.height)
+            for point in run.map.allPoints {
+                run.map[point].isRevealed = true
+                run.map[point].elevation = 0
+            }
+            let nearby = run.map.allPoints.filter {
+                $0 != center && abs($0.x - center.x) <= 5 && abs($0.y - center.y) <= 5
+            }.sorted { ($0.y, $0.x) < ($1.y, $1.x) }
+            let fixed: [TileContent] = [
+                .hazard, .portal(isEntry: true), .portal(isEntry: false), .lockedCache,
+                .diaryPage("evidence-page"), .foundWriting("evidence-writing"),
+                .item(ItemStack(id: InstanceID(rawValue: 80_001), catalogID: "field_maul")),
+                .item(ItemStack(id: InstanceID(rawValue: 80_002), catalogID: "salve")),
+            ]
+            for (point, content) in zip(nearby, fixed) { run.map[point].content = content }
+            run.sites = []
+            for (index, pair) in zip(ContentCatalog.shared.sites.indices,
+                                     zip(ContentCatalog.shared.sites, nearby.dropFirst(fixed.count))) {
+                let (site, point) = pair
+                let instance = InstanceID(rawValue: UInt64(90_000 + index))
+                run.sites.append(PlacedSite(id: instance, siteID: site.id, position: point,
+                                            isLooted: index.isMultiple(of: 2),
+                                            searchTurnsRemaining: 0))
+                run.map[point].content = .site(instance)
+            }
+            saved.worlds.activeRun = run
+        }
+        var rendered: [UIImage] = []
+        for scheme in [ColorScheme.light, .dark] {
+            let controller = UIHostingController(rootView: WorldView().environmentObject(store)
+                .environment(\.colorScheme, scheme).frame(width: 368, height: 800))
+            let window = UIWindow(frame: CGRect(x: 0, y: 0, width: 368, height: 800))
+            window.rootViewController = controller; window.makeKeyAndVisible()
+            controller.view.frame = window.bounds; controller.view.layoutIfNeeded()
+            RunLoop.main.run(until: Date().addingTimeInterval(0.1))
+            let image = UIGraphicsImageRenderer(size: window.bounds.size).image { _ in
+                controller.view.drawHierarchy(in: controller.view.bounds, afterScreenUpdates: true)
+            }
+            window.isHidden = true
+            XCTAssertEqual(image.size, CGSize(width: 368, height: 800))
+            rendered.append(image)
+            let attachment = XCTAttachment(image: image)
+            attachment.name = "exploration-map-final-art-\(scheme == .light ? "light" : "dark")-368x800"
+            attachment.lifetime = .keepAlways; add(attachment)
+        }
+        let grayscale = try XCTUnwrap(literalGrayscale(rendered[1]))
+        let attachment = XCTAttachment(image: grayscale)
+        attachment.name = "exploration-map-final-art-grayscale-368x800"
+        attachment.lifetime = .keepAlways; add(attachment)
+    }
+
     private let owned = Set(ContentCatalog.shared.starterSymbolIDs)
 
     private func book(_ symbols: [SlotID: SymbolID]) -> BoundBook {
@@ -1341,6 +1405,124 @@ final class WorldTests: XCTestCase {
         XCTAssertNil(MinimapDisclosure.marker(for: Tile(isRevealed: false), enemy: apex))
         XCTAssertEqual(MinimapDisclosure.marker(for: Tile(isRevealed: true), enemy: ordinary), .encounter)
         XCTAssertEqual(MinimapDisclosure.marker(for: Tile(isRevealed: true), enemy: apex), .apex)
+    }
+
+    @MainActor
+    func testExplorationMapPromotionExhaustivelyLoadsOnlyApprovedKeysAndFrames() throws {
+        let root = URL(fileURLWithPath: #filePath).deletingLastPathComponent()
+            .deletingLastPathComponent()
+        let receiptURL = root.appendingPathComponent(
+            "AssetLab/integration/exploration-map-final-art-promotion-v1/promotion-receipt.json")
+        let json = try XCTUnwrap(try JSONSerialization.jsonObject(with: Data(contentsOf: receiptURL))
+            as? [String: Any])
+        XCTAssertEqual(json["status"] as? String, "aimee-approved-for-native-integration")
+        XCTAssertEqual(json["integrationReady"] as? Bool, true)
+        let packs = try XCTUnwrap(json["packs"] as? [String: [String: Any]])
+        let approved = packs.values.flatMap { $0["approvedStableKeys"] as? [String] ?? [] }.sorted()
+        XCTAssertEqual(approved.count, 154)
+        XCTAssertEqual(MapAssetTestSupport.explorationMapAssetKeys, approved)
+
+        for key in approved {
+            let image = try XCTUnwrap(MapAssetTestSupport.explorationMapImage(key), key)
+            let expected = key.hasPrefix("minimap/") ? CGSize(width: 7, height: 7)
+                : CGSize(width: 16, height: 19)
+            XCTAssertEqual(image.size, expected, key)
+        }
+        for blocked in ["traveller", "creature", "apex", "binder/", "quill"] {
+            XCTAssertFalse(approved.contains { $0.localizedCaseInsensitiveContains(blocked) }, blocked)
+        }
+
+        XCTAssertEqual(MapAssetTestSupport.explorationMapFrameKey(
+            identity: "entry_portal", tick: 0, remembered: false),
+                       "entry_portal/ordinary/frame-0")
+        XCTAssertEqual(MapAssetTestSupport.explorationMapFrameKey(
+            identity: "entry_portal", tick: 1, remembered: false),
+                       "entry_portal/ordinary/frame-1")
+        XCTAssertEqual(MapAssetTestSupport.explorationMapFrameKey(
+            identity: "entry_portal", tick: 23, remembered: true),
+                       "entry_portal/ordinary/frame-0")
+        XCTAssertNil(MapAssetTestSupport.explorationMapFrameKey(
+            identity: "named_traveller", tick: 0, remembered: false))
+        XCTAssertNil(MapAssetTestSupport.explorationMapImage("unapproved/missing"))
+
+        let tileSide: CGFloat = 16
+        let assetSize = ExplorationMapIdentityLayout.mapAssetSize(tileSide: tileSide)
+        let bottomAligned = CGRect(x: 0, y: tileSide - assetSize.height,
+                                   width: assetSize.width, height: assetSize.height)
+        XCTAssertEqual(assetSize, CGSize(width: 16, height: 19))
+        XCTAssertEqual(bottomAligned.maxY, tileSide, "authored bottom pivot owns tile baseline")
+        XCTAssertEqual(bottomAligned.minY, -3, "three authored overhang rows remain above tile")
+        XCTAssertEqual(ExplorationMapIdentityLayout.mapPivot, CGPoint(x: 8, y: 18))
+    }
+
+    @MainActor
+    func testExplorationMinimapUsesExactlySevenCategoryOnlyIdentities() throws {
+        let expected = ["minimap/cache/ordinary", "minimap/hazard/ordinary", "minimap/item",
+                        "minimap/page/ordinary", "minimap/portal/ordinary",
+                        "minimap/resource/ordinary", "minimap/site/ordinary"]
+        XCTAssertEqual(MapAssetTestSupport.explorationMapAssetKeys.filter {
+            $0.hasPrefix("minimap/")
+        }, expected)
+        for key in expected {
+            XCTAssertNotNil(MapAssetTestSupport.explorationMapImage(key))
+        }
+        let minimapCellSide = CGFloat(96) / 11
+        XCTAssertEqual(ExplorationMapIdentityLayout.minimapCanvas, CGSize(width: 7, height: 7))
+        XCTAssertLessThanOrEqual(ExplorationMapIdentityLayout.minimapCanvas.width, minimapCellSide)
+    }
+
+    @MainActor
+    func testExplorationMapResolverPreservesVisibilityIdentityAndPersistedSiteState() throws {
+        XCTAssertNil(MapAssetTestSupport.explorationMapKey(
+            tile: Tile(content: .hazard, isRevealed: false), tick: 2, disclosed: false))
+        XCTAssertEqual(MapAssetTestSupport.explorationMapKey(
+            tile: Tile(content: .hazard, isRevealed: true), tick: 2),
+                       "hazard/ordinary/frame-2")
+        XCTAssertEqual(MapAssetTestSupport.explorationMapKey(
+            tile: Tile(content: .hazard, isRevealed: true), tick: 2, remembered: true),
+                       "hazard/ordinary/frame-0")
+        XCTAssertEqual(MapAssetTestSupport.explorationMapKey(
+            tile: Tile(), hasLooseWorldPage: true), "loose_world_page/ordinary/frame-0")
+
+        XCTAssertEqual(ContentCatalog.shared.sites.count, 9)
+        for (offset, site) in ContentCatalog.shared.sites.enumerated() {
+            let tile = Tile(content: .site(InstanceID(rawValue: UInt64(offset + 1))),
+                            isRevealed: true)
+            if site.providesNaturalAnchor {
+                XCTAssertEqual(MapAssetTestSupport.explorationMapKey(
+                    tile: tile, site: site, siteLooted: true, tick: 2),
+                               "natural_anchor/ordinary/frame-2")
+            } else {
+                XCTAssertNotNil(MapAssetTestSupport.explorationMapKey(
+                    tile: tile, site: site, siteLooted: false, tick: 0))
+                XCTAssertNotNil(MapAssetTestSupport.explorationMapKey(
+                    tile: tile, site: site, siteLooted: true, tick: 0))
+                XCTAssertTrue(MapAssetTestSupport.explorationMapKey(
+                    tile: tile, site: site, siteLooted: false, tick: 0)?.contains("/unlooted/") == true)
+                XCTAssertTrue(MapAssetTestSupport.explorationMapKey(
+                    tile: tile, site: site, siteLooted: true, tick: 0)?.contains("/looted/") == true)
+            }
+        }
+    }
+
+    @MainActor
+    func testExplorationMapResolverCoversEveryCatalogueObjectAndOpaqueUnknownIdentity() {
+        XCTAssertEqual(ContentCatalog.shared.items.count, 102)
+        for (offset, item) in ContentCatalog.shared.items.enumerated() {
+            let stack = ItemStack(id: InstanceID(rawValue: UInt64(10_000 + offset)),
+                                  catalogID: item.id, identified: true)
+            let key = MapAssetTestSupport.explorationMapKey(
+                tile: Tile(content: .item(stack), isRevealed: true))
+            XCTAssertNotNil(key, item.id.rawValue)
+            XCTAssertTrue(key?.contains(item.id.rawValue) == true, item.id.rawValue)
+        }
+        let hiddenIdentity = ItemStack(id: InstanceID(rawValue: 99), catalogID: "field_maul",
+                                       identified: false)
+        XCTAssertEqual(MapAssetTestSupport.explorationMapKey(
+            tile: Tile(content: .item(hiddenIdentity), isRevealed: true)),
+                       "catalogue-item/unknown-curio")
+        XCTAssertNil(MapAssetTestSupport.explorationMapKey(
+            tile: Tile(content: .traveller("mara"), isRevealed: true)))
     }
 
     func testMinimapTerrainStyleIsOpaqueNonblackAndIndependentOfRememberedContent() {

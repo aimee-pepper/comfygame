@@ -41,25 +41,19 @@ struct MinimapView: View {
                 }
             }
         } symbols: {
-            Image(systemName: "arrow.down.left.circle.fill")
-                .font(.system(size: 10, weight: .bold))
-                .foregroundStyle(.blue)
-                .tag("portal")
-            Image(systemName: "doc.fill")
-                .font(.system(size: 10, weight: .bold))
-                .foregroundStyle(.purple)
-                .tag("page")
+            minimapIdentity("minimap/portal/ordinary", fallback: "arrow.down.left.circle.fill", tag: "portal")
+            minimapIdentity("minimap/page/ordinary", fallback: "doc.fill", tag: "page")
             Image(systemName: "crown.fill")
                 .font(.system(size: 10, weight: .bold))
                 .foregroundStyle(.orange)
                 .tag("apex")
-            Image(systemName: "building.columns.fill").font(.system(size: 9, weight: .bold)).foregroundStyle(.brown).tag("site")
-            Image(systemName: "cube.fill").font(.system(size: 8, weight: .bold)).foregroundStyle(.teal).tag("resource")
-            Image(systemName: "shippingbox.fill").font(.system(size: 8, weight: .bold)).foregroundStyle(.yellow).tag("item")
+            minimapIdentity("minimap/site/ordinary", fallback: "building.columns.fill", tag: "site")
+            minimapIdentity("minimap/resource/ordinary", fallback: "cube.fill", tag: "resource")
+            minimapIdentity("minimap/item", fallback: "shippingbox.fill", tag: "item")
             Image(systemName: "person.fill").font(.system(size: 9, weight: .bold)).foregroundStyle(.green).tag("traveller")
             Image(systemName: "pawprint.fill").font(.system(size: 9, weight: .bold)).foregroundStyle(.red).tag("encounter")
-            Image(systemName: "lock.fill").font(.system(size: 8, weight: .bold)).foregroundStyle(.purple).tag("cache")
-            Image(systemName: "exclamationmark.triangle.fill").font(.system(size: 8, weight: .bold)).foregroundStyle(.orange).tag("hazard")
+            minimapIdentity("minimap/cache/ordinary", fallback: "lock.fill", tag: "cache")
+            minimapIdentity("minimap/hazard/ordinary", fallback: "exclamationmark.triangle.fill", tag: "hazard")
         }
         .aspectRatio(1, contentMode: .fit)
         .background(Color.black)
@@ -68,6 +62,16 @@ struct MinimapView: View {
         }
         .accessibilityLabel("Map overview")
         .accessibilityIdentifier("world.minimap")
+    }
+
+    @ViewBuilder private func minimapIdentity(_ key: String, fallback: String,
+                                               tag: String) -> some View {
+        if let image = ExplorationMapIdentityPack.image(key: key) {
+            Image(uiImage: image).resizable().interpolation(.none).antialiased(false)
+                .frame(width: 7, height: 7).tag(tag)
+        } else {
+            Image(systemName: fallback).font(.system(size: 9, weight: .bold)).tag(tag)
+        }
     }
 
     private func draw(_ symbol: String, at point: GridPoint, side: CGFloat,
