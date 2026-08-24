@@ -1,0 +1,272 @@
+{
+  "schemaVersion": "traveller-adjacent-speech-source-receipt-v1",
+  "status": "candidate-unapproved",
+  "integrationReady": false,
+  "selectionRule": "opening-final-complete-direct-speech;otherwise-first-question-reply-with-complete-direct-speech/first-span",
+  "pairedQuotes": [
+    "straight-double",
+    "curly-double"
+  ],
+  "forbiddenSources": [
+    "ask",
+    "offer",
+    "accepted",
+    "declined",
+    "calling",
+    "blurb",
+    "signature",
+    "unquoted-narration"
+  ],
+  "effectiveMeetingCorpusFingerprint": "0aae8a49b89e9ef66f6d870a7c84bcd0ed81c810d35b3e8eec9cebd8a6ca47a8",
+  "sourceCatalogue": {
+    "file": "Sources/Content/Data/travellers.json",
+    "sha256": "ae57096a78141052f11f1b8a0baa5246fb00bbf7543394f978fabc8f02944597"
+  },
+  "generatedOverlay": {
+    "file": "Sources/Content/DraftMeetingCorpus.generated.swift",
+    "sha256": "26bbacf0dcba9ab0302d0b41d571fcf5d6d7cb0d42d15cd0c4ad4ab8a9c6fc2e",
+    "authoredSourceFingerprint": "eef2a120a69d4bfe",
+    "sourceFiles": [
+      "traveller-meetings-early-hinge-review.md",
+      "traveller-meetings-mature-core-review.md",
+      "traveller-meetings-specialists-review.md",
+      "traveller-meetings-transformation-endgame-review.md"
+    ],
+    "meetingCount": 23
+  },
+  "rows": [
+    {
+      "travellerID": "ashe",
+      "displayName": "Ashe",
+      "sourceKey": "opening:last-direct-speech",
+      "text": "“That is permission for this moment, from that direction.”",
+      "effectiveMeetingSHA256": "df075e747e5ac89297a746006c5829fcad0eeb81eedef72fec4df4a17002a2a6",
+      "effectiveMeetingCorpusFingerprint": "0aae8a49b89e9ef66f6d870a7c84bcd0ed81c810d35b3e8eec9cebd8a6ca47a8"
+    },
+    {
+      "travellerID": "auber",
+      "displayName": "Auber",
+      "sourceKey": "opening:last-direct-speech",
+      "text": "“This is the interesting half. Nobody asks to taste this one.”",
+      "effectiveMeetingSHA256": "debf812bc5c9220145a0d1f994e22626625c0e31f9a8674cd67ca98ea45feb83",
+      "effectiveMeetingCorpusFingerprint": "0aae8a49b89e9ef66f6d870a7c84bcd0ed81c810d35b3e8eec9cebd8a6ca47a8"
+    },
+    {
+      "travellerID": "bracken",
+      "displayName": "Bracken",
+      "sourceKey": "opening:last-direct-speech",
+      "text": "“The wearer was less fortunate.”",
+      "effectiveMeetingSHA256": "04705485c92ac983735fbd8cedafc6a87b4893f23ba7f3249cdcb21f2ac191d2",
+      "effectiveMeetingCorpusFingerprint": "0aae8a49b89e9ef66f6d870a7c84bcd0ed81c810d35b3e8eec9cebd8a6ca47a8"
+    },
+    {
+      "travellerID": "bryn",
+      "displayName": "Bryn",
+      "sourceKey": "opening:last-direct-speech",
+      "text": "“I'm keeping this one open until they're clear.”",
+      "effectiveMeetingSHA256": "c412c4f890ff2b2685a51701d498945e246c63fbb02ce38baaa00c181a9ce3a0",
+      "effectiveMeetingCorpusFingerprint": "0aae8a49b89e9ef66f6d870a7c84bcd0ed81c810d35b3e8eec9cebd8a6ca47a8"
+    },
+    {
+      "travellerID": "corrin",
+      "displayName": "Corrin",
+      "sourceKey": "opening:last-direct-speech",
+      "text": "“The shoulder that has to meet it eight hundred times is less theoretical.”",
+      "effectiveMeetingSHA256": "ccf30c7031dbc5f611aa09874a78de0a996334fd1f962512e168dec653c58efb",
+      "effectiveMeetingCorpusFingerprint": "0aae8a49b89e9ef66f6d870a7c84bcd0ed81c810d35b3e8eec9cebd8a6ca47a8"
+    },
+    {
+      "travellerID": "dagg",
+      "displayName": "Dagg",
+      "sourceKey": "exchange:dagg.one_strike:first-direct-speech",
+      "text": "“Because I moved the slab.”",
+      "effectiveMeetingSHA256": "f4623978ca70997e913fcf103cab711062ec0b94f2a21d1b0cb1860ec871b420",
+      "effectiveMeetingCorpusFingerprint": "0aae8a49b89e9ef66f6d870a7c84bcd0ed81c810d35b3e8eec9cebd8a6ca47a8"
+    },
+    {
+      "travellerID": "edren",
+      "displayName": "Edren",
+      "sourceKey": "opening:last-direct-speech",
+      "text": "\"Mind where you tread. There's a floor about eight inches down and I've nearly got the edge of it.\"",
+      "effectiveMeetingSHA256": "b0d1d67181d0e4828c40124180f0a106ecdf2f85a578d0da2374150620eb4513",
+      "effectiveMeetingCorpusFingerprint": "0aae8a49b89e9ef66f6d870a7c84bcd0ed81c810d35b3e8eec9cebd8a6ca47a8"
+    },
+    {
+      "travellerID": "fen",
+      "displayName": "Fen",
+      "sourceKey": "opening:last-direct-speech",
+      "text": "“It stretched. Fine for a sling, poor for a bow.”",
+      "effectiveMeetingSHA256": "8573ec55e1a05ad80f4b3d9b2f4a6ca5da936b96460d9a94a0cc95b57f182ba3",
+      "effectiveMeetingCorpusFingerprint": "0aae8a49b89e9ef66f6d870a7c84bcd0ed81c810d35b3e8eec9cebd8a6ca47a8"
+    },
+    {
+      "travellerID": "grimmond",
+      "displayName": "Grimmond",
+      "sourceKey": "opening:last-direct-speech",
+      "text": "“It'll still crush you.”",
+      "effectiveMeetingSHA256": "8043240fcc2622cfb21790c6c1f5e88fff4ad2cea77d5045c8bac33be24bed0c",
+      "effectiveMeetingCorpusFingerprint": "0aae8a49b89e9ef66f6d870a7c84bcd0ed81c810d35b3e8eec9cebd8a6ca47a8"
+    },
+    {
+      "travellerID": "halloway",
+      "displayName": "Halloway",
+      "sourceKey": "opening:last-direct-speech",
+      "text": "\"Don't crowd it. It's shy.\"",
+      "effectiveMeetingSHA256": "9ec1e1bbbdccc85580d369281d542d0eefacf89d2b3218c6bbf5cbeca8d32c53",
+      "effectiveMeetingCorpusFingerprint": "0aae8a49b89e9ef66f6d870a7c84bcd0ed81c810d35b3e8eec9cebd8a6ca47a8"
+    },
+    {
+      "travellerID": "isolde",
+      "displayName": "Isolde",
+      "sourceKey": "opening:last-direct-speech",
+      "text": "\"Don't speak for a moment. I'm nearly at the bottom.\"",
+      "effectiveMeetingSHA256": "e939ec1f68f54eb0d12035b720e444f06e5048959dddcc15ece39dbed3fbd2de",
+      "effectiveMeetingCorpusFingerprint": "0aae8a49b89e9ef66f6d870a7c84bcd0ed81c810d35b3e8eec9cebd8a6ca47a8"
+    },
+    {
+      "travellerID": "kestrel",
+      "displayName": "Kestrel",
+      "sourceKey": "opening:last-direct-speech",
+      "text": "“That is not yet the animal.”",
+      "effectiveMeetingSHA256": "6bacd9c48f210187b0351288f3404b415e3fcb9078910ec36c2d6fe0d4f5a57d",
+      "effectiveMeetingCorpusFingerprint": "0aae8a49b89e9ef66f6d870a7c84bcd0ed81c810d35b3e8eec9cebd8a6ca47a8"
+    },
+    {
+      "travellerID": "lys",
+      "displayName": "Lys",
+      "sourceKey": "opening:last-direct-speech",
+      "text": "“Only the account of how one became the other.”",
+      "effectiveMeetingSHA256": "5eb41f6447e4250ae0a0f941970c1add18b3c5750306a281546fcc935c1a122a",
+      "effectiveMeetingCorpusFingerprint": "0aae8a49b89e9ef66f6d870a7c84bcd0ed81c810d35b3e8eec9cebd8a6ca47a8"
+    },
+    {
+      "travellerID": "mara",
+      "displayName": "Mara",
+      "sourceKey": "opening:last-direct-speech",
+      "text": "\"Don't move. You're the first fixed point I've had in a long while.\"",
+      "effectiveMeetingSHA256": "d51d09f4027676565b8fbe5e9bbb85fdeb1196f570bdd48e71069fd090def1fa",
+      "effectiveMeetingCorpusFingerprint": "0aae8a49b89e9ef66f6d870a7c84bcd0ed81c810d35b3e8eec9cebd8a6ca47a8"
+    },
+    {
+      "travellerID": "marrick",
+      "displayName": "Marrick",
+      "sourceKey": "opening:last-direct-speech",
+      "text": "“The sixth couldn't reach their place. We kept calling that a successful formation.”",
+      "effectiveMeetingSHA256": "8a1ebd1ce688ac2296db18cfae446e4b05572df2b9e2f6a32e99fd8390843c79",
+      "effectiveMeetingCorpusFingerprint": "0aae8a49b89e9ef66f6d870a7c84bcd0ed81c810d35b3e8eec9cebd8a6ca47a8"
+    },
+    {
+      "travellerID": "maud",
+      "displayName": "Maud",
+      "sourceKey": "opening:last-direct-speech",
+      "text": "“That is the first measurement the metal could not give me.”",
+      "effectiveMeetingSHA256": "3a8b8fbb47c484245b7ab283026f98d610b764ece89e42f553b7503117b5191f",
+      "effectiveMeetingCorpusFingerprint": "0aae8a49b89e9ef66f6d870a7c84bcd0ed81c810d35b3e8eec9cebd8a6ca47a8"
+    },
+    {
+      "travellerID": "nessa",
+      "displayName": "Nessa",
+      "sourceKey": "opening:last-direct-speech",
+      "text": "“Different instructions. The old labels nearly made that expensive.”",
+      "effectiveMeetingSHA256": "817ad59bf22e09162822c5eb49843decdb7e93ba9dfc2c5af2c32d30e56482d2",
+      "effectiveMeetingCorpusFingerprint": "0aae8a49b89e9ef66f6d870a7c84bcd0ed81c810d35b3e8eec9cebd8a6ca47a8"
+    },
+    {
+      "travellerID": "nine",
+      "displayName": "Nine",
+      "sourceKey": "opening:last-direct-speech",
+      "text": "“So is the revision.”",
+      "effectiveMeetingSHA256": "9ed7cdc2b08f6b97ef981b453ea4a4c751eace0bca4705d39fbc6745e29a2e78",
+      "effectiveMeetingCorpusFingerprint": "0aae8a49b89e9ef66f6d870a7c84bcd0ed81c810d35b3e8eec9cebd8a6ca47a8"
+    },
+    {
+      "travellerID": "noll",
+      "displayName": "Noll",
+      "sourceKey": "exchange:noll.join_left:first-direct-speech",
+      "text": "“I haven't finished checking why it failed.”",
+      "effectiveMeetingSHA256": "0fdd1c2977534ebf630fa6f097b5a6312c88ec1d20268bcdc15dc7e9ca6fcbd3",
+      "effectiveMeetingCorpusFingerprint": "0aae8a49b89e9ef66f6d870a7c84bcd0ed81c810d35b3e8eec9cebd8a6ca47a8"
+    },
+    {
+      "travellerID": "oda",
+      "displayName": "Oda",
+      "sourceKey": "opening:last-direct-speech",
+      "text": "“Approach corridor held. Marker four did not. Please stand exactly where you are while I determine which result matters.”",
+      "effectiveMeetingSHA256": "334fac283dce5ba9c77da391001055d5454835887846826d1e61fa78c175adc3",
+      "effectiveMeetingCorpusFingerprint": "0aae8a49b89e9ef66f6d870a7c84bcd0ed81c810d35b3e8eec9cebd8a6ca47a8"
+    },
+    {
+      "travellerID": "orsa",
+      "displayName": "Orsa",
+      "sourceKey": "opening:last-direct-speech",
+      "text": "“I repaired it, but I don't trust its opinion of taller guests.”",
+      "effectiveMeetingSHA256": "1bf6a1fbd3f48502c654386fc4b706e6d95f36fb7f029e9c0c0b8c1081c17eea",
+      "effectiveMeetingCorpusFingerprint": "0aae8a49b89e9ef66f6d870a7c84bcd0ed81c810d35b3e8eec9cebd8a6ca47a8"
+    },
+    {
+      "travellerID": "perren",
+      "displayName": "Perren",
+      "sourceKey": "opening:last-direct-speech",
+      "text": "“So is the decision about which relationship the repetition is allowed to prove.”",
+      "effectiveMeetingSHA256": "4c61886751c20d55427c87732f7d07875bdf02ed26ad38a26eeb58d74335c91d",
+      "effectiveMeetingCorpusFingerprint": "0aae8a49b89e9ef66f6d870a7c84bcd0ed81c810d35b3e8eec9cebd8a6ca47a8"
+    },
+    {
+      "travellerID": "rook",
+      "displayName": "Rook",
+      "sourceKey": "opening:last-direct-speech",
+      "text": "“It could not know what the line meant. That failure is mine.”",
+      "effectiveMeetingSHA256": "191fe3a8e836e4ebc67390c8d6e90142f510c07c6d491cbce89468cad964074f",
+      "effectiveMeetingCorpusFingerprint": "0aae8a49b89e9ef66f6d870a7c84bcd0ed81c810d35b3e8eec9cebd8a6ca47a8"
+    },
+    {
+      "travellerID": "sabine",
+      "displayName": "Sabine",
+      "sourceKey": "opening:last-direct-speech",
+      "text": "“Sorry. The twigs are doing excellent work, but they are terrible at introductions.”",
+      "effectiveMeetingSHA256": "4bf62942661213a9ade68f678e3ff80d459bbf9cfc493de7f1db97f7e57fd696",
+      "effectiveMeetingCorpusFingerprint": "0aae8a49b89e9ef66f6d870a7c84bcd0ed81c810d35b3e8eec9cebd8a6ca47a8"
+    },
+    {
+      "travellerID": "sela",
+      "displayName": "Sela",
+      "sourceKey": "opening:last-direct-speech",
+      "text": "\"Oh, good. Company. Keep up.\"",
+      "effectiveMeetingSHA256": "f66546fea888c195b758dcdf595983d60c5ea74083bab81a8e2d4e44ca9dd5be",
+      "effectiveMeetingCorpusFingerprint": "0aae8a49b89e9ef66f6d870a7c84bcd0ed81c810d35b3e8eec9cebd8a6ca47a8"
+    },
+    {
+      "travellerID": "talin",
+      "displayName": "Talin",
+      "sourceKey": "opening:last-direct-speech",
+      "text": "“The gap closes before I can recover.”",
+      "effectiveMeetingSHA256": "06e7055fe066ca3987222314d2f0286a9e2392c8e1ac7fae1b6f56af1a04dad9",
+      "effectiveMeetingCorpusFingerprint": "0aae8a49b89e9ef66f6d870a7c84bcd0ed81c810d35b3e8eec9cebd8a6ca47a8"
+    },
+    {
+      "travellerID": "tovin",
+      "displayName": "Tovin",
+      "sourceKey": "opening:last-direct-speech",
+      "text": "\"You wrote this. I can tell by the light — it's got somebody's opinion in it.\"",
+      "effectiveMeetingSHA256": "7919bf7abb291f33002d29fed108b2b041ad5957c2d795063a5d44d0f6de26e3",
+      "effectiveMeetingCorpusFingerprint": "0aae8a49b89e9ef66f6d870a7c84bcd0ed81c810d35b3e8eec9cebd8a6ca47a8"
+    },
+    {
+      "travellerID": "vance",
+      "displayName": "Vance",
+      "sourceKey": "opening:last-direct-speech",
+      "text": "“Good start. Not much of a sales pitch.”",
+      "effectiveMeetingSHA256": "57149e800ce8004db928e35a886afe32345dc09d92e2783821fdbd089cb9f15d",
+      "effectiveMeetingCorpusFingerprint": "0aae8a49b89e9ef66f6d870a7c84bcd0ed81c810d35b3e8eec9cebd8a6ca47a8"
+    },
+    {
+      "travellerID": "wren",
+      "displayName": "Wren",
+      "sourceKey": "opening:last-direct-speech",
+      "text": "“They can't. So we're using their route first.”",
+      "effectiveMeetingSHA256": "81631dded368522c0b15f586e8424c576cc76677d4d6682e9fd210e45f5c4b13",
+      "effectiveMeetingCorpusFingerprint": "0aae8a49b89e9ef66f6d870a7c84bcd0ed81c810d35b3e8eec9cebd8a6ca47a8"
+    }
+  ],
+  "canonicalBodySHA256": "0e44bae22895b261573594228961dd3f22871d38c3d8e9656f9b55be265ed8f0"
+}
