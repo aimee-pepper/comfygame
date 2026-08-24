@@ -1,0 +1,158 @@
+{
+  "schemaVersion": "player-visible-identity-native-audit-v1",
+  "status": "audit-and-native-handoff-only",
+  "nativeCodeModified": false,
+  "nativeSourceBaseline": "d50324844ea74874f1d4c6bd73c919f66e96644b",
+  "assetCheckpoint": "4e02b1e90cc5d886416b8175b57961566ebb8796",
+  "priority": "return-recap-first",
+  "classifications": {
+    "A": "final truthful asset profile and exact native selector already exist; integration seam only",
+    "B": "final identity exists only in another approved profile or current state/profile mapping remains unresolved",
+    "C": "no truthful final asset exists; do not fabricate or substitute"
+  },
+  "sourcePins": {
+    "returnRecap": {
+      "path": "Sources/App/RootView.swift",
+      "sha256": "cc0edf0b135b14501ddd590819267303c2d8b843327bf3cfeb452b3fe70db139"
+    },
+    "sharedItemTile": {
+      "path": "Sources/Screens/ItemGrid.swift",
+      "sha256": "a6c7f1b7e96a497f87f61b329fa0e8f376a03432fdbebff3de547fcfedd25a4f"
+    },
+    "sharedCatalogueAndMaterialResolver": {
+      "path": "Sources/Screens/CatalogueItemPixelIdentity.swift",
+      "sha256": "7a152b1cc7da1c7b9dfbe5abdc0a14548f1d1c89b207136896a31bb5d274ea37"
+    },
+    "blacksmith": {
+      "path": "Sources/Screens/BlacksmithView.swift",
+      "sha256": "8f3ce3b78e23c8f4088d4938fef8adf314bf567211e844942e6fa4ba9d48b8b7"
+    }
+  },
+  "authorityPins": {
+    "explorationPromotion": {
+      "path": "AssetLab/integration/exploration-map-final-art-promotion-v1/promotion-receipt.json",
+      "sha256": "51b9a0780171341e18c75576964bd8e3725e52d13fd2cad1847851ee41a51da2"
+    },
+    "resourceSprites": {
+      "path": "AssetLab/integration/resource-sprites-v1/manifest.json",
+      "sha256": "a3e3134b51225f2b4dad61380e2e425780571a099e97e1572f7164589f307c11",
+      "stableIdentities": 23
+    },
+    "mobGear": {
+      "path": "AssetLab/integration/mob-gear-sprites-v1/manifest.json",
+      "sha256": "1ad0b3729a36a732912ec63b28ae9ea190fdd3e42f512c1ff94fc5ce6aec7b98",
+      "materialKinds": 16,
+      "gearFamilies": 24
+    },
+    "gearMap": {
+      "path": "AssetLab/integration/exploration-loose-items-v1/runtime/manifest.json",
+      "sha256": "a0c8251adde90797a64d43ef87668af65d235b93b16a1aecb13f8aeb235ae48d",
+      "catalogueIDs": 75
+    },
+    "catalogueObjectMap": {
+      "path": "AssetLab/integration/exploration-catalogue-objects-v1/runtime/manifest.json",
+      "sha256": "71dcb608dae62dc6503f9333f0114ac6b9d75871f39a1c3f222b9645d027e239",
+      "catalogueIDs": 27
+    },
+    "looseRawEssence": {
+      "path": "AssetLab/integration/exploration-loose-essence-v1/promotion-receipt.json",
+      "sha256": "abe9fa779f6cbc14c808be1a2b5c303e8328ae95cb41df5181a5206ef8fcdcf9",
+      "integrationReady": true
+    }
+  },
+  "returnRecap": [
+    {
+      "family": "resource-receipts",
+      "count": 23,
+      "classification": "already-integrated",
+      "consumer": "ResourceIconTile -> ResourcePixelIdentity inventory profile",
+      "requiredSeam": "none; preserve exact ResourceID"
+    },
+    {
+      "family": "gear-receipts",
+      "count": 75,
+      "classification": "already-integrated",
+      "consumer": "ItemIconTile -> CatalogueItemPixelIdentity -> CatalogueGearSpriteV1Registry",
+      "requiredSeam": "none; preserve exact catalogueID and identified state"
+    },
+    {
+      "family": "material-sample-receipts",
+      "count": 16,
+      "classification": "A",
+      "consumer": "receiptTile currently omits ItemIconTile.materialKind",
+      "requiredSeam": "pass material.sample.kind through existing materialKind input; sprite selection is MaterialKind only"
+    },
+    {
+      "family": "catalogue-object-receipts",
+      "count": 27,
+      "classification": "B",
+      "consumer": "17 functional 32x32 placeholders plus 10 SF fallbacks",
+      "requiredSeam": "freeze a truthful non-map item profile; do not silently upscale/reinterpret approved 16x19 bottom-pivot map art"
+    },
+    {
+      "family": "page-and-writing-receipts",
+      "count": 3,
+      "classification": "B",
+      "consumer": "SF document symbols",
+      "requiredSeam": "freeze an exact row/display profile for loose_world_page, diary_page and found_writing"
+    },
+    {
+      "family": "legacy-receipts",
+      "count": null,
+      "classification": "C",
+      "consumer": "LegacyReceiptIconTile",
+      "requiredSeam": "preserve explicit legacy fallback; no modern identity substitution"
+    }
+  ],
+  "smallestBatches": [
+    {
+      "id": "R1",
+      "name": "Return MaterialKind pass-through",
+      "classification": "A",
+      "visibleIdentitiesClosed": 16,
+      "newArt": false,
+      "profileDecision": false
+    },
+    {
+      "id": "R2",
+      "name": "shared catalogue-object non-map profile",
+      "classification": "B",
+      "visibleIdentitiesClosed": 27,
+      "newArtOrProfileDecision": true,
+      "consumers": [
+        "Return Recap",
+        "Storehouse",
+        "Field Kit",
+        "Loot Decision",
+        "Encounter",
+        "Trading Post",
+        "Recycler",
+        "Apothecary",
+        "World detail"
+      ]
+    },
+    {
+      "id": "R3",
+      "name": "shared Page/writing row profile",
+      "classification": "B",
+      "visibleIdentitiesClosed": 3,
+      "newArtOrProfileDecision": true
+    }
+  ],
+  "presentationRules": {
+    "inventoryProfile": "native 32x32 nearest-neighbour, centered in existing 44-point minimum tile",
+    "mapProfile": "native 16x19, bottom pivot 8,18 over 16x16 terrain",
+    "minimapProfile": "native centered 7x7 category-only where already approved",
+    "recolor": "never recolor accepted identity pixels by rarity, theme, grade or WorldGrade",
+    "lookup": "exact stable identity/state only; never name, fallback symbol, rarity, slot, order or catalogue position"
+  },
+  "blocked": [
+    "named travellers",
+    "ordinary creatures",
+    "apex creatures",
+    "Binder",
+    "Quill",
+    "spendable Essence",
+    "legacy receipts without a stable modern identity"
+  ]
+}
