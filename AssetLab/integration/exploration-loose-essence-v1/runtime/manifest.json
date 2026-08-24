@@ -1,0 +1,180 @@
+{
+  "schemaVersion": "exploration-loose-essence-v1",
+  "status": "candidate-unapproved",
+  "integrationReady": false,
+  "resourceID": "essence_raw",
+  "stableIdentity": "loose_essence",
+  "assetType": "final-premade-logical-pixel-art-candidate",
+  "runtimeGeneratedPixels": false,
+  "canvas": {
+    "width": 16,
+    "height": 19,
+    "pivot": [
+      8,
+      18
+    ],
+    "tileSurface": [
+      16,
+      16
+    ]
+  },
+  "selection": {
+    "full": "presentationTick modulo 4 selects an exact premade frame",
+    "disclosedNonFull": "previously revealed fringe or hidden selects frame 0",
+    "undisclosed": "never-revealed fringe or hidden performs no request and draws nothing",
+    "temporalSelector": "presentationTick is the sole temporal selector",
+    "sharedClockOnly": true,
+    "gameplayStateMutation": false
+  },
+  "layerOrder": [
+    "terrain-and-south-wall",
+    "stationary-loose-essence",
+    "party",
+    "selection-and-interaction",
+    "alerts-and-HUD"
+  ],
+  "semanticIdentity": {
+    "owns": "loose Raw Essence wildDrop only",
+    "excludes": [
+      "spendable Essence",
+      "Essence Crystal",
+      "Mote",
+      "resource node",
+      "depletion state",
+      "pickup transition"
+    ],
+    "recolor": "none; preserve established Raw Essence blue/luminous palette"
+  },
+  "assetsByKey": {
+    "loose_essence/ordinary/frame-0": {
+      "path": "assets/ae6aa3ad0e1058c948aac23ebe41b24a52f80e7f5d46d974548eb03d89361a1a.png",
+      "sourcePath": "final/loose-essence-frame-0.png",
+      "width": 16,
+      "height": 19,
+      "pivot": [
+        8,
+        18
+      ],
+      "fileSHA256": "ae6aa3ad0e1058c948aac23ebe41b24a52f80e7f5d46d974548eb03d89361a1a",
+      "decodedRGBASHA256": "5f4cd1dba080b946b263b889b87914cbd6529a4d638cfaddeb287b2b30cfab04",
+      "frame": 0,
+      "resourceID": "essence_raw",
+      "animation": "premade-ambient-energy"
+    },
+    "loose_essence/ordinary/frame-1": {
+      "path": "assets/a070a7a95eb8efcc134adfb0537547fe188f80da8eae6b810dffacafa95d8b86.png",
+      "sourcePath": "final/loose-essence-frame-1.png",
+      "width": 16,
+      "height": 19,
+      "pivot": [
+        8,
+        18
+      ],
+      "fileSHA256": "a070a7a95eb8efcc134adfb0537547fe188f80da8eae6b810dffacafa95d8b86",
+      "decodedRGBASHA256": "bd52b4fc9519c155c769a0b38fbf30b37d2db030e607e167b1029642a9c54ffe",
+      "frame": 1,
+      "resourceID": "essence_raw",
+      "animation": "premade-ambient-energy"
+    },
+    "loose_essence/ordinary/frame-2": {
+      "path": "assets/e60591c8c18f2325be3639d7f9108922b8cfa4570987d604d0c37a9b5e9b26cc.png",
+      "sourcePath": "final/loose-essence-frame-2.png",
+      "width": 16,
+      "height": 19,
+      "pivot": [
+        8,
+        18
+      ],
+      "fileSHA256": "e60591c8c18f2325be3639d7f9108922b8cfa4570987d604d0c37a9b5e9b26cc",
+      "decodedRGBASHA256": "e1a28f4ea67239032bdd0b404e7593351d7c8108ea7bce85e7632d22020b0776",
+      "frame": 2,
+      "resourceID": "essence_raw",
+      "animation": "premade-ambient-energy"
+    },
+    "loose_essence/ordinary/frame-3": {
+      "path": "assets/c15b6b303ef6799994cc86218efbe6f7db46f827e47b32dc9ea1ee7a0321675c.png",
+      "sourcePath": "final/loose-essence-frame-3.png",
+      "width": 16,
+      "height": 19,
+      "pivot": [
+        8,
+        18
+      ],
+      "fileSHA256": "c15b6b303ef6799994cc86218efbe6f7db46f827e47b32dc9ea1ee7a0321675c",
+      "decodedRGBASHA256": "484bddf2f0e49bb9946eb1d0f41c173549c8e4f3de1fc55c5b57aa92fb90a12d",
+      "frame": 3,
+      "resourceID": "essence_raw",
+      "animation": "premade-ambient-energy"
+    }
+  },
+  "sourceReferences": {
+    "rawEssenceInventory": {
+      "path": "AssetLab/integration/resource-sprites-v1/inventory/essence_raw.png",
+      "sha256": "9e0f7dacd5f65065de6b164e6bbf494ca55011f394595fc3b8928f6d0f82ab82",
+      "productionSource": true
+    },
+    "rawEssenceMap": {
+      "path": "AssetLab/integration/resource-sprites-v1/map/essence_raw.png",
+      "sha256": "56948c0ec6c0699a26d8889cd857e7da058581536c9e447ff9e259f1341ec20d",
+      "productionSource": true
+    },
+    "rawEssenceField": {
+      "path": "AssetLab/integration/resource-sprites-v1/field/essence_raw.png",
+      "sha256": "7fe5b9aacca35c57f57a7e9ac00a4f948476d1f5d225b31504fc7871a8bd6927",
+      "productionSource": true
+    },
+    "essenceCrystalNegativeReference": {
+      "path": "AssetLab/integration/exploration-catalogue-objects-v1/runtime/assets/478f94342cdee30d8e20be97e89c83e0cd0e3cb597cd6059fbee70334c45f93d.png",
+      "sha256": "478f94342cdee30d8e20be97e89c83e0cd0e3cb597cd6059fbee70334c45f93d",
+      "productionSource": true
+    },
+    "imagegenSourceReference": {
+      "path": "AssetLab/integration/exploration-loose-essence-v1/source/imagegen-reference-nonproduction.png",
+      "sha256": "4bdb12dc55f21b67196864ac955ff5082b88e228dda99524214e5d0734fc5b45",
+      "productionSource": false
+    }
+  },
+  "evidence": {
+    "loose-essence-contact-sheet.png": {
+      "path": "evidence/loose-essence-contact-sheet.png",
+      "sha256": "0edda8ec60181641eb85eb1354b4dc1e91e01f58bf261d7cfeddedd2b3413397"
+    },
+    "loose-essence-dark-368x800.png": {
+      "path": "evidence/loose-essence-dark-368x800.png",
+      "sha256": "0cc688b0f4c33c505721ee9a15cc3f24f451ee044fd28a027b0aab40f8f6036a"
+    },
+    "loose-essence-light-368x800.png": {
+      "path": "evidence/loose-essence-light-368x800.png",
+      "sha256": "df77afd6ab3b63582b17259a4fdaad567a2a5559a48a6b8c5e4ce6d41060a106"
+    },
+    "loose-essence-grayscale-368x800.png": {
+      "path": "evidence/loose-essence-grayscale-368x800.png",
+      "sha256": "e9112b669fde49ee3811d43f6f1372639787d804a268fb6249f1e2d2c4de4472"
+    }
+  },
+  "productionAggregateSHA256": "ece8fe5e3f573e1de1b0a4fd4aeb92d91886ec486cddad8594a918079ab47b9b",
+  "nativeHandoff": {
+    "request": "TileContent.wildDrop(resource: Resources.essenceRaw, amount: positive)",
+    "stableKeyPrefix": "loose_essence/ordinary/",
+    "mapSocket": "16x19 bottom-pivot (8,18)",
+    "stateInputs": [
+      "visibility",
+      "presentationTick"
+    ],
+    "forbiddenInputs": [
+      "amount beyond positive eligibility",
+      "point or any coordinate",
+      "mapSeed",
+      "worldRunID or runIndex",
+      "phaseOffset or per-tile stable phase",
+      "player inventory",
+      "spendable Essence",
+      "Essence Crystal state"
+    ],
+    "temporalSelection": "frame = presentationTick modulo 4; no coordinate, seed, run or phase offset participates",
+    "minimapKey": null,
+    "recolor": false,
+    "gameplayMutation": false
+  },
+  "canonicalBodySHA256": "85326602bd995e1192b967bf23047dd485c117a807865c94200ef80e9c3214e3"
+}

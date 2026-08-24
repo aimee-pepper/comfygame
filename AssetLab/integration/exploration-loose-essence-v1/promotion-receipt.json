@@ -1,0 +1,70 @@
+{
+  "schemaVersion": "exploration-loose-essence-promotion-v1",
+  "status": "aimee-visual-and-game-design-functional-approved",
+  "integrationReady": true,
+  "scope": "loose-raw-essence-world-presentation-only",
+  "approvalAuthority": {
+    "assetVisual": "Aimee",
+    "gameDesignFunctional": "Game Design Lead"
+  },
+  "approvalDate": "2026-08-23",
+  "candidatePins": {
+    "canonicalBodySHA256": "85326602bd995e1192b967bf23047dd485c117a807865c94200ef80e9c3214e3",
+    "manifestFileSHA256": "58daa8282f5f4312bbbece64325aadd343e4551f0792999680e3ebaf9550fb6e",
+    "productionAggregateSHA256": "ece8fe5e3f573e1de1b0a4fd4aeb92d91886ec486cddad8594a918079ab47b9b",
+    "resolverFileSHA256": "4703f2f7aaa7becdc3dc9499fffae3161adf04f2f611fc23f5c639e94610d673",
+    "focusedTestFileSHA256": "fd138936181409319e7a3d6ba90451a3c1b8dce15d1a3902d7add278d8d060ec"
+  },
+  "promotionPolicy": {
+    "additiveReceiptOnly": true,
+    "candidateManifestRemainsImmutableProvenance": true,
+    "approvedArtBytesChanged": false,
+    "runtimeGeneratedPixels": false,
+    "missingOrInvalidRequest": "fail closed with no sprite lookup"
+  },
+  "approvedStableKeys": [
+    "loose_essence/ordinary/frame-0",
+    "loose_essence/ordinary/frame-1",
+    "loose_essence/ordinary/frame-2",
+    "loose_essence/ordinary/frame-3"
+  ],
+  "nativeConsumption": {
+    "request": "positive TileContent.wildDrop(resource: Resources.essenceRaw, amount: positive)",
+    "stableKeyPrefix": "loose_essence/ordinary/",
+    "mapCanvas": [16, 19],
+    "mapPivot": [8, 18],
+    "tileSurface": [16, 16],
+    "filtering": "nearest-neighbour",
+    "selection": {
+      "full": "frame = presentationTick modulo 4",
+      "previouslyRevealedNonFull": "frame 0",
+      "neverRevealedFringeOrHidden": "no lookup and no draw"
+    },
+    "temporalSelector": "presentationTick only",
+    "forbiddenSelectors": [
+      "amount beyond positive eligibility",
+      "point or coordinate",
+      "mapSeed",
+      "worldRunID or runIndex",
+      "phase or phaseOffset or stablePhase"
+    ],
+    "layerOrder": [
+      "terrain-and-south-wall",
+      "stationary-loose-essence",
+      "party",
+      "selection-and-interaction",
+      "alerts-and-HUD"
+    ],
+    "minimapKey": null,
+    "recolor": false,
+    "gameplayMutation": false
+  },
+  "refusedIdentities": [
+    "zero-or-negative Raw Essence wildDrop",
+    "Raw Essence resource node",
+    "Mote",
+    "any other ResourceID",
+    "essence_crystal Item",
+    "spendable Essence"
+  ]
+}
