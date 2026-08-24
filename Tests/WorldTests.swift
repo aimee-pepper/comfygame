@@ -1713,6 +1713,183 @@ final class WorldTests: XCTestCase {
         attachment.lifetime = .keepAlways; add(attachment)
     }
 
+    @MainActor
+    func testTravellerAdjacentSpeechUsesExactReceiptAndCommittedMovementSession() throws {
+        XCTAssertEqual(TravellerAdjacentSpeechV1Registry.textByTravellerID.count, 29)
+        XCTAssertEqual(TravellerAdjacentSpeechV1Registry.textByTravellerID["mara"],
+                       "\"Don't move. You're the first fixed point I've had in a long while.\"")
+        let io = SaveFileIO.temporary(name: "traveller-speech-\(UUID().uuidString)")
+        let store = GameStore(io: io)
+        var fixture = startedRun(book([:]), seed: 7_701)
+        var run = try XCTUnwrap(fixture.worlds.activeRun)
+        for index in run.map.tiles.indices {
+            run.map.tiles[index].ground = .soil
+            run.map.tiles[index].isRevealed = true
+            run.map.tiles[index].content = .empty
+        }
+        let before = GridPoint(x: 5, y: 6), after = GridPoint(x: 5, y: 5)
+        let north = GridPoint(x: 5, y: 4), east = GridPoint(x: 6, y: 5)
+        run.playerPosition = before
+        run.map[north].content = .traveller("mara")
+        run.map[east].content = .traveller("tovin")
+        fixture.worlds.activeRun = run
+        store.mutate("test traveller speech", flush: true) { $0 = fixture }
+        store.step(to: after)
+        XCTAssertEqual(store.activeRun?.playerPosition, after)
+        XCTAssertEqual(store.worldTravellerSpeech?.travellerID, "mara")
+        XCTAssertEqual(store.worldTravellerSpeechQueue.map { $0.travellerID }, ["tovin"],
+                       "new adjacency is queued North then East")
+        let gameplay = try SaveCodec.encode(store.state)
+        store.finishWorldTravellerSpeech(expectedTravellerID: "mara")
+        XCTAssertEqual(store.worldTravellerSpeech?.travellerID, "tovin")
+        XCTAssertEqual(try SaveCodec.encode(store.state), gameplay)
+        store.finishWorldTravellerSpeech(expectedTravellerID: "mara")
+        XCTAssertEqual(store.worldTravellerSpeech?.travellerID, "tovin",
+                       "stale expiry cannot advance a successor")
+        _ = store.beginWorldFieldAttempt(WorldFieldEventBatchV1.SourceAction.survey)
+        XCTAssertNil(store.worldTravellerSpeech)
+        XCTAssertTrue(store.worldTravellerSpeechQueue.isEmpty)
+        store.presentTravellerSpeechAfterMovement(from: before, sourceAction: .step)
+        XCTAssertNil(store.worldTravellerSpeech, "shown travellers never repeat in one run")
+        let relaunched = GameStore(io: io)
+        XCTAssertNil(relaunched.worldTravellerSpeech)
+        XCTAssertTrue(relaunched.worldTravellerSpeechQueue.isEmpty)
+    }
+
+    @MainActor
+    func testTravellerAdjacentSpeechFailsClosedForDisclosureEncounterAndRetainedAdjacency() throws {
+        let store = GameStore(io: .temporary(name: "traveller-speech-closed-\(UUID().uuidString)"))
+        var fixture = startedRun(book([:]), seed: 7_702)
+        var run = try XCTUnwrap(fixture.worlds.activeRun)
+        for index in run.map.tiles.indices {
+            run.map.tiles[index].ground = .soil
+            run.map.tiles[index].isRevealed = true
+            run.map.tiles[index].content = .empty
+        }
+        let before = GridPoint(x: 5, y: 6), after = GridPoint(x: 5, y: 5)
+        let north = GridPoint(x: 5, y: 4)
+        run.playerPosition = after
+        run.map[north].content = .traveller("mara")
+        fixture.worlds.activeRun = run
+        store.mutate("test traveller disclosure", flush: true) { $0 = fixture }
+        store.presentTravellerSpeechAfterMovement(from: before, sourceAction: .step)
+        XCTAssertEqual(store.worldTravellerSpeech?.travellerID, "mara")
+        store.clearWorldTravellerSpeechSession()
+        store.mutate("hide traveller") { state in
+            state.worlds.activeRun?.map[north].isRevealed = false
+        }
+        store.presentTravellerSpeechAfterMovement(from: before, sourceAction: .step)
+        XCTAssertNil(store.worldTravellerSpeech)
+        store.mutate("reveal traveller") { state in
+            state.worlds.activeRun?.map[north].isRevealed = true
+            state.worlds.activeRun?.map[north].isCrumbled = true
+        }
+        store.presentTravellerSpeechAfterMovement(from: before, sourceAction: .step)
+        XCTAssertNil(store.worldTravellerSpeech, "crumbled traveller tiles fail closed")
+        store.mutate("restore traveller tile") { state in
+            state.worlds.activeRun?.map[north].isCrumbled = false
+        }
+        store.presentTravellerSpeechAfterMovement(from: GridPoint(x: 5, y: 3),
+                                                   sourceAction: .travel)
+        XCTAssertNil(store.worldTravellerSpeech,
+                     "retained adjacency is not newly created by the presented movement")
+
+        store.clearWorldTravellerSpeechSession()
+        store.mutate("four speech directions") { state in
+            state.worlds.activeRun?.map[GridPoint(x: 5, y: 4)].content = .traveller("mara")
+            state.worlds.activeRun?.map[GridPoint(x: 6, y: 5)].content = .traveller("tovin")
+            state.worlds.activeRun?.map[GridPoint(x: 5, y: 6)].content = .traveller("oda")
+            state.worlds.activeRun?.map[GridPoint(x: 4, y: 5)].content = .traveller("noll")
+        }
+        store.presentTravellerSpeechAfterMovement(from: GridPoint(x: 5, y: 8),
+                                                   sourceAction: .step)
+        XCTAssertNil(store.worldTravellerSpeech,
+                     "a step candidate must be exactly one cardinal move")
+        store.presentTravellerSpeechAfterMovement(from: GridPoint(x: 5, y: 8),
+                                                   sourceAction: .travel)
+        XCTAssertEqual(store.worldTravellerSpeech?.travellerID, "mara")
+        XCTAssertEqual(store.worldTravellerSpeechQueue.map { $0.travellerID },
+                       ["tovin", "oda", "noll"], "ordering is North, East, South, West")
+    }
+
+    @MainActor
+    func testTravellerAdjacentSpeechUsesActualAutoTravelFinalPositionOnly() throws {
+        let store = GameStore(io: .temporary(name: "traveller-speech-travel-\(UUID().uuidString)"))
+        var fixture = startedRun(book([:]), seed: 7_704)
+        var run = try XCTUnwrap(fixture.worlds.activeRun)
+        for index in run.map.tiles.indices {
+            run.map.tiles[index].ground = .soil
+            run.map.tiles[index].baseGround = .soil
+            run.map.tiles[index].isRevealed = true
+            run.map.tiles[index].isCrumbled = false
+            run.map.tiles[index].content = .empty
+        }
+        run.playerPosition = GridPoint(x: 5, y: 8)
+        run.map[GridPoint(x: 5, y: 4)].content = .traveller("oda")
+        fixture.worlds.activeRun = run
+        store.mutate("test traveller auto travel", flush: true) { $0 = fixture }
+        store.travel(to: GridPoint(x: 5, y: 5))
+        XCTAssertEqual(store.activeRun?.playerPosition, GridPoint(x: 5, y: 5))
+        XCTAssertEqual(store.worldTravellerSpeech?.travellerID, "oda")
+        XCTAssertEqual(store.worldTravellerSpeech?.point, GridPoint(x: 5, y: 4))
+    }
+
+    @MainActor
+    func testTravellerBubblePlacementAndMountedWorldRemainInMapAndGameplayInert() throws {
+        let top = TravellerSpeechBubblePlacement.resolve(
+            anchor: CGPoint(x: 18, y: 40), stageSize: CGSize(width: 368, height: 368))
+        let bottom = TravellerSpeechBubblePlacement.resolve(
+            anchor: CGPoint(x: 350, y: 350), stageSize: CGSize(width: 368, height: 368))
+        for placement in [top, bottom] {
+            XCTAssertGreaterThanOrEqual(placement.center.x - placement.width / 2, 8)
+            XCTAssertLessThanOrEqual(placement.center.x + placement.width / 2, 360)
+            XCTAssertGreaterThanOrEqual(placement.center.y - placement.height / 2, 8)
+            XCTAssertLessThanOrEqual(placement.center.y + placement.height / 2, 360)
+            XCTAssertGreaterThanOrEqual(placement.tailX, 12)
+            XCTAssertLessThanOrEqual(placement.tailX, placement.width - 12)
+        }
+        XCTAssertFalse(top.isAboveTraveller); XCTAssertTrue(bottom.isAboveTraveller)
+
+        let store = GameStore(io: .temporary(name: "traveller-speech-mounted-\(UUID().uuidString)"))
+        var fixture = startedRun(book([:]), seed: 7_703)
+        var run = try XCTUnwrap(fixture.worlds.activeRun)
+        for index in run.map.tiles.indices {
+            run.map.tiles[index].ground = .soil
+            run.map.tiles[index].isRevealed = true
+            run.map.tiles[index].content = .empty
+        }
+        let before = GridPoint(x: 5, y: 6), after = GridPoint(x: 5, y: 5)
+        run.playerPosition = before
+        run.map[GridPoint(x: 5, y: 4)].content = .traveller("mara")
+        fixture.worlds.activeRun = run
+        for lesson in TutorialLessonID.allCases {
+            fixture.tutorial.complete(lesson, fact: "traveller_speech_visual_fixture")
+        }
+        store.mutate("test mounted traveller speech", flush: true) { $0 = fixture }
+        store.step(to: after)
+        XCTAssertEqual(store.worldTravellerSpeech?.travellerID, "mara")
+        let controller = UIHostingController(rootView:
+            WorldView().environmentObject(store).frame(width: 368, height: 800))
+        let window = UIWindow(frame: CGRect(x: 0, y: 0, width: 368, height: 800))
+        window.rootViewController = controller; window.makeKeyAndVisible()
+        controller.view.frame = window.bounds; controller.view.layoutIfNeeded()
+        RunLoop.main.run(until: Date().addingTimeInterval(0.04))
+        let frozen = try SaveCodec.encode(store.state)
+        RunLoop.main.run(until: Date().addingTimeInterval(0.20))
+        controller.view.layoutIfNeeded()
+        XCTAssertEqual(store.worldTravellerSpeech?.travellerID, "mara")
+        XCTAssertEqual(WorldMapStageMeasurement.latestFrame.width, 368, accuracy: 0.5)
+        XCTAssertEqual(WorldMapStageMeasurement.latestFrame.height, 368, accuracy: 0.5)
+        XCTAssertEqual(try SaveCodec.encode(store.state), frozen)
+        let image = UIGraphicsImageRenderer(size: window.bounds.size).image { _ in
+            controller.view.drawHierarchy(in: controller.view.bounds, afterScreenUpdates: true)
+        }
+        window.isHidden = true
+        let attachment = XCTAttachment(image: image)
+        attachment.name = "traveller-adjacent-speech-368x800"
+        attachment.lifetime = .keepAlways; add(attachment)
+    }
+
     func testMinimapTerrainStyleIsOpaqueNonblackAndIndependentOfRememberedContent() {
         for appearance in MinimapTerrainStyle.Appearance.allCases {
             var classes = Set<String>()

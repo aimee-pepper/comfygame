@@ -430,12 +430,14 @@ extension GameStore {
     /// A single step onto an adjacent tile.
     func step(to point: GridPoint) {
         guard activeRun?.activeEncounter == nil else { return }
+        guard let priorPosition = activeRun?.playerPosition else { return }
         guard let attempt = beginWorldFieldAttempt(.step) else { return }
         var events: [WorldRules.Event] = []
         mutate("step", scope: .expedition) { state in
             events = WorldRules.step(to: point, in: &state)
         }
         finishTurn(events, attempt: attempt)
+        presentTravellerSpeechAfterMovement(from: priorPosition, sourceAction: .step)
     }
 
     /// What's in the satchel that could be used right now, out in the world.
@@ -571,6 +573,7 @@ extension GameStore {
     /// stopping for — an enemy waking, a hazard, a threshold, a fight (SPD-style, locked decision).
     func travel(to destination: GridPoint) {
         guard let run = activeRun, run.activeEncounter == nil else { return }
+        let priorPosition = run.playerPosition
         guard destination != run.playerPosition else { return }
         guard let attempt = beginWorldFieldAttempt(.travel) else { return }
 
@@ -608,6 +611,7 @@ extension GameStore {
             }
         }
         finishTurn(events, attempt: attempt)
+        presentTravellerSpeechAfterMovement(from: priorPosition, sourceAction: .travel)
     }
 
     /// One pull from the node underfoot.

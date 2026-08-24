@@ -646,7 +646,12 @@ struct WorldView: View {
                                 maximumWidth: mapWidth,
                                 viewportColumns: viewportColumns,
                                 viewportRows: viewportRows,
-                                visibilityProfile: visibilityProfile
+                                visibilityProfile: visibilityProfile,
+                                travellerSpeech: store.worldTravellerSpeech,
+                                onTravellerSpeechFinished: { travellerID in
+                                    store.finishWorldTravellerSpeech(
+                                        expectedTravellerID: travellerID)
+                                }
                             ) { point in
                                 tapped(point, in: run)
                             }
@@ -912,6 +917,7 @@ struct WorldView: View {
                 coordinator: controlCoordinator, action: .fieldKit,
                 snapshot: controlSnapshot, disabledReason: nil,
                 operation: {
+                    store.clearWorldTravellerSpeechPresentation()
                     isShowingFieldKit = true
                     return .completed(.openedFieldKit)
                 }) {
@@ -945,6 +951,7 @@ struct WorldView: View {
                 let point = GridPoint(x: run.playerPosition.x + direction.dx,
                                       y: run.playerPosition.y + direction.dy)
                 if isLookArmed {
+                    store.clearWorldTravellerSpeechPresentation()
                     inspection = InspectionPresentation(value: WorldRules.inspect(
                         point, in: run, base: store.state.base))
                     isLookArmed = false
@@ -983,6 +990,7 @@ struct WorldView: View {
                         coordinator: controlCoordinator, action: .armLook,
                         snapshot: controlSnapshot, disabledReason: nil,
                         operation: {
+                            store.clearWorldTravellerSpeechPresentation()
                             isLookArmed.toggle()
                             return .completed(.lookArmed(isLookArmed))
                         }) {
@@ -1067,6 +1075,7 @@ struct WorldView: View {
     }
 
     private func performInteraction() -> WorldControlExecution {
+        store.clearWorldTravellerSpeechPresentation()
         if let page = store.offeredWorldPageHere,
            let quote = store.offeredWorldPageQuote(page.id) {
             switch store.takeOfferedWorldPage(quote) {
@@ -1599,12 +1608,85 @@ enum WorldMapLayout {
     }
 }
 
+struct TravellerSpeechBubblePlacement: Equatable {
+    let center: CGPoint
+    let width: CGFloat
+    let height: CGFloat
+    let isAboveTraveller: Bool
+    let tailX: CGFloat
+
+    static func resolve(anchor: CGPoint, stageSize: CGSize) -> Self {
+        let width = min(284, max(0, stageSize.width - 16))
+        let height = min(120, max(0, stageSize.height - 16))
+        let above = anchor.y - height - 12 >= 8
+        let centerY = above ? anchor.y - 8 - height / 2
+            : min(stageSize.height - 8 - height / 2, anchor.y + 8 + height / 2)
+        let centerX = min(stageSize.width - 8 - width / 2,
+                          max(8 + width / 2, anchor.x))
+        let left = centerX - width / 2
+        return Self(center: CGPoint(x: centerX, y: centerY), width: width, height: height,
+                    isAboveTraveller: above,
+                    tailX: min(width - 12, max(12, anchor.x - left)))
+    }
+}
+
+private struct TravellerAdjacentSpeechBubbleView: View {
+    let speech: WorldTravellerSpeechBubbleV1
+    let placement: TravellerSpeechBubblePlacement
+    let onFinished: () -> Void
+    @State private var isSettled = false
+    @State private var isVisible = false
+
+    var body: some View {
+        ZStack(alignment: placement.isAboveTraveller ? .bottomLeading : .topLeading) {
+            Text(speech.text)
+                .font(.system(size: 17))
+                .lineSpacing(4)
+                .foregroundStyle(PixelUITheme.textOnEdgeDark)
+                .multilineTextAlignment(.leading)
+                .padding(.horizontal, 12)
+                .padding(.vertical, 10)
+                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+                .background(PixelUITheme.edgeDark.opacity(0.94))
+                .overlay(Rectangle().stroke(PixelUITheme.edge, lineWidth: 2))
+                .padding(.vertical, 6)
+            Rectangle()
+                .fill(PixelUITheme.edgeDark.opacity(0.94))
+                .frame(width: 12, height: 12)
+                .rotationEffect(.degrees(45))
+                .offset(x: placement.tailX - 6,
+                        y: placement.isAboveTraveller ? 0 : 0)
+        }
+        .offset(y: isSettled ? 0 : 6)
+        .opacity(isVisible ? 1 : 0)
+        .animation(.easeOut(duration: isVisible ? 0.18 : 0.16), value: isVisible)
+        .allowsHitTesting(false)
+        .task(id: speech.travellerID) {
+            isVisible = true
+            isSettled = true
+            do { try await Task.sleep(nanoseconds: 180_000_000) }
+            catch { return }
+            guard !Task.isCancelled else { return }
+            do { try await Task.sleep(nanoseconds: 4_800_000_000) }
+            catch { return }
+            guard !Task.isCancelled else { return }
+            isVisible = false
+            do { try await Task.sleep(nanoseconds: 160_000_000) }
+            catch { return }
+            guard !Task.isCancelled else { return }
+            onFinished()
+        }
+    }
+}
+
 private struct MapGrid: View {
     let run: WorldRun
     let maximumWidth: CGFloat
     let viewportColumns: Int
     let viewportRows: Int
     let visibilityProfile: WorldRules.VisibilityProfile
+    let travellerSpeech: WorldTravellerSpeechBubbleV1?
+    let onTravellerSpeechFinished: (TravellerID) -> Void
     let onTap: (GridPoint) -> Void
     @Environment(\.scenePhase) private var scenePhase
     @StateObject private var terrainClock = TerrainPresentationClock.shared
@@ -1631,6 +1713,7 @@ private struct MapGrid: View {
             let grade = WorldGrade.from(readings)
             let atmosphereMotion = Int(readings["atmosphere"].aspect("motion")
                 .rounded(.toNearestOrAwayFromZero))
+            ZStack(alignment: .topLeading) {
             VStack(spacing: 0) {
                 ForEach(origin.y..<(origin.y + viewportRows), id: \.self) { y in
                     HStack(spacing: 0) {
@@ -1687,6 +1770,22 @@ private struct MapGrid: View {
                     }
                     .zIndex(Double(y))
                 }
+            }
+            if let speech = travellerSpeech,
+               speech.worldRunID == "\(run.runIndex):\(run.mapSeed)" {
+                let anchor = CGPoint(
+                    x: (CGFloat(speech.point.x - origin.x) + 0.5) * side,
+                    y: (CGFloat(speech.point.y - origin.y) + 0.5) * side)
+                let placement = TravellerSpeechBubblePlacement.resolve(
+                    anchor: anchor, stageSize: proxy.size)
+                TravellerAdjacentSpeechBubbleView(
+                    speech: speech, placement: placement,
+                    onFinished: { onTravellerSpeechFinished(speech.travellerID) })
+                    .frame(width: placement.width, height: placement.height)
+                    .position(x: placement.center.x, y: placement.center.y)
+                    .transition(.opacity)
+                    .zIndex(10_000)
+            }
             }
         }
         .frame(width: maximumWidth,

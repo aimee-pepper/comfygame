@@ -236,6 +236,48 @@ struct WorldMiningFeedbackGroupV1: Equatable {
     let startedAtMonotonicTime: UInt64
 }
 
+struct WorldTravellerSpeechBubbleV1: Equatable, Identifiable {
+    let travellerID: TravellerID
+    let worldRunID: String
+    let point: GridPoint
+    let text: String
+    var id: TravellerID { travellerID }
+}
+
+enum TravellerAdjacentSpeechV1Registry {
+    static let textByTravellerID: [String: String] = [
+        "ashe": "“That is permission for this moment, from that direction.”",
+        "auber": "“This is the interesting half. Nobody asks to taste this one.”",
+        "bracken": "“The wearer was less fortunate.”",
+        "bryn": "“I'm keeping this one open until they're clear.”",
+        "corrin": "“The shoulder that has to meet it eight hundred times is less theoretical.”",
+        "dagg": "“Because I moved the slab.”",
+        "edren": "\"Mind where you tread. There's a floor about eight inches down and I've nearly got the edge of it.\"",
+        "fen": "“It stretched. Fine for a sling, poor for a bow.”",
+        "grimmond": "“It'll still crush you.”",
+        "halloway": "\"Don't crowd it. It's shy.\"",
+        "isolde": "\"Don't speak for a moment. I'm nearly at the bottom.\"",
+        "kestrel": "“That is not yet the animal.”",
+        "lys": "“Only the account of how one became the other.”",
+        "mara": "\"Don't move. You're the first fixed point I've had in a long while.\"",
+        "marrick": "“The sixth couldn't reach their place. We kept calling that a successful formation.”",
+        "maud": "“That is the first measurement the metal could not give me.”",
+        "nessa": "“Different instructions. The old labels nearly made that expensive.”",
+        "nine": "“So is the revision.”",
+        "noll": "“I haven't finished checking why it failed.”",
+        "oda": "“Approach corridor held. Marker four did not. Please stand exactly where you are while I determine which result matters.”",
+        "orsa": "“I repaired it, but I don't trust its opinion of taller guests.”",
+        "perren": "“So is the decision about which relationship the repetition is allowed to prove.”",
+        "rook": "“It could not know what the line meant. That failure is mine.”",
+        "sabine": "“Sorry. The twigs are doing excellent work, but they are terrible at introductions.”",
+        "sela": "\"Oh, good. Company. Keep up.\"",
+        "talin": "“The gap closes before I can recover.”",
+        "tovin": "\"You wrote this. I can tell by the light — it's got somebody's opinion in it.\"",
+        "vance": "“Good start. Not much of a sales pitch.”",
+        "wren": "“They can't. So we're using their route first.”",
+    ]
+}
+
 enum WorldFieldNarration {
     static func text(for event: WorldRules.Event) -> String? {
         return switch event {
@@ -368,6 +410,8 @@ final class GameStore: ObservableObject {
     @Published private(set) var worldFieldEventQueue: [WorldFieldEventBatchV1] = []
     @Published private(set) var worldMiningFeedback: WorldMiningFeedbackGroupV1?
     @Published private(set) var worldMiningFeedbackQueue: [WorldMiningFeedbackGroupV1] = []
+    @Published private(set) var worldTravellerSpeech: WorldTravellerSpeechBubbleV1?
+    @Published private(set) var worldTravellerSpeechQueue: [WorldTravellerSpeechBubbleV1] = []
     /// Recoverable player-facing failure from the bind preview/receipt commitment boundary.
     /// It is deliberately outside the save: a failed bind changes no campaign fact.
     @Published var bindError: String?
@@ -379,6 +423,8 @@ final class GameStore: ObservableObject {
     private var seenWorldFieldBatchIDs: Set<String> = []
     private var visibleWorldFieldBatchSince: UInt64?
     private var seenWorldMiningBatchIDs: Set<String> = []
+    private var travellerSpeechWorldRunID: String?
+    private var shownTravellerSpeechIDs: Set<TravellerID> = []
 
     var diagnosticCampaignReference: String? { io.diagnosticCampaignReference }
 
@@ -424,6 +470,7 @@ final class GameStore: ObservableObject {
 
     func beginWorldFieldAttempt(_ sourceAction: WorldFieldEventBatchV1.SourceAction) -> WorldFieldAttempt? {
         guard let run = activeRun else { return nil }
+        clearWorldTravellerSpeechPresentation()
         let attempt = WorldFieldAttempt(
             id: nextWorldFieldAttemptID, sourceAction: sourceAction,
             worldRunID: "\(run.runIndex):\(run.mapSeed)", turnBefore: run.turnsTaken)
@@ -518,6 +565,83 @@ final class GameStore: ObservableObject {
         worldMiningFeedback = nil
         worldMiningFeedbackQueue.removeAll()
         seenWorldMiningBatchIDs.removeAll()
+        clearWorldTravellerSpeechSession()
+    }
+
+    func clearWorldTravellerSpeechPresentation() {
+        worldTravellerSpeech = nil
+        worldTravellerSpeechQueue.removeAll()
+    }
+
+    func clearWorldTravellerSpeechSession() {
+        clearWorldTravellerSpeechPresentation()
+        travellerSpeechWorldRunID = nil
+        shownTravellerSpeechIDs.removeAll()
+    }
+
+    func finishWorldTravellerSpeech(expectedTravellerID: TravellerID) {
+        guard worldTravellerSpeech?.travellerID == expectedTravellerID else { return }
+        if worldTravellerSpeechQueue.isEmpty { worldTravellerSpeech = nil }
+        else {
+            worldTravellerSpeech = worldTravellerSpeechQueue.removeFirst()
+            if let travellerID = worldTravellerSpeech?.travellerID {
+                shownTravellerSpeechIDs.insert(travellerID)
+            }
+        }
+    }
+
+    func presentTravellerSpeechAfterMovement(
+        from priorPosition: GridPoint,
+        sourceAction: WorldFieldEventBatchV1.SourceAction
+    ) {
+        guard let run = activeRun, run.activeEncounter == nil,
+              run.playerPosition != priorPosition,
+              sourceAction == .travel
+                || (sourceAction == .step
+                    && run.playerPosition.manhattanDistance(to: priorPosition) == 1)
+        else { return }
+        let worldRunID = "\(run.runIndex):\(run.mapSeed)"
+        if travellerSpeechWorldRunID != worldRunID {
+            clearWorldTravellerSpeechSession()
+            travellerSpeechWorldRunID = worldRunID
+        }
+        let directions = [(0, -1), (1, 0), (0, 1), (-1, 0)]
+        let previouslyAdjacent = Set(directions.compactMap { direction -> TravellerID? in
+            let point = GridPoint(x: priorPosition.x + direction.0,
+                                  y: priorPosition.y + direction.1)
+            guard run.map.contains(point), case .traveller(let id) = run.map[point].content else {
+                return nil
+            }
+            return id
+        })
+        let alreadyPresented = Set(
+            ([worldTravellerSpeech].compactMap { $0 } + worldTravellerSpeechQueue)
+                .map(\.travellerID))
+        var admitted: [WorldTravellerSpeechBubbleV1] = []
+        for direction in directions {
+            let point = GridPoint(x: run.playerPosition.x + direction.0,
+                                  y: run.playerPosition.y + direction.1)
+            guard run.map.contains(point), run.map[point].isRevealed,
+                  !run.map[point].isCrumbled,
+                  WorldRules.visibility(of: point, from: run.playerPosition, in: run.map,
+                                        profile: WorldRules.visibilityProfile(
+                                            in: run, party: WorldRules.sightBonus(in: state))) == .full,
+                  case .traveller(let id) = run.map[point].content,
+                  !previouslyAdjacent.contains(id), !shownTravellerSpeechIDs.contains(id),
+                  !alreadyPresented.contains(id),
+                  let text = TravellerAdjacentSpeechV1Registry.textByTravellerID[id.rawValue]
+            else { continue }
+            admitted.append(.init(travellerID: id, worldRunID: worldRunID,
+                                  point: point, text: text))
+        }
+        guard !admitted.isEmpty else { return }
+        if worldTravellerSpeech == nil {
+            worldTravellerSpeech = admitted.removeFirst()
+            if let travellerID = worldTravellerSpeech?.travellerID {
+                shownTravellerSpeechIDs.insert(travellerID)
+            }
+        }
+        worldTravellerSpeechQueue.append(contentsOf: admitted)
     }
 
     func refreshWorldFieldContext() {
