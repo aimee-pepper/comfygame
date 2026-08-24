@@ -31,6 +31,23 @@ final class LibraryTests: XCTestCase {
             }
             state.base.roster = (0..<4).map { _ in CompanionState() }
             state.base.activeParty = [0, 1, 2, 3]
+            let pages = Array(ContentCatalog.shared.diaryPages.prefix(16))
+            for page in pages {
+                state.reality.library.recordPage(page.id, worldRecordID: nil, siteID: nil)
+                state.reality.library.knownTravellers.insert(page.diary)
+            }
+            state.reality.library.foundTravellers.formUnion(
+                ContentCatalog.shared.travellers.prefix(8).map(\.id))
+            state.reality.library.foundWritings = FoundWritingRecord.Family.allCases
+                .enumerated().flatMap { familyIndex, family in
+                    (0..<4).map { index in
+                        FoundWritingRecord(
+                            id: FoundWritingID(rawValue: "p2-note-\(familyIndex)-\(index)"),
+                            family: family,
+                            prose: "Recovered \(family.rawValue) \(index) remains fully reachable.",
+                            position: GridPoint(x: familyIndex, y: index))
+                    }
+                }
             state.reality.library.visitedWorlds = (1...18).map { index in
                 VisitedWorld(id: InstanceID(rawValue: UInt64(20_000 + index)),
                              seed: UInt64(index), runIndex: index,
@@ -38,6 +55,17 @@ final class LibraryTests: XCTestCase {
                              written: ["Illumination ← Sun"], inertModifiers: [], readings: [:],
                              travellersPresent: [], isKept: index.isMultiple(of: 3))
             }
+        }
+        return store
+    }
+
+    private func p2EmptyStore() -> GameStore {
+        let store = p2Store()
+        store.mutate("fixture: clear every collected library fact") { state in
+            state.reality.library = LibraryState()
+            state.reality.encounteredLexemes = []
+            state.base.ownedSources = []
+            state.base.ownedSymbols = []
         }
         return store
     }
@@ -84,6 +112,34 @@ final class LibraryTests: XCTestCase {
 
     @MainActor private func p2Descendants(_ view: UIView) -> [UIView] {
         [view] + view.subviews.flatMap(p2Descendants)
+    }
+
+    private func p2LibrarySlots(_ tab: Int, store: GameStore)
+        -> (firstSlot: String, firstID: String, lastSlot: String, lastID: String) {
+        let library = store.state.reality.library
+        switch tab {
+        case 0:
+            let values = LibraryPresentation.diaries(in: library)
+            return ("diaries.first", values.first!.id.rawValue,
+                    "diaries.last", values.last!.id.rawValue)
+        case 1:
+            let values = LibraryPresentation.people(in: library)
+            return ("people.first", values.first!.id.rawValue,
+                    "people.last", values.last!.id.rawValue)
+        case 2:
+            let values = LibraryRules.dictionaryEntries(
+                reality: store.state.reality, base: store.state.base)
+            return ("dictionary.first", values.first!.glyphID,
+                    "dictionary.last", values.last!.glyphID)
+        case 3:
+            let values = LibraryPresentation.recoveredNoteFamilies(in: library)
+            return ("notes.first", values.first!.rawValue,
+                    "notes.last", values.last!.rawValue)
+        default:
+            let values = Array(library.visitedWorlds.reversed().prefix(5))
+            return ("history.first", String(values.first!.id.rawValue),
+                    "history.last", String(values.last!.id.rawValue))
+        }
     }
 
     @MainActor
@@ -145,16 +201,38 @@ final class LibraryTests: XCTestCase {
     }
 
     func testP2_02LibraryPickerAndScrollOwnTheSafeRemainderForAllFiveTabs() throws {
-        for tab in 0..<5 {
-            let store = p2Store(); let mount = try p2Mount(.library(tab), scheme: .light, store: store)
+        for scheme in [ColorScheme.light, .dark] {
+          for tab in 0..<5 {
+            let store = p2Store(); let mount = try p2Mount(.library(tab), scheme: scheme, store: store)
+            XCTAssertFalse(LibraryPresentation.diaries(in: store.state.reality.library).isEmpty)
+            XCTAssertFalse(LibraryPresentation.people(in: store.state.reality.library).isEmpty)
+            XCTAssertFalse(LibraryRules.dictionaryEntries(
+                reality: store.state.reality, base: store.state.base).isEmpty)
+            XCTAssertEqual(LibraryPresentation.recoveredNoteFamilies(
+                in: store.state.reality.library).count, FoundWritingRecord.Family.allCases.count)
+            XCTAssertEqual(store.state.reality.library.visitedWorlds.count, 18)
+            let expected = p2LibrarySlots(tab, store: store)
             XCTAssertEqual(P2SafeSpaceMeasurement.libraryScrollFrame.minY,
                            P2SafeSpaceMeasurement.libraryPickerFrame.maxY, accuracy: 0.75)
             XCTAssertEqual(P2SafeSpaceMeasurement.libraryScrollFrame.maxY,
                            800 - mount.safe.bottom, accuracy: 0.75)
+            XCTAssertEqual(P2SafeSpaceMeasurement.librarySemanticIDs[expected.firstSlot],
+                           expected.firstID)
+            let firstFrame = try XCTUnwrap(
+                P2SafeSpaceMeasurement.librarySemanticFrames[expected.firstSlot])
+            XCTAssertTrue(P2SafeSpaceMeasurement.libraryScrollFrame.insetBy(dx: 0, dy: -0.75)
+                .contains(firstFrame))
             p2ScrollToEnd(mount)
             XCTAssertLessThanOrEqual(P2SafeSpaceMeasurement.libraryContentFrame.maxY,
                                      P2SafeSpaceMeasurement.libraryScrollFrame.maxY + 0.75)
+            XCTAssertEqual(P2SafeSpaceMeasurement.librarySemanticIDs[expected.lastSlot],
+                           expected.lastID)
+            let lastFrame = try XCTUnwrap(
+                P2SafeSpaceMeasurement.librarySemanticFrames[expected.lastSlot])
+            XCTAssertTrue(P2SafeSpaceMeasurement.libraryScrollFrame.insetBy(dx: 0, dy: -0.75)
+                .contains(lastFrame))
             mount.window.isHidden = true
+          }
         }
     }
 
@@ -238,6 +316,23 @@ final class LibraryTests: XCTestCase {
             let attachment = XCTAttachment(image: mount.image)
             attachment.name = "p2-history-\(name)-368x800"; attachment.lifetime = .keepAlways
             add(attachment); mount.window.isHidden = true
+        }
+        for scheme in [ColorScheme.light, .dark] {
+            for tab in 0..<5 {
+                let store = p2EmptyStore()
+                let mount = try p2Mount(.library(tab), scheme: scheme, store: store)
+                if tab == 2 {
+                    let expected = p2LibrarySlots(tab, store: store)
+                    XCTAssertEqual(P2SafeSpaceMeasurement.librarySemanticIDs[expected.firstSlot],
+                                   expected.firstID)
+                    XCTAssertEqual(P2SafeSpaceMeasurement.librarySemanticIDs[expected.lastSlot],
+                                   expected.lastID)
+                } else {
+                    XCTAssertTrue(P2SafeSpaceMeasurement.librarySemanticFrames.isEmpty)
+                    XCTAssertTrue(P2SafeSpaceMeasurement.librarySemanticIDs.isEmpty)
+                }
+                mount.window.isHidden = true
+            }
         }
     }
 

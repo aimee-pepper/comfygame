@@ -11,6 +11,8 @@ import SwiftUI
     static var historyScrollFrame: CGRect = .zero
     static var historyContentFrame: CGRect = .zero
     static var historyFooterFrame: CGRect = .zero
+    static var librarySemanticFrames: [String: CGRect] = [:]
+    static var librarySemanticIDs: [String: String] = [:]
 
     static func reset() {
         libraryPickerFrame = .zero
@@ -21,6 +23,8 @@ import SwiftUI
         historyScrollFrame = .zero
         historyContentFrame = .zero
         historyFooterFrame = .zero
+        librarySemanticFrames = [:]
+        librarySemanticIDs = [:]
     }
 }
 
@@ -53,6 +57,27 @@ struct P2SafeSpaceProbe: View {
         case .historyContent: P2SafeSpaceMeasurement.historyContentFrame = frame
         case .historyFooter: P2SafeSpaceMeasurement.historyFooterFrame = frame
         }
+    }
+}
+
+struct P2LibrarySemanticProbe: View {
+    let slot: String
+    let identity: String
+
+    var body: some View {
+        GeometryReader { proxy in
+            let frame = proxy.frame(in: .global)
+            Color.clear
+                .onAppear { record(frame) }
+                .onChange(of: frame) { _, value in record(value) }
+        }
+        .allowsHitTesting(false)
+    }
+
+    private func record(_ frame: CGRect) {
+        guard P2SafeSpaceMeasurement.isArmed else { return }
+        P2SafeSpaceMeasurement.librarySemanticFrames[slot] = frame
+        P2SafeSpaceMeasurement.librarySemanticIDs[slot] = identity
     }
 }
 #endif
@@ -268,6 +293,18 @@ struct LibraryView: View {
                                     wide: dynamicTypeSize.isAccessibilitySize)
                     }
                     .buttonStyle(.plain)
+#if DEBUG
+                    .background {
+                        if traveller.id == authors.first?.id {
+                            P2LibrarySemanticProbe(slot: "diaries.first",
+                                                   identity: traveller.id.rawValue)
+                        }
+                        if traveller.id == authors.last?.id {
+                            P2LibrarySemanticProbe(slot: "diaries.last",
+                                                   identity: traveller.id.rawValue)
+                        }
+                    }
+#endif
                 }
                 if !olderRecords.isEmpty {
                     NavigationLink {
@@ -342,6 +379,18 @@ struct LibraryView: View {
                         personTile(traveller)
                     }
                     .buttonStyle(.plain)
+#if DEBUG
+                    .background {
+                        if traveller.id == people.first?.id {
+                            P2LibrarySemanticProbe(slot: "people.first",
+                                                   identity: traveller.id.rawValue)
+                        }
+                        if traveller.id == people.last?.id {
+                            P2LibrarySemanticProbe(slot: "people.last",
+                                                   identity: traveller.id.rawValue)
+                        }
+                    }
+#endif
                 }
             }
         }
@@ -375,7 +424,23 @@ struct LibraryView: View {
                                 columns: Array(repeating: GridItem(.flexible(), spacing: 6), count: 6),
                                 spacing: 8
                             ) {
-                                ForEach(group) { DictionaryGlyphCell(entry: $0) }
+                                ForEach(group) { entry in
+                                    DictionaryGlyphCell(entry: entry)
+#if DEBUG
+                                        .background {
+                                            if entry.id == entries.first?.id {
+                                                P2LibrarySemanticProbe(
+                                                    slot: "dictionary.first",
+                                                    identity: entry.glyphID)
+                                            }
+                                            if entry.id == entries.last?.id {
+                                                P2LibrarySemanticProbe(
+                                                    slot: "dictionary.last",
+                                                    identity: entry.glyphID)
+                                            }
+                                        }
+#endif
+                                }
                             }
                         }
                     }
@@ -402,6 +467,18 @@ struct LibraryView: View {
                                     wide: dynamicTypeSize.isAccessibilitySize)
                     }
                     .buttonStyle(.plain)
+#if DEBUG
+                    .background {
+                        if family == families.first {
+                            P2LibrarySemanticProbe(slot: "notes.first",
+                                                   identity: family.rawValue)
+                        }
+                        if family == families.last {
+                            P2LibrarySemanticProbe(slot: "notes.last",
+                                                   identity: family.rawValue)
+                        }
+                    }
+#endif
                 }
             }
         }
@@ -417,7 +494,8 @@ struct LibraryView: View {
     }
 
     private var historyPane: some View {
-        VStack(spacing: 12) {
+        let recent = Array(library.visitedWorlds.reversed().prefix(5))
+        return VStack(spacing: 12) {
             NavigationLink(value: AppRoute.worldHistory) {
                 LibraryTile(icon: "rectangle.split.2x1", title: "Open full history",
                             subtitle: "Read, keep and compare records",
@@ -432,7 +510,7 @@ struct LibraryView: View {
             } else {
                 VStack(alignment: .leading, spacing: 8) {
                     Text("Most recent").font(.headline)
-                    ForEach(library.visitedWorlds.reversed().prefix(5)) { world in
+                    ForEach(recent) { world in
                         HStack(spacing: 10) {
                             Image(systemName: world.isKept ? "bookmark.fill" : "globe")
                                 .foregroundStyle(.teal).frame(width: 24)
@@ -444,6 +522,18 @@ struct LibraryView: View {
                             Spacer(minLength: 0)
                         }
                         .frame(minHeight: 52)
+#if DEBUG
+                        .background {
+                            if world.id == recent.first?.id {
+                                P2LibrarySemanticProbe(slot: "history.first",
+                                                       identity: String(world.id.rawValue))
+                            }
+                            if world.id == recent.last?.id {
+                                P2LibrarySemanticProbe(slot: "history.last",
+                                                       identity: String(world.id.rawValue))
+                            }
+                        }
+#endif
                     }
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
