@@ -123,7 +123,7 @@ struct BaseView: View {
                 }
             }
         }
-        .background(PixelUITheme.screen)
+        .background(PixelUITheme.screen.ignoresSafeArea())
         .navigationTitle("Village")
         .toolbar(.hidden, for: .navigationBar)
         .safeAreaInset(edge: .bottom, spacing: 0) {

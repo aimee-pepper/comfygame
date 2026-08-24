@@ -1,5 +1,39 @@
 import SwiftUI
 
+#if DEBUG
+@MainActor enum EncounterSafeSpaceMeasurement {
+    static var isArmed = false
+    static var rootFrame: CGRect = .zero
+    static var headerFrame: CGRect = .zero
+    static var battleLogFrame: CGRect = .zero
+    static var actionFrame: CGRect = .zero
+}
+
+private struct EncounterSafeSpaceProbe: View {
+    enum Region { case root, header, battleLog, action }
+    let region: Region
+    var body: some View {
+        GeometryReader { proxy in
+            let frame = proxy.frame(in: .global)
+            Color.clear
+                .onAppear { record(frame) }
+                .onChange(of: frame) { _, value in record(value) }
+        }
+    }
+
+    private func record(_ frame: CGRect) {
+        guard EncounterSafeSpaceMeasurement.isArmed,
+              abs(frame.width - 368) < 0.5 else { return }
+        switch region {
+        case .root: EncounterSafeSpaceMeasurement.rootFrame = frame
+        case .header: EncounterSafeSpaceMeasurement.headerFrame = frame
+        case .battleLog: EncounterSafeSpaceMeasurement.battleLogFrame = frame
+        case .action: EncounterSafeSpaceMeasurement.actionFrame = frame
+        }
+    }
+}
+#endif
+
 /// The battle screen: party left, foes right, action bar in the thumb zone.
 ///
 /// **No gambit editing here** — a locked decision. You can hand the companion's next turn to
@@ -30,6 +64,9 @@ struct EncounterView: View {
             if let run, let encounter {
                 header(encounter)
 #if DEBUG
+                    .overlay { EncounterSafeSpaceProbe(region: .header) }
+#endif
+#if DEBUG
                 if encounter.debugGodMode != nil {
                     Label("GOD MODE · COMBAT-BALANCE EVIDENCE INVALID", systemImage: "exclamationmark.shield.fill")
                         .font(.caption.bold())
@@ -41,21 +78,32 @@ struct EncounterView: View {
                 }
 #endif
                 combatants(run, encounter)
-                // Log sits directly under the fight it describes; the slack goes below it, so the
-                // action bar still lands in the thumb zone without stranding the text mid-screen.
+                // The log owns the measured remainder beneath the fight; the action bar remains
+                // the final safe-area sibling without manufacturing an empty spacer band.
                 battleLog(encounter)
-                Spacer(minLength: 0)
+#if DEBUG
+                    .overlay { EncounterSafeSpaceProbe(region: .battleLog) }
+#endif
                 if let outcome = encounter.outcome {
                     outcomeBar(outcome)
+#if DEBUG
+                        .overlay { EncounterSafeSpaceProbe(region: .action) }
+#endif
                 } else {
                     actionBar(run, encounter)
+#if DEBUG
+                        .overlay { EncounterSafeSpaceProbe(region: .action) }
+#endif
                         .sheet(isPresented: $isChoosingItem) {
                             CombatItemSheet(onCommit: use).environmentObject(store)
                         }
                 }
             }
         }
-        .background(Color(.systemGroupedBackground))
+#if DEBUG
+        .overlay { EncounterSafeSpaceProbe(region: .root) }
+#endif
+        .background(Color(.systemGroupedBackground).ignoresSafeArea())
         .confirmationDialog("Withdraw from this fight?", isPresented: $isConfirmingWithdraw,
                             titleVisibility: .visible) {
             Button(withdrawalCost == 0 ? "Withdraw without losing Stability"
@@ -263,7 +311,8 @@ struct EncounterView: View {
             }
         }
         .padding(10)
-        .frame(maxWidth: .infinity, minHeight: 62, alignment: .bottomLeading)
+        .frame(maxWidth: .infinity, minHeight: 62, maxHeight: .infinity,
+               alignment: .bottomLeading)
         .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 10))
         .padding(.horizontal, 12)
     }

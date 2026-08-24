@@ -4,6 +4,14 @@ import XCTest
 @testable import Bookbinder
 
 final class BaseBoardTests: XCTestCase {
+    private func rgba(_ image: UIImage, x: Int, y: Int) throws -> [UInt8] {
+        let cg = try XCTUnwrap(image.cgImage)
+        let data = try XCTUnwrap(cg.dataProvider?.data)
+        let bytes = CFDataGetBytePtr(data)!
+        let offset = y * cg.bytesPerRow + x * 4
+        return Array(UnsafeBufferPointer(start: bytes + offset, count: 4))
+    }
+
     @MainActor
     func testApprovedHomeRendersAt368By800InLightAndDark() throws {
         let store = GameStore(io: .temporary(name: "base-render-\(UUID().uuidString)"))
@@ -21,6 +29,8 @@ final class BaseBoardTests: XCTestCase {
             )
             let window = UIWindow(frame: CGRect(x: 0, y: 0, width: 368, height: 800))
             window.rootViewController = controller
+            controller.additionalSafeAreaInsets = UIEdgeInsets(top: 59, left: 0,
+                                                                bottom: 34, right: 0)
             window.makeKeyAndVisible()
             controller.view.frame = window.bounds
             controller.view.layoutIfNeeded()
@@ -30,11 +40,25 @@ final class BaseBoardTests: XCTestCase {
             }
             window.isHidden = true
             XCTAssertEqual(image.size, CGSize(width: 368, height: 800))
+            XCTAssertNotEqual(try rgba(image, x: 184, y: 10), [0, 0, 0, 255],
+                              "Village top unsafe region must use its semantic backdrop")
+            XCTAssertNotEqual(try rgba(image, x: 184, y: 785), [0, 0, 0, 255],
+                              "Village bottom unsafe region must use its semantic backdrop")
             let attachment = XCTAttachment(image: image)
             attachment.name = "base-home-\(scheme == .light ? "light" : "dark")"
             attachment.lifetime = .keepAlways
             add(attachment)
         }
+    }
+
+    func testVillageSafeSpaceChangeOwnsBackdropOnly() throws {
+        let root = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent().deletingLastPathComponent()
+        let source = try String(contentsOf: root.appending(path: "Sources/Screens/BaseView.swift"),
+                                encoding: .utf8)
+        XCTAssertTrue(source.contains(".background(PixelUITheme.screen.ignoresSafeArea())"))
+        XCTAssertTrue(source.contains("districtPager(containerSize: geometry.size)\n                        .frame(maxWidth: .infinity, maxHeight: .infinity)"))
+        XCTAssertTrue(source.contains(".safeAreaInset(edge: .bottom, spacing: 0)"))
     }
 
     func testBaseSaveMenuIsADirectFullSizeSettingsDestination() throws {

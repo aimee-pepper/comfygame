@@ -5,6 +5,14 @@ import XCTest
 
 @MainActor
 final class ExpeditionOutcomeTests: XCTestCase {
+    private func rgba(_ image: UIImage, x: Int, y: Int) throws -> [UInt8] {
+        let cg = try XCTUnwrap(image.cgImage)
+        let data = try XCTUnwrap(cg.dataProvider?.data)
+        let bytes = CFDataGetBytePtr(data)!
+        let offset = y * cg.bytesPerRow + x * 4
+        return Array(UnsafeBufferPointer(start: bytes + offset, count: 4))
+    }
+
     private func departureRun(player: GridPoint = .init(x: 0, y: 0),
                               tiles: [Tile] = Array(repeating: Tile(), count: 4),
                               collapsedOnTurn: Int? = nil) -> WorldRun {
@@ -222,7 +230,7 @@ final class ExpeditionOutcomeTests: XCTestCase {
         XCTAssertTrue(source.contains("count: 6"))
     }
 
-    func testReturnRecapRendersAtApprovedOrdinaryPhoneSize() {
+    func testReturnRecapRendersAtApprovedOrdinaryPhoneSize() throws {
         let store = GameStore(io: .temporary(name: "return-recap-render-\(UUID().uuidString)"))
         func fixture(kind: RunExitSummary.Kind) -> RunExitSummary {
             RunExitSummary(
@@ -284,6 +292,8 @@ final class ExpeditionOutcomeTests: XCTestCase {
             )
             let window = UIWindow(frame: CGRect(x: 0, y: 0, width: 368, height: 800))
             window.rootViewController = controller
+            controller.additionalSafeAreaInsets = UIEdgeInsets(top: 59, left: 0,
+                                                                bottom: 34, right: 0)
             window.makeKeyAndVisible()
             controller.view.frame = window.bounds
             controller.view.layoutIfNeeded()
@@ -293,12 +303,34 @@ final class ExpeditionOutcomeTests: XCTestCase {
             }
             window.isHidden = true
             XCTAssertEqual(image.size, CGSize(width: 368, height: 800))
+            XCTAssertNotEqual(try rgba(image, x: 184, y: 10), [0, 0, 0, 255])
+            XCTAssertNotEqual(try rgba(image, x: 184, y: 785), [0, 0, 0, 255])
+            let scrollFrame = RunExitSafeSpaceMeasurement.scrollFrame
+            let actionFrame = RunExitSafeSpaceMeasurement.actionFrame
+            XCTAssertGreaterThan(scrollFrame.height, 0)
+            XCTAssertGreaterThan(actionFrame.height, 0)
+            XCTAssertLessThanOrEqual(scrollFrame.maxY, actionFrame.minY + 0.5,
+                                     "the fixed action may not cover the final recap row")
             let attachment = XCTAttachment(image: image)
             attachment.name = "return-recap-\(state.name)-\(scheme == .light ? "light" : "dark")"
             attachment.lifetime = .keepAlways
             add(attachment)
           }
         }
+    }
+
+    func testReturnRecapSafeSpaceChangeOwnsBackdropOnly() throws {
+        let root = URL(fileURLWithPath: #filePath).deletingLastPathComponent()
+            .deletingLastPathComponent()
+        let source = try String(contentsOf: root.appending(path: "Sources/App/RootView.swift"),
+                                encoding: .utf8)
+        let start = try XCTUnwrap(source.range(of: "struct RunExitSummaryView"))
+        let end = try XCTUnwrap(source.range(of: "private var recapHeader",
+                                             range: start.upperBound..<source.endIndex))
+        let recap = String(source[start.lowerBound..<end.lowerBound])
+        XCTAssertTrue(recap.contains(".background(PixelUITheme.screen.ignoresSafeArea())"))
+        XCTAssertTrue(recap.contains("recapHeader\n            ScrollView"))
+        XCTAssertFalse(recap.contains("Spacer("))
     }
 
     func testReturnRecapKeepsWorldPagesSeparateAndDoesNotLeakUninspectedTitles() throws {

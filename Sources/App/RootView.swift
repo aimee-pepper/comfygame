@@ -300,6 +300,40 @@ private struct AnchorSettlementView: View {
     }
 }
 
+#if DEBUG
+@MainActor enum RunExitSafeSpaceMeasurement {
+    static var scrollFrame: CGRect = .zero
+    static var actionFrame: CGRect = .zero
+}
+
+private struct RunExitSafeSpaceProbe: UIViewRepresentable {
+    enum Region { case scroll, action }
+    let region: Region
+
+    final class ProbeView: UIView {
+        var region: Region = .scroll
+        private func recordFrame() {
+            guard let window, abs(window.bounds.width - 368) < 0.5 else { return }
+            let frame = convert(bounds, to: window)
+            switch region {
+            case .scroll: RunExitSafeSpaceMeasurement.scrollFrame = frame
+            case .action: RunExitSafeSpaceMeasurement.actionFrame = frame
+            }
+        }
+        override func didMoveToWindow() {
+            super.didMoveToWindow()
+            DispatchQueue.main.async { [weak self] in self?.recordFrame() }
+        }
+        override func layoutSubviews() { super.layoutSubviews(); recordFrame() }
+    }
+
+    func makeUIView(context: Context) -> ProbeView {
+        let view = ProbeView(frame: .zero); view.region = region; return view
+    }
+    func updateUIView(_ uiView: ProbeView, context: Context) { uiView.region = region }
+}
+#endif
+
 struct RunExitSummaryView: View {
     @EnvironmentObject private var store: GameStore
     @State private var tutorialHidden = false
@@ -340,6 +374,9 @@ struct RunExitSummaryView: View {
                 .padding(.vertical, 8)
             }
             .scrollBounceBehavior(.basedOnSize)
+#if DEBUG
+            .background { RunExitSafeSpaceProbe(region: .scroll) }
+#endif
 
             VStack {
                 Button("Return to Village", action: dismiss)
@@ -355,9 +392,12 @@ struct RunExitSummaryView: View {
             .padding(.vertical, 9)
             .background(PixelUITheme.headerB)
             .overlay(alignment: .top) { Rectangle().fill(PixelUITheme.edge).frame(height: 2) }
+#if DEBUG
+            .background { RunExitSafeSpaceProbe(region: .action) }
+#endif
         }
         .foregroundStyle(PixelUITheme.text)
-        .background(PixelUITheme.screen)
+        .background(PixelUITheme.screen.ignoresSafeArea())
         .presentationDetents([.large])
         .interactiveDismissDisabled()
         .overlay {

@@ -1,3 +1,5 @@
+import SwiftUI
+import UIKit
 import XCTest
 @testable import Bookbinder
 
@@ -90,7 +92,105 @@ final class CombatTests: XCTestCase {
         store.activeEncounter?.foes ?? []
     }
 
+    private func renderedRGBA(_ image: UIImage, x: Int, y: Int) throws -> [UInt8] {
+        let cg = try XCTUnwrap(image.cgImage)
+        let data = try XCTUnwrap(cg.dataProvider?.data)
+        let bytes = CFDataGetBytePtr(data)!
+        let offset = y * cg.bytesPerRow + x * 4
+        return Array(UnsafeBufferPointer(start: bytes + offset, count: 4))
+    }
+
     // MARK: Structure
+
+    func testEncounterSafeSpaceBackdropAndBattleLogOwnFormerSpacerRemainder() throws {
+        EncounterSafeSpaceMeasurement.isArmed = true
+        defer { EncounterSafeSpaceMeasurement.isArmed = false }
+        let store = GameStore(io: .temporary(name: "encounter-safe-space-\(UUID().uuidString)"))
+        store.mutate("safe-space encounter fixture", flush: true) { state in
+            let point = GridPoint(x: 0, y: 0)
+            var map = WorldMap(width: 1, height: 1, tiles: [Tile(isRevealed: true)], entry: point)
+            map[point].content = .portal(isEntry: true)
+            var run = WorldRun(runIndex: 1, book: BoundBook(written: [], essencePaid: 0),
+                               mapSeed: 1, rng: SeededRNG(seed: 1), map: map,
+                               playerPosition: point)
+            var rng = SeededRNG(seed: 2)
+            let stats = CombatStats(displayName: "Paper Moth", icon: "ant",
+                                    maxHP: 12, attack: 2)
+            let foe = FoeState(id: InstanceID(rawValue: 9), stats: stats, currentHP: 12)
+            run.activeEncounter = CombatRules.makeEncounter(
+                id: InstanceID(rawValue: 10), foes: [foe], party: [.binder], rng: &rng)
+            run.activeEncounter?.log = [
+                "First event.", "Second event.", "Third event.", "Latest event."
+            ]
+            state.worlds.activeRun = run
+        }
+        XCTAssertNotNil(store.activeEncounter)
+
+        func mount(_ name: String) throws {
+            let frozen = try SaveCodec.encode(store.state)
+            let controller = UIHostingController(rootView:
+                EncounterView().environmentObject(store))
+            let window = UIWindow(frame: CGRect(x: 0, y: 0, width: 368, height: 800))
+            window.rootViewController = controller
+            controller.additionalSafeAreaInsets = UIEdgeInsets(top: 59, left: 0,
+                                                                bottom: 34, right: 0)
+            window.makeKeyAndVisible()
+            controller.view.frame = window.bounds
+            controller.view.layoutIfNeeded()
+            RunLoop.main.run(until: Date().addingTimeInterval(0.08))
+
+            let safe = controller.view.safeAreaInsets
+            let header = EncounterSafeSpaceMeasurement.headerFrame
+            let log = EncounterSafeSpaceMeasurement.battleLogFrame
+            let action = EncounterSafeSpaceMeasurement.actionFrame
+            XCTAssertEqual(header.minY, safe.top, accuracy: 0.75)
+            XCTAssertGreaterThan(log.height, 62,
+                                 "the battle log must own the former flexible spacer remainder")
+            XCTAssertEqual(log.maxY, action.minY, accuracy: 0.75,
+                           "no unowned spacer may remain above the action/outcome rail")
+            XCTAssertEqual(action.maxY, 800 - safe.bottom, accuracy: 0.75)
+            XCTAssertEqual(try SaveCodec.encode(store.state), frozen)
+
+            let image = UIGraphicsImageRenderer(size: window.bounds.size).image { _ in
+                controller.view.drawHierarchy(in: controller.view.bounds, afterScreenUpdates: true)
+            }
+            XCTAssertNotEqual(try renderedRGBA(image, x: 184, y: 10), [0, 0, 0, 255])
+            XCTAssertNotEqual(try renderedRGBA(image, x: 184, y: 785), [0, 0, 0, 255])
+            let attachment = XCTAttachment(image: image)
+            attachment.name = "encounter-safe-space-\(name)-368x800"
+            attachment.lifetime = .keepAlways
+            add(attachment)
+            window.isHidden = true
+        }
+
+        try mount("in-progress")
+        store.mutate("safe-space completed branch", flush: true) {
+            $0.worlds.activeRun?.activeEncounter?.outcome = .victory
+        }
+        try mount("completed")
+#if DEBUG
+        store.mutate("safe-space debug branch", flush: true) {
+            $0.worlds.activeRun?.activeEncounter?.outcome = nil
+            $0.worlds.activeRun?.activeEncounter?.debugGodMode = .init()
+        }
+        try mount("debug")
+#endif
+    }
+
+    func testEncounterSafeSpaceSourcePreservesLogOrderAndRemovesOnlyTopLevelSpacer() throws {
+        let root = URL(fileURLWithPath: #filePath).deletingLastPathComponent()
+            .deletingLastPathComponent()
+        let source = try String(contentsOf: root.appending(path: "Sources/Screens/EncounterView.swift"),
+                                encoding: .utf8)
+        XCTAssertTrue(source.contains(".background(Color(.systemGroupedBackground).ignoresSafeArea())"))
+        XCTAssertTrue(source.contains("encounter.log.suffix(3).enumerated()"))
+        XCTAssertTrue(source.contains("minHeight: 62, maxHeight: .infinity"))
+        let bodyStart = try XCTUnwrap(source.range(of: "var body: some View"))
+        let bodyEnd = try XCTUnwrap(source.range(of: "// MARK: Header",
+                                                 range: bodyStart.upperBound..<source.endIndex))
+        XCTAssertFalse(source[bodyStart.lowerBound..<bodyEnd.lowerBound]
+            .contains("Spacer(minLength: 0)"))
+    }
 
     func testRecommendedEncounterScalingAnchorsFoeLevelToBinder() throws {
         let store = GameStore(io: .temporary(name: "scaling-party-\(UUID().uuidString)"))
