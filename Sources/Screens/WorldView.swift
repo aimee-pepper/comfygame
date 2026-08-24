@@ -618,57 +618,59 @@ struct WorldView: View {
     private var run: WorldRun? { store.state.worlds.activeRun }
 
     var body: some View {
-        VStack(spacing: 0) {
+        AnyView(VStack(spacing: 0) {
             if let run {
                 StabilityHeader(run: run)
                 PartyHealthStrip(run: run, state: store.state)
-                GeometryReader { viewport in
-                    let visibilityProfile = WorldRules.visibilityProfile(
-                        in: run, party: WorldRules.sightBonus(in: store.state))
-                    let viewportColumns = WorldMapLayout.viewportColumns(
-                        mapColumns: run.map.width,
-                        cameraColumns: Tuning.World.viewportTiles)
-                    let mapWidth = WorldMapLayout.maximumSide(
-                        containerWidth: viewport.size.width,
-                        viewportHeight: viewport.size.height,
-                        viewportTiles: viewportColumns,
-                        displayScale: displayScale)
-                    let viewportRows = WorldMapLayout.viewportRows(
-                        mapWidth: mapWidth,
-                        availableHeight: viewport.size.height,
-                        viewportColumns: viewportColumns,
-                        mapRows: run.map.height)
-                    VStack(spacing: 0) {
-                        MapGrid(
-                            run: run,
-                            maximumWidth: mapWidth,
-                            viewportColumns: viewportColumns,
-                            viewportRows: viewportRows,
-                            visibilityProfile: visibilityProfile
-                        ) { point in
-                            tapped(point, in: run)
-                        }
-                        .overlay(alignment: .bottom) {
-                            WorldFieldFeedbackRow().environmentObject(store)
-                        }
-                    }
-                    .overlay(alignment: .top) {
-                        LootDecisionCard()
-                            .padding(12)
-                    }
-                }
-                .aspectRatio(1, contentMode: .fit)
-                .background {
-#if DEBUG
-                    WorldMapStageProbe()
-#endif
-                }
-                .clipped()
-
                 VStack(spacing: 0) {
-                    satchel(run)
-                        .padding(.horizontal, 12)
-                        .padding(.vertical, 6)
+                    VStack(spacing: 0) {
+                        GeometryReader { viewport in
+                        let visibilityProfile = WorldRules.visibilityProfile(
+                            in: run, party: WorldRules.sightBonus(in: store.state))
+                        let viewportColumns = WorldMapLayout.viewportColumns(
+                            mapColumns: run.map.width,
+                            cameraColumns: Tuning.World.viewportTiles)
+                        let mapWidth = WorldMapLayout.maximumSide(
+                            containerWidth: viewport.size.width,
+                            viewportHeight: viewport.size.height,
+                            viewportTiles: viewportColumns,
+                            displayScale: displayScale)
+                        let viewportRows = WorldMapLayout.viewportRows(
+                            mapWidth: mapWidth,
+                            availableHeight: viewport.size.height,
+                            viewportColumns: viewportColumns,
+                            mapRows: run.map.height)
+                        VStack(spacing: 0) {
+                            MapGrid(
+                                run: run,
+                                maximumWidth: mapWidth,
+                                viewportColumns: viewportColumns,
+                                viewportRows: viewportRows,
+                                visibilityProfile: visibilityProfile
+                            ) { point in
+                                tapped(point, in: run)
+                            }
+                            .overlay(alignment: .bottom) {
+                                WorldFieldFeedbackRow().environmentObject(store)
+                            }
+                        }
+                        .overlay(alignment: .top) {
+                            LootDecisionCard()
+                                .padding(12)
+                        }
+                        }
+                        .aspectRatio(1, contentMode: .fit)
+                        .background {
+#if DEBUG
+                            WorldMapStageProbe()
+#endif
+                        }
+                        .clipped()
+                        satchel(run)
+                            .padding(.horizontal, 12)
+                            .padding(.vertical, 6)
+                    }
+
                     controls(run)
                 }
                 .background(PixelUITheme.surfaceInset)
@@ -677,10 +679,8 @@ struct WorldView: View {
                 }
                 .zIndex(2)
             }
-        }
-        .overlayPreferenceValue(MiningAnchorReceiptKey.self) { anchors in
-            miningOverlay(anchors: anchors)
-        }
+        })
+        .modifier(WorldMiningFeedbackPresentationModifier(store: store))
         .background(PixelUITheme.edgeDark)
 #if DEBUG
         .toolbar {
@@ -1039,36 +1039,6 @@ struct WorldView: View {
     }
 
     private var useTileUnavailableReason: String { "There is nothing to use here." }
-
-    @ViewBuilder private func miningOverlay(anchors: MiningAnchorReceipt) -> some View {
-        GeometryReader { proxy in
-            if let group = store.worldMiningFeedback,
-               let presentation = ResourceMiningFeedbackV1.make(from: group),
-               let origin = anchors.origin {
-                    let bounds = CGRect(origin: .zero, size: proxy.size)
-                    let start = proxy[origin]
-                    let allDestinationsVisible = presentation.subjects.allSatisfy { subject in
-                        guard let anchor = anchors.destinations[subject.resourceID] else { return false }
-                        return ResourceMiningFeedbackV1.anchorIsVisible(proxy[anchor], in: bounds)
-                    }
-                    if ResourceMiningFeedbackV1.anchorIsVisible(start, in: bounds),
-                       allDestinationsVisible {
-                        ResourceMiningFeedbackOverlay(
-                            presentation: presentation,
-                            start: start,
-                            destination: { proxy[anchors.destinations[$0]!] },
-                            startedAtMonotonicTime: group.startedAtMonotonicTime,
-                            onFinished: {
-                                store.finishWorldMiningFeedback(expectedBatchID: group.batchID)
-                            })
-                    } else {
-                        Color.clear.task(id: group.batchID) {
-                            store.finishWorldMiningFeedback(expectedBatchID: group.batchID)
-                        }
-                    }
-            }
-        }
-    }
 
     private func interactionDetail(in run: WorldRun) -> String {
         if let node = store.harvestableHere {
@@ -1712,11 +1682,6 @@ private struct MapGrid: View {
                                      side: side,
 									 presentationTick: terrainClock.tick,
                                      useSimpleRenderer: simpleRenderer)
-                                .anchorPreference(key: MiningAnchorReceiptKey.self,
-                                                  value: .center) {
-                                    MiningAnchorReceipt(
-                                        origin: point == run.playerPosition ? $0 : nil)
-                                }
                                 .onTapGesture { onTap(point) }
                         }
                     }
@@ -2003,6 +1968,10 @@ private struct TileView: View {
                     Circle()
                         .fill(Color.accentColor)
                         .padding(side * 0.14)
+                        .anchorPreference(key: MiningAnchorReceiptKey.self,
+                                          value: .center) {
+                            MiningAnchorReceipt(origin: $0, originEmissionCount: 1)
+                        }
                 }
                 if let enemy, case .alert = enemy.awareness {
                     Circle()

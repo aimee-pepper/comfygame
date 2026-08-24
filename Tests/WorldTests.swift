@@ -1697,7 +1697,7 @@ final class WorldTests: XCTestCase {
         RunLoop.main.run(until: Date().addingTimeInterval(0.18))
         XCTAssertEqual(store.worldMiningFeedback?.batchID,
                        store.currentWorldFieldEventBatch?.batchID,
-                       "mounted origin and every toolbar destination must be collected")
+                       "the mounted map must emit exactly one player origin and collect every toolbar destination")
         XCTAssertEqual(WorldMapStageMeasurement.latestFrame.width, 368, accuracy: 0.5)
         XCTAssertEqual(WorldMapStageMeasurement.latestFrame.height, 368, accuracy: 0.5,
                        "mining overlay cannot alter build-255 map geometry")

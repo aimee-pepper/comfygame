@@ -712,6 +712,7 @@ struct ResourceMiningFeedbackOverlay: View {
 
 struct MiningAnchorReceipt {
     var origin: Anchor<CGPoint>?
+    var originEmissionCount = 0
     var destinations: [ResourceID: Anchor<CGPoint>] = [:]
 }
 
@@ -721,7 +722,49 @@ struct MiningAnchorReceiptKey: PreferenceKey {
                        nextValue: () -> MiningAnchorReceipt) {
         let next = nextValue()
         value.origin = value.origin ?? next.origin
+        value.originEmissionCount += next.originEmissionCount
         value.destinations.merge(next.destinations, uniquingKeysWith: { first, _ in first })
+    }
+}
+
+@MainActor
+struct WorldMiningFeedbackPresentationModifier: ViewModifier {
+    @ObservedObject var store: GameStore
+
+    func body(content: Content) -> some View {
+        content.overlayPreferenceValue(MiningAnchorReceiptKey.self) { anchors in
+            GeometryReader { proxy in
+                if let group = store.worldMiningFeedback,
+                   let presentation = ResourceMiningFeedbackV1.make(from: group),
+                   anchors.originEmissionCount == 1,
+                   let origin = anchors.origin {
+                    let bounds = CGRect(origin: .zero, size: proxy.size)
+                    let start = proxy[origin]
+                    let allDestinationsVisible = presentation.subjects.allSatisfy { subject in
+                        guard let anchor = anchors.destinations[subject.resourceID] else {
+                            return false
+                        }
+                        return ResourceMiningFeedbackV1.anchorIsVisible(proxy[anchor], in: bounds)
+                    }
+                    if ResourceMiningFeedbackV1.anchorIsVisible(start, in: bounds),
+                       allDestinationsVisible {
+                        ResourceMiningFeedbackOverlay(
+                            presentation: presentation,
+                            start: start,
+                            destination: { proxy[anchors.destinations[$0]!] },
+                            startedAtMonotonicTime: group.startedAtMonotonicTime,
+                            onFinished: {
+                                store.finishWorldMiningFeedback(expectedBatchID: group.batchID)
+                            }
+                        )
+                    } else {
+                        Color.clear.task(id: group.batchID) {
+                            store.finishWorldMiningFeedback(expectedBatchID: group.batchID)
+                        }
+                    }
+                }
+            }
+        }
     }
 }
 
