@@ -470,7 +470,6 @@ final class GameStore: ObservableObject {
 
     func beginWorldFieldAttempt(_ sourceAction: WorldFieldEventBatchV1.SourceAction) -> WorldFieldAttempt? {
         guard let run = activeRun else { return nil }
-        clearWorldTravellerSpeechPresentation()
         let attempt = WorldFieldAttempt(
             id: nextWorldFieldAttemptID, sourceAction: sourceAction,
             worldRunID: "\(run.runIndex):\(run.mapSeed)", turnBefore: run.turnsTaken)
@@ -478,8 +477,22 @@ final class GameStore: ObservableObject {
         return attempt
     }
 
+    /// Cancels transient speech only once the rules-owned action has actually committed.
+    /// Refused/no-op attempts must not consume a bubble that has already entered the shown set.
+    func acceptWorldFieldAttempt(_ attempt: WorldFieldAttempt) {
+        guard let run = activeRun,
+              "\(run.runIndex):\(run.mapSeed)" == attempt.worldRunID else { return }
+        clearWorldTravellerSpeechPresentation()
+    }
+
     func submitWorldFieldEvents(_ events: [WorldRules.Event], for attempt: WorldFieldAttempt,
                                 now: UInt64 = DispatchTime.now().uptimeNanoseconds) {
+        if events.contains(where: { event in
+            if case .blocked = event { return false }
+            return true
+        }) {
+            acceptWorldFieldAttempt(attempt)
+        }
         let narrations = events.compactMap(WorldFieldNarration.text)
         guard !narrations.isEmpty else { return }
         let turnAfter = activeRun?.turnsTaken ?? attempt.turnBefore

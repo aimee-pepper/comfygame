@@ -430,8 +430,21 @@ extension GameStore {
     /// A single step onto an adjacent tile.
     func step(to point: GridPoint) {
         guard activeRun?.activeEncounter == nil else { return }
-        guard let priorPosition = activeRun?.playerPosition else { return }
+        guard let run = activeRun else { return }
+        let priorPosition = run.playerPosition
         guard let attempt = beginWorldFieldAttempt(.step) else { return }
+        guard WorldRules.isAdjacent(run.playerPosition, point) else {
+            let events: [WorldRules.Event] = [.blocked("That's not a step away.")]
+            recentEvents = events
+            submitWorldFieldEvents(events, for: attempt)
+            return
+        }
+        if let refusal = WorldRules.blockedMovementRefusal(to: point, in: run.map) {
+            let events: [WorldRules.Event] = [.blocked(refusal)]
+            recentEvents = events
+            submitWorldFieldEvents(events, for: attempt)
+            return
+        }
         var events: [WorldRules.Event] = []
         mutate("step", scope: .expedition) { state in
             events = WorldRules.step(to: point, in: &state)

@@ -1746,11 +1746,44 @@ final class WorldTests: XCTestCase {
         store.finishWorldTravellerSpeech(expectedTravellerID: "mara")
         XCTAssertEqual(store.worldTravellerSpeech?.travellerID, "tovin",
                        "stale expiry cannot advance a successor")
-        _ = store.beginWorldFieldAttempt(WorldFieldEventBatchV1.SourceAction.survey)
+
+        store.mutate("prepare refused traveller speech actions", flush: true) { state in
+            state.worlds.activeRun?.map[GridPoint(x: 5, y: 6)].ground = .deepWater
+            state.worlds.activeRun?.map[GridPoint(x: 8, y: 8)].ground = .deepWater
+        }
+        let refusedBytes = try SaveCodec.encode(store.state)
+        let refusedTurn = store.activeRun?.turnsTaken
+        let currentBeforeRefusal = store.worldTravellerSpeech
+        let queueBeforeRefusal = store.worldTravellerSpeechQueue
+
+        store.step(to: GridPoint(x: 5, y: 6))
+        XCTAssertEqual(store.worldTravellerSpeech, currentBeforeRefusal)
+        XCTAssertEqual(store.worldTravellerSpeechQueue, queueBeforeRefusal)
+        XCTAssertEqual(store.activeRun?.turnsTaken, refusedTurn)
+        XCTAssertEqual(try SaveCodec.encode(store.state), refusedBytes,
+                       "a real Deep Water refusal cannot consume speech or mutate saved play")
+
+        store.travel(to: GridPoint(x: 8, y: 8))
+        XCTAssertEqual(store.worldTravellerSpeech, currentBeforeRefusal)
+        XCTAssertEqual(store.worldTravellerSpeechQueue, queueBeforeRefusal)
+        XCTAssertEqual(store.activeRun?.turnsTaken, refusedTurn)
+        XCTAssertEqual(try SaveCodec.encode(store.state), refusedBytes,
+                       "a real no-path travel cannot consume speech or mutate saved play")
+
+        store.travel(to: after)
+        XCTAssertEqual(store.worldTravellerSpeech, currentBeforeRefusal)
+        XCTAssertEqual(store.worldTravellerSpeechQueue, queueBeforeRefusal)
+        XCTAssertEqual(try SaveCodec.encode(store.state), refusedBytes,
+                       "a shared no-op action seam cannot consume speech")
+
+        store.step(to: GridPoint(x: 4, y: 5))
         XCTAssertNil(store.worldTravellerSpeech)
         XCTAssertTrue(store.worldTravellerSpeechQueue.isEmpty)
-        store.presentTravellerSpeechAfterMovement(from: before, sourceAction: .step)
-        XCTAssertNil(store.worldTravellerSpeech, "shown travellers never repeat in one run")
+        XCTAssertEqual(store.activeRun?.turnsTaken, (refusedTurn ?? 0) + 1,
+                       "one accepted World action clears presentation after committing")
+        store.step(to: after)
+        XCTAssertNil(store.worldTravellerSpeech,
+                     "accepted movement back beside already-shown travellers cannot repeat them")
         let relaunched = GameStore(io: io)
         XCTAssertNil(relaunched.worldTravellerSpeech)
         XCTAssertTrue(relaunched.worldTravellerSpeechQueue.isEmpty)
