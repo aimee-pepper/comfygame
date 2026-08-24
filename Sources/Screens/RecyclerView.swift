@@ -220,16 +220,20 @@ private struct RecyclerPreviewSheet: View {
                         }
 #endif
                     }
+#if DEBUG
                     ForEach(Array(preview.returnedSamples.enumerated()), id: \.offset) { index, sample in
                         LabeledContent(sample.displayName, value: sample.grade.formatted(.number.precision(.fractionLength(0))))
-#if DEBUG
                             .background {
                                 if index == preview.returnedSamples.indices.last {
                                     P3SafeSpaceProbe("recycler.preview.final", identity: sample.displayName)
                                 }
                             }
-#endif
                     }
+#else
+                    ForEach(Array(preview.returnedSamples.enumerated()), id: \.offset) { _, sample in
+                        LabeledContent(sample.displayName, value: sample.grade.formatted(.number.precision(.fractionLength(0))))
+                    }
+#endif
                     if preview.returnedResources.nonZero.isEmpty && preview.returnedSamples.isEmpty {
                         Text("No recoverable output.").foregroundStyle(.secondary)
 #if DEBUG
