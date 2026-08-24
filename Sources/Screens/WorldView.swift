@@ -1642,6 +1642,10 @@ private struct MapGrid: View {
                                 visibility: currentVisibility, wasExplored: wasExplored,
                                 profile: visibilityProfile)
                             let showsStationaryContents = currentVisibility == .full || wasExplored
+                            let usesRememberedStationaryIdentity =
+                                ExplorationMapIdentityResolver.usesRememberedFrame(
+                                    currentVisibility: currentVisibility,
+                                    disclosed: showsStationaryContents)
                             let displayTile = displayTile(at: point, visibility: visibility)
                             let presentation = WorldTileVisibilityPresentation.resolve(
                                 run: run, point: point, tile: displayTile, visibility: visibility,
@@ -1653,6 +1657,8 @@ private struct MapGrid: View {
                             TileView(tile: displayTile,
                                      visibility: visibility,
                                      isRememberedTerrain: isRememberedTerrain,
+                                     usesRememberedStationaryIdentity:
+                                        usesRememberedStationaryIdentity,
                                      unexploredFringeGradient: unexploredFringeGradient,
                                      showsStationaryContents: showsStationaryContents,
                                      visibilityProfile: visibilityProfile,
@@ -1911,6 +1917,7 @@ private struct TileView: View {
     let tile: Tile
     let visibility: WorldRules.TileVisibility
     let isRememberedTerrain: Bool
+    let usesRememberedStationaryIdentity: Bool
     let unexploredFringeGradient: UnexploredFringeGradient?
     let showsStationaryContents: Bool
     let visibilityProfile: WorldRules.VisibilityProfile
@@ -2065,7 +2072,8 @@ private struct TileView: View {
 		return ExplorationMapIdentityResolver.key(
 			tile: tile, site: site, siteLooted: siteLooted,
 			hasLooseWorldPage: hasLooseWorldPage, tick: presentationTick,
-			disclosed: showsStationaryContents, remembered: isRememberedTerrain)
+			disclosed: showsStationaryContents,
+			remembered: usesRememberedStationaryIdentity)
 	}
 
     private var tint: Color {

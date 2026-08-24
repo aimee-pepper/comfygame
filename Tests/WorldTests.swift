@@ -1481,6 +1481,26 @@ final class WorldTests: XCTestCase {
         XCTAssertEqual(MapAssetTestSupport.explorationMapKey(
             tile: Tile(content: .hazard, isRevealed: true), tick: 2, remembered: true),
                        "hazard/ordinary/frame-0")
+        XCTAssertFalse(MapAssetTestSupport.stationaryIdentityUsesRememberedFrame(
+            currentVisibility: .full, disclosed: true))
+        XCTAssertTrue(MapAssetTestSupport.stationaryIdentityUsesRememberedFrame(
+            currentVisibility: .fringe, disclosed: true))
+        XCTAssertTrue(MapAssetTestSupport.stationaryIdentityUsesRememberedFrame(
+            currentVisibility: .hidden, disclosed: true))
+        XCTAssertFalse(MapAssetTestSupport.stationaryIdentityUsesRememberedFrame(
+            currentVisibility: .fringe, disclosed: false))
+        XCTAssertFalse(MapAssetTestSupport.stationaryIdentityUsesRememberedFrame(
+            currentVisibility: .hidden, disclosed: false))
+        for visibility: WorldRules.TileVisibility in [.fringe, .hidden] {
+            let remembered = MapAssetTestSupport.stationaryIdentityUsesRememberedFrame(
+                currentVisibility: visibility, disclosed: true)
+            XCTAssertEqual(MapAssetTestSupport.explorationMapKey(
+                tile: Tile(content: .hazard, isRevealed: true), tick: 2,
+                disclosed: true, remembered: remembered), "hazard/ordinary/frame-0")
+            XCTAssertNil(MapAssetTestSupport.explorationMapKey(
+                tile: Tile(content: .hazard, isRevealed: false), tick: 2,
+                disclosed: false, remembered: false))
+        }
         XCTAssertEqual(MapAssetTestSupport.explorationMapKey(
             tile: Tile(), hasLooseWorldPage: true), "loose_world_page/ordinary/frame-0")
 
@@ -1516,11 +1536,19 @@ final class WorldTests: XCTestCase {
             XCTAssertNotNil(key, item.id.rawValue)
             XCTAssertTrue(key?.contains(item.id.rawValue) == true, item.id.rawValue)
         }
-        let hiddenIdentity = ItemStack(id: InstanceID(rawValue: 99), catalogID: "field_maul",
-                                       identified: false)
-        XCTAssertEqual(MapAssetTestSupport.explorationMapKey(
-            tile: Tile(content: .item(hiddenIdentity), isRevealed: true)),
-                       "catalogue-item/unknown-curio")
+        for id: ItemID in ["curio_humming_shard", "curio_bound_knot"] {
+            let hiddenCurio = ItemStack(id: InstanceID(rawValue: 99), catalogID: id,
+                                        identified: false)
+            XCTAssertEqual(MapAssetTestSupport.explorationMapKey(
+                tile: Tile(content: .item(hiddenCurio), isRevealed: true)),
+                           "catalogue-item/unknown-curio")
+        }
+        for id: ItemID in ["field_maul", "salve", "legacy_unknown_item"] {
+            let unauthorized = ItemStack(id: InstanceID(rawValue: 100), catalogID: id,
+                                         identified: false)
+            XCTAssertNil(MapAssetTestSupport.explorationMapKey(
+                tile: Tile(content: .item(unauthorized), isRevealed: true)), id.rawValue)
+        }
         XCTAssertNil(MapAssetTestSupport.explorationMapKey(
             tile: Tile(content: .traveller("mara"), isRevealed: true)))
     }

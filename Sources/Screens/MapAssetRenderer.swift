@@ -51,6 +51,15 @@ enum ExplorationMapIdentityPack {
 /// Pure key adapter. It never manufactures pixels and returns nil for every unpromoted identity.
 @MainActor
 enum ExplorationMapIdentityResolver {
+    private static let opaqueCurioIDs: Set<ItemID> = [
+        "curio_humming_shard", "curio_bound_knot"
+    ]
+
+    static func usesRememberedFrame(currentVisibility: WorldRules.TileVisibility,
+                                    disclosed: Bool) -> Bool {
+        disclosed && currentVisibility != .full
+    }
+
     static func key(tile: Tile, site: SiteDef?, siteLooted: Bool?, hasLooseWorldPage: Bool,
                     tick: Int, disclosed: Bool, remembered: Bool) -> String? {
         guard disclosed else { return nil }
@@ -58,9 +67,10 @@ enum ExplorationMapIdentityResolver {
         switch tile.content {
         case .item(let stack):
             let id = stack.catalogID.rawValue
+            guard stack.identified || opaqueCurioIDs.contains(stack.catalogID) else { return nil }
             let candidates = stack.identified
                 ? ["catalogue-item/\(id)/identified", "catalogue-item/\(id)"]
-                : ["catalogue-item/unknown-curio", "catalogue-item/\(id)"]
+                : ["catalogue-item/unknown-curio"]
             return candidates.first { ExplorationMapIdentityPack.image(key: $0) != nil }
         case .hazard:
             return ExplorationMapIdentityPack.frameKey(identity: "hazard", tick: tick,
@@ -343,6 +353,13 @@ struct MapTileArtRequest {
         ExplorationMapIdentityResolver.key(tile: tile, site: site, siteLooted: siteLooted,
                                            hasLooseWorldPage: hasLooseWorldPage, tick: tick,
                                            disclosed: disclosed, remembered: remembered)
+    }
+
+    static func stationaryIdentityUsesRememberedFrame(
+        currentVisibility: WorldRules.TileVisibility, disclosed: Bool
+    ) -> Bool {
+        ExplorationMapIdentityResolver.usesRememberedFrame(
+            currentVisibility: currentVisibility, disclosed: disclosed)
     }
 
     static func productionRequest(
