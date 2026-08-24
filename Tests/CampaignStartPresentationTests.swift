@@ -102,11 +102,12 @@ final class CampaignStartPresentationTests: XCTestCase {
         XCTAssertEqual(CampaignStartLayoutPolicy.ordinarySlotRowCount(slotCount: 1), 1)
         XCTAssertEqual(CampaignStartLayoutPolicy.ordinarySlotRowCount(slotCount: 8), 8)
         XCTAssertEqual(CampaignStartLayoutPolicy.ordinarySlotCardMinimumHeight, 112)
-        XCTAssertEqual(CampaignStartLayoutPolicy.ordinaryShelfHeight, 430)
+        XCTAssertEqual(CampaignStartLayoutPolicy.ordinaryShelfHeight(availableHeight: 707), 477)
+        XCTAssertGreaterThan(CampaignStartLayoutPolicy.ordinaryShelfHeight(availableHeight: 707), 430)
         XCTAssertEqual(CampaignStartLayoutPolicy.ordinaryBottomRailHeight, 84)
     }
 
-    func testOrdinaryCampaignSurfaceScrollsOnlyInsideTheFixedArchiveShelf() throws {
+    func testOrdinaryCampaignSurfaceAllocatesMeasuredRemainderToArchiveShelf() throws {
         let root = URL(fileURLWithPath: #filePath)
             .deletingLastPathComponent().deletingLastPathComponent()
         let source = try String(contentsOf: root.appending(path: "Sources/Screens/CampaignStartView.swift"),
@@ -125,12 +126,12 @@ final class CampaignStartPresentationTests: XCTestCase {
                                                        range: ordinaryStart.upperBound..<source.endIndex))
         let ordinary = String(source[ordinaryStart.lowerBound..<contentsStart.lowerBound])
         XCTAssertTrue(ordinary.contains("CampaignArchiveShelf"))
-        XCTAssertTrue(ordinary.contains("ordinaryShelfHeight"))
+        XCTAssertTrue(ordinary.contains(".frame(maxHeight: .infinity)"))
         XCTAssertTrue(ordinary.contains("ordinaryBottomRailHeight"))
-        XCTAssertTrue(ordinary.contains(".overlay(alignment: .bottom)"),
-                      "The fixed rail must be drawn wholly inside the ordinary-phone viewport")
-        XCTAssertTrue(ordinary.contains(".offset(y: -33)"),
-                      "Action shadows need the approved sixteen-point bottom clearance")
+        XCTAssertFalse(ordinary.contains(".frame(height: 430)"))
+        XCTAssertFalse(ordinary.contains(".offset(y: -33)"))
+        XCTAssertFalse(ordinary.contains(".overlay(alignment: .bottom) {\n            ZStack"),
+                       "The action rail must be a measured sibling, never cover the last shelf item")
         XCTAssertFalse(ordinary.contains("ScrollView"),
                        "The page and fixed action rail must not scroll; only CampaignArchiveShelf may scroll.")
 
@@ -156,7 +157,7 @@ final class CampaignStartPresentationTests: XCTestCase {
         XCTAssertTrue(ordinary.contains(".frame(width: 5)"))
         XCTAssertTrue(ordinary.contains(".padding(.leading, 8)"))
         XCTAssertTrue(ordinary.contains("Older test books open Details; they never load or overwrite."))
-        XCTAssertTrue(ordinary.contains(".overlay(alignment: .bottom)"))
+        XCTAssertTrue(ordinary.contains("CampaignPaperBackground().ignoresSafeArea()"))
         XCTAssertTrue(source.contains(".font(.custom(\"Tiny5\", size: 11))"),
                       "Campaign actions use the approved compact pixel face, not the display face.")
         XCTAssertTrue(source.contains("HStack(alignment: .bottom, spacing: 3)"))
@@ -329,6 +330,46 @@ final class CampaignStartPresentationTests: XCTestCase {
             attachment.lifetime = .keepAlways
             add(attachment)
         }
+    }
+
+    @MainActor
+    func testCampaignUsesMeasuredSafeRemainderWithoutUnsafeInteractiveContentOrBottomOverlap() {
+        let slots = campaignFixtureSlots(count: 8, includesInvalid: true)
+        let controller = UIHostingController(rootView: CampaignStartView(
+            presentation: CampaignStartPresentation(slots: slots),
+            onContinue: { _ in }, onNewGame: {}, onLoad: { _ in },
+            onDelete: { _ in }, onExport: { _ in }))
+        let window = UIWindow(frame: CGRect(x: 0, y: 0, width: 368, height: 800))
+        window.rootViewController = controller
+        window.makeKeyAndVisible()
+        controller.additionalSafeAreaInsets = UIEdgeInsets(top: 59, left: 0, bottom: 34, right: 0)
+        controller.view.frame = window.bounds
+        controller.view.setNeedsLayout(); controller.view.layoutIfNeeded()
+        RunLoop.main.run(until: Date().addingTimeInterval(0.08))
+
+        let header = CampaignStartLayoutMeasurement.headerFrame
+        let shelf = CampaignStartLayoutMeasurement.shelfFrame
+        let actions = CampaignStartLayoutMeasurement.actionFrame
+        let safe = controller.view.safeAreaInsets
+        XCTAssertGreaterThanOrEqual(safe.top, 59)
+        XCTAssertGreaterThanOrEqual(safe.bottom, 34)
+        XCTAssertEqual(header.minY, safe.top, accuracy: 0.5)
+        XCTAssertEqual(actions.maxY, 800 - safe.bottom, accuracy: 0.5)
+        XCTAssertEqual(shelf.minY, header.maxY + 10, accuracy: 0.5)
+        XCTAssertLessThanOrEqual(shelf.maxY, actions.minY - 10 + 0.5,
+                                 "the shelf ends before the sibling action rail")
+        XCTAssertEqual(shelf.height,
+                       CampaignStartLayoutPolicy.ordinaryShelfHeight(
+                        availableHeight: 800 - safe.top - safe.bottom), accuracy: 1,
+                       "the shelf owns the entire measured interval between fixed siblings")
+
+        let image = UIGraphicsImageRenderer(size: window.bounds.size).image { _ in
+            controller.view.drawHierarchy(in: controller.view.bounds, afterScreenUpdates: true)
+        }
+        let attachment = XCTAttachment(image: image)
+        attachment.name = "campaign-safe-space-368x800"
+        attachment.lifetime = .keepAlways; add(attachment)
+        window.isHidden = true
     }
 
     @MainActor

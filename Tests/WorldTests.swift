@@ -491,8 +491,8 @@ final class WorldTests: XCTestCase {
         RunLoop.main.run(until: Date().addingTimeInterval(0.08))
         let mapFrameBefore = WorldMapStageMeasurement.latestFrame
         XCTAssertEqual(mapFrameBefore.width, 368, accuracy: 0.5)
-        XCTAssertEqual(mapFrameBefore.height, 368, accuracy: 0.5,
-                       "the hotfix must retain build 247's square map stage")
+        XCTAssertEqual(mapFrameBefore.height, 475, accuracy: 0.5,
+                       "the compact feedback remains inside the expanded measured map stage")
         XCTAssertEqual(WorldFieldFeedbackLayout.compactHeight, 78)
         XCTAssertEqual(WorldFieldFeedbackLayout.paneWidths(total: 368).context, 91)
         XCTAssertEqual(WorldFieldFeedbackLayout.paneWidths(total: 368).event, 273)
@@ -813,7 +813,7 @@ final class WorldTests: XCTestCase {
             }
             window.isHidden = true
             XCTAssertEqual(WorldMapStageMeasurement.latestFrame.size,
-                           CGSize(width: 368, height: 368))
+                           CGSize(width: 368, height: 475))
             XCTAssertEqual(try SaveCodec.encode(store.state), savedBytes)
             images.append(image)
             let attachment = XCTAttachment(image: image)
@@ -2053,8 +2053,8 @@ final class WorldTests: XCTestCase {
         XCTAssertEqual(mountedSource.maxX, mountedViewport.maxX, accuracy: 0.1,
                        "the first proof owns the edge-clamped rightmost source tile")
         XCTAssertEqual(WorldMapStageMeasurement.latestFrame.width, 368, accuracy: 0.5)
-        XCTAssertEqual(WorldMapStageMeasurement.latestFrame.height, 368, accuracy: 0.5,
-                       "mining overlay cannot alter build-255 map geometry")
+        XCTAssertEqual(WorldMapStageMeasurement.latestFrame.height, 475, accuracy: 0.5,
+                       "mining overlay cannot alter the measured Explore map geometry")
         let image = UIGraphicsImageRenderer(size: window.bounds.size).image { _ in
             controller.view.drawHierarchy(in: controller.view.bounds, afterScreenUpdates: true)
         }
@@ -2282,7 +2282,7 @@ final class WorldTests: XCTestCase {
         controller.view.layoutIfNeeded()
         XCTAssertEqual(store.worldTravellerSpeech?.travellerID, "mara")
         XCTAssertEqual(WorldMapStageMeasurement.latestFrame.width, 368, accuracy: 0.5)
-        XCTAssertEqual(WorldMapStageMeasurement.latestFrame.height, 368, accuracy: 0.5)
+        XCTAssertEqual(WorldMapStageMeasurement.latestFrame.height, 475, accuracy: 0.5)
         XCTAssertEqual(try SaveCodec.encode(store.state), frozen)
         let image = UIGraphicsImageRenderer(size: window.bounds.size).image { _ in
             controller.view.drawHierarchy(in: controller.view.bounds, afterScreenUpdates: true)
@@ -2734,7 +2734,7 @@ final class WorldTests: XCTestCase {
         XCTAssertEqual(WorldMapLayout.viewportRows(mapWidth: phone, availableHeight: 260,
                                                    viewportColumns: 11, mapRows: 30), 7)
         XCTAssertEqual(WorldMapLayout.viewportRows(mapWidth: phone, availableHeight: 500,
-                                                   viewportColumns: 11, mapRows: 30), 11)
+                                                   viewportColumns: 11, mapRows: 30), 15)
         XCTAssertEqual(WorldMapLayout.viewportRows(mapWidth: phone, availableHeight: 500,
                                                    viewportColumns: 11, mapRows: 9), 9)
         let rows = WorldMapLayout.viewportRows(mapWidth: phone, availableHeight: 500,
@@ -2761,8 +2761,63 @@ final class WorldTests: XCTestCase {
             "Only a genuinely smaller map may reduce the camera column count")
         XCTAssertEqual(WorldMapLayout.viewportRows(
             mapWidth: 367, availableHeight: 2_000,
-            viewportColumns: 11, mapRows: 30), 11,
-            "Extra page height must not expose the full map vertically")
+            viewportColumns: 11, mapRows: 30), 30,
+            "Measured safe height admits every complete row without changing tile width")
+    }
+
+    @MainActor
+    func testExploreConsumesSafeRemainderAsCompleteRowsAtUnchangedTileWidth() throws {
+        let store = GameStore(io: .temporary(name: "explore-safe-space-\(UUID().uuidString)"))
+        store.mutate("test explore safe space") {
+            $0.worlds.activeRun = WorldRun(
+                runIndex: 3, book: self.book([:]), mapSeed: 264,
+                rng: SeededRNG(seed: 264),
+                map: WorldMap(width: 30, height: 30,
+                              tiles: Array(repeating: Tile(), count: 900),
+                              entry: GridPoint(x: 15, y: 15)),
+                playerPosition: GridPoint(x: 15, y: 15))
+        }
+        WorldMapStageMeasurement.latestFrame = .zero
+        WorldMapStageMeasurement.latestMapFrame = .zero
+        WorldMapStageMeasurement.latestMapWidth = 0
+        WorldMapStageMeasurement.latestViewportRows = 0
+        let frozenState = try SaveCodec.encode(store.state)
+        let controller = UIHostingController(rootView: WorldView().environmentObject(store))
+        let window = UIWindow(frame: CGRect(x: 0, y: 0, width: 368, height: 800))
+        window.rootViewController = controller
+        window.makeKeyAndVisible()
+        controller.additionalSafeAreaInsets = UIEdgeInsets(top: 59, left: 0, bottom: 34, right: 0)
+        controller.view.frame = window.bounds
+        controller.view.setNeedsLayout(); controller.view.layoutIfNeeded()
+        RunLoop.main.run(until: Date().addingTimeInterval(0.08))
+
+        let stage = WorldMapStageMeasurement.latestFrame
+        let map = WorldMapStageMeasurement.latestMapFrame
+        let safe = controller.view.safeAreaInsets
+        XCTAssertGreaterThanOrEqual(safe.top, 59)
+        XCTAssertGreaterThanOrEqual(safe.bottom, 34)
+        XCTAssertGreaterThanOrEqual(stage.minY, safe.top - 0.5)
+        XCTAssertLessThanOrEqual(stage.maxY, 800 - safe.bottom + 0.5)
+        XCTAssertEqual(WorldMapStageMeasurement.latestMapWidth, 1100.0 / 3.0, accuracy: 0.5,
+                       "safe height cannot change the established eleven-column tile width")
+        let tile = WorldMapStageMeasurement.latestMapWidth / 11
+        let rows = WorldMapStageMeasurement.latestViewportRows
+        XCTAssertEqual(map.height, tile * CGFloat(rows), accuracy: 0.5)
+        XCTAssertLessThanOrEqual(map.height, stage.height + 0.5)
+        if rows < (store.activeRun?.map.height ?? 0) {
+            XCTAssertLessThan(stage.height - map.height, tile + 0.5,
+                              "no additional complete row may fit in the measured safe remainder")
+        }
+        XCTAssertEqual(try SaveCodec.encode(store.state), frozenState,
+                       "safe-space measurement and rendering cannot mutate gameplay or persistence")
+
+        let image = UIGraphicsImageRenderer(size: window.bounds.size).image { _ in
+            controller.view.drawHierarchy(in: controller.view.bounds, afterScreenUpdates: true)
+        }
+        let attachment = XCTAttachment(image: image)
+        attachment.name = "explore-safe-space-complete-rows-368x800"
+        attachment.lifetime = .keepAlways; add(attachment)
+        window.isHidden = true
     }
 
     func testWorldControlsHaveExactlyTwoActionsInOneNonOverlappingBottomDock() throws {
@@ -2819,8 +2874,9 @@ final class WorldTests: XCTestCase {
                                        encoding: .utf8)
         XCTAssertTrue(minimapSource.contains("Rectangle().stroke(PixelUITheme.edge, lineWidth: 2)"),
                       "The minimap needs the approved visible hard border")
-        XCTAssertTrue(source.contains(".aspectRatio(1, contentMode: .fit)"),
-                      "The current redesign keeps the map stage square without a magic height")
+        XCTAssertFalse(source.contains(".aspectRatio(1, contentMode: .fit)"),
+                       "Explore must use measured safe remainder instead of forcing a square stage")
+        XCTAssertTrue(source.contains("PixelUITheme.edgeDark.ignoresSafeArea()"))
         XCTAssertTrue(source.contains("Text(\"Explore\")"))
         XCTAssertTrue(source.contains("Text(\"STABILITY\")"))
         XCTAssertTrue(source.contains("Text(\"COLLAPSE\")"))

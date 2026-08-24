@@ -4,6 +4,9 @@ import UIKit
 #if DEBUG
 @MainActor enum WorldMapStageMeasurement {
     static var latestFrame: CGRect = .zero
+    static var latestMapFrame: CGRect = .zero
+    static var latestMapWidth: CGFloat = 0
+    static var latestViewportRows: Int = 0
 }
 
 private struct WorldMapStageProbe: UIViewRepresentable {
@@ -15,6 +18,30 @@ private struct WorldMapStageProbe: UIViewRepresentable {
     }
     func makeUIView(context: Context) -> ProbeView { ProbeView(frame: .zero) }
     func updateUIView(_ uiView: ProbeView, context: Context) {}
+}
+
+private struct WorldMapViewportProbe: UIViewRepresentable {
+    let mapWidth: CGFloat
+    let viewportRows: Int
+    final class ProbeView: UIView {
+        var mapWidth: CGFloat = 0
+        var viewportRows: Int = 0
+        override func layoutSubviews() {
+            super.layoutSubviews()
+            guard abs((window?.bounds.width ?? 0) - 368) < 0.5 else { return }
+            WorldMapStageMeasurement.latestMapFrame = convert(bounds, to: nil)
+            WorldMapStageMeasurement.latestMapWidth = mapWidth
+            WorldMapStageMeasurement.latestViewportRows = viewportRows
+        }
+    }
+    func makeUIView(context: Context) -> ProbeView {
+        let view = ProbeView(frame: .zero)
+        view.mapWidth = mapWidth; view.viewportRows = viewportRows
+        return view
+    }
+    func updateUIView(_ uiView: ProbeView, context: Context) {
+        uiView.mapWidth = mapWidth; uiView.viewportRows = viewportRows
+    }
 }
 #endif
 
@@ -655,6 +682,7 @@ struct WorldView: View {
                             ) { point in
                                 tapped(point, in: run)
                             }
+                            .id("world-map-\(viewportColumns)x\(viewportRows)-\(mapWidth)")
                             .overlay(alignment: .bottom) {
                                 WorldFieldFeedbackRow().environmentObject(store)
                             }
@@ -664,7 +692,6 @@ struct WorldView: View {
                                 .padding(12)
                         }
                         }
-                        .aspectRatio(1, contentMode: .fit)
                         .background {
 #if DEBUG
                             WorldMapStageProbe()
@@ -686,7 +713,7 @@ struct WorldView: View {
             }
         })
         .modifier(WorldMiningFeedbackPresentationModifier(store: store))
-        .background(PixelUITheme.edgeDark)
+        .background(PixelUITheme.edgeDark.ignoresSafeArea())
 #if DEBUG
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
@@ -1580,7 +1607,7 @@ enum WorldMapLayout {
         let columns = max(1, viewportColumns)
         let tileSide = mapWidth / CGFloat(columns)
         let completeRowsThatFit = Int(floor(max(0, availableHeight) / max(1, tileSide)))
-        return min(max(1, mapRows), columns, max(1, completeRowsThatFit))
+        return min(max(1, mapRows), max(1, completeRowsThatFit))
     }
 }
 
@@ -1787,6 +1814,11 @@ private struct MapGrid: View {
                     .zIndex(10_000)
             }
             }
+#if DEBUG
+            .background(WorldMapViewportProbe(
+                mapWidth: maximumWidth, viewportRows: viewportRows)
+                .frame(width: proxy.size.width, height: proxy.size.height))
+#endif
         }
         .frame(width: maximumWidth,
                height: maximumWidth / CGFloat(viewportColumns) * CGFloat(viewportRows))

@@ -1,5 +1,37 @@
 import SwiftUI
 
+#if DEBUG
+@MainActor enum CampaignStartLayoutMeasurement {
+    static var headerFrame: CGRect = .zero
+    static var shelfFrame: CGRect = .zero
+    static var actionFrame: CGRect = .zero
+}
+
+private struct CampaignStartLayoutProbe: UIViewRepresentable {
+    enum Region { case header, shelf, actions }
+    let region: Region
+
+    final class ProbeView: UIView {
+        var region: Region = .header
+        override func layoutSubviews() {
+            super.layoutSubviews()
+            guard abs((window?.bounds.width ?? 0) - 368) < 0.5 else { return }
+            let frame = convert(bounds, to: nil)
+            switch region {
+            case .header: CampaignStartLayoutMeasurement.headerFrame = frame
+            case .shelf: CampaignStartLayoutMeasurement.shelfFrame = frame
+            case .actions: CampaignStartLayoutMeasurement.actionFrame = frame
+            }
+        }
+    }
+
+    func makeUIView(context: Context) -> ProbeView {
+        let view = ProbeView(frame: .zero); view.region = region; return view
+    }
+    func updateUIView(_ uiView: ProbeView, context: Context) { uiView.region = region }
+}
+#endif
+
 enum CampaignSlotHealth: Equatable, Sendable {
     case valid
     case corrupt(message: String)
@@ -126,8 +158,15 @@ struct CampaignStartPresentation: Equatable, Sendable {
 enum CampaignStartLayoutPolicy {
     static let ordinarySlotColumnCount = 1
     static let ordinarySlotCardMinimumHeight: CGFloat = 112
-    static let ordinaryShelfHeight: CGFloat = 430
     static let ordinaryBottomRailHeight: CGFloat = 84
+
+    static func ordinaryShelfHeight(availableHeight: CGFloat, headerHeight: CGFloat = 62,
+                                    bottomRailHeight: CGFloat = ordinaryBottomRailHeight,
+                                    verticalPadding: CGFloat = 20,
+                                    selectedCampaignHeight: CGFloat = 64) -> CGFloat {
+        max(0, availableHeight - headerHeight - bottomRailHeight
+            - verticalPadding - selectedCampaignHeight)
+    }
 
     static func primaryActionLabelHeight(dynamicTypeSize: DynamicTypeSize) -> CGFloat {
         dynamicTypeSize.isAccessibilitySize ? 88 : 52
@@ -245,6 +284,9 @@ struct CampaignStartView: View {
                     Rectangle().fill(PixelUITheme.edge.opacity(0.45)).frame(height: 1)
                 }
             }
+#if DEBUG
+            .background(CampaignStartLayoutProbe(region: .header))
+#endif
 
             VStack(spacing: 10) {
                 CampaignArchiveShelf {
@@ -263,7 +305,10 @@ struct CampaignStartView: View {
                         }
                     }
                 }
-                .frame(height: CampaignStartLayoutPolicy.ordinaryShelfHeight)
+                .frame(maxHeight: .infinity)
+#if DEBUG
+                .background(CampaignStartLayoutProbe(region: .shelf))
+#endif
 
                 if let slot = presentation.continueSlot {
                     VStack(alignment: .leading, spacing: 3) {
@@ -298,24 +343,21 @@ struct CampaignStartView: View {
             .padding(.vertical, 10)
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
 
+            primaryActions
+                .padding(.horizontal, 14)
+                .padding(.top, 10)
+                .padding(.bottom, 20)
+                .frame(height: CampaignStartLayoutPolicy.ordinaryBottomRailHeight)
+                .background { Rectangle().fill(PixelUITheme.surfaceRaised) }
+                .overlay(alignment: .top) {
+                    Rectangle().fill(PixelUITheme.edge).frame(height: 2)
+                }
+#if DEBUG
+                .background(CampaignStartLayoutProbe(region: .actions))
+#endif
         }
         .foregroundStyle(CampaignShelfPalette.ink)
-        .background(CampaignPaperBackground())
-        .overlay(alignment: .bottom) {
-            ZStack(alignment: .bottom) {
-                Rectangle()
-                    .fill(PixelUITheme.surfaceRaised)
-                    .frame(height: CampaignStartLayoutPolicy.ordinaryBottomRailHeight + 33)
-                primaryActions
-                    .padding(.horizontal, 14)
-                    .padding(.top, 10)
-                    .padding(.bottom, 20)
-                    .frame(height: CampaignStartLayoutPolicy.ordinaryBottomRailHeight)
-                    .background { Rectangle().fill(PixelUITheme.surfaceRaised) }
-                    .overlay(alignment: .top) { Rectangle().fill(PixelUITheme.edge).frame(height: 2) }
-                    .offset(y: -33)
-            }
-        }
+        .background(CampaignPaperBackground().ignoresSafeArea())
     }
 
     private var emptyShelf: some View {
