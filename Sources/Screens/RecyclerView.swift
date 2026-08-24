@@ -31,6 +31,9 @@ struct RecyclerView: View {
 
                 if previews.isEmpty {
                     recyclerEmptyState
+#if DEBUG
+                        .background { P3SafeSpaceProbe("recycler.main.empty", identity: "no-eligible-gear") }
+#endif
                 } else {
                     SixAcrossItemGrid(data: previews, id: \.stackID) { preview in
                         Button { selected = preview } label: {
@@ -43,6 +46,18 @@ struct RecyclerView: View {
                                          accessibilityName: preview.snapshot.displayName)
                         }
                         .buttonStyle(.plain)
+#if DEBUG
+                        .background {
+                            if preview.stackID == previews.first?.stackID {
+                                P3SafeSpaceProbe("recycler.main.first",
+                                                 identity: String(preview.stackID.rawValue))
+                            }
+                            if preview.stackID == previews.last?.stackID {
+                                P3SafeSpaceProbe("recycler.main.last",
+                                                 identity: String(preview.stackID.rawValue))
+                            }
+                        }
+#endif
                     }
                 }
 
@@ -58,11 +73,20 @@ struct RecyclerView: View {
                         }
                     }
                     .font(.callout)
+#if DEBUG
+                    .background {
+                        P3SafeSpaceProbe("recycler.main.protected",
+                            identity: ineligibilityCounts.map(\.reason.rawValue).joined(separator: ","))
+                    }
+#endif
                 }
             }
             .padding(16)
         }
-        .background(Color(.systemGroupedBackground))
+#if DEBUG
+        .background { P3SafeSpaceProbe("recycler.main.scroll") }
+#endif
+        .background(Color(.systemGroupedBackground).ignoresSafeArea())
         .navigationTitle("Recycler")
         .navigationBarTitleDisplayMode(.inline)
         .sheet(item: $selected) { preview in
@@ -141,6 +165,13 @@ private struct RecyclerPreviewSheet: View {
     let preview: RecyclerPreview
     @State private var failure: RecyclerCommitResult?
 
+#if DEBUG
+    init(preview: RecyclerPreview, debugFailure: RecyclerCommitResult? = nil) {
+        self.preview = preview
+        _failure = State(initialValue: debugFailure)
+    }
+#endif
+
     var body: some View {
         NavigationStack {
             List {
@@ -180,15 +211,36 @@ private struct RecyclerPreviewSheet: View {
                                              accessibilityName: RecyclerPresentation.resourceName(entry.id))
                         }
                         .padding(.vertical, 4)
+#if DEBUG
+                        .background {
+                            if preview.returnedSamples.isEmpty,
+                               let last = preview.returnedResources.nonZero.last {
+                                P3SafeSpaceProbe("recycler.preview.final", identity: last.id.rawValue)
+                            }
+                        }
+#endif
                     }
-                    ForEach(Array(preview.returnedSamples.enumerated()), id: \.offset) { _, sample in
+                    ForEach(Array(preview.returnedSamples.enumerated()), id: \.offset) { index, sample in
                         LabeledContent(sample.displayName, value: sample.grade.formatted(.number.precision(.fractionLength(0))))
+#if DEBUG
+                            .background {
+                                if index == preview.returnedSamples.indices.last {
+                                    P3SafeSpaceProbe("recycler.preview.final", identity: sample.displayName)
+                                }
+                            }
+#endif
                     }
                     if preview.returnedResources.nonZero.isEmpty && preview.returnedSamples.isEmpty {
                         Text("No recoverable output.").foregroundStyle(.secondary)
+#if DEBUG
+                            .background { P3SafeSpaceProbe("recycler.preview.final", identity: "no-output") }
+#endif
                     }
                 }
             }
+#if DEBUG
+            .background { P3SafeSpaceProbe("recycler.preview.list") }
+#endif
             .safeAreaInset(edge: .bottom, spacing: 0) { dismantleActionBar }
             .navigationTitle("Recovery preview")
             .navigationBarTitleDisplayMode(.inline)
@@ -213,6 +265,12 @@ private struct RecyclerPreviewSheet: View {
             .tint(.red)
             .disabled(failure != nil)
         }
+#if DEBUG
+        .background {
+            P3SafeSpaceProbe("recycler.preview.action",
+                             identity: failure.map(message(for:)) ?? "ready")
+        }
+#endif
     }
 
     private var routeName: String {
@@ -230,6 +288,14 @@ private struct RecyclerPreviewSheet: View {
         }
     }
 }
+
+#if DEBUG
+struct P3RecyclerPreviewDebugHost: View {
+    let preview: RecyclerPreview
+    let failure: RecyclerCommitResult?
+    var body: some View { RecyclerPreviewSheet(preview: preview, debugFailure: failure) }
+}
+#endif
 
 extension RecyclerPreview: Identifiable {
     var id: String { "\(location.rawValue)-\(stackID.rawValue)-\(revision)" }

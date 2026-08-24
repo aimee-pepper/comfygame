@@ -1,7 +1,446 @@
+import SwiftUI
+import UIKit
 import XCTest
 @testable import Bookbinder
 
+@MainActor
 final class MakerStationPresentationTests: XCTestCase {
+#if DEBUG
+    private enum P3Screen {
+        case trading(String)
+        case tradingListing(P3TradingListingDebugHost.Mode)
+        case tradingMaterial(TradingPostCommitResult?)
+        case recycler
+        case recyclerPreview(RecyclerPreview, RecyclerCommitResult?)
+        case apothecary(ItemID?, MaterialReserveUnitID?, String?)
+    }
+
+    private struct P3Mount {
+        let window: UIWindow
+        let controller: UIHostingController<AnyView>
+        let safe: UIEdgeInsets
+        let image: UIImage
+        let frozen: Data
+    }
+
+    private func p3Store(populated: Bool = true, recipes: Set<ItemID>? = nil,
+                         reagent: Int = 4, resin: Int = 8,
+                         qualifyingMaterial: Bool = true) -> GameStore {
+        let store = GameStore(io: .temporary(name: "p3-safe-space-\(UUID().uuidString)"))
+        store.mutate("fixture: p3 station presentation") { state in
+            for lesson in TutorialLessonID.allCases {
+                state.tutorial.complete(lesson, fact: "p3_safe_space")
+            }
+            state.base.essence = 999
+            state.base.goldCoins = 999
+            state.base.stations[Stations.apothecary] = StationState(isUnlocked: true, tier: 0)
+            state.base.tradingPost.stock = []
+            state.base.tradingPost.essenceBundlesRemaining = 0
+            state.base.tradingPost.expeditionOutcomeID = nil
+            state.base.knownConsumableRecipes = recipes ?? (populated
+                ? Set(ConsumableCraftingRules.recipes.map(\.output)) : [])
+            guard populated else {
+                state.base.essence = 0
+                state.base.goldCoins = 0
+                return
+            }
+            state.base.tradingPost.expeditionOutcomeID = 77
+            state.base.tradingPost.stock = [
+                TradingPostStockLine(id: 70, kind: .resource("clay"),
+                                     remainingQuantity: 3, unitPrice: 2)
+            ]
+            state.base.resources.add(7, of: "clay")
+            state.base.resources.add(reagent, of: "reagent")
+            state.base.resources.add(resin, of: "resin")
+            let stored = ItemStack(id: InstanceID(rawValue: 700), catalogID: "blade_chipped")
+            let waiting = ItemStack(id: InstanceID(rawValue: 701), catalogID: "blade_chipped")
+            state.base.inventory.stacks = [stored]
+            state.base.spillover = [waiting]
+            if qualifyingMaterial { state.base.materialReserve.add(.init(
+                id: .init(rawValue: "p3-hide"),
+                sample: MaterialSample(kind: .hide,
+                    properties: MaterialProperties(hardness: 55, density: 50,
+                                                   insulation: 70, flexibility: 65,
+                                                   lustre: 20, reactivity: 70),
+                    grade: 70,
+                    source: "A deliberately long exact source record retained for mounted metadata reachability",
+                    qualifier: "kept")
+            )) }
+        }
+        store.discoverConsumableRecipes()
+        return store
+    }
+
+    @MainActor
+    private func p3Mount(_ screen: P3Screen, scheme: ColorScheme,
+                         store: GameStore) throws -> P3Mount {
+        P3SafeSpaceMeasurement.reset(); P3SafeSpaceMeasurement.isArmed = true
+        let content: AnyView = switch screen {
+        case .trading(let tab): AnyView(TradingPostView(debugTab: tab).environmentObject(store))
+        case .tradingListing(let mode): AnyView(P3TradingListingDebugHost(mode: mode).environmentObject(store))
+        case .tradingMaterial(let failure):
+            AnyView(P3TradingMaterialDebugHost(failure: failure).environmentObject(store))
+        case .recycler: AnyView(RecyclerView().environmentObject(store))
+        case .recyclerPreview(let preview, let failure):
+            AnyView(P3RecyclerPreviewDebugHost(preview: preview, failure: failure).environmentObject(store))
+        case .apothecary(let recipe, let unit, let failure):
+            AnyView(ApothecaryView(debugSelectedRecipeID: recipe,
+                                   debugSelectedScentMaskUnitID: unit,
+                                   debugFailure: failure).environmentObject(store))
+        }
+        let controller = UIHostingController(rootView: AnyView(
+            NavigationStack { content }
+                .environment(\.colorScheme, scheme)
+                .environment(\.dynamicTypeSize, .large)
+        ))
+        let window = UIWindow(frame: CGRect(x: 0, y: 0, width: 368, height: 800))
+        window.rootViewController = controller
+        controller.additionalSafeAreaInsets = UIEdgeInsets(top: 59, left: 0, bottom: 34, right: 0)
+        window.makeKeyAndVisible()
+        controller.view.frame = window.bounds
+        controller.view.setNeedsLayout(); controller.view.layoutIfNeeded()
+        RunLoop.main.run(until: Date().addingTimeInterval(0.12))
+        let format = UIGraphicsImageRendererFormat.default()
+        format.scale = 1; format.opaque = true
+        let image = UIGraphicsImageRenderer(size: window.bounds.size, format: format).image { _ in
+            controller.view.drawHierarchy(in: controller.view.bounds, afterScreenUpdates: true)
+        }
+        return P3Mount(window: window, controller: controller,
+                       safe: controller.view.safeAreaInsets, image: image,
+                       frozen: try SaveCodec.encode(store.state))
+    }
+
+    @MainActor private func p3Views(_ view: UIView) -> [UIView] {
+        [view] + view.subviews.flatMap(p3Views)
+    }
+
+    @MainActor private func p3RootScroll(_ mount: P3Mount) throws -> UIScrollView {
+        try XCTUnwrap(p3Views(mount.controller.view).compactMap { $0 as? UIScrollView }
+            .max(by: { $0.bounds.height < $1.bounds.height }))
+    }
+
+    @MainActor private func p3ScrollToEnd(_ mount: P3Mount) throws {
+        let scroll = try p3RootScroll(mount)
+        let bottom = max(-scroll.adjustedContentInset.top,
+                         scroll.contentSize.height - scroll.bounds.height + scroll.adjustedContentInset.bottom)
+        scroll.setContentOffset(CGPoint(x: scroll.contentOffset.x, y: bottom), animated: false)
+        scroll.layoutIfNeeded(); RunLoop.main.run(until: Date().addingTimeInterval(0.05))
+    }
+
+    @MainActor private func p3VisibleScrollRect(_ mount: P3Mount) throws -> CGRect {
+        let scroll = try p3RootScroll(mount)
+        let frame = scroll.convert(scroll.bounds, to: mount.window)
+        return CGRect(x: frame.minX,
+                      y: frame.minY + scroll.adjustedContentInset.top,
+                      width: frame.width,
+                      height: frame.height - scroll.adjustedContentInset.top
+                          - scroll.adjustedContentInset.bottom)
+    }
+
+    private func p3Frame(_ key: String, file: StaticString = #filePath,
+                         line: UInt = #line) throws -> CGRect {
+        try XCTUnwrap(P3SafeSpaceMeasurement.frames[key], "missing real probe \(key)",
+                      file: file, line: line)
+    }
+
+    private func p3AssertFinal(_ key: String, inside viewport: CGRect,
+                               identity: String? = nil,
+                               file: StaticString = #filePath, line: UInt = #line) throws {
+        let frame = try p3Frame(key, file: file, line: line)
+        XCTAssertGreaterThanOrEqual(frame.minY, viewport.minY - 0.75, file: file, line: line)
+        XCTAssertLessThanOrEqual(frame.maxY, viewport.maxY + 0.75, file: file, line: line)
+        if let identity {
+            XCTAssertEqual(P3SafeSpaceMeasurement.identities[key], identity, file: file, line: line)
+        }
+    }
+
+    private func p3Preview(location: TradingPostItemLocation = .stored,
+                           route: RecyclerRecoveryRoute = .constructionReceipt,
+                           resources: ResourcePool = ResourcePool(),
+                           samples: [MaterialSample] = [], id: UInt64 = 800) -> RecyclerPreview {
+        let stack = ItemStack(id: InstanceID(rawValue: id), catalogID: "blade_chipped")
+        return RecyclerPreview(revision: 0, location: location, stackID: stack.id,
+                               snapshot: stack, serviceTier: 1, route: route,
+                               selectedReceiptIndices: samples.indices.map { $0 },
+                               recoveryCapacity: samples.count, returnedSamples: samples,
+                               returnedResources: resources)
+    }
+
+    private func p3RGBA(_ image: UIImage, x: Int, y: Int) throws -> [UInt8] {
+        let cg = try XCTUnwrap(image.cgImage)
+        let data = try XCTUnwrap(cg.dataProvider?.data)
+        let bytes = CFDataGetBytePtr(data)!
+        let offset = y * cg.bytesPerRow + x * 4
+        return Array(UnsafeBufferPointer(start: bytes + offset, count: 4))
+    }
+
+    @MainActor private func p3AssertRootGeometry(_ mount: P3Mount) throws {
+        XCTAssertGreaterThanOrEqual(mount.safe.top, 59)
+        XCTAssertGreaterThanOrEqual(mount.safe.bottom, 34)
+        XCTAssertNotEqual(try p3RGBA(mount.image, x: 184, y: 10), [0, 0, 0, 255])
+        XCTAssertNotEqual(try p3RGBA(mount.image, x: 184, y: 785), [0, 0, 0, 255])
+        let scroll = try p3RootScroll(mount)
+        let frame = try p3VisibleScrollRect(mount)
+        XCTAssertGreaterThan(frame.height, 500)
+        XCTAssertGreaterThanOrEqual(frame.minY, mount.safe.top - 0.75)
+        XCTAssertLessThanOrEqual(frame.maxY, 800 - mount.safe.bottom + 0.75)
+        for control in p3Views(mount.controller.view).compactMap({ $0 as? UIControl })
+        where !control.isHidden && control.alpha > 0.01 {
+            let controlFrame = control.convert(control.bounds, to: mount.window)
+            XCTAssertGreaterThanOrEqual(controlFrame.minY, mount.safe.top - 0.75)
+            XCTAssertLessThanOrEqual(controlFrame.maxY, 800 - mount.safe.bottom + 0.75)
+        }
+    }
+
+    private func p3Source(_ name: String) throws -> String {
+        let root = URL(fileURLWithPath: #filePath).deletingLastPathComponent().deletingLastPathComponent()
+        return try String(contentsOf: root.appending(path: "Sources/Screens/\(name)"), encoding: .utf8)
+    }
+
+    func testP3_01SemanticBackdropOnlyFillsUnsafeRegionsInLightAndDark() throws {
+        for scheme in [ColorScheme.light, .dark] {
+            for (name, screen) in [("trading", P3Screen.trading("buy")),
+                                   ("recycler", .recycler),
+                                   ("apothecary", .apothecary("salve_lesser", nil, nil))] {
+                let store = p3Store(); let mount = try p3Mount(screen, scheme: scheme, store: store)
+                try p3AssertRootGeometry(mount)
+                let attachment = XCTAttachment(image: mount.image)
+                attachment.name = "p3-\(name)-\(scheme)-368x800"
+                attachment.lifetime = .keepAlways; add(attachment)
+                XCTAssertEqual(try SaveCodec.encode(store.state), mount.frozen)
+                mount.window.isHidden = true
+            }
+        }
+    }
+
+    func testP3_02EachRootScrollOwnsItsAllocatedSafeRemainder() throws {
+        for screen in [P3Screen.trading("buy"), .recycler,
+                       .apothecary("salve_lesser", nil, nil)] {
+            let mount = try p3Mount(screen, scheme: .light, store: p3Store())
+            let scroll = try p3RootScroll(mount)
+            let frame = try p3VisibleScrollRect(mount)
+            if let action = P3SafeSpaceMeasurement.frames["apothecary.main.action"] {
+                XCTAssertEqual(frame.maxY, action.minY, accuracy: 0.75)
+            } else {
+                XCTAssertEqual(frame.maxY, 800 - mount.safe.bottom, accuracy: 0.75)
+            }
+            mount.window.isHidden = true
+        }
+    }
+
+    func testP3_03TradingMainPreservesBuySellAndEmptyOwnership() throws {
+        for scheme in [ColorScheme.light, .dark] {
+            for tab in ["buy", "sell"] {
+                let mount = try p3Mount(.trading(tab), scheme: scheme, store: p3Store())
+                let scroll = try p3VisibleScrollRect(mount)
+                let firstID = try XCTUnwrap(P3SafeSpaceMeasurement.identities["trading.main.first"])
+                try p3AssertFinal("trading.main.first", inside: scroll, identity: firstID)
+                try p3ScrollToEnd(mount)
+                try p3AssertFinal("trading.main.last", inside: scroll)
+                XCTAssertFalse(firstID.isEmpty)
+                mount.window.isHidden = true
+            }
+            for tab in ["buy", "sell"] {
+                let mount = try p3Mount(.trading(tab), scheme: scheme,
+                                        store: p3Store(populated: false, recipes: []))
+                try p3AssertFinal("trading.main.empty", inside: try p3VisibleScrollRect(mount),
+                                  identity: tab)
+                mount.window.isHidden = true
+            }
+        }
+    }
+
+    func testP3_04TradingListingListRemainsAboveItsFixedActionRail() throws {
+        for mode in [P3TradingListingDebugHost.Mode.affordable, .unaffordable, .unavailable,
+                     .stored, .waiting, .quantity, .stale] {
+            let mount = try p3Mount(.tradingListing(mode), scheme: .light, store: p3Store())
+            try p3ScrollToEnd(mount)
+            let list = try p3VisibleScrollRect(mount)
+            let action = try p3Frame("trading.listing.action")
+            XCTAssertLessThanOrEqual(list.maxY, action.minY + 0.75)
+            try p3AssertFinal("trading.listing.final",
+                              inside: CGRect(x: list.minX, y: list.minY,
+                                             width: list.width, height: action.minY - list.minY))
+            mount.window.isHidden = true
+        }
+    }
+
+    func testP3_05TradingMaterialDetailRetainsExactUnitAndFailureOwnership() throws {
+        for failure in [Optional<TradingPostCommitResult>.none, .some(.stale), .some(.invalid)] {
+            let mount = try p3Mount(.tradingMaterial(failure), scheme: .dark, store: p3Store())
+            try p3ScrollToEnd(mount)
+            let list = try p3VisibleScrollRect(mount)
+            let action = try p3Frame("trading.material.action")
+            XCTAssertLessThanOrEqual(list.maxY, action.minY + 0.75)
+            try p3AssertFinal("trading.material.final", inside: list)
+            mount.window.isHidden = true
+        }
+    }
+
+    func testP3_06RecyclerMainRetainsEligibleAndProtectedHoldingsStates() throws {
+        let empty = try p3Mount(.recycler, scheme: .light,
+                                store: p3Store(populated: false, recipes: []))
+        try p3AssertFinal("recycler.main.empty", inside: try p3VisibleScrollRect(empty),
+                          identity: "no-eligible-gear")
+        empty.window.isHidden = true
+        let store = p3Store()
+        store.mutate("fixture: protected recycler") { state in
+            func piece(_ id: UInt64, _ catalog: ItemID = "blade_chipped") -> ItemStack {
+                ItemStack(id: InstanceID(rawValue: id), catalogID: catalog)
+            }
+            var stacked = piece(790); stacked.count = 2
+            var unidentified = piece(791); unidentified.identified = false
+            var favorite = piece(792); favorite.isFavorite = true
+            var locked = piece(793); locked.isLocked = true
+            var unique = piece(794); unique.gearProfile?.authoredUniqueRuleID = "p3-unique"
+            var narrative = piece(795); narrative.gearProfile?.authoredUniqueRuleID = "p3-narrative"
+            var legacy = piece(796); legacy.gearProfile?.legacyPowerCredit = 1
+            var protected = [stacked, unidentified, favorite, locked,
+                             piece(797, Items.conduitFixture), piece(798, "salve_lesser"),
+                             unique, narrative, legacy]
+            if let apex = ContentCatalog.shared.items.first(where: { $0.gear?.breaks != nil }) {
+                protected.append(piece(799, apex.id))
+            }
+            if let unprofiled = RecyclerRules.unprofiledOrdinaryGearIDs().first {
+                protected.append(piece(806, unprofiled))
+            }
+            state.base.inventory.stacks.append(contentsOf: protected)
+            state.base.binderEquipped[.weapon] = EquippedPiece(catalogID: "blade_chipped")
+        }
+        let populated = try p3Mount(.recycler, scheme: .dark, store: store)
+        let recyclerScroll = try p3VisibleScrollRect(populated)
+        let firstRecyclerID = try XCTUnwrap(P3SafeSpaceMeasurement.identities["recycler.main.first"])
+        try p3AssertFinal("recycler.main.first", inside: recyclerScroll, identity: firstRecyclerID)
+        try p3ScrollToEnd(populated)
+        try p3AssertFinal("recycler.main.last", inside: recyclerScroll)
+        XCTAssertNotNil(P3SafeSpaceMeasurement.frames["recycler.main.protected"])
+        let renderedReasons = Set((P3SafeSpaceMeasurement.identities["recycler.main.protected"] ?? "")
+            .split(separator: ",").map(String.init))
+        let expectedReasons = Set(RecyclerRules.Ineligibility.allCases.map(\.rawValue))
+        XCTAssertTrue(expectedReasons.isSubset(of: renderedReasons),
+                      "missing protected groups: \(expectedReasons.subtracting(renderedReasons))")
+        populated.window.isHidden = true
+    }
+
+    func testP3_07RecyclerPreviewListRemainsAboveDismantleActionRail() throws {
+        var resources = ResourcePool(); resources.add(2, of: "ore")
+        let material = MaterialSample(kind: .plate, properties: .init(hardness: 60),
+                                      grade: 60, source: "recorded construction stock")
+        let fixtures: [(RecyclerPreview, RecyclerCommitResult?)] = [
+            (p3Preview(resources: resources), nil),
+            (p3Preview(location: .overflow, route: .authoredSalvage(profileID: "forged_edge_v1"),
+                       resources: resources, id: 801), nil),
+            (p3Preview(samples: [material], id: 802), nil),
+            (p3Preview(id: 803), nil),
+            (p3Preview(id: 804), .stale),
+            (p3Preview(id: 805), .invalid)
+        ]
+        for (preview, failure) in fixtures {
+            let mount = try p3Mount(.recyclerPreview(preview, failure), scheme: .light,
+                                    store: p3Store())
+            try p3ScrollToEnd(mount)
+            let list = try p3VisibleScrollRect(mount)
+            let action = try p3Frame("recycler.preview.action")
+            XCTAssertLessThanOrEqual(list.maxY, action.minY + 0.75)
+            try p3AssertFinal("recycler.preview.final", inside: list)
+            mount.window.isHidden = true
+        }
+    }
+
+    func testP3_08ApothecaryEmptyOwnsFullSafeIntervalWithoutActionBarContent() throws {
+        let store = p3Store(populated: false, recipes: [])
+        store.discoverConsumableRecipes()
+        XCTAssertTrue(store.state.base.knownConsumableRecipes.isEmpty)
+        let mount = try p3Mount(.apothecary(nil, nil, nil), scheme: .light, store: store)
+        try p3AssertFinal("apothecary.main.empty", inside: try p3VisibleScrollRect(mount),
+                          identity: "no-known-recipes")
+        XCTAssertNil(P3SafeSpaceMeasurement.frames["apothecary.main.action"])
+        let scroll = try p3VisibleScrollRect(mount)
+        XCTAssertEqual(scroll.maxY, 800 - mount.safe.bottom, accuracy: 0.75)
+        mount.window.isHidden = true
+    }
+
+    func testP3_09ApothecarySelectedRecipeKeepsDetailAboveActionRail() throws {
+        for (ready, failure) in [(true, Optional<String>.none),
+                                 (false, nil),
+                                 (true, "The required stock changed. Review the exact recipe and try again.")] {
+            let store = p3Store(resin: ready ? 8 : 0,
+                                qualifyingMaterial: ready)
+            let expectedAction = ConsumableCraftingRules.shortfall(
+                try XCTUnwrap(ConsumableCraftingRules.recipe("salve_lesser")), in: store.state
+            ).joined(separator: " · ")
+            let mount = try p3Mount(.apothecary("salve_lesser", nil, failure),
+                                    scheme: .dark, store: store)
+            try p3ScrollToEnd(mount)
+            let scroll = try p3VisibleScrollRect(mount)
+            let action = try p3Frame("apothecary.main.action")
+            XCTAssertLessThanOrEqual(scroll.maxY, action.minY + 0.75)
+            XCTAssertEqual(P3SafeSpaceMeasurement.identities["apothecary.main.action"],
+                           ready ? "ready" : expectedAction)
+            try p3AssertFinal("apothecary.main.final", inside: scroll,
+                              identity: "salve_lesser")
+            mount.window.isHidden = true
+        }
+    }
+
+    func testP3_10ScentMaskSelectionAndRefusalTruthRemainUnchanged() throws {
+        for (unit, reagent, expected) in [
+            (Optional<MaterialReserveUnitID>.none, 4, "Choose one exact grade 25+ animal resource."),
+            (Optional(.init(rawValue: "p3-hide")), 4, "This exact resource + 1 Reagent · 0 Essence"),
+            (Optional(.init(rawValue: "p3-hide")), 0, "Needs 1 Reagent.")
+        ] {
+            let store = p3Store(reagent: reagent)
+            XCTAssertEqual(store.state.base.resources[Resources.reagent], reagent)
+            XCTAssertEqual(store.state.base.materialReserve.selections().first?.unitID.rawValue,
+                           "p3-hide")
+            let mount = try p3Mount(.apothecary(Items.scentMask, unit, nil),
+                                    scheme: .light, store: store)
+            try p3ScrollToEnd(mount)
+            XCTAssertEqual(P3SafeSpaceMeasurement.identities["apothecary.main.action"], expected)
+            try p3AssertFinal("apothecary.main.final",
+                              inside: try p3VisibleScrollRect(mount),
+                              identity: Items.scentMask.rawValue)
+            mount.window.isHidden = true
+        }
+        let staleStore = p3Store()
+        let stale = try p3Mount(.apothecary(Items.scentMask,
+                                            .init(rawValue: "p3-hide"),
+                                            "That exact animal resource or the Reagent is no longer available. Choose the resource again."),
+                                  scheme: .light, store: staleStore)
+        XCTAssertEqual(P3SafeSpaceMeasurement.identities["apothecary.main.action"],
+                       "This exact resource + 1 Reagent · 0 Essence")
+        XCTAssertEqual(P3SafeSpaceMeasurement.identities["apothecary.main.failure"],
+                       "That exact animal resource or the Reagent is no longer available. Choose the resource again.")
+        stale.window.isHidden = true
+    }
+
+    func testP3_11MountedSafeSpaceIsSaveCodecAndTurnInert() throws {
+        let fixtures: [(P3Screen, GameStore)] = [
+            (.trading("buy"), p3Store()), (.trading("sell"), p3Store()),
+            (.recycler, p3Store()),
+            (.apothecary(nil, nil, nil), p3Store(populated: false, recipes: [])),
+            (.apothecary("salve_lesser", nil, nil), p3Store())
+        ]
+        for (screen, store) in fixtures {
+            store.discoverConsumableRecipes()
+            let frozen = try SaveCodec.encode(store.state)
+            let turn = store.state.worlds.activeRun?.turnsTaken
+            let mount = try p3Mount(screen, scheme: .dark, store: store)
+            _ = try p3RootScroll(mount)
+            XCTAssertEqual(try SaveCodec.encode(store.state), frozen)
+            XCTAssertEqual(store.state.worlds.activeRun?.turnsTaken, turn)
+            mount.window.isHidden = true
+        }
+    }
+
+    func testP3_12ExactFourFileBoundaryAndNoLayoutSubstituteContract() throws {
+        for file in ["TradingPostView.swift", "RecyclerView.swift", "ApothecaryView.swift"] {
+            let source = try p3Source(file)
+            XCTAssertTrue(source.contains("Color(.systemGroupedBackground).ignoresSafeArea()"))
+            XCTAssertFalse(source.contains("frame(height: 430"))
+        }
+    }
+#endif
     func testGearPresentationCopyUsesNaturalStockCountsAndOlderSaveCopy() {
         XCTAssertEqual(GearPresentationCopy.piecesOfStock(0), "0 pieces of stock")
         XCTAssertEqual(GearPresentationCopy.piecesOfStock(1), "1 piece of stock")

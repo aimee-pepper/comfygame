@@ -1,5 +1,31 @@
 import SwiftUI
 
+#if DEBUG
+@MainActor enum P3SafeSpaceMeasurement {
+    static var isArmed = false
+    static var frames: [String: CGRect] = [:]
+    static var identities: [String: String] = [:]
+    static func reset() { frames = [:]; identities = [:] }
+}
+
+struct P3SafeSpaceProbe: View {
+    let key: String
+    let identity: String?
+    init(_ key: String, identity: String? = nil) { self.key = key; self.identity = identity }
+    var body: some View {
+        GeometryReader { proxy in
+            let frame = proxy.frame(in: .global)
+            Color.clear.onAppear { record(frame) }.onChange(of: frame) { _, value in record(value) }
+        }.allowsHitTesting(false)
+    }
+    private func record(_ frame: CGRect) {
+        guard P3SafeSpaceMeasurement.isArmed else { return }
+        P3SafeSpaceMeasurement.frames[key] = frame
+        if let identity { P3SafeSpaceMeasurement.identities[key] = identity }
+    }
+}
+#endif
+
 enum TradingPostPresentation {
     static let proprietorID: TravellerID = "vance"
 
@@ -22,6 +48,12 @@ struct TradingPostView: View {
     @State private var opened: TradingPostListing?
     @State private var openedMaterial: TradingPostMaterialListing?
 
+#if DEBUG
+    init(debugTab: String = "buy") {
+        _tab = State(initialValue: debugTab == "sell" ? .sell : .buy)
+    }
+#endif
+
     var body: some View {
         ScrollView {
             VStack(spacing: 16) {
@@ -41,6 +73,9 @@ struct TradingPostView: View {
 
                 if listings.isEmpty && (tab != .sell || materialGroups.isEmpty) {
                     EmptyNote(emptyMessage)
+#if DEBUG
+                        .background { P3SafeSpaceProbe("trading.main.empty", identity: tab.rawValue) }
+#endif
                 } else {
                     SixAcrossItemGrid(data: listings, id: \.id) { listing in
                         AnchoredItemDetailButton(item: listing, selection: $opened) {
@@ -48,6 +83,16 @@ struct TradingPostView: View {
                         } detail: { selected in
                             TradingPostListingSheet(listing: selected).environmentObject(store)
                         }
+#if DEBUG
+                        .background {
+                            if listing.id == listings.first?.id {
+                                P3SafeSpaceProbe("trading.main.first", identity: listing.id)
+                            }
+                            if listing.id == listings.last?.id {
+                                P3SafeSpaceProbe("trading.main.last", identity: listing.id)
+                            }
+                        }
+#endif
                     }
                 }
 
@@ -60,7 +105,10 @@ struct TradingPostView: View {
             }
             .padding(16)
         }
-        .background(Color(.systemGroupedBackground))
+#if DEBUG
+        .background { P3SafeSpaceProbe("trading.main.scroll") }
+#endif
+        .background(Color(.systemGroupedBackground).ignoresSafeArea())
         .navigationTitle("Trading Post")
         .navigationBarTitleDisplayMode(.inline)
     }
@@ -298,6 +346,13 @@ private struct TradingPostMaterialSaleSheet: View {
     let listing: TradingPostMaterialListing
     @State private var failure: TradingPostCommitResult?
 
+#if DEBUG
+    init(listing: TradingPostMaterialListing, debugFailure: TradingPostCommitResult? = nil) {
+        self.listing = listing
+        _failure = State(initialValue: debugFailure)
+    }
+#endif
+
     var body: some View {
         NavigationStack {
             List {
@@ -307,12 +362,21 @@ private struct TradingPostMaterialSaleSheet: View {
                     LabeledContent("Source", value: listing.selection.sample.source.isEmpty ? "Unknown" : listing.selection.sample.source)
                     LabeledContent("Qualifier", value: listing.selection.sample.qualifier ?? "None")
                     LabeledContent("Value", value: "+\(price) gold")
+#if DEBUG
+                        .background { P3SafeSpaceProbe("trading.material.final", identity: listing.id.rawValue) }
+#endif
                     if let failure {
                         Text(failure.message).font(.caption).foregroundStyle(.red)
                             .accessibilityIdentifier("trading-post.material-failure")
+#if DEBUG
+                            .background { P3SafeSpaceProbe("trading.material.final", identity: failure.message) }
+#endif
                     }
                 }
             }
+#if DEBUG
+            .background { P3SafeSpaceProbe("trading.material.list") }
+#endif
             .safeAreaInset(edge: .bottom, spacing: 0) {
                 PersistentActionBar(message: "This exact reserve unit is checked again before anything changes.",
                                     messageTint: failure == nil ? .secondary : .red) {
@@ -320,6 +384,9 @@ private struct TradingPostMaterialSaleSheet: View {
                         .buttonStyle(.borderedProminent).controlSize(.large)
                         .frame(maxWidth: .infinity)
                 }
+#if DEBUG
+                .background { P3SafeSpaceProbe("trading.material.action") }
+#endif
             }
             .navigationTitle(listing.selection.sample.displayName)
             .navigationBarTitleDisplayMode(.inline)
@@ -344,6 +411,14 @@ private struct TradingPostListingSheet: View {
     let listing: TradingPostListing
     @State private var quantity = 1
     @State private var failure: TradingPostCommitResult?
+
+#if DEBUG
+    init(listing: TradingPostListing, debugQuantity: Int = 1, debugFailure: Bool = false) {
+        self.listing = listing
+        _quantity = State(initialValue: debugQuantity)
+        _failure = State(initialValue: debugFailure ? .stale : nil)
+    }
+#endif
 
     var body: some View {
         NavigationStack {
@@ -377,6 +452,9 @@ private struct TradingPostListingSheet: View {
                         LabeledContent("Quantity", value: "\(quantity * listing.unitQuantity)")
                     }
                     LabeledContent("Price", value: priceLabel)
+#if DEBUG
+                        .background { P3SafeSpaceProbe("trading.listing.final", identity: listing.id) }
+#endif
                     if listing.unitQuantity > 1 {
                         Text("Each trade unit contains \(listing.unitQuantity) Essence.")
                             .font(.caption).foregroundStyle(.secondary)
@@ -385,6 +463,9 @@ private struct TradingPostListingSheet: View {
                         Text(failure.message)
                             .font(.caption).foregroundStyle(.red)
                             .accessibilityIdentifier("trading-post.failure")
+#if DEBUG
+                            .background { P3SafeSpaceProbe("trading.listing.final", identity: failure.message) }
+#endif
                     }
                 }
                 if let stack = listing.stack {
@@ -393,16 +474,31 @@ private struct TradingPostListingSheet: View {
                             LabeledContent("Power", value: profile.effectivePower.formatted(.number.precision(.fractionLength(0...1))))
                             LabeledContent("Construction tier", value: "\(profile.constructionTier)")
                             LabeledContent("Reforge", value: "\(profile.reforgeRank) of \(SmithRules.maximumReforgeLevel)")
+#if DEBUG
+                                .background {
+                                    P3SafeSpaceProbe("trading.listing.final",
+                                                     identity: stack.catalogID.rawValue)
+                                }
+#endif
                             if let provenance = profile.displayProvenance {
                                 LabeledContent("History", value: provenance)
                             }
                         } else if let definition = ContentCatalog.shared.item(stack.catalogID),
                                   !definition.blurb.isEmpty {
                             Text(definition.blurb)
+#if DEBUG
+                                .background {
+                                    P3SafeSpaceProbe("trading.listing.final",
+                                                     identity: stack.catalogID.rawValue)
+                                }
+#endif
                         }
                     }
                 }
             }
+#if DEBUG
+            .background { P3SafeSpaceProbe("trading.listing.list") }
+#endif
             .safeAreaInset(edge: .bottom, spacing: 0) { tradeActionBar }
             .navigationTitle(listing.name)
             .navigationBarTitleDisplayMode(.inline)
@@ -420,6 +516,9 @@ private struct TradingPostListingSheet: View {
                 .controlSize(.large)
                 .disabled(!listing.action.isAvailable || cannotAfford)
         }
+#if DEBUG
+        .background { P3SafeSpaceProbe("trading.listing.action", identity: actionTitle) }
+#endif
     }
 
     private var actionFootnote: String {
@@ -474,6 +573,47 @@ private struct TradingPostListingSheet: View {
         if result == .committed { dismiss() } else { failure = result }
     }
 }
+
+#if DEBUG
+struct P3TradingListingDebugHost: View {
+    enum Mode: Equatable { case affordable, unaffordable, unavailable, stored, waiting, quantity, stale }
+    let mode: Mode
+    private var listing: TradingPostListing {
+        let purchase = mode == .affordable || mode == .unaffordable || mode == .quantity || mode == .stale
+        let location: ItemGridLocation = mode == .waiting ? .waiting : (mode == .stored ? .stored : .offered)
+        let stack = (mode == .stored || mode == .waiting)
+            ? ItemStack(id: InstanceID(rawValue: mode == .stored ? 910 : 911),
+                        catalogID: "blade_chipped") : nil
+        return TradingPostListing(
+            id: "p3-\(String(describing: mode))", name: "P3 exact listing", icon: "shippingbox",
+            rarity: .common, displayQuantity: mode == .quantity ? 123 : 1,
+            maximumQuantity: mode == .quantity ? 123 : 1, unitQuantity: 1,
+            unitPrice: mode == .unaffordable ? 10_000 : 1, location: location,
+            revision: 0, stack: stack,
+            action: mode == .unavailable ? .unavailablePurchase
+                : (purchase ? .buyEssence : .sellEssence))
+    }
+    var body: some View {
+        TradingPostListingSheet(listing: listing,
+                                debugQuantity: mode == .quantity ? 123 : 1,
+                                debugFailure: mode == .stale)
+    }
+}
+
+struct P3TradingMaterialDebugHost: View {
+    @EnvironmentObject private var store: GameStore
+    let failure: TradingPostCommitResult?
+    var body: some View {
+        if let selection = store.state.base.materialReserve.selections().first {
+            TradingPostMaterialSaleSheet(listing: .init(
+                selection: selection,
+                revision: store.state.base.tradingPost.inventoryRevision,
+                unitPrice: TradingPostRules.materialSaleUnitPrice(for: selection.sample)),
+                debugFailure: failure)
+        }
+    }
+}
+#endif
 
 private enum TradingPostTab: String, CaseIterable, Identifiable {
     case buy, sell

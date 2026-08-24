@@ -22,6 +22,16 @@ struct ApothecaryView: View {
     @State private var selectedScentMaskUnitID: MaterialReserveUnitID?
     @State private var preparationFailure: String?
 
+#if DEBUG
+    init(debugSelectedRecipeID: ItemID? = nil,
+         debugSelectedScentMaskUnitID: MaterialReserveUnitID? = nil,
+         debugFailure: String? = nil) {
+        _selectedRecipeID = State(initialValue: debugSelectedRecipeID)
+        _selectedScentMaskUnitID = State(initialValue: debugSelectedScentMaskUnitID)
+        _preparationFailure = State(initialValue: debugFailure)
+    }
+#endif
+
     private var known: [ConsumableCraftingRules.Recipe] {
         ConsumableCraftingRules.recipes.filter {
             store.state.base.knownConsumableRecipes.contains($0.output)
@@ -57,6 +67,9 @@ struct ApothecaryView: View {
                         description: Text("Bring Nessa stock whose properties suggest a preparation. Once understood, a recipe stays understood.")
                     )
                     .frame(maxWidth: .infinity, minHeight: 280)
+#if DEBUG
+                    .background { P3SafeSpaceProbe("apothecary.main.empty", identity: "no-known-recipes") }
+#endif
                 } else {
                     Text("Preparations")
                         .font(.headline)
@@ -73,6 +86,18 @@ struct ApothecaryView: View {
                                 )
                             }
                             .buttonStyle(.plain)
+#if DEBUG
+                            .background {
+                                if recipe.id == known.first?.id {
+                                    P3SafeSpaceProbe("apothecary.main.first",
+                                                     identity: recipe.id.rawValue)
+                                }
+                                if recipe.id == known.last?.id {
+                                    P3SafeSpaceProbe("apothecary.main.last",
+                                                     identity: recipe.id.rawValue)
+                                }
+                            }
+#endif
                         }
                     }
 
@@ -83,9 +108,21 @@ struct ApothecaryView: View {
                                 selectedUnitID: $selectedScentMaskUnitID
                             )
                             .id(selectedRecipe.output)
+#if DEBUG
+                            .background {
+                                P3SafeSpaceProbe("apothecary.main.final",
+                                                 identity: selectedRecipe.output.rawValue)
+                            }
+#endif
                         } else {
                             ConsumableRecipeDetail(recipe: selectedRecipe)
                                 .id(selectedRecipe.output)
+#if DEBUG
+                                .background {
+                                    P3SafeSpaceProbe("apothecary.main.final",
+                                                     identity: selectedRecipe.output.rawValue)
+                                }
+#endif
                         }
                     } else {
                         Text("Choose a preparation to see its exact stock and prepare it.")
@@ -100,8 +137,16 @@ struct ApothecaryView: View {
             }
             .padding(16)
         }
+#if DEBUG
+        .background { P3SafeSpaceProbe("apothecary.main.scroll") }
+        .background {
+            if let preparationFailure {
+                P3SafeSpaceProbe("apothecary.main.failure", identity: preparationFailure)
+            }
+        }
+#endif
         .safeAreaInset(edge: .bottom, spacing: 0) { preparationActionBar }
-        .background(Color(.systemGroupedBackground))
+        .background(Color(.systemGroupedBackground).ignoresSafeArea())
         .navigationTitle("The Apothecary")
         .navigationBarTitleDisplayMode(.inline)
         .onAppear {
@@ -170,6 +215,12 @@ struct ApothecaryView: View {
                 .disabled(!missing.isEmpty)
                 .accessibilityIdentifier("apothecary.craft.\(recipe.output.rawValue)")
             }
+#if DEBUG
+            .background {
+                P3SafeSpaceProbe("apothecary.main.action",
+                                 identity: missing.isEmpty ? "ready" : missing.joined(separator: " · "))
+            }
+#endif
             }
         }
     }
@@ -201,6 +252,12 @@ struct ApothecaryView: View {
             .disabled(quote == nil)
             .accessibilityIdentifier("apothecary.craft.scent_mask")
         }
+#if DEBUG
+        .background {
+            P3SafeSpaceProbe("apothecary.main.action",
+                             identity: scentMaskActionMessage(quote: quote))
+        }
+#endif
     }
 
     private func scentMaskActionMessage(
