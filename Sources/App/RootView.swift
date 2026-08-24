@@ -644,6 +644,7 @@ struct RunExitSummaryView: View {
                          location: .carried, accessibilityName: item.fallbackName)
         case .materialSample(let material):
             ItemIconTile(icon: material.fallbackIcon, catalogueID: material.catalogID,
+                         materialKind: material.sample.kind,
                          rarity: ContentCatalog.shared.item(material.catalogID)?.rarity ?? .common,
                          quantity: 1, identified: material.identified,
                          location: .carried, accessibilityName: material.fallbackName)

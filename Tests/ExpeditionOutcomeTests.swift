@@ -687,6 +687,28 @@ final class ExpeditionOutcomeTests: XCTestCase {
         XCTAssertFalse(source.contains("recapSection(\"Items\", gains: summary.items)"))
     }
 
+    func testRunExitRecapRoutesEveryMaterialKindToExistingPixelIdentity() throws {
+        XCTAssertEqual(MaterialKind.allCases.count, 16)
+        XCTAssertEqual(Set(MaterialKind.allCases.map(\.rawValue)).count, 16)
+
+        let root = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent().deletingLastPathComponent()
+        let source = try String(contentsOf: root.appending(path: "Sources/App/RootView.swift"),
+                                encoding: .utf8)
+        let materialCase = try XCTUnwrap(
+            source.range(of: "case .materialSample(let material):")
+        )
+        let legacyCase = try XCTUnwrap(
+            source.range(of: "case .legacy(let legacy):", range: materialCase.upperBound..<source.endIndex)
+        )
+        let materialRoute = String(source[materialCase.lowerBound..<legacyCase.lowerBound])
+
+        XCTAssertTrue(materialRoute.contains("ItemIconTile(icon: material.fallbackIcon"))
+        XCTAssertTrue(materialRoute.contains("materialKind: material.sample.kind"))
+        XCTAssertFalse(materialRoute.contains("MaterialKind."),
+                       "the recap must route the frozen kind, not special-case a subset")
+    }
+
     func testMaterialReceiptFreezesEverySampleAsItsOwnStableLine() throws {
         let store = fundedStore()
         XCTAssertTrue(store.bindAndDepart())
