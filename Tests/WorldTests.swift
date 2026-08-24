@@ -1553,6 +1553,166 @@ final class WorldTests: XCTestCase {
             tile: Tile(content: .traveller("mara"), isRevealed: true)))
     }
 
+    @MainActor
+    func testResourceMiningFeedbackUsesCommittedHarvestOrderCoalescingAndExactFieldIdentity() throws {
+        let batch = WorldFieldEventBatchV1(
+            batchID: "mining-a", worldRunID: "1:2", attemptID: 4,
+            sourceAction: .harvest, turnBefore: 8, turnAfter: 9,
+            orderedEvents: [
+                .harvested(Resources.ore, amount: 2, exhausted: false),
+                .harvested(Resources.fiber, amount: 1, exhausted: false),
+                .harvested(Resources.ore, amount: 3, exhausted: true),
+                .harvested(Resources.ore, amount: 0, exhausted: true),
+            ], orderedNarrations: ["Harvested."], createdAtMonotonicTime: 10)
+        let group = WorldMiningFeedbackGroupV1(
+            batchID: batch.batchID, worldRunID: batch.worldRunID,
+            subjects: [
+                .init(resourceID: Resources.ore, amount: 5),
+                .init(resourceID: Resources.fiber, amount: 1),
+            ], startedAtMonotonicTime: 10)
+        let presentation = try XCTUnwrap(ResourceMiningFeedbackV1.make(from: group))
+        XCTAssertEqual(presentation.batchID, "mining-a")
+        XCTAssertEqual(presentation.subjects, [
+            .init(resourceID: Resources.ore, amount: 5),
+            .init(resourceID: Resources.fiber, amount: 1),
+        ])
+        XCTAssertEqual(ResourceMiningFeedbackV1.subjectProgress(
+            elapsedMilliseconds: 0, index: 0), 0)
+        XCTAssertEqual(ResourceMiningFeedbackV1.subjectProgress(
+            elapsedMilliseconds: 130, index: 0), 130.0 / 760.0, accuracy: 0.0001)
+        XCTAssertEqual(ResourceMiningFeedbackV1.subjectProgress(
+            elapsedMilliseconds: 130, index: 1), 0)
+        XCTAssertEqual(ResourceMiningFeedbackV1.subjectProgress(
+            elapsedMilliseconds: 760, index: 0), 1)
+        XCTAssertEqual(ResourceMiningFeedbackV1.subjectProgress(
+            elapsedMilliseconds: 760, index: 1), 630.0 / 760.0, accuracy: 0.0001)
+        XCTAssertEqual(ResourceMiningFeedbackV1.subjectProgress(
+            elapsedMilliseconds: 890, index: 1), 1)
+        XCTAssertEqual(presentation.durationMilliseconds, 890)
+        XCTAssertTrue(ResourceMiningFeedbackV1.anchorIsVisible(
+            CGPoint(x: 50, y: 50), in: CGRect(x: 0, y: 0, width: 100, height: 100)))
+        XCTAssertFalse(ResourceMiningFeedbackV1.anchorIsVisible(
+            CGPoint(x: 2, y: 50), in: CGRect(x: 0, y: 0, width: 100, height: 100)))
+    }
+
+    @MainActor
+    func testResourceMiningFeedbackSessionDedupesRejectsWrongRunAndCannotDeadlockOnMissingArt() {
+        let io = SaveFileIO.temporary(name: "mining-session-\(UUID().uuidString)")
+        let store = GameStore(io: io)
+        store.mutate("test mining run", flush: true) { state in
+            state.worlds.activeRun = self.wildPageRun(seed: 2)
+        }
+        func batch(_ id: String, resource: ResourceID, runID: String = "3:2")
+            -> WorldFieldEventBatchV1 {
+            .init(batchID: id, worldRunID: runID, attemptID: 1, sourceAction: .harvest,
+                  turnBefore: 0, turnAfter: 1,
+                  orderedEvents: [.harvested(resource, amount: 2, exhausted: false)],
+                  orderedNarrations: ["Harvested."], createdAtMonotonicTime: 1)
+        }
+        let first = batch("first", resource: Resources.ore)
+        store.claimWorldMiningFeedback(for: first, now: 10)
+        XCTAssertEqual(store.worldMiningFeedback?.batchID, "first")
+        store.claimWorldMiningFeedback(for: first, now: 20)
+        XCTAssertEqual(store.worldMiningFeedback?.startedAtMonotonicTime, 10,
+                       "remount/reclaim cannot restart a claimed batch")
+        store.finishWorldMiningFeedback(expectedBatchID: "first")
+        store.claimWorldMiningFeedback(for: first, now: 30)
+        XCTAssertNil(store.worldMiningFeedback, "a completed batch never replays")
+        store.claimWorldMiningFeedback(for: batch("wrong", resource: Resources.ore,
+                                                  runID: "99:99"), now: 40)
+        XCTAssertNil(store.worldMiningFeedback)
+        store.claimWorldMiningFeedback(for: batch("missing", resource: "future_resource"), now: 50)
+        XCTAssertNil(store.worldMiningFeedback, "missing-only visual group fails closed")
+        store.claimWorldMiningFeedback(for: batch("valid-next", resource: Resources.fiber), now: 60)
+        XCTAssertEqual(store.worldMiningFeedback?.batchID, "valid-next")
+        store.clearWorldFieldFeedback()
+        XCTAssertNil(store.worldMiningFeedback)
+        let relaunched = GameStore(io: io)
+        XCTAssertNil(relaunched.worldMiningFeedback, "transient animation never survives relaunch")
+    }
+
+    @MainActor
+    func testResourceMiningFeedbackHasIndependentFIFOAndAdvancesExactlyOneGroup() {
+        let store = GameStore(io: .temporary(name: "mining-fifo-\(UUID().uuidString)"))
+        store.mutate("test mining fifo", flush: true) { state in
+            state.worlds.activeRun = self.wildPageRun(seed: 2)
+        }
+        func batch(_ id: String, action: WorldFieldEventBatchV1.SourceAction,
+                   resource: ResourceID = Resources.ore) -> WorldFieldEventBatchV1 {
+            .init(batchID: id, worldRunID: "3:2", attemptID: UInt64(id.utf8.count),
+                  sourceAction: action, turnBefore: 0, turnAfter: 1,
+                  orderedEvents: action == .harvest
+                    ? [.harvested(resource, amount: 1, exhausted: false)]
+                    : [.blocked("Older narration")],
+                  orderedNarrations: ["Narration"], createdAtMonotonicTime: 1)
+        }
+        let older = batch("older", action: .step)
+        let a = batch("A", action: .harvest)
+        let b = batch("B", action: .harvest, resource: Resources.fiber)
+        store.enqueueWorldFieldBatch(older, now: 10)
+        XCTAssertNil(store.worldMiningFeedback)
+        store.enqueueWorldFieldBatch(a, now: 20)
+        store.enqueueWorldFieldBatch(b, now: 30)
+        store.enqueueWorldFieldBatch(a, now: 40)
+        XCTAssertEqual(store.currentWorldFieldEventBatch?.batchID, "older",
+                       "field narration remains independently FIFO")
+        XCTAssertEqual(store.worldMiningFeedback?.batchID, "A",
+                       "older field narration cannot delay committed mining")
+        XCTAssertEqual(store.worldMiningFeedbackQueue.map(\.batchID), ["B"])
+        store.finishWorldMiningFeedback(expectedBatchID: "A", now: 50)
+        XCTAssertEqual(store.worldMiningFeedback?.batchID, "B")
+        XCTAssertEqual(store.worldMiningFeedback?.startedAtMonotonicTime, 50)
+        XCTAssertTrue(store.worldMiningFeedbackQueue.isEmpty)
+        store.finishWorldMiningFeedback(expectedBatchID: "B", now: 60)
+        XCTAssertNil(store.worldMiningFeedback)
+        store.clearWorldFieldFeedback()
+        XCTAssertTrue(store.worldMiningFeedbackQueue.isEmpty)
+    }
+
+    @MainActor
+    func testAcceptedHarvestCommitsCountsBeforeMountedMiningFeedbackAndPreservesWorldLayout() throws {
+        let store = GameStore(io: .temporary(name: "mining-mounted-\(UUID().uuidString)"))
+        var fixture = startedRun(book(["bounty": "teeming_life"]), seed: 99)
+        var run = try XCTUnwrap(fixture.worlds.activeRun)
+        run.map[run.playerPosition].content = .node(ResourceNode(
+            resource: Resources.timber, remainingHarvests: 1, yieldPerHarvest: 3,
+            secondaryResource: Resources.resin, secondaryYieldPerHarvest: 1))
+        fixture.worlds.activeRun = run
+        store.mutate("test mounted mining", flush: true) { $0 = fixture }
+        store.harvest()
+        XCTAssertEqual(store.activeRun?.satchel[Resources.timber], 3)
+        XCTAssertEqual(store.activeRun?.satchel[Resources.resin], 1)
+        XCTAssertEqual(store.activeRun?.turnsTaken, 1)
+        XCTAssertEqual(store.worldMiningFeedback?.subjects, [
+            .init(resourceID: Resources.timber, amount: 3),
+            .init(resourceID: Resources.resin, amount: 1),
+        ], "the toolbar counts are committed before frame one")
+        let controller = UIHostingController(rootView: WorldView().environmentObject(store)
+            .frame(width: 368, height: 800))
+        let window = UIWindow(frame: CGRect(x: 0, y: 0, width: 368, height: 800))
+        window.rootViewController = controller; window.makeKeyAndVisible()
+        controller.view.frame = window.bounds; controller.view.layoutIfNeeded()
+        RunLoop.main.run(until: Date().addingTimeInterval(0.04))
+        let before = try SaveCodec.encode(store.state)
+        RunLoop.main.run(until: Date().addingTimeInterval(0.18))
+        XCTAssertEqual(store.worldMiningFeedback?.batchID,
+                       store.currentWorldFieldEventBatch?.batchID,
+                       "mounted origin and every toolbar destination must be collected")
+        XCTAssertEqual(WorldMapStageMeasurement.latestFrame.width, 368, accuracy: 0.5)
+        XCTAssertEqual(WorldMapStageMeasurement.latestFrame.height, 368, accuracy: 0.5,
+                       "mining overlay cannot alter build-255 map geometry")
+        let image = UIGraphicsImageRenderer(size: window.bounds.size).image { _ in
+            controller.view.drawHierarchy(in: controller.view.bounds, afterScreenUpdates: true)
+        }
+        window.isHidden = true
+        XCTAssertEqual(image.size, CGSize(width: 368, height: 800))
+        XCTAssertEqual(try SaveCodec.encode(store.state), before,
+                       "the travelling presentation is hit-test transparent and gameplay inert")
+        let attachment = XCTAttachment(image: image)
+        attachment.name = "resource-mining-feedback-two-output-368x800"
+        attachment.lifetime = .keepAlways; add(attachment)
+    }
+
     func testMinimapTerrainStyleIsOpaqueNonblackAndIndependentOfRememberedContent() {
         for appearance in MinimapTerrainStyle.Appearance.allCases {
             var classes = Set<String>()

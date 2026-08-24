@@ -623,6 +623,108 @@ struct ResourceFieldMarkerIdentity: View {
     }
 }
 
+struct ResourceMiningFeedbackV1: Equatable {
+    struct Subject: Equatable, Identifiable {
+        let resourceID: ResourceID
+        let amount: Int
+        var id: ResourceID { resourceID }
+    }
+
+    let batchID: String
+    let subjects: [Subject]
+
+    @MainActor static func make(from group: WorldMiningFeedbackGroupV1) -> Self? {
+        let subjects = group.subjects.compactMap { row -> Subject? in
+            guard row.amount > 0,
+                  ResourceSpriteV1Registry.asset(for: row.resourceID, profile: .field) != nil
+            else { return nil }
+            return Subject(resourceID: row.resourceID, amount: row.amount)
+        }
+        guard !subjects.isEmpty else { return nil }
+        return Self(batchID: group.batchID, subjects: subjects)
+    }
+
+    static func subjectProgress(elapsedMilliseconds: Double, index: Int) -> CGFloat {
+        min(1, max(0, CGFloat((elapsedMilliseconds - Double(index) * 130) / 760)))
+    }
+
+    var durationMilliseconds: Double { 760 + 130 * Double(max(0, subjects.count - 1)) }
+
+    static func anchorIsVisible(_ point: CGPoint, in bounds: CGRect,
+                                targetSide: CGFloat = 8) -> Bool {
+        bounds.contains(CGRect(x: point.x - targetSide / 2, y: point.y - targetSide / 2,
+                               width: targetSide, height: targetSide))
+    }
+}
+
+@MainActor
+struct ResourceMiningFeedbackOverlay: View {
+    let presentation: ResourceMiningFeedbackV1
+    let start: CGPoint
+    let destination: (ResourceID) -> CGPoint
+    let startedAtMonotonicTime: UInt64
+    let onFinished: () -> Void
+
+    var body: some View {
+        TimelineView(.animation(minimumInterval: 1.0 / 60.0)) { _ in
+          let now = DispatchTime.now().uptimeNanoseconds
+          let elapsed = Double(now &- min(now, startedAtMonotonicTime)) / 1_000_000
+          ZStack {
+            ForEach(Array(presentation.subjects.enumerated()), id: \.element.id) { index, subject in
+                let local = ResourceMiningFeedbackV1.subjectProgress(
+                    elapsedMilliseconds: elapsed, index: index)
+                let end = destination(subject.resourceID)
+                let control = CGPoint(x: (start.x + end.x) / 2,
+                                      y: min(start.y, end.y) - 54)
+                let point = quadratic(from: start, control: control, to: end, t: local)
+                VStack(spacing: 2) {
+                    ResourceFieldMarkerIdentity(id: subject.resourceID, fallbackSystemIcon: "")
+                        .frame(width: 8, height: 8)
+                        .scaleEffect(2 - local)
+                    Text("+\(subject.amount)")
+                        .font(.custom("Tiny5", size: 13))
+                        .foregroundStyle(PixelUITheme.text)
+                        .padding(.horizontal, 3)
+                        .background(PixelUITheme.edgeDark.opacity(0.9))
+                }
+                .position(point)
+                .opacity(local >= 1 ? 0 : 1)
+            }
+          }
+        }
+        .allowsHitTesting(false)
+        .task(id: presentation.batchID) {
+            let now = DispatchTime.now().uptimeNanoseconds
+            let elapsed = Double(now &- min(now, startedAtMonotonicTime)) / 1_000_000
+            let remaining = max(0, presentation.durationMilliseconds - elapsed)
+            try? await Task.sleep(nanoseconds: UInt64(remaining * 1_000_000))
+            guard !Task.isCancelled else { return }
+            onFinished()
+        }
+    }
+
+    private func quadratic(from: CGPoint, control: CGPoint, to: CGPoint, t: CGFloat) -> CGPoint {
+        let u = 1 - t
+        return CGPoint(x: u * u * from.x + 2 * u * t * control.x + t * t * to.x,
+                       y: u * u * from.y + 2 * u * t * control.y + t * t * to.y)
+    }
+}
+
+struct MiningAnchorReceipt {
+    var origin: Anchor<CGPoint>?
+    var destinations: [ResourceID: Anchor<CGPoint>] = [:]
+}
+
+struct MiningAnchorReceiptKey: PreferenceKey {
+    static let defaultValue = MiningAnchorReceipt()
+    static func reduce(value: inout MiningAnchorReceipt,
+                       nextValue: () -> MiningAnchorReceipt) {
+        let next = nextValue()
+        value.origin = value.origin ?? next.origin
+        value.destinations.merge(next.destinations, uniquingKeysWith: { first, _ in first })
+    }
+}
+
 struct MapTileArt: View {
     let request: MapTileArtRequest
     @Environment(\.accessibilityReduceMotion) private var reduceMotion

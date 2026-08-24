@@ -678,6 +678,9 @@ struct WorldView: View {
                 .zIndex(2)
             }
         }
+        .overlayPreferenceValue(MiningAnchorReceiptKey.self) { anchors in
+            miningOverlay(anchors: anchors)
+        }
         .background(PixelUITheme.edgeDark)
 #if DEBUG
         .toolbar {
@@ -892,6 +895,10 @@ struct WorldView: View {
                                     fallbackSystemIcon: ContentCatalog.shared.resource(entry.id)?.icon ?? "cube"
                                 )
                                 .frame(width: 8, height: 8)
+                                .anchorPreference(key: MiningAnchorReceiptKey.self,
+                                                  value: .center) {
+                                    MiningAnchorReceipt(destinations: [entry.id: $0])
+                                }
                                 Text("\(entry.amount)")
                             }
                             .fixedSize()
@@ -1032,6 +1039,36 @@ struct WorldView: View {
     }
 
     private var useTileUnavailableReason: String { "There is nothing to use here." }
+
+    @ViewBuilder private func miningOverlay(anchors: MiningAnchorReceipt) -> some View {
+        GeometryReader { proxy in
+            if let group = store.worldMiningFeedback,
+               let presentation = ResourceMiningFeedbackV1.make(from: group),
+               let origin = anchors.origin {
+                    let bounds = CGRect(origin: .zero, size: proxy.size)
+                    let start = proxy[origin]
+                    let allDestinationsVisible = presentation.subjects.allSatisfy { subject in
+                        guard let anchor = anchors.destinations[subject.resourceID] else { return false }
+                        return ResourceMiningFeedbackV1.anchorIsVisible(proxy[anchor], in: bounds)
+                    }
+                    if ResourceMiningFeedbackV1.anchorIsVisible(start, in: bounds),
+                       allDestinationsVisible {
+                        ResourceMiningFeedbackOverlay(
+                            presentation: presentation,
+                            start: start,
+                            destination: { proxy[anchors.destinations[$0]!] },
+                            startedAtMonotonicTime: group.startedAtMonotonicTime,
+                            onFinished: {
+                                store.finishWorldMiningFeedback(expectedBatchID: group.batchID)
+                            })
+                    } else {
+                        Color.clear.task(id: group.batchID) {
+                            store.finishWorldMiningFeedback(expectedBatchID: group.batchID)
+                        }
+                    }
+            }
+        }
+    }
 
     private func interactionDetail(in run: WorldRun) -> String {
         if let node = store.harvestableHere {
@@ -1675,6 +1712,11 @@ private struct MapGrid: View {
                                      side: side,
 									 presentationTick: terrainClock.tick,
                                      useSimpleRenderer: simpleRenderer)
+                                .anchorPreference(key: MiningAnchorReceiptKey.self,
+                                                  value: .center) {
+                                    MiningAnchorReceipt(
+                                        origin: point == run.playerPosition ? $0 : nil)
+                                }
                                 .onTapGesture { onTap(point) }
                         }
                     }

@@ -228,6 +228,14 @@ struct WorldFieldEventBatchV1: Equatable {
     let createdAtMonotonicTime: UInt64
 }
 
+struct WorldMiningFeedbackGroupV1: Equatable {
+    struct Subject: Equatable { let resourceID: ResourceID; let amount: Int }
+    let batchID: String
+    let worldRunID: String
+    let subjects: [Subject]
+    let startedAtMonotonicTime: UInt64
+}
+
 enum WorldFieldNarration {
     static func text(for event: WorldRules.Event) -> String? {
         return switch event {
@@ -358,6 +366,8 @@ final class GameStore: ObservableObject {
     @Published var recentEvents: [WorldRules.Event] = []
     @Published private(set) var worldFieldContext: WorldFieldContextReceiptV1?
     @Published private(set) var worldFieldEventQueue: [WorldFieldEventBatchV1] = []
+    @Published private(set) var worldMiningFeedback: WorldMiningFeedbackGroupV1?
+    @Published private(set) var worldMiningFeedbackQueue: [WorldMiningFeedbackGroupV1] = []
     /// Recoverable player-facing failure from the bind preview/receipt commitment boundary.
     /// It is deliberately outside the save: a failed bind changes no campaign fact.
     @Published var bindError: String?
@@ -368,6 +378,7 @@ final class GameStore: ObservableObject {
     private var nextWorldFieldAttemptID: UInt64 = 1
     private var seenWorldFieldBatchIDs: Set<String> = []
     private var visibleWorldFieldBatchSince: UInt64?
+    private var seenWorldMiningBatchIDs: Set<String> = []
 
     var diagnosticCampaignReference: String? { io.diagnosticCampaignReference }
 
@@ -446,11 +457,48 @@ final class GameStore: ObservableObject {
         let wasEmpty = worldFieldEventQueue.isEmpty
         worldFieldEventQueue.append(batch)
         if wasEmpty { visibleWorldFieldBatchSince = now }
+        claimWorldMiningFeedback(for: batch, now: now)
+    }
+
+    func claimWorldMiningFeedback(for batch: WorldFieldEventBatchV1,
+        now: UInt64 = DispatchTime.now().uptimeNanoseconds) {
+        guard batch.sourceAction == .harvest,
+              let run = activeRun, batch.worldRunID == "\(run.runIndex):\(run.mapSeed)",
+              seenWorldMiningBatchIDs.insert(batch.batchID).inserted else { return }
+        var order: [ResourceID] = []; var totals: [ResourceID: Int] = [:]
+        for event in batch.orderedEvents {
+            guard case .harvested(let id, let amount, _) = event, amount > 0 else { continue }
+            if totals[id] == nil { order.append(id) }
+            totals[id, default: 0] += amount
+        }
+        let subjects = order.compactMap { id -> WorldMiningFeedbackGroupV1.Subject? in
+            guard let amount = totals[id],
+                  ResourceSpriteV1Registry.asset(for: id, profile: .field) != nil else { return nil }
+            return .init(resourceID: id, amount: amount)
+        }
+        guard !subjects.isEmpty else { return }
+        let group = WorldMiningFeedbackGroupV1(
+            batchID: batch.batchID, worldRunID: batch.worldRunID, subjects: subjects,
+            startedAtMonotonicTime: worldMiningFeedback == nil ? now : 0)
+        if worldMiningFeedback == nil { worldMiningFeedback = group }
+        else { worldMiningFeedbackQueue.append(group) }
+    }
+
+    func finishWorldMiningFeedback(expectedBatchID: String,
+        now: UInt64 = DispatchTime.now().uptimeNanoseconds) {
+        guard worldMiningFeedback?.batchID == expectedBatchID else { return }
+        if worldMiningFeedbackQueue.isEmpty { worldMiningFeedback = nil }
+        else {
+            let next = worldMiningFeedbackQueue.removeFirst()
+            worldMiningFeedback = .init(batchID: next.batchID, worldRunID: next.worldRunID,
+                subjects: next.subjects, startedAtMonotonicTime: now)
+        }
     }
 
     func dismissWorldFieldFeedback(expectedBatchID: String,
                                    now: UInt64 = DispatchTime.now().uptimeNanoseconds) {
         guard worldFieldEventQueue.first?.batchID == expectedBatchID else { return }
+        finishWorldMiningFeedback(expectedBatchID: expectedBatchID, now: now)
         worldFieldEventQueue.removeFirst()
         visibleWorldFieldBatchSince = worldFieldEventQueue.isEmpty ? nil : now
     }
@@ -467,6 +515,9 @@ final class GameStore: ObservableObject {
         worldFieldEventQueue.removeAll()
         seenWorldFieldBatchIDs.removeAll()
         visibleWorldFieldBatchSince = nil
+        worldMiningFeedback = nil
+        worldMiningFeedbackQueue.removeAll()
+        seenWorldMiningBatchIDs.removeAll()
     }
 
     func refreshWorldFieldContext() {
