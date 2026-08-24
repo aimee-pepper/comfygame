@@ -16,7 +16,8 @@ enum ExplorationMapIdentityPack {
     }
 
     private static let packs: [Pack] = [
-        "ExplorationMapIdentities-v1", "ExplorationLooseItems-v1", "ExplorationCatalogueObjects-v1"
+        "ExplorationMapIdentities-v1", "ExplorationLooseItems-v1", "ExplorationCatalogueObjects-v1",
+        "ExplorationLooseEssence-v1"
     ].compactMap { name in
         guard let root = Bundle.main.url(forResource: name, withExtension: nil),
               let data = try? Data(contentsOf: root.appendingPathComponent("manifest.json")),
@@ -82,6 +83,10 @@ enum ExplorationMapIdentityResolver {
         case .lockedCache: return "locked_cache/ordinary/frame-0"
         case .diaryPage: return "diary_page/ordinary/frame-0"
         case .foundWriting: return "found_writing/ordinary/frame-0"
+        case .wildDrop(let resource, let amount)
+            where resource == Resources.essenceRaw && amount > 0:
+            return ExplorationMapIdentityPack.frameKey(
+                identity: "loose_essence", tick: tick, remembered: remembered)
         case .site:
             guard let site else { return nil }
             let state = site.id.rawValue == "natural_anchor"

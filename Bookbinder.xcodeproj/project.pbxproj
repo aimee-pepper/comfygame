@@ -99,6 +99,7 @@
 		E50000000000000000000001 /* ExplorationMapIdentities-v1 in Resources */ = {isa = PBXBuildFile; fileRef = E50000000000000000000004 /* ExplorationMapIdentities-v1 */; };
 		E50000000000000000000002 /* ExplorationLooseItems-v1 in Resources */ = {isa = PBXBuildFile; fileRef = E50000000000000000000005 /* ExplorationLooseItems-v1 */; };
 		E50000000000000000000003 /* ExplorationCatalogueObjects-v1 in Resources */ = {isa = PBXBuildFile; fileRef = E50000000000000000000006 /* ExplorationCatalogueObjects-v1 */; };
+		E50000000000000000000007 /* ExplorationLooseEssence-v1 in Resources */ = {isa = PBXBuildFile; fileRef = E50000000000000000000008 /* ExplorationLooseEssence-v1 */; };
 		2AAA4E398F09BD29BAD7816B /* stations.json in Resources */ = {isa = PBXBuildFile; fileRef = 59F1E2A3A08364F9452A684F /* stations.json */; };
 		2C0118338DCCD9231D0DE4D0 /* GambitEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1EEBBF5F9C846FD07202D739 /* GambitEditorView.swift */; };
 		2EB9403AD8A6CC32F54FBFA1 /* upgrades.json in Resources */ = {isa = PBXBuildFile; fileRef = 84E44EC84F5C25D11A62DAC1 /* upgrades.json */; };
@@ -417,6 +418,7 @@
 		E50000000000000000000004 /* ExplorationMapIdentities-v1 */ = {isa = PBXFileReference; lastKnownFileType = folder; path = "RuntimePacks/ExplorationMapIdentities-v1"; sourceTree = SOURCE_ROOT; };
 		E50000000000000000000005 /* ExplorationLooseItems-v1 */ = {isa = PBXFileReference; lastKnownFileType = folder; path = "RuntimePacks/ExplorationLooseItems-v1"; sourceTree = SOURCE_ROOT; };
 		E50000000000000000000006 /* ExplorationCatalogueObjects-v1 */ = {isa = PBXFileReference; lastKnownFileType = folder; path = "RuntimePacks/ExplorationCatalogueObjects-v1"; sourceTree = SOURCE_ROOT; };
+		E50000000000000000000008 /* ExplorationLooseEssence-v1 */ = {isa = PBXFileReference; lastKnownFileType = folder; path = "RuntimePacks/ExplorationLooseEssence-v1"; sourceTree = SOURCE_ROOT; };
 		3B6F502E8B3B230294A2874A /* PartyRosterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PartyRosterView.swift; sourceTree = "<group>"; };
 		3CD59EA0991C7AFB32B3129C /* BookbinderTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = BookbinderTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		3F7B97CCB3D7660ADA8ED9E5 /* MapAssetRenderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapAssetRenderer.swift; sourceTree = "<group>"; };
@@ -1171,6 +1173,7 @@
 				E50000000000000000000001 /* ExplorationMapIdentities-v1 in Resources */,
 				E50000000000000000000002 /* ExplorationLooseItems-v1 in Resources */,
 				E50000000000000000000003 /* ExplorationCatalogueObjects-v1 in Resources */,
+				E50000000000000000000007 /* ExplorationLooseEssence-v1 in Resources */,
 				E30000000000000000000005 /* WritingDeskProductionPack-v1 in Resources */,
 				E40000000000000000000003 /* TerrainProductionPack-v1 in Resources */,
 				E40000000000000000000007 /* TerrainSouthWallPack-v1 in Resources */,

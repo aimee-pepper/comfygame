@@ -725,6 +725,7 @@ final class WorldTests: XCTestCase {
                 .diaryPage("evidence-page"), .foundWriting("evidence-writing"),
                 .item(ItemStack(id: InstanceID(rawValue: 80_001), catalogID: "field_maul")),
                 .item(ItemStack(id: InstanceID(rawValue: 80_002), catalogID: "salve")),
+                .wildDrop(resource: Resources.essenceRaw, amount: 2),
             ]
             for (point, content) in zip(nearby, fixed) { run.map[point].content = content }
             run.sites = []
@@ -760,6 +761,67 @@ final class WorldTests: XCTestCase {
         let grayscale = try XCTUnwrap(literalGrayscale(rendered[1]))
         let attachment = XCTAttachment(image: grayscale)
         attachment.name = "exploration-map-final-art-grayscale-368x800"
+        attachment.lifetime = .keepAlways; add(attachment)
+    }
+
+    @MainActor
+    func testLooseRawEssenceMountedNative368EvidenceIsGameplayInert() throws {
+        UserDefaults.standard.set(false, forKey: "debug.simpleMapRenderer")
+        let store = GameStore(io: .temporary(name: "loose-essence-art-\(UUID().uuidString)"))
+        for lesson in TutorialLessonID.allCases {
+            store.completeTutorial(lesson, fact: "loose_essence_visual_fixture")
+        }
+        XCTAssertTrue(store.bindAndDepart(
+            worldPageInstanceID: WorldPageCatalog.earthlikeTestInstance.id))
+        let arrivalID = try XCTUnwrap(store.state.worlds.pendingWorldArrivalReceiptID)
+        XCTAssertTrue(store.enterPendingWorld(arrivalReceiptID: arrivalID))
+        store.mutate("test mounted Loose Raw Essence", flush: true) { state in
+            guard var run = state.worlds.activeRun else { return }
+            let center = GridPoint(x: run.map.width / 2, y: run.map.height / 2)
+            run.playerPosition = center
+            run.tuning.baseVisionRadius = max(run.map.width, run.map.height)
+            run.enemies = []
+            for point in run.map.allPoints {
+                run.map[point].elevation = 0
+                run.map[point].isRevealed = true
+                run.map[point].isCrumbled = false
+                run.map[point].isCracking = false
+                run.map[point].flora = nil
+                run.map[point].content = .empty
+            }
+            run.map[GridPoint(x: center.x, y: center.y - 1)].content =
+                .wildDrop(resource: Resources.essenceRaw, amount: 2)
+            state.worlds.activeRun = run
+        }
+        let mountedRun = try XCTUnwrap(store.activeRun)
+        let mountedCenter = GridPoint(x: mountedRun.map.width / 2, y: mountedRun.map.height / 2)
+        XCTAssertEqual(mountedRun.playerPosition, mountedCenter)
+        XCTAssertEqual(mountedRun.map[GridPoint(x: mountedCenter.x, y: mountedCenter.y - 1)].content,
+                       .wildDrop(resource: Resources.essenceRaw, amount: 2))
+        let savedBytes = try SaveCodec.encode(store.state)
+
+        var images: [UIImage] = []
+        for scheme in [ColorScheme.light, .dark] {
+            let controller = UIHostingController(rootView: WorldView().environmentObject(store)
+                .environment(\.colorScheme, scheme).frame(width: 368, height: 800))
+            let window = UIWindow(frame: CGRect(x: 0, y: 0, width: 368, height: 800))
+            window.rootViewController = controller; window.makeKeyAndVisible()
+            controller.view.frame = window.bounds; controller.view.layoutIfNeeded()
+            RunLoop.main.run(until: Date().addingTimeInterval(0.08))
+            let image = UIGraphicsImageRenderer(size: window.bounds.size).image { _ in
+                controller.view.drawHierarchy(in: controller.view.bounds, afterScreenUpdates: true)
+            }
+            window.isHidden = true
+            XCTAssertEqual(WorldMapStageMeasurement.latestFrame.size,
+                           CGSize(width: 368, height: 368))
+            XCTAssertEqual(try SaveCodec.encode(store.state), savedBytes)
+            images.append(image)
+            let attachment = XCTAttachment(image: image)
+            attachment.name = "loose-raw-essence-\(scheme == .light ? "light" : "dark")-368x800"
+            attachment.lifetime = .keepAlways; add(attachment)
+        }
+        let attachment = XCTAttachment(image: try XCTUnwrap(literalGrayscale(images[1])))
+        attachment.name = "loose-raw-essence-grayscale-368x800"
         attachment.lifetime = .keepAlways; add(attachment)
     }
 
@@ -1420,9 +1482,11 @@ final class WorldTests: XCTestCase {
         let packs = try XCTUnwrap(json["packs"] as? [String: [String: Any]])
         let approved = packs.values.flatMap { $0["approvedStableKeys"] as? [String] ?? [] }.sorted()
         XCTAssertEqual(approved.count, 154)
-        XCTAssertEqual(MapAssetTestSupport.explorationMapAssetKeys, approved)
+        let looseEssenceKeys = (0..<4).map { "loose_essence/ordinary/frame-\($0)" }
+        let allApproved = (approved + looseEssenceKeys).sorted()
+        XCTAssertEqual(MapAssetTestSupport.explorationMapAssetKeys, allApproved)
 
-        for key in approved {
+        for key in allApproved {
             let image = try XCTUnwrap(MapAssetTestSupport.explorationMapImage(key), key)
             let expected = key.hasPrefix("minimap/") ? CGSize(width: 7, height: 7)
                 : CGSize(width: 16, height: 19)
@@ -1453,6 +1517,124 @@ final class WorldTests: XCTestCase {
         XCTAssertEqual(bottomAligned.maxY, tileSide, "authored bottom pivot owns tile baseline")
         XCTAssertEqual(bottomAligned.minY, -3, "three authored overhang rows remain above tile")
         XCTAssertEqual(ExplorationMapIdentityLayout.mapPivot, CGPoint(x: 8, y: 18))
+    }
+
+    @MainActor
+    func testLooseRawEssenceUsesOnlyApprovedPositiveWildDropFramesAndDisclosure() throws {
+        let keys = (0..<4).map { "loose_essence/ordinary/frame-\($0)" }
+        for key in keys {
+            XCTAssertEqual(try XCTUnwrap(MapAssetTestSupport.explorationMapImage(key)).size,
+                           CGSize(width: 16, height: 19))
+        }
+
+        func key(resource: ResourceID = Resources.essenceRaw, amount: Int = 1,
+                 tick: Int = 0, disclosed: Bool = true,
+                 remembered: Bool = false) -> String? {
+            MapAssetTestSupport.explorationMapKey(
+                tile: Tile(content: .wildDrop(resource: resource, amount: amount),
+                           isRevealed: disclosed),
+                tick: tick, disclosed: disclosed, remembered: remembered)
+        }
+        XCTAssertEqual((0..<8).compactMap { key(tick: $0) },
+                       [keys[0], keys[1], keys[2], keys[3],
+                        keys[0], keys[1], keys[2], keys[3]])
+        XCTAssertEqual(key(amount: 99, tick: 3), keys[3],
+                       "positive amount affects eligibility only, never the temporal frame")
+        XCTAssertEqual(key(tick: 3, remembered: true), keys[0])
+        XCTAssertNil(key(disclosed: false))
+        XCTAssertNil(key(amount: 0))
+        XCTAssertNil(key(amount: -1))
+        XCTAssertNil(key(resource: Resources.ore))
+        XCTAssertNil(MapAssetTestSupport.explorationMapKey(
+            tile: Tile(content: .node(ResourceNode(resource: Resources.essenceRaw,
+                                                    remainingHarvests: 1,
+                                                    yieldPerHarvest: 1)),
+                       isRevealed: true)))
+        XCTAssertFalse(MapAssetTestSupport.explorationMapKey(
+            tile: Tile(content: .item(ItemStack(id: InstanceID(rawValue: 77),
+                                                catalogID: "essence_crystal")),
+                       isRevealed: true))?.hasPrefix("loose_essence/") == true,
+                       "Essence Crystal retains its own catalogue identity")
+    }
+
+    @MainActor
+    func testLooseRawEssenceMountsInNormalTileConsumerAndOnlyOwnsApprovedBounds() throws {
+        let canvas = CGSize(width: 48, height: 54)
+        func render(_ content: TileContent, visibility: WorldRules.TileVisibility = .full,
+                    revealed: Bool = true, disclosed: Bool = true) -> UIImage {
+            let view = ZStack {
+                Color.clear
+                MapAssetTestSupport.mountedStationaryIdentity(
+                    content: content, visibility: visibility, revealed: revealed,
+                    disclosed: disclosed, presentationTick: 2)
+            }
+            .frame(width: canvas.width, height: canvas.height)
+            let controller = UIHostingController(rootView: view)
+            let window = UIWindow(frame: CGRect(origin: .zero, size: canvas))
+            window.rootViewController = controller; window.makeKeyAndVisible()
+            controller.view.frame = window.bounds; controller.view.layoutIfNeeded()
+            let format = UIGraphicsImageRendererFormat(); format.scale = 1
+            let image = UIGraphicsImageRenderer(size: canvas, format: format).image { _ in
+                controller.view.drawHierarchy(in: controller.view.bounds,
+                                              afterScreenUpdates: true)
+            }
+            window.isHidden = true
+            return image
+        }
+        func rgba(_ image: UIImage) throws -> Data {
+            let cgImage = try XCTUnwrap(image.cgImage)
+            var bytes = [UInt8](repeating: 0, count: cgImage.width * cgImage.height * 4)
+            let context = try XCTUnwrap(CGContext(
+                data: &bytes, width: cgImage.width, height: cgImage.height,
+                bitsPerComponent: 8, bytesPerRow: cgImage.width * 4,
+                space: CGColorSpaceCreateDeviceRGB(),
+                bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue))
+            context.draw(cgImage, in: CGRect(x: 0, y: 0,
+                                             width: cgImage.width, height: cgImage.height))
+            return Data(bytes)
+        }
+        func changes(_ lhs: UIImage, _ rhs: UIImage) throws -> Set<Int> {
+            let a = try rgba(lhs), b = try rgba(rhs)
+            XCTAssertEqual(a.count, b.count)
+            var result: Set<Int> = []
+            for offset in stride(from: 0, to: min(a.count, b.count), by: 4) {
+                if a[offset] != b[offset] || a[offset + 1] != b[offset + 1]
+                    || a[offset + 2] != b[offset + 2] || a[offset + 3] != b[offset + 3] {
+                    result.insert(offset / 4)
+                }
+            }
+            return result
+        }
+
+        let empty = render(.empty)
+        let essence = render(.wildDrop(resource: Resources.essenceRaw, amount: 1))
+        let owned = try changes(essence, empty)
+        XCTAssertFalse(owned.isEmpty, "normal renderer must mount the approved essence image")
+        let xs = owned.map { $0 % Int(canvas.width) }
+        let ys = owned.map { $0 / Int(canvas.width) }
+        let actualBounds = CGRect(x: xs.min() ?? 0, y: ys.min() ?? 0,
+                                  width: (xs.max() ?? 0) - (xs.min() ?? 0) + 1,
+                                  height: (ys.max() ?? 0) - (ys.min() ?? 0) + 1)
+        let approvedBounds = CGRect(x: 8, y: 16, width: 32, height: 38)
+        XCTAssertEqual(approvedBounds.maxY, canvas.height,
+                       "the authored bottom pivot owns the mounted tile baseline")
+        XCTAssertTrue(owned.allSatisfy { index in
+            approvedBounds.contains(CGPoint(x: index % Int(canvas.width),
+                                            y: index / Int(canvas.width)))
+        }, "only the scaled 16×19 bottom-pivot asset bounds may change: \(actualBounds)")
+
+        for excluded in [
+            TileContent.wildDrop(resource: Resources.essenceRaw, amount: 0),
+            .wildDrop(resource: Resources.essenceRaw, amount: -1),
+            .wildDrop(resource: Resources.ore, amount: 1)
+        ] {
+            XCTAssertEqual(try rgba(render(excluded)), try rgba(empty))
+        }
+        let undisclosed = render(.wildDrop(resource: Resources.essenceRaw, amount: 1),
+                                 visibility: .hidden, revealed: false, disclosed: false)
+        let undisclosedEmpty = render(.empty, visibility: .hidden,
+                                      revealed: false, disclosed: false)
+        XCTAssertEqual(try rgba(undisclosed), try rgba(undisclosedEmpty))
     }
 
     @MainActor

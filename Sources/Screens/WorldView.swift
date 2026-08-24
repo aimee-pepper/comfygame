@@ -2087,17 +2087,16 @@ private struct TileView: View {
                         fallbackColor: .green
                     )
                     .frame(width: side * 0.72, height: side * 0.72)
+                } else if let assetKey,
+                          let image = ExplorationMapIdentityPack.image(key: assetKey) {
+					let assetSize = ExplorationMapIdentityLayout.mapAssetSize(tileSide: side)
+					Image(uiImage: image).resizable().interpolation(.none).antialiased(false)
+						.frame(width: assetSize.width, height: assetSize.height)
+						.frame(width: side, height: side, alignment: .bottom)
                 } else if let symbol {
-					if let assetKey, let image = ExplorationMapIdentityPack.image(key: assetKey) {
-						let assetSize = ExplorationMapIdentityLayout.mapAssetSize(tileSide: side)
-						Image(uiImage: image).resizable().interpolation(.none).antialiased(false)
-							.frame(width: assetSize.width, height: assetSize.height)
-							.frame(width: side, height: side, alignment: .bottom)
-					} else {
-						Image(systemName: symbol)
-							.font(.system(size: side * (isPlayer ? 0.46 : 0.54), weight: isPlayer ? .bold : .regular))
-							.foregroundStyle(tint)
-					}
+					Image(systemName: symbol)
+						.font(.system(size: side * (isPlayer ? 0.46 : 0.54), weight: isPlayer ? .bold : .regular))
+						.foregroundStyle(tint)
                 }
             }
             .frame(width: side, height: side)
@@ -2235,6 +2234,42 @@ private struct TileView: View {
         return tile.isRevealed ? groundColour : Palette.mapFog
     }
 }
+
+#if DEBUG
+@MainActor extension MapAssetTestSupport {
+    /// Mounts the production content branch with the normal renderer. The outer inset preserves
+    /// the approved 16×19 bottom-pivot overhang around its 16×16 tile surface.
+    static func mountedStationaryIdentity(
+        content: TileContent,
+        visibility: WorldRules.TileVisibility = .full,
+        revealed: Bool = true,
+        disclosed: Bool = true,
+        presentationTick: Int = 0,
+        tileSide: CGFloat = 32,
+        inset: CGFloat = 8
+    ) -> AnyView {
+        let tile = Tile(content: content, ground: .soil, isRevealed: revealed)
+        return AnyView(
+            TileView(
+                tile: tile, visibility: visibility,
+                isRememberedTerrain: visibility != .full,
+                usesRememberedStationaryIdentity: visibility != .full,
+                unexploredFringeGradient: nil,
+                showsStationaryContents: disclosed,
+                visibilityProfile: WorldRules.visibilityProfile(
+                    illumination: 100, baseRadius: 1),
+                artRequest: nil, fogBoundaryEdges: [], enemy: nil,
+                site: nil, siteLooted: nil, hasLooseWorldPage: false,
+                isPlayer: false, side: tileSide,
+                presentationTick: presentationTick, useSimpleRenderer: false)
+                .frame(width: tileSide, height: tileSide)
+                .frame(width: tileSide + inset * 2,
+                       height: tileSide * 19 / 16 + inset * 2,
+                       alignment: .center)
+        )
+    }
+}
+#endif
 
 /// DEBUG fallback only. The native renderer uses the frozen 16px crack command grammar.
 private struct SimpleCrackShape: Shape {
