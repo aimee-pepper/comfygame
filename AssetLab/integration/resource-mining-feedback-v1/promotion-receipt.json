@@ -1,0 +1,62 @@
+{
+  "schemaVersion": "resource-mining-feedback-promotion-v1",
+  "status": "asset-approved-for-native-integration",
+  "integrationReady": true,
+  "scope": "resource-mining-feedback-only",
+  "candidatePins": {
+    "canonicalBodySHA256": "a8c0aaf64facadca00b0da1c83a1a8b6a1560d9a8de82e129515ba6aa5ba4abf",
+    "manifestFileSHA256": "e063fcee75be0fcea6260522f62a190ed2b70c984481e2fe2104ab19c3225e89",
+    "contactSheetSHA256": "b57eb9e00d1c53a5cacd6ae50f918235b0d8f81865e6881d3bd871d77dfce523",
+    "routeSHA256": "a888df7ba7986d3ac66b69c93796643b75e2e9991bdf139c974a13da269f6622",
+    "styleSHA256": "01f52748b62e092a28bd43dfc4c3e9b6de5b082e17ac440e535898aa074a9537",
+    "liveRouteSHA256": "1dba29e51a651077009d38d0814f9f84301ed5a04c70b460eaf7d08448b0ca02",
+    "contractSHA256": "a3d04e8100d7b35cc87275bff4573eaa6dd07727ce3b8067cf1426b9cd116f35",
+    "exporterSHA256": "2cbe94d55ec3bc24b88d7782d67d6e9ba6089b9114ed13e56878aa02f5f5be6b",
+    "focusedTestSHA256": "3f2911a50b4b7a978d36b68723ad17029438e0dc9ee9848edcdf9045b3a10eb5"
+  },
+  "approvals": {
+    "gameDesignFunctional": "approved",
+    "assetVisual": "approved",
+    "assetVisualDisposition": "The short deterministic arc, exact two-to-one nearest-neighbor scale, ordered stagger and one exact amount label preserve the ultra-small identity, keep the map readable and avoid per-unit clutter."
+  },
+  "nativeConsumption": {
+    "trigger": "newly accepted WorldFieldEventBatchV1 with sourceAction harvest and at least one positive harvested event",
+    "identity": "ResourceSpriteV1Registry.asset(for: resourceID, profile: .field)",
+    "sourceLogicalSize": [8, 8],
+    "filtering": "nearest-neighbor",
+    "amount": "exact positive associated harvested amount",
+    "coalescing": "sum repeated ResourceID amounts inside one batch and retain first-occurrence order",
+    "countTiming": "toolbar count is already committed before frame one and never changes from presentation",
+    "motion": {
+      "durationMS": 760,
+      "orderedSubjectStaggerMS": 130,
+      "path": "deterministic quadratic arc from selected tile centre to matching existing toolbar identity centre",
+      "scale": [2, 1],
+      "completion": "remove travelling copy and acknowledge the existing destination; no mutation"
+    },
+    "queue": "unique batchID FIFO while the same World owner remains active",
+    "dismissOrExpiry": "finish current presentation and advance exactly one queued committed group",
+    "worldOwnerExit": "navigation, encounter, return home or run change clears current and queued presentation only",
+    "relaunch": "show persisted committed count and replay no mining presentation",
+    "missingIdentity": "omit only the visual subject; never substitute art",
+    "playerCopy": "retain canonical Use Tile and source-backed World narration only"
+  },
+  "approvedEvidence": [
+    "m01-start-368x800.png",
+    "m01-mid-368x800.png",
+    "m01-end-368x800.png",
+    "m02-multi-output-368x800.png",
+    "m05-refusal-368x800.png",
+    "m08-interruption-368x800.png",
+    "m09-relaunch-368x800.png",
+    "m10-missing-identity-368x800.png"
+  ],
+  "excluded": [
+    "resource-art-redraw",
+    "runtime-image-generation",
+    "mining-mechanics",
+    "toolbar-layout-or-sorting",
+    "traveller-bubble",
+    "world-splash-parallax"
+  ]
+}
