@@ -27,8 +27,14 @@ struct PartyRosterView: View {
                 }
             }
             .padding(16)
+#if DEBUG
+            .background { P2SafeSpaceProbe(region: .partyContent) }
+#endif
         }
-        .background(Color(.systemGroupedBackground))
+#if DEBUG
+        .background { P2SafeSpaceProbe(region: .partyScroll) }
+#endif
+        .background(Color(.systemGroupedBackground).ignoresSafeArea())
         .navigationTitle("Party")
         .navigationBarTitleDisplayMode(.inline)
         .sheet(item: $opened) { slot in

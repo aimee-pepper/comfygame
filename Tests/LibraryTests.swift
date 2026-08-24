@@ -1,3 +1,5 @@
+import SwiftUI
+import UIKit
 import XCTest
 @testable import Bookbinder
 
@@ -5,6 +7,259 @@ import XCTest
 /// across worlds, and a Library that collects without interpreting.
 @MainActor
 final class LibraryTests: XCTestCase {
+
+#if DEBUG
+    private enum P2Screen {
+        case library(Int)
+        case party
+        case history(compare: Bool, selected: [InstanceID])
+    }
+
+    private struct P2Mount {
+        let window: UIWindow
+        let controller: UIHostingController<AnyView>
+        let image: UIImage
+        let safe: UIEdgeInsets
+        let stateBytes: Data
+    }
+
+    private func p2Store() -> GameStore {
+        let store = GameStore(io: .temporary(name: "p2-safe-space-\(UUID().uuidString)"))
+        store.mutate("fixture: p2 safe-space") { state in
+            for lesson in TutorialLessonID.allCases {
+                state.tutorial.complete(lesson, fact: "p2_safe_space")
+            }
+            state.base.roster = (0..<4).map { _ in CompanionState() }
+            state.base.activeParty = [0, 1, 2, 3]
+            state.reality.library.visitedWorlds = (1...18).map { index in
+                VisitedWorld(id: InstanceID(rawValue: UInt64(20_000 + index)),
+                             seed: UInt64(index), runIndex: index,
+                             descriptionSentence: "World \(index) remained readable in History.",
+                             written: ["Illumination ← Sun"], inertModifiers: [], readings: [:],
+                             travellersPresent: [], isKept: index.isMultiple(of: 3))
+            }
+        }
+        return store
+    }
+
+    @MainActor
+    private func p2Mount(_ screen: P2Screen, scheme: ColorScheme,
+                         store: GameStore) throws -> P2Mount {
+        P2SafeSpaceMeasurement.reset()
+        P2SafeSpaceMeasurement.isArmed = true
+        let content: AnyView = switch screen {
+        case .library(let tab): AnyView(LibraryView(debugTabIndex: tab).environmentObject(store))
+        case .party: AnyView(PartyRosterView().environmentObject(store))
+        case .history(let compare, let selected):
+            AnyView(WorldHistoryView(debugCompareMode: compare, debugSelected: selected)
+                .environmentObject(store))
+        }
+        let root = AnyView(NavigationStack { content }
+            .environment(\.colorScheme, scheme)
+            .environment(\.dynamicTypeSize, .large))
+        let controller = UIHostingController(rootView: root)
+        let window = UIWindow(frame: CGRect(x: 0, y: 0, width: 368, height: 800))
+        window.rootViewController = controller
+        controller.additionalSafeAreaInsets = UIEdgeInsets(top: 59, left: 0, bottom: 34, right: 0)
+        window.makeKeyAndVisible()
+        controller.view.frame = window.bounds
+        controller.view.setNeedsLayout(); controller.view.layoutIfNeeded()
+        RunLoop.main.run(until: Date().addingTimeInterval(0.12))
+        let format = UIGraphicsImageRendererFormat.default()
+        format.scale = 1; format.opaque = true
+        let image = UIGraphicsImageRenderer(size: window.bounds.size, format: format).image { _ in
+            controller.view.drawHierarchy(in: controller.view.bounds, afterScreenUpdates: true)
+        }
+        return P2Mount(window: window, controller: controller, image: image,
+                       safe: controller.view.safeAreaInsets,
+                       stateBytes: try SaveCodec.encode(store.state))
+    }
+
+    private func p2RGBA(_ image: UIImage, x: Int, y: Int) throws -> [UInt8] {
+        let cg = try XCTUnwrap(image.cgImage)
+        let data = try XCTUnwrap(cg.dataProvider?.data)
+        let bytes = CFDataGetBytePtr(data)!
+        return Array(UnsafeBufferPointer(start: bytes + y * cg.bytesPerRow + x * 4, count: 4))
+    }
+
+    @MainActor private func p2Descendants(_ view: UIView) -> [UIView] {
+        [view] + view.subviews.flatMap(p2Descendants)
+    }
+
+    @MainActor
+    private func p2AssertBackdropAndSafeControls(_ mount: P2Mount, file: StaticString = #filePath,
+                                                  line: UInt = #line) throws {
+        XCTAssertGreaterThanOrEqual(mount.safe.top, 59, file: file, line: line)
+        XCTAssertGreaterThanOrEqual(mount.safe.bottom, 34, file: file, line: line)
+        XCTAssertNotEqual(try p2RGBA(mount.image, x: 184, y: 10), [0, 0, 0, 255],
+                          file: file, line: line)
+        XCTAssertNotEqual(try p2RGBA(mount.image, x: 184, y: 785), [0, 0, 0, 255],
+                          file: file, line: line)
+        for control in p2Descendants(mount.controller.view).compactMap({ $0 as? UIControl })
+            where !control.isHidden && control.alpha > 0.01 {
+            let frame = control.convert(control.bounds, to: mount.window)
+            XCTAssertGreaterThanOrEqual(frame.minY, mount.safe.top - 0.75, file: file, line: line)
+            XCTAssertLessThanOrEqual(frame.maxY, 800 - mount.safe.bottom + 1.25,
+                                     file: file, line: line)
+        }
+    }
+
+    @MainActor
+    private func p2ScrollToEnd(_ mount: P2Mount) {
+        let scrolls = p2Descendants(mount.controller.view).compactMap { $0 as? UIScrollView }
+        guard let scroll = scrolls.max(by: { $0.bounds.height < $1.bounds.height }) else { return }
+        let y = max(-scroll.adjustedContentInset.top,
+                    scroll.contentSize.height - scroll.bounds.height + scroll.adjustedContentInset.bottom)
+        scroll.setContentOffset(CGPoint(x: scroll.contentOffset.x, y: y), animated: false)
+        scroll.layoutIfNeeded()
+        RunLoop.main.run(until: Date().addingTimeInterval(0.04))
+    }
+
+    @MainActor
+    private func p2SearchFrame(_ mount: P2Mount) throws -> CGRect {
+        let search = try XCTUnwrap(p2Descendants(mount.window).first { view in
+            let name = String(describing: type(of: view))
+            let frame = view.convert(view.bounds, to: mount.window)
+            return name.localizedCaseInsensitiveContains("search")
+                && frame.height > 20 && frame.minY > 600
+        })
+        var owner = search
+        while let parent = owner.superview {
+            let frame = parent.convert(parent.bounds, to: mount.window)
+            guard frame.minY > 600, frame.maxY <= 800 - mount.safe.bottom + 1 else { break }
+            owner = parent
+        }
+        return owner.convert(owner.bounds, to: mount.window)
+    }
+
+    func testP2_01GlobalUnsafeBackdropIsSemanticInLightAndDark() throws {
+        for scheme in [ColorScheme.light, .dark] {
+            let store = p2Store()
+            for screen in [P2Screen.library(0), .party, .history(compare: false, selected: [])] {
+                let mount = try p2Mount(screen, scheme: scheme, store: store)
+                try p2AssertBackdropAndSafeControls(mount)
+                XCTAssertEqual(try SaveCodec.encode(store.state), mount.stateBytes)
+                mount.window.isHidden = true
+            }
+        }
+    }
+
+    func testP2_02LibraryPickerAndScrollOwnTheSafeRemainderForAllFiveTabs() throws {
+        for tab in 0..<5 {
+            let store = p2Store(); let mount = try p2Mount(.library(tab), scheme: .light, store: store)
+            XCTAssertEqual(P2SafeSpaceMeasurement.libraryScrollFrame.minY,
+                           P2SafeSpaceMeasurement.libraryPickerFrame.maxY, accuracy: 0.75)
+            XCTAssertEqual(P2SafeSpaceMeasurement.libraryScrollFrame.maxY,
+                           800 - mount.safe.bottom, accuracy: 0.75)
+            p2ScrollToEnd(mount)
+            XCTAssertLessThanOrEqual(P2SafeSpaceMeasurement.libraryContentFrame.maxY,
+                                     P2SafeSpaceMeasurement.libraryScrollFrame.maxY + 0.75)
+            mount.window.isHidden = true
+        }
+    }
+
+    func testP2_03LibrarySemanticsRemainSourceOwnedAndUnchanged() throws {
+        let source = try String(contentsOfFile: #filePath.replacingOccurrences(
+            of: "/Tests/LibraryTests.swift", with: "/Sources/Screens/LibraryView.swift"))
+        for copy in ["Diaries", "People", "Dictionary", "Notes", "History"] {
+            XCTAssertTrue(source.contains("case .\(copy.lowercased())") || source.contains("\"\(copy)\""))
+        }
+        XCTAssertTrue(source.contains("tutorialHoverOverlay"))
+        XCTAssertTrue(source.contains("Color(.systemGroupedBackground).ignoresSafeArea()"))
+        XCTAssertFalse(source.contains("safeAreaInset(edge: .bottom"))
+    }
+
+    func testP2_04PartyScrollConsumesSafeIntervalAndFinalCardIsReachable() throws {
+        let store = p2Store(); let mount = try p2Mount(.party, scheme: .light, store: store)
+        XCTAssertEqual(P2SafeSpaceMeasurement.partyScrollFrame.maxY,
+                       800 - mount.safe.bottom, accuracy: 0.75)
+        XCTAssertGreaterThan(P2SafeSpaceMeasurement.partyScrollFrame.height, 500)
+        p2ScrollToEnd(mount)
+        XCTAssertLessThanOrEqual(P2SafeSpaceMeasurement.partyContentFrame.maxY,
+                                 P2SafeSpaceMeasurement.partyScrollFrame.maxY + 0.75)
+        XCTAssertEqual(try SaveCodec.encode(store.state), mount.stateBytes)
+        mount.window.isHidden = true
+    }
+
+    func testP2_05PartyCardsAndCharacterRoutesRemainOwnedByExistingScreen() throws {
+        let source = try String(contentsOfFile: #filePath.replacingOccurrences(
+            of: "/Tests/LibraryTests.swift", with: "/Sources/Screens/PartyRosterView.swift"))
+        for token in ["Field Kit", "CharacterPager(start: slot)", "case gear = \"Gear\"",
+                      "case training = \"Training\"", "case stats = \"Stats\"",
+                      "case gambits = \"Gambits\""] { XCTAssertTrue(source.contains(token)) }
+        XCTAssertTrue(source.contains("Color(.systemGroupedBackground).ignoresSafeArea()"))
+    }
+
+    func testP2_06HistoryOrdinaryScrollOwnsRemainderAndLastWorldIsReachable() throws {
+        let store = p2Store(); let mount = try p2Mount(.history(compare: false, selected: []),
+                                                       scheme: .light, store: store)
+        XCTAssertEqual(P2SafeSpaceMeasurement.historyFooterFrame, .zero)
+        let searchFrame = try p2SearchFrame(mount)
+        XCTAssertEqual(searchFrame.minY - P2SafeSpaceMeasurement.historyScrollFrame.maxY,
+                       15, accuracy: 0.75,
+                       "only the system search control's own vertical padding may follow the scroll")
+        XCTAssertLessThanOrEqual(searchFrame.maxY, 800 - mount.safe.bottom + 1.25)
+        p2ScrollToEnd(mount)
+        XCTAssertLessThanOrEqual(P2SafeSpaceMeasurement.historyContentFrame.maxY,
+                                 P2SafeSpaceMeasurement.historyScrollFrame.maxY + 0.75)
+        mount.window.isHidden = true
+    }
+
+    func testP2_07HistoryCompareFooterIsSafeSiblingForZeroOneAndTwoSelections() throws {
+        let store = p2Store()
+        let ids = store.state.reality.library.visitedWorlds.map(\.id)
+        for selected in [[], Array(ids.prefix(1)), Array(ids.prefix(2))] {
+            let mount = try p2Mount(.history(compare: true, selected: selected),
+                                    scheme: .dark, store: store)
+            XCTAssertGreaterThan(P2SafeSpaceMeasurement.historyFooterFrame.height, 44)
+            let insetGap = P2SafeSpaceMeasurement.historyFooterFrame.minY
+                - P2SafeSpaceMeasurement.historyScrollFrame.maxY
+            XCTAssertGreaterThanOrEqual(insetGap, 0)
+            XCTAssertLessThanOrEqual(insetGap, 8.25,
+                                     "only SwiftUI's existing safeAreaInset sibling spacing may separate content")
+            let searchFrame = try p2SearchFrame(mount)
+            XCTAssertEqual(searchFrame.minY - P2SafeSpaceMeasurement.historyFooterFrame.maxY,
+                           15, accuracy: 0.75)
+            XCTAssertLessThanOrEqual(searchFrame.maxY, 800 - mount.safe.bottom + 1.25)
+            p2ScrollToEnd(mount)
+            XCTAssertLessThanOrEqual(P2SafeSpaceMeasurement.historyContentFrame.maxY,
+                                     P2SafeSpaceMeasurement.historyScrollFrame.maxY + 0.75)
+            mount.window.isHidden = true
+        }
+    }
+
+    func testP2_08HistoryStateBreadthRendersEmptyDenseAndComparison() throws {
+        let empty = GameStore(io: .temporary(name: "p2-history-empty-\(UUID().uuidString)"))
+        for (name, store, compare) in [("empty", empty, false), ("dense", p2Store(), false),
+                                       ("compare", p2Store(), true)] {
+            let mount = try p2Mount(.history(compare: compare, selected: []), scheme: .light,
+                                    store: store)
+            try p2AssertBackdropAndSafeControls(mount)
+            let attachment = XCTAttachment(image: mount.image)
+            attachment.name = "p2-history-\(name)-368x800"; attachment.lifetime = .keepAlways
+            add(attachment); mount.window.isHidden = true
+        }
+    }
+
+    func testP2_09MountedAppearanceAndScrollingAreSaveCodecInert() throws {
+        let store = p2Store(); let frozen = try SaveCodec.encode(store.state)
+        for screen in [P2Screen.library(4), .party, .history(compare: true, selected: [])] {
+            let mount = try p2Mount(screen, scheme: .dark, store: store)
+            p2ScrollToEnd(mount)
+            XCTAssertEqual(try SaveCodec.encode(store.state), frozen)
+            mount.window.isHidden = true
+        }
+    }
+
+    func testP2_10ExactFourFileBoundaryContract() throws {
+        let root = URL(fileURLWithPath: #filePath).deletingLastPathComponent().deletingLastPathComponent()
+        for path in ["Sources/Screens/LibraryView.swift", "Sources/Screens/PartyRosterView.swift",
+                     "Sources/Screens/WorldHistoryView.swift"] {
+            let source = try String(contentsOf: root.appending(path: path), encoding: .utf8)
+            XCTAssertTrue(source.contains("Color(.systemGroupedBackground).ignoresSafeArea()"))
+        }
+    }
+#endif
 
     func testBand2DictionaryPhoneFixtureRelaunchesTypedKnownUnknownAndExactInspection() throws {
         let fixture = try GameStore.makeBand2DictionaryPhoneFixture()

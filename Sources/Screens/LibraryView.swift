@@ -1,5 +1,62 @@
 import SwiftUI
 
+#if DEBUG
+@MainActor enum P2SafeSpaceMeasurement {
+    static var isArmed = false
+    static var libraryPickerFrame: CGRect = .zero
+    static var libraryScrollFrame: CGRect = .zero
+    static var libraryContentFrame: CGRect = .zero
+    static var partyScrollFrame: CGRect = .zero
+    static var partyContentFrame: CGRect = .zero
+    static var historyScrollFrame: CGRect = .zero
+    static var historyContentFrame: CGRect = .zero
+    static var historyFooterFrame: CGRect = .zero
+
+    static func reset() {
+        libraryPickerFrame = .zero
+        libraryScrollFrame = .zero
+        libraryContentFrame = .zero
+        partyScrollFrame = .zero
+        partyContentFrame = .zero
+        historyScrollFrame = .zero
+        historyContentFrame = .zero
+        historyFooterFrame = .zero
+    }
+}
+
+struct P2SafeSpaceProbe: View {
+    enum Region {
+        case libraryPicker, libraryScroll, libraryContent
+        case partyScroll, partyContent
+        case historyScroll, historyContent, historyFooter
+    }
+    let region: Region
+
+    var body: some View {
+        GeometryReader { proxy in
+            let frame = proxy.frame(in: .global)
+            Color.clear
+                .onAppear { record(frame) }
+                .onChange(of: frame) { _, value in record(value) }
+        }
+    }
+
+    private func record(_ frame: CGRect) {
+        guard P2SafeSpaceMeasurement.isArmed else { return }
+        switch region {
+        case .libraryPicker: P2SafeSpaceMeasurement.libraryPickerFrame = frame
+        case .libraryScroll: P2SafeSpaceMeasurement.libraryScrollFrame = frame
+        case .libraryContent: P2SafeSpaceMeasurement.libraryContentFrame = frame
+        case .partyScroll: P2SafeSpaceMeasurement.partyScrollFrame = frame
+        case .partyContent: P2SafeSpaceMeasurement.partyContentFrame = frame
+        case .historyScroll: P2SafeSpaceMeasurement.historyScrollFrame = frame
+        case .historyContent: P2SafeSpaceMeasurement.historyContentFrame = frame
+        case .historyFooter: P2SafeSpaceMeasurement.historyFooterFrame = frame
+        }
+    }
+}
+#endif
+
 enum LibraryPresentation {
     static func placementLabel(for traveller: TravellerDef, in state: GameState) -> String {
         guard state.reality.library.foundTravellers.contains(traveller.id) else {
@@ -132,6 +189,13 @@ struct LibraryView: View {
     @State private var tab: LibraryTab = .diaries
     @State private var firstReturnPrompt: FirstReturnTutorialContext?
 
+#if DEBUG
+    init(debugTabIndex: Int = 0) {
+        let tabs = LibraryTab.allCases
+        _tab = State(initialValue: tabs.indices.contains(debugTabIndex) ? tabs[debugTabIndex] : .diaries)
+    }
+#endif
+
     private var library: LibraryState { store.state.reality.library }
     private var columns: [GridItem] {
         dynamicTypeSize.isAccessibilitySize
@@ -149,6 +213,9 @@ struct LibraryView: View {
             .pickerStyle(.segmented)
             .padding(.horizontal, 16)
             .padding(.vertical, 10)
+#if DEBUG
+            .background { P2SafeSpaceProbe(region: .libraryPicker) }
+#endif
 
             ScrollView {
                 VStack(spacing: 16) {
@@ -162,9 +229,15 @@ struct LibraryView: View {
                 }
                 .padding(16)
                 .padding(.top, 2)
+#if DEBUG
+                .background { P2SafeSpaceProbe(region: .libraryContent) }
+#endif
             }
+#if DEBUG
+            .background { P2SafeSpaceProbe(region: .libraryScroll) }
+#endif
         }
-        .background(Color(.systemGroupedBackground))
+        .background(Color(.systemGroupedBackground).ignoresSafeArea())
         .navigationTitle("The Library")
         .navigationBarTitleDisplayMode(.inline)
         .accessibilityIdentifier("library.\(tab.id.lowercased())")

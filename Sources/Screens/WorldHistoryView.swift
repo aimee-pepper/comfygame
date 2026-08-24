@@ -22,6 +22,13 @@ struct WorldHistoryView: View {
     @State private var filter: WorldHistoryFilter = .all
     @State private var newestFirst = true
 
+#if DEBUG
+    init(debugCompareMode: Bool = false, debugSelected: [InstanceID] = []) {
+        _compareMode = State(initialValue: debugCompareMode)
+        _selected = State(initialValue: debugSelected)
+    }
+#endif
+
     private var allWorlds: [VisitedWorld] {
         store.state.reality.library.visitedWorlds
     }
@@ -78,8 +85,14 @@ struct WorldHistoryView: View {
                 }
             }
             .padding(16)
+#if DEBUG
+            .background { P2SafeSpaceProbe(region: .historyContent) }
+#endif
         }
-        .background(Color(.systemGroupedBackground))
+#if DEBUG
+        .background { P2SafeSpaceProbe(region: .historyScroll) }
+#endif
+        .background(Color(.systemGroupedBackground).ignoresSafeArea())
         .navigationTitle("Worlds you've written")
         .navigationBarTitleDisplayMode(.inline)
         .searchable(text: $query, prompt: "World number or known traveller")
@@ -153,6 +166,9 @@ struct WorldHistoryView: View {
         }
         .padding(.horizontal, 16).padding(.vertical, 10)
         .background(.bar)
+#if DEBUG
+        .background { P2SafeSpaceProbe(region: .historyFooter) }
+#endif
     }
 
     private var selectedWorldNames: String {
