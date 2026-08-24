@@ -1,0 +1,337 @@
+{
+  "schemaVersion": "resource-mining-feedback-visual-v1",
+  "status": "candidate-not-approved",
+  "integrationReady": false,
+  "sourceAuthority": {
+    "revision": "fb762e4682f3c53d41ca12fd64ebb8472ee8d90e",
+    "batch": "WorldFieldEventBatchV1",
+    "rules": "WorldRules.harvest",
+    "action": "GameStore.harvest/finishTurn",
+    "consumer": "ResourceFieldMarkerIdentity"
+  },
+  "sourceIdentityPack": {
+    "path": "integration/resource-sprites-v1/manifest.json",
+    "sha256": "a3e3134b51225f2b4dad61380e2e425780571a099e97e1572f7164589f307c11",
+    "packID": "resource-sprites-v1",
+    "catalogueSHA256": "8eee965ce7df075abfe3f646bb36d416a10ef1d7d194845e30fa0f31b7b23e6f",
+    "fieldAssets": {
+      "rubble": {
+        "name": "Rubble",
+        "path": "integration/resource-sprites-v1/field/rubble.png",
+        "width": 8,
+        "height": 8,
+        "pngSHA256": "5e4d046b6385f565b06f8aee391d2803fbd9380fc9bae4f97b127537dd69f12d",
+        "rgbaSHA256": "c4e2aeb349cc2bddd3e07e779cf1461e343526a7b6d904ed572f19e95afae58d"
+      },
+      "clay": {
+        "name": "Clay",
+        "path": "integration/resource-sprites-v1/field/clay.png",
+        "width": 8,
+        "height": 8,
+        "pngSHA256": "1b8dacc7ede149e946faad625c225ad1f43f62a8b831c79f189f11c873903ad0",
+        "rgbaSHA256": "d979f265f87f2334e912117b7c599b811ad50fb68b5ba44f945f8a3d08cd4ed2"
+      },
+      "ore": {
+        "name": "Iron Ore",
+        "path": "integration/resource-sprites-v1/field/ore.png",
+        "width": 8,
+        "height": 8,
+        "pngSHA256": "7b461118b59f35c1068c133868e44293f7d5c520964317d005702f5267310da0",
+        "rgbaSHA256": "dd1363e4a777936e465d1d4ef8c01261b6f2e244451822f8a166cb2a607ae78e"
+      },
+      "copper": {
+        "name": "Copper",
+        "path": "integration/resource-sprites-v1/field/copper.png",
+        "width": 8,
+        "height": 8,
+        "pngSHA256": "dedd15c06785f6e77fd51c8f7c7c42011ea284da71f896fa7b0e66e28f114783",
+        "rgbaSHA256": "0ff447ecf500ba2727958d772e6f7d2f1297391e3703b1405487f5c1113d7606"
+      },
+      "silver": {
+        "name": "Silver",
+        "path": "integration/resource-sprites-v1/field/silver.png",
+        "width": 8,
+        "height": 8,
+        "pngSHA256": "ab85c4093e3b4c76e939c0334fba324abc1ad4b8f11228841a6872834f7ff654",
+        "rgbaSHA256": "327a3e8837ef407e2cced165a8ba60fca0c575dc80d3d7529026143e5b6da3a5"
+      },
+      "gold": {
+        "name": "Gold",
+        "path": "integration/resource-sprites-v1/field/gold.png",
+        "width": 8,
+        "height": 8,
+        "pngSHA256": "549397d7b49eae3c236b66d05aeff5fead1eb3a7b7952ab976e12f78a4721d7b",
+        "rgbaSHA256": "fce1eddf57569cb82998fb8f15d5a553fbe54f8b07a7c431484ebf5c50f644fb"
+      },
+      "quartz": {
+        "name": "Quartz",
+        "path": "integration/resource-sprites-v1/field/quartz.png",
+        "width": 8,
+        "height": 8,
+        "pngSHA256": "f0b37bdcc61883954ff04d6a0aacf5503e5628014432ce957f96c6f33acb706d",
+        "rgbaSHA256": "bab9b1b4b8ddd568982f475b0e228431d2e1c8b9346724425f86c835c615792a"
+      },
+      "obsidian": {
+        "name": "Obsidian",
+        "path": "integration/resource-sprites-v1/field/obsidian.png",
+        "width": 8,
+        "height": 8,
+        "pngSHA256": "ac9246757a7570c7726172d9ec69c0e672c80b831e779d5f786154dab2bcbb83",
+        "rgbaSHA256": "a8b4d2911237f7a2bf16893082fda4e3834e75b16d56aba2e4390b5f707ba76b"
+      },
+      "salt": {
+        "name": "Salt",
+        "path": "integration/resource-sprites-v1/field/salt.png",
+        "width": 8,
+        "height": 8,
+        "pngSHA256": "45645eb7b6b34a7771812dcd2e93759ad4bb65ef9597a727b9c24f890a46341b",
+        "rgbaSHA256": "17877d930ba773e78d8b7a6e3e8051236d1c4b99a98155ded24e0843f07701ee"
+      },
+      "sulfur": {
+        "name": "Sulfur",
+        "path": "integration/resource-sprites-v1/field/sulfur.png",
+        "width": 8,
+        "height": 8,
+        "pngSHA256": "557cd6e731966d1a0404c2de32b6259e40483f294e353602cce98b80fd000eba",
+        "rgbaSHA256": "33561f9c2a16b67acb551feac84acd4786e4ed1aae7fadcffcc00737f0484c6d"
+      },
+      "mercury": {
+        "name": "Mercury",
+        "path": "integration/resource-sprites-v1/field/mercury.png",
+        "width": 8,
+        "height": 8,
+        "pngSHA256": "a1698ce78549d609a63e1644d85f6d7058a1de346fb9d5418e18b51c5bb2ae83",
+        "rgbaSHA256": "d9e146bd88e5ffcddf3876007c909e7ad72505ecaf264be475988ab8bc6fe397"
+      },
+      "adamant": {
+        "name": "Adamant",
+        "path": "integration/resource-sprites-v1/field/adamant.png",
+        "width": 8,
+        "height": 8,
+        "pngSHA256": "54c45cb08f6b25741028d44bef4158bc14171d583eaab57f880316d0992f0423",
+        "rgbaSHA256": "c8f13e1d390b2cca8b99bcdb78fa75c57447a5773cd8f3652c10a8bbcee40f92"
+      },
+      "fiber": {
+        "name": "Fibre",
+        "path": "integration/resource-sprites-v1/field/fiber.png",
+        "width": 8,
+        "height": 8,
+        "pngSHA256": "f2bbed00a7d0cbde09c1d26206294de36a803f5d4297b931eb75af2b5244e54a",
+        "rgbaSHA256": "d9d07fb9b6e3639931833d57202e373cbcc9ba394444e2a2e3c59e9a4372ded6"
+      },
+      "timber": {
+        "name": "Timber",
+        "path": "integration/resource-sprites-v1/field/timber.png",
+        "width": 8,
+        "height": 8,
+        "pngSHA256": "02814e178c8e6201ac30f835d542bde760cfab7afd6d28e6e372c50c58fc9e95",
+        "rgbaSHA256": "febcf752944acd5ab8476e84f4edd95920a633295077c53af75f2f0d867a6f36"
+      },
+      "pulp": {
+        "name": "Pulp",
+        "path": "integration/resource-sprites-v1/field/pulp.png",
+        "width": 8,
+        "height": 8,
+        "pngSHA256": "1df00ec978acdb606275f1a2fd50b8f6a1ca391d30dfc9c55d08a8688bea0b21",
+        "rgbaSHA256": "c5e937fe670421694c16216e5a36ba6a4d0f39b6bf4b7dde1cadefc53e562e5e"
+      },
+      "resin": {
+        "name": "Resin",
+        "path": "integration/resource-sprites-v1/field/resin.png",
+        "width": 8,
+        "height": 8,
+        "pngSHA256": "d4269d5ee39a74b664e5a79c6905c3affa1df5355c62e3c92d101b559d5fc55c",
+        "rgbaSHA256": "0ea9e7a7872939f6cd800d9e0b5e1ceef0e6d35ff4ca3c746935ec91f4c2bbfe"
+      },
+      "toxin": {
+        "name": "Toxin",
+        "path": "integration/resource-sprites-v1/field/toxin.png",
+        "width": 8,
+        "height": 8,
+        "pngSHA256": "25085cd6b6eeb141d4a560b1900441f9467641669a50f5d13aa94311a4d60e40",
+        "rgbaSHA256": "c7ef20c104b13f80774b76d25eb72e859b06b516c9375fab64a3fa1d8f4765b3"
+      },
+      "spore": {
+        "name": "Spore",
+        "path": "integration/resource-sprites-v1/field/spore.png",
+        "width": 8,
+        "height": 8,
+        "pngSHA256": "517d5555e6fc728bfff530029fe59af6e76d785b75af584bcf61e872df5246cb",
+        "rgbaSHA256": "249f43dc2ecb07f7f3fcff33d4482b0bb995c595339a7047cc4227cdf9b1e9ee"
+      },
+      "reagent": {
+        "name": "Reagent",
+        "path": "integration/resource-sprites-v1/field/reagent.png",
+        "width": 8,
+        "height": 8,
+        "pngSHA256": "ec4be238cd3e08261d1bae2caaf06c014955abb97ba1fd071e4a43a11b6135d3",
+        "rgbaSHA256": "5ec57c17fdd7797b2abc25d7756c6ef588664cc7f7f9dad0eb1aa20174b19f9d"
+      },
+      "ichor": {
+        "name": "Ichor",
+        "path": "integration/resource-sprites-v1/field/ichor.png",
+        "width": 8,
+        "height": 8,
+        "pngSHA256": "c4934fe314a4d4a1037d7e3725fb9df2489a184623bfb6c12873d4b825711d62",
+        "rgbaSHA256": "7a83757cbfceac8db580db4813074900c6503456e399022fdae2120b71caa441"
+      },
+      "rift_glass": {
+        "name": "Rift-glass",
+        "path": "integration/resource-sprites-v1/field/rift_glass.png",
+        "width": 8,
+        "height": 8,
+        "pngSHA256": "693e615abb7fa4566b22fbd117b75f7f06c81dccc1b313fde6d699b893e90ee0",
+        "rgbaSHA256": "8bb86f5602cb277cf5b32b91bd66703fd02c7b869a8c82eec5f89f3248f723de"
+      },
+      "essence_raw": {
+        "name": "Raw Essence",
+        "path": "integration/resource-sprites-v1/field/essence_raw.png",
+        "width": 8,
+        "height": 8,
+        "pngSHA256": "7fe5b9aacca35c57f57a7e9ac00a4f948476d1f5d225b31504fc7871a8bd6927",
+        "rgbaSHA256": "74950b08d82dbd15eabc8d4af909e135ad4685b49b31cd90ddae2df0ea158e30"
+      },
+      "mote": {
+        "name": "Mote",
+        "path": "integration/resource-sprites-v1/field/mote.png",
+        "width": 8,
+        "height": 8,
+        "pngSHA256": "e98a1ba50eeb151f037740560a6b3b6c679d4f829b182a723e0a20c7f754e304",
+        "rgbaSHA256": "4282c32867e1bfcc619b451f032609d54139b686833a8347f0121fae92afaf35"
+      }
+    }
+  },
+  "acceptedTerrainEvidence": {
+    "path": "artifacts/dynamic-terrain-style-v0.2/evidence/phone-opposed-cool-368x800.png",
+    "sha256": "56acf61079a886614ba2d62b8f2a5356afd66107968ce0132409aa2b63cc6d55",
+    "use": "proof-map-backdrop-only"
+  },
+  "miningFeedbackContract": {
+    "schemaVersion": "resource-mining-feedback-v1",
+    "trigger": "newly-accepted-world-field-event-batch-v1/harvest/positive-harvested-event",
+    "sourceProfile": "resource-sprites-v1/field/8x8",
+    "committedBeforePresentation": true,
+    "oneSubjectPerDistinctResource": true,
+    "repeatedResourcePolicy": "sum-positive-amounts-first-occurrence-order",
+    "missingIdentityPolicy": "omit-subject-no-substitution",
+    "queuePolicy": "unique-batch-fifo-while-owning-world-remains-active",
+    "duplicatePolicy": "same-batch-id-never-replays",
+    "interruptionPolicy": "dismiss-or-expiry-advances-fifo;world-owner-exit-clears-all;no-gameplay-mutation-or-replay",
+    "relaunchPolicy": "persisted-counts-only-no-presentation-replay",
+    "amountPresentation": "one-exact-field-identity-plus-exact-total-label",
+    "clutterPolicy": "never-create-one-particle-per-unit",
+    "forbiddenImplications": [
+      "delayed-resource-commit",
+      "completion-increment",
+      "tool-damage",
+      "extraction-rank",
+      "bonus-yield",
+      "second-strike",
+      "second-turn",
+      "substitute-resource-art"
+    ]
+  },
+  "motionContract": {
+    "durationMS": 760,
+    "orderedSubjectStaggerMS": 130,
+    "startScale": 2,
+    "restScale": 1,
+    "path": "deterministic-quadratic-arc",
+    "origin": "selected-harvest-cell-centre",
+    "destination": "matching-existing-toolbar-identity-centre",
+    "end": "travelling-copy-removed-destination-acknowledged"
+  },
+  "coverage": {
+    "M01": "one primary subject with existing final count plus exact amount",
+    "M02": "primary then secondary identities in one ordered transaction",
+    "M03": "repeated exact ResourceID coalesces summed positive amount at first position",
+    "M04": "depleted final pull produces only its committed reward subject",
+    "M05": "nothing/spent/refused/stale/busy produces zero subjects",
+    "M06": "unique accepted batches remain FIFO; duplicate batchID never replays",
+    "M07": "toolbar count identical at first and final presentation frames",
+    "M08": "dismiss/expiry advances one committed FIFO group; World-owner exits clear current + queue; neither mutates gameplay or replays",
+    "M09": "cold relaunch retains committed count and shows no animation",
+    "M10": "missing exact field identity omits subject without substitute art"
+  },
+  "visual": {
+    "ordinaryPhone": [
+      368,
+      800
+    ],
+    "particleIdentity": "exact accepted field PNG",
+    "flightScale": [
+      2,
+      1
+    ],
+    "amountLabel": "one exact total per distinct resource",
+    "multiOutput": "130ms ordered stagger inside one group",
+    "largeQuantity": "one particle plus label; never per-unit particles",
+    "toolbar": "layout/count/order unchanged"
+  },
+  "outputs": [
+    {
+      "path": "evidence/m01-start-368x800.png",
+      "width": 368,
+      "height": 800,
+      "sha256": "e82d945d5428c5dae946d7dc09309fc6927c4c23f127cfcea778170c87b2e7f8"
+    },
+    {
+      "path": "evidence/m01-mid-368x800.png",
+      "width": 368,
+      "height": 800,
+      "sha256": "3405626cf47bcf1ee8a2d24fe55effdbd552153debcb4c35ab6f9636faf524b4"
+    },
+    {
+      "path": "evidence/m01-end-368x800.png",
+      "width": 368,
+      "height": 800,
+      "sha256": "79a6d86debfa28a8e01649cdc39dfdbf706145c2f00744c8c3f0aa6d1e95d865"
+    },
+    {
+      "path": "evidence/m02-multi-output-368x800.png",
+      "width": 368,
+      "height": 800,
+      "sha256": "9f1f929ca686c8db13c96dc47ebac85dd1828222c28759f56118f52fd23630b3"
+    },
+    {
+      "path": "evidence/m05-refusal-368x800.png",
+      "width": 368,
+      "height": 800,
+      "sha256": "29d295c83de3e004c432cd0b925a261f91de75502341c89389c44248ed3e8893"
+    },
+    {
+      "path": "evidence/m08-interruption-368x800.png",
+      "width": 368,
+      "height": 800,
+      "sha256": "30328bf72748e972dab224b1b903f1a23335fb2210edae905c5d3f935c0d9743"
+    },
+    {
+      "path": "evidence/m09-relaunch-368x800.png",
+      "width": 368,
+      "height": 800,
+      "sha256": "ad0c155a070f3586ca2b26d3eee41acce4f6d910588d3a9dcae175458ce2bd86"
+    },
+    {
+      "path": "evidence/m10-missing-identity-368x800.png",
+      "width": 368,
+      "height": 800,
+      "sha256": "786be5e3ca83304f361ad857c39a4631c3bdce07667b9237ed97b3f6072e309c"
+    }
+  ],
+  "contactSheet": {
+    "path": "review-contact-sheet.png",
+    "width": 1200,
+    "height": 2530,
+    "sha256": "b57eb9e00d1c53a5cacd6ae50f918235b0d8f81865e6881d3bd871d77dfce523"
+  },
+  "forbidden": [
+    "runtime-image-generation",
+    "resource-redraw",
+    "substitute-resource-art",
+    "gameplay-mutation",
+    "count-increment",
+    "invented-mining-state",
+    "native-implementation"
+  ],
+  "canonicalBodySHA256": "a8c0aaf64facadca00b0da1c83a1a8b6a1560d9a8de82e129515ba6aa5ba4abf"
+}
