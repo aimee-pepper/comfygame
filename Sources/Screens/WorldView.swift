@@ -66,9 +66,9 @@ enum WorldControlsLayout {
 
 /// A closed two-slot strip prevents action growth from silently adding fixed rows and obscuring
 /// the scrollable event/satchel content above the controls.
-private struct WorldActionRow<Interact: View, Look: View>: View {
-    @ViewBuilder let interact: () -> Interact
-    @ViewBuilder let look: () -> Look
+private struct WorldActionRow: View {
+    let interact: () -> AnyView
+    let look: () -> AnyView
 
     var body: some View {
         HStack(spacing: 6) {
@@ -955,7 +955,7 @@ struct WorldView: View {
                     .frame(maxWidth: .infinity)
 
                 WorldActionRow {
-                    WorldWholeFaceControl(
+                    AnyView(WorldWholeFaceControl(
                         coordinator: controlCoordinator, action: .useTile,
                         snapshot: controlSnapshot,
                         disabledReason: canInteract ? nil : useTileUnavailableReason,
@@ -970,9 +970,9 @@ struct WorldView: View {
                             .overlay(Rectangle().stroke(PixelUITheme.edgeDark, lineWidth: 2))
                     }
                     .accessibilityValue(interactionDetail(in: run))
-                    .accessibilityIdentifier("world.interact")
+                    .accessibilityIdentifier("world.interact"))
                 } look: {
-                    WorldWholeFaceControl(
+                    AnyView(WorldWholeFaceControl(
                         coordinator: controlCoordinator, action: .armLook,
                         snapshot: controlSnapshot, disabledReason: nil,
                         operation: {
@@ -995,7 +995,7 @@ struct WorldView: View {
                     .accessibilityHint(isLookArmed
                         ? "Look mode armed. Choose one direction."
                         : "Inspect one adjacent tile without moving or spending a turn.")
-                    .accessibilityIdentifier("world.look")
+                    .accessibilityIdentifier("world.look"))
                     }
                     .accessibilityElement(children: .contain)
                     .accessibilityIdentifier("world.action-row")

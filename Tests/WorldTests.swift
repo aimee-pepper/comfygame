@@ -244,6 +244,45 @@ final class WorldTests: XCTestCase {
     }
 
     @MainActor
+    func testBuild252ExistingActiveRunRelaunchMountsBoundedWorldActionTypes() throws {
+        let original = startedRun(book([:]), seed: 252)
+        let persisted = try SaveCodec.encode(original)
+        let decoded = try SaveCodec.decode(persisted)
+        let relaunched = GameStore(io: .temporary(
+            name: "build-252-active-run-launch-\(UUID().uuidString)"))
+        relaunched.mutate("test load persisted active-run shape") { $0 = decoded }
+        XCTAssertNotNil(relaunched.activeRun)
+        XCTAssertNil(relaunched.state.worlds.pendingWorldArrivalReceipt)
+        let loadedPosition = relaunched.activeRun?.playerPosition
+        let loadedMap = relaunched.activeRun?.map
+        let loadedTurn = relaunched.activeRun?.turnsTaken
+
+        let controller = UIHostingController(rootView:
+            WorldView().environmentObject(relaunched).frame(width: 368, height: 800))
+        let window = UIWindow(frame: .init(x: 0, y: 0, width: 368, height: 800))
+        window.rootViewController = controller; window.makeKeyAndVisible()
+        controller.view.frame = window.bounds; controller.view.layoutIfNeeded()
+        RunLoop.main.run(until: Date().addingTimeInterval(0.08))
+
+        let actions = descendants(controller.view)
+            .compactMap { ($0 as? WorldControlHitOwner.ControlButton)?.worldAction }
+        XCTAssertTrue(actions.contains(.useTile))
+        XCTAssertTrue(actions.contains(.armLook))
+        XCTAssertEqual(relaunched.activeRun?.playerPosition, loadedPosition)
+        XCTAssertEqual(relaunched.activeRun?.map, loadedMap)
+        XCTAssertEqual(relaunched.activeRun?.turnsTaken, loadedTurn,
+                       "materializing World controls must not spend a turn")
+        window.isHidden = true
+
+        let source = try String(contentsOf: URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent().deletingLastPathComponent()
+            .appending(path: "Sources/Screens/WorldView.swift"), encoding: .utf8)
+        XCTAssertTrue(source.contains("private struct WorldActionRow: View"))
+        XCTAssertFalse(source.contains("private struct WorldActionRow<"),
+                       "the device stack-overflowing generic action-row type must stay erased")
+    }
+
+    @MainActor
     func testCR08RepeatAfterCompletionCreatesNextAttempt() throws {
         let coordinator = WorldControlAttemptCoordinator(); let snapshot = controlSnapshot()
         guard case .accepted(let first) = coordinator.accept(.fieldKit, snapshot: snapshot) else {
