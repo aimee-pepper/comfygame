@@ -1,0 +1,293 @@
+{
+  "schemaVersion": "traveller-adjacent-speech-proof-v1",
+  "status": "candidate-unapproved",
+  "integrationReady": false,
+  "sourceReceipt": {
+    "file": "AssetLab/integration/traveller-adjacent-speech-v1/source-receipt.json",
+    "sha256": "af142eb9b1d4c5cfc95bcf510f11f2665ff0b9d49bc11b5414020601d6fc1092",
+    "canonicalBodySHA256": "0e44bae22895b261573594228961dd3f22871d38c3d8e9656f9b55be265ed8f0",
+    "rowCount": 29,
+    "effectiveMeetingCorpusFingerprint": "0aae8a49b89e9ef66f6d870a7c84bcd0ed81c810d35b3e8eec9cebd8a6ca47a8"
+  },
+  "contract": {
+    "schemaVersion": "traveller-adjacent-speech-v1",
+    "sourceReceipt": "build-time-effective-traveller-meeting-corpus",
+    "trigger": "accepted-step-or-auto-travel-final-presented-state-new-cardinal-adjacency",
+    "visibility": "full-revealed-intact-exact-traveller-only",
+    "sameTileOwner": "TravellerMeetingView",
+    "queueOrder": [
+      "north",
+      "east",
+      "south",
+      "west"
+    ],
+    "sessionScope": "transient-shown-traveller-ids-per-loaded-world-run",
+    "interaction": "noninteractive-hit-test-transparent",
+    "mutation": "none",
+    "integrationReady": false
+  },
+  "visualTokens": {
+    "maxWidth": 284,
+    "minimumWidth": 176,
+    "edgeInset": 8,
+    "mapTop": 64,
+    "mapBottom": 492,
+    "anchorGap": 13,
+    "nameRole": {
+      "family": "Tiny5",
+      "size": 15,
+      "lineHeight": 16
+    },
+    "speechRole": {
+      "family": "system",
+      "size": 17,
+      "lineHeight": 21
+    },
+    "padding": {
+      "top": 10,
+      "right": 12,
+      "bottom": 12,
+      "left": 12
+    },
+    "enterMS": 180,
+    "holdMS": 4800,
+    "exitMS": 160,
+    "enterOffsetY": 6,
+    "fill": "#11201ff2",
+    "innerFill": "#1a2c29f5",
+    "borderDark": "#07100f",
+    "borderLight": "#b9cfb8",
+    "nameInk": "#f0cf7d",
+    "speechInk": "#fff7e3"
+  },
+  "visualOwnership": {
+    "bubble": "pixel-stepped dark local scrim with exact traveller tail",
+    "speakerIdentity": "no name header and no map labels; existing traveller sprite plus tail owns association",
+    "copy": "byte-pinned direct-speech span only",
+    "placement": "above first; below/clamped at map edge; never covers fixed controls",
+    "motion": "brief 6px fade/settle; fixed hold; fade removal",
+    "interaction": "pointer/hit-test transparent; never looks or behaves like a control"
+  },
+  "acceptedExistingInputs": {
+    "terrain": {
+      "file": "AssetLab/artifacts/dynamic-terrain-style-v0.2/evidence/phone-opposed-cool-368x800.png",
+      "sha256": "56acf61079a886614ba2d62b8f2a5356afd66107968ce0132409aa2b63cc6d55"
+    },
+    "namedCharacterPlaceholderManifest": {
+      "file": "AssetLab/integration/named-character-placeholders-v1/manifest.json",
+      "sha256": "e3c9b6b68c00e710d8a3ad0cdd9adb190c0de023e44e18944c731de8283a1993",
+      "finalArt": false
+    },
+    "fonts": [
+      {
+        "file": "AssetLab/fonts/Jersey10-Regular.ttf",
+        "sha256": "db9cbd091617048a145d249daa2b815fe7083be6ab66ac26626e21a4e01c3e82"
+      },
+      {
+        "file": "AssetLab/fonts/Tiny5-Regular.ttf",
+        "sha256": "cb8168f80cfee2f47f6db59f2a7afbde31cdcdcdcf262e7a993e4d468a5bf4b0"
+      }
+    ]
+  },
+  "coverage": [
+    {
+      "id": "T01",
+      "statement": "accepted cardinal step → exact Mara bubble"
+    },
+    {
+      "id": "T02",
+      "statement": "adjacent-to-adjacent movement → no repeat"
+    },
+    {
+      "id": "T03",
+      "statement": "leave/re-enter same loaded run → no repeat"
+    },
+    {
+      "id": "T04",
+      "statement": "blocked / Deep Water / no path / selection → none"
+    },
+    {
+      "id": "T05",
+      "statement": "full intact exact traveller only"
+    },
+    {
+      "id": "T06",
+      "statement": "same-tile arrival remains TravellerMeetingView-owned"
+    },
+    {
+      "id": "T07",
+      "statement": "adversarial neighbours queue North / East / South / West"
+    },
+    {
+      "id": "T08",
+      "statement": "expiry advances; accepted action clears; zero mutation"
+    },
+    {
+      "id": "T09",
+      "statement": "encounter / return / navigation / run change cancel"
+    },
+    {
+      "id": "T10",
+      "statement": "cold relaunch while adjacent → none"
+    },
+    {
+      "id": "T11",
+      "statement": "auto-travel evaluates final presented position only"
+    },
+    {
+      "id": "T12",
+      "statement": "29 exact source rows and fail-closed corpus gate"
+    },
+    {
+      "id": "T13",
+      "statement": "Oda / Tovin complete wrap without truncation"
+    },
+    {
+      "id": "T14",
+      "statement": "later full meeting and recruitment remain unchanged"
+    },
+    {
+      "id": "T15",
+      "statement": "same action / corpus / run → identical output"
+    }
+  ],
+  "evidence": [
+    {
+      "file": "evidence/t01-mara-enter-368x800.png",
+      "width": 368,
+      "height": 800,
+      "sha256": "283fead04fc4f33c19a50ebef0e32c8e184b9f6110293a720f9e196cc0887ede"
+    },
+    {
+      "file": "evidence/t01-mara-hold-368x800.png",
+      "width": 368,
+      "height": 800,
+      "sha256": "3b42b08492e3f1075d10262af7354e35cd2ff2f61dddf4521929b426ce7e4b2f"
+    },
+    {
+      "file": "evidence/t07-fifo-north-368x800.png",
+      "width": 368,
+      "height": 800,
+      "sha256": "d2c84b143652092d3d5244b8cd65646b9c180d680d254b0abecd064b171bd8de"
+    },
+    {
+      "file": "evidence/t07-fifo-east-368x800.png",
+      "width": 368,
+      "height": 800,
+      "sha256": "f01a23fecd050131447bdb19746d37326d400599d9ba3ed8165cc887dff348c0"
+    },
+    {
+      "file": "evidence/t05-nondisclosed-368x800.png",
+      "width": 368,
+      "height": 800,
+      "sha256": "1876b3c3573a1d103e90f5a557bf09a189831bd07b8c881c9f17122114a9c7f1"
+    },
+    {
+      "file": "evidence/t06-same-tile-meeting-368x800.png",
+      "width": 368,
+      "height": 800,
+      "sha256": "eca9516a61b052e9a69a70b6dd6093c4ca1e6cda7d5f8c8ea6aace273a3baf29"
+    },
+    {
+      "file": "evidence/t13-oda-wrap-368x800.png",
+      "width": 368,
+      "height": 800,
+      "sha256": "3b25d1e9154de46ed3af37e0a19e745d9b2457327c9a6e4f9827cb0431768d7c"
+    },
+    {
+      "file": "evidence/t13-tovin-wrap-368x800.png",
+      "width": 368,
+      "height": 800,
+      "sha256": "a9cae35aad5f3c33caec1dfd326215b55b8f0247d23109199c74cdc1ff3e2c83"
+    },
+    {
+      "file": "evidence/t08-cleared-368x800.png",
+      "width": 368,
+      "height": 800,
+      "sha256": "b1a49a8a3ce0645a889caa131827a9b1d614a448c6d7482e9c32aa300e13f417"
+    },
+    {
+      "file": "evidence/t01-mara-hold-grayscale-368x800.png",
+      "width": 368,
+      "height": 800,
+      "sha256": "bb7f0775112423c53d95de33a8043c5d524815cf4c412eec8b31481b5462ec21"
+    }
+  ],
+  "contactSheet": {
+    "file": "review-contact-sheet.png",
+    "width": 1280,
+    "height": 3300,
+    "sha256": "30c1579736cd5581a4cd80f11d4afe5a67b9ea6b582e6700c3511f124c316c4b"
+  },
+  "spriteReferences": [
+    {
+      "id": "binder",
+      "file": "sprites/binder-map.png",
+      "sha256": "388437bd465f1b22271c0aaa134b39b11f605c57a7ac34309a6668841fecb98f",
+      "role": "existing-party-proof-reference",
+      "finalArt": false
+    },
+    {
+      "id": "mara",
+      "file": "sprites/mara-map.png",
+      "sha256": "e44797a04688a693a01f56d0cb93fb8ad41f0283b70520176a6073c4ae067eb0",
+      "role": "existing-functional-named-character-placeholder",
+      "finalArt": false
+    },
+    {
+      "id": "tovin",
+      "file": "sprites/tovin-map.png",
+      "sha256": "f331f5cbcebeaa2ce41a71357f2fe3a28e6ada3c2f47143c59b1a3c3c32f9723",
+      "role": "existing-functional-named-character-placeholder",
+      "finalArt": false
+    },
+    {
+      "id": "oda",
+      "file": "sprites/oda-map.png",
+      "sha256": "3083a412ae4826c6f86fc0bf5502cc5fc1a8327c2584c3d0a94b6dad0a12788f",
+      "role": "existing-functional-named-character-placeholder",
+      "finalArt": false
+    },
+    {
+      "id": "noll",
+      "file": "sprites/noll-map.png",
+      "sha256": "0fc451ef6311e4d3f306e0a323a330e523ba42b2d1a1ba21ef88bf11fb8ee567",
+      "role": "existing-functional-named-character-placeholder",
+      "finalArt": false
+    }
+  ],
+  "exclusions": [
+    "native-implementation",
+    "gameplay-mutation",
+    "meeting-content-change",
+    "character-art",
+    "traveller-name-disclosure",
+    "runtime-prose-parsing",
+    "runtime-generated-imagery",
+    "mining-feedback",
+    "world-splash-parallax"
+  ],
+  "preservedInteractionAuthority": [
+    {
+      "file": "Sources/Screens/TravellerMeetingView.swift",
+      "sha256": "0df07116bb40e44021c4ffc46c547c4912f61f888f75564d57b05a0e6edd411d",
+      "ownership": "full-opening-question-offer-accepted-declined-meeting-ui"
+    },
+    {
+      "file": "Sources/Rules/WorldRules.swift",
+      "sha256": "01e3deb555b90eaf5a674200bddf16e2d8fab83aab015fbaba41ad2b687f7f08",
+      "ownership": "recruitment-rules-mutation"
+    },
+    {
+      "file": "Sources/Rules/GameActions+World.swift",
+      "sha256": "96032382e766beb2589b573792711a79da1716e39ce0b3815162c5fd3c0068ee",
+      "ownership": "GameStore-recruit-action-and-flush"
+    },
+    {
+      "file": "Sources/Persistence/GameStore.swift",
+      "sha256": "2b49993e064a072a1f9898fba95d4b18b95764473cc34ddacf39001c816c38fa",
+      "ownership": "persisted-game-state-owner"
+    }
+  ],
+  "canonicalBodySHA256": "57b27b8977842843bcee3e60105a9bbe986957c1c2d84f940866c1629f8164e5"
+}

@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Traveller Adjacent Speech Bubble v1</title>
+  <link rel="stylesheet" href="traveller-adjacent-speech-v1.css">
+</head>
+<body>
+  <main>
+    <header class="review-header">
+      <p class="eyebrow">AssetLab · bounded visual/functional candidate · not approved</p>
+      <h1>Traveller Adjacent Speech Bubble</h1>
+      <p>A brief, noninteractive pixel bubble belongs to the exact newly adjacent traveller. It shows one byte-pinned authored line and leaves the full meeting untouched.</p>
+      <div class="contract-strip"><span>exact authored speech</span><span>cardinal adjacency only</span><span>N / E / S / W FIFO</span><span>no world mutation</span></div>
+    </header>
+
+    <section class="live-review">
+      <div class="section-copy">
+        <p class="eyebrow">Live ordinary-phone proof</p>
+        <h2>Exact anchor, complete line, no tap affordance</h2>
+        <p>The tail remains attached to the traveller when the bubble moves to avoid the map edge. Expiry advances the queue; a new accepted World action clears it.</p>
+        <div class="review-controls">
+          <button type="button" data-scenario="T01">T01 · Mara cardinal arrival</button>
+          <button type="button" data-scenario="T07">T07 · N/E/S/W FIFO</button>
+          <button type="button" data-scenario="T13O">T13 · Oda long line / top edge</button>
+          <button type="button" data-scenario="T13T">T13 · Tovin long line / side edge</button>
+          <button type="button" data-scenario="T05">T05 · nondisclosed / no bubble</button>
+          <button type="button" id="advance">Expire current / advance FIFO</button>
+          <button type="button" id="replay">Replay selected proof</button>
+        </div>
+        <dl id="live-receipt" class="live-receipt"></dl>
+      </div>
+
+      <div id="live-phone" class="phone" data-proof="T01">
+        <div class="phone-top"><strong>Explore</strong><span>Stability 73%</span></div>
+        <div id="map-stage" class="map-stage">
+          <div id="bubble" class="speech-bubble">
+            <p id="bubble-copy"></p>
+            <i class="bubble-tail"></i>
+          </div>
+          <div id="map-people" class="map-people"></div>
+        </div>
+        <div class="place-pane"><span>AT THIS PLACE</span><strong>Rain-soft ground</strong><small>The path opens between living cover.</small></div>
+        <div class="world-actions"><span>Look</span><strong>Use Tile</strong><span>Field Kit</span></div>
+        <div class="world-footer"><span>Health 12 / 12</span><span>turn 13</span></div>
+      </div>
+    </section>
+
+    <section class="evidence">
+      <p class="eyebrow">Deterministic ordinary-phone evidence</p>
+      <h2>Entry, queue, visibility refusal, meeting ownership, long copy, and interruption</h2>
+      <div class="evidence-grid">
+        <figure><img src="artifacts/traveller-adjacent-speech-v1/evidence/t01-mara-enter-368x800.png"><figcaption>T01 · exact Mara anchor and pinned line</figcaption></figure>
+        <figure><img src="artifacts/traveller-adjacent-speech-v1/evidence/t01-mara-hold-368x800.png"><figcaption>T01 · stable readable hold; bubble remains noninteractive</figcaption></figure>
+        <figure><img src="artifacts/traveller-adjacent-speech-v1/evidence/t07-fifo-north-368x800.png"><figcaption>T07 · North owns the first visible bubble</figcaption></figure>
+        <figure><img src="artifacts/traveller-adjacent-speech-v1/evidence/t07-fifo-east-368x800.png"><figcaption>T07 / T08 · expiry advances exactly once to East</figcaption></figure>
+        <figure><img src="artifacts/traveller-adjacent-speech-v1/evidence/t05-nondisclosed-368x800.png"><figcaption>T05 · fringe / remembered / hidden / crumbled emit nothing</figcaption></figure>
+        <figure><img src="artifacts/traveller-adjacent-speech-v1/evidence/t06-same-tile-meeting-368x800.png"><figcaption>T06 · same tile stays full-meeting owned; no bubble</figcaption></figure>
+        <figure><img src="artifacts/traveller-adjacent-speech-v1/evidence/t13-oda-wrap-368x800.png"><figcaption>T13 · Oda wraps completely at the top edge</figcaption></figure>
+        <figure><img src="artifacts/traveller-adjacent-speech-v1/evidence/t13-tovin-wrap-368x800.png"><figcaption>T13 · Tovin wraps completely at the side edge</figcaption></figure>
+        <figure><img src="artifacts/traveller-adjacent-speech-v1/evidence/t08-cleared-368x800.png"><figcaption>T08 / T09 · accepted action or owner exit clears presentation only</figcaption></figure>
+      </div>
+      <p class="downloads"><a href="artifacts/traveller-adjacent-speech-v1/review-contact-sheet.png">Standalone contact sheet</a> · <a href="integration/traveller-adjacent-speech-v1/source-receipt.json">29-line source receipt</a> · <a href="artifacts/traveller-adjacent-speech-v1/manifest.json">Manifest</a></p>
+    </section>
+
+    <section class="census">
+      <h2>T01–T15 coverage</h2>
+      <div id="fixture-census"></div>
+    </section>
+  </main>
+  <script type="module" src="traveller-adjacent-speech-v1-live.js"></script>
+</body>
+</html>
