@@ -263,6 +263,7 @@ enum Worldgen {
         static let pages: UInt64 = 0x9A6E
         static let travellerArrival: UInt64 = 0x7A4E2
         static let playerStart: UInt64 = 0x57A47
+        static let depositLife: UInt64 = 0xD3_90517
     }
 
     struct ArrivalCausalSummary: Equatable {
@@ -591,7 +592,7 @@ enum Worldgen {
             if $0.resource != $1.resource { return $0.resource.rawValue < $1.resource.rawValue }
             return ($0.plantID?.rawValue ?? 0) < ($1.plantID?.rawValue ?? 0)
         }
-        for _ in 0..<nodeCount {
+        for placementOrdinal in 0..<nodeCount {
             candidates = candidates.compactMap { candidate in
                 var copy = candidate
                 copy.hosts.removeAll { occupied.contains($0) || map[$0].content != .empty }
@@ -605,9 +606,21 @@ enum Worldgen {
             let candidate = candidates[candidateIndex]
             let resource = candidate.resource
             let plant = candidate.plantID.flatMap { floraByID[$0] }
+            // Preserve the established node stream exactly. Mineral life now comes from its own
+            // placement-ordinal stream, but this legacy draw must still be consumed so resource
+            // choice, placement and per-hit yield for this and later nodes do not shift.
+            let legacyHarvests = nodeRNG.int(in: Tuning.World.harvestTurnsRange)
+            let generatedHarvests = plant == nil ? mineralDepositHarvests(
+                abundance: candidate.abundance,
+                substratePeak: readings["substrate"].peak,
+                dispersion: readings["substrate"].aspect("dispersion"),
+                seed: seed,
+                placementOrdinal: placementOrdinal
+            ) : nil
             map[point].content = .node(ResourceNode(
                 resource: resource,
-                remainingHarvests: nodeRNG.int(in: Tuning.World.harvestTurnsRange),
+                remainingHarvests: generatedHarvests ?? legacyHarvests,
+                generatedHarvests: generatedHarvests,
                 // **Quantity from stature**, where a plant is what you're cutting. Otherwise the
                 // substrate's concentration decides, as it always has.
                 yieldPerHarvest: plant.map { FloraRules.harvestQuantity(of: $0.traits) }
@@ -1681,6 +1694,29 @@ enum Worldgen {
         let concentration = 1 - min(1, max(0, dispersion / Tuning.Pressure.scaleMaximum))
         let bonus = 1 + concentration * Tuning.World.nodeYieldConcentrationBonus
         return max(1, Int((Double(rng.int(in: Tuning.World.nodeYieldRange)) * bonus).rounded()))
+    }
+
+    /// Stable 1...5 successful-hit life for an ordinary mineral deposit.
+    ///
+    /// Each of four independent trials uses the same source-owned probability: the mean of the
+    /// candidate's abundance among current mineral candidates, substrate strength, and substrate
+    /// concentration. Deriving by placement ordinal prevents this pass from consuming or shifting
+    /// any established world-generation stream.
+    static func mineralDepositHarvests(abundance: Double, substratePeak: Double,
+                                       dispersion: Double,
+                                       seed: UInt64, placementOrdinal: Int) -> Int {
+        // Resource abundance is expressed as peak / 10 before catalogue affinities, so ten is its
+        // ordinary full-scale value. Affinity can exceed that and clamps rather than exceeding p=1.
+        let abundanceScale = Tuning.Pressure.scaleMaximum / 10
+        let abundanceStrength = min(1, max(0, abundance / abundanceScale))
+        let substrateStrength = min(1, max(0,
+            substratePeak / Tuning.Pressure.scaleMaximum))
+        let concentration = 1 - min(1, max(0,
+            dispersion / Tuning.Pressure.scaleMaximum))
+        let probability = (abundanceStrength + substrateStrength + concentration) / 3
+        var rng = SeededRNG(seed: seed).derived(Salt.depositLife)
+            .derived(UInt64(max(0, placementOrdinal)))
+        return 1 + (0..<4).count { _ in rng.chance(probability) }
     }
 
     /// How many things are actually standing in the world.

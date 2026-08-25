@@ -209,16 +209,24 @@ enum TileContent: Codable, Equatable, Sendable {
 struct ResourceNode: Codable, Equatable, Sendable {
     var resource: ResourceID
     var remainingHarvests: Int
+    /// The successful-hit count rolled when an ordinary mineral deposit was generated.
+    ///
+    /// Legacy nodes and flora nodes leave this nil. Keeping the original total separate from the
+    /// mutable remainder lets a resumed run retain the deposit's generated richness without
+    /// changing the legacy decode contract.
+    var generatedHarvests: Int?
     var yieldPerHarvest: Int
     /// A second output from the same flora host. Resin supplements woody harvest; it is never an
     /// independently scattered ordinary deposit.
     var secondaryResource: ResourceID?
     var secondaryYieldPerHarvest: Int
 
-    init(resource: ResourceID, remainingHarvests: Int, yieldPerHarvest: Int,
+    init(resource: ResourceID, remainingHarvests: Int, generatedHarvests: Int? = nil,
+         yieldPerHarvest: Int,
          secondaryResource: ResourceID? = nil, secondaryYieldPerHarvest: Int = 0) {
         self.resource = resource
         self.remainingHarvests = remainingHarvests
+        self.generatedHarvests = generatedHarvests
         self.yieldPerHarvest = yieldPerHarvest
         self.secondaryResource = secondaryResource
         self.secondaryYieldPerHarvest = secondaryYieldPerHarvest
@@ -228,6 +236,7 @@ struct ResourceNode: Codable, Equatable, Sendable {
         let c = try decoder.container(keyedBy: CodingKeys.self)
         resource = try c.decode(ResourceID.self, forKey: .resource)
         remainingHarvests = try c.decode(Int.self, forKey: .remainingHarvests)
+        generatedHarvests = try c.decodeIfPresent(Int.self, forKey: .generatedHarvests)
         yieldPerHarvest = try c.decode(Int.self, forKey: .yieldPerHarvest)
         secondaryResource = try c.decodeIfPresent(ResourceID.self, forKey: .secondaryResource)
         secondaryYieldPerHarvest = try c.decodeIfPresent(Int.self, forKey: .secondaryYieldPerHarvest) ?? 0

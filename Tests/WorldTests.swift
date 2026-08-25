@@ -1198,7 +1198,7 @@ final class WorldTests: XCTestCase {
         map.tiles.enumerated().compactMap { index, tile in
             switch tile.content {
             case .node(let node):
-                return "\(index)|node|\(node.resource.rawValue)|\(node.remainingHarvests)|\(node.yieldPerHarvest)|\(node.secondaryResource?.rawValue ?? "-")|\(node.secondaryYieldPerHarvest)"
+                return "\(index)|node|\(node.resource.rawValue)|\(node.remainingHarvests)|\(node.generatedHarvests.map(String.init) ?? "-")|\(node.yieldPerHarvest)|\(node.secondaryResource?.rawValue ?? "-")|\(node.secondaryYieldPerHarvest)"
             case .wildDrop(let resource, let amount):
                 return "\(index)|drop|\(resource.rawValue)|\(amount)"
             default:
@@ -3441,6 +3441,124 @@ final class WorldTests: XCTestCase {
     }
 
     // MARK: Harvesting
+
+    func testMineralDepositLifeIsDeterministicBoundedAndMonotonic() {
+        var sawStrictIncrease = false
+        var observed: Set<Int> = []
+        for seed in UInt64(1)...200 {
+            for ordinal in 0..<8 {
+                let first = Worldgen.mineralDepositHarvests(
+                    abundance: 4, substratePeak: 35, dispersion: 70,
+                    seed: seed, placementOrdinal: ordinal)
+                let replay = Worldgen.mineralDepositHarvests(
+                    abundance: 4, substratePeak: 35, dispersion: 70,
+                    seed: seed, placementOrdinal: ordinal)
+                let richer = Worldgen.mineralDepositHarvests(
+                    abundance: 10, substratePeak: 100, dispersion: 0,
+                    seed: seed, placementOrdinal: ordinal)
+                XCTAssertEqual(first, replay)
+                XCTAssertTrue((1...5).contains(first))
+                XCTAssertGreaterThanOrEqual(richer, first,
+                    "raising every probability input must never shorten the same deposit roll")
+                sawStrictIncrease = sawStrictIncrease || richer > first
+                observed.insert(first)
+                observed.insert(richer)
+            }
+        }
+        XCTAssertTrue(sawStrictIncrease)
+        XCTAssertEqual(observed, Set(1...5), "the deterministic corpus must exercise every legal life")
+    }
+
+    func testMineralDepositLifeUsesAnIndependentPlacementOrdinalStream() {
+        var observedNodeStream = SeededRNG(seed: 84_202).derived(0x2D0DE)
+        var expectedNodeStream = SeededRNG(seed: 84_202).derived(0x2D0DE)
+        XCTAssertEqual(observedNodeStream.next(), expectedNodeStream.next())
+        for ordinal in 0..<40 {
+            _ = Worldgen.mineralDepositHarvests(
+                abundance: 8, substratePeak: 75, dispersion: 20,
+                seed: 84_202, placementOrdinal: ordinal)
+        }
+        XCTAssertEqual(observedNodeStream.next(), expectedNodeStream.next(),
+                       "deposit life must not consume the established node stream")
+    }
+
+    func testGeneratedMineralsOwnTotalLifeWhileFloraKeepsLegacyHarvestRange() throws {
+        var sawMineral = false
+        var sawFlora = false
+        for seed in UInt64(1)...80 where !sawMineral || !sawFlora {
+            let generated = Worldgen.generate(
+                book: book(["bounty": "teeming_life", "terrain": "plains"]), seed: seed)
+            for tile in generated.map.tiles {
+                guard case .node(let node) = tile.content else { continue }
+                if FloraRules.isFloraResource(node.resource) {
+                    sawFlora = true
+                    XCTAssertNil(node.generatedHarvests)
+                    XCTAssertTrue(Tuning.World.harvestTurnsRange.contains(node.remainingHarvests))
+                } else {
+                    sawMineral = true
+                    let total = try XCTUnwrap(node.generatedHarvests)
+                    XCTAssertTrue((1...5).contains(total))
+                    XCTAssertEqual(node.remainingHarvests, total)
+                }
+            }
+        }
+        XCTAssertTrue(sawMineral)
+        XCTAssertTrue(sawFlora)
+    }
+
+    func testGeneratedMineralTotalPersistsSeparatelyAndPerHitYieldStaysExact() throws {
+        var state = startedRun(book(["bounty": "rich_ore"]), seed: 272)
+        var run = try XCTUnwrap(state.worlds.activeRun)
+        run.map[run.playerPosition].content = .node(ResourceNode(
+            resource: Resources.ore, remainingHarvests: 3, generatedHarvests: 5,
+            yieldPerHarvest: 7))
+        state.worlds.activeRun = run
+
+        let events = WorldRules.harvest(in: &state)
+        let after = try XCTUnwrap(state.worlds.activeRun)
+        guard case .node(let node) = after.map[after.playerPosition].content else {
+            return XCTFail("a deposit with two hits left must remain on its tile")
+        }
+        XCTAssertEqual(node.remainingHarvests, 2)
+        XCTAssertEqual(node.generatedHarvests, 5)
+        XCTAssertEqual(after.satchel[Resources.ore], 7)
+        XCTAssertTrue(events.contains(.harvested(Resources.ore, amount: 7, exhausted: false)))
+        XCTAssertEqual(after.turnsTaken, run.turnsTaken + 1)
+
+        let resumed = try SaveCodec.decode(SaveCodec.encode(state))
+        let resumedRun = try XCTUnwrap(resumed.worlds.activeRun)
+        guard case .node(let resumedNode) = resumedRun.map[resumedRun.playerPosition].content else {
+            return XCTFail("the partly mined deposit must survive relaunch")
+        }
+        XCTAssertEqual(resumedNode.remainingHarvests, 2)
+        XCTAssertEqual(resumedNode.generatedHarvests, 5)
+        XCTAssertEqual(resumedRun.satchel[Resources.ore], 7)
+    }
+
+    func testLegacyResourceNodeDecodesWithNilGeneratedLifeAndKeepsLegacyBehavior() throws {
+        let bytes = try XCTUnwrap(
+            #"{"resource":"ore","remainingHarvests":2,"yieldPerHarvest":3}"#.data(using: .utf8))
+        let legacy = try SaveCodec.makeDecoder().decode(ResourceNode.self, from: bytes)
+        XCTAssertNil(legacy.generatedHarvests)
+        XCTAssertEqual(legacy.remainingHarvests, 2)
+
+        var state = startedRun(book([:]), seed: 273)
+        var run = try XCTUnwrap(state.worlds.activeRun)
+        run.map[run.playerPosition].content = .node(legacy)
+        state.worlds.activeRun = run
+        _ = WorldRules.harvest(in: &state)
+        guard case .node(let remaining) = try XCTUnwrap(state.worlds.activeRun)
+            .map[run.playerPosition].content else {
+            return XCTFail("legacy two-hit node must retain its established first-hit behavior")
+        }
+        XCTAssertNil(remaining.generatedHarvests)
+        XCTAssertEqual(remaining.remainingHarvests, 1)
+        XCTAssertEqual(state.worlds.activeRun?.satchel[Resources.ore], 3)
+    }
+
+    func testWorldSplashFiveHitSourceCeilingIsThirtyFive() {
+        XCTAssertEqual(WorldSplashReceiptV3.maximumObtainableQuantityPerSource, 35)
+    }
 
     func testHarvestingFillsTheSatchelAndExhaustsTheNode() throws {
         var state = startedRun(book(["bounty": "teeming_life"]), seed: 99)

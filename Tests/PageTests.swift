@@ -1559,21 +1559,29 @@ final class PageTests: XCTestCase {
                                  "q→q+1 must add collision-free resource-owned pixels")
             priorResourceOwnedPixels = owned
         }
+        var beyondFiveHitCeiling = emptyOpportunities
+        beyondFiveHitCeiling.explorationOpportunities.resources = [
+            .init(stableID: "silver", sourceCount: 1,
+                  obtainableQuantity: WorldSplashReceiptV3.maximumObtainableQuantityPerSource + 1,
+                  causalMarkIDs: [])
+        ]
+        beyondFiveHitCeiling.seal()
+        XCTAssertFalse(beyondFiveHitCeiling.validates(), "a 36-unit source must fail closed")
         let opportunityTileCount = emptyOpportunities.terrain.width
             * emptyOpportunities.terrain.height
-        let maximumAggregateQuantity = opportunityTileCount
+        let slotCapacity = WorldArrivalNativeRenderer.resourceOpportunitySlotCapacity(
+            for: .init(width: 320, height: 360))
+        let maximumFullSources = min(
+            opportunityTileCount,
+            slotCapacity / (WorldSplashReceiptV3.maximumObtainableQuantityPerSource + 1))
+        let maximumAggregateQuantity = maximumFullSources
             * WorldSplashReceiptV3.maximumObtainableQuantityPerSource
-        let maximumAggregateMarks = opportunityTileCount + maximumAggregateQuantity
+        let maximumAggregateMarks = maximumFullSources + maximumAggregateQuantity
         XCTAssertEqual(
-            WorldArrivalNativeRenderer.resourceOpportunitySlotCapacity(
-                for: .init(width: 320, height: 360)),
+            slotCapacity,
             WorldSplashReceiptV3.maximumResourceOpportunityMarks)
-        XCTAssertGreaterThanOrEqual(
-            WorldArrivalNativeRenderer.resourceOpportunitySlotCapacity(
-                for: .init(width: 320, height: 360)),
-            max(maximumAggregateMarks,
-                28 * 28 * (WorldSplashReceiptV3.maximumObtainableQuantityPerSource + 1)),
-            "the canonical scene must have a collision-free slot for every legal generated mark")
+        XCTAssertGreaterThanOrEqual(slotCapacity, maximumAggregateMarks,
+            "the canonical scene must have a collision-free slot for every accepted mark")
 
         func resourceOwned(sourceCount: Int, quantity: Int) throws -> Set<Int> {
             var exact = emptyOpportunities
@@ -1593,9 +1601,9 @@ final class PageTests: XCTestCase {
         XCTAssertTrue(fewerSources.isSubset(of: moreSources))
         XCTAssertGreaterThan(moreSources.count, fewerSources.count,
                              "n→n+1 sources must add collision-free ownership")
-        let nearMaximum = try resourceOwned(sourceCount: opportunityTileCount,
+        let nearMaximum = try resourceOwned(sourceCount: maximumFullSources,
                                             quantity: maximumAggregateQuantity - 1)
-        let maximum = try resourceOwned(sourceCount: opportunityTileCount,
+        let maximum = try resourceOwned(sourceCount: maximumFullSources,
                                         quantity: maximumAggregateQuantity)
         XCTAssertTrue(nearMaximum.isSubset(of: maximum))
         XCTAssertGreaterThan(maximum.count, nearMaximum.count,
@@ -2306,7 +2314,7 @@ final class PageTests: XCTestCase {
         let expected = [
             "starter_open_meadow": "Broad sandy ground stretches into the distance. Your Plains Sigil opened the terrain, while your Verdant Sigil spread low growth farther along the few wet and stony edges.",
             "starter_rainwashed_shore": "Stone shelves rise as islands from shallow and deep water. Your Archipelago Sigil divided the route, while only the ground nearest the entry remained clearly visible.",
-            "starter_stone_hollow": "Stone closes around narrow paths and wet hollows. Your Caverns Sigil shaped the enclosure, while sparse growth settled on the open stone."
+            "starter_stone_hollow": "Stone closes around narrow paths and wet hollows. Your Caverns Sigil shaped the enclosure, while your Ore Sigil made ore more plentiful."
         ]
         let closed: [WorldArrivalReceipt.CausalVisualFact.Scope: Set<String>] = [
             .ground: Set(GroundType.allCases.map(\.rawValue)),

@@ -21,8 +21,8 @@ struct WorldSplashReceiptV3: Codable, Equatable, Sendable {
     static let regionColumns = 4
     static let regionRows = 3
     /// One generated source occupies one tile. The richest legal source is a concentrated
-    /// substrate node: 3 harvests × 7 units. Raw drops and flora nodes are lower.
-    static let maximumObtainableQuantityPerSource = 21
+    /// substrate node: 5 successful hits × 7 units. Raw drops and flora nodes are lower.
+    static let maximumObtainableQuantityPerSource = 35
     /// Collision-free opportunity slots in the canonical 320×360 proof scene (8pt inset,
     /// two logical pixels per slot). Persisted receipts exceeding this fail closed.
     // Canonical 320×360 proof scene: the inset 296×336 interior owns a
@@ -1005,8 +1005,9 @@ enum WorldArrivalReceiptFactory {
             }
             let counterfactualAtmosphere = try WorldGrade2BindAdapter.atmosphereDescriptor(
                 sigils: intervention.counterfactualSigils)
-            for resourceID in candidate.registeredResourceFamilies where
-                WorldArrivalCausalCandidateRules.resourceQuantity(resourceID, in: actualSummary.map)
+            for resourceID in candidate.registeredResourceFamilies
+            where candidate.registeredScopes.contains(.resource)
+                && WorldArrivalCausalCandidateRules.resourceQuantity(resourceID, in: actualSummary.map)
                     > WorldArrivalCausalCandidateRules.resourceQuantity(resourceID, in: summary.map) {
                 causalResourceOwners[resourceID, default: []].insert(candidate.markID)
             }
