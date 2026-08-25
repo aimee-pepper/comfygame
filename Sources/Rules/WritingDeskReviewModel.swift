@@ -461,7 +461,7 @@ extension GameStore {
             bindAvailability(worldPageInstanceID: $0, bornAnchored: bornAnchored)
         } ?? bindAvailability(bornAnchored: bornAnchored)
         return WritingDeskReviewModelFactory.make(
-            state: state, selectedWorldPageID: selectedWorldPageID,
+            state: writingDeskState, selectedWorldPageID: selectedWorldPageID,
             bornAnchored: bornAnchored, bindAvailability: availability,
             tuning: DebugTuningProfile.active)
     }
@@ -469,7 +469,7 @@ extension GameStore {
     func writingDeskBindQuote(selectedWorldPageID: InstanceID? = nil,
                               bornAnchored: Bool = false) -> WritingDeskBindQuote? {
         WritingDeskBindQuoteFactory.make(
-            state: state, selectedWorldPageID: selectedWorldPageID,
+            state: writingDeskState, selectedWorldPageID: selectedWorldPageID,
             bornAnchored: bornAnchored)
     }
 }

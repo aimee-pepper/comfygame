@@ -145,6 +145,7 @@ struct WritingDeskView: View {
     }
 
     private var state: GameState { store.state }
+    private var draft: Page { store.writingDeskPage }
     private var projection: BookProjection {
         selectedWorldPageID.flatMap(store.worldPageProjection) ?? store.bookProjection
     }
@@ -176,7 +177,7 @@ struct WritingDeskView: View {
             Text("Every placed Sigil and connection on this page will be removed.")
         }
         .modifier(TemplatePresentationModifier(
-            markCount: state.base.page.runes.count,
+            markCount: draft.runes.count,
             isNaming: $isNamingTemplate,
             name: $templateName,
             renamingID: $renamingTemplateID,
@@ -204,17 +205,23 @@ struct WritingDeskView: View {
             }
         }
         .onAppear {
+            store.beginWritingDeskSession()
             store.reconcileStarterWorldPageBundle()
             presentWritingRequestIfNeeded()
             openWritingProductionPack()
         }
-        .onDisappear { cancelPageInteraction(.back) }
+        .onDisappear {
+            cancelPageInteraction(.back)
+            store.endWritingDeskSession()
+        }
         .onChange(of: ghost?.glyph) { _, glyph in
             guard glyph != nil else { return }
             present(.writingPageSpace)
         }
-        .onChange(of: state.base.page.runes.count) { _, count in
-            if count > 0 { store.completeTutorial(.writingPageSpace, fact: "mark_placed") }
+        .onChange(of: draft.runes.count) { _, count in
+            if count > 0, store.state.tutorial[.writingPageSpace].status != .completed {
+                store.completeTutorial(.writingPageSpace, fact: "mark_placed")
+            }
         }
         .onChange(of: pane) { _, pane in
             cancelPageInteraction(.pane)
@@ -270,7 +277,7 @@ struct WritingDeskView: View {
             if showsPageActions, let productionPack {
                 WritingDeskPageActionsPopover(
                     pack: productionPack,
-                    canAct: writingAssetsReady && !state.base.page.runes.isEmpty,
+                    canAct: writingAssetsReady && !draft.runes.isEmpty,
                     clearLabel: clearPageActionLabel,
                     save: {
                         showsPageActions = false
@@ -285,7 +292,7 @@ struct WritingDeskView: View {
                     .zIndex(100)
             } else if showsPageActions {
                 WritingDeskNativePageActions(
-                    canAct: !state.base.page.runes.isEmpty,
+                    canAct: !draft.runes.isEmpty,
                     clearLabel: clearPageActionLabel,
                     save: {
                         showsPageActions = false
@@ -304,7 +311,7 @@ struct WritingDeskView: View {
     }
 
     private var clearPageActionLabel: String {
-        let count = state.base.page.runes.count
+        let count = draft.runes.count
         return "Clear \(PlayerSigilCopy.count(count))"
     }
 
@@ -344,7 +351,6 @@ struct WritingDeskView: View {
                              side: metrics.cellSide, pageInset: metrics.pageInset,
                              dismissalToken: pageInteractionDismissalToken)
                     .frame(width: metrics.pageOuterSide, height: metrics.pageOuterSide)
-                    .background { Rectangle().fill(PixelUITheme.shadow).offset(x: 4, y: 4) }
                 inkWellBar
                 binTabs
                 ScrollView { binContents(columns: metrics.paletteColumns).padding(.bottom, 8) }
@@ -398,7 +404,7 @@ struct WritingDeskView: View {
 
     private var inkWellBar: some View {
         let unlocked = state.base.hasCapability("inkMixing")
-        let mixedCount = state.base.page.runes.filter { $0.inkRecipe != nil }.count
+        let mixedCount = draft.runes.filter { $0.inkRecipe != nil }.count
         return Group {
             if let productionPack {
                 WritingDeskPackToolStrip(
@@ -563,7 +569,7 @@ struct WritingDeskView: View {
     private func personalCompoundDetail(_ record: PersonalCompoundRecord) -> some View {
         let footprint = PageRules.personalCompoundFootprint(record, hand: state.base.bestHand)
         let canPlace = PageRules.shape(forPersonalCompound: record, hand: state.base.bestHand)
-            .map { !PageRules.validOrigins(for: $0, on: state.base.page).isEmpty } ?? false
+            .map { !PageRules.validOrigins(for: $0, on: draft).isEmpty } ?? false
         return VStack(alignment: .leading, spacing: 6) {
             HStack {
                 VStack(alignment: .leading, spacing: 2) {
@@ -592,14 +598,14 @@ struct WritingDeskView: View {
 
     private func placePersonalCompound(_ record: PersonalCompoundRecord) {
         guard let shape = PageRules.shape(forPersonalCompound: record, hand: state.base.bestHand),
-              let origin = PageRules.validOrigins(for: shape, on: state.base.page).first,
+              let origin = PageRules.validOrigins(for: shape, on: draft).first,
               let updated = PageRules.place(record, hand: state.base.bestHand,
-                                            at: origin, on: state.base.page)
+                                            at: origin, on: draft)
         else {
             personalCompoundMessage = "This compound does not fit in the current hand."
             return
         }
-        store.mutate("place personal compound") { $0.base.page = updated }
+        store.replaceWritingDeskDraft(updated)
         personalCompoundMessage = nil
         cancelPageInteraction(.outsidePage)
     }
@@ -729,7 +735,7 @@ struct WritingDeskView: View {
                     }) { template in
                         SavedPageTemplateCard(
                             template: template,
-                            canOverwrite: !state.base.page.runes.isEmpty,
+                            canOverwrite: !draft.runes.isEmpty,
                             load: { requestTemplateLoad(template.id) },
                             rename: {
                                 templateName = template.name
@@ -749,7 +755,7 @@ struct WritingDeskView: View {
             ScrollView {
                 VStack(spacing: 12) {
                     PreviewPanel(projection: projection, discovery: state.reality.discovery)
-                    if selectedWorldPageID == nil && state.base.page.runes.isEmpty { blankPageNote }
+                    if selectedWorldPageID == nil && draft.runes.isEmpty { blankPageNote }
                 }
                 .padding(.horizontal, 12)
                 .padding(.bottom, 8)
@@ -873,7 +879,7 @@ struct WritingDeskView: View {
         guard let shape = PageRules.shape(for: content, hand: state.base.bestHand) else {
             return PageCell(column: 0, row: 0)
         }
-        return PageRules.validOrigins(for: shape, on: state.base.page).first
+        return PageRules.validOrigins(for: shape, on: draft).first
             ?? PageCell(column: 0, row: 0)
     }
 
@@ -1003,8 +1009,8 @@ struct WritingDeskView: View {
             templateError = "That Template is no longer available."
             return
         }
-        if !state.base.page.runes.isEmpty,
-           !PageTemplateRules.structurallyEquivalent(state.base.page, template.page) {
+        if !draft.runes.isEmpty,
+           !PageTemplateRules.structurallyEquivalent(draft, template.page) {
             pendingTemplateLoad = id
         } else {
             performTemplateLoad(id)
@@ -1194,7 +1200,7 @@ private struct InkWellSheet: View {
     @State private var message: String?
 
     private var eligibleMarks: [PlacedRune] {
-        store.state.base.page.runes.filter {
+        store.writingDeskPage.runes.filter {
             $0.hand != .crude
                 && $0.inkEligibleSourceID.map(InkEconomyRules.supportedSourceIDs.contains) == true
         }

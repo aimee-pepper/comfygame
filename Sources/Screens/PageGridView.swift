@@ -78,7 +78,7 @@ struct PageGridView: View {
     }
 
 
-    private var page: Page { store.state.base.page }
+    private var page: Page { store.writingDeskPage }
     private var visibleMarksByID: [InstanceID: WritingDeskVisibleMark] {
         Dictionary(uniqueKeysWithValues: (store.writingDeskReviewModel()?.visibleMarks ?? []).map { ($0.id, $0) })
     }

@@ -317,15 +317,6 @@ final class PageTests: XCTestCase {
                 state.tutorial.complete(lesson, fact: "visual_fixture")
             }
         }
-        XCTAssertTrue(store.write(.target("illumination"), glyph: "illumination",
-                                  at: .init(column: 0, row: 0)))
-        XCTAssertTrue(store.write(.source("sun"), glyph: "sun",
-                                  at: .init(column: 0, row: 2)))
-        let marks = store.state.base.page.runes
-        XCTAssertEqual(marks.count, 2)
-        store.mutate("connect writing render fixture") {
-            $0.base.page.links.insert(MarkLink(marks[0].id, marks[1].id))
-        }
         for scheme in [ColorScheme.light, .dark] {
             let controller = UIHostingController(rootView:
                 NavigationStack { WritingDeskView().environmentObject(store) }
@@ -339,16 +330,86 @@ final class PageTests: XCTestCase {
             controller.view.frame = window.bounds
             controller.view.layoutIfNeeded()
             RunLoop.main.run(until: Date().addingTimeInterval(0.05))
-            let image = UIGraphicsImageRenderer(size: window.bounds.size).image { _ in
-                controller.view.drawHierarchy(in: controller.view.bounds, afterScreenUpdates: true)
+            XCTAssertTrue(store.writingDeskPage.runes.isEmpty)
+            let persistedBefore = try SaveCodec.makeEncoder().encode(store.state)
+            let marks: [(MarkContent, String, PageCell)] = [
+                (.target("illumination"), "illumination", .init(column: 0, row: 0)),
+                (.target("thermal"), "thermal", .init(column: 2, row: 0)),
+                (.target("hydrology"), "hydrology", .init(column: 0, row: 2)),
+                (.target("substrate"), "substrate", .init(column: 2, row: 2)),
+            ]
+            for count in 0...marks.count {
+                if count > 0 {
+                    let mark = marks[count - 1]
+                    XCTAssertTrue(store.write(mark.0, glyph: mark.1, at: mark.2))
+                    RunLoop.main.run(until: Date().addingTimeInterval(0.03))
+                    controller.view.layoutIfNeeded()
+                }
+                XCTAssertEqual(store.writingDeskPage.runes.count, count)
+                let image = UIGraphicsImageRenderer(size: window.bounds.size).image { _ in
+                    controller.view.drawHierarchy(in: controller.view.bounds, afterScreenUpdates: true)
+                }
+                XCTAssertEqual(image.size, CGSize(width: 368, height: 800))
+                let attachment = XCTAttachment(image: image)
+                attachment.name = "writing-desk-\(count)-marks-\(scheme == .light ? "light" : "dark")"
+                attachment.lifetime = .keepAlways
+                add(attachment)
             }
             window.isHidden = true
-            XCTAssertEqual(image.size, CGSize(width: 368, height: 800))
-            let attachment = XCTAttachment(image: image)
-            attachment.name = "writing-desk-write-\(scheme == .light ? "light" : "dark")"
-            attachment.lifetime = .keepAlways
-            add(attachment)
+            XCTAssertEqual(try SaveCodec.makeEncoder().encode(store.state), persistedBefore)
         }
+    }
+
+    @MainActor
+    func testWritingDeskOrdinarySessionIsBlankTransientAndRelaunchSafe() throws {
+        let io = SaveFileIO.temporary(name: "writing-transient-\(UUID().uuidString)")
+        let store = GameStore(io: io)
+        XCTAssertTrue(store.write(.source("sun"), glyph: "sun",
+                                  at: .init(column: 0, row: 0)))
+        store.flushNow()
+        let persistedPage = store.state.base.page
+        let persistedBytes = try SaveCodec.makeEncoder().encode(store.state)
+
+        store.beginWritingDeskSession()
+        XCTAssertTrue(store.writingDeskPage.runes.isEmpty)
+        XCTAssertEqual(try SaveCodec.makeEncoder().encode(store.state), persistedBytes)
+        XCTAssertTrue(store.write(.target("thermal"), glyph: "thermal",
+                                  at: .init(column: 0, row: 0)))
+        XCTAssertEqual(store.writingDeskPage.runes.count, 1)
+        XCTAssertEqual(store.state.base.page, persistedPage)
+        XCTAssertEqual(try SaveCodec.makeEncoder().encode(store.state), persistedBytes)
+        store.endWritingDeskSession()
+
+        let relaunched = GameStore(io: io)
+        XCTAssertEqual(relaunched.state.base.page, persistedPage)
+        let relaunchedBytes = try SaveCodec.makeEncoder().encode(relaunched.state)
+        relaunched.beginWritingDeskSession()
+        XCTAssertTrue(relaunched.writingDeskPage.runes.isEmpty)
+        XCTAssertEqual(try SaveCodec.makeEncoder().encode(relaunched.state), relaunchedBytes)
+    }
+
+    @MainActor
+    func testWritingDeskTemplateLoadIsExplicitAndTargetsOnlyCurrentSession() throws {
+        let store = GameStore(io: .temporary(name: "writing-template-session-\(UUID().uuidString)"))
+        let persistedPage = store.state.base.page
+        store.beginWritingDeskSession()
+        XCTAssertTrue(store.write(.source("sun"), glyph: "sun",
+                                  at: .init(column: 0, row: 0)))
+        let saveResult = store.savePageTemplate(named: "Light")
+        guard case .saved(let templateID) = saveResult else {
+            return XCTFail("expected the real Template save path, got \(saveResult); draft=\(store.writingDeskPage)")
+        }
+        let templatePage = try XCTUnwrap(
+            store.state.base.savedPageTemplates.first { $0.id == templateID }).page
+        store.clearPage()
+        XCTAssertTrue(store.writingDeskPage.runes.isEmpty)
+        XCTAssertEqual(store.loadPageTemplate(templateID), .loaded(templateID))
+        XCTAssertTrue(PageTemplateRules.structurallyEquivalent(store.writingDeskPage, templatePage))
+        XCTAssertEqual(store.state.base.page, persistedPage)
+        store.endWritingDeskSession()
+        store.beginWritingDeskSession()
+        XCTAssertTrue(store.writingDeskPage.runes.isEmpty,
+                      "a previously selected Template must not become the next ordinary visit")
     }
     @MainActor
     func testEarthlikeTestWorldIsPermanentAndAddedToExistingCampaigns() throws {
@@ -3518,7 +3579,7 @@ final class PageTests: XCTestCase {
         XCTAssertTrue(source.contains("CompoundRunebookPresentation.expansion(record)"))
         XCTAssertTrue(source.contains("Text(record.provenance)"))
         XCTAssertTrue(source.contains("PageRules.place(record, hand: state.base.bestHand"))
-        XCTAssertTrue(source.contains("store.mutate(\"place personal compound\")"))
+        XCTAssertTrue(source.contains("store.replaceWritingDeskDraft(updated)"))
         XCTAssertTrue(source.contains("Sigils saved at the time"))
         XCTAssertFalse(source.contains("formalizePersonalCompound"),
                        "The Writing Desk places saved notation; it must not mint or charge for it")

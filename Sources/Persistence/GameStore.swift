@@ -415,6 +415,9 @@ final class GameStore: ObservableObject {
     /// Recoverable player-facing failure from the bind preview/receipt commitment boundary.
     /// It is deliberately outside the save: a failed bind changes no campaign fact.
     @Published var bindError: String?
+    /// The unfinished page on the currently mounted Writing Desk. Deliberately transient: an
+    /// ordinary visit starts blank and a relaunch cannot silently restore an abandoned draft.
+    @Published private(set) var writingDeskDraft: Page?
 
     private let io: any GamePersistenceIO
     private let writeQueue = DispatchQueue(label: "com.aimeepepper.bookbinder.save", qos: .userInitiated)
@@ -427,6 +430,34 @@ final class GameStore: ObservableObject {
     private var shownTravellerSpeechIDs: Set<TravellerID> = []
 
     var diagnosticCampaignReference: String? { io.diagnosticCampaignReference }
+
+    var writingDeskPage: Page { writingDeskDraft ?? state.base.page }
+
+    var writingDeskState: GameState {
+        guard let writingDeskDraft else { return state }
+        var value = state
+        value.base.page = writingDeskDraft
+        return value
+    }
+
+    func beginWritingDeskSession() {
+        bindError = nil
+        writingDeskDraft = Page(width: state.base.page.width, height: state.base.page.height)
+    }
+
+    func endWritingDeskSession() {
+        writingDeskDraft = nil
+        bindError = nil
+    }
+
+    func replaceWritingDeskDraft(_ page: Page, label: String = "edit Writing Desk page",
+                                 flush: Bool = false) {
+        if writingDeskDraft != nil {
+            writingDeskDraft = page
+        } else {
+            mutate(label, flush: flush) { $0.base.page = page }
+        }
+    }
 
     // MARK: - Construction
 
