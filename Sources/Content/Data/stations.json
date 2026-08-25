@@ -369,7 +369,7 @@
       "id": "distillery",
       "name": "The Distillery",
       "icon": "flask.fill",
-      "blurb": "Crystallise essence and attune it through world-made samples.",
+      "blurb": "Attune Essence Crystals through world-made samples.",
       "sortOrder": 14,
       "homeSection": "make",
       "sectionOrder": 8,

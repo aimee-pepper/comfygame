@@ -38,6 +38,44 @@ final class SaveSlotTests: XCTestCase {
         return value
     }
 
+    func testSaveSlotSchemaOneScalarOnlyMigrationAllocatesUniqueCrystalIDAndIsIdempotent() async throws {
+        let root = directory()
+        defer { try? FileManager.default.removeItem(at: root) }
+        let slots = SaveSlotFileIO(directory: root)
+        let created = try await slots.create(name: "Legacy Essence")
+        let url = try await slots.exportURL(for: created.metadata.id)
+        var envelope = try SaveCodec.makeDecoder().decode(
+            SaveSlotEnvelope.self, from: Data(contentsOf: url))
+        envelope.payload = Data(#"""
+        {
+          "schemaVersion":1,
+          "base":{
+            "essence":19,
+            "inventory":{"slots":8,"stacks":[
+              {"id":{"rawValue":1201},"catalogID":"salve_lesser","count":1,"identified":true}
+            ]},
+            "spillover":[
+              {"id":{"rawValue":1302},"catalogID":"field_ration","count":1,"identified":true}
+            ]
+          }
+        }
+        """#.utf8)
+        try encoder().encode(envelope).write(to: url, options: .atomic)
+
+        let first = try await slots.load(created.metadata.id).state
+        let crystalID = try XCTUnwrap(first.base.essenceCrystals?.id)
+        XCTAssertGreaterThan(crystalID.rawValue, 1302)
+        XCTAssertEqual(first.base.essenceCrystalCount, 19)
+        let allIDs = first.base.inventory.stacks.map(\.id)
+            + first.base.spillover.map(\.id) + [crystalID]
+        XCTAssertEqual(Set(allIDs).count, allIDs.count)
+
+        _ = try await slots.save(created.metadata.id, state: first)
+        let relaunched = try await slots.load(created.metadata.id).state
+        XCTAssertEqual(relaunched.base.essenceCrystals?.id, crystalID)
+        XCTAssertEqual(relaunched, first)
+    }
+
     func testLegacyAdoptionIsIdempotentAndPreservesExactPayloadBytes() async throws {
         let root = directory()
         defer { try? FileManager.default.removeItem(at: root) }

@@ -57,6 +57,32 @@ enum Migrations {
         guard var root = try JSONSerialization.jsonObject(with: data) as? [String: Any] else {
             return data
         }
+
+        func encodedRawValue(_ value: Any?) -> UInt64? {
+            if let encoded = value as? [String: Any],
+               let number = encoded["rawValue"] as? NSNumber {
+                return number.uint64Value
+            }
+            if let number = value as? NSNumber { return number.uint64Value }
+            return nil
+        }
+        func maximumEncodedRawValue(in value: Any) -> UInt64? {
+            if let object = value as? [String: Any] {
+                let own = encodedRawValue(object)
+                return object.values.reduce(own) { maximum, child in
+                    guard let candidate = maximumEncodedRawValue(in: child) else { return maximum }
+                    return max(maximum ?? candidate, candidate)
+                }
+            }
+            if let array = value as? [Any] {
+                return array.reduce(nil as UInt64?) { maximum, child in
+                    guard let candidate = maximumEncodedRawValue(in: child) else { return maximum }
+                    return max(maximum ?? candidate, candidate)
+                }
+            }
+            return nil
+        }
+        let highestExistingPhysicalID = maximumEncodedRawValue(in: root) ?? 0
         var base = root["base"] as? [String: Any] ?? [:]
         let scalar = max(0, base["essence"] as? Int ?? 0)
         var inventory = base["inventory"] as? [String: Any] ?? [:]
@@ -89,9 +115,17 @@ enum Migrations {
         carried.removeAll { $0["catalogID"] as? String == "essence_crystal" }
         let total = scalar + physical
         if total > 0 {
-            let usedIDs = (stored + spillover + carried).compactMap { $0["id"] as? Int }
+            let walletID: [String: Any]
+            if let rawValue = encodedRawValue(existingID) {
+                walletID = ["rawValue": NSNumber(value: rawValue)]
+            } else {
+                guard highestExistingPhysicalID < UInt64.max else {
+                    throw CocoaError(.coderInvalidValue)
+                }
+                walletID = ["rawValue": NSNumber(value: highestExistingPhysicalID + 1)]
+            }
             base["essenceCrystals"] = [
-                "id": existingID ?? ["rawValue": (usedIDs.max() ?? 0) + 1],
+                "id": walletID,
                 "catalogID": "essence_crystal", "count": total, "identified": true
             ]
         } else {

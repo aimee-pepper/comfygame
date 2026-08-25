@@ -37,6 +37,35 @@ final class PersistenceTests: XCTestCase {
         XCTAssertEqual(relaunched, migrated)
     }
 
+    func testSchemaOneScalarOnlyMigrationAllocatesCrystalBeyondNestedPhysicalIDs() throws {
+        let legacy = Data(#"""
+        {
+          "schemaVersion":1,
+          "base":{
+            "essence":12,
+            "inventory":{"slots":8,"stacks":[
+              {"id":{"rawValue":801},"catalogID":"salve_lesser","count":1,"identified":true}
+            ]},
+            "spillover":[
+              {"id":{"rawValue":902},"catalogID":"field_ration","count":1,"identified":true}
+            ]
+          }
+        }
+        """#.utf8)
+
+        let migrated = try SaveCodec.decode(legacy)
+        let crystalID = try XCTUnwrap(migrated.base.essenceCrystals?.id)
+        XCTAssertGreaterThan(crystalID.rawValue, 902)
+        XCTAssertEqual(migrated.base.essenceCrystalCount, 12)
+        let allIDs = migrated.base.inventory.stacks.map(\.id)
+            + migrated.base.spillover.map(\.id) + [crystalID]
+        XCTAssertEqual(Set(allIDs).count, allIDs.count)
+
+        let relaunched = try SaveCodec.decode(SaveCodec.encode(migrated))
+        XCTAssertEqual(relaunched.base.essenceCrystals?.id, crystalID)
+        XCTAssertEqual(relaunched, migrated)
+    }
+
     func testSchemaOneMigrationMovesOwnedRunCrystalsWithoutTouchingOffers() throws {
         var legacy = GameState.newGame()
         legacy.schemaVersion = 1

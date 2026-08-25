@@ -2,6 +2,12 @@ import XCTest
 @testable import Bookbinder
 
 final class DistilleryRequirementAuthorityTests: XCTestCase {
+    func testDistilleryCatalogueDescribesAttunementWithoutRetiredManufacture() throws {
+        let station = try XCTUnwrap(ContentCatalog.shared.station(Stations.distillery))
+        XCTAssertEqual(station.blurb, "Attune Essence Crystals through world-made samples.")
+        XCTAssertFalse(station.blurb.localizedCaseInsensitiveContains("crystallise"))
+    }
+
     func testCatalystOptionsAreDerivedFromTheAttunementRequirement() {
         for attunement in CoreAttunement.allCases {
             let expected = DistilleryRules.requirement(for: attunement).catalysts
