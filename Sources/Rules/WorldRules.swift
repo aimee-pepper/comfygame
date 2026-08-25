@@ -686,7 +686,7 @@ enum WorldRules {
                     events.append(.learnedFocus(focus))
                 }
                 if definition.contents.essence > 0 {
-                    state.base.essence += definition.contents.essence
+                    state.base.addEssenceCrystals(definition.contents.essence)
                     events.append(.gainedEssence(definition.contents.essence))
                 }
             }

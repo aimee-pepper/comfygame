@@ -475,8 +475,8 @@ enum PhysicalGearCraftingRules {
             }.map(\.id)
             return .needsSamples(requirementIDs: missing)
         }
-        guard state.base.essence >= preview.essence else {
-            return .needsEssence(have: state.base.essence, need: preview.essence)
+        guard state.base.essenceCrystalCount >= preview.essence else {
+            return .needsEssence(have: state.base.essenceCrystalCount, need: preview.essence)
         }
         return .ready(preview)
     }
@@ -486,10 +486,10 @@ enum PhysicalGearCraftingRules {
         guard state.base.station(preview.recipe.station).isUnlocked,
               isUnlocked(preview.recipe, in: state),
               let fresh = self.preview(preview.recipe, selections: preview.selections, in: state),
-              fresh == preview, state.base.essence >= preview.essence else { return nil }
+              fresh == preview, state.base.essenceCrystalCount >= preview.essence else { return nil }
 
         guard consume(preview.selections, in: &state) else { return nil }
-        state.base.essence -= preview.essence
+        guard state.base.spendEssenceCrystals(preview.essence) else { return nil }
 
         let id = InstanceID(rawValue: state.base.nextItemID())
         var output = ItemStack(id: id, catalogID: preview.recipe.catalogFallback)

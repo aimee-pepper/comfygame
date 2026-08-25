@@ -315,7 +315,7 @@ extension GameStore {
     var canUseNaturalAnchor: Bool {
         naturalAnchorHere != nil
             && state.base.station(Stations.anchorage).isUnlocked
-            && state.base.essence >= naturalAnchorCost
+            && state.base.essenceCrystalCount >= naturalAnchorCost
             && !(activeRun.map { run in state.worlds.anchoredRealms.contains { $0.runIndex == run.runIndex } } ?? true)
     }
 
@@ -333,8 +333,8 @@ extension GameStore {
         mutate("anchor realm at natural point", flush: true, scope: .expedition) { state in
             guard let run = state.worlds.activeRun,
                   !state.worlds.anchoredRealms.contains(where: { $0.runIndex == run.runIndex }),
-                  state.base.essence >= cost else { return }
-            state.base.essence -= cost
+                  state.base.essenceCrystalCount >= cost else { return }
+            guard state.base.spendEssenceCrystals(cost) else { return }
             state.worlds.anchoredRealms.append(
                 AnchoredRealm(runIndex: run.runIndex, name: "Realm \(run.runIndex)",
                               route: .naturalPoint,
@@ -805,9 +805,9 @@ extension GameStore {
         let due = dueRealms
             .filter { payingIDs.contains($0.id) }
             .reduce(0) { $0 + $1.projectedShortfall }
-        guard due <= state.base.essence else { return false }
+        guard due <= state.base.essenceCrystalCount else { return false }
         mutate("settle anchored realms", flush: true, scope: .expedition) { state in
-            state.base.essence -= due
+            guard state.base.spendEssenceCrystals(due) else { return }
             for index in state.worlds.anchoredRealms.indices {
                 guard state.worlds.anchoredRealms[index].projectedShortfall > 0,
                       !state.worlds.anchoredRealms[index].isDormant else { continue }
@@ -828,10 +828,10 @@ extension GameStore {
             return false
         }
         let cost = max(Tuning.Anchoring.minimumReactivationCost, realm.projectedShortfall)
-        guard state.base.essence >= cost else { return false }
+        guard state.base.essenceCrystalCount >= cost else { return false }
         mutate("reactivate anchored realm", flush: true, scope: .expedition) { state in
             guard let index = state.worlds.anchoredRealms.firstIndex(where: { $0.id == id }) else { return }
-            state.base.essence -= cost
+            guard state.base.spendEssenceCrystals(cost) else { return }
             state.worlds.anchoredRealms[index].isDormant = false
         }
         return true

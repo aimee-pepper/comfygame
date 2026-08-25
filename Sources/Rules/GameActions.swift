@@ -125,7 +125,7 @@ extension GameStore {
             if let existing = state.base.personalCompounds.first(where: {
                 $0.provenFingerprint == fingerprint
             }) { return .refused(.alreadyFormalized(existing.id)) }
-            guard state.base.essence >= Tuning.Page.personalCompoundFormalizeEssence,
+            guard state.base.essenceCrystalCount >= Tuning.Page.personalCompoundFormalizeEssence,
                   state.base.resources[Resources.pulp] >= Tuning.Page.personalCompoundFormalizePulp
             else { return .refused(.insufficientResources) }
             return .ready(.init(
@@ -155,7 +155,7 @@ extension GameStore {
                   }),
                   quote.essenceCost == Tuning.Page.personalCompoundFormalizeEssence,
                   quote.pulpCost == Tuning.Page.personalCompoundFormalizePulp,
-                  state.base.essence >= quote.essenceCost,
+                  state.base.essenceCrystalCount >= quote.essenceCost,
                   state.base.resources[Resources.pulp] >= quote.pulpCost
             else { return false }
             let record = PersonalCompoundRecord(
@@ -167,7 +167,7 @@ extension GameStore {
                 creationOrdinal: quote.creationOrdinal)
             guard PageRules.isEffectEquivalent(record, to: receipt),
                   state.base.resources.spend(quote.pulpCost, of: Resources.pulp) else { return false }
-            state.base.essence -= quote.essenceCost
+            guard state.base.spendEssenceCrystals(quote.essenceCost) else { return false }
             state.base.personalCompounds.append(record)
             state.base.nextPersonalCompoundID &+= 1
             state.base.nextPersonalCompoundOrdinal &+= 1
@@ -748,8 +748,8 @@ extension GameStore {
         if bornAnchored && !state.base.station(Stations.anchorage).isUnlocked {
             return .anchorageLocked
         }
-        if state.base.essence < total {
-            return .insufficientEssence(available: state.base.essence, required: total)
+        if state.base.essenceCrystalCount < total {
+            return .insufficientEssence(available: state.base.essenceCrystalCount, required: total)
         }
         if let refusal = Self.inkDepartureRefusal(page: writingDeskActionPage, in: state.base) {
             return .unavailable(refusal)
@@ -848,8 +848,8 @@ extension GameStore {
         if bornAnchored && !state.base.station(Stations.anchorage).isUnlocked {
             return .anchorageLocked
         }
-        if state.base.essence < total {
-            return .insufficientEssence(available: state.base.essence, required: total)
+        if state.base.essenceCrystalCount < total {
+            return .insufficientEssence(available: state.base.essenceCrystalCount, required: total)
         }
         if let refusal = Self.inkDepartureRefusal(page: instance.definition.page, in: state.base) {
             return .unavailable(refusal)
@@ -1091,7 +1091,7 @@ extension GameStore {
                 state: quoteState, selectedWorldPageID: worldPageInstanceID,
                 bornAnchored: bornAnchored) == stagedBindQuote else { return false }
             guard state.worlds.activeRun == nil,
-                  state.base.essence >= book.essencePaid + anchorPremium,
+                  state.base.essenceCrystalCount >= book.essencePaid + anchorPremium,
                   !bornAnchored || state.base.station(Stations.anchorage).isUnlocked else { return false }
             guard case .allowed(let fieldKit) = Self.fieldKitDepartureQuote(in: state) else { return false }
             var selectedIndex: Int?
@@ -1146,8 +1146,7 @@ extension GameStore {
             TutorialRules.pairNewWorld(historyRecord, in: &state)
 
             LibraryRules.advancePatience(after: world.pages, library: &state.reality.library)
-            state.base.essence -= book.essencePaid
-            state.base.essence -= anchorPremium
+            guard state.base.spendEssenceCrystals(book.essencePaid + anchorPremium) else { return false }
             state.worlds.runIndex += 1
             state.reality.lifetime.runsStarted += 1
             state.worlds.lastExit = nil
@@ -1321,6 +1320,6 @@ extension GameStore {
     /// (pillar 2). Nothing accrues while the app is closed, by construction: there is no code
     /// path that can add essence except a player action.
     nonisolated static func creditEssenceSpring(_ state: inout GameState) {
-        state.base.essence += essenceSpringYield(for: state)
+        state.base.addEssenceCrystals(essenceSpringYield(for: state))
     }
 }

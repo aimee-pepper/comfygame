@@ -125,8 +125,8 @@ enum SmithRules {
         guard stock.count >= requirement.count else {
             return .needsMaterials(have: stock.count, need: requirement.count)
         }
-        guard state.base.essence >= requirement.essence else {
-            return .needsEssence(have: state.base.essence, need: requirement.essence)
+        guard state.base.essenceCrystalCount >= requirement.essence else {
+            return .needsEssence(have: state.base.essenceCrystalCount, need: requirement.essence)
         }
         return .ready
     }
@@ -145,11 +145,11 @@ enum SmithRules {
 
     private static func pay(_ requirement: Requirement, in state: inout GameState) -> Bool {
         let spending = Array(candidates(for: requirement, in: state).prefix(requirement.count))
-        guard spending.count == requirement.count, state.base.essence >= requirement.essence
+        guard spending.count == requirement.count, state.base.essenceCrystalCount >= requirement.essence
         else { return false }
 
         guard consume(spending, in: &state) else { return false }
-        state.base.essence -= requirement.essence
+        guard state.base.spendEssenceCrystals(requirement.essence) else { return false }
         return true
     }
 
@@ -432,7 +432,7 @@ enum AnchorFrameRules {
 
     static func canCraft(in state: GameState) -> Bool {
         state.base.station(Stations.anchorage).isUnlocked
-            && state.base.essence >= essenceCost
+            && state.base.essenceCrystalCount >= essenceCost
             && selectedSamples(in: state) != nil
     }
 
@@ -448,14 +448,14 @@ enum AnchorFrameRules {
         if selectedSamples(in: state) == nil && missing.isEmpty {
             missing.append("six distinct qualifying samples")
         }
-        if state.base.essence < essenceCost { missing.append("\(essenceCost - state.base.essence) essence") }
+        if state.base.essenceCrystalCount < essenceCost { missing.append("\(essenceCost - state.base.essenceCrystalCount) essence") }
         return missing.sorted()
     }
 
     static func craft(in state: inout GameState) -> Bool {
         guard canCraft(in: state), let spending = selectedSamples(in: state) else { return false }
         guard SmithRules.consume(spending, in: &state) else { return false }
-        state.base.essence -= essenceCost
+        guard state.base.spendEssenceCrystals(essenceCost) else { return false }
         state.base.store(ItemStack(id: InstanceID(rawValue: state.base.nextItemID()),
                                    catalogID: Items.anchorFrame))
         return true

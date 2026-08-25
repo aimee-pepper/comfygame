@@ -177,7 +177,7 @@ struct ApothecaryView: View {
 
     private var contextRow: some View {
         HStack(spacing: 14) {
-            Label("\(store.state.base.essence)", systemImage: "drop.fill")
+            Label("\(store.state.base.essenceCrystalCount)", systemImage: "drop.fill")
                 .foregroundStyle(.teal)
             Label("\(store.state.reality.motes)", systemImage: "star.fill")
                 .foregroundStyle(.purple)

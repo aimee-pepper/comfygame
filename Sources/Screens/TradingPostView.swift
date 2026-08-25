@@ -203,8 +203,8 @@ struct TradingPostView: View {
             Label("\(store.state.base.goldCoins)", systemImage: "circle.hexagongrid.fill")
                 .accessibilityLabel("Gold coins, \(store.state.base.goldCoins)")
             Divider().frame(height: 22)
-            Label("\(store.state.base.essence)", systemImage: "drop.fill")
-                .accessibilityLabel("Essence, \(store.state.base.essence)")
+            Label("\(store.state.base.essenceCrystalCount)", systemImage: "drop.fill")
+                .accessibilityLabel("Essence, \(store.state.base.essenceCrystalCount)")
             Spacer()
         }
         .font(.headline.monospacedDigit())
@@ -290,7 +290,7 @@ struct TradingPostView: View {
                                       stack: nil,
                                       action: .sellResource(entry.id))
         }
-        let essenceBundles = base.essence / TradingPostRules.essenceSaleUnit
+        let essenceBundles = base.essenceCrystalCount / TradingPostRules.essenceSaleUnit
         if essenceBundles > 0 {
             result.append(TradingPostListing(id: "sell-essence", name: "Refined Essence",
                                              icon: "drop.fill", rarity: .uncommon,

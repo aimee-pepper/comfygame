@@ -85,7 +85,7 @@ struct BlacksmithView: View {
             }
             HStack(spacing: 10) {
                 CurrencyChip(icon: "drop.fill", label: "Essence",
-                             value: "\(store.state.base.essence)", tint: .teal)
+                             value: "\(store.state.base.essenceCrystalCount)", tint: .teal)
                 CurrencyChip(icon: "shippingbox", label: "Stock",
                              value: "\(store.materialSampleCount)")
             }
@@ -253,7 +253,7 @@ struct BowyerView: View {
             VStack(spacing: 16) {
                 HStack(spacing: 12) {
                     CurrencyChip(icon: "drop.fill", label: "Essence",
-                                 value: "\(store.state.base.essence)", tint: .green)
+                                 value: "\(store.state.base.essenceCrystalCount)", tint: .green)
                     CurrencyChip(icon: "shippingbox", label: "Stock",
                                  value: "\(store.materialSampleCount)")
                 }
@@ -596,20 +596,20 @@ private struct ArmouryRebuildSheet: View {
             }
             .buttonStyle(.borderedProminent)
             .controlSize(.large)
-            .disabled(store.state.base.essence < preview.essence)
+            .disabled(store.state.base.essenceCrystalCount < preview.essence)
         }
     }
 
     private func rebuildActionFootnote(_ preview: ArmouryRules.Preview) -> String {
         if let commitFailure { return commitFailure }
-        if store.state.base.essence < preview.essence {
-            return "Needs \(preview.essence - store.state.base.essence) more essence."
+        if store.state.base.essenceCrystalCount < preview.essence {
+            return "Needs \(preview.essence - store.state.base.essenceCrystalCount) more essence."
         }
         return "The selected stock, tier, and cost are checked again before rebuilding."
     }
 
     private func rebuildActionHasFailure(_ preview: ArmouryRules.Preview) -> Bool {
-        commitFailure != nil || store.state.base.essence < preview.essence
+        commitFailure != nil || store.state.base.essenceCrystalCount < preview.essence
     }
 
     private func commit(_ preview: ArmouryRules.Preview, allowLegacy: Bool) {
@@ -630,7 +630,7 @@ struct TanneryView: View {
             VStack(spacing: 16) {
                 HStack(spacing: 12) {
                     CurrencyChip(icon: "drop.fill", label: "Essence",
-                                 value: "\(store.state.base.essence)", tint: .brown)
+                                 value: "\(store.state.base.essenceCrystalCount)", tint: .brown)
                     CurrencyChip(icon: "shippingbox", label: "Stock",
                                  value: "\(store.materialSampleCount)")
                 }
@@ -772,20 +772,20 @@ private struct ConstructionSheet: View {
             }
             .buttonStyle(.borderedProminent)
             .controlSize(.large)
-            .disabled(store.state.base.essence < preview.essence)
+            .disabled(store.state.base.essenceCrystalCount < preview.essence)
         }
     }
 
     private func constructionActionFootnote(_ preview: PhysicalGearCraftingRules.Preview) -> String {
         if let commitFailure { return commitFailure }
-        if store.state.base.essence < preview.essence {
-            return "Needs \(preview.essence - store.state.base.essence) more essence."
+        if store.state.base.essenceCrystalCount < preview.essence {
+            return "Needs \(preview.essence - store.state.base.essenceCrystalCount) more essence."
         }
         return "One persistent piece. Its selected stock and origins stay with it."
     }
 
     private func constructionActionHasFailure(_ preview: PhysicalGearCraftingRules.Preview) -> Bool {
-        commitFailure != nil || store.state.base.essence < preview.essence
+        commitFailure != nil || store.state.base.essenceCrystalCount < preview.essence
     }
 
     private func commit(_ preview: PhysicalGearCraftingRules.Preview) {

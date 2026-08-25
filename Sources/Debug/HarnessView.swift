@@ -94,7 +94,7 @@ struct HarnessView: View {
 
     private var baseCard: some View {
         Card(title: "Village — kept between expeditions", icon: "house.fill") {
-            Row("Essence", "\(state.base.essence)")
+            Row("Essence", "\(state.base.essenceCrystalCount)")
             Row("Sigils known", "\(state.base.ownedSymbols.count)")
             Row("Gambit parts known", "\(state.base.ownedGambitComponents.count) of \(ContentCatalog.shared.gambitComponents.count)")
             Row("Upgrades completed", "\(state.base.completedResearch.count) of \(ContentCatalog.shared.researchNodes.count)")

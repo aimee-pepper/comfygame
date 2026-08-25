@@ -986,11 +986,11 @@ struct WritingDeskView: View {
             if let refusal = activeBindAvailability.refusalMessage { return refusal }
             if store.needsToRefine {
                 let raw = state.base.resources[Resources.essenceRaw]
-                return "You have \(state.base.essence) essence and \(raw) raw. Refine it at the Essence Spring — raw essence can't be written with."
+                return "You have \(state.base.essenceCrystalCount) essence and \(raw) raw. Refine it at the Essence Spring — raw essence can't be written with."
             }
-            return "You have \(state.base.essence) essence; this binding costs \(totalCost). Erase a Sigil or bind it without anchoring."
+            return "You have \(state.base.essenceCrystalCount) essence; this binding costs \(totalCost). Erase a Sigil or bind it without anchoring."
         }
-        return "Costs \(totalCost) essence of your \(state.base.essence)."
+        return "Costs \(totalCost) essence of your \(state.base.essenceCrystalCount)."
     }
 
     private func presentWritingRequestIfNeeded() {

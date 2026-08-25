@@ -164,7 +164,7 @@ struct IdentifyCard: View {
     }
 
     private var identifyEssenceShortfall: Int {
-        max(0, Tuning.Economy.identifyCostEssence - store.state.base.essence)
+        max(0, Tuning.Economy.identifyCostEssence - store.state.base.essenceCrystalCount)
     }
 }
 

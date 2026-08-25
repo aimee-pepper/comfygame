@@ -142,7 +142,7 @@ enum EconomyRules {
         let rate = refinementRate(in: state)
         let gained = amount * rate
         state.base.resources.spend(amount, of: Resources.essenceRaw)
-        state.base.essence += gained
+        state.base.addEssenceCrystals(gained)
         state.base.lifetimeRawEssenceRefined += amount
         return RefinementReceipt(rawSpent: amount, essenceGained: gained, rate: rate)
     }
@@ -177,7 +177,7 @@ enum EconomyRules {
 
     /// Everything the player could turn into essence right now without leaving the base.
     static func spendableEssence(in state: GameState) -> Int {
-        state.base.essence + refine(rawUnits: state.base.resources[Resources.essenceRaw], in: state)
+        state.base.essenceCrystalCount + refine(rawUnits: state.base.resources[Resources.essenceRaw], in: state)
     }
 
     // MARK: Research
@@ -293,7 +293,7 @@ enum EconomyRules {
     }
 
     static func canAfford(_ cost: UpgradeCost, in state: GameState) -> Bool {
-        guard state.base.essence >= cost.essence else { return false }
+        guard state.base.essenceCrystalCount >= cost.essence else { return false }
         return cost.resources.allSatisfy { state.base.resources[$0.key] >= $0.value }
     }
 
@@ -341,7 +341,7 @@ enum EconomyRules {
         let remaining = bindCost.map { $0 > 0 ? Double(after) / $0 : 0 }
         let rawEquivalent = refine(rawUnits: state.base.resources[Resources.essenceRaw], in: state)
         let affordability = EssenceAffordabilityPresentation(
-            action: .study, essenceAvailableNow: state.base.essence,
+            action: .study, essenceAvailableNow: state.base.essenceCrystalCount,
             refinableRawEquivalent: rawEquivalent, actionCost: cost.essence,
             basis: median != nil ? .recentWorld : (currentAuthoredCost != nil ? .currentWorldPreview : nil),
             basisCost: bindCost)
@@ -377,8 +377,8 @@ enum EconomyRules {
     /// What you're short of, for the UI to say so plainly instead of just greying a button out.
     static func shortfall(_ cost: UpgradeCost, in state: GameState) -> [String] {
         var missing: [String] = []
-        if state.base.essence < cost.essence {
-            missing.append("\(cost.essence - state.base.essence) essence")
+        if state.base.essenceCrystalCount < cost.essence {
+            missing.append("\(cost.essence - state.base.essenceCrystalCount) essence")
         }
         for (id, amount) in cost.resources.sorted(by: { $0.key.rawValue < $1.key.rawValue })
         where state.base.resources[id] < amount {
@@ -389,7 +389,7 @@ enum EconomyRules {
     }
 
     static func pay(_ cost: UpgradeCost, in state: inout GameState) {
-        state.base.essence -= cost.essence
+        _ = state.base.spendEssenceCrystals(cost.essence)
         for (id, amount) in cost.resources {
             state.base.resources.spend(amount, of: id)
         }

@@ -4,6 +4,91 @@ import XCTest
 /// The interruptibility pillar, tested. Anything that breaks here breaks pillar 2.
 final class PersistenceTests: XCTestCase {
 
+    func testSchemaOneEssenceMigrationCombinesScalarAndOwnedPhysicalExactlyOnce() throws {
+        let legacy = Data(#"""
+        {
+          "schemaVersion":1,
+          "base":{
+            "essence":37,
+            "inventory":{"slots":1,"stacks":[
+              {"id":{"rawValue":41},"catalogID":"essence_crystal","count":2,"identified":true},
+              {"id":{"rawValue":42},"catalogID":"salve_lesser","count":1,"identified":true}
+            ]},
+            "spillover":[{"id":{"rawValue":43},"catalogID":"essence_crystal","count":3,"identified":true}],
+            "goldCoins":9,
+            "resources":{"amounts":{"essence_raw":7}}
+          }
+        }
+        """#.utf8)
+
+        let migrated = try SaveCodec.decode(legacy)
+        XCTAssertEqual(migrated.schemaVersion, 2)
+        XCTAssertEqual(migrated.base.essenceCrystalCount, 42)
+        XCTAssertEqual(migrated.base.essenceCrystals?.catalogID, Items.essenceCrystal)
+        XCTAssertFalse(migrated.base.inventory.stacks.contains { $0.catalogID == Items.essenceCrystal })
+        XCTAssertFalse(migrated.base.spillover.contains { $0.catalogID == Items.essenceCrystal })
+        XCTAssertEqual(migrated.base.goldCoins, 9)
+        XCTAssertEqual(migrated.base.resources[Resources.essenceRaw], 7)
+        XCTAssertEqual(migrated.base.inventory.stacks.count, 1,
+                       "the crystal wallet must not consume Storehouse capacity")
+
+        let relaunched = try SaveCodec.decode(SaveCodec.encode(migrated))
+        XCTAssertEqual(relaunched.base.essenceCrystalCount, 42)
+        XCTAssertEqual(relaunched, migrated)
+    }
+
+    func testSchemaOneMigrationMovesOwnedRunCrystalsWithoutTouchingOffers() throws {
+        var legacy = GameState.newGame()
+        legacy.schemaVersion = 1
+        legacy.base.essenceCrystals = nil
+        var run = legacyMaterialRun()
+        run.satchelItems.stacks.append(ItemStack(id: .init(rawValue: 510),
+                                                  catalogID: Items.essenceCrystal, count: 4))
+        run.offeredItems.append(ItemStack(id: .init(rawValue: 511),
+                                          catalogID: Items.essenceCrystal, count: 6))
+        legacy.worlds.activeRun = run
+        var root = try XCTUnwrap(JSONSerialization.jsonObject(
+            with: SaveCodec.encode(legacy)) as? [String: Any])
+        root["schemaVersion"] = 1
+        var base = try XCTUnwrap(root["base"] as? [String: Any])
+        base["essence"] = 11
+        root["base"] = base
+
+        let migrated = try SaveCodec.decode(JSONSerialization.data(withJSONObject: root))
+        XCTAssertEqual(migrated.base.essenceCrystalCount, 15)
+        XCTAssertFalse(try XCTUnwrap(migrated.worlds.activeRun).satchelItems.stacks.contains {
+            $0.catalogID == Items.essenceCrystal
+        })
+        XCTAssertEqual(try XCTUnwrap(migrated.worlds.activeRun).offeredItems.first(where: {
+            $0.id == InstanceID(rawValue: 511)
+        })?.count, 6, "merchant/world offers are not already-owned wallet stock")
+    }
+
+    func testPhysicalCrystalWalletIsCapacityNeutralAtomicAndRelaunchStable() throws {
+        var state = GameState.newGame()
+        state.base.inventory = Inventory(slots: 1, stacks: [
+            ItemStack(id: .init(rawValue: 700), catalogID: "salve_lesser")
+        ])
+        state.base.setEssenceCrystalCount(9)
+        let fullInventory = state.base.inventory
+
+        XCTAssertFalse(state.base.spendEssenceCrystals(10))
+        XCTAssertEqual(state.base.essenceCrystalCount, 9)
+        XCTAssertEqual(state.base.inventory, fullInventory)
+        XCTAssertTrue(state.base.spendEssenceCrystals(4))
+        state.base.addEssenceCrystals(6)
+        XCTAssertEqual(state.base.essenceCrystalCount, 11)
+        XCTAssertEqual(state.base.inventory, fullInventory)
+        XCTAssertTrue(state.base.spillover.isEmpty)
+
+        let relaunched = try SaveCodec.decode(SaveCodec.encode(state))
+        XCTAssertEqual(relaunched.base.essenceCrystalCount, 11)
+        XCTAssertEqual(relaunched.base.inventory.stacks, fullInventory.stacks)
+        XCTAssertEqual(relaunched.base.inventory.slots, relaunched.base.inventoryCapacity,
+                       "decode retains the existing derived Storehouse-capacity reconciliation")
+        XCTAssertEqual(relaunched.base.essenceCrystals?.catalogID, Items.essenceCrystal)
+    }
+
     func testLegacyMaterialContainersMigrateEveryKindExactlyOnceAndReencodeCanonically() throws {
         var state = GameState.newGame()
         let samples = MaterialKind.allCases.enumerated().map { index, kind in
@@ -335,6 +420,8 @@ final class PersistenceTests: XCTestCase {
         """
         try FileManager.default.createDirectory(at: io.directory, withIntermediateDirectories: true)
         try Data(partial.utf8).write(to: io.saveURL)
+
+        _ = try SaveCodec.decode(Data(partial.utf8))
 
         let loaded = try XCTUnwrap(io.load().state)
         XCTAssertEqual(loaded.base.essence, 77)

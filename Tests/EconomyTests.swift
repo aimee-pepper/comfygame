@@ -473,7 +473,7 @@ final class EconomyTests: XCTestCase {
 
         XCTAssertTrue(source.contains("Needs \\(identifyEssenceShortfall) more essence to identify."))
         XCTAssertTrue(source.contains(
-            "max(0, Tuning.Economy.identifyCostEssence - store.state.base.essence)"
+            "max(0, Tuning.Economy.identifyCostEssence - store.state.base.essenceCrystalCount)"
         ))
         XCTAssertFalse(source.contains("Not enough essence to identify anything."))
     }

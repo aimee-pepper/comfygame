@@ -83,7 +83,7 @@ enum TutorialRules {
             context = .init(runIndex: run.runIndex, route: .storehouse,
                             reason: .unidentifiedObject, writingID: item.rawValue)
         } else if banked.returnedRawEssence
-                    && state.base.essence < EconomyRules.minimumBindCost(in: state) {
+                    && state.base.essenceCrystalCount < EconomyRules.minimumBindCost(in: state) {
             context = .init(runIndex: run.runIndex, route: .essenceSpring,
                             reason: .rawEssence, writingID: nil)
         } else if let traveller = newTravellers.sorted(by: { $0.rawValue < $1.rawValue }).first {

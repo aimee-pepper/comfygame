@@ -26,7 +26,8 @@ final class SpilloverTests: XCTestCase {
         let distillery = String(source[distilleryStart.lowerBound..<channelworksStart.lowerBound])
         let channelworks = String(source[channelworksStart.lowerBound..<reliquaryStart.lowerBound])
 
-        XCTAssertTrue(distillery.contains("Crystallise essence"))
+        XCTAssertFalse(distillery.contains("Crystallise essence"),
+                       "the retired scalar-to-crystal manufacturing step must stay absent")
         XCTAssertTrue(distillery.contains("attunementCard(attunement)"))
         XCTAssertFalse(distillery.contains("ComingLater"))
         XCTAssertTrue(channelworks.contains("Oda's restored conduit"))
@@ -141,15 +142,13 @@ final class SpilloverTests: XCTestCase {
         XCTAssertFalse(source.contains("Button(\"Improve\") { store.improveInstrument(target.id) }"))
     }
 
-    func testDistilleryReportsStaleCrystallisationAndAttunementFailures() throws {
+    func testDistilleryReportsStaleAttunementFailureWithoutBlankManufacture() throws {
         let source = try stationViewsSource()
 
-        XCTAssertTrue(source.contains("if store.crystalliseEssence()"))
+        XCTAssertFalse(source.contains("if store.crystalliseEssence()"))
         XCTAssertTrue(source.contains("if store.attuneCore(attunement, candidate: chosen, catalyst: catalyst)"))
         XCTAssertTrue(source.contains("Distillery action not completed"))
-        XCTAssertTrue(source.contains("The Essence, Quartz, or Storehouse space changed."))
-        XCTAssertTrue(source.contains("The selected sample, catalyst, blank crystal, Essence, or Storehouse space changed."))
-        XCTAssertFalse(source.contains("Button(\"Crystallise essence\") { store.crystalliseEssence() }"))
+        XCTAssertTrue(source.contains("The selected sample, catalyst, Essence Crystals, or Storehouse space changed."))
     }
 
     func testChannelworksReportsAStaleFixtureConstructionFailure() throws {
@@ -401,7 +400,7 @@ final class SpilloverTests: XCTestCase {
         let store = GameStore(io: .temporary(name: "spillover-\(UUID().uuidString)"))
         store.mutate("test: fund") { state in state.base.essence = 500 }
         store.write("plains")
-        store.bindAndDepart()
+        XCTAssertTrue(store.bindAndDepart(), store.bindError ?? "departure refused")
         return store
     }
 

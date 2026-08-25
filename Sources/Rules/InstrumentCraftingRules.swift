@@ -86,8 +86,8 @@ enum InstrumentCraftingRules {
         guard stock.count >= recipe.count else {
             return .needsMaterials(have: stock.count, need: recipe.count)
         }
-        guard state.base.essence >= recipe.essence else {
-            return .needsEssence(have: state.base.essence, need: recipe.essence)
+        guard state.base.essenceCrystalCount >= recipe.essence else {
+            return .needsEssence(have: state.base.essenceCrystalCount, need: recipe.essence)
         }
         return .ready
     }
@@ -95,11 +95,11 @@ enum InstrumentCraftingRules {
     @discardableResult
     static func craftUpgrade(for target: PressureTargetID, in state: inout GameState) -> Bool {
         guard let recipe = recipe(for: target, in: state),
-              state.base.essence >= recipe.essence else { return false }
+              state.base.essenceCrystalCount >= recipe.essence else { return false }
         let spending = Array(candidates(for: recipe, in: state).prefix(recipe.count))
         guard spending.count == recipe.count,
               state.base.materialReserve.consume(spending.map(\.selection)) != nil else { return false }
-        state.base.essence -= recipe.essence
+        guard state.base.spendEssenceCrystals(recipe.essence) else { return false }
         state.reality.instrumentPrecisions[target] = recipe.output
         return true
     }

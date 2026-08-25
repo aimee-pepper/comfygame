@@ -16,29 +16,6 @@ struct DistilleryView: View {
     var body: some View {
         ScrollView {
             VStack(spacing: 16) {
-                StationCard(title: "Crystallise", icon: "diamond.fill") {
-                    let readiness = DistilleryRules.crystallisationReadiness(in: store.state)
-                    Text("A stable blank. Quartz is the lattice; essence remains the thing being held.")
-                        .font(.caption).foregroundStyle(.secondary)
-                    LabeledRow(icon: "drop.fill", label: "Essence",
-                               value: "\(DistilleryRules.blankEssence)")
-                    LabeledRow(icon: "diamond", label: "Quartz",
-                               value: "\(DistilleryRules.blankQuartz)")
-                    Label(crystallisationReadinessText(readiness),
-                          systemImage: readiness == .ready
-                              ? "checkmark.circle.fill" : "exclamationmark.circle")
-                        .font(.caption.weight(.semibold))
-                        .foregroundStyle(readiness == .ready ? Color.green : Color.orange)
-                    Button("Crystallise essence") {
-                        if store.crystalliseEssence() {
-                            actionFailure = nil
-                        } else {
-                            actionFailure = "The Essence, Quartz, or Storehouse space changed. Review the crystallisation requirements and try again."
-                        }
-                    }
-                        .buttonStyle(.borderedProminent).frame(maxWidth: .infinity, minHeight: 44)
-                        .disabled(readiness != .ready)
-                }
                 ForEach(CoreAttunement.allCases, id: \.self) { attunement in
                     attunementCard(attunement)
                 }
@@ -54,18 +31,6 @@ struct DistilleryView: View {
             Button("OK", role: .cancel) {}
         } message: {
             Text(actionFailure ?? "The Distillery action could not be completed.")
-        }
-    }
-
-    private func crystallisationReadinessText(
-        _ readiness: DistilleryRules.CrystallisationReadiness
-    ) -> String {
-        switch readiness {
-        case .ready: "Ready to crystallise"
-        case .stationLocked: "Distillery unavailable"
-        case .needsEssence(let have, let need): "Needs \(need) Essence · \(have) held"
-        case .needsQuartz(let have, let need): "Needs \(need) Quartz · \(have) held"
-        case .needsRoom: "Needs room in the Storehouse"
         }
     }
 
@@ -109,7 +74,7 @@ struct DistilleryView: View {
                         if store.attuneCore(attunement, candidate: chosen, catalyst: catalyst) {
                             actionFailure = nil
                         } else {
-                            actionFailure = "The selected sample, catalyst, blank crystal, Essence, or Storehouse space changed. Review this core's requirements and try again."
+                            actionFailure = "The selected sample, catalyst, Essence Crystals, or Storehouse space changed. Review this core's requirements and try again."
                         }
                     }.buttonStyle(.borderedProminent).frame(maxWidth: .infinity, minHeight: 44)
                         .disabled(readiness != .ready)
@@ -127,7 +92,6 @@ struct DistilleryView: View {
         case .unsupportedCatalyst: "Selected catalyst is not valid for this core"
         case .needsCatalyst(let resource, let have, let need):
             "Needs \(need) \(StationCataloguePresentation.resourceName(resource)) · \(have) held"
-        case .needsBlankCrystal: "Needs one blank Essence Crystal"
         case .needsRoom: "Needs room in the Storehouse"
         }
     }
@@ -147,7 +111,8 @@ struct DistilleryView: View {
         if let minimum = rule.minimumInsulation { sample.append("insulating \(Int(minimum))+") }
         if let minimum = rule.minimumLustre { sample.append("lustrous \(Int(minimum))+") }
         if let minimum = rule.minimumHardness { sample.append("hard \(Int(minimum))+") }
-        return (["\(rule.essence) essence", catalyst] + sample).joined(separator: " · ") + " sample"
+        return (["\(rule.essence) Essence Crystals", catalyst] + sample)
+            .joined(separator: " · ") + " sample"
     }
     private func coreIcon(_ value: CoreAttunement) -> String {
         switch value { case .heat: "flame.circle.fill"; case .caustic: "drop.triangle.fill"; case .light: "sun.max.circle.fill" }
@@ -370,7 +335,7 @@ struct AnchorageView: View {
                             if realm.isDormant {
                                 let cost = max(Tuning.Anchoring.minimumReactivationCost,
                                                realm.projectedShortfall)
-                                let missingEssence = max(0, cost - store.state.base.essence)
+                                let missingEssence = max(0, cost - store.state.base.essenceCrystalCount)
                                 Button {
                                     if store.reactivateAnchoredRealm(realm.id) {
                                         actionFailure = nil
@@ -382,7 +347,7 @@ struct AnchorageView: View {
                                         .frame(maxWidth: .infinity).frame(minHeight: 44)
                                 }
                                 .buttonStyle(.bordered)
-                                .disabled(store.state.base.essence < cost)
+                                .disabled(store.state.base.essenceCrystalCount < cost)
                                 if missingEssence > 0 {
                                     Text("Needs \(missingEssence) more Essence to reactivate.")
                                         .font(.caption)
@@ -1082,7 +1047,7 @@ struct WorkshopView: View {
         ScrollView {
             VStack(spacing: 16) {
                 HStack(spacing: 12) {
-                    CurrencyChip(icon: "drop.fill", label: "Essence", value: "\(store.state.base.essence)", tint: .teal)
+                    CurrencyChip(icon: "drop.fill", label: "Essence", value: "\(store.state.base.essenceCrystalCount)", tint: .teal)
                     CurrencyChip(icon: "cube", label: "Ore", value: "\(store.state.base.resources[Resources.ore])")
                     CurrencyChip(icon: "scribble", label: "Fiber", value: "\(store.state.base.resources[Resources.fiber])")
                 }
@@ -1132,7 +1097,7 @@ struct ScriptoriumView: View {
             VStack(spacing: 16) {
                 HStack(spacing: 12) {
                     CurrencyChip(icon: "drop.fill", label: "Essence",
-                                 value: "\(store.state.base.essence)", tint: .teal)
+                                 value: "\(store.state.base.essenceCrystalCount)", tint: .teal)
                     CurrencyChip(icon: "pencil", label: "Hand",
                                  value: store.state.base.bestHand.displayName)
                 }
@@ -1441,7 +1406,7 @@ struct SurveyPostView: View {
             VStack(spacing: 16) {
                 HStack(spacing: 12) {
                     CurrencyChip(icon: "drop.fill", label: "Essence",
-                                 value: "\(store.state.base.essence)", tint: .teal)
+                                 value: "\(store.state.base.essenceCrystalCount)", tint: .teal)
                     CurrencyChip(icon: "ruler", label: "Instruments",
                                  value: "\(store.state.reality.instruments.count) owned · \(store.state.reality.observations.count) calibrated")
                 }
@@ -1669,7 +1634,7 @@ struct EssenceSpringView: View {
             VStack(spacing: 16) {
                 HStack(spacing: 12) {
                     CurrencyChip(icon: "drop.fill", label: "Essence",
-                                 value: "\(store.state.base.essence)", tint: .teal)
+                                 value: "\(store.state.base.essenceCrystalCount)", tint: .teal)
                     CurrencyChip(icon: "arrow.down.circle", label: "Return",
                                  value: "+\(store.essenceSpringYield)")
                     CurrencyChip(icon: "chart.bar", label: "Tier",

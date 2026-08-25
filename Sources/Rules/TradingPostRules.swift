@@ -195,7 +195,8 @@ enum TradingPostRules {
     static func previewSale(resources requested: [ResourceID: Int],
                             items itemRequests: [TradingPostItemSaleRequest] = [], essence: Int = 0,
                             in base: BaseState) -> TradingPostSalePreview? {
-        guard essence >= 0, essence % essenceSaleUnit == 0, base.essence >= essence else { return nil }
+        guard essence >= 0, essence % essenceSaleUnit == 0,
+              base.essenceCrystalCount >= essence else { return nil }
         var lines: [TradingPostSalePreview.ResourceLine] = []
         var total = essence / essenceSaleUnit
         for (id, quantity) in requested.sorted(by: { $0.key.rawValue < $1.key.rawValue }) {
@@ -250,7 +251,7 @@ enum TradingPostRules {
         }
         base.inventory = inventory
         base.spillover = overflow
-        base.essence -= preview.essenceQuantity
+        guard base.spendEssenceCrystals(preview.essenceQuantity) else { return .invalid }
         base.goldCoins += preview.goldTotal
         base.tradingPost.inventoryRevision &+= 1
         return .committed
@@ -396,7 +397,7 @@ enum TradingPostRules {
             guard base.tradingPost.essenceBundlesRemaining >= preview.quantity,
                   preview.goldCost == preview.quantity * essencePurchasePrice else { return .invalid }
             base.tradingPost.essenceBundlesRemaining -= preview.quantity
-            base.essence += preview.quantity * essencePurchaseQuantity
+            base.addEssenceCrystals(preview.quantity * essencePurchaseQuantity)
         }
         base.goldCoins -= preview.goldCost
         base.tradingPost.inventoryRevision &+= 1

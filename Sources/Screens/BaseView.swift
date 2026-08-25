@@ -155,7 +155,7 @@ struct BaseView: View {
             Spacer(minLength: 4)
             HStack(spacing: 5) {
                 CompactCurrency(icon: "drop.fill", label: "Essence",
-                                value: state.base.essence, tint: .teal)
+                                value: state.base.essenceCrystalCount, tint: .teal)
                 Text("·").foregroundStyle(PixelUITheme.muted)
                 CompactCurrency(icon: "star.fill", label: "Motes",
                                 value: state.reality.motes, tint: .purple)

@@ -9,12 +9,21 @@ struct FieldKitPreparationEntry: Codable, Equatable, Sendable, Identifiable {
 
 /// Layer 2 — Home Base. Persists between runs; a future reset wipes this and keeps `RealityState`.
 struct BaseState: Codable, Equatable, Sendable {
-    /// Refined common currency: binds books, identifies items, buys upgrades.
-    var essence: Int = Tuning.Economy.startingEssence
+    /// Compatibility spelling for older callers and fixtures. The durable authority is the
+    /// physical `essence_crystal` stack below; no scalar balance is stored or encoded.
+    var essence: Int {
+        get { essenceCrystalCount }
+        set { setEssenceCrystalCount(newValue) }
+    }
     /// Raw stockpiles hauled home (Ore, Fiber, Essence-raw…). Motes live in Reality.
     var resources: ResourcePool = ResourcePool()
     /// Exact harvested material samples. Bulk reserves never consume Storehouse slots.
     var materialReserve: MaterialReserve = MaterialReserve()
+    /// The physical wallet. It uses the existing catalogue item and art identity, but is not a
+    /// Storehouse slot, spillover decision, merchant offer, or expedition stack.
+    var essenceCrystals: ItemStack? = ItemStack(
+        id: InstanceID(rawValue: 1), catalogID: Items.essenceCrystal,
+        count: Tuning.Economy.startingEssence)
     var inventory: Inventory = Inventory(slots: Tuning.Economy.startingInventorySlots)
     /// Durable desired quantities for the next expedition. `nil` is a legacy save that has not
     /// yet reviewed the conservative suggested Field Kit; an explicit empty array is player intent.
@@ -343,10 +352,42 @@ struct BaseState: Codable, Equatable, Sendable {
     /// piece coming off somebody can't collide with one already on the shelf.
     func nextItemID() -> UInt64 {
         let stored = inventory.stacks.map(\.id.rawValue) + spillover.map(\.id.rawValue)
+            + [essenceCrystals?.id.rawValue].compactMap { $0 }
         let worn = Array(binderEquipped.values).compactMap { $0.gearProfile?.stableInstanceID.rawValue }
             + roster.flatMap { $0.equipped.values.compactMap { $0.gearProfile?.stableInstanceID.rawValue } }
         let merchant = tradingPost.stock.flatMap(\.frozenUnits).map(\.id.rawValue)
         return ((stored + worn + merchant).max() ?? 0) + 1
+    }
+
+    var essenceCrystalCount: Int {
+        guard essenceCrystals?.catalogID == Items.essenceCrystal else { return 0 }
+        return max(0, essenceCrystals?.count ?? 0)
+    }
+
+    mutating func setEssenceCrystalCount(_ amount: Int) {
+        let amount = max(0, amount)
+        let existingID = essenceCrystals?.catalogID == Items.essenceCrystal
+            ? essenceCrystals?.id.rawValue : nil
+            ?? inventory.stacks.first(where: { $0.catalogID == Items.essenceCrystal })?.id.rawValue
+            ?? spillover.first(where: { $0.catalogID == Items.essenceCrystal })?.id.rawValue
+        inventory.stacks.removeAll { $0.catalogID == Items.essenceCrystal }
+        spillover.removeAll { $0.catalogID == Items.essenceCrystal }
+        guard amount > 0 else { essenceCrystals = nil; return }
+        let id = existingID ?? nextItemID()
+        essenceCrystals = ItemStack(id: InstanceID(rawValue: id),
+                                    catalogID: Items.essenceCrystal, count: amount)
+    }
+
+    mutating func addEssenceCrystals(_ amount: Int) {
+        guard amount != 0 else { return }
+        setEssenceCrystalCount(essenceCrystalCount + amount)
+    }
+
+    @discardableResult
+    mutating func spendEssenceCrystals(_ amount: Int) -> Bool {
+        guard amount >= 0, essenceCrystalCount >= amount else { return false }
+        setEssenceCrystalCount(essenceCrystalCount - amount)
+        return true
     }
 
     /// `Inventory.slots` is the stored capacity (the run satchel has its own), so it has to be
@@ -361,7 +402,7 @@ struct BaseState: Codable, Equatable, Sendable {
     /// Explicit because `companion` is no longer stored — it's a window onto the roster — and the
     /// decoder still has to be able to read it out of a save written before the roster existed.
     private enum CodingKeys: String, CodingKey {
-        case essence, resources, materialReserve, inventory, preparationLoadout, preparationLoadoutNeedsReview
+        case essence, essenceCrystals, resources, materialReserve, inventory, preparationLoadout, preparationLoadoutNeedsReview
         case satchelLoadout, spillover, goldCoins, tradingPost, recycler
         case lifetimeRawEssenceRefined, autoRefineReturnedRawEssence, lastAutoRefinedOutcomeID
         case ownedSymbols, ownedGambitComponents
@@ -382,7 +423,10 @@ struct BaseState: Codable, Equatable, Sendable {
 
     func encode(to encoder: Encoder) throws {
         var c = encoder.container(keyedBy: CodingKeys.self)
-        try c.encode(essence, forKey: .essence)
+        // Keep the historical wire key fail-closed for tolerant older tooling. Version 2 stores
+        // the real balance only in the canonical physical item stack.
+        try c.encode(0, forKey: .essence)
+        try c.encodeIfPresent(essenceCrystals, forKey: .essenceCrystals)
         try c.encode(resources, forKey: .resources)
         try c.encode(materialReserve, forKey: .materialReserve)
         try c.encode(inventory, forKey: .inventory)
@@ -434,7 +478,8 @@ struct BaseState: Codable, Equatable, Sendable {
 
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        essence = try container.decodeIfPresent(Int.self, forKey: .essence) ?? Tuning.Economy.startingEssence
+        let legacyEssence = max(0, try container.decodeIfPresent(Int.self, forKey: .essence) ?? 0)
+        essenceCrystals = try container.decodeIfPresent(ItemStack.self, forKey: .essenceCrystals)
         resources = try container.decodeIfPresent(ResourcePool.self, forKey: .resources) ?? ResourcePool()
         materialReserve = try container.decodeIfPresent(MaterialReserve.self,
                                                         forKey: .materialReserve) ?? MaterialReserve()
@@ -623,6 +668,9 @@ struct BaseState: Codable, Equatable, Sendable {
         // the whole reason the numbers live in one file. It can only ever grow the storehouse:
         // `syncInventoryCapacity` doesn't touch what's in it.
         syncInventoryCapacity()
+        // SaveCodec's schema migration clears this value. Retaining this decode fallback keeps
+        // direct JSONDecoder callers safe and makes the transformation idempotent.
+        if legacyEssence > 0 { addEssenceCrystals(legacyEssence) }
     }
 
     /// Equipped legacy saves had no instance id. Assign one once, after every storage location has

@@ -3,9 +3,9 @@ import Foundation
 /// Auber's finite essence work. Bulk stock and provenance-bearing samples intentionally remain
 /// separate inputs: aggregate resources must never pretend to have world properties or an origin.
 enum DistilleryRules {
-    static let blankEssence = 40
-    static let blankQuartz = 2
-    static let attuneEssence = 15
+    /// The former blank-manufacture step spent scalar Essence to manufacture this same currency
+    /// item. Attunement now spends the corrected complete physical-crystal cost directly.
+    static let attuneEssence = 16
 
     struct AttunementRequirement: Sendable {
         let essence: Int
@@ -62,15 +62,6 @@ enum DistilleryRules {
         case sampleUnavailable
         case unsupportedCatalyst
         case needsCatalyst(resource: ResourceID, have: Int, need: Int)
-        case needsBlankCrystal
-        case needsRoom
-    }
-
-    enum CrystallisationReadiness: Equatable, Sendable {
-        case ready
-        case stationLocked
-        case needsEssence(have: Int, need: Int)
-        case needsQuartz(have: Int, need: Int)
         case needsRoom
     }
 
@@ -94,37 +85,6 @@ enum DistilleryRules {
         Int((candidate.sample.grade * 0.7 + candidate.relevantProperty * 0.3).rounded())
     }
 
-    static func canCrystallise(in state: GameState) -> Bool {
-        crystallisationReadiness(in: state) == .ready
-    }
-
-    static func crystallisationReadiness(in state: GameState) -> CrystallisationReadiness {
-        guard state.base.station(Stations.distillery).isUnlocked else { return .stationLocked }
-        guard state.base.essence >= blankEssence else {
-            return .needsEssence(have: state.base.essence, need: blankEssence)
-        }
-        let quartz = state.base.resources[Resources.quartz]
-        guard quartz >= blankQuartz else {
-            return .needsQuartz(have: quartz, need: blankQuartz)
-        }
-        guard canStore(output(catalogID: Items.essenceCrystal,
-                              core: DistilledCore(attunement: nil, potency: 0,
-                                                  catalystCount: 0)), in: state) else {
-            return .needsRoom
-        }
-        return .ready
-    }
-
-    @discardableResult
-    static func crystallise(in state: inout GameState) -> Bool {
-        guard canCrystallise(in: state) else { return false }
-        state.base.essence -= blankEssence
-        state.base.resources.spend(blankQuartz, of: Resources.quartz)
-        return state.base.inventory.add(output(catalogID: Items.essenceCrystal,
-                                               core: DistilledCore(attunement: nil, potency: 0,
-                                                                   catalystCount: 0), in: state))
-    }
-
     static func canAttune(_ attunement: CoreAttunement, candidate: Candidate,
                           catalyst: ResourceID, in state: GameState) -> Bool {
         readiness(attunement, candidate: candidate, catalyst: catalyst, in: state) == .ready
@@ -134,8 +94,8 @@ enum DistilleryRules {
                           catalyst: ResourceID, in state: GameState) -> AttunementReadiness {
         let requirement = requirement(for: attunement)
         guard state.base.station(Stations.distillery).isUnlocked else { return .stationLocked }
-        guard state.base.essence >= requirement.essence else {
-            return .needsEssence(have: state.base.essence, need: requirement.essence)
+        guard state.base.essenceCrystalCount >= requirement.essence else {
+            return .needsEssence(have: state.base.essenceCrystalCount, need: requirement.essence)
         }
         guard candidates(for: attunement, in: state).contains(candidate) else {
             return .sampleUnavailable
@@ -147,13 +107,10 @@ enum DistilleryRules {
         guard catalystHeld >= required.amount else {
             return .needsCatalyst(resource: catalyst, have: catalystHeld, need: required.amount)
         }
-        guard state.base.inventory.stacks.contains(where: {
-            $0.catalogID == Items.essenceCrystal && $0.count > 0
-        }) else { return .needsBlankCrystal }
         let core = provenance(for: attunement, candidate: candidate,
                               catalyst: (required.resource, required.amount))
         guard canStore(output(catalogID: item(for: attunement), core: core), in: state,
-                       replacingOneBlank: true, consuming: candidate) else { return .needsRoom }
+                       consuming: candidate) else { return .needsRoom }
         return .ready
     }
 
@@ -166,11 +123,10 @@ enum DistilleryRules {
         var staged = state
         let catalystReceipt = (required.resource, required.amount)
         let core = provenance(for: attunement, candidate: candidate, catalyst: catalystReceipt)
-        guard removeOne(catalogID: Items.essenceCrystal, from: &staged.base.inventory),
+        guard staged.base.spendEssenceCrystals(requirement.essence),
               remove(candidate: candidate, from: &staged.base),
               staged.base.inventory.add(output(catalogID: item(for: attunement), core: core,
                                                in: staged)) else { return false }
-        staged.base.essence -= requirement.essence
         staged.base.resources.spend(required.amount, of: catalyst)
         state = staged
         return true

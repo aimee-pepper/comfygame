@@ -186,13 +186,6 @@ extension GameStore {
         return result
     }
 
-    @discardableResult func crystalliseEssence() -> Bool {
-        guard DistilleryRules.canCrystallise(in: state) else { return false }
-        var made = false
-        mutate("crystallise essence", flush: true) { made = DistilleryRules.crystallise(in: &$0) }
-        return made
-    }
-
     @discardableResult func attuneCore(_ attunement: CoreAttunement,
                                        candidate: DistilleryRules.Candidate,
                                        catalyst: ResourceID) -> Bool {
@@ -288,13 +281,13 @@ extension GameStore {
         guard state.worlds.activeRun == nil else { return 0 }
         let floor = EconomyRules.minimumBindCost(in: state)
         let subsidy = max(0, floor - EconomyRules.spendableEssence(in: state))
-        state.base.essence += subsidy
+        state.base.addEssenceCrystals(subsidy)
         return subsidy
     }
 
     /// True when the only thing standing between the player and a world is a trip to the Refinery.
     var needsToRefine: Bool {
-        state.base.essence < EconomyRules.minimumBindCost(in: state)
+        state.base.essenceCrystalCount < EconomyRules.minimumBindCost(in: state)
             && state.base.resources[Resources.essenceRaw] > 0
     }
 
@@ -410,13 +403,13 @@ extension GameStore {
 
     var unidentifiedStacks: [ItemStack] { state.base.inventory.stacks.filter { !$0.identified } }
 
-    var canAffordIdentify: Bool { state.base.essence >= Tuning.Economy.identifyCostEssence }
+    var canAffordIdentify: Bool { state.base.essenceCrystalCount >= Tuning.Economy.identifyCostEssence }
 
     /// Find out what a curio actually is. The small version of the per-component identification
     /// the writing system will want later.
     func identify(_ stack: ItemStack) -> IdentificationCommitResult {
         func candidate(from current: GameState) -> IdentificationEvaluation {
-            guard current.base.essence >= Tuning.Economy.identifyCostEssence else {
+            guard current.base.essenceCrystalCount >= Tuning.Economy.identifyCostEssence else {
                 return .refused("Not enough Essence to identify this item.")
             }
             guard let index = current.base.inventory.stacks.firstIndex(where: { $0.id == stack.id }),
@@ -439,7 +432,9 @@ extension GameStore {
             guard candidate.base.inventory.add(identified) else {
                 return .refused("The Storehouse needs room for the identified item.")
             }
-            candidate.base.essence -= Tuning.Economy.identifyCostEssence
+            guard candidate.base.spendEssenceCrystals(Tuning.Economy.identifyCostEssence) else {
+                return .refused("The available Essence Crystals changed. Review the cost and try again.")
+            }
             return .ready(candidate, revealed)
         }
 
@@ -1055,7 +1050,7 @@ extension GameStore {
 
     func canRespec(_ member: PartyMember) -> Bool {
         let cost = respecCost(for: member)
-        return activeEncounter == nil && cost > 0 && state.base.essence >= cost
+        return activeEncounter == nil && cost > 0 && state.base.essenceCrystalCount >= cost
     }
 
     /// **The Spring takes it back.** Every point returns and can be spent again.
@@ -1063,7 +1058,7 @@ extension GameStore {
         guard canRespec(member) else { return }
         let cost = respecCost(for: member)
         mutate("respec \(name(of: member))", flush: true) { state in
-            state.base.essence -= cost
+            guard state.base.spendEssenceCrystals(cost) else { return }
             state.base.withCharacter(member) { CombatTreeRules.forget(&$0) }
         }
     }

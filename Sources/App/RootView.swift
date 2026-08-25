@@ -219,7 +219,7 @@ private struct AnchorSettlementView: View {
     private var total: Int {
         realms.filter { decisions[$0.id] == .sustain }.reduce(0) { $0 + $1.projectedShortfall }
     }
-    private var remaining: Int { store.state.base.essence - total }
+    private var remaining: Int { store.state.base.essenceCrystalCount - total }
     private var bindCost: Int { EconomyRules.minimumBindCost(in: store.state) }
     private var bindRunway: Int { max(0, remaining) / max(1, bindCost) }
     private var restCount: Int { decisions.values.filter { $0 == .letRest }.count }
@@ -262,7 +262,7 @@ private struct AnchorSettlementView: View {
             .safeAreaInset(edge: .bottom) {
                 VStack(spacing: 8) {
                     HStack {
-                        summary("Available", store.state.base.essence)
+                        summary("Available", store.state.base.essenceCrystalCount)
                         summary("Payment", total)
                         summary("Remaining", remaining)
                     }

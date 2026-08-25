@@ -106,7 +106,7 @@ enum ConsumableCraftingRules {
             missing.append("\(amount - state.base.resources[id]) \(name)")
         }
         if state.reality.motes < recipe.motes { missing.append("\(recipe.motes - state.reality.motes) mote") }
-        if state.base.essence < recipe.essence { missing.append("\(recipe.essence - state.base.essence) essence") }
+        if state.base.essenceCrystalCount < recipe.essence { missing.append("\(recipe.essence - state.base.essenceCrystalCount) essence") }
         return missing.sorted()
     }
 
@@ -123,7 +123,7 @@ enum ConsumableCraftingRules {
         }
         for (id, amount) in recipe.resources { state.base.resources.spend(amount, of: id) }
         state.reality.motes -= recipe.motes
-        state.base.essence -= recipe.essence
+        guard state.base.spendEssenceCrystals(recipe.essence) else { return false }
         state.base.store(ItemStack(id: InstanceID(rawValue: state.base.nextItemID()),
                                    catalogID: recipe.output))
         return true

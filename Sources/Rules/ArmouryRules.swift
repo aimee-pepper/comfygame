@@ -196,7 +196,7 @@ enum ArmouryRules {
                                        selections: preview.selections,
                                        includeLegacy: allowLegacyLoss, in: state),
               fresh == preview, (!preview.destroysLegacyWork || allowLegacyLoss),
-              state.base.essence >= preview.essence else { return false }
+              state.base.essenceCrystalCount >= preview.essence else { return false }
 
         var rebuilt = current.gearProfile!
         rebuilt.constructionTier = preview.outputTier
@@ -209,7 +209,7 @@ enum ArmouryRules {
         rebuilt.recipeVersion = 1
 
         guard PhysicalGearCraftingRules.consume(preview.selections, in: &state) else { return false }
-        state.base.essence -= preview.essence
+        guard state.base.spendEssenceCrystals(preview.essence) else { return false }
         apply(rebuilt, to: current, in: &state)
         return true
     }

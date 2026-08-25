@@ -118,7 +118,7 @@ struct WorldFieldContextReceiptV1: Equatable, Sendable {
                 interactionState = .unavailable(reason: "Not while something is standing over you.")
             } else if isNaturalAnchor && !state.base.station(Stations.anchorage).isUnlocked {
                 interactionState = .unavailable(reason: "Unlock the Anchorage first.")
-            } else if isNaturalAnchor && state.base.essence < anchorCost {
+            } else if isNaturalAnchor && state.base.essenceCrystalCount < anchorCost {
                 interactionState = .unavailable(reason: "You need \(anchorCost) essence.")
             } else if isNaturalAnchor && state.worlds.anchoredRealms.contains(where: { $0.runIndex == run.runIndex }) {
                 interactionState = .unavailable(reason: "This world is already anchored.")
@@ -787,7 +787,7 @@ final class GameStore: ObservableObject {
         if state.worlds.activeRun == nil {
             let floor = EconomyRules.minimumBindCost(in: state)
             if EconomyRules.spendableEssence(in: state) < floor {
-                state.base.essence += max(0, floor - EconomyRules.spendableEssence(in: state))
+                state.base.addEssenceCrystals(max(0, floor - EconomyRules.spendableEssence(in: state)))
             }
         }
         let reconciledAt = DispatchTime.now().uptimeNanoseconds

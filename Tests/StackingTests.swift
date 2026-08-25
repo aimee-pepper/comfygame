@@ -64,13 +64,6 @@ final class DistilleryRequirementAuthorityTests: XCTestCase {
 
         state.base.resources.add(2, of: Resources.sulfur)
         XCTAssertEqual(DistilleryRules.readiness(.heat, candidate: candidate,
-                                                  catalyst: Resources.sulfur, in: state),
-                       .needsBlankCrystal)
-
-        state.base.inventory.add(ItemStack(id: InstanceID(rawValue: 2),
-                                           catalogID: Items.essenceCrystal,
-                                           distilledCore: DistilledCore(attunement: nil, potency: 0)))
-        XCTAssertEqual(DistilleryRules.readiness(.heat, candidate: candidate,
                                                   catalyst: Resources.sulfur, in: state), .ready)
         XCTAssertTrue(DistilleryRules.canAttune(.heat, candidate: candidate,
                                                 catalyst: Resources.sulfur, in: state))
@@ -86,22 +79,25 @@ final class DistilleryRequirementAuthorityTests: XCTestCase {
         XCTAssertTrue(DistilleryRules.candidates(for: .heat, in: state).isEmpty)
     }
 
-    func testCrystallisationReadinessNamesTheExactMissingInput() {
+    func testAttunementSpendsSixteenPhysicalCrystalsWithoutBlankManufacture() throws {
         var state = GameState.newGame()
-        XCTAssertEqual(DistilleryRules.crystallisationReadiness(in: state), .stationLocked)
-
         state.base.stations[Stations.distillery] = StationState(isUnlocked: true, tier: 0)
-        state.base.essence = 0
-        XCTAssertEqual(DistilleryRules.crystallisationReadiness(in: state),
-                       .needsEssence(have: 0, need: DistilleryRules.blankEssence))
+        state.base.essence = DistilleryRules.attuneEssence
+        state.base.resources.add(2, of: Resources.sulfur)
+        let sample = MaterialSample(kind: .reagent,
+            properties: MaterialProperties(insulation: 30, reactivity: 80),
+            grade: 70, source: "ashen bloom")
+        state.base.materialReserve.addHarvested(sample, count: 1,
+                                                sourceReceipt: "test", dropOrdinal: 0)
+        let candidate = try XCTUnwrap(DistilleryRules.candidates(for: .heat, in: state).first)
 
-        state.base.essence = DistilleryRules.blankEssence
-        XCTAssertEqual(DistilleryRules.crystallisationReadiness(in: state),
-                       .needsQuartz(have: 0, need: DistilleryRules.blankQuartz))
-
-        state.base.resources.add(DistilleryRules.blankQuartz, of: Resources.quartz)
-        XCTAssertEqual(DistilleryRules.crystallisationReadiness(in: state), .ready)
-        XCTAssertTrue(DistilleryRules.canCrystallise(in: state))
+        XCTAssertTrue(DistilleryRules.attune(.heat, candidate: candidate,
+                                              catalyst: Resources.sulfur, in: &state))
+        XCTAssertEqual(state.base.essenceCrystalCount, 0)
+        XCTAssertTrue(state.base.inventory.stacks.contains { $0.catalogID == Items.heatCore })
+        XCTAssertFalse(state.base.inventory.stacks.contains {
+            $0.catalogID == Items.essenceCrystal && $0.distilledCore?.attunement == nil
+        })
     }
 }
 
@@ -273,8 +269,6 @@ final class StackingTests: XCTestCase {
         state.base.stations[Stations.distillery] = StationState(isUnlocked: true, tier: 0)
         state.base.essence = 100
         state.base.resources.add(2, of: Resources.sulfur)
-        state.base.inventory.add(ItemStack(id: InstanceID(rawValue: 1), catalogID: Items.essenceCrystal,
-                                           distilledCore: DistilledCore(attunement: nil, potency: 0)))
         state.base.inventory.add(ItemStack(id: InstanceID(rawValue: 2), catalogID: Items.material,
                                            material: MaterialSample(kind: .reagent,
                                                properties: MaterialProperties(insulation: 30, reactivity: 80),
@@ -284,7 +278,7 @@ final class StackingTests: XCTestCase {
         let candidate = try XCTUnwrap(DistilleryRules.candidates(for: .heat, in: state).first)
         XCTAssertTrue(DistilleryRules.attune(.heat, candidate: candidate,
                                              catalyst: Resources.sulfur, in: &state))
-        XCTAssertEqual(state.base.essence, 85)
+        XCTAssertEqual(state.base.essence, 84)
         XCTAssertEqual(state.base.resources[Resources.sulfur], 0)
         let core = try XCTUnwrap(state.base.inventory.stacks.first { $0.catalogID == Items.heatCore }?.distilledCore)
         XCTAssertEqual(core.potency, 73)
@@ -297,8 +291,6 @@ final class StackingTests: XCTestCase {
         state.base.essence = 100
         state.base.resources.add(2, of: Resources.sulfur)
         state.base.inventory = Inventory(slots: 2)
-        state.base.inventory.add(ItemStack(id: InstanceID(rawValue: 1), catalogID: Items.essenceCrystal,
-                                           count: 2, distilledCore: DistilledCore(attunement: nil, potency: 0)))
         let qualifying = MaterialSample(kind: .reagent,
             properties: MaterialProperties(insulation: 30, reactivity: 80), grade: 70, source: "a")
         let spare = MaterialSample(kind: .reagent, properties: MaterialProperties(), grade: 10, source: "b")
@@ -587,7 +579,7 @@ final class StackingTests: XCTestCase {
     func testTheSatchelBinsTooSoCarryingIsntMiserable() throws {
         let store = GameStore(io: .temporary(name: "stack-\(UUID().uuidString)"))
         store.write("plains")
-        store.bindAndDepart()
+        XCTAssertTrue(store.bindAndDepart(), store.bindError ?? "departure refused")
         store.mutate("haul several of the same thing") { state in
             guard var run = state.worlds.activeRun else { return }
             run.satchelItems = Inventory(slots: 2)

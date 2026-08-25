@@ -395,8 +395,8 @@ enum WritingDeskBindQuoteFactory {
             availability = .fieldKit(reason)
         } else if bornAnchored && !state.base.station(Stations.anchorage).isUnlocked {
             availability = .anchorageLocked
-        } else if state.base.essence < total {
-            availability = .insufficientEssence(available: state.base.essence, required: total)
+        } else if state.base.essenceCrystalCount < total {
+            availability = .insufficientEssence(available: state.base.essenceCrystalCount, required: total)
         } else if let reason = GameStore.inkDepartureRefusal(page: page, in: state.base) {
             availability = .unavailable(reason)
         } else {
@@ -431,8 +431,8 @@ enum WritingDeskBindQuoteFactory {
                      reservedCampaignSeed: state.worlds.seeds.peekNextSeed(),
                      generationSeed: generationSeed,
                      pageCost: pageCost,
-                     availableEssence: state.base.essence,
-                     essenceAfter: state.base.essence - total,
+                     availableEssence: state.base.essenceCrystalCount,
+                     essenceAfter: state.base.essenceCrystalCount - total,
                      anchorageReceipt: .init(bornAnchored: bornAnchored,
                                              isUnlocked: station.isUnlocked,
                                              stationTier: station.tier,

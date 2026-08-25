@@ -729,7 +729,7 @@ extension GameStore {
             staging.mutate("stage exact World Page bind acceptance", flush: true) { state in
                 state.worlds.activeRun = nil
                 state.base.collectedWorldPages = pages
-                state.base.essence = pages.map(\.definition.worldPageCost).max() ?? 0
+                state.base.setEssenceCrystalCount(pages.map(\.definition.worldPageCost).max() ?? 0)
                 state.base.preparationLoadout = []
                 state.base.preparationLoadoutNeedsReview = false
             }
@@ -737,7 +737,7 @@ extension GameStore {
             let relaunched = GameStore(io: io)
             guard relaunched.state.base.collectedWorldPages
                     == expected.base.collectedWorldPages,
-                  relaunched.state.base.essence == expected.base.essence,
+                  relaunched.state.base.essenceCrystalCount == expected.base.essenceCrystalCount,
                   relaunched.state.base.preparationLoadout
                     == expected.base.preparationLoadout,
                   relaunched.state.worlds.activeRun == nil else {
@@ -1000,7 +1000,7 @@ extension GameStore {
             state.base.personalCompounds = []
             state.base.nextPersonalCompoundID = 1
             state.base.nextPersonalCompoundOrdinal = 1
-            state.base.essence = Tuning.Page.personalCompoundFormalizeEssence
+            state.base.setEssenceCrystalCount(Tuning.Page.personalCompoundFormalizeEssence)
             state.base.resources = ResourcePool([
                 Resources.pulp: Tuning.Page.personalCompoundFormalizePulp
             ])
@@ -1217,7 +1217,7 @@ extension GameStore {
     func harnessPrepareInstrumentCrafting() {
         mutate("harness: instrument crafting", flush: true) { state in
             state.base.stations[Stations.surveyPost] = StationState(isUnlocked: true, tier: 1)
-            state.base.essence = max(state.base.essence, 100)
+            state.base.setEssenceCrystalCount(max(state.base.essenceCrystalCount, 100))
             let target: PressureTargetID = "illumination"
             state.reality.instruments.insert(target)
             state.reality.instrumentPrecisions[target] = .crude
@@ -1240,7 +1240,7 @@ extension GameStore {
     func harnessPrepareApothecary() {
         mutate("harness: apothecary", flush: true) { state in
             state.base.stations[Stations.apothecary] = StationState(isUnlocked: true, tier: 0)
-            state.base.essence = max(state.base.essence, 500)
+            state.base.setEssenceCrystalCount(max(state.base.essenceCrystalCount, 500))
             state.reality.motes = max(state.reality.motes, 3)
             for resource in ContentCatalog.shared.resources where resource.id != Resources.mote {
                 state.base.resources.add(10, of: resource.id)

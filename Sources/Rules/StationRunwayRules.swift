@@ -37,7 +37,7 @@ enum StationRunwayRules {
     static func preview(for station: StationDef, in state: GameState) -> Preview {
         let rawEquivalent = EconomyRules.refine(rawUnits: state.base.resources[Resources.essenceRaw],
                                                  in: state)
-        let now = state.base.essence + rawEquivalent
+        let now = state.base.essenceCrystalCount + rawEquivalent
         let cost = max(0, station.buildCost?.essence ?? 0)
         let after = max(0, now - cost)
         let paid = state.reality.library.visitedWorlds.reversed().compactMap { world -> Int? in
@@ -60,7 +60,7 @@ enum StationRunwayRules {
             return nil
         }
         let affordability = EssenceAffordabilityPresentation(
-            action: .construction, essenceAvailableNow: state.base.essence,
+            action: .construction, essenceAvailableNow: state.base.essenceCrystalCount,
             refinableRawEquivalent: rawEquivalent, actionCost: cost,
             basis: median == nil ? nil : .recentWorld, basisCost: median)
         return Preview(spendableNow: now, refinableRawEssence: rawEquivalent,
