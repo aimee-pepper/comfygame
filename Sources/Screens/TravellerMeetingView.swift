@@ -30,6 +30,17 @@ struct TravellerMeetingView: View {
 
     private var meeting: TravellerMeeting? { traveller.meeting }
 
+#if DEBUG
+    init(traveller: TravellerDef) {
+        self.traveller = traveller
+    }
+
+    init(traveller: TravellerDef, initialConversation: TravellerMeetingConversation) {
+        self.traveller = traveller
+        _conversation = State(initialValue: initialConversation)
+    }
+#endif
+
     var body: some View {
         NavigationStack {
             ScrollView {
@@ -57,7 +68,7 @@ struct TravellerMeetingView: View {
                             VStack(spacing: 8) {
                                 ForEach(remaining) { exchange in
                                     Button {
-                                        withAnimation { conversation.ask(exchange.id) }
+                                        conversation.ask(exchange.id)
                                     } label: {
                                         Text(exchange.ask)
                                             .font(.callout)
@@ -131,7 +142,7 @@ struct TravellerMeetingView: View {
                 HStack(spacing: 10) {
                     Button("Not now") {
                         blockedReason = nil
-                        withAnimation { conversation.decline() }
+                        conversation.decline()
                     }
                     .buttonStyle(.bordered)
                     .controlSize(.large)
@@ -141,7 +152,7 @@ struct TravellerMeetingView: View {
                     store.recruit(traveller.id)
                     if store.state.reality.library.foundTravellers.contains(traveller.id) {
                         blockedReason = nil
-                        withAnimation { conversation.accept() }
+                        conversation.accept()
                     } else {
                         blockedReason = store.recentEvents.reversed().compactMap {
                             if case .blocked(let reason) = $0 { reason } else { nil }

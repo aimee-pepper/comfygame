@@ -1,8 +1,134 @@
+import SwiftUI
+import UIKit
 import XCTest
 @testable import Bookbinder
 
 final class TravellerWorldPacingTests: XCTestCase {
     private let catalog = ContentCatalog.shared
+
+    @MainActor
+    private func mountedMeeting(_ traveller: TravellerDef, store: GameStore,
+                                conversation: TravellerMeetingConversation = .init())
+        -> (controller: UIHostingController<AnyView>, window: UIWindow) {
+        let controller = UIHostingController(rootView: AnyView(
+            TravellerMeetingView(traveller: traveller, initialConversation: conversation)
+                .environmentObject(store)
+                .environment(\.colorScheme, .light)
+                .frame(width: 368, height: 800)))
+        let window = UIWindow(frame: CGRect(x: 0, y: 0, width: 368, height: 800))
+        window.rootViewController = controller
+        window.makeKeyAndVisible()
+        controller.view.frame = CGRect(x: 0, y: 0, width: 368, height: 800)
+        controller.view.setNeedsLayout()
+        controller.view.layoutIfNeeded()
+        settle(0.05)
+        controller.view.layoutIfNeeded()
+        return (controller, window)
+    }
+
+    @MainActor
+    private func renderedPNG(_ controller: UIViewController) throws -> Data {
+        let renderer = UIGraphicsImageRenderer(size: controller.view.bounds.size)
+        return try XCTUnwrap(renderer.image { context in
+            controller.view.layer.render(in: context.cgContext)
+        }.pngData())
+    }
+
+    @MainActor
+    private func settle(_ interval: TimeInterval = 0.4) {
+        RunLoop.main.run(until: Date().addingTimeInterval(interval))
+    }
+
+    func testMeetingTransitionsContainNoLoadingOrImplicitReflowOwner() throws {
+        let root = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent().deletingLastPathComponent()
+        let source = try String(
+            contentsOf: root.appending(path: "Sources/Screens/TravellerMeetingView.swift"),
+            encoding: .utf8)
+        XCTAssertFalse(source.contains("withAnimation"))
+        for forbidden in ["ProgressView", "AsyncImage", "redacted(", "shimmer", "placeholder"] {
+            XCTAssertFalse(source.contains(forbidden), "meeting introduced loading owner \(forbidden)")
+        }
+    }
+
+    @MainActor
+    func testMountedQuestionAndDeclineTransitionsAreImmediateStableAndInert() throws {
+        let traveller = try traveller("isolde")
+        let meeting = try XCTUnwrap(traveller.meeting)
+
+        let askStore = GameStore(io: .temporary(name: "meeting-ask-\(UUID().uuidString)"))
+        let askBytes = try SaveCodec.makeEncoder().encode(askStore.state)
+        let askTurn = askStore.state.worlds.activeRun?.turnsTaken
+        let exchange = try XCTUnwrap(meeting.questions.first)
+        let baselineAsk = mountedMeeting(traveller, store: askStore)
+        var asked = TravellerMeetingConversation()
+        asked.ask(exchange.id)
+        let askedMount = mountedMeeting(traveller, store: askStore, conversation: asked)
+        let askController = askedMount.controller
+        let immediateAskReceipt = try renderedPNG(askController)
+        XCTAssertNotEqual(immediateAskReceipt, try renderedPNG(baselineAsk.controller),
+                          "the exact asked exchange did not change the mounted production view")
+        settle()
+        askController.view.layoutIfNeeded()
+        XCTAssertEqual(try renderedPNG(askController), immediateAskReceipt,
+                       "question/reply content continued moving like a loading transition")
+        XCTAssertEqual(try SaveCodec.makeEncoder().encode(askStore.state), askBytes)
+        XCTAssertEqual(askStore.state.worlds.activeRun?.turnsTaken, askTurn)
+
+        let declineStore = GameStore(io: .temporary(name: "meeting-decline-\(UUID().uuidString)"))
+        let declineBytes = try SaveCodec.makeEncoder().encode(declineStore.state)
+        var declined = TravellerMeetingConversation()
+        declined.decline()
+        let baselineDecline = mountedMeeting(traveller, store: declineStore)
+        let declinedMount = mountedMeeting(traveller, store: declineStore,
+                                           conversation: declined)
+        let declineController = declinedMount.controller
+        let immediateDeclineReceipt = try renderedPNG(declineController)
+        XCTAssertNotEqual(immediateDeclineReceipt, try renderedPNG(baselineDecline.controller),
+                          "declined terminal copy did not change the mounted production view")
+        settle()
+        declineController.view.layoutIfNeeded()
+        XCTAssertEqual(try renderedPNG(declineController), immediateDeclineReceipt,
+                       "terminal dialogue continued moving after decline")
+        XCTAssertEqual(try SaveCodec.makeEncoder().encode(declineStore.state), declineBytes)
+        XCTAssertNil(declineStore.state.worlds.activeRun)
+    }
+
+    @MainActor
+    func testMountedAcceptTransitionIsImmediateAndKeepsRecruitmentOwnedByRules() throws {
+        let traveller = try traveller("isolde")
+        let store = GameStore(io: .temporary(name: "meeting-accept-\(UUID().uuidString)"))
+        store.mutate("prepare meeting accept") {
+            $0.base.essence = 5_000
+            $0.worlds.seeds = SeedSequence(rootSeed: 1)
+        }
+        XCTAssertTrue(store.bindAndDepart(), store.bindError ?? "world not prepared")
+        let point = try XCTUnwrap(store.state.worlds.activeRun?.playerPosition)
+        let turn = store.state.worlds.activeRun?.turnsTaken
+        var recruitedState = store.state
+        let beforeRoster = recruitedState.base.roster.count
+        var recruitEvents: [WorldRules.Event] = []
+        guard var run = recruitedState.worlds.activeRun else {
+            return XCTFail("world not prepared")
+        }
+        run.map[point].content = .traveller(traveller.id)
+        run.travellersHere = [traveller.id]
+        recruitedState.worlds.activeRun = run
+        recruitEvents = WorldRules.recruit(traveller.id, in: &recruitedState)
+        XCTAssertFalse(recruitEvents.contains { if case .blocked = $0 { true } else { false } })
+        var accepted = TravellerMeetingConversation()
+        accepted.accept()
+        let acceptedMount = mountedMeeting(traveller, store: store, conversation: accepted)
+        let controller = acceptedMount.controller
+        XCTAssertTrue(recruitedState.reality.library.foundTravellers.contains(traveller.id))
+        XCTAssertEqual(recruitedState.base.roster.count, beforeRoster + 1)
+        XCTAssertEqual(recruitedState.worlds.activeRun?.turnsTaken, turn)
+        let immediateReceipt = try renderedPNG(controller)
+        settle()
+        controller.view.layoutIfNeeded()
+        XCTAssertEqual(try renderedPNG(controller), immediateReceipt,
+                       "accepted copy and decision content continued moving after recruitment")
+    }
 
     func testMeetingKeepsAuthoredOfferOutOfOversizedActionLabel() throws {
         let root = URL(fileURLWithPath: #filePath)
