@@ -58,31 +58,39 @@ enum Migrations {
             return data
         }
 
-        func encodedRawValue(_ value: Any?) -> UInt64? {
-            if let encoded = value as? [String: Any],
-               let number = encoded["rawValue"] as? NSNumber {
-                return number.uint64Value
+        func encodedRawValue(_ value: Any?) throws -> UInt64? {
+            guard let value else { return nil }
+            guard let encoded = value as? [String: Any],
+                  let number = encoded["rawValue"] as? NSNumber,
+                  CFGetTypeID(number) != CFBooleanGetTypeID(),
+                  let rawValue = UInt64(number.stringValue),
+                  rawValue < UInt64.max else {
+                throw CocoaError(.coderInvalidValue)
             }
-            if let number = value as? NSNumber { return number.uint64Value }
-            return nil
+            return rawValue
         }
-        func maximumEncodedRawValue(in value: Any) -> UInt64? {
+        func maximumEncodedRawValue(in value: Any) throws -> UInt64? {
             if let object = value as? [String: Any] {
-                let own = encodedRawValue(object)
-                return object.values.reduce(own) { maximum, child in
-                    guard let candidate = maximumEncodedRawValue(in: child) else { return maximum }
-                    return max(maximum ?? candidate, candidate)
+                let own = object["catalogID"] is String
+                    ? try encodedRawValue(object["id"]) : nil
+                return try object.values.reduce(own) { maximum, child in
+                    guard let candidate = try maximumEncodedRawValue(in: child) else {
+                        return maximum
+                    }
+                    return Swift.max(maximum ?? candidate, candidate)
                 }
             }
             if let array = value as? [Any] {
-                return array.reduce(nil as UInt64?) { maximum, child in
-                    guard let candidate = maximumEncodedRawValue(in: child) else { return maximum }
-                    return max(maximum ?? candidate, candidate)
+                return try array.reduce(nil as UInt64?) { maximum, child in
+                    guard let candidate = try maximumEncodedRawValue(in: child) else {
+                        return maximum
+                    }
+                    return Swift.max(maximum ?? candidate, candidate)
                 }
             }
             return nil
         }
-        let highestExistingPhysicalID = maximumEncodedRawValue(in: root) ?? 0
+        let highestExistingPhysicalID = try maximumEncodedRawValue(in: root) ?? 0
         var base = root["base"] as? [String: Any] ?? [:]
         let scalar = max(0, base["essence"] as? Int ?? 0)
         var inventory = base["inventory"] as? [String: Any] ?? [:]
@@ -116,7 +124,7 @@ enum Migrations {
         let total = scalar + physical
         if total > 0 {
             let walletID: [String: Any]
-            if let rawValue = encodedRawValue(existingID) {
+            if let rawValue = try encodedRawValue(existingID) {
                 walletID = ["rawValue": NSNumber(value: rawValue)]
             } else {
                 guard highestExistingPhysicalID < UInt64.max else {

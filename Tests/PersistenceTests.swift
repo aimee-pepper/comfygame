@@ -66,6 +66,34 @@ final class PersistenceTests: XCTestCase {
         XCTAssertEqual(relaunched, migrated)
     }
 
+    func testSchemaOneMigrationRejectsEveryMalformedItemStackIDInExistingAndAllocationPaths() {
+        let malformedValues = [
+            "negative": "-1",
+            "fractional": "1.5",
+            "boolean": "true",
+            "overflow": "18446744073709551616",
+            "maximum": "18446744073709551615"
+        ]
+
+        for (name, rawValue) in malformedValues {
+            let existingCrystal = Data(#"""
+            {"schemaVersion":1,"base":{"essence":4,"essenceCrystals":{
+              "id":{"rawValue":\#(rawValue)},"catalogID":"essence_crystal",
+              "count":2,"identified":true
+            },"inventory":{"slots":8,"stacks":[]}}}
+            """#.utf8)
+            XCTAssertThrowsError(try SaveCodec.decode(existingCrystal), "existing crystal: \(name)")
+
+            let allocation = Data(#"""
+            {"schemaVersion":1,"base":{"essence":4,"inventory":{"slots":8,"stacks":[{
+              "id":{"rawValue":\#(rawValue)},"catalogID":"salve_lesser",
+              "count":1,"identified":true
+            }]}}}
+            """#.utf8)
+            XCTAssertThrowsError(try SaveCodec.decode(allocation), "allocation census: \(name)")
+        }
+    }
+
     func testSchemaOneMigrationMovesOwnedRunCrystalsWithoutTouchingOffers() throws {
         var legacy = GameState.newGame()
         legacy.schemaVersion = 1

@@ -76,6 +76,44 @@ final class SaveSlotTests: XCTestCase {
         XCTAssertEqual(relaunched, first)
     }
 
+    func testSaveSlotMigrationRejectsMalformedItemStackIDsWithoutRewritingEnvelope() async throws {
+        let malformedValues = [
+            "negative": "-1",
+            "fractional": "1.5",
+            "boolean": "true",
+            "overflow": "18446744073709551616",
+            "maximum": "18446744073709551615"
+        ]
+
+        for (name, rawValue) in malformedValues {
+            for existingCrystal in [false, true] {
+                let root = directory()
+                defer { try? FileManager.default.removeItem(at: root) }
+                let slots = SaveSlotFileIO(directory: root)
+                let created = try await slots.create(name: "Malformed \(name)")
+                let url = try await slots.exportURL(for: created.metadata.id)
+                var envelope = try SaveCodec.makeDecoder().decode(
+                    SaveSlotEnvelope.self, from: Data(contentsOf: url))
+                let stack = existingCrystal
+                    ? #""essenceCrystals":{"id":{"rawValue":\#(rawValue)},"catalogID":"essence_crystal","count":2,"identified":true},"#
+                    : #""inventory":{"slots":8,"stacks":[{"id":{"rawValue":\#(rawValue)},"catalogID":"salve_lesser","count":1,"identified":true}]},"#
+                envelope.payload = Data(#"""
+                {"schemaVersion":1,"base":{"essence":7,\#(stack)"goldCoins":3}}
+                """#.utf8)
+                let originalEnvelope = try encoder().encode(envelope)
+                try originalEnvelope.write(to: url, options: .atomic)
+
+                do {
+                    _ = try await slots.load(created.metadata.id)
+                    XCTFail("\(existingCrystal ? "existing" : "allocation") path accepted \(name)")
+                } catch {
+                    XCTAssertEqual(try Data(contentsOf: url), originalEnvelope,
+                                   "failed migration must not rewrite the slot")
+                }
+            }
+        }
+    }
+
     func testLegacyAdoptionIsIdempotentAndPreservesExactPayloadBytes() async throws {
         let root = directory()
         defer { try? FileManager.default.removeItem(at: root) }
