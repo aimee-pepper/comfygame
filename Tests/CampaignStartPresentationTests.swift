@@ -4,6 +4,39 @@ import XCTest
 @testable import Bookbinder
 
 final class CampaignStartPresentationTests: XCTestCase {
+    @MainActor
+    func testPrimaryCampaignFaceOwnsItsExactPressedFrameWithoutResizing() throws {
+        FullFacePressMeasurements.reset()
+        var activations = 0
+        let controller = UIHostingController(rootView: CampaignStartView(
+            presentation: CampaignStartPresentation(slots: []),
+            onContinue: { _ in }, onNewGame: { activations += 1 }, onLoad: { _ in },
+            onDelete: { _ in }, onExport: { _ in })
+            .environment(\.fullFacePressFixtureID, "campaign.primary.new")
+            .environment(\.dynamicTypeSize, .large)
+            .frame(width: 368, height: 800))
+        let window = UIWindow(frame: .init(x: 0, y: 0, width: 368, height: 800))
+        window.rootViewController = controller; window.makeKeyAndVisible()
+        controller.view.frame = window.bounds; controller.view.layoutIfNeeded()
+        RunLoop.main.run(until: Date().addingTimeInterval(0.08))
+
+        let measurement = try XCTUnwrap(FullFacePressMeasurements.values["campaign.primary.new"])
+        XCTAssertTrue(measurement.isEnabled)
+        XCTAssertTrue(measurement.isPressed)
+        XCTAssertEqual(measurement.frame.width, 340, accuracy: 0.5)
+        XCTAssertEqual(measurement.frame.height,
+                       CampaignStartLayoutPolicy.primaryActionLabelHeight(dynamicTypeSize: .large),
+                       accuracy: 0.5)
+        XCTAssertEqual(activations, 0, "pressed acknowledgement cannot invoke the action")
+        let image = UIGraphicsImageRenderer(size: window.bounds.size).image { _ in
+            controller.view.drawHierarchy(in: controller.view.bounds, afterScreenUpdates: true)
+        }
+        let attachment = XCTAttachment(image: image)
+        attachment.name = "campaign-primary-new-pressed-368x800"
+        attachment.lifetime = .keepAlways; add(attachment)
+        window.isHidden = true
+    }
+
     func testContinueSelectsMostRecentValidSlotAndIgnoresInvalidSlots() {
         let older = slot(name: "Old", date: 10, health: .valid)
         let newestCorrupt = slot(name: "Broken", date: 30,
@@ -63,6 +96,7 @@ final class CampaignStartPresentationTests: XCTestCase {
         let action = String(source[start.lowerBound..<end.lowerBound])
 
         XCTAssertTrue(action.contains("buttonStyle(.plain)"))
+        XCTAssertTrue(action.contains("fullFacePressFeedback(identifier)"))
         XCTAssertTrue(action.contains("CampaignShelfPalette.pageHighlight"))
         XCTAssertTrue(action.contains("Rectangle()"))
         XCTAssertTrue(action.contains("CampaignShelfPalette.shelf"))

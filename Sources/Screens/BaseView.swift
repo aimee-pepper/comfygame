@@ -255,6 +255,7 @@ struct BaseView: View {
                         }
                 }
                 .buttonStyle(.plain)
+                .fullFacePressFeedback("village.tab.\(section.rawValue)")
                 .accessibilityAddTraits(section == selectedSection ? .isSelected : [])
             }
         }
@@ -430,6 +431,7 @@ struct BaseView: View {
                 }
         }
         .buttonStyle(.plain)
+        .fullFacePressFeedback("village.party")
         .accessibilityHint("Manage party members, gear and gambits")
 
         NavigationLink(value: AppRoute.writingDesk) {
@@ -445,6 +447,7 @@ struct BaseView: View {
                 }
         }
         .buttonStyle(.plain)
+        .fullFacePressFeedback("village.bind-depart")
         .accessibilityHint(departureHint)
         .simultaneousGesture(TapGesture().onEnded {
             store.openedFirstReturnDestination(.writingDesk)

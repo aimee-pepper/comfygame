@@ -552,6 +552,49 @@ final class PageTests: XCTestCase {
     }
 
     @MainActor
+    func testWritingDeskPrimaryFacesPressImmediatelyAndDisabledBindStaysInactive() throws {
+        let store = GameStore(io: .temporary(name: "writing-press-\(UUID().uuidString)"))
+        store.mutate("prepare writing press fixture") { state in
+            for lesson in TutorialLessonID.allCases {
+                state.tutorial.complete(lesson, fact: "press_fixture")
+            }
+            state.base.setEssenceCrystalCount(0)
+            state.base.stations[Stations.anchorage] = StationState(isUnlocked: true, tier: 0)
+        }
+        store.reconcileStarterWorldPageBundle()
+        let beforeTurn = store.activeRun?.turnsTaken
+        for id in ["writing.pane.Write", "writing.bin.compounds", "writing.bind-depart"] {
+            FullFacePressMeasurements.reset()
+            let controller = UIHostingController(rootView:
+                NavigationStack {
+                    (id == "writing.bind-depart"
+                     ? WritingDeskView(debugInitialPane: "The world", debugBornAnchored: true)
+                     : WritingDeskView()).environmentObject(store)
+                }
+                    .environment(\.fullFacePressFixtureID, id)
+                    .environment(\.dynamicTypeSize, .large)
+                    .frame(width: 368, height: 800))
+            let window = UIWindow(frame: .init(x: 0, y: 0, width: 368, height: 800))
+            window.rootViewController = controller; window.makeKeyAndVisible()
+            controller.view.frame = window.bounds; controller.view.layoutIfNeeded()
+            RunLoop.main.run(until: Date().addingTimeInterval(0.1))
+            let measurement = try XCTUnwrap(FullFacePressMeasurements.values[id], id)
+            if id == "writing.bind-depart" {
+                XCTAssertFalse(measurement.isEnabled)
+                XCTAssertFalse(measurement.isPressed,
+                               "a disabled action cannot borrow enabled-looking feedback")
+            } else {
+                XCTAssertTrue(measurement.isEnabled)
+                XCTAssertTrue(measurement.isPressed)
+            }
+            XCTAssertGreaterThan(measurement.frame.width, 0)
+            XCTAssertGreaterThan(measurement.frame.height, 0)
+            window.isHidden = true
+        }
+        XCTAssertEqual(store.activeRun?.turnsTaken, beforeTurn)
+    }
+
+    @MainActor
     func testWritingDeskOrdinarySessionIsBlankTransientAndRelaunchSafe() throws {
         let io = SaveFileIO.temporary(name: "writing-transient-\(UUID().uuidString)")
         let store = GameStore(io: io)

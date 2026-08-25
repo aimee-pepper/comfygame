@@ -92,6 +92,15 @@ struct WritingDeskView: View {
 
     @State private var bin: Bin = .compounds
 
+    init() {}
+
+#if DEBUG
+    init(debugInitialPane: String, debugBornAnchored: Bool = false) {
+        _pane = State(initialValue: Pane(rawValue: debugInitialPane) ?? .write)
+        _bornAnchored = State(initialValue: debugBornAnchored)
+    }
+#endif
+
     /// One bin per pressure target, plus compounds and the ladders that apply everywhere.
     ///
     /// A target's bin holds **everything you'd write about that target**: the target sigil itself,
@@ -244,6 +253,7 @@ struct WritingDeskView: View {
                     .frame(width: 32, height: 44)
             }
             .buttonStyle(.plain)
+            .fullFacePressFeedback("writing.back")
             .accessibilityLabel("Back")
 
             Text("Writing Desk")
@@ -259,6 +269,7 @@ struct WritingDeskView: View {
                         .frame(width: 44, height: 44)
                 }
                 .buttonStyle(.plain)
+                .fullFacePressFeedback("writing.page-actions")
                 .disabled(!writingAssetsReady)
                 .accessibilityLabel("Page actions")
             }
@@ -327,6 +338,7 @@ struct WritingDeskView: View {
                         .overlay(Rectangle().stroke(PixelUITheme.edge, lineWidth: 2))
                 }
                 .buttonStyle(.plain)
+                .fullFacePressFeedback("writing.pane.\(entry.id)")
             }
         }
         .padding(.horizontal, 10)
@@ -427,6 +439,7 @@ struct WritingDeskView: View {
                     .frame(maxWidth: .infinity, alignment: .leading)
                 }
                 .buttonStyle(.plain)
+                .fullFacePressFeedback("writing.ink-well")
                 .disabled(!unlocked)
             }
         }
@@ -459,6 +472,7 @@ struct WritingDeskView: View {
                         .contentShape(Rectangle())
                     }
                     .buttonStyle(.plain)
+                    .fullFacePressFeedback("writing.bin.\(entry.id)")
                 }
             }
             .padding(.horizontal, 4)
@@ -633,6 +647,7 @@ struct WritingDeskView: View {
                             .overlay(Rectangle().stroke(PixelUITheme.edge, lineWidth: 2))
                     }
                     .buttonStyle(.plain)
+                    .fullFacePressFeedback("writing.pages.\(section.id)")
                 }
             }
             .padding(.horizontal, 38)
@@ -707,6 +722,7 @@ struct WritingDeskView: View {
                         }
                     }
                     .buttonStyle(.plain)
+                    .fullFacePressFeedback("writing.collected.\(instance.id.rawValue)")
                     .accessibilityLabel("\(concealsFieldPage ? "Unknown page" : instance.definition.title), collected World Page, costs \(instance.definition.worldPageCost) Essence")
                 }
             }
@@ -943,6 +959,7 @@ struct WritingDeskView: View {
                 .padding(.horizontal, 4)
             }
             .buttonStyle(.borderedProminent)
+            .fullFacePressFeedback("writing.bind-depart")
             .disabled(!activeBindAvailability.isReady)
 
             if let error = store.bindError {
@@ -1160,6 +1177,7 @@ private struct SavedPageTemplateCard: View {
                         in: RoundedRectangle(cornerRadius: 12))
         }
         .buttonStyle(.plain)
+        .fullFacePressFeedback("writing.template.\(template.id.rawValue)")
         .accessibilityLabel("\(template.name), Template, \(PlayerSigilCopy.count(template.page.runes.count))")
         .popover(isPresented: $showsActions, arrowEdge: .top) {
             VStack(alignment: .leading, spacing: 4) {
@@ -1632,6 +1650,7 @@ private struct WritingDeskPageActionsPopover: View {
         }
         .frame(width: 164, height: 96)
         .buttonStyle(.plain)
+        .fullFacePressFeedback("writing.page-actions-popover")
         .task { loadPackChrome() }
     }
 
@@ -1678,6 +1697,7 @@ private struct WritingDeskPackToolStrip: View {
             }
         }
         .buttonStyle(.plain)
+        .fullFacePressFeedback("writing.ink-well")
         .disabled(image == nil || !isEnabled)
         .frame(height: 44)
         .task(id: hand) { load() }
@@ -1718,6 +1738,7 @@ private struct WritingDeskPackVocabularyTile: View {
             }
         }
         .buttonStyle(.plain)
+        .fullFacePressFeedback("writing.vocabulary.\(kind).\(id)")
         .disabled(image == nil || !isEnabled)
         .frame(height: 58)
         .task(id: "\(kind)-\(id)-\(hand)-\(state)") { load() }

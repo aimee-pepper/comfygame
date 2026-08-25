@@ -5,6 +5,34 @@ import XCTest
 
 @MainActor
 final class ExpeditionOutcomeTests: XCTestCase {
+    @MainActor
+    func testReturnActionWholeFaceShowsPressedStateWithoutDismissing() throws {
+        let summary = RunExitSummary(
+            runIndex: 1, kind: .portal, reason: "Returned.", departureState: .holding,
+            turnsTaken: 1, haulKeptFraction: 1, resources: [], items: [],
+            lostResources: [], lostItems: [], progress: [], writings: [],
+            recruitedTravellers: [], essenceEconomy: .init(rawCollected: 0, bindCostPaid: 0,
+                                                            springYield: 0, netRunway: 0))
+        var dismissals = 0
+        let store = GameStore(io: .temporary(name: "return-press-\(UUID().uuidString)"))
+        FullFacePressMeasurements.reset()
+        let controller = UIHostingController(rootView:
+            RunExitSummaryView(summary: summary, dismiss: { dismissals += 1 })
+                .environmentObject(store)
+                .environment(\.fullFacePressFixtureID, "run-exit.continue")
+                .frame(width: 368, height: 800))
+        let window = UIWindow(frame: .init(x: 0, y: 0, width: 368, height: 800))
+        window.rootViewController = controller; window.makeKeyAndVisible()
+        controller.view.frame = window.bounds; controller.view.layoutIfNeeded()
+        RunLoop.main.run(until: Date().addingTimeInterval(0.08))
+        let measurement = try XCTUnwrap(FullFacePressMeasurements.values["run-exit.continue"])
+        XCTAssertTrue(measurement.isPressed)
+        XCTAssertEqual(measurement.frame.width, 344, accuracy: 0.5)
+        XCTAssertEqual(measurement.frame.height, 54, accuracy: 0.5)
+        XCTAssertEqual(dismissals, 0)
+        window.isHidden = true
+    }
+
     private func rgba(_ image: UIImage, x: Int, y: Int) throws -> [UInt8] {
         let cg = try XCTUnwrap(image.cgImage)
         let data = try XCTUnwrap(cg.dataProvider?.data)

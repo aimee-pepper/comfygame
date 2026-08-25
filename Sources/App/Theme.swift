@@ -116,6 +116,96 @@ enum PixelUITheme {
     }
 }
 
+/// Keeps the authored face exactly where it is while making that complete face the control.
+///
+/// The pressed treatment is deliberately immediate: it is direct acknowledgement of a finger
+/// going down, not an animation or a gameplay outcome. Disabled controls keep their existing
+/// appearance and never borrow the enabled pressed treatment.
+private struct FullFacePressFeedbackModifier: ViewModifier {
+    let id: String
+    @Environment(\.isEnabled) private var isEnabled
+    @GestureState private var isPressed = false
+#if DEBUG
+    @Environment(\.fullFacePressFixtureID) private var fixtureID
+#endif
+
+    func body(content: Content) -> some View {
+#if DEBUG
+        let visiblyPressed = isEnabled && (isPressed || fixtureID == id)
+#else
+        let visiblyPressed = isEnabled && isPressed
+#endif
+        content
+            .contentShape(Rectangle())
+            .overlay {
+                if visiblyPressed {
+                    Rectangle()
+                        .fill(PixelUITheme.edgeDark.opacity(0.18))
+                        .overlay(Rectangle().stroke(PixelUITheme.primaryHighlight, lineWidth: 2))
+                        .allowsHitTesting(false)
+                }
+            }
+            .simultaneousGesture(
+                DragGesture(minimumDistance: 0)
+                    .updating($isPressed) { _, pressed, _ in pressed = true },
+                isEnabled: isEnabled
+            )
+#if DEBUG
+            .background(FullFacePressProbe(id: id, isEnabled: isEnabled,
+                                           isPressed: visiblyPressed))
+#endif
+    }
+}
+
+extension View {
+    func fullFacePressFeedback(_ id: String) -> some View {
+        modifier(FullFacePressFeedbackModifier(id: id))
+    }
+}
+
+#if DEBUG
+struct FullFacePressMeasurement: Equatable {
+    var frame: CGRect
+    var isEnabled: Bool
+    var isPressed: Bool
+}
+
+@MainActor enum FullFacePressMeasurements {
+    static var values: [String: FullFacePressMeasurement] = [:]
+    static func reset() { values = [:] }
+}
+
+private struct FullFacePressFixtureIDKey: EnvironmentKey {
+    static let defaultValue: String? = nil
+}
+
+extension EnvironmentValues {
+    var fullFacePressFixtureID: String? {
+        get { self[FullFacePressFixtureIDKey.self] }
+        set { self[FullFacePressFixtureIDKey.self] = newValue }
+    }
+}
+
+private struct FullFacePressProbe: UIViewRepresentable {
+    let id: String
+    let isEnabled: Bool
+    let isPressed: Bool
+
+    func makeUIView(context: Context) -> UIView { UIView(frame: .zero) }
+
+    func updateUIView(_ view: UIView, context: Context) {
+        DispatchQueue.main.async {
+            guard let window = view.window else { return }
+            FullFacePressMeasurements.values[id] = .init(
+                frame: view.convert(view.bounds, to: window),
+                isEnabled: isEnabled,
+                isPressed: isPressed
+            )
+        }
+    }
+}
+#endif
+
 /// Appearance preference.
 ///
 /// This game is meant to be played in bed, so the dark theme isn't a nicety — it's a feature of the

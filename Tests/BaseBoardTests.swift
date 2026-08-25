@@ -4,6 +4,39 @@ import XCTest
 @testable import Bookbinder
 
 final class BaseBoardTests: XCTestCase {
+    @MainActor
+    func testVillagePrimaryFacesExposeImmediatePressedStateWithoutMutation() throws {
+        let store = GameStore(io: .temporary(name: "base-press-\(UUID().uuidString)"))
+        store.mutate("prepare press fixture") { state in
+            for lesson in TutorialLessonID.allCases {
+                state.tutorial.complete(lesson, fact: "press_fixture")
+            }
+        }
+        let before = try SaveCodec.encode(store.state)
+        for id in ["village.tab.home", "village.party", "village.bind-depart"] {
+            FullFacePressMeasurements.reset()
+            let controller = UIHostingController(rootView:
+                NavigationStack { BaseView().environmentObject(store) }
+                    .environment(\.fullFacePressFixtureID, id)
+                    .environment(\.dynamicTypeSize, .large)
+                    .frame(width: 368, height: 800))
+            let window = UIWindow(frame: .init(x: 0, y: 0, width: 368, height: 800))
+            window.rootViewController = controller; window.makeKeyAndVisible()
+            controller.additionalSafeAreaInsets = .init(top: 59, left: 0, bottom: 34, right: 0)
+            controller.view.frame = window.bounds; controller.view.layoutIfNeeded()
+            RunLoop.main.run(until: Date().addingTimeInterval(0.08))
+            let measurement = try XCTUnwrap(FullFacePressMeasurements.values[id], id)
+            XCTAssertTrue(measurement.isEnabled, id)
+            XCTAssertTrue(measurement.isPressed, id)
+            XCTAssertGreaterThan(measurement.frame.width, 0, id)
+            XCTAssertGreaterThan(measurement.frame.height, 0, id)
+            XCTAssertGreaterThanOrEqual(measurement.frame.minX, 0, id)
+            XCTAssertLessThanOrEqual(measurement.frame.maxX, 368, id)
+            window.isHidden = true
+        }
+        XCTAssertEqual(try SaveCodec.encode(store.state), before)
+    }
+
     private func rgba(_ image: UIImage, x: Int, y: Int) throws -> [UInt8] {
         let cg = try XCTUnwrap(image.cgImage)
         let data = try XCTUnwrap(cg.dataProvider?.data)

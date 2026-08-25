@@ -495,6 +495,7 @@ struct CampaignStartPrimaryAction: View {
                             lineWidth: 2)
                     .allowsHitTesting(false)
             }
+            .fullFacePressFeedback(identifier)
         .frame(maxWidth: .infinity)
     }
 
@@ -704,6 +705,7 @@ private struct CampaignSlotCard: View {
                 Rectangle().stroke(PixelUITheme.clasp, lineWidth: 3).padding(-3)
             }
         }
+        .fullFacePressFeedback("campaign.slot.\(slot.id.uuidString)")
         .accessibilityElement(children: .contain)
     }
 

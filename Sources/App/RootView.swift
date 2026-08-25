@@ -386,6 +386,7 @@ struct RunExitSummaryView: View {
                     .background(PixelUITheme.primary)
                     .overlay(Rectangle().stroke(PixelUITheme.edgeDark, lineWidth: 2))
                     .buttonStyle(.plain)
+                    .fullFacePressFeedback("run-exit.continue")
                     .accessibilityIdentifier("run-exit.continue")
             }
             .padding(.horizontal, 12)
