@@ -673,30 +673,98 @@ struct WorldFieldFeedbackRow: View {
 /// would need a 616pt screen. So the grid is a *map*, not a control surface: tapping a tile is the
 /// planning gesture (walk there), while the primary one-handed control is the D-pad in the thumb
 /// zone, which the brief offers for exactly this reason. Every button is ≥44pt.
-@MainActor enum WorldDestinationPreloader {
+struct WorldMapFirstFrameReceipt: Equatable {
+    let columns: Int
+    let rows: Int
+    let origin: GridPoint
+    let presentationTick: Int
+    let reduceMotion: Bool
+    let orderedPoints: [GridPoint]
+    let identityKeys: [String]
+    let rasterIdentities: [String]
+}
+
+#if DEBUG
+@MainActor enum WorldMapFirstFrameMeasurement {
+    static var preloaded: WorldMapFirstFrameReceipt?
+    static var mounted: WorldMapFirstFrameReceipt?
+    static func reset() { preloaded = nil; mounted = nil }
+}
+#endif
+
+@MainActor enum WorldMapFrameRequestAuthority {
+    struct Viewport: Equatable {
+        let width: CGFloat
+        let columns: Int
+        let rows: Int
+        let origin: GridPoint
+    }
+    struct Cell {
+        let point: GridPoint
+        let currentVisibility: WorldRules.TileVisibility
+        let visibility: WorldRules.TileVisibility
+        let isRememberedTerrain: Bool
+        let unexploredFringeGradient: UnexploredFringeGradient?
+        let showsStationaryContents: Bool
+        let usesRememberedStationaryIdentity: Bool
+        let displayTile: Tile
+        let presentation: WorldTileVisibilityPresentation
+        let site: PlacedSite?
+        let hasLooseWorldPage: Bool
+        let identityKey: String?
+    }
     struct Request {
-        let artRequests: [MapTileArtRequest]
-        let identityKeys: [String]
+        let viewport: Viewport
+        let cells: [Cell]
+        let visibilityProfile: WorldRules.VisibilityProfile
+        let presentationTick: Int
+        let reduceMotion: Bool
+
+        var artRequests: [MapTileArtRequest] { cells.compactMap(\.presentation.artRequest) }
+        var identityKeys: [String] { cells.compactMap(\.identityKey) }
+        @MainActor var receipt: WorldMapFirstFrameReceipt {
+            .init(columns: viewport.columns, rows: viewport.rows, origin: viewport.origin,
+                  presentationTick: presentationTick, reduceMotion: reduceMotion,
+                  orderedPoints: cells.map(\.point), identityKeys: identityKeys,
+                  rasterIdentities: artRequests.compactMap {
+                      MapPixelRaster.cacheIdentity(for: $0, reduceMotion: reduceMotion)
+                  })
+        }
     }
 
-    static func request(run: WorldRun, state: GameState) -> Request {
+    /// The fixed chrome surrounding the map is shared by the pre-arrival and live layouts.
+    static let surroundingChromeHeight: CGFloat = 62 + 39 + 56 + 168
+
+    static func viewport(run: WorldRun, containerWidth: CGFloat, availableHeight: CGFloat,
+                         displayScale: CGFloat) -> Viewport {
+        let columns = WorldMapLayout.viewportColumns(
+            mapColumns: run.map.width, cameraColumns: Tuning.World.viewportTiles)
+        let width = WorldMapLayout.maximumSide(
+            containerWidth: containerWidth, viewportHeight: availableHeight,
+            viewportTiles: columns, displayScale: displayScale)
+        let rows = WorldMapLayout.viewportRows(
+            mapWidth: width, availableHeight: availableHeight,
+            viewportColumns: columns, mapRows: run.map.height)
+        return .init(width: width, columns: columns, rows: rows,
+                     origin: .init(
+                        x: max(0, min(run.playerPosition.x - columns / 2,
+                                      run.map.width - columns)),
+                        y: max(0, min(run.playerPosition.y - rows / 2,
+                                      run.map.height - rows))))
+    }
+
+    static func request(run: WorldRun, state: GameState, viewport: Viewport,
+                        presentationTick: Int, reduceMotion: Bool) -> Request {
         let profile = WorldRules.visibilityProfile(
             in: run, party: WorldRules.sightBonus(in: state))
         let readings = BookRules.readings(for: run.book, seed: run.mapSeed)
         let grade = WorldGrade.from(readings)
         let atmosphereMotion = Int(readings["atmosphere"].aspect("motion")
             .rounded(.toNearestOrAwayFromZero))
-        let columns = WorldMapLayout.viewportColumns(
-            mapColumns: run.map.width, cameraColumns: Tuning.World.viewportTiles)
-        let rows = min(run.map.height, columns)
-        let origin = GridPoint(
-            x: max(0, min(run.playerPosition.x - columns / 2, run.map.width - columns)),
-            y: max(0, min(run.playerPosition.y - rows / 2, run.map.height - rows)))
-        var artRequests: [MapTileArtRequest] = []
-        var identityKeys: [String] = []
+        var cells: [Cell] = []
 
-        for y in origin.y..<(origin.y + rows) {
-            for x in origin.x..<(origin.x + columns) {
+        for y in viewport.origin.y..<(viewport.origin.y + viewport.rows) {
+            for x in viewport.origin.x..<(viewport.origin.x + viewport.columns) {
                 let point = GridPoint(x: x, y: y)
                 let current = WorldRules.visibility(
                     of: point, from: run.playerPosition, in: run.map, profile: profile)
@@ -724,35 +792,66 @@ struct WorldFieldFeedbackRow: View {
                 let presentation = WorldTileVisibilityPresentation.resolve(
                     run: run, point: point, tile: tile, visibility: terrain,
                     profile: profile, grade: grade, atmosphereMotion: atmosphereMotion,
-                    presentationTick: 0, isRememberedTerrain: remembered,
+                    presentationTick: presentationTick, isRememberedTerrain: remembered,
                     showsStationaryContents: showsContents)
-                if let request = presentation.artRequest { artRequests.append(request) }
                 let site = showsContents ? run.sites.first(where: { $0.position == point }) : nil
                 let hasLoosePage = showsContents && run.offeredWorldPages.contains {
                     $0.fieldProvenance?.position == point
                 }
-                if let key = ExplorationMapIdentityResolver.key(
+                let identityKey = ExplorationMapIdentityResolver.key(
                     tile: tile, site: site?.definition, siteLooted: site?.isLooted,
-                    hasLooseWorldPage: hasLoosePage, tick: 0, disclosed: showsContents,
+                    hasLooseWorldPage: hasLoosePage, tick: presentationTick,
+                    disclosed: showsContents,
                     remembered: ExplorationMapIdentityResolver.usesRememberedFrame(
-                        currentVisibility: current, disclosed: showsContents)) {
-                    identityKeys.append(key)
-                }
+                        currentVisibility: current, disclosed: showsContents))
+                cells.append(.init(
+                    point: point, currentVisibility: current, visibility: terrain,
+                    isRememberedTerrain: remembered,
+                    unexploredFringeGradient: UnexploredFringeGradient.resolve(
+                        tile: point, player: run.playerPosition, visibility: current,
+                        wasExplored: run.map[point].isRevealed, profile: profile),
+                    showsStationaryContents: showsContents,
+                    usesRememberedStationaryIdentity:
+                        ExplorationMapIdentityResolver.usesRememberedFrame(
+                            currentVisibility: current, disclosed: showsContents),
+                    displayTile: tile, presentation: presentation, site: site,
+                    hasLooseWorldPage: hasLoosePage, identityKey: identityKey))
             }
         }
-        return Request(artRequests: artRequests, identityKeys: Array(Set(identityKeys)).sorted())
+        return Request(viewport: viewport, cells: cells, visibilityProfile: profile,
+                       presentationTick: presentationTick, reduceMotion: reduceMotion)
+    }
+}
+
+@MainActor enum WorldDestinationPreloader {
+    static func request(run: WorldRun, state: GameState, containerSize: CGSize,
+                        displayScale: CGFloat, presentationTick: Int,
+                        reduceMotion: Bool) -> WorldMapFrameRequestAuthority.Request {
+        let viewport = WorldMapFrameRequestAuthority.viewport(
+            run: run, containerWidth: containerSize.width,
+            availableHeight: max(1, containerSize.height
+                - WorldMapFrameRequestAuthority.surroundingChromeHeight),
+            displayScale: displayScale)
+        return WorldMapFrameRequestAuthority.request(
+            run: run, state: state, viewport: viewport,
+            presentationTick: presentationTick, reduceMotion: reduceMotion)
     }
 
-    static func prepare(run: WorldRun, state: GameState) async -> Bool {
-        let request = request(run: run, state: state)
+    static func prepare(request: WorldMapFrameRequestAuthority.Request) async -> Bool {
+#if DEBUG
+        WorldMapFirstFrameMeasurement.preloaded = request.receipt
+#endif
         return await WorldDestinationMapPreloader.prepare(
-            artRequests: request.artRequests, identityKeys: request.identityKeys)
+            artRequests: request.artRequests, identityKeys: request.identityKeys,
+            reduceMotion: request.reduceMotion)
     }
 }
 
 struct WorldView: View {
     @EnvironmentObject private var store: GameStore
     @Environment(\.displayScale) private var displayScale
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @StateObject private var terrainClock = TerrainPresentationClock.shared
     /// Everything that crossed the threshold and can be consulted or used outside combat.
     @State private var isShowingFieldKit = false
     @State private var isConfirmingAtlasSeam = false
@@ -778,28 +877,16 @@ struct WorldView: View {
                 VStack(spacing: 0) {
                     VStack(spacing: 0) {
                         GeometryReader { viewport in
-                        let visibilityProfile = WorldRules.visibilityProfile(
-                            in: run, party: WorldRules.sightBonus(in: store.state))
-                        let viewportColumns = WorldMapLayout.viewportColumns(
-                            mapColumns: run.map.width,
-                            cameraColumns: Tuning.World.viewportTiles)
-                        let mapWidth = WorldMapLayout.maximumSide(
-                            containerWidth: viewport.size.width,
-                            viewportHeight: viewport.size.height,
-                            viewportTiles: viewportColumns,
-                            displayScale: displayScale)
-                        let viewportRows = WorldMapLayout.viewportRows(
-                            mapWidth: mapWidth,
-                            availableHeight: viewport.size.height,
-                            viewportColumns: viewportColumns,
-                            mapRows: run.map.height)
+                        let mapViewport = WorldMapFrameRequestAuthority.viewport(
+                            run: run, containerWidth: viewport.size.width,
+                            availableHeight: viewport.size.height, displayScale: displayScale)
+                        let frameRequest = WorldMapFrameRequestAuthority.request(
+                            run: run, state: store.state, viewport: mapViewport,
+                            presentationTick: terrainClock.tick, reduceMotion: reduceMotion)
                         VStack(spacing: 0) {
                             MapGrid(
                                 run: run,
-                                maximumWidth: mapWidth,
-                                viewportColumns: viewportColumns,
-                                viewportRows: viewportRows,
-                                visibilityProfile: visibilityProfile,
+                                frameRequest: frameRequest,
                                 travellerSpeech: store.worldTravellerSpeech,
                                 onTravellerSpeechFinished: { travellerID in
                                     store.finishWorldTravellerSpeech(
@@ -808,16 +895,17 @@ struct WorldView: View {
                             ) { point in
                                 tapped(point, in: run)
                             }
-                            .id("world-map-\(viewportColumns)x\(viewportRows)-\(mapWidth)")
+                            .id("world-map-\(mapViewport.columns)x\(mapViewport.rows)-\(mapViewport.width)")
                             .overlay(alignment: .bottom) {
                                 WorldFieldFeedbackRow(contextOverlapsPlayer:
                                     WorldFieldFeedbackLayout.contextOverlapsPlayer(
                                         player: run.playerPosition,
                                         mapWidth: run.map.width, mapHeight: run.map.height,
-                                        viewportColumns: viewportColumns,
-                                        viewportRows: viewportRows,
-                                        mapHeightPoints: mapWidth / CGFloat(viewportColumns)
-                                            * CGFloat(viewportRows)))
+                                        viewportColumns: mapViewport.columns,
+                                        viewportRows: mapViewport.rows,
+                                        mapHeightPoints: mapViewport.width
+                                            / CGFloat(mapViewport.columns)
+                                            * CGFloat(mapViewport.rows)))
                                     .environmentObject(store)
                             }
                         }
@@ -1752,7 +1840,7 @@ enum WorldMapLayout {
 /// **The map no longer has to fit one screen** (decisions-session-13 §3) — only the page does, since
 /// you compose on a page and walk through a world. The camera is **clamped follow**: centred on you
 /// until you reach an edge, where it stops rather than showing empty space past the border.
-@MainActor private final class TerrainPresentationClock: ObservableObject {
+@MainActor final class TerrainPresentationClock: ObservableObject {
     static let shared = TerrainPresentationClock()
     @Published private(set) var tick = 0
     private var isRunning = false
@@ -1843,10 +1931,7 @@ private struct TravellerAdjacentSpeechBubbleView: View {
 
 private struct MapGrid: View {
     let run: WorldRun
-    let maximumWidth: CGFloat
-    let viewportColumns: Int
-    let viewportRows: Int
-    let visibilityProfile: WorldRules.VisibilityProfile
+    let frameRequest: WorldMapFrameRequestAuthority.Request
     let travellerSpeech: WorldTravellerSpeechBubbleV1?
     let onTravellerSpeechFinished: (TravellerID) -> Void
     let onTap: (GridPoint) -> Void
@@ -1856,89 +1941,48 @@ private struct MapGrid: View {
     @AppStorage("debug.simpleMapRenderer") private var useSimpleRenderer = false
 #endif
 
-    /// Top-left of the window: centred on the player, then clamped to the map.
-    private var origin: GridPoint {
-        GridPoint(x: clamp(run.playerPosition.x - viewportColumns / 2,
-                           extent: run.map.width, viewport: viewportColumns),
-                  y: clamp(run.playerPosition.y - viewportRows / 2,
-                           extent: run.map.height, viewport: viewportRows))
-    }
-
-    private func clamp(_ value: Int, extent: Int, viewport: Int) -> Int {
-        max(0, min(value, extent - viewport))
-    }
+    private var viewport: WorldMapFrameRequestAuthority.Viewport { frameRequest.viewport }
 
     var body: some View {
         GeometryReader { proxy in
-            let side = proxy.size.width / CGFloat(viewportColumns)
-            let readings = BookRules.readings(for: run.book, seed: run.mapSeed)
-            let grade = WorldGrade.from(readings)
-            let atmosphereMotion = Int(readings["atmosphere"].aspect("motion")
-                .rounded(.toNearestOrAwayFromZero))
+            let side = proxy.size.width / CGFloat(viewport.columns)
             ZStack(alignment: .topLeading) {
             VStack(spacing: 0) {
-                ForEach(origin.y..<(origin.y + viewportRows), id: \.self) { y in
+                ForEach(0..<viewport.rows, id: \.self) { row in
                     HStack(spacing: 0) {
-                        ForEach(origin.x..<(origin.x + viewportColumns), id: \.self) { x in
-                            let point = GridPoint(x: x, y: y)
-                            let currentVisibility = WorldRules.visibility(
-                                of: point, from: run.playerPosition,
-                                in: run.map, profile: visibilityProfile)
-                            let wasExplored = run.map[point].isRevealed
-                            let visibility = WorldRules.terrainVisibility(
-                                current: currentVisibility, wasRevealed: wasExplored)
-                            let isRememberedTerrain = currentVisibility == .hidden
-                                && visibility == .fringe
-                            let unexploredFringeGradient = UnexploredFringeGradient.resolve(
-                                tile: point, player: run.playerPosition,
-                                visibility: currentVisibility, wasExplored: wasExplored,
-                                profile: visibilityProfile)
-                            let showsStationaryContents = currentVisibility == .full || wasExplored
-                            let usesRememberedStationaryIdentity =
-                                ExplorationMapIdentityResolver.usesRememberedFrame(
-                                    currentVisibility: currentVisibility,
-                                    disclosed: showsStationaryContents)
-                            let displayTile = displayTile(at: point, visibility: visibility)
-                            let presentation = WorldTileVisibilityPresentation.resolve(
-                                run: run, point: point, tile: displayTile, visibility: visibility,
-                                profile: visibilityProfile, grade: grade,
-                                atmosphereMotion: atmosphereMotion,
-                                presentationTick: terrainClock.tick,
-                                isRememberedTerrain: isRememberedTerrain,
-                                showsStationaryContents: showsStationaryContents)
-                            TileView(tile: displayTile,
-                                     point: point,
-                                     visibility: visibility,
-                                     isRememberedTerrain: isRememberedTerrain,
+                        ForEach(0..<viewport.columns, id: \.self) { column in
+                            let cell = frameRequest.cells[row * viewport.columns + column]
+                            TileView(tile: cell.displayTile,
+                                     point: cell.point,
+                                     visibility: cell.visibility,
+                                     isRememberedTerrain: cell.isRememberedTerrain,
                                      usesRememberedStationaryIdentity:
-                                        usesRememberedStationaryIdentity,
-                                     unexploredFringeGradient: unexploredFringeGradient,
-                                     showsStationaryContents: showsStationaryContents,
-                                     visibilityProfile: visibilityProfile,
-                                     artRequest: presentation.artRequest,
-                                     fogBoundaryEdges: presentation.fogBoundaryEdges,
-                                     enemy: enemy(at: point, visibility: currentVisibility),
-                                     site: showsStationaryContents ? site(at: point) : nil,
-									 siteLooted: showsStationaryContents ? placedSite(at: point)?.isLooted : nil,
-                                     hasLooseWorldPage: showsStationaryContents
-                                        && run.offeredWorldPages.contains {
-                                            $0.fieldProvenance?.position == point
-                                        },
-                                     isPlayer: point == run.playerPosition,
+                                        cell.usesRememberedStationaryIdentity,
+                                     unexploredFringeGradient: cell.unexploredFringeGradient,
+                                     showsStationaryContents: cell.showsStationaryContents,
+                                     visibilityProfile: frameRequest.visibilityProfile,
+                                     artRequest: cell.presentation.artRequest,
+                                     fogBoundaryEdges: cell.presentation.fogBoundaryEdges,
+                                     enemy: enemy(at: cell.point,
+                                                  visibility: cell.currentVisibility),
+                                     site: cell.site?.definition,
+									 siteLooted: cell.site?.isLooted,
+                                     hasLooseWorldPage: cell.hasLooseWorldPage,
+                                     isPlayer: cell.point == run.playerPosition,
                                      side: side,
-									 presentationTick: terrainClock.tick,
+									 presentationTick: frameRequest.presentationTick,
                                      useSimpleRenderer: simpleRenderer)
-                                .onTapGesture { onTap(point) }
+                                .onTapGesture { onTap(cell.point) }
                         }
                     }
-                    .zIndex(Double(y))
+                    .zIndex(Double(row))
                 }
             }
             if let speech = travellerSpeech,
                speech.worldRunID == "\(run.runIndex):\(run.mapSeed)" {
                 let anchor = CGPoint(
-                    x: (CGFloat(speech.point.x - origin.x) + 0.5) * side,
-                    y: (CGFloat(speech.point.y - origin.y) + 0.5) * side)
+                    x: (CGFloat(speech.point.x - viewport.origin.x) + 0.5) * side,
+                    y: (CGFloat(speech.point.y - viewport.origin.y) + 0.5) * side)
                 let placement = TravellerSpeechBubblePlacement.resolve(
                     anchor: anchor, stageSize: proxy.size)
                 TravellerAdjacentSpeechBubbleView(
@@ -1952,12 +1996,13 @@ private struct MapGrid: View {
             }
 #if DEBUG
             .background(WorldMapViewportProbe(
-                mapWidth: maximumWidth, viewportRows: viewportRows)
+                mapWidth: viewport.width, viewportRows: viewport.rows)
                 .frame(width: proxy.size.width, height: proxy.size.height))
+            .onAppear { WorldMapFirstFrameMeasurement.mounted = frameRequest.receipt }
 #endif
         }
-        .frame(width: maximumWidth,
-               height: maximumWidth / CGFloat(viewportColumns) * CGFloat(viewportRows))
+        .frame(width: viewport.width,
+               height: viewport.width / CGFloat(viewport.columns) * CGFloat(viewport.rows))
         .frame(maxWidth: .infinity)
         .background(
             Color(red: Double(WorldMapLayout.backdropRGB[0]) / 255,
@@ -1988,42 +2033,19 @@ private struct MapGrid: View {
     /// never guesses a screen coordinate or depends on a sibling toolbar layout.
     private var miningSourceUnitFrames: [GridPoint: CGRect] {
         var result: [GridPoint: CGRect] = [:]
-        let width = CGFloat(viewportColumns)
-        let height = CGFloat(viewportRows)
-        for y in origin.y..<(origin.y + viewportRows) {
-            for x in origin.x..<(origin.x + viewportColumns) {
+        let width = CGFloat(viewport.columns)
+        let height = CGFloat(viewport.rows)
+        for y in viewport.origin.y..<(viewport.origin.y + viewport.rows) {
+            for x in viewport.origin.x..<(viewport.origin.x + viewport.columns) {
                 let point = GridPoint(x: x, y: y)
                 result[point] = CGRect(
-                    x: CGFloat(x - origin.x) / width,
-                    y: CGFloat(y - origin.y) / height,
+                    x: CGFloat(x - viewport.origin.x) / width,
+                    y: CGFloat(y - viewport.origin.y) / height,
                     width: 1 / width, height: 1 / height)
             }
         }
         return result
     }
-
-    private func displayTile(at point: GridPoint,
-                             visibility: WorldRules.TileVisibility) -> Tile {
-        var tile = run.map[point]
-        switch visibility {
-        case .full:
-            tile.isRevealed = true
-        case .fringe:
-            tile.isRevealed = true
-            if !run.map[point].isRevealed {
-                tile.content = .empty
-                tile.flora = nil
-            }
-            tile.isCracking = false
-        case .hidden:
-            tile.isRevealed = false
-            tile.content = .empty
-            tile.flora = nil
-            tile.isCracking = false
-        }
-        return tile
-    }
-
 
     /// Cryptic creatures don't show until they're on you — see `WorldRules.isVisible`.
     private func enemy(at point: GridPoint,
@@ -2032,14 +2054,6 @@ private struct MapGrid: View {
         return run.enemies.first {
             $0.position == point && WorldRules.isVisible($0, in: run)
         }
-    }
-
-    private func site(at point: GridPoint) -> SiteDef? {
-        run.sites.first { $0.position == point }?.definition
-    }
-
-    private func placedSite(at point: GridPoint) -> PlacedSite? {
-        run.sites.first { $0.position == point }
     }
 }
 

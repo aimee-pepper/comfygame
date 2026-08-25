@@ -920,7 +920,8 @@ struct MapTileArt: View {
 /// Warms only the lookup/raster caches that the first mounted Explore frame will ask for.
 /// It owns no gameplay state and returns false when a promoted asset cannot be resolved.
 @MainActor enum WorldDestinationMapPreloader {
-    static func prepare(artRequests: [MapTileArtRequest], identityKeys: [String]) async -> Bool {
+    static func prepare(artRequests: [MapTileArtRequest], identityKeys: [String],
+                        reduceMotion: Bool) async -> Bool {
         for key in identityKeys {
             guard !Task.isCancelled else { return false }
             guard ExplorationMapIdentityPack.image(key: key) != nil else { return false }
@@ -928,9 +929,9 @@ struct MapTileArt: View {
         }
         for request in artRequests {
             guard !Task.isCancelled else { return false }
-            // The first live map frame is tick zero. Reduced-motion has a distinct cache identity.
-            guard MapPixelRaster.image(for: request, reduceMotion: false) != nil,
-                  MapPixelRaster.image(for: request, reduceMotion: true) != nil else { return false }
+            guard MapPixelRaster.image(for: request, reduceMotion: reduceMotion) != nil else {
+                return false
+            }
             await Task.yield()
         }
         return !Task.isCancelled
@@ -1395,7 +1396,7 @@ struct RGBA: Equatable {
     }
 }
 
-@MainActor private enum MapPixelRaster {
+@MainActor enum MapPixelRaster {
     static let cache = NSCache<NSString, UIImage>()
     static let terrainPack: TerrainProductionPack? = {
         guard let pack = try? TerrainProductionPack.bundled() else { return nil }
@@ -1422,7 +1423,8 @@ struct RGBA: Equatable {
         return image
     }
 
-    static func image(for request: MapTileArtRequest, reduceMotion: Bool = false) -> UIImage? {
+    static func cacheIdentity(for request: MapTileArtRequest,
+                              reduceMotion: Bool = false) -> String? {
         let descriptor = request.flora.map(FloraRenderDescriptor.init)
         let floraKey = descriptor.map(stableFloraKey) ?? "none"
         guard let grade2 = request.worldGrade2Descriptor,
@@ -1446,8 +1448,23 @@ struct RGBA: Equatable {
             String(request.contactShadeDepths[$0])
         }.joined(separator: ",")
         let motionTick = reduceMotion || request.visibility != .full ? 0 : request.presentationTick
-        let key = "\(MapAssetContract.rendererTuple)-\(grade2Key)-\(request.seed)-\(request.point.x),\(request.point.y)-\(request.tile.ground.rawValue)-\(neighbors)-\(contours)-\(shades)-wall-\(request.southWallDepth)-\(request.wallWestContinuation)-\(request.wallEastContinuation)-\(request.visibility.rawValue)-\(request.tile.isRevealed)-\(request.tile.isCrumbled)-\(request.tile.isCracking)-\(request.tile.elevation)-\(request.surfaceDeposits.snow)-\(request.surfaceDeposits.settledAsh)-\(request.atmosphereMotion)-\(motionTick)-\(reduceMotion)-\(floraKey)-\(resourceKey)" as NSString
+        return "\(MapAssetContract.rendererTuple)-\(grade2Key)-\(request.seed)-\(request.point.x),\(request.point.y)-\(request.tile.ground.rawValue)-\(neighbors)-\(contours)-\(shades)-wall-\(request.southWallDepth)-\(request.wallWestContinuation)-\(request.wallEastContinuation)-\(request.visibility.rawValue)-\(request.tile.isRevealed)-\(request.tile.isCrumbled)-\(request.tile.isCracking)-\(request.tile.elevation)-\(request.surfaceDeposits.snow)-\(request.surfaceDeposits.settledAsh)-\(request.atmosphereMotion)-\(motionTick)-\(reduceMotion)-\(floraKey)-\(resourceKey)"
+    }
+
+    static func image(for request: MapTileArtRequest, reduceMotion: Bool = false) -> UIImage? {
+        guard let identity = cacheIdentity(for: request, reduceMotion: reduceMotion) else {
+            return nil
+        }
+        let key = identity as NSString
         if let cached = cache.object(forKey: key) { return cached }
+        let descriptor = request.flora.map(FloraRenderDescriptor.init)
+        let phase = request.resourceID.map { _ in
+            ResourcePixelGrammar.phase(
+                mapSeed: request.mapSeed, runIndex: request.runIndex, point: request.point)
+        }
+        let sheenFrame = reduceMotion ? nil : phase.flatMap {
+            ResourcePixelGrammar.frame(phase: $0, tick: request.presentationTick)
+        }
         guard var commands = try? terrainCommands(for: request, reduceMotion: reduceMotion) else {
             return nil
         }

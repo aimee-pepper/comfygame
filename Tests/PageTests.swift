@@ -198,6 +198,7 @@ final class PageTests: XCTestCase {
         let beforeTurn = run.turnsTaken
         let beforeMutationCount = store.state.meta.mutationCount
         WorldDestinationPreparationMeasurement.reset()
+        WorldMapFirstFrameMeasurement.reset()
 
         let host = UIHostingController(rootView:
             WorldArrivalView(receipt: receipt)
@@ -216,13 +217,22 @@ final class PageTests: XCTestCase {
             receiptID: receipt.id, runIndex: run.runIndex, mapSeed: run.mapSeed)
         XCTAssertEqual(WorldDestinationPreparationMeasurement.startedKeys, [expectedKey])
         XCTAssertEqual(WorldDestinationPreparationMeasurement.readyKeys, [expectedKey])
+        let preloadedFrame = try XCTUnwrap(WorldMapFirstFrameMeasurement.preloaded)
+        XCTAssertEqual(preloadedFrame.columns, 11)
+        XCTAssertEqual(preloadedFrame.rows, 14)
         XCTAssertEqual(store.state.worlds.pendingWorldArrivalReceiptID, receipt.id)
         XCTAssertEqual(store.activeRun?.turnsTaken, beforeTurn)
         XCTAssertEqual(store.state.meta.mutationCount, beforeMutationCount)
         XCTAssertEqual(try SaveCodec.encode(store.state), beforeBytes)
 
-        let firstRequest = WorldDestinationPreloader.request(run: run, state: store.state)
-        let secondRequest = WorldDestinationPreloader.request(run: run, state: store.state)
+        let firstRequest = WorldDestinationPreloader.request(
+            run: run, state: store.state, containerSize: .init(width: 368, height: 800),
+            displayScale: 2, presentationTick: TerrainPresentationClock.shared.tick,
+            reduceMotion: false)
+        let secondRequest = WorldDestinationPreloader.request(
+            run: run, state: store.state, containerSize: .init(width: 368, height: 800),
+            displayScale: 2, presentationTick: TerrainPresentationClock.shared.tick,
+            reduceMotion: false)
         XCTAssertEqual(firstRequest.artRequests.count, secondRequest.artRequests.count)
         XCTAssertEqual(firstRequest.identityKeys, secondRequest.identityKeys)
         XCTAssertFalse(firstRequest.artRequests.isEmpty)
@@ -233,6 +243,21 @@ final class PageTests: XCTestCase {
         XCTAssertEqual(store.activeRun?.mapSeed, run.mapSeed)
         XCTAssertEqual(store.activeRun?.map, run.map)
         XCTAssertFalse(store.enterPendingWorld(arrivalReceiptID: receipt.id))
+
+        host.rootView = WorldArrivalView(receipt: receipt)
+            .environmentObject(store)
+            .frame(width: 368, height: 800)
+        let worldHost = UIHostingController(rootView:
+            WorldView().environmentObject(store).frame(width: 368, height: 800))
+        window.rootViewController = worldHost
+        worldHost.view.frame = window.bounds
+        worldHost.view.layoutIfNeeded()
+        let mapDeadline = Date().addingTimeInterval(2)
+        while WorldMapFirstFrameMeasurement.mounted == nil, Date() < mapDeadline {
+            RunLoop.main.run(until: Date().addingTimeInterval(0.01))
+        }
+        XCTAssertEqual(WorldMapFirstFrameMeasurement.mounted, preloadedFrame,
+                       "the splash preload must exactly equal the first production MapGrid request")
     }
 
     @MainActor
@@ -244,12 +269,16 @@ final class PageTests: XCTestCase {
         let before = try XCTUnwrap(store?.activeRun)
         let beforeState = try XCTUnwrap(store?.state)
         let beforeRequest = WorldDestinationPreloader.request(
-            run: before, state: beforeState)
+            run: before, state: beforeState, containerSize: .init(width: 368, height: 800),
+            displayScale: 2, presentationTick: 0, reduceMotion: false)
         store = nil
 
         let relaunched = GameStore(io: io)
         let after = try XCTUnwrap(relaunched.activeRun)
-        let afterRequest = WorldDestinationPreloader.request(run: after, state: relaunched.state)
+        let afterRequest = WorldDestinationPreloader.request(
+            run: after, state: relaunched.state,
+            containerSize: .init(width: 368, height: 800), displayScale: 2,
+            presentationTick: 0, reduceMotion: false)
         XCTAssertEqual(after, before)
         XCTAssertEqual(relaunched.state.base, beforeState.base)
         XCTAssertEqual(relaunched.state.reality, beforeState.reality)

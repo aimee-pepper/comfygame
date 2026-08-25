@@ -85,6 +85,8 @@ struct WorldArrivalLayout: Equatable {
 struct WorldArrivalView: View {
     @EnvironmentObject private var store: GameStore
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+    @Environment(\.displayScale) private var displayScale
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @StateObject private var destinationPreparation = WorldDestinationPreparationCoordinator()
     let receipt: WorldArrivalReceipt
 
@@ -93,11 +95,16 @@ struct WorldArrivalView: View {
         return .init(receiptID: receipt.id, runIndex: run.runIndex, mapSeed: run.mapSeed)
     }
 
-    @MainActor private func prepareDestination() async -> Bool {
+    @MainActor private func prepareDestination(containerSize: CGSize) async -> Bool {
         guard let key = preparationKey, let run = store.activeRun else { return false }
         let state = store.state
+        let request = WorldDestinationPreloader.request(
+            run: run, state: state, containerSize: containerSize,
+            displayScale: displayScale,
+            presentationTick: TerrainPresentationClock.shared.tick,
+            reduceMotion: reduceMotion)
         return await destinationPreparation.prepare(key: key) {
-            await WorldDestinationPreloader.prepare(run: run, state: state)
+            await WorldDestinationPreloader.prepare(request: request)
         }
     }
 
@@ -133,7 +140,7 @@ struct WorldArrivalView: View {
 
                 Button("Enter World") {
                     Task { @MainActor in
-                        _ = await prepareDestination()
+                        _ = await prepareDestination(containerSize: proxy.size)
                         guard store.state.worlds.pendingWorldArrivalReceiptID == receipt.id,
                               store.activeRun?.worldArrivalReceipt?.id == receipt.id else { return }
                         _ = store.enterPendingWorld(arrivalReceiptID: receipt.id)
@@ -152,11 +159,13 @@ struct WorldArrivalView: View {
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .background(PixelUITheme.screen.ignoresSafeArea())
+            .task(id: receipt.id) {
+                _ = await prepareDestination(containerSize: proxy.size)
+            }
         }
 #if DEBUG
         .preference(key: DebugBugReporterSuppressedPreferenceKey.self, value: true)
 #endif
-        .task(id: receipt.id) { _ = await prepareDestination() }
         .onDisappear {
             guard store.state.worlds.pendingWorldArrivalReceiptID == receipt.id,
                   let key = preparationKey else { return }
