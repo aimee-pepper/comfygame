@@ -917,6 +917,26 @@ struct MapTileArt: View {
     }
 }
 
+/// Warms only the lookup/raster caches that the first mounted Explore frame will ask for.
+/// It owns no gameplay state and returns false when a promoted asset cannot be resolved.
+@MainActor enum WorldDestinationMapPreloader {
+    static func prepare(artRequests: [MapTileArtRequest], identityKeys: [String]) async -> Bool {
+        for key in identityKeys {
+            guard !Task.isCancelled else { return false }
+            guard ExplorationMapIdentityPack.image(key: key) != nil else { return false }
+            await Task.yield()
+        }
+        for request in artRequests {
+            guard !Task.isCancelled else { return false }
+            // The first live map frame is tick zero. Reduced-motion has a distinct cache identity.
+            guard MapPixelRaster.image(for: request, reduceMotion: false) != nil,
+                  MapPixelRaster.image(for: request, reduceMotion: true) != nil else { return false }
+            await Task.yield()
+        }
+        return !Task.isCancelled
+    }
+}
+
 private extension MapTileArtRequest {
     var resourceID: ResourceID? {
         switch tile.content {

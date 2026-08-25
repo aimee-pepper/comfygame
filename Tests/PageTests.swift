@@ -101,6 +101,168 @@ final class PageTests: XCTestCase {
     }
 
     @MainActor
+    func testWorldDestinationPreparationStartsOnceAndReusesTheSameResult() async {
+        let coordinator = WorldDestinationPreparationCoordinator()
+        let key = WorldDestinationPreparationCoordinator.Key(
+            receiptID: .init(rawValue: "prepared-a"), runIndex: 4, mapSeed: 44)
+        var calls = 0
+        let first = Task { @MainActor in
+            await coordinator.prepare(key: key) {
+                calls += 1
+                try? await Task.sleep(for: .milliseconds(40))
+                return !Task.isCancelled
+            }
+        }
+        await Task.yield()
+        let second = Task { @MainActor in
+            await coordinator.prepare(key: key) {
+                XCTFail("a peer waiter must reuse the one owned preparation")
+                return false
+            }
+        }
+        let firstResult = await first.value
+        let secondResult = await second.value
+        XCTAssertTrue(firstResult)
+        XCTAssertTrue(secondResult)
+        XCTAssertEqual(calls, 1)
+        XCTAssertEqual(coordinator.startedPreparationCount, 1)
+        XCTAssertEqual(coordinator.phase, .ready(key))
+        let reused = await coordinator.prepare(key: key) {
+            XCTFail("a ready destination must not prepare twice")
+            return false
+        }
+        XCTAssertTrue(reused)
+        XCTAssertEqual(coordinator.startedPreparationCount, 1)
+    }
+
+    @MainActor
+    func testWorldDestinationPreparationCancelsStaleDestinationAndIgnoresItsCallback() async {
+        let coordinator = WorldDestinationPreparationCoordinator()
+        let old = WorldDestinationPreparationCoordinator.Key(
+            receiptID: .init(rawValue: "prepared-old"), runIndex: 4, mapSeed: 44)
+        let current = WorldDestinationPreparationCoordinator.Key(
+            receiptID: .init(rawValue: "prepared-current"), runIndex: 5, mapSeed: 55)
+        let stale = Task { @MainActor in
+            await coordinator.prepare(key: old) {
+                try? await Task.sleep(for: .milliseconds(80))
+                return !Task.isCancelled
+            }
+        }
+        await Task.yield()
+        let currentResult = await coordinator.prepare(key: current) { true }
+        let staleResult = await stale.value
+        XCTAssertTrue(currentResult)
+        XCTAssertFalse(staleResult)
+        XCTAssertEqual(coordinator.phase, .ready(current))
+        XCTAssertEqual(coordinator.startedPreparationCount, 2)
+
+        coordinator.cancel(key: old)
+        XCTAssertEqual(coordinator.phase, .ready(current),
+                       "an obsolete route callback cannot cancel the selected destination")
+        coordinator.cancel(key: current)
+        XCTAssertEqual(coordinator.phase, .idle)
+    }
+
+    @MainActor
+    func testWorldDestinationPreparationFailureIsOneShotForTheSelectedDestination() async {
+        let coordinator = WorldDestinationPreparationCoordinator()
+        let key = WorldDestinationPreparationCoordinator.Key(
+            receiptID: .init(rawValue: "prepared-failure"), runIndex: 6, mapSeed: 66)
+        var calls = 0
+
+        let failed = await coordinator.prepare(key: key) {
+            calls += 1
+            return false
+        }
+        XCTAssertFalse(failed)
+        XCTAssertEqual(coordinator.phase, .failed(key))
+
+        let reusedFailure = await coordinator.prepare(key: key) {
+            XCTFail("a failed destination must not start an implicit second preparation")
+            return true
+        }
+        XCTAssertFalse(reusedFailure)
+        XCTAssertEqual(calls, 1)
+        XCTAssertEqual(coordinator.startedPreparationCount, 1)
+    }
+
+    @MainActor
+    func testMountedWorldSplashPreparesExactDestinationWithoutSaveOrTurnMutation() throws {
+        let io = SaveFileIO.temporary(name: "world-preload-mounted-\(UUID().uuidString)")
+        let store = GameStore(io: io)
+        XCTAssertTrue(store.bindAndDepart(
+            worldPageInstanceID: WorldPageCatalog.earthlikeTestInstance.id))
+        let receipt = try XCTUnwrap(store.state.worlds.pendingWorldArrivalReceipt)
+        let run = try XCTUnwrap(store.activeRun)
+        let beforeBytes = try SaveCodec.encode(store.state)
+        let beforeTurn = run.turnsTaken
+        let beforeMutationCount = store.state.meta.mutationCount
+        WorldDestinationPreparationMeasurement.reset()
+
+        let host = UIHostingController(rootView:
+            WorldArrivalView(receipt: receipt)
+                .environmentObject(store)
+                .frame(width: 368, height: 800))
+        let window = UIWindow(frame: CGRect(x: 0, y: 0, width: 368, height: 800))
+        window.rootViewController = host
+        window.makeKeyAndVisible()
+        host.view.frame = window.bounds
+        host.view.layoutIfNeeded()
+        let deadline = Date().addingTimeInterval(4)
+        while WorldDestinationPreparationMeasurement.readyKeys.isEmpty, Date() < deadline {
+            RunLoop.main.run(until: Date().addingTimeInterval(0.01))
+        }
+        let expectedKey = WorldDestinationPreparationCoordinator.Key(
+            receiptID: receipt.id, runIndex: run.runIndex, mapSeed: run.mapSeed)
+        XCTAssertEqual(WorldDestinationPreparationMeasurement.startedKeys, [expectedKey])
+        XCTAssertEqual(WorldDestinationPreparationMeasurement.readyKeys, [expectedKey])
+        XCTAssertEqual(store.state.worlds.pendingWorldArrivalReceiptID, receipt.id)
+        XCTAssertEqual(store.activeRun?.turnsTaken, beforeTurn)
+        XCTAssertEqual(store.state.meta.mutationCount, beforeMutationCount)
+        XCTAssertEqual(try SaveCodec.encode(store.state), beforeBytes)
+
+        let firstRequest = WorldDestinationPreloader.request(run: run, state: store.state)
+        let secondRequest = WorldDestinationPreloader.request(run: run, state: store.state)
+        XCTAssertEqual(firstRequest.artRequests.count, secondRequest.artRequests.count)
+        XCTAssertEqual(firstRequest.identityKeys, secondRequest.identityKeys)
+        XCTAssertFalse(firstRequest.artRequests.isEmpty)
+
+        XCTAssertTrue(store.enterPendingWorld(arrivalReceiptID: receipt.id))
+        XCTAssertNil(store.state.worlds.pendingWorldArrivalReceiptID)
+        XCTAssertEqual(store.activeRun?.turnsTaken, beforeTurn)
+        XCTAssertEqual(store.activeRun?.mapSeed, run.mapSeed)
+        XCTAssertEqual(store.activeRun?.map, run.map)
+        XCTAssertFalse(store.enterPendingWorld(arrivalReceiptID: receipt.id))
+    }
+
+    @MainActor
+    func testWorldDestinationPreparationIsTransientAndDeterministicAcrossRelaunch() throws {
+        let io = SaveFileIO.temporary(name: "world-preload-relaunch-\(UUID().uuidString)")
+        var store: GameStore? = GameStore(io: io)
+        XCTAssertTrue(store?.bindAndDepart(
+            worldPageInstanceID: WorldPageCatalog.earthlikeTestInstance.id) == true)
+        let before = try XCTUnwrap(store?.activeRun)
+        let beforeState = try XCTUnwrap(store?.state)
+        let beforeRequest = WorldDestinationPreloader.request(
+            run: before, state: beforeState)
+        store = nil
+
+        let relaunched = GameStore(io: io)
+        let after = try XCTUnwrap(relaunched.activeRun)
+        let afterRequest = WorldDestinationPreloader.request(run: after, state: relaunched.state)
+        XCTAssertEqual(after, before)
+        XCTAssertEqual(relaunched.state.base, beforeState.base)
+        XCTAssertEqual(relaunched.state.reality, beforeState.reality)
+        XCTAssertEqual(relaunched.state.worlds, beforeState.worlds)
+        XCTAssertEqual(relaunched.state.meta.mutationCount, beforeState.meta.mutationCount)
+        XCTAssertEqual(relaunched.state.meta.lastAction, beforeState.meta.lastAction)
+        XCTAssertEqual(afterRequest.artRequests.count, beforeRequest.artRequests.count)
+        XCTAssertEqual(afterRequest.identityKeys, beforeRequest.identityKeys)
+        XCTAssertEqual(relaunched.state.worlds.pendingWorldArrivalReceiptID,
+                       before.worldArrivalReceipt?.id)
+    }
+
+    @MainActor
     func testWorldArrivalRendersOrdinaryPhoneLayoutsInLightAndDark() throws {
         func pixels(_ image: UIImage) throws -> (data: Data, width: Int, height: Int, row: Int) {
             let cg = try XCTUnwrap(image.cgImage)

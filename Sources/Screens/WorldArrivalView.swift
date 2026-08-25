@@ -1,5 +1,70 @@
 import SwiftUI
 
+#if DEBUG
+@MainActor enum WorldDestinationPreparationMeasurement {
+    static var startedKeys: [WorldDestinationPreparationCoordinator.Key] = []
+    static var readyKeys: [WorldDestinationPreparationCoordinator.Key] = []
+    static var failedKeys: [WorldDestinationPreparationCoordinator.Key] = []
+    static func reset() { startedKeys = []; readyKeys = []; failedKeys = [] }
+}
+#endif
+
+@MainActor final class WorldDestinationPreparationCoordinator: ObservableObject {
+    struct Key: Equatable {
+        let receiptID: WorldArrivalReceiptID
+        let runIndex: Int
+        let mapSeed: UInt64
+    }
+    enum Phase: Equatable { case idle, preparing(Key), ready(Key), failed(Key) }
+
+    @Published private(set) var phase: Phase = .idle
+    private(set) var startedPreparationCount = 0
+    private var generation: UInt64 = 0
+    private var preparationTask: Task<Bool, Never>?
+
+    func prepare(key: Key, operation: @escaping @MainActor () async -> Bool) async -> Bool {
+        if phase == .ready(key) { return true }
+        if phase == .failed(key) { return false }
+        if phase == .preparing(key), let preparationTask {
+            return await preparationTask.value
+        }
+
+        cancel()
+        generation &+= 1
+        let ownedGeneration = generation
+        startedPreparationCount += 1
+        phase = .preparing(key)
+#if DEBUG
+        WorldDestinationPreparationMeasurement.startedKeys.append(key)
+#endif
+        let task = Task { @MainActor in await operation() }
+        preparationTask = task
+        let succeeded = await task.value
+        guard generation == ownedGeneration else { return false }
+        preparationTask = nil
+        phase = succeeded ? .ready(key) : .failed(key)
+#if DEBUG
+        if succeeded {
+            WorldDestinationPreparationMeasurement.readyKeys.append(key)
+        } else {
+            WorldDestinationPreparationMeasurement.failedKeys.append(key)
+        }
+#endif
+        return succeeded
+    }
+
+    func cancel(key: Key? = nil) {
+        if let key {
+            guard phase == .preparing(key) || phase == .ready(key) || phase == .failed(key)
+            else { return }
+        }
+        generation &+= 1
+        preparationTask?.cancel()
+        preparationTask = nil
+        phase = .idle
+    }
+}
+
 struct WorldArrivalLayout: Equatable {
     static let enterHeight: CGFloat = 58
     static let enterBottomInset: CGFloat = 14
@@ -20,7 +85,21 @@ struct WorldArrivalLayout: Equatable {
 struct WorldArrivalView: View {
     @EnvironmentObject private var store: GameStore
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+    @StateObject private var destinationPreparation = WorldDestinationPreparationCoordinator()
     let receipt: WorldArrivalReceipt
+
+    private var preparationKey: WorldDestinationPreparationCoordinator.Key? {
+        guard let run = store.activeRun, run.worldArrivalReceipt?.id == receipt.id else { return nil }
+        return .init(receiptID: receipt.id, runIndex: run.runIndex, mapSeed: run.mapSeed)
+    }
+
+    @MainActor private func prepareDestination() async -> Bool {
+        guard let key = preparationKey, let run = store.activeRun else { return false }
+        let state = store.state
+        return await destinationPreparation.prepare(key: key) {
+            await WorldDestinationPreloader.prepare(run: run, state: state)
+        }
+    }
 
     private var rendered: WorldArrivalRenderedSceneReceipt? { receipt.renderedSceneReceipt }
     private func sceneImage(size: CGSize) -> UIImage? {
@@ -53,7 +132,12 @@ struct WorldArrivalView: View {
                 .frame(height: decisionHeight)
 
                 Button("Enter World") {
-                    _ = store.enterPendingWorld(arrivalReceiptID: receipt.id)
+                    Task { @MainActor in
+                        _ = await prepareDestination()
+                        guard store.state.worlds.pendingWorldArrivalReceiptID == receipt.id,
+                              store.activeRun?.worldArrivalReceipt?.id == receipt.id else { return }
+                        _ = store.enterPendingWorld(arrivalReceiptID: receipt.id)
+                    }
                 }
                 .font(.custom("Tiny5", size: 15, relativeTo: .headline))
                 .foregroundStyle(Color.white)
@@ -72,6 +156,12 @@ struct WorldArrivalView: View {
 #if DEBUG
         .preference(key: DebugBugReporterSuppressedPreferenceKey.self, value: true)
 #endif
+        .task(id: receipt.id) { _ = await prepareDestination() }
+        .onDisappear {
+            guard store.state.worlds.pendingWorldArrivalReceiptID == receipt.id,
+                  let key = preparationKey else { return }
+            destinationPreparation.cancel(key: key)
+        }
     }
 
     @ViewBuilder

@@ -673,6 +673,83 @@ struct WorldFieldFeedbackRow: View {
 /// would need a 616pt screen. So the grid is a *map*, not a control surface: tapping a tile is the
 /// planning gesture (walk there), while the primary one-handed control is the D-pad in the thumb
 /// zone, which the brief offers for exactly this reason. Every button is ≥44pt.
+@MainActor enum WorldDestinationPreloader {
+    struct Request {
+        let artRequests: [MapTileArtRequest]
+        let identityKeys: [String]
+    }
+
+    static func request(run: WorldRun, state: GameState) -> Request {
+        let profile = WorldRules.visibilityProfile(
+            in: run, party: WorldRules.sightBonus(in: state))
+        let readings = BookRules.readings(for: run.book, seed: run.mapSeed)
+        let grade = WorldGrade.from(readings)
+        let atmosphereMotion = Int(readings["atmosphere"].aspect("motion")
+            .rounded(.toNearestOrAwayFromZero))
+        let columns = WorldMapLayout.viewportColumns(
+            mapColumns: run.map.width, cameraColumns: Tuning.World.viewportTiles)
+        let rows = min(run.map.height, columns)
+        let origin = GridPoint(
+            x: max(0, min(run.playerPosition.x - columns / 2, run.map.width - columns)),
+            y: max(0, min(run.playerPosition.y - rows / 2, run.map.height - rows)))
+        var artRequests: [MapTileArtRequest] = []
+        var identityKeys: [String] = []
+
+        for y in origin.y..<(origin.y + rows) {
+            for x in origin.x..<(origin.x + columns) {
+                let point = GridPoint(x: x, y: y)
+                let current = WorldRules.visibility(
+                    of: point, from: run.playerPosition, in: run.map, profile: profile)
+                let terrain = WorldRules.terrainVisibility(
+                    current: current, wasRevealed: run.map[point].isRevealed)
+                var tile = run.map[point]
+                switch terrain {
+                case .full:
+                    tile.isRevealed = true
+                case .fringe:
+                    tile.isRevealed = true
+                    if !run.map[point].isRevealed {
+                        tile.content = .empty
+                        tile.flora = nil
+                    }
+                    tile.isCracking = false
+                case .hidden:
+                    tile.isRevealed = false
+                    tile.content = .empty
+                    tile.flora = nil
+                    tile.isCracking = false
+                }
+                let remembered = current == .hidden && terrain == .fringe
+                let showsContents = current == .full || run.map[point].isRevealed
+                let presentation = WorldTileVisibilityPresentation.resolve(
+                    run: run, point: point, tile: tile, visibility: terrain,
+                    profile: profile, grade: grade, atmosphereMotion: atmosphereMotion,
+                    presentationTick: 0, isRememberedTerrain: remembered,
+                    showsStationaryContents: showsContents)
+                if let request = presentation.artRequest { artRequests.append(request) }
+                let site = showsContents ? run.sites.first(where: { $0.position == point }) : nil
+                let hasLoosePage = showsContents && run.offeredWorldPages.contains {
+                    $0.fieldProvenance?.position == point
+                }
+                if let key = ExplorationMapIdentityResolver.key(
+                    tile: tile, site: site?.definition, siteLooted: site?.isLooted,
+                    hasLooseWorldPage: hasLoosePage, tick: 0, disclosed: showsContents,
+                    remembered: ExplorationMapIdentityResolver.usesRememberedFrame(
+                        currentVisibility: current, disclosed: showsContents)) {
+                    identityKeys.append(key)
+                }
+            }
+        }
+        return Request(artRequests: artRequests, identityKeys: Array(Set(identityKeys)).sorted())
+    }
+
+    static func prepare(run: WorldRun, state: GameState) async -> Bool {
+        let request = request(run: run, state: state)
+        return await WorldDestinationMapPreloader.prepare(
+            artRequests: request.artRequests, identityKeys: request.identityKeys)
+    }
+}
+
 struct WorldView: View {
     @EnvironmentObject private var store: GameStore
     @Environment(\.displayScale) private var displayScale
