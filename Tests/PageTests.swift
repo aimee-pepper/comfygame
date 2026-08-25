@@ -389,6 +389,128 @@ final class PageTests: XCTestCase {
     }
 
     @MainActor
+    func testWritingDeskFirstRenderedPageIsBlankBeforeOnAppearOwnsASession() throws {
+        func preparedStore(_ name: String, withLegacyPage: Bool) -> GameStore {
+            let store = GameStore(io: .temporary(name: name))
+            store.mutate("prepare first-frame fixture") { state in
+                for lesson in TutorialLessonID.allCases {
+                    state.tutorial.complete(lesson, fact: "first_frame_fixture")
+                }
+            }
+            if withLegacyPage { XCTAssertTrue(store.write("plains")) }
+            store.reconcileStarterWorldPageBundle()
+            return store
+        }
+        func firstRender(_ store: GameStore) throws -> UIImage {
+            let renderer = ImageRenderer(content:
+                WritingDeskView()
+                    .environmentObject(store)
+                    .environment(\.colorScheme, .light)
+                    .environment(\.dynamicTypeSize, .large)
+                    .frame(width: 368, height: 800))
+            renderer.scale = 1
+            renderer.proposedSize = ProposedViewSize(width: 368, height: 800)
+            return try XCTUnwrap(renderer.uiImage)
+        }
+
+        let legacy = preparedStore("writing-first-legacy-\(UUID().uuidString)", withLegacyPage: true)
+        let blank = preparedStore("writing-first-blank-\(UUID().uuidString)", withLegacyPage: false)
+        XCTAssertNil(legacy.writingDeskDraft, "the pre-appearance proof must precede session setup")
+        XCTAssertEqual(legacy.state.base.page.runes.count, 1)
+        XCTAssertTrue(legacy.writingDeskPage.runes.isEmpty,
+                      "the presentation owner must be blank before the first body evaluation")
+        let persistedPageBeforeRender = legacy.state.base.page
+        let legacyFirstFrame = try firstRender(legacy)
+        let blankFirstFrame = try firstRender(blank)
+        XCTAssertEqual(legacy.state.base.page, persistedPageBeforeRender,
+                       "mount may own a transient session but must not rewrite the persisted legacy page")
+        XCTAssertEqual(legacyFirstFrame.pngData(), blankFirstFrame.pngData(),
+                       "a legacy persisted mark must not change any first-render Writing Desk pixel")
+    }
+
+    @MainActor
+    func testWritingDeskBlankAndEditedDraftsStageReviewAndCommitOneRevision() throws {
+        func exercise(_ symbolID: SymbolID?) throws {
+            let store = GameStore(io: .temporary(name: "writing-bind-revision-\(UUID().uuidString)"))
+            store.mutate("fund transient bind fixture") {
+                $0.base.essence = 1_000
+                $0.worlds.seeds = SeedSequence(rootSeed: 1)
+            }
+            store.beginWritingDeskSession()
+            if let symbolID { XCTAssertTrue(store.write(symbolID)) }
+            let draft = store.writingDeskPage
+            let revision = try XCTUnwrap(WritingDeskReviewModelFactory.canonicalHash(draft))
+            let quote = try XCTUnwrap(store.writingDeskBindQuote())
+            let review = try XCTUnwrap(store.writingDeskReviewModel())
+            XCTAssertEqual(quote.sourceKey, .draft(pageRevisionID: revision))
+            XCTAssertEqual(review.sourceKey, quote.sourceKey)
+            XCTAssertEqual(quote.frozenPageHash, revision)
+            XCTAssertEqual(review.visibleMarkCount, draft.runes.count)
+            XCTAssertTrue(store.bindAndDepart(), store.bindError ?? "ordinary transient bind refused")
+            XCTAssertEqual(store.activeRun?.book.allSymbolIDs, draft.symbolIDs)
+            XCTAssertEqual(store.writingDeskPage, draft,
+                           "commit must use the frozen draft without rewriting session ownership")
+        }
+        try exercise(nil)
+        try exercise("plains")
+    }
+
+    @MainActor
+    func testWritingDeskChangedTransientQuoteRefusesWithoutCommitDrift() throws {
+        let store = GameStore(io: .temporary(name: "writing-stale-quote-\(UUID().uuidString)"))
+        store.mutate("fund stale transient bind") {
+            $0.base.essence = 1_000
+            $0.worlds.seeds = SeedSequence(rootSeed: 1)
+        }
+        store.beginWritingDeskSession()
+        XCTAssertTrue(store.write("caverns"))
+        let staged = try XCTUnwrap(store.writingDeskBindQuote())
+        var changedDraft: Page?
+        var bytesAfterChange: Data?
+        store.writingDeskBeforeCommitForTesting = {
+            XCTAssertTrue(store.write("frostbound"))
+            changedDraft = store.writingDeskPage
+            bytesAfterChange = try! SaveCodec.makeEncoder().encode(store.state)
+        }
+        let committed = store.bindAndDepart()
+        XCTAssertNotNil(changedDraft, "the test hook must cross the staged/commit boundary")
+        XCTAssertFalse(committed)
+        XCTAssertEqual(store.bindError, "The binding changed before departure. Nothing was spent.")
+        XCTAssertNotEqual(store.writingDeskBindQuote(), staged)
+        XCTAssertEqual(store.writingDeskPage, changedDraft)
+        XCTAssertEqual(try SaveCodec.makeEncoder().encode(store.state), bytesAfterChange,
+                       "refusal may not spend Essence/seed/ink, add History, change the persisted page, or emit a turn")
+        XCTAssertNil(store.activeRun)
+        XCTAssertTrue(store.state.reality.library.visitedWorlds.isEmpty)
+    }
+
+    @MainActor
+    func testWritingDeskCollectedPageBindIgnoresAndPreservesTransientDraft() throws {
+        let selected = try XCTUnwrap(WorldPageCatalog.starterInstances.first)
+        let store = GameStore(io: .temporary(name: "writing-collected-owner-\(UUID().uuidString)"))
+        store.mutate("prepare collected bind owner") { state in
+            state.base.essence = 1_000
+            state.worlds.seeds = SeedSequence(rootSeed: 1)
+            state.base.collectedWorldPages = [selected]
+            state.base.starterWorldPageBundleFulfilled = true
+        }
+        let persistedPage = store.state.base.page
+        store.beginWritingDeskSession()
+        XCTAssertTrue(store.write("plains"))
+        let transientDraft = store.writingDeskPage
+        let quote = try XCTUnwrap(store.writingDeskBindQuote(selectedWorldPageID: selected.id))
+        let review = try XCTUnwrap(store.writingDeskReviewModel(selectedWorldPageID: selected.id))
+        XCTAssertEqual(quote.sourceKey, review.sourceKey)
+        XCTAssertTrue(store.bindAndDepart(worldPageInstanceID: selected.id))
+        XCTAssertEqual(store.activeRun?.book.worldPageUseReceipt?.instanceID, selected.id)
+        XCTAssertFalse(store.state.base.collectedWorldPages.contains { $0.id == selected.id })
+        XCTAssertEqual(store.writingDeskPage, transientDraft)
+        XCTAssertEqual(store.state.base.page, persistedPage)
+        XCTAssertEqual(store.activeRun?.book.allSymbolIDs,
+                       BookRules.resolveBook(worldPage: selected).allSymbolIDs)
+    }
+
+    @MainActor
     func testWritingDeskTemplateLoadIsExplicitAndTargetsOnlyCurrentSession() throws {
         let store = GameStore(io: .temporary(name: "writing-template-session-\(UUID().uuidString)"))
         let persistedPage = store.state.base.page

@@ -274,7 +274,7 @@ extension GameStore {
     func canWrite(_ id: SymbolID) -> Bool {
         guard let symbol = ContentCatalog.shared.symbol(id) else { return false }
         guard blockingPrimary(for: id) == nil else { return false }
-        return PageRules.placeAnywhere(symbol, hand: state.base.bestHand, on: writingDeskPage) != nil
+        return PageRules.placeAnywhere(symbol, hand: state.base.bestHand, on: writingDeskActionPage) != nil
     }
 
     /// The primary already claiming this symbol's target, if one is in the way.
@@ -283,7 +283,7 @@ extension GameStore {
     /// land" is a rule you can learn; a greyed-out button is not.
     func blockingPrimary(for id: SymbolID) -> SymbolDef? {
         guard let symbol = ContentCatalog.shared.symbol(id) else { return nil }
-        return PageRules.exclusivityConflict(writing: symbol, on: writingDeskPage,
+        return PageRules.exclusivityConflict(writing: symbol, on: writingDeskActionPage,
                                              chainingUnlocked: state.base.hasChainingUnlock)
     }
 
@@ -299,7 +299,7 @@ extension GameStore {
     func write(_ id: SymbolID, at cell: PageCell) -> Bool {
         guard blockingPrimary(for: id) == nil,
               let symbol = ContentCatalog.shared.symbol(id),
-              let updated = PageRules.place(symbol, hand: state.base.bestHand, at: cell, on: writingDeskPage)
+              let updated = PageRules.place(symbol, hand: state.base.bestHand, at: cell, on: writingDeskActionPage)
         else { return false }
         replaceWritingDeskDraft(updated, label: "write \(id.rawValue)")
         return true
@@ -310,7 +310,7 @@ extension GameStore {
     func write(_ id: SymbolID) -> Bool {
         guard blockingPrimary(for: id) == nil,
               let symbol = ContentCatalog.shared.symbol(id),
-              let updated = PageRules.placeAnywhere(symbol, hand: state.base.bestHand, on: writingDeskPage)
+              let updated = PageRules.placeAnywhere(symbol, hand: state.base.bestHand, on: writingDeskActionPage)
         else { return false }
         replaceWritingDeskDraft(updated, label: "write \(id.rawValue)")
         return true
@@ -319,7 +319,7 @@ extension GameStore {
     /// Pick a mark up and put it down elsewhere. Free, and repeatable, until you bind.
     @discardableResult
     func move(_ mark: InstanceID, to cell: PageCell) -> Bool {
-        guard let updated = PageRules.move(mark, to: cell, on: writingDeskPage) else { return false }
+        guard let updated = PageRules.move(mark, to: cell, on: writingDeskActionPage) else { return false }
         replaceWritingDeskDraft(updated, label: "move Sigil")
         return true
     }
@@ -328,9 +328,9 @@ extension GameStore {
     @discardableResult
     func write(_ content: MarkContent, glyph: String, at cell: PageCell) -> Bool {
         guard let shape = PageRules.shape(for: content, hand: state.base.bestHand),
-              PageRules.canPlace(shape: shape, at: cell, on: writingDeskPage)
+              PageRules.canPlace(shape: shape, at: cell, on: writingDeskActionPage)
         else { return false }
-        var page = writingDeskPage
+        var page = writingDeskActionPage
         let next = (page.runes.map(\.id.rawValue).max() ?? 0) + 1
         var placed = PlacedRune(id: InstanceID(rawValue: next), content: content,
                                 hand: state.base.bestHand, origin: cell, shapeID: shape.id)
@@ -348,7 +348,7 @@ extension GameStore {
     /// Whether a sigil will fit anywhere at all in the current hand.
     func canWrite(_ content: MarkContent) -> Bool {
         guard let shape = PageRules.shape(for: content, hand: state.base.bestHand) else { return false }
-        return !PageRules.validOrigins(for: shape, on: writingDeskPage).isEmpty
+        return !PageRules.validOrigins(for: shape, on: writingDeskActionPage).isEmpty
     }
 
     func footprint(_ content: MarkContent) -> Int {
@@ -374,7 +374,7 @@ extension GameStore {
     /// Join two adjacent marks. Adjacency constrains; this is the declaration of intent.
     @discardableResult
     func connect(_ a: InstanceID, _ b: InstanceID) -> Bool {
-        guard let updated = PageRules.connect(a, b, on: writingDeskPage,
+        guard let updated = PageRules.connect(a, b, on: writingDeskActionPage,
                                               chainingUnlocked: state.base.hasChainingUnlock)
         else { return false }
         replaceWritingDeskDraft(updated, label: "connect Sigils", flush: true)
@@ -382,7 +382,7 @@ extension GameStore {
     }
 
     func connectionIssue(_ a: InstanceID, _ b: InstanceID) -> PageRules.ConnectionIssue? {
-        PageRules.connectionIssue(a, b, on: writingDeskPage,
+        PageRules.connectionIssue(a, b, on: writingDeskActionPage,
                                   chainingUnlocked: state.base.hasChainingUnlock)
     }
 
@@ -391,13 +391,13 @@ extension GameStore {
     }
 
     func disconnect(_ a: InstanceID, _ b: InstanceID) {
-        replaceWritingDeskDraft(PageRules.disconnect(a, b, on: writingDeskPage),
+        replaceWritingDeskDraft(PageRules.disconnect(a, b, on: writingDeskActionPage),
                                 label: "disconnect Sigils", flush: true)
     }
 
     /// Break every link a mark has, splitting it out of its cluster.
     func disconnectAll(_ mark: InstanceID) {
-        var page = writingDeskPage
+        var page = writingDeskActionPage
         page.links = page.links.filter { !$0.involves(mark) }
         replaceWritingDeskDraft(page, label: "remove Sigil link", flush: true)
     }
@@ -405,7 +405,7 @@ extension GameStore {
     /// Move a whole cluster. A cluster is one object, so nothing inside it can come apart.
     @discardableResult
     func moveCluster(_ mark: InstanceID, by delta: PageCell) -> Bool {
-        guard let updated = PageRules.move(cluster: mark, by: delta, on: writingDeskPage) else { return false }
+        guard let updated = PageRules.move(cluster: mark, by: delta, on: writingDeskActionPage) else { return false }
         replaceWritingDeskDraft(updated, label: "move linked Sigils")
         return true
     }
@@ -413,19 +413,19 @@ extension GameStore {
     /// Turn a cluster a quarter turn. Where the packing gameplay lives.
     @discardableResult
     func rotateCluster(_ mark: InstanceID) -> Bool {
-        guard let updated = PageRules.rotate(cluster: mark, on: writingDeskPage) else { return false }
+        guard let updated = PageRules.rotate(cluster: mark, on: writingDeskActionPage) else { return false }
         replaceWritingDeskDraft(updated, label: "rotate linked Sigils", flush: true)
         return true
     }
 
     func erase(_ mark: InstanceID) {
-        var page = writingDeskPage
+        var page = writingDeskActionPage
         page.links = page.links.filter { !$0.involves(mark) }
         replaceWritingDeskDraft(PageRules.remove(mark, from: page), label: "erase Sigil")
     }
 
     func clearPage() {
-        let page = writingDeskPage
+        let page = writingDeskActionPage
         replaceWritingDeskDraft(Page(width: page.width, height: page.height), label: "clear the page")
     }
 
@@ -433,7 +433,7 @@ extension GameStore {
 
     @discardableResult
     func savePageTemplate(named proposedName: String) -> PageTemplateActionResult {
-        let draft = writingDeskPage
+        let draft = writingDeskActionPage
         guard !draft.runes.isEmpty else { return .emptyDraft }
         guard Self.isLegalTemplatePage(draft, in: state.base) else { return .invalidDraft }
         guard state.base.savedPageTemplates.count < PageTemplateRules.capacity else {
@@ -474,7 +474,7 @@ extension GameStore {
 
     @discardableResult
     func overwritePageTemplate(_ id: PageTemplateID) -> PageTemplateActionResult {
-        let draft = writingDeskPage
+        let draft = writingDeskActionPage
         guard !draft.runes.isEmpty else { return .emptyDraft }
         guard Self.isLegalTemplatePage(draft, in: state.base) else { return .invalidDraft }
         guard let current = state.base.savedPageTemplates.first(where: { $0.id == id })
@@ -509,7 +509,7 @@ extension GameStore {
         guard let current = state.base.savedPageTemplates.first(where: { $0.id == id })
         else { return .staleTemplate }
         guard Self.isLegalTemplatePage(current.page, in: state.base) else { return .invalidDraft }
-        guard !PageTemplateRules.structurallyEquivalent(current.page, writingDeskPage)
+        guard !PageTemplateRules.structurallyEquivalent(current.page, writingDeskActionPage)
         else { return .noChange }
         var nextID = state.base.nextTemplateMarkID
         guard let fresh = PageTemplateRules.remap(current.page, nextID: &nextID) else {
@@ -525,13 +525,13 @@ extension GameStore {
     @discardableResult
     func applyInkRecipe(_ recipe: InkRecipe, to markID: InstanceID) -> InkActionResult {
         guard state.base.hasCapability("inkMixing") else { return .mixingLocked }
-        guard let mark = writingDeskPage.runes.first(where: { $0.id == markID })
+        guard let mark = writingDeskActionPage.runes.first(where: { $0.id == markID })
         else { return .staleMark }
         guard mark.hand != .crude, mark.canCarryInk,
               mark.inkEligibleSourceID.map(InkEconomyRules.supportedSourceIDs.contains) == true
         else { return .ineligibleMark }
         guard mark.inkRecipe != recipe else { return .noChange }
-        var page = writingDeskPage
+        var page = writingDeskActionPage
         guard let index = page.runes.firstIndex(where: { $0.id == markID }),
                   page.runes[index].hand != .crude,
                   page.runes[index].canCarryInk,
@@ -545,11 +545,11 @@ extension GameStore {
 
     @discardableResult
     func returnMarkToAsh(_ markID: InstanceID) -> InkActionResult {
-        guard let mark = writingDeskPage.runes.first(where: { $0.id == markID })
+        guard let mark = writingDeskActionPage.runes.first(where: { $0.id == markID })
         else { return .staleMark }
         guard mark.hand != .crude, mark.canCarryInk else { return .ineligibleMark }
         guard mark.inkRecipe != nil else { return .noChange }
-        var page = writingDeskPage
+        var page = writingDeskActionPage
         guard let index = page.runes.firstIndex(where: { $0.id == markID }),
               page.runes[index].hand != .crude, page.runes[index].canCarryInk
         else { return .staleMark }
@@ -712,7 +712,7 @@ extension GameStore {
     /// Reads the seed the next bind *will* use, without consuming it — so what the preview
     /// promises is what the world delivers, sites included.
     var bookProjection: BookProjection {
-        BookProjection.project(page: writingDeskPage,
+        BookProjection.project(page: writingDeskActionPage,
                                seed: state.worlds.seeds.peekNextSeed(),
                                analysisTier: state.reality.analysisTier,
                                measuring: state.reality.calibratedSubjects,
@@ -751,7 +751,7 @@ extension GameStore {
         if state.base.essence < total {
             return .insufficientEssence(available: state.base.essence, required: total)
         }
-        if let refusal = Self.inkDepartureRefusal(page: writingDeskPage, in: state.base) {
+        if let refusal = Self.inkDepartureRefusal(page: writingDeskActionPage, in: state.base) {
             return .unavailable(refusal)
         }
         return .ready(totalCost: total)
@@ -981,7 +981,7 @@ extension GameStore {
         // change no page/history fact and create no half-world.
         let reservedCampaignSeed = stagedBindQuote.reservedCampaignSeed
         let generationSeed = stagedBindQuote.generationSeed
-        let sourcePage = selectedWorldPage?.definition.page ?? writingDeskPage
+        let sourcePage = selectedWorldPage?.definition.page ?? writingDeskActionPage
         var book = selectedWorldPage.map(BookRules.resolveBook(worldPage:))
             ?? BookRules.resolveBook(page: sourcePage)
         book.provenStatementReceipts = PageRules.compoundStatementAssessments(
@@ -1076,9 +1076,19 @@ extension GameStore {
             return false
         }
 
+#if DEBUG
+        let beforeCommitForTesting = writingDeskBeforeCommitForTesting
+        writingDeskBeforeCommitForTesting = nil
+        beforeCommitForTesting?()
+#endif
+        let currentDraftAtCommit = writingDeskDraft
         let didCommit = mutateIf("bind book & depart", flush: true) { state in
+            var quoteState = state
+            if worldPageInstanceID == nil, let currentDraftAtCommit {
+                quoteState.base.page = currentDraftAtCommit
+            }
             guard WritingDeskBindQuoteFactory.make(
-                state: state, selectedWorldPageID: worldPageInstanceID,
+                state: quoteState, selectedWorldPageID: worldPageInstanceID,
                 bornAnchored: bornAnchored) == stagedBindQuote else { return false }
             guard state.worlds.activeRun == nil,
                   state.base.essence >= book.essencePaid + anchorPremium,

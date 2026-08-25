@@ -418,6 +418,10 @@ final class GameStore: ObservableObject {
     /// The unfinished page on the currently mounted Writing Desk. Deliberately transient: an
     /// ordinary visit starts blank and a relaunch cannot silently restore an abandoned draft.
     @Published private(set) var writingDeskDraft: Page?
+#if DEBUG
+    /// Test-only interruption at the exact staged-quote/atomic-commit boundary.
+    var writingDeskBeforeCommitForTesting: (() -> Void)?
+#endif
 
     private let io: any GamePersistenceIO
     private let writeQueue = DispatchQueue(label: "com.aimeepepper.bookbinder.save", qos: .userInitiated)
@@ -431,7 +435,15 @@ final class GameStore: ObservableObject {
 
     var diagnosticCampaignReference: String? { io.diagnosticCampaignReference }
 
-    var writingDeskPage: Page { writingDeskDraft ?? state.base.page }
+    /// The page the mounted Writing Desk presents. Before SwiftUI delivers `onAppear`, this must
+    /// already be blank so a legacy persisted page can never flash during the first frame.
+    var writingDeskPage: Page {
+        writingDeskDraft ?? Page(width: state.base.page.width, height: state.base.page.height)
+    }
+
+    /// Rule calls outside a mounted Writing Desk retain their established persisted-page owner.
+    /// Once a session exists, the same calls edit the transient page shown by the screen.
+    var writingDeskActionPage: Page { writingDeskDraft ?? state.base.page }
 
     var writingDeskState: GameState {
         guard let writingDeskDraft else { return state }
