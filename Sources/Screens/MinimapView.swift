@@ -158,14 +158,16 @@ enum MinimapTerrainStyle {
 enum MinimapDisclosure {
     enum Marker: String, CaseIterable { case portal, page, apex, site, resource, item, traveller, encounter, cache, hazard }
 
-    static func marker(for tile: Tile, enemy: WorldEnemy?) -> Marker? {
+    static func marker(for tile: Tile, enemy: WorldEnemy?, siteLooted: Bool? = nil) -> Marker? {
         guard tile.isRevealed else { return nil }
         if let enemy { return enemy.isApex ? .apex : .encounter }
         return switch tile.content {
         case .empty: nil
         case .portal: .portal
         case .diaryPage, .foundWriting: .page
-        case .site: .site
+        // No approved depleted minimap identity exists in build268. Fail truthfully closed rather
+        // than retaining the active-site marker after its contents are exhausted.
+        case .site: siteLooted == true ? nil : .site
         case .node, .wildDrop: .resource
         case .item: .item
         case .traveller: .traveller
@@ -178,6 +180,10 @@ enum MinimapDisclosure {
         let visibleEnemy = run.enemies.first {
             $0.position == point && WorldRules.isCurrentlyVisible($0, in: run)
         }
-        return marker(for: run.map[point], enemy: visibleEnemy)
+        let tile = run.map[point]
+        let siteLooted: Bool? = if case .site(let instanceID) = tile.content {
+            run.sites.first(where: { $0.id == instanceID })?.isLooted
+        } else { nil }
+        return marker(for: tile, enemy: visibleEnemy, siteLooted: siteLooted)
     }
 }

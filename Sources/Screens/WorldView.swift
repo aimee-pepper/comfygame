@@ -113,10 +113,36 @@ enum WorldFieldFeedbackLayout {
     static let spacing: CGFloat = 4
     static let contextFraction: CGFloat = 0.25
     static let expandedEventMaximumHeight: CGFloat = 260
+    static let eventHoldNanoseconds: UInt64 = 1_700_000_000
+    static let eventFadeNanoseconds: UInt64 = 300_000_000
+    static let eventLifetimeNanoseconds = eventHoldNanoseconds + eventFadeNanoseconds
     static func paneWidths(total: CGFloat) -> (context: CGFloat, event: CGFloat) {
         let usable = max(0, total - spacing)
         let context = floor(usable * contextFraction)
         return (context, max(0, usable - context))
+    }
+
+    static func eventOpacity(elapsedNanoseconds: UInt64) -> CGFloat {
+        guard elapsedNanoseconds > eventHoldNanoseconds else { return 1 }
+        guard elapsedNanoseconds < eventLifetimeNanoseconds else { return 0 }
+        return 1 - CGFloat(elapsedNanoseconds - eventHoldNanoseconds)
+            / CGFloat(eventFadeNanoseconds)
+    }
+
+    static func contextOverlapsPlayer(player: GridPoint, mapWidth: Int, mapHeight: Int,
+                                      viewportColumns: Int, viewportRows: Int,
+                                      mapHeightPoints: CGFloat) -> Bool {
+        let originX = max(0, min(player.x - viewportColumns / 2, mapWidth - viewportColumns))
+        let originY = max(0, min(player.y - viewportRows / 2, mapHeight - viewportRows))
+        let playerRect = CGRect(
+            x: CGFloat(player.x - originX) / CGFloat(viewportColumns),
+            y: CGFloat(player.y - originY) / CGFloat(viewportRows),
+            width: 1 / CGFloat(viewportColumns), height: 1 / CGFloat(viewportRows))
+        let contextRect = CGRect(
+            x: 0,
+            y: max(0, 1 - compactHeight / mapHeightPoints),
+            width: contextFraction, height: 1)
+        return playerRect.intersects(contextRect)
     }
 }
 
@@ -344,23 +370,20 @@ struct WorldWholeFaceControl<Label: View>: View {
     @ViewBuilder let label: () -> Label
 
     var body: some View {
+        let isPressed = if case .touchDown(let pressedAction) = coordinator.lifecycle {
+            pressedAction == action
+        } else { false }
         label().frame(maxWidth: .infinity)
-                .frame(minWidth: 44, minHeight: 44).contentShape(Rectangle())
+                .contentShape(Rectangle())
+                .brightness(isPressed ? -0.18 : 0)
                 .overlay {
-                    if case .touchDown(let pressedAction) = coordinator.lifecycle,
-                       pressedAction == action {
-                        Rectangle().stroke(PixelUITheme.primaryHighlight, lineWidth: 2)
+                    if isPressed {
+                        Rectangle()
+                            .fill(PixelUITheme.edgeDark.opacity(0.18))
+                            .overlay(Rectangle().stroke(PixelUITheme.primaryHighlight, lineWidth: 3))
                     }
                 }
-                .overlay(alignment: .bottom) {
-                    if let status = coordinator.statusCopy(for: action) {
-                        Text(status).font(.custom("Tiny5", size: 10))
-                            .foregroundStyle(PixelUITheme.text)
-                            .padding(.horizontal, 4).padding(.vertical, 2)
-                            .background(PixelUITheme.surfaceRaised.opacity(0.94))
-                            .allowsHitTesting(false)
-                        }
-                }
+                .animation(.easeOut(duration: 0.06), value: isPressed)
                 .overlay {
                     WorldControlHitOwner(action: action, disabledReason: disabledReason,
                         onTouchDown: {
@@ -378,7 +401,6 @@ struct WorldWholeFaceControl<Label: View>: View {
                                 _ = coordinator.execute(attempt, current: snapshot(), operation: operation)
                             }
                         })
-                        .frame(minWidth: 44, minHeight: 44)
                 }
     }
 }
@@ -427,12 +449,15 @@ struct WorldControlHitOwner: UIViewRepresentable {
 
 struct WorldFieldFeedbackRow: View {
     private enum Expansion: Hashable { case context, events(String) }
-    private struct ExpiryTask: Hashable { let batchID: String?; let isHeld: Bool }
+    private struct ExpiryTask: Hashable { let batchID: String? }
     @EnvironmentObject private var store: GameStore
     @State private var expansion: Expansion?
+    @State private var eventVisibleSince = DispatchTime.now().uptimeNanoseconds
+    let contextOverlapsPlayer: Bool
 
-    init(initiallyExpandedBatchID: String? = nil) {
+    init(initiallyExpandedBatchID: String? = nil, contextOverlapsPlayer: Bool = false) {
         _expansion = State(initialValue: initiallyExpandedBatchID.map(Expansion.events))
+        self.contextOverlapsPlayer = contextOverlapsPlayer
     }
 
     var body: some View {
@@ -442,8 +467,10 @@ struct WorldFieldFeedbackRow: View {
                 HStack(alignment: .top, spacing: WorldFieldFeedbackLayout.spacing) {
                     contextPane.frame(width: widths.context)
                         .frame(maxHeight: .infinity, alignment: .topLeading)
-                    compactEventPane.frame(width: widths.event)
-                        .frame(maxHeight: .infinity, alignment: .topLeading)
+                    if store.currentWorldFieldEventBatch != nil {
+                        compactEventPane.frame(width: widths.event)
+                            .frame(maxHeight: .infinity, alignment: .topLeading)
+                    }
                 }
                 if expansion == .context, let context = store.worldFieldContext {
                     expandedContextPane(context)
@@ -461,14 +488,17 @@ struct WorldFieldFeedbackRow: View {
             }
         }
         .frame(height: WorldFieldFeedbackLayout.compactHeight)
-        .background(PixelUITheme.surfaceInset.opacity(0.82))
-        .task(id: ExpiryTask(batchID: store.currentWorldFieldEventBatch?.batchID,
-                             isHeld: expansion != nil)) {
-            guard expansion == nil else { return }
+        .task(id: ExpiryTask(batchID: store.currentWorldFieldEventBatch?.batchID)) {
             guard let batchID = store.currentWorldFieldEventBatch?.batchID else { return }
-            try? await Task.sleep(nanoseconds: 4_000_000_000)
+            try? await Task.sleep(nanoseconds: WorldFieldFeedbackLayout.eventLifetimeNanoseconds)
             guard !Task.isCancelled else { return }
             store.expireWorldFieldFeedback(ifCurrent: batchID)
+        }
+        .onChange(of: store.currentWorldFieldEventBatch?.batchID) { _, newBatchID in
+            eventVisibleSince = DispatchTime.now().uptimeNanoseconds
+            if case let .events(expandedID) = expansion, expandedID != newBatchID {
+                expansion = nil
+            }
         }
     }
 
@@ -491,7 +521,7 @@ struct WorldFieldFeedbackRow: View {
             }
             .buttonStyle(.plain)
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
-            .background(PixelUITheme.edgeDark.opacity(0.76))
+            .background(PixelUITheme.edgeDark.opacity(contextOverlapsPlayer ? 0.25 : 0.50))
             .overlay(Rectangle().stroke(PixelUITheme.edge, lineWidth: 2))
         } else {
             Color.clear
@@ -500,6 +530,7 @@ struct WorldFieldFeedbackRow: View {
 
     @ViewBuilder private var compactEventPane: some View {
         if let batch = store.currentWorldFieldEventBatch {
+            TimelineView(.animation(minimumInterval: 1.0 / 60.0)) { _ in
             VStack(alignment: .leading, spacing: 2) {
                 Text(batch.orderedNarrations[0])
                     .font(.system(size: 16)).foregroundStyle(PixelUITheme.text)
@@ -526,10 +557,19 @@ struct WorldFieldFeedbackRow: View {
             }
             .padding(7)
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
-            .background(PixelUITheme.edgeDark.opacity(0.72))
+            .background(
+                LinearGradient(
+                    colors: [PixelUITheme.edgeDark.opacity(0.75),
+                             PixelUITheme.edgeDark.opacity(0.25)],
+                    startPoint: .top, endPoint: .bottom)
+            )
             .overlay(Rectangle().stroke(PixelUITheme.edge, lineWidth: 2))
-        } else {
-            Color.clear.overlay(Rectangle().stroke(PixelUITheme.edge.opacity(0.35), lineWidth: 1))
+            .opacity({
+                let now = DispatchTime.now().uptimeNanoseconds
+                return WorldFieldFeedbackLayout.eventOpacity(
+                    elapsedNanoseconds: now &- min(now, eventVisibleSince))
+            }())
+            }
         }
     }
 
@@ -684,7 +724,15 @@ struct WorldView: View {
                             }
                             .id("world-map-\(viewportColumns)x\(viewportRows)-\(mapWidth)")
                             .overlay(alignment: .bottom) {
-                                WorldFieldFeedbackRow().environmentObject(store)
+                                WorldFieldFeedbackRow(contextOverlapsPlayer:
+                                    WorldFieldFeedbackLayout.contextOverlapsPlayer(
+                                        player: run.playerPosition,
+                                        mapWidth: run.map.width, mapHeight: run.map.height,
+                                        viewportColumns: viewportColumns,
+                                        viewportRows: viewportRows,
+                                        mapHeightPoints: mapWidth / CGFloat(viewportColumns)
+                                            * CGFloat(viewportRows)))
+                                    .environmentObject(store)
                             }
                         }
                         .overlay(alignment: .top) {
@@ -1008,8 +1056,10 @@ struct WorldView: View {
                             .foregroundStyle(canInteract ? PixelUITheme.screen : PixelUITheme.muted)
                             .background(canInteract ? PixelUITheme.primary : PixelUITheme.neutral)
                             .overlay(Rectangle().stroke(PixelUITheme.edgeDark, lineWidth: 2))
+                            .opacity(canInteract ? 1 : 0.48)
                     }
                     .accessibilityValue(interactionDetail(in: run))
+                    .accessibilityHint(canInteract ? "" : useTileUnavailableReason)
                     .accessibilityIdentifier("world.interact"))
                 } look: {
                     AnyView(WorldWholeFaceControl(
@@ -2117,6 +2167,16 @@ private struct TileView: View {
                 .allowsHitTesting(false)
             }
             ZStack {
+                // A depleted site remains truthful ground-owned identity while the party occupies
+                // it. This narrow underlay does not change the occlusion policy for any other
+                // stationary content.
+                if let depletedSiteAssetKey,
+                   let image = ExplorationMapIdentityPack.image(key: depletedSiteAssetKey) {
+                    let assetSize = ExplorationMapIdentityLayout.mapAssetSize(tileSide: side)
+                    Image(uiImage: image).resizable().interpolation(.none).antialiased(false)
+                        .frame(width: assetSize.width, height: assetSize.height)
+                        .frame(width: side, height: side, alignment: .bottom)
+                }
                 // The player gets a filled disc behind them: at 27pt a bare glyph disappears into
                 // the grid, and "where am I" has to be answerable at a glance.
                 if isPlayer {
@@ -2237,6 +2297,15 @@ private struct TileView: View {
 			remembered: usesRememberedStationaryIdentity)
 	}
 
+	private var depletedSiteAssetKey: String? {
+		guard isPlayer, enemy == nil, siteLooted == true, showsStationaryContents,
+		      case .site = tile.content else { return nil }
+		return ExplorationMapIdentityResolver.key(
+			tile: tile, site: site, siteLooted: true,
+			hasLooseWorldPage: false, tick: presentationTick,
+			disclosed: true, remembered: usesRememberedStationaryIdentity)
+	}
+
     private var tint: Color {
         if isPlayer { return Palette.mapFloor }
         if enemy != nil { return .red }
@@ -2298,7 +2367,10 @@ private struct TileView: View {
         disclosed: Bool = true,
         presentationTick: Int = 0,
         tileSide: CGFloat = 32,
-        inset: CGFloat = 8
+        inset: CGFloat = 8,
+        site: SiteDef? = nil,
+        siteLooted: Bool? = nil,
+        isPlayer: Bool = false
     ) -> AnyView {
         let tile = Tile(content: content, ground: .soil, isRevealed: revealed)
         return AnyView(
@@ -2311,8 +2383,8 @@ private struct TileView: View {
                 visibilityProfile: WorldRules.visibilityProfile(
                     illumination: 100, baseRadius: 1),
                 artRequest: nil, fogBoundaryEdges: [], enemy: nil,
-                site: nil, siteLooted: nil, hasLooseWorldPage: false,
-                isPlayer: false, side: tileSide,
+                site: site, siteLooted: siteLooted, hasLooseWorldPage: false,
+                isPlayer: isPlayer, side: tileSide,
                 presentationTick: presentationTick, useSimpleRenderer: false)
                 .frame(width: tileSide, height: tileSide)
                 .frame(width: tileSide + inset * 2,

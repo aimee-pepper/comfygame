@@ -663,20 +663,29 @@ struct ResourceMiningFeedbackV1: Equatable {
                 / (durationMilliseconds - fullOpacityMilliseconds))))
     }
 
-    static func riseDistance(tileHeight: CGFloat, sourceCenterY: CGFloat,
+    static func riseDistance(tileHeight: CGFloat, startCenterY: CGFloat,
                              mapMinY: CGFloat, contentHeight: CGFloat) -> CGFloat {
         max(0, min(tileHeight * 1.5,
-                   sourceCenterY - mapMinY - contentHeight / 2))
+                   startCenterY - mapMinY - contentHeight / 2))
+    }
+
+    static func startCenter(sourceTile: CGRect, mapMinY: CGFloat,
+                            contentHeight: CGFloat) -> CGPoint {
+        CGPoint(x: sourceTile.midX,
+                y: max(mapMinY + contentHeight / 2,
+                       sourceTile.minY - contentHeight / 2))
     }
 
     static func center(sourceTile: CGRect, mapViewport: CGRect,
                        contentHeight: CGFloat, elapsedMilliseconds: Double) -> CGPoint {
+        let start = startCenter(sourceTile: sourceTile, mapMinY: mapViewport.minY,
+                                contentHeight: contentHeight)
         let rise = riseDistance(tileHeight: sourceTile.height,
-                                sourceCenterY: sourceTile.midY,
+                                startCenterY: start.y,
                                 mapMinY: mapViewport.minY,
                                 contentHeight: contentHeight)
-        return CGPoint(x: sourceTile.midX,
-                       y: sourceTile.midY - rise * progress(
+        return CGPoint(x: start.x,
+                       y: start.y - rise * progress(
                         elapsedMilliseconds: elapsedMilliseconds))
     }
 

@@ -503,6 +503,7 @@ final class GameStore: ObservableObject {
     }
 
     var currentWorldFieldEventBatch: WorldFieldEventBatchV1? { worldFieldEventQueue.first }
+    var currentWorldFieldEventVisibleSince: UInt64? { visibleWorldFieldBatchSince }
 
     struct WorldFieldAttempt: Equatable, Sendable {
         let id: UInt64
@@ -557,9 +558,11 @@ final class GameStore: ObservableObject {
     func enqueueWorldFieldBatch(_ batch: WorldFieldEventBatchV1,
                                 now: UInt64 = DispatchTime.now().uptimeNanoseconds) {
         guard seenWorldFieldBatchIDs.insert(batch.batchID).inserted else { return }
-        let wasEmpty = worldFieldEventQueue.isEmpty
-        worldFieldEventQueue.append(batch)
-        if wasEmpty { visibleWorldFieldBatchSince = now }
+        // The phone audit made recency the explicit ownership rule: a newly committed
+        // interaction is immediately the visible event. Older, still-live events remain behind it
+        // and receive their own complete visible lifetime only if they become frontmost again.
+        worldFieldEventQueue.insert(batch, at: 0)
+        visibleWorldFieldBatchSince = now
         claimWorldMiningFeedback(for: batch, now: now)
     }
 
@@ -604,7 +607,7 @@ final class GameStore: ObservableObject {
                                   now: UInt64 = DispatchTime.now().uptimeNanoseconds) {
         guard currentWorldFieldEventBatch?.batchID == batchID,
               let visibleWorldFieldBatchSince,
-              now >= visibleWorldFieldBatchSince + 4_000_000_000 else { return }
+              now >= visibleWorldFieldBatchSince + 2_000_000_000 else { return }
         dismissWorldFieldFeedback(expectedBatchID: batchID, now: now)
     }
 

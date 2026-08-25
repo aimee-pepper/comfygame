@@ -38,16 +38,26 @@ final class WorldTests: XCTestCase {
         window.rootViewController = controller; window.makeKeyAndVisible()
         controller.view.frame = window.bounds; controller.view.layoutIfNeeded()
         let button = try XCTUnwrap(descendants(controller.view).compactMap { $0 as? UIButton }.first)
-        XCTAssertGreaterThanOrEqual(button.bounds.width, 44)
-        XCTAssertGreaterThanOrEqual(button.bounds.height, 44)
+        XCTAssertEqual(button.bounds, controller.view.bounds,
+                       "the hit owner must be the complete visible control face")
         let points = [CGPoint(x: button.bounds.midX, y: button.bounds.midY),
                       CGPoint(x: 2, y: 2),
                       CGPoint(x: button.bounds.maxX - 2, y: 2),
                       CGPoint(x: 2, y: button.bounds.maxY - 2),
                       CGPoint(x: button.bounds.maxX - 2, y: button.bounds.maxY - 2)]
-        for point in points {
+        for (index, point) in points.enumerated() {
             XCTAssertTrue(button.point(inside: point, with: nil))
             button.sendActions(for: .touchDown)
+            if index == 0 {
+                RunLoop.main.run(until: Date().addingTimeInterval(0.03))
+                let pressed = UIGraphicsImageRenderer(size: window.bounds.size).image { _ in
+                    controller.view.drawHierarchy(in: controller.view.bounds,
+                                                  afterScreenUpdates: true)
+                }
+                let attachment = XCTAttachment(image: pressed)
+                attachment.name = "WORLD-07-whole-face-pressed"
+                attachment.lifetime = .keepAlways; add(attachment)
+            }
             button.sendActions(for: .touchUpInside)
             RunLoop.main.run(until: Date().addingTimeInterval(0.02))
         }
@@ -240,6 +250,12 @@ final class WorldTests: XCTestCase {
         RunLoop.main.run(until: Date().addingTimeInterval(0.05))
         XCTAssertEqual(try SaveCodec.encode(store.state), before)
         XCTAssertEqual(store.activeRun?.turnsTaken, turn)
+        let disabled = UIGraphicsImageRenderer(size: window.bounds.size).image { _ in
+            controller.view.drawHierarchy(in: controller.view.bounds, afterScreenUpdates: true)
+        }
+        let attachment = XCTAttachment(image: disabled)
+        attachment.name = "WORLD-06-disabled-use-tile-no-popup-368x800"
+        attachment.lifetime = .keepAlways; add(attachment)
         window.isHidden = true
     }
 
@@ -433,8 +449,8 @@ final class WorldTests: XCTestCase {
     }
 
     @MainActor
-    func testWorldFieldFeedbackFIFOExpiryAndIdentityDismissal() throws {
-        let store = GameStore(io: .temporary(name: "field-feedback-fifo-\(UUID().uuidString)"))
+    func testWorldFieldFeedbackNewestFirstExpiryAndIdentityDismissal() throws {
+        let store = GameStore(io: .temporary(name: "field-feedback-newest-\(UUID().uuidString)"))
         store.mutate("test: start field feedback") { $0 = startedRun(book([:]), seed: 901) }
         let first = try XCTUnwrap(store.beginWorldFieldAttempt(.step))
         let duplicateEvents: [WorldRules.Event] = [.blocked("Still blocked."), .blocked("Still blocked.")]
@@ -448,21 +464,44 @@ final class WorldTests: XCTestCase {
         store.submitWorldFieldEvents([.blocked("Still blocked.")], for: second, now: 300)
         let third = try XCTUnwrap(store.beginWorldFieldAttempt(.step))
         store.submitWorldFieldEvents([.blocked("Third batch.")], for: third, now: 400)
-        XCTAssertEqual(store.worldFieldEventQueue.count, 3,
-                       "equal narration in a later attempt must remain queued")
+        XCTAssertEqual(store.worldFieldEventQueue.map(\.orderedNarrations), [
+            ["Third batch."], ["Still blocked."], ["Still blocked.", "Still blocked."],
+        ], "the newest admitted interaction must become visible immediately")
         let frozenState = try SaveCodec.encode(store.state)
         let frozenContext = store.worldFieldContext
-        let firstID = try XCTUnwrap(store.currentWorldFieldEventBatch?.batchID)
-        store.expireWorldFieldFeedback(ifCurrent: firstID, now: 4_000_000_099)
-        XCTAssertEqual(store.currentWorldFieldEventBatch?.batchID, firstID)
-        store.expireWorldFieldFeedback(ifCurrent: firstID, now: 4_000_000_100)
+        let newestID = try XCTUnwrap(store.currentWorldFieldEventBatch?.batchID)
+        store.expireWorldFieldFeedback(ifCurrent: newestID, now: 2_000_000_399)
+        XCTAssertEqual(store.currentWorldFieldEventBatch?.batchID, newestID)
+        store.expireWorldFieldFeedback(ifCurrent: newestID, now: 2_000_000_400)
         let secondID = try XCTUnwrap(store.currentWorldFieldEventBatch?.batchID)
-        XCTAssertNotEqual(secondID, firstID)
+        XCTAssertNotEqual(secondID, newestID)
+        XCTAssertEqual(store.currentWorldFieldEventBatch?.orderedNarrations, ["Still blocked."])
+        XCTAssertEqual(store.currentWorldFieldEventVisibleSince, 2_000_000_400,
+                       "each older event starts its full visible lifetime only when frontmost")
         store.dismissWorldFieldFeedback(expectedBatchID: secondID, now: 5_000_000_000)
         store.dismissWorldFieldFeedback(expectedBatchID: secondID, now: 5_000_000_001)
-        XCTAssertEqual(store.currentWorldFieldEventBatch?.orderedNarrations, ["Third batch."])
+        XCTAssertEqual(store.currentWorldFieldEventBatch?.orderedNarrations,
+                       ["Still blocked.", "Still blocked."])
         XCTAssertEqual(try SaveCodec.encode(store.state), frozenState)
         XCTAssertEqual(store.worldFieldContext, frozenContext)
+    }
+
+    func testWORLD03Through05FeedbackTimingGradientAndContextOverlapTruth() {
+        XCTAssertEqual(WorldFieldFeedbackLayout.eventHoldNanoseconds, 1_700_000_000)
+        XCTAssertEqual(WorldFieldFeedbackLayout.eventFadeNanoseconds, 300_000_000)
+        XCTAssertEqual(WorldFieldFeedbackLayout.eventOpacity(elapsedNanoseconds: 0), 1)
+        XCTAssertEqual(WorldFieldFeedbackLayout.eventOpacity(
+            elapsedNanoseconds: 1_700_000_000), 1)
+        XCTAssertEqual(WorldFieldFeedbackLayout.eventOpacity(
+            elapsedNanoseconds: 1_850_000_000), 0.5, accuracy: 0.001)
+        XCTAssertEqual(WorldFieldFeedbackLayout.eventOpacity(
+            elapsedNanoseconds: 2_000_000_000), 0)
+        XCTAssertTrue(WorldFieldFeedbackLayout.contextOverlapsPlayer(
+            player: .init(x: 0, y: 19), mapWidth: 20, mapHeight: 20,
+            viewportColumns: 11, viewportRows: 14, mapHeightPoints: 466.67))
+        XCTAssertFalse(WorldFieldFeedbackLayout.contextOverlapsPlayer(
+            player: .init(x: 10, y: 10), mapWidth: 20, mapHeight: 20,
+            viewportColumns: 11, viewportRows: 14, mapHeightPoints: 466.67))
     }
 
     @MainActor
@@ -524,11 +563,24 @@ final class WorldTests: XCTestCase {
         let attachment = XCTAttachment(image: after)
         attachment.name = "world-field-feedback-three-lines-368x800"
         attachment.lifetime = .keepAlways; add(attachment)
+        controller.overrideUserInterfaceStyle = .dark
+        controller.view.setNeedsLayout(); controller.view.layoutIfNeeded()
+        let darkEvent = image()
+        let darkAttachment = XCTAttachment(image: darkEvent)
+        darkAttachment.name = "WORLD-01-05-dark-event-368x800"
+        darkAttachment.lifetime = .keepAlways; add(darkAttachment)
+        store.clearWorldFieldFeedback()
+        RunLoop.main.run(until: Date().addingTimeInterval(0.05))
+        let darkEmpty = image()
+        XCTAssertNotEqual(darkEvent.pngData(), darkEmpty.pngData())
+        let emptyAttachment = XCTAttachment(image: darkEmpty)
+        emptyAttachment.name = "WORLD-02-dark-empty-event-absent-368x800"
+        emptyAttachment.lifetime = .keepAlways; add(emptyAttachment)
         window.isHidden = true
     }
 
     @MainActor
-    func testExpandedWorldFieldBatchHoldsExpiryAndKeepsEveryNarrationReachable() throws {
+    func testExpandedWorldFieldBatchKeepsEveryNarrationReachableWithoutExtendingLifetime() throws {
         let store = GameStore(io: .temporary(name: "field-feedback-expanded-\(UUID().uuidString)"))
         store.mutate("test: expanded feedback") { $0 = startedRun(book([:]), seed: 906) }
         let frozen = try SaveCodec.encode(store.state)
@@ -544,11 +596,7 @@ final class WorldTests: XCTestCase {
         let window = UIWindow(frame: CGRect(x: 0, y: 0, width: 368, height: 300))
         window.rootViewController = controller; window.makeKeyAndVisible()
         controller.view.frame = window.bounds; controller.view.layoutIfNeeded()
-        RunLoop.main.run(until: Date().addingTimeInterval(4.05))
-        XCTAssertEqual(store.currentWorldFieldEventBatch?.batchID, batch.batchID,
-                       "reading the expanded receipt must hold its expiry")
-        XCTAssertEqual(store.currentWorldFieldEventBatch?.orderedNarrations,
-                       batch.orderedNarrations)
+        XCTAssertEqual(store.currentWorldFieldEventBatch?.orderedNarrations, batch.orderedNarrations)
         XCTAssertEqual(try SaveCodec.encode(store.state), frozen)
         let image = UIGraphicsImageRenderer(size: window.bounds.size).image { _ in
             controller.view.drawHierarchy(in: controller.view.bounds, afterScreenUpdates: true)
@@ -556,6 +604,9 @@ final class WorldTests: XCTestCase {
         let attachment = XCTAttachment(image: image)
         attachment.name = "world-field-feedback-expanded-three-lines"
         attachment.lifetime = .keepAlways; add(attachment)
+        store.expireWorldFieldFeedback(ifCurrent: batch.batchID, now: 2_000_000_010)
+        XCTAssertNil(store.currentWorldFieldEventBatch,
+                     "expanded presentation must not extend the event's 1.7s hold + 0.3s fade")
         window.isHidden = true
     }
 
@@ -1467,6 +1518,11 @@ final class WorldTests: XCTestCase {
         XCTAssertNil(MinimapDisclosure.marker(for: Tile(isRevealed: false), enemy: apex))
         XCTAssertEqual(MinimapDisclosure.marker(for: Tile(isRevealed: true), enemy: ordinary), .encounter)
         XCTAssertEqual(MinimapDisclosure.marker(for: Tile(isRevealed: true), enemy: apex), .apex)
+        let siteTile = Tile(content: .site(InstanceID(rawValue: 1)), isRevealed: true)
+        XCTAssertEqual(MinimapDisclosure.marker(for: siteTile, enemy: nil,
+                                                siteLooted: false), .site)
+        XCTAssertNil(MinimapDisclosure.marker(for: siteTile, enemy: nil, siteLooted: true),
+                     "without an approved depleted minimap identity, the active marker disappears")
     }
 
     @MainActor
@@ -1708,6 +1764,32 @@ final class WorldTests: XCTestCase {
     }
 
     @MainActor
+    func testWORLD10DepletedSiteArtRemainsMountedUnderPlayer() throws {
+        let site = try XCTUnwrap(ContentCatalog.shared.sites.first { !$0.providesNaturalAnchor })
+        let content = TileContent.site(InstanceID(rawValue: 7_001))
+        func render(siteLooted: Bool?) -> UIImage {
+            let controller = UIHostingController(rootView:
+                MapAssetTestSupport.mountedStationaryIdentity(
+                    content: content, tileSide: 48, inset: 12,
+                    site: site, siteLooted: siteLooted, isPlayer: true))
+            let size = CGSize(width: 72, height: 81)
+            controller.view.frame = CGRect(origin: .zero, size: size)
+            controller.view.backgroundColor = .clear
+            controller.view.layoutIfNeeded()
+            return UIGraphicsImageRenderer(size: size).image { _ in
+                controller.view.drawHierarchy(in: controller.view.bounds, afterScreenUpdates: true)
+            }
+        }
+        let depleted = render(siteLooted: true)
+        let activeSuppressedByPlayer = render(siteLooted: false)
+        XCTAssertNotEqual(depleted.pngData(), activeSuppressedByPlayer.pngData(),
+                          "depleted site art must remain visible beneath the occupied player tile")
+        let attachment = XCTAttachment(image: depleted)
+        attachment.name = "WORLD-10-depleted-site-under-player"
+        attachment.lifetime = .keepAlways; add(attachment)
+    }
+
+    @MainActor
     func testExplorationMapResolverCoversEveryCatalogueObjectAndOpaqueUnknownIdentity() {
         XCTAssertEqual(ContentCatalog.shared.items.count, 102)
         for (offset, item) in ContentCatalog.shared.items.enumerated() {
@@ -1769,7 +1851,8 @@ final class WorldTests: XCTestCase {
             sourceTile: tile, mapViewport: map, contentHeight: 28, elapsedMilliseconds: 180)
         let at450 = ResourceMiningFeedbackV1.center(
             sourceTile: tile, mapViewport: map, contentHeight: 28, elapsedMilliseconds: 450)
-        XCTAssertEqual(at0, CGPoint(x: tile.midX, y: tile.midY))
+        XCTAssertEqual(at0, CGPoint(x: tile.midX, y: tile.minY - 14),
+                       "feedback starts immediately above the player/source tile")
         XCTAssertEqual(at180.x, at0.x)
         XCTAssertEqual(at450.x, at0.x)
         XCTAssertEqual(at0.y - at180.y, 19.2, accuracy: 0.001)
@@ -1940,8 +2023,8 @@ final class WorldTests: XCTestCase {
         store.enqueueWorldFieldBatch(a, now: 20)
         store.enqueueWorldFieldBatch(b, now: 30)
         store.enqueueWorldFieldBatch(a, now: 40)
-        XCTAssertEqual(store.currentWorldFieldEventBatch?.batchID, "older",
-                       "field narration remains independently FIFO")
+        XCTAssertEqual(store.currentWorldFieldEventBatch?.batchID, "B",
+                       "the newest committed interaction must be visible immediately")
         XCTAssertEqual(store.worldMiningFeedbackPresentations.map(\.batchID), ["A", "B"])
         XCTAssertEqual(store.worldMiningFeedbackPresentations.map(\.startedAtMonotonicTime), [20, 30])
         store.finishWorldMiningFeedback(expectedBatchID: "A")
@@ -2853,15 +2936,16 @@ final class WorldTests: XCTestCase {
                           "Map, Field Kit, and navigation are ordered siblings in one layout")
         XCTAssertTrue(source.contains("MapGrid("))
         XCTAssertFalse(source.contains("MapGrid(") && source.contains("eventLog.padding(8)"))
-        XCTAssertTrue(source.contains("WorldFieldFeedbackRow().environmentObject(store)"),
+        XCTAssertTrue(source.contains("WorldFieldFeedbackRow(contextOverlapsPlayer:"),
                       "The approved compact place/event receipt remains inside the map stage")
         XCTAssertTrue(source.contains("availableHeight: viewport.size.height"),
                       "The square stage must admit all eleven square rows without a false gap")
         XCTAssertFalse(source.contains("return \"Forest track\""),
                        "Place copy must derive from the live tile rather than a static fixture")
         XCTAssertTrue(source.contains("ground.displayName.capitalized"))
-        XCTAssertTrue(source.contains("LinearGradient(colors: [.clear, PixelUITheme.surfaceInset.opacity(0.96)]"),
-                      "Place copy must float over the approved transparent-to-field gradient")
+        XCTAssertTrue(source.contains("PixelUITheme.edgeDark.opacity(0.75)"))
+        XCTAssertTrue(source.contains("PixelUITheme.edgeDark.opacity(0.25)"),
+                      "Event copy must use the approved 75%-to-25% opacity gradient")
         XCTAssertTrue(source.contains(".font(.custom(\"Tiny5\", size: 10))"),
                       "The live place context must remain readable on an ordinary phone")
         XCTAssertTrue(source.contains(".font(.custom(\"Jersey 10\", size: 20))"))
