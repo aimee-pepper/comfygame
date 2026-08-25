@@ -59,7 +59,15 @@ final class WorldTests: XCTestCase {
                 attachment.lifetime = .keepAlways; add(attachment)
             }
             button.sendActions(for: .touchUpInside)
-            RunLoop.main.run(until: Date().addingTimeInterval(0.02))
+            let completionDeadline = Date().addingTimeInterval(1)
+            while Date() < completionDeadline {
+                if case .completed = coordinator.lifecycle { break }
+                RunLoop.main.run(until: Date().addingTimeInterval(0.002))
+            }
+            guard case .completed = coordinator.lifecycle else {
+                XCTFail("each deliberate repeat must wait for the authoritative completion")
+                return
+            }
         }
         XCTAssertEqual(activations, 5)
         window.isHidden = true
@@ -465,23 +473,18 @@ final class WorldTests: XCTestCase {
         let third = try XCTUnwrap(store.beginWorldFieldAttempt(.step))
         store.submitWorldFieldEvents([.blocked("Third batch.")], for: third, now: 400)
         XCTAssertEqual(store.worldFieldEventQueue.map(\.orderedNarrations), [
-            ["Third batch."], ["Still blocked."], ["Still blocked.", "Still blocked."],
-        ], "the newest admitted interaction must become visible immediately")
+            ["Third batch."],
+        ], "the newest interaction is immediate and preempted receipts retire")
         let frozenState = try SaveCodec.encode(store.state)
         let frozenContext = store.worldFieldContext
         let newestID = try XCTUnwrap(store.currentWorldFieldEventBatch?.batchID)
         store.expireWorldFieldFeedback(ifCurrent: newestID, now: 2_000_000_399)
         XCTAssertEqual(store.currentWorldFieldEventBatch?.batchID, newestID)
         store.expireWorldFieldFeedback(ifCurrent: newestID, now: 2_000_000_400)
-        let secondID = try XCTUnwrap(store.currentWorldFieldEventBatch?.batchID)
-        XCTAssertNotEqual(secondID, newestID)
-        XCTAssertEqual(store.currentWorldFieldEventBatch?.orderedNarrations, ["Still blocked."])
-        XCTAssertEqual(store.currentWorldFieldEventVisibleSince, 2_000_000_400,
-                       "each older event starts its full visible lifetime only when frontmost")
-        store.dismissWorldFieldFeedback(expectedBatchID: secondID, now: 5_000_000_000)
-        store.dismissWorldFieldFeedback(expectedBatchID: secondID, now: 5_000_000_001)
-        XCTAssertEqual(store.currentWorldFieldEventBatch?.orderedNarrations,
-                       ["Still blocked.", "Still blocked."])
+        XCTAssertNil(store.currentWorldFieldEventBatch,
+                     "an older preempted receipt cannot resurface with a fresh lifetime")
+        store.dismissWorldFieldFeedback(expectedBatchID: newestID, now: 5_000_000_000)
+        XCTAssertNil(store.currentWorldFieldEventBatch)
         XCTAssertEqual(try SaveCodec.encode(store.state), frozenState)
         XCTAssertEqual(store.worldFieldContext, frozenContext)
     }
@@ -511,12 +514,12 @@ final class WorldTests: XCTestCase {
         let first = try XCTUnwrap(store.beginWorldFieldAttempt(.interact))
         store.submitWorldFieldEvents(
             [.readFoundWriting(FoundWritingID(rawValue: "a:b"), "c;d")], for: first, now: 1)
+        let firstBatchID = try XCTUnwrap(store.worldFieldEventQueue.first?.batchID)
         let second = try XCTUnwrap(store.beginWorldFieldAttempt(.interact))
         store.submitWorldFieldEvents(
             [.readFoundWriting(FoundWritingID(rawValue: "a"), "b:c;d")], for: second, now: 2)
-        XCTAssertEqual(store.worldFieldEventQueue.count, 2)
-        XCTAssertNotEqual(store.worldFieldEventQueue[0].batchID,
-                          store.worldFieldEventQueue[1].batchID)
+        XCTAssertEqual(store.worldFieldEventQueue.count, 1)
+        XCTAssertNotEqual(firstBatchID, store.worldFieldEventQueue[0].batchID)
     }
     @MainActor
     func testWorldFieldFeedbackMountedConsumerChangesPhoneRenderWithoutGameplayMutation() throws {
@@ -748,6 +751,120 @@ final class WorldTests: XCTestCase {
             attachment.lifetime = .keepAlways
             add(attachment)
         }
+    }
+
+    @MainActor
+    func testWORLDAssetEvidenceUsesActualContextAndControlOwnersWithoutTutorial() throws {
+        func makeStore(overPlayer: Bool, interactable: Bool) throws -> GameStore {
+            let store = GameStore(io: .temporary(
+                name: "world-asset-evidence-\(overPlayer)-\(interactable)-\(UUID().uuidString)"))
+            store.mutate("test: unobscured World asset evidence") { saved in
+                saved = startedRun(book(["terrain": "plains"]), seed: 12_071)
+                guard var run = saved.worlds.activeRun else { return }
+                let point = overPlayer
+                    ? GridPoint(x: 0, y: run.map.height - 1)
+                    : GridPoint(x: run.map.width / 2, y: run.map.height / 2)
+                run.playerPosition = point
+                run.enemies = []
+                for mapPoint in run.map.allPoints {
+                    run.map[mapPoint].isRevealed = true
+                    run.map[mapPoint].isCrumbled = false
+                    run.map[mapPoint].isCracking = false
+                    run.map[mapPoint].elevation = 0
+                }
+                run.map[point].flora = nil
+                run.map[point].content = interactable
+                    ? .node(ResourceNode(resource: Resources.ore, remainingHarvests: 2,
+                                         yieldPerHarvest: 1, secondaryResource: nil,
+                                         secondaryYieldPerHarvest: 0))
+                    : .empty
+                saved.worlds.activeRun = run
+                for lesson in TutorialLessonID.allCases {
+                    saved.tutorial.complete(lesson, fact: "world_asset_evidence")
+                }
+            }
+            return store
+        }
+
+        func mountedEvidence(store: GameStore, scheme: ColorScheme,
+                             name: String, contextOverPlayer: Bool,
+                             pressUseTile: Bool = false) throws {
+            let frozen = try SaveCodec.encode(store.state)
+            let controller = UIHostingController(rootView:
+                WorldView().environmentObject(store)
+                    .environment(\.colorScheme, scheme).frame(width: 368, height: 800))
+            let window = UIWindow(frame: CGRect(x: 0, y: 0, width: 368, height: 800))
+            window.rootViewController = controller; window.makeKeyAndVisible()
+            controller.view.frame = window.bounds; controller.view.layoutIfNeeded()
+            RunLoop.main.run(until: Date().addingTimeInterval(0.08))
+            XCTAssertEqual(WorldMapStageMeasurement.latestFrame.size,
+                           CGSize(width: 368, height: 475))
+            let contextSocket = CGRect(
+                x: WorldMapStageMeasurement.latestMapFrame.minX,
+                y: WorldMapStageMeasurement.latestMapFrame.maxY
+                    - WorldFieldFeedbackLayout.compactHeight,
+                width: WorldFieldFeedbackLayout.paneWidths(total: 368).context,
+                height: WorldFieldFeedbackLayout.compactHeight)
+            XCTAssertEqual(contextSocket.minX, 0, accuracy: 0.75,
+                           "the empty-event context remains in its established left socket")
+            XCTAssertEqual(contextSocket.width, 91, accuracy: 0.5)
+            XCTAssertEqual(contextSocket.height, 78, accuracy: 0.5)
+            let run = try XCTUnwrap(store.activeRun)
+            XCTAssertEqual(WorldFieldFeedbackLayout.contextOverlapsPlayer(
+                player: run.playerPosition, mapWidth: run.map.width, mapHeight: run.map.height,
+                viewportColumns: 11, viewportRows: 14,
+                mapHeightPoints: WorldMapStageMeasurement.latestMapFrame.height), contextOverPlayer)
+            let useTile = try XCTUnwrap(descendants(controller.view)
+                .compactMap { $0 as? WorldControlHitOwner.ControlButton }
+                .first { $0.worldAction == .useTile })
+            let controlFrame = useTile.convert(useTile.bounds, to: nil)
+            XCTAssertGreaterThan(controlFrame.width, 70)
+            XCTAssertEqual(controlFrame.height, WorldControlsLayout.actionHeight, accuracy: 0.5)
+            if pressUseTile {
+                XCTAssertNil(useTile.worldDisabledReason)
+                useTile.sendActions(for: .touchDown)
+                RunLoop.main.run(until: Date().addingTimeInterval(0.04))
+            } else {
+                XCTAssertEqual(useTile.worldDisabledReason, "There is nothing to use here.")
+            }
+            let image = UIGraphicsImageRenderer(size: window.bounds.size).image { _ in
+                controller.view.drawHierarchy(in: controller.view.bounds, afterScreenUpdates: true)
+            }
+            let attachment = XCTAttachment(image: image)
+            attachment.name = name
+            attachment.lifetime = .keepAlways; add(attachment)
+            if pressUseTile { useTile.sendActions(for: .touchDragExit) }
+            XCTAssertEqual(try SaveCodec.encode(store.state), frozen)
+            window.isHidden = true
+        }
+
+        for scheme in [ColorScheme.light, .dark] {
+            let suffix = scheme == .light ? "light" : "dark"
+            let ordinary = try makeStore(overPlayer: false, interactable: false)
+            let ordinaryRun = try XCTUnwrap(ordinary.activeRun)
+            XCTAssertFalse(WorldFieldFeedbackLayout.contextOverlapsPlayer(
+                player: ordinaryRun.playerPosition,
+                mapWidth: ordinaryRun.map.width, mapHeight: ordinaryRun.map.height,
+                viewportColumns: 11, viewportRows: 14, mapHeightPoints: 466.67))
+            try mountedEvidence(store: ordinary, scheme: scheme,
+                name: "WORLD-context-50-disabled-no-tutorial-\(suffix)-368x800",
+                contextOverPlayer: false)
+
+            let overlapping = try makeStore(overPlayer: true, interactable: false)
+            let overlappingRun = try XCTUnwrap(overlapping.activeRun)
+            XCTAssertTrue(WorldFieldFeedbackLayout.contextOverlapsPlayer(
+                player: overlappingRun.playerPosition,
+                mapWidth: overlappingRun.map.width, mapHeight: overlappingRun.map.height,
+                viewportColumns: 11, viewportRows: 14, mapHeightPoints: 466.67))
+            try mountedEvidence(store: overlapping, scheme: scheme,
+                name: "WORLD-context-25-over-player-disabled-no-tutorial-\(suffix)-368x800",
+                contextOverPlayer: true)
+        }
+
+        let pressed = try makeStore(overPlayer: false, interactable: true)
+        try mountedEvidence(store: pressed, scheme: .light,
+            name: "WORLD-real-use-tile-pressed-no-tutorial-light-368x800",
+            contextOverPlayer: false, pressUseTile: true)
     }
 
     @MainActor
@@ -1510,7 +1627,10 @@ final class WorldTests: XCTestCase {
         ]
         for (content, expected) in cases {
             XCTAssertNil(MinimapDisclosure.marker(for: Tile(content: content, isRevealed: false), enemy: nil))
-            XCTAssertEqual(MinimapDisclosure.marker(for: Tile(content: content, isRevealed: true), enemy: nil), expected)
+            let siteLooted: Bool? = expected == .site ? false : nil
+            XCTAssertEqual(MinimapDisclosure.marker(
+                for: Tile(content: content, isRevealed: true), enemy: nil,
+                siteLooted: siteLooted), expected)
         }
         let ordinary = WorldEnemy(id: InstanceID(rawValue: 2), position: GridPoint(x: 0, y: 0))
         let apex = WorldEnemy(id: InstanceID(rawValue: 3), position: GridPoint(x: 0, y: 0), isApex: true)
@@ -1523,6 +1643,8 @@ final class WorldTests: XCTestCase {
                                                 siteLooted: false), .site)
         XCTAssertNil(MinimapDisclosure.marker(for: siteTile, enemy: nil, siteLooted: true),
                      "without an approved depleted minimap identity, the active marker disappears")
+        XCTAssertNil(MinimapDisclosure.marker(for: siteTile, enemy: nil, siteLooted: nil),
+                     "missing or mismatched site state must fail closed")
     }
 
     @MainActor
@@ -2025,6 +2147,7 @@ final class WorldTests: XCTestCase {
         store.enqueueWorldFieldBatch(a, now: 40)
         XCTAssertEqual(store.currentWorldFieldEventBatch?.batchID, "B",
                        "the newest committed interaction must be visible immediately")
+        XCTAssertEqual(store.worldFieldEventQueue.map(\.batchID), ["B"])
         XCTAssertEqual(store.worldMiningFeedbackPresentations.map(\.batchID), ["A", "B"])
         XCTAssertEqual(store.worldMiningFeedbackPresentations.map(\.startedAtMonotonicTime), [20, 30])
         store.finishWorldMiningFeedback(expectedBatchID: "A")
@@ -2120,7 +2243,6 @@ final class WorldTests: XCTestCase {
         ], "the counter is committed before frame one")
         let miningBatchID = try XCTUnwrap(store.worldMiningFeedbackPresentations.first?.batchID)
         let before = try SaveCodec.encode(store.state)
-
         RunLoop.main.run(until: Date().addingTimeInterval(0.12))
         XCTAssertEqual(store.worldMiningFeedbackPresentations.first?.batchID, miningBatchID,
                        "the local presentation remains independently owned during its 450 ms lifetime")
@@ -2135,19 +2257,94 @@ final class WorldTests: XCTestCase {
                                  "the source tile must resolve inside the rendered map viewport")
         XCTAssertEqual(mountedSource.maxX, mountedViewport.maxX, accuracy: 0.1,
                        "the first proof owns the edge-clamped rightmost source tile")
+        let startCenter = ResourceMiningFeedbackV1.center(
+            sourceTile: mountedSource, mapViewport: mountedViewport,
+            contentHeight: 28, elapsedMilliseconds: 0)
+        let endCenter = ResourceMiningFeedbackV1.center(
+            sourceTile: mountedSource, mapViewport: mountedViewport,
+            contentHeight: 28, elapsedMilliseconds: 450)
+        XCTAssertEqual(startCenter.y + 14, mountedSource.minY, accuracy: 0.1,
+                       "frame one begins immediately above the player/source tile")
+        XCTAssertEqual(startCenter.y - endCenter.y, mountedSource.height * 1.5, accuracy: 0.1,
+                       "the production path rises exactly one and a half tile heights")
         XCTAssertEqual(WorldMapStageMeasurement.latestFrame.width, 368, accuracy: 0.5)
         XCTAssertEqual(WorldMapStageMeasurement.latestFrame.height, 475, accuracy: 0.5,
                        "mining overlay cannot alter the measured Explore map geometry")
-        let image = UIGraphicsImageRenderer(size: window.bounds.size).image { _ in
-            controller.view.drawHierarchy(in: controller.view.bounds, afterScreenUpdates: true)
-        }
-        XCTAssertEqual(image.size, CGSize(width: 368, height: 800))
         XCTAssertEqual(try SaveCodec.encode(store.state), before,
                        "the local presentation is hit-test transparent and gameplay inert")
-        let attachment = XCTAttachment(image: image)
-        attachment.name = "resource-mining-right-edge-rise-and-counter-pulse-368x800"
-        attachment.lifetime = .keepAlways; add(attachment)
         window.isHidden = true
+    }
+
+    @MainActor
+    func testWORLDMiningEvidenceUsesActualWorldPlayerAndProductionOverlay() throws {
+        func capture(elapsedMilliseconds target: Double, scheme: ColorScheme,
+                     suffix: String) throws {
+            MiningFeedbackLayoutMeasurement.latestBatchID = nil
+            MiningFeedbackLayoutMeasurement.latestSourceTile = nil
+            MiningFeedbackLayoutMeasurement.latestMapViewport = nil
+            let store = GameStore(io: .temporary(
+                name: "world-mining-evidence-\(suffix)-\(UUID().uuidString)"))
+            for lesson in TutorialLessonID.allCases {
+                store.completeTutorial(lesson, fact: "world_mining_asset_evidence")
+            }
+            XCTAssertTrue(store.bindAndDepart(
+                worldPageInstanceID: WorldPageCatalog.earthlikeTestInstance.id))
+            let arrivalID = try XCTUnwrap(store.state.worlds.pendingWorldArrivalReceiptID)
+            XCTAssertTrue(store.enterPendingWorld(arrivalReceiptID: arrivalID))
+            store.mutate("test: actual production mining evidence", flush: true) { state in
+                guard let point = state.worlds.activeRun?.playerPosition else { return }
+                state.worlds.activeRun?.enemies = []
+                state.worlds.activeRun?.map[point].isRevealed = true
+                state.worlds.activeRun?.map[point].flora = nil
+                state.worlds.activeRun?.map[point].content = .node(ResourceNode(
+                    resource: Resources.timber, remainingHarvests: 2, yieldPerHarvest: 3,
+                    secondaryResource: nil, secondaryYieldPerHarvest: 0))
+            }
+            let controller = UIHostingController(rootView:
+                WorldView().environmentObject(store)
+                    .environment(\.colorScheme, scheme).frame(width: 368, height: 800))
+            let window = UIWindow(frame: CGRect(x: 0, y: 0, width: 368, height: 800))
+            window.rootViewController = controller; window.makeKeyAndVisible()
+            controller.view.frame = window.bounds; controller.view.layoutIfNeeded()
+            RunLoop.main.run(until: Date().addingTimeInterval(0.12))
+            store.harvest()
+            let startedAt = try XCTUnwrap(
+                store.worldMiningFeedbackPresentations.first?.startedAtMonotonicTime)
+            let frozen = try SaveCodec.encode(store.state)
+            while MiningFeedbackLayoutMeasurement.latestSourceTile == nil {
+                controller.view.layoutIfNeeded()
+                RunLoop.main.run(until: Date().addingTimeInterval(0.002))
+            }
+            while Double(DispatchTime.now().uptimeNanoseconds &- startedAt) / 1_000_000 < target {
+                RunLoop.main.run(until: Date().addingTimeInterval(0.003))
+            }
+            XCTAssertNotNil(store.worldMiningFeedbackPresentations.first,
+                            "the requested capture must precede the 450ms removal")
+            controller.view.layoutIfNeeded()
+            let source = try XCTUnwrap(MiningFeedbackLayoutMeasurement.latestSourceTile)
+            let viewport = try XCTUnwrap(MiningFeedbackLayoutMeasurement.latestMapViewport)
+            let start = ResourceMiningFeedbackV1.center(
+                sourceTile: source, mapViewport: viewport,
+                contentHeight: 28, elapsedMilliseconds: 0)
+            let end = ResourceMiningFeedbackV1.center(
+                sourceTile: source, mapViewport: viewport,
+                contentHeight: 28, elapsedMilliseconds: 450)
+            XCTAssertEqual(start.y + 14, source.minY, accuracy: 0.1)
+            XCTAssertEqual(start.y - end.y, source.height * 1.5, accuracy: 0.1)
+            let image = UIGraphicsImageRenderer(size: window.bounds.size).image { _ in
+                controller.view.drawHierarchy(in: controller.view.bounds, afterScreenUpdates: true)
+            }
+            let attachment = XCTAttachment(image: image)
+            attachment.name = "WORLD-production-mining-\(suffix)-player-source-visible-368x800"
+            attachment.lifetime = .keepAlways; add(attachment)
+            XCTAssertEqual(try SaveCodec.encode(store.state), frozen)
+            window.isHidden = true
+        }
+
+        try capture(elapsedMilliseconds: 0, scheme: .light, suffix: "start-light")
+        try capture(elapsedMilliseconds: 225, scheme: .light, suffix: "mid-225ms-light")
+        try capture(elapsedMilliseconds: 405, scheme: .light, suffix: "near-end-405ms-light")
+        try capture(elapsedMilliseconds: 225, scheme: .dark, suffix: "mid-225ms-dark")
     }
 
     @MainActor
@@ -2938,6 +3135,8 @@ final class WorldTests: XCTestCase {
         XCTAssertFalse(source.contains("MapGrid(") && source.contains("eventLog.padding(8)"))
         XCTAssertTrue(source.contains("WorldFieldFeedbackRow(contextOverlapsPlayer:"),
                       "The approved compact place/event receipt remains inside the map stage")
+        XCTAssertTrue(source.contains("if disabledReason == nil, let status = coordinator.statusCopy"),
+                      "typed Working/busy/stale feedback remains mounted for non-disabled controls")
         XCTAssertTrue(source.contains("availableHeight: viewport.size.height"),
                       "The square stage must admit all eleven square rows without a false gap")
         XCTAssertFalse(source.contains("return \"Forest track\""),

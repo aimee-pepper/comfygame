@@ -167,7 +167,7 @@ enum MinimapDisclosure {
         case .diaryPage, .foundWriting: .page
         // No approved depleted minimap identity exists in build268. Fail truthfully closed rather
         // than retaining the active-site marker after its contents are exhausted.
-        case .site: siteLooted == true ? nil : .site
+        case .site: siteLooted == false ? .site : nil
         case .node, .wildDrop: .resource
         case .item: .item
         case .traveller: .traveller

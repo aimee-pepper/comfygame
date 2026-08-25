@@ -383,6 +383,15 @@ struct WorldWholeFaceControl<Label: View>: View {
                             .overlay(Rectangle().stroke(PixelUITheme.primaryHighlight, lineWidth: 3))
                     }
                 }
+                .overlay(alignment: .bottom) {
+                    if disabledReason == nil, let status = coordinator.statusCopy(for: action) {
+                        Text(status).font(.custom("Tiny5", size: 10))
+                            .foregroundStyle(PixelUITheme.text)
+                            .padding(.horizontal, 4).padding(.vertical, 2)
+                            .background(PixelUITheme.surfaceRaised.opacity(0.94))
+                            .allowsHitTesting(false)
+                    }
+                }
                 .animation(.easeOut(duration: 0.06), value: isPressed)
                 .overlay {
                     WorldControlHitOwner(action: action, disabledReason: disabledReason,
@@ -395,10 +404,9 @@ struct WorldWholeFaceControl<Label: View>: View {
                                 action, snapshot: snapshot(), disabledReason: disabledReason)
                             else { return }
                             Task { @MainActor in
-                                await Task.yield()
                                 guard coordinator.begin(attempt) else { return }
-                                await Task.yield()
-                                _ = coordinator.execute(attempt, current: snapshot(), operation: operation)
+                                _ = coordinator.execute(
+                                    attempt, current: snapshot(), operation: operation)
                             }
                         })
                 }
@@ -472,6 +480,7 @@ struct WorldFieldFeedbackRow: View {
                             .frame(maxHeight: .infinity, alignment: .topLeading)
                     }
                 }
+                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottomLeading)
                 if expansion == .context, let context = store.worldFieldContext {
                     expandedContextPane(context)
                         .frame(width: proxy.size.width)

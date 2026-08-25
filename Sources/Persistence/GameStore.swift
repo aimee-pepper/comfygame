@@ -558,10 +558,10 @@ final class GameStore: ObservableObject {
     func enqueueWorldFieldBatch(_ batch: WorldFieldEventBatchV1,
                                 now: UInt64 = DispatchTime.now().uptimeNanoseconds) {
         guard seenWorldFieldBatchIDs.insert(batch.batchID).inserted else { return }
-        // The phone audit made recency the explicit ownership rule: a newly committed
-        // interaction is immediately the visible event. Older, still-live events remain behind it
-        // and receive their own complete visible lifetime only if they become frontmost again.
-        worldFieldEventQueue.insert(batch, at: 0)
+        // A newly committed interaction owns the visible socket immediately. A preempted receipt
+        // is retired instead of resurfacing with a newly reset lifetime.
+        worldFieldEventQueue.removeAll(keepingCapacity: true)
+        worldFieldEventQueue.append(batch)
         visibleWorldFieldBatchSince = now
         claimWorldMiningFeedback(for: batch, now: now)
     }
