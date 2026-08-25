@@ -755,8 +755,12 @@ struct WorldGenerationDiagnostics: Codable, Equatable, Sendable {
 }
 
 struct PlayableEntryReceipt: Codable, Equatable, Sendable {
-    static let schemaVersion = 1
+    static let schemaVersion = 2
     var version: Int = Self.schemaVersion
+    var playerStart: GridPoint?
+    var returnPortal: GridPoint?
+    var startIsSafeInterior: Bool
+    var returnPortalReachable: Bool
     var hasCardinalFirstMove: Bool
     var ordinaryWritingPlaced: Bool
     var promisedStarterFindPlaced: Bool
@@ -766,15 +770,25 @@ struct PlayableEntryReceipt: Codable, Equatable, Sendable {
     var allPlacedFactsReachable: Bool
 
     var isAccepted: Bool {
-        version == Self.schemaVersion && hasCardinalFirstMove && ordinaryWritingPlaced
+        let originalFacts = hasCardinalFirstMove && ordinaryWritingPlaced
             && promisedStarterFindPlaced && requiredExitPlaced
             && requiredExitPortalCount == placedExitPortalCount && allPlacedFactsReachable
+        if version == 1 { return originalFacts }
+        return version == Self.schemaVersion && originalFacts
+            && playerStart != nil && returnPortal != nil && playerStart != returnPortal
+            && startIsSafeInterior && returnPortalReachable
     }
 
-    init(hasCardinalFirstMove: Bool, ordinaryWritingPlaced: Bool,
+    init(playerStart: GridPoint? = nil, returnPortal: GridPoint? = nil,
+         startIsSafeInterior: Bool = false, returnPortalReachable: Bool = false,
+         hasCardinalFirstMove: Bool, ordinaryWritingPlaced: Bool,
          promisedStarterFindPlaced: Bool, requiredExitPlaced: Bool,
          requiredExitPortalCount: Int = 0, placedExitPortalCount: Int = 0,
          allPlacedFactsReachable: Bool) {
+        self.playerStart = playerStart
+        self.returnPortal = returnPortal
+        self.startIsSafeInterior = startIsSafeInterior
+        self.returnPortalReachable = returnPortalReachable
         self.hasCardinalFirstMove = hasCardinalFirstMove
         self.ordinaryWritingPlaced = ordinaryWritingPlaced
         self.promisedStarterFindPlaced = promisedStarterFindPlaced
@@ -786,7 +800,13 @@ struct PlayableEntryReceipt: Codable, Equatable, Sendable {
 
     init(from decoder: Decoder) throws {
         let c = try decoder.container(keyedBy: CodingKeys.self)
-        version = try c.decodeIfPresent(Int.self, forKey: .version) ?? Self.schemaVersion
+        version = try c.decodeIfPresent(Int.self, forKey: .version) ?? 1
+        playerStart = try c.decodeIfPresent(GridPoint.self, forKey: .playerStart)
+        returnPortal = try c.decodeIfPresent(GridPoint.self, forKey: .returnPortal)
+        startIsSafeInterior = try c.decodeIfPresent(Bool.self,
+                                                     forKey: .startIsSafeInterior) ?? false
+        returnPortalReachable = try c.decodeIfPresent(Bool.self,
+                                                       forKey: .returnPortalReachable) ?? false
         hasCardinalFirstMove = try c.decode(Bool.self, forKey: .hasCardinalFirstMove)
         ordinaryWritingPlaced = try c.decode(Bool.self, forKey: .ordinaryWritingPlaced)
         promisedStarterFindPlaced = try c.decode(Bool.self, forKey: .promisedStarterFindPlaced)

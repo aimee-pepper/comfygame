@@ -1032,7 +1032,9 @@ enum WorldArrivalReceiptFactory {
             links: source.pageThumbnail.links.map {
                 .init(firstMarkID: $0.firstMarkID, secondMarkID: $0.secondMarkID)
             })
-        let crop = firstCrop(map: map, flora: flora, profile: visibilityProfile)
+        let crop = firstCrop(
+            map: map, flora: flora, profile: visibilityProfile,
+            center: generationDiagnostics.playableEntry?.playerStart ?? map.entry)
         let grammarInput = WorldArrivalDescriptionRules.Input(
             dominantDryGround: dominant,
             terrain: .init(wetTileCount: wetTileCount, deepWaterTileCount: deepWaterTileCount,
@@ -1477,16 +1479,18 @@ enum WorldArrivalReceiptFactory {
     }
 
     static func firstCrop(map: WorldMap, flora: [Flora],
-                          profile: WorldRules.VisibilityProfile) -> WorldArrivalReceipt.FirstMapCrop {
+                          profile: WorldRules.VisibilityProfile,
+                          center: GridPoint? = nil) -> WorldArrivalReceipt.FirstMapCrop {
+        let center = center ?? map.entry
         let ids = Set(flora.map(\.id))
         let cells = (-4...4).flatMap { dy in (-4...4).map { dx -> WorldArrivalReceipt.MapCell in
-            let point = GridPoint(x: map.entry.x + dx, y: map.entry.y + dy)
+            let point = GridPoint(x: center.x + dx, y: center.y + dy)
             guard map.contains(point) else {
                 return .init(point: point, ground: nil, elevation: nil,
                              floraStableID: nil, visibility: "hidden")
             }
             let tile = map[point]
-            let current = WorldRules.visibility(of: point, from: map.entry, in: map, profile: profile)
+            let current = WorldRules.visibility(of: point, from: center, in: map, profile: profile)
             let terrain = WorldRules.terrainVisibility(current: current, wasRevealed: tile.isRevealed)
             guard terrain != .hidden else {
                 return .init(point: point, ground: nil, elevation: nil,

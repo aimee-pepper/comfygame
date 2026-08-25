@@ -704,6 +704,10 @@ final class WorldTests: XCTestCase {
         }
         let returnAttempt = try XCTUnwrap(returnStore.beginWorldFieldAttempt(.interact))
         returnStore.submitWorldFieldEvents([.blocked("Old feedback.")], for: returnAttempt, now: 1)
+        returnStore.mutate("stand on the return portal") { state in
+            guard let entry = state.worlds.activeRun?.map.entry else { return }
+            state.worlds.activeRun?.playerPosition = entry
+        }
         XCTAssertTrue(returnStore.canPortalHere)
         returnStore.portalHome()
         XCTAssertNil(returnStore.activeRun)
@@ -1140,8 +1144,8 @@ final class WorldTests: XCTestCase {
             XCTAssertTrue(first.map[find.0].isRevealed)
             XCTAssertTrue(first.map[find.0].isPassable)
             XCTAssertEqual(first.map[find.0].ground.movementCost, 1)
-            var distance: [GridPoint: Int] = [first.map.entry: 0]
-            var queue = [first.map.entry]
+            var distance: [GridPoint: Int] = [first.start: 0]
+            var queue = [first.start]
             while !queue.isEmpty, distance[find.0] == nil {
                 let point = queue.removeFirst()
                 for next in first.map.neighbours(of: point)
@@ -2255,8 +2259,8 @@ final class WorldTests: XCTestCase {
         XCTAssertLessThanOrEqual(mountedSource.maxX, mountedViewport.maxX + 0.01)
         XCTAssertLessThanOrEqual(mountedSource.maxY, mountedViewport.maxY + 0.01,
                                  "the source tile must resolve inside the rendered map viewport")
-        XCTAssertEqual(mountedSource.maxX, mountedViewport.maxX, accuracy: 0.1,
-                       "the first proof owns the edge-clamped rightmost source tile")
+        XCTAssertEqual(mountedSource.width, mountedViewport.width / 11, accuracy: 0.1,
+                       "the production source owns exactly one camera tile")
         let startCenter = ResourceMiningFeedbackV1.center(
             sourceTile: mountedSource, mapViewport: mountedViewport,
             contentHeight: 28, elapsedMilliseconds: 0)
@@ -2508,6 +2512,7 @@ final class WorldTests: XCTestCase {
             run.map.tiles[index].content = .empty
         }
         run.playerPosition = GridPoint(x: 5, y: 8)
+        run.enemies = []
         run.map[GridPoint(x: 5, y: 4)].content = .traveller("oda")
         fixture.worlds.activeRun = run
         store.mutate("test traveller auto travel", flush: true) { $0 = fixture }
@@ -2745,7 +2750,11 @@ final class WorldTests: XCTestCase {
     func testEveryWorldHasAnEntryAndAtLeastOneOtherPortal() {
         for seed in (1...30).map({ UInt64($0) &* 65_537 }) {
             let world = Worldgen.generate(book: book(["terrain": "plains"]), seed: seed)
-            XCTAssertEqual(world.map[world.start].content, .portal(isEntry: true))
+            XCTAssertNotEqual(world.start, world.map.entry)
+            XCTAssertEqual(world.map[world.start].content, .empty)
+            XCTAssertEqual(world.map[world.map.entry].content, .portal(isEntry: true))
+            XCTAssertTrue(TerrainRules.reachable(from: world.start, in: world.map)
+                .contains(world.map.entry))
             let portals = world.map.tiles.count { $0.content.isPortal }
             XCTAssertGreaterThanOrEqual(portals, 2, "Brief requires at least one exit besides the entry")
         }
@@ -2772,7 +2781,9 @@ final class WorldTests: XCTestCase {
                 XCTAssertGreaterThanOrEqual(
                     enemy.position.chebyshevDistance(to: world.start),
                     Tuning.World.enemyFreeRadiusAroundEntry,
-                    "No ambush the moment you arrive"
+                    "No ambush the moment you arrive (seed \(seed), enemy \(enemy.position), "
+                        + "start \(world.start), apex \(enemy.isApex), sessile \(enemy.isSessile), "
+                        + "guardian \(world.sites.contains { $0.position == enemy.position }))"
                 )
             }
         }
@@ -2885,6 +2896,110 @@ final class WorldTests: XCTestCase {
         let data = try SaveCodec.makeEncoder().encode(run)
         XCTAssertEqual(try SaveCodec.makeDecoder().decode(WorldRun.self, from: data)
             .generationDiagnostics, first.diagnostics)
+    }
+
+    func testNewWorldStartsOnReservedSafeInteriorGroundWithReachableEdgeReturnPortal() throws {
+        let compositions = [
+            book(["terrain": "plains"]),
+            book(["terrain": "caverns", "biome": "verdant"]),
+            book(["terrain": "islands", "quirk": "dim_sky"]),
+            book(["terrain": "caverns", "biome": "frostbound",
+                  "bounty": "sparse_ore", "quirk": "dim_sky"]),
+        ]
+        for (compositionIndex, composition) in compositions.enumerated() {
+            for seed in UInt64(1)...12 {
+                let generated = Worldgen.generate(
+                    book: composition,
+                    seed: seed &+ UInt64(compositionIndex * 10_000))
+                let start = generated.start
+                let returnPortal = generated.map.entry
+                let startTile = generated.map[start]
+                let receipt = try XCTUnwrap(generated.diagnostics.playableEntry)
+
+                XCTAssertTrue(generated.diagnostics.terrainGenerationSucceeded)
+                XCTAssertTrue(receipt.isAccepted)
+                XCTAssertEqual(receipt.version, 2)
+                XCTAssertEqual(receipt.playerStart, start)
+                XCTAssertEqual(receipt.returnPortal, returnPortal)
+                XCTAssertNotEqual(start, returnPortal)
+                XCTAssertGreaterThanOrEqual(generated.map.ring(of: start), 1)
+                XCTAssertEqual(generated.map.ring(of: returnPortal), 0)
+                XCTAssertTrue(startTile.isPassable)
+                XCTAssertEqual(startTile.content, .empty)
+                XCTAssertNil(startTile.flora)
+                XCTAssertEqual(startTile.ground.movementCost, 1)
+                XCTAssertTrue(startTile.isRevealed)
+                XCTAssertTrue(generated.map.neighbours(of: start).contains { neighbour in
+                    let tile = generated.map[neighbour]
+                    return tile.isPassable && tile.ground.movementCost == 1
+                        && abs(tile.elevation - startTile.elevation) <= 1
+                })
+                guard case .portal(isEntry: true) = generated.map[returnPortal].content else {
+                    return XCTFail("the retained edge coordinate must be the return portal")
+                }
+                XCTAssertTrue(TerrainRules.reachable(from: start, in: generated.map)
+                    .contains(returnPortal))
+                XCTAssertFalse(generated.enemies.contains { $0.position == start })
+                XCTAssertFalse(generated.sites.contains { $0.position == start })
+                XCTAssertNotEqual(generated.wildPage?.fieldProvenance?.position, start)
+            }
+        }
+    }
+
+    func testSafeInteriorStartUsesItsOwnDeterministicSeedStream() throws {
+        let generated = Worldgen.generate(book: book(["terrain": "plains"]), seed: 84_201)
+        let component = TerrainRules.reachable(from: generated.map.entry, in: generated.map)
+        let first = Worldgen.safeInteriorStartForTesting(
+            in: generated.map, component: component, seed: 84_201)
+        var unrelatedLayout = SeededRNG(seed: 84_201).derived(0x1A70)
+        let layoutBefore = unrelatedLayout.next()
+        _ = Worldgen.safeInteriorStartForTesting(
+            in: generated.map, component: component, seed: 84_201)
+        let layoutAfter = unrelatedLayout.next()
+        var expectedLayout = SeededRNG(seed: 84_201).derived(0x1A70)
+        XCTAssertEqual(layoutBefore, expectedLayout.next())
+        XCTAssertEqual(layoutAfter, expectedLayout.next(),
+                       "start selection must not consume the layout stream")
+        XCTAssertEqual(first, Worldgen.safeInteriorStartForTesting(
+            in: generated.map, component: component, seed: 84_201))
+    }
+
+    func testLegacyDecodedRunKeepsItsExactSavedPositionAndMap() throws {
+        let composition = book(["terrain": "plains"])
+        let generated = Worldgen.generate(book: composition, seed: 770_271)
+        var run = WorldRun(runIndex: 7, book: composition, mapSeed: 770_271,
+                           rng: SeededRNG(seed: 770_271), map: generated.map,
+                           playerPosition: generated.map.entry,
+                           generationDiagnostics: generated.diagnostics)
+        run.generationDiagnostics.playableEntry = nil
+        let mapBytes = try SaveCodec.makeEncoder().encode(run.map)
+        let decoded = try SaveCodec.makeDecoder().decode(
+            WorldRun.self, from: SaveCodec.makeEncoder().encode(run))
+        XCTAssertEqual(decoded.playerPosition, generated.map.entry)
+        XCTAssertEqual(try SaveCodec.makeEncoder().encode(decoded.map), mapBytes)
+        XCTAssertNil(decoded.generationDiagnostics.playableEntry)
+    }
+
+    func testLegacyPlayableEntryReceiptDecodesWithoutInventingNewStartFacts() throws {
+        let generated = Worldgen.generate(book: book(["terrain": "plains"]), seed: 770_272)
+        let receipt = try XCTUnwrap(generated.diagnostics.playableEntry)
+        var object = try XCTUnwrap(JSONSerialization.jsonObject(
+            with: SaveCodec.makeEncoder().encode(receipt)) as? [String: Any])
+        object["version"] = 1
+        object.removeValue(forKey: "playerStart")
+        object.removeValue(forKey: "returnPortal")
+        object.removeValue(forKey: "startIsSafeInterior")
+        object.removeValue(forKey: "returnPortalReachable")
+        let legacy = try SaveCodec.makeDecoder().decode(
+            PlayableEntryReceipt.self,
+            from: JSONSerialization.data(withJSONObject: object, options: [.sortedKeys]))
+        XCTAssertEqual(legacy.version, 1)
+        XCTAssertNil(legacy.playerStart)
+        XCTAssertNil(legacy.returnPortal)
+        XCTAssertFalse(legacy.startIsSafeInterior)
+        XCTAssertFalse(legacy.returnPortalReachable)
+        XCTAssertTrue(legacy.isAccepted,
+                      "the v2 receipt must not retroactively invalidate a playable legacy run")
     }
 
     func testRawEssenceRecommendedProfileIsTheDefaultAndLegacyRemainsComparable() throws {
@@ -3228,7 +3343,9 @@ final class WorldTests: XCTestCase {
     func testAStepIsExactlyOneTurn() {
         var state = startedRun(book(["terrain": "plains"]), seed: 12)
         let before = state.worlds.activeRun!
-        let step = before.map.neighbours(of: before.playerPosition).first { WorldRules.canEnter($0, in: before.map) }!
+        let step = before.map.neighbours(of: before.playerPosition).first {
+            WorldRules.canEnter($0, in: before.map) && before.map[$0].ground.movementCost == 1
+        }!
 
         _ = WorldRules.step(to: step, in: &state)
         let after = state.worlds.activeRun!
@@ -4169,6 +4286,10 @@ final class WorldTests: XCTestCase {
         if let id = store.state.worlds.pendingWorldArrivalReceiptID {
             XCTAssertTrue(store.enterPendingWorld(arrivalReceiptID: id))
         }
+        store.mutate("stand on the return portal") { state in
+            guard let entry = state.worlds.activeRun?.map.entry else { return }
+            state.worlds.activeRun?.playerPosition = entry
+        }
         store.portalHome()
         XCTAssertFalse(store.state.reality.library.visitedWorlds.isEmpty)
         store.write("plains")
@@ -4293,6 +4414,10 @@ final class WorldTests: XCTestCase {
             XCTAssertTrue(store.enterPendingWorld(arrivalReceiptID: id))
         }
         store.mutate("stock the satchel") { $0.worlds.activeRun?.satchel.add(9, of: Resources.ore) }
+        store.mutate("stand on the return portal") { state in
+            guard let entry = state.worlds.activeRun?.map.entry else { return }
+            state.worlds.activeRun?.playerPosition = entry
+        }
 
         XCTAssertTrue(store.canPortalHere)
         store.portalHome()
@@ -4407,7 +4532,11 @@ final class WorldTests: XCTestCase {
         if let id = store.state.worlds.pendingWorldArrivalReceiptID {
             XCTAssertTrue(store.enterPendingWorld(arrivalReceiptID: id))
         }
-        store.mutate("mark legacy") { $0.worlds.activeRun?.generationDiagnostics.playableEntry = nil }
+        store.mutate("mark legacy at the return portal") { state in
+            state.worlds.activeRun?.generationDiagnostics.playableEntry = nil
+            guard let entry = state.worlds.activeRun?.map.entry else { return }
+            state.worlds.activeRun?.playerPosition = entry
+        }
         XCTAssertTrue(store.canPortalHere)
         XCTAssertFalse(store.canLeaveMalformedOlderWorld)
 
@@ -4542,6 +4671,16 @@ final class WorldTests: XCTestCase {
     /// The pillar, at world scale: a kill mid-run resumes on the same tile of the same map.
     @MainActor
     func testTheWholeMapSurvivesAForceQuit() throws {
+        let defaults = UserDefaults.standard
+        let priorTuning = defaults.data(forKey: DebugTuningProfile.storageKey)
+        defaults.removeObject(forKey: DebugTuningProfile.storageKey)
+        defer {
+            if let priorTuning {
+                defaults.set(priorTuning, forKey: DebugTuningProfile.storageKey)
+            } else {
+                defaults.removeObject(forKey: DebugTuningProfile.storageKey)
+            }
+        }
         let io = SaveFileIO.temporary(name: "world-kill-\(UUID().uuidString)")
         defer { io.deleteEverything() }
 
@@ -4553,7 +4692,10 @@ final class WorldTests: XCTestCase {
         first.write("frostbound")
         first.write("sparse_ore")
         first.write("dim_sky")
-        first.bindAndDepart()
+        XCTAssertTrue(first.bindAndDepart(), first.bindError ?? "binding failed")
+        if let id = first.state.worlds.pendingWorldArrivalReceiptID {
+            XCTAssertTrue(first.enterPendingWorld(arrivalReceiptID: id))
+        }
         // Wander a bit so fog, position and RNG have all moved off their initial values.
         for _ in 0..<5 {
             guard let run = first.state.worlds.activeRun else { break }
@@ -4824,7 +4966,7 @@ final class WorldTests: XCTestCase {
             generated.map[$0].content == .empty && !generated.map[$0].isCrumbled
         })
         var run = WorldRun(runIndex: 1, book: blank, mapSeed: 404, rng: SeededRNG(seed: 404),
-                           map: generated.map, playerPosition: generated.start)
+                           map: generated.map, playerPosition: generated.map.entry)
         XCTAssertTrue(run.satchelItems.add(ItemStack(id: InstanceID(rawValue: 77),
                                                      catalogID: Items.anchorFrame)))
         let store = GameStore(io: .temporary(name: "anchor-frame-\(UUID().uuidString)"))

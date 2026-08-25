@@ -110,8 +110,11 @@ final class ChasmTests: XCTestCase {
             let world = Worldgen.generate(book: book(.overwhelming), seed: seed)
             let exits = world.map.tiles.count { $0.content == .portal(isEntry: false) }
             XCTAssertEqual(exits, 0, "a riven world offered a way out other than the way in")
-            XCTAssertEqual(world.map[world.start].content, .portal(isEntry: true),
+            XCTAssertEqual(world.map[world.map.entry].content, .portal(isEntry: true),
                            "…and the way in must still be there, or it's a trap rather than a price")
+            XCTAssertNotEqual(world.start, world.map.entry)
+            XCTAssertTrue(TerrainRules.reachable(from: world.start, in: world.map)
+                .contains(world.map.entry))
             riven += 1
         }
         XCTAssertEqual(riven, 12)

@@ -675,27 +675,35 @@ final class TerrainTests: XCTestCase {
     }
 
     func testPlayableEntryReceiptCertifiesFinalEntryPortalAndExactStarterIdentity() throws {
-        var map = WorldMap(width: 5, height: 1,
-                           tiles: Array(repeating: Tile(ground: .soil), count: 5),
-                           entry: GridPoint(x: 0, y: 0))
+        var map = WorldMap(width: 5, height: 3,
+                           tiles: Array(repeating: Tile(ground: .soil), count: 15),
+                           entry: GridPoint(x: 0, y: 1))
+        let start = GridPoint(x: 2, y: 1)
         map[map.entry].content = .portal(isEntry: true)
         let starterBook = BookRules.resolveBook(worldPage: try XCTUnwrap(
             WorldPageCatalog.starterInstances.first))
         let receipt = try XCTUnwrap(starterBook.worldPageUseReceipt)
-        var occupied: Set<GridPoint> = [map.entry]
+        var occupied: Set<GridPoint> = [map.entry, start]
         let starter = try XCTUnwrap(StarterKnownFindPlacementRules.place(
-            receipt: receipt, in: &map, avoiding: &occupied))
+            receipt: receipt, in: &map, from: start, avoiding: &occupied))
 
         var certified = Worldgen.playableEntryReceiptForTesting(
-            map: map, entry: map.entry, starterReceipt: receipt, starterPoint: starter,
+            map: map, start: start, returnPortal: map.entry,
+            starterReceipt: receipt, starterPoint: starter,
             requiredExitPortalCount: 0)
+        XCTAssertEqual(certified.version, 2)
+        XCTAssertEqual(certified.playerStart, start)
+        XCTAssertEqual(certified.returnPortal, map.entry)
+        XCTAssertTrue(certified.startIsSafeInterior)
+        XCTAssertTrue(certified.returnPortalReachable)
         XCTAssertTrue(certified.hasCardinalFirstMove)
         XCTAssertTrue(certified.promisedStarterFindPlaced)
 
         let exactStack = map[starter].content
         map[starter].content = .empty
         certified = Worldgen.playableEntryReceiptForTesting(
-            map: map, entry: map.entry, starterReceipt: receipt, starterPoint: starter,
+            map: map, start: start, returnPortal: map.entry,
+            starterReceipt: receipt, starterPoint: starter,
             requiredExitPortalCount: 0)
         XCTAssertFalse(certified.promisedStarterFindPlaced,
                        "a reachable planned point cannot certify an absent final item")
@@ -703,7 +711,8 @@ final class TerrainTests: XCTestCase {
         let promisedID = try XCTUnwrap(receipt.definition.knownFind)
         map[starter].content = .item(ItemStack(id: InstanceID(rawValue: 999), catalogID: promisedID))
         certified = Worldgen.playableEntryReceiptForTesting(
-            map: map, entry: map.entry, starterReceipt: receipt, starterPoint: starter,
+            map: map, start: start, returnPortal: map.entry,
+            starterReceipt: receipt, starterPoint: starter,
             requiredExitPortalCount: 0)
         XCTAssertFalse(certified.promisedStarterFindPlaced,
                        "the promised definition with the wrong physical instance is not exact")
@@ -711,17 +720,19 @@ final class TerrainTests: XCTestCase {
         map[starter].content = exactStack
         map[map.entry].content = .empty
         certified = Worldgen.playableEntryReceiptForTesting(
-            map: map, entry: map.entry, starterReceipt: receipt, starterPoint: starter,
+            map: map, start: start, returnPortal: map.entry,
+            starterReceipt: receipt, starterPoint: starter,
             requiredExitPortalCount: 0)
-        XCTAssertFalse(certified.hasCardinalFirstMove,
-                       "a passable entry coordinate without the entry Portal cannot certify playability")
+        XCTAssertFalse(certified.returnPortalReachable,
+                       "a return coordinate without the entry Portal cannot certify playability")
 
         map[map.entry].content = .portal(isEntry: false)
         certified = Worldgen.playableEntryReceiptForTesting(
-            map: map, entry: map.entry, starterReceipt: receipt, starterPoint: starter,
+            map: map, start: start, returnPortal: map.entry,
+            starterReceipt: receipt, starterPoint: starter,
             requiredExitPortalCount: 0)
-        XCTAssertFalse(certified.hasCardinalFirstMove,
-                       "a non-entry Portal cannot stand in for the arrival Portal")
+        XCTAssertFalse(certified.returnPortalReachable,
+                       "a non-entry Portal cannot stand in for the return Portal")
     }
 
     func testPlayableEntryGate14CoversEveryLiveScaleAndExtremeProfileDeterministically() {
@@ -788,8 +799,11 @@ final class TerrainTests: XCTestCase {
                         XCTAssertEqual(WorldRules.path(from: first.start, to: step, in: first.map),
                                        [step], "the first move must be executable: \(label)")
                         XCTAssertEqual(WorldRules.path(from: step, to: first.start, in: first.map),
-                                       [first.start], "the portal return must be executable: \(label)")
+                                       [first.start], "the return step must be executable: \(label)")
                     }
+                    XCTAssertTrue(reached.contains(first.map.entry),
+                                  "the edge return portal must be reachable: \(label)")
+                    XCTAssertEqual(first.map[first.map.entry].content, .portal(isEntry: true), label)
                     XCTAssertGreaterThanOrEqual(first.diagnostics.reachableTerrainFraction,
                                                 Tuning.Terrain.reachableGroundFraction, label)
                     XCTAssertTrue(first.map.allPoints.allSatisfy {
@@ -798,7 +812,7 @@ final class TerrainTests: XCTestCase {
                     XCTAssertTrue(first.sites.allSatisfy { reached.contains($0.position) }, label)
                     XCTAssertTrue(first.enemies.allSatisfy { reached.contains($0.position) }, label)
                     let exits = first.map.allPoints.filter {
-                        $0 != first.start && first.map[$0].content.isPortal
+                        $0 != first.map.entry && first.map[$0].content.isPortal
                     }
                     let receipt = first.diagnostics.playableEntry!
                     XCTAssertEqual(exits.count, receipt.requiredExitPortalCount, label)
@@ -896,14 +910,22 @@ final class TerrainTests: XCTestCase {
                 XCTAssertTrue(world.diagnostics.terrainGenerationSucceeded,
                               "terrain failed for \(symbols), seed \(seed)")
                 XCTAssertEqual(world.diagnostics.playableEntry?.isAccepted, true)
-                let entry = world.start
+                let start = world.start
+                let entry = world.map.entry
+                XCTAssertNotEqual(start, entry)
                 XCTAssertTrue(world.map[entry].content.isPortal)
-                let legalSteps = world.map.neighbours(of: entry).filter { world.map[$0].isPassable }
+                XCTAssertEqual(world.map[start].content, .empty)
+                let legalSteps = world.map.neighbours(of: start).filter {
+                    WorldRules.canEnter($0, in: world.map)
+                        && world.map[$0].ground.movementCost == 1
+                }
                 XCTAssertFalse(legalSteps.isEmpty,
-                               "entry had no legal step for \(symbols), seed \(seed)")
-                let reached = TerrainRules.reachable(from: entry, in: world.map)
+                               "start had no legal one-turn step for \(symbols), seed \(seed)")
+                let reached = TerrainRules.reachable(from: start, in: world.map)
                 XCTAssertGreaterThan(reached.count, 1,
-                                     "entry had no route into the world for \(symbols), seed \(seed)")
+                                     "start had no route into the world for \(symbols), seed \(seed)")
+                XCTAssertTrue(reached.contains(entry),
+                              "the retained return portal was unreachable for \(symbols), seed \(seed)")
                 let passable = world.map.allPoints.count { world.map[$0].isPassable }
                 XCTAssertEqual(Double(reached.count) / Double(passable),
                                world.diagnostics.reachableTerrainFraction, accuracy: 0.000_000_1)

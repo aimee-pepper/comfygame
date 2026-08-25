@@ -72,11 +72,13 @@ enum StarterKnownFindPlacementRules {
     /// steps. This runs after guaranteed writing, so it can replace only an otherwise empty host.
     @discardableResult
     static func place(receipt: WorldPageUseReceipt, in map: inout WorldMap,
+                      from start: GridPoint? = nil,
                       avoiding occupied: inout Set<GridPoint>) -> GridPoint? {
         guard let itemID = receipt.definition.knownFind,
               ContentCatalog.shared.item(itemID)?.gear?.tier == 1 else { return nil }
-        var distances: [GridPoint: Int] = [map.entry: 0]
-        var queue = [map.entry]
+        let origin = start ?? map.entry
+        var distances: [GridPoint: Int] = [origin: 0]
+        var queue = [origin]
         while !queue.isEmpty {
             let point = queue.removeFirst()
             let distance = distances[point, default: 0]
@@ -211,10 +213,10 @@ enum WildWorldPageFieldRules {
 enum WildWorldPagePlacementRules {
     static func place(_ selection: WildWorldPageSelectionRules.Selection,
                       originRunIndex: Int, originWorldSeed: UInt64,
-                      in map: WorldMap) -> WorldPageInstance? {
+                      in map: WorldMap, avoiding occupied: Set<GridPoint> = []) -> WorldPageInstance? {
         let reachable = reachablePoints(from: map.entry, in: map)
         let candidates = reachable.filter { point in
-            point != map.entry && map[point].content == .empty
+            point != map.entry && !occupied.contains(point) && map[point].content == .empty
         }.sorted { ($0.y, $0.x) < ($1.y, $1.x) }
         guard !candidates.isEmpty else { return nil }
         var rng = SeededRNG(seed: selection.generationSeed).derived(0x504C_4143_45)
@@ -260,6 +262,7 @@ enum Worldgen {
         static let sites: UInt64 = 0x5175
         static let pages: UInt64 = 0x9A6E
         static let travellerArrival: UInt64 = 0x7A4E2
+        static let playerStart: UInt64 = 0x57A47
     }
 
     struct ArrivalCausalSummary: Equatable {
@@ -319,6 +322,7 @@ enum Worldgen {
         var featureRNG = root.derived(Salt.features)
         var siteRNG = root.derived(Salt.sites)
         var pageRNG = root.derived(Salt.pages)
+        var playerStartRNG = root.derived(Salt.playerStart)
 
         // Everything below reads the world's *pressures*. What a world is made of and what lives
         // in it now come from the eight targets rather than from flat per-symbol tables.
@@ -378,17 +382,39 @@ enum Worldgen {
         let isRiven = TerrainRules.isRiven(asWritten: asWritten)
         let needsStarterFind = book.worldPageUseReceipt?.definition.knownFind != nil
         let exitCount = isRiven ? 0 : layoutRNG.int(in: Tuning.World.exitPortalCountRange)
+        let startCandidates = safeInteriorStartCandidates(in: map, component: walkable,
+                                                          rng: &playerStartRNG)
+        guard !startCandidates.isEmpty else {
+            var diagnostics = WorldGenerationDiagnostics()
+            diagnostics.terrainGenerationSucceeded = false
+            diagnostics.reachableTerrainFraction = reachability.reachableFraction
+            diagnostics.softenedDeepWaterTiles = reachability.softenedDeepWater
+            diagnostics.filledChasmTiles = reachability.filledChasm
+            diagnostics.writingWasGuaranteed = false
+            diagnostics.playableEntry = PlayableEntryReceipt(
+                hasCardinalFirstMove: false, ordinaryWritingPlaced: false,
+                promisedStarterFindPlaced: !needsStarterFind, requiredExitPlaced: isRiven,
+                requiredExitPortalCount: exitCount, placedExitPortalCount: 0,
+                allPlacedFactsReachable: false)
+            return (map, [], [], [], [], nil, [], [], flora, initialEntry, diagnostics)
+        }
         let postExitCountLayoutRNG = layoutRNG
-        var selected: (entry: GridPoint, exits: [GridPoint], rng: SeededRNG)?
-        for candidate in playableEntryCandidates(in: map, component: walkable,
-                                                 preferred: preferredEntry, initial: initialEntry) {
-            var probe = postExitCountLayoutRNG
-            if let exits = openingReservation(at: candidate, in: map, component: walkable,
-                                              exitCount: exitCount,
-                                              needsStarterFind: needsStarterFind, rng: &probe) {
-                selected = (candidate, exits, probe)
-                break
+        var selected: (start: GridPoint, entry: GridPoint, exits: [GridPoint], rng: SeededRNG)?
+        for startCandidate in startCandidates {
+            for portalCandidate in playableEntryCandidates(
+                in: map, component: walkable, preferred: preferredEntry, initial: initialEntry
+            ) {
+                var probe = postExitCountLayoutRNG
+                if let exits = openingReservation(
+                    at: startCandidate, returnPortal: portalCandidate,
+                    in: map, component: walkable, exitCount: exitCount,
+                    needsStarterFind: needsStarterFind, rng: &probe
+                ) {
+                    selected = (startCandidate, portalCandidate, exits, probe)
+                    break
+                }
             }
+            if selected != nil { break }
         }
         guard let selected else {
             var diagnostics = WorldGenerationDiagnostics()
@@ -404,12 +430,39 @@ enum Worldgen {
                 allPlacedFactsReachable: false)
             return (map, [], [], [], [], nil, [], [], flora, initialEntry, diagnostics)
         }
+        let start = selected.start
         let entry = selected.entry
         layoutRNG = selected.rng
+        // Reserve the selected footing in the already-painted terrain. This is the same local
+        // preparation used for a portal tile, but the portal remains at the edge: it removes only
+        // the chosen tile's growth/flora and consumes no generation stream.
+        TerrainRules.prepareEntry(at: start, in: &map)
+        if map[start].ground.movementCost != 1 {
+            map[start].ground = .soil
+            map[start].baseGround = .soil
+        }
+        let cardinalEgress = map.neighbours(of: start).filter { neighbour in
+            let tile = map[neighbour]
+            return walkable.contains(neighbour) && tile.isPassable
+        }.sorted { ($0.y, $0.x) < ($1.y, $1.x) }
+        let readyEgress = cardinalEgress.first {
+            map[$0].ground.movementCost == 1
+                && abs(map[$0].elevation - map[start].elevation) <= 1
+        }
+        if readyEgress == nil, let egress = cardinalEgress.first {
+            TerrainRules.prepareEntry(at: egress, in: &map)
+            if map[egress].ground.movementCost != 1 {
+                map[egress].ground = .soil
+                map[egress].baseGround = .soil
+            }
+            if abs(map[egress].elevation - map[start].elevation) > 1 {
+                map[egress].elevation = map[start].elevation
+            }
+        }
         map.entry = entry
         TerrainRules.prepareEntry(at: entry, in: &map)
         map[entry].content = .portal(isEntry: true)
-        var occupied: Set<GridPoint> = [entry]
+        var occupied: Set<GridPoint> = [entry, start]
         occupied.formUnion(map.allPoints.filter { !walkable.contains($0) })
 
         // 2. At least one more portal, placed away from the entry so it's worth finding — unless the
@@ -446,7 +499,7 @@ enum Worldgen {
 
         var placedPages: [DiaryPageID] = []
         for page in pages {
-            guard let point = writingPoint(in: map, from: entry, avoiding: occupied, rng: &pageRNG)
+            guard let point = writingPoint(in: map, from: start, avoiding: occupied, rng: &pageRNG)
             else { continue }
             map[point].content = .diaryPage(page)
             occupied.insert(point)
@@ -455,7 +508,7 @@ enum Worldgen {
         var foundWritings: [FoundWritingRecord] = []
         var usedFieldNoteKeys: Set<String> = []
         for index in 0..<noteCount {
-            guard let point = writingPoint(in: map, from: entry, avoiding: occupied, rng: &pageRNG)
+            guard let point = writingPoint(in: map, from: start, avoiding: occupied, rng: &pageRNG)
             else { continue }
             let id = FoundWritingID(rawValue: "world_\(seed)_field_\(index)")
             let record = fieldNote(id: id, at: point, in: map, flora: flora,
@@ -466,7 +519,7 @@ enum Worldgen {
             foundWritings.append(record)
         }
         if placedPages.isEmpty, foundWritings.isEmpty,
-           let point = writingPoint(in: map, from: entry, avoiding: occupied, rng: &pageRNG) {
+           let point = writingPoint(in: map, from: start, avoiding: occupied, rng: &pageRNG) {
             let id = FoundWritingID(rawValue: "world_\(seed)_field_fallback")
             let record = fieldNote(id: id, at: point, in: map, flora: flora,
                                    readings: readings, seed: seed,
@@ -479,7 +532,8 @@ enum Worldgen {
         // Starter pages disclose one ordinary opening weapon before Bind. Its exact physical
         // identity and safe near-entry host are frozen before any optional content is placed.
         let starterFindPoint = book.worldPageUseReceipt.flatMap {
-            StarterKnownFindPlacementRules.place(receipt: $0, in: &map, avoiding: &occupied)
+            StarterKnownFindPlacementRules.place(receipt: $0, in: &map, from: start,
+                                                 avoiding: &occupied)
         }
 
         // The loose World Page reserves an already reachable empty host only after ordinary
@@ -488,7 +542,7 @@ enum Worldgen {
         let wildPage = wildPageSelection.flatMap { selection in
             WildWorldPagePlacementRules.place(
                 selection, originRunIndex: wildPageOriginRunIndex ?? 0,
-                originWorldSeed: seed, in: map)
+                originWorldSeed: seed, in: map, avoiding: occupied)
         }
         if let point = wildPage?.fieldProvenance?.position { occupied.insert(point) }
 
@@ -605,7 +659,7 @@ enum Worldgen {
             diagnostics.rawEssencePlacementAttempts = wildCount
             diagnostics.rawEssenceDropsPlaced = rawEssenceDropsPlaced
             diagnostics.rawEssenceObtainable = rawEssenceObtainable
-            return (map, [], [], placedPages, foundWritings, wildPage, [], [], flora, entry,
+            return (map, [], [], placedPages, foundWritings, wildPage, [], [], flora, start,
                     diagnostics)
         }
 
@@ -628,7 +682,7 @@ enum Worldgen {
         let impacts = readings["substrate"].has("impact") ? Tuning.World.meteorCraters : 0
         for _ in 0..<(danger.hazardTiles + impacts) {
             guard let point = randomFreePoint(in: map, avoiding: occupied,
-                                              minimumDistanceFrom: entry,
+                                              minimumDistanceFrom: start,
                                               distance: Tuning.World.enemyFreeRadiusAroundEntry,
                                               rng: &featureRNG)
             else { break }
@@ -639,11 +693,14 @@ enum Worldgen {
         // 7. Sites — the discrete placed things. Eligibility is read off the world's *pressures*
         //    rather than off its symbols, so a site is found by writing a kind of place rather than
         //    by writing a specific recipe (docs/sites-system.md §2).
+        let siteOpeningClearance = Set(map.allPoints.filter {
+            $0.chebyshevDistance(to: start) < Tuning.World.enemyFreeRadiusAroundEntry
+        })
         var sites = SiteRules.place(in: map,
                                     readings: readings,
                                     contradictions: ContradictionRules.fired(in: sigils, readings: readings),
-                                    avoiding: occupied, rng: &siteRNG)
-        let sitePositions = occupied.union(sites.map(\.position))
+                                    avoiding: occupied.union(siteOpeningClearance), rng: &siteRNG)
+        let sitePositions = occupied.union(siteOpeningClearance).union(sites.map(\.position))
         if let anchor = SiteRules.placeNaturalAnchor(in: map, avoiding: sitePositions, rng: &siteRNG) {
             sites.append(anchor)
         }
@@ -737,13 +794,13 @@ enum Worldgen {
             // them, which is the marooning bug's shape. Right in the common case, dead end in the
             // uncommon one.
             let beside = sites
-                .filter { $0.position.chebyshevDistance(to: entry) >= Tuning.World.travellerMinimumDistance }
+                .filter { $0.position.chebyshevDistance(to: start) >= Tuning.World.travellerMinimumDistance }
                 .flatMap { site in map.neighbours(of: site.position) }
                 .filter { !occupied.contains($0) && map[$0].content == .empty && map[$0].isPassable }
 
             let point = travellerRNG.pick(beside)
                 ?? randomFreePoint(in: map, avoiding: occupied,
-                                   minimumDistanceFrom: entry,
+                                   minimumDistanceFrom: start,
                                    distance: Tuning.World.travellerMinimumDistance,
                                    rng: &travellerRNG)
             if let point {
@@ -764,7 +821,7 @@ enum Worldgen {
                                     multiplier: tuning.creatureDensityMultiplier,
                                     rng: &enemyRNG, tiles: map.width * map.height)
         var enemies: [WorldEnemy] = guardians
-            + plantPredators(flora, in: map, avoiding: &occupied, clearOf: entry,
+            + plantPredators(flora, in: map, avoiding: &occupied, clearOf: start,
                              multiplier: tuning.activeFloraFrequencyMultiplier, rng: &enemyRNG)
 
         // 9a. **Something this world cannot afford** (`apex-encounters.md`). Drawn by the things
@@ -781,8 +838,9 @@ enum Worldgen {
         let apexRollSucceeded = apexDecisionRNG.chance(apexChance)
         if let apex = ApexRules.sample(for: readings, seed: seed, chance: apexChance),
            let point = randomFreePoint(in: map, avoiding: occupied,
-                                       minimumDistanceFrom: entry,
+                                       minimumDistanceFrom: start,
                                        distance: Tuning.Apex.minimumDistanceFromEntry,
+                                       requiringMinimumDistance: true,
                                        rng: &apexRNG) {
             var standing = spawn(apex, at: point, rng: &apexRNG)
             standing.isApex = true
@@ -792,22 +850,23 @@ enum Worldgen {
         for _ in 0..<enemyCount {
             guard let species = enemyRNG.pickWeighted(dayRoster),
                   let point = randomFreePoint(in: map, avoiding: occupied,
-                                              minimumDistanceFrom: entry,
+                                              minimumDistanceFrom: start,
                                               distance: Tuning.World.enemyFreeRadiusAroundEntry,
+                                              requiringMinimumDistance: true,
                                               rng: &enemyRNG)
             else { continue }
             enemies.append(spawn(species, at: point, rng: &enemyRNG))
             occupied.insert(point)
         }
 
-        WorldRules.reveal(around: entry, in: &map,
+        WorldRules.reveal(around: start, in: &map,
                           radius: WorldRules.visionRadius(for: book, seed: seed,
                                                           base: tuning.baseVisionRadius))
         let envelopeApplied = isFreshFirstExpedition
             && tuning.openingEncounterEnvelope != .natural
         let relocated = envelopeApplied
             ? applyOpeningEnvelope(tuning.openingEncounterEnvelope, to: &enemies, in: map,
-                                   sites: sites, occupied: &occupied, seed: seed)
+                                   sites: sites, occupied: &occupied, clearOf: start, seed: seed)
             : 0
 
         let nodeDiagnostics = map.tiles.reduce(into: [ResourceID: Int]()) { result, tile in
@@ -820,7 +879,8 @@ enum Worldgen {
             : Tuning.World.indefiniteTurns
         var diagnostics = WorldGenerationDiagnostics()
         let playableEntry = playableEntryReceipt(
-            map: map, entry: entry, pages: placedPages, writings: foundWritings,
+            map: map, start: start, returnPortal: entry,
+            pages: placedPages, writings: foundWritings,
             starterReceipt: book.worldPageUseReceipt, starterPoint: starterFindPoint,
             requiredExitPortalCount: exitCount, sites: sites, enemies: enemies)
         terrainGenerationSucceeded = terrainGenerationSucceeded && playableEntry.isAccepted
@@ -863,7 +923,7 @@ enum Worldgen {
         diagnostics.openingEnvelopeApplied = envelopeApplied
         diagnostics.openingEnemiesRelocated = relocated
         return (map, enemies, sites, placedPages, foundWritings, wildPage, placedTravellers,
-                cast, flora, entry,
+                cast, flora, start,
                 diagnostics)
     }
 
@@ -932,7 +992,7 @@ enum Worldgen {
     private static func playableEntryCandidates(in map: WorldMap, component: Set<GridPoint>,
                                                 preferred: GridPoint,
                                                 initial: GridPoint) -> [GridPoint] {
-        let alternatives = component.filter { $0 != initial }.sorted {
+        let alternatives = component.filter { $0 != initial && map.ring(of: $0) == 0 }.sorted {
             let left = (map.ring(of: $0) == 0 ? 0 : 1,
                         map[$0].ground == .water ? 1 : 0,
                         $0.chebyshevDistance(to: preferred), $0.y, $0.x)
@@ -941,15 +1001,49 @@ enum Worldgen {
                          $1.chebyshevDistance(to: preferred), $1.y, $1.x)
             return left < right
         }
-        return component.contains(initial) ? [initial] + alternatives : alternatives
+        return component.contains(initial) && map.ring(of: initial) == 0
+            ? [initial] + alternatives
+            : alternatives
     }
 
-    private static func openingReservation(at entry: GridPoint, in map: WorldMap,
+    /// A new run begins away from the return portal, on ordinary footing that can immediately
+    /// make a cardinal move. Selection owns a dedicated derived stream so adding or changing this
+    /// choice cannot consume any layout, content, creature, or live-run randomness.
+    private static func safeInteriorStartCandidates(
+        in map: WorldMap, component: Set<GridPoint>, rng: inout SeededRNG
+    ) -> [GridPoint] {
+        var remaining = component.filter { point in
+            let tile = map[point]
+            guard map.ring(of: point) >= 1, tile.isPassable,
+                  tile.content == .empty else { return false }
+            return map.neighbours(of: point).contains { neighbour in
+                let next = map[neighbour]
+                return component.contains(neighbour) && next.isPassable
+            }
+        }.sorted { ($0.y, $0.x) < ($1.y, $1.x) }
+        var ordered: [GridPoint] = []
+        while !remaining.isEmpty {
+            let index = rng.int(in: 0...(remaining.count - 1))
+            ordered.append(remaining.remove(at: index))
+        }
+        return ordered
+    }
+
+    static func safeInteriorStartForTesting(in map: WorldMap, component: Set<GridPoint>,
+                                            seed: UInt64) -> GridPoint? {
+        var rng = SeededRNG(seed: seed).derived(Salt.playerStart)
+        return safeInteriorStartCandidates(in: map, component: component, rng: &rng).first
+    }
+
+    private static func openingReservation(at entry: GridPoint,
+                                           returnPortal: GridPoint? = nil,
+                                           in map: WorldMap,
                                            component: Set<GridPoint>, exitCount: Int,
                                            needsStarterFind: Bool,
                                            rng: inout SeededRNG) -> [GridPoint]? {
         guard map.neighbours(of: entry).contains(where: component.contains) else { return nil }
-        let unavailable = Set(map.allPoints.filter { !component.contains($0) }).union([entry])
+        var unavailable = Set(map.allPoints.filter { !component.contains($0) }).union([entry])
+        if let returnPortal { unavailable.insert(returnPortal) }
         var starterDistances: [GridPoint: Int] = [entry: 0]
         var queue = [entry]
         while let point = queue.first {
@@ -1108,21 +1202,33 @@ enum Worldgen {
     }
 
     private static func playableEntryReceipt(
-        map: WorldMap, entry: GridPoint, pages: [DiaryPageID],
+        map: WorldMap, start: GridPoint, returnPortal: GridPoint,
+        pages: [DiaryPageID],
         writings: [FoundWritingRecord], starterReceipt: WorldPageUseReceipt?,
         starterPoint: GridPoint?, requiredExitPortalCount: Int,
         sites: [PlacedSite], enemies: [WorldEnemy]
     ) -> PlayableEntryReceipt {
-        let reached = TerrainRules.reachable(from: entry, in: map)
-        let entryIsPortal: Bool
-        if map[entry].isPassable, case .portal(isEntry: true) = map[entry].content {
-            entryIsPortal = true
+        let reached = TerrainRules.reachable(from: start, in: map)
+        let returnIsPortal: Bool
+        if map[returnPortal].isPassable,
+           case .portal(isEntry: true) = map[returnPortal].content {
+            returnIsPortal = true
         } else {
-            entryIsPortal = false
+            returnIsPortal = false
         }
-        let hasMove = entryIsPortal && map.neighbours(of: entry).contains { reached.contains($0) }
+        let startTile = map[start]
+        let startIsSafeInterior = start != returnPortal && map.ring(of: start) >= 1
+            && startTile.isPassable && startTile.content == .empty && startTile.flora == nil
+            && startTile.ground.movementCost == 1
+        let hasMove = startIsSafeInterior && map.neighbours(of: start).contains { neighbour in
+            let tile = map[neighbour]
+            return reached.contains(neighbour) && tile.isPassable
+                && tile.ground.movementCost == 1
+                && abs(tile.elevation - startTile.elevation) <= 1
+        }
+        let returnPortalReachable = returnIsPortal && reached.contains(returnPortal)
         let ordinaryWriting = map.allPoints.contains { point in
-            guard reached.contains(point), point.chebyshevDistance(to: entry) > 2 else { return false }
+            guard reached.contains(point), point.chebyshevDistance(to: start) > 2 else { return false }
             switch map[point].content {
             case .diaryPage, .foundWriting: return true
             default: return false
@@ -1138,7 +1244,7 @@ enum Worldgen {
             promised = starterReceipt?.definition.knownFind == nil
         }
         let placedExitPortalCount = map.allPoints.count {
-            $0 != entry && reached.contains($0) && map[$0].content.isPortal
+            $0 != returnPortal && reached.contains($0) && map[$0].content.isPortal
         }
         let exit = placedExitPortalCount == requiredExitPortalCount
         let contentReachable = map.allPoints.allSatisfy {
@@ -1147,7 +1253,10 @@ enum Worldgen {
         let factsReachable = contentReachable
             && sites.allSatisfy { reached.contains($0.position) }
             && enemies.allSatisfy { reached.contains($0.position) }
-        return PlayableEntryReceipt(hasCardinalFirstMove: hasMove,
+        return PlayableEntryReceipt(playerStart: start, returnPortal: returnPortal,
+                                    startIsSafeInterior: startIsSafeInterior,
+                                    returnPortalReachable: returnPortalReachable,
+                                    hasCardinalFirstMove: hasMove,
                                     ordinaryWritingPlaced: ordinaryWriting,
                                     promisedStarterFindPlaced: promised,
                                     requiredExitPlaced: exit,
@@ -1157,10 +1266,12 @@ enum Worldgen {
     }
 
     static func playableEntryReceiptForTesting(
-        map: WorldMap, entry: GridPoint, starterReceipt: WorldPageUseReceipt?,
+        map: WorldMap, start: GridPoint, returnPortal: GridPoint,
+        starterReceipt: WorldPageUseReceipt?,
         starterPoint: GridPoint?, requiredExitPortalCount: Int
     ) -> PlayableEntryReceipt {
-        playableEntryReceipt(map: map, entry: entry, pages: [], writings: [],
+        playableEntryReceipt(map: map, start: start, returnPortal: returnPortal,
+                             pages: [], writings: [],
                              starterReceipt: starterReceipt, starterPoint: starterPoint,
                              requiredExitPortalCount: requiredExitPortalCount,
                              sites: [], enemies: [])
@@ -1214,7 +1325,7 @@ enum Worldgen {
     private static func applyOpeningEnvelope(
         _ envelope: DebugTuningProfile.OpeningEncounterEnvelope,
         to enemies: inout [WorldEnemy], in map: WorldMap, sites: [PlacedSite],
-        occupied: inout Set<GridPoint>, seed: UInt64
+        occupied: inout Set<GridPoint>, clearOf start: GridPoint, seed: UInt64
     ) -> Int {
         let allowed = envelope == .gentle ? 1 : 0
         let guardianPositions = Set(sites.map(\.position))
@@ -1232,6 +1343,8 @@ enum Worldgen {
             let candidates = map.allPoints.filter { point in
                 !map[point].isRevealed && map[point].isPassable && map[point].content == .empty
                     && !occupied.contains(point)
+                    && point.chebyshevDistance(to: start)
+                        >= Tuning.World.enemyFreeRadiusAroundEntry
             }
             guard let destination = rng.pick(candidates) else {
                 occupied.insert(old)
@@ -1619,6 +1732,7 @@ enum Worldgen {
                                         avoiding occupied: Set<GridPoint>,
                                         minimumDistanceFrom origin: GridPoint? = nil,
                                         distance: Int = 0,
+                                        requiringMinimumDistance: Bool = false,
                                         preferringGrowth: Bool = false,
                                         rng: inout SeededRNG) -> GridPoint? {
         var candidates = map.allPoints.filter { point in
@@ -1627,9 +1741,9 @@ enum Worldgen {
         }
         if let origin, distance > 0 {
             let far = candidates.filter { $0.chebyshevDistance(to: origin) >= distance }
-            // Fall back to the unfiltered set rather than placing nothing at all — on a small or
-            // crowded map the distance constraint can be unsatisfiable.
-            if !far.isEmpty { candidates = far }
+            // Most optional content falls back to the unfiltered set rather than disappearing on
+            // a crowded map. Arrival threats opt into a strict opening-clearance guarantee.
+            if requiringMinimumDistance || !far.isEmpty { candidates = far }
         }
         guard preferringGrowth else { return rng.pick(candidates) }
         let weighted = candidates.map { point in

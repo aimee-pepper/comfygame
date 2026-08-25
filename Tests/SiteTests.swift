@@ -147,7 +147,9 @@ final class SiteTests: XCTestCase {
                 book: BoundBook(symbols: [:], randomlyFilled: [], essencePaid: 0), seed: seed)
             var seen: Set<GridPoint> = []
             for site in world.sites {
-                XCTAssertNotEqual(site.position, world.start, "site on the entry portal, seed \(seed)")
+                XCTAssertNotEqual(site.position, world.start, "site on the reserved start, seed \(seed)")
+                XCTAssertNotEqual(site.position, world.map.entry,
+                                  "site on the return portal, seed \(seed)")
                 XCTAssertTrue(seen.insert(site.position).inserted, "two sites stacked, seed \(seed)")
                 guard case .site = world.map[site.position].content else {
                     return XCTFail("tile under site \(site.siteID) isn't a site, seed \(seed)")
