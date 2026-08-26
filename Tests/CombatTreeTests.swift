@@ -297,7 +297,8 @@ final class CombatTreeTests: XCTestCase {
             state.base.seat("halloway")
         }
         let index = try XCTUnwrap(store.state.base.roster.firstIndex { $0.traveller == "halloway" })
-        let member = PartyMember.member(index)
+        let member = PartyMember.member(try XCTUnwrap(
+            store.state.base.persistentID(forRosterIndex: index)))
         XCTAssertGreaterThan(store.respecCost(for: member), 0)
 
         store.respec(member)

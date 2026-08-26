@@ -107,11 +107,11 @@ struct DebugEncounterScalingEvidence: Codable, Equatable, Sendable {
                 name = "Binder"
                 level = state.base.binderCharacter.level
                 currentHP = run.binderHP
-            case .companion(let index):
-                guard state.base.roster.indices.contains(index) else { return nil }
+            case .companion(let id):
+                guard let index = state.base.rosterIndex(for: id) else { return nil }
                 let companion = state.base.roster[index]
                 identity = stableIdentity(for: companion)
-                name = encounter.partyNames[index] ?? companion.name
+                name = encounter.partyNames[id] ?? companion.name
                 level = companion.character.level
                 currentHP = CombatRules.health(of: actor, in: run).current
             case .foe:

@@ -219,7 +219,13 @@ struct EncounterView: View {
             current: encounter.current,
             encounterFinished: encounter.outcome != nil,
             companionOverride: encounter.isCompanionOverridden,
-            rosterNames: store.state.base.roster.map(\.name)
+            rosterNames: store.state.base.roster.map(\.name),
+            rosterNamesByID: Dictionary(uniqueKeysWithValues:
+                store.state.base.roster.indices.compactMap { index in
+                    store.state.base.persistentID(forRosterIndex: index).map {
+                        ($0, store.state.base.roster[index].name)
+                    }
+                })
         )
     }
 
@@ -238,14 +244,14 @@ struct EncounterView: View {
 
                 // **Everybody who came.** One hardcoded card was the last place the party of two
                 // survived — the fight itself already knows how to run five.
-                ForEach(store.state.base.activeParty, id: \.self) { index in
-                    if store.state.base.roster.indices.contains(index) {
-                        PartyCard(actor: .companion(index),
+                ForEach(store.state.base.activeParty, id: \.self) { id in
+                    if let index = store.state.base.rosterIndex(for: id) {
+                        PartyCard(actor: .companion(id),
                                   name: store.state.base.roster[index].name,
                                   icon: store.state.base.roster[index].icon,
                                   travellerID: store.state.base.roster[index].traveller,
-                                  health: CombatRules.health(of: .companion(index), in: run),
-                                  isActing: encounter.current == .companion(index) && encounter.outcome == nil,
+                                  health: CombatRules.health(of: .companion(id), in: run),
+                                  isActing: encounter.current == .companion(id) && encounter.outcome == nil,
                                   badge: encounter.isCompanionOverridden ? "manual" : "auto")
                             .onTapGesture { store.toggleCompanionOverride() }
                     }
@@ -537,14 +543,17 @@ enum EncounterTurnText {
         current: Combatant,
         encounterFinished: Bool,
         companionOverride: Bool,
-        rosterNames: [String]
+        rosterNames: [String],
+        rosterNamesByID: [PersistentPartyMemberID: String] = [:]
     ) -> String {
         guard !encounterFinished else { return "" }
         switch current {
         case .binder:
             return "your move"
-        case .companion(let index):
-            let name = rosterNames.indices.contains(index) ? rosterNames[index] : "Companion"
+        case .companion(let id):
+            let name = rosterNamesByID[id]
+                ?? id.legacyFixtureIndex.flatMap { rosterNames.indices.contains($0) ? rosterNames[$0] : nil }
+                ?? "Companion"
             return companionOverride ? "you're directing \(name)" : "\(name) is acting"
         case .foe:
             return "…"
@@ -984,9 +993,9 @@ private struct CombatItemSheet: View {
     private func name(of actor: Combatant) -> String {
         switch actor {
         case .binder: return "You"
-        case .companion(let index):
-            return store.state.base.roster.indices.contains(index)
-                ? store.state.base.roster[index].name : "Companion"
+        case .companion(let id):
+            return store.state.base.rosterIndex(for: id)
+                .map { store.state.base.roster[$0].name } ?? "Companion"
         case .foe: return "Foe"
         }
     }

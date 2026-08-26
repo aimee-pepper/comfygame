@@ -165,7 +165,8 @@ final class WeaponsmithTests: XCTestCase {
         var state = state(tier: 0)
         XCTAssertTrue(state.base.seat("maud"))
         let index = try XCTUnwrap(state.base.roster.firstIndex { $0.traveller == "maud" })
-        state.base.activeParty.removeAll { $0 == index }
+        let memberID = try XCTUnwrap(state.base.persistentID(forRosterIndex: index))
+        state.base.activeParty.removeAll { $0 == memberID }
         let preview = try XCTUnwrap(PhysicalGearCraftingRules.preview(
             PhysicalGearCraftingRules.fittedPoint, in: state))
         XCTAssertLessThan(preview.essence, preview.rawEssence)

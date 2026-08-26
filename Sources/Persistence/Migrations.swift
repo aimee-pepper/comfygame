@@ -43,6 +43,7 @@ enum Migrations {
     private static func step(_ data: Data, from version: Int) throws -> Data {
         switch version {
         case 1: return try migrate1to2(data)
+        case 2: return try migrate2to3(data)
         default:
             // No migration registered. Tolerant decoding is the fallback; if the save is genuinely
             // incompatible, `SaveFileIO.load()` quarantines it rather than losing it.
@@ -152,6 +153,113 @@ enum Migrations {
             root["worlds"] = worlds
         }
         root["schemaVersion"] = 2
+        return try JSONSerialization.data(withJSONObject: root, options: [.sortedKeys])
+    }
+
+    /// Replaces every durable roster-position owner with the stable identity already present in
+    /// the saved roster. The whole JSON graph is transformed before decoding, so an invalid actor
+    /// fails without partially constructing or rewriting a campaign or slot payload.
+    private static func migrate2to3(_ data: Data) throws -> Data {
+        guard var root = try JSONSerialization.jsonObject(with: data) as? [String: Any] else {
+            throw CocoaError(.coderInvalidValue)
+        }
+        var base = root["base"] as? [String: Any] ?? [:]
+        var roster = base["roster"] as? [[String: Any]]
+            ?? (base["companion"] as? [String: Any]).map { [$0] }
+            ?? []
+
+        func travellerRawValue(_ value: Any?) -> String? {
+            if let string = value as? String { return string.isEmpty ? nil : string }
+            guard let object = value as? [String: Any],
+                  let string = object["rawValue"] as? String, !string.isEmpty else { return nil }
+            return string
+        }
+        func identity(for value: Any) throws -> String {
+            guard let number = value as? NSNumber,
+                  CFGetTypeID(number) != CFBooleanGetTypeID(),
+                  let index = Int(number.stringValue), index >= 0, index < roster.count else {
+                throw CocoaError(.coderInvalidValue)
+            }
+            if index == 0 { return "founder:quill" }
+            guard let traveller = travellerRawValue(roster[index]["traveller"]) else {
+                throw CocoaError(.coderInvalidValue)
+            }
+            return "traveller:\(traveller)"
+        }
+
+        // Freeze member identity onto the roster itself. That makes its array order presentation
+        // only after this migration rather than a hidden durable lookup authority.
+        for index in roster.indices {
+            roster[index]["persistentID"] = try identity(for: NSNumber(value: index))
+        }
+        base["roster"] = roster
+        base.removeValue(forKey: "companion")
+        root["base"] = base
+        func migratedActorPayload(_ value: Any) throws -> Any {
+            guard var payload = value as? [String: Any], let legacy = payload["_0"] else {
+                throw CocoaError(.coderInvalidValue)
+            }
+            if legacy is String { return payload }
+            payload["_0"] = try identity(for: legacy)
+            return payload
+        }
+        func migrate(_ value: Any, key: String? = nil) throws -> Any {
+            if let array = value as? [Any] {
+                if key == "activeParty" || key == "assignedCompanions" {
+                    return try array.map { element in
+                        if element is String { return element }
+                        return try identity(for: element)
+                    }
+                }
+                return try array.map { try migrate($0) }
+            }
+            guard let object = value as? [String: Any] else {
+                if key == "activeCompanion", !(value is String) { return try identity(for: value) }
+                return value
+            }
+
+            if key == "partyNames" || key == "companionHP" {
+                var encoded: [Any] = []
+                for legacyKey in object.keys.sorted(by: { (Int($0) ?? 0) < (Int($1) ?? 0) }) {
+                    guard let index = Int(legacyKey) else { throw CocoaError(.coderInvalidValue) }
+                    encoded.append(try identity(for: NSNumber(value: index)))
+                    encoded.append(try migrate(object[legacyKey] as Any))
+                }
+                return encoded
+            }
+
+            var result: [String: Any] = [:]
+            for (childKey, child) in object {
+                if childKey == "companion" || childKey == "member" {
+                    if let payload = child as? [String: Any], payload["_0"] != nil {
+                        result[childKey] = try migratedActorPayload(payload)
+                    } else {
+                        result[childKey] = try migrate(child, key: childKey)
+                    }
+                } else if childKey == "cooldowns", let cooldowns = child as? [String: Any] {
+                    var migratedCooldowns: [String: Any] = [:]
+                    for (cooldownKey, count) in cooldowns {
+                        if cooldownKey.hasPrefix("companion-"),
+                           let separator = cooldownKey.firstIndex(of: "|") {
+                            let indexText = cooldownKey[cooldownKey.index(cooldownKey.startIndex,
+                                                                          offsetBy: "companion-".count)..<separator]
+                            guard let index = Int(indexText) else { throw CocoaError(.coderInvalidValue) }
+                            let id = try identity(for: NSNumber(value: index))
+                            migratedCooldowns["party-\(id)\(cooldownKey[separator...])"] = count
+                        } else {
+                            migratedCooldowns[cooldownKey] = count
+                        }
+                    }
+                    result[childKey] = migratedCooldowns
+                } else {
+                    result[childKey] = try migrate(child, key: childKey)
+                }
+            }
+            return result
+        }
+
+        root = try migrate(root) as! [String: Any]
+        root["schemaVersion"] = 3
         return try JSONSerialization.data(withJSONObject: root, options: [.sortedKeys])
     }
 }

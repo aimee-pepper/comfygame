@@ -196,7 +196,7 @@ extension GameStore {
             actor = waiting
         } else if case .quench = action,
                   let current = activeEncounter?.current,
-                  current.rosterIndex != nil {
+                  current.persistentPartyMemberID != nil {
             // Quench is an exact, player-selected companion transaction. Its picker is the input
             // authority for this companion turn even when the general one-turn override toggle is
             // not armed; routing it through `actingCombatant` used to discard the selection before
@@ -266,7 +266,8 @@ extension GameStore {
     var canEditGambits: Bool { activeEncounter == nil }
 
     func gambits(for owner: Combatant) -> [GambitRule] {
-        guard let index = owner.rosterIndex else { return state.base.binderGambits }
+        guard let id = owner.persistentPartyMemberID,
+              let index = state.base.rosterIndex(for: id) else { return state.base.binderGambits }
         return state.base.roster.indices.contains(index) ? state.base.roster[index].gambits : []
     }
 
@@ -289,8 +290,8 @@ extension GameStore {
     /// "the Binder's, or the companion's", which was fine while there was one of them.
     private func withGambits(_ owner: Combatant, _ body: @escaping (inout [GambitRule]) -> Void) -> (inout GameState) -> Void {
         { state in
-            guard let index = owner.rosterIndex else { return body(&state.base.binderGambits) }
-            guard state.base.roster.indices.contains(index) else { return }
+            guard let id = owner.persistentPartyMemberID else { return body(&state.base.binderGambits) }
+            guard let index = state.base.rosterIndex(for: id) else { return }
             body(&state.base.roster[index].gambits)
         }
     }

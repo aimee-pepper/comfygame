@@ -1847,7 +1847,9 @@ final class CombatTests: XCTestCase {
     @MainActor
     func testEachOfThemActsOnTheirOwnRulesAndIsNamed() throws {
         let store = try storeWithAFullParty()
-        let expectedNames = Set(store.state.base.activeParty.map { store.state.base.roster[$0].name })
+        let expectedNames = Set(store.state.base.activeParty.compactMap {
+            store.state.base.rosterIndex(for: $0).map { store.state.base.roster[$0].name }
+        })
         var seenNames = Set<String>()
         var guardCount = 0
         while store.activeEncounter?.outcome == nil, seenNames != expectedNames, guardCount < 40 {
@@ -1916,8 +1918,10 @@ final class CombatTests: XCTestCase {
             run.activeEncounter = CombatRules.makeEncounter(
                 id: InstanceID(rawValue: 7), foes: foes,
                 party: CombatRules.party(of: state),
-                names: state.base.activeParty.reduce(into: [Int: String]()) {
-                    $0[$1] = state.base.roster[$1].name
+                names: state.base.activeParty.reduce(into: [PersistentPartyMemberID: String]()) {
+                    if let index = state.base.rosterIndex(for: $1) {
+                        $0[$1] = state.base.roster[index].name
+                    }
                 },
                 rng: &rng)
             state.worlds.activeRun = run

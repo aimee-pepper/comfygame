@@ -14,11 +14,11 @@ enum CombatActionOwnershipRules {
         switch actor {
         case .binder:
             return binderInnate
-        case .companion(let index):
-            guard state.base.roster.indices.contains(index) else { return [] }
+        case .companion(let id):
+            guard let index = state.base.rosterIndex(for: id) else { return [] }
             // Quill is the documented, always-present roster member at index zero. Do not infer
             // Quill from `traveller == nil`: generated people share that representation today.
-            var result = index == 0 ? quillInnate : []
+            var result = id == .founderQuill ? quillInnate : []
             if state.base.roster[index].traveller == TravellerID(rawValue: "ashe") {
                 result.formUnion(asheInnate)
             }

@@ -10,9 +10,10 @@ enum StationStaffingRules {
     }
 
     static func keeperIsHome(for station: StationDef, in state: GameState) -> Bool {
-        guard let index = keeperIndex(for: station, in: state) else { return false }
-        guard !state.base.activeParty.contains(index) else { return false }
-        return !state.worlds.anchoredRealms.contains { $0.assignedCompanions.contains(index) }
+        guard let index = keeperIndex(for: station, in: state),
+              let memberID = state.base.persistentID(forRosterIndex: index) else { return false }
+        guard !state.base.activeParty.contains(memberID) else { return false }
+        return !state.worlds.anchoredRealms.contains { $0.assignedCompanions.contains(memberID) }
     }
 
     static func keeperEarnedTier(for station: StationDef, in state: GameState) -> Int {

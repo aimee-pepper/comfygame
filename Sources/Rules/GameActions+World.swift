@@ -166,7 +166,7 @@ extension GameStore {
             run.binderHP = healthCaps.first { $0.member == .binder }?.maximum
                 ?? Tuning.Encounter.binderMaxHP
             run.companionHP = healthCaps.reduce(into: [:]) { hp, entry in
-                if case .member(let index) = entry.member { hp[index] = entry.maximum }
+                if case .member(let id) = entry.member { hp[id] = entry.maximum }
             }
 
             state.base.inventory = fieldKit.remainingInventory
@@ -186,8 +186,8 @@ extension GameStore {
                 run.carriedInstruments.map { ($0, state.reality.instrumentPrecision(for: $0)) })
             run.partyProgressAtStart = state.base.partyMembers.map { member in
                 let character = state.base.character(member)
-                let name = member.rosterIndex.flatMap { index in
-                    state.base.roster.indices.contains(index) ? state.base.roster[index].name : nil
+                let name = member.persistentID.flatMap { id in
+                    state.base.rosterIndex(for: id).map { state.base.roster[$0].name }
                 } ?? "You"
                 return RunProgressStart(member: member, name: name,
                                         experience: character.experience, level: character.level)
@@ -838,26 +838,27 @@ extension GameStore {
     }
 
     func assignCompanion(_ companion: Int, toAnchoredRealm id: Int) -> Bool {
-        guard state.base.roster.indices.contains(companion),
+        guard let memberID = state.base.persistentID(forRosterIndex: companion),
               state.worlds.anchoredRealms.contains(where: { $0.id == id && !$0.isDormant }) else {
             return false
         }
         mutate("assign companion to anchored realm", flush: true, scope: .expedition) { state in
-            state.base.activeParty.removeAll { $0 == companion }
+            state.base.activeParty.removeAll { $0 == memberID }
             for index in state.worlds.anchoredRealms.indices {
-                state.worlds.anchoredRealms[index].assignedCompanions.removeAll { $0 == companion }
+                state.worlds.anchoredRealms[index].assignedCompanions.removeAll { $0 == memberID }
             }
             guard let target = state.worlds.anchoredRealms.firstIndex(where: { $0.id == id }) else { return }
-            state.worlds.anchoredRealms[target].assignedCompanions.append(companion)
+            state.worlds.anchoredRealms[target].assignedCompanions.append(memberID)
             Self.recalculateAnchorProduction(in: &state)
         }
         return true
     }
 
     func unassignCompanion(_ companion: Int, fromAnchoredRealm id: Int) {
+        guard let memberID = state.base.persistentID(forRosterIndex: companion) else { return }
         mutate("return companion from anchored realm", flush: true, scope: .expedition) { state in
             guard let target = state.worlds.anchoredRealms.firstIndex(where: { $0.id == id }) else { return }
-            state.worlds.anchoredRealms[target].assignedCompanions.removeAll { $0 == companion }
+            state.worlds.anchoredRealms[target].assignedCompanions.removeAll { $0 == memberID }
             Self.recalculateAnchorProduction(in: &state)
         }
     }

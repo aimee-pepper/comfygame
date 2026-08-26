@@ -1460,10 +1460,11 @@ final class LibraryTests: XCTestCase {
 
             // And you can take them **as well as** Quill — a party, not a swap.
             let index = try XCTUnwrap(store.state.base.roster.firstIndex { $0.traveller == id })
+            let memberID = try XCTUnwrap(store.state.base.persistentID(forRosterIndex: index))
             store.setComing(index, true)
-            XCTAssertTrue(store.state.base.activeParty.contains(index),
+            XCTAssertTrue(store.state.base.activeParty.contains(memberID),
                           "recruited them, took them, and they still aren't coming")
-            XCTAssertTrue(store.state.base.activeParty.contains(0),
+            XCTAssertTrue(store.state.base.activeParty.contains(.founderQuill),
                           "taking somebody new pushed Quill out — that's a swap, not a party")
             XCTAssertEqual(store.state.base.partyMembers.count, 3, "you and two others")
             return
@@ -1495,13 +1496,14 @@ final class LibraryTests: XCTestCase {
         var mara = CompanionState()
         mara.name = "Mara"
         mara.traveller = "mara"
+        mara.persistentID = .traveller("mara")
         state.base.roster.append(mara)
         let index = state.base.roster.count - 1
         state.reality.library.foundTravellers.insert("mara")
         let definition = try XCTUnwrap(ContentCatalog.shared.traveller("mara"))
 
         XCTAssertEqual(LibraryPresentation.placementLabel(for: definition, in: state), "At Home")
-        state.base.activeParty.append(index)
+        state.base.activeParty.append(.traveller("mara"))
         XCTAssertEqual(LibraryPresentation.placementLabel(for: definition, in: state), "With you")
 
         let root = URL(fileURLWithPath: #filePath)
@@ -1576,7 +1578,9 @@ final class LibraryTests: XCTestCase {
             while state.base.roster.count < Tuning.Party.maximumSize + 3 {
                 state.base.roster.append(CompanionState())
             }
-            state.base.activeParty = Array(0..<(Tuning.Party.maximumSize - 1))
+            state.base.activeParty = (0..<(Tuning.Party.maximumSize - 1)).map {
+                $0 == 0 ? .founderQuill : .generated("legacy-fixture-\($0)")
+            }
         }
         XCTAssertEqual(store.state.base.partyMembers.count, Tuning.Party.maximumSize)
         XCTAssertFalse(store.state.base.canTakeAnother)
@@ -1621,7 +1625,8 @@ final class LibraryTests: XCTestCase {
 
         // And the Firepit shows them as people you can take, not as one person you already have.
         let waiting = reopened.state.base.roster.enumerated()
-            .filter { $0.offset != reopened.state.base.activeCompanion }
+            .filter { reopened.state.base.persistentID(forRosterIndex: $0.offset)
+                != reopened.state.base.activeCompanion }
         XCTAssertEqual(waiting.count, everyone.count,
                        "the fire is still empty with \(everyone.count) people found")
     }

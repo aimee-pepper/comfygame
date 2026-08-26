@@ -53,17 +53,22 @@ struct PartyTransferPreview: Identifiable, Equatable, Sendable {
 
 enum RosterPlacementRules {
     static func placement(of index: Int, in state: GameState) -> RosterPlacement {
-        if state.base.activeParty.contains(index) { return .activeParty }
+        guard let id = state.base.persistentID(forRosterIndex: index) else { return .home }
+        return placement(of: id, in: state)
+    }
+
+    static func placement(of id: PersistentPartyMemberID, in state: GameState) -> RosterPlacement {
+        if state.base.activeParty.contains(id) { return .activeParty }
         if let realm = state.worlds.anchoredRealms.first(where: {
-            !$0.isDormant && $0.assignedCompanions.contains(index)
+            !$0.isDormant && $0.assignedCompanions.contains(id)
         }) {
             return .anchoredRealm(id: realm.id, name: realm.name)
         }
         return .home
     }
 
-    static func contribution(of index: Int, in state: GameState) -> Int {
-        guard state.base.roster.indices.contains(index) else { return 0 }
+    static func contribution(of id: PersistentPartyMemberID, in state: GameState) -> Int {
+        guard let index = state.base.rosterIndex(for: id) else { return 0 }
         let person = state.base.roster[index]
         return Tuning.Anchoring.worldworkBaseContribution + person.worldwork
             + max(0, person.character.level - 1) / Tuning.Anchoring.levelsPerWorldworkBonus
@@ -82,10 +87,10 @@ enum RosterPlacementRules {
     /// active realm keeps the worker. Invalid, dormant and duplicate references return Home.
     static func reconcileLegacyProjections(in state: inout GameState) -> Bool {
         var changed = false
-        var seenParty = Set<Int>()
-        let party = state.base.activeParty.filter { index in
-            let valid = state.base.roster.indices.contains(index)
-                && seenParty.insert(index).inserted
+        var seenParty = Set<PersistentPartyMemberID>()
+        let party = state.base.activeParty.filter { id in
+            let valid = state.base.rosterIndex(for: id) != nil
+                && seenParty.insert(id).inserted
                 && seenParty.count <= Tuning.Party.maximumSize - 1
             if !valid { changed = true }
             return valid
@@ -100,10 +105,10 @@ enum RosterPlacementRules {
             state.worlds.anchoredRealms[$0].id < state.worlds.anchoredRealms[$1].id
         }) {
             let realm = state.worlds.anchoredRealms[realmIndex]
-            var local = Set<Int>()
+            var local = Set<PersistentPartyMemberID>()
             let repaired = realm.assignedCompanions.filter { companion in
                 let keep = !realm.isDormant
-                    && state.base.roster.indices.contains(companion)
+                    && state.base.rosterIndex(for: companion) != nil
                     && !claimed.contains(companion)
                     && local.insert(companion).inserted
                 if keep { claimed.insert(companion) }
@@ -681,7 +686,9 @@ extension GameStore {
             guard (stack.gearProfile?.slot ?? ContentCatalog.shared.item(stack.catalogID)?.gear?.slot) == slot else { return nil }
             return WearableGearOption(piece: EquippedPiece(stack), source: .overflow(stack.id), count: stack.count)
         }
-        let owners: [PartySlot] = [.binder] + state.base.roster.indices.map(PartySlot.member)
+        let owners: [PartySlot] = [.binder] + state.base.roster.indices.compactMap {
+            state.base.persistentID(forRosterIndex: $0).map(PartySlot.member)
+        }
         let worn = owners.compactMap { owner -> WearableGearOption? in
             guard owner != wearer, let piece = self.worn(slot, by: owner), piece.frozenSlot == slot else { return nil }
             return WearableGearOption(piece: piece, source: .worn(owner), count: 1)
@@ -765,30 +772,32 @@ extension GameStore {
 
     /// Everybody at the fire, in or out. The Firepit's list.
     var everyoneAtTheFire: [PartySlot] {
-        state.base.roster.indices.map(PartySlot.member)
+        state.base.roster.indices.compactMap {
+            state.base.persistentID(forRosterIndex: $0).map(PartySlot.member)
+        }
     }
 
     func name(of slot: PartySlot) -> String {
         switch slot {
         case .binder: "You"
-        case .member(let index): state.base.roster.indices.contains(index)
-            ? state.base.roster[index].name : "—"
+        case .member(let id): state.base.rosterIndex(for: id)
+            .map { state.base.roster[$0].name } ?? "—"
         }
     }
 
     func character(of slot: PartySlot) -> CharacterState {
         switch slot {
         case .binder: state.base.binderCharacter
-        case .member(let index): state.base.roster.indices.contains(index)
-            ? state.base.roster[index].character : CharacterState()
+        case .member(let id): state.base.rosterIndex(for: id)
+            .map { state.base.roster[$0].character } ?? CharacterState()
         }
     }
 
     func worn(_ gearSlot: GearSlot, by slot: PartySlot) -> EquippedPiece? {
         switch slot {
         case .binder: state.base.binderEquipped[gearSlot]
-        case .member(let index): state.base.roster.indices.contains(index)
-            ? state.base.roster[index].equipped[gearSlot] : nil
+        case .member(let id): state.base.rosterIndex(for: id)
+            .flatMap { state.base.roster[$0].equipped[gearSlot] }
         }
     }
 
@@ -906,7 +915,7 @@ extension GameStore {
     private static func isValid(_ slot: PartySlot, in state: GameState) -> Bool {
         switch slot {
         case .binder: true
-        case .member(let index): state.base.roster.indices.contains(index)
+        case .member(let id): state.base.rosterIndex(for: id) != nil
         }
     }
 
@@ -934,8 +943,8 @@ extension GameStore {
             let previous = state.base.binderEquipped[gearSlot]
             state.base.binderEquipped[gearSlot] = piece
             return previous
-        case .member(let index):
-            guard state.base.roster.indices.contains(index) else { return nil }
+        case .member(let id):
+            guard let index = state.base.rosterIndex(for: id) else { return nil }
             let previous = state.base.roster[index].equipped[gearSlot]
             state.base.roster[index].equipped[gearSlot] = piece
             return previous
@@ -946,8 +955,8 @@ extension GameStore {
     func gambits(of slot: PartySlot) -> [GambitRule] {
         switch slot {
         case .binder: state.base.binderGambits
-        case .member(let index): state.base.roster.indices.contains(index)
-            ? state.base.roster[index].gambits : []
+        case .member(let id): state.base.rosterIndex(for: id)
+            .map { state.base.roster[$0].gambits } ?? []
         }
     }
 
@@ -971,7 +980,8 @@ extension GameStore {
         if case .anchoredRealm(let id, _) = source,
            let realm = state.worlds.anchoredRealms.first(where: { $0.id == id }) {
             before = realm.productionContribution
-            after = max(0, realm.productionContribution - RosterPlacementRules.contribution(of: index, in: state))
+            after = max(0, realm.productionContribution - RosterPlacementRules.contribution(
+                of: state.base.persistentID(forRosterIndex: index) ?? .founderQuill, in: state))
             shortfallBefore = realm.projectedShortfall
             shortfallAfter = max(0, realm.sustainObligation - (after ?? 0))
         }
@@ -986,28 +996,28 @@ extension GameStore {
     /// wrong projection.
     @discardableResult
     func setComing(_ index: Int, _ coming: Bool, expected: RosterPlacement? = nil) -> Bool {
-        guard state.base.roster.indices.contains(index),
+        guard let memberID = state.base.persistentID(forRosterIndex: index),
               expected == nil || placement(of: index) == expected else { return false }
         if coming {
-            guard !state.base.activeParty.contains(index), state.base.canTakeAnother else { return false }
+            guard !state.base.activeParty.contains(memberID), state.base.canTakeAnother else { return false }
         } else {
-            guard state.base.activeParty.contains(index) else { return false }
+            guard state.base.activeParty.contains(memberID) else { return false }
         }
         let name = state.base.roster[index].name
         var committed = false
         mutate(coming ? "take \(name)" : "leave \(name)", flush: true) {
             guard expected == nil || RosterPlacementRules.placement(of: index, in: $0) == expected else { return }
             if coming {
-                guard !$0.base.activeParty.contains(index), $0.base.canTakeAnother else { return }
+                guard !$0.base.activeParty.contains(memberID), $0.base.canTakeAnother else { return }
                 for realmIndex in $0.worlds.anchoredRealms.indices {
-                    $0.worlds.anchoredRealms[realmIndex].assignedCompanions.removeAll { $0 == index }
+                    $0.worlds.anchoredRealms[realmIndex].assignedCompanions.removeAll { $0 == memberID }
                 }
-                $0.base.activeParty.append(index)
+                $0.base.activeParty.append(memberID)
             } else {
-                guard $0.base.activeParty.contains(index) else { return }
-                $0.base.activeParty.removeAll { $0 == index }
+                guard $0.base.activeParty.contains(memberID) else { return }
+                $0.base.activeParty.removeAll { $0 == memberID }
                 for realmIndex in $0.worlds.anchoredRealms.indices {
-                    $0.worlds.anchoredRealms[realmIndex].assignedCompanions.removeAll { $0 == index }
+                    $0.worlds.anchoredRealms[realmIndex].assignedCompanions.removeAll { $0 == memberID }
                 }
             }
             RosterPlacementRules.recalculateRealmProduction(in: &$0)
@@ -1041,7 +1051,9 @@ extension GameStore {
             : .refused("Party placement changed. Review the current roster and try again.")
     }
 
-    func isComing(_ index: Int) -> Bool { state.base.activeParty.contains(index) }
+    func isComing(_ index: Int) -> Bool {
+        state.base.persistentID(forRosterIndex: index).map(state.base.activeParty.contains) ?? false
+    }
 
     /// What unlearning everything would cost this person, and whether you can afford it.
     func respecCost(for member: PartyMember) -> Int {
@@ -1088,7 +1100,7 @@ extension GameStore {
     func purchaseCombatNode(_ quote: CombatGraphRules.PurchaseQuote,
                             for member: PartyMember) -> CombatGraphRules.PurchaseResult {
         guard activeEncounter == nil else { return .refused(.unavailable) }
-        if case .member(let index) = member, !state.base.roster.indices.contains(index) {
+        if case .member(let id) = member, state.base.rosterIndex(for: id) == nil {
             return .refused(.stale)
         }
         var result: CombatGraphRules.PurchaseResult = .refused(.stale)
@@ -1115,8 +1127,8 @@ extension GameStore {
             switch slot {
             case .binder:
                 state.base.binderCharacter.rank = rank
-            case .member(let index):
-                guard state.base.roster.indices.contains(index) else { return }
+            case .member(let id):
+                guard let index = state.base.rosterIndex(for: id) else { return }
                 state.base.roster[index].character.rank = rank
             }
         }
@@ -1229,7 +1241,9 @@ extension GameStore {
     /// what `reforge` puts back.
     var reforgeable: [ReforgeTarget] {
         var targets: [ReforgeTarget] = []
-        for member in ([.binder] + state.base.roster.indices.map(PartyMember.member)) {
+        for member in ([.binder] + state.base.roster.indices.compactMap {
+            state.base.persistentID(forRosterIndex: $0).map(PartyMember.member)
+        }) {
             for slot in GearSlot.allCases {
                 if let piece = state.base.worn(slot, by: member) {
                     targets.append(.worn(slot: slot, member: member, piece: piece))

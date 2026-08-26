@@ -1107,7 +1107,9 @@ extension GameStore {
                 member.equipped = [:]
                 return member
             }
-            state.base.activeParty = Array(kind.memberLevels.indices)
+            state.base.activeParty = kind.memberLevels.indices.compactMap {
+                state.base.persistentID(forRosterIndex: $0)
+            }
         }
         guard store.write("plains") else {
             throw EncounterScalingPhoneFixtureError.couldNotWritePage

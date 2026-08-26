@@ -145,7 +145,8 @@ struct BaseState: Codable, Equatable, Sendable {
     /// (6 Aug). She was kept, in Reality, where nothing can take her; there was simply nothing to
     /// show for it, which is indistinguishable from losing her.
     ///
-    /// Quill is index 0 and always there. Everyone else arrives by being talked into it.
+    /// Quill starts first. Durable ownership uses each member's `persistentID`; array order is
+    /// presentation only and may change without changing anybody's identity.
     var roster: [CompanionState] = [CompanionState()]
 
     /// **Who is walking out with you**, as roster indices, in the order they'll stand.
@@ -153,15 +154,15 @@ struct BaseState: Codable, Equatable, Sendable {
     /// Aimee asked for this repeatedly and I kept deferring it: *"I still can only add one person
     /// to my party from the fire pit."* It was one index, so the fire could only ever hand you one
     /// person however many you had found.
-    var activeParty: [Int] = [0]
+    var activeParty: [PersistentPartyMemberID] = [.founderQuill]
 
     /// The first of them. Kept only for the handful of places that genuinely mean "the one in
     /// front" — everything about *the party* reads `activeParty`.
-    var activeCompanion: Int { activeParty.first ?? 0 }
+    var activeCompanion: PersistentPartyMemberID { activeParty.first ?? .founderQuill }
 
     /// Everybody in the fight, you included, in turn-order-agnostic order.
     var partyMembers: [PartyMember] {
-        [.binder] + activeParty.filter { roster.indices.contains($0) }.map(PartyMember.member)
+        [.binder] + activeParty.filter { rosterIndex(for: $0) != nil }.map(PartyMember.member)
     }
 
     /// How many more can come. The Binder is one of the five.
@@ -170,12 +171,29 @@ struct BaseState: Codable, Equatable, Sendable {
     /// Who's fighting beside you, as one value. Kept as a property so the hundred places that read
     /// `base.companion` don't all have to learn about the roster at once.
     var companion: CompanionState {
-        get { roster.indices.contains(activeCompanion) ? roster[activeCompanion] : CompanionState() }
+        get { rosterIndex(for: activeCompanion).map { roster[$0] } ?? CompanionState() }
         set {
             if roster.isEmpty { roster = [newValue] }
-            else if roster.indices.contains(activeCompanion) { roster[activeCompanion] = newValue }
+            else if let index = rosterIndex(for: activeCompanion) { roster[index] = newValue }
             else { roster[0] = newValue }
         }
+    }
+
+    func persistentID(forRosterIndex index: Int) -> PersistentPartyMemberID? {
+        guard roster.indices.contains(index) else { return nil }
+        if let id = roster[index].persistentID { return id }
+        if index == 0 { return .founderQuill }
+        guard let traveller = roster[index].traveller else { return nil }
+        return .traveller(traveller)
+    }
+
+    func rosterIndex(for id: PersistentPartyMemberID) -> Int? {
+        if let exact = roster.firstIndex(where: { $0.persistentID == id }) { return exact }
+        if id == .founderQuill {
+            return roster.firstIndex(where: { $0.persistentID == nil && $0.traveller == nil })
+        }
+        guard let traveller = id.travellerID else { return id.legacyFixtureIndex }
+        return roster.firstIndex { $0.traveller == traveller }
     }
 
     /// **What the Binder is wearing** (Aimee, 5 Aug).
@@ -264,6 +282,7 @@ struct BaseState: Codable, Equatable, Sendable {
         guard let person = ContentCatalog.shared.traveller(id) else { return false }
         guard !roster.contains(where: { $0.traveller == id }) else { return false }
         var joined = CompanionState()
+        joined.persistentID = .traveller(id)
         joined.name = person.name
         joined.traveller = id
         joined.calling = person.calling
@@ -316,16 +335,16 @@ struct BaseState: Codable, Equatable, Sendable {
     func character(_ member: PartyMember) -> CharacterState {
         switch member {
         case .binder: binderCharacter
-        case .member(let index):
-            roster.indices.contains(index) ? roster[index].character : CharacterState(rank: .front)
+        case .member(let id):
+            rosterIndex(for: id).map { roster[$0].character } ?? CharacterState(rank: .front)
         }
     }
 
     mutating func withCharacter(_ member: PartyMember, _ change: (inout CharacterState) -> Void) {
         switch member {
         case .binder: change(&binderCharacter)
-        case .member(let index):
-            guard roster.indices.contains(index) else { return }
+        case .member(let id):
+            guard let index = rosterIndex(for: id) else { return }
             change(&roster[index].character)
         }
     }
@@ -334,8 +353,8 @@ struct BaseState: Codable, Equatable, Sendable {
     func worn(_ slot: GearSlot, by member: PartyMember) -> EquippedPiece? {
         switch member {
         case .binder: binderEquipped[slot]
-        case .member(let index):
-            roster.indices.contains(index) ? roster[index].equipped[slot] : nil
+        case .member(let id):
+            rosterIndex(for: id).flatMap { roster[$0].equipped[slot] }
         }
     }
 
@@ -603,12 +622,13 @@ struct BaseState: Codable, Equatable, Sendable {
             ?? [try container.decodeIfPresent(CompanionState.self, forKey: .companion) ?? CompanionState()]
         if roster.isEmpty { roster = [CompanionState()] }
         // A save from when only one person could come brings that one person with it.
-        if let savedParty = try container.decodeIfPresent([Int].self, forKey: .activeParty) {
+        if let savedParty = try container.decodeIfPresent([PersistentPartyMemberID].self, forKey: .activeParty) {
             // Empty is a deliberate Binder-only party. Only a genuinely absent legacy field
             // inherits the old single active companion.
-            activeParty = savedParty.filter { $0 >= 0 }
+            activeParty = savedParty
         } else {
-            activeParty = [try container.decodeIfPresent(Int.self, forKey: .activeCompanion) ?? 0]
+            activeParty = [try container.decodeIfPresent(PersistentPartyMemberID.self,
+                                                          forKey: .activeCompanion) ?? .founderQuill]
         }
         binderEquipped = try container.decodeIfPresent([GearSlot: EquippedPiece].self, forKey: .binderEquipped) ?? [:]
         hasAutomateSelfUnlock = try container.decodeIfPresent(Bool.self, forKey: .hasAutomateSelfUnlock) ?? false
@@ -777,25 +797,68 @@ struct StationState: Codable, Equatable, Sendable {
 /// five stall: one of them knew about a roster and the other knew about a fight, so nothing could
 /// talk about the same person on both sides of the door. They're one type now, and `PartySlot`
 /// survives as a spelling of it.
+struct PersistentPartyMemberID: RawRepresentable, Hashable, Sendable, Codable,
+                                ExpressibleByStringLiteral, ExpressibleByIntegerLiteral {
+    let rawValue: String
+
+    init(rawValue: String) { self.rawValue = rawValue }
+    init(stringLiteral value: String) { rawValue = value }
+    // Source compatibility for old test fixtures only. Canonical saves are produced by the v3
+    // migration and live roster resolution, never by this spelling.
+    init(integerLiteral value: Int) {
+        rawValue = value == 0 ? Self.founderQuill.rawValue : "generated:legacy-fixture-\(value)"
+    }
+
+    static let founderQuill = Self(rawValue: "founder:quill")
+    static func traveller(_ id: TravellerID) -> Self { Self(rawValue: "traveller:\(id.rawValue)") }
+    static func generated(_ id: String) -> Self { Self(rawValue: "generated:\(id)") }
+    static func animal(_ id: String) -> Self { Self(rawValue: "animal:\(id)") }
+
+    var travellerID: TravellerID? {
+        guard rawValue.hasPrefix("traveller:"), rawValue.count > "traveller:".count else { return nil }
+        return TravellerID(rawValue: String(rawValue.dropFirst("traveller:".count)))
+    }
+    var legacyFixtureIndex: Int? {
+        let prefix = "generated:legacy-fixture-"
+        guard rawValue.hasPrefix(prefix) else { return nil }
+        return Int(rawValue.dropFirst(prefix.count))
+    }
+
+    init(from decoder: Decoder) throws {
+        let value = try decoder.singleValueContainer().decode(String.self)
+        let valid = value == Self.founderQuill.rawValue
+            || (value.hasPrefix("traveller:") && value.count > "traveller:".count)
+            || (value.hasPrefix("generated:") && value.count > "generated:".count)
+            || (value.hasPrefix("animal:") && value.count > "animal:".count)
+        guard valid else { throw DecodingError.dataCorruptedError(in: try decoder.singleValueContainer(),
+                                                                   debugDescription: "Invalid party member identity") }
+        rawValue = value
+    }
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.singleValueContainer()
+        try container.encode(rawValue)
+    }
+}
+
 enum PartyMember: Hashable, Identifiable, Sendable, Codable {
     case binder
-    case member(Int)
+    case member(PersistentPartyMemberID)
 
     var id: String {
         switch self {
         case .binder: "binder"
-        case .member(let index): "member-\(index)"
+        case .member(let id): id.rawValue
         }
     }
 
     /// Which of the roster this is, if it isn't you.
-    var rosterIndex: Int? { if case .member(let index) = self { index } else { nil } }
+    var persistentID: PersistentPartyMemberID? { if case .member(let id) = self { id } else { nil } }
 
     /// Who this is inside a fight.
     var combatant: Combatant {
         switch self {
         case .binder: .binder
-        case .member(let index): .companion(index)
+        case .member(let id): .companion(id)
         }
     }
 
@@ -813,6 +876,9 @@ typealias PartySlot = PartyMember
 /// The one companion in v0. Party expands in v1+, so this is a struct that can become an array
 /// element without reshaping the save.
 struct CompanionState: Codable, Equatable, Sendable {
+    /// Stable durable identity. Optional only so pre-v3 standalone fixture decoding remains
+    /// tolerant; the v2-to-v3 whole-save migration fills it for every valid roster member.
+    var persistentID: PersistentPartyMemberID? = .founderQuill
     var name: String = "Quill" // PLACEHOLDER name
     /// Who they were out in the worlds. Nil for Quill, who was always here.
     var traveller: TravellerID?
@@ -845,6 +911,7 @@ struct CompanionState: Codable, Equatable, Sendable {
     /// gambits became composed rather than canned) should cost you your rules, not your save.
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
+        persistentID = try container.decodeIfPresent(PersistentPartyMemberID.self, forKey: .persistentID)
         name = try container.decodeIfPresent(String.self, forKey: .name) ?? "Quill"
         traveller = try container.decodeIfPresent(TravellerID.self, forKey: .traveller)
         calling = try container.decodeIfPresent(String.self, forKey: .calling) ?? ""

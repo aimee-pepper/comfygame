@@ -1159,8 +1159,8 @@ extension GameStore {
             var packedItems = fieldKit.packed
             let progressAtStart = state.base.partyMembers.map { member in
                 let character = state.base.character(member)
-                let name = member.rosterIndex.flatMap { index in
-                    state.base.roster.indices.contains(index) ? state.base.roster[index].name : nil
+                let name = member.persistentID.flatMap { id in
+                    state.base.rosterIndex(for: id).map { state.base.roster[$0].name }
                 } ?? "You"
                 return RunProgressStart(member: member, name: name,
                                         experience: character.experience, level: character.level)
@@ -1171,8 +1171,8 @@ extension GameStore {
             let healthCaps = CombatRules.expeditionHealthCaps(in: state, tuning: tuning)
             let binderMaximum = healthCaps.first { $0.member == .binder }?.maximum
                 ?? Tuning.Encounter.binderMaxHP
-            let companionMaximums = healthCaps.reduce(into: [Int: Int]()) { result, entry in
-                if case .member(let index) = entry.member { result[index] = entry.maximum }
+            let companionMaximums = healthCaps.reduce(into: [PersistentPartyMemberID: Int]()) { result, entry in
+                if case .member(let id) = entry.member { result[id] = entry.maximum }
             }
             let departingRun = WorldRun(
                 runIndex: state.worlds.runIndex,

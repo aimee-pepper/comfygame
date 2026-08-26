@@ -269,8 +269,8 @@ struct AnchorageView: View {
                                        ? "covered" : "short by \(realm.projectedShortfall)")
                             LabeledRow(icon: "person.2", label: "Assigned companions",
                                        value: "\(realm.assignedCompanions.count)")
-                            ForEach(realm.assignedCompanions, id: \.self) { index in
-                                if store.state.base.roster.indices.contains(index) {
+                            ForEach(realm.assignedCompanions, id: \.self) { memberID in
+                                if let index = store.state.base.rosterIndex(for: memberID) {
                                     let worker = store.state.base.roster[index]
                                     let contribution = Tuning.Anchoring.worldworkBaseContribution
                                         + worker.worldwork
@@ -1715,10 +1715,13 @@ struct EssenceSpringView: View {
         StationCard(title: "Unlearning", icon: "arrow.uturn.backward.circle") {
             Text("Reclaim somebody's spent points for an Essence cost.")
                 .font(.caption2).foregroundStyle(.secondary)
-            ForEach([PartyMember.binder] + store.state.base.roster.indices.map(PartyMember.member)) { member in
+            ForEach([PartyMember.binder] + store.state.base.roster.indices.compactMap {
+                store.state.base.persistentID(forRosterIndex: $0).map(PartyMember.member)
+            }) { member in
                 let cost = store.respecCost(for: member)
                 HStack(spacing: 8) {
-                    if let index = member.rosterIndex,
+                    if let id = member.persistentID,
+                       let index = store.state.base.rosterIndex(for: id),
                        store.state.base.roster.indices.contains(index) {
                         let person = store.state.base.roster[index]
                         NamedCharacterPixelIdentity(

@@ -22,7 +22,7 @@ final class PersistenceTests: XCTestCase {
         """#.utf8)
 
         let migrated = try SaveCodec.decode(legacy)
-        XCTAssertEqual(migrated.schemaVersion, 2)
+        XCTAssertEqual(migrated.schemaVersion, Tuning.saveSchemaVersion)
         XCTAssertEqual(migrated.base.essenceCrystalCount, 42)
         XCTAssertEqual(migrated.base.essenceCrystals?.catalogID, Items.essenceCrystal)
         XCTAssertFalse(migrated.base.inventory.stacks.contains { $0.catalogID == Items.essenceCrystal })
@@ -119,6 +119,41 @@ final class PersistenceTests: XCTestCase {
         XCTAssertEqual(try XCTUnwrap(migrated.worlds.activeRun).offeredItems.first(where: {
             $0.id == InstanceID(rawValue: 511)
         })?.count, 6, "merchant/world offers are not already-owned wallet stock")
+    }
+
+    func testSchemaTwoPartyPositionsMigrateToStableRosterIdentitiesAndRelaunchIdempotently() throws {
+        let legacy = Data(#"""
+        {"schemaVersion":2,"base":{"roster":[
+          {"name":"Quill"},
+          {"name":"Same","traveller":"mara"},
+          {"name":"Same","traveller":"edren"}
+        ],"activeParty":[0,2]}}
+        """#.utf8)
+
+        var migrated = try SaveCodec.decode(legacy)
+        XCTAssertEqual(migrated.schemaVersion, Tuning.saveSchemaVersion)
+        XCTAssertEqual(migrated.base.activeParty, [.founderQuill, .traveller("edren")])
+        XCTAssertEqual(migrated.base.roster.map(\.persistentID), [
+            .founderQuill, .traveller("mara"), .traveller("edren")
+        ])
+
+        migrated.base.roster.swapAt(0, 2)
+        XCTAssertEqual(migrated.base.rosterIndex(for: .founderQuill), 2)
+        XCTAssertEqual(migrated.base.rosterIndex(for: .traveller("edren")), 0)
+        XCTAssertEqual(migrated.base.roster[migrated.base.rosterIndex(for: .traveller("edren"))!].traveller,
+                       "edren", "same display names must not participate in identity")
+
+        let relaunched = try SaveCodec.decode(SaveCodec.encode(migrated))
+        XCTAssertEqual(relaunched, migrated)
+    }
+
+    func testSchemaTwoUnknownPartyPositionFailsAtomically() {
+        let legacy = Data(#"""
+        {"schemaVersion":2,"base":{"roster":[{"name":"Quill"}],"activeParty":[9]}}
+        """#.utf8)
+        let original = legacy
+        XCTAssertThrowsError(try SaveCodec.decode(legacy))
+        XCTAssertEqual(legacy, original, "failed migration must not rewrite source bytes")
     }
 
     func testPhysicalCrystalWalletIsCapacityNeutralAtomicAndRelaunchStable() throws {

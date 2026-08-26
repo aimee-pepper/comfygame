@@ -75,11 +75,12 @@ final class ConstellationPresentationTests: XCTestCase {
             XCTAssertTrue(state.base.seat(future.id))
         }
         let index = try XCTUnwrap(store.state.base.roster.firstIndex { $0.traveller == future.id })
-        let expected = store.activeGambitSlots(for: .companion(index))
+        let memberID = try XCTUnwrap(store.state.base.persistentID(forRosterIndex: index))
+        let expected = store.activeGambitSlots(for: .companion(memberID))
 
         let relaunched = GameStore(io: io)
         XCTAssertEqual(relaunched.state.reality.rank(of: node.id), 1)
         XCTAssertEqual(relaunched.activeGambitSlots(for: .binder), binderBefore + 1)
-        XCTAssertEqual(relaunched.activeGambitSlots(for: .companion(index)), expected)
+        XCTAssertEqual(relaunched.activeGambitSlots(for: .companion(memberID)), expected)
     }
 }

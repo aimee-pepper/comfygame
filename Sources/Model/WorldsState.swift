@@ -120,7 +120,7 @@ struct AnchoredRealm: Codable, Equatable, Identifiable, Sendable {
     var isDormant: Bool
     var sustainObligation: Int
     var productionContribution: Int
-    var assignedCompanions: [Int]
+    var assignedCompanions: [PersistentPartyMemberID]
     var world: WorldRun
 
     var id: Int { runIndex }
@@ -128,7 +128,7 @@ struct AnchoredRealm: Codable, Equatable, Identifiable, Sendable {
 
     init(runIndex: Int, name: String, route: AnchorRoute, isDormant: Bool = false,
          sustainObligation: Int = 0, productionContribution: Int = 0,
-         assignedCompanions: [Int] = [], world: WorldRun) {
+         assignedCompanions: [PersistentPartyMemberID] = [], world: WorldRun) {
         self.runIndex = runIndex
         self.name = name
         self.route = route
@@ -147,7 +147,8 @@ struct AnchoredRealm: Codable, Equatable, Identifiable, Sendable {
         isDormant = try c.decodeIfPresent(Bool.self, forKey: .isDormant) ?? false
         sustainObligation = try c.decodeIfPresent(Int.self, forKey: .sustainObligation) ?? 0
         productionContribution = try c.decodeIfPresent(Int.self, forKey: .productionContribution) ?? 0
-        assignedCompanions = try c.decodeIfPresent([Int].self, forKey: .assignedCompanions) ?? []
+        assignedCompanions = try c.decodeIfPresent([PersistentPartyMemberID].self,
+                                                    forKey: .assignedCompanions) ?? []
         world = try c.decode(WorldRun.self, forKey: .world)
     }
 }
@@ -1130,7 +1131,7 @@ struct WorldRun: Codable, Equatable, Sendable {
     /// It was one number, which is the other half of why a party of five couldn't exist: there was
     /// exactly one place to keep a companion's health, so a second one had nowhere to be hurt.
     /// Anybody absent from the dictionary is at full — joining mid-run shouldn't arrive wounded.
-    var companionHP: [Int: Int] = [:]
+    var companionHP: [PersistentPartyMemberID: Int] = [:]
     /// Frozen expedition maximums. `nil` means a legacy run awaiting post-decode adoption; an
     /// empty/nonmatching receipt never licenses a lookup against mutable Base progression.
     var healthCaps: [RunHealthCapEntry]?
@@ -1150,7 +1151,7 @@ struct WorldRun: Codable, Equatable, Sendable {
          travellersHere: [TravellerID] = [], cast: [Species] = [], flora: [Flora] = [],
          foundWritings: [FoundWritingRecord] = [],
          binderHP: Int = Tuning.Encounter.binderMaxHP,
-         companionHP: [Int: Int] = [:],
+         companionHP: [PersistentPartyMemberID: Int] = [:],
          healthCaps: [RunHealthCapEntry]? = nil,
          satchelItems: Inventory = Inventory(slots: Tuning.Economy.startingInventorySlots),
          carriedWorldPages: [WorldPageInstance] = [],
@@ -1345,10 +1346,11 @@ struct WorldRun: Codable, Equatable, Sendable {
         foundTravellersAtStart = try container.decodeIfPresent(Set<TravellerID>.self,
                                                                 forKey: .foundTravellersAtStart) ?? []
         // A run saved when only one person could come brings that one person's health with it.
-        if let perMember = try? container.decodeIfPresent([Int: Int].self, forKey: .companionHP) {
+        if let perMember = try? container.decodeIfPresent([PersistentPartyMemberID: Int].self,
+                                                           forKey: .companionHP) {
             companionHP = perMember
         } else if let single = try? container.decode(Int.self, forKey: .companionHP) {
-            companionHP = [0: single]
+            companionHP = [.founderQuill: single]
         } else {
             companionHP = [:]
         }

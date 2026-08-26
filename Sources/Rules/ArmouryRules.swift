@@ -114,7 +114,8 @@ enum ArmouryRules {
         }
         for index in state.base.roster.indices {
             for (slot, piece) in state.base.roster[index].equipped {
-                let target = Target.worn(slot: slot, member: .member(index), piece: piece)
+                guard let id = state.base.persistentID(forRosterIndex: index) else { continue }
+                let target = Target.worn(slot: slot, member: .member(id), piece: piece)
                 if eligible(target, includeLegacy: includeLegacy) { worn.append(target) }
             }
         }
@@ -241,8 +242,8 @@ enum ArmouryRules {
             case .binder:
                 state.base.binderEquipped[slot]?.gearProfile = profile
                 state.base.binderEquipped[slot]?.upgradeLevel = 0
-            case .member(let index):
-                guard state.base.roster.indices.contains(index) else { return }
+            case .member(let id):
+                guard let index = state.base.rosterIndex(for: id) else { return }
                 state.base.roster[index].equipped[slot]?.gearProfile = profile
                 state.base.roster[index].equipped[slot]?.upgradeLevel = 0
             }

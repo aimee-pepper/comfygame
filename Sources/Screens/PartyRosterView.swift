@@ -116,16 +116,16 @@ struct PartyRosterView: View {
     private func icon(_ slot: PartySlot) -> String {
         switch slot {
         case .binder: "figure.stand"
-        case .member(let index): store.state.base.roster.indices.contains(index)
-            ? store.state.base.roster[index].icon : "person.fill"
+        case .member(let id): store.state.base.rosterIndex(for: id)
+            .map { store.state.base.roster[$0].icon } ?? "person.fill"
         }
     }
 
     /// Binder and Quill/generated companions intentionally return nil and keep their SF fallback.
     /// A recruited named traveller resolves only through the stable ID already stored on roster.
     private func travellerID(_ slot: PartySlot) -> TravellerID? {
-        guard case .member(let index) = slot,
-              store.state.base.roster.indices.contains(index) else { return nil }
+        guard case .member(let id) = slot,
+              let index = store.state.base.rosterIndex(for: id) else { return nil }
         return store.state.base.roster[index].traveller
     }
 
@@ -134,11 +134,11 @@ struct PartyRosterView: View {
         case .binder:
             CharacterRules.maximumHealth(store.state.base.binderCharacter,
                                          base: Tuning.Encounter.binderMaxHP)
-        case .member(let index):
-            store.state.base.roster.indices.contains(index)
-                ? CharacterRules.maximumHealth(store.state.base.roster[index].character,
-                                               base: store.state.base.roster[index].maxHP)
-                : 0
+        case .member(let id):
+            store.state.base.rosterIndex(for: id)
+                .map { CharacterRules.maximumHealth(store.state.base.roster[$0].character,
+                                               base: store.state.base.roster[$0].maxHP)
+                } ?? 0
         }
     }
 }

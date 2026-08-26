@@ -76,6 +76,49 @@ final class SaveSlotTests: XCTestCase {
         XCTAssertEqual(relaunched, first)
     }
 
+    func testSaveSlotSchemaTwoPartyMigrationIsLosslessAndIdempotent() async throws {
+        let root = directory()
+        defer { try? FileManager.default.removeItem(at: root) }
+        let slots = SaveSlotFileIO(directory: root)
+        let created = try await slots.create(name: "Legacy party")
+        let url = try await slots.exportURL(for: created.metadata.id)
+        var envelope = try SaveCodec.makeDecoder().decode(
+            SaveSlotEnvelope.self, from: Data(contentsOf: url))
+        envelope.payload = Data(#"""
+        {"schemaVersion":2,"base":{"roster":[
+          {"name":"Quill"},{"name":"Mara","traveller":"mara"}
+        ],"activeParty":[0,1]}}
+        """#.utf8)
+        let originalEnvelope = try encoder().encode(envelope)
+        try originalEnvelope.write(to: url, options: .atomic)
+
+        let migrated = try await slots.load(created.metadata.id).state
+        XCTAssertEqual(migrated.base.activeParty, [.founderQuill, .traveller("mara")])
+        XCTAssertEqual(migrated.base.roster.map(\.persistentID),
+                       [.founderQuill, .traveller("mara")])
+        let canonical = try SaveCodec.decode(SaveCodec.encode(migrated))
+        XCTAssertEqual(canonical, migrated)
+    }
+
+    func testSaveSlotUnknownLegacyPartyActorFailsWithoutRewritingEnvelope() async throws {
+        let root = directory()
+        defer { try? FileManager.default.removeItem(at: root) }
+        let slots = SaveSlotFileIO(directory: root)
+        let created = try await slots.create(name: "Corrupt party")
+        let url = try await slots.exportURL(for: created.metadata.id)
+        var envelope = try SaveCodec.makeDecoder().decode(
+            SaveSlotEnvelope.self, from: Data(contentsOf: url))
+        envelope.payload = Data(#"""
+        {"schemaVersion":2,"base":{"roster":[{"name":"Quill"}],"activeParty":[4]}}
+        """#.utf8)
+        let bytes = try encoder().encode(envelope)
+        try bytes.write(to: url, options: .atomic)
+
+        do { _ = try await slots.load(created.metadata.id); XCTFail("Expected corrupt migration") }
+        catch { }
+        XCTAssertEqual(try Data(contentsOf: url), bytes)
+    }
+
     func testSaveSlotMigrationRejectsMalformedItemStackIDsWithoutRewritingEnvelope() async throws {
         let malformedValues = [
             "negative": "-1",

@@ -339,13 +339,13 @@ enum EncounterScalingRules {
 
     static func partyLevels(in state: GameState) -> [Int] {
         [state.base.binderCharacter.level] + state.base.activeParty.compactMap {
-            state.base.roster.indices.contains($0) ? state.base.roster[$0].character.level : nil
+            state.base.rosterIndex(for: $0).map { state.base.roster[$0].character.level }
         }
     }
 
     static func companionInputs(in state: GameState) -> [PartyMemberInput] {
-        state.base.activeParty.compactMap { index in
-            guard state.base.roster.indices.contains(index) else { return nil }
+        state.base.activeParty.compactMap { id in
+            guard let index = state.base.rosterIndex(for: id) else { return nil }
             let companion = state.base.roster[index]
             let identity: String
             if let traveller = companion.traveller {

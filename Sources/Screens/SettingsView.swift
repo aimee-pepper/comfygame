@@ -936,43 +936,7 @@ struct BalancingView: View {
                         Text(kind.rawValue.capitalized).tag(Optional(kind))
                     }
                 }
-                ForEach(store.state.base.activeParty, id: \.self) { index in
-                    if store.state.base.roster.indices.contains(index) {
-                        let name = store.state.base.roster[index].name
-                        Text("Skills learned by \(name)").font(.subheadline.weight(.semibold))
-                        debugCompanionNodeToggle("Quick Step · +4", index: index,
-                                                 id: CombatDerivedStatsRules.Node.quickStep)
-                        debugCompanionNodeToggle("Light Frame · +3", index: index,
-                                                 id: CombatDerivedStatsRules.Node.lightFrame)
-                        debugCompanionNodeToggle("Thick Hide · maximum HP +6", index: index,
-                                                 id: CombatDerivedStatsRules.Node.thickHide)
-                        debugCompanionNodeToggle("Iron Skin · personal armour +2", index: index,
-                                                 id: CombatDerivedStatsRules.Node.ironSkin)
-                        debugCompanionNodeToggle("Bulwark · self +1, same-rank allies +2", index: index,
-                                                 id: CombatDerivedStatsRules.Node.bulwark)
-                        debugCompanionNodeToggle("Shieldwall · conscious front line +2", index: index,
-                                                 id: CombatDerivedStatsRules.Node.shieldwall)
-                        debugCompanionNodeToggle("Immovable · armour applies to Pierce and emanation",
-                                                 index: index,
-                                                 id: CombatDerivedStatsRules.Node.immovable)
-                        debugCompanionNodeToggle("Stagger · Crush delay", index: index,
-                                                 id: CombatDerivedStatsRules.Node.stagger)
-                        debugCompanionNodeToggle("Footwork · miss chance +6", index: index,
-                                                 id: CombatDerivedStatsRules.Node.footwork)
-                        debugCompanionNodeToggle("Ghost · one guaranteed miss", index: index,
-                                                 id: CombatDerivedStatsRules.Node.ghost)
-                        debugCompanionNodeToggle("Feint · +10 after direct attack", index: index,
-                                                 id: CombatDerivedStatsRules.Node.feint)
-                        debugCompanionNodeToggle("Untouchable · targeted misses build +5", index: index,
-                                                 id: CombatDerivedStatsRules.Node.untouchable)
-                        Picker("\(name) Insulation", selection: debugCompanionInsulationChoice(index)) {
-                            Text("Not owned").tag(EmanationKind?.none)
-                            ForEach(EmanationKind.allCases, id: \.self) { kind in
-                                Text(kind.rawValue.capitalized).tag(Optional(kind))
-                            }
-                        }
-                    }
-                }
+                debugCompanionSkillControls
                 if settings.debugTuning.debugCombatV2BinderAttackEnabled,
                    let preview = debugInitiativePreview {
                     ForEach(preview.entries, id: \.actor) { entry in
@@ -989,7 +953,7 @@ struct BalancingView: View {
                         }?.amount ?? 0
                         let ghostOwned: Bool = switch entry.actor {
                         case .binder: settings.debugTuning.debugCombatV2BinderNodeIDs.contains(CombatDerivedStatsRules.Node.ghost)
-                        case .companion(let index): (settings.debugTuning.debugCombatV2CompanionNodeIDs[index] ?? []).contains(CombatDerivedStatsRules.Node.ghost)
+                        case .companion(let id): (debugCompanionNodeIDs[id] ?? []).contains(CombatDerivedStatsRules.Node.ghost)
                         case .foe: false
                         }
                         Text("\(debugActorName(entry.actor)) · base \(Int(entry.characterEvasion * 100))%\(footwork > 0 ? " + Footwork 6%" : "") = \(Int(entry.total * 100))% · Skills saved when combat opened: Ghost \(ghostOwned ? "learned" : "not learned"), Feint \(entry.ownsFeint == true ? "learned" : "not learned"), Untouchable \(entry.ownsUntouchable == true ? "learned" : "not learned")")
@@ -1204,7 +1168,7 @@ struct BalancingView: View {
             enabled: settings.debugTuning.debugCombatV2BinderAttackEnabled,
             party: CombatRules.party(of: store.state), foes: [],
             binderNodeIDs: settings.debugTuning.debugCombatV2BinderNodeIDs,
-            companionNodeIDs: settings.debugTuning.debugCombatV2CompanionNodeIDs)
+            companionNodeIDs: debugCompanionNodeIDs)
     }
 
     private var debugHealthCapPreview: [RunHealthCapEntry] {
@@ -1216,7 +1180,7 @@ struct BalancingView: View {
             enabled: settings.debugTuning.debugCombatV2BinderAttackEnabled,
             party: CombatRules.party(of: store.state), in: store.state,
             binderNodeIDs: settings.debugTuning.debugCombatV2BinderNodeIDs,
-            companionNodeIDs: settings.debugTuning.debugCombatV2CompanionNodeIDs)
+            companionNodeIDs: debugCompanionNodeIDs)
     }
 
     private var debugResistancePreview: EncounterState.DebugV2ResistanceReceipt? {
@@ -1225,8 +1189,62 @@ struct BalancingView: View {
             party: CombatRules.party(of: store.state),
             binderNodeIDs: settings.debugTuning.debugCombatV2BinderNodeIDs,
             binderChoices: settings.debugTuning.debugCombatV2BinderChoices,
-            companionNodeIDs: settings.debugTuning.debugCombatV2CompanionNodeIDs,
-            companionChoices: settings.debugTuning.debugCombatV2CompanionChoices)
+            companionNodeIDs: debugCompanionNodeIDs,
+            companionChoices: debugCompanionChoices)
+    }
+
+    private var debugCompanionNodeIDs: [PersistentPartyMemberID: Set<CombatNodeID>] {
+        Dictionary(uniqueKeysWithValues: settings.debugTuning.debugCombatV2CompanionNodeIDs.compactMap {
+            guard let id = store.state.base.persistentID(forRosterIndex: $0.key) else { return nil }
+            return (id, $0.value)
+        })
+    }
+
+    private var debugCompanionChoices: [PersistentPartyMemberID: [CombatNodeID: StableChoiceID]] {
+        Dictionary(uniqueKeysWithValues: settings.debugTuning.debugCombatV2CompanionChoices.compactMap {
+            guard let id = store.state.base.persistentID(forRosterIndex: $0.key) else { return nil }
+            return (id, $0.value)
+        })
+    }
+
+    @ViewBuilder
+    private var debugCompanionSkillControls: some View {
+        ForEach(store.state.base.activeParty, id: \.self) { memberID in
+            if let index = store.state.base.rosterIndex(for: memberID) {
+                let name = store.state.base.roster[index].name
+                Text("Skills learned by \(name)").font(.subheadline.weight(.semibold))
+                debugCompanionNodeToggle("Quick Step · +4", index: index,
+                                         id: CombatDerivedStatsRules.Node.quickStep)
+                debugCompanionNodeToggle("Light Frame · +3", index: index,
+                                         id: CombatDerivedStatsRules.Node.lightFrame)
+                debugCompanionNodeToggle("Thick Hide · maximum HP +6", index: index,
+                                         id: CombatDerivedStatsRules.Node.thickHide)
+                debugCompanionNodeToggle("Iron Skin · personal armour +2", index: index,
+                                         id: CombatDerivedStatsRules.Node.ironSkin)
+                debugCompanionNodeToggle("Bulwark · self +1, same-rank allies +2", index: index,
+                                         id: CombatDerivedStatsRules.Node.bulwark)
+                debugCompanionNodeToggle("Shieldwall · conscious front line +2", index: index,
+                                         id: CombatDerivedStatsRules.Node.shieldwall)
+                debugCompanionNodeToggle("Immovable · armour applies to Pierce and emanation",
+                                         index: index, id: CombatDerivedStatsRules.Node.immovable)
+                debugCompanionNodeToggle("Stagger · Crush delay", index: index,
+                                         id: CombatDerivedStatsRules.Node.stagger)
+                debugCompanionNodeToggle("Footwork · miss chance +6", index: index,
+                                         id: CombatDerivedStatsRules.Node.footwork)
+                debugCompanionNodeToggle("Ghost · one guaranteed miss", index: index,
+                                         id: CombatDerivedStatsRules.Node.ghost)
+                debugCompanionNodeToggle("Feint · +10 after direct attack", index: index,
+                                         id: CombatDerivedStatsRules.Node.feint)
+                debugCompanionNodeToggle("Untouchable · targeted misses build +5", index: index,
+                                         id: CombatDerivedStatsRules.Node.untouchable)
+                Picker("\(name) Insulation", selection: debugCompanionInsulationChoice(index)) {
+                    Text("Not owned").tag(EmanationKind?.none)
+                    ForEach(EmanationKind.allCases, id: \.self) { kind in
+                        Text(kind.rawValue.capitalized).tag(Optional(kind))
+                    }
+                }
+            }
+        }
     }
 
     private var debugArmourReceipt: EncounterState.DebugV2ArmourReceipt? {
@@ -1235,7 +1253,7 @@ struct BalancingView: View {
             party: store.state.base.partyMembers.map(\.combatant),
             in: store.state,
             binderNodeIDs: settings.debugTuning.debugCombatV2BinderNodeIDs,
-            companionNodeIDs: settings.debugTuning.debugCombatV2CompanionNodeIDs
+            companionNodeIDs: debugCompanionNodeIDs
         )
     }
 
@@ -1262,8 +1280,9 @@ struct BalancingView: View {
     private func debugActorName(_ actor: Combatant) -> String {
         switch actor {
         case .binder: "Binder"
-        case .companion(let index):
-            store.state.base.roster.indices.contains(index) ? store.state.base.roster[index].name : "Companion \(index)"
+        case .companion(let id):
+            store.state.base.rosterIndex(for: id).map { store.state.base.roster[$0].name }
+                ?? "Companion \(id.rawValue)"
         case .foe: "Foe"
         }
     }

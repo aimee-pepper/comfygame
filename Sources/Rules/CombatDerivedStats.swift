@@ -256,7 +256,7 @@ enum CombatDerivedStatsRules {
     /// entries, so an absent/unconscious party member cannot lend an aura to somebody else.
     static func debugInitiativeReceipt(enabled: Bool, party: [Combatant], foes: [FoeState],
                                        binderNodeIDs: Set<CombatNodeID>,
-                                       companionNodeIDs: [Int: Set<CombatNodeID>])
+                                       companionNodeIDs: [PersistentPartyMemberID: Set<CombatNodeID>])
         -> EncounterState.DebugV2InitiativeReceipt? {
         guard enabled else { return nil }
         let supported: Set<CombatNodeID> = [Node.quickStep, Node.lightFrame]
@@ -264,8 +264,8 @@ enum CombatDerivedStatsRules {
             let owned: Set<CombatNodeID>
             switch actor {
             case .binder: owned = binderNodeIDs.intersection(supported)
-            case .companion(let index):
-                owned = (companionNodeIDs[index] ?? []).intersection(supported)
+            case .companion(let id):
+                owned = (companionNodeIDs[id] ?? []).intersection(supported)
             case .foe: owned = []
             }
             var components: [EncounterState.DebugV2InitiativeReceipt.Component] = []
@@ -291,14 +291,14 @@ enum CombatDerivedStatsRules {
     /// active encounter's personal miss chance.
     static func debugEvasionReceipt(enabled: Bool, party: [Combatant], in state: GameState,
                                     binderNodeIDs: Set<CombatNodeID>,
-                                    companionNodeIDs: [Int: Set<CombatNodeID>])
+                                    companionNodeIDs: [PersistentPartyMemberID: Set<CombatNodeID>])
         -> EncounterState.DebugV2EvasionReceipt? {
         guard enabled else { return nil }
         let entries = party.compactMap { actor -> EncounterState.DebugV2EvasionReceipt.Entry? in
             guard let stats = CombatRules.stats(of: actor, in: state) else { return nil }
             let owned: Set<CombatNodeID> = switch actor {
             case .binder: binderNodeIDs
-            case .companion(let index): companionNodeIDs[index] ?? []
+            case .companion(let id): companionNodeIDs[id] ?? []
             case .foe: []
             }
             let components: [EncounterState.DebugV2EvasionReceipt.Component] =
@@ -315,8 +315,8 @@ enum CombatDerivedStatsRules {
         enabled: Bool, party: [Combatant],
         binderNodeIDs: Set<CombatNodeID>,
         binderChoices: [CombatNodeID: StableChoiceID],
-        companionNodeIDs: [Int: Set<CombatNodeID>],
-        companionChoices: [Int: [CombatNodeID: StableChoiceID]]
+        companionNodeIDs: [PersistentPartyMemberID: Set<CombatNodeID>],
+        companionChoices: [PersistentPartyMemberID: [CombatNodeID: StableChoiceID]]
     ) -> EncounterState.DebugV2ResistanceReceipt? {
         guard enabled else { return nil }
         let entries = party.map { actor -> EncounterState.DebugV2ResistanceReceipt.Entry in
@@ -326,9 +326,9 @@ enum CombatDerivedStatsRules {
             case .binder:
                 owned = binderNodeIDs
                 choices = binderChoices
-            case .companion(let index):
-                owned = companionNodeIDs[index] ?? []
-                choices = companionChoices[index] ?? [:]
+            case .companion(let id):
+                owned = companionNodeIDs[id] ?? []
+                choices = companionChoices[id] ?? [:]
             case .foe:
                 owned = []
                 choices = [:]

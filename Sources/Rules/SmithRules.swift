@@ -225,8 +225,8 @@ enum SmithRules {
             reforged.gearProfile?.reforgeRank += 1
             reforged.upgradeLevel = reforged.gearProfile?.reforgeRank ?? (piece.upgradeLevel + 1)
             state.base.binderEquipped[slot] = reforged
-        case .member(let index):
-            guard state.base.roster.indices.contains(index) else { return false }
+        case .member(let id):
+            guard let index = state.base.rosterIndex(for: id) else { return false }
             guard var reforged = state.base.roster[index].equipped[slot] else { return false }
             reforged.gearProfile?.reforgeRank += 1
             reforged.upgradeLevel = reforged.gearProfile?.reforgeRank ?? (piece.upgradeLevel + 1)

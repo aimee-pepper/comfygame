@@ -122,7 +122,7 @@ struct CombatStats: Codable, Equatable, Sendable {
 
 /// Who is acting.
 ///
-/// **The companion carries a roster index**, because a party of five fights together (Aimee, 6 Aug)
+/// **The companion carries a durable party identity**, because roster order is presentation.
 /// and this was the type that made that impossible: with one nameless `.companion` there was exactly
 /// one slot in the turn order, one place to keep HP, and one rule list to run, so choosing four
 /// people at the fire could only ever have been a lie.
@@ -130,7 +130,7 @@ struct CombatStats: Codable, Equatable, Sendable {
 /// `foe` carries an id for the same reason — things come and go and have to stay distinguishable.
 enum Combatant: Codable, Equatable, Hashable, Sendable {
     case binder
-    case companion(Int)
+    case companion(PersistentPartyMemberID)
     case foe(InstanceID)
 
     var isParty: Bool {
@@ -142,13 +142,15 @@ enum Combatant: Codable, Equatable, Hashable, Sendable {
 
     var foeID: InstanceID? { if case .foe(let id) = self { id } else { nil } }
     /// Which of the roster this is, if it's one of yours.
-    var rosterIndex: Int? { if case .companion(let index) = self { index } else { nil } }
+    var persistentPartyMemberID: PersistentPartyMemberID? {
+        if case .companion(let id) = self { id } else { nil }
+    }
 
     /// Who this is on the Party screen — the same person, asked about outside a fight.
     var member: PartyMember {
         switch self {
         case .binder: .binder
-        case .companion(let index): .member(index)
+        case .companion(let id): .member(id)
         case .foe: .binder
         }
     }
@@ -157,7 +159,7 @@ enum Combatant: Codable, Equatable, Hashable, Sendable {
     var storageKey: String {
         switch self {
         case .binder: "binder"
-        case .companion(let index): "companion-\(index)"
+        case .companion(let id): "party-\(id.rawValue)"
         case .foe(let id): "foe-\(id.rawValue)"
         }
     }
@@ -499,7 +501,7 @@ struct EncounterState: Codable, Equatable, Sendable {
     /// The same rule the foes follow: a save stores resolved facts, not pointers into content that
     /// can change underneath it. It also means the log doesn't need the roster passed into every
     /// function that writes a line, which is what made a party of five awkward to name.
-    var partyNames: [Int: String] = [:]
+    var partyNames: [PersistentPartyMemberID: String] = [:]
     /// Frozen DEBUG comparison inputs/results. Existing encounters decode without it.
     var scalingPreview: EncounterScalingRules.Preview?
     /// Non-nil only when DEBUG God mode was enabled as this encounter opened. Persisted so
@@ -708,7 +710,7 @@ struct EncounterState: Codable, Equatable, Sendable {
         if log.count > 24 { log.removeFirst(log.count - 24) }
     }
 
-    init(id: InstanceID, foes: [FoeState], partyNames: [Int: String] = [:],
+    init(id: InstanceID, foes: [FoeState], partyNames: [PersistentPartyMemberID: String] = [:],
          order: [Combatant], turnSlots: [TurnSlot] = [],
          initiallyUnrecordedSpecies: Set<String> = [],
          debugV2BinderAttack: DebugV2BinderAttackReceipt? = nil,
@@ -761,7 +763,8 @@ struct EncounterState: Codable, Equatable, Sendable {
         let c = try decoder.container(keyedBy: CodingKeys.self)
         id = try c.decode(InstanceID.self, forKey: .id)
         foes = try c.decodeIfPresent([FoeState].self, forKey: .foes) ?? []
-        partyNames = try c.decodeIfPresent([Int: String].self, forKey: .partyNames) ?? [:]
+        partyNames = try c.decodeIfPresent([PersistentPartyMemberID: String].self,
+                                            forKey: .partyNames) ?? [:]
         scalingPreview = try c.decodeIfPresent(EncounterScalingRules.Preview.self, forKey: .scalingPreview)
         debugGodMode = try c.decodeIfPresent(DebugGodModeReceipt.self, forKey: .debugGodMode)
         debugV2BinderAttack = try c.decodeIfPresent(DebugV2BinderAttackReceipt.self,

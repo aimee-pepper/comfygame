@@ -7,7 +7,8 @@ final class StationStaffingTests: XCTestCase {
         XCTAssertTrue(state.base.seat("halloway"))
         let index = try XCTUnwrap(state.base.roster.firstIndex { $0.traveller == "halloway" })
         state.base.roster[index].character.level = level
-        state.base.activeParty.removeAll { $0 == index }
+        let memberID = try XCTUnwrap(state.base.persistentID(forRosterIndex: index))
+        state.base.activeParty.removeAll { $0 == memberID }
         let station = try XCTUnwrap(ContentCatalog.shared.station(Stations.blacksmith))
         return (state, index, station)
     }
@@ -81,7 +82,8 @@ final class StationStaffingTests: XCTestCase {
         var state = GameState.newGame()
         XCTAssertTrue(state.base.seat("corrin"))
         let index = try XCTUnwrap(state.base.roster.firstIndex { $0.traveller == "corrin" })
-        state.base.activeParty.removeAll { $0 == index }
+        let memberID = try XCTUnwrap(state.base.persistentID(forRosterIndex: index))
+        state.base.activeParty.removeAll { $0 == memberID }
         state.base.stations[Stations.tannery] = StationState(isUnlocked: true, tier: 0)
         let node = try XCTUnwrap(ContentCatalog.shared.researchNode("tannery_wear_tier_two"))
         let paid = EconomyRules.paidCost(for: node, in: state)
@@ -141,10 +143,11 @@ final class StationStaffingTests: XCTestCase {
 
     func testPartyAndRealmAssignmentsRemoveHomeDiscountImmediately() throws {
         var (state, index, station) = try stateWithHalloway(level: 20)
+        let memberID = try XCTUnwrap(state.base.persistentID(forRosterIndex: index))
         XCTAssertGreaterThan(StationStaffingRules.homeDiscountRate(for: station, in: state), 0)
-        state.base.activeParty.append(index)
+        state.base.activeParty.append(memberID)
         XCTAssertEqual(StationStaffingRules.homeDiscountRate(for: station, in: state), 0)
-        state.base.activeParty.removeAll { $0 == index }
+        state.base.activeParty.removeAll { $0 == memberID }
 
         let generated = Worldgen.generate(book: BoundBook(symbols: [:], randomlyFilled: [], essencePaid: 0),
                                           seed: 42)
@@ -153,7 +156,7 @@ final class StationStaffingTests: XCTestCase {
                            playerPosition: generated.start)
         state.worlds.anchoredRealms = [AnchoredRealm(runIndex: 1, name: "Test", route: .craftedFrame,
                                                      sustainObligation: 0,
-                                                     assignedCompanions: [index], world: run)]
+                                                     assignedCompanions: [memberID], world: run)]
         XCTAssertEqual(StationStaffingRules.homeDiscountRate(for: station, in: state), 0)
     }
 
@@ -185,7 +188,8 @@ final class StationStaffingTests: XCTestCase {
             XCTAssertTrue(state.base.seat("fen"))
             let index = state.base.roster.firstIndex { $0.traveller == "fen" }!
             state.base.roster[index].character.level = 8
-            state.base.activeParty.removeAll { $0 == index }
+            let memberID = state.base.persistentID(forRosterIndex: index)!
+            state.base.activeParty.removeAll { $0 == memberID }
             state.base.stations[Stations.bowyer] = StationState(isUnlocked: true, tier: 0)
             state.base.essence = 1_000
             state.base.resources.add(100, of: "timber")

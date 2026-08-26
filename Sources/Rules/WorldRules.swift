@@ -1435,26 +1435,30 @@ enum WorldRules {
         let openingIDs = CombatGraphRules.implementedOpeningNodeIDs(in: combatGraph)
         let binderCharacter = state.base.binderCharacter
         var binderNodeIDs = (binderCharacter.ownedCombatNodeIDs ?? []).intersection(openingIDs)
-        var companionNodeIDs: [Int: Set<CombatNodeID>] = Dictionary(uniqueKeysWithValues: state.base.activeParty.compactMap { index in
-            guard state.base.roster.indices.contains(index) else { return nil }
+        var companionNodeIDs: [PersistentPartyMemberID: Set<CombatNodeID>] = Dictionary(uniqueKeysWithValues: state.base.activeParty.compactMap { id in
+            guard let index = state.base.rosterIndex(for: id) else { return nil }
             let nodes = (state.base.roster[index].character.ownedCombatNodeIDs ?? [])
                 .intersection(openingIDs)
-            return (index, nodes)
+            return (id, nodes)
         })
         var binderChoices = binderCharacter.combatNodeChoices.filter { openingIDs.contains($0.key) }
-        var companionChoices: [Int: [CombatNodeID: StableChoiceID]] = Dictionary(uniqueKeysWithValues: state.base.activeParty.compactMap { index in
-            guard state.base.roster.indices.contains(index) else { return nil }
-            return (index, state.base.roster[index].character.combatNodeChoices
+        var companionChoices: [PersistentPartyMemberID: [CombatNodeID: StableChoiceID]] = Dictionary(uniqueKeysWithValues: state.base.activeParty.compactMap { id in
+            guard let index = state.base.rosterIndex(for: id) else { return nil }
+            return (id, state.base.roster[index].character.combatNodeChoices
                 .filter { openingIDs.contains($0.key) })
         })
         if run.tuning.debugCombatV2BinderAttackEnabled {
             binderNodeIDs.formUnion(run.tuning.debugCombatV2BinderNodeIDs)
             binderChoices.merge(run.tuning.debugCombatV2BinderChoices) { _, debug in debug }
             for (index, nodes) in run.tuning.debugCombatV2CompanionNodeIDs {
-                companionNodeIDs[index, default: []].formUnion(nodes)
+                if let id = state.base.persistentID(forRosterIndex: index) {
+                    companionNodeIDs[id, default: []].formUnion(nodes)
+                }
             }
             for (index, choices) in run.tuning.debugCombatV2CompanionChoices {
-                companionChoices[index, default: [:]].merge(choices) { _, debug in debug }
+                if let id = state.base.persistentID(forRosterIndex: index) {
+                    companionChoices[id, default: [:]].merge(choices) { _, debug in debug }
+                }
             }
         }
         let usesStableCombatGraph = run.tuning.debugCombatV2BinderAttackEnabled || !binderNodeIDs.isEmpty
@@ -1490,8 +1494,8 @@ enum WorldRules {
             if usesStableCombatGraph {
                 switch actor {
                 case .binder: return binderNodeIDs.contains(CombatDerivedStatsRules.Node.ghost)
-                case .companion(let index):
-                    return (companionNodeIDs[index] ?? [])
+                case .companion(let id):
+                    return (companionNodeIDs[id] ?? [])
                         .contains(CombatDerivedStatsRules.Node.ghost)
                 case .foe: return false
                 }
@@ -1505,7 +1509,7 @@ enum WorldRules {
             ? Dictionary(uniqueKeysWithValues: party.map { actor in
                 switch actor {
                 case .binder: return (actor, binderNodeIDs)
-                case .companion(let index): return (actor, companionNodeIDs[index] ?? [])
+                case .companion(let id): return (actor, companionNodeIDs[id] ?? [])
                 case .foe: return (actor, [])
                 }
             })
@@ -1513,9 +1517,9 @@ enum WorldRules {
         run.activeEncounter = CombatRules.makeEncounter(id: InstanceID(rawValue: run.rng.next()),
                                                         foes: foes,
                                                         party: party,
-                                                        names: state.base.activeParty.reduce(into: [Int: String]()) {
-                                                            guard state.base.roster.indices.contains($1) else { return }
-                                                            $0[$1] = state.base.roster[$1].name
+                                                        names: state.base.activeParty.reduce(into: [PersistentPartyMemberID: String]()) {
+                                                            guard let index = state.base.rosterIndex(for: $1) else { return }
+                                                            $0[$1] = state.base.roster[index].name
                                                         },
                                                         apexActionSlots: scalingPreview.map { preview in
                                                             foes.filter(\.isApex).reduce(into: [:]) {

@@ -39,8 +39,8 @@ enum GambitEngine {
     /// Whose rule list to run. The Binder's is only consulted once "write your own hand" is learned.
     static func rules(for actor: Combatant, in state: GameState) -> [GambitRule] {
         switch actor {
-        case .companion(let index):
-            state.base.roster.indices.contains(index) ? state.base.roster[index].gambits : []
+        case .companion(let id):
+            state.base.rosterIndex(for: id).map { state.base.roster[$0].gambits } ?? []
         case .binder: state.base.hasAutomateSelfUnlock ? state.base.binderGambits : []
         case .foe: []
         }

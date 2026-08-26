@@ -57,7 +57,7 @@ enum CombatRules {
     /// - Parameter party: everybody who walked out with you. **All of them get a place in the
     ///   order** — this is where a party of five becomes real, and it used to be a hardcoded two.
     static func makeEncounter(id: InstanceID, foes: [FoeState], party: [Combatant] = [.binder, .companion(0)],
-                              names: [Int: String] = [:],
+                              names: [PersistentPartyMemberID: String] = [:],
                               apexActionSlots: [InstanceID: Int] = [:],
                               ordinaryPressureSlots: Int = 0,
                               initiallyUnrecordedSpecies: Set<String> = [],
@@ -277,12 +277,12 @@ enum CombatRules {
         CombatDamageRules.effectiveness(of: kind, against: covering)
     }
 
-    static func companionAttack(_ index: Int, in state: GameState) -> Int {
-        let member = PartyMember.member(index)
+    static func companionAttack(_ id: PersistentPartyMemberID, in state: GameState) -> Int {
+        let member = PartyMember.member(id)
         let power = state.base.worn(.weapon, by: member)?.effectivePower ?? 0
         let total = Double(Tuning.Encounter.companionBaseAttack
             + CharacterRules.damageBonus(state.base.character(member).stats,
-                                         with: damageKind(for: .companion(index), in: state)))
+                                         with: damageKind(for: .companion(id), in: state)))
             + power * Double(Tuning.Encounter.attackPerWeaponTier)
         return Int(total.rounded())
     }
@@ -449,7 +449,7 @@ enum CombatRules {
 
     static func debugArmourReceipt(enabled: Bool, party: [Combatant], in state: GameState,
                                    binderNodeIDs: Set<CombatNodeID>,
-                                   companionNodeIDs: [Int: Set<CombatNodeID>])
+                                   companionNodeIDs: [PersistentPartyMemberID: Set<CombatNodeID>])
         -> EncounterState.DebugV2ArmourReceipt? {
         guard enabled else { return nil }
         let supported: Set<CombatNodeID> = [CombatDerivedStatsRules.Node.ironSkin,
@@ -465,7 +465,7 @@ enum CombatRules {
             let selected: Set<CombatNodeID>
             switch actor {
             case .binder: selected = binderNodeIDs
-            case .companion(let index): selected = companionNodeIDs[index] ?? []
+            case .companion(let id): selected = companionNodeIDs[id] ?? []
             case .foe: selected = []
             }
             return .init(actor: actor, equipmentProtectivePower: power,
@@ -1258,11 +1258,11 @@ enum CombatRules {
         case .binder:
             CharacterRules.maximumHealth(state.base.binderCharacter, base: Tuning.Encounter.binderMaxHP)
                 + loadout(of: actor, in: state).maxHP
-        case .companion(let index):
-            CharacterRules.maximumHealth(state.base.character(.member(index)),
-                                         base: state.base.roster.indices.contains(index)
-                                             ? state.base.roster[index].maxHP
-                                             : Tuning.Encounter.companionMaxHP)
+        case .companion(let id):
+            CharacterRules.maximumHealth(state.base.character(.member(id)),
+                                         base: state.base.rosterIndex(for: id)
+                                             .map { state.base.roster[$0].maxHP }
+                                             ?? Tuning.Encounter.companionMaxHP)
                 + loadout(of: actor, in: state).maxHP
         case .foe:
             0
@@ -1280,8 +1280,10 @@ enum CombatRules {
             if tuning.debugCombatV2BinderAttackEnabled {
                 switch member {
                 case .binder: selected.formUnion(tuning.debugCombatV2BinderNodeIDs)
-                case .member(let index):
-                    selected.formUnion(tuning.debugCombatV2CompanionNodeIDs[index] ?? [])
+                case .member(let id):
+                    if let index = state.base.rosterIndex(for: id) {
+                        selected.formUnion(tuning.debugCombatV2CompanionNodeIDs[index] ?? [])
+                    }
                 }
             }
             let explicitV2 = tuning.debugCombatV2BinderAttackEnabled || !selected.isEmpty
@@ -1291,11 +1293,11 @@ enum CombatRules {
                 ordinary = CharacterRules.maximumHealth(state.base.binderCharacter,
                                                          base: Tuning.Encounter.binderMaxHP)
                     + (explicitV2 ? 0 : loadout(of: actor, in: state).maxHP)
-            case .companion(let index):
+            case .companion(let id):
                 ordinary = CharacterRules.maximumHealth(
-                    state.base.character(.member(index)),
-                    base: state.base.roster.indices.contains(index)
-                        ? state.base.roster[index].maxHP : Tuning.Encounter.companionMaxHP)
+                    state.base.character(.member(id)),
+                    base: state.base.rosterIndex(for: id).map { state.base.roster[$0].maxHP }
+                        ?? Tuning.Encounter.companionMaxHP)
                     + (explicitV2 ? 0 : loadout(of: actor, in: state).maxHP)
             case .foe:
                 ordinary = 1
@@ -1319,7 +1321,7 @@ enum CombatRules {
                 let current: Int
                 switch member {
                 case .binder: current = run.binderHP
-                case .member(let index): current = run.companionHP[index] ?? 0
+                case .member(let id): current = run.companionHP[id] ?? 0
                 }
                 let draft = proposed[member] ?? RunHealthCapEntry(
                     member: member,
@@ -1339,9 +1341,9 @@ enum CombatRules {
             run.binderHP = binderCap.maximum
             changed = true
         }
-        for (index, current) in run.companionHP {
-            guard let cap = run.healthCap(for: .member(index)), current > cap.maximum else { continue }
-            run.companionHP[index] = cap.maximum
+        for (id, current) in run.companionHP {
+            guard let cap = run.healthCap(for: .member(id)), current > cap.maximum else { continue }
+            run.companionHP[id] = cap.maximum
             changed = true
         }
         guard changed else { return false }
@@ -1354,21 +1356,21 @@ enum CombatRules {
             let member: PartyMember
             switch actor {
             case .binder: member = .binder
-            case .companion(let index): member = .member(index)
+            case .companion(let id): member = .member(id)
             case .foe: preconditionFailure("foes do not have expedition health caps")
             }
             guard let cap = run.healthCap(for: member) else { return (0, 1) }
             switch actor {
             case .binder: return (min(run.binderHP, cap.maximum), cap.maximum)
-            case .companion(let index):
-                return (min(run.companionHP[index] ?? cap.maximum, cap.maximum), cap.maximum)
+            case .companion(let id):
+                return (min(run.companionHP[id] ?? cap.maximum, cap.maximum), cap.maximum)
             case .foe: break
             }
         }
         switch actor {
         case .binder: return (run.binderHP, Tuning.Encounter.binderMaxHP)
-        case .companion(let index):
-            return (run.companionHP[index] ?? Tuning.Encounter.companionMaxHP,
+        case .companion(let id):
+            return (run.companionHP[id] ?? Tuning.Encounter.companionMaxHP,
                     Tuning.Encounter.companionMaxHP)
         case .foe(let id):
             return run.activeEncounter?.foes.first { $0.id == id }
@@ -1575,7 +1577,7 @@ enum CombatRules {
         if committedCost == .normal { encounter.firstNormalActionCompleted?.insert(actor) }
 
         // The FF12 rule: an override covers that turn and then hands control back.
-        if actor.rosterIndex != nil { encounter.isCompanionOverridden = false }
+        if actor.persistentPartyMemberID != nil { encounter.isCompanionOverridden = false }
         // Recovery knowledge describes exactly the first completed action after the debt cleared.
         encounter.recoveryComplete.remove(actor)
 
@@ -1899,7 +1901,7 @@ enum CombatRules {
             let frozen = state.worlds.activeRun?.activeEncounter?.debugV2BinderAttack
             return binderAttack(in: state)
                 + (frozen?.preMatchupBonus(for: frozen?.ordinaryWeaponKind).total ?? 0)
-        case .companion(let index): return companionAttack(index, in: state)
+        case .companion(let id): return companionAttack(id, in: state)
         case .foe(let id):
             return state.worlds.activeRun?.activeEncounter?.foes.first { $0.id == id }?.stats.attack ?? 1
         }
@@ -2376,8 +2378,8 @@ enum CombatRules {
             ? 1 : max(0, before.current - reduced)
         switch target {
         case .binder: run.binderHP = finalHP
-        case .companion(let index):
-            run.companionHP[index] = finalHP
+        case .companion(let id):
+            run.companionHP[id] = finalHP
         case .foe(let id):
             _ = applyFoeDamage(foeID: id, amount: reduced, sourceActor: nil,
                                provenance: .environment, run: &run, encounter: &encounter)
@@ -2408,9 +2410,9 @@ enum CombatRules {
         let ceiling = health(of: ally, in: run).max
         switch ally {
         case .binder: run.binderHP = min(ceiling, run.binderHP + amount)
-        case .companion(let index):
-            run.companionHP[index] = min(ceiling,
-                                         (run.companionHP[index] ?? ceiling) + amount)
+        case .companion(let id):
+            run.companionHP[id] = min(ceiling,
+                                      (run.companionHP[id] ?? ceiling) + amount)
         case .foe: return
         }
         encounter.note("\(actorName(healer, encounter: encounter)) — \(source) — restores \(amount) to \(actorName(ally, encounter: encounter)).")
@@ -2948,8 +2950,8 @@ enum CombatRules {
             var grounded = false
             if foe.stats.element != nil, !isSnuffed(foeID, in: encounter),
                let ashe = standing.first(where: { member in
-                   member.rosterIndex.flatMap {
-                       state.base.roster.indices.contains($0) ? state.base.roster[$0].traveller : nil
+                   member.persistentPartyMemberID.flatMap {
+                       state.base.rosterIndex(for: $0).flatMap { state.base.roster[$0].traveller }
                    } == TravellerID(rawValue: "ashe")
                }), originalTarget != ashe, (encounter.grounding[ashe] ?? 0) > 0 {
                 encounter.grounding.removeValue(forKey: ashe)
@@ -3073,7 +3075,7 @@ enum CombatRules {
                 hurt(target, by: amount, braceApplies: braceApplies,
                      run: &run, encounter: &encounter)
             }
-            if wasStanding, !isAlive(target, in: run), target.rosterIndex != nil {
+            if wasStanding, !isAlive(target, in: run), target.persistentPartyMemberID != nil {
                 encounter.note("\(actorName(target, encounter: encounter)) goes down. They'll be all right at home.")
             }
 
@@ -3210,8 +3212,10 @@ enum CombatRules {
             if let name = piece?.displayName { lines.append("\(name) grew after the fight") }
         }
         grow(&state.base.binderEquipped[.weapon])
-        for index in state.base.activeParty where state.base.roster.indices.contains(index) {
-            grow(&state.base.roster[index].equipped[.weapon])
+        for id in state.base.activeParty {
+            if let index = state.base.rosterIndex(for: id) {
+                grow(&state.base.roster[index].equipped[.weapon])
+            }
         }
         return lines
     }
@@ -3236,7 +3240,7 @@ enum CombatRules {
             state.base.withCharacter(member) { levels = CharacterRules.award(earned, to: &$0) }
             if levels > 0 {
                 let name: String
-                if let index = member.rosterIndex, state.base.roster.indices.contains(index) {
+                if let id = member.persistentID, let index = state.base.rosterIndex(for: id) {
                     name = "\(state.base.roster[index].name) is"
                 } else {
                     name = "You are"
