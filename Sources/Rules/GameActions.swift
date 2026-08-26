@@ -1041,6 +1041,8 @@ extension GameStore {
 #endif
             return false
         }
+        let atmospherePresentationReceipt = WorldGrade2BindAdapter.makeAtmospherePresentationReceipt(
+            book: book, mapSeed: generationSeed, visualReceipt: visualReceipt)
         var arrivalReceipt: WorldArrivalReceipt
         do {
             arrivalReceipt = try WorldArrivalReceiptFactory.make(
@@ -1054,6 +1056,7 @@ extension GameStore {
                 sites: world.sites,
                 generationDiagnostics: world.diagnostics,
                 visualReceipt: visualReceipt,
+                atmospherePresentationReceipt: atmospherePresentationReceipt,
                 visibilityProfile: WorldRules.visibilityProfile(
                     book: book, mapSeed: generationSeed, tuning: tuning,
                     worldVisualReceipt: visualReceipt,
@@ -1133,6 +1136,7 @@ extension GameStore {
                                                     runIndex: state.worlds.runIndex + 1,
                                                     travellers: world.travellers,
                                                     worldVisualReceipt: visualReceipt,
+                                                    atmospherePresentationReceipt: atmospherePresentationReceipt,
                                                     worldArrivalReceipt: arrivalReceipt)
             state.reality.library.record(world: historyRecord)
             for receipt in book.provenStatementReceipts
@@ -1217,6 +1221,7 @@ extension GameStore {
                 generationDiagnostics: world.diagnostics,
                 tuning: tuning,
                 worldVisualReceipt: visualReceipt,
+                atmospherePresentationReceipt: atmospherePresentationReceipt,
                 worldArrivalReceipt: arrivalReceipt
             )
             state.worlds.activeRun = departingRun

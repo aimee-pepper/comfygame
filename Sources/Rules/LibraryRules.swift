@@ -449,6 +449,7 @@ enum LibraryRules {
     static func record(book: BoundBook, page: Page, seed: UInt64, runIndex: Int,
                        travellers: [TravellerID],
                        worldVisualReceipt: WorldVisualReceipt? = nil,
+                       atmospherePresentationReceipt: WorldAtmospherePresentationReceiptV1? = nil,
                        worldArrivalReceipt: WorldArrivalReceipt? = nil) -> VisitedWorld {
         let sigils = BookRules.sigils(for: book)
         let written = Set(sigils.map(\.target))
@@ -496,6 +497,7 @@ enum LibraryRules {
             semanticRequests: TutorialRules.semanticRequests(on: page),
             bindEssencePaid: book.essencePaid,
             worldVisualReceipt: worldVisualReceipt,
+            atmospherePresentationReceipt: atmospherePresentationReceipt,
             worldArrivalReceipt: worldArrivalReceipt,
             worldPageUseReceipt: book.worldPageUseReceipt
         )

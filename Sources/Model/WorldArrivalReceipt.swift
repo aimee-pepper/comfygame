@@ -443,7 +443,7 @@ struct WorldSplashReceiptV3: Codable, Equatable, Sendable {
               ["none", "trace", "light", "heavy", "dense"].contains(environment.suspendedDensity),
               ["calm", "moving", "strong"].contains(environment.suspendedMotion),
               ["none", "rain", "snow", "mixedRainSnow"].contains(environment.precipitationMedium),
-              ["none", "trace", "light", "heavy"].contains(environment.precipitationIntensity),
+              ["none", "trace", "light", "heavy", "dense"].contains(environment.precipitationIntensity),
               ["calm", "moving", "strong"].contains(environment.precipitationMotion),
               (environment.suspendedMedium == "none") == (environment.suspendedDensity == "none"),
               (environment.precipitationMedium == "none") == (environment.precipitationIntensity == "none"),
@@ -912,6 +912,7 @@ enum WorldArrivalReceiptFactory {
                      sites: [PlacedSite] = [],
                      generationDiagnostics: WorldGenerationDiagnostics,
                      visualReceipt: WorldVisualReceipt,
+                     atmospherePresentationReceipt: WorldAtmospherePresentationReceiptV1,
                      visibilityProfile: WorldRules.VisibilityProfile,
                      library: LibraryState, tuning: DebugTuningProfile,
                      isFreshFirstExpedition: Bool,
@@ -1085,6 +1086,7 @@ enum WorldArrivalReceiptFactory {
             hydrologyTopology: generationDiagnostics.hydrologyTopology,
             environment: environmentSummary, illuminationSourceClass: sourceClass,
             motionBand: motionBand,
+            atmospherePresentationReceipt: atmospherePresentationReceipt,
             causalFacts: causalFacts,
             causalResourceOwners: causalResourceOwners.mapValues {
                 $0.sorted { $0.rawValue < $1.rawValue }
@@ -1101,6 +1103,7 @@ enum WorldArrivalReceiptFactory {
         hydrologyTopology: WorldHydrologyTopologyObservation?,
         environment: WorldArrivalReceipt.EnvironmentSummary,
         illuminationSourceClass: String, motionBand: String,
+        atmospherePresentationReceipt: WorldAtmospherePresentationReceiptV1? = nil,
         causalFacts: [WorldArrivalReceipt.CausalVisualFact],
         causalResourceOwners: [ResourceID: [InstanceID]] = [:],
         crop: WorldArrivalReceipt.FirstMapCrop,
@@ -1257,12 +1260,22 @@ enum WorldArrivalReceiptFactory {
                 hasGeneratedSiteOpportunity: !placedSites.isEmpty, resources: resourceRows),
             environment: .init(illuminationBand: environment.illuminationBand,
                                illuminationSourceClass: illuminationSourceClass,
-                               suspendedMedium: environment.suspendedMedium,
-                               suspendedDensity: environment.suspendedDensity,
-                               suspendedMotion: motionBand,
-                               precipitationMedium: environment.precipitation,
-                               precipitationIntensity: environment.precipitationIntensity,
-                               precipitationMotion: motionBand),
+                               suspendedMedium: atmospherePresentationReceipt?.suspendedMedium.rawValue
+                                ?? environment.suspendedMedium,
+                               suspendedDensity: atmospherePresentationReceipt.map {
+                                   WorldAtmospherePresentationReceiptV1.densityBand(
+                                    $0.suspendedDensity, present: $0.suspendedMedium != .none)
+                               } ?? environment.suspendedDensity,
+                               suspendedMotion: atmospherePresentationReceipt?.motionBand.rawValue
+                                ?? motionBand,
+                               precipitationMedium: atmospherePresentationReceipt?.precipitation.rawValue
+                                ?? environment.precipitation,
+                               precipitationIntensity: atmospherePresentationReceipt.map {
+                                   WorldAtmospherePresentationReceiptV1.densityBand(
+                                    $0.precipitationDensity, present: $0.precipitation != .none)
+                               } ?? environment.precipitationIntensity,
+                               precipitationMotion: atmospherePresentationReceipt?.motionBand.rawValue
+                                ?? motionBand),
             causalVisualFacts: causalFacts,
             entryMark: sourcePage.marks.first.map {
                 .init(markID: $0.id, rendererAssetKey: $0.rendererAssetKey, hand: $0.hand,
@@ -1465,9 +1478,9 @@ enum WorldArrivalReceiptFactory {
 
     private static func densityBand(_ density: Double, medium: String) -> String {
         guard medium != "none", density > 0 else { return "none" }
-        if density < 0.12 { return "trace" }
-        if density < 0.35 { return "light" }
-        if density < 0.7 { return "heavy" }
+        if density < 25 { return "trace" }
+        if density < 50 { return "light" }
+        if density < 75 { return "heavy" }
         return "dense"
     }
 

@@ -355,3 +355,99 @@ enum WorldGrade2BindAdapter {
     }
     private static func rounded3(_ value: Double) -> Double { (value * 1000).rounded() / 1000 }
 }
+
+extension WorldGrade2BindAdapter {
+    /// Resolves the immutable atmosphere facts from the same authored sigils and pressure
+    /// arithmetic as world generation. This consumes no generation RNG.
+    static func makeAtmospherePresentationReceipt(
+        book: BoundBook, mapSeed: UInt64, visualReceipt: WorldVisualReceipt
+    ) -> WorldAtmospherePresentationReceiptV1 {
+        let sigils = BookRules.sigils(for: book)
+        let suspendedKinds: [(PressureSourceID, WorldAtmospherePresentationReceiptV1.SuspendedMedium)] = [
+            ("smoke", .smoke), ("ash", .airborneAsh), ("mist", .mist), ("miasma", .miasma)
+        ]
+        struct Candidate {
+            var medium: WorldAtmospherePresentationReceiptV1.SuspendedMedium
+            var contribution: Double
+            var ids: [InstanceID]
+        }
+        func contributions(sourceID: PressureSourceID, targetID: PressureTargetID) -> [(InstanceID, Double)] {
+            guard let target = ContentCatalog.shared.pressureTarget(targetID),
+                  let base = ContentCatalog.shared.pressureSource(sourceID)?.contribution(to: targetID)
+            else { return [] }
+            return sigils.compactMap { sigil in
+                guard sigil.source == sourceID, sigil.intensity != .absent,
+                      !sigil.negatedTargets.contains(targetID) else { return nil }
+                let value = base.peak * sigil.intensity.multiplier
+                    * PressureRules.scaleMultiplier(sigil, target: target)
+                    * PressureRules.countMultiplier(sigil)
+                return value > 0 && value.isFinite ? (sigil.id, value) : nil
+            }
+        }
+        func normalized(_ contribution: Double) -> Int {
+            min(100, max(10, Int((contribution / 50 * 100).rounded())))
+        }
+
+        let candidates = suspendedKinds.compactMap { source, medium -> Candidate? in
+            let parts = contributions(sourceID: source, targetID: "atmosphere")
+            let combined = PressureRules.diminished(parts.map(\.1))
+            guard combined > 0, combined.isFinite else { return nil }
+            return .init(medium: medium, contribution: combined,
+                         ids: parts.map(\.0).sorted { $0.rawValue < $1.rawValue })
+        }
+        let suspended = candidates.sorted {
+            if $0.contribution != $1.contribution { return $0.contribution > $1.contribution }
+            return ($0.ids.first?.rawValue ?? .max) < ($1.ids.first?.rawValue ?? .max)
+        }.first
+
+        let rain = contributions(sourceID: "rain", targetID: "hydrology")
+        let snow = contributions(sourceID: "snow", targetID: "hydrology")
+        let rainTotal = PressureRules.diminished(rain.map(\.1))
+        let snowTotal = PressureRules.diminished(snow.map(\.1))
+        let precipitation: WorldAtmospherePresentationReceiptV1.Precipitation
+        let precipitationTotal: Double
+        let precipitationIDs: [InstanceID]
+        if rainTotal <= 0, snowTotal <= 0 {
+            precipitation = .none; precipitationTotal = 0; precipitationIDs = []
+        } else if snowTotal <= 0 || rainTotal >= snowTotal * 1.5 {
+            precipitation = .rain; precipitationTotal = rainTotal; precipitationIDs = rain.map(\.0)
+        } else if rainTotal <= 0 || snowTotal >= rainTotal * 1.5 {
+            precipitation = .snow; precipitationTotal = snowTotal; precipitationIDs = snow.map(\.0)
+        } else {
+            precipitation = .mixedRainSnow
+            precipitationTotal = PressureRules.diminished(rain.map(\.1) + snow.map(\.1))
+            precipitationIDs = rain.map(\.0) + snow.map(\.0)
+        }
+
+        let motion = BookRules.readings(for: book, seed: mapSeed)["atmosphere"].aspect("motion")
+        let motionBand: WorldAtmospherePresentationReceiptV1.MotionBand =
+            motion <= 40 ? .calm : motion <= 65 ? .moving : .strong
+        let presentation = SeededRNG(seed: mapSeed).derived(0x4154_4D4F_5350_4852)
+        let selectedIDs = Set(suspended?.ids ?? [])
+        let authoredColor = visualReceipt.selectedSourceByScope[.atmosphere]
+            .flatMap { selectedIDs.contains($0) ? visualReceipt.request.resolvedColors.atmosphere : nil }
+        let family: String = {
+            switch suspended?.medium {
+            case .smoke: "neutralSmoke"
+            case .airborneAsh: "coolAsh"
+            case .mist: "neutralMist"
+            case .miasma: "neutralMiasma"
+            case .some(.none), nil: "clear"
+            }
+        }()
+        let receipt = WorldAtmospherePresentationReceiptV1(
+            schemaVersion: WorldAtmospherePresentationReceiptV1.schemaVersion,
+            suspendedMedium: suspended?.medium ?? .none,
+            suspendedDensity: suspended.map { normalized($0.contribution) } ?? 0,
+            suspendedSourceIDs: suspended?.ids ?? [], precipitation: precipitation,
+            precipitationDensity: precipitation == .none ? 0 : normalized(precipitationTotal),
+            precipitationSourceIDs: precipitationIDs.sorted { $0.rawValue < $1.rawValue },
+            motionBand: motionBand,
+            presentationDirection: WorldAtmospherePresentationReceiptV1.Direction.allCases[
+                Int(presentation.seed % 8)],
+            mediumPalette: .init(familyID: family, authoredColor: authoredColor),
+            phaseSeed: presentation.derived(0x5048_4153_455F_5631).seed,
+            resolverVersion: WorldAtmospherePresentationReceiptV1.resolverVersion)
+        return receipt.validates() ? receipt : .clear(seed: mapSeed)
+    }
+}

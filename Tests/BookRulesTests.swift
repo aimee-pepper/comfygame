@@ -333,7 +333,9 @@ final class BookRulesTests: XCTestCase {
 
     @MainActor
     func testBindingPersistsOneVisualReceiptInRunAndHistory() throws {
-        let store = GameStore(io: .temporary(name: "visual-bind-\(UUID().uuidString)"))
+        let io = SaveFileIO.temporary(name: "visual-bind-\(UUID().uuidString)")
+        defer { io.deleteEverything() }
+        let store = GameStore(io: io)
         store.write("caverns")
         store.write("frostbound")
 
@@ -344,10 +346,28 @@ final class BookRulesTests: XCTestCase {
         let receipt = try XCTUnwrap(run.worldVisualReceipt)
         XCTAssertEqual(history.worldVisualReceipt, receipt,
                        "History and the active world must retain the same immutable visual fact")
+        XCTAssertEqual(history.atmospherePresentationReceipt,
+                       run.atmospherePresentationReceipt)
+        XCTAssertEqual(run.worldArrivalReceipt?.worldSplashReceiptV3?.environment.suspendedMedium,
+                       run.atmospherePresentationReceipt.suspendedMedium.rawValue)
+        XCTAssertEqual(run.worldArrivalReceipt?.worldSplashReceiptV3?.environment.suspendedDensity,
+                       WorldAtmospherePresentationReceiptV1.densityBand(
+                        run.atmospherePresentationReceipt.suspendedDensity,
+                        present: run.atmospherePresentationReceipt.suspendedMedium != .none))
         let restored = try JSONDecoder().decode(
             GameState.self, from: JSONEncoder().encode(store.state))
         XCTAssertEqual(restored.worlds.activeRun?.worldVisualReceipt, receipt)
         XCTAssertEqual(restored.reality.library.visitedWorlds.last?.worldVisualReceipt, receipt)
+        XCTAssertEqual(restored.worlds.activeRun?.atmospherePresentationReceipt,
+                       run.atmospherePresentationReceipt)
+        XCTAssertEqual(restored.reality.library.visitedWorlds.last?.atmospherePresentationReceipt,
+                       run.atmospherePresentationReceipt)
+        store.flushNow()
+        let relaunched = GameStore(io: io)
+        XCTAssertEqual(relaunched.activeRun?.atmospherePresentationReceipt,
+                       run.atmospherePresentationReceipt)
+        XCTAssertEqual(relaunched.state.reality.library.visitedWorlds.last?
+            .atmospherePresentationReceipt, run.atmospherePresentationReceipt)
     }
 
     @MainActor

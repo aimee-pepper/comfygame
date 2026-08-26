@@ -164,6 +164,53 @@ final class WorldGrade2BindAdapterTests: XCTestCase {
                        atmospheres.dropFirst().map(\.density).sorted())
     }
 
+    func testAtmosphereReceiptResolvesAuthoredCausesWithoutGenerationRNG() throws {
+        let marks = [
+            sigil(40, "smoke", "illumination", intensity: .moderate),
+            sigil(10, "ash", "substrate", intensity: .moderate),
+            sigil(30, "rain", "hydrology", intensity: .moderate),
+            sigil(20, "snow", "hydrology", intensity: .great),
+        ]
+        let visual = try receipt(marks)
+        let first = WorldGrade2BindAdapter.makeAtmospherePresentationReceipt(
+            book: book(marks), mapSeed: seed, visualReceipt: visual)
+        let second = WorldGrade2BindAdapter.makeAtmospherePresentationReceipt(
+            book: book(marks), mapSeed: seed, visualReceipt: visual)
+
+        XCTAssertEqual(first, second)
+        XCTAssertTrue(first.validates())
+        XCTAssertEqual(first.suspendedMedium, .airborneAsh)
+        XCTAssertEqual(first.suspendedSourceIDs, [InstanceID(rawValue: 10)])
+        XCTAssertEqual(first.precipitation, .mixedRainSnow)
+        XCTAssertEqual(first.precipitationSourceIDs,
+                       [InstanceID(rawValue: 20), InstanceID(rawValue: 30)])
+        XCTAssertEqual(first.schemaVersion, "world-atmosphere-presentation-1")
+        XCTAssertEqual(first.resolverVersion, "world-atmosphere-resolver-1.0.0")
+    }
+
+    func testAtmosphereReceiptDoesNotInventWeatherFromUnwrittenReadings() throws {
+        let marks = [sigil(1, "wind", "atmosphere", intensity: .great)]
+        let visual = try receipt(marks)
+        let result = WorldGrade2BindAdapter.makeAtmospherePresentationReceipt(
+            book: book(marks), mapSeed: seed, visualReceipt: visual)
+        XCTAssertEqual(result.suspendedMedium, .none)
+        XCTAssertEqual(result.suspendedDensity, 0)
+        XCTAssertEqual(result.precipitation, .none)
+        XCTAssertEqual(result.precipitationDensity, 0)
+        XCTAssertEqual(result.motionBand, .strong)
+    }
+
+    func testAtmosphereDensityBandsUseExactIntegerBoundaries() {
+        let cases = [(0, false, "none"), (10, true, "trace"), (24, true, "trace"),
+                     (25, true, "light"), (49, true, "light"),
+                     (50, true, "heavy"), (74, true, "heavy"),
+                     (75, true, "dense"), (100, true, "dense")]
+        for (density, present, expected) in cases {
+            XCTAssertEqual(WorldAtmospherePresentationReceiptV1.densityBand(
+                density, present: present), expected, "density \(density)")
+        }
+    }
+
     func testGraniteAndSunRemainInTheirOwnColorScopes() throws {
         let result = try receipt([sigil(1, "granite", "substrate"),
                                   sigil(2, "sun", "illumination")])

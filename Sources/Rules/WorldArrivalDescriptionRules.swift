@@ -233,7 +233,7 @@ enum WorldArrivalDescriptionRules {
             default: break
             }
         }
-        if environment.precipitationIntensity == "heavy" {
+        if environment.precipitationIntensity == "heavy" || environment.precipitationIntensity == "dense" {
             switch environment.precipitation {
             case "rain": return "Heavy rain crosses the open ground."
             case "snow": return "Heavy snow crosses the open ground."
@@ -289,7 +289,7 @@ enum WorldArrivalDescriptionRules {
             default: break
             }
         }
-        if environment.precipitationIntensity == "heavy" {
+        if environment.precipitationIntensity == "heavy" || environment.precipitationIntensity == "dense" {
             switch environment.precipitation {
             case "rain": return "heavy rain crossed the open ground"
             case "snow": return "heavy snow crossed the open ground"
@@ -356,7 +356,7 @@ enum WorldArrivalDescriptionRules {
               ["none", "smoke", "airborneAsh", "mist", "miasma"].contains(environment.suspendedMedium),
               ["none", "trace", "light", "heavy", "dense"].contains(environment.suspendedDensity),
               ["none", "rain", "snow", "mixedRainSnow"].contains(environment.precipitation),
-              ["none", "trace", "light", "heavy"].contains(environment.precipitationIntensity),
+              ["none", "trace", "light", "heavy", "dense"].contains(environment.precipitationIntensity),
               ["none", "sparse", "present", "abundant"].contains(environment.floraCoverageBand),
               ["none", "solitary", "clustered", "spreading", "mixed"].contains(environment.floraHabit),
               (environment.suspendedMedium == "none") == (environment.suspendedDensity == "none"),

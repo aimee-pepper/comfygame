@@ -67,6 +67,44 @@ final class WorldGrade2MapIntegrationTests: XCTestCase {
         let decoded = try JSONDecoder().decode(WorldRun.self, from: JSONEncoder().encode(original))
         XCTAssertEqual(decoded.worldVisualReceipt, expectedReceipt)
         XCTAssertEqual(decoded.anchoredSnapshot.worldVisualReceipt, expectedReceipt)
+        XCTAssertEqual(decoded.anchoredSnapshot.atmospherePresentationReceipt,
+                       decoded.atmospherePresentationReceipt)
+    }
+
+    func testLegacySmokeMigratesOnceAndMalformedOrFutureReceiptFailsClosed() throws {
+        let base = try descriptor()
+        let smokeRequest = WorldGrade2V1.Request(
+            material: base.material,
+            atmosphere: .init(medium: "smoke", density: 55,
+                              paletteFamilyID: "neutralSmoke"),
+            flora: .init(coveragePercent: base.flora.coveragePercent,
+                         paletteRichness: base.flora.paletteRichness,
+                         cast: base.flora.cast), resolvedColors: .init())
+        let smokeDescriptor = try WorldGrade2V1.resolve(smokeRequest)
+        let smoke = try receipt(smokeDescriptor)
+        var object = try XCTUnwrap(JSONSerialization.jsonObject(
+            with: JSONEncoder().encode(run(receipt: smoke))) as? [String: Any])
+        object.removeValue(forKey: "atmospherePresentationReceipt")
+        let legacy = try JSONDecoder().decode(WorldRun.self,
+            from: JSONSerialization.data(withJSONObject: object))
+        XCTAssertEqual(legacy.atmospherePresentationReceipt.suspendedMedium, .smoke)
+        XCTAssertEqual(legacy.atmospherePresentationReceipt.suspendedDensity, 55)
+        let relaunched = try JSONDecoder().decode(WorldRun.self,
+            from: JSONEncoder().encode(legacy))
+        XCTAssertEqual(relaunched.atmospherePresentationReceipt,
+                       legacy.atmospherePresentationReceipt)
+
+        for malformed in [
+            ["schemaVersion": "world-atmosphere-presentation-2"],
+            ["schemaVersion": "world-atmosphere-presentation-1", "suspendedDensity": -1],
+        ] as [[String: Any]] {
+            var bad = object
+            bad["atmospherePresentationReceipt"] = malformed
+            let decoded = try JSONDecoder().decode(WorldRun.self,
+                from: JSONSerialization.data(withJSONObject: bad))
+            XCTAssertEqual(decoded.atmospherePresentationReceipt.suspendedMedium, .none)
+            XCTAssertEqual(decoded.atmospherePresentationReceipt.suspendedDensity, 0)
+        }
     }
 
     func testCorruptHashAndUnsupportedVersionFailWorldRunDecode() throws {

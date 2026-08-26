@@ -968,6 +968,7 @@ struct WorldRun: Codable, Equatable, Sendable {
     /// Optional frozen visual receipt for the accepted world-grade-2 renderer. Worlds bound
     /// before that contract omit it and retain the v1 appearance; it is never inferred on load.
     var worldVisualReceipt: WorldVisualReceipt?
+    var atmospherePresentationReceipt: WorldAtmospherePresentationReceiptV1
     /// Frozen arrival facts and prose. Legacy runs omit this and never synthesize a reveal.
     var worldArrivalReceipt: WorldArrivalReceipt?
     var generationDiagnostics: WorldGenerationDiagnostics
@@ -1166,6 +1167,7 @@ struct WorldRun: Codable, Equatable, Sendable {
          generationDiagnostics: WorldGenerationDiagnostics = WorldGenerationDiagnostics(),
          tuning: DebugTuningProfile = .defaults,
          worldVisualReceipt: WorldVisualReceipt? = nil,
+         atmospherePresentationReceipt: WorldAtmospherePresentationReceiptV1? = nil,
          worldArrivalReceipt: WorldArrivalReceipt? = nil) {
         self.runIndex = runIndex
         self.book = book
@@ -1173,6 +1175,8 @@ struct WorldRun: Codable, Equatable, Sendable {
         self.rng = rng
         self.tuning = tuning
         self.worldVisualReceipt = worldVisualReceipt
+        self.atmospherePresentationReceipt = atmospherePresentationReceipt
+            ?? .migratingLegacy(worldVisualReceipt, seed: mapSeed)
         self.worldArrivalReceipt = worldArrivalReceipt
         self.generationDiagnostics = generationDiagnostics
         self.clock = WorldClock(book: book, seed: mapSeed)
@@ -1256,6 +1260,14 @@ struct WorldRun: Codable, Equatable, Sendable {
         worldVisualReceipt = try container.decodeIfPresent(WorldVisualReceipt.self,
                                                             forKey: .worldVisualReceipt)
         try worldVisualReceipt?.validate()
+        if container.contains(.atmospherePresentationReceipt) {
+            atmospherePresentationReceipt = (try? container.decode(
+                WorldAtmospherePresentationReceiptV1.self,
+                forKey: .atmospherePresentationReceipt)).flatMap { $0.validates() ? $0 : nil }
+                ?? .clear(seed: mapSeed)
+        } else {
+            atmospherePresentationReceipt = .migratingLegacy(worldVisualReceipt, seed: mapSeed)
+        }
         worldArrivalReceipt = try container.decodeIfPresent(WorldArrivalReceipt.self,
                                                              forKey: .worldArrivalReceipt)
         generationDiagnostics = try container.decodeIfPresent(WorldGenerationDiagnostics.self,
