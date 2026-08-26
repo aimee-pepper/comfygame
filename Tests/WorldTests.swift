@@ -3313,6 +3313,36 @@ final class WorldTests: XCTestCase {
                                "Only complete rows that fit may be admitted to the viewport")
     }
 
+    func testB18bTransientProjectionKeepsTypedCarriedAndPartyTruthOutOfSave() throws {
+        var state = startedRun(book(["terrain": "plains"]), seed: 18_800)
+        state.worlds.activeRun?.satchel.add(4, of: Resources.quartz)
+        state.worlds.activeRun?.satchelItems.stacks = [
+            ItemStack(id: InstanceID(rawValue: 8_811), catalogID: Items.scentMask,
+                      count: 2, identified: true),
+        ]
+        let run = try XCTUnwrap(state.worlds.activeRun)
+        let frozen = try SaveCodec.encode(state)
+
+        let presentation = WorldScreenPresentation.make(run: run, state: state)
+
+        XCTAssertEqual(presentation.turn, run.turnsTaken)
+        XCTAssertEqual(presentation.party.first?.id, .founderQuill)
+        XCTAssertEqual(presentation.party.first?.current, run.binderHP)
+        XCTAssertTrue(presentation.carried.contains(.resource(Resources.quartz, amount: 4)))
+        XCTAssertTrue(presentation.carried.contains(.item(
+            InstanceID(rawValue: 8_811), itemID: Items.scentMask,
+            identified: true, amount: 2)))
+        XCTAssertEqual(try SaveCodec.encode(state), frozen,
+                       "the World-screen projection is transient and cannot mutate persistence")
+    }
+
+    func testB18bEmergencyScrollBeginsOnlyBelowFiveCompleteRows() {
+        XCTAssertEqual(WorldScreenLayoutPolicy.minimumCompleteRows, 5)
+        XCTAssertEqual(WorldScreenLayoutPolicy.minimumMapHeight(
+            mapWidth: 1100.0 / 3.0, viewportColumns: 11), 500.0 / 3.0,
+                       accuracy: 0.001)
+    }
+
     func testWorldCameraNeverResizesTilesToFitVisibility() {
         let ordinary = WorldRules.visibilityProfile(illumination: 100, baseRadius: 7)
         XCTAssertEqual(ordinary.fullRadius, 7)
@@ -3347,10 +3377,14 @@ final class WorldTests: XCTestCase {
                               entry: GridPoint(x: 15, y: 15)),
                 playerPosition: GridPoint(x: 15, y: 15))
         }
+        for lesson in TutorialLessonID.allCases {
+            store.completeTutorial(lesson, fact: "b18b_layout_fixture")
+        }
         WorldMapStageMeasurement.latestFrame = .zero
         WorldMapStageMeasurement.latestMapFrame = .zero
         WorldMapStageMeasurement.latestMapWidth = 0
         WorldMapStageMeasurement.latestViewportRows = 0
+        WorldMapStageMeasurement.layoutReceipt = WorldScreenLayoutReceipt()
         let frozenState = try SaveCodec.encode(store.state)
         let controller = UIHostingController(rootView: WorldView().environmentObject(store))
         let window = UIWindow(frame: CGRect(x: 0, y: 0, width: 368, height: 800))
@@ -3372,6 +3406,18 @@ final class WorldTests: XCTestCase {
                        "safe height cannot change the established eleven-column tile width")
         let tile = WorldMapStageMeasurement.latestMapWidth / 11
         let rows = WorldMapStageMeasurement.latestViewportRows
+        let receipt = WorldMapStageMeasurement.layoutReceipt
+        XCTAssertGreaterThanOrEqual(rows, WorldScreenLayoutPolicy.minimumCompleteRows)
+        XCTAssertGreaterThan(receipt.statusFrame.height, 0)
+        XCTAssertGreaterThan(receipt.carriedStripFrame.height, 0)
+        XCTAssertGreaterThan(receipt.controlsFrame.height, 0)
+        XCTAssertLessThanOrEqual(receipt.statusFrame.maxY, receipt.mapViewportFrame.minY + 0.5)
+        XCTAssertLessThanOrEqual(receipt.mapViewportFrame.maxY,
+                                 receipt.carriedStripFrame.minY + 0.5)
+        XCTAssertLessThanOrEqual(receipt.carriedStripFrame.maxY,
+                                 receipt.controlsFrame.minY + 0.5)
+        XCTAssertNil(receipt.eventToastFrame,
+                     "no event means no empty event surface or event measurement owner")
         XCTAssertEqual(map.height, tile * CGFloat(rows), accuracy: 0.5)
         XCTAssertLessThanOrEqual(map.height, stage.height + 0.5)
         if rows < (store.activeRun?.map.height ?? 0) {
@@ -3414,13 +3460,13 @@ final class WorldTests: XCTestCase {
         XCTAssertFalse(source.contains(".safeAreaInset(edge: .bottom"),
                        "The bottom dock must reserve an ordinary sibling frame, never composite over the map")
         let geometry = try XCTUnwrap(source.range(of: "GeometryReader { viewport in"))
-        let satchel = try XCTUnwrap(source.range(of: "satchel(run)",
+        let satchel = try XCTUnwrap(source.range(of: "carriedStrip(presentation)",
                                                  range: geometry.upperBound..<source.endIndex))
         let controls = try XCTUnwrap(source.range(of: "controls(run)",
                                                   range: satchel.upperBound..<source.endIndex))
         XCTAssertLessThan(geometry.lowerBound, satchel.lowerBound)
         XCTAssertLessThan(satchel.lowerBound, controls.lowerBound,
-                          "Map, Field Kit, and navigation are ordered siblings in one layout")
+                          "Map, typed carried strip, and navigation are ordered siblings in one layout")
         XCTAssertTrue(source.contains("MapGrid("))
         XCTAssertFalse(source.contains("MapGrid(") && source.contains("eventLog.padding(8)"))
         XCTAssertTrue(source.contains("WorldFieldFeedbackRow(contextOverlapsPlayer:"),
