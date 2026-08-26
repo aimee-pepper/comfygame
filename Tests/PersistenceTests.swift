@@ -236,6 +236,28 @@ final class PersistenceTests: XCTestCase {
         }
     }
 
+    func testSchemaTwoMigrationRejectsPresentMalformedPersistentIDsBeforeWriting() {
+        let malformedValues = [
+            "number": "7",
+            "object": #"{"rawValue":"founder:quill"}"#,
+            "array": #"["founder:quill"]"#,
+            "boolean": "true",
+            "null": "null"
+        ]
+        for (name, value) in malformedValues {
+            let payloads = [
+                #"{"schemaVersion":2,"base":{"roster":[{"name":"Quill","persistentID":\#(value)}],"activeParty":[0]}}"#,
+                #"{"schemaVersion":2,"base":{"roster":[{"name":"Quill"},{"name":"Mara","traveller":"mara","persistentID":\#(value)}],"activeParty":[1]}}"#
+            ]
+            for payload in payloads {
+                let bytes = Data(payload.utf8)
+                let original = bytes
+                XCTAssertThrowsError(try Migrations.migrateIfNeeded(bytes), name)
+                XCTAssertEqual(bytes, original, "failed \(name) migration must preserve raw bytes")
+            }
+        }
+    }
+
     func testPhysicalCrystalWalletIsCapacityNeutralAtomicAndRelaunchStable() throws {
         var state = GameState.newGame()
         state.base.inventory = Inventory(slots: 1, stacks: [

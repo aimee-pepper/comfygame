@@ -127,6 +127,39 @@ final class SaveSlotTests: XCTestCase {
         }
     }
 
+    func testSaveSlotMalformedPersistentIDsFailWithoutRewritingEnvelope() async throws {
+        let malformedValues = [
+            "number": "7",
+            "object": #"{"rawValue":"traveller:mara"}"#,
+            "array": #"["traveller:mara"]"#,
+            "boolean": "true",
+            "null": "null"
+        ]
+        for (name, value) in malformedValues {
+            let payloads = [
+                #"{"schemaVersion":2,"base":{"roster":[{"name":"Quill","persistentID":\#(value)}],"activeParty":[0]}}"#,
+                #"{"schemaVersion":2,"base":{"roster":[{"name":"Quill"},{"name":"Mara","traveller":"mara","persistentID":\#(value)}],"activeParty":[1]}}"#
+            ]
+            for payload in payloads {
+                let root = directory()
+                defer { try? FileManager.default.removeItem(at: root) }
+                let slots = SaveSlotFileIO(directory: root)
+                let created = try await slots.create(name: "Malformed persistent ID \(name)")
+                let url = try await slots.exportURL(for: created.metadata.id)
+                var envelope = try SaveCodec.makeDecoder().decode(
+                    SaveSlotEnvelope.self, from: Data(contentsOf: url))
+                envelope.payload = Data(payload.utf8)
+                let bytes = try encoder().encode(envelope)
+                try bytes.write(to: url, options: .atomic)
+
+                do { _ = try await slots.load(created.metadata.id); XCTFail("Expected \(name) rejection") }
+                catch { }
+                XCTAssertEqual(try Data(contentsOf: url), bytes,
+                               "failed \(name) migration must preserve slot bytes")
+            }
+        }
+    }
+
     func testSaveSlotMigrationRejectsMalformedItemStackIDsWithoutRewritingEnvelope() async throws {
         let malformedValues = [
             "negative": "-1",

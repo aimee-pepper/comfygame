@@ -189,13 +189,17 @@ enum Migrations {
             }
             let id = "traveller:\(rawTraveller)"
             guard rosterIDs.insert(id).inserted else { throw CocoaError(.coderInvalidValue) }
-            if let encoded = roster[index]["persistentID"] as? String, encoded != id {
-                throw CocoaError(.coderInvalidValue)
+            if let encoded = roster[index]["persistentID"] {
+                guard let encoded = encoded as? String, encoded == id else {
+                    throw CocoaError(.coderInvalidValue)
+                }
             }
         }
-        if let encodedFounder = roster[0]["persistentID"] as? String,
-           encodedFounder != "founder:quill" {
-            throw CocoaError(.coderInvalidValue)
+        if let encodedFounder = roster[0]["persistentID"] {
+            guard let encodedFounder = encodedFounder as? String,
+                  encodedFounder == "founder:quill" else {
+                throw CocoaError(.coderInvalidValue)
+            }
         }
         func identity(for value: Any) throws -> String {
             guard let number = value as? NSNumber,
