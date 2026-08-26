@@ -144,6 +144,7 @@
 		54180CF9C6CE41FEA6C57B60 /* ContradictionRules.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92B2180E4666F5000817D3EC /* ContradictionRules.swift */; };
 		54E8A6FB039D4B6F7FF4AA92 /* OpeningEconomyContentTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DED817BCBD65429BDCD60C9 /* OpeningEconomyContentTests.swift */; };
 		56C2C67D2033B74FFD18EE24 /* Worldgen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8946B89F914D32DABAC53D5A /* Worldgen.swift */; };
+		B31200000000000000000002 /* ResourceExtractionRules.swift in Sources */ = {isa = PBXBuildFile; fileRef = B31200000000000000000001 /* ResourceExtractionRules.swift */; };
 		583140A5C38A586267218BC1 /* combat_trees.json in Resources */ = {isa = PBXBuildFile; fileRef = FD2CA32A5090B2067ABD22C0 /* combat_trees.json */; };
 		58549BB48C3385534CE0E23C /* GameActions+Recycler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F419C1C64D8762E4085EC70 /* GameActions+Recycler.swift */; };
 		5A3C249D84DE9D8C0576B2EA /* ResourceVisualTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58CFC1BCB5228A5CA88FB517 /* ResourceVisualTests.swift */; };
@@ -491,6 +492,7 @@
 		867ADA7C98334AD5152A4937 /* AppRoute.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppRoute.swift; sourceTree = "<group>"; };
 		87D64CB10C984E402DFA9E50 /* ItemGrid.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ItemGrid.swift; sourceTree = "<group>"; };
 		8946B89F914D32DABAC53D5A /* Worldgen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Worldgen.swift; sourceTree = "<group>"; };
+		B31200000000000000000001 /* ResourceExtractionRules.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResourceExtractionRules.swift; sourceTree = "<group>"; };
 		89776C411F7BC83CF86396E9 /* items.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = items.json; sourceTree = "<group>"; };
 		8ADC03C0E941B354BFE2EF65 /* Discovery.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Discovery.swift; sourceTree = "<group>"; };
 		8B8A444C3FE08E6935849BA8 /* InstrumentCraftingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InstrumentCraftingTests.swift; sourceTree = "<group>"; };
@@ -680,6 +682,7 @@
 				D2AAB75EDFEC0064219E57D4 /* PageRules.swift */,
 				E3EDB1BAC65E07DA7319F3C6 /* PhysicalGearCraftingRules.swift */,
 				CB3C5DA8117A704E44B23C91 /* PressureRules.swift */,
+				B31200000000000000000001 /* ResourceExtractionRules.swift */,
 				9E17B23F244C182A99CD9DB7 /* RecyclerRules.swift */,
 				D5A56C2CA4EF6B5366F86828 /* SiteRules.swift */,
 				BDFF9A08573788622472DB26 /* SmithRules.swift */,
@@ -1440,6 +1443,7 @@
 				A19A9A001A9A9A001A9A9A00 /* WorldArrivalView.swift in Sources */,
 				A20A0A001A0A0A001A0A0A00 /* WorldArrivalRenderedSceneReceipt.swift in Sources */,
 				56C2C67D2033B74FFD18EE24 /* Worldgen.swift in Sources */,
+				B31200000000000000000002 /* ResourceExtractionRules.swift in Sources */,
 				3F6C7DB75723783F90E7E5F8 /* WorldsState.swift in Sources */,
 				3E24E2D2D2BEAD60ADE93D0A /* WritingDeskView.swift in Sources */,
 			);

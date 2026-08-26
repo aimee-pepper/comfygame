@@ -782,6 +782,11 @@ final class WorldTests: XCTestCase {
                                          yieldPerHarvest: 1, secondaryResource: nil,
                                          secondaryYieldPerHarvest: 0))
                     : .empty
+                if !interactable {
+                    for neighbour in run.map.neighbours(of: point) {
+                        run.map[neighbour].content = .empty
+                    }
+                }
                 saved.worlds.activeRun = run
                 for lesson in TutorialLessonID.allCases {
                     saved.tutorial.complete(lesson, fact: "world_asset_evidence")
@@ -3538,9 +3543,11 @@ final class WorldTests: XCTestCase {
     func testLegacyResourceNodeDecodesWithNilGeneratedLifeAndKeepsLegacyBehavior() throws {
         let bytes = try XCTUnwrap(
             #"{"resource":"ore","remainingHarvests":2,"yieldPerHarvest":3}"#.data(using: .utf8))
-        let legacy = try SaveCodec.makeDecoder().decode(ResourceNode.self, from: bytes)
+        var legacy = try SaveCodec.makeDecoder().decode(ResourceNode.self, from: bytes)
         XCTAssertNil(legacy.generatedHarvests)
+        XCTAssertNil(legacy.extractionRequirement)
         XCTAssertEqual(legacy.remainingHarvests, 2)
+        legacy.extractionRequirement = ResourceExtractionRules.requirementReceipt(for: legacy.resource)
 
         var state = startedRun(book([:]), seed: 273)
         var run = try XCTUnwrap(state.worlds.activeRun)
@@ -3577,8 +3584,11 @@ final class WorldTests: XCTestCase {
 
         _ = WorldRules.harvest(in: &state)
         XCTAssertEqual(state.worlds.activeRun?.satchel[Resources.fiber], 6)
-        XCTAssertEqual(state.worlds.activeRun?.map[state.worlds.activeRun!.playerPosition].content, .empty,
-                       "A spent node clears itself off the map")
+        guard case .node(let exhausted) = state.worlds.activeRun?
+            .map[state.worlds.activeRun!.playerPosition].content else {
+            return XCTFail("worked-out ground must retain its frozen node receipt")
+        }
+        XCTAssertTrue(exhausted.isExhausted)
     }
 
     func testFloraHarvestCommitsPrimaryAndExactSecondaryResinAtomically() throws {
@@ -3597,6 +3607,135 @@ final class WorldTests: XCTestCase {
         XCTAssertEqual(events.filter {
             if case .harvested = $0 { return true }; return false
         }.count, 2)
+    }
+
+    func testResourceExtractionCatalogueOwnsExactDispositionAndRank() throws {
+        let expected: [ResourceID: Int] = [
+            "rubble": 0, "clay": 0, Resources.ore: 0,
+            "salt": 0, Resources.sulfur: 0, "copper": 1,
+            Resources.quartz: 1, "obsidian": 1, Resources.silver: 2,
+            "gold": 2, "mercury": 3, "rift_glass": 3,
+            "adamant": 4,
+        ]
+        for resource in ContentCatalog.shared.resources {
+            if let rank = expected[resource.id] {
+                XCTAssertEqual(resource.extractionDisposition, .mineralNode, resource.id.rawValue)
+                XCTAssertEqual(resource.requiredExtractionRank, rank, resource.id.rawValue)
+            } else {
+                XCTAssertNotEqual(resource.extractionDisposition, .mineralNode, resource.id.rawValue)
+                XCTAssertNil(resource.requiredExtractionRank, resource.id.rawValue)
+            }
+        }
+        XCTAssertEqual(Set(expected.keys), Set(ContentCatalog.shared.resources
+            .filter { $0.extractionDisposition == .mineralNode }.map(\.id)))
+    }
+
+    func testResourceExtractionGeometryIsCardinalPassabilityOnly() throws {
+        let state = startedRun(book(["terrain": "plains"]), seed: 31_201)
+        var map = try XCTUnwrap(state.worlds.activeRun).map
+        let center = GridPoint(x: map.width / 2, y: map.height / 2)
+        map[center] = Tile(content: .node(ResourceNode(
+            resource: Resources.ore, remainingHarvests: 1, yieldPerHarvest: 1)),
+            ground: .deepWater, isRevealed: false)
+        for point in map.neighbours(of: center) {
+            map[point].ground = .soil
+            map[point].isCrumbled = false
+        }
+        let blocked = map.neighbours(of: center)[0]
+        map[blocked].isCrumbled = true
+        let positions = ResourceExtractionRules.legalInteractionPositions(nodePoint: center, map: map)
+        XCTAssertFalse(positions.contains(center), "an impassable host is worked from beside it")
+        XCTAssertFalse(positions.contains(blocked))
+        XCTAssertEqual(positions, positions.sorted { map.index(of: $0) < map.index(of: $1) })
+        XCTAssertTrue(positions.allSatisfy { abs($0.x - center.x) + abs($0.y - center.y) == 1 })
+    }
+
+    func testResourceExtractionSelectsUnderPartyThenAdjacentRowMajorAndBindsTarget() throws {
+        var state = startedRun(book(["terrain": "plains"]), seed: 31_202)
+        var run = try XCTUnwrap(state.worlds.activeRun)
+        let player = run.playerPosition
+        let adjacent = run.map.neighbours(of: player)
+            .sorted { run.map.index(of: $0) < run.map.index(of: $1) }
+        let first = try XCTUnwrap(adjacent.first)
+        let last = try XCTUnwrap(adjacent.last)
+        for point in [player, first, last] {
+            run.map[point].ground = .soil
+            run.map[point].isRevealed = true
+        }
+        run.map[first].content = .node(ResourceNode(
+            resource: "clay", remainingHarvests: 1, yieldPerHarvest: 1))
+        run.map[last].content = .node(ResourceNode(
+            resource: "rubble", remainingHarvests: 1, yieldPerHarvest: 1))
+        state.worlds.activeRun = run
+        guard case .available(let adjacentQuote) = ResourceExtractionRules.evaluate(in: state) else {
+            return XCTFail("rank-zero adjacent mineral should be available")
+        }
+        XCTAssertEqual(adjacentQuote.nodePoint, first)
+
+        state.worlds.activeRun?.map[player].content = .node(ResourceNode(
+            resource: Resources.ore, remainingHarvests: 1, yieldPerHarvest: 2))
+        guard case .available(let underQuote) = ResourceExtractionRules.evaluate(in: state) else {
+            return XCTFail("under-party mineral should win")
+        }
+        XCTAssertEqual(underQuote.nodePoint, player)
+        state.worlds.activeRun?.map[player].content = .empty
+        let before = state
+        let refused = ResourceExtractionRules.commit(underQuote, in: &state)
+        XCTAssertEqual(refused.result, .refused(.noDisclosedNode))
+        XCTAssertEqual(state, before)
+    }
+
+    func testResourceExtractionRankUsesOnlyBestWornTravellingFieldPick() throws {
+        var state = startedRun(book(["terrain": "plains"]), seed: 31_203)
+        var run = try XCTUnwrap(state.worlds.activeRun)
+        let point = run.playerPosition
+        run.map[point].isRevealed = true
+        run.map[point].content = .node(ResourceNode(
+            resource: "adamant", remainingHarvests: 1, yieldPerHarvest: 5))
+        state.worlds.activeRun = run
+
+        state.base.inventory.stacks = [ItemStack(
+            id: InstanceID(rawValue: 91), catalogID: "the_willing_edge")]
+        guard case .refused(.underEquipped(let required, let current, _)) =
+                ResourceExtractionRules.evaluate(in: state) else {
+            return XCTFail("stored tools cannot qualify")
+        }
+        XCTAssertEqual(required, 4); XCTAssertEqual(current, 0)
+        state.base.binderEquipped[.tool] = EquippedPiece(catalogID: "the_willing_edge")
+        guard case .available(let quote) = ResourceExtractionRules.evaluate(in: state) else {
+            return XCTFail("worn exact rank-four pick should qualify")
+        }
+        XCTAssertEqual(quote.currentPartyExtractionRank, 4)
+        let reserveBefore = state.base.materialReserve
+        let outcome = ResourceExtractionRules.commit(quote, in: &state)
+        guard case .committed(let success) = outcome.result else {
+            return XCTFail("qualified extraction should commit")
+        }
+        XCTAssertEqual(success.primaryAmount, 5)
+        XCTAssertEqual(state.worlds.activeRun?.satchel["adamant"], 5)
+        XCTAssertEqual(state.base.materialReserve, reserveBefore)
+        XCTAssertEqual(success.turnsSpent, 1)
+        guard case .node(let exhausted) = state.worlds.activeRun?.map[point].content else {
+            return XCTFail("exhausted receipt must remain")
+        }
+        XCTAssertTrue(exhausted.isExhausted)
+    }
+
+    func testResourceExtractionStaleToolRefusesWithoutMutation() throws {
+        var state = startedRun(book(["terrain": "plains"]), seed: 31_204)
+        let point = try XCTUnwrap(state.worlds.activeRun).playerPosition
+        state.worlds.activeRun?.map[point].isRevealed = true
+        state.worlds.activeRun?.map[point].content = .node(ResourceNode(
+            resource: Resources.quartz, remainingHarvests: 2, yieldPerHarvest: 3))
+        state.base.binderEquipped[.tool] = EquippedPiece(catalogID: "bent_pick")
+        guard case .available(let quote) = ResourceExtractionRules.evaluate(in: state) else {
+            return XCTFail("rank-one pick should qualify")
+        }
+        state.base.binderEquipped[.tool] = nil
+        let before = state
+        let outcome = ResourceExtractionRules.commit(quote, in: &state)
+        XCTAssertEqual(outcome.result, .refused(.stale))
+        XCTAssertEqual(state, before)
     }
 
     func testWayfarersTableImprovesOrganicHarvestAndPacking() throws {

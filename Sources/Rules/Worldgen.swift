@@ -565,8 +565,7 @@ enum Worldgen {
             var hosts: [GridPoint]
         }
         let ordinaryTable = BookRules.yieldTable(from: readings).filter {
-            !FloraRules.isFloraResource($0.value)
-                && !["ichor", "mote", "resin", "essence_raw"].contains($0.value.rawValue)
+            ContentCatalog.shared.resource($0.value)?.extractionDisposition == .mineralNode
         }
         var candidates: [NodeCandidate] = ordinaryTable.compactMap { row in
             let hosts = map.allPoints.filter { point in
@@ -619,6 +618,7 @@ enum Worldgen {
             ) : nil
             map[point].content = .node(ResourceNode(
                 resource: resource,
+                extractionRequirement: ResourceExtractionRules.requirementReceipt(for: resource),
                 remainingHarvests: generatedHarvests ?? legacyHarvests,
                 generatedHarvests: generatedHarvests,
                 // **Quantity from stature**, where a plant is what you're cutting. Otherwise the

@@ -44,11 +44,47 @@ enum Migrations {
         switch version {
         case 1: return try migrate1to2(data)
         case 2: return try migrate2to3(data)
+        case 3: return try migrate3to4(data)
         default:
             // No migration registered. Tolerant decoding is the fallback; if the save is genuinely
             // incompatible, `SaveFileIO.load()` quarantines it rather than losing it.
             return data
         }
+    }
+
+    /// Freezes the catalogue-owned extraction classification onto every persisted world node.
+    /// The complete graph is validated and transformed before a new save value is decoded.
+    private static func migrate3to4(_ data: Data) throws -> Data {
+        guard var root = try JSONSerialization.jsonObject(with: data) as? [String: Any] else {
+            throw CocoaError(.coderInvalidValue)
+        }
+        func migrate(_ value: Any) throws -> Any {
+            if let array = value as? [Any] { return try array.map(migrate) }
+            guard var object = value as? [String: Any] else { return value }
+            if let resourceRaw = object["resource"] as? String,
+               object["remainingHarvests"] != nil,
+               object["yieldPerHarvest"] != nil {
+                let resourceID = ResourceID(rawValue: resourceRaw)
+                guard let resource = ContentCatalog.shared.resource(resourceID) else {
+                    throw CocoaError(.coderInvalidValue)
+                }
+                var receipt: [String: Any] = [
+                    "rulesVersion": ResourceExtractionRequirementReceiptV1.currentRulesVersion,
+                    "resourceID": resourceRaw,
+                    "disposition": resource.extractionDisposition.rawValue,
+                ]
+                if let rank = resource.requiredExtractionRank { receipt["requiredExtractionRank"] = rank }
+                object["extractionRequirement"] = receipt
+            }
+            for (key, child) in object { object[key] = try migrate(child) }
+            return object
+        }
+        guard var migrated = try migrate(root) as? [String: Any] else {
+            throw CocoaError(.coderInvalidValue)
+        }
+        migrated["schemaVersion"] = 4
+        root = migrated
+        return try JSONSerialization.data(withJSONObject: root, options: [.sortedKeys])
     }
 
     /// Makes the existing physical `essence_crystal` item the sole durable Essence authority.

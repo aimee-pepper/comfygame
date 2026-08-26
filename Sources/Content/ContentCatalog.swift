@@ -416,6 +416,22 @@ struct ContentCatalog: Sendable {
         let creatureIDs = Set(creatures.map(\.id))
         let itemIDs = Set(items.map(\.id))
 
+        for resource in resources {
+            switch resource.extractionDisposition {
+            case .mineralNode:
+                guard let rank = resource.requiredExtractionRank, (0...4).contains(rank) else {
+                    throw ContentError.danglingReference(
+                        "mineral resource '\(resource.id)' needs Extraction rank 0...4")
+                }
+            case .floraPrimary, .floraSecondary, .directPickup, .realityAward,
+                 .creatureMaterialOnly:
+                guard resource.requiredExtractionRank == nil else {
+                    throw ContentError.danglingReference(
+                        "non-mineral resource '\(resource.id)' cannot require Extraction")
+                }
+            }
+        }
+
         // Every locked live station must name a reachable keeper and an authored, payable cost.
         // Otherwise it can have a route and screen while remaining impossible to build in play.
         let stationOwnerIDs = Set(travellers.map(\.id))

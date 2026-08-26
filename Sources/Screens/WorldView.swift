@@ -1289,7 +1289,7 @@ struct WorldView: View {
     }
 
     private var canInteract: Bool {
-        store.harvestableHere != nil || store.searchableHere != nil || store.canPortalHere
+        store.canExtractResource || store.searchableHere != nil || store.canPortalHere
             || store.canLeaveMalformedOlderWorld
             || (store.isOnLockedCache && store.carriedCacheKey != nil)
             || store.canUseNaturalAnchor || store.canPlaceAnchorFrame || store.canSurvey
@@ -1340,7 +1340,7 @@ struct WorldView: View {
             case .inspected, .swapped:
                 return .refused(.rules("That page action is no longer current."))
             }
-        } else if store.harvestableHere != nil {
+        } else if store.canExtractResource {
             completeInteraction(); store.harvest()
             return .completed(.usedTile("Harvested"))
         } else if store.searchableHere != nil {

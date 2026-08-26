@@ -206,8 +206,19 @@ enum TileContent: Codable, Equatable, Sendable {
 }
 
 /// A harvestable node. Yield and pull count are rolled at worldgen from the book's bounty symbols.
+struct ResourceExtractionRequirementReceiptV1: Codable, Equatable, Sendable {
+    static let currentRulesVersion = "resource-extraction-1"
+
+    var rulesVersion: String = Self.currentRulesVersion
+    var resourceID: ResourceID
+    var disposition: ResourceExtractionDisposition
+    var requiredExtractionRank: Int?
+}
+
 struct ResourceNode: Codable, Equatable, Sendable {
     var resource: ResourceID
+    /// Frozen when the node is generated or migrated so later catalogue tuning cannot rewrite it.
+    var extractionRequirement: ResourceExtractionRequirementReceiptV1?
     var remainingHarvests: Int
     /// The successful-hit count rolled when an ordinary mineral deposit was generated.
     ///
@@ -221,10 +232,14 @@ struct ResourceNode: Codable, Equatable, Sendable {
     var secondaryResource: ResourceID?
     var secondaryYieldPerHarvest: Int
 
-    init(resource: ResourceID, remainingHarvests: Int, generatedHarvests: Int? = nil,
+    init(resource: ResourceID,
+         extractionRequirement: ResourceExtractionRequirementReceiptV1? = nil,
+         remainingHarvests: Int, generatedHarvests: Int? = nil,
          yieldPerHarvest: Int,
          secondaryResource: ResourceID? = nil, secondaryYieldPerHarvest: Int = 0) {
         self.resource = resource
+        self.extractionRequirement = extractionRequirement
+            ?? ResourceExtractionRules.requirementReceipt(for: resource)
         self.remainingHarvests = remainingHarvests
         self.generatedHarvests = generatedHarvests
         self.yieldPerHarvest = yieldPerHarvest
@@ -235,6 +250,8 @@ struct ResourceNode: Codable, Equatable, Sendable {
     init(from decoder: Decoder) throws {
         let c = try decoder.container(keyedBy: CodingKeys.self)
         resource = try c.decode(ResourceID.self, forKey: .resource)
+        extractionRequirement = try c.decodeIfPresent(
+            ResourceExtractionRequirementReceiptV1.self, forKey: .extractionRequirement)
         remainingHarvests = try c.decode(Int.self, forKey: .remainingHarvests)
         generatedHarvests = try c.decodeIfPresent(Int.self, forKey: .generatedHarvests)
         yieldPerHarvest = try c.decode(Int.self, forKey: .yieldPerHarvest)

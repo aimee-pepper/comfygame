@@ -386,10 +386,23 @@ enum GearSlot: String, Codable, CaseIterable, Sendable, CodingKeyRepresentable {
 }
 
 /// A stackable resource. Never consumes an inventory slot.
+enum ResourceExtractionDisposition: String, Codable, Equatable, Sendable {
+    case mineralNode = "mineral_node"
+    case floraPrimary = "flora_primary"
+    case floraSecondary = "flora_secondary"
+    case directPickup = "direct_pickup"
+    case realityAward = "reality_award"
+    case creatureMaterialOnly = "creature_material_only"
+}
+
 struct ResourceDef: Codable, Equatable, Identifiable, Sendable {
     var id: ResourceID
     var name: String
     var icon: String
+    /// Exact world-source ownership. Extraction rules never infer this from display or economy data.
+    var extractionDisposition: ResourceExtractionDisposition
+    /// Present only for ordinary mineral nodes. Zero is a real, hand-workable requirement.
+    var requiredExtractionRank: Int?
     /// The target whose magnitude decides how much of this a world holds.
     var drivenBy: PressureTargetID?
     /// Conditions without which there is none at all.

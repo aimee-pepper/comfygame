@@ -48,6 +48,17 @@ struct GameState: Codable, Equatable, Sendable {
         base = try container.decodeIfPresent(BaseState.self, forKey: .base) ?? .newGame()
         var seeds = SeedSequence.newGame()
         worlds = try container.decodeIfPresent(WorldsState.self, forKey: .worlds) ?? .newGame(seeds: &seeds)
+        if schemaVersion >= 4 {
+            let runs = [worlds.activeRun].compactMap { $0 } + worlds.anchoredRealms.map(\.world)
+            for run in runs {
+                for tile in run.map.tiles {
+                    if case .node(let node) = tile.content,
+                       ResourceExtractionRules.validatedRequirement(of: node) == nil {
+                        throw CocoaError(.coderInvalidValue)
+                    }
+                }
+            }
+        }
         // Trading Post shipped briefly before the campaign-wide receipt source. Seed the new
         // sequence from every durable consumer so the first post-migration return cannot reuse
         // an already-processed identifier and silently skip a refresh.

@@ -4,6 +4,23 @@ import XCTest
 /// The interruptibility pillar, tested. Anything that breaks here breaks pillar 2.
 final class PersistenceTests: XCTestCase {
 
+    func testSchemaThreeExtractionReceiptMigrationFreezesCatalogueTruthAndFailsUnknown() throws {
+        let legacy = Data(#"{"schemaVersion":3,"nested":{"resource":"gold","remainingHarvests":2,"yieldPerHarvest":3}}"#.utf8)
+        let migrated = try Migrations.migrateIfNeeded(legacy)
+        let root = try XCTUnwrap(JSONSerialization.jsonObject(with: migrated) as? [String: Any])
+        XCTAssertEqual(root["schemaVersion"] as? Int, Tuning.saveSchemaVersion)
+        let node = try XCTUnwrap(root["nested"] as? [String: Any])
+        let receipt = try XCTUnwrap(node["extractionRequirement"] as? [String: Any])
+        XCTAssertEqual(receipt["rulesVersion"] as? String, "resource-extraction-1")
+        XCTAssertEqual(receipt["resourceID"] as? String, "gold")
+        XCTAssertEqual(receipt["disposition"] as? String, "mineral_node")
+        XCTAssertEqual(receipt["requiredExtractionRank"] as? Int, 2)
+        XCTAssertEqual(try Migrations.migrateIfNeeded(migrated), migrated)
+
+        let unknown = Data(#"{"schemaVersion":3,"nested":{"resource":"unknown_future","remainingHarvests":1,"yieldPerHarvest":1}}"#.utf8)
+        XCTAssertThrowsError(try Migrations.migrateIfNeeded(unknown))
+    }
+
     func testSchemaOneEssenceMigrationCombinesScalarAndOwnedPhysicalExactlyOnce() throws {
         let legacy = Data(#"""
         {

@@ -503,31 +503,19 @@ enum WorldRules {
 
     /// Harvests the node under the player. One pull per turn.
     static func harvest(in state: inout GameState) -> [Event] {
-        guard var run = state.worlds.activeRun,
-              case .node(var node) = run.map[run.playerPosition].content, !node.isExhausted
-        else { return [.blocked("Nothing here to harvest.")] }
-
-        node.remainingHarvests -= 1
-        let fieldcraftBonus = state.base.station(Stations.wayfarersTable).isUnlocked
-            && FloraRules.isFloraResource(node.resource)
-            ? Tuning.Economy.fieldcraftOrganicYieldBonus : 0
-        let harvested = node.yieldPerHarvest + fieldcraftBonus
-        run.satchel.add(harvested, of: node.resource)
-        state.reality.discovery.recordResource(node.resource, runIndex: run.runIndex)
-        if let secondary = node.secondaryResource, node.secondaryYieldPerHarvest > 0 {
-            run.satchel.add(node.secondaryYieldPerHarvest, of: secondary)
-            state.reality.discovery.recordResource(secondary, runIndex: run.runIndex)
+        switch ResourceExtractionRules.evaluate(in: state) {
+        case .available(let quote):
+            let outcome = ResourceExtractionRules.commit(quote, in: &state)
+            if case .refused(let refusal) = outcome.result {
+                return [.blocked(ResourceExtractionRules.playerCopy(
+                    for: refusal, vanishedAtCommit: refusal == .noDisclosedNode))]
+            }
+            return outcome.events
+        case .refused(let refusal):
+            let name = ResourceExtractionRules.selectedDisclosedNode(in: state)
+                .flatMap { ContentCatalog.shared.resource($0.1.resource)?.name }
+            return [.blocked(ResourceExtractionRules.playerCopy(for: refusal, resourceName: name))]
         }
-        run.map[run.playerPosition].content = node.isExhausted ? .empty : .node(node)
-
-        var events: [Event] = [.harvested(node.resource, amount: harvested, exhausted: node.isExhausted)]
-        if let secondary = node.secondaryResource, node.secondaryYieldPerHarvest > 0 {
-            events.append(.harvested(secondary, amount: node.secondaryYieldPerHarvest,
-                                     exhausted: node.isExhausted))
-        }
-        state.worlds.activeRun = run
-        events.append(contentsOf: advanceTurn(in: &state))
-        return events
     }
 
     /// Use every instrument in the field kit at once. The readings become permanent knowledge and

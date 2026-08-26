@@ -292,8 +292,18 @@ extension GameStore {
     }
 
     var harvestableHere: ResourceNode? {
-        guard case .node(let node) = tileUnderPlayer?.content, !node.isExhausted else { return nil }
+        guard let (_, node) = ResourceExtractionRules.selectedDisclosedNode(in: state),
+              !node.isExhausted else { return nil }
         return node
+    }
+
+    var resourceExtractionEvaluation: ResourceExtractionRules.ResourceExtractionEvaluation {
+        ResourceExtractionRules.evaluate(in: state)
+    }
+
+    var canExtractResource: Bool {
+        if case .available = resourceExtractionEvaluation { return true }
+        return false
     }
 
     var canPortalHere: Bool { tileUnderPlayer?.content.isPortal ?? false }
@@ -629,7 +639,7 @@ extension GameStore {
 
     /// One pull from the node underfoot.
     func harvest() {
-        guard harvestableHere != nil, activeRun?.activeEncounter == nil else { return }
+        guard canExtractResource else { return }
         guard let attempt = beginWorldFieldAttempt(.harvest) else { return }
         var events: [WorldRules.Event] = []
         mutate("harvest", flush: true, scope: .expedition) { state in

@@ -46,6 +46,7 @@ struct WorldFieldContextReceiptV1: Equatable, Sendable {
         let interaction: Interaction
         let interactionState: InteractionState
         let encounterBlocksInteraction = run.activeEncounter != nil
+        let extractionTarget = ResourceExtractionRules.selectedDisclosedNode(in: state)
         let offeredPages = run.offeredWorldPages.filter {
             $0.fieldProvenance?.position == run.playerPosition
         }
@@ -55,6 +56,17 @@ struct WorldFieldContextReceiptV1: Equatable, Sendable {
             interactionState = encounterBlocksInteraction
                 ? .unavailable(reason: "Finish the encounter first.")
                 : .available
+        } else if let (_, node) = extractionTarget {
+            content = .node(name: ContentCatalog.shared.resource(node.resource)?.name ?? "Unknown resource")
+            interaction = .harvest
+            switch ResourceExtractionRules.evaluate(in: state) {
+            case .available:
+                interactionState = .available
+            case .refused(let refusal):
+                interactionState = .unavailable(reason: ResourceExtractionRules.playerCopy(
+                    for: refusal,
+                    resourceName: ContentCatalog.shared.resource(node.resource)?.name))
+            }
         } else { switch tile.content {
         case .empty:
             content = .none
