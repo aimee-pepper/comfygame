@@ -67,8 +67,7 @@ enum ResourceExtractionRules {
 
     /// Geometry only. Equipment, disclosure, enemies and route reachability deliberately do not enter.
     static func legalInteractionPositions(nodePoint: GridPoint, map: WorldMap) -> [GridPoint] {
-        guard map.contains(nodePoint), case .node(let node) = map[nodePoint].content,
-              !node.isExhausted else { return [] }
+        guard map.contains(nodePoint), case .node = map[nodePoint].content else { return [] }
         return ([nodePoint] + map.neighbours(of: nodePoint))
             .filter { map[$0].isPassable }
             .sorted { map.index(of: $0) < map.index(of: $1) }
@@ -97,26 +96,22 @@ enum ResourceExtractionRules {
         guard let run = state.worlds.activeRun else { return .refused(.noActiveWorld) }
         guard run.activeEncounter == nil else { return .refused(.encounterActive) }
 
-        let visibleNodes = disclosedCandidatePoints(in: run)
-        guard let target = visibleNodes.first(where: {
-            if case .node(let node) = run.map[$0].content { return !node.isExhausted }
-            return false
-        }) else {
-            let hasExhausted = visibleNodes.contains {
-                if case .node(let node) = run.map[$0].content { return node.isExhausted }
-                return false
-            }
-            return .refused(hasExhausted ? .exhausted : .noDisclosedNode)
+        guard let target = selectedDisclosedNode(in: state)?.0 else {
+            return .refused(.noDisclosedNode)
         }
         return evaluate(nodePoint: target, in: state)
     }
 
     static func selectedDisclosedNode(in state: GameState) -> (GridPoint, ResourceNode)? {
         guard let run = state.worlds.activeRun else { return nil }
-        for point in disclosedCandidatePoints(in: run) {
-            if case .node(let node) = run.map[point].content { return (point, node) }
+        let candidates = disclosedCandidatePoints(in: run).compactMap { point -> (GridPoint, ResourceNode)? in
+            guard case .node(let node) = run.map[point].content else { return nil }
+            return (point, node)
         }
-        return nil
+        // Target ownership is shared by context, evaluate and commit staging: a live node under the
+        // party wins, otherwise the first live cardinal neighbour wins. Only when no live target
+        // exists does an exhausted node become the selected refusal target.
+        return candidates.first(where: { !$0.1.isExhausted }) ?? candidates.first
     }
 
     static func evaluate(nodePoint: GridPoint, in state: GameState)
@@ -258,9 +253,7 @@ enum ResourceExtractionRules {
         guard let receipt = node.extractionRequirement,
               receipt.rulesVersion == ResourceExtractionRequirementReceiptV1.currentRulesVersion,
               receipt.resourceID == node.resource,
-              let resource = ContentCatalog.shared.resource(node.resource),
-              resource.extractionDisposition == receipt.disposition,
-              resource.requiredExtractionRank == receipt.requiredExtractionRank else { return nil }
+              ContentCatalog.shared.resource(node.resource) != nil else { return nil }
         switch receipt.disposition {
         case .mineralNode:
             guard let rank = receipt.requiredExtractionRank, (0...4).contains(rank) else { return nil }

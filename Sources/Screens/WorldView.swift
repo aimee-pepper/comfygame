@@ -1289,16 +1289,29 @@ struct WorldView: View {
     }
 
     private var canInteract: Bool {
-        store.canExtractResource || store.searchableHere != nil || store.canPortalHere
+        store.canExtractResource || hasActionableExtractionRefusal
+            || store.searchableHere != nil || store.canPortalHere
             || store.canLeaveMalformedOlderWorld
             || (store.isOnLockedCache && store.carriedCacheKey != nil)
             || store.canUseNaturalAnchor || store.canPlaceAnchorFrame || store.canSurvey
             || store.offeredWorldPageHere != nil
     }
 
+    private var hasActionableExtractionRefusal: Bool {
+        if case .refused(.underEquipped) = store.resourceExtractionEvaluation { return true }
+        return false
+    }
+
     private var useTileUnavailableReason: String { "There is nothing to use here." }
 
     private func interactionDetail(in run: WorldRun) -> String {
+        if case .refused(let refusal) = store.resourceExtractionEvaluation,
+           case .underEquipped = refusal,
+           let (_, node) = ResourceExtractionRules.selectedDisclosedNode(in: store.state) {
+            return ResourceExtractionRules.playerCopy(
+                for: refusal,
+                resourceName: ContentCatalog.shared.resource(node.resource)?.name)
+        }
         if let node = store.harvestableHere {
             return "Harvest \(ContentCatalog.shared.resource(node.resource)?.name ?? "resource") · \(node.remainingHarvests) left"
         }
@@ -1340,9 +1353,20 @@ struct WorldView: View {
             case .inspected, .swapped:
                 return .refused(.rules("That page action is no longer current."))
             }
-        } else if store.canExtractResource {
-            completeInteraction(); store.harvest()
-            return .completed(.usedTile("Harvested"))
+        } else if store.canExtractResource || hasActionableExtractionRefusal {
+            let wasAvailable = store.canExtractResource
+            let refusalCopy: String? = {
+                guard case .refused(let refusal) = store.resourceExtractionEvaluation,
+                      let (_, node) = ResourceExtractionRules.selectedDisclosedNode(in: store.state)
+                else { return nil }
+                return ResourceExtractionRules.playerCopy(
+                    for: refusal,
+                    resourceName: ContentCatalog.shared.resource(node.resource)?.name)
+            }()
+            if wasAvailable { completeInteraction() }
+            store.harvest()
+            if wasAvailable { return .completed(.usedTile("Harvested")) }
+            return .refused(.rules(refusalCopy ?? useTileUnavailableReason))
         } else if store.searchableHere != nil {
             completeInteraction(); store.searchSite()
             return .completed(.usedTile("Searched site"))

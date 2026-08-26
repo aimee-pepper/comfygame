@@ -3648,6 +3648,106 @@ final class WorldTests: XCTestCase {
         XCTAssertFalse(positions.contains(blocked))
         XCTAssertEqual(positions, positions.sorted { map.index(of: $0) < map.index(of: $1) })
         XCTAssertTrue(positions.allSatisfy { abs($0.x - center.x) + abs($0.y - center.y) == 1 })
+
+        let baseline = positions
+        guard case .node(var exhausted) = map[center].content else {
+            return XCTFail("fixture must retain its node")
+        }
+        exhausted.remainingHarvests = 0
+        map[center].content = .node(exhausted)
+        map[center].isRevealed = true
+        XCTAssertEqual(ResourceExtractionRules.legalInteractionPositions(nodePoint: center, map: map),
+                       baseline, "geometry cannot depend on node life or disclosure")
+    }
+
+    func testFrozenExtractionReceiptSurvivesLaterCatalogueRankTuning() throws {
+        var state = startedRun(book(["terrain": "plains"]), seed: 31_205)
+        let point = try XCTUnwrap(state.worlds.activeRun).playerPosition
+        var node = ResourceNode(resource: Resources.ore, remainingHarvests: 1, yieldPerHarvest: 2)
+        node.extractionRequirement = .init(resourceID: Resources.ore,
+                                           disposition: .mineralNode,
+                                           requiredExtractionRank: 4)
+        state.worlds.activeRun?.map[point].isRevealed = true
+        state.worlds.activeRun?.map[point].content = .node(node)
+
+        let relaunched = try SaveCodec.decode(SaveCodec.encode(state))
+        guard case .node(let frozen) = try XCTUnwrap(relaunched.worlds.activeRun).map[point].content else {
+            return XCTFail("frozen node must relaunch")
+        }
+        XCTAssertEqual(ResourceExtractionRules.validatedRequirement(of: frozen)?.requiredExtractionRank, 4)
+        guard case .refused(.underEquipped(let required, let current, _)) =
+                ResourceExtractionRules.evaluate(in: relaunched) else {
+            return XCTFail("the frozen rank, not today's catalogue rank, must own play")
+        }
+        XCTAssertEqual(required, 4)
+        XCTAssertEqual(current, 0)
+    }
+
+    func testResourceExtractionSharedTargetSkipsExhaustedUnderPartyForLiveAdjacent() throws {
+        var state = startedRun(book(["terrain": "plains"]), seed: 31_206)
+        var run = try XCTUnwrap(state.worlds.activeRun)
+        let player = run.playerPosition
+        let adjacent = try XCTUnwrap(run.map.neighbours(of: player)
+            .sorted { run.map.index(of: $0) < run.map.index(of: $1) }.first)
+        for point in [player, adjacent] {
+            run.map[point].ground = .soil
+            run.map[point].isCrumbled = false
+            run.map[point].isRevealed = true
+        }
+        run.map[player].content = .node(ResourceNode(
+            resource: "clay", remainingHarvests: 0, yieldPerHarvest: 1))
+        run.map[adjacent].content = .node(ResourceNode(
+            resource: Resources.ore, remainingHarvests: 1, yieldPerHarvest: 2))
+        state.worlds.activeRun = run
+
+        XCTAssertEqual(ResourceExtractionRules.selectedDisclosedNode(in: state)?.0, adjacent)
+        guard case .available(let quote) = ResourceExtractionRules.evaluate(in: state) else {
+            return XCTFail("the shared live adjacent target must be available")
+        }
+        XCTAssertEqual(quote.nodePoint, adjacent)
+        let context = try XCTUnwrap(WorldFieldContextReceiptV1.make(from: state))
+        XCTAssertEqual(context.contentSummary, .node(name: "Iron Ore"))
+        XCTAssertEqual(context.interaction, .harvest)
+        XCTAssertEqual(context.interactionState, .available)
+    }
+
+    @MainActor
+    func testMountedUnderEquippedUseTileReturnsTypedRefusalWithoutMutation() throws {
+        let store = GameStore(io: .temporary(name: "under-equipped-mounted-\(UUID().uuidString)"))
+        store.mutate("test under-equipped mounted") { state in
+            state = startedRun(book(["terrain": "plains"]), seed: 31_207)
+            let point = state.worlds.activeRun!.playerPosition
+            state.worlds.activeRun?.map[point].isRevealed = true
+            state.worlds.activeRun?.map[point].content = .node(ResourceNode(
+                resource: "adamant", remainingHarvests: 2, yieldPerHarvest: 5))
+        }
+        let controller = UIHostingController(rootView:
+            WorldView().environmentObject(store).frame(width: 368, height: 800))
+        let window = UIWindow(frame: .init(x: 0, y: 0, width: 368, height: 800))
+        window.rootViewController = controller; window.makeKeyAndVisible()
+        controller.view.frame = window.bounds; controller.view.layoutIfNeeded()
+        let button = try XCTUnwrap(descendants(controller.view)
+            .compactMap { $0 as? WorldControlHitOwner.ControlButton }
+            .first { $0.worldAction == .useTile })
+        XCTAssertNil(button.worldDisabledReason,
+                     "under-equipped extraction must remain actionable for its typed refusal")
+        let before = try SaveCodec.encode(store.state)
+        let beforeTurn = store.activeRun?.turnsTaken
+        button.sendActions(for: .touchDown); button.sendActions(for: .touchUpInside)
+        let deadline = Date().addingTimeInterval(1)
+        while store.worldFieldEventQueue.isEmpty && Date() < deadline {
+            RunLoop.main.run(until: Date().addingTimeInterval(0.005))
+        }
+        XCTAssertEqual(store.worldFieldEventQueue.last?.orderedNarrations,
+                       ["Adamant needs Extraction 4. Your party has Extraction 0."])
+        XCTAssertEqual(try SaveCodec.encode(store.state), before)
+        XCTAssertEqual(store.activeRun?.turnsTaken, beforeTurn)
+        guard case .node(let unchanged) = try XCTUnwrap(store.activeRun)
+            .map[store.activeRun!.playerPosition].content else {
+            return XCTFail("refusal must preserve the node")
+        }
+        XCTAssertEqual(unchanged.remainingHarvests, 2)
+        window.isHidden = true
     }
 
     func testResourceExtractionSelectsUnderPartyThenAdjacentRowMajorAndBindsTarget() throws {

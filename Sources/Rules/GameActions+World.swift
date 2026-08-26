@@ -639,8 +639,19 @@ extension GameStore {
 
     /// One pull from the node underfoot.
     func harvest() {
-        guard canExtractResource else { return }
+        let evaluation = resourceExtractionEvaluation
+        switch evaluation {
+        case .available, .refused(.underEquipped): break
+        case .refused: return
+        }
         guard let attempt = beginWorldFieldAttempt(.harvest) else { return }
+        if case .refused(let refusal) = evaluation {
+            let name = ResourceExtractionRules.selectedDisclosedNode(in: state)
+                .flatMap { ContentCatalog.shared.resource($0.1.resource)?.name }
+            finishTurn([.blocked(ResourceExtractionRules.playerCopy(
+                for: refusal, resourceName: name))], attempt: attempt)
+            return
+        }
         var events: [WorldRules.Event] = []
         mutate("harvest", flush: true, scope: .expedition) { state in
             events = WorldRules.harvest(in: &state)
