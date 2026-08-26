@@ -9,6 +9,7 @@ final class PersistenceTests: XCTestCase {
         {
           "schemaVersion":1,
           "base":{
+            "roster":[{"name":"Quill"}],
             "essence":37,
             "inventory":{"slots":1,"stacks":[
               {"id":{"rawValue":41},"catalogID":"essence_crystal","count":2,"identified":true},
@@ -42,6 +43,7 @@ final class PersistenceTests: XCTestCase {
         {
           "schemaVersion":1,
           "base":{
+            "roster":[{"name":"Quill"}],
             "essence":12,
             "inventory":{"slots":8,"stacks":[
               {"id":{"rawValue":801},"catalogID":"salve_lesser","count":1,"identified":true}
@@ -77,7 +79,7 @@ final class PersistenceTests: XCTestCase {
 
         for (name, rawValue) in malformedValues {
             let existingCrystal = Data(#"""
-            {"schemaVersion":1,"base":{"essence":4,"essenceCrystals":{
+            {"schemaVersion":1,"base":{"roster":[{"name":"Quill"}],"essence":4,"essenceCrystals":{
               "id":{"rawValue":\#(rawValue)},"catalogID":"essence_crystal",
               "count":2,"identified":true
             },"inventory":{"slots":8,"stacks":[]}}}
@@ -85,7 +87,7 @@ final class PersistenceTests: XCTestCase {
             XCTAssertThrowsError(try SaveCodec.decode(existingCrystal), "existing crystal: \(name)")
 
             let allocation = Data(#"""
-            {"schemaVersion":1,"base":{"essence":4,"inventory":{"slots":8,"stacks":[{
+            {"schemaVersion":1,"base":{"roster":[{"name":"Quill"}],"essence":4,"inventory":{"slots":8,"stacks":[{
               "id":{"rawValue":\#(rawValue)},"catalogID":"salve_lesser",
               "count":1,"identified":true
             }]}}}
@@ -109,7 +111,19 @@ final class PersistenceTests: XCTestCase {
         root["schemaVersion"] = 1
         var base = try XCTUnwrap(root["base"] as? [String: Any])
         base["essence"] = 11
+        base["activeParty"] = [0]
+        if var roster = base["roster"] as? [[String: Any]] {
+            for index in roster.indices { roster[index].removeValue(forKey: "persistentID") }
+            base["roster"] = roster
+        }
         root["base"] = base
+        if var worlds = root["worlds"] as? [String: Any],
+           var activeRun = worlds["activeRun"] as? [String: Any] {
+            activeRun.removeValue(forKey: "companionHP")
+            activeRun.removeValue(forKey: "healthCaps")
+            worlds["activeRun"] = activeRun
+            root["worlds"] = worlds
+        }
 
         let migrated = try SaveCodec.decode(JSONSerialization.data(withJSONObject: root))
         XCTAssertEqual(migrated.base.essenceCrystalCount, 15)
@@ -154,6 +168,72 @@ final class PersistenceTests: XCTestCase {
         let original = legacy
         XCTAssertThrowsError(try SaveCodec.decode(legacy))
         XCTAssertEqual(legacy, original, "failed migration must not rewrite source bytes")
+    }
+
+    func testSchemaTwoMigrationTransformsEveryNestedDurablePartyOwnerFromOneValidatedRoster() throws {
+        let legacy = Data(#"""
+        {"schemaVersion":2,
+         "base":{"roster":[{"name":"Quill"},{"name":"Mara","traveller":"mara"}],
+                 "activeParty":[0,1],"activeCompanion":1},
+         "worlds":{"anchoredRealms":[{"assignedCompanions":[1]}],
+                   "activeRun":{"companionHP":{"0":12,"1":9},
+                     "activeEncounter":{"partyNames":{"0":"Quill","1":"Mara"},
+                       "turn":{"actor":{"companion":{"_0":1}}},
+                       "action":{"skill":{"ally":{"companion":{"_0":0}}}},
+                       "owner":{"member":{"_0":1}},
+                       "cooldowns":{"companion-1|quick_step":2}}}}}
+        """#.utf8)
+
+        let migrated = try Migrations.migrateIfNeeded(legacy)
+        let root = try XCTUnwrap(JSONSerialization.jsonObject(with: migrated) as? [String: Any])
+        let base = try XCTUnwrap(root["base"] as? [String: Any])
+        XCTAssertEqual(base["activeParty"] as? [String], ["founder:quill", "traveller:mara"])
+        XCTAssertEqual(base["activeCompanion"] as? String, "traveller:mara")
+        let roster = try XCTUnwrap(base["roster"] as? [[String: Any]])
+        XCTAssertEqual(roster.compactMap { $0["persistentID"] as? String },
+                       ["founder:quill", "traveller:mara"])
+
+        let worlds = try XCTUnwrap(root["worlds"] as? [String: Any])
+        let realms = try XCTUnwrap(worlds["anchoredRealms"] as? [[String: Any]])
+        XCTAssertEqual(realms[0]["assignedCompanions"] as? [String], ["traveller:mara"])
+        let run = try XCTUnwrap(worlds["activeRun"] as? [String: Any])
+        let hp = try XCTUnwrap(run["companionHP"] as? [Any])
+        XCTAssertTrue(hp.contains { ($0 as? String) == "founder:quill" })
+        XCTAssertTrue(hp.contains { ($0 as? String) == "traveller:mara" })
+        let encounter = try XCTUnwrap(run["activeEncounter"] as? [String: Any])
+        let names = try XCTUnwrap(encounter["partyNames"] as? [Any])
+        XCTAssertTrue(names.contains { ($0 as? String) == "traveller:mara" })
+        let turn = try XCTUnwrap(encounter["turn"] as? [String: Any])
+        let actor = try XCTUnwrap(turn["actor"] as? [String: Any])
+        let companion = try XCTUnwrap(actor["companion"] as? [String: Any])
+        XCTAssertEqual(companion["_0"] as? String, "traveller:mara")
+        let action = try XCTUnwrap(encounter["action"] as? [String: Any])
+        let skill = try XCTUnwrap(action["skill"] as? [String: Any])
+        let ally = try XCTUnwrap(skill["ally"] as? [String: Any])
+        let founder = try XCTUnwrap(ally["companion"] as? [String: Any])
+        XCTAssertEqual(founder["_0"] as? String, "founder:quill")
+        let owner = try XCTUnwrap(encounter["owner"] as? [String: Any])
+        let member = try XCTUnwrap(owner["member"] as? [String: Any])
+        XCTAssertEqual(member["_0"] as? String, "traveller:mara")
+        let cooldowns = try XCTUnwrap(encounter["cooldowns"] as? [String: Any])
+        XCTAssertEqual(cooldowns["party-traveller:mara|quick_step"] as? Int, 2)
+    }
+
+    func testSchemaTwoMigrationRejectsCorruptRosterAndNestedReferencesBeforeWriting() {
+        let invalid = [
+            #"{"schemaVersion":2,"base":{"roster":[{"name":"Mara","traveller":"mara"}],"activeParty":[0]}}"#,
+            #"{"schemaVersion":2,"base":{"roster":[{"name":"Not Quill"}],"activeParty":[0]}}"#,
+            #"{"schemaVersion":2,"base":{"roster":[{"name":"Quill"},{"name":"Unknown","traveller":"not_in_catalogue"}],"activeParty":[1]}}"#,
+            #"{"schemaVersion":2,"base":{"roster":[{"name":"Quill"},{"name":"Mara","traveller":"mara"},{"name":"Again","traveller":"mara"}],"activeParty":[1]}}"#,
+            #"{"schemaVersion":2,"base":{"roster":[{"name":"Quill"},{"name":"Empty","traveller":""}],"activeParty":[1]}}"#,
+            #"{"schemaVersion":2,"base":{"roster":[{"name":"Quill"},{"name":"Mara","traveller":"mara"}],"activeParty":[0]},"worlds":{"activeRun":{"activeEncounter":{"turn":{"actor":{"companion":{"_0":7}}}}}}}"#
+        ]
+        for source in invalid {
+            let bytes = Data(source.utf8)
+            let original = bytes
+            XCTAssertThrowsError(try Migrations.migrateIfNeeded(bytes), source)
+            XCTAssertEqual(bytes, original)
+        }
     }
 
     func testPhysicalCrystalWalletIsCapacityNeutralAtomicAndRelaunchStable() throws {
@@ -540,7 +620,7 @@ final class PersistenceTests: XCTestCase {
     /// Adding a field to a layer must not cost a player their save.
     func testSaveMissingAWholeLayerStillLoads() throws {
         let partial = """
-        { "schemaVersion": 1, "base": { "essence": 77 } }
+        { "schemaVersion": 1, "base": { "roster":[{"name":"Quill"}], "essence": 77 } }
         """
         try FileManager.default.createDirectory(at: io.directory, withIntermediateDirectories: true)
         try Data(partial.utf8).write(to: io.saveURL)

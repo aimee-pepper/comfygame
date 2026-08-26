@@ -50,6 +50,7 @@ final class SaveSlotTests: XCTestCase {
         {
           "schemaVersion":1,
           "base":{
+            "roster":[{"name":"Quill"}],
             "essence":19,
             "inventory":{"slots":8,"stacks":[
               {"id":{"rawValue":1201},"catalogID":"salve_lesser","count":1,"identified":true}
@@ -101,22 +102,29 @@ final class SaveSlotTests: XCTestCase {
     }
 
     func testSaveSlotUnknownLegacyPartyActorFailsWithoutRewritingEnvelope() async throws {
-        let root = directory()
-        defer { try? FileManager.default.removeItem(at: root) }
-        let slots = SaveSlotFileIO(directory: root)
-        let created = try await slots.create(name: "Corrupt party")
-        let url = try await slots.exportURL(for: created.metadata.id)
-        var envelope = try SaveCodec.makeDecoder().decode(
-            SaveSlotEnvelope.self, from: Data(contentsOf: url))
-        envelope.payload = Data(#"""
-        {"schemaVersion":2,"base":{"roster":[{"name":"Quill"}],"activeParty":[4]}}
-        """#.utf8)
-        let bytes = try encoder().encode(envelope)
-        try bytes.write(to: url, options: .atomic)
+        let payloads = [
+            #"{"schemaVersion":2,"base":{"roster":[{"name":"Quill"}],"activeParty":[4]}}"#,
+            #"{"schemaVersion":2,"base":{"roster":[{"name":"Mara","traveller":"mara"}],"activeParty":[0]}}"#,
+            #"{"schemaVersion":2,"base":{"roster":[{"name":"Quill"},{"name":"Unknown","traveller":"missing"}],"activeParty":[1]}}"#,
+            #"{"schemaVersion":2,"base":{"roster":[{"name":"Quill"},{"name":"Mara","traveller":"mara"},{"name":"Again","traveller":"mara"}],"activeParty":[1]}}"#,
+            #"{"schemaVersion":2,"base":{"roster":[{"name":"Quill"},{"name":"Mara","traveller":"mara"}],"activeParty":[0]},"worlds":{"activeRun":{"activeEncounter":{"actor":{"companion":{"_0":8}}}}}}"#
+        ]
+        for payload in payloads {
+            let root = directory()
+            defer { try? FileManager.default.removeItem(at: root) }
+            let slots = SaveSlotFileIO(directory: root)
+            let created = try await slots.create(name: "Corrupt party")
+            let url = try await slots.exportURL(for: created.metadata.id)
+            var envelope = try SaveCodec.makeDecoder().decode(
+                SaveSlotEnvelope.self, from: Data(contentsOf: url))
+            envelope.payload = Data(payload.utf8)
+            let bytes = try encoder().encode(envelope)
+            try bytes.write(to: url, options: .atomic)
 
-        do { _ = try await slots.load(created.metadata.id); XCTFail("Expected corrupt migration") }
-        catch { }
-        XCTAssertEqual(try Data(contentsOf: url), bytes)
+            do { _ = try await slots.load(created.metadata.id); XCTFail("Expected corrupt migration") }
+            catch { }
+            XCTAssertEqual(try Data(contentsOf: url), bytes)
+        }
     }
 
     func testSaveSlotMigrationRejectsMalformedItemStackIDsWithoutRewritingEnvelope() async throws {
@@ -141,7 +149,7 @@ final class SaveSlotTests: XCTestCase {
                     ? #""essenceCrystals":{"id":{"rawValue":\#(rawValue)},"catalogID":"essence_crystal","count":2,"identified":true},"#
                     : #""inventory":{"slots":8,"stacks":[{"id":{"rawValue":\#(rawValue)},"catalogID":"salve_lesser","count":1,"identified":true}]},"#
                 envelope.payload = Data(#"""
-                {"schemaVersion":1,"base":{"essence":7,\#(stack)"goldCoins":3}}
+                {"schemaVersion":1,"base":{"roster":[{"name":"Quill"}],"essence":7,\#(stack)"goldCoins":3}}
                 """#.utf8)
                 let originalEnvelope = try encoder().encode(envelope)
                 try originalEnvelope.write(to: url, options: .atomic)

@@ -174,6 +174,29 @@ enum Migrations {
                   let string = object["rawValue"] as? String, !string.isEmpty else { return nil }
             return string
         }
+        // Validate the complete roster before transforming a single durable reference. A v2
+        // position is meaningful only relative to this exact canonical identity table.
+        guard !roster.isEmpty,
+              travellerRawValue(roster[0]["traveller"]) == nil,
+              roster[0]["name"] as? String == "Quill" else {
+            throw CocoaError(.coderInvalidValue)
+        }
+        var rosterIDs: Set<String> = ["founder:quill"]
+        for index in roster.indices.dropFirst() {
+            guard let rawTraveller = travellerRawValue(roster[index]["traveller"]),
+                  ContentCatalog.shared.traveller(TravellerID(rawValue: rawTraveller)) != nil else {
+                throw CocoaError(.coderInvalidValue)
+            }
+            let id = "traveller:\(rawTraveller)"
+            guard rosterIDs.insert(id).inserted else { throw CocoaError(.coderInvalidValue) }
+            if let encoded = roster[index]["persistentID"] as? String, encoded != id {
+                throw CocoaError(.coderInvalidValue)
+            }
+        }
+        if let encodedFounder = roster[0]["persistentID"] as? String,
+           encodedFounder != "founder:quill" {
+            throw CocoaError(.coderInvalidValue)
+        }
         func identity(for value: Any) throws -> String {
             guard let number = value as? NSNumber,
                   CFGetTypeID(number) != CFBooleanGetTypeID(),
@@ -199,22 +222,18 @@ enum Migrations {
             guard var payload = value as? [String: Any], let legacy = payload["_0"] else {
                 throw CocoaError(.coderInvalidValue)
             }
-            if legacy is String { return payload }
             payload["_0"] = try identity(for: legacy)
             return payload
         }
         func migrate(_ value: Any, key: String? = nil) throws -> Any {
             if let array = value as? [Any] {
                 if key == "activeParty" || key == "assignedCompanions" {
-                    return try array.map { element in
-                        if element is String { return element }
-                        return try identity(for: element)
-                    }
+                    return try array.map(identity(for:))
                 }
                 return try array.map { try migrate($0) }
             }
             guard let object = value as? [String: Any] else {
-                if key == "activeCompanion", !(value is String) { return try identity(for: value) }
+                if key == "activeCompanion" { return try identity(for: value) }
                 return value
             }
 
