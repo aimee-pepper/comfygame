@@ -941,7 +941,8 @@ extension GameStore {
     }
 
     nonisolated private static func receiptLines(
-        for stack: ItemStack, outcomeID: ExpeditionOutcomeID, side: String
+        for stack: ItemStack, outcomeID: ExpeditionOutcomeID, side: String,
+        recoveredDestination: RunExitSummary.ReceiptLine.RecoveredItemDestination? = nil
     ) -> [RunExitSummary.ReceiptLine] {
         if !stack.materials.isEmpty {
             return stack.materials.enumerated().map { index, sample in
@@ -949,13 +950,15 @@ extension GameStore {
                     lineID: "\(outcomeID.rawValue)-\(side)-\(stack.id.rawValue)-\(index)",
                     sourceStackID: stack.id,
                     catalogID: stack.catalogID, sample: sample, identified: stack.identified,
-                    fallbackName: stack.displayName, fallbackIcon: stack.icon))
+                    fallbackName: stack.displayName, fallbackIcon: stack.icon,
+                    recoveredDestination: recoveredDestination))
             }
         }
         let frozen = RunExitSummary.ReceiptLine.Item(
             lineID: "\(outcomeID.rawValue)-\(side)-\(stack.id.rawValue)",
             instanceID: stack.id, snapshot: stack, quantity: stack.count,
-            fallbackName: stack.displayName, fallbackIcon: stack.icon)
+            fallbackName: stack.displayName, fallbackIcon: stack.icon,
+            recoveredDestination: recoveredDestination)
         let isUnique = stack.gearProfile != nil || stack.distilledCore != nil
             || stack.upgradeLevel != 0 || stack.wildGrowth != 0
             || stack.isFavorite || stack.isLocked
@@ -1023,7 +1026,8 @@ extension GameStore {
                     lineID: "\(outcomeID.rawValue)-\(side)-\(unit.id.rawValue)",
                     sourceStackID: nil, reserveUnitID: unit.id,
                     catalogID: Items.material, sample: unit.sample, identified: true,
-                    fallbackName: unit.sample.displayName, fallbackIcon: unit.sample.kind.icon))
+                    fallbackName: unit.sample.displayName, fallbackIcon: unit.sample.kind.icon,
+                    recoveredDestination: side == "recovered" ? .stored : nil))
             }
         }
         for var unit in materialPartition.kept.units {
@@ -1064,17 +1068,24 @@ extension GameStore {
         let lostItemGains = lostStacks.map {
             RunExitGain(name: $0.displayName, icon: $0.icon, count: $0.count)
         }
-        let recoveredItemLines = kept.stacks.filter { $0.count > 0 }.flatMap {
-            receiptLines(for: $0, outcomeID: outcomeID, side: "recovered")
-        }
         let lostItemLines = lostStacks.filter { $0.count > 0 }.flatMap {
             receiptLines(for: $0, outcomeID: outcomeID, side: "lost")
         }
+        var recoveredItemLines: [RunExitSummary.ReceiptLine] = []
         for var stack in kept.stacks {
+            let frozenStack = stack
             stack.protectedReturnCount = 0
-            guard !state.base.inventory.add(stack) else { continue }
-            // Full Storehouse. It waits rather than evaporating — see `BaseState.spillover`.
-            state.base.spillover.append(stack)
+            let destination: RunExitSummary.ReceiptLine.RecoveredItemDestination
+            if state.base.inventory.add(stack) {
+                destination = .stored
+            } else {
+                // Full Storehouse. It waits rather than evaporating — see `BaseState.spillover`.
+                state.base.spillover.append(stack)
+                destination = .waitingToSort
+            }
+            recoveredItemLines += receiptLines(
+                for: frozenStack, outcomeID: outcomeID, side: "recovered",
+                recoveredDestination: destination)
         }
         let isFirstBankForOutcome = outcomeID.rawValue > 0
             && !state.worlds.worldPageBankedOutcomeIDs.contains(outcomeID)

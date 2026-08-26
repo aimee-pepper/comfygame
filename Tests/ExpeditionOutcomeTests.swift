@@ -374,7 +374,7 @@ final class ExpeditionOutcomeTests: XCTestCase {
     }
     private func fundedStore(_ name: String = #function) -> GameStore {
         let store = GameStore(io: .temporary(name: "outcome-\(name)-\(UUID().uuidString)"))
-        store.mutate("fixture: fund") { $0.base.essence = 5_000 }
+        store.mutate("fixture: fund") { $0.base.addEssenceCrystals(5_000) }
         return store
     }
 
@@ -647,6 +647,160 @@ final class ExpeditionOutcomeTests: XCTestCase {
             GameState.self, from: SaveCodec.makeEncoder().encode(store.state))
         XCTAssertEqual(restored.worlds.lastExit?.recoveredLines, summary.recoveredLines)
     }
+
+    func testReturnReceiptFreezesStoredAndWaitingDestinationsAtBankTime() throws {
+        var stored = ItemStack(id: InstanceID(rawValue: 71), catalogID: "blade_keen")
+        stored.upgradeLevel = 1
+        stored.protectedReturnCount = 1
+        stored.isFavorite = true
+        var waiting = ItemStack(id: InstanceID(rawValue: 72), catalogID: "shield_plain")
+        waiting.upgradeLevel = 1
+        waiting.identified = false
+        waiting.isLocked = true
+        var run = departureRun()
+        run.satchelItems.stacks = [stored, waiting]
+        var bankedState = GameState.newGame()
+        bankedState.base.inventory = Inventory(slots: 1)
+        bankedState.base.spillover = []
+        let banked = GameStore.bankHaul(of: run, outcomeID: 82,
+                                        into: &bankedState, fraction: 1)
+        let summary = RunExitSummary(
+            runIndex: run.runIndex, outcomeID: 82, kind: .portal, reason: "fixture",
+            turnsTaken: run.turnsTaken, haulKeptFraction: 1,
+            recoveredLines: banked.recoveredLines, lostLines: banked.lostLines)
+        bankedState.worlds.lastExit = summary
+        let items = summary.recoveredLines.compactMap { line -> RunExitSummary.ReceiptLine.Item? in
+            switch line {
+            case .stackableItem(let item), .uniqueItem(let item): item
+            case .resource, .materialSample, .legacy: nil
+            }
+        }
+        XCTAssertEqual(Set(items.map(\.instanceID)), [stored.id, waiting.id])
+        XCTAssertEqual(items.map(\.recoveredDestination), [.stored, .waitingToSort])
+        var returnedStored = stored
+        returnedStored.protectedReturnCount = 0
+        XCTAssertEqual(items.first { $0.instanceID == stored.id }?.snapshot, returnedStored,
+                       "protection guarantees banking and is cleared by the existing return rule")
+        XCTAssertEqual(items.first { $0.instanceID == waiting.id }?.snapshot, waiting)
+        XCTAssertEqual(bankedState.base.inventory.stacks.map(\.id), [items[0].instanceID],
+                       "the first rules-partitioned return must receive the first available slot")
+        XCTAssertEqual(bankedState.base.spillover.map(\.id), [items[1].instanceID],
+                       "the next rules-partitioned return must retain overflow ownership")
+
+        bankedState.base.inventory.stacks = [waiting]
+        bankedState.base.spillover = [stored]
+        XCTAssertEqual(bankedState.worlds.lastExit?.recoveredLines, summary.recoveredLines,
+                       "the immutable receipt must not reconstruct destination from current storage")
+
+        let restored = try SaveCodec.makeDecoder().decode(
+            GameState.self, from: SaveCodec.makeEncoder().encode(bankedState))
+        XCTAssertEqual(restored.worlds.lastExit?.recoveredLines, summary.recoveredLines)
+
+        var lossRun = run
+        lossRun.satchelItems.stacks = [waiting]
+        var allLostState = GameState.newGame()
+        let allLost = GameStore.bankHaul(of: lossRun, outcomeID: 83,
+                                         into: &allLostState, fraction: 0)
+        XCTAssertTrue(allLost.recoveredLines.isEmpty)
+        XCTAssertTrue(allLost.lostLines.allSatisfy { $0.recoveredItemDestination == nil },
+                      "lost-side receipt lines retain their existing Return disposition")
+    }
+
+    func testRecoveredMaterialDestinationsAreFrozenWithoutChangingReserveBanking() throws {
+        var run = departureRun()
+        let sample = MaterialSample(kind: .hide, properties: .init(flexibility: 55),
+                                    grade: 63, source: "receipt fixture")
+        let unitID = MaterialReserveUnitID(rawValue: "receipt-hide")
+        run.materialReserve.add(MaterialReserveUnit(id: unitID, sample: sample))
+        var state = GameState.newGame()
+
+        let banked = GameStore.bankHaul(of: run, outcomeID: 81, into: &state, fraction: 1)
+        let material = try XCTUnwrap(banked.recoveredLines.compactMap {
+            line -> RunExitSummary.ReceiptLine.Material? in
+            guard case .materialSample(let material) = line else { return nil }
+            return material
+        }.first)
+        XCTAssertEqual(material.recoveredDestination, .stored)
+        XCTAssertTrue(state.base.materialReserve.units.contains { $0.id == unitID })
+    }
+
+    func testLegacyTypedRecoveredItemDecodesWithDestinationNotRecorded() throws {
+        let item = RunExitSummary.ReceiptLine.Item(
+            lineID: "legacy-typed", instanceID: .init(rawValue: 91),
+            snapshot: ItemStack(id: .init(rawValue: 91), catalogID: "blade_keen"), quantity: 1,
+            fallbackName: "Keen blade", fallbackIcon: "shield")
+        let summary = RunExitSummary(
+            runIndex: 3, kind: .portal, reason: "legacy typed receipt", turnsTaken: 2,
+            haulKeptFraction: 1, recoveredLines: [.uniqueItem(item)])
+
+        let decoded = try SaveCodec.makeDecoder().decode(
+            RunExitSummary.self, from: SaveCodec.makeEncoder().encode(summary))
+        guard case .uniqueItem(let decodedItem) = try XCTUnwrap(decoded.recoveredLines.first) else {
+            return XCTFail("expected exact typed receipt item")
+        }
+        XCTAssertNil(decodedItem.recoveredDestination,
+                     "missing additive destination means the older receipt did not record it")
+    }
+
+#if DEBUG
+    @MainActor
+    func testReturnReceiptSemanticFramesCarryExactFrozenDestinationAndSide() throws {
+        let stored = RunExitSummary.ReceiptLine.uniqueItem(.init(
+            lineID: "stored", instanceID: .init(rawValue: 101),
+            snapshot: ItemStack(id: .init(rawValue: 101), catalogID: "blade_keen"), quantity: 1,
+            fallbackName: "Stored blade", fallbackIcon: "shield",
+            recoveredDestination: .stored))
+        let waiting = RunExitSummary.ReceiptLine.stackableItem(.init(
+            lineID: "waiting", instanceID: .init(rawValue: 102),
+            snapshot: ItemStack(id: .init(rawValue: 102), catalogID: Items.essenceCrystal, count: 2), quantity: 2,
+            fallbackName: "Waiting crystals", fallbackIcon: "diamond",
+            recoveredDestination: .waitingToSort))
+        let legacyTyped = RunExitSummary.ReceiptLine.uniqueItem(.init(
+            lineID: "not-recorded", instanceID: .init(rawValue: 103),
+            snapshot: ItemStack(id: .init(rawValue: 103), catalogID: "shield_plain"), quantity: 1,
+            fallbackName: "Older shield", fallbackIcon: "shield"))
+        let lost = RunExitSummary.ReceiptLine.uniqueItem(.init(
+            lineID: "lost", instanceID: .init(rawValue: 104),
+            snapshot: ItemStack(id: .init(rawValue: 104), catalogID: "blade_keen"), quantity: 1,
+            fallbackName: "Lost blade", fallbackIcon: "shield"))
+        let summary = RunExitSummary(
+            runIndex: 9, kind: .collapse, reason: "fixture", turnsTaken: 4,
+            haulKeptFraction: 0.5, recoveredLines: [stored, waiting, legacyTyped],
+            lostLines: [lost])
+        let store = GameStore(io: .temporary(name: "return-destination-frames-\(UUID().uuidString)"))
+        store.mutate("fixture: hide tutorial") { state in
+            for lesson in TutorialLessonID.allCases {
+                state.tutorial.complete(lesson, fact: "return_destination_fixture")
+            }
+        }
+        RunExitSafeSpaceMeasurement.receiptFrames = [:]
+        let controller = UIHostingController(rootView:
+            RunExitSummaryView(summary: summary, dismiss: {}).environmentObject(store)
+                .frame(width: 368, height: 800))
+        let window = UIWindow(frame: CGRect(x: 0, y: 0, width: 368, height: 800))
+        window.rootViewController = controller
+        controller.additionalSafeAreaInsets = UIEdgeInsets(top: 59, left: 0, bottom: 34, right: 0)
+        window.makeKeyAndVisible()
+        controller.view.frame = window.bounds
+        controller.view.layoutIfNeeded()
+        RunLoop.main.run(until: Date().addingTimeInterval(0.2))
+
+        let expected: [RunExitReceiptSemanticID] = [
+            .init(side: .recovered, lineID: stored.id, destination: .stored),
+            .init(side: .recovered, lineID: waiting.id, destination: .waitingToSort),
+            .init(side: .recovered, lineID: legacyTyped.id, destination: nil),
+            .init(side: .lost, lineID: lost.id, destination: nil),
+        ]
+        for identity in expected {
+            let frame = try XCTUnwrap(RunExitSafeSpaceMeasurement.receiptFrames[identity])
+            XCTAssertGreaterThan(frame.width, 0)
+            XCTAssertGreaterThan(frame.height, 0)
+            XCTAssertGreaterThanOrEqual(frame.minY, 59)
+            XCTAssertLessThanOrEqual(frame.maxY, 766)
+        }
+        window.isHidden = true
+    }
+#endif
 
     func testOneReturnConstructorKeepsNonLossFieldsIdenticalAcrossExitKinds() throws {
         let store = fundedStore()

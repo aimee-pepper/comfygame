@@ -304,6 +304,14 @@ private struct AnchorSettlementView: View {
 @MainActor enum RunExitSafeSpaceMeasurement {
     static var scrollFrame: CGRect = .zero
     static var actionFrame: CGRect = .zero
+    static var receiptFrames: [RunExitReceiptSemanticID: CGRect] = [:]
+}
+
+struct RunExitReceiptSemanticID: Hashable, Sendable {
+    enum Side: String, Hashable, Sendable { case recovered, lost }
+    let side: Side
+    let lineID: String
+    let destination: RunExitSummary.ReceiptLine.RecoveredItemDestination?
 }
 
 private struct RunExitSafeSpaceProbe: UIViewRepresentable {
@@ -331,6 +339,28 @@ private struct RunExitSafeSpaceProbe: UIViewRepresentable {
         let view = ProbeView(frame: .zero); view.region = region; return view
     }
     func updateUIView(_ uiView: ProbeView, context: Context) { uiView.region = region }
+}
+
+private struct RunExitReceiptSemanticProbe: UIViewRepresentable {
+    let identity: RunExitReceiptSemanticID
+
+    final class ProbeView: UIView {
+        var identity = RunExitReceiptSemanticID(side: .recovered, lineID: "", destination: nil)
+        private func recordFrame() {
+            guard let window, abs(window.bounds.width - 368) < 0.5 else { return }
+            RunExitSafeSpaceMeasurement.receiptFrames[identity] = convert(bounds, to: window)
+        }
+        override func didMoveToWindow() {
+            super.didMoveToWindow()
+            DispatchQueue.main.async { [weak self] in self?.recordFrame() }
+        }
+        override func layoutSubviews() { super.layoutSubviews(); recordFrame() }
+    }
+
+    func makeUIView(context: Context) -> ProbeView {
+        let view = ProbeView(frame: .zero); view.identity = identity; return view
+    }
+    func updateUIView(_ uiView: ProbeView, context: Context) { uiView.identity = identity }
 }
 #endif
 
@@ -512,9 +542,18 @@ struct RunExitSummaryView: View {
                 LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 4), count: 6), spacing: 4) {
                     ForEach(lines, id: \.id) { line in
                         Button { selectedReceipt = line } label: {
-                            receiptTile(line).opacity(isLost ? 0.62 : 1)
+                            receiptTile(line, isLost: isLost).opacity(isLost ? 0.62 : 1)
                         }
                         .buttonStyle(.plain)
+                        .accessibilityIdentifier(receiptSemanticIdentifier(line, isLost: isLost))
+#if DEBUG
+                        .background {
+                            RunExitReceiptSemanticProbe(identity: .init(
+                                side: isLost ? .lost : .recovered,
+                                lineID: line.id,
+                                destination: line.recoveredItemDestination))
+                        }
+#endif
                     }
                     ForEach(pages) { page in
                         Image(systemName: "doc.text")
@@ -661,10 +700,19 @@ struct RunExitSummaryView: View {
             } else {
                 SixAcrossItemGrid(data: lines, id: \.id) { line in
                     Button { selectedReceipt = line } label: {
-                        receiptTile(line).opacity(isLost ? 0.62 : 1)
+                        receiptTile(line, isLost: isLost).opacity(isLost ? 0.62 : 1)
                     }
                     .buttonStyle(.plain)
+                    .accessibilityIdentifier(receiptSemanticIdentifier(line, isLost: isLost))
                     .accessibilityAddTraits(selectedReceipt?.id == line.id ? .isSelected : [])
+#if DEBUG
+                    .background {
+                        RunExitReceiptSemanticProbe(identity: .init(
+                            side: isLost ? .lost : .recovered,
+                            lineID: line.id,
+                            destination: line.recoveredItemDestination))
+                    }
+#endif
                 }
             }
         }
@@ -672,23 +720,43 @@ struct RunExitSummaryView: View {
     }
 
     @ViewBuilder
-    private func receiptTile(_ line: RunExitSummary.ReceiptLine) -> some View {
+    private func receiptTile(_ line: RunExitSummary.ReceiptLine, isLost: Bool) -> some View {
         switch line {
         case .resource(let resource):
             ResourceIconTile(resourceID: resource.id, icon: resource.fallbackIcon,
                              quantity: resource.quantity,
                              accessibilityName: resource.fallbackName)
         case .stackableItem(let item), .uniqueItem(let item):
-            ItemIconTile(icon: item.fallbackIcon, catalogueID: item.snapshot.catalogID,
-                         rarity: ContentCatalog.shared.item(item.snapshot.catalogID)?.rarity ?? .common,
-                         quantity: item.quantity, identified: item.snapshot.identified,
-                         location: .carried, accessibilityName: item.fallbackName)
+            if let location = receiptItemLocation(item.recoveredDestination, isLost: isLost) {
+                ItemIconTile(icon: item.fallbackIcon, catalogueID: item.snapshot.catalogID,
+                             rarity: ContentCatalog.shared.item(item.snapshot.catalogID)?.rarity ?? .common,
+                             quantity: item.quantity, identified: item.snapshot.identified,
+                             location: location, accessibilityName: item.fallbackName)
+            } else {
+                RunExitUnrecordedItemTile(icon: item.fallbackIcon,
+                                          catalogueID: item.snapshot.catalogID,
+                                          materialKind: nil,
+                                          rarity: ContentCatalog.shared
+                                            .item(item.snapshot.catalogID)?.rarity ?? .common,
+                                          quantity: item.quantity,
+                                          identified: item.snapshot.identified,
+                                          accessibilityName: item.fallbackName)
+            }
         case .materialSample(let material):
-            ItemIconTile(icon: material.fallbackIcon, catalogueID: material.catalogID,
-                         materialKind: material.sample.kind,
-                         rarity: ContentCatalog.shared.item(material.catalogID)?.rarity ?? .common,
-                         quantity: 1, identified: material.identified,
-                         location: .carried, accessibilityName: material.fallbackName)
+            if let location = receiptItemLocation(material.recoveredDestination, isLost: isLost) {
+                ItemIconTile(icon: material.fallbackIcon, catalogueID: material.catalogID,
+                             materialKind: material.sample.kind,
+                             rarity: ContentCatalog.shared.item(material.catalogID)?.rarity ?? .common,
+                             quantity: 1, identified: material.identified,
+                             location: location, accessibilityName: material.fallbackName)
+            } else {
+                RunExitUnrecordedItemTile(icon: material.fallbackIcon,
+                                          catalogueID: material.catalogID,
+                                          materialKind: material.sample.kind,
+                                          rarity: ContentCatalog.shared.item(material.catalogID)?.rarity ?? .common,
+                                          quantity: 1, identified: material.identified,
+                                          accessibilityName: material.fallbackName)
+            }
         case .legacy(let legacy):
             LegacyReceiptIconTile(icon: legacy.fallbackIcon, quantity: legacy.quantity,
                                   accessibilityName: legacy.fallbackName)
@@ -704,10 +772,12 @@ struct RunExitSummaryView: View {
             case .stackableItem(let item), .uniqueItem(let item):
                 LabeledContent("Quantity", value: "\(item.quantity)")
                 LabeledContent("State", value: item.snapshot.identified ? "Identified" : "Unidentified")
+                receiptDisposition(line)
             case .materialSample(let material):
                 LabeledContent("Kind", value: material.sample.kind.displayName)
                 LabeledContent("Grade", value: "\(material.sample.grade)")
                 LabeledContent("Source", value: material.sample.source)
+                receiptDisposition(line)
             case .legacy(let legacy):
                 LabeledContent("Quantity", value: "\(legacy.quantity)")
                 Text(GearPresentationCopy.olderSaveArtUnavailable)
@@ -715,6 +785,38 @@ struct RunExitSummaryView: View {
             }
         }
         .padding(16)
+    }
+
+    @ViewBuilder
+    private func receiptDisposition(_ line: RunExitSummary.ReceiptLine) -> some View {
+        if summary.lostLines.contains(where: { $0.id == line.id }) {
+            LabeledContent("Disposition", value: "Lost on Return")
+                .accessibilityIdentifier("run-exit.receipt-disposition.\(line.id).lost")
+        } else {
+            let destination = line.recoveredItemDestination
+            LabeledContent("Destination", value: destination?.playerCopy ?? "Destination not recorded")
+                .accessibilityIdentifier(
+                    "run-exit.receipt-destination.\(line.id).\(destination?.rawValue ?? "not-recorded")")
+        }
+    }
+
+    private func receiptItemLocation(
+        _ destination: RunExitSummary.ReceiptLine.RecoveredItemDestination?, isLost: Bool
+    ) -> ItemGridLocation? {
+        if isLost { return .carried }
+        switch destination {
+        case .stored: return .stored
+        case .waitingToSort: return .waiting
+        case nil: return nil
+        }
+    }
+
+    private func receiptSemanticIdentifier(
+        _ line: RunExitSummary.ReceiptLine, isLost: Bool
+    ) -> String {
+        let side = isLost ? "lost" : "recovered"
+        let destination = line.recoveredItemDestination?.rawValue ?? "none"
+        return "run-exit.receipt.\(side).\(line.id).\(destination)"
     }
 
     private func receiptDetailOverlay(_ line: RunExitSummary.ReceiptLine) -> some View {
@@ -828,6 +930,50 @@ private struct LegacyReceiptIconTile: View {
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(accessibilityName)
         .accessibilityValue("Quantity \(quantity)")
+    }
+}
+
+private struct RunExitUnrecordedItemTile: View {
+    let icon: String
+    let catalogueID: ItemID?
+    let materialKind: MaterialKind?
+    let rarity: Rarity
+    let quantity: Int
+    let identified: Bool
+    let accessibilityName: String
+
+    var body: some View {
+        ZStack {
+            RoundedRectangle(cornerRadius: 9)
+                .fill(Color(.secondarySystemGroupedBackground))
+            RoundedRectangle(cornerRadius: 9)
+                .strokeBorder(rarity.tint.opacity(0.72), lineWidth: 1.5)
+            if let materialKind {
+                MaterialSamplePixelIdentity(kind: materialKind,
+                                            fallbackColor: identified ? rarity.tint : .secondary)
+                    .frame(width: 32, height: 32)
+            } else {
+                CatalogueItemPixelIdentity(itemID: catalogueID, identified: identified,
+                                           fallbackSystemIcon: icon,
+                                           fallbackColor: identified ? rarity.tint : .secondary)
+                    .frame(width: 32, height: 32)
+            }
+            if quantity > 1 {
+                Text("\(quantity)")
+                    .font(.system(size: 10, weight: .bold, design: .rounded).monospacedDigit())
+                    .padding(.horizontal, 4).padding(.vertical, 1)
+                    .background(.ultraThinMaterial, in: Capsule())
+                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topTrailing)
+                    .padding(4)
+            }
+        }
+        .aspectRatio(1, contentMode: .fit)
+        .frame(minWidth: 44, minHeight: 44)
+        .contentShape(RoundedRectangle(cornerRadius: 9))
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(
+            "\(identified ? accessibilityName : "Unknown item"), \(rarity.displayName), "
+                + "destination not recorded\(quantity > 1 ? ", quantity \(quantity)" : "")")
     }
 }
 

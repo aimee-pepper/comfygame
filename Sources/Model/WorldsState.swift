@@ -203,6 +203,18 @@ struct RunExitSummary: Codable, Equatable, Identifiable, Sendable {
     /// Frozen, typed receipt authority. The older name/icon/count arrays remain compatibility
     /// projections for existing presentation; they are never used to reconstruct identity.
     enum ReceiptLine: Codable, Equatable, Identifiable, Sendable {
+        enum RecoveredItemDestination: String, Codable, Equatable, Sendable {
+            case stored
+            case waitingToSort
+
+            var playerCopy: String {
+                switch self {
+                case .stored: "Stored"
+                case .waitingToSort: "Waiting to sort"
+                }
+            }
+        }
+
         struct Resource: Codable, Equatable, Sendable {
             var lineID: String
             var id: ResourceID
@@ -218,6 +230,7 @@ struct RunExitSummary: Codable, Equatable, Identifiable, Sendable {
             var quantity: Int
             var fallbackName: String
             var fallbackIcon: String
+            var recoveredDestination: RecoveredItemDestination? = nil
         }
 
         struct Material: Codable, Equatable, Sendable {
@@ -229,6 +242,7 @@ struct RunExitSummary: Codable, Equatable, Identifiable, Sendable {
             var identified: Bool
             var fallbackName: String
             var fallbackIcon: String
+            var recoveredDestination: RecoveredItemDestination? = nil
         }
 
         struct Legacy: Codable, Equatable, Sendable {
@@ -251,6 +265,14 @@ struct RunExitSummary: Codable, Equatable, Identifiable, Sendable {
             case .uniqueItem(let line): "instance-\(line.lineID)"
             case .materialSample(let line): "material-\(line.lineID)"
             case .legacy(let line): "legacy-\(line.stableID)"
+            }
+        }
+
+        var recoveredItemDestination: RecoveredItemDestination? {
+            switch self {
+            case .stackableItem(let line), .uniqueItem(let line): line.recoveredDestination
+            case .materialSample(let line): line.recoveredDestination
+            case .resource, .legacy: nil
             }
         }
 
