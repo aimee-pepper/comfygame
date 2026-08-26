@@ -312,6 +312,9 @@ enum PhysicalGearCraftingRules {
     static let tanneryWearRoot: ResearchNodeID = "tannery_wear_root"
     static let tanneryWearTierTwo: ResearchNodeID = "tannery_wear_tier_two"
     static let weaponsmithPointRoot: ResearchNodeID = "weaponsmith_point_root"
+    static let tanneryWearCapability: CapabilityID = "tannery_wear"
+    static let tanneryTierTwoCapability: CapabilityID = "tannery_tier_two"
+    static let weaponsmithPointCapability: CapabilityID = "weaponsmith_fitted_point"
     static let maudFittingPattern: WorkshopPatternID = "maud_fitting_pattern"
 
     static func requiredResearch(for recipe: Recipe) -> ResearchNodeID? {
@@ -320,9 +323,15 @@ enum PhysicalGearCraftingRules {
         return nil
     }
 
+    static func requiredCapability(for recipe: Recipe) -> CapabilityID? {
+        if recipe.station == Stations.tannery { return tanneryWearCapability }
+        if recipe.station == Stations.weaponsmith { return weaponsmithPointCapability }
+        return nil
+    }
+
     static func isUnlocked(_ recipe: Recipe, in state: GameState) -> Bool {
-        if let required = requiredResearch(for: recipe),
-           !state.base.completedResearch.contains(required) { return false }
+        if let required = requiredCapability(for: recipe),
+           !state.base.hasCapability(required) { return false }
         if recipe.id == "weaponsmith_fitted_polearm",
            !state.reality.library.knownPatterns.contains(maudFittingPattern) { return false }
         return effectiveTier(for: recipe, in: state) >= recipe.minimumEffectiveTier
@@ -337,7 +346,7 @@ enum PhysicalGearCraftingRules {
 
     static func constructionCap(for recipe: Recipe, in state: GameState) -> Int {
         if recipe.station == Stations.tannery {
-            return state.base.completedResearch.contains(tanneryWearTierTwo)
+            return state.base.hasCapability(tanneryTierTwoCapability)
                 ? recipe.stationCap : min(1, recipe.stationCap)
         }
         if recipe.station == Stations.bowyer {
@@ -461,9 +470,10 @@ enum PhysicalGearCraftingRules {
 
     static func readiness(_ recipe: Recipe, in state: GameState) -> Readiness {
         guard state.base.station(recipe.station).isUnlocked else { return .stationLocked }
-        if let required = requiredResearch(for: recipe),
-           !state.base.completedResearch.contains(required) {
-            return .researchLocked(required)
+        if let requiredCapability = requiredCapability(for: recipe),
+           !state.base.hasCapability(requiredCapability),
+           let requiredNode = requiredResearch(for: recipe) {
+            return .researchLocked(requiredNode)
         }
         let tier = effectiveTier(for: recipe, in: state)
         guard tier >= recipe.minimumEffectiveTier else {

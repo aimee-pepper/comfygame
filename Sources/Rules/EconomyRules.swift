@@ -114,6 +114,8 @@ enum EconomyRules {
 
     static let secondPassNode: ResearchNodeID = "essence_second_pass"
     static let continuousSettlingNode: ResearchNodeID = "essence_continuous_settling"
+    static let secondPassCapability: CapabilityID = "essence_second_pass"
+    static let continuousSettlingCapability: CapabilityID = "essence_continuous_settling"
     static var secondPassPracticeRequired: Int {
         ContentCatalog.shared.researchNode(secondPassNode)?.needsLifetimeRawRefined ?? 50
     }
@@ -124,7 +126,7 @@ enum EconomyRules {
     }
 
     static func refinementRate(in state: GameState) -> Int {
-        state.base.completedResearch.contains(secondPassNode)
+        state.base.hasCapability(secondPassCapability)
             ? Tuning.Economy.secondPassEssencePerRawEssence
             : Tuning.Economy.essencePerRawEssence
     }
@@ -151,7 +153,7 @@ enum EconomyRules {
     @discardableResult
     static func commitContinuousSettling(rawUnits: Int, outcomeID: ExpeditionOutcomeID,
                                          in state: inout GameState) -> RefinementReceipt? {
-        guard state.base.completedResearch.contains(continuousSettlingNode),
+        guard state.base.hasCapability(continuousSettlingCapability),
               state.base.autoRefineReturnedRawEssence,
               state.base.station(Stations.essenceSpring).tier >= 1,
               state.base.lastAutoRefinedOutcomeID != outcomeID else { return nil }

@@ -137,6 +137,7 @@
       "blurb": "Corrin can fit a supple coat, working gloves and working boots from the exact stock you choose.",
       "cost": { "essence": 12, "resources": { "fiber": 4 } },
       "requires": [],
+      "constructionBundledWith": "tannery",
       "grants": [{ "kind": "capability", "id": "tannery_wear" }]
     },
     {
@@ -167,6 +168,7 @@
       "blurb": "Fit a close piercing point around repeatable Finesse-led motion.",
       "cost": { "essence": 0 },
       "requires": [],
+      "constructionBundledWith": "weaponsmith",
       "grants": [{ "kind": "capability", "id": "weaponsmith_fitted_point" }]
     },
     {

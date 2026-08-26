@@ -107,11 +107,14 @@ struct ResearchNodeDef: Codable, Equatable, Identifiable, Sendable {
     var needsInstruments: Int = 0
     /// Committed Raw Essence conversions required before this node can be bought.
     var needsLifetimeRawRefined: Int = 0
+    /// A zero-additional-cost capability taught as part of raising this exact station.
+    /// The node remains completed history; its capability grant is the live entitlement.
+    var constructionBundledWith: StationID?
 
     init(id: ResearchNodeID, branch: ResearchBranchID, name: String, icon: String, blurb: String,
          cost: UpgradeCost, requires: [ResearchNodeID] = [], grants: [ResearchGrant] = [],
          needsStationTier: Int = 0, needsInstruments: Int = 0,
-         needsLifetimeRawRefined: Int = 0) {
+         needsLifetimeRawRefined: Int = 0, constructionBundledWith: StationID? = nil) {
         self.id = id
         self.branch = branch
         self.name = name
@@ -123,6 +126,7 @@ struct ResearchNodeDef: Codable, Equatable, Identifiable, Sendable {
         self.needsStationTier = needsStationTier
         self.needsInstruments = needsInstruments
         self.needsLifetimeRawRefined = needsLifetimeRawRefined
+        self.constructionBundledWith = constructionBundledWith
     }
 
     /// Tolerant, per the policy in `Migrations.swift`.
@@ -140,6 +144,8 @@ struct ResearchNodeDef: Codable, Equatable, Identifiable, Sendable {
         needsInstruments = try c.decodeIfPresent(Int.self, forKey: .needsInstruments) ?? 0
         needsLifetimeRawRefined = try c.decodeIfPresent(Int.self,
                                                         forKey: .needsLifetimeRawRefined) ?? 0
+        constructionBundledWith = try c.decodeIfPresent(StationID.self,
+                                                         forKey: .constructionBundledWith)
     }
 }
 

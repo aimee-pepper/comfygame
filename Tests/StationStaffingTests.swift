@@ -103,10 +103,15 @@ final class StationStaffingTests: XCTestCase {
         XCTAssertTrue(store.build(station))
         XCTAssertTrue(store.state.base.completedResearch.contains(
             PhysicalGearCraftingRules.tanneryWearRoot))
+        XCTAssertTrue(store.state.base.hasCapability(
+            PhysicalGearCraftingRules.tanneryWearCapability))
         XCTAssertFalse(store.state.base.completedResearch.contains(
             PhysicalGearCraftingRules.tanneryWearTierTwo))
         XCTAssertFalse(store.state.base.completedResearch.contains("tannery_carry_root"))
         XCTAssertFalse(store.state.base.completedResearch.contains("tannery_keep_root"))
+        XCTAssertFalse(store.state.base.hasCapability("tannery_tier_two"))
+        XCTAssertFalse(store.state.base.hasCapability("tannery_carry"))
+        XCTAssertFalse(store.state.base.hasCapability("tannery_keep"))
     }
 
     func testAlreadyBuiltTanneryInfersFreeWearRootOnLoad() throws {
@@ -116,6 +121,22 @@ final class StationStaffingTests: XCTestCase {
         let restored = try JSONDecoder().decode(GameState.self, from: JSONEncoder().encode(state))
         XCTAssertTrue(restored.base.completedResearch.contains(
             PhysicalGearCraftingRules.tanneryWearRoot))
+        XCTAssertTrue(restored.base.hasCapability(
+            PhysicalGearCraftingRules.tanneryWearCapability))
+    }
+
+    @MainActor func testFailedTanneryBuildGrantsNeitherCompletionNorCapability() throws {
+        let store = GameStore(io: .temporary(name: "tannery-atomic-\(UUID().uuidString)"))
+        let station = try XCTUnwrap(ContentCatalog.shared.station(Stations.tannery))
+        store.mutate("find Corrin without stock") {
+            $0.reality.library.foundTravellers.insert("corrin")
+            $0.base.essence = 0
+        }
+        XCTAssertFalse(store.build(station))
+        XCTAssertFalse(store.state.base.completedResearch.contains(
+            PhysicalGearCraftingRules.tanneryWearRoot))
+        XCTAssertFalse(store.state.base.hasCapability(
+            PhysicalGearCraftingRules.tanneryWearCapability))
     }
 
     func testPartyAndRealmAssignmentsRemoveHomeDiscountImmediately() throws {

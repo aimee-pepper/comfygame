@@ -111,6 +111,9 @@ final class EssenceSpringRefiningTests: XCTestCase {
         var state = GameState.newGame()
         state.base.completedResearch.insert(EconomyRules.secondPassNode)
         state.base.completedResearch.insert(EconomyRules.continuousSettlingNode)
+        state.base.capabilities.formUnion([
+            EconomyRules.secondPassCapability, EconomyRules.continuousSettlingCapability
+        ])
         state.base.stations[Stations.essenceSpring] = StationState(isUnlocked: true, tier: 1)
         state.base.autoRefineReturnedRawEssence = true
         state.base.resources.add(12, of: Resources.essenceRaw) // 8 old + 4 newly retained
@@ -133,6 +136,7 @@ final class EssenceSpringRefiningTests: XCTestCase {
         state.base.resources.add(3, of: Resources.essenceRaw)
         XCTAssertNil(EconomyRules.commitContinuousSettling(rawUnits: 3, outcomeID: 1, in: &state))
         state.base.completedResearch.insert(EconomyRules.continuousSettlingNode)
+        state.base.capabilities.insert(EconomyRules.continuousSettlingCapability)
         XCTAssertNil(EconomyRules.commitContinuousSettling(rawUnits: 3, outcomeID: 1, in: &state))
         XCTAssertEqual(state.base.resources[Resources.essenceRaw], 3)
     }
@@ -151,6 +155,9 @@ final class EssenceSpringRefiningTests: XCTestCase {
         store.mutate("continuous fixture") { state in
             state.base.completedResearch.formUnion([
                 EconomyRules.secondPassNode, EconomyRules.continuousSettlingNode
+            ])
+            state.base.capabilities.formUnion([
+                EconomyRules.secondPassCapability, EconomyRules.continuousSettlingCapability
             ])
             state.base.stations[Stations.essenceSpring] = StationState(isUnlocked: true, tier: 1)
             state.base.autoRefineReturnedRawEssence = true
@@ -229,6 +236,9 @@ final class EssenceSpringRefiningTests: XCTestCase {
         state.base.completedResearch.formUnion([
             EconomyRules.secondPassNode, EconomyRules.continuousSettlingNode
         ])
+        state.base.capabilities.formUnion([
+            EconomyRules.secondPassCapability, EconomyRules.continuousSettlingCapability
+        ])
         let restored = try SaveCodec.makeDecoder().decode(
             GameState.self, from: SaveCodec.makeEncoder().encode(state))
         XCTAssertEqual(restored.base.lifetimeRawEssenceRefined, 73)
@@ -243,8 +253,31 @@ final class EssenceSpringRefiningTests: XCTestCase {
         state.base.resources.add(4, of: Resources.essenceRaw)
         XCTAssertEqual(EconomyRules.spendableEssence(in: state), 13)
         state.base.completedResearch.insert(EconomyRules.secondPassNode)
+        state.base.capabilities.insert(EconomyRules.secondPassCapability)
         XCTAssertEqual(EconomyRules.spendableEssence(in: state), 17)
         let spring = try XCTUnwrap(ContentCatalog.shared.station(Stations.essenceSpring))
         XCTAssertEqual(StationRunwayRules.preview(for: spring, in: state).refinableRawEssence, 12)
+    }
+
+    func testCapabilitiesNotCompletionHistoryOwnSpringMechanics() {
+        var historyOnly = GameState.newGame()
+        historyOnly.base.completedResearch.formUnion([
+            EconomyRules.secondPassNode, EconomyRules.continuousSettlingNode
+        ])
+        historyOnly.base.stations[Stations.essenceSpring] = StationState(isUnlocked: true, tier: 1)
+        historyOnly.base.autoRefineReturnedRawEssence = true
+        historyOnly.base.resources.add(2, of: Resources.essenceRaw)
+        XCTAssertEqual(EconomyRules.refinementRate(in: historyOnly), 2)
+        XCTAssertNil(EconomyRules.commitContinuousSettling(rawUnits: 1, outcomeID: 9,
+                                                            in: &historyOnly))
+
+        var entitlementOnly = historyOnly
+        entitlementOnly.base.completedResearch.removeAll()
+        entitlementOnly.base.capabilities.formUnion([
+            EconomyRules.secondPassCapability, EconomyRules.continuousSettlingCapability
+        ])
+        XCTAssertEqual(EconomyRules.refinementRate(in: entitlementOnly), 3)
+        XCTAssertEqual(EconomyRules.commitContinuousSettling(rawUnits: 1, outcomeID: 9,
+                                                              in: &entitlementOnly)?.rate, 3)
     }
 }

@@ -499,24 +499,6 @@ struct BaseState: Codable, Equatable, Sendable {
             completedResearch.insert("pen_brush")
         }
         capabilities = try container.decodeIfPresent(Set<CapabilityID>.self, forKey: .capabilities) ?? []
-        // Saves written before capabilities became their own authority recorded the teaching node
-        // only. Canonicalize all shipped grants once at decode; unknown future completions remain
-        // untouched rather than being guessed.
-        let legacyCapabilityNodes: [ResearchNodeID: CapabilityID] = [
-            "tannery_wear_root": "tannery_wear",
-            "weaponsmith_point_root": "weaponsmith_fitted_point",
-            "tannery_carry_root": "tannery_carry",
-            "tannery_wear_tier_two": "tannery_tier_two",
-            "tannery_keep_root": "tannery_keep",
-            "essence_second_pass": "essence_second_pass",
-            "essence_continuous_settling": "essence_continuous_settling",
-            "pen_ink_mixing": "inkMixing",
-            "pen_compounds": "compoundAssembly",
-            "pen_chaining": "chaining"
-        ]
-        for (node, capability) in legacyCapabilityNodes where completedResearch.contains(node) {
-            capabilities.insert(capability)
-        }
         lifetimeRawEssenceRefined = try container.decodeIfPresent(Int.self,
                                                                    forKey: .lifetimeRawEssenceRefined) ?? 0
         autoRefineReturnedRawEssence = try container.decodeIfPresent(Bool.self,
@@ -535,11 +517,18 @@ struct BaseState: Codable, Equatable, Sendable {
         // Migration for saves from the brief window where a built Tannery existed before its
         // immediate Wear capability. Idempotent and free: the player already paid for the room.
         if stations[Stations.tannery]?.isUnlocked == true {
-            completedResearch.insert("tannery_wear_root")
+            if let node = ContentCatalog.shared.constructionBundledResearch(for: Stations.tannery) {
+                completedResearch.insert(node.id)
+            }
         }
         if stations[Stations.weaponsmith]?.isUnlocked == true {
-            completedResearch.insert("weaponsmith_point_root")
+            if let node = ContentCatalog.shared.constructionBundledResearch(for: Stations.weaponsmith) {
+                completedResearch.insert(node.id)
+            }
         }
+        // Completion is durable topology/history. Canonical capability grants are the sole live
+        // entitlement, derived after all legacy completion reconciliation so one decode suffices.
+        capabilities.formUnion(ContentCatalog.shared.capabilityGrants(for: completedResearch))
         // A paid Apothecary must never reopen empty. This reconciles saves from before its
         // first-use guarantee without granting stock or changing the station's tier.
         if stations[Stations.apothecary]?.isUnlocked == true {

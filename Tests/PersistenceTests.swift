@@ -252,6 +252,38 @@ final class PersistenceTests: XCTestCase {
         XCTAssertEqual(relaunched.capabilities, decoded.capabilities)
     }
 
+    func testEveryCanonicalCompletedCapabilityGrantMigratesWithoutGuessingUnknownIDs() throws {
+        let nodes = ContentCatalog.shared.researchNodes.filter {
+            $0.grants.contains { $0.kind == .capability }
+        }
+        let completed = nodes.map(\.id.rawValue) + ["future_unknown_completion"]
+        let data = try JSONSerialization.data(withJSONObject: [
+            "completedResearch": completed,
+            "capabilities": ["legacy_unknown_capability"]
+        ])
+        let decoded = try JSONDecoder().decode(BaseState.self, from: data)
+        let expected = Set(nodes.flatMap(\.grants).compactMap { grant in
+            grant.kind == .capability ? grant.id.map(CapabilityID.init(rawValue:)) : nil
+        })
+        XCTAssertTrue(expected.isSubset(of: decoded.capabilities))
+        XCTAssertTrue(decoded.capabilities.contains("legacy_unknown_capability"))
+        XCTAssertTrue(decoded.completedResearch.contains("future_unknown_completion"))
+
+        let relaunched = try JSONDecoder().decode(BaseState.self,
+            from: JSONEncoder().encode(decoded))
+        XCTAssertEqual(relaunched.completedResearch, decoded.completedResearch)
+        XCTAssertEqual(relaunched.capabilities, decoded.capabilities)
+    }
+
+    func testBuiltStationMigrationGrantsCompletionAndCapabilityInOneDecode() throws {
+        let data = Data(#"{"stations":{"tannery":{"isUnlocked":true,"tier":0},"weaponsmith":{"isUnlocked":true,"tier":0}}}"#.utf8)
+        let decoded = try JSONDecoder().decode(BaseState.self, from: data)
+        XCTAssertTrue(decoded.completedResearch.contains("tannery_wear_root"))
+        XCTAssertTrue(decoded.capabilities.contains("tannery_wear"))
+        XCTAssertTrue(decoded.completedResearch.contains("weaponsmith_point_root"))
+        XCTAssertTrue(decoded.capabilities.contains("weaponsmith_fitted_point"))
+    }
+
     func testLegacyBrushDiaryProgressAliasesEveryPersistedKeyWithoutDuplicates() throws {
         let data = Data(#"{"foundPages":["halloway_lead_pencil","halloway_brush_ferrule","isolde_lead_pencil"],"pagesWaiting":{"halloway_lead_pencil":2,"halloway_brush_ferrule":5},"patiencePage":"isolde_lead_pencil"}"#.utf8)
         let decoded = try JSONDecoder().decode(LibraryState.self, from: data)

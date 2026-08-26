@@ -61,6 +61,7 @@ final class WeaponsmithTests: XCTestCase {
         var state = GameState.newGame()
         state.base.stations[Stations.weaponsmith] = StationState(isUnlocked: true, tier: tier)
         state.base.completedResearch.insert(PhysicalGearCraftingRules.weaponsmithPointRoot)
+        state.base.capabilities.insert(PhysicalGearCraftingRules.weaponsmithPointCapability)
         state.base.essence = 1_000
         if pattern { state.reality.library.knownPatterns.insert(PhysicalGearCraftingRules.maudFittingPattern) }
         let samples = [
@@ -201,6 +202,7 @@ final class WeaponsmithTests: XCTestCase {
         }
         XCTAssertTrue(store.build(station))
         XCTAssertTrue(store.state.base.completedResearch.contains(PhysicalGearCraftingRules.weaponsmithPointRoot))
+        XCTAssertTrue(store.state.base.hasCapability(PhysicalGearCraftingRules.weaponsmithPointCapability))
         XCTAssertEqual(store.state.base.essence, 0)
 
         var old = GameState.newGame()
@@ -208,6 +210,19 @@ final class WeaponsmithTests: XCTestCase {
         old.base.completedResearch.remove(PhysicalGearCraftingRules.weaponsmithPointRoot)
         let restored = try JSONDecoder().decode(GameState.self, from: JSONEncoder().encode(old))
         XCTAssertTrue(restored.base.completedResearch.contains(PhysicalGearCraftingRules.weaponsmithPointRoot))
+        XCTAssertTrue(restored.base.hasCapability(PhysicalGearCraftingRules.weaponsmithPointCapability))
+    }
+
+    func testCapabilityNotCompletionIsTheLiveWeaponsmithEntitlement() {
+        var historyOnly = state()
+        historyOnly.base.capabilities.remove(PhysicalGearCraftingRules.weaponsmithPointCapability)
+        XCTAssertFalse(PhysicalGearCraftingRules.isUnlocked(
+            PhysicalGearCraftingRules.fittedPoint, in: historyOnly))
+
+        var entitlementOnly = state()
+        entitlementOnly.base.completedResearch.remove(PhysicalGearCraftingRules.weaponsmithPointRoot)
+        XCTAssertTrue(PhysicalGearCraftingRules.isUnlocked(
+            PhysicalGearCraftingRules.fittedPoint, in: entitlementOnly))
     }
 
     @MainActor func testStoreReturnsFailureForStalePatternOrSampleCommit() throws {

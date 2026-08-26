@@ -61,6 +61,16 @@ struct ContentCatalog: Sendable {
 
     func researchBranch(_ id: ResearchBranchID) -> ResearchBranchDef? { researchBranches.first { $0.id == id } }
     func researchNode(_ id: ResearchNodeID) -> ResearchNodeDef? { researchNodes.first { $0.id == id } }
+    func constructionBundledResearch(for station: StationID) -> ResearchNodeDef? {
+        researchNodes.first { $0.constructionBundledWith == station }
+    }
+    func capabilityGrants(for completed: Set<ResearchNodeID>) -> Set<CapabilityID> {
+        Set(researchNodes.lazy
+            .filter { completed.contains($0.id) }
+            .flatMap(\.grants)
+            .filter { $0.kind == .capability }
+            .compactMap { $0.id.map(CapabilityID.init(rawValue:)) })
+    }
     func gambitComponent(_ id: GambitComponentID) -> GambitComponentDef? { gambitComponents.first { $0.id == id } }
 
     var branchesInOrder: [ResearchBranchDef] { researchBranches.sorted { $0.order < $1.order } }
@@ -508,6 +518,16 @@ struct ContentCatalog: Sendable {
             guard !node.grants.isEmpty else {
                 throw ContentError.danglingReference("research node '\(node.id)' grants nothing")
             }
+            if let stationID = node.constructionBundledWith {
+                guard station(stationID) != nil,
+                      researchBranch(node.branch)?.station == stationID,
+                      node.grants.count == 1,
+                      node.grants.first?.kind == .capability,
+                      node.grants.first?.id != nil else {
+                    throw ContentError.danglingReference(
+                        "construction-bundled node '\(node.id)' must grant one capability at its station")
+                }
+            }
             for grant in node.grants {
                 switch grant.kind {
                 case .gambitComponent:
@@ -545,6 +565,10 @@ struct ContentCatalog: Sendable {
                     }
                 }
             }
+        }
+        let bundledStations = researchNodes.compactMap(\.constructionBundledWith)
+        guard Set(bundledStations).count == bundledStations.count else {
+            throw ContentError.duplicateID("construction-bundled station")
         }
         for branch in researchBranches where nodes(in: branch.id).isEmpty {
             throw ContentError.danglingReference("research branch '\(branch.id)' has no nodes")

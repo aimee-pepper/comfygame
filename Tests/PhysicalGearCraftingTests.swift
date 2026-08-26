@@ -114,6 +114,7 @@ final class PhysicalGearCraftingTests: XCTestCase {
         var state = GameState.newGame()
         state.base.stations[Stations.tannery] = StationState(isUnlocked: true, tier: 0)
         state.base.completedResearch.insert(PhysicalGearCraftingRules.tanneryWearRoot)
+        state.base.capabilities.insert(PhysicalGearCraftingRules.tanneryWearCapability)
         state.base.essence = 100
         state.base.inventory.add(ItemStack(id: InstanceID(rawValue: 71), catalogID: Items.material,
             materials: [
@@ -131,13 +132,17 @@ final class PhysicalGearCraftingTests: XCTestCase {
         XCTAssertFalse(state.base.inventory.stacks.contains { $0.id == InstanceID(rawValue: 71) })
     }
 
-    func testTanneryFamiliesRequireWearResearchEvenAfterBuildingExists() {
+    func testTanneryFamiliesRequireWearCapabilityEvenWhenCompletionHistoryExists() {
         var state = GameState.newGame()
         state.base.stations[Stations.tannery] = StationState(isUnlocked: true, tier: 0)
         XCTAssertEqual(PhysicalGearCraftingRules.readiness(
             PhysicalGearCraftingRules.suppleCoat, in: state),
                        .researchLocked(PhysicalGearCraftingRules.tanneryWearRoot))
         state.base.completedResearch.insert(PhysicalGearCraftingRules.tanneryWearRoot)
+        XCTAssertEqual(PhysicalGearCraftingRules.readiness(
+            PhysicalGearCraftingRules.suppleCoat, in: state),
+                       .researchLocked(PhysicalGearCraftingRules.tanneryWearRoot))
+        state.base.capabilities.insert(PhysicalGearCraftingRules.tanneryWearCapability)
         XCTAssertNotEqual(PhysicalGearCraftingRules.readiness(
             PhysicalGearCraftingRules.suppleCoat, in: state),
                           .researchLocked(PhysicalGearCraftingRules.tanneryWearRoot))
@@ -147,6 +152,7 @@ final class PhysicalGearCraftingTests: XCTestCase {
         var state = GameState.newGame()
         state.base.stations[Stations.tannery] = StationState(isUnlocked: true, tier: 0)
         state.base.completedResearch.insert(PhysicalGearCraftingRules.tanneryWearRoot)
+        state.base.capabilities.insert(PhysicalGearCraftingRules.tanneryWearCapability)
         state.base.essence = 100
         state.base.inventory.add(ItemStack(id: InstanceID(rawValue: 72), catalogID: Items.material,
             materials: [
@@ -158,6 +164,7 @@ final class PhysicalGearCraftingTests: XCTestCase {
         XCTAssertEqual(try XCTUnwrap(PhysicalGearCraftingRules.preview(
             PhysicalGearCraftingRules.suppleCoat, in: state)).outputTier, 1)
         state.base.completedResearch.insert(PhysicalGearCraftingRules.tanneryWearTierTwo)
+        state.base.capabilities.insert(PhysicalGearCraftingRules.tanneryTierTwoCapability)
         XCTAssertEqual(try XCTUnwrap(PhysicalGearCraftingRules.preview(
             PhysicalGearCraftingRules.suppleCoat, in: state)).outputTier, 2)
     }

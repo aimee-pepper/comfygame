@@ -1695,13 +1695,13 @@ struct EssenceSpringView: View {
             LabeledRow(icon: "drop", label: "Lifetime Raw refined", value: "\(practiced)")
             LabeledRow(icon: "arrow.right", label: "Current conversion",
                        value: "1 Raw → \(EconomyRules.refinementRate(in: store.state)) Essence")
-            if !store.state.base.completedResearch.contains(EconomyRules.secondPassNode) {
+            if !store.state.base.hasCapability(EconomyRules.secondPassCapability) {
                 let remaining = max(0, EconomyRules.secondPassPracticeRequired - practiced)
                 Text(remaining == 0 ? "Second pass practice complete."
                      : "Refine \(remaining) more Raw Essence to qualify for Second pass.")
                     .font(.caption).foregroundStyle(.secondary)
             }
-            if store.state.base.completedResearch.contains(EconomyRules.continuousSettlingNode) {
+            if store.state.base.hasCapability(EconomyRules.continuousSettlingCapability) {
                 Toggle("Auto-refine newly returned Raw", isOn: Binding(
                     get: { store.state.base.autoRefineReturnedRawEssence },
                     set: { store.setAutoRefineReturnedRawEssence($0) }

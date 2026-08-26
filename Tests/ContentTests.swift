@@ -251,6 +251,15 @@ final class ContentTests: XCTestCase {
         XCTAssertNoThrow(try catalog.validate())
     }
 
+    func testOnlyAuthoredStationBuildRootsBundleCanonicalCapabilities() throws {
+        let catalog = try ContentCatalog.load()
+        let bundled = catalog.researchNodes.filter { $0.constructionBundledWith != nil }
+        XCTAssertEqual(bundled.map(\.id), ["tannery_wear_root", "weaponsmith_point_root"])
+        XCTAssertEqual(bundled.map(\.constructionBundledWith), [Stations.tannery, Stations.weaponsmith])
+        XCTAssertEqual(bundled.compactMap { $0.grants.first?.id },
+                       ["tannery_wear", "weaponsmith_fitted_point"])
+    }
+
     func testMeetingConversationPreservesTapOrderAndFreezesAtDecision() {
         var first = TravellerMeetingConversation()
         first.ask("isolde.charcoal_hand")

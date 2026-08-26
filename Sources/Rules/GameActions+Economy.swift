@@ -242,7 +242,7 @@ extension GameStore {
     }
 
     func setAutoRefineReturnedRawEssence(_ enabled: Bool) {
-        guard state.base.completedResearch.contains(EconomyRules.continuousSettlingNode),
+        guard state.base.hasCapability(EconomyRules.continuousSettlingCapability),
               state.base.station(Stations.essenceSpring).tier >= 1 else { return }
         mutate("set continuous settling", flush: true) {
             $0.base.autoRefineReturnedRawEssence = enabled
@@ -1171,13 +1171,9 @@ extension GameStore {
                 // screen. Learning is permanent, idempotent, and grants no prepared item.
                 state.base.knownConsumableRecipes.insert("salve_lesser")
             }
-            if canonical.id == Stations.tannery {
-                // A completed building must have an immediate verb. Wear is Corrin's free root;
-                // the later fit, Carry and Keep capabilities remain authored research choices.
-                state.base.completedResearch.insert(PhysicalGearCraftingRules.tanneryWearRoot)
-            }
-            if canonical.id == Stations.weaponsmith {
-                state.base.completedResearch.insert(PhysicalGearCraftingRules.weaponsmithPointRoot)
+            if let bundled = ContentCatalog.shared.constructionBundledResearch(for: canonical.id) {
+                // Construction and its authored free teaching are one atomic transaction.
+                EconomyRules.complete(bundled, in: &state)
             }
             if canonical.id == Stations.channelworks {
                 let restored = DistilledCore(attunement: .heat, potency: 40,
