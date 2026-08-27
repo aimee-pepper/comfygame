@@ -3,7 +3,6 @@ import Foundation
 enum ChannelworksRestoredFixtureLocation: Equatable {
     case stored
     case waitingToSort
-    case worn(PartyMember, GearSlot)
     case awayOrNoLongerOwned
     case legacyIdentityUnknown
 }
@@ -50,6 +49,10 @@ enum ChannelworksRestorationRules {
             member.equipped.values.compactMap { $0.gearProfile?.stableInstanceID.rawValue }
         }
         values += base.tradingPost.stock.flatMap(\.frozenUnits).map(\.id.rawValue)
+        if let historical = base.channelworksRestoration?.fixtureInstanceID?.rawValue,
+           !values.contains(historical) {
+            values.append(historical)
+        }
         let runs = [state.worlds.activeRun].compactMap { $0 }
             + state.worlds.anchoredRealms.map(\.world)
         for run in runs {
@@ -69,18 +72,6 @@ enum ChannelworksRestorationRules {
         guard let id = receipt.fixtureInstanceID else { return .legacyIdentityUnknown }
         if base.inventory.stacks.contains(where: { $0.id == id }) { return .stored }
         if base.spillover.contains(where: { $0.id == id }) { return .waitingToSort }
-        if base.binderEquipped.contains(where: { $0.value.gearProfile?.stableInstanceID == id }) {
-            let slot = base.binderEquipped.first { $0.value.gearProfile?.stableInstanceID == id }!.key
-            return .worn(.binder, slot)
-        }
-        if let member = base.roster.enumerated().first(where: { entry in
-            entry.element.equipped.values.contains { $0.gearProfile?.stableInstanceID == id }
-        }), let slot = member.element.equipped.first(where: { $0.value.gearProfile?.stableInstanceID == id })?.key {
-            guard let persistentID = member.element.persistentID else {
-                return .awayOrNoLongerOwned
-            }
-            return .worn(.member(persistentID), slot)
-        }
         return .awayOrNoLongerOwned
     }
 
@@ -116,24 +107,19 @@ enum ChannelworksRestorationRules {
 
     static func commit(_ quote: ChannelworksConduitBuildQuoteV1,
                        in state: inout GameState) -> ChannelworksConduitBuildResult {
-        guard state.base.station(Stations.channelworks).isUnlocked else {
-            return .refused(.channelworksUnavailable)
+        let canonical: ChannelworksConduitBuildQuoteV1
+        switch evaluate(in: state) {
+        case .allowed(let current): canonical = current
+        case .refused(let refusal): return .refused(refusal)
         }
-        guard let current = state.base.inventory.stacks.first(where: {
-            $0.id == quote.inputHeatCoreInstanceID
-        }), current == quote.inputSnapshot else { return .refused(.staleQuote) }
-        guard validPlayerHeatCore(current.distilledCore),
-              quote.outputSnapshot.distilledCore == current.distilledCore,
-              quote.outputSnapshot.catalogID == Items.conduitFixture else {
-            return .refused(.invalidHeatCoreReceipt)
-        }
+        guard quote == canonical else { return .refused(.staleQuote) }
         var staged = state
-        guard removeOne(id: current.id, from: &staged.base.inventory),
-              staged.base.inventory.add(quote.outputSnapshot) else {
+        guard removeOne(id: canonical.inputHeatCoreInstanceID, from: &staged.base.inventory),
+              staged.base.inventory.add(canonical.outputSnapshot) else {
             return .refused(.storageUnavailable)
         }
         state = staged
-        return .committed(quote.outputSnapshot)
+        return .committed(canonical.outputSnapshot)
     }
 
     private static func validPlayerHeatCore(_ core: DistilledCore?) -> Bool {

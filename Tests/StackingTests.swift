@@ -419,6 +419,81 @@ final class StackingTests: XCTestCase {
         XCTAssertEqual(state, original)
     }
 
+    func testRepeatableChannelworksRejectsEveryForgedQuoteWithoutMutation() throws {
+        var state = repeatableChannelworksState(coreCount: 1)
+        guard case .allowed(let canonical) = ChannelworksRestorationRules.evaluate(in: state) else {
+            return XCTFail("Expected canonical quote")
+        }
+        var forged: [ChannelworksConduitBuildQuoteV1] = []
+        var wrongStation = canonical; wrongStation.stationID = Stations.blacksmith
+        forged.append(wrongStation)
+        var wrongInput = canonical; wrongInput.inputHeatCoreInstanceID = .init(rawValue: 999)
+        forged.append(wrongInput)
+        var wrongSnapshot = canonical; wrongSnapshot.inputSnapshot.count += 1
+        forged.append(wrongSnapshot)
+        var wrongOutputID = canonical; wrongOutputID.outputSnapshot.id = .init(rawValue: 998)
+        forged.append(wrongOutputID)
+        var wrongOutputCount = canonical; wrongOutputCount.outputSnapshot.count = 2
+        forged.append(wrongOutputCount)
+        var wrongOutputCore = canonical
+        wrongOutputCore.outputSnapshot.distilledCore?.potency += 1
+        forged.append(wrongOutputCore)
+
+        for quote in forged {
+            let original = state
+            XCTAssertEqual(ChannelworksRestorationRules.commit(quote, in: &state),
+                           .refused(.staleQuote))
+            XCTAssertEqual(state, original)
+        }
+    }
+
+    func testIdenticalCoreBuildsKeepIndependentFixtureIdentities() throws {
+        var state = repeatableChannelworksState(coreCount: 2)
+        for _ in 0..<2 {
+            guard case .allowed(let quote) = ChannelworksRestorationRules.evaluate(in: state),
+                  case .committed = ChannelworksRestorationRules.commit(quote, in: &state) else {
+                return XCTFail("Expected repeatable commit")
+            }
+        }
+        let fixtures = state.base.inventory.stacks.filter { $0.catalogID == Items.conduitFixture }
+        XCTAssertEqual(fixtures.count, 2)
+        XCTAssertEqual(Set(fixtures.map(\.id)).count, 2)
+        XCTAssertTrue(fixtures.allSatisfy { $0.count == 1 })
+        XCTAssertEqual(Set(fixtures.compactMap(\.distilledCore)).count, 1)
+    }
+
+    func testHistoricalRestorationIdentityRemainsReservedAfterFixtureLeavesOwnership() throws {
+        var state = GameState.newGame()
+        state.base.channelworksRestoration = .init(fixtureInstanceID: .init(rawValue: 500))
+        state.base.inventory.stacks = [
+            .init(id: .init(rawValue: 12), catalogID: Items.heatCore)
+        ]
+        XCTAssertEqual(ChannelworksRestorationRules.nextPhysicalID(in: state),
+                       .init(rawValue: 501))
+
+        let lookalike = ItemStack(id: .init(rawValue: 500), catalogID: "blade_chipped")
+        state.base.binderEquipped[.weapon] = EquippedPiece(lookalike)
+        XCTAssertEqual(ChannelworksRestorationRules.location(in: state.base),
+                       .awayOrNoLongerOwned,
+                       "a gear identity cannot make the non-gear fixture appear worn")
+    }
+
+    private func repeatableChannelworksState(coreCount: Int) -> GameState {
+        var state = GameState.newGame()
+        state.base.stations[Stations.channelworks] = .init(isUnlocked: true, tier: 0)
+        state.base.channelworksRestoration = .init(fixtureInstanceID: nil)
+        state.base.inventory.slots = 4
+        let core = DistilledCore(attunement: .heat, potency: 77, sampleKind: "ore",
+                                 sampleSource: "Auber", catalystID: Resources.sulfur,
+                                 catalystCount: 1, recipeVersion: 1,
+                                 stationID: Stations.distillery)
+        state.base.inventory.stacks = [
+            .init(id: .init(rawValue: 91), catalogID: Items.heatCore,
+                  count: coreCount, distilledCore: core)
+        ]
+        return state
+    }
+
     private func legacySchemaEight(_ state: GameState, restored: Bool?) throws -> Data {
         var root = try XCTUnwrap(JSONSerialization.jsonObject(with: SaveCodec.encode(state))
                                   as? [String: Any])

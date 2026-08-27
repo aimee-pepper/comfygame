@@ -284,6 +284,7 @@ struct ItemStack: Codable, Equatable, Identifiable, Sendable {
     enum BinKey: Hashable, Sendable {
         case material(MaterialFamilyID)
         case distilledCore(ItemID, DistilledCore)
+        case distilledFixture(InstanceID)
         case item(ItemID, identified: Bool, upgradeLevel: Int, wildGrowth: Int,
                   isFavorite: Bool, isLocked: Bool)
         case gear(InstanceID)
@@ -291,6 +292,9 @@ struct ItemStack: Codable, Equatable, Identifiable, Sendable {
 
     var binKey: BinKey {
         if let kind = materials.first?.kind { return .material(kind) }
+        if catalogID == Items.conduitFixture, distilledCore != nil {
+            return .distilledFixture(id)
+        }
         if let distilledCore { return .distilledCore(catalogID, distilledCore) }
         if let gearProfile { return .gear(gearProfile.stableInstanceID) }
         // Upgrade level is part of what a piece *is*: a blade you've reforged twice is not

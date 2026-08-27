@@ -212,7 +212,6 @@ extension GameStore {
         switch ChannelworksRestorationRules.location(in: state.base) {
         case .stored: "in the Storehouse"
         case .waitingToSort: "waiting at the Storehouse"
-        case .worn(let member, _): "worn by \(name(of: member))"
         case .awayOrNoLongerOwned, .legacyIdentityUnknown, nil: nil
         }
     }
