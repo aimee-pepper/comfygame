@@ -624,18 +624,21 @@ final class PageTests: XCTestCase {
 
             for scheme in [ColorScheme.light, .dark] {
                 var mountedRail: (disabled: Bool, copy: String)?
+                var frames: [String: CGRect] = [:]
                 let controller = UIHostingController(rootView:
                     WritingDeskView(debugInitialPane: "The world",
                                     debugSelectedWorldPageID: selected.id,
                                     debugBindRailProbe: { disabled, copy in
                                         mountedRail = (disabled, copy)
+                                    }, debugBindRailFrameProbe: { identity, frame in
+                                        frames[identity] = frame
                                     })
                         .environmentObject(store)
-                        .environment(\.colorScheme, scheme)
-                        .frame(width: 368, height: 800))
+                        .environment(\.colorScheme, scheme))
                 let window = UIWindow(frame: .init(x: 0, y: 0, width: 368, height: 800))
                 window.rootViewController = controller
                 window.makeKeyAndVisible()
+                controller.additionalSafeAreaInsets.bottom = 34
                 controller.view.frame = window.bounds
                 controller.view.layoutIfNeeded()
                 RunLoop.main.run(until: Date().addingTimeInterval(0.1))
@@ -645,6 +648,17 @@ final class PageTests: XCTestCase {
                                "strict invalid source must disable the mounted Bind rail")
                 XCTAssertEqual(mountedRail?.copy,
                                "This page changed before it could be reviewed.")
+                let safeBottom = controller.view.safeAreaInsets.bottom
+                let rail = try XCTUnwrap(frames["rail"])
+                let capsule = try XCTUnwrap(frames["capsule"])
+                let footnote = try XCTUnwrap(frames["footnote"])
+                XCTAssertGreaterThanOrEqual(safeBottom, 34)
+                XCTAssertLessThanOrEqual(rail.maxY, 800 - safeBottom + 0.75)
+                XCTAssertTrue(rail.contains(capsule))
+                XCTAssertTrue(rail.contains(footnote))
+                XCTAssertGreaterThanOrEqual(capsule.height, 44)
+                XCTAssertLessThanOrEqual(capsule.maxY, footnote.minY + 0.75,
+                                         "disabled capsule and refusal footnote must not overlap")
 
                 let image = UIGraphicsImageRenderer(size: window.bounds.size).image { _ in
                     controller.view.drawHierarchy(in: controller.view.bounds,

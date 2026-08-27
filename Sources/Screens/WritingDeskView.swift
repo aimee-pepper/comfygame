@@ -91,6 +91,7 @@ struct WritingDeskView: View {
     @State private var writingPackUnavailable = false
 #if DEBUG
     private var debugBindRailProbe: ((Bool, String) -> Void)?
+    private var debugBindRailFrameProbe: ((String, CGRect) -> Void)?
 #endif
 
     @State private var bin: Bin = .compounds
@@ -98,17 +99,20 @@ struct WritingDeskView: View {
     init() {
 #if DEBUG
         debugBindRailProbe = nil
+        debugBindRailFrameProbe = nil
 #endif
     }
 
 #if DEBUG
     init(debugInitialPane: String, debugBornAnchored: Bool = false,
          debugSelectedWorldPageID: InstanceID? = nil,
-         debugBindRailProbe: ((Bool, String) -> Void)? = nil) {
+         debugBindRailProbe: ((Bool, String) -> Void)? = nil,
+         debugBindRailFrameProbe: ((String, CGRect) -> Void)? = nil) {
         _pane = State(initialValue: Pane(rawValue: debugInitialPane) ?? .write)
         _bornAnchored = State(initialValue: debugBornAnchored)
         _selectedWorldPageID = State(initialValue: debugSelectedWorldPageID)
         self.debugBindRailProbe = debugBindRailProbe
+        self.debugBindRailFrameProbe = debugBindRailFrameProbe
     }
 #endif
 
@@ -177,7 +181,11 @@ struct WritingDeskView: View {
             case .world: worldPane
             }
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(WritingDeskPaperBackground())
+        .safeAreaInset(edge: .bottom, spacing: 0) {
+            if pane == .world { bindBar }
+        }
         .toolbar(.hidden, for: .navigationBar)
         .confirmationDialog(
             "Clear this page?",
@@ -775,8 +783,7 @@ struct WritingDeskView: View {
     }
 
     private var worldPane: some View {
-        VStack(spacing: 0) {
-            ScrollView {
+        ScrollView {
                 if let review = store.writingDeskReviewModel(
                     selectedWorldPageID: selectedWorldPageID, bornAnchored: bornAnchored) {
                     let presentation = WritingDeskCausalPresentation.make(from: review)
@@ -828,8 +835,6 @@ struct WritingDeskView: View {
                         description: Text("This page changed before it could be reviewed."))
                         .accessibilityIdentifier("writing.causal-review-unavailable")
                 }
-            }
-            bindBar
         }
     }
 
@@ -1036,6 +1041,7 @@ struct WritingDeskView: View {
             .fullFacePressFeedback("writing.bind-depart")
             .accessibilityIdentifier("writing.bind-depart")
             .disabled(!activeBindAvailability.isReady)
+            .background { debugBindFrame("capsule") }
 
             if let error = store.bindError {
                 Text(error)
@@ -1049,15 +1055,31 @@ struct WritingDeskView: View {
                 .font(.caption)
                 .foregroundStyle(activeBindAvailability.isReady ? Color.secondary : Color.orange)
                 .multilineTextAlignment(.center)
+                .background { debugBindFrame("footnote") }
         }
         .padding(.horizontal, 16)
         .padding(.top, 10)
         .padding(.bottom, 8)
         .background(.bar)
+        .background { debugBindFrame("rail") }
 #if DEBUG
         .onAppear {
             debugBindRailProbe?(!activeBindAvailability.isReady, bindFootnote)
         }
+#endif
+    }
+
+    @ViewBuilder private func debugBindFrame(_ identity: String) -> some View {
+#if DEBUG
+        GeometryReader { proxy in
+            Color.clear
+                .onAppear { debugBindRailFrameProbe?(identity, proxy.frame(in: .global)) }
+                .onChange(of: proxy.frame(in: .global)) { _, frame in
+                    debugBindRailFrameProbe?(identity, frame)
+                }
+        }
+#else
+        EmptyView()
 #endif
     }
 
