@@ -731,7 +731,8 @@ struct RunExitSummaryView: View {
                 ItemIconTile(icon: item.fallbackIcon, catalogueID: item.snapshot.catalogID,
                              rarity: ContentCatalog.shared.item(item.snapshot.catalogID)?.rarity ?? .common,
                              quantity: item.quantity, identified: item.snapshot.identified,
-                             location: location, accessibilityName: item.fallbackName)
+                             location: location, accessibilityName: item.fallbackName,
+                             gearQualityBand: item.snapshot.gearProfile?.qualityBand)
             } else {
                 RunExitUnrecordedItemTile(icon: item.fallbackIcon,
                                           catalogueID: item.snapshot.catalogID,
@@ -740,7 +741,8 @@ struct RunExitSummaryView: View {
                                             .item(item.snapshot.catalogID)?.rarity ?? .common,
                                           quantity: item.quantity,
                                           identified: item.snapshot.identified,
-                                          accessibilityName: item.fallbackName)
+                                          accessibilityName: item.fallbackName,
+                                          gearQualityBand: item.snapshot.gearProfile?.qualityBand)
             }
         case .materialSample(let material):
             if let location = receiptItemLocation(material.recoveredDestination, isLost: isLost) {
@@ -941,6 +943,8 @@ private struct RunExitUnrecordedItemTile: View {
     let quantity: Int
     let identified: Bool
     let accessibilityName: String
+    /// Frozen receipt instance authority. Nil is reserved for catalogue-only/non-gear records.
+    var gearQualityBand: CraftMaterialQualityBand? = nil
 
     var body: some View {
         ZStack {
@@ -971,9 +975,16 @@ private struct RunExitUnrecordedItemTile: View {
         .frame(minWidth: 44, minHeight: 44)
         .contentShape(RoundedRectangle(cornerRadius: 9))
         .accessibilityElement(children: .ignore)
-        .accessibilityLabel(
-            "\(identified ? accessibilityName : "Unknown item"), \(rarity.displayName), "
-                + "destination not recorded\(quantity > 1 ? ", quantity \(quantity)" : "")")
+        .accessibilityLabel(accessibilityLabel)
+    }
+
+    private var accessibilityLabel: String {
+        let identity = identified ? accessibilityName : "Unknown item"
+        let quality = GearPresentationCopy.itemGridQuality(instanceBand: gearQualityBand,
+                                                           catalogueID: catalogueID,
+                                                           fallbackRarity: rarity)
+        return "\(identity), \(quality), destination not recorded"
+            + (quantity > 1 ? ", quantity \(quantity)" : "")
     }
 }
 

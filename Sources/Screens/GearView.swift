@@ -43,6 +43,7 @@ struct GearView: View {
                                          quantity: option.count, identified: true,
                                          location: gridLocation(of: option),
                                          accessibilityName: option.piece.displayName,
+                                         gearQualityBand: option.piece.gearProfile?.qualityBand,
                                          isEnabled: option.canEquipAtHome)
                                 .opacity(isWornByAnotherCharacter(option) ? 0.55 : 1)
                                 .overlay {
@@ -195,7 +196,8 @@ private struct GearOptionDetailPane: View {
                                      rarity: option.piece.definition?.rarity ?? .common,
                                      quantity: option.count, identified: true,
                                      location: gridLocation,
-                                     accessibilityName: option.piece.displayName)
+                                     accessibilityName: option.piece.displayName,
+                                     gearQualityBand: option.piece.gearProfile?.qualityBand)
                             .frame(width: 52, height: 52)
                         VStack(alignment: .leading, spacing: 3) {
                             Text(location)

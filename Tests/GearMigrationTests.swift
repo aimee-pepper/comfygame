@@ -212,6 +212,14 @@ final class GearMigrationTests: XCTestCase {
                                                              catalogueID: "silvered_helm",
                                                              fallbackRarity: .mythic), "Superior",
                        "catalogue quality is allowed only when no instance authority is supplied")
+
+        let root = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent().deletingLastPathComponent()
+        let gearView = try String(contentsOf: root.appending(path: "Sources/Screens/GearView.swift"),
+                                  encoding: .utf8)
+        XCTAssertEqual(gearView.components(separatedBy:
+            "gearQualityBand: option.piece.gearProfile?.qualityBand").count - 1, 2,
+            "both the Party/Gear option and detail tile must carry frozen instance quality")
     }
 
     func testMigrationPreservesConstructionReceiptPrecedenceForCatalogueAuthoredID() throws {

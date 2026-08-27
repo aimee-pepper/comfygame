@@ -927,6 +927,34 @@ final class ExpeditionOutcomeTests: XCTestCase {
         XCTAssertTrue(source.contains("LegacyReceiptIconTile(icon:"))
         XCTAssertFalse(source.contains("recapSection(\"Resources\", gains: summary.resources)"))
         XCTAssertFalse(source.contains("recapSection(\"Items\", gains: summary.items)"))
+        XCTAssertTrue(source.contains(
+            "gearQualityBand: item.snapshot.gearProfile?.qualityBand"),
+            "recorded and unrecorded Return tiles must retain frozen instance quality")
+        XCTAssertTrue(source.contains(
+            "GearPresentationCopy.itemGridQuality(instanceBand: gearQualityBand"),
+            "unrecorded Return must not append catalogue rarity over instance quality")
+    }
+
+    func testFrozenRoughGearOverridesSuperiorCatalogueAcrossGearAndReturnSurfaces() throws {
+        var superiorCatalogueInstance = ItemStack(id: .init(rawValue: 8_801),
+                                                  catalogID: "silvered_helm")
+        superiorCatalogueInstance.gearProfile?.qualityBand = .rough
+        XCTAssertEqual(ContentCatalog.shared.item("silvered_helm")?
+            .gearCatalogueDisposition?.foundReceipt?.qualityBand, .superior)
+        XCTAssertEqual(GearPresentationCopy.instanceQuality(superiorCatalogueInstance), "Rough")
+        XCTAssertEqual(GearPresentationCopy.itemGridQuality(
+            instanceBand: superiorCatalogueInstance.gearProfile?.qualityBand,
+            catalogueID: superiorCatalogueInstance.catalogID,
+            fallbackRarity: .mythic), "Rough")
+
+        let frozenReturn = RunExitSummary.ReceiptLine.Item(
+            lineID: "rough-silvered", instanceID: superiorCatalogueInstance.id,
+            snapshot: superiorCatalogueInstance, quantity: 1,
+            fallbackName: superiorCatalogueInstance.displayName,
+            fallbackIcon: superiorCatalogueInstance.icon)
+        XCTAssertEqual(frozenReturn.snapshot.gearProfile?.qualityBand, .rough,
+                       "both recorded and unrecorded Return paths consume this frozen snapshot")
+        XCTAssertFalse(frozenReturn.fallbackName.contains("Superior"))
     }
 
     func testRunExitRecapRoutesEveryMaterialKindToExistingPixelIdentity() throws {
