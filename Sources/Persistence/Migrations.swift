@@ -80,42 +80,60 @@ enum Migrations {
                 guard var encounter = encounterValue as? [String: Any] else {
                     throw CocoaError(.coderInvalidValue)
                 }
+                let resolution: CreatureMaterialRewardResolutionV1
                 if encounter.keys.contains("creatureMaterialRewardResolution") {
                     guard !(encounter["creatureMaterialRewardResolution"] is NSNull) else {
                         throw CocoaError(.coderInvalidValue)
                     }
-                    _ = try SaveCodec.makeDecoder().decode(
+                    resolution = try SaveCodec.makeDecoder().decode(
                         CreatureMaterialRewardResolutionV1.self,
                         from: JSONSerialization.data(
                             withJSONObject: encounter["creatureMaterialRewardResolution"] as Any))
                 } else {
-                    let resolution: CreatureMaterialRewardResolutionV1 =
+                    resolution =
                         encounter["outcome"] == nil || encounter["outcome"] is NSNull
                         ? .pending : .legacyResolved
-                    if case .pending = resolution {
-                        let enemies = try SaveCodec.makeDecoder().decode(
-                            [WorldEnemy].self,
-                            from: JSONSerialization.data(withJSONObject: run["enemies"] ?? []))
-                        var foes = try SaveCodec.makeDecoder().decode(
-                            [FoeState].self,
-                            from: JSONSerialization.data(withJSONObject: encounter["foes"] ?? []))
-                        guard Set(enemies.map(\.id)).count == enemies.count else {
+                    encounter["creatureMaterialRewardResolution"] = try json(resolution)
+                }
+                if case .pending = resolution {
+                    let enemies = try SaveCodec.makeDecoder().decode(
+                        [WorldEnemy].self,
+                        from: JSONSerialization.data(withJSONObject: run["enemies"] ?? []))
+                    var foes = try SaveCodec.makeDecoder().decode(
+                        [FoeState].self,
+                        from: JSONSerialization.data(withJSONObject: encounter["foes"] ?? []))
+                    guard Set(enemies.map(\.id)).count == enemies.count,
+                          Set(foes.map(\.id)).count == foes.count else {
+                        throw CocoaError(.coderInvalidValue)
+                    }
+                    for index in foes.indices {
+                        if foes[index].creatureID != nil {
+                            guard foes[index].speciesID == nil else { throw CocoaError(.coderInvalidValue) }
+                            continue
+                        }
+                        guard foes[index].traits != nil else {
+                            guard foes[index].speciesID == nil else { throw CocoaError(.coderInvalidValue) }
+                            continue
+                        }
+                        guard let enemy = enemies.first(where: { $0.id == foes[index].id }) else {
                             throw CocoaError(.coderInvalidValue)
                         }
-                        for index in foes.indices where foes[index].speciesID == nil {
-                            guard foes[index].creatureID == nil, foes[index].traits != nil else { continue }
-                            guard let enemy = enemies.first(where: { $0.id == foes[index].id }) else {
-                                throw CocoaError(.coderInvalidValue)
-                            }
-                            if enemy.floraID != nil { continue }
-                            guard let speciesID = enemy.speciesID else {
-                                throw CocoaError(.coderInvalidValue)
-                            }
-                            foes[index].speciesID = speciesID
+                        if enemy.floraID != nil {
+                            guard foes[index].speciesID == nil else { throw CocoaError(.coderInvalidValue) }
+                            continue
                         }
-                        encounter["foes"] = try json(foes)
+                        guard let expectedSpeciesID = enemy.speciesID else {
+                            throw CocoaError(.coderInvalidValue)
+                        }
+                        if let presentSpeciesID = foes[index].speciesID {
+                            guard presentSpeciesID == expectedSpeciesID else {
+                                throw CocoaError(.coderInvalidValue)
+                            }
+                        } else {
+                            foes[index].speciesID = expectedSpeciesID
+                        }
                     }
-                    encounter["creatureMaterialRewardResolution"] = try json(resolution)
+                    encounter["foes"] = try json(foes)
                 }
                 run["activeEncounter"] = encounter
             }

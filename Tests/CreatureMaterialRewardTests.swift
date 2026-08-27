@@ -173,7 +173,6 @@ final class CreatureMaterialRewardTests: XCTestCase {
         var active = try XCTUnwrap(worlds["activeRun"] as? [String: Any])
         active.removeValue(forKey: "sourceDangerReceipt")
         var encounter = try XCTUnwrap(active["activeEncounter"] as? [String: Any])
-        encounter.removeValue(forKey: "creatureMaterialRewardResolution")
         active["activeEncounter"] = encounter; worlds["activeRun"] = active; root["worlds"] = worlds
 
         let migrated = try Migrations.migrateIfNeeded(
@@ -189,6 +188,54 @@ final class CreatureMaterialRewardTests: XCTestCase {
         let relaunched = try SaveCodec.decode(SaveCodec.encode(decoded))
         XCTAssertEqual(relaunched.worlds.activeRun?.creatureMaterialRewardReceipts, [receipt])
         XCTAssertEqual(relaunched.worlds.activeRun?.materialReserve.units.count, 1)
+    }
+
+    func testSchemaFiveTransitionalPendingRetainsMatchingSpeciesAndRejectsMismatchAtomically() throws {
+        let speciesID = InstanceID(rawValue: 91)
+        let foeID = InstanceID(rawValue: 52)
+        var state = GameState.newGame()
+        var run = fixtureRun()
+        let traits = CreatureTraits()
+        run.cast = [.init(id: speciesID, traits: traits, worldSeed: 8,
+                          habitat: .terrestrial, materialProjection: .init(entries: []))]
+        run.enemies = [.init(id: foeID, speciesID: speciesID, traits: traits,
+                             position: .init(x: 0, y: 0))]
+        var rng = SeededRNG(seed: 9)
+        run.activeEncounter = CombatRules.makeEncounter(
+            id: .init(rawValue: 51),
+            foes: [.init(id: foeID, speciesID: speciesID, traits: traits,
+                         stats: .init(displayName: "Generated", icon: "ant", maxHP: 1, attack: 1),
+                         currentHP: 1)], party: [.binder], rng: &rng)
+        state.worlds.activeRun = run
+
+        func schemaFiveRoot() throws -> [String: Any] {
+            var root = try XCTUnwrap(JSONSerialization.jsonObject(
+                with: SaveCodec.makeEncoder().encode(state)) as? [String: Any])
+            root["schemaVersion"] = 5
+            var worlds = try XCTUnwrap(root["worlds"] as? [String: Any])
+            var active = try XCTUnwrap(worlds["activeRun"] as? [String: Any])
+            active.removeValue(forKey: "sourceDangerReceipt")
+            worlds["activeRun"] = active; root["worlds"] = worlds
+            return root
+        }
+
+        let matching = try schemaFiveRoot()
+        let migrated = try Migrations.migrateIfNeeded(
+            JSONSerialization.data(withJSONObject: matching, options: [.sortedKeys]))
+        XCTAssertEqual(try SaveCodec.decode(migrated).worlds.activeRun?
+            .activeEncounter?.foes.first?.speciesID, speciesID)
+
+        var mismatched = try schemaFiveRoot()
+        var worlds = try XCTUnwrap(mismatched["worlds"] as? [String: Any])
+        var active = try XCTUnwrap(worlds["activeRun"] as? [String: Any])
+        var encounter = try XCTUnwrap(active["activeEncounter"] as? [String: Any])
+        var foes = try XCTUnwrap(encounter["foes"] as? [[String: Any]])
+        foes[0]["speciesID"] = ["rawValue": 999]
+        encounter["foes"] = foes; active["activeEncounter"] = encounter
+        worlds["activeRun"] = active; mismatched["worlds"] = worlds
+        let raw = try JSONSerialization.data(withJSONObject: mismatched, options: [.sortedKeys])
+        XCTAssertThrowsError(try Migrations.migrateIfNeeded(raw))
+        XCTAssertEqual(raw, try JSONSerialization.data(withJSONObject: mismatched, options: [.sortedKeys]))
     }
 
     func testSchemaFiveGeneratedEncounterWithoutExactWorldEnemyFailsAtomically() throws {
