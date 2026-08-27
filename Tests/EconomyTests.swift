@@ -98,6 +98,67 @@ final class EconomyTests: XCTestCase {
         XCTAssertEqual(vitality.collapseDisclosure, illumination.collapseDisclosure)
     }
 
+    func testWritingDeskCausalPresentationUsesOnlyRedactedReviewTruth() throws {
+        let store = GameStore(io: .temporary(name: "desk-causal-\(UUID().uuidString)"))
+        let target = PlacedRune(id: .init(rawValue: 31), content: .target("illumination"), hand: .plain,
+                                origin: .init(column: 0, row: 0), shapeID: "refined_dot")
+        let source = PlacedRune(id: .init(rawValue: 32), content: .source("sun"), hand: .plain,
+                                origin: .init(column: 1, row: 0), shapeID: "refined_dot")
+        let inert = PlacedRune(id: .init(rawValue: 33), content: .target("vitality"), hand: .plain,
+                               origin: .init(column: 3, row: 0), shapeID: "refined_dot")
+        store.mutate("install causal presentation page") { state in
+            state.base.ownedSources.insert("sun")
+            state.base.page = Page(runes: [target, source, inert],
+                                   links: [MarkLink(target.id, source.id)])
+        }
+
+        let review = try XCTUnwrap(store.writingDeskReviewModel())
+        let presentation = WritingDeskCausalPresentation.make(from: review)
+
+        XCTAssertEqual(presentation.sourceTitle, "Current page")
+        XCTAssertEqual(presentation.sourceState, "Current page · 3 placed marks")
+        XCTAssertEqual(presentation.requests, [
+            .init(subject: "Illumination", detail: "Sun")
+        ])
+        XCTAssertEqual(presentation.placedMarkState,
+                       "1 placed marks are not connected into a request.")
+        XCTAssertNil(presentation.unreadMarkState)
+        XCTAssertEqual(presentation.stability,
+                       review.stabilityRange.isPoint
+                        ? "Stability \(review.stabilityRange.lowerBound)"
+                        : "Stability \(review.stabilityRange.lowerBound)–\(review.stabilityRange.upperBound)")
+        XCTAssertEqual(presentation.collapse, review.collapseDisclosure.copy)
+        XCTAssertEqual(presentation.preparation, [review.fieldKitSummary])
+    }
+
+    func testWritingDeskCausalPresentationCannotLeakUnreadMeaning() throws {
+        func presentation(target: PressureTargetID) throws -> WritingDeskCausalPresentation {
+            let store = GameStore(io: .temporary(name: "desk-causal-unread-\(UUID().uuidString)"))
+            let mark = PlacedRune(
+                id: .init(rawValue: 41),
+                sigil: Sigil(id: .init(rawValue: 42), source: "sun", target: target),
+                hand: .plain, origin: .init(column: 0, row: 0), shapeID: "refined_dot")
+            store.mutate("install unread causal page") { state in
+                state.base.ownedSources.remove("sun")
+                state.base.page = Page(runes: [mark])
+                state.reality.encounteredLexemes.formUnion(mark.content.encounteredLexemes)
+            }
+            return WritingDeskCausalPresentation.make(
+                from: try XCTUnwrap(store.writingDeskReviewModel()))
+        }
+
+        let vitality = try presentation(target: "vitality")
+        let illumination = try presentation(target: "illumination")
+        XCTAssertEqual(vitality.requests, illumination.requests)
+        XCTAssertEqual(vitality.unreadMarkState, "1 marks remain unread.")
+        XCTAssertEqual(vitality.uncertainty, illumination.uncertainty)
+        XCTAssertEqual(vitality.stability, "Stability 0–100")
+        XCTAssertEqual(vitality.collapse, illumination.collapse)
+        XCTAssertEqual(vitality.sight, illumination.sight)
+        XCTAssertEqual(vitality.danger, illumination.danger)
+        XCTAssertEqual(vitality.ecology, illumination.ecology)
+    }
+
     func testCollectedReviewNeverFallsBackToDraftWhenCanonicalSnapshotChanges() throws {
         let store = GameStore(io: .temporary(name: "desk-stale-source-\(UUID().uuidString)"))
         let page = try XCTUnwrap(store.state.base.collectedWorldPages.first)

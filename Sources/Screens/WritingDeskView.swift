@@ -155,9 +155,6 @@ struct WritingDeskView: View {
 
     private var state: GameState { store.state }
     private var draft: Page { store.writingDeskPage }
-    private var projection: BookProjection {
-        selectedWorldPageID.flatMap(store.worldPageProjection) ?? store.bookProjection
-    }
 
     var body: some View {
         VStack(spacing: 0) {
@@ -769,15 +766,83 @@ struct WritingDeskView: View {
     private var worldPane: some View {
         VStack(spacing: 0) {
             ScrollView {
-                VStack(spacing: 12) {
-                    PreviewPanel(projection: projection, discovery: state.reality.discovery)
-                    if selectedWorldPageID == nil && draft.runes.isEmpty { blankPageNote }
+                if let review = store.writingDeskReviewModel(
+                    selectedWorldPageID: selectedWorldPageID, bornAnchored: bornAnchored) {
+                    let presentation = WritingDeskCausalPresentation.make(from: review)
+                    VStack(alignment: .leading, spacing: 14) {
+                        causalSourceCard(presentation)
+                        causalSection("What the page says") {
+                            if presentation.requests.isEmpty {
+                                Text("No connected readable requests.")
+                                    .foregroundStyle(.secondary)
+                            } else {
+                                ForEach(Array(presentation.requests.enumerated()), id: \.offset) { _, request in
+                                    VStack(alignment: .leading, spacing: 2) {
+                                        Text(request.subject).font(.subheadline.weight(.semibold))
+                                        Text(request.detail).font(.caption).foregroundStyle(.secondary)
+                                    }
+                                }
+                            }
+                            if let copy = presentation.placedMarkState { Text(copy).font(.caption) }
+                            if let copy = presentation.unreadMarkState { Text(copy).font(.caption) }
+                        }
+                        causalSection("What remains open") {
+                            Text(presentation.uncertainty)
+                        }
+                        causalSection("Risk") {
+                            Text(presentation.stability).font(.headline).monospacedDigit()
+                            Text(presentation.collapse)
+                            Text(presentation.sight)
+                            if presentation.danger != presentation.sight { Text(presentation.danger) }
+                        }
+                        causalSection("Preparation") {
+                            ForEach(presentation.preparation, id: \.self) { Text($0) }
+                        }
+                        DisclosureGroup("Further reading") {
+                            VStack(alignment: .leading, spacing: 6) {
+                                Text(presentation.ecology)
+                            }
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                        }
+                    }
+                    .accessibilityIdentifier("writing.causal-review")
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 10)
+                    .padding(.bottom, 8)
+                } else {
+                    ContentUnavailableView(
+                        "Page unavailable",
+                        systemImage: "doc.badge.ellipsis",
+                        description: Text("This page changed before it could be reviewed."))
+                        .accessibilityIdentifier("writing.causal-review-unavailable")
                 }
-                .padding(.horizontal, 12)
-                .padding(.bottom, 8)
             }
             bindBar
         }
+    }
+
+    private func causalSourceCard(_ presentation: WritingDeskCausalPresentation) -> some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Text(presentation.sourceTitle).font(.headline)
+            Text(presentation.sourceState).font(.caption).foregroundStyle(.secondary)
+            Text("Bind cost · \(totalCost) Essence").font(.caption.weight(.semibold))
+        }
+        .frame(maxWidth: .infinity, minHeight: 72, alignment: .leading)
+        .padding(10)
+        .background(PixelUITheme.surfaceRaised)
+        .overlay(Rectangle().stroke(PixelUITheme.edge, lineWidth: 2))
+        .accessibilityIdentifier("writing.causal-source")
+    }
+
+    private func causalSection<Content: View>(
+        _ title: String, @ViewBuilder content: () -> Content
+    ) -> some View {
+        VStack(alignment: .leading, spacing: 6) {
+            Text(title).font(.headline).accessibilityAddTraits(.isHeader)
+            content().font(.callout)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
     }
 
     // MARK: The palette
@@ -951,11 +1016,9 @@ struct WritingDeskView: View {
             } label: {
                 HStack {
                     Label("Bind & Depart", systemImage: "book.closed.fill")
-                    Spacer()
-                    Text(costLabel).monospacedDigit()
                 }
                 .font(.headline)
-                .frame(minHeight: 50)
+                .frame(maxWidth: .infinity, minHeight: 50)
                 .padding(.horizontal, 4)
             }
             .buttonStyle(.borderedProminent)
@@ -990,11 +1053,15 @@ struct WritingDeskView: View {
 
     private var totalCost: Int {
         if case .ready(let total) = activeBindAvailability { return total }
-        let premium = bornAnchored ? GameStore.bornAnchoredPremium(forBookCost: projection.cost) : 0
-        return projection.cost + premium
+        return currentSourceCost + (bornAnchored ? activeAnchoredPremium : 0)
     }
     private var activeAnchoredPremium: Int {
-        GameStore.bornAnchoredPremium(forBookCost: projection.cost)
+        GameStore.bornAnchoredPremium(forBookCost: currentSourceCost)
+    }
+    private var currentSourceCost: Int {
+        store.writingDeskReviewModel(
+            selectedWorldPageID: selectedWorldPageID,
+            bornAnchored: bornAnchored)?.costQuote ?? 0
     }
     private var costLabel: String { "\(totalCost)" }
 
@@ -1007,10 +1074,11 @@ struct WritingDeskView: View {
             }
             return "You have \(state.base.essenceCrystalCount) essence; this binding costs \(totalCost). Erase a Sigil or bind it without anchoring."
         }
-        return "Costs \(totalCost) essence of your \(state.base.essenceCrystalCount)."
+        return "Essence \(state.base.essenceCrystalCount) → \(state.base.essenceCrystalCount - totalCost)"
     }
 
     private func presentWritingRequestIfNeeded() {
+        guard store.state.tutorial[.writingPageRequest].status != .completed else { return }
         store.tutorialEligible(.writingPageRequest)
         present(.writingPageRequest)
     }

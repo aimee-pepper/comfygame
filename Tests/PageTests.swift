@@ -552,6 +552,44 @@ final class PageTests: XCTestCase {
     }
 
     @MainActor
+    func testWritingDeskCausalReviewMountsAtOrdinaryPhoneWithoutMutation() throws {
+        let store = GameStore(io: .temporary(name: "writing-causal-mount-\(UUID().uuidString)"))
+        store.mutate("prepare causal mount") { state in
+            state.base.setEssenceCrystalCount(100)
+            for lesson in TutorialLessonID.allCases {
+                state.tutorial.complete(lesson, fact: "causal_mount")
+            }
+        }
+        store.reconcileStarterWorldPageBundle()
+        let before = try SaveCodec.makeEncoder().encode(store.state)
+        for scheme in [ColorScheme.light, .dark] {
+            let controller = UIHostingController(rootView:
+                WritingDeskView(debugInitialPane: "The world")
+                    .environmentObject(store)
+                    .environment(\.colorScheme, scheme)
+                    .frame(width: 368, height: 800))
+            let window = UIWindow(frame: .init(x: 0, y: 0, width: 368, height: 800))
+            window.rootViewController = controller
+            window.makeKeyAndVisible()
+            controller.view.frame = window.bounds
+            controller.view.layoutIfNeeded()
+            RunLoop.main.run(until: Date().addingTimeInterval(0.1))
+            controller.view.layoutIfNeeded()
+
+            XCTAssertEqual(controller.view.bounds.size, CGSize(width: 368, height: 800))
+            let image = UIGraphicsImageRenderer(size: window.bounds.size).image { _ in
+                controller.view.drawHierarchy(in: controller.view.bounds, afterScreenUpdates: true)
+            }
+            let attachment = XCTAttachment(image: image)
+            attachment.name = "writing-causal-review-\(scheme == .light ? "light" : "dark")"
+            attachment.lifetime = .keepAlways
+            add(attachment)
+            window.isHidden = true
+        }
+        XCTAssertEqual(try SaveCodec.makeEncoder().encode(store.state), before)
+    }
+
+    @MainActor
     func testWritingDeskPrimaryFacesPressImmediatelyAndDisabledBindStaysInactive() throws {
         let store = GameStore(io: .temporary(name: "writing-press-\(UUID().uuidString)"))
         store.mutate("prepare writing press fixture") { state in
@@ -3833,6 +3871,14 @@ final class PageTests: XCTestCase {
         XCTAssertFalse(source.contains("Picker(\"\", selection: $pane)"),
                        "The approved three-pane rail belongs in the screen, not the navigation title.")
         XCTAssertTrue(source.contains("store.bindAndDepart"))
+        XCTAssertTrue(source.contains("WritingDeskCausalPresentation.make(from: review)"))
+        XCTAssertTrue(source.contains("causalSection(\"What the page says\")"))
+        XCTAssertTrue(source.contains("causalSection(\"What remains open\")"))
+        XCTAssertTrue(source.contains("causalSection(\"Risk\")"))
+        XCTAssertTrue(source.contains("causalSection(\"Preparation\")"))
+        XCTAssertTrue(source.contains("DisclosureGroup(\"Further reading\")"))
+        XCTAssertFalse(source.contains("PreviewPanel(projection:"),
+                       "The live review pane must not bypass the redacted causal model.")
         XCTAssertTrue(source.contains("store.savePageTemplate"))
         XCTAssertTrue(source.contains("store.clearPage()"))
         XCTAssertFalse(source.contains("private var writingContextTools"))

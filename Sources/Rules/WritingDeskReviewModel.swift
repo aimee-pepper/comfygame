@@ -99,6 +99,66 @@ struct WritingDeskReviewModel: Equatable, Sendable {
     var visibleMarkCount: Int { visibleMarks.count }
 }
 
+/// Closed player-facing causal summary for the Writing Desk's review pane.
+///
+/// Keeping this projection beside the redacted review model prevents the SwiftUI surface from
+/// reaching back into `BookProjection` for a more precise (and potentially undisclosed) answer.
+struct WritingDeskCausalPresentation: Equatable, Sendable {
+    struct Request: Equatable, Sendable {
+        var subject: String
+        var detail: String
+    }
+
+    var sourceTitle: String
+    var sourceKind: WritingDeskReviewModel.SourceKind
+    var sourceState: String
+    var requests: [Request]
+    var placedMarkState: String?
+    var unreadMarkState: String?
+    var uncertainty: String
+    var stability: String
+    var collapse: String
+    var sight: String
+    var danger: String
+    var ecology: String
+    var preparation: [String]
+
+    static func make(from review: WritingDeskReviewModel) -> Self {
+        let sourceState = switch review.sourceKind {
+        case .draft: "Current page · \(review.visibleMarkCount) placed marks"
+        case .collected: "Collected World Page · consumed only when departure succeeds"
+        }
+        let requests = review.knownRequests.map { request in
+            Request(
+                subject: request.subject,
+                detail: request.focuses.map { focus in
+                    focus.qualifiers.isEmpty
+                        ? focus.name
+                        : "\(focus.name); \(focus.qualifiers.joined(separator: ", "))"
+                }.joined(separator: " · "))
+        }
+        let stability = review.stabilityRange.lowerBound == review.stabilityRange.upperBound
+            ? "Stability \(review.stabilityRange.lowerBound)"
+            : "Stability \(review.stabilityRange.lowerBound)–\(review.stabilityRange.upperBound)"
+        return Self(
+            sourceTitle: review.title,
+            sourceKind: review.sourceKind,
+            sourceState: sourceState,
+            requests: requests,
+            placedMarkState: review.silentMarkCount == 0 ? nil
+                : "\(review.silentMarkCount) placed marks are not connected into a request.",
+            unreadMarkState: review.unreadMarkCount == 0 ? nil
+                : "\(review.unreadMarkCount) marks remain unread.",
+            uncertainty: review.uncertaintyReason,
+            stability: stability,
+            collapse: review.collapseDisclosure.copy,
+            sight: review.sightDisclosure,
+            danger: review.dangerDisclosure,
+            ecology: review.ecologyDisclosure,
+            preparation: [review.fieldKitSummary])
+    }
+}
+
 enum WritingDeskReviewModelFactory {
     /// Builds one redacted model. `selectedWorldPageID != nil` never falls back to the draft.
     static func make(state: GameState,
