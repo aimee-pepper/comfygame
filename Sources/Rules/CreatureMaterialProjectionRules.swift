@@ -179,7 +179,7 @@ enum CreatureMaterialProjectionRules {
         if primary == .feather && values.insulation >= 25 { families.append(.down) }
         if traits.appendages.type == .finned && traits.appendages.count > 0 { families.append(.fin) }
         if values.armamentTotal >= 30 {
-            switch traits.armament.dominant {
+            switch values.dominantArmament {
             case .pierce: families.append(.fang)
             case .rend: families.append(.claw)
             case .crush: families.append(traits.cranialFeature == .horns ? .horn : .tusk)
@@ -287,6 +287,14 @@ enum CreatureMaterialProjectionRules {
         let insulation, flexibility, appendageExtent, finishLustre, armourValue: Double
         let finishSchiller, colorationPatterning, toxinPotency, emanationStrength: Double
         let sizeBand, appendageQuantity: Int
+
+        var dominantArmament: DamageKind {
+            if armamentPierce >= armamentCrush && armamentPierce >= armamentRend {
+                return .pierce
+            }
+            if armamentCrush >= armamentRend { return .crush }
+            return .rend
+        }
 
         init(traits: CreatureTraits) {
             size = clamp(traits.size)

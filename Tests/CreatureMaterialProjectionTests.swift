@@ -78,6 +78,24 @@ final class CreatureMaterialProjectionTests: XCTestCase {
         XCTAssertNil(try primary(hardness: 100, coverage: 14.9))
     }
 
+    func testArmamentDominanceUsesClampedValuesAndPierceCrushRendTieOrder() throws {
+        func armamentFamily(pierce: Double, crush: Double,
+                            rend: Double) throws -> CreatureMaterialFamilyID? {
+            var traits = CreatureTraits()
+            traits.bodyPlan = .amorphous
+            traits.armament.pierce = pierce
+            traits.armament.crush = crush
+            traits.armament.rend = rend
+            return try frozen(traits, habitat: .terrestrial).entries.first?.family
+        }
+        XCTAssertEqual(try armamentFamily(pierce: 101, crush: 102, rend: 0), .fang,
+                       "clamping creates a 100/100 tie owned by Pierce")
+        XCTAssertEqual(try armamentFamily(pierce: 99, crush: 102, rend: 0), .tusk,
+                       "a strictly greater clamped Crush value owns the armament")
+        XCTAssertEqual(try armamentFamily(pierce: 0, crush: 99, rend: 102), .claw,
+                       "a strictly greater clamped Rend value owns the armament")
+    }
+
     func testLegacyNilAndEcologyAwareCastFreezeWithoutChangingLegacyCast() throws {
         let readings = PressureRules.resolve([])
         let legacy = LifeRules.cast(for: readings, seed: 411)
