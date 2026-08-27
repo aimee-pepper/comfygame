@@ -115,6 +115,7 @@ struct GearInstanceProfile: Codable, Equatable, Sendable {
     var displayProvenance: String?
     var authoredUniqueRuleID: String?
     var foundReceipt: FoundGearReceiptV1?
+    var inscription: EquipmentInscriptionReceiptV1?
 
     init(stableInstanceID: InstanceID, definition: ItemDef, legacyUpgradeLevel: Int = 0) {
         let gear = definition.gear!

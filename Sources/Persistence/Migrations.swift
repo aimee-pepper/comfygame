@@ -120,7 +120,7 @@ enum Migrations {
         case 3: return try migrate3to4(data)
         case 4: return try migrate4to5(data)
         case 5: return try migrate5to6(data)
-        case 6: return try migrate6to7(data)
+        case 6: return try migrate6to7CreatureRewards(migrate6to7(data))
         case 7: return try migrate7to8(data)
         case 8: return try migrate8to9(data)
         default:
@@ -695,7 +695,7 @@ enum Migrations {
     }
 
     /// Freezes source danger and explicit once-only creature reward resolution across every run.
-    private static func migrate6to7(_ data: Data) throws -> Data {
+    private static func migrate6to7CreatureRewards(_ data: Data) throws -> Data {
         guard var root = try JSONSerialization.jsonObject(with: data) as? [String: Any] else {
             throw CocoaError(.coderInvalidValue)
         }

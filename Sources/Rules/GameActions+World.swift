@@ -195,6 +195,7 @@ extension GameStore {
             run.foundPagesAtStart = Set(state.reality.library.foundPages)
             run.foundWritingsAtStart = Set(state.reality.library.foundWritings.map(\.id))
             run.foundTravellersAtStart = state.reality.library.foundTravellers
+            run.seamwardExpedition = EquipmentInscriptionRules.expeditionReceipt(from: state.base)
             state.reality.lifetime.runsStarted += 1
             state.worlds.lastExit = nil
             state.worlds.activeRun = run
@@ -557,6 +558,24 @@ extension GameStore {
 
     /// Use something out here. Costs a turn, like everything else the world charges for.
     func useItemInWorld(_ stack: ItemStack, on member: PartyMember) {
+        if ContentCatalog.shared.item(stack.catalogID)?.consumable?.effect == .seamlightGuidance {
+            guard let attempt = beginWorldFieldAttempt(.useItem) else { return }
+            var events: [WorldRules.Event] = []
+            mutate("use seamlight", flush: true, scope: .expedition) { state in
+                switch SeamlightRules.evaluate(sourceItemInstanceID: stack.id, in: state) {
+                case .failure(let refusal):
+                    events = [.blocked(SeamlightRules.playerCopy(for: refusal))]
+                case .success(let quote):
+                    switch SeamlightRules.commit(quote, in: &state) {
+                    case .activated(_, let committed): events = committed
+                    case .refused(let refusal):
+                        events = [.blocked(SeamlightRules.playerCopy(for: refusal))]
+                    }
+                }
+            }
+            finishTurn(events, attempt: attempt)
+            return
+        }
         guard activeRun?.activeEncounter == nil else { return }
         if ContentCatalog.shared.item(stack.catalogID)?.consumable?.effect == .returnHome {
             returnHomeWithFullHaul(

@@ -113,10 +113,14 @@ enum TradingPostRules {
                    units: [], materialUnits: [sample])
         }
 
-        let knownConsumables = base.knownConsumableRecipes.compactMap { id -> ItemDef? in
-            guard let item = catalog.item(id), item.kind == .consumable,
-                  item.rarity == .common || item.rarity == .uncommon else { return nil }
-            return item
+        let knownConsumables = catalog.items.filter { item in
+            guard item.kind == .consumable,
+                  item.rarity == .common || item.rarity == .uncommon else { return false }
+            switch item.consumableMerchantStockAccess ?? .recipeKnown {
+            case .recipeKnown: return base.knownConsumableRecipes.contains(item.id)
+            case .independent: return item.tradingPostDisposition == .sellable
+            case .invalid: return false
+            }
         }.sorted { $0.id.rawValue < $1.id.rawValue }
         for item in chosenItems(knownConsumables, count: rng.int(in: 0...2), rng: &rng) {
             let quantity = rng.int(in: 1...2)

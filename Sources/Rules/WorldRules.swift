@@ -53,6 +53,8 @@ enum WorldRules {
         case metTraveller(TravellerID)
         /// Something used out in the world rather than mid-fight.
         case usedItem(String, on: PartyMember)
+        case seamlightActivated
+        case seamwardFoundNoSeam
         case surveyed([SurveyReading])
         case searchedSite(SiteID, turnsRemaining: Int)
         case siteOpened(SiteID)
@@ -484,6 +486,15 @@ enum WorldRules {
             run.scentMask = .init(sourceItemInstanceID: stackID,
                                   startTurn: run.turnsTaken,
                                   expiresAfterTurn: run.turnsTaken + scentMaskDuration(effect))
+        case .seamlightGuidance:
+            switch SeamlightRules.evaluate(sourceItemInstanceID: stackID, in: state) {
+            case .failure(let refusal): return [.blocked(SeamlightRules.playerCopy(for: refusal))]
+            case .success(let quote):
+                switch SeamlightRules.commit(quote, in: &state) {
+                case .activated(_, let events): return events
+                case .refused(let refusal): return [.blocked(SeamlightRules.playerCopy(for: refusal))]
+                }
+            }
         case .returnHome, .clearPoison, .clearElemental, .clearAnyStatus, .preventStatus,
              .coatPoison, .coatBurn, .coatBleed, .coatDazzle, .identifyCurio:
             return [.blocked("Use that at the appropriate moment.")]
@@ -779,10 +790,20 @@ enum WorldRules {
                 run.collapsedOnTurn = run.turnsTaken
                 // Said once, the turn it happens: the world has gone, and you are still in it.
                 events.append(.collapsed)
+                if run.seamwardExpedition?.hasActiveContributor == true {
+                    run.seamwardExpedition?.activatedOnTurn = run.turnsTaken
+                }
             }
             let (crumbled, lost) = crumble(in: &run)
             if crumbled > 0 { events.append(.tilesCrumbled(crumbled)) }
             if lost > 0 { events.append(.lostToCrumbling(lost)) }
+        }
+
+        if run.seamwardExpedition?.activatedOnTurn != nil,
+           SeamwardRules.projection(in: run) == nil,
+           run.seamwardExpedition?.noAnsweringSeamReported == false {
+            run.seamwardExpedition?.noAnsweringSeamReported = true
+            events.append(.seamwardFoundNoSeam)
         }
 
         let concealment = fieldConcealment(in: state)

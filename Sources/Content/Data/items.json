@@ -278,6 +278,21 @@
       "recyclerDisposition": "notGear"
     },
     {
+      "id": "seamlight",
+      "name": "Seamlight",
+      "icon": "",
+      "rarity": "uncommon",
+      "blurb": "Its light leans toward the nearest usable portal seam.",
+      "kind": "consumable",
+      "consumable": {
+        "effect": "seamlightGuidance",
+        "potency": 0
+      },
+      "consumableMerchantStockAccess": "independent",
+      "tradingPostDisposition": "sellable",
+      "recyclerDisposition": "notGear"
+    },
+    {
       "id": "stillwater",
       "name": "Stillwater",
       "icon": "water.waves",

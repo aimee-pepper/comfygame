@@ -35,6 +35,11 @@ struct SymbolID: StringIdentifier {
     init(rawValue: String) { self.rawValue = rawValue }
 }
 
+struct InscriptionID: StringIdentifier {
+    var rawValue: String
+    init(rawValue: String) { self.rawValue = rawValue }
+}
+
 /// A slot in a book.
 ///
 /// Deliberately *not* an enum. Old saves may still contain IDs from the retired slot taxonomy;

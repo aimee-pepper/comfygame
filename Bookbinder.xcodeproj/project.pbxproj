@@ -67,6 +67,7 @@
 		10EA98516A8B4CB4C9379D71 /* MinimapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D238962CB9F8B60B212D9473 /* MinimapView.swift */; };
 		10FAF7D28B2984AD85FBEB44 /* LivingAnalysisView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9BE7FAE39BDF3B01C8F7B497 /* LivingAnalysisView.swift */; };
 		11BD659A05151A43A4F78554 /* WorldTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6430D823936296B085FA9EBA /* WorldTests.swift */; };
+		B16000000000000000000004 /* SeamlightRulesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B16000000000000000000003 /* SeamlightRulesTests.swift */; };
 		12DA6127DA1CEF02D5108CE9 /* SiteRules.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5A56C2CA4EF6B5366F86828 /* SiteRules.swift */; };
 		15B201231C024A3C01DBA20A /* BookRules.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3CC1BB415696E2B7417C43D /* BookRules.swift */; };
 		19C9DFC5BC904175AC32B894 /* GameActions+Economy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 224E1E95022E7547C70C35C2 /* GameActions+Economy.swift */; };
@@ -145,6 +146,9 @@
 		54E8A6FB039D4B6F7FF4AA92 /* OpeningEconomyContentTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DED817BCBD65429BDCD60C9 /* OpeningEconomyContentTests.swift */; };
 		56C2C67D2033B74FFD18EE24 /* Worldgen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8946B89F914D32DABAC53D5A /* Worldgen.swift */; };
 		B31200000000000000000002 /* ResourceExtractionRules.swift in Sources */ = {isa = PBXBuildFile; fileRef = B31200000000000000000001 /* ResourceExtractionRules.swift */; };
+		B16000000000000000000002 /* SeamlightRules.swift in Sources */ = {isa = PBXBuildFile; fileRef = B16000000000000000000001 /* SeamlightRules.swift */; };
+		B34000000000000000000002 /* EquipmentInscriptionRules.swift in Sources */ = {isa = PBXBuildFile; fileRef = B34000000000000000000001 /* EquipmentInscriptionRules.swift */; };
+		B34000000000000000000004 /* EquipmentInscriptionRulesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B34000000000000000000003 /* EquipmentInscriptionRulesTests.swift */; };
 		583140A5C38A586267218BC1 /* combat_trees.json in Resources */ = {isa = PBXBuildFile; fileRef = FD2CA32A5090B2067ABD22C0 /* combat_trees.json */; };
 		58549BB48C3385534CE0E23C /* GameActions+Recycler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F419C1C64D8762E4085EC70 /* GameActions+Recycler.swift */; };
 		5A3C249D84DE9D8C0576B2EA /* ResourceVisualTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58CFC1BCB5228A5CA88FB517 /* ResourceVisualTests.swift */; };
@@ -458,6 +462,7 @@
 		606F9667A67D771D03320DDA /* PersistenceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersistenceTests.swift; sourceTree = "<group>"; };
 		637E2762C9738BB22D883D75 /* InstrumentCraftingRules.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InstrumentCraftingRules.swift; sourceTree = "<group>"; };
 		6430D823936296B085FA9EBA /* WorldTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorldTests.swift; sourceTree = "<group>"; };
+		B16000000000000000000003 /* SeamlightRulesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeamlightRulesTests.swift; sourceTree = "<group>"; };
 		644939D61FCF530C40392FCC /* Tuning.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tuning.swift; sourceTree = "<group>"; };
 		64F1E5BF56652C658BFF5484 /* PressureTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PressureTests.swift; sourceTree = "<group>"; };
 		6638830B7B5223E3065252FC /* HarnessView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HarnessView.swift; sourceTree = "<group>"; };
@@ -499,6 +504,9 @@
 		87D64CB10C984E402DFA9E50 /* ItemGrid.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ItemGrid.swift; sourceTree = "<group>"; };
 		8946B89F914D32DABAC53D5A /* Worldgen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Worldgen.swift; sourceTree = "<group>"; };
 		B31200000000000000000001 /* ResourceExtractionRules.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResourceExtractionRules.swift; sourceTree = "<group>"; };
+		B16000000000000000000001 /* SeamlightRules.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeamlightRules.swift; sourceTree = "<group>"; };
+		B34000000000000000000001 /* EquipmentInscriptionRules.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EquipmentInscriptionRules.swift; sourceTree = "<group>"; };
+		B34000000000000000000003 /* EquipmentInscriptionRulesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EquipmentInscriptionRulesTests.swift; sourceTree = "<group>"; };
 		89776C411F7BC83CF86396E9 /* items.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = items.json; sourceTree = "<group>"; };
 		8ADC03C0E941B354BFE2EF65 /* Discovery.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Discovery.swift; sourceTree = "<group>"; };
 		8B8A444C3FE08E6935849BA8 /* InstrumentCraftingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InstrumentCraftingTests.swift; sourceTree = "<group>"; };
@@ -693,6 +701,8 @@
 				E3EDB1BAC65E07DA7319F3C6 /* PhysicalGearCraftingRules.swift */,
 				CB3C5DA8117A704E44B23C91 /* PressureRules.swift */,
 				B31200000000000000000001 /* ResourceExtractionRules.swift */,
+				B16000000000000000000001 /* SeamlightRules.swift */,
+				B34000000000000000000001 /* EquipmentInscriptionRules.swift */,
 				9E17B23F244C182A99CD9DB7 /* RecyclerRules.swift */,
 				D5A56C2CA4EF6B5366F86828 /* SiteRules.swift */,
 				BDFF9A08573788622472DB26 /* SmithRules.swift */,
@@ -1058,6 +1068,8 @@
 				2CCC9B79C252DA82D33A758A /* WorldInspectionTests.swift */,
 				9A91FFF6BF680BAFC6742249 /* WorldScaleAndNightTests.swift */,
 				6430D823936296B085FA9EBA /* WorldTests.swift */,
+				B16000000000000000000003 /* SeamlightRulesTests.swift */,
+				B34000000000000000000003 /* EquipmentInscriptionRulesTests.swift */,
 			);
 			path = Tests;
 			sourceTree = "<group>";
@@ -1458,6 +1470,8 @@
 				A20A0A001A0A0A001A0A0A00 /* WorldArrivalRenderedSceneReceipt.swift in Sources */,
 				56C2C67D2033B74FFD18EE24 /* Worldgen.swift in Sources */,
 				B31200000000000000000002 /* ResourceExtractionRules.swift in Sources */,
+				B16000000000000000000002 /* SeamlightRules.swift in Sources */,
+				B34000000000000000000002 /* EquipmentInscriptionRules.swift in Sources */,
 				3F6C7DB75723783F90E7E5F8 /* WorldsState.swift in Sources */,
 				3E24E2D2D2BEAD60ADE93D0A /* WritingDeskView.swift in Sources */,
 			);
@@ -1558,6 +1572,8 @@
 				CA284D5488986FFA0719A4A6 /* WorldInspectionTests.swift in Sources */,
 				66727C83C77239282A12ADBC /* WorldScaleAndNightTests.swift in Sources */,
 				11BD659A05151A43A4F78554 /* WorldTests.swift in Sources */,
+				B16000000000000000000004 /* SeamlightRulesTests.swift in Sources */,
+				B34000000000000000000004 /* EquipmentInscriptionRulesTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

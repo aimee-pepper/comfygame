@@ -482,6 +482,16 @@ struct ContentCatalog: Sendable {
                     "apothecary recipe '\(recipe.output)' uses unknown resource '\(id)'")
             }
         }
+        for item in items where item.kind == .consumable {
+            let access = item.consumableMerchantStockAccess ?? .recipeKnown
+            if access == .independent {
+                guard item.tradingPostDisposition == .sellable,
+                      item.rarity == .common || item.rarity == .uncommon else {
+                    throw ContentError.danglingReference(
+                        "independent merchant consumable '\(item.id)' is not sellable common/uncommon")
+                }
+            }
+        }
 
         // A source that points at a target nobody defined would silently contribute nothing.
         let targetIDs = Set(pressureTargets.map(\.id))
@@ -1168,6 +1178,7 @@ enum Items {
     static let lightCore: ItemID = "light_core"
     static let conduitFixture: ItemID = "conduit_fixture"
     static let scentMask: ItemID = "scent_mask"
+    static let seamlight: ItemID = "seamlight"
     /// **Reserved, and deliberately not in `items.json`.** A material is not an authored item: what
     /// it is and what it's good for came off the animal it was cut from, and travels on the stack
     /// as a `CraftMaterialUnitV1`. This id exists only so a material can share the slot machinery.

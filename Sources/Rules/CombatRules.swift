@@ -2452,7 +2452,7 @@ enum CombatRules {
             encounter.preparedCoatings[ally] = coating
             encounter.note("\(item.name) is ready on \(actorName(ally, encounter: encounter))'s weapon.")
         case .restoreStability, .returnHome, .lightWorld, .farsight, .identifyCurio, .lureCreature,
-             .maskScent:
+             .maskScent, .seamlightGuidance:
             return false
         }
         // Through the bin rather than by poking `count`, so a stack that also carries samples

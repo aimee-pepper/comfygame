@@ -455,6 +455,9 @@ struct ItemDef: Codable, Equatable, Identifiable, Sendable {
     /// What using this item does. Optional so every pre-consumable save and ordinary catalogue
     /// entry remains valid; the legacy Lesser Salve is authored explicitly in content.
     var consumable: ConsumableDef?
+    /// How a finished consumable becomes eligible for newly generated Trading Post stock.
+    /// Older catalogue entries omit this and retain recipe-known behavior.
+    var consumableMerchantStockAccess: ConsumableMerchantStockAccess?
     /// Catalogue-owned merchant disposition. Runtime never infers this from rarity or name.
     var tradingPostDisposition: TradingPostDisposition
     /// Catalogue-owned Recycler disposition and optional authored fallback profile.
@@ -683,6 +686,18 @@ enum GearCatalogueDispositionRules {
     }
 }
 
+enum ConsumableMerchantStockAccess: String, Codable, Sendable {
+    case recipeKnown
+    case independent
+    /// Decode-only fail-closed value; it never enters merchant stock.
+    case invalid = "__invalid"
+
+    init(from decoder: Decoder) throws {
+        let raw = try decoder.singleValueContainer().decode(String.self)
+        self = Self(rawValue: raw) ?? .invalid
+    }
+}
+
 struct ConsumableDef: Codable, Equatable, Sendable {
     enum Effect: String, Codable, Sendable {
         case heal
@@ -701,6 +716,7 @@ struct ConsumableDef: Codable, Equatable, Sendable {
         case identifyCurio
         case lureCreature
         case maskScent
+        case seamlightGuidance
     }
 
     var effect: Effect
