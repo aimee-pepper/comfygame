@@ -124,6 +124,46 @@ final class EquipmentInscriptionRulesTests: XCTestCase {
     }
 
     @MainActor
+    func testUnknownInscriptionUsesSemanticNativeTreatmentInLightAndDark() throws {
+        let store = GameStore(io: .temporary(name: "seamward-unknown-native-\(UUID().uuidString)"))
+        store.mutate("unknown inscription native proof", flush: true) { state in
+            state = eligibleState()
+            state.base.inventory.stacks[0].gearProfile?.inscription = .init(
+                version: 1, definitionID: "future_starlace", sourceItemID: "future_source",
+                rulesVersion: 7, inkRecipe: nil)
+        }
+        let frozen = try SaveCodec.encode(store.state)
+        for scheme in [ColorScheme.light, .dark] {
+            let controller = UIHostingController(rootView:
+                NavigationStack { ScriptoriumView() }
+                    .environmentObject(store)
+                    .environment(\.colorScheme, scheme))
+            let window = UIWindow(frame: CGRect(x: 0, y: 0, width: 368, height: 800))
+            window.rootViewController = controller
+            window.makeKeyAndVisible()
+            controller.view.frame = window.bounds
+            controller.view.layoutIfNeeded()
+            RunLoop.main.run(until: Date().addingTimeInterval(0.08))
+            let image = UIGraphicsImageRenderer(size: window.bounds.size).image { _ in
+                controller.view.drawHierarchy(in: controller.view.bounds, afterScreenUpdates: true)
+            }
+            let attachment = XCTAttachment(image: image)
+            attachment.name = "seamward-unknown-inscription-368x800-\(scheme == .light ? "light" : "dark")"
+            attachment.lifetime = .keepAlways
+            add(attachment)
+            XCTAssertFalse(image.pngData()?.isEmpty ?? true)
+            window.isHidden = true
+        }
+        XCTAssertEqual(try SaveCodec.encode(store.state), frozen)
+
+        let source = try String(contentsOf: URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent().deletingLastPathComponent()
+            .appending(path: "Sources/Screens/StationViews.swift"), encoding: .utf8)
+        XCTAssertTrue(source.contains("Text(\"Unknown inscription ·"))
+        XCTAssertFalse(source.contains("Text(\"\\(inscription.definitionID.rawValue)"))
+    }
+
+    @MainActor
     func testLiveErasureRejectsStoredAndInactiveRosterUnknownInscriptionsByteExactly() throws {
         let unknown = EquipmentInscriptionReceiptV1(version: 1,
                                                      definitionID: "future_starlace",

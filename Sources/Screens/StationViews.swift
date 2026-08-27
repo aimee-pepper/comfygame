@@ -1224,9 +1224,11 @@ struct ScriptoriumView: View {
                         pendingErasureReceipt = inscription
                     }
                     .accessibilityIdentifier("scriptorium.seamward.erase.\(profile.stableInstanceID.rawValue)")
-                } else if let inscription = profile.inscription {
-                    Text("\(inscription.definitionID.rawValue) · \(profile.slot.displayName) · \(locationCopy(location))")
+                } else if profile.inscription != nil {
+                    Text("Unknown inscription · \(profile.slot.displayName) · \(locationCopy(location))")
                         .foregroundStyle(.secondary)
+                        .accessibilityLabel("Unknown inscription")
+                        .accessibilityValue("\(profile.slot.displayName) · \(locationCopy(location))")
                         .accessibilityIdentifier(
                             "scriptorium.inscription.inert.\(profile.stableInstanceID.rawValue)")
                 }
