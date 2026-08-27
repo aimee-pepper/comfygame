@@ -2,6 +2,30 @@ import XCTest
 @testable import Bookbinder
 
 final class SaveSlotTests: XCTestCase {
+    func testChannelworksSchemaEightRealSlotFailurePreservesEnvelope() async throws {
+        let root = directory()
+        defer { try? FileManager.default.removeItem(at: root) }
+        let slots = SaveSlotFileIO(directory: root)
+        let created = try await slots.create(name: "Channelworks migration")
+        let url = try await slots.exportURL(for: created.metadata.id)
+        var envelope = try SaveCodec.makeDecoder().decode(
+            SaveSlotEnvelope.self, from: Data(contentsOf: url))
+        var state = GameState.newGame()
+        state.base.stations[Stations.channelworks] = .init(isUnlocked: true, tier: 0)
+        var payload = try XCTUnwrap(JSONSerialization.jsonObject(with: SaveCodec.encode(state))
+                                     as? [String: Any])
+        payload["schemaVersion"] = 8
+        var base = try XCTUnwrap(payload["base"] as? [String: Any])
+        base.removeValue(forKey: "channelworksRestoration")
+        base["odaFixtureRestored"] = NSNull(); payload["base"] = base
+        envelope.payload = try JSONSerialization.data(withJSONObject: payload, options: [.sortedKeys])
+        let original = try encoder().encode(envelope)
+        try original.write(to: url, options: .atomic)
+        do { _ = try await slots.load(created.metadata.id); XCTFail("Expected corrupt legacy receipt") }
+        catch { }
+        XCTAssertEqual(try Data(contentsOf: url), original)
+    }
+
     func testSchemaFiveTransitionalPendingGeneratedSpeciesMigrationInRealSlotEnvelope() async throws {
         enum Fixture { case missing, matching, mismatched }
         for fixture in [Fixture.missing, .matching, .mismatched] {

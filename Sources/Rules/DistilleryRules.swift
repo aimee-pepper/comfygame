@@ -1,5 +1,162 @@
 import Foundation
 
+enum ChannelworksRestoredFixtureLocation: Equatable {
+    case stored
+    case waitingToSort
+    case worn(PartyMember, GearSlot)
+    case awayOrNoLongerOwned
+    case legacyIdentityUnknown
+}
+
+struct ChannelworksConduitBuildQuoteV1: Equatable {
+    var stationID: StationID
+    var inputHeatCoreInstanceID: InstanceID
+    var inputSnapshot: ItemStack
+    var outputSnapshot: ItemStack
+}
+
+enum ChannelworksConduitBuildRefusal: Equatable {
+    case channelworksUnavailable, heatCoreUnavailable, invalidHeatCoreReceipt, storageUnavailable, staleQuote
+}
+enum ChannelworksConduitBuildEvaluation: Equatable {
+    case allowed(ChannelworksConduitBuildQuoteV1)
+    case refused(ChannelworksConduitBuildRefusal)
+}
+enum ChannelworksConduitBuildResult: Equatable {
+    case committed(ItemStack)
+    case refused(ChannelworksConduitBuildRefusal)
+}
+
+enum ChannelworksRestorationRules {
+    static let authoredCore = DistilledCore(
+        attunement: .heat, potency: 40, sampleKind: "authored fixture",
+        sampleSource: "Oda's damaged conduit",
+        sampleQualifier: "intact, non-recoverable core", catalystID: nil,
+        catalystCount: 0, recipeVersion: 0, stationID: Stations.channelworks)
+
+    static func isAuthoredFixture(_ stack: ItemStack) -> Bool {
+        stack.catalogID == Items.conduitFixture && stack.distilledCore == authoredCore
+    }
+
+    static func nextPhysicalID(in state: GameState) -> InstanceID? {
+        let base = state.base
+        var values = base.inventory.stacks.map(\.id.rawValue)
+        values += base.spillover.map(\.id.rawValue)
+        if let essence = base.essenceCrystals?.id.rawValue { values.append(essence) }
+        values += base.binderEquipped.values.compactMap {
+            $0.gearProfile?.stableInstanceID.rawValue
+        }
+        values += base.roster.flatMap { member in
+            member.equipped.values.compactMap { $0.gearProfile?.stableInstanceID.rawValue }
+        }
+        values += base.tradingPost.stock.flatMap(\.frozenUnits).map(\.id.rawValue)
+        let runs = [state.worlds.activeRun].compactMap { $0 }
+            + state.worlds.anchoredRealms.map(\.world)
+        for run in runs {
+            values += run.satchelItems.stacks.map(\.id.rawValue)
+            values += run.offeredItems.map(\.id.rawValue)
+        }
+        let maximum = values.max() ?? 0
+        guard !values.contains(0), Set(values).count == values.count,
+              maximum < UInt64.max else {
+            return nil
+        }
+        return .init(rawValue: maximum + 1)
+    }
+
+    static func location(in base: BaseState) -> ChannelworksRestoredFixtureLocation? {
+        guard let receipt = base.channelworksRestoration else { return nil }
+        guard let id = receipt.fixtureInstanceID else { return .legacyIdentityUnknown }
+        if base.inventory.stacks.contains(where: { $0.id == id }) { return .stored }
+        if base.spillover.contains(where: { $0.id == id }) { return .waitingToSort }
+        if base.binderEquipped.contains(where: { $0.value.gearProfile?.stableInstanceID == id }) {
+            let slot = base.binderEquipped.first { $0.value.gearProfile?.stableInstanceID == id }!.key
+            return .worn(.binder, slot)
+        }
+        if let member = base.roster.enumerated().first(where: { entry in
+            entry.element.equipped.values.contains { $0.gearProfile?.stableInstanceID == id }
+        }), let slot = member.element.equipped.first(where: { $0.value.gearProfile?.stableInstanceID == id })?.key {
+            guard let persistentID = member.element.persistentID else {
+                return .awayOrNoLongerOwned
+            }
+            return .worn(.member(persistentID), slot)
+        }
+        return .awayOrNoLongerOwned
+    }
+
+    static func evaluate(in state: GameState) -> ChannelworksConduitBuildEvaluation {
+        guard state.base.station(Stations.channelworks).isUnlocked else {
+            return .refused(.channelworksUnavailable)
+        }
+        let heat = state.base.inventory.stacks
+            .filter { $0.catalogID == Items.heatCore }
+            .sorted { $0.id.rawValue < $1.id.rawValue }
+        guard !heat.isEmpty else { return .refused(.heatCoreUnavailable) }
+        guard let input = heat.first(where: { validPlayerHeatCore($0.distilledCore) }) else {
+            return .refused(.invalidHeatCoreReceipt)
+        }
+        guard let outputID = nextPhysicalID(in: state) else {
+            return .refused(.storageUnavailable)
+        }
+        var inventory = state.base.inventory
+        guard removeOne(id: input.id, from: &inventory) else { return .refused(.staleQuote) }
+        let output = ItemStack(id: outputID,
+                               catalogID: Items.conduitFixture, distilledCore: input.distilledCore)
+        guard inventory.add(output) else { return .refused(.storageUnavailable) }
+        return .allowed(.init(stationID: Stations.channelworks,
+                              inputHeatCoreInstanceID: input.id, inputSnapshot: input,
+                              outputSnapshot: output))
+    }
+
+    static func hasValidHeatCore(in state: GameState) -> Bool {
+        state.base.inventory.stacks.contains {
+            $0.catalogID == Items.heatCore && validPlayerHeatCore($0.distilledCore)
+        }
+    }
+
+    static func commit(_ quote: ChannelworksConduitBuildQuoteV1,
+                       in state: inout GameState) -> ChannelworksConduitBuildResult {
+        guard state.base.station(Stations.channelworks).isUnlocked else {
+            return .refused(.channelworksUnavailable)
+        }
+        guard let current = state.base.inventory.stacks.first(where: {
+            $0.id == quote.inputHeatCoreInstanceID
+        }), current == quote.inputSnapshot else { return .refused(.staleQuote) }
+        guard validPlayerHeatCore(current.distilledCore),
+              quote.outputSnapshot.distilledCore == current.distilledCore,
+              quote.outputSnapshot.catalogID == Items.conduitFixture else {
+            return .refused(.invalidHeatCoreReceipt)
+        }
+        var staged = state
+        guard removeOne(id: current.id, from: &staged.base.inventory),
+              staged.base.inventory.add(quote.outputSnapshot) else {
+            return .refused(.storageUnavailable)
+        }
+        state = staged
+        return .committed(quote.outputSnapshot)
+    }
+
+    private static func validPlayerHeatCore(_ core: DistilledCore?) -> Bool {
+        guard let core else { return false }
+        return core.attunement == .heat && core.recipeVersion == 1
+            && core.stationID == Stations.distillery
+            && core.potency >= 0
+            && !(core.sampleKind?.isEmpty ?? true)
+            && !(core.sampleSource?.isEmpty ?? true)
+            && core.catalystID != nil && core.catalystCount > 0
+    }
+
+    @discardableResult private static func removeOne(id: InstanceID,
+                                                      from inventory: inout Inventory) -> Bool {
+        guard let index = inventory.stacks.firstIndex(where: { $0.id == id && $0.count > 0 }) else {
+            return false
+        }
+        inventory.stacks[index].count -= 1
+        if inventory.stacks[index].count == 0 { inventory.stacks.remove(at: index) }
+        return true
+    }
+}
+
 /// Auber's finite essence work. Bulk stock and provenance-bearing samples intentionally remain
 /// separate inputs: aggregate resources must never pretend to have world properties or an origin.
 enum DistilleryRules {
@@ -135,19 +292,6 @@ enum DistilleryRules {
         staged.base.resources.spend(required.amount, of: catalyst)
         state = staged
         return true
-    }
-
-    /// First Channelworks consumer: construction transfers the core receipt onto the fixture.
-    @discardableResult
-    static func constructConduit(in state: inout GameState) -> Bool {
-        guard state.base.station(Stations.channelworks).isUnlocked,
-              let stack = state.base.inventory.stacks.first(where: { $0.catalogID == Items.heatCore }),
-              let core = stack.distilledCore else { return false }
-        let fixture = output(catalogID: Items.conduitFixture, core: core, in: state)
-        var preview = state.base.inventory
-        guard removeOne(catalogID: Items.heatCore, from: &preview), preview.add(fixture) else { return false }
-        guard removeOne(catalogID: Items.heatCore, from: &state.base.inventory) else { return false }
-        return state.base.inventory.add(fixture)
     }
 
     private static func item(for attunement: CoreAttunement) -> ItemID {

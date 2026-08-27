@@ -124,7 +124,7 @@ struct ChannelworksView: View {
     @State private var constructionFailure: String?
 
     private var hasHeatCore: Bool {
-        store.state.base.inventory.stacks.contains { $0.catalogID == Items.heatCore }
+        ChannelworksRestorationRules.hasValidHeatCore(in: store.state)
     }
 
     var body: some View {
@@ -136,7 +136,7 @@ struct ChannelworksView: View {
                     Text(store.odaRestoredConduitLocation.map { "The restored fixture is \($0)." }
                          ?? "The restoration is complete. The original fixture is no longer in known Home storage.")
                         .font(.caption).foregroundStyle(.secondary)
-                    Text("Build another conduit by consuming one player-made Heat core and transferring its attunement, potency, and recorded origin into a contained fixture.")
+                    Text("Build another conduit by consuming one player-made Heat core and transferring its attunement, potency and origin receipt into a contained fixture.")
                         .font(.caption).foregroundStyle(.secondary)
 
                     Label(hasHeatCore ? "Heat core ready" : "Requires one Heat core",

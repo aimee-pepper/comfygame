@@ -323,42 +323,112 @@ final class StackingTests: XCTestCase {
         let fixtures = store.state.base.inventory.stacks.filter { $0.catalogID == Items.conduitFixture }
         XCTAssertEqual(fixtures.reduce(0) { $0 + $1.count }, 1)
         XCTAssertEqual(fixtures.first?.distilledCore?.recipeVersion, 0)
-        XCTAssertTrue(store.state.base.odaFixtureRestored)
+        XCTAssertEqual(store.state.base.channelworksRestoration?.fixtureInstanceID,
+                       fixtures.first?.id)
+        XCTAssertEqual(store.state.base.channelworksRestoration?.fixtureCore,
+                       ChannelworksRestorationRules.authoredCore)
         XCTAssertFalse(store.build(station))
         XCTAssertEqual(store.state.base.inventory.stacks.filter { $0.catalogID == Items.conduitFixture }
             .reduce(0) { $0 + $1.count }, 1)
     }
 
+    @MainActor func testBuildingChannelworksWithFullStorehouseSpillsExactFixture() throws {
+        let store = GameStore(io: .temporary(name: "channelworks-full-\(UUID().uuidString)"))
+        let station = try XCTUnwrap(ContentCatalog.shared.station(Stations.channelworks))
+        store.mutate("prepare full Oda build") { state in
+            state.reality.library.foundTravellers.insert("oda")
+            state.base.essence = 1_000
+            for (id, amount) in station.buildCost?.resources ?? [:] {
+                state.base.resources.add(amount, of: id)
+            }
+            state.base.inventory.slots = 1
+            let id = InstanceID(rawValue: state.base.nextItemID())
+            _ = state.base.inventory.add(.init(id: id, catalogID: "salve_lesser"))
+        }
+        XCTAssertTrue(store.build(station))
+        let fixture = try XCTUnwrap(store.state.base.spillover.first(where: {
+            ChannelworksRestorationRules.isAuthoredFixture($0)
+        }))
+        XCTAssertEqual(store.state.base.channelworksRestoration?.fixtureInstanceID, fixture.id)
+    }
+
     func testUnlockedLegacyChannelworksAdoptsOrGrantsOneRestorationReceipt() throws {
         var adopting = GameState.newGame()
         adopting.base.stations[Stations.channelworks] = StationState(isUnlocked: true, tier: 0)
-        let authored = DistilledCore(attunement: .heat, potency: 40,
-            sampleKind: "authored fixture", sampleSource: "Oda's damaged conduit",
-            sampleQualifier: "intact, non-recoverable core", catalystID: nil, catalystCount: 0,
-            recipeVersion: 0, stationID: Stations.channelworks)
         adopting.base.store(ItemStack(id: InstanceID(rawValue: 800),
-                                     catalogID: Items.conduitFixture, distilledCore: authored))
+                                     catalogID: Items.conduitFixture,
+                                     distilledCore: ChannelworksRestorationRules.authoredCore))
 
-        let adopted = try SaveCodec.decode(SaveCodec.encode(adopting))
-        XCTAssertTrue(adopted.base.odaFixtureRestored)
+        let adopted = try SaveCodec.decode(legacySchemaEight(adopting, restored: false))
+        XCTAssertEqual(adopted.base.channelworksRestoration?.fixtureInstanceID,
+                       InstanceID(rawValue: 800))
         XCTAssertEqual(restorationCount(in: adopted), 1)
         XCTAssertEqual(restorationCount(in: try SaveCodec.decode(SaveCodec.encode(adopted))), 1)
 
         var granting = GameState.newGame()
         granting.base.stations[Stations.channelworks] = StationState(isUnlocked: true, tier: 0)
-        let granted = try SaveCodec.decode(SaveCodec.encode(granting))
-        XCTAssertTrue(granted.base.odaFixtureRestored)
+        let granted = try SaveCodec.decode(legacySchemaEight(granting, restored: nil))
+        XCTAssertNotNil(granted.base.channelworksRestoration?.fixtureInstanceID)
         XCTAssertEqual(restorationCount(in: granted), 1)
     }
 
     func testRestorationReceiptPreventsReplacementAfterFixtureLeavesStorage() throws {
         var state = GameState.newGame()
         state.base.stations[Stations.channelworks] = StationState(isUnlocked: true, tier: 0)
-        state.base.odaFixtureRestored = true
-
-        let restored = try SaveCodec.decode(SaveCodec.encode(state))
-        XCTAssertTrue(restored.base.odaFixtureRestored)
+        let restored = try SaveCodec.decode(legacySchemaEight(state, restored: true))
+        XCTAssertNotNil(restored.base.channelworksRestoration)
+        XCTAssertNil(restored.base.channelworksRestoration?.fixtureInstanceID)
         XCTAssertEqual(restorationCount(in: restored), 0)
+    }
+
+    func testRepeatableChannelworksQuoteTransfersOneExactPlayerHeatCore() throws {
+        var state = GameState.newGame()
+        state.base.stations[Stations.channelworks] = .init(isUnlocked: true, tier: 0)
+        state.base.channelworksRestoration = .init(fixtureInstanceID: nil)
+        let core = DistilledCore(attunement: .heat, potency: 77, sampleKind: "ore",
+                                 sampleSource: "Auber", catalystID: Resources.sulfur,
+                                 catalystCount: 1, recipeVersion: 1,
+                                 stationID: Stations.distillery)
+        state.base.inventory.add(.init(id: .init(rawValue: 91), catalogID: Items.heatCore,
+                                       distilledCore: core))
+        let receipt = state.base.channelworksRestoration
+        guard case .allowed(let quote) = ChannelworksRestorationRules.evaluate(in: state) else {
+            return XCTFail("Expected quote")
+        }
+        guard case .committed(let output) = ChannelworksRestorationRules.commit(quote, in: &state)
+        else { return XCTFail("Expected commit") }
+        XCTAssertEqual(output.distilledCore, core)
+        XCTAssertFalse(state.base.inventory.stacks.contains { $0.id == quote.inputHeatCoreInstanceID })
+        XCTAssertEqual(state.base.channelworksRestoration, receipt)
+    }
+
+    func testRepeatableChannelworksFullStorageRefusesMultiCountCoreWithoutMutation() throws {
+        var state = GameState.newGame()
+        state.base.stations[Stations.channelworks] = .init(isUnlocked: true, tier: 0)
+        state.base.channelworksRestoration = .init(fixtureInstanceID: nil)
+        state.base.inventory.slots = 1
+        let core = DistilledCore(attunement: .heat, potency: 70, sampleKind: "ore",
+                                 sampleSource: "Auber", catalystID: Resources.sulfur,
+                                 catalystCount: 1, recipeVersion: 1,
+                                 stationID: Stations.distillery)
+        state.base.inventory.stacks = [.init(id: .init(rawValue: 7), catalogID: Items.heatCore,
+                                               count: 2, distilledCore: core)]
+        let original = state
+        XCTAssertEqual(ChannelworksRestorationRules.evaluate(in: state),
+                       .refused(.storageUnavailable))
+        XCTAssertEqual(state, original)
+    }
+
+    private func legacySchemaEight(_ state: GameState, restored: Bool?) throws -> Data {
+        var root = try XCTUnwrap(JSONSerialization.jsonObject(with: SaveCodec.encode(state))
+                                  as? [String: Any])
+        root["schemaVersion"] = 8
+        var base = try XCTUnwrap(root["base"] as? [String: Any])
+        base.removeValue(forKey: "channelworksRestoration")
+        if let restored { base["odaFixtureRestored"] = restored }
+        else { base.removeValue(forKey: "odaFixtureRestored") }
+        root["base"] = base
+        return try JSONSerialization.data(withJSONObject: root, options: [.sortedKeys])
     }
 
     private func restorationCount(in state: GameState) -> Int {

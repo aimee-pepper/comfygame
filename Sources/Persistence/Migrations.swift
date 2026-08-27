@@ -25,12 +25,16 @@ enum Migrations {
         guard version <= Tuning.saveSchemaVersion else {
             throw FutureSchemaError(found: version, supported: Tuning.saveSchemaVersion)
         }
-        guard version < Tuning.saveSchemaVersion else { return data }
+        guard version < Tuning.saveSchemaVersion else {
+            try validateCurrentChannelworksRestoration(in: data)
+            return data
+        }
 
         var working = data
         for from in version..<Tuning.saveSchemaVersion {
             working = try step(working, from: from)
         }
+        try validateCurrentChannelworksRestoration(in: working)
         return working
     }
 
@@ -49,10 +53,121 @@ enum Migrations {
         case 5: return try migrate5to6(data)
         case 6: return try migrate6to7(data)
         case 7: return try migrate7to8(data)
+        case 8: return try migrate8to9(data)
         default:
             // No migration registered. Tolerant decoding is the fallback; if the save is genuinely
             // incompatible, `SaveFileIO.load()` quarantines it rather than losing it.
             return data
+        }
+    }
+
+    private static func migrate8to9(_ data: Data) throws -> Data {
+        guard var root = try JSONSerialization.jsonObject(with: data) as? [String: Any],
+              var base = root["base"] as? [String: Any],
+              let stations = base["stations"] as? [String: Any] else {
+            throw CocoaError(.coderInvalidValue)
+        }
+        let unlocked = ((stations[Stations.channelworks.rawValue] as? [String: Any])?["isUnlocked"]
+                        as? Bool) == true
+        let hasLegacy = base.keys.contains("odaFixtureRestored")
+        let legacy: Bool?
+        if hasLegacy {
+            guard !(base["odaFixtureRestored"] is NSNull),
+                  let value = base["odaFixtureRestored"] as? Bool else {
+                throw CocoaError(.coderInvalidValue)
+            }
+            legacy = value
+        } else { legacy = nil }
+        if !unlocked {
+            guard legacy != true else { throw CocoaError(.coderInvalidValue) }
+            base.removeValue(forKey: "odaFixtureRestored")
+            base.removeValue(forKey: "channelworksRestoration")
+            root["base"] = base; root["schemaVersion"] = 9
+            return try JSONSerialization.data(withJSONObject: root, options: [.sortedKeys])
+        }
+
+        func stacks(_ value: Any?) -> [[String: Any]] { value as? [[String: Any]] ?? [] }
+        let inventory = base["inventory"] as? [String: Any]
+        let stored = stacks(inventory?["stacks"])
+        let waiting = stacks(base["spillover"])
+        var liveStacks = stored + waiting
+        if let worlds = root["worlds"] as? [String: Any] {
+            func appendRun(_ run: [String: Any]?) {
+                guard let run else { return }
+                if let satchel = run["satchelItems"] as? [String: Any] {
+                    liveStacks += stacks(satchel["stacks"])
+                }
+                liveStacks += stacks(run["offeredItems"])
+            }
+            appendRun(worlds["activeRun"] as? [String: Any])
+            for realm in worlds["anchoredRealms"] as? [[String: Any]] ?? [] {
+                appendRun(realm["world"] as? [String: Any])
+            }
+        }
+        let candidates = liveStacks.compactMap { object -> UInt64? in
+            guard object["catalogID"] as? String == Items.conduitFixture.rawValue,
+                  let coreObject = object["distilledCore"],
+                  let coreData = try? JSONSerialization.data(withJSONObject: coreObject),
+                  let core = try? SaveCodec.makeDecoder().decode(DistilledCore.self, from: coreData),
+                  core == ChannelworksRestorationRules.authoredCore,
+                  let raw = (object["id"] as? [String: Any])?["rawValue"] as? NSNumber,
+                  raw.uint64Value > 0 else { return nil }
+            return raw.uint64Value
+        }
+        var fixtureID = candidates.min().map(InstanceID.init(rawValue:))
+        if fixtureID == nil && legacy != true {
+            func maximumID(_ value: Any) -> UInt64 {
+                if let array = value as? [Any] { return array.map(maximumID).max() ?? 0 }
+                guard let object = value as? [String: Any] else { return 0 }
+                let own = ((object["id"] as? [String: Any])?["rawValue"] as? NSNumber)?.uint64Value ?? 0
+                return max(own, object.values.map(maximumID).max() ?? 0)
+            }
+            let maximum = maximumID(root)
+            guard maximum < UInt64.max else { throw CocoaError(.coderInvalidValue) }
+            let id = InstanceID(rawValue: maximum + 1)
+            let fixture = ItemStack(id: id, catalogID: Items.conduitFixture,
+                                    distilledCore: ChannelworksRestorationRules.authoredCore)
+            let fixtureObject = try JSONSerialization.jsonObject(with: SaveCodec.makeEncoder().encode(fixture))
+            var mutableInventory = inventory ?? [:]
+            var mutableStored = stored
+            let slots = mutableInventory["slots"] as? Int ?? Tuning.Economy.startingInventorySlots
+            if mutableStored.count < slots {
+                mutableStored.append(fixtureObject as! [String: Any])
+                mutableInventory["stacks"] = mutableStored; base["inventory"] = mutableInventory
+            } else {
+                var mutableWaiting = waiting; mutableWaiting.append(fixtureObject as! [String: Any])
+                base["spillover"] = mutableWaiting
+            }
+            fixtureID = id
+        }
+        let receipt = ChannelworksRestorationReceiptV1(fixtureInstanceID: fixtureID)
+        base["channelworksRestoration"] = try JSONSerialization.jsonObject(
+            with: SaveCodec.makeEncoder().encode(receipt))
+        base.removeValue(forKey: "odaFixtureRestored")
+        root["base"] = base; root["schemaVersion"] = 9
+        return try JSONSerialization.data(withJSONObject: root, options: [.sortedKeys])
+    }
+
+    private static func validateCurrentChannelworksRestoration(in data: Data) throws {
+        guard let root = try JSONSerialization.jsonObject(with: data) as? [String: Any],
+              let base = root["base"] as? [String: Any],
+              let stations = base["stations"] as? [String: Any] else {
+            throw CocoaError(.coderInvalidValue)
+        }
+        guard !base.keys.contains("odaFixtureRestored") else { throw CocoaError(.coderInvalidValue) }
+        let unlocked = ((stations[Stations.channelworks.rawValue] as? [String: Any])?["isUnlocked"]
+                        as? Bool) == true
+        let present = base.keys.contains("channelworksRestoration")
+        guard unlocked == present else { throw CocoaError(.coderInvalidValue) }
+        guard present else { return }
+        guard let value = base["channelworksRestoration"], !(value is NSNull),
+              let object = value as? [String: Any],
+              Set(object.keys) == Set(["version", "entitlementID", "restorerID", "stationID",
+                                       "fixtureCatalogueID", "fixtureInstanceID", "fixtureCore"]),
+              let receipt = try? SaveCodec.makeDecoder().decode(
+                ChannelworksRestorationReceiptV1.self,
+                from: JSONSerialization.data(withJSONObject: object)), receipt.validates() else {
+            throw CocoaError(.coderInvalidValue)
         }
     }
 

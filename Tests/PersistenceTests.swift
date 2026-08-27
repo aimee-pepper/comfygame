@@ -3,6 +3,40 @@ import XCTest
 
 /// The interruptibility pillar, tested. Anything that breaks here breaks pillar 2.
 final class PersistenceTests: XCTestCase {
+    func testChannelworksSchemaEightMigrationAndCurrentReceiptFailClosed() throws {
+        var state = GameState.newGame()
+        state.base.stations[Stations.channelworks] = .init(isUnlocked: true, tier: 0)
+        var root = try XCTUnwrap(JSONSerialization.jsonObject(with: SaveCodec.encode(state))
+                                  as? [String: Any])
+        root["schemaVersion"] = 8
+        var base = try XCTUnwrap(root["base"] as? [String: Any])
+        base.removeValue(forKey: "channelworksRestoration")
+        base["odaFixtureRestored"] = false
+        root["base"] = base
+        let legacy = try JSONSerialization.data(withJSONObject: root, options: [.sortedKeys])
+        let migrated = try SaveCodec.decode(legacy)
+        XCTAssertEqual(migrated.schemaVersion, 9)
+        XCTAssertNotNil(migrated.base.channelworksRestoration?.fixtureInstanceID)
+        XCTAssertEqual(migrated.base.channelworksRestoration?.fixtureCore,
+                       ChannelworksRestorationRules.authoredCore)
+        XCTAssertEqual(try SaveCodec.decode(SaveCodec.encode(migrated)), migrated)
+
+        for invalid: Any in [NSNull(), "yes"] {
+            base["odaFixtureRestored"] = invalid; root["base"] = base
+            let bytes = try JSONSerialization.data(withJSONObject: root, options: [.sortedKeys])
+            let original = bytes
+            XCTAssertThrowsError(try SaveCodec.decode(bytes))
+            XCTAssertEqual(bytes, original)
+        }
+
+        var current = try XCTUnwrap(JSONSerialization.jsonObject(with: SaveCodec.encode(migrated))
+                                     as? [String: Any])
+        var currentBase = try XCTUnwrap(current["base"] as? [String: Any])
+        currentBase["channelworksRestoration"] = NSNull(); current["base"] = currentBase
+        let nullCurrent = try JSONSerialization.data(withJSONObject: current, options: [.sortedKeys])
+        XCTAssertThrowsError(try SaveCodec.decode(nullCurrent))
+    }
+
 
     func testSchemaThreeExtractionReceiptMigrationFreezesCatalogueTruthAndFailsUnknown() throws {
         let legacy = Data(#"{"schemaVersion":3,"nested":{"resource":"gold","remainingHarvests":2,"yieldPerHarvest":3}}"#.utf8)

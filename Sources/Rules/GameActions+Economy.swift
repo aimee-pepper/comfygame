@@ -203,20 +203,18 @@ extension GameStore {
     }
 
     @discardableResult func constructConduitFixture() -> Bool {
-        var made = false
-        mutate("construct conduit fixture", flush: true) { made = DistilleryRules.constructConduit(in: &$0) }
-        return made
+        guard case .allowed(let quote) = evaluateChannelworksConduitBuild() else { return false }
+        if case .committed = buildAnotherConduit(quote) { return true }
+        return false
     }
 
     var odaRestoredConduitLocation: String? {
-        let isOdas = { (stack: ItemStack) in
-            stack.catalogID == Items.conduitFixture
-                && stack.distilledCore?.recipeVersion == 0
-                && stack.distilledCore?.sampleSource == "Oda's damaged conduit"
+        switch ChannelworksRestorationRules.location(in: state.base) {
+        case .stored: "in the Storehouse"
+        case .waitingToSort: "waiting at the Storehouse"
+        case .worn(let member, _): "worn by \(name(of: member))"
+        case .awayOrNoLongerOwned, .legacyIdentityUnknown, nil: nil
         }
-        if state.base.inventory.stacks.contains(where: isOdas) { return "in the Storehouse" }
-        if state.base.spillover.contains(where: isOdas) { return "waiting at the Storehouse" }
-        return nil
     }
 
     @discardableResult
@@ -1174,6 +1172,31 @@ extension GameStore {
               canAfford(canonical)
         else { return false }
         let runway = StationRunwayRules.preview(for: canonical, in: state)
+        if canonical.id == Stations.channelworks {
+            var candidate = state
+            guard !candidate.base.station(Stations.channelworks).isUnlocked,
+                  candidate.base.channelworksRestoration == nil,
+                  let fixtureID = ChannelworksRestorationRules.nextPhysicalID(in: candidate) else {
+                return false
+            }
+            if let cost = canonical.buildCost {
+                guard EconomyRules.canAfford(cost, in: candidate) else { return false }
+                EconomyRules.pay(cost, in: &candidate)
+            }
+            candidate.base.stations[canonical.id] = StationState(
+                isUnlocked: true, tier: canonical.startingTier)
+            if let bundled = ContentCatalog.shared.constructionBundledResearch(for: canonical.id) {
+                EconomyRules.complete(bundled, in: &candidate)
+            }
+            let fixture = ItemStack(id: fixtureID, catalogID: Items.conduitFixture,
+                                    distilledCore: ChannelworksRestorationRules.authoredCore)
+            candidate.base.store(fixture)
+            candidate.base.channelworksRestoration = .init(fixtureInstanceID: fixtureID)
+            mutate("build \(canonical.id.rawValue) [\(runway.telemetryLabel)]", flush: true) {
+                $0 = candidate
+            }
+            return true
+        }
         mutate("build \(canonical.id.rawValue) [\(runway.telemetryLabel)]", flush: true) { state in
             if let cost = canonical.buildCost { EconomyRules.pay(cost, in: &state) }
             state.base.stations[canonical.id] = StationState(isUnlocked: true,
@@ -1187,20 +1210,23 @@ extension GameStore {
                 // Construction and its authored free teaching are one atomic transaction.
                 EconomyRules.complete(bundled, in: &state)
             }
-            if canonical.id == Stations.channelworks {
-                let restored = DistilledCore(attunement: .heat, potency: 40,
-                                             sampleKind: "authored fixture",
-                                             sampleSource: "Oda's damaged conduit",
-                                             sampleQualifier: "intact, non-recoverable core",
-                                             catalystID: nil, catalystCount: 0,
-                                             recipeVersion: 0, stationID: Stations.channelworks)
-                state.base.store(ItemStack(id: InstanceID(rawValue: state.base.nextItemID()),
-                                           catalogID: Items.conduitFixture,
-                                           distilledCore: restored))
-                state.base.odaFixtureRestored = true
-            }
         }
         return true
+    }
+
+    func evaluateChannelworksConduitBuild() -> ChannelworksConduitBuildEvaluation {
+        ChannelworksRestorationRules.evaluate(in: state)
+    }
+
+    func buildAnotherConduit(_ quote: ChannelworksConduitBuildQuoteV1)
+        -> ChannelworksConduitBuildResult {
+        var result: ChannelworksConduitBuildResult = .refused(.staleQuote)
+        _ = mutateIf("build another conduit", flush: true) { candidate in
+            result = ChannelworksRestorationRules.commit(quote, in: &candidate)
+            if case .committed = result { return true }
+            return false
+        }
+        return result
     }
 
     // MARK: - The Blacksmith

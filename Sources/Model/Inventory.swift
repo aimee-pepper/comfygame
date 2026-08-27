@@ -453,6 +453,63 @@ struct DistilledCore: Codable, Equatable, Hashable, Sendable {
     }
 }
 
+enum ChannelworksRestorationEntitlementID: String, Codable, Sendable {
+    case odaDamagedHeatConduitV1 = "oda-damaged-heat-conduit-v1"
+}
+
+struct ChannelworksRestorationReceiptV1: Codable, Equatable, Sendable {
+    static let version = 1
+    var version: Int = Self.version
+    var entitlementID: ChannelworksRestorationEntitlementID = .odaDamagedHeatConduitV1
+    var restorerID: TravellerID = "oda"
+    var stationID: StationID = Stations.channelworks
+    var fixtureCatalogueID: ItemID = Items.conduitFixture
+    var fixtureInstanceID: InstanceID?
+    var fixtureCore: DistilledCore = ChannelworksRestorationRules.authoredCore
+
+    private enum CodingKeys: String, CodingKey, CaseIterable {
+        case version, entitlementID, restorerID, stationID, fixtureCatalogueID
+        case fixtureInstanceID, fixtureCore
+    }
+
+    init(fixtureInstanceID: InstanceID?) { self.fixtureInstanceID = fixtureInstanceID }
+
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        guard Set(c.allKeys) == Set(CodingKeys.allCases) else { throw CocoaError(.coderInvalidValue) }
+        version = try c.decode(Int.self, forKey: .version)
+        entitlementID = try c.decode(ChannelworksRestorationEntitlementID.self,
+                                     forKey: .entitlementID)
+        restorerID = try c.decode(TravellerID.self, forKey: .restorerID)
+        stationID = try c.decode(StationID.self, forKey: .stationID)
+        fixtureCatalogueID = try c.decode(ItemID.self, forKey: .fixtureCatalogueID)
+        fixtureInstanceID = try c.decodeIfPresent(InstanceID.self, forKey: .fixtureInstanceID)
+        fixtureCore = try c.decode(DistilledCore.self, forKey: .fixtureCore)
+        guard validates() else { throw CocoaError(.coderInvalidValue) }
+    }
+
+    func encode(to encoder: Encoder) throws {
+        var c = encoder.container(keyedBy: CodingKeys.self)
+        try c.encode(version, forKey: .version)
+        try c.encode(entitlementID, forKey: .entitlementID)
+        try c.encode(restorerID, forKey: .restorerID)
+        try c.encode(stationID, forKey: .stationID)
+        try c.encode(fixtureCatalogueID, forKey: .fixtureCatalogueID)
+        if let fixtureInstanceID { try c.encode(fixtureInstanceID, forKey: .fixtureInstanceID) }
+        else { try c.encodeNil(forKey: .fixtureInstanceID) }
+        try c.encode(fixtureCore, forKey: .fixtureCore)
+    }
+
+    func validates() -> Bool {
+        version == Self.version
+            && entitlementID == .odaDamagedHeatConduitV1
+            && restorerID == "oda" && stationID == Stations.channelworks
+            && fixtureCatalogueID == Items.conduitFixture
+            && (fixtureInstanceID?.rawValue ?? 1) > 0
+            && fixtureCore == ChannelworksRestorationRules.authoredCore
+    }
+}
+
 /// Slot-limited item storage. Slot count grows with Storehouse tiers.
 struct Inventory: Codable, Equatable, Sendable {
     struct FailurePartition: Equatable, Sendable {

@@ -98,9 +98,8 @@ struct BaseState: Codable, Equatable, Sendable {
     var capabilities: Set<CapabilityID> = []
     /// Recipes inferred from stock once the Apothecary exists. Once understood, never forgotten.
     var knownConsumableRecipes: Set<ItemID> = []
-    /// Durable entitlement for Oda's one authored restoration. The item may move or leave without
-    /// making a second restoration available.
-    var odaFixtureRestored: Bool = false
+    /// Durable causal receipt for Oda's one authored restoration. Item presence is not entitlement.
+    var channelworksRestoration: ChannelworksRestorationReceiptV1?
 
     /// Instruments selected at the Survey Post for the next departure. This is a Base-layer
     /// packing choice; the instruments themselves and the knowledge they produce remain Reality.
@@ -455,7 +454,7 @@ struct BaseState: Codable, Equatable, Sendable {
         case satchelLoadout, spillover, goldCoins, tradingPost, recycler
         case lifetimeRawEssenceRefined, autoRefineReturnedRawEssence, lastAutoRefinedOutcomeID
         case ownedSymbols, ownedGambitComponents
-        case completedResearch, capabilities, knownConsumableRecipes, odaFixtureRestored, stations, page
+        case completedResearch, capabilities, knownConsumableRecipes, channelworksRestoration, stations, page
         case savedPageTemplates, nextPageTemplateID, nextTemplateMarkID
         case savedInkMixtures, nextInkMixtureID
         case provenStatementReceipts, personalCompounds
@@ -521,7 +520,7 @@ struct BaseState: Codable, Equatable, Sendable {
         try c.encode(satchelTier, forKey: .satchelTier)
         try c.encode(purchasedGambitSlots, forKey: .purchasedGambitSlots)
         try c.encode(knownConsumableRecipes, forKey: .knownConsumableRecipes)
-        try c.encode(odaFixtureRestored, forKey: .odaFixtureRestored)
+        try c.encodeIfPresent(channelworksRestoration, forKey: .channelworksRestoration)
         try c.encode(binderGambits, forKey: .binderGambits)
         try c.encode(binderCharacter, forKey: .binderCharacter)
     }
@@ -562,8 +561,8 @@ struct BaseState: Codable, Equatable, Sendable {
                                                                   forKey: .lastAutoRefinedOutcomeID)
         knownConsumableRecipes = try container.decodeIfPresent(Set<ItemID>.self,
                                                                 forKey: .knownConsumableRecipes) ?? []
-        odaFixtureRestored = try container.decodeIfPresent(Bool.self,
-                                                           forKey: .odaFixtureRestored) ?? false
+        channelworksRestoration = try container.decodeIfPresent(
+            ChannelworksRestorationReceiptV1.self, forKey: .channelworksRestoration)
         instrumentLoadout = try container.decodeIfPresent(Set<PressureTargetID>.self,
                                                           forKey: .instrumentLoadout) ?? []
         hasConfiguredInstrumentLoadout = try container.decodeIfPresent(Bool.self,
@@ -682,25 +681,10 @@ struct BaseState: Codable, Equatable, Sendable {
 
         migrateEquippedGearProfiles()
 
-        if stations[Stations.channelworks]?.isUnlocked == true, !odaFixtureRestored {
-            let authoredFixtureExists = (inventory.stacks + spillover).contains {
-                $0.catalogID == Items.conduitFixture
-                    && $0.distilledCore?.attunement == .heat
-                    && $0.distilledCore?.recipeVersion == 0
-                    && $0.distilledCore?.sampleSource == "Oda's damaged conduit"
-            }
-            if !authoredFixtureExists {
-                let restored = DistilledCore(attunement: .heat, potency: 40,
-                                             sampleKind: "authored fixture",
-                                             sampleSource: "Oda's damaged conduit",
-                                             sampleQualifier: "intact, non-recoverable core",
-                                             catalystID: nil, catalystCount: 0,
-                                             recipeVersion: 0, stationID: Stations.channelworks)
-                store(ItemStack(id: InstanceID(rawValue: nextItemID()),
-                                catalogID: Items.conduitFixture,
-                                distilledCore: restored))
-            }
-            odaFixtureRestored = true
+        let channelworksUnlocked = stations[Stations.channelworks]?.isUnlocked == true
+        guard channelworksUnlocked == (channelworksRestoration != nil),
+              channelworksRestoration?.validates() ?? !channelworksUnlocked else {
+            throw CocoaError(.coderInvalidValue)
         }
 
         // **Capacity is derived, not remembered.**
