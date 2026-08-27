@@ -12,6 +12,14 @@ struct WorldScreenLayoutReceipt: Equatable {
     var viewportRows: Int = 0
     var carriedStripFrame: CGRect = .zero
     var controlsFrame: CGRect = .zero
+    var directionPadFrame: CGRect = .zero
+    var directionButtonFrames: [CGRect] = Array(repeating: .zero, count: 4)
+    var minimapFrame: CGRect = .zero
+    var fieldKitFrame: CGRect = .zero
+    var useTileFrame: CGRect = .zero
+    var lookFrame: CGRect = .zero
+    var safeContentFrame: CGRect = .zero
+    var emergencyScrollFrame: CGRect?
     var eventToastFrame: CGRect?
 }
 
@@ -24,7 +32,10 @@ struct WorldScreenLayoutReceipt: Equatable {
 }
 
 private struct WorldRegionProbe: UIViewRepresentable {
-    enum Region { case safe, status, carried, controls, event }
+    enum Region {
+        case safe, safeContent, status, carried, controls, directionPad, directionButton(Int), minimap, fieldKit,
+             actionRow, emergencyScroll, event
+    }
     let region: Region
     final class ProbeView: UIView {
         var region: Region = .safe
@@ -33,9 +44,25 @@ private struct WorldRegionProbe: UIViewRepresentable {
             let frame = convert(bounds, to: nil)
             switch region {
             case .safe: WorldMapStageMeasurement.layoutReceipt.safeFrame = frame
+            case .safeContent: WorldMapStageMeasurement.layoutReceipt.safeContentFrame = frame
             case .status: WorldMapStageMeasurement.layoutReceipt.statusFrame = frame
             case .carried: WorldMapStageMeasurement.layoutReceipt.carriedStripFrame = frame
             case .controls: WorldMapStageMeasurement.layoutReceipt.controlsFrame = frame
+            case .directionPad: WorldMapStageMeasurement.layoutReceipt.directionPadFrame = frame
+            case .directionButton(let index):
+                guard WorldMapStageMeasurement.layoutReceipt.directionButtonFrames.indices.contains(index)
+                else { break }
+                WorldMapStageMeasurement.layoutReceipt.directionButtonFrames[index] = frame
+            case .minimap: WorldMapStageMeasurement.layoutReceipt.minimapFrame = frame
+            case .fieldKit: WorldMapStageMeasurement.layoutReceipt.fieldKitFrame = frame
+            case .actionRow:
+                let width = max(0, (frame.width - WorldControlsLayout.actionSpacing) / 2)
+                WorldMapStageMeasurement.layoutReceipt.useTileFrame = CGRect(
+                    x: frame.minX, y: frame.minY, width: width, height: frame.height)
+                WorldMapStageMeasurement.layoutReceipt.lookFrame = CGRect(
+                    x: frame.maxX - width, y: frame.minY, width: width, height: frame.height)
+            case .emergencyScroll:
+                WorldMapStageMeasurement.layoutReceipt.emergencyScrollFrame = frame
             case .event: WorldMapStageMeasurement.layoutReceipt.eventToastFrame = frame
             }
         }
@@ -60,9 +87,11 @@ private struct WorldMapStageProbe: UIViewRepresentable {
 
 private struct WorldMapViewportProbe: UIViewRepresentable {
     let mapWidth: CGFloat
+    let viewportColumns: Int
     let viewportRows: Int
     final class ProbeView: UIView {
         var mapWidth: CGFloat = 0
+        var viewportColumns: Int = 0
         var viewportRows: Int = 0
         override func layoutSubviews() {
             super.layoutSubviews()
@@ -71,6 +100,7 @@ private struct WorldMapViewportProbe: UIViewRepresentable {
             WorldMapStageMeasurement.latestMapWidth = mapWidth
             WorldMapStageMeasurement.latestViewportRows = viewportRows
             WorldMapStageMeasurement.layoutReceipt.mapRenderedFrame = convert(bounds, to: nil)
+            WorldMapStageMeasurement.layoutReceipt.viewportColumns = viewportColumns
             WorldMapStageMeasurement.layoutReceipt.viewportRows = viewportRows
             WorldMapStageMeasurement.layoutReceipt.tileSidePixels = viewportRows > 0
                 ? Int((bounds.height / CGFloat(viewportRows) * (window?.screen.scale ?? 1)).rounded()) : 0
@@ -78,11 +108,13 @@ private struct WorldMapViewportProbe: UIViewRepresentable {
     }
     func makeUIView(context: Context) -> ProbeView {
         let view = ProbeView(frame: .zero)
-        view.mapWidth = mapWidth; view.viewportRows = viewportRows
+        view.mapWidth = mapWidth; view.viewportColumns = viewportColumns
+        view.viewportRows = viewportRows
         return view
     }
     func updateUIView(_ uiView: ProbeView, context: Context) {
-        uiView.mapWidth = mapWidth; uiView.viewportRows = viewportRows
+        uiView.mapWidth = mapWidth; uiView.viewportColumns = viewportColumns
+        uiView.viewportRows = viewportRows
     }
 }
 #endif
@@ -126,14 +158,16 @@ struct WorldScreenPresentation: Equatable, Sendable {
         case resource(ResourceID, amount: Int)
         case item(InstanceID, itemID: ItemID, identified: Bool, amount: Int)
         case material(MaterialKind, unitIDs: [MaterialReserveUnitID])
-        case worldPage(InstanceID, inspected: Bool, title: String)
+        case inspectedWorldPage(InstanceID, title: String)
+        case uninspectedWorldPage(position: Int)
 
         var id: String {
             switch self {
             case .resource(let id, _): "resource:\(id.rawValue)"
             case .item(let id, _, _, _): "item:\(id.rawValue)"
             case .material(let kind, _): "material:\(kind.rawValue)"
-            case .worldPage(let id, _, _): "page:\(id.rawValue)"
+            case .inspectedWorldPage(let id, _): "page:\(id.rawValue)"
+            case .uninspectedWorldPage(let position): "unknown-page:\(position)"
             }
         }
 
@@ -141,7 +175,7 @@ struct WorldScreenPresentation: Equatable, Sendable {
             switch self {
             case .resource(_, let amount), .item(_, _, _, let amount): amount
             case .material(_, let unitIDs): unitIDs.count
-            case .worldPage: 1
+            case .inspectedWorldPage, .uninspectedWorldPage: 1
             }
         }
     }
@@ -173,8 +207,10 @@ struct WorldScreenPresentation: Equatable, Sendable {
         carried += materialGroups.keys.sorted { $0.rawValue < $1.rawValue }.map { kind in
             .material(kind, unitIDs: materialGroups[kind, default: []].map(\.id).sorted())
         }
-        carried += run.carriedWorldPages.map {
-            .worldPage($0.id, inspected: $0.inspected, title: $0.definition.title)
+        carried += run.carriedWorldPages.enumerated().map { position, page in
+            page.inspected
+                ? .inspectedWorldPage(page.id, title: page.definition.title)
+                : .uninspectedWorldPage(position: position)
         }
         return .init(
             collapseStatus: WorldDurationPresentation.status(
@@ -202,6 +238,15 @@ private extension EnvironmentValues {
     }
 }
 
+private struct WorldMinimumMapHeightReader<Content: View>: View {
+    @Environment(\.worldMinimumMapHeight) private var minimumMapHeight
+    @ViewBuilder let content: (CGFloat) -> Content
+
+    var body: some View {
+        content(minimumMapHeight).frame(minHeight: minimumMapHeight)
+    }
+}
+
 private struct WorldEmergencyScrollModifier: ViewModifier {
     @Environment(\.displayScale) private var displayScale
 
@@ -217,6 +262,11 @@ private struct WorldEmergencyScrollModifier: ViewModifier {
                 measuredContent
                 ScrollView(.vertical) {
                     measuredContent.fixedSize(horizontal: false, vertical: true)
+                        .background {
+#if DEBUG
+                            WorldRegionProbe(region: .emergencyScroll)
+#endif
+                        }
                 }
                 .accessibilityIdentifier("world.emergency-scroll")
             }
@@ -1010,7 +1060,6 @@ struct WorldView: View {
     @EnvironmentObject private var store: GameStore
     @Environment(\.displayScale) private var displayScale
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
-    @Environment(\.worldMinimumMapHeight) private var worldMinimumMapHeight
     @StateObject private var terrainClock = TerrainPresentationClock.shared
     /// Everything that crossed the threshold and can be consulted or used outside combat.
     @State private var isShowingFieldKit = false
@@ -1034,7 +1083,7 @@ struct WorldView: View {
             if let run {
                 let presentation = WorldScreenPresentation.make(run: run, state: store.state)
                 VStack(spacing: 0) {
-                    StabilityHeader(run: run)
+                    StabilityHeader(run: run, collapseStatus: presentation.collapseStatus)
                     PartyHealthStrip(party: presentation.party)
                 }
                 .background {
@@ -1047,10 +1096,12 @@ struct WorldView: View {
                 }
                 VStack(spacing: 0) {
                     VStack(spacing: 0) {
+                        WorldMinimumMapHeightReader { minimumMapHeight in
                         GeometryReader { viewport in
+                        let requestedMapHeight = max(viewport.size.height, minimumMapHeight)
                         let mapViewport = WorldMapFrameRequestAuthority.viewport(
                             run: run, containerWidth: viewport.size.width,
-                            availableHeight: viewport.size.height, displayScale: displayScale)
+                            availableHeight: requestedMapHeight, displayScale: displayScale)
                         let frameRequest = WorldMapFrameRequestAuthority.request(
                             run: run, state: store.state, viewport: mapViewport,
                             presentationTick: terrainClock.tick, reduceMotion: reduceMotion)
@@ -1085,7 +1136,7 @@ struct WorldView: View {
                                 .padding(12)
                         }
                         }
-                        .frame(minHeight: worldMinimumMapHeight)
+                        }
                         .background {
 #if DEBUG
                             WorldMapStageProbe()
@@ -1104,6 +1155,9 @@ struct WorldView: View {
                     Rectangle().fill(PixelUITheme.edge).frame(height: 2)
                 }
                 .zIndex(2)
+#if DEBUG
+                .background(WorldRegionProbe(region: .safeContent))
+#endif
             }
         }.modifier(WorldEmergencyScrollModifier()))
         .modifier(WorldMiningFeedbackPresentationModifier(store: store))
@@ -1341,6 +1395,9 @@ struct WorldView: View {
             .foregroundStyle(.teal)
             .fixedSize()
             .accessibilityIdentifier("world.field-kit")
+#if DEBUG
+            .background(WorldRegionProbe(region: .fieldKit))
+#endif
             Text("turn \(presentation.turn)")
                 .foregroundStyle(.secondary)
                 .fixedSize()
@@ -1397,14 +1454,22 @@ struct WorldView: View {
             .fixedSize()
             .accessibilityElement(children: .combine)
             .accessibilityLabel("\(kind.displayName), \(unitIDs.count) carried")
-        case .worldPage(_, let inspected, let title):
+        case .inspectedWorldPage(_, let title):
             HStack(spacing: 3) {
                 Image(systemName: "doc.text")
                 Text("1")
             }
             .fixedSize()
             .accessibilityElement(children: .combine)
-            .accessibilityLabel("\(inspected ? title : "Unknown World Page"), carried")
+            .accessibilityLabel("\(title), carried")
+        case .uninspectedWorldPage:
+            HStack(spacing: 3) {
+                Image(systemName: "doc.text")
+                Text("1")
+            }
+            .fixedSize()
+            .accessibilityElement(children: .combine)
+            .accessibilityLabel("Unknown World Page, carried")
         }
     }
 
@@ -1427,12 +1492,18 @@ struct WorldView: View {
                 }
             }
             .frame(maxWidth: .infinity)
+#if DEBUG
+            .background(WorldRegionProbe(region: .directionPad))
+#endif
 
             VStack(spacing: 12) {
                 MinimapView(run: run)
                     .frame(width: 96, height: 96)
                     .fixedSize()
                     .frame(maxWidth: .infinity)
+#if DEBUG
+                    .background(WorldRegionProbe(region: .minimap))
+#endif
 
                 WorldActionRow {
                     AnyView(WorldWholeFaceControl(
@@ -1482,6 +1553,9 @@ struct WorldView: View {
                     }
                     .accessibilityElement(children: .contain)
                     .accessibilityIdentifier("world.action-row")
+#if DEBUG
+                    .background(WorldRegionProbe(region: .actionRow))
+#endif
             }
             .frame(maxWidth: .infinity)
         }
@@ -2017,6 +2091,7 @@ private struct PartyHealthStrip: View {
 
 private struct StabilityHeader: View {
     let run: WorldRun
+    let collapseStatus: String
 
     var body: some View {
         HStack(spacing: 10) {
@@ -2050,7 +2125,7 @@ private struct StabilityHeader: View {
                 Text("COLLAPSE")
                     .font(.custom("Tiny5", size: 9))
                     .foregroundStyle(PixelUITheme.muted)
-                Text(turnsLeftText)
+                Text(collapseStatus)
                     .font(.custom("Tiny5", size: 10))
                     .foregroundStyle(PixelUITheme.text)
                     .lineLimit(1)
@@ -2061,12 +2136,6 @@ private struct StabilityHeader: View {
         .frame(height: 62)
         .background(PixelUITheme.headerB)
         .overlay(alignment: .bottom) { Rectangle().fill(PixelUITheme.edge).frame(height: 2) }
-    }
-
-    private var turnsLeftText: String {
-        WorldDurationPresentation.status(stability: run.stability,
-                                         decayPerTurn: run.decayPerTurn,
-                                         collapsedOnTurn: run.collapsedOnTurn)
     }
 
     private var bandText: String {
@@ -2285,7 +2354,8 @@ private struct MapGrid: View {
             }
 #if DEBUG
             .background(WorldMapViewportProbe(
-                mapWidth: viewport.width, viewportRows: viewport.rows)
+                mapWidth: viewport.width, viewportColumns: viewport.columns,
+                viewportRows: viewport.rows)
                 .frame(width: proxy.size.width, height: proxy.size.height))
             .onAppear { WorldMapFirstFrameMeasurement.mounted = frameRequest.receipt }
 #endif
@@ -2852,6 +2922,10 @@ private struct DirectionPad: View {
                 .overlay(Rectangle().stroke(PixelUITheme.edgeDark, lineWidth: 2))
         }
         .accessibilityLabel("\(isLooking ? "Look" : "Move") \(direction.accessibilityName)")
+#if DEBUG
+        .background(WorldRegionProbe(region: .directionButton(
+            Direction.allCases.firstIndex(of: direction) ?? 0)))
+#endif
     }
 }
 

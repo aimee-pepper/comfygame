@@ -3320,6 +3320,25 @@ final class WorldTests: XCTestCase {
             ItemStack(id: InstanceID(rawValue: 8_811), catalogID: Items.scentMask,
                       count: 2, identified: true),
         ]
+        var traveller = CompanionState()
+        traveller.persistentID = .traveller("halloway")
+        traveller.traveller = "halloway"
+        traveller.name = "Halloway"
+        traveller.maxHP = 17
+        state.base.roster.append(traveller)
+        state.base.activeParty.append(.traveller("halloway"))
+        state.worlds.activeRun?.companionHP[.traveller("halloway")] = 9
+        state.worlds.activeRun?.materialReserve = MaterialReserve(units: [
+            MaterialReserveUnit(
+                id: .init(rawValue: "b18b-hide"),
+                sample: MaterialSample(kind: .hide, properties: .init(), grade: 22,
+                                       source: "Moss Hart")),
+        ])
+        let page = try XCTUnwrap(WorldPageCatalog.definition("wild_moss_and_mist"))
+        state.worlds.activeRun?.carriedWorldPages = [
+            WorldPageInstance(id: .init(rawValue: 18_812), definition: page, inspected: true),
+            WorldPageInstance(id: .init(rawValue: 18_813), definition: page, inspected: false),
+        ]
         let run = try XCTUnwrap(state.worlds.activeRun)
         let frozen = try SaveCodec.encode(state)
 
@@ -3328,10 +3347,25 @@ final class WorldTests: XCTestCase {
         XCTAssertEqual(presentation.turn, run.turnsTaken)
         XCTAssertEqual(presentation.party.first?.id, .founderQuill)
         XCTAssertEqual(presentation.party.first?.current, run.binderHP)
+        XCTAssertEqual(presentation.party.last, .init(
+            id: .traveller("halloway"), name: "Halloway", current: 9,
+            maximum: CombatRules.health(of: .companion(.traveller("halloway")),
+                                        in: run).max))
         XCTAssertTrue(presentation.carried.contains(.resource(Resources.quartz, amount: 4)))
         XCTAssertTrue(presentation.carried.contains(.item(
             InstanceID(rawValue: 8_811), itemID: Items.scentMask,
             identified: true, amount: 2)))
+        XCTAssertTrue(presentation.carried.contains(.material(
+            .hide, unitIDs: [.init(rawValue: "b18b-hide")])))
+        XCTAssertTrue(presentation.carried.contains(.inspectedWorldPage(
+            .init(rawValue: 18_812), title: page.title)))
+        XCTAssertTrue(presentation.carried.contains(.uninspectedWorldPage(position: 1)))
+
+        var alternate = run
+        alternate.carriedWorldPages[1].id = .init(rawValue: 99_999)
+        let alternateProjection = WorldScreenPresentation.make(run: alternate, state: state)
+        XCTAssertEqual(presentation.carried.last, alternateProjection.carried.last,
+                       "an uninspected page projection must be structurally neutral to hidden identity")
         XCTAssertEqual(try SaveCodec.encode(state), frozen,
                        "the World-screen projection is transient and cannot mutate persistence")
     }
@@ -3407,10 +3441,24 @@ final class WorldTests: XCTestCase {
         let tile = WorldMapStageMeasurement.latestMapWidth / 11
         let rows = WorldMapStageMeasurement.latestViewportRows
         let receipt = WorldMapStageMeasurement.layoutReceipt
+        XCTAssertEqual(receipt.viewportColumns, 11)
         XCTAssertGreaterThanOrEqual(rows, WorldScreenLayoutPolicy.minimumCompleteRows)
         XCTAssertGreaterThan(receipt.statusFrame.height, 0)
         XCTAssertGreaterThan(receipt.carriedStripFrame.height, 0)
         XCTAssertGreaterThan(receipt.controlsFrame.height, 0)
+        XCTAssertEqual(receipt.directionButtonFrames.count, 4)
+        for frame in receipt.directionButtonFrames {
+            XCTAssertGreaterThanOrEqual(frame.width, 44)
+            XCTAssertGreaterThanOrEqual(frame.height, 44)
+            XCTAssertTrue(receipt.safeContentFrame.insetBy(dx: -0.5, dy: -0.5).contains(frame))
+        }
+        for frame in [receipt.minimapFrame, receipt.fieldKitFrame,
+                      receipt.useTileFrame, receipt.lookFrame] {
+            XCTAssertGreaterThanOrEqual(frame.width, 44)
+            XCTAssertGreaterThanOrEqual(frame.height, 44)
+            XCTAssertTrue(receipt.safeContentFrame.insetBy(dx: -0.5, dy: -0.5).contains(frame))
+        }
+        XCTAssertFalse(receipt.mapViewportFrame.intersects(receipt.controlsFrame))
         XCTAssertLessThanOrEqual(receipt.statusFrame.maxY, receipt.mapViewportFrame.minY + 0.5)
         XCTAssertLessThanOrEqual(receipt.mapViewportFrame.maxY,
                                  receipt.carriedStripFrame.minY + 0.5)
@@ -3418,6 +3466,8 @@ final class WorldTests: XCTestCase {
                                  receipt.controlsFrame.minY + 0.5)
         XCTAssertNil(receipt.eventToastFrame,
                      "no event means no empty event surface or event measurement owner")
+        XCTAssertNil(receipt.emergencyScrollFrame,
+                     "ordinary 368x800 must use the direct non-scrolling composition")
         XCTAssertEqual(map.height, tile * CGFloat(rows), accuracy: 0.5)
         XCTAssertLessThanOrEqual(map.height, stage.height + 0.5)
         if rows < (store.activeRun?.map.height ?? 0) {
@@ -3433,6 +3483,69 @@ final class WorldTests: XCTestCase {
         let attachment = XCTAttachment(image: image)
         attachment.name = "explore-safe-space-complete-rows-368x800"
         attachment.lifetime = .keepAlways; add(attachment)
+        window.isHidden = true
+    }
+
+    @MainActor
+    func testB18bEmergencyScrollOnlyOwnsConstrainedHeightAndKeepsFiveCompleteRows() throws {
+        let store = GameStore(io: .temporary(name: "b18b-emergency-\(UUID().uuidString)"))
+        store.mutate("test constrained world") {
+            $0.worlds.activeRun = WorldRun(
+                runIndex: 4, book: self.book([:]), mapSeed: 18_814,
+                rng: SeededRNG(seed: 18_814),
+                map: WorldMap(width: 30, height: 30,
+                              tiles: Array(repeating: Tile(), count: 900),
+                              entry: GridPoint(x: 15, y: 15)),
+                playerPosition: GridPoint(x: 15, y: 15))
+        }
+        for lesson in TutorialLessonID.allCases {
+            store.completeTutorial(lesson, fact: "b18b_emergency_fixture")
+        }
+        WorldMapStageMeasurement.layoutReceipt = WorldScreenLayoutReceipt()
+        let frozen = try SaveCodec.encode(store.state)
+        let controller = UIHostingController(rootView: WorldView().environmentObject(store))
+        let window = UIWindow(frame: CGRect(x: 0, y: 0, width: 368, height: 400))
+        window.rootViewController = controller
+        window.makeKeyAndVisible()
+        controller.additionalSafeAreaInsets = UIEdgeInsets(top: 59, left: 0, bottom: 34, right: 0)
+        controller.view.frame = window.bounds
+        controller.view.setNeedsLayout(); controller.view.layoutIfNeeded()
+        RunLoop.main.run(until: Date().addingTimeInterval(0.12))
+
+        let receipt = WorldMapStageMeasurement.layoutReceipt
+        XCTAssertNotNil(receipt.emergencyScrollFrame)
+        XCTAssertEqual(receipt.viewportColumns, 11)
+        XCTAssertGreaterThanOrEqual(receipt.viewportRows, WorldScreenLayoutPolicy.minimumCompleteRows)
+        XCTAssertEqual(try SaveCodec.encode(store.state), frozen)
+        window.isHidden = true
+    }
+
+    @MainActor
+    func testB18bMountedEventStaysInsideMapAndClearOfFixedControls() throws {
+        let store = GameStore(io: .temporary(name: "b18b-event-clearance-\(UUID().uuidString)"))
+        store.mutate("test event world") { $0 = startedRun(book([:]), seed: 18_815) }
+        for lesson in TutorialLessonID.allCases {
+            store.completeTutorial(lesson, fact: "b18b_event_fixture")
+        }
+        let attempt = try XCTUnwrap(store.beginWorldFieldAttempt(.step))
+        store.submitWorldFieldEvents([.blocked("A visible event.")], for: attempt, now: 1)
+        WorldMapStageMeasurement.layoutReceipt = WorldScreenLayoutReceipt()
+        let frozen = try SaveCodec.encode(store.state)
+        let controller = UIHostingController(rootView: WorldView().environmentObject(store))
+        let window = UIWindow(frame: CGRect(x: 0, y: 0, width: 368, height: 800))
+        window.rootViewController = controller
+        window.makeKeyAndVisible()
+        controller.additionalSafeAreaInsets = UIEdgeInsets(top: 59, left: 0, bottom: 34, right: 0)
+        controller.view.frame = window.bounds
+        controller.view.setNeedsLayout(); controller.view.layoutIfNeeded()
+        RunLoop.main.run(until: Date().addingTimeInterval(0.08))
+
+        let receipt = WorldMapStageMeasurement.layoutReceipt
+        let event = try XCTUnwrap(receipt.eventToastFrame)
+        XCTAssertTrue(receipt.mapViewportFrame.insetBy(dx: -0.5, dy: -0.5).contains(event))
+        XCTAssertFalse(event.intersects(receipt.carriedStripFrame))
+        XCTAssertFalse(event.intersects(receipt.controlsFrame))
+        XCTAssertEqual(try SaveCodec.encode(store.state), frozen)
         window.isHidden = true
     }
 
@@ -3473,8 +3586,8 @@ final class WorldTests: XCTestCase {
                       "The approved compact place/event receipt remains inside the map stage")
         XCTAssertTrue(source.contains("if disabledReason == nil, let status = coordinator.statusCopy"),
                       "typed Working/busy/stale feedback remains mounted for non-disabled controls")
-        XCTAssertTrue(source.contains("availableHeight: viewport.size.height"),
-                      "The square stage must admit all eleven square rows without a false gap")
+        XCTAssertTrue(source.contains("availableHeight: requestedMapHeight"),
+                      "The map request must use measured height or the five-row emergency floor")
         XCTAssertFalse(source.contains("return \"Forest track\""),
                        "Place copy must derive from the live tile rather than a static fixture")
         XCTAssertTrue(source.contains("ground.displayName.capitalized"))
