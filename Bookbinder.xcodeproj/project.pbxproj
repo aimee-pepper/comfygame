@@ -226,6 +226,7 @@
 		A901EE2297DFB40E48663457 /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFFBF656255758DFA8E45232 /* Theme.swift */; };
 		A94D38590FAA36B2D274214B /* LifeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A7229E243E5EB4700C03C4A /* LifeTests.swift */; };
 		B213P0000000000000000004 /* CreatureMaterialProjectionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B213P0000000000000000003 /* CreatureMaterialProjectionTests.swift */; };
+		B213R0000000000000000004 /* CreatureMaterialRewardTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B213R0000000000000000003 /* CreatureMaterialRewardTests.swift */; };
 		AA2D2059F9D661241D17CCC2 /* CombatGraphRouteExplorer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03DE9B08C1ED73C404EE2AF9 /* CombatGraphRouteExplorer.swift */; };
 		AA467E2DFFB389EFACA3B124 /* sites.json in Resources */ = {isa = PBXBuildFile; fileRef = 77957A7595BE1E25AC8CF406 /* sites.json */; };
 		AAFAB01A37942E4A425FE909 /* LibraryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2CBCB8652F20B361959F9B5C /* LibraryView.swift */; };
@@ -235,6 +236,7 @@
 		AD06A15C582B042710CEED9F /* GameStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86093A93DD9720F92E4148D5 /* GameStore.swift */; };
 		AEBED915A9156084389B1BD6 /* LifeRules.swift in Sources */ = {isa = PBXBuildFile; fileRef = AE4002533174316FAE3274D6 /* LifeRules.swift */; };
 		B213P0000000000000000002 /* CreatureMaterialProjectionRules.swift in Sources */ = {isa = PBXBuildFile; fileRef = B213P0000000000000000001 /* CreatureMaterialProjectionRules.swift */; };
+		B213R0000000000000000002 /* CreatureMaterialRewardRules.swift in Sources */ = {isa = PBXBuildFile; fileRef = B213R0000000000000000001 /* CreatureMaterialRewardRules.swift */; };
 		AEBEF81AB87C48DD9D3C7AA1 /* playability-roadmap.json in Resources */ = {isa = PBXBuildFile; fileRef = AE024D65F580FDE6AE922F0E /* playability-roadmap.json */; };
 		AF40F83C822A636A79DABF02 /* CombatDamageRules.swift in Sources */ = {isa = PBXBuildFile; fileRef = 13670D6FD1A95328A0EF06A3 /* CombatDamageRules.swift */; };
 		B3127BCE033E785E4B3EA912 /* Page.swift in Sources */ = {isa = PBXBuildFile; fileRef = B543B94C8E89980FDE029D9C /* Page.swift */; };
@@ -481,6 +483,7 @@
 		79874A74B2CF52DA90868DA0 /* Gambit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Gambit.swift; sourceTree = "<group>"; };
 		7A7229E243E5EB4700C03C4A /* LifeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LifeTests.swift; sourceTree = "<group>"; };
 		B213P0000000000000000003 /* CreatureMaterialProjectionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreatureMaterialProjectionTests.swift; sourceTree = "<group>"; };
+		B213R0000000000000000003 /* CreatureMaterialRewardTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreatureMaterialRewardTests.swift; sourceTree = "<group>"; };
 		7B20DAF90C2684826A3C3F21 /* WorldMap.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorldMap.swift; sourceTree = "<group>"; };
 		80B20E4E8E0EE351CA9E333B /* DraftMeetingCorpus.generated.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DraftMeetingCorpus.generated.swift; sourceTree = "<group>"; };
 		80DFFB14B396FE04A7C03E01 /* LibraryTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibraryTests.swift; sourceTree = "<group>"; };
@@ -541,6 +544,7 @@
 		AE0ED58C8EAA439ABE4A10DE /* CombatGraphTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CombatGraphTests.swift; sourceTree = "<group>"; };
 		AE4002533174316FAE3274D6 /* LifeRules.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LifeRules.swift; sourceTree = "<group>"; };
 		B213P0000000000000000001 /* CreatureMaterialProjectionRules.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreatureMaterialProjectionRules.swift; sourceTree = "<group>"; };
+		B213R0000000000000000001 /* CreatureMaterialRewardRules.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreatureMaterialRewardRules.swift; sourceTree = "<group>"; };
 		AE7F491C849679A2428073CA /* SaveFileIO.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SaveFileIO.swift; sourceTree = "<group>"; };
 		AF13E2576281E76FA92CD685 /* StationStaffingRules.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StationStaffingRules.swift; sourceTree = "<group>"; };
 		AF9F316970B5ECF902615BC3 /* FloraRules.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FloraRules.swift; sourceTree = "<group>"; };
@@ -683,6 +687,7 @@
 				F1A0D044C45D04A1D2195A0F /* LibraryRules.swift */,
 				AE4002533174316FAE3274D6 /* LifeRules.swift */,
 				B213P0000000000000000001 /* CreatureMaterialProjectionRules.swift */,
+				B213R0000000000000000001 /* CreatureMaterialRewardRules.swift */,
 				2EADA515B59EC9ABA10B19F9 /* LivingAnalysisRules.swift */,
 				D2AAB75EDFEC0064219E57D4 /* PageRules.swift */,
 				E3EDB1BAC65E07DA7319F3C6 /* PhysicalGearCraftingRules.swift */,
@@ -1010,6 +1015,7 @@
 				80DFFB14B396FE04A7C03E01 /* LibraryTests.swift */,
 				7A7229E243E5EB4700C03C4A /* LifeTests.swift */,
 				B213P0000000000000000003 /* CreatureMaterialProjectionTests.swift */,
+				B213R0000000000000000003 /* CreatureMaterialRewardTests.swift */,
 				42E87D371EF13A3599ED4B41 /* MakerStationPresentationTests.swift */,
 				E14C42A31CF4E0C858F212BF /* MaterialTests.swift */,
 				D56058E017000066A61CD5F0 /* NamingTests.swift */,
@@ -1369,6 +1375,7 @@
 				AAFAB01A37942E4A425FE909 /* LibraryView.swift in Sources */,
 				AEBED915A9156084389B1BD6 /* LifeRules.swift in Sources */,
 				B213P0000000000000000002 /* CreatureMaterialProjectionRules.swift in Sources */,
+				B213R0000000000000000002 /* CreatureMaterialRewardRules.swift in Sources */,
 				69FCE6C7088A60DA6EF29039 /* LivingAnalysisRules.swift in Sources */,
 				10FAF7D28B2984AD85FBEB44 /* LivingAnalysisView.swift in Sources */,
 				CF22F5AA092E017612B1124E /* LootDecisionView.swift in Sources */,
@@ -1508,6 +1515,7 @@
 				DEB5615945275C75236426AD /* LibraryTests.swift in Sources */,
 				A94D38590FAA36B2D274214B /* LifeTests.swift in Sources */,
 				B213P0000000000000000004 /* CreatureMaterialProjectionTests.swift in Sources */,
+				B213R0000000000000000004 /* CreatureMaterialRewardTests.swift in Sources */,
 				AC7D7F7C063E577D75003D57 /* MakerStationPresentationTests.swift in Sources */,
 				BCB44A183A64B987C97BC1EA /* MaterialTests.swift in Sources */,
 				9F43622A2E66874204BCCDC7 /* NamingTests.swift in Sources */,

@@ -1342,6 +1342,7 @@ enum WorldRules {
             }
 
             foes.append(FoeState(id: member.id,
+                                 speciesID: member.speciesID,
                                  creatureID: member.creatureID,
                                  identityKey: member.identityKey,
                                  traits: member.traits,

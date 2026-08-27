@@ -11,7 +11,7 @@ import Foundation
 /// where you've been.
 enum MaterialKind: String, Codable, CaseIterable, Equatable, Hashable, Sendable {
     // From covering
-    case plate, quill, pelt, down, hide, chitin
+    case plate, quill, pelt, down, hide, chitin, feather, fin, scale, oil, shell, horn, venom
     // From armament
     case fang, tusk, claw
     // From the skeleton
@@ -27,7 +27,8 @@ enum MaterialKind: String, Codable, CaseIterable, Equatable, Hashable, Sendable 
     /// and property values never get to imply that it came from an animal.
     var isAnimalWorldResource: Bool {
         switch self {
-        case .plate, .quill, .pelt, .down, .hide, .chitin, .fang, .tusk, .claw, .bone, .ichor:
+        case .plate, .quill, .pelt, .down, .hide, .chitin, .feather, .fin, .scale,
+             .oil, .shell, .horn, .venom, .fang, .tusk, .claw, .bone, .ichor:
             true
         case .timber, .fibre, .pulp, .toxin, .reagent:
             false
@@ -40,8 +41,8 @@ enum MaterialKind: String, Codable, CaseIterable, Equatable, Hashable, Sendable 
     /// take one, and a bin labelled "Downs" reads as a mistake.
     var pluralName: String {
         switch self {
-        case .down, .ichor, .timber, .fibre, .pulp, .chitin: rawValue
-        case .toxin, .reagent: rawValue + "s"
+        case .down, .ichor, .timber, .fibre, .pulp, .chitin, .oil: rawValue
+        case .toxin, .reagent, .venom: rawValue + "s"
         default: rawValue + "s"
         }
     }
@@ -49,16 +50,23 @@ enum MaterialKind: String, Codable, CaseIterable, Equatable, Hashable, Sendable 
     /// **[PLACEHOLDER]** — session 11's glyph guidance applies to these too.
     var icon: String {
         switch self {
-        case .plate, .chitin: "shield.lefthalf.filled"
-        case .quill: "line.diagonal"
+        case .plate, .chitin, .scale, .shell: "shield.lefthalf.filled"
+        case .quill, .feather: "line.diagonal"
         case .pelt, .down, .hide: "square.stack.3d.down.right"
         case .fang, .claw: "triangle"
-        case .tusk, .bone: "oval"
-        case .ichor, .toxin, .reagent: "drop"
+        case .tusk, .horn, .bone: "oval"
+        case .ichor, .oil, .venom, .toxin, .reagent: "drop"
+        case .fin: "water.waves"
         case .timber: "rectangle.portrait"
         case .fibre: "scribble"
         case .pulp: "circle.dotted"
         }
+    }
+}
+
+extension MaterialKind {
+    init(_ family: CreatureMaterialFamilyID) {
+        self = MaterialKind(rawValue: family.rawValue)!
     }
 }
 
@@ -214,6 +222,15 @@ struct MaterialReserve: Codable, Equatable, Sendable {
     mutating func add(_ unit: MaterialReserveUnit) {
         guard !units.contains(where: { $0.id == unit.id }) else { return }
         units.append(unit)
+    }
+
+    @discardableResult
+    mutating func addExact(_ newUnits: [MaterialReserveUnit]) -> Bool {
+        let ids = newUnits.map(\.id)
+        guard Set(ids).count == ids.count,
+              Set(units.map(\.id)).isDisjoint(with: ids) else { return false }
+        units.append(contentsOf: newUnits)
+        return true
     }
 
     /// Adds a harvested group while consuming only the caller's one historical stack identity.

@@ -46,11 +46,73 @@ enum Migrations {
         case 2: return try migrate2to3(data)
         case 3: return try migrate3to4(data)
         case 4: return try migrate4to5(data)
+        case 5: return try migrate5to6(data)
         default:
             // No migration registered. Tolerant decoding is the fallback; if the save is genuinely
             // incompatible, `SaveFileIO.load()` quarantines it rather than losing it.
             return data
         }
+    }
+
+    /// Freezes source danger and explicit once-only creature reward resolution across every run.
+    private static func migrate5to6(_ data: Data) throws -> Data {
+        guard var root = try JSONSerialization.jsonObject(with: data) as? [String: Any] else {
+            throw CocoaError(.coderInvalidValue)
+        }
+        func json<T: Encodable>(_ value: T) throws -> Any {
+            try JSONSerialization.jsonObject(with: SaveCodec.makeEncoder().encode(value))
+        }
+        func migrateRun(_ value: Any) throws -> Any {
+            guard var run = value as? [String: Any], let bookValue = run["book"] else {
+                throw CocoaError(.coderInvalidValue)
+            }
+            if run.keys.contains("sourceDangerReceipt") {
+                guard !(run["sourceDangerReceipt"] is NSNull) else { throw CocoaError(.coderInvalidValue) }
+                _ = try SaveCodec.makeDecoder().decode(
+                    WorldSourceDangerReceiptV1.self,
+                    from: JSONSerialization.data(withJSONObject: run["sourceDangerReceipt"] as Any))
+            } else {
+                let book = try SaveCodec.makeDecoder().decode(
+                    BoundBook.self, from: JSONSerialization.data(withJSONObject: bookValue))
+                run["sourceDangerReceipt"] = try json(WorldSourceDangerReceiptV1.freeze(book: book))
+            }
+            if let encounterValue = run["activeEncounter"], !(encounterValue is NSNull) {
+                guard var encounter = encounterValue as? [String: Any] else {
+                    throw CocoaError(.coderInvalidValue)
+                }
+                if encounter.keys.contains("creatureMaterialRewardResolution") {
+                    guard !(encounter["creatureMaterialRewardResolution"] is NSNull) else {
+                        throw CocoaError(.coderInvalidValue)
+                    }
+                    _ = try SaveCodec.makeDecoder().decode(
+                        CreatureMaterialRewardResolutionV1.self,
+                        from: JSONSerialization.data(
+                            withJSONObject: encounter["creatureMaterialRewardResolution"] as Any))
+                } else {
+                    let resolution: CreatureMaterialRewardResolutionV1 =
+                        encounter["outcome"] == nil || encounter["outcome"] is NSNull
+                        ? .pending : .legacyResolved
+                    encounter["creatureMaterialRewardResolution"] = try json(resolution)
+                }
+                run["activeEncounter"] = encounter
+            }
+            return run
+        }
+        if var worlds = root["worlds"] as? [String: Any] {
+            if let active = worlds["activeRun"], !(active is NSNull) {
+                worlds["activeRun"] = try migrateRun(active)
+            }
+            if let realms = worlds["anchoredRealms"] as? [[String: Any]] {
+                worlds["anchoredRealms"] = try realms.map { value in
+                    var realm = value
+                    if let world = realm["world"] { realm["world"] = try migrateRun(world) }
+                    return realm
+                }
+            }
+            root["worlds"] = worlds
+        }
+        root["schemaVersion"] = 6
+        return try JSONSerialization.data(withJSONObject: root, options: [.sortedKeys])
     }
 
     /// Freezes the deterministic creature-material projection onto ecology-aware species only.

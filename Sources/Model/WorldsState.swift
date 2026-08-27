@@ -418,6 +418,7 @@ struct RunExitSummary: Codable, Equatable, Identifiable, Sendable {
     var recruitedTravellers: [TravellerID] = []
     var essenceEconomy = EssenceEconomy()
     var experienceBreakdown = RunExperienceBreakdown()
+    var creatureMaterialRewardReceipts: [CreatureMaterialRewardReceiptV1] = []
 
     var id: String { outcomeID.map { "outcome-\($0.rawValue)" } ?? "legacy-run-\(runIndex)" }
     var departureCopy: String {
@@ -440,6 +441,7 @@ struct RunExitSummary: Codable, Equatable, Identifiable, Sendable {
          pages: [DiaryPageID] = [], writings: [RecoveredWriting] = [],
          recruitedTravellers: [TravellerID] = [],
          experienceBreakdown: RunExperienceBreakdown = RunExperienceBreakdown(),
+         creatureMaterialRewardReceipts: [CreatureMaterialRewardReceiptV1] = [],
          essenceEconomy: EssenceEconomy = EssenceEconomy()) {
         self.runIndex = runIndex
         self.outcomeID = outcomeID
@@ -476,6 +478,7 @@ struct RunExitSummary: Codable, Equatable, Identifiable, Sendable {
         self.recruitedTravellers = recruitedTravellers
         self.essenceEconomy = essenceEconomy
         self.experienceBreakdown = experienceBreakdown
+        self.creatureMaterialRewardReceipts = creatureMaterialRewardReceipts
     }
 
     init(from decoder: Decoder) throws {
@@ -527,6 +530,9 @@ struct RunExitSummary: Codable, Equatable, Identifiable, Sendable {
         experienceBreakdown = try c.decodeIfPresent(RunExperienceBreakdown.self,
                                                      forKey: .experienceBreakdown)
             ?? RunExperienceBreakdown()
+        creatureMaterialRewardReceipts = try c.decodeIfPresent(
+            [CreatureMaterialRewardReceiptV1].self,
+            forKey: .creatureMaterialRewardReceipts) ?? []
     }
 }
 
@@ -1092,6 +1098,10 @@ struct WorldRun: Codable, Equatable, Sendable {
     var carriedWorldPages: [WorldPageInstance] = []
     /// Exact harvested material haul. This reserve is carried, but never occupies a satchel slot.
     var materialReserve: MaterialReserve = MaterialReserve()
+    /// Frozen source danger used by deterministic creature-material quality.
+    var sourceDangerReceipt: WorldSourceDangerReceiptV1?
+    /// Immutable encounter reward receipts retained until Return freezes the outcome.
+    var creatureMaterialRewardReceipts: [CreatureMaterialRewardReceiptV1] = []
     /// Frozen at departure: changing next trip's kit cannot alter a world already in progress.
     var carriedInstruments: Set<PressureTargetID> = []
     /// Grade is frozen at departure along with the packing choice.
@@ -1169,7 +1179,9 @@ struct WorldRun: Codable, Equatable, Sendable {
          tuning: DebugTuningProfile = .defaults,
          worldVisualReceipt: WorldVisualReceipt? = nil,
          atmospherePresentationReceipt: WorldAtmospherePresentationReceiptV1? = nil,
-         worldArrivalReceipt: WorldArrivalReceipt? = nil) {
+         worldArrivalReceipt: WorldArrivalReceipt? = nil,
+         sourceDangerReceipt: WorldSourceDangerReceiptV1? = nil,
+         creatureMaterialRewardReceipts: [CreatureMaterialRewardReceiptV1] = []) {
         self.runIndex = runIndex
         self.book = book
         self.mapSeed = mapSeed
@@ -1179,6 +1191,8 @@ struct WorldRun: Codable, Equatable, Sendable {
         self.atmospherePresentationReceipt = atmospherePresentationReceipt
             ?? .migratingLegacy(worldVisualReceipt, seed: mapSeed)
         self.worldArrivalReceipt = worldArrivalReceipt
+        self.sourceDangerReceipt = sourceDangerReceipt ?? .freeze(book: book)
+        self.creatureMaterialRewardReceipts = creatureMaterialRewardReceipts
         self.generationDiagnostics = generationDiagnostics
         self.clock = WorldClock(book: book, seed: mapSeed)
         self.map = map
@@ -1300,6 +1314,17 @@ struct WorldRun: Codable, Equatable, Sendable {
             [WorldPageInstance].self, forKey: .carriedWorldPages) ?? []
         materialReserve = try container.decodeIfPresent(MaterialReserve.self,
                                                         forKey: .materialReserve) ?? MaterialReserve()
+        if container.contains(.sourceDangerReceipt) {
+            guard try !container.decodeNil(forKey: .sourceDangerReceipt) else {
+                throw CocoaError(.coderInvalidValue)
+            }
+            sourceDangerReceipt = try container.decode(WorldSourceDangerReceiptV1.self,
+                                                        forKey: .sourceDangerReceipt)
+        } else {
+            sourceDangerReceipt = .freeze(book: book)
+        }
+        creatureMaterialRewardReceipts = try container.decodeIfPresent(
+            [CreatureMaterialRewardReceiptV1].self, forKey: .creatureMaterialRewardReceipts) ?? []
         carriedInstruments = try container.decodeIfPresent(Set<PressureTargetID>.self,
                                                             forKey: .carriedInstruments) ?? []
         carriedInstrumentPrecisions = try container.decodeIfPresent(
@@ -1354,6 +1379,7 @@ struct WorldRun: Codable, Equatable, Sendable {
         } else {
             companionHP = [:]
         }
+        try CreatureMaterialRewardRules.validatePersisted(run: self)
     }
 
     private static func normalizedHealthCaps(_ entries: [RunHealthCapEntry]) -> [RunHealthCapEntry] {
@@ -1403,6 +1429,7 @@ extension WorldRun {
         snapshot.offeredWorldPages = []
         snapshot.partyProgressAtStart = []
         snapshot.experienceBreakdown = RunExperienceBreakdown()
+        snapshot.creatureMaterialRewardReceipts = []
         snapshot.carriedItemCountsAtStart = [:]
         snapshot.foundPagesAtStart = []
         return snapshot

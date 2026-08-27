@@ -189,6 +189,8 @@ enum CombatAction: Codable, Equatable, Sendable {
 
 struct FoeState: Codable, Equatable, Identifiable, Sendable {
     var id: InstanceID
+    /// Exact generated-species identity copied from the map specimen at encounter creation.
+    var speciesID: InstanceID?
     /// An authored creature. **Legacy**, and nil for anything a world grew itself.
     var creatureID: CreatureID?
     /// Which bestiary entry this belongs under. Derived from the traits at spawn and stored, so a
@@ -236,11 +238,13 @@ struct FoeState: Codable, Equatable, Identifiable, Sendable {
         }
     }
 
-    init(id: InstanceID, creatureID: CreatureID? = nil, identityKey: String = "unknown",
+    init(id: InstanceID, speciesID: InstanceID? = nil,
+         creatureID: CreatureID? = nil, identityKey: String = "unknown",
          traits: CreatureTraits? = nil, stats: CombatStats, currentHP: Int,
          qualifier: String? = nil, bleedRounds: Int = 0, level: Int = 1,
          isApex: Bool = false) {
         self.id = id
+        self.speciesID = speciesID
         self.creatureID = creatureID
         self.identityKey = identityKey
         self.traits = traits
@@ -256,6 +260,7 @@ struct FoeState: Codable, Equatable, Identifiable, Sendable {
     init(from decoder: Decoder) throws {
         let c = try decoder.container(keyedBy: CodingKeys.self)
         id = try c.decode(InstanceID.self, forKey: .id)
+        speciesID = try c.decodeIfPresent(InstanceID.self, forKey: .speciesID)
         creatureID = try c.decodeIfPresent(CreatureID.self, forKey: .creatureID)
         identityKey = try c.decodeIfPresent(String.self, forKey: .identityKey)
             ?? creatureID?.rawValue ?? "unknown"
@@ -679,6 +684,8 @@ struct EncounterState: Codable, Equatable, Sendable {
 
     /// Non-nil once the fight is over and waiting to be dismissed.
     var outcome: EncounterOutcome?
+    /// Explicit once-only body-material transaction state.
+    var creatureMaterialRewardResolution: CreatureMaterialRewardResolutionV1 = .pending
 
     /// Rounds of bleeding left on each of you. Rend's wound outlives the blow, which is what makes
     /// a rending creature worth fleeing rather than trading with.
@@ -750,6 +757,7 @@ struct EncounterState: Codable, Equatable, Sendable {
         self.rankAtPreviousCompletedAction = debugV2OwnedNodeIDs == nil ? nil : partyRanks
         self.afflictions = []
         self.log = log
+        self.creatureMaterialRewardResolution = .pending
     }
 
     /// Tolerant decoding, per the policy in `Migrations.swift`.
@@ -880,6 +888,16 @@ struct EncounterState: Codable, Equatable, Sendable {
         recoveryComplete = try c.decodeIfPresent(Set<Combatant>.self, forKey: .recoveryComplete) ?? []
         isCompanionOverridden = try c.decodeIfPresent(Bool.self, forKey: .isCompanionOverridden) ?? false
         outcome = try c.decodeIfPresent(EncounterOutcome.self, forKey: .outcome)
+        if c.contains(.creatureMaterialRewardResolution) {
+            guard try !c.decodeNil(forKey: .creatureMaterialRewardResolution) else {
+                throw CocoaError(.coderInvalidValue)
+            }
+            creatureMaterialRewardResolution = try c.decode(
+                CreatureMaterialRewardResolutionV1.self,
+                forKey: .creatureMaterialRewardResolution)
+        } else {
+            creatureMaterialRewardResolution = outcome == nil ? .pending : .legacyResolved
+        }
         binderBleedRounds = try c.decodeIfPresent(Int.self, forKey: .binderBleedRounds) ?? 0
         companionBleedRounds = try c.decodeIfPresent(Int.self, forKey: .companionBleedRounds) ?? 0
         log = try c.decodeIfPresent([String].self, forKey: .log) ?? []

@@ -3180,12 +3180,19 @@ enum CombatRules {
         else { return }
 
         if encounter.isResolved {
+            var candidate = state
             encounter.outcome = .victory
             encounter.note("Nothing left standing.")
-            awardSpoils(run: &run, encounter: &encounter, state: &state)
-            awardExperience(for: encounter.foes, run: &run, encounter: &encounter, state: &state)
-            let grown = growLivingHooks(in: &state)
+            guard awardCreatureMaterialSpoils(run: &run, encounter: &encounter,
+                                               state: &candidate) else { return }
+            awardExperience(for: encounter.foes, run: &run, encounter: &encounter,
+                            state: &candidate)
+            let grown = growLivingHooks(in: &candidate)
             encounter.spoils.append(contentsOf: grown)
+            run.activeEncounter = encounter
+            candidate.worlds.activeRun = run
+            state = candidate
+            return
         } else if run.binderHP <= 0 {
             // **Nobody dies, and the Binder going down ends the run** (session 17 §6): *"companions
             // can never die. They pass out and are revived back in town. If the Binder passes out,
@@ -3198,6 +3205,49 @@ enum CombatRules {
         }
         run.activeEncounter = encounter
         state.worlds.activeRun = run
+    }
+
+    /// Deterministic, receipt-owned generated body materials. The caller operates on a candidate
+    /// state, so every invariant failure aborts before XP, trophies, growth or reserve mutation.
+    private static func awardCreatureMaterialSpoils(run: inout WorldRun,
+                                                     encounter: inout EncounterState,
+                                                     state: inout GameState) -> Bool {
+        switch CreatureMaterialRewardRules.evaluate(run: run, encounter: encounter) {
+        case .alreadyResolved(let resolution):
+            encounter.creatureMaterialRewardResolution = resolution
+            return true
+        case .noEligibleSpecimens:
+            encounter.creatureMaterialRewardResolution = .ineligible(.noEligibleSpecimens)
+            encounter.spoils = []
+        case .eligible(let receipt, let units):
+            guard run.materialReserve.addExact(units) else { return false }
+            encounter.creatureMaterialRewardResolution = .awarded(receipt)
+            run.creatureMaterialRewardReceipts.append(receipt)
+            encounter.spoils = receipt.entries.map { entry in
+                let kind = MaterialKind(entry.family)
+                return entry.quantity > 1
+                    ? "\(kind.displayName) ×\(entry.quantity)"
+                    : kind.displayName
+            }
+        default:
+            return false
+        }
+
+        // The authored apex route remains reliable, but ordinary generated foes no longer enter
+        // resource, generic gear/curio/key, or surprise-apex lotteries.
+        for foe in encounter.foes where foe.isApex && !foe.isAlive {
+            let readings = BookRules.readings(for: run.book, seed: run.mapSeed)
+            if let id = ApexRules.weapon(for: readings, rng: &run.rng) {
+                let name = ContentCatalog.shared.item(id)?.name ?? "Something you couldn't make"
+                let stack = ItemStack(id: InstanceID(rawValue: run.rng.next()), catalogID: id)
+                if run.satchelItems.add(stack) { encounter.spoils.append(name) }
+                else {
+                    run.offeredItems.append(stack)
+                    encounter.spoils.append("\(name) — no room; waiting on you")
+                }
+            }
+        }
+        return true
     }
 
     /// One growth credit per won encounter, regardless of hits or killing blows. Growth belongs to
