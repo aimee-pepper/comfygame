@@ -47,6 +47,14 @@ struct LibraryShelfPresentation: Equatable, Sendable {
     var objects: [LibraryShelfObjectPresentation]
     var uncheckedCount: Int
 
+    /// Collection roots may check only content that the root itself truthfully renders. Diary
+    /// pages are behind an author route, so the diary grid never checks them on its own.
+    static func contentIDsRenderedByCollectionRoot(_ shelfID: LibraryShelfID,
+                                                   in state: GameState)
+        -> Set<LibraryAttentionContentID> {
+        shelfID == .diaries ? [] : contentIDs(for: shelfID, in: state)
+    }
+
     static func make(in state: GameState) -> [Self] {
         let current = currentContentIDs(in: state)
         let checked = state.reality.library.attention.checkedContentIDs

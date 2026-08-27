@@ -3,7 +3,9 @@ import UIKit
 
 enum BaseBoardRules {
     static func destinations(from stations: [StationDef]) -> [StationDef] {
-        stations.filter { $0.route != AppRoute.party.rawValue }
+        stations.filter {
+            $0.route != AppRoute.party.rawValue && $0.route != AppRoute.bestiary.rawValue
+        }
     }
 
     static func knownStations(_ stations: [StationDef], unlocked: Set<StationID>,

@@ -813,8 +813,9 @@ enum WorldRules {
         state.worlds.activeRun = run
 
         if let bumped = enemyOnPlayer(in: run) {
-            beginEncounter(triggeredBy: bumped, preContact: preContact, in: &state)
-            events.append(.encounterBegan)
+            if beginEncounter(triggeredBy: bumped, preContact: preContact, in: &state) {
+                events.append(.encounterBegan)
+            }
         }
 
         // **You are only forced out when the block you're standing on goes** (Aimee, 5 Aug). The
@@ -1280,14 +1281,15 @@ enum WorldRules {
 
     /// Opens an encounter with the bumped enemy plus anything awake standing next to it, up to the
     /// party's limit. Milestone 4 replaces the combat itself, not this trigger.
+    @discardableResult
     static func beginEncounter(triggeredBy enemy: WorldEnemy,
                                preContact suppliedSnapshot: PreContactSnapshot? = nil,
                                runsAutomaticTurns: Bool = true,
                                debugGodModeEnabled suppliedDebugGodMode: Bool? = nil,
-                               in state: inout GameState) {
-        guard var run = state.worlds.activeRun, run.activeEncounter == nil else { return }
+                               in state: inout GameState) -> Bool {
+        guard var run = state.worlds.activeRun, run.activeEncounter == nil else { return false }
         // Just fled? You get a moment before anything else can catch you.
-        guard run.encounterGraceTurns == 0 else { return }
+        guard run.encounterGraceTurns == 0 else { return false }
 
         let partyLevels = EncounterScalingRules.partyLevels(in: state)
         let usesAdditiveScaling = run.tuning.encounterScalingProfile == .recommended
@@ -1338,6 +1340,7 @@ enum WorldRules {
 
         var foes: [FoeState] = []
         var initiallyUnrecordedSpecies: Set<String> = []
+        var candidateDiscovery = state.reality.discovery
         for member in group {
             // Stats are resolved here, once, and saved with the foe — not looked up mid-fight.
             // **Derived from the trait vector**, so how it fights is what it is.
@@ -1387,22 +1390,26 @@ enum WorldRules {
             let isNewSpecies = state.reality.discovery.species[member.identityKey] == nil
             if isNewSpecies { initiallyUnrecordedSpecies.insert(member.identityKey) }
             if let habitat = member.habitatPlacement?.habitat {
-                guard state.reality.discovery.recordSpecies(
-                    member.identityKey, habitat: habitat, runIndex: run.runIndex) else { return }
+                guard candidateDiscovery.recordSpecies(
+                    member.identityKey, habitat: habitat, runIndex: run.runIndex) else { return false }
             } else {
                 // Legacy/authored bodies remain visible in Bestiary detail but unclassified on
                 // the physical habitat shelves.
-                state.reality.discovery.recordSpecies(member.identityKey, runIndex: run.runIndex)
+                candidateDiscovery.recordSpecies(member.identityKey, runIndex: run.runIndex)
             }
-            if isNewSpecies { awardDiscovery(.species, run: &run, in: &state) }
             if let traits = member.traits {
-                state.reality.discovery.recordSpecimen(traits, of: member.identityKey, runIndex: run.runIndex)
+                candidateDiscovery.recordSpecimen(traits, of: member.identityKey,
+                                                   runIndex: run.runIndex)
             }
             if let legacy = member.creatureID {
-                state.reality.discovery.recordCreature(legacy, runIndex: run.runIndex)
+                candidateDiscovery.recordCreature(legacy, runIndex: run.runIndex)
             }
         }
-        guard !foes.isEmpty else { return }
+        guard !foes.isEmpty else { return false }
+        state.reality.discovery = candidateDiscovery
+        for _ in initiallyUnrecordedSpecies {
+            awardDiscovery(.species, run: &run, in: &state)
+        }
         let containsApex = foes.contains(where: \.isApex)
         let ordinaryPressureSlots: Int
         if !containsApex, let fraction = scalingPreview?.totalHPAdditionFraction,
@@ -1619,6 +1626,7 @@ enum WorldRules {
         // otherwise sit there waiting on nobody: the player's buttons do nothing, because it isn't
         // their turn, and nothing else is running.
         if runsAutomaticTurns { CombatRules.runAutomaticTurns(in: &state) }
+        return true
     }
 
 }

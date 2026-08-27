@@ -1912,6 +1912,28 @@ final class LibraryTests: XCTestCase {
         XCTAssertEqual(try SaveCodec.makeEncoder().encode(store.state), bytes)
     }
 
+    func testDiaryGridDoesNotCheckPagesButAnExactRenderedPageDoes() throws {
+        let store = p2Store()
+        let diary = try XCTUnwrap(LibraryShelfPresentation.make(in: store.state).first {
+            $0.id == .diaries
+        })
+        let pageIDs = Set(diary.objects.flatMap(\.contentIDs))
+        XCTAssertFalse(pageIDs.isEmpty)
+        let rootIDs = LibraryShelfPresentation.contentIDsRenderedByCollectionRoot(
+            .diaries, in: store.state)
+        XCTAssertTrue(rootIDs.isEmpty)
+
+        let before = store.state.reality.library.attention.checkedContentIDs
+        store.checkLibraryContent(rootIDs)
+        XCTAssertEqual(store.state.reality.library.attention.checkedContentIDs, before)
+
+        let rendered = try XCTUnwrap(pageIDs.first)
+        store.checkLibraryContent([rendered])
+        let newlyChecked = store.state.reality.library.attention.checkedContentIDs
+            .subtracting(before)
+        XCTAssertEqual(newlyChecked, [rendered])
+    }
+
     private func catalogueCopy(_ catalog: ContentCatalog, pages: [DiaryPageDef]) -> ContentCatalog {
         ContentCatalog(symbols: catalog.symbols, creatures: catalog.creatures,
             resources: catalog.resources, items: catalog.items, skills: catalog.skills,

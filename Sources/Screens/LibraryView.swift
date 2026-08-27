@@ -370,17 +370,18 @@ struct LibraryView: View {
     }
 
     private func checkSelectedShelfAfterRender() {
-        let shelfID: LibraryShelfID = switch tab {
-        case .diaries, .people: .diaries
-        case .dictionary: .dictionary
-        case .notes: .fieldNotes
-        case .history: .worldHistory
+        let shelfID: LibraryShelfID
+        switch tab {
+        case .diaries, .people: shelfID = .diaries
+        case .dictionary: shelfID = .dictionary
+        case .notes: shelfID = .fieldNotes
+        case .history: shelfID = .worldHistory
         }
         guard let shelf = LibraryShelfPresentation.make(in: store.state).first(where: {
             $0.id == shelfID
         }) else { return }
-        store.checkLibraryContent(LibraryShelfPresentation.contentIDs(
-            for: shelf.id, in: store.state))
+        store.checkLibraryContent(LibraryShelfPresentation.contentIDsRenderedByCollectionRoot(
+            shelf.id, in: store.state))
     }
 
     @ViewBuilder private var diariesGrid: some View {
@@ -807,6 +808,7 @@ private struct LibraryTravellerView: View {
 }
 
 private struct LibraryDiaryView: View {
+    @EnvironmentObject private var store: GameStore
     let traveller: TravellerDef
     let pages: [DiaryPageDef]
 
@@ -814,7 +816,10 @@ private struct LibraryDiaryView: View {
         ScrollView {
             PageCollection(title: "\(pages.count) page\(pages.count == 1 ? "" : "s") written",
                            pages: pages,
-                           empty: "No pages from this diary recovered yet.")
+                           empty: "No pages from this diary recovered yet.",
+                           onPageRendered: { page in
+                               store.checkLibraryContent([.diaryPage(page.id)])
+                           })
                 .padding(16)
         }
         .background(Color(.systemGroupedBackground))
@@ -858,6 +863,7 @@ private struct PageCollection: View {
     let title: String
     let pages: [DiaryPageDef]
     let empty: String
+    var onPageRendered: ((DiaryPageDef) -> Void)? = nil
 
     private let columns = [GridItem(.adaptive(minimum: 132), spacing: 10)]
 
@@ -873,6 +879,7 @@ private struct PageCollection: View {
                             DiaryPageDetailView(page: page)
                         } label: {
                             DiaryPageTile(page: page)
+                                .onAppear { onPageRendered?(page) }
                         }
                         .buttonStyle(.plain)
                     }

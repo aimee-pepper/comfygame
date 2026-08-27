@@ -217,6 +217,14 @@ final class BaseBoardTests: XCTestCase {
         })
     }
 
+    func testBestiaryIsLibraryOwnedAndNeverAnIndependentBaseDestination() {
+        let destinations = BaseBoardRules.destinations(from: ContentCatalog.shared.stationsInOrder)
+        XCTAssertFalse(destinations.contains { $0.id == "bestiary" })
+        XCTAssertTrue(destinations.contains { $0.id == "library" })
+        XCTAssertEqual(AppRoute.bestiary.rawValue, "bestiary",
+                       "The nested Library/deep-link route must remain stable")
+    }
+
     func testTownPlotCoordinatesFollowTheAspectFilledBackdropCrop() {
         let image = CGSize(width: 1408, height: 3048)
         let container = CGSize(width: 344, height: 430)

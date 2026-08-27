@@ -4793,6 +4793,39 @@ final class WorldTests: XCTestCase {
         XCTAssertTrue(state.reality.discovery.hasEncountered(creature: "ink_hound"))
     }
 
+    func testEncounterHabitatMismatchRejectsWholeGroupWithoutDiscoveryOrCommencement() throws {
+        var state = startedRun(book(["terrain": "plains"]), seed: 6_213)
+        var run = try XCTUnwrap(state.worlds.activeRun)
+        let destination = try XCTUnwrap(run.map.neighbours(of: run.playerPosition)
+            .first { WorldRules.canEnter($0, in: run.map) })
+        let otherLegalTile = try XCTUnwrap(run.map.neighbours(of: destination).first)
+        run.map[destination].isRevealed = true
+        run.map[otherLegalTile].isRevealed = true
+        let first = WorldEnemy(
+            id: .init(rawValue: 62_130), creatureID: "paper_moth", position: destination,
+            habitatPlacement: .init(habitat: .terrestrial, componentID: 1,
+                                    legalTiles: [destination, otherLegalTile],
+                                    contactEligible: true), isAwake: true)
+        let conflicting = WorldEnemy(
+            id: .init(rawValue: 62_131), creatureID: "ink_hound", position: destination,
+            habitatPlacement: .init(habitat: .aerial, componentID: 2,
+                                    legalTiles: [destination, otherLegalTile],
+                                    contactEligible: true), isAwake: true)
+        run.enemies = [first, conflicting]
+        state.worlds.activeRun = run
+        XCTAssertTrue(state.reality.discovery.recordSpecies(
+            conflicting.identityKey, habitat: .shore, runIndex: 0))
+        let discoveryBefore = state.reality.discovery
+
+        let events = WorldRules.step(to: destination, in: &state)
+
+        XCTAssertFalse(events.contains(.encounterBegan))
+        XCTAssertNil(state.worlds.activeRun?.activeEncounter)
+        XCTAssertEqual(state.reality.discovery, discoveryBefore,
+                       "An earlier valid group member was staged before a later mismatch refused")
+        XCTAssertFalse(state.reality.discovery.hasEncountered(species: first.identityKey))
+    }
+
     // MARK: Banking
 
     @MainActor
