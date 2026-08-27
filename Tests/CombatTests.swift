@@ -48,13 +48,14 @@ final class CombatTests: XCTestCase {
     /// **Skills come from the trees now**, so a test about *what a skill does* has to buy it first.
     /// Everything, at full depth: these tests are about behaviour, not about unlocking.
     private static func learnEverything(_ state: inout GameState) {
-        var depths: [CombatBranchID: Int] = [:]
-        for branch in ContentCatalog.shared.combatBranches { depths[branch.id] = branch.nodes.count }
+        let owned = Set(ContentCatalog.shared.combatGraph.nodes
+            .filter { $0.depth <= CombatGraphRules.openingMaximumDepth && $0.techniqueID != nil }
+            .map(\.id))
         // **Depths only, not levels.** Foes scale to the party's level (session 17 §3), so raising
         // it here would quietly turn every stat test into a test about levelling.
-        state.base.binderCharacter.branchDepth = depths
+        state.base.binderCharacter.ownedCombatNodeIDs = owned
         for index in state.base.roster.indices {
-            state.base.roster[index].character.branchDepth = depths
+            state.base.roster[index].character.ownedCombatNodeIDs = owned
         }
     }
 
@@ -63,7 +64,7 @@ final class CombatTests: XCTestCase {
         let store = GameStore(io: .temporary(name: "combat-\(UUID().uuidString)"))
         store.mutate("test: everything learned") { Self.learnEverything(&$0) }
         store.write("plains")
-        store.bindAndDepart()
+        XCTAssertTrue(store.bindAndDepart(), store.bindError ?? "bind failed without a reason")
         if let gambits {
             store.mutate("set rules") { state in
                 // Tests may use components a fresh game hasn't learned; grant them so the rule is
@@ -461,8 +462,8 @@ final class CombatTests: XCTestCase {
         // Vanish (Shadow 6) makes leaving free, and the fixture hands out every branch — so for
         // *this* test, unlearn it. That the capstone branch removes the cost is its own test.
         store.mutate("test: no shadow") { state in
-            state.base.binderCharacter.branchDepth["shadow"] = 0
-            for index in state.base.roster.indices { state.base.roster[index].character.branchDepth["shadow"] = 0 }
+            state.base.binderCharacter.ownedCombatNodeIDs.formUnion(legacyCombatNodes(["shadow": 0]))
+            for index in state.base.roster.indices { state.base.roster[index].character.ownedCombatNodeIDs.formUnion(legacyCombatNodes(["shadow": 0])) }
         }
         store.takeCombatAction(.flee)
         XCTAssertEqual(store.activeEncounter?.outcome, .fled)
@@ -2097,7 +2098,7 @@ final class CombatTests: XCTestCase {
     func testThickHideComposesLevelAndLegacyCompatibilityExactlyOnce() throws {
         var state = GameState.newGame()
         state.base.binderCharacter.level = 8
-        state.base.binderCharacter.branchDepth["defense_fortitude"] = 1
+        state.base.binderCharacter.ownedCombatNodeIDs.formUnion(legacyCombatNodes(["fortitude": 1]))
         let characterOnly = CharacterRules.maximumHealth(state.base.binderCharacter,
                                                           base: Tuning.Encounter.binderMaxHP)
         var v2 = DebugTuningProfile.defaults
@@ -2454,7 +2455,7 @@ final class CombatTests: XCTestCase {
 
     func testV2ArmourMissingEntryAndRankFailClosedWithoutLiveLegacyFallback() throws {
         var state = GameState.newGame()
-        state.base.binderCharacter.branchDepth["defense_fortitude"] = 3
+        state.base.binderCharacter.ownedCombatNodeIDs.formUnion(legacyCombatNodes(["fortitude": 3]))
         let missingReceiver = EncounterState.DebugV2ArmourReceipt(entries: [
             .init(actor: .companion(0), equipmentProtectivePower: 99, sturdiness: 2,
                   ownedNodeIDs: [CombatDerivedStatsRules.Node.bulwark], entryRank: .back)
@@ -2539,7 +2540,7 @@ final class CombatTests: XCTestCase {
 
         store.mutate("change mutable base after contact") { state in
             state.base.binderCharacter.stats.fortitude = 99
-            state.base.binderCharacter.branchDepth["fortitude"] = 8
+            state.base.binderCharacter.ownedCombatNodeIDs.formUnion(legacyCombatNodes(["fortitude": 8]))
             state.base.binderEquipped[.armor] = EquippedPiece(catalogID: "guard_vault")
             state.base.binderCharacter.rank = state.base.binderCharacter.rank == .front ? .back : .front
             state.worlds.activeRun?.tuning.debugCombatV2BinderNodeIDs = []
@@ -4814,7 +4815,7 @@ final class CombatTests: XCTestCase {
             store.mutate("stage exact Conduction owner") { state in
                 guard var run = state.worlds.activeRun, var encounter = run.activeEncounter,
                       encounter.foes.count == 2 else { return }
-                state.base.binderCharacter.branchDepth["kindling"] = 3
+                state.base.binderCharacter.ownedCombatNodeIDs.formUnion(legacyCombatNodes(["kindling": 3]))
                 encounter.debugV2OwnedNodeIDs = [.binder: [node]]
                 encounter.order = [.binder] + encounter.foes.map { .foe($0.id) }
                 encounter.turnSlots = encounter.order.map { .init(actor: $0) }

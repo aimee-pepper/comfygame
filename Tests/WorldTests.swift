@@ -4280,7 +4280,7 @@ final class WorldTests: XCTestCase {
     func testQuietStepCreatesOnePersistedAlertTurnRatherThanAnInvisibleRoll() throws {
         var state = startedRun(book(["terrain": "plains"]), seed: 6_101)
         state.base.binderCharacter.level = 3
-        state.base.binderCharacter.branchDepth["shadow"] = 1
+        state.base.binderCharacter.ownedCombatNodeIDs.formUnion(legacyCombatNodes(["shadow": 1]))
         var run = try XCTUnwrap(state.worlds.activeRun)
         run.enemies = []
         run.playerPosition = GridPoint(x: 7, y: 7)
@@ -4317,7 +4317,7 @@ final class WorldTests: XCTestCase {
     func testScentMaskIsChemoOnlyNonstackingAndPersistsForTwelveAdvances() throws {
         var state = startedRun(book(["terrain": "plains"]), seed: 6_102)
         state.base.binderCharacter.level = 3
-        state.base.binderCharacter.branchDepth["shadow"] = 1
+        state.base.binderCharacter.ownedCombatNodeIDs.formUnion(legacyCombatNodes(["shadow": 1]))
         var run = try XCTUnwrap(state.worlds.activeRun)
         run.playerPosition = .init(x: 7, y: 7)
         let position = GridPoint(x: 7, y: 9)
@@ -4532,7 +4532,7 @@ final class WorldTests: XCTestCase {
 
     func testWatchfulSuppressesActionsWithoutReclassifyingAmbush() throws {
         var state = startedRun(book(["terrain": "plains"]), seed: 8_121)
-        state.base.binderCharacter.branchDepth["protection"] = 2
+        state.base.binderCharacter.ownedCombatNodeIDs.formUnion(legacyCombatNodes(["protection": 2]))
         var run = try XCTUnwrap(state.worlds.activeRun)
         let enemy = WorldEnemy(id: InstanceID(rawValue: 8121), creatureID: "paper_moth",
                                position: run.playerPosition)
@@ -4552,7 +4552,7 @@ final class WorldTests: XCTestCase {
         var preventedState: GameState?
         for seed in UInt64(8_130)...8_194 {
             var state = startedRun(book(["terrain": "plains"]), seed: seed)
-            state.base.binderCharacter.branchDepth["evasion"] = 4
+            state.base.binderCharacter.ownedCombatNodeIDs.formUnion(legacyCombatNodes(["evasion": 4]))
             var run = try XCTUnwrap(state.worlds.activeRun)
             let enemy = WorldEnemy(id: InstanceID(rawValue: seed), creatureID: "paper_moth",
                                    position: run.playerPosition)
@@ -4574,7 +4574,7 @@ final class WorldTests: XCTestCase {
         XCTAssertTrue(slipperyOpening.pendingFoeActions.isEmpty)
 
         var unseen = startedRun(book(["terrain": "plains"]), seed: 8_195)
-        unseen.base.binderCharacter.branchDepth["shadow"] = 8
+        unseen.base.binderCharacter.ownedCombatNodeIDs.formUnion(legacyCombatNodes(["shadow": 8]))
         var run = try XCTUnwrap(unseen.worlds.activeRun)
         let enemy = WorldEnemy(id: InstanceID(rawValue: 8195), creatureID: "paper_moth",
                                position: run.playerPosition)
@@ -4623,8 +4623,8 @@ final class WorldTests: XCTestCase {
                        "a repeated or stale Ambush tap mutated the encounter")
 
         var quickenFirst = unseen
-        quickenFirst.base.binderCharacter.branchDepth["swiftness"] = 3
-        quickenFirst.base.binderCharacter.branchDepth["shadow"] = 5
+        quickenFirst.base.binderCharacter.ownedCombatNodeIDs.formUnion(legacyCombatNodes(["swiftness": 3]))
+        quickenFirst.base.binderCharacter.ownedCombatNodeIDs.formUnion(legacyCombatNodes(["shadow": 5]))
         quickenFirst.worlds.activeRun?.activeEncounter = nil
         WorldRules.beginEncounter(triggeredBy: enemy,
                                   preContact: .init(disclosedEnemyIDs: [enemy.id],
@@ -4655,7 +4655,7 @@ final class WorldTests: XCTestCase {
 
     func testUnseenExcludesOnlyItsOwnerFromOpeningTargetsThroughFirstOrdinaryRound() throws {
         var state = startedRun(book(["terrain": "plains"]), seed: 8_201)
-        state.base.binderCharacter.branchDepth["shadow"] = 8
+        state.base.binderCharacter.ownedCombatNodeIDs.formUnion(legacyCombatNodes(["shadow": 8]))
         var companion = CompanionState()
         companion.name = "Quill"
         state.base.roster = [companion]
@@ -4688,10 +4688,10 @@ final class WorldTests: XCTestCase {
                      "Unseen lasted beyond the end of the first ordinary round")
 
         var allUnseen = startedRun(book(["terrain": "plains"]), seed: 8_202)
-        allUnseen.base.binderCharacter.branchDepth["shadow"] = 8
+        allUnseen.base.binderCharacter.ownedCombatNodeIDs.formUnion(legacyCombatNodes(["shadow": 8]))
         var hiddenCompanion = CompanionState()
         hiddenCompanion.name = "Quill"
-        hiddenCompanion.character.branchDepth["shadow"] = 8
+        hiddenCompanion.character.ownedCombatNodeIDs.formUnion(legacyCombatNodes(["shadow": 8]))
         allUnseen.base.roster = [hiddenCompanion]
         allUnseen.base.activeParty = [0]
         var allHiddenRun = try XCTUnwrap(allUnseen.worlds.activeRun)
@@ -4714,7 +4714,7 @@ final class WorldTests: XCTestCase {
     func testUnseenExcludesItsOwnerFromMultiAndAreaOpeningDelivery() throws {
         for (offset, delivery) in [Delivery.multi, .area].enumerated() {
             var state = startedRun(book(["terrain": "plains"]), seed: 8_210 + UInt64(offset))
-            state.base.binderCharacter.branchDepth["shadow"] = 8
+            state.base.binderCharacter.ownedCombatNodeIDs.formUnion(legacyCombatNodes(["shadow": 8]))
             var companion = CompanionState()
             companion.name = "Quill"
             state.base.roster = [companion]
@@ -4761,12 +4761,12 @@ final class WorldTests: XCTestCase {
     func testFieldRadiusSkillsArePartyScopedNonstackingAndHomeDoesNotHelp() {
         var state = GameState.newGame()
         state.base.binderCharacter.level = 5
-        state.base.binderCharacter.branchDepth["shadow"] = 2
+        state.base.binderCharacter.ownedCombatNodeIDs.formUnion(legacyCombatNodes(["shadow": 2]))
         XCTAssertEqual(WorldRules.fieldConcealment(in: state).radiusReduction, 1)
 
         var traveller = CompanionState()
         traveller.character.level = 10
-        traveller.character.branchDepth["shadow"] = 7
+        traveller.character.ownedCombatNodeIDs.formUnion(legacyCombatNodes(["shadow": 7]))
         state.base.roster = [traveller, traveller]
         state.base.activeParty = [0]
         XCTAssertEqual(WorldRules.fieldConcealment(in: state).radiusReduction, 2)

@@ -1,6 +1,11 @@
 import XCTest
 @testable import Bookbinder
 
+func legacyCombatNodes(_ depths: [CombatBranchID: Int]) -> Set<CombatNodeID> {
+    CombatGraphRules.migratedLegacyNodes(branchDepth: depths,
+                                         catalogue: ContentCatalog.shared.combatGraph)
+}
+
 final class CombatGraphTests: XCTestCase {
     private var graph: CombatGraphCatalogue { ContentCatalog.shared.combatGraph }
 
@@ -200,7 +205,6 @@ final class CombatGraphTests: XCTestCase {
             XCTAssertEqual(CombatGraphRules.unspentPoints(for: character, catalogue: graph), before - 1)
         }
         XCTAssertEqual(character.ownedCombatNodeIDs, Set(route))
-        XCTAssertEqual(character.branchDepth, [:])
         let relaunched = try JSONDecoder().decode(CharacterState.self,
                                                    from: JSONEncoder().encode(character))
         XCTAssertEqual(relaunched.ownedCombatNodeIDs, Set(route))
@@ -211,8 +215,8 @@ final class CombatGraphTests: XCTestCase {
 
     func testLegacyMigrationUsesOnlySettledIDsAndRefundsUnresolvedPoints() throws {
         var legacy = CharacterState(level: Tuning.Character.maximumLevel)
-        legacy.branchDepth = ["force": 2, "removed_branch": 3]
-        let reconciliation = CombatGraphRules.reconcileLegacy(branchDepth: legacy.branchDepth,
+        let legacyDepths: [CombatBranchID: Int] = ["force": 2, "removed_branch": 3]
+        let reconciliation = CombatGraphRules.reconcileLegacy(branchDepth: legacyDepths,
                                                                catalogue: graph)
         let migrated: Set<CombatNodeID> = ["combat.offense.force.heavy_hand",
                                            "combat.offense.force.follow_through"]

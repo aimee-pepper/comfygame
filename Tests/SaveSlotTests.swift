@@ -388,6 +388,41 @@ final class SaveSlotTests: XCTestCase {
         }
     }
 
+    func testCurrentCombatOpeningOmissionFailsSlotLoadWithoutRewritingEnvelope() async throws {
+        let root = directory()
+        defer { try? FileManager.default.removeItem(at: root) }
+        let io = SaveSlotFileIO(directory: root)
+        let id = SaveSlotID()
+        let now = Date(timeIntervalSince1970: 55)
+        let state = GameState.newGame()
+        var payload = try XCTUnwrap(JSONSerialization.jsonObject(
+            with: SaveCodec.encode(state)) as? [String: Any])
+        var base = try XCTUnwrap(payload["base"] as? [String: Any])
+        var binder = try XCTUnwrap(base["binderCharacter"] as? [String: Any])
+        binder.removeValue(forKey: "ownedCombatNodeIDs")
+        base["binderCharacter"] = binder
+        payload["base"] = base
+        let malformedPayload = try JSONSerialization.data(withJSONObject: payload,
+                                                           options: [.sortedKeys])
+        let metadata = SaveSlotMetadata.make(id: id, name: "Malformed combat", state: state,
+                                             createdAt: now, lastPlayedAt: now)
+        let envelope = SaveSlotEnvelope(metadata: metadata, payload: malformedPayload)
+        let bytes = try encoder().encode(envelope)
+        let slotsDirectory = await io.slotsDirectory
+        try FileManager.default.createDirectory(at: slotsDirectory, withIntermediateDirectories: true)
+        let url = slotsDirectory.appending(path: "\(id.description).slot.json")
+        try bytes.write(to: url)
+
+        do { _ = try await io.load(id); XCTFail("Expected malformed combat ownership rejection") }
+        catch { }
+        XCTAssertEqual(try Data(contentsOf: url), bytes)
+        let adapter = SaveSlotPayloadIO(saveURL: url, slotID: id, lease: SaveSlotWriterLease())
+        guard case .unrecoverable = adapter.load() else {
+            return XCTFail("Malformed current combat ownership must fail closed")
+        }
+        XCTAssertEqual(try Data(contentsOf: url), bytes)
+    }
+
     func testFutureEnvelopeWithCurrentPayloadIsVisibleExportableAndNeverDecodedOrRewritten() async throws {
         let root = directory()
         defer { try? FileManager.default.removeItem(at: root) }

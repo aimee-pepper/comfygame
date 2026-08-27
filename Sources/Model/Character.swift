@@ -138,13 +138,6 @@ struct CharacterState: Codable, Equatable, Sendable {
     /// Front or back. Front takes the melee and deals it; back is protected and weaker in melee.
     var rank: Rank = .front
 
-    /// **How far into each branch this person has bought**, keyed by branch.
-    ///
-    /// A depth rather than a set of node ids, because nodes are bought in order — so the depth *is*
-    /// the purchase history, an out-of-order state is unrepresentable, and a re-cut branch can't
-    /// leave somebody holding a node that no longer exists.
-    var branchDepth: [CombatBranchID: Int] = [:]
-
     /// Stable graph-v2 ownership. Canonical saves always encode this set, including when empty.
     var ownedCombatNodeIDs: Set<CombatNodeID> = []
     /// Stable typed selections belonging to purchased nodes. Opening depths currently require no
@@ -153,11 +146,6 @@ struct CharacterState: Codable, Equatable, Sendable {
 
     /// Durable standard and refunded combat points. Never reconstructed from level after migration.
     var unspentCombatPoints: Int = 0
-
-    /// Points that didn't come from levelling — a calling's starting lean. Kept as a count rather
-    /// than baked into `branchDepth` alone, so the budget stays honest and a respec hands them back
-    /// rather than quietly deleting them.
-    var freePoints: Int = 0
 
     init(stats: CharacterStats = CharacterStats(), level: Int = 1,
          experience: Int = 0, rank: Rank = .front) {
@@ -174,15 +162,12 @@ struct CharacterState: Codable, Equatable, Sendable {
         level = try c.decodeIfPresent(Int.self, forKey: .level) ?? 1
         experience = try c.decodeIfPresent(Int.self, forKey: .experience) ?? 0
         rank = try c.decodeIfPresent(Rank.self, forKey: .rank) ?? .front
-        branchDepth = try c.decodeIfPresent([CombatBranchID: Int].self, forKey: .branchDepth) ?? [:]
-        ownedCombatNodeIDs = try c.decodeIfPresent(Set<CombatNodeID>.self,
-                                                    forKey: .ownedCombatNodeIDs) ?? []
-        combatNodeChoices = try c.decodeIfPresent([CombatNodeID: StableChoiceID].self,
-                                                   forKey: .combatNodeChoices) ?? [:]
-        freePoints = try c.decodeIfPresent(Int.self, forKey: .freePoints) ?? 0
-        unspentCombatPoints = try c.decodeIfPresent(Int.self, forKey: .unspentCombatPoints)
-            ?? max(0, CombatTreeRules.totalPoints(atLevel: level) + freePoints
-                   - ownedCombatNodeIDs.count)
+        ownedCombatNodeIDs = try c.decode(Set<CombatNodeID>.self, forKey: .ownedCombatNodeIDs)
+        combatNodeChoices = try c.decode([CombatNodeID: StableChoiceID].self,
+                                         forKey: .combatNodeChoices)
+        unspentCombatPoints = try c.decode(Int.self, forKey: .unspentCombatPoints)
+        guard unspentCombatPoints >= 0 else { throw DecodingError.dataCorruptedError(
+            forKey: .unspentCombatPoints, in: c, debugDescription: "negative combat point balance") }
     }
 
     func encode(to encoder: Encoder) throws {
@@ -198,7 +183,7 @@ struct CharacterState: Codable, Equatable, Sendable {
 
     private enum CodingKeys: String, CodingKey {
         case stats, level, experience, rank
-        case branchDepth, ownedCombatNodeIDs, combatNodeChoices, freePoints
+        case ownedCombatNodeIDs, combatNodeChoices
         case unspentCombatPoints
     }
 

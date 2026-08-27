@@ -1074,7 +1074,7 @@ extension GameStore {
             guard state.base.character(member) == frozen,
                   CombatTreeRules.respecCost(for: frozen) == cost else { return false }
             guard state.base.spendEssenceCrystals(cost) else { return false }
-            state.base.withCharacter(member) { CombatTreeRules.forget(&$0) }
+            state.base.withCharacter(member) { CombatTreeRules.respec(&$0) }
             return true
         }
     }

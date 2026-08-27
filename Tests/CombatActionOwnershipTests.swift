@@ -64,7 +64,7 @@ final class CombatActionOwnershipTests: XCTestCase {
 
     func testGraphSkillsUnionWithIdentityButRoutRemainsDecodeOnly() {
         var state = GameState.newGame()
-        state.base.binderCharacter.branchDepth["force"] = 3
+        state.base.binderCharacter.ownedCombatNodeIDs.formUnion(legacyCombatNodes(["force": 3]))
         let graph = CombatTreeRules.loadout(for: state.base.binderCharacter).skills
         let available = CombatActionOwnershipRules.availableSkillIDs(for: .binder, in: state)
 
