@@ -40,6 +40,7 @@ enum CharacterRules {
             character.stats[stat] += 1
         }
         character.level += 1
+        character.unspentCombatPoints += Tuning.Character.treePointsPerLevel
     }
 
     /// Adds experience and levels up as far as it reaches. Returns the levels gained, so the UI can

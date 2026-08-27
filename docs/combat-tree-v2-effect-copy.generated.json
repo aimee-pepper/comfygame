@@ -4,7 +4,7 @@
   "sourceMarkdown": "docs/combat-tree-node-copy-current.md",
   "sourceMarkdownSHA256": "d33ddf802b7620952a997575ede5dd3fffb252ddc6774a89076cf5a5d73cca53",
   "combatAuthority": "docs/combat-tree-v2-authority.json",
-  "combatAuthoritySHA256": "235abe8b86e4f39dec920c8dd47063be3adc4b2a8189e5adcefdc83ca1378d0f",
+  "combatAuthoritySHA256": "1238ebfa27746b0936e7e86419d58cac7f1069273e1b523ac6e9cad1b07c38ef",
   "effectCopyByNode": {
     "combat.offense.force.heavy_hand": "Your Crush attacks deal +2 raw damage.",
     "combat.offense.force.follow_through": "Deal +3 raw damage to a foe with 8 or more armour before the hit.",

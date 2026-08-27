@@ -1069,39 +1069,36 @@ extension GameStore {
     func respec(_ member: PartyMember) {
         guard canRespec(member) else { return }
         let cost = respecCost(for: member)
-        mutate("respec \(name(of: member))", flush: true) { state in
-            guard state.base.spendEssenceCrystals(cost) else { return }
+        let frozen = state.base.character(member)
+        _ = mutateIf("respec \(name(of: member))", flush: true) { state in
+            guard state.base.character(member) == frozen,
+                  CombatTreeRules.respecCost(for: frozen) == cost else { return false }
+            guard state.base.spendEssenceCrystals(cost) else { return false }
             state.base.withCharacter(member) { CombatTreeRules.forget(&$0) }
-        }
-    }
-
-    /// **Spend a point.** Bought in order within a branch, one at a time, and never mid-fight —
-    /// the same rule gambits follow, and for the same reason: a build is a decision you make about
-    /// the next fight, not during this one.
-    func spendPoint(in branch: CombatBranchID, for member: PartyMember) {
-        guard activeEncounter == nil,
-              let definition = ContentCatalog.shared.combatBranch(branch) else { return }
-        mutate("learn in \(definition.name)", flush: true) { state in
-            state.base.withCharacter(member) {
-                CombatTreeRules.buyNext(in: definition, for: &$0)
-            }
+            return true
         }
     }
 
     /// Stable graph purchase quote. Details hold their exact ownership/point snapshot so a stale
     /// sheet can never spend against a character who changed underneath it.
-    func previewCombatNodePurchase(_ nodeID: CombatNodeID, for member: PartyMember)
+    func previewCombatNodePurchase(_ nodeID: CombatNodeID, choice: StableChoiceID? = nil,
+                                   for member: PartyMember)
         -> Result<CombatGraphRules.PurchaseQuote, CombatGraphRules.PurchaseRefusal> {
-        CombatGraphRules.previewPurchase(nodeID, for: state.base.character(member),
+        guard activeEncounter == nil else { return .failure(.encounterActive) }
+        if case .member(let id) = member, state.base.rosterIndex(for: id) == nil {
+            return .failure(.ineligibleMember)
+        }
+        return CombatGraphRules.previewPurchase(nodeID, choice: choice,
+                                         for: state.base.character(member),
                                          catalogue: ContentCatalog.shared.combatGraph)
     }
 
     @discardableResult
     func purchaseCombatNode(_ quote: CombatGraphRules.PurchaseQuote,
                             for member: PartyMember) -> CombatGraphRules.PurchaseResult {
-        guard activeEncounter == nil else { return .refused(.unavailable) }
+        guard activeEncounter == nil else { return .refused(.encounterActive) }
         if case .member(let id) = member, state.base.rosterIndex(for: id) == nil {
-            return .refused(.stale)
+            return .refused(.ineligibleMember)
         }
         var result: CombatGraphRules.PurchaseResult = .refused(.stale)
         let skillName = ContentCatalog.shared.combatGraph.node(quote.nodeID)?.name ?? "Unknown Skill"

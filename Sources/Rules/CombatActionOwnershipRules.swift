@@ -30,9 +30,11 @@ enum CombatActionOwnershipRules {
 
     static func availableSkillIDs(for actor: Combatant, in state: GameState) -> Set<SkillID> {
         guard actor.isParty else { return [] }
-        let graph = CombatTreeRules.loadout(for: state.base.character(actor.member)).skills
+        let character = state.base.character(actor.member)
+        let graph = ContentCatalog.shared.combatGraph
+        let granted = character.ownedCombatNodeIDs.compactMap { graph.node($0)?.techniqueID }
         return innateSkillIDs(for: actor, in: state)
-            .union(graph)
+            .union(granted)
             .subtracting(retiredDecodeOnly)
     }
 }

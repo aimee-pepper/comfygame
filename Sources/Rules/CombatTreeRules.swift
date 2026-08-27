@@ -21,11 +21,11 @@ enum CombatTreeRules {
     }
 
     static func spentPoints(_ character: CharacterState) -> Int {
-        character.ownedCombatNodeIDs?.count ?? character.branchDepth.values.reduce(0, +)
+        character.ownedCombatNodeIDs.count
     }
 
     static func unspentPoints(_ character: CharacterState) -> Int {
-        max(0, totalPoints(atLevel: character.level) + character.freePoints - spentPoints(character))
+        character.unspentCombatPoints
     }
 
     // MARK: Spending
@@ -70,6 +70,7 @@ enum CombatTreeRules {
     }
 
     static func forget(_ character: inout CharacterState) {
+        character.unspentCombatPoints += character.ownedCombatNodeIDs.count
         character.branchDepth = [:]
         character.ownedCombatNodeIDs = []
         character.combatNodeChoices = [:]
@@ -98,8 +99,12 @@ enum CombatTreeRules {
 
     /// Every node somebody has actually bought.
     static func boughtNodes(_ character: CharacterState) -> [CombatNodeDef] {
-        ContentCatalog.shared.combatBranches.flatMap { branch in
-            branch.nodes.prefix(depth(of: branch.id, in: character))
+        let graph = ContentCatalog.shared.combatGraph
+        return character.ownedCombatNodeIDs.compactMap { id in
+            guard let node = graph.node(id),
+                  let branch = ContentCatalog.shared.combatBranch(node.legacyBranchID),
+                  branch.nodes.indices.contains(node.formerIndex - 1) else { return nil }
+            return branch.nodes[node.formerIndex - 1]
         }
     }
 

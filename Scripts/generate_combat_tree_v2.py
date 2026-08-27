@@ -44,6 +44,7 @@ def generate() -> dict:
         raise ValueError("effect-copy artifact is stale against its source Markdown")
     effect_copy = effect_copy_artifact["effectCopyByNode"]
     technique_ids = authority["techniqueIDByNode"]
+    purchase_choices = authority["purchaseChoicesByNode"]
     legacy = load(LEGACY_CONTENT)
     trees_by_id = {tree["id"]: tree for tree in legacy["trees"]}
     legacy_branch_ids = {
@@ -110,6 +111,7 @@ def generate() -> dict:
                     "legacyEffect": legacy_node["effect"],
                     "legacyTechniqueID": legacy_node.get("grantsSkill"),
                     "techniqueID": technique_ids.get(stable_id),
+                    "purchaseChoices": purchase_choices.get(stable_id, []),
                     "effectCopy": effect_copy.get(stable_id),
                     "sameDisciplineParents": same_parents,
                     "hybridAlternativeParents": authored_tree["hybridAlternativeParents"].get(stable_id, []),

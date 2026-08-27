@@ -4,6 +4,35 @@ import XCTest
 /// The interruptibility pillar, tested. Anything that breaks here breaks pillar 2.
 final class PersistenceTests: XCTestCase {
 
+    func testSchemaFourCombatOpeningMigrationFreezesOwnershipChoiceAndRefundsUnknownDepth() throws {
+        let legacy = Data(#"{"schemaVersion":4,"character":{"level":4,"branchDepth":{"kindling":2,"retired":3},"freePoints":1}}"#.utf8)
+        let migrated = try Migrations.migrateIfNeeded(legacy)
+        let root = try XCTUnwrap(JSONSerialization.jsonObject(with: migrated) as? [String: Any])
+        let character = try XCTUnwrap(root["character"] as? [String: Any])
+        XCTAssertNil(character["branchDepth"])
+        XCTAssertNil(character["freePoints"])
+        XCTAssertEqual(character["ownedCombatNodeIDs"] as? [String], [
+            "combat.craft.emanation.insulation", "combat.craft.emanation.sparkhand",
+        ])
+        XCTAssertEqual(character["unspentCombatPoints"] as? Int, 3)
+        XCTAssertEqual((character["combatNodeChoices"] as? [String: String])?[
+            "combat.craft.emanation.insulation"], "heat")
+        XCTAssertEqual(try Migrations.migrateIfNeeded(migrated), migrated)
+    }
+
+    func testSchemaFourCombatOpeningMigrationRejectsMalformedLegacyAndCanonicalValues() {
+        let fixtures = [
+            #"{"schemaVersion":4,"character":{"level":4,"branchDepth":{"force":true}}}"#,
+            #"{"schemaVersion":4,"character":{"level":4,"branchDepth":{"force":1.5}}}"#,
+            #"{"schemaVersion":4,"character":{"level":4,"ownedCombatNodeIDs":null}}"#,
+            #"{"schemaVersion":4,"character":{"level":4,"ownedCombatNodeIDs":[],"combatNodeChoices":null}}"#,
+            #"{"schemaVersion":4,"character":{"level":4,"ownedCombatNodeIDs":[],"unspentCombatPoints":-1}}"#,
+        ]
+        for fixture in fixtures {
+            XCTAssertThrowsError(try Migrations.migrateIfNeeded(Data(fixture.utf8)), fixture)
+        }
+    }
+
     func testSchemaThreeExtractionReceiptMigrationFreezesCatalogueTruthAndFailsUnknown() throws {
         let legacy = Data(#"{"schemaVersion":3,"nested":{"resource":"gold","remainingHarvests":2,"yieldPerHarvest":3}}"#.utf8)
         let migrated = try Migrations.migrateIfNeeded(legacy)

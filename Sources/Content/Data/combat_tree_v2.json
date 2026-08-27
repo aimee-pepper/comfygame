@@ -2,8 +2,8 @@
   "_note": "GENERATED schema-2 topology, canonical technique IDs and exact Effect copy. Legacy fields are decode/migration payload only.",
   "schemaVersion": 2,
   "graphVersion": 2,
-  "authoritySHA256": "235abe8b86e4f39dec920c8dd47063be3adc4b2a8189e5adcefdc83ca1378d0f",
-  "effectCopySHA256": "220d5a0812ad63f51b39de8def8b75d03b7c851f98f813508d1f0a4ed2d91baf",
+  "authoritySHA256": "1238ebfa27746b0936e7e86419d58cac7f1069273e1b523ac6e9cad1b07c38ef",
+  "effectCopySHA256": "6a00d78dd914f1fef9801eea10aede9f82d6fe28017cf22a8ca8ad140b948aa2",
   "effectCopySourceMarkdownSHA256": "d33ddf802b7620952a997575ede5dd3fffb252ddc6774a89076cf5a5d73cca53",
   "capstoneGate": {
     "minimumPriorNodesInTree": 7,
@@ -47,6 +47,7 @@
               },
               "legacyTechniqueID": null,
               "techniqueID": null,
+              "purchaseChoices": [],
               "effectCopy": "Your Crush attacks deal +2 raw damage.",
               "sameDisciplineParents": [],
               "hybridAlternativeParents": []
@@ -67,6 +68,7 @@
               },
               "legacyTechniqueID": null,
               "techniqueID": null,
+              "purchaseChoices": [],
               "effectCopy": "Deal +3 raw damage to a foe with 8 or more armour before the hit.",
               "sameDisciplineParents": [
                 "combat.offense.force.heavy_hand"
@@ -87,6 +89,7 @@
               },
               "legacyTechniqueID": "overbear",
               "techniqueID": "overbear",
+              "purchaseChoices": [],
               "effectCopy": "Make a heavy Crush attack now, then skip your next personal turn.",
               "sameDisciplineParents": [
                 "combat.offense.force.heavy_hand"
@@ -108,6 +111,7 @@
               },
               "legacyTechniqueID": null,
               "techniqueID": null,
+              "purchaseChoices": [],
               "effectCopy": "Deal +3 raw damage while you have held the same rank since your previous action.",
               "sameDisciplineParents": [
                 "combat.offense.force.follow_through"
@@ -131,6 +135,7 @@
               },
               "legacyTechniqueID": null,
               "techniqueID": null,
+              "purchaseChoices": [],
               "effectCopy": "Landed Crush hits have a 30% chance to move the foe one place later next round.",
               "sameDisciplineParents": [
                 "combat.offense.force.overbear"
@@ -151,6 +156,7 @@
               },
               "legacyTechniqueID": "shatter",
               "techniqueID": "shatter",
+              "purchaseChoices": [],
               "effectCopy": "Strike one foe and permanently reduce its armour for this encounter, to a minimum of 0.",
               "sameDisciplineParents": [
                 "combat.offense.force.bracing_stance"
@@ -174,6 +180,7 @@
               },
               "legacyTechniqueID": null,
               "techniqueID": null,
+              "purchaseChoices": [],
               "effectCopy": "Gain raw damage from gear initiative penalty: 40% of the penalty, rounded down, maximum +4.",
               "sameDisciplineParents": [
                 "combat.offense.force.stagger"
@@ -194,6 +201,7 @@
               },
               "legacyTechniqueID": null,
               "techniqueID": null,
+              "purchaseChoices": [],
               "effectCopy": "Crush hits ignore armour; the first landed Crush hit each personal turn also Staggers.",
               "sameDisciplineParents": [
                 "combat.offense.force.shatter",
@@ -226,6 +234,7 @@
               },
               "legacyTechniqueID": null,
               "techniqueID": null,
+              "purchaseChoices": [],
               "effectCopy": "Your Pierce attacks deal +2 raw damage.",
               "sameDisciplineParents": [],
               "hybridAlternativeParents": []
@@ -246,6 +255,7 @@
               },
               "legacyTechniqueID": null,
               "techniqueID": null,
+              "purchaseChoices": [],
               "effectCopy": "Deal +3 raw damage when the foe's covering density is 50 or more.",
               "sameDisciplineParents": [
                 "combat.offense.precision.keen_eye"
@@ -266,6 +276,7 @@
               },
               "legacyTechniqueID": "pry",
               "techniqueID": "pry",
+              "purchaseChoices": [],
               "effectCopy": "Make a lower-power Pierce attack that ignores armour.",
               "sameDisciplineParents": [
                 "combat.offense.precision.keen_eye"
@@ -287,6 +298,7 @@
               },
               "legacyTechniqueID": null,
               "techniqueID": null,
+              "purchaseChoices": [],
               "effectCopy": "Landed attacks have a 12% chance to deal ×1.5 raw damage before armour.",
               "sameDisciplineParents": [
                 "combat.offense.precision.weak_point"
@@ -310,6 +322,7 @@
               },
               "legacyTechniqueID": null,
               "techniqueID": null,
+              "purchaseChoices": [],
               "effectCopy": "Deal +4 raw damage to a foe with Burn, Poison, Dazzle or Bleed.",
               "sameDisciplineParents": [
                 "combat.offense.precision.pry"
@@ -332,6 +345,7 @@
               },
               "legacyTechniqueID": "finish",
               "techniqueID": "finish",
+              "purchaseChoices": [],
               "effectCopy": "Strike one foe at full power below the shown HP threshold, or one-third power above it.",
               "sameDisciplineParents": [
                 "combat.offense.precision.steady_hand"
@@ -356,6 +370,7 @@
               },
               "legacyTechniqueID": null,
               "techniqueID": null,
+              "purchaseChoices": [],
               "effectCopy": "The party gains 35% more butchery output while you took part in the expedition; copies do not stack.",
               "sameDisciplineParents": [
                 "combat.offense.precision.exploit"
@@ -377,6 +392,7 @@
               },
               "legacyTechniqueID": null,
               "techniqueID": null,
+              "purchaseChoices": [],
               "effectCopy": "Defeat a surviving non-apex foe at 15% HP or less after your hit; apexes take +4 damage instead.",
               "sameDisciplineParents": [
                 "combat.offense.precision.finish",
@@ -408,6 +424,7 @@
               },
               "legacyTechniqueID": null,
               "techniqueID": null,
+              "purchaseChoices": [],
               "effectCopy": "Gain +4 initiative.",
               "sameDisciplineParents": [],
               "hybridAlternativeParents": []
@@ -427,6 +444,7 @@
               },
               "legacyTechniqueID": null,
               "techniqueID": null,
+              "purchaseChoices": [],
               "effectCopy": "Halve initiative penalties from equipped gear, rounding toward 0.",
               "sameDisciplineParents": [
                 "combat.offense.swiftness.quick_step"
@@ -447,6 +465,7 @@
               },
               "legacyTechniqueID": "quicken",
               "techniqueID": "quicken",
+              "purchaseChoices": [],
               "effectCopy": "As zero-turn setup, take two ordinary actions now, then skip your next personal turn; cannot combine with Blur.",
               "sameDisciplineParents": [
                 "combat.offense.swiftness.quick_step"
@@ -468,6 +487,7 @@
               },
               "legacyTechniqueID": null,
               "techniqueID": null,
+              "purchaseChoices": [],
               "effectCopy": "When you defeat a foe, recover 3 HP if still conscious.",
               "sameDisciplineParents": [
                 "combat.offense.swiftness.light_touch"
@@ -491,6 +511,7 @@
               },
               "legacyTechniqueID": null,
               "techniqueID": null,
+              "purchaseChoices": [],
               "effectCopy": "A landed direct attack carries 40% of damage dealt to one other legal foe; it cannot chain.",
               "sameDisciplineParents": [
                 "combat.offense.swiftness.quicken"
@@ -511,6 +532,7 @@
               },
               "legacyTechniqueID": "first_strike",
               "techniqueID": "first_strike",
+              "purchaseChoices": [],
               "effectCopy": "As your first normal-cost action, attack for +4 raw damage without allowing retaliation.",
               "sameDisciplineParents": [
                 "combat.offense.swiftness.second_wind"
@@ -534,6 +556,7 @@
               },
               "legacyTechniqueID": null,
               "techniqueID": null,
+              "purchaseChoices": [],
               "effectCopy": "Each foe you defeat grants +3 initiative for this encounter, up to three times.",
               "sameDisciplineParents": [
                 "combat.offense.swiftness.flurry"
@@ -554,6 +577,7 @@
               },
               "legacyTechniqueID": null,
               "techniqueID": "blur",
+              "purchaseChoices": [],
               "effectCopy": "Once per encounter, take two ordinary actions without spending this action; cannot combine with Quicken this turn.",
               "sameDisciplineParents": [
                 "combat.offense.swiftness.first_strike",
@@ -593,6 +617,7 @@
               },
               "legacyTechniqueID": null,
               "techniqueID": null,
+              "purchaseChoices": [],
               "effectCopy": "Gain +6 maximum and starting expedition HP.",
               "sameDisciplineParents": [],
               "hybridAlternativeParents": []
@@ -612,6 +637,7 @@
               },
               "legacyTechniqueID": null,
               "techniqueID": null,
+              "purchaseChoices": [],
               "effectCopy": "Gain +2 armour after equipment and sturdiness.",
               "sameDisciplineParents": [
                 "combat.defense.fortitude.thick_hide"
@@ -632,6 +658,7 @@
               },
               "legacyTechniqueID": "brace",
               "techniqueID": "brace",
+              "purchaseChoices": [],
               "effectCopy": "Reduce direct damage by 35% through the next hostile action slot that damages you.",
               "sameDisciplineParents": [
                 "combat.defense.fortitude.thick_hide"
@@ -653,6 +680,7 @@
               },
               "legacyTechniqueID": null,
               "techniqueID": null,
+              "purchaseChoices": [],
               "effectCopy": "Burn, Poison, Dazzle and Bleed on you last half as many rounds, rounded up.",
               "sameDisciplineParents": [
                 "combat.defense.fortitude.iron_skin"
@@ -676,6 +704,7 @@
               },
               "legacyTechniqueID": null,
               "techniqueID": null,
+              "purchaseChoices": [],
               "effectCopy": "At half HP or less, reduce final incoming damage by 25%, without passing the global minimum.",
               "sameDisciplineParents": [
                 "combat.defense.fortitude.brace"
@@ -696,6 +725,7 @@
               },
               "legacyTechniqueID": "ward",
               "techniqueID": "ward",
+              "purchaseChoices": [],
               "effectCopy": "Choose one disclosed harm kind; reduce matching direct harm by 60% this round and next round.",
               "sameDisciplineParents": [
                 "combat.defense.fortitude.constitution"
@@ -718,6 +748,7 @@
               },
               "legacyTechniqueID": null,
               "techniqueID": null,
+              "purchaseChoices": [],
               "effectCopy": "Once per encounter, harm that would pass you out leaves you at 1 HP.",
               "sameDisciplineParents": [
                 "combat.defense.fortitude.endurance"
@@ -738,6 +769,7 @@
               },
               "legacyTechniqueID": null,
               "techniqueID": null,
+              "purchaseChoices": [],
               "effectCopy": "Your armour also applies against Pierce, Heat, Caustic and Light damage.",
               "sameDisciplineParents": [
                 "combat.defense.fortitude.ward",
@@ -769,6 +801,7 @@
               },
               "legacyTechniqueID": null,
               "techniqueID": null,
+              "purchaseChoices": [],
               "effectCopy": "Gain +1 armour; allies in your rank gain +2 armour while you are conscious. Copies use only the strongest bonus.",
               "sameDisciplineParents": [],
               "hybridAlternativeParents": []
@@ -788,6 +821,7 @@
               },
               "legacyTechniqueID": null,
               "techniqueID": null,
+              "purchaseChoices": [],
               "effectCopy": "If an ordinary creature ambushes the party, cancel its free opening actions and use normal initiative.",
               "sameDisciplineParents": [
                 "combat.defense.protection.bulwark"
@@ -808,6 +842,7 @@
               },
               "legacyTechniqueID": "draw_off",
               "techniqueID": "draw_off",
+              "purchaseChoices": [],
               "effectCopy": "Choose one foe; while Draw Off lasts, it targets you whenever legally able.",
               "sameDisciplineParents": [
                 "combat.defense.protection.bulwark"
@@ -829,6 +864,7 @@
               },
               "legacyTechniqueID": null,
               "techniqueID": null,
+              "purchaseChoices": [],
               "effectCopy": "While conscious in front, take 30% of final damage aimed at a back-rank ally; Cover cannot chain.",
               "sameDisciplineParents": [
                 "combat.defense.protection.watchful"
@@ -853,6 +889,7 @@
               },
               "legacyTechniqueID": null,
               "techniqueID": null,
+              "purchaseChoices": [],
               "effectCopy": "While conscious in front, every conscious front-rank party member gains +2 armour.",
               "sameDisciplineParents": [
                 "combat.defense.protection.draw_off"
@@ -873,6 +910,7 @@
               },
               "legacyTechniqueID": "interpose",
               "techniqueID": "interpose",
+              "purchaseChoices": [],
               "effectCopy": "Receive the next legal hit meant for an ally, then the effect ends.",
               "sameDisciplineParents": [
                 "combat.defense.protection.cover"
@@ -897,6 +935,7 @@
               },
               "legacyTechniqueID": null,
               "techniqueID": null,
+              "purchaseChoices": [],
               "effectCopy": "When you defeat a foe, every other conscious party member recovers 2 HP.",
               "sameDisciplineParents": [
                 "combat.defense.protection.shieldwall"
@@ -917,6 +956,7 @@
               },
               "legacyTechniqueID": null,
               "techniqueID": null,
+              "purchaseChoices": [],
               "effectCopy": "While conscious in front, foes cannot directly target the back rank when a legal front target exists.",
               "sameDisciplineParents": [
                 "combat.defense.protection.interpose",
@@ -948,6 +988,7 @@
               },
               "legacyTechniqueID": null,
               "techniqueID": null,
+              "purchaseChoices": [],
               "effectCopy": "Foes are 6 percentage points more likely to miss you.",
               "sameDisciplineParents": [],
               "hybridAlternativeParents": []
@@ -967,6 +1008,7 @@
               },
               "legacyTechniqueID": null,
               "techniqueID": null,
+              "purchaseChoices": [],
               "effectCopy": "Gain +3 initiative.",
               "sameDisciplineParents": [
                 "combat.defense.evasion.footwork"
@@ -987,6 +1029,7 @@
               },
               "legacyTechniqueID": "sidestep",
               "techniqueID": "sidestep",
+              "purchaseChoices": [],
               "effectCopy": "The next otherwise legal attack against you misses; its affliction also fails.",
               "sameDisciplineParents": [
                 "combat.defense.evasion.footwork"
@@ -1008,6 +1051,7 @@
               },
               "legacyTechniqueID": null,
               "techniqueID": null,
+              "purchaseChoices": [],
               "effectCopy": "Gain a 50% chance to turn an ordinary creature ambush into mutual contact; party copies do not stack.",
               "sameDisciplineParents": [
                 "combat.defense.evasion.light_frame"
@@ -1030,6 +1074,7 @@
               },
               "legacyTechniqueID": "fall_back",
               "techniqueID": "fall_back",
+              "purchaseChoices": [],
               "effectCopy": "As zero-turn setup, change Front↔Back and keep your ordinary action; this ends Bracing Stance.",
               "sameDisciplineParents": [
                 "combat.defense.evasion.sidestep"
@@ -1051,6 +1096,7 @@
               },
               "legacyTechniqueID": null,
               "techniqueID": null,
+              "purchaseChoices": [],
               "effectCopy": "After your direct attack, gain +10 percentage-point evasion through your next normal-cost action.",
               "sameDisciplineParents": [
                 "combat.defense.evasion.slippery"
@@ -1072,6 +1118,7 @@
               },
               "legacyTechniqueID": null,
               "techniqueID": null,
+              "purchaseChoices": [],
               "effectCopy": "At round end, gain +5 percentage-point evasion if targeted but not hit, up to +20; a hit resets it.",
               "sameDisciplineParents": [
                 "combat.defense.evasion.fall_back"
@@ -1094,6 +1141,7 @@
               },
               "legacyTechniqueID": null,
               "techniqueID": null,
+              "purchaseChoices": [],
               "effectCopy": "The first otherwise legal attack against you each encounter misses.",
               "sameDisciplineParents": [
                 "combat.defense.evasion.feint",
@@ -1133,6 +1181,7 @@
               },
               "legacyTechniqueID": null,
               "techniqueID": null,
+              "purchaseChoices": [],
               "effectCopy": "Landed direct weapon hits apply weak Poison: 1 damage for 2 rounds, unless stronger Poison is present.",
               "sameDisciplineParents": [],
               "hybridAlternativeParents": []
@@ -1152,6 +1201,7 @@
               },
               "legacyTechniqueID": null,
               "techniqueID": null,
+              "purchaseChoices": [],
               "effectCopy": "Beneficial items you use gain +50% magnitude or duration; harmful thrown items are unchanged.",
               "sameDisciplineParents": [
                 "combat.craft.venom.tainted_edge"
@@ -1172,6 +1222,7 @@
               },
               "legacyTechniqueID": "envenom",
               "techniqueID": "envenom",
+              "purchaseChoices": [],
               "effectCopy": "Arm your next 3 landed physical-weapon hits with Poison 2×3; misses spend no charge.",
               "sameDisciplineParents": [
                 "combat.craft.venom.tainted_edge"
@@ -1193,6 +1244,7 @@
               },
               "legacyTechniqueID": null,
               "techniqueID": null,
+              "purchaseChoices": [],
               "effectCopy": "Afflictions you directly apply last +2 rounds after resistance.",
               "sameDisciplineParents": [
                 "combat.craft.venom.apothecary_s_hand"
@@ -1215,6 +1267,7 @@
               },
               "legacyTechniqueID": "flense",
               "techniqueID": "flense",
+              "purchaseChoices": [],
               "effectCopy": "Apply 3 Bleed ticks at 9% of covering insulation, rounded to at least 1 damage per tick.",
               "sameDisciplineParents": [
                 "combat.craft.venom.envenom"
@@ -1236,6 +1289,7 @@
               },
               "legacyTechniqueID": null,
               "techniqueID": null,
+              "purchaseChoices": [],
               "effectCopy": "The first tick each round from Poison you applied reduces that foe's armour by 1.",
               "sameDisciplineParents": [
                 "combat.craft.venom.virulence"
@@ -1259,6 +1313,7 @@
               },
               "legacyTechniqueID": null,
               "techniqueID": null,
+              "purchaseChoices": [],
               "effectCopy": "Coatings prepared for you use 40% fewer positive world-resource ingredients, rounded up; Essence is unchanged.",
               "sameDisciplineParents": [
                 "combat.craft.venom.flense"
@@ -1279,6 +1334,7 @@
               },
               "legacyTechniqueID": null,
               "techniqueID": null,
+              "purchaseChoices": [],
               "effectCopy": "New or strengthened Poison you apply copies at half strength and duration to one other foe; it cannot spread again.",
               "sameDisciplineParents": [
                 "combat.craft.venom.corrode",
@@ -1310,6 +1366,7 @@
               },
               "legacyTechniqueID": null,
               "techniqueID": null,
+              "purchaseChoices": [],
               "effectCopy": "Landed direct weapon hits apply weak Burn: 1 damage for 2 rounds, unless stronger Burn is present.",
               "sameDisciplineParents": [],
               "hybridAlternativeParents": []
@@ -1329,6 +1386,11 @@
               },
               "legacyTechniqueID": null,
               "techniqueID": null,
+              "purchaseChoices": [
+                "heat",
+                "caustic",
+                "light"
+              ],
               "effectCopy": "Choose Heat, Caustic or Light when learned; take 35% less matching emanation damage.",
               "sameDisciplineParents": [
                 "combat.craft.emanation.sparkhand"
@@ -1349,6 +1411,7 @@
               },
               "legacyTechniqueID": "elemental_strike",
               "techniqueID": "emanation_strike",
+              "purchaseChoices": [],
               "effectCopy": "Make a 9-power Heat, Caustic or Light attack, carrying Burn 4×2, Poison 2×4 or Dazzle 0×2.",
               "sameDisciplineParents": [
                 "combat.craft.emanation.sparkhand"
@@ -1370,6 +1433,7 @@
               },
               "legacyTechniqueID": null,
               "techniqueID": null,
+              "purchaseChoices": [],
               "effectCopy": "Emanation Strike and Channelworks attacks deal +3 raw damage.",
               "sameDisciplineParents": [
                 "combat.craft.emanation.insulation"
@@ -1393,6 +1457,7 @@
               },
               "legacyTechniqueID": "snuff",
               "techniqueID": "snuff",
+              "purchaseChoices": [],
               "effectCopy": "Suppress one foe's active emanation through its next 2 complete hostile turns.",
               "sameDisciplineParents": [
                 "combat.craft.emanation.emanation_strike"
@@ -1413,6 +1478,7 @@
               },
               "legacyTechniqueID": "steady",
               "techniqueID": "quench",
+              "purchaseChoices": [],
               "effectCopy": "Choose one ally and remove one selected Burn, Poison or Dazzle; Bleed and unchosen conditions remain.",
               "sameDisciplineParents": [
                 "combat.craft.emanation.attunement"
@@ -1437,6 +1503,7 @@
               },
               "legacyTechniqueID": null,
               "techniqueID": null,
+              "purchaseChoices": [],
               "effectCopy": "A direct emanation hit carries 50% damage and half-duration affliction to one other foe; it cannot chain.",
               "sameDisciplineParents": [
                 "combat.craft.emanation.snuff"
@@ -1457,6 +1524,7 @@
               },
               "legacyTechniqueID": null,
               "techniqueID": null,
+              "purchaseChoices": [],
               "effectCopy": "Choose Heat, Caustic or Light when learned. Ordinary direct attacks carry its weak matching affliction; matching Sparkhand or Tainted Edge strengthens that application, while a nonmatching root remains separate.",
               "sameDisciplineParents": [
                 "combat.craft.emanation.quench",
@@ -1488,6 +1556,7 @@
               },
               "legacyTechniqueID": null,
               "techniqueID": null,
+              "purchaseChoices": [],
               "effectCopy": "Once per ordinary roaming creature, turn its first distant movement detection into one visible alert turn instead of immediate pursuit.",
               "sameDisciplineParents": [],
               "hybridAlternativeParents": []
@@ -1507,6 +1576,7 @@
               },
               "legacyTechniqueID": null,
               "techniqueID": null,
+              "purchaseChoices": [],
               "effectCopy": "Reduce the party's detection radius by 1 tile. This actor also gains +6 evasion during an ordinary creature ambush's foe-only opening actions.",
               "sameDisciplineParents": [
                 "combat.craft.shadow.quiet_step"
@@ -1527,6 +1597,7 @@
               },
               "legacyTechniqueID": "conceal",
               "techniqueID": "conceal",
+              "purchaseChoices": [],
               "effectCopy": "Through next round, prevent direct targeting while another legal target exists; attacking or intervening reveals you.",
               "sameDisciplineParents": [
                 "combat.craft.shadow.quiet_step"
@@ -1548,6 +1619,7 @@
               },
               "legacyTechniqueID": null,
               "techniqueID": null,
+              "purchaseChoices": [],
               "effectCopy": "Your first landed direct hit while concealed or in the action when you emerge deals +5 raw damage.",
               "sameDisciplineParents": [
                 "combat.craft.shadow.low_profile"
@@ -1570,6 +1642,7 @@
               },
               "legacyTechniqueID": "ambush",
               "techniqueID": "ambush",
+              "purchaseChoices": [],
               "effectCopy": "In an eligible opening, make one shared free direct attack before your first normal-cost action.",
               "sameDisciplineParents": [
                 "combat.craft.shadow.conceal"
@@ -1590,6 +1663,7 @@
               },
               "legacyTechniqueID": null,
               "techniqueID": null,
+              "purchaseChoices": [],
               "effectCopy": "Once per expedition, the confirmed ordinary combat retreat costs no Stability.",
               "sameDisciplineParents": [
                 "combat.craft.shadow.opportunist"
@@ -1613,6 +1687,7 @@
               },
               "legacyTechniqueID": null,
               "techniqueID": null,
+              "purchaseChoices": [],
               "effectCopy": "Reduce the party's detection radius by 2 tiles, replacing Low Profile's field reduction but not its personal ambush-opening evasion.",
               "sameDisciplineParents": [
                 "combat.craft.shadow.ambush"
@@ -1633,6 +1708,7 @@
               },
               "legacyTechniqueID": null,
               "techniqueID": null,
+              "purchaseChoices": [],
               "effectCopy": "Begin ordinary encounters concealed through the end of the first ordinary round; this does not cancel an ambush.",
               "sameDisciplineParents": [
                 "combat.craft.shadow.vanish",

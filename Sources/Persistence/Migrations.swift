@@ -45,11 +45,119 @@ enum Migrations {
         case 1: return try migrate1to2(data)
         case 2: return try migrate2to3(data)
         case 3: return try migrate3to4(data)
+        case 4: return try migrate4to5(data)
         default:
             // No migration registered. Tolerant decoding is the fallback; if the save is genuinely
             // incompatible, `SaveFileIO.load()` quarantines it rather than losing it.
             return data
         }
+    }
+
+    /// Promotes stable combat-graph ownership, typed choices and durable unspent points.
+    private static func migrate4to5(_ data: Data) throws -> Data {
+        guard var root = try JSONSerialization.jsonObject(with: data) as? [String: Any] else {
+            throw CocoaError(.coderInvalidValue)
+        }
+        func integer(_ value: Any) throws -> Int {
+            guard let number = value as? NSNumber,
+                  CFGetTypeID(number) != CFBooleanGetTypeID(),
+                  let parsed = Int(number.stringValue),
+                  Double(parsed) == number.doubleValue,
+                  parsed >= 0 else { throw CocoaError(.coderInvalidValue) }
+            return parsed
+        }
+        let graph = ContentCatalog.shared.combatGraph
+        let insulation = CombatNodeID(rawValue: "combat.craft.emanation.insulation")
+
+        func migrateCharacter(_ input: [String: Any]) throws -> [String: Any] {
+            var object = input
+            let level = try object["level"].map(integer) ?? 1
+            let free = try object["freePoints"].map(integer) ?? 0
+            var owned: Set<String> = []
+            if let encoded = object["ownedCombatNodeIDs"] {
+                guard !(encoded is NSNull), let values = encoded as? [Any] else {
+                    throw CocoaError(.coderInvalidValue)
+                }
+                for value in values {
+                    guard let id = value as? String, !id.isEmpty, owned.insert(id).inserted else {
+                        throw CocoaError(.coderInvalidValue)
+                    }
+                }
+            } else {
+                let depths = object["branchDepth"] as? [String: Any] ?? [:]
+                var claimed = 0
+                for (legacyID, rawDepth) in depths {
+                    let depth = try integer(rawDepth)
+                    claimed += depth
+                    guard let discipline = graph.disciplines.first(where: {
+                        $0.legacyBranchID.rawValue == legacyID
+                    }) else { continue }
+                    owned.formUnion(discipline.nodes.prefix(min(depth, discipline.nodes.count))
+                        .map { $0.id.rawValue })
+                }
+                let standard = CombatTreeRules.totalPoints(atLevel: level)
+                object["unspentCombatPoints"] = max(standard + free, claimed) - owned.count
+            }
+            if object["unspentCombatPoints"] == nil {
+                object["unspentCombatPoints"] = max(
+                    0, CombatTreeRules.totalPoints(atLevel: level) + free - owned.count)
+            } else {
+                _ = try integer(object["unspentCombatPoints"] as Any)
+            }
+            let decodedChoices: [String: Any]
+            if let encoded = object["combatNodeChoices"] {
+                guard !(encoded is NSNull), let decoded = encoded as? [String: Any] else {
+                    throw CocoaError(.coderInvalidValue)
+                }
+                decodedChoices = decoded
+            } else {
+                decodedChoices = [:]
+            }
+            var choices = decodedChoices
+            for (node, value) in choices {
+                guard owned.contains(node), let choice = value as? String,
+                      graph.node(CombatNodeID(rawValue: node))?.purchaseChoices
+                        .contains(StableChoiceID(rawValue: choice)) == true else {
+                    throw CocoaError(.coderInvalidValue)
+                }
+            }
+            if owned.contains(insulation.rawValue), choices[insulation.rawValue] == nil {
+                choices[insulation.rawValue] = "heat"
+            }
+            object["ownedCombatNodeIDs"] = owned.sorted()
+            object["combatNodeChoices"] = choices
+            object.removeValue(forKey: "branchDepth")
+            object.removeValue(forKey: "freePoints")
+            return object
+        }
+
+        func migrate(_ value: Any) throws -> Any {
+            if let string = value as? String, string == "elemental_strike" {
+                return "emanation_strike"
+            }
+            if let array = value as? [Any] { return try array.map(migrate) }
+            guard var object = value as? [String: Any] else { return value }
+            let isCharacter = object["level"] != nil
+                && (object["branchDepth"] != nil || object["ownedCombatNodeIDs"] != nil
+                    || object["unspentCombatPoints"] != nil)
+            if isCharacter { object = try migrateCharacter(object) }
+            for (key, child) in object { object[key] = try migrate(child) }
+            if var cooldowns = object["cooldowns"] as? [String: Any] {
+                for key in cooldowns.keys where key.hasSuffix("|elemental_strike") {
+                    let replacement = String(key.dropLast("elemental_strike".count)) + "emanation_strike"
+                    guard cooldowns[replacement] == nil else { throw CocoaError(.coderInvalidValue) }
+                    cooldowns[replacement] = cooldowns.removeValue(forKey: key)
+                }
+                object["cooldowns"] = cooldowns
+            }
+            return object
+        }
+        guard var migrated = try migrate(root) as? [String: Any] else {
+            throw CocoaError(.coderInvalidValue)
+        }
+        migrated["schemaVersion"] = 5
+        root = migrated
+        return try JSONSerialization.data(withJSONObject: root, options: [.sortedKeys])
     }
 
     /// Freezes the catalogue-owned extraction classification onto every persisted world node.

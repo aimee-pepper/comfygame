@@ -1434,10 +1434,10 @@ enum WorldRules {
         let combatGraph = ContentCatalog.shared.combatGraph
         let openingIDs = CombatGraphRules.implementedOpeningNodeIDs(in: combatGraph)
         let binderCharacter = state.base.binderCharacter
-        var binderNodeIDs = (binderCharacter.ownedCombatNodeIDs ?? []).intersection(openingIDs)
+        var binderNodeIDs = binderCharacter.ownedCombatNodeIDs.intersection(openingIDs)
         var companionNodeIDs: [PersistentPartyMemberID: Set<CombatNodeID>] = Dictionary(uniqueKeysWithValues: state.base.activeParty.compactMap { id in
             guard let index = state.base.rosterIndex(for: id) else { return nil }
-            let nodes = (state.base.roster[index].character.ownedCombatNodeIDs ?? [])
+            let nodes = state.base.roster[index].character.ownedCombatNodeIDs
                 .intersection(openingIDs)
             return (id, nodes)
         })
