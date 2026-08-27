@@ -1,4 +1,6 @@
 import XCTest
+import SwiftUI
+import UIKit
 @testable import Bookbinder
 
 final class EquipmentInscriptionRulesTests: XCTestCase {
@@ -116,5 +118,153 @@ final class EquipmentInscriptionRulesTests: XCTestCase {
         let second = WorldRules.advanceTurn(in: &state)
         XCTAssertTrue(first.contains(.seamwardFoundNoSeam))
         XCTAssertFalse(second.contains(.seamwardFoundNoSeam))
+    }
+
+    func testWornPreparedInkInstallationAndStoreErasureAreExact() throws {
+        var state = eligibleState(gearID: 40)
+        let worn = try XCTUnwrap(state.base.inventory.stacks.first { $0.id.rawValue == 40 })
+        state.base.inventory.remove(.init(rawValue: 40))
+        state.base.binderEquipped[.armor] = EquippedPiece(worn)
+        let ink = InkRecipe(cyan: 15, magenta: 25, yellow: 35, depth: 45)
+        state.base.preparedInkVials = [.init(id: 7, recipe: ink, remainingApplications: 1)]
+        let quote = try EquipmentInscriptionRules.evaluate(
+            gearStableInstanceID: .init(rawValue: 40), inkChoice: .prepared(ink), in: state).get()
+        XCTAssertEqual(quote.location, .worn(.binder))
+        XCTAssertEqual(quote.preparedVialID, 7)
+        guard case .committed(let receipt) = EquipmentInscriptionRules.commit(quote, in: &state) else {
+            return XCTFail("expected worn inscription")
+        }
+        XCTAssertEqual(state.base.binderEquipped[.armor]?.gearProfile?.inscription, receipt)
+        XCTAssertTrue(state.base.preparedInkVials.isEmpty)
+        XCTAssertTrue(EquipmentInscriptionRules.erase(.init(rawValue: 40), expected: receipt, in: &state))
+        XCTAssertNil(state.base.binderEquipped[.armor]?.gearProfile?.inscription)
+    }
+
+    func testGuidanceRetargetsReachesPortalAndNeverDisclosesMap() throws {
+        var run = makeWorldRun()
+        run.seamwardExpedition = .init(contributors: [
+            .init(member: .binder, gearStableInstanceID: .init(rawValue: 70), slot: .armor,
+                  definitionID: "seamward", rulesVersion: 1, inkRecipe: nil)
+        ], activatedOnTurn: 0)
+        let disclosure = run.map.tiles.map(\.isRevealed)
+        XCTAssertEqual(SeamwardRules.projection(in: run), .directional(.east, .far))
+        run.playerPosition = .init(x: 1, y: 0)
+        XCTAssertEqual(SeamwardRules.projection(in: run), .directional(.east, .near))
+        run.playerPosition = .init(x: 2, y: 0)
+        XCTAssertEqual(SeamwardRules.projection(in: run), .onPortal)
+        XCTAssertEqual(run.map.tiles.map(\.isRevealed), disclosure)
+    }
+
+    func testMalformedAndFutureInscriptionReceiptsFailDecode() throws {
+        let receipt = EquipmentInscriptionReceiptV1(version: 1, definitionID: "seamward",
+                                                     sourceItemID: Items.seamlight,
+                                                     rulesVersion: 1, inkRecipe: nil)
+        var object = try XCTUnwrap(JSONSerialization.jsonObject(
+            with: SaveCodec.makeEncoder().encode(receipt)) as? [String: Any])
+        object["version"] = 2
+        XCTAssertThrowsError(try SaveCodec.makeDecoder().decode(
+            EquipmentInscriptionReceiptV1.self,
+            from: JSONSerialization.data(withJSONObject: object)))
+
+        var state = GameState.newGame()
+        var run = makeWorldRun()
+        run.seamwardExpedition = .init(contributors: [
+            .init(member: .binder, gearStableInstanceID: .init(rawValue: 70), slot: .armor,
+                  definitionID: "seamward", rulesVersion: 1, inkRecipe: nil)
+        ])
+        state.worlds.activeRun = run
+        var root = try XCTUnwrap(JSONSerialization.jsonObject(
+            with: SaveCodec.makeEncoder().encode(state)) as? [String: Any])
+        var worlds = try XCTUnwrap(root["worlds"] as? [String: Any])
+        var active = try XCTUnwrap(worlds["activeRun"] as? [String: Any])
+        var expedition = try XCTUnwrap(active["seamwardExpedition"] as? [String: Any])
+        expedition["version"] = 2
+        active["seamwardExpedition"] = expedition; worlds["activeRun"] = active; root["worlds"] = worlds
+        XCTAssertThrowsError(try SaveCodec.decode(JSONSerialization.data(withJSONObject: root)))
+        expedition["version"] = 1
+        expedition["activatedOnTurn"] = 99
+        active["seamwardExpedition"] = expedition; worlds["activeRun"] = active; root["worlds"] = worlds
+        XCTAssertThrowsError(try SaveCodec.decode(JSONSerialization.data(withJSONObject: root)))
+    }
+
+    func testInscriptionSnapshotSurvivesStorageOverflowEquipReforgeAndRelaunch() throws {
+        var state = eligibleState()
+        let quote = try EquipmentInscriptionRules.evaluate(
+            gearStableInstanceID: .init(rawValue: 40), inkChoice: .ash, in: state).get()
+        guard case .committed(let receipt) = EquipmentInscriptionRules.commit(quote, in: &state) else {
+            return XCTFail("expected inscription")
+        }
+        let encoded = try SaveCodec.encode(state)
+        state = try SaveCodec.decode(encoded)
+        XCTAssertEqual(state.base.inventory.stacks.first(where: { $0.id.rawValue == 40 })?
+            .gearProfile?.inscription, receipt)
+        let stack = try XCTUnwrap(state.base.inventory.stacks.first { $0.id.rawValue == 40 })
+        state.base.inventory.remove(.init(rawValue: 40))
+        state.base.spillover.append(stack)
+        XCTAssertEqual(state.base.spillover.first?.gearProfile?.inscription, receipt)
+        let overflow = try XCTUnwrap(state.base.spillover.first)
+        state.base.spillover.removeAll()
+        state.base.binderEquipped[.armor] = EquippedPiece(overflow)
+        XCTAssertEqual(state.base.binderEquipped[.armor]?.gearProfile?.inscription, receipt)
+        _ = SmithRules.reforge(worn: .armor, on: .binder, in: &state)
+        XCTAssertEqual(state.base.binderEquipped[.armor]?.gearProfile?.inscription, receipt)
+    }
+
+    func testTradingAndRecyclerDestructivePreviewsFreezeTheInscribedSnapshot() throws {
+        var state = eligibleState()
+        let quote = try EquipmentInscriptionRules.evaluate(
+            gearStableInstanceID: .init(rawValue: 40), inkChoice: .ash, in: state).get()
+        guard case .committed(let receipt) = EquipmentInscriptionRules.commit(quote, in: &state) else {
+            return XCTFail("expected inscription")
+        }
+        let sale = try XCTUnwrap(TradingPostRules.previewSale(
+            resources: [:],
+            items: [.init(location: .stored, stackID: .init(rawValue: 40), quantity: 1)],
+            in: state.base))
+        XCTAssertEqual(sale.items.first?.snapshot.gearProfile?.inscription, receipt)
+        let recycler = try XCTUnwrap(RecyclerRules.preview(
+            location: .stored, stackID: .init(rawValue: 40), serviceTier: 1, in: state.base))
+        XCTAssertEqual(recycler.snapshot.gearProfile?.inscription, receipt)
+    }
+
+    @MainActor
+    func testMountedWorldShowsDirectionalRetargetAndOnPortalWithoutDisclosure() throws {
+        let store = GameStore(io: .temporary(name: "seamward-mounted-\(UUID().uuidString)"))
+        var run = makeWorldRun()
+        run.seamwardExpedition = .init(contributors: [
+            .init(member: .binder, gearStableInstanceID: .init(rawValue: 70), slot: .armor,
+                  definitionID: "seamward", rulesVersion: 1, inkRecipe: nil)
+        ], activatedOnTurn: 0)
+        let disclosure = run.map.tiles.map(\.isRevealed)
+        store.mutate("mounted seamward") { state in
+            state.worlds.activeRun = run
+            for lesson in TutorialLessonID.allCases {
+                state.tutorial.complete(lesson, fact: "seamward_fixture")
+            }
+        }
+
+        func capture(_ name: String) -> Data {
+            let controller = UIHostingController(rootView:
+                WorldView().environmentObject(store).frame(width: 368, height: 800))
+            let window = UIWindow(frame: CGRect(x: 0, y: 0, width: 368, height: 800))
+            window.rootViewController = controller; window.makeKeyAndVisible()
+            controller.view.frame = window.bounds; controller.view.layoutIfNeeded()
+            RunLoop.main.run(until: Date().addingTimeInterval(0.08))
+            let image = UIGraphicsImageRenderer(size: window.bounds.size).image { _ in
+                controller.view.drawHierarchy(in: controller.view.bounds, afterScreenUpdates: true)
+            }
+            let attachment = XCTAttachment(image: image)
+            attachment.name = name; attachment.lifetime = .keepAlways; add(attachment)
+            window.isHidden = true
+            return image.pngData() ?? Data()
+        }
+
+        let far = capture("seamward-world-east-far-368x800")
+        store.mutate("retarget seamward") { $0.worlds.activeRun?.playerPosition = .init(x: 1, y: 0) }
+        let near = capture("seamward-world-east-near-368x800")
+        store.mutate("stand on seam") { $0.worlds.activeRun?.playerPosition = .init(x: 2, y: 0) }
+        let portal = capture("seamward-world-on-portal-368x800")
+        XCTAssertFalse(far.isEmpty); XCTAssertNotEqual(far, near); XCTAssertNotEqual(near, portal)
+        XCTAssertEqual(store.state.worlds.activeRun?.map.tiles.map(\.isRevealed), disclosure)
     }
 }

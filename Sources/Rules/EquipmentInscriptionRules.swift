@@ -23,6 +23,29 @@ struct EquipmentInscriptionReceiptV1: Codable, Equatable, Sendable {
         version == 1 && definitionID == "seamward" && sourceItemID == Items.seamlight
             && rulesVersion == 1
     }
+
+    func validate() throws {
+        guard isActiveSeamward else { throw ValidationError.invalidInscription }
+    }
+
+    init(version: Int, definitionID: InscriptionID, sourceItemID: ItemID,
+         rulesVersion: Int, inkRecipe: InkRecipe?) {
+        self.version = version; self.definitionID = definitionID
+        self.sourceItemID = sourceItemID; self.rulesVersion = rulesVersion
+        self.inkRecipe = inkRecipe
+    }
+
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        version = try c.decode(Int.self, forKey: .version)
+        definitionID = try c.decode(InscriptionID.self, forKey: .definitionID)
+        sourceItemID = try c.decode(ItemID.self, forKey: .sourceItemID)
+        rulesVersion = try c.decode(Int.self, forKey: .rulesVersion)
+        inkRecipe = try c.decodeIfPresent(InkRecipe.self, forKey: .inkRecipe)
+        try validate()
+    }
+
+    enum ValidationError: Error { case invalidInscription }
 }
 
 struct SeamwardExpeditionReceiptV1: Codable, Equatable, Sendable {
@@ -42,6 +65,26 @@ struct SeamwardExpeditionReceiptV1: Codable, Equatable, Sendable {
     var hasActiveContributor: Bool {
         version == 1 && contributors.contains { $0.definitionID == "seamward" && $0.rulesVersion == 1 }
     }
+
+    func validate(for turnsTaken: Int) throws {
+        guard version == 1, !contributors.isEmpty else { throw ValidationError.invalidVersion }
+        var gearIDs = Set<InstanceID>()
+        var owners = Set<String>()
+        for contributor in contributors {
+            guard contributor.slot == .armor || contributor.slot == .keepsake,
+                  contributor.definitionID == "seamward", contributor.rulesVersion == 1,
+                  gearIDs.insert(contributor.gearStableInstanceID).inserted,
+                  owners.insert("\(contributor.member.id)|\(contributor.slot.rawValue)").inserted
+            else { throw ValidationError.invalidContributor }
+        }
+        if let activatedOnTurn {
+            guard activatedOnTurn >= 0, activatedOnTurn <= turnsTaken else {
+                throw ValidationError.invalidActivationTurn
+            }
+        }
+    }
+
+    enum ValidationError: Error { case invalidVersion, invalidContributor, invalidActivationTurn }
 }
 
 enum InscriptionInkChoice: Equatable, Sendable {
@@ -89,6 +132,38 @@ enum EquipmentInscriptionRules {
         base.inventory.stacks.compactMap(\.gearProfile).filter {
             ($0.slot == .armor || $0.slot == .keepsake) && $0.inscription == nil
         }.sorted { $0.stableInstanceID.rawValue < $1.stableInstanceID.rawValue }
+    }
+
+    static func eligibleGear(in base: BaseState) -> [(EquipmentInscriptionLocation, GearInstanceProfile)] {
+        var result: [(EquipmentInscriptionLocation, GearInstanceProfile)] =
+            eligibleStoredGear(in: base).map { (EquipmentInscriptionLocation.stored, $0) }
+        for member in base.partyMembers {
+            for slot in [GearSlot.armor, .keepsake] {
+                if let profile = base.worn(slot, by: member)?.gearProfile,
+                   profile.inscription == nil {
+                    result.append((EquipmentInscriptionLocation.worn(member), profile))
+                }
+            }
+        }
+        return result.sorted { $0.1.stableInstanceID.rawValue < $1.1.stableInstanceID.rawValue }
+    }
+
+    static func inscribedGear(in base: BaseState) -> [(EquipmentInscriptionLocation, GearInstanceProfile)] {
+        var result: [(EquipmentInscriptionLocation, GearInstanceProfile)] = []
+        for stack in base.inventory.stacks {
+            if let profile = stack.gearProfile, profile.inscription?.isActiveSeamward == true {
+                result.append((.stored, profile))
+            }
+        }
+        for member in base.partyMembers {
+            for slot in [GearSlot.armor, .keepsake] {
+                if let profile = base.worn(slot, by: member)?.gearProfile,
+                   profile.inscription?.isActiveSeamward == true {
+                    result.append((.worn(member), profile))
+                }
+            }
+        }
+        return result.sorted { $0.1.stableInstanceID.rawValue < $1.1.stableInstanceID.rawValue }
     }
 
     static func playerCopy(for refusal: EquipmentInscriptionRefusal) -> String {
@@ -272,5 +347,15 @@ extension GameStore {
             return false
         }
         return result
+    }
+
+    @discardableResult
+    func eraseInscription(on gearID: InstanceID, expected: EquipmentInscriptionReceiptV1) -> Bool {
+        var erased = false
+        _ = mutateIf("erase Seamward", flush: true) { candidate in
+            erased = EquipmentInscriptionRules.erase(gearID, expected: expected, in: &candidate)
+            return erased
+        }
+        return erased
     }
 }

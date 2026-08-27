@@ -1074,6 +1074,9 @@ struct ScriptoriumView: View {
     @State private var capability: Capability = .hands
     @State private var pendingInscription: EquipmentInscriptionQuoteV1?
     @State private var inscriptionMessage: String?
+    @State private var selectedInscriptionVialID: UInt64?
+    @State private var pendingErasureID: InstanceID?
+    @State private var pendingErasureReceipt: EquipmentInscriptionReceiptV1?
 
     private var tier: Int { store.state.base.station(Stations.scriptorium).tier }
 
@@ -1142,6 +1145,23 @@ struct ScriptoriumView: View {
         } message: {
             Text("Consumes 1 Seamlight, 10 Essence and writes one permanent Inscription on this exact piece.")
         }
+        .confirmationDialog("Erase Seamward?", isPresented: Binding(
+            get: { pendingErasureID != nil && pendingErasureReceipt != nil },
+            set: { if !$0 { pendingErasureID = nil; pendingErasureReceipt = nil } }
+        ), titleVisibility: .visible) {
+            Button("Erase permanently", role: .destructive) {
+                guard let id = pendingErasureID, let receipt = pendingErasureReceipt else { return }
+                inscriptionMessage = store.eraseInscription(on: id, expected: receipt)
+                    ? "Seamward was erased. Nothing was refunded."
+                    : "That piece moved or changed. Review the Inscription and try again."
+                pendingErasureID = nil; pendingErasureReceipt = nil
+            }
+            Button("Keep Seamward", role: .cancel) {
+                pendingErasureID = nil; pendingErasureReceipt = nil
+            }
+        } message: {
+            Text("Erasing destroys the Inscription and refunds no Seamlight, ink, or Essence.")
+        }
     }
 
     private var handsCapability: some View {
@@ -1171,24 +1191,56 @@ struct ScriptoriumView: View {
         StationCard(title: "Equipment Inscriptions", icon: "pencil.and.scribble") {
             Text("Seamward wakes only when a world begins collapsing.")
                 .font(.caption).foregroundStyle(.secondary)
-            ForEach(EquipmentInscriptionRules.eligibleStoredGear(in: store.state.base),
-                    id: \.stableInstanceID) { profile in
-                Button("Inscribe \(profile.slot.displayName) · Seamward") {
-                    switch store.seamwardQuote(for: profile.stableInstanceID) {
+            if !store.state.base.preparedInkVials.isEmpty {
+                Picker("Inscription ink", selection: $selectedInscriptionVialID) {
+                    Text("Ash ink").tag(nil as UInt64?)
+                    ForEach(store.state.base.preparedInkVials) { vial in
+                        Text("Prepared ink · vial \(vial.id)").tag(Optional(vial.id))
+                    }
+                }
+                .accessibilityIdentifier("scriptorium.seamward.ink")
+            }
+            ForEach(EquipmentInscriptionRules.eligibleGear(in: store.state.base),
+                    id: \.1.stableInstanceID) { location, profile in
+                Button("Inscribe \(profile.slot.displayName) · \(locationCopy(location))") {
+                    let inkChoice = selectedInscriptionVialID.flatMap { id in
+                        store.state.base.preparedInkVials.first(where: { $0.id == id })?.recipe
+                    }.map(InscriptionInkChoice.prepared) ?? .ash
+                    switch store.seamwardQuote(for: profile.stableInstanceID, inkChoice: inkChoice) {
                     case .success(let quote): pendingInscription = quote
                     case .failure(let refusal):
                         inscriptionMessage = EquipmentInscriptionRules.playerCopy(for: refusal)
                     }
-                }.buttonStyle(.bordered).frame(maxWidth: .infinity, alignment: .leading)
+                }
+                .buttonStyle(.bordered).frame(maxWidth: .infinity, alignment: .leading)
+                .accessibilityIdentifier("scriptorium.seamward.inscribe.\(profile.stableInstanceID.rawValue)")
             }
-            if EquipmentInscriptionRules.eligibleStoredGear(in: store.state.base).isEmpty {
-                Text("Store an uninscribed Body or Keepsake piece here first.")
+            ForEach(EquipmentInscriptionRules.inscribedGear(in: store.state.base),
+                    id: \.1.stableInstanceID) { location, profile in
+                Button("Erase Seamward · \(profile.slot.displayName) · \(locationCopy(location))",
+                       role: .destructive) {
+                    pendingErasureID = profile.stableInstanceID
+                    pendingErasureReceipt = profile.inscription
+                }
+                .accessibilityIdentifier("scriptorium.seamward.erase.\(profile.stableInstanceID.rawValue)")
+            }
+            if EquipmentInscriptionRules.eligibleGear(in: store.state.base).isEmpty,
+               EquipmentInscriptionRules.inscribedGear(in: store.state.base).isEmpty {
+                Text("Store or wear a Body or Keepsake piece first.")
                     .font(.caption).foregroundStyle(.secondary)
             }
             if let inscriptionMessage {
                 Text(inscriptionMessage).font(.caption).foregroundStyle(.secondary)
             }
         }
+        }
+    }
+
+    private func locationCopy(_ location: EquipmentInscriptionLocation) -> String {
+        switch location {
+        case .stored: "Stored"
+        case .worn(.binder): "Worn by Binder"
+        case .worn(let member): "Worn by \(member.id)"
         }
     }
 }

@@ -874,6 +874,9 @@ struct WorldView: View {
             if let run {
                 StabilityHeader(run: run)
                 PartyHealthStrip(run: run, state: store.state)
+                if let guidance = SeamwardRules.projection(in: run) {
+                    SeamwardGuidanceView(projection: guidance)
+                }
                 VStack(spacing: 0) {
                     VStack(spacing: 0) {
                         GeometryReader { viewport in
@@ -1450,6 +1453,50 @@ struct WorldView: View {
     private func completeInteraction() {
         store.completeTutorial(.worldInteraction, fact: "first_valid_world_action")
         if tutorialLesson == .worldInteraction { tutorialLesson = nil }
+    }
+}
+
+private struct SeamwardGuidanceView: View {
+    let projection: SeamlightGuidanceProjection
+
+    var body: some View {
+        HStack(spacing: 8) {
+            Image(systemName: symbol)
+                .accessibilityHidden(true)
+            VStack(alignment: .leading, spacing: 1) {
+                Text("SEAMWARD")
+                    .font(.custom("Tiny5", size: 10))
+                Text(copy)
+                    .font(.custom("Tiny5", size: 12))
+            }
+            Spacer(minLength: 0)
+        }
+        .foregroundStyle(PixelUITheme.text)
+        .padding(.horizontal, 12)
+        .padding(.vertical, 6)
+        .background(PixelUITheme.headerB)
+        .overlay(alignment: .bottom) { Rectangle().fill(PixelUITheme.edge).frame(height: 1) }
+        .accessibilityElement(children: .combine)
+        .accessibilityIdentifier("world.seamward.guidance")
+        .accessibilityLabel("Seamward, \(copy)")
+    }
+
+    private var symbol: String {
+        switch projection {
+        case .directional(.north, _): "arrow.up"
+        case .directional(.east, _): "arrow.right"
+        case .directional(.south, _): "arrow.down"
+        case .directional(.west, _): "arrow.left"
+        case .onPortal: "circle.circle.fill"
+        }
+    }
+
+    private var copy: String {
+        switch projection {
+        case .directional(let direction, let band):
+            "\(direction.rawValue.capitalized) · \(band.rawValue.capitalized)"
+        case .onPortal: "Portal seam underfoot"
+        }
     }
 }
 
