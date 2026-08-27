@@ -138,24 +138,14 @@ struct CharacterState: Codable, Equatable, Sendable {
     /// Front or back. Front takes the melee and deals it; back is protected and weaker in melee.
     var rank: Rank = .front
 
-    /// **How far into each branch this person has bought**, keyed by branch.
-    ///
-    /// A depth rather than a set of node ids, because nodes are bought in order — so the depth *is*
-    /// the purchase history, an out-of-order state is unrepresentable, and a re-cut branch can't
-    /// leave somebody holding a node that no longer exists.
-    var branchDepth: [CombatBranchID: Int] = [:]
-
-    /// Stable graph-v2 ownership. `nil` means this character has not yet reconciled a legacy
-    /// branch-depth save; an explicit empty set is canonical and must stay empty on relaunch.
-    var ownedCombatNodeIDs: Set<CombatNodeID>?
+    /// Stable graph-v2 ownership. Canonical saves always encode this set, including when empty.
+    var ownedCombatNodeIDs: Set<CombatNodeID> = []
     /// Stable typed selections belonging to purchased nodes. Opening depths currently require no
     /// choice, but persistence lives beside ownership so later typed nodes cannot become indexes.
     var combatNodeChoices: [CombatNodeID: StableChoiceID] = [:]
 
-    /// Points that didn't come from levelling — a calling's starting lean. Kept as a count rather
-    /// than baked into `branchDepth` alone, so the budget stays honest and a respec hands them back
-    /// rather than quietly deleting them.
-    var freePoints: Int = 0
+    /// Durable standard and refunded combat points. Never reconstructed from level after migration.
+    var unspentCombatPoints: Int = 0
 
     init(stats: CharacterStats = CharacterStats(), level: Int = 1,
          experience: Int = 0, rank: Rank = .front) {
@@ -163,6 +153,7 @@ struct CharacterState: Codable, Equatable, Sendable {
         self.level = level
         self.experience = experience
         self.rank = rank
+        self.unspentCombatPoints = max(0, min(level, Tuning.Character.maximumLevel) - 1)
     }
 
     init(from decoder: Decoder) throws {
@@ -171,12 +162,29 @@ struct CharacterState: Codable, Equatable, Sendable {
         level = try c.decodeIfPresent(Int.self, forKey: .level) ?? 1
         experience = try c.decodeIfPresent(Int.self, forKey: .experience) ?? 0
         rank = try c.decodeIfPresent(Rank.self, forKey: .rank) ?? .front
-        branchDepth = try c.decodeIfPresent([CombatBranchID: Int].self, forKey: .branchDepth) ?? [:]
-        ownedCombatNodeIDs = try c.decodeIfPresent(Set<CombatNodeID>.self,
-                                                    forKey: .ownedCombatNodeIDs)
-        combatNodeChoices = try c.decodeIfPresent([CombatNodeID: StableChoiceID].self,
-                                                   forKey: .combatNodeChoices) ?? [:]
-        freePoints = try c.decodeIfPresent(Int.self, forKey: .freePoints) ?? 0
+        ownedCombatNodeIDs = try c.decode(Set<CombatNodeID>.self, forKey: .ownedCombatNodeIDs)
+        combatNodeChoices = try c.decode([CombatNodeID: StableChoiceID].self,
+                                         forKey: .combatNodeChoices)
+        unspentCombatPoints = try c.decode(Int.self, forKey: .unspentCombatPoints)
+        guard unspentCombatPoints >= 0 else { throw DecodingError.dataCorruptedError(
+            forKey: .unspentCombatPoints, in: c, debugDescription: "negative combat point balance") }
+    }
+
+    func encode(to encoder: Encoder) throws {
+        var c = encoder.container(keyedBy: CodingKeys.self)
+        try c.encode(stats, forKey: .stats)
+        try c.encode(level, forKey: .level)
+        try c.encode(experience, forKey: .experience)
+        try c.encode(rank, forKey: .rank)
+        try c.encode(ownedCombatNodeIDs, forKey: .ownedCombatNodeIDs)
+        try c.encode(combatNodeChoices, forKey: .combatNodeChoices)
+        try c.encode(unspentCombatPoints, forKey: .unspentCombatPoints)
+    }
+
+    private enum CodingKeys: String, CodingKey {
+        case stats, level, experience, rank
+        case ownedCombatNodeIDs, combatNodeChoices
+        case unspentCombatPoints
     }
 
     /// What the next level costs, and how far along you are.

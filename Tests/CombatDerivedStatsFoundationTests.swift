@@ -21,16 +21,15 @@ final class CombatDerivedStatsFoundationTests: XCTestCase {
               formation: formation)
     }
 
-    func testLegacyAdapterMapsDepthWithoutPersistingOrActivatingV2() throws {
+    func testCanonicalOwnershipPersistsAndActivatesDerivedStats() throws {
         var character = CharacterState()
-        character.branchDepth = ["force": 2, "evasion": 1]
+        character.ownedCombatNodeIDs = legacyCombatNodes(["force": 2, "evasion": 1])
         let graph = ContentCatalog.shared.combatGraph
         let owned = Rules.legacyOwnedNodes(for: character, catalogue: graph)
-        XCTAssertEqual(owned, CombatGraphRules.migratedLegacyNodes(
-            branchDepth: character.branchDepth, catalogue: graph))
+        XCTAssertEqual(owned, character.ownedCombatNodeIDs)
 
         let encoded = try JSONEncoder().encode(character)
-        XCTAssertFalse(String(decoding: encoded, as: UTF8.self).contains("ownedCombatNodes"))
+        XCTAssertTrue(String(decoding: encoded, as: UTF8.self).contains("ownedCombatNodeIDs"))
         XCTAssertEqual(CombatTreeRules.loadout(for: character),
                        CombatTreeRules.loadout(for: try JSONDecoder().decode(CharacterState.self,
                                                                              from: encoded)))

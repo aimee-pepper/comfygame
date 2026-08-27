@@ -49,10 +49,11 @@
         "accepted": "\"A base.\" She pulls the stick out of the ground and holds onto it. \"Right. I'll want to survey the whole thing before I unpack.\"",
         "declined": "\"Suit yourself. I'm not going anywhere \u2014 that's rather the trouble.\""
       },
-      "lean": {
-        "shadow": 1,
-        "swiftness": 1
-      }
+      "combatGraphVersion": 2,
+      "combatNodePlan": [
+        "combat.craft.shadow.quiet_step",
+        "combat.offense.swiftness.quick_step"
+      ]
     },
     {
       "id": "edren",
@@ -110,10 +111,11 @@
         "accepted": "\"Let me finish this corner.\" He doesn't finish the corner. He's already up.",
         "declined": "\"Another time, then. The floor'll keep.\""
       },
-      "lean": {
-        "fortitude": 1,
-        "precision": 1
-      }
+      "combatGraphVersion": 2,
+      "combatNodePlan": [
+        "combat.defense.fortitude.thick_hide",
+        "combat.offense.precision.keen_eye"
+      ]
     },
     {
       "id": "sela",
@@ -179,10 +181,11 @@
         "accepted": "\"Now that,\" she says, \"is the first offer anyone's made me that understood the problem.\"",
         "declined": "\"Fair enough. Mind how you go \u2014 and mind the ground here, it lies to you.\""
       },
-      "lean": {
-        "evasion": 1,
-        "venom": 1
-      }
+      "combatGraphVersion": 2,
+      "combatNodePlan": [
+        "combat.defense.evasion.footwork",
+        "combat.craft.venom.tainted_edge"
+      ]
     },
     {
       "id": "tovin",
@@ -292,10 +295,11 @@
         "accepted": "\"Careful,\" he says, getting up. \"I'm going to have opinions about your handwriting.\"",
         "declined": "\"Go on, then. And listen \u2014 when the floor starts going, that's not the warning. That's the second warning.\""
       },
-      "lean": {
-        "fortitude": 1,
-        "kindling": 1
-      }
+      "combatGraphVersion": 2,
+      "combatNodePlan": [
+        "combat.defense.fortitude.thick_hide",
+        "combat.craft.emanation.sparkhand"
+      ]
     },
     {
       "id": "halloway",
@@ -353,9 +357,11 @@
         "accepted": "She stands, and she takes the fire with her somehow. \"Then let's not stand about. I've been cold a long time.\"",
         "declined": "\"Right you are.\" She turns back to the fire. \"It'll be here. So will I.\""
       },
-      "lean": {
-        "force": 2
-      }
+      "combatGraphVersion": 2,
+      "combatNodePlan": [
+        "combat.offense.force.heavy_hand",
+        "combat.offense.force.follow_through"
+      ]
     },
     {
       "id": "isolde",
@@ -413,10 +419,11 @@
         "declined": "\"Go on then.\" She picks the board back up. \"You'll be back when the page runs out. They always are.\""
       },
       "isRequired": true,
-      "lean": {
-        "precision": 1,
-        "shadow": 1
-      }
+      "combatGraphVersion": 2,
+      "combatNodePlan": [
+        "combat.offense.precision.keen_eye",
+        "combat.craft.shadow.quiet_step"
+      ]
     },
     {
       "id": "bryn", "name": "Bryn", "calling": "a warden", "icon": "figure.stand",
@@ -428,7 +435,11 @@
         { "condition": { "target": "atmosphere", "measure": "peak", "minimum": 62 }, "passage": "The air becomes unusually dense and heavy at its peak. Everyone breathes harder in it, including the person standing first." }
       ],
       "leansToward": ["locationClue", "gambit"],
-      "lean": { "protection": 1, "fortitude": 1 }
+      "combatGraphVersion": 2,
+      "combatNodePlan": [
+        "combat.defense.protection.bulwark",
+        "combat.defense.fortitude.thick_hide"
+      ]
     },
     {
       "id": "orsa", "name": "Orsa", "calling": "a keeper", "icon": "figure.stand",
@@ -440,7 +451,11 @@
         { "condition": { "target": "atmosphere", "measure": "aspect", "key": "motion", "maximum": 20 }, "passage": "The air remains almost completely still, and smoke rises straight upward. A fire could be placed without its smoke crossing every bedroll." }
       ],
       "leansToward": ["whereabouts", "ruin"],
-      "lean": { "fortitude": 1, "kindling": 1 }
+      "combatGraphVersion": 2,
+      "combatNodePlan": [
+        "combat.defense.fortitude.thick_hide",
+        "combat.craft.emanation.sparkhand"
+      ]
     },
     {
       "id": "vance", "name": "Vance", "calling": "a trader and appraiser", "icon": "figure.stand",
@@ -450,7 +465,11 @@
         { "condition": { "target": "relief", "measure": "aspect", "key": "openness", "minimum": 68 }, "passage": "The land is broad and open, with few barriers between one horizon and the next. A loaded cart could cross without the ground inventing a toll." }
       ],
       "leansToward": ["worldWorthWriting", "whereabouts"],
-      "lean": { "precision": 1, "kindling": 1 }
+      "combatGraphVersion": 2,
+      "combatNodePlan": [
+        "combat.offense.precision.keen_eye",
+        "combat.craft.emanation.sparkhand"
+      ]
     },
     {
       "id": "noll", "name": "Noll", "calling": "a salvager", "icon": "figure.stand",
@@ -472,7 +491,11 @@
         "accepted": "“Then do not call it rescue when we take something apart.” Noll folds the joined corner into cloth and gathers the reusable pieces separately. “Give each result its own name.”",
         "declined": "“Go carefully.” They return to the failed join. “Whole ground can hide worse breaks than this.”"
       },
-      "lean": { "precision": 1, "protection": 1 }
+      "combatGraphVersion": 2,
+      "combatNodePlan": [
+        "combat.offense.precision.keen_eye",
+        "combat.defense.protection.bulwark"
+      ]
     },
     {
       "id": "talin", "name": "Talin", "calling": "a blade fighter", "icon": "figure.stand",
@@ -484,7 +507,11 @@
         { "condition": { "target": "illumination", "measure": "peak", "minimum": 65 }, "passage": "At the brightest interval every edge separates from the surface behind it. A visible opening can still close while you consider it." }
       ],
       "leansToward": ["locationClue", "gambit"],
-      "lean": { "precision": 1, "swiftness": 1 }
+      "combatGraphVersion": 2,
+      "combatNodePlan": [
+        "combat.offense.precision.keen_eye",
+        "combat.offense.swiftness.quick_step"
+      ]
     },
     {
       "id": "nessa", "name": "Nessa", "calling": "an apothecary", "icon": "figure.stand",
@@ -497,7 +524,11 @@
         { "condition": { "target": "substrate", "measure": "form", "key": "volatile", "minimum": 35 }, "passage": "Much of the exposed ground reacts to moisture by changing colour, venting or shifting. I need to test which reactions are dangerous." }
       ],
       "leansToward": ["locationClue", "focus"],
-      "lean": { "venom": 1, "protection": 1 }
+      "combatGraphVersion": 2,
+      "combatNodePlan": [
+        "combat.craft.venom.tainted_edge",
+        "combat.defense.protection.bulwark"
+      ]
     },
     {
       "id": "corrin", "name": "Corrin", "calling": "a tanner", "icon": "figure.stand",
@@ -510,7 +541,11 @@
         { "condition": { "target": "hydrology", "measure": "aspect", "key": "dispersion", "minimum": 70 }, "passage": "Films, puddles and shallow crossings spread water across nearly the whole route. Leather fastenings would swell repeatedly here." }
       ],
       "leansToward": ["locationClue", "focus"],
-      "lean": { "evasion": 1, "fortitude": 1 }
+      "combatGraphVersion": 2,
+      "combatNodePlan": [
+        "combat.defense.evasion.footwork",
+        "combat.defense.fortitude.thick_hide"
+      ]
     },
     {
       "id": "dagg", "name": "Dagg", "calling": "a hammer fighter", "icon": "figure.stand",
@@ -523,7 +558,11 @@
         { "condition": { "target": "atmosphere", "measure": "aspect", "key": "motion", "minimum": 58 }, "passage": "Strong gusts move through the world, then briefly fall still. Swinging is not different because the weapon has a name." }
       ],
       "leansToward": ["locationClue", "gambit"],
-      "lean": { "force": 1, "fortitude": 1 }
+      "combatGraphVersion": 2,
+      "combatNodePlan": [
+        "combat.offense.force.heavy_hand",
+        "combat.defense.fortitude.thick_hide"
+      ]
     },
     {
       "id": "rook", "name": "Rook", "calling": "a spear fighter", "icon": "figure.stand",
@@ -536,7 +575,11 @@
         { "condition": { "target": "atmosphere", "measure": "aspect", "key": "motion", "maximum": 20 }, "passage": "Grass tips remain still enough to show the smallest disturbance. Distance speaks before the person crossing it does." }
       ],
       "leansToward": ["locationClue", "gambit"],
-      "lean": { "precision": 1, "protection": 1 }
+      "combatGraphVersion": 2,
+      "combatNodePlan": [
+        "combat.offense.precision.keen_eye",
+        "combat.defense.protection.bulwark"
+      ]
     },
     {
       "id": "lys", "name": "Lys", "calling": "an archivist", "icon": "figure.stand",
@@ -549,7 +592,11 @@
         { "condition": { "target": "atmosphere", "measure": "aspect", "key": "motion", "maximum": 20 }, "passage": "The air is so still that a loose page remains open to the same line. Any movement on the page can be attributed to something nearby." }
       ],
       "leansToward": ["locationClue", "focus"],
-      "lean": { "kindling": 1, "precision": 1 }
+      "combatGraphVersion": 2,
+      "combatNodePlan": [
+        "combat.craft.emanation.sparkhand",
+        "combat.offense.precision.keen_eye"
+      ]
     },
     {
       "id": "bracken", "name": "Bracken", "calling": "an armorer", "icon": "figure.stand",
@@ -563,7 +610,11 @@
         { "condition": { "target": "atmosphere", "measure": "peak", "minimum": 62 }, "passage": "The air is dense enough to press against every seam and gap. The body underneath will not call a weak join negligible." }
       ],
       "leansToward": ["locationClue", "focus"],
-      "lean": { "fortitude": 1, "protection": 1 }
+      "combatGraphVersion": 2,
+      "combatNodePlan": [
+        "combat.defense.fortitude.thick_hide",
+        "combat.defense.protection.bulwark"
+      ]
     },
     {
       "id": "fen", "name": "Fen", "calling": "a bowyer", "icon": "figure.stand",
@@ -577,7 +628,11 @@
         { "condition": { "target": "cycle", "measure": "aspect", "key": "regularity", "minimum": 82 }, "passage": "Light, wind and other world changes return on a predictable schedule. Repeating a shot under the same interval could produce a useful comparison." }
       ],
       "leansToward": ["locationClue", "focus"],
-      "lean": { "precision": 1, "swiftness": 1 }
+      "combatGraphVersion": 2,
+      "combatNodePlan": [
+        "combat.offense.precision.keen_eye",
+        "combat.offense.swiftness.quick_step"
+      ]
     },
     {
       "id": "wren", "name": "Wren", "calling": "a skirmisher", "icon": "figure.stand",
@@ -591,7 +646,11 @@
         { "condition": { "target": "cycle", "measure": "aspect", "key": "amplitude", "minimum": 62 }, "passage": "The quiet and the rush demand different routes through the same ground. Remembering only the dramatic one is how exits disappear." }
       ],
       "leansToward": ["locationClue", "gambit"],
-      "lean": { "evasion": 1, "swiftness": 1 }
+      "combatGraphVersion": 2,
+      "combatNodePlan": [
+        "combat.defense.evasion.footwork",
+        "combat.offense.swiftness.quick_step"
+      ]
     },
     {
       "id": "kestrel", "name": "Kestrel", "calling": "a field naturalist", "icon": "figure.stand",
@@ -606,7 +665,11 @@
         { "condition": { "target": "atmosphere", "measure": "aspect", "key": "clarity", "minimum": 76 }, "passage": "Fine disturbance stays visible at range. Observation becomes easier; interpretation does not." }
       ],
       "leansToward": ["locationClue", "gambit"],
-      "lean": { "precision": 1, "force": 1 }
+      "combatGraphVersion": 2,
+      "combatNodePlan": [
+        "combat.offense.precision.keen_eye",
+        "combat.offense.force.heavy_hand"
+      ]
     },
     {
       "id": "maud", "name": "Maud", "calling": "a weaponsmith", "icon": "figure.stand",
@@ -620,7 +683,12 @@
         { "condition": { "target": "cycle", "measure": "aspect", "key": "regularity", "minimum": 85 }, "passage": "The same light and weather conditions return at a highly predictable time. I can test each alteration under matching conditions." }
       ],
       "leansToward": ["locationClue", "whereabouts"],
-      "lean": { "force": 1, "precision": 1, "fortitude": 1 }
+      "combatGraphVersion": 2,
+      "combatNodePlan": [
+        "combat.offense.force.heavy_hand",
+        "combat.offense.precision.keen_eye",
+        "combat.defense.fortitude.thick_hide"
+      ]
     },
     {
       "id": "marrick", "name": "Marrick", "calling": "a formation leader", "icon": "figure.stand",
@@ -635,7 +703,11 @@
         { "condition": { "target": "hydrology", "measure": "available", "minimum": 60 }, "passage": "There is water along the route. No one person must carry enough for everyone, which is how a provision becomes part of the formation." }
       ],
       "leansToward": ["locationClue", "gambit"],
-      "lean": { "protection": 1, "fortitude": 1 }
+      "combatGraphVersion": 2,
+      "combatNodePlan": [
+        "combat.defense.protection.bulwark",
+        "combat.defense.fortitude.thick_hide"
+      ]
     },
     {
       "id": "sabine", "name": "Sabine", "calling": "a menagerist", "icon": "figure.stand",
@@ -651,7 +723,12 @@
         { "condition": { "target": "cycle", "measure": "aspect", "key": "regularity", "minimum": 85 }, "passage": "The same calls begin at the same interval, and the same paths fill soon after. They can learn when I return; that does not mean they must come." }
       ],
       "leansToward": ["locationClue", "focus"],
-      "lean": { "protection": 1, "precision": 1, "evasion": 1 }
+      "combatGraphVersion": 2,
+      "combatNodePlan": [
+        "combat.defense.protection.bulwark",
+        "combat.offense.precision.keen_eye",
+        "combat.defense.evasion.footwork"
+      ]
     },
     {
       "id": "grimmond", "name": "Grimmond", "calling": "a deep miner", "icon": "figure.stand",
@@ -667,7 +744,11 @@
         { "condition": { "target": "atmosphere", "measure": "peak", "maximum": 30 }, "passage": "Breath thins before stone yields. A body is the first support the plan spends." }
       ],
       "leansToward": ["locationClue", "focus"],
-      "lean": { "force": 1, "fortitude": 1 }
+      "combatGraphVersion": 2,
+      "combatNodePlan": [
+        "combat.offense.force.heavy_hand",
+        "combat.defense.fortitude.thick_hide"
+      ]
     },
     {
       "id": "oda", "name": "Oda", "calling": "a magic weaponsmith", "icon": "figure.stand",
@@ -684,7 +765,12 @@
         { "condition": { "target": "cycle", "measure": "aspect", "key": "regularity", "minimum": 85 }, "passage": "Light, weather and other world changes return on a highly predictable schedule. Repeating a test under the same interval can distinguish containment from luck." }
       ],
       "leansToward": ["locationClue", "whereabouts"],
-      "lean": { "precision": 1, "kindling": 1, "fortitude": 1 }
+      "combatGraphVersion": 2,
+      "combatNodePlan": [
+        "combat.offense.precision.keen_eye",
+        "combat.craft.emanation.sparkhand",
+        "combat.defense.fortitude.thick_hide"
+      ]
     },
     {
       "id": "auber", "name": "Auber", "calling": "a distiller", "icon": "figure.stand",
@@ -701,7 +787,12 @@
         { "condition": { "target": "cycle", "measure": "aspect", "key": "amplitude", "minimum": 65 }, "passage": "Conditions change sharply from one interval to the next, enough to alter the mixture each time. Repetition is not purification by itself." }
       ],
       "leansToward": ["locationClue", "focus"],
-      "lean": { "precision": 1, "kindling": 1, "fortitude": 1 },
+      "combatGraphVersion": 2,
+      "combatNodePlan": [
+        "combat.offense.precision.keen_eye",
+        "combat.craft.emanation.sparkhand",
+        "combat.defense.fortitude.thick_hide"
+      ],
       "meeting": {
         "opening": "Auber moves the nearly empty vessel rather than the full one, then marks where its last ring dried.",
         "questions": [
@@ -729,7 +820,11 @@
         { "condition": { "target": "cycle", "measure": "aspect", "key": "amplitude", "minimum": 65 }, "passage": "Heat, light, wind and other conditions swing between mild and extreme states. Even a predictable return to the extreme is a burden on the body." }
       ],
       "leansToward": ["locationClue", "gambit"],
-      "lean": { "fortitude": 1, "kindling": 1 }
+      "combatGraphVersion": 2,
+      "combatNodePlan": [
+        "combat.defense.fortitude.thick_hide",
+        "combat.craft.emanation.sparkhand"
+      ]
     },
     {
       "id": "perren", "name": "Perren", "calling": "an interpreter", "icon": "figure.stand",
@@ -747,7 +842,11 @@
         { "condition": { "target": "hydrology", "measure": "aspect", "key": "salinity", "minimum": 45 }, "passage": "Retreating water leaves a bright white mineral line along every bank. It looks inevitable after it appears; the water remembers otherwise." }
       ],
       "leansToward": ["locationClue", "focus"],
-      "lean": { "precision": 1, "shadow": 1 }
+      "combatGraphVersion": 2,
+      "combatNodePlan": [
+        "combat.offense.precision.keen_eye",
+        "combat.craft.shadow.quiet_step"
+      ]
     },
     {
       "id": "nine", "name": "Nine", "calling": "a continuity keeper", "icon": "figure.stand",
@@ -765,7 +864,11 @@
         { "condition": { "target": "atmosphere", "measure": "aspect", "key": "motion", "maximum": 20 }, "passage": "A loose marker remains where I placed it. I trust the choice again when I see it, even if I cannot recover making it." }
       ],
       "leansToward": ["locationClue", "whereabouts"],
-      "lean": { "precision": 1, "fortitude": 1 }
+      "combatGraphVersion": 2,
+      "combatNodePlan": [
+        "combat.offense.precision.keen_eye",
+        "combat.defense.fortitude.thick_hide"
+      ]
     }
   ],
   "pages": [

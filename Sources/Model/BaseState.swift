@@ -317,10 +317,8 @@ struct BaseState: Codable, Equatable, Sendable {
         joined.worldwork = person.worldwork
         joined.icon = person.icon
         joined.gambits = GambitStarter.rules
-        // **What their trade already taught them.** Free rather than deducted: a lean is who they
-        // were before you met them, and charging it would make a smith arrive behind a stranger.
-        joined.character.branchDepth = person.lean
-        joined.character.freePoints = person.lean.values.reduce(0, +)
+        // Authored calling practice is bonus ownership. Standard flexible points remain untouched.
+        joined.character.ownedCombatNodeIDs = Set(person.combatNodePlan)
         roster.append(joined)
         return true
     }

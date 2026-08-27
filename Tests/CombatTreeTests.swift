@@ -8,9 +8,12 @@ final class CombatTreeTests: XCTestCase {
     private var branches: [CombatBranchDef] { ContentCatalog.shared.combatBranches }
 
     private func spent(_ depths: [CombatBranchID: Int], level: Int = 25) -> CharacterState {
-        var c = CharacterState()
-        c.level = level
-        c.branchDepth = depths
+        var c = CharacterState(level: level)
+        c.ownedCombatNodeIDs = legacyCombatNodes(depths).filter {
+            ContentCatalog.shared.combatGraph.node($0)!.depth <= CombatGraphRules.openingMaximumDepth
+        }
+        c.unspentCombatPoints = max(0, CombatTreeRules.totalPoints(atLevel: level)
+                                      - c.ownedCombatNodeIDs.count)
         return c
     }
 
@@ -44,56 +47,6 @@ final class CombatTreeTests: XCTestCase {
 
     /// Six branches are left untouched at maximum, which is what keeps a rogue permanently not a
     /// knight — the property the whole shape exists for.
-    func testAFinishedCompanionHasThreeBranchesAndSixTheyNeverTouched() throws {
-        var character = CharacterState()
-        character.level = Tuning.Character.maximumLevel
-        for id: CombatBranchID in ["swiftness", "evasion", "shadow"] {
-            let branch = try XCTUnwrap(ContentCatalog.shared.combatBranch(id))
-            for _ in branch.nodes.indices { CombatTreeRules.buyNext(in: branch, for: &character) }
-        }
-        XCTAssertEqual(CombatTreeRules.unspentPoints(character), 0, "a finished build has nothing left")
-        XCTAssertEqual(CombatTreeRules.completedBranches(character).count, 3)
-        XCTAssertEqual(CombatTreeRules.className(for: character), "Rogue", "Aimee's own example")
-
-        // A fourth branch is unaffordable, whatever else you do.
-        let force = try XCTUnwrap(ContentCatalog.shared.combatBranch("force"))
-        XCTAssertFalse(CombatTreeRules.canBuyNext(in: force, for: character))
-    }
-
-    // MARK: Spending
-
-    func testNodesAreBoughtInOrderAndCostOneEach() throws {
-        let branch = try XCTUnwrap(ContentCatalog.shared.combatBranch("force"))
-        var character = spent([:])
-
-        for expected in branch.nodes {
-            let bought = CombatTreeRules.buyNext(in: branch, for: &character)
-            XCTAssertEqual(bought?.index, expected.index, "bought out of order")
-        }
-        XCTAssertNil(CombatTreeRules.buyNext(in: branch, for: &character), "bought past the capstone")
-        XCTAssertEqual(CombatTreeRules.spentPoints(character), branch.nodes.count)
-    }
-
-    func testYouCannotSpendPointsYouHaveNotEarned() throws {
-        let branch = try XCTUnwrap(ContentCatalog.shared.combatBranch("force"))
-        var fresh = spent([:], level: 1)
-        XCTAssertEqual(CombatTreeRules.totalPoints(atLevel: 1), 0, "level one is the first, not a paid one")
-        XCTAssertFalse(CombatTreeRules.canBuyNext(in: branch, for: fresh))
-        XCTAssertNil(CombatTreeRules.buyNext(in: branch, for: &fresh))
-    }
-
-    /// **Partial investment is legal** — spreading gives you unfinished branches rather than an
-    /// illegal state. A worse choice, never a refused one.
-    func testSpreadingAcrossNineBranchesIsAllowedAndSimplyWorse() {
-        var character = spent([:])
-        for branch in branches {
-            for _ in 0..<2 { CombatTreeRules.buyNext(in: branch, for: &character) }
-        }
-        XCTAssertEqual(CombatTreeRules.spentPoints(character), 18)
-        XCTAssertTrue(CombatTreeRules.completedBranches(character).isEmpty)
-        XCTAssertNil(CombatTreeRules.className(for: character), "nine shallow branches is not a class")
-    }
-
     // MARK: Nothing ships inert
 
     /// **The Constellation fossil guard, applied to seventy-two nodes** (`fossil-audit.md` §6).
@@ -104,7 +57,7 @@ final class CombatTreeTests: XCTestCase {
     func testEveryNodeDoesSomething() {
         let nothing = CombatTreeRules.Loadout()
         for branch in branches {
-            for index in branch.nodes.indices {
+            for index in branch.nodes.indices where index < CombatGraphRules.openingMaximumDepth {
                 let node = branch.nodes[index]
                 let onlyThis = CombatTreeRules.loadout(for: spent([branch.id: index + 1]))
                 let withoutIt = CombatTreeRules.loadout(for: spent([branch.id: index]))
@@ -121,7 +74,7 @@ final class CombatTreeTests: XCTestCase {
     func testEveryEffectKindIsRead() {
         var seen: Set<CombatNodeEffect.Kind> = []
         for branch in branches {
-            for index in branch.nodes.indices {
+            for index in branch.nodes.indices where index < CombatGraphRules.openingMaximumDepth {
                 let node = branch.nodes[index]
                 seen.insert(node.effect.kind)
                 if node.effect.kind == .skill { continue }
@@ -131,17 +84,19 @@ final class CombatTreeTests: XCTestCase {
                                "effect kind '\(node.effect.kind.rawValue)' changes nothing")
             }
         }
-        XCTAssertGreaterThan(seen.count, 40, "the catalogue stopped exercising most of the kinds")
+        XCTAssertGreaterThan(seen.count, 15, "the opening catalogue stopped exercising its effect kinds")
     }
 
     /// Every skill a node teaches has to exist, or the node is a promise of nothing.
     func testEverySkillANodeTeachesExists() {
-        for branch in branches {
-            for node in branch.nodes {
-                guard let skill = node.grantsSkill else { continue }
-                XCTAssertNotNil(ContentCatalog.shared.skill(skill),
-                                "\(branch.name) \(node.index) teaches '\(skill.rawValue)', which doesn't exist")
-            }
+        let opening = ContentCatalog.shared.combatGraph.nodes.filter {
+            $0.depth <= CombatGraphRules.openingMaximumDepth
+        }
+        XCTAssertEqual(opening.compactMap(\.techniqueID).count, 13)
+        for node in opening {
+            guard let skill = node.techniqueID else { continue }
+            XCTAssertNotNil(ContentCatalog.shared.skill(skill),
+                            "\(node.id) teaches '\(skill.rawValue)', which doesn't exist")
         }
     }
 
@@ -167,7 +122,7 @@ final class CombatTreeTests: XCTestCase {
 
         store.mutate("test: three into Precision") { state in
             state.base.binderCharacter.level = 10
-            state.base.binderCharacter.branchDepth["precision"] = 3
+            state.base.binderCharacter.ownedCombatNodeIDs = legacyCombatNodes(["precision": 3])
         }
         let after = CombatRules.skills(for: .binder, in: store.state).map(\.id)
         XCTAssertTrue(after.contains("pry"), "bought Precision 3 and still can't Pry")
@@ -182,27 +137,12 @@ final class CombatTreeTests: XCTestCase {
 
         store.mutate("test: into Fortitude") { state in
             state.base.binderCharacter.level = 10
-            state.base.binderCharacter.branchDepth["fortitude"] = 2
+            state.base.binderCharacter.ownedCombatNodeIDs = legacyCombatNodes(["fortitude": 2])
         }
         XCTAssertGreaterThan(CombatRules.maximumHealth(of: .binder, in: store.state), bareHP,
                              "Thick Hide bought no health")
         XCTAssertLessThan(CombatRules.damageTaken(20, by: .binder, in: store.state), bareTaken,
                           "Iron Skin soaked nothing")
-    }
-
-    /// A capstone should be near-absolute, which is what a capstone is for.
-    @MainActor
-    func testImmovableMakesArmourWorkAgainstPiercing() {
-        let store = GameStore(io: .temporary(name: "immov-\(UUID().uuidString)"))
-        store.mutate("test: armoured") { state in
-            state.base.binderCharacter.level = Tuning.Character.maximumLevel
-            state.base.binderCharacter.branchDepth["fortitude"] = 7
-        }
-        let pierced = CombatRules.damageTaken(30, by: .binder, in: store.state, armourIgnored: 1)
-
-        store.mutate("test: the capstone") { $0.base.binderCharacter.branchDepth["fortitude"] = 8 }
-        let withCapstone = CombatRules.damageTaken(30, by: .binder, in: store.state, armourIgnored: 1)
-        XCTAssertLessThan(withCapstone, pierced, "Immovable let a piercing blow through anyway")
     }
 
     private func sameNumbers(_ a: CombatTreeRules.Loadout, _ b: CombatTreeRules.Loadout) -> Bool {
@@ -217,23 +157,23 @@ final class CombatTreeTests: XCTestCase {
     func testTheSpringTakesBackWhatSomebodyLearned() {
         let store = GameStore(io: .temporary(name: "respec-\(UUID().uuidString)"))
         store.mutate("test: a build, and money") { state in
-            state.base.essence = 5000
+            state.base.addEssenceCrystals(5000)
             state.base.binderCharacter.level = Tuning.Character.maximumLevel
-            state.base.binderCharacter.branchDepth = ["force": 8, "fortitude": 4]
+            state.base.binderCharacter.ownedCombatNodeIDs = legacyCombatNodes(["force": 3, "fortitude": 3])
+            state.base.binderCharacter.unspentCombatPoints = 18
         }
-        XCTAssertEqual(CombatTreeRules.spentPoints(store.state.base.binderCharacter), 12)
-        XCTAssertTrue(store.state.base.binderCharacter.branchDepth["force"] == 8)
+        XCTAssertEqual(CombatTreeRules.spentPoints(store.state.base.binderCharacter), 6)
 
         let cost = store.respecCost(for: .binder)
         XCTAssertGreaterThan(cost, 0, "unlearning has to cost, or it's a free retry")
-        let purse = store.state.base.essence
+        let purse = store.state.base.essenceCrystalCount
 
         store.respec(.binder)
         XCTAssertEqual(CombatTreeRules.spentPoints(store.state.base.binderCharacter), 0)
         XCTAssertEqual(CombatTreeRules.unspentPoints(store.state.base.binderCharacter),
                        CombatTreeRules.totalPoints(atLevel: Tuning.Character.maximumLevel),
                        "the points came back")
-        XCTAssertEqual(store.state.base.essence, purse - cost)
+        XCTAssertEqual(store.state.base.essenceCrystalCount, purse - cost)
         XCTAssertEqual(Set(CombatRules.skills(for: .binder, in: store.state).map(\.id)),
                        CombatActionOwnershipRules.binderInnate,
                        "respec kept only the Binder's identity techniques")
@@ -247,13 +187,13 @@ final class CombatTreeTests: XCTestCase {
         XCTAssertFalse(store.canRespec(.binder))
 
         store.mutate("test: a build, and no money") { state in
-            state.base.essence = 0
+            state.base.essenceCrystals = nil
             state.base.binderCharacter.level = 10
-            state.base.binderCharacter.branchDepth = ["force": 5]
+            state.base.binderCharacter.ownedCombatNodeIDs = legacyCombatNodes(["force": 3])
         }
         XCTAssertFalse(store.canRespec(.binder), "afforded a respec with an empty purse")
         store.respec(.binder)
-        XCTAssertEqual(CombatTreeRules.spentPoints(store.state.base.binderCharacter), 5,
+        XCTAssertEqual(CombatTreeRules.spentPoints(store.state.base.binderCharacter), 3,
                        "respecced without paying")
     }
 
@@ -264,12 +204,12 @@ final class CombatTreeTests: XCTestCase {
     @MainActor
     func testRecruitingSomebodyBringsTheirTradeWithThem() throws {
         let halloway = try XCTUnwrap(ContentCatalog.shared.traveller("halloway"))
-        XCTAssertFalse(halloway.lean.isEmpty, "a smith joined knowing nothing about anything")
+        XCTAssertFalse(halloway.combatNodePlan.isEmpty, "a smith joined knowing nothing about anything")
 
         var base = BaseState.newGame()
         base.seat("halloway")
         let seated = try XCTUnwrap(base.roster.first { $0.traveller == "halloway" })
-        XCTAssertEqual(seated.character.branchDepth, halloway.lean)
+        XCTAssertEqual(seated.character.ownedCombatNodeIDs, Set(halloway.combatNodePlan))
         XCTAssertGreaterThan(CombatTreeRules.spentPoints(seated.character), 0)
     }
 
@@ -293,7 +233,7 @@ final class CombatTreeTests: XCTestCase {
     func testALeanCanBeRespeccedLikeAnythingElse() throws {
         let store = GameStore(io: .temporary(name: "lean-\(UUID().uuidString)"))
         store.mutate("test: a smith, and money") { state in
-            state.base.essence = 5000
+            state.base.addEssenceCrystals(5000)
             state.base.seat("halloway")
         }
         let index = try XCTUnwrap(store.state.base.roster.firstIndex { $0.traveller == "halloway" })
@@ -302,7 +242,7 @@ final class CombatTreeTests: XCTestCase {
         XCTAssertGreaterThan(store.respecCost(for: member), 0)
 
         store.respec(member)
-        XCTAssertTrue(store.character(of: member).branchDepth.isEmpty, "the lean stuck")
+        XCTAssertTrue(store.character(of: member).ownedCombatNodeIDs.isEmpty, "the lean stuck")
         XCTAssertGreaterThan(CombatTreeRules.unspentPoints(store.character(of: member)), 0,
                              "unlearning a lean deleted the points instead of returning them")
     }
@@ -310,11 +250,12 @@ final class CombatTreeTests: XCTestCase {
     /// Nobody joins as a blank. A traveller without a lean is a person with no past.
     func testEveryTravellerHasATrade() {
         for traveller in ContentCatalog.shared.travellers {
-            XCTAssertFalse(traveller.lean.isEmpty,
+            XCTAssertEqual(traveller.combatGraphVersion, CombatGraphRules.graphVersion)
+            XCTAssertFalse(traveller.combatNodePlan.isEmpty,
                            "\(traveller.name) has a calling and no lean to show for it")
-            for branch in traveller.lean.keys {
-                XCTAssertNotNil(ContentCatalog.shared.combatBranch(branch),
-                                "\(traveller.name) leans into '\(branch.rawValue)', which isn't a branch")
+            for node in traveller.combatNodePlan {
+                XCTAssertNotNil(ContentCatalog.shared.combatGraph.node(node),
+                                "\(traveller.name) leans into unknown node '\(node.rawValue)'")
             }
         }
     }

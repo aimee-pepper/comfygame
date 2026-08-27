@@ -118,6 +118,9 @@
     }
   ],
   "techniqueIdentity": "explicit-per-node-not-derived-from-role",
+  "purchaseChoicesByNode": {
+    "combat.craft.emanation.insulation": ["heat", "caustic", "light"]
+  },
   "effectCopyArtifact": "docs/combat-tree-v2-effect-copy.generated.json",
   "techniqueIDByNode": {
     "combat.offense.force.overbear": "overbear",

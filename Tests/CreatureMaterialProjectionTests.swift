@@ -123,13 +123,14 @@ final class CreatureMaterialProjectionTests: XCTestCase {
             CreatureMaterialProjectionReceiptV1(entries: [inconsistent])))
     }
 
-    func testSchemaFourMigrationFreezesActiveAndAnchoredButPreservesLegacyNil() throws {
+    func testCumulativeSchemaFourMigrationFreezesActiveAndAnchoredButPreservesLegacyNil() throws {
         let ecology = #"{"id":{"rawValue":1},"traits":{},"worldSeed":9,"habitat":"terrestrial"}"#
         let legacy = #"{"id":{"rawValue":2},"traits":{},"worldSeed":9}"#
-        let raw = Data(#"{"schemaVersion":4,"worlds":{"activeRun":{"cast":[\#(ecology),\#(legacy)]},"anchoredRealms":[{"world":{"cast":[\#(ecology)]}}]}}"#.utf8)
+        let book = #"{"written":[],"essencePaid":0}"#
+        let raw = Data(#"{"schemaVersion":4,"worlds":{"activeRun":{"book":\#(book),"cast":[\#(ecology),\#(legacy)]},"anchoredRealms":[{"world":{"book":\#(book),"cast":[\#(ecology)]}}]}}"#.utf8)
         let migrated = try Migrations.migrateIfNeeded(raw)
         let root = try XCTUnwrap(JSONSerialization.jsonObject(with: migrated) as? [String: Any])
-        XCTAssertEqual(root["schemaVersion"] as? Int, 5)
+        XCTAssertEqual(root["schemaVersion"] as? Int, Tuning.saveSchemaVersion)
         let worlds = try XCTUnwrap(root["worlds"] as? [String: Any])
         let active = try XCTUnwrap(worlds["activeRun"] as? [String: Any])
         let cast = try XCTUnwrap(active["cast"] as? [[String: Any]])

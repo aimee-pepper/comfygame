@@ -7,6 +7,7 @@ struct CombatTreeView: View {
     let member: PartyMember
     @State private var treeID: CombatTreeID?
     @State private var selectedNodeID: CombatNodeID?
+    @State private var selectedChoice: StableChoiceID?
     @State private var refusal: String?
 
     private let catalogue = ContentCatalog.shared.combatGraph
@@ -48,7 +49,7 @@ struct CombatTreeView: View {
         .background(Color(.systemGroupedBackground))
         .navigationTitle("Training")
         .navigationBarTitleDisplayMode(.inline)
-        .onChange(of: tree.id) { _, _ in selectedNodeID = nil; refusal = nil }
+        .onChange(of: tree.id) { _, _ in selectedNodeID = nil; selectedChoice = nil; refusal = nil }
     }
 
     private var header: some View {
@@ -85,7 +86,11 @@ struct CombatTreeView: View {
                     }
                 }
                 ForEach(layout.placements) { placement in
-                    Button { selectedNodeID = placement.id; refusal = nil } label: {
+                    Button {
+                        if selectedNodeID != placement.id { selectedChoice = nil }
+                        selectedNodeID = placement.id
+                        refusal = nil
+                    } label: {
                         nodeTile(placement.node)
                     }
                     .buttonStyle(.plain).frame(width: 44, height: 44).position(points[placement.id]!)
@@ -124,10 +129,19 @@ struct CombatTreeView: View {
                 Text(ProgressionRequirementPresentation.capstoneRequirement)
                     .font(.caption).foregroundStyle(.secondary)
             }
-            if node.depth > CombatGraphRules.openingMaximumDepth {
+            if !CombatGraphRules.isImplemented(node) {
                 Text(CombatGraphRules.PurchaseRefusal.unavailable.playerCopy)
                     .font(.caption).foregroundStyle(.secondary)
             } else if state != .owned {
+                if !node.purchaseChoices.isEmpty {
+                    Picker("Emanation", selection: $selectedChoice) {
+                        Text("Choose an emanation").tag(StableChoiceID?.none)
+                        ForEach(node.purchaseChoices, id: \.rawValue) { choice in
+                            Text(choice.rawValue.capitalisedSentence).tag(Optional(choice))
+                        }
+                    }
+                    .pickerStyle(.segmented)
+                }
                 Button("Learn \(node.name)") { purchase(node) }
                     .buttonStyle(.borderedProminent).frame(maxWidth: .infinity, minHeight: 44)
                     .disabled(state != .available)
@@ -140,13 +154,16 @@ struct CombatTreeView: View {
 
     private func state(of node: CombatGraphNodeDef) -> CombatGraphNodeState {
         if owned.contains(node.id) { return .owned }
-        guard node.depth <= CombatGraphRules.openingMaximumDepth else { return .blocked }
-        if case .success = store.previewCombatNodePurchase(node.id, for: member) { return .available }
+        guard CombatGraphRules.isImplemented(node) else { return .blocked }
+        let choice = selectedNodeID == node.id ? selectedChoice : nil
+        if case .success = store.previewCombatNodePurchase(node.id, choice: choice, for: member) {
+            return .available
+        }
         return .blocked
     }
 
     private func purchase(_ node: CombatGraphNodeDef) {
-        switch store.previewCombatNodePurchase(node.id, for: member) {
+        switch store.previewCombatNodePurchase(node.id, choice: selectedChoice, for: member) {
         case .failure(let reason): refusal = reason.playerCopy
         case .success(let quote):
             switch store.purchaseCombatNode(quote, for: member) {

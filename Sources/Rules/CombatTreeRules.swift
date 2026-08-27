@@ -21,39 +21,11 @@ enum CombatTreeRules {
     }
 
     static func spentPoints(_ character: CharacterState) -> Int {
-        character.ownedCombatNodeIDs?.count ?? character.branchDepth.values.reduce(0, +)
+        character.ownedCombatNodeIDs.count
     }
 
     static func unspentPoints(_ character: CharacterState) -> Int {
-        max(0, totalPoints(atLevel: character.level) + character.freePoints - spentPoints(character))
-    }
-
-    // MARK: Spending
-
-    /// How far into a branch somebody has bought.
-    static func depth(of branch: CombatBranchID, in character: CharacterState) -> Int {
-        character.branchDepth[branch] ?? 0
-    }
-
-    /// The next node in a branch, or nil at the capstone.
-    static func nextNode(in branch: CombatBranchDef, for character: CharacterState) -> CombatNodeDef? {
-        let bought = depth(of: branch.id, in: character)
-        return bought < branch.nodes.count ? branch.nodes[bought] : nil
-    }
-
-    /// **Bought in order, one point each.** Depth comes from nodes getting stronger rather than
-    /// costlier — easier to reason about on a phone, and it keeps the decision "which three" rather
-    /// than "can I afford the next one".
-    static func canBuyNext(in branch: CombatBranchDef, for character: CharacterState) -> Bool {
-        nextNode(in: branch, for: character) != nil && unspentPoints(character) > 0
-    }
-
-    @discardableResult
-    static func buyNext(in branch: CombatBranchDef, for character: inout CharacterState) -> CombatNodeDef? {
-        guard canBuyNext(in: branch, for: character),
-              let node = nextNode(in: branch, for: character) else { return nil }
-        character.branchDepth[branch.id, default: 0] += 1
-        return node
+        character.unspentCombatPoints
     }
 
     /// **Unspending.** Aimee, 7 Aug: *"people should be able to be respec'd at the spring in town."*
@@ -69,37 +41,22 @@ enum CombatTreeRules {
         return Tuning.Character.respecBaseCost + spent * Tuning.Character.respecCostPerPoint
     }
 
-    static func forget(_ character: inout CharacterState) {
-        character.branchDepth = [:]
+    static func respec(_ character: inout CharacterState) {
+        character.unspentCombatPoints += character.ownedCombatNodeIDs.count
         character.ownedCombatNodeIDs = []
         character.combatNodeChoices = [:]
-    }
-
-    /// **Partial investment is legal.** The cap is on total points, so spreading across nine
-    /// branches gives you nine shallow ones rather than three deep — a worse choice, never an
-    /// illegal one. The commitment is the interesting part.
-    static func completedBranches(_ character: CharacterState) -> [CombatBranchDef] {
-        ContentCatalog.shared.combatBranches.filter {
-            depth(of: $0.id, in: character) >= $0.nodes.count
-        }
-    }
-
-    /// What the player would call this build. Emergent — nothing here is authored per companion.
-    static func className(for character: CharacterState) -> String? {
-        let finished = Set(completedBranches(character).map(\.id.rawValue))
-        guard finished.count >= 3 else { return nil }
-        for (name, branches) in Tuning.Character.emergentClasses where branches.isSubset(of: finished) {
-            return name
-        }
-        return "Adept"
     }
 
     // MARK: What it all adds up to
 
     /// Every node somebody has actually bought.
     static func boughtNodes(_ character: CharacterState) -> [CombatNodeDef] {
-        ContentCatalog.shared.combatBranches.flatMap { branch in
-            branch.nodes.prefix(depth(of: branch.id, in: character))
+        let graph = ContentCatalog.shared.combatGraph
+        return character.ownedCombatNodeIDs.compactMap { id in
+            guard let node = graph.node(id),
+                  let branch = ContentCatalog.shared.combatBranch(node.legacyBranchID),
+                  branch.nodes.indices.contains(node.formerIndex - 1) else { return nil }
+            return branch.nodes[node.formerIndex - 1]
         }
     }
 

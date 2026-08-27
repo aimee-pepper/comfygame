@@ -27,6 +27,7 @@ enum Migrations {
         }
         guard version < Tuning.saveSchemaVersion else {
             try validateCurrentChannelworksRestoration(in: data)
+            try validateCurrentCombatOpening(in: data)
             return data
         }
 
@@ -35,6 +36,7 @@ enum Migrations {
             working = try step(working, from: from)
         }
         try validateCurrentChannelworksRestoration(in: working)
+        try validateCurrentCombatOpening(in: working)
         return working
     }
 
@@ -42,6 +44,73 @@ enum Migrations {
     static func probeSchemaVersion(_ data: Data) -> Int? {
         struct Probe: Decodable { var schemaVersion: Int? }
         return (try? JSONDecoder().decode(Probe.self, from: data))?.schemaVersion
+    }
+
+    private static func validateCurrentCombatOpening(in data: Data) throws {
+        let root = try JSONSerialization.jsonObject(with: data)
+        let graph = ContentCatalog.shared.combatGraph
+        let implemented = CombatGraphRules.implementedNodeIDs(in: graph)
+
+        func integer(_ value: Any) throws -> Int {
+            guard let number = value as? NSNumber,
+                  CFGetTypeID(number) != CFBooleanGetTypeID(),
+                  let parsed = Int(number.stringValue),
+                  Double(parsed) == number.doubleValue, parsed >= 0 else {
+                throw CocoaError(.coderInvalidValue)
+            }
+            return parsed
+        }
+        func validateCharacter(_ object: [String: Any]) throws {
+            guard object["branchDepth"] == nil, object["freePoints"] == nil,
+                  let rawOwned = object["ownedCombatNodeIDs"] as? [Any],
+                  let rawChoices = object["combatNodeChoices"] as? [String: Any],
+                  let rawPoints = object["unspentCombatPoints"] else {
+                throw CocoaError(.coderInvalidValue)
+            }
+            var owned: Set<CombatNodeID> = []
+            for raw in rawOwned {
+                guard let string = raw as? String, !string.isEmpty else {
+                    throw CocoaError(.coderInvalidValue)
+                }
+                let id = CombatNodeID(rawValue: string)
+                guard implemented.contains(id), owned.insert(id).inserted else {
+                    throw CocoaError(.coderInvalidValue)
+                }
+            }
+            _ = try integer(rawPoints)
+            var choices: [CombatNodeID: StableChoiceID] = [:]
+            for (rawNode, rawChoice) in rawChoices {
+                let nodeID = CombatNodeID(rawValue: rawNode)
+                guard owned.contains(nodeID), let choiceString = rawChoice as? String,
+                      let node = graph.node(nodeID), !node.purchaseChoices.isEmpty else {
+                    throw CocoaError(.coderInvalidValue)
+                }
+                let choice = StableChoiceID(rawValue: choiceString)
+                guard node.purchaseChoices.contains(choice), choices[nodeID] == nil else {
+                    throw CocoaError(.coderInvalidValue)
+                }
+                choices[nodeID] = choice
+            }
+            for id in owned {
+                guard let node = graph.node(id),
+                      node.purchaseChoices.isEmpty || choices[id] != nil else {
+                    throw CocoaError(.coderInvalidValue)
+                }
+            }
+        }
+        func walk(_ value: Any) throws {
+            if let array = value as? [Any] {
+                for child in array { try walk(child) }
+                return
+            }
+            guard let object = value as? [String: Any] else { return }
+            let isCharacter = object["ownedCombatNodeIDs"] != nil
+                || object["combatNodeChoices"] != nil || object["unspentCombatPoints"] != nil
+                || object["branchDepth"] != nil || object["freePoints"] != nil
+            if isCharacter { try validateCharacter(object) }
+            for child in object.values { try walk(child) }
+        }
+        try walk(root)
     }
 
     private static func step(_ data: Data, from version: Int) throws -> Data {
@@ -626,7 +695,7 @@ enum Migrations {
     }
 
     /// Freezes source danger and explicit once-only creature reward resolution across every run.
-    private static func migrate5to6(_ data: Data) throws -> Data {
+    private static func migrate6to7(_ data: Data) throws -> Data {
         guard var root = try JSONSerialization.jsonObject(with: data) as? [String: Any] else {
             throw CocoaError(.coderInvalidValue)
         }
@@ -723,12 +792,132 @@ enum Migrations {
             }
             root["worlds"] = worlds
         }
-        root["schemaVersion"] = 6
+        root["schemaVersion"] = 7
+        return try JSONSerialization.data(withJSONObject: root, options: [.sortedKeys])
+    }
+
+    /// Promotes stable combat-graph ownership, typed choices and durable unspent points.
+    private static func migrate4to5(_ data: Data) throws -> Data {
+        guard var root = try JSONSerialization.jsonObject(with: data) as? [String: Any] else {
+            throw CocoaError(.coderInvalidValue)
+        }
+        func integer(_ value: Any) throws -> Int {
+            guard let number = value as? NSNumber,
+                  CFGetTypeID(number) != CFBooleanGetTypeID(),
+                  let parsed = Int(number.stringValue),
+                  Double(parsed) == number.doubleValue,
+                  parsed >= 0 else { throw CocoaError(.coderInvalidValue) }
+            return parsed
+        }
+        let graph = ContentCatalog.shared.combatGraph
+        let insulation = CombatNodeID(rawValue: "combat.craft.emanation.insulation")
+
+        func migrateCharacter(_ input: [String: Any]) throws -> [String: Any] {
+            var object = input
+            let level = try object["level"].map(integer) ?? 1
+            let free = try object["freePoints"].map(integer) ?? 0
+            var owned: Set<String> = []
+            if let encoded = object["ownedCombatNodeIDs"] {
+                guard !(encoded is NSNull), let values = encoded as? [Any] else {
+                    throw CocoaError(.coderInvalidValue)
+                }
+                for value in values {
+                    guard let id = value as? String, !id.isEmpty,
+                          let node = graph.node(CombatNodeID(rawValue: id)),
+                          node.depth <= CombatGraphRules.openingMaximumDepth,
+                          owned.insert(id).inserted else {
+                        throw CocoaError(.coderInvalidValue)
+                    }
+                }
+            } else {
+                let depths = object["branchDepth"] as? [String: Any] ?? [:]
+                var claimed = 0
+                for (legacyID, rawDepth) in depths {
+                    let depth = try integer(rawDepth)
+                    claimed += depth
+                    guard let discipline = graph.disciplines.first(where: {
+                        $0.legacyBranchID.rawValue == legacyID
+                    }) else { continue }
+                    owned.formUnion(discipline.nodes.prefix(min(depth, discipline.nodes.count))
+                        .map { $0.id.rawValue })
+                }
+                let standard = CombatTreeRules.totalPoints(atLevel: level)
+                object["unspentCombatPoints"] = max(standard + free, claimed) - owned.count
+            }
+            if object["unspentCombatPoints"] == nil {
+                object["unspentCombatPoints"] = max(
+                    0, CombatTreeRules.totalPoints(atLevel: level) + free - owned.count)
+            } else {
+                _ = try integer(object["unspentCombatPoints"] as Any)
+            }
+            let decodedChoices: [String: Any]
+            if let encoded = object["combatNodeChoices"] {
+                guard !(encoded is NSNull), let decoded = encoded as? [String: Any] else {
+                    throw CocoaError(.coderInvalidValue)
+                }
+                decodedChoices = decoded
+            } else {
+                decodedChoices = [:]
+            }
+            var choices = decodedChoices
+            for (node, value) in choices {
+                guard owned.contains(node), let choice = value as? String,
+                      graph.node(CombatNodeID(rawValue: node))?.purchaseChoices
+                        .contains(StableChoiceID(rawValue: choice)) == true else {
+                    throw CocoaError(.coderInvalidValue)
+                }
+            }
+            if owned.contains(insulation.rawValue), choices[insulation.rawValue] == nil {
+                choices[insulation.rawValue] = "heat"
+            }
+            object["ownedCombatNodeIDs"] = owned.sorted()
+            object["combatNodeChoices"] = choices
+            object.removeValue(forKey: "branchDepth")
+            object.removeValue(forKey: "freePoints")
+            return object
+        }
+
+        let typedSkillKeys: Set<String> = ["skillID", "techniqueID", "grantsSkill", "selectedSkill"]
+        func migrate(_ value: Any) throws -> Any {
+            if let array = value as? [Any] { return try array.map(migrate) }
+            guard var object = value as? [String: Any] else { return value }
+            let isCharacter = object["level"] != nil
+                && (object["branchDepth"] != nil || object["ownedCombatNodeIDs"] != nil
+                    || object["unspentCombatPoints"] != nil)
+            if isCharacter { object = try migrateCharacter(object) }
+            for (key, child) in object {
+                if typedSkillKeys.contains(key), let string = child as? String,
+                   string == "elemental_strike" {
+                    object[key] = "emanation_strike"
+                } else if key == "skill", var payload = child as? [String: Any],
+                          let string = payload["_0"] as? String,
+                          string == "elemental_strike" {
+                    payload["_0"] = "emanation_strike"
+                    object[key] = payload
+                } else {
+                    object[key] = try migrate(child)
+                }
+            }
+            if var cooldowns = object["cooldowns"] as? [String: Any] {
+                for key in cooldowns.keys where key.hasSuffix("|elemental_strike") {
+                    let replacement = String(key.dropLast("elemental_strike".count)) + "emanation_strike"
+                    guard cooldowns[replacement] == nil else { throw CocoaError(.coderInvalidValue) }
+                    cooldowns[replacement] = cooldowns.removeValue(forKey: key)
+                }
+                object["cooldowns"] = cooldowns
+            }
+            return object
+        }
+        guard var migrated = try migrate(root) as? [String: Any] else {
+            throw CocoaError(.coderInvalidValue)
+        }
+        migrated["schemaVersion"] = 5
+        root = migrated
         return try JSONSerialization.data(withJSONObject: root, options: [.sortedKeys])
     }
 
     /// Freezes the deterministic creature-material projection onto ecology-aware species only.
-    private static func migrate4to5(_ data: Data) throws -> Data {
+    private static func migrate5to6(_ data: Data) throws -> Data {
         guard var root = try JSONSerialization.jsonObject(with: data) as? [String: Any] else {
             throw CocoaError(.coderInvalidValue)
         }
@@ -777,7 +966,7 @@ enum Migrations {
             }
             root["worlds"] = worlds
         }
-        root["schemaVersion"] = 5
+        root["schemaVersion"] = 6
         return try JSONSerialization.data(withJSONObject: root, options: [.sortedKeys])
     }
 

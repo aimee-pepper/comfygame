@@ -2,28 +2,55 @@ import Foundation
 
 /// Pure prerequisite and legacy-mapping rules for CombatGraphVersion 2.
 ///
-/// This deliberately does not activate v2 ownership yet. It lets catalogue, topology, route, and
-/// migration fixtures become authoritative before the save writer stops emitting `branchDepth`.
+/// Canonical depth-1–3 purchase, prerequisite and legacy-mapping authority.
 enum CombatGraphRules {
     static let graphVersion = 2
     static let openingMaximumDepth = 3
+    static let firstCompleteRouteNodeIDs: Set<CombatNodeID> = [
+        "combat.defense.fortitude.thick_hide",
+        "combat.defense.fortitude.iron_skin",
+        "combat.defense.fortitude.brace",
+        "combat.defense.fortitude.constitution",
+        "combat.defense.fortitude.endurance",
+        "combat.defense.fortitude.ward",
+        "combat.defense.fortitude.unyielding",
+        "combat.defense.fortitude.immovable",
+    ]
+    static let protectionCompleteRouteNodeIDs: Set<CombatNodeID> = [
+        "combat.defense.protection.bulwark",
+        "combat.defense.protection.watchful",
+        "combat.defense.protection.draw_off",
+        "combat.defense.protection.cover",
+        "combat.defense.protection.shieldwall",
+        "combat.defense.protection.interpose",
+        "combat.defense.protection.rally",
+        "combat.defense.protection.guardian",
+    ]
+    static let evasionCompleteRouteNodeIDs: Set<CombatNodeID> = [
+        "combat.defense.evasion.footwork",
+        "combat.defense.evasion.light_frame",
+        "combat.defense.evasion.sidestep",
+        "combat.defense.evasion.slippery",
+        "combat.defense.evasion.fall_back",
+        "combat.defense.evasion.feint",
+        "combat.defense.evasion.untouchable",
+        "combat.defense.evasion.ghost",
+    ]
 
-    enum PurchaseRefusal: String, Error, Equatable, Sendable {
-        case unavailable = "This development is not implemented yet."
-        case alreadyOwned = "Already learned."
-        case missingPoint = "No combat point is available."
-        case illegalParent = "Learn one of the required earlier Skills first."
-        case invalidChoice = "That selection is not available for this development."
-        case stale = "This character changed. Review the development and try again."
+    enum PurchaseRefusal: Error, Equatable, Sendable {
+        case unavailable, alreadyOwned, missingPoint, illegalParent, invalidChoice
+        case encounterActive, ineligibleMember, stale
 
         var playerCopy: String {
             switch self {
-            case .unavailable: "This Skill is not available yet."
+            case .unavailable: "This development is not implemented yet."
             case .alreadyOwned: "Already learned."
-            case .missingPoint: "No Combat Point is available."
-            case .illegalParent: "Learn one of the required earlier Skills first."
-            case .invalidChoice: "That choice is not available for this Skill."
-            case .stale: "This character changed. Review this Skill and try again."
+            case .missingPoint: "No combat point is available."
+            case .illegalParent: "Learn one of this development’s exact prerequisites first."
+            case .invalidChoice: "That selection is not available for this development."
+            case .encounterActive: "Combat practice cannot change during an encounter."
+            case .ineligibleMember: "This party member cannot learn human combat practice."
+            case .stale: "This character changed. Review the development and try again."
             }
         }
     }
@@ -33,6 +60,8 @@ enum CombatGraphRules {
         var choice: StableChoiceID?
         var ownedBefore: Set<CombatNodeID>
         var pointsBefore: Int
+        var graphVersion: Int
+        var characterRevision: UInt64
     }
 
     enum PurchaseResult: Equatable, Sendable {
@@ -47,6 +76,20 @@ enum CombatGraphRules {
 
     static func implementedOpeningNodeIDs(in catalogue: CombatGraphCatalogue) -> Set<CombatNodeID> {
         Set(catalogue.nodes.filter { $0.depth <= openingMaximumDepth }.map(\.id))
+    }
+
+    static func implementedNodeIDs(in catalogue: CombatGraphCatalogue) -> Set<CombatNodeID> {
+        implementedOpeningNodeIDs(in: catalogue)
+            .union(firstCompleteRouteNodeIDs)
+            .union(protectionCompleteRouteNodeIDs)
+            .union(evasionCompleteRouteNodeIDs)
+    }
+
+    static func isImplemented(_ node: CombatGraphNodeDef) -> Bool {
+        node.depth <= openingMaximumDepth
+            || firstCompleteRouteNodeIDs.contains(node.id)
+            || protectionCompleteRouteNodeIDs.contains(node.id)
+            || evasionCompleteRouteNodeIDs.contains(node.id)
     }
 
     static func migratedLegacyNodes(branchDepth: [CombatBranchID: Int],
@@ -67,20 +110,18 @@ enum CombatGraphRules {
     static func ownedNodes(for character: CharacterState,
                            catalogue: CombatGraphCatalogue) -> Set<CombatNodeID> {
         character.ownedCombatNodeIDs
-            ?? reconcileLegacy(branchDepth: character.branchDepth, catalogue: catalogue).owned
     }
 
     static func unspentPoints(for character: CharacterState,
                               catalogue: CombatGraphCatalogue) -> Int {
-        let earned = CombatTreeRules.totalPoints(atLevel: character.level) + character.freePoints
-        return max(0, earned - ownedNodes(for: character, catalogue: catalogue).count)
+        character.unspentCombatPoints
     }
 
     static func previewPurchase(_ nodeID: CombatNodeID, choice: StableChoiceID? = nil,
                                 for character: CharacterState,
                                 catalogue: CombatGraphCatalogue)
         -> Result<PurchaseQuote, PurchaseRefusal> {
-        guard let node = catalogue.node(nodeID), node.depth <= openingMaximumDepth else {
+        guard let node = catalogue.node(nodeID), isImplemented(node) else {
             return .failure(.unavailable)
         }
         let owned = ownedNodes(for: character, catalogue: catalogue)
@@ -91,13 +132,18 @@ enum CombatGraphRules {
         guard canPurchase(node, owned: owned, catalogue: catalogue) else {
             return .failure(.illegalParent)
         }
-        // No depth-1–3 authority record declares a typed choice. Reject stray selections rather
-        // than persisting an unowned or invented option.
-        guard choice == nil else { return .failure(.invalidChoice) }
+        if node.purchaseChoices.isEmpty {
+            guard choice == nil else { return .failure(.invalidChoice) }
+        } else {
+            guard let choice, node.purchaseChoices.contains(choice) else {
+                return .failure(.invalidChoice)
+            }
+        }
         return .success(PurchaseQuote(nodeID: nodeID, choice: choice,
                                       ownedBefore: owned,
-                                      pointsBefore: unspentPoints(for: character,
-                                                                  catalogue: catalogue)))
+                                      pointsBefore: character.unspentCombatPoints,
+                                      graphVersion: catalogue.graphVersion,
+                                      characterRevision: revision(of: character)))
     }
 
     @discardableResult
@@ -105,13 +151,27 @@ enum CombatGraphRules {
                        catalogue: CombatGraphCatalogue) -> PurchaseResult {
         guard case .success(let current) = previewPurchase(quote.nodeID, choice: quote.choice,
                                                            for: character, catalogue: catalogue),
-              current == quote else { return .refused(.stale) }
+              current == quote,
+              quote.graphVersion == graphVersion else { return .refused(.stale) }
         var owned = current.ownedBefore
         owned.insert(current.nodeID)
         character.ownedCombatNodeIDs = owned
+        character.unspentCombatPoints -= 1
         character.combatNodeChoices = character.combatNodeChoices.filter { owned.contains($0.key) }
         if let choice = current.choice { character.combatNodeChoices[current.nodeID] = choice }
         return .committed(current.nodeID)
+    }
+
+    static func revision(of character: CharacterState) -> UInt64 {
+        var value: UInt64 = 14_695_981_039_346_656_037
+        let fields = character.ownedCombatNodeIDs.map(\.rawValue).sorted()
+            + character.combatNodeChoices.sorted { $0.key.rawValue < $1.key.rawValue }
+                .flatMap { [$0.key.rawValue, $0.value.rawValue] }
+            + [String(character.unspentCombatPoints)]
+        for byte in fields.joined(separator: "|").utf8 {
+            value = (value ^ UInt64(byte)) &* 1_099_511_628_211
+        }
+        return value
     }
 
     static func canPurchase(_ node: CombatGraphNodeDef, owned: Set<CombatNodeID>,
@@ -128,7 +188,8 @@ enum CombatGraphRules {
 
     static func availableNodes(owned: Set<CombatNodeID>,
                                catalogue: CombatGraphCatalogue) -> [CombatGraphNodeDef] {
-        catalogue.nodes.filter { canPurchase($0, owned: owned, catalogue: catalogue) }
+        catalogue.nodes.filter { isImplemented($0)
+            && canPurchase($0, owned: owned, catalogue: catalogue) }
     }
 
     static func isLegalPurchaseOrder(_ ids: [CombatNodeID],

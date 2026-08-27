@@ -384,6 +384,17 @@ struct ContentCatalog: Sendable {
         try validateCombatGraph()
 
         for traveller in travellers {
+            guard traveller.combatGraphVersion == CombatGraphRules.graphVersion,
+                  !traveller.combatNodePlan.isEmpty,
+                  Set(traveller.combatNodePlan).count == traveller.combatNodePlan.count,
+                  traveller.combatNodePlan.allSatisfy({ node in
+                      combatGraph.node(node).map { $0.depth <= CombatGraphRules.openingMaximumDepth } == true
+                  }),
+                  CombatGraphRules.isLegalPurchaseOrder(traveller.combatNodePlan,
+                                                        catalogue: combatGraph) else {
+                throw ContentError.danglingReference(
+                    "traveller '\(traveller.id)' has an invalid combat graph v2 arrival plan")
+            }
             guard let meeting = traveller.meeting else { continue }
             let ids = meeting.questions.map(\.id)
             guard ids.allSatisfy({ !$0.isEmpty && !$0.hasPrefix("legacy.") }) else {
@@ -1052,7 +1063,8 @@ struct ContentCatalog: Sendable {
                         throw ContentError.danglingReference(
                             "generated combat node '\(node.id)' is stale against authored node content")
                     }
-                    if let skill = node.legacyTechniqueID, !skillIDs.contains(skill) {
+                    if let skill = node.legacyTechniqueID,
+                       !skillIDs.contains(skill), skill != "elemental_strike" {
                         throw ContentError.danglingReference(
                             "combat node '\(node.id)' grants unknown technique '\(skill)'")
                     }
@@ -1060,6 +1072,15 @@ struct ContentCatalog: Sendable {
                        !skillIDs.contains(skill), !pendingV2SkillIDs.contains(skill) {
                         throw ContentError.danglingReference(
                             "combat node '\(node.id)' grants unknown v2 technique '\(skill)'")
+                    }
+                    if node.id == "combat.craft.emanation.insulation" {
+                        guard node.purchaseChoices == ["heat", "caustic", "light"] else {
+                            throw ContentError.danglingReference(
+                                "combat insulation must own the exact heat/caustic/light choice")
+                        }
+                    } else if !node.purchaseChoices.isEmpty {
+                        throw ContentError.danglingReference(
+                            "combat node '\(node.id)' owns an unauthorized purchase choice")
                     }
                     guard !node.effectCopy.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
                         throw ContentError.danglingReference(

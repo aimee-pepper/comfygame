@@ -56,16 +56,9 @@ struct TravellerDef: Codable, Equatable, Identifiable, Sendable {
     /// particular person's diary can be motivated by what they knew.
     var leansToward: [DiaryPageDef.Kind]
 
-    /// **Where their trade already took them**, as free points in combat branches.
-    ///
-    /// *"A calling gives a starting lean, never a limit"* (`combat-trees-full.md` §6). Halloway the
-    /// smith begins in Force because she has swung a hammer for a living; nothing stops you making
-    /// her a knife-fighter, and a respec can move even this.
-    ///
-    /// **Free, not deducted.** A lean is who somebody was before you met them, not what they have
-    /// learned since — charging it against the level budget would make an experienced tradesperson
-    /// arrive *behind* a stranger, which is backwards.
-    var lean: [CombatBranchID: Int] = [:]
+    /// Stable authored bonus practice owned on recruitment. It never consumes standard points.
+    var combatGraphVersion: Int
+    var combatNodePlan: [CombatNodeID]
 
     /// **What they say when you walk up to them** (Aimee, 6 Aug).
     ///
@@ -112,7 +105,8 @@ struct TravellerDef: Codable, Equatable, Identifiable, Sendable {
         worldwork = min(3, max(0, try c.decodeIfPresent(Int.self, forKey: .worldwork) ?? 1))
         signature = try c.decodeIfPresent([SignatureClue].self, forKey: .signature) ?? []
         leansToward = try c.decodeIfPresent([DiaryPageDef.Kind].self, forKey: .leansToward) ?? []
-        lean = try c.decodeIfPresent([CombatBranchID: Int].self, forKey: .lean) ?? [:]
+        combatGraphVersion = try c.decode(Int.self, forKey: .combatGraphVersion)
+        combatNodePlan = try c.decode([CombatNodeID].self, forKey: .combatNodePlan)
         meeting = try c.decodeIfPresent(TravellerMeeting.self, forKey: .meeting)
         isRequired = try c.decodeIfPresent(Bool.self, forKey: .isRequired) ?? false
     }

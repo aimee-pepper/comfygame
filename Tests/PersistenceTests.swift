@@ -38,6 +38,66 @@ final class PersistenceTests: XCTestCase {
     }
 
 
+    func testSchemaFourCombatOpeningMigrationFreezesOwnershipChoiceAndRefundsUnknownDepth() throws {
+        let legacy = Data(#"{"schemaVersion":4,"character":{"level":4,"branchDepth":{"kindling":2,"retired":3},"freePoints":1}}"#.utf8)
+        let migrated = try Migrations.migrateIfNeeded(legacy)
+        let root = try XCTUnwrap(JSONSerialization.jsonObject(with: migrated) as? [String: Any])
+        let character = try XCTUnwrap(root["character"] as? [String: Any])
+        XCTAssertNil(character["branchDepth"])
+        XCTAssertNil(character["freePoints"])
+        XCTAssertEqual(character["ownedCombatNodeIDs"] as? [String], [
+            "combat.craft.emanation.insulation", "combat.craft.emanation.sparkhand",
+        ])
+        XCTAssertEqual(character["unspentCombatPoints"] as? Int, 3)
+        XCTAssertEqual((character["combatNodeChoices"] as? [String: String])?[
+            "combat.craft.emanation.insulation"], "heat")
+        XCTAssertEqual(try Migrations.migrateIfNeeded(migrated), migrated)
+    }
+
+    func testSchemaFourCombatOpeningMigrationRejectsMalformedLegacyAndCanonicalValues() {
+        let fixtures = [
+            #"{"schemaVersion":4,"character":{"level":4,"branchDepth":{"force":true}}}"#,
+            #"{"schemaVersion":4,"character":{"level":4,"branchDepth":{"force":1.5}}}"#,
+            #"{"schemaVersion":4,"character":{"level":4,"ownedCombatNodeIDs":null}}"#,
+            #"{"schemaVersion":4,"character":{"level":4,"ownedCombatNodeIDs":[],"combatNodeChoices":null}}"#,
+            #"{"schemaVersion":4,"character":{"level":4,"ownedCombatNodeIDs":[],"unspentCombatPoints":-1}}"#,
+        ]
+        for fixture in fixtures {
+            XCTAssertThrowsError(try Migrations.migrateIfNeeded(Data(fixture.utf8)), fixture)
+        }
+    }
+
+    func testCurrentCombatOwnershipRequiresCanonicalFieldsAndExactImplementedMembership() throws {
+        let valid = Data(#"{"schemaVersion":7,"character":{"ownedCombatNodeIDs":[],"combatNodeChoices":{},"unspentCombatPoints":0}}"#.utf8)
+        XCTAssertEqual(try Migrations.migrateIfNeeded(valid), valid)
+        let fortitude = Data(#"{"schemaVersion":7,"character":{"ownedCombatNodeIDs":["combat.defense.fortitude.thick_hide","combat.defense.fortitude.iron_skin","combat.defense.fortitude.brace","combat.defense.fortitude.constitution","combat.defense.fortitude.endurance","combat.defense.fortitude.ward","combat.defense.fortitude.unyielding","combat.defense.fortitude.immovable"],"combatNodeChoices":{},"unspentCombatPoints":0}}"#.utf8)
+        XCTAssertEqual(try Migrations.migrateIfNeeded(fortitude), fortitude)
+        let malformed = [
+            #"{"schemaVersion":7,"character":{"combatNodeChoices":{},"unspentCombatPoints":0}}"#,
+            #"{"schemaVersion":7,"character":{"ownedCombatNodeIDs":[],"unspentCombatPoints":0}}"#,
+            #"{"schemaVersion":7,"character":{"ownedCombatNodeIDs":[],"combatNodeChoices":{}}}"#,
+            #"{"schemaVersion":7,"character":{"ownedCombatNodeIDs":null,"combatNodeChoices":{},"unspentCombatPoints":0}}"#,
+            #"{"schemaVersion":7,"character":{"ownedCombatNodeIDs":["combat.offense.force.heavy_hand","combat.offense.force.heavy_hand"],"combatNodeChoices":{},"unspentCombatPoints":0}}"#,
+            #"{"schemaVersion":7,"character":{"ownedCombatNodeIDs":["combat.offense.force.shatter"],"combatNodeChoices":{},"unspentCombatPoints":0}}"#,
+            #"{"schemaVersion":7,"character":{"ownedCombatNodeIDs":["unknown"],"combatNodeChoices":{},"unspentCombatPoints":0}}"#,
+            #"{"schemaVersion":7,"character":{"ownedCombatNodeIDs":["combat.craft.emanation.insulation"],"combatNodeChoices":{},"unspentCombatPoints":0}}"#,
+        ]
+        for fixture in malformed {
+            let bytes = Data(fixture.utf8)
+            let original = bytes
+            XCTAssertThrowsError(try Migrations.migrateIfNeeded(bytes), fixture)
+            XCTAssertEqual(bytes, original)
+        }
+    }
+
+    func testElementalRenameTouchesOnlyTypedSkillOwners() throws {
+        let legacy = Data(#"{"schemaVersion":4,"note":"elemental_strike","skillID":"elemental_strike","character":{"level":1,"branchDepth":{},"freePoints":0}}"#.utf8)
+        let migrated = try Migrations.migrateIfNeeded(legacy)
+        let root = try XCTUnwrap(JSONSerialization.jsonObject(with: migrated) as? [String: Any])
+        XCTAssertEqual(root["note"] as? String, "elemental_strike")
+        XCTAssertEqual(root["skillID"] as? String, "emanation_strike")
+    }
+
     func testSchemaThreeExtractionReceiptMigrationFreezesCatalogueTruthAndFailsUnknown() throws {
         let legacy = Data(#"{"schemaVersion":3,"nested":{"resource":"gold","remainingHarvests":2,"yieldPerHarvest":3}}"#.utf8)
         let migrated = try Migrations.migrateIfNeeded(legacy)

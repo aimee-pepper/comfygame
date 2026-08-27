@@ -532,26 +532,14 @@ enum CombatRules {
     /// Identity techniques remain separate from graph ownership: Binder carries Unbind/Sight,
     /// Quill carries Mend/Read, and Ashe carries Ground. `SkillDef.owner` and Rout are legacy input.
     static func skills(for actor: Combatant, in state: GameState) -> [SkillDef] {
-        var owned = CombatActionOwnershipRules.availableSkillIDs(for: actor, in: state)
+        var owned = CombatActionOwnershipRules.innateSkillIDs(for: actor, in: state)
         if let modern = state.worlds.activeRun?.activeEncounter?.debugV2OwnedNodeIDs {
-            owned.subtract(["steady", "snuff", "interpose", "draw_off", "quicken",
-                            "overbear", "first_strike"])
-            if modern[actor]?.contains(CombatDerivedStatsRules.Node.quench) == true {
-                owned.insert("quench")
-            }
-            if modern[actor]?.contains(CombatDerivedStatsRules.Node.snuff) == true {
-                owned.insert("snuff")
-            }
-            if modern[actor]?.contains(CombatDerivedStatsRules.Node.interpose) == true {
-                owned.insert("interpose")
-            }
-            if modern[actor]?.contains(CombatDerivedStatsRules.Node.drawOff) == true {
-                owned.insert("draw_off")
-            }
-            if modern[actor]?.contains(quickenNode) == true { owned.insert("quicken") }
-            if modern[actor]?.contains(overbearNode) == true { owned.insert("overbear") }
-            if modern[actor]?.contains(firstStrikeNode) == true { owned.insert("first_strike") }
+            let graph = ContentCatalog.shared.combatGraph
+            owned.formUnion((modern[actor] ?? []).compactMap { graph.node($0)?.techniqueID })
+        } else {
+            owned.formUnion(CombatActionOwnershipRules.availableSkillIDs(for: actor, in: state))
         }
+        owned.subtract(CombatActionOwnershipRules.retiredDecodeOnly)
         return ContentCatalog.shared.skills.filter { owned.contains($0.id) }
     }
 
@@ -1274,9 +1262,9 @@ enum CombatRules {
         state.base.partyMembers.map { member in
             let actor = member.combatant
             let graph = ContentCatalog.shared.combatGraph
-            let opening = CombatGraphRules.implementedOpeningNodeIDs(in: graph)
-            var selected = (state.base.character(member).ownedCombatNodeIDs ?? [])
-                .intersection(opening)
+            let implemented = CombatGraphRules.implementedNodeIDs(in: graph)
+            var selected = state.base.character(member).ownedCombatNodeIDs
+                .intersection(implemented)
             if tuning.debugCombatV2BinderAttackEnabled {
                 switch member {
                 case .binder: selected.formUnion(tuning.debugCombatV2BinderNodeIDs)

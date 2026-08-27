@@ -36,6 +36,8 @@ struct CombatGraphNodeDef: Codable, Equatable, Identifiable, Sendable {
     var legacyTechniqueID: SkillID?
     /// Canonical v2 action grant. Nil is an explicit passive/no-action declaration.
     var techniqueID: SkillID?
+    /// Authored purchase-time choices. Empty means the node requires no choice.
+    var purchaseChoices: [StableChoiceID]
     /// Exact player-facing Effect copy generated from Design authority.
     var effectCopy: String
     var sameDisciplineParents: [CombatNodeID]

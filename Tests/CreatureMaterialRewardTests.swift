@@ -107,7 +107,7 @@ final class CreatureMaterialRewardTests: XCTestCase {
         let migrated = try Migrations.migrateIfNeeded(
             JSONSerialization.data(withJSONObject: root, options: [.sortedKeys]))
         let object = try XCTUnwrap(JSONSerialization.jsonObject(with: migrated) as? [String: Any])
-        XCTAssertEqual(object["schemaVersion"] as? Int, 7)
+        XCTAssertEqual(object["schemaVersion"] as? Int, Tuning.saveSchemaVersion)
         let worlds = try XCTUnwrap(object["worlds"] as? [String: Any])
         let active = try XCTUnwrap(worlds["activeRun"] as? [String: Any])
         XCTAssertNotNil(active["sourceDangerReceipt"])
@@ -278,7 +278,7 @@ final class CreatureMaterialRewardTests: XCTestCase {
         XCTAssertEqual(raw, try JSONSerialization.data(withJSONObject: root, options: [.sortedKeys]))
     }
 
-    func testCurrentSchemaSixOmissionsFailClosedInsteadOfReconstructing() throws {
+    func testCurrentSchemaSevenOmissionsFailClosedInsteadOfReconstructing() throws {
         var state = GameState.newGame()
         var run = fixtureRun()
         let stats = CombatStats(displayName: "Guardian", icon: "ant", maxHP: 4, attack: 1)

@@ -11,7 +11,10 @@ final class NollRecyclerPromotionTests: XCTestCase {
         XCTAssertEqual(noll.campaignPhase, .opening)
         XCTAssertEqual(noll.calling, "a Salvager")
         XCTAssertEqual(noll.signature.count, 2)
-        XCTAssertEqual(noll.lean, ["precision": 1, "protection": 1])
+        XCTAssertEqual(noll.combatGraphVersion, 2)
+        XCTAssertEqual(noll.combatNodePlan, [
+            "combat.offense.precision.keen_eye", "combat.defense.protection.bulwark",
+        ])
         XCTAssertEqual(catalog.traveller("vance")?.authoredOrder, 1)
         XCTAssertEqual(catalog.traveller("halloway")?.authoredOrder, 3)
         XCTAssertEqual(catalog.diary(of: "noll").map(\.id),
