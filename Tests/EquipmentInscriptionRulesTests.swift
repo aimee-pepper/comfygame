@@ -123,6 +123,38 @@ final class EquipmentInscriptionRulesTests: XCTestCase {
         XCTAssertEqual(decoded.base.inventory.stacks, state.base.inventory.stacks)
     }
 
+    @MainActor
+    func testLiveErasureRejectsStoredAndInactiveRosterUnknownInscriptionsByteExactly() throws {
+        let unknown = EquipmentInscriptionReceiptV1(version: 1,
+                                                     definitionID: "future_starlace",
+                                                     sourceItemID: "future_source",
+                                                     rulesVersion: 7, inkRecipe: nil)
+
+        let stored = GameStore(io: .temporary(name: "seamward-erase-stored-\(UUID().uuidString)"))
+        stored.mutate("stored unknown inscription", flush: true) { state in
+            state = eligibleState()
+            state.base.inventory.stacks[0].gearProfile?.inscription = unknown
+        }
+        let storedBefore = try SaveCodec.encode(stored.state)
+        XCTAssertFalse(stored.eraseInscription(on: .init(rawValue: 40), expected: unknown))
+        XCTAssertEqual(try SaveCodec.encode(stored.state), storedBefore)
+
+        let inactive = GameStore(io: .temporary(name: "seamward-erase-inactive-\(UUID().uuidString)"))
+        inactive.mutate("inactive wearer unknown inscription", flush: true) { state in
+            state = eligibleState()
+            state.base.activeParty = []
+            var worn = state.base.inventory.stacks.removeFirst()
+            worn.gearProfile?.inscription = unknown
+            state.base.roster[0].equipped[.armor] = EquippedPiece(worn)
+        }
+        let inactiveBefore = try SaveCodec.encode(inactive.state)
+        XCTAssertFalse(inactive.eraseInscription(on: .init(rawValue: 40), expected: unknown))
+        XCTAssertEqual(try SaveCodec.encode(inactive.state), inactiveBefore)
+        XCTAssertEqual(inactive.state.base.roster[0].equipped[.armor]?.gearProfile?.inscription,
+                       unknown)
+        XCTAssertNil(EquipmentInscriptionRules.expeditionReceipt(from: inactive.state.base))
+    }
+
     func testCollapseActivatesWithoutExtraTurnAndGuidancePersists() throws {
         var state = GameState.newGame()
         var active = makeWorldRun()

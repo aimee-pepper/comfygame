@@ -268,8 +268,11 @@ enum EquipmentInscriptionRules {
     static func erase(_ gearID: InstanceID, expected: EquipmentInscriptionReceiptV1,
                       in state: inout GameState) -> Bool {
         var candidate = state
+        guard expected.isActiveSeamward else { return false }
         guard let (location, profile) = locatedGear(gearID, in: candidate.base),
-              profile.inscription == expected else { return false }
+              let installed = profile.inscription,
+              installed.isActiveSeamward,
+              installed == expected else { return false }
         guard setInscription(nil, on: gearID, at: location, in: &candidate.base) else { return false }
         state = candidate
         return true
