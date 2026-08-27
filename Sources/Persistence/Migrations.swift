@@ -45,11 +45,66 @@ enum Migrations {
         case 1: return try migrate1to2(data)
         case 2: return try migrate2to3(data)
         case 3: return try migrate3to4(data)
+        case 4: return try migrate4to5(data)
         default:
             // No migration registered. Tolerant decoding is the fallback; if the save is genuinely
             // incompatible, `SaveFileIO.load()` quarantines it rather than losing it.
             return data
         }
+    }
+
+    /// Freezes the deterministic creature-material projection onto ecology-aware species only.
+    private static func migrate4to5(_ data: Data) throws -> Data {
+        guard var root = try JSONSerialization.jsonObject(with: data) as? [String: Any] else {
+            throw CocoaError(.coderInvalidValue)
+        }
+
+        func migratedSpecies(_ value: Any) throws -> Any {
+            guard var object = value as? [String: Any] else { throw CocoaError(.coderInvalidValue) }
+            let hasHabitat = object["habitat"] != nil && !(object["habitat"] is NSNull)
+            let hasProjection = object.keys.contains("materialProjection")
+            if hasProjection {
+                guard hasHabitat, !(object["materialProjection"] is NSNull) else {
+                    throw CocoaError(.coderInvalidValue)
+                }
+                _ = try SaveCodec.makeDecoder().decode(
+                    CreatureMaterialProjectionReceiptV1.self,
+                    from: JSONSerialization.data(withJSONObject: object["materialProjection"] as Any))
+                return object
+            }
+            guard hasHabitat else { return object }
+            let species = try SaveCodec.makeDecoder().decode(
+                Species.self, from: JSONSerialization.data(withJSONObject: object))
+            guard case .frozen(let receipt) = CreatureMaterialProjectionRules.freeze(
+                traits: species.traits, habitat: species.habitat) else {
+                throw CocoaError(.coderInvalidValue)
+            }
+            object["materialProjection"] = try JSONSerialization.jsonObject(
+                with: SaveCodec.makeEncoder().encode(receipt))
+            return object
+        }
+
+        func migrateCast(in runValue: Any) throws -> Any {
+            guard var run = runValue as? [String: Any] else { throw CocoaError(.coderInvalidValue) }
+            if let cast = run["cast"] as? [Any] { run["cast"] = try cast.map(migratedSpecies) }
+            return run
+        }
+
+        if var worlds = root["worlds"] as? [String: Any] {
+            if let active = worlds["activeRun"], !(active is NSNull) {
+                worlds["activeRun"] = try migrateCast(in: active)
+            }
+            if let realms = worlds["anchoredRealms"] as? [[String: Any]] {
+                worlds["anchoredRealms"] = try realms.map { realmValue in
+                    var realm = realmValue
+                    if let world = realm["world"] { realm["world"] = try migrateCast(in: world) }
+                    return realm
+                }
+            }
+            root["worlds"] = worlds
+        }
+        root["schemaVersion"] = 5
+        return try JSONSerialization.data(withJSONObject: root, options: [.sortedKeys])
     }
 
     /// Freezes the catalogue-owned extraction classification onto every persisted world node.
