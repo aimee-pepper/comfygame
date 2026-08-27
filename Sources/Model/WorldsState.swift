@@ -1105,6 +1105,8 @@ struct WorldRun: Codable, Equatable, Sendable {
     var sourceDangerReceipt: WorldSourceDangerReceiptV1?
     /// Immutable encounter reward receipts retained until Return freezes the outcome.
     var creatureMaterialRewardReceipts: [CreatureMaterialRewardReceiptV1] = []
+    /// Strongest-once Anatomy ownership frozen from the exact departing party.
+    var anatomyButcheryReceipt: AnatomyButcheryReceiptV1?
     /// Frozen at departure: changing next trip's kit cannot alter a world already in progress.
     var carriedInstruments: Set<PressureTargetID> = []
     /// Grade is frozen at departure along with the packing choice.
@@ -1185,7 +1187,8 @@ struct WorldRun: Codable, Equatable, Sendable {
          atmospherePresentationReceipt: WorldAtmospherePresentationReceiptV1? = nil,
          worldArrivalReceipt: WorldArrivalReceipt? = nil,
          sourceDangerReceipt: WorldSourceDangerReceiptV1? = nil,
-         creatureMaterialRewardReceipts: [CreatureMaterialRewardReceiptV1] = []) {
+         creatureMaterialRewardReceipts: [CreatureMaterialRewardReceiptV1] = [],
+         anatomyButcheryReceipt: AnatomyButcheryReceiptV1? = nil) {
         self.runIndex = runIndex
         self.book = book
         self.mapSeed = mapSeed
@@ -1197,6 +1200,7 @@ struct WorldRun: Codable, Equatable, Sendable {
         self.worldArrivalReceipt = worldArrivalReceipt
         self.sourceDangerReceipt = sourceDangerReceipt ?? .freeze(book: book)
         self.creatureMaterialRewardReceipts = creatureMaterialRewardReceipts
+        self.anatomyButcheryReceipt = anatomyButcheryReceipt
         self.generationDiagnostics = generationDiagnostics
         self.clock = WorldClock(book: book, seed: mapSeed)
         self.map = map
@@ -1350,6 +1354,16 @@ struct WorldRun: Codable, Equatable, Sendable {
         }
         creatureMaterialRewardReceipts = try container.decodeIfPresent(
             [CreatureMaterialRewardReceiptV1].self, forKey: .creatureMaterialRewardReceipts) ?? []
+        if container.contains(.anatomyButcheryReceipt) {
+            guard try !container.decodeNil(forKey: .anatomyButcheryReceipt) else {
+                throw CocoaError(.coderInvalidValue)
+            }
+            anatomyButcheryReceipt = try container.decode(
+                AnatomyButcheryReceiptV1.self, forKey: .anatomyButcheryReceipt)
+        } else {
+            anatomyButcheryReceipt = nil
+        }
+        try anatomyButcheryReceipt?.validate()
         carriedInstruments = try container.decodeIfPresent(Set<PressureTargetID>.self,
                                                             forKey: .carriedInstruments) ?? []
         carriedInstrumentPrecisions = try container.decodeIfPresent(
@@ -1454,6 +1468,7 @@ extension WorldRun {
         snapshot.partyProgressAtStart = []
         snapshot.experienceBreakdown = RunExperienceBreakdown()
         snapshot.creatureMaterialRewardReceipts = []
+        snapshot.anatomyButcheryReceipt = nil
         snapshot.carriedItemCountsAtStart = [:]
         snapshot.foundPagesAtStart = []
         snapshot.seamlightGuidance = nil

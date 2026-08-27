@@ -64,6 +64,54 @@ struct WorldSourceDangerReceiptV1: Codable, Equatable, Sendable {
     }
 }
 
+/// Frozen expedition-level authority for Precision's strongest-once Anatomy bonus.
+///
+/// The exact participants are captured when the party departs. Later roster, respec, health and
+/// encounter changes therefore cannot add or remove the bonus from a live expedition.
+struct AnatomyButcheryReceiptV1: Codable, Equatable, Sendable {
+    static let version = 1
+    static let bonusPercent = 35
+
+    var version: Int
+    var contributingPartyMembers: [PartyMember]
+    var bonusPercent: Int
+
+    init(contributingPartyMembers: [PartyMember]) {
+        version = Self.version
+        self.contributingPartyMembers = contributingPartyMembers.sorted { $0.id < $1.id }
+        bonusPercent = Self.bonusPercent
+    }
+
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CreatureRewardCodingKey.self)
+        try requireCreatureRewardKeys(c, ["version", "contributingPartyMembers", "bonusPercent"])
+        version = try c.decode(Int.self, forKey: .init("version"))
+        contributingPartyMembers = try c.decode([PartyMember].self,
+                                                 forKey: .init("contributingPartyMembers"))
+        bonusPercent = try c.decode(Int.self, forKey: .init("bonusPercent"))
+        try validate()
+    }
+
+    func encode(to encoder: Encoder) throws {
+        var c = encoder.container(keyedBy: CreatureRewardCodingKey.self)
+        try c.encode(version, forKey: .init("version"))
+        try c.encode(contributingPartyMembers, forKey: .init("contributingPartyMembers"))
+        try c.encode(bonusPercent, forKey: .init("bonusPercent"))
+    }
+
+    func validate() throws {
+        guard version == Self.version, bonusPercent == Self.bonusPercent,
+              !contributingPartyMembers.isEmpty,
+              contributingPartyMembers == contributingPartyMembers.sorted(by: { $0.id < $1.id }),
+              Set(contributingPartyMembers.map(\.id)).count == contributingPartyMembers.count
+        else { throw CocoaError(.coderInvalidValue) }
+    }
+
+    func finalQuantity(base: Int) -> Int {
+        guard base > 0 else { return base }
+        return base + max(1, base * bonusPercent / 100)
+    }
+}
 struct CreatureMaterialRewardEntryV1: Codable, Equatable, Sendable {
     var foeID: InstanceID
     var speciesID: InstanceID
@@ -235,7 +283,15 @@ enum CreatureMaterialRewardEvaluation: Equatable, Sendable {
 }
 
 enum CreatureMaterialRewardRules {
+    static func anatomyReceipt(in state: GameState) -> AnatomyButcheryReceiptV1? {
+        let owners = state.base.partyMembers.filter {
+            state.base.character($0).ownedCombatNodeIDs.contains(CombatDerivedStatsRules.Node.anatomy)
+        }
+        return owners.isEmpty ? nil : .init(contributingPartyMembers: owners)
+    }
+
     static func validatePersisted(run: WorldRun) throws {
+        try run.anatomyButcheryReceipt?.validate()
         guard !run.creatureMaterialRewardReceipts.isEmpty
                 || run.activeEncounter.map({
                     if case .awarded = $0.creatureMaterialRewardResolution { return true }
@@ -254,7 +310,9 @@ enum CreatureMaterialRewardRules {
                       let projection = species.materialProjection,
                       let frozen = projection.entries.first(where: { $0.family == entry.family }),
                       frozen.partExpression == entry.partExpression,
-                      frozen.quantityPerDefeatedSpecimen == entry.quantity else {
+                      (run.anatomyButcheryReceipt?.finalQuantity(
+                        base: frozen.quantityPerDefeatedSpecimen)
+                        ?? frozen.quantityPerDefeatedSpecimen) == entry.quantity else {
                     throw CocoaError(.coderInvalidValue)
                 }
             }
@@ -305,7 +363,10 @@ enum CreatureMaterialRewardRules {
                 let score = qualityScore(partExpression: projected.partExpression,
                                          sourceQuality: danger.qualityInput)
                 let source = "run:\(run.runIndex):encounter:\(encounter.id.rawValue):foe:\(foe.id.rawValue):family:\(projected.family.rawValue)"
-                let ids = (0..<projected.quantityPerDefeatedSpecimen).map {
+                let quantity = run.anatomyButcheryReceipt?.finalQuantity(
+                    base: projected.quantityPerDefeatedSpecimen)
+                    ?? projected.quantityPerDefeatedSpecimen
+                let ids = (0..<quantity).map {
                     CraftMaterialUnitID(rawValue: "creature-material:\(source):\($0)")
                 }
                 guard ids.allSatisfy({ allocated.insert($0).inserted }) else {
@@ -316,7 +377,7 @@ enum CreatureMaterialRewardRules {
                 entries.append(.init(foeID: foe.id, speciesID: speciesID,
                                      family: projected.family,
                                      partExpression: projected.partExpression,
-                                     quantity: projected.quantityPerDefeatedSpecimen,
+                                     quantity: quantity,
                                      qualityScore: score, qualityBand: qualityBand(score: score),
                                      reserveUnitIDs: ids, sourceReceiptID: source))
             }

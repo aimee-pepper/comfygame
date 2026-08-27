@@ -197,6 +197,7 @@ extension GameStore {
             run.foundTravellersAtStart = state.reality.library.foundTravellers
             run.seamwardExpedition = EquipmentInscriptionRules.expeditionReceipt(
                 from: state.base, activatedOnTurn: run.turnsTaken)
+            run.anatomyButcheryReceipt = CreatureMaterialRewardRules.anatomyReceipt(in: state)
             state.reality.lifetime.runsStarted += 1
             state.worlds.lastExit = nil
             state.worlds.activeRun = run

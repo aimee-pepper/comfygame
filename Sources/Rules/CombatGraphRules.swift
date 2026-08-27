@@ -36,6 +36,16 @@ enum CombatGraphRules {
         "combat.defense.evasion.untouchable",
         "combat.defense.evasion.ghost",
     ]
+    static let precisionCompleteRouteNodeIDs: Set<CombatNodeID> = [
+        "combat.offense.precision.keen_eye",
+        "combat.offense.precision.weak_point",
+        "combat.offense.precision.pry",
+        "combat.offense.precision.steady_hand",
+        "combat.offense.precision.exploit",
+        "combat.offense.precision.finish",
+        "combat.offense.precision.anatomy",
+        "combat.offense.precision.killing_stroke",
+    ]
 
     enum PurchaseRefusal: Error, Equatable, Sendable {
         case unavailable, alreadyOwned, missingPoint, illegalParent, invalidChoice
@@ -83,6 +93,7 @@ enum CombatGraphRules {
             .union(firstCompleteRouteNodeIDs)
             .union(protectionCompleteRouteNodeIDs)
             .union(evasionCompleteRouteNodeIDs)
+            .union(precisionCompleteRouteNodeIDs)
     }
 
     static func isImplemented(_ node: CombatGraphNodeDef) -> Bool {
@@ -90,6 +101,7 @@ enum CombatGraphRules {
             || firstCompleteRouteNodeIDs.contains(node.id)
             || protectionCompleteRouteNodeIDs.contains(node.id)
             || evasionCompleteRouteNodeIDs.contains(node.id)
+            || precisionCompleteRouteNodeIDs.contains(node.id)
     }
 
     static func migratedLegacyNodes(branchDepth: [CombatBranchID: Int],

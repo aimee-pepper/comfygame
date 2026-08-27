@@ -155,6 +155,8 @@ enum CombatDerivedStatsRules {
         static let weakPoint: CombatNodeID = "combat.offense.precision.weak_point"
         static let exploit: CombatNodeID = "combat.offense.precision.exploit"
         static let steadyHand: CombatNodeID = "combat.offense.precision.steady_hand"
+        static let anatomy: CombatNodeID = "combat.offense.precision.anatomy"
+        static let killingStroke: CombatNodeID = "combat.offense.precision.killing_stroke"
         static let flense: CombatNodeID = "combat.craft.venom.flense"
         static let virulence: CombatNodeID = "combat.craft.venom.virulence"
         static let corrode: CombatNodeID = "combat.craft.venom.corrode"

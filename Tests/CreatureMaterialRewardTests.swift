@@ -66,6 +66,86 @@ final class CreatureMaterialRewardTests: XCTestCase {
         XCTAssertNoThrow(try receipt.validate())
     }
 
+    func testAnatomyFreezesExactDepartingOwnersAndAppliesStrongestOnceQuantity() throws {
+        var state = GameState.newGame()
+        state.base.binderCharacter.ownedCombatNodeIDs = [CombatDerivedStatsRules.Node.anatomy]
+        let companionID = try XCTUnwrap(state.base.activeParty.first)
+        let companionIndex = try XCTUnwrap(state.base.rosterIndex(for: companionID))
+        state.base.roster[companionIndex].character.ownedCombatNodeIDs = [
+            CombatDerivedStatsRules.Node.anatomy
+        ]
+        let frozen = try XCTUnwrap(CreatureMaterialRewardRules.anatomyReceipt(in: state))
+        XCTAssertEqual(frozen.contributingPartyMembers, [.binder, .member(companionID)])
+        XCTAssertEqual((1...10).map(frozen.finalQuantity), [2, 3, 4, 5, 6, 8, 9, 10, 12, 13])
+
+        var run = fixtureRun()
+        run.anatomyButcheryReceipt = frozen
+        let speciesID = InstanceID(rawValue: 190)
+        let projection = CreatureMaterialProjectionReceiptV1(entries: [
+            .init(family: .hide,
+                  capabilityA: .init(id: .coveringCoverage, value: 60),
+                  capabilityB: .init(id: .derivedFlexibility, value: 40),
+                  partExpression: 50, quantityPerDefeatedSpecimen: 2),
+            .init(family: .bone,
+                  capabilityA: .init(id: .boneDensity, value: 30),
+                  capabilityB: .init(id: .size, value: 50),
+                  partExpression: 40, quantityPerDefeatedSpecimen: 2)
+        ])
+        run.cast = [.init(id: speciesID, traits: CreatureTraits(), worldSeed: 8,
+                          habitat: .terrestrial, materialProjection: projection)]
+        var rng = SeededRNG(seed: 9)
+        let encounter = CombatRules.makeEncounter(
+            id: .init(rawValue: 191),
+            foes: [.init(id: .init(rawValue: 192), speciesID: speciesID,
+                         stats: .init(displayName: "Animal", icon: "ant", maxHP: 1, attack: 1),
+                         currentHP: 0)], party: [.binder], rng: &rng)
+        let evaluation = CreatureMaterialRewardRules.evaluate(run: run, encounter: encounter)
+        guard case .eligible(let receipt, let units) = evaluation else {
+            return XCTFail("expected Anatomy reward, got \(evaluation)")
+        }
+        XCTAssertEqual(receipt.entries.map(\.quantity), [3, 3])
+        XCTAssertEqual(units.map(\.sample.kind),
+                       [.hide, .hide, .hide, .bone, .bone, .bone])
+        run.creatureMaterialRewardReceipts = [receipt]
+        XCTAssertNoThrow(try CreatureMaterialRewardRules.validatePersisted(run: run))
+
+        state.base.binderCharacter.ownedCombatNodeIDs = []
+        state.base.roster[companionIndex].character.ownedCombatNodeIDs = []
+        XCTAssertEqual(run.anatomyButcheryReceipt, frozen)
+        let relaunched = try SaveCodec.makeDecoder().decode(
+            WorldRun.self, from: SaveCodec.makeEncoder().encode(run))
+        XCTAssertEqual(relaunched.anatomyButcheryReceipt, frozen)
+        XCTAssertEqual(relaunched.creatureMaterialRewardReceipts, [receipt])
+        XCTAssertNil(relaunched.anchoredSnapshot.anatomyButcheryReceipt)
+    }
+
+    func testAnatomyHomeOwnerDoesNotContributeAndMalformedReceiptRejects() throws {
+        var state = GameState.newGame()
+        let homeID = try XCTUnwrap(state.base.activeParty.first)
+        let homeIndex = try XCTUnwrap(state.base.rosterIndex(for: homeID))
+        state.base.activeParty.removeAll { $0 == homeID }
+        state.base.roster[homeIndex].character.ownedCombatNodeIDs = [
+            CombatDerivedStatsRules.Node.anatomy
+        ]
+        XCTAssertNil(CreatureMaterialRewardRules.anatomyReceipt(in: state))
+
+        var invalid = AnatomyButcheryReceiptV1(contributingPartyMembers: [.binder])
+        invalid.bonusPercent = 34
+        XCTAssertThrowsError(try invalid.validate())
+
+        var object = try XCTUnwrap(JSONSerialization.jsonObject(with:
+            SaveCodec.makeEncoder().encode(fixtureRun())) as? [String: Any])
+        object["anatomyButcheryReceipt"] = NSNull()
+        XCTAssertThrowsError(try SaveCodec.makeDecoder().decode(
+            WorldRun.self, from: JSONSerialization.data(withJSONObject: object)))
+        object["anatomyButcheryReceipt"] = [
+            "version": 1, "contributingPartyMembers": ["binder"],
+            "bonusPercent": 35, "extra": true
+        ]
+        XCTAssertThrowsError(try SaveCodec.makeDecoder().decode(
+            WorldRun.self, from: JSONSerialization.data(withJSONObject: object)))
+    }
+
     func testAuthoredAndProjectionNilFoesDoNotFallThroughToGenericRewards() {
         var run = fixtureRun()
         let legacyID = InstanceID(rawValue: 92)

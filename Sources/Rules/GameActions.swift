@@ -1222,7 +1222,8 @@ extension GameStore {
                 tuning: tuning,
                 worldVisualReceipt: visualReceipt,
                 atmospherePresentationReceipt: atmospherePresentationReceipt,
-                worldArrivalReceipt: arrivalReceipt
+                worldArrivalReceipt: arrivalReceipt,
+                anatomyButcheryReceipt: CreatureMaterialRewardRules.anatomyReceipt(in: state)
             )
             departingRun.seamwardExpedition = EquipmentInscriptionRules.expeditionReceipt(
                 from: state.base, activatedOnTurn: 0)
