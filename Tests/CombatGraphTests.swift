@@ -227,6 +227,62 @@ final class CombatGraphTests: XCTestCase {
         XCTAssertEqual(roundTrip, character)
     }
 
+    func testProtectionIsTheOnlySecondCompleteEightPointRoute() throws {
+        let route: [CombatNodeID] = [
+            "combat.defense.protection.bulwark",
+            "combat.defense.protection.watchful",
+            "combat.defense.protection.draw_off",
+            "combat.defense.protection.cover",
+            "combat.defense.protection.shieldwall",
+            "combat.defense.protection.interpose",
+            "combat.defense.protection.rally",
+            "combat.defense.protection.guardian",
+        ]
+        XCTAssertEqual(CombatGraphRules.protectionCompleteRouteNodeIDs, Set(route))
+        let implemented = CombatGraphRules.implementedNodeIDs(in: graph)
+        XCTAssertEqual(implemented.count, 51)
+        XCTAssertEqual(
+            implemented.subtracting(CombatGraphRules.implementedOpeningNodeIDs(in: graph)),
+            CombatGraphRules.firstCompleteRouteNodeIDs
+                .union(CombatGraphRules.protectionCompleteRouteNodeIDs)
+                .subtracting(CombatGraphRules.implementedOpeningNodeIDs(in: graph)))
+        XCTAssertTrue(graph.nodes.filter {
+            $0.depth > 3
+                && !CombatGraphRules.firstCompleteRouteNodeIDs.contains($0.id)
+                && !Set(route).contains($0.id)
+        }.allSatisfy { !implemented.contains($0.id) })
+
+        var character = CharacterState(level: 9)
+        for id in route {
+            let quote = try CombatGraphRules.previewPurchase(id, for: character,
+                                                             catalogue: graph).get()
+            XCTAssertEqual(CombatGraphRules.commit(quote, for: &character, catalogue: graph),
+                           .committed(id))
+        }
+        XCTAssertEqual(character.ownedCombatNodeIDs, Set(route))
+        XCTAssertEqual(character.unspentCombatPoints, 0)
+
+        var missingMastery = CharacterState(level: 9)
+        missingMastery.ownedCombatNodeIDs = Set(route.dropLast()).subtracting([route[5]])
+        missingMastery.unspentCombatPoints = 1
+        XCTAssertEqual(CombatGraphRules.previewPurchase(route[7], for: missingMastery,
+                                                        catalogue: graph),
+                       .failure(.illegalParent))
+
+        let laterOther: CombatNodeID = "combat.defense.evasion.ghost"
+        XCTAssertEqual(CombatGraphRules.previewPurchase(laterOther,
+                                                        for: CharacterState(level: 25),
+                                                        catalogue: graph),
+                       .failure(.unavailable))
+        XCTAssertEqual(try JSONDecoder().decode(CharacterState.self,
+            from: JSONEncoder().encode(character)), character)
+
+        CombatTreeRules.respec(&character)
+        XCTAssertEqual(character.ownedCombatNodeIDs, [])
+        XCTAssertEqual(character.unspentCombatPoints, 8)
+        XCTAssertEqual(character.combatNodeChoices, [:])
+    }
+
     func testEveryOpeningHybridIsLegalFromEitherExactParentAndNotFromDestinationRoot() throws {
         let hybrids = graph.nodes.filter { $0.depth == 3 && !$0.hybridAlternativeParents.isEmpty }
         XCTAssertFalse(hybrids.isEmpty)

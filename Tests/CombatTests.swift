@@ -5198,6 +5198,52 @@ final class CombatTests: XCTestCase {
         XCTAssertEqual(relaunched.worlds.activeRun?.activeEncounter?.unyieldingSpent, [])
     }
 
+    func testPurchasedProtectionRouteFreezesEveryConsumerForTheEncounterAndRelaunch() throws {
+        let route = CombatGraphRules.protectionCompleteRouteNodeIDs
+        let io = SaveFileIO.temporary(name: "protection-route-\(UUID().uuidString)")
+        let store = GameStore(io: io)
+        store.mutate("own the exact Protection route", flush: true) { state in
+            state.base.binderCharacter.level = 9
+            state.base.binderCharacter.ownedCombatNodeIDs = route
+            state.base.binderCharacter.unspentCombatPoints = 0
+        }
+        store.write("plains")
+        XCTAssertTrue(store.bindAndDepart(), store.bindError ?? "bind failed")
+
+        var state = store.state
+        var run = try XCTUnwrap(state.worlds.activeRun)
+        let enemy = WorldEnemy(id: .init(rawValue: 0xB555), creatureID: "paper_moth",
+                               position: run.playerPosition, isAwake: true)
+        run.enemies = [enemy]
+        run.encounterGraceTurns = 0
+        state.worlds.activeRun = run
+        WorldRules.beginEncounter(triggeredBy: enemy, runsAutomaticTurns: false, in: &state)
+
+        let encounter = try XCTUnwrap(state.worlds.activeRun?.activeEncounter)
+        XCTAssertEqual(encounter.debugV2OwnedNodeIDs?[.binder], route)
+        XCTAssertEqual(encounter.debugV2Armour?.entry(for: .binder)?.ownedNodeIDs,
+                       [CombatDerivedStatsRules.Node.bulwark,
+                        CombatDerivedStatsRules.Node.shieldwall])
+        XCTAssertEqual(encounter.drawOffReceipts, [:])
+        XCTAssertEqual(encounter.interposeReceipts, [])
+        XCTAssertEqual(encounter.nextInterposeActivationSequence, 1)
+        XCTAssertTrue(CombatRules.skills(for: .binder, in: state).contains { $0.id == "draw_off" })
+        XCTAssertTrue(CombatRules.skills(for: .binder, in: state).contains { $0.id == "interpose" })
+
+        state.base.binderCharacter.ownedCombatNodeIDs = []
+        let frozen = try XCTUnwrap(state.worlds.activeRun?.activeEncounter)
+        XCTAssertEqual(frozen.debugV2OwnedNodeIDs?[.binder], route,
+                       "a live encounter must not reread later character ownership")
+
+        let relaunched = try SaveCodec.decode(SaveCodec.encode(state))
+        let restored = try XCTUnwrap(relaunched.worlds.activeRun?.activeEncounter)
+        XCTAssertEqual(restored.debugV2OwnedNodeIDs?[.binder], route)
+        XCTAssertEqual(restored.debugV2Armour, encounter.debugV2Armour)
+        XCTAssertEqual(restored.drawOffReceipts, [:])
+        XCTAssertEqual(restored.interposeReceipts, [])
+        XCTAssertEqual(restored.nextInterposeActivationSequence, 1)
+    }
+
     func testEnduranceThresholdCrossingAndMinimumArePureAndFrozenMaximumAware() {
         let node = true
         XCTAssertEqual(CombatDerivedStatsRules.enduranceDamage(

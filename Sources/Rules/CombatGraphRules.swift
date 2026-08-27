@@ -16,6 +16,16 @@ enum CombatGraphRules {
         "combat.defense.fortitude.unyielding",
         "combat.defense.fortitude.immovable",
     ]
+    static let protectionCompleteRouteNodeIDs: Set<CombatNodeID> = [
+        "combat.defense.protection.bulwark",
+        "combat.defense.protection.watchful",
+        "combat.defense.protection.draw_off",
+        "combat.defense.protection.cover",
+        "combat.defense.protection.shieldwall",
+        "combat.defense.protection.interpose",
+        "combat.defense.protection.rally",
+        "combat.defense.protection.guardian",
+    ]
 
     enum PurchaseRefusal: Error, Equatable, Sendable {
         case unavailable, alreadyOwned, missingPoint, illegalParent, invalidChoice
@@ -59,11 +69,15 @@ enum CombatGraphRules {
     }
 
     static func implementedNodeIDs(in catalogue: CombatGraphCatalogue) -> Set<CombatNodeID> {
-        implementedOpeningNodeIDs(in: catalogue).union(firstCompleteRouteNodeIDs)
+        implementedOpeningNodeIDs(in: catalogue)
+            .union(firstCompleteRouteNodeIDs)
+            .union(protectionCompleteRouteNodeIDs)
     }
 
     static func isImplemented(_ node: CombatGraphNodeDef) -> Bool {
-        node.depth <= openingMaximumDepth || firstCompleteRouteNodeIDs.contains(node.id)
+        node.depth <= openingMaximumDepth
+            || firstCompleteRouteNodeIDs.contains(node.id)
+            || protectionCompleteRouteNodeIDs.contains(node.id)
     }
 
     static func migratedLegacyNodes(branchDepth: [CombatBranchID: Int],
