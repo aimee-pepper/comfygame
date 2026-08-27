@@ -1224,7 +1224,8 @@ extension GameStore {
                 atmospherePresentationReceipt: atmospherePresentationReceipt,
                 worldArrivalReceipt: arrivalReceipt
             )
-            departingRun.seamwardExpedition = EquipmentInscriptionRules.expeditionReceipt(from: state.base)
+            departingRun.seamwardExpedition = EquipmentInscriptionRules.expeditionReceipt(
+                from: state.base, activatedOnTurn: 0)
             state.worlds.activeRun = departingRun
             if WorldArrivalPresentationAuthority.isNativePresentationEnabled {
                 state.worlds.pendingWorldArrivalReceiptID = arrivalReceipt.id

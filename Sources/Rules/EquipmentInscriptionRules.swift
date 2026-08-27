@@ -72,6 +72,32 @@ struct SeamwardExpeditionReceiptV1: Codable, Equatable, Sendable {
     var activatedOnTurn: Int?
     var noAnsweringSeamReported: Bool = false
 
+    init(version: Int = 1, contributors: [Contributor], activatedOnTurn: Int? = 0,
+         noAnsweringSeamReported: Bool = false) {
+        self.version = version
+        self.contributors = contributors
+        self.activatedOnTurn = activatedOnTurn
+        self.noAnsweringSeamReported = noAnsweringSeamReported
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        version = try container.decode(Int.self, forKey: .version)
+        contributors = try container.decode([Contributor].self, forKey: .contributors)
+        if container.contains(.activatedOnTurn) {
+            // A present null is malformed current data. Only genuine legacy absence promotes.
+            activatedOnTurn = try container.decode(Int.self, forKey: .activatedOnTurn)
+        } else {
+            activatedOnTurn = 0
+        }
+        if container.contains(.noAnsweringSeamReported) {
+            noAnsweringSeamReported = try container.decode(
+                Bool.self, forKey: .noAnsweringSeamReported)
+        } else {
+            noAnsweringSeamReported = false
+        }
+    }
+
     var hasActiveContributor: Bool {
         version == 1 && contributors.contains { $0.definitionID == "seamward" && $0.rulesVersion == 1 }
     }
@@ -87,10 +113,8 @@ struct SeamwardExpeditionReceiptV1: Codable, Equatable, Sendable {
                   owners.insert("\(contributor.member.id)|\(contributor.slot.rawValue)").inserted
             else { throw ValidationError.invalidContributor }
         }
-        if let activatedOnTurn {
-            guard activatedOnTurn >= 0, activatedOnTurn <= turnsTaken else {
-                throw ValidationError.invalidActivationTurn
-            }
+        guard let activatedOnTurn, activatedOnTurn >= 0, activatedOnTurn <= turnsTaken else {
+            throw ValidationError.invalidActivationTurn
         }
     }
 
@@ -278,7 +302,8 @@ enum EquipmentInscriptionRules {
         return true
     }
 
-    static func expeditionReceipt(from base: BaseState) -> SeamwardExpeditionReceiptV1? {
+    static func expeditionReceipt(from base: BaseState,
+                                  activatedOnTurn: Int = 0) -> SeamwardExpeditionReceiptV1? {
         let members: [PartyMember] = [.binder] + base.activeParty.map(PartyMember.member)
         let contributors = members.flatMap { member in
             [GearSlot.armor, .keepsake].compactMap { slot -> SeamwardExpeditionReceiptV1.Contributor? in
@@ -289,7 +314,8 @@ enum EquipmentInscriptionRules {
                              rulesVersion: inscription.rulesVersion, inkRecipe: inscription.inkRecipe)
             }
         }
-        return contributors.isEmpty ? nil : .init(contributors: contributors)
+        return contributors.isEmpty ? nil : .init(
+            contributors: contributors, activatedOnTurn: activatedOnTurn)
     }
 
     private static func locatedGear(_ id: InstanceID, in base: BaseState)
@@ -337,8 +363,7 @@ enum EquipmentInscriptionRules {
 
 enum SeamwardRules {
     static func projection(in run: WorldRun) -> SeamlightGuidanceProjection? {
-        guard run.seamwardExpedition?.activatedOnTurn != nil,
-              run.seamwardExpedition?.hasActiveContributor == true,
+        guard run.seamwardExpedition?.hasActiveContributor == true,
               let points = SeamlightRules.route(in: run) else { return nil }
         guard points.count > 1 else { return .onPortal }
         let from = points[0], to = points[1]

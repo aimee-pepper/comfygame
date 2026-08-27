@@ -790,9 +790,6 @@ enum WorldRules {
                 run.collapsedOnTurn = run.turnsTaken
                 // Said once, the turn it happens: the world has gone, and you are still in it.
                 events.append(.collapsed)
-                if run.seamwardExpedition?.hasActiveContributor == true {
-                    run.seamwardExpedition?.activatedOnTurn = run.turnsTaken
-                }
             }
             let (crumbled, lost) = crumble(in: &run)
             if crumbled > 0 { events.append(.tilesCrumbled(crumbled)) }

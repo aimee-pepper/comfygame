@@ -128,8 +128,8 @@
       "priority": "B3.4",
       "title": "Equipment inscriptions and Seamward",
       "status": "queued",
-      "detail": "Add the Scriptorium-owned authored equipment-enchantment system for one inscription on one exact Body or Keepsake item. The first recipe sacrifices a Seamlight to make Seamward, which wakes only during collapse and provides the same fog-neutral portal guidance without consuming an expedition item or turn.",
-      "gate": "Use equipment-inscription-system-current.md after Seamlight, exact gear identity and Scriptorium Ink preparation are stable. Prove atomic install/erase, slot eligibility, stable-instance persistence, reforge/equip/trade/recycle retention, saved departure ownership, collapse-only activation, duplicate nonstacking, route retargeting and portal/minimap nondisclosure. Do not infer inscriptions from arbitrary consumables or make Waystone inscribable.",
+      "detail": "Add the Scriptorium-owned authored equipment-enchantment system for one inscription on one exact Body or Keepsake item. The first recipe sacrifices a Seamlight to make Seamward, which guides throughout each expedition with the same fog-neutral portal grammar without consuming an expedition item or turn.",
+      "gate": "Use equipment-inscription-system-current.md after Seamlight, exact gear identity and Scriptorium Ink preparation are stable. Prove atomic install/erase, slot eligibility, stable-instance persistence, reforge/equip/trade/recycle retention, saved departure ownership, expedition-entry activation, duplicate nonstacking, route retargeting and portal/minimap nondisclosure. Do not infer inscriptions from arbitrary consumables or make Waystone inscribable.",
       "workstream": "engineering",
       "isPrimary": false
     },

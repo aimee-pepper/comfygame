@@ -72,10 +72,52 @@ final class EquipmentInscriptionRulesTests: XCTestCase {
         var quill = ItemStack(id: .init(rawValue: 71), catalogID: "pressed_leaf")
         quill.gearProfile?.inscription = receipt
         state.base.roster[0].equipped[.keepsake] = EquippedPiece(quill)
-        let frozen = try XCTUnwrap(EquipmentInscriptionRules.expeditionReceipt(from: state.base))
+        let frozen = try XCTUnwrap(EquipmentInscriptionRules.expeditionReceipt(
+            from: state.base, activatedOnTurn: 7))
         XCTAssertEqual(frozen.contributors.map(\.gearStableInstanceID), [.init(rawValue: 70), .init(rawValue: 71)])
         XCTAssertEqual(frozen.contributors.map(\.member), [.binder, .member(.founderQuill)])
+        XCTAssertEqual(frozen.activatedOnTurn, 7)
         XCTAssertTrue(frozen.hasActiveContributor)
+    }
+
+    @MainActor
+    func testNewWorldAndAnchoredRevisitFreezeEntryTurnActivation() throws {
+        let inscription = EquipmentInscriptionReceiptV1(
+            version: 1, definitionID: "seamward", sourceItemID: Items.seamlight,
+            rulesVersion: 1, inkRecipe: nil)
+
+        let fresh = GameStore(io: .temporary(name: "seamward-new-world-\(UUID().uuidString)"))
+        fresh.mutate("prepare always-on new world") { state in
+            state = eligibleState()
+            let index = state.base.inventory.stacks.firstIndex { $0.id.rawValue == 40 }!
+            var gear = state.base.inventory.stacks.remove(at: index)
+            gear.gearProfile?.inscription = inscription
+            state.base.binderEquipped[.armor] = EquippedPiece(gear)
+            state.base.essence = 1_000
+        }
+        XCTAssertTrue(fresh.bindAndDepart())
+        XCTAssertEqual(fresh.state.worlds.activeRun?.turnsTaken, 0)
+        XCTAssertEqual(fresh.state.worlds.activeRun?.seamwardExpedition?.activatedOnTurn, 0)
+        XCTAssertNotNil(fresh.state.worlds.activeRun.flatMap { SeamwardRules.projection(in: $0) })
+
+        let anchored = GameStore(io: .temporary(name: "seamward-anchored-revisit-\(UUID().uuidString)"))
+        var saved = makeWorldRun()
+        saved.turnsTaken = 6
+        anchored.mutate("prepare always-on anchored revisit") { state in
+            state = eligibleState()
+            let index = state.base.inventory.stacks.firstIndex { $0.id.rawValue == 40 }!
+            var gear = state.base.inventory.stacks.remove(at: index)
+            gear.gearProfile?.inscription = inscription
+            state.base.binderEquipped[.armor] = EquippedPiece(gear)
+            state.worlds.anchoredRealms = [
+                AnchoredRealm(runIndex: saved.runIndex, name: "Saved", route: .bornAnchored,
+                              world: saved)
+            ]
+        }
+        XCTAssertTrue(anchored.revisitAnchoredRealm(saved.runIndex))
+        XCTAssertEqual(anchored.state.worlds.activeRun?.turnsTaken, 6)
+        XCTAssertEqual(anchored.state.worlds.activeRun?.seamwardExpedition?.activatedOnTurn, 6)
+        XCTAssertNotNil(anchored.state.worlds.activeRun.flatMap { SeamwardRules.projection(in: $0) })
     }
 
     func testInactiveHomeRosterWornGearIsSelectableAndErasableButNeverContributes() throws {
@@ -195,23 +237,46 @@ final class EquipmentInscriptionRulesTests: XCTestCase {
         XCTAssertNil(EquipmentInscriptionRules.expeditionReceipt(from: inactive.state.base))
     }
 
-    func testCollapseActivatesWithoutExtraTurnAndGuidancePersists() throws {
+    func testGuidanceIsActiveBeforeCollapseAndCollapseDoesNotReactivateIt() throws {
         var state = GameState.newGame()
         var active = makeWorldRun()
+        active.stability = 1
         active.seamwardExpedition = .init(contributors: [
             .init(member: .binder, gearStableInstanceID: .init(rawValue: 70), slot: .armor,
                   definitionID: "seamward", rulesVersion: 1, inkRecipe: nil)
         ])
         state.worlds.activeRun = active
+        XCTAssertEqual(state.worlds.activeRun?.seamwardExpedition?.activatedOnTurn, 0)
+        XCTAssertNotNil(SeamwardRules.projection(in: try XCTUnwrap(state.worlds.activeRun)))
         let events = WorldRules.advanceTurn(in: &state)
         XCTAssertEqual(state.worlds.activeRun?.turnsTaken, 1)
-        XCTAssertEqual(state.worlds.activeRun?.seamwardExpedition?.activatedOnTurn, 1)
+        XCTAssertEqual(state.worlds.activeRun?.seamwardExpedition?.activatedOnTurn, 0)
         XCTAssertNotNil(SeamwardRules.projection(in: try XCTUnwrap(state.worlds.activeRun)))
         let decoded = try SaveCodec.decode(SaveCodec.encode(state))
         XCTAssertEqual(decoded.worlds.activeRun?.seamwardExpedition,
                        state.worlds.activeRun?.seamwardExpedition)
         XCTAssertTrue(events.contains(.collapsed))
         XCTAssertNil(state.worlds.activeRun?.anchoredSnapshot.seamwardExpedition)
+    }
+
+    @MainActor
+    func testPortalReturnRemainsAvailableBeforeCollapse() throws {
+        let store = GameStore(io: .temporary(name: "seamward-pre-collapse-portal-\(UUID().uuidString)"))
+        var run = makeWorldRun()
+        run.stability = 100
+        run.playerPosition = .init(x: 2, y: 0)
+        run.seamwardExpedition = .init(contributors: [
+            .init(member: .binder, gearStableInstanceID: .init(rawValue: 70), slot: .armor,
+                  definitionID: "seamward", rulesVersion: 1, inkRecipe: nil)
+        ], activatedOnTurn: 0)
+        store.mutate("pre-collapse seamward portal") { $0.worlds.activeRun = run }
+
+        XCTAssertTrue(store.canPortalHere)
+        XCTAssertEqual(SeamwardRules.projection(in: run), .onPortal)
+        store.portalHome()
+        XCTAssertNil(store.state.worlds.activeRun)
+        XCTAssertEqual(store.state.worlds.lastExit?.kind, .portal)
+        XCTAssertEqual(store.state.worlds.lastExit?.haulKeptFraction, 1)
     }
 
     func testNoRouteEventEmitsOnceAndErasureRefundsNothing() throws {
@@ -301,6 +366,18 @@ final class EquipmentInscriptionRulesTests: XCTestCase {
         expedition["version"] = 1
         expedition["activatedOnTurn"] = 99
         active["seamwardExpedition"] = expedition; worlds["activeRun"] = active; root["worlds"] = worlds
+        XCTAssertThrowsError(try SaveCodec.decode(JSONSerialization.data(withJSONObject: root)))
+
+        expedition.removeValue(forKey: "activatedOnTurn")
+        active["seamwardExpedition"] = expedition; worlds["activeRun"] = active; root["worlds"] = worlds
+        let promoted = try SaveCodec.decode(JSONSerialization.data(withJSONObject: root))
+        XCTAssertEqual(promoted.worlds.activeRun?.seamwardExpedition?.activatedOnTurn, 0)
+
+        expedition["activatedOnTurn"] = NSNull()
+        active["seamwardExpedition"] = expedition; worlds["activeRun"] = active; root["worlds"] = worlds
+        XCTAssertThrowsError(try SaveCodec.decode(JSONSerialization.data(withJSONObject: root)))
+
+        active["seamwardExpedition"] = NSNull(); worlds["activeRun"] = active; root["worlds"] = worlds
         XCTAssertThrowsError(try SaveCodec.decode(JSONSerialization.data(withJSONObject: root)))
     }
 

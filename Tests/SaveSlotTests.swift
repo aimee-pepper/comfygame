@@ -2,6 +2,43 @@ import XCTest
 @testable import Bookbinder
 
 final class SaveSlotTests: XCTestCase {
+    func testCurrentSeamwardNullFailsSlotLoadWithoutRewritingEnvelope() async throws {
+        let root = directory()
+        defer { try? FileManager.default.removeItem(at: root) }
+        let slots = SaveSlotFileIO(directory: root)
+        let created = try await slots.create(name: "Malformed Seamward")
+        let url = try await slots.exportURL(for: created.metadata.id)
+        var envelope = try SaveCodec.makeDecoder().decode(
+            SaveSlotEnvelope.self, from: Data(contentsOf: url))
+        var state = GameState.newGame()
+        var run = WorldRun(
+            runIndex: 1, book: .init(symbols: [:], randomlyFilled: [], essencePaid: 0),
+            mapSeed: 1, rng: .init(seed: 1),
+            map: .init(width: 1, height: 1,
+                       tiles: [Tile(content: .portal(isEntry: true), ground: .soil)],
+                       entry: .init(x: 0, y: 0)), playerPosition: .init(x: 0, y: 0))
+        run.seamwardExpedition = .init(contributors: [
+            .init(member: .binder, gearStableInstanceID: .init(rawValue: 70), slot: .armor,
+                  definitionID: "seamward", rulesVersion: 1, inkRecipe: nil)
+        ], activatedOnTurn: 0)
+        state.worlds.activeRun = run
+        var payload = try XCTUnwrap(JSONSerialization.jsonObject(
+            with: SaveCodec.encode(state)) as? [String: Any])
+        var worlds = try XCTUnwrap(payload["worlds"] as? [String: Any])
+        var active = try XCTUnwrap(worlds["activeRun"] as? [String: Any])
+        var receipt = try XCTUnwrap(active["seamwardExpedition"] as? [String: Any])
+        receipt["activatedOnTurn"] = NSNull()
+        active["seamwardExpedition"] = receipt; worlds["activeRun"] = active
+        payload["worlds"] = worlds
+        envelope.payload = try JSONSerialization.data(withJSONObject: payload, options: [.sortedKeys])
+        let bytes = try encoder().encode(envelope)
+        try bytes.write(to: url, options: .atomic)
+
+        do { _ = try await slots.load(created.metadata.id); XCTFail("expected strict failure") }
+        catch { }
+        XCTAssertEqual(try Data(contentsOf: url), bytes)
+    }
+
     func testChannelworksSchemaEightRealSlotFailurePreservesEnvelope() async throws {
         let root = directory()
         defer { try? FileManager.default.removeItem(at: root) }

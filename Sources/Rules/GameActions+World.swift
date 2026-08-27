@@ -195,7 +195,8 @@ extension GameStore {
             run.foundPagesAtStart = Set(state.reality.library.foundPages)
             run.foundWritingsAtStart = Set(state.reality.library.foundWritings.map(\.id))
             run.foundTravellersAtStart = state.reality.library.foundTravellers
-            run.seamwardExpedition = EquipmentInscriptionRules.expeditionReceipt(from: state.base)
+            run.seamwardExpedition = EquipmentInscriptionRules.expeditionReceipt(
+                from: state.base, activatedOnTurn: run.turnsTaken)
             state.reality.lifetime.runsStarted += 1
             state.worlds.lastExit = nil
             state.worlds.activeRun = run

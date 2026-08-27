@@ -1320,8 +1320,12 @@ struct WorldRun: Codable, Equatable, Sendable {
         } else {
             seamlightGuidance = nil
         }
-        seamwardExpedition = try container.decodeIfPresent(
-            SeamwardExpeditionReceiptV1.self, forKey: .seamwardExpedition)
+        if container.contains(.seamwardExpedition) {
+            seamwardExpedition = try container.decode(
+                SeamwardExpeditionReceiptV1.self, forKey: .seamwardExpedition)
+        } else {
+            seamwardExpedition = nil
+        }
         try seamwardExpedition?.validate(for: turnsTaken)
         satchel = try container.decodeIfPresent(ResourcePool.self, forKey: .satchel) ?? ResourcePool()
         satchelItems = try container.decodeIfPresent(Inventory.self, forKey: .satchelItems)

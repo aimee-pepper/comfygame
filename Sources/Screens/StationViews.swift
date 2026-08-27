@@ -1208,7 +1208,7 @@ struct ScriptoriumView: View {
                        value: "\(store.state.base.preparedInkVials.map(\.remainingApplications).reduce(0, +))")
         }
         StationCard(title: "Equipment Inscriptions", icon: "pencil.and.scribble") {
-            Text("Seamward wakes only when a world begins collapsing.")
+            Text("Seamward guides the party toward a usable portal throughout an expedition.")
                 .font(.caption).foregroundStyle(.secondary)
             if !store.state.base.preparedInkVials.isEmpty {
                 Picker("Inscription ink", selection: $selectedInscriptionVialID) {

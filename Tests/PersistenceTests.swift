@@ -3,6 +3,37 @@ import XCTest
 
 /// The interruptibility pillar, tested. Anything that breaks here breaks pillar 2.
 final class PersistenceTests: XCTestCase {
+    func testCurrentSeamwardNullFailsRawLoadWithoutRewritingBytes() throws {
+        var state = GameState.newGame()
+        var run = WorldRun(
+            runIndex: 1, book: .init(symbols: [:], randomlyFilled: [], essencePaid: 0),
+            mapSeed: 1, rng: .init(seed: 1),
+            map: .init(width: 1, height: 1,
+                       tiles: [Tile(content: .portal(isEntry: true), ground: .soil)],
+                       entry: .init(x: 0, y: 0)),
+            playerPosition: .init(x: 0, y: 0))
+        run.seamwardExpedition = .init(contributors: [
+            .init(member: .binder, gearStableInstanceID: .init(rawValue: 70), slot: .armor,
+                  definitionID: "seamward", rulesVersion: 1, inkRecipe: nil)
+        ], activatedOnTurn: 0)
+        state.worlds.activeRun = run
+        var root = try XCTUnwrap(JSONSerialization.jsonObject(
+            with: SaveCodec.encode(state)) as? [String: Any])
+        var worlds = try XCTUnwrap(root["worlds"] as? [String: Any])
+        var active = try XCTUnwrap(worlds["activeRun"] as? [String: Any])
+        var receipt = try XCTUnwrap(active["seamwardExpedition"] as? [String: Any])
+        receipt["activatedOnTurn"] = NSNull()
+        active["seamwardExpedition"] = receipt
+        worlds["activeRun"] = active
+        root["worlds"] = worlds
+        let bytes = try JSONSerialization.data(withJSONObject: root, options: [.sortedKeys])
+        let io = SaveFileIO.temporary(name: "seamward-null-\(UUID().uuidString)")
+        try io.write(bytes)
+
+        guard case .unrecoverable = io.load() else { return XCTFail("expected strict failure") }
+        XCTAssertEqual(try Data(contentsOf: io.saveURL), bytes)
+    }
+
     func testChannelworksSchemaEightMigrationAndCurrentReceiptFailClosed() throws {
         var state = GameState.newGame()
         state.base.stations[Stations.channelworks] = .init(isUnlocked: true, tier: 0)
