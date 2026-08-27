@@ -178,7 +178,7 @@ final class CombatGraphTests: XCTestCase {
         XCTAssertTrue(graph.nodes.filter { $0.depth > 3 }.allSatisfy { !opening.contains($0.id) })
     }
 
-    func testOnlyTheExactEightPointFortitudeRouteIsPromotedBeyondOpening() throws {
+    func testFortitudeRemainsTheExactFirstCompleteEightPointRoute() throws {
         let route: [CombatNodeID] = [
             "combat.defense.fortitude.thick_hide",
             "combat.defense.fortitude.iron_skin",
@@ -191,10 +191,19 @@ final class CombatGraphTests: XCTestCase {
         ]
         XCTAssertEqual(CombatGraphRules.firstCompleteRouteNodeIDs, Set(route))
         let implemented = CombatGraphRules.implementedNodeIDs(in: graph)
-        XCTAssertEqual(implemented.count, 48)
-        XCTAssertEqual(implemented.subtracting(CombatGraphRules.implementedOpeningNodeIDs(in: graph)),
-                       Set(route.suffix(3)))
-        XCTAssertTrue(graph.nodes.filter { $0.depth > 3 && !Set(route).contains($0.id) }
+        XCTAssertEqual(implemented.count, 54)
+        XCTAssertEqual(
+            implemented.subtracting(CombatGraphRules.implementedOpeningNodeIDs(in: graph)),
+            CombatGraphRules.firstCompleteRouteNodeIDs
+                .union(CombatGraphRules.protectionCompleteRouteNodeIDs)
+                .union(CombatGraphRules.evasionCompleteRouteNodeIDs)
+                .subtracting(CombatGraphRules.implementedOpeningNodeIDs(in: graph)))
+        XCTAssertTrue(graph.nodes.filter {
+            $0.depth > 3
+                && !CombatGraphRules.firstCompleteRouteNodeIDs.contains($0.id)
+                && !CombatGraphRules.protectionCompleteRouteNodeIDs.contains($0.id)
+                && !CombatGraphRules.evasionCompleteRouteNodeIDs.contains($0.id)
+        }
             .allSatisfy { !implemented.contains($0.id) })
 
         var character = CharacterState(level: 8)
@@ -218,7 +227,7 @@ final class CombatGraphTests: XCTestCase {
         XCTAssertEqual(character.ownedCombatNodeIDs, Set(route))
         XCTAssertEqual(character.unspentCombatPoints, 0)
 
-        let laterOther: CombatNodeID = "combat.defense.protection.interpose"
+        let laterOther: CombatNodeID = "combat.offense.precision.killing_stroke"
         XCTAssertEqual(CombatGraphRules.previewPurchase(laterOther, for: CharacterState(level: 25),
                                                         catalogue: graph),
                        .failure(.unavailable))
@@ -227,7 +236,7 @@ final class CombatGraphTests: XCTestCase {
         XCTAssertEqual(roundTrip, character)
     }
 
-    func testProtectionIsTheOnlySecondCompleteEightPointRoute() throws {
+    func testProtectionRemainsTheExactSecondCompleteEightPointRoute() throws {
         let route: [CombatNodeID] = [
             "combat.defense.protection.bulwark",
             "combat.defense.protection.watchful",
@@ -240,15 +249,75 @@ final class CombatGraphTests: XCTestCase {
         ]
         XCTAssertEqual(CombatGraphRules.protectionCompleteRouteNodeIDs, Set(route))
         let implemented = CombatGraphRules.implementedNodeIDs(in: graph)
-        XCTAssertEqual(implemented.count, 51)
+        XCTAssertEqual(implemented.count, 54)
         XCTAssertEqual(
             implemented.subtracting(CombatGraphRules.implementedOpeningNodeIDs(in: graph)),
             CombatGraphRules.firstCompleteRouteNodeIDs
                 .union(CombatGraphRules.protectionCompleteRouteNodeIDs)
+                .union(CombatGraphRules.evasionCompleteRouteNodeIDs)
                 .subtracting(CombatGraphRules.implementedOpeningNodeIDs(in: graph)))
         XCTAssertTrue(graph.nodes.filter {
             $0.depth > 3
                 && !CombatGraphRules.firstCompleteRouteNodeIDs.contains($0.id)
+                && !Set(route).contains($0.id)
+                && !CombatGraphRules.evasionCompleteRouteNodeIDs.contains($0.id)
+        }.allSatisfy { !implemented.contains($0.id) })
+
+        var character = CharacterState(level: 9)
+        for id in route {
+            let quote = try CombatGraphRules.previewPurchase(id, for: character,
+                                                             catalogue: graph).get()
+            XCTAssertEqual(CombatGraphRules.commit(quote, for: &character, catalogue: graph),
+                           .committed(id))
+        }
+        XCTAssertEqual(character.ownedCombatNodeIDs, Set(route))
+        XCTAssertEqual(character.unspentCombatPoints, 0)
+
+        var missingMastery = CharacterState(level: 9)
+        missingMastery.ownedCombatNodeIDs = Set(route.dropLast()).subtracting([route[5]])
+        missingMastery.unspentCombatPoints = 1
+        XCTAssertEqual(CombatGraphRules.previewPurchase(route[7], for: missingMastery,
+                                                        catalogue: graph),
+                       .failure(.illegalParent))
+
+        let laterOther: CombatNodeID = "combat.offense.precision.killing_stroke"
+        XCTAssertEqual(CombatGraphRules.previewPurchase(laterOther,
+                                                        for: CharacterState(level: 25),
+                                                        catalogue: graph),
+                       .failure(.unavailable))
+        XCTAssertEqual(try JSONDecoder().decode(CharacterState.self,
+            from: JSONEncoder().encode(character)), character)
+
+        CombatTreeRules.respec(&character)
+        XCTAssertEqual(character.ownedCombatNodeIDs, [])
+        XCTAssertEqual(character.unspentCombatPoints, 8)
+        XCTAssertEqual(character.combatNodeChoices, [:])
+    }
+
+    func testEvasionIsTheExactThirdCompleteEightPointRoute() throws {
+        let route: [CombatNodeID] = [
+            "combat.defense.evasion.footwork",
+            "combat.defense.evasion.light_frame",
+            "combat.defense.evasion.sidestep",
+            "combat.defense.evasion.slippery",
+            "combat.defense.evasion.fall_back",
+            "combat.defense.evasion.feint",
+            "combat.defense.evasion.untouchable",
+            "combat.defense.evasion.ghost",
+        ]
+        XCTAssertEqual(CombatGraphRules.evasionCompleteRouteNodeIDs, Set(route))
+        let implemented = CombatGraphRules.implementedNodeIDs(in: graph)
+        XCTAssertEqual(implemented.count, 54)
+        XCTAssertEqual(
+            implemented.subtracting(CombatGraphRules.implementedOpeningNodeIDs(in: graph)),
+            CombatGraphRules.firstCompleteRouteNodeIDs
+                .union(CombatGraphRules.protectionCompleteRouteNodeIDs)
+                .union(CombatGraphRules.evasionCompleteRouteNodeIDs)
+                .subtracting(CombatGraphRules.implementedOpeningNodeIDs(in: graph)))
+        XCTAssertTrue(graph.nodes.filter {
+            $0.depth > 3
+                && !CombatGraphRules.firstCompleteRouteNodeIDs.contains($0.id)
+                && !CombatGraphRules.protectionCompleteRouteNodeIDs.contains($0.id)
                 && !Set(route).contains($0.id)
         }.allSatisfy { !implemented.contains($0.id) })
 
@@ -269,7 +338,7 @@ final class CombatGraphTests: XCTestCase {
                                                         catalogue: graph),
                        .failure(.illegalParent))
 
-        let laterOther: CombatNodeID = "combat.defense.evasion.ghost"
+        let laterOther: CombatNodeID = "combat.offense.precision.killing_stroke"
         XCTAssertEqual(CombatGraphRules.previewPurchase(laterOther,
                                                         for: CharacterState(level: 25),
                                                         catalogue: graph),

@@ -65,6 +65,9 @@ final class CombatTests: XCTestCase {
         store.mutate("test: everything learned") { Self.learnEverything(&$0) }
         store.write("plains")
         XCTAssertTrue(store.bindAndDepart(), store.bindError ?? "bind failed without a reason")
+        if let arrivalID = store.state.worlds.pendingWorldArrivalReceiptID {
+            XCTAssertTrue(store.enterPendingWorld(arrivalReceiptID: arrivalID))
+        }
         if let gambits {
             store.mutate("set rules") { state in
                 // Tests may use components a fresh game hasn't learned; grant them so the rule is
@@ -836,6 +839,9 @@ final class CombatTests: XCTestCase {
         store.mutate("test: everything learned") { Self.learnEverything(&$0) }
         store.write("plains")
         store.bindAndDepart()
+        if let arrivalID = store.state.worlds.pendingWorldArrivalReceiptID {
+            XCTAssertTrue(store.enterPendingWorld(arrivalReceiptID: arrivalID))
+        }
         store.mutate("stage a fight") { state in
             guard var run = state.worlds.activeRun else { return }
             // **Pinned, so a fight in a test is the same fight every time.** A new game draws its
@@ -3016,7 +3022,7 @@ final class CombatTests: XCTestCase {
 
     func testLegacyGhostAdoptsOnceAndSpentReceiptDoesNotRemintAfterReload() throws {
         var state = GameState.newGame()
-        Self.learnEverything(&state)
+        state.base.binderCharacter.ownedCombatNodeIDs = [CombatDerivedStatsRules.Node.ghost]
         var map = WorldMap(width: 1, height: 1, tiles: [Tile(isRevealed: true)],
                            entry: .init(x: 0, y: 0))
         map[.init(x: 0, y: 0)].content = .portal(isEntry: true)
@@ -3114,6 +3120,9 @@ final class CombatTests: XCTestCase {
         let store = GameStore(io: .temporary(name: "footwork-contact-\(UUID().uuidString)"))
         store.write("plains")
         store.bindAndDepart()
+        if let arrivalID = store.state.worlds.pendingWorldArrivalReceiptID {
+            XCTAssertTrue(store.enterPendingWorld(arrivalReceiptID: arrivalID))
+        }
         store.mutate("stage exact v2 evasion contact") { state in
             while state.base.roster.count < 2 { state.base.roster.append(CompanionState()) }
             state.base.activeParty = [0, 1]
@@ -3129,11 +3138,12 @@ final class CombatTests: XCTestCase {
             WorldRules.beginEncounter(triggeredBy: enemy, runsAutomaticTurns: false, in: &state)
         }
         let frozen = try XCTUnwrap(store.activeEncounter)
-        XCTAssertEqual(frozen.ghostEvasionAvailable, [.binder, .companion(1)])
+        let companionID = try XCTUnwrap(store.state.base.persistentID(forRosterIndex: 1))
+        XCTAssertEqual(frozen.ghostEvasionAvailable, [.binder, .companion(companionID)])
         XCTAssertEqual(frozen.debugV2Evasion?.entry(for: .binder)?.components.map(\.nodeID),
                        [CombatDerivedStatsRules.Node.footwork])
-        XCTAssertTrue(frozen.debugV2Evasion?.entry(for: .companion(0))?.components.isEmpty == true)
-        XCTAssertTrue(frozen.debugV2Evasion?.entry(for: .companion(1))?.components.isEmpty == true)
+        XCTAssertTrue(frozen.debugV2Evasion?.entries.filter { $0.actor != .binder }
+            .allSatisfy(\.components.isEmpty) == true)
 
         store.mutate("change DEBUG ownership after contact") { state in
             state.worlds.activeRun?.tuning.debugCombatV2BinderNodeIDs = []
@@ -5242,6 +5252,64 @@ final class CombatTests: XCTestCase {
         XCTAssertEqual(restored.drawOffReceipts, [:])
         XCTAssertEqual(restored.interposeReceipts, [])
         XCTAssertEqual(restored.nextInterposeActivationSequence, 1)
+    }
+
+    func testPurchasedEvasionRouteFreezesEveryConsumerForTheEncounterAndRelaunch() throws {
+        let route = CombatGraphRules.evasionCompleteRouteNodeIDs
+        let io = SaveFileIO.temporary(name: "evasion-route-\(UUID().uuidString)")
+        let store = GameStore(io: io)
+        store.mutate("own the exact Evasion route", flush: true) { state in
+            state.base.binderCharacter.level = 9
+            state.base.binderCharacter.ownedCombatNodeIDs = route
+            state.base.binderCharacter.unspentCombatPoints = 0
+        }
+        let loadout = CombatTreeRules.loadout(for: store.state.base.binderCharacter)
+        XCTAssertEqual(loadout.evasion, 0.06)
+        XCTAssertEqual(loadout.initiative, 3)
+        XCTAssertEqual(loadout.ambushResistance, 0.5)
+        XCTAssertEqual(loadout.evasionAfterAttacking, 0.10)
+        XCTAssertEqual(loadout.evasionPerCleanRound, 0.05)
+        XCTAssertTrue(loadout.firstAttackAlwaysMisses)
+        XCTAssertEqual(loadout.skills, ["sidestep", "fall_back"])
+
+        store.write("plains")
+        XCTAssertTrue(store.bindAndDepart(), store.bindError ?? "bind failed")
+
+        var state = store.state
+        var run = try XCTUnwrap(state.worlds.activeRun)
+        let enemy = WorldEnemy(id: .init(rawValue: 0xE555), creatureID: "paper_moth",
+                               position: run.playerPosition, isAwake: true)
+        run.enemies = [enemy]
+        run.encounterGraceTurns = 0
+        state.worlds.activeRun = run
+        WorldRules.beginEncounter(triggeredBy: enemy, runsAutomaticTurns: false, in: &state)
+
+        let encounter = try XCTUnwrap(state.worlds.activeRun?.activeEncounter)
+        XCTAssertEqual(encounter.debugV2OwnedNodeIDs?[.binder], route)
+        XCTAssertEqual(encounter.debugV2Initiative?.entry(for: .binder)?.components,
+                       [.init(nodeID: CombatDerivedStatsRules.Node.lightFrame, amount: 3)])
+        let evasion = try XCTUnwrap(encounter.debugV2Evasion?.entry(for: .binder))
+        XCTAssertEqual(evasion.components,
+                       [.init(nodeID: CombatDerivedStatsRules.Node.footwork, amount: 0.06)])
+        XCTAssertEqual(evasion.ownsFeint, true)
+        XCTAssertEqual(evasion.ownsUntouchable, true)
+        XCTAssertEqual(encounter.ghostEvasionAvailable, [.binder])
+        XCTAssertTrue(CombatRules.skills(for: .binder, in: state).contains { $0.id == "sidestep" })
+        XCTAssertTrue(CombatRules.skills(for: .binder, in: state).contains { $0.id == "fall_back" })
+
+        state.base.binderCharacter.ownedCombatNodeIDs = []
+        let frozen = try XCTUnwrap(state.worlds.activeRun?.activeEncounter)
+        XCTAssertEqual(frozen.debugV2OwnedNodeIDs?[.binder], route,
+                       "a live encounter must not reread later character ownership")
+        XCTAssertEqual(frozen.debugV2Evasion, encounter.debugV2Evasion)
+        XCTAssertEqual(frozen.debugV2Initiative, encounter.debugV2Initiative)
+
+        let relaunched = try SaveCodec.decode(SaveCodec.encode(state))
+        let restored = try XCTUnwrap(relaunched.worlds.activeRun?.activeEncounter)
+        XCTAssertEqual(restored.debugV2OwnedNodeIDs?[.binder], route)
+        XCTAssertEqual(restored.debugV2Evasion, encounter.debugV2Evasion)
+        XCTAssertEqual(restored.debugV2Initiative, encounter.debugV2Initiative)
+        XCTAssertEqual(restored.ghostEvasionAvailable, [.binder])
     }
 
     func testEnduranceThresholdCrossingAndMinimumArePureAndFrozenMaximumAware() {
