@@ -1072,6 +1072,8 @@ struct WorkshopView: View {
 struct ScriptoriumView: View {
     @EnvironmentObject private var store: GameStore
     @State private var capability: Capability = .hands
+    @State private var pendingInscription: EquipmentInscriptionQuoteV1?
+    @State private var inscriptionMessage: String?
 
     private var tier: Int { store.state.base.station(Stations.scriptorium).tier }
 
@@ -1123,6 +1125,23 @@ struct ScriptoriumView: View {
         .background(Color(.systemGroupedBackground))
         .navigationTitle("The Scriptorium")
         .navigationBarTitleDisplayMode(.inline)
+        .confirmationDialog("Write Seamward?", isPresented: Binding(
+            get: { pendingInscription != nil },
+            set: { if !$0 { pendingInscription = nil } }
+        ), titleVisibility: .visible) {
+            Button("Inscribe · 10 Essence") {
+                guard let quote = pendingInscription else { return }
+                switch store.installInscription(quote) {
+                case .committed: inscriptionMessage = "Seamward is written on the piece."
+                case .refused(let refusal):
+                    inscriptionMessage = EquipmentInscriptionRules.playerCopy(for: refusal)
+                }
+                pendingInscription = nil
+            }
+            Button("Cancel", role: .cancel) { pendingInscription = nil }
+        } message: {
+            Text("Consumes 1 Seamlight, 10 Essence and writes one permanent Inscription on this exact piece.")
+        }
     }
 
     private var handsCapability: some View {
@@ -1140,6 +1159,7 @@ struct ScriptoriumView: View {
     }
 
     private var inksCapability: some View {
+        VStack(spacing: 12) {
         StationCard(title: "Inks", icon: "eyedropper.halffull") {
             Text("Mixed inks change a focus's authored colour, not its meaning. Prepare and apply them at the Writing Desk.")
                 .font(.caption).foregroundStyle(.secondary)
@@ -1147,6 +1167,28 @@ struct ScriptoriumView: View {
                        value: "\(store.state.base.savedInkMixtures.count)")
             LabeledRow(icon: "drop", label: "Prepared applications",
                        value: "\(store.state.base.preparedInkVials.map(\.remainingApplications).reduce(0, +))")
+        }
+        StationCard(title: "Equipment Inscriptions", icon: "pencil.and.scribble") {
+            Text("Seamward wakes only when a world begins collapsing.")
+                .font(.caption).foregroundStyle(.secondary)
+            ForEach(EquipmentInscriptionRules.eligibleStoredGear(in: store.state.base),
+                    id: \.stableInstanceID) { profile in
+                Button("Inscribe \(profile.slot.displayName) · Seamward") {
+                    switch store.seamwardQuote(for: profile.stableInstanceID) {
+                    case .success(let quote): pendingInscription = quote
+                    case .failure(let refusal):
+                        inscriptionMessage = EquipmentInscriptionRules.playerCopy(for: refusal)
+                    }
+                }.buttonStyle(.bordered).frame(maxWidth: .infinity, alignment: .leading)
+            }
+            if EquipmentInscriptionRules.eligibleStoredGear(in: store.state.base).isEmpty {
+                Text("Store an uninscribed Body or Keepsake piece here first.")
+                    .font(.caption).foregroundStyle(.secondary)
+            }
+            if let inscriptionMessage {
+                Text(inscriptionMessage).font(.caption).foregroundStyle(.secondary)
+            }
+        }
         }
     }
 }

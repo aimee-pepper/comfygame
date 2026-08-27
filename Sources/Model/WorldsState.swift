@@ -1006,6 +1006,7 @@ struct WorldRun: Codable, Equatable, Sendable {
     var floraPoisonTurns: Int = 0
     var scentMask: ScentMaskState?
     var seamlightGuidance: SeamlightGuidanceReceiptV1?
+    var seamwardExpedition: SeamwardExpeditionReceiptV1?
 
     var scentMaskTurnsRemaining: Int {
         guard let scentMask else { return 0 }
@@ -1302,6 +1303,8 @@ struct WorldRun: Codable, Equatable, Sendable {
         } else {
             seamlightGuidance = nil
         }
+        seamwardExpedition = try container.decodeIfPresent(
+            SeamwardExpeditionReceiptV1.self, forKey: .seamwardExpedition)
         satchel = try container.decodeIfPresent(ResourcePool.self, forKey: .satchel) ?? ResourcePool()
         satchelItems = try container.decodeIfPresent(Inventory.self, forKey: .satchelItems)
             ?? Inventory(slots: Tuning.Economy.startingInventorySlots)
@@ -1415,6 +1418,7 @@ extension WorldRun {
         snapshot.carriedItemCountsAtStart = [:]
         snapshot.foundPagesAtStart = []
         snapshot.seamlightGuidance = nil
+        snapshot.seamwardExpedition = nil
         return snapshot
     }
 }

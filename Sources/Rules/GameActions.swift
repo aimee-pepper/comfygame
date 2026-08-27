@@ -1174,7 +1174,7 @@ extension GameStore {
             let companionMaximums = healthCaps.reduce(into: [PersistentPartyMemberID: Int]()) { result, entry in
                 if case .member(let id) = entry.member { result[id] = entry.maximum }
             }
-            let departingRun = WorldRun(
+            var departingRun = WorldRun(
                 runIndex: state.worlds.runIndex,
                 book: book,
                 mapSeed: generationSeed,
@@ -1224,6 +1224,7 @@ extension GameStore {
                 atmospherePresentationReceipt: atmospherePresentationReceipt,
                 worldArrivalReceipt: arrivalReceipt
             )
+            departingRun.seamwardExpedition = EquipmentInscriptionRules.expeditionReceipt(from: state.base)
             state.worlds.activeRun = departingRun
             if WorldArrivalPresentationAuthority.isNativePresentationEnabled {
                 state.worlds.pendingWorldArrivalReceiptID = arrivalReceipt.id
