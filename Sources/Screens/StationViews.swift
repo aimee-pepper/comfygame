@@ -1217,12 +1217,19 @@ struct ScriptoriumView: View {
             }
             ForEach(EquipmentInscriptionRules.inscribedGear(in: store.state.base),
                     id: \.1.stableInstanceID) { location, profile in
-                Button("Erase Seamward · \(profile.slot.displayName) · \(locationCopy(location))",
-                       role: .destructive) {
-                    pendingErasureID = profile.stableInstanceID
-                    pendingErasureReceipt = profile.inscription
+                if let inscription = profile.inscription, inscription.isActiveSeamward {
+                    Button("Erase Seamward · \(profile.slot.displayName) · \(locationCopy(location))",
+                           role: .destructive) {
+                        pendingErasureID = profile.stableInstanceID
+                        pendingErasureReceipt = inscription
+                    }
+                    .accessibilityIdentifier("scriptorium.seamward.erase.\(profile.stableInstanceID.rawValue)")
+                } else if let inscription = profile.inscription {
+                    Text("\(inscription.definitionID.rawValue) · \(profile.slot.displayName) · \(locationCopy(location))")
+                        .foregroundStyle(.secondary)
+                        .accessibilityIdentifier(
+                            "scriptorium.inscription.inert.\(profile.stableInstanceID.rawValue)")
                 }
-                .accessibilityIdentifier("scriptorium.seamward.erase.\(profile.stableInstanceID.rawValue)")
             }
             if EquipmentInscriptionRules.eligibleGear(in: store.state.base).isEmpty,
                EquipmentInscriptionRules.inscribedGear(in: store.state.base).isEmpty {

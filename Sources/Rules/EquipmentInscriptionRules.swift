@@ -24,8 +24,18 @@ struct EquipmentInscriptionReceiptV1: Codable, Equatable, Sendable {
             && rulesVersion == 1
     }
 
+    var isKnownDefinition: Bool { definitionID == EquipmentInscriptionRules.seamward }
+
+    var isStructurallyValid: Bool {
+        version == 1 && !definitionID.rawValue.isEmpty && !sourceItemID.rawValue.isEmpty
+            && rulesVersion > 0
+    }
+
     func validate() throws {
-        guard isActiveSeamward else { throw ValidationError.invalidInscription }
+        guard isStructurallyValid else { throw ValidationError.invalidInscription }
+        if definitionID == EquipmentInscriptionRules.seamward {
+            guard isActiveSeamward else { throw ValidationError.invalidInscription }
+        }
     }
 
     init(version: Int, definitionID: InscriptionID, sourceItemID: ItemID,
@@ -137,7 +147,7 @@ enum EquipmentInscriptionRules {
     static func eligibleGear(in base: BaseState) -> [(EquipmentInscriptionLocation, GearInstanceProfile)] {
         var result: [(EquipmentInscriptionLocation, GearInstanceProfile)] =
             eligibleStoredGear(in: base).map { (EquipmentInscriptionLocation.stored, $0) }
-        for member in base.partyMembers {
+        for member in homeRosterMembers(in: base) {
             for slot in [GearSlot.armor, .keepsake] {
                 if let profile = base.worn(slot, by: member)?.gearProfile,
                    profile.inscription == nil {
@@ -151,14 +161,14 @@ enum EquipmentInscriptionRules {
     static func inscribedGear(in base: BaseState) -> [(EquipmentInscriptionLocation, GearInstanceProfile)] {
         var result: [(EquipmentInscriptionLocation, GearInstanceProfile)] = []
         for stack in base.inventory.stacks {
-            if let profile = stack.gearProfile, profile.inscription?.isActiveSeamward == true {
+            if let profile = stack.gearProfile, profile.inscription != nil {
                 result.append((.stored, profile))
             }
         }
-        for member in base.partyMembers {
+        for member in homeRosterMembers(in: base) {
             for slot in [GearSlot.armor, .keepsake] {
                 if let profile = base.worn(slot, by: member)?.gearProfile,
-                   profile.inscription?.isActiveSeamward == true {
+                   profile.inscription != nil {
                     result.append((.worn(member), profile))
                 }
             }
@@ -284,7 +294,7 @@ enum EquipmentInscriptionRules {
         if let profile = base.inventory.stacks.first(where: { $0.gearProfile?.stableInstanceID == id })?.gearProfile {
             return (.stored, profile)
         }
-        for member in base.partyMembers {
+        for member in homeRosterMembers(in: base) {
             for slot in [GearSlot.armor, .keepsake] {
                 if let profile = base.worn(slot, by: member)?.gearProfile, profile.stableInstanceID == id {
                     return (.worn(member), profile)
@@ -292,6 +302,12 @@ enum EquipmentInscriptionRules {
             }
         }
         return nil
+    }
+
+    private static func homeRosterMembers(in base: BaseState) -> [PartyMember] {
+        [.binder] + base.roster.indices.compactMap { index in
+            base.persistentID(forRosterIndex: index).map(PartyMember.member)
+        }
     }
 
     private static func setInscription(_ receipt: EquipmentInscriptionReceiptV1?, on id: InstanceID,

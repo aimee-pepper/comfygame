@@ -78,6 +78,51 @@ final class EquipmentInscriptionRulesTests: XCTestCase {
         XCTAssertTrue(frozen.hasActiveContributor)
     }
 
+    func testInactiveHomeRosterWornGearIsSelectableAndErasableButNeverContributes() throws {
+        var state = eligibleState()
+        state.base.activeParty = []
+        let receipt = EquipmentInscriptionReceiptV1(version: 1, definitionID: "seamward",
+                                                     sourceItemID: Items.seamlight,
+                                                     rulesVersion: 1, inkRecipe: nil)
+        let worn = try XCTUnwrap(state.base.inventory.stacks.first { $0.id.rawValue == 40 })
+        state.base.inventory.remove(worn.id)
+        state.base.roster[0].equipped[.armor] = EquippedPiece(worn)
+
+        XCTAssertEqual(EquipmentInscriptionRules.eligibleGear(in: state.base).map(\.0),
+                       [.worn(.member(.founderQuill))])
+        let quote = try EquipmentInscriptionRules.evaluate(
+            gearStableInstanceID: .init(rawValue: 40), inkChoice: .ash, in: state).get()
+        XCTAssertEqual(quote.location, .worn(.member(.founderQuill)))
+        XCTAssertEqual(EquipmentInscriptionRules.commit(quote, in: &state), .committed(receipt))
+        XCTAssertEqual(EquipmentInscriptionRules.inscribedGear(in: state.base).map(\.0),
+                       [.worn(.member(.founderQuill))])
+        XCTAssertNil(EquipmentInscriptionRules.expeditionReceipt(from: state.base),
+                     "a Home wearer must remain absent from expedition contributors")
+        XCTAssertTrue(EquipmentInscriptionRules.erase(.init(rawValue: 40), expected: receipt,
+                                                       in: &state))
+        XCTAssertNil(state.base.roster[0].equipped[.armor]?.gearProfile?.inscription)
+    }
+
+    func testUnknownStructurallyValidInscriptionRoundTripsVisibleAndInert() throws {
+        var state = eligibleState()
+        let unknown = EquipmentInscriptionReceiptV1(version: 1,
+                                                     definitionID: "future_starlace",
+                                                     sourceItemID: "future_source",
+                                                     rulesVersion: 7, inkRecipe: nil)
+        state.base.inventory.stacks[0].gearProfile?.inscription = unknown
+        let before = try SaveCodec.encode(state)
+        let decoded = try SaveCodec.decode(before)
+        XCTAssertEqual(decoded, state)
+        let canonical = try SaveCodec.encode(decoded)
+        XCTAssertEqual(try SaveCodec.decode(canonical), decoded)
+        let visible = EquipmentInscriptionRules.inscribedGear(in: decoded.base)
+        XCTAssertEqual(visible.first?.1.inscription, unknown)
+        XCTAssertFalse(try XCTUnwrap(visible.first?.1.inscription).isActiveSeamward)
+        XCTAssertNil(EquipmentInscriptionRules.expeditionReceipt(from: decoded.base))
+        XCTAssertEqual(decoded.base.essenceCrystalCount, state.base.essenceCrystalCount)
+        XCTAssertEqual(decoded.base.inventory.stacks, state.base.inventory.stacks)
+    }
+
     func testCollapseActivatesWithoutExtraTurnAndGuidancePersists() throws {
         var state = GameState.newGame()
         var active = makeWorldRun()
