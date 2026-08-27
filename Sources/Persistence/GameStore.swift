@@ -314,6 +314,7 @@ enum WorldFieldNarration {
                 ?? "They're coming with you."
         case .usedItem(let what, let member):
             "\(what). \(member == .binder ? "You feel" : "They feel") better."
+        case .seamlightActivated: "The Seamlight leans toward a portal seam."
         case .surveyed(let readings):
             "Surveyed: " + readings.map { "\($0.name) \($0.text)" }.joined(separator: ", ") + "."
         case .metTraveller(let id):
@@ -737,6 +738,7 @@ final class GameStore: ObservableObject {
         case .foundTraveller(let id): tagged("traveller", id.rawValue)
         case .metTraveller(let id): tagged("met", id.rawValue)
         case .usedItem(let name, let member): tagged("use", name, member.id)
+        case .seamlightActivated: tagged("seamlight-activated")
         case .surveyed(let readings):
             tagged("survey", readings.map {
                 encoded([$0.target.rawValue, $0.name, $0.text])

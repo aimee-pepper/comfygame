@@ -53,6 +53,7 @@ enum WorldRules {
         case metTraveller(TravellerID)
         /// Something used out in the world rather than mid-fight.
         case usedItem(String, on: PartyMember)
+        case seamlightActivated
         case surveyed([SurveyReading])
         case searchedSite(SiteID, turnsRemaining: Int)
         case siteOpened(SiteID)
@@ -484,6 +485,15 @@ enum WorldRules {
             run.scentMask = .init(sourceItemInstanceID: stackID,
                                   startTurn: run.turnsTaken,
                                   expiresAfterTurn: run.turnsTaken + scentMaskDuration(effect))
+        case .seamlightGuidance:
+            switch SeamlightRules.evaluate(sourceItemInstanceID: stackID, in: state) {
+            case .failure(let refusal): return [.blocked(SeamlightRules.playerCopy(for: refusal))]
+            case .success(let quote):
+                switch SeamlightRules.commit(quote, in: &state) {
+                case .activated(_, let events): return events
+                case .refused(let refusal): return [.blocked(SeamlightRules.playerCopy(for: refusal))]
+                }
+            }
         case .returnHome, .clearPoison, .clearElemental, .clearAnyStatus, .preventStatus,
              .coatPoison, .coatBurn, .coatBleed, .coatDazzle, .identifyCurio:
             return [.blocked("Use that at the appropriate moment.")]

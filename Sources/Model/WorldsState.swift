@@ -1005,6 +1005,7 @@ struct WorldRun: Codable, Equatable, Sendable {
     /// survive a force-quit halfway through it.
     var floraPoisonTurns: Int = 0
     var scentMask: ScentMaskState?
+    var seamlightGuidance: SeamlightGuidanceReceiptV1?
 
     var scentMaskTurnsRemaining: Int {
         guard let scentMask else { return 0 }
@@ -1293,6 +1294,14 @@ struct WorldRun: Codable, Equatable, Sendable {
         turnsTaken = try container.decodeIfPresent(Int.self, forKey: .turnsTaken) ?? 0
         clock = try container.decodeIfPresent(WorldClock.self, forKey: .clock)
             ?? WorldClock.migratingLegacy(book: book, seed: mapSeed, turnsTaken: turnsTaken)
+        if container.contains(.seamlightGuidance),
+           let receipt = try? container.decode(SeamlightGuidanceReceiptV1.self,
+                                               forKey: .seamlightGuidance),
+           receipt.validates(for: turnsTaken) {
+            seamlightGuidance = receipt
+        } else {
+            seamlightGuidance = nil
+        }
         satchel = try container.decodeIfPresent(ResourcePool.self, forKey: .satchel) ?? ResourcePool()
         satchelItems = try container.decodeIfPresent(Inventory.self, forKey: .satchelItems)
             ?? Inventory(slots: Tuning.Economy.startingInventorySlots)
@@ -1405,6 +1414,7 @@ extension WorldRun {
         snapshot.experienceBreakdown = RunExperienceBreakdown()
         snapshot.carriedItemCountsAtStart = [:]
         snapshot.foundPagesAtStart = []
+        snapshot.seamlightGuidance = nil
         return snapshot
     }
 }

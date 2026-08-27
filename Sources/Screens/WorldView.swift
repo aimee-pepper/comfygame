@@ -2836,14 +2836,17 @@ private struct FieldKitSheet: View {
                     .disabled(true)
                     .accessibilityIdentifier("field-kit.scent-mask.use")
             } else {
-                Button(stack.catalogID == Items.scentMask ? "Apply Scent Mask" : "Use now") {
+                Button(stack.catalogID == Items.scentMask ? "Apply Scent Mask"
+                       : stack.catalogID == Items.seamlight ? "Light Seamlight" : "Use now") {
                     store.useItemInWorld(stack, on: .binder)
                     dismiss()
                 }
                 .buttonStyle(.borderedProminent)
                 .frame(maxWidth: .infinity, minHeight: 44)
                 .accessibilityIdentifier(stack.catalogID == Items.scentMask
-                                         ? "field-kit.scent-mask.use" : "field-kit.supply.use")
+                                         ? "field-kit.scent-mask.use"
+                                         : stack.catalogID == Items.seamlight
+                                         ? "field-kit.seamlight.use" : "field-kit.supply.use")
             }
         }
         .padding(14)

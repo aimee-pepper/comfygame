@@ -3,6 +3,7 @@ import Foundation
 /// Apothecary recipes combine named reagents with property-matched natural stock. Named resources
 /// keep their authored chemical jobs; animal and plant samples remain freely substitutable.
 enum ConsumableCraftingRules {
+    enum Family: String, Codable, Sendable { case treatments, coatings, fieldwork }
     static let scentMaskDuration = 12
     static let scentMaskMinimumGrade = 25.0
 
@@ -30,9 +31,13 @@ enum ConsumableCraftingRules {
         var resources: [ResourceID: Int]
         var motes: Int = 0
         var essence: Int
+        var family: Family = .treatments
     }
 
     static let recipes: [Recipe] = [
+        Recipe(output: Items.seamlight, material: nil,
+               resources: ["quartz": 1, "resin": 1, "fiber": 1], essence: 0,
+               family: .fieldwork),
         Recipe(output: Items.scentMask, material: nil, resources: ["reagent": 1], essence: 0),
         Recipe(output: "salve_lesser", material: .init(property: .flexibility, minimum: 25, count: 1),
                resources: ["resin": 1], essence: 0),
@@ -81,9 +86,14 @@ enum ConsumableCraftingRules {
     }
 
     static func canInfer(_ recipe: Recipe, in state: GameState) -> Bool {
+        guard state.base.station(Stations.apothecary).isUnlocked else { return false }
+        if recipe.output == Items.seamlight {
+            return [ResourceID("quartz"), "resin", "fiber"].contains {
+                state.base.resources[$0] > 0
+            }
+        }
         if recipe.output == Items.scentMask {
-            return state.base.station(Stations.apothecary).isUnlocked
-                && state.base.resources["reagent"] > 0
+            return state.base.resources["reagent"] > 0
                 && !scentMaskAnimalResources(in: state).isEmpty
         }
         let hasSample = recipe.material == nil || !qualifyingSamples(for: recipe, in: state).isEmpty
@@ -115,6 +125,18 @@ enum ConsumableCraftingRules {
         // Scent Mask has an exact-instance commit API. Refuse the legacy automatic-sample path so
         // presentation can never quote one animal resource and silently consume another.
         guard recipe.output != Items.scentMask else { return false }
+        if recipe.output == Items.seamlight {
+            var candidate = state
+            guard candidate.base.knownConsumableRecipes.contains(Items.seamlight),
+                  shortfall(recipe, in: candidate).isEmpty else { return false }
+            for (id, amount) in recipe.resources {
+                guard candidate.base.resources.spend(amount, of: id) else { return false }
+            }
+            candidate.base.store(ItemStack(id: .init(rawValue: candidate.base.nextItemID()),
+                                           catalogID: Items.seamlight))
+            state = candidate
+            return true
+        }
         guard state.base.knownConsumableRecipes.contains(recipe.output),
               shortfall(recipe, in: state).isEmpty else { return false }
         if let need = recipe.material {

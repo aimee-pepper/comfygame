@@ -1019,6 +1019,7 @@ private struct CombatItemSheet: View {
         case .identifyCurio: return "Identifies a curio outside combat."
         case .lureCreature: return "Draws a roaming creature outside combat."
         case .maskScent: return "Masks the party's scent outside combat."
+        case .seamlightGuidance: return "Guides the expedition toward a portal seam outside combat."
         }
     }
 }

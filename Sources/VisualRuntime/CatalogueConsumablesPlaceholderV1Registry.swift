@@ -170,7 +170,7 @@ struct CatalogueConsumablesPlaceholderV1Registry: NativeVisualRuntime.Registry {
     ]
 
     private static let unsupportedIDs = """
-    essence_crystal heat_core caustic_core light_core conduit_fixture
+    essence_crystal heat_core caustic_core light_core conduit_fixture seamlight
     curio_humming_shard curio_bound_knot cache_key anchor_frame
     blade_chipped blade_keen ripping_hook the_long_grievance bone_awl raking_edge
     blade_binders hairsplitter field_maul banded_mace anvilfall the_settled_argument

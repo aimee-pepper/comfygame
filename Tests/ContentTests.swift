@@ -26,8 +26,8 @@ final class ContentTests: XCTestCase {
 #endif
     func testReleaseContentDoesNotPromiseRetiredTokenOrQuirkSystems() throws {
         let catalogue = ContentCatalog.shared
-        XCTAssertEqual(catalogue.items.filter { $0.consumable != nil }.count, 18,
-                       "Scent Mask expands the intended release consumables; Traveller's Token stays retired")
+        XCTAssertEqual(catalogue.items.filter { $0.consumable != nil }.count, 19,
+                       "Seamlight expands intended release consumables; Traveller's Token stays retired")
         let scentMask = try XCTUnwrap(catalogue.item(Items.scentMask))
         XCTAssertEqual(scentMask.name, "Scent Mask")
         XCTAssertEqual(scentMask.consumable?.effect, .maskScent,

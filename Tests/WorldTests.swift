@@ -2088,12 +2088,16 @@ final class WorldTests: XCTestCase {
 
     @MainActor
     func testExplorationMapResolverCoversEveryCatalogueObjectAndOpaqueUnknownIdentity() {
-        XCTAssertEqual(ContentCatalog.shared.items.count, 102)
+        XCTAssertEqual(ContentCatalog.shared.items.count, 103)
         for (offset, item) in ContentCatalog.shared.items.enumerated() {
             let stack = ItemStack(id: InstanceID(rawValue: UInt64(10_000 + offset)),
                                   catalogID: item.id, identified: true)
             let key = MapAssetTestSupport.explorationMapKey(
                 tile: Tile(content: .item(stack), isRevealed: true))
+            if item.id == Items.seamlight {
+                XCTAssertNil(key, "Seamlight art remains Asset-owned and unpromoted")
+                continue
+            }
             XCTAssertNotNil(key, item.id.rawValue)
             XCTAssertTrue(key?.contains(item.id.rawValue) == true, item.id.rawValue)
         }
