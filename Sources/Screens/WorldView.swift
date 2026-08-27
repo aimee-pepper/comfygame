@@ -34,7 +34,7 @@ struct WorldScreenLayoutReceipt: Equatable {
 private struct WorldRegionProbe: UIViewRepresentable {
     enum Region {
         case safe, safeContent, status, carried, controls, directionPad, directionButton(Int), minimap, fieldKit,
-             actionRow, emergencyScroll, event
+             useTile, look, emergencyScroll, event
     }
     let region: Region
     final class ProbeView: UIView {
@@ -55,12 +55,8 @@ private struct WorldRegionProbe: UIViewRepresentable {
                 WorldMapStageMeasurement.layoutReceipt.directionButtonFrames[index] = frame
             case .minimap: WorldMapStageMeasurement.layoutReceipt.minimapFrame = frame
             case .fieldKit: WorldMapStageMeasurement.layoutReceipt.fieldKitFrame = frame
-            case .actionRow:
-                let width = max(0, (frame.width - WorldControlsLayout.actionSpacing) / 2)
-                WorldMapStageMeasurement.layoutReceipt.useTileFrame = CGRect(
-                    x: frame.minX, y: frame.minY, width: width, height: frame.height)
-                WorldMapStageMeasurement.layoutReceipt.lookFrame = CGRect(
-                    x: frame.maxX - width, y: frame.minY, width: width, height: frame.height)
+            case .useTile: WorldMapStageMeasurement.layoutReceipt.useTileFrame = frame
+            case .look: WorldMapStageMeasurement.layoutReceipt.lookFrame = frame
             case .emergencyScroll:
                 WorldMapStageMeasurement.layoutReceipt.emergencyScrollFrame = frame
             case .event: WorldMapStageMeasurement.layoutReceipt.eventToastFrame = frame
@@ -148,7 +144,7 @@ enum WorldDurationPresentation {
 /// It deliberately owns no view state and is never encoded into the campaign save.
 struct WorldScreenPresentation: Equatable, Sendable {
     struct PartyHealth: Equatable, Sendable, Identifiable {
-        var id: PersistentPartyMemberID
+        var id: PartyMember
         var name: String
         var current: Int
         var maximum: Int
@@ -187,13 +183,13 @@ struct WorldScreenPresentation: Equatable, Sendable {
 
     static func make(run: WorldRun, state: GameState) -> Self {
         var party: [PartyHealth] = [
-            .init(id: .founderQuill, name: "Binder", current: run.binderHP,
+            .init(id: .binder, name: "Binder", current: run.binderHP,
                   maximum: CombatRules.health(of: .binder, in: run).max),
         ]
-        for id in state.base.activeParty where id != .founderQuill {
+        for id in state.base.activeParty {
             guard let index = state.base.rosterIndex(for: id) else { continue }
             let health = CombatRules.health(of: .companion(id), in: run)
-            party.append(.init(id: id, name: state.base.roster[index].name,
+            party.append(.init(id: .member(id), name: state.base.roster[index].name,
                                current: health.current, maximum: health.max))
         }
 
@@ -1499,11 +1495,11 @@ struct WorldView: View {
             VStack(spacing: 12) {
                 MinimapView(run: run)
                     .frame(width: 96, height: 96)
-                    .fixedSize()
-                    .frame(maxWidth: .infinity)
 #if DEBUG
                     .background(WorldRegionProbe(region: .minimap))
 #endif
+                    .fixedSize()
+                    .frame(maxWidth: .infinity)
 
                 WorldActionRow {
                     AnyView(WorldWholeFaceControl(
@@ -1523,7 +1519,11 @@ struct WorldView: View {
                     }
                     .accessibilityValue(interactionDetail(in: run))
                     .accessibilityHint(canInteract ? "" : useTileUnavailableReason)
-                    .accessibilityIdentifier("world.interact"))
+                    .accessibilityIdentifier("world.interact")
+#if DEBUG
+                    .background(WorldRegionProbe(region: .useTile))
+#endif
+                    )
                 } look: {
                     AnyView(WorldWholeFaceControl(
                         coordinator: controlCoordinator, action: .armLook,
@@ -1549,13 +1549,14 @@ struct WorldView: View {
                     .accessibilityHint(isLookArmed
                         ? "Look mode armed. Choose one direction."
                         : "Inspect one adjacent tile without moving or spending a turn.")
-                    .accessibilityIdentifier("world.look"))
+                    .accessibilityIdentifier("world.look")
+#if DEBUG
+                    .background(WorldRegionProbe(region: .look))
+#endif
+                    )
                     }
                     .accessibilityElement(children: .contain)
                     .accessibilityIdentifier("world.action-row")
-#if DEBUG
-                    .background(WorldRegionProbe(region: .actionRow))
-#endif
             }
             .frame(maxWidth: .infinity)
         }

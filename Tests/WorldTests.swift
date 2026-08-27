@@ -3315,6 +3315,8 @@ final class WorldTests: XCTestCase {
 
     func testB18bTransientProjectionKeepsTypedCarriedAndPartyTruthOutOfSave() throws {
         var state = startedRun(book(["terrain": "plains"]), seed: 18_800)
+        state.worlds.activeRun?.binderHP = 6
+        state.worlds.activeRun?.companionHP[.founderQuill] = 8
         state.worlds.activeRun?.satchel.add(4, of: Resources.quartz)
         state.worlds.activeRun?.satchelItems.stacks = [
             ItemStack(id: InstanceID(rawValue: 8_811), catalogID: Items.scentMask,
@@ -3345,10 +3347,16 @@ final class WorldTests: XCTestCase {
         let presentation = WorldScreenPresentation.make(run: run, state: state)
 
         XCTAssertEqual(presentation.turn, run.turnsTaken)
-        XCTAssertEqual(presentation.party.first?.id, .founderQuill)
-        XCTAssertEqual(presentation.party.first?.current, run.binderHP)
+        XCTAssertEqual(presentation.party.count, 3)
+        XCTAssertEqual(presentation.party.map(\.id), [
+            PartyMember.binder,
+            PartyMember.member(.founderQuill),
+            PartyMember.member(.traveller("halloway")),
+        ])
+        XCTAssertEqual(presentation.party.map(\.current), [6, 8, 9],
+                       "Binder, Quill, and traveller health must remain independent")
         XCTAssertEqual(presentation.party.last, .init(
-            id: .traveller("halloway"), name: "Halloway", current: 9,
+            id: .member(.traveller("halloway")), name: "Halloway", current: 9,
             maximum: CombatRules.health(of: .companion(.traveller("halloway")),
                                         in: run).max))
         XCTAssertTrue(presentation.carried.contains(.resource(Resources.quartz, amount: 4)))
@@ -3368,6 +3376,20 @@ final class WorldTests: XCTestCase {
                        "an uninspected page projection must be structurally neutral to hidden identity")
         XCTAssertEqual(try SaveCodec.encode(state), frozen,
                        "the World-screen projection is transient and cannot mutate persistence")
+    }
+
+    func testB18bDefaultPartyProjectsBinderAndQuillAsDistinctTypedMembers() throws {
+        var state = startedRun(book([:]), seed: 18_799)
+        state.worlds.activeRun?.binderHP = 5
+        state.worlds.activeRun?.companionHP[.founderQuill] = 7
+        let run = try XCTUnwrap(state.worlds.activeRun)
+
+        let party = WorldScreenPresentation.make(run: run, state: state).party
+
+        XCTAssertEqual(party.count, 2)
+        XCTAssertEqual(party.map(\.id), [.binder, .member(.founderQuill)])
+        XCTAssertEqual(party.map(\.name), ["Binder", "Quill"])
+        XCTAssertEqual(party.map(\.current), [5, 7])
     }
 
     func testB18bEmergencyScrollBeginsOnlyBelowFiveCompleteRows() {
@@ -3410,6 +3432,11 @@ final class WorldTests: XCTestCase {
                               tiles: Array(repeating: Tile(), count: 900),
                               entry: GridPoint(x: 15, y: 15)),
                 playerPosition: GridPoint(x: 15, y: 15))
+            $0.worlds.activeRun?.satchel.add(4, of: Resources.quartz)
+            $0.worlds.activeRun?.satchelItems.stacks = [
+                ItemStack(id: InstanceID(rawValue: 18_814), catalogID: Items.scentMask,
+                          count: 2, identified: true),
+            ]
         }
         for lesson in TutorialLessonID.allCases {
             store.completeTutorial(lesson, fact: "b18b_layout_fixture")
@@ -3481,7 +3508,7 @@ final class WorldTests: XCTestCase {
             controller.view.drawHierarchy(in: controller.view.bounds, afterScreenUpdates: true)
         }
         let attachment = XCTAttachment(image: image)
-        attachment.name = "explore-safe-space-complete-rows-368x800"
+        attachment.name = "world-populated-carried-strip-368x800"
         attachment.lifetime = .keepAlways; add(attachment)
         window.isHidden = true
     }
@@ -3517,6 +3544,12 @@ final class WorldTests: XCTestCase {
         XCTAssertEqual(receipt.viewportColumns, 11)
         XCTAssertGreaterThanOrEqual(receipt.viewportRows, WorldScreenLayoutPolicy.minimumCompleteRows)
         XCTAssertEqual(try SaveCodec.encode(store.state), frozen)
+        let image = UIGraphicsImageRenderer(size: window.bounds.size).image { _ in
+            controller.view.drawHierarchy(in: controller.view.bounds, afterScreenUpdates: true)
+        }
+        let attachment = XCTAttachment(image: image)
+        attachment.name = "world-emergency-scroll-368x400"
+        attachment.lifetime = .keepAlways; add(attachment)
         window.isHidden = true
     }
 
@@ -3546,6 +3579,12 @@ final class WorldTests: XCTestCase {
         XCTAssertFalse(event.intersects(receipt.carriedStripFrame))
         XCTAssertFalse(event.intersects(receipt.controlsFrame))
         XCTAssertEqual(try SaveCodec.encode(store.state), frozen)
+        let image = UIGraphicsImageRenderer(size: window.bounds.size).image { _ in
+            controller.view.drawHierarchy(in: controller.view.bounds, afterScreenUpdates: true)
+        }
+        let attachment = XCTAttachment(image: image)
+        attachment.name = "world-event-present-368x800"
+        attachment.lifetime = .keepAlways; add(attachment)
         window.isHidden = true
     }
 
