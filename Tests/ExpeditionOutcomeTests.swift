@@ -408,10 +408,15 @@ final class ExpeditionOutcomeTests: XCTestCase {
                                   grade: 57, source: "plain grazer")
         let bone = CraftMaterialUnitV1(kind: .bone, properties: MaterialProperties(density: 78),
                                   grade: 71, source: "dense walker")
-        run.worldMaterialReserve.addHarvested(hide, count: 19,
+        run.creatureMaterialReserve.addHarvested(hide, count: 19,
                                          sourceReceipt: "run:1:foe:100", dropOrdinal: 0)
-        run.worldMaterialReserve.addHarvested(bone, count: 6,
+        run.creatureMaterialReserve.addHarvested(bone, count: 6,
                                          sourceReceipt: "run:1:foe:101", dropOrdinal: 0)
+        let fibre = CraftMaterialUnitV1(kind: .fibre,
+                                        properties: MaterialProperties(flexibility: 50),
+                                        grade: 55, source: "field fibre")
+        run.worldMaterialReserve.addHarvested(fibre, count: 2,
+                                              sourceReceipt: "run:1:harvest:102", dropOrdinal: 0)
         var state = store.state
         let banked = GameStore.bankHaul(of: run, outcomeID: 44, into: &state, fraction: 1)
 
@@ -422,9 +427,10 @@ final class ExpeditionOutcomeTests: XCTestCase {
             guard case .materialSample(let material) = line else { return nil }
             return material
         }
-        XCTAssertEqual(materialLines.count, 25)
-        XCTAssertEqual(Set(materialLines.compactMap(\.reserveUnitID)).count, 25)
-        XCTAssertEqual(state.base.worldMaterialReserve.count, 25)
+        XCTAssertEqual(materialLines.count, 27)
+        XCTAssertEqual(Set(materialLines.compactMap(\.reserveUnitID)).count, 27)
+        XCTAssertEqual(state.base.creatureMaterialReserve.count, 25)
+        XCTAssertEqual(state.base.worldMaterialReserve.count, 2)
 
         let summary = RunExitSummary(runIndex: 1, kind: .portal, reason: "fixture",
                                      turnsTaken: 1, haulKeptFraction: 1,
@@ -451,6 +457,8 @@ final class ExpeditionOutcomeTests: XCTestCase {
         for (label, fraction) in [("full", 1.0), ("partial", 0.5), ("failure", 0.0)] {
             let store = fundedStore("reserve-\(label)")
             XCTAssertTrue(store.bindAndDepart())
+            let arrivalID = try XCTUnwrap(store.state.worlds.pendingWorldArrivalReceiptID)
+            XCTAssertTrue(store.enterPendingWorld(arrivalReceiptID: arrivalID))
             var run = try XCTUnwrap(store.state.worlds.activeRun)
             run.tuning.collapseRecoveryFraction = fraction
             for index in 0..<6 {
@@ -462,14 +470,22 @@ final class ExpeditionOutcomeTests: XCTestCase {
                     grade: Double(60 + index), source: "\(label)-sample-\(index)",
                     qualifier: index.isMultiple(of: 2) ? "pale" : "dense"
                 )
-                run.worldMaterialReserve.add(CraftMaterialHoldingV1(
+                run.creatureMaterialReserve.add(CraftMaterialHoldingV1(
                     id: .init(rawValue: "\(label)-unit-\(index)"), sample: sample,
                     protectedReturn: index < 2
                 ))
             }
-            let expected = run.worldMaterialReserve.partitionedForFailure(
-                fraction: fraction, outcomeID: 1
-            )
+            for index in 0..<2 {
+                let family: MaterialFamilyID = index == 0 ? .timber : .fibre
+                let sample = CraftMaterialUnitV1(
+                    kind: family, properties: MaterialProperties(flexibility: Double(50 + index)),
+                    grade: Double(55 + index), source: "\(label)-world-\(index)")
+                run.worldMaterialReserve.add(CraftMaterialHoldingV1(
+                    id: .init(rawValue: "\(label)-world-unit-\(index)"), sample: sample))
+            }
+            let expected = partitionCraftMaterialsForFailure(
+                world: run.worldMaterialReserve, creature: run.creatureMaterialReserve,
+                fraction: fraction, outcomeID: 1)
             store.mutate("fixture: reserve outcome \(label)") {
                 $0.worlds.activeRun = run
             }
@@ -488,19 +504,26 @@ final class ExpeditionOutcomeTests: XCTestCase {
                 return material
             }
             XCTAssertEqual(Set(recovered.compactMap { $0.reserveUnitID }),
-                           Set(expected.kept.units.map(\.id)), label)
+                           Set((expected.keptWorld.units + expected.keptCreature.units).map(\.id)), label)
             XCTAssertEqual(Set(lost.compactMap { $0.reserveUnitID }),
-                           Set(expected.lost.units.map(\.id)), label)
-            XCTAssertTrue(run.worldMaterialReserve.units.filter(\.protectedReturn).allSatisfy { unit in
+                           Set((expected.lostWorld.units + expected.lostCreature.units).map(\.id)), label)
+            XCTAssertTrue(run.creatureMaterialReserve.units.filter(\.protectedReturn).allSatisfy { unit in
                 recovered.contains { $0.reserveUnitID == unit.id && $0.sample == unit.sample }
             }, label)
             XCTAssertEqual(Set(store.state.base.worldMaterialReserve.units.map(\.id)),
-                           Set(expected.kept.units.map(\.id)), label)
+                           Set(expected.keptWorld.units.map(\.id)), label)
+            XCTAssertEqual(Set(store.state.base.creatureMaterialReserve.units.map(\.id)),
+                           Set(expected.keptCreature.units.map(\.id)), label)
             XCTAssertTrue(store.state.base.worldMaterialReserve.units.allSatisfy {
                 !$0.protectedReturn
             }, label)
+            XCTAssertTrue(store.state.base.creatureMaterialReserve.units.allSatisfy {
+                !$0.protectedReturn
+            }, label)
 
-            let expectedCounts = Dictionary(grouping: expected.kept.units, by: \.sample.kind)
+            let expectedCounts = Dictionary(
+                grouping: expected.keptWorld.units + expected.keptCreature.units,
+                by: \.sample.kind)
                 .mapValues(\.count)
             for (kind, count) in expectedCounts {
                 let name = count == 1 ? kind.displayName : kind.pluralName.capitalisedSentence
@@ -711,7 +734,11 @@ final class ExpeditionOutcomeTests: XCTestCase {
         let sample = CraftMaterialUnitV1(kind: .hide, properties: .init(flexibility: 55),
                                     grade: 63, source: "receipt fixture")
         let unitID = CraftMaterialUnitID(rawValue: "receipt-hide")
-        run.worldMaterialReserve.add(CraftMaterialHoldingV1(id: unitID, sample: sample))
+        run.creatureMaterialReserve.add(CraftMaterialHoldingV1(id: unitID, sample: sample))
+        let worldID = CraftMaterialUnitID(rawValue: "receipt-timber")
+        let timber = CraftMaterialUnitV1(kind: .timber, properties: .init(hardness: 55),
+                                         grade: 63, source: "world receipt fixture")
+        run.worldMaterialReserve.add(CraftMaterialHoldingV1(id: worldID, sample: timber))
         var state = GameState.newGame()
 
         let banked = GameStore.bankHaul(of: run, outcomeID: 81, into: &state, fraction: 1)
@@ -721,7 +748,8 @@ final class ExpeditionOutcomeTests: XCTestCase {
             return material
         }.first)
         XCTAssertEqual(material.recoveredDestination, .stored)
-        XCTAssertTrue(state.base.worldMaterialReserve.units.contains { $0.id == unitID })
+        XCTAssertTrue(state.base.creatureMaterialReserve.units.contains { $0.id == unitID })
+        XCTAssertTrue(state.base.worldMaterialReserve.units.contains { $0.id == worldID })
     }
 
     func testLegacyTypedRecoveredItemDecodesWithDestinationNotRecorded() throws {
