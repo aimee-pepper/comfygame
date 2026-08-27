@@ -3568,6 +3568,7 @@ final class WorldTests: XCTestCase {
         let window = UIWindow(frame: CGRect(x: 0, y: 0, width: 368, height: 800))
         window.rootViewController = controller
         window.makeKeyAndVisible()
+        controller.overrideUserInterfaceStyle = .light
         controller.additionalSafeAreaInsets = UIEdgeInsets(top: 59, left: 0, bottom: 34, right: 0)
         controller.view.frame = window.bounds
         controller.view.setNeedsLayout(); controller.view.layoutIfNeeded()
@@ -3575,6 +3576,12 @@ final class WorldTests: XCTestCase {
 
         let receipt = WorldMapStageMeasurement.layoutReceipt
         let event = try XCTUnwrap(receipt.eventToastFrame)
+        XCTAssertTrue(receipt.statusFrame.insetBy(dx: -0.5, dy: -0.5)
+            .contains(receipt.exploreTitleFrame), "Explore must remain fully inside the fixed header")
+        XCTAssertTrue(receipt.statusFrame.insetBy(dx: -0.5, dy: -0.5)
+            .contains(receipt.collapseValueFrame), "collapse value must remain fully inside the fixed header")
+        XCTAssertGreaterThan(receipt.exploreTitleFrame.width, 0)
+        XCTAssertGreaterThan(receipt.collapseValueFrame.width, 0)
         XCTAssertTrue(receipt.mapViewportFrame.insetBy(dx: -0.5, dy: -0.5).contains(event))
         XCTAssertFalse(event.intersects(receipt.carriedStripFrame))
         XCTAssertFalse(event.intersects(receipt.controlsFrame))
@@ -3583,8 +3590,23 @@ final class WorldTests: XCTestCase {
             controller.view.drawHierarchy(in: controller.view.bounds, afterScreenUpdates: true)
         }
         let attachment = XCTAttachment(image: image)
-        attachment.name = "world-event-present-368x800"
+        attachment.name = "world-event-present-light-header-contrast-368x800"
         attachment.lifetime = .keepAlways; add(attachment)
+
+        controller.overrideUserInterfaceStyle = .dark
+        controller.view.setNeedsLayout(); controller.view.layoutIfNeeded()
+        RunLoop.main.run(until: Date().addingTimeInterval(0.04))
+        let darkImage = UIGraphicsImageRenderer(size: window.bounds.size).image { _ in
+            controller.view.drawHierarchy(in: controller.view.bounds, afterScreenUpdates: true)
+        }
+        let darkAttachment = XCTAttachment(image: darkImage)
+        darkAttachment.name = "world-event-present-dark-header-contrast-368x800"
+        darkAttachment.lifetime = .keepAlways; add(darkAttachment)
+
+        XCTAssertGreaterThanOrEqual(PixelUITheme.contrastRatio(
+            PixelUITheme.light.screen, PixelUITheme.light.edgeDark), 4.5)
+        XCTAssertGreaterThanOrEqual(PixelUITheme.contrastRatio(
+            PixelUITheme.dark.text, PixelUITheme.dark.edgeDark), 4.5)
         window.isHidden = true
     }
 

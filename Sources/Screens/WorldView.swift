@@ -5,6 +5,8 @@ import UIKit
 struct WorldScreenLayoutReceipt: Equatable {
     var safeFrame: CGRect = .zero
     var statusFrame: CGRect = .zero
+    var exploreTitleFrame: CGRect = .zero
+    var collapseValueFrame: CGRect = .zero
     var mapViewportFrame: CGRect = .zero
     var mapRenderedFrame: CGRect = .zero
     var tileSidePixels: Int = 0
@@ -33,7 +35,7 @@ struct WorldScreenLayoutReceipt: Equatable {
 
 private struct WorldRegionProbe: UIViewRepresentable {
     enum Region {
-        case safe, safeContent, status, carried, controls, directionPad, directionButton(Int), minimap, fieldKit,
+        case safe, safeContent, status, exploreTitle, collapseValue, carried, controls, directionPad, directionButton(Int), minimap, fieldKit,
              useTile, look, emergencyScroll, event
     }
     let region: Region
@@ -46,6 +48,8 @@ private struct WorldRegionProbe: UIViewRepresentable {
             case .safe: WorldMapStageMeasurement.layoutReceipt.safeFrame = frame
             case .safeContent: WorldMapStageMeasurement.layoutReceipt.safeContentFrame = frame
             case .status: WorldMapStageMeasurement.layoutReceipt.statusFrame = frame
+            case .exploreTitle: WorldMapStageMeasurement.layoutReceipt.exploreTitleFrame = frame
+            case .collapseValue: WorldMapStageMeasurement.layoutReceipt.collapseValueFrame = frame
             case .carried: WorldMapStageMeasurement.layoutReceipt.carriedStripFrame = frame
             case .controls: WorldMapStageMeasurement.layoutReceipt.controlsFrame = frame
             case .directionPad: WorldMapStageMeasurement.layoutReceipt.directionPadFrame = frame
@@ -747,7 +751,7 @@ struct WorldFieldFeedbackRow: View {
             TimelineView(.animation(minimumInterval: 1.0 / 60.0)) { _ in
             VStack(alignment: .leading, spacing: 2) {
                 Text(batch.orderedNarrations[0])
-                    .font(.system(size: 16)).foregroundStyle(PixelUITheme.text)
+                    .font(.system(size: 16)).foregroundStyle(PixelUITheme.textOnEdgeDark)
                     .lineLimit(2).frame(maxWidth: .infinity, alignment: .leading)
                 HStack(spacing: 6) {
                     if batch.orderedNarrations.count > 1 {
@@ -815,7 +819,7 @@ struct WorldFieldFeedbackRow: View {
                     ForEach(Array(batch.orderedNarrations.enumerated()), id: \.offset) { index, line in
                         Text(index == 0 ? line : "NEXT · \(line)")
                             .font(index == 0 ? .system(size: 17) : .custom("Tiny5", size: 15))
-                            .foregroundStyle(index == 0 ? PixelUITheme.text : PixelUITheme.muted)
+                            .foregroundStyle(PixelUITheme.textOnEdgeDark.opacity(index == 0 ? 1 : 0.82))
                             .fixedSize(horizontal: false, vertical: true)
                             .frame(maxWidth: .infinity, alignment: .leading)
                     }
@@ -2095,13 +2099,18 @@ private struct StabilityHeader: View {
     let collapseStatus: String
 
     var body: some View {
-        HStack(spacing: 10) {
+        HStack(spacing: 6) {
             Rectangle()
                 .fill(PixelUITheme.clasp)
                 .frame(width: 5, height: 34)
             Text("Explore")
                 .font(.custom("Jersey 10", size: 25))
                 .foregroundStyle(PixelUITheme.text)
+                .fixedSize()
+                .layoutPriority(2)
+#if DEBUG
+                .background(WorldRegionProbe(region: .exploreTitle))
+#endif
             Spacer(minLength: 4)
             VStack(alignment: .leading, spacing: 1) {
                 Text("STABILITY")
@@ -2111,6 +2120,7 @@ private struct StabilityHeader: View {
                     .font(.custom("Tiny5", size: 11))
                     .foregroundStyle(colour)
             }
+            .fixedSize(horizontal: true, vertical: false)
             GeometryReader { proxy in
                 Rectangle()
                     .fill(PixelUITheme.edgeDark)
@@ -2121,7 +2131,7 @@ private struct StabilityHeader: View {
                     }
                     .overlay(Rectangle().stroke(PixelUITheme.edge, lineWidth: 1))
             }
-            .frame(width: 78, height: 6)
+            .frame(minWidth: 36, idealWidth: 52, maxWidth: 52, minHeight: 6, maxHeight: 6)
             VStack(alignment: .trailing, spacing: 1) {
                 Text("COLLAPSE")
                     .font(.custom("Tiny5", size: 9))
@@ -2130,8 +2140,12 @@ private struct StabilityHeader: View {
                     .font(.custom("Tiny5", size: 10))
                     .foregroundStyle(PixelUITheme.text)
                     .lineLimit(1)
-                    .minimumScaleFactor(0.7)
+                    .minimumScaleFactor(0.55)
+#if DEBUG
+                    .background(WorldRegionProbe(region: .collapseValue))
+#endif
                 }
+            .frame(width: 94, alignment: .trailing)
         }
         .padding(.horizontal, 8)
         .frame(height: 62)
