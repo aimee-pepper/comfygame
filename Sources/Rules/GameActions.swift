@@ -952,21 +952,14 @@ extension GameStore {
         forcePlayableEntryRefusalForTesting: Bool = false
     ) -> Bool {
         bindError = nil
-        let selectedWorldPage = worldPageInstanceID.flatMap { collectedWorldPage($0) }
-        if worldPageInstanceID != nil && selectedWorldPage == nil {
-            bindError = "That collected page is no longer available."
-            return false
-        }
-        let availability = worldPageInstanceID.map {
-            bindAvailability(worldPageInstanceID: $0, bornAnchored: bornAnchored)
-        } ?? bindAvailability(bornAnchored: bornAnchored)
-        guard availability.isReady else {
-            bindError = availability.refusalMessage
-            return false
-        }
         guard let stagedBindQuote = writingDeskBindQuote(
             selectedWorldPageID: worldPageInstanceID, bornAnchored: bornAnchored) else {
             bindError = "The binding changed before departure. Nothing was spent."
+            return false
+        }
+        let selectedWorldPage = worldPageInstanceID.flatMap { collectedWorldPage($0) }
+        guard stagedBindQuote.availability.isReady else {
+            bindError = stagedBindQuote.availability.refusalMessage
             return false
         }
         let anchorPremium = stagedBindQuote.anchorageReceipt.premium

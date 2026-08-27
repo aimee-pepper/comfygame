@@ -590,6 +590,82 @@ final class PageTests: XCTestCase {
     }
 
     @MainActor
+    func testInvalidCollectedSourcesMountUnavailableAndDisableStrictBindRailWithoutMutation() throws {
+        enum Fixture: String, CaseIterable { case staleHash, duplicateID }
+
+        for fixture in Fixture.allCases {
+            var selected = try XCTUnwrap(WorldPageCatalog.starterInstances.first {
+                $0.definition.id != WorldPageCatalog.earthlikeTestInstance.definition.id
+            })
+            selected.id = InstanceID(rawValue: 9_000_001)
+            let store = GameStore(io: .temporary(
+                name: "writing-invalid-\(fixture.rawValue)-\(UUID().uuidString)"))
+            store.mutate("prepare invalid collected source") { state in
+                state.base.setEssenceCrystalCount(1_000)
+                for lesson in TutorialLessonID.allCases {
+                    state.tutorial.complete(lesson, fact: "invalid_source_fixture")
+                }
+                switch fixture {
+                case .staleHash:
+                    var stale = selected
+                    stale.definition.title += " stale"
+                    state.base.collectedWorldPages = WorldPageCatalog.starterInstances
+                        + [WorldPageCatalog.earthlikeTestInstance, stale]
+                case .duplicateID:
+                    state.base.collectedWorldPages = WorldPageCatalog.starterInstances
+                        + [WorldPageCatalog.earthlikeTestInstance, selected, selected]
+                }
+                state.base.starterWorldPageBundleFulfilled = true
+            }
+            let before = try SaveCodec.makeEncoder().encode(store.state)
+
+            XCTAssertNil(store.writingDeskReviewModel(selectedWorldPageID: selected.id))
+            XCTAssertNil(store.writingDeskBindQuote(selectedWorldPageID: selected.id))
+
+            for scheme in [ColorScheme.light, .dark] {
+                var mountedRail: (disabled: Bool, copy: String)?
+                let controller = UIHostingController(rootView:
+                    WritingDeskView(debugInitialPane: "The world",
+                                    debugSelectedWorldPageID: selected.id,
+                                    debugBindRailProbe: { disabled, copy in
+                                        mountedRail = (disabled, copy)
+                                    })
+                        .environmentObject(store)
+                        .environment(\.colorScheme, scheme)
+                        .frame(width: 368, height: 800))
+                let window = UIWindow(frame: .init(x: 0, y: 0, width: 368, height: 800))
+                window.rootViewController = controller
+                window.makeKeyAndVisible()
+                controller.view.frame = window.bounds
+                controller.view.layoutIfNeeded()
+                RunLoop.main.run(until: Date().addingTimeInterval(0.1))
+                controller.view.layoutIfNeeded()
+
+                XCTAssertEqual(mountedRail?.disabled, true,
+                               "strict invalid source must disable the mounted Bind rail")
+                XCTAssertEqual(mountedRail?.copy,
+                               "This page changed before it could be reviewed.")
+
+                let image = UIGraphicsImageRenderer(size: window.bounds.size).image { _ in
+                    controller.view.drawHierarchy(in: controller.view.bounds,
+                                                  afterScreenUpdates: true)
+                }
+                let attachment = XCTAttachment(image: image)
+                attachment.name = "writing-invalid-\(fixture.rawValue)-\(scheme == .light ? "light" : "dark")"
+                attachment.lifetime = .keepAlways
+                add(attachment)
+                window.isHidden = true
+            }
+
+            XCTAssertFalse(store.bindAndDepart(worldPageInstanceID: selected.id))
+            XCTAssertEqual(store.bindError,
+                           "The binding changed before departure. Nothing was spent.")
+            XCTAssertEqual(try SaveCodec.makeEncoder().encode(store.state), before,
+                           "mount and refusal must preserve tutorial and all SaveCodec state")
+        }
+    }
+
+    @MainActor
     func testWritingDeskPrimaryFacesPressImmediatelyAndDisabledBindStaysInactive() throws {
         let store = GameStore(io: .temporary(name: "writing-press-\(UUID().uuidString)"))
         store.mutate("prepare writing press fixture") { state in

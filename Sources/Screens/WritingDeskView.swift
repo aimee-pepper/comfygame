@@ -89,15 +89,26 @@ struct WritingDeskView: View {
     @State private var writingAssetsReady = false
     @State private var productionPack: WritingDeskProductionPack?
     @State private var writingPackUnavailable = false
+#if DEBUG
+    private var debugBindRailProbe: ((Bool, String) -> Void)?
+#endif
 
     @State private var bin: Bin = .compounds
 
-    init() {}
+    init() {
+#if DEBUG
+        debugBindRailProbe = nil
+#endif
+    }
 
 #if DEBUG
-    init(debugInitialPane: String, debugBornAnchored: Bool = false) {
+    init(debugInitialPane: String, debugBornAnchored: Bool = false,
+         debugSelectedWorldPageID: InstanceID? = nil,
+         debugBindRailProbe: ((Bool, String) -> Void)? = nil) {
         _pane = State(initialValue: Pane(rawValue: debugInitialPane) ?? .write)
         _bornAnchored = State(initialValue: debugBornAnchored)
+        _selectedWorldPageID = State(initialValue: debugSelectedWorldPageID)
+        self.debugBindRailProbe = debugBindRailProbe
     }
 #endif
 
@@ -1023,6 +1034,7 @@ struct WritingDeskView: View {
             }
             .buttonStyle(.borderedProminent)
             .fullFacePressFeedback("writing.bind-depart")
+            .accessibilityIdentifier("writing.bind-depart")
             .disabled(!activeBindAvailability.isReady)
 
             if let error = store.bindError {
@@ -1042,13 +1054,18 @@ struct WritingDeskView: View {
         .padding(.top, 10)
         .padding(.bottom, 8)
         .background(.bar)
+#if DEBUG
+        .onAppear {
+            debugBindRailProbe?(!activeBindAvailability.isReady, bindFootnote)
+        }
+#endif
     }
 
     private var activeBindAvailability: BindAvailability {
-        if let id = selectedWorldPageID {
-            return store.bindAvailability(worldPageInstanceID: id, bornAnchored: bornAnchored)
-        }
-        return store.bindAvailability(bornAnchored: bornAnchored)
+        store.writingDeskReviewModel(
+            selectedWorldPageID: selectedWorldPageID,
+            bornAnchored: bornAnchored)?.bindAvailability
+            ?? .unavailable("This page changed before it could be reviewed.")
     }
 
     private var totalCost: Int {

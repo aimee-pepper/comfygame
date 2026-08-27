@@ -513,17 +513,18 @@ enum WritingDeskBindQuoteFactory {
 }
 
 extension GameStore {
-    /// Authoritative no-mutation review projection. Availability comes from the existing exact
-    /// departure quote path, while the factory owns disclosure and never exposes BookProjection.
+    /// Authoritative no-mutation review projection. The strict departure quote validates the
+    /// exact source first; its availability then owns both the review and the fixed Bind rail.
     func writingDeskReviewModel(selectedWorldPageID: InstanceID? = nil,
                                 bornAnchored: Bool = false) -> WritingDeskReviewModel? {
-        let availability = selectedWorldPageID.map {
-            bindAvailability(worldPageInstanceID: $0, bornAnchored: bornAnchored)
-        } ?? bindAvailability(bornAnchored: bornAnchored)
-        return WritingDeskReviewModelFactory.make(
+        guard let quote = writingDeskBindQuote(
+            selectedWorldPageID: selectedWorldPageID, bornAnchored: bornAnchored),
+              let review = WritingDeskReviewModelFactory.make(
             state: writingDeskState, selectedWorldPageID: selectedWorldPageID,
-            bornAnchored: bornAnchored, bindAvailability: availability,
-            tuning: DebugTuningProfile.active)
+            bornAnchored: bornAnchored, bindAvailability: quote.availability,
+            tuning: DebugTuningProfile.active),
+              review.sourceKey == quote.sourceKey else { return nil }
+        return review
     }
 
     func writingDeskBindQuote(selectedWorldPageID: InstanceID? = nil,
