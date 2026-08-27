@@ -403,6 +403,8 @@ struct Species: Codable, Equatable, Identifiable, Sendable {
     var traits: CreatureTraits
     /// Which world it belongs to, so an anchored world keeps its cast forever.
     var worldSeed: UInt64
+    /// Frozen for newly generated ecology-aware worlds. Nil preserves legacy casts exactly.
+    var habitat: CreatureHabitat?
     /// Whether it's out after dark. Derived from what it senses with, not authored.
     var isNocturnal: Bool { CreatureIdentity.isNocturnal(traits) }
 
@@ -416,10 +418,12 @@ struct Species: Codable, Equatable, Identifiable, Sendable {
     var identity: CreatureIdentity.Match { identity() }
     var displayName: String { identity.name }
 
-    init(id: InstanceID, traits: CreatureTraits, worldSeed: UInt64) {
+    init(id: InstanceID, traits: CreatureTraits, worldSeed: UInt64,
+         habitat: CreatureHabitat? = nil) {
         self.id = id
         self.traits = traits
         self.worldSeed = worldSeed
+        self.habitat = habitat
     }
 
     init(from decoder: Decoder) throws {
@@ -427,5 +431,6 @@ struct Species: Codable, Equatable, Identifiable, Sendable {
         id = try c.decode(InstanceID.self, forKey: .id)
         traits = try c.decodeIfPresent(CreatureTraits.self, forKey: .traits) ?? CreatureTraits()
         worldSeed = try c.decodeIfPresent(UInt64.self, forKey: .worldSeed) ?? 0
+        habitat = try c.decodeIfPresent(CreatureHabitat.self, forKey: .habitat)
     }
 }

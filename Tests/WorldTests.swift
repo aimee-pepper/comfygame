@@ -1019,6 +1019,172 @@ final class WorldTests: XCTestCase {
 
     // MARK: Worldgen
 
+    func testB213aHabitatComponentsUseRepairedStartTopologyAndStableRowMajorIDs() throws {
+        let width = 7, height = 5
+        var map = WorldMap(width: width, height: height,
+                           tiles: Array(repeating: Tile(ground: .chasm), count: width * height),
+                           entry: GridPoint(x: 0, y: 2))
+        for x in 0...2 { map[GridPoint(x: x, y: 2)] = Tile(ground: .soil) }
+        map[GridPoint(x: 3, y: 2)] = Tile(ground: .water)
+        for x in 4...6 { map[GridPoint(x: x, y: 2)] = Tile(ground: .deepWater) }
+        map[GridPoint(x: 5, y: 0)] = Tile(ground: .deepWater)
+        map[GridPoint(x: 6, y: 0)] = Tile(ground: .deepWater)
+        map[GridPoint(x: 0, y: 4)] = Tile(ground: .water) // one-tile puddle: unavailable
+
+        let availability = CreatureHabitatAvailability.resolve(
+            in: map, from: GridPoint(x: 0, y: 2))
+        XCTAssertEqual(availability.components(for: .terrestrial).count, 1)
+        let terrestrial = try XCTUnwrap(availability.components(for: .terrestrial).first)
+        XCTAssertEqual(terrestrial.id, map.index(of: GridPoint(x: 0, y: 2)))
+        XCTAssertEqual(terrestrial.tiles, (0...2).map { GridPoint(x: $0, y: 2) })
+        XCTAssertEqual(availability.components(for: .shore).count, 1)
+        let shore = try XCTUnwrap(availability.components(for: .shore).first)
+        XCTAssertEqual(shore.tiles, [GridPoint(x: 2, y: 2), GridPoint(x: 3, y: 2)])
+        XCTAssertTrue(shore.contactEligible)
+        let aquatic = availability.components(for: .aquatic)
+        XCTAssertEqual(aquatic.map(\.id), [map.index(of: GridPoint(x: 5, y: 0)),
+                                            map.index(of: GridPoint(x: 3, y: 2))])
+        XCTAssertFalse(aquatic[0].contactEligible)
+        XCTAssertTrue(aquatic[1].contactEligible)
+        XCTAssertFalse(aquatic.flatMap(\.tiles).contains(GridPoint(x: 0, y: 4)))
+        XCTAssertEqual(availability.components(for: .aerial).first?.tiles,
+                       (0...3).map { GridPoint(x: $0, y: 2) })
+    }
+
+    func testB213aEcologyStreamDoesNotPerturbLegacyGameplayCast() {
+        let seed: UInt64 = 0xB2_13_A
+        let readings = BookRules.readings(for: book(["biome": "verdant"]), seed: seed)
+        let map = WorldMap(width: 5, height: 5,
+                           tiles: Array(repeating: Tile(ground: .soil), count: 25),
+                           entry: GridPoint(x: 0, y: 2))
+        let habitats = CreatureHabitatAvailability.resolve(in: map,
+                                                            from: GridPoint(x: 2, y: 2))
+        let legacy = LifeRules.cast(for: readings, seed: seed)
+        let ecological = LifeRules.cast(for: readings, seed: seed, habitats: habitats)
+        XCTAssertEqual(ecological.map(\.id), legacy.map(\.id))
+        XCTAssertEqual(ecological.map(\.traits), legacy.map(\.traits))
+        XCTAssertEqual(ecological.map(\.worldSeed), legacy.map(\.worldSeed))
+        XCTAssertTrue(ecological.allSatisfy { $0.habitat != nil })
+    }
+
+    func testB213aGeneratedOrdinaryEnemiesPersistOnlyOnTheirFrozenLegalComponents() throws {
+        for seed in (1...18).map({ UInt64($0) * 65_537 }) {
+            let generated = Worldgen.generate(
+                book: book(["biome": "verdant", "bounty": "teeming_life"]), seed: seed)
+            let guardianPoints = Set(generated.sites.filter {
+                $0.definition?.contents.guardian != nil
+            }.map(\.position))
+            let ordinary = generated.enemies.filter {
+                !$0.isSessile && !$0.isApex && !guardianPoints.contains($0.position)
+            }
+            for enemy in ordinary {
+                let receipt = try XCTUnwrap(enemy.habitatPlacement)
+                XCTAssertTrue(receipt.isValid)
+                XCTAssertTrue(receipt.legalTiles.contains(enemy.position))
+                XCTAssertEqual(generated.cast.first { $0.id == enemy.speciesID }?.habitat,
+                               receipt.habitat)
+                switch receipt.habitat {
+                case .terrestrial:
+                    XCTAssertNotEqual(generated.map[enemy.position].ground, .water)
+                    XCTAssertNotEqual(generated.map[enemy.position].ground, .deepWater)
+                case .shore:
+                    XCTAssertTrue(receipt.legalTiles.contains(enemy.position))
+                case .aquatic:
+                    XCTAssertTrue([.water, .deepWater].contains(
+                        generated.map[enemy.position].ground))
+                case .aerial:
+                    XCTAssertNotEqual(generated.map[enemy.position].ground, .deepWater)
+                    XCTAssertNotEqual(generated.map[enemy.position].ground, .chasm)
+                }
+            }
+            let requiredContact = min(ordinary.count,
+                                      max(ordinary.isEmpty ? 0 : 1,
+                                          Int(ceil(Double(ordinary.count) * 0.65))))
+            XCTAssertGreaterThanOrEqual(ordinary.count {
+                $0.habitatPlacement?.contactEligible == true
+            }, requiredContact)
+        }
+    }
+
+    func testB213aHabitatIdentityAndPlacementRoundTripWhileLegacyDecodeStaysNil() throws {
+        let tiles = [GridPoint(x: 1, y: 1), GridPoint(x: 2, y: 1)]
+        let receipt = CreatureHabitatPlacementReceiptV1(
+            habitat: .terrestrial, componentID: 6, legalTiles: tiles, contactEligible: true)
+        let species = Species(id: InstanceID(rawValue: 91), traits: CreatureTraits(),
+                              worldSeed: 44, habitat: .terrestrial)
+        let enemy = WorldEnemy(id: InstanceID(rawValue: 92), speciesID: species.id,
+                               traits: species.traits, position: tiles[0],
+                               habitatPlacement: receipt)
+        XCTAssertEqual(try SaveCodec.makeDecoder().decode(
+            Species.self, from: JSONEncoder().encode(species)), species)
+        XCTAssertEqual(try SaveCodec.makeDecoder().decode(
+            WorldEnemy.self, from: JSONEncoder().encode(enemy)), enemy)
+
+        let legacySpecies = try SaveCodec.makeDecoder().decode(Species.self, from: Data(
+            "{\"id\":{\"rawValue\":1},\"traits\":{},\"worldSeed\":2}".utf8))
+        let legacyEnemy = try SaveCodec.makeDecoder().decode(WorldEnemy.self, from: Data(
+            "{\"id\":{\"rawValue\":3},\"position\":{\"x\":0,\"y\":0}}".utf8))
+        XCTAssertNil(legacySpecies.habitat)
+        XCTAssertNil(legacyEnemy.habitatPlacement)
+    }
+
+    func testB213aRosterSwapPreservesFrozenHabitatComponent() throws {
+        let tiles = [GridPoint(x: 1, y: 1), GridPoint(x: 2, y: 1)]
+        let receipt = CreatureHabitatPlacementReceiptV1(
+            habitat: .terrestrial, componentID: 6, legalTiles: tiles,
+            contactEligible: true)
+        let day = Species(id: InstanceID(rawValue: 101), traits: CreatureTraits(),
+                          worldSeed: 44, habitat: .terrestrial)
+        var nightTraits = CreatureTraits()
+        nightTraits.sensory = Sensory.allocation(
+            vision: 3, mechano: 60, chemo: 30, thermo: 7)
+        let night = Species(id: InstanceID(rawValue: 102), traits: nightTraits,
+                            worldSeed: 44, habitat: .terrestrial)
+        var run = WorldRun(runIndex: 1, book: book([:]), mapSeed: 44,
+                           rng: SeededRNG(seed: 44),
+                           map: WorldMap(width: 4, height: 4,
+                                         tiles: Array(repeating: Tile(), count: 16),
+                                         entry: GridPoint(x: 0, y: 0)),
+                           playerPosition: GridPoint(x: 0, y: 0),
+                           enemies: [WorldEnemy(id: InstanceID(rawValue: 103),
+                                                speciesID: day.id, traits: day.traits,
+                                                position: tiles[0],
+                                                habitatPlacement: receipt)],
+                           cast: [day, night])
+
+        WorldRules.swapRoster(in: &run, toNight: true)
+
+        XCTAssertEqual(run.enemies[0].speciesID, night.id)
+        XCTAssertEqual(run.enemies[0].position, tiles[0])
+        XCTAssertEqual(run.enemies[0].habitatPlacement, receipt)
+    }
+
+    func testB213aPursuitCannotLeaveTheFrozenHabitatComponent() {
+        let origin = GridPoint(x: 1, y: 1)
+        let receipt = CreatureHabitatPlacementReceiptV1(
+            habitat: .terrestrial, componentID: 1,
+            legalTiles: [GridPoint(x: 1, y: 0), origin], contactEligible: true)
+        let species = Species(id: InstanceID(rawValue: 111), traits: CreatureTraits(),
+                              worldSeed: 55, habitat: .terrestrial)
+        let enemy = WorldEnemy(id: InstanceID(rawValue: 112), speciesID: species.id,
+                               traits: species.traits, position: origin,
+                               habitatPlacement: receipt, isAwake: true)
+        let map = WorldMap(width: 5, height: 4,
+                           tiles: Array(repeating: Tile(ground: .soil), count: 20),
+                           entry: GridPoint(x: 0, y: 0))
+        let run = WorldRun(runIndex: 1, book: book([:]), mapSeed: 55,
+                           rng: SeededRNG(seed: 55), map: map,
+                           playerPosition: GridPoint(x: 3, y: 1), enemies: [enemy],
+                           cast: [species])
+        var state = GameState.newGame()
+        state.worlds.activeRun = run
+
+        _ = WorldRules.advanceTurn(in: &state)
+
+        XCTAssertEqual(state.worlds.activeRun?.enemies[0].position, origin)
+        XCTAssertEqual(state.worlds.activeRun?.enemies[0].habitatPlacement, receipt)
+    }
+
     func testWildWorldPageSelectionIsDeterministicOrderIndependentAndPityGuaranteed() throws {
         let context = WildWorldPageSelectionRules.Context(
             resolvedExpeditions: 5, drought: 5, ownedCopies: [:],

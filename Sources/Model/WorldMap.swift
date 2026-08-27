@@ -97,6 +97,28 @@ enum GroundType: String, Codable, CaseIterable, Sendable {
     }
 }
 
+enum CreatureHabitat: String, Codable, CaseIterable, Sendable {
+    case terrestrial, shore, aquatic, aerial
+}
+
+/// The bind-time habitat component an ordinary specimen belongs to. The exact legal tile set is
+/// frozen with the specimen so later crumbling can block movement without reinterpreting which
+/// island, shoreline, water body, or aerial region the animal came from.
+struct CreatureHabitatPlacementReceiptV1: Codable, Equatable, Sendable {
+    static let rulesVersion = "creature-habitat-1"
+
+    var version: String = Self.rulesVersion
+    var habitat: CreatureHabitat
+    var componentID: Int
+    var legalTiles: [GridPoint]
+    var contactEligible: Bool
+
+    var isValid: Bool {
+        version == Self.rulesVersion && componentID >= 0
+            && Set(legalTiles).count == legalTiles.count && legalTiles.count >= 2
+    }
+}
+
 struct SurfaceDeposits: Codable, Equatable, Sendable {
     var snow: Bool = false
     var settledAsh: Bool = false
@@ -283,6 +305,8 @@ struct WorldEnemy: Codable, Equatable, Identifiable, Sendable {
     /// resolves rather than emptying its map of everything the player was walking toward.
     var creatureID: CreatureID?
     var position: GridPoint
+    /// Nil only for legacy, authored, sessile, and apex enemies whose movement remains unchanged.
+    var habitatPlacement: CreatureHabitatPlacementReceiptV1?
     /// Woken by the player entering its aggro radius. Never goes back to sleep.
     var awareness: Awareness = .unaware
     var quietStepHesitationUsed = false
@@ -310,13 +334,15 @@ struct WorldEnemy: Codable, Equatable, Identifiable, Sendable {
     var isApex: Bool = false
 
     init(id: InstanceID, speciesID: InstanceID? = nil, traits: CreatureTraits? = nil,
-         creatureID: CreatureID? = nil, position: GridPoint, isAwake: Bool = false,
+         creatureID: CreatureID? = nil, position: GridPoint,
+         habitatPlacement: CreatureHabitatPlacementReceiptV1? = nil, isAwake: Bool = false,
          isSessile: Bool = false, floraID: InstanceID? = nil, isApex: Bool = false) {
         self.id = id
         self.speciesID = speciesID
         self.traits = traits
         self.creatureID = creatureID
         self.position = position
+        self.habitatPlacement = habitatPlacement
         self.awareness = isAwake ? .pursuing : .unaware
         self.isSessile = isSessile
         self.floraID = floraID
@@ -331,6 +357,8 @@ struct WorldEnemy: Codable, Equatable, Identifiable, Sendable {
         traits = try c.decodeIfPresent(CreatureTraits.self, forKey: .traits)
         creatureID = try c.decodeIfPresent(CreatureID.self, forKey: .creatureID)
         position = try c.decode(GridPoint.self, forKey: .position)
+        habitatPlacement = try c.decodeIfPresent(
+            CreatureHabitatPlacementReceiptV1.self, forKey: .habitatPlacement)
         awareness = try c.decodeIfPresent(Awareness.self, forKey: .awareness)
             ?? ((try c.decodeIfPresent(Bool.self, forKey: .isAwake) ?? false) ? .pursuing : .unaware)
         quietStepHesitationUsed = try c.decodeIfPresent(Bool.self, forKey: .quietStepHesitationUsed) ?? false
@@ -341,7 +369,7 @@ struct WorldEnemy: Codable, Equatable, Identifiable, Sendable {
     }
 
     private enum CodingKeys: String, CodingKey {
-        case id, speciesID, traits, creatureID, position, awareness, isAwake
+        case id, speciesID, traits, creatureID, position, habitatPlacement, awareness, isAwake
         case quietStepHesitationUsed, maskedScentContact, isSessile, floraID, isApex
     }
 
@@ -352,6 +380,7 @@ struct WorldEnemy: Codable, Equatable, Identifiable, Sendable {
         try c.encodeIfPresent(traits, forKey: .traits)
         try c.encodeIfPresent(creatureID, forKey: .creatureID)
         try c.encode(position, forKey: .position)
+        try c.encodeIfPresent(habitatPlacement, forKey: .habitatPlacement)
         try c.encode(awareness, forKey: .awareness)
         try c.encode(isAwake, forKey: .isAwake)
         try c.encode(quietStepHesitationUsed, forKey: .quietStepHesitationUsed)

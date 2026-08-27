@@ -1,5 +1,95 @@
 import Foundation
 
+struct CreatureHabitatComponent: Equatable, Sendable {
+    var habitat: CreatureHabitat
+    var id: Int
+    var tiles: [GridPoint]
+    var contactEligible: Bool
+
+    var placementReceipt: CreatureHabitatPlacementReceiptV1 {
+        .init(habitat: habitat, componentID: id, legalTiles: tiles,
+              contactEligible: contactEligible)
+    }
+}
+
+struct CreatureHabitatAvailability: Equatable, Sendable {
+    static let minimumComponentTileCount = 2
+
+    var components: [CreatureHabitat: [CreatureHabitatComponent]]
+    var waterFraction: Double
+    var shoreFraction: Double
+
+    func components(for habitat: CreatureHabitat, contactOnly: Bool = false)
+        -> [CreatureHabitatComponent] {
+        (components[habitat] ?? []).filter { !contactOnly || $0.contactEligible }
+    }
+
+    func isAvailable(_ habitat: CreatureHabitat, contactOnly: Bool = false) -> Bool {
+        !components(for: habitat, contactOnly: contactOnly).isEmpty
+    }
+
+    static func resolve(in map: WorldMap, from start: GridPoint) -> Self {
+        let startConnected = TerrainRules.reachable(from: start, in: map)
+        let liquid = Set(map.allPoints.filter {
+            map[$0].ground == .water || map[$0].ground == .deepWater
+        })
+        let nonChasmCount = max(1, map.allPoints.count { map[$0].ground != .chasm })
+        let terrestrial = Set(startConnected.filter {
+            map[$0].ground != .water && map[$0].ground != .deepWater
+        })
+        let shore = Set(map.allPoints.filter { point in
+            if map[point].ground == .water { return true }
+            return startConnected.contains(point)
+                && map[point].ground != .water && map[point].ground != .deepWater
+                && map.neighbours(of: point).contains { liquid.contains($0) }
+        })
+        let aerial = Set(startConnected.filter {
+            map[$0].ground != .deepWater && map[$0].ground != .chasm
+        })
+
+        func connected(_ points: Set<GridPoint>, habitat: CreatureHabitat,
+                       contact: (Set<GridPoint>) -> Bool) -> [CreatureHabitatComponent] {
+            var remaining = points
+            var result: [CreatureHabitatComponent] = []
+            while let first = remaining.min(by: { map.index(of: $0) < map.index(of: $1) }) {
+                var queue = [first]
+                var cursor = 0
+                var memberSet: Set<GridPoint> = [first]
+                remaining.remove(first)
+                while cursor < queue.count {
+                    let point = queue[cursor]
+                    cursor += 1
+                    for next in map.neighbours(of: point)
+                    where remaining.remove(next) != nil {
+                        memberSet.insert(next)
+                        queue.append(next)
+                    }
+                }
+                guard memberSet.count >= minimumComponentTileCount else { continue }
+                let tiles = memberSet.sorted { map.index(of: $0) < map.index(of: $1) }
+                result.append(.init(habitat: habitat, id: map.index(of: tiles[0]),
+                                    tiles: tiles, contactEligible: contact(memberSet)))
+            }
+            return result.sorted { $0.id < $1.id }
+        }
+
+        let all: [CreatureHabitat: [CreatureHabitatComponent]] = [
+            .terrestrial: connected(terrestrial, habitat: .terrestrial) { !$0.isEmpty },
+            .shore: connected(shore, habitat: .shore) {
+                !$0.isDisjoint(with: startConnected.filter { map[$0].isPassable })
+            },
+            .aquatic: connected(liquid, habitat: .aquatic) {
+                !$0.isDisjoint(with: startConnected.filter { map[$0].ground == .water })
+            },
+            .aerial: connected(aerial, habitat: .aerial) { !$0.isEmpty }
+        ]
+        return .init(
+            components: all,
+            waterFraction: 100 * Double(liquid.count) / Double(nonChasmCount),
+            shoreFraction: 100 * Double(shore.count) / Double(nonChasmCount))
+    }
+}
+
 /// Turning a world's pressures into the animals in it.
 ///
 /// **The mechanism** (creature-system-spec §1): a world's pressures produce **weights** over trait
@@ -36,6 +126,44 @@ enum LifeRules {
             species.append(Species(id: InstanceID(rawValue: rng.next()), traits: traits, worldSeed: seed))
         }
         return species
+    }
+
+    /// Adds habitat identity on a separate versioned ecology stream after the legacy gameplay
+    /// cast has consumed exactly its established RNG sequence.
+    static func cast(for readings: PressureReadings, seed: UInt64,
+                     habitats: CreatureHabitatAvailability) -> [Species] {
+        var result = cast(for: readings, seed: seed)
+        var ecologyRNG = SeededRNG(seed: seed).derived(0xEC01_06_01)
+        var selectedCounts: [CreatureHabitat: Int] = [:]
+        for index in result.indices {
+            let contactOnly = index == result.startIndex
+            let weighted = CreatureHabitat.allCases.compactMap { habitat
+                -> (value: CreatureHabitat, weight: Double)? in
+                guard habitats.isAvailable(habitat, contactOnly: contactOnly) else { return nil }
+                let raw = habitatWeight(habitat, readings: readings, availability: habitats)
+                let repeatCount = selectedCounts[habitat, default: 0]
+                return (habitat, raw * pow(0.65, Double(repeatCount)))
+            }
+            guard let habitat = ecologyRNG.pickWeighted(weighted), !weighted.isEmpty else { continue }
+            result[index].habitat = habitat
+            selectedCounts[habitat, default: 0] += 1
+        }
+        return result
+    }
+
+    static func habitatWeight(_ habitat: CreatureHabitat, readings: PressureReadings,
+                              availability: CreatureHabitatAvailability) -> Double {
+        let hydrology = readings["hydrology"]
+        let liquidHydrology = hydrology.peak
+            * min(1, max(0, hydrology.share(of: "standing") + hydrology.share(of: "flowing")))
+        return switch habitat {
+        case .terrestrial: 20 + 0.80 * (100 - availability.waterFraction)
+        case .shore: 0.60 * availability.shoreFraction + 0.25 * liquidHydrology
+        case .aquatic: 0.80 * availability.waterFraction + 0.30 * liquidHydrology
+        case .aerial:
+            0.35 * readings["relief"].aspect("verticality")
+                + 0.35 * readings["atmosphere"].aspect("motion")
+        }
     }
 
     /// How many species. **Vitality, and only vitality** — 2 on dead ground, the full range on a

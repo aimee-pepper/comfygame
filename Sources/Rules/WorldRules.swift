@@ -705,9 +705,15 @@ enum WorldRules {
             guard !run.enemies[index].isSessile, !run.enemies[index].isApex else { continue }
             let current = run.species(of: run.enemies[index])
             guard current?.isNocturnal != toNight else { continue }
-            guard let replacement = run.rng.pickWeighted(table) else { continue }
+            let habitat = run.enemies[index].habitatPlacement?.habitat
+            let legalTable = habitat.map { required in
+                table.filter { $0.value.habitat == required }
+            } ?? table
+            guard let replacement = run.rng.pickWeighted(legalTable) else { continue }
             let position = run.enemies[index].position
-            run.enemies[index] = Worldgen.spawn(replacement, at: position, rng: &run.rng)
+            let placement = run.enemies[index].habitatPlacement
+            run.enemies[index] = Worldgen.spawn(replacement, at: position,
+                                                habitat: placement, rng: &run.rng)
         }
     }
 
@@ -1033,7 +1039,9 @@ enum WorldRules {
                 continue
             }
 
-            if let next = stepToward(run.playerPosition, from: enemy.position, in: run.map, avoiding: taken) {
+            let habitatTiles = enemy.habitatPlacement.map { Set($0.legalTiles) }
+            if let next = stepToward(run.playerPosition, from: enemy.position, in: run.map,
+                                     avoiding: taken, allowed: habitatTiles) {
                 taken.remove(enemy.position)
                 taken.insert(next)
                 enemy.position = next
@@ -1089,7 +1097,8 @@ enum WorldRules {
     private static func stepToward(_ target: GridPoint,
                                    from origin: GridPoint,
                                    in map: WorldMap,
-                                   avoiding taken: Set<GridPoint>) -> GridPoint? {
+                                   avoiding taken: Set<GridPoint>,
+                                   allowed: Set<GridPoint>? = nil) -> GridPoint? {
         let dx = target.x - origin.x
         let dy = target.y - origin.y
         var options: [GridPoint] = []
@@ -1100,7 +1109,10 @@ enum WorldRules {
             if dy != 0 { options.append(GridPoint(x: origin.x, y: origin.y + (dy > 0 ? 1 : -1))) }
             if dx != 0 { options.append(GridPoint(x: origin.x + (dx > 0 ? 1 : -1), y: origin.y)) }
         }
-        return options.first { canEnter($0, in: map) && (!taken.contains($0) || $0 == target) }
+        return options.first {
+            (allowed?.contains($0) ?? true) && canEnter($0, in: map)
+                && (!taken.contains($0) || $0 == target)
+        }
     }
 
     static func enemyOnPlayer(in run: WorldRun) -> WorldEnemy? {

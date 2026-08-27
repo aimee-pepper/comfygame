@@ -463,6 +463,10 @@ enum Worldgen {
         map.entry = entry
         TerrainRules.prepareEntry(at: entry, in: &map)
         map[entry].content = .portal(isEntry: true)
+        // Habitat topology is frozen only after the start, its cardinal egress, and the retained
+        // return entry have all received their final terrain repair. Optional content comes later;
+        // its occupancy may filter placement but can never reinterpret ecological identity.
+        let habitatAvailability = CreatureHabitatAvailability.resolve(in: map, from: start)
         var occupied: Set<GridPoint> = [entry, start]
         occupied.formUnion(map.allPoints.filter { !walkable.contains($0) })
 
@@ -719,7 +723,7 @@ enum Worldgen {
         }
         // 7a. **The cast** — the species this world settled on, before anything is placed. Drawn
         //     from the readings and the seed, so the same world always holds the same animals.
-        let cast = LifeRules.cast(for: readings, seed: seed)
+        let cast = LifeRules.cast(for: readings, seed: seed, habitats: habitatAvailability)
 
         var guardians: [WorldEnemy] = []
         for site in sites {
@@ -733,9 +737,22 @@ enum Worldgen {
             // into its ruins — an authored guardian would be a creature from nowhere, in a world
             // that grew everything else it holds.
             if site.definition?.contents.guardian != nil {
-                let guardian = cast.max { $0.traits.appetite < $1.traits.appetite } ?? cast.first
-                if let guardian {
-                    guardians.append(spawn(guardian, at: site.position, rng: &siteRNG))
+                let eligible = cast.compactMap { species
+                    -> (Species, CreatureHabitatComponent)? in
+                    guard let habitat = species.habitat,
+                          let component = habitatAvailability.components(for: habitat).first(where: {
+                              $0.tiles.contains(site.position)
+                          }) else { return nil }
+                    return (species, component)
+                }.sorted {
+                    if $0.0.traits.appetite != $1.0.traits.appetite {
+                        return $0.0.traits.appetite > $1.0.traits.appetite
+                    }
+                    return $0.0.id.rawValue < $1.0.id.rawValue
+                }
+                if let (guardian, component) = eligible.first {
+                    guardians.append(spawn(guardian, at: site.position,
+                                           habitat: component.placementReceipt, rng: &siteRNG))
                 }
             }
         }
@@ -829,7 +846,7 @@ enum Worldgen {
 
         // 10. Enemies, drawn from the world's own cast. It's daytime when you arrive, so it's the
         //     day roster you meet; the night roster swaps in when the world turns.
-        let dayRoster = roster(from: cast, nocturnal: false)
+        let dayRoster = roster(from: cast, nocturnal: false).map(\.value)
         let enemyCount = enemyCount(for: book, readings: readings,
                                     multiplier: tuning.creatureDensityMultiplier,
                                     rng: &enemyRNG, tiles: map.width * map.height)
@@ -860,15 +877,41 @@ enum Worldgen {
             enemies.append(standing)
             occupied.insert(point)
         }
-        for _ in 0..<enemyCount {
-            guard let species = enemyRNG.pickWeighted(dayRoster),
-                  let point = randomFreePoint(in: map, avoiding: occupied,
-                                              minimumDistanceFrom: start,
-                                              distance: Tuning.World.enemyFreeRadiusAroundEntry,
-                                              requiringMinimumDistance: true,
-                                              rng: &enemyRNG)
-            else { continue }
-            enemies.append(spawn(species, at: point, rng: &enemyRNG))
+        let contactQuota = min(enemyCount, max(1, Int(ceil(Double(enemyCount) * 0.65))))
+        for ordinal in 0..<enemyCount {
+            let contactOnly = ordinal < contactQuota
+            var choices: [(species: Species,
+                           candidates: [(point: GridPoint,
+                                         component: CreatureHabitatComponent)])] = []
+            for species in dayRoster {
+                guard let habitat = species.habitat else { continue }
+                var candidates: [(point: GridPoint,
+                                  component: CreatureHabitatComponent)] = []
+                for component in habitatAvailability.components(
+                    for: habitat, contactOnly: contactOnly
+                ) {
+                    candidates.append(contentsOf: component.tiles.compactMap { point in
+                        guard !occupied.contains(point), map[point].content == .empty,
+                              point.chebyshevDistance(to: start)
+                                >= Tuning.World.enemyFreeRadiusAroundEntry
+                        else { return nil }
+                        return (point, component)
+                    })
+                }
+                candidates.sort {
+                    if $0.component.id != $1.component.id {
+                        return $0.component.id < $1.component.id
+                    }
+                    return map.index(of: $0.point) < map.index(of: $1.point)
+                }
+                if !candidates.isEmpty { choices.append((species, candidates)) }
+            }
+            choices.sort { $0.species.id.rawValue < $1.species.id.rawValue }
+            guard let choice = enemyRNG.pick(choices),
+                  let placement = enemyRNG.pick(choice.candidates) else { continue }
+            let point = placement.point
+            enemies.append(spawn(choice.species, at: point,
+                                 habitat: placement.component.placementReceipt, rng: &enemyRNG))
             occupied.insert(point)
         }
 
@@ -1265,7 +1308,11 @@ enum Worldgen {
         }
         let factsReachable = contentReachable
             && sites.allSatisfy { reached.contains($0.position) }
-            && enemies.allSatisfy { reached.contains($0.position) }
+            && enemies.allSatisfy { enemy in
+                reached.contains(enemy.position)
+                    || (enemy.habitatPlacement?.habitat == .aquatic
+                        && enemy.habitatPlacement?.contactEligible == false)
+            }
         return PlayableEntryReceipt(playerStart: start, returnPortal: returnPortal,
                                     startIsSafeInterior: startIsSafeInterior,
                                     returnPortalReachable: returnPortalReachable,
@@ -1353,9 +1400,11 @@ enum Worldgen {
         for index in nearby.dropFirst(allowed) {
             let old = enemies[index].position
             occupied.remove(old)
+            let legalTiles = enemies[index].habitatPlacement.map { Set($0.legalTiles) }
             let candidates = map.allPoints.filter { point in
                 !map[point].isRevealed && map[point].isPassable && map[point].content == .empty
                     && !occupied.contains(point)
+                    && (legalTiles?.contains(point) ?? true)
                     && point.chebyshevDistance(to: start)
                         >= Tuning.World.enemyFreeRadiusAroundEntry
             }
@@ -1636,11 +1685,13 @@ enum Worldgen {
 
     /// One animal of a species, standing somewhere. Its own jitter is rolled here and kept, so a
     /// resume finds the same creature rather than re-rolling it.
-    static func spawn(_ species: Species, at point: GridPoint, rng: inout SeededRNG) -> WorldEnemy {
+    static func spawn(_ species: Species, at point: GridPoint,
+                      habitat: CreatureHabitatPlacementReceiptV1? = nil,
+                      rng: inout SeededRNG) -> WorldEnemy {
         WorldEnemy(id: InstanceID(rawValue: rng.next()),
                    speciesID: species.id,
                    traits: LifeRules.spawn(of: species, rng: &rng),
-                   position: point)
+                   position: point, habitatPlacement: habitat)
     }
 
     /// Who's out, and how common each of them is.
