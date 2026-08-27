@@ -633,6 +633,13 @@ enum WorldRules {
             return [.blocked("Not while that's standing over you.")]
         }
 
+        if let definition = run.sites[index].definition {
+            guard definition.contents.items.allSatisfy({ itemID in
+                GearCatalogueDispositionRules.makeAcquiredStack(
+                    id: InstanceID(rawValue: 1), catalogID: itemID, route: .authoredSite) != nil
+            }) else { return [.blocked("This site's authored contents are invalid.")] }
+        }
+
         run.sites[index].searchTurnsRemaining -= 1
         let site = run.sites[index]
         var events: [Event] = []
@@ -653,7 +660,9 @@ enum WorldRules {
                 // Items go into the satchel like any other haul, so a site's gear is something
                 // you still have to carry home — and can still lose to a collapse.
                 for itemID in definition.contents.items {
-                    let stack = ItemStack(id: InstanceID(rawValue: run.rng.next()), catalogID: itemID)
+                    guard let stack = GearCatalogueDispositionRules.makeAcquiredStack(
+                        id: InstanceID(rawValue: run.rng.next()), catalogID: itemID,
+                        route: .authoredSite) else { continue }
                     if run.satchelItems.add(stack) {
                         events.append(.pickedUpItem(ContentCatalog.shared.item(itemID)?.name ?? "Something"))
                     } else {

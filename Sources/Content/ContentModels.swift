@@ -542,9 +542,8 @@ struct FoundGearReceiptV1: Codable, Equatable, Sendable {
     init(from decoder: Decoder) throws {
         let rawKeys = try decoder.container(keyedBy: ContentStrictCodingKey.self)
         let rawKeySet = Set(rawKeys.allKeys.map(\.stringValue))
-        let allowed = Set(CodingKeys.allCases.map(\.rawValue))
-        let required = Set([CodingKeys.version, .mode, .qualityBand, .components].map(\.rawValue))
-        guard rawKeySet.isSubset(of: allowed), rawKeySet.isSuperset(of: required) else {
+        let required = Set(CodingKeys.allCases.map(\.rawValue))
+        guard rawKeySet == required else {
             throw CocoaError(.coderInvalidValue)
         }
         let c = try decoder.container(keyedBy: CodingKeys.self)
@@ -568,6 +567,20 @@ struct FoundGearReceiptV1: Codable, Equatable, Sendable {
                 throw CocoaError(.coderInvalidValue)
             }
         }
+    }
+
+    func encode(to encoder: Encoder) throws {
+        var c = encoder.container(keyedBy: CodingKeys.self)
+        try c.encode(version, forKey: .version)
+        try c.encode(mode, forKey: .mode)
+        if let schematicID { try c.encode(schematicID, forKey: .schematicID) }
+        else { try c.encodeNil(forKey: .schematicID) }
+        if let fixedIdentity { try c.encode(fixedIdentity, forKey: .fixedIdentity) }
+        else { try c.encodeNil(forKey: .fixedIdentity) }
+        if let outputSlot { try c.encode(outputSlot, forKey: .outputSlot) }
+        else { try c.encodeNil(forKey: .outputSlot) }
+        try c.encode(qualityBand, forKey: .qualityBand)
+        try c.encode(components, forKey: .components)
     }
 
     private enum CodingKeys: String, CodingKey, CaseIterable {
@@ -603,6 +616,22 @@ enum GearAcquisitionEvaluation: Equatable, Sendable {
 }
 
 enum GearCatalogueDispositionRules {
+    static func makeAcquiredStack(id: InstanceID, catalogID: ItemID,
+                                  route: GearAcquisitionRoute,
+                                  catalog: ContentCatalog = .shared) -> ItemStack? {
+        guard let item = catalog.item(catalogID) else { return nil }
+        guard item.kind == .gear else {
+            return ItemStack(id: id, catalogID: catalogID)
+        }
+        guard case .eligible(let creation) = evaluate(catalogID, route: route, catalog: catalog) else {
+            return nil
+        }
+        let stack = ItemStack(id: id, catalogID: catalogID)
+        guard stack.gearProfile?.qualityBand == creation.qualityBand,
+              stack.gearProfile?.foundReceipt == creation.foundReceipt else { return nil }
+        return stack
+    }
+
     static func evaluate(_ id: ItemID, route: GearAcquisitionRoute,
                          catalog: ContentCatalog = .shared) -> GearAcquisitionEvaluation {
         guard let item = catalog.item(id) else { return .ineligible(.unknownItem) }

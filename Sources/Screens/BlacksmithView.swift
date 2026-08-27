@@ -13,10 +13,10 @@ enum MakerStationPresentationRules {
 
     static func readinessLabel(_ readiness: PhysicalGearCraftingRules.Readiness) -> String {
         switch readiness {
-        case .ready(let preview): "Ready · Tier \(preview.outputTier)"
+        case .ready(let preview): "Ready · \(GearPresentationCopy.quality(tier: preview.outputTier))"
         case .stationLocked: "Unavailable"
         case .researchLocked: "Learn first"
-        case .tierLocked(let need): "Tier \(need)"
+        case .tierLocked(let need): "Requires \(GearPresentationCopy.quality(tier: need))"
         case .needsSamples: "Needs stock"
         case .needsEssence: "Needs Essence"
         }
@@ -78,7 +78,7 @@ struct BlacksmithView: View {
                 }
                 .accessibilityLabel("About the Blacksmith")
                 .popover(isPresented: $showingIdentity) {
-                    Text("Halloway constructs rigid physical gear and reforges an exact retained piece without crossing its construction tier.")
+                    Text("Halloway constructs rigid physical gear and reforges an exact retained piece without changing its frozen quality band.")
                         .font(.callout).padding(16).frame(idealWidth: 280)
                         .presentationCompactAdaptation(.popover)
                 }
@@ -222,20 +222,20 @@ private struct ConstructionRow: View {
     }
 
     private var summary: String {
-        "Needs \(GearPresentationCopy.piecesOfStock(recipe.requirements.count)) · Tier 1–\(PhysicalGearCraftingRules.constructionCap(for: recipe, in: store.state))"
+        "Needs \(GearPresentationCopy.piecesOfStock(recipe.requirements.count)) · up to \(GearPresentationCopy.quality(tier: PhysicalGearCraftingRules.constructionCap(for: recipe, in: store.state)))"
     }
 
     @ViewBuilder private var status: some View {
         switch store.physicalGearReadiness(recipe) {
         case .ready(let preview):
-            Text("Tier \(preview.outputTier) · \(preview.essence)")
+            Text("\(GearPresentationCopy.quality(tier: preview.outputTier)) · \(preview.essence)")
                 .font(.caption2.weight(.medium)).foregroundStyle(.green)
         case .stationLocked:
             Text("locked").font(.caption2).foregroundStyle(.secondary)
         case .researchLocked:
             Text("learn Wear").font(.caption2).foregroundStyle(.secondary)
         case .tierLocked(let need):
-            Text("tier \(need)").font(.caption2).foregroundStyle(.secondary)
+            Text("requires \(GearPresentationCopy.quality(tier: need))").font(.caption2).foregroundStyle(.secondary)
         case .needsSamples:
             Text("needs stock").font(.caption2).foregroundStyle(.orange)
         case .needsEssence(_, let need):
@@ -564,7 +564,7 @@ private struct ArmouryRebuildSheet: View {
             .alert("Use this stock?", isPresented: $confirmingOrdinary) {
                 Button("Cancel", role: .cancel) {}
                 Button("Rebuild") { if let preview { commit(preview, allowLegacy: false) } }
-            } message: { Text("The shown tier and essence cost are final. Selected stock will be consumed.") }
+            } message: { Text("The shown quality and essence cost are final. Selected stock will be consumed.") }
             .alert("Replace upgrade from older save?", isPresented: $confirmingLegacy) {
                 Button("Cancel", role: .cancel) {}
                 Button("Rebuild", role: .destructive) { if let preview { commit(preview, allowLegacy: true) } }
@@ -729,7 +729,7 @@ private struct ConstructionSheet: View {
                 }
             } message: {
                 if let preview, let headline = recipe.specialistHeadlineTier {
-                    Text("The selected stock yields Tier \(preview.outputTier), not Tier \(headline). It will still be consumed at the shown Tier \(preview.outputTier) cost.")
+                    Text("The selected stock yields \(GearPresentationCopy.quality(tier: preview.outputTier)), not \(GearPresentationCopy.quality(tier: headline)). It will still be consumed at the shown \(GearPresentationCopy.quality(tier: preview.outputTier)) cost.")
                 }
             }
         }
@@ -1097,7 +1097,8 @@ private struct ReforgeSheet: View {
 
                     Section {
                         LabeledRow(icon: target.icon, label: target.displayName,
-                                   value: "tier \(target.constructionTier)", tint: target.rarity.tint)
+                                   value: GearPresentationCopy.quality(tier: target.constructionTier),
+                                   tint: target.rarity.tint)
                         LabeledRow(icon: "arrow.up.circle", label: "Becomes",
                                    value: String(format: "power %.1f", target.effectivePower + 0.2))
                         if let wearer = target.wearer {

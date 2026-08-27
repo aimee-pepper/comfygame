@@ -276,7 +276,8 @@ struct ItemIconTile: View {
     private var accessibilityLabel: String {
         let identity = identified ? accessibilityName : "Unknown item"
         let count = quantity > 1 ? ", quantity \(quantity)" : ""
-        return "\(identity), \(rarity.displayName), \(location.displayName)\(count)"
+        let quality = GearPresentationCopy.catalogueQuality(catalogueID) ?? rarity.displayName
+        return "\(identity), \(quality), \(location.displayName)\(count)"
     }
 
 }

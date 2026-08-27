@@ -221,7 +221,7 @@ private struct GearOptionDetailPane: View {
                                 in: RoundedRectangle(cornerRadius: 12))
 
                     if let profile = option.piece.gearProfile {
-                        Text("Tier \(profile.constructionTier) · Reforge \(profile.reforgeRank)/\(SmithRules.maximumReforgeLevel)")
+                        Text("\(GearPresentationCopy.quality(profile)) · Reforge \(profile.reforgeRank)/\(SmithRules.maximumReforgeLevel)")
                             .font(.caption)
                             .foregroundStyle(.secondary)
                     }

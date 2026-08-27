@@ -143,7 +143,7 @@ struct IdentifyCard: View {
             switch notice {
             case .revealed(let item):
                 Alert(
-                    title: Text("It's a \(item.name) — \(item.rarity.displayName)"),
+                    title: Text("It's a \(item.name) — \(GearPresentationCopy.catalogueQuality(item) ?? item.rarity.displayName)"),
                     message: Text(revealedMessage(item)),
                     dismissButton: .default(Text("Oh"))
                 )

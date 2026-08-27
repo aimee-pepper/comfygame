@@ -307,6 +307,53 @@ final class SaveSlotTests: XCTestCase {
         }
     }
 
+    func testSchemaSevenGearProfileNumericAndPartialProvenanceFailuresPreserveEnvelopeBytes() async throws {
+        let mutations: [(String, (inout [String: Any]) -> Void)] = [
+            ("fractional tier", { $0["constructionTier"] = 2.5 }),
+            ("null credit", { $0["legacyPowerCredit"] = NSNull() }),
+            ("partial provenance", { profile in
+                profile["recipeVersion"] = 1
+                profile["consumedSamples"] = []
+            }),
+        ]
+        for (label, mutate) in mutations {
+            let root = directory()
+            defer { try? FileManager.default.removeItem(at: root) }
+            let slots = SaveSlotFileIO(directory: root)
+            let created = try await slots.create(name: "Schema 7 gear \(label)")
+            let url = try await slots.exportURL(for: created.metadata.id)
+            var envelope = try SaveCodec.makeDecoder().decode(
+                SaveSlotEnvelope.self, from: Data(contentsOf: url))
+
+            var state = GameState.newGame()
+            state.base.inventory.add(ItemStack(id: .init(rawValue: 88_001), catalogID: "blade_keen"))
+            var payload = try XCTUnwrap(JSONSerialization.jsonObject(
+                with: SaveCodec.encode(state)) as? [String: Any])
+            payload["schemaVersion"] = 7
+            var base = try XCTUnwrap(payload["base"] as? [String: Any])
+            var inventory = try XCTUnwrap(base["inventory"] as? [String: Any])
+            var stacks = try XCTUnwrap(inventory["stacks"] as? [[String: Any]])
+            var profile = try XCTUnwrap(stacks[0]["gearProfile"] as? [String: Any])
+            profile["version"] = 1
+            profile.removeValue(forKey: "qualityBand")
+            profile.removeValue(forKey: "legacyEffectivePowerCredit")
+            profile.removeValue(forKey: "foundReceipt")
+            mutate(&profile)
+            stacks[0]["gearProfile"] = profile
+            inventory["stacks"] = stacks
+            base["inventory"] = inventory
+            payload["base"] = base
+            envelope.payload = try JSONSerialization.data(withJSONObject: payload, options: [.sortedKeys])
+            let original = try encoder().encode(envelope)
+            try original.write(to: url, options: .atomic)
+
+            do { _ = try await slots.load(created.metadata.id); XCTFail("accepted \(label)") }
+            catch { }
+            XCTAssertEqual(try Data(contentsOf: url), original,
+                           "failed schema-7 gear migration rewrote the slot")
+        }
+    }
+
     func testLegacyAdoptionIsIdempotentAndPreservesExactPayloadBytes() async throws {
         let root = directory()
         defer { try? FileManager.default.removeItem(at: root) }

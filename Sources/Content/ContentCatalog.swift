@@ -920,6 +920,20 @@ struct ContentCatalog: Sendable {
             "timber", "fiber", "resin", "rift_glass", "rubble"
         ]
         let allowedCreatureFamilies = Set(MaterialFamilyID.allCases.filter(\.isAnimalWorldResource).map(\.rawValue))
+        let exactFoundReceipts: [ItemID: String] = [
+            "rubble_sling": "schematic|sling|-|-|1|cord:world:fiber:1,projectile:world:rubble:1,pouch:creature:hide:1",
+            "ironwork_blade": "schematic|cutting_blade|-|-|2|edge:world:ore:2,grip:creature:hide:2",
+            "copper_buckler": "schematic|shield|-|-|2|face:world:copper:2,brace:world:timber:2,binding:world:fiber:2",
+            "silvered_helm": "schematic|armoury_balanced_laminate|-|head|3|body:world:ore:3,lining:creature:hide:3,binding:world:fiber:3,fitting:world:silver:3",
+            "golden_keepsake": "fixedFound|-|worked-gold-keepsake|-|3|fitting:world:gold:3",
+            "quartz_point": "schematic|long_spear|-|-|2|point:world:quartz:2,haft:world:timber:2,binding:world:fiber:2",
+            "obsidian_edge": "schematic|weaponsmith_fitted_edge|-|-|3|edge:world:obsidian:3,grip:creature:hide:3,fitting:creature:bone:3",
+            "adamant_cuirass": "schematic|rigid_guard|-|-|4|body-1:world:adamant:4,body-2:world:adamant:4,binding:world:fiber:4",
+            "woven_sling": "schematic|sling|-|-|1|cord:world:fiber:1,projectile:world:clay:1,pouch:world:fiber:1",
+            "timber_longbow": "schematic|longbow|-|-|1|limb-1:world:timber:1,limb-2:world:timber:1,string:world:fiber:1",
+            "resinbound_boots": "schematic|working_boots|-|-|1|upper:creature:hide:1,sole:world:timber:1,binding:world:resin:1",
+            "riftglass_rapier": "fixedSpecial|-|riftglass-rapier|-|4|special-core:world:rift_glass:4",
+        ]
         for item in gear {
             guard item.gear != nil, let disposition = item.gearCatalogueDisposition,
                   disposition.version == 1 else {
@@ -953,6 +967,16 @@ struct ContentCatalog: Sendable {
                     guard valid else {
                         throw ContentError.danglingReference("gear '\(item.id)' has an unknown found family")
                     }
+                }
+                let components = receipt.components.map {
+                    "\($0.socket):\($0.domain.rawValue):\($0.familyID):\($0.qualityBand.rawValue)"
+                }.joined(separator: ",")
+                let fingerprint = [receipt.mode.rawValue, receipt.schematicID?.rawValue ?? "-",
+                                   receipt.fixedIdentity ?? "-", receipt.outputSlot?.rawValue ?? "-",
+                                   String(receipt.qualityBand.rawValue), components].joined(separator: "|")
+                guard exactFoundReceipts[item.id] == fingerprint else {
+                    throw ContentError.danglingReference(
+                        "gear '\(item.id)' found receipt differs from immutable v1 authority")
                 }
                 switch receipt.mode {
                 case .schematic:

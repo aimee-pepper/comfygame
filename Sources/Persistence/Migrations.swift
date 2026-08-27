@@ -66,6 +66,18 @@ enum Migrations {
             "obsidian_edge": 3, "adamant_cuirass": 4, "woven_sling": 1,
             "timber_longbow": 1, "resinbound_boots": 1, "riftglass_rapier": 4,
         ]
+        func exactInt(_ value: Any?) throws -> Int {
+            guard let number = value as? NSNumber,
+                  CFGetTypeID(number) != CFBooleanGetTypeID(),
+                  !CFNumberIsFloatType(number),
+                  number.doubleValue.isFinite,
+                  number.doubleValue.rounded(.towardZero) == number.doubleValue,
+                  number.doubleValue >= Double(Int.min),
+                  number.doubleValue <= Double(Int.max) else {
+                throw CocoaError(.coderInvalidValue)
+            }
+            return number.intValue
+        }
         func migrate(_ value: Any) throws -> Any {
             if let array = value as? [Any] { return try array.map(migrate) }
             guard var object = value as? [String: Any] else { return value }
@@ -79,7 +91,15 @@ enum Migrations {
                           Double(rawID.uint64Value) == rawID.doubleValue else {
                         throw CocoaError(.coderInvalidValue)
                     }
-                    let upgrade = (object["upgradeLevel"] as? NSNumber)?.intValue ?? 0
+                    let upgrade: Int
+                    if object.keys.contains("upgradeLevel") {
+                        guard !(object["upgradeLevel"] is NSNull) else {
+                            throw CocoaError(.coderInvalidValue)
+                        }
+                        upgrade = try exactInt(object["upgradeLevel"])
+                    } else {
+                        upgrade = 0
+                    }
                     guard upgrade >= 0 else { throw CocoaError(.coderInvalidValue) }
                     let synthesized = GearInstanceProfile(
                         stableInstanceID: .init(rawValue: rawID.uint64Value),
@@ -91,12 +111,44 @@ enum Migrations {
                 guard var profile = object["gearProfile"] as? [String: Any] else {
                     throw CocoaError(.coderInvalidValue)
                 }
-                guard (profile["version"] as? NSNumber)?.intValue == 1,
-                      let tier = (profile["constructionTier"] as? NSNumber)?.intValue,
-                      let credit = (profile["legacyPowerCredit"] as? NSNumber)?.intValue,
-                      (1...4).contains(tier), credit >= 0 else { throw CocoaError(.coderInvalidValue) }
-                let constructed = (profile["recipeVersion"] as? NSNumber) != nil
-                    && ((profile["consumedSamples"] as? [Any])?.isEmpty == false)
+                let version = try exactInt(profile["version"])
+                let tier = try exactInt(profile["constructionTier"])
+                let credit = try exactInt(profile["legacyPowerCredit"])
+                guard version == 1, (1...4).contains(tier), credit >= 0 else {
+                    throw CocoaError(.coderInvalidValue)
+                }
+                if profile.keys.contains("reforgeRank") {
+                    guard !(profile["reforgeRank"] is NSNull),
+                          (0...3).contains(try exactInt(profile["reforgeRank"])) else {
+                        throw CocoaError(.coderInvalidValue)
+                    }
+                }
+                guard !profile.keys.contains("foundReceipt") else {
+                    throw CocoaError(.coderInvalidValue)
+                }
+                let hasRecipe = profile.keys.contains("recipeVersion")
+                let hasSamples = profile.keys.contains("consumedSamples")
+                let samples: [Any]
+                if hasSamples {
+                    guard !(profile["consumedSamples"] is NSNull),
+                          let decoded = profile["consumedSamples"] as? [Any] else {
+                        throw CocoaError(.coderInvalidValue)
+                    }
+                    samples = decoded
+                } else {
+                    samples = []
+                }
+                var constructed = false
+                if hasRecipe {
+                    guard !(profile["recipeVersion"] is NSNull),
+                          try exactInt(profile["recipeVersion"]) >= 0,
+                          hasSamples, !samples.isEmpty else {
+                        throw CocoaError(.coderInvalidValue)
+                    }
+                    constructed = true
+                } else if !samples.isEmpty {
+                    throw CocoaError(.coderInvalidValue)
+                }
                 let band = constructed ? tier : (authoredBands[catalogID] ?? tier)
                 guard (1...4).contains(band), tier + credit >= band else {
                     throw CocoaError(.coderInvalidValue)

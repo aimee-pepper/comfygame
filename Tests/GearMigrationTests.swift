@@ -115,6 +115,8 @@ final class GearMigrationTests: XCTestCase {
         let encoded = try SaveCodec.encode(state)
         let mutations: [(String, (inout [String: Any]) -> Void)] = [
             ("future version", { $0["version"] = 2 }),
+            ("missing explicit nullable key", { $0.removeValue(forKey: "fixedIdentity") }),
+            ("mode-inapplicable key is nonnull", { $0["fixedIdentity"] = "invented" }),
             ("extra receipt key", { $0["unexpected"] = true }),
             ("extra component key", { receipt in
                 var components = receipt["components"] as! [[String: Any]]
@@ -147,6 +149,54 @@ final class GearMigrationTests: XCTestCase {
             root["base"] = base
             XCTAssertThrowsError(try SaveCodec.decode(JSONSerialization.data(withJSONObject: root)), label)
         }
+    }
+
+    func testSchemaSevenMigrationRejectsNonIntegralNullAndPartialGearProvenance() throws {
+        var state = GameState.newGame()
+        state.base.inventory.add(ItemStack(id: .init(rawValue: 995), catalogID: "blade_keen"))
+        let current = try SaveCodec.encode(state)
+        let mutations: [(String, (inout [String: Any]) -> Void)] = [
+            ("fractional version", { $0["version"] = 1.5 }),
+            ("boolean tier", { $0["constructionTier"] = true }),
+            ("null credit", { $0["legacyPowerCredit"] = NSNull() }),
+            ("fractional reforge", { $0["reforgeRank"] = 1.25 }),
+            ("recipe without units", { profile in
+                profile["recipeVersion"] = 1
+                profile["consumedSamples"] = []
+            }),
+            ("units without recipe", { profile in
+                profile.removeValue(forKey: "recipeVersion")
+                profile["consumedSamples"] = [["partial": true]]
+            }),
+        ]
+        for (label, mutate) in mutations {
+            var root = try XCTUnwrap(JSONSerialization.jsonObject(with: current) as? [String: Any])
+            root["schemaVersion"] = 7
+            var base = try XCTUnwrap(root["base"] as? [String: Any])
+            var inventory = try XCTUnwrap(base["inventory"] as? [String: Any])
+            var stacks = try XCTUnwrap(inventory["stacks"] as? [[String: Any]])
+            var profile = try XCTUnwrap(stacks[0]["gearProfile"] as? [String: Any])
+            profile["version"] = 1
+            profile.removeValue(forKey: "qualityBand")
+            profile.removeValue(forKey: "legacyEffectivePowerCredit")
+            profile.removeValue(forKey: "foundReceipt")
+            mutate(&profile)
+            stacks[0]["gearProfile"] = profile
+            inventory["stacks"] = stacks
+            base["inventory"] = inventory
+            root["base"] = base
+            let bytes = try JSONSerialization.data(withJSONObject: root, options: [.sortedKeys])
+            XCTAssertThrowsError(try SaveCodec.decode(bytes), label)
+        }
+    }
+
+    func testSharedGearPresentationUsesSixBandIdentityInsteadOfLegacyRarityOrTier() throws {
+        let stack = ItemStack(id: .init(rawValue: 996), catalogID: "silvered_helm")
+        XCTAssertTrue(stack.displayName.contains("Superior"))
+        XCTAssertFalse(stack.displayName.contains("Tier"))
+        XCTAssertEqual(GearPresentationCopy.catalogueQuality("silvered_helm"), "Superior")
+        XCTAssertEqual(GearPresentationCopy.catalogueQuality("blade_chipped"), "Standard")
+        XCTAssertNil(GearPresentationCopy.catalogueQuality("salve_lesser"))
     }
 
     func testMigrationPreservesConstructionReceiptPrecedenceForCatalogueAuthoredID() throws {

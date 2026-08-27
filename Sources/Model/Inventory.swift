@@ -395,7 +395,7 @@ struct ItemStack: Codable, Equatable, Identifiable, Sendable {
         if let profile = gearProfile {
             let suffix = profile.reforgeRank > 0
                 ? " · Reforged \(profile.reforgeRank)/\(Tuning.Smith.maximumReforgeRank)" : ""
-            return "\(base) · Tier \(profile.constructionTier)\(suffix)"
+            return "\(base) · \(GearPresentationCopy.quality(profile))\(suffix)"
         }
         let bonus = upgradeLevel + wildGrowth
         return bonus > 0 ? "\(base) +\(bonus)" : base
@@ -704,7 +704,7 @@ struct EquippedPiece: Codable, Equatable, Sendable, ExpressibleByStringLiteral {
         if let profile = gearProfile {
             let suffix = profile.reforgeRank > 0
                 ? " · Reforged \(profile.reforgeRank)/\(Tuning.Smith.maximumReforgeRank)" : ""
-            return "\(base) · Tier \(profile.constructionTier)\(suffix)"
+            return "\(base) · \(GearPresentationCopy.quality(profile))\(suffix)"
         }
         let bonus = upgradeLevel + wildGrowth
         return bonus > 0 ? "\(base) +\(bonus)" : base

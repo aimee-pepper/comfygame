@@ -314,6 +314,37 @@ final class SiteTests: XCTestCase {
     }
 
     @MainActor
+    func testAuthoredSiteGearUsesValidatedAcquisitionDispositionAndFreezesProfile() throws {
+        let (store, site) = try makeStoreInWorld {
+            !($0.definition?.contents.items.filter {
+                ContentCatalog.shared.item($0)?.kind == .gear
+            }.isEmpty ?? true)
+        }
+        let gearID = try XCTUnwrap(site.definition?.contents.items.first {
+            ContentCatalog.shared.item($0)?.kind == .gear
+        })
+        guard case .eligible(let creation) = GearCatalogueDispositionRules.evaluate(
+            gearID, route: .authoredSite) else { return XCTFail("authored site route refused") }
+        var state = store.state
+        state.worlds.activeRun?.playerPosition = site.position
+        state.worlds.activeRun?.enemies.removeAll()
+        state.worlds.activeRun?.stability = Tuning.World.startingStability
+        var events: [WorldRules.Event] = []
+        for _ in 0..<(site.definition?.contents.searchTurns ?? 1) {
+            events = WorldRules.searchSite(in: &state)
+        }
+        let run = try XCTUnwrap(state.worlds.activeRun)
+        XCTAssertTrue(run.sites.first { $0.id == site.id }?.isLooted ?? false,
+                      "site did not complete: \(events)")
+        let stack = try XCTUnwrap((run.satchelItems.stacks + run.offeredItems)
+            .first { $0.catalogID == gearID }, "missing \(gearID): \(events)")
+        XCTAssertEqual(stack.gearProfile?.qualityBand, creation.qualityBand)
+        XCTAssertEqual(stack.gearProfile?.foundReceipt, creation.foundReceipt)
+        XCTAssertNil(GearCatalogueDispositionRules.makeAcquiredStack(
+            id: .init(rawValue: 9), catalogID: "fired_clay_guard", route: .authoredSite))
+    }
+
+    @MainActor
     func testTaughtSymbolsSurviveTheWorldTheyWereFoundIn() throws {
         // Literacy is permanent (rune spec §1): knowledge banks to Base immediately rather than
         // riding home in the satchel, so a collapse can't take it back.

@@ -1244,7 +1244,7 @@
     },
     {
       "id": "rubble_sling", "name": "Rubble Sling", "icon": "circle.grid.cross",
-      "gearCatalogueDisposition": {"version":1,"classification":"componentAuthoredFound","territoryFindEligible":true,"foundReceipt":{"version":1,"mode":"schematic","schematicID":"sling","qualityBand":1,"components":[{"socket":"cord","domain":"world","familyID":"fiber","qualityBand":1},{"socket":"projectile","domain":"world","familyID":"rubble","qualityBand":1},{"socket":"pouch","domain":"creature","familyID":"hide","qualityBand":1}]}},
+      "gearCatalogueDisposition": {"version":1,"classification":"componentAuthoredFound","territoryFindEligible":true,"foundReceipt":{"version":1,"mode":"schematic","schematicID":"sling","fixedIdentity":null,"outputSlot":null,"qualityBand":1,"components":[{"socket":"cord","domain":"world","familyID":"fiber","qualityBand":1},{"socket":"projectile","domain":"world","familyID":"rubble","qualityBand":1},{"socket":"pouch","domain":"creature","familyID":"hide","qualityBand":1}]}},
       "rarity": "common", "blurb": "A broad sling and a pouch of carefully matched roadside stone.",
       "kind": "gear", "gear": { "slot": "weapon", "tier": 1, "damage": "crush", "reach": "far", "visualFamilyID": "sling", "materialProfileID": "world:rubble" },
       "tradingPostDisposition": "sellable", "recyclerDisposition": "recyclable"
@@ -1258,42 +1258,42 @@
     },
     {
       "id": "ironwork_blade", "name": "Ironwork Blade", "icon": "scissors",
-      "gearCatalogueDisposition": {"version":1,"classification":"componentAuthoredFound","territoryFindEligible":true,"foundReceipt":{"version":1,"mode":"schematic","schematicID":"cutting_blade","qualityBand":2,"components":[{"socket":"edge","domain":"world","familyID":"ore","qualityBand":2},{"socket":"grip","domain":"creature","familyID":"hide","qualityBand":2}]}},
+      "gearCatalogueDisposition": {"version":1,"classification":"componentAuthoredFound","territoryFindEligible":true,"foundReceipt":{"version":1,"mode":"schematic","schematicID":"cutting_blade","fixedIdentity":null,"outputSlot":null,"qualityBand":2,"components":[{"socket":"edge","domain":"world","familyID":"ore","qualityBand":2},{"socket":"grip","domain":"creature","familyID":"hide","qualityBand":2}]}},
       "rarity": "uncommon", "blurb": "A practical iron chopping blade with enough weight to keep its cut moving.",
       "kind": "gear", "gear": { "slot": "weapon", "tier": 2, "damage": "rend", "reach": "close", "visualFamilyID": "cutting_blade", "materialProfileID": "world:ore" },
       "tradingPostDisposition": "sellable", "recyclerDisposition": "recyclable"
     },
     {
       "id": "copper_buckler", "name": "Copper Buckler", "icon": "shield.lefthalf.filled",
-      "gearCatalogueDisposition": {"version":1,"classification":"componentAuthoredFound","territoryFindEligible":true,"foundReceipt":{"version":1,"mode":"schematic","schematicID":"shield","qualityBand":2,"components":[{"socket":"face","domain":"world","familyID":"copper","qualityBand":2},{"socket":"brace","domain":"world","familyID":"timber","qualityBand":2},{"socket":"binding","domain":"world","familyID":"fiber","qualityBand":2}]}},
+      "gearCatalogueDisposition": {"version":1,"classification":"componentAuthoredFound","territoryFindEligible":true,"foundReceipt":{"version":1,"mode":"schematic","schematicID":"shield","fixedIdentity":null,"outputSlot":null,"qualityBand":2,"components":[{"socket":"face","domain":"world","familyID":"copper","qualityBand":2},{"socket":"brace","domain":"world","familyID":"timber","qualityBand":2},{"socket":"binding","domain":"world","familyID":"fiber","qualityBand":2}]}},
       "rarity": "uncommon", "blurb": "A work-hardened copper face over a resilient timber core.",
       "kind": "gear", "gear": { "slot": "offhand", "tier": 2, "visualFamilyID": "buckler", "materialProfileID": "world:copper" },
       "tradingPostDisposition": "sellable", "recyclerDisposition": "recyclable"
     },
     {
       "id": "silvered_helm", "name": "Silvered Helm", "icon": "circle.dashed",
-      "gearCatalogueDisposition": {"version":1,"classification":"componentAuthoredFound","territoryFindEligible":true,"foundReceipt":{"version":1,"mode":"schematic","schematicID":"armoury_balanced_laminate","outputSlot":"head","qualityBand":3,"components":[{"socket":"body","domain":"world","familyID":"ore","qualityBand":3},{"socket":"lining","domain":"creature","familyID":"hide","qualityBand":3},{"socket":"binding","domain":"world","familyID":"fiber","qualityBand":3},{"socket":"fitting","domain":"world","familyID":"silver","qualityBand":3}]}},
+      "gearCatalogueDisposition": {"version":1,"classification":"componentAuthoredFound","territoryFindEligible":true,"foundReceipt":{"version":1,"mode":"schematic","schematicID":"armoury_balanced_laminate","fixedIdentity":null,"outputSlot":"head","qualityBand":3,"components":[{"socket":"body","domain":"world","familyID":"ore","qualityBand":3},{"socket":"lining","domain":"creature","familyID":"hide","qualityBand":3},{"socket":"binding","domain":"world","familyID":"fiber","qualityBand":3},{"socket":"fitting","domain":"world","familyID":"silver","qualityBand":3}]}},
       "rarity": "rare", "blurb": "A close helm whose pale fitted plates turn a glancing blow cleanly aside.",
       "kind": "gear", "gear": { "slot": "head", "tier": 3, "visualFamilyID": "enclosed_helm", "materialProfileID": "world:silver" },
       "tradingPostDisposition": "sellable", "recyclerDisposition": "recyclable"
     },
     {
       "id": "golden_keepsake", "name": "Golden Keepsake", "icon": "seal.fill",
-      "gearCatalogueDisposition": {"version":1,"classification":"componentAuthoredFound","territoryFindEligible":true,"foundReceipt":{"version":1,"mode":"fixedFound","fixedIdentity":"worked-gold-keepsake","qualityBand":3,"components":[{"socket":"fitting","domain":"world","familyID":"gold","qualityBand":3}]}},
+      "gearCatalogueDisposition": {"version":1,"classification":"componentAuthoredFound","territoryFindEligible":true,"foundReceipt":{"version":1,"mode":"fixedFound","schematicID":null,"fixedIdentity":"worked-gold-keepsake","outputSlot":null,"qualityBand":3,"components":[{"socket":"fitting","domain":"world","familyID":"gold","qualityBand":3}]}},
       "rarity": "rare", "blurb": "A small worked-gold pendant, made to outlast the story attached to it.",
       "kind": "gear", "gear": { "slot": "keepsake", "tier": 3, "visualFamilyID": "keepsake", "materialProfileID": "world:gold" },
       "tradingPostDisposition": "sellable", "recyclerDisposition": "recyclable"
     },
     {
       "id": "quartz_point", "name": "Quartz Point", "icon": "arrow.up.right",
-      "gearCatalogueDisposition": {"version":1,"classification":"componentAuthoredFound","territoryFindEligible":true,"foundReceipt":{"version":1,"mode":"schematic","schematicID":"long_spear","qualityBand":2,"components":[{"socket":"point","domain":"world","familyID":"quartz","qualityBand":2},{"socket":"haft","domain":"world","familyID":"timber","qualityBand":2},{"socket":"binding","domain":"world","familyID":"fiber","qualityBand":2}]}},
+      "gearCatalogueDisposition": {"version":1,"classification":"componentAuthoredFound","territoryFindEligible":true,"foundReceipt":{"version":1,"mode":"schematic","schematicID":"long_spear","fixedIdentity":null,"outputSlot":null,"qualityBand":2,"components":[{"socket":"point","domain":"world","familyID":"quartz","qualityBand":2},{"socket":"haft","domain":"world","familyID":"timber","qualityBand":2},{"socket":"binding","domain":"world","familyID":"fiber","qualityBand":2}]}},
       "rarity": "uncommon", "blurb": "A clear mineral point fitted to a long shaft and kept away from lateral strain.",
       "kind": "gear", "gear": { "slot": "weapon", "tier": 2, "damage": "pierce", "reach": "mid", "visualFamilyID": "long_spear", "materialProfileID": "world:quartz" },
       "tradingPostDisposition": "sellable", "recyclerDisposition": "recyclable"
     },
     {
       "id": "obsidian_edge", "name": "Obsidian Edge", "icon": "scissors",
-      "gearCatalogueDisposition": {"version":1,"classification":"componentAuthoredFound","territoryFindEligible":true,"foundReceipt":{"version":1,"mode":"schematic","schematicID":"weaponsmith_fitted_edge","qualityBand":3,"components":[{"socket":"edge","domain":"world","familyID":"obsidian","qualityBand":3},{"socket":"grip","domain":"creature","familyID":"hide","qualityBand":3},{"socket":"fitting","domain":"creature","familyID":"bone","qualityBand":3}]}},
+      "gearCatalogueDisposition": {"version":1,"classification":"componentAuthoredFound","territoryFindEligible":true,"foundReceipt":{"version":1,"mode":"schematic","schematicID":"weaponsmith_fitted_edge","fixedIdentity":null,"outputSlot":null,"qualityBand":3,"components":[{"socket":"edge","domain":"world","familyID":"obsidian","qualityBand":3},{"socket":"grip","domain":"creature","familyID":"hide","qualityBand":3},{"socket":"fitting","domain":"creature","familyID":"bone","qualityBand":3}]}},
       "rarity": "rare", "blurb": "A dark glass edge assembled from replaceable flakes rather than one fragile length.",
       "kind": "gear", "gear": { "slot": "weapon", "tier": 3, "damage": "rend", "reach": "close", "visualFamilyID": "fitted_edge", "materialProfileID": "world:obsidian" },
       "tradingPostDisposition": "sellable", "recyclerDisposition": "recyclable"
@@ -1321,21 +1321,21 @@
     },
     {
       "id": "adamant_cuirass", "name": "Adamant Cuirass", "icon": "shield.fill",
-      "gearCatalogueDisposition": {"version":1,"classification":"componentAuthoredFound","territoryFindEligible":true,"foundReceipt":{"version":1,"mode":"schematic","schematicID":"rigid_guard","qualityBand":4,"components":[{"socket":"body-1","domain":"world","familyID":"adamant","qualityBand":4},{"socket":"body-2","domain":"world","familyID":"adamant","qualityBand":4},{"socket":"binding","domain":"world","familyID":"fiber","qualityBand":4}]}},
+      "gearCatalogueDisposition": {"version":1,"classification":"componentAuthoredFound","territoryFindEligible":true,"foundReceipt":{"version":1,"mode":"schematic","schematicID":"rigid_guard","fixedIdentity":null,"outputSlot":null,"qualityBand":4,"components":[{"socket":"body-1","domain":"world","familyID":"adamant","qualityBand":4},{"socket":"body-2","domain":"world","familyID":"adamant","qualityBand":4},{"socket":"binding","domain":"world","familyID":"fiber","qualityBand":4}]}},
       "rarity": "mythic", "blurb": "A fitted green-metal shell whose thin plates carry more force than their weight suggests.",
       "kind": "gear", "gear": { "slot": "armor", "tier": 4, "visualFamilyID": "rigid_guard", "materialProfileID": "world:adamant" },
       "tradingPostDisposition": "protected", "recyclerDisposition": "recyclable"
     },
     {
       "id": "woven_sling", "name": "Woven Sling", "icon": "circle.grid.cross",
-      "gearCatalogueDisposition": {"version":1,"classification":"componentAuthoredFound","territoryFindEligible":true,"foundReceipt":{"version":1,"mode":"schematic","schematicID":"sling","qualityBand":1,"components":[{"socket":"cord","domain":"world","familyID":"fiber","qualityBand":1},{"socket":"projectile","domain":"world","familyID":"clay","qualityBand":1},{"socket":"pouch","domain":"world","familyID":"fiber","qualityBand":1}]}},
+      "gearCatalogueDisposition": {"version":1,"classification":"componentAuthoredFound","territoryFindEligible":true,"foundReceipt":{"version":1,"mode":"schematic","schematicID":"sling","fixedIdentity":null,"outputSlot":null,"qualityBand":1,"components":[{"socket":"cord","domain":"world","familyID":"fiber","qualityBand":1},{"socket":"projectile","domain":"world","familyID":"clay","qualityBand":1},{"socket":"pouch","domain":"world","familyID":"fiber","qualityBand":1}]}},
       "rarity": "common", "blurb": "Long fibres braided into a broad pocket and cords that release cleanly.",
       "kind": "gear", "gear": { "slot": "weapon", "tier": 1, "damage": "crush", "reach": "far", "visualFamilyID": "sling", "materialProfileID": "world:fiber" },
       "tradingPostDisposition": "sellable", "recyclerDisposition": "recyclable"
     },
     {
       "id": "timber_longbow", "name": "Timber Longbow", "icon": "arrow.up.and.down.and.arrow.left.and.right",
-      "gearCatalogueDisposition": {"version":1,"classification":"componentAuthoredFound","territoryFindEligible":true,"foundReceipt":{"version":1,"mode":"schematic","schematicID":"longbow","qualityBand":1,"components":[{"socket":"limb-1","domain":"world","familyID":"timber","qualityBand":1},{"socket":"limb-2","domain":"world","familyID":"timber","qualityBand":1},{"socket":"string","domain":"world","familyID":"fiber","qualityBand":1}]}},
+      "gearCatalogueDisposition": {"version":1,"classification":"componentAuthoredFound","territoryFindEligible":true,"foundReceipt":{"version":1,"mode":"schematic","schematicID":"longbow","fixedIdentity":null,"outputSlot":null,"qualityBand":1,"components":[{"socket":"limb-1","domain":"world","familyID":"timber","qualityBand":1},{"socket":"limb-2","domain":"world","familyID":"timber","qualityBand":1},{"socket":"string","domain":"world","familyID":"fiber","qualityBand":1}]}},
       "rarity": "common", "blurb": "A tall stave cut along the grain and backed where the bend asks most of it.",
       "kind": "gear", "gear": { "slot": "weapon", "tier": 1, "damage": "pierce", "reach": "far", "visualFamilyID": "longbow", "materialProfileID": "world:timber" },
       "tradingPostDisposition": "sellable", "recyclerDisposition": "recyclable"
@@ -1349,7 +1349,7 @@
     },
     {
       "id": "resinbound_boots", "name": "Resinbound Boots", "icon": "shoeprints.fill",
-      "gearCatalogueDisposition": {"version":1,"classification":"componentAuthoredFound","territoryFindEligible":true,"foundReceipt":{"version":1,"mode":"schematic","schematicID":"working_boots","qualityBand":1,"components":[{"socket":"upper","domain":"creature","familyID":"hide","qualityBand":1},{"socket":"sole","domain":"world","familyID":"timber","qualityBand":1},{"socket":"binding","domain":"world","familyID":"resin","qualityBand":1}]}},
+      "gearCatalogueDisposition": {"version":1,"classification":"componentAuthoredFound","territoryFindEligible":true,"foundReceipt":{"version":1,"mode":"schematic","schematicID":"working_boots","fixedIdentity":null,"outputSlot":null,"qualityBand":1,"components":[{"socket":"upper","domain":"creature","familyID":"hide","qualityBand":1},{"socket":"sole","domain":"world","familyID":"timber","qualityBand":1},{"socket":"binding","domain":"world","familyID":"resin","qualityBand":1}]}},
       "rarity": "common", "blurb": "Working boots whose seams and soles have been repeatedly sealed with resin.",
       "kind": "gear", "gear": { "slot": "feet", "tier": 1, "insulation": 14, "visualFamilyID": "working_boots", "materialProfileID": "world:resin" },
       "tradingPostDisposition": "sellable", "recyclerDisposition": "recyclable"
@@ -1384,7 +1384,7 @@
     },
     {
       "id": "riftglass_rapier", "name": "Rift-glass Rapier", "icon": "arrow.up.right",
-      "gearCatalogueDisposition": {"version":1,"classification":"componentAuthoredFound","territoryFindEligible":false,"foundReceipt":{"version":1,"mode":"fixedSpecial","fixedIdentity":"riftglass-rapier","qualityBand":4,"components":[{"socket":"special-core","domain":"world","familyID":"rift_glass","qualityBand":4}]}},
+      "gearCatalogueDisposition": {"version":1,"classification":"componentAuthoredFound","territoryFindEligible":false,"foundReceipt":{"version":1,"mode":"fixedSpecial","schematicID":null,"fixedIdentity":"riftglass-rapier","outputSlot":null,"qualityBand":4,"components":[{"socket":"special-core","domain":"world","familyID":"rift_glass","qualityBand":4}]}},
       "rarity": "mythic", "blurb": "A narrow blue-glass point braced along facets that never quite meet.",
       "kind": "gear", "gear": { "slot": "weapon", "tier": 4, "damage": "pierce", "reach": "close", "visualFamilyID": "fitted_point", "materialProfileID": "world:rift_glass" },
       "tradingPostDisposition": "protected", "recyclerDisposition": "recyclable"
