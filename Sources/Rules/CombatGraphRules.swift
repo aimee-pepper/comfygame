@@ -6,6 +6,16 @@ import Foundation
 enum CombatGraphRules {
     static let graphVersion = 2
     static let openingMaximumDepth = 3
+    static let firstCompleteRouteNodeIDs: Set<CombatNodeID> = [
+        "combat.defense.fortitude.thick_hide",
+        "combat.defense.fortitude.iron_skin",
+        "combat.defense.fortitude.brace",
+        "combat.defense.fortitude.constitution",
+        "combat.defense.fortitude.endurance",
+        "combat.defense.fortitude.ward",
+        "combat.defense.fortitude.unyielding",
+        "combat.defense.fortitude.immovable",
+    ]
 
     enum PurchaseRefusal: Error, Equatable, Sendable {
         case unavailable, alreadyOwned, missingPoint, illegalParent, invalidChoice
@@ -48,6 +58,14 @@ enum CombatGraphRules {
         Set(catalogue.nodes.filter { $0.depth <= openingMaximumDepth }.map(\.id))
     }
 
+    static func implementedNodeIDs(in catalogue: CombatGraphCatalogue) -> Set<CombatNodeID> {
+        implementedOpeningNodeIDs(in: catalogue).union(firstCompleteRouteNodeIDs)
+    }
+
+    static func isImplemented(_ node: CombatGraphNodeDef) -> Bool {
+        node.depth <= openingMaximumDepth || firstCompleteRouteNodeIDs.contains(node.id)
+    }
+
     static func migratedLegacyNodes(branchDepth: [CombatBranchID: Int],
                                     catalogue: CombatGraphCatalogue) -> Set<CombatNodeID> {
         Set(catalogue.disciplines.flatMap { discipline in
@@ -77,7 +95,7 @@ enum CombatGraphRules {
                                 for character: CharacterState,
                                 catalogue: CombatGraphCatalogue)
         -> Result<PurchaseQuote, PurchaseRefusal> {
-        guard let node = catalogue.node(nodeID), node.depth <= openingMaximumDepth else {
+        guard let node = catalogue.node(nodeID), isImplemented(node) else {
             return .failure(.unavailable)
         }
         let owned = ownedNodes(for: character, catalogue: catalogue)
@@ -144,7 +162,8 @@ enum CombatGraphRules {
 
     static func availableNodes(owned: Set<CombatNodeID>,
                                catalogue: CombatGraphCatalogue) -> [CombatGraphNodeDef] {
-        catalogue.nodes.filter { canPurchase($0, owned: owned, catalogue: catalogue) }
+        catalogue.nodes.filter { isImplemented($0)
+            && canPurchase($0, owned: owned, catalogue: catalogue) }
     }
 
     static func isLegalPurchaseOrder(_ ids: [CombatNodeID],

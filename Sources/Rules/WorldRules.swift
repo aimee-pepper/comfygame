@@ -1432,20 +1432,20 @@ enum WorldRules {
         let watchfulSuppressed = resolvedOpening == .creatureAmbush && watchful
 
         let combatGraph = ContentCatalog.shared.combatGraph
-        let openingIDs = CombatGraphRules.implementedOpeningNodeIDs(in: combatGraph)
+        let implementedIDs = CombatGraphRules.implementedNodeIDs(in: combatGraph)
         let binderCharacter = state.base.binderCharacter
-        var binderNodeIDs = binderCharacter.ownedCombatNodeIDs.intersection(openingIDs)
+        var binderNodeIDs = binderCharacter.ownedCombatNodeIDs.intersection(implementedIDs)
         var companionNodeIDs: [PersistentPartyMemberID: Set<CombatNodeID>] = Dictionary(uniqueKeysWithValues: state.base.activeParty.compactMap { id in
             guard let index = state.base.rosterIndex(for: id) else { return nil }
             let nodes = state.base.roster[index].character.ownedCombatNodeIDs
-                .intersection(openingIDs)
+                .intersection(implementedIDs)
             return (id, nodes)
         })
-        var binderChoices = binderCharacter.combatNodeChoices.filter { openingIDs.contains($0.key) }
+        var binderChoices = binderCharacter.combatNodeChoices.filter { implementedIDs.contains($0.key) }
         var companionChoices: [PersistentPartyMemberID: [CombatNodeID: StableChoiceID]] = Dictionary(uniqueKeysWithValues: state.base.activeParty.compactMap { id in
             guard let index = state.base.rosterIndex(for: id) else { return nil }
             return (id, state.base.roster[index].character.combatNodeChoices
-                .filter { openingIDs.contains($0.key) })
+                .filter { implementedIDs.contains($0.key) })
         })
         if run.tuning.debugCombatV2BinderAttackEnabled {
             binderNodeIDs.formUnion(run.tuning.debugCombatV2BinderNodeIDs)

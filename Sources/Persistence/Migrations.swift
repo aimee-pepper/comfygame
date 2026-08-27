@@ -46,7 +46,7 @@ enum Migrations {
     private static func validateCurrentCombatOpening(in data: Data) throws {
         let root = try JSONSerialization.jsonObject(with: data)
         let graph = ContentCatalog.shared.combatGraph
-        let opening = CombatGraphRules.implementedOpeningNodeIDs(in: graph)
+        let implemented = CombatGraphRules.implementedNodeIDs(in: graph)
 
         func integer(_ value: Any) throws -> Int {
             guard let number = value as? NSNumber,
@@ -70,7 +70,7 @@ enum Migrations {
                     throw CocoaError(.coderInvalidValue)
                 }
                 let id = CombatNodeID(rawValue: string)
-                guard opening.contains(id), owned.insert(id).inserted else {
+                guard implemented.contains(id), owned.insert(id).inserted else {
                     throw CocoaError(.coderInvalidValue)
                 }
             }

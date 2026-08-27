@@ -129,7 +129,7 @@ struct CombatTreeView: View {
                 Text(ProgressionRequirementPresentation.capstoneRequirement)
                     .font(.caption).foregroundStyle(.secondary)
             }
-            if node.depth > CombatGraphRules.openingMaximumDepth {
+            if !CombatGraphRules.isImplemented(node) {
                 Text(CombatGraphRules.PurchaseRefusal.unavailable.playerCopy)
                     .font(.caption).foregroundStyle(.secondary)
             } else if state != .owned {
@@ -154,7 +154,7 @@ struct CombatTreeView: View {
 
     private func state(of node: CombatGraphNodeDef) -> CombatGraphNodeState {
         if owned.contains(node.id) { return .owned }
-        guard node.depth <= CombatGraphRules.openingMaximumDepth else { return .blocked }
+        guard CombatGraphRules.isImplemented(node) else { return .blocked }
         let choice = selectedNodeID == node.id ? selectedChoice : nil
         if case .success = store.previewCombatNodePurchase(node.id, choice: choice, for: member) {
             return .available

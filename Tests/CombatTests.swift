@@ -5153,6 +5153,51 @@ final class CombatTests: XCTestCase {
                                                                   ownsNode: true), 7)
     }
 
+    func testPurchasedFortitudeRouteOwnsExpeditionAndFrozenEncounterConsumers() throws {
+        let route: Set<CombatNodeID> = CombatGraphRules.firstCompleteRouteNodeIDs
+        let io = SaveFileIO.temporary(name: "fortitude-route-\(UUID().uuidString)")
+        let store = GameStore(io: io)
+        store.mutate("own the exact first complete route", flush: true) { state in
+            state.base.binderCharacter.level = 9
+            state.base.binderCharacter.ownedCombatNodeIDs = route
+            state.base.binderCharacter.unspentCombatPoints = 0
+        }
+        store.write("plains")
+        XCTAssertTrue(store.bindAndDepart(), store.bindError ?? "bind failed")
+        let cap = try XCTUnwrap(store.activeRun?.healthCap(for: .binder))
+        XCTAssertEqual(cap.components,
+                       [.init(nodeID: CombatDerivedStatsRules.Node.thickHide, amount: 6)])
+        XCTAssertEqual(store.activeRun?.binderHP, cap.maximum)
+
+        var state = store.state
+        var run = try XCTUnwrap(state.worlds.activeRun)
+        let enemy = WorldEnemy(id: .init(rawValue: 0xF047), creatureID: "paper_moth",
+                               position: run.playerPosition, isAwake: true)
+        run.enemies = [enemy]
+        run.encounterGraceTurns = 0
+        state.worlds.activeRun = run
+        WorldRules.beginEncounter(triggeredBy: enemy, runsAutomaticTurns: false, in: &state)
+
+        let encounter = try XCTUnwrap(state.worlds.activeRun?.activeEncounter)
+        XCTAssertEqual(encounter.debugV2OwnedNodeIDs?[.binder], route)
+        XCTAssertEqual(encounter.debugV2Armour?.entry(for: .binder)?.ownedNodeIDs,
+                       [CombatDerivedStatsRules.Node.ironSkin,
+                        CombatDerivedStatsRules.Node.immovable])
+        XCTAssertEqual(encounter.braceReceipts, [:])
+        XCTAssertEqual(encounter.wardReceipts, [:])
+        XCTAssertEqual(encounter.unyieldingSpent, [])
+        XCTAssertTrue(CombatRules.skills(for: .binder, in: state).contains { $0.id == "brace" })
+        XCTAssertTrue(CombatRules.skills(for: .binder, in: state).contains { $0.id == "ward" })
+
+        let relaunched = try SaveCodec.decode(SaveCodec.encode(state))
+        XCTAssertEqual(relaunched.worlds.activeRun?.healthCaps, state.worlds.activeRun?.healthCaps)
+        XCTAssertEqual(relaunched.worlds.activeRun?.activeEncounter?
+            .debugV2OwnedNodeIDs?[.binder], route)
+        XCTAssertEqual(relaunched.worlds.activeRun?.activeEncounter?.braceReceipts, [:])
+        XCTAssertEqual(relaunched.worlds.activeRun?.activeEncounter?.wardReceipts, [:])
+        XCTAssertEqual(relaunched.worlds.activeRun?.activeEncounter?.unyieldingSpent, [])
+    }
+
     func testEnduranceThresholdCrossingAndMinimumArePureAndFrozenMaximumAware() {
         let node = true
         XCTAssertEqual(CombatDerivedStatsRules.enduranceDamage(

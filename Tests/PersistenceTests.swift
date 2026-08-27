@@ -33,9 +33,11 @@ final class PersistenceTests: XCTestCase {
         }
     }
 
-    func testCurrentCombatOpeningRequiresCanonicalFieldsAndExactOpeningMembership() throws {
+    func testCurrentCombatOwnershipRequiresCanonicalFieldsAndExactImplementedMembership() throws {
         let valid = Data(#"{"schemaVersion":5,"character":{"ownedCombatNodeIDs":[],"combatNodeChoices":{},"unspentCombatPoints":0}}"#.utf8)
         XCTAssertEqual(try Migrations.migrateIfNeeded(valid), valid)
+        let fortitude = Data(#"{"schemaVersion":5,"character":{"ownedCombatNodeIDs":["combat.defense.fortitude.thick_hide","combat.defense.fortitude.iron_skin","combat.defense.fortitude.brace","combat.defense.fortitude.constitution","combat.defense.fortitude.endurance","combat.defense.fortitude.ward","combat.defense.fortitude.unyielding","combat.defense.fortitude.immovable"],"combatNodeChoices":{},"unspentCombatPoints":0}}"#.utf8)
+        XCTAssertEqual(try Migrations.migrateIfNeeded(fortitude), fortitude)
         let malformed = [
             #"{"schemaVersion":5,"character":{"combatNodeChoices":{},"unspentCombatPoints":0}}"#,
             #"{"schemaVersion":5,"character":{"ownedCombatNodeIDs":[],"unspentCombatPoints":0}}"#,

@@ -1262,9 +1262,9 @@ enum CombatRules {
         state.base.partyMembers.map { member in
             let actor = member.combatant
             let graph = ContentCatalog.shared.combatGraph
-            let opening = CombatGraphRules.implementedOpeningNodeIDs(in: graph)
+            let implemented = CombatGraphRules.implementedNodeIDs(in: graph)
             var selected = state.base.character(member).ownedCombatNodeIDs
-                .intersection(opening)
+                .intersection(implemented)
             if tuning.debugCombatV2BinderAttackEnabled {
                 switch member {
                 case .binder: selected.formUnion(tuning.debugCombatV2BinderNodeIDs)

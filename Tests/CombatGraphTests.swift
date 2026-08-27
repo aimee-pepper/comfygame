@@ -178,6 +178,55 @@ final class CombatGraphTests: XCTestCase {
         XCTAssertTrue(graph.nodes.filter { $0.depth > 3 }.allSatisfy { !opening.contains($0.id) })
     }
 
+    func testOnlyTheExactEightPointFortitudeRouteIsPromotedBeyondOpening() throws {
+        let route: [CombatNodeID] = [
+            "combat.defense.fortitude.thick_hide",
+            "combat.defense.fortitude.iron_skin",
+            "combat.defense.fortitude.brace",
+            "combat.defense.fortitude.constitution",
+            "combat.defense.fortitude.endurance",
+            "combat.defense.fortitude.ward",
+            "combat.defense.fortitude.unyielding",
+            "combat.defense.fortitude.immovable",
+        ]
+        XCTAssertEqual(CombatGraphRules.firstCompleteRouteNodeIDs, Set(route))
+        let implemented = CombatGraphRules.implementedNodeIDs(in: graph)
+        XCTAssertEqual(implemented.count, 48)
+        XCTAssertEqual(implemented.subtracting(CombatGraphRules.implementedOpeningNodeIDs(in: graph)),
+                       Set(route.suffix(3)))
+        XCTAssertTrue(graph.nodes.filter { $0.depth > 3 && !Set(route).contains($0.id) }
+            .allSatisfy { !implemented.contains($0.id) })
+
+        var character = CharacterState(level: 8)
+        for id in route.prefix(7) {
+            let quote = try CombatGraphRules.previewPurchase(id, for: character,
+                                                             catalogue: graph).get()
+            XCTAssertEqual(CombatGraphRules.commit(quote, for: &character, catalogue: graph),
+                           .committed(id))
+        }
+        XCTAssertEqual(character.unspentCombatPoints, 0)
+        XCTAssertEqual(CombatGraphRules.previewPurchase(route[7], for: character,
+                                                        catalogue: graph),
+                       .failure(.missingPoint))
+
+        CharacterRules.grow(&character)
+        XCTAssertEqual(character.level, 9)
+        let capstone = try CombatGraphRules.previewPurchase(route[7], for: character,
+                                                            catalogue: graph).get()
+        XCTAssertEqual(CombatGraphRules.commit(capstone, for: &character, catalogue: graph),
+                       .committed(route[7]))
+        XCTAssertEqual(character.ownedCombatNodeIDs, Set(route))
+        XCTAssertEqual(character.unspentCombatPoints, 0)
+
+        let laterOther: CombatNodeID = "combat.defense.protection.interpose"
+        XCTAssertEqual(CombatGraphRules.previewPurchase(laterOther, for: CharacterState(level: 25),
+                                                        catalogue: graph),
+                       .failure(.unavailable))
+        let roundTrip = try JSONDecoder().decode(CharacterState.self,
+            from: JSONEncoder().encode(character))
+        XCTAssertEqual(roundTrip, character)
+    }
+
     func testEveryOpeningHybridIsLegalFromEitherExactParentAndNotFromDestinationRoot() throws {
         let hybrids = graph.nodes.filter { $0.depth == 3 && !$0.hybridAlternativeParents.isEmpty }
         XCTAssertFalse(hybrids.isEmpty)
