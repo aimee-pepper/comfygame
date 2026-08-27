@@ -40,7 +40,7 @@ struct TradingPostStockLine: Codable, Equatable, Identifiable, Sendable {
     enum Kind: Codable, Equatable, Sendable {
         case resource(ResourceID)
         case item(ItemID)
-        case material(MaterialSample)
+        case material(CraftMaterialUnitV1)
     }
 
     var id: UInt64
@@ -50,18 +50,20 @@ struct TradingPostStockLine: Codable, Equatable, Identifiable, Sendable {
     /// Exact persisted objects supplied by this line, one entry per purchasable unit. Old resource
     /// shelves decode empty; item/material shelves without this receipt remain safely unbuyable.
     var frozenUnits: [ItemStack] = []
+    var frozenMaterialUnits: [CraftMaterialUnitV1] = []
 
     private enum CodingKeys: String, CodingKey {
-        case id, kind, remainingQuantity, unitPrice, frozenUnits
+        case id, kind, remainingQuantity, unitPrice, frozenUnits, frozenMaterialUnits
     }
 
     init(id: UInt64, kind: Kind, remainingQuantity: Int, unitPrice: Int,
-         frozenUnits: [ItemStack] = []) {
+         frozenUnits: [ItemStack] = [], frozenMaterialUnits: [CraftMaterialUnitV1] = []) {
         self.id = id
         self.kind = kind
         self.remainingQuantity = remainingQuantity
         self.unitPrice = unitPrice
         self.frozenUnits = frozenUnits
+        self.frozenMaterialUnits = frozenMaterialUnits
     }
 
     init(from decoder: Decoder) throws {
@@ -71,6 +73,8 @@ struct TradingPostStockLine: Codable, Equatable, Identifiable, Sendable {
         remainingQuantity = try c.decode(Int.self, forKey: .remainingQuantity)
         unitPrice = try c.decode(Int.self, forKey: .unitPrice)
         frozenUnits = try c.decodeIfPresent([ItemStack].self, forKey: .frozenUnits) ?? []
+        frozenMaterialUnits = try c.decodeIfPresent([CraftMaterialUnitV1].self,
+                                                     forKey: .frozenMaterialUnits) ?? []
     }
 
     func encode(to encoder: Encoder) throws {
@@ -80,6 +84,7 @@ struct TradingPostStockLine: Codable, Equatable, Identifiable, Sendable {
         try c.encode(remainingQuantity, forKey: .remainingQuantity)
         try c.encode(unitPrice, forKey: .unitPrice)
         try c.encode(frozenUnits, forKey: .frozenUnits)
+        try c.encode(frozenMaterialUnits, forKey: .frozenMaterialUnits)
     }
 }
 
@@ -151,6 +156,7 @@ struct TradingPostPurchasePreview: Equatable, Sendable {
     var quantity: Int
     var goldCost: Int
     var frozenUnits: [ItemStack] = []
+    var frozenMaterialUnits: [CraftMaterialUnitV1] = []
 }
 
 enum TradingPostCommitResult: Equatable, Sendable {

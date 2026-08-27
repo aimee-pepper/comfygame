@@ -1224,18 +1224,16 @@ extension GameStore {
             state.reality.instruments.insert(target)
             state.reality.instrumentPrecisions[target] = .crude
             state.base.instrumentLoadout.insert(target)
-            let samples = (0..<5).map { index in
-                MaterialSample(kind: .chitin,
-                               properties: MaterialProperties(lustre: 45 + Double(index) * 10),
-                               grade: 45 + Double(index) * 10,
-                               source: "harness specimen")
+            for index in 0..<5 {
+                let id = CraftMaterialUnitID(rawValue: "harness-instrument-\(index)")
+                let unit = CraftMaterialUnitV1(stableUnitID: id, domain: .creature,
+                    familyID: .chitin, qualityBand: .fine,
+                    properties: MaterialProperties(lustre: 45 + Double(index) * 10),
+                    sourceReceipt: .legacy(originalKind: .chitin,
+                        frozenSource: "harness specimen", qualifier: nil,
+                        migrationLocation: "debug-harness", originalIdentity: nil))
+                _ = state.base.creatureMaterialReserve.add(.init(unit: unit, protectedReturn: false))
             }
-            state.base.inventory.slots = max(state.base.inventory.slots,
-                                             state.base.inventory.stacks.count + 1)
-            _ = state.base.inventory.add(ItemStack(
-                id: InstanceID(rawValue: state.base.nextItemID()),
-                catalogID: Items.material,
-                materials: samples))
         }
     }
 
@@ -1247,18 +1245,19 @@ extension GameStore {
             for resource in ContentCatalog.shared.resources where resource.id != Resources.mote {
                 state.base.resources.add(10, of: resource.id)
             }
-            let samples = MaterialProperty.allCases.flatMap { property in
-                (0..<3).map { index -> MaterialSample in
+            for property in MaterialProperty.allCases {
+                for index in 0..<3 {
                     var properties = MaterialProperties()
                     properties[property] = 80 + Double(index)
-                    return MaterialSample(kind: .reagent, properties: properties,
-                                          grade: 80 + Double(index), source: "harness specimen")
+                    let id = CraftMaterialUnitID(rawValue: "harness-apothecary-\(property.rawValue)-\(index)")
+                    let unit = CraftMaterialUnitV1(stableUnitID: id, domain: .world,
+                        familyID: .reagent, qualityBand: .exceptional, properties: properties,
+                        sourceReceipt: .legacy(originalKind: .reagent,
+                            frozenSource: "harness specimen", qualifier: nil,
+                            migrationLocation: "debug-harness", originalIdentity: nil))
+                    _ = state.base.worldMaterialReserve.add(.init(unit: unit, protectedReturn: false))
                 }
             }
-            state.base.inventory.slots = max(state.base.inventory.slots,
-                                             state.base.inventory.stacks.count + 1)
-            _ = state.base.inventory.add(ItemStack(id: InstanceID(rawValue: state.base.nextItemID()),
-                                                   catalogID: Items.material, materials: samples))
             state.base.knownConsumableRecipes = Set(ConsumableCraftingRules.recipes.map(\.output))
         }
     }

@@ -222,7 +222,7 @@ private struct RecyclerPreviewSheet: View {
                     }
 #if DEBUG
                     ForEach(Array(preview.returnedSamples.enumerated()), id: \.offset) { index, sample in
-                        LabeledContent(sample.displayName, value: sample.grade.formatted(.number.precision(.fractionLength(0))))
+                        LabeledContent(sample.displayName, value: sample.qualityBand.displayName)
                             .background {
                                 if index == preview.returnedSamples.indices.last {
                                     P3SafeSpaceProbe("recycler.preview.final", identity: sample.displayName)
@@ -231,7 +231,7 @@ private struct RecyclerPreviewSheet: View {
                     }
 #else
                     ForEach(Array(preview.returnedSamples.enumerated()), id: \.offset) { _, sample in
-                        LabeledContent(sample.displayName, value: sample.grade.formatted(.number.precision(.fractionLength(0))))
+                        LabeledContent(sample.displayName, value: sample.qualityBand.displayName)
                     }
 #endif
                     if preview.returnedResources.nonZero.isEmpty && preview.returnedSamples.isEmpty {

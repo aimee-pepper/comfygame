@@ -17,12 +17,12 @@ enum InstrumentCraftingRules {
     }
 
     struct Candidate: Equatable, Sendable {
-        var unitID: MaterialReserveUnitID
-        var sample: MaterialSample
+        var unitID: CraftMaterialUnitID
+        var sample: CraftMaterialUnitV1
         var value: Double
 
-        var selection: MaterialReserveSelection {
-            MaterialReserveSelection(unitID: unitID, sample: sample)
+        var selection: CraftMaterialSelection {
+            CraftMaterialSelection(unitID: unitID, unit: sample)
         }
     }
 
@@ -67,7 +67,7 @@ enum InstrumentCraftingRules {
     }
 
     static func candidates(for recipe: Recipe, in state: GameState) -> [Candidate] {
-        state.base.materialReserve.selections { sample in
+        state.base.craftMaterialSelections { sample in
             sample.properties[recipe.property] >= recipe.minimum
         }
         .map { selection in
@@ -75,8 +75,7 @@ enum InstrumentCraftingRules {
                       value: selection.sample.properties[recipe.property])
         }
         // Never silently eat the player's exceptional sample when an ordinary one qualifies.
-        .sorted { ($0.value, $0.sample.grade, $0.unitID)
-            < ($1.value, $1.sample.grade, $1.unitID) }
+        .sorted { ($0.value, $0.unitID) < ($1.value, $1.unitID) }
     }
 
     static func readiness(for target: PressureTargetID, in state: GameState) -> Readiness {
@@ -98,7 +97,7 @@ enum InstrumentCraftingRules {
               state.base.essenceCrystalCount >= recipe.essence else { return false }
         let spending = Array(candidates(for: recipe, in: state).prefix(recipe.count))
         guard spending.count == recipe.count,
-              state.base.materialReserve.consume(spending.map(\.selection)) != nil else { return false }
+              state.base.consumeCraftMaterials(spending.map(\.selection)) != nil else { return false }
         guard state.base.spendEssenceCrystals(recipe.essence) else { return false }
         state.reality.instrumentPrecisions[target] = recipe.output
         return true

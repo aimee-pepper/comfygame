@@ -1031,10 +1031,11 @@ extension GameStore {
                 state.base.resources.add(amount, of: id)
             }
         }
-        let materialPartition = run.materialReserve.partitionedForFailure(
+        let materialPartition = partitionCraftMaterialsForFailure(
+            world: run.worldMaterialReserve, creature: run.creatureMaterialReserve,
             fraction: fraction, outcomeID: outcomeID)
-        func materialGains(_ reserve: MaterialReserve) -> [RunExitGain] {
-            Dictionary(grouping: reserve.units, by: { $0.sample.kind })
+        func materialGains(_ units: [CraftMaterialHoldingV1]) -> [RunExitGain] {
+            Dictionary(grouping: units, by: { $0.sample.kind })
                 .map { kind, units in
                     RunExitGain(name: units.count == 1 ? kind.displayName
                                                        : kind.pluralName.capitalisedSentence,
@@ -1042,9 +1043,9 @@ extension GameStore {
                 }
                 .sorted { $0.name < $1.name }
         }
-        func materialLines(_ reserve: MaterialReserve, side: String)
+        func materialLines(_ units: [CraftMaterialHoldingV1], side: String)
             -> [RunExitSummary.ReceiptLine] {
-            reserve.units.sorted { $0.id < $1.id }.map { unit in
+            units.sorted { $0.id < $1.id }.map { unit in
                 .materialSample(.init(
                     lineID: "\(outcomeID.rawValue)-\(side)-\(unit.id.rawValue)",
                     sourceStackID: nil, reserveUnitID: unit.id,
@@ -1053,9 +1054,13 @@ extension GameStore {
                     recoveredDestination: side == "recovered" ? .stored : nil))
             }
         }
-        for var unit in materialPartition.kept.units {
+        for var unit in materialPartition.keptWorld.units {
             unit.protectedReturn = false
-            state.base.materialReserve.add(unit)
+            _ = state.base.worldMaterialReserve.add(unit)
+        }
+        for var unit in materialPartition.keptCreature.units {
+            unit.protectedReturn = false
+            _ = state.base.creatureMaterialReserve.add(unit)
         }
         var guaranteed = Inventory(slots: run.satchelItems.slots)
         var exposed = Inventory(slots: run.satchelItems.slots)
@@ -1128,14 +1133,16 @@ extension GameStore {
             }
             state.worlds.worldPageBankedOutcomeIDs.insert(outcomeID)
         }
-        return BankedHaul(resources: resourceGains + materialGains(materialPartition.kept),
+        let keptMaterialUnits = materialPartition.keptWorld.units + materialPartition.keptCreature.units
+        let lostMaterialUnits = materialPartition.lostWorld.units + materialPartition.lostCreature.units
+        return BankedHaul(resources: resourceGains + materialGains(keptMaterialUnits),
                           items: itemGains,
-                          lostResources: lostResourceGains + materialGains(materialPartition.lost),
+                          lostResources: lostResourceGains + materialGains(lostMaterialUnits),
                           lostItems: lostItemGains,
                           recoveredLines: recoveredResourceLines + recoveredItemLines
-                            + materialLines(materialPartition.kept, side: "recovered"),
+                            + materialLines(keptMaterialUnits, side: "recovered"),
                           lostLines: lostResourceLines + lostItemLines
-                            + materialLines(materialPartition.lost, side: "lost"),
+                            + materialLines(lostMaterialUnits, side: "lost"),
                           keptWorldPages: keptPages,
                           lostWorldPages: lostPages,
                           unidentifiedItemIDs: retainedRisk.stacks.filter { !$0.identified }.map(\.catalogID),

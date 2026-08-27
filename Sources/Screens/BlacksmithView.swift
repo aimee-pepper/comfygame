@@ -526,13 +526,9 @@ private struct ArmouryRebuildSheet: View {
                                    value: String(format: "%.1f → %.1f", preview.currentPhysical, preview.rebuiltPhysical))
                         LabeledRow(icon: "thermometer.medium", label: "Insulation",
                                    value: String(format: "%.0f → %.0f", preview.currentInsulation, preview.insulation))
-                        LabeledRow(icon: "hammer", label: profile.name, value: "Tier \(preview.outputTier)")
+                        LabeledRow(icon: "hammer", label: profile.name, value: preview.qualityBand.displayName)
                         if preview.isBelowSpecialistHeadline {
-                            Label("This stock yields Tier \(preview.outputTier); this Armoury can do better.",
-                                  systemImage: "exclamationmark.triangle").font(.caption).foregroundStyle(.orange)
-                        }
-                        if preview.wastesGradeAboveCap {
-                            Label("This stock naturally reaches Tier \(preview.naturalTier), but the Armoury currently caps it at Tier \(preview.outputTier).",
+                            Label("This stock yields \(preview.qualityBand.displayName) quality; this Armoury can do better.",
                                   systemImage: "exclamationmark.triangle").font(.caption).foregroundStyle(.orange)
                         }
                         if target.hasReforgeWork {
@@ -588,7 +584,7 @@ private struct ArmouryRebuildSheet: View {
                             messageTint: rebuildActionHasFailure(preview) ? .orange : .secondary) {
             Button {
                 if preview.destroysLegacyWork { confirmingLegacy = true }
-                else if preview.isBelowSpecialistHeadline || preview.wastesGradeAboveCap {
+                else if preview.isBelowSpecialistHeadline {
                     confirmingOrdinary = true
                 } else { commit(preview, allowLegacy: false) }
             } label: {
@@ -664,7 +660,6 @@ private struct ConstructionSheet: View {
     let recipe: PhysicalGearCraftingRules.Recipe
     @State private var selected: [String: PhysicalGearCraftingRules.Selection] = [:]
     @State private var confirmingBelowHeadline = false
-    @State private var confirmingWastedGrade = false
     @State private var commitFailure: String?
     @State private var activeRequirementID: String?
     @State private var openedCandidate: PhysicalGearCraftingRules.CandidateAssessment?
@@ -688,9 +683,7 @@ private struct ConstructionSheet: View {
                 if let preview {
                     Section("Result") {
                         LabeledRow(icon: "hammer", label: recipe.displayName,
-                                   value: "Tier \(preview.outputTier)", tint: .teal)
-                        LabeledRow(icon: "gauge.with.dots.needle.50percent", label: "Craft grade",
-                                   value: String(format: "%.1f", preview.craftGrade))
+                                   value: preview.qualityBand.displayName, tint: .teal)
                         if let damage = recipe.damage {
                             LabeledRow(icon: "scope", label: "Consequence and reach",
                                        value: "\(damage.rawValue.capitalisedSentence) · \(recipe.reach.rawValue.capitalisedSentence)")
@@ -701,11 +694,6 @@ private struct ConstructionSheet: View {
                         if preview.homeDiscountRate > 0 {
                             LabeledRow(icon: "person.crop.circle.badge.checkmark", label: "Keeper at Home",
                                        value: "\(Int((preview.homeDiscountRate * 100).rounded()))% off")
-                        }
-                        if preview.wastesGradeAboveCap {
-                            Label("This stock naturally reaches Tier \(preview.naturalTier), but this station caps the result at Tier \(preview.outputTier).",
-                                  systemImage: "exclamationmark.triangle")
-                                .font(.caption).foregroundStyle(.orange)
                         }
                         if let headline = recipe.specialistHeadlineTier,
                            preview.isBelowSpecialistHeadline {
@@ -744,14 +732,6 @@ private struct ConstructionSheet: View {
                     Text("The selected stock yields Tier \(preview.outputTier), not Tier \(headline). It will still be consumed at the shown Tier \(preview.outputTier) cost.")
                 }
             }
-            .alert("Use stock above this station's cap?", isPresented: $confirmingWastedGrade) {
-                Button("Cancel", role: .cancel) {}
-                Button("Construct") { if let preview { commit(preview) } }
-            } message: {
-                if let preview {
-                    Text("The stock naturally reaches Tier \(preview.naturalTier), but this station will produce Tier \(preview.outputTier). The selected stock will still be consumed.")
-                }
-            }
         }
     }
 
@@ -759,9 +739,7 @@ private struct ConstructionSheet: View {
         PersistentActionBar(message: constructionActionFootnote(preview),
                             messageTint: constructionActionHasFailure(preview) ? .orange : .secondary) {
             Button {
-                if preview.wastesGradeAboveCap {
-                    confirmingWastedGrade = true
-                } else if recipe.specialistHeadlineTier != nil,
+                if recipe.specialistHeadlineTier != nil,
                           preview.isBelowSpecialistHeadline {
                     confirmingBelowHeadline = true
                 } else {
@@ -906,7 +884,7 @@ private struct CandidateStockDetail: View {
                 if !assessment.selection.sample.source.isEmpty {
                     LabeledContent("History", value: assessment.selection.sample.source)
                 }
-                LabeledContent("Grade", value: String(format: "%.1f", assessment.selection.sample.grade))
+                LabeledContent("Quality", value: assessment.selection.sample.qualityBand.displayName)
                 Text(requirement.summary).font(.caption).foregroundStyle(.secondary)
                 if let reason = assessment.rejectionReason {
                     Label(reason, systemImage: "xmark.circle")
@@ -984,7 +962,7 @@ private struct ArmourySampleDetail: View {
                 if !candidate.sample.source.isEmpty {
                     LabeledContent("History", value: candidate.sample.source)
                 }
-                LabeledContent("Grade", value: String(format: "%.1f", candidate.sample.grade))
+                LabeledContent("Quality", value: candidate.sample.qualityBand.displayName)
                 ForEach(requirement.floors, id: \.property) { floor in
                     LabeledContent(floor.property.displayName,
                                    value: "\(Int(candidate.sample.properties[floor.property])) · needs \(Int(floor.minimum))+")

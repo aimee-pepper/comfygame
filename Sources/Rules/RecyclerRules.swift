@@ -94,13 +94,9 @@ enum RecyclerRules {
         return max(1, Int(floor(Double(receiptCount) * efficiency(serviceTier: serviceTier))))
     }
 
-    /// Highest grade first is the honest default available in the current receipt. Recipes do not
-    /// yet persist which input satisfied their primary requirement, so this does not fabricate it.
-    static func defaultReceiptSelection(for samples: [MaterialSample], capacity: Int) -> [Int] {
-        samples.indices.sorted {
-            if samples[$0].grade != samples[$1].grade { return samples[$0].grade > samples[$1].grade }
-            return $0 < $1
-        }.prefix(max(0, capacity)).map { $0 }
+    /// Immutable construction-receipt order owns the initial recovery defaults.
+    static func defaultReceiptSelection(for samples: [CraftMaterialUnitV1], capacity: Int) -> [Int] {
+        Array(samples.indices.prefix(max(0, capacity)))
     }
 
     static func preview(location: TradingPostItemLocation, stackID: InstanceID,
@@ -134,11 +130,11 @@ enum RecyclerRules {
         default: 3
         }
         var resources = ResourcePool()
-        var samples: [MaterialSample] = []
+        var samples: [CraftMaterialUnitV1] = []
         for output in profile.sequence.prefix(outputCount) {
             switch output {
             case .resource(let id): resources.add(1, of: id)
-            case .reclaimedHide: samples.append(reclaimedHide(forConstructionTier: stack.constructionTier))
+            case .reclaimedHide: resources.add(1, of: Resources.fiber)
             }
         }
         return RecyclerPreview(revision: base.recycler.inventoryRevision,
@@ -178,30 +174,22 @@ enum RecyclerRules {
 
         var candidate = base
         let returnedUnits = preview.returnedSamples.enumerated().map { ordinal, sample in
-            MaterialReserveUnit(
-                id: MaterialReserveUnitID(
-                    rawValue: "recycler-\(preview.stackID.rawValue)-\(ordinal)"),
-                sample: sample)
+            let id = CraftMaterialUnitID(rawValue: "recycler-\(preview.stackID.rawValue)-\(ordinal)")
+            return CraftMaterialHoldingV1(unit: sample.withStableID(id), protectedReturn: false)
         }
-        let existingReserveIDs = Set(candidate.materialReserve.selections().map(\.unitID))
+        let existingReserveIDs = Set(candidate.craftMaterialSelections().map(\.unitID))
         guard returnedUnits.allSatisfy({ !existingReserveIDs.contains($0.id) }) else {
             return .invalid
         }
         guard remove(preview.stackID, at: preview.location, in: &candidate) else { return .invalid }
         candidate.resources.add(contentsOf: preview.returnedResources)
-        for unit in returnedUnits { candidate.materialReserve.add(unit) }
+        for unit in returnedUnits {
+            if unit.unit.domain == .world { _ = candidate.worldMaterialReserve.add(unit) }
+            else { _ = candidate.creatureMaterialReserve.add(unit) }
+        }
         candidate.recycler.inventoryRevision &+= 1
         base = candidate
         return .committed
-    }
-
-    private static func reclaimedHide(forConstructionTier tier: Int) -> MaterialSample {
-        let grade = min(80, Double(min(4, max(1, tier))) * 20)
-        return MaterialSample(kind: .hide,
-                              properties: MaterialProperties(hardness: 15, density: 25,
-                                                             insulation: 58, flexibility: 58,
-                                                             lustre: 10, reactivity: 5),
-                              grade: grade, source: "Recycler reclamation", qualifier: "reclaimed")
     }
 
     private static func stack(_ id: InstanceID, at location: TradingPostItemLocation,

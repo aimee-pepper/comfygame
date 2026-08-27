@@ -1023,7 +1023,7 @@ enum Items {
     static let scentMask: ItemID = "scent_mask"
     /// **Reserved, and deliberately not in `items.json`.** A material is not an authored item: what
     /// it is and what it's good for came off the animal it was cut from, and travels on the stack
-    /// as a `MaterialSample`. This id exists only so a material can share the slot machinery.
+    /// as a `CraftMaterialUnitV1`. This id exists only so a material can share the slot machinery.
     static let material: ItemID = "material"
 }
 

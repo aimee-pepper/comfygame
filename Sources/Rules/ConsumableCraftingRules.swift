@@ -4,10 +4,10 @@ import Foundation
 /// keep their authored chemical jobs; animal and plant samples remain freely substitutable.
 enum ConsumableCraftingRules {
     static let scentMaskDuration = 12
-    static let scentMaskMinimumGrade = 25.0
+    static let scentMaskFamilies: Set<MaterialFamilyID> = [.hide, .pelt, .down, .oil]
 
     struct ScentMaskQuote: Equatable, Sendable {
-        var animalResource: MaterialReserveSelection
+        var animalResource: CraftMaterialSelection
         var reagentCost: Int
         var output: ItemID
     }
@@ -95,7 +95,7 @@ enum ConsumableCraftingRules {
         var missing: [String] = []
         if recipe.output == Items.scentMask,
            scentMaskAnimalResources(in: state).isEmpty {
-            missing.append("1 animal resource · grade 25+")
+            missing.append("1 creature Hide, Pelt, Down, or Oil")
         }
         if let need = recipe.material {
             let have = qualifyingSamples(for: recipe, in: state).count
@@ -129,22 +129,22 @@ enum ConsumableCraftingRules {
         return true
     }
 
-    static func scentMaskAnimalResources(in state: GameState) -> [MaterialReserveSelection] {
-        state.base.materialReserve.selections {
-            $0.kind.isAnimalWorldResource && $0.grade >= scentMaskMinimumGrade
+    static func scentMaskAnimalResources(in state: GameState) -> [CraftMaterialSelection] {
+        state.base.creatureMaterialReserve.selections {
+            scentMaskFamilies.contains($0.familyID)
         }
     }
 
     static func previewScentMask(
-        using animalResource: MaterialReserveSelection, in state: GameState
+        using animalResource: CraftMaterialSelection, in state: GameState
     ) -> ScentMaskQuote? {
         guard state.base.station(Stations.apothecary).isUnlocked,
               state.base.station(Stations.apothecary).tier >= 0,
               state.base.knownConsumableRecipes.contains(Items.scentMask),
               state.base.resources["reagent"] >= 1,
-              animalResource.sample.kind.isAnimalWorldResource,
-              animalResource.sample.grade >= scentMaskMinimumGrade,
-              state.base.materialReserve.selections().contains(animalResource)
+              animalResource.unit.domain == .creature,
+              scentMaskFamilies.contains(animalResource.unit.familyID),
+              state.base.creatureMaterialReserve.selections().contains(animalResource)
         else { return nil }
         return .init(animalResource: animalResource, reagentCost: 1, output: Items.scentMask)
     }
@@ -154,14 +154,14 @@ enum ConsumableCraftingRules {
     static func craftScentMask(_ quote: ScentMaskQuote, in state: inout GameState)
         -> ScentMaskCommitResult {
         guard quote.output == Items.scentMask, quote.reagentCost == 1,
-              quote.animalResource.sample.kind.isAnimalWorldResource,
-              quote.animalResource.sample.grade >= scentMaskMinimumGrade else { return .stale }
+              quote.animalResource.unit.domain == .creature,
+              scentMaskFamilies.contains(quote.animalResource.unit.familyID) else { return .stale }
         var candidate = state
         guard candidate.base.station(Stations.apothecary).isUnlocked,
               candidate.base.station(Stations.apothecary).tier >= 0,
               candidate.base.knownConsumableRecipes.contains(Items.scentMask),
               candidate.base.resources.spend(quote.reagentCost, of: "reagent"),
-              candidate.base.materialReserve.consume([quote.animalResource]) != nil
+              candidate.base.creatureMaterialReserve.consume([quote.animalResource]) != nil
         else { return .stale }
         candidate.base.store(ItemStack(id: .init(rawValue: candidate.base.nextItemID()),
                                        catalogID: Items.scentMask))

@@ -3,7 +3,7 @@ import Foundation
 enum TradingPostRules {
     struct MaterialSalePreview: Equatable, Sendable {
         var revision: UInt64
-        var selections: [MaterialReserveSelection]
+        var selections: [CraftMaterialSelection]
         var unitPrices: [Int]
         var goldTotal: Int
     }
@@ -82,29 +82,21 @@ enum TradingPostRules {
         for id in chosen(uncommon, count: rng.int(in: 0...2)) { append(id, quantity: rng.int(in: 1...3)) }
 
         var nextItemID = base.nextItemID()
-        func mint(_ catalogID: ItemID, count: Int = 1,
-                  material: MaterialSample? = nil) -> [ItemStack] {
+        func mint(_ catalogID: ItemID, count: Int = 1) -> [ItemStack] {
             (0..<count).map { _ in
                 defer { nextItemID &+= 1 }
-                if let material {
-                    return ItemStack(id: InstanceID(rawValue: nextItemID), catalogID: Items.material,
-                                     materials: [material])
-                }
                 return ItemStack(id: InstanceID(rawValue: nextItemID), catalogID: catalogID)
             }
         }
         func append(kind: TradingPostStockLine.Kind, quantity: Int, unitPrice: Int,
-                    units: [ItemStack]) {
+                    units: [ItemStack], materialUnits: [CraftMaterialUnitV1] = []) {
             lines.append(.init(id: post.nextStockLineID, kind: kind,
                                remainingQuantity: quantity, unitPrice: unitPrice,
-                               frozenUnits: units))
+                               frozenUnits: units, frozenMaterialUnits: materialUnits))
             post.nextStockLineID &+= 1
         }
 
-        let physicalKinds: [MaterialKind] = [
-            .plate, .quill, .pelt, .down, .hide, .chitin, .fang, .tusk, .claw, .bone,
-            .timber, .fibre, .pulp
-        ]
+        let physicalKinds = MaterialFamilyID.allCases.filter { CraftMaterialDomain.forFamily($0) == .creature }
         for kind in chosenMaterialKinds(physicalKinds, count: rng.int(in: 0...2), rng: &rng) {
             let pair = merchantPropertyPair(for: kind)
             var properties = MaterialProperties()
@@ -113,11 +105,12 @@ enum TradingPostRules {
             for property in MaterialProperty.allCases where property != pair.0 && property != pair.1 {
                 properties[property] = Double(rng.int(in: 0...14))
             }
-            let sample = MaterialSample(kind: kind, properties: properties,
-                                        grade: Double(rng.int(in: 25...39)),
-                                        source: "Vance's supplier")
-            append(kind: .material(sample), quantity: 1, unitPrice: 3,
-                   units: mint(Items.material, material: sample))
+            let sample = CraftMaterialUnitFactory.merchant(kind: kind, properties: properties)
+                .withStableID(.init(rawValue: "trading-post-\(nextItemID)"))
+            guard let salePrice = materialSaleUnitPrice(for: sample) else { continue }
+            append(kind: .material(sample), quantity: 1,
+                   unitPrice: salePrice + 1,
+                   units: [], materialUnits: [sample])
         }
 
         let knownConsumables = base.knownConsumableRecipes.compactMap { id -> ItemDef? in
@@ -164,12 +157,12 @@ enum TradingPostRules {
         return result
     }
 
-    private static func chosenMaterialKinds(_ source: [MaterialKind], count: Int,
-                                            rng: inout SeededRNG) -> [MaterialKind] {
+    private static func chosenMaterialKinds(_ source: [MaterialFamilyID], count: Int,
+                                            rng: inout SeededRNG) -> [MaterialFamilyID] {
         chosenItems(source, count: count, rng: &rng)
     }
 
-    private static func merchantPropertyPair(for kind: MaterialKind) -> (MaterialProperty, MaterialProperty) {
+    private static func merchantPropertyPair(for kind: MaterialFamilyID) -> (MaterialProperty, MaterialProperty) {
         switch kind {
         case .plate, .chitin, .scale, .shell, .bone, .tusk, .horn: (.hardness, .density)
         case .fang, .claw: (.hardness, .reactivity)
@@ -287,33 +280,67 @@ enum TradingPostRules {
               line.remainingQuantity >= quantity else { return nil }
         switch line.kind {
         case .resource: break
-        case .item, .material:
+        case .item:
             guard line.frozenUnits.count >= quantity else { return nil }
+        case .material:
+            guard line.frozenMaterialUnits.count >= quantity else { return nil }
         }
         let cost = quantity * line.unitPrice
         guard base.goldCoins >= cost else { return nil }
         return .init(revision: base.tradingPost.inventoryRevision, kind: .stock(lineID: lineID, kind: line.kind),
                      quantity: quantity, goldCost: cost,
-                     frozenUnits: Array(line.frozenUnits.prefix(quantity)))
+                     frozenUnits: Array(line.frozenUnits.prefix(quantity)),
+                     frozenMaterialUnits: Array(line.frozenMaterialUnits.prefix(quantity)))
     }
 
-    static func materialSaleUnitPrice(for sample: MaterialSample) -> Int {
-        guard sample.grade.isFinite else { return 1 }
-        return min(6, max(1, 1 + Int(floor(sample.grade / 20))))
+    static func materialSaleUnitPrice(for sample: CraftMaterialUnitV1) -> Int? {
+        guard let base = materialFamilyBaseValue(sample.familyID),
+              let pair = commercialCapabilities(for: sample.familyID),
+              sample.properties.values.allSatisfy({ $0.isFinite && (0...100).contains($0) })
+        else { return nil }
+        let capabilityCount = [sample.properties[pair.0], sample.properties[pair.1]]
+            .filter { $0 >= 60 }.count
+        return base + capabilityCount
+    }
+
+    private static func materialFamilyBaseValue(_ kind: MaterialFamilyID) -> Int? {
+        switch kind {
+        case .hide, .down, .feather, .fin, .bone: 1
+        case .pelt, .scale, .quill, .fang, .claw, .oil: 2
+        case .plate, .chitin, .shell, .tusk, .horn, .venom: 3
+        case .ichor: 4
+        case .timber, .fibre, .pulp, .toxin, .reagent: nil
+        }
+    }
+
+    private static func commercialCapabilities(for kind: MaterialFamilyID) -> (MaterialProperty, MaterialProperty)? {
+        switch kind {
+        case .hide: (.flexibility, .hardness)
+        case .down: (.insulation, .flexibility)
+        case .feather: (.flexibility, .lustre)
+        case .fin: (.flexibility, .insulation)
+        case .bone: (.density, .hardness)
+        case .pelt: (.insulation, .flexibility)
+        case .scale, .quill, .claw: (.hardness, .flexibility)
+        case .fang: (.hardness, .reactivity)
+        case .oil: (.insulation, .reactivity)
+        case .plate, .chitin, .shell: (.hardness, .density)
+        case .tusk, .horn: (.density, .hardness)
+        case .venom, .ichor: (.reactivity, .lustre)
+        case .timber, .fibre, .pulp, .toxin, .reagent: nil
+        }
     }
 
     /// Quotes only the exact reserve units the player selected. There is intentionally no
-    /// "best" or automatic material selection: provenance and grade are part of the choice.
-    static func previewMaterialSale(_ selections: [MaterialReserveSelection],
+    /// "best" or automatic material selection: provenance and capabilities are part of the choice.
+    static func previewMaterialSale(_ selections: [CraftMaterialSelection],
                                     in base: BaseState) -> MaterialSalePreview? {
         guard !selections.isEmpty,
               Set(selections.map(\.unitID)).count == selections.count else { return nil }
-        guard selections.allSatisfy({ selection in
-            base.materialReserve.units.contains {
-                $0.id == selection.unitID && $0.sample == selection.sample
-            }
-        }) else { return nil }
-        let prices = selections.map { materialSaleUnitPrice(for: $0.sample) }
+        let current = Dictionary(uniqueKeysWithValues: base.craftMaterialSelections().map { ($0.unitID, $0.unit) })
+        guard selections.allSatisfy({ current[$0.unitID] == $0.unit }) else { return nil }
+        let prices = selections.compactMap { materialSaleUnitPrice(for: $0.sample) }
+        guard prices.count == selections.count else { return nil }
         return MaterialSalePreview(revision: base.tradingPost.inventoryRevision,
                                    selections: selections, unitPrices: prices,
                                    goldTotal: prices.reduce(0, +))
@@ -326,17 +353,15 @@ enum TradingPostRules {
         else { return .invalid }
 
         var candidate = base
-        guard candidate.materialReserve.consume(preview.selections) != nil else { return .invalid }
+        guard candidate.consumeCraftMaterials(preview.selections) != nil else { return .invalid }
         var nextItemID = candidate.nextItemID()
         for selection in preview.selections {
             let lineID = candidate.tradingPost.nextStockLineID
-            let repurchasePrice = materialSaleUnitPrice(for: selection.sample) + 1
-            let frozen = ItemStack(id: InstanceID(rawValue: nextItemID),
-                                   catalogID: Items.material, identified: true,
-                                   materials: [selection.sample])
+            guard let salePrice = materialSaleUnitPrice(for: selection.sample) else { return .invalid }
+            let repurchasePrice = salePrice + 1
             candidate.tradingPost.stock.append(TradingPostStockLine(
                 id: lineID, kind: .material(selection.sample), remainingQuantity: 1,
-                unitPrice: repurchasePrice, frozenUnits: [frozen]))
+                unitPrice: repurchasePrice, frozenMaterialUnits: [selection.sample]))
             candidate.tradingPost.nextStockLineID &+= 1
             nextItemID &+= 1
         }
@@ -364,7 +389,8 @@ enum TradingPostRules {
                   base.tradingPost.stock[index].kind == kind,
                   base.tradingPost.stock[index].remainingQuantity >= preview.quantity,
                   preview.goldCost == base.tradingPost.stock[index].unitPrice * preview.quantity,
-                  preview.frozenUnits == Array(base.tradingPost.stock[index].frozenUnits.prefix(preview.quantity))
+                  preview.frozenUnits == Array(base.tradingPost.stock[index].frozenUnits.prefix(preview.quantity)),
+                  preview.frozenMaterialUnits == Array(base.tradingPost.stock[index].frozenMaterialUnits.prefix(preview.quantity))
             else { return .invalid }
             switch kind {
             case .resource(let id): base.resources.add(preview.quantity, of: id)
@@ -372,25 +398,21 @@ enum TradingPostRules {
                 guard preview.frozenUnits.count == preview.quantity else { return .invalid }
                 for unit in preview.frozenUnits { base.store(unit) }
                 base.tradingPost.stock[index].frozenUnits.removeFirst(preview.quantity)
-            case .material(let sample):
-                guard preview.frozenUnits.count == preview.quantity else { return .invalid }
-                let reserveUnits = preview.frozenUnits.map { unit -> MaterialReserveUnit? in
-                    guard unit.catalogID == Items.material, unit.materials == [sample] else {
-                        return nil
-                    }
-                    return MaterialReserveUnit(
-                        id: MaterialReserveUnitID(rawValue: "trading-post-\(unit.id.rawValue)"),
-                        sample: sample)
+            case .material:
+                guard preview.frozenMaterialUnits.count == preview.quantity else { return .invalid }
+                let exactUnits = preview.frozenMaterialUnits.map {
+                    CraftMaterialHoldingV1(unit: $0, protectedReturn: false)
                 }
-                guard reserveUnits.allSatisfy({ $0 != nil }) else { return .invalid }
-                let exactUnits = reserveUnits.compactMap { $0 }
                 guard Set(exactUnits.map(\.id)).count == exactUnits.count else { return .invalid }
-                let existingReserveIDs = Set(base.materialReserve.selections().map(\.unitID))
+                let existingReserveIDs = Set(base.craftMaterialSelections().map(\.unitID))
                 guard exactUnits.allSatisfy({ !existingReserveIDs.contains($0.id) }) else {
                     return .invalid
                 }
-                for unit in exactUnits { base.materialReserve.add(unit) }
-                base.tradingPost.stock[index].frozenUnits.removeFirst(preview.quantity)
+                for unit in exactUnits {
+                    if unit.unit.domain == .world { _ = base.worldMaterialReserve.add(unit) }
+                    else { _ = base.creatureMaterialReserve.add(unit) }
+                }
+                base.tradingPost.stock[index].frozenMaterialUnits.removeFirst(preview.quantity)
             }
             base.tradingPost.stock[index].remainingQuantity -= preview.quantity
         case .essence:

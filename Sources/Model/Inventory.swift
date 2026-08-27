@@ -107,7 +107,7 @@ struct GearInstanceProfile: Codable, Equatable, Sendable {
     var reach: Reach
     var insulation: Double
     var reactivity: Double
-    var consumedSamples: [MaterialSample] = []
+    var consumedSamples: [CraftMaterialUnitV1] = []
     var recipeVersion: Int?
     var specialistProfile: String?
     var displayProvenance: String?
@@ -189,7 +189,7 @@ struct ItemStack: Codable, Equatable, Identifiable, Sendable {
     /// The bin is the slot; these are what's in it. Crafting picks from among them, so a recipe can
     /// be satisfied cheaply or generously, and "the finest pelt you've recovered" stays a question
     /// with an answer.
-    var materials: [MaterialSample] = []
+    var materials: [CraftMaterialUnitV1] = []
     /// Quantity in this bin that crossed the expedition threshold from Home and must return unless
     /// actually consumed. New pickups merging into the bin do not increase it.
     var protectedReturnCount: Int = 0
@@ -198,7 +198,7 @@ struct ItemStack: Codable, Equatable, Identifiable, Sendable {
     var distilledCore: DistilledCore?
 
     init(id: InstanceID, catalogID: ItemID, count: Int = 1, identified: Bool = true,
-         material: MaterialSample? = nil, distilledCore: DistilledCore? = nil) {
+         material: CraftMaterialUnitV1? = nil, distilledCore: DistilledCore? = nil) {
         self.id = id
         self.catalogID = catalogID
         self.identified = identified
@@ -210,7 +210,7 @@ struct ItemStack: Codable, Equatable, Identifiable, Sendable {
         }
     }
 
-    init(id: InstanceID, catalogID: ItemID, identified: Bool = true, materials: [MaterialSample]) {
+    init(id: InstanceID, catalogID: ItemID, identified: Bool = true, materials: [CraftMaterialUnitV1]) {
         self.id = id
         self.catalogID = catalogID
         self.identified = identified
@@ -244,9 +244,9 @@ struct ItemStack: Codable, Equatable, Identifiable, Sendable {
         distilledCore = try c.decodeIfPresent(DistilledCore.self, forKey: .distilledCore)
         protectedReturnCount = min(count, max(0, try c.decodeIfPresent(Int.self,
                                                     forKey: .protectedReturnCount) ?? 0))
-        if let many = try c.decodeIfPresent([MaterialSample].self, forKey: .materials) {
+        if let many = try c.decodeIfPresent([CraftMaterialUnitV1].self, forKey: .materials) {
             materials = many
-        } else if let one = try c.decodeIfPresent(MaterialSample.self, forKey: .material) {
+        } else if let one = try c.decodeIfPresent(CraftMaterialUnitV1.self, forKey: .material) {
             materials = Array(repeating: one, count: max(1, count))
         } else {
             materials = []
@@ -255,11 +255,11 @@ struct ItemStack: Codable, Equatable, Identifiable, Sendable {
     }
 
     /// The single sample a bin is *about*, for anything that just needs to know what kind it is.
-    var material: MaterialSample? { materials.first }
+    var material: CraftMaterialUnitV1? { materials.first }
 
     /// What two stacks must agree on to be the same bin.
     enum BinKey: Hashable, Sendable {
-        case material(MaterialKind)
+        case material(MaterialFamilyID)
         case distilledCore(ItemID, DistilledCore)
         case item(ItemID, identified: Bool, upgradeLevel: Int, wildGrowth: Int,
                   isFavorite: Bool, isLocked: Bool)
@@ -276,8 +276,7 @@ struct ItemStack: Codable, Equatable, Identifiable, Sendable {
                      wildGrowth: wildGrowth, isFavorite: isFavorite, isLocked: isLocked)
     }
 
-    /// The best example in the bin — what makes "12 hides · finest superb" possible.
-    var finest: MaterialSample? { materials.max { $0.grade < $1.grade } }
+    var finest: CraftMaterialUnitV1? { materials.max { $0.qualityBand.rawValue < $1.qualityBand.rawValue } }
 
     /// Takes everything from another bin of the same kind.
     mutating func absorb(_ other: ItemStack) {
@@ -305,7 +304,7 @@ struct ItemStack: Codable, Equatable, Identifiable, Sendable {
             result.isLocked = isLocked
             return result
         }
-        let ordered = materials.sorted { $0.grade < $1.grade }
+        let ordered = materials.sorted { $0.stableUnitID < $1.stableUnitID }
         let taken = Array(ordered.prefix(amount))
         let kept = Array(ordered.dropFirst(amount))
         materials = kept
@@ -388,7 +387,7 @@ struct ItemStack: Codable, Equatable, Identifiable, Sendable {
     /// The right-hand column of a list row.
     ///
     /// **For a material bin this is the best thing in it**, because "12 hides" tells you how much
-    /// room it takes and nothing about whether it's worth anything, and the grade is the reason to
+    /// room it takes and nothing about whether it's worth anything, and quality is the reason to
     /// have gone anywhere. Session 16 §1 leaves this open; the more useful of the two is built and
     /// flagged in questions-for-design.
     var detail: String {
@@ -403,7 +402,7 @@ struct ItemStack: Codable, Equatable, Identifiable, Sendable {
             guard quality.value > Tuning.Materials.notableProperty else { return tally }
             return tally.isEmpty ? quality.name : "\(quality.name)  \(tally)"
         }
-        let best = finest.gradeWord.map { "finest \($0)" } ?? finest.properties.dominant.name
+        let best = finest.qualityBand.displayName
         return tally.isEmpty ? best : "\(best)  \(tally)"
     }
 }
@@ -556,7 +555,7 @@ struct Inventory: Codable, Equatable, Sendable {
     }
 }
 
-private func failureCanonicalMaterial(_ sample: MaterialSample) -> String {
+private func failureCanonicalMaterial(_ sample: CraftMaterialUnitV1) -> String {
     let properties = sample.properties
     let qualifier = sample.qualifier ?? ""
     return [
@@ -567,7 +566,7 @@ private func failureCanonicalMaterial(_ sample: MaterialSample) -> String {
         String(properties.flexibility.bitPattern, radix: 16),
         String(properties.lustre.bitPattern, radix: 16),
         String(properties.reactivity.bitPattern, radix: 16),
-        String(sample.grade.bitPattern, radix: 16),
+        String(sample.qualityBand.rawValue),
         "\(sample.source.utf8.count):\(sample.source)",
         "\(qualifier.utf8.count):\(qualifier)"
     ].joined(separator: "|")

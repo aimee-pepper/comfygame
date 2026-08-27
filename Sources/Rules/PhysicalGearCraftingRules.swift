@@ -13,7 +13,7 @@ enum PhysicalGearCraftingRules {
 
     struct SampleRequirement: Identifiable, Equatable, Sendable {
         var id: String
-        var allowedKinds: Set<MaterialKind>?
+        var allowedKinds: Set<MaterialFamilyID>?
         var floors: [PropertyFloor]
         var alternativeFloors: [PropertyFloor] = []
     }
@@ -42,8 +42,8 @@ enum PhysicalGearCraftingRules {
         var requirementID: String
         var binID: InstanceID
         var sampleIndex: Int
-        var sample: MaterialSample
-        var reserveSelection: MaterialReserveSelection? = nil
+        var sample: CraftMaterialUnitV1
+        var reserveSelection: CraftMaterialSelection? = nil
 
         var stockKey: String {
             reserveSelection?.unitID.rawValue ?? "legacy:\(binID.rawValue):\(sampleIndex)"
@@ -60,17 +60,14 @@ enum PhysicalGearCraftingRules {
     struct Preview: Equatable, Sendable {
         var recipe: Recipe
         var selections: [Selection]
-        var craftGrade: Double
-        var naturalTier: Int
+        var qualityBand: CraftMaterialQualityBand
         var outputTier: Int
-        var constructionCap: Int
         var rawEssence: Int
         var essence: Int
         var homeDiscountRate: Double
         var insulation: Double
         var reactivity: Double
 
-        var wastesGradeAboveCap: Bool { naturalTier > constructionCap }
         var isBelowSpecialistHeadline: Bool {
             recipe.specialistHeadlineTier.map { outputTier < $0 } ?? false
         }
@@ -358,24 +355,15 @@ enum PhysicalGearCraftingRules {
         return recipe.stationCap
     }
 
-    static func naturalTier(for grade: Double) -> Int {
-        switch grade {
-        case ..<40: 1
-        case ..<65: 2
-        case ..<85: 3
-        default: 4
-        }
-    }
-
     static func essenceCost(for tier: Int) -> Int {
         [1: 12, 2: 24, 3: 48, 4: 80][tier] ?? 80
     }
 
-    static func qualifies(_ sample: MaterialSample, for requirement: SampleRequirement) -> Bool {
+    static func qualifies(_ sample: CraftMaterialUnitV1, for requirement: SampleRequirement) -> Bool {
         rejectionReason(for: sample, requirement: requirement) == nil
     }
 
-    static func rejectionReason(for sample: MaterialSample,
+    static func rejectionReason(for sample: CraftMaterialUnitV1,
                                 requirement: SampleRequirement) -> String? {
         if let kinds = requirement.allowedKinds, !kinds.contains(sample.kind) {
             let allowed = kinds.map(\.displayName).sorted().joined(separator: ", ")
@@ -400,7 +388,7 @@ enum PhysicalGearCraftingRules {
 
     static func assessments(for requirement: SampleRequirement,
                             in state: GameState) -> [CandidateAssessment] {
-        let reserve = state.base.materialReserve.selections().map { quote in
+        let reserve = state.base.craftMaterialSelections().map { quote in
             CandidateAssessment(selection: Selection(requirementID: requirement.id,
                 binID: .init(rawValue: 0), sampleIndex: 0, sample: quote.sample,
                 reserveSelection: quote),
@@ -410,7 +398,7 @@ enum PhysicalGearCraftingRules {
     }
 
     static func candidates(for requirement: SampleRequirement, in state: GameState) -> [Selection] {
-        let reserve = state.base.materialReserve.selections { qualifies($0, for: requirement) }
+        let reserve = state.base.craftMaterialSelections { qualifies($0, for: requirement) }
             .map { quote in Selection(requirementID: requirement.id,
                 binID: .init(rawValue: 0), sampleIndex: 0, sample: quote.sample,
                 reserveSelection: quote) }
@@ -418,8 +406,8 @@ enum PhysicalGearCraftingRules {
             let scoringFloors = requirement.floors + requirement.alternativeFloors
             let left = scoringFloors.map { lhs.sample.properties[$0.property] }.reduce(0, +)
             let right = scoringFloors.map { rhs.sample.properties[$0.property] }.reduce(0, +)
-            return (left, lhs.sample.grade, lhs.stockKey)
-                < (right, rhs.sample.grade, rhs.stockKey)
+            return (left, lhs.sample.qualityBand.rawValue, lhs.stockKey)
+                < (right, rhs.sample.qualityBand.rawValue, rhs.stockKey)
         }
     }
 
@@ -450,11 +438,14 @@ enum PhysicalGearCraftingRules {
         }
         let unique = Set(chosen.map(\.stockKey))
         guard unique.count == chosen.count else { return nil }
-        let grades = chosen.map(\.sample.grade)
-        let grade = 0.6 * (grades.min() ?? 0)
-            + 0.4 * (grades.reduce(0, +) / Double(grades.count))
-        let natural = naturalTier(for: grade)
-        let output = min(natural, constructionCap(for: recipe, in: state))
+        let ranks = chosen.map { $0.sample.qualityBand.rawValue }
+        let primary = Double(ranks.first ?? 0)
+        let secondary = ranks.dropFirst().isEmpty
+            ? primary
+            : Double(ranks.dropFirst().reduce(0, +)) / Double(ranks.count - 1)
+        let qualityRank = Int((0.7 * primary + 0.3 * secondary).rounded())
+        let qualityBand = CraftMaterialQualityBand(rawValue: qualityRank) ?? .rough
+        let output = min(max(1, qualityRank), constructionCap(for: recipe, in: state))
         let averageInsulation = chosen.map(\.sample.properties.insulation).reduce(0, +) / Double(chosen.count)
         let averageReactivity = chosen.map(\.sample.properties.reactivity).reduce(0, +) / Double(chosen.count)
         let rawEssence = essenceCost(for: output)
@@ -462,8 +453,8 @@ enum PhysicalGearCraftingRules {
         let paidEssence = station.map { StationStaffingRules.discounted(rawEssence, at: $0, in: state) }
             ?? rawEssence
         let discount = station.map { StationStaffingRules.homeDiscountRate(for: $0, in: state) } ?? 0
-        return Preview(recipe: recipe, selections: chosen, craftGrade: grade,
-                       naturalTier: natural, outputTier: output, constructionCap: constructionCap(for: recipe, in: state), rawEssence: rawEssence,
+        return Preview(recipe: recipe, selections: chosen, qualityBand: qualityBand,
+                       outputTier: output, rawEssence: rawEssence,
                        essence: paidEssence, homeDiscountRate: discount,
                        insulation: averageInsulation, reactivity: averageReactivity)
     }
@@ -525,13 +516,13 @@ enum PhysicalGearCraftingRules {
         guard selections.allSatisfy({ selectionIsCurrent($0, in: state) }) else { return false }
         let reserve = selections.compactMap(\.reserveSelection)
         guard reserve.count == selections.count else { return false }
-        if !reserve.isEmpty, state.base.materialReserve.consume(reserve) == nil { return false }
+        if !reserve.isEmpty, state.base.consumeCraftMaterials(reserve) == nil { return false }
         return true
     }
 
     private static func selectionIsCurrent(_ selection: Selection, in state: GameState) -> Bool {
         if let reserve = selection.reserveSelection {
-            return state.base.materialReserve.units.contains {
+            return state.base.worldMaterialReserve.units.contains {
                 $0.id == reserve.unitID && $0.sample == reserve.sample
             }
         }

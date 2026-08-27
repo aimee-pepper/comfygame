@@ -33,7 +33,7 @@ struct RecyclerPreview: Equatable, Sendable {
     /// Receipt indices, not copies chosen by value: duplicate-looking samples remain distinct work.
     var selectedReceiptIndices: [Int]
     var recoveryCapacity: Int
-    var returnedSamples: [MaterialSample]
+    var returnedSamples: [CraftMaterialUnitV1]
     var returnedResources: ResourcePool
 }
 

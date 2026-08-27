@@ -146,15 +146,15 @@ final class NamingTests: XCTestCase {
 
     /// `[grade] [qualifier] [kind]` — and an ordinary one needs no grade word.
     func testAMaterialsNameReadsAsGradeQualifierKind() {
-        let superb = MaterialSample(kind: .plate, properties: MaterialProperties(hardness: 90),
+        let superb = CraftMaterialUnitV1(kind: .plate, properties: MaterialProperties(hardness: 90),
                                     grade: 80, source: "x", qualifier: "ironbound")
         XCTAssertEqual(superb.displayName, "Superb ironbound plate")
 
-        let plain = MaterialSample(kind: .hide, properties: MaterialProperties(),
+        let plain = CraftMaterialUnitV1(kind: .hide, properties: MaterialProperties(),
                                    grade: 40, source: "x", qualifier: "pale")
         XCTAssertEqual(plain.displayName, "Pale hide")
 
-        let bare = MaterialSample(kind: .bone, properties: MaterialProperties(), grade: 40,
+        let bare = CraftMaterialUnitV1(kind: .bone, properties: MaterialProperties(), grade: 40,
                                   source: "x")
         XCTAssertEqual(bare.displayName, "Bone")
     }
@@ -163,7 +163,7 @@ final class NamingTests: XCTestCase {
         let json = """
         {"kind": "pelt", "grade": 60, "source": "browser"}
         """
-        let sample = try SaveCodec.makeDecoder().decode(MaterialSample.self, from: Data(json.utf8))
+        let sample = try SaveCodec.makeDecoder().decode(CraftMaterialUnitV1.self, from: Data(json.utf8))
         XCTAssertNil(sample.qualifier)
         XCTAssertEqual(sample.displayName, "Fine pelt")
     }

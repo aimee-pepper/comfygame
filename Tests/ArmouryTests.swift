@@ -12,14 +12,14 @@ final class ArmouryTests: XCTestCase {
         gear.gearProfile?.legacyPowerCredit = legacy
         state.base.inventory.add(gear)
         let samples = [
-            MaterialSample(kind: .plate, properties: .init(hardness: 80, density: 70, insulation: 75, flexibility: 60, reactivity: 20), grade: grade, source: "a"),
-            MaterialSample(kind: .bone, properties: .init(hardness: 75, density: 65, insulation: 70, flexibility: 60, reactivity: 40), grade: grade, source: "b"),
-            MaterialSample(kind: .hide, properties: .init(hardness: 60, density: 60, insulation: 70, flexibility: 65, reactivity: 60), grade: grade, source: "c"),
-            MaterialSample(kind: .timber, properties: .init(hardness: 70, density: 60, insulation: 60, flexibility: 60, reactivity: 80), grade: grade, source: "d")
+            CraftMaterialUnitV1(kind: .plate, properties: .init(hardness: 80, density: 70, insulation: 75, flexibility: 60, reactivity: 20), grade: grade, source: "a"),
+            CraftMaterialUnitV1(kind: .bone, properties: .init(hardness: 75, density: 65, insulation: 70, flexibility: 60, reactivity: 40), grade: grade, source: "b"),
+            CraftMaterialUnitV1(kind: .hide, properties: .init(hardness: 60, density: 60, insulation: 70, flexibility: 65, reactivity: 60), grade: grade, source: "c"),
+            CraftMaterialUnitV1(kind: .timber, properties: .init(hardness: 70, density: 60, insulation: 60, flexibility: 60, reactivity: 80), grade: grade, source: "d")
         ]
         for (ordinal, sample) in samples.enumerated() {
-            state.base.materialReserve.add(MaterialReserveUnit(
-                id: MaterialReserveUnitID(rawValue: "armoury-fixture-\(ordinal)"),
+            state.base.worldMaterialReserve.add(CraftMaterialHoldingV1(
+                id: CraftMaterialUnitID(rawValue: "armoury-fixture-\(ordinal)"),
                 sample: sample))
         }
         return state
@@ -36,7 +36,7 @@ final class ArmouryTests: XCTestCase {
         XCTAssertTrue(ArmouryRules.isAvailable(ArmouryRules.balanced, for: target1, in: tierOne))
         let capped = try XCTUnwrap(ArmouryRules.preview(ArmouryRules.rigid, target: target1, in: tierOne))
         XCTAssertEqual(capped.outputTier, 3)
-        XCTAssertTrue(capped.wastesGradeAboveCap)
+        XCTAssertEqual(capped.qualityBand, .superior)
 
         let tierTwo = try preparedState(tier: 2, grade: 90)
         let target2 = try XCTUnwrap(ArmouryRules.targets(in: tierTwo).first)
@@ -51,7 +51,7 @@ final class ArmouryTests: XCTestCase {
         let index = try XCTUnwrap(state.base.inventory.stacks.firstIndex { $0.id.rawValue == 700 })
         state.base.inventory.stacks[index].gearProfile?.displayProvenance = "Aimee's road coat"
         state.base.inventory.stacks[index].gearProfile?.consumedSamples = [
-            MaterialSample(kind: .pelt, properties: .init(), grade: 10, source: "old craft")
+            CraftMaterialUnitV1(kind: .pelt, properties: .init(), grade: 10, source: "old craft")
         ]
         let target = try XCTUnwrap(ArmouryRules.targets(in: state).first)
         let beforeProvenance = target.gearProfile?.displayProvenance
@@ -66,7 +66,7 @@ final class ArmouryTests: XCTestCase {
         XCTAssertTrue(rebuilt.displayName.hasPrefix("Aimee's road coat"))
         XCTAssertEqual(rebuilt.gearProfile?.stableInstanceID, stableID)
         XCTAssertEqual(rebuilt.gearProfile?.consumedSamples.count, 5)
-        XCTAssertTrue(state.base.materialReserve.isEmpty)
+        XCTAssertTrue(state.base.worldMaterialReserve.isEmpty)
         XCTAssertTrue(state.base.inventory.stacks.flatMap(\.materials).isEmpty)
         let roundTrip = try JSONDecoder().decode(GameState.self, from: JSONEncoder().encode(state))
         XCTAssertEqual(roundTrip.base.inventory.stacks.first { $0.id.rawValue == 700 }?.gearProfile,
@@ -175,8 +175,8 @@ final class ArmouryTests: XCTestCase {
         var stale = try preparedState()
         let staleTarget = try XCTUnwrap(ArmouryRules.targets(in: stale).first)
         let stalePreview = try XCTUnwrap(ArmouryRules.preview(ArmouryRules.rigid, target: staleTarget, in: stale))
-        let removed = try XCTUnwrap(stale.base.materialReserve.selections().first)
-        XCTAssertNotNil(stale.base.materialReserve.consume([removed]))
+        let removed = try XCTUnwrap(stale.base.worldMaterialReserve.selections().first)
+        XCTAssertNotNil(stale.base.worldMaterialReserve.consume([removed]))
         let changed = stale
         XCTAssertFalse(ArmouryRules.rebuild(stalePreview, in: &stale))
         XCTAssertEqual(stale, changed)
@@ -189,16 +189,16 @@ final class ArmouryTests: XCTestCase {
         let target = try XCTUnwrap(ArmouryRules.targets(in: store.state).first)
         let preview = try XCTUnwrap(ArmouryRules.preview(ArmouryRules.rigid, target: target, in: store.state))
         store.mutate("stale") {
-            guard let removed = $0.base.materialReserve.selections().first else { return }
-            _ = $0.base.materialReserve.consume([removed])
+            guard let removed = $0.base.worldMaterialReserve.selections().first else { return }
+            _ = $0.base.worldMaterialReserve.consume([removed])
         }
         XCTAssertFalse(store.rebuildArmoury(preview, allowLegacyLoss: false))
     }
 
     func testLegacyInventoryMaterialBinCannotEnterArmouryPreviewOrCommit() throws {
         var state = try preparedState()
-        let reserveSelections = state.base.materialReserve.selections()
-        XCTAssertEqual(state.base.materialReserve.consume(reserveSelections),
+        let reserveSelections = state.base.worldMaterialReserve.selections()
+        XCTAssertEqual(state.base.worldMaterialReserve.consume(reserveSelections),
                        reserveSelections.map(\.sample))
         let samples = reserveSelections.map(\.sample)
         state.base.inventory.add(ItemStack(id: InstanceID(rawValue: 701),
@@ -216,11 +216,11 @@ final class ArmouryTests: XCTestCase {
         let target = try XCTUnwrap(ArmouryRules.targets(in: state).first)
         let preview = try XCTUnwrap(
             ArmouryRules.preview(ArmouryRules.rigid, target: target, in: state))
-        state.base.materialReserve = MaterialReserve(
-            units: Array(state.base.materialReserve.units.reversed()))
+        state.base.worldMaterialReserve = WorldMaterialReserve(
+            units: Array(state.base.worldMaterialReserve.units.reversed()))
 
         XCTAssertTrue(ArmouryRules.rebuild(preview, in: &state))
-        XCTAssertTrue(state.base.materialReserve.isEmpty)
+        XCTAssertTrue(state.base.worldMaterialReserve.isEmpty)
         XCTAssertEqual(state.base.inventory.stacks.count, 1)
     }
 }

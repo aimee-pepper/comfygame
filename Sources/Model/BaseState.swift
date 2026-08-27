@@ -17,8 +17,37 @@ struct BaseState: Codable, Equatable, Sendable {
     }
     /// Raw stockpiles hauled home (Ore, Fiber, Essence-raw…). Motes live in Reality.
     var resources: ResourcePool = ResourcePool()
-    /// Exact harvested material samples. Bulk reserves never consume Storehouse slots.
-    var materialReserve: MaterialReserve = MaterialReserve()
+    /// Exact slot-free crafting units, separated permanently by frozen source domain.
+    var worldMaterialReserve: WorldMaterialReserve = WorldMaterialReserve()
+    var creatureMaterialReserve: CreatureMaterialReserve = CreatureMaterialReserve()
+
+    var craftMaterialHoldings: [CraftMaterialHoldingV1] {
+        worldMaterialReserve.units + creatureMaterialReserve.units
+    }
+
+    func craftMaterialSelections(where accepts: (CraftMaterialUnitV1) -> Bool = { _ in true })
+        -> [CraftMaterialSelection] {
+        craftMaterialHoldings.filter { accepts($0.unit) }
+            .sorted { $0.id < $1.id }
+            .map { .init(unitID: $0.id, unit: $0.unit) }
+    }
+
+    mutating func consumeCraftMaterials(_ selections: [CraftMaterialSelection])
+        -> [CraftMaterialUnitV1]? {
+        guard Set(selections.map(\.unitID)).count == selections.count else { return nil }
+        var world = worldMaterialReserve
+        var creature = creatureMaterialReserve
+        let worldSelections = selections.filter { $0.unit.domain == .world }
+        let creatureSelections = selections.filter { $0.unit.domain == .creature }
+        guard worldSelections.count + creatureSelections.count == selections.count,
+              let spentWorld = world.consume(worldSelections),
+              let spentCreature = creature.consume(creatureSelections) else { return nil }
+        worldMaterialReserve = world
+        creatureMaterialReserve = creature
+        let spent = Dictionary(uniqueKeysWithValues:
+            (spentWorld + spentCreature).map { ($0.stableUnitID, $0) })
+        return selections.compactMap { spent[$0.unitID] }
+    }
     /// The physical wallet. It uses the existing catalogue item and art identity, but is not a
     /// Storehouse slot, spillover decision, merchant offer, or expedition stack.
     var essenceCrystals: ItemStack? = ItemStack(
@@ -421,7 +450,8 @@ struct BaseState: Codable, Equatable, Sendable {
     /// Explicit because `companion` is no longer stored — it's a window onto the roster — and the
     /// decoder still has to be able to read it out of a save written before the roster existed.
     private enum CodingKeys: String, CodingKey {
-        case essence, essenceCrystals, resources, materialReserve, inventory, preparationLoadout, preparationLoadoutNeedsReview
+        case essence, essenceCrystals, resources, worldMaterialReserve, creatureMaterialReserve
+        case inventory, preparationLoadout, preparationLoadoutNeedsReview
         case satchelLoadout, spillover, goldCoins, tradingPost, recycler
         case lifetimeRawEssenceRefined, autoRefineReturnedRawEssence, lastAutoRefinedOutcomeID
         case ownedSymbols, ownedGambitComponents
@@ -447,7 +477,8 @@ struct BaseState: Codable, Equatable, Sendable {
         try c.encode(0, forKey: .essence)
         try c.encodeIfPresent(essenceCrystals, forKey: .essenceCrystals)
         try c.encode(resources, forKey: .resources)
-        try c.encode(materialReserve, forKey: .materialReserve)
+        try c.encode(worldMaterialReserve, forKey: .worldMaterialReserve)
+        try c.encode(creatureMaterialReserve, forKey: .creatureMaterialReserve)
         try c.encode(inventory, forKey: .inventory)
         try c.encodeIfPresent(preparationLoadout, forKey: .preparationLoadout)
         try c.encode(preparationLoadoutNeedsReview, forKey: .preparationLoadoutNeedsReview)
@@ -500,8 +531,13 @@ struct BaseState: Codable, Equatable, Sendable {
         let legacyEssence = max(0, try container.decodeIfPresent(Int.self, forKey: .essence) ?? 0)
         essenceCrystals = try container.decodeIfPresent(ItemStack.self, forKey: .essenceCrystals)
         resources = try container.decodeIfPresent(ResourcePool.self, forKey: .resources) ?? ResourcePool()
-        materialReserve = try container.decodeIfPresent(MaterialReserve.self,
-                                                        forKey: .materialReserve) ?? MaterialReserve()
+        worldMaterialReserve = try container.decode(WorldMaterialReserve.self,
+                                                    forKey: .worldMaterialReserve)
+        creatureMaterialReserve = try container.decode(CreatureMaterialReserve.self,
+                                                       forKey: .creatureMaterialReserve)
+        guard Set(worldMaterialReserve.units.map(\.id)).isDisjoint(
+            with: Set(creatureMaterialReserve.units.map(\.id))
+        ) else { throw CocoaError(.coderInvalidValue) }
         inventory = try container.decodeIfPresent(Inventory.self, forKey: .inventory)
             ?? Inventory(slots: Tuning.Economy.startingInventorySlots)
         preparationLoadout = try container.decodeIfPresent([FieldKitPreparationEntry].self,
@@ -638,8 +674,6 @@ struct BaseState: Codable, Equatable, Sendable {
         binderCharacter = try container.decodeIfPresent(CharacterState.self, forKey: .binderCharacter)
             ?? CharacterState(rank: .front)
         spillover = try container.decodeIfPresent([ItemStack].self, forKey: .spillover) ?? []
-        materialReserve.migrateLegacyStacks(&inventory.stacks, location: "base.inventory")
-        materialReserve.migrateLegacyStacks(&spillover, location: "base.spillover")
         goldCoins = max(0, try container.decodeIfPresent(Int.self, forKey: .goldCoins) ?? 0)
         tradingPost = try container.decodeIfPresent(TradingPostState.self, forKey: .tradingPost)
             ?? TradingPostState()

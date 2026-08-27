@@ -20,10 +20,10 @@ final class DistilleryRequirementAuthorityTests: XCTestCase {
 
     func testHeatCandidateThresholdUsesTheSharedRequirement() {
         let requirement = DistilleryRules.requirement(for: .heat)
-        let accepted = MaterialSample(kind: .bone,
+        let accepted = CraftMaterialUnitV1(kind: .bone,
             properties: MaterialProperties(insulation: 25, reactivity: 60),
             grade: 50, source: "test")
-        let tooCold = MaterialSample(kind: .bone,
+        let tooCold = CraftMaterialUnitV1(kind: .bone,
             properties: MaterialProperties(insulation: 24, reactivity: 60),
             grade: 50, source: "test")
         XCTAssertTrue(requirement.accepts(accepted))
@@ -31,16 +31,16 @@ final class DistilleryRequirementAuthorityTests: XCTestCase {
     }
 
     func testCausticKindAndLightPropertyThresholdsUseSharedRequirements() {
-        let reactiveReagent = MaterialSample(kind: .reagent,
+        let reactiveReagent = CraftMaterialUnitV1(kind: .reagent,
             properties: MaterialProperties(reactivity: 60), grade: 50, source: "test")
-        let reactiveBone = MaterialSample(kind: .bone,
+        let reactiveBone = CraftMaterialUnitV1(kind: .bone,
             properties: MaterialProperties(reactivity: 60), grade: 50, source: "test")
         XCTAssertTrue(DistilleryRules.requirement(for: .caustic).accepts(reactiveReagent))
         XCTAssertFalse(DistilleryRules.requirement(for: .caustic).accepts(reactiveBone))
 
-        let luminous = MaterialSample(kind: .quill,
+        let luminous = CraftMaterialUnitV1(kind: .quill,
             properties: MaterialProperties(hardness: 30, lustre: 60), grade: 50, source: "test")
-        let tooSoft = MaterialSample(kind: .quill,
+        let tooSoft = CraftMaterialUnitV1(kind: .quill,
             properties: MaterialProperties(hardness: 29, lustre: 60), grade: 50, source: "test")
         XCTAssertTrue(DistilleryRules.requirement(for: .light).accepts(luminous))
         XCTAssertFalse(DistilleryRules.requirement(for: .light).accepts(tooSoft))
@@ -50,12 +50,12 @@ final class DistilleryRequirementAuthorityTests: XCTestCase {
         var state = GameState.newGame()
         state.base.stations[Stations.distillery] = StationState(isUnlocked: true, tier: 0)
         state.base.essence = 0
-        let sample = MaterialSample(kind: .reagent,
+        let sample = CraftMaterialUnitV1(kind: .reagent,
             properties: MaterialProperties(insulation: 30, reactivity: 80),
             grade: 70, source: "ashen bloom")
         state.base.inventory.add(ItemStack(id: InstanceID(rawValue: 1), catalogID: Items.material,
                                            material: sample))
-        state.base.materialReserve.migrateLegacyStacks(&state.base.inventory.stacks,
+        state.base.worldMaterialReserve.migrateLegacyStacks(&state.base.inventory.stacks,
                                                        location: "fixture.distillery.readiness")
         let candidate = try XCTUnwrap(DistilleryRules.candidates(for: .heat, in: state).first)
 
@@ -77,7 +77,7 @@ final class DistilleryRequirementAuthorityTests: XCTestCase {
 
     func testInMemoryLegacyMaterialBinCannotBecomeADistilleryCandidate() {
         var state = GameState.newGame()
-        let sample = MaterialSample(kind: .reagent,
+        let sample = CraftMaterialUnitV1(kind: .reagent,
             properties: MaterialProperties(insulation: 30, reactivity: 80),
             grade: 70, source: "legacy")
         state.base.inventory.add(ItemStack(id: .init(rawValue: 991),
@@ -90,10 +90,10 @@ final class DistilleryRequirementAuthorityTests: XCTestCase {
         state.base.stations[Stations.distillery] = StationState(isUnlocked: true, tier: 0)
         state.base.essence = DistilleryRules.attuneEssence
         state.base.resources.add(2, of: Resources.sulfur)
-        let sample = MaterialSample(kind: .reagent,
+        let sample = CraftMaterialUnitV1(kind: .reagent,
             properties: MaterialProperties(insulation: 30, reactivity: 80),
             grade: 70, source: "ashen bloom")
-        state.base.materialReserve.addHarvested(sample, count: 1,
+        state.base.worldMaterialReserve.addHarvested(sample, count: 1,
                                                 sourceReceipt: "test", dropOrdinal: 0)
         let candidate = try XCTUnwrap(DistilleryRules.candidates(for: .heat, in: state).first)
 
@@ -200,7 +200,7 @@ final class HomeSatchelTransferTests: XCTestCase {
                                 encoding: .utf8)
         XCTAssertTrue(source.contains("case items, stockpiles, satchel, waiting"))
         XCTAssertTrue(source.contains("if !reserveMaterialBins.isEmpty"))
-        XCTAssertTrue(source.contains("Dictionary(grouping: base.materialReserve.units"))
+        XCTAssertTrue(source.contains("Dictionary(grouping: base.worldMaterialReserve.units"))
         XCTAssertTrue(source.contains("private var itemStacks: [ItemStack] { base.inventory.stacks.filter(\\.materials.isEmpty) }"))
         XCTAssertTrue(source.contains("Text(\"Materials\").font(.headline)"))
         XCTAssertTrue(source.contains("case .stockpiles: \"Resources\""))
@@ -215,13 +215,13 @@ final class HomeSatchelTransferTests: XCTestCase {
     func testReserveMaterialsDoNotConsumeStorehouseItemSlots() {
         var base = BaseState.newGame()
         let slotsBefore = base.inventory.freeSlots
-        base.materialReserve.addHarvested(
-            MaterialSample(kind: .hide, properties: .init(flexibility: 72),
+        base.worldMaterialReserve.addHarvested(
+            CraftMaterialUnitV1(kind: .hide, properties: .init(flexibility: 72),
                            grade: 68, source: "reserve fixture"),
             count: 19, sourceReceipt: "storehouse-presentation", dropOrdinal: 0
         )
 
-        XCTAssertEqual(base.materialReserve.units(of: .hide).count, 19)
+        XCTAssertEqual(base.worldMaterialReserve.units(of: .hide).count, 19)
         XCTAssertEqual(base.inventory.freeSlots, slotsBefore)
         XCTAssertFalse(base.inventory.stacks.contains { $0.catalogID == Items.material })
     }
@@ -276,10 +276,10 @@ final class StackingTests: XCTestCase {
         state.base.essence = 100
         state.base.resources.add(2, of: Resources.sulfur)
         state.base.inventory.add(ItemStack(id: InstanceID(rawValue: 2), catalogID: Items.material,
-                                           material: MaterialSample(kind: .reagent,
+                                           material: CraftMaterialUnitV1(kind: .reagent,
                                                properties: MaterialProperties(insulation: 30, reactivity: 80),
                                                grade: 70, source: "ashen bloom")))
-        state.base.materialReserve.migrateLegacyStacks(&state.base.inventory.stacks,
+        state.base.worldMaterialReserve.migrateLegacyStacks(&state.base.inventory.stacks,
                                                        location: "fixture.distillery.attune")
         let candidate = try XCTUnwrap(DistilleryRules.candidates(for: .heat, in: state).first)
         XCTAssertTrue(DistilleryRules.attune(.heat, candidate: candidate,
@@ -297,17 +297,17 @@ final class StackingTests: XCTestCase {
         state.base.essence = 100
         state.base.resources.add(2, of: Resources.sulfur)
         state.base.inventory = Inventory(slots: 2)
-        let qualifying = MaterialSample(kind: .reagent,
+        let qualifying = CraftMaterialUnitV1(kind: .reagent,
             properties: MaterialProperties(insulation: 30, reactivity: 80), grade: 70, source: "a")
-        let spare = MaterialSample(kind: .reagent, properties: MaterialProperties(), grade: 10, source: "b")
+        let spare = CraftMaterialUnitV1(kind: .reagent, properties: MaterialProperties(), grade: 10, source: "b")
         state.base.inventory.add(ItemStack(id: InstanceID(rawValue: 2), catalogID: Items.material,
                                            identified: true, materials: [qualifying, spare]))
-        state.base.materialReserve.migrateLegacyStacks(&state.base.inventory.stacks,
+        state.base.worldMaterialReserve.migrateLegacyStacks(&state.base.inventory.stacks,
                                                        location: "fixture.distillery.capacity")
         let candidate = try XCTUnwrap(DistilleryRules.candidates(for: .heat, in: state).first)
         XCTAssertTrue(DistilleryRules.attune(.heat, candidate: candidate,
                                              catalyst: Resources.sulfur, in: &state))
-        XCTAssertEqual(state.base.materialReserve.count, 1)
+        XCTAssertEqual(state.base.worldMaterialReserve.count, 1)
         XCTAssertNotNil(state.base.inventory.stacks.first { $0.catalogID == Items.heatCore })
     }
 
@@ -418,7 +418,7 @@ final class StackingTests: XCTestCase {
 
         let bin = try XCTUnwrap(inventory.stacks.first)
         XCTAssertEqual(Set(bin.materials.map(\.source)), ["pale groper", "shaggy browser"])
-        XCTAssertEqual(bin.finest?.grade, 80)
+        XCTAssertEqual(bin.finest?.qualityBand, .superior)
         XCTAssertEqual(bin.finest?.source, "shaggy browser")
     }
 
@@ -430,7 +430,7 @@ final class StackingTests: XCTestCase {
         XCTAssertEqual(inventory.stacks.count, 3)
     }
 
-    /// Historical display metadata remains decodable; current presentation reads MaterialReserve.
+    /// Historical display metadata remains decodable; current presentation reads WorldMaterialReserve.
     func testLegacyInventoryBinRetainsKindAndBestGradeMetadata() {
         var inventory = Inventory(slots: 8)
         inventory.add(material(.hide, grade: 20, source: "x"))
@@ -465,12 +465,12 @@ final class StackingTests: XCTestCase {
                                         sample(.hide, grade: 90, source: "b"),
                                         sample(.hide, grade: 50, source: "c")])
         let taken = try XCTUnwrap(bin.removing(1))
-        XCTAssertEqual(taken.materials.first?.grade, 10)
+        XCTAssertEqual(taken.materials.first?.qualityBand, .rough)
         XCTAssertEqual(bin.count, 2)
-        XCTAssertEqual(bin.finest?.grade, 90)
+        XCTAssertEqual(bin.finest?.qualityBand, .exceptional)
     }
 
-    /// Historical Inventory partitioning remains decodable; MaterialReserve owns current failures.
+    /// Historical Inventory partitioning remains decodable; WorldMaterialReserve owns current failures.
     func testLegacyInventoryCollapsePartitionsSamplesRatherThanBins() {
         var rng = SeededRNG(seed: 4)
         var inventory = Inventory(slots: 8)
@@ -481,7 +481,7 @@ final class StackingTests: XCTestCase {
 
         let kept = inventory.randomlyKeeping(fraction: 0.5, rng: &rng)
         XCTAssertEqual(kept.stacks.first?.count, 5, "half of ten hides is five hides")
-        XCTAssertEqual(kept.stacks.first?.finest?.grade, 100, "the collapse took the best ones")
+        XCTAssertEqual(kept.stacks.first?.finest?.qualityBand, .peerless, "the collapse took the best ones")
     }
 
     // MARK: Persistence
@@ -529,14 +529,14 @@ final class StackingTests: XCTestCase {
 
         XCTAssertEqual(migrated.inventory.stacks.map(\.catalogID), ["legacy_property_item"])
         XCTAssertEqual(migrated.inventory.freeSlots, migrated.inventory.slots - 1)
-        XCTAssertEqual(migrated.materialReserve.units.map(\.sample.source),
+        XCTAssertEqual(migrated.worldMaterialReserve.units.map(\.sample.source),
                        ["pale groper", "sable grazer", "shaggy browser"])
-        XCTAssertEqual(Set(migrated.materialReserve.units.map(\.sample.kind)), [.hide, .bone, .pelt])
-        XCTAssertEqual(Set(migrated.materialReserve.units.map(\.id).map(\.rawValue)).count, 3)
+        XCTAssertEqual(Set(migrated.worldMaterialReserve.units.map(\.sample.kind)), [.hide, .bone, .pelt])
+        XCTAssertEqual(Set(migrated.worldMaterialReserve.units.map(\.id).map(\.rawValue)).count, 3)
 
         let second = try SaveCodec.makeDecoder().decode(
             BaseState.self, from: SaveCodec.makeEncoder().encode(migrated))
-        XCTAssertEqual(second.materialReserve, migrated.materialReserve)
+        XCTAssertEqual(second.worldMaterialReserve, migrated.worldMaterialReserve)
         XCTAssertEqual(second.inventory.stacks, migrated.inventory.stacks)
     }
 
@@ -562,17 +562,17 @@ final class StackingTests: XCTestCase {
         XCTAssertTrue(migrated.satchelItems.stacks.isEmpty)
         XCTAssertTrue(migrated.offeredItems.isEmpty)
         XCTAssertEqual(migrated.satchelItems.freeSlots, 1)
-        XCTAssertEqual(Set(migrated.materialReserve.units.map(\.sample.source)), ["carried", "offered"])
-        XCTAssertEqual(migrated.materialReserve.units.first {
+        XCTAssertEqual(Set(migrated.worldMaterialReserve.units.map(\.sample.source)), ["carried", "offered"])
+        XCTAssertEqual(migrated.worldMaterialReserve.units.first {
             $0.sample.source == "carried"
         }?.protectedReturn, true)
-        XCTAssertEqual(migrated.materialReserve.units.first {
+        XCTAssertEqual(migrated.worldMaterialReserve.units.first {
             $0.sample.source == "offered"
         }?.protectedReturn, false)
 
         let second = try SaveCodec.makeDecoder().decode(
             WorldRun.self, from: SaveCodec.makeEncoder().encode(migrated))
-        XCTAssertEqual(second.materialReserve, migrated.materialReserve)
+        XCTAssertEqual(second.worldMaterialReserve, migrated.worldMaterialReserve)
         XCTAssertTrue(second.satchelItems.stacks.isEmpty)
         XCTAssertTrue(second.offeredItems.isEmpty)
     }
@@ -659,12 +659,12 @@ final class StackingTests: XCTestCase {
                   catalogID: ItemID(rawValue: id))
     }
 
-    private func sample(_ kind: MaterialKind, grade: Double, source: String) -> MaterialSample {
-        MaterialSample(kind: kind, properties: MaterialProperties(hardness: 40),
+    private func sample(_ kind: MaterialFamilyID, grade: Double, source: String) -> CraftMaterialUnitV1 {
+        CraftMaterialUnitV1(kind: kind, properties: MaterialProperties(hardness: 40),
                        grade: grade, source: source)
     }
 
-    private func material(_ kind: MaterialKind, grade: Double, source: String) -> ItemStack {
+    private func material(_ kind: MaterialFamilyID, grade: Double, source: String) -> ItemStack {
         ItemStack(id: InstanceID(rawValue: UInt64.random(in: 1...9_999_999)),
                   catalogID: Items.material,
                   materials: [sample(kind, grade: grade, source: source)])

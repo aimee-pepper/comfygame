@@ -64,10 +64,6 @@ struct WorldSourceDangerReceiptV1: Codable, Equatable, Sendable {
     }
 }
 
-enum CreatureMaterialQualityBand: String, Codable, CaseIterable, Sendable {
-    case rough, standard, fine, superior, exceptional, peerless
-}
-
 struct CreatureMaterialRewardEntryV1: Codable, Equatable, Sendable {
     var foeID: InstanceID
     var speciesID: InstanceID
@@ -75,14 +71,14 @@ struct CreatureMaterialRewardEntryV1: Codable, Equatable, Sendable {
     var partExpression: Int
     var quantity: Int
     var qualityScore: Int
-    var qualityBand: CreatureMaterialQualityBand
-    var reserveUnitIDs: [MaterialReserveUnitID]
+    var qualityBand: CraftMaterialQualityBand
+    var reserveUnitIDs: [CraftMaterialUnitID]
     var sourceReceiptID: String
 
     init(foeID: InstanceID, speciesID: InstanceID, family: CreatureMaterialFamilyID,
          partExpression: Int, quantity: Int, qualityScore: Int,
-         qualityBand: CreatureMaterialQualityBand,
-         reserveUnitIDs: [MaterialReserveUnitID], sourceReceiptID: String) {
+         qualityBand: CraftMaterialQualityBand,
+         reserveUnitIDs: [CraftMaterialUnitID], sourceReceiptID: String) {
         self.foeID = foeID; self.speciesID = speciesID; self.family = family
         self.partExpression = partExpression; self.quantity = quantity
         self.qualityScore = qualityScore; self.qualityBand = qualityBand
@@ -100,8 +96,8 @@ struct CreatureMaterialRewardEntryV1: Codable, Equatable, Sendable {
         partExpression = try c.decode(Int.self, forKey: .init("partExpression"))
         quantity = try c.decode(Int.self, forKey: .init("quantity"))
         qualityScore = try c.decode(Int.self, forKey: .init("qualityScore"))
-        qualityBand = try c.decode(CreatureMaterialQualityBand.self, forKey: .init("qualityBand"))
-        reserveUnitIDs = try c.decode([MaterialReserveUnitID].self, forKey: .init("reserveUnitIDs"))
+        qualityBand = try c.decode(CraftMaterialQualityBand.self, forKey: .init("qualityBand"))
+        reserveUnitIDs = try c.decode([CraftMaterialUnitID].self, forKey: .init("reserveUnitIDs"))
         sourceReceiptID = try c.decode(String.self, forKey: .init("sourceReceiptID"))
     }
 
@@ -173,7 +169,7 @@ struct CreatureMaterialRewardReceiptV1: Codable, Equatable, Sendable {
               authorityID == Self.currentAuthorityID, runIndex >= 0 else {
             throw CocoaError(.coderInvalidValue)
         }
-        var pairs = Set<String>(), unitIDs = Set<MaterialReserveUnitID>()
+        var pairs = Set<String>(), unitIDs = Set<CraftMaterialUnitID>()
         for entry in entries {
             try entry.validate(sourceDanger: sourceDanger)
             guard pairs.insert("\(entry.foeID.rawValue):\(entry.family.rawValue)").inserted,
@@ -230,7 +226,7 @@ enum CreatureMaterialRewardResolutionV1: Codable, Equatable, Sendable {
 }
 
 enum CreatureMaterialRewardEvaluation: Equatable, Sendable {
-    case eligible(CreatureMaterialRewardReceiptV1, [MaterialReserveUnit])
+    case eligible(CreatureMaterialRewardReceiptV1, [CraftMaterialHoldingV1])
     case noEligibleSpecimens
     case alreadyResolved(CreatureMaterialRewardResolutionV1)
     case staleEncounter, missingSourceDanger, invalidSourceDanger, missingSpeciesID
@@ -276,7 +272,7 @@ enum CreatureMaterialRewardRules {
         min(100, max(0, (3 * partExpression + sourceQuality + 2) / 4))
     }
 
-    static func qualityBand(score: Int) -> CreatureMaterialQualityBand {
+    static func qualityBand(score: Int) -> CraftMaterialQualityBand {
         switch score {
         case ...24: .rough
         case 25...54: .standard
@@ -297,8 +293,8 @@ enum CreatureMaterialRewardRules {
         do { try danger.validate() } catch { return .invalidSourceDanger }
 
         var entries: [CreatureMaterialRewardEntryV1] = []
-        var units: [MaterialReserveUnit] = []
-        var allocated = Set(run.materialReserve.units.map(\.id))
+        var units: [CraftMaterialHoldingV1] = []
+        var allocated = Set(run.creatureMaterialReserve.units.map(\.id))
         for foe in encounter.foes where !foe.isAlive {
             guard let speciesID = foe.speciesID else { continue }
             guard let species = run.cast.first(where: { $0.id == speciesID }) else { return .unknownSpecies }
@@ -310,13 +306,13 @@ enum CreatureMaterialRewardRules {
                                          sourceQuality: danger.qualityInput)
                 let source = "run:\(run.runIndex):encounter:\(encounter.id.rawValue):foe:\(foe.id.rawValue):family:\(projected.family.rawValue)"
                 let ids = (0..<projected.quantityPerDefeatedSpecimen).map {
-                    MaterialReserveUnitID(rawValue: "creature-material:\(source):\($0)")
+                    CraftMaterialUnitID(rawValue: "creature-material:\(source):\($0)")
                 }
                 guard ids.allSatisfy({ allocated.insert($0).inserted }) else {
                     return .reserveIDExhausted
                 }
                 let sample = sample(for: projected, foe: foe, species: species, score: score)
-                units += ids.map { .init(id: $0, sample: sample) }
+                units += ids.map { .init(unit: sample.withStableID($0), protectedReturn: false) }
                 entries.append(.init(foeID: foe.id, speciesID: speciesID,
                                      family: projected.family,
                                      partExpression: projected.partExpression,
@@ -331,7 +327,7 @@ enum CreatureMaterialRewardRules {
     }
 
     private static func sample(for entry: CreatureMaterialProjectionEntryV1, foe: FoeState,
-                               species: Species, score: Int) -> MaterialSample {
+                               species: Species, score: Int) -> CraftMaterialUnitV1 {
         let a = entry.capabilityA.value, b = entry.capabilityB.value
         let properties = MaterialProperties(
             hardness: entry.capabilityA.id == .coveringHardness ? a : (entry.capabilityB.id == .coveringHardness ? b : 0),
@@ -340,7 +336,12 @@ enum CreatureMaterialRewardRules {
             flexibility: entry.capabilityA.id == .derivedFlexibility ? a : (entry.capabilityB.id == .derivedFlexibility ? b : 0),
             lustre: entry.capabilityA.id == .derivedFinishLustre ? a : (entry.capabilityB.id == .derivedFinishLustre ? b : 0),
             reactivity: entry.family == .venom || entry.family == .ichor ? max(a, b) : 0)
-        return .init(kind: MaterialKind(entry.family), properties: properties, grade: Double(score),
-                     source: foe.stats.displayName, qualifier: foe.qualifier)
+        return .init(stableUnitID: .init(rawValue: "creature-reward-prototype"),
+                     domain: .creature, familyID: MaterialFamilyID(entry.family),
+                     qualityBand: qualityBand(score: score), properties: properties,
+                     sourceReceipt: .creatureReward(sourceReceiptID: "creature-material-reward-v1",
+                                                    encounterID: foe.id,
+                                                    foeID: foe.id,
+                                                    speciesID: species.id))
     }
 }

@@ -19,12 +19,12 @@ struct ApothecaryView: View {
     @EnvironmentObject private var store: GameStore
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     @State private var selectedRecipeID: ItemID?
-    @State private var selectedScentMaskUnitID: MaterialReserveUnitID?
+    @State private var selectedScentMaskUnitID: CraftMaterialUnitID?
     @State private var preparationFailure: String?
 
 #if DEBUG
     init(debugSelectedRecipeID: ItemID? = nil,
-         debugSelectedScentMaskUnitID: MaterialReserveUnitID? = nil,
+         debugSelectedScentMaskUnitID: CraftMaterialUnitID? = nil,
          debugFailure: String? = nil) {
         _selectedRecipeID = State(initialValue: debugSelectedRecipeID)
         _selectedScentMaskUnitID = State(initialValue: debugSelectedScentMaskUnitID)
@@ -42,11 +42,11 @@ struct ApothecaryView: View {
         known.first { $0.output == selectedRecipeID }
     }
 
-    private var scentMaskAnimalResources: [MaterialReserveSelection] {
+    private var scentMaskAnimalResources: [CraftMaterialSelection] {
         ConsumableCraftingRules.scentMaskAnimalResources(in: store.state)
     }
 
-    private var selectedScentMaskResource: MaterialReserveSelection? {
+    private var selectedScentMaskResource: CraftMaterialSelection? {
         scentMaskAnimalResources.first { $0.unitID == selectedScentMaskUnitID }
     }
 
@@ -233,7 +233,7 @@ struct ApothecaryView: View {
         ) {
             Button {
                 guard let quote else {
-                    preparationFailure = "Choose one exact grade 25+ animal resource and keep 1 Reagent available."
+                    preparationFailure = "Choose one exact creature material and keep 1 Reagent available."
                     return
                 }
                 switch store.craftScentMask(quote) {
@@ -264,15 +264,15 @@ struct ApothecaryView: View {
         quote: ConsumableCraftingRules.ScentMaskQuote?
     ) -> String {
         if quote != nil { return "This exact resource + 1 Reagent · 0 Essence" }
-        if selectedScentMaskResource == nil { return "Choose one exact grade 25+ animal resource." }
+        if selectedScentMaskResource == nil { return "Choose one exact creature material." }
         return "Needs 1 Reagent."
     }
 }
 
 private struct ScentMaskRecipeDetail: View {
     @EnvironmentObject private var store: GameStore
-    let resources: [MaterialReserveSelection]
-    @Binding var selectedUnitID: MaterialReserveUnitID?
+    let resources: [CraftMaterialSelection]
+    @Binding var selectedUnitID: CraftMaterialUnitID?
 
     private var preparedCount: Int {
         store.state.base.inventory.stacks
@@ -290,11 +290,11 @@ private struct ScentMaskRecipeDetail: View {
                     .font(.caption.weight(.semibold)).foregroundStyle(.secondary)
             }
 
-            Text("1 Reagent + 1 selected animal resource (grade 25+) · 0 Essence · 12 turns")
+            Text("1 Reagent + 1 selected creature material · 0 Essence · 12 turns")
                 .font(.callout).foregroundStyle(.secondary)
 
             Picker("Exact animal resource", selection: $selectedUnitID) {
-                Text("Choose a resource").tag(Optional<MaterialReserveUnitID>.none)
+                Text("Choose a resource").tag(Optional<CraftMaterialUnitID>.none)
                 ForEach(resources, id: \.unitID) { resource in
                     Text(resourceLabel(resource)).tag(Optional(resource.unitID))
                 }
@@ -303,7 +303,7 @@ private struct ScentMaskRecipeDetail: View {
             .accessibilityIdentifier("apothecary.scent-mask.animal-resource")
 
             if resources.isEmpty {
-                Label("No grade 25+ animal resources in reserve.", systemImage: "exclamationmark.circle")
+                Label("No eligible creature materials in reserve.", systemImage: "exclamationmark.circle")
                     .font(.caption).foregroundStyle(.secondary)
             }
 
@@ -316,11 +316,10 @@ private struct ScentMaskRecipeDetail: View {
         .accessibilityElement(children: .contain)
     }
 
-    private func resourceLabel(_ resource: MaterialReserveSelection) -> String {
+    private func resourceLabel(_ resource: CraftMaterialSelection) -> String {
         let sample = resource.sample
         let source = sample.source.isEmpty ? "unknown source" : sample.source
-        let grade = sample.grade.formatted(.number.precision(.fractionLength(0...1)))
-        return "\(sample.displayName) · grade \(grade) · from \(source)"
+        return "\(sample.displayName) · \(sample.qualityBand.displayName) · from \(source)"
     }
 }
 

@@ -3220,11 +3220,11 @@ enum CombatRules {
             encounter.creatureMaterialRewardResolution = .ineligible(.noEligibleSpecimens)
             encounter.spoils = []
         case .eligible(let receipt, let units):
-            guard run.materialReserve.addExact(units) else { return false }
+            guard run.creatureMaterialReserve.addExact(units) else { return false }
             encounter.creatureMaterialRewardResolution = .awarded(receipt)
             run.creatureMaterialRewardReceipts.append(receipt)
             encounter.spoils = receipt.entries.map { entry in
-                let kind = MaterialKind(entry.family)
+                let kind = MaterialFamilyID(entry.family)
                 return entry.quantity > 1
                     ? "\(kind.displayName) ×\(entry.quantity)"
                     : kind.displayName
@@ -3312,7 +3312,7 @@ enum CombatRules {
     private static func awardSpoils(run: inout WorldRun, encounter: inout EncounterState, state: inout GameState) {
         var gained = ResourcePool()
         var found: [String] = []
-        var materialSpoils: [(sample: MaterialSample, count: Int)] = []
+        var materialSpoils: [(sample: CraftMaterialUnitV1, count: Int)] = []
 
         for foe in encounter.foes {
             // How much a kill is worth follows what the world spent making it, rather than an
@@ -3406,9 +3406,9 @@ enum CombatRules {
     }
 
     nonisolated static func stackedMaterialSpoils(
-        _ drops: [(sample: MaterialSample, count: Int)]
-    ) -> [(sample: MaterialSample, count: Int)] {
-        var stacked: [(sample: MaterialSample, count: Int)] = []
+        _ drops: [(sample: CraftMaterialUnitV1, count: Int)]
+    ) -> [(sample: CraftMaterialUnitV1, count: Int)] {
+        var stacked: [(sample: CraftMaterialUnitV1, count: Int)] = []
         for drop in drops where drop.count > 0 {
             if let index = stacked.firstIndex(where: { $0.sample == drop.sample }) {
                 stacked[index].count += drop.count
@@ -3423,14 +3423,14 @@ enum CombatRules {
     /// slot or enters the loot-swap queue; source identity is the saved run + defeated combatant.
     private static func butcher(_ traits: CreatureTraits, named name: String,
                                 qualifier: String?, foeID: InstanceID,
-                                run: inout WorldRun) -> [(sample: MaterialSample, count: Int)] {
-        var drops: [(sample: MaterialSample, count: Int)] = []
+                                run: inout WorldRun) -> [(sample: CraftMaterialUnitV1, count: Int)] {
+        var drops: [(sample: CraftMaterialUnitV1, count: Int)] = []
         let count = ButcheryRules.quantity(from: traits, rng: &run.rng)
 
         for (dropOrdinal, sample) in ButcheryRules.materials(
             from: traits, named: name, qualifier: qualifier
         ).enumerated() {
-            run.materialReserve.addHarvested(
+            run.worldMaterialReserve.addHarvested(
                 sample, count: count,
                 sourceReceipt: "run:\(run.runIndex):foe:\(foeID.rawValue)",
                 dropOrdinal: dropOrdinal)

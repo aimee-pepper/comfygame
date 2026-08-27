@@ -19,7 +19,7 @@ enum MobGearSpriteV1Registry {
     static let packID = "mob-gear-sprites-v1"
     static let canonicalBodySHA256 = "ee65afce662d74615ed3c602a7654650ab6e317df1e3d43b612820a6ede40fc9"
 
-    static func mobDropAsset(for kind: MaterialKind) -> NativeVisualRuntime.GeneratedPixelAsset? {
+    static func mobDropAsset(for kind: MaterialFamilyID) -> NativeVisualRuntime.GeneratedPixelAsset? {
         mobDropAssets[kind.rawValue]
     }
 

@@ -65,10 +65,10 @@ final class WeaponsmithTests: XCTestCase {
         state.base.essence = 1_000
         if pattern { state.reality.library.knownPatterns.insert(PhysicalGearCraftingRules.maudFittingPattern) }
         let samples = [
-            MaterialSample(kind: .plate, properties: .init(hardness: 80, density: 80, flexibility: 60, lustre: 60, reactivity: 60), grade: grade, source: "head"),
-            MaterialSample(kind: .bone, properties: .init(hardness: 75, density: 75, flexibility: 65, lustre: 55, reactivity: 55), grade: grade, source: "haft"),
-            MaterialSample(kind: .timber, properties: .init(hardness: 70, density: 70, flexibility: 65, lustre: 50, reactivity: 50), grade: grade, source: "binding"),
-            MaterialSample(kind: .hide, properties: .init(hardness: 70, density: 70, flexibility: 65, lustre: 50, reactivity: 50), grade: grade, source: "spare")
+            CraftMaterialUnitV1(kind: .plate, properties: .init(hardness: 80, density: 80, flexibility: 60, lustre: 60, reactivity: 60), grade: grade, source: "head"),
+            CraftMaterialUnitV1(kind: .bone, properties: .init(hardness: 75, density: 75, flexibility: 65, lustre: 55, reactivity: 55), grade: grade, source: "haft"),
+            CraftMaterialUnitV1(kind: .timber, properties: .init(hardness: 70, density: 70, flexibility: 65, lustre: 50, reactivity: 50), grade: grade, source: "binding"),
+            CraftMaterialUnitV1(kind: .hide, properties: .init(hardness: 70, density: 70, flexibility: 65, lustre: 50, reactivity: 50), grade: grade, source: "spare")
         ]
         state.base.inventory.add(ItemStack(id: InstanceID(rawValue: 800), catalogID: Items.material,
                                            materials: samples))
@@ -91,7 +91,7 @@ final class WeaponsmithTests: XCTestCase {
         for recipe in fixed {
             let preview = try XCTUnwrap(PhysicalGearCraftingRules.preview(recipe, in: one))
             XCTAssertEqual(preview.outputTier, 3)
-            XCTAssertTrue(preview.wastesGradeAboveCap)
+            XCTAssertEqual(preview.qualityBand, .superior)
         }
         let two = state(tier: 2, grade: 90)
         XCTAssertEqual(PhysicalGearCraftingRules.preview(PhysicalGearCraftingRules.fittedPoint,

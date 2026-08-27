@@ -404,13 +404,13 @@ final class ExpeditionOutcomeTests: XCTestCase {
         let store = fundedStore()
         XCTAssertTrue(store.bindAndDepart())
         var run = try XCTUnwrap(store.state.worlds.activeRun)
-        let hide = MaterialSample(kind: .hide, properties: MaterialProperties(flexibility: 62),
+        let hide = CraftMaterialUnitV1(kind: .hide, properties: MaterialProperties(flexibility: 62),
                                   grade: 57, source: "plain grazer")
-        let bone = MaterialSample(kind: .bone, properties: MaterialProperties(density: 78),
+        let bone = CraftMaterialUnitV1(kind: .bone, properties: MaterialProperties(density: 78),
                                   grade: 71, source: "dense walker")
-        run.materialReserve.addHarvested(hide, count: 19,
+        run.worldMaterialReserve.addHarvested(hide, count: 19,
                                          sourceReceipt: "run:1:foe:100", dropOrdinal: 0)
-        run.materialReserve.addHarvested(bone, count: 6,
+        run.worldMaterialReserve.addHarvested(bone, count: 6,
                                          sourceReceipt: "run:1:foe:101", dropOrdinal: 0)
         var state = store.state
         let banked = GameStore.bankHaul(of: run, outcomeID: 44, into: &state, fraction: 1)
@@ -424,7 +424,7 @@ final class ExpeditionOutcomeTests: XCTestCase {
         }
         XCTAssertEqual(materialLines.count, 25)
         XCTAssertEqual(Set(materialLines.compactMap(\.reserveUnitID)).count, 25)
-        XCTAssertEqual(state.base.materialReserve.count, 25)
+        XCTAssertEqual(state.base.worldMaterialReserve.count, 25)
 
         let summary = RunExitSummary(runIndex: 1, kind: .portal, reason: "fixture",
                                      turnsTaken: 1, haulKeptFraction: 1,
@@ -454,20 +454,20 @@ final class ExpeditionOutcomeTests: XCTestCase {
             var run = try XCTUnwrap(store.state.worlds.activeRun)
             run.tuning.collapseRecoveryFraction = fraction
             for index in 0..<6 {
-                let kind: MaterialKind = index.isMultiple(of: 2) ? .hide : .bone
-                let sample = MaterialSample(
+                let kind: MaterialFamilyID = index.isMultiple(of: 2) ? .hide : .bone
+                let sample = CraftMaterialUnitV1(
                     kind: kind, properties: MaterialProperties(
                         hardness: Double(20 + index), flexibility: Double(40 + index)
                     ),
                     grade: Double(60 + index), source: "\(label)-sample-\(index)",
                     qualifier: index.isMultiple(of: 2) ? "pale" : "dense"
                 )
-                run.materialReserve.add(MaterialReserveUnit(
+                run.worldMaterialReserve.add(CraftMaterialHoldingV1(
                     id: .init(rawValue: "\(label)-unit-\(index)"), sample: sample,
                     protectedReturn: index < 2
                 ))
             }
-            let expected = run.materialReserve.partitionedForFailure(
+            let expected = run.worldMaterialReserve.partitionedForFailure(
                 fraction: fraction, outcomeID: 1
             )
             store.mutate("fixture: reserve outcome \(label)") {
@@ -491,12 +491,12 @@ final class ExpeditionOutcomeTests: XCTestCase {
                            Set(expected.kept.units.map(\.id)), label)
             XCTAssertEqual(Set(lost.compactMap { $0.reserveUnitID }),
                            Set(expected.lost.units.map(\.id)), label)
-            XCTAssertTrue(run.materialReserve.units.filter(\.protectedReturn).allSatisfy { unit in
+            XCTAssertTrue(run.worldMaterialReserve.units.filter(\.protectedReturn).allSatisfy { unit in
                 recovered.contains { $0.reserveUnitID == unit.id && $0.sample == unit.sample }
             }, label)
-            XCTAssertEqual(Set(store.state.base.materialReserve.units.map(\.id)),
+            XCTAssertEqual(Set(store.state.base.worldMaterialReserve.units.map(\.id)),
                            Set(expected.kept.units.map(\.id)), label)
-            XCTAssertTrue(store.state.base.materialReserve.units.allSatisfy {
+            XCTAssertTrue(store.state.base.worldMaterialReserve.units.allSatisfy {
                 !$0.protectedReturn
             }, label)
 
@@ -708,10 +708,10 @@ final class ExpeditionOutcomeTests: XCTestCase {
 
     func testRecoveredMaterialDestinationsAreFrozenWithoutChangingReserveBanking() throws {
         var run = departureRun()
-        let sample = MaterialSample(kind: .hide, properties: .init(flexibility: 55),
+        let sample = CraftMaterialUnitV1(kind: .hide, properties: .init(flexibility: 55),
                                     grade: 63, source: "receipt fixture")
-        let unitID = MaterialReserveUnitID(rawValue: "receipt-hide")
-        run.materialReserve.add(MaterialReserveUnit(id: unitID, sample: sample))
+        let unitID = CraftMaterialUnitID(rawValue: "receipt-hide")
+        run.worldMaterialReserve.add(CraftMaterialHoldingV1(id: unitID, sample: sample))
         var state = GameState.newGame()
 
         let banked = GameStore.bankHaul(of: run, outcomeID: 81, into: &state, fraction: 1)
@@ -721,7 +721,7 @@ final class ExpeditionOutcomeTests: XCTestCase {
             return material
         }.first)
         XCTAssertEqual(material.recoveredDestination, .stored)
-        XCTAssertTrue(state.base.materialReserve.units.contains { $0.id == unitID })
+        XCTAssertTrue(state.base.worldMaterialReserve.units.contains { $0.id == unitID })
     }
 
     func testLegacyTypedRecoveredItemDecodesWithDestinationNotRecorded() throws {
@@ -902,8 +902,8 @@ final class ExpeditionOutcomeTests: XCTestCase {
     }
 
     func testRunExitRecapRoutesEveryMaterialKindToExistingPixelIdentity() throws {
-        XCTAssertEqual(MaterialKind.allCases.count, 16)
-        XCTAssertEqual(Set(MaterialKind.allCases.map(\.rawValue)).count, 16)
+        XCTAssertEqual(MaterialFamilyID.allCases.count, 16)
+        XCTAssertEqual(Set(MaterialFamilyID.allCases.map(\.rawValue)).count, 16)
 
         let root = URL(fileURLWithPath: #filePath)
             .deletingLastPathComponent().deletingLastPathComponent()
@@ -919,16 +919,16 @@ final class ExpeditionOutcomeTests: XCTestCase {
 
         XCTAssertTrue(materialRoute.contains("ItemIconTile(icon: material.fallbackIcon"))
         XCTAssertTrue(materialRoute.contains("materialKind: material.sample.kind"))
-        XCTAssertFalse(materialRoute.contains("MaterialKind."),
+        XCTAssertFalse(materialRoute.contains("MaterialFamilyID."),
                        "the recap must route the frozen kind, not special-case a subset")
     }
 
     func testMaterialReceiptFreezesEverySampleAsItsOwnStableLine() throws {
         let store = fundedStore()
         XCTAssertTrue(store.bindAndDepart())
-        let pale = MaterialSample(kind: .hide, properties: .init(insulation: 31),
+        let pale = CraftMaterialUnitV1(kind: .hide, properties: .init(insulation: 31),
                                   grade: 42, source: "pale browser", qualifier: "pale")
-        let shaggy = MaterialSample(kind: .hide, properties: .init(insulation: 67),
+        let shaggy = CraftMaterialUnitV1(kind: .hide, properties: .init(insulation: 67),
                                     grade: 81, source: "shaggy groper", qualifier: "shaggy")
         let bin = ItemStack(id: InstanceID(rawValue: 902), catalogID: Items.material,
                             materials: [pale, shaggy])
@@ -953,9 +953,9 @@ final class ExpeditionOutcomeTests: XCTestCase {
     func testSplitMaterialReceiptIDsCannotCollideAcrossRecoveredAndLostSides() throws {
         let store = fundedStore()
         XCTAssertTrue(store.bindAndDepart())
-        let first = MaterialSample(kind: .hide, properties: .init(insulation: 31),
+        let first = CraftMaterialUnitV1(kind: .hide, properties: .init(insulation: 31),
                                    grade: 42, source: "first")
-        let second = MaterialSample(kind: .hide, properties: .init(insulation: 67),
+        let second = CraftMaterialUnitV1(kind: .hide, properties: .init(insulation: 67),
                                     grade: 81, source: "second")
         store.mutate("fixture: split material samples") {
             $0.worlds.activeRun?.satchelItems.stacks = [
@@ -1053,9 +1053,9 @@ final class ExpeditionOutcomeTests: XCTestCase {
     func testDecision207PartitionPreservesExactGearAndMaterialUnitsWithoutDuplication() throws {
         var gear = ItemStack(id: InstanceID(rawValue: 901), catalogID: "blade_keen")
         gear.upgradeLevel = 2
-        let pale = MaterialSample(kind: .hide, properties: .init(insulation: 31),
+        let pale = CraftMaterialUnitV1(kind: .hide, properties: .init(insulation: 31),
                                   grade: 42, source: "pale")
-        let shaggy = MaterialSample(kind: .hide, properties: .init(insulation: 67),
+        let shaggy = CraftMaterialUnitV1(kind: .hide, properties: .init(insulation: 67),
                                     grade: 81, source: "shaggy")
         let materials = ItemStack(id: InstanceID(rawValue: 902), catalogID: Items.material,
                                   materials: [pale, shaggy])
@@ -1063,18 +1063,20 @@ final class ExpeditionOutcomeTests: XCTestCase {
         let partition = inventory.partitionedForFailure(fraction: 0.5, outcomeID: 61)
         let all = partition.kept.stacks + partition.lost.stacks
         XCTAssertEqual(all.reduce(0) { $0 + $1.count }, 3)
-        XCTAssertEqual(all.flatMap { $0.materials }.sorted { $0.grade < $1.grade }, [pale, shaggy])
+        XCTAssertEqual(all.flatMap { $0.materials }.sorted {
+            $0.qualityBand.rawValue < $1.qualityBand.rawValue
+        }, [pale, shaggy])
         XCTAssertEqual(all.first { $0.catalogID == gear.catalogID }?.upgradeLevel, 2)
         XCTAssertEqual(partition.kept.stacks.reduce(0) { $0 + $1.count }, 2)
     }
 
     func testDecision207ProtectedMaterialsAreComplementaryExactSamples() {
         let samples = [
-            MaterialSample(kind: .hide, properties: .init(insulation: 11),
+            CraftMaterialUnitV1(kind: .hide, properties: .init(insulation: 11),
                            grade: 10, source: "first"),
-            MaterialSample(kind: .hide, properties: .init(insulation: 22),
+            CraftMaterialUnitV1(kind: .hide, properties: .init(insulation: 22),
                            grade: 20, source: "second"),
-            MaterialSample(kind: .hide, properties: .init(insulation: 33),
+            CraftMaterialUnitV1(kind: .hide, properties: .init(insulation: 33),
                            grade: 30, source: "third")
         ]
         var stack = ItemStack(id: InstanceID(rawValue: 910), catalogID: Items.material,
@@ -1090,13 +1092,13 @@ final class ExpeditionOutcomeTests: XCTestCase {
 
     func testDecision207MaterialSelectionIgnoresReorderSplitMergeAndFreezesTypedSides() throws {
         let samples = [
-            MaterialSample(kind: .hide, properties: .init(hardness: 13, insulation: 19),
+            CraftMaterialUnitV1(kind: .hide, properties: .init(hardness: 13, insulation: 19),
                            grade: 21, source: "alpha", qualifier: "ashen"),
-            MaterialSample(kind: .hide, properties: .init(density: 29, flexibility: 31),
+            CraftMaterialUnitV1(kind: .hide, properties: .init(density: 29, flexibility: 31),
                            grade: 37, source: "beta", qualifier: "shaggy"),
-            MaterialSample(kind: .hide, properties: .init(lustre: 41, reactivity: 43),
+            CraftMaterialUnitV1(kind: .hide, properties: .init(lustre: 41, reactivity: 43),
                            grade: 47, source: "gamma", qualifier: "pale"),
-            MaterialSample(kind: .hide, properties: .init(insulation: 53),
+            CraftMaterialUnitV1(kind: .hide, properties: .init(insulation: 53),
                            grade: 59, source: "delta")
         ]
         let merged = Inventory(slots: 8, stacks: [
@@ -1111,7 +1113,7 @@ final class ExpeditionOutcomeTests: XCTestCase {
         ])
         let mergedPartition = merged.partitionedForFailure(fraction: 0.5, outcomeID: 71)
         let splitPartition = splitReordered.partitionedForFailure(fraction: 0.5, outcomeID: 71)
-        let samplesBySource: (Inventory) -> [MaterialSample] = {
+        let samplesBySource: (Inventory) -> [CraftMaterialUnitV1] = {
             $0.stacks.flatMap { $0.materials }.sorted { $0.source < $1.source }
         }
         XCTAssertEqual(samplesBySource(mergedPartition.kept), samplesBySource(splitPartition.kept))
@@ -1128,11 +1130,11 @@ final class ExpeditionOutcomeTests: XCTestCase {
         let banked = GameStore.bankHaul(of: run, outcomeID: 71, into: &state,
                                         fraction: 0.5, rng: &rng)
         XCTAssertEqual(rng, rngBefore, "failure partition must not consume the live run RNG")
-        let recovered = banked.recoveredLines.compactMap { line -> MaterialSample? in
+        let recovered = banked.recoveredLines.compactMap { line -> CraftMaterialUnitV1? in
             guard case .materialSample(let material) = line else { return nil }
             return material.sample
         }.sorted { $0.source < $1.source }
-        let lost = banked.lostLines.compactMap { line -> MaterialSample? in
+        let lost = banked.lostLines.compactMap { line -> CraftMaterialUnitV1? in
             guard case .materialSample(let material) = line else { return nil }
             return material.sample
         }.sorted { $0.source < $1.source }

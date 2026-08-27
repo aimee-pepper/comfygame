@@ -213,7 +213,7 @@ struct ItemIconTile: View {
     /// The generated visual adapter may consume it; nil/non-covered IDs retain the visible fallback.
     var catalogueID: ItemID? = nil
     /// Property-bearing harvested materials are not catalogue items and use their own exact kind.
-    var materialKind: MaterialKind? = nil
+    var materialKind: MaterialFamilyID? = nil
     let rarity: Rarity
     let quantity: Int
     let identified: Bool
@@ -230,7 +230,7 @@ struct ItemIconTile: View {
                 .strokeBorder(rarity.tint.opacity(isSelected ? 1 : 0.72),
                               lineWidth: isSelected ? 3 : 1.5)
             if let materialKind {
-                MaterialSamplePixelIdentity(kind: materialKind,
+                CraftMaterialUnitPixelIdentity(kind: materialKind,
                                             fallbackColor: identified ? rarity.tint : .secondary)
                     .frame(width: 32, height: 32)
             } else {

@@ -15,9 +15,9 @@ final class SmithTests: XCTestCase {
         GameStore(io: .temporary(name: "smith-\(name)-\(UUID().uuidString)"))
     }
 
-    private func sample(_ kind: MaterialKind = .plate, hardness: Double,
-                        grade: Double = 50, source: String = "bulwark") -> MaterialSample {
-        MaterialSample(kind: kind, properties: MaterialProperties(hardness: hardness),
+    private func sample(_ kind: MaterialFamilyID = .plate, hardness: Double,
+                        grade: Double = 50, source: String = "bulwark") -> CraftMaterialUnitV1 {
+        CraftMaterialUnitV1(kind: kind, properties: MaterialProperties(hardness: hardness),
                        grade: grade, source: source)
     }
 
@@ -50,21 +50,21 @@ final class SmithTests: XCTestCase {
                                                  count: 1, essence: 0, level: 0)
 
         XCTAssertTrue(restored.base.inventory.stacks.flatMap(\.materials).isEmpty)
-        XCTAssertEqual(restored.base.materialReserve.selections().map(\.sample), [exact])
+        XCTAssertEqual(restored.base.worldMaterialReserve.selections().map(\.sample), [exact])
         XCTAssertEqual(SmithRules.candidates(for: requirement, in: restored).count, 1)
     }
 
     func testSmithCandidatesQuoteAndConsumeExactReserveUnit() throws {
         var state = GameState.newGame()
         let exact = sample(hardness: 70, source: "reserve source")
-        state.base.materialReserve.add(.init(id: .init(rawValue: "reserve-smith-1"), sample: exact))
+        state.base.worldMaterialReserve.add(.init(id: .init(rawValue: "reserve-smith-1"), sample: exact))
         let requirement = SmithRules.Requirement(property: .hardness, minimum: 60,
                                                  count: 1, essence: 0, level: 0)
         let candidate = try XCTUnwrap(SmithRules.candidates(for: requirement, in: state).first)
         XCTAssertEqual(candidate.reserveSelection.unitID.rawValue, "reserve-smith-1")
 
         XCTAssertTrue(SmithRules.consume([candidate], in: &state))
-        XCTAssertTrue(state.base.materialReserve.isEmpty)
+        XCTAssertTrue(state.base.worldMaterialReserve.isEmpty)
     }
 
     /// A storehouse with `count` pieces of hard stock and plenty of essence.
@@ -74,8 +74,8 @@ final class SmithTests: XCTestCase {
         store.mutate("test: stock the shelf") { state in
             state.base.essence = essence
             for ordinal in 0..<count {
-                state.base.materialReserve.add(MaterialReserveUnit(
-                    id: MaterialReserveUnitID(rawValue: "smith-fixture-\(ordinal)"),
+                state.base.worldMaterialReserve.add(CraftMaterialHoldingV1(
+                    id: CraftMaterialUnitID(rawValue: "smith-fixture-\(ordinal)"),
                     sample: self.sample(hardness: hardness)))
             }
         }
@@ -180,8 +180,8 @@ final class SmithTests: XCTestCase {
                            self.sample(hardness: 41, grade: 21),
                            self.sample(hardness: 42, grade: 22)]
             for (ordinal, sample) in samples.enumerated() {
-                state.base.materialReserve.add(MaterialReserveUnit(
-                    id: MaterialReserveUnitID(rawValue: "smith-quality-\(ordinal)"),
+                state.base.worldMaterialReserve.add(CraftMaterialHoldingV1(
+                    id: CraftMaterialUnitID(rawValue: "smith-quality-\(ordinal)"),
                     sample: sample))
             }
             state.base.inventory.add(ItemStack(id: InstanceID(rawValue: 1), catalogID: "blade_chipped"))
@@ -189,8 +189,8 @@ final class SmithTests: XCTestCase {
         let target = try XCTUnwrap(store.reforgeable.first { $0.catalogID == "blade_chipped" })
         store.reforge(target)
 
-        let left = store.state.base.materialReserve.selections().map(\.sample)
-        XCTAssertTrue(left.contains { $0.grade == 99 }, "the smith ate the best thing in the bin")
+        let left = store.state.base.worldMaterialReserve.selections().map(\.sample)
+        XCTAssertTrue(left.contains { $0.qualityBand == .peerless }, "the smith ate the best thing in the bin")
         XCTAssertEqual(left.count, 2)
     }
 

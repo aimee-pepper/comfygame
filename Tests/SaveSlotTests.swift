@@ -37,9 +37,17 @@ final class SaveSlotTests: XCTestCase {
             var payload = try XCTUnwrap(JSONSerialization.jsonObject(
                 with: SaveCodec.makeEncoder().encode(state)) as? [String: Any])
             payload["schemaVersion"] = 5
+            var base = try XCTUnwrap(payload["base"] as? [String: Any])
+            base.removeValue(forKey: "worldMaterialReserve")
+            base.removeValue(forKey: "creatureMaterialReserve")
+            base["materialReserve"] = ["units": []]
+            payload["base"] = base
             var worlds = try XCTUnwrap(payload["worlds"] as? [String: Any])
             var active = try XCTUnwrap(worlds["activeRun"] as? [String: Any])
             active.removeValue(forKey: "sourceDangerReceipt")
+            active.removeValue(forKey: "worldMaterialReserve")
+            active.removeValue(forKey: "creatureMaterialReserve")
+            active["materialReserve"] = ["units": []]
             var encounter = try XCTUnwrap(active["activeEncounter"] as? [String: Any])
             var foes = try XCTUnwrap(encounter["foes"] as? [[String: Any]])
             switch fixture {

@@ -6,14 +6,14 @@ import Foundation
 /// carried and the skeleton that held it up are each read straight off the trait vector, so what a
 /// world pays out is a consequence of what it grew rather than a table someone typed.
 ///
-/// **Quantity scales with size. Grade scales with trait extremity.** So a world of monstrous
+/// **Quantity scales with size. Quality scales with trait extremity.** So a world of monstrous
 /// armoured things drops monstrous plates — which is the reason to write such a world.
 enum ButcheryRules {
 
     /// Everything one creature leaves. Ordered so the most characteristic part comes first.
     static func materials(from traits: CreatureTraits, named source: String,
-                          qualifier: String? = nil) -> [MaterialSample] {
-        var samples: [MaterialSample] = []
+                          qualifier: String? = nil) -> [CraftMaterialUnitV1] {
+        var samples: [CraftMaterialUnitV1] = []
         let covering = traits.covering
         let lustre = traits.finish.lustre
 
@@ -27,7 +27,7 @@ enum ButcheryRules {
             // Hard things don't bend; long soft things do.
             let flexibility: Double = max(0, 100 - covering.hardness) * (0.5 + covering.length / 200)
 
-            samples.append(MaterialSample(
+            samples.append(unit(
                 kind: kind,
                 properties: MaterialProperties(
                     hardness: covering.hardness,
@@ -36,7 +36,7 @@ enum ButcheryRules {
                     flexibility: flexibility,
                     lustre: lustre
                 ),
-                grade: grade(of: [covering.hardness, covering.length, covering.coverage], lustre: lustre),
+                quality: quality(of: [covering.hardness, covering.length, covering.coverage], lustre: lustre),
                 source: source,
                 qualifier: qualifier
             ))
@@ -44,12 +44,12 @@ enum ButcheryRules {
 
         // The weapons, where it had any worth taking.
         if !traits.armament.isUnarmed, traits.armament.total > Tuning.Materials.minimumArmamentToYield {
-            let kind: MaterialKind = switch traits.armament.dominant {
+            let kind: MaterialFamilyID = switch traits.armament.dominant {
             case .pierce: .fang
             case .crush: .tusk
             case .rend: .claw
             }
-            samples.append(MaterialSample(
+            samples.append(unit(
                 kind: kind,
                 properties: MaterialProperties(
                     hardness: kind == .tusk ? traits.armament.total * 0.4 : traits.armament.total * 0.7,
@@ -59,7 +59,7 @@ enum ButcheryRules {
                     lustre: lustre,
                     reactivity: 0
                 ),
-                grade: grade(of: [traits.armament.total, traits.boneDensity], lustre: lustre),
+                quality: quality(of: [traits.armament.total, traits.boneDensity], lustre: lustre),
                 source: source,
                 qualifier: qualifier
             ))
@@ -67,7 +67,7 @@ enum ButcheryRules {
 
         // The skeleton.
         if traits.boneDensity > Tuning.Materials.minimumBoneToYield {
-            samples.append(MaterialSample(
+            samples.append(unit(
                 kind: .bone,
                 properties: MaterialProperties(
                     hardness: traits.boneDensity * 0.6,
@@ -77,7 +77,7 @@ enum ButcheryRules {
                     lustre: lustre * 0.4,
                     reactivity: 0
                 ),
-                grade: grade(of: [traits.boneDensity, traits.size], lustre: lustre),
+                quality: quality(of: [traits.boneDensity, traits.size], lustre: lustre),
                 source: source,
                 qualifier: qualifier
             ))
@@ -85,7 +85,7 @@ enum ButcheryRules {
 
         // Whatever it was doing instead of being ordinary.
         if let emanation = traits.emanation, emanation.strength > Tuning.Materials.minimumEmanationToYield {
-            samples.append(MaterialSample(
+            samples.append(unit(
                 kind: .ichor,
                 properties: MaterialProperties(
                     hardness: 0,
@@ -95,7 +95,7 @@ enum ButcheryRules {
                     lustre: lustre,
                     reactivity: emanation.strength
                 ),
-                grade: grade(of: [emanation.strength], lustre: lustre),
+                quality: quality(of: [emanation.strength], lustre: lustre),
                 source: source,
                 qualifier: qualifier
             ))
@@ -107,7 +107,7 @@ enum ButcheryRules {
     /// Which material a covering is. Hardness, length and coverage between them say whether the
     /// animal was wearing plate, quills, a pelt, down or plain hide — and layered iridescence is
     /// what makes a hard covering chitin rather than plate.
-    static func coveringMaterial(of traits: CreatureTraits) -> MaterialKind {
+    static func coveringMaterial(of traits: CreatureTraits) -> MaterialFamilyID {
         let c = traits.covering
         let hard = c.hardness > Tuning.Materials.hardCoveringThreshold
         let long = c.length > Tuning.Materials.longCoveringThreshold
@@ -129,7 +129,7 @@ enum ButcheryRules {
         return max(1, rounded + rng.int(in: -1...1))
     }
 
-    /// **Grade scales with trait extremity.** An animal that is remarkable in some direction leaves
+    /// **Quality scales with trait extremity.** An animal that is remarkable in some direction leaves
     /// remarkable parts; a thoroughly average one leaves average ones, however big it is.
     ///
     /// Measured as distance from the middle rather than as height, so a *strikingly* bare or
@@ -137,14 +137,26 @@ enum ButcheryRules {
     /// claim, not magnitude.
     ///
     /// Averaged across the contributing traits rather than taken from the most extreme of them: a
-    /// single unusual number shouldn't carry a grade, or a thick plate that happens to be short
-    /// scores for its shortness. Top grades belong to animals that are remarkable *throughout*.
-    static func grade(of values: [Double], lustre: Double) -> Double {
+    /// single unusual number shouldn't carry the result. Top bands belong to animals that are
+    /// remarkable throughout.
+    static func quality(of values: [Double], lustre: Double) -> Double {
         guard !values.isEmpty else { return 0 }
         let extremity = values
             .map { abs($0 - 50) / 50 }
             .reduce(0, +) / Double(values.count)
         let polish = lustre / Tuning.Pressure.scaleMaximum * Tuning.Materials.gradePerLustre
         return min(100, max(0, extremity * Tuning.Materials.gradePerExtremity + polish))
+    }
+
+    private static func unit(kind: MaterialFamilyID, properties: MaterialProperties,
+                             quality: Double, source: String, qualifier: String?) -> CraftMaterialUnitV1 {
+        CraftMaterialUnitV1(schemaVersion: 1,
+            stableUnitID: CraftMaterialUnitID(rawValue: "butchery-prototype-\(kind.rawValue)"),
+            domain: .creature, familyID: kind,
+            qualityBand: (try? .init(legacyGrade: quality)) ?? .rough,
+            properties: properties,
+            sourceReceipt: .legacy(originalKind: kind, frozenSource: source,
+                                   qualifier: qualifier, migrationLocation: "butchery",
+                                   originalIdentity: nil))
     }
 }

@@ -50,9 +50,8 @@ enum ArmouryRules {
         var target: Target
         var profile: Profile
         var selections: [Selection]
-        var naturalTier: Int
+        var qualityBand: CraftMaterialQualityBand
         var outputTier: Int
-        var constructionCap: Int
         var rawEssence: Int
         var essence: Int
         var insulation: Double
@@ -61,7 +60,6 @@ enum ArmouryRules {
         var rebuiltPhysical: Double
         var currentInsulation: Double
 
-        var wastesGradeAboveCap: Bool { naturalTier > constructionCap }
         var isBelowSpecialistHeadline: Bool { outputTier < 3 }
         var destroysLegacyWork: Bool { target.hasLegacyCredit }
     }
@@ -147,7 +145,7 @@ enum ArmouryRules {
     }
 
     static func candidates(for requirement: Requirement, in state: GameState) -> [Selection] {
-        state.base.materialReserve.selections {
+        state.base.craftMaterialSelections {
             PhysicalGearCraftingRules.qualifies($0, for: requirement)
         }.map { quote in
             Selection(requirementID: requirement.id, binID: .init(rawValue: 0), sampleIndex: 0,
@@ -156,8 +154,8 @@ enum ArmouryRules {
             let scoringFloors = requirement.floors + requirement.alternativeFloors
             let left = scoringFloors.map { lhs.sample.properties[$0.property] }.reduce(0, +)
             let right = scoringFloors.map { rhs.sample.properties[$0.property] }.reduce(0, +)
-            return (left, lhs.sample.grade, lhs.stockKey)
-                < (right, rhs.sample.grade, rhs.stockKey)
+            return (left, lhs.sample.qualityBand.rawValue, lhs.stockKey)
+                < (right, rhs.sample.qualityBand.rawValue, rhs.stockKey)
         }
     }
 
@@ -170,18 +168,22 @@ enum ArmouryRules {
         guard let chosen, chosen.allSatisfy({ $0.reserveSelection != nil }),
               PhysicalGearCraftingRules.preview(selectionRecipe(profile), selections: chosen, in: state) != nil
         else { return nil }
-        let grades = chosen.map(\.sample.grade)
-        let grade = 0.6 * (grades.min() ?? 0) + 0.4 * (grades.reduce(0, +) / Double(grades.count))
-        let natural = PhysicalGearCraftingRules.naturalTier(for: grade)
+        let ranks = chosen.map { $0.sample.qualityBand.rawValue }
+        let primary = Double(ranks.first ?? 0)
+        let secondary = ranks.dropFirst().isEmpty
+            ? primary
+            : Double(ranks.dropFirst().reduce(0, +)) / Double(ranks.count - 1)
+        let qualityRank = Int((0.7 * primary + 0.3 * secondary).rounded())
+        let qualityBand = CraftMaterialQualityBand(rawValue: qualityRank) ?? .rough
         let cap = effectiveTier(in: state) >= 2 ? 4 : 3
-        let output = min(natural, cap)
+        let output = min(max(1, qualityRank), cap)
         let station = ContentCatalog.shared.station(Stations.armoury)!
         let raw = PhysicalGearCraftingRules.essenceCost(for: output)
         let paid = StationStaffingRules.discounted(raw, at: station, in: state)
         let insulation = chosen.map(\.sample.properties.insulation).reduce(0, +) / Double(chosen.count)
         let reactivity = chosen.map(\.sample.properties.reactivity).reduce(0, +) / Double(chosen.count)
-        return Preview(target: target, profile: profile, selections: chosen, naturalTier: natural,
-                       outputTier: output, constructionCap: cap, rawEssence: raw, essence: paid,
+        return Preview(target: target, profile: profile, selections: chosen, qualityBand: qualityBand,
+                       outputTier: output, rawEssence: raw, essence: paid,
                        insulation: insulation, reactivity: reactivity,
                        currentPhysical: target.gearProfile?.protectivePower ?? 0,
                        rebuiltPhysical: max(0, Double(output) + profile.physicalOffset),

@@ -49,8 +49,8 @@ struct CatalogueItemPixelIdentity: View {
 
 /// Exact harvested-material identity. Grade, provenance and inherited properties remain text/state;
 /// the central 32px silhouette is selected only by the stable material kind.
-struct MaterialSamplePixelIdentity: View {
-    let kind: MaterialKind
+struct CraftMaterialUnitPixelIdentity: View {
+    let kind: MaterialFamilyID
     let fallbackColor: Color
 
     var body: some View {

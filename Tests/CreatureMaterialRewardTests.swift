@@ -19,7 +19,7 @@ final class CreatureMaterialRewardTests: XCTestCase {
     }
 
     func testQualityBandsAndHalfUpFormulaAreExact() {
-        let boundaries: [(Int, CreatureMaterialQualityBand)] = [
+        let boundaries: [(Int, CraftMaterialQualityBand)] = [
             (24, .rough), (25, .standard), (54, .standard), (55, .fine),
             (74, .fine), (75, .superior), (89, .superior), (90, .exceptional),
             (97, .exceptional), (98, .peerless)
@@ -107,7 +107,7 @@ final class CreatureMaterialRewardTests: XCTestCase {
         let migrated = try Migrations.migrateIfNeeded(
             JSONSerialization.data(withJSONObject: root, options: [.sortedKeys]))
         let object = try XCTUnwrap(JSONSerialization.jsonObject(with: migrated) as? [String: Any])
-        XCTAssertEqual(object["schemaVersion"] as? Int, 6)
+        XCTAssertEqual(object["schemaVersion"] as? Int, 7)
         let worlds = try XCTUnwrap(object["worlds"] as? [String: Any])
         let active = try XCTUnwrap(worlds["activeRun"] as? [String: Any])
         XCTAssertNotNil(active["sourceDangerReceipt"])
@@ -169,9 +169,17 @@ final class CreatureMaterialRewardTests: XCTestCase {
         var root = try XCTUnwrap(JSONSerialization.jsonObject(
             with: SaveCodec.makeEncoder().encode(state)) as? [String: Any])
         root["schemaVersion"] = 5
+        var base = try XCTUnwrap(root["base"] as? [String: Any])
+        base.removeValue(forKey: "worldMaterialReserve")
+        base.removeValue(forKey: "creatureMaterialReserve")
+        base["materialReserve"] = ["units": []]
+        root["base"] = base
         var worlds = try XCTUnwrap(root["worlds"] as? [String: Any])
         var active = try XCTUnwrap(worlds["activeRun"] as? [String: Any])
         active.removeValue(forKey: "sourceDangerReceipt")
+        active.removeValue(forKey: "worldMaterialReserve")
+        active.removeValue(forKey: "creatureMaterialReserve")
+        active["materialReserve"] = ["units": []]
         var encounter = try XCTUnwrap(active["activeEncounter"] as? [String: Any])
         active["activeEncounter"] = encounter; worlds["activeRun"] = active; root["worlds"] = worlds
 
@@ -184,10 +192,10 @@ final class CreatureMaterialRewardTests: XCTestCase {
             return XCTFail("victory must atomically award")
         }
         XCTAssertEqual(receipt.entries.first?.speciesID, speciesID)
-        XCTAssertEqual(decoded.worlds.activeRun?.materialReserve.units.count, 1)
+        XCTAssertEqual(decoded.worlds.activeRun?.creatureMaterialReserve.units.count, 1)
         let relaunched = try SaveCodec.decode(SaveCodec.encode(decoded))
         XCTAssertEqual(relaunched.worlds.activeRun?.creatureMaterialRewardReceipts, [receipt])
-        XCTAssertEqual(relaunched.worlds.activeRun?.materialReserve.units.count, 1)
+        XCTAssertEqual(relaunched.worlds.activeRun?.creatureMaterialReserve.units.count, 1)
     }
 
     func testSchemaFiveTransitionalPendingRetainsMatchingSpeciesAndRejectsMismatchAtomically() throws {
@@ -212,9 +220,17 @@ final class CreatureMaterialRewardTests: XCTestCase {
             var root = try XCTUnwrap(JSONSerialization.jsonObject(
                 with: SaveCodec.makeEncoder().encode(state)) as? [String: Any])
             root["schemaVersion"] = 5
+            var base = try XCTUnwrap(root["base"] as? [String: Any])
+            base.removeValue(forKey: "worldMaterialReserve")
+            base.removeValue(forKey: "creatureMaterialReserve")
+            base["materialReserve"] = ["units": []]
+            root["base"] = base
             var worlds = try XCTUnwrap(root["worlds"] as? [String: Any])
             var active = try XCTUnwrap(worlds["activeRun"] as? [String: Any])
             active.removeValue(forKey: "sourceDangerReceipt")
+            active.removeValue(forKey: "worldMaterialReserve")
+            active.removeValue(forKey: "creatureMaterialReserve")
+            active["materialReserve"] = ["units": []]
             worlds["activeRun"] = active; root["worlds"] = worlds
             return root
         }
@@ -317,7 +333,7 @@ final class CreatureMaterialRewardTests: XCTestCase {
         CombatRules.checkOutcome(in: &state)
 
         let awardedRun = try XCTUnwrap(state.worlds.activeRun)
-        XCTAssertEqual(awardedRun.materialReserve.units.map(\.sample.kind), [.hide])
+        XCTAssertEqual(awardedRun.creatureMaterialReserve.units.map(\.sample.kind), [.hide])
         XCTAssertEqual(awardedRun.creatureMaterialRewardReceipts.count, 1)
         let trophies = awardedRun.satchelItems.stacks + awardedRun.offeredItems
         XCTAssertEqual(trophies.count, 1)

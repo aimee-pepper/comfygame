@@ -364,7 +364,7 @@ final class SpilloverTests: XCTestCase {
     }
 
     func testLegacyHideWaitingInSpilloverMigratesToReserveWithoutLoss() throws {
-        let sample = MaterialSample(kind: .hide,
+        let sample = CraftMaterialUnitV1(kind: .hide,
             properties: MaterialProperties(hardness: 44, flexibility: 71),
             grade: 68, source: "marsh prowler", qualifier: "supple")
         var base = BaseState.newGame()
@@ -379,7 +379,7 @@ final class SpilloverTests: XCTestCase {
             BaseState.self, from: JSONSerialization.data(withJSONObject: object))
 
         XCTAssertTrue(migrated.spillover.isEmpty)
-        XCTAssertEqual(migrated.materialReserve.units.map(\.sample), [sample])
+        XCTAssertEqual(migrated.worldMaterialReserve.units.map(\.sample), [sample])
         XCTAssertEqual(migrated.inventory.stacks.count, 0)
     }
 

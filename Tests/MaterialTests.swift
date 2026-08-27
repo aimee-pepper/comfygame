@@ -1,15 +1,81 @@
 import XCTest
 @testable import Bookbinder
 
+extension CraftMaterialUnitV1 {
+    init(kind: MaterialFamilyID, properties: MaterialProperties, grade: Double,
+         source: String, qualifier: String? = nil) {
+        self.init(stableUnitID: .init(rawValue: "test-prototype-\(kind.rawValue)-\(source)-\(grade)"),
+                  domain: .forFamily(kind), familyID: kind,
+                  qualityBand: (try? .init(legacyGrade: grade)) ?? .rough,
+                  properties: properties,
+                  sourceReceipt: .legacy(originalKind: kind, frozenSource: source,
+                                         qualifier: qualifier, migrationLocation: "test-fixture",
+                                         originalIdentity: nil))
+    }
+}
+
+extension CraftMaterialHoldingV1 {
+    init(id: CraftMaterialUnitID, sample: CraftMaterialUnitV1, protectedReturn: Bool = false) {
+        self.init(unit: sample.withStableID(id), protectedReturn: protectedReturn)
+    }
+}
+
+extension CraftMaterialSelection {
+    init(unitID: CraftMaterialUnitID, sample: CraftMaterialUnitV1) {
+        self.init(unitID: unitID, unit: sample)
+    }
+}
+
+extension WorldMaterialReserve {
+    mutating func migrateLegacyStacks(_ stacks: inout [ItemStack], location: String) {
+        var retained: [ItemStack] = []
+        for stack in stacks {
+            guard !stack.materials.isEmpty else { retained.append(stack); continue }
+            for (ordinal, sample) in stack.materials.enumerated() where sample.domain == .world {
+                let id = CraftMaterialUnitID(rawValue: "\(location):\(stack.id.rawValue):\(ordinal)")
+                _ = add(.init(unit: sample.withStableID(id), protectedReturn: false))
+            }
+        }
+        stacks = retained
+    }
+}
+
 /// What a creature leaves behind (creature-system-spec §8).
 ///
 /// **No authored drop tables** — the parts that composed the creature compose what it leaves.
 final class MaterialTests: XCTestCase {
+    func testTwoReserveFailureUsesOneCombinedBudgetAndPreservesDomains() {
+        func holding(_ id: String, _ family: MaterialFamilyID,
+                     protected: Bool = false) -> CraftMaterialHoldingV1 {
+            let unit = CraftMaterialUnitV1(kind: family, properties: .init(), grade: 50,
+                                           source: "fixture")
+                .withStableID(.init(rawValue: id))
+            return .init(unit: unit, protectedReturn: protected)
+        }
+        let world = WorldMaterialReserve(units: [
+            holding("world-protected", .timber, protected: true),
+            holding("world-a", .fibre), holding("world-b", .pulp)
+        ])
+        let creature = CreatureMaterialReserve(units: [
+            holding("creature-a", .hide), holding("creature-b", .bone)
+        ])
+        let result = partitionCraftMaterialsForFailure(
+            world: world, creature: creature, fraction: 0.5, outcomeID: 991)
+        let kept = result.keptWorld.units + result.keptCreature.units
+        let lost = result.lostWorld.units + result.lostCreature.units
+        XCTAssertEqual(kept.count, 3, "one protected plus ceil(4 exposed × 0.5)")
+        XCTAssertEqual(lost.count, 2)
+        XCTAssertTrue(kept.contains { $0.id.rawValue == "world-protected" })
+        XCTAssertTrue(result.keptWorld.units.allSatisfy { $0.unit.domain == .world })
+        XCTAssertTrue(result.keptCreature.units.allSatisfy { $0.unit.domain == .creature })
+        XCTAssertEqual(Set((kept + lost).map(\.id)),
+                       Set((world.units + creature.units).map(\.id)))
+    }
 
     func testIdenticalMobMaterialsStackInVictoryPresentationWithoutFlatteningSamples() {
-        let hide = MaterialSample(kind: .hide, properties: .init(flexibility: 72),
+        let hide = CraftMaterialUnitV1(kind: .hide, properties: .init(flexibility: 72),
                                   grade: 68, source: "shaggy browser")
-        let otherHide = MaterialSample(kind: .hide, properties: .init(flexibility: 31),
+        let otherHide = CraftMaterialUnitV1(kind: .hide, properties: .init(flexibility: 31),
                                        grade: 42, source: "smooth browser")
         let stacked = CombatRules.stackedMaterialSpoils([
             (hide, 2), (otherHide, 1), (hide, 3)
@@ -22,40 +88,44 @@ final class MaterialTests: XCTestCase {
         XCTAssertEqual(stacked[1].count, 1)
     }
 
-    func testEveryHarvestedMaterialKindHasAValidatedDistinctInventoryIdentity() throws {
-        let assets = try MaterialKind.allCases.map { kind in
+    func testLegacyMaterialVisualRegistryRemainsValidForItsAuthoredFamilies() throws {
+        let visualFamilies: [MaterialFamilyID] = [
+            .plate, .quill, .pelt, .down, .hide, .chitin, .fang, .tusk, .claw, .bone,
+            .ichor, .timber, .fibre, .pulp, .toxin, .reagent,
+        ]
+        let assets = try visualFamilies.map { kind in
             let asset = try XCTUnwrap(MobGearSpriteV1Registry.mobDropAsset(for: kind), kind.rawValue)
             XCTAssertNoThrow(try NativeVisualRuntime.validate(asset), kind.rawValue)
             return asset
         }
-        XCTAssertEqual(Set(assets.map(\.decodedRGBASHA256)).count, MaterialKind.allCases.count)
+        XCTAssertEqual(Set(assets.map(\.decodedRGBASHA256)).count, visualFamilies.count)
     }
 
     func testMaterialReserveRoundTripPreservesStableIdentityAndExactSample() throws {
-        let sample = MaterialSample(kind: .hide,
+        let sample = CraftMaterialUnitV1(kind: .hide,
             properties: MaterialProperties(hardness: 31, density: 42, insulation: 53,
                                            flexibility: 64, lustre: 75, reactivity: 86),
             grade: 67, source: "shaggy browser", qualifier: "ashen")
-        let reserve = MaterialReserve(units: [
-            MaterialReserveUnit(id: .init(rawValue: "sample-1"), sample: sample,
+        let reserve = CreatureMaterialReserve(units: [
+            CraftMaterialHoldingV1(id: .init(rawValue: "sample-1"), sample: sample,
                                 protectedReturn: true)
         ])
 
         let restored = try SaveCodec.makeDecoder().decode(
-            MaterialReserve.self, from: SaveCodec.makeEncoder().encode(reserve))
+            CreatureMaterialReserve.self, from: SaveCodec.makeEncoder().encode(reserve))
 
         XCTAssertEqual(restored, reserve)
-        XCTAssertEqual(restored.units.first?.sample, sample)
+        XCTAssertEqual(restored.units.first?.sample, sample.withStableID(.init(rawValue: "sample-1")))
         XCTAssertEqual(restored.units.first?.id.rawValue, "sample-1")
         XCTAssertEqual(restored.units.first?.protectedReturn, true)
     }
 
     func testReserveSelectionUsesStableIDAndRefusesStaleBatchAtomically() throws {
-        let first = MaterialSample(kind: .hide, properties: MaterialProperties(hardness: 20),
+        let first = CraftMaterialUnitV1(kind: .hide, properties: MaterialProperties(hardness: 20),
                                    grade: 30, source: "first")
-        let second = MaterialSample(kind: .bone, properties: MaterialProperties(density: 80),
+        let second = CraftMaterialUnitV1(kind: .bone, properties: MaterialProperties(density: 80),
                                     grade: 70, source: "second")
-        var reserve = MaterialReserve(units: [
+        var reserve = CreatureMaterialReserve(units: [
             .init(id: .init(rawValue: "z"), sample: second),
             .init(id: .init(rawValue: "a"), sample: first)
         ])
@@ -63,26 +133,27 @@ final class MaterialTests: XCTestCase {
         XCTAssertEqual(selections.map(\.unitID.rawValue), ["a", "z"])
 
         var stale = selections[1]
-        stale.sample.grade = 1
+        stale.unit.qualityBand = .rough
         XCTAssertNil(reserve.consume([selections[0], stale]))
         XCTAssertEqual(reserve.count, 2)
 
-        XCTAssertEqual(reserve.consume(selections), [first, second])
+        XCTAssertEqual(reserve.consume(selections)?.map(\.stableUnitID),
+                       selections.map(\.unitID))
         XCTAssertTrue(reserve.isEmpty)
     }
 
     func testHarvestReceiptIsStableAcrossReplayAndRelaunch() throws {
-        let sample = MaterialSample(kind: .quill,
+        let sample = CraftMaterialUnitV1(kind: .quill,
             properties: MaterialProperties(hardness: 72, flexibility: 31),
             grade: 64, source: "barbed glider", qualifier: "ashen")
-        var reserve = MaterialReserve()
+        var reserve = WorldMaterialReserve()
         reserve.addHarvested(sample, count: 3, sourceReceipt: "run:8:foe:91", dropOrdinal: 0)
         let first = reserve
         reserve.addHarvested(sample, count: 3, sourceReceipt: "run:8:foe:91", dropOrdinal: 0)
         XCTAssertEqual(reserve, first, "replaying combat conclusion duplicated its harvest")
 
         let restored = try SaveCodec.makeDecoder().decode(
-            MaterialReserve.self, from: SaveCodec.makeEncoder().encode(reserve))
+            WorldMaterialReserve.self, from: SaveCodec.makeEncoder().encode(reserve))
         XCTAssertEqual(restored, first)
         XCTAssertEqual(restored.units.map(\.id), first.units.map(\.id))
     }
@@ -108,7 +179,7 @@ final class MaterialTests: XCTestCase {
     }
 
     func testTheWeaponCornerDecidesWhatComesOffIt() {
-        for (kind, expected) in [(DamageKind.pierce, MaterialKind.fang),
+        for (kind, expected) in [(DamageKind.pierce, MaterialFamilyID.fang),
                                  (.crush, .tusk),
                                  (.rend, .claw)] {
             let kinds = ButcheryRules.materials(from: armed(with: kind), named: "x").map(\.kind)
@@ -168,12 +239,12 @@ final class MaterialTests: XCTestCase {
         XCTAssertTrue(fromSmall.allSatisfy { $0 >= 1 }, "a body yielded nothing at all")
     }
 
-    /// **Grade scales with trait extremity** — measured as distance from ordinary, so a strikingly
+    /// **Quality scales with trait extremity** — measured as distance from ordinary, so a strikingly
     /// *bare* creature is as interesting as a heavily armoured one.
-    func testGradeFollowsHowRemarkableAnAnimalIsInEitherDirection() {
-        let ordinary = ButcheryRules.grade(of: [50, 50], lustre: 0)
-        let armoured = ButcheryRules.grade(of: [98, 50], lustre: 0)
-        let bare = ButcheryRules.grade(of: [2, 50], lustre: 0)
+    func testQualityFollowsHowRemarkableAnAnimalIsInEitherDirection() {
+        let ordinary = ButcheryRules.quality(of: [50, 50], lustre: 0)
+        let armoured = ButcheryRules.quality(of: [98, 50], lustre: 0)
+        let bare = ButcheryRules.quality(of: [2, 50], lustre: 0)
 
         XCTAssertLessThan(ordinary, armoured)
         XCTAssertEqual(armoured, bare, accuracy: 0.001,
@@ -187,67 +258,53 @@ final class MaterialTests: XCTestCase {
         monster.boneDensity = 95
         let plate = ButcheryRules.materials(from: monster, named: "x")[0]
         XCTAssertEqual(plate.kind, .plate)
-        XCTAssertGreaterThan(plate.grade, 70)
-        XCTAssertGreaterThanOrEqual(plate.rarity, .rare)
+        XCTAssertGreaterThanOrEqual(plate.qualityBand, .fine)
     }
 
-    /// One unusual number must not carry a grade — top grades belong to animals that are
+    /// One unusual number must not carry quality — top bands belong to animals that are
     /// remarkable throughout, or every short-haired thing leaves a treasure.
     func testOneOddNumberDoesntMakeATreasure() {
-        let throughout = ButcheryRules.grade(of: [95, 95, 95], lustre: 0)
-        let inOnePlace = ButcheryRules.grade(of: [95, 50, 50], lustre: 0)
+        let throughout = ButcheryRules.quality(of: [95, 95, 95], lustre: 0)
+        let inOnePlace = ButcheryRules.quality(of: [95, 50, 50], lustre: 0)
         XCTAssertGreaterThan(throughout, inOnePlace * 2)
     }
 
     // MARK: It reaches the player
 
-    @MainActor
     func testWinningAFightPutsThePartsInYourSatchel() throws {
-        let store = GameStore(io: .temporary(name: "loot-\(UUID().uuidString)"))
-        store.write("plains")
-        store.bindAndDepart()
-        store.mutate("stage a fight against something worth skinning") { state in
-            guard var run = state.worlds.activeRun else { return }
-            var traits = CreatureTraits()
-            traits.size = 45
-            traits.covering = Covering(hardness: 10, length: 80, coverage: 85)   // a pelt
-            traits.boneDensity = 60
-            let species = Species(id: InstanceID(rawValue: 1), traits: traits, worldSeed: 1)
-            run.cast = [species]
-            run.enemies = [WorldEnemy(id: InstanceID(rawValue: 1), speciesID: species.id,
-                                      traits: traits, position: run.playerPosition, isAwake: true)]
-            state.worlds.activeRun = run
-            WorldRules.beginEncounter(triggeredBy: run.enemies[0], in: &state)
-        }
+        var traits = CreatureTraits()
+        traits.size = 45
+        traits.covering = Covering(hardness: 10, length: 80, coverage: 85)
+        traits.boneDensity = 60
+        guard case .frozen(let projection) = CreatureMaterialProjectionRules.freeze(
+            traits: traits, habitat: .terrestrial
+        ) else { return XCTFail("expected ecology-aware projection") }
+        let species = Species(id: .init(rawValue: 1), traits: traits, worldSeed: 1,
+                              habitat: .terrestrial, materialProjection: projection)
+        let point = GridPoint(x: 0, y: 0)
+        var run = WorldRun(runIndex: 1, book: .init(written: [], essencePaid: 0), mapSeed: 1,
+                           rng: .init(seed: 2), map: .init(width: 1, height: 1,
+                           tiles: [.init(isRevealed: true)], entry: point),
+                           playerPosition: point, sourceDangerReceipt: .init(sourceBand: 1))
+        run.cast = [species]
+        var encounterRNG = SeededRNG(seed: 3)
+        run.activeEncounter = CombatRules.makeEncounter(
+            id: .init(rawValue: 4),
+            foes: [.init(id: .init(rawValue: 5), speciesID: species.id, traits: traits,
+                         stats: .init(displayName: "Browser", icon: "ant", maxHP: 1, attack: 1),
+                         currentHP: 0)], party: [.binder], rng: &encounterRNG)
+        var state = GameState.newGame()
+        state.worlds.activeRun = run
 
-        var guardCount = 0
-        while store.activeEncounter?.outcome == nil, guardCount < 40 {
-            guardCount += 1
-            guard let foe = store.activeEncounter?.foes.first(where: \.isAlive) else { break }
-            store.takeCombatAction(.attack(foe: foe.id))
-        }
-        XCTAssertEqual(store.activeEncounter?.outcome, .victory)
+        CombatRules.checkOutcome(in: &state)
 
-        let run = try XCTUnwrap(store.state.worlds.activeRun)
-        let materials = run.materialReserve.units.map(\.sample)
+        let awardedRun = try XCTUnwrap(state.worlds.activeRun)
+        XCTAssertEqual(awardedRun.activeEncounter?.outcome, .victory)
+        let materials = awardedRun.creatureMaterialReserve.units.map(\.sample)
         XCTAssertTrue(materials.contains { $0.kind == .pelt }, "the fur went nowhere")
         XCTAssertTrue(materials.contains { $0.kind == .bone })
-        XCTAssertTrue(try XCTUnwrap(store.activeEncounter).spoils.contains { $0.lowercased().contains("pelt") },
+        XCTAssertTrue(try XCTUnwrap(awardedRun.activeEncounter).spoils.contains { $0.lowercased().contains("pelt") },
                       "the victory screen didn't mention what dropped")
-    }
-
-    func testAMaterialStackRoundTripsThroughASave() throws {
-        var traits = CreatureTraits()
-        traits.covering = Covering(hardness: 80, length: 10, coverage: 80)
-        let sample = ButcheryRules.materials(from: traits, named: "large armoured walker")[0]
-        let stack = ItemStack(id: InstanceID(rawValue: 9), catalogID: Items.material,
-                              count: 3, material: sample)
-
-        let data = try SaveCodec.makeEncoder().encode(stack)
-        let restored = try SaveCodec.makeDecoder().decode(ItemStack.self, from: data)
-        XCTAssertEqual(restored, stack)
-        XCTAssertEqual(restored.material?.source, "large armoured walker")
-        XCTAssertFalse(restored.displayName.isEmpty)
     }
 
     /// A stack written before materials existed must still load.

@@ -83,9 +83,9 @@ enum SmithRules {
 
     /// One sample on the shelf that would satisfy a requirement, and where it lives.
     struct Candidate: Equatable, Sendable {
-        var sample: MaterialSample
+        var sample: CraftMaterialUnitV1
         var value: Double
-        var reserveSelection: MaterialReserveSelection
+        var reserveSelection: CraftMaterialSelection
         var stockKey: String { reserveSelection.unitID.rawValue }
     }
 
@@ -96,15 +96,14 @@ enum SmithRules {
     /// happened to be in the same bin would make you afraid to use the smith at all. It spends what
     /// clears the bar and leaves the rest of the hoard alone.
     static func candidates(for requirement: Requirement, in state: GameState) -> [Candidate] {
-        state.base.materialReserve.selections { sample in
+        state.base.craftMaterialSelections { sample in
             sample.properties[requirement.property] >= requirement.minimum
         }.map { selection in
             Candidate(sample: selection.sample,
                       value: selection.sample.properties[requirement.property],
                       reserveSelection: selection)
         }.sorted {
-            ($0.value, $0.sample.grade, $0.stockKey)
-                < ($1.value, $1.sample.grade, $1.stockKey)
+            ($0.value, $0.stockKey) < ($1.value, $1.stockKey)
         }
     }
 
@@ -140,7 +139,7 @@ enum SmithRules {
     @discardableResult
     static func consume(_ spending: [Candidate], in state: inout GameState) -> Bool {
         guard Set(spending.map(\.stockKey)).count == spending.count else { return false }
-        return state.base.materialReserve.consume(spending.map(\.reserveSelection)) != nil
+        return state.base.consumeCraftMaterials(spending.map(\.reserveSelection)) != nil
     }
 
     private static func pay(_ requirement: Requirement, in state: inout GameState) -> Bool {

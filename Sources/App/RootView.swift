@@ -775,7 +775,7 @@ struct RunExitSummaryView: View {
                 receiptDisposition(line)
             case .materialSample(let material):
                 LabeledContent("Kind", value: material.sample.kind.displayName)
-                LabeledContent("Grade", value: "\(material.sample.grade)")
+                LabeledContent("Quality", value: material.sample.qualityBand.displayName)
                 LabeledContent("Source", value: material.sample.source)
                 receiptDisposition(line)
             case .legacy(let legacy):
@@ -936,7 +936,7 @@ private struct LegacyReceiptIconTile: View {
 private struct RunExitUnrecordedItemTile: View {
     let icon: String
     let catalogueID: ItemID?
-    let materialKind: MaterialKind?
+    let materialKind: MaterialFamilyID?
     let rarity: Rarity
     let quantity: Int
     let identified: Bool
@@ -949,7 +949,7 @@ private struct RunExitUnrecordedItemTile: View {
             RoundedRectangle(cornerRadius: 9)
                 .strokeBorder(rarity.tint.opacity(0.72), lineWidth: 1.5)
             if let materialKind {
-                MaterialSamplePixelIdentity(kind: materialKind,
+                CraftMaterialUnitPixelIdentity(kind: materialKind,
                                             fallbackColor: identified ? rarity.tint : .secondary)
                     .frame(width: 32, height: 32)
             } else {

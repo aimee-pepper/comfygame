@@ -10,13 +10,13 @@ enum DistilleryRules {
     struct AttunementRequirement: Sendable {
         let essence: Int
         let catalysts: [(resource: ResourceID, amount: Int)]
-        let allowedKinds: Set<MaterialKind>?
+        let allowedKinds: Set<MaterialFamilyID>?
         let minimumReactivity: Double?
         let minimumInsulation: Double?
         let minimumLustre: Double?
         let minimumHardness: Double?
 
-        func accepts(_ sample: MaterialSample) -> Bool {
+        func accepts(_ sample: CraftMaterialUnitV1) -> Bool {
             if let allowedKinds, !allowedKinds.contains(sample.kind) { return false }
             if let minimumReactivity, sample.properties.reactivity < minimumReactivity { return false }
             if let minimumInsulation, sample.properties.insulation < minimumInsulation { return false }
@@ -47,11 +47,12 @@ enum DistilleryRules {
     }
 
     struct Candidate: Equatable, Identifiable, Sendable {
+        var attunement: CoreAttunement
         var binID: InstanceID
         var sampleIndex: Int
-        var sample: MaterialSample
+        var sample: CraftMaterialUnitV1
         var relevantProperty: Double
-        var reserveSelection: MaterialReserveSelection? = nil
+        var reserveSelection: CraftMaterialSelection? = nil
         var id: String { reserveSelection?.unitID.rawValue ?? "\(binID.rawValue)-\(sampleIndex)" }
     }
 
@@ -67,14 +68,13 @@ enum DistilleryRules {
 
     static func candidates(for attunement: CoreAttunement, in state: GameState) -> [Candidate] {
         let requirement = requirement(for: attunement)
-        let reserve = state.base.materialReserve.selections { requirement.accepts($0) }.map { quote in
+        let reserve = state.base.craftMaterialSelections { requirement.accepts($0) }.map { quote in
             let relevant = attunement == .light ? quote.sample.properties.lustre
                                                 : quote.sample.properties.reactivity
-            return Candidate(binID: .init(rawValue: 0), sampleIndex: 0, sample: quote.sample,
+            return Candidate(attunement: attunement, binID: .init(rawValue: 0), sampleIndex: 0, sample: quote.sample,
                              relevantProperty: relevant, reserveSelection: quote)
         }
-        return reserve.sorted { ($0.sample.grade, $0.relevantProperty, $0.id)
-            < ($1.sample.grade, $1.relevantProperty, $1.id) }
+        return reserve.sorted { (potency(for: $0), $0.id) < (potency(for: $1), $1.id) }
     }
 
     static func catalystOptions(for attunement: CoreAttunement) -> [(ResourceID, Int)] {
@@ -82,7 +82,12 @@ enum DistilleryRules {
     }
 
     static func potency(for candidate: Candidate) -> Int {
-        Int((candidate.sample.grade * 0.7 + candidate.relevantProperty * 0.3).rounded())
+        let properties = candidate.sample.properties
+        return switch candidate.attunement {
+        case .heat: Int((0.65 * properties.reactivity + 0.35 * properties.insulation).rounded())
+        case .caustic: Int(properties.reactivity.rounded())
+        case .light: Int((0.65 * properties.lustre + 0.35 * properties.hardness).rounded())
+        }
     }
 
     static func canAttune(_ attunement: CoreAttunement, candidate: Candidate,
@@ -180,6 +185,6 @@ enum DistilleryRules {
 
     @discardableResult private static func remove(candidate: Candidate, from base: inout BaseState) -> Bool {
         guard let reserve = candidate.reserveSelection else { return false }
-        return base.materialReserve.consume([reserve]) != nil
+        return base.consumeCraftMaterials([reserve]) != nil
     }
 }

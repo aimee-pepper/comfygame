@@ -113,9 +113,11 @@ struct TradingPostView: View {
         .navigationBarTitleDisplayMode(.inline)
     }
 
-    private var materialGroups: [(kind: MaterialKind, selections: [MaterialReserveSelection])] {
-        MaterialKind.allCases.compactMap { kind in
-            let selections = store.state.base.materialReserve.selections { $0.kind == kind }
+    private var materialGroups: [(kind: MaterialFamilyID, selections: [CraftMaterialSelection])] {
+        MaterialFamilyID.allCases.compactMap { kind in
+            let selections = store.state.base.craftMaterialSelections {
+                $0.kind == kind && TradingPostRules.materialSaleUnitPrice(for: $0) != nil
+            }
             return selections.isEmpty ? nil : (kind, selections)
         }
     }
@@ -127,14 +129,15 @@ struct TradingPostView: View {
                 DisclosureGroup("\(group.kind.displayName) · \(group.selections.count)") {
                     VStack(spacing: 8) {
                         ForEach(group.selections, id: \.unitID) { selection in
+                            let unitPrice = TradingPostRules.materialSaleUnitPrice(for: selection.sample)!
                             let listing = TradingPostMaterialListing(
                                 selection: selection,
                                 revision: store.state.base.tradingPost.inventoryRevision,
-                                unitPrice: TradingPostRules.materialSaleUnitPrice(for: selection.sample)
+                                unitPrice: unitPrice
                             )
                             AnchoredItemDetailButton(item: listing, selection: $openedMaterial) {
                                 HStack(spacing: 10) {
-                                    MaterialSamplePixelIdentity(kind: selection.sample.kind,
+                                    CraftMaterialUnitPixelIdentity(kind: selection.sample.kind,
                                                                 fallbackColor: selection.sample.rarity.tint)
                                         .frame(width: 32, height: 32)
                                     VStack(alignment: .leading, spacing: 2) {
@@ -143,7 +146,7 @@ struct TradingPostView: View {
                                             .font(.caption).foregroundStyle(.secondary)
                                     }
                                     Spacer()
-                                    Text("+\(TradingPostRules.materialSaleUnitPrice(for: selection.sample)) gold")
+                                    Text("+\(unitPrice) gold")
                                         .font(.subheadline.monospacedDigit())
                                 }
                                 .frame(minHeight: 44)
@@ -330,10 +333,10 @@ struct TradingPostView: View {
 }
 
 private struct TradingPostMaterialListing: Identifiable {
-    let selection: MaterialReserveSelection
+    let selection: CraftMaterialSelection
     let revision: UInt64
     let unitPrice: Int
-    var id: MaterialReserveUnitID { selection.unitID }
+    var id: CraftMaterialUnitID { selection.unitID }
 
     var preview: TradingPostRules.MaterialSalePreview {
         .init(revision: revision, selections: [selection], unitPrices: [unitPrice], goldTotal: unitPrice)
@@ -358,7 +361,7 @@ private struct TradingPostMaterialSaleSheet: View {
             List {
                 Section("Exact resource unit") {
                     LabeledContent("Kind", value: listing.selection.sample.kind.displayName)
-                    LabeledContent("Grade", value: listing.selection.sample.grade.formatted(.number.precision(.fractionLength(0...1))))
+                    LabeledContent("Quality", value: listing.selection.sample.qualityBand.displayName)
                     LabeledContent("Source", value: listing.selection.sample.source.isEmpty ? "Unknown" : listing.selection.sample.source)
                     LabeledContent("Qualifier", value: listing.selection.sample.qualifier ?? "None")
                     LabeledContent("Value", value: "+\(price) gold")
@@ -604,11 +607,13 @@ struct P3TradingMaterialDebugHost: View {
     @EnvironmentObject private var store: GameStore
     let failure: TradingPostCommitResult?
     var body: some View {
-        if let selection = store.state.base.materialReserve.selections().first {
+        if let selection = store.state.base.craftMaterialSelections().first(where: {
+            TradingPostRules.materialSaleUnitPrice(for: $0.sample) != nil
+        }), let unitPrice = TradingPostRules.materialSaleUnitPrice(for: selection.sample) {
             TradingPostMaterialSaleSheet(listing: .init(
                 selection: selection,
                 revision: store.state.base.tradingPost.inventoryRevision,
-                unitPrice: TradingPostRules.materialSaleUnitPrice(for: selection.sample)),
+                unitPrice: unitPrice),
                 debugFailure: failure)
         }
     }

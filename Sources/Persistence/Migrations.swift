@@ -47,11 +47,351 @@ enum Migrations {
         case 3: return try migrate3to4(data)
         case 4: return try migrate4to5(data)
         case 5: return try migrate5to6(data)
+        case 6: return try migrate6to7(data)
         default:
             // No migration registered. Tolerant decoding is the fallback; if the save is genuinely
             // incompatible, `SaveFileIO.load()` quarantines it rather than losing it.
             return data
         }
+    }
+
+    /// Replaces the mixed continuous-grade material graph with two exact domain reserves and
+    /// immutable six-band units before any schema-7 model is constructed.
+    private static func migrate6to7(_ data: Data) throws -> Data {
+        guard var root = try JSONSerialization.jsonObject(with: data) as? [String: Any] else {
+            throw CocoaError(.coderInvalidValue)
+        }
+        let creatureFamilies: Set<String> = [
+            "plate", "quill", "pelt", "down", "hide", "chitin", "feather", "fin",
+            "scale", "oil", "shell", "horn", "venom", "fang", "tusk", "claw", "bone", "ichor",
+        ]
+        let worldFamilies: Set<String> = ["timber", "fibre", "pulp", "toxin", "reagent"]
+
+        func integerGrade(_ value: Any?) throws -> Double {
+            guard let number = value as? NSNumber,
+                  CFGetTypeID(number) != CFBooleanGetTypeID(), number.doubleValue.isFinite,
+                  (0...100).contains(number.doubleValue) else { throw CocoaError(.coderInvalidValue) }
+            return number.doubleValue
+        }
+        func stableHash(_ text: String) -> UInt64 {
+            var hash: UInt64 = 0xcbf29ce484222325
+            for byte in text.utf8 { hash ^= UInt64(byte); hash = hash &* 0x100000001b3 }
+            return hash
+        }
+        func rawInstanceID(_ value: Any?) throws -> String {
+            guard let value else { return "none" }
+            if let object = value as? [String: Any] {
+                if let string = object["rawValue"] as? String, !string.isEmpty { return string }
+                if let number = object["rawValue"] as? NSNumber,
+                   CFGetTypeID(number) != CFBooleanGetTypeID(), number.doubleValue.rounded() == number.doubleValue,
+                   number.doubleValue >= 0 { return number.stringValue }
+            }
+            throw CocoaError(.coderInvalidValue)
+        }
+        func unitJSON(sample: [String: Any], location: String, identity: String) throws -> Any {
+            let allowed = Set(["kind", "properties", "grade", "source", "qualifier"])
+            guard Set(sample.keys).isSubset(of: allowed),
+                  let familyRaw = sample["kind"] as? String,
+                  let family = MaterialFamilyID(rawValue: familyRaw),
+                  let propertiesValue = sample["properties"],
+                  let source = sample["source"] as? String else { throw CocoaError(.coderInvalidValue) }
+            let domain: CraftMaterialDomain
+            if creatureFamilies.contains(familyRaw) { domain = .creature }
+            else if worldFamilies.contains(familyRaw) { domain = .world }
+            else { throw CocoaError(.coderInvalidValue) }
+            let grade = try integerGrade(sample["grade"])
+            let properties = try SaveCodec.makeDecoder().decode(
+                MaterialProperties.self,
+                from: JSONSerialization.data(withJSONObject: propertiesValue))
+            guard properties.values.allSatisfy({ $0.isFinite && (0...100).contains($0) }) else {
+                throw CocoaError(.coderInvalidValue)
+            }
+            let qualifier: String?
+            if sample.keys.contains("qualifier") {
+                if sample["qualifier"] is NSNull { qualifier = nil }
+                else if let value = sample["qualifier"] as? String { qualifier = value }
+                else { throw CocoaError(.coderInvalidValue) }
+            } else { qualifier = nil }
+            let id = CraftMaterialUnitID(rawValue:
+                "legacy-\(String(stableHash("\(location)|\(identity)|\(familyRaw)|\(grade.bitPattern)"), radix: 16))")
+            let unit = CraftMaterialUnitV1(
+                stableUnitID: id, domain: domain, familyID: family,
+                qualityBand: try .init(legacyGrade: grade), properties: properties,
+                sourceReceipt: .legacy(.init(originalKind: family, frozenSource: source,
+                    qualifier: qualifier, migrationLocation: location, originalIdentity: identity)))
+            return try JSONSerialization.jsonObject(with: SaveCodec.makeEncoder().encode(unit))
+        }
+        func migrateReserve(_ value: Any?, location: String) throws
+            -> (world: [[String: Any]], creature: [[String: Any]]) {
+            guard let object = value as? [String: Any],
+                  Set(object.keys) == ["units"], let units = object["units"] as? [[String: Any]] else {
+                if value == nil { return ([], []) }
+                throw CocoaError(.coderInvalidValue)
+            }
+            var world: [[String: Any]] = [], creature: [[String: Any]] = []
+            var ids = Set<String>()
+            for (ordinal, holding) in units.enumerated() {
+                guard Set(holding.keys).isSubset(of: ["id", "sample", "protectedReturn"]),
+                      let sample = holding["sample"] as? [String: Any] else {
+                    throw CocoaError(.coderInvalidValue)
+                }
+                let oldID = try rawInstanceID(holding["id"])
+                guard ids.insert(oldID).inserted else { throw CocoaError(.coderInvalidValue) }
+                guard var unit = try unitJSON(sample: sample, location: location,
+                                              identity: "reserve:\(oldID):\(ordinal)") as? [String: Any]
+                else { throw CocoaError(.coderInvalidValue) }
+                unit["stableUnitID"] = holding["id"]
+                let migrated: [String: Any] = [
+                    "unit": unit,
+                    "protectedReturn": holding["protectedReturn"] as? Bool ?? false,
+                ]
+                if unit["domain"] as? String == CraftMaterialDomain.world.rawValue { world.append(migrated) }
+                else { creature.append(migrated) }
+            }
+            return (world, creature)
+        }
+        func migrateOwner(_ value: Any, location: String) throws -> Any {
+            guard var owner = value as? [String: Any] else { throw CocoaError(.coderInvalidValue) }
+            guard owner["worldMaterialReserve"] == nil, owner["creatureMaterialReserve"] == nil else {
+                throw CocoaError(.coderInvalidValue)
+            }
+            var split = try migrateReserve(owner.removeValue(forKey: "materialReserve"), location: location)
+
+            func migrateStack(_ value: [String: Any], stackLocation: String,
+                              liveHolding: Bool) throws -> (stack: [String: Any]?, world: [[String: Any]], creature: [[String: Any]]) {
+                var stack = value
+                let stackID = try rawInstanceID(stack["id"])
+                var samples: [[String: Any]] = []
+                if stack.keys.contains("materials") {
+                    guard let values = stack.removeValue(forKey: "materials") as? [[String: Any]] else {
+                        throw CocoaError(.coderInvalidValue)
+                    }
+                    samples = values
+                } else if stack.keys.contains("material") {
+                    guard let value = stack.removeValue(forKey: "material") as? [String: Any] else {
+                        throw CocoaError(.coderInvalidValue)
+                    }
+                    guard let count = stack["count"] as? NSNumber,
+                          CFGetTypeID(count) != CFBooleanGetTypeID(), count.intValue > 0,
+                          Double(count.intValue) == count.doubleValue else { throw CocoaError(.coderInvalidValue) }
+                    samples = Array(repeating: value, count: count.intValue)
+                }
+                var world: [[String: Any]] = [], creature: [[String: Any]] = []
+                if !samples.isEmpty {
+                    guard liveHolding else { throw CocoaError(.coderInvalidValue) }
+                    if let count = stack["count"] as? NSNumber,
+                       (CFGetTypeID(count) == CFBooleanGetTypeID() || count.intValue != samples.count) {
+                        throw CocoaError(.coderInvalidValue)
+                    }
+                    let protected = (stack["protectedReturnCount"] as? NSNumber)?.intValue ?? 0
+                    guard protected >= 0, protected <= samples.count else { throw CocoaError(.coderInvalidValue) }
+                    for (ordinal, sample) in samples.enumerated() {
+                        guard let unit = try unitJSON(sample: sample, location: stackLocation,
+                            identity: "stack:\(stackID):\(ordinal)") as? [String: Any] else {
+                            throw CocoaError(.coderInvalidValue)
+                        }
+                        let holding: [String: Any] = ["unit": unit, "protectedReturn": ordinal < protected]
+                        if unit["domain"] as? String == CraftMaterialDomain.world.rawValue { world.append(holding) }
+                        else { creature.append(holding) }
+                    }
+                    return (nil, world, creature)
+                }
+                if var profile = stack["gearProfile"] as? [String: Any],
+                   let consumed = profile["consumedSamples"] as? [[String: Any]] {
+                    profile["consumedSamples"] = try consumed.enumerated().map { ordinal, sample in
+                        try unitJSON(sample: sample, location: stackLocation,
+                                     identity: "gear:\(stackID):\(ordinal)")
+                    }
+                    stack["gearProfile"] = profile
+                }
+                return (stack, world, creature)
+            }
+
+            func migrateInventory(_ value: Any, inventoryLocation: String) throws
+                -> (inventory: [String: Any], world: [[String: Any]], creature: [[String: Any]]) {
+                guard var inventory = value as? [String: Any],
+                      let stacks = inventory["stacks"] as? [[String: Any]] else {
+                    throw CocoaError(.coderInvalidValue)
+                }
+                var kept: [[String: Any]] = [], world: [[String: Any]] = [], creature: [[String: Any]] = []
+                for (ordinal, stack) in stacks.enumerated() {
+                    let migrated = try migrateStack(stack,
+                        stackLocation: "\(inventoryLocation).stacks[\(ordinal)]", liveHolding: true)
+                    if let stack = migrated.stack { kept.append(stack) }
+                    world += migrated.world; creature += migrated.creature
+                }
+                inventory["stacks"] = kept
+                return (inventory, world, creature)
+            }
+
+            func migrateEquippedPiece(_ value: Any, pieceLocation: String) throws -> Any {
+                guard var piece = value as? [String: Any] else { return value }
+                if var profile = piece["gearProfile"] as? [String: Any],
+                   let samples = profile["consumedSamples"] as? [[String: Any]] {
+                    profile["consumedSamples"] = try samples.enumerated().map { ordinal, sample in
+                        try unitJSON(sample: sample, location: pieceLocation,
+                                     identity: "consumed:\(ordinal)")
+                    }
+                    piece["gearProfile"] = profile
+                }
+                return piece
+            }
+
+            if let equipped = owner["binderEquipped"] as? [String: Any] {
+                owner["binderEquipped"] = try equipped.mapValues {
+                    try migrateEquippedPiece($0, pieceLocation: "\(location).binderEquipped")
+                }
+            }
+            if let roster = owner["roster"] as? [[String: Any]] {
+                owner["roster"] = try roster.enumerated().map { memberIndex, value in
+                    var member = value
+                    if let equipped = member["equipped"] as? [String: Any] {
+                        member["equipped"] = try equipped.mapValues {
+                            try migrateEquippedPiece(
+                                $0, pieceLocation: "\(location).roster[\(memberIndex)].equipped")
+                        }
+                    }
+                    return member
+                }
+            }
+
+            if let inventoryValue = owner["inventory"] {
+                let migrated = try migrateInventory(inventoryValue, inventoryLocation: "\(location).inventory")
+                owner["inventory"] = migrated.inventory
+                split.world += migrated.world; split.creature += migrated.creature
+            }
+            if let inventoryValue = owner["satchelItems"] {
+                let migrated = try migrateInventory(inventoryValue, inventoryLocation: "\(location).satchelItems")
+                owner["satchelItems"] = migrated.inventory
+                split.world += migrated.world; split.creature += migrated.creature
+            }
+            if let spillover = owner["spillover"] as? [[String: Any]] {
+                var kept: [[String: Any]] = []
+                for (ordinal, stack) in spillover.enumerated() {
+                    let migrated = try migrateStack(stack,
+                        stackLocation: "\(location).spillover[\(ordinal)]", liveHolding: true)
+                    if let stack = migrated.stack { kept.append(stack) }
+                    split.world += migrated.world; split.creature += migrated.creature
+                }
+                owner["spillover"] = kept
+            }
+            if let offered = owner["offeredItems"] as? [[String: Any]] {
+                var kept: [[String: Any]] = []
+                for (ordinal, stack) in offered.enumerated() {
+                    let migrated = try migrateStack(stack,
+                        stackLocation: "\(location).offeredItems[\(ordinal)]", liveHolding: true)
+                    if let stack = migrated.stack { kept.append(stack) }
+                    split.world += migrated.world; split.creature += migrated.creature
+                }
+                owner["offeredItems"] = kept
+            }
+            if var map = owner["map"] as? [String: Any],
+               let tiles = map["tiles"] as? [[String: Any]] {
+                map["tiles"] = try tiles.enumerated().map { tileIndex, value in
+                    var tile = value
+                    if var content = tile["content"] as? [String: Any],
+                       var tagged = content["item"] as? [String: Any],
+                       let stack = tagged["_0"] as? [String: Any] {
+                        let migrated = try migrateStack(
+                            stack, stackLocation: "\(location).map.tiles[\(tileIndex)].content.item",
+                            liveHolding: true)
+                        split.world += migrated.world
+                        split.creature += migrated.creature
+                        if let stack = migrated.stack {
+                            tagged["_0"] = stack
+                            content["item"] = tagged
+                            tile["content"] = content
+                        } else {
+                            tile.removeValue(forKey: "content")
+                        }
+                    }
+                    return tile
+                }
+                owner["map"] = map
+            }
+            if var tradingPost = owner["tradingPost"] as? [String: Any],
+               let stock = tradingPost["stock"] as? [[String: Any]] {
+                tradingPost["stock"] = try stock.enumerated().map { lineIndex, value in
+                    var line = value
+                    guard line["frozenMaterialUnits"] == nil else {
+                        throw CocoaError(.coderInvalidValue)
+                    }
+                    let frozen = line["frozenUnits"] as? [[String: Any]] ?? []
+                    var kept: [[String: Any]] = []
+                    var materialUnits: [[String: Any]] = []
+                    for (unitIndex, stack) in frozen.enumerated() {
+                        let migrated = try migrateStack(
+                            stack,
+                            stackLocation: "\(location).tradingPost.stock[\(lineIndex)].frozenUnits[\(unitIndex)]",
+                            liveHolding: true)
+                        if let stack = migrated.stack { kept.append(stack) }
+                        materialUnits += (migrated.world + migrated.creature).compactMap {
+                            $0["unit"] as? [String: Any]
+                        }
+                    }
+                    guard materialUnits.isEmpty || kept.isEmpty else {
+                        throw CocoaError(.coderInvalidValue)
+                    }
+                    line["frozenUnits"] = kept
+                    line["frozenMaterialUnits"] = materialUnits
+                    return line
+                }
+                owner["tradingPost"] = tradingPost
+            }
+            owner["worldMaterialReserve"] = ["holdings": split.world]
+            owner["creatureMaterialReserve"] = ["holdings": split.creature]
+            return owner
+        }
+        if var base = root["base"] as? [String: Any] {
+            guard let migratedBase = try migrateOwner(base, location: "base") as? [String: Any] else {
+                throw CocoaError(.coderInvalidValue)
+            }
+            base = migratedBase
+            root["base"] = base
+        } else if root.keys.contains("base") {
+            throw CocoaError(.coderInvalidValue)
+        }
+        if var worlds = root["worlds"] as? [String: Any] {
+            if let active = worlds["activeRun"], !(active is NSNull) {
+                worlds["activeRun"] = try migrateOwner(active, location: "worlds.activeRun")
+            }
+            if let realms = worlds["anchoredRealms"] as? [[String: Any]] {
+                worlds["anchoredRealms"] = try realms.enumerated().map { index, value in
+                    var realm = value
+                    if let world = realm["world"] {
+                        realm["world"] = try migrateOwner(
+                            world, location: "worlds.anchoredRealms[\(index)].world")
+                    }
+                    return realm
+                }
+            }
+            if var summary = worlds["lastExit"] as? [String: Any] {
+                for key in ["recoveredLines", "lostLines"] {
+                    if let lines = summary[key] as? [[String: Any]] {
+                        summary[key] = try lines.enumerated().map { lineIndex, value in
+                            var line = value
+                            if var tagged = line["materialSample"] as? [String: Any],
+                               var payload = tagged["_0"] as? [String: Any],
+                               let sample = payload["sample"] as? [String: Any] {
+                                payload["sample"] = try unitJSON(
+                                    sample: sample,
+                                    location: "worlds.lastExit.\(key)[\(lineIndex)]",
+                                    identity: "receipt")
+                                tagged["_0"] = payload
+                                line["materialSample"] = tagged
+                            }
+                            return line
+                        }
+                    }
+                }
+                worlds["lastExit"] = summary
+            } else if worlds.keys.contains("lastExit"), !(worlds["lastExit"] is NSNull) {
+                throw CocoaError(.coderInvalidValue)
+            }
+            root["worlds"] = worlds
+        }
+        root["schemaVersion"] = 7
+        return try JSONSerialization.data(withJSONObject: root, options: [.sortedKeys])
     }
 
     /// Freezes source danger and explicit once-only creature reward resolution across every run.

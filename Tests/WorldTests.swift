@@ -3972,14 +3972,14 @@ final class WorldTests: XCTestCase {
             return XCTFail("worn exact rank-four pick should qualify")
         }
         XCTAssertEqual(quote.currentPartyExtractionRank, 4)
-        let reserveBefore = state.base.materialReserve
+        let reserveBefore = state.base.worldMaterialReserve
         let outcome = ResourceExtractionRules.commit(quote, in: &state)
         guard case .committed(let success) = outcome.result else {
             return XCTFail("qualified extraction should commit")
         }
         XCTAssertEqual(success.primaryAmount, 5)
         XCTAssertEqual(state.worlds.activeRun?.satchel["adamant"], 5)
-        XCTAssertEqual(state.base.materialReserve, reserveBefore)
+        XCTAssertEqual(state.base.worldMaterialReserve, reserveBefore)
         XCTAssertEqual(success.turnsSpent, 1)
         guard case .node(let exhausted) = state.worlds.activeRun?.map[point].content else {
             return XCTFail("exhausted receipt must remain")
@@ -5527,8 +5527,8 @@ final class WorldTests: XCTestCase {
     @MainActor
     func testAnchorFrameRecipeUsesSixDistinctWeakestQualifyingSamples() throws {
         func sample(hardness: Double = 0, density: Double = 0,
-                    flexibility: Double = 0, reactivity: Double = 0) -> MaterialSample {
-            MaterialSample(kind: .chitin,
+                    flexibility: Double = 0, reactivity: Double = 0) -> CraftMaterialUnitV1 {
+            CraftMaterialUnitV1(kind: .chitin,
                            properties: MaterialProperties(hardness: hardness, density: density,
                                                           flexibility: flexibility, reactivity: reactivity),
                            grade: max(hardness, density, flexibility, reactivity), source: "test world")
@@ -5541,14 +5541,14 @@ final class WorldTests: XCTestCase {
                            sample(density: 65), sample(density: 66),
                            sample(flexibility: 55), sample(reactivity: 65),
                            sample(hardness: 100, density: 100, flexibility: 100, reactivity: 100)]
-            state.base.materialReserve = MaterialReserve(units: samples.enumerated().map { index, sample in
-                MaterialReserveUnit(id: .init(rawValue: "anchor-frame-\(index)"), sample: sample)
+            state.base.worldMaterialReserve = WorldMaterialReserve(units: samples.enumerated().map { index, sample in
+                CraftMaterialHoldingV1(id: .init(rawValue: "anchor-frame-\(index)"), sample: sample)
             })
         }
 
         XCTAssertTrue(store.craftAnchorFrame())
         XCTAssertEqual(store.state.base.essence, 40)
-        XCTAssertEqual(store.state.base.materialReserve.units.map(\.sample.grade), [100],
+        XCTAssertEqual(store.state.base.worldMaterialReserve.units.map(\.sample.qualityBand), [.peerless],
                        "weakest qualifying stock should be consumed first")
         XCTAssertEqual(store.state.base.inventory.stacks.first(where: { $0.catalogID == Items.anchorFrame })?.count, 1)
     }

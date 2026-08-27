@@ -237,9 +237,9 @@ struct RunExitSummary: Codable, Equatable, Identifiable, Sendable {
         struct Material: Codable, Equatable, Sendable {
             var lineID: String
             var sourceStackID: InstanceID?
-            var reserveUnitID: MaterialReserveUnitID? = nil
+            var reserveUnitID: CraftMaterialUnitID? = nil
             var catalogID: ItemID
-            var sample: MaterialSample
+            var sample: CraftMaterialUnitV1
             var identified: Bool
             var fallbackName: String
             var fallbackIcon: String
@@ -1096,8 +1096,9 @@ struct WorldRun: Codable, Equatable, Sendable {
     var satchelItems: Inventory = Inventory(slots: Tuning.Economy.startingInventorySlots)
     /// Physical pages are a separate payload, but each consumes one ordinary satchel slot.
     var carriedWorldPages: [WorldPageInstance] = []
-    /// Exact harvested material haul. This reserve is carried, but never occupies a satchel slot.
-    var materialReserve: MaterialReserve = MaterialReserve()
+    /// Exact slot-free crafting haul, separated permanently by frozen source domain.
+    var worldMaterialReserve: WorldMaterialReserve = WorldMaterialReserve()
+    var creatureMaterialReserve: CreatureMaterialReserve = CreatureMaterialReserve()
     /// Frozen source danger used by deterministic creature-material quality.
     var sourceDangerReceipt: WorldSourceDangerReceiptV1?
     /// Immutable encounter reward receipts retained until Return freezes the outcome.
@@ -1166,7 +1167,8 @@ struct WorldRun: Codable, Equatable, Sendable {
          satchelItems: Inventory = Inventory(slots: Tuning.Economy.startingInventorySlots),
          carriedWorldPages: [WorldPageInstance] = [],
          offeredWorldPages: [WorldPageInstance] = [],
-         materialReserve: MaterialReserve = MaterialReserve(),
+         worldMaterialReserve: WorldMaterialReserve = WorldMaterialReserve(),
+         creatureMaterialReserve: CreatureMaterialReserve = CreatureMaterialReserve(),
          carriedInstruments: Set<PressureTargetID> = [],
          carriedInstrumentPrecisions: [PressureTargetID: RealityState.InstrumentPrecision] = [:],
          partyProgressAtStart: [RunProgressStart] = [],
@@ -1209,7 +1211,8 @@ struct WorldRun: Codable, Equatable, Sendable {
         self.satchelItems = satchelItems
         self.carriedWorldPages = carriedWorldPages
         self.offeredWorldPages = offeredWorldPages
-        self.materialReserve = materialReserve
+        self.worldMaterialReserve = worldMaterialReserve
+        self.creatureMaterialReserve = creatureMaterialReserve
         self.carriedInstruments = carriedInstruments
         self.carriedInstrumentPrecisions = carriedInstrumentPrecisions
         self.partyProgressAtStart = partyProgressAtStart
@@ -1312,8 +1315,13 @@ struct WorldRun: Codable, Equatable, Sendable {
             ?? Inventory(slots: Tuning.Economy.startingInventorySlots)
         carriedWorldPages = try container.decodeIfPresent(
             [WorldPageInstance].self, forKey: .carriedWorldPages) ?? []
-        materialReserve = try container.decodeIfPresent(MaterialReserve.self,
-                                                        forKey: .materialReserve) ?? MaterialReserve()
+        worldMaterialReserve = try container.decode(WorldMaterialReserve.self,
+                                                    forKey: .worldMaterialReserve)
+        creatureMaterialReserve = try container.decode(CreatureMaterialReserve.self,
+                                                       forKey: .creatureMaterialReserve)
+        guard Set(worldMaterialReserve.units.map(\.id)).isDisjoint(
+            with: Set(creatureMaterialReserve.units.map(\.id))
+        ) else { throw CocoaError(.coderInvalidValue) }
         if container.contains(.sourceDangerReceipt) {
             guard try !container.decodeNil(forKey: .sourceDangerReceipt) else {
                 throw CocoaError(.coderInvalidValue)
@@ -1361,8 +1369,6 @@ struct WorldRun: Codable, Equatable, Sendable {
                 remaining[id, default: 0] -= protected
             }
         }
-        materialReserve.migrateLegacyStacks(&satchelItems.stacks, location: "run.satchelItems")
-        materialReserve.migrateLegacyStacks(&offeredItems, location: "run.offeredItems")
         foundPagesAtStart = Set((try container.decodeIfPresent(Set<DiaryPageID>.self,
                                                                 forKey: .foundPagesAtStart) ?? [])
             .map(\.canonicalLegacyID))
@@ -1420,7 +1426,8 @@ extension WorldRun {
         snapshot.satchel = ResourcePool()
         snapshot.satchelItems = Inventory(slots: Tuning.Economy.startingSatchelSlots)
         snapshot.carriedWorldPages = []
-        snapshot.materialReserve = MaterialReserve()
+        snapshot.worldMaterialReserve = WorldMaterialReserve()
+        snapshot.creatureMaterialReserve = CreatureMaterialReserve()
         snapshot.carriedInstruments = []
         snapshot.carriedInstrumentPrecisions = [:]
         snapshot.activeEncounter = nil

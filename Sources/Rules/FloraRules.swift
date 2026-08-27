@@ -319,8 +319,8 @@ enum FloraRules {
     /// **Grade scales with trait extremity**, same rule as creature loot, so an ordinary shrub gives
     /// ordinary fibre and a towering ironbarked thing gives timber worth carrying home.
     static func material(from traits: FloraTraits, named source: String,
-                         qualifier: String? = nil) -> MaterialSample {
-        let kind: MaterialKind = switch yield(of: traits) {
+                         qualifier: String? = nil) -> CraftMaterialUnitV1 {
+        let kind: MaterialFamilyID = switch yield(of: traits) {
         case Resources.timber: .timber
         case Resources.toxin: .toxin
         case Resources.reagent: .reagent
@@ -328,8 +328,13 @@ enum FloraRules {
         default: .fibre
         }
         let woodiness = traits.tissue.woody
-        return MaterialSample(
-            kind: kind,
+        let legacyQuality = ButcheryRules.quality(
+            of: [traits.stature, traits.tissue.total, traits.defence],
+            lustre: traits.finish.lustre)
+        return CraftMaterialUnitV1(
+            stableUnitID: .init(rawValue: "flora-prototype:\(kind.rawValue):\(source)"),
+            domain: .world, familyID: kind,
+            qualityBand: (try? .init(legacyGrade: legacyQuality)) ?? .standard,
             properties: MaterialProperties(
                 hardness: woodiness * Tuning.Flora.hardnessPerWoody,
                 density: woodiness * Tuning.Flora.densityPerWoody,
@@ -339,11 +344,8 @@ enum FloraRules {
                 lustre: traits.finish.lustre,
                 // What a plant defends itself with is what an apothecary wants from it.
                 reactivity: reactivity(of: traits)
-            ),
-            grade: ButcheryRules.grade(of: [traits.stature, traits.tissue.total, traits.defence],
-                                       lustre: traits.finish.lustre),
-            source: source,
-            qualifier: qualifier
+            ), sourceReceipt: .worldHarvest(.init(receiptID:
+                [source, qualifier].compactMap { $0 }.joined(separator: " · ")))
         )
     }
 

@@ -2,10 +2,10 @@ import XCTest
 @testable import Bookbinder
 
 final class PhysicalGearCraftingTests: XCTestCase {
-    private func sample(_ kind: MaterialKind, grade: Double, hardness: Double = 0,
+    private func sample(_ kind: MaterialFamilyID, grade: Double, hardness: Double = 0,
                         density: Double = 0, flexibility: Double = 0, insulation: Double = 0,
-                        reactivity: Double = 0, source: String) -> MaterialSample {
-        MaterialSample(kind: kind,
+                        reactivity: Double = 0, source: String) -> CraftMaterialUnitV1 {
+        CraftMaterialUnitV1(kind: kind,
                        properties: MaterialProperties(hardness: hardness,
                                                       density: density,
                                                       insulation: insulation,
@@ -29,7 +29,7 @@ final class PhysicalGearCraftingTests: XCTestCase {
                 sample(.chitin, grade: 90, hardness: 70, source: "edge two"),
                 sample(.pelt, grade: 90, flexibility: 60, source: "carrier")
             ]))
-        state.base.materialReserve.migrateLegacyStacks(&state.base.inventory.stacks,
+        state.base.worldMaterialReserve.migrateLegacyStacks(&state.base.inventory.stacks,
                                                        location: "fixture.bowyer")
         return state
     }
@@ -45,7 +45,7 @@ final class PhysicalGearCraftingTests: XCTestCase {
                 sample(.hide, grade: 70, flexibility: 70, insulation: 50, source: "moss browser"),
                 sample(.fibre, grade: 45, flexibility: 35, reactivity: 20, source: "reed")
             ]))
-        state.base.materialReserve.migrateLegacyStacks(&state.base.inventory.stacks,
+        state.base.worldMaterialReserve.migrateLegacyStacks(&state.base.inventory.stacks,
                                                        location: "fixture.blacksmith")
         return state
     }
@@ -104,7 +104,7 @@ final class PhysicalGearCraftingTests: XCTestCase {
         XCTAssertTrue(PhysicalGearCraftingRules.qualifies(
             sample(.bone, grade: 30, hardness: 31, source: "hard"), for: sole))
         XCTAssertTrue(PhysicalGearCraftingRules.qualifies(
-            MaterialSample(kind: .bone, properties: MaterialProperties(density: 31),
+            CraftMaterialUnitV1(kind: .bone, properties: MaterialProperties(density: 31),
                            grade: 30, source: "dense"), for: sole))
         XCTAssertFalse(PhysicalGearCraftingRules.qualifies(
             sample(.bone, grade: 30, hardness: 29, source: "soft"), for: sole))
@@ -121,7 +121,7 @@ final class PhysicalGearCraftingTests: XCTestCase {
                 sample(.hide, grade: 50, flexibility: 50, insulation: 30, source: "hide one"),
                 sample(.pelt, grade: 55, flexibility: 45, insulation: 35, source: "pelt two")
             ]))
-        state.base.materialReserve.migrateLegacyStacks(&state.base.inventory.stacks,
+        state.base.worldMaterialReserve.migrateLegacyStacks(&state.base.inventory.stacks,
                                                        location: "fixture.tannery.craft")
         let preview = try XCTUnwrap(PhysicalGearCraftingRules.preview(
             PhysicalGearCraftingRules.suppleCoat, in: state))
@@ -159,7 +159,7 @@ final class PhysicalGearCraftingTests: XCTestCase {
                 sample(.hide, grade: 70, flexibility: 70, insulation: 60, source: "one"),
                 sample(.pelt, grade: 70, flexibility: 70, insulation: 60, source: "two")
             ]))
-        state.base.materialReserve.migrateLegacyStacks(&state.base.inventory.stacks,
+        state.base.worldMaterialReserve.migrateLegacyStacks(&state.base.inventory.stacks,
                                                        location: "fixture.tannery.tier")
         XCTAssertEqual(try XCTUnwrap(PhysicalGearCraftingRules.preview(
             PhysicalGearCraftingRules.suppleCoat, in: state)).outputTier, 1)
@@ -210,12 +210,12 @@ final class PhysicalGearCraftingTests: XCTestCase {
     func testEveryBowyerFamilyAllowsLowGradePreviewButRejectsAStaleCommit() throws {
         for recipe in PhysicalGearCraftingRules.bowyerRecipes {
             var state = bowyerState(tier: 1)
-            let original = state.base.materialReserve.units
-            XCTAssertEqual(state.base.materialReserve.consume(
-                state.base.materialReserve.selections()), original.map(\.sample))
+            let original = state.base.worldMaterialReserve.units
+            XCTAssertEqual(state.base.worldMaterialReserve.consume(
+                state.base.worldMaterialReserve.selections()), original.map(\.sample))
             for var unit in original {
-                unit.sample.grade = 20
-                state.base.materialReserve.add(unit)
+                unit.unit.qualityBand = .rough
+                _ = state.base.worldMaterialReserve.add(unit)
             }
             let preview = try XCTUnwrap(PhysicalGearCraftingRules.preview(recipe, in: state), recipe.id)
             XCTAssertEqual(preview.outputTier, 1, recipe.id)
@@ -225,14 +225,14 @@ final class PhysicalGearCraftingTests: XCTestCase {
             }
 
             let first = try XCTUnwrap(preview.selections.first)
-            _ = state.base.materialReserve.consume([try XCTUnwrap(first.reserveSelection)])
+            _ = state.base.worldMaterialReserve.consume([try XCTUnwrap(first.reserveSelection)])
             let afterExternalChange = state
             XCTAssertNil(PhysicalGearCraftingRules.craft(preview, in: &state), recipe.id)
             XCTAssertEqual(state, afterExternalChange, "\(recipe.id) stale preview debited state")
         }
     }
 
-    func testGradeUsesWeakestSixtyAverageFortyAndStationCap() throws {
+    func testQualityUsesPrimarySeventySecondaryThirtyAndPreservesStationTierCap() throws {
         var state = readyState()
         let recipe = PhysicalGearCraftingRules.pointedBlade
         let selections = [
@@ -243,10 +243,8 @@ final class PhysicalGearCraftingTests: XCTestCase {
         ]
         let preview = try XCTUnwrap(PhysicalGearCraftingRules.preview(recipe, selections: selections,
                                                                       in: state))
-        XCTAssertEqual(preview.craftGrade, 74, accuracy: 0.000_001)
-        XCTAssertEqual(preview.naturalTier, 3)
+        XCTAssertEqual(preview.qualityBand, .superior)
         XCTAssertEqual(preview.outputTier, 2)
-        XCTAssertTrue(preview.wastesGradeAboveCap)
         XCTAssertEqual(preview.essence, 24)
     }
 
@@ -254,11 +252,11 @@ final class PhysicalGearCraftingTests: XCTestCase {
         var state = readyState()
         let preview = try XCTUnwrap(PhysicalGearCraftingRules.preview(
             PhysicalGearCraftingRules.pointedBlade, in: state))
-        let beforeCount = state.base.materialReserve.count
+        let beforeCount = state.base.worldMaterialReserve.count
         let output = try XCTUnwrap(PhysicalGearCraftingRules.craft(preview, in: &state))
 
         XCTAssertEqual(state.base.essence, 200 - preview.essence)
-        XCTAssertEqual(state.base.materialReserve.count, beforeCount - 2)
+        XCTAssertEqual(state.base.worldMaterialReserve.count, beforeCount - 2)
         XCTAssertEqual(output.gearProfile?.familyID, "pointed_blade")
         XCTAssertEqual(output.gearProfile?.constructionTier, preview.outputTier)
         XCTAssertEqual(output.gearProfile?.damage, .pierce)
@@ -272,7 +270,7 @@ final class PhysicalGearCraftingTests: XCTestCase {
         var state = readyState()
         let preview = try XCTUnwrap(PhysicalGearCraftingRules.preview(
             PhysicalGearCraftingRules.pointedBlade, in: state))
-        _ = state.base.materialReserve.consume([
+        _ = state.base.worldMaterialReserve.consume([
             try XCTUnwrap(preview.selections[0].reserveSelection)
         ])
         let essence = state.base.essence

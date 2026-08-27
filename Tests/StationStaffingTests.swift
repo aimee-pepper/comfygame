@@ -165,9 +165,9 @@ final class StationStaffingTests: XCTestCase {
         state.base.stations[Stations.blacksmith] = StationState(isUnlocked: true, tier: 0)
         state.base.essence = 11
         let samples = [
-            MaterialSample(kind: .bone,
+            CraftMaterialUnitV1(kind: .bone,
                            properties: MaterialProperties(hardness: 40), grade: 30, source: "one"),
-            MaterialSample(kind: .fibre,
+            CraftMaterialUnitV1(kind: .fibre,
                            properties: MaterialProperties(flexibility: 35), grade: 30, source: "two")
         ]
         state.base.inventory.add(ItemStack(id: InstanceID(rawValue: 90), catalogID: Items.material,

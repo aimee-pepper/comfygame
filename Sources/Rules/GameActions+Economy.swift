@@ -389,7 +389,7 @@ extension GameStore {
         return crafted
     }
 
-    func scentMaskQuote(using animalResource: MaterialReserveSelection)
+    func scentMaskQuote(using animalResource: CraftMaterialSelection)
         -> ConsumableCraftingRules.ScentMaskQuote? {
         ConsumableCraftingRules.previewScentMask(using: animalResource, in: state)
     }
@@ -1207,7 +1207,7 @@ extension GameStore {
 
     /// How much stock is on the shelf at all, for the header — a hoard's worth in one number.
     var materialSampleCount: Int {
-        state.base.materialReserve.count
+        state.base.worldMaterialReserve.count
     }
 
     func physicalGearReadiness(_ recipe: PhysicalGearCraftingRules.Recipe)

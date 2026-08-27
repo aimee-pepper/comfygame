@@ -40,12 +40,9 @@ final class TradingPostTests: XCTestCase {
         XCTAssertTrue(source.contains("TradingPostPresentation.proprietorID"))
     }
 
-    func testOldBaseSaveDefaultsToEmptyTradingPostAndSeparateZeroGoldWallet() throws {
-        let old = try SaveCodec.makeDecoder().decode(BaseState.self, from: Data("{\"essence\":37}".utf8))
-
-        XCTAssertEqual(old.goldCoins, 0)
-        XCTAssertEqual(old.tradingPost, TradingPostState())
-        XCTAssertEqual(old.resources["gold"], 0, "Gold Ore remains a resource, not the wallet")
+    func testCurrentBaseMissingTypedReservesFailsClosed() throws {
+        XCTAssertThrowsError(try SaveCodec.makeDecoder().decode(
+            BaseState.self, from: Data("{\"essence\":37}".utf8)))
     }
 
     func testPartialTradingPostSaveToleratesNewFields() throws {
@@ -79,7 +76,7 @@ final class TradingPostTests: XCTestCase {
     }
 
     func testLegacyItemAndMaterialRowsDecodeButFailClosedWithoutFrozenIdentity() throws {
-        let sample = MaterialSample(kind: .hide, properties: .init(flexibility: 30),
+        let sample = CraftMaterialUnitV1(kind: .hide, properties: .init(flexibility: 30),
                                     grade: 28, source: "legacy supplier")
         for modern in [
             TradingPostStockLine(id: 10, kind: .item("salve_lesser"),
@@ -222,7 +219,7 @@ final class TradingPostTests: XCTestCase {
             return line.remainingQuantity == 1 && line.unitPrice == 3
                 && line.frozenUnits.first?.materials == [sample]
                 && sample.source == "Vance's supplier" && sample.qualifier == nil
-                && (25...39).contains(Int(sample.grade))
+                && sample.qualityBand == .standard
         })
 
         let restored = try SaveCodec.makeDecoder().decode(
@@ -417,17 +414,17 @@ final class TradingPostTests: XCTestCase {
     }
 
     func testMaterialSaleQuotesAndCommitsOnlyTheExplicitExactReserveUnit() throws {
-        let coarse = MaterialSample(kind: .hide, properties: .init(flexibility: 12),
+        let coarse = CraftMaterialUnitV1(kind: .hide, properties: .init(flexibility: 12),
                                     grade: 19, source: "reed grazer", qualifier: "mottled")
-        let fine = MaterialSample(kind: .hide, properties: .init(flexibility: 81),
+        let fine = CraftMaterialUnitV1(kind: .hide, properties: .init(flexibility: 81),
                                   grade: 84, source: "ridge prowler", qualifier: "ashen")
         var base = BaseState.newGame()
-        base.materialReserve = MaterialReserve(units: [
-            .init(id: MaterialReserveUnitID(rawValue: "hide-coarse"), sample: coarse),
-            .init(id: MaterialReserveUnitID(rawValue: "hide-fine"), sample: fine)
+        base.creatureMaterialReserve = CreatureMaterialReserve(units: [
+            .init(id: CraftMaterialUnitID(rawValue: "hide-coarse"), sample: coarse),
+            .init(id: CraftMaterialUnitID(rawValue: "hide-fine"), sample: fine)
         ])
-        let selected = try XCTUnwrap(base.materialReserve.selections().first {
-            $0.unitID == MaterialReserveUnitID(rawValue: "hide-coarse")
+        let selected = try XCTUnwrap(base.creatureMaterialReserve.selections().first {
+            $0.unitID == CraftMaterialUnitID(rawValue: "hide-coarse")
         })
         let preview = try XCTUnwrap(TradingPostRules.previewMaterialSale([selected], in: base))
         XCTAssertEqual(preview.selections, [selected])
@@ -435,23 +432,23 @@ final class TradingPostTests: XCTestCase {
 
         XCTAssertEqual(TradingPostRules.commit(preview, in: &base), .committed)
         XCTAssertEqual(base.goldCoins, 1)
-        XCTAssertEqual(base.materialReserve.selections().map(\.unitID),
-                       [MaterialReserveUnitID(rawValue: "hide-fine")])
-        XCTAssertEqual(base.tradingPost.stock.last?.kind, .material(coarse))
+        XCTAssertEqual(base.creatureMaterialReserve.selections().map(\.unitID),
+                       [CraftMaterialUnitID(rawValue: "hide-fine")])
+        XCTAssertEqual(base.tradingPost.stock.last?.kind, .material(selected.sample))
         XCTAssertEqual(base.tradingPost.stock.last?.unitPrice,
-                       TradingPostRules.materialSaleUnitPrice(for: coarse) + 1)
+                       try XCTUnwrap(TradingPostRules.materialSaleUnitPrice(for: coarse)) + 1)
         XCTAssertEqual(base.inventory.stacks, [])
         XCTAssertEqual(base.spillover, [])
     }
 
     func testMaterialSalePreviewRejectsDuplicateAndCommitRejectsStaleOrChangedReceiptAtomically() throws {
-        let sample = MaterialSample(kind: .bone, properties: .init(hardness: 44),
+        let sample = CraftMaterialUnitV1(kind: .bone, properties: .init(hardness: 44),
                                     grade: 42, source: "fen hart", qualifier: "pale")
         var base = BaseState.newGame()
-        base.materialReserve = MaterialReserve(units: [
-            .init(id: MaterialReserveUnitID(rawValue: "bone-1"), sample: sample)
+        base.creatureMaterialReserve = CreatureMaterialReserve(units: [
+            .init(id: CraftMaterialUnitID(rawValue: "bone-1"), sample: sample)
         ])
-        let selected = try XCTUnwrap(base.materialReserve.selections().first)
+        let selected = try XCTUnwrap(base.creatureMaterialReserve.selections().first)
         XCTAssertNil(TradingPostRules.previewMaterialSale([selected, selected], in: base))
 
         let preview = try XCTUnwrap(TradingPostRules.previewMaterialSale([selected], in: base))
@@ -461,24 +458,24 @@ final class TradingPostTests: XCTestCase {
         XCTAssertEqual(base, staleBefore)
 
         var changed = selected
-        changed.sample.grade = 99
+        changed.unit.properties.hardness = 99
         let invalid = TradingPostRules.MaterialSalePreview(
             revision: base.tradingPost.inventoryRevision, selections: [changed],
-            unitPrices: [TradingPostRules.materialSaleUnitPrice(for: changed.sample)], goldTotal: 5)
+            unitPrices: [try XCTUnwrap(TradingPostRules.materialSaleUnitPrice(for: changed.sample))], goldTotal: 5)
         let invalidBefore = base
         XCTAssertEqual(TradingPostRules.commit(invalid, in: &base), .invalid)
         XCTAssertEqual(base, invalidBefore)
     }
 
     func testMaterialReserveSalePersistsExactRepurchaseSourceAcrossRelaunch() throws {
-        let sample = MaterialSample(kind: .plate, properties: .init(hardness: 63),
+        let sample = CraftMaterialUnitV1(kind: .plate, properties: .init(hardness: 63),
                                     grade: 67, source: "salt drake", qualifier: "glassy")
         var base = BaseState.newGame()
-        base.materialReserve = MaterialReserve(units: [
-            .init(id: MaterialReserveUnitID(rawValue: "plate-1"), sample: sample)
+        base.creatureMaterialReserve = CreatureMaterialReserve(units: [
+            .init(id: CraftMaterialUnitID(rawValue: "plate-1"), sample: sample)
         ])
         let preview = try XCTUnwrap(TradingPostRules.previewMaterialSale(
-            [try XCTUnwrap(base.materialReserve.selections().first)], in: base))
+            [try XCTUnwrap(base.creatureMaterialReserve.selections().first)], in: base))
         XCTAssertEqual(TradingPostRules.commit(preview, in: &base), .committed)
 
         let restored = try SaveCodec.makeDecoder().decode(
@@ -489,7 +486,7 @@ final class TradingPostTests: XCTestCase {
         }
         XCTAssertEqual(restoredSample.source, "salt drake")
         XCTAssertEqual(restoredSample.qualifier, "glassy")
-        XCTAssertEqual(restoredSample.grade, 67)
+        XCTAssertEqual(restoredSample.qualityBand, .fine)
     }
 
     func testMaterialSaleUIUsesGroupedExplicitStableSelectionsAndNoSlotInventory() throws {
@@ -503,7 +500,7 @@ final class TradingPostTests: XCTestCase {
         XCTAssertTrue(source.contains("AnchoredItemDetailButton(item: listing"))
         XCTAssertTrue(source.contains("LabeledContent(\"Source\""))
         XCTAssertTrue(source.contains("LabeledContent(\"Qualifier\""))
-        XCTAssertTrue(source.contains("LabeledContent(\"Grade\""))
+        XCTAssertTrue(source.contains("LabeledContent(\"Quality\""))
         XCTAssertTrue(source.contains("TradingPostRules.materialSaleUnitPrice"))
         XCTAssertTrue(source.contains("TradingPostRules.commit(listing.preview"))
         XCTAssertTrue(source.contains("never use Storehouse slots"))

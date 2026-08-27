@@ -12,7 +12,7 @@ final class MakerStationPresentationTests: XCTestCase {
         case tradingMaterial(TradingPostCommitResult?)
         case recycler
         case recyclerPreview(RecyclerPreview, RecyclerCommitResult?)
-        case apothecary(ItemID?, MaterialReserveUnitID?, String?)
+        case apothecary(ItemID?, CraftMaterialUnitID?, String?)
     }
 
     private struct P3Mount {
@@ -56,9 +56,9 @@ final class MakerStationPresentationTests: XCTestCase {
             let waiting = ItemStack(id: InstanceID(rawValue: 701), catalogID: "blade_chipped")
             state.base.inventory.stacks = [stored]
             state.base.spillover = [waiting]
-            if qualifyingMaterial { state.base.materialReserve.add(.init(
+            if qualifyingMaterial { state.base.worldMaterialReserve.add(.init(
                 id: .init(rawValue: "p3-hide"),
-                sample: MaterialSample(kind: .hide,
+                sample: CraftMaterialUnitV1(kind: .hide,
                     properties: MaterialProperties(hardness: 55, density: 50,
                                                    insulation: 70, flexibility: 65,
                                                    lustre: 20, reactivity: 70),
@@ -157,7 +157,7 @@ final class MakerStationPresentationTests: XCTestCase {
     private func p3Preview(location: TradingPostItemLocation = .stored,
                            route: RecyclerRecoveryRoute = .constructionReceipt,
                            resources: ResourcePool = ResourcePool(),
-                           samples: [MaterialSample] = [], id: UInt64 = 800) -> RecyclerPreview {
+                           samples: [CraftMaterialUnitV1] = [], id: UInt64 = 800) -> RecyclerPreview {
         let stack = ItemStack(id: InstanceID(rawValue: id), catalogID: "blade_chipped")
         return RecyclerPreview(revision: 0, location: location, stackID: stack.id,
                                snapshot: stack, serviceTier: 1, route: route,
@@ -324,7 +324,7 @@ final class MakerStationPresentationTests: XCTestCase {
 
     func testP3_07RecyclerPreviewListRemainsAboveDismantleActionRail() throws {
         var resources = ResourcePool(); resources.add(2, of: "ore")
-        let material = MaterialSample(kind: .plate, properties: .init(hardness: 60),
+        let material = CraftMaterialUnitV1(kind: .plate, properties: .init(hardness: 60),
                                       grade: 60, source: "recorded construction stock")
         let fixtures: [(RecyclerPreview, RecyclerCommitResult?)] = [
             (p3Preview(resources: resources), nil),
@@ -385,13 +385,13 @@ final class MakerStationPresentationTests: XCTestCase {
 
     func testP3_10ScentMaskSelectionAndRefusalTruthRemainUnchanged() throws {
         for (unit, reagent, expected) in [
-            (Optional<MaterialReserveUnitID>.none, 4, "Choose one exact grade 25+ animal resource."),
+            (Optional<CraftMaterialUnitID>.none, 4, "Choose one exact grade 25+ animal resource."),
             (Optional(.init(rawValue: "p3-hide")), 4, "This exact resource + 1 Reagent · 0 Essence"),
             (Optional(.init(rawValue: "p3-hide")), 0, "Needs 1 Reagent.")
         ] {
             let store = p3Store(reagent: reagent)
             XCTAssertEqual(store.state.base.resources[Resources.reagent], reagent)
-            XCTAssertEqual(store.state.base.materialReserve.selections().first?.unitID.rawValue,
+            XCTAssertEqual(store.state.base.worldMaterialReserve.selections().first?.unitID.rawValue,
                            "p3-hide")
             let mount = try p3Mount(.apothecary(Items.scentMask, unit, nil),
                                     scheme: .light, store: store)
@@ -774,11 +774,11 @@ final class MakerStationPresentationTests: XCTestCase {
         var state = GameState.newGame()
         state.base.stations[Stations.blacksmith] = StationState(isUnlocked: true, tier: 0)
         state.base.essence = 100
-        state.base.materialReserve.add(.init(
+        state.base.worldMaterialReserve.add(.init(
             id: .init(rawValue: "landing-point"),
             sample: sample(.fang, hardness: 60, source: "point")
         ))
-        state.base.materialReserve.add(.init(
+        state.base.worldMaterialReserve.add(.init(
             id: .init(rawValue: "landing-grip"),
             sample: sample(.fibre, flexibility: 60, source: "grip")
         ))
@@ -812,7 +812,7 @@ final class MakerStationPresentationTests: XCTestCase {
             sample(.plate, hardness: requirement.minimum + 5, source: "stock \(index)")
         }
         for (index, sample) in stock.enumerated() {
-            state.base.materialReserve.add(.init(
+            state.base.worldMaterialReserve.add(.init(
                 id: .init(rawValue: "overflow-reforge-\(index)"), sample: sample
             ))
         }
@@ -855,9 +855,9 @@ final class MakerStationPresentationTests: XCTestCase {
                        "unlearning should mutate only from the confirmed destructive action")
     }
 
-    private func sample(_ kind: MaterialKind, hardness: Double = 0,
-                        flexibility: Double = 0, source: String) -> MaterialSample {
-        MaterialSample(kind: kind,
+    private func sample(_ kind: MaterialFamilyID, hardness: Double = 0,
+                        flexibility: Double = 0, source: String) -> CraftMaterialUnitV1 {
+        CraftMaterialUnitV1(kind: kind,
                        properties: MaterialProperties(hardness: hardness,
                                                       flexibility: flexibility),
                        grade: 50, source: source)

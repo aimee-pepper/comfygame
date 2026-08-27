@@ -38,7 +38,7 @@ final class InstrumentCraftingTests: XCTestCase {
         XCTAssertTrue(InstrumentCraftingRules.craftUpgrade(for: "illumination", in: &state))
         XCTAssertEqual(state.reality.instrumentPrecision(for: "illumination"), .good)
         XCTAssertEqual(state.base.essence, 80)
-        XCTAssertEqual(state.base.materialReserve.units.map(\.sample.properties.lustre), [80])
+        XCTAssertEqual(state.base.worldMaterialReserve.units.map(\.sample.properties.lustre), [80])
     }
 
     func testGoodThenFineAndNoUpgradePastFine() {
@@ -74,11 +74,11 @@ final class InstrumentCraftingTests: XCTestCase {
         let recipe = try XCTUnwrap(InstrumentCraftingRules.recipe(for: "illumination", in: state))
         let quote = Array(InstrumentCraftingRules.candidates(for: recipe, in: state).prefix(2))
             .map(\.selection)
-        _ = state.base.materialReserve.consume([quote[0]])
-        let before = state.base.materialReserve
+        _ = state.base.worldMaterialReserve.consume([quote[0]])
+        let before = state.base.worldMaterialReserve
 
-        XCTAssertNil(state.base.materialReserve.consume(quote))
-        XCTAssertEqual(state.base.materialReserve, before)
+        XCTAssertNil(state.base.worldMaterialReserve.consume(quote))
+        XCTAssertEqual(state.base.worldMaterialReserve, before)
     }
 
     func testOldOwnedInstrumentDefaultsToCrude() throws {
@@ -87,17 +87,17 @@ final class InstrumentCraftingTests: XCTestCase {
         XCTAssertEqual(reality.instrumentPrecision(for: "thermal"), .crude)
     }
 
-    private func sample(lustre: Double) -> MaterialSample {
-        MaterialSample(kind: .chitin,
+    private func sample(lustre: Double) -> CraftMaterialUnitV1 {
+        CraftMaterialUnitV1(kind: .chitin,
                        properties: MaterialProperties(lustre: lustre),
                        grade: lustre,
                        source: "test creature")
     }
 
-    private func addSamples(_ samples: [MaterialSample], to state: inout GameState) {
+    private func addSamples(_ samples: [CraftMaterialUnitV1], to state: inout GameState) {
         for (index, sample) in samples.enumerated() {
-            state.base.materialReserve.add(MaterialReserveUnit(
-                id: MaterialReserveUnitID(rawValue: "instrument-\(index)"), sample: sample
+            state.base.worldMaterialReserve.add(CraftMaterialHoldingV1(
+                id: CraftMaterialUnitID(rawValue: "instrument-\(index)"), sample: sample
             ))
         }
     }

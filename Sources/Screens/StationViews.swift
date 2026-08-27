@@ -698,7 +698,7 @@ struct StorehouseView: View {
 
                 switch tab {
                 case .stockpiles:
-                    if base.resources.isEmpty && base.materialReserve.isEmpty {
+                    if base.resources.isEmpty && base.worldMaterialReserve.isEmpty {
                         EmptyNote("Nothing hauled home yet.")
                     } else {
                         SixAcrossItemGrid(data: resourceEntries, id: \.id) { entry in
@@ -814,9 +814,9 @@ struct StorehouseView: View {
     }
 
     private var reserveMaterialBins: [ItemStack] {
-        Dictionary(grouping: base.materialReserve.units, by: { $0.sample.kind })
+        Dictionary(grouping: base.worldMaterialReserve.units, by: { $0.sample.kind })
             .map { kind, units in
-                let ordinal = MaterialKind.allCases.firstIndex(of: kind) ?? 0
+                let ordinal = MaterialFamilyID.allCases.firstIndex(of: kind) ?? 0
                 return ItemStack(id: .init(rawValue: UInt64.max - 1_000 - UInt64(ordinal)),
                                  catalogID: Items.material,
                                  materials: units.sorted { $0.id < $1.id }.map(\.sample))
@@ -829,10 +829,10 @@ struct StorehouseView: View {
 private struct MaterialReserveSheet: View {
     @EnvironmentObject private var store: GameStore
     @Environment(\.dismiss) private var dismiss
-    let kind: MaterialKind
+    let kind: MaterialFamilyID
 
-    private var current: [MaterialReserveUnit] {
-        store.state.base.materialReserve.units(of: kind).sorted { $0.id < $1.id }
+    private var current: [CraftMaterialHoldingV1] {
+        store.state.base.worldMaterialReserve.units(of: kind).sorted { $0.id < $1.id }
     }
 
     var body: some View {
@@ -1836,7 +1836,7 @@ struct ComingLater: View {
 /// What's actually in a material bin.
 ///
 /// Binning by kind is what keeps eight slots usable (session 16 §1), and it only works because
-/// nothing is lost by it: every sample keeps its own grade, its own name and the animal it came
+/// nothing is lost by it: every unit keeps its quality, name and source
 /// off. This is where you look at them — and sort them, because "which is my best pelt" is the
 /// question a hoard exists to answer.
 struct MaterialBinSheet: View {
@@ -1851,12 +1851,12 @@ struct MaterialBinSheet: View {
     private var displayedBin: ItemStack { currentBin ?? bin }
 
     enum Order: String, CaseIterable, Identifiable {
-        case grade = "Grade"
+        case quality = "Quality"
         case source = "Where from"
         case order = "Order found"
         var id: String { rawValue }
     }
-    @State private var order: Order = .grade
+    @State private var order: Order = .quality
 
     var body: some View {
         NavigationStack {
@@ -1864,7 +1864,7 @@ struct MaterialBinSheet: View {
                 Section {
                     ForEach(Array(sorted.enumerated()), id: \.offset) { _, sample in
                         HStack(spacing: 10) {
-                            MaterialSamplePixelIdentity(kind: sample.kind,
+                            CraftMaterialUnitPixelIdentity(kind: sample.kind,
                                                         fallbackColor: sample.rarity.tint)
                                 .frame(width: 28, height: 28)
                             VStack(alignment: .leading, spacing: 1) {
@@ -1878,8 +1878,8 @@ struct MaterialBinSheet: View {
                             }
                             Spacer(minLength: 8)
                             VStack(alignment: .trailing, spacing: 1) {
-                                Text("\(Int(sample.grade))")
-                                    .font(.callout.monospacedDigit())
+                                Text(sample.qualityBand.displayName)
+                                    .font(.callout)
                                 Text(sample.properties.dominant.name)
                                     .font(.caption2).foregroundStyle(.secondary)
                             }
@@ -1896,7 +1896,7 @@ struct MaterialBinSheet: View {
                 } footer: {
                     Text(currentBin == nil
                          ? "This material bin is no longer in the Storehouse."
-                         : "All \(displayedBin.count) share one slot. Every one keeps its own grade and the animal it came off.")
+                         : "All \(displayedBin.count) share one slot. Every one keeps its own quality and source.")
                 }
             }
             .navigationTitle(displayedBin.displayName)
@@ -1907,11 +1907,11 @@ struct MaterialBinSheet: View {
         }
     }
 
-    private var sorted: [MaterialSample] {
+    private var sorted: [CraftMaterialUnitV1] {
         let materials = currentBin?.materials ?? []
         return switch order {
-        case .grade: materials.sorted { $0.grade > $1.grade }
-        case .source: materials.sorted { ($0.source, $0.grade) < ($1.source, $1.grade) }
+        case .quality: materials.sorted { ($0.qualityBand.rawValue, $0.stableUnitID) > ($1.qualityBand.rawValue, $1.stableUnitID) }
+        case .source: materials.sorted { ($0.source, $0.stableUnitID) < ($1.source, $1.stableUnitID) }
         case .order: materials
         }
     }

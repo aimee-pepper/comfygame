@@ -10,7 +10,7 @@ final class ConsumableCraftingTests: XCTestCase {
             "Sources/Screens/ApothecaryView.swift"), encoding: .utf8)
 
         XCTAssertTrue(source.contains("ConsumableCraftingRules.scentMaskAnimalResources(in: store.state)"))
-        XCTAssertTrue(source.contains("Text(\"Choose a resource\").tag(Optional<MaterialReserveUnitID>.none)"))
+        XCTAssertTrue(source.contains("Text(\"Choose a resource\").tag(Optional<CraftMaterialUnitID>.none)"))
         XCTAssertTrue(source.contains("store.scentMaskQuote(using: $0)"))
         XCTAssertTrue(source.contains("store.craftScentMask(quote)"))
         XCTAssertTrue(source.contains("That exact animal resource or the Reagent is no longer available."))
@@ -31,22 +31,23 @@ final class ConsumableCraftingTests: XCTestCase {
     }
 
     func testScentMaskAcceptsEveryAnimalKindAt25AndRejectsFloraAndBelowFloor() {
-        let animalKinds = MaterialKind.allCases.filter(\.isAnimalWorldResource)
+        let animalKinds = MaterialFamilyID.allCases.filter(\.isAnimalWorldResource)
         XCTAssertEqual(Set(animalKinds), [.plate, .quill, .pelt, .down, .hide, .chitin,
+                                          .feather, .fin, .scale, .oil, .shell, .horn, .venom,
                                           .fang, .tusk, .claw, .bone, .ichor])
         for kind in animalKinds {
             XCTAssertTrue(kind.isAnimalWorldResource)
-            XCTAssertGreaterThanOrEqual(MaterialSample(kind: kind, properties: .init(), grade: 25,
-                                                        source: "animal").grade, 25)
+            XCTAssertEqual(CraftMaterialUnitV1(kind: kind, properties: .init(), grade: 25,
+                                               source: "animal").qualityBand, .standard)
         }
-        XCTAssertTrue(MaterialKind.allCases.filter { !$0.isAnimalWorldResource }.allSatisfy {
+        XCTAssertTrue(MaterialFamilyID.allCases.filter { !$0.isAnimalWorldResource }.allSatisfy {
             [.timber, .fibre, .pulp, .toxin, .reagent].contains($0)
         })
 
         var state = scentMaskCraftingState()
-        state.base.materialReserve.add(.init(id: .init(rawValue: "below"),
+        state.base.worldMaterialReserve.add(.init(id: .init(rawValue: "below"),
             sample: .init(kind: .hide, properties: .init(), grade: 24.999, source: "animal")))
-        state.base.materialReserve.add(.init(id: .init(rawValue: "flora"),
+        state.base.worldMaterialReserve.add(.init(id: .init(rawValue: "flora"),
             sample: .init(kind: .reagent, properties: .init(reactivity: 100), grade: 100,
                           source: "claims to be animal")))
         XCTAssertTrue(ConsumableCraftingRules.scentMaskAnimalResources(in: state).isEmpty)
@@ -54,12 +55,12 @@ final class ConsumableCraftingTests: XCTestCase {
 
     func testScentMaskExactInstanceCommitIsAtomicAndCostsNoRealityCurrency() throws {
         var state = scentMaskCraftingState()
-        let chosen = MaterialReserveUnit(id: .init(rawValue: "chosen"),
+        let chosen = CraftMaterialHoldingV1(id: .init(rawValue: "chosen"),
             sample: .init(kind: .pelt, properties: .init(), grade: 25, source: "chosen beast"))
-        let twin = MaterialReserveUnit(id: .init(rawValue: "twin"), sample: chosen.sample)
-        state.base.materialReserve.add(chosen)
-        state.base.materialReserve.add(twin)
-        let selection = try XCTUnwrap(state.base.materialReserve.selections().first {
+        let twin = CraftMaterialHoldingV1(id: .init(rawValue: "twin"), sample: chosen.sample)
+        state.base.worldMaterialReserve.add(chosen)
+        state.base.worldMaterialReserve.add(twin)
+        let selection = try XCTUnwrap(state.base.worldMaterialReserve.selections().first {
             $0.unitID == chosen.id
         })
         let quote = try XCTUnwrap(ConsumableCraftingRules.previewScentMask(using: selection,
@@ -70,12 +71,12 @@ final class ConsumableCraftingTests: XCTestCase {
         XCTAssertEqual(state.base.resources["reagent"], 0)
         XCTAssertEqual(state.base.essence, essence)
         XCTAssertEqual(state.reality.motes, motes)
-        XCTAssertEqual(state.base.materialReserve.selections().map(\.unitID), [twin.id])
+        XCTAssertEqual(state.base.worldMaterialReserve.selections().map(\.unitID), [twin.id])
         XCTAssertEqual(state.base.inventory.stacks.first?.catalogID, Items.scentMask)
 
         var stale = scentMaskCraftingState()
-        stale.base.materialReserve.add(chosen)
-        _ = stale.base.materialReserve.consume([selection])
+        stale.base.worldMaterialReserve.add(chosen)
+        _ = stale.base.worldMaterialReserve.consume([selection])
         let before = stale
         XCTAssertEqual(ConsumableCraftingRules.craftScentMask(quote, in: &stale), .stale)
         XCTAssertEqual(stale, before)
@@ -84,11 +85,11 @@ final class ConsumableCraftingTests: XCTestCase {
     func testScentMaskFullStorehouseUsesOrdinarySpillover() throws {
         var state = scentMaskCraftingState()
         state.base.inventory = Inventory(slots: 0)
-        let unit = MaterialReserveUnit(id: .init(rawValue: "animal"),
+        let unit = CraftMaterialHoldingV1(id: .init(rawValue: "animal"),
             sample: .init(kind: .bone, properties: .init(), grade: 25, source: "animal"))
-        state.base.materialReserve.add(unit)
+        state.base.worldMaterialReserve.add(unit)
         let quote = try XCTUnwrap(ConsumableCraftingRules.previewScentMask(
-            using: try XCTUnwrap(state.base.materialReserve.selections().first), in: state))
+            using: try XCTUnwrap(state.base.worldMaterialReserve.selections().first), in: state))
         XCTAssertEqual(ConsumableCraftingRules.craftScentMask(quote, in: &state), .prepared)
         XCTAssertEqual(state.base.spillover.map(\.catalogID), [Items.scentMask])
     }
@@ -163,13 +164,13 @@ final class ConsumableCraftingTests: XCTestCase {
         state.base.inventory.stacks = [ItemStack(
             id: InstanceID(rawValue: 800), catalogID: Items.material,
             materials: [sample(.flexibility, 90), sample(.flexibility, 26)])]
-        state.base.materialReserve.migrateLegacyStacks(&state.base.inventory.stacks,
+        state.base.worldMaterialReserve.migrateLegacyStacks(&state.base.inventory.stacks,
                                                        location: "fixture.consumable")
         state.base.resources.add(1, of: "resin")
 
         XCTAssertTrue(ConsumableCraftingRules.craft(recipe, in: &state))
         XCTAssertEqual(state.base.resources["resin"], 0)
-        XCTAssertEqual(state.base.materialReserve.units.first?.sample.properties.flexibility, 90)
+        XCTAssertEqual(state.base.worldMaterialReserve.units.first?.sample.properties.flexibility, 90)
         XCTAssertEqual(state.base.inventory.stacks.first { $0.catalogID == "salve_lesser" }?.count, 1)
     }
 
@@ -435,9 +436,9 @@ final class ConsumableCraftingTests: XCTestCase {
             properties.lustre = 61
             state.base.inventory.stacks = [ItemStack(
                 id: InstanceID(rawValue: 700), catalogID: Items.material,
-                materials: [MaterialSample(kind: .reagent, properties: properties,
+                materials: [CraftMaterialUnitV1(kind: .reagent, properties: properties,
                                            grade: 61, source: "test")])]
-            state.base.materialReserve.migrateLegacyStacks(&state.base.inventory.stacks,
+            state.base.worldMaterialReserve.migrateLegacyStacks(&state.base.inventory.stacks,
                                                            location: "fixture.inference")
             state.base.resources.add(1, of: "mercury")
         }
@@ -473,10 +474,10 @@ final class ConsumableCraftingTests: XCTestCase {
         GameStore(io: .temporary(name: "apothecary-reachability-\(UUID().uuidString)"))
     }
 
-    private func sample(_ property: MaterialProperty, _ value: Double) -> MaterialSample {
+    private func sample(_ property: MaterialProperty, _ value: Double) -> CraftMaterialUnitV1 {
         var properties = MaterialProperties()
         properties[property] = value
-        return MaterialSample(kind: .reagent, properties: properties, grade: value, source: "test")
+        return CraftMaterialUnitV1(kind: .reagent, properties: properties, grade: value, source: "test")
     }
 
     private func fieldState(item: ItemID) -> GameState {
