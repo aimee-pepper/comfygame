@@ -951,6 +951,7 @@ extension GameStore {
             writings: writingsFound(in: run, state: state),
             recruitedTravellers: travellersRecruited(in: run, state: state),
             experienceBreakdown: run.experienceBreakdown,
+            creatureMaterialRewardReceipts: run.creatureMaterialRewardReceipts,
             essenceEconomy: .init(
                 rawCollected: banked.rawEssence,
                 refinedEquivalent: EconomyRules.refine(

@@ -146,6 +146,10 @@ enum LifeRules {
             }
             guard let habitat = ecologyRNG.pickWeighted(weighted), !weighted.isEmpty else { continue }
             result[index].habitat = habitat
+            if case .frozen(let receipt) = CreatureMaterialProjectionRules.freeze(
+                traits: result[index].traits, habitat: habitat) {
+                result[index].materialProjection = receipt
+            }
             selectedCounts[habitat, default: 0] += 1
         }
         return result

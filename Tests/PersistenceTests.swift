@@ -34,19 +34,19 @@ final class PersistenceTests: XCTestCase {
     }
 
     func testCurrentCombatOwnershipRequiresCanonicalFieldsAndExactImplementedMembership() throws {
-        let valid = Data(#"{"schemaVersion":5,"character":{"ownedCombatNodeIDs":[],"combatNodeChoices":{},"unspentCombatPoints":0}}"#.utf8)
+        let valid = Data(#"{"schemaVersion":7,"character":{"ownedCombatNodeIDs":[],"combatNodeChoices":{},"unspentCombatPoints":0}}"#.utf8)
         XCTAssertEqual(try Migrations.migrateIfNeeded(valid), valid)
-        let fortitude = Data(#"{"schemaVersion":5,"character":{"ownedCombatNodeIDs":["combat.defense.fortitude.thick_hide","combat.defense.fortitude.iron_skin","combat.defense.fortitude.brace","combat.defense.fortitude.constitution","combat.defense.fortitude.endurance","combat.defense.fortitude.ward","combat.defense.fortitude.unyielding","combat.defense.fortitude.immovable"],"combatNodeChoices":{},"unspentCombatPoints":0}}"#.utf8)
+        let fortitude = Data(#"{"schemaVersion":7,"character":{"ownedCombatNodeIDs":["combat.defense.fortitude.thick_hide","combat.defense.fortitude.iron_skin","combat.defense.fortitude.brace","combat.defense.fortitude.constitution","combat.defense.fortitude.endurance","combat.defense.fortitude.ward","combat.defense.fortitude.unyielding","combat.defense.fortitude.immovable"],"combatNodeChoices":{},"unspentCombatPoints":0}}"#.utf8)
         XCTAssertEqual(try Migrations.migrateIfNeeded(fortitude), fortitude)
         let malformed = [
-            #"{"schemaVersion":5,"character":{"combatNodeChoices":{},"unspentCombatPoints":0}}"#,
-            #"{"schemaVersion":5,"character":{"ownedCombatNodeIDs":[],"unspentCombatPoints":0}}"#,
-            #"{"schemaVersion":5,"character":{"ownedCombatNodeIDs":[],"combatNodeChoices":{}}}"#,
-            #"{"schemaVersion":5,"character":{"ownedCombatNodeIDs":null,"combatNodeChoices":{},"unspentCombatPoints":0}}"#,
-            #"{"schemaVersion":5,"character":{"ownedCombatNodeIDs":["combat.offense.force.heavy_hand","combat.offense.force.heavy_hand"],"combatNodeChoices":{},"unspentCombatPoints":0}}"#,
-            #"{"schemaVersion":5,"character":{"ownedCombatNodeIDs":["combat.offense.force.shatter"],"combatNodeChoices":{},"unspentCombatPoints":0}}"#,
-            #"{"schemaVersion":5,"character":{"ownedCombatNodeIDs":["unknown"],"combatNodeChoices":{},"unspentCombatPoints":0}}"#,
-            #"{"schemaVersion":5,"character":{"ownedCombatNodeIDs":["combat.craft.emanation.insulation"],"combatNodeChoices":{},"unspentCombatPoints":0}}"#,
+            #"{"schemaVersion":7,"character":{"combatNodeChoices":{},"unspentCombatPoints":0}}"#,
+            #"{"schemaVersion":7,"character":{"ownedCombatNodeIDs":[],"unspentCombatPoints":0}}"#,
+            #"{"schemaVersion":7,"character":{"ownedCombatNodeIDs":[],"combatNodeChoices":{}}}"#,
+            #"{"schemaVersion":7,"character":{"ownedCombatNodeIDs":null,"combatNodeChoices":{},"unspentCombatPoints":0}}"#,
+            #"{"schemaVersion":7,"character":{"ownedCombatNodeIDs":["combat.offense.force.heavy_hand","combat.offense.force.heavy_hand"],"combatNodeChoices":{},"unspentCombatPoints":0}}"#,
+            #"{"schemaVersion":7,"character":{"ownedCombatNodeIDs":["combat.offense.force.shatter"],"combatNodeChoices":{},"unspentCombatPoints":0}}"#,
+            #"{"schemaVersion":7,"character":{"ownedCombatNodeIDs":["unknown"],"combatNodeChoices":{},"unspentCombatPoints":0}}"#,
+            #"{"schemaVersion":7,"character":{"ownedCombatNodeIDs":["combat.craft.emanation.insulation"],"combatNodeChoices":{},"unspentCombatPoints":0}}"#,
         ]
         for fixture in malformed {
             let bytes = Data(fixture.utf8)
@@ -253,7 +253,8 @@ final class PersistenceTests: XCTestCase {
          "base":{"roster":[{"name":"Quill"},{"name":"Mara","traveller":"mara"}],
                  "activeParty":[0,1],"activeCompanion":1},
          "worlds":{"anchoredRealms":[{"assignedCompanions":[1]}],
-                   "activeRun":{"companionHP":{"0":12,"1":9},
+                   "activeRun":{"book":{"written":[],"essencePaid":0},
+                     "companionHP":{"0":12,"1":9},
                      "activeEncounter":{"partyNames":{"0":"Quill","1":"Mara"},
                        "turn":{"actor":{"companion":{"_0":1}}},
                        "action":{"skill":{"ally":{"companion":{"_0":0}}}},

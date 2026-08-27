@@ -405,6 +405,8 @@ struct Species: Codable, Equatable, Identifiable, Sendable {
     var worldSeed: UInt64
     /// Frozen for newly generated ecology-aware worlds. Nil preserves legacy casts exactly.
     var habitat: CreatureHabitat?
+    /// Frozen material-family capability projection for ecology-aware species.
+    var materialProjection: CreatureMaterialProjectionReceiptV1?
     /// Whether it's out after dark. Derived from what it senses with, not authored.
     var isNocturnal: Bool { CreatureIdentity.isNocturnal(traits) }
 
@@ -419,11 +421,13 @@ struct Species: Codable, Equatable, Identifiable, Sendable {
     var displayName: String { identity.name }
 
     init(id: InstanceID, traits: CreatureTraits, worldSeed: UInt64,
-         habitat: CreatureHabitat? = nil) {
+         habitat: CreatureHabitat? = nil,
+         materialProjection: CreatureMaterialProjectionReceiptV1? = nil) {
         self.id = id
         self.traits = traits
         self.worldSeed = worldSeed
         self.habitat = habitat
+        self.materialProjection = materialProjection
     }
 
     init(from decoder: Decoder) throws {
@@ -432,5 +436,17 @@ struct Species: Codable, Equatable, Identifiable, Sendable {
         traits = try c.decodeIfPresent(CreatureTraits.self, forKey: .traits) ?? CreatureTraits()
         worldSeed = try c.decodeIfPresent(UInt64.self, forKey: .worldSeed) ?? 0
         habitat = try c.decodeIfPresent(CreatureHabitat.self, forKey: .habitat)
+        if c.contains(.materialProjection) {
+            guard try !c.decodeNil(forKey: .materialProjection) else {
+                throw CocoaError(.coderInvalidValue)
+            }
+            materialProjection = try c.decode(CreatureMaterialProjectionReceiptV1.self,
+                                              forKey: .materialProjection)
+        } else {
+            materialProjection = nil
+        }
+        if materialProjection != nil && habitat == nil {
+            throw CreatureMaterialProjectionValidationError.projectionWithoutHabitat
+        }
     }
 }

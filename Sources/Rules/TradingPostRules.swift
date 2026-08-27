@@ -171,15 +171,15 @@ enum TradingPostRules {
 
     private static func merchantPropertyPair(for kind: MaterialKind) -> (MaterialProperty, MaterialProperty) {
         switch kind {
-        case .plate, .chitin, .bone, .tusk: (.hardness, .density)
+        case .plate, .chitin, .scale, .shell, .bone, .tusk, .horn: (.hardness, .density)
         case .fang, .claw: (.hardness, .reactivity)
-        case .quill: (.flexibility, .hardness)
+        case .quill, .feather, .fin: (.flexibility, .hardness)
         case .pelt, .down: (.insulation, .flexibility)
         case .hide: (.flexibility, .hardness)
         case .timber: (.density, .hardness)
         case .fibre: (.flexibility, .insulation)
         case .pulp: (.flexibility, .reactivity)
-        case .ichor, .toxin, .reagent: (.reactivity, .density)
+        case .ichor, .oil, .venom, .toxin, .reagent: (.reactivity, .density)
         }
     }
 
