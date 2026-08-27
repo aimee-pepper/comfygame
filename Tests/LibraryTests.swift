@@ -1822,6 +1822,96 @@ final class LibraryTests: XCTestCase {
         XCTAssertTrue(decoded.reality.encounteredLexemes.isEmpty)
     }
 
+    func testLibraryShelfProjectionHasClosedOrderAndTruthfulVolumeForms() throws {
+        let store = p2Store()
+        store.mutate("complete shelf projection fixture") { state in
+            for index in 0..<9 {
+                let key = "library-land-\(index)"
+                state.reality.discovery.species[key] = .init(firstSeenRunIndex: index,
+                                                               timesEncountered: 1)
+                state.reality.discovery.speciesHabitatByIdentity[key] = .terrestrial
+            }
+            state.base.ownedSymbols = Set(ContentCatalog.shared.symbols.map(\.id))
+        }
+        let shelves = LibraryShelfPresentation.make(in: store.state)
+        XCTAssertEqual(shelves.map(\.id), [.diaries, .bestiary, .dictionary,
+                                            .fieldNotes, .worldHistory])
+        let bestiary = try XCTUnwrap(shelves.first { $0.id == .bestiary })
+        XCTAssertEqual(bestiary.objects.map(\.id), [
+            .bestiary(habitat: .land, volume: 1),
+            .bestiary(habitat: .land, volume: 2),
+        ])
+        XCTAssertEqual(bestiary.objects.map(\.entryCount), [8, 1])
+        XCTAssertEqual(bestiary.objects.map(\.form), [.fullHardcoverWithSlips, .stitchedFolio])
+        XCTAssertEqual(try XCTUnwrap(shelves.first { $0.id == .dictionary }).objects.count, 3)
+        XCTAssertEqual(try XCTUnwrap(shelves.first { $0.id == .fieldNotes }).objects.count, 2)
+        XCTAssertEqual(try XCTUnwrap(shelves.first { $0.id == .worldHistory }).objects.count, 3)
+    }
+
+    func testLegacyUnclassifiedSpeciesCountsWithoutInventingHabitatVolume() throws {
+        var state = GameState.newGame()
+        state.reality.discovery.species["older"] = .init(firstSeenRunIndex: 2,
+                                                          timesEncountered: 1)
+        let shelf = try XCTUnwrap(LibraryShelfPresentation.make(in: state).first {
+            $0.id == .bestiary
+        })
+        XCTAssertEqual(shelf.entryCount, 1)
+        XCTAssertTrue(shelf.objects.isEmpty)
+    }
+
+    func testSpeciesHabitatFirstRecordWinsAndMismatchIsAtomic() {
+        var discovery = DiscoveryLog()
+        XCTAssertTrue(discovery.recordSpecies("same", habitat: .shore, runIndex: 3))
+        let frozen = discovery
+        XCTAssertFalse(discovery.recordSpecies("same", habitat: .aerial, runIndex: 4))
+        XCTAssertEqual(discovery, frozen)
+    }
+
+    func testSchemaNineMigrationChecksEveryExistingTruthAndIsIdempotent() throws {
+        let store = p2Store()
+        var root = try XCTUnwrap(JSONSerialization.jsonObject(
+            with: SaveCodec.makeEncoder().encode(store.state)) as? [String: Any])
+        root["schemaVersion"] = 9
+        var reality = try XCTUnwrap(root["reality"] as? [String: Any])
+        var library = try XCTUnwrap(reality["library"] as? [String: Any])
+        library.removeValue(forKey: "attention")
+        reality["library"] = library; root["reality"] = reality
+        let legacy = try JSONSerialization.data(withJSONObject: root, options: [.sortedKeys])
+        let migrated = try Migrations.migrateIfNeeded(legacy)
+        let state = try SaveCodec.makeDecoder().decode(GameState.self, from: migrated)
+        XCTAssertEqual(state.schemaVersion, 10)
+        XCTAssertEqual(state.reality.library.attention.checkedContentIDs,
+                       LibraryShelfPresentation.currentContentIDs(in: state))
+        XCTAssertEqual(try Migrations.migrateIfNeeded(migrated), migrated)
+    }
+
+    func testPresentNullAttentionRejectsWhileAbsentRemainsTolerant() throws {
+        let data = try SaveCodec.makeEncoder().encode(GameState.newGame())
+        var root = try XCTUnwrap(JSONSerialization.jsonObject(with: data) as? [String: Any])
+        var reality = try XCTUnwrap(root["reality"] as? [String: Any])
+        var library = try XCTUnwrap(reality["library"] as? [String: Any])
+        library.removeValue(forKey: "attention")
+        reality["library"] = library; root["reality"] = reality
+        let absent = try JSONSerialization.data(withJSONObject: root, options: [.sortedKeys])
+        XCTAssertNoThrow(try SaveCodec.makeDecoder().decode(GameState.self, from: absent))
+        library["attention"] = NSNull(); reality["library"] = library; root["reality"] = reality
+        let null = try JSONSerialization.data(withJSONObject: root, options: [.sortedKeys])
+        XCTAssertThrowsError(try SaveCodec.makeDecoder().decode(GameState.self, from: null))
+    }
+
+    func testCheckingRenderedShelfContentIsExactAndIdempotent() throws {
+        let store = p2Store()
+        let diary = try XCTUnwrap(LibraryShelfPresentation.make(in: store.state).first {
+            $0.id == .diaries
+        })
+        let rendered = Set(diary.objects.flatMap(\.contentIDs))
+        store.checkLibraryContent(rendered)
+        XCTAssertTrue(rendered.isSubset(of: store.state.reality.library.attention.checkedContentIDs))
+        let bytes = try SaveCodec.makeEncoder().encode(store.state)
+        store.checkLibraryContent(rendered)
+        XCTAssertEqual(try SaveCodec.makeEncoder().encode(store.state), bytes)
+    }
+
     private func catalogueCopy(_ catalog: ContentCatalog, pages: [DiaryPageDef]) -> ContentCatalog {
         ContentCatalog(symbols: catalog.symbols, creatures: catalog.creatures,
             resources: catalog.resources, items: catalog.items, skills: catalog.skills,

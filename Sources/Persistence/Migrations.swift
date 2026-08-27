@@ -28,6 +28,7 @@ enum Migrations {
         guard version < Tuning.saveSchemaVersion else {
             try validateCurrentChannelworksRestoration(in: data)
             try validateCurrentCombatOpening(in: data)
+            try validateCurrentLibraryAttention(in: data)
             return data
         }
 
@@ -37,6 +38,7 @@ enum Migrations {
         }
         try validateCurrentChannelworksRestoration(in: working)
         try validateCurrentCombatOpening(in: working)
+        try validateCurrentLibraryAttention(in: working)
         return working
     }
 
@@ -123,11 +125,43 @@ enum Migrations {
         case 6: return try migrate6to7CreatureRewards(migrate6to7(data))
         case 7: return try migrate7to8(data)
         case 8: return try migrate8to9(data)
+        case 9: return try migrate9to10(data)
         default:
             // No migration registered. Tolerant decoding is the fallback; if the save is genuinely
             // incompatible, `SaveFileIO.load()` quarantines it rather than losing it.
             return data
         }
+    }
+
+    private static func migrate9to10(_ data: Data) throws -> Data {
+        guard var root = try JSONSerialization.jsonObject(with: data) as? [String: Any] else {
+            throw CocoaError(.coderInvalidValue)
+        }
+        root["schemaVersion"] = 10
+        let staged = try JSONSerialization.data(withJSONObject: root, options: [.sortedKeys])
+        var state = try SaveCodec.makeDecoder().decode(GameState.self, from: staged)
+        state.schemaVersion = 10
+        state.reality.library.attention = LibraryAttentionStateV1(
+            checkedContentIDs: LibraryShelfPresentation.currentContentIDs(in: state))
+        return try SaveCodec.makeEncoder().encode(state)
+    }
+
+    private static func validateCurrentLibraryAttention(in data: Data) throws {
+        guard let root = try JSONSerialization.jsonObject(with: data) as? [String: Any],
+              let reality = root["reality"] as? [String: Any],
+              let library = reality["library"] as? [String: Any],
+              let attention = library["attention"] as? [String: Any],
+              Set(attention.keys) == Set(["version", "checkedContentIDs"]),
+              let version = attention["version"] as? NSNumber,
+              CFGetTypeID(version) != CFBooleanGetTypeID(), version.intValue == 1,
+              let rawIDs = attention["checkedContentIDs"] as? [Any] else {
+            throw CocoaError(.coderInvalidValue)
+        }
+        let ids = try rawIDs.map { raw -> LibraryAttentionContentID in
+            let encoded = try JSONSerialization.data(withJSONObject: raw)
+            return try SaveCodec.makeDecoder().decode(LibraryAttentionContentID.self, from: encoded)
+        }
+        guard Set(ids).count == ids.count else { throw CocoaError(.coderInvalidValue) }
     }
 
     private static func migrate8to9(_ data: Data) throws -> Data {

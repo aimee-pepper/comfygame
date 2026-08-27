@@ -1386,7 +1386,14 @@ enum WorldRules {
             // of a win.
             let isNewSpecies = state.reality.discovery.species[member.identityKey] == nil
             if isNewSpecies { initiallyUnrecordedSpecies.insert(member.identityKey) }
-            state.reality.discovery.recordSpecies(member.identityKey, runIndex: run.runIndex)
+            if let habitat = member.habitatPlacement?.habitat {
+                guard state.reality.discovery.recordSpecies(
+                    member.identityKey, habitat: habitat, runIndex: run.runIndex) else { return }
+            } else {
+                // Legacy/authored bodies remain visible in Bestiary detail but unclassified on
+                // the physical habitat shelves.
+                state.reality.discovery.recordSpecies(member.identityKey, runIndex: run.runIndex)
+            }
             if isNewSpecies { awardDiscovery(.species, run: &run, in: &state) }
             if let traits = member.traits {
                 state.reality.discovery.recordSpecimen(traits, of: member.identityKey, runIndex: run.runIndex)

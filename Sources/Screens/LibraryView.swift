@@ -212,12 +212,14 @@ struct LibraryView: View {
     @EnvironmentObject private var store: GameStore
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     @State private var tab: LibraryTab = .diaries
+    @State private var showsShelfRoot = true
     @State private var firstReturnPrompt: FirstReturnTutorialContext?
 
 #if DEBUG
-    init(debugTabIndex: Int = 0) {
+    init(debugTabIndex: Int = 0, debugShowsShelfRoot: Bool = true) {
         let tabs = LibraryTab.allCases
         _tab = State(initialValue: tabs.indices.contains(debugTabIndex) ? tabs[debugTabIndex] : .diaries)
+        _showsShelfRoot = State(initialValue: debugShowsShelfRoot)
     }
 #endif
 
@@ -229,7 +231,30 @@ struct LibraryView: View {
     }
 
     var body: some View {
+        Group {
+            if showsShelfRoot { shelfRoot }
+            else { existingCollection }
+        }
+        .background(Color(.systemGroupedBackground).ignoresSafeArea())
+        .navigationTitle(showsShelfRoot ? "The Library" : selectedShelfTitle)
+        .navigationBarTitleDisplayMode(.inline)
+        .accessibilityIdentifier(showsShelfRoot ? "library.shelves" : "library.\(tab.id.lowercased())")
+        .tutorialHoverOverlay(isPresented: firstReturnPrompt != nil, alignment: .top) {
+            firstReturnWritingOverlay
+        }
+        .onAppear { prepareFirstReturnWritingPrompt() }
+    }
+
+    private var existingCollection: some View {
         VStack(spacing: 0) {
+            HStack {
+                Button { showsShelfRoot = true } label: {
+                    Label("Shelves", systemImage: "chevron.left")
+                        .frame(minHeight: 44)
+                }
+                Spacer()
+            }
+            .padding(.horizontal, 16)
             Picker("Library collection", selection: $tab) {
                 ForEach(LibraryTab.allCases) {
                     Text($0.tabLabel).tag($0).accessibilityLabel($0.tabLabel)
@@ -262,14 +287,100 @@ struct LibraryView: View {
             .background { P2SafeSpaceProbe(region: .libraryScroll) }
 #endif
         }
-        .background(Color(.systemGroupedBackground).ignoresSafeArea())
-        .navigationTitle("The Library")
-        .navigationBarTitleDisplayMode(.inline)
-        .accessibilityIdentifier("library.\(tab.id.lowercased())")
-        .tutorialHoverOverlay(isPresented: firstReturnPrompt != nil, alignment: .top) {
-            firstReturnWritingOverlay
+        .onAppear { checkSelectedShelfAfterRender() }
+        .onChange(of: tab) { _, _ in checkSelectedShelfAfterRender() }
+    }
+
+    private var selectedShelfTitle: String {
+        switch tab {
+        case .diaries, .people: "Diaries"
+        case .dictionary: "Dictionary"
+        case .notes: "Field Notes"
+        case .history: "World History"
         }
-        .onAppear { prepareFirstReturnWritingPrompt() }
+    }
+
+    private var shelfRoot: some View {
+        let shelves = LibraryShelfPresentation.make(in: store.state)
+        return ScrollView {
+            VStack(spacing: 10) {
+                ForEach(shelves, id: \.id) { shelf in
+                    shelfDestination(shelf)
+                }
+            }
+            .padding(16)
+        }
+    }
+
+    @ViewBuilder private func shelfDestination(_ shelf: LibraryShelfPresentation) -> some View {
+        let label = shelfLabel(shelf)
+        if shelf.id == .bestiary || shelf.id == .worldHistory {
+            NavigationLink(value: shelf.route) {
+                shelfRow(label: label, shelf: shelf)
+            }
+            .buttonStyle(.plain)
+        } else {
+            Button {
+                tab = switch shelf.id {
+                case .diaries: .diaries
+                case .dictionary: .dictionary
+                case .fieldNotes: .notes
+                case .bestiary: .diaries
+                case .worldHistory: .history
+                }
+                showsShelfRoot = false
+            } label: { shelfRow(label: label, shelf: shelf) }
+            .buttonStyle(.plain)
+        }
+    }
+
+    private func shelfRow(label: String, shelf: LibraryShelfPresentation) -> some View {
+        HStack(spacing: 12) {
+            Image(systemName: "books.vertical")
+                .frame(width: 32, height: 32)
+            VStack(alignment: .leading, spacing: 2) {
+                Text(label).font(.headline)
+                Text("\(shelf.entryCount) entr\(shelf.entryCount == 1 ? "y" : "ies")")
+                    .font(.caption).foregroundStyle(.secondary)
+            }
+            Spacer()
+            if shelf.uncheckedCount > 0 {
+                Text("\(shelf.uncheckedCount) new")
+                    .font(.caption.weight(.semibold))
+                    .accessibilityLabel("\(shelf.uncheckedCount) unchecked")
+            }
+            Image(systemName: "chevron.right")
+        }
+        .padding(.horizontal, 14)
+        .frame(maxWidth: .infinity, minHeight: 64)
+        .background(Color(.secondarySystemGroupedBackground))
+        .clipShape(RoundedRectangle(cornerRadius: 10))
+        .accessibilityElement(children: .combine)
+        .accessibilityIdentifier("library.shelf.\(shelf.id.rawValue)")
+    }
+
+    private func shelfLabel(_ shelf: LibraryShelfPresentation) -> String {
+        switch shelf.id {
+        case .diaries: "Diaries"
+        case .bestiary: "Bestiary"
+        case .dictionary: "Dictionary"
+        case .fieldNotes: "Field Notes"
+        case .worldHistory: "World History"
+        }
+    }
+
+    private func checkSelectedShelfAfterRender() {
+        let shelfID: LibraryShelfID = switch tab {
+        case .diaries, .people: .diaries
+        case .dictionary: .dictionary
+        case .notes: .fieldNotes
+        case .history: .worldHistory
+        }
+        guard let shelf = LibraryShelfPresentation.make(in: store.state).first(where: {
+            $0.id == shelfID
+        }) else { return }
+        store.checkLibraryContent(LibraryShelfPresentation.contentIDs(
+            for: shelf.id, in: store.state))
     }
 
     @ViewBuilder private var diariesGrid: some View {

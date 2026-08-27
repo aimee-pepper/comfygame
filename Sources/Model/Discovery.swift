@@ -17,6 +17,9 @@ struct DiscoveryLog: Codable, Equatable, Sendable {
     /// **The bestiary's first tier: identities are entries** (session 15 §1, spec §6). Keyed by the
     /// derived identity, so two similar ambushers from different worlds are one entry.
     var species: [String: DiscoveryRecord] = [:]
+    /// Habitat is frozen at the first legitimate species record. Missing legacy entries remain
+    /// deliberately unclassified rather than being inferred from mutable worlds or names.
+    var speciesHabitatByIdentity: [String: CreatureHabitat] = [:]
     /// **The second tier: specimens.** One record per animal actually met, which is where personal
     /// bests and "the largest you've seen" come from. Capped, because this is the only collection in
     /// the save that grows without bound.
@@ -30,12 +33,14 @@ struct DiscoveryLog: Codable, Equatable, Sendable {
 
     init(creatures: [CreatureID: DiscoveryRecord] = [:],
          species: [String: DiscoveryRecord] = [:],
+         speciesHabitatByIdentity: [String: CreatureHabitat] = [:],
          specimens: [SpecimenRecord] = [],
          apexSightings: [ApexSighting] = [],
          resources: [ResourceID: DiscoveryRecord] = [:],
          sites: [SiteID: DiscoveryRecord] = [:]) {
         self.creatures = creatures
         self.species = species
+        self.speciesHabitatByIdentity = speciesHabitatByIdentity
         self.specimens = specimens
         self.apexSightings = apexSightings
         self.resources = resources
@@ -52,6 +57,8 @@ struct DiscoveryLog: Codable, Equatable, Sendable {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         creatures = try container.decodeIfPresent([CreatureID: DiscoveryRecord].self, forKey: .creatures) ?? [:]
         species = try container.decodeIfPresent([String: DiscoveryRecord].self, forKey: .species) ?? [:]
+        speciesHabitatByIdentity = try container.decodeIfPresent(
+            [String: CreatureHabitat].self, forKey: .speciesHabitatByIdentity) ?? [:]
         specimens = try container.decodeIfPresent([SpecimenRecord].self, forKey: .specimens) ?? []
         apexSightings = try container.decodeIfPresent([ApexSighting].self,
                                                        forKey: .apexSightings) ?? []
@@ -98,6 +105,17 @@ struct DiscoveryLog: Codable, Equatable, Sendable {
     /// A bestiary *entry* — that this kind of animal exists and you've met one.
     mutating func recordSpecies(_ key: String, runIndex: Int) {
         species[key, default: DiscoveryRecord()].record(runIndex: runIndex)
+    }
+
+    /// Returns false without mutation when an already-frozen identity is presented with a
+    /// different habitat. Callers own the surrounding transaction and must fail atomically.
+    @discardableResult
+    mutating func recordSpecies(_ key: String, habitat: CreatureHabitat,
+                                runIndex: Int) -> Bool {
+        if let frozen = speciesHabitatByIdentity[key], frozen != habitat { return false }
+        speciesHabitatByIdentity[key] = habitat
+        species[key, default: DiscoveryRecord()].record(runIndex: runIndex)
+        return true
     }
 
     /// A bestiary *specimen* — this particular animal, kept so the entry can say how this one

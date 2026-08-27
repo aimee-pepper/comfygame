@@ -5,6 +5,8 @@ import Foundation
 /// Lives in the **Reality** layer: pages read and people found are knowledge, and knowledge is
 /// never taken back. A collapse can cost you a haul; it can't cost you a page you've already read.
 struct LibraryState: Codable, Equatable, Sendable {
+    /// Presentation-only acknowledgement ledger for the five physical Library shelves.
+    var attention: LibraryAttentionStateV1 = .init()
     /// Canonical first-recovery receipts. `foundPages` remains a compatibility projection while
     /// older saves and callers migrate to these provenance-bearing records.
     var recoveredPages: [RecoveredPageRecord] = []
@@ -48,6 +50,11 @@ struct LibraryState: Codable, Equatable, Sendable {
 
     init(from decoder: Decoder) throws {
         let c = try decoder.container(keyedBy: CodingKeys.self)
+        if c.contains(.attention) {
+            attention = try c.decode(LibraryAttentionStateV1.self, forKey: .attention)
+            guard attention.validates() else { throw DecodingError.dataCorruptedError(
+                forKey: .attention, in: c, debugDescription: "Invalid Library attention receipt") }
+        } else { attention = .init() }
         let decodedRecords = try c.decodeIfPresent([RecoveredPageRecord].self,
                                                    forKey: .recoveredPages) ?? []
         let decodedPages = try c.decodeIfPresent([DiaryPageID].self, forKey: .foundPages) ?? []
@@ -157,6 +164,22 @@ struct LibraryState: Codable, Equatable, Sendable {
             .filter { $0.kind == .locationClue && $0.about == traveller }
             .compactMap(\.clueIndex))
     }
+}
+
+enum LibraryAttentionContentID: Codable, Equatable, Hashable, Sendable {
+    case diaryPage(DiaryPageID)
+    case bestiarySpecies(String)
+    case dictionaryCompound(SymbolID)
+    case foundWriting(FoundWritingID)
+    case visitedWorld(InstanceID)
+}
+
+struct LibraryAttentionStateV1: Codable, Equatable, Sendable {
+    static let version = 1
+    var version: Int = Self.version
+    var checkedContentIDs: Set<LibraryAttentionContentID> = []
+
+    func validates() -> Bool { version == Self.version }
 }
 
 /// Transitional source compatibility while rules and presentation move to WorkshopPatternID.

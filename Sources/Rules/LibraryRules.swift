@@ -1,5 +1,212 @@
 import Foundation
 
+enum LibraryShelfID: String, Codable, CaseIterable, Sendable {
+    case diaries, bestiary, dictionary, fieldNotes, worldHistory
+}
+
+enum LibraryHabitatFamily: String, Codable, CaseIterable, Sendable {
+    case land, shore, water, air
+
+    init(_ habitat: CreatureHabitat) {
+        self = switch habitat {
+        case .terrestrial: .land
+        case .shore: .shore
+        case .aquatic: .water
+        case .aerial: .air
+        }
+    }
+}
+
+enum LibraryObjectID: Hashable, Sendable {
+    case diary(TravellerID)
+    case bestiary(habitat: LibraryHabitatFamily, volume: Int)
+    case dictionary(volume: Int)
+    case fieldNotes(volume: Int)
+    case worldHistory(volume: Int)
+}
+
+enum LibraryObjectForm: String, Equatable, Sendable {
+    case loosePage = "loose-page"
+    case stitchedFolio = "stitched-folio"
+    case softbound
+    case hardcover
+    case fullHardcoverWithSlips = "full-hardcover-with-slips"
+}
+
+struct LibraryShelfObjectPresentation: Equatable, Sendable {
+    var id: LibraryObjectID
+    var form: LibraryObjectForm
+    var entryCount: Int
+    var contentIDs: [LibraryAttentionContentID]
+}
+
+struct LibraryShelfPresentation: Equatable, Sendable {
+    var id: LibraryShelfID
+    var route: AppRoute
+    var entryCount: Int
+    var objects: [LibraryShelfObjectPresentation]
+    var uncheckedCount: Int
+
+    static func make(in state: GameState) -> [Self] {
+        let current = currentContentIDs(in: state)
+        let checked = state.reality.library.attention.checkedContentIDs
+        func shelf(_ id: LibraryShelfID, route: AppRoute,
+                   objects: [LibraryShelfObjectPresentation]) -> Self {
+            let ids = Set(objects.flatMap(\.contentIDs))
+            return .init(id: id, route: route, entryCount: ids.count, objects: objects,
+                         uncheckedCount: ids.subtracting(checked).count)
+        }
+        return [
+            shelf(.diaries, route: .library, objects: diaryObjects(in: state)),
+            shelf(.bestiary, route: .bestiary, objects: bestiaryObjects(in: state)),
+            shelf(.dictionary, route: .library, objects: dictionaryObjects(in: state)),
+            shelf(.fieldNotes, route: .library, objects: fieldNoteObjects(in: state)),
+            shelf(.worldHistory, route: .worldHistory, objects: historyObjects(in: state)),
+        ].map { value in
+            var result = value
+            // Legacy/unclassified content remains truthful in the count without inventing art.
+            result.entryCount = current.filter { content in
+                switch (result.id, content) {
+                case (.diaries, .diaryPage(_)), (.bestiary, .bestiarySpecies(_)),
+                     (.dictionary, .dictionaryCompound(_)), (.fieldNotes, .foundWriting(_)),
+                     (.worldHistory, .visitedWorld(_)): true
+                default: false
+                }
+            }.count
+            result.uncheckedCount = current.filter { !checked.contains($0) }.filter { content in
+                switch (result.id, content) {
+                case (.diaries, .diaryPage(_)), (.bestiary, .bestiarySpecies(_)),
+                     (.dictionary, .dictionaryCompound(_)), (.fieldNotes, .foundWriting(_)),
+                     (.worldHistory, .visitedWorld(_)): true
+                default: false
+                }
+            }.count
+            return result
+        }
+    }
+
+    static func currentContentIDs(in state: GameState) -> Set<LibraryAttentionContentID> {
+        var result = Set((state.reality.library.recoveredPages.map(\.pageID)
+            + state.reality.library.foundPages).map(LibraryAttentionContentID.diaryPage))
+        result.formUnion(state.reality.discovery.species.compactMap { key, record in
+            record.firstSeenRunIndex == nil ? nil : .bestiarySpecies(key)
+        })
+        let encountered = state.reality.encounteredLexemes
+        result.formUnion(ContentCatalog.shared.symbols.compactMap { symbol in
+            (encountered.contains(.compound(symbol.id)) || state.base.ownedSymbols.contains(symbol.id))
+                ? .dictionaryCompound(symbol.id) : nil
+        })
+        result.formUnion(state.reality.library.foundWritings.map { .foundWriting($0.id) })
+        result.formUnion(state.reality.library.visitedWorlds.map { .visitedWorld($0.id) })
+        return result
+    }
+
+    static func contentIDs(for shelf: LibraryShelfID,
+                           in state: GameState) -> Set<LibraryAttentionContentID> {
+        currentContentIDs(in: state).filter { content in
+            switch (shelf, content) {
+            case (.diaries, .diaryPage(_)), (.bestiary, .bestiarySpecies(_)),
+                 (.dictionary, .dictionaryCompound(_)), (.fieldNotes, .foundWriting(_)),
+                 (.worldHistory, .visitedWorld(_)): true
+            default: false
+            }
+        }
+    }
+
+    private static func diaryObjects(in state: GameState) -> [LibraryShelfObjectPresentation] {
+        var seen = Set<DiaryPageID>()
+        let pageIDs = (state.reality.library.recoveredPages.map(\.pageID)
+            + state.reality.library.foundPages).filter { seen.insert($0).inserted }
+        let pages = pageIDs.compactMap { id -> (TravellerID, LibraryAttentionContentID)? in
+            guard let definition = ContentCatalog.shared.diaryPage(id) else { return nil }
+            return (definition.diary, .diaryPage(id))
+        }
+        return ContentCatalog.shared.travellersInAuthoredOrder.compactMap { traveller in
+            let ids = pages.filter { $0.0 == traveller.id }.map(\.1)
+            guard !ids.isEmpty else { return nil }
+            let form: LibraryObjectForm = switch ids.count {
+            case 1: .loosePage
+            case 2...3: .stitchedFolio
+            case 4...6: .softbound
+            case 7...9: .hardcover
+            default: .fullHardcoverWithSlips
+            }
+            return .init(id: .diary(traveller.id), form: form,
+                         entryCount: ids.count, contentIDs: ids)
+        }
+    }
+
+    private static func bestiaryObjects(in state: GameState) -> [LibraryShelfObjectPresentation] {
+        LibraryHabitatFamily.allCases.flatMap { habitat -> [LibraryShelfObjectPresentation] in
+            let ids = state.reality.discovery.speciesHabitatByIdentity
+                .filter { LibraryHabitatFamily($0.value) == habitat
+                    && state.reality.discovery.species[$0.key]?.firstSeenRunIndex != nil }
+                .map(\.key).sorted()
+            return ids.chunkedLibrary(every: 8).enumerated().map { index, group in
+                let form: LibraryObjectForm = switch group.count {
+                case 1...2: .stitchedFolio
+                case 3...5: .softbound
+                default: .fullHardcoverWithSlips
+                }
+                return LibraryShelfObjectPresentation(
+                    id: .bestiary(habitat: habitat, volume: index + 1), form: form,
+                    entryCount: group.count,
+                    contentIDs: group.map(LibraryAttentionContentID.bestiarySpecies))
+            }
+        }
+    }
+
+    private static func dictionaryObjects(in state: GameState) -> [LibraryShelfObjectPresentation] {
+        let encountered = state.reality.encounteredLexemes
+        return ContentCatalog.shared.symbols.chunkedLibrary(every: 7).enumerated().compactMap { index, group in
+            let ids = group.filter { encountered.contains(.compound($0.id))
+                || state.base.ownedSymbols.contains($0.id) }.map { LibraryAttentionContentID.dictionaryCompound($0.id) }
+            guard !ids.isEmpty else { return nil }
+            let form: LibraryObjectForm = ids.count <= 2 ? .stitchedFolio
+                : (ids.count <= 5 ? .softbound : .hardcover)
+            return .init(id: .dictionary(volume: index + 1), form: form,
+                         entryCount: ids.count, contentIDs: ids)
+        }
+    }
+
+    private static func fieldNoteObjects(in state: GameState) -> [LibraryShelfObjectPresentation] {
+        var seen = Set<FoundWritingID>()
+        let ids = state.reality.library.foundWritings.compactMap { seen.insert($0.id).inserted ? $0.id : nil }
+        return ids.chunkedLibrary(every: 8).enumerated().map { index, group in
+            let form: LibraryObjectForm = group.count <= 2 ? .stitchedFolio
+                : (group.count <= 5 ? .softbound : .fullHardcoverWithSlips)
+            return .init(id: .fieldNotes(volume: index + 1), form: form,
+                         entryCount: group.count, contentIDs: group.map(LibraryAttentionContentID.foundWriting))
+        }
+    }
+
+    private static func historyObjects(in state: GameState) -> [LibraryShelfObjectPresentation] {
+        state.reality.library.visitedWorlds.map(\.id).chunkedLibrary(every: 8).enumerated().map { index, group in
+            let form: LibraryObjectForm = group.count <= 2 ? .stitchedFolio
+                : (group.count <= 5 ? .softbound : .fullHardcoverWithSlips)
+            return .init(id: .worldHistory(volume: index + 1), form: form,
+                         entryCount: group.count, contentIDs: group.map(LibraryAttentionContentID.visitedWorld))
+        }
+    }
+}
+
+extension GameStore {
+    /// A route may acknowledge only the exact underlying identities it actually rendered.
+    func checkLibraryContent(_ rendered: Set<LibraryAttentionContentID>) {
+        let unchecked = rendered.subtracting(state.reality.library.attention.checkedContentIDs)
+        guard !unchecked.isEmpty else { return }
+        mutate("check rendered Library content") { state in
+            state.reality.library.attention.checkedContentIDs.formUnion(unchecked)
+        }
+    }
+}
+
+private extension Array {
+    func chunkedLibrary(every size: Int) -> [[Element]] {
+        stride(from: 0, to: count, by: size).map { Array(self[$0..<Swift.min($0 + size, count)]) }
+    }
+}
+
 enum PlayerSigilCopy {
     static let singular = "Sigil"
     static let plural = "Sigils"

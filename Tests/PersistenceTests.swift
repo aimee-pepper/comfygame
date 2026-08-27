@@ -46,7 +46,7 @@ final class PersistenceTests: XCTestCase {
         root["base"] = base
         let legacy = try JSONSerialization.data(withJSONObject: root, options: [.sortedKeys])
         let migrated = try SaveCodec.decode(legacy)
-        XCTAssertEqual(migrated.schemaVersion, 9)
+        XCTAssertEqual(migrated.schemaVersion, Tuning.saveSchemaVersion)
         XCTAssertNotNil(migrated.base.channelworksRestoration?.fixtureInstanceID)
         XCTAssertEqual(migrated.base.channelworksRestoration?.fixtureCore,
                        ChannelworksRestorationRules.authoredCore)

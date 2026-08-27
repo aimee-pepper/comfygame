@@ -999,7 +999,8 @@ extension RootView {
         case .essenceSpring: EssenceSpringView()
         case .constellation: ConstellationView()
         case .library: LibraryView()
-        case .bestiary: BestiaryView()
+        case .bestiary:
+            BestiaryView().onAppear { checkLibraryShelf(.bestiary) }
         case .blacksmith: BlacksmithView()
         case .tradingPost: TradingPostView()
         case .recycler: RecyclerView()
@@ -1007,7 +1008,8 @@ extension RootView {
         case .bowyer: BowyerView()
         case .armoury: ArmouryView()
         case .weaponsmith: WeaponsmithView()
-        case .worldHistory: WorldHistoryView()
+        case .worldHistory:
+            WorldHistoryView().onAppear { checkLibraryShelf(.worldHistory) }
         case .scriptorium: ScriptoriumView()
         case .surveyPost: SurveyPostView()
         case .apothecary: ApothecaryView()
@@ -1021,6 +1023,13 @@ extension RootView {
         case .harness: HarnessView()
         case .base, .world, .encounter: BaseView()
         }
+    }
+
+    private func checkLibraryShelf(_ id: LibraryShelfID) {
+        guard LibraryShelfPresentation.make(in: store.state).contains(where: {
+            $0.id == id
+        }) else { return }
+        store.checkLibraryContent(LibraryShelfPresentation.contentIDs(for: id, in: store.state))
     }
 }
 
