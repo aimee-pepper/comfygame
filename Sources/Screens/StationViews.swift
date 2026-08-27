@@ -409,7 +409,8 @@ private struct SpilloverCard: View {
                                  rarity: stack.rarity,
                                  quantity: stack.count, identified: stack.identified,
                                  location: .waiting,
-                                 accessibilityName: stack.displayName)
+                                 accessibilityName: stack.displayName,
+                                 gearQualityBand: stack.gearProfile?.qualityBand)
                 } detail: { spilled in
                     SpilloverDetailSheet(spilled: spilled).environmentObject(store)
                 }
@@ -440,7 +441,8 @@ private struct SpilloverDetailSheet: View {
                                      rarity: displaySpilled.rarity,
                                      quantity: displaySpilled.count, identified: displaySpilled.identified,
                                      location: .waiting,
-                                     accessibilityName: displaySpilled.displayName)
+                                     accessibilityName: displaySpilled.displayName,
+                                     gearQualityBand: displaySpilled.gearProfile?.qualityBand)
                             .frame(width: 58, height: 58)
                         VStack(alignment: .leading, spacing: 4) {
                             Text(displaySpilled.displayName).font(.headline).foregroundStyle(displaySpilled.rarity.tint)
@@ -558,7 +560,8 @@ private struct SwapSheet: View {
                                      rarity: displaySpilled.rarity,
                                      quantity: displaySpilled.count, identified: displaySpilled.identified,
                                      location: .waiting,
-                                     accessibilityName: displaySpilled.displayName)
+                                     accessibilityName: displaySpilled.displayName,
+                                     gearQualityBand: displaySpilled.gearProfile?.qualityBand)
                             .frame(width: 52, height: 52)
                         VStack(alignment: .leading, spacing: 2) {
                             Text(displaySpilled.displayName).font(.callout.weight(.medium))
@@ -577,7 +580,8 @@ private struct SwapSheet: View {
                                          rarity: stored.rarity,
                                          quantity: stored.count, identified: stored.identified,
                                          location: .stored,
-                                         accessibilityName: stored.displayName)
+                                         accessibilityName: stored.displayName,
+                                         gearQualityBand: stored.gearProfile?.qualityBand)
                         } detail: { selected in
                             SwapStoredDetail(stored: selected, spilled: spilled) {
                                 guard case .allowed(let quote) = store.swapSpilledQuote(
@@ -630,7 +634,8 @@ private struct SwapStoredDetail: View {
                         ItemIconTile(icon: displayStored.icon, catalogueID: displayStored.catalogID,
                                      rarity: displayStored.rarity,
                                      quantity: displayStored.count, identified: displayStored.identified,
-                                     location: .stored, accessibilityName: displayStored.displayName)
+                                     location: .stored, accessibilityName: displayStored.displayName,
+                                     gearQualityBand: displayStored.gearProfile?.qualityBand)
                             .frame(width: 58, height: 58)
                         Text(displayStored.displayName).font(.headline).foregroundStyle(displayStored.rarity.tint)
                     }
@@ -724,7 +729,8 @@ struct StorehouseView: View {
                                              materialKind: bin.material?.kind,
                                              rarity: bin.rarity, quantity: bin.count,
                                              identified: bin.identified, location: .stored,
-                                             accessibilityName: bin.displayName)
+                                             accessibilityName: bin.displayName,
+                                             gearQualityBand: bin.gearProfile?.qualityBand)
                             } detail: { selected in
                                 MaterialReserveSheet(kind: selected.material!.kind)
                                     .environmentObject(store)
@@ -748,7 +754,8 @@ struct StorehouseView: View {
                                              rarity: stack.rarity,
                                              quantity: stack.count, identified: stack.identified,
                                              location: .stored,
-                                             accessibilityName: stack.displayName)
+                                             accessibilityName: stack.displayName,
+                                             gearQualityBand: stack.gearProfile?.qualityBand)
                             } detail: { selected in
                                 StorehouseItemSheet(stack: selected).environmentObject(store)
                             }
@@ -928,12 +935,12 @@ private struct StorehouseItemSheet: View {
                             ItemIconTile(icon: displayedStack.icon, catalogueID: displayedStack.catalogID,
                                          rarity: displayedStack.rarity,
                                          quantity: displayedStack.count, identified: displayedStack.identified,
-                                         location: .stored, accessibilityName: displayedStack.displayName)
+                                         location: .stored, accessibilityName: displayedStack.displayName,
+                                         gearQualityBand: displayedStack.gearProfile?.qualityBand)
                                 .frame(width: 58, height: 58)
                             VStack(alignment: .leading, spacing: 4) {
                                 Text(displayedStack.displayName).font(.headline).foregroundStyle(displayedStack.rarity.tint)
-                                Text(displayedStack.gearProfile.map { $0.qualityBand.displayName }
-                                     ?? GearPresentationCopy.catalogueQuality(displayedStack.catalogID)
+                                Text(GearPresentationCopy.instanceQuality(displayedStack)
                                      ?? displayedStack.rarity.displayName)
                                     .font(.caption).foregroundStyle(.secondary)
                             }
@@ -945,7 +952,7 @@ private struct StorehouseItemSheet: View {
                                        ? "No longer stored" : ItemGridLocation.stored.displayName)
                         if !displayedStack.detail.isEmpty { Text(displayedStack.detail) }
                         if let profile = displayedStack.gearProfile {
-                            LabeledContent("Tier", value: "\(profile.constructionTier)")
+                            LabeledContent("Quality", value: GearPresentationCopy.quality(profile))
                             LabeledContent("Reforge", value: "\(profile.reforgeRank) of \(SmithRules.maximumReforgeLevel)")
                             if let provenance = profile.displayProvenance {
                                 LabeledContent("Provenance", value: provenance)
@@ -993,7 +1000,8 @@ private struct HomeSatchelItemSheet: View {
             VStack(spacing: 16) {
                 ItemIconTile(icon: stack.icon, catalogueID: stack.catalogID, rarity: stack.rarity,
                              quantity: stack.count, identified: stack.identified, location: .carried,
-                             accessibilityName: stack.displayName)
+                             accessibilityName: stack.displayName,
+                             gearQualityBand: stack.gearProfile?.qualityBand)
                     .frame(width: 64, height: 64)
                 Text(stack.displayName).font(.headline)
                 Text("Wanted \(store.fieldKitDesiredCount(for: stack.catalogID)) · available \(store.fieldKitOwnedCount(for: stack.catalogID))")

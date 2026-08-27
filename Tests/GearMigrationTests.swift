@@ -191,12 +191,27 @@ final class GearMigrationTests: XCTestCase {
     }
 
     func testSharedGearPresentationUsesSixBandIdentityInsteadOfLegacyRarityOrTier() throws {
-        let stack = ItemStack(id: .init(rawValue: 996), catalogID: "silvered_helm")
+        var stack = ItemStack(id: .init(rawValue: 996), catalogID: "silvered_helm")
         XCTAssertTrue(stack.displayName.contains("Superior"))
         XCTAssertFalse(stack.displayName.contains("Tier"))
         XCTAssertEqual(GearPresentationCopy.catalogueQuality("silvered_helm"), "Superior")
         XCTAssertEqual(GearPresentationCopy.catalogueQuality("blade_chipped"), "Standard")
         XCTAssertNil(GearPresentationCopy.catalogueQuality("salve_lesser"))
+
+        stack.gearProfile?.qualityBand = .rough
+        XCTAssertEqual(GearPresentationCopy.instanceQuality(stack), "Rough")
+        XCTAssertEqual(ReforgeTarget.stored(stack).qualityBand, .rough)
+        XCTAssertEqual(ReforgeTarget.stored(stack).displayName,
+                       "Silvered Helm · Rough")
+        XCTAssertFalse(ReforgeTarget.stored(stack).displayName.contains("Superior"),
+                       "an instance consumer must not re-read catalogue quality")
+        XCTAssertEqual(GearPresentationCopy.itemGridQuality(instanceBand: .rough,
+                                                             catalogueID: "silvered_helm",
+                                                             fallbackRarity: .mythic), "Rough")
+        XCTAssertEqual(GearPresentationCopy.itemGridQuality(instanceBand: nil,
+                                                             catalogueID: "silvered_helm",
+                                                             fallbackRarity: .mythic), "Superior",
+                       "catalogue quality is allowed only when no instance authority is supplied")
     }
 
     func testMigrationPreservesConstructionReceiptPrecedenceForCatalogueAuthoredID() throws {

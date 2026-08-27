@@ -116,6 +116,7 @@ struct BlacksmithView: View {
                                  quantity: target.count, identified: true,
                                  location: target.gridLocation,
                                  accessibilityName: target.displayName,
+                                 gearQualityBand: target.qualityBand,
                                  isEnabled: SmithRules.requirement(
                                     for: target.catalogID, at: target.upgradeLevel) != nil)
                 } detail: { target in
@@ -310,7 +311,8 @@ struct ArmouryView: View {
                                     quantity: 1,
                                     identified: targetIsIdentified(target),
                                     location: targetLocation(target),
-                                    accessibilityName: target.displayName
+                                    accessibilityName: target.displayName,
+                                    gearQualityBand: target.gearProfile?.qualityBand
                                 )
                             }
                             .buttonStyle(.plain)
@@ -1097,7 +1099,7 @@ private struct ReforgeSheet: View {
 
                     Section {
                         LabeledRow(icon: target.icon, label: target.displayName,
-                                   value: GearPresentationCopy.quality(tier: target.constructionTier),
+                                   value: GearPresentationCopy.quality(target.qualityBand),
                                    tint: target.rarity.tint)
                         LabeledRow(icon: "arrow.up.circle", label: "Becomes",
                                    value: String(format: "power %.1f", target.effectivePower + 0.2))
@@ -1203,6 +1205,6 @@ private struct ReforgeSheet: View {
     private var effectText: String {
         guard let slot = target.definition?.gear?.slot else { return "" }
         let unit = slot == .weapon ? "damage" : "protection"
-        return "+0.2 power toward final \(unit). Construction tier stays \(target.constructionTier). This exact piece keeps it."
+        return "+0.2 power toward final \(unit). Quality stays \(GearPresentationCopy.quality(target.qualityBand)). This exact piece keeps it."
     }
 }

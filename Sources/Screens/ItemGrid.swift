@@ -219,6 +219,8 @@ struct ItemIconTile: View {
     let identified: Bool
     let location: ItemGridLocation
     let accessibilityName: String
+    /// Frozen instance authority. Nil is reserved for catalogue-only/non-gear surfaces.
+    var gearQualityBand: CraftMaterialQualityBand? = nil
     var isSelected = false
     var isEnabled = true
 
@@ -276,7 +278,9 @@ struct ItemIconTile: View {
     private var accessibilityLabel: String {
         let identity = identified ? accessibilityName : "Unknown item"
         let count = quantity > 1 ? ", quantity \(quantity)" : ""
-        let quality = GearPresentationCopy.catalogueQuality(catalogueID) ?? rarity.displayName
+        let quality = GearPresentationCopy.itemGridQuality(instanceBand: gearQualityBand,
+                                                           catalogueID: catalogueID,
+                                                           fallbackRarity: rarity)
         return "\(identity), \(quality), \(location.displayName)\(count)"
     }
 

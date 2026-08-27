@@ -47,7 +47,8 @@ struct LootDecisionCard: View {
                     ItemIconTile(icon: offered.icon, catalogueID: offered.catalogID,
                                  rarity: offered.rarity,
                                  quantity: offered.count, identified: offered.identified,
-                                 location: .offered, accessibilityName: offered.displayName)
+                                 location: .offered, accessibilityName: offered.displayName,
+                                 gearQualityBand: offered.gearProfile?.qualityBand)
                         .frame(width: 52, height: 52)
                     VStack(alignment: .leading, spacing: 1) {
                         Text(offered.displayName)
@@ -71,7 +72,8 @@ struct LootDecisionCard: View {
                                      rarity: carried.rarity,
                                      quantity: carried.count, identified: carried.identified,
                                      location: .carried,
-                                     accessibilityName: carried.displayName)
+                                     accessibilityName: carried.displayName,
+                                     gearQualityBand: carried.gearProfile?.qualityBand)
                     } detail: { selected in
                         LootSwapDetailSheet(carried: selected, offered: offered) {
                             guard case .allowed(let quote) = store.lootSwapQuote(
@@ -184,7 +186,8 @@ private struct LootSwapDetailSheet: View {
                          rarity: stack.rarity,
                          quantity: stack.count, identified: stack.identified,
                          location: location,
-                         accessibilityName: stack.displayName)
+                         accessibilityName: stack.displayName,
+                         gearQualityBand: stack.gearProfile?.qualityBand)
                 .frame(width: 52, height: 52)
             VStack(alignment: .leading, spacing: 2) {
                 Text(role)

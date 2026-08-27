@@ -43,7 +43,8 @@ struct RecyclerView: View {
                                          quantity: 1,
                                          identified: preview.snapshot.identified,
                                          location: preview.location == .stored ? .stored : .waiting,
-                                         accessibilityName: preview.snapshot.displayName)
+                                         accessibilityName: preview.snapshot.displayName,
+                                         gearQualityBand: preview.snapshot.gearProfile?.qualityBand)
                         }
                         .buttonStyle(.plain)
 #if DEBUG
@@ -183,7 +184,8 @@ private struct RecyclerPreviewSheet: View {
                                      quantity: 1,
                                      identified: preview.snapshot.identified,
                                      location: preview.location == .stored ? .stored : .waiting,
-                                     accessibilityName: preview.snapshot.displayName)
+                                     accessibilityName: preview.snapshot.displayName,
+                                     gearQualityBand: preview.snapshot.gearProfile?.qualityBand)
                             .frame(width: 52, height: 52)
                         VStack(alignment: .leading, spacing: 3) {
                             Text(preview.snapshot.displayName).font(.headline)

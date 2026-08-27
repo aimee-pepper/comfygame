@@ -315,20 +315,27 @@ final class SiteTests: XCTestCase {
 
     @MainActor
     func testAuthoredSiteGearUsesValidatedAcquisitionDispositionAndFreezesProfile() throws {
-        let (store, site) = try makeStoreInWorld {
-            !($0.definition?.contents.items.filter {
-                ContentCatalog.shared.item($0)?.kind == .gear
-            }.isEmpty ?? true)
-        }
+        let store = GameStore(io: .temporary(name: "authored-site-gear-\(UUID().uuidString)"))
+        XCTAssertTrue(store.bindAndDepart())
+        let definition = try XCTUnwrap(ContentCatalog.shared.site("wayfarers_camp"))
+        let point = try XCTUnwrap(store.state.worlds.activeRun?.playerPosition)
+        let site = PlacedSite(id: .init(rawValue: 0xA117_40ED), siteID: definition.id,
+                              position: point, searchTurnsRemaining: definition.contents.searchTurns)
         let gearID = try XCTUnwrap(site.definition?.contents.items.first {
             ContentCatalog.shared.item($0)?.kind == .gear
         })
         guard case .eligible(let creation) = GearCatalogueDispositionRules.evaluate(
             gearID, route: .authoredSite) else { return XCTFail("authored site route refused") }
         var state = store.state
-        state.worlds.activeRun?.playerPosition = site.position
-        state.worlds.activeRun?.enemies.removeAll()
-        state.worlds.activeRun?.stability = Tuning.World.startingStability
+        var mountedRun = try XCTUnwrap(state.worlds.activeRun)
+        mountedRun.sites = [site]
+        mountedRun.playerPosition = site.position
+        var tile = mountedRun.map[point]
+        tile.content = .site(site.id)
+        mountedRun.map[point] = tile
+        mountedRun.enemies.removeAll()
+        mountedRun.stability = Tuning.World.startingStability
+        state.worlds.activeRun = mountedRun
         var events: [WorldRules.Event] = []
         for _ in 0..<(site.definition?.contents.searchTurns ?? 1) {
             events = WorldRules.searchSite(in: &state)

@@ -8,6 +8,14 @@ enum GearPresentationCopy {
     static func quality(_ profile: GearInstanceProfile?) -> String {
         quality(profile?.qualityBand ?? .standard)
     }
+    static func instanceQuality(_ stack: ItemStack) -> String? {
+        guard ContentCatalog.shared.item(stack.catalogID)?.kind == .gear else { return nil }
+        return quality(stack.gearProfile)
+    }
+    static func instanceQuality(_ piece: EquippedPiece) -> String? {
+        guard piece.definition?.kind == .gear else { return nil }
+        return quality(piece.gearProfile)
+    }
     static func catalogueQuality(_ item: ItemDef) -> String? {
         guard item.kind == .gear, let gear = item.gear else { return nil }
         let band = item.gearCatalogueDisposition?.foundReceipt?.qualityBand
@@ -16,6 +24,12 @@ enum GearPresentationCopy {
     }
     static func catalogueQuality(_ id: ItemID?) -> String? {
         id.flatMap(ContentCatalog.shared.item).flatMap(catalogueQuality)
+    }
+    static func itemGridQuality(instanceBand: CraftMaterialQualityBand?, catalogueID: ItemID?,
+                                fallbackRarity: Rarity) -> String {
+        instanceBand.map(quality)
+            ?? catalogueQuality(catalogueID)
+            ?? fallbackRarity.displayName
     }
     static func damage(_ damage: DamageKind) -> String { damage.rawValue.capitalisedSentence }
     static func reach(_ reach: Reach) -> String { reach.rawValue.capitalisedSentence }

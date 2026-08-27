@@ -197,7 +197,8 @@ struct TradingPostView: View {
             ItemIconTile(icon: listing.icon, catalogueID: listing.catalogueItemID,
                          rarity: listing.rarity,
                          quantity: listing.displayQuantity, identified: true,
-                         location: listing.location, accessibilityName: listing.name)
+                         location: listing.location, accessibilityName: listing.name,
+                         gearQualityBand: listing.stack?.gearProfile?.qualityBand)
         }
     }
 
@@ -240,6 +241,7 @@ struct TradingPostView: View {
                                           action: .buyStock(lineID: line.id, kind: line.kind))
             case .item(let id):
                 let definition = ContentCatalog.shared.item(id)
+                let frozenUnit = line.frozenUnits.first
                 return TradingPostListing(id: "stock-\(line.id)",
                                           name: TradingPostPresentation.itemName(id),
                                           icon: definition?.icon ?? "shippingbox.fill",
@@ -247,7 +249,7 @@ struct TradingPostView: View {
                                           displayQuantity: line.remainingQuantity, maximumQuantity: line.remainingQuantity,
                                           unitQuantity: 1, unitPrice: line.unitPrice, location: .offered,
                                           revision: base.tradingPost.inventoryRevision,
-                                          stack: nil,
+                                          stack: frozenUnit,
                                           action: .unavailablePurchase,
                                           authoredCatalogueItemID: id)
             case .material(let sample):
@@ -438,7 +440,8 @@ private struct TradingPostListingSheet: View {
                                              catalogueID: listing.catalogueItemID,
                                              rarity: listing.rarity,
                                              quantity: listing.displayQuantity, identified: true,
-                                             location: listing.location, accessibilityName: listing.name)
+                                             location: listing.location, accessibilityName: listing.name,
+                                             gearQualityBand: listing.stack?.gearProfile?.qualityBand)
                             }
                         }
                         .frame(width: 58, height: 58)
@@ -474,8 +477,8 @@ private struct TradingPostListingSheet: View {
                 if let stack = listing.stack {
                     Section("Details") {
                         if let profile = stack.gearProfile {
+                            LabeledContent("Quality", value: GearPresentationCopy.quality(profile))
                             LabeledContent("Power", value: profile.effectivePower.formatted(.number.precision(.fractionLength(0...1))))
-                            LabeledContent("Construction tier", value: "\(profile.constructionTier)")
                             LabeledContent("Reforge", value: "\(profile.reforgeRank) of \(SmithRules.maximumReforgeLevel)")
 #if DEBUG
                                 .background {

@@ -286,13 +286,19 @@ enum ReforgeTarget: Identifiable, Equatable, Sendable {
         }
     }
     var rarity: Rarity { definition?.rarity ?? .common }
+    var qualityBand: CraftMaterialQualityBand {
+        switch self {
+        case .stored(let stack), .overflow(let stack): stack.gearProfile?.qualityBand ?? .standard
+        case .worn(_, _, let piece): piece.gearProfile?.qualityBand ?? .standard
+        }
+    }
     var icon: String { definition?.icon ?? "questionmark" }
 
     var displayName: String {
         let base = definition?.name ?? catalogID.rawValue
         let suffix = upgradeLevel > 0
             ? " · Reforged \(upgradeLevel)/\(SmithRules.maximumReforgeLevel)" : ""
-        return "\(base) · Tier \(constructionTier)\(suffix)"
+        return "\(base) · \(GearPresentationCopy.quality(qualityBand))\(suffix)"
     }
 
     /// How many of this exact piece are in the bin — nothing, for a worn one.
