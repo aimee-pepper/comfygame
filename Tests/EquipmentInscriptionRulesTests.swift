@@ -135,7 +135,7 @@ final class EquipmentInscriptionRulesTests: XCTestCase {
         let frozen = try SaveCodec.encode(store.state)
         for scheme in [ColorScheme.light, .dark] {
             let controller = UIHostingController(rootView:
-                NavigationStack { ScriptoriumView() }
+                NavigationStack { ScriptoriumView(debugShowsInksCapability: true) }
                     .environmentObject(store)
                     .environment(\.colorScheme, scheme))
             let window = UIWindow(frame: CGRect(x: 0, y: 0, width: 368, height: 800))

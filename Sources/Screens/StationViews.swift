@@ -1087,6 +1087,14 @@ struct ScriptoriumView: View {
         var id: String { rawValue }
     }
 
+    init() {}
+
+#if DEBUG
+    init(debugShowsInksCapability: Bool) {
+        _capability = State(initialValue: debugShowsInksCapability ? .inks : .hands)
+    }
+#endif
+
     private var availableCapabilities: [Capability] {
         Capability.allCases.filter {
             switch $0 {
