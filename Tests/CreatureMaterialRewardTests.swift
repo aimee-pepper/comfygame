@@ -142,6 +142,173 @@ final class CreatureMaterialRewardTests: XCTestCase {
         XCTAssertEqual(decoded.worlds.activeRun?.activeEncounter, run.activeEncounter)
     }
 
+    func testSchemaFivePendingGeneratedEncounterCopiesExactWorldEnemySpeciesAndAwardsAfterRelaunch() throws {
+        let speciesID = InstanceID(rawValue: 91)
+        let foeID = InstanceID(rawValue: 52)
+        var state = GameState.newGame()
+        var run = fixtureRun()
+        let projection = CreatureMaterialProjectionReceiptV1(entries: [
+            .init(family: .hide,
+                  capabilityA: .init(id: .coveringCoverage, value: 60),
+                  capabilityB: .init(id: .derivedFlexibility, value: 40),
+                  partExpression: 50, quantityPerDefeatedSpecimen: 1)
+        ])
+        let traits = CreatureTraits()
+        run.cast = [.init(id: speciesID, traits: traits, worldSeed: 8,
+                          habitat: .terrestrial, materialProjection: projection)]
+        run.enemies = [.init(id: foeID, speciesID: speciesID, traits: traits,
+                             position: .init(x: 0, y: 0))]
+        var rng = SeededRNG(seed: 9)
+        run.activeEncounter = CombatRules.makeEncounter(
+            id: .init(rawValue: 51),
+            foes: [.init(id: foeID, traits: traits,
+                         stats: .init(displayName: "Generated", icon: "ant", maxHP: 1, attack: 1),
+                         currentHP: 0)], party: [.binder], rng: &rng)
+        state.worlds.activeRun = run
+
+        var root = try XCTUnwrap(JSONSerialization.jsonObject(
+            with: SaveCodec.makeEncoder().encode(state)) as? [String: Any])
+        root["schemaVersion"] = 5
+        var worlds = try XCTUnwrap(root["worlds"] as? [String: Any])
+        var active = try XCTUnwrap(worlds["activeRun"] as? [String: Any])
+        active.removeValue(forKey: "sourceDangerReceipt")
+        var encounter = try XCTUnwrap(active["activeEncounter"] as? [String: Any])
+        encounter.removeValue(forKey: "creatureMaterialRewardResolution")
+        active["activeEncounter"] = encounter; worlds["activeRun"] = active; root["worlds"] = worlds
+
+        let migrated = try Migrations.migrateIfNeeded(
+            JSONSerialization.data(withJSONObject: root, options: [.sortedKeys]))
+        var decoded = try SaveCodec.decode(migrated)
+        XCTAssertEqual(decoded.worlds.activeRun?.activeEncounter?.foes.first?.speciesID, speciesID)
+        CombatRules.checkOutcome(in: &decoded)
+        guard case .awarded(let receipt)? = decoded.worlds.activeRun?.activeEncounter?.creatureMaterialRewardResolution else {
+            return XCTFail("victory must atomically award")
+        }
+        XCTAssertEqual(receipt.entries.first?.speciesID, speciesID)
+        XCTAssertEqual(decoded.worlds.activeRun?.materialReserve.units.count, 1)
+        let relaunched = try SaveCodec.decode(SaveCodec.encode(decoded))
+        XCTAssertEqual(relaunched.worlds.activeRun?.creatureMaterialRewardReceipts, [receipt])
+        XCTAssertEqual(relaunched.worlds.activeRun?.materialReserve.units.count, 1)
+    }
+
+    func testSchemaFiveGeneratedEncounterWithoutExactWorldEnemyFailsAtomically() throws {
+        var state = GameState.newGame()
+        var run = fixtureRun()
+        var rng = SeededRNG(seed: 1)
+        run.activeEncounter = CombatRules.makeEncounter(
+            id: .init(rawValue: 10),
+            foes: [.init(id: .init(rawValue: 99), traits: CreatureTraits(),
+                         stats: .init(displayName: "Generated", icon: "ant", maxHP: 1, attack: 1),
+                         currentHP: 1)], party: [.binder], rng: &rng)
+        state.worlds.activeRun = run
+        var root = try XCTUnwrap(JSONSerialization.jsonObject(
+            with: SaveCodec.makeEncoder().encode(state)) as? [String: Any])
+        root["schemaVersion"] = 5
+        var worlds = try XCTUnwrap(root["worlds"] as? [String: Any])
+        var active = try XCTUnwrap(worlds["activeRun"] as? [String: Any])
+        active.removeValue(forKey: "sourceDangerReceipt")
+        var encounter = try XCTUnwrap(active["activeEncounter"] as? [String: Any])
+        encounter.removeValue(forKey: "creatureMaterialRewardResolution")
+        active["activeEncounter"] = encounter; worlds["activeRun"] = active; root["worlds"] = worlds
+        let raw = try JSONSerialization.data(withJSONObject: root, options: [.sortedKeys])
+        XCTAssertThrowsError(try Migrations.migrateIfNeeded(raw))
+        XCTAssertEqual(raw, try JSONSerialization.data(withJSONObject: root, options: [.sortedKeys]))
+    }
+
+    func testCurrentSchemaSixOmissionsFailClosedInsteadOfReconstructing() throws {
+        var state = GameState.newGame()
+        var run = fixtureRun()
+        let stats = CombatStats(displayName: "Guardian", icon: "ant", maxHP: 4, attack: 1)
+        var rng = SeededRNG(seed: 9)
+        run.activeEncounter = CombatRules.makeEncounter(
+            id: .init(rawValue: 51),
+            foes: [.init(id: .init(rawValue: 52), creatureID: "paper_moth",
+                         stats: stats, currentHP: 4)], party: [.binder], rng: &rng)
+        state.worlds.activeRun = run
+        let encoded = try SaveCodec.makeEncoder().encode(state)
+
+        var missingDanger = try XCTUnwrap(JSONSerialization.jsonObject(with: encoded) as? [String: Any])
+        var worlds = try XCTUnwrap(missingDanger["worlds"] as? [String: Any])
+        var active = try XCTUnwrap(worlds["activeRun"] as? [String: Any])
+        active.removeValue(forKey: "sourceDangerReceipt")
+        worlds["activeRun"] = active; missingDanger["worlds"] = worlds
+        XCTAssertThrowsError(try SaveCodec.decode(
+            JSONSerialization.data(withJSONObject: missingDanger, options: [.sortedKeys])))
+
+        var missingResolution = try XCTUnwrap(JSONSerialization.jsonObject(with: encoded) as? [String: Any])
+        worlds = try XCTUnwrap(missingResolution["worlds"] as? [String: Any])
+        active = try XCTUnwrap(worlds["activeRun"] as? [String: Any])
+        var encounter = try XCTUnwrap(active["activeEncounter"] as? [String: Any])
+        encounter.removeValue(forKey: "creatureMaterialRewardResolution")
+        active["activeEncounter"] = encounter; worlds["activeRun"] = active
+        missingResolution["worlds"] = worlds
+        XCTAssertThrowsError(try SaveCodec.decode(
+            JSONSerialization.data(withJSONObject: missingResolution, options: [.sortedKeys])))
+    }
+
+    func testGeneratedApexVictoryAwardsBodyMaterialsAndOneApexTrophy() throws {
+        let speciesID = InstanceID(rawValue: 101)
+        let foeID = InstanceID(rawValue: 102)
+        let projection = CreatureMaterialProjectionReceiptV1(entries: [
+            .init(family: .hide,
+                  capabilityA: .init(id: .coveringCoverage, value: 60),
+                  capabilityB: .init(id: .derivedFlexibility, value: 40),
+                  partExpression: 50, quantityPerDefeatedSpecimen: 1)
+        ])
+        var state = GameState.newGame()
+        var run = fixtureRun()
+        run.cast = [.init(id: speciesID, traits: CreatureTraits(), worldSeed: 8,
+                          habitat: .terrestrial, materialProjection: projection)]
+        var rng = SeededRNG(seed: 9)
+        run.activeEncounter = CombatRules.makeEncounter(
+            id: .init(rawValue: 103),
+            foes: [.init(id: foeID, speciesID: speciesID, traits: CreatureTraits(),
+                         stats: .init(displayName: "Apex", icon: "ant", maxHP: 1, attack: 1),
+                         currentHP: 0, isApex: true)], party: [.binder], rng: &rng)
+        state.worlds.activeRun = run
+
+        CombatRules.checkOutcome(in: &state)
+
+        let awardedRun = try XCTUnwrap(state.worlds.activeRun)
+        XCTAssertEqual(awardedRun.materialReserve.units.map(\.sample.kind), [.hide])
+        XCTAssertEqual(awardedRun.creatureMaterialRewardReceipts.count, 1)
+        let trophies = awardedRun.satchelItems.stacks + awardedRun.offeredItems
+        XCTAssertEqual(trophies.count, 1)
+        XCTAssertTrue(ApexRules.wildWeapons.contains(trophies[0].catalogID))
+    }
+
+    func testReturnFreezesRewardReceiptAndAnchoredSnapshotClearsExpeditionReceipt() throws {
+        let speciesID = InstanceID(rawValue: 111)
+        var run = fixtureRun()
+        let projection = CreatureMaterialProjectionReceiptV1(entries: [
+            .init(family: .bone,
+                  capabilityA: .init(id: .boneDensity, value: 30),
+                  capabilityB: .init(id: .size, value: 50),
+                  partExpression: 40, quantityPerDefeatedSpecimen: 1)
+        ])
+        run.cast = [.init(id: speciesID, traits: CreatureTraits(), worldSeed: 8,
+                          habitat: .terrestrial, materialProjection: projection)]
+        var rng = SeededRNG(seed: 4)
+        let encounter = CombatRules.makeEncounter(
+            id: .init(rawValue: 112),
+            foes: [.init(id: .init(rawValue: 113), speciesID: speciesID,
+                         stats: .init(displayName: "Animal", icon: "ant", maxHP: 1, attack: 1),
+                         currentHP: 0)], party: [.binder], rng: &rng)
+        guard case .eligible(let receipt, _) =
+                CreatureMaterialRewardRules.evaluate(run: run, encounter: encounter) else {
+            return XCTFail("expected reward receipt")
+        }
+        run.creatureMaterialRewardReceipts = [receipt]
+        let summary = RunExitSummary(runIndex: run.runIndex, kind: .portal, reason: "fixture",
+                                     turnsTaken: run.turnsTaken, haulKeptFraction: 1,
+                                     creatureMaterialRewardReceipts: run.creatureMaterialRewardReceipts)
+
+        XCTAssertEqual(summary.creatureMaterialRewardReceipts, [receipt])
+        XCTAssertEqual(try SaveCodec.makeDecoder().decode(
+            RunExitSummary.self, from: SaveCodec.makeEncoder().encode(summary)), summary)
+        XCTAssertTrue(run.anchoredSnapshot.creatureMaterialRewardReceipts.isEmpty)
+    }
+
     private func fixtureRun() -> WorldRun {
         let point = GridPoint(x: 0, y: 0)
         return WorldRun(runIndex: 3, book: BoundBook(written: [], essencePaid: 0),

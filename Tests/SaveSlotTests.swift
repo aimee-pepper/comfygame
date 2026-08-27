@@ -2,6 +2,43 @@ import XCTest
 @testable import Bookbinder
 
 final class SaveSlotTests: XCTestCase {
+    func testSchemaSixMissingCreatureRewardAuthorityPreservesRealSlotEnvelope() async throws {
+        let root = directory()
+        defer { try? FileManager.default.removeItem(at: root) }
+        let slots = SaveSlotFileIO(directory: root)
+        let created = try await slots.create(name: "Missing reward authority")
+        let url = try await slots.exportURL(for: created.metadata.id)
+        var envelope = try SaveCodec.makeDecoder().decode(
+            SaveSlotEnvelope.self, from: Data(contentsOf: url))
+        var state = GameState.newGame()
+        let point = GridPoint(x: 0, y: 0)
+        var run = WorldRun(runIndex: 1, book: .init(written: [], essencePaid: 0),
+                           mapSeed: 1, rng: .init(seed: 1),
+                           map: .init(width: 1, height: 1,
+                                      tiles: [.init(isRevealed: true)], entry: point),
+                           playerPosition: point, sourceDangerReceipt: .init(sourceBand: 1))
+        var rng = SeededRNG(seed: 2)
+        run.activeEncounter = CombatRules.makeEncounter(
+            id: .init(rawValue: 3),
+            foes: [.init(id: .init(rawValue: 4), creatureID: "paper_moth",
+                         stats: .init(displayName: "Guardian", icon: "ant", maxHP: 2, attack: 1),
+                         currentHP: 2)], party: [.binder], rng: &rng)
+        state.worlds.activeRun = run
+        var payload = try XCTUnwrap(JSONSerialization.jsonObject(
+            with: SaveCodec.makeEncoder().encode(state)) as? [String: Any])
+        var worlds = try XCTUnwrap(payload["worlds"] as? [String: Any])
+        var active = try XCTUnwrap(worlds["activeRun"] as? [String: Any])
+        var encounter = try XCTUnwrap(active["activeEncounter"] as? [String: Any])
+        encounter.removeValue(forKey: "creatureMaterialRewardResolution")
+        active["activeEncounter"] = encounter; worlds["activeRun"] = active; payload["worlds"] = worlds
+        envelope.payload = try JSONSerialization.data(withJSONObject: payload, options: [.sortedKeys])
+        let original = try encoder().encode(envelope)
+        try original.write(to: url, options: .atomic)
+        do { _ = try await slots.load(created.metadata.id); XCTFail("Expected current-schema omission") }
+        catch { }
+        XCTAssertEqual(try Data(contentsOf: url), original)
+    }
+
     func testInspectionReportsExactCompletedAndTotalFileUnits() async throws {
         let directory = directory()
         let io = SaveSlotFileIO(directory: directory)

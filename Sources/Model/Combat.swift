@@ -896,7 +896,7 @@ struct EncounterState: Codable, Equatable, Sendable {
                 CreatureMaterialRewardResolutionV1.self,
                 forKey: .creatureMaterialRewardResolution)
         } else {
-            creatureMaterialRewardResolution = outcome == nil ? .pending : .legacyResolved
+            throw CocoaError(.coderInvalidValue)
         }
         binderBleedRounds = try c.decodeIfPresent(Int.self, forKey: .binderBleedRounds) ?? 0
         companionBleedRounds = try c.decodeIfPresent(Int.self, forKey: .companionBleedRounds) ?? 0

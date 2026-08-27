@@ -92,6 +92,29 @@ enum Migrations {
                     let resolution: CreatureMaterialRewardResolutionV1 =
                         encounter["outcome"] == nil || encounter["outcome"] is NSNull
                         ? .pending : .legacyResolved
+                    if case .pending = resolution {
+                        let enemies = try SaveCodec.makeDecoder().decode(
+                            [WorldEnemy].self,
+                            from: JSONSerialization.data(withJSONObject: run["enemies"] ?? []))
+                        var foes = try SaveCodec.makeDecoder().decode(
+                            [FoeState].self,
+                            from: JSONSerialization.data(withJSONObject: encounter["foes"] ?? []))
+                        guard Set(enemies.map(\.id)).count == enemies.count else {
+                            throw CocoaError(.coderInvalidValue)
+                        }
+                        for index in foes.indices where foes[index].speciesID == nil {
+                            guard foes[index].creatureID == nil, foes[index].traits != nil else { continue }
+                            guard let enemy = enemies.first(where: { $0.id == foes[index].id }) else {
+                                throw CocoaError(.coderInvalidValue)
+                            }
+                            if enemy.floraID != nil { continue }
+                            guard let speciesID = enemy.speciesID else {
+                                throw CocoaError(.coderInvalidValue)
+                            }
+                            foes[index].speciesID = speciesID
+                        }
+                        encounter["foes"] = try json(foes)
+                    }
                     encounter["creatureMaterialRewardResolution"] = try json(resolution)
                 }
                 run["activeEncounter"] = encounter

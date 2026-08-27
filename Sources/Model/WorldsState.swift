@@ -1321,7 +1321,7 @@ struct WorldRun: Codable, Equatable, Sendable {
             sourceDangerReceipt = try container.decode(WorldSourceDangerReceiptV1.self,
                                                         forKey: .sourceDangerReceipt)
         } else {
-            sourceDangerReceipt = .freeze(book: book)
+            throw CocoaError(.coderInvalidValue)
         }
         creatureMaterialRewardReceipts = try container.decodeIfPresent(
             [CreatureMaterialRewardReceiptV1].self, forKey: .creatureMaterialRewardReceipts) ?? []
