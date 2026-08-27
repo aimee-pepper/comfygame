@@ -48,11 +48,75 @@ enum Migrations {
         case 4: return try migrate4to5(data)
         case 5: return try migrate5to6(data)
         case 6: return try migrate6to7(data)
+        case 7: return try migrate7to8(data)
         default:
             // No migration registered. Tolerant decoding is the fallback; if the save is genuinely
             // incompatible, `SaveFileIO.load()` quarantines it rather than losing it.
             return data
         }
+    }
+
+    private static func migrate7to8(_ data: Data) throws -> Data {
+        guard var root = try JSONSerialization.jsonObject(with: data) as? [String: Any] else {
+            throw CocoaError(.coderInvalidValue)
+        }
+        let authoredBands: [String: Int] = [
+            "rubble_sling": 1, "ironwork_blade": 2, "copper_buckler": 2,
+            "silvered_helm": 3, "golden_keepsake": 3, "quartz_point": 2,
+            "obsidian_edge": 3, "adamant_cuirass": 4, "woven_sling": 1,
+            "timber_longbow": 1, "resinbound_boots": 1, "riftglass_rapier": 4,
+        ]
+        func migrate(_ value: Any) throws -> Any {
+            if let array = value as? [Any] { return try array.map(migrate) }
+            guard var object = value as? [String: Any] else { return value }
+            for (key, child) in object { object[key] = try migrate(child) }
+            if let catalogID = object["catalogID"] as? String,
+               let definition = ContentCatalog.shared.item(ItemID(rawValue: catalogID)),
+               definition.gear != nil {
+                if object["gearProfile"] == nil {
+                    guard let rawID = (object["id"] as? [String: Any])?["rawValue"] as? NSNumber,
+                          CFGetTypeID(rawID) != CFBooleanGetTypeID(), rawID.uint64Value > 0,
+                          Double(rawID.uint64Value) == rawID.doubleValue else {
+                        throw CocoaError(.coderInvalidValue)
+                    }
+                    let upgrade = (object["upgradeLevel"] as? NSNumber)?.intValue ?? 0
+                    guard upgrade >= 0 else { throw CocoaError(.coderInvalidValue) }
+                    let synthesized = GearInstanceProfile(
+                        stableInstanceID: .init(rawValue: rawID.uint64Value),
+                        definition: definition, legacyUpgradeLevel: upgrade)
+                    object["gearProfile"] = try JSONSerialization.jsonObject(
+                        with: SaveCodec.makeEncoder().encode(synthesized))
+                    return object
+                }
+                guard var profile = object["gearProfile"] as? [String: Any] else {
+                    throw CocoaError(.coderInvalidValue)
+                }
+                guard (profile["version"] as? NSNumber)?.intValue == 1,
+                      let tier = (profile["constructionTier"] as? NSNumber)?.intValue,
+                      let credit = (profile["legacyPowerCredit"] as? NSNumber)?.intValue,
+                      (1...4).contains(tier), credit >= 0 else { throw CocoaError(.coderInvalidValue) }
+                let constructed = (profile["recipeVersion"] as? NSNumber) != nil
+                    && ((profile["consumedSamples"] as? [Any])?.isEmpty == false)
+                let band = constructed ? tier : (authoredBands[catalogID] ?? tier)
+                guard (1...4).contains(band), tier + credit >= band else {
+                    throw CocoaError(.coderInvalidValue)
+                }
+                profile["version"] = 2
+                profile["qualityBand"] = band
+                profile["legacyEffectivePowerCredit"] = tier + credit - band
+                if !constructed, let receipt = definition.gearCatalogueDisposition?.foundReceipt {
+                    profile["foundReceipt"] = try JSONSerialization.jsonObject(
+                        with: SaveCodec.makeEncoder().encode(receipt))
+                }
+                object["gearProfile"] = profile
+            } else if object["gearProfile"] != nil {
+                throw CocoaError(.coderInvalidValue)
+            }
+            return object
+        }
+        root = try migrate(root) as! [String: Any]
+        root["schemaVersion"] = 8
+        return try JSONSerialization.data(withJSONObject: root, options: [.sortedKeys])
     }
 
     /// Replaces the mixed continuous-grade material graph with two exact domain reserves and

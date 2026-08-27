@@ -355,6 +355,7 @@
     },
     {
       "id": "blade_chipped",
+      "gearCatalogueDisposition": {"version":1,"classification":"ordinaryFound","territoryFindEligible":true},
       "name": "Chipped Blade",
       "icon": "hammer",
       "rarity": "common",
@@ -372,6 +373,7 @@
     },
     {
       "id": "blade_keen",
+      "gearCatalogueDisposition": {"version":1,"classification":"ordinaryFound","territoryFindEligible":true},
       "name": "Keen Blade",
       "icon": "arrowtriangle.up",
       "rarity": "uncommon",
@@ -389,6 +391,7 @@
     },
     {
       "id": "ripping_hook",
+      "gearCatalogueDisposition": {"version":1,"classification":"ordinaryFound","territoryFindEligible":true},
       "name": "Ripping Hook",
       "icon": "hammer",
       "rarity": "rare",
@@ -406,6 +409,7 @@
     },
     {
       "id": "the_long_grievance",
+      "gearCatalogueDisposition": {"version":1,"classification":"ordinaryFound","territoryFindEligible":true},
       "name": "The Long Grievance",
       "icon": "hammer",
       "rarity": "mythic",
@@ -424,6 +428,7 @@
     },
     {
       "id": "bone_awl",
+      "gearCatalogueDisposition": {"version":1,"classification":"ordinaryFound","territoryFindEligible":true},
       "name": "Bone Awl",
       "icon": "arrowtriangle.up",
       "rarity": "common",
@@ -441,6 +446,7 @@
     },
     {
       "id": "raking_edge",
+      "gearCatalogueDisposition": {"version":1,"classification":"ordinaryFound","territoryFindEligible":true},
       "name": "Raking Edge",
       "icon": "hammer",
       "rarity": "uncommon",
@@ -458,6 +464,7 @@
     },
     {
       "id": "blade_binders",
+      "gearCatalogueDisposition": {"version":1,"classification":"ordinaryFound","territoryFindEligible":true},
       "name": "Binder's Edge",
       "icon": "figure.fencing",
       "rarity": "rare",
@@ -475,6 +482,7 @@
     },
     {
       "id": "hairsplitter",
+      "gearCatalogueDisposition": {"version":1,"classification":"ordinaryFound","territoryFindEligible":true},
       "name": "Hairsplitter",
       "icon": "arrowtriangle.up",
       "rarity": "mythic",
@@ -493,6 +501,7 @@
     },
     {
       "id": "field_maul",
+      "gearCatalogueDisposition": {"version":1,"classification":"ordinaryFound","territoryFindEligible":true},
       "name": "Field Maul",
       "icon": "hammer.fill",
       "rarity": "common",
@@ -510,6 +519,7 @@
     },
     {
       "id": "banded_mace",
+      "gearCatalogueDisposition": {"version":1,"classification":"ordinaryFound","territoryFindEligible":true},
       "name": "Banded Mace",
       "icon": "hammer.fill",
       "rarity": "uncommon",
@@ -527,6 +537,7 @@
     },
     {
       "id": "anvilfall",
+      "gearCatalogueDisposition": {"version":1,"classification":"ordinaryFound","territoryFindEligible":true},
       "name": "Anvilfall",
       "icon": "hammer.fill",
       "rarity": "rare",
@@ -544,6 +555,7 @@
     },
     {
       "id": "the_settled_argument",
+      "gearCatalogueDisposition": {"version":1,"classification":"ordinaryFound","territoryFindEligible":true},
       "name": "The Settled Argument",
       "icon": "hammer.fill",
       "rarity": "mythic",
@@ -562,6 +574,7 @@
     },
     {
       "id": "long_pick",
+      "gearCatalogueDisposition": {"version":1,"classification":"ordinaryFound","territoryFindEligible":true},
       "name": "Long Pick",
       "icon": "figure.fencing",
       "rarity": "common",
@@ -579,6 +592,7 @@
     },
     {
       "id": "warded_spear",
+      "gearCatalogueDisposition": {"version":1,"classification":"ordinaryFound","territoryFindEligible":true},
       "name": "Warded Spear",
       "icon": "figure.fencing",
       "rarity": "uncommon",
@@ -596,6 +610,7 @@
     },
     {
       "id": "parting_needle",
+      "gearCatalogueDisposition": {"version":1,"classification":"ordinaryFound","territoryFindEligible":true},
       "name": "Parting Needle",
       "icon": "arrowtriangle.up",
       "rarity": "rare",
@@ -613,6 +628,7 @@
     },
     {
       "id": "the_kept_distance",
+      "gearCatalogueDisposition": {"version":1,"classification":"ordinaryFound","territoryFindEligible":true},
       "name": "The Kept Distance",
       "icon": "figure.fencing",
       "rarity": "mythic",
@@ -631,6 +647,7 @@
     },
     {
       "id": "split_board",
+      "gearCatalogueDisposition": {"version":1,"classification":"ordinaryFound","territoryFindEligible":true},
       "name": "Split Board",
       "icon": "shield.lefthalf.filled",
       "rarity": "common",
@@ -646,6 +663,7 @@
     },
     {
       "id": "banded_buckler",
+      "gearCatalogueDisposition": {"version":1,"classification":"ordinaryFound","territoryFindEligible":true},
       "name": "Banded Buckler",
       "icon": "shield.lefthalf.filled",
       "rarity": "uncommon",
@@ -661,6 +679,7 @@
     },
     {
       "id": "tower_guard",
+      "gearCatalogueDisposition": {"version":1,"classification":"ordinaryFound","territoryFindEligible":true},
       "name": "Tower Guard",
       "icon": "shield.lefthalf.filled",
       "rarity": "rare",
@@ -676,6 +695,7 @@
     },
     {
       "id": "the_unarguable",
+      "gearCatalogueDisposition": {"version":1,"classification":"ordinaryFound","territoryFindEligible":true},
       "name": "The Unarguable",
       "icon": "shield.lefthalf.filled",
       "rarity": "mythic",
@@ -691,6 +711,7 @@
     },
     {
       "id": "padded_cap",
+      "gearCatalogueDisposition": {"version":1,"classification":"ordinaryFound","territoryFindEligible":true},
       "name": "Padded Cap",
       "icon": "circle.dashed",
       "rarity": "common",
@@ -707,6 +728,7 @@
     },
     {
       "id": "ridged_helm",
+      "gearCatalogueDisposition": {"version":1,"classification":"ordinaryFound","territoryFindEligible":true},
       "name": "Ridged Helm",
       "icon": "circle.dashed",
       "rarity": "uncommon",
@@ -722,6 +744,7 @@
     },
     {
       "id": "visored_casque",
+      "gearCatalogueDisposition": {"version":1,"classification":"ordinaryFound","territoryFindEligible":true},
       "name": "Visored Casque",
       "icon": "circle.dashed",
       "rarity": "rare",
@@ -737,6 +760,7 @@
     },
     {
       "id": "crown_of_quiet",
+      "gearCatalogueDisposition": {"version":1,"classification":"ordinaryFound","territoryFindEligible":true},
       "name": "Crown of Quiet",
       "icon": "circle.dashed",
       "rarity": "mythic",
@@ -752,6 +776,7 @@
     },
     {
       "id": "guard_padded",
+      "gearCatalogueDisposition": {"version":1,"classification":"ordinaryFound","territoryFindEligible":true},
       "name": "Padded Guard",
       "icon": "shield",
       "rarity": "common",
@@ -768,6 +793,7 @@
     },
     {
       "id": "guard_banded",
+      "gearCatalogueDisposition": {"version":1,"classification":"ordinaryFound","territoryFindEligible":true},
       "name": "Banded Guard",
       "icon": "shield",
       "rarity": "uncommon",
@@ -783,6 +809,7 @@
     },
     {
       "id": "guard_vault",
+      "gearCatalogueDisposition": {"version":1,"classification":"ordinaryFound","territoryFindEligible":true},
       "name": "Vaultplate",
       "icon": "shield",
       "rarity": "rare",
@@ -798,6 +825,7 @@
     },
     {
       "id": "the_standing_wall",
+      "gearCatalogueDisposition": {"version":1,"classification":"ordinaryFound","territoryFindEligible":true},
       "name": "The Standing Wall",
       "icon": "shield",
       "rarity": "mythic",
@@ -813,6 +841,7 @@
     },
     {
       "id": "wrapped_hands",
+      "gearCatalogueDisposition": {"version":1,"classification":"ordinaryFound","territoryFindEligible":true},
       "name": "Wrapped Hands",
       "icon": "hand.raised",
       "rarity": "common",
@@ -829,6 +858,7 @@
     },
     {
       "id": "studded_gloves",
+      "gearCatalogueDisposition": {"version":1,"classification":"ordinaryFound","territoryFindEligible":true},
       "name": "Studded Gloves",
       "icon": "hand.raised",
       "rarity": "uncommon",
@@ -844,6 +874,7 @@
     },
     {
       "id": "gauntlets_of_hold",
+      "gearCatalogueDisposition": {"version":1,"classification":"ordinaryFound","territoryFindEligible":true},
       "name": "Gauntlets of Hold",
       "icon": "hand.raised",
       "rarity": "rare",
@@ -859,6 +890,7 @@
     },
     {
       "id": "the_sure_hands",
+      "gearCatalogueDisposition": {"version":1,"classification":"ordinaryFound","territoryFindEligible":true},
       "name": "The Sure Hands",
       "icon": "hand.raised",
       "rarity": "mythic",
@@ -874,6 +906,7 @@
     },
     {
       "id": "worn_boots",
+      "gearCatalogueDisposition": {"version":1,"classification":"ordinaryFound","territoryFindEligible":true},
       "name": "Worn Boots",
       "icon": "shoeprints.fill",
       "rarity": "common",
@@ -889,6 +922,7 @@
     },
     {
       "id": "shod_boots",
+      "gearCatalogueDisposition": {"version":1,"classification":"ordinaryFound","territoryFindEligible":true},
       "name": "Shod Boots",
       "icon": "shoeprints.fill",
       "rarity": "uncommon",
@@ -904,6 +938,7 @@
     },
     {
       "id": "longstriders",
+      "gearCatalogueDisposition": {"version":1,"classification":"ordinaryFound","territoryFindEligible":true},
       "name": "Longstriders",
       "icon": "shoeprints.fill",
       "rarity": "rare",
@@ -919,6 +954,7 @@
     },
     {
       "id": "the_unhurried",
+      "gearCatalogueDisposition": {"version":1,"classification":"ordinaryFound","territoryFindEligible":true},
       "name": "The Unhurried",
       "icon": "shoeprints.fill",
       "rarity": "mythic",
@@ -934,6 +970,7 @@
     },
     {
       "id": "bent_pick",
+      "gearCatalogueDisposition": {"version":1,"classification":"ordinaryFound","territoryFindEligible":true},
       "name": "Bent Pick",
       "icon": "wrench.and.screwdriver",
       "rarity": "common",
@@ -949,6 +986,7 @@
     },
     {
       "id": "balanced_pick",
+      "gearCatalogueDisposition": {"version":1,"classification":"ordinaryFound","territoryFindEligible":true},
       "name": "Balanced Pick",
       "icon": "wrench.and.screwdriver",
       "rarity": "uncommon",
@@ -964,6 +1002,7 @@
     },
     {
       "id": "corebreaker",
+      "gearCatalogueDisposition": {"version":1,"classification":"ordinaryFound","territoryFindEligible":true},
       "name": "Corebreaker",
       "icon": "wrench.and.screwdriver",
       "rarity": "rare",
@@ -979,6 +1018,7 @@
     },
     {
       "id": "the_willing_edge",
+      "gearCatalogueDisposition": {"version":1,"classification":"ordinaryFound","territoryFindEligible":true},
       "name": "The Willing Edge",
       "icon": "wrench.and.screwdriver",
       "rarity": "mythic",
@@ -994,6 +1034,7 @@
     },
     {
       "id": "pressed_leaf",
+      "gearCatalogueDisposition": {"version":1,"classification":"ordinaryFound","territoryFindEligible":true},
       "name": "Pressed Leaf",
       "icon": "sparkles",
       "rarity": "common",
@@ -1009,6 +1050,7 @@
     },
     {
       "id": "cold_compass",
+      "gearCatalogueDisposition": {"version":1,"classification":"ordinaryFound","territoryFindEligible":true},
       "name": "Cold Compass",
       "icon": "sparkles",
       "rarity": "uncommon",
@@ -1024,6 +1066,7 @@
     },
     {
       "id": "someones_ring",
+      "gearCatalogueDisposition": {"version":1,"classification":"ordinaryFound","territoryFindEligible":true},
       "name": "Someone's Ring",
       "icon": "sparkles",
       "rarity": "rare",
@@ -1039,6 +1082,7 @@
     },
     {
       "id": "the_first_page",
+      "gearCatalogueDisposition": {"version":1,"classification":"ordinaryFound","territoryFindEligible":true},
       "name": "The First Page",
       "icon": "sparkles",
       "rarity": "mythic",
@@ -1054,6 +1098,7 @@
     },
     {
       "id": "two_natured_blade",
+      "gearCatalogueDisposition": {"version":1,"classification":"wildApexOnly","territoryFindEligible":false},
       "name": "Two-Natured Blade",
       "icon": "tuningfork",
       "rarity": "rare",
@@ -1071,6 +1116,7 @@
     },
     {
       "id": "long_fang",
+      "gearCatalogueDisposition": {"version":1,"classification":"wildApexOnly","territoryFindEligible":false},
       "name": "Long Fang",
       "icon": "arrow.up.right",
       "rarity": "rare",
@@ -1088,6 +1134,7 @@
     },
     {
       "id": "ranked_spear",
+      "gearCatalogueDisposition": {"version":1,"classification":"wildApexOnly","territoryFindEligible":false},
       "name": "Ranked Spear",
       "icon": "arrow.right.to.line",
       "rarity": "rare",
@@ -1105,6 +1152,7 @@
     },
     {
       "id": "rimed_edge",
+      "gearCatalogueDisposition": {"version":1,"classification":"wildApexOnly","territoryFindEligible":false},
       "name": "Barbed Edge",
       "icon": "leaf.fill",
       "rarity": "rare",
@@ -1123,6 +1171,7 @@
     },
     {
       "id": "living_hook",
+      "gearCatalogueDisposition": {"version":1,"classification":"wildApexOnly","territoryFindEligible":false},
       "name": "Living Hook",
       "icon": "arrow.triangle.turn.up.right.circle",
       "rarity": "mythic",
@@ -1140,6 +1189,7 @@
     },
     {
       "id": "quiet_knife",
+      "gearCatalogueDisposition": {"version":1,"classification":"wildApexOnly","territoryFindEligible":false},
       "name": "Quiet Knife",
       "icon": "moon.fill",
       "rarity": "rare",
@@ -1157,6 +1207,7 @@
     },
     {
       "id": "bloodletter",
+      "gearCatalogueDisposition": {"version":1,"classification":"wildApexOnly","territoryFindEligible":false},
       "name": "Bloodletter",
       "icon": "drop.triangle",
       "rarity": "rare",
@@ -1174,6 +1225,7 @@
     },
     {
       "id": "warded_haft",
+      "gearCatalogueDisposition": {"version":1,"classification":"wildApexOnly","territoryFindEligible":false},
       "name": "Warded Haft",
       "icon": "shield.lefthalf.filled",
       "rarity": "rare",
@@ -1192,138 +1244,161 @@
     },
     {
       "id": "rubble_sling", "name": "Rubble Sling", "icon": "circle.grid.cross",
+      "gearCatalogueDisposition": {"version":1,"classification":"componentAuthoredFound","territoryFindEligible":true,"foundReceipt":{"version":1,"mode":"schematic","schematicID":"sling","qualityBand":1,"components":[{"socket":"cord","domain":"world","familyID":"fiber","qualityBand":1},{"socket":"projectile","domain":"world","familyID":"rubble","qualityBand":1},{"socket":"pouch","domain":"creature","familyID":"hide","qualityBand":1}]}},
       "rarity": "common", "blurb": "A broad sling and a pouch of carefully matched roadside stone.",
       "kind": "gear", "gear": { "slot": "weapon", "tier": 1, "damage": "crush", "reach": "far", "visualFamilyID": "sling", "materialProfileID": "world:rubble" },
       "tradingPostDisposition": "sellable", "recyclerDisposition": "recyclable"
     },
     {
       "id": "fired_clay_guard", "name": "Fired-Clay Guard", "icon": "shield.lefthalf.filled",
+      "gearCatalogueDisposition": {"version":1,"classification":"decodeOnly","territoryFindEligible":false},
       "rarity": "common", "blurb": "Layered fired plates tied over a wooden brace; brittle, but honest protection.",
       "kind": "gear", "gear": { "slot": "offhand", "tier": 1, "visualFamilyID": "buckler", "materialProfileID": "world:clay" },
       "tradingPostDisposition": "sellable", "recyclerDisposition": "recyclable"
     },
     {
       "id": "ironwork_blade", "name": "Ironwork Blade", "icon": "scissors",
+      "gearCatalogueDisposition": {"version":1,"classification":"componentAuthoredFound","territoryFindEligible":true,"foundReceipt":{"version":1,"mode":"schematic","schematicID":"cutting_blade","qualityBand":2,"components":[{"socket":"edge","domain":"world","familyID":"ore","qualityBand":2},{"socket":"grip","domain":"creature","familyID":"hide","qualityBand":2}]}},
       "rarity": "uncommon", "blurb": "A practical iron chopping blade with enough weight to keep its cut moving.",
       "kind": "gear", "gear": { "slot": "weapon", "tier": 2, "damage": "rend", "reach": "close", "visualFamilyID": "cutting_blade", "materialProfileID": "world:ore" },
       "tradingPostDisposition": "sellable", "recyclerDisposition": "recyclable"
     },
     {
       "id": "copper_buckler", "name": "Copper Buckler", "icon": "shield.lefthalf.filled",
+      "gearCatalogueDisposition": {"version":1,"classification":"componentAuthoredFound","territoryFindEligible":true,"foundReceipt":{"version":1,"mode":"schematic","schematicID":"shield","qualityBand":2,"components":[{"socket":"face","domain":"world","familyID":"copper","qualityBand":2},{"socket":"brace","domain":"world","familyID":"timber","qualityBand":2},{"socket":"binding","domain":"world","familyID":"fiber","qualityBand":2}]}},
       "rarity": "uncommon", "blurb": "A work-hardened copper face over a resilient timber core.",
       "kind": "gear", "gear": { "slot": "offhand", "tier": 2, "visualFamilyID": "buckler", "materialProfileID": "world:copper" },
       "tradingPostDisposition": "sellable", "recyclerDisposition": "recyclable"
     },
     {
       "id": "silvered_helm", "name": "Silvered Helm", "icon": "circle.dashed",
+      "gearCatalogueDisposition": {"version":1,"classification":"componentAuthoredFound","territoryFindEligible":true,"foundReceipt":{"version":1,"mode":"schematic","schematicID":"armoury_balanced_laminate","outputSlot":"head","qualityBand":3,"components":[{"socket":"body","domain":"world","familyID":"ore","qualityBand":3},{"socket":"lining","domain":"creature","familyID":"hide","qualityBand":3},{"socket":"binding","domain":"world","familyID":"fiber","qualityBand":3},{"socket":"fitting","domain":"world","familyID":"silver","qualityBand":3}]}},
       "rarity": "rare", "blurb": "A close helm whose pale fitted plates turn a glancing blow cleanly aside.",
       "kind": "gear", "gear": { "slot": "head", "tier": 3, "visualFamilyID": "enclosed_helm", "materialProfileID": "world:silver" },
       "tradingPostDisposition": "sellable", "recyclerDisposition": "recyclable"
     },
     {
       "id": "golden_keepsake", "name": "Golden Keepsake", "icon": "seal.fill",
+      "gearCatalogueDisposition": {"version":1,"classification":"componentAuthoredFound","territoryFindEligible":true,"foundReceipt":{"version":1,"mode":"fixedFound","fixedIdentity":"worked-gold-keepsake","qualityBand":3,"components":[{"socket":"fitting","domain":"world","familyID":"gold","qualityBand":3}]}},
       "rarity": "rare", "blurb": "A small worked-gold pendant, made to outlast the story attached to it.",
       "kind": "gear", "gear": { "slot": "keepsake", "tier": 3, "visualFamilyID": "keepsake", "materialProfileID": "world:gold" },
       "tradingPostDisposition": "sellable", "recyclerDisposition": "recyclable"
     },
     {
       "id": "quartz_point", "name": "Quartz Point", "icon": "arrow.up.right",
+      "gearCatalogueDisposition": {"version":1,"classification":"componentAuthoredFound","territoryFindEligible":true,"foundReceipt":{"version":1,"mode":"schematic","schematicID":"long_spear","qualityBand":2,"components":[{"socket":"point","domain":"world","familyID":"quartz","qualityBand":2},{"socket":"haft","domain":"world","familyID":"timber","qualityBand":2},{"socket":"binding","domain":"world","familyID":"fiber","qualityBand":2}]}},
       "rarity": "uncommon", "blurb": "A clear mineral point fitted to a long shaft and kept away from lateral strain.",
       "kind": "gear", "gear": { "slot": "weapon", "tier": 2, "damage": "pierce", "reach": "mid", "visualFamilyID": "long_spear", "materialProfileID": "world:quartz" },
       "tradingPostDisposition": "sellable", "recyclerDisposition": "recyclable"
     },
     {
       "id": "obsidian_edge", "name": "Obsidian Edge", "icon": "scissors",
+      "gearCatalogueDisposition": {"version":1,"classification":"componentAuthoredFound","territoryFindEligible":true,"foundReceipt":{"version":1,"mode":"schematic","schematicID":"weaponsmith_fitted_edge","qualityBand":3,"components":[{"socket":"edge","domain":"world","familyID":"obsidian","qualityBand":3},{"socket":"grip","domain":"creature","familyID":"hide","qualityBand":3},{"socket":"fitting","domain":"creature","familyID":"bone","qualityBand":3}]}},
       "rarity": "rare", "blurb": "A dark glass edge assembled from replaceable flakes rather than one fragile length.",
       "kind": "gear", "gear": { "slot": "weapon", "tier": 3, "damage": "rend", "reach": "close", "visualFamilyID": "fitted_edge", "materialProfileID": "world:obsidian" },
       "tradingPostDisposition": "sellable", "recyclerDisposition": "recyclable"
     },
     {
       "id": "saltward_pendant", "name": "Saltward Pendant", "icon": "diamond.fill",
+      "gearCatalogueDisposition": {"version":1,"classification":"decodeOnly","territoryFindEligible":false},
       "rarity": "common", "blurb": "A sealed salt crystal worn close enough to cloud when the air changes.",
       "kind": "gear", "gear": { "slot": "keepsake", "tier": 1, "visualFamilyID": "keepsake", "materialProfileID": "world:salt" },
       "tradingPostDisposition": "sellable", "recyclerDisposition": "recyclable"
     },
     {
       "id": "sulfurous_maul", "name": "Sulfurous Maul", "icon": "hammer.fill",
+      "gearCatalogueDisposition": {"version":1,"classification":"decodeOnly","territoryFindEligible":false},
       "rarity": "uncommon", "blurb": "A dense hammer whose sealed yellow fitting leaves a reactive trace in a split surface.",
       "kind": "gear", "gear": { "slot": "weapon", "tier": 2, "damage": "crush", "reach": "close", "reactivity": 28, "visualFamilyID": "hand_maul", "materialProfileID": "world:sulfur" },
       "tradingPostDisposition": "sellable", "recyclerDisposition": "recyclable"
     },
     {
       "id": "mercurial_gloves", "name": "Mercurial Gloves", "icon": "hand.raised.fill",
+      "gearCatalogueDisposition": {"version":1,"classification":"decodeOnly","territoryFindEligible":false},
       "rarity": "rare", "blurb": "Jointed gloves balanced with enclosed liquid-metal weights.",
       "kind": "gear", "gear": { "slot": "hands", "tier": 3, "visualFamilyID": "working_gloves", "materialProfileID": "world:mercury" },
       "tradingPostDisposition": "sellable", "recyclerDisposition": "recyclable"
     },
     {
       "id": "adamant_cuirass", "name": "Adamant Cuirass", "icon": "shield.fill",
+      "gearCatalogueDisposition": {"version":1,"classification":"componentAuthoredFound","territoryFindEligible":true,"foundReceipt":{"version":1,"mode":"schematic","schematicID":"rigid_guard","qualityBand":4,"components":[{"socket":"body-1","domain":"world","familyID":"adamant","qualityBand":4},{"socket":"body-2","domain":"world","familyID":"adamant","qualityBand":4},{"socket":"binding","domain":"world","familyID":"fiber","qualityBand":4}]}},
       "rarity": "mythic", "blurb": "A fitted green-metal shell whose thin plates carry more force than their weight suggests.",
       "kind": "gear", "gear": { "slot": "armor", "tier": 4, "visualFamilyID": "rigid_guard", "materialProfileID": "world:adamant" },
       "tradingPostDisposition": "protected", "recyclerDisposition": "recyclable"
     },
     {
       "id": "woven_sling", "name": "Woven Sling", "icon": "circle.grid.cross",
+      "gearCatalogueDisposition": {"version":1,"classification":"componentAuthoredFound","territoryFindEligible":true,"foundReceipt":{"version":1,"mode":"schematic","schematicID":"sling","qualityBand":1,"components":[{"socket":"cord","domain":"world","familyID":"fiber","qualityBand":1},{"socket":"projectile","domain":"world","familyID":"clay","qualityBand":1},{"socket":"pouch","domain":"world","familyID":"fiber","qualityBand":1}]}},
       "rarity": "common", "blurb": "Long fibres braided into a broad pocket and cords that release cleanly.",
       "kind": "gear", "gear": { "slot": "weapon", "tier": 1, "damage": "crush", "reach": "far", "visualFamilyID": "sling", "materialProfileID": "world:fiber" },
       "tradingPostDisposition": "sellable", "recyclerDisposition": "recyclable"
     },
     {
       "id": "timber_longbow", "name": "Timber Longbow", "icon": "arrow.up.and.down.and.arrow.left.and.right",
+      "gearCatalogueDisposition": {"version":1,"classification":"componentAuthoredFound","territoryFindEligible":true,"foundReceipt":{"version":1,"mode":"schematic","schematicID":"longbow","qualityBand":1,"components":[{"socket":"limb-1","domain":"world","familyID":"timber","qualityBand":1},{"socket":"limb-2","domain":"world","familyID":"timber","qualityBand":1},{"socket":"string","domain":"world","familyID":"fiber","qualityBand":1}]}},
       "rarity": "common", "blurb": "A tall stave cut along the grain and backed where the bend asks most of it.",
       "kind": "gear", "gear": { "slot": "weapon", "tier": 1, "damage": "pierce", "reach": "far", "visualFamilyID": "longbow", "materialProfileID": "world:timber" },
       "tradingPostDisposition": "sellable", "recyclerDisposition": "recyclable"
     },
     {
       "id": "pressed_pulp_cap", "name": "Pressed-Pulp Cap", "icon": "circle.dashed",
+      "gearCatalogueDisposition": {"version":1,"classification":"decodeOnly","territoryFindEligible":false},
       "rarity": "common", "blurb": "Layered pulp pressed into a light shell and sealed against rain.",
       "kind": "gear", "gear": { "slot": "head", "tier": 1, "insulation": 18, "visualFamilyID": "padded_cap", "materialProfileID": "world:pulp" },
       "tradingPostDisposition": "sellable", "recyclerDisposition": "recyclable"
     },
     {
       "id": "resinbound_boots", "name": "Resinbound Boots", "icon": "shoeprints.fill",
+      "gearCatalogueDisposition": {"version":1,"classification":"componentAuthoredFound","territoryFindEligible":true,"foundReceipt":{"version":1,"mode":"schematic","schematicID":"working_boots","qualityBand":1,"components":[{"socket":"upper","domain":"creature","familyID":"hide","qualityBand":1},{"socket":"sole","domain":"world","familyID":"timber","qualityBand":1},{"socket":"binding","domain":"world","familyID":"resin","qualityBand":1}]}},
       "rarity": "common", "blurb": "Working boots whose seams and soles have been repeatedly sealed with resin.",
       "kind": "gear", "gear": { "slot": "feet", "tier": 1, "insulation": 14, "visualFamilyID": "working_boots", "materialProfileID": "world:resin" },
       "tradingPostDisposition": "sellable", "recyclerDisposition": "recyclable"
     },
     {
       "id": "toxin_edge", "name": "Toxin Edge", "icon": "leaf.fill",
+      "gearCatalogueDisposition": {"version":1,"classification":"decodeOnly","territoryFindEligible":false},
       "rarity": "uncommon", "blurb": "A fitted cutting edge with a sealed channel for a stable toxic preparation.",
       "kind": "gear", "gear": { "slot": "weapon", "tier": 2, "damage": "rend", "reach": "close", "reactivity": 34, "visualFamilyID": "fitted_edge", "materialProfileID": "world:toxin" },
       "tradingPostDisposition": "sellable", "recyclerDisposition": "recyclable"
     },
     {
       "id": "sporeward_coat", "name": "Sporeward Coat", "icon": "shield",
+      "gearCatalogueDisposition": {"version":1,"classification":"decodeOnly","territoryFindEligible":false},
       "rarity": "uncommon", "blurb": "A supple coat quilted with dry spore-felt and kept behind a tight outer weave.",
       "kind": "gear", "gear": { "slot": "armor", "tier": 2, "insulation": 38, "visualFamilyID": "supple_coat", "materialProfileID": "world:spore" },
       "tradingPostDisposition": "sellable", "recyclerDisposition": "recyclable"
     },
     {
       "id": "reagent_field_pick", "name": "Reagent Field Pick", "icon": "wrench.and.screwdriver",
+      "gearCatalogueDisposition": {"version":1,"classification":"decodeOnly","territoryFindEligible":false},
       "rarity": "uncommon", "blurb": "A field pick with a treated head that shows fresh mineral under its first strike.",
       "kind": "gear", "gear": { "slot": "tool", "tier": 2, "visualFamilyID": "field_pick", "materialProfileID": "world:reagent" },
       "tradingPostDisposition": "sellable", "recyclerDisposition": "recyclable"
     },
     {
       "id": "ichor_hook", "name": "Ichor Hook", "icon": "arrow.triangle.turn.up.right.circle",
+      "gearCatalogueDisposition": {"version":1,"classification":"decodeOnly","territoryFindEligible":false},
       "rarity": "uncommon", "blurb": "A hooked edge whose reactive reservoir is isolated from the grip.",
       "kind": "gear", "gear": { "slot": "weapon", "tier": 2, "damage": "rend", "reach": "close", "reactivity": 42, "visualFamilyID": "wild_hook", "materialProfileID": "world:ichor" },
       "tradingPostDisposition": "sellable", "recyclerDisposition": "recyclable"
     },
     {
       "id": "riftglass_rapier", "name": "Rift-glass Rapier", "icon": "arrow.up.right",
+      "gearCatalogueDisposition": {"version":1,"classification":"componentAuthoredFound","territoryFindEligible":false,"foundReceipt":{"version":1,"mode":"fixedSpecial","fixedIdentity":"riftglass-rapier","qualityBand":4,"components":[{"socket":"special-core","domain":"world","familyID":"rift_glass","qualityBand":4}]}},
       "rarity": "mythic", "blurb": "A narrow blue-glass point braced along facets that never quite meet.",
       "kind": "gear", "gear": { "slot": "weapon", "tier": 4, "damage": "pierce", "reach": "close", "visualFamilyID": "fitted_point", "materialProfileID": "world:rift_glass" },
       "tradingPostDisposition": "protected", "recyclerDisposition": "recyclable"
     },
     {
       "id": "raw_essence_pendant", "name": "Raw-Essence Pendant", "icon": "sparkles",
+      "gearCatalogueDisposition": {"version":1,"classification":"decodeOnly","territoryFindEligible":false},
       "rarity": "mythic", "blurb": "Unrefined Essence held inside a fitted lattice rather than allowed to disperse.",
       "kind": "gear", "gear": { "slot": "keepsake", "tier": 4, "visualFamilyID": "keepsake", "materialProfileID": "world:essence_raw" },
       "tradingPostDisposition": "protected", "recyclerDisposition": "protected"
     },
     {
       "id": "mote_compass", "name": "Mote Compass", "icon": "sparkles",
+      "gearCatalogueDisposition": {"version":1,"classification":"decodeOnly","territoryFindEligible":false},
       "rarity": "mythic", "blurb": "A singular compass whose captive Mote points toward changes that persist across the campaign, not north.",
       "kind": "gear", "gear": { "slot": "keepsake", "tier": 4, "visualFamilyID": "keepsake", "materialProfileID": "world:mote" },
       "tradingPostDisposition": "protected", "recyclerDisposition": "protected"

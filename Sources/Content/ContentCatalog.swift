@@ -356,6 +356,7 @@ struct ContentCatalog: Sendable {
         try requireUniqueIDs(creatures.map(\.id.rawValue), label: "creature")
         try requireUniqueIDs(resources.map(\.id.rawValue), label: "resource")
         try requireUniqueIDs(items.map(\.id.rawValue), label: "item")
+        try validateGearCatalogueDisposition()
         try requireUniqueIDs(skills.map(\.id.rawValue), label: "skill")
         try requireUniqueIDs(pressureTargets.map(\.id.rawValue), label: "pressure target")
         try requireUniqueIDs(pressureSources.map(\.id.rawValue), label: "pressure source")
@@ -867,6 +868,107 @@ struct ContentCatalog: Sendable {
             case .worldWorthWriting, .account, .turn:
                 break
             }
+        }
+    }
+
+    private func validateGearCatalogueDisposition() throws {
+        let gear = items.filter { $0.kind == .gear }
+        let exactPartition: [GearCatalogueClassification: Set<ItemID>] = [
+            .ordinaryFound: [
+                "blade_chipped", "blade_keen", "ripping_hook", "the_long_grievance",
+                "bone_awl", "raking_edge", "blade_binders", "hairsplitter",
+                "field_maul", "banded_mace", "anvilfall", "the_settled_argument",
+                "long_pick", "warded_spear", "parting_needle", "the_kept_distance",
+                "split_board", "banded_buckler", "tower_guard", "the_unarguable",
+                "padded_cap", "ridged_helm", "visored_casque", "crown_of_quiet",
+                "guard_padded", "guard_banded", "guard_vault", "the_standing_wall",
+                "wrapped_hands", "studded_gloves", "gauntlets_of_hold", "the_sure_hands",
+                "worn_boots", "shod_boots", "longstriders", "the_unhurried",
+                "bent_pick", "balanced_pick", "corebreaker", "the_willing_edge",
+                "pressed_leaf", "cold_compass", "someones_ring", "the_first_page",
+            ],
+            .wildApexOnly: [
+                "two_natured_blade", "long_fang", "ranked_spear", "rimed_edge",
+                "living_hook", "quiet_knife", "bloodletter", "warded_haft",
+            ],
+            .componentAuthoredFound: [
+                "rubble_sling", "ironwork_blade", "copper_buckler", "silvered_helm",
+                "golden_keepsake", "quartz_point", "obsidian_edge", "adamant_cuirass",
+                "woven_sling", "timber_longbow", "resinbound_boots", "riftglass_rapier",
+            ],
+            .decodeOnly: [
+                "fired_clay_guard", "saltward_pendant", "sulfurous_maul", "mercurial_gloves",
+                "pressed_pulp_cap", "toxin_edge", "sporeward_coat", "reagent_field_pick",
+                "ichor_hook", "raw_essence_pendant", "mote_compass",
+            ],
+        ]
+        for (classification, expected) in exactPartition {
+            let actual = Set(gear.filter { $0.gearCatalogueDisposition?.classification == classification }.map(\.id))
+            guard actual == expected else {
+                throw ContentError.danglingReference("gear catalogue exact partition mismatch for \(classification.rawValue)")
+            }
+        }
+        guard gear.count == 75 else {
+            throw ContentError.danglingReference("gear catalogue must contain exactly 75 entries")
+        }
+        guard items.filter({ $0.kind != .gear }).allSatisfy({ $0.gearCatalogueDisposition == nil }) else {
+            throw ContentError.danglingReference("non-gear carries gear catalogue disposition")
+        }
+        var counts: [GearCatalogueClassification: Int] = [:]
+        let allowedWorldFamilies: Set<String> = [
+            "ore", "copper", "silver", "gold", "quartz", "obsidian", "adamant", "clay",
+            "timber", "fiber", "resin", "rift_glass", "rubble"
+        ]
+        let allowedCreatureFamilies = Set(MaterialFamilyID.allCases.filter(\.isAnimalWorldResource).map(\.rawValue))
+        for item in gear {
+            guard item.gear != nil, let disposition = item.gearCatalogueDisposition,
+                  disposition.version == 1 else {
+                throw ContentError.danglingReference("gear '\(item.id)' lacks disposition v1")
+            }
+            counts[disposition.classification, default: 0] += 1
+            let expectsTerritory = disposition.classification == .ordinaryFound
+                || (disposition.classification == .componentAuthoredFound
+                    && item.id != ItemID(rawValue: "riftglass_rapier"))
+            guard disposition.territoryFindEligible == expectsTerritory else {
+                throw ContentError.danglingReference("gear '\(item.id)' has wrong territory eligibility")
+            }
+            switch disposition.classification {
+            case .ordinaryFound, .wildApexOnly, .decodeOnly:
+                guard disposition.foundReceipt == nil else {
+                    throw ContentError.danglingReference("gear '\(item.id)' has an unauthorized found receipt")
+                }
+            case .componentAuthoredFound:
+                guard let receipt = disposition.foundReceipt, receipt.version == 1,
+                      !receipt.components.isEmpty else {
+                    throw ContentError.danglingReference("gear '\(item.id)' lacks its authored found receipt")
+                }
+                let sockets = receipt.components.map(\.socket)
+                guard sockets.allSatisfy({ !$0.isEmpty }), Set(sockets).count == sockets.count else {
+                    throw ContentError.danglingReference("gear '\(item.id)' has invalid found sockets")
+                }
+                for component in receipt.components {
+                    let valid = component.domain == .world
+                        ? allowedWorldFamilies.contains(component.familyID)
+                        : allowedCreatureFamilies.contains(component.familyID)
+                    guard valid else {
+                        throw ContentError.danglingReference("gear '\(item.id)' has an unknown found family")
+                    }
+                }
+                switch receipt.mode {
+                case .schematic:
+                    guard receipt.schematicID != nil, receipt.fixedIdentity == nil else {
+                        throw ContentError.danglingReference("gear '\(item.id)' has an invalid schematic receipt")
+                    }
+                case .fixedFound, .fixedSpecial:
+                    guard receipt.schematicID == nil, !(receipt.fixedIdentity ?? "").isEmpty else {
+                        throw ContentError.danglingReference("gear '\(item.id)' has an invalid fixed receipt")
+                    }
+                }
+            }
+        }
+        guard counts[.ordinaryFound] == 44, counts[.wildApexOnly] == 8,
+              counts[.componentAuthoredFound] == 12, counts[.decodeOnly] == 11 else {
+            throw ContentError.danglingReference("gear catalogue partition must be 44/8/12/11")
         }
     }
 

@@ -75,7 +75,8 @@ enum StarterKnownFindPlacementRules {
                       from start: GridPoint? = nil,
                       avoiding occupied: inout Set<GridPoint>) -> GridPoint? {
         guard let itemID = receipt.definition.knownFind,
-              ContentCatalog.shared.item(itemID)?.gear?.tier == 1 else { return nil }
+              case .eligible = GearCatalogueDispositionRules.evaluate(
+                itemID, route: .authoredWorldPage) else { return nil }
         let origin = start ?? map.entry
         var distances: [GridPoint: Int] = [origin: 0]
         var queue = [origin]

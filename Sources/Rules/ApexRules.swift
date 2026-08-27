@@ -65,10 +65,13 @@ enum ApexRules {
     ///
     /// **They are not strictly better.** A two-natured blade at a mediocre grade is a real trade
     /// against a superb crafted one — you are buying the rule, not the numbers.
-    static let wildWeapons: [ItemID] = [
-        "two_natured_blade", "long_fang", "ranked_spear", "rimed_edge",
-        "living_hook", "quiet_knife", "bloodletter", "warded_haft"
-    ]
+    static var wildWeapons: [ItemID] {
+        ContentCatalog.shared.items.compactMap { item in
+            guard case .eligible = GearCatalogueDispositionRules.evaluate(
+                item.id, route: .apexReward) else { return nil }
+            return item.id
+        }.sorted { $0.rawValue < $1.rawValue }
+    }
 
     /// Which of them this world would grow, weighted toward its own character.
     ///

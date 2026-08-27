@@ -302,7 +302,7 @@ private struct GearSlotRow: View {
                     Text(piece?.displayName ?? gearSlot.displayName)
                         .foregroundStyle(piece?.definition?.rarity.tint ?? Color.secondary)
                     if let piece, let definition = piece.definition {
-                        Text("\(GearPresentationCopy.rarity(definition.rarity)) · tier \(piece.effectiveTier)")
+                        Text(GearPresentationCopy.quality(piece.gearProfile))
                             .font(.caption2).foregroundStyle(.secondary)
                     }
                 }

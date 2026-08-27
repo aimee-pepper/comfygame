@@ -129,8 +129,9 @@ enum TradingPostRules {
         let ownsWeapon = ownsCampaignWeapon(base)
         let equipment = catalog.items.filter { item in
             guard let gear = item.gear else { return false }
-            return gear.tier == 1 && gear.breaks == nil
-                && item.tradingPostDisposition == .sellable
+            guard case .eligible = GearCatalogueDispositionRules.evaluate(
+                item.id, route: .tradingPostStock, catalog: catalog) else { return false }
+            return gear.breaks == nil
                 && (ownsWeapon || gear.slot == .weapon)
         }.sorted { $0.id.rawValue < $1.id.rawValue }
         if let item = chosenItems(equipment, count: 1, rng: &rng).first {

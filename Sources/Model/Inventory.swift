@@ -96,12 +96,14 @@ enum Rarity: String, Codable, CaseIterable, Sendable, Comparable {
 /// Catalogue definitions remain a fallback for old/found pieces, but once this profile exists the
 /// instance no longer changes shape because content data or station rules changed later.
 struct GearInstanceProfile: Codable, Equatable, Sendable {
-    var version: Int = 1
+    var version: Int = 2
     var stableInstanceID: InstanceID
     var familyID: String?
     var constructionTier: Int
     var reforgeRank: Int = 0
     var legacyPowerCredit: Int = 0
+    var qualityBand: CraftMaterialQualityBand = .standard
+    var legacyEffectivePowerCredit: Int = 0
     var slot: GearSlot
     var damage: DamageKind?
     var reach: Reach
@@ -112,6 +114,7 @@ struct GearInstanceProfile: Codable, Equatable, Sendable {
     var specialistProfile: String?
     var displayProvenance: String?
     var authoredUniqueRuleID: String?
+    var foundReceipt: FoundGearReceiptV1?
 
     init(stableInstanceID: InstanceID, definition: ItemDef, legacyUpgradeLevel: Int = 0) {
         let gear = definition.gear!
@@ -119,17 +122,28 @@ struct GearInstanceProfile: Codable, Equatable, Sendable {
         self.stableInstanceID = stableInstanceID
         self.constructionTier = min(4, max(1, legacySmithPower))
         self.legacyPowerCredit = max(0, legacySmithPower - 4)
+        self.qualityBand = CraftMaterialQualityBand(rawValue: self.constructionTier) ?? .standard
+        self.legacyEffectivePowerCredit = self.legacyPowerCredit
         self.slot = gear.slot
         self.damage = gear.damage
         self.reach = gear.reach
         self.insulation = gear.insulation
         self.reactivity = gear.reactivity
         self.authoredUniqueRuleID = gear.breaks?.rawValue
+        if let receipt = definition.gearCatalogueDisposition?.foundReceipt {
+            self.qualityBand = receipt.qualityBand
+            self.constructionTier = receipt.qualityBand.rawValue
+            self.foundReceipt = receipt
+        }
     }
 
     var effectivePower: Double {
-        Double(constructionTier + legacyPowerCredit)
+        Double(qualityBand.rawValue + legacyEffectivePowerCredit)
             + Double(reforgeRank) * Tuning.Smith.powerPerReforgeRank
+    }
+
+    var hasImmutableConstructionReceipt: Bool {
+        recipeVersion != nil && !consumedSamples.isEmpty
     }
 
     var legacyLabel: String? {
@@ -237,10 +251,6 @@ struct ItemStack: Codable, Equatable, Identifiable, Sendable {
         upgradeLevel = try c.decodeIfPresent(Int.self, forKey: .upgradeLevel) ?? 0
         wildGrowth = try c.decodeIfPresent(Int.self, forKey: .wildGrowth) ?? 0
         gearProfile = try c.decodeIfPresent(GearInstanceProfile.self, forKey: .gearProfile)
-        if gearProfile == nil, let definition = ContentCatalog.shared.item(catalogID), definition.gear != nil {
-            gearProfile = GearInstanceProfile(stableInstanceID: id, definition: definition,
-                                              legacyUpgradeLevel: upgradeLevel)
-        }
         distilledCore = try c.decodeIfPresent(DistilledCore.self, forKey: .distilledCore)
         protectedReturnCount = min(count, max(0, try c.decodeIfPresent(Int.self,
                                                     forKey: .protectedReturnCount) ?? 0))
@@ -252,6 +262,19 @@ struct ItemStack: Codable, Equatable, Identifiable, Sendable {
             materials = []
         }
         if !materials.isEmpty { count = materials.count }
+        if let definition = ContentCatalog.shared.item(catalogID), let gear = definition.gear {
+            guard let profile = gearProfile, profile.version == 2,
+                  profile.stableInstanceID == id, profile.slot == gear.slot,
+                  profile.authoredUniqueRuleID == gear.breaks?.rawValue,
+                  profile.foundReceipt == (profile.hasImmutableConstructionReceipt
+                    ? nil : definition.gearCatalogueDisposition?.foundReceipt),
+                  profile.legacyEffectivePowerCredit >= 0,
+                  (0...3).contains(profile.reforgeRank) else {
+                throw CocoaError(.coderInvalidValue)
+            }
+        } else if gearProfile != nil {
+            throw CocoaError(.coderInvalidValue)
+        }
     }
 
     /// The single sample a bin is *about*, for anything that just needs to know what kind it is.
@@ -694,10 +717,10 @@ struct EquippedPiece: Codable, Equatable, Sendable, ExpressibleByStringLiteral {
         var stack = ItemStack(id: stableID, catalogID: catalogID)
         stack.upgradeLevel = upgradeLevel
         stack.wildGrowth = wildGrowth
-        stack.gearProfile = gearProfile.map { profile in
-            var kept = profile
+        if let gearProfile {
+            var kept = gearProfile
             if kept.stableInstanceID.rawValue == 0 { kept.stableInstanceID = stableID }
-            return kept
+            stack.gearProfile = kept
         }
         stack.isFavorite = isFavorite
         stack.isLocked = isLocked

@@ -4,6 +4,7 @@ enum RecyclerRules {
     enum Ineligibility: String, CaseIterable, Hashable, Sendable {
         case stacked, unidentified, favorite, locked, equipped, notGear, unique, apex
         case narrative, channelworks, legacyCredit, noRecoveryProfile
+        case foundReceiptRecoveryUndefined
 
         var explanation: String {
             switch self {
@@ -19,13 +20,14 @@ enum RecyclerRules {
             case .channelworks: "This belongs at Channelworks and cannot be dismantled here."
             case .legacyCredit: "Gear with power carried forward from an older save stays protected until you rebuild it at the Armoury."
             case .noRecoveryProfile: "This piece has no recorded construction stock or standard salvage."
+            case .foundReceiptRecoveryUndefined:
+                "This piece records its components, but its recoverable material units are not defined."
             }
         }
     }
 
     enum SalvageOutput: Equatable, Sendable {
         case resource(ResourceID)
-        case reclaimedHide
     }
 
     struct SalvageProfile: Equatable, Sendable {
@@ -44,9 +46,9 @@ enum RecyclerRules {
     private static let rigidProtection = SalvageProfile(
         id: "rigid_protection_v1", sequence: [.resource("ore"), .resource("fiber"), .resource("ore")])
     private static let paddedProtection = SalvageProfile(
-        id: "padded_protection_v1", sequence: [.resource("fiber"), .reclaimedHide, .resource("fiber")])
+        id: "padded_protection_v1", sequence: [.resource("fiber"), .resource("fiber"), .resource("fiber")])
     private static let boots = SalvageProfile(
-        id: "boots_v1", sequence: [.resource("fiber"), .reclaimedHide, .resource("timber")])
+        id: "boots_v1", sequence: [.resource("fiber"), .resource("fiber"), .resource("timber")])
     private static let keepsake = SalvageProfile(
         id: "keepsake_v1", sequence: [.resource("pulp"), .resource("fiber"), .resource("quartz")])
 
@@ -61,7 +63,8 @@ enum RecyclerRules {
 
     static func unprofiledOrdinaryGearIDs(in catalog: ContentCatalog = .shared) -> [ItemID] {
         catalog.items.filter { item in
-            item.gear != nil && item.gear?.breaks == nil && salvageProfile(for: item) == nil
+            item.gearCatalogueDisposition?.classification == .ordinaryFound
+                && item.gear?.breaks == nil && salvageProfile(for: item) == nil
         }.map(\.id).sorted { $0.rawValue < $1.rawValue }
     }
 
@@ -71,9 +74,12 @@ enum RecyclerRules {
     }
 
     static func hasValidCatalogueDisposition(_ item: ItemDef) -> Bool {
+        if item.gearCatalogueDisposition?.classification == .decodeOnly { return item.gear != nil }
         switch item.recyclerDisposition {
         case .recyclable:
-            return item.gear != nil && item.gear?.breaks == nil && salvageProfile(for: item) != nil
+            return item.gear != nil && item.gear?.breaks == nil
+                && (salvageProfile(for: item) != nil
+                    || item.gearCatalogueDisposition?.foundReceipt != nil)
         case .protected:
             return item.salvageProfileID == nil
         case .notGear:
@@ -130,18 +136,16 @@ enum RecyclerRules {
         default: 3
         }
         var resources = ResourcePool()
-        var samples: [CraftMaterialUnitV1] = []
         for output in profile.sequence.prefix(outputCount) {
             switch output {
             case .resource(let id): resources.add(1, of: id)
-            case .reclaimedHide: resources.add(1, of: Resources.fiber)
             }
         }
         return RecyclerPreview(revision: base.recycler.inventoryRevision,
                                location: location, stackID: stackID, snapshot: stack,
                                serviceTier: tier, route: .authoredSalvage(profileID: profile.id),
                                selectedReceiptIndices: [], recoveryCapacity: 0,
-                               returnedSamples: samples, returnedResources: resources)
+                               returnedSamples: [], returnedResources: resources)
     }
 
     static func ineligibility(of stack: ItemStack) -> Ineligibility? {
@@ -156,8 +160,10 @@ enum RecyclerRules {
         if let unique = stack.gearProfile?.authoredUniqueRuleID {
             return unique.contains("narrative") ? .narrative : .unique
         }
-        if (stack.gearProfile?.legacyPowerCredit ?? 0) > 0 { return .legacyCredit }
+        if (stack.gearProfile?.legacyEffectivePowerCredit ?? 0) > 0
+            || (stack.gearProfile?.legacyPowerCredit ?? 0) > 0 { return .legacyCredit }
         if !(stack.gearProfile?.consumedSamples.isEmpty ?? true) { return nil }
+        if stack.gearProfile?.foundReceipt != nil { return .foundReceiptRecoveryUndefined }
         return salvageProfile(for: definition) == nil ? .noRecoveryProfile : nil
     }
 

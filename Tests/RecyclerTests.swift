@@ -301,6 +301,44 @@ final class RecyclerTests: XCTestCase {
         XCTAssertTrue(preview.returnedResources.isEmpty)
     }
 
+    func testAllTwelveFoundReceiptsDeferStoredAndOverflowRecoveryWithoutMutation() throws {
+        let ids = ContentCatalog.shared.items.compactMap { item in
+            item.gearCatalogueDisposition?.foundReceipt == nil ? nil : item.id
+        }.sorted { $0.rawValue < $1.rawValue }
+        XCTAssertEqual(ids.count, 12)
+        XCTAssertTrue(ids.contains("copper_buckler"))
+        XCTAssertTrue(ids.contains("timber_longbow"))
+        XCTAssertTrue(ids.contains("rubble_sling"))
+        XCTAssertTrue(ids.contains("ironwork_blade"))
+        XCTAssertTrue(ids.contains("resinbound_boots"))
+        XCTAssertTrue(ids.contains("golden_keepsake"))
+        XCTAssertTrue(ids.contains("riftglass_rapier"))
+
+        for (ordinal, id) in ids.enumerated() {
+            for location in [TradingPostItemLocation.stored, .overflow] {
+                let stack = gear(id, id: UInt64(80_000 + ordinal))
+                var state = base(containing: stack, overflow: location == .overflow)
+                let before = try SaveCodec.makeEncoder().encode(state)
+                let revision = state.recycler.inventoryRevision
+                XCTAssertEqual(RecyclerRules.ineligibility(of: stack),
+                               .foundReceiptRecoveryUndefined, id.rawValue)
+                XCTAssertNil(RecyclerRules.preview(location: location, stackID: stack.id,
+                                                    serviceTier: 3, in: state), id.rawValue)
+
+                var forged = RecyclerPreview(
+                    revision: revision, location: location, stackID: stack.id, snapshot: stack,
+                    serviceTier: 3, route: .constructionReceipt,
+                    selectedReceiptIndices: [], recoveryCapacity: 0,
+                    returnedSamples: [], returnedResources: ResourcePool())
+                XCTAssertEqual(RecyclerRules.commit(forged, in: &state), .invalid)
+                XCTAssertEqual(try SaveCodec.makeEncoder().encode(state), before, id.rawValue)
+                forged.revision &+= 1
+                XCTAssertEqual(RecyclerRules.commit(forged, in: &state), .stale)
+                XCTAssertEqual(try SaveCodec.makeEncoder().encode(state), before, id.rawValue)
+            }
+        }
+    }
+
     func testFoundSalvageUsesAuthoredTierSequenceWithoutInventingReceipt() throws {
         for (tier, expectedOre, expectedTimber) in [(1, 1, 0), (3, 1, 1), (4, 2, 1)] {
             let stack = gear("blade_chipped", id: UInt64(700 + tier), tier: tier)

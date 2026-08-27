@@ -1,5 +1,12 @@
 import Foundation
 
+private struct ContentStrictCodingKey: CodingKey {
+    var stringValue: String
+    var intValue: Int? { nil }
+    init?(stringValue: String) { self.stringValue = stringValue }
+    init?(intValue: Int) { return nil }
+}
+
 // Content definitions: the *shape* of catalog data. The data itself is JSON under
 // `Sources/Content/Data/`, per CLAUDE.md — symbols, gambit pieces, creatures, items and base
 // stations are expected to grow a lot, so none of them may become hardcoded logic.
@@ -453,6 +460,8 @@ struct ItemDef: Codable, Equatable, Identifiable, Sendable {
     /// Catalogue-owned Recycler disposition and optional authored fallback profile.
     var recyclerDisposition: RecyclerDisposition
     var salvageProfileID: String?
+    /// Required, closed acquisition/provenance authority for gear only.
+    var gearCatalogueDisposition: GearCatalogueDispositionV1?
 
     enum TradingPostDisposition: String, Codable, Sendable {
         case sellable, protected, notBought
@@ -468,6 +477,180 @@ struct ItemDef: Codable, Equatable, Identifiable, Sendable {
         case curio     // drops unidentified
         case gear
         case treasure
+    }
+}
+
+enum GearCatalogueClassification: String, Codable, CaseIterable, Sendable {
+    case ordinaryFound, wildApexOnly, componentAuthoredFound, decodeOnly
+}
+
+struct FoundGearComponentV1: Codable, Equatable, Sendable {
+    var socket: String
+    var domain: CraftMaterialDomain
+    /// The frozen authored family vocabulary includes both bulk-world and unit-material families.
+    var familyID: String
+    var qualityBand: CraftMaterialQualityBand
+
+    init(socket: String, domain: CraftMaterialDomain, familyID: String,
+         qualityBand: CraftMaterialQualityBand) {
+        self.socket = socket
+        self.domain = domain
+        self.familyID = familyID
+        self.qualityBand = qualityBand
+    }
+
+    init(from decoder: Decoder) throws {
+        let rawKeys = try decoder.container(keyedBy: ContentStrictCodingKey.self)
+        guard Set(rawKeys.allKeys.map(\.stringValue)) == Set(CodingKeys.allCases.map(\.rawValue)) else {
+            throw CocoaError(.coderInvalidValue)
+        }
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        socket = try c.decode(String.self, forKey: .socket)
+        domain = try c.decode(CraftMaterialDomain.self, forKey: .domain)
+        familyID = try c.decode(String.self, forKey: .familyID)
+        qualityBand = try c.decode(CraftMaterialQualityBand.self, forKey: .qualityBand)
+        guard !socket.isEmpty, !familyID.isEmpty else { throw CocoaError(.coderInvalidValue) }
+    }
+
+    private enum CodingKeys: String, CodingKey, CaseIterable {
+        case socket, domain, familyID, qualityBand
+    }
+}
+
+struct FoundGearReceiptV1: Codable, Equatable, Sendable {
+    enum Mode: String, Codable, Sendable { case schematic, fixedFound, fixedSpecial }
+    var version: Int
+    var mode: Mode
+    var schematicID: SchematicID?
+    var fixedIdentity: String?
+    var outputSlot: GearSlot?
+    var qualityBand: CraftMaterialQualityBand
+    var components: [FoundGearComponentV1]
+
+    init(version: Int, mode: Mode, schematicID: SchematicID?, fixedIdentity: String?,
+         outputSlot: GearSlot?, qualityBand: CraftMaterialQualityBand,
+         components: [FoundGearComponentV1]) {
+        self.version = version
+        self.mode = mode
+        self.schematicID = schematicID
+        self.fixedIdentity = fixedIdentity
+        self.outputSlot = outputSlot
+        self.qualityBand = qualityBand
+        self.components = components
+    }
+
+    init(from decoder: Decoder) throws {
+        let rawKeys = try decoder.container(keyedBy: ContentStrictCodingKey.self)
+        let rawKeySet = Set(rawKeys.allKeys.map(\.stringValue))
+        let allowed = Set(CodingKeys.allCases.map(\.rawValue))
+        let required = Set([CodingKeys.version, .mode, .qualityBand, .components].map(\.rawValue))
+        guard rawKeySet.isSubset(of: allowed), rawKeySet.isSuperset(of: required) else {
+            throw CocoaError(.coderInvalidValue)
+        }
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        version = try c.decode(Int.self, forKey: .version)
+        mode = try c.decode(Mode.self, forKey: .mode)
+        schematicID = try c.decodeIfPresent(SchematicID.self, forKey: .schematicID)
+        fixedIdentity = try c.decodeIfPresent(String.self, forKey: .fixedIdentity)
+        outputSlot = try c.decodeIfPresent(GearSlot.self, forKey: .outputSlot)
+        qualityBand = try c.decode(CraftMaterialQualityBand.self, forKey: .qualityBand)
+        components = try c.decode([FoundGearComponentV1].self, forKey: .components)
+        guard version == 1, !components.isEmpty,
+              Set(components.map(\.socket)).count == components.count,
+              components.allSatisfy({ $0.qualityBand == qualityBand }) else {
+            throw CocoaError(.coderInvalidValue)
+        }
+        switch mode {
+        case .schematic:
+            guard schematicID != nil, fixedIdentity == nil else { throw CocoaError(.coderInvalidValue) }
+        case .fixedFound, .fixedSpecial:
+            guard schematicID == nil, !(fixedIdentity ?? "").isEmpty else {
+                throw CocoaError(.coderInvalidValue)
+            }
+        }
+    }
+
+    private enum CodingKeys: String, CodingKey, CaseIterable {
+        case version, mode, schematicID, fixedIdentity, outputSlot, qualityBand, components
+    }
+}
+
+struct GearCatalogueDispositionV1: Codable, Equatable, Sendable {
+    var version: Int
+    var classification: GearCatalogueClassification
+    var territoryFindEligible: Bool
+    var foundReceipt: FoundGearReceiptV1?
+}
+
+enum GearAcquisitionRoute: String, CaseIterable, Sendable {
+    case territoryFind, tradingPostStock, authoredSite, authoredWorldPage, apexReward, craftedOutput
+}
+
+enum GearAcquisitionIneligibility: String, Equatable, Sendable {
+    case unknownItem, notGear, decodeOnly, apexOnly, specialOnly, tradingProtected
+    case routeNotAuthorized, invalidCatalogue
+}
+
+struct FrozenGearCreationV1: Equatable, Sendable {
+    var catalogID: ItemID
+    var qualityBand: CraftMaterialQualityBand
+    var foundReceipt: FoundGearReceiptV1?
+}
+
+enum GearAcquisitionEvaluation: Equatable, Sendable {
+    case eligible(FrozenGearCreationV1)
+    case ineligible(GearAcquisitionIneligibility)
+}
+
+enum GearCatalogueDispositionRules {
+    static func evaluate(_ id: ItemID, route: GearAcquisitionRoute,
+                         catalog: ContentCatalog = .shared) -> GearAcquisitionEvaluation {
+        guard let item = catalog.item(id) else { return .ineligible(.unknownItem) }
+        guard item.kind == .gear, let gear = item.gear else { return .ineligible(.notGear) }
+        guard let disposition = item.gearCatalogueDisposition, disposition.version == 1 else {
+            return .ineligible(.invalidCatalogue)
+        }
+        let creation = FrozenGearCreationV1(
+            catalogID: id,
+            qualityBand: disposition.foundReceipt?.qualityBand
+                ?? CraftMaterialQualityBand(rawValue: min(4, max(1, gear.tier))) ?? .standard,
+            foundReceipt: disposition.foundReceipt)
+        switch disposition.classification {
+        case .decodeOnly:
+            return .ineligible(.decodeOnly)
+        case .wildApexOnly:
+            return route == .apexReward ? .eligible(creation) : .ineligible(.apexOnly)
+        case .ordinaryFound:
+            switch route {
+            case .territoryFind, .authoredSite, .authoredWorldPage:
+                return .eligible(creation)
+            case .tradingPostStock:
+                return item.tradingPostDisposition == .sellable && gear.tier == 1
+                    ? .eligible(creation) : .ineligible(.tradingProtected)
+            case .craftedOutput:
+                return .eligible(creation)
+            case .apexReward:
+                return .ineligible(.routeNotAuthorized)
+            }
+        case .componentAuthoredFound:
+            if disposition.foundReceipt?.mode == .fixedSpecial {
+                return .ineligible(.specialOnly)
+            }
+            switch route {
+            case .territoryFind, .authoredSite, .authoredWorldPage:
+                return disposition.territoryFindEligible ? .eligible(creation)
+                    : .ineligible(.routeNotAuthorized)
+            case .tradingPostStock:
+                return disposition.territoryFindEligible
+                    && item.tradingPostDisposition == .sellable
+                    && creation.qualityBand == .standard
+                    ? .eligible(creation) : .ineligible(.tradingProtected)
+            case .craftedOutput:
+                return .eligible(creation)
+            case .apexReward:
+                return .ineligible(.routeNotAuthorized)
+            }
+        }
     }
 }
 

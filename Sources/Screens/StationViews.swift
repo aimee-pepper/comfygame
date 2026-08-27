@@ -932,7 +932,9 @@ private struct StorehouseItemSheet: View {
                                 .frame(width: 58, height: 58)
                             VStack(alignment: .leading, spacing: 4) {
                                 Text(displayedStack.displayName).font(.headline).foregroundStyle(displayedStack.rarity.tint)
-                                Text(displayedStack.rarity.displayName).font(.caption).foregroundStyle(.secondary)
+                                Text(displayedStack.gearProfile.map { $0.qualityBand.displayName }
+                                     ?? displayedStack.rarity.displayName)
+                                    .font(.caption).foregroundStyle(.secondary)
                             }
                         }
                     }
