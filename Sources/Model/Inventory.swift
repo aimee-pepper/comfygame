@@ -535,7 +535,8 @@ enum PhysicalGearReceiptEngineV1 {
 /// Catalogue definitions remain a fallback for old/found pieces, but once this profile exists the
 /// instance no longer changes shape because content data or station rules changed later.
 struct GearInstanceProfile: Codable, Equatable, Sendable {
-    var version: Int = 4
+    static let currentVersion = 4
+    var version: Int = Self.currentVersion
     var stableInstanceID: InstanceID
     var familyID: String?
     var constructionTier: Int
@@ -1019,7 +1020,7 @@ struct ItemStack: Codable, Equatable, Identifiable, Sendable {
         }
         if !materials.isEmpty { count = materials.count }
         if let definition = ContentCatalog.shared.item(catalogID), let gear = definition.gear {
-            guard let profile = gearProfile, profile.version == 3,
+            guard let profile = gearProfile, profile.version == GearInstanceProfile.currentVersion,
                   profile.stableInstanceID == id,
                   profile.authoredUniqueRuleID == gear.breaks?.rawValue,
                   (profile.hasImmutableConstructionReceipt

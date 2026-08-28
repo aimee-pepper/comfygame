@@ -2,6 +2,61 @@ import XCTest
 @testable import Bookbinder
 
 final class GearMigrationTests: XCTestCase {
+    func testSchemaSeventeenStoredAndWornGearMigrateThroughRawAndRealSlot() async throws {
+        var state = GameState.newGame()
+        state.base.inventory.add(ItemStack(id: .init(rawValue: 81_201),
+                                           catalogID: "guard_padded"))
+        state.base.binderEquipped[.weapon] = EquippedPiece(
+            ItemStack(id: .init(rawValue: 81_202), catalogID: "blade_keen"))
+        var root = try XCTUnwrap(JSONSerialization.jsonObject(with: SaveCodec.encode(state))
+            as? [String: Any])
+        func schemaSeventeen(_ value: Any) -> Any {
+            if let array = value as? [Any] { return array.map(schemaSeventeen) }
+            guard var object = value as? [String: Any] else { return value }
+            if (object["version"] as? NSNumber)?.intValue == 4,
+               object["stableInstanceID"] != nil, object["slot"] != nil {
+                object["version"] = 3
+                object.removeValue(forKey: "gameplayFacts")
+            }
+            for (key, child) in object { object[key] = schemaSeventeen(child) }
+            return object
+        }
+        root = schemaSeventeen(root) as! [String: Any]
+        root["schemaVersion"] = 17
+        let legacy = try JSONSerialization.data(withJSONObject: root, options: [.sortedKeys])
+
+        let rawRoot = FileManager.default.temporaryDirectory
+            .appending(path: "projection-raw-\(UUID().uuidString)", directoryHint: .isDirectory)
+        defer { try? FileManager.default.removeItem(at: rawRoot) }
+        try FileManager.default.createDirectory(at: rawRoot, withIntermediateDirectories: true)
+        let raw = SaveFileIO(directory: rawRoot)
+        try legacy.write(to: raw.saveURL)
+        let rawState = try XCTUnwrap(raw.load().state)
+        XCTAssertEqual(rawState.base.inventory.stacks.first?.gearProfile?.version,
+                       4)
+        XCTAssertEqual(rawState.base.binderEquipped[.weapon]?.gearProfile?.version,
+                       4)
+
+        let slotRoot = FileManager.default.temporaryDirectory
+            .appending(path: "projection-slot-\(UUID().uuidString)", directoryHint: .isDirectory)
+        defer { try? FileManager.default.removeItem(at: slotRoot) }
+        let slots = SaveSlotFileIO(directory: slotRoot)
+        let created = try await slots.create(name: "Schema 17 projection")
+        let slotURL = try await slots.exportURL(for: created.metadata.id)
+        var envelope = try SaveCodec.makeDecoder().decode(
+            SaveSlotEnvelope.self, from: Data(contentsOf: slotURL))
+        envelope.payload = legacy
+        let envelopeBytes = try SaveCodec.makeEncoder().encode(envelope)
+        try envelopeBytes.write(to: slotURL, options: .atomic)
+        let loaded = try await slots.load(created.metadata.id)
+        XCTAssertEqual(loaded.state.base.inventory.stacks.first?.gearProfile?.version,
+                       4)
+        XCTAssertEqual(loaded.state.base.binderEquipped[.weapon]?.gearProfile?.version,
+                       4)
+        XCTAssertEqual(try Data(contentsOf: slotURL), envelopeBytes,
+                       "in-memory migration must preserve the real slot envelope bytes")
+    }
+
     func testSchemaSeventeenFreezesGameplayFactsAndCurrentMissingFactsFailsClosed() throws {
         var state = GameState.newGame()
         state.base.inventory.add(ItemStack(id: .init(rawValue: 81_100), catalogID: "bent_pick"))
