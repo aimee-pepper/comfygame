@@ -508,11 +508,13 @@ extension GameStore {
 
         var reward: EconomyRules.CacheReward?
         var bonusName: String?
-        mutate("open locked cache", flush: true) { state in
+        _ = mutateIf("open locked cache", flush: true) { state in
             var candidate = state
             guard var run = candidate.worlds.activeRun,
                   run.map[run.playerPosition].content == .lockedCache,
-                  candidate.base.inventory.stacks.contains(where: { $0.id == key.id }) else { return }
+                  let keyIndex = candidate.base.inventory.stacks.firstIndex(where: {
+                      $0.id == key.id && $0 == key && $0.count > 0
+                  }) else { return false }
             let rolled = EconomyRules.rollCacheReward(in: state, rng: &run.rng)
             let readings = BookRules.readings(for: run.book, seed: run.mapSeed)
             if let id = ApexRules.cacheBonus(for: readings, rng: &run.rng) {
@@ -526,11 +528,16 @@ extension GameStore {
             EconomyRules.grant(rolled, in: &candidate)
             if !key.identified {
                 guard EconomyRules.recordCurioResolution(familyID: key.catalogID, in: &candidate)
-                        || candidate.reality.curioFamilyKnowledge[key.catalogID] != nil else { return }
+                        || candidate.reality.curioFamilyKnowledge[key.catalogID] != nil else { return false }
             }
-            candidate.base.inventory.remove(key.id) // the key is spent
+            // A cache consumes one exact selected unit, not the entire merged bound-knot bin.
+            _ = candidate.base.inventory.stacks[keyIndex].removing(1)
+            if candidate.base.inventory.stacks[keyIndex].isEmpty {
+                candidate.base.inventory.stacks.remove(at: keyIndex)
+            }
             state = candidate
             reward = rolled
+            return true
         }
         if let reward {
             let bonus = bonusName.map { " A wild weapon was tucked beside it: \($0)." } ?? ""

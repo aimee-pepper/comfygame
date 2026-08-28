@@ -1124,6 +1124,34 @@ final class EconomyTests: XCTestCase {
         XCTAssertFalse(store.isOnLockedCache)
     }
 
+    func testUnknownBoundKnotStackConsumesExactlyOneSelectedUnitAtCache() throws {
+        let store = richStore()
+        let family: ItemID = "curio_bound_knot"
+        let stack = ItemStack(id: .init(rawValue: 70_102), catalogID: family,
+                              count: 2, identified: false)
+        store.mutate("stacked bound-knot fixture") { state in
+            state.base.inventory = Inventory(slots: 8, stacks: [stack])
+        }
+        store.write("plains")
+        XCTAssertTrue(store.bindAndDepart())
+        if let arrivalID = store.state.worlds.pendingWorldArrivalReceiptID {
+            XCTAssertTrue(store.enterPendingWorld(arrivalReceiptID: arrivalID))
+        }
+        store.mutate("stand on compatible cache") { state in
+            guard let point = state.worlds.activeRun?.playerPosition else { return }
+            state.worlds.activeRun?.map[point].content = .lockedCache
+        }
+
+        XCTAssertEqual(store.carriedCacheKey, stack)
+        XCTAssertNotNil(store.openCacheHere())
+        let remainder = try XCTUnwrap(store.state.base.inventory.stacks.first { $0.id == stack.id })
+        XCTAssertEqual(remainder.catalogID, family)
+        XCTAssertFalse(remainder.identified)
+        XCTAssertEqual(remainder.count, 1)
+        XCTAssertEqual(store.state.reality.curioFamilyKnowledge[family]?.observationCount, 1)
+        XCTAssertFalse(store.isOnLockedCache)
+    }
+
     // MARK: The delayed payoff
 
     /// The moment the whole itemization spine exists for: a key found in one world, carried home,

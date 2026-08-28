@@ -250,6 +250,39 @@ final class ConsumableCraftingTests: XCTestCase {
         XCTAssertEqual(store.state.reality.curioFamilyKnowledge["curio_humming_shard"]?.observationCount, 1)
     }
 
+    func testSolventRefusesAtomicallyWhenFullTwoLiveBinsCannotPlaceTransformedItem() throws {
+        let io = SaveFileIO.temporary(name: "solvent-full-two-bin-\(UUID().uuidString)")
+        defer { io.deleteEverything() }
+        let store = GameStore(io: io)
+        var state = fieldState(item: "solvent")
+        state.worlds.activeRun?.satchelItems.slots = 2
+        state.worlds.activeRun?.satchelItems.stacks[0].count = 2
+        let curio = ItemStack(id: InstanceID(rawValue: 901), catalogID: "curio_humming_shard",
+                              count: 2, identified: false)
+        XCTAssertTrue(state.worlds.activeRun?.satchelItems.add(curio) == true)
+        store.mutate("full two-live-bin fixture", flush: true) { $0 = state }
+        let solvent = try XCTUnwrap(store.activeRun?.satchelItems.stacks.first {
+            $0.catalogID == "solvent"
+        })
+        let selectedCurio = try XCTUnwrap(store.activeRun?.satchelItems.stacks.first {
+            $0.id == curio.id
+        })
+        let beforeState = store.state
+        let beforeBytes = try SaveCodec.encode(beforeState)
+
+        store.useSolventInWorld(solvent, on: selectedCurio)
+
+        XCTAssertEqual(store.state, beforeState)
+        XCTAssertEqual(try SaveCodec.encode(store.state), beforeBytes)
+        XCTAssertEqual(store.activeRun?.turnsTaken, beforeState.worlds.activeRun?.turnsTaken)
+        XCTAssertNil(store.state.reality.curioFamilyKnowledge[curio.catalogID])
+        XCTAssertEqual(store.activeRun?.satchelItems.stacks.first { $0.id == solvent.id }?.count, 2)
+        XCTAssertEqual(store.activeRun?.satchelItems.stacks.first { $0.id == curio.id }?.count, 2)
+        XCTAssertFalse(store.activeRun?.satchelItems.stacks.contains {
+            $0.catalogID == "salve_lesser"
+        } ?? true)
+    }
+
     func testContextlessUnknownCurioConsumesNothingAndTeachesNothing() throws {
         let store = GameStore(io: .temporary(name: "curio-contextless-\(UUID().uuidString)"))
         var state = fieldState(item: "field_ration")

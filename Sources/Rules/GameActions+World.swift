@@ -549,14 +549,14 @@ extension GameStore {
         else { return }
         guard let attempt = beginWorldFieldAttempt(.useItem) else { return }
         var events: [WorldRules.Event] = []
-        mutate("use solvent", flush: true, scope: .expedition) { state in
+        let committed = mutateIf("use solvent", flush: true, scope: .expedition) { state in
             var candidate = state
             guard var run = candidate.worlds.activeRun,
                   let revealed = EconomyRules.identification(of: curio),
                   run.satchelItems.stacks.contains(where: { $0.id == solvent.id }),
                   let curioIndex = run.satchelItems.stacks.firstIndex(where: { $0.id == curio.id }),
                   var transformed = run.satchelItems.stacks[curioIndex].removing(1)
-            else { return }
+            else { return false }
 
             transformed.catalogID = revealed.id
             transformed.identified = true
@@ -565,20 +565,23 @@ extension GameStore {
             }
             // Resolve the solvent again because removing the curio may shift its array index.
             guard let currentSolvent = run.satchelItems.stacks.firstIndex(where: { $0.id == solvent.id })
-            else { return }
+            else { return false }
             _ = run.satchelItems.stacks[currentSolvent].removing(1)
             if run.satchelItems.stacks[currentSolvent].isEmpty {
                 run.satchelItems.stacks.remove(at: currentSolvent)
             }
-            _ = run.satchelItems.add(transformed)
+            // Placement is part of the transaction. If both source bins remain live and the
+            // revealed identity needs a third full-satchel bin, publish none of the staged work.
+            guard run.satchelItems.add(transformed) else { return false }
             candidate.worlds.activeRun = run
             guard EconomyRules.recordCurioResolution(familyID: curio.catalogID, in: &candidate)
-                    || candidate.reality.curioFamilyKnowledge[curio.catalogID] != nil else { return }
+                    || candidate.reality.curioFamilyKnowledge[curio.catalogID] != nil else { return false }
             events = [.usedItem("Solvent", on: .binder)]
             events.append(contentsOf: WorldRules.advanceTurn(in: &candidate))
             state = candidate
+            return true
         }
-        finishTurn(events, attempt: attempt)
+        if committed { finishTurn(events, attempt: attempt) }
     }
 
     /// Use something out here. Costs a turn, like everything else the world charges for.
