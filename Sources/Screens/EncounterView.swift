@@ -214,18 +214,22 @@ struct EncounterView: View {
     }
 #endif
 
+    static func rosterNamesByID(in base: BaseState) -> [PersistentPartyMemberID: String] {
+        base.roster.indices.reduce(
+            into: [PersistentPartyMemberID: String]()) { names, index in
+                guard let id = base.persistentID(forRosterIndex: index),
+                      names[id] == nil else { return }
+                names[id] = base.roster[index].name
+            }
+    }
+
     private func turnText(_ encounter: EncounterState) -> String {
         EncounterTurnText.format(
             current: encounter.current,
             encounterFinished: encounter.outcome != nil,
             companionOverride: encounter.isCompanionOverridden,
             rosterNames: store.state.base.roster.map(\.name),
-            rosterNamesByID: Dictionary(uniqueKeysWithValues:
-                store.state.base.roster.indices.compactMap { index in
-                    store.state.base.persistentID(forRosterIndex: index).map {
-                        ($0, store.state.base.roster[index].name)
-                    }
-                })
+            rosterNamesByID: Self.rosterNamesByID(in: store.state.base)
         )
     }
 

@@ -181,6 +181,49 @@ final class CombatTests: XCTestCase {
 #endif
     }
 
+    func testEncounterMountToleratesDuplicateLegacyRosterIdentity() throws {
+        let duplicate = PersistentPartyMemberID.traveller("quill")
+        let store = GameStore(io: .temporary(name: "encounter-duplicate-roster-\(UUID().uuidString)"))
+        store.mutate("duplicate legacy roster encounter fixture") { state in
+            var first = CompanionState()
+            first.persistentID = duplicate
+            first.name = "First Quill"
+            var second = CompanionState()
+            second.persistentID = duplicate
+            second.name = "Duplicate Quill"
+            state.base.roster = [first, second]
+
+            let point = GridPoint(x: 0, y: 0)
+            let map = WorldMap(width: 1, height: 1, tiles: [Tile(isRevealed: true)], entry: point)
+            var run = WorldRun(runIndex: 1, book: BoundBook(written: [], essencePaid: 0),
+                               mapSeed: 1, rng: SeededRNG(seed: 1), map: map,
+                               playerPosition: point)
+            var rng = SeededRNG(seed: 2)
+            run.activeEncounter = CombatRules.makeEncounter(
+                id: InstanceID(rawValue: 10),
+                foes: [FoeState(id: InstanceID(rawValue: 9),
+                                stats: CombatStats(displayName: "Paper Moth", icon: "ant",
+                                                   maxHP: 12, attack: 2),
+                                currentHP: 12)],
+                party: [.binder], rng: &rng)
+            state.worlds.activeRun = run
+        }
+
+        let frozen = try SaveCodec.encode(store.state)
+        XCTAssertEqual(EncounterView.rosterNamesByID(in: store.state.base),
+                       [duplicate: "First Quill"],
+                       "the first stable roster occurrence deterministically owns presentation")
+        let controller = UIHostingController(rootView: EncounterView().environmentObject(store))
+        let window = UIWindow(frame: CGRect(x: 0, y: 0, width: 368, height: 800))
+        window.rootViewController = controller
+        window.makeKeyAndVisible()
+        controller.view.frame = window.bounds
+        controller.view.layoutIfNeeded()
+        RunLoop.main.run(until: Date().addingTimeInterval(0.05))
+        XCTAssertEqual(try SaveCodec.encode(store.state), frozen)
+        window.isHidden = true
+    }
+
     func testEncounterSafeSpaceSourcePreservesLogOrderAndRemovesOnlyTopLevelSpacer() throws {
         let root = URL(fileURLWithPath: #filePath).deletingLastPathComponent()
             .deletingLastPathComponent()
