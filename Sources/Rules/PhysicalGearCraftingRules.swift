@@ -496,6 +496,7 @@ enum PhysicalGearCraftingRules {
               let fresh = self.preview(preview.recipe, selections: preview.selections, in: state),
               fresh == preview, state.base.essenceCrystalCount >= preview.essence else { return nil }
 
+        guard state.base.physicalGearOwnershipRevision < UInt64.max else { return nil }
         var candidate = state
         guard consume(preview.selections, in: &candidate),
               candidate.base.spendEssenceCrystals(preview.essence),
@@ -532,6 +533,7 @@ enum PhysicalGearCraftingRules {
         guard output.gearProfile?.physicalReceipt?.validates(profile: output.gearProfile!) == true
         else { return nil }
         candidate.base.store(output)
+        candidate.base.physicalGearOwnershipRevision += 1
         guard candidate.validatesPhysicalGearReceipts() else { return nil }
         state = candidate
         return output

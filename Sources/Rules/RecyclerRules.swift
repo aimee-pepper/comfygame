@@ -193,7 +193,9 @@ enum RecyclerRules {
         let creature = returnedUnits.filter { $0.unit.domain == .creature }
         guard candidate.worldMaterialReserve.addExact(world),
               candidate.creatureMaterialReserve.addExact(creature) else { return .invalid }
+        guard candidate.physicalGearOwnershipRevision < UInt64.max else { return .invalid }
         candidate.recycler.inventoryRevision += 1
+        candidate.physicalGearOwnershipRevision += 1
         base = candidate
         return .committed
     }

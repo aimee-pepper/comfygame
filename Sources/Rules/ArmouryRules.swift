@@ -201,6 +201,7 @@ enum ArmouryRules {
               fresh == preview, (!preview.destroysLegacyWork || allowLegacyLoss),
               state.base.essenceCrystalCount >= preview.essence else { return false }
 
+        guard state.base.physicalGearOwnershipRevision < UInt64.max else { return false }
         var candidate = state
         var rebuilt = current.gearProfile!
         rebuilt.constructionTier = preview.outputTier
@@ -227,6 +228,7 @@ enum ArmouryRules {
               candidate.base.spendEssenceCrystals(preview.essence),
               rebuilt.physicalReceipt?.validates(profile: rebuilt) == true else { return false }
         apply(rebuilt, to: current, in: &candidate)
+        candidate.base.physicalGearOwnershipRevision += 1
         guard candidate.validatesPhysicalGearReceipts() else { return false }
         state = candidate
         return true

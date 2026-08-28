@@ -325,6 +325,8 @@ struct BaseState: Codable, Equatable, Sendable {
     /// meant the damage-type matchup never reached the player's own turns, which is the whole point
     /// of giving weapons a type at all.
     var binderEquipped: [GearSlot: EquippedPiece] = [:]
+    /// Invalidates every quote that moves a physical gear identity between durable owners.
+    var physicalGearOwnershipRevision: UInt64 = 0
 
     /// Purchased at the Workshop. Until then the Binder is manual every turn.
     ///
@@ -557,7 +559,7 @@ struct BaseState: Codable, Equatable, Sendable {
         case hasConfiguredInstrumentLoadout
         case ownedSources
         case roster, activeCompanion, activeParty, tamedAnimalCompanions
-        case binderEquipped, hasAutomateSelfUnlock, satchelTier
+        case binderEquipped, physicalGearOwnershipRevision, hasAutomateSelfUnlock, satchelTier
         case purchasedGambitSlots, binderGambits, binderCharacter
         case companion
     }
@@ -610,6 +612,7 @@ struct BaseState: Codable, Equatable, Sendable {
         try c.encode(activeParty, forKey: .activeParty)
         try c.encode(tamedAnimalCompanions, forKey: .tamedAnimalCompanions)
         try c.encode(binderEquipped, forKey: .binderEquipped)
+        try c.encode(physicalGearOwnershipRevision, forKey: .physicalGearOwnershipRevision)
         try c.encode(hasAutomateSelfUnlock, forKey: .hasAutomateSelfUnlock)
         try c.encode(satchelTier, forKey: .satchelTier)
         try c.encode(purchasedGambitSlots, forKey: .purchasedGambitSlots)
@@ -762,6 +765,9 @@ struct BaseState: Codable, Equatable, Sendable {
         tamedAnimalCompanions = try container.decodeIfPresent(
             [TamedAnimalID: TamedAnimalCompanionStateV1].self, forKey: .tamedAnimalCompanions) ?? [:]
         binderEquipped = try container.decodeIfPresent([GearSlot: EquippedPiece].self, forKey: .binderEquipped) ?? [:]
+        let isPreOwnershipSchema = !container.contains(.physicalGearOwnershipRevision)
+        physicalGearOwnershipRevision = try container.decodeIfPresent(
+            UInt64.self, forKey: .physicalGearOwnershipRevision) ?? 0
         hasAutomateSelfUnlock = try container.decodeIfPresent(Bool.self, forKey: .hasAutomateSelfUnlock) ?? false
         satchelTier = try container.decodeIfPresent(Int.self, forKey: .satchelTier) ?? 0
         purchasedGambitSlots = try container.decodeIfPresent(Int.self, forKey: .purchasedGambitSlots) ?? 0
@@ -775,7 +781,9 @@ struct BaseState: Codable, Equatable, Sendable {
         recycler = try container.decodeIfPresent(RecyclerState.self, forKey: .recycler)
             ?? RecyclerState()
 
-        migrateEquippedGearProfiles()
+        if isPreOwnershipSchema {
+            migrateEquippedGearProfiles()
+        }
 
         let channelworksUnlocked = stations[Stations.channelworks]?.isUnlocked == true
         guard channelworksUnlocked == (channelworksRestoration != nil),

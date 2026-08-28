@@ -16,7 +16,7 @@ enum Tuning {
 
     /// Save-file schema version. Bump when `GameState`'s shape changes incompatibly and add a
     /// step in `Migrations.swift`.
-    static let saveSchemaVersion: Int = 16
+    static let saveSchemaVersion: Int = 17
 
     enum AnimalTrust {
         static let patientTurns = 2

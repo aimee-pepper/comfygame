@@ -1,4 +1,5 @@
 import Foundation
+import CryptoKit
 
 enum RosterPlacement: Equatable, Sendable {
     case home
@@ -36,6 +37,202 @@ enum IdentificationCommitResult: Equatable, Sendable {
 private enum IdentificationEvaluation {
     case ready(GameState, ItemDef)
     case refused(String)
+}
+
+enum GearOwnershipRulesV1 {
+    private static func ownerIsValid(_ owner: PhysicalGearOwnerV1, target: Bool,
+                                     state: GameState) -> GearOwnershipRefusalV1? {
+        switch owner {
+        case .binder: return nil
+        case .member(let id):
+            if id.rawValue.hasPrefix("animal:") { return .unsupportedOwner }
+            let matches = state.base.roster.indices.filter {
+                state.base.persistentID(forRosterIndex: $0) == id
+            }
+            guard matches.count == 1 else { return matches.isEmpty ? .ownerUnavailable : .invalidPersistedState }
+            if target && !state.base.activeParty.contains(id) { return .ownerNotActive }
+            return nil
+        }
+    }
+
+    private static func homeRefusal(_ state: GameState) -> GearOwnershipRefusalV1? {
+        if state.worlds.activeRun?.activeEncounter != nil { return .encounterActive }
+        if state.worlds.activeRun != nil { return .expeditionActive }
+        return nil
+    }
+
+    private static func worn(_ owner: PhysicalGearOwnerV1, slot: GearSlot,
+                             state: GameState) -> EquippedPiece? {
+        switch owner {
+        case .binder: state.base.binderEquipped[slot]
+        case .member(let id): state.base.rosterIndex(for: id).flatMap { state.base.roster[$0].equipped[slot] }
+        }
+    }
+
+    @discardableResult
+    private static func setWorn(_ piece: EquippedPiece?, owner: PhysicalGearOwnerV1,
+                                slot: GearSlot, state: inout GameState) -> Bool {
+        switch owner {
+        case .binder:
+            state.base.binderEquipped[slot] = piece
+            return true
+        case .member(let id):
+            guard let index = state.base.rosterIndex(for: id) else { return false }
+            state.base.roster[index].equipped[slot] = piece
+            return true
+        }
+    }
+
+    private static func digest<T: Encodable>(_ value: T) -> String? {
+        guard let data = try? JSONEncoder.sorted.encode(value) else { return nil }
+        return SHA256.hash(data: data).map { String(format: "%02x", $0) }.joined()
+    }
+
+    private struct EquipDigest: Codable {
+        var version: Int; var ownershipRevision: UInt64; var source: GearOwnershipSourceV1
+        var targetOwner: PhysicalGearOwnerV1; var targetSlot: GearSlot
+        var movingSnapshot: PhysicalGearSnapshotV1; var displacedSnapshot: PhysicalGearSnapshotV1?
+        var displacedDestination: GearOwnershipDestinationV1
+    }
+    private struct UnequipDigest: Codable {
+        var version: Int; var ownershipRevision: UInt64; var owner: PhysicalGearOwnerV1
+        var slot: GearSlot; var wornSnapshot: PhysicalGearSnapshotV1
+        var destination: GearOwnershipDestinationV1
+    }
+
+    static func evaluateEquip(source: GearOwnershipSourceV1, target: PhysicalGearOwnerV1,
+                              slot: GearSlot, state: GameState) -> GearEquipEvaluationV1 {
+        if let refusal = homeRefusal(state) { return .refused(refusal) }
+        if let refusal = ownerIsValid(target, target: true, state: state) { return .refused(refusal) }
+        guard state.validatesPhysicalGearReceipts() else { return .refused(.invalidPersistedState) }
+
+        let moving: PhysicalGearSnapshotV1
+        switch source {
+        case .stored(let id):
+            guard let stack = state.base.inventory.stacks.first(where: { $0.id == id }) else {
+                return .refused(.sourceMissing)
+            }
+            guard let snapshot = PhysicalGearSnapshotV1(stack) else { return .refused(.notPhysicalGear) }
+            moving = snapshot
+        case .waiting(let id):
+            guard let stack = state.base.spillover.first(where: { $0.id == id }) else {
+                return .refused(.sourceMissing)
+            }
+            guard let snapshot = PhysicalGearSnapshotV1(stack) else { return .refused(.notPhysicalGear) }
+            moving = snapshot
+        case .worn(let owner, let sourceSlot):
+            if owner == target { return .refused(.alreadyWorn) }
+            if let refusal = ownerIsValid(owner, target: false, state: state) { return .refused(refusal) }
+            guard let piece = worn(owner, slot: sourceSlot, state: state),
+                  let snapshot = PhysicalGearSnapshotV1(piece) else { return .refused(.sourceMissing) }
+            moving = snapshot
+        }
+        guard moving.stack.gearProfile?.slot == slot else { return .refused(.slotMismatch) }
+        let displaced = worn(target, slot: slot, state: state).flatMap(PhysicalGearSnapshotV1.init)
+        if worn(target, slot: slot, state: state) != nil && displaced == nil {
+            return .refused(.invalidReceipt)
+        }
+        let destination: GearOwnershipDestinationV1 = switch source {
+        case .stored: .stored
+        case .waiting: state.base.inventory.isFull ? .waiting : .stored
+        case .worn: .sourceWorn
+        }
+        let payload = EquipDigest(version: 1, ownershipRevision: state.base.physicalGearOwnershipRevision,
+                                  source: source, targetOwner: target, targetSlot: slot,
+                                  movingSnapshot: moving, displacedSnapshot: displaced,
+                                  displacedDestination: destination)
+        guard let canonicalDigest = digest(payload) else { return .refused(.invalidPersistedState) }
+        return .allowed(.init(ownershipRevision: payload.ownershipRevision, source: source,
+                              targetOwner: target, targetSlot: slot, movingSnapshot: moving,
+                              displacedSnapshot: displaced, displacedDestination: destination,
+                              canonicalDigest: canonicalDigest))
+    }
+
+    static func evaluateUnequip(owner: PhysicalGearOwnerV1, slot: GearSlot,
+                                state: GameState) -> GearUnequipEvaluationV1 {
+        if let refusal = homeRefusal(state) { return .refused(refusal) }
+        if let refusal = ownerIsValid(owner, target: false, state: state) { return .refused(refusal) }
+        guard state.validatesPhysicalGearReceipts(), let piece = worn(owner, slot: slot, state: state),
+              let snapshot = PhysicalGearSnapshotV1(piece) else { return .refused(.sourceMissing) }
+        let destination: GearOwnershipDestinationV1 = state.base.inventory.isFull ? .waiting : .stored
+        let payload = UnequipDigest(version: 1, ownershipRevision: state.base.physicalGearOwnershipRevision,
+                                    owner: owner, slot: slot, wornSnapshot: snapshot,
+                                    destination: destination)
+        guard let canonicalDigest = digest(payload) else { return .refused(.invalidPersistedState) }
+        return .allowed(.init(ownershipRevision: payload.ownershipRevision, owner: owner, slot: slot,
+                              wornSnapshot: snapshot, destination: destination,
+                              canonicalDigest: canonicalDigest))
+    }
+
+    static func commit(_ quote: GearEquipQuoteV1, state: inout GameState) -> GearOwnershipCommitResultV1 {
+        guard state.base.physicalGearOwnershipRevision == quote.ownershipRevision else {
+            return .refused(.staleRevision)
+        }
+        guard case .allowed(let current) = evaluateEquip(source: quote.source,
+                                                          target: quote.targetOwner,
+                                                          slot: quote.targetSlot, state: state),
+              current == quote else { return .refused(.staleQuote) }
+        guard quote.ownershipRevision < UInt64.max else { return .refused(.revisionExhausted) }
+        var candidate = state
+        let moving = EquippedPiece(quote.movingSnapshot.stack)
+        switch quote.source {
+        case .stored(let id): candidate.base.inventory.remove(id)
+        case .waiting(let id): candidate.base.spillover.removeAll { $0.id == id }
+        case .worn(let owner, let slot):
+            guard setWorn(nil, owner: owner, slot: slot, state: &candidate) else {
+                return .refused(.ownerUnavailable)
+            }
+        }
+        guard setWorn(moving, owner: quote.targetOwner, slot: quote.targetSlot, state: &candidate)
+        else { return .refused(.ownerUnavailable) }
+        if let displaced = quote.displacedSnapshot?.stack {
+            switch quote.displacedDestination {
+            case .stored: guard candidate.base.inventory.add(displaced) else { return .refused(.staleQuote) }
+            case .waiting: candidate.base.spillover.append(displaced)
+            case .sourceWorn:
+                guard case .worn(let owner, let slot) = quote.source,
+                      setWorn(EquippedPiece(displaced), owner: owner, slot: slot, state: &candidate)
+                else { return .refused(.staleQuote) }
+            }
+        }
+        candidate.base.physicalGearOwnershipRevision += 1
+        guard candidate.validatesPhysicalGearReceipts() else { return .refused(.invalidPersistedState) }
+        state = candidate
+        return .committed
+    }
+
+    static func commit(_ quote: GearUnequipQuoteV1,
+                       state: inout GameState) -> GearOwnershipCommitResultV1 {
+        guard state.base.physicalGearOwnershipRevision == quote.ownershipRevision else {
+            return .refused(.staleRevision)
+        }
+        guard case .allowed(let current) = evaluateUnequip(owner: quote.owner, slot: quote.slot,
+                                                            state: state), current == quote else {
+            return .refused(.staleQuote)
+        }
+        guard quote.ownershipRevision < UInt64.max else { return .refused(.revisionExhausted) }
+        var candidate = state
+        guard setWorn(nil, owner: quote.owner, slot: quote.slot, state: &candidate) else {
+            return .refused(.ownerUnavailable)
+        }
+        switch quote.destination {
+        case .stored: guard candidate.base.inventory.add(quote.wornSnapshot.stack) else {
+            return .refused(.staleQuote)
+        }
+        case .waiting: candidate.base.spillover.append(quote.wornSnapshot.stack)
+        case .sourceWorn: return .refused(.staleQuote)
+        }
+        candidate.base.physicalGearOwnershipRevision += 1
+        guard candidate.validatesPhysicalGearReceipts() else { return .refused(.invalidPersistedState) }
+        state = candidate
+        return .committed
+    }
+}
+
+private extension JSONEncoder {
+    static var sorted: JSONEncoder {
+        let encoder = JSONEncoder(); encoder.outputFormatting = [.sortedKeys]; return encoder
+    }
 }
 
 struct PartyTransferPreview: Identifiable, Equatable, Sendable {
@@ -850,84 +1047,23 @@ extension GameStore {
     /// Put something on somebody. Takes the piece out of the bin, puts back what it replaces —
     /// the same rule as before, now aimed at anybody in the party.
     func equip(_ stack: ItemStack, on slot: PartySlot) {
-        guard let gearSlot = stack.gearProfile?.slot ?? ContentCatalog.shared.item(stack.catalogID)?.gear?.slot else { return }
-        mutate("equip \(stack.catalogID.rawValue)", flush: true) { state in
-            guard let index = state.base.inventory.stacks.firstIndex(where: { $0.id == stack.id }),
-                  let taken = state.base.inventory.stacks[index].removing(1)
-            else { return }
-            if state.base.inventory.stacks[index].isEmpty {
-                state.base.inventory.stacks.remove(at: index)
-            }
-            let previous = Self.swapIn(EquippedPiece(taken), gearSlot, slot, in: &state)
-            if let previous {
-                state.base.store(previous.asStack(id: InstanceID(rawValue: state.base.nextItemID())))
-            }
-        }
+        guard let gearSlot = stack.gearProfile?.slot else { return }
+        _ = commitGearEquip(source: .stored(stack.id), target: Self.owner(slot), slot: gearSlot)
     }
 
     /// Equip from an explicit ownership location. Stale sources are a complete no-op, and a piece
     /// worn by somebody else moves directly rather than briefly pretending to fit on a full shelf.
     @discardableResult
     func equip(_ option: WearableGearOption, on target: PartySlot) -> Bool {
-        guard option.canEquipAtHome, let gearSlot = option.piece.frozenSlot,
-              Self.isValid(target, in: state)
-        else { return false }
-
-        // Resolve and validate the exact physical source before opening the mutation. In
-        // particular, an old "Worn by Quill" tile must not move whatever Quill put on afterward.
-        switch option.source {
-        case .stored(let id):
-            guard let stack = state.base.inventory.stacks.first(where: { $0.id == id }),
-                  Self.samePhysicalPiece(stack, option.piece),
-                  (stack.gearProfile?.slot ?? ContentCatalog.shared.item(stack.catalogID)?.gear?.slot) == gearSlot
-            else { return false }
-        case .overflow(let id):
-            guard let stack = state.base.spillover.first(where: { $0.id == id }),
-                  Self.samePhysicalPiece(stack, option.piece),
-                  (stack.gearProfile?.slot ?? ContentCatalog.shared.item(stack.catalogID)?.gear?.slot) == gearSlot
-            else { return false }
-        case .worn(let source):
-            guard source != target, Self.isValid(source, in: state),
-                  worn(gearSlot, by: source) == option.piece
-            else { return false }
-        case .carried:
-            return false
+        guard option.canEquipAtHome, let gearSlot = option.piece.gearProfile?.slot else { return false }
+        if case .carried = option.source { return false }
+        let source: GearOwnershipSourceV1 = switch option.source {
+        case .stored(let id): .stored(id)
+        case .overflow(let id): .waiting(id)
+        case .worn(let owner): .worn(Self.owner(owner), gearSlot)
+        case .carried: fatalError("handled above")
         }
-
-        mutate("equip owned \(option.piece.catalogID.rawValue)", flush: true) { state in
-            switch option.source {
-            case .stored(let id):
-                guard let index = state.base.inventory.stacks.firstIndex(where: { $0.id == id }),
-                      (state.base.inventory.stacks[index].gearProfile?.slot
-                       ?? ContentCatalog.shared.item(state.base.inventory.stacks[index].catalogID)?.gear?.slot) == gearSlot,
-                      let taken = state.base.inventory.stacks[index].removing(1)
-                else { return }
-                if state.base.inventory.stacks[index].isEmpty { state.base.inventory.stacks.remove(at: index) }
-                if let previous = Self.swapIn(EquippedPiece(taken), gearSlot, target, in: &state) {
-                    state.base.store(previous.asStack(id: InstanceID(rawValue: state.base.nextItemID())))
-                }
-            case .overflow(let id):
-                guard let index = state.base.spillover.firstIndex(where: { $0.id == id }),
-                      (state.base.spillover[index].gearProfile?.slot
-                       ?? ContentCatalog.shared.item(state.base.spillover[index].catalogID)?.gear?.slot) == gearSlot,
-                      let taken = state.base.spillover[index].removing(1)
-                else { return }
-                if state.base.spillover[index].isEmpty { state.base.spillover.remove(at: index) }
-                if let previous = Self.swapIn(EquippedPiece(taken), gearSlot, target, in: &state) {
-                    state.base.store(previous.asStack(id: InstanceID(rawValue: state.base.nextItemID())))
-                }
-            case .worn(let source):
-                guard source != target,
-                      let moving = Self.swapIn(nil, gearSlot, source, in: &state),
-                      moving.frozenSlot == gearSlot
-                else { return }
-                let previous = Self.swapIn(moving, gearSlot, target, in: &state)
-                _ = Self.swapIn(previous, gearSlot, source, in: &state)
-            case .carried:
-                return
-            }
-        }
-        return true
+        return commitGearEquip(source: source, target: Self.owner(target), slot: gearSlot) == .committed
     }
 
     private static func isValid(_ slot: PartySlot, in state: GameState) -> Bool {
@@ -946,11 +1082,56 @@ extension GameStore {
     }
 
     func unequip(_ gearSlot: GearSlot, from slot: PartySlot) {
-        mutate("unequip \(gearSlot.rawValue)", flush: true) { state in
-            if let removed = Self.swapIn(nil, gearSlot, slot, in: &state) {
-                state.base.store(removed.asStack(id: InstanceID(rawValue: state.base.nextItemID())))
+        _ = commitGearUnequip(owner: Self.owner(slot), slot: gearSlot)
+    }
+
+    func evaluateGearEquip(source: GearOwnershipSourceV1, target: PhysicalGearOwnerV1,
+                           slot: GearSlot) -> GearEquipEvaluationV1 {
+        GearOwnershipRulesV1.evaluateEquip(source: source, target: target, slot: slot, state: state)
+    }
+
+    @discardableResult
+    func commitGearEquip(source: GearOwnershipSourceV1, target: PhysicalGearOwnerV1,
+                         slot: GearSlot) -> GearOwnershipCommitResultV1 {
+        guard case .allowed(let quote) = evaluateGearEquip(source: source, target: target, slot: slot)
+        else {
+            if case .refused(let refusal) = evaluateGearEquip(source: source, target: target, slot: slot) {
+                return .refused(refusal)
             }
+            return .refused(.staleQuote)
         }
+        var result: GearOwnershipCommitResultV1 = .refused(.staleQuote)
+        let committed = mutateIf("equip physical gear", flush: true) {
+            result = GearOwnershipRulesV1.commit(quote, state: &$0)
+            return result == .committed
+        }
+        return committed ? .committed : result
+    }
+
+    func evaluateGearUnequip(owner: PhysicalGearOwnerV1,
+                             slot: GearSlot) -> GearUnequipEvaluationV1 {
+        GearOwnershipRulesV1.evaluateUnequip(owner: owner, slot: slot, state: state)
+    }
+
+    @discardableResult
+    func commitGearUnequip(owner: PhysicalGearOwnerV1,
+                           slot: GearSlot) -> GearOwnershipCommitResultV1 {
+        guard case .allowed(let quote) = evaluateGearUnequip(owner: owner, slot: slot) else {
+            if case .refused(let refusal) = evaluateGearUnequip(owner: owner, slot: slot) {
+                return .refused(refusal)
+            }
+            return .refused(.staleQuote)
+        }
+        var result: GearOwnershipCommitResultV1 = .refused(.staleQuote)
+        let committed = mutateIf("unequip physical gear", flush: true) {
+            result = GearOwnershipRulesV1.commit(quote, state: &$0)
+            return result == .committed
+        }
+        return committed ? .committed : result
+    }
+
+    private static func owner(_ slot: PartySlot) -> PhysicalGearOwnerV1 {
+        switch slot { case .binder: .binder; case .member(let id): .member(id) }
     }
 
     /// Writes a piece into a slot and hands back whatever was there.

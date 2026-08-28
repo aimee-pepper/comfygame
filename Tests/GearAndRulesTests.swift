@@ -677,4 +677,80 @@ final class GearAndRulesTests: XCTestCase {
         XCTAssertEqual(returned.gearProfile, previous.gearProfile)
         XCTAssertEqual(returned.gearProfile?.reforgeRank, 3)
     }
+
+    func testStableOwnershipStoredEquipAndUnequipPreserveExactIdentityAndRevision() throws {
+        var state = GameState.newGame()
+        var blade = ItemStack(id: .init(rawValue: 9801), catalogID: "blade_keen")
+        blade.gearProfile?.reforgeRank = 2
+        blade.wildGrowth = 1
+        blade.isFavorite = true
+        blade.isLocked = true
+        blade.identified = false
+        blade.protectedReturnCount = 1
+        state.base.inventory = Inventory(slots: 8, stacks: [blade])
+
+        guard case .allowed(let quote) = GearOwnershipRulesV1.evaluateEquip(
+            source: .stored(blade.id), target: .binder, slot: .weapon, state: state) else {
+            return XCTFail("expected an exact stored quote")
+        }
+        XCTAssertEqual(GearOwnershipRulesV1.commit(quote, state: &state), .committed)
+        XCTAssertEqual(state.base.physicalGearOwnershipRevision, 1)
+        let worn = try XCTUnwrap(state.base.binderEquipped[.weapon])
+        XCTAssertEqual(worn.gearProfile?.stableInstanceID, blade.id)
+        XCTAssertEqual(worn.gearProfile, blade.gearProfile)
+        XCTAssertEqual(worn.wildGrowth, 1)
+        XCTAssertTrue(worn.isFavorite)
+        XCTAssertTrue(worn.isLocked)
+        XCTAssertFalse(worn.identified)
+        XCTAssertEqual(worn.protectedReturnCount, 1)
+
+        guard case .allowed(let returnQuote) = GearOwnershipRulesV1.evaluateUnequip(
+            owner: .binder, slot: .weapon, state: state) else {
+            return XCTFail("expected exact unequip quote")
+        }
+        XCTAssertEqual(GearOwnershipRulesV1.commit(returnQuote, state: &state), .committed)
+        XCTAssertEqual(state.base.physicalGearOwnershipRevision, 2)
+        XCTAssertEqual(state.base.inventory.stacks.first, blade)
+    }
+
+    func testStableOwnershipWornTransferSwapsExactIDsWithoutStorage() throws {
+        var state = GameState.newGame()
+        var inactive = CompanionState()
+        inactive.persistentID = .traveller("inactive-fixture")
+        state.base.roster.append(inactive)
+        let binderBlade = ItemStack(id: .init(rawValue: 9811), catalogID: "blade_keen")
+        let travellerBlade = ItemStack(id: .init(rawValue: 9812), catalogID: "blade_chipped")
+        state.base.binderEquipped[.weapon] = EquippedPiece(binderBlade)
+        state.base.roster[1].equipped[.weapon] = EquippedPiece(travellerBlade)
+
+        guard case .allowed(let quote) = GearOwnershipRulesV1.evaluateEquip(
+            source: .worn(.member(.traveller("inactive-fixture")), .weapon),
+            target: .binder, slot: .weapon, state: state) else {
+            return XCTFail("inactive human worn source must be transferable")
+        }
+        XCTAssertEqual(GearOwnershipRulesV1.commit(quote, state: &state), .committed)
+        XCTAssertEqual(state.base.binderEquipped[.weapon]?.gearProfile?.stableInstanceID,
+                       travellerBlade.id)
+        XCTAssertEqual(state.base.roster[1].equipped[.weapon]?.gearProfile?.stableInstanceID,
+                       binderBlade.id)
+        XCTAssertTrue(state.base.inventory.stacks.isEmpty)
+        XCTAssertTrue(state.base.spillover.isEmpty)
+    }
+
+    func testStableOwnershipStaleRevisionAndAnimalTargetRefuseAtomically() throws {
+        var state = GameState.newGame()
+        let blade = ItemStack(id: .init(rawValue: 9821), catalogID: "blade_keen")
+        state.base.inventory = Inventory(slots: 8, stacks: [blade])
+        guard case .allowed(let quote) = GearOwnershipRulesV1.evaluateEquip(
+            source: .stored(blade.id), target: .binder, slot: .weapon, state: state) else {
+            return XCTFail("expected quote")
+        }
+        state.base.physicalGearOwnershipRevision += 1
+        let before = state
+        XCTAssertEqual(GearOwnershipRulesV1.commit(quote, state: &state), .refused(.staleRevision))
+        XCTAssertEqual(state, before)
+        XCTAssertEqual(GearOwnershipRulesV1.evaluateEquip(
+            source: .stored(blade.id), target: .member(.animal("tamed:1:2")),
+            slot: .weapon, state: state), .refused(.unsupportedOwner))
+    }
 }

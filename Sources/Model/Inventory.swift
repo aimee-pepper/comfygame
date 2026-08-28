@@ -110,7 +110,8 @@ extension GameState {
         guard materialIDs.count == base.craftMaterialHoldings.count else { return false }
         func validate(_ profile: GearInstanceProfile, expectedStackID: InstanceID?) -> Bool {
             if let expectedStackID, expectedStackID != profile.stableInstanceID { return false }
-            guard gearIDs.insert(profile.stableInstanceID).inserted,
+            guard profile.stableInstanceID.rawValue > 0,
+                  gearIDs.insert(profile.stableInstanceID).inserted,
                   profile.physicalReceipt?.validates(profile: profile) ?? true else { return false }
             for unit in profile.physicalReceipt?.flattenedUnits ?? [] {
                 guard materialIDs.insert(unit.stableUnitID).inserted else { return false }
@@ -122,16 +123,33 @@ extension GameState {
                 return false
             }
         }
-        for piece in base.binderEquipped.values {
+        for (slot, piece) in base.binderEquipped {
+            guard piece.gearProfile?.slot == slot else { return false }
             if let profile = piece.gearProfile, !validate(profile, expectedStackID: nil) {
                 return false
             }
         }
+        var rosterIDs = Set<PersistentPartyMemberID>()
         for member in base.roster {
-            for piece in member.equipped.values {
+            guard let id = member.persistentID, rosterIDs.insert(id).inserted else { return false }
+            for (slot, piece) in member.equipped {
+                guard piece.gearProfile?.slot == slot else { return false }
                 if let profile = piece.gearProfile, !validate(profile, expectedStackID: nil) {
                     return false
                 }
+            }
+        }
+        for id in base.activeParty {
+            if id.rawValue.hasPrefix("animal:") {
+                guard base.tamedAnimalCompanions.values.contains(where: {
+                    PersistentPartyMemberID.animal($0.id.rawValue) == id
+                }) else { return false }
+            } else if !rosterIDs.contains(id) { return false }
+        }
+        let runs = [worlds.activeRun].compactMap { $0 } + worlds.anchoredRealms.map(\.world)
+        for stack in runs.flatMap({ $0.satchelItems.stacks + $0.offeredItems }) {
+            if let profile = stack.gearProfile, !validate(profile, expectedStackID: stack.id) {
+                return false
             }
         }
         return true
@@ -223,6 +241,95 @@ enum PhysicalGearLocationV1: Codable, Equatable, Sendable {
     case storehouse(stackID: InstanceID)
     case waiting(stackID: InstanceID)
     case worn(member: PartyMember, slot: GearSlot)
+}
+
+enum PhysicalGearOwnerV1: Codable, Equatable, Hashable, Sendable {
+    case binder
+    case member(PersistentPartyMemberID)
+}
+
+enum GearOwnershipSourceV1: Codable, Equatable, Sendable {
+    case stored(InstanceID)
+    case waiting(InstanceID)
+    case worn(PhysicalGearOwnerV1, GearSlot)
+}
+
+enum GearOwnershipDestinationV1: String, Codable, Equatable, Sendable {
+    case stored, waiting, sourceWorn
+}
+
+struct PhysicalGearSnapshotV1: Codable, Equatable, Sendable {
+    var stack: ItemStack
+
+    init?(_ stack: ItemStack) {
+        guard stack.count == 1, let profile = stack.gearProfile,
+              stack.id == profile.stableInstanceID,
+              profile.physicalReceipt?.validates(profile: profile) ?? true else { return nil }
+        self.stack = stack
+    }
+
+    init?(_ piece: EquippedPiece) {
+        guard let id = piece.gearProfile?.stableInstanceID, id.rawValue > 0 else { return nil }
+        self.init(piece.asStack(id: id))
+    }
+}
+
+struct GearEquipQuoteV1: Codable, Equatable, Sendable {
+    var version: Int = 1
+    var ownershipRevision: UInt64
+    var source: GearOwnershipSourceV1
+    var targetOwner: PhysicalGearOwnerV1
+    var targetSlot: GearSlot
+    var movingSnapshot: PhysicalGearSnapshotV1
+    var displacedSnapshot: PhysicalGearSnapshotV1?
+    var displacedDestination: GearOwnershipDestinationV1
+    var canonicalDigest: String
+}
+
+struct GearUnequipQuoteV1: Codable, Equatable, Sendable {
+    var version: Int = 1
+    var ownershipRevision: UInt64
+    var owner: PhysicalGearOwnerV1
+    var slot: GearSlot
+    var wornSnapshot: PhysicalGearSnapshotV1
+    var destination: GearOwnershipDestinationV1
+    var canonicalDigest: String
+}
+
+enum GearOwnershipRefusalV1: Error, Codable, Equatable, Sendable {
+    case encounterActive, expeditionActive, unsupportedOwner, ownerUnavailable, ownerNotActive
+    case sourceMissing, sourceMoved, alreadyWorn, notPhysicalGear, slotMismatch
+    case duplicateIdentity, invalidReceipt, staleRevision, staleQuote, revisionExhausted
+    case invalidPersistedState
+
+    var message: String? {
+        switch self {
+        case .encounterActive: "Equipment cannot be changed during an encounter."
+        case .expeditionActive: "Carried gear can be changed after you return home."
+        case .ownerUnavailable, .ownerNotActive: "That party member is not available."
+        case .unsupportedOwner: "Animals do not use this equipment."
+        case .notPhysicalGear, .slotMismatch: "That gear does not fit this slot."
+        case .sourceMissing, .sourceMoved, .staleRevision, .staleQuote:
+            "The gear changed. Review it and try again."
+        case .alreadyWorn: "That gear is already worn here."
+        case .duplicateIdentity, .invalidReceipt, .revisionExhausted, .invalidPersistedState: nil
+        }
+    }
+}
+
+enum GearEquipEvaluationV1: Equatable, Sendable {
+    case allowed(GearEquipQuoteV1)
+    case refused(GearOwnershipRefusalV1)
+}
+
+enum GearUnequipEvaluationV1: Equatable, Sendable {
+    case allowed(GearUnequipQuoteV1)
+    case refused(GearOwnershipRefusalV1)
+}
+
+enum GearOwnershipCommitResultV1: Equatable, Sendable {
+    case committed
+    case refused(GearOwnershipRefusalV1)
 }
 
 enum PhysicalGearConstructionDestinationV1: String, Codable, Equatable, Sendable {
@@ -347,12 +454,16 @@ enum PhysicalGearReceiptEngineV1 {
             return .refused(.essenceShortfall(
                 quote.physicalEssenceCrystalDebit - state.base.essenceCrystalCount))
         }
+        guard state.base.physicalGearOwnershipRevision < UInt64.max else {
+            return .refused(.identityExhausted)
+        }
         var candidate = state
         guard candidate.base.consumeCraftMaterials(quote.selectedComponents) != nil,
               candidate.base.spendEssenceCrystals(quote.physicalEssenceCrystalDebit) else {
             return .refused(.componentUnavailable)
         }
         candidate.base.store(output)
+        candidate.base.physicalGearOwnershipRevision += 1
         guard candidate.validatesPhysicalGearReceipts() else { return .refused(.invalidReceipt) }
         state = candidate
         let location: PhysicalGearLocationV1 = destination == .storehouse
@@ -657,7 +768,7 @@ struct ItemStack: Codable, Equatable, Identifiable, Sendable {
         if !materials.isEmpty { count = materials.count }
         if let definition = ContentCatalog.shared.item(catalogID), let gear = definition.gear {
             guard let profile = gearProfile, profile.version == 3,
-                  profile.stableInstanceID == id, profile.slot == gear.slot,
+                  profile.stableInstanceID == id,
                   profile.authoredUniqueRuleID == gear.breaks?.rawValue,
                   (profile.hasImmutableConstructionReceipt
                     ? (profile.foundReceipt == nil || profile.foundReceipt
@@ -1063,9 +1174,12 @@ struct EquippedPiece: Codable, Equatable, Sendable, ExpressibleByStringLiteral {
     var gearProfile: GearInstanceProfile?
     var isFavorite: Bool = false
     var isLocked: Bool = false
+    var identified: Bool = true
+    var protectedReturnCount: Int = 0
 
     private enum StoredKeys: String, CodingKey {
         case catalogID, upgradeLevel, wildGrowth, gearProfile, isFavorite, isLocked
+        case identified, protectedReturnCount
     }
 
     init(stringLiteral value: String) {
@@ -1075,6 +1189,8 @@ struct EquippedPiece: Codable, Equatable, Sendable, ExpressibleByStringLiteral {
         self.gearProfile = nil
         self.isFavorite = false
         self.isLocked = false
+        self.identified = true
+        self.protectedReturnCount = 0
     }
 
     init(catalogID: ItemID, upgradeLevel: Int = 0, wildGrowth: Int = 0) {
@@ -1084,6 +1200,8 @@ struct EquippedPiece: Codable, Equatable, Sendable, ExpressibleByStringLiteral {
         self.gearProfile = nil
         self.isFavorite = false
         self.isLocked = false
+        self.identified = true
+        self.protectedReturnCount = 0
     }
 
     init(_ stack: ItemStack) {
@@ -1093,6 +1211,8 @@ struct EquippedPiece: Codable, Equatable, Sendable, ExpressibleByStringLiteral {
         self.gearProfile = stack.gearProfile
         self.isFavorite = stack.isFavorite
         self.isLocked = stack.isLocked
+        self.identified = stack.identified
+        self.protectedReturnCount = stack.protectedReturnCount
     }
 
     /// **Writes itself as a bare id when there's nothing else to say.**
@@ -1101,7 +1221,8 @@ struct EquippedPiece: Codable, Equatable, Sendable, ExpressibleByStringLiteral {
     /// stays hand-editable and legible — which is worth keeping. Only a reforged piece needs the
     /// object form, and only then does it stop being readable by an older build.
     func encode(to encoder: Encoder) throws {
-        guard upgradeLevel != 0 || wildGrowth != 0 || gearProfile != nil || isFavorite || isLocked else {
+        guard upgradeLevel != 0 || wildGrowth != 0 || gearProfile != nil || isFavorite || isLocked
+                || !identified || protectedReturnCount != 0 else {
             var single = encoder.singleValueContainer()
             try single.encode(catalogID)
             return
@@ -1113,6 +1234,8 @@ struct EquippedPiece: Codable, Equatable, Sendable, ExpressibleByStringLiteral {
         try c.encodeIfPresent(gearProfile, forKey: .gearProfile)
         try c.encode(isFavorite, forKey: .isFavorite)
         try c.encode(isLocked, forKey: .isLocked)
+        try c.encode(identified, forKey: .identified)
+        try c.encode(protectedReturnCount, forKey: .protectedReturnCount)
     }
 
     /// Accepts the **bare item id** this used to be, so a save from before pieces could be
@@ -1125,6 +1248,8 @@ struct EquippedPiece: Codable, Equatable, Sendable, ExpressibleByStringLiteral {
             gearProfile = nil
             isFavorite = false
             isLocked = false
+            identified = true
+            protectedReturnCount = 0
             return
         }
         let c = try decoder.container(keyedBy: StoredKeys.self)
@@ -1134,6 +1259,9 @@ struct EquippedPiece: Codable, Equatable, Sendable, ExpressibleByStringLiteral {
         gearProfile = try c.decodeIfPresent(GearInstanceProfile.self, forKey: .gearProfile)
         isFavorite = try c.decodeIfPresent(Bool.self, forKey: .isFavorite) ?? false
         isLocked = try c.decodeIfPresent(Bool.self, forKey: .isLocked) ?? false
+        identified = try c.decodeIfPresent(Bool.self, forKey: .identified) ?? true
+        protectedReturnCount = max(0, try c.decodeIfPresent(Int.self,
+                                                            forKey: .protectedReturnCount) ?? 0)
         if gearProfile == nil, let definition = ContentCatalog.shared.item(catalogID), definition.gear != nil {
             // BaseState assigns a collision-free stable id after every equipped slot is decoded.
             gearProfile = GearInstanceProfile(stableInstanceID: InstanceID(rawValue: 0),
@@ -1180,6 +1308,8 @@ struct EquippedPiece: Codable, Equatable, Sendable, ExpressibleByStringLiteral {
         }
         stack.isFavorite = isFavorite
         stack.isLocked = isLocked
+        stack.identified = identified
+        stack.protectedReturnCount = protectedReturnCount
         return stack
     }
 }

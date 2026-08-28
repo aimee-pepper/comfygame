@@ -35,6 +35,7 @@ enum Migrations {
             try validateCurrentAnimalTrust(in: data)
             try validateCurrentAnimalCompanionCombat(in: data)
             try validateCurrentPhysicalGearReceipts(in: data)
+            try validateCurrentPhysicalGearOwnership(in: data)
             return data
         }
 
@@ -51,6 +52,7 @@ enum Migrations {
         try validateCurrentAnimalTrust(in: working)
         try validateCurrentAnimalCompanionCombat(in: working)
         try validateCurrentPhysicalGearReceipts(in: working)
+        try validateCurrentPhysicalGearOwnership(in: working)
         return working
     }
 
@@ -154,11 +156,37 @@ enum Migrations {
         case 13: return try migrate13to14(data)
         case 14: return try migrate14to15(data)
         case 15: return try migrate15to16(data)
+        case 16: return try migrate16to17(data)
         default:
             // No migration registered. Tolerant decoding is the fallback; if the save is genuinely
             // incompatible, `SaveFileIO.load()` quarantines it rather than losing it.
             return data
         }
+    }
+
+    private static func migrate16to17(_ data: Data) throws -> Data {
+        guard var root = try JSONSerialization.jsonObject(with: data) as? [String: Any],
+              var base = root["base"] as? [String: Any],
+              base["physicalGearOwnershipRevision"] == nil else {
+            throw CocoaError(.coderInvalidValue)
+        }
+        base["physicalGearOwnershipRevision"] = 0
+        root["base"] = base
+        root["schemaVersion"] = 17
+        let result = try JSONSerialization.data(withJSONObject: root, options: [.sortedKeys])
+        try validateCurrentPhysicalGearOwnership(in: result)
+        return result
+    }
+
+    private static func validateCurrentPhysicalGearOwnership(in data: Data) throws {
+        guard let root = try JSONSerialization.jsonObject(with: data) as? [String: Any],
+              let base = root["base"] as? [String: Any],
+              let value = base["physicalGearOwnershipRevision"] as? NSNumber,
+              CFGetTypeID(value) != CFBooleanGetTypeID(),
+              UInt64(value.stringValue) != nil,
+              !value.stringValue.hasPrefix("-") else { throw CocoaError(.coderInvalidValue) }
+        let state = try SaveCodec.makeDecoder().decode(GameState.self, from: data)
+        guard state.validatesPhysicalGearReceipts() else { throw CocoaError(.coderInvalidValue) }
     }
 
     private static func migrate15to16(_ data: Data) throws -> Data {
