@@ -5,6 +5,78 @@ import Foundation
 /// Only put something here if losing it in a reset would feel like losing the *player's* history
 /// rather than the *character's* possessions.
 struct RealityState: Codable, Equatable, Sendable {
+    enum AnimalTrustPropertyV1: String, Codable, CaseIterable, Sendable {
+        case flexibility, insulation, hardness, reactivity
+
+        func value(in properties: MaterialProperties) -> Double {
+            switch self {
+            case .flexibility: properties.flexibility
+            case .insulation: properties.insulation
+            case .hardness: properties.hardness
+            case .reactivity: properties.reactivity
+            }
+        }
+    }
+
+    enum AnimalTrustConditionV1: Codable, Equatable, Sendable {
+        case patientPresence(requiredTurns: Int)
+        case usefulOffering(property: AnimalTrustPropertyV1, threshold: Double)
+    }
+
+    struct AnimalTrustRecordV1: Codable, Equatable, Sendable {
+        static let version = 1
+        var version: Int = Self.version
+        var worldSeed: UInt64
+        var enemyID: InstanceID
+        var speciesID: InstanceID?
+        var creatureID: CreatureID?
+        var traits: CreatureTraits
+        var condition: AnimalTrustConditionV1
+        var progress: Int
+        var firstAttendedRunIndex: Int
+        var firstAttendedTurn: Int
+        var lastProgressTurn: Int?
+        var interactionCount: Int
+        var completed: Bool
+
+        var key: String { Self.key(worldSeed: worldSeed, enemyID: enemyID) }
+        static func key(worldSeed: UInt64, enemyID: InstanceID) -> String {
+            "world:\(worldSeed):animal:\(enemyID.rawValue)"
+        }
+        func validates(key suppliedKey: String? = nil) -> Bool {
+            guard version == Self.version, suppliedKey == nil || suppliedKey == key,
+                  firstAttendedRunIndex >= 0, firstAttendedTurn >= 0,
+                  progress >= 0, interactionCount > 0 else { return false }
+            switch condition {
+            case .patientPresence(let required):
+                return required > 0 && progress <= required && completed == (progress == required)
+                    && (lastProgressTurn == nil || lastProgressTurn! > firstAttendedTurn)
+            case .usefulOffering(_, let threshold):
+                return threshold.isFinite && (0...100).contains(threshold)
+                    && progress <= 1 && completed == (progress == 1)
+            }
+        }
+    }
+
+    struct TamedAnimalV1: Codable, Equatable, Sendable {
+        static let version = 1
+        var version: Int = Self.version
+        var id: String
+        var originWorldSeed: UInt64
+        var originEnemyID: InstanceID
+        var speciesID: InstanceID?
+        var creatureID: CreatureID?
+        var traits: CreatureTraits
+        var trustCondition: AnimalTrustConditionV1
+        var joinedRunIndex: Int
+        var joinedTurn: Int
+
+        func validates(key: String? = nil) -> Bool {
+            version == Self.version && !id.isEmpty && (key == nil || key == id)
+                && id == "tamed:\(originWorldSeed):\(originEnemyID.rawValue)"
+                && joinedRunIndex >= 0 && joinedTurn >= 0
+        }
+    }
     struct CurioFamilyKnowledgeV1: Codable, Equatable, Sendable {
         static let version = 1
 
@@ -112,6 +184,10 @@ struct RealityState: Codable, Equatable, Sendable {
     /// Permanent knowledge keyed by the unidentified family. Physical examples resolve one at a
     /// time; the second independent resolution recognizes the family for this Reality forever.
     var curioFamilyKnowledge: [ItemID: CurioFamilyKnowledgeV1] = [:]
+    /// One deterministic, individual relationship per attended wild animal. Incomplete records
+    /// survive relaunch and anchored revisits; accepted animals remain Reality history forever.
+    var animalTrustRecords: [String: AnimalTrustRecordV1] = [:]
+    var tamedAnimals: [String: TamedAnimalV1] = [:]
 
     mutating func recordEncounter(on page: Page) {
         encounteredLexemes.formUnion(page.encounteredLexemes)
@@ -163,6 +239,14 @@ struct RealityState: Codable, Equatable, Sendable {
         curioFamilyKnowledge = try container.decodeIfPresent(
             [ItemID: CurioFamilyKnowledgeV1].self, forKey: .curioFamilyKnowledge) ?? [:]
         guard curioFamilyKnowledge.allSatisfy({ $0.value.validates(key: $0.key) }) else {
+            throw CocoaError(.coderInvalidValue)
+        }
+        animalTrustRecords = try container.decodeIfPresent(
+            [String: AnimalTrustRecordV1].self, forKey: .animalTrustRecords) ?? [:]
+        tamedAnimals = try container.decodeIfPresent(
+            [String: TamedAnimalV1].self, forKey: .tamedAnimals) ?? [:]
+        guard animalTrustRecords.allSatisfy({ $0.value.validates(key: $0.key) }),
+              tamedAnimals.allSatisfy({ $0.value.validates(key: $0.key) }) else {
             throw CocoaError(.coderInvalidValue)
         }
     }

@@ -78,6 +78,10 @@ enum WorldRules {
         /// read off its traits, so there is no longer a catalogue entry to point at.
         case enemySighted(String)
         case enemyAlerted(String)
+        case animalAttended(String)
+        case animalTrustProgress(String, current: Int, required: Int)
+        case animalTrustCompleted(String)
+        case animalJoined(String)
         case encounterBegan
         case crossedThreshold(StabilityBand)
         case nightfall
@@ -98,6 +102,176 @@ enum WorldRules {
             default: true
             }
         }
+    }
+
+    enum AttendRefusal: Equatable, Sendable {
+        case locked, noActiveWorld, missingAnimal, notVisible, outOfRange, adjacent
+        case sessile, apex, pursuing, attackedThisExpedition, alreadyTamed, malformedIndividual
+
+        var copy: String {
+            switch self {
+            case .locked: "Build the Menagerie after recruiting Sabine to learn Attend."
+            case .noActiveWorld: "There is no active expedition."
+            case .missingAnimal: "That animal is no longer there."
+            case .notVisible: "You cannot attend to what the party cannot currently see."
+            case .outOfRange: "Move within two tiles to attend to that animal."
+            case .adjacent: "Give the animal room before attending to it."
+            case .sessile: "That rooted hazard cannot choose to travel with you."
+            case .apex: "An apex will not accept attention."
+            case .pursuing: "It is pursuing the party and will not accept attention."
+            case .attackedThisExpedition: "The party harmed this animal during this expedition."
+            case .alreadyTamed: "This animal has already chosen to travel with you."
+            case .malformedIndividual: "This older creature has no exact individual record to preserve."
+            }
+        }
+    }
+
+    struct AttendProjection: Equatable, Sendable, Identifiable {
+        var enemyID: InstanceID
+        var name: String
+        var distance: Int
+        var record: RealityState.AnimalTrustRecordV1?
+        var refusal: AttendRefusal?
+        var id: InstanceID { enemyID }
+    }
+
+    static func attendProjection(for enemyID: InstanceID, in state: GameState) -> AttendProjection? {
+        guard let run = state.worlds.activeRun,
+              let enemy = run.enemies.first(where: { $0.id == enemyID }) else { return nil }
+        let key = RealityState.AnimalTrustRecordV1.key(worldSeed: run.mapSeed, enemyID: enemy.id)
+        let distance = enemy.position.chebyshevDistance(to: run.playerPosition)
+        let refusal: AttendRefusal?
+        if !state.base.station(Stations.menagerie).isUnlocked { refusal = .locked }
+        else if enemy.isSessile { refusal = .sessile }
+        else if enemy.isApex { refusal = .apex }
+        else if case .pursuing = enemy.awareness { refusal = .pursuing }
+        else if run.animalsAttackedThisExpedition.contains(enemy.id) { refusal = .attackedThisExpedition }
+        else if state.reality.tamedAnimals.values.contains(where: {
+            $0.originWorldSeed == run.mapSeed && $0.originEnemyID == enemy.id
+        }) { refusal = .alreadyTamed }
+        else if !isCurrentlyVisible(enemy, in: run, party: sightBonus(in: state)) { refusal = .notVisible }
+        else if distance > Tuning.AnimalTrust.attendRange { refusal = .outOfRange }
+        else if distance <= 1 { refusal = .adjacent }
+        else if enemy.traits == nil { refusal = .malformedIndividual }
+        else { refusal = nil }
+        return .init(enemyID: enemy.id, name: run.name(of: enemy), distance: distance,
+                     record: state.reality.animalTrustRecords[key], refusal: refusal)
+    }
+
+    static func attendableAnimals(in state: GameState) -> [AttendProjection] {
+        guard let run = state.worlds.activeRun else { return [] }
+        return run.enemies.compactMap { attendProjection(for: $0.id, in: state) }
+            .filter { $0.distance <= Tuning.AnimalTrust.attendRange }
+            .sorted { $0.enemyID.rawValue < $1.enemyID.rawValue }
+    }
+
+    static func attend(_ enemyID: InstanceID, in state: inout GameState) -> [Event] {
+        guard let projection = attendProjection(for: enemyID, in: state) else {
+            return [.blocked(AttendRefusal.missingAnimal.copy)]
+        }
+        guard let run = state.worlds.activeRun else {
+            return [.blocked(AttendRefusal.noActiveWorld.copy)]
+        }
+        guard let refusal = projection.refusal else {
+            guard let enemy = run.enemies.first(where: { $0.id == enemyID }),
+                  let traits = enemy.traits else {
+                return [.blocked(AttendRefusal.malformedIndividual.copy)]
+            }
+            let key = RealityState.AnimalTrustRecordV1.key(worldSeed: run.mapSeed, enemyID: enemyID)
+            if var existing = state.reality.animalTrustRecords[key] {
+                existing.interactionCount += 1
+                state.reality.animalTrustRecords[key] = existing
+            } else {
+                let condition = generatedTrustCondition(for: enemy, in: run)
+                state.reality.animalTrustRecords[key] = .init(
+                    worldSeed: run.mapSeed, enemyID: enemyID, speciesID: enemy.speciesID,
+                    creatureID: enemy.creatureID, traits: traits, condition: condition,
+                    progress: 0, firstAttendedRunIndex: run.runIndex,
+                    firstAttendedTurn: run.turnsTaken, lastProgressTurn: nil,
+                    interactionCount: 1, completed: false)
+            }
+            var events: [Event] = [.animalAttended(projection.name)]
+            events.append(contentsOf: advanceTurn(in: &state))
+            return events
+        }
+        return [.blocked(refusal.copy)]
+    }
+
+    private static func generatedTrustCondition(for enemy: WorldEnemy, in run: WorldRun)
+        -> RealityState.AnimalTrustConditionV1 {
+        let candidates = run.worldMaterialReserve.units.flatMap { holding in
+            RealityState.AnimalTrustPropertyV1.allCases.compactMap { property in
+                property.value(in: holding.unit.properties) >= Tuning.AnimalTrust.offeringPropertyThreshold
+                    ? property : nil
+            }
+        }
+        let properties = Array(Set(candidates)).sorted { $0.rawValue < $1.rawValue }
+        if !properties.isEmpty {
+            let index = Int((run.mapSeed ^ enemy.id.rawValue) % UInt64(properties.count))
+            return .usefulOffering(property: properties[index],
+                                   threshold: Tuning.AnimalTrust.offeringPropertyThreshold)
+        }
+        return .patientPresence(requiredTurns: Tuning.AnimalTrust.patientTurns)
+    }
+
+    static func offer(_ selection: CraftMaterialSelection, to enemyID: InstanceID,
+                      in state: inout GameState) -> [Event] {
+        guard var run = state.worlds.activeRun,
+              let enemy = run.enemies.first(where: { $0.id == enemyID }) else {
+            return [.blocked(AttendRefusal.missingAnimal.copy)]
+        }
+        let key = RealityState.AnimalTrustRecordV1.key(worldSeed: run.mapSeed, enemyID: enemyID)
+        guard var record = state.reality.animalTrustRecords[key], !record.completed,
+              case .usefulOffering(let property, let threshold) = record.condition,
+              property.value(in: selection.unit.properties) >= threshold else {
+            return [.blocked("That exact sample does not answer the animal's visible need.")]
+        }
+        guard run.worldMaterialReserve.consume([selection]) != nil else {
+            return [.blocked("That material sample is no longer carried.")]
+        }
+        record.progress = 1
+        record.completed = true
+        record.interactionCount += 1
+        state.reality.animalTrustRecords[key] = record
+        state.worlds.activeRun = run
+        return [.animalTrustCompleted(run.name(of: enemy))]
+    }
+
+    static func joinAnimal(_ enemyID: InstanceID, in state: inout GameState) -> [Event] {
+        guard var run = state.worlds.activeRun,
+              let index = run.enemies.firstIndex(where: { $0.id == enemyID }) else {
+            return [.blocked(AttendRefusal.missingAnimal.copy)]
+        }
+        let enemy = run.enemies[index]
+        let key = RealityState.AnimalTrustRecordV1.key(worldSeed: run.mapSeed, enemyID: enemyID)
+        let tamedID = "tamed:\(run.mapSeed):\(enemyID.rawValue)"
+        if state.reality.tamedAnimals[tamedID] != nil {
+            run.enemies.remove(at: index)
+            state.worlds.activeRun = run
+            return []
+        }
+        guard let record = state.reality.animalTrustRecords[key], record.completed,
+              record.traits == enemy.traits else {
+            return [.blocked("Trust is not complete for this exact animal.")]
+        }
+        let tamed = RealityState.TamedAnimalV1(
+            id: tamedID, originWorldSeed: run.mapSeed, originEnemyID: enemyID,
+            speciesID: record.speciesID, creatureID: record.creatureID, traits: record.traits,
+            trustCondition: record.condition, joinedRunIndex: run.runIndex,
+            joinedTurn: run.turnsTaken)
+        guard tamed.validates(key: tamedID) else { return [.blocked("The animal record is unavailable.")] }
+        state.reality.tamedAnimals[tamedID] = tamed
+        run.enemies.remove(at: index)
+        state.worlds.activeRun = run
+        return [.animalJoined(projectionName(for: record, in: run))]
+    }
+
+    private static func projectionName(for record: RealityState.AnimalTrustRecordV1,
+                                       in run: WorldRun) -> String {
+        if let traits = Optional(record.traits) {
+            return CreatureIdentity.name(for: traits, in: .none)
+        }
+        return "Animal"
     }
 
     struct SurveyReading: Equatable, Sendable {

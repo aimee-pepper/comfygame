@@ -160,6 +160,7 @@ extension GameStore {
                   case .allowed(let fieldKit) = Self.fieldKitDepartureQuote(in: state) else { return }
             var run = realm.world
             run.activeEncounter = nil
+            run.animalsAttackedThisExpedition = []
             run.offeredItems = []
             let healthCaps = CombatRules.expeditionHealthCaps(in: state, tuning: DebugTuningProfile.active)
             run.healthCaps = healthCaps
@@ -776,6 +777,7 @@ extension GameStore {
                                         consuming stackID: InstanceID? = nil) {
         mutateIf("return home", flush: true, scope: .expedition) { state in
             guard var run = state.worlds.activeRun else { return false }
+            Self.discardUnanchoredIncompleteAnimalTrust(for: run, in: &state)
             let departureState = WorldDepartureState.capture(from: run)
             if let stackID {
                 guard let index = run.satchelItems.stacks.firstIndex(where: { $0.id == stackID })
@@ -828,6 +830,7 @@ extension GameStore {
         guard activeRun != nil else { return }
         mutateIf("run ended: \(reason)", flush: true, scope: .expedition) { state in
             guard var run = state.worlds.activeRun else { return false }
+            Self.discardUnanchoredIncompleteAnimalTrust(for: run, in: &state)
             let departureState = WorldDepartureState.capture(from: run)
             let outcomeID = state.worlds.mintOutcomeID()
             Self.resolveRecoveredTeachingOffer(in: &run, outcomeID: outcomeID, state: &state)
@@ -868,6 +871,17 @@ extension GameStore {
         recentEvents = []
         clearWorldFieldFeedback()
         refreshWorldFieldContext()
+    }
+
+    nonisolated private static func discardUnanchoredIncompleteAnimalTrust(
+        for run: WorldRun, in state: inout GameState
+    ) {
+        guard !state.worlds.anchoredRealms.contains(where: { $0.runIndex == run.runIndex }) else {
+            return
+        }
+        state.reality.animalTrustRecords = state.reality.animalTrustRecords.filter { _, record in
+            record.worldSeed != run.mapSeed || record.completed
+        }
     }
 
     nonisolated private static func resolveRecoveredTeachingOffer(

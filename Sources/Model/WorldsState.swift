@@ -1228,6 +1228,9 @@ struct WorldRun: Codable, Equatable, Sendable {
     var seamlightGuidance: SeamlightGuidanceReceiptV1?
     var seamwardExpedition: SeamwardExpeditionReceiptV1?
     var recoveredTeachingExpedition: RecoveredTeachingExpeditionReceiptV1?
+    /// Exact wild individuals harmed by the party during this expedition. Attend refuses them;
+    /// the set is cleared only by beginning a later visit, never by leaving combat.
+    var animalsAttackedThisExpedition: Set<InstanceID> = []
 
     var scentMaskTurnsRemaining: Int {
         guard let scentMask else { return 0 }
@@ -1417,6 +1420,7 @@ struct WorldRun: Codable, Equatable, Sendable {
         self.creatureMaterialRewardReceipts = creatureMaterialRewardReceipts
         self.anatomyButcheryReceipt = anatomyButcheryReceipt
         self.recoveredTeachingExpedition = nil
+        self.animalsAttackedThisExpedition = []
         self.generationDiagnostics = generationDiagnostics
         self.clock = WorldClock(book: book, seed: mapSeed)
         self.map = map
@@ -1559,6 +1563,8 @@ struct WorldRun: Codable, Equatable, Sendable {
         } else {
             recoveredTeachingExpedition = nil
         }
+        animalsAttackedThisExpedition = try container.decodeIfPresent(
+            Set<InstanceID>.self, forKey: .animalsAttackedThisExpedition) ?? []
         satchel = try container.decodeIfPresent(ResourcePool.self, forKey: .satchel) ?? ResourcePool()
         satchelItems = try container.decodeIfPresent(Inventory.self, forKey: .satchelItems)
             ?? Inventory(slots: Tuning.Economy.startingInventorySlots)
@@ -1701,6 +1707,7 @@ extension WorldRun {
         snapshot.foundPagesAtStart = []
         snapshot.seamlightGuidance = nil
         snapshot.seamwardExpedition = nil
+        snapshot.animalsAttackedThisExpedition = []
         return snapshot
     }
 }

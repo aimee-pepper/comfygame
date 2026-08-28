@@ -794,6 +794,7 @@ enum Stations {
     static let anchorage: StationID = "anchorage"
     static let distillery: StationID = "distillery"
     static let channelworks: StationID = "channelworks"
+    static let menagerie: StationID = "menagerie"
 }
 
 struct StationState: Codable, Equatable, Sendable {
