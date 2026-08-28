@@ -2,6 +2,64 @@ import XCTest
 @testable import Bookbinder
 
 final class SaveSlotTests: XCTestCase {
+    func testCurioKnowledgeSchemaTwelveRealSlotMigratesEmpty() async throws {
+        let root = directory()
+        defer { try? FileManager.default.removeItem(at: root) }
+        let slots = SaveSlotFileIO(directory: root)
+        let created = try await slots.create(name: "Schema twelve curio migration")
+        let url = try await slots.exportURL(for: created.metadata.id)
+        var envelope = try SaveCodec.makeDecoder().decode(
+            SaveSlotEnvelope.self, from: Data(contentsOf: url))
+        var payload = try XCTUnwrap(JSONSerialization.jsonObject(
+            with: SaveCodec.encode(.newGame())) as? [String: Any])
+        payload["schemaVersion"] = 12
+        var reality = try XCTUnwrap(payload["reality"] as? [String: Any])
+        reality.removeValue(forKey: "curioFamilyKnowledge")
+        payload["reality"] = reality
+        envelope.payload = try JSONSerialization.data(withJSONObject: payload, options: [.sortedKeys])
+        try encoder().encode(envelope).write(to: url, options: .atomic)
+
+        let loaded = try await slots.load(created.metadata.id)
+        XCTAssertEqual(loaded.state.schemaVersion, 13)
+        XCTAssertTrue(loaded.state.reality.curioFamilyKnowledge.isEmpty)
+    }
+
+    func testCurrentCurioKnowledgeMalformedRealSlotPreservesExactEnvelope() async throws {
+        for mutation in ["null", "negative"] {
+            let root = directory()
+            defer { try? FileManager.default.removeItem(at: root) }
+            let slots = SaveSlotFileIO(directory: root)
+            let created = try await slots.create(name: "Malformed curio knowledge")
+            let url = try await slots.exportURL(for: created.metadata.id)
+            var envelope = try SaveCodec.makeDecoder().decode(
+                SaveSlotEnvelope.self, from: Data(contentsOf: url))
+            var state = GameState.newGame()
+            state.reality.curioFamilyKnowledge["curio_humming_shard"] = .init(
+                familyID: "curio_humming_shard", revealedItemID: "salve_lesser",
+                observationCount: 1, firstResolutionRunIndex: 0, isRecognized: false)
+            var payload = try XCTUnwrap(JSONSerialization.jsonObject(with: SaveCodec.encode(state))
+                                         as? [String: Any])
+            var reality = try XCTUnwrap(payload["reality"] as? [String: Any])
+            if mutation == "null" {
+                reality["curioFamilyKnowledge"] = NSNull()
+            } else {
+                var knowledge = try XCTUnwrap(reality["curioFamilyKnowledge"] as? [String: Any])
+                var receipt = try XCTUnwrap(knowledge["curio_humming_shard"] as? [String: Any])
+                receipt["observationCount"] = -1
+                knowledge["curio_humming_shard"] = receipt
+                reality["curioFamilyKnowledge"] = knowledge
+            }
+            payload["reality"] = reality
+            envelope.payload = try JSONSerialization.data(withJSONObject: payload,
+                                                            options: [.sortedKeys])
+            let bytes = try encoder().encode(envelope)
+            try bytes.write(to: url, options: .atomic)
+            do { _ = try await slots.load(created.metadata.id); XCTFail("expected strict failure") }
+            catch { }
+            XCTAssertEqual(try Data(contentsOf: url), bytes)
+        }
+    }
+
     func testB111ASchemaTenMalformedQueueMigrationPreservesRealSlotEnvelope() async throws {
         let root = directory()
         defer { try? FileManager.default.removeItem(at: root) }

@@ -439,6 +439,10 @@ extension GameStore {
             guard candidate.base.spendEssenceCrystals(Tuning.Economy.identifyCostEssence) else {
                 return .refused("The available Essence Crystals changed. Review the cost and try again.")
             }
+            guard EconomyRules.recordCurioResolution(familyID: stack.catalogID, in: &candidate)
+                    || candidate.reality.curioFamilyKnowledge[stack.catalogID] != nil else {
+                return .refused("The curio's identity could not be recorded. Nothing changed.")
+            }
             return .ready(candidate, revealed)
         }
 
@@ -505,7 +509,10 @@ extension GameStore {
         var reward: EconomyRules.CacheReward?
         var bonusName: String?
         mutate("open locked cache", flush: true) { state in
-            guard var run = state.worlds.activeRun else { return }
+            var candidate = state
+            guard var run = candidate.worlds.activeRun,
+                  run.map[run.playerPosition].content == .lockedCache,
+                  candidate.base.inventory.stacks.contains(where: { $0.id == key.id }) else { return }
             let rolled = EconomyRules.rollCacheReward(in: state, rng: &run.rng)
             let readings = BookRules.readings(for: run.book, seed: run.mapSeed)
             if let id = ApexRules.cacheBonus(for: readings, rng: &run.rng) {
@@ -514,10 +521,15 @@ extension GameStore {
                     if !run.satchelItems.add(stack) { run.offeredItems.append(stack) }
             }
             run.map[run.playerPosition].content = .empty
-            state.worlds.activeRun = run
+            candidate.worlds.activeRun = run
 
-            EconomyRules.grant(rolled, in: &state)
-            state.base.inventory.remove(key.id) // the key is spent
+            EconomyRules.grant(rolled, in: &candidate)
+            if !key.identified {
+                guard EconomyRules.recordCurioResolution(familyID: key.catalogID, in: &candidate)
+                        || candidate.reality.curioFamilyKnowledge[key.catalogID] != nil else { return }
+            }
+            candidate.base.inventory.remove(key.id) // the key is spent
+            state = candidate
             reward = rolled
         }
         if let reward {

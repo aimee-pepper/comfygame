@@ -247,6 +247,41 @@ final class ConsumableCraftingTests: XCTestCase {
         XCTAssertTrue(store.activeRun?.satchelItems.stacks.contains {
             $0.catalogID == "salve_lesser" && $0.identified
         } == true)
+        XCTAssertEqual(store.state.reality.curioFamilyKnowledge["curio_humming_shard"]?.observationCount, 1)
+    }
+
+    func testContextlessUnknownCurioConsumesNothingAndTeachesNothing() throws {
+        let store = GameStore(io: .temporary(name: "curio-contextless-\(UUID().uuidString)"))
+        var state = fieldState(item: "field_ration")
+        let unknown = ItemStack(id: .init(rawValue: 70_201), catalogID: "curio_humming_shard",
+                                identified: false)
+        _ = state.worlds.activeRun?.satchelItems.add(unknown)
+        store.mutate("full-health curio fixture") { $0 = state }
+        let before = store.state
+
+        XCTAssertTrue(store.curioTryTargets(unknown).isEmpty)
+        store.useItemInWorld(unknown, on: .binder)
+        XCTAssertEqual(store.state, before)
+        XCTAssertNil(store.state.reality.curioFamilyKnowledge[unknown.catalogID])
+    }
+
+    func testValidFieldTryAppliesHiddenHealingConsumesTurnAndRecordsFamily() throws {
+        let store = GameStore(io: .temporary(name: "curio-field-try-\(UUID().uuidString)"))
+        var state = fieldState(item: "field_ration")
+        let unknown = ItemStack(id: .init(rawValue: 70_202), catalogID: "curio_humming_shard",
+                                identified: false)
+        state.worlds.activeRun?.binderHP = 5
+        _ = state.worlds.activeRun?.satchelItems.add(unknown)
+        store.mutate("wounded curio fixture") { $0 = state }
+        let turn = try XCTUnwrap(store.activeRun?.turnsTaken)
+
+        XCTAssertEqual(store.curioTryTargets(unknown), [.binder])
+        store.useItemInWorld(unknown, on: .binder)
+
+        XCTAssertEqual(store.activeRun?.turnsTaken, turn + 1)
+        XCTAssertEqual(store.activeRun?.binderHP, 15)
+        XCTAssertNil(store.activeRun?.satchelItems.stacks.first { $0.id == unknown.id })
+        XCTAssertEqual(store.state.reality.curioFamilyKnowledge[unknown.catalogID]?.observationCount, 1)
     }
 
     func testLureWakesNearestRoamingCreatureAndCostsATurn() throws {

@@ -13,6 +13,67 @@ final class PersistenceTests: XCTestCase {
         XCTAssertEqual(try Data(contentsOf: quarantined), bytes, file: file, line: line)
     }
 
+    func testCurioKnowledgeSchemaTwelveMigrationStartsEmptyWithoutBackwardInference() throws {
+        var root = try XCTUnwrap(JSONSerialization.jsonObject(
+            with: SaveCodec.encode(.newGame())) as? [String: Any])
+        root["schemaVersion"] = 12
+        var reality = try XCTUnwrap(root["reality"] as? [String: Any])
+        reality.removeValue(forKey: "curioFamilyKnowledge")
+        root["reality"] = reality
+        let legacy = try JSONSerialization.data(withJSONObject: root, options: [.sortedKeys])
+
+        let migrated = try SaveCodec.decode(legacy)
+        XCTAssertEqual(migrated.schemaVersion, 13)
+        XCTAssertTrue(migrated.reality.curioFamilyKnowledge.isEmpty)
+        XCTAssertEqual(try SaveCodec.decode(SaveCodec.encode(migrated)), migrated)
+    }
+
+    func testCurrentCurioKnowledgeMalformedRawSavePreservesExactBytes() throws {
+        for mutation in ["null", "future", "negative", "wrong-target", "wrong-recognition"] {
+            var state = GameState.newGame()
+            state.reality.curioFamilyKnowledge["curio_humming_shard"] = .init(
+                familyID: "curio_humming_shard", revealedItemID: "salve_lesser",
+                observationCount: 1, firstResolutionRunIndex: 0, isRecognized: false)
+            var root = try XCTUnwrap(JSONSerialization.jsonObject(with: SaveCodec.encode(state))
+                                      as? [String: Any])
+            var reality = try XCTUnwrap(root["reality"] as? [String: Any])
+            if mutation == "null" {
+                reality["curioFamilyKnowledge"] = NSNull()
+            } else {
+                var knowledge = try XCTUnwrap(reality["curioFamilyKnowledge"] as? [String: Any])
+                var receipt = try XCTUnwrap(knowledge["curio_humming_shard"] as? [String: Any])
+                switch mutation {
+                case "future": receipt["version"] = 2
+                case "negative": receipt["observationCount"] = -1
+                case "wrong-target": receipt["revealedItemID"] = "cache_key"
+                default: receipt["isRecognized"] = true
+                }
+                knowledge["curio_humming_shard"] = receipt
+                reality["curioFamilyKnowledge"] = knowledge
+            }
+            root["reality"] = reality
+            let bytes = try JSONSerialization.data(withJSONObject: root, options: [.sortedKeys])
+            let io = SaveFileIO.temporary(name: "curio-knowledge-\(mutation)-\(UUID().uuidString)")
+            try io.write(bytes)
+            guard case .unrecoverable = io.load() else { return XCTFail("expected \(mutation) failure") }
+            try assertQuarantinedSavePreserves(bytes, io: io)
+        }
+    }
+
+    func testCurrentRecognizedCurioCannotPersistAsUnidentifiedOwnedCopy() throws {
+        var state = GameState.newGame()
+        state.reality.curioFamilyKnowledge["curio_humming_shard"] = .init(
+            familyID: "curio_humming_shard", revealedItemID: "salve_lesser",
+            observationCount: 2, firstResolutionRunIndex: 0, isRecognized: true)
+        state.base.inventory.stacks = [.init(id: .init(rawValue: 73_001),
+            catalogID: "curio_humming_shard", identified: false)]
+        let bytes = try SaveCodec.encode(state)
+        let io = SaveFileIO.temporary(name: "curio-recognized-unknown-\(UUID().uuidString)")
+        try io.write(bytes)
+        guard case .unrecoverable = io.load() else { return XCTFail("expected invariant failure") }
+        try assertQuarantinedSavePreserves(bytes, io: io)
+    }
+
     func testRecoveredTeachingSchemaElevenMigrationPreservesLegacyRewardAsReadReceipt() throws {
         var state = GameState.newGame()
         state.base.completedResearch.insert("study_starlight")

@@ -489,6 +489,94 @@ enum EconomyRules {
         return ContentCatalog.shared.item(target)
     }
 
+    static func recognizedIdentification(of stack: ItemStack, in reality: RealityState) -> ItemDef? {
+        guard !stack.identified,
+              let knowledge = reality.curioFamilyKnowledge[stack.catalogID],
+              knowledge.validates(key: stack.catalogID), knowledge.isRecognized else { return nil }
+        return ContentCatalog.shared.item(knowledge.revealedItemID)
+    }
+
+    /// Records one exact physical resolution and atomically normalizes every durable owned copy
+    /// when the second independent example completes recognition.
+    @discardableResult
+    static func recordCurioResolution(familyID: ItemID, in state: inout GameState) -> Bool {
+        guard let family = ContentCatalog.shared.item(familyID), family.kind == .curio,
+              let revealedID = family.identifiesInto,
+              ContentCatalog.shared.item(revealedID) != nil else { return false }
+        if var knowledge = state.reality.curioFamilyKnowledge[familyID] {
+            guard knowledge.validates(key: familyID), knowledge.revealedItemID == revealedID else {
+                return false
+            }
+            guard knowledge.observationCount < Int.max else { return false }
+            knowledge.observationCount += 1
+            knowledge.isRecognized = knowledge.observationCount >= Tuning.Economy.curioRecognitionThreshold
+            state.reality.curioFamilyKnowledge[familyID] = knowledge
+        } else {
+            let runIndex = state.worlds.activeRun?.runIndex
+                ?? state.worlds.expeditionReviewQueue.pending.last?.summary.runIndex ?? 0
+            state.reality.curioFamilyKnowledge[familyID] = .init(
+                familyID: familyID, revealedItemID: revealedID, observationCount: 1,
+                firstResolutionRunIndex: max(0, runIndex), isRecognized: false)
+        }
+        if state.reality.curioFamilyKnowledge[familyID]?.isRecognized == true {
+            normalizeRecognizedCurios(in: &state)
+            return true
+        }
+        return false
+    }
+
+    static func normalizeRecognizedCurios(in state: inout GameState) {
+        normalizeRecognizedCurios(in: &state.base.inventory,
+                                  knowledge: state.reality.curioFamilyKnowledge)
+        normalizeRecognizedCurios(in: &state.base.spillover,
+                                  knowledge: state.reality.curioFamilyKnowledge)
+        if var run = state.worlds.activeRun {
+            normalizeRecognizedCurios(in: &run.satchelItems,
+                                      knowledge: state.reality.curioFamilyKnowledge)
+            normalizeRecognizedCurios(in: &run.offeredItems,
+                                      knowledge: state.reality.curioFamilyKnowledge)
+            state.worlds.activeRun = run
+        }
+        for index in state.worlds.anchoredRealms.indices {
+            normalizeRecognizedCurios(in: &state.worlds.anchoredRealms[index].world.satchelItems,
+                                      knowledge: state.reality.curioFamilyKnowledge)
+            normalizeRecognizedCurios(in: &state.worlds.anchoredRealms[index].world.offeredItems,
+                                      knowledge: state.reality.curioFamilyKnowledge)
+        }
+    }
+
+    static func normalizeRecognizedCurios(
+        in inventory: inout Inventory,
+        knowledge: [ItemID: RealityState.CurioFamilyKnowledgeV1]
+    ) {
+        var rebuilt = Inventory(slots: inventory.slots)
+        for var stack in inventory.stacks {
+            if !stack.identified, let record = knowledge[stack.catalogID], record.isRecognized {
+                stack.catalogID = record.revealedItemID
+                stack.identified = true
+            }
+            _ = rebuilt.add(stack)
+        }
+        inventory = rebuilt
+    }
+
+    static func normalizeRecognizedCurios(
+        in stacks: inout [ItemStack],
+        knowledge: [ItemID: RealityState.CurioFamilyKnowledgeV1]
+    ) {
+        var rebuilt: [ItemStack] = []
+        for var stack in stacks {
+            if !stack.identified, let record = knowledge[stack.catalogID], record.isRecognized {
+                stack.catalogID = record.revealedItemID
+                stack.identified = true
+            }
+            if let bin = rebuilt.firstIndex(where: { $0.binKey == stack.binKey }) {
+                rebuilt[bin].absorb(stack)
+            } else { rebuilt.append(stack) }
+        }
+        stacks = rebuilt
+    }
+
     // MARK: Locked caches
 
     /// What opening a cache pays out. Guaranteed Rare+ (design brief): a symbol you don't own, a

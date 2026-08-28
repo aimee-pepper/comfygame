@@ -1521,7 +1521,7 @@ enum CombatRules {
 
         case .useItem(let stackID, let ally, let afflictionReceipt):
             if useItem(stackID, on: ally, afflictionReceipt: afflictionReceipt,
-                       run: &run, encounter: &encounter) {
+                       run: &run, encounter: &encounter, state: &state) {
                 outcome = .committed(cost: .normal, completedDirectAttack: false)
             }
 
@@ -2411,9 +2411,15 @@ enum CombatRules {
                                 on ally: Combatant,
                                 afflictionReceipt: UInt64?,
                                 run: inout WorldRun,
-                                encounter: inout EncounterState) -> Bool {
-        guard let index = run.satchelItems.stacks.firstIndex(where: { $0.id == stackID }),
-              let item = ContentCatalog.shared.item(run.satchelItems.stacks[index].catalogID),
+                                encounter: inout EncounterState,
+                                state: inout GameState) -> Bool {
+        guard let index = run.satchelItems.stacks.firstIndex(where: { $0.id == stackID }) else {
+            return false
+        }
+        let stack = run.satchelItems.stacks[index]
+        let familyID: ItemID? = stack.identified ? nil : stack.catalogID
+        guard let item = stack.identified ? ContentCatalog.shared.item(stack.catalogID)
+                : EconomyRules.identification(of: stack),
               item.kind == .consumable
         else { return false }
 
@@ -2421,6 +2427,10 @@ enum CombatRules {
         adoptLegacyAfflictions(in: &encounter)
         switch effect.effect {
         case .heal:
+            if familyID != nil {
+                let current = health(of: ally, in: run)
+                guard current.current < current.max else { return false }
+            }
             heal(ally, by: effect.potency, run: &run, encounter: &encounter,
                  source: item.name, healer: ally)
         case .clearPoison:
@@ -2460,6 +2470,14 @@ enum CombatRules {
         _ = run.satchelItems.stacks[index].removing(1)
         if run.satchelItems.stacks[index].isEmpty {
             run.satchelItems.stacks.remove(at: index)
+        }
+        if let familyID {
+            guard EconomyRules.recordCurioResolution(familyID: familyID, in: &state)
+                    || state.reality.curioFamilyKnowledge[familyID] != nil else { return false }
+            EconomyRules.normalizeRecognizedCurios(
+                in: &run.satchelItems, knowledge: state.reality.curioFamilyKnowledge)
+            EconomyRules.normalizeRecognizedCurios(
+                in: &run.offeredItems, knowledge: state.reality.curioFamilyKnowledge)
         }
         return true
     }

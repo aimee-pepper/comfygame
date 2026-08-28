@@ -961,6 +961,14 @@ final class EconomyTests: XCTestCase {
 
     // MARK: Identifying
 
+    func testCurioIdentificationV1HasExactTwoFamilyAuthority() {
+        let curios = ContentCatalog.shared.items.filter { $0.kind == .curio }
+        XCTAssertEqual(Dictionary(uniqueKeysWithValues: curios.compactMap { item in
+            item.identifiesInto.map { (item.id, $0) }
+        }), ["curio_humming_shard": "salve_lesser", "curio_bound_knot": "cache_key"])
+        XCTAssertTrue(curios.allSatisfy { !($0.unidentifiedName ?? "").isEmpty })
+    }
+
     func testIdentifyingACurioRevealsWhatItIs() throws {
         let store = richStore()
         let curio = try XCTUnwrap(ContentCatalog.shared.items.first { $0.kind == .curio })
@@ -1029,6 +1037,93 @@ final class EconomyTests: XCTestCase {
         XCTAssertEqual(store.state, before)
     }
 
+    func testTwoCurioResolutionsRecognizeFamilyAndNormalizeEveryOwnedContainer() throws {
+        let io = SaveFileIO.temporary(name: "curio-recognition-\(UUID().uuidString)")
+        defer { io.deleteEverything() }
+        let store = GameStore(io: io)
+        let family: ItemID = "curio_humming_shard"
+        let target: ItemID = "salve_lesser"
+        let first = ItemStack(id: .init(rawValue: 70_001), catalogID: family,
+                              count: 2, identified: false)
+        store.mutate("stage curio family") { state in
+            state.base.inventory = Inventory(slots: 12, stacks: [first])
+            state.base.setEssenceCrystalCount(20)
+        }
+
+        guard case .committed = store.identify(first) else { return XCTFail("first study refused") }
+        XCTAssertEqual(store.state.reality.curioFamilyKnowledge[family]?.observationCount, 1)
+        XCTAssertFalse(store.state.reality.curioFamilyKnowledge[family]?.isRecognized ?? true)
+
+        store.mutate("stage durable duplicate containers") { state in
+            state.base.spillover = [.init(id: .init(rawValue: 70_002), catalogID: family,
+                                          identified: false)]
+            var run = WorldRun(
+                runIndex: 7, book: .init(written: [], essencePaid: 0), mapSeed: 7,
+                rng: .init(seed: 7),
+                map: .init(width: 1, height: 1, tiles: [Tile()], entry: .init(x: 0, y: 0)),
+                playerPosition: .init(x: 0, y: 0))
+            _ = run.satchelItems.add(.init(id: .init(rawValue: 70_003), catalogID: family,
+                                           identified: false))
+            run.offeredItems = [.init(id: .init(rawValue: 70_004), catalogID: family,
+                                      identified: false)]
+            state.worlds.activeRun = run
+        }
+        let second = try XCTUnwrap(store.state.base.inventory.stacks.first {
+            $0.catalogID == family && !$0.identified
+        })
+        guard case .committed = store.identify(second) else { return XCTFail("second study refused") }
+
+        let knowledge = try XCTUnwrap(store.state.reality.curioFamilyKnowledge[family])
+        XCTAssertEqual(knowledge.observationCount, 2)
+        XCTAssertTrue(knowledge.isRecognized)
+        XCTAssertFalse(store.state.base.inventory.stacks.contains { $0.catalogID == family })
+        XCTAssertTrue(store.state.base.spillover.allSatisfy { $0.catalogID == target && $0.identified })
+        XCTAssertTrue(store.activeRun?.satchelItems.stacks.allSatisfy {
+            $0.catalogID == target && $0.identified
+        } == true)
+        XCTAssertTrue(store.activeRun?.offeredItems.allSatisfy {
+            $0.catalogID == target && $0.identified
+        } == true)
+
+        store.mutate("future recognized drop") { state in
+            state.worlds.activeRun?.offeredItems.append(.init(
+                id: .init(rawValue: 70_005), catalogID: family, identified: false))
+        }
+        XCTAssertEqual(store.activeRun?.offeredItems.last?.catalogID, target)
+        XCTAssertTrue(store.activeRun?.offeredItems.last?.identified == true)
+        store.flushNow()
+        let relaunched = GameStore(io: io)
+        XCTAssertEqual(relaunched.state.reality.curioFamilyKnowledge[family], knowledge)
+        XCTAssertEqual(relaunched.activeRun?.offeredItems.last?.catalogID, target)
+    }
+
+    func testUnknownKeyCanOnlyBeTriedAtCompatibleLockedCache() throws {
+        let store = richStore()
+        let family: ItemID = "curio_bound_knot"
+        let unknown = ItemStack(id: .init(rawValue: 70_101), catalogID: family,
+                                identified: false)
+        store.mutate("unknown key fixture") { state in
+            state.base.inventory = Inventory(slots: 8, stacks: [unknown])
+        }
+        XCTAssertNil(store.carriedCacheKey)
+
+        store.write("plains")
+        XCTAssertTrue(store.bindAndDepart())
+        if let arrivalID = store.state.worlds.pendingWorldArrivalReceiptID {
+            XCTAssertTrue(store.enterPendingWorld(arrivalReceiptID: arrivalID))
+        }
+        store.mutate("stand on compatible cache") { state in
+            guard let point = state.worlds.activeRun?.playerPosition else { return }
+            state.worlds.activeRun?.map[point].content = .lockedCache
+        }
+        XCTAssertEqual(store.carriedCacheKey?.id, unknown.id)
+        XCTAssertTrue(store.carriedCacheKeyIsUnidentified)
+        XCTAssertNotNil(store.openCacheHere())
+        XCTAssertNil(store.state.base.inventory.stacks.first { $0.id == unknown.id })
+        XCTAssertEqual(store.state.reality.curioFamilyKnowledge[family]?.observationCount, 1)
+        XCTAssertFalse(store.isOnLockedCache)
+    }
+
     // MARK: The delayed payoff
 
     /// The moment the whole itemization spine exists for: a key found in one world, carried home,
@@ -1051,7 +1146,10 @@ final class EconomyTests: XCTestCase {
 
         // World B: stand on a cache.
         store.write("plains")
-        store.bindAndDepart()
+        XCTAssertTrue(store.bindAndDepart())
+        if let arrivalID = store.state.worlds.pendingWorldArrivalReceiptID {
+            XCTAssertTrue(store.enterPendingWorld(arrivalReceiptID: arrivalID))
+        }
         store.mutate("stand on a cache") { state in
             guard var run = state.worlds.activeRun else { return }
             run.map[run.playerPosition].content = .lockedCache
@@ -1084,7 +1182,10 @@ final class EconomyTests: XCTestCase {
     func testACacheWithoutAKeyStaysShut() throws {
         let store = richStore()
         store.write("plains")
-        store.bindAndDepart()
+        XCTAssertTrue(store.bindAndDepart())
+        if let arrivalID = store.state.worlds.pendingWorldArrivalReceiptID {
+            XCTAssertTrue(store.enterPendingWorld(arrivalReceiptID: arrivalID))
+        }
         store.mutate("stand on a cache") { state in
             guard var run = state.worlds.activeRun else { return }
             run.map[run.playerPosition].content = .lockedCache

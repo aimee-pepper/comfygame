@@ -16,7 +16,7 @@ enum Tuning {
 
     /// Save-file schema version. Bump when `GameState`'s shape changes incompatibly and add a
     /// step in `Migrations.swift`.
-    static let saveSchemaVersion: Int = 12
+    static let saveSchemaVersion: Int = 13
 
     // MARK: - Book authoring
 
@@ -920,6 +920,7 @@ enum Tuning {
     // MARK: - Economy
 
     enum Economy {
+        static let curioRecognitionThreshold = 2
         static let startingEssence: Int = 40         // PLACEHOLDER
         /// **Far more room than it used to be** (Aimee, 5 Aug). Eight slots and four per tier
         /// capped the storehouse at twenty forever, which fights the hoarding pillar outright.

@@ -867,6 +867,7 @@ final class GameStore: ObservableObject {
                 _ body: (inout GameState) -> Void) {
         guard permitsMutationWhileArrivalOwnsRoot(scope) else { return }
         body(&state)
+        EconomyRules.normalizeRecognizedCurios(in: &state)
         state.meta.mutationCount += 1
         state.meta.recordSemanticAction(label)
         state.meta.lastSavedAt = Date() // diagnostics only — no gameplay rule may read this
@@ -886,6 +887,7 @@ final class GameStore: ObservableObject {
         guard permitsMutationWhileArrivalOwnsRoot(scope) else { return false }
         var candidate = state
         guard body(&candidate) else { return false }
+        EconomyRules.normalizeRecognizedCurios(in: &candidate)
         state = candidate
         state.meta.mutationCount += 1
         state.meta.recordSemanticAction(label)

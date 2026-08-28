@@ -62,6 +62,15 @@ struct GameState: Codable, Equatable, Sendable {
                 }
             }) else { throw CocoaError(.coderInvalidValue) }
         }
+        if schemaVersion >= 13 {
+            let recognized = Set(reality.curioFamilyKnowledge.values.filter(\.isRecognized)
+                .map(\.familyID))
+            let runs = [worlds.activeRun].compactMap { $0 } + worlds.anchoredRealms.map(\.world)
+            let owned = base.inventory.stacks + base.spillover
+                + runs.flatMap { $0.satchelItems.stacks + $0.offeredItems }
+            guard !owned.contains(where: { !$0.identified && recognized.contains($0.catalogID) })
+            else { throw CocoaError(.coderInvalidValue) }
+        }
         if schemaVersion >= 4 {
             let runs = [worlds.activeRun].compactMap { $0 } + worlds.anchoredRealms.map(\.world)
             for run in runs {

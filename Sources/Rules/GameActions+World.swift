@@ -433,9 +433,14 @@ extension GameStore {
     /// worlds, so this is nearly always false until milestone 5 delivers the identify flow.
     var carriedCacheKey: ItemStack? {
         state.base.inventory.stacks.first {
-            $0.identified && ContentCatalog.shared.item($0.catalogID)?.kind == .key
+            if $0.identified { return ContentCatalog.shared.item($0.catalogID)?.kind == .key }
+            guard isOnLockedCache,
+                  let revealed = EconomyRules.identification(of: $0) else { return false }
+            return revealed.kind == .key
         }
     }
+
+    var carriedCacheKeyIsUnidentified: Bool { carriedCacheKey?.identified == false }
 
     // MARK: - Turns
 
@@ -468,12 +473,23 @@ extension GameStore {
     /// What's in the satchel that could be used right now, out in the world.
     var carriedConsumables: [ItemStack] {
         (activeRun?.satchelItems.stacks ?? []).filter {
+            if !$0.identified { return !curioTryTargets($0).isEmpty }
             guard $0.identified,
                   let item = ContentCatalog.shared.item($0.catalogID),
                   item.kind == .consumable,
                   let effect = item.consumable?.effect else { return false }
             return [.heal, .restoreStability, .returnHome, .lightWorld, .farsight,
                     .identifyCurio, .lureCreature].contains(effect)
+        }
+    }
+
+    func curioTryTargets(_ stack: ItemStack) -> [PartyMember] {
+        guard !stack.identified, let run = activeRun,
+              let revealed = EconomyRules.identification(of: stack),
+              revealed.consumable?.effect == .heal else { return [] }
+        return partyMembers.filter { member in
+            let health = CombatRules.health(of: member.combatant, in: run)
+            return health.current < health.max
         }
     }
 
@@ -525,12 +541,17 @@ extension GameStore {
     /// same satchel before the world charges its turn.
     func useSolventInWorld(_ solvent: ItemStack, on curio: ItemStack) {
         guard activeRun?.activeEncounter == nil,
-              ContentCatalog.shared.item(solvent.catalogID)?.consumable?.effect == .identifyCurio
+              ContentCatalog.shared.item(solvent.catalogID)?.consumable?.effect == .identifyCurio,
+              let run = activeRun,
+              run.satchelItems.stacks.first(where: { $0.id == solvent.id }) == solvent,
+              run.satchelItems.stacks.first(where: { $0.id == curio.id }) == curio,
+              EconomyRules.identification(of: curio) != nil
         else { return }
         guard let attempt = beginWorldFieldAttempt(.useItem) else { return }
         var events: [WorldRules.Event] = []
         mutate("use solvent", flush: true, scope: .expedition) { state in
-            guard var run = state.worlds.activeRun,
+            var candidate = state
+            guard var run = candidate.worlds.activeRun,
                   let revealed = EconomyRules.identification(of: curio),
                   run.satchelItems.stacks.contains(where: { $0.id == solvent.id }),
                   let curioIndex = run.satchelItems.stacks.firstIndex(where: { $0.id == curio.id }),
@@ -550,15 +571,44 @@ extension GameStore {
                 run.satchelItems.stacks.remove(at: currentSolvent)
             }
             _ = run.satchelItems.add(transformed)
-            state.worlds.activeRun = run
+            candidate.worlds.activeRun = run
+            guard EconomyRules.recordCurioResolution(familyID: curio.catalogID, in: &candidate)
+                    || candidate.reality.curioFamilyKnowledge[curio.catalogID] != nil else { return }
             events = [.usedItem("Solvent", on: .binder)]
-            events.append(contentsOf: WorldRules.advanceTurn(in: &state))
+            events.append(contentsOf: WorldRules.advanceTurn(in: &candidate))
+            state = candidate
         }
         finishTurn(events, attempt: attempt)
     }
 
     /// Use something out here. Costs a turn, like everything else the world charges for.
     func useItemInWorld(_ stack: ItemStack, on member: PartyMember) {
+        if !stack.identified {
+            guard activeRun?.activeEncounter == nil,
+                  activeRun?.satchelItems.stacks.first(where: { $0.id == stack.id }) == stack,
+                  curioTryTargets(stack).contains(member),
+                  let attempt = beginWorldFieldAttempt(.useItem) else { return }
+            var events: [WorldRules.Event] = []
+            mutate("try unidentified curio", flush: true, scope: .expedition) { state in
+                var candidate = state
+                guard var run = candidate.worlds.activeRun,
+                      let index = run.satchelItems.stacks.firstIndex(where: { $0.id == stack.id }),
+                      run.satchelItems.stacks[index] == stack,
+                      let revealed = EconomyRules.identification(of: stack),
+                      revealed.consumable?.effect == .heal else { return }
+                run.satchelItems.stacks[index].catalogID = revealed.id
+                run.satchelItems.stacks[index].identified = true
+                candidate.worlds.activeRun = run
+                let committed = WorldRules.useItem(stack.id, on: member, in: &candidate)
+                guard !committed.contains(where: { if case .blocked = $0 { return true }; return false }),
+                      EconomyRules.recordCurioResolution(familyID: stack.catalogID, in: &candidate)
+                        || candidate.reality.curioFamilyKnowledge[stack.catalogID] != nil else { return }
+                events = committed
+                state = candidate
+            }
+            finishTurn(events, attempt: attempt)
+            return
+        }
         if ContentCatalog.shared.item(stack.catalogID)?.consumable?.effect == .seamlightGuidance {
             guard let attempt = beginWorldFieldAttempt(.useItem) else { return }
             var events: [WorldRules.Event] = []

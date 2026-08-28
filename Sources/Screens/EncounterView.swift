@@ -846,6 +846,7 @@ private struct CombatItemSheet: View {
     let onCommit: (CombatItemUseQuote) -> CombatItemUseCommitResult
     @State private var refusalMessage: String?
     @State private var selectedStackID: InstanceID?
+    @State private var pendingCurioTry: (stack: ItemStack, ally: Combatant)?
 
     private var livingParty: [Combatant] {
         guard let run = store.activeRun else { return [] }
@@ -875,7 +876,7 @@ private struct CombatItemSheet: View {
                                     quantity: stack.count,
                                     identified: stack.identified,
                                     location: .carried,
-                                    accessibilityName: item.name,
+                                    accessibilityName: stack.displayName,
                                     isSelected: selectedStackID == stack.id
                                 )
                             }
@@ -886,9 +887,10 @@ private struct CombatItemSheet: View {
                     if let stack = selectedStack,
                        let item = ContentCatalog.shared.item(stack.catalogID) {
                         VStack(alignment: .leading, spacing: 10) {
-                            Text(stack.count > 1 ? "\(item.name) ×\(stack.count)" : item.name)
+                            Text(stack.count > 1 ? "\(stack.displayName) ×\(stack.count)" : stack.displayName)
                                 .font(.headline)
-                            Text(itemEffect(item))
+                            Text(stack.identified ? itemEffect(item)
+                                 : "Its result is unknown. Trying it will use the curio, and whatever it does will happen.")
                                 .font(.caption)
                                 .foregroundStyle(.secondary)
 
@@ -932,6 +934,24 @@ private struct CombatItemSheet: View {
                     Button("Cancel", role: .cancel) { self.pendingSelection = nil }
                 }
             }
+            .confirmationDialog(
+                pendingCurioTry.map {
+                    "Try this on \(name(of: $0.ally))? It will be used, and whatever it does will happen."
+                } ?? "Try this curio?",
+                isPresented: Binding(
+                    get: { pendingCurioTry != nil },
+                    set: { if !$0 { pendingCurioTry = nil } }
+                ), titleVisibility: .visible
+            ) {
+                if let pendingCurioTry {
+                    Button("Try it") {
+                        let pending = pendingCurioTry
+                        self.pendingCurioTry = nil
+                        beginUse(pending.stack, on: pending.ally)
+                    }
+                }
+                Button("Cancel", role: .cancel) { pendingCurioTry = nil }
+            }
         }
         .presentationDetents([.medium, .large])
     }
@@ -939,18 +959,23 @@ private struct CombatItemSheet: View {
     @ViewBuilder private var selectedRemedyActionBar: some View {
         if let stack = selectedStack,
            let item = ContentCatalog.shared.item(stack.catalogID) {
-            PersistentActionBar(message: itemEffect(item)) {
+            PersistentActionBar(message: stack.identified ? itemEffect(item)
+                                : "The curio will be used, and whatever it does will happen.") {
                 HStack(spacing: 10) {
-                    Text(stack.count > 1 ? "\(item.name) ×\(stack.count)" : item.name)
+                    Text(stack.count > 1 ? "\(stack.displayName) ×\(stack.count)" : stack.displayName)
                         .font(.callout.weight(.semibold))
                         .lineLimit(1)
                     Spacer(minLength: 4)
                     Menu {
                         ForEach(livingParty, id: \.self) { ally in
-                            Button(name(of: ally)) { beginUse(stack, on: ally) }
+                            Button(name(of: ally)) {
+                                if stack.identified { beginUse(stack, on: ally) }
+                                else { pendingCurioTry = (stack, ally) }
+                            }
                         }
                     } label: {
-                        Label("Use on…", systemImage: "person.crop.circle.badge.checkmark")
+                        Label(stack.identified ? "Use on…" : "Try it on…",
+                              systemImage: "person.crop.circle.badge.checkmark")
                             .frame(minHeight: 44)
                     }
                     .buttonStyle(.borderedProminent)

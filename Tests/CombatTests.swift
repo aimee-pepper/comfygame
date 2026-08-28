@@ -2082,6 +2082,27 @@ final class CombatTests: XCTestCase {
         XCTAssertEqual(store.activeRun?.binderHP, 26)
     }
 
+    func testCombatTryUnknownHealingCurioAppliesEffectConsumesAndRecordsFamily() throws {
+        let store = inFight(["paper_moth"])
+        let unknown = ItemStack(id: .init(rawValue: 88_101),
+                                catalogID: "curio_humming_shard", identified: false)
+        store.mutate("unknown combat curio") { state in
+            guard var run = state.worlds.activeRun else { return }
+            run.binderHP = 10
+            _ = run.satchelItems.add(unknown)
+            run.activeEncounter?.order = [.binder]
+            run.activeEncounter?.turnIndex = 0
+            state.worlds.activeRun = run
+        }
+        let offered = try XCTUnwrap(store.usableItems.first { $0.id == unknown.id })
+        guard case .ready(let quote) = store.combatItemUseEvaluation(
+            stack: offered, on: .binder) else { return XCTFail("valid try was refused") }
+
+        XCTAssertEqual(store.commitCombatItemUse(quote), .committed)
+        XCTAssertNil(store.activeRun?.satchelItems.stacks.first { $0.id == unknown.id })
+        XCTAssertEqual(store.state.reality.curioFamilyKnowledge[unknown.catalogID]?.observationCount, 1)
+    }
+
     func testLegacyRunHealthAdoptionPreservesSavedCurrentWithoutV2Provenance() throws {
         var state = GameState.newGame()
         var map = WorldMap(width: 1, height: 1, tiles: [Tile(isRevealed: true)],

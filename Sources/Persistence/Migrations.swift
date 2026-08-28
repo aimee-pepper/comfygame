@@ -31,6 +31,7 @@ enum Migrations {
             try validateCurrentLibraryAttention(in: data)
             try validateCurrentExpeditionReviewQueue(in: data)
             try validateCurrentRecoveredTeachings(in: data)
+            try validateCurrentCurioKnowledge(in: data)
             return data
         }
 
@@ -43,6 +44,7 @@ enum Migrations {
         try validateCurrentLibraryAttention(in: working)
         try validateCurrentExpeditionReviewQueue(in: working)
         try validateCurrentRecoveredTeachings(in: working)
+        try validateCurrentCurioKnowledge(in: working)
         return working
     }
 
@@ -132,11 +134,44 @@ enum Migrations {
         case 9: return try migrate9to10(data)
         case 10: return try migrate10to11(data)
         case 11: return try migrate11to12(data)
+        case 12: return try migrate12to13(data)
         default:
             // No migration registered. Tolerant decoding is the fallback; if the save is genuinely
             // incompatible, `SaveFileIO.load()` quarantines it rather than losing it.
             return data
         }
+    }
+
+    private static func migrate12to13(_ data: Data) throws -> Data {
+        guard var root = try JSONSerialization.jsonObject(with: data) as? [String: Any],
+              var reality = root["reality"] as? [String: Any],
+              !reality.keys.contains("curioFamilyKnowledge") else {
+            throw CocoaError(.coderInvalidValue)
+        }
+        reality["curioFamilyKnowledge"] = [:]
+        root["reality"] = reality
+        root["schemaVersion"] = 13
+        return try JSONSerialization.data(withJSONObject: root, options: [.sortedKeys])
+    }
+
+    private static func validateCurrentCurioKnowledge(in data: Data) throws {
+        guard let root = try JSONSerialization.jsonObject(with: data) as? [String: Any],
+              let reality = root["reality"] as? [String: Any],
+              let raw = reality["curioFamilyKnowledge"] as? [String: Any] else {
+            throw CocoaError(.coderInvalidValue)
+        }
+        let exact = Set(["version", "familyID", "revealedItemID", "observationCount",
+                         "firstResolutionRunIndex", "isRecognized"])
+        for (family, value) in raw {
+            guard let receipt = value as? [String: Any], Set(receipt.keys) == exact,
+                  receipt["familyID"] as? String == family else {
+                throw CocoaError(.coderInvalidValue)
+            }
+        }
+        let decoded = try SaveCodec.makeDecoder().decode(GameState.self, from: data)
+        guard decoded.reality.curioFamilyKnowledge.allSatisfy({
+            $0.value.validates(key: $0.key)
+        }) else { throw CocoaError(.coderInvalidValue) }
     }
 
     /// Replaces the overwrite-prone return receipt with a strict FIFO review queue while retaining
@@ -322,7 +357,17 @@ enum Migrations {
             state.reality.library.attention.checkedContentIDs.insert(
                 .recoveredTeaching(definition.id))
         }
-        return try SaveCodec.makeEncoder().encode(state)
+        let encoded = try SaveCodec.makeEncoder().encode(state)
+        guard var root = try JSONSerialization.jsonObject(with: encoded) as? [String: Any],
+              var reality = root["reality"] as? [String: Any] else {
+            throw CocoaError(.coderInvalidValue)
+        }
+        // The current model already knows schema-13 fields. Keep the schema-12 intermediate
+        // truthful so the next migration remains the sole owner of introducing Curio knowledge.
+        reality.removeValue(forKey: "curioFamilyKnowledge")
+        root["reality"] = reality
+        root["schemaVersion"] = 12
+        return try JSONSerialization.data(withJSONObject: root, options: [.sortedKeys])
     }
 
     private static func validateCurrentRecoveredTeachings(in data: Data) throws {

@@ -1328,7 +1328,10 @@ struct WorldView: View {
         if store.canPortalHere { return "Portal home · keep everything" }
         if store.canLeaveMalformedOlderWorld { return "Leave this world · keep everything · no turn" }
         if store.isOnLockedCache {
-            return store.carriedCacheKey == nil ? "Locked cache · needs a key" : "Open cache · spends your key"
+            if store.carriedCacheKey == nil { return "Locked cache · needs a key" }
+            return store.carriedCacheKeyIsUnidentified
+                ? "Try unknown curio · it will be used"
+                : "Open cache · spends your key"
         }
         if store.canUseNaturalAnchor { return "Use Atlas Seam · \(store.naturalAnchorCost) essence" }
         if store.canPlaceAnchorFrame { return "Place Anchor Frame here" }
@@ -2705,6 +2708,7 @@ private struct FieldKitSheet: View {
     @Environment(\.dismiss) private var dismiss
     @State private var section: FieldKitSection = .instruments
     @State private var selectedSupply: ItemStack?
+    @State private var pendingCurioTry: (stack: ItemStack, member: PartyMember)?
 
     private enum FieldKitSection: String, CaseIterable, Identifiable {
         case instruments = "Instruments"
@@ -2747,6 +2751,24 @@ private struct FieldKitSheet: View {
             }
         }
         .presentationDetents([.medium, .large])
+        .confirmationDialog(
+            pendingCurioTry.map {
+                "Try this on \(store.name(of: $0.member))? It will be used, and whatever it does will happen."
+            } ?? "Try this curio?",
+            isPresented: Binding(
+                get: { pendingCurioTry != nil },
+                set: { if !$0 { pendingCurioTry = nil } }
+            ), titleVisibility: .visible
+        ) {
+            if let pendingCurioTry {
+                Button("Try it") {
+                    store.useItemInWorld(pendingCurioTry.stack, on: pendingCurioTry.member)
+                    self.pendingCurioTry = nil
+                    dismiss()
+                }
+            }
+            Button("Cancel", role: .cancel) { pendingCurioTry = nil }
+        }
     }
 
     @ViewBuilder private var instrumentTray: some View {
@@ -2829,7 +2851,8 @@ private struct FieldKitSheet: View {
                 }
             }
 
-            Text(fieldEffectDetail(stack.catalogID))
+            Text(stack.identified ? fieldEffectDetail(stack.catalogID)
+                 : "Its result is unknown. Trying it will use the curio, and whatever it does will happen.")
                 .font(.callout)
                 .foregroundStyle(.secondary)
 
@@ -2844,7 +2867,19 @@ private struct FieldKitSheet: View {
 
             Divider()
 
-            if ContentCatalog.shared.item(stack.catalogID)?.consumable?.effect == .heal {
+            if !stack.identified, !store.curioTryTargets(stack).isEmpty {
+                Text("Try it on").font(.caption.weight(.semibold)).foregroundStyle(.secondary)
+                ForEach(store.curioTryTargets(stack)) { member in
+                    Button {
+                        pendingCurioTry = (stack, member)
+                    } label: {
+                        LabeledRow(icon: "questionmark.diamond", label: store.name(of: member),
+                                   value: "use unknown curio")
+                            .frame(minHeight: 44).contentShape(Rectangle())
+                    }
+                    .buttonStyle(.bordered)
+                }
+            } else if ContentCatalog.shared.item(stack.catalogID)?.consumable?.effect == .heal {
                 Text("Use on").font(.caption.weight(.semibold)).foregroundStyle(.secondary)
                 ForEach(store.partyMembers) { member in
                     Button {

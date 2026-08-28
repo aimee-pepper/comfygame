@@ -5,6 +5,25 @@ import Foundation
 /// Only put something here if losing it in a reset would feel like losing the *player's* history
 /// rather than the *character's* possessions.
 struct RealityState: Codable, Equatable, Sendable {
+    struct CurioFamilyKnowledgeV1: Codable, Equatable, Sendable {
+        static let version = 1
+
+        var version: Int = Self.version
+        var familyID: ItemID
+        var revealedItemID: ItemID
+        var observationCount: Int
+        var firstResolutionRunIndex: Int
+        var isRecognized: Bool
+
+        func validates(key: ItemID? = nil) -> Bool {
+            guard version == Self.version, key == nil || key == familyID,
+                  observationCount > 0, firstResolutionRunIndex >= 0,
+                  let family = ContentCatalog.shared.item(familyID), family.kind == .curio,
+                  family.identifiesInto == revealedItemID,
+                  ContentCatalog.shared.item(revealedItemID) != nil else { return false }
+            return isRecognized == (observationCount >= Tuning.Economy.curioRecognitionThreshold)
+        }
+    }
     enum InstrumentPrecision: Int, Codable, Comparable, Sendable {
         case crude = 1, good = 2, fine = 3
 
@@ -90,6 +109,10 @@ struct RealityState: Codable, Equatable, Sendable {
     /// Writing Desk. Unknown/retired IDs remain here so save migration never erases a sighting.
     var encounteredLexemes: Set<LexemeIdentity> = []
 
+    /// Permanent knowledge keyed by the unidentified family. Physical examples resolve one at a
+    /// time; the second independent resolution recognizes the family for this Reality forever.
+    var curioFamilyKnowledge: [ItemID: CurioFamilyKnowledgeV1] = [:]
+
     mutating func recordEncounter(on page: Page) {
         encounteredLexemes.formUnion(page.encounteredLexemes)
     }
@@ -137,6 +160,11 @@ struct RealityState: Codable, Equatable, Sendable {
         library = try container.decodeIfPresent(LibraryState.self, forKey: .library) ?? LibraryState()
         encounteredLexemes = try container.decodeIfPresent(
             Set<LexemeIdentity>.self, forKey: .encounteredLexemes) ?? []
+        curioFamilyKnowledge = try container.decodeIfPresent(
+            [ItemID: CurioFamilyKnowledgeV1].self, forKey: .curioFamilyKnowledge) ?? [:]
+        guard curioFamilyKnowledge.allSatisfy({ $0.value.validates(key: $0.key) }) else {
+            throw CocoaError(.coderInvalidValue)
+        }
     }
 }
 

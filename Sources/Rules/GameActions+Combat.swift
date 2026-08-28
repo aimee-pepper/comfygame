@@ -90,9 +90,16 @@ extension GameStore {
     /// Consumables carried into the world. Milestone 5 gives you ways to get them.
     var usableItems: [ItemStack] {
         (state.worlds.activeRun?.satchelItems.stacks ?? []).filter {
-            guard $0.identified,
-                  let effect = ContentCatalog.shared.item($0.catalogID)?.consumable?.effect
-            else { return false }
+            let definition = $0.identified ? ContentCatalog.shared.item($0.catalogID)
+                : EconomyRules.identification(of: $0)
+            guard let effect = definition?.consumable?.effect else { return false }
+            if !$0.identified {
+                guard effect == .heal, let run = state.worlds.activeRun else { return false }
+                return CombatRules.party(of: state).contains { ally in
+                    let health = CombatRules.health(of: ally, in: run)
+                    return health.current > 0 && health.current < health.max
+                }
+            }
             return [.heal, .clearPoison, .clearElemental, .clearAnyStatus, .preventStatus,
                     .coatPoison, .coatBurn, .coatBleed, .coatDazzle].contains(effect)
         }
@@ -107,14 +114,21 @@ extension GameStore {
               let encounter = run.activeEncounter
         else { return .refused(.wrongTurn) }
         guard run.satchelItems.stacks.first(where: { $0.id == stack.id }) == stack,
-              stack.identified,
-              let item = ContentCatalog.shared.item(stack.catalogID),
+              let item = stack.identified ? ContentCatalog.shared.item(stack.catalogID)
+                : EconomyRules.identification(of: stack),
               let effect = item.consumable
         else { return .refused(.staleItem) }
         guard ally.isParty,
               CombatRules.party(of: state).contains(ally),
               CombatRules.isAlive(ally, in: run)
         else { return .refused(.invalidTarget) }
+
+        if !stack.identified {
+            let health = CombatRules.health(of: ally, in: run)
+            guard effect.effect == .heal, health.current < health.max else {
+                return .refused(.invalidTarget)
+            }
+        }
 
         switch effect.effect {
         case .clearPoison, .clearElemental, .clearAnyStatus:

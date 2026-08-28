@@ -752,6 +752,22 @@ struct ContentCatalog: Sendable {
                 throw ContentError.danglingReference("item '\(item.id)' identifies into unknown item '\(target)'")
             }
         }
+        let curioV1Authority: [ItemID: ItemID] = [
+            "curio_humming_shard": "salve_lesser",
+            "curio_bound_knot": "cache_key",
+        ]
+        let authoredCurios = Dictionary(uniqueKeysWithValues: items.compactMap { item in
+            item.kind == .curio ? item.identifiesInto.map { (item.id, $0) } : nil
+        })
+        guard authoredCurios == curioV1Authority else {
+            throw ContentError.danglingReference(
+                "Curio Identification V1 requires the exact two-family authority")
+        }
+        for familyID in curioV1Authority.keys {
+            guard let family = item(familyID), !(family.unidentifiedName ?? "").isEmpty else {
+                throw ContentError.danglingReference("curio '\(familyID)' lacks neutral unidentified copy")
+            }
+        }
 
         // Gameplay code refers to a handful of well-known IDs; make sure the data still has them.
         let requiredStations: [StationID] = [
