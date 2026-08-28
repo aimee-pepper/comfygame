@@ -5485,6 +5485,33 @@ final class WorldTests: XCTestCase {
                        [strong.stableUnitID])
     }
 
+    func testPlayerInitiatedAnimalContactMarksExactBodyAndResetsPatienceAtomically() throws {
+        var state = startedRun(book(["terrain": "plains"]), seed: 14_031)
+        var run = try XCTUnwrap(state.worlds.activeRun)
+        let animal = WorldEnemy(id: .init(rawValue: 14_031), traits: CreatureTraits(),
+                                creatureID: "paper_moth", position: run.playerPosition)
+        run.enemies = [animal]
+        let key = RealityState.AnimalTrustRecordV1.key(
+            worldSeed: run.mapSeed, enemyID: animal.id)
+        state.reality.animalTrustRecords[key] = .init(
+            worldSeed: run.mapSeed, enemyID: animal.id, speciesID: nil,
+            creatureID: animal.creatureID, traits: CreatureTraits(),
+            condition: .patientPresence(requiredTurns: 2), progress: 1,
+            firstAttendedRunIndex: run.runIndex, firstAttendedTurn: 0,
+            lastProgressTurn: 1, interactionCount: 1, completed: false)
+        state.worlds.activeRun = run
+        let snapshot = WorldRules.PreContactSnapshot(
+            disclosedEnemyIDs: [animal.id], approachedEnemyID: nil,
+            playerContactEnemyID: animal.id)
+
+        XCTAssertTrue(WorldRules.beginEncounter(triggeredBy: animal, preContact: snapshot,
+                                                runsAutomaticTurns: false, in: &state))
+        XCTAssertTrue(state.worlds.activeRun?.animalsAttackedThisExpedition.contains(animal.id) == true)
+        XCTAssertEqual(state.reality.animalTrustRecords[key]?.progress, 0)
+        XCTAssertNil(state.reality.animalTrustRecords[key]?.lastProgressTurn)
+        XCTAssertEqual(try SaveCodec.decode(SaveCodec.encode(state)), state)
+    }
+
     private func startedRun(_ composition: BoundBook, seed: UInt64) -> GameState {
         var state = GameState.newGame()
         let world = Worldgen.generate(book: composition, seed: seed)

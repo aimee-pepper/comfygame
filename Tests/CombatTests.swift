@@ -2082,6 +2082,79 @@ final class CombatTests: XCTestCase {
         XCTAssertEqual(store.activeRun?.binderHP, 26)
     }
 
+    func testAnimalHostilityUsesCommittedExactTargetEvenWhenAttackMissesOrDealsNoDamage() throws {
+        func stage(_ store: GameStore, forcedMiss: Bool) throws -> (InstanceID, InstanceID, String, String) {
+            let ids = try XCTUnwrap(store.activeEncounter).foes.map(\.id)
+            let first = try XCTUnwrap(ids.first)
+            let other = try XCTUnwrap(ids.dropFirst().first)
+            let seed = try XCTUnwrap(store.activeRun).mapSeed
+            let firstKey = RealityState.AnimalTrustRecordV1.key(worldSeed: seed, enemyID: first)
+            let otherKey = RealityState.AnimalTrustRecordV1.key(worldSeed: seed, enemyID: other)
+            store.mutate("stage exact animal hostility") { state in
+                guard var run = state.worlds.activeRun, var encounter = run.activeEncounter else { return }
+                encounter.order = [.binder, .foe(first), .foe(other)]
+                encounter.turnSlots = encounter.order.map { .init(actor: $0) }
+                encounter.turnIndex = 0
+                if forcedMiss { encounter.ghostEvasionAvailable = [.foe(first)] }
+                run.activeEncounter = encounter
+                state.worlds.activeRun = run
+                for (id, key) in [(first, firstKey), (other, otherKey)] {
+                    state.reality.animalTrustRecords[key] = .init(
+                        worldSeed: seed, enemyID: id, speciesID: nil, creatureID: "paper_moth",
+                        traits: CreatureTraits(), condition: .patientPresence(requiredTurns: 2),
+                        progress: 1, firstAttendedRunIndex: run.runIndex, firstAttendedTurn: 0,
+                        lastProgressTurn: 1, interactionCount: 1, completed: false)
+                }
+            }
+            return (first, other, firstKey, otherKey)
+        }
+
+        for forcedMiss in [true, false] {
+            let store = inFight(["paper_moth", "paper_moth"])
+            let (target, other, targetKey, otherKey) = try stage(store, forcedMiss: forcedMiss)
+            store.takeCombatAction(.attack(foe: target))
+            XCTAssertTrue(store.activeRun?.animalsAttackedThisExpedition.contains(target) == true)
+            XCTAssertFalse(store.activeRun?.animalsAttackedThisExpedition.contains(other) == true)
+            XCTAssertEqual(store.state.reality.animalTrustRecords[targetKey]?.progress, 0)
+            XCTAssertEqual(store.state.reality.animalTrustRecords[otherKey]?.progress, 1)
+            let relaunched = try SaveCodec.decode(SaveCodec.encode(store.state))
+            XCTAssertTrue(relaunched.worlds.activeRun?.animalsAttackedThisExpedition.contains(target) == true)
+            XCTAssertEqual(relaunched.reality.animalTrustRecords[targetKey]?.progress, 0)
+        }
+
+        var burning = CreatureTraits()
+        burning.emanation = emanation(of: .heat)
+        let statusStore = inFightWith([burning])
+        let statusTarget = try XCTUnwrap(statusStore.activeEncounter?.foes.first?.id)
+        let statusSeed = try XCTUnwrap(statusStore.activeRun).mapSeed
+        let statusKey = RealityState.AnimalTrustRecordV1.key(
+            worldSeed: statusSeed, enemyID: statusTarget)
+        statusStore.mutate("stage committed status-only animal hostility") { state in
+            guard var run = state.worlds.activeRun, var encounter = run.activeEncounter else { return }
+            encounter.debugV2OwnedNodeIDs = [.binder: [CombatDerivedStatsRules.Node.snuff]]
+            encounter.snuffReceipts = [:]
+            encounter.revealed.insert(statusTarget)
+            encounter.order = [.binder, .foe(statusTarget)]
+            encounter.turnSlots = encounter.order.map { .init(actor: $0) }
+            encounter.turnIndex = 0
+            run.activeEncounter = encounter
+            state.worlds.activeRun = run
+            state.reality.animalTrustRecords[statusKey] = .init(
+                worldSeed: statusSeed, enemyID: statusTarget, speciesID: nil,
+                creatureID: "paper_moth", traits: burning,
+                condition: .patientPresence(requiredTurns: 2), progress: 1,
+                firstAttendedRunIndex: run.runIndex, firstAttendedTurn: 0,
+                lastProgressTurn: 1, interactionCount: 1, completed: false)
+        }
+        statusStore.mutate("commit status-only animal hostility") {
+            CombatRules.perform(.skill("snuff", foe: statusTarget), by: .binder, in: &$0)
+        }
+        XCTAssertEqual(statusStore.activeEncounter?.snuffReceipts?[statusTarget]?.remainingScheduledTurns, 2)
+        XCTAssertTrue(statusStore.activeRun?.animalsAttackedThisExpedition.contains(statusTarget) == true)
+        XCTAssertEqual(statusStore.state.reality.animalTrustRecords[statusKey]?.progress, 0)
+        XCTAssertNil(CombatRules.hostileAttemptTarget(of: .healSkill(ally: .binder)))
+    }
+
     func testCombatTryUnknownHealingCurioAppliesEffectConsumesAndRecordsFamily() throws {
         let store = inFight(["paper_moth"])
         let unknown = ItemStack(id: .init(rawValue: 88_101),

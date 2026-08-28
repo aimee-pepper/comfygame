@@ -10,6 +10,8 @@ enum WorldRules {
     struct PreContactSnapshot: Equatable, Sendable {
         var disclosedEnemyIDs: Set<InstanceID>
         var approachedEnemyID: InstanceID?
+        /// Exact body whose tile the party deliberately entered. Enemy movement never sets this.
+        var playerContactEnemyID: InstanceID? = nil
 
         func disclosed(_ enemy: WorldEnemy) -> Bool {
             disclosedEnemyIDs.contains(enemy.id)
@@ -32,7 +34,11 @@ enum WorldRules {
                 return (enemy.isApex || enemy.isSessile) && disclosed.contains(enemy.id)
             })?.id
         }
-        return PreContactSnapshot(disclosedEnemyIDs: disclosed, approachedEnemyID: approached)
+        let contact = playerDestination.flatMap { destination in
+            run.enemies.first(where: { $0.position == destination })?.id
+        }
+        return PreContactSnapshot(disclosedEnemyIDs: disclosed, approachedEnemyID: approached,
+                                  playerContactEnemyID: contact)
     }
 
     /// Things that happened during a turn, for the UI to narrate and for travel to interrupt on.
@@ -164,6 +170,17 @@ enum WorldRules {
         return run.enemies.compactMap { attendProjection(for: $0.id, in: state) }
             .filter { $0.distance <= Tuning.AnimalTrust.attendRange }
             .sorted { $0.enemyID.rawValue < $1.enemyID.rawValue }
+    }
+
+    static func recordAnimalHostility(against enemyID: InstanceID, run: inout WorldRun,
+                                      reality: inout RealityState) {
+        run.animalsAttackedThisExpedition.insert(enemyID)
+        let key = RealityState.AnimalTrustRecordV1.key(
+            worldSeed: run.mapSeed, enemyID: enemyID)
+        guard var trust = reality.animalTrustRecords[key], !trust.completed else { return }
+        trust.progress = 0
+        trust.lastProgressTurn = nil
+        reality.animalTrustRecords[key] = trust
     }
 
     static func attend(_ enemyID: InstanceID, in state: inout GameState) -> [Event] {
@@ -1733,7 +1750,10 @@ enum WorldRules {
         // **Everybody who came gets a place in the order.** This is the line that makes a party of
         // five a party of five rather than a list on the Firepit screen.
         let preContact = suppliedSnapshot ?? preContactSnapshot(in: run,
-                                                                partySightBonus: sightBonus(in: state))
+                                                                 partySightBonus: sightBonus(in: state))
+        if preContact.playerContactEnemyID == enemy.id {
+            recordAnimalHostility(against: enemy.id, run: &run, reality: &state.reality)
+        }
         let initialOpening: EncounterState.Opening
         if preContact.approachedEnemyID == enemy.id {
             initialOpening = .partyApproach

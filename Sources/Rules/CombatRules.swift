@@ -1431,7 +1431,6 @@ enum CombatRules {
             }
         }
         let feintWasActive = encounter.feintActive?.contains(actor) == true
-        let foeHPBefore = Dictionary(uniqueKeysWithValues: encounter.foes.map { ($0.id, $0.currentHP) })
         var outcome: CommittedActionOutcome = .rejected
 
         switch action {
@@ -1542,17 +1541,9 @@ enum CombatRules {
 
         guard case .committed(let committedCost, let completedDirectAttack) = outcome else { return }
 
-        if actor.isParty {
-            for foe in encounter.foes where foe.currentHP < (foeHPBefore[foe.id] ?? foe.currentHP) {
-                run.animalsAttackedThisExpedition.insert(foe.id)
-                let key = RealityState.AnimalTrustRecordV1.key(
-                    worldSeed: run.mapSeed, enemyID: foe.id)
-                if var trust = state.reality.animalTrustRecords[key], !trust.completed {
-                    trust.progress = 0
-                    trust.lastProgressTurn = nil
-                    state.reality.animalTrustRecords[key] = trust
-                }
-            }
+        if actor.isParty, let target = hostileAttemptTarget(of: action) {
+            WorldRules.recordAnimalHostility(against: target, run: &run,
+                                             reality: &state.reality)
         }
 
         // Ambush is a separate opening opportunity, not the actor's first normal-cost action.
@@ -1647,6 +1638,14 @@ enum CombatRules {
     }
 
     private enum CombatActionCost { case zero, normal }
+
+    static func hostileAttemptTarget(of action: CombatAction) -> InstanceID? {
+        switch action {
+        case .attack(let foe), .damageSkill(let foe): foe
+        case .skill(_, let foe, _): foe
+        default: nil
+        }
+    }
 
     private enum CommittedActionOutcome {
         case rejected
