@@ -1159,12 +1159,14 @@ extension GameStore {
             state.base.inventory = fieldKit.remainingInventory
             var packedItems = fieldKit.packed
             let progressAtStart = state.base.partyMembers.map { member in
+                let animal = member.persistentID.flatMap { state.base.animalCompanion(for: $0) }
                 let character = state.base.character(member)
-                let name = member.persistentID.flatMap { id in
+                let name = animal?.originReceipt.frozenDisplayName ?? member.persistentID.flatMap { id in
                     state.base.rosterIndex(for: id).map { state.base.roster[$0].name }
                 } ?? "You"
                 return RunProgressStart(member: member, name: name,
-                                        experience: character.experience, level: character.level)
+                                        experience: animal?.experience ?? character.experience,
+                                        level: animal?.level ?? character.level)
             }
             for index in packedItems.stacks.indices {
                 packedItems.stacks[index].protectedReturnCount = packedItems.stacks[index].count

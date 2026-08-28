@@ -33,6 +33,7 @@ enum Migrations {
             try validateCurrentRecoveredTeachings(in: data)
             try validateCurrentCurioKnowledge(in: data)
             try validateCurrentAnimalTrust(in: data)
+            try validateCurrentAnimalCompanionCombat(in: data)
             return data
         }
 
@@ -47,6 +48,7 @@ enum Migrations {
         try validateCurrentRecoveredTeachings(in: working)
         try validateCurrentCurioKnowledge(in: working)
         try validateCurrentAnimalTrust(in: working)
+        try validateCurrentAnimalCompanionCombat(in: working)
         return working
     }
 
@@ -138,11 +140,63 @@ enum Migrations {
         case 11: return try migrate11to12(data)
         case 12: return try migrate12to13(data)
         case 13: return try migrate13to14(data)
+        case 14: return try migrate14to15(data)
         default:
             // No migration registered. Tolerant decoding is the fallback; if the save is genuinely
             // incompatible, `SaveFileIO.load()` quarantines it rather than losing it.
             return data
         }
+    }
+
+    private static func migrate14to15(_ data: Data) throws -> Data {
+        guard let root = try JSONSerialization.jsonObject(with: data) as? [String: Any],
+              let base = root["base"] as? [String: Any],
+              !base.keys.contains("tamedAnimalCompanions") else {
+            throw CocoaError(.coderInvalidValue)
+        }
+        var state = try SaveCodec.makeDecoder().decode(GameState.self, from: data)
+        guard state.schemaVersion == 14, state.base.tamedAnimalCompanions.isEmpty else {
+            throw CocoaError(.coderInvalidValue)
+        }
+        for (rawID, animal) in state.reality.tamedAnimals.sorted(by: { $0.key < $1.key }) {
+            let displayName = CreatureIdentity.name(for: animal.traits, in: .none)
+            guard let receipt = AnimalCompanionCombatRules.originReceipt(
+                animal: animal, displayName: displayName, icon: "questionmark",
+                level: 1, provenance: .legacySchema14LevelOne) else {
+                throw CocoaError(.coderInvalidValue)
+            }
+            let id = TamedAnimalID(rawValue: rawID)
+            state.base.tamedAnimalCompanions[id] = .init(
+                id: id, originReceipt: receipt, level: 1,
+                experience: CharacterRules.experienceForLevel(1), gambits: [], posting: .menagerie)
+        }
+        state.schemaVersion = 15
+        guard state.validatesAnimalCompanionCombat() else { throw CocoaError(.coderInvalidValue) }
+        return try SaveCodec.makeEncoder().encode(state)
+    }
+
+    private static func validateCurrentAnimalCompanionCombat(in data: Data) throws {
+        guard let root = try JSONSerialization.jsonObject(with: data) as? [String: Any],
+              let base = root["base"] as? [String: Any],
+              let raw = base["tamedAnimalCompanions"] as? [String: Any] else {
+            throw CocoaError(.coderInvalidValue)
+        }
+        let stateKeys: Set<String> = ["version", "id", "originReceipt", "level", "experience",
+                                      "gambits", "posting"]
+        let receiptKeys: Set<String> = ["version", "derivationRulesVersion", "animalID",
+            "frozenDisplayName", "levelOneStats", "reach", "startingLevel", "startingExperience",
+            "instinctiveActionID", "dominantTechnique", "sourceProvenance"]
+        for (key, value) in raw {
+            guard let object = value as? [String: Any], Set(object.keys) == stateKeys,
+                  object["id"] as? String == key,
+                  let receipt = object["originReceipt"] as? [String: Any],
+                  Set(receipt.keys) == receiptKeys,
+                  receipt["animalID"] as? String == key else {
+                throw CocoaError(.coderInvalidValue)
+            }
+        }
+        let decoded = try SaveCodec.makeDecoder().decode(GameState.self, from: data)
+        guard decoded.validatesAnimalCompanionCombat() else { throw CocoaError(.coderInvalidValue) }
     }
 
     private static func migrate13to14(_ data: Data) throws -> Data {
@@ -151,6 +205,17 @@ enum Migrations {
               !reality.keys.contains("animalTrustRecords"),
               !reality.keys.contains("tamedAnimals") else {
             throw CocoaError(.coderInvalidValue)
+        }
+        // Older migration fixtures are produced from the newest encoder and may therefore carry
+        // a future empty field. Strip only that impossible-empty future shape before schema 14 is
+        // constructed; a real schema-14 payload must still omit the field at 14→15.
+        if var base = root["base"] as? [String: Any],
+           let future = base["tamedAnimalCompanions"] {
+            guard let empty = future as? [String: Any], empty.isEmpty else {
+                throw CocoaError(.coderInvalidValue)
+            }
+            base.removeValue(forKey: "tamedAnimalCompanions")
+            root["base"] = base
         }
         reality["animalTrustRecords"] = [:]
         reality["tamedAnimals"] = [:]

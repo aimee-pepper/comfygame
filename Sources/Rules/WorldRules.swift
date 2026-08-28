@@ -280,7 +280,9 @@ enum WorldRules {
         let enemy = run.enemies[index]
         let key = RealityState.AnimalTrustRecordV1.key(worldSeed: run.mapSeed, enemyID: enemyID)
         let tamedID = "tamed:\(run.mapSeed):\(enemyID.rawValue)"
-        if state.reality.tamedAnimals[tamedID] != nil {
+        let typedID = TamedAnimalID(rawValue: tamedID)
+        if state.reality.tamedAnimals[tamedID] != nil,
+           state.base.tamedAnimalCompanions[typedID] != nil {
             run.enemies.remove(at: index)
             state.worlds.activeRun = run
             return []
@@ -295,10 +297,32 @@ enum WorldRules {
             trustCondition: record.condition, joinedRunIndex: run.runIndex,
             joinedTurn: run.turnsTaken)
         guard tamed.validates(key: tamedID) else { return [.blocked("The animal record is unavailable.")] }
-        state.reality.tamedAnimals[tamedID] = tamed
+        let name = projectionName(for: record, in: run)
+        let level = AnimalCompanionCombatRules.resolvedLevel(
+            for: enemy, in: run, binderLevel: state.base.binderCharacter.level)
+        guard let origin = AnimalCompanionCombatRules.originReceipt(
+            animal: tamed, displayName: name, icon: enemy.icon, level: level,
+            provenance: .exactJoin(worldSeed: run.mapSeed, enemyID: enemyID,
+                                   runIndex: run.runIndex, turn: run.turnsTaken)) else {
+            return [.blocked("The animal record is unavailable.")]
+        }
+        let companion = TamedAnimalCompanionStateV1(
+            id: typedID, originReceipt: origin, level: level,
+            experience: CharacterRules.experienceForLevel(level), gambits: [],
+            posting: .travelling(runIndex: run.runIndex))
+        guard companion.validates(animal: tamed) else {
+            return [.blocked("The animal record is unavailable.")]
+        }
+        var candidate = state
+        candidate.reality.tamedAnimals[tamedID] = tamed
+        candidate.base.tamedAnimalCompanions[typedID] = companion
         run.enemies.remove(at: index)
-        state.worlds.activeRun = run
-        return [.animalJoined(projectionName(for: record, in: run))]
+        candidate.worlds.activeRun = run
+        guard candidate.validatesAnimalCompanionCombat() else {
+            return [.blocked("The animal record is unavailable.")]
+        }
+        state = candidate
+        return [.animalJoined(name)]
     }
 
     private static func projectionName(for record: RealityState.AnimalTrustRecordV1,
@@ -1866,13 +1890,35 @@ enum WorldRules {
                 }
             })
             : nil
+        let animalParticipants = Dictionary(uniqueKeysWithValues: party.compactMap { actor ->
+            (Combatant, EncounterState.AnimalCombatParticipantReceiptV1)? in
+            guard case .companion(let memberID) = actor,
+                  let companion = state.base.animalCompanion(for: memberID) else { return nil }
+            return (actor, .init(
+                animalID: companion.id, memberID: memberID,
+                frozenDisplayName: companion.originReceipt.frozenDisplayName,
+                level: companion.level,
+                scaledStats: AnimalCompanionCombatRules.scaledStats(companion),
+                reach: companion.originReceipt.reach,
+                availableActionIDs: [AnimalCompanionCombatRules.instinctiveActionID,
+                                     companion.originReceipt.dominantTechnique.rawValue],
+                dominantTechnique: companion.originReceipt.dominantTechnique,
+                gambits: companion.gambits,
+                gambitSlotCount: GambitEngine.availableSlots(for: actor, in: state),
+                commitStrengthMultiplier: Tuning.AnimalCompanionCombat.commitStrengthMultiplier,
+                originReceipt: companion.originReceipt))
+        })
         run.activeEncounter = CombatRules.makeEncounter(id: InstanceID(rawValue: run.rng.next()),
                                                         foes: foes,
                                                         party: party,
                                                         names: state.base.activeParty.reduce(into: [PersistentPartyMemberID: String]()) {
-                                                            guard let index = state.base.rosterIndex(for: $1) else { return }
-                                                            $0[$1] = state.base.roster[index].name
+                                                            if let animal = state.base.animalCompanion(for: $1) {
+                                                                $0[$1] = animal.originReceipt.frozenDisplayName
+                                                            } else if let index = state.base.rosterIndex(for: $1) {
+                                                                $0[$1] = state.base.roster[index].name
+                                                            }
                                                         },
+                                                        animalParticipants: animalParticipants,
                                                         apexActionSlots: scalingPreview.map { preview in
                                                             foes.filter(\.isApex).reduce(into: [:]) {
                                                                 $0[$1.id] = preview.apexActionSlots

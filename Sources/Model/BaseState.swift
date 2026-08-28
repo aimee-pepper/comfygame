@@ -1,5 +1,89 @@
 import Foundation
 
+struct TamedAnimalID: StringIdentifier, Comparable {
+    let rawValue: String
+    init(rawValue: String) { self.rawValue = rawValue }
+    static func < (lhs: Self, rhs: Self) -> Bool { lhs.rawValue < rhs.rawValue }
+
+    init?(animal: RealityState.TamedAnimalV1) {
+        let value = "tamed:\(animal.originWorldSeed):\(animal.originEnemyID.rawValue)"
+        guard animal.id == value else { return nil }
+        rawValue = value
+    }
+}
+
+enum AnimalPostingV1: Codable, Equatable, Sendable {
+    case travelling(runIndex: Int)
+    case menagerie
+    case activeParty
+}
+
+enum AnimalDominantTechniqueV1: String, Codable, Equatable, Sendable, CaseIterable {
+    case interpose = "animal.interpose"
+    case harrier = "animal.harrier"
+    case slipAway = "animal.slip_away"
+    case warningDisplay = "animal.warning_display"
+    case commit = "animal.commit"
+}
+
+enum AnimalCombatSourceProvenanceV1: Codable, Equatable, Sendable {
+    case exactJoin(worldSeed: UInt64, enemyID: InstanceID, runIndex: Int, turn: Int)
+    case legacySchema14LevelOne
+}
+
+struct AnimalCombatOriginReceiptV1: Codable, Equatable, Sendable {
+    static let version = 1
+    static let derivationRulesVersion = 1
+    var version = Self.version
+    var derivationRulesVersion = Self.derivationRulesVersion
+    var animalID: TamedAnimalID
+    var frozenDisplayName: String
+    var levelOneStats: CombatStats
+    var reach: Reach
+    var startingLevel: Int
+    var startingExperience: Int
+    var instinctiveActionID = "animal.instinctive_attack"
+    var dominantTechnique: AnimalDominantTechniqueV1
+    var sourceProvenance: AnimalCombatSourceProvenanceV1
+
+    func validates(animal: RealityState.TamedAnimalV1) -> Bool {
+        guard version == Self.version,
+              derivationRulesVersion == Self.derivationRulesVersion,
+              TamedAnimalID(animal: animal) == animalID,
+              !frozenDisplayName.isEmpty,
+              (1...Tuning.Character.maximumLevel).contains(startingLevel),
+              startingExperience == CharacterRules.experienceForLevel(startingLevel),
+              instinctiveActionID == "animal.instinctive_attack",
+              reach == animal.traits.armament.reach,
+              dominantTechnique == AnimalCompanionCombatRules.dominantTechnique(for: animal.traits)
+        else { return false }
+        let expected = CombatStats.derived(from: animal.traits,
+                                           name: frozenDisplayName,
+                                           icon: levelOneStats.icon)
+        return expected == levelOneStats
+    }
+}
+
+struct TamedAnimalCompanionStateV1: Codable, Equatable, Sendable {
+    static let version = 1
+    var version = Self.version
+    var id: TamedAnimalID
+    var originReceipt: AnimalCombatOriginReceiptV1
+    var level: Int
+    var experience: Int
+    var gambits: [GambitRule]
+    var posting: AnimalPostingV1
+
+    func validates(animal: RealityState.TamedAnimalV1) -> Bool {
+        guard version == Self.version, id == originReceipt.animalID,
+              originReceipt.validates(animal: animal),
+              (1...Tuning.Character.maximumLevel).contains(level),
+              experience >= CharacterRules.experienceForLevel(level) else { return false }
+        return level == Tuning.Character.maximumLevel
+            || experience < CharacterRules.experienceForLevel(level + 1)
+    }
+}
+
 struct FieldKitPreparationEntry: Codable, Equatable, Sendable, Identifiable {
     var itemID: ItemID
     var desiredCount: Int
@@ -183,6 +267,8 @@ struct BaseState: Codable, Equatable, Sendable {
     /// to my party from the fire pit."* It was one index, so the fire could only ever hand you one
     /// person however many you had found.
     var activeParty: [PersistentPartyMemberID] = [.founderQuill]
+    /// Mutable combat/progression state for every unreleased tamed animal.
+    var tamedAnimalCompanions: [TamedAnimalID: TamedAnimalCompanionStateV1] = [:]
 
     /// The first of them. Kept only for the handful of places that genuinely mean "the one in
     /// front" — everything about *the party* reads `activeParty`.
@@ -190,7 +276,15 @@ struct BaseState: Codable, Equatable, Sendable {
 
     /// Everybody in the fight, you included, in turn-order-agnostic order.
     var partyMembers: [PartyMember] {
-        [.binder] + activeParty.filter { rosterIndex(for: $0) != nil }.map(PartyMember.member)
+        [.binder] + activeParty.filter {
+            rosterIndex(for: $0) != nil || animalCompanion(for: $0)?.posting == .activeParty
+        }.map(PartyMember.member)
+    }
+
+    func animalCompanion(for id: PersistentPartyMemberID) -> TamedAnimalCompanionStateV1? {
+        let prefix = "animal:"
+        guard id.rawValue.hasPrefix(prefix) else { return nil }
+        return tamedAnimalCompanions[TamedAnimalID(rawValue: String(id.rawValue.dropFirst(prefix.count)))]
     }
 
     /// How many more can come. The Binder is one of the five.
@@ -462,7 +556,8 @@ struct BaseState: Codable, Equatable, Sendable {
         case ownedHands, hasChainingUnlock, instrumentLoadout
         case hasConfiguredInstrumentLoadout
         case ownedSources
-        case roster, activeCompanion, activeParty, binderEquipped, hasAutomateSelfUnlock, satchelTier
+        case roster, activeCompanion, activeParty, tamedAnimalCompanions
+        case binderEquipped, hasAutomateSelfUnlock, satchelTier
         case purchasedGambitSlots, binderGambits, binderCharacter
         case companion
     }
@@ -513,6 +608,7 @@ struct BaseState: Codable, Equatable, Sendable {
         try c.encode(ownedHands, forKey: .ownedHands)
         try c.encode(roster, forKey: .roster)
         try c.encode(activeParty, forKey: .activeParty)
+        try c.encode(tamedAnimalCompanions, forKey: .tamedAnimalCompanions)
         try c.encode(binderEquipped, forKey: .binderEquipped)
         try c.encode(hasAutomateSelfUnlock, forKey: .hasAutomateSelfUnlock)
         try c.encode(satchelTier, forKey: .satchelTier)
@@ -663,6 +759,8 @@ struct BaseState: Codable, Equatable, Sendable {
             activeParty = [try container.decodeIfPresent(PersistentPartyMemberID.self,
                                                           forKey: .activeCompanion) ?? .founderQuill]
         }
+        tamedAnimalCompanions = try container.decodeIfPresent(
+            [TamedAnimalID: TamedAnimalCompanionStateV1].self, forKey: .tamedAnimalCompanions) ?? [:]
         binderEquipped = try container.decodeIfPresent([GearSlot: EquippedPiece].self, forKey: .binderEquipped) ?? [:]
         hasAutomateSelfUnlock = try container.decodeIfPresent(Bool.self, forKey: .hasAutomateSelfUnlock) ?? false
         satchelTier = try container.decodeIfPresent(Int.self, forKey: .satchelTier) ?? 0

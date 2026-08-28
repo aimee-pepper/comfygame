@@ -43,6 +43,21 @@ enum CombatItemUseCommitResult: Equatable, Sendable {
 /// acceptance criteria name. One tap, one saved fight state.
 extension GameStore {
 
+    func animalCombatEvaluation(_ command: AnimalCombatCommandV1, owner: Combatant)
+        -> Result<AnimalCombatQuoteV1, AnimalCombatRefusalV1> {
+        AnimalCompanionCombatRules.evaluate(command, owner: owner, in: state)
+    }
+
+    @discardableResult
+    func commitAnimalCombat(_ quote: AnimalCombatQuoteV1) -> AnimalCombatCommitResultV1 {
+        var result: AnimalCombatCommitResultV1 = .refused(.staleQuote)
+        mutate("animal combat: \(quote.owner.storageKey)", flush: true, scope: .expedition) { state in
+            result = AnimalCompanionCombatRules.commit(quote, in: &state)
+            if result == .committed { CombatRules.runAutomaticTurns(in: &state) }
+        }
+        return result
+    }
+
     var activeEncounter: EncounterState? { state.worlds.activeRun?.activeEncounter }
 
     /// Whose turn it is, when the game is waiting on the player.
@@ -240,7 +255,27 @@ extension GameStore {
     func toggleCompanionOverride() {
         guard activeEncounter?.outcome == nil else { return }
         mutate("companion override", flush: true, scope: .expedition) { state in
-            state.worlds.activeRun?.activeEncounter?.isCompanionOverridden.toggle()
+            guard var encounter = state.worlds.activeRun?.activeEncounter else { return }
+            let living = encounter.order.filter {
+                if case .companion = $0 { return CombatRules.isAlive($0, in: state.worlds.activeRun!) }
+                return false
+            }
+            guard living.count == 1, let owner = living.first else { return }
+            encounter.manualOverrideOwner = encounter.manualOverrideOwner == owner ? nil : owner
+            encounter.isCompanionOverridden = encounter.manualOverrideOwner != nil
+            state.worlds.activeRun?.activeEncounter = encounter
+        }
+    }
+
+    func toggleCompanionOverride(for owner: Combatant) {
+        guard activeEncounter?.outcome == nil, case .companion = owner else { return }
+        mutate("companion override", flush: true, scope: .expedition) { state in
+            guard var run = state.worlds.activeRun, var encounter = run.activeEncounter,
+                  encounter.order.contains(owner), CombatRules.isAlive(owner, in: run) else { return }
+            encounter.manualOverrideOwner = encounter.manualOverrideOwner == owner ? nil : owner
+            encounter.isCompanionOverridden = encounter.manualOverrideOwner != nil
+            run.activeEncounter = encounter
+            state.worlds.activeRun = run
         }
     }
 

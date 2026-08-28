@@ -277,6 +277,37 @@ struct FoeState: Codable, Equatable, Identifiable, Sendable {
 /// A fight in progress. Saved in full — being mid-encounter is the hardest resume case in the game,
 /// and the one the acceptance criteria call out by name.
 struct EncounterState: Codable, Equatable, Sendable {
+    struct AnimalCombatParticipantReceiptV1: Codable, Equatable, Sendable {
+        static let version = 1
+        var version = Self.version
+        var animalID: TamedAnimalID
+        var memberID: PersistentPartyMemberID
+        var frozenDisplayName: String
+        var level: Int
+        var scaledStats: CombatStats
+        var reach: Reach
+        var availableActionIDs: [String]
+        var dominantTechnique: AnimalDominantTechniqueV1
+        var gambits: [GambitRule]
+        var gambitSlotCount: Int
+        var commitStrengthMultiplier: Double
+        var originReceipt: AnimalCombatOriginReceiptV1
+
+        func validates(companion: TamedAnimalCompanionStateV1) -> Bool {
+            version == Self.version && animalID == companion.id
+                && memberID == .animal(animalID.rawValue)
+                && frozenDisplayName == companion.originReceipt.frozenDisplayName
+                && level == companion.level
+                && scaledStats == AnimalCompanionCombatRules.scaledStats(companion)
+                && reach == companion.originReceipt.reach
+                && availableActionIDs == [AnimalCompanionCombatRules.instinctiveActionID,
+                                          companion.originReceipt.dominantTechnique.rawValue]
+                && dominantTechnique == companion.originReceipt.dominantTechnique
+                && gambits == companion.gambits && gambitSlotCount >= 1
+                && commitStrengthMultiplier.isFinite && commitStrengthMultiplier > 0
+                && originReceipt == companion.originReceipt
+        }
+    }
     struct DebugGodModeReceipt: Codable, Equatable, Sendable {
         static let schemaVersion = 1
         var version = schemaVersion
@@ -507,6 +538,8 @@ struct EncounterState: Codable, Equatable, Sendable {
     /// can change underneath it. It also means the log doesn't need the roster passed into every
     /// function that writes a line, which is what made a party of five awkward to name.
     var partyNames: [PersistentPartyMemberID: String] = [:]
+    /// Frozen exact-animal combat truth. Nil is legacy; modern encounters use an authoritative map.
+    var animalParticipants: [Combatant: AnimalCombatParticipantReceiptV1]? = nil
     /// Frozen DEBUG comparison inputs/results. Existing encounters decode without it.
     var scalingPreview: EncounterScalingRules.Preview?
     /// Non-nil only when DEBUG God mode was enabled as this encounter opened. Persisted so
@@ -681,6 +714,11 @@ struct EncounterState: Codable, Equatable, Sendable {
     /// Set by tapping the companion: their next turn is yours to direct instead of the gambits'.
     /// Clears once used — an override is for that turn only (the FF12 rule).
     var isCompanionOverridden: Bool = false
+    /// Exact animal whose next actionable turn is manually directed.
+    var manualOverrideOwner: Combatant? = nil
+    /// Nil is legacy. Modern animal encounters keep exact-owner target-priority receipts.
+    var animalSlipAwayOwners: Set<Combatant>? = nil
+    var animalWarningDisplayOwners: Set<Combatant>? = nil
 
     /// Non-nil once the fight is over and waiting to be dismissed.
     var outcome: EncounterOutcome?
@@ -725,6 +763,7 @@ struct EncounterState: Codable, Equatable, Sendable {
          debugV2Armour: DebugV2ArmourReceipt? = nil,
          debugV2Evasion: DebugV2EvasionReceipt? = nil,
          debugV2Resistance: DebugV2ResistanceReceipt? = nil,
+         animalParticipants: [Combatant: AnimalCombatParticipantReceiptV1]? = nil,
          ghostEvasionAvailable: Set<Combatant>? = nil,
          debugV2OwnedNodeIDs: [Combatant: Set<CombatNodeID>]? = nil,
          partyRanks: [Combatant: Rank] = [:],
@@ -740,6 +779,9 @@ struct EncounterState: Codable, Equatable, Sendable {
         self.debugV2Armour = debugV2Armour
         self.debugV2Evasion = debugV2Evasion
         self.debugV2Resistance = debugV2Resistance
+        self.animalParticipants = animalParticipants
+        self.animalSlipAwayOwners = animalParticipants == nil ? nil : []
+        self.animalWarningDisplayOwners = animalParticipants == nil ? nil : []
         self.debugGodMode = nil
         self.ghostEvasionAvailable = ghostEvasionAvailable
         self.debugV2OwnedNodeIDs = debugV2OwnedNodeIDs
@@ -773,6 +815,8 @@ struct EncounterState: Codable, Equatable, Sendable {
         foes = try c.decodeIfPresent([FoeState].self, forKey: .foes) ?? []
         partyNames = try c.decodeIfPresent([PersistentPartyMemberID: String].self,
                                             forKey: .partyNames) ?? [:]
+        animalParticipants = try c.decodeIfPresent(
+            [Combatant: AnimalCombatParticipantReceiptV1].self, forKey: .animalParticipants)
         scalingPreview = try c.decodeIfPresent(EncounterScalingRules.Preview.self, forKey: .scalingPreview)
         debugGodMode = try c.decodeIfPresent(DebugGodModeReceipt.self, forKey: .debugGodMode)
         debugV2BinderAttack = try c.decodeIfPresent(DebugV2BinderAttackReceipt.self,
@@ -887,6 +931,14 @@ struct EncounterState: Codable, Equatable, Sendable {
         skippedTurns = try c.decodeIfPresent([Combatant: Int].self, forKey: .skippedTurns) ?? [:]
         recoveryComplete = try c.decodeIfPresent(Set<Combatant>.self, forKey: .recoveryComplete) ?? []
         isCompanionOverridden = try c.decodeIfPresent(Bool.self, forKey: .isCompanionOverridden) ?? false
+        manualOverrideOwner = try c.decodeIfPresent(Combatant.self, forKey: .manualOverrideOwner)
+        if manualOverrideOwner == nil, isCompanionOverridden {
+            manualOverrideOwner = order.first { if case .companion = $0 { true } else { false } }
+        }
+        animalSlipAwayOwners = try c.decodeIfPresent(Set<Combatant>.self,
+                                                       forKey: .animalSlipAwayOwners)
+        animalWarningDisplayOwners = try c.decodeIfPresent(Set<Combatant>.self,
+                                                            forKey: .animalWarningDisplayOwners)
         outcome = try c.decodeIfPresent(EncounterOutcome.self, forKey: .outcome)
         if c.contains(.creatureMaterialRewardResolution) {
             guard try !c.decodeNil(forKey: .creatureMaterialRewardResolution) else {

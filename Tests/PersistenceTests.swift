@@ -43,7 +43,7 @@ final class PersistenceTests: XCTestCase {
         let legacy = try JSONSerialization.data(withJSONObject: root, options: [.sortedKeys])
 
         let migrated = try SaveCodec.decode(legacy)
-        XCTAssertEqual(migrated.schemaVersion, 14)
+        XCTAssertEqual(migrated.schemaVersion, Tuning.saveSchemaVersion)
         XCTAssertTrue(migrated.reality.animalTrustRecords.isEmpty)
         XCTAssertTrue(migrated.reality.tamedAnimals.isEmpty)
         XCTAssertEqual(try SaveCodec.decode(SaveCodec.encode(migrated)), migrated)

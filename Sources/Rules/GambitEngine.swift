@@ -40,9 +40,11 @@ enum GambitEngine {
     static func rules(for actor: Combatant, in state: GameState) -> [GambitRule] {
         switch actor {
         case .companion(let id):
-            state.base.rosterIndex(for: id).map { state.base.roster[$0].gambits } ?? []
-        case .binder: state.base.hasAutomateSelfUnlock ? state.base.binderGambits : []
-        case .foe: []
+            return state.worlds.activeRun?.activeEncounter?.animalParticipants?[actor]?.gambits
+                ?? state.base.animalCompanion(for: id)?.gambits
+                ?? state.base.rosterIndex(for: id).map { state.base.roster[$0].gambits } ?? []
+        case .binder: return state.base.hasAutomateSelfUnlock ? state.base.binderGambits : []
+        case .foe: return []
         }
     }
 
@@ -66,6 +68,9 @@ enum GambitEngine {
             + state.base.purchasedGambitSlots     // researched; lost in a reset
             + state.reality.bonusGambitSlots      // bought with motes; survives everything
         guard actor.isParty else { return shared }
+        if case .companion(let id) = actor, state.base.animalCompanion(for: id) != nil {
+            return shared
+        }
         return shared + CharacterRules.gambitSlots(state.base.character(actor.member).stats)
     }
 

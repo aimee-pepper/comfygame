@@ -16,12 +16,17 @@ enum Tuning {
 
     /// Save-file schema version. Bump when `GameState`'s shape changes incompatibly and add a
     /// step in `Migrations.swift`.
-    static let saveSchemaVersion: Int = 14
+    static let saveSchemaVersion: Int = 15
 
     enum AnimalTrust {
         static let patientTurns = 2
         static let offeringPropertyThreshold: Double = 60
         static let attendRange = 2
+    }
+
+    enum AnimalCompanionCombat {
+        /// Reversible playtest coefficient frozen into each participant receipt.
+        static let commitStrengthMultiplier = 1.5
     }
 
     // MARK: - Book authoring

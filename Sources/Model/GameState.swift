@@ -91,6 +91,9 @@ struct GameState: Codable, Equatable, Sendable {
                 }
             }) else { throw CocoaError(.coderInvalidValue) }
         }
+        if schemaVersion >= 15, !validatesAnimalCompanionCombat() {
+            throw CocoaError(.coderInvalidValue)
+        }
         if schemaVersion >= 4 {
             let runs = [worlds.activeRun].compactMap { $0 } + worlds.anchoredRealms.map(\.world)
             for run in runs {

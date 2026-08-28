@@ -34,6 +34,23 @@ enum FieldKitDepartureEvaluation: Equatable, Sendable {
 
 /// Player actions inside a world. Each one is a turn, and each one is saved.
 extension GameStore {
+    func animalPartyQuote(_ animalID: TamedAnimalID)
+        -> Result<AnimalPartyQuoteV1, AnimalPartyRefusalV1> {
+        AnimalCompanionCombatRules.evaluatePartyChange(animalID, in: state)
+    }
+
+    @discardableResult
+    func commitAnimalPartyChange(_ quote: AnimalPartyQuoteV1) -> AnimalPartyCommitResultV1 {
+        var result: AnimalPartyCommitResultV1 = .refused(.staleQuote)
+        mutateIf("animal party posting", flush: true, scope: .ordinary) { state in
+            var candidate = state
+            result = AnimalCompanionCombatRules.commitPartyChange(quote, in: &candidate)
+            guard result == .committed else { return false }
+            state = candidate
+            return true
+        }
+        return result
+    }
     static func legacyFieldKitSuggestion(in state: GameState) -> [FieldKitPreparationEntry] {
         let capacity = state.base.satchelCapacity
         let available: (ItemID) -> Int = { itemID in
@@ -186,12 +203,14 @@ extension GameStore {
             run.carriedInstrumentPrecisions = Dictionary(uniqueKeysWithValues:
                 run.carriedInstruments.map { ($0, state.reality.instrumentPrecision(for: $0)) })
             run.partyProgressAtStart = state.base.partyMembers.map { member in
+                let animal = member.persistentID.flatMap { state.base.animalCompanion(for: $0) }
                 let character = state.base.character(member)
-                let name = member.persistentID.flatMap { id in
+                let name = animal?.originReceipt.frozenDisplayName ?? member.persistentID.flatMap { id in
                     state.base.rosterIndex(for: id).map { state.base.roster[$0].name }
                 } ?? "You"
                 return RunProgressStart(member: member, name: name,
-                                        experience: character.experience, level: character.level)
+                                        experience: animal?.experience ?? character.experience,
+                                        level: animal?.level ?? character.level)
             }
             run.foundPagesAtStart = Set(state.reality.library.foundPages)
             run.foundWritingsAtStart = Set(state.reality.library.foundWritings.map(\.id))
@@ -821,6 +840,7 @@ extension GameStore {
         mutateIf("return home", flush: true, scope: .expedition) { state in
             guard var run = state.worlds.activeRun else { return false }
             Self.discardUnanchoredIncompleteAnimalTrust(for: run, in: &state)
+            AnimalCompanionCombatRules.returnTravellingAnimals(runIndex: run.runIndex, in: &state)
             let departureState = WorldDepartureState.capture(from: run)
             if let stackID {
                 guard let index = run.satchelItems.stacks.firstIndex(where: { $0.id == stackID })
@@ -874,6 +894,7 @@ extension GameStore {
         mutateIf("run ended: \(reason)", flush: true, scope: .expedition) { state in
             guard var run = state.worlds.activeRun else { return false }
             Self.discardUnanchoredIncompleteAnimalTrust(for: run, in: &state)
+            AnimalCompanionCombatRules.returnTravellingAnimals(runIndex: run.runIndex, in: &state)
             let departureState = WorldDepartureState.capture(from: run)
             let outcomeID = state.worlds.mintOutcomeID()
             Self.resolveRecoveredTeachingOffer(in: &run, outcomeID: outcomeID, state: &state)

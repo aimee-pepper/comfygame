@@ -157,6 +157,8 @@
 		5B91181B627494D599038230 /* constellation.json in Resources */ = {isa = PBXBuildFile; fileRef = DD0C594698AE7E6D06191449 /* constellation.json */; };
 		5BA053D5F38A0AE4F9E782C3 /* SiteTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1BB569F0B672F268545701C /* SiteTests.swift */; };
 		5BAABA4D069D949BB71CA216 /* WorldRules.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DB361F4E36998C9A7F31A44 /* WorldRules.swift */; };
+		ACC150000000000000000002 /* AnimalCompanionCombatRules.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACC150000000000000000001 /* AnimalCompanionCombatRules.swift */; };
+		ACC150000000000000000004 /* AnimalCompanionCombatTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACC150000000000000000003 /* AnimalCompanionCombatTests.swift */; };
 		5C566924739958DDBD8FBFF9 /* StationStaffingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A994CD6D435E84CB0C58E988 /* StationStaffingTests.swift */; };
 		5DEF7F6C69BC916C96535B2D /* TerrainTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7E8A2DF6BF1E7AB1B5B574C /* TerrainTests.swift */; };
 		5FE46B0BE1FA690A55635C78 /* TradingPostRules.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4CD14CCF42EC2DE49E1F617 /* TradingPostRules.swift */; };
@@ -525,6 +527,8 @@
 		9576197010FD2BAC456588C6 /* gambit_pieces.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = gambit_pieces.json; sourceTree = "<group>"; };
 		961E1AC7BEB7E7C4C243CAD1 /* ExclusivityTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExclusivityTests.swift; sourceTree = "<group>"; };
 		99D023496EC834EA78E9BE63 /* CombatRules.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CombatRules.swift; sourceTree = "<group>"; };
+		ACC150000000000000000001 /* AnimalCompanionCombatRules.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimalCompanionCombatRules.swift; sourceTree = "<group>"; };
+		ACC150000000000000000003 /* AnimalCompanionCombatTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimalCompanionCombatTests.swift; sourceTree = "<group>"; };
 		9A5E11DF83FB060B8C22D36A /* WorldInspectionRules.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorldInspectionRules.swift; sourceTree = "<group>"; };
 		9A91FFF6BF680BAFC6742249 /* WorldScaleAndNightTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorldScaleAndNightTests.swift; sourceTree = "<group>"; };
 		9BE7FAE39BDF3B01C8F7B497 /* LivingAnalysisView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LivingAnalysisView.swift; sourceTree = "<group>"; };
@@ -663,6 +667,7 @@
 		21AAB30585002EFE1DBBC7F6 /* Rules */ = {
 			isa = PBXGroup;
 			children = (
+				ACC150000000000000000001 /* AnimalCompanionCombatRules.swift */,
 				B8E261DE325914CF72D32BD5 /* ApexRules.swift */,
 				CAAE51E0323DDA3AA3015D22 /* ArmouryRules.swift */,
 				A588AFCFC47B584CE07F3B4E /* BestiaryRules.swift */,
@@ -982,6 +987,7 @@
 				01DD7C9C85D04883D2042EFF /* Fixtures */,
 				CA9D12FE35D80EBAAD321DB4 /* ApexTests.swift */,
 				29C0E5CEA72598582B970714 /* ArmouryTests.swift */,
+				ACC150000000000000000003 /* AnimalCompanionCombatTests.swift */,
 				5B5EAF43921CF15DDB7B1488 /* BaseBoardTests.swift */,
 				L20000000000000000000002 /* ResourceSpriteV1RegistryTests.swift */,
 				H20000000000000000000001 /* CreaturePixelIdentityTests.swift */,
@@ -1342,6 +1348,7 @@
 				A1B2C3D4E5F60718293A4B5C /* ProgressionRequirementPresentation.swift in Sources */,
 				C1D2E3F40516273849A5B6C7 /* GearPresentationCopy.swift in Sources */,
 				BE5D3BC36C9F1D8030CFEE81 /* CombatRules.swift in Sources */,
+				ACC150000000000000000002 /* AnimalCompanionCombatRules.swift in Sources */,
 				E0C67C543BF911F3F58A0C80 /* CombatTreeModels.swift in Sources */,
 				3333DDA45D780B04AC00F1C2 /* CombatTreeRules.swift in Sources */,
 				04A394B9CE1582C902CDEFB2 /* CombatTreeView.swift in Sources */,
@@ -1578,6 +1585,7 @@
 				11BD659A05151A43A4F78554 /* WorldTests.swift in Sources */,
 				B16000000000000000000004 /* SeamlightRulesTests.swift in Sources */,
 				B34000000000000000000004 /* EquipmentInscriptionRulesTests.swift in Sources */,
+				ACC150000000000000000004 /* AnimalCompanionCombatTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

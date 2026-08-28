@@ -72,6 +72,7 @@ enum CombatRules {
     ///   order** — this is where a party of five becomes real, and it used to be a hardcoded two.
     static func makeEncounter(id: InstanceID, foes: [FoeState], party: [Combatant] = [.binder, .companion(0)],
                               names: [PersistentPartyMemberID: String] = [:],
+                              animalParticipants: [Combatant: EncounterState.AnimalCombatParticipantReceiptV1]? = nil,
                               apexActionSlots: [InstanceID: Int] = [:],
                               ordinaryPressureSlots: Int = 0,
                               initiallyUnrecordedSpecies: Set<String> = [],
@@ -163,6 +164,7 @@ enum CombatRules {
             debugV2Armour: debugV2Armour,
             debugV2Evasion: debugV2Evasion,
             debugV2Resistance: debugV2Resistance,
+            animalParticipants: animalParticipants,
             ghostEvasionAvailable: ghostEvasionAvailable,
             debugV2OwnedNodeIDs: debugV2OwnedNodeIDs,
             partyRanks: partyRanks,
@@ -197,17 +199,21 @@ enum CombatRules {
     /// are. That's a real equipping decision rather than "wear the highest tier".
     static func stats(of actor: Combatant, in state: GameState) -> CharacterStats? {
         switch actor {
-        case .binder: state.base.binderCharacter.stats
-        case .companion(let index): state.base.character(.member(index)).stats
-        case .foe: nil
+        case .binder: return state.base.binderCharacter.stats
+        case .companion(let index):
+            guard state.base.animalCompanion(for: index) == nil else { return nil }
+            return state.base.character(.member(index)).stats
+        case .foe: return nil
         }
     }
 
     static func rank(of actor: Combatant, in state: GameState) -> Rank {
         switch actor {
-        case .binder: state.base.binderCharacter.rank
-        case .companion(let index): state.base.character(.member(index)).rank
-        case .foe: .front
+        case .binder: return state.base.binderCharacter.rank
+        case .companion(let index):
+            return state.base.animalCompanion(for: index) == nil
+                ? state.base.character(.member(index)).rank : .front
+        case .foe: return .front
         }
     }
 
@@ -232,11 +238,17 @@ enum CombatRules {
     /// carrying a piercing blade while Quill carries a rending one is a real answer to a world that
     /// grew both plated and furred things.
     static func damageKind(for actor: Combatant, in state: GameState) -> DamageKind? {
-        equipped(.weapon, for: actor, in: state)?.frozenDamage
+        if case .companion(let id) = actor,
+           let animal = state.base.animalCompanion(for: id) {
+            return AnimalCompanionCombatRules.scaledStats(animal).damageKind
+        }
+        return equipped(.weapon, for: actor, in: state)?.frozenDamage
     }
 
     static func reach(for actor: Combatant, in state: GameState) -> Reach {
-        equipped(.weapon, for: actor, in: state)?.frozenReach ?? .close
+        if case .companion(let id) = actor,
+           let animal = state.base.animalCompanion(for: id) { return animal.originReceipt.reach }
+        return equipped(.weapon, for: actor, in: state)?.frozenReach ?? .close
     }
 
     /// Whether this foe can include a party member in any attack it can currently perform. Foes
@@ -292,6 +304,13 @@ enum CombatRules {
     }
 
     static func companionAttack(_ id: PersistentPartyMemberID, in state: GameState) -> Int {
+        if let frozen = state.worlds.activeRun?.activeEncounter?
+            .animalParticipants?[.companion(id)] {
+            return frozen.scaledStats.attack
+        }
+        if let animal = state.base.animalCompanion(for: id) {
+            return AnimalCompanionCombatRules.scaledStats(animal).attack
+        }
         let member = PartyMember.member(id)
         let power = state.base.worn(.weapon, by: member)?.effectivePower ?? 0
         let total = Double(Tuning.Encounter.companionBaseAttack
@@ -1258,16 +1277,19 @@ enum CombatRules {
     static func maximumHealth(of actor: Combatant, in state: GameState) -> Int {
         switch actor {
         case .binder:
-            CharacterRules.maximumHealth(state.base.binderCharacter, base: Tuning.Encounter.binderMaxHP)
+            return CharacterRules.maximumHealth(state.base.binderCharacter, base: Tuning.Encounter.binderMaxHP)
                 + loadout(of: actor, in: state).maxHP
         case .companion(let id):
-            CharacterRules.maximumHealth(state.base.character(.member(id)),
-                                         base: state.base.rosterIndex(for: id)
-                                             .map { state.base.roster[$0].maxHP }
-                                             ?? Tuning.Encounter.companionMaxHP)
+            if let animal = state.base.animalCompanion(for: id) {
+                return AnimalCompanionCombatRules.scaledStats(animal).maxHP
+            }
+            return CharacterRules.maximumHealth(state.base.character(.member(id)),
+                                                 base: state.base.rosterIndex(for: id)
+                                                     .map { state.base.roster[$0].maxHP }
+                                                     ?? Tuning.Encounter.companionMaxHP)
                 + loadout(of: actor, in: state).maxHP
         case .foe:
-            0
+            return 0
         }
     }
 
@@ -1296,11 +1318,15 @@ enum CombatRules {
                                                          base: Tuning.Encounter.binderMaxHP)
                     + (explicitV2 ? 0 : loadout(of: actor, in: state).maxHP)
             case .companion(let id):
-                ordinary = CharacterRules.maximumHealth(
-                    state.base.character(.member(id)),
-                    base: state.base.rosterIndex(for: id).map { state.base.roster[$0].maxHP }
-                        ?? Tuning.Encounter.companionMaxHP)
-                    + (explicitV2 ? 0 : loadout(of: actor, in: state).maxHP)
+                if let animal = state.base.animalCompanion(for: id) {
+                    ordinary = AnimalCompanionCombatRules.scaledStats(animal).maxHP
+                } else {
+                    ordinary = CharacterRules.maximumHealth(
+                        state.base.character(.member(id)),
+                        base: state.base.rosterIndex(for: id).map { state.base.roster[$0].maxHP }
+                            ?? Tuning.Encounter.companionMaxHP)
+                        + (explicitV2 ? 0 : loadout(of: actor, in: state).maxHP)
+                }
             case .foe:
                 ordinary = 1
             }
@@ -1584,7 +1610,10 @@ enum CombatRules {
         if committedCost == .normal { encounter.firstNormalActionCompleted?.insert(actor) }
 
         // The FF12 rule: an override covers that turn and then hands control back.
-        if actor.persistentPartyMemberID != nil { encounter.isCompanionOverridden = false }
+        if encounter.manualOverrideOwner == actor {
+            encounter.manualOverrideOwner = nil
+            encounter.isCompanionOverridden = false
+        }
         // Recovery knowledge describes exactly the first completed action after the debt cleared.
         encounter.recoveryComplete.remove(actor)
 
@@ -2567,6 +2596,9 @@ enum CombatRules {
     /// reaches combat rather than only the tree screen.
     static func loadout(of actor: Combatant, in state: GameState) -> CombatTreeRules.Loadout {
         guard actor.isParty else { return CombatTreeRules.Loadout() }
+        if case .companion(let id) = actor, state.base.animalCompanion(for: id) != nil {
+            return CombatTreeRules.Loadout()
+        }
         return CombatTreeRules.loadout(for: state.base.character(actor.member))
     }
 
@@ -2666,6 +2698,7 @@ enum CombatRules {
             if usesPersonalTurnAuthority(encounter) {
                 encounter.personalTurn = .init(owner: who)
             }
+            encounter.animalSlipAwayOwners?.remove(who)
             // A newly reached scheduled personal turn mints one Breaking Blow opportunity. Extra
             // action credits return above without clearing this receipt and therefore share it.
             encounter.breakingBlowScheduledSpent?.remove(who)
@@ -2685,6 +2718,7 @@ enum CombatRules {
 
     static func startNewRound(_ encounter: inout EncounterState, run: WorldRun) {
         normalizeV2EvasionState(&encounter)
+        encounter.animalWarningDisplayOwners?.removeAll()
         if var states = encounter.untouchableStates {
             for actor in states.keys {
                 guard var state = states[actor] else { continue }
@@ -2888,7 +2922,7 @@ enum CombatRules {
             // Manual until you've bought the right to automate yourself, and still manual if you
             // bought it and set no rules — an empty list shouldn't mean "stand there".
             return !state.base.hasAutomateSelfUnlock || state.base.binderGambits.isEmpty
-        case .companion: return encounter.isCompanionOverridden
+        case .companion: return encounter.manualOverrideOwner == encounter.current
         case .foe: return false
         }
     }
@@ -2946,7 +2980,15 @@ enum CombatRules {
         let visibleTargets = standing.filter { (encounter.concealed[$0] ?? 0) <= 0 }
         // Concealment redirects attention while another legal target exists; an entirely concealed
         // party does not make the encounter unable to act.
-        let targetable = visibleTargets.isEmpty ? standing : visibleTargets
+        var targetable = visibleTargets.isEmpty ? standing : visibleTargets
+        if let warning = encounter.animalWarningDisplayOwners,
+           let exact = targetable.sorted(by: { $0.storageKey < $1.storageKey })
+            .first(where: warning.contains) {
+            targetable = [exact]
+        } else if let slipped = encounter.animalSlipAwayOwners {
+            let ordinary = targetable.filter { !slipped.contains($0) }
+            if !ordinary.isEmpty { targetable = ordinary }
+        }
 
         // **The front rank takes the melee** (session 17 §4). Targeting was uniform, so standing at
         // the back was pure upside — less damage, no more risk of being chosen — which is half a
@@ -3139,6 +3181,14 @@ enum CombatRules {
             } else {
                 hurt(target, by: amount, braceApplies: braceApplies,
                      run: &run, encounter: &encounter)
+            }
+            if isSingleTargetDirect,
+               encounter.animalWarningDisplayOwners?.contains(target) == true,
+               let retaliation = encounter.animalParticipants?[target]?.scaledStats.retaliation,
+               retaliation > 0,
+               encounter.foes.first(where: { $0.id == foeID })?.isAlive == true {
+                hurt(.foe(foeID), by: retaliation, run: &run, encounter: &encounter)
+                encounter.note("\(actorName(target, encounter: encounter)) answers for \(retaliation).")
             }
             if wasStanding, !isAlive(target, in: run), target.persistentPartyMemberID != nil {
                 encounter.note("\(actorName(target, encounter: encounter)) goes down. They'll be all right at home.")
@@ -3343,7 +3393,12 @@ enum CombatRules {
     private static func awardExperience(for foes: [FoeState], run: inout WorldRun,
                                         encounter: inout EncounterState,
                                         state: inout GameState) {
-        let partyLevel = state.base.partyMembers.map { state.base.character($0).level }.max() ?? 1
+        let partyLevel = state.base.partyMembers.map { member -> Int in
+            if let id = member.persistentID, let animal = state.base.animalCompanion(for: id) {
+                return animal.level
+            }
+            return state.base.character(member).level
+        }.max() ?? 1
         let earned = foes.reduce(0) {
             $0 + CharacterRules.experience(forDefeating: $1, partyLevel: partyLevel)
         }
@@ -3352,15 +3407,28 @@ enum CombatRules {
         var gained: [String] = []
         for member in state.base.partyMembers {
             var levels = 0
-            state.base.withCharacter(member) { levels = CharacterRules.award(earned, to: &$0) }
+            if let id = member.persistentID, var animal = state.base.animalCompanion(for: id) {
+                let oldLevel = animal.level
+                animal.experience += earned
+                animal.level = min(Tuning.Character.maximumLevel,
+                                   CharacterRules.level(forExperience: animal.experience))
+                levels = animal.level - oldLevel
+                state.base.tamedAnimalCompanions[animal.id] = animal
+            } else {
+                state.base.withCharacter(member) { levels = CharacterRules.award(earned, to: &$0) }
+            }
             if levels > 0 {
                 let name: String
-                if let id = member.persistentID, let index = state.base.rosterIndex(for: id) {
+                if let id = member.persistentID, let animal = state.base.animalCompanion(for: id) {
+                    name = "\(animal.originReceipt.frozenDisplayName) is"
+                } else if let id = member.persistentID, let index = state.base.rosterIndex(for: id) {
                     name = "\(state.base.roster[index].name) is"
                 } else {
                     name = "You are"
                 }
-                gained.append("\(name) level \(state.base.character(member).level).")
+                let finalLevel = member.persistentID.flatMap { state.base.animalCompanion(for: $0)?.level }
+                    ?? state.base.character(member).level
+                gained.append("\(name) level \(finalLevel).")
             }
         }
         run.experienceBreakdown.combat += earned
