@@ -221,14 +221,15 @@ enum AnimalCompanionCombatRules {
             candidate.worlds.activeRun?.activeEncounter?
                 .animalParticipants?[quote.owner] = receipt
             candidate.worlds.activeRun?.activeEncounter?.skippedTurns[quote.owner, default: 0] += 1
-        case .interpose:
+        case .interpose(let ally):
             guard var encounter = candidate.worlds.activeRun?.activeEncounter else {
                 return .refused(.staleQuote)
             }
             encounter.interposeReceipts = encounter.interposeReceipts ?? []
             encounter.interposeReceipts?.removeAll { $0.owner == quote.owner }
             encounter.interposeReceipts?.append(.init(
-                owner: quote.owner, activationSequence: encounter.nextInterposeActivationSequence))
+                owner: quote.owner, selectedAlly: ally,
+                activationSequence: encounter.nextInterposeActivationSequence))
             encounter.nextInterposeActivationSequence += 1
             let name = quote.owner.persistentPartyMemberID
                 .flatMap { encounter.partyNames[$0] } ?? "Animal"
@@ -296,6 +297,14 @@ extension GameState {
             if let override = encounter.manualOverrideOwner,
                case .companion(let id) = override, id.rawValue.hasPrefix("animal:"),
                !animalActors.contains(override) { return false }
+            if let interposeReceipts = encounter.interposeReceipts {
+                for receipt in interposeReceipts where animalActors.contains(receipt.owner) {
+                    guard let selectedAlly = receipt.selectedAlly,
+                          selectedAlly != receipt.owner,
+                          selectedAlly.isParty,
+                          encounter.order.contains(selectedAlly) else { return false }
+                }
+            }
         }
         return true
     }

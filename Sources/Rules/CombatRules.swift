@@ -3070,7 +3070,9 @@ enum CombatRules {
             if redirectable, let receipts = encounter.interposeReceipts {
                 let intendedTarget = target
                 let candidates = receipts.filter {
-                    $0.owner != intendedTarget && isAlive($0.owner, in: run)
+                    $0.owner != intendedTarget
+                        && ($0.selectedAlly == nil || $0.selectedAlly == intendedTarget)
+                        && isAlive($0.owner, in: run)
                 }.sorted {
                     if $0.activationSequence != $1.activationSequence {
                         return $0.activationSequence < $1.activationSequence

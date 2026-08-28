@@ -700,6 +700,9 @@ struct EncounterState: Codable, Equatable, Sendable {
     var interposing: [Combatant: Int] = [:]
     struct InterposeReceipt: Codable, Equatable, Sendable {
         var owner: Combatant
+        /// Animal Interpose protects one exact selected ally. `nil` is retained for the existing
+        /// human Protection-node receipt, whose action has no ally parameter.
+        var selectedAlly: Combatant? = nil
         var activationSequence: UInt64
     }
     var interposeReceipts: [InterposeReceipt]?

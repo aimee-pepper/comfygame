@@ -3,15 +3,18 @@ import XCTest
 
 final class AnimalCompanionCombatTests: XCTestCase {
     private func animalState(posting: AnimalPostingV1 = .menagerie,
-                             level: Int = 1) throws -> (GameState, TamedAnimalID) {
+                             level: Int = 1,
+                             defence: DefenceBranch? = nil) throws -> (GameState, TamedAnimalID) {
         var state = GameState.newGame()
         let enemyID = InstanceID(rawValue: 501)
         let seed: UInt64 = 9001
         let condition = RealityState.AnimalTrustConditionV1.usefulOffering(
             property: .hardness, threshold: 0)
+        var traits = CreatureTraits()
+        traits.defence = defence
         let trust = RealityState.AnimalTrustRecordV1(
             worldSeed: seed, enemyID: enemyID, speciesID: InstanceID(rawValue: 77), creatureID: nil,
-            traits: CreatureTraits(), condition: condition, progress: 1,
+            traits: traits, condition: condition, progress: 1,
             firstAttendedRunIndex: 1, firstAttendedTurn: 2, lastProgressTurn: nil,
             interactionCount: 1, completed: true)
         let rawID = "tamed:\(seed):\(enemyID.rawValue)"
@@ -202,5 +205,80 @@ final class AnimalCompanionCombatTests: XCTestCase {
         XCTAssertEqual(state.worlds.activeRun?.activeEncounter?.skippedTurns[actor], 1)
         XCTAssertEqual(state.worlds.activeRun?.activeEncounter?
             .animalParticipants?[actor]?.scaledStats, participant.scaledStats)
+    }
+
+    func testAnimalInterposeProtectsOnlySelectedBinderAcrossRelaunch() throws {
+        var (state, id) = try animalState(posting: .activeParty, defence: .armour)
+        let animal = Combatant.companion(.animal(id.rawValue))
+        let quill = Combatant.companion(.founderQuill)
+        let companion = try XCTUnwrap(state.base.tamedAnimalCompanions[id])
+        let participant = EncounterState.AnimalCombatParticipantReceiptV1(
+            animalID: id, memberID: .animal(id.rawValue),
+            frozenDisplayName: companion.originReceipt.frozenDisplayName,
+            level: companion.level, scaledStats: AnimalCompanionCombatRules.scaledStats(companion),
+            reach: companion.originReceipt.reach,
+            availableActionIDs: [AnimalCompanionCombatRules.instinctiveActionID,
+                                 AnimalDominantTechniqueV1.interpose.rawValue],
+            dominantTechnique: .interpose, gambits: [], gambitSlotCount: 1,
+            commitStrengthMultiplier: Tuning.AnimalCompanionCombat.commitStrengthMultiplier,
+            originReceipt: companion.originReceipt)
+        let point = GridPoint(x: 0, y: 0)
+        var map = WorldMap(width: 1, height: 1, tiles: [Tile(isRevealed: true)], entry: point)
+        map[point].content = .portal(isEntry: true)
+        var run = WorldRun(runIndex: 1, book: BoundBook(written: [], essencePaid: 0),
+                           mapSeed: 1, rng: SeededRNG(seed: 1), map: map,
+                           playerPosition: point)
+        let foeID = InstanceID(rawValue: 771)
+        let foe = FoeState(id: foeID,
+                           stats: CombatStats(displayName: "Attacker", icon: "ant",
+                                              maxHP: 30, attack: 4, delivery: .single),
+                           currentHP: 30)
+        var encounter = EncounterState(
+            id: InstanceID(rawValue: 772), foes: [foe],
+            partyNames: [.founderQuill: "Quill", .animal(id.rawValue): "Test animal"],
+            order: [animal, .foe(foeID), .binder, quill],
+            turnSlots: [animal, .foe(foeID), .binder, quill].map { .init(actor: $0) },
+            animalParticipants: [animal: participant],
+            partyRanks: [animal: .front, .binder: .front, quill: .front])
+        encounter.revealed.insert(foeID)
+        encounter.debugV2Evasion = .init(entries: [animal, .binder, quill].map {
+            .init(actor: $0, characterEvasion: 0, components: [])
+        })
+        run.binderHP = 30
+        run.companionHP[.founderQuill] = 30
+        run.companionHP[.animal(id.rawValue)] = participant.scaledStats.maxHP
+        run.activeEncounter = encounter
+        state.worlds.activeRun = run
+
+        let quote = try AnimalCompanionCombatRules.evaluate(
+            .interpose(ally: .binder), owner: animal, in: state).get()
+        XCTAssertEqual(AnimalCompanionCombatRules.commit(quote, in: &state), .committed)
+        XCTAssertEqual(state.worlds.activeRun?.activeEncounter?.interposeReceipts?.first?.selectedAlly,
+                       .binder)
+
+        let saved = try SaveCodec.makeEncoder().encode(state)
+        state = try SaveCodec.makeDecoder().decode(GameState.self, from: saved)
+        XCTAssertEqual(state.worlds.activeRun?.activeEncounter?.interposeReceipts?.first?.selectedAlly,
+                       .binder)
+
+        state.worlds.activeRun?.activeEncounter?.drawOffReceipts = [foeID: .init(
+            owner: quill, activationRound: 1, expiresBeforeRound: 3)]
+        let animalBeforeQuill = try XCTUnwrap(state.worlds.activeRun?.companionHP[.animal(id.rawValue)])
+        CombatRules.runAutomaticTurns(in: &state)
+        XCTAssertLessThan(try XCTUnwrap(state.worlds.activeRun?.companionHP[.founderQuill]), 30)
+        XCTAssertEqual(state.worlds.activeRun?.companionHP[.animal(id.rawValue)], animalBeforeQuill)
+        XCTAssertEqual(state.worlds.activeRun?.activeEncounter?.interposeReceipts?.count, 1)
+
+        state.worlds.activeRun?.activeEncounter?.turnIndex = 1
+        state.worlds.activeRun?.activeEncounter?.drawOffReceipts = [foeID: .init(
+            owner: .binder, activationRound: 1, expiresBeforeRound: 3)]
+        let binderBefore = try XCTUnwrap(state.worlds.activeRun?.binderHP)
+        let animalBeforeBinder = try XCTUnwrap(
+            state.worlds.activeRun?.companionHP[.animal(id.rawValue)])
+        CombatRules.runAutomaticTurns(in: &state)
+        XCTAssertEqual(state.worlds.activeRun?.binderHP, binderBefore)
+        XCTAssertLessThan(try XCTUnwrap(
+            state.worlds.activeRun?.companionHP[.animal(id.rawValue)]), animalBeforeBinder)
+        XCTAssertTrue(state.worlds.activeRun?.activeEncounter?.interposeReceipts?.isEmpty == true)
     }
 }
