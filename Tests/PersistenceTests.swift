@@ -1262,7 +1262,7 @@ final class PersistenceTests: XCTestCase {
         XCTAssertEqual(reloaded.rng.next(), expectedNext, "Resuming must not rewind the RNG stream")
     }
 
-    func testCorruptSaveFallsBackToBackupAndQuarantinesTheBadFile() throws {
+    func testCorruptSaveIsReadOnlyAndDoesNotSilentlyPromoteBackup() throws {
         var good = GameState.newGame()
         good.base.essence = 555
         try io.write(SaveCodec.encode(good))
@@ -1270,15 +1270,11 @@ final class PersistenceTests: XCTestCase {
         try io.write(SaveCodec.encode(good))
         try Data("{ not json".utf8).write(to: io.saveURL)
 
-        guard case .recoveredFromBackup(let recovered, _) = io.load() else {
-            return XCTFail("Expected recovery from the backup file")
-        }
-        XCTAssertEqual(recovered.base.essence, 555)
-
-        let quarantined = try FileManager.default
-            .contentsOfDirectory(atPath: io.directory.path(percentEncoded: false))
-            .filter { $0.contains("corrupt") }
-        XCTAssertFalse(quarantined.isEmpty, "A bad save must be moved aside, never deleted")
+        let primary = try Data(contentsOf: io.saveURL)
+        let backup = try Data(contentsOf: io.backupURL)
+        guard case .unrecoverable = io.load() else { return XCTFail("Expected read-only failure") }
+        XCTAssertEqual(try Data(contentsOf: io.saveURL), primary)
+        XCTAssertEqual(try Data(contentsOf: io.backupURL), backup)
     }
 
     /// Adding a field to a layer must not cost a player their save.

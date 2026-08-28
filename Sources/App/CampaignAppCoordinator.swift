@@ -57,6 +57,7 @@ final class CampaignAppCoordinator: ObservableObject {
         case idle
         case loading
         case choosing([SaveSlotDescriptor])
+        case recoveryAvailable(CampaignRecoveryAssessmentV1)
         case opening
         case playing(GameStore)
         case failed(String)
@@ -111,6 +112,13 @@ final class CampaignAppCoordinator: ObservableObject {
                 let clock = ContinuousClock()
                 let earliestChooser = clock.now.advanced(by: minimumInitialDisplay)
                 let startedAt = DispatchTime.now().uptimeNanoseconds
+                if let assessment = await slots.assessRawRecovery(),
+                   case .recoverableRawBackup = assessment.classification {
+                    guard generation == token else { return }
+                    phase = .recoveryAvailable(assessment)
+                    task = nil
+                    return
+                }
                 _ = try await slots.adoptLegacyIfNeeded()
                 let adoptedAt = DispatchTime.now().uptimeNanoseconds
                 guard generation == token else { return }
@@ -194,6 +202,35 @@ final class CampaignAppCoordinator: ObservableObject {
         guard task == nil else { return }
         phase = .idle
         start()
+    }
+
+    func confirmRawRecovery(_ assessment: CampaignRecoveryAssessmentV1) {
+        guard case .recoveryAvailable = phase, task == nil else { return }
+        phase = .loading
+        task = Task { [weak self] in
+            guard let self else { return }
+            do {
+                _ = try await slots.recoverRawBackup(assessment)
+                phase = .idle
+                task = nil
+                start()
+            } catch let refusal as CampaignRecoveryRefusalV1 {
+                phase = .failed(refusal.playerCopy)
+                task = nil
+            } catch {
+                phase = .failed(CampaignRecoveryRefusalV1.writeFailed.playerCopy)
+                task = nil
+            }
+        }
+    }
+
+    func exportRawRecoverySource() {
+        guard task == nil else { return }
+        task = Task { [weak self] in
+            guard let self else { return }
+            exportFile = CampaignExportFile(url: await slots.legacyExportURL())
+            task = nil
+        }
     }
 
     /// Flushes the active autosave, retires its write capability, then returns to the chooser.
@@ -340,6 +377,17 @@ struct CampaignAppRootView: View {
                     onDelete: coordinator.delete,
                     onExport: coordinator.export
                 )
+            case .recoveryAvailable(let assessment):
+                VStack(spacing: 16) {
+                    Text("Needs recovery").font(.title2.bold())
+                    Text("A complete earlier copy is available. Recover this campaign? The current file will be preserved unchanged.")
+                        .foregroundStyle(.secondary).multilineTextAlignment(.center)
+                    Button("Recover campaign") { coordinator.confirmRawRecovery(assessment) }
+                        .buttonStyle(.borderedProminent)
+                    Button("Export save", action: coordinator.exportRawRecoverySource)
+                        .buttonStyle(.bordered)
+                }
+                .padding(24)
             case .playing(let store):
                 RootView()
                     .environmentObject(store)

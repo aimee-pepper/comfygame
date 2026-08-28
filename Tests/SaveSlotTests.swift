@@ -745,7 +745,7 @@ final class SaveSlotTests: XCTestCase {
                 .path(percentEncoded: false)))
     }
 
-    func testCorruptLegacyPrimaryAdoptsOneHealthyBackupAndArchivesBoth() async throws {
+    func testCorruptLegacyPrimaryRequiresExplicitRecoveryAndPreservesBoth() async throws {
         let root = directory()
         defer { try? FileManager.default.removeItem(at: root) }
         try FileManager.default.createDirectory(at: root, withIntermediateDirectories: true)
@@ -756,20 +756,170 @@ final class SaveSlotTests: XCTestCase {
         try healthyBytes.write(to: root.appending(path: "bookbinder-save.json.backup"))
         let io = SaveSlotFileIO(directory: root)
 
-        let adoptedResult = try await io.adoptLegacyIfNeeded()
-        let adopted = try XCTUnwrap(adoptedResult)
-        let slots = await io.inspect()
-        XCTAssertEqual(slots.count, 1)
-        XCTAssertEqual(slots.first?.id, adopted)
-        XCTAssertTrue(slots[0].isValid)
-        let loaded = try await io.load(adopted)
-        XCTAssertEqual(loaded.state.base.essence, 818)
+        let automaticAdoption = try await io.adoptLegacyIfNeeded()
+        XCTAssertNil(automaticAdoption)
+        let assessed = await io.assessRawRecovery()
+        let assessment = try XCTUnwrap(assessed)
+        guard case .recoverableRawBackup(let primaryFingerprint, _) = assessment.classification else {
+            return XCTFail("expected explicit recovery")
+        }
+        XCTAssertEqual(try Data(contentsOf: root.appending(path: "bookbinder-save.json")), corrupt)
+        XCTAssertEqual(try Data(contentsOf: root.appending(path: "bookbinder-save.json.backup")), healthyBytes)
+        let recoveredID = try await io.recoverRawBackup(assessment)
+        XCTAssertEqual(recoveredID, SaveSlotFileIO.legacyID(for: healthyBytes))
+        XCTAssertEqual(try Data(contentsOf: root.appending(path: "bookbinder-save.json")), healthyBytes)
+        XCTAssertEqual(try Data(contentsOf: root.appending(path: "bookbinder-save.json.backup")), healthyBytes)
         XCTAssertEqual(try Data(contentsOf: root.appending(
-            path: "bookbinder-save.json.legacy-corrupt-primary")), corrupt)
-        XCTAssertEqual(try Data(contentsOf: root.appending(
-            path: "bookbinder-save.json.legacy-adopted")), healthyBytes)
-        let repeated = try await io.adoptLegacyIfNeeded()
-        XCTAssertNil(repeated)
+            path: "bookbinder-save.json.recovery-original-\(primaryFingerprint.sha256)")), corrupt)
+    }
+
+    func testRawRecoveryAssessmentRejectsChangedSourceWithoutMutation() async throws {
+        let root = directory()
+        defer { try? FileManager.default.removeItem(at: root) }
+        try FileManager.default.createDirectory(at: root, withIntermediateDirectories: true)
+        let primaryURL = root.appending(path: "bookbinder-save.json")
+        let backupURL = root.appending(path: "bookbinder-save.json.backup")
+        let corrupt = Data("broken primary".utf8)
+        let backup = try SaveCodec.encode(.newGame())
+        try corrupt.write(to: primaryURL)
+        try backup.write(to: backupURL)
+        let io = SaveSlotFileIO(directory: root)
+        let assessed = await io.assessRawRecovery()
+        let assessment = try XCTUnwrap(assessed)
+        let changed = Data("changed after assessment".utf8)
+        try changed.write(to: primaryURL)
+
+        do {
+            _ = try await io.recoverRawBackup(assessment)
+            XCTFail("expected stale assessment")
+        } catch {
+            XCTAssertEqual(error as? CampaignRecoveryRefusalV1, .staleAssessment)
+        }
+        XCTAssertEqual(try Data(contentsOf: primaryURL), changed)
+        XCTAssertEqual(try Data(contentsOf: backupURL), backup)
+    }
+
+    func testSlotRecoveryAssessmentSeparatesFuturePayloadAndPreservesEnvelope() async throws {
+        let root = directory()
+        defer { try? FileManager.default.removeItem(at: root) }
+        let io = SaveSlotFileIO(directory: root)
+        let created = try await io.create(name: "Future")
+        let url = try await io.exportURL(for: created.metadata.id)
+        var envelope = try SaveCodec.makeDecoder().decode(
+            SaveSlotEnvelope.self, from: Data(contentsOf: url))
+        var payload = try XCTUnwrap(JSONSerialization.jsonObject(with: envelope.payload)
+            as? [String: Any])
+        payload["schemaVersion"] = Tuning.saveSchemaVersion + 1
+        envelope.payload = try JSONSerialization.data(withJSONObject: payload)
+        let bytes = try SaveCodec.makeEncoder().encode(envelope)
+        try bytes.write(to: url, options: .atomic)
+
+        let assessment = await io.assessSlotRecovery(created.metadata.id)
+        guard case .futureIncompatible(let found, let supported) = assessment.classification else {
+            return XCTFail("expected future payload")
+        }
+        XCTAssertEqual(found, Tuning.saveSchemaVersion + 1)
+        XCTAssertEqual(supported, Tuning.saveSchemaVersion)
+        XCTAssertEqual(try Data(contentsOf: url), bytes)
+    }
+
+    func testRawRecoveryIsIdempotentAndCreatesOneDeterministicArchive() async throws {
+        let root = directory()
+        defer { try? FileManager.default.removeItem(at: root) }
+        try FileManager.default.createDirectory(at: root, withIntermediateDirectories: true)
+        let primaryURL = root.appending(path: "bookbinder-save.json")
+        let backupURL = root.appending(path: "bookbinder-save.json.backup")
+        let corrupt = Data("corrupt idempotent primary".utf8)
+        let backup = try SaveCodec.encode(.newGame())
+        try corrupt.write(to: primaryURL)
+        try backup.write(to: backupURL)
+        let io = SaveSlotFileIO(directory: root)
+        let assessed = await io.assessRawRecovery()
+        let assessment = try XCTUnwrap(assessed)
+        guard case .recoverableRawBackup(let primaryFingerprint, _) = assessment.classification else {
+            return XCTFail("expected recovery")
+        }
+
+        let first = try await io.recoverRawBackup(assessment)
+        let second = try await io.recoverRawBackup(assessment)
+        XCTAssertEqual(first, second)
+        XCTAssertEqual(try Data(contentsOf: primaryURL), backup)
+        XCTAssertEqual(try Data(contentsOf: backupURL), backup)
+        let archiveName = "bookbinder-save.json.recovery-original-\(primaryFingerprint.sha256)"
+        XCTAssertEqual(try Data(contentsOf: root.appending(path: archiveName)), corrupt)
+        XCTAssertEqual(try FileManager.default.contentsOfDirectory(atPath: root.path)
+            .filter { $0.hasPrefix("bookbinder-save.json.recovery-original-") }.count, 1)
+    }
+
+    func testRawRecoveryArchiveAndDestinationCollisionsAreAtomic() async throws {
+        for collision in ["archive", "destination"] {
+            let root = directory()
+            defer { try? FileManager.default.removeItem(at: root) }
+            try FileManager.default.createDirectory(at: root, withIntermediateDirectories: true)
+            let primaryURL = root.appending(path: "bookbinder-save.json")
+            let backupURL = root.appending(path: "bookbinder-save.json.backup")
+            let corrupt = Data("collision primary".utf8)
+            let backup = try SaveCodec.encode(.newGame())
+            try corrupt.write(to: primaryURL)
+            try backup.write(to: backupURL)
+            let io = SaveSlotFileIO(directory: root)
+            let assessed = await io.assessRawRecovery()
+            let assessment = try XCTUnwrap(assessed)
+            guard case .recoverableRawBackup(let primaryFingerprint, let backupFingerprint) =
+                    assessment.classification else { return XCTFail("expected recovery") }
+            if collision == "archive" {
+                try Data("different archive".utf8).write(to: root.appending(
+                    path: "bookbinder-save.json.recovery-original-\(primaryFingerprint.sha256)"))
+            } else {
+                let slots = root.appending(path: "bookbinder-slots", directoryHint: .isDirectory)
+                try FileManager.default.createDirectory(at: slots, withIntermediateDirectories: true)
+                try Data("different destination".utf8).write(to: slots.appending(
+                    path: "\(backupFingerprint.identity.description).slot.json"))
+            }
+            do {
+                _ = try await io.recoverRawBackup(assessment)
+                XCTFail("expected collision refusal")
+            } catch { }
+            XCTAssertEqual(try Data(contentsOf: primaryURL), corrupt)
+            XCTAssertEqual(try Data(contentsOf: backupURL), backup)
+        }
+    }
+
+    func testSlotIdentityMismatchAssessmentPreservesExactEnvelope() async throws {
+        let root = directory()
+        defer { try? FileManager.default.removeItem(at: root) }
+        let io = SaveSlotFileIO(directory: root)
+        let created = try await io.create(name: "Identity")
+        let url = try await io.exportURL(for: created.metadata.id)
+        var envelope = try SaveCodec.makeDecoder().decode(
+            SaveSlotEnvelope.self, from: Data(contentsOf: url))
+        envelope.metadata.id = SaveSlotID()
+        let bytes = try SaveCodec.makeEncoder().encode(envelope)
+        try bytes.write(to: url, options: .atomic)
+
+        let assessment = await io.assessSlotRecovery(created.metadata.id)
+        XCTAssertEqual(assessment.classification, .invalid(.slotIdentityMismatch))
+        XCTAssertEqual(try Data(contentsOf: url), bytes)
+    }
+
+    func testCompletePendingTransactionClassifiesPlayableWithoutMutation() async throws {
+        let root = directory()
+        defer { try? FileManager.default.removeItem(at: root) }
+        try FileManager.default.createDirectory(at: root, withIntermediateDirectories: true)
+        var state = GameState.newGame()
+        state.worlds.pendingAnchorSettlement = true
+        let bytes = try SaveCodec.encode(state)
+        let primaryURL = root.appending(path: "bookbinder-save.json")
+        try bytes.write(to: primaryURL)
+        let io = SaveSlotFileIO(directory: root)
+
+        let assessed = await io.assessRawRecovery()
+        let assessment = try XCTUnwrap(assessed)
+        guard case .playable(_, _, let hasPending) = assessment.classification else {
+            return XCTFail("expected playable")
+        }
+        XCTAssertTrue(hasPending)
+        XCTAssertEqual(try Data(contentsOf: primaryURL), bytes)
     }
 
     func testCorruptLegacyPrimaryAndBackupBecomeOneVisibleInvalidSlot() async throws {

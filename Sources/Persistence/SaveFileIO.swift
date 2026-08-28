@@ -114,31 +114,8 @@ struct SaveFileIO: GamePersistenceIO {
             return .loaded(try SaveCodec.decode(Data(contentsOf: saveURL)))
         } catch {
             Logger.persistence.error("Primary save unreadable: \(String(describing: error))")
-
-            if FileManager.default.fileExists(atPath: backupURL.path(percentEncoded: false)) {
-                do {
-                    let state = try SaveCodec.decode(Data(contentsOf: backupURL))
-                    quarantine(saveURL)
-                    return .recoveredFromBackup(state, reason: shortReason(error))
-                } catch {
-                    Logger.persistence.error("Backup save also unreadable: \(String(describing: error))")
-                }
-            }
-
-            quarantine(saveURL)
-            quarantine(backupURL)
             return .unrecoverable(reason: shortReason(error))
         }
-    }
-
-    /// Never delete a player's save, even a broken one — move it aside so it can be recovered by
-    /// hand or mailed to us.
-    private func quarantine(_ url: URL) {
-        guard FileManager.default.fileExists(atPath: url.path(percentEncoded: false)) else { return }
-        let stamp = ISO8601DateFormatter().string(from: Date()).replacingOccurrences(of: ":", with: "-")
-        let destination = directory.appending(path: "\(url.lastPathComponent).corrupt-\(stamp)")
-        try? FileManager.default.moveItem(at: url, to: destination)
-        Logger.persistence.error("Quarantined \(url.lastPathComponent) → \(destination.lastPathComponent)")
     }
 
     private func shortReason(_ error: Error) -> String {

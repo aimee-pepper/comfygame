@@ -1,5 +1,55 @@
 import Foundation
 
+struct CampaignRecoveryFingerprintV1: Equatable, Sendable {
+    var byteCount: Int
+    var sha256: String
+    var probedSchemaVersion: Int?
+    var identity: SaveSlotID
+}
+
+enum CampaignRecoverySubjectV1: Equatable, Sendable {
+    case rawSave
+    case slot(SaveSlotID)
+}
+
+enum CampaignRecoveryRefusalV1: Error, Equatable, Sendable {
+    case unreadablePrimary, unreadableBackup, noValidatedRecoverySource
+    case futureEnvelope(found: Int, supported: Int)
+    case futurePayload(found: Int, supported: Int)
+    case slotIdentityMismatch, invalidMigration, invalidReceipt, staleAssessment
+    case destinationCollision, archiveCollision, writeFailed
+
+    var playerCopy: String {
+        switch self {
+        case .futureEnvelope, .futurePayload:
+            "This campaign was made by a newer version of Bookbinder. Update the app to open it."
+        case .slotIdentityMismatch:
+            "The recovery copy belongs to a different campaign. Nothing was changed."
+        case .staleAssessment:
+            "The campaign changed while recovery was being prepared. Nothing was changed. Inspect it again."
+        case .writeFailed, .archiveCollision, .destinationCollision:
+            "Recovery did not finish. The original campaign is still preserved."
+        default:
+            "This campaign cannot be recovered automatically. Export the unchanged save for recovery."
+        }
+    }
+}
+
+enum CampaignRecoveryClassificationV1: Equatable, Sendable {
+    case playable(sourceVersion: Int, migratedVersion: Int, hasCompletePendingTransaction: Bool)
+    case recoverableRawBackup(primary: CampaignRecoveryFingerprintV1,
+                              backup: CampaignRecoveryFingerprintV1)
+    case invalid(CampaignRecoveryRefusalV1)
+    case futureIncompatible(foundVersion: Int, supportedVersion: Int)
+}
+
+struct CampaignRecoveryAssessmentV1: Equatable, Sendable {
+    var subject: CampaignRecoverySubjectV1
+    var sourceSHA256: String
+    var metadata: SaveSlotMetadata?
+    var classification: CampaignRecoveryClassificationV1
+}
+
 struct SaveSlotID: RawRepresentable, Codable, Hashable, Sendable, CustomStringConvertible {
     var rawValue: UUID
 

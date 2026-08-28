@@ -55,6 +55,11 @@ actor SaveSlotFileIO {
         }
         let primaryValid = primary.flatMap { try? decodePayload($0) } != nil
         let backupValid = backup.flatMap { try? decodePayload($0) } != nil
+        if !primaryValid, backupValid {
+            // Choosing an earlier copy over an existing primary is destructive recovery and must
+            // be explicitly confirmed through recoverRawBackup(_:), never during app launch.
+            return nil
+        }
         // A corrupt primary never masks its last known-good backup. If both are broken, preserve
         // exactly one visible invalid slot (the primary when present) rather than inventing state.
         let payload: Data
@@ -74,7 +79,9 @@ actor SaveSlotFileIO {
         }
         let id = Self.legacyID(for: payload)
         let destination = slotURL(id)
-        if !FileManager.default.fileExists(atPath: destination.path(percentEncoded: false)) {
+        let destinationExisted = FileManager.default.fileExists(
+            atPath: destination.path(percentEncoded: false))
+        if !destinationExisted {
             let metadata: SaveSlotMetadata
             if let state = try? decodePayload(payload) {
                 metadata = .make(id: id, name: "Legacy campaign", state: state,
@@ -91,6 +98,15 @@ actor SaveSlotFileIO {
         if readActiveSelection() == nil, descriptor(at: destination).isValid {
             try writeActiveSelection(id)
         }
+        if primaryValid, backupValid, primary == backup {
+            // Explicit recovery intentionally preserves the validated .backup byte-for-byte.
+            // The digest-owned destination makes repeated launches converge without another copy.
+            return id
+        }
+        if !primaryValid && !backupValid {
+            // The visible wrapper is export-only; both original raw sources remain untouched.
+            return destinationExisted ? nil : id
+        }
         if usedBackup {
             try archiveIfPresent(legacySaveURL, as: "bookbinder-save.json.legacy-corrupt-primary")
             try archiveIfPresent(backupURL, as: "bookbinder-save.json.legacy-adopted")
@@ -103,7 +119,134 @@ actor SaveSlotFileIO {
         return id
     }
 
+    func assessRawRecovery() -> CampaignRecoveryAssessmentV1? {
+        let backupURL = rootDirectory.appending(path: "bookbinder-save.json.backup")
+        let primary = try? Data(contentsOf: legacySaveURL)
+        let backup = try? Data(contentsOf: backupURL)
+        guard let source = primary ?? backup else { return nil }
+        let sourceHash = Self.sha256(source)
+        if let primary, let version = Migrations.probeSchemaVersion(primary),
+           version > Tuning.saveSchemaVersion {
+            return .init(subject: .rawSave, sourceSHA256: sourceHash, metadata: nil,
+                         classification: .futureIncompatible(foundVersion: version,
+                                                              supportedVersion: Tuning.saveSchemaVersion))
+        }
+        if let primary, let state = try? decodePayload(primary) {
+            let version = Migrations.probeSchemaVersion(primary) ?? Tuning.saveSchemaVersion
+            return .init(subject: .rawSave, sourceSHA256: sourceHash, metadata: nil,
+                         classification: .playable(sourceVersion: version,
+                                                   migratedVersion: Tuning.saveSchemaVersion,
+                                                   hasCompletePendingTransaction:
+                                                    Self.hasCompletePendingTransaction(state)))
+        }
+        guard let backup else {
+            return .init(subject: .rawSave, sourceSHA256: sourceHash, metadata: nil,
+                         classification: .invalid(.noValidatedRecoverySource))
+        }
+        guard (try? decodePayload(backup)) != nil else {
+            return .init(subject: .rawSave, sourceSHA256: sourceHash, metadata: nil,
+                         classification: .invalid(.noValidatedRecoverySource))
+        }
+        return .init(subject: .rawSave, sourceSHA256: sourceHash, metadata: nil,
+                     classification: .recoverableRawBackup(primary: Self.fingerprint(primary ?? Data()),
+                                                           backup: Self.fingerprint(backup)))
+    }
+
+    func assessSlotRecovery(_ id: SaveSlotID) -> CampaignRecoveryAssessmentV1 {
+        let url = slotURL(id)
+        guard let bytes = try? Data(contentsOf: url) else {
+            return .init(subject: .slot(id), sourceSHA256: "", metadata: nil,
+                         classification: .invalid(.unreadablePrimary))
+        }
+        let hash = Self.sha256(bytes)
+        guard let envelope = try? decoder().decode(SaveSlotEnvelope.self, from: bytes) else {
+            return .init(subject: .slot(id), sourceSHA256: hash, metadata: nil,
+                         classification: .invalid(.noValidatedRecoverySource))
+        }
+        guard envelope.metadata.id == id else {
+            return .init(subject: .slot(id), sourceSHA256: hash, metadata: nil,
+                         classification: .invalid(.slotIdentityMismatch))
+        }
+        if envelope.schemaVersion > SaveSlotEnvelope.schemaVersion {
+            return .init(subject: .slot(id), sourceSHA256: hash, metadata: envelope.metadata,
+                         classification: .futureIncompatible(foundVersion: envelope.schemaVersion,
+                                                              supportedVersion: SaveSlotEnvelope.schemaVersion))
+        }
+        if let version = Migrations.probeSchemaVersion(envelope.payload),
+           version > Tuning.saveSchemaVersion {
+            return .init(subject: .slot(id), sourceSHA256: hash, metadata: envelope.metadata,
+                         classification: .futureIncompatible(foundVersion: version,
+                                                              supportedVersion: Tuning.saveSchemaVersion))
+        }
+        guard let state = try? decodePayload(envelope.payload) else {
+            return .init(subject: .slot(id), sourceSHA256: hash, metadata: envelope.metadata,
+                         classification: .invalid(.invalidMigration))
+        }
+        let version = Migrations.probeSchemaVersion(envelope.payload) ?? Tuning.saveSchemaVersion
+        return .init(subject: .slot(id), sourceSHA256: hash, metadata: envelope.metadata,
+                     classification: .playable(sourceVersion: version,
+                                               migratedVersion: Tuning.saveSchemaVersion,
+                                               hasCompletePendingTransaction:
+                                                Self.hasCompletePendingTransaction(state)))
+    }
+
+    @discardableResult
+    func recoverRawBackup(_ assessment: CampaignRecoveryAssessmentV1) throws -> SaveSlotID {
+        guard case .rawSave = assessment.subject,
+              case .recoverableRawBackup(let expectedPrimary, let expectedBackup) = assessment.classification else {
+            throw CampaignRecoveryRefusalV1.noValidatedRecoverySource
+        }
+        let backupURL = rootDirectory.appending(path: "bookbinder-save.json.backup")
+        let primary = try? Data(contentsOf: legacySaveURL)
+        let backup = try? Data(contentsOf: backupURL)
+        if let primary, let backup, Self.fingerprint(primary) == expectedBackup,
+           Self.fingerprint(backup) == expectedBackup,
+           (try? decodePayload(primary)) != nil {
+            return Self.legacyID(for: primary)
+        }
+        guard let backup,
+              Self.fingerprint(primary ?? Data()) == expectedPrimary,
+              Self.fingerprint(backup) == expectedBackup else {
+            throw CampaignRecoveryRefusalV1.staleAssessment
+        }
+        guard (try? decodePayload(backup)) != nil else {
+            throw CampaignRecoveryRefusalV1.noValidatedRecoverySource
+        }
+        let destination = slotURL(expectedBackup.identity)
+        if let existing = try? Data(contentsOf: destination) {
+            guard let envelope = try? decoder().decode(SaveSlotEnvelope.self, from: existing),
+                  envelope.metadata.id == expectedBackup.identity,
+                  envelope.payload == backup else {
+                throw CampaignRecoveryRefusalV1.destinationCollision
+            }
+        }
+        let archive = rootDirectory.appending(
+            path: "bookbinder-save.json.recovery-original-\(expectedPrimary.sha256)")
+        if let primary {
+            if let existing = try? Data(contentsOf: archive) {
+                guard existing == primary else { throw CampaignRecoveryRefusalV1.archiveCollision }
+            } else {
+                do { try primary.write(to: archive, options: .atomic) }
+                catch { throw CampaignRecoveryRefusalV1.writeFailed }
+            }
+        }
+        guard (try? Data(contentsOf: legacySaveURL)) == primary,
+              (try? Data(contentsOf: backupURL)) == backup else {
+            throw CampaignRecoveryRefusalV1.staleAssessment
+        }
+        do { try backup.write(to: legacySaveURL, options: .atomic) }
+        catch { throw CampaignRecoveryRefusalV1.writeFailed }
+        guard let committed = try? Data(contentsOf: legacySaveURL), committed == backup,
+              (try? decodePayload(committed)) != nil else {
+            if let primary { try? primary.write(to: legacySaveURL, options: .atomic) }
+            throw CampaignRecoveryRefusalV1.writeFailed
+        }
+        return Self.legacyID(for: backup)
+    }
+
     func activeSlotID() -> SaveSlotID? { readActiveSelection() }
+
+    func legacyExportURL() -> URL { legacySaveURL }
 
     /// Exact envelope export for corrupt/future recovery. Merely returning this URL performs no
     /// decode, quarantine or mutation; callers copy the whole file byte-for-byte.
@@ -383,5 +526,23 @@ actor SaveSlotFileIO {
         let hex = SHA256.hash(data: payload).prefix(16).map { String(format: "%02x", $0) }.joined()
         let value = "\(hex.prefix(8))-\(hex.dropFirst(8).prefix(4))-5\(hex.dropFirst(13).prefix(3))-a\(hex.dropFirst(17).prefix(3))-\(hex.dropFirst(20).prefix(12))"
         return SaveSlotID(rawValue: UUID(uuidString: value)!)
+    }
+
+    private static func sha256(_ data: Data) -> String {
+        SHA256.hash(data: data).map { String(format: "%02x", $0) }.joined()
+    }
+
+    private static func fingerprint(_ data: Data) -> CampaignRecoveryFingerprintV1 {
+        .init(byteCount: data.count, sha256: sha256(data),
+              probedSchemaVersion: Migrations.probeSchemaVersion(data),
+              identity: legacyID(for: data))
+    }
+
+    private static func hasCompletePendingTransaction(_ state: GameState) -> Bool {
+        !state.worlds.expeditionReviewQueue.pending.isEmpty
+            || state.worlds.pendingWorldArrivalReceiptID != nil
+            || state.worlds.pendingAnchorSettlement
+            || state.worlds.pendingAnchorSettlementOutcomeID != nil
+            || !state.reality.library.recoveredTeachingOffers.isEmpty
     }
 }
