@@ -357,6 +357,7 @@ struct ContentCatalog: Sendable {
         try requireUniqueIDs(resources.map(\.id.rawValue), label: "resource")
         try requireUniqueIDs(items.map(\.id.rawValue), label: "item")
         try validateGearCatalogueDisposition()
+        try validateBeneficialConsumableScaling()
         try requireUniqueIDs(skills.map(\.id.rawValue), label: "skill")
         try requireUniqueIDs(pressureTargets.map(\.id.rawValue), label: "pressure target")
         try requireUniqueIDs(pressureSources.map(\.id.rawValue), label: "pressure source")
@@ -1030,6 +1031,25 @@ struct ContentCatalog: Sendable {
         guard counts[.ordinaryFound] == 44, counts[.wildApexOnly] == 8,
               counts[.componentAuthoredFound] == 12, counts[.decodeOnly] == 11 else {
             throw ContentError.danglingReference("gear catalogue partition must be 44/8/12/11")
+        }
+    }
+
+    private func validateBeneficialConsumableScaling() throws {
+        let expected: [ItemID: ConsumableDef.BeneficialScalingField] = [
+            "salve_lesser": .healingMagnitude,
+            "salve": .healingMagnitude,
+            "salve_greater": .healingMagnitude,
+            "scent_mask": .timedDuration,
+        ]
+        for item in items where item.kind == .consumable {
+            guard let consumable = item.consumable else {
+                throw ContentError.danglingReference("consumable '\(item.id)' lacks effect metadata")
+            }
+            let required = expected[item.id] ?? .none
+            guard consumable.beneficialScalingField == required else {
+                throw ContentError.danglingReference(
+                    "consumable '\(item.id)' has wrong beneficial scaling field")
+            }
         }
     }
 

@@ -1,5 +1,19 @@
 import Foundation
 
+struct BeneficialItemEffectQuoteV1: Equatable, Sendable {
+    var stack: ItemStack
+    var usingActor: Combatant
+    var target: Combatant
+    var effect: ConsumableDef.Effect
+    var scalingField: ConsumableDef.BeneficialScalingField
+    var authoredValue: Int
+    var nodeBonus: Int
+    var finalValue: Int
+    var encounterID: InstanceID
+    var roundNumber: Int
+    var turnIndex: Int
+}
+
 /// How a fight resolves.
 ///
 /// Turn-based to the bone: nothing advances except by a call from a player action. The party acts
@@ -1521,7 +1535,7 @@ enum CombatRules {
 
         case .useItem(let stackID, let ally, let afflictionReceipt):
             if useItem(stackID, on: ally, afflictionReceipt: afflictionReceipt,
-                       run: &run, encounter: &encounter, state: &state) {
+                       actor: actor, run: &run, encounter: &encounter, state: &state) {
                 outcome = .committed(cost: .normal, completedDirectAttack: false)
             }
 
@@ -2423,6 +2437,7 @@ enum CombatRules {
     private static func useItem(_ stackID: InstanceID,
                                 on ally: Combatant,
                                 afflictionReceipt: UInt64?,
+                                actor: Combatant,
                                 run: inout WorldRun,
                                 encounter: inout EncounterState,
                                 state: inout GameState) -> Bool {
@@ -2444,8 +2459,11 @@ enum CombatRules {
                 let current = health(of: ally, in: run)
                 guard current.current < current.max else { return false }
             }
-            heal(ally, by: effect.potency, run: &run, encounter: &encounter,
-                 source: item.name, healer: ally)
+            guard let quote = beneficialItemEffectQuote(stack: stack, effect: effect,
+                                                         usingActor: actor, target: ally,
+                                                         in: encounter) else { return false }
+            heal(ally, by: quote.finalValue, run: &run, encounter: &encounter,
+                 source: item.name, healer: actor)
         case .clearPoison:
             guard cureAfflictions(for: effect.effect, on: ally,
                                   selectedReceipt: afflictionReceipt,
@@ -2493,6 +2511,34 @@ enum CombatRules {
                 in: &run.offeredItems, knowledge: state.reality.curioFamilyKnowledge)
         }
         return true
+    }
+
+    static func beneficialItemValue(_ effect: ConsumableDef, usedBy actor: Combatant,
+                                    in encounter: EncounterState) -> Int {
+        guard effect.potency > 0,
+              effect.beneficialScalingField != .none,
+              encounter.debugV2OwnedNodeIDs?[actor]?.contains(
+                "combat.craft.venom.apothecary_s_hand") == true else {
+            return effect.potency
+        }
+        let bonus = max(1, Int(floor(Double(effect.potency) * 0.5)))
+        return effect.potency + bonus
+    }
+
+    static func beneficialItemEffectQuote(stack: ItemStack, effect: ConsumableDef,
+                                          usingActor: Combatant, target: Combatant,
+                                          in encounter: EncounterState)
+        -> BeneficialItemEffectQuoteV1? {
+        guard stack.count > 0, usingActor.isParty, target.isParty,
+              effect.effect == .heal,
+              effect.beneficialScalingField == .healingMagnitude,
+              effect.potency > 0 else { return nil }
+        let final = beneficialItemValue(effect, usedBy: usingActor, in: encounter)
+        return .init(stack: stack, usingActor: usingActor, target: target,
+                     effect: effect.effect, scalingField: effect.beneficialScalingField,
+                     authoredValue: effect.potency, nodeBonus: final - effect.potency,
+                     finalValue: final, encounterID: encounter.id,
+                     roundNumber: encounter.roundNumber, turnIndex: encounter.turnIndex)
     }
 
     private static func setCooldown(_ rounds: Int, for actor: Combatant, in encounter: inout EncounterState) {

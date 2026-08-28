@@ -32,6 +32,22 @@ final class ContentTests: XCTestCase {
         XCTAssertEqual(scentMask.name, "Scent Mask")
         XCTAssertEqual(scentMask.consumable?.effect, .maskScent,
                        "Scent Mask is intended release content, not a retired placeholder")
+        let scaling = Dictionary(uniqueKeysWithValues: catalogue.items.compactMap { item in
+            item.consumable.map { (item.id, $0.beneficialScalingField) }
+        })
+        XCTAssertEqual(scaling["salve_lesser"], .healingMagnitude)
+        XCTAssertEqual(scaling["salve"], .healingMagnitude)
+        XCTAssertEqual(scaling["salve_greater"], .healingMagnitude)
+        XCTAssertEqual(scaling["scent_mask"], .timedDuration)
+        XCTAssertTrue(scaling.filter { !["salve_lesser", "salve", "salve_greater", "scent_mask"]
+            .contains($0.key) }.values.allSatisfy { $0 == .none })
+
+        let missingMetadata = Data(#"{"effect":"heal","potency":10}"#.utf8)
+        XCTAssertThrowsError(try JSONDecoder().decode(ConsumableDef.self, from: missingMetadata),
+                             "every consumable must explicitly declare its scaling field")
+        let unknownMetadata = Data(
+            #"{"effect":"heal","potency":10,"beneficialScalingField":"future"}"#.utf8)
+        XCTAssertThrowsError(try JSONDecoder().decode(ConsumableDef.self, from: unknownMetadata))
 
         let projectRoot = URL(fileURLWithPath: #filePath)
             .deletingLastPathComponent()

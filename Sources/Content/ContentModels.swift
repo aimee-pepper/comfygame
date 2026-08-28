@@ -699,6 +699,10 @@ enum ConsumableMerchantStockAccess: String, Codable, Sendable {
 }
 
 struct ConsumableDef: Codable, Equatable, Sendable {
+    enum BeneficialScalingField: String, Codable, Sendable {
+        case none, healingMagnitude, timedDuration
+    }
+
     enum Effect: String, Codable, Sendable {
         case heal
         case restoreStability
@@ -722,6 +726,8 @@ struct ConsumableDef: Codable, Equatable, Sendable {
     var effect: Effect
     /// HP, stability, vision radius, or revealed radius depending on the effect.
     var potency: Int = 0
+    /// Explicit combat-node scaling authority. Never infer this from effect, name, or potency.
+    var beneficialScalingField: BeneficialScalingField
 }
 
 /// One Skill. Each party member has exactly one in v0.

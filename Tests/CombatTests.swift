@@ -2155,6 +2155,53 @@ final class CombatTests: XCTestCase {
         XCTAssertNil(CombatRules.hostileAttemptTarget(of: .healSkill(ally: .binder)))
     }
 
+    func testApothecarysHandUsesExactActingOwnerAndScalesHealingOnce() throws {
+        let node: CombatNodeID = "combat.craft.venom.apothecary_s_hand"
+        for (itemID, authored, expected) in [("salve_lesser", 10, 15),
+                                             ("salve", 24, 36),
+                                             ("salve_greater", 45, 67)] {
+            let store = inFight(["paper_moth"])
+            let stack = ItemStack(id: .init(rawValue: UInt64(89_000 + authored)),
+                                  catalogID: ItemID(rawValue: itemID))
+            store.mutate("stage exact Apothecary owner") { state in
+                guard var run = state.worlds.activeRun else { return }
+                run.binderHP = 1
+                _ = run.satchelItems.add(stack)
+                run.activeEncounter?.order = [.binder]
+                run.activeEncounter?.turnIndex = 0
+                run.activeEncounter?.debugV2OwnedNodeIDs?[.binder, default: []].insert(node)
+                state.worlds.activeRun = run
+                CombatRules.perform(.useItem(stack: stack.id, ally: .binder),
+                                    by: .binder, in: &state)
+            }
+            XCTAssertEqual(store.activeRun?.binderHP, min(30, 1 + expected))
+            XCTAssertFalse(store.activeRun?.satchelItems.stacks.contains { $0.id == stack.id } ?? true)
+            XCTAssertEqual(CombatRules.beneficialItemValue(
+                try XCTUnwrap(ContentCatalog.shared.item(ItemID(rawValue: itemID))?.consumable),
+                usedBy: .binder, in: try XCTUnwrap(store.activeEncounter)), expected)
+        }
+
+        let plain = try XCTUnwrap(ContentCatalog.shared.item("salve")?.consumable)
+        var rng = SeededRNG(seed: 89_999)
+        let encounter = CombatRules.makeEncounter(id: .init(rawValue: 89_999), foes: [],
+                                                   party: [.binder],
+                                                   debugV2OwnedNodeIDs: [.binder: [], .companion(0): [node]],
+                                                   rng: &rng)
+        XCTAssertEqual(CombatRules.beneficialItemValue(plain, usedBy: .binder, in: encounter), 24,
+                       "target-only or another actor's ownership cannot scale the user")
+        let companionStack = ItemStack(id: .init(rawValue: 89_999), catalogID: "salve")
+        let companionQuote = try XCTUnwrap(CombatRules.beneficialItemEffectQuote(
+            stack: companionStack, effect: plain, usingActor: Combatant.companion(0),
+            target: Combatant.binder,
+            in: encounter))
+        XCTAssertEqual(companionQuote.authoredValue, 24)
+        XCTAssertEqual(companionQuote.nodeBonus, 12)
+        XCTAssertEqual(companionQuote.finalValue, 36)
+        XCTAssertEqual(companionQuote.usingActor, Combatant.companion(0))
+        XCTAssertEqual(companionQuote.target, Combatant.binder)
+        XCTAssertEqual(companionQuote.encounterID, encounter.id)
+    }
+
     func testCombatTryUnknownHealingCurioAppliesEffectConsumesAndRecordsFamily() throws {
         let store = inFight(["paper_moth"])
         let unknown = ItemStack(id: .init(rawValue: 88_101),

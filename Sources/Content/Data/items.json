@@ -90,7 +90,8 @@
       "kind": "consumable",
       "consumable": {
         "effect": "heal",
-        "potency": 10
+        "potency": 10,
+        "beneficialScalingField": "healingMagnitude"
       },
       "tradingPostDisposition": "sellable",
       "recyclerDisposition": "notGear"
@@ -104,7 +105,8 @@
       "kind": "consumable",
       "consumable": {
         "effect": "heal",
-        "potency": 24
+        "potency": 24,
+        "beneficialScalingField": "healingMagnitude"
       },
       "tradingPostDisposition": "sellable",
       "recyclerDisposition": "notGear"
@@ -118,7 +120,8 @@
       "kind": "consumable",
       "consumable": {
         "effect": "heal",
-        "potency": 45
+        "potency": 45,
+        "beneficialScalingField": "healingMagnitude"
       },
       "tradingPostDisposition": "sellable",
       "recyclerDisposition": "notGear"
@@ -132,7 +135,8 @@
       "kind": "consumable",
       "consumable": {
         "effect": "clearPoison",
-        "potency": 0
+        "potency": 0,
+        "beneficialScalingField": "none"
       },
       "tradingPostDisposition": "sellable",
       "recyclerDisposition": "notGear"
@@ -146,7 +150,8 @@
       "kind": "consumable",
       "consumable": {
         "effect": "clearElemental",
-        "potency": 0
+        "potency": 0,
+        "beneficialScalingField": "none"
       },
       "tradingPostDisposition": "sellable",
       "recyclerDisposition": "notGear"
@@ -160,7 +165,8 @@
       "kind": "consumable",
       "consumable": {
         "effect": "clearAnyStatus",
-        "potency": 0
+        "potency": 0,
+        "beneficialScalingField": "none"
       },
       "tradingPostDisposition": "sellable",
       "recyclerDisposition": "notGear"
@@ -174,7 +180,8 @@
       "kind": "consumable",
       "consumable": {
         "effect": "preventStatus",
-        "potency": 1
+        "potency": 1,
+        "beneficialScalingField": "none"
       },
       "tradingPostDisposition": "sellable",
       "recyclerDisposition": "notGear"
@@ -188,7 +195,8 @@
       "kind": "consumable",
       "consumable": {
         "effect": "coatPoison",
-        "potency": 0
+        "potency": 0,
+        "beneficialScalingField": "none"
       },
       "tradingPostDisposition": "sellable",
       "recyclerDisposition": "notGear"
@@ -202,7 +210,8 @@
       "kind": "consumable",
       "consumable": {
         "effect": "coatBurn",
-        "potency": 0
+        "potency": 0,
+        "beneficialScalingField": "none"
       },
       "tradingPostDisposition": "sellable",
       "recyclerDisposition": "notGear"
@@ -216,7 +225,8 @@
       "kind": "consumable",
       "consumable": {
         "effect": "coatBleed",
-        "potency": 0
+        "potency": 0,
+        "beneficialScalingField": "none"
       },
       "tradingPostDisposition": "sellable",
       "recyclerDisposition": "notGear"
@@ -230,7 +240,8 @@
       "kind": "consumable",
       "consumable": {
         "effect": "coatDazzle",
-        "potency": 0
+        "potency": 0,
+        "beneficialScalingField": "none"
       },
       "tradingPostDisposition": "sellable",
       "recyclerDisposition": "notGear"
@@ -244,7 +255,8 @@
       "kind": "consumable",
       "consumable": {
         "effect": "identifyCurio",
-        "potency": 0
+        "potency": 0,
+        "beneficialScalingField": "none"
       },
       "tradingPostDisposition": "sellable",
       "recyclerDisposition": "notGear"
@@ -258,7 +270,8 @@
       "kind": "consumable",
       "consumable": {
         "effect": "lureCreature",
-        "potency": 0
+        "potency": 0,
+        "beneficialScalingField": "none"
       },
       "tradingPostDisposition": "sellable",
       "recyclerDisposition": "notGear"
@@ -272,7 +285,8 @@
       "kind": "consumable",
       "consumable": {
         "effect": "maskScent",
-        "potency": 12
+        "potency": 12,
+        "beneficialScalingField": "timedDuration"
       },
       "tradingPostDisposition": "sellable",
       "recyclerDisposition": "notGear"
@@ -286,7 +300,8 @@
       "kind": "consumable",
       "consumable": {
         "effect": "seamlightGuidance",
-        "potency": 0
+        "potency": 0,
+        "beneficialScalingField": "none"
       },
       "consumableMerchantStockAccess": "independent",
       "tradingPostDisposition": "sellable",
@@ -301,7 +316,8 @@
       "kind": "consumable",
       "consumable": {
         "effect": "restoreStability",
-        "potency": 25
+        "potency": 25,
+        "beneficialScalingField": "none"
       },
       "tradingPostDisposition": "sellable",
       "recyclerDisposition": "notGear"
@@ -315,7 +331,8 @@
       "kind": "consumable",
       "consumable": {
         "effect": "returnHome",
-        "potency": 0
+        "potency": 0,
+        "beneficialScalingField": "none"
       },
       "tradingPostDisposition": "sellable",
       "recyclerDisposition": "notGear"
@@ -329,7 +346,8 @@
       "kind": "consumable",
       "consumable": {
         "effect": "lightWorld",
-        "potency": 2
+        "potency": 2,
+        "beneficialScalingField": "none"
       },
       "tradingPostDisposition": "sellable",
       "recyclerDisposition": "notGear"
@@ -343,7 +361,8 @@
       "kind": "consumable",
       "consumable": {
         "effect": "farsight",
-        "potency": 2
+        "potency": 2,
+        "beneficialScalingField": "none"
       },
       "tradingPostDisposition": "sellable",
       "recyclerDisposition": "notGear"
