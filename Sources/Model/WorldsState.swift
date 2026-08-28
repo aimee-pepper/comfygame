@@ -10,8 +10,143 @@ struct ExpeditionOutcomeID: RawRepresentable, Codable, Equatable, Hashable, Comp
     static func < (lhs: Self, rhs: Self) -> Bool { lhs.rawValue < rhs.rawValue }
 }
 
+enum ExpeditionReviewID: Codable, Equatable, Hashable, Sendable {
+    case outcome(ExpeditionOutcomeID)
+    case legacy(String)
+
+    private enum Kind: String, Codable { case outcome, legacy }
+    private enum CodingKeys: String, CodingKey { case kind, outcomeID, legacyKey }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        switch try container.decode(Kind.self, forKey: .kind) {
+        case .outcome:
+            guard container.contains(.outcomeID), !container.contains(.legacyKey) else {
+                throw CocoaError(.coderInvalidValue)
+            }
+            self = .outcome(try container.decode(ExpeditionOutcomeID.self, forKey: .outcomeID))
+        case .legacy:
+            guard container.contains(.legacyKey), !container.contains(.outcomeID) else {
+                throw CocoaError(.coderInvalidValue)
+            }
+            self = .legacy(try container.decode(String.self, forKey: .legacyKey))
+        }
+    }
+
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        switch self {
+        case .outcome(let outcomeID):
+            try container.encode(Kind.outcome, forKey: .kind)
+            try container.encode(outcomeID, forKey: .outcomeID)
+        case .legacy(let key):
+            try container.encode(Kind.legacy, forKey: .kind)
+            try container.encode(key, forKey: .legacyKey)
+        }
+    }
+}
+
+struct PendingExpeditionReviewV1: Codable, Equatable, Identifiable, Sendable {
+    var reviewID: ExpeditionReviewID
+    var summary: RunExitSummary
+    var id: ExpeditionReviewID { reviewID }
+}
+
+struct ExpeditionReviewQueueV1: Codable, Equatable, Sendable {
+    static let schemaVersion = 1
+    static let acknowledgedLimit = 64
+    var schemaVersion: Int = Self.schemaVersion
+    var pending: [PendingExpeditionReviewV1] = []
+    var acknowledged: [ExpeditionReviewID] = []
+
+    init(schemaVersion: Int = Self.schemaVersion,
+         pending: [PendingExpeditionReviewV1] = [],
+         acknowledged: [ExpeditionReviewID] = []) {
+        self.schemaVersion = schemaVersion
+        self.pending = pending
+        self.acknowledged = acknowledged
+    }
+
+    private enum CodingKeys: String, CodingKey { case schemaVersion, pending, acknowledged }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        schemaVersion = try container.decode(Int.self, forKey: .schemaVersion)
+        pending = try container.decode([PendingExpeditionReviewV1].self, forKey: .pending)
+        acknowledged = try container.decodeIfPresent(
+            [ExpeditionReviewID].self, forKey: .acknowledged) ?? []
+    }
+
+    func validate(outcomeSequence: UInt64) throws {
+        guard schemaVersion == Self.schemaVersion else { throw CocoaError(.coderInvalidValue) }
+        guard acknowledged.count <= Self.acknowledgedLimit,
+              Set(acknowledged).count == acknowledged.count else {
+            throw CocoaError(.coderInvalidValue)
+        }
+        var identities = Set<ExpeditionReviewID>()
+        var previousOutcome: UInt64?
+        for review in pending {
+            guard identities.insert(review.reviewID).inserted else {
+                throw CocoaError(.coderInvalidValue)
+            }
+            switch review.reviewID {
+            case .outcome(let outcomeID):
+                guard review.summary.outcomeID == outcomeID,
+                      outcomeID.rawValue <= outcomeSequence,
+                      previousOutcome.map({ $0 < outcomeID.rawValue }) ?? true else {
+                    throw CocoaError(.coderInvalidValue)
+                }
+                previousOutcome = outcomeID.rawValue
+            case .legacy(let key):
+                guard review.summary.outcomeID == nil,
+                      key == "legacy-run-\(review.summary.runIndex)" else {
+                    throw CocoaError(.coderInvalidValue)
+                }
+            }
+        }
+        guard identities.isDisjoint(with: acknowledged) else {
+            throw CocoaError(.coderInvalidValue)
+        }
+        var previousAcknowledgedOutcome: UInt64?
+        for identity in acknowledged {
+            switch identity {
+            case .outcome(let outcomeID):
+                guard outcomeID.rawValue <= outcomeSequence,
+                      previousAcknowledgedOutcome.map({ $0 < outcomeID.rawValue }) ?? true else {
+                    throw CocoaError(.coderInvalidValue)
+                }
+                previousAcknowledgedOutcome = outcomeID.rawValue
+            case .legacy(let key):
+                guard key.hasPrefix("legacy-run-"), key.count > "legacy-run-".count else {
+                    throw CocoaError(.coderInvalidValue)
+                }
+            }
+        }
+        if let previousAcknowledgedOutcome,
+           let firstPendingOutcome = pending.compactMap({ review -> UInt64? in
+               guard case .outcome(let outcomeID) = review.reviewID else { return nil }
+               return outcomeID.rawValue
+           }).first,
+           previousAcknowledgedOutcome >= firstPendingOutcome {
+            throw CocoaError(.coderInvalidValue)
+        }
+    }
+}
+
+enum ExpeditionReviewAcknowledgementResult: Equatable, Sendable {
+    case acknowledged
+    case alreadyAcknowledged
+    case stale(expected: ExpeditionReviewID?, actual: ExpeditionReviewID)
+}
+
 /// Layer 3 — Authored Worlds. Instanced expeditions plus realms rebound into the Atlas.
 struct WorldsState: Codable, Equatable, Sendable {
+    private enum CodingKeys: String, CodingKey {
+        case activeRun, pendingWorldArrivalReceiptID, runIndex, outcomeSequence, seeds
+        case expeditionReviewQueue, lastExit, anchoredRealms, pendingAnchorSettlement
+        case pendingAnchorSettlementOutcomeID, lastSpringOutcomeID, randomWorldPageDrought
+        case worldPageBankedOutcomeIDs
+    }
     /// The run in progress, or `nil` when the player is at base. Saving this whole struct is what
     /// makes "force-quit mid-run, even mid-encounter" resume exactly (pillar 2).
     var activeRun: WorldRun?
@@ -24,8 +159,8 @@ struct WorldsState: Codable, Equatable, Sendable {
     /// Deterministic source of world seeds; lives in the save so relaunching cannot re-roll a
     /// seed the player already saw in a pre-bind preview.
     var seeds: SeedSequence
-    /// The last trip's ending, kept until acknowledged so routing home cannot swallow why it ended.
-    var lastExit: RunExitSummary?
+    /// FIFO durable reviews. This is the sole mutable authority; `lastExit` is compatibility-only.
+    var expeditionReviewQueue: ExpeditionReviewQueueV1 = .init()
     /// Durable world snapshots. They survive expedition endings and never age by wall clock.
     var anchoredRealms: [AnchoredRealm] = []
     /// A return-time player decision. Never resolved by a clock or hidden automatic spending.
@@ -37,6 +172,47 @@ struct WorldsState: Codable, Equatable, Sendable {
     var randomWorldPageDrought: Int = 0
     /// Return outcomes already applied to World Page ownership/pity.
     var worldPageBankedOutcomeIDs: Set<ExpeditionOutcomeID> = []
+
+    var lastExit: RunExitSummary? {
+        get { expeditionReviewQueue.pending.first?.summary }
+        set {
+            guard let newValue else {
+                if !expeditionReviewQueue.pending.isEmpty {
+                    expeditionReviewQueue.pending.removeFirst()
+                }
+                return
+            }
+            let review = PendingExpeditionReviewV1(
+                reviewID: newValue.outcomeID.map(ExpeditionReviewID.outcome)
+                    ?? .legacy("legacy-run-\(newValue.runIndex)"),
+                summary: newValue)
+            if expeditionReviewQueue.pending.isEmpty {
+                expeditionReviewQueue.pending = [review]
+            } else {
+                expeditionReviewQueue.pending[0] = review
+            }
+        }
+    }
+
+    var pendingExpeditionReview: PendingExpeditionReviewV1? {
+        expeditionReviewQueue.pending.first
+    }
+
+    @discardableResult
+    mutating func appendExpeditionReview(_ summary: RunExitSummary) -> Bool {
+        guard let outcomeID = summary.outcomeID else { return false }
+        let reviewID = ExpeditionReviewID.outcome(outcomeID)
+        guard !expeditionReviewQueue.acknowledged.contains(reviewID) else { return true }
+        if let existing = expeditionReviewQueue.pending.first(where: { $0.reviewID == reviewID }) {
+            return existing.summary == summary
+        }
+        guard expeditionReviewQueue.pending.compactMap({ review -> UInt64? in
+            guard case .outcome(let id) = review.reviewID else { return nil }
+            return id.rawValue
+        }).last.map({ $0 < outcomeID.rawValue }) ?? true else { return false }
+        expeditionReviewQueue.pending.append(.init(reviewID: reviewID, summary: summary))
+        return true
+    }
 
     static func newGame(seeds: inout SeedSequence) -> WorldsState {
         WorldsState(activeRun: nil, runIndex: 0, seeds: seeds, lastExit: nil,
@@ -59,13 +235,17 @@ struct WorldsState: Codable, Equatable, Sendable {
          pendingAnchorSettlementOutcomeID: ExpeditionOutcomeID? = nil,
          lastSpringOutcomeID: ExpeditionOutcomeID? = nil,
          randomWorldPageDrought: Int = 0,
-         worldPageBankedOutcomeIDs: Set<ExpeditionOutcomeID> = []) {
+         worldPageBankedOutcomeIDs: Set<ExpeditionOutcomeID> = [],
+         expeditionReviewQueue: ExpeditionReviewQueueV1? = nil) {
         self.activeRun = activeRun
         self.pendingWorldArrivalReceiptID = pendingWorldArrivalReceiptID
         self.runIndex = runIndex
-        self.outcomeSequence = outcomeSequence
+        self.outcomeSequence = max(outcomeSequence, lastExit?.outcomeID?.rawValue ?? 0)
         self.seeds = seeds
-        self.lastExit = lastExit
+        self.expeditionReviewQueue = expeditionReviewQueue ?? .init(pending: lastExit.map {
+            [.init(reviewID: $0.outcomeID.map(ExpeditionReviewID.outcome)
+                ?? .legacy("legacy-run-\($0.runIndex)"), summary: $0)]
+        } ?? [])
         self.anchoredRealms = anchoredRealms
         self.pendingAnchorSettlement = pendingAnchorSettlement
         self.pendingAnchorSettlementOutcomeID = pendingAnchorSettlementOutcomeID
@@ -82,7 +262,22 @@ struct WorldsState: Codable, Equatable, Sendable {
         runIndex = try container.decodeIfPresent(Int.self, forKey: .runIndex) ?? 0
         outcomeSequence = try container.decodeIfPresent(UInt64.self, forKey: .outcomeSequence) ?? 0
         seeds = try container.decodeIfPresent(SeedSequence.self, forKey: .seeds) ?? SeedSequence.newGame()
-        lastExit = try container.decodeIfPresent(RunExitSummary.self, forKey: .lastExit)
+        let legacyLastExit = try container.decodeIfPresent(RunExitSummary.self, forKey: .lastExit)
+        if container.contains(.expeditionReviewQueue) {
+            expeditionReviewQueue = try container.decode(
+                ExpeditionReviewQueueV1.self, forKey: .expeditionReviewQueue)
+            if let legacyLastExit {
+                guard expeditionReviewQueue.pending.count == 1,
+                      expeditionReviewQueue.pending[0].summary == legacyLastExit else {
+                    throw CocoaError(.coderInvalidValue)
+                }
+            }
+        } else {
+            expeditionReviewQueue = .init(pending: legacyLastExit.map {
+                [.init(reviewID: $0.outcomeID.map(ExpeditionReviewID.outcome)
+                    ?? .legacy("legacy-run-\($0.runIndex)"), summary: $0)]
+            } ?? [])
+        }
         anchoredRealms = try container.decodeIfPresent([AnchoredRealm].self, forKey: .anchoredRealms) ?? []
         pendingAnchorSettlement = try container.decodeIfPresent(Bool.self, forKey: .pendingAnchorSettlement) ?? false
         pendingAnchorSettlementOutcomeID = try container.decodeIfPresent(
@@ -93,6 +288,25 @@ struct WorldsState: Codable, Equatable, Sendable {
             Int.self, forKey: .randomWorldPageDrought) ?? 0
         worldPageBankedOutcomeIDs = try container.decodeIfPresent(
             Set<ExpeditionOutcomeID>.self, forKey: .worldPageBankedOutcomeIDs) ?? []
+        try expeditionReviewQueue.validate(outcomeSequence: outcomeSequence)
+    }
+
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encodeIfPresent(activeRun, forKey: .activeRun)
+        try container.encodeIfPresent(pendingWorldArrivalReceiptID,
+                                      forKey: .pendingWorldArrivalReceiptID)
+        try container.encode(runIndex, forKey: .runIndex)
+        try container.encode(outcomeSequence, forKey: .outcomeSequence)
+        try container.encode(seeds, forKey: .seeds)
+        try container.encode(expeditionReviewQueue, forKey: .expeditionReviewQueue)
+        try container.encode(anchoredRealms, forKey: .anchoredRealms)
+        try container.encode(pendingAnchorSettlement, forKey: .pendingAnchorSettlement)
+        try container.encodeIfPresent(pendingAnchorSettlementOutcomeID,
+                                      forKey: .pendingAnchorSettlementOutcomeID)
+        try container.encodeIfPresent(lastSpringOutcomeID, forKey: .lastSpringOutcomeID)
+        try container.encode(randomWorldPageDrought, forKey: .randomWorldPageDrought)
+        try container.encode(worldPageBankedOutcomeIDs, forKey: .worldPageBankedOutcomeIDs)
     }
 
     mutating func mintOutcomeID() -> ExpeditionOutcomeID {

@@ -154,17 +154,20 @@ struct RootView: View {
         .onChange(of: store.state.worlds.pendingWorldArrivalReceiptID) {
             reconcileArrivalPresentation()
         }
-        .sheet(item: Binding(get: { store.state.worlds.lastExit }, set: { _ in
+        .sheet(item: Binding(get: { store.state.worlds.pendingExpeditionReview }, set: { _ in
             // The WorldView -> BaseView identity transition can ask the presentation host to
             // dismiss. That is not player acknowledgement. Only the recap's Continue action may
             // consume this durable receipt.
-        })) { summary in
-            RunExitSummaryView(summary: summary) {
-                store.acknowledgeFirstReturnRecap()
+        })) { review in
+            RunExitSummaryView(summary: review.summary) {
+                store.acknowledgeExpeditionReview(review.reviewID)
             }
         }
         .sheet(isPresented: Binding(
-            get: { store.state.worlds.pendingAnchorSettlement && store.state.worlds.lastExit == nil },
+            get: {
+                store.state.worlds.pendingAnchorSettlement
+                    && store.state.worlds.expeditionReviewQueue.pending.isEmpty
+            },
             set: { _ in }
         )) {
             AnchorSettlementView().environmentObject(store)

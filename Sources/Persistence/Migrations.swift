@@ -29,6 +29,7 @@ enum Migrations {
             try validateCurrentChannelworksRestoration(in: data)
             try validateCurrentCombatOpening(in: data)
             try validateCurrentLibraryAttention(in: data)
+            try validateCurrentExpeditionReviewQueue(in: data)
             return data
         }
 
@@ -39,6 +40,7 @@ enum Migrations {
         try validateCurrentChannelworksRestoration(in: working)
         try validateCurrentCombatOpening(in: working)
         try validateCurrentLibraryAttention(in: working)
+        try validateCurrentExpeditionReviewQueue(in: working)
         return working
     }
 
@@ -126,11 +128,141 @@ enum Migrations {
         case 7: return try migrate7to8(data)
         case 8: return try migrate8to9(data)
         case 9: return try migrate9to10(data)
+        case 10: return try migrate10to11(data)
         default:
             // No migration registered. Tolerant decoding is the fallback; if the save is genuinely
             // incompatible, `SaveFileIO.load()` quarantines it rather than losing it.
             return data
         }
+    }
+
+    /// Replaces the overwrite-prone return receipt with a strict FIFO review queue while retaining
+    /// the complete current RunExitSummary JSON unchanged.
+    private static func migrate10to11(_ data: Data) throws -> Data {
+        guard var root = try JSONSerialization.jsonObject(with: data) as? [String: Any] else {
+            throw CocoaError(.coderInvalidValue)
+        }
+        let hasWorlds = root.keys.contains("worlds")
+        guard !hasWorlds || root["worlds"] is [String: Any] else {
+            throw CocoaError(.coderInvalidValue)
+        }
+        var worlds = root["worlds"] as? [String: Any] ?? [:]
+        let outcomeSequence: UInt64
+        if worlds.keys.contains("outcomeSequence") {
+            guard let parsed = strictUInt64Number(worlds["outcomeSequence"]) else {
+                throw CocoaError(.coderInvalidValue)
+            }
+            outcomeSequence = parsed
+        } else {
+            outcomeSequence = 0
+            worlds["outcomeSequence"] = 0
+        }
+
+        guard !worlds.keys.contains("expeditionReviewQueue") else {
+            throw CocoaError(.coderInvalidValue)
+        }
+        let legacySummary = worlds["lastExit"] is NSNull ? nil : worlds["lastExit"]
+        var pending: [[String: Any]] = []
+        if let legacySummary {
+            guard let summary = legacySummary as? [String: Any],
+                  let runIndex = strictNonnegativeInteger(summary["runIndex"]) else {
+                throw CocoaError(.coderInvalidValue)
+            }
+            let reviewID: [String: Any]
+            if let rawOutcome = summary["outcomeID"] {
+                guard !(rawOutcome is NSNull),
+                      let outcomeID = strictUInt64RawValue(rawOutcome) else {
+                    throw CocoaError(.coderInvalidValue)
+                }
+                reviewID = ["kind": "outcome", "outcomeID": outcomeID]
+                worlds["outcomeSequence"] = max(outcomeSequence, outcomeID)
+            } else {
+                reviewID = ["kind": "legacy", "legacyKey": "legacy-run-\(runIndex)"]
+            }
+            pending = [["reviewID": reviewID, "summary": summary]]
+        }
+        worlds["expeditionReviewQueue"] = [
+            "schemaVersion": ExpeditionReviewQueueV1.schemaVersion,
+            "pending": pending,
+            "acknowledged": [],
+        ]
+        worlds.removeValue(forKey: "lastExit")
+        root["worlds"] = worlds
+        root["schemaVersion"] = 11
+        let migrated = try JSONSerialization.data(withJSONObject: root, options: [.sortedKeys])
+        try validateCurrentExpeditionReviewQueue(in: migrated)
+        _ = try SaveCodec.makeDecoder().decode(GameState.self, from: migrated)
+        return migrated
+    }
+
+    private static func validateCurrentExpeditionReviewQueue(in data: Data) throws {
+        guard let root = try JSONSerialization.jsonObject(with: data) as? [String: Any],
+              let worlds = root["worlds"] as? [String: Any],
+              !worlds.keys.contains("lastExit"),
+              let sequence = strictUInt64Number(worlds["outcomeSequence"]),
+              let queue = worlds["expeditionReviewQueue"] as? [String: Any],
+              Set(queue.keys) == Set(["schemaVersion", "pending", "acknowledged"]) else {
+            throw CocoaError(.coderInvalidValue)
+        }
+        guard let pending = queue["pending"] as? [[String: Any]],
+              let acknowledged = queue["acknowledged"] as? [[String: Any]] else {
+            throw CocoaError(.coderInvalidValue)
+        }
+        func validateIdentityShape(_ identity: [String: Any]) throws {
+            guard let kind = identity["kind"] as? String else {
+                throw CocoaError(.coderInvalidValue)
+            }
+            switch kind {
+            case "outcome":
+                guard Set(identity.keys) == Set(["kind", "outcomeID"]),
+                      let raw = identity["outcomeID"],
+                      strictUInt64RawValue(raw) != nil else {
+                    throw CocoaError(.coderInvalidValue)
+                }
+            case "legacy":
+                guard Set(identity.keys) == Set(["kind", "legacyKey"]),
+                      let key = identity["legacyKey"] as? String, !key.isEmpty else {
+                    throw CocoaError(.coderInvalidValue)
+                }
+            default:
+                throw CocoaError(.coderInvalidValue)
+            }
+        }
+        for review in pending {
+            guard Set(review.keys) == Set(["reviewID", "summary"]),
+                  let identity = review["reviewID"] as? [String: Any],
+                  review["summary"] is [String: Any] else {
+                throw CocoaError(.coderInvalidValue)
+            }
+            try validateIdentityShape(identity)
+        }
+        for identity in acknowledged { try validateIdentityShape(identity) }
+        let queueData = try JSONSerialization.data(withJSONObject: queue, options: [.sortedKeys])
+        let decoded = try SaveCodec.makeDecoder().decode(ExpeditionReviewQueueV1.self,
+                                                          from: queueData)
+        try decoded.validate(outcomeSequence: sequence)
+    }
+
+    private static func strictNonnegativeInteger(_ value: Any?) -> Int? {
+        guard let number = value as? NSNumber,
+              CFGetTypeID(number) != CFBooleanGetTypeID(),
+              let result = Int(number.stringValue), result >= 0,
+              Double(result) == number.doubleValue else { return nil }
+        return result
+    }
+
+    private static func strictUInt64Number(_ value: Any?) -> UInt64? {
+        guard let number = value as? NSNumber,
+              CFGetTypeID(number) != CFBooleanGetTypeID(),
+              let result = UInt64(number.stringValue),
+              Double(result) == number.doubleValue else { return nil }
+        return result
+    }
+
+    private static func strictUInt64RawValue(_ value: Any) -> UInt64? {
+        if let scalar = strictUInt64Number(value) { return scalar }
+        guard let object = value as? [String: Any], object.count == 1 else { return nil }
+        return strictUInt64Number(object["rawValue"])
     }
 
     private static func migrate9to10(_ data: Data) throws -> Data {

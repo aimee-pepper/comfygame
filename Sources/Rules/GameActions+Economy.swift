@@ -279,8 +279,10 @@ extension GameStore {
     /// Returning from an expedition calls this before freezing its receipt, so subsidy and final
     /// runway cannot be separated by a process interruption.
     @discardableResult
-    nonisolated static func applyDepartureSubsidy(in state: inout GameState) -> Int {
-        guard state.worlds.activeRun == nil else { return 0 }
+    nonisolated static func applyDepartureSubsidy(
+        in state: inout GameState, duringExpeditionExit: Bool = false
+    ) -> Int {
+        guard duringExpeditionExit || state.worlds.activeRun == nil else { return 0 }
         let floor = EconomyRules.minimumBindCost(in: state)
         let subsidy = max(0, floor - EconomyRules.spendableEssence(in: state))
         state.base.addEssenceCrystals(subsidy)

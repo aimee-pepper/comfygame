@@ -231,8 +231,8 @@ final class ExpeditionOutcomeTests: XCTestCase {
             .deletingLastPathComponent()
         let source = try String(contentsOf: root.appending(path: "Sources/App/RootView.swift"),
                                 encoding: .utf8)
-        XCTAssertTrue(source.contains(".sheet(item: Binding(get: { store.state.worlds.lastExit }, set: { _ in"))
-        XCTAssertTrue(source.contains("Button(\"Return to Base\", action: dismiss)"))
+        XCTAssertTrue(source.contains(".sheet(item: Binding(get: { store.state.worlds.pendingExpeditionReview }, set: { _ in"))
+        XCTAssertTrue(source.contains("Button(\"Return to Village\", action: dismiss)"))
         XCTAssertTrue(source.contains(".interactiveDismissDisabled()"))
         XCTAssertFalse(source.contains("if value == nil { store.dismissRunExitSummary() }"))
         XCTAssertFalse(source.contains("Recovered</button>"))
@@ -691,6 +691,7 @@ final class ExpeditionOutcomeTests: XCTestCase {
             runIndex: run.runIndex, outcomeID: 82, kind: .portal, reason: "fixture",
             turnsTaken: run.turnsTaken, haulKeptFraction: 1,
             recoveredLines: banked.recoveredLines, lostLines: banked.lostLines)
+        bankedState.worlds.outcomeSequence = 82
         bankedState.worlds.lastExit = summary
         let items = summary.recoveredLines.compactMap { line -> RunExitSummary.ReceiptLine.Item? in
             switch line {
@@ -1232,5 +1233,75 @@ final class ExpeditionOutcomeTests: XCTestCase {
             GameState.self, from: JSONSerialization.data(withJSONObject: object))
         XCTAssertEqual(decoded.worlds.outcomeSequence, 7)
         XCTAssertEqual(decoded.worlds.mintOutcomeID(), 8)
+    }
+
+    func testB111AQueueIsFIFOAndAcknowledgementIsExactHeadOnly() throws {
+        let store = GameStore(io: .temporary(name: "b111a-fifo-\(UUID().uuidString)"))
+        func run(_ index: Int) -> WorldRun {
+            var value = departureRun()
+            value.runIndex = index
+            value.turnsTaken = index + 2
+            return value
+        }
+        store.mutate("fixture: first queued outcome") { $0.worlds.activeRun = run(4) }
+        store.endRunWithPartialHaul(reason: "first", kind: .defeat)
+        store.mutate("fixture: second queued outcome") { $0.worlds.activeRun = run(4) }
+        store.endRunWithPartialHaul(reason: "second", kind: .collapse)
+
+        let before = store.state
+        let reviews = store.state.worlds.expeditionReviewQueue.pending
+        XCTAssertEqual(reviews.map(\.reviewID), [.outcome(1), .outcome(2)])
+        XCTAssertEqual(reviews.map(\.summary.reason), ["first", "second"])
+        XCTAssertEqual(store.acknowledgeExpeditionReview(.outcome(2)),
+                       .stale(expected: .outcome(1), actual: .outcome(2)))
+        XCTAssertEqual(store.state, before)
+
+        XCTAssertEqual(store.acknowledgeExpeditionReview(.outcome(1)), .acknowledged)
+        XCTAssertEqual(store.state.worlds.pendingExpeditionReview?.reviewID, .outcome(2))
+        let second = try XCTUnwrap(store.state.worlds.pendingExpeditionReview)
+        XCTAssertEqual(store.acknowledgeExpeditionReview(.outcome(1)), .alreadyAcknowledged)
+        XCTAssertEqual(store.state.worlds.pendingExpeditionReview, second)
+        XCTAssertEqual(store.acknowledgeExpeditionReview(.outcome(2)), .acknowledged)
+        XCTAssertTrue(store.state.worlds.expeditionReviewQueue.pending.isEmpty)
+        XCTAssertEqual(store.acknowledgeExpeditionReview(.outcome(2)), .alreadyAcknowledged)
+    }
+
+    func testB111APendingReviewSurvivesAnotherDepartureAndRoundTrip() throws {
+        let store = fundedStore("b111a-departure")
+        let first = RunExitSummary(runIndex: 7, outcomeID: 1, kind: .defeat,
+                                   reason: "still pending", turnsTaken: 9,
+                                   haulKeptFraction: 0.5)
+        store.mutate("fixture: pending review") { state in
+            state.worlds.outcomeSequence = 1
+            XCTAssertTrue(state.worlds.appendExpeditionReview(first))
+        }
+        XCTAssertTrue(store.bindAndDepart())
+        XCTAssertEqual(store.state.worlds.pendingExpeditionReview?.summary, first)
+
+        let restored = try SaveCodec.decode(SaveCodec.encode(store.state))
+        XCTAssertEqual(restored.worlds.expeditionReviewQueue,
+                       store.state.worlds.expeditionReviewQueue)
+        XCTAssertEqual(restored.worlds.pendingExpeditionReview?.summary, first)
+    }
+
+    func testB111AAcknowledgementCompletesTutorialUsingRemovedHeadOnly() throws {
+        let store = GameStore(io: .temporary(name: "b111a-tutorial-\(UUID().uuidString)"))
+        let first = RunExitSummary(runIndex: 11, outcomeID: 1, kind: .portal,
+                                   reason: "first", turnsTaken: 3, haulKeptFraction: 1)
+        let second = RunExitSummary(runIndex: 22, outcomeID: 2, kind: .collapse,
+                                    reason: "second", turnsTaken: 8, haulKeptFraction: 0.5)
+        store.mutate("fixture: tutorial reviews") { state in
+            state.worlds.outcomeSequence = 2
+            XCTAssertTrue(state.worlds.appendExpeditionReview(first))
+            XCTAssertTrue(state.worlds.appendExpeditionReview(second))
+            state.tutorial.firstReturnContext = .init(
+                runIndex: first.runIndex, route: .writingDesk, reason: .ordinaryReturn,
+                writingID: nil)
+        }
+        XCTAssertEqual(store.acknowledgeExpeditionReview(.outcome(1)), .acknowledged)
+        XCTAssertEqual(store.state.tutorial[.returnPersistenceBoundary].status, .completed)
+        XCTAssertEqual(store.state.tutorial[.baseFirstResultRoute].firstEligibleRunIndex,
+                       first.runIndex)
+        XCTAssertEqual(store.state.worlds.pendingExpeditionReview?.summary.runIndex, second.runIndex)
     }
 }

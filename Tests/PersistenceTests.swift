@@ -129,6 +129,162 @@ final class PersistenceTests: XCTestCase {
         XCTAssertEqual(root["skillID"] as? String, "emanation_strike")
     }
 
+    func testB111ASchemaTenReviewMigrationPreservesCompleteCurrentSummaryAndIdentity() throws {
+        func summary(_ outcomeID: ExpeditionOutcomeID?) -> RunExitSummary {
+            RunExitSummary(runIndex: 17, outcomeID: outcomeID, kind: .defeat,
+                           reason: "frozen review", departureState: .breaking,
+                           turnsTaken: 19, haulKeptFraction: 0.5,
+                           recoveredLines: [.resource(.init(
+                            lineID: "ore", id: "ore", quantity: 3,
+                            fallbackName: "Ore", fallbackIcon: "cube"))])
+        }
+        func legacyData(_ receipt: RunExitSummary?) throws -> Data {
+            var root = try XCTUnwrap(JSONSerialization.jsonObject(
+                with: SaveCodec.encode(GameState.newGame())) as? [String: Any])
+            root["schemaVersion"] = 10
+            var worlds = try XCTUnwrap(root["worlds"] as? [String: Any])
+            worlds.removeValue(forKey: "expeditionReviewQueue")
+            worlds["runIndex"] = 17
+            worlds["outcomeSequence"] = 0
+            if let receipt {
+                worlds["lastExit"] = try JSONSerialization.jsonObject(
+                    with: SaveCodec.makeEncoder().encode(receipt))
+            }
+            root["worlds"] = worlds
+            return try JSONSerialization.data(withJSONObject: root, options: [.sortedKeys])
+        }
+
+        let empty = try SaveCodec.decode(legacyData(nil))
+        XCTAssertTrue(empty.worlds.expeditionReviewQueue.pending.isEmpty)
+
+        let genuine = summary(8)
+        let migrated = try SaveCodec.decode(legacyData(genuine))
+        XCTAssertEqual(migrated.worlds.outcomeSequence, 8)
+        XCTAssertEqual(migrated.worlds.pendingExpeditionReview,
+                       .init(reviewID: .outcome(8), summary: genuine))
+
+        let legacy = summary(nil)
+        let migratedLegacy = try SaveCodec.decode(legacyData(legacy))
+        XCTAssertEqual(migratedLegacy.worlds.outcomeSequence, 0)
+        XCTAssertEqual(migratedLegacy.worlds.pendingExpeditionReview,
+                       .init(reviewID: .legacy("legacy-run-17"), summary: legacy))
+        XCTAssertEqual(try SaveCodec.decode(SaveCodec.encode(migratedLegacy)), migratedLegacy)
+        let encodedRoot = try XCTUnwrap(JSONSerialization.jsonObject(
+            with: SaveCodec.encode(migratedLegacy)) as? [String: Any])
+        let encodedWorlds = try XCTUnwrap(encodedRoot["worlds"] as? [String: Any])
+        XCTAssertNil(encodedWorlds["lastExit"], "canonical re-encode has only one queue authority")
+
+        var transitionalRoot = try XCTUnwrap(JSONSerialization.jsonObject(
+            with: SaveCodec.encode(migrated)) as? [String: Any])
+        var transitionalWorlds = try XCTUnwrap(transitionalRoot["worlds"] as? [String: Any])
+        transitionalWorlds["lastExit"] = try JSONSerialization.jsonObject(
+            with: SaveCodec.makeEncoder().encode(genuine))
+        transitionalRoot["worlds"] = transitionalWorlds
+        let transitional = try JSONSerialization.data(
+            withJSONObject: transitionalRoot, options: [.sortedKeys])
+        XCTAssertThrowsError(try SaveCodec.decode(transitional),
+                             "schema 11 has one queue authority and rejects legacy duplication")
+    }
+
+    func testB111AQueueValidationRejectsMalformedIdentityAndOrdering() throws {
+        func stateObject() throws -> [String: Any] {
+            var state = GameState.newGame()
+            state.worlds.outcomeSequence = 2
+            XCTAssertTrue(state.worlds.appendExpeditionReview(.init(
+                runIndex: 1, outcomeID: 1, kind: .portal, reason: "one",
+                turnsTaken: 2, haulKeptFraction: 1)))
+            XCTAssertTrue(state.worlds.appendExpeditionReview(.init(
+                runIndex: 2, outcomeID: 2, kind: .defeat, reason: "two",
+                turnsTaken: 3, haulKeptFraction: 0.5)))
+            return try XCTUnwrap(JSONSerialization.jsonObject(
+                with: SaveCodec.encode(state)) as? [String: Any])
+        }
+        func assertRejected(_ mutate: (inout [String: Any]) throws -> Void,
+                            file: StaticString = #filePath, line: UInt = #line) throws {
+            var root = try stateObject()
+            try mutate(&root)
+            let bytes = try JSONSerialization.data(withJSONObject: root, options: [.sortedKeys])
+            let original = bytes
+            XCTAssertThrowsError(try SaveCodec.decode(bytes), file: file, line: line)
+            XCTAssertEqual(bytes, original, file: file, line: line)
+        }
+        func queue(_ root: inout [String: Any]) throws -> [String: Any] {
+            let worlds = try XCTUnwrap(root["worlds"] as? [String: Any])
+            return try XCTUnwrap(worlds["expeditionReviewQueue"] as? [String: Any])
+        }
+        func setQueue(_ value: Any, in root: inout [String: Any]) throws {
+            var worlds = try XCTUnwrap(root["worlds"] as? [String: Any])
+            worlds["expeditionReviewQueue"] = value
+            root["worlds"] = worlds
+        }
+
+        try assertRejected { try setQueue(NSNull(), in: &$0) }
+        try assertRejected {
+            var value = try queue(&$0); value["schemaVersion"] = 2
+            try setQueue(value, in: &$0)
+        }
+        try assertRejected {
+            var value = try queue(&$0)
+            var pending = try XCTUnwrap(value["pending"] as? [[String: Any]])
+            pending.append(pending[0]); value["pending"] = pending
+            try setQueue(value, in: &$0)
+        }
+        try assertRejected {
+            var value = try queue(&$0)
+            var pending = try XCTUnwrap(value["pending"] as? [[String: Any]])
+            var first = pending[0]
+            var summary = try XCTUnwrap(first["summary"] as? [String: Any])
+            summary["outcomeID"] = 2
+            first["summary"] = summary
+            pending[0] = first
+            value["pending"] = pending
+            try setQueue(value, in: &$0)
+        }
+        try assertRejected {
+            var value = try queue(&$0)
+            var pending = try XCTUnwrap(value["pending"] as? [[String: Any]])
+            pending.swapAt(0, 1); value["pending"] = pending
+            try setQueue(value, in: &$0)
+        }
+        try assertRejected {
+            var worlds = try XCTUnwrap($0["worlds"] as? [String: Any])
+            worlds["outcomeSequence"] = 1; $0["worlds"] = worlds
+        }
+        try assertRejected {
+            var value = try queue(&$0)
+            value["pending"] = []
+            value["acknowledged"] = [
+                ["kind": "outcome", "outcomeID": 2],
+                ["kind": "outcome", "outcomeID": 1],
+            ]
+            try setQueue(value, in: &$0)
+        }
+        try assertRejected {
+            var value = try queue(&$0)
+            var pending = try XCTUnwrap(value["pending"] as? [[String: Any]])
+            pending.removeFirst()
+            value["pending"] = pending
+            value["acknowledged"] = [["kind": "outcome", "outcomeID": 2]]
+            try setQueue(value, in: &$0)
+        }
+    }
+
+    func testB111ASchemaTenOutcomeSequenceMalformedFailsWithoutChangingRawBytes() throws {
+        var root = try XCTUnwrap(JSONSerialization.jsonObject(
+            with: SaveCodec.encode(GameState.newGame())) as? [String: Any])
+        root["schemaVersion"] = 10
+        var worlds = try XCTUnwrap(root["worlds"] as? [String: Any])
+        worlds.removeValue(forKey: "expeditionReviewQueue")
+        for malformed: Any in [NSNull(), -1, 1.5, true, "1", Double.greatestFiniteMagnitude] {
+            worlds["outcomeSequence"] = malformed
+            root["worlds"] = worlds
+            let bytes = try JSONSerialization.data(withJSONObject: root, options: [.sortedKeys])
+            let original = bytes
+            XCTAssertThrowsError(try SaveCodec.decode(bytes))
+            XCTAssertEqual(bytes, original)
+        }
+    }
+
     func testSchemaThreeExtractionReceiptMigrationFreezesCatalogueTruthAndFailsUnknown() throws {
         let legacy = Data(#"{"schemaVersion":3,"nested":{"resource":"gold","remainingHarvests":2,"yieldPerHarvest":3}}"#.utf8)
         let migrated = try Migrations.migrateIfNeeded(legacy)

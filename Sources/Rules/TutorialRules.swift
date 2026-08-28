@@ -239,16 +239,58 @@ extension GameStore {
         }
     }
 
-    func acknowledgeFirstReturnRecap() {
-        mutate("acknowledge first return recap", flush: true) { state in
-            if state.tutorial.firstReturnContext != nil {
-                state.tutorial.complete(.returnPersistenceBoundary, fact: "first_recap_acknowledged")
-                state.tutorial.becameEligible(.baseFirstResultRoute,
-                                              runIndex: state.worlds.lastExit?.runIndex
-                                                ?? state.worlds.runIndex)
-            }
-            state.worlds.lastExit = nil
+    @discardableResult
+    func acknowledgeExpeditionReview(
+        _ reviewID: ExpeditionReviewID
+    ) -> ExpeditionReviewAcknowledgementResult {
+        if state.worlds.expeditionReviewQueue.acknowledged.contains(reviewID) {
+            return .alreadyAcknowledged
         }
+        guard let presented = state.worlds.pendingExpeditionReview else {
+            return .stale(expected: nil, actual: reviewID)
+        }
+        guard presented.reviewID == reviewID else {
+            if case .outcome(let attempted) = reviewID,
+               case .outcome(let expected) = presented.reviewID,
+               attempted.rawValue < expected.rawValue,
+               !state.worlds.expeditionReviewQueue.pending.contains(where: {
+                   $0.reviewID == reviewID
+               }) {
+                return .alreadyAcknowledged
+            }
+            return .stale(expected: presented.reviewID, actual: reviewID)
+        }
+        let acknowledged = mutateIf("acknowledge expedition review", flush: true) { state in
+            guard let head = state.worlds.expeditionReviewQueue.pending.first,
+                  head.reviewID == reviewID else { return false }
+            let summary = head.summary
+            state.worlds.expeditionReviewQueue.pending.removeFirst()
+            state.worlds.expeditionReviewQueue.acknowledged.append(reviewID)
+            if state.worlds.expeditionReviewQueue.acknowledged.count
+                > ExpeditionReviewQueueV1.acknowledgedLimit {
+                state.worlds.expeditionReviewQueue.acknowledged.removeFirst(
+                    state.worlds.expeditionReviewQueue.acknowledged.count
+                        - ExpeditionReviewQueueV1.acknowledgedLimit)
+            }
+            if state.tutorial.firstReturnContext != nil {
+                state.tutorial.complete(.returnPersistenceBoundary,
+                                        fact: "first_recap_acknowledged")
+                state.tutorial.becameEligible(.baseFirstResultRoute,
+                                              runIndex: summary.runIndex)
+            }
+            return true
+        }
+        return acknowledged ? .acknowledged
+                            : .stale(expected: state.worlds.pendingExpeditionReview?.reviewID,
+                                     actual: reviewID)
+    }
+
+    @discardableResult
+    func acknowledgeFirstReturnRecap() -> ExpeditionReviewAcknowledgementResult {
+        guard let reviewID = state.worlds.pendingExpeditionReview?.reviewID else {
+            return .stale(expected: nil, actual: .legacy("missing-review"))
+        }
+        return acknowledgeExpeditionReview(reviewID)
     }
 
     func openedFirstReturnDestination(_ route: AppRoute) {

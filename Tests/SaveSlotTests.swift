@@ -2,6 +2,67 @@ import XCTest
 @testable import Bookbinder
 
 final class SaveSlotTests: XCTestCase {
+    func testB111ASchemaTenMalformedQueueMigrationPreservesRealSlotEnvelope() async throws {
+        let root = directory()
+        defer { try? FileManager.default.removeItem(at: root) }
+        let slots = SaveSlotFileIO(directory: root)
+        let created = try await slots.create(name: "Malformed expedition review")
+        let url = try await slots.exportURL(for: created.metadata.id)
+        var envelope = try SaveCodec.makeDecoder().decode(
+            SaveSlotEnvelope.self, from: Data(contentsOf: url))
+        var payload = try XCTUnwrap(JSONSerialization.jsonObject(
+            with: SaveCodec.encode(GameState.newGame())) as? [String: Any])
+        payload["schemaVersion"] = 10
+        var worlds = try XCTUnwrap(payload["worlds"] as? [String: Any])
+        worlds.removeValue(forKey: "expeditionReviewQueue")
+        for malformed: Any in [NSNull(), -1, 1.5, true, "1"] {
+            worlds["outcomeSequence"] = malformed
+            payload["worlds"] = worlds
+            envelope.payload = try JSONSerialization.data(
+                withJSONObject: payload, options: [.sortedKeys])
+            let original = try encoder().encode(envelope)
+            try original.write(to: url, options: .atomic)
+            do {
+                _ = try await slots.load(created.metadata.id)
+                XCTFail("present malformed sequence must fail: \(malformed)")
+            } catch { }
+            XCTAssertEqual(try Data(contentsOf: url), original)
+        }
+    }
+
+    func testB111ACurrentQueueCrossFieldFailurePreservesRealSlotEnvelope() async throws {
+        let root = directory()
+        defer { try? FileManager.default.removeItem(at: root) }
+        let slots = SaveSlotFileIO(directory: root)
+        let created = try await slots.create(name: "Mismatched expedition review")
+        let url = try await slots.exportURL(for: created.metadata.id)
+        var envelope = try SaveCodec.makeDecoder().decode(
+            SaveSlotEnvelope.self, from: Data(contentsOf: url))
+        var state = GameState.newGame()
+        state.worlds.outcomeSequence = 1
+        XCTAssertTrue(state.worlds.appendExpeditionReview(.init(
+            runIndex: 1, outcomeID: 1, kind: .portal, reason: "frozen",
+            turnsTaken: 3, haulKeptFraction: 1)))
+        var payload = try XCTUnwrap(JSONSerialization.jsonObject(
+            with: SaveCodec.encode(state)) as? [String: Any])
+        var worlds = try XCTUnwrap(payload["worlds"] as? [String: Any])
+        var queue = try XCTUnwrap(worlds["expeditionReviewQueue"] as? [String: Any])
+        var pending = try XCTUnwrap(queue["pending"] as? [[String: Any]])
+        var first = pending[0]
+        first["reviewID"] = ["kind": "outcome", "outcomeID": 2]
+        pending[0] = first
+        queue["pending"] = pending
+        worlds["expeditionReviewQueue"] = queue
+        payload["worlds"] = worlds
+        envelope.payload = try JSONSerialization.data(
+            withJSONObject: payload, options: [.sortedKeys])
+        let original = try encoder().encode(envelope)
+        try original.write(to: url, options: .atomic)
+        do { _ = try await slots.load(created.metadata.id); XCTFail("expected mismatch failure") }
+        catch { }
+        XCTAssertEqual(try Data(contentsOf: url), original)
+    }
+
     func testCurrentSeamwardNullFailsSlotLoadWithoutRewritingEnvelope() async throws {
         let root = directory()
         defer { try? FileManager.default.removeItem(at: root) }

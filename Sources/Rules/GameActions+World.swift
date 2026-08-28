@@ -199,7 +199,6 @@ extension GameStore {
                 from: state.base, activatedOnTurn: run.turnsTaken)
             run.anatomyButcheryReceipt = CreatureMaterialRewardRules.anatomyReceipt(in: state)
             state.reality.lifetime.runsStarted += 1
-            state.worlds.lastExit = nil
             state.worlds.activeRun = run
             didCommit = true
         }
@@ -722,12 +721,12 @@ extension GameStore {
     /// while the party remains stranded in the world.
     private func returnHomeWithFullHaul(reason: String, kind: RunExitSummary.Kind,
                                         consuming stackID: InstanceID? = nil) {
-        mutate("return home", flush: true, scope: .expedition) { state in
-            guard var run = state.worlds.activeRun else { return }
+        mutateIf("return home", flush: true, scope: .expedition) { state in
+            guard var run = state.worlds.activeRun else { return false }
             let departureState = WorldDepartureState.capture(from: run)
             if let stackID {
                 guard let index = run.satchelItems.stacks.firstIndex(where: { $0.id == stackID })
-                else { return }
+                else { return false }
                 _ = run.satchelItems.stacks[index].removing(1)
                 if run.satchelItems.stacks[index].isEmpty { run.satchelItems.stacks.remove(at: index) }
             }
@@ -748,19 +747,22 @@ extension GameStore {
                 GameStore.creditEssenceSpring(&state)
                 state.worlds.lastSpringOutcomeID = outcomeID
             }
-            state.worlds.activeRun = nil
-            state.worlds.pendingWorldArrivalReceiptID = nil
-            let subsidy = GameStore.applyDepartureSubsidy(in: &state)
-            state.worlds.lastExit = GameStore.makeReturnReceipt(
+            let subsidy = GameStore.applyDepartureSubsidy(
+                in: &state, duringExpeditionExit: true)
+            let reviewSummary = GameStore.makeReturnReceipt(
                 run: run, outcomeID: outcomeID, kind: kind, reason: reason, fraction: 1,
                 banked: banked, departureState: departureState,
                 autoRefinedRaw: automatic?.rawSpent ?? 0,
                 autoRefinedEssence: automatic?.essenceGained ?? 0,
                 springYield: springYield, antiLockSubsidy: subsidy, state: state)
+            guard state.worlds.appendExpeditionReview(reviewSummary) else { return false }
+            state.worlds.activeRun = nil
+            state.worlds.pendingWorldArrivalReceiptID = nil
             TutorialRules.freezeFirstReturnContext(run: run, banked: banked, in: &state)
             TutorialRules.recordExpeditionOutcome(in: &state)
             Self.refreshTradingPost(after: run, outcomeID: outcomeID, in: &state)
             Self.prepareAnchorSettlement(for: outcomeID, in: &state)
+            return true
         }
         recentEvents = []
         clearWorldFieldFeedback()
@@ -770,8 +772,8 @@ extension GameStore {
     /// Caught by the collapse (or carried out unconscious): keep a fraction, chosen at random.
     func endRunWithPartialHaul(reason: String, kind: RunExitSummary.Kind = .collapse) {
         guard activeRun != nil else { return }
-        mutate("run ended: \(reason)", flush: true, scope: .expedition) { state in
-            guard var run = state.worlds.activeRun else { return }
+        mutateIf("run ended: \(reason)", flush: true, scope: .expedition) { state in
+            guard var run = state.worlds.activeRun else { return false }
             let departureState = WorldDepartureState.capture(from: run)
             let outcomeID = state.worlds.mintOutcomeID()
             state.reality.library.attachOutcome(outcomeID,
@@ -791,19 +793,22 @@ extension GameStore {
                 GameStore.creditEssenceSpring(&state)
                 state.worlds.lastSpringOutcomeID = outcomeID
             }
-            state.worlds.activeRun = nil
-            state.worlds.pendingWorldArrivalReceiptID = nil
-            let subsidy = GameStore.applyDepartureSubsidy(in: &state)
-            state.worlds.lastExit = GameStore.makeReturnReceipt(
+            let subsidy = GameStore.applyDepartureSubsidy(
+                in: &state, duringExpeditionExit: true)
+            let reviewSummary = GameStore.makeReturnReceipt(
                 run: run, outcomeID: outcomeID, kind: kind, reason: reason, fraction: fraction,
                 banked: banked, departureState: departureState,
                 autoRefinedRaw: automatic?.rawSpent ?? 0,
                 autoRefinedEssence: automatic?.essenceGained ?? 0,
                 springYield: springYield, antiLockSubsidy: subsidy, state: state)
+            guard state.worlds.appendExpeditionReview(reviewSummary) else { return false }
+            state.worlds.activeRun = nil
+            state.worlds.pendingWorldArrivalReceiptID = nil
             TutorialRules.freezeFirstReturnContext(run: run, banked: banked, in: &state)
             TutorialRules.recordExpeditionOutcome(in: &state)
             Self.refreshTradingPost(after: run, outcomeID: outcomeID, in: &state)
             Self.prepareAnchorSettlement(for: outcomeID, in: &state)
+            return true
         }
         recentEvents = []
         clearWorldFieldFeedback()
@@ -811,9 +816,8 @@ extension GameStore {
     }
 
     func dismissRunExitSummary() {
-        mutate("dismiss run summary", flush: true, scope: .expedition) {
-            $0.worlds.lastExit = nil
-        }
+        guard let reviewID = state.worlds.pendingExpeditionReview?.reviewID else { return }
+        _ = acknowledgeExpeditionReview(reviewID)
     }
 
     nonisolated static func sustainObligation(forExistingRealmCount count: Int) -> Int {

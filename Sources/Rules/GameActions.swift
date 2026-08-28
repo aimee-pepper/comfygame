@@ -1146,8 +1146,6 @@ extension GameStore {
             guard state.base.spendEssenceCrystals(book.essencePaid + anchorPremium) else { return false }
             state.worlds.runIndex += 1
             state.reality.lifetime.runsStarted += 1
-            state.worlds.lastExit = nil
-
             state.base.inventory = fieldKit.remainingInventory
             var packedItems = fieldKit.packed
             let progressAtStart = state.base.partyMembers.map { member in
