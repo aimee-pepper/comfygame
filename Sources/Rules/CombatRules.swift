@@ -1431,6 +1431,7 @@ enum CombatRules {
             }
         }
         let feintWasActive = encounter.feintActive?.contains(actor) == true
+        let foeHPBefore = Dictionary(uniqueKeysWithValues: encounter.foes.map { ($0.id, $0.currentHP) })
         var outcome: CommittedActionOutcome = .rejected
 
         switch action {
@@ -1540,6 +1541,19 @@ enum CombatRules {
         }
 
         guard case .committed(let committedCost, let completedDirectAttack) = outcome else { return }
+
+        if actor.isParty {
+            for foe in encounter.foes where foe.currentHP < (foeHPBefore[foe.id] ?? foe.currentHP) {
+                run.animalsAttackedThisExpedition.insert(foe.id)
+                let key = RealityState.AnimalTrustRecordV1.key(
+                    worldSeed: run.mapSeed, enemyID: foe.id)
+                if var trust = state.reality.animalTrustRecords[key], !trust.completed {
+                    trust.progress = 0
+                    trust.lastProgressTurn = nil
+                    state.reality.animalTrustRecords[key] = trust
+                }
+            }
+        }
 
         // Ambush is a separate opening opportunity, not the actor's first normal-cost action.
         // Choosing anything else closes that opportunity even when the chosen setup action costs

@@ -5381,6 +5381,110 @@ final class WorldTests: XCTestCase {
 
     // MARK: Helpers
 
+    func testAnimalAttendPatientPresenceAndJoinPreserveExactIndividual() throws {
+        var state = startedRun(book(["terrain": "plains"]), seed: 14_001)
+        state.reality.library.foundTravellers.insert("sabine")
+        state.base.stations[Stations.menagerie] = .init(isUnlocked: true, tier: 0)
+        var run = try XCTUnwrap(state.worlds.activeRun)
+        run.playerPosition = .init(x: 7, y: 7)
+        var traits = CreatureTraits()
+        traits.sensory.vision = 0; traits.sensory.mechano = 0
+        traits.sensory.chemo = 0; traits.sensory.thermo = 0
+        let animal = WorldEnemy(id: .init(rawValue: 14_001), speciesID: .init(rawValue: 14_002),
+                                traits: traits, position: .init(x: 7, y: 9))
+        run.enemies = [animal]
+        state.worlds.activeRun = run
+
+        let first = WorldRules.attend(animal.id, in: &state)
+        let key = RealityState.AnimalTrustRecordV1.key(
+            worldSeed: 14_001, enemyID: animal.id)
+        let attended = try XCTUnwrap(state.reality.animalTrustRecords[key])
+        XCTAssertEqual(attended.condition, .patientPresence(requiredTurns: 2))
+        XCTAssertEqual(attended.progress, 1)
+        XCTAssertTrue(first.contains { if case .animalAttended = $0 { true } else { false } })
+
+        let second = WorldRules.advanceTurn(in: &state)
+        XCTAssertTrue(state.reality.animalTrustRecords[key]?.completed == true)
+        XCTAssertTrue(second.contains { if case .animalTrustCompleted = $0 { true } else { false } })
+
+        let joined = WorldRules.joinAnimal(animal.id, in: &state)
+        let tamedID = "tamed:14001:14001"
+        let tamed = try XCTUnwrap(state.reality.tamedAnimals[tamedID])
+        XCTAssertEqual(tamed.traits, traits)
+        XCTAssertEqual(tamed.speciesID, animal.speciesID)
+        XCTAssertFalse(state.worlds.activeRun?.enemies.contains(where: { $0.id == animal.id }) ?? true)
+        XCTAssertTrue(joined.contains { if case .animalJoined = $0 { true } else { false } })
+        XCTAssertEqual(try SaveCodec.decode(SaveCodec.encode(state)), state)
+    }
+
+    func testAnimalAttendRefusalsAreAtomicAndRadiusOneStillHasDistanceTwoSolution() throws {
+        var state = startedRun(book(["terrain": "plains"]), seed: 14_011)
+        state.reality.library.foundTravellers.insert("sabine")
+        state.base.stations[Stations.menagerie] = .init(isUnlocked: true, tier: 0)
+        var run = try XCTUnwrap(state.worlds.activeRun)
+        run.playerPosition = .init(x: 7, y: 7)
+        var traits = CreatureTraits()
+        traits.sensory.vision = 0; traits.sensory.mechano = 0
+        traits.sensory.chemo = 0; traits.sensory.thermo = 0
+        let animal = WorldEnemy(id: .init(rawValue: 14_011), traits: traits,
+                                position: .init(x: 7, y: 9))
+        run.enemies = [animal]
+        run.animalsAttackedThisExpedition.insert(animal.id)
+        state.worlds.activeRun = run
+        let before = state
+
+        let refused = WorldRules.attend(animal.id, in: &state)
+        XCTAssertEqual(state, before)
+        XCTAssertTrue(refused.contains { if case .blocked(let copy) = $0 {
+            copy == WorldRules.AttendRefusal.attackedThisExpedition.copy
+        } else { false } })
+
+        state.worlds.activeRun?.animalsAttackedThisExpedition.remove(animal.id)
+        _ = WorldRules.attend(animal.id, in: &state)
+        let key = RealityState.AnimalTrustRecordV1.key(worldSeed: 14_011, enemyID: animal.id)
+        XCTAssertEqual(state.reality.animalTrustRecords[key]?.progress, 1,
+                       "the disclosed distance-two floor must work for a radius-one animal")
+
+        state.worlds.activeRun?.playerPosition = .init(x: 7, y: 8)
+        _ = WorldRules.advanceTurn(in: &state)
+        XCTAssertEqual(state.reality.animalTrustRecords[key]?.progress, 0,
+                       "crowding the exact animal resets only its incomplete patience")
+        XCTAssertNil(state.reality.animalTrustRecords[key]?.lastProgressTurn)
+    }
+
+    func testAnimalUsefulOfferingDefaultsWeakestAndConsumesExactSelectedUnit() throws {
+        var state = startedRun(book(["terrain": "plains"]), seed: 14_021)
+        state.reality.library.foundTravellers.insert("sabine")
+        state.base.stations[Stations.menagerie] = .init(isUnlocked: true, tier: 0)
+        var run = try XCTUnwrap(state.worlds.activeRun)
+        run.playerPosition = .init(x: 7, y: 7)
+        let animal = WorldEnemy(id: .init(rawValue: 14_021), traits: CreatureTraits(),
+                                position: .init(x: 7, y: 9))
+        run.enemies = [animal]
+        let weak = CraftMaterialUnitV1(
+            stableUnitID: .init(rawValue: "animal-offer-weak"), domain: .world,
+            familyID: .fibre, qualityBand: .standard,
+            properties: .init(flexibility: 61),
+            sourceReceipt: .worldHarvest(receiptID: "animal-offer-weak"))
+        let strong = CraftMaterialUnitV1(
+            stableUnitID: .init(rawValue: "animal-offer-strong"), domain: .world,
+            familyID: .fibre, qualityBand: .fine,
+            properties: .init(flexibility: 88),
+            sourceReceipt: .worldHarvest(receiptID: "animal-offer-strong"))
+        run.worldMaterialReserve = .init(units: [
+            .init(unit: strong), .init(unit: weak)
+        ])
+        state.worlds.activeRun = run
+
+        _ = WorldRules.attend(animal.id, in: &state)
+        let choices = WorldRules.qualifyingOfferings(to: animal.id, in: state)
+        XCTAssertEqual(choices.map(\.unitID), [weak.stableUnitID, strong.stableUnitID])
+        let completed = WorldRules.offer(try XCTUnwrap(choices.first), to: animal.id, in: &state)
+        XCTAssertTrue(completed.contains { if case .animalTrustCompleted = $0 { true } else { false } })
+        XCTAssertEqual(state.worlds.activeRun?.worldMaterialReserve.units.map(\.id),
+                       [strong.stableUnitID])
+    }
+
     private func startedRun(_ composition: BoundBook, seed: UInt64) -> GameState {
         var state = GameState.newGame()
         let world = Worldgen.generate(book: composition, seed: seed)

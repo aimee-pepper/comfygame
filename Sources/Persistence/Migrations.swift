@@ -162,9 +162,30 @@ enum Migrations {
     private static func validateCurrentAnimalTrust(in data: Data) throws {
         guard let root = try JSONSerialization.jsonObject(with: data) as? [String: Any],
               let reality = root["reality"] as? [String: Any],
-              reality["animalTrustRecords"] is [String: Any],
-              reality["tamedAnimals"] is [String: Any] else {
+              let trust = reality["animalTrustRecords"] as? [String: Any],
+              let tamed = reality["tamedAnimals"] as? [String: Any] else {
             throw CocoaError(.coderInvalidValue)
+        }
+        let trustRequired: Set<String> = ["version", "worldSeed", "enemyID", "traits",
+            "condition", "progress", "firstAttendedRunIndex", "firstAttendedTurn",
+            "interactionCount", "completed"]
+        let trustAllowed = trustRequired.union(["speciesID", "creatureID", "lastProgressTurn"])
+        for value in trust.values {
+            guard let receipt = value as? [String: Any],
+                  trustRequired.isSubset(of: Set(receipt.keys)),
+                  Set(receipt.keys).isSubset(of: trustAllowed) else {
+                throw CocoaError(.coderInvalidValue)
+            }
+        }
+        let tamedRequired: Set<String> = ["version", "id", "originWorldSeed",
+            "originEnemyID", "traits", "trustCondition", "joinedRunIndex", "joinedTurn"]
+        let tamedAllowed = tamedRequired.union(["speciesID", "creatureID"])
+        for value in tamed.values {
+            guard let receipt = value as? [String: Any],
+                  tamedRequired.isSubset(of: Set(receipt.keys)),
+                  Set(receipt.keys).isSubset(of: tamedAllowed) else {
+                throw CocoaError(.coderInvalidValue)
+            }
         }
         let decoded = try SaveCodec.makeDecoder().decode(GameState.self, from: data)
         guard decoded.reality.animalTrustRecords.allSatisfy({ $0.value.validates(key: $0.key) }),

@@ -141,7 +141,8 @@ enum WorldRules {
         let key = RealityState.AnimalTrustRecordV1.key(worldSeed: run.mapSeed, enemyID: enemy.id)
         let distance = enemy.position.chebyshevDistance(to: run.playerPosition)
         let refusal: AttendRefusal?
-        if !state.base.station(Stations.menagerie).isUnlocked { refusal = .locked }
+        if !state.reality.library.foundTravellers.contains("sabine")
+            || !state.base.station(Stations.menagerie).isUnlocked { refusal = .locked }
         else if enemy.isSessile { refusal = .sessile }
         else if enemy.isApex { refusal = .apex }
         else if case .pursuing = enemy.awareness { refusal = .pursuing }
@@ -235,6 +236,23 @@ enum WorldRules {
         state.reality.animalTrustRecords[key] = record
         state.worlds.activeRun = run
         return [.animalTrustCompleted(run.name(of: enemy))]
+    }
+
+    static func qualifyingOfferings(to enemyID: InstanceID, in state: GameState)
+        -> [CraftMaterialSelection] {
+        guard let run = state.worlds.activeRun else { return [] }
+        let key = RealityState.AnimalTrustRecordV1.key(
+            worldSeed: run.mapSeed, enemyID: enemyID)
+        guard let record = state.reality.animalTrustRecords[key], !record.completed,
+              case .usefulOffering(let property, let threshold) = record.condition else { return [] }
+        return run.worldMaterialReserve.units.compactMap { holding in
+            guard property.value(in: holding.unit.properties) >= threshold else { return nil }
+            return CraftMaterialSelection(unitID: holding.id, unit: holding.unit)
+        }.sorted {
+            let left = property.value(in: $0.unit.properties)
+            let right = property.value(in: $1.unit.properties)
+            return left != right ? left < right : $0.unitID < $1.unitID
+        }
     }
 
     static func joinAnimal(_ enemyID: InstanceID, in state: inout GameState) -> [Event] {
@@ -680,6 +698,13 @@ enum WorldRules {
                 .min(by: { run.enemies[$0].position.manhattanDistance(to: run.playerPosition)
                     < run.enemies[$1].position.manhattanDistance(to: run.playerPosition) })
             else { return [.blocked("No visible roaming creature answers the lure.")] }
+            let trustKey = RealityState.AnimalTrustRecordV1.key(
+                worldSeed: run.mapSeed, enemyID: run.enemies[nearest].id)
+            if var trust = state.reality.animalTrustRecords[trustKey], !trust.completed {
+                trust.progress = 0
+                trust.lastProgressTurn = nil
+                state.reality.animalTrustRecords[trustKey] = trust
+            }
             run.enemies[nearest].isAwake = true
         case .maskScent:
             guard run.scentMask == nil else {

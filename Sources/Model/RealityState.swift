@@ -49,8 +49,11 @@ struct RealityState: Codable, Equatable, Sendable {
                   progress >= 0, interactionCount > 0 else { return false }
             switch condition {
             case .patientPresence(let required):
+                let progressTurnValid = progress == 0
+                    ? lastProgressTurn == nil
+                    : lastProgressTurn.map { $0 > firstAttendedTurn } == true
                 return required > 0 && progress <= required && completed == (progress == required)
-                    && (lastProgressTurn == nil || lastProgressTurn! > firstAttendedTurn)
+                    && progressTurnValid
             case .usefulOffering(_, let threshold):
                 return threshold.isFinite && (0...100).contains(threshold)
                     && progress <= 1 && completed == (progress == 1)

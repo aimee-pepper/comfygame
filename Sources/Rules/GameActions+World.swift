@@ -758,6 +758,49 @@ extension GameStore {
         finishTurn(events, attempt: attempt)
     }
 
+    var attendableAnimals: [WorldRules.AttendProjection] {
+        WorldRules.attendableAnimals(in: state)
+    }
+
+    func attend(to enemyID: InstanceID) {
+        guard activeRun?.activeEncounter == nil,
+              let projection = WorldRules.attendProjection(for: enemyID, in: state) else { return }
+        if let refusal = projection.refusal {
+            recentEvents = [.blocked(refusal.copy)]
+            return
+        }
+        guard let attempt = beginWorldFieldAttempt(.interact) else { return }
+        var events: [WorldRules.Event] = []
+        mutate("attend to animal", flush: true, scope: .expedition) { state in
+            events = WorldRules.attend(enemyID, in: &state)
+        }
+        finishTurn(events, attempt: attempt)
+    }
+
+    @discardableResult
+    func offer(_ selection: CraftMaterialSelection, toAnimal enemyID: InstanceID) -> Bool {
+        var events: [WorldRules.Event] = []
+        let committed = mutateIf("offer animal material", flush: true, scope: .expedition) { state in
+            let before = state
+            events = WorldRules.offer(selection, to: enemyID, in: &state)
+            return state != before
+        }
+        if committed { recentEvents = events }
+        return committed
+    }
+
+    @discardableResult
+    func joinAnimal(_ enemyID: InstanceID) -> Bool {
+        var events: [WorldRules.Event] = []
+        let committed = mutateIf("animal joins expedition", flush: true, scope: .expedition) { state in
+            let before = state
+            events = WorldRules.joinAnimal(enemyID, in: &state)
+            return state != before
+        }
+        if committed { recentEvents = events }
+        return committed
+    }
+
     /// Leave through a portal, keeping the whole haul. The good ending.
     func portalHome(reason: String = "You returned through a portal.") {
         guard canPortalHere, activeRun?.activeEncounter == nil else { return }
@@ -879,8 +922,12 @@ extension GameStore {
         guard !state.worlds.anchoredRealms.contains(where: { $0.runIndex == run.runIndex }) else {
             return
         }
-        state.reality.animalTrustRecords = state.reality.animalTrustRecords.filter { _, record in
-            record.worldSeed != run.mapSeed || record.completed
+        let claimed = Set(state.reality.tamedAnimals.values.map {
+            RealityState.AnimalTrustRecordV1.key(
+                worldSeed: $0.originWorldSeed, enemyID: $0.originEnemyID)
+        })
+        state.reality.animalTrustRecords = state.reality.animalTrustRecords.filter { key, record in
+            record.worldSeed != run.mapSeed || claimed.contains(key)
         }
     }
 

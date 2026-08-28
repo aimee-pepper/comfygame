@@ -71,6 +71,26 @@ struct GameState: Codable, Equatable, Sendable {
             guard !owned.contains(where: { !$0.identified && recognized.contains($0.catalogID) })
             else { throw CocoaError(.coderInvalidValue) }
         }
+        if schemaVersion >= 14 {
+            for animal in reality.tamedAnimals.values {
+                let key = RealityState.AnimalTrustRecordV1.key(
+                    worldSeed: animal.originWorldSeed, enemyID: animal.originEnemyID)
+                guard let trust = reality.animalTrustRecords[key], trust.completed,
+                      trust.traits == animal.traits, trust.speciesID == animal.speciesID,
+                      trust.creatureID == animal.creatureID,
+                      trust.condition == animal.trustCondition else {
+                    throw CocoaError(.coderInvalidValue)
+                }
+            }
+            let runs = [worlds.activeRun].compactMap { $0 } + worlds.anchoredRealms.map(\.world)
+            guard runs.allSatisfy({ run in
+                !run.enemies.contains { enemy in
+                    reality.tamedAnimals.values.contains {
+                        $0.originWorldSeed == run.mapSeed && $0.originEnemyID == enemy.id
+                    }
+                }
+            }) else { throw CocoaError(.coderInvalidValue) }
+        }
         if schemaVersion >= 4 {
             let runs = [worlds.activeRun].compactMap { $0 } + worlds.anchoredRealms.map(\.world)
             for run in runs {

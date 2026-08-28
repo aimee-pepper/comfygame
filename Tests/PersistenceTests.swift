@@ -19,13 +19,69 @@ final class PersistenceTests: XCTestCase {
         root["schemaVersion"] = 12
         var reality = try XCTUnwrap(root["reality"] as? [String: Any])
         reality.removeValue(forKey: "curioFamilyKnowledge")
+        reality.removeValue(forKey: "animalTrustRecords")
+        reality.removeValue(forKey: "tamedAnimals")
         root["reality"] = reality
         let legacy = try JSONSerialization.data(withJSONObject: root, options: [.sortedKeys])
 
         let migrated = try SaveCodec.decode(legacy)
-        XCTAssertEqual(migrated.schemaVersion, 13)
+        XCTAssertEqual(migrated.schemaVersion, Tuning.saveSchemaVersion)
         XCTAssertTrue(migrated.reality.curioFamilyKnowledge.isEmpty)
+        XCTAssertTrue(migrated.reality.animalTrustRecords.isEmpty)
+        XCTAssertTrue(migrated.reality.tamedAnimals.isEmpty)
         XCTAssertEqual(try SaveCodec.decode(SaveCodec.encode(migrated)), migrated)
+    }
+
+    func testAnimalTrustSchemaThirteenMigrationStartsEmptyAndIsIdempotent() throws {
+        var root = try XCTUnwrap(JSONSerialization.jsonObject(
+            with: SaveCodec.encode(.newGame())) as? [String: Any])
+        root["schemaVersion"] = 13
+        var reality = try XCTUnwrap(root["reality"] as? [String: Any])
+        reality.removeValue(forKey: "animalTrustRecords")
+        reality.removeValue(forKey: "tamedAnimals")
+        root["reality"] = reality
+        let legacy = try JSONSerialization.data(withJSONObject: root, options: [.sortedKeys])
+
+        let migrated = try SaveCodec.decode(legacy)
+        XCTAssertEqual(migrated.schemaVersion, 14)
+        XCTAssertTrue(migrated.reality.animalTrustRecords.isEmpty)
+        XCTAssertTrue(migrated.reality.tamedAnimals.isEmpty)
+        XCTAssertEqual(try SaveCodec.decode(SaveCodec.encode(migrated)), migrated)
+    }
+
+    func testCurrentAnimalTrustMalformedRawSavePreservesExactBytes() throws {
+        for mutation in ["null", "future", "negative", "extra"] {
+            var state = GameState.newGame()
+            let record = RealityState.AnimalTrustRecordV1(
+                worldSeed: 14, enemyID: .init(rawValue: 7), speciesID: nil,
+                creatureID: nil, traits: CreatureTraits(),
+                condition: .patientPresence(requiredTurns: 2), progress: 0,
+                firstAttendedRunIndex: 1, firstAttendedTurn: 0,
+                lastProgressTurn: nil, interactionCount: 1, completed: false)
+            state.reality.animalTrustRecords[record.key] = record
+            var root = try XCTUnwrap(JSONSerialization.jsonObject(with: SaveCodec.encode(state))
+                                      as? [String: Any])
+            var reality = try XCTUnwrap(root["reality"] as? [String: Any])
+            if mutation == "null" {
+                reality["animalTrustRecords"] = NSNull()
+            } else {
+                var records = try XCTUnwrap(reality["animalTrustRecords"] as? [String: Any])
+                var receipt = try XCTUnwrap(records[record.key] as? [String: Any])
+                switch mutation {
+                case "future": receipt["version"] = 2
+                case "negative": receipt["progress"] = -1
+                default: receipt["unexpected"] = true
+                }
+                records[record.key] = receipt
+                reality["animalTrustRecords"] = records
+            }
+            root["reality"] = reality
+            let bytes = try JSONSerialization.data(withJSONObject: root, options: [.sortedKeys])
+            let io = SaveFileIO.temporary(name: "animal-trust-\(mutation)-\(UUID().uuidString)")
+            try io.write(bytes)
+            guard case .unrecoverable = io.load() else { return XCTFail("expected \(mutation) failure") }
+            try assertQuarantinedSavePreserves(bytes, io: io)
+        }
     }
 
     func testCurrentCurioKnowledgeMalformedRawSavePreservesExactBytes() throws {
