@@ -16,10 +16,18 @@ ROOT = Path(__file__).resolve().parents[2]
 SOURCE = ROOT / "AssetLab/source/mob-gear-sprites-v1"
 OUTPUT = ROOT / "AssetLab/integration/mob-gear-sprites-v1"
 
-MOB_MATERIALS = [
+ATLAS_MOB_MATERIALS = [
     "plate", "quill", "pelt", "down", "hide", "chitin", "fang", "tusk",
     "claw", "bone", "ichor", "timber", "fibre", "pulp", "toxin", "reagent",
 ]
+
+REFINED_MOB_MATERIALS = [
+    "feather", "fin", "scale", "oil", "shell", "horn", "venom",
+]
+
+# Append the exact reviewed b3a33170 command-source bytes without reordering any pre-existing
+# pack record. That keeps all sixteen established source rows and generated literals stable.
+MOB_MATERIALS = [*ATLAS_MOB_MATERIALS, *REFINED_MOB_MATERIALS]
 
 GEAR_FAMILIES = [
     "pointed_blade", "cutting_blade", "hand_maul", "long_spear", "longbow", "sling",
@@ -148,6 +156,25 @@ def split_atlas(source: Path, columns: int, rows: int, names: list[str], out: Pa
     return records
 
 
+def copy_exact_sprites(source: Path, names: list[str], out: Path) -> list[dict]:
+    records: list[dict] = []
+    for name in names:
+        source_file = source / f"{name}.png"
+        image = Image.open(source_file).convert("RGBA")
+        if image.size != (32, 32):
+            raise ValueError(f"wrong refined material size for {name}: {image.size}")
+        occupied = sum(1 for value in image.getchannel("A").getdata() if value > 0)
+        if not 40 <= occupied <= 784:
+            raise ValueError(f"implausible occupied area for {name}: {occupied}")
+        target = out / f"{name}.png"
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_bytes(source_file.read_bytes())
+        records.append({"id": name, "file": target.name, "sha256": sha256(target),
+                        "width": 32, "height": 32, "occupiedPixels": occupied,
+                        "source": "b3a33170-refined-material-command-output"})
+    return records
+
+
 def recolor(source: Path, palette: list[int], target: Path) -> dict:
     image = Image.open(source).convert("RGBA")
     output = Image.new("RGBA", image.size, (0, 0, 0, 0))
@@ -170,8 +197,12 @@ def recolor(source: Path, palette: list[int], target: Path) -> dict:
 
 
 def render(destination: Path) -> dict:
-    mob = split_atlas(SOURCE / "mob-material-atlas-alpha.png", 4, 4, MOB_MATERIALS,
-                      destination / "mob-drops")
+    atlas_mob = split_atlas(SOURCE / "mob-material-atlas-alpha.png", 4, 4,
+                            ATLAS_MOB_MATERIALS, destination / "mob-drops")
+    refined_mob = copy_exact_sprites(SOURCE / "refined-mob-drops", REFINED_MOB_MATERIALS,
+                                     destination / "mob-drops")
+    mob_by_id = {record["id"]: record for record in atlas_mob + refined_mob}
+    mob = [mob_by_id[name] for name in MOB_MATERIALS]
     gear = split_atlas(SOURCE / "gear-family-atlas-alpha.png", 6, 4, GEAR_FAMILIES,
                        destination / "gear-families")
     catalogue_gear: list[dict] = []
@@ -199,6 +230,8 @@ def render(destination: Path) -> dict:
         },
         "coverage": {
             "mobMaterialKinds": MOB_MATERIALS,
+            "refinedMaterialSourceCheckpoint": "b3a33170314998c76909f8a2f2aeeb5d038882e8",
+            "refinedMaterialKinds": REFINED_MOB_MATERIALS,
             "gearFamilies": GEAR_FAMILIES,
             "worldResourceMaterialProfiles": [
                 {"id": f"world:{material_id}", "materialLevel": profile["level"],

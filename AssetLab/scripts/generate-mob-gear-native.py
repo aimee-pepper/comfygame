@@ -89,7 +89,7 @@ def generated_source() -> str:
         "    }", "}", "", "enum MobGearSpriteV1Registry {",
         f'    static let packID = "{manifest["packID"]}"',
         f'    static let canonicalBodySHA256 = "{manifest["canonicalBodySHA256"]}"', "",
-        "    static func mobDropAsset(for kind: MaterialKind) -> NativeVisualRuntime.GeneratedPixelAsset? {",
+        "    static func mobDropAsset(for kind: MaterialFamilyID) -> NativeVisualRuntime.GeneratedPixelAsset? {",
         "        mobDropAssets[kind.rawValue]", "    }", "",
         "    static let catalogueRegistry = CatalogueGearSpriteV1Registry()", "",
         "    private static let mobDropAssets: [String: NativeVisualRuntime.GeneratedPixelAsset] = [",

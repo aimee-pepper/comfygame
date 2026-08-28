@@ -1,0 +1,10 @@
+{
+  "schema": "bookbinder.world-material-pixel-correction-v1.deterministic-receipt",
+  "status": "corrected-candidate-not-Aimee-approved",
+  "integrationReady": false,
+  "manifestSHA256": "0644e1c83a0c2b948331658dc5afec889bbe4867dc3abbc48eb4a21d9b130cee",
+  "canonicalBodySHA256": "c5e4511564ecb73af1435670ea872e0e2765ab6700eac733f848425f4b65fac5",
+  "sourceAggregateSHA256": "ddb36cad7a122efb82f5c788b423681ef81f7c53a22f6ee1d632828102129e00",
+  "evidenceAggregateSHA256": "26671ad087d32531128f14e12b323d947b41a144773817a4b1bab8a064cf6fdd",
+  "check": "NODE_PATH=<workspace AssetLab/node_modules> node AssetLab/scripts/export-world-material-pixel-correction-v1.mjs --check"
+}

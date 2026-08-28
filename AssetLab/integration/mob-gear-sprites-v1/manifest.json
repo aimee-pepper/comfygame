@@ -136,6 +136,69 @@
           "width": 32,
           "height": 32,
           "occupiedPixels": 391
+        },
+        {
+          "id": "feather",
+          "file": "feather.png",
+          "sha256": "d31cf1718b4169b8507ccaa80989f5bbc4366b328ae941d428979a000c270106",
+          "width": 32,
+          "height": 32,
+          "occupiedPixels": 272,
+          "source": "b3a33170-refined-material-command-output"
+        },
+        {
+          "id": "fin",
+          "file": "fin.png",
+          "sha256": "a2d7bd7a527023b1f1b5aff6d7aaa0846c7db62e077d9d5ac4bcf9ec26344c8f",
+          "width": 32,
+          "height": 32,
+          "occupiedPixels": 355,
+          "source": "b3a33170-refined-material-command-output"
+        },
+        {
+          "id": "scale",
+          "file": "scale.png",
+          "sha256": "be24a9b22bde4c49d39eadc2db16b1d3d330fa54428ffdb397a26f75087aaef2",
+          "width": 32,
+          "height": 32,
+          "occupiedPixels": 326,
+          "source": "b3a33170-refined-material-command-output"
+        },
+        {
+          "id": "oil",
+          "file": "oil.png",
+          "sha256": "f58235660562332dea4ec3a0156abe9f8da2fdda5622432dfbdd5ba6d66551d4",
+          "width": 32,
+          "height": 32,
+          "occupiedPixels": 262,
+          "source": "b3a33170-refined-material-command-output"
+        },
+        {
+          "id": "shell",
+          "file": "shell.png",
+          "sha256": "f10c6620c026f6aeb8b67b04ec6f46ac8ced850a776b05ccc0045fd30831a7d2",
+          "width": 32,
+          "height": 32,
+          "occupiedPixels": 330,
+          "source": "b3a33170-refined-material-command-output"
+        },
+        {
+          "id": "horn",
+          "file": "horn.png",
+          "sha256": "f3d72915f3c04fb3b9c140474909a75204043dc8152d65f04054ab59978a0914",
+          "width": 32,
+          "height": 32,
+          "occupiedPixels": 218,
+          "source": "b3a33170-refined-material-command-output"
+        },
+        {
+          "id": "venom",
+          "file": "venom.png",
+          "sha256": "b0c328438e9c82497bb04f54dacb9e02adbb7d86d2b8a916e455cf7e184e5cb2",
+          "width": 32,
+          "height": 32,
+          "occupiedPixels": 232,
+          "source": "b3a33170-refined-material-command-output"
         }
       ]
     },
@@ -1196,7 +1259,24 @@
       "fibre",
       "pulp",
       "toxin",
-      "reagent"
+      "reagent",
+      "feather",
+      "fin",
+      "scale",
+      "oil",
+      "shell",
+      "horn",
+      "venom"
+    ],
+    "refinedMaterialSourceCheckpoint": "b3a33170314998c76909f8a2f2aeeb5d038882e8",
+    "refinedMaterialKinds": [
+      "feather",
+      "fin",
+      "scale",
+      "oil",
+      "shell",
+      "horn",
+      "venom"
     ],
     "gearFamilies": [
       "pointed_blade",
@@ -1591,5 +1671,5 @@
     "No gameplay property is inferred from sprite color.",
     "Quality and stat badges remain separate presentation metadata."
   ],
-  "canonicalBodySHA256": "ee65afce662d74615ed3c602a7654650ab6e317df1e3d43b612820a6ede40fc9"
+  "canonicalBodySHA256": "eff8f3bdb8d50fa15242ee75aea457f674c75f9e3af1640e5dbd598ebe9f87d4"
 }

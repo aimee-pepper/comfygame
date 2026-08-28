@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>World Material Pixel Correction v1</title>
+  <style>
+    :root { color-scheme: dark; font-family: system-ui, sans-serif; background: #101614; color: #eee4cf; }
+    body { margin: 0 auto; max-width: 1180px; padding: 24px; }
+    h1 { margin-bottom: 6px; } p { color: #b8c0b6; max-width: 72ch; }
+    .status { color: #d8b667; font-weight: 700; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 18px; }
+    figure { margin: 0; padding: 12px; background: #202a25; border: 1px solid #526259; }
+    img { display: block; width: min(100%, 368px); height: auto; margin: auto; image-rendering: pixelated; }
+    figcaption { margin-top: 8px; color: #b8c0b6; }
+    code { color: #d8b667; }
+  </style>
+</head>
+<body>
+  <h1>World material pixel correction v1</h1>
+  <p class="status">Corrected candidate · not Aimee-approved · integrationReady:false</p>
+  <p>Exact 32×32 generated identities for Feather, Fin, Scale, Oil, Shell, Horn and Venom, shown in the World carried strip’s native 16×16 slot and beside collision-prone existing families. Existing material bytes, World header and Seamward composition remain unchanged.</p>
+  <div class="grid">
+    <figure><img src="artifacts/world-material-pixel-correction-v1/world-carried-materials-light-368x800.png" alt="Light composition"><figcaption>Light composition</figcaption></figure>
+    <figure><img src="artifacts/world-material-pixel-correction-v1/world-carried-materials-dark-368x800.png" alt="Dark composition"><figcaption>Dark composition</figcaption></figure>
+    <figure><img src="artifacts/world-material-pixel-correction-v1/world-carried-materials-grayscale-368x800.png" alt="Literal grayscale"><figcaption>Literal grayscale</figcaption></figure>
+  </div>
+</body>
+</html>

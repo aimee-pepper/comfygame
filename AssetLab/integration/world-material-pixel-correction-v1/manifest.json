@@ -1,0 +1,155 @@
+{
+  "schema": "bookbinder.world-material-pixel-correction-v1.manifest",
+  "status": "corrected-candidate-not-Aimee-approved",
+  "integrationReady": false,
+  "provenance": {
+    "parentCommit": "3aa44270a7930a2af52a3551200cc3060b988f81",
+    "sourceCheckpoint": "b3a33170314998c76909f8a2f2aeeb5d038882e8",
+    "sourceTree": "a8b3a8c2c66a101442a6372addeac3899c072cae",
+    "sourceCandidateCanonicalBodySHA256": "b5dd9a6ce521f75c960cd7ede852ea71d08a9b6aa1639fd358a6c215c616b454",
+    "sharedPack": {
+      "file": "AssetLab/integration/mob-gear-sprites-v1/manifest.json",
+      "sha256": "6a299e1599c8612e1443c506a51794681dedbc3e60cd5128e0d768381167923b",
+      "canonicalBodySHA256": "eff8f3bdb8d50fa15242ee75aea457f674c75f9e3af1640e5dbd598ebe9f87d4"
+    }
+  },
+  "families": [
+    "feather",
+    "fin",
+    "scale",
+    "oil",
+    "shell",
+    "horn",
+    "venom"
+  ],
+  "sourceRecords": {
+    "feather": {
+      "file": "AssetLab/source/mob-gear-sprites-v1/refined-mob-drops/feather.png",
+      "sha256": "d31cf1718b4169b8507ccaa80989f5bbc4366b328ae941d428979a000c270106",
+      "decodedRGBASHA256": "8beb76d6c643ca7c03d400bb6ce1295187d76125dbdeac1c2f933427afd93d29",
+      "commandSHA256": "f1e3869eabf50b2bf961d1c0fdbf47165f637f6956868828ef2e1d6931ac3bc8",
+      "silhouetteSHA256": "d8efbb75491294d511b64f8e2789c245ca9602c40206912aaaaf1f3b84110bc7",
+      "width": 32,
+      "height": 32
+    },
+    "fin": {
+      "file": "AssetLab/source/mob-gear-sprites-v1/refined-mob-drops/fin.png",
+      "sha256": "a2d7bd7a527023b1f1b5aff6d7aaa0846c7db62e077d9d5ac4bcf9ec26344c8f",
+      "decodedRGBASHA256": "9214cd85447a7e63d64c828e1bc1e7e95e25ec3f1c8b7323f67b23cb02933325",
+      "commandSHA256": "4d2e97f3fa9f97f7f7f6de3d387264dba596cfcb8838d27a1f39229aca5187fc",
+      "silhouetteSHA256": "b1ce7c8d565aa49f002b78926b34cc6c81628b877901220df1d0a401b462db47",
+      "width": 32,
+      "height": 32
+    },
+    "scale": {
+      "file": "AssetLab/source/mob-gear-sprites-v1/refined-mob-drops/scale.png",
+      "sha256": "be24a9b22bde4c49d39eadc2db16b1d3d330fa54428ffdb397a26f75087aaef2",
+      "decodedRGBASHA256": "c6185219dc35abaeba47d057a9b4cf0a936f82b30df9198bc896bbbac204a319",
+      "commandSHA256": "8f7b99591cdca8b5b93349b5f0f4e2946eeabedc5777fdf2be10f6b47118181b",
+      "silhouetteSHA256": "aa309b67c8aa51bc1d4d90ec2df3e78433524197d4b89e92124a53b92e3f152c",
+      "width": 32,
+      "height": 32
+    },
+    "oil": {
+      "file": "AssetLab/source/mob-gear-sprites-v1/refined-mob-drops/oil.png",
+      "sha256": "f58235660562332dea4ec3a0156abe9f8da2fdda5622432dfbdd5ba6d66551d4",
+      "decodedRGBASHA256": "701691d5bca8ee39bb4bc2c5cb2c44d1aa259a7e13a972d413f38f7940b5e4f0",
+      "commandSHA256": "9d4ffd7c55357cdd8b9f33e426f59b5d2875a9ca156f8d0f0e17e33d9c9c9208",
+      "silhouetteSHA256": "1d5f1b15dc8380d6b7ada1d0b206bd758aa1567d6adc08f3cf05fba915a14dd5",
+      "width": 32,
+      "height": 32
+    },
+    "shell": {
+      "file": "AssetLab/source/mob-gear-sprites-v1/refined-mob-drops/shell.png",
+      "sha256": "f10c6620c026f6aeb8b67b04ec6f46ac8ced850a776b05ccc0045fd30831a7d2",
+      "decodedRGBASHA256": "6e1da46dadbb6bda8d149ceb79b3e7417528b7ea972d8d16c6a9b3012ac2df27",
+      "commandSHA256": "ca4520a7a06ee9b675abc5204f0d4452e7d88e13db96445b2901a146b2ae53bb",
+      "silhouetteSHA256": "ea435d99cb217c35e2bd852219244f57fd3c415a024de204a66eecda4f52325a",
+      "width": 32,
+      "height": 32
+    },
+    "horn": {
+      "file": "AssetLab/source/mob-gear-sprites-v1/refined-mob-drops/horn.png",
+      "sha256": "f3d72915f3c04fb3b9c140474909a75204043dc8152d65f04054ab59978a0914",
+      "decodedRGBASHA256": "0a24bed4676841cfa6597bcf7445b69387dc83ff29531b24ea138248396cc5fd",
+      "commandSHA256": "a6cf60c2412e9b060fbd5d45c576d40830fdef1c5054da467800a869a88f57d0",
+      "silhouetteSHA256": "31bbb0f3edebb779824ff963813170a5f2c5a443d9057373bd90216e3c199f84",
+      "width": 32,
+      "height": 32
+    },
+    "venom": {
+      "file": "AssetLab/source/mob-gear-sprites-v1/refined-mob-drops/venom.png",
+      "sha256": "b0c328438e9c82497bb04f54dacb9e02adbb7d86d2b8a916e455cf7e184e5cb2",
+      "decodedRGBASHA256": "2accf3f985cb4a4c91ef26fc59f33639ddd0ab0c6d38f2e9332e638feaca9e24",
+      "commandSHA256": "7a9ee34b0e3992307d3ca6922f98c9bd7b8980308c4dabef358ed49a5d61ecc8",
+      "silhouetteSHA256": "91e30554c0fdd42ebaaa2edcd908361e6807bbdc8ccf6fbdd7e719952763f2b9",
+      "width": 32,
+      "height": 32
+    }
+  },
+  "preservedExistingMaterialHashes": {
+    "plate": "c3a5b2b4daf166f5db8c255685f437c28733e5f6a8240f6bf3f1ef8a7e0ceec4",
+    "quill": "758bc8a1b19d1b19cfb4a534f582479ed12d16fc118e7ed18905257bb405e7da",
+    "pelt": "8c2d704229244ded55f615efd693877ca7469ed6a27e37d0ff2155c357bd6b11",
+    "down": "d1acb8d28f21f59b2bf11ab9248293312e2ab3596f8774762ec8b293f9604a18",
+    "hide": "dbf8dc993d7b9df36545c41cc2332b05c9d708d2e670355b6ec67fc52b1ff892",
+    "chitin": "ea7a03f2fda06bac2e3719fd98beccabc56820be24a06110c0968fb429f7957a",
+    "fang": "4986e8ef9f39889d8bbfc0f673349b923b05d3c808d74b09366e97df4d1ec0a0",
+    "tusk": "caf6346bf6fb2f208309855fb25d92354db22c6abe45f9b4027c5b47e56fccfc",
+    "claw": "ab7628b908c228da8bf485eda5c8e425a729a29506e991c0e4c805b3bddc8ded",
+    "bone": "5ae5fc492c76b99bcde84e930571f80009cb33a397fbfaa221d16826a726ff7d",
+    "ichor": "0bab25df7fdf7a6754a3e3061a6a5e1fbd66fd9929b330877cb89e04939a4136",
+    "timber": "2c4dda26823c06c313a298d9b66a120cd2d0613a2e676e5c4b9784fa014b5c51",
+    "fibre": "8714db06732384d09efb1a7c026f3af0c26d3d7d645e24009ece94d06518078e",
+    "pulp": "b590044e7a56f0e3722cba7d2beea1a9cb98f7a3d4d46ed6cd4c8b27c4f41aab",
+    "toxin": "373e41191f5e04b9c409deacb246e3bef319dc7ed16476c60aaea199c4c9368c",
+    "reagent": "15662477bdb4f538e40424ea6fd3322732832ea4b4c68200c46d06a33046de8e"
+  },
+  "evidence": {
+    "light": {
+      "file": "world-carried-materials-light-368x800.png",
+      "sha256": "539f01b73dc876fe731a4a0bdf6c127bce296427ad9931c8290fae0254f8440c",
+      "bytes": 37179,
+      "width": 368,
+      "height": 800
+    },
+    "dark": {
+      "file": "world-carried-materials-dark-368x800.png",
+      "sha256": "8b6bc6e3f122b9839bc6353a65db12167a33b2cf963579a0a5138c42e1cfb890",
+      "bytes": 37702,
+      "width": 368,
+      "height": 800
+    },
+    "grayscale": {
+      "file": "world-carried-materials-grayscale-368x800.png",
+      "sha256": "a6ef61e1d297e485edf5ac7ce8ebb1981a25c353290c1ca9fbf5e02ba4a84e50",
+      "bytes": 35566,
+      "width": 368,
+      "height": 800,
+      "literalGrayscale": true
+    }
+  },
+  "runtime": {
+    "resolver": "CraftMaterialUnitPixelIdentity -> MobGearSpriteV1Registry",
+    "authoredSize": [
+      32,
+      32
+    ],
+    "worldCarriedSlot": [
+      16,
+      16
+    ],
+    "interpolation": "nearest-neighbour",
+    "exactPixelCoverageCount": 23,
+    "sfSymbolFallbackCountForMaterialFamilyID": 0
+  },
+  "boundary": {
+    "changedMaterialFamilies": 7,
+    "preservedMaterialFamilies": 16,
+    "WorldHeaderChanged": false,
+    "SeamwardLayoutChanged": false,
+    "SurveyPostChanged": false,
+    "simulatorUsed": false
+  },
+  "canonicalBodySHA256": "c5e4511564ecb73af1435670ea872e0e2765ab6700eac733f848425f4b65fac5"
+}
