@@ -101,6 +101,31 @@ final class MaterialTests: XCTestCase {
         XCTAssertEqual(Set(assets.map(\.decodedRGBASHA256)).count, visualFamilies.count)
     }
 
+    func testEveryMaterialFamilyHasOneDistinctGeneratedPixelIdentityWithoutFallback() throws {
+        let assets = try MaterialFamilyID.allCases.map { kind in
+            let asset = try XCTUnwrap(
+                MobGearSpriteV1Registry.mobDropAsset(for: kind),
+                "\(kind.rawValue) would fall through CraftMaterialUnitPixelIdentity to an SF Symbol")
+            XCTAssertNoThrow(try NativeVisualRuntime.validate(asset), kind.rawValue)
+            XCTAssertEqual(asset.width, 32, kind.rawValue)
+            XCTAssertEqual(asset.height, 32, kind.rawValue)
+            return asset
+        }
+
+        XCTAssertEqual(assets.count, 23)
+        XCTAssertEqual(Set(assets.map(\.decodedRGBASHA256)).count, assets.count,
+                       "every material family must retain a visually distinct exact pixel identity")
+        XCTAssertEqual(Set(assets.map(\.commandSHA256)).count, assets.count,
+                       "no two material families may share the same generated command stream")
+
+        let correctedFamilies: [MaterialFamilyID] = [
+            .feather, .fin, .scale, .oil, .shell, .horn, .venom,
+        ]
+        XCTAssertTrue(correctedFamilies.allSatisfy {
+            MobGearSpriteV1Registry.mobDropAsset(for: $0) != nil
+        })
+    }
+
     func testMaterialReserveRoundTripPreservesStableIdentityAndExactSample() throws {
         let sample = CraftMaterialUnitV1(kind: .hide,
             properties: MaterialProperties(hardness: 31, density: 42, insulation: 53,
