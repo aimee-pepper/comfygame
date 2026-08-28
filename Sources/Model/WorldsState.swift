@@ -1227,6 +1227,7 @@ struct WorldRun: Codable, Equatable, Sendable {
     var scentMask: ScentMaskState?
     var seamlightGuidance: SeamlightGuidanceReceiptV1?
     var seamwardExpedition: SeamwardExpeditionReceiptV1?
+    var recoveredTeachingExpedition: RecoveredTeachingExpeditionReceiptV1?
 
     var scentMaskTurnsRemaining: Int {
         guard let scentMask else { return 0 }
@@ -1415,6 +1416,7 @@ struct WorldRun: Codable, Equatable, Sendable {
         self.sourceDangerReceipt = sourceDangerReceipt ?? .freeze(book: book)
         self.creatureMaterialRewardReceipts = creatureMaterialRewardReceipts
         self.anatomyButcheryReceipt = anatomyButcheryReceipt
+        self.recoveredTeachingExpedition = nil
         self.generationDiagnostics = generationDiagnostics
         self.clock = WorldClock(book: book, seed: mapSeed)
         self.map = map
@@ -1545,6 +1547,18 @@ struct WorldRun: Codable, Equatable, Sendable {
             seamwardExpedition = nil
         }
         try seamwardExpedition?.validate(for: turnsTaken)
+        if container.contains(.recoveredTeachingExpedition) {
+            guard try !container.decodeNil(forKey: .recoveredTeachingExpedition) else {
+                throw CocoaError(.coderInvalidValue)
+            }
+            recoveredTeachingExpedition = try container.decode(
+                RecoveredTeachingExpeditionReceiptV1.self, forKey: .recoveredTeachingExpedition)
+            guard recoveredTeachingExpedition?.validates() == true else {
+                throw CocoaError(.coderInvalidValue)
+            }
+        } else {
+            recoveredTeachingExpedition = nil
+        }
         satchel = try container.decodeIfPresent(ResourcePool.self, forKey: .satchel) ?? ResourcePool()
         satchelItems = try container.decodeIfPresent(Inventory.self, forKey: .satchelItems)
             ?? Inventory(slots: Tuning.Economy.startingInventorySlots)

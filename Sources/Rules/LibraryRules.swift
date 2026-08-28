@@ -1,5 +1,322 @@
 import Foundation
 
+struct RecoveredTeachingReward: Equatable, Sendable {
+    var kind: RecoveredTeachingRewardKind
+    var id: String
+}
+
+enum RecoveredTeachingBandV1: String, Codable, Sendable {
+    case opening, developing, later
+}
+
+enum RecoveredTeachingPlacementV1: String, Codable, Sendable {
+    case fieldInstruction, localObservation, warningNote, siteRubbing, quietCounterexample
+}
+
+struct RecoveredTeachingDefinitionV1: Equatable, Sendable {
+    var order: Int
+    var id: RecoveredTeachingID
+    var band: RecoveredTeachingBandV1
+    var reward: RecoveredTeachingReward
+    var placement: RecoveredTeachingPlacementV1
+    var title: String
+    var instructionCopy: String
+}
+
+/// Closed machine-readable reward census for Recovered Teaching V1. Titles and frozen prose are
+/// carried by the recovery receipt; reward authority never comes from displayed copy.
+enum RecoveredTeachingCatalogueV1 {
+    static let version = 1
+    static let rewards: [RecoveredTeachingID: RecoveredTeachingReward] =
+        Dictionary(uniqueKeysWithValues: definitions.map { ($0.id, $0.reward) })
+
+    static func reward(for id: RecoveredTeachingID) -> RecoveredTeachingReward? { rewards[id] }
+}
+
+enum RecoveredTeachingReadResult: Equatable, Sendable {
+    case committed(RecoveredTeachingID)
+    case alreadyRead(RecoveredTeachingID)
+    case invalid
+}
+
+struct RecoveredTeachingWorldOfferV1: Equatable, Sendable {
+    var definition: RecoveredTeachingDefinitionV1?
+    var point: GridPoint?
+    var offerStates: [RecoveredTeachingOfferStateV1]
+}
+
+/// Frozen, typed evidence used by both eligibility and placement for one generated world. It is
+/// deliberately derived from the resolved authored-plus-unwritten sigils, never display strings.
+struct RecoveredTeachingWorldEvidenceV1: Equatable, Sendable {
+    var generatedSourceIDs: Set<PressureSourceID>
+    var greatSourceIDs: Set<PressureSourceID>
+    var authoredCompositeIDs: Set<SymbolID>
+    var eligibleDangerTeachingIDs: Set<RecoveredTeachingID>
+    var manifestationPoints: [RecoveredTeachingID: Set<GridPoint>]
+
+    func supports(_ definition: RecoveredTeachingDefinitionV1, state: GameState) -> Bool {
+        switch definition.reward.kind {
+        case .gambitComponent: return true
+        case .capability:
+            return ["subject_self", "act_flee", "act_skill"].allSatisfy {
+                state.base.ownedGambitComponents.contains(.init(rawValue: $0))
+            }
+        case .focus:
+            return generatedSourceIDs.contains(.init(rawValue: definition.reward.id))
+        case .symbol:
+            if definition.reward.id == "peace" {
+                let danger = ["swarm_rune", "storm", "predation", "blight", "tremor", "miasma_rune"]
+                    .filter { state.base.ownedSymbols.contains(.init(rawValue: $0)) }.count
+                return danger >= 2 && authoredCompositeIDs.contains("peace")
+            }
+            return eligibleDangerTeachingIDs.contains(definition.id)
+        }
+    }
+}
+
+enum RecoveredTeachingWorldRulesV1 {
+    static let offerChance = 0.45
+
+    static func prepare(state: GameState, book: BoundBook, seed: UInt64,
+                        map: WorldMap, enemies: [WorldEnemy]) -> RecoveredTeachingWorldOfferV1 {
+        let evidence = evidence(book: book, seed: seed, map: map, enemies: enemies)
+        let definitions = RecoveredTeachingCatalogueV1.definitions.filter { definition in
+            definition.placement != .siteRubbing && bandIsOpen(definition.band, state: state)
+                && !rewardIsKnown(definition.reward, state: state)
+                && !state.reality.library.recoveredTeachings.contains(where: {
+                    $0.teachingID == definition.id
+                })
+                && evidence.supports(definition, state: state)
+        }
+        var states = Dictionary(uniqueKeysWithValues:
+            state.reality.library.recoveredTeachingOffers.map { ($0.teachingID, $0) })
+        let outcomeIndex = Int(clamping: state.worlds.outcomeSequence) + 1
+        var offered: [(definition: RecoveredTeachingDefinitionV1, wasDue: Bool)] = []
+        for definition in definitions {
+            var receipt = states[definition.id] ?? .init(
+                teachingID: definition.id, firstEligibleOutcomeIndex: outcomeIndex)
+            let due = receipt.isDue || receipt.eligibleWorldsWithoutOffer >= 2
+            var rng = SeededRNG(seed: seed).derived(UInt64(definition.order) ^ 0x5445_4143_48)
+            if due || rng.chance(offerChance) {
+                offered.append((definition, due))
+            } else {
+                receipt.eligibleWorldsWithoutOffer += 1
+                if receipt.eligibleWorldsWithoutOffer >= 2 { receipt.isDue = true }
+            }
+            states[definition.id] = receipt
+        }
+        let selected = offered.sorted {
+            let lhs = states[$0.definition.id]!
+            let rhs = states[$1.definition.id]!
+            if $0.wasDue != $1.wasDue { return $0.wasDue && !$1.wasDue }
+            if lhs.firstEligibleOutcomeIndex != rhs.firstEligibleOutcomeIndex {
+                return (lhs.firstEligibleOutcomeIndex ?? .max) < (rhs.firstEligibleOutcomeIndex ?? .max)
+            }
+            return $0.definition.order < $1.definition.order
+        }.first?.definition
+        for choice in offered {
+            if choice.definition.id == selected?.id {
+                states[choice.definition.id]?.isDue = true
+            } else if !choice.wasDue {
+                states[choice.definition.id]?.eligibleWorldsWithoutOffer += 1
+                if states[choice.definition.id]!.eligibleWorldsWithoutOffer >= 2 {
+                    states[choice.definition.id]?.isDue = true
+                }
+            }
+        }
+        let point = selected.flatMap {
+            placementPoint(for: $0, manifestations: evidence.manifestationPoints[$0.id] ?? [],
+                           in: map, enemies: enemies)
+        }
+        return .init(definition: point == nil ? nil : selected, point: point,
+                     offerStates: states.values.sorted { $0.teachingID.rawValue < $1.teachingID.rawValue })
+    }
+
+    static func bandIsOpen(_ band: RecoveredTeachingBandV1, state: GameState) -> Bool {
+        switch band {
+        case .opening: state.worlds.outcomeSequence >= 1
+        case .developing: state.base.binderCharacter.level >= 4 && state.worlds.outcomeSequence >= 3
+        case .later: state.base.binderCharacter.level >= 8 && state.worlds.outcomeSequence >= 8
+        }
+    }
+
+    private static func rewardIsKnown(_ reward: RecoveredTeachingReward,
+                                      state: GameState) -> Bool {
+        switch reward.kind {
+        case .gambitComponent: state.base.ownedGambitComponents.contains(.init(rawValue: reward.id))
+        case .focus: state.base.ownedSources.contains(.init(rawValue: reward.id))
+        case .symbol: state.base.ownedSymbols.contains(.init(rawValue: reward.id))
+        case .capability: state.base.capabilities.contains(.init(rawValue: reward.id))
+        }
+    }
+
+    static func evidence(book: BoundBook, seed: UInt64, map: WorldMap,
+                         enemies: [WorldEnemy]) -> RecoveredTeachingWorldEvidenceV1 {
+        let authored = BookRules.sigils(for: book)
+        let generated = authored + PressureRules.rollUnwritten(after: authored, seed: seed)
+        let sources = Set(generated.map(\.source))
+        let great = Set(generated.filter { $0.intensity == .great || $0.intensity == .overwhelming }
+            .map(\.source))
+        let cracking = Set(map.allPoints.filter { map[$0].isCracking })
+        let enemyPoints = Set(enemies.map(\.position))
+        var resourcePointsByIdentity: [String: Set<GridPoint>] = [:]
+        for point in map.allPoints {
+            guard case .node(let node) = map[point].content else { continue }
+            resourcePointsByIdentity[node.resource.rawValue, default: []].insert(point)
+        }
+
+        func focusPoints(_ id: String) -> Set<GridPoint> {
+            // A local manifestation must carry the exact same stable identity. Generic water,
+            // growth, resources and hazards cannot stand in for a named source. Most generated
+            // source effects are world-global today and therefore truthfully use the field
+            // fallback until the map owns a typed local manifestation.
+            resourcePointsByIdentity[id] ?? []
+        }
+
+        var manifestations: [RecoveredTeachingID: Set<GridPoint>] = [:]
+        for definition in RecoveredTeachingCatalogueV1.definitions where definition.reward.kind == .focus {
+            manifestations[definition.id] = focusPoints(definition.reward.id)
+        }
+        let authoredIDs = Set(book.allSymbolIDs)
+        let readings = PressureRules.resolve(generated)
+        var eligibleDanger: Set<RecoveredTeachingID> = []
+        let swarm = great.contains("swarm") || authoredIDs.contains("swarm_rune")
+        if swarm { eligibleDanger.insert("teaching.symbol.swarm_rune") }
+        // The current enemy ABI carries no swarm manifestation identity. A Great Swarm remains
+        // valid world evidence, but an arbitrary enemy cannot become its warning landmark.
+        manifestations["teaching.symbol.swarm_rune"] = []
+        let storm = great.contains("wind") && sources.contains("rain")
+        if storm || authoredIDs.contains("storm") { eligibleDanger.insert("teaching.symbol.storm") }
+        manifestations["teaching.symbol.storm"] = []
+        let predatoryEnemyPoints = Set(enemies.filter {
+            !$0.isApex && ($0.traits?.armament.total ?? 0) >= Tuning.Life.unarmedThreshold
+        }.map(\.position))
+        let predatory = readings["vitality"].aspect("trophicDepth") >= Tuning.Life.predationThreshold
+            || !predatoryEnemyPoints.isEmpty
+        if predatory { eligibleDanger.insert("teaching.symbol.predation") }
+        manifestations["teaching.symbol.predation"] = predatoryEnemyPoints
+        let blight = great.contains("rot") || authoredIDs.contains("blight")
+        if blight { eligibleDanger.insert("teaching.symbol.blight") }
+        manifestations["teaching.symbol.blight"] = []
+        let tremor = !cracking.isEmpty || authoredIDs.contains("tremor")
+        if tremor { eligibleDanger.insert("teaching.symbol.tremor") }
+        manifestations["teaching.symbol.tremor"] = tremor ? cracking : []
+        let miasma = great.contains("miasma") || authoredIDs.contains("miasma_rune")
+        if miasma { eligibleDanger.insert("teaching.symbol.miasma_rune") }
+        manifestations["teaching.symbol.miasma_rune"] = []
+        if authoredIDs.contains("peace") { eligibleDanger.insert("teaching.symbol.peace") }
+        manifestations["teaching.symbol.peace"] = []
+        return .init(generatedSourceIDs: sources, greatSourceIDs: great,
+                     authoredCompositeIDs: authoredIDs,
+                     eligibleDangerTeachingIDs: eligibleDanger,
+                     manifestationPoints: manifestations)
+    }
+
+    static func placementPoint(for definition: RecoveredTeachingDefinitionV1,
+                               manifestations: Set<GridPoint>,
+                               in map: WorldMap, enemies: [WorldEnemy]) -> GridPoint? {
+        let enemyPoints = Set(enemies.map(\.position))
+        let unsafeRoutePoints = Set(map.allPoints.filter { point in
+            if enemyPoints.contains(point) { return true }
+            switch map[point].content {
+            case .hazard, .site, .traveller: return true
+            default: return false
+            }
+        })
+        func distances(avoiding forbidden: Set<GridPoint> = []) -> [GridPoint: Int] {
+            var result: [GridPoint: Int] = [map.entry: 0], queue = [map.entry], head = 0
+            while head < queue.count {
+                let point = queue[head]; head += 1
+                for next in map.neighbours(of: point) where result[next] == nil && !forbidden.contains(next) {
+                    let tile = map[next]
+                    guard tile.isPassable, abs(tile.elevation - map[point].elevation) <= 1 else { continue }
+                    result[next] = result[point, default: 0] + 1
+                    queue.append(next)
+                }
+            }
+            return result
+        }
+        let routeForbidden: Set<GridPoint>
+        switch definition.placement {
+        case .fieldInstruction, .localObservation, .quietCounterexample:
+            routeForbidden = unsafeRoutePoints
+        case .warningNote:
+            routeForbidden = manifestations
+        case .siteRubbing:
+            routeForbidden = []
+        }
+        let routeDistances = distances(avoiding: routeForbidden)
+        return map.allPoints.filter { point in
+            guard let distance = routeDistances[point],
+                  map[point].content == .empty, !enemyPoints.contains(point) else { return false }
+            switch definition.placement {
+            case .localObservation where !manifestations.isEmpty:
+                return manifestations.compactMap { distancesFrom($0, in: map)[point] }.min()
+                    .map { (1...4).contains($0) } ?? false
+            case .warningNote:
+                return manifestations.compactMap { distancesFrom($0, in: map)[point] }.min()
+                    .map { (2...4).contains($0) } ?? false
+            default:
+                return (6...18).contains(distance)
+            }
+        }.sorted {
+            let lhs = routeDistances[$0, default: .max], rhs = routeDistances[$1, default: .max]
+            return lhs == rhs ? ($0.y, $0.x) < ($1.y, $1.x) : lhs < rhs
+        }.first
+    }
+
+    private static func distancesFrom(_ start: GridPoint, in map: WorldMap) -> [GridPoint: Int] {
+        guard map.contains(start) else { return [:] }
+        var result = [start: 0], queue = [start], head = 0
+        while head < queue.count {
+            let point = queue[head]; head += 1
+            for next in map.neighbours(of: point) where result[next] == nil {
+                guard map[next].isPassable,
+                      abs(map[next].elevation - map[point].elevation) <= 1 else { continue }
+                result[next] = result[point, default: 0] + 1
+                queue.append(next)
+            }
+        }
+        return result
+    }
+}
+
+extension GameStore {
+    /// Applies a recovered lesson exactly once. The frozen record must agree with the immutable V1
+    /// reward census; stale or fabricated presentation data cannot grant a different entitlement.
+    @discardableResult
+    func readRecoveredTeaching(_ id: RecoveredTeachingID) -> RecoveredTeachingReadResult {
+        guard let index = state.reality.library.recoveredTeachings.firstIndex(
+            where: { $0.teachingID == id }),
+              let authority = RecoveredTeachingCatalogueV1.reward(for: id) else { return .invalid }
+        let record = state.reality.library.recoveredTeachings[index]
+        guard record.validates(), record.rewardKind == authority.kind,
+              record.rewardID == authority.id else { return .invalid }
+        guard !record.isRead else { return .alreadyRead(id) }
+
+        mutate("read recovered teaching", flush: true) { state in
+            guard let current = state.reality.library.recoveredTeachings.firstIndex(
+                where: { $0.teachingID == id }),
+                  state.reality.library.recoveredTeachings[current].readAt == nil else { return }
+            switch authority.kind {
+            case .gambitComponent:
+                state.base.ownedGambitComponents.insert(.init(rawValue: authority.id))
+            case .focus:
+                state.base.ownedSources.insert(.init(rawValue: authority.id))
+            case .symbol:
+                state.base.ownedSymbols.insert(.init(rawValue: authority.id))
+            case .capability:
+                state.base.capabilities.insert(.init(rawValue: authority.id))
+                if authority.id == "automate_self" { state.base.hasAutomateSelfUnlock = true }
+            }
+            state.reality.library.recoveredTeachings[current].readAt =
+                state.reality.library.nextRecoveredTeachingSequence
+            state.reality.library.nextRecoveredTeachingSequence += 1
+        }
+        return .committed(id)
+    }
+}
+
 enum LibraryShelfID: String, Codable, CaseIterable, Sendable {
     case diaries, bestiary, dictionary, fieldNotes, worldHistory
 }
@@ -77,6 +394,7 @@ struct LibraryShelfPresentation: Equatable, Sendable {
                 switch (result.id, content) {
                 case (.diaries, .diaryPage(_)), (.bestiary, .bestiarySpecies(_)),
                      (.dictionary, .dictionaryCompound(_)), (.fieldNotes, .foundWriting(_)),
+                     (.fieldNotes, .recoveredTeaching(_)),
                      (.worldHistory, .visitedWorld(_)): true
                 default: false
                 }
@@ -85,6 +403,7 @@ struct LibraryShelfPresentation: Equatable, Sendable {
                 switch (result.id, content) {
                 case (.diaries, .diaryPage(_)), (.bestiary, .bestiarySpecies(_)),
                      (.dictionary, .dictionaryCompound(_)), (.fieldNotes, .foundWriting(_)),
+                     (.fieldNotes, .recoveredTeaching(_)),
                      (.worldHistory, .visitedWorld(_)): true
                 default: false
                 }
@@ -105,6 +424,9 @@ struct LibraryShelfPresentation: Equatable, Sendable {
                 ? .dictionaryCompound(symbol.id) : nil
         })
         result.formUnion(state.reality.library.foundWritings.map { .foundWriting($0.id) })
+        result.formUnion(state.reality.library.recoveredTeachings.map {
+            .recoveredTeaching($0.teachingID)
+        })
         result.formUnion(state.reality.library.visitedWorlds.map { .visitedWorld($0.id) })
         return result
     }
@@ -115,6 +437,7 @@ struct LibraryShelfPresentation: Equatable, Sendable {
             switch (shelf, content) {
             case (.diaries, .diaryPage(_)), (.bestiary, .bestiarySpecies(_)),
                  (.dictionary, .dictionaryCompound(_)), (.fieldNotes, .foundWriting(_)),
+                 (.fieldNotes, .recoveredTeaching(_)),
                  (.worldHistory, .visitedWorld(_)): true
             default: false
             }
@@ -179,12 +502,17 @@ struct LibraryShelfPresentation: Equatable, Sendable {
 
     private static func fieldNoteObjects(in state: GameState) -> [LibraryShelfObjectPresentation] {
         var seen = Set<FoundWritingID>()
-        let ids = state.reality.library.foundWritings.compactMap { seen.insert($0.id).inserted ? $0.id : nil }
-        return ids.chunkedLibrary(every: 8).enumerated().map { index, group in
+        let writingIDs = state.reality.library.foundWritings.compactMap {
+            seen.insert($0.id).inserted ? LibraryAttentionContentID.foundWriting($0.id) : nil
+        }
+        let teachingIDs = state.reality.library.recoveredTeachings.map {
+            LibraryAttentionContentID.recoveredTeaching($0.teachingID)
+        }
+        return (writingIDs + teachingIDs).chunkedLibrary(every: 8).enumerated().map { index, group in
             let form: LibraryObjectForm = group.count <= 2 ? .stitchedFolio
                 : (group.count <= 5 ? .softbound : .fullHardcoverWithSlips)
             return .init(id: .fieldNotes(volume: index + 1), form: form,
-                         entryCount: group.count, contentIDs: group.map(LibraryAttentionContentID.foundWriting))
+                         entryCount: group.count, contentIDs: group)
         }
     }
 

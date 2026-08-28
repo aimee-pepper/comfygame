@@ -1287,7 +1287,7 @@ enum Worldgen {
         let ordinaryWriting = map.allPoints.contains { point in
             guard reached.contains(point), point.chebyshevDistance(to: start) > 2 else { return false }
             switch map[point].content {
-            case .diaryPage, .foundWriting: return true
+            case .diaryPage, .foundWriting, .recoveredTeaching: return true
             default: return false
             }
         } && (!pages.isEmpty || !writings.isEmpty)

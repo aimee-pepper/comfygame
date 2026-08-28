@@ -2454,7 +2454,7 @@ private struct TileView: View {
         case .portal(let isEntry): return isEntry ? "arrow.down.left.circle" : "circle.circle"
         case .lockedCache: return "lock.fill"
         case .diaryPage: return "doc.text"
-        case .foundWriting: return "note.text"
+        case .foundWriting, .recoveredTeaching: return "note.text"
         case .site: return site?.icon ?? "building.columns"
         // Named travellers are rendered by exact persisted identity in `body`.
         case .traveller: return nil
@@ -2490,7 +2490,7 @@ private struct TileView: View {
         case .lockedCache: return .purple
         case .wildDrop: return .teal
         case .diaryPage: return .indigo
-        case .foundWriting: return .cyan
+        case .foundWriting, .recoveredTeaching: return .cyan
         case .site: return site?.category == .hazard ? .orange : .brown
         // Green, and nothing else on the map is green. A person standing in a world you wrote is
         // the single most interesting thing on the grid and has to look like it.

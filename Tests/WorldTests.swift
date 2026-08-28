@@ -4069,6 +4069,93 @@ final class WorldTests: XCTestCase {
         XCTAssertEqual(known.worlds.activeRun?.map[knownTarget].content, .empty)
     }
 
+    func testRecoveredTeachingDuplicateClearsWithoutExperienceOrFirstRecoveryFeedback() throws {
+        let definition = try XCTUnwrap(RecoveredTeachingCatalogueV1.definitions.first)
+        func fixture(alreadyRecorded: Bool) -> (GameState, GridPoint) {
+            var state = startedRun(book(["terrain": "plains"]), seed: 2_026_082_701)
+            var run = state.worlds.activeRun!
+            run.enemies = []
+            let target = run.map.neighbours(of: run.playerPosition)
+                .first { WorldRules.canEnter($0, in: run.map) }!
+            run.map[target].content = .recoveredTeaching(definition.id)
+            run.recoveredTeachingExpedition = .init(
+                offeredTeachingID: definition.id, placement: target,
+                resultingOfferStates: [.init(teachingID: definition.id, isDue: true)],
+                resolvedAtOutcomeID: nil)
+            state.worlds.activeRun = run
+            if alreadyRecorded {
+                _ = state.reality.library.recordTeaching(.init(
+                    teachingID: definition.id, catalogueVersion: 1,
+                    rewardKind: definition.reward.kind, rewardID: definition.reward.id,
+                    recoveredAtOutcomeID: nil, worldSeed: run.mapSeed,
+                    sourcePlacementIdentity: "world:\(run.mapSeed):\(target.x),\(target.y)",
+                    recoveredAt: 0, readAt: nil, frozenTitle: definition.title,
+                    frozenInstructionCopy: definition.instructionCopy))
+            }
+            return (state, target)
+        }
+
+        var (fresh, freshTarget) = fixture(alreadyRecorded: false)
+        let freshXP = fresh.base.binderCharacter.experience
+        let freshEvents = WorldRules.step(to: freshTarget, in: &fresh)
+        XCTAssertEqual(fresh.base.binderCharacter.experience - freshXP,
+                       Tuning.Character.experienceForPage)
+        XCTAssertTrue(freshEvents.contains { if case .recoveredTeaching = $0 { true } else { false } })
+
+        var (stale, staleTarget) = fixture(alreadyRecorded: true)
+        let staleXP = stale.base.binderCharacter.experience
+        let staleEvents = WorldRules.step(to: staleTarget, in: &stale)
+        XCTAssertEqual(stale.base.binderCharacter.experience, staleXP)
+        XCTAssertFalse(staleEvents.contains { if case .recoveredTeaching = $0 { true } else { false } })
+        XCTAssertEqual(stale.worlds.activeRun?.map[staleTarget].content, .empty)
+        XCTAssertEqual(stale.reality.library.recoveredTeachings.count, 1)
+    }
+
+    func testRecoveredTeachingCollectionRequiresExactFrozenReceiptAndPlacement() throws {
+        let definition = try XCTUnwrap(RecoveredTeachingCatalogueV1.definitions.first)
+        var state = startedRun(book(["terrain": "plains"]), seed: 2_026_082_702)
+        var run = try XCTUnwrap(state.worlds.activeRun)
+        run.enemies = []
+        let target = try XCTUnwrap(run.map.neighbours(of: run.playerPosition)
+            .first { WorldRules.canEnter($0, in: run.map) })
+        run.map[target].content = .recoveredTeaching(definition.id)
+        run.recoveredTeachingExpedition = .init(
+            offeredTeachingID: "teaching.focus.stars", placement: target,
+            resultingOfferStates: [.init(teachingID: "teaching.focus.stars", isDue: true)],
+            resolvedAtOutcomeID: nil)
+        state.worlds.activeRun = run
+        let beforeLibrary = state.reality.library
+        let beforeXP = state.base.binderCharacter.experience
+
+        let events = WorldRules.step(to: target, in: &state)
+
+        XCTAssertFalse(events.contains { if case .recoveredTeaching = $0 { true } else { false } })
+        XCTAssertEqual(state.reality.library, beforeLibrary)
+        XCTAssertEqual(state.base.binderCharacter.experience, beforeXP)
+        XCTAssertEqual(state.worlds.activeRun?.map[target].content,
+                       .recoveredTeaching(definition.id))
+
+        var duplicate = startedRun(book(["terrain": "plains"]), seed: 2_026_082_703)
+        var duplicateRun = try XCTUnwrap(duplicate.worlds.activeRun)
+        duplicateRun.enemies = []
+        let duplicateTarget = try XCTUnwrap(duplicateRun.map.neighbours(
+            of: duplicateRun.playerPosition).first { WorldRules.canEnter($0, in: duplicateRun.map) })
+        let second = try XCTUnwrap(duplicateRun.map.allPoints.first {
+            $0 != duplicateTarget && duplicateRun.map[$0].content == .empty
+        })
+        duplicateRun.map[duplicateTarget].content = .recoveredTeaching(definition.id)
+        duplicateRun.map[second].content = .recoveredTeaching(definition.id)
+        duplicateRun.recoveredTeachingExpedition = .init(
+            offeredTeachingID: definition.id, placement: duplicateTarget,
+            resultingOfferStates: [.init(teachingID: definition.id, isDue: true)],
+            resolvedAtOutcomeID: nil)
+        duplicate.worlds.activeRun = duplicateRun
+        _ = WorldRules.step(to: duplicateTarget, in: &duplicate)
+        XCTAssertTrue(duplicate.reality.library.recoveredTeachings.isEmpty)
+        XCTAssertEqual(duplicate.worlds.activeRun?.map[duplicateTarget].content,
+                       .recoveredTeaching(definition.id))
+    }
+
     func testExperienceBreakdownIsTolerantAndFrozenIntoARecap() throws {
         var run = try XCTUnwrap(startedRun(book([:]), seed: 741).worlds.activeRun)
         run.experienceBreakdown = RunExperienceBreakdown(combat: 36, species: 14,

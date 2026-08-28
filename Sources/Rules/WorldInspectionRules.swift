@@ -100,7 +100,7 @@ extension WorldRules {
         case .site(let id):
             run.sites.first(where: { $0.id == id }).flatMap { ContentCatalog.shared.site($0.siteID)?.name }
                 .map { "site: \($0)" } ?? "site"
-        case .diaryPage, .foundWriting: "writing"
+        case .diaryPage, .foundWriting, .recoveredTeaching: "writing"
         case .traveller(let id):
             ContentCatalog.shared.traveller(id).map { "traveller: \($0.name)" } ?? "traveller"
         }

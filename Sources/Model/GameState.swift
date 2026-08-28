@@ -46,8 +46,22 @@ struct GameState: Codable, Equatable, Sendable {
         meta = try container.decodeIfPresent(SaveMeta.self, forKey: .meta) ?? SaveMeta()
         reality = try container.decodeIfPresent(RealityState.self, forKey: .reality) ?? .newGame()
         base = try container.decodeIfPresent(BaseState.self, forKey: .base) ?? .newGame()
+        tutorial = TutorialState()
         var seeds = SeedSequence.newGame()
         worlds = try container.decodeIfPresent(WorldsState.self, forKey: .worlds) ?? .newGame(seeds: &seeds)
+        if schemaVersion >= 12 {
+            let runs = [worlds.activeRun].compactMap { $0 } + worlds.anchoredRealms.map(\.world)
+            guard runs.allSatisfy({ run in
+                if let receipt = run.recoveredTeachingExpedition {
+                    return receipt.validates(map: run.map, worldSeed: run.mapSeed,
+                                             recovered: reality.library.recoveredTeachings)
+                }
+                return !run.map.tiles.contains { tile in
+                    if case .recoveredTeaching = tile.content { return true }
+                    return false
+                }
+            }) else { throw CocoaError(.coderInvalidValue) }
+        }
         if schemaVersion >= 4 {
             let runs = [worlds.activeRun].compactMap { $0 } + worlds.anchoredRealms.map(\.world)
             for run in runs {

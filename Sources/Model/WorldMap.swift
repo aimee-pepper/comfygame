@@ -210,6 +210,9 @@ enum TileContent: Codable, Equatable, Sendable {
     /// A page torn from someone's diary, lying where it fell.
     case diaryPage(DiaryPageID)
     case foundWriting(FoundWritingID)
+    /// One closed Recovered Teaching V1 identity. Its title/reward remain undisclosed until the
+    /// ordinary writing collection transaction records the frozen receipt.
+    case recoveredTeaching(RecoveredTeachingID)
     /// **Somebody, standing there.** Reaching them opens the meeting; recruiting them is what
     /// actually finds them (Aimee, 6 Aug).
     case traveller(TravellerID)
@@ -219,7 +222,8 @@ enum TileContent: Codable, Equatable, Sendable {
     /// Whether losing this tile to crumbling costs the player something.
     var isLoseable: Bool {
         switch self {
-        case .node, .wildDrop, .item, .lockedCache, .site, .diaryPage, .foundWriting: true
+        case .node, .wildDrop, .item, .lockedCache, .site, .diaryPage, .foundWriting,
+             .recoveredTeaching: true
         // A person is not loot, and losing them to the floor is the point of the timer rather
         // than a cost to be tallied.
         case .empty, .hazard, .portal, .traveller: false

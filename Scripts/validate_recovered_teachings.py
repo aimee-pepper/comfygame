@@ -11,6 +11,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 RESEARCH = ROOT / "Sources/Content/Data/research.json"
 AUTHORITY = ROOT / "docs/recovered-teachings-current.md"
+GENERATED = ROOT / "Sources/Rules/RecoveredTeachingCatalogue.generated.swift"
 
 
 def fail(message: str) -> None:
@@ -52,6 +53,14 @@ if actual != expected:
     fail(f"reward mismatch; missing={sorted(expected - actual)} extra={sorted(actual - expected)}")
 if len(reward_matches) != len(actual):
     fail("a reward is assigned to more than one primary teaching")
+
+generated = GENERATED.read_text()
+generated_ids = re.findall(r'id: "(teaching\.[a-z0-9_.]+)"', generated)
+if generated_ids != teaching_ids:
+    fail("generated native catalogue is stale or reordered")
+for reward in reward_matches:
+    if f'id: "{reward}"' not in generated:
+        fail(f"generated native catalogue omits reward {reward}")
 
 diary_exclusive = {
     "scarp", "ruin", "gold_ore", "hush", "pond", "drift", "hive", "amber", "chitin",

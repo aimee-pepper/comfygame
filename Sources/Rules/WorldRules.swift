@@ -48,6 +48,7 @@ enum WorldRules {
         case foundSite(SiteID)
         case readPage(DiaryPageID)
         case readFoundWriting(FoundWritingID, String)
+        case recoveredTeaching(RecoveredTeachingID, String)
         case foundTraveller(TravellerID)
         /// You've walked up to somebody. The scene, not the recruitment.
         case metTraveller(TravellerID)
@@ -326,6 +327,33 @@ enum WorldRules {
                 awardDiscovery(.page, run: &run, in: &state)
             }
             run.map[destination].content = .empty
+        case .recoveredTeaching(let id):
+            guard let offer = run.recoveredTeachingExpedition,
+                  offer.validates(map: run.map, worldSeed: run.mapSeed,
+                                  recovered: state.reality.library.recoveredTeachings),
+                  offer.offeredTeachingID == id,
+                  offer.placement == destination else { break }
+            guard let definition = RecoveredTeachingCatalogueV1.definitions.first(where: {
+                $0.id == id
+            }) else { break }
+            let candidate = RecoveredTeachingRecord(
+                teachingID: id, catalogueVersion: RecoveredTeachingCatalogueV1.version,
+                rewardKind: definition.reward.kind, rewardID: definition.reward.id,
+                recoveredAtOutcomeID: nil, worldSeed: run.mapSeed,
+                sourcePlacementIdentity: "world:\(run.mapSeed):\(destination.x),\(destination.y)",
+                recoveredAt: state.reality.library.nextRecoveredTeachingSequence,
+                readAt: nil, frozenTitle: definition.title,
+                frozenInstructionCopy: definition.instructionCopy)
+            switch state.reality.library.recordTeaching(candidate) {
+            case .inserted:
+                events.append(.recoveredTeaching(id, definition.title))
+                awardDiscovery(.page, run: &run, in: &state)
+                run.map[destination].content = .empty
+            case .alreadyRecorded:
+                run.map[destination].content = .empty
+            case .refused:
+                break
+            }
         case .site(let instance):
             if let site = run.sites.first(where: { $0.id == instance }) {
                 events.append(.foundSite(site.siteID))
@@ -684,7 +712,8 @@ enum WorldRules {
                 }
                 // Knowledge is banked to Reality immediately rather than carried in the satchel:
                 // literacy is permanent and cannot be lost to a collapse (rune spec §1).
-                for symbol in definition.contents.teaches where !state.base.ownedSymbols.contains(symbol) {
+                for symbol in definition.contents.teaches
+                where symbol != "verdigris_bloom" && !state.base.ownedSymbols.contains(symbol) {
                     state.base.ownedSymbols.insert(symbol)
                     events.append(.learnedSymbol(symbol))
                 }
@@ -692,6 +721,14 @@ enum WorldRules {
                 where !state.base.ownedSources.contains(focus) {
                     state.base.ownedSources.insert(focus)
                     events.append(.learnedFocus(focus))
+                }
+                if definition.contents.teaches.contains("verdigris_bloom") {
+                    recoverSiteTeaching("teaching.symbol.verdigris_bloom", run: run,
+                                        state: &state, events: &events)
+                }
+                if definition.contents.yields["mote", default: 0] > 0 {
+                    recoverSiteTeaching("teaching.symbol.mote_vein", run: run,
+                                        state: &state, events: &events)
                 }
                 if definition.contents.essence > 0 {
                     state.base.addEssenceCrystals(definition.contents.essence)
@@ -703,6 +740,26 @@ enum WorldRules {
         state.worlds.activeRun = run
         events.append(contentsOf: advanceTurn(in: &state))
         return events
+    }
+
+    private static func recoverSiteTeaching(_ id: RecoveredTeachingID, run: WorldRun,
+                                            state: inout GameState, events: inout [Event]) {
+        guard let definition = RecoveredTeachingCatalogueV1.definitions.first(where: {
+            $0.id == id
+        }), RecoveredTeachingWorldRulesV1.bandIsOpen(definition.band, state: state),
+              !state.reality.library.recoveredTeachings.contains(where: { $0.teachingID == id })
+        else { return }
+        let record = RecoveredTeachingRecord(
+            teachingID: id, catalogueVersion: 1, rewardKind: definition.reward.kind,
+            rewardID: definition.reward.id, recoveredAtOutcomeID: nil,
+            worldSeed: run.mapSeed,
+            sourcePlacementIdentity: "site:\(run.mapSeed):\(run.playerPosition.x),\(run.playerPosition.y)",
+            recoveredAt: state.reality.library.nextRecoveredTeachingSequence,
+            readAt: nil, frozenTitle: definition.title,
+            frozenInstructionCopy: definition.instructionCopy)
+        if state.reality.library.recordTeaching(record) == .inserted {
+            events.append(.recoveredTeaching(id, definition.title))
+        }
     }
 
     /// What replaces a creature when the roster turns over at nightfall.

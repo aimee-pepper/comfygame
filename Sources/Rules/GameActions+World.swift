@@ -731,6 +731,7 @@ extension GameStore {
                 if run.satchelItems.stacks[index].isEmpty { run.satchelItems.stacks.remove(at: index) }
             }
             let outcomeID = state.worlds.mintOutcomeID()
+            Self.resolveRecoveredTeachingOffer(in: &run, outcomeID: outcomeID, state: &state)
             state.reality.library.attachOutcome(outcomeID,
                                                 toWorld: InstanceID(rawValue: run.mapSeed))
             let banked = GameStore.bankHaul(of: run, outcomeID: outcomeID,
@@ -776,6 +777,7 @@ extension GameStore {
             guard var run = state.worlds.activeRun else { return false }
             let departureState = WorldDepartureState.capture(from: run)
             let outcomeID = state.worlds.mintOutcomeID()
+            Self.resolveRecoveredTeachingOffer(in: &run, outcomeID: outcomeID, state: &state)
             state.reality.library.attachOutcome(outcomeID,
                                                 toWorld: InstanceID(rawValue: run.mapSeed))
             let fraction = min(1, max(0, run.tuning.collapseRecoveryFraction))
@@ -813,6 +815,19 @@ extension GameStore {
         recentEvents = []
         clearWorldFieldFeedback()
         refreshWorldFieldContext()
+    }
+
+    nonisolated private static func resolveRecoveredTeachingOffer(
+        in run: inout WorldRun, outcomeID: ExpeditionOutcomeID, state: inout GameState
+    ) {
+        guard var receipt = run.recoveredTeachingExpedition,
+              receipt.validates(), receipt.resolvedAtOutcomeID == nil else { return }
+        let recovered = Set(state.reality.library.recoveredTeachings.map(\.teachingID))
+        state.reality.library.recoveredTeachingOffers = receipt.resultingOfferStates.filter {
+            !recovered.contains($0.teachingID)
+        }
+        receipt.resolvedAtOutcomeID = outcomeID
+        run.recoveredTeachingExpedition = receipt
     }
 
     func dismissRunExitSummary() {

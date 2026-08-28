@@ -82,7 +82,7 @@ enum ExplorationMapIdentityResolver {
                 remembered: remembered)
         case .lockedCache: return "locked_cache/ordinary/frame-0"
         case .diaryPage: return "diary_page/ordinary/frame-0"
-        case .foundWriting: return "found_writing/ordinary/frame-0"
+        case .foundWriting, .recoveredTeaching: return "found_writing/ordinary/frame-0"
         case .wildDrop(let resource, let amount)
             where resource == Resources.essenceRaw && amount > 0:
             return ExplorationMapIdentityPack.frameKey(

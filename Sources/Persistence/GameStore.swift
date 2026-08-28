@@ -139,7 +139,7 @@ struct WorldFieldContextReceiptV1: Equatable, Sendable {
             } else {
                 interactionState = .available
             }
-        case .diaryPage, .foundWriting:
+        case .diaryPage, .foundWriting, .recoveredTeaching:
             content = .writing
             interaction = .takePage
             interactionState = encounterBlocksInteraction
@@ -204,6 +204,7 @@ struct WorldFieldContextReceiptV1: Equatable, Sendable {
                 switch tile.content {
                 case .diaryPage(let page): page.rawValue
                 case .foundWriting(let writing): writing.rawValue
+                case .recoveredTeaching: "recovered-teaching"
                 default: "unknown"
                 }
             }
@@ -309,6 +310,7 @@ enum WorldFieldNarration {
             ContentCatalog.shared.diaryPage(id).map { "A page, in somebody's hand. \"\($0.prose)\"" }
                 ?? "A page from someone's diary."
         case .readFoundWriting(_, let prose): "A weathered field note. \"\(prose)\""
+        case .recoveredTeaching(_, let title): "Recovered teaching: \(title)."
         case .foundTraveller(let id):
             ContentCatalog.shared.traveller(id).map { "\($0.name) is coming with you." }
                 ?? "They're coming with you."
@@ -740,6 +742,7 @@ final class GameStore: ObservableObject {
         case .foundSite(let id): tagged("site", id.rawValue)
         case .readPage(let id): tagged("page", id.rawValue)
         case .readFoundWriting(let id, let prose): tagged("writing", id.rawValue, prose)
+        case .recoveredTeaching(let id, let title): tagged("teaching", id.rawValue, title)
         case .foundTraveller(let id): tagged("traveller", id.rawValue)
         case .metTraveller(let id): tagged("met", id.rawValue)
         case .usedItem(let name, let member): tagged("use", name, member.id)

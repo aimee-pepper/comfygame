@@ -30,6 +30,7 @@ enum Migrations {
             try validateCurrentCombatOpening(in: data)
             try validateCurrentLibraryAttention(in: data)
             try validateCurrentExpeditionReviewQueue(in: data)
+            try validateCurrentRecoveredTeachings(in: data)
             return data
         }
 
@@ -41,6 +42,7 @@ enum Migrations {
         try validateCurrentCombatOpening(in: working)
         try validateCurrentLibraryAttention(in: working)
         try validateCurrentExpeditionReviewQueue(in: working)
+        try validateCurrentRecoveredTeachings(in: working)
         return working
     }
 
@@ -129,6 +131,7 @@ enum Migrations {
         case 8: return try migrate8to9(data)
         case 9: return try migrate9to10(data)
         case 10: return try migrate10to11(data)
+        case 11: return try migrate11to12(data)
         default:
             // No migration registered. Tolerant decoding is the fallback; if the save is genuinely
             // incompatible, `SaveFileIO.load()` quarantines it rather than losing it.
@@ -265,6 +268,122 @@ enum Migrations {
         return strictUInt64Number(object["rawValue"])
     }
 
+    private static func migrate11to12(_ data: Data) throws -> Data {
+        guard var root = try JSONSerialization.jsonObject(with: data) as? [String: Any],
+              var reality = root["reality"] as? [String: Any],
+              var library = reality["library"] as? [String: Any] else {
+            throw CocoaError(.coderInvalidValue)
+        }
+        library["recoveredTeachings"] = []
+        library["recoveredTeachingOffers"] = []
+        library["nextRecoveredTeachingSequence"] = 0
+        reality["library"] = library
+        root["reality"] = reality
+        root["schemaVersion"] = 12
+        let staged = try JSONSerialization.data(withJSONObject: root, options: [.sortedKeys])
+        var state = try SaveCodec.makeDecoder().decode(GameState.self, from: staged)
+        let removedBranches: Set<ResearchBranchID> = ["instruction", "hand", "lexicon", "bargain"]
+        let completed = ContentCatalog.shared.researchNodes
+            .filter { removedBranches.contains($0.branch) && state.base.completedResearch.contains($0.id) }
+            .flatMap(\.grants)
+        for grant in completed {
+            let reward: RecoveredTeachingReward?
+            switch grant.kind {
+            case .gambitComponent:
+                reward = grant.id.map { .init(kind: .gambitComponent, id: $0) }
+            case .symbol:
+                reward = grant.id.map { .init(kind: .symbol, id: $0) }
+            case .focus:
+                reward = grant.id.map { .init(kind: .focus, id: $0) }
+            case .effect where grant.effect == .automateSelf:
+                reward = .init(kind: .capability, id: "automate_self")
+            default:
+                reward = nil // Legacy Gambit-slot credits and unrelated grants remain as stored.
+            }
+            guard let reward,
+                  let definition = RecoveredTeachingCatalogueV1.definitions.first(where: {
+                      $0.reward == reward
+                  }),
+                  !state.reality.library.recoveredTeachings.contains(where: {
+                      $0.teachingID == definition.id
+                  }) else { continue }
+            let recoveredAt = state.reality.library.nextRecoveredTeachingSequence
+            state.reality.library.nextRecoveredTeachingSequence += 1
+            let readAt = state.reality.library.nextRecoveredTeachingSequence
+            state.reality.library.nextRecoveredTeachingSequence += 1
+            state.reality.library.recoveredTeachings.append(.init(
+                teachingID: definition.id, catalogueVersion: 1,
+                rewardKind: reward.kind, rewardID: reward.id,
+                recoveredAtOutcomeID: nil, worldSeed: nil,
+                sourcePlacementIdentity: "migration:completed-research",
+                recoveredAt: recoveredAt, readAt: readAt,
+                frozenTitle: definition.title,
+                frozenInstructionCopy: definition.instructionCopy))
+            state.reality.library.attention.checkedContentIDs.insert(
+                .recoveredTeaching(definition.id))
+        }
+        return try SaveCodec.makeEncoder().encode(state)
+    }
+
+    private static func validateCurrentRecoveredTeachings(in data: Data) throws {
+        let root = try JSONSerialization.jsonObject(with: data)
+        guard let object = root as? [String: Any],
+              let reality = object["reality"] as? [String: Any],
+              let library = reality["library"] as? [String: Any] else {
+            throw CocoaError(.coderInvalidValue)
+        }
+        for key in ["recoveredTeachings", "recoveredTeachingOffers"] {
+            guard let value = library[key], !(value is NSNull), value is [Any] else {
+                throw CocoaError(.coderInvalidValue)
+            }
+        }
+        guard let rawSequence = library["nextRecoveredTeachingSequence"] as? NSNumber,
+              CFGetTypeID(rawSequence) != CFBooleanGetTypeID(),
+              rawSequence.doubleValue >= 0,
+              rawSequence.doubleValue.rounded() == rawSequence.doubleValue else {
+            throw CocoaError(.coderInvalidValue)
+        }
+        let recordRequired: Set<String> = [
+            "teachingID", "catalogueVersion", "rewardKind", "rewardID",
+            "sourcePlacementIdentity", "recoveredAt", "frozenTitle", "frozenInstructionCopy",
+        ]
+        let recordAllowed = recordRequired.union([
+            "recoveredAtOutcomeID", "worldSeed", "readAt",
+        ])
+        var seenRecords = Set<String>()
+        for raw in library["recoveredTeachings"] as! [Any] {
+            guard let receipt = raw as? [String: Any],
+                  recordRequired.isSubset(of: Set(receipt.keys)),
+                  Set(receipt.keys).isSubset(of: recordAllowed),
+                  !receipt.values.contains(where: { $0 is NSNull }),
+                  let teachingID = receipt["teachingID"] as? String,
+                  let rewardKind = receipt["rewardKind"] as? String,
+                  let rewardID = receipt["rewardID"] as? String,
+                  seenRecords.insert(teachingID).inserted,
+                  let authority = RecoveredTeachingCatalogueV1.reward(
+                    for: .init(rawValue: teachingID)),
+                  authority.kind.rawValue == rewardKind, authority.id == rewardID else {
+                throw CocoaError(.coderInvalidValue)
+            }
+        }
+        let offerRequired: Set<String> = [
+            "version", "teachingID", "eligibleWorldsWithoutOffer", "isDue",
+        ]
+        let offerAllowed = offerRequired.union(["firstEligibleOutcomeIndex"])
+        var seenOffers = Set<String>()
+        for raw in library["recoveredTeachingOffers"] as! [Any] {
+            guard let receipt = raw as? [String: Any],
+                  offerRequired.isSubset(of: Set(receipt.keys)),
+                  Set(receipt.keys).isSubset(of: offerAllowed),
+                  !receipt.values.contains(where: { $0 is NSNull }),
+                  let teachingID = receipt["teachingID"] as? String,
+                  RecoveredTeachingCatalogueV1.reward(for: .init(rawValue: teachingID)) != nil,
+                  seenOffers.insert(teachingID).inserted else {
+                throw CocoaError(.coderInvalidValue)
+            }
+        }
+    }
+
     private static func migrate9to10(_ data: Data) throws -> Data {
         guard var root = try JSONSerialization.jsonObject(with: data) as? [String: Any] else {
             throw CocoaError(.coderInvalidValue)
@@ -275,7 +394,27 @@ enum Migrations {
         state.schemaVersion = 10
         state.reality.library.attention = LibraryAttentionStateV1(
             checkedContentIDs: LibraryShelfPresentation.currentContentIDs(in: state))
-        return try SaveCodec.makeEncoder().encode(state)
+        // Re-encoding with current models would otherwise leak schema-11/12 fields backward into
+        // the intermediate schema-10 bytes and make the next strict migration reject its own
+        // input. Preserve the legacy single return receipt explicitly, then strip only fields
+        // whose owning migration has not run yet.
+        var encoded = try JSONSerialization.jsonObject(
+            with: SaveCodec.makeEncoder().encode(state)) as! [String: Any]
+        var worlds = encoded["worlds"] as! [String: Any]
+        worlds.removeValue(forKey: "expeditionReviewQueue")
+        if let summary = state.worlds.lastExit {
+            worlds["lastExit"] = try JSONSerialization.jsonObject(
+                with: SaveCodec.makeEncoder().encode(summary))
+        }
+        encoded["worlds"] = worlds
+        var encodedReality = encoded["reality"] as! [String: Any]
+        var encodedLibrary = encodedReality["library"] as! [String: Any]
+        encodedLibrary.removeValue(forKey: "recoveredTeachings")
+        encodedLibrary.removeValue(forKey: "recoveredTeachingOffers")
+        encodedLibrary.removeValue(forKey: "nextRecoveredTeachingSequence")
+        encodedReality["library"] = encodedLibrary
+        encoded["reality"] = encodedReality
+        return try JSONSerialization.data(withJSONObject: encoded, options: [.sortedKeys])
     }
 
     private static func validateCurrentLibraryAttention(in data: Data) throws {

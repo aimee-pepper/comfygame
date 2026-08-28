@@ -164,7 +164,7 @@ enum MinimapDisclosure {
         return switch tile.content {
         case .empty: nil
         case .portal: .portal
-        case .diaryPage, .foundWriting: .page
+        case .diaryPage, .foundWriting, .recoveredTeaching: .page
         // No approved depleted minimap identity exists in build268. Fail truthfully closed rather
         // than retaining the active-site marker after its contents are exhausted.
         case .site: siteLooted == false ? .site : nil

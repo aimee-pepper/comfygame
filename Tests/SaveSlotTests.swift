@@ -63,6 +63,101 @@ final class SaveSlotTests: XCTestCase {
         XCTAssertEqual(try Data(contentsOf: url), original)
     }
 
+    func testCurrentRecoveredTeachingNullFailsSlotLoadWithoutRewritingEnvelope() async throws {
+        let root = directory()
+        defer { try? FileManager.default.removeItem(at: root) }
+        let slots = SaveSlotFileIO(directory: root)
+        let created = try await slots.create(name: "Malformed recovered teaching")
+        let url = try await slots.exportURL(for: created.metadata.id)
+        var envelope = try SaveCodec.makeDecoder().decode(
+            SaveSlotEnvelope.self, from: Data(contentsOf: url))
+        var payload = try XCTUnwrap(JSONSerialization.jsonObject(
+            with: SaveCodec.encode(.newGame())) as? [String: Any])
+        var reality = try XCTUnwrap(payload["reality"] as? [String: Any])
+        var library = try XCTUnwrap(reality["library"] as? [String: Any])
+        library["recoveredTeachingOffers"] = NSNull()
+        reality["library"] = library; payload["reality"] = reality
+        envelope.payload = try JSONSerialization.data(withJSONObject: payload, options: [.sortedKeys])
+        let bytes = try encoder().encode(envelope)
+        try bytes.write(to: url, options: .atomic)
+        do { _ = try await slots.load(created.metadata.id); XCTFail("expected strict failure") }
+        catch { }
+        XCTAssertEqual(try Data(contentsOf: url), bytes)
+    }
+
+    func testCurrentRecoveredTeachingCrossFieldMismatchFailsSlotWithoutRewritingEnvelope() async throws {
+        let root = directory()
+        defer { try? FileManager.default.removeItem(at: root) }
+        let slots = SaveSlotFileIO(directory: root)
+        let created = try await slots.create(name: "Mismatched teaching receipt")
+        let url = try await slots.exportURL(for: created.metadata.id)
+        var envelope = try SaveCodec.makeDecoder().decode(
+            SaveSlotEnvelope.self, from: Data(contentsOf: url))
+        var state = GameState.newGame()
+        var run = WorldRun(
+            runIndex: 1, book: .init(written: [], essencePaid: 0), mapSeed: 71,
+            rng: .init(seed: 71),
+            map: .init(width: 1, height: 1, tiles: [Tile()], entry: .init(x: 0, y: 0)),
+            playerPosition: .init(x: 0, y: 0))
+        run.recoveredTeachingExpedition = .init(
+            offeredTeachingID: "teaching.focus.stars", placement: .init(x: 0, y: 0),
+            resultingOfferStates: [.init(teachingID: "teaching.focus.stars", isDue: true)],
+            resolvedAtOutcomeID: nil)
+        state.worlds.activeRun = run
+        var payload = try XCTUnwrap(JSONSerialization.jsonObject(with: SaveCodec.encode(state))
+                                     as? [String: Any])
+        var worlds = try XCTUnwrap(payload["worlds"] as? [String: Any])
+        var active = try XCTUnwrap(worlds["activeRun"] as? [String: Any])
+        var receipt = try XCTUnwrap(active["recoveredTeachingExpedition"] as? [String: Any])
+        var states = try XCTUnwrap(receipt["resultingOfferStates"] as? [[String: Any]])
+        states[0]["isDue"] = false
+        receipt["resultingOfferStates"] = states
+        active["recoveredTeachingExpedition"] = receipt; worlds["activeRun"] = active
+        payload["worlds"] = worlds
+        envelope.payload = try JSONSerialization.data(withJSONObject: payload, options: [.sortedKeys])
+        let bytes = try encoder().encode(envelope)
+        try bytes.write(to: url, options: .atomic)
+        do { _ = try await slots.load(created.metadata.id); XCTFail("expected strict failure") }
+        catch { }
+        XCTAssertEqual(try Data(contentsOf: url), bytes)
+    }
+
+    func testCurrentRecoveredTeachingReceiptMapMismatchPreservesRealSlotEnvelope() async throws {
+        let root = directory()
+        defer { try? FileManager.default.removeItem(at: root) }
+        let slots = SaveSlotFileIO(directory: root)
+        let created = try await slots.create(name: "Mismatched teaching map")
+        let url = try await slots.exportURL(for: created.metadata.id)
+        var envelope = try SaveCodec.makeDecoder().decode(
+            SaveSlotEnvelope.self, from: Data(contentsOf: url))
+        var state = GameState.newGame()
+        var tile = Tile(); tile.content = .recoveredTeaching("teaching.focus.stars")
+        var run = WorldRun(
+            runIndex: 1, book: .init(written: [], essencePaid: 0), mapSeed: 71,
+            rng: .init(seed: 71),
+            map: .init(width: 1, height: 1, tiles: [tile], entry: .init(x: 0, y: 0)),
+            playerPosition: .init(x: 0, y: 0))
+        run.recoveredTeachingExpedition = .init(
+            offeredTeachingID: "teaching.focus.stars", placement: .init(x: 0, y: 0),
+            resultingOfferStates: [.init(teachingID: "teaching.focus.stars", isDue: true)],
+            resolvedAtOutcomeID: nil)
+        state.worlds.activeRun = run
+        var payload = try XCTUnwrap(JSONSerialization.jsonObject(with: SaveCodec.encode(state))
+                                     as? [String: Any])
+        var worlds = try XCTUnwrap(payload["worlds"] as? [String: Any])
+        var active = try XCTUnwrap(worlds["activeRun"] as? [String: Any])
+        var receipt = try XCTUnwrap(active["recoveredTeachingExpedition"] as? [String: Any])
+        receipt["placement"] = ["x": 9, "y": 0]
+        active["recoveredTeachingExpedition"] = receipt; worlds["activeRun"] = active
+        payload["worlds"] = worlds
+        envelope.payload = try JSONSerialization.data(withJSONObject: payload, options: [.sortedKeys])
+        let bytes = try encoder().encode(envelope)
+        try bytes.write(to: url, options: .atomic)
+        do { _ = try await slots.load(created.metadata.id); XCTFail("expected map mismatch failure") }
+        catch { }
+        XCTAssertEqual(try Data(contentsOf: url), bytes)
+    }
+
     func testCurrentSeamwardNullFailsSlotLoadWithoutRewritingEnvelope() async throws {
         let root = directory()
         defer { try? FileManager.default.removeItem(at: root) }

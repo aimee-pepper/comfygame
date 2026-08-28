@@ -563,11 +563,24 @@ struct LibraryView: View {
 
     @ViewBuilder private var notesGrid: some View {
         let families = LibraryPresentation.recoveredNoteFamilies(in: library)
-        if families.isEmpty {
+        let teachings = library.recoveredTeachings
+        if families.isEmpty && teachings.isEmpty {
             EmptyCollection(icon: "note.text",
                             text: "No anonymous world notes recovered yet.")
         } else {
             LazyVGrid(columns: columns, spacing: 12) {
+                ForEach(teachings) { teaching in
+                    NavigationLink {
+                        RecoveredTeachingDetailView(teachingID: teaching.teachingID)
+                            .environmentObject(store)
+                    } label: {
+                        LibraryTile(icon: "text.book.closed", title: teaching.frozenTitle,
+                                    subtitle: teaching.isRead ? "Teaching read" : "Unread teaching",
+                                    count: nil, accent: teaching.isRead ? .indigo : .orange,
+                                    wide: dynamicTypeSize.isAccessibilitySize)
+                    }
+                    .buttonStyle(.plain)
+                }
                 ForEach(families, id: \.self) { family in
                     NavigationLink {
                         LibraryWorldNotesView(family: family).environmentObject(store)
@@ -650,6 +663,36 @@ struct LibraryView: View {
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
             }
+        }
+    }
+}
+
+private struct RecoveredTeachingDetailView: View {
+    @EnvironmentObject private var store: GameStore
+    let teachingID: RecoveredTeachingID
+
+    private var record: RecoveredTeachingRecord? {
+        store.state.reality.library.recoveredTeachings.first { $0.teachingID == teachingID }
+    }
+
+    var body: some View {
+        ScrollView {
+            if let record {
+                VStack(alignment: .leading, spacing: 12) {
+                    Text(record.frozenTitle).font(.title2.weight(.semibold))
+                    Text(record.frozenInstructionCopy).font(.body)
+                    Text(record.isRead ? "Teaching learned" : "Teaching unavailable")
+                        .font(.caption).foregroundStyle(.secondary)
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(16)
+            }
+        }
+        .navigationTitle("Recovered teaching")
+        .navigationBarTitleDisplayMode(.inline)
+        .onAppear {
+            _ = store.readRecoveredTeaching(teachingID)
+            store.checkLibraryContent([.recoveredTeaching(teachingID)])
         }
     }
 }

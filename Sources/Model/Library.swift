@@ -14,6 +14,15 @@ struct LibraryState: Codable, Equatable, Sendable {
     var foundPages: [DiaryPageID] = []
     /// Anonymous notes recovered from worlds. These never affect diary completion or patience.
     var foundWritings: [FoundWritingRecord] = []
+    /// Physical teachings recovered from worlds. Recovery and reward application are deliberately
+    /// separate: an unread record is permanent knowledge of the object, not ownership of its
+    /// lesson yet.
+    var recoveredTeachings: [RecoveredTeachingRecord] = []
+    /// Independent offer/pity receipts. A counter advances only for an eligible teaching and an
+    /// uncollected offer remains due until that exact teaching is recovered.
+    var recoveredTeachingOffers: [RecoveredTeachingOfferStateV1] = []
+    /// Monotonic, gameplay-owned ordering for recovery/read receipts. Never wall-clock time.
+    var nextRecoveredTeachingSequence: UInt64 = 0
     /// Travellers found — you have written the world they were in and gone there.
     var foundTravellers: Set<TravellerID> = []
     /// Travellers you know to look for, whether or not you know where they are.
@@ -87,6 +96,19 @@ struct LibraryState: Codable, Equatable, Sendable {
         }
         foundPages = recoveredPages.map(\.pageID)
         foundWritings = try c.decodeIfPresent([FoundWritingRecord].self, forKey: .foundWritings) ?? []
+        recoveredTeachings = try c.decodeIfPresent(
+            [RecoveredTeachingRecord].self, forKey: .recoveredTeachings) ?? []
+        recoveredTeachingOffers = try c.decodeIfPresent(
+            [RecoveredTeachingOfferStateV1].self, forKey: .recoveredTeachingOffers) ?? []
+        nextRecoveredTeachingSequence = try c.decodeIfPresent(
+            UInt64.self, forKey: .nextRecoveredTeachingSequence) ?? 0
+        guard RecoveredTeachingPersistence.validates(
+            records: recoveredTeachings, offers: recoveredTeachingOffers,
+            nextSequence: nextRecoveredTeachingSequence) else {
+            throw DecodingError.dataCorruptedError(
+                forKey: .recoveredTeachings, in: c,
+                debugDescription: "Invalid recovered-teaching receipts")
+        }
         foundTravellers = try c.decodeIfPresent(Set<TravellerID>.self, forKey: .foundTravellers) ?? []
         knownTravellers = try c.decodeIfPresent(Set<TravellerID>.self, forKey: .knownTravellers) ?? []
         // WorkshopPatternID has the same single-string wire representation as the historical
@@ -121,11 +143,31 @@ struct LibraryState: Codable, Equatable, Sendable {
         foundPages = recoveredPages.map(\.pageID)
     }
 
+    /// Inserts the immutable physical recovery receipt before its world object is removed.
+    @discardableResult
+    mutating func recordTeaching(_ candidate: RecoveredTeachingRecord) -> RecoveredTeachingRecordResult {
+        if recoveredTeachings.contains(where: { $0.teachingID == candidate.teachingID }) {
+            recoveredTeachingOffers.removeAll { $0.teachingID == candidate.teachingID }
+            return .alreadyRecorded
+        }
+        guard candidate.validates(), candidate.readAt == nil,
+              candidate.recoveredAt == nextRecoveredTeachingSequence else { return .refused }
+        recoveredTeachings.append(candidate)
+        recoveredTeachingOffers.removeAll { $0.teachingID == candidate.teachingID }
+        nextRecoveredTeachingSequence += 1
+        return .inserted
+    }
+
     mutating func attachOutcome(_ outcomeID: ExpeditionOutcomeID, toWorld worldID: InstanceID) {
         for index in recoveredPages.indices
         where recoveredPages[index].foundInWorldRecordID == worldID
             && recoveredPages[index].foundInOutcomeID == nil {
             recoveredPages[index].foundInOutcomeID = outcomeID
+        }
+        for index in recoveredTeachings.indices
+        where recoveredTeachings[index].worldSeed == worldID.rawValue
+            && recoveredTeachings[index].recoveredAtOutcomeID == nil {
+            recoveredTeachings[index].recoveredAtOutcomeID = outcomeID
         }
     }
 
@@ -166,11 +208,144 @@ struct LibraryState: Codable, Equatable, Sendable {
     }
 }
 
+struct RecoveredTeachingID: StringIdentifier {
+    var rawValue: String
+    init(rawValue: String) { self.rawValue = rawValue }
+}
+
+enum RecoveredTeachingRewardKind: String, Codable, Sendable {
+    case gambitComponent, focus, symbol, capability
+}
+
+enum RecoveredTeachingRecordResult: Equatable, Sendable {
+    case inserted
+    case alreadyRecorded
+    case refused
+}
+
+struct RecoveredTeachingRecord: Codable, Equatable, Identifiable, Sendable {
+    static let catalogueVersion = 1
+
+    var teachingID: RecoveredTeachingID
+    var catalogueVersion: Int
+    var rewardKind: RecoveredTeachingRewardKind
+    var rewardID: String
+    var recoveredAtOutcomeID: ExpeditionOutcomeID?
+    var worldSeed: UInt64?
+    var sourcePlacementIdentity: String
+    var recoveredAt: UInt64
+    var readAt: UInt64?
+    var frozenTitle: String
+    var frozenInstructionCopy: String
+
+    var id: RecoveredTeachingID { teachingID }
+    var isRead: Bool { readAt != nil }
+
+    func validates() -> Bool {
+        catalogueVersion == Self.catalogueVersion && !rewardID.isEmpty
+            && !sourcePlacementIdentity.isEmpty && !frozenTitle.isEmpty
+            && !frozenInstructionCopy.isEmpty && (readAt == nil || readAt! >= recoveredAt)
+    }
+}
+
+struct RecoveredTeachingOfferStateV1: Codable, Equatable, Identifiable, Sendable {
+    static let version = 1
+    var version: Int = Self.version
+    var teachingID: RecoveredTeachingID
+    var eligibleWorldsWithoutOffer: Int = 0
+    var firstEligibleOutcomeIndex: Int?
+    var isDue: Bool = false
+
+    var id: RecoveredTeachingID { teachingID }
+
+    func validates() -> Bool {
+        version == Self.version && eligibleWorldsWithoutOffer >= 0
+            && (firstEligibleOutcomeIndex == nil || firstEligibleOutcomeIndex! >= 0)
+    }
+}
+
+/// Frozen offer/pity result for one newly generated world. It is applied only when that
+/// expedition resolves; anchored revisits retain the resolved outcome and cannot advance pity.
+struct RecoveredTeachingExpeditionReceiptV1: Codable, Equatable, Sendable {
+    var version: Int = 1
+    var offeredTeachingID: RecoveredTeachingID?
+    var placement: GridPoint?
+    var resultingOfferStates: [RecoveredTeachingOfferStateV1]
+    var resolvedAtOutcomeID: ExpeditionOutcomeID?
+
+    func validates() -> Bool {
+        guard version == 1,
+              Set(resultingOfferStates.map(\.teachingID)).count == resultingOfferStates.count,
+              resultingOfferStates.allSatisfy({ RecoveredTeachingCatalogueV1.reward(for: $0.teachingID) != nil })
+        else { return false }
+        switch (offeredTeachingID, placement) {
+        case (nil, nil): break
+        case (.some(let id), .some(let point)):
+            guard RecoveredTeachingCatalogueV1.reward(for: id) != nil,
+                  point.x >= 0, point.y >= 0,
+                  let selected = resultingOfferStates.first(where: { $0.teachingID == id }),
+                  selected.validates(), selected.isDue else { return false }
+        default: return false
+        }
+        return true
+    }
+
+    /// Current-schema receipt/map agreement. An outstanding offer owns exactly one matching map
+    /// object. Once collected, that object is empty only when Reality carries the exact recovery
+    /// receipt for this world and placement. No other recovered-teaching tile may coexist.
+    func validates(map: WorldMap, worldSeed: UInt64,
+                   recovered: [RecoveredTeachingRecord]) -> Bool {
+        guard validates() else { return false }
+        let teachingTiles = map.allPoints.compactMap { point -> (GridPoint, RecoveredTeachingID)? in
+            guard case .recoveredTeaching(let id) = map[point].content else { return nil }
+            return (point, id)
+        }
+        guard let offeredTeachingID, let placement else { return teachingTiles.isEmpty }
+        guard map.contains(placement), teachingTiles.allSatisfy({
+            $0.0 == placement && $0.1 == offeredTeachingID
+        }) else { return false }
+        if case .recoveredTeaching(let tileID) = map[placement].content {
+            return tileID == offeredTeachingID && teachingTiles.count == 1
+        }
+        guard map[placement].content == .empty else { return false }
+        let expectedSource = "world:\(worldSeed):\(placement.x),\(placement.y)"
+        return recovered.contains {
+            $0.teachingID == offeredTeachingID && $0.worldSeed == worldSeed
+                && $0.sourcePlacementIdentity == expectedSource && $0.validates()
+        }
+    }
+}
+
+enum RecoveredTeachingPersistence {
+    static func validates(records: [RecoveredTeachingRecord],
+                          offers: [RecoveredTeachingOfferStateV1],
+                          nextSequence: UInt64) -> Bool {
+        let recordIDs = records.map(\.teachingID)
+        let offerIDs = offers.map(\.teachingID)
+        guard Set(recordIDs).count == recordIDs.count,
+              Set(offerIDs).count == offerIDs.count,
+              records.allSatisfy({ $0.validates() }),
+              records.allSatisfy({ record in
+                  RecoveredTeachingCatalogueV1.reward(for: record.teachingID).map {
+                      $0.kind == record.rewardKind && $0.id == record.rewardID
+                  } == true
+              }),
+              offers.allSatisfy({ $0.validates()
+                  && RecoveredTeachingCatalogueV1.reward(for: $0.teachingID) != nil }) else {
+            return false
+        }
+        let sequences = records.flatMap { [$0.recoveredAt, $0.readAt].compactMap { $0 } }
+        return Set(sequences).count == sequences.count
+            && sequences.allSatisfy { $0 < nextSequence }
+    }
+}
+
 enum LibraryAttentionContentID: Codable, Equatable, Hashable, Sendable {
     case diaryPage(DiaryPageID)
     case bestiarySpecies(String)
     case dictionaryCompound(SymbolID)
     case foundWriting(FoundWritingID)
+    case recoveredTeaching(RecoveredTeachingID)
     case visitedWorld(InstanceID)
 }
 

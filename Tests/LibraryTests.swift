@@ -1875,11 +1875,17 @@ final class LibraryTests: XCTestCase {
         var reality = try XCTUnwrap(root["reality"] as? [String: Any])
         var library = try XCTUnwrap(reality["library"] as? [String: Any])
         library.removeValue(forKey: "attention")
+        library.removeValue(forKey: "recoveredTeachings")
+        library.removeValue(forKey: "recoveredTeachingOffers")
+        library.removeValue(forKey: "nextRecoveredTeachingSequence")
         reality["library"] = library; root["reality"] = reality
+        var worlds = try XCTUnwrap(root["worlds"] as? [String: Any])
+        worlds.removeValue(forKey: "expeditionReviewQueue")
+        root["worlds"] = worlds
         let legacy = try JSONSerialization.data(withJSONObject: root, options: [.sortedKeys])
         let migrated = try Migrations.migrateIfNeeded(legacy)
         let state = try SaveCodec.makeDecoder().decode(GameState.self, from: migrated)
-        XCTAssertEqual(state.schemaVersion, 10)
+        XCTAssertEqual(state.schemaVersion, Tuning.saveSchemaVersion)
         XCTAssertEqual(state.reality.library.attention.checkedContentIDs,
                        LibraryShelfPresentation.currentContentIDs(in: state))
         XCTAssertEqual(try Migrations.migrateIfNeeded(migrated), migrated)
@@ -1932,6 +1938,319 @@ final class LibraryTests: XCTestCase {
         let newlyChecked = store.state.reality.library.attention.checkedContentIDs
             .subtracting(before)
         XCTAssertEqual(newlyChecked, [rendered])
+    }
+
+    func testRecoveredTeachingV1HasExactClosedRewardCensus() {
+        let rewards = RecoveredTeachingCatalogueV1.rewards
+        XCTAssertEqual(rewards.count, 38)
+        XCTAssertEqual(Set(rewards.values.map { "\($0.kind.rawValue):\($0.id)" }).count, 38)
+        XCTAssertEqual(rewards["teaching.instruction.automate_self"],
+                       .init(kind: .capability, id: "automate_self"))
+        XCTAssertEqual(rewards.values.filter { $0.kind == .gambitComponent }.count, 9)
+        XCTAssertEqual(rewards.values.filter { $0.kind == .focus }.count, 19)
+        XCTAssertEqual(rewards.values.filter { $0.kind == .symbol }.count, 9)
+    }
+
+    func testRecoveredTeachingCollectionAndReadingAreSeparateIdempotentTransactions() throws {
+        let store = GameStore(io: .temporary(name: "recovered-teaching-\(UUID().uuidString)"))
+        let record = RecoveredTeachingRecord(
+            teachingID: "teaching.focus.stars", catalogueVersion: 1,
+            rewardKind: .focus, rewardID: "stars", recoveredAtOutcomeID: nil,
+            worldSeed: 101, sourcePlacementIdentity: "world:101:7,8",
+            recoveredAt: 0, readAt: nil, frozenTitle: "Starlight",
+            frozenInstructionCopy: "Stars are a faint source of illumination.")
+
+        store.mutate("recover teaching") { state in
+            XCTAssertEqual(state.reality.library.recordTeaching(record), .inserted)
+        }
+        XCTAssertFalse(store.state.base.ownedSources.contains("stars"))
+        let bytesAfterRecovery = try SaveCodec.encode(store.state)
+
+        XCTAssertEqual(store.readRecoveredTeaching(record.teachingID), .committed(record.teachingID))
+        XCTAssertTrue(store.state.base.ownedSources.contains("stars"))
+        XCTAssertTrue(store.state.reality.library.recoveredTeachings[0].isRead)
+        let bytesAfterRead = try SaveCodec.encode(store.state)
+        XCTAssertNotEqual(bytesAfterRecovery, bytesAfterRead)
+
+        XCTAssertEqual(store.readRecoveredTeaching(record.teachingID), .alreadyRead(record.teachingID))
+        XCTAssertEqual(try SaveCodec.encode(store.state), bytesAfterRead)
+    }
+
+    func testRecoveredTeachingRejectsReceiptRewardMismatchWithoutMutation() throws {
+        let store = GameStore(io: .temporary(name: "recovered-teaching-forged-\(UUID().uuidString)"))
+        let record = RecoveredTeachingRecord(
+            teachingID: "teaching.focus.stars", catalogueVersion: 1,
+            rewardKind: .focus, rewardID: "magma", recoveredAtOutcomeID: nil,
+            worldSeed: 101, sourcePlacementIdentity: "world:101:7,8",
+            recoveredAt: 0, readAt: nil, frozenTitle: "Starlight",
+            frozenInstructionCopy: "Frozen copy")
+        store.mutate("fixture forged teaching") { state in
+            XCTAssertEqual(state.reality.library.recordTeaching(record), .inserted)
+        }
+        let before = try SaveCodec.encode(store.state)
+        XCTAssertEqual(store.readRecoveredTeaching(record.teachingID), .invalid)
+        XCTAssertEqual(try SaveCodec.encode(store.state), before)
+        XCTAssertFalse(store.state.base.ownedSources.contains("magma"))
+    }
+
+    func testRecoveredTeachingThirdEligibleWorldIsDueAndPlacementIsAdditionalWriting() throws {
+        var state = GameState.newGame()
+        state.worlds.outcomeSequence = 2
+        for definition in RecoveredTeachingCatalogueV1.definitions
+        where definition.id != "teaching.gambit.subject_self" {
+            switch definition.reward.kind {
+            case .gambitComponent:
+                state.base.ownedGambitComponents.insert(.init(rawValue: definition.reward.id))
+            case .focus: state.base.ownedSources.insert(.init(rawValue: definition.reward.id))
+            case .symbol: state.base.ownedSymbols.insert(.init(rawValue: definition.reward.id))
+            case .capability: state.base.capabilities.insert(.init(rawValue: definition.reward.id))
+            }
+        }
+        state.reality.library.recoveredTeachingOffers = [
+            .init(teachingID: "teaching.gambit.subject_self",
+                  eligibleWorldsWithoutOffer: 2, firstEligibleOutcomeIndex: 1)
+        ]
+        var tiles = Array(repeating: Tile(), count: 20)
+        tiles[10].content = .foundWriting("ordinary-writing")
+        let map = WorldMap(width: 20, height: 1, tiles: tiles, entry: .init(x: 0, y: 0))
+        let offer = RecoveredTeachingWorldRulesV1.prepare(
+            state: state, book: .init(written: [], essencePaid: 0), seed: 777,
+            map: map, enemies: [])
+        XCTAssertEqual(offer.definition?.id, "teaching.gambit.subject_self")
+        let point = try XCTUnwrap(offer.point)
+        XCTAssertTrue((6...18).contains(point.x))
+        XCTAssertNotEqual(point, .init(x: 10, y: 0))
+        XCTAssertEqual(map[.init(x: 10, y: 0)].content, .foundWriting("ordinary-writing"))
+    }
+
+    func testRecoveredTeachingPityAdvancesOnlyWhenExpeditionResolves() throws {
+        let store = GameStore(io: .temporary(name: "teaching-outcome-\(UUID().uuidString)"))
+        store.mutate("fund") { $0.base.essence = 500 }
+        XCTAssertTrue(store.bindAndDepart())
+        if let arrivalID = store.state.worlds.pendingWorldArrivalReceiptID {
+            XCTAssertTrue(store.enterPendingWorld(arrivalReceiptID: arrivalID))
+        }
+        let teachingID: RecoveredTeachingID = "teaching.gambit.subject_self"
+        let result = RecoveredTeachingOfferStateV1(
+            teachingID: teachingID, eligibleWorldsWithoutOffer: 1,
+            firstEligibleOutcomeIndex: 1, isDue: true)
+        store.mutate("freeze teaching outcome fixture") { state in
+            state.reality.library.recoveredTeachingOffers = []
+            let point = state.worlds.activeRun!.map.neighbours(
+                of: state.worlds.activeRun!.playerPosition).first {
+                    state.worlds.activeRun!.map[$0].content == .empty
+                }!
+            state.worlds.activeRun!.map[point].content = .recoveredTeaching(teachingID)
+            state.worlds.activeRun?.recoveredTeachingExpedition = .init(
+                offeredTeachingID: teachingID, placement: point,
+                resultingOfferStates: [result], resolvedAtOutcomeID: nil)
+        }
+        XCTAssertTrue(store.state.reality.library.recoveredTeachingOffers.isEmpty)
+
+        store.endRunWithPartialHaul(reason: "teaching outcome fixture", kind: .defeat)
+
+        XCTAssertEqual(store.state.reality.library.recoveredTeachingOffers, [result])
+        XCTAssertEqual(store.state.worlds.outcomeSequence, 1)
+    }
+
+    func testRecoveredTeachingShelfAttentionClearsOnlyExactRenderedTeaching() throws {
+        let store = GameStore(io: .temporary(name: "teaching-attention-\(UUID().uuidString)"))
+        let definition = try XCTUnwrap(RecoveredTeachingCatalogueV1.definitions.first)
+        store.mutate("fixture recovered teaching") { state in
+            _ = state.reality.library.recordTeaching(.init(
+                teachingID: definition.id, catalogueVersion: 1,
+                rewardKind: definition.reward.kind, rewardID: definition.reward.id,
+                recoveredAtOutcomeID: nil, worldSeed: 9,
+                sourcePlacementIdentity: "world:9:6,0", recoveredAt: 0, readAt: nil,
+                frozenTitle: definition.title,
+                frozenInstructionCopy: definition.instructionCopy))
+        }
+        let identity = LibraryAttentionContentID.recoveredTeaching(definition.id)
+        let shelf = try XCTUnwrap(LibraryShelfPresentation.make(in: store.state).first {
+            $0.id == .fieldNotes
+        })
+        XCTAssertEqual(shelf.uncheckedCount, 1)
+        XCTAssertTrue(shelf.objects.flatMap(\.contentIDs).contains(identity))
+        store.checkLibraryContent([identity])
+        XCTAssertEqual(LibraryShelfPresentation.make(in: store.state).first {
+            $0.id == .fieldNotes
+        }?.uncheckedCount, 0)
+        XCTAssertFalse(store.state.reality.library.recoveredTeachings[0].isRead)
+    }
+
+    func testRecoveredTeachingEvidenceUsesGeneratedSourcesAndMatchingManifestations() throws {
+        let storm = try XCTUnwrap(RecoveredTeachingCatalogueV1.definitions.first {
+            $0.id == "teaching.symbol.storm"
+        })
+        let sigils = [
+            Sigil(id: .init(rawValue: 1), source: "wind", target: "atmosphere", intensity: .great),
+            Sigil(id: .init(rawValue: 2), source: "rain", target: "hydrology", intensity: .moderate)
+        ]
+        var tiles = Array(repeating: Tile(), count: 20)
+        tiles[10].content = .hazard
+        let map = WorldMap(width: 20, height: 1, tiles: tiles, entry: .init(x: 0, y: 0))
+        let book = BoundBook(written: [], composition: sigils, essencePaid: 0)
+        let evidence = RecoveredTeachingWorldRulesV1.evidence(
+            book: book, seed: 41, map: map, enemies: [])
+
+        XCTAssertFalse(evidence.authoredCompositeIDs.contains("storm"))
+        XCTAssertTrue(evidence.greatSourceIDs.contains("wind"))
+        XCTAssertEqual(evidence.manifestationPoints[storm.id], [],
+                       "Great wind plus rain is exact world evidence; an untyped hazard is not a storm manifestation")
+        XCTAssertTrue(evidence.supports(storm, state: GameState.newGame()))
+        XCTAssertNil(RecoveredTeachingWorldRulesV1.placementPoint(
+            for: storm, manifestations: evidence.manifestationPoints[storm.id] ?? [],
+            in: map, enemies: []), "a warning cannot be placed without its matching manifestation")
+
+        var unrelatedTiles = tiles
+        unrelatedTiles[10].content = .empty
+        unrelatedTiles[12].content = .hazard
+        let unrelatedMap = WorldMap(width: 20, height: 1, tiles: unrelatedTiles,
+                                    entry: .init(x: 0, y: 0))
+        let nonStorm = BoundBook(written: [], composition: [
+            Sigil(id: .init(rawValue: 3), source: "smoke", target: "atmosphere",
+                  intensity: .moderate),
+            Sigil(id: .init(rawValue: 4), source: "river", target: "hydrology",
+                  intensity: .moderate)
+        ], essencePaid: 0)
+        let unrelated = RecoveredTeachingWorldRulesV1.evidence(
+            book: nonStorm, seed: 41,
+            map: unrelatedMap, enemies: [])
+        XCTAssertFalse(unrelated.supports(storm, state: GameState.newGame()),
+                       "an arbitrary hazard cannot manifest Storm")
+    }
+
+    func testRecoveredTeachingManifestationsNeverBorrowGenericResourcesHazardsOrEnemies() throws {
+        var tiles = Array(repeating: Tile(), count: 20)
+        tiles[3].content = .node(.init(resource: "sulfur", remainingHarvests: 1,
+                                       yieldPerHarvest: 1))
+        tiles[4].content = .node(.init(resource: "quartz", remainingHarvests: 1,
+                                       yieldPerHarvest: 1))
+        tiles[5].content = .hazard
+        tiles[6].isCracking = true
+        let map = WorldMap(width: 20, height: 1, tiles: tiles, entry: .init(x: 0, y: 0))
+        let ordinaryEnemy = WorldEnemy(id: .init(rawValue: 44), position: .init(x: 7, y: 0))
+        let book = BoundBook(written: [], composition: [
+            .init(id: .init(rawValue: 1), source: "sulfur", target: "substrate",
+                  intensity: .moderate),
+            .init(id: .init(rawValue: 2), source: "swarm", target: "vitality",
+                  intensity: .great)
+        ], essencePaid: 0)
+        let evidence = RecoveredTeachingWorldRulesV1.evidence(
+            book: book, seed: 3, map: map, enemies: [ordinaryEnemy])
+
+        XCTAssertEqual(evidence.manifestationPoints["teaching.focus.sulfur"],
+                       [.init(x: 3, y: 0)])
+        XCTAssertEqual(evidence.manifestationPoints["teaching.focus.crystal"], [])
+        XCTAssertEqual(evidence.manifestationPoints["teaching.symbol.swarm_rune"], [])
+        XCTAssertEqual(evidence.manifestationPoints["teaching.symbol.tremor"],
+                       [.init(x: 6, y: 0)])
+        XCTAssertFalse(evidence.manifestationPoints["teaching.symbol.tremor"]!
+            .contains(.init(x: 5, y: 0)))
+    }
+
+    func testRecoveredTeachingPlacementFamiliesUseExactDistanceBands() throws {
+        let field = try XCTUnwrap(RecoveredTeachingCatalogueV1.definitions.first {
+            $0.placement == .fieldInstruction
+        })
+        let local = try XCTUnwrap(RecoveredTeachingCatalogueV1.definitions.first {
+            $0.id == "teaching.focus.river"
+        })
+        let quiet = try XCTUnwrap(RecoveredTeachingCatalogueV1.definitions.first {
+            $0.id == "teaching.symbol.peace"
+        })
+        let map = WorldMap(width: 20, height: 1, tiles: Array(repeating: Tile(), count: 20),
+                           entry: .init(x: 0, y: 0))
+        let manifestation: Set<GridPoint> = [.init(x: 8, y: 0)]
+        let fieldPoint = try XCTUnwrap(RecoveredTeachingWorldRulesV1.placementPoint(
+            for: field, manifestations: [], in: map, enemies: []))
+        let localPoint = try XCTUnwrap(RecoveredTeachingWorldRulesV1.placementPoint(
+            for: local, manifestations: manifestation, in: map, enemies: []))
+        let quietPoint = try XCTUnwrap(RecoveredTeachingWorldRulesV1.placementPoint(
+            for: quiet, manifestations: [], in: map, enemies: []))
+        XCTAssertTrue((6...18).contains(fieldPoint.x))
+        XCTAssertTrue((1...4).contains(abs(localPoint.x - 8)))
+        XCTAssertTrue((6...18).contains(quietPoint.x))
+    }
+
+    func testRecoveredTeachingSafeRoutesExcludeHazardSiteTravellerAndEnemy() throws {
+        let definitions = try [
+            XCTUnwrap(RecoveredTeachingCatalogueV1.definitions.first { $0.placement == .fieldInstruction }),
+            XCTUnwrap(RecoveredTeachingCatalogueV1.definitions.first { $0.id == "teaching.focus.river" }),
+            XCTUnwrap(RecoveredTeachingCatalogueV1.definitions.first { $0.id == "teaching.symbol.peace" })
+        ]
+        for obstruction in 0..<4 {
+            var tiles = Array(repeating: Tile(), count: 20)
+            var enemies: [WorldEnemy] = []
+            switch obstruction {
+            case 0: tiles[3].content = .hazard
+            case 1: tiles[3].content = .site(.init(rawValue: 31))
+            case 2: tiles[3].content = .traveller("vance")
+            default: enemies = [.init(id: .init(rawValue: 32), position: .init(x: 3, y: 0))]
+            }
+            let map = WorldMap(width: 20, height: 1, tiles: tiles,
+                               entry: .init(x: 0, y: 0))
+            for definition in definitions {
+                let manifestations: Set<GridPoint> = definition.placement == .localObservation
+                    ? [.init(x: 10, y: 0)] : []
+                XCTAssertNil(RecoveredTeachingWorldRulesV1.placementPoint(
+                    for: definition, manifestations: manifestations, in: map, enemies: enemies),
+                    "unsafe route obstruction \(obstruction) must block \(definition.placement)")
+            }
+        }
+    }
+
+    func testEveryFocusUsesItsExactFrozenGeneratedSourceIdentity() {
+        let map = WorldMap(width: 20, height: 1, tiles: Array(repeating: Tile(), count: 20),
+                           entry: .init(x: 0, y: 0))
+        let focuses = RecoveredTeachingCatalogueV1.definitions.filter { $0.reward.kind == .focus }
+        XCTAssertEqual(focuses.count, 19)
+        for (index, definition) in focuses.enumerated() {
+            let source = PressureSourceID(rawValue: definition.reward.id)
+            let target = ContentCatalog.shared.pressureSource(source)?.targets.first ?? "relief"
+            let book = BoundBook(written: [], composition: [Sigil(
+                id: .init(rawValue: UInt64(index + 100)), source: source, target: target,
+                intensity: .moderate)], essencePaid: 0)
+            let evidence = RecoveredTeachingWorldRulesV1.evidence(
+                book: book, seed: UInt64(index + 900), map: map, enemies: [])
+            XCTAssertTrue(evidence.generatedSourceIDs.contains(source), definition.id.rawValue)
+            XCTAssertTrue(evidence.supports(definition, state: GameState.newGame()),
+                          definition.id.rawValue)
+        }
+    }
+
+    func testEveryDangerHasAnIdentityOwnedQueryAndManifestationSlot() {
+        let dangers = RecoveredTeachingCatalogueV1.definitions.filter {
+            $0.reward.kind == .symbol && $0.placement != .siteRubbing
+        }
+        XCTAssertEqual(dangers.count, 7)
+        let evidence = RecoveredTeachingWorldEvidenceV1(
+            generatedSourceIDs: [], greatSourceIDs: [], authoredCompositeIDs: [],
+            eligibleDangerTeachingIDs: Set(dangers.map(\.id)),
+            manifestationPoints: Dictionary(uniqueKeysWithValues: dangers.map { ($0.id, []) }))
+        var state = GameState.newGame()
+        state.base.ownedSymbols.formUnion(["storm", "blight"])
+        for definition in dangers where definition.reward.id != "peace" {
+            XCTAssertTrue(evidence.supports(definition, state: state), definition.id.rawValue)
+            XCTAssertNotNil(evidence.manifestationPoints[definition.id])
+        }
+    }
+
+    func testRecoveredTeachingRecordResultDistinguishesDuplicateAndRefusal() {
+        var library = LibraryState()
+        let definition = RecoveredTeachingCatalogueV1.definitions[0]
+        let valid = RecoveredTeachingRecord(
+            teachingID: definition.id, catalogueVersion: 1,
+            rewardKind: definition.reward.kind, rewardID: definition.reward.id,
+            recoveredAtOutcomeID: nil, worldSeed: 9, sourcePlacementIdentity: "world:9:6,0",
+            recoveredAt: 0, readAt: nil, frozenTitle: definition.title,
+            frozenInstructionCopy: definition.instructionCopy)
+        XCTAssertEqual(library.recordTeaching(valid), .inserted)
+        XCTAssertEqual(library.recordTeaching(valid), .alreadyRecorded)
+        var forged = valid
+        forged.teachingID = "teaching.focus.stars"
+        forged.recoveredAt = 99
+        XCTAssertEqual(library.recordTeaching(forged), .refused)
     }
 
     private func catalogueCopy(_ catalog: ContentCatalog, pages: [DiaryPageDef]) -> ContentCatalog {

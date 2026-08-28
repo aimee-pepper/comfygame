@@ -3,6 +3,155 @@ import XCTest
 
 /// The interruptibility pillar, tested. Anything that breaks here breaks pillar 2.
 final class PersistenceTests: XCTestCase {
+    private func assertQuarantinedSavePreserves(_ bytes: Data, io: SaveFileIO,
+                                                file: StaticString = #filePath,
+                                                line: UInt = #line) throws {
+        let quarantined = try XCTUnwrap(FileManager.default.contentsOfDirectory(
+            at: io.directory, includingPropertiesForKeys: nil).first {
+                $0.lastPathComponent.hasPrefix(io.fileName + ".corrupt-")
+            }, file: file, line: line)
+        XCTAssertEqual(try Data(contentsOf: quarantined), bytes, file: file, line: line)
+    }
+
+    func testRecoveredTeachingSchemaElevenMigrationPreservesLegacyRewardAsReadReceipt() throws {
+        var state = GameState.newGame()
+        state.base.completedResearch.insert("study_starlight")
+        state.base.ownedSources.insert("stars")
+        state.worlds.outcomeSequence = 1
+        XCTAssertTrue(state.worlds.appendExpeditionReview(.init(
+            runIndex: 1, outcomeID: 1, kind: .portal, reason: "schema eleven queue",
+            turnsTaken: 4, haulKeptFraction: 1)))
+        let frozenQueue = state.worlds.expeditionReviewQueue
+        var root = try XCTUnwrap(JSONSerialization.jsonObject(with: SaveCodec.encode(state))
+                                  as? [String: Any])
+        root["schemaVersion"] = 11
+        var reality = try XCTUnwrap(root["reality"] as? [String: Any])
+        var library = try XCTUnwrap(reality["library"] as? [String: Any])
+        library.removeValue(forKey: "recoveredTeachings")
+        library.removeValue(forKey: "recoveredTeachingOffers")
+        library.removeValue(forKey: "nextRecoveredTeachingSequence")
+        reality["library"] = library; root["reality"] = reality
+        let legacy = try JSONSerialization.data(withJSONObject: root, options: [.sortedKeys])
+
+        let migrated = try SaveCodec.decode(legacy)
+        let record = try XCTUnwrap(migrated.reality.library.recoveredTeachings.first {
+            $0.teachingID == "teaching.focus.stars"
+        })
+        XCTAssertTrue(record.isRead)
+        XCTAssertEqual(record.sourcePlacementIdentity, "migration:completed-research")
+        XCTAssertTrue(migrated.base.ownedSources.contains("stars"))
+        XCTAssertEqual(migrated.worlds.expeditionReviewQueue, frozenQueue)
+        XCTAssertEqual(try SaveCodec.decode(SaveCodec.encode(migrated)), migrated)
+    }
+
+    func testCurrentRecoveredTeachingNullFailsRawLoadWithoutRewritingBytes() throws {
+        var root = try XCTUnwrap(JSONSerialization.jsonObject(
+            with: SaveCodec.encode(.newGame())) as? [String: Any])
+        var reality = try XCTUnwrap(root["reality"] as? [String: Any])
+        var library = try XCTUnwrap(reality["library"] as? [String: Any])
+        library["recoveredTeachings"] = NSNull()
+        reality["library"] = library; root["reality"] = reality
+        let bytes = try JSONSerialization.data(withJSONObject: root, options: [.sortedKeys])
+        let io = SaveFileIO.temporary(name: "teaching-null-\(UUID().uuidString)")
+        try io.write(bytes)
+        guard case .unrecoverable = io.load() else { return XCTFail("expected strict failure") }
+        try assertQuarantinedSavePreserves(bytes, io: io)
+    }
+
+    func testCurrentRecoveredTeachingExpeditionNullFailsRawLoadWithoutRewritingBytes() throws {
+        var state = GameState.newGame()
+        state.worlds.activeRun = WorldRun(
+            runIndex: 1, book: .init(symbols: [:], randomlyFilled: [], essencePaid: 0),
+            mapSeed: 71, rng: .init(seed: 71),
+            map: .init(width: 1, height: 1, tiles: [Tile()], entry: .init(x: 0, y: 0)),
+            playerPosition: .init(x: 0, y: 0))
+        var root = try XCTUnwrap(JSONSerialization.jsonObject(
+            with: SaveCodec.encode(state)) as? [String: Any])
+        var worlds = try XCTUnwrap(root["worlds"] as? [String: Any])
+        var run = try XCTUnwrap(worlds["activeRun"] as? [String: Any])
+        run["recoveredTeachingExpedition"] = NSNull()
+        worlds["activeRun"] = run; root["worlds"] = worlds
+        let bytes = try JSONSerialization.data(withJSONObject: root, options: [.sortedKeys])
+        let io = SaveFileIO.temporary(name: "teaching-expedition-null-\(UUID().uuidString)")
+        try io.write(bytes)
+        guard case .unrecoverable = io.load() else { return XCTFail("expected strict failure") }
+        try assertQuarantinedSavePreserves(bytes, io: io)
+    }
+
+    func testCurrentRecoveredTeachingCrossFieldMismatchFailsRawLoadWithoutRewritingBytes() throws {
+        for mutation in ["missing-state", "not-due"] {
+            var state = GameState.newGame()
+            var run = WorldRun(
+                runIndex: 1, book: .init(written: [], essencePaid: 0), mapSeed: 71,
+                rng: .init(seed: 71),
+                map: .init(width: 1, height: 1, tiles: [Tile()], entry: .init(x: 0, y: 0)),
+                playerPosition: .init(x: 0, y: 0))
+            run.recoveredTeachingExpedition = .init(
+                offeredTeachingID: "teaching.focus.stars", placement: .init(x: 0, y: 0),
+                resultingOfferStates: [.init(teachingID: "teaching.focus.stars", isDue: true)],
+                resolvedAtOutcomeID: nil)
+            state.worlds.activeRun = run
+            var root = try XCTUnwrap(JSONSerialization.jsonObject(with: SaveCodec.encode(state))
+                                      as? [String: Any])
+            var worlds = try XCTUnwrap(root["worlds"] as? [String: Any])
+            var active = try XCTUnwrap(worlds["activeRun"] as? [String: Any])
+            var receipt = try XCTUnwrap(active["recoveredTeachingExpedition"] as? [String: Any])
+            var states = try XCTUnwrap(receipt["resultingOfferStates"] as? [[String: Any]])
+            if mutation == "missing-state" { states[0]["teachingID"] = "teaching.focus.mist" }
+            else { states[0]["isDue"] = false }
+            receipt["resultingOfferStates"] = states
+            active["recoveredTeachingExpedition"] = receipt; worlds["activeRun"] = active
+            root["worlds"] = worlds
+            let bytes = try JSONSerialization.data(withJSONObject: root, options: [.sortedKeys])
+            let io = SaveFileIO.temporary(name: "teaching-cross-field-\(mutation)-\(UUID().uuidString)")
+            try io.write(bytes)
+            guard case .unrecoverable = io.load() else { return XCTFail("expected strict failure") }
+            try assertQuarantinedSavePreserves(bytes, io: io)
+        }
+    }
+
+    func testCurrentRecoveredTeachingReceiptMapMismatchFailsRawLoadWithoutRewritingBytes() throws {
+        for mutation in ["out-of-bounds", "wrong-tile", "wrong-identity", "orphan-tile"] {
+            var state = GameState.newGame()
+            var tile = Tile()
+            tile.content = .recoveredTeaching("teaching.focus.stars")
+            var run = WorldRun(
+                runIndex: 1, book: .init(written: [], essencePaid: 0), mapSeed: 71,
+                rng: .init(seed: 71),
+                map: .init(width: 1, height: 1, tiles: [tile], entry: .init(x: 0, y: 0)),
+                playerPosition: .init(x: 0, y: 0))
+            run.recoveredTeachingExpedition = .init(
+                offeredTeachingID: "teaching.focus.stars", placement: .init(x: 0, y: 0),
+                resultingOfferStates: [.init(teachingID: "teaching.focus.stars", isDue: true)],
+                resolvedAtOutcomeID: nil)
+            state.worlds.activeRun = run
+            var root = try XCTUnwrap(JSONSerialization.jsonObject(with: SaveCodec.encode(state))
+                                      as? [String: Any])
+            var worlds = try XCTUnwrap(root["worlds"] as? [String: Any])
+            var active = try XCTUnwrap(worlds["activeRun"] as? [String: Any])
+            if mutation == "out-of-bounds" {
+                var receipt = try XCTUnwrap(active["recoveredTeachingExpedition"] as? [String: Any])
+                receipt["placement"] = ["x": 2, "y": 0]
+                active["recoveredTeachingExpedition"] = receipt
+            } else if mutation == "orphan-tile" {
+                active.removeValue(forKey: "recoveredTeachingExpedition")
+            } else {
+                var map = try XCTUnwrap(active["map"] as? [String: Any])
+                var tiles = try XCTUnwrap(map["tiles"] as? [[String: Any]])
+                var content = try XCTUnwrap(tiles[0]["content"] as? [String: Any])
+                if mutation == "wrong-tile" { content = ["empty": [:]] }
+                else { content = ["recoveredTeaching": ["_0": "teaching.focus.mist"]] }
+                tiles[0]["content"] = content; map["tiles"] = tiles; active["map"] = map
+            }
+            worlds["activeRun"] = active; root["worlds"] = worlds
+            let bytes = try JSONSerialization.data(withJSONObject: root, options: [.sortedKeys])
+            let io = SaveFileIO.temporary(name: "teaching-map-\(mutation)-\(UUID().uuidString)")
+            try io.write(bytes)
+            guard case .unrecoverable = io.load() else { return XCTFail("expected \(mutation) failure") }
+            try assertQuarantinedSavePreserves(bytes, io: io)
+        }
+    }
+
     func testCurrentSeamwardNullFailsRawLoadWithoutRewritingBytes() throws {
         var state = GameState.newGame()
         var run = WorldRun(

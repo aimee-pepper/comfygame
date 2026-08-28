@@ -1002,6 +1002,13 @@ extension GameStore {
                                       isFreshFirstExpedition: state.worlds.runIndex == 0,
                                       wildPageSelection: wildSelection,
                                       wildPageOriginRunIndex: state.worlds.runIndex + 1)
+        let teachingSourceMap = world.map
+        let teachingOffer = RecoveredTeachingWorldRulesV1.prepare(
+            state: state, book: book, seed: generationSeed, map: teachingSourceMap,
+            enemies: world.enemies)
+        if let id = teachingOffer.definition?.id, let point = teachingOffer.point {
+            world.map[point].content = .recoveredTeaching(id)
+        }
 #if DEBUG
         if forcePlayableEntryRefusalForTesting {
             world.diagnostics.terrainGenerationSucceeded = false
@@ -1099,6 +1106,9 @@ extension GameStore {
                 selectedIndex = index
             }
             guard state.worlds.seeds.peekNextSeed() == reservedCampaignSeed else { return false }
+            guard RecoveredTeachingWorldRulesV1.prepare(
+                state: state, book: book, seed: generationSeed, map: teachingSourceMap,
+                enemies: world.enemies) == teachingOffer else { return false }
             guard Self.consumeInkApplications(for: sourcePage, in: &state.base) else { return false }
             // The actor is synchronous from preview through commit, so the peeked seed is exactly
             // the one consumed here. World generation and visual resolution use isolated streams.
@@ -1218,6 +1228,11 @@ extension GameStore {
             )
             departingRun.seamwardExpedition = EquipmentInscriptionRules.expeditionReceipt(
                 from: state.base, activatedOnTurn: 0)
+            departingRun.recoveredTeachingExpedition = .init(
+                offeredTeachingID: teachingOffer.definition?.id,
+                placement: teachingOffer.point,
+                resultingOfferStates: teachingOffer.offerStates,
+                resolvedAtOutcomeID: nil)
             state.worlds.activeRun = departingRun
             if WorldArrivalPresentationAuthority.isNativePresentationEnabled {
                 state.worlds.pendingWorldArrivalReceiptID = arrivalReceipt.id

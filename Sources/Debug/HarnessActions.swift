@@ -623,7 +623,7 @@ extension GameStore {
             }
             let writingHosts = run.map.allPoints.filter { point in
                 switch run.map[point].content {
-                case .diaryPage, .foundWriting: true
+                case .diaryPage, .foundWriting, .recoveredTeaching: true
                 default: false
                 }
             }

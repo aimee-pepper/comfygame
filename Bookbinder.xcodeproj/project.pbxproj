@@ -108,6 +108,7 @@
 		2F11A7C912A84D768B774A01 /* design-homework.json in Resources */ = {isa = PBXBuildFile; fileRef = 2F11A7C912A84D768B774A02 /* design-homework.json */; };
 		3062AB49BB5A3BBCC3A396BD /* Combat.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BD3736ADDC83B6481EFAC9A /* Combat.swift */; };
 		332407592859288828CA4B63 /* LibraryRules.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1A0D044C45D04A1D2195A0F /* LibraryRules.swift */; };
+		RTV100000000000000000001 /* RecoveredTeachingCatalogue.generated.swift in Sources */ = {isa = PBXBuildFile; fileRef = RTV100000000000000000002 /* RecoveredTeachingCatalogue.generated.swift */; };
 		3333DDA45D780B04AC00F1C2 /* CombatTreeRules.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72CF1DBF72334A81AE35B198 /* CombatTreeRules.swift */; };
 		35A27AF646DD34DD1F8A9585 /* Gambit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79874A74B2CF52DA90868DA0 /* Gambit.swift */; };
 		3939EA44678C9E3D7CE7FF86 /* GameActions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 40DDEB42C7E2856E98352341 /* GameActions.swift */; };
@@ -631,6 +632,7 @@
 		F04D876D78710D8DC1CAB2BE /* TutorialCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TutorialCard.swift; sourceTree = "<group>"; };
 		F06DDF5073DF537BC555BB06 /* CombatGraphLayoutTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CombatGraphLayoutTests.swift; sourceTree = "<group>"; };
 		F1A0D044C45D04A1D2195A0F /* LibraryRules.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibraryRules.swift; sourceTree = "<group>"; };
+		RTV100000000000000000002 /* RecoveredTeachingCatalogue.generated.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecoveredTeachingCatalogue.generated.swift; sourceTree = "<group>"; };
 		F1B71324BA8EC6B7B6732500 /* GearView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GearView.swift; sourceTree = "<group>"; };
 		F308F3AB5ABAC31BC6DE4938 /* CreatureTraits.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreatureTraits.swift; sourceTree = "<group>"; };
 		F3329464831CD9BBDA9B45C9 /* PixelRaster.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PixelRaster.swift; sourceTree = "<group>"; };
@@ -693,6 +695,7 @@
 				1AE0FA07FD91558E2F953944 /* GameActions+World.swift */,
 				637E2762C9738BB22D883D75 /* InstrumentCraftingRules.swift */,
 				F1A0D044C45D04A1D2195A0F /* LibraryRules.swift */,
+				RTV100000000000000000002 /* RecoveredTeachingCatalogue.generated.swift */,
 				AE4002533174316FAE3274D6 /* LifeRules.swift */,
 				B213P0000000000000000001 /* CreatureMaterialProjectionRules.swift */,
 				B213R0000000000000000001 /* CreatureMaterialRewardRules.swift */,
@@ -1384,6 +1387,7 @@
 				19D0785C0B260232ED4A360E /* ItemGrid.swift in Sources */,
 				F3BBDF3F527FAD220FA4F5D8 /* Library.swift in Sources */,
 				332407592859288828CA4B63 /* LibraryRules.swift in Sources */,
+				RTV100000000000000000001 /* RecoveredTeachingCatalogue.generated.swift in Sources */,
 				AAFAB01A37942E4A425FE909 /* LibraryView.swift in Sources */,
 				AEBED915A9156084389B1BD6 /* LifeRules.swift in Sources */,
 				B213P0000000000000000002 /* CreatureMaterialProjectionRules.swift in Sources */,
