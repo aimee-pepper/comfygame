@@ -751,6 +751,37 @@ final class PageTests: XCTestCase {
     }
 
     @MainActor
+    func testWritingDeskSecondSigilSurvivesRepeatedMountedAppearanceWithoutPersistingDraft() throws {
+        let io = SaveFileIO.temporary(name: "writing-second-sigil-\(UUID().uuidString)")
+        let store = GameStore(io: io)
+        store.flushNow()
+        let persistedBefore = try Data(contentsOf: io.saveURL)
+
+        store.beginWritingDeskSession()
+        XCTAssertTrue(store.write(.source("sun"), glyph: "sun",
+                                  at: .init(column: 0, row: 0)))
+        let first = store.writingDeskPage.runes
+        XCTAssertEqual(first.count, 1)
+
+        // SwiftUI may redeliver appearance while the same routed Desk remains mounted. That is
+        // not a new visit and must not reconstruct the transient draft before the next placement.
+        store.beginWritingDeskSession()
+        XCTAssertTrue(store.write(.target("illumination"), glyph: "illumination",
+                                  at: .init(column: 3, row: 3)))
+        XCTAssertEqual(store.writingDeskPage.runes.count, 2)
+        XCTAssertEqual(store.writingDeskPage.runes.first, first.first)
+        XCTAssertEqual(try Data(contentsOf: io.saveURL), persistedBefore,
+                       "both successful placements remain transient and cannot rewrite campaign bytes")
+
+        store.endWritingDeskSession()
+        let relaunched = GameStore(io: io)
+        XCTAssertEqual(try Data(contentsOf: io.saveURL), persistedBefore)
+        relaunched.beginWritingDeskSession()
+        XCTAssertTrue(relaunched.writingDeskPage.runes.isEmpty,
+                      "process relaunch begins a new ordinary Desk visit, not a restored abandoned draft")
+    }
+
+    @MainActor
     func testWritingDeskFirstRenderedPageIsBlankBeforeOnAppearOwnsASession() throws {
         func preparedStore(_ name: String, withLegacyPage: Bool) -> GameStore {
             let store = GameStore(io: .temporary(name: name))

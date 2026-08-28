@@ -468,6 +468,10 @@ final class GameStore: ObservableObject {
 
     func beginWritingDeskSession() {
         bindError = nil
+        // SwiftUI may redeliver appearance while the same routed Desk remains mounted (for
+        // example as its tutorial/overlay tree changes). Only the matching end call starts a new
+        // visit; another appearance must not reconstruct a draft that already owns placed marks.
+        guard writingDeskDraft == nil else { return }
         writingDeskDraft = Page(width: state.base.page.width, height: state.base.page.height)
     }
 
