@@ -143,6 +143,12 @@ actor SaveSlotFileIO {
             return .init(subject: .rawSave, sourceSHA256: sourceHash, metadata: nil,
                          classification: .invalid(.noValidatedRecoverySource))
         }
+        if let version = Migrations.probeSchemaVersion(backup),
+           version > Tuning.saveSchemaVersion {
+            return .init(subject: .rawSave, sourceSHA256: sourceHash, metadata: nil,
+                         classification: .futureIncompatible(foundVersion: version,
+                                                              supportedVersion: Tuning.saveSchemaVersion))
+        }
         guard (try? decodePayload(backup)) != nil else {
             return .init(subject: .rawSave, sourceSHA256: sourceHash, metadata: nil,
                          classification: .invalid(.noValidatedRecoverySource))

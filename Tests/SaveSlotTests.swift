@@ -773,6 +773,56 @@ final class SaveSlotTests: XCTestCase {
             path: "bookbinder-save.json.recovery-original-\(primaryFingerprint.sha256)")), corrupt)
     }
 
+    func testMissingPrimaryAndFutureBackupClassifiesFutureWithoutMutation() async throws {
+        let root = directory()
+        defer { try? FileManager.default.removeItem(at: root) }
+        try FileManager.default.createDirectory(at: root, withIntermediateDirectories: true)
+        let backupURL = root.appending(path: "bookbinder-save.json.backup")
+        var object = try XCTUnwrap(JSONSerialization.jsonObject(
+            with: SaveCodec.encode(.newGame())) as? [String: Any])
+        object["schemaVersion"] = Tuning.saveSchemaVersion + 1
+        let future = try JSONSerialization.data(withJSONObject: object, options: [.sortedKeys])
+        try future.write(to: backupURL)
+        let io = SaveSlotFileIO(directory: root)
+
+        let assessed = await io.assessRawRecovery()
+        let assessment = try XCTUnwrap(assessed)
+        guard case .futureIncompatible(let found, let supported) = assessment.classification else {
+            return XCTFail("expected future backup classification")
+        }
+        XCTAssertEqual(found, Tuning.saveSchemaVersion + 1)
+        XCTAssertEqual(supported, Tuning.saveSchemaVersion)
+        XCTAssertFalse(FileManager.default.fileExists(
+            atPath: root.appending(path: "bookbinder-save.json").path))
+        XCTAssertEqual(try Data(contentsOf: backupURL), future)
+    }
+
+    func testCorruptPrimaryAndFutureBackupClassifiesFutureAndPreservesBoth() async throws {
+        let root = directory()
+        defer { try? FileManager.default.removeItem(at: root) }
+        try FileManager.default.createDirectory(at: root, withIntermediateDirectories: true)
+        let primaryURL = root.appending(path: "bookbinder-save.json")
+        let backupURL = root.appending(path: "bookbinder-save.json.backup")
+        let corrupt = Data("corrupt primary with future backup".utf8)
+        var object = try XCTUnwrap(JSONSerialization.jsonObject(
+            with: SaveCodec.encode(.newGame())) as? [String: Any])
+        object["schemaVersion"] = Tuning.saveSchemaVersion + 2
+        let future = try JSONSerialization.data(withJSONObject: object, options: [.sortedKeys])
+        try corrupt.write(to: primaryURL)
+        try future.write(to: backupURL)
+        let io = SaveSlotFileIO(directory: root)
+
+        let assessed = await io.assessRawRecovery()
+        let assessment = try XCTUnwrap(assessed)
+        guard case .futureIncompatible(let found, let supported) = assessment.classification else {
+            return XCTFail("expected future backup classification")
+        }
+        XCTAssertEqual(found, Tuning.saveSchemaVersion + 2)
+        XCTAssertEqual(supported, Tuning.saveSchemaVersion)
+        XCTAssertEqual(try Data(contentsOf: primaryURL), corrupt)
+        XCTAssertEqual(try Data(contentsOf: backupURL), future)
+    }
+
     func testRawRecoveryAssessmentRejectsChangedSourceWithoutMutation() async throws {
         let root = directory()
         defer { try? FileManager.default.removeItem(at: root) }
