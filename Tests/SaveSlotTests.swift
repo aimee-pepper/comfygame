@@ -1191,6 +1191,65 @@ final class SaveSlotTests: XCTestCase {
         XCTAssertEqual(try Data(contentsOf: url), bytes)
     }
 
+    func testDuplicateMerchantPhysicalGearIdentityFailsRawAndSlotWithoutRewritingBytes() async throws {
+        var state = GameState.newGame()
+        let stack = ItemStack(id: .init(rawValue: 98_001), catalogID: "blade_chipped")
+        XCTAssertTrue(state.base.inventory.add(stack))
+        state.base.tradingPost.stock = [.init(
+            id: 301, kind: .item(stack.catalogID), remainingQuantity: 1,
+            unitPrice: 20, frozenUnits: [stack])]
+        state.base.tradingPost.nextStockLineID = 302
+        let payload = try SaveCodec.encode(state)
+        XCTAssertThrowsError(try SaveCodec.decode(payload))
+
+        let root = directory()
+        defer { try? FileManager.default.removeItem(at: root) }
+        let io = SaveSlotFileIO(directory: root)
+        let id = SaveSlotID()
+        let now = Date(timeIntervalSince1970: 56)
+        let metadata = SaveSlotMetadata.make(id: id, name: "Duplicate merchant gear", state: state,
+                                             createdAt: now, lastPlayedAt: now)
+        let bytes = try encoder().encode(SaveSlotEnvelope(metadata: metadata, payload: payload))
+        let slotsDirectory = await io.slotsDirectory
+        try FileManager.default.createDirectory(at: slotsDirectory, withIntermediateDirectories: true)
+        let url = slotsDirectory.appending(path: "\(id.description).slot.json")
+        try bytes.write(to: url)
+
+        do { _ = try await io.load(id); XCTFail("Expected duplicate physical identity rejection") }
+        catch { }
+        XCTAssertEqual(try Data(contentsOf: url), bytes)
+    }
+
+    func testMalformedPhysicalGearIdentityAuthorityFailsRawAndSlotWithoutRewritingBytes() async throws {
+        let valid = try SaveCodec.encode(GameState.newGame())
+        let corruptValues: [Any] = [0, -1, true, NSNull()]
+        for (offset, corruptValue) in corruptValues.enumerated() {
+            var root = try XCTUnwrap(JSONSerialization.jsonObject(with: valid) as? [String: Any])
+            var base = try XCTUnwrap(root["base"] as? [String: Any])
+            base["nextPhysicalGearInstanceID"] = corruptValue
+            root["base"] = base
+            let payload = try JSONSerialization.data(withJSONObject: root, options: [.sortedKeys])
+            XCTAssertThrowsError(try SaveCodec.decode(payload))
+
+            let directory = directory()
+            defer { try? FileManager.default.removeItem(at: directory) }
+            let io = SaveSlotFileIO(directory: directory)
+            let id = SaveSlotID()
+            let now = Date(timeIntervalSince1970: TimeInterval(70 + offset))
+            let metadata = SaveSlotMetadata.make(
+                id: id, name: "Malformed gear identity", state: .newGame(),
+                createdAt: now, lastPlayedAt: now)
+            let bytes = try encoder().encode(SaveSlotEnvelope(metadata: metadata, payload: payload))
+            let slotsDirectory = await io.slotsDirectory
+            try FileManager.default.createDirectory(at: slotsDirectory, withIntermediateDirectories: true)
+            let url = slotsDirectory.appending(path: "\(id.description).slot.json")
+            try bytes.write(to: url)
+            do { _ = try await io.load(id); XCTFail("Expected malformed identity rejection") }
+            catch { }
+            XCTAssertEqual(try Data(contentsOf: url), bytes)
+        }
+    }
+
     func testFutureEnvelopeWithCurrentPayloadIsVisibleExportableAndNeverDecodedOrRewritten() async throws {
         let root = directory()
         defer { try? FileManager.default.removeItem(at: root) }

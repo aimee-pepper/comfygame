@@ -1,6 +1,26 @@
 import Foundation
 
 extension GameStore {
+    func commitTradingPostPhysicalGearSale(
+        _ quote: TradingPostPhysicalGearSaleQuoteV1
+    ) -> TradingPostPhysicalGearCommitResultV1 {
+        var result: TradingPostPhysicalGearCommitResultV1 = .refused(.staleQuote)
+        mutate("trading post physical gear sale", flush: true) { state in
+            result = TradingPostRules.commitPhysicalGearSale(quote, in: &state)
+        }
+        return result
+    }
+
+    func commitTradingPostPhysicalGearPurchase(
+        _ quote: TradingPostPhysicalGearPurchaseQuoteV1
+    ) -> TradingPostPhysicalGearCommitResultV1 {
+        var result: TradingPostPhysicalGearCommitResultV1 = .refused(.staleQuote)
+        mutate("trading post physical gear purchase", flush: true) { state in
+            result = TradingPostRules.commitPhysicalGearPurchase(quote, in: &state)
+        }
+        return result
+    }
+
     /// Consumes the campaign-wide receipt inside the atomic return mutation, so each resolved
     /// expedition advances stock exactly once, including anchored revisits.
     nonisolated static func refreshTradingPost(after run: WorldRun, outcomeID: ExpeditionOutcomeID,

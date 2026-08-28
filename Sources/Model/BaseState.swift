@@ -327,6 +327,8 @@ struct BaseState: Codable, Equatable, Sendable {
     var binderEquipped: [GearSlot: EquippedPiece] = [:]
     /// Invalidates every quote that moves a physical gear identity between durable owners.
     var physicalGearOwnershipRevision: UInt64 = 0
+    /// Monotonic lower bound for the next physical gear identity. Retired gear remains reserved.
+    var nextPhysicalGearInstanceID: UInt64 = 1
 
     /// Purchased at the Workshop. Until then the Binder is manual every turn.
     ///
@@ -497,7 +499,8 @@ struct BaseState: Codable, Equatable, Sendable {
         let worn = Array(binderEquipped.values).compactMap { $0.gearProfile?.stableInstanceID.rawValue }
             + roster.flatMap { $0.equipped.values.compactMap { $0.gearProfile?.stableInstanceID.rawValue } }
         let merchant = tradingPost.stock.flatMap(\.frozenUnits).map(\.id.rawValue)
-        return ((stored + worn + merchant).max() ?? 0) + 1
+        let liveNext = ((stored + worn + merchant).max() ?? 0).addingReportingOverflow(1)
+        return max(nextPhysicalGearInstanceID, liveNext.overflow ? UInt64.max : liveNext.partialValue)
     }
 
     var essenceCrystalCount: Int {
@@ -559,7 +562,8 @@ struct BaseState: Codable, Equatable, Sendable {
         case hasConfiguredInstrumentLoadout
         case ownedSources
         case roster, activeCompanion, activeParty, tamedAnimalCompanions
-        case binderEquipped, physicalGearOwnershipRevision, hasAutomateSelfUnlock, satchelTier
+        case binderEquipped, physicalGearOwnershipRevision, nextPhysicalGearInstanceID
+        case hasAutomateSelfUnlock, satchelTier
         case purchasedGambitSlots, binderGambits, binderCharacter
         case companion
     }
@@ -613,6 +617,7 @@ struct BaseState: Codable, Equatable, Sendable {
         try c.encode(tamedAnimalCompanions, forKey: .tamedAnimalCompanions)
         try c.encode(binderEquipped, forKey: .binderEquipped)
         try c.encode(physicalGearOwnershipRevision, forKey: .physicalGearOwnershipRevision)
+        try c.encode(nextPhysicalGearInstanceID, forKey: .nextPhysicalGearInstanceID)
         try c.encode(hasAutomateSelfUnlock, forKey: .hasAutomateSelfUnlock)
         try c.encode(satchelTier, forKey: .satchelTier)
         try c.encode(purchasedGambitSlots, forKey: .purchasedGambitSlots)
@@ -768,6 +773,17 @@ struct BaseState: Codable, Equatable, Sendable {
         let isPreOwnershipSchema = !container.contains(.physicalGearOwnershipRevision)
         physicalGearOwnershipRevision = try container.decodeIfPresent(
             UInt64.self, forKey: .physicalGearOwnershipRevision) ?? 0
+        if container.contains(.nextPhysicalGearInstanceID) {
+            guard let decoded = try container.decodeIfPresent(
+                UInt64.self, forKey: .nextPhysicalGearInstanceID), decoded > 0 else {
+                throw DecodingError.dataCorruptedError(
+                    forKey: .nextPhysicalGearInstanceID, in: container,
+                    debugDescription: "Physical gear identity authority must be positive")
+            }
+            nextPhysicalGearInstanceID = decoded
+        } else {
+            nextPhysicalGearInstanceID = 1
+        }
         hasAutomateSelfUnlock = try container.decodeIfPresent(Bool.self, forKey: .hasAutomateSelfUnlock) ?? false
         satchelTier = try container.decodeIfPresent(Int.self, forKey: .satchelTier) ?? 0
         purchasedGambitSlots = try container.decodeIfPresent(Int.self, forKey: .purchasedGambitSlots) ?? 0

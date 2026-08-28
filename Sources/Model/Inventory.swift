@@ -99,7 +99,7 @@ enum PhysicalGearIdentityAuthority {
         guard let ids = everyPersistedID(in: state) else { return .failure(.invalidReceipt) }
         let maximum = ids.map(\.rawValue).max() ?? 0
         guard maximum < UInt64.max else { return .failure(.identityExhausted) }
-        return .success(.init(rawValue: maximum + 1))
+        return .success(.init(rawValue: max(state.base.nextPhysicalGearInstanceID, maximum + 1)))
     }
 }
 
@@ -122,6 +122,23 @@ extension GameState {
             if let profile = stack.gearProfile, !validate(profile, expectedStackID: stack.id) {
                 return false
             }
+        }
+        var stockLineIDs = Set<UInt64>()
+        for line in base.tradingPost.stock {
+            guard line.id > 0, stockLineIDs.insert(line.id).inserted,
+                  line.remainingQuantity >= 0, line.unitPrice >= 0 else { return false }
+            if case .item(let catalogID) = line.kind {
+                guard line.frozenUnits.isEmpty
+                        || line.frozenUnits.count == line.remainingQuantity else { return false }
+                for stack in line.frozenUnits {
+                    guard stack.count == 1, stack.catalogID == catalogID,
+                          let profile = stack.gearProfile,
+                          validate(profile, expectedStackID: stack.id) else { return false }
+                }
+            } else if !line.frozenUnits.isEmpty { return false }
+        }
+        if let maximum = stockLineIDs.max(), base.tradingPost.nextStockLineID <= maximum {
+            return false
         }
         for (slot, piece) in base.binderEquipped {
             guard piece.gearProfile?.slot == slot else { return false }
@@ -518,6 +535,8 @@ enum PhysicalGearReceiptEngineV1 {
             return .refused(.componentUnavailable)
         }
         candidate.base.store(output)
+        guard expectedID.rawValue < UInt64.max else { return .refused(.identityExhausted) }
+        candidate.base.nextPhysicalGearInstanceID = expectedID.rawValue + 1
         candidate.base.physicalGearOwnershipRevision += 1
         guard candidate.validatesPhysicalGearReceipts() else { return .refused(.invalidReceipt) }
         state = candidate

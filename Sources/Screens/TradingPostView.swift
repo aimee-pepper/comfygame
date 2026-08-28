@@ -250,7 +250,7 @@ struct TradingPostView: View {
                                           unitQuantity: 1, unitPrice: line.unitPrice, location: .offered,
                                           revision: base.tradingPost.inventoryRevision,
                                           stack: frozenUnit,
-                                          action: .unavailablePurchase,
+                                          action: .buyPhysical(lineID: line.id),
                                           authoredCatalogueItemID: id)
             case .material(let sample):
                 return TradingPostListing(id: "stock-\(line.id)", name: sample.displayName,
@@ -567,12 +567,26 @@ private struct TradingPostListingSheet: View {
                                              essence: quantity * listing.unitQuantity,
                                              expectedRevision: listing.revision)
         case .sellItem(let location, let stackID):
-            result = store.sellAtTradingPost(
-                resources: [:],
-                items: [TradingPostItemSaleRequest(location: location, stackID: stackID,
-                                                   quantity: quantity)],
-                essence: 0,
-                expectedRevision: listing.revision)
+            if listing.stack?.gearProfile != nil {
+                let source: TradingPostPhysicalGearLocationV1 = location == .stored
+                    ? .storehouse(stackID: stackID) : .waiting(stackID: stackID)
+                guard case .allowed(let quote) = TradingPostRules.evaluatePhysicalGearSale(
+                    source: source, in: store.state) else { failure = .invalid; return }
+                result = store.commitTradingPostPhysicalGearSale(quote) == .committed
+                    ? .committed : .invalid
+            } else {
+                result = store.sellAtTradingPost(
+                    resources: [:],
+                    items: [TradingPostItemSaleRequest(location: location, stackID: stackID,
+                                                       quantity: quantity)],
+                    essence: 0,
+                    expectedRevision: listing.revision)
+            }
+        case .buyPhysical(let lineID):
+            guard case .allowed(let quote) = TradingPostRules.evaluatePhysicalGearPurchase(
+                lineID: lineID, in: store.state) else { failure = .invalid; return }
+            result = store.commitTradingPostPhysicalGearPurchase(quote) == .committed
+                ? .committed : .invalid
         case .unavailablePurchase:
             result = .invalid
         }
@@ -636,11 +650,12 @@ private struct TradingPostListing: Identifiable {
         case sellResource(ResourceID)
         case sellEssence
         case sellItem(location: TradingPostItemLocation, stackID: InstanceID)
+        case buyPhysical(lineID: UInt64)
         case unavailablePurchase
 
         var isPurchase: Bool {
             switch self {
-            case .buyStock, .buyEssence, .unavailablePurchase: true
+            case .buyStock, .buyEssence, .buyPhysical, .unavailablePurchase: true
             default: false
             }
         }

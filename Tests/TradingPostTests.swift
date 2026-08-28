@@ -2,6 +2,98 @@ import XCTest
 @testable import Bookbinder
 
 final class TradingPostTests: XCTestCase {
+    func testPhysicalGearSaleUsesExactCustodyPriceAndBothRevisions() throws {
+        var state = GameState.newGame()
+        state.base.stations[Stations.tradingPost] = .init(isUnlocked: true, tier: 0)
+        let stack = ItemStack(id: .init(rawValue: 90_001), catalogID: "blade_chipped")
+        XCTAssertTrue(state.base.inventory.add(stack))
+        let expectedPrice = max(4, Int(floor(4 * stack.effectivePower)))
+        guard case .allowed(let quote) = TradingPostRules.evaluatePhysicalGearSale(
+            source: .storehouse(stackID: stack.id), in: state) else {
+            return XCTFail("expected sale quote")
+        }
+        XCTAssertEqual(quote.unitPrice, expectedPrice)
+        XCTAssertEqual(quote.snapshot.stack, stack)
+        let gold = state.base.goldCoins
+        XCTAssertEqual(TradingPostRules.commitPhysicalGearSale(quote, in: &state), .committed)
+        XCTAssertFalse(state.base.inventory.stacks.contains { $0.id == stack.id })
+        XCTAssertEqual(state.base.goldCoins, gold + expectedPrice)
+        XCTAssertEqual(state.base.tradingPost.inventoryRevision, 1)
+        XCTAssertEqual(state.base.physicalGearOwnershipRevision, 1)
+        XCTAssertTrue(state.base.tradingPost.stock.isEmpty, "sale must not create buyback stock")
+        XCTAssertEqual(state.base.nextPhysicalGearInstanceID, stack.id.rawValue + 1)
+        XCTAssertEqual(PhysicalGearIdentityAuthority.nextID(in: state),
+                       .success(.init(rawValue: stack.id.rawValue + 1)))
+    }
+
+    func testPhysicalGearPurchaseTransfersExactFrozenUnitToWaitingAndIsAtomicWhenStale() throws {
+        var state = GameState.newGame()
+        state.base.stations[Stations.tradingPost] = .init(isUnlocked: true, tier: 0)
+        state.base.goldCoins = 500
+        state.base.inventory.slots = 0
+        let frozen = ItemStack(id: .init(rawValue: 90_101), catalogID: "blade_chipped")
+        state.base.tradingPost.stock = [.init(id: 41, kind: .item(frozen.catalogID),
+                                              remainingQuantity: 1, unitPrice: 77,
+                                              frozenUnits: [frozen])]
+        state.base.tradingPost.nextStockLineID = 42
+        guard case .allowed(let quote) = TradingPostRules.evaluatePhysicalGearPurchase(
+            lineID: 41, in: state) else { return XCTFail("expected purchase quote") }
+        XCTAssertEqual(quote.destination, .waiting)
+        XCTAssertEqual(quote.reservedSnapshot.stack, frozen)
+        let before = try SaveCodec.encode(state)
+        var stale = quote
+        stale.goldDebit += 1
+        XCTAssertEqual(TradingPostRules.commitPhysicalGearPurchase(stale, in: &state),
+                       .refused(.staleQuote))
+        XCTAssertEqual(try SaveCodec.encode(state), before)
+
+        XCTAssertEqual(TradingPostRules.commitPhysicalGearPurchase(quote, in: &state), .committed)
+        XCTAssertEqual(state.base.spillover.last, frozen)
+        XCTAssertEqual(state.base.goldCoins, 423)
+        XCTAssertEqual(state.base.tradingPost.stock[0].remainingQuantity, 0)
+        XCTAssertTrue(state.base.tradingPost.stock[0].frozenUnits.isEmpty)
+        XCTAssertEqual(state.base.tradingPost.inventoryRevision, 1)
+        XCTAssertEqual(state.base.physicalGearOwnershipRevision, 1)
+    }
+
+    func testPhysicalGearSaleRefusalMatrixIsByteInert() throws {
+        var base = GameState.newGame()
+        base.base.stations[Stations.tradingPost] = .init(isUnlocked: true, tier: 0)
+        let original = ItemStack(id: .init(rawValue: 90_201), catalogID: "blade_chipped")
+        for refusal in ["favorite", "locked", "unidentified", "protected", "legacy"] {
+            var state = base
+            var stack = original
+            if refusal == "favorite" { stack.isFavorite = true }
+            if refusal == "locked" { stack.isLocked = true }
+            if refusal == "unidentified" { stack.identified = false }
+            if refusal == "protected" { stack.protectedReturnCount = 1 }
+            if refusal == "legacy" { stack.gearProfile?.legacyEffectivePowerCredit = 1 }
+            XCTAssertTrue(state.base.inventory.add(stack))
+            let before = try SaveCodec.encode(state)
+            guard case .refused = TradingPostRules.evaluatePhysicalGearSale(
+                source: .storehouse(stackID: stack.id), in: state) else {
+                return XCTFail("accepted \(refusal)")
+            }
+            XCTAssertEqual(try SaveCodec.encode(state), before)
+        }
+    }
+
+    func testPhysicalGearQuoteRevisionChangeIsAtomic() throws {
+        var state = GameState.newGame()
+        state.base.stations[Stations.tradingPost] = .init(isUnlocked: true, tier: 0)
+        let stack = ItemStack(id: .init(rawValue: 90_401), catalogID: "blade_chipped")
+        state.base.spillover = [stack]
+        guard case .allowed(let quote) = TradingPostRules.evaluatePhysicalGearSale(
+            source: .waiting(stackID: stack.id), in: state) else {
+            return XCTFail("expected waiting sale")
+        }
+        state.base.physicalGearOwnershipRevision += 1
+        let bytes = try SaveCodec.encode(state)
+        XCTAssertEqual(TradingPostRules.commitPhysicalGearSale(quote, in: &state),
+                       .refused(.staleOwnershipRevision))
+        XCTAssertEqual(try SaveCodec.encode(state), bytes)
+    }
+
     func testTradingPostProprietorUsesExactVanceIdentity() throws {
         XCTAssertEqual(TradingPostPresentation.proprietorID, TravellerID(rawValue: "vance"))
         let vance = try XCTUnwrap(ContentCatalog.shared.traveller(TradingPostPresentation.proprietorID))
@@ -31,7 +123,8 @@ final class TradingPostTests: XCTestCase {
                                 encoding: .utf8)
 
         XCTAssertTrue(source.contains("case unavailablePurchase"))
-        XCTAssertTrue(source.contains("case .buyStock, .buyEssence, .unavailablePurchase: true"))
+        XCTAssertTrue(source.contains("case .buyStock, .buyEssence, .buyPhysical, .unavailablePurchase: true"))
+        XCTAssertTrue(source.contains("action: .buyPhysical(lineID: line.id)"))
         XCTAssertFalse(source.contains("case unavailable\n"))
         XCTAssertTrue(source.contains("You can inspect this stock, but Vance cannot sell it yet."))
         XCTAssertFalse(source.contains("capacity-safe purchase path"))
@@ -263,16 +356,19 @@ final class TradingPostTests: XCTestCase {
             return ContentCatalog.shared.item(id)?.gear != nil
         })
         let frozen = try XCTUnwrap(equipment.frozenUnits.first)
-        let preview = try XCTUnwrap(TradingPostRules.previewPurchase(
-            lineID: equipment.id, quantity: 1, in: base))
-        let stale = preview
-        XCTAssertEqual(TradingPostRules.commit(preview, in: &base), .committed)
-        XCTAssertEqual(base.spillover.last, frozen)
-        XCTAssertEqual(base.tradingPost.stock.first(where: { $0.id == equipment.id })?.remainingQuantity, 0)
+        var state = GameState.newGame(); state.base = base
+        state.base.stations[Stations.tradingPost] = .init(isUnlocked: true, tier: 0)
+        guard case .allowed(let quote) = TradingPostRules.evaluatePhysicalGearPurchase(
+            lineID: equipment.id, in: state) else { return XCTFail("expected physical quote") }
+        XCTAssertEqual(TradingPostRules.commitPhysicalGearPurchase(quote, in: &state), .committed)
+        XCTAssertEqual(state.base.spillover.last, frozen)
+        XCTAssertEqual(state.base.tradingPost.stock.first(where: { $0.id == equipment.id })?
+            .remainingQuantity, 0)
 
-        let before = base
-        XCTAssertEqual(TradingPostRules.commit(stale, in: &base), .stale)
-        XCTAssertEqual(base, before)
+        let before = state
+        XCTAssertEqual(TradingPostRules.commitPhysicalGearPurchase(quote, in: &state),
+                       .refused(.staleTradingRevision))
+        XCTAssertEqual(state, before)
     }
 
     func testResolvedRunWrapperAdvancesOnePersistedSnapshotPerSequentialCall() {
@@ -386,18 +482,18 @@ final class TradingPostTests: XCTestCase {
         XCTAssertTrue(base.inventory.add(ItemStack(id: InstanceID(rawValue: 201),
                                                     catalogID: "salve_lesser", count: 3)))
         base.spillover = [ItemStack(id: InstanceID(rawValue: 202), catalogID: "blade_chipped")]
-        let requests = [
-            TradingPostItemSaleRequest(location: .stored, stackID: InstanceID(rawValue: 201), quantity: 2),
-            TradingPostItemSaleRequest(location: .overflow, stackID: InstanceID(rawValue: 202), quantity: 1)
-        ]
+        let requests = [TradingPostItemSaleRequest(
+            location: .stored, stackID: InstanceID(rawValue: 201), quantity: 2)]
         let preview = try XCTUnwrap(TradingPostRules.previewSale(resources: [:], items: requests, in: base))
-        let bladePrice = try XCTUnwrap(TradingPostRules.saleUnitPrice(for: base.spillover[0]))
-        XCTAssertEqual(preview.goldTotal, 4 + bladePrice)
+        XCTAssertNil(TradingPostRules.previewSale(resources: [:], items: [
+            TradingPostItemSaleRequest(location: .overflow,
+                                       stackID: InstanceID(rawValue: 202), quantity: 1)], in: base))
+        XCTAssertEqual(preview.goldTotal, 4)
         XCTAssertEqual(TradingPostRules.commit(preview, in: &base), .committed)
         XCTAssertEqual(base.inventory.stacks.first?.id, InstanceID(rawValue: 201))
         XCTAssertEqual(base.inventory.stacks.first?.count, 1)
-        XCTAssertEqual(base.spillover, [])
-        XCTAssertEqual(base.goldCoins, 4 + bladePrice)
+        XCTAssertEqual(base.spillover.map(\.id), [InstanceID(rawValue: 202)])
+        XCTAssertEqual(base.goldCoins, 4)
     }
 
     func testChangedItemSnapshotRejectsSaleWithoutRemovingOrCreditingAnything() throws {

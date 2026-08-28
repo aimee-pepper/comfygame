@@ -1,4 +1,95 @@
+import CryptoKit
 import Foundation
+
+enum TradingPostPhysicalGearLocationV1: Codable, Equatable, Sendable {
+    case storehouse(stackID: InstanceID)
+    case waiting(stackID: InstanceID)
+    case merchant(lineID: UInt64, stackID: InstanceID)
+}
+
+struct TradingPostPhysicalGearSaleQuoteV1: Codable, Equatable, Sendable {
+    var version: Int = 1
+    var stationID: StationID = Stations.tradingPost
+    var tradingRevision: UInt64
+    var ownershipRevision: UInt64
+    var source: TradingPostPhysicalGearLocationV1
+    var snapshot: PhysicalGearSnapshotV1
+    var unitPrice: Int
+    var goldCredit: Int
+    var quoteSHA256: String
+
+    mutating func seal() { quoteSHA256 = canonicalDigest() ?? "" }
+    func validatesDigest() -> Bool { quoteSHA256 == canonicalDigest() }
+    private func canonicalDigest() -> String? {
+        var copy = self; copy.quoteSHA256 = ""
+        guard let data = try? SaveCodec.makeEncoder().encode(copy) else { return nil }
+        return SHA256.hash(data: data).map { String(format: "%02x", $0) }.joined()
+    }
+}
+
+struct TradingPostPhysicalGearPurchaseQuoteV1: Codable, Equatable, Sendable {
+    var version: Int = 1
+    var stationID: StationID = Stations.tradingPost
+    var tradingRevision: UInt64
+    var ownershipRevision: UInt64
+    var lineID: UInt64
+    var reservedSnapshot: PhysicalGearSnapshotV1
+    var frozenUnitPrice: Int
+    var goldDebit: Int
+    var destination: PhysicalGearConstructionDestinationV1
+    var quoteSHA256: String
+
+    mutating func seal() { quoteSHA256 = canonicalDigest() ?? "" }
+    func validatesDigest() -> Bool { quoteSHA256 == canonicalDigest() }
+    private func canonicalDigest() -> String? {
+        var copy = self; copy.quoteSHA256 = ""
+        guard let data = try? SaveCodec.makeEncoder().encode(copy) else { return nil }
+        return SHA256.hash(data: data).map { String(format: "%02x", $0) }.joined()
+    }
+}
+
+enum TradingPostPhysicalGearRefusalV1: Codable, Equatable, Sendable {
+    case stationUnavailable, notAtHome, encounterActive, sourceMissing, sourceMoved
+    case notPhysicalGear, unidentified, favorite, locked, protectedReturn, tradingProtected
+    case singularOrApex, legacyMasterwork, invalidReceipt, invalidPersistedState
+    case merchantLineMissing, merchantUnitMissing, insufficientGold, duplicateIdentity
+    case staleTradingRevision, staleOwnershipRevision, staleQuote, revisionExhausted
+
+    var playerCopy: String? {
+        switch self {
+        case .stationUnavailable: "Build the Trading Post first."
+        case .notAtHome, .encounterActive: "Gear can be traded after you return home."
+        case .unidentified: "Identify this piece before selling it."
+        case .favorite: "Remove the favorite mark before selling this piece."
+        case .locked: "Unlock this piece before selling it."
+        case .protectedReturn, .tradingProtected, .singularOrApex:
+            "The Trading Post will not buy this piece."
+        case .legacyMasterwork:
+            "Gear with power carried forward from an older save stays protected until you rebuild it."
+        case .insufficientGold: "You do not have enough Gold."
+        case .sourceMoved, .staleTradingRevision, .staleOwnershipRevision, .staleQuote:
+            "The gear or offer changed. Review it and try again."
+        case .sourceMissing: "Those goods are no longer available in that quantity."
+        case .notPhysicalGear, .invalidReceipt, .invalidPersistedState, .merchantLineMissing,
+             .merchantUnitMissing, .duplicateIdentity, .revisionExhausted: nil
+        }
+    }
+}
+
+enum TradingPostPhysicalGearSaleEvaluationV1: Equatable, Sendable {
+    case allowed(TradingPostPhysicalGearSaleQuoteV1)
+    case refused(TradingPostPhysicalGearRefusalV1)
+}
+
+enum TradingPostPhysicalGearPurchaseEvaluationV1: Equatable, Sendable {
+    case allowed(TradingPostPhysicalGearPurchaseQuoteV1)
+    case refused(TradingPostPhysicalGearRefusalV1)
+}
+
+enum TradingPostPhysicalGearCommitResultV1: Equatable, Sendable {
+    case committed
+    case refused(TradingPostPhysicalGearRefusalV1)
+}
 
 /// Home-layer Trading Post state. A missing value in an old save decodes to this empty,
 /// awaiting-first-expedition snapshot; opening the station never rolls stock.

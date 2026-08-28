@@ -12,6 +12,163 @@ enum TradingPostRules {
     static let essencePurchaseQuantity = 10
     static let essencePurchasePrice = 8
 
+    static func evaluatePhysicalGearSale(
+        source: TradingPostPhysicalGearLocationV1, in state: GameState
+    ) -> TradingPostPhysicalGearSaleEvaluationV1 {
+        if state.worlds.activeRun?.activeEncounter != nil { return .refused(.encounterActive) }
+        if state.worlds.activeRun != nil { return .refused(.notAtHome) }
+        guard state.base.station(Stations.tradingPost).isUnlocked else {
+            return .refused(.stationUnavailable)
+        }
+        guard state.validatesPhysicalGearReceipts() else { return .refused(.invalidPersistedState) }
+        let stack: ItemStack?
+        switch source {
+        case .storehouse(let id): stack = state.base.inventory.stacks.first { $0.id == id }
+        case .waiting(let id): stack = state.base.spillover.first { $0.id == id }
+        case .merchant: return .refused(.sourceMoved)
+        }
+        guard let stack else { return .refused(.sourceMissing) }
+        guard stack.count == 1, let profile = stack.gearProfile,
+              stack.id == profile.stableInstanceID,
+              let snapshot = PhysicalGearSnapshotV1(stack) else { return .refused(.notPhysicalGear) }
+        guard stack.identified else { return .refused(.unidentified) }
+        guard !stack.isFavorite else { return .refused(.favorite) }
+        guard !stack.isLocked else { return .refused(.locked) }
+        guard stack.protectedReturnCount == 0 else { return .refused(.protectedReturn) }
+        guard let definition = ContentCatalog.shared.item(stack.catalogID), definition.gear != nil,
+              definition.tradingPostDisposition == .sellable else { return .refused(.tradingProtected) }
+        guard definition.gear?.breaks == nil, profile.authoredUniqueRuleID == nil,
+              definition.gearCatalogueDisposition?.classification != .wildApexOnly,
+              definition.gearCatalogueDisposition?.foundReceipt?.mode != .fixedSpecial else {
+            return .refused(.singularOrApex)
+        }
+        guard profile.legacyPowerCredit == 0, profile.legacyEffectivePowerCredit == 0 else {
+            return .refused(.legacyMasterwork)
+        }
+        guard profile.physicalReceipt?.validates(profile: profile) ?? true else {
+            return .refused(.invalidReceipt)
+        }
+        let scaledPrice = 4 * stack.effectivePower
+        guard scaledPrice.isFinite, scaledPrice <= Double(Int.max),
+              scaledPrice >= Double(Int.min) else { return .refused(.invalidPersistedState) }
+        let price = max(4, Int(floor(scaledPrice)))
+        var quote = TradingPostPhysicalGearSaleQuoteV1(
+            tradingRevision: state.base.tradingPost.inventoryRevision,
+            ownershipRevision: state.base.physicalGearOwnershipRevision,
+            source: source, snapshot: snapshot, unitPrice: price, goldCredit: price,
+            quoteSHA256: "")
+        quote.seal()
+        return .allowed(quote)
+    }
+
+    static func evaluatePhysicalGearPurchase(
+        lineID: UInt64, in state: GameState
+    ) -> TradingPostPhysicalGearPurchaseEvaluationV1 {
+        if state.worlds.activeRun?.activeEncounter != nil { return .refused(.encounterActive) }
+        if state.worlds.activeRun != nil { return .refused(.notAtHome) }
+        guard state.base.station(Stations.tradingPost).isUnlocked else {
+            return .refused(.stationUnavailable)
+        }
+        guard state.validatesPhysicalGearReceipts() else { return .refused(.invalidPersistedState) }
+        guard let line = state.base.tradingPost.stock.first(where: { $0.id == lineID }) else {
+            return .refused(.merchantLineMissing)
+        }
+        guard case .item = line.kind, line.remainingQuantity > 0,
+              let stack = line.frozenUnits.first,
+              let snapshot = PhysicalGearSnapshotV1(stack) else {
+            return .refused(.merchantUnitMissing)
+        }
+        guard state.base.goldCoins >= line.unitPrice else { return .refused(.insufficientGold) }
+        let destination: PhysicalGearConstructionDestinationV1 = state.base.inventory.isFull
+            ? .waiting : .storehouse
+        var quote = TradingPostPhysicalGearPurchaseQuoteV1(
+            tradingRevision: state.base.tradingPost.inventoryRevision,
+            ownershipRevision: state.base.physicalGearOwnershipRevision, lineID: lineID,
+            reservedSnapshot: snapshot, frozenUnitPrice: line.unitPrice,
+            goldDebit: line.unitPrice, destination: destination, quoteSHA256: "")
+        quote.seal()
+        return .allowed(quote)
+    }
+
+    static func commitPhysicalGearSale(
+        _ quote: TradingPostPhysicalGearSaleQuoteV1, in state: inout GameState
+    ) -> TradingPostPhysicalGearCommitResultV1 {
+        guard quote.validatesDigest() else { return .refused(.staleQuote) }
+        guard state.base.tradingPost.inventoryRevision == quote.tradingRevision else {
+            return .refused(.staleTradingRevision)
+        }
+        guard state.base.physicalGearOwnershipRevision == quote.ownershipRevision else {
+            return .refused(.staleOwnershipRevision)
+        }
+        guard quote.tradingRevision < UInt64.max, quote.ownershipRevision < UInt64.max else {
+            return .refused(.revisionExhausted)
+        }
+        guard case .allowed(let current) = evaluatePhysicalGearSale(source: quote.source, in: state),
+              current == quote else { return .refused(.staleQuote) }
+        let addition = state.base.goldCoins.addingReportingOverflow(quote.goldCredit)
+        guard !addition.overflow else { return .refused(.invalidPersistedState) }
+        var candidate = state
+        switch quote.source {
+        case .storehouse(let id):
+            guard let index = candidate.base.inventory.stacks.firstIndex(where: { $0.id == id })
+            else { return .refused(.sourceMoved) }
+            candidate.base.inventory.stacks.remove(at: index)
+        case .waiting(let id):
+            guard let index = candidate.base.spillover.firstIndex(where: { $0.id == id })
+            else { return .refused(.sourceMoved) }
+            candidate.base.spillover.remove(at: index)
+        case .merchant: return .refused(.sourceMoved)
+        }
+        candidate.base.goldCoins = addition.partialValue
+        guard quote.snapshot.stack.id.rawValue < UInt64.max else {
+            return .refused(.revisionExhausted)
+        }
+        candidate.base.nextPhysicalGearInstanceID = max(
+            candidate.base.nextPhysicalGearInstanceID,
+            quote.snapshot.stack.id.rawValue + 1)
+        candidate.base.tradingPost.inventoryRevision += 1
+        candidate.base.physicalGearOwnershipRevision += 1
+        guard candidate.validatesPhysicalGearReceipts() else { return .refused(.invalidPersistedState) }
+        state = candidate
+        return .committed
+    }
+
+    static func commitPhysicalGearPurchase(
+        _ quote: TradingPostPhysicalGearPurchaseQuoteV1, in state: inout GameState
+    ) -> TradingPostPhysicalGearCommitResultV1 {
+        guard quote.validatesDigest() else { return .refused(.staleQuote) }
+        guard state.base.tradingPost.inventoryRevision == quote.tradingRevision else {
+            return .refused(.staleTradingRevision)
+        }
+        guard state.base.physicalGearOwnershipRevision == quote.ownershipRevision else {
+            return .refused(.staleOwnershipRevision)
+        }
+        guard quote.tradingRevision < UInt64.max, quote.ownershipRevision < UInt64.max else {
+            return .refused(.revisionExhausted)
+        }
+        guard case .allowed(let current) = evaluatePhysicalGearPurchase(lineID: quote.lineID, in: state),
+              current == quote else { return .refused(.staleQuote) }
+        var candidate = state
+        guard let index = candidate.base.tradingPost.stock.firstIndex(where: { $0.id == quote.lineID }),
+              candidate.base.goldCoins >= quote.goldDebit else { return .refused(.staleQuote) }
+        let stack = candidate.base.tradingPost.stock[index].frozenUnits.removeFirst()
+        candidate.base.tradingPost.stock[index].remainingQuantity -= 1
+        candidate.base.goldCoins -= quote.goldDebit
+        switch quote.destination {
+        case .storehouse:
+            guard candidate.base.inventory.add(stack) else { return .refused(.staleQuote) }
+        case .waiting: candidate.base.spillover.append(stack)
+        }
+        guard stack.id.rawValue < UInt64.max else { return .refused(.revisionExhausted) }
+        candidate.base.nextPhysicalGearInstanceID = max(
+            candidate.base.nextPhysicalGearInstanceID, stack.id.rawValue + 1)
+        candidate.base.tradingPost.inventoryRevision += 1
+        candidate.base.physicalGearOwnershipRevision += 1
+        guard candidate.validatesPhysicalGearReceipts() else { return .refused(.invalidPersistedState) }
+        state = candidate
+        return .committed
+    }
+
     static func tradeBand(for resource: ResourceID,
                           in catalog: ContentCatalog = .shared) -> TradingPostTradeBand? {
         catalog.resource(resource)?.tradeBand
@@ -214,7 +371,7 @@ enum TradingPostRules {
                   let stack = stack(request.stackID, at: request.location, in: base),
                   stack.count >= request.quantity,
                   let price = saleUnitPrice(for: stack) else { return nil }
-            if stack.gearProfile != nil && request.quantity != 1 { return nil }
+            if stack.gearProfile != nil { return nil }
             itemLines.append(.init(location: request.location, stackID: request.stackID,
                                    quantity: request.quantity, unitPrice: price, snapshot: stack))
             total += request.quantity * price
@@ -287,6 +444,9 @@ enum TradingPostRules {
         case .resource: break
         case .item:
             guard line.frozenUnits.count >= quantity else { return nil }
+            if line.frozenUnits.prefix(quantity).contains(where: { $0.gearProfile != nil }) {
+                return nil
+            }
         case .material:
             guard line.frozenMaterialUnits.count >= quantity else { return nil }
         }
