@@ -110,6 +110,42 @@ final class PersistenceTests: XCTestCase {
         }
     }
 
+    func testCurrentRecoveredTeachingInvalidNonSelectedOfferFailsRawLoadWithoutRewritingBytes() throws {
+        for mutation in ["future-version", "negative-counter"] {
+            var state = GameState.newGame()
+            var tile = Tile()
+            tile.content = .recoveredTeaching("teaching.focus.stars")
+            var run = WorldRun(
+                runIndex: 1, book: .init(written: [], essencePaid: 0), mapSeed: 71,
+                rng: .init(seed: 71),
+                map: .init(width: 1, height: 1, tiles: [tile], entry: .init(x: 0, y: 0)),
+                playerPosition: .init(x: 0, y: 0))
+            run.recoveredTeachingExpedition = .init(
+                offeredTeachingID: "teaching.focus.stars", placement: .init(x: 0, y: 0),
+                resultingOfferStates: [
+                    .init(teachingID: "teaching.focus.stars", isDue: true),
+                    .init(teachingID: "teaching.focus.mist", eligibleWorldsWithoutOffer: 1)
+                ], resolvedAtOutcomeID: nil)
+            state.worlds.activeRun = run
+            var root = try XCTUnwrap(JSONSerialization.jsonObject(with: SaveCodec.encode(state))
+                                      as? [String: Any])
+            var worlds = try XCTUnwrap(root["worlds"] as? [String: Any])
+            var active = try XCTUnwrap(worlds["activeRun"] as? [String: Any])
+            var receipt = try XCTUnwrap(active["recoveredTeachingExpedition"] as? [String: Any])
+            var states = try XCTUnwrap(receipt["resultingOfferStates"] as? [[String: Any]])
+            if mutation == "future-version" { states[1]["version"] = 2 }
+            else { states[1]["eligibleWorldsWithoutOffer"] = -1 }
+            receipt["resultingOfferStates"] = states
+            active["recoveredTeachingExpedition"] = receipt; worlds["activeRun"] = active
+            root["worlds"] = worlds
+            let bytes = try JSONSerialization.data(withJSONObject: root, options: [.sortedKeys])
+            let io = SaveFileIO.temporary(name: "teaching-nonselected-\(mutation)-\(UUID().uuidString)")
+            try io.write(bytes)
+            guard case .unrecoverable = io.load() else { return XCTFail("expected strict failure") }
+            try assertQuarantinedSavePreserves(bytes, io: io)
+        }
+    }
+
     func testCurrentRecoveredTeachingReceiptMapMismatchFailsRawLoadWithoutRewritingBytes() throws {
         for mutation in ["out-of-bounds", "wrong-tile", "wrong-identity", "orphan-tile"] {
             var state = GameState.newGame()

@@ -241,7 +241,7 @@ enum RecoveredTeachingWorldRulesV1 {
         case .fieldInstruction, .localObservation, .quietCounterexample:
             routeForbidden = unsafeRoutePoints
         case .warningNote:
-            routeForbidden = manifestations
+            routeForbidden = unsafeRoutePoints.union(manifestations)
         case .siteRubbing:
             routeForbidden = []
         }

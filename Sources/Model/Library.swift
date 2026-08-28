@@ -276,7 +276,9 @@ struct RecoveredTeachingExpeditionReceiptV1: Codable, Equatable, Sendable {
     func validates() -> Bool {
         guard version == 1,
               Set(resultingOfferStates.map(\.teachingID)).count == resultingOfferStates.count,
-              resultingOfferStates.allSatisfy({ RecoveredTeachingCatalogueV1.reward(for: $0.teachingID) != nil })
+              resultingOfferStates.allSatisfy({
+                  $0.validates() && RecoveredTeachingCatalogueV1.reward(for: $0.teachingID) != nil
+              })
         else { return false }
         switch (offeredTeachingID, placement) {
         case (nil, nil): break

@@ -2200,6 +2200,28 @@ final class LibraryTests: XCTestCase {
         }
     }
 
+    func testRecoveredTeachingWarningRoutesExcludeManifestationAndEveryUnsafeRouteKind() throws {
+        let warning = try XCTUnwrap(RecoveredTeachingCatalogueV1.definitions.first {
+            $0.id == "teaching.symbol.tremor"
+        })
+        let manifestation: Set<GridPoint> = [.init(x: 10, y: 0)]
+        for obstruction in 0..<4 {
+            var tiles = Array(repeating: Tile(), count: 20)
+            var enemies: [WorldEnemy] = []
+            switch obstruction {
+            case 0: tiles[3].content = .hazard
+            case 1: tiles[3].content = .site(.init(rawValue: 31))
+            case 2: tiles[3].content = .traveller("vance")
+            default: enemies = [.init(id: .init(rawValue: 32), position: .init(x: 3, y: 0))]
+            }
+            let map = WorldMap(width: 20, height: 1, tiles: tiles,
+                               entry: .init(x: 0, y: 0))
+            XCTAssertNil(RecoveredTeachingWorldRulesV1.placementPoint(
+                for: warning, manifestations: manifestation, in: map, enemies: enemies),
+                "warning route must avoid manifestation points and unsafe obstruction \(obstruction)")
+        }
+    }
+
     func testEveryFocusUsesItsExactFrozenGeneratedSourceIdentity() {
         let map = WorldMap(width: 20, height: 1, tiles: Array(repeating: Tile(), count: 20),
                            entry: .init(x: 0, y: 0))
