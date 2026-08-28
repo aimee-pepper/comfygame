@@ -1037,6 +1037,7 @@ enum WorldRules {
         let concealment = fieldConcealment(in: state)
         events.append(contentsOf: moveEnemies(in: &run, concealment: concealment,
                                                partySightBonus: partySightBonus))
+        events.append(contentsOf: advanceAnimalTrust(in: &run, reality: &state.reality))
         if let mask = run.scentMask, run.turnsTaken >= mask.expiresAfterTurn {
             run.scentMask = nil
             for index in run.enemies.indices { run.enemies[index].maskedScentContact = false }
@@ -1067,6 +1068,39 @@ enum WorldRules {
                 reason = "Your injuries overwhelmed you. You were carried home."
             }
             events.append(.ejected(reason: reason))
+        }
+        return events
+    }
+
+    private static func advanceAnimalTrust(
+        in run: inout WorldRun, reality: inout RealityState
+    ) -> [Event] {
+        var events: [Event] = []
+        let matchingKeys = reality.animalTrustRecords.keys.sorted().filter {
+            reality.animalTrustRecords[$0]?.worldSeed == run.mapSeed
+        }
+        for key in matchingKeys {
+            guard var record = reality.animalTrustRecords[key], !record.completed,
+                  case .patientPresence(let required) = record.condition,
+                  let enemy = run.enemies.first(where: { $0.id == record.enemyID }) else { continue }
+            let distance = enemy.position.chebyshevDistance(to: run.playerPosition)
+            let radius = max(2, detectionRadius(of: enemy, in: run))
+            let scentOnlyMasked = run.isScentMasked && enemy.traits != nil && distance > 1
+                && distance > detectionRadius(of: enemy, in: run, includingChemo: false)
+            if distance <= 1 {
+                record.progress = 0
+                record.lastProgressTurn = nil
+            } else if distance <= radius && !scentOnlyMasked
+                        && record.lastProgressTurn != run.turnsTaken {
+                record.progress = min(required, record.progress + 1)
+                record.lastProgressTurn = run.turnsTaken
+                record.completed = record.progress == required
+                let name = run.name(of: enemy)
+                events.append(record.completed
+                    ? .animalTrustCompleted(name)
+                    : .animalTrustProgress(name, current: record.progress, required: required))
+            }
+            reality.animalTrustRecords[key] = record
         }
         return events
     }

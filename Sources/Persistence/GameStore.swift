@@ -349,6 +349,11 @@ enum WorldFieldNarration {
         case .poisonWorking(let damage): "Whatever that was is still in you — \(damage) damage."
         case .enemySighted(let name): "A \(name) has noticed you."
         case .enemyAlerted(let name): "A \(name) pauses, alert to your movement."
+        case .animalAttended(let name): "You attend to the \(name)."
+        case .animalTrustProgress(let name, let current, let required):
+            "The \(name) keeps watching. \(current) of \(required) patient turns."
+        case .animalTrustCompleted(let name): "The \(name) chooses to approach."
+        case .animalJoined(let name): "The \(name) chooses to travel with you."
         case .crossedThreshold(let band):
             switch band {
             case .stable: nil
@@ -768,6 +773,11 @@ final class GameStore: ObservableObject {
         case .poisonWorking(let damage): tagged("poison", String(damage))
         case .enemySighted(let name): tagged("sighted", name)
         case .enemyAlerted(let name): tagged("alerted", name)
+        case .animalAttended(let name): tagged("animal-attended", name)
+        case .animalTrustProgress(let name, let current, let required):
+            tagged("animal-trust-progress", name, String(current), String(required))
+        case .animalTrustCompleted(let name): tagged("animal-trust-completed", name)
+        case .animalJoined(let name): tagged("animal-joined", name)
         case .encounterBegan: tagged("encounter")
         case .crossedThreshold(let band): tagged("threshold", band.rawValue)
         case .nightfall: tagged("nightfall")

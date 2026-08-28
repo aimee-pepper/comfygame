@@ -32,6 +32,7 @@ enum Migrations {
             try validateCurrentExpeditionReviewQueue(in: data)
             try validateCurrentRecoveredTeachings(in: data)
             try validateCurrentCurioKnowledge(in: data)
+            try validateCurrentAnimalTrust(in: data)
             return data
         }
 
@@ -45,6 +46,7 @@ enum Migrations {
         try validateCurrentExpeditionReviewQueue(in: working)
         try validateCurrentRecoveredTeachings(in: working)
         try validateCurrentCurioKnowledge(in: working)
+        try validateCurrentAnimalTrust(in: working)
         return working
     }
 
@@ -135,10 +137,39 @@ enum Migrations {
         case 10: return try migrate10to11(data)
         case 11: return try migrate11to12(data)
         case 12: return try migrate12to13(data)
+        case 13: return try migrate13to14(data)
         default:
             // No migration registered. Tolerant decoding is the fallback; if the save is genuinely
             // incompatible, `SaveFileIO.load()` quarantines it rather than losing it.
             return data
+        }
+    }
+
+    private static func migrate13to14(_ data: Data) throws -> Data {
+        guard var root = try JSONSerialization.jsonObject(with: data) as? [String: Any],
+              var reality = root["reality"] as? [String: Any],
+              !reality.keys.contains("animalTrustRecords"),
+              !reality.keys.contains("tamedAnimals") else {
+            throw CocoaError(.coderInvalidValue)
+        }
+        reality["animalTrustRecords"] = [:]
+        reality["tamedAnimals"] = [:]
+        root["reality"] = reality
+        root["schemaVersion"] = 14
+        return try JSONSerialization.data(withJSONObject: root, options: [.sortedKeys])
+    }
+
+    private static func validateCurrentAnimalTrust(in data: Data) throws {
+        guard let root = try JSONSerialization.jsonObject(with: data) as? [String: Any],
+              let reality = root["reality"] as? [String: Any],
+              reality["animalTrustRecords"] is [String: Any],
+              reality["tamedAnimals"] is [String: Any] else {
+            throw CocoaError(.coderInvalidValue)
+        }
+        let decoded = try SaveCodec.makeDecoder().decode(GameState.self, from: data)
+        guard decoded.reality.animalTrustRecords.allSatisfy({ $0.value.validates(key: $0.key) }),
+              decoded.reality.tamedAnimals.allSatisfy({ $0.value.validates(key: $0.key) }) else {
+            throw CocoaError(.coderInvalidValue)
         }
     }
 
