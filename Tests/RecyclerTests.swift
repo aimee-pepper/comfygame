@@ -274,6 +274,16 @@ final class RecyclerTests: XCTestCase {
         XCTAssertEqual(preview.selectedReceiptIndices, [0, 1])
         XCTAssertEqual(preview.returnedSamples, [receipt[0], receipt[1]])
         XCTAssertTrue(preview.returnedResources.isEmpty)
+
+        var committedBase = base(containing: stack)
+        XCTAssertEqual(RecyclerRules.commit(preview, in: &committedBase), .committed)
+        XCTAssertEqual(committedBase.creatureMaterialReserve.units.map(\.unit),
+                       [receipt[0], receipt[1]])
+        XCTAssertEqual(committedBase.creatureMaterialReserve.units.map(\.id),
+                       [receipt[0].stableUnitID, receipt[1].stableUnitID])
+        XCTAssertFalse(committedBase.creatureMaterialReserve.units.contains {
+            $0.id.rawValue.hasPrefix("recycler-")
+        })
     }
 
     func testReceiptSelectionRejectsDuplicatesOutOfRangeAndOverCapacity() {

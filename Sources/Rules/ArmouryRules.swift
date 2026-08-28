@@ -201,19 +201,35 @@ enum ArmouryRules {
               fresh == preview, (!preview.destroysLegacyWork || allowLegacyLoss),
               state.base.essenceCrystalCount >= preview.essence else { return false }
 
+        var candidate = state
         var rebuilt = current.gearProfile!
         rebuilt.constructionTier = preview.outputTier
+        rebuilt.qualityBand = CraftMaterialQualityBand(rawValue: preview.outputTier)
+            ?? rebuilt.qualityBand
         rebuilt.reforgeRank = 0
         rebuilt.legacyPowerCredit = 0
         rebuilt.specialistProfile = preview.profile.id
         rebuilt.insulation = preview.insulation
         rebuilt.reactivity = preview.reactivity
-        rebuilt.consumedSamples += preview.selections.map(\.sample)
-        rebuilt.recipeVersion = 1
+        let prior = rebuilt.physicalReceipt?.revisions ?? []
+        let revision = PhysicalGearWorkRevisionV1(
+            ordinal: prior.count,
+            authority: .rebuild(stationID: Stations.armoury,
+                                profileID: preview.profile.id, rulesVersion: 1),
+            components: preview.selections.enumerated().map {
+                .init(ordinal: $0.offset, role: .authoredSocket($0.element.requirementID),
+                      unit: $0.element.sample)
+            }, resultingQualityBand: rebuilt.qualityBand,
+            resultingConstructionTier: rebuilt.constructionTier)
+        rebuilt.physicalReceipt = .init(gearInstanceID: rebuilt.stableInstanceID,
+                                        revisions: prior + [revision])
 
-        guard PhysicalGearCraftingRules.consume(preview.selections, in: &state) else { return false }
-        guard state.base.spendEssenceCrystals(preview.essence) else { return false }
-        apply(rebuilt, to: current, in: &state)
+        guard PhysicalGearCraftingRules.consume(preview.selections, in: &candidate),
+              candidate.base.spendEssenceCrystals(preview.essence),
+              rebuilt.physicalReceipt?.validates(profile: rebuilt) == true else { return false }
+        apply(rebuilt, to: current, in: &candidate)
+        guard candidate.validatesPhysicalGearReceipts() else { return false }
+        state = candidate
         return true
     }
 

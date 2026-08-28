@@ -67,6 +67,8 @@ enum PhysicalGearCraftingRules {
         var homeDiscountRate: Double
         var insulation: Double
         var reactivity: Double
+        var expectedInstanceID: InstanceID
+        var destination: PhysicalGearConstructionDestinationV1
 
         var isBelowSpecialistHeadline: Bool {
             recipe.specialistHeadlineTier.map { outputTier < $0 } ?? false
@@ -453,10 +455,15 @@ enum PhysicalGearCraftingRules {
         let paidEssence = station.map { StationStaffingRules.discounted(rawEssence, at: $0, in: state) }
             ?? rawEssence
         let discount = station.map { StationStaffingRules.homeDiscountRate(for: $0, in: state) } ?? 0
+        guard case .success(let expectedID) = PhysicalGearIdentityAuthority.nextID(in: state)
+        else { return nil }
+        let destination: PhysicalGearConstructionDestinationV1 = state.base.inventory.isFull
+            ? .waiting : .storehouse
         return Preview(recipe: recipe, selections: chosen, qualityBand: qualityBand,
                        outputTier: output, rawEssence: rawEssence,
                        essence: paidEssence, homeDiscountRate: discount,
-                       insulation: averageInsulation, reactivity: averageReactivity)
+                       insulation: averageInsulation, reactivity: averageReactivity,
+                       expectedInstanceID: expectedID, destination: destination)
     }
 
     static func readiness(_ recipe: Recipe, in state: GameState) -> Readiness {
@@ -489,26 +496,44 @@ enum PhysicalGearCraftingRules {
               let fresh = self.preview(preview.recipe, selections: preview.selections, in: state),
               fresh == preview, state.base.essenceCrystalCount >= preview.essence else { return nil }
 
-        guard consume(preview.selections, in: &state) else { return nil }
-        guard state.base.spendEssenceCrystals(preview.essence) else { return nil }
-
-        let id = InstanceID(rawValue: state.base.nextItemID())
+        var candidate = state
+        guard consume(preview.selections, in: &candidate),
+              candidate.base.spendEssenceCrystals(preview.essence),
+              case .success(let id) = PhysicalGearIdentityAuthority.nextID(in: state),
+              id == preview.expectedInstanceID else { return nil }
         var output = ItemStack(id: id, catalogID: preview.recipe.catalogFallback)
         output.gearProfile?.familyID = preview.recipe.id
         output.gearProfile?.constructionTier = preview.outputTier
+        output.gearProfile?.qualityBand = preview.qualityBand
         output.gearProfile?.slot = preview.recipe.slot
         output.gearProfile?.damage = preview.recipe.damage
         output.gearProfile?.reach = preview.recipe.reach
         output.gearProfile?.insulation = preview.insulation
         output.gearProfile?.reactivity = preview.reactivity
-        output.gearProfile?.consumedSamples = preview.selections.map(\.sample)
-        output.gearProfile?.recipeVersion = 1
         output.gearProfile?.specialistProfile = preview.recipe.station.rawValue
+        output.gearProfile?.foundReceipt = nil
+        output.gearProfile?.inscription = nil
+        output.gearProfile?.physicalReceipt = .init(
+            gearInstanceID: id,
+            revisions: [.init(
+                ordinal: 0,
+                authority: .construction(stationID: preview.recipe.station,
+                                         schematicID: preview.recipe.id, rulesVersion: 1),
+                components: preview.selections.enumerated().map {
+                    .init(ordinal: $0.offset,
+                          role: .authoredSocket($0.element.requirementID),
+                          unit: $0.element.sample)
+                }, resultingQualityBand: preview.qualityBand,
+                resultingConstructionTier: preview.outputTier)])
         let origin = preview.selections.map(\.sample.source).filter { !$0.isEmpty }
         output.gearProfile?.displayProvenance = origin.isEmpty
             ? preview.recipe.displayName
             : "\(preview.recipe.displayName) · \(origin.joined(separator: " + "))"
-        state.base.store(output)
+        guard output.gearProfile?.physicalReceipt?.validates(profile: output.gearProfile!) == true
+        else { return nil }
+        candidate.base.store(output)
+        guard candidate.validatesPhysicalGearReceipts() else { return nil }
+        state = candidate
         return output
     }
 
@@ -522,7 +547,7 @@ enum PhysicalGearCraftingRules {
 
     private static func selectionIsCurrent(_ selection: Selection, in state: GameState) -> Bool {
         if let reserve = selection.reserveSelection {
-            return state.base.worldMaterialReserve.units.contains {
+            return state.base.craftMaterialHoldings.contains {
                 $0.id == reserve.unitID && $0.sample == reserve.sample
             }
         }

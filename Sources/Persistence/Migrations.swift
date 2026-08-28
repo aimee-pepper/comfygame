@@ -34,6 +34,7 @@ enum Migrations {
             try validateCurrentCurioKnowledge(in: data)
             try validateCurrentAnimalTrust(in: data)
             try validateCurrentAnimalCompanionCombat(in: data)
+            try validateCurrentPhysicalGearReceipts(in: data)
             return data
         }
 
@@ -49,6 +50,7 @@ enum Migrations {
         try validateCurrentCurioKnowledge(in: working)
         try validateCurrentAnimalTrust(in: working)
         try validateCurrentAnimalCompanionCombat(in: working)
+        try validateCurrentPhysicalGearReceipts(in: working)
         return working
     }
 
@@ -56,6 +58,16 @@ enum Migrations {
     static func probeSchemaVersion(_ data: Data) -> Int? {
         struct Probe: Decodable { var schemaVersion: Int? }
         return (try? JSONDecoder().decode(Probe.self, from: data))?.schemaVersion
+    }
+
+    private static func exactInt(_ value: Any?) throws -> Int {
+        guard let number = value as? NSNumber,
+              CFGetTypeID(number) != CFBooleanGetTypeID(),
+              let parsed = Int(number.stringValue),
+              Double(parsed) == number.doubleValue else {
+            throw CocoaError(.coderInvalidValue)
+        }
+        return parsed
     }
 
     private static func validateCurrentCombatOpening(in data: Data) throws {
@@ -141,11 +153,146 @@ enum Migrations {
         case 12: return try migrate12to13(data)
         case 13: return try migrate13to14(data)
         case 14: return try migrate14to15(data)
+        case 15: return try migrate15to16(data)
         default:
             // No migration registered. Tolerant decoding is the fallback; if the save is genuinely
             // incompatible, `SaveFileIO.load()` quarantines it rather than losing it.
             return data
         }
+    }
+
+    private static func migrate15to16(_ data: Data) throws -> Data {
+        guard var root = try JSONSerialization.jsonObject(with: data) as? [String: Any],
+              try exactInt(root["schemaVersion"]) == 15 else {
+            throw CocoaError(.coderInvalidValue)
+        }
+        func decode<T: Decodable>(_ type: T.Type, _ value: Any) throws -> T {
+            try SaveCodec.makeDecoder().decode(type, from: JSONSerialization.data(
+                withJSONObject: value, options: [.sortedKeys]))
+        }
+        func migrate(_ value: Any) throws -> Any {
+            if let array = value as? [Any] { return try array.map(migrate) }
+            guard var object = value as? [String: Any] else { return value }
+            if try object["version"].map(exactInt) == 2,
+               object["stableInstanceID"] != nil, object["constructionTier"] != nil,
+               object["slot"] != nil {
+                guard let rawSamples = object["consumedSamples"] as? [Any] else {
+                    throw CocoaError(.coderInvalidValue)
+                }
+                let stableID = try decode(InstanceID.self, object["stableInstanceID"] as Any)
+                let band = try decode(CraftMaterialQualityBand.self,
+                                      object["qualityBand"] as Any)
+                let tier = try exactInt(object["constructionTier"])
+                let family = object["familyID"] is NSNull ? nil : object["familyID"] as? String
+                let specialist = object["specialistProfile"] is NSNull
+                    ? nil : object["specialistProfile"] as? String
+                let recipe: Int? = if let value = object["recipeVersion"] {
+                    value is NSNull ? nil : try exactInt(value)
+                } else { nil }
+                if rawSamples.isEmpty {
+                    guard recipe == nil else { throw CocoaError(.coderInvalidValue) }
+                    object["physicalReceipt"] = NSNull()
+                } else {
+                    guard recipe != nil else { throw CocoaError(.coderInvalidValue) }
+                    let units = try rawSamples.map { try decode(CraftMaterialUnitV1.self, $0) }
+                    let receipt = PhysicalGearReceiptV1(
+                        gearInstanceID: stableID,
+                        revisions: [.init(
+                            ordinal: 0,
+                            authority: .legacyImported(familyID: family,
+                                                       specialistProfile: specialist,
+                                                       recipeVersion: recipe),
+                            components: units.enumerated().map {
+                                .init(ordinal: $0.offset, role: .legacyOrdinal($0.offset),
+                                      unit: $0.element)
+                            }, resultingQualityBand: band,
+                            resultingConstructionTier: tier)])
+                    object["physicalReceipt"] = try JSONSerialization.jsonObject(
+                        with: SaveCodec.makeEncoder().encode(receipt))
+                }
+                object.removeValue(forKey: "consumedSamples")
+                object.removeValue(forKey: "recipeVersion")
+                object["version"] = 3
+                for key in ["familyID", "damage", "specialistProfile", "displayProvenance",
+                            "authoredUniqueRuleID", "foundReceipt", "inscription"]
+                    where object[key] == nil { object[key] = NSNull() }
+                return object
+            }
+            if try object["version"].map(exactInt) == 3,
+               object["stableInstanceID"] != nil, object["constructionTier"] != nil,
+               object["slot"] != nil {
+                guard object.keys.contains("physicalReceipt"),
+                      object["consumedSamples"] == nil, object["recipeVersion"] == nil else {
+                    throw CocoaError(.coderInvalidValue)
+                }
+                return object
+            }
+            for (key, child) in object { object[key] = try migrate(child) }
+            return object
+        }
+        root = try migrate(root) as! [String: Any]
+        root["schemaVersion"] = 16
+        let migrated = try JSONSerialization.data(withJSONObject: root, options: [.sortedKeys])
+        try validateCurrentPhysicalGearReceipts(in: migrated)
+        return migrated
+    }
+
+    private static func validateCurrentPhysicalGearReceipts(in data: Data) throws {
+        let root = try JSONSerialization.jsonObject(with: data)
+        let profileKeys: Set<String> = ["version", "stableInstanceID", "familyID",
+            "constructionTier", "reforgeRank", "legacyPowerCredit", "qualityBand",
+            "legacyEffectivePowerCredit", "slot", "damage", "reach", "insulation",
+            "reactivity", "physicalReceipt", "specialistProfile", "displayProvenance",
+            "authoredUniqueRuleID", "foundReceipt", "inscription"]
+        func validateReceipt(_ value: Any) throws {
+            if value is NSNull { return }
+            guard let receipt = value as? [String: Any],
+                  Set(receipt.keys) == ["version", "gearInstanceID", "revisions"],
+                  let revisions = receipt["revisions"] as? [[String: Any]], !revisions.isEmpty
+            else { throw CocoaError(.coderInvalidValue) }
+            for revision in revisions {
+                guard Set(revision.keys) == ["ordinal", "authority", "components",
+                                              "resultingQualityBand", "resultingConstructionTier"],
+                      let authority = revision["authority"] as? [String: Any],
+                      authority.count == 1,
+                      let components = revision["components"] as? [[String: Any]],
+                      !components.isEmpty else { throw CocoaError(.coderInvalidValue) }
+                switch authority.first! {
+                case ("construction", let payload), ("rebuild", let payload):
+                    guard let object = payload as? [String: Any],
+                          Set(object.keys) == ["stationID", authority.keys.first == "construction"
+                            ? "schematicID" : "profileID", "rulesVersion"] else {
+                        throw CocoaError(.coderInvalidValue)
+                    }
+                case ("legacyImported", let payload):
+                    guard let object = payload as? [String: Any],
+                          Set(object.keys) == ["familyID", "specialistProfile", "recipeVersion"]
+                    else { throw CocoaError(.coderInvalidValue) }
+                default: throw CocoaError(.coderInvalidValue)
+                }
+                for component in components {
+                    guard Set(component.keys) == ["ordinal", "role", "unit"],
+                          let role = component["role"] as? [String: Any], role.count == 1,
+                          let payload = role.values.first as? [String: Any],
+                          Set(payload.keys) == ["_0"] else { throw CocoaError(.coderInvalidValue) }
+                }
+            }
+        }
+        func inspect(_ value: Any) throws {
+            if let array = value as? [Any] { try array.forEach(inspect); return }
+            guard let object = value as? [String: Any] else { return }
+            if let profile = object["gearProfile"] as? [String: Any] {
+                guard Set(profile.keys) == profileKeys,
+                      try exactInt(profile["version"]) == 3 else {
+                    throw CocoaError(.coderInvalidValue)
+                }
+                try validateReceipt(profile["physicalReceipt"] as Any)
+            }
+            try object.values.forEach(inspect)
+        }
+        try inspect(root)
+        let decoded = try SaveCodec.makeDecoder().decode(GameState.self, from: data)
+        guard decoded.validatesPhysicalGearReceipts() else { throw CocoaError(.coderInvalidValue) }
     }
 
     private static func migrate14to15(_ data: Data) throws -> Data {

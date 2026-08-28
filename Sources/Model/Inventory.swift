@@ -1,4 +1,5 @@
 import Foundation
+import CryptoKit
 
 /// Stackable resources (Ore, Fiber, Essence-raw, Motes). Do not consume inventory slots.
 struct ResourcePool: Codable, Equatable, Sendable {
@@ -74,6 +75,69 @@ struct ResourcePool: Codable, Equatable, Sendable {
     }
 }
 
+enum PhysicalGearIdentityAuthority {
+    static func everyPersistedID(in state: GameState) -> [InstanceID]? {
+        guard let data = try? SaveCodec.makeEncoder().encode(state),
+              let root = try? JSONSerialization.jsonObject(with: data) else { return nil }
+        var result: [InstanceID] = []
+        func walk(_ value: Any) {
+            if let array = value as? [Any] { array.forEach(walk); return }
+            guard let object = value as? [String: Any] else { return }
+            if let profile = object["gearProfile"] as? [String: Any],
+               let idObject = profile["stableInstanceID"] as? [String: Any],
+               let number = idObject["rawValue"] as? NSNumber,
+               CFGetTypeID(number) != CFBooleanGetTypeID() {
+                result.append(.init(rawValue: number.uint64Value))
+            }
+            object.values.forEach(walk)
+        }
+        walk(root)
+        return result
+    }
+
+    static func nextID(in state: GameState) -> Result<InstanceID, PhysicalGearEngineRefusalV1> {
+        guard let ids = everyPersistedID(in: state) else { return .failure(.invalidReceipt) }
+        let maximum = ids.map(\.rawValue).max() ?? 0
+        guard maximum < UInt64.max else { return .failure(.identityExhausted) }
+        return .success(.init(rawValue: maximum + 1))
+    }
+}
+
+extension GameState {
+    func validatesPhysicalGearReceipts() -> Bool {
+        var gearIDs = Set<InstanceID>()
+        var materialIDs = Set(base.craftMaterialHoldings.map(\.id))
+        guard materialIDs.count == base.craftMaterialHoldings.count else { return false }
+        func validate(_ profile: GearInstanceProfile, expectedStackID: InstanceID?) -> Bool {
+            if let expectedStackID, expectedStackID != profile.stableInstanceID { return false }
+            guard gearIDs.insert(profile.stableInstanceID).inserted,
+                  profile.physicalReceipt?.validates(profile: profile) ?? true else { return false }
+            for unit in profile.physicalReceipt?.flattenedUnits ?? [] {
+                guard materialIDs.insert(unit.stableUnitID).inserted else { return false }
+            }
+            return true
+        }
+        for stack in base.inventory.stacks + base.spillover {
+            if let profile = stack.gearProfile, !validate(profile, expectedStackID: stack.id) {
+                return false
+            }
+        }
+        for piece in base.binderEquipped.values {
+            if let profile = piece.gearProfile, !validate(profile, expectedStackID: nil) {
+                return false
+            }
+        }
+        for member in base.roster {
+            for piece in member.equipped.values {
+                if let profile = piece.gearProfile, !validate(profile, expectedStackID: nil) {
+                    return false
+                }
+            }
+        }
+        return true
+    }
+}
+
 private func failureStableHash(_ text: String) -> UInt64 {
     var hash: UInt64 = 0xcbf29ce484222325
     for byte in text.utf8 {
@@ -91,12 +155,212 @@ enum Rarity: String, Codable, CaseIterable, Sendable, Comparable {
     static func < (lhs: Rarity, rhs: Rarity) -> Bool { lhs.order < rhs.order }
 }
 
+enum PhysicalGearWorkAuthorityV1: Codable, Equatable, Sendable {
+    case construction(stationID: StationID, schematicID: String, rulesVersion: Int)
+    case rebuild(stationID: StationID, profileID: String, rulesVersion: Int)
+    case legacyImported(familyID: String?, specialistProfile: String?, recipeVersion: Int?)
+}
+
+enum PhysicalGearComponentRoleV1: Codable, Equatable, Sendable {
+    case authoredSocket(String)
+    case legacyOrdinal(Int)
+}
+
+struct PhysicalGearComponentReceiptV1: Codable, Equatable, Sendable {
+    var ordinal: Int
+    var role: PhysicalGearComponentRoleV1
+    var unit: CraftMaterialUnitV1
+}
+
+struct PhysicalGearWorkRevisionV1: Codable, Equatable, Sendable {
+    var ordinal: Int
+    var authority: PhysicalGearWorkAuthorityV1
+    var components: [PhysicalGearComponentReceiptV1]
+    var resultingQualityBand: CraftMaterialQualityBand
+    var resultingConstructionTier: Int
+}
+
+struct PhysicalGearReceiptV1: Codable, Equatable, Sendable {
+    var version: Int = 1
+    var gearInstanceID: InstanceID
+    var revisions: [PhysicalGearWorkRevisionV1]
+
+    func validates(profile: GearInstanceProfile) -> Bool {
+        guard version == 1, gearInstanceID == profile.stableInstanceID, !revisions.isEmpty,
+              revisions.indices.allSatisfy({ revisions[$0].ordinal == $0 }),
+              revisions.last?.resultingQualityBand == profile.qualityBand,
+              revisions.last?.resultingConstructionTier == profile.constructionTier else {
+            return false
+        }
+        var unitIDs = Set<CraftMaterialUnitID>()
+        for revision in revisions {
+            guard !revision.components.isEmpty,
+                  revision.components.indices.allSatisfy({ revision.components[$0].ordinal == $0 })
+            else { return false }
+            var socketIDs = Set<String>()
+            for component in revision.components {
+                guard unitIDs.insert(component.unit.stableUnitID).inserted else { return false }
+                switch (revision.authority, component.role) {
+                case (.legacyImported, .legacyOrdinal(let ordinal)):
+                    guard ordinal == component.ordinal else { return false }
+                case (.construction(_, let id, let rules), .authoredSocket(let socket)),
+                     (.rebuild(_, let id, let rules), .authoredSocket(let socket)):
+                    guard !id.isEmpty, rules > 0, !socket.isEmpty,
+                          socketIDs.insert(socket).inserted else { return false }
+                default: return false
+                }
+            }
+        }
+        return true
+    }
+
+    var flattenedUnits: [CraftMaterialUnitV1] {
+        revisions.flatMap { $0.components.map(\.unit) }
+    }
+}
+
+enum PhysicalGearLocationV1: Codable, Equatable, Sendable {
+    case storehouse(stackID: InstanceID)
+    case waiting(stackID: InstanceID)
+    case worn(member: PartyMember, slot: GearSlot)
+}
+
+enum PhysicalGearConstructionDestinationV1: String, Codable, Equatable, Sendable {
+    case storehouse, waiting
+}
+
+enum PhysicalGearExactSnapshotV1: Codable, Equatable, Sendable {
+    case stack(ItemStack)
+    case equipped(EquippedPiece)
+}
+
+enum PhysicalGearOperationV1: Codable, Equatable, Sendable {
+    case construct(expectedInstanceID: InstanceID,
+                   expectedDestination: PhysicalGearConstructionDestinationV1)
+    case mutateSameInstance(location: PhysicalGearLocationV1,
+                            exactSnapshot: PhysicalGearExactSnapshotV1)
+}
+
+struct PhysicalGearCommitEnvelopeV1: Codable, Equatable, Sendable {
+    var version: Int = 1
+    var authorityID: String
+    var authorityRulesVersion: Int
+    var operation: PhysicalGearOperationV1
+    var selectedComponents: [CraftMaterialSelection]
+    var physicalEssenceCrystalDebit: Int
+    var expectedReceipt: PhysicalGearReceiptV1
+    var stationPayloadSHA256: String
+    var quoteSHA256: String
+
+    private static func sha256(_ data: Data) -> String {
+        SHA256.hash(data: data).map { String(format: "%02x", $0) }.joined()
+    }
+
+    func canonicalQuoteSHA256() -> String? {
+        var copy = self
+        copy.quoteSHA256 = ""
+        let encoder = JSONEncoder()
+        encoder.outputFormatting = [.sortedKeys, .withoutEscapingSlashes]
+        return (try? encoder.encode(copy)).map(Self.sha256)
+    }
+
+    func validates() -> Bool {
+        guard version == 1, !authorityID.isEmpty, authorityRulesVersion > 0,
+              physicalEssenceCrystalDebit >= 0,
+              Set(selectedComponents.map(\.unitID)).count == selectedComponents.count,
+              selectedComponents.allSatisfy({ $0.unitID == $0.unit.stableUnitID }),
+              stationPayloadSHA256.count == 64,
+              stationPayloadSHA256.allSatisfy({ $0.isHexDigit && !$0.isUppercase }),
+              quoteSHA256 == canonicalQuoteSHA256() else { return false }
+        switch operation {
+        case .construct(let id, _): return id == expectedReceipt.gearInstanceID
+        case .mutateSameInstance(_, let snapshot):
+            let id: InstanceID? = switch snapshot {
+            case .stack(let stack): stack.gearProfile?.stableInstanceID
+            case .equipped(let piece): piece.gearProfile?.stableInstanceID
+            }
+            return id == expectedReceipt.gearInstanceID
+        }
+    }
+}
+
+enum PhysicalGearEngineRefusalV1: Error, Equatable, Sendable {
+    case invalidAuthority, gearUnavailable, staleGear, componentUnavailable, duplicateComponent
+    case essenceShortfall(Int), destinationChanged, identityExhausted, invalidReceipt, staleQuote
+
+    var explanation: String {
+        switch self {
+        case .invalidAuthority: "That work is not available."
+        case .gearUnavailable, .staleGear: "That piece moved or changed. Review the work and try again."
+        case .componentUnavailable: "Those materials changed. Review the selected materials and try again."
+        case .duplicateComponent: "Choose a different material for each part."
+        case .essenceShortfall(let count): "You need \(count) more Essence."
+        case .destinationChanged: "Storehouse space changed. Review where the finished piece will wait."
+        case .identityExhausted: "The finished piece cannot be recorded safely."
+        case .invalidReceipt: "That piece’s construction record cannot be used."
+        case .staleQuote: "The work changed. Review it and try again."
+        }
+    }
+}
+
+enum PhysicalGearEngineCommitResultV1: Equatable, Sendable {
+    case committed(instanceID: InstanceID, finalLocation: PhysicalGearLocationV1,
+                   physicalReceipt: PhysicalGearReceiptV1,
+                   spentUnitIDs: [CraftMaterialUnitID], essenceSpent: Int)
+    case refused(PhysicalGearEngineRefusalV1)
+}
+
+enum PhysicalGearReceiptEngineV1 {
+    static func commitConstruction(_ quote: PhysicalGearCommitEnvelopeV1,
+                                   rederived: PhysicalGearCommitEnvelopeV1,
+                                   output: ItemStack, in state: inout GameState)
+        -> PhysicalGearEngineCommitResultV1 {
+        guard quote == rederived, quote.validates() else { return .refused(.staleQuote) }
+        guard case .construct(let expectedID, let destination) = quote.operation,
+              output.id == expectedID, output.count == 1, output.identified,
+              let profile = output.gearProfile,
+              profile.stableInstanceID == expectedID,
+              profile.physicalReceipt == quote.expectedReceipt,
+              profile.inscription == nil, profile.foundReceipt == nil,
+              quote.expectedReceipt.validates(profile: profile) else {
+            return .refused(.invalidReceipt)
+        }
+        guard case .success(let currentID) = PhysicalGearIdentityAuthority.nextID(in: state),
+              currentID == expectedID else { return .refused(.identityExhausted) }
+        let currentDestination: PhysicalGearConstructionDestinationV1 = state.base.inventory.isFull
+            ? .waiting : .storehouse
+        guard currentDestination == destination else { return .refused(.destinationChanged) }
+        let current = state.base.craftMaterialSelections()
+        guard quote.selectedComponents.allSatisfy(current.contains) else {
+            return .refused(.componentUnavailable)
+        }
+        guard state.base.essenceCrystalCount >= quote.physicalEssenceCrystalDebit else {
+            return .refused(.essenceShortfall(
+                quote.physicalEssenceCrystalDebit - state.base.essenceCrystalCount))
+        }
+        var candidate = state
+        guard candidate.base.consumeCraftMaterials(quote.selectedComponents) != nil,
+              candidate.base.spendEssenceCrystals(quote.physicalEssenceCrystalDebit) else {
+            return .refused(.componentUnavailable)
+        }
+        candidate.base.store(output)
+        guard candidate.validatesPhysicalGearReceipts() else { return .refused(.invalidReceipt) }
+        state = candidate
+        let location: PhysicalGearLocationV1 = destination == .storehouse
+            ? .storehouse(stackID: expectedID) : .waiting(stackID: expectedID)
+        return .committed(instanceID: expectedID, finalLocation: location,
+                          physicalReceipt: quote.expectedReceipt,
+                          spentUnitIDs: quote.selectedComponents.map(\.unitID),
+                          essenceSpent: quote.physicalEssenceCrystalDebit)
+    }
+}
+
 /// Frozen identity and construction facts shared by stored and equipped physical gear.
 ///
 /// Catalogue definitions remain a fallback for old/found pieces, but once this profile exists the
 /// instance no longer changes shape because content data or station rules changed later.
 struct GearInstanceProfile: Codable, Equatable, Sendable {
-    var version: Int = 2
+    var version: Int = 3
     var stableInstanceID: InstanceID
     var familyID: String?
     var constructionTier: Int
@@ -109,13 +373,19 @@ struct GearInstanceProfile: Codable, Equatable, Sendable {
     var reach: Reach
     var insulation: Double
     var reactivity: Double
-    var consumedSamples: [CraftMaterialUnitV1] = []
-    var recipeVersion: Int?
+    var physicalReceipt: PhysicalGearReceiptV1?
     var specialistProfile: String?
     var displayProvenance: String?
     var authoredUniqueRuleID: String?
     var foundReceipt: FoundGearReceiptV1?
     var inscription: EquipmentInscriptionReceiptV1?
+
+    private enum CodingKeys: String, CodingKey, CaseIterable {
+        case version, stableInstanceID, familyID, constructionTier, reforgeRank,
+             legacyPowerCredit, qualityBand, legacyEffectivePowerCredit, slot, damage, reach,
+             insulation, reactivity, physicalReceipt, specialistProfile, displayProvenance,
+             authoredUniqueRuleID, foundReceipt, inscription, consumedSamples, recipeVersion
+    }
 
     init(stableInstanceID: InstanceID, definition: ItemDef, legacyUpgradeLevel: Int = 0) {
         let gear = definition.gear!
@@ -138,13 +408,126 @@ struct GearInstanceProfile: Codable, Equatable, Sendable {
         }
     }
 
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        let decodedVersion = try c.decode(Int.self, forKey: .version)
+        let currentKeys = Set(CodingKeys.allCases).subtracting([.consumedSamples, .recipeVersion])
+        guard decodedVersion == 2 || Set(c.allKeys) == currentKeys else {
+            throw CocoaError(.coderInvalidValue)
+        }
+        version = 3
+        stableInstanceID = try c.decode(InstanceID.self, forKey: .stableInstanceID)
+        familyID = try c.decodeIfPresent(String.self, forKey: .familyID)
+        constructionTier = try c.decode(Int.self, forKey: .constructionTier)
+        reforgeRank = try c.decode(Int.self, forKey: .reforgeRank)
+        legacyPowerCredit = try c.decode(Int.self, forKey: .legacyPowerCredit)
+        qualityBand = try c.decode(CraftMaterialQualityBand.self, forKey: .qualityBand)
+        legacyEffectivePowerCredit = try c.decode(Int.self, forKey: .legacyEffectivePowerCredit)
+        slot = try c.decode(GearSlot.self, forKey: .slot)
+        damage = try c.decodeIfPresent(DamageKind.self, forKey: .damage)
+        reach = try c.decode(Reach.self, forKey: .reach)
+        insulation = try c.decode(Double.self, forKey: .insulation)
+        reactivity = try c.decode(Double.self, forKey: .reactivity)
+        physicalReceipt = try c.decodeIfPresent(PhysicalGearReceiptV1.self, forKey: .physicalReceipt)
+        specialistProfile = try c.decodeIfPresent(String.self, forKey: .specialistProfile)
+        displayProvenance = try c.decodeIfPresent(String.self, forKey: .displayProvenance)
+        authoredUniqueRuleID = try c.decodeIfPresent(String.self, forKey: .authoredUniqueRuleID)
+        foundReceipt = try c.decodeIfPresent(FoundGearReceiptV1.self, forKey: .foundReceipt)
+        inscription = try c.decodeIfPresent(EquipmentInscriptionReceiptV1.self, forKey: .inscription)
+        if decodedVersion == 2 {
+            let units = try c.decodeIfPresent([CraftMaterialUnitV1].self,
+                                              forKey: .consumedSamples) ?? []
+            let recipe = try c.decodeIfPresent(Int.self, forKey: .recipeVersion)
+            guard units.isEmpty == (recipe == nil) else { throw CocoaError(.coderInvalidValue) }
+            if !units.isEmpty {
+                physicalReceipt = .init(gearInstanceID: stableInstanceID, revisions: [
+                    .init(ordinal: 0,
+                          authority: .legacyImported(familyID: familyID,
+                                                     specialistProfile: specialistProfile,
+                                                     recipeVersion: recipe),
+                          components: units.enumerated().map {
+                              .init(ordinal: $0.offset, role: .legacyOrdinal($0.offset),
+                                    unit: $0.element)
+                          }, resultingQualityBand: qualityBand,
+                          resultingConstructionTier: constructionTier)
+                ])
+            }
+        }
+        guard version == 3, constructionTier >= 0, legacyPowerCredit >= 0,
+              legacyEffectivePowerCredit >= 0, (0...3).contains(reforgeRank),
+              insulation.isFinite, reactivity.isFinite,
+              physicalReceipt?.validates(profile: self) ?? true else {
+            throw CocoaError(.coderInvalidValue)
+        }
+    }
+
+    func encode(to encoder: Encoder) throws {
+        guard version == 3, physicalReceipt?.validates(profile: self) ?? true else {
+            throw CocoaError(.coderInvalidValue)
+        }
+        var c = encoder.container(keyedBy: CodingKeys.self)
+        try c.encode(version, forKey: .version)
+        try c.encode(stableInstanceID, forKey: .stableInstanceID)
+        try c.encode(familyID, forKey: .familyID)
+        try c.encode(constructionTier, forKey: .constructionTier)
+        try c.encode(reforgeRank, forKey: .reforgeRank)
+        try c.encode(legacyPowerCredit, forKey: .legacyPowerCredit)
+        try c.encode(qualityBand, forKey: .qualityBand)
+        try c.encode(legacyEffectivePowerCredit, forKey: .legacyEffectivePowerCredit)
+        try c.encode(slot, forKey: .slot)
+        try c.encode(damage, forKey: .damage)
+        try c.encode(reach, forKey: .reach)
+        try c.encode(insulation, forKey: .insulation)
+        try c.encode(reactivity, forKey: .reactivity)
+        try c.encode(physicalReceipt, forKey: .physicalReceipt)
+        try c.encode(specialistProfile, forKey: .specialistProfile)
+        try c.encode(displayProvenance, forKey: .displayProvenance)
+        try c.encode(authoredUniqueRuleID, forKey: .authoredUniqueRuleID)
+        try c.encode(foundReceipt, forKey: .foundReceipt)
+        try c.encode(inscription, forKey: .inscription)
+    }
+
     var effectivePower: Double {
         Double(qualityBand.rawValue + legacyEffectivePowerCredit)
             + Double(reforgeRank) * Tuning.Smith.powerPerReforgeRank
     }
 
     var hasImmutableConstructionReceipt: Bool {
-        recipeVersion != nil && !consumedSamples.isEmpty
+        physicalReceipt != nil
+    }
+
+    /// Source-compatibility adapter while live station owners move to typed revisions. These are
+    /// computed only and therefore never restore the removed schema-15 keys to schema-16 bytes.
+    var consumedSamples: [CraftMaterialUnitV1] {
+        get { physicalReceipt?.flattenedUnits ?? [] }
+        set {
+            guard !newValue.isEmpty else { physicalReceipt = nil; return }
+            let recipe = recipeVersion
+            physicalReceipt = .init(gearInstanceID: stableInstanceID, revisions: [
+                .init(ordinal: 0,
+                      authority: .legacyImported(familyID: familyID,
+                                                 specialistProfile: specialistProfile,
+                                                 recipeVersion: recipe),
+                      components: newValue.enumerated().map {
+                          .init(ordinal: $0.offset, role: .legacyOrdinal($0.offset), unit: $0.element)
+                      }, resultingQualityBand: qualityBand,
+                      resultingConstructionTier: constructionTier)
+            ])
+        }
+    }
+
+    var recipeVersion: Int? {
+        get {
+            guard case .legacyImported(_, _, let recipe)? = physicalReceipt?.revisions.first?.authority
+            else { return nil }
+            return recipe
+        }
+        set {
+            guard var receipt = physicalReceipt, !receipt.revisions.isEmpty else { return }
+            receipt.revisions[0].authority = .legacyImported(
+                familyID: familyID, specialistProfile: specialistProfile, recipeVersion: newValue)
+            physicalReceipt = receipt
+        }
     }
 
     var legacyLabel: String? {
@@ -264,11 +647,13 @@ struct ItemStack: Codable, Equatable, Identifiable, Sendable {
         }
         if !materials.isEmpty { count = materials.count }
         if let definition = ContentCatalog.shared.item(catalogID), let gear = definition.gear {
-            guard let profile = gearProfile, profile.version == 2,
+            guard let profile = gearProfile, profile.version == 3,
                   profile.stableInstanceID == id, profile.slot == gear.slot,
                   profile.authoredUniqueRuleID == gear.breaks?.rawValue,
-                  profile.foundReceipt == (profile.hasImmutableConstructionReceipt
-                    ? nil : definition.gearCatalogueDisposition?.foundReceipt),
+                  (profile.hasImmutableConstructionReceipt
+                    ? (profile.foundReceipt == nil || profile.foundReceipt
+                        == definition.gearCatalogueDisposition?.foundReceipt)
+                    : profile.foundReceipt == definition.gearCatalogueDisposition?.foundReceipt),
                   profile.legacyEffectivePowerCredit >= 0,
                   (0...3).contains(profile.reforgeRank) else {
                 throw CocoaError(.coderInvalidValue)

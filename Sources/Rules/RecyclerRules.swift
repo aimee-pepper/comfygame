@@ -179,9 +179,9 @@ enum RecyclerRules {
               current == preview else { return .invalid }
 
         var candidate = base
-        let returnedUnits = preview.returnedSamples.enumerated().map { ordinal, sample in
-            let id = CraftMaterialUnitID(rawValue: "recycler-\(preview.stackID.rawValue)-\(ordinal)")
-            return CraftMaterialHoldingV1(unit: sample.withStableID(id), protectedReturn: false)
+        guard candidate.recycler.inventoryRevision < UInt64.max else { return .invalid }
+        let returnedUnits = preview.returnedSamples.map {
+            CraftMaterialHoldingV1(unit: $0, protectedReturn: false)
         }
         let existingReserveIDs = Set(candidate.craftMaterialSelections().map(\.unitID))
         guard returnedUnits.allSatisfy({ !existingReserveIDs.contains($0.id) }) else {
@@ -189,11 +189,11 @@ enum RecyclerRules {
         }
         guard remove(preview.stackID, at: preview.location, in: &candidate) else { return .invalid }
         candidate.resources.add(contentsOf: preview.returnedResources)
-        for unit in returnedUnits {
-            if unit.unit.domain == .world { _ = candidate.worldMaterialReserve.add(unit) }
-            else { _ = candidate.creatureMaterialReserve.add(unit) }
-        }
-        candidate.recycler.inventoryRevision &+= 1
+        let world = returnedUnits.filter { $0.unit.domain == .world }
+        let creature = returnedUnits.filter { $0.unit.domain == .creature }
+        guard candidate.worldMaterialReserve.addExact(world),
+              candidate.creatureMaterialReserve.addExact(creature) else { return .invalid }
+        candidate.recycler.inventoryRevision += 1
         base = candidate
         return .committed
     }

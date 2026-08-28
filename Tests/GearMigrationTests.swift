@@ -78,7 +78,7 @@ final class GearMigrationTests: XCTestCase {
 
     func testAuthoredFoundInstancesFreezeBandAndReceipt() throws {
         let found = ItemStack(id: .init(rawValue: 991), catalogID: "silvered_helm")
-        XCTAssertEqual(found.gearProfile?.version, 2)
+        XCTAssertEqual(found.gearProfile?.version, 3)
         XCTAssertEqual(found.gearProfile?.qualityBand, .superior)
         XCTAssertEqual(found.gearProfile?.foundReceipt,
                        ContentCatalog.shared.item("silvered_helm")?.gearCatalogueDisposition?.foundReceipt)
@@ -253,6 +253,79 @@ final class GearMigrationTests: XCTestCase {
         XCTAssertTrue(result.hasImmutableConstructionReceipt)
         XCTAssertNil(result.foundReceipt)
         XCTAssertEqual(result.qualityBand.rawValue, result.constructionTier)
+    }
+
+    func testSchemaFifteenPhysicalSamplesBecomeOneExactLegacyRevision() throws {
+        var state = GameState.newGame()
+        let units = [
+            CraftMaterialUnitV1(
+                stableUnitID: .init(rawValue: "legacy-world-1"), domain: .world, familyID: .timber,
+                qualityBand: .fine, properties: .init(hardness: 60),
+                sourceReceipt: .legacy(originalKind: .timber, frozenSource: "old timber",
+                    qualifier: nil, migrationLocation: "fixture", originalIdentity: "ore-1")),
+            CraftMaterialUnitV1(
+                stableUnitID: .init(rawValue: "legacy-creature-2"), domain: .creature, familyID: .hide,
+                qualityBand: .standard, properties: .init(flexibility: 55),
+                sourceReceipt: .legacy(originalKind: .hide, frozenSource: "old hide",
+                    qualifier: nil, migrationLocation: "fixture", originalIdentity: "hide-2"))
+        ]
+        var stack = ItemStack(id: .init(rawValue: 44_001), catalogID: "blade_chipped")
+        stack.gearProfile?.familyID = "legacy_blade"
+        stack.gearProfile?.specialistProfile = "blacksmith"
+        stack.gearProfile?.consumedSamples = units
+        stack.gearProfile?.recipeVersion = 7
+        state.base.inventory.add(stack)
+        var root = try XCTUnwrap(JSONSerialization.jsonObject(
+            with: SaveCodec.makeEncoder().encode(state)) as? [String: Any])
+        root["schemaVersion"] = 15
+        var base = try XCTUnwrap(root["base"] as? [String: Any])
+        var inventory = try XCTUnwrap(base["inventory"] as? [String: Any])
+        var stacks = try XCTUnwrap(inventory["stacks"] as? [[String: Any]])
+        var profile = try XCTUnwrap(stacks[0]["gearProfile"] as? [String: Any])
+        profile["version"] = 2
+        profile["consumedSamples"] = units.map {
+            try! JSONSerialization.jsonObject(with: SaveCodec.makeEncoder().encode($0))
+        }
+        profile["recipeVersion"] = 7
+        profile.removeValue(forKey: "physicalReceipt")
+        stacks[0]["gearProfile"] = profile
+        inventory["stacks"] = stacks; base["inventory"] = inventory; root["base"] = base
+
+        let migrated = try Migrations.migrateIfNeeded(
+            JSONSerialization.data(withJSONObject: root, options: [.sortedKeys]))
+        let restored = try SaveCodec.makeDecoder().decode(GameState.self, from: migrated)
+        let receipt = try XCTUnwrap(restored.base.inventory.stacks.first?.gearProfile?.physicalReceipt)
+        XCTAssertEqual(restored.schemaVersion, 16)
+        XCTAssertEqual(receipt.gearInstanceID.rawValue, 44_001)
+        XCTAssertEqual(receipt.flattenedUnits, units)
+        XCTAssertEqual(receipt.revisions.first?.components.map(\.role),
+                       [.legacyOrdinal(0), .legacyOrdinal(1)])
+        guard case .legacyImported(let family, let specialist, let recipe)? =
+                receipt.revisions.first?.authority else { return XCTFail("wrong authority") }
+        XCTAssertEqual(family, "legacy_blade")
+        XCTAssertEqual(specialist, "blacksmith")
+        XCTAssertEqual(recipe, 7)
+        XCTAssertFalse(String(data: migrated, encoding: .utf8)!.contains("consumedSamples"))
+        XCTAssertFalse(String(data: migrated, encoding: .utf8)!.contains("recipeVersion"))
+    }
+
+    func testCurrentPhysicalReceiptKeyAndLegacyKeysFailClosed() throws {
+        var state = GameState.newGame()
+        state.base.inventory.add(ItemStack(id: .init(rawValue: 44_002), catalogID: "blade_chipped"))
+        let encoded = try SaveCodec.makeEncoder().encode(state)
+        for mutation in ["missing", "legacy"] {
+            var root = try XCTUnwrap(JSONSerialization.jsonObject(with: encoded) as? [String: Any])
+            var base = root["base"] as! [String: Any]
+            var inventory = base["inventory"] as! [String: Any]
+            var stacks = inventory["stacks"] as! [[String: Any]]
+            var profile = stacks[0]["gearProfile"] as! [String: Any]
+            if mutation == "missing" { profile.removeValue(forKey: "physicalReceipt") }
+            else { profile["consumedSamples"] = [] }
+            stacks[0]["gearProfile"] = profile
+            inventory["stacks"] = stacks; base["inventory"] = inventory; root["base"] = base
+            XCTAssertThrowsError(try Migrations.migrateIfNeeded(
+                JSONSerialization.data(withJSONObject: root, options: [.sortedKeys])))
+        }
     }
 
     private func legacyState(equippedValue: Any) throws -> GameState {
