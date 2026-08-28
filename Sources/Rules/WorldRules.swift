@@ -1908,6 +1908,19 @@ enum WorldRules {
                 commitStrengthMultiplier: Tuning.AnimalCompanionCombat.commitStrengthMultiplier,
                 originReceipt: companion.originReceipt))
         })
+        var gearProjections: [Combatant: GearLoadoutProjectionV1] = [:]
+        for actor in party where animalParticipants[actor] == nil {
+            let owner: PartyMember
+            switch actor {
+            case .binder: owner = .binder
+            case .companion(let id): owner = .member(id)
+            case .foe: continue
+            }
+            guard case .projected(let projection) =
+                    GearGameplayProjectionRulesV1.project(owner: owner, in: state.base)
+            else { return false }
+            gearProjections[actor] = projection
+        }
         run.activeEncounter = CombatRules.makeEncounter(id: InstanceID(rawValue: run.rng.next()),
                                                         foes: foes,
                                                         party: party,
@@ -1919,6 +1932,7 @@ enum WorldRules {
                                                             }
                                                         },
                                                         animalParticipants: animalParticipants,
+                                                        gearProjections: gearProjections,
                                                         apexActionSlots: scalingPreview.map { preview in
                                                             foes.filter(\.isApex).reduce(into: [:]) {
                                                                 $0[$1.id] = preview.apexActionSlots

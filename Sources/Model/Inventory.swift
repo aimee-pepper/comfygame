@@ -190,12 +190,61 @@ struct PhysicalGearComponentReceiptV1: Codable, Equatable, Sendable {
     var unit: CraftMaterialUnitV1
 }
 
+struct WildGearGameplayRuleV1: Codable, Equatable, Sendable {
+    var rule: WildRule
+    var innateStatus: String?
+    var wardsAgainst: DamageKind?
+}
+
+struct GearToolCapabilityV1: Codable, Equatable, Sendable {
+    static let extractionAuthorityID = "physical-gear-extraction-v1"
+    var capabilityID: String
+    var rank: Int
+    var authorityID: String
+    var authorityVersion: Int
+
+    func validates() -> Bool {
+        capabilityID == "extraction" && (0...4).contains(rank)
+            && authorityID == Self.extractionAuthorityID && authorityVersion == 1
+    }
+}
+
+struct GearGameplayFactsV1: Codable, Equatable, Sendable {
+    var version = 1
+    var stableGearID: InstanceID
+    var sourceRevisionOrdinal: Int
+    var sourceRevisionDigest: String
+    var slot: GearSlot
+    var qualityBand: CraftMaterialQualityBand
+    var constructionTier: Int
+    var powerOffset: Double
+    var protectivePowerOffset: Double
+    var damageKind: DamageKind?
+    var reach: Reach
+    var insulation: Double
+    var reactivity: Double
+    var specialRule: WildGearGameplayRuleV1?
+    var toolCapability: GearToolCapabilityV1?
+
+    func validates(profile: GearInstanceProfile) -> Bool {
+        version == 1 && stableGearID == profile.stableInstanceID
+            && sourceRevisionOrdinal >= -1 && sourceRevisionDigest.count == 64
+            && sourceRevisionDigest.allSatisfy { $0.isHexDigit && !$0.isUppercase }
+            && slot == profile.slot && qualityBand == profile.qualityBand
+            && constructionTier == profile.constructionTier
+            && [powerOffset, protectivePowerOffset, insulation, reactivity]
+                .allSatisfy(\.isFinite)
+            && (toolCapability?.validates() ?? true)
+    }
+}
+
 struct PhysicalGearWorkRevisionV1: Codable, Equatable, Sendable {
     var ordinal: Int
     var authority: PhysicalGearWorkAuthorityV1
     var components: [PhysicalGearComponentReceiptV1]
     var resultingQualityBand: CraftMaterialQualityBand
     var resultingConstructionTier: Int
+    var gameplayFacts: GearGameplayFactsV1? = nil
 }
 
 struct PhysicalGearReceiptV1: Codable, Equatable, Sendable {
@@ -228,6 +277,12 @@ struct PhysicalGearReceiptV1: Codable, Equatable, Sendable {
                 default: return false
                 }
             }
+        }
+        if let facts = profile.gameplayFacts, let latest = revisions.last {
+            guard latest.gameplayFacts == facts,
+                  facts.sourceRevisionOrdinal == latest.ordinal,
+                  facts.sourceRevisionDigest == GearInstanceProfile.revisionDigest(latest)
+            else { return false }
         }
         return true
     }
@@ -480,7 +535,7 @@ enum PhysicalGearReceiptEngineV1 {
 /// Catalogue definitions remain a fallback for old/found pieces, but once this profile exists the
 /// instance no longer changes shape because content data or station rules changed later.
 struct GearInstanceProfile: Codable, Equatable, Sendable {
-    var version: Int = 3
+    var version: Int = 4
     var stableInstanceID: InstanceID
     var familyID: String?
     var constructionTier: Int
@@ -499,12 +554,14 @@ struct GearInstanceProfile: Codable, Equatable, Sendable {
     var authoredUniqueRuleID: String?
     var foundReceipt: FoundGearReceiptV1?
     var inscription: EquipmentInscriptionReceiptV1?
+    var gameplayFacts: GearGameplayFactsV1?
 
     private enum CodingKeys: String, CodingKey, CaseIterable {
         case version, stableInstanceID, familyID, constructionTier, reforgeRank,
              legacyPowerCredit, qualityBand, legacyEffectivePowerCredit, slot, damage, reach,
              insulation, reactivity, physicalReceipt, specialistProfile, displayProvenance,
-             authoredUniqueRuleID, foundReceipt, inscription, consumedSamples, recipeVersion
+             authoredUniqueRuleID, foundReceipt, inscription, gameplayFacts,
+             consumedSamples, recipeVersion
     }
 
     init(stableInstanceID: InstanceID, definition: ItemDef, legacyUpgradeLevel: Int = 0) {
@@ -526,16 +583,39 @@ struct GearInstanceProfile: Codable, Equatable, Sendable {
             self.constructionTier = receipt.qualityBand.rawValue
             self.foundReceipt = receipt
         }
+        let special = gear.breaks.flatMap { WildRule(rawValue: $0.rawValue) }.map {
+            WildGearGameplayRuleV1(rule: $0, innateStatus: gear.statusKind,
+                                   wardsAgainst: gear.wardsAgainst)
+        }
+        let toolRank: Int? = switch definition.id.rawValue {
+        case "bent_pick": 1
+        case "balanced_pick": 2
+        case "corebreaker": 3
+        case "the_willing_edge": 4
+        default: nil
+        }
+        let digestSeed = "legacy-gear-gameplay-v1:\(stableInstanceID.rawValue):\(definition.id.rawValue)"
+        self.gameplayFacts = .init(
+            stableGearID: stableInstanceID, sourceRevisionOrdinal: -1,
+            sourceRevisionDigest: Self.sha256(digestSeed), slot: gear.slot,
+            qualityBand: qualityBand, constructionTier: constructionTier,
+            powerOffset: 0, protectivePowerOffset: 0, damageKind: gear.damage,
+            reach: gear.reach, insulation: gear.insulation, reactivity: gear.reactivity,
+            specialRule: special,
+            toolCapability: toolRank.map { .init(capabilityID: "extraction", rank: $0,
+                                                authorityID: GearToolCapabilityV1.extractionAuthorityID,
+                                                authorityVersion: 1) })
     }
 
     init(from decoder: Decoder) throws {
         let c = try decoder.container(keyedBy: CodingKeys.self)
         let decodedVersion = try c.decode(Int.self, forKey: .version)
         let currentKeys = Set(CodingKeys.allCases).subtracting([.consumedSamples, .recipeVersion])
-        guard decodedVersion == 2 || Set(c.allKeys) == currentKeys else {
+        guard decodedVersion == 2 || decodedVersion == 3 ||
+                (decodedVersion == 4 && Set(c.allKeys) == currentKeys) else {
             throw CocoaError(.coderInvalidValue)
         }
-        version = 3
+        version = 4
         stableInstanceID = try c.decode(InstanceID.self, forKey: .stableInstanceID)
         familyID = try c.decodeIfPresent(String.self, forKey: .familyID)
         constructionTier = try c.decode(Int.self, forKey: .constructionTier)
@@ -554,6 +634,7 @@ struct GearInstanceProfile: Codable, Equatable, Sendable {
         authoredUniqueRuleID = try c.decodeIfPresent(String.self, forKey: .authoredUniqueRuleID)
         foundReceipt = try c.decodeIfPresent(FoundGearReceiptV1.self, forKey: .foundReceipt)
         inscription = try c.decodeIfPresent(EquipmentInscriptionReceiptV1.self, forKey: .inscription)
+        gameplayFacts = try c.decodeIfPresent(GearGameplayFactsV1.self, forKey: .gameplayFacts)
         if decodedVersion == 2 {
             let units = try c.decodeIfPresent([CraftMaterialUnitV1].self,
                                               forKey: .consumedSamples) ?? []
@@ -573,16 +654,18 @@ struct GearInstanceProfile: Codable, Equatable, Sendable {
                 ])
             }
         }
-        guard version == 3, constructionTier >= 0, legacyPowerCredit >= 0,
+        guard version == 4, constructionTier >= 0, legacyPowerCredit >= 0,
               legacyEffectivePowerCredit >= 0, (0...3).contains(reforgeRank),
               insulation.isFinite, reactivity.isFinite,
+              gameplayFacts?.validates(profile: self) == true,
               physicalReceipt?.validates(profile: self) ?? true else {
             throw CocoaError(.coderInvalidValue)
         }
     }
 
     func encode(to encoder: Encoder) throws {
-        guard version == 3, physicalReceipt?.validates(profile: self) ?? true else {
+        guard version == 4, gameplayFacts?.validates(profile: self) == true,
+              physicalReceipt?.validates(profile: self) ?? true else {
             throw CocoaError(.coderInvalidValue)
         }
         var c = encoder.container(keyedBy: CodingKeys.self)
@@ -605,11 +688,54 @@ struct GearInstanceProfile: Codable, Equatable, Sendable {
         try c.encode(authoredUniqueRuleID, forKey: .authoredUniqueRuleID)
         try c.encode(foundReceipt, forKey: .foundReceipt)
         try c.encode(inscription, forKey: .inscription)
+        try c.encode(gameplayFacts, forKey: .gameplayFacts)
+    }
+
+    static func sha256(_ value: String) -> String {
+        SHA256.hash(data: Data(value.utf8)).map { String(format: "%02x", $0) }.joined()
+    }
+
+    static func revisionDigest(_ revision: PhysicalGearWorkRevisionV1) -> String? {
+        var revision = revision
+        revision.gameplayFacts = nil
+        let encoder = JSONEncoder()
+        encoder.outputFormatting = [.sortedKeys, .withoutEscapingSlashes]
+        guard let data = try? encoder.encode(revision) else { return nil }
+        return SHA256.hash(data: data).map { String(format: "%02x", $0) }.joined()
+    }
+
+    mutating func freezeGameplayFacts(powerOffset: Double = 0,
+                                      protectivePowerOffset: Double = 0,
+                                      toolCapability: GearToolCapabilityV1? = nil) {
+        let priorSpecialRule = gameplayFacts?.specialRule
+        let priorToolCapability = gameplayFacts?.toolCapability
+        let ordinal = physicalReceipt?.revisions.last?.ordinal ?? -1
+        let digest: String = {
+            guard let revision = physicalReceipt?.revisions.last else {
+                return Self.sha256("legacy-gear-gameplay-v1:\(stableInstanceID.rawValue)")
+            }
+            return Self.revisionDigest(revision) ?? String(repeating: "0", count: 64)
+        }()
+        gameplayFacts = .init(stableGearID: stableInstanceID,
+                              sourceRevisionOrdinal: ordinal,
+                              sourceRevisionDigest: digest, slot: slot,
+                              qualityBand: qualityBand, constructionTier: constructionTier,
+                              powerOffset: powerOffset,
+                              protectivePowerOffset: protectivePowerOffset,
+                              damageKind: damage, reach: reach,
+                              insulation: insulation, reactivity: reactivity,
+                              specialRule: priorSpecialRule,
+                              toolCapability: toolCapability ?? priorToolCapability)
+        if var receipt = physicalReceipt, !receipt.revisions.isEmpty {
+            receipt.revisions[receipt.revisions.count - 1].gameplayFacts = gameplayFacts
+            physicalReceipt = receipt
+        }
     }
 
     var effectivePower: Double {
-        Double(qualityBand.rawValue + legacyEffectivePowerCredit)
+        Double((gameplayFacts?.qualityBand ?? qualityBand).rawValue + legacyEffectivePowerCredit)
             + Double(reforgeRank) * Tuning.Smith.powerPerReforgeRank
+            + (gameplayFacts?.powerOffset ?? 0)
     }
 
     var hasImmutableConstructionReceipt: Bool {
@@ -655,12 +781,138 @@ struct GearInstanceProfile: Codable, Equatable, Sendable {
     }
 
     var protectivePower: Double {
-        let offset: Double = switch specialistProfile {
+        let legacyOffset: Double = switch specialistProfile {
         case "armoury_balanced_laminate_v1": -0.5
         case "armoury_insulated_layer_v1": -1.0
         default: 0
         }
-        return max(0, effectivePower + offset)
+        return max(0, effectivePower + (gameplayFacts?.protectivePowerOffset ?? legacyOffset))
+    }
+}
+
+enum GearInscriptionDispositionV1: Codable, Equatable, Sendable {
+    case none, activeSeamward, inertUnknown(String)
+}
+
+struct GearGameplayProjectionV1: Codable, Equatable, Sendable {
+    var version = 1
+    var owner: PartyMember
+    var stableGearID: InstanceID
+    var slot: GearSlot
+    var qualityBand: CraftMaterialQualityBand
+    var constructionTier: Int
+    var effectivePower: Double
+    var protectivePower: Double
+    var damageKind: DamageKind?
+    var reach: Reach
+    var insulation: Double
+    var reactivity: Double
+    var specialRule: WildGearGameplayRuleV1?
+    var toolCapability: GearToolCapabilityV1?
+    var inscriptionDisposition: GearInscriptionDispositionV1
+    var displayProvenance: String?
+    var sourceRevisionDigest: String
+}
+
+struct GearLoadoutProjectionV1: Codable, Equatable, Sendable {
+    var version = 1
+    var owner: PartyMember
+    var entries: [GearSlot: GearGameplayProjectionV1]
+    var canonicalDigest: String
+
+    func validates() -> Bool {
+        guard version == 1, canonicalDigest.count == 64,
+              canonicalDigest.allSatisfy({ $0.isHexDigit && !$0.isUppercase }),
+              entries.allSatisfy({ slot, entry in
+                  entry.version == 1 && entry.owner == owner && entry.slot == slot
+                      && entry.effectivePower.isFinite && entry.protectivePower.isFinite
+                      && entry.insulation.isFinite && entry.reactivity.isFinite
+                      && entry.sourceRevisionDigest.count == 64
+              }) else { return false }
+        let encoder = JSONEncoder()
+        encoder.outputFormatting = [.sortedKeys, .withoutEscapingSlashes]
+        var copy = self
+        copy.canonicalDigest = ""
+        guard let data = try? encoder.encode(copy) else { return false }
+        let expected = SHA256.hash(data: data).map { String(format: "%02x", $0) }.joined()
+        return expected == canonicalDigest
+    }
+}
+
+enum GearGameplayProjectionRefusal: Error, Equatable, Sendable {
+    case ownerUnavailable, unsupportedAnimalOwner, duplicateStableIdentity, wrongSlot
+    case missingPhysicalReceipt, invalidPhysicalReceipt, missingGameplayFacts
+    case sourceRevisionMismatch, unsupportedSpecialRule, unsupportedToolCapability
+    case missingEncounterProjection, futureVersion, invalidNumericValue
+}
+
+enum GearGameplayProjectionEvaluationV1: Equatable, Sendable {
+    case projected(GearLoadoutProjectionV1)
+    case refused(GearGameplayProjectionRefusal)
+}
+
+enum GearGameplayProjectionRulesV1 {
+    static func project(owner: PartyMember, in base: BaseState)
+        -> GearGameplayProjectionEvaluationV1 {
+        switch owner {
+        case .binder:
+            return project(owner: owner, equipped: base.binderEquipped)
+        case .member(let id):
+            if id.rawValue.hasPrefix("animal:") { return .refused(.unsupportedAnimalOwner) }
+            guard let index = base.rosterIndex(for: id) else { return .refused(.ownerUnavailable) }
+            return project(owner: owner, equipped: base.roster[index].equipped)
+        }
+    }
+
+    static func project(owner: PartyMember, equipped: [GearSlot: EquippedPiece])
+        -> GearGameplayProjectionEvaluationV1 {
+        if case .member(let id) = owner, id.rawValue.hasPrefix("animal:") {
+            return .refused(.unsupportedAnimalOwner)
+        }
+        var ids = Set<InstanceID>()
+        var entries: [GearSlot: GearGameplayProjectionV1] = [:]
+        for (slot, piece) in equipped {
+            guard let profile = piece.gearProfile else { return .refused(.missingPhysicalReceipt) }
+            guard profile.slot == slot else { return .refused(.wrongSlot) }
+            guard ids.insert(profile.stableInstanceID).inserted else {
+                return .refused(.duplicateStableIdentity)
+            }
+            guard let facts = profile.gameplayFacts else { return .refused(.missingGameplayFacts) }
+            guard facts.validates(profile: profile) else { return .refused(.invalidPhysicalReceipt) }
+            if let receipt = profile.physicalReceipt {
+                guard receipt.validates(profile: profile) else { return .refused(.invalidPhysicalReceipt) }
+                guard receipt.revisions.last?.gameplayFacts == facts,
+                      facts.sourceRevisionOrdinal == receipt.revisions.last?.ordinal else {
+                    return .refused(.sourceRevisionMismatch)
+                }
+            }
+            let effective = Double(facts.qualityBand.rawValue)
+                + Double(profile.legacyEffectivePowerCredit)
+                + Double(profile.reforgeRank) * Tuning.Smith.powerPerReforgeRank
+                + facts.powerOffset + Double(piece.wildGrowth)
+            let protective = max(0, effective + facts.protectivePowerOffset)
+            guard effective.isFinite, protective.isFinite else { return .refused(.invalidNumericValue) }
+            let inscription: GearInscriptionDispositionV1 = if let value = profile.inscription {
+                value.isKnownDefinition ? .activeSeamward : .inertUnknown(value.definitionID.rawValue)
+            } else { .none }
+            entries[slot] = .init(owner: owner, stableGearID: profile.stableInstanceID,
+                                  slot: slot, qualityBand: facts.qualityBand,
+                                  constructionTier: facts.constructionTier,
+                                  effectivePower: effective, protectivePower: protective,
+                                  damageKind: facts.damageKind, reach: facts.reach,
+                                  insulation: facts.insulation, reactivity: facts.reactivity,
+                                  specialRule: facts.specialRule,
+                                  toolCapability: facts.toolCapability,
+                                  inscriptionDisposition: inscription,
+                                  displayProvenance: profile.displayProvenance,
+                                  sourceRevisionDigest: facts.sourceRevisionDigest)
+        }
+        let encoder = JSONEncoder()
+        encoder.outputFormatting = [.sortedKeys, .withoutEscapingSlashes]
+        let provisional = GearLoadoutProjectionV1(owner: owner, entries: entries, canonicalDigest: "")
+        guard let data = try? encoder.encode(provisional) else { return .refused(.invalidNumericValue) }
+        let digest = SHA256.hash(data: data).map { String(format: "%02x", $0) }.joined()
+        return .projected(.init(owner: owner, entries: entries, canonicalDigest: digest))
     }
 }
 

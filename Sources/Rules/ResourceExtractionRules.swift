@@ -231,21 +231,12 @@ enum ResourceExtractionRules {
     }
 
     private static func qualification(for piece: EquippedPiece) -> ToolQualification? {
-        guard piece.frozenSlot == .tool else { return nil }
-        let instanceID = piece.gearProfile?.stableInstanceID.rawValue == 0
-            ? nil : piece.gearProfile?.stableInstanceID
-        if piece.gearProfile?.familyID == PhysicalGearCraftingRules.fieldPick.id,
-           let tier = piece.gearProfile?.constructionTier, (0...4).contains(tier) {
-            return .init(rank: tier, instanceID: instanceID, catalogID: piece.catalogID)
-        }
-        let rank: Int? = switch piece.catalogID.rawValue {
-        case "bent_pick": 1
-        case "balanced_pick": 2
-        case "corebreaker": 3
-        case "the_willing_edge": 4
-        default: nil
-        }
-        return rank.map { .init(rank: $0, instanceID: instanceID, catalogID: piece.catalogID) }
+        guard piece.frozenSlot == .tool,
+              let profile = piece.gearProfile,
+              let capability = profile.gameplayFacts?.toolCapability,
+              capability.validates() else { return nil }
+        return .init(rank: capability.rank, instanceID: profile.stableInstanceID,
+                     catalogID: piece.catalogID)
     }
 
     static func validatedRequirement(of node: ResourceNode)

@@ -540,6 +540,8 @@ struct EncounterState: Codable, Equatable, Sendable {
     var partyNames: [PersistentPartyMemberID: String] = [:]
     /// Frozen exact-animal combat truth. Nil is legacy; modern encounters use an authoritative map.
     var animalParticipants: [Combatant: AnimalCombatParticipantReceiptV1]? = nil
+    /// Frozen exact-human loadouts. Animals remain owned solely by `animalParticipants`.
+    var gearProjections: [Combatant: GearLoadoutProjectionV1]? = nil
     /// Frozen DEBUG comparison inputs/results. Existing encounters decode without it.
     var scalingPreview: EncounterScalingRules.Preview?
     /// Non-nil only when DEBUG God mode was enabled as this encounter opened. Persisted so
@@ -767,6 +769,7 @@ struct EncounterState: Codable, Equatable, Sendable {
          debugV2Evasion: DebugV2EvasionReceipt? = nil,
          debugV2Resistance: DebugV2ResistanceReceipt? = nil,
          animalParticipants: [Combatant: AnimalCombatParticipantReceiptV1]? = nil,
+         gearProjections: [Combatant: GearLoadoutProjectionV1]? = nil,
          ghostEvasionAvailable: Set<Combatant>? = nil,
          debugV2OwnedNodeIDs: [Combatant: Set<CombatNodeID>]? = nil,
          partyRanks: [Combatant: Rank] = [:],
@@ -783,6 +786,20 @@ struct EncounterState: Codable, Equatable, Sendable {
         self.debugV2Evasion = debugV2Evasion
         self.debugV2Resistance = debugV2Resistance
         self.animalParticipants = animalParticipants
+        self.gearProjections = gearProjections ?? Dictionary(uniqueKeysWithValues:
+            order.compactMap { actor -> (Combatant, GearLoadoutProjectionV1)? in
+                if actor.foeID != nil || animalParticipants?[actor] != nil { return nil }
+                let owner: PartyMember
+                switch actor {
+                case .binder: owner = .binder
+                case .companion(let id): owner = .member(id)
+                case .foe: return nil
+                }
+                guard case .projected(let projection) =
+                        GearGameplayProjectionRulesV1.project(owner: owner, equipped: [:])
+                else { return nil }
+                return (actor, projection)
+            })
         self.animalSlipAwayOwners = animalParticipants == nil ? nil : []
         self.animalWarningDisplayOwners = animalParticipants == nil ? nil : []
         self.debugGodMode = nil
@@ -820,6 +837,8 @@ struct EncounterState: Codable, Equatable, Sendable {
                                             forKey: .partyNames) ?? [:]
         animalParticipants = try c.decodeIfPresent(
             [Combatant: AnimalCombatParticipantReceiptV1].self, forKey: .animalParticipants)
+        gearProjections = try c.decodeIfPresent(
+            [Combatant: GearLoadoutProjectionV1].self, forKey: .gearProjections)
         scalingPreview = try c.decodeIfPresent(EncounterScalingRules.Preview.self, forKey: .scalingPreview)
         debugGodMode = try c.decodeIfPresent(DebugGodModeReceipt.self, forKey: .debugGodMode)
         debugV2BinderAttack = try c.decodeIfPresent(DebugV2BinderAttackReceipt.self,

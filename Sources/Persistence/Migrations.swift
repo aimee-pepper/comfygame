@@ -157,6 +157,7 @@ enum Migrations {
         case 14: return try migrate14to15(data)
         case 15: return try migrate15to16(data)
         case 16: return try migrate16to17(data)
+        case 17: return try migrate17to18(data)
         default:
             // No migration registered. Tolerant decoding is the fallback; if the save is genuinely
             // incompatible, `SaveFileIO.load()` quarantines it rather than losing it.
@@ -173,9 +174,149 @@ enum Migrations {
         base["physicalGearOwnershipRevision"] = 0
         root["base"] = base
         root["schemaVersion"] = 17
-        let result = try JSONSerialization.data(withJSONObject: root, options: [.sortedKeys])
-        try validateCurrentPhysicalGearOwnership(in: result)
-        return result
+        return try JSONSerialization.data(withJSONObject: root, options: [.sortedKeys])
+    }
+
+    private static func migrate17to18(_ data: Data) throws -> Data {
+        guard var root = try JSONSerialization.jsonObject(with: data) as? [String: Any],
+              try exactInt(root["schemaVersion"]) == 17 else {
+            throw CocoaError(.coderInvalidValue)
+        }
+        func decode<T: Decodable>(_ type: T.Type, _ value: Any) throws -> T {
+            try SaveCodec.makeDecoder().decode(type, from: JSONSerialization.data(
+                withJSONObject: value, options: [.sortedKeys]))
+        }
+        func encoded<T: Encodable>(_ value: T) throws -> Any {
+            try JSONSerialization.jsonObject(with: SaveCodec.makeEncoder().encode(value))
+        }
+        func migrateProfile(_ raw: [String: Any], catalogID: ItemID) throws -> [String: Any] {
+            var profile = raw
+            guard try exactInt(profile["version"]) == 3,
+                  profile["gameplayFacts"] == nil,
+                  let definition = ContentCatalog.shared.item(catalogID),
+                  let gear = definition.gear else { throw CocoaError(.coderInvalidValue) }
+            let stableID = try decode(InstanceID.self, profile["stableInstanceID"] as Any)
+            let slot = try decode(GearSlot.self, profile["slot"] as Any)
+            var band = try decode(CraftMaterialQualityBand.self, profile["qualityBand"] as Any)
+            let tier = try exactInt(profile["constructionTier"])
+            let damage: DamageKind? = profile["damage"] is NSNull ? nil
+                : try decode(DamageKind.self, profile["damage"] as Any)
+            let reach = try decode(Reach.self, profile["reach"] as Any)
+            guard let insulation = (profile["insulation"] as? NSNumber)?.doubleValue,
+                  let reactivity = (profile["reactivity"] as? NSNumber)?.doubleValue,
+                  insulation.isFinite, reactivity.isFinite else { throw CocoaError(.coderInvalidValue) }
+            let specialist = profile["specialistProfile"] is NSNull
+                ? nil : profile["specialistProfile"] as? String
+            let protectiveOffset: Double = switch specialist {
+            case "armoury_rigid_shell": 0.5
+            case "armoury_insulated_layer": -0.5
+            case "armoury_balanced_laminate": 0
+            case "armoury_balanced_laminate_v1": -0.5
+            case "armoury_insulated_layer_v1": -1
+            default: 0
+            }
+            let special = gear.breaks.flatMap { WildRule(rawValue: $0.rawValue) }.map {
+                WildGearGameplayRuleV1(rule: $0, innateStatus: gear.statusKind,
+                                       wardsAgainst: gear.wardsAgainst)
+            }
+            let legacyRank: Int? = switch catalogID.rawValue {
+            case "bent_pick": 1
+            case "balanced_pick": 2
+            case "corebreaker": 3
+            case "the_willing_edge": 4
+            default: nil
+            }
+            let family = profile["familyID"] is NSNull ? nil : profile["familyID"] as? String
+            let toolRank = family == PhysicalGearCraftingRules.fieldPick.id
+                ? min(4, max(0, tier)) : legacyRank
+            var receipt: PhysicalGearReceiptV1? = profile["physicalReceipt"] is NSNull ? nil
+                : try decode(PhysicalGearReceiptV1.self, profile["physicalReceipt"] as Any)
+            if var imported = receipt, imported.revisions.count == 1,
+               case .legacyImported(_, _, let recipeVersion) = imported.revisions[0].authority,
+               recipeVersion == 1 {
+                let ranks = imported.revisions[0].components.map { $0.unit.qualityBand.rawValue }
+                guard let primary = ranks.first else { throw CocoaError(.coderInvalidValue) }
+                let secondary = ranks.count == 1 ? Double(primary)
+                    : Double(ranks.dropFirst().reduce(0, +)) / Double(ranks.count - 1)
+                let rank = Int((0.7 * Double(primary) + 0.3 * secondary).rounded())
+                guard let reconstructed = CraftMaterialQualityBand(rawValue: rank) else {
+                    throw CocoaError(.coderInvalidValue)
+                }
+                band = reconstructed
+                profile["qualityBand"] = try encoded(reconstructed)
+                imported.revisions[0].resultingQualityBand = reconstructed
+                receipt = imported
+            }
+            let ordinal = receipt?.revisions.last?.ordinal ?? -1
+            let digest: String
+            if let latest = receipt?.revisions.last,
+               let value = GearInstanceProfile.revisionDigest(latest) { digest = value }
+            else { digest = GearInstanceProfile.sha256(
+                "legacy-gear-gameplay-v1:\(stableID.rawValue):\(catalogID.rawValue)") }
+            let facts = GearGameplayFactsV1(
+                stableGearID: stableID, sourceRevisionOrdinal: ordinal,
+                sourceRevisionDigest: digest, slot: slot, qualityBand: band,
+                constructionTier: tier, powerOffset: 0,
+                protectivePowerOffset: protectiveOffset, damageKind: damage,
+                reach: reach, insulation: insulation, reactivity: reactivity,
+                specialRule: special,
+                toolCapability: toolRank.map { .init(
+                    capabilityID: "extraction", rank: $0,
+                    authorityID: GearToolCapabilityV1.extractionAuthorityID,
+                    authorityVersion: 1) })
+            if receipt != nil {
+                receipt!.revisions[receipt!.revisions.count - 1].gameplayFacts = facts
+                profile["physicalReceipt"] = try encoded(receipt!)
+            }
+            profile["gameplayFacts"] = try encoded(facts)
+            profile["version"] = 4
+            return profile
+        }
+        func walk(_ value: Any) throws -> Any {
+            if let array = value as? [Any] { return try array.map(walk) }
+            guard var object = value as? [String: Any] else { return value }
+            if let rawProfile = object["gearProfile"] as? [String: Any],
+               let rawCatalog = object["catalogID"] {
+                object["gearProfile"] = try migrateProfile(
+                    rawProfile, catalogID: decode(ItemID.self, rawCatalog))
+            }
+            for (key, child) in object where key != "gearProfile" {
+                object[key] = try walk(child)
+            }
+            return object
+        }
+        root = try walk(root) as! [String: Any]
+        root["schemaVersion"] = 18
+        let provisional = try JSONSerialization.data(withJSONObject: root, options: [.sortedKeys])
+        var state = try SaveCodec.makeDecoder().decode(GameState.self, from: provisional)
+        func freeze(_ encounter: inout EncounterState) throws {
+            var projections: [Combatant: GearLoadoutProjectionV1] = [:]
+            for actor in Set(encounter.order + encounter.turnSlots.map(\.actor)) {
+                if actor.foeID != nil || encounter.animalParticipants?[actor] != nil { continue }
+                let owner: PartyMember
+                switch actor {
+                case .binder: owner = .binder
+                case .companion(let id): owner = .member(id)
+                case .foe: continue
+                }
+                guard case .projected(let projection) =
+                        GearGameplayProjectionRulesV1.project(owner: owner, in: state.base)
+                else { throw CocoaError(.coderInvalidValue) }
+                projections[actor] = projection
+            }
+            encounter.gearProjections = projections
+        }
+        if var run = state.worlds.activeRun, var encounter = run.activeEncounter {
+            try freeze(&encounter)
+            run.activeEncounter = encounter
+            state.worlds.activeRun = run
+        }
+        for index in state.worlds.anchoredRealms.indices {
+            guard var encounter = state.worlds.anchoredRealms[index].world.activeEncounter else { continue }
+            try freeze(&encounter)
+            state.worlds.anchoredRealms[index].world.activeEncounter = encounter
+        }
+        return try SaveCodec.makeEncoder().encode(state)
     }
 
     private static func validateCurrentPhysicalGearOwnership(in data: Data) throws {
@@ -186,7 +327,21 @@ enum Migrations {
               UInt64(value.stringValue) != nil,
               !value.stringValue.hasPrefix("-") else { throw CocoaError(.coderInvalidValue) }
         let state = try SaveCodec.makeDecoder().decode(GameState.self, from: data)
-        guard state.validatesPhysicalGearReceipts() else { throw CocoaError(.coderInvalidValue) }
+        func validates(_ encounter: EncounterState) -> Bool {
+            guard let projections = encounter.gearProjections else { return false }
+            let humans = Set((encounter.order + encounter.turnSlots.map(\.actor)).filter {
+                $0.foeID == nil && encounter.animalParticipants?[$0] == nil
+            })
+            return Set(projections.keys) == humans && projections.allSatisfy { actor, loadout in
+                loadout.owner.combatant == actor && loadout.validates()
+            }
+        }
+        let encounters = [state.worlds.activeRun?.activeEncounter]
+            + state.worlds.anchoredRealms.map { $0.world.activeEncounter }
+        guard state.validatesPhysicalGearReceipts(),
+              encounters.compactMap({ $0 }).allSatisfy(validates) else {
+            throw CocoaError(.coderInvalidValue)
+        }
     }
 
     private static func migrate15to16(_ data: Data) throws -> Data {
@@ -271,7 +426,20 @@ enum Migrations {
             "constructionTier", "reforgeRank", "legacyPowerCredit", "qualityBand",
             "legacyEffectivePowerCredit", "slot", "damage", "reach", "insulation",
             "reactivity", "physicalReceipt", "specialistProfile", "displayProvenance",
-            "authoredUniqueRuleID", "foundReceipt", "inscription"]
+            "authoredUniqueRuleID", "foundReceipt", "inscription", "gameplayFacts"]
+        let gameplayFactKeys: Set<String> = ["version", "stableGearID",
+            "sourceRevisionOrdinal", "sourceRevisionDigest", "slot", "qualityBand",
+            "constructionTier", "powerOffset", "protectivePowerOffset", "damageKind", "reach",
+            "insulation", "reactivity", "specialRule", "toolCapability"]
+        func validateGameplayFacts(_ value: Any) throws {
+            guard let facts = value as? [String: Any], Set(facts.keys) == gameplayFactKeys,
+                  try exactInt(facts["version"]) == 1,
+                  let digest = facts["sourceRevisionDigest"] as? String,
+                  digest.count == 64,
+                  digest.allSatisfy({ $0.isHexDigit && !$0.isUppercase }) else {
+                throw CocoaError(.coderInvalidValue)
+            }
+        }
         func validateReceipt(_ value: Any) throws {
             if value is NSNull { return }
             guard let receipt = value as? [String: Any],
@@ -279,12 +447,17 @@ enum Migrations {
                   let revisions = receipt["revisions"] as? [[String: Any]], !revisions.isEmpty
             else { throw CocoaError(.coderInvalidValue) }
             for revision in revisions {
-                guard Set(revision.keys) == ["ordinal", "authority", "components",
-                                              "resultingQualityBand", "resultingConstructionTier"],
+                let baseRevisionKeys: Set<String> = ["ordinal", "authority", "components",
+                    "resultingQualityBand", "resultingConstructionTier"]
+                guard Set(revision.keys) == baseRevisionKeys
+                        || Set(revision.keys) == baseRevisionKeys.union(["gameplayFacts"]),
                       let authority = revision["authority"] as? [String: Any],
                       authority.count == 1,
                       let components = revision["components"] as? [[String: Any]],
                       !components.isEmpty else { throw CocoaError(.coderInvalidValue) }
+                if let facts = revision["gameplayFacts"] {
+                    try validateGameplayFacts(facts)
+                }
                 switch authority.first! {
                 case ("construction", let payload), ("rebuild", let payload):
                     guard let object = payload as? [String: Any],
@@ -311,9 +484,11 @@ enum Migrations {
             guard let object = value as? [String: Any] else { return }
             if let profile = object["gearProfile"] as? [String: Any] {
                 guard Set(profile.keys) == profileKeys,
-                      try exactInt(profile["version"]) == 3 else {
+                      try exactInt(profile["version"]) == 4,
+                      profile["gameplayFacts"] is [String: Any] else {
                     throw CocoaError(.coderInvalidValue)
                 }
+                try validateGameplayFacts(profile["gameplayFacts"] as Any)
                 try validateReceipt(profile["physicalReceipt"] as Any)
             }
             try object.values.forEach(inspect)

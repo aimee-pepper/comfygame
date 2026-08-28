@@ -73,6 +73,7 @@ enum CombatRules {
     static func makeEncounter(id: InstanceID, foes: [FoeState], party: [Combatant] = [.binder, .companion(0)],
                               names: [PersistentPartyMemberID: String] = [:],
                               animalParticipants: [Combatant: EncounterState.AnimalCombatParticipantReceiptV1]? = nil,
+                              gearProjections: [Combatant: GearLoadoutProjectionV1]? = nil,
                               apexActionSlots: [InstanceID: Int] = [:],
                               ordinaryPressureSlots: Int = 0,
                               initiallyUnrecordedSpecies: Set<String> = [],
@@ -152,6 +153,16 @@ enum CombatRules {
             }
             finalizedInitiative = receipt
         }
+        let resolvedGearProjections: [Combatant: GearLoadoutProjectionV1] = gearProjections
+            ?? Dictionary(uniqueKeysWithValues: party.compactMap { actor in
+                if animalParticipants?[actor] != nil || actor.foeID != nil { return nil }
+                let owner: PartyMember = actor == .binder ? .binder
+                    : .member(actor.persistentPartyMemberID!)
+                guard case .projected(let value) =
+                        GearGameplayProjectionRulesV1.project(owner: owner, equipped: [:])
+                else { return nil }
+                return (actor, value)
+            })
         var result = EncounterState(
             id: id,
             foes: foes,
@@ -165,6 +176,7 @@ enum CombatRules {
             debugV2Evasion: debugV2Evasion,
             debugV2Resistance: debugV2Resistance,
             animalParticipants: animalParticipants,
+            gearProjections: resolvedGearProjections,
             ghostEvasionAvailable: ghostEvasionAvailable,
             debugV2OwnedNodeIDs: debugV2OwnedNodeIDs,
             partyRanks: partyRanks,
@@ -190,6 +202,11 @@ enum CombatRules {
         case .companion(let index): state.base.worn(slot, by: .member(index))
         case .foe: nil
         }
+    }
+
+    static func projectedGear(_ slot: GearSlot, for actor: Combatant,
+                              in state: GameState) -> GearGameplayProjectionV1? {
+        state.worlds.activeRun?.activeEncounter?.gearProjections?[actor]?.entries[slot]
     }
 
     /// **What somebody is, on top of what they're holding** (session 17 §1).
@@ -226,7 +243,8 @@ enum CombatRules {
     }
 
     static func binderAttack(in state: GameState) -> Int {
-        let power = equipped(.weapon, for: .binder, in: state)?.effectivePower ?? 0
+        let power = projectedGear(.weapon, for: .binder, in: state)?.effectivePower
+            ?? equipped(.weapon, for: .binder, in: state)?.effectivePower ?? 0
         let total = Double(Tuning.Encounter.binderAttack
             + CharacterRules.damageBonus(state.base.binderCharacter.stats,
                                          with: damageKind(for: .binder, in: state)))
@@ -242,13 +260,15 @@ enum CombatRules {
            let animal = state.base.animalCompanion(for: id) {
             return AnimalCompanionCombatRules.scaledStats(animal).damageKind
         }
-        return equipped(.weapon, for: actor, in: state)?.frozenDamage
+        return projectedGear(.weapon, for: actor, in: state)?.damageKind
+            ?? equipped(.weapon, for: actor, in: state)?.frozenDamage
     }
 
     static func reach(for actor: Combatant, in state: GameState) -> Reach {
         if case .companion(let id) = actor,
            let animal = state.base.animalCompanion(for: id) { return animal.originReceipt.reach }
-        return equipped(.weapon, for: actor, in: state)?.frozenReach ?? .close
+        return projectedGear(.weapon, for: actor, in: state)?.reach
+            ?? equipped(.weapon, for: actor, in: state)?.frozenReach ?? .close
     }
 
     /// Whether this foe can include a party member in any attack it can currently perform. Foes
@@ -271,13 +291,17 @@ enum CombatRules {
     /// **The rule this hand is breaking**, on the eight wild-only weapons and nowhere else
     /// (`apex-encounters.md` §4). Nil on everything you can make.
     static func wildRule(for actor: Combatant, in state: GameState) -> WildRule? {
-        equipped(.weapon, for: actor, in: state)?.gear?.breaks
+        projectedGear(.weapon, for: actor, in: state)?.specialRule?.rule
+            ?? equipped(.weapon, for: actor, in: state)?.gearProfile?
+                .gameplayFacts?.specialRule?.rule
     }
 
     static func wardedHaftMultiplier(against kind: DamageKind, for actor: Combatant,
                                      in state: GameState) -> Double {
-        let weapon = equipped(.weapon, for: actor, in: state)
-        return weapon?.gear?.breaks == .wardWhileHeld && weapon?.gear?.wardsAgainst == kind
+        let special = projectedGear(.weapon, for: actor, in: state)?.specialRule
+            ?? equipped(.weapon, for: actor, in: state)?.gearProfile?
+                .gameplayFacts?.specialRule
+        return special?.rule == .wardWhileHeld && special?.wardsAgainst == kind
             ? 1 - Tuning.Apex.wardedHaftReduction : 1
     }
 
@@ -312,7 +336,8 @@ enum CombatRules {
             return AnimalCompanionCombatRules.scaledStats(animal).attack
         }
         let member = PartyMember.member(id)
-        let power = state.base.worn(.weapon, by: member)?.effectivePower ?? 0
+        let power = projectedGear(.weapon, for: .companion(id), in: state)?.effectivePower
+            ?? state.base.worn(.weapon, by: member)?.effectivePower ?? 0
         let total = Double(Tuning.Encounter.companionBaseAttack
             + CharacterRules.damageBonus(state.base.character(member).stats,
                                          with: damageKind(for: .companion(id), in: state)))
@@ -336,7 +361,11 @@ enum CombatRules {
     /// swing carries a status into the wound.** Which ties gear to the world it came from — a cold
     /// world is one you dress for.
     static func insulation(of actor: Combatant, in state: GameState) -> Double {
-        GearSlot.allCases
+        if let projected = state.worlds.activeRun?.activeEncounter?.gearProjections?[actor] {
+            return projected.entries.values.filter { $0.slot.isProtective }
+                .map(\.insulation).reduce(0, +) / Tuning.Pressure.scaleMaximum
+        }
+        return GearSlot.allCases
             .filter(\.isProtective)
             .compactMap { equipped($0, for: actor, in: state)?.frozenInsulation }
             .reduce(0, +) / Tuning.Pressure.scaleMaximum
@@ -344,10 +373,17 @@ enum CombatRules {
 
     /// What the weapon in somebody's hand is volatile enough to leave behind.
     static func coating(of actor: Combatant, in state: GameState) -> StatusKind? {
-        guard let weapon = equipped(.weapon, for: actor, in: state),
-              weapon.frozenReactivity >= Tuning.Encounter.coatingReactivity
+        let reactivity = projectedGear(.weapon, for: actor, in: state)?.reactivity
+            ?? equipped(.weapon, for: actor, in: state)?.frozenReactivity ?? 0
+        guard reactivity >= Tuning.Encounter.coatingReactivity
         else { return nil }
         return .poison
+    }
+
+    static func innateStatus(for actor: Combatant, in state: GameState) -> String? {
+        projectedGear(.weapon, for: actor, in: state)?.specialRule?.innateStatus
+            ?? equipped(.weapon, for: actor, in: state)?.gearProfile?
+                .gameplayFacts?.specialRule?.innateStatus
     }
 
     /// The one final-target miss resolver for otherwise legal single-target direct foe attacks.
@@ -462,6 +498,9 @@ enum CombatRules {
         let power = GearSlot.allCases
             .filter(\.isProtective)
             .reduce(0.0) { total, slot in
+                if let projected = projectedGear(slot, for: actor, in: state) {
+                    return total + projected.protectivePower
+                }
                 guard let piece = equipped(slot, for: actor, in: state) else { return total }
                 return total + (piece.gearProfile?.protectivePower ?? piece.effectivePower)
             }
@@ -734,7 +773,7 @@ enum CombatRules {
                    standingBack: standingBack, reachOfActor: reach,
                    coating: coating(of: actor, in: state),
                    breaking: wildRule(for: actor, in: state),
-                   innateStatus: equipped(.weapon, for: actor, in: state)?.gear?.statusKind,
+                   innateStatus: innateStatus(for: actor, in: state),
                    allowsConditionalDirectHit: true)
 
         case .overbear:
@@ -908,7 +947,7 @@ enum CombatRules {
                    standingBack: standingBack, reachOfActor: reach,
                    coating: coating(of: actor, in: state),
                    breaking: wildRule(for: actor, in: state),
-                   innateStatus: equipped(.weapon, for: actor, in: state)?.gear?.statusKind,
+                   innateStatus: innateStatus(for: actor, in: state),
                    allowsConditionalDirectHit: true)
 
         case .preempt:
@@ -926,7 +965,7 @@ enum CombatRules {
                    standingBack: standingBack, reachOfActor: reach,
                    coating: coating(of: actor, in: state),
                    breaking: wildRule(for: actor, in: state),
-                   innateStatus: equipped(.weapon, for: actor, in: state)?.gear?.statusKind,
+                   innateStatus: innateStatus(for: actor, in: state),
                    allowsStagger: true, allowsConditionalDirectHit: true,
                    allowsRetaliation: false)
 
@@ -1481,7 +1520,7 @@ enum CombatRules {
                    reachOfActor: reach(for: actor, in: state),
                    coating: coating(of: actor, in: state),
                    breaking: wildRule(for: actor, in: state),
-                   innateStatus: equipped(.weapon, for: actor, in: state)?.gear?.statusKind,
+                   innateStatus: innateStatus(for: actor, in: state),
                    allowsStagger: true, allowsConditionalDirectHit: true).committed {
                 outcome = .committed(cost: actionCost, completedDirectAttack: true)
             }
@@ -3372,7 +3411,7 @@ enum CombatRules {
     private static func growLivingHooks(in state: inout GameState) -> [String] {
         var lines: [String] = []
         func grow(_ piece: inout EquippedPiece?) {
-            guard piece?.gear?.breaks == .growingGrade,
+            guard piece?.gearProfile?.gameplayFacts?.specialRule?.rule == .growingGrade,
                   let current = piece?.wildGrowth,
                   current < Tuning.Apex.livingHookGrowthCap else { return }
             piece?.wildGrowth = current + 1

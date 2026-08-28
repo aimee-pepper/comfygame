@@ -4,6 +4,58 @@ import XCTest
 /// Session 12: gear is found rather than researched, and rules are edited in place.
 @MainActor
 final class GearAndRulesTests: XCTestCase {
+    func testGameplayProjectionUsesFrozenInstanceFactsAndExactOwner() throws {
+        let definition = try XCTUnwrap(ContentCatalog.shared.item("blade_keen"))
+        var profile = GearInstanceProfile(stableInstanceID: .init(rawValue: 81_001),
+                                          definition: definition)
+        profile.qualityBand = .peerless
+        profile.constructionTier = 2
+        profile.damage = .rend
+        profile.reach = .far
+        profile.insulation = 37
+        profile.reactivity = 61
+        profile.freezeGameplayFacts(powerOffset: 0.5, protectivePowerOffset: -0.5)
+        var piece = EquippedPiece(catalogID: definition.id)
+        piece.gearProfile = profile
+        piece.wildGrowth = 2
+
+        guard case .projected(let loadout) = GearGameplayProjectionRulesV1.project(
+            owner: .binder, equipped: [.weapon: piece]) else {
+            return XCTFail("valid exact-instance projection refused")
+        }
+        let projected = try XCTUnwrap(loadout.entries[.weapon])
+        XCTAssertEqual(projected.owner, .binder)
+        XCTAssertEqual(projected.stableGearID, .init(rawValue: 81_001))
+        XCTAssertEqual(projected.qualityBand, .peerless)
+        XCTAssertEqual(projected.constructionTier, 2)
+        XCTAssertEqual(projected.effectivePower, 7.5)
+        XCTAssertEqual(projected.damageKind, .rend)
+        XCTAssertEqual(projected.reach, .far)
+        XCTAssertEqual(projected.insulation, 37)
+        XCTAssertEqual(projected.reactivity, 61)
+    }
+
+    func testGameplayProjectionRejectsAnimalAndWrongSlotWithoutFallback() throws {
+        let piece = EquippedPiece(ItemStack(id: .init(rawValue: 81_002), catalogID: "blade_keen"))
+        XCTAssertEqual(GearGameplayProjectionRulesV1.project(
+            owner: .member(.animal("tamed:1:2")), equipped: [.weapon: piece]),
+                       .refused(.unsupportedAnimalOwner))
+        XCTAssertEqual(GearGameplayProjectionRulesV1.project(
+            owner: .binder, equipped: [.armor: piece]), .refused(.wrongSlot))
+    }
+
+    func testRuntimeExtractionAndCombatSourcesDoNotUseCatalogueGearSwitches() throws {
+        let root = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent().deletingLastPathComponent()
+        let extraction = try String(contentsOf: root.appending(
+            path: "Sources/Rules/ResourceExtractionRules.swift"), encoding: .utf8)
+        XCTAssertFalse(extraction.contains("case \"bent_pick\""))
+        XCTAssertFalse(extraction.contains("case \"balanced_pick\""))
+        let combat = try String(contentsOf: root.appending(
+            path: "Sources/Rules/CombatRules.swift"), encoding: .utf8)
+        XCTAssertFalse(combat.contains("piece?.gear?.breaks == .growingGrade"))
+        XCTAssertFalse(combat.contains("equipped(.weapon, for: actor, in: state)?.gear?.statusKind"))
+    }
     func testGearSlotUsesAPageAndItemsUseAnchoredDetailsWithoutScrolling() throws {
         let root = URL(fileURLWithPath: #filePath)
             .deletingLastPathComponent().deletingLastPathComponent()

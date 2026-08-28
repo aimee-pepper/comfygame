@@ -150,7 +150,7 @@ struct GearView: View {
                         Text("×\(count)").font(.caption2.monospacedDigit()).foregroundStyle(.secondary)
                     }
                 }
-                Text(definition.flatMap(damageLine) ?? definition?.blurb ?? "Unknown equipment")
+                Text(damageLine(piece) ?? definition?.blurb ?? "Unknown equipment")
                     .font(.caption2)
                     .foregroundStyle(.secondary)
                     .lineLimit(2)
@@ -171,9 +171,10 @@ struct GearView: View {
 
     /// A weapon's corner and reach, because that's the matchup read — a blurb won't tell you
     /// whether this is any use against the plated thing you keep meeting.
-    private func damageLine(_ definition: ItemDef) -> String? {
-        guard let gear = definition.gear, let damage = gear.damage else { return nil }
-        let reach = gear.reach == .close ? "" : " · \(GearPresentationCopy.reach(gear.reach)) reach"
+    private func damageLine(_ piece: EquippedPiece) -> String? {
+        guard let facts = piece.gearProfile?.gameplayFacts,
+              let damage = facts.damageKind else { return nil }
+        let reach = facts.reach == .close ? "" : " · \(GearPresentationCopy.reach(facts.reach)) reach"
         return "\(GearPresentationCopy.damage(damage))\(reach)"
     }
 }

@@ -2,6 +2,44 @@ import XCTest
 @testable import Bookbinder
 
 final class GearMigrationTests: XCTestCase {
+    func testSchemaSeventeenFreezesGameplayFactsAndCurrentMissingFactsFailsClosed() throws {
+        var state = GameState.newGame()
+        state.base.inventory.add(ItemStack(id: .init(rawValue: 81_100), catalogID: "bent_pick"))
+        let current = try SaveCodec.encode(state)
+        var root = try XCTUnwrap(JSONSerialization.jsonObject(with: current) as? [String: Any])
+        func downgrade(_ value: Any) -> Any {
+            if let array = value as? [Any] { return array.map(downgrade) }
+            guard var object = value as? [String: Any] else { return value }
+            if (object["version"] as? NSNumber)?.intValue == 4,
+               object["stableInstanceID"] != nil, object["slot"] != nil {
+                object["version"] = 3
+                object.removeValue(forKey: "gameplayFacts")
+            }
+            for (key, child) in object { object[key] = downgrade(child) }
+            return object
+        }
+        root = downgrade(root) as! [String: Any]
+        root["schemaVersion"] = 17
+        let legacy = try JSONSerialization.data(withJSONObject: root, options: [.sortedKeys])
+        let migrated = try SaveCodec.decode(legacy)
+        let facts = try XCTUnwrap(migrated.base.inventory.stacks.first?.gearProfile?.gameplayFacts)
+        XCTAssertEqual(migrated.schemaVersion, 18)
+        XCTAssertEqual(facts.stableGearID, .init(rawValue: 81_100))
+        XCTAssertEqual(facts.toolCapability?.rank, 1)
+
+        var malformed = try XCTUnwrap(JSONSerialization.jsonObject(with: current) as? [String: Any])
+        var base = malformed["base"] as! [String: Any]
+        var inventory = base["inventory"] as! [String: Any]
+        var stacks = inventory["stacks"] as! [[String: Any]]
+        var profile = stacks[0]["gearProfile"] as! [String: Any]
+        profile.removeValue(forKey: "gameplayFacts")
+        stacks[0]["gearProfile"] = profile
+        inventory["stacks"] = stacks
+        base["inventory"] = inventory
+        malformed["base"] = base
+        XCTAssertThrowsError(try SaveCodec.decode(
+            JSONSerialization.data(withJSONObject: malformed, options: [.sortedKeys])))
+    }
     func testGearCatalogueDispositionHasExactClosedPartitionAndRoutes() throws {
         let gear = ContentCatalog.shared.items.filter { $0.kind == .gear }
         XCTAssertEqual(gear.count, 75)
@@ -78,7 +116,7 @@ final class GearMigrationTests: XCTestCase {
 
     func testAuthoredFoundInstancesFreezeBandAndReceipt() throws {
         let found = ItemStack(id: .init(rawValue: 991), catalogID: "silvered_helm")
-        XCTAssertEqual(found.gearProfile?.version, 3)
+        XCTAssertEqual(found.gearProfile?.version, 4)
         XCTAssertEqual(found.gearProfile?.qualityBand, .superior)
         XCTAssertEqual(found.gearProfile?.foundReceipt,
                        ContentCatalog.shared.item("silvered_helm")?.gearCatalogueDisposition?.foundReceipt)
@@ -236,6 +274,7 @@ final class GearMigrationTests: XCTestCase {
         var root = try XCTUnwrap(JSONSerialization.jsonObject(with: SaveCodec.encode(state)) as? [String: Any])
         root["schemaVersion"] = 7
         var base = try XCTUnwrap(root["base"] as? [String: Any])
+        base.removeValue(forKey: "physicalGearOwnershipRevision")
         var inventory = try XCTUnwrap(base["inventory"] as? [String: Any])
         var stacks = try XCTUnwrap(inventory["stacks"] as? [[String: Any]])
         var profile = try XCTUnwrap(stacks[0]["gearProfile"] as? [String: Any])
@@ -279,6 +318,7 @@ final class GearMigrationTests: XCTestCase {
             with: SaveCodec.makeEncoder().encode(state)) as? [String: Any])
         root["schemaVersion"] = 15
         var base = try XCTUnwrap(root["base"] as? [String: Any])
+        base.removeValue(forKey: "physicalGearOwnershipRevision")
         var inventory = try XCTUnwrap(base["inventory"] as? [String: Any])
         var stacks = try XCTUnwrap(inventory["stacks"] as? [[String: Any]])
         var profile = try XCTUnwrap(stacks[0]["gearProfile"] as? [String: Any])
@@ -288,6 +328,7 @@ final class GearMigrationTests: XCTestCase {
         }
         profile["recipeVersion"] = 7
         profile.removeValue(forKey: "physicalReceipt")
+        profile.removeValue(forKey: "gameplayFacts")
         stacks[0]["gearProfile"] = profile
         inventory["stacks"] = stacks; base["inventory"] = inventory; root["base"] = base
 
@@ -295,7 +336,7 @@ final class GearMigrationTests: XCTestCase {
             JSONSerialization.data(withJSONObject: root, options: [.sortedKeys]))
         let restored = try SaveCodec.makeDecoder().decode(GameState.self, from: migrated)
         let receipt = try XCTUnwrap(restored.base.inventory.stacks.first?.gearProfile?.physicalReceipt)
-        XCTAssertEqual(restored.schemaVersion, 16)
+        XCTAssertEqual(restored.schemaVersion, 18)
         XCTAssertEqual(receipt.gearInstanceID.rawValue, 44_001)
         XCTAssertEqual(receipt.flattenedUnits, units)
         XCTAssertEqual(receipt.revisions.first?.components.map(\.role),

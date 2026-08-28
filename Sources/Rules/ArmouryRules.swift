@@ -223,6 +223,7 @@ enum ArmouryRules {
             resultingConstructionTier: rebuilt.constructionTier)
         rebuilt.physicalReceipt = .init(gearInstanceID: rebuilt.stableInstanceID,
                                         revisions: prior + [revision])
+        rebuilt.freezeGameplayFacts(protectivePowerOffset: preview.profile.physicalOffset)
 
         guard PhysicalGearCraftingRules.consume(preview.selections, in: &candidate),
               candidate.base.spendEssenceCrystals(preview.essence),

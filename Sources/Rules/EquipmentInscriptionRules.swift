@@ -305,9 +305,12 @@ enum EquipmentInscriptionRules {
     static func expeditionReceipt(from base: BaseState,
                                   activatedOnTurn: Int = 0) -> SeamwardExpeditionReceiptV1? {
         let members: [PartyMember] = [.binder] + base.activeParty.map(PartyMember.member)
-        let contributors = members.flatMap { member in
-            [GearSlot.armor, .keepsake].compactMap { slot -> SeamwardExpeditionReceiptV1.Contributor? in
-                guard let profile = base.worn(slot, by: member)?.gearProfile,
+        let contributors = members.flatMap { member -> [SeamwardExpeditionReceiptV1.Contributor] in
+            guard case .projected(let loadout) =
+                    GearGameplayProjectionRulesV1.project(owner: member, in: base) else { return [] }
+            return [GearSlot.armor, .keepsake].compactMap { slot -> SeamwardExpeditionReceiptV1.Contributor? in
+                guard loadout.entries[slot]?.inscriptionDisposition == .activeSeamward,
+                      let profile = base.worn(slot, by: member)?.gearProfile,
                       let inscription = profile.inscription, inscription.isActiveSeamward else { return nil }
                 return .init(member: member, gearStableInstanceID: profile.stableInstanceID,
                              slot: slot, definitionID: inscription.definitionID,

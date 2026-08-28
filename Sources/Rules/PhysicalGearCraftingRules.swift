@@ -526,6 +526,12 @@ enum PhysicalGearCraftingRules {
                           unit: $0.element.sample)
                 }, resultingQualityBand: preview.qualityBand,
                 resultingConstructionTier: preview.outputTier)])
+        let toolCapability: GearToolCapabilityV1? = preview.recipe.id == fieldPick.id
+            ? .init(capabilityID: "extraction", rank: min(4, max(0, preview.outputTier)),
+                    authorityID: GearToolCapabilityV1.extractionAuthorityID,
+                    authorityVersion: 1)
+            : nil
+        output.gearProfile?.freezeGameplayFacts(toolCapability: toolCapability)
         let origin = preview.selections.map(\.sample.source).filter { !$0.isEmpty }
         output.gearProfile?.displayProvenance = origin.isEmpty
             ? preview.recipe.displayName
