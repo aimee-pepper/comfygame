@@ -157,7 +157,7 @@ struct WorldScreenPresentation: Equatable, Sendable {
     enum CarriedIdentity: Equatable, Sendable, Identifiable {
         case resource(ResourceID, amount: Int)
         case item(InstanceID, itemID: ItemID, identified: Bool, amount: Int)
-        case material(MaterialKind, unitIDs: [MaterialReserveUnitID])
+        case material(MaterialFamilyID, unitIDs: [CraftMaterialUnitID])
         case inspectedWorldPage(InstanceID, title: String)
         case uninspectedWorldPage(position: Int)
 
@@ -203,7 +203,9 @@ struct WorldScreenPresentation: Equatable, Sendable {
         carried += run.satchelItems.stacks.map {
             .item($0.id, itemID: $0.catalogID, identified: $0.identified, amount: $0.count)
         }
-        let materialGroups = Dictionary(grouping: run.materialReserve.units, by: { $0.sample.kind })
+        let materialGroups = Dictionary(
+            grouping: run.worldMaterialReserve.units + run.creatureMaterialReserve.units,
+            by: { $0.sample.kind })
         carried += materialGroups.keys.sorted { $0.rawValue < $1.rawValue }.map { kind in
             .material(kind, unitIDs: materialGroups[kind, default: []].map(\.id).sorted())
         }
@@ -1447,7 +1449,7 @@ struct WorldView: View {
             .accessibilityLabel("\(identified ? ContentCatalog.shared.item(itemID)?.name ?? itemID.rawValue : "Unknown item"), \(amount) carried")
         case .material(let kind, let unitIDs):
             HStack(spacing: 3) {
-                MaterialSamplePixelIdentity(kind: kind, fallbackColor: .secondary)
+                CraftMaterialUnitPixelIdentity(kind: kind, fallbackColor: .secondary)
                     .frame(width: 16, height: 16)
                 Text("\(unitIDs.count)")
             }

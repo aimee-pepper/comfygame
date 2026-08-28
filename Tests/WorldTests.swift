@@ -3330,11 +3330,11 @@ final class WorldTests: XCTestCase {
         state.base.roster.append(traveller)
         state.base.activeParty.append(.traveller("halloway"))
         state.worlds.activeRun?.companionHP[.traveller("halloway")] = 9
-        state.worlds.activeRun?.materialReserve = MaterialReserve(units: [
-            MaterialReserveUnit(
+        state.worlds.activeRun?.creatureMaterialReserve = CreatureMaterialReserve(units: [
+            CraftMaterialHoldingV1(
                 id: .init(rawValue: "b18b-hide"),
-                sample: MaterialSample(kind: .hide, properties: .init(), grade: 22,
-                                       source: "Moss Hart")),
+                sample: CraftMaterialUnitV1(kind: .hide, properties: .init(), grade: 22,
+                                            source: "Moss Hart")),
         ])
         let page = try XCTUnwrap(WorldPageCatalog.definition("wild_moss_and_mist"))
         state.worlds.activeRun?.carriedWorldPages = [
