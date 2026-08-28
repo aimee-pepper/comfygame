@@ -204,8 +204,7 @@ enum ArmouryRules {
         var candidate = state
         var rebuilt = current.gearProfile!
         rebuilt.constructionTier = preview.outputTier
-        rebuilt.qualityBand = CraftMaterialQualityBand(rawValue: preview.outputTier)
-            ?? rebuilt.qualityBand
+        rebuilt.qualityBand = preview.qualityBand
         rebuilt.reforgeRank = 0
         rebuilt.legacyPowerCredit = 0
         rebuilt.specialistProfile = preview.profile.id

@@ -46,6 +46,34 @@ final class ArmouryTests: XCTestCase {
         XCTAssertTrue(try XCTUnwrap(ArmouryRules.preview(ArmouryRules.rigid, target: lowTarget, in: low)).isBelowSpecialistHeadline)
     }
 
+    func testRebuildFreezesQualityAboveConstructionTierCapThroughRelaunchAndReceipt() throws {
+        var state = try preparedState(tier: 1, grade: 100)
+        let target = try XCTUnwrap(ArmouryRules.targets(in: state).first)
+        let preview = try XCTUnwrap(ArmouryRules.preview(ArmouryRules.rigid,
+                                                        target: target, in: state))
+        XCTAssertEqual(preview.qualityBand, .peerless)
+        XCTAssertEqual(preview.outputTier, 3)
+        XCTAssertTrue(ArmouryRules.rebuild(preview, in: &state))
+        let rebuilt = try XCTUnwrap(state.base.inventory.stacks.first { $0.id.rawValue == 700 })
+        XCTAssertEqual(rebuilt.gearProfile?.qualityBand, .peerless)
+        XCTAssertEqual(rebuilt.gearProfile?.constructionTier, 3)
+        XCTAssertEqual(rebuilt.gearProfile?.physicalReceipt?.revisions.last?.resultingQualityBand,
+                       .peerless)
+        XCTAssertEqual(rebuilt.gearProfile?.physicalReceipt?.revisions.last?.resultingConstructionTier,
+                       3)
+        let decoded = try SaveCodec.makeDecoder().decode(
+            GameState.self, from: SaveCodec.makeEncoder().encode(state))
+        let relaunched = try XCTUnwrap(decoded.base.inventory.stacks.first { $0.id.rawValue == 700 })
+        XCTAssertEqual(relaunched.gearProfile, rebuilt.gearProfile)
+        XCTAssertEqual(relaunched.gearProfile?.physicalReceipt?.flattenedUnits,
+                       rebuilt.gearProfile?.physicalReceipt?.flattenedUnits)
+        let recycler = try XCTUnwrap(RecyclerRules.preview(
+            location: .stored, stackID: relaunched.id, serviceTier: 1, in: decoded.base))
+        XCTAssertEqual(recycler.route, .constructionReceipt)
+        XCTAssertEqual(recycler.returnedSamples,
+                       Array(rebuilt.gearProfile!.physicalReceipt!.flattenedUnits.prefix(1)))
+    }
+
     func testProfileOffsetsAveragesReceiptAndDisplayIdentitySurviveRebuild() throws {
         var state = try preparedState()
         let index = try XCTUnwrap(state.base.inventory.stacks.firstIndex { $0.id.rawValue == 700 })

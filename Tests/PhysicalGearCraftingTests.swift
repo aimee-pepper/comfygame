@@ -50,6 +50,81 @@ final class PhysicalGearCraftingTests: XCTestCase {
         return state
     }
 
+    private func forgedEngineFixture(
+        receiptUnits: ([CraftMaterialUnitV1]) -> [CraftMaterialUnitV1]
+    ) throws -> (GameState, PhysicalGearCommitEnvelopeV1, ItemStack) {
+        var state = GameState.newGame()
+        state.base.addEssenceCrystals(20)
+        let units = [
+            sample(.timber, grade: 50, source: "selected limb")
+                .withStableID(.init(rawValue: "engine-selected-a")),
+            sample(.fibre, grade: 50, source: "selected string")
+                .withStableID(.init(rawValue: "engine-selected-b"))
+        ]
+        units.forEach { state.base.worldMaterialReserve.add(.init(unit: $0, protectedReturn: false)) }
+        let selections = units.map { CraftMaterialSelection(unitID: $0.stableUnitID, unit: $0) }
+        let outputID: InstanceID
+        guard case .success(let next) = PhysicalGearIdentityAuthority.nextID(in: state) else {
+            throw CocoaError(.coderInvalidValue)
+        }
+        outputID = next
+        let recorded = receiptUnits(units)
+        let receipt = PhysicalGearReceiptV1(gearInstanceID: outputID, revisions: [
+            .init(ordinal: 0,
+                  authority: .construction(stationID: Stations.bowyer,
+                                           schematicID: "forged-fixture", rulesVersion: 1),
+                  components: recorded.enumerated().map {
+                      .init(ordinal: $0.offset,
+                            role: .authoredSocket($0.offset == 0 ? "limb" : "string"),
+                            unit: $0.element)
+                  }, resultingQualityBand: .standard, resultingConstructionTier: 1)
+        ])
+        var output = ItemStack(id: outputID, catalogID: "blade_chipped")
+        output.gearProfile?.qualityBand = .standard
+        output.gearProfile?.constructionTier = 1
+        output.gearProfile?.physicalReceipt = receipt
+        output.gearProfile?.foundReceipt = nil
+        output.gearProfile?.inscription = nil
+        let destination: PhysicalGearConstructionDestinationV1 = state.base.inventory.isFull
+            ? .waiting : .storehouse
+        var quote = PhysicalGearCommitEnvelopeV1(
+            authorityID: "test.physical-engine", authorityRulesVersion: 1,
+            operation: .construct(expectedInstanceID: outputID,
+                                  expectedDestination: destination),
+            selectedComponents: selections, physicalEssenceCrystalDebit: 10,
+            expectedReceipt: receipt, stationPayloadSHA256: String(repeating: "a", count: 64),
+            quoteSHA256: "")
+        quote.quoteSHA256 = try XCTUnwrap(quote.canonicalQuoteSHA256())
+        return (state, quote, output)
+    }
+
+    func testReceiptEngineRejectsForgedConstructionUnitsOrderAndProvenanceByteAtomically() throws {
+        let transforms: [([CraftMaterialUnitV1]) -> [CraftMaterialUnitV1]] = [
+            { units in
+                units.enumerated().map {
+                    $0.element.withStableID(.init(rawValue: "fabricated-\($0.offset)"))
+                }
+            },
+            { Array($0.reversed()) },
+            { units in
+                var changed = units
+                changed[1].sourceReceipt = .legacy(originalKind: .fibre,
+                                                   frozenSource: "fabricated provenance",
+                                                   qualifier: nil,
+                                                   migrationLocation: "forged-fixture",
+                                                   originalIdentity: nil)
+                return changed
+            }
+        ]
+        for transform in transforms {
+            var (state, quote, output) = try forgedEngineFixture(receiptUnits: transform)
+            let before = try SaveCodec.makeEncoder().encode(state)
+            XCTAssertEqual(PhysicalGearReceiptEngineV1.commitConstruction(
+                quote, rederived: quote, output: output, in: &state), .refused(.invalidReceipt))
+            XCTAssertEqual(try SaveCodec.makeEncoder().encode(state), before)
+        }
+    }
+
     func testPointedBladeDefaultsToWeakestQualifyingDistinctSamples() throws {
         let preview = try XCTUnwrap(PhysicalGearCraftingRules.preview(
             PhysicalGearCraftingRules.pointedBlade, in: readyState()))

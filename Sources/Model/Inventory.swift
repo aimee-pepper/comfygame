@@ -325,6 +325,15 @@ enum PhysicalGearReceiptEngineV1 {
               quote.expectedReceipt.validates(profile: profile) else {
             return .refused(.invalidReceipt)
         }
+        guard quote.expectedReceipt.revisions.count == 1,
+              let construction = quote.expectedReceipt.revisions.first,
+              case .construction = construction.authority,
+              construction.components.count == quote.selectedComponents.count,
+              zip(construction.components, quote.selectedComponents).allSatisfy({ component, selection in
+                  component.unit == selection.unit && component.unit.stableUnitID == selection.unitID
+              }) else {
+            return .refused(.invalidReceipt)
+        }
         guard case .success(let currentID) = PhysicalGearIdentityAuthority.nextID(in: state),
               currentID == expectedID else { return .refused(.identityExhausted) }
         let currentDestination: PhysicalGearConstructionDestinationV1 = state.base.inventory.isFull
