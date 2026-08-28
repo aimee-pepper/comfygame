@@ -773,6 +773,55 @@ final class SaveSlotTests: XCTestCase {
             path: "bookbinder-save.json.recovery-original-\(primaryFingerprint.sha256)")), corrupt)
     }
 
+    func testRecoveryAcceptsSchemaSeventeenStoredAndWornGearThenProjectionMigrates() async throws {
+        let root = directory()
+        defer { try? FileManager.default.removeItem(at: root) }
+        try FileManager.default.createDirectory(at: root, withIntermediateDirectories: true)
+        let corrupt = Data("broken schema-17 primary".utf8)
+        var state = GameState.newGame()
+        XCTAssertTrue(state.base.inventory.add(ItemStack(
+            id: .init(rawValue: 88_101), catalogID: "guard_padded")))
+        state.base.binderEquipped[.weapon] = EquippedPiece(ItemStack(
+            id: .init(rawValue: 88_102), catalogID: "blade_keen"))
+        var payload = try XCTUnwrap(JSONSerialization.jsonObject(
+            with: SaveCodec.encode(state)) as? [String: Any])
+        func schemaSeventeen(_ value: Any) -> Any {
+            if let array = value as? [Any] { return array.map(schemaSeventeen) }
+            guard var object = value as? [String: Any] else { return value }
+            if (object["version"] as? NSNumber)?.intValue == 4,
+               object["stableInstanceID"] != nil, object["slot"] != nil {
+                object["version"] = 3
+                object.removeValue(forKey: "gameplayFacts")
+            }
+            for (key, child) in object { object[key] = schemaSeventeen(child) }
+            return object
+        }
+        payload = schemaSeventeen(payload) as! [String: Any]
+        payload["schemaVersion"] = 17
+        let backup = try JSONSerialization.data(withJSONObject: payload, options: [.sortedKeys])
+        let primaryURL = root.appending(path: "bookbinder-save.json")
+        let backupURL = root.appending(path: "bookbinder-save.json.backup")
+        try corrupt.write(to: primaryURL)
+        try backup.write(to: backupURL)
+        let io = SaveSlotFileIO(directory: root)
+
+        let assessed = await io.assessRawRecovery()
+        let assessment = try XCTUnwrap(assessed)
+        guard case .recoverableRawBackup = assessment.classification else {
+            return XCTFail("expected schema-17 backup to be recoverable")
+        }
+        XCTAssertEqual(try Data(contentsOf: primaryURL), corrupt)
+        XCTAssertEqual(try Data(contentsOf: backupURL), backup)
+        _ = try await io.recoverRawBackup(assessment)
+        XCTAssertEqual(try Data(contentsOf: primaryURL), backup)
+        XCTAssertEqual(try Data(contentsOf: backupURL), backup)
+
+        let migrated = try XCTUnwrap(SaveFileIO(directory: root).load().state)
+        XCTAssertEqual(migrated.schemaVersion, 18)
+        XCTAssertEqual(migrated.base.inventory.stacks.first?.gearProfile?.version, 4)
+        XCTAssertEqual(migrated.base.binderEquipped[.weapon]?.gearProfile?.version, 4)
+    }
+
     func testMissingPrimaryAndFutureBackupClassifiesFutureWithoutMutation() async throws {
         let root = directory()
         defer { try? FileManager.default.removeItem(at: root) }
