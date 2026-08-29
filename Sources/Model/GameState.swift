@@ -215,6 +215,28 @@ enum EncounterSnapshotRulesV1 {
         }
         guard primaryActors.count == closedActors.count,
               Set(primaryActors) == closedActors else { return false }
+        var apexActionSlots: [InstanceID: Int] = [:]
+        var ordinaryPressureSlots = 0
+        if let preview = encounter.scalingPreview {
+            guard (1...3).contains(preview.apexActionSlots) else { return false }
+            let apexFoes = encounter.foes.filter(\.isApex)
+            if apexFoes.isEmpty {
+                if preview.scalingRulesVersion == EncounterScalingRules.additivePartyPowerRulesVersion {
+                    guard let frozen = preview.wholePressureSlots, (0...2).contains(frozen) else {
+                        return false
+                    }
+                    ordinaryPressureSlots = frozen
+                }
+            } else {
+                guard (preview.wholePressureSlots ?? 0) == 0 else { return false }
+                apexActionSlots = Dictionary(uniqueKeysWithValues:
+                    apexFoes.map { ($0.id, preview.apexActionSlots) })
+            }
+        }
+        let expectedSlots = CombatRules.turnSlots(order: encounter.order, foes: encounter.foes,
+                                                   apexActionSlots: apexActionSlots,
+                                                   ordinaryPressureSlots: ordinaryPressureSlots)
+        guard encounter.turnSlots == expectedSlots else { return false }
 
         let expectedNames = state.base.activeParty.reduce(into: [PersistentPartyMemberID: String]()) {
             if let animal = state.base.animalCompanion(for: $1) {

@@ -21,6 +21,30 @@ final class PersistenceTests: XCTestCase {
         return state
     }
 
+    private func currentApexEncounterState() throws -> GameState {
+        var state = GameState.newGame()
+        let generatedID = PersistentPartyMemberID.generated("apex-raw-helper")
+        var generated = CompanionState(); generated.persistentID = generatedID
+        generated.name = "Aster"
+        state.base.roster.append(generated); state.base.activeParty.append(generatedID)
+        let point = GridPoint(x: 0, y: 0)
+        var run = WorldRun(runIndex: 92, book: .init(written: [], essencePaid: 0),
+                           mapSeed: 92_001, rng: .init(seed: 92_001),
+                           map: .init(width: 1, height: 1,
+                                      tiles: [Tile(isRevealed: true)], entry: point),
+                           playerPosition: point)
+        let enemy = WorldEnemy(id: .init(rawValue: 92_001), creatureID: "paper_moth",
+                               position: point, isApex: true)
+        run.enemies = [enemy]; state.worlds.activeRun = run
+        guard case .started = WorldRules.beginEncounter(triggerID: enemy.id, expected: enemy,
+            runsAutomaticTurns: false, in: &state),
+              let encounter = state.worlds.activeRun?.activeEncounter,
+              encounter.scalingPreview?.apexActionSlots == 2 else {
+            throw CocoaError(.coderInvalidValue)
+        }
+        return state
+    }
+
     private func mutatingActiveEncounter(
         in data: Data, _ mutation: (inout [String: Any]) -> Void
     ) throws -> Data {
@@ -50,6 +74,43 @@ final class PersistenceTests: XCTestCase {
             XCTAssertThrowsError(try Migrations.migrateIfNeeded(bytes), name)
             XCTAssertEqual(bytes, original, name)
         }
+    }
+
+    func testCurrentEncounterTurnSlotAuthorityRawRejectionIsBytePreserving() throws {
+        let valid = try currentApexEncounterState()
+        XCTAssertTrue(EncounterSnapshotRulesV1.validatesAll(in: valid))
+        XCTAssertNoThrow(try Migrations.migrateIfNeeded(SaveCodec.encode(valid)))
+        let apexID = try XCTUnwrap(valid.worlds.activeRun?.activeEncounter?.foes.first?.id)
+        let mutations: [(String, (inout EncounterState) -> Void)] = [
+            ("missing follow-up", { $0.turnSlots.removeAll { $0.kind != .primary } }),
+            ("party follow-up", { $0.turnSlots.append(.init(actor: .binder,
+                kind: .apexFollowUp(2), strengthMultiplier: 0.60, suppressesAfflictions: true)) }),
+            ("wrong apex identity", { $0.turnSlots[$0.turnSlots.count - 1].actor =
+                .foe(.init(rawValue: 999_992)) }),
+            ("wrong ordinal", { $0.turnSlots[$0.turnSlots.count - 1].kind = .apexFollowUp(3) }),
+            ("wrong multiplier", { $0.turnSlots[$0.turnSlots.count - 1].strengthMultiplier = 99 }),
+            ("wrong suppression", { $0.turnSlots[$0.turnSlots.count - 1].suppressesAfflictions = false }),
+            ("duplicate follow-up", { $0.turnSlots.append(.init(actor: .foe(apexID),
+                kind: .apexFollowUp(2), strengthMultiplier: 0.60, suppressesAfflictions: true)) })
+        ]
+        for (name, mutation) in mutations {
+            var invalid = valid
+            var encounter = try XCTUnwrap(invalid.worlds.activeRun?.activeEncounter)
+            mutation(&encounter)
+            invalid.worlds.activeRun?.activeEncounter = encounter
+            let bytes = try SaveCodec.encode(invalid)
+            let original = bytes
+            XCTAssertThrowsError(try Migrations.migrateIfNeeded(bytes), name)
+            XCTAssertEqual(bytes, original, name)
+        }
+
+        var ordinary = try currentEncounterState()
+        let ordinaryID = try XCTUnwrap(ordinary.worlds.activeRun?.activeEncounter?.foes.first?.id)
+        ordinary.worlds.activeRun?.activeEncounter?.turnSlots.append(.init(
+            actor: .foe(ordinaryID), kind: .apexFollowUp(2),
+            strengthMultiplier: 0.60, suppressesAfflictions: true))
+        let ordinaryBytes = try SaveCodec.encode(ordinary)
+        XCTAssertThrowsError(try Migrations.migrateIfNeeded(ordinaryBytes))
     }
 
     @MainActor

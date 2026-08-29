@@ -120,33 +120,8 @@ enum CombatRules {
             }
             .map(\.0.actor)
 
-        var slots = order.map { EncounterState.TurnSlot(actor: $0) }
-        for (foeID, count) in apexActionSlots.sorted(by: { $0.key.rawValue < $1.key.rawValue }) where count > 1 {
-            guard var previous = slots.firstIndex(where: { $0.actor == .foe(foeID) }) else { continue }
-            for ordinal in 2...min(3, count) {
-                // Place each lighter action after another actor whenever the remaining initiative
-                // order permits it. Re-resolve from the last insertion: using the original primary
-                // index for every insertion can accidentally bunch slots 2 and 3 together.
-                let intervening = slots.indices.first { $0 > previous && slots[$0].actor != .foe(foeID) }
-                let index = intervening.map { $0 + 1 } ?? slots.endIndex
-                slots.insert(.init(actor: .foe(foeID), kind: .apexFollowUp(ordinal),
-                                   strengthMultiplier: 0.60, suppressesAfflictions: true), at: index)
-                previous = index
-            }
-        }
-        let ordinaryFoeOrder = order.compactMap(\.foeID).filter { foeID in
-            foes.contains { $0.id == foeID && !$0.isApex }
-        }
-        if !ordinaryFoeOrder.isEmpty, ordinaryPressureSlots > 0 {
-            for ordinal in 1...ordinaryPressureSlots {
-                let foeID = ordinaryFoeOrder[(ordinal - 1) % ordinaryFoeOrder.count]
-                let previous = slots.lastIndex(where: { $0.actor == .foe(foeID) }) ?? 0
-                let intervening = slots.indices.first { $0 > previous && slots[$0].actor != .foe(foeID) }
-                let index = intervening.map { $0 + 1 } ?? slots.endIndex
-                slots.insert(.init(actor: .foe(foeID), kind: .ordinaryPressureFollowUp(ordinal),
-                                   strengthMultiplier: 0.55, suppressesAfflictions: true), at: index)
-            }
-        }
+        let slots = turnSlots(order: order, foes: foes, apexActionSlots: apexActionSlots,
+                              ordinaryPressureSlots: ordinaryPressureSlots)
         var opening = [foes.count == 1 ? "A \(foes[0].stats.displayName) notices you."
                                        : "They close in around you."]
         if let relentless = apexActionSlots.values.max(), relentless > 1 {
@@ -199,6 +174,41 @@ enum CombatRules {
             })
         }
         return result
+    }
+
+    /// Exact schedule constructor shared by encounter creation and current-save validation.
+    /// Counts come from the encounter's frozen scaling receipt, never mutable tuning.
+    static func turnSlots(order: [Combatant], foes: [FoeState],
+                          apexActionSlots: [InstanceID: Int],
+                          ordinaryPressureSlots: Int) -> [EncounterState.TurnSlot] {
+        var slots = order.map { EncounterState.TurnSlot(actor: $0) }
+        for (foeID, count) in apexActionSlots.sorted(by: { $0.key.rawValue < $1.key.rawValue }) where count > 1 {
+            guard var previous = slots.firstIndex(where: { $0.actor == .foe(foeID) }) else { continue }
+            for ordinal in 2...min(3, count) {
+                // Place each lighter action after another actor whenever the remaining initiative
+                // order permits it. Re-resolve from the last insertion: using the original primary
+                // index for every insertion can accidentally bunch slots 2 and 3 together.
+                let intervening = slots.indices.first { $0 > previous && slots[$0].actor != .foe(foeID) }
+                let index = intervening.map { $0 + 1 } ?? slots.endIndex
+                slots.insert(.init(actor: .foe(foeID), kind: .apexFollowUp(ordinal),
+                                   strengthMultiplier: 0.60, suppressesAfflictions: true), at: index)
+                previous = index
+            }
+        }
+        let ordinaryFoeOrder = order.compactMap(\.foeID).filter { foeID in
+            foes.contains { $0.id == foeID && !$0.isApex }
+        }
+        if !ordinaryFoeOrder.isEmpty, ordinaryPressureSlots > 0 {
+            for ordinal in 1...ordinaryPressureSlots {
+                let foeID = ordinaryFoeOrder[(ordinal - 1) % ordinaryFoeOrder.count]
+                let previous = slots.lastIndex(where: { $0.actor == .foe(foeID) }) ?? 0
+                let intervening = slots.indices.first { $0 > previous && slots[$0].actor != .foe(foeID) }
+                let index = intervening.map { $0 + 1 } ?? slots.endIndex
+                slots.insert(.init(actor: .foe(foeID), kind: .ordinaryPressureFollowUp(ordinal),
+                                   strengthMultiplier: 0.55, suppressesAfflictions: true), at: index)
+            }
+        }
+        return slots
     }
 
     // MARK: Party numbers

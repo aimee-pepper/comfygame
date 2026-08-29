@@ -4803,6 +4803,48 @@ final class WorldTests: XCTestCase {
         XCTAssertEqual(repeated, reloaded)
     }
 
+    func testEncounterFrozenApexTurnSlotsRoundTripAndExecuteIdentically() throws {
+        var state = startedRun(book(["terrain": "plains"]), seed: 81_020)
+        let generatedID = PersistentPartyMemberID.generated("apex-world-helper")
+        var generated = CompanionState(); generated.persistentID = generatedID
+        generated.name = "Aster"
+        state.base.roster.append(generated); state.base.activeParty.append(generatedID)
+        var run = try XCTUnwrap(state.worlds.activeRun)
+        let apex = WorldEnemy(id: .init(rawValue: 81_020), creatureID: "paper_moth",
+                              position: run.playerPosition, isApex: true)
+        run.enemies = [apex]; state.worlds.activeRun = run
+        guard case .started = WorldRules.beginEncounter(triggerID: apex.id, expected: apex,
+            runsAutomaticTurns: false, in: &state),
+              var encounter = state.worlds.activeRun?.activeEncounter,
+              encounter.scalingPreview?.apexActionSlots == 2 else {
+            return XCTFail("missing apex snapshot")
+        }
+        encounter.turnIndex = try XCTUnwrap(encounter.turnSlots.firstIndex {
+            $0.kind == .apexFollowUp(2)
+        })
+        state.worlds.activeRun?.activeEncounter = encounter
+        XCTAssertTrue(EncounterSnapshotRulesV1.validatesAll(in: state))
+
+        let reloaded = try SaveCodec.decode(SaveCodec.encode(state))
+        XCTAssertEqual(reloaded.worlds.activeRun?.activeEncounter, encounter)
+        var direct = state
+        var resumed = reloaded
+        CombatRules.runAutomaticTurns(in: &direct)
+        CombatRules.runAutomaticTurns(in: &resumed)
+        XCTAssertEqual(direct.worlds.activeRun, resumed.worlds.activeRun)
+
+        var ordinary = startedRun(book(["terrain": "plains"]), seed: 81_021)
+        var ordinaryRun = try XCTUnwrap(ordinary.worlds.activeRun)
+        let body = WorldEnemy(id: .init(rawValue: 81_021), creatureID: "paper_moth",
+                              position: ordinaryRun.playerPosition)
+        ordinaryRun.enemies = [body]; ordinary.worlds.activeRun = ordinaryRun
+        guard case .started = WorldRules.beginEncounter(triggerID: body.id, expected: body,
+            runsAutomaticTurns: false, in: &ordinary) else { return XCTFail("ordinary start") }
+        XCTAssertTrue(EncounterSnapshotRulesV1.validatesAll(in: ordinary))
+        XCTAssertTrue(ordinary.worlds.activeRun?.activeEncounter?.turnSlots
+            .allSatisfy { $0.kind == .primary } == true)
+    }
+
     func testRealStepUsesThePresentationBeforeMovementAndReveal() throws {
         var state = startedRun(book(["terrain": "plains"]), seed: 8_105)
         var run = try XCTUnwrap(state.worlds.activeRun)

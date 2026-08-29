@@ -20,6 +20,30 @@ final class SaveSlotTests: XCTestCase {
         return state
     }
 
+    private func currentApexEncounterState() throws -> GameState {
+        var state = GameState.newGame()
+        let generatedID = PersistentPartyMemberID.generated("apex-slot-helper")
+        var generated = CompanionState(); generated.persistentID = generatedID
+        generated.name = "Aster"
+        state.base.roster.append(generated); state.base.activeParty.append(generatedID)
+        let point = GridPoint(x: 0, y: 0)
+        var run = WorldRun(runIndex: 92, book: .init(written: [], essencePaid: 0),
+                           mapSeed: 92_101, rng: .init(seed: 92_101),
+                           map: .init(width: 1, height: 1,
+                                      tiles: [Tile(isRevealed: true)], entry: point),
+                           playerPosition: point)
+        let enemy = WorldEnemy(id: .init(rawValue: 92_101), creatureID: "paper_moth",
+                               position: point, isApex: true)
+        run.enemies = [enemy]; state.worlds.activeRun = run
+        guard case .started = WorldRules.beginEncounter(triggerID: enemy.id, expected: enemy,
+            runsAutomaticTurns: false, in: &state),
+              let encounter = state.worlds.activeRun?.activeEncounter,
+              encounter.scalingPreview?.apexActionSlots == 2 else {
+            throw CocoaError(.coderInvalidValue)
+        }
+        return state
+    }
+
     private func mutatingActiveEncounter(
         in data: Data, _ mutation: (inout [String: Any]) -> Void
     ) throws -> Data {
@@ -55,6 +79,59 @@ final class SaveSlotTests: XCTestCase {
             catch { }
             XCTAssertEqual(try Data(contentsOf: url), bytes, name)
         }
+    }
+
+    func testCurrentEncounterTurnSlotAuthorityPreservesRealEnvelope() async throws {
+        let root = directory(); defer { try? FileManager.default.removeItem(at: root) }
+        let slots = SaveSlotFileIO(directory: root)
+        let validState = try currentApexEncounterState()
+        let created = try await slots.create(name: "Apex slot authority", state: validState)
+        let url = try await slots.exportURL(for: created.metadata.id)
+        let validEnvelope = try SaveCodec.makeDecoder().decode(
+            SaveSlotEnvelope.self, from: Data(contentsOf: url))
+        let apexID = try XCTUnwrap(validState.worlds.activeRun?.activeEncounter?.foes.first?.id)
+        let mutations: [(String, (inout EncounterState) -> Void)] = [
+            ("missing", { $0.turnSlots.removeAll { $0.kind != .primary } }),
+            ("party", { $0.turnSlots.append(.init(actor: .binder, kind: .apexFollowUp(2),
+                strengthMultiplier: 0.60, suppressesAfflictions: true)) }),
+            ("wrong apex", { $0.turnSlots[$0.turnSlots.count - 1].actor =
+                .foe(.init(rawValue: 999_993)) }),
+            ("ordinal", { $0.turnSlots[$0.turnSlots.count - 1].kind = .apexFollowUp(1) }),
+            ("multiplier", { $0.turnSlots[$0.turnSlots.count - 1].strengthMultiplier = -100 }),
+            ("suppression", { $0.turnSlots[$0.turnSlots.count - 1].suppressesAfflictions = false }),
+            ("duplicate", { $0.turnSlots.append(.init(actor: .foe(apexID),
+                kind: .apexFollowUp(2), strengthMultiplier: 0.60, suppressesAfflictions: true)) })
+        ]
+        for (name, mutation) in mutations {
+            var invalid = validState
+            var encounter = try XCTUnwrap(invalid.worlds.activeRun?.activeEncounter)
+            mutation(&encounter); invalid.worlds.activeRun?.activeEncounter = encounter
+            var envelope = validEnvelope
+            envelope.payload = try SaveCodec.encode(invalid)
+            let bytes = try encoder().encode(envelope)
+            try bytes.write(to: url, options: .atomic)
+            do { _ = try await slots.load(created.metadata.id); XCTFail("accepted \(name)") }
+            catch { }
+            XCTAssertEqual(try Data(contentsOf: url), bytes, name)
+        }
+
+        var ordinary = try currentEncounterState()
+        let ordinaryID = try XCTUnwrap(ordinary.worlds.activeRun?.activeEncounter?.foes.first?.id)
+        ordinary.worlds.activeRun?.activeEncounter?.turnSlots.append(.init(
+            actor: .foe(ordinaryID), kind: .apexFollowUp(2),
+            strengthMultiplier: 0.60, suppressesAfflictions: true))
+        var ordinaryEnvelope = validEnvelope
+        ordinaryEnvelope.payload = try SaveCodec.encode(ordinary)
+        let ordinaryBytes = try encoder().encode(ordinaryEnvelope)
+        try ordinaryBytes.write(to: url, options: .atomic)
+        do { _ = try await slots.load(created.metadata.id); XCTFail("accepted ordinary foe follow-up") }
+        catch { }
+        XCTAssertEqual(try Data(contentsOf: url), ordinaryBytes)
+
+        try (try encoder().encode(validEnvelope)).write(to: url, options: .atomic)
+        let reloaded = try await slots.load(created.metadata.id).state
+        XCTAssertEqual(reloaded.worlds.activeRun?.activeEncounter,
+                       validState.worlds.activeRun?.activeEncounter)
     }
 
     @MainActor
