@@ -784,6 +784,17 @@ extension GameStore {
                 consuming: stack.id)
             return
         }
+        // Scent Mask retains its established standalone field action and WorldRules ownership.
+        // It is intentionally not part of the consolidated ordinary-consumable quote.
+        if ContentCatalog.shared.item(stack.catalogID)?.consumable?.effect == .maskScent {
+            guard let attempt = beginWorldFieldAttempt(.useItem) else { return }
+            var events: [WorldRules.Event] = []
+            mutate("use \(stack.catalogID.rawValue)", flush: true, scope: .expedition) { state in
+                events = WorldRules.useItem(stack.id, on: member, in: &state)
+            }
+            finishTurn(events, attempt: attempt)
+            return
+        }
         guard case .success(let quote) = worldFieldItemUseEvaluation(stack, on: member) else {
             return
         }

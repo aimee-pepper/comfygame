@@ -464,6 +464,31 @@ final class ConsumableCraftingTests: XCTestCase {
         }
     }
 
+    func testScentMaskLiveGameStoreDispatchConsumesOnceAdvancesOneTurnAndRelaunches() throws {
+        let io = SaveFileIO.temporary(name: "scent-mask-dispatch-\(UUID().uuidString)")
+        defer { io.deleteEverything() }
+        let store = GameStore(io: io)
+        let state = fieldState(item: Items.scentMask)
+        store.mutate("stage scent mask", flush: true) { $0 = state }
+        let mask = try XCTUnwrap(store.activeRun?.satchelItems.stacks.first)
+        let turn = try XCTUnwrap(store.activeRun?.turnsTaken)
+        let writes = store.diagnostics.writeCount
+
+        store.useItemInWorld(mask, on: .binder)
+
+        XCTAssertNil(store.activeRun?.satchelItems.stacks.first { $0.id == mask.id })
+        XCTAssertEqual(store.activeRun?.turnsTaken, turn + 1)
+        XCTAssertEqual(store.activeRun?.scentMask?.sourceItemInstanceID, mask.id)
+        XCTAssertEqual(store.diagnostics.writeCount, writes + 1)
+        let committed = store.state
+        let relaunched = try SaveCodec.decode(Data(contentsOf: store.diagnostics.saveURL))
+        XCTAssertEqual(relaunched.worlds.activeRun, committed.worlds.activeRun)
+        XCTAssertEqual(relaunched.meta.mutationCount, committed.meta.mutationCount)
+
+        XCTAssertEqual(relaunched.worlds.activeRun?.turnsTaken, turn + 1)
+        XCTAssertNil(relaunched.worlds.activeRun?.satchelItems.stacks.first { $0.id == mask.id })
+    }
+
     func testApothecaryHasNessaLifecycleAndExactBuildCost() throws {
         let station = try XCTUnwrap(ContentCatalog.shared.station(Stations.apothecary))
         XCTAssertFalse(station.unlockedAtStart)
