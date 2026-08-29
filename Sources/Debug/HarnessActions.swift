@@ -770,6 +770,11 @@ extension GameStore {
         guard store.bindAndDepart() else {
             throw WildWorldPagesPhoneFixtureError.couldNotBind
         }
+        if let arrivalID = store.state.worlds.pendingWorldArrivalReceiptID {
+            guard store.enterPendingWorld(arrivalReceiptID: arrivalID) else {
+                throw WildWorldPagesPhoneFixtureError.couldNotBind
+            }
+        }
         guard var run = store.activeRun else { throw WildWorldPagesPhoneFixtureError.missingRun }
         guard let page = run.offeredWorldPages.first,
               let position = page.fieldProvenance?.position else {
@@ -779,9 +784,17 @@ extension GameStore {
         run.map[position].isRevealed = true
         if fullSatchel {
             let slots = run.satchelItems.slots
+            let fixtureItems: [ItemID] = [
+                "salve_lesser", "salve", "salve_greater", "draught_clearing",
+                "draught_quenching", "antidote_broad", "stonebark_tonic", "lure",
+                "scent_mask", "seamlight", "stillwater", "torch", "farsight_draught"
+            ]
+            guard slots <= fixtureItems.count else {
+                throw WildWorldPagesPhoneFixtureError.missingRun
+            }
             run.satchelItems = Inventory(slots: slots, stacks: (0..<slots).map { index in
                 ItemStack(id: InstanceID(rawValue: 0x5749_4C44_534C_0000 + UInt64(index)),
-                          catalogID: "salve_lesser", count: 1, identified: index.isMultiple(of: 2))
+                          catalogID: fixtureItems[index], count: 1, identified: true)
             })
         }
         store.mutate("stand at loose World Page", flush: true) { state in

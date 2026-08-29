@@ -144,6 +144,76 @@ final class SaveSlotTests: XCTestCase {
         XCTAssertEqual(store.diagnostics.hasPendingWrite, diagnostics.hasPendingWrite)
     }
 
+    @MainActor
+    func testLooseWorldPageSwapRefusalAndCommitPreserveRealSlotAtomicity() async throws {
+        let root = directory(); defer { try? FileManager.default.removeItem(at: root) }
+        let slots = SaveSlotFileIO(directory: root)
+        let definition = try XCTUnwrap(WorldPageCatalog.definition("wild_storm_coast"))
+        let point = GridPoint(x: 1, y: 1)
+        let page = WorldPageInstance(
+            id: .init(rawValue: 702_101), definition: definition,
+            fieldProvenance: .init(originRunIndex: 702, originWorldSeed: 702_101,
+                                   generationSeed: 702_102, position: point))
+        let map = WorldMap(width: 3, height: 3,
+                           tiles: Array(repeating: Tile(isRevealed: true), count: 9), entry: point)
+        var run = WorldRun(runIndex: 702, book: .init(written: [], essencePaid: 0),
+                           mapSeed: 702_101, rng: .init(seed: 702_101), map: map,
+                           playerPosition: point)
+        run.offeredWorldPages = [page]
+        run.satchelItems.slots = 1
+        let carried = ItemStack(id: .init(rawValue: 702_103), catalogID: "salve", count: 2)
+        XCTAssertTrue(run.satchelItems.add(carried))
+        var state = GameState.newGame(); state.worlds.activeRun = run
+        let created = try await slots.create(name: "Loose page swap", state: state)
+        _ = try await slots.acquireWriterLease(for: created.metadata.id)
+        let store = GameStore(io: try await slots.payloadIOForLeasedSlot())
+        let url = try await slots.exportURL(for: created.metadata.id)
+        let quote = try XCTUnwrap(store.offeredWorldPageQuote(page.id))
+        let envelopeBefore = try Data(contentsOf: url)
+        let stateBefore = store.state
+        let diagnosticsBefore = store.diagnostics
+
+        XCTAssertEqual(store.swapOfferedWorldPage(
+            quote, discarding: .itemStack(.init(rawValue: 999_702))), .stale)
+        XCTAssertEqual(store.state, stateBefore)
+        XCTAssertEqual(try Data(contentsOf: url), envelopeBefore)
+        XCTAssertEqual(store.diagnostics.writeCount, diagnosticsBefore.writeCount)
+        XCTAssertEqual(store.diagnostics.savedMutationCount,
+                       diagnosticsBefore.savedMutationCount)
+        XCTAssertFalse(store.diagnostics.hasPendingWrite)
+
+        guard case .swapped(let taken, discarded: .itemStack(let removed)) =
+                store.swapOfferedWorldPage(quote, discarding: .itemStack(carried.id)) else {
+            return XCTFail("exact swap must commit")
+        }
+        XCTAssertEqual(taken, page)
+        XCTAssertEqual(removed, carried)
+        XCTAssertEqual(store.activeRun?.turnsTaken, run.turnsTaken)
+        XCTAssertEqual(store.activeRun?.rng, run.rng)
+        let committed = store.state
+        let loaded = try await slots.load(created.metadata.id).state
+        XCTAssertEqual(loaded.worlds.activeRun?.offeredWorldPages,
+                       committed.worlds.activeRun?.offeredWorldPages)
+        XCTAssertEqual(loaded.worlds.activeRun?.carriedWorldPages,
+                       committed.worlds.activeRun?.carriedWorldPages)
+        XCTAssertEqual(loaded.worlds.activeRun?.satchelItems,
+                       committed.worlds.activeRun?.satchelItems)
+        XCTAssertEqual(loaded.worlds.activeRun?.turnsTaken,
+                       committed.worlds.activeRun?.turnsTaken)
+        XCTAssertEqual(loaded.worlds.activeRun?.rng, committed.worlds.activeRun?.rng)
+        XCTAssertEqual(loaded.reality.encounteredLexemes,
+                       committed.reality.encounteredLexemes)
+
+        let envelopeAfter = try Data(contentsOf: url)
+        let diagnosticsAfter = store.diagnostics
+        XCTAssertEqual(store.swapOfferedWorldPage(
+            quote, discarding: .itemStack(carried.id)), .stale)
+        XCTAssertEqual(store.state, committed)
+        XCTAssertEqual(try Data(contentsOf: url), envelopeAfter)
+        XCTAssertEqual(store.diagnostics.writeCount, diagnosticsAfter.writeCount)
+        XCTAssertFalse(store.diagnostics.hasPendingWrite)
+    }
+
     private func currentEncounterState() throws -> GameState {
         var state = GameState.newGame()
         let point = GridPoint(x: 0, y: 0)

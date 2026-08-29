@@ -410,12 +410,13 @@ extension GameStore {
     func inspectOfferedWorldPage(_ quote: WildWorldPageFieldRules.Quote)
         -> WildWorldPageFieldRules.Result {
         var result: WildWorldPageFieldRules.Result = .stale
-        mutate("inspect loose World Page", flush: true, scope: .expedition) { state in
-            guard var run = state.worlds.activeRun else { return }
+        mutateIf("inspect loose World Page", flush: true, scope: .expedition) { state in
+            guard var run = state.worlds.activeRun else { return false }
             result = WildWorldPageFieldRules.inspect(quote, in: &run)
-            guard case .inspected(let page) = result else { return }
+            guard case .inspected(let page) = result else { return false }
             state.reality.recordEncounter(on: page.definition.page)
             state.worlds.activeRun = run
+            return true
         }
         return result
     }
@@ -424,11 +425,12 @@ extension GameStore {
     func takeOfferedWorldPage(_ quote: WildWorldPageFieldRules.Quote)
         -> WildWorldPageFieldRules.Result {
         var result: WildWorldPageFieldRules.Result = .stale
-        mutate("take loose World Page", flush: true, scope: .expedition) { state in
-            guard var run = state.worlds.activeRun else { return }
+        mutateIf("take loose World Page", flush: true, scope: .expedition) { state in
+            guard var run = state.worlds.activeRun else { return false }
             result = WildWorldPageFieldRules.take(quote, in: &run)
-            guard case .taken = result else { return }
+            guard case .taken = result else { return false }
             state.worlds.activeRun = run
+            return true
         }
         if case .taken = result { refreshWorldFieldContext() }
         return result
@@ -439,11 +441,12 @@ extension GameStore {
                               discarding occupant: WildWorldPageFieldRules.SlotOccupant)
         -> WildWorldPageFieldRules.Result {
         var result: WildWorldPageFieldRules.Result = .stale
-        mutate("swap loose World Page", flush: true, scope: .expedition) { state in
-            guard var run = state.worlds.activeRun else { return }
+        mutateIf("swap loose World Page", flush: true, scope: .expedition) { state in
+            guard var run = state.worlds.activeRun else { return false }
             result = WildWorldPageFieldRules.swap(quote, discarding: occupant, in: &run)
-            guard case .swapped = result else { return }
+            guard case .swapped = result else { return false }
             state.worlds.activeRun = run
+            return true
         }
         if case .swapped = result { refreshWorldFieldContext() }
         return result
