@@ -23,7 +23,11 @@ final class SaveSlotTests: XCTestCase {
     }
 
     private func activeAnimalState() throws -> GameState {
-        var state = GameState.newGame()
+        var state = currentRosterPlacementState()
+        var generatedMember = CompanionState()
+        generatedMember.name = "Generated person"
+        generatedMember.persistentID = .generated("slot-positive")
+        state.base.roster.append(generatedMember)
         let enemyID = InstanceID(rawValue: 92_501)
         let seed: UInt64 = 92_001
         let condition = RealityState.AnimalTrustConditionV1.usefulOffering(
@@ -52,6 +56,14 @@ final class SaveSlotTests: XCTestCase {
     }
 
     func testCurrentRosterPlacementCorruptionPreservesRealSlotEnvelopeBytes() async throws {
+        let rootDirectory = directory()
+        defer { try? FileManager.default.removeItem(at: rootDirectory) }
+        let slots = SaveSlotFileIO(directory: rootDirectory)
+        let created = try await slots.create(name: "Invalid roster matrix")
+        let url = try await slots.exportURL(for: created.metadata.id)
+        let validEnvelope = try SaveCodec.makeDecoder().decode(
+            SaveSlotEnvelope.self, from: Data(contentsOf: url))
+        let validPayload = try SaveCodec.encode(currentRosterPlacementState())
         let mutations: [(String, (inout [String: Any]) throws -> Void)] = [
             ("duplicate persistent ID", { root in
                 var base = try XCTUnwrap(root["base"] as? [String: Any])
@@ -85,18 +97,29 @@ final class SaveSlotTests: XCTestCase {
                 var realms = try XCTUnwrap(worlds["anchoredRealms"] as? [[String: Any]])
                 realms[0]["assignedCompanions"] = ["generated:not-halloway"]
                 worlds["anchoredRealms"] = realms; root["worlds"] = worlds
+            }),
+            ("authored traveller missing canonical traveller", { root in
+                var base = try XCTUnwrap(root["base"] as? [String: Any])
+                var roster = try XCTUnwrap(base["roster"] as? [[String: Any]])
+                roster[1].removeValue(forKey: "traveller")
+                base["roster"] = roster; root["base"] = base
+            }),
+            ("animal identity in human roster", { root in
+                var base = try XCTUnwrap(root["base"] as? [String: Any])
+                var roster = try XCTUnwrap(base["roster"] as? [[String: Any]])
+                roster[1]["persistentID"] = "animal:forged-human-owner"
+                roster[1].removeValue(forKey: "traveller")
+                base["roster"] = roster; root["base"] = base
+                var worlds = try XCTUnwrap(root["worlds"] as? [String: Any])
+                var realms = try XCTUnwrap(worlds["anchoredRealms"] as? [[String: Any]])
+                realms[0]["assignedCompanions"] = ["animal:forged-human-owner"]
+                worlds["anchoredRealms"] = realms; root["worlds"] = worlds
             })
         ]
         for (name, mutation) in mutations {
-            let rootDirectory = directory()
-            defer { try? FileManager.default.removeItem(at: rootDirectory) }
-            let slots = SaveSlotFileIO(directory: rootDirectory)
-            let created = try await slots.create(name: "Invalid roster \(name)")
-            let url = try await slots.exportURL(for: created.metadata.id)
-            var envelope = try SaveCodec.makeDecoder().decode(
-                SaveSlotEnvelope.self, from: Data(contentsOf: url))
+            var envelope = validEnvelope
             var payload = try XCTUnwrap(JSONSerialization.jsonObject(
-                with: SaveCodec.encode(currentRosterPlacementState())) as? [String: Any])
+                with: validPayload) as? [String: Any])
             try mutation(&payload)
             envelope.payload = try JSONSerialization.data(
                 withJSONObject: payload, options: [.sortedKeys])

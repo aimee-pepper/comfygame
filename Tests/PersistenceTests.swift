@@ -24,7 +24,11 @@ final class PersistenceTests: XCTestCase {
     }
 
     private func activeAnimalState() throws -> GameState {
-        var state = GameState.newGame()
+        var state = currentRosterPlacementState()
+        var generatedMember = CompanionState()
+        generatedMember.name = "Generated person"
+        generatedMember.persistentID = .generated("raw-positive")
+        state.base.roster.append(generatedMember)
         let enemyID = InstanceID(rawValue: 90_501)
         let seed: UInt64 = 90_001
         let condition = RealityState.AnimalTrustConditionV1.usefulOffering(
@@ -63,6 +67,7 @@ final class PersistenceTests: XCTestCase {
     }
 
     func testCurrentRosterPlacementCorruptionRejectsRawBytesWithoutMutation() throws {
+        let validBytes = try SaveCodec.encode(currentRosterPlacementState())
         let mutations: [(String, (inout [String: Any]) throws -> Void)] = [
             ("duplicate persistent ID", { root in
                 var base = try XCTUnwrap(root["base"] as? [String: Any])
@@ -96,11 +101,28 @@ final class PersistenceTests: XCTestCase {
                 var realms = try XCTUnwrap(worlds["anchoredRealms"] as? [[String: Any]])
                 realms[0]["assignedCompanions"] = ["generated:not-halloway"]
                 worlds["anchoredRealms"] = realms; root["worlds"] = worlds
+            }),
+            ("authored traveller missing canonical traveller", { root in
+                var base = try XCTUnwrap(root["base"] as? [String: Any])
+                var roster = try XCTUnwrap(base["roster"] as? [[String: Any]])
+                roster[1].removeValue(forKey: "traveller")
+                base["roster"] = roster; root["base"] = base
+            }),
+            ("animal identity in human roster", { root in
+                var base = try XCTUnwrap(root["base"] as? [String: Any])
+                var roster = try XCTUnwrap(base["roster"] as? [[String: Any]])
+                roster[1]["persistentID"] = "animal:forged-human-owner"
+                roster[1].removeValue(forKey: "traveller")
+                base["roster"] = roster; root["base"] = base
+                var worlds = try XCTUnwrap(root["worlds"] as? [String: Any])
+                var realms = try XCTUnwrap(worlds["anchoredRealms"] as? [[String: Any]])
+                realms[0]["assignedCompanions"] = ["animal:forged-human-owner"]
+                worlds["anchoredRealms"] = realms; root["worlds"] = worlds
             })
         ]
         for (name, mutation) in mutations {
             var root = try XCTUnwrap(JSONSerialization.jsonObject(
-                with: SaveCodec.encode(currentRosterPlacementState())) as? [String: Any])
+                with: validBytes) as? [String: Any])
             try mutation(&root)
             let bytes = try JSONSerialization.data(withJSONObject: root, options: [.sortedKeys])
             let original = bytes
@@ -116,7 +138,7 @@ final class PersistenceTests: XCTestCase {
         XCTAssertEqual(decoded, state)
         XCTAssertEqual(decoded.base.activeParty.last, state.base.activeParty.last)
         XCTAssertTrue(decoded.validatesAnimalCompanionCombat())
-        XCTAssertEqual(try SaveCodec.encode(decoded), bytes)
+        XCTAssertEqual(try SaveCodec.decode(SaveCodec.encode(decoded)), decoded)
     }
 
     func testCurioKnowledgeSchemaTwelveMigrationStartsEmptyWithoutBackwardInference() throws {

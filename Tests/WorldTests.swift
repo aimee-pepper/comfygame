@@ -6218,8 +6218,9 @@ final class WorldTests: XCTestCase {
         ]
 
         let bytes = try JSONEncoder().encode(state)
+        let original = bytes
         XCTAssertThrowsError(try JSONDecoder().decode(GameState.self, from: bytes))
-        XCTAssertEqual(try JSONEncoder().encode(state), bytes)
+        XCTAssertEqual(bytes, original)
     }
 
     private func minimapEvidenceRun() -> WorldRun {

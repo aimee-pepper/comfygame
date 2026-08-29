@@ -314,8 +314,18 @@ enum RosterPlacementRules {
         guard ids.count == state.base.roster.count, Set(ids).count == ids.count else { return false }
         for index in state.base.roster.indices {
             guard let id = state.base.persistentID(forRosterIndex: index) else { return false }
-            if let traveller = state.base.roster[index].traveller,
-               id != .traveller(traveller) { return false }
+            let traveller = state.base.roster[index].traveller
+            if id == .founderQuill {
+                guard traveller == nil else { return false }
+            } else if let travellerID = id.travellerID {
+                guard traveller == travellerID else { return false }
+            } else if id.rawValue.hasPrefix("generated:") {
+                guard traveller == nil else { return false }
+            } else {
+                // Animal identities have their own durable owner and may only be projected into
+                // activeParty from tamedAnimalCompanions; they are never human roster records.
+                return false
+            }
         }
         let known = Set(ids)
         let validActiveIDs = known.union(state.base.tamedAnimalCompanions.compactMap { animalID, animal in
