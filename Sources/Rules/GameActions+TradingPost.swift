@@ -5,8 +5,9 @@ extension GameStore {
         _ quote: TradingPostPhysicalGearSaleQuoteV1
     ) -> TradingPostPhysicalGearCommitResultV1 {
         var result: TradingPostPhysicalGearCommitResultV1 = .refused(.staleQuote)
-        mutate("trading post physical gear sale", flush: true) { state in
+        mutateIf("trading post physical gear sale", flush: true) { state in
             result = TradingPostRules.commitPhysicalGearSale(quote, in: &state)
+            return result == .committed
         }
         return result
     }
@@ -15,8 +16,9 @@ extension GameStore {
         _ quote: TradingPostPhysicalGearPurchaseQuoteV1
     ) -> TradingPostPhysicalGearCommitResultV1 {
         var result: TradingPostPhysicalGearCommitResultV1 = .refused(.staleQuote)
-        mutate("trading post physical gear purchase", flush: true) { state in
+        mutateIf("trading post physical gear purchase", flush: true) { state in
             result = TradingPostRules.commitPhysicalGearPurchase(quote, in: &state)
+            return result == .committed
         }
         return result
     }

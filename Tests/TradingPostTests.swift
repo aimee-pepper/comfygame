@@ -94,6 +94,99 @@ final class TradingPostTests: XCTestCase {
         XCTAssertEqual(try SaveCodec.encode(state), bytes)
     }
 
+    @MainActor
+    func testLiveStoreRefusedPhysicalGearSalePublishesAndSchedulesNothing() throws {
+        let io = SaveFileIO.temporary(name: "trading-sale-refusal-\(UUID().uuidString)")
+        let store = GameStore(io: io)
+        store.mutate("prepare sale", flush: true) { state in
+            state.base.stations[Stations.tradingPost] = .init(isUnlocked: true, tier: 0)
+            XCTAssertTrue(state.base.inventory.add(ItemStack(
+                id: .init(rawValue: 90_501), catalogID: "blade_chipped")))
+        }
+        guard case .allowed(let quote) = TradingPostRules.evaluatePhysicalGearSale(
+            source: .storehouse(stackID: .init(rawValue: 90_501)), in: store.state) else {
+            return XCTFail("expected sale quote")
+        }
+        store.mutate("make sale stale", flush: true) {
+            $0.base.physicalGearOwnershipRevision += 1
+        }
+        let staleBytes = try SaveCodec.encode(store.state)
+        let staleMetadata = store.state.meta
+        let staleDiagnostics = store.diagnostics
+        XCTAssertFalse(staleDiagnostics.hasPendingWrite)
+        XCTAssertEqual(store.commitTradingPostPhysicalGearSale(quote),
+                       .refused(.staleOwnershipRevision))
+        XCTAssertEqual(try SaveCodec.encode(store.state), staleBytes)
+        XCTAssertEqual(store.state.meta, staleMetadata)
+        XCTAssertEqual(store.diagnostics.writeCount, staleDiagnostics.writeCount)
+        XCTAssertEqual(store.diagnostics.hasPendingWrite, staleDiagnostics.hasPendingWrite)
+
+        guard case .allowed(var forged) = TradingPostRules.evaluatePhysicalGearSale(
+            source: .storehouse(stackID: .init(rawValue: 90_501)), in: store.state) else {
+            return XCTFail("expected refreshed sale quote")
+        }
+        forged.goldCredit += 1
+        let forgedBytes = try SaveCodec.encode(store.state)
+        let forgedMetadata = store.state.meta
+        let forgedDiagnostics = store.diagnostics
+        XCTAssertFalse(forgedDiagnostics.hasPendingWrite)
+        XCTAssertEqual(store.commitTradingPostPhysicalGearSale(forged), .refused(.staleQuote))
+        XCTAssertEqual(try SaveCodec.encode(store.state), forgedBytes)
+        XCTAssertEqual(store.state.meta, forgedMetadata)
+        XCTAssertEqual(store.diagnostics.writeCount, forgedDiagnostics.writeCount)
+        XCTAssertEqual(store.diagnostics.hasPendingWrite, forgedDiagnostics.hasPendingWrite)
+        XCTAssertTrue(store.state.base.inventory.stacks.contains {
+            $0.id == .init(rawValue: 90_501)
+        })
+    }
+
+    @MainActor
+    func testLiveStoreRefusedPhysicalGearPurchasePublishesAndSchedulesNothing() throws {
+        let io = SaveFileIO.temporary(name: "trading-purchase-refusal-\(UUID().uuidString)")
+        let store = GameStore(io: io)
+        store.mutate("prepare purchase", flush: true) { state in
+            state.base.stations[Stations.tradingPost] = .init(isUnlocked: true, tier: 0)
+            state.base.goldCoins = 500
+            let frozen = ItemStack(id: .init(rawValue: 90_601), catalogID: "blade_chipped")
+            state.base.tradingPost.stock = [.init(
+                id: 61, kind: .item(frozen.catalogID), remainingQuantity: 1,
+                unitPrice: 77, frozenUnits: [frozen])]
+            state.base.tradingPost.nextStockLineID = 62
+        }
+        guard case .allowed(let quote) = TradingPostRules.evaluatePhysicalGearPurchase(
+            lineID: 61, in: store.state) else { return XCTFail("expected purchase quote") }
+        store.mutate("make purchase stale", flush: true) {
+            $0.base.tradingPost.inventoryRevision += 1
+        }
+        let staleBytes = try SaveCodec.encode(store.state)
+        let staleMetadata = store.state.meta
+        let staleDiagnostics = store.diagnostics
+        XCTAssertFalse(staleDiagnostics.hasPendingWrite)
+        XCTAssertEqual(store.commitTradingPostPhysicalGearPurchase(quote),
+                       .refused(.staleTradingRevision))
+        XCTAssertEqual(try SaveCodec.encode(store.state), staleBytes)
+        XCTAssertEqual(store.state.meta, staleMetadata)
+        XCTAssertEqual(store.diagnostics.writeCount, staleDiagnostics.writeCount)
+        XCTAssertEqual(store.diagnostics.hasPendingWrite, staleDiagnostics.hasPendingWrite)
+
+        guard case .allowed(var forged) = TradingPostRules.evaluatePhysicalGearPurchase(
+            lineID: 61, in: store.state) else { return XCTFail("expected refreshed purchase quote") }
+        forged.goldDebit += 1
+        let forgedBytes = try SaveCodec.encode(store.state)
+        let forgedMetadata = store.state.meta
+        let forgedDiagnostics = store.diagnostics
+        XCTAssertFalse(forgedDiagnostics.hasPendingWrite)
+        XCTAssertEqual(store.commitTradingPostPhysicalGearPurchase(forged), .refused(.staleQuote))
+        XCTAssertEqual(try SaveCodec.encode(store.state), forgedBytes)
+        XCTAssertEqual(store.state.meta, forgedMetadata)
+        XCTAssertEqual(store.diagnostics.writeCount, forgedDiagnostics.writeCount)
+        XCTAssertEqual(store.diagnostics.hasPendingWrite, forgedDiagnostics.hasPendingWrite)
+        XCTAssertEqual(store.state.base.goldCoins, 500)
+        XCTAssertEqual(store.state.base.tradingPost.stock.first?.remainingQuantity, 1)
+        XCTAssertEqual(store.state.base.tradingPost.stock.first?.frozenUnits.first?.id,
+                       .init(rawValue: 90_601))
+    }
+
     func testTradingPostProprietorUsesExactVanceIdentity() throws {
         XCTAssertEqual(TradingPostPresentation.proprietorID, TravellerID(rawValue: "vance"))
         let vance = try XCTUnwrap(ContentCatalog.shared.traveller(TradingPostPresentation.proprietorID))
