@@ -571,6 +571,80 @@ final class PhysicalGearCraftingTests: XCTestCase {
                        Array(preview.selections.map(\.sample).prefix(1)))
     }
 
+    func testPointedBladeFreezesCanonicalAdamantPeltEffectsThroughRelaunchAndConsumers() throws {
+        var state = GameState.newGame()
+        state.base.stations[Stations.blacksmith] = .init(isUnlocked: true, tier: 0)
+        state.reality.library.knownSchematics.insert("pointed_blade")
+        state.base.essence = 100
+        var adamant = sample(.adamant, grade: 90, source: "peerless adamant")
+        adamant.qualityBand = .peerless
+        adamant = adamant.withStableID(.init(rawValue: "pointed-adamant"))
+        var pelt = sample(.pelt, grade: 50, insulation: 70, source: "fine pelt")
+        pelt.qualityBand = .fine
+        pelt = pelt.withStableID(.init(rawValue: "pointed-pelt"))
+        state.base.worldMaterialReserve.add(.init(unit: adamant, protectedReturn: false))
+        state.base.creatureMaterialReserve.add(.init(unit: pelt, protectedReturn: false))
+
+        let preview = try XCTUnwrap(PhysicalGearCraftingRules.preview(
+            PhysicalGearCraftingRules.pointedBlade, in: state))
+        XCTAssertEqual(preview.qualityBand, .exceptional)
+        XCTAssertEqual(preview.materialPowerOffset, 0.75)
+        XCTAssertEqual(preview.materialInitiativeModifier, -1)
+        XCTAssertEqual(preview.materialHeatWard, 10)
+        XCTAssertEqual(preview.appliedContributionIDs, ["forceful", "heavy", "insulated"])
+
+        let output = try XCTUnwrap(PhysicalGearCraftingRules.craft(preview, in: &state))
+        let facts = try XCTUnwrap(output.gearProfile?.gameplayFacts)
+        XCTAssertEqual(output.effectivePower, 4.75)
+        XCTAssertEqual(facts.powerOffset, 0.75)
+        XCTAssertEqual(facts.initiativeModifier, -1)
+        XCTAssertEqual(facts.heatWard, 10)
+        XCTAssertEqual(facts.appliedContributionIDs, preview.appliedContributionIDs)
+
+        let tradingPrice = max(4, Int(floor(4 * output.effectivePower)))
+        XCTAssertEqual(tradingPrice, 19)
+        let recycler = try XCTUnwrap(RecyclerRules.preview(
+            location: .stored, stackID: output.id, serviceTier: 3, in: state.base))
+        XCTAssertEqual(recycler.snapshot.gearProfile?.gameplayFacts, facts)
+        XCTAssertEqual(recycler.returnedSamples, [adamant])
+
+        let restored = try SaveCodec.decode(SaveCodec.encode(state))
+        let relaunched = try XCTUnwrap(restored.base.inventory.stacks.first { $0.id == output.id })
+        XCTAssertEqual(relaunched.gearProfile?.gameplayFacts, facts)
+        XCTAssertEqual(relaunched.gearProfile?.physicalReceipt,
+                       output.gearProfile?.physicalReceipt)
+        XCTAssertEqual(relaunched.effectivePower, 4.75)
+    }
+
+    func testPointedBladeControlAndStrongestOnceMaterialEffects() {
+        func selection(_ requirement: String, _ unit: CraftMaterialUnitV1, _ id: UInt64)
+            -> PhysicalGearCraftingRules.Selection {
+            .init(requirementID: requirement, binID: .init(rawValue: id), sampleIndex: 0,
+                  sample: unit.withStableID(.init(rawValue: "effect-\(id)")))
+        }
+        var fang = sample(.fang, grade: 30, source: "standard fang")
+        fang.qualityBand = .standard
+        var hide = sample(.hide, grade: 30, source: "standard hide")
+        hide.qualityBand = .standard
+        let control = PhysicalGearCraftingRules.materialEffects(
+            for: PhysicalGearCraftingRules.pointedBlade,
+            selections: [selection("point.0", fang, 1), selection("grip.0", hide, 2)])
+        XCTAssertEqual(control.powerOffset, 0.25)
+        XCTAssertEqual(control.initiativeModifier, 0)
+        XCTAssertEqual(control.heatWard, 0)
+        XCTAssertEqual(control.contributionIDs, ["keen"])
+
+        var adamant = sample(.adamant, grade: 90, source: "one")
+        adamant.qualityBand = .peerless
+        let duplicate = PhysicalGearCraftingRules.materialEffects(
+            for: PhysicalGearCraftingRules.pointedBlade,
+            selections: [selection("point.0", adamant, 3),
+                         selection("point.0", adamant, 4)])
+        XCTAssertEqual(duplicate.powerOffset, 0.75)
+        XCTAssertEqual(duplicate.initiativeModifier, -1)
+        XCTAssertEqual(duplicate.contributionIDs, ["forceful", "heavy"])
+    }
+
     func testStaleOrDuplicateSelectionCannotConsumeOrCraft() throws {
         var state = readyState()
         let preview = try XCTUnwrap(PhysicalGearCraftingRules.preview(

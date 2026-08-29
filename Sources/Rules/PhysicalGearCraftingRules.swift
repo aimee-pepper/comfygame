@@ -75,6 +75,11 @@ enum PhysicalGearCraftingRules {
         var homeDiscountRate: Double
         var insulation: Double
         var reactivity: Double
+        var appliedContributionIDs: [String]
+        var materialPowerOffset: Double
+        var materialInitiativeModifier: Int
+        var materialHeatWard: Int
+        var materialValueModifier: Double
         var expectedInstanceID: InstanceID
         var destination: PhysicalGearConstructionDestinationV1
 
@@ -194,6 +199,55 @@ enum PhysicalGearCraftingRules {
         pointedBlade, cuttingBlade, handMaul, longSpear, shield, helm, rigidGuard, fieldPick
     ]
     static let blacksmithLiveRecipes: [Recipe] = [pointedBlade]
+
+    struct MaterialEffectProjection: Equatable, Sendable {
+        var contributionIDs: [String] = []
+        var powerOffset: Double = 0
+        var initiativeModifier: Int = 0
+        var heatWard: Int = 0
+        var valueModifier: Double = 0
+    }
+
+    /// Canonical component-role projection. Results are frozen into gameplay facts at construction;
+    /// downstream systems never consult this table for an existing item.
+    static func materialEffects(for recipe: Recipe,
+                                selections: [Selection]) -> MaterialEffectProjection {
+        guard recipe.id == pointedBlade.id, recipe.station == Stations.blacksmith else {
+            return .init()
+        }
+        var positives: [(String, Double)] = []
+        var initiativePenalties: [(String, Int)] = []
+        var wards: [(String, Int)] = []
+        var values: [(String, Double)] = []
+        for selection in selections {
+            let band = selection.sample.qualityBand.rawValue
+            let major = band <= 1 ? 0.25 : band <= 3 ? 0.50 : 0.75
+            let ward = band <= 1 ? 5 : band <= 3 ? 10 : 15
+            let value = band <= 1 ? 0.10 : band <= 3 ? 0.20 : 0.30
+            switch (selection.requirementID, selection.sample.familyID) {
+            case ("point.0", .adamant):
+                positives.append(("forceful", major))
+                initiativePenalties.append(("heavy", -1))
+                values.append(("forceful", value))
+            case ("point.0", .fang):
+                positives.append(("keen", major))
+            case ("grip.0", .pelt):
+                wards.append(("insulated", ward))
+            default: break
+            }
+        }
+        let strongestPositive = positives.max { $0.1 < $1.1 }
+        let strongestPenalty = initiativePenalties.min { $0.1 < $1.1 }
+        let strongestWard = wards.max { $0.1 < $1.1 }
+        let strongestValue = values.max { $0.1 < $1.1 }
+        let ids = Set([strongestPositive?.0, strongestPenalty?.0,
+                       strongestWard?.0, strongestValue?.0].compactMap { $0 }).sorted()
+        return .init(contributionIDs: ids,
+                     powerOffset: strongestPositive?.1 ?? 0,
+                     initiativeModifier: strongestPenalty?.1 ?? 0,
+                     heatWard: min(50, strongestWard?.1 ?? 0),
+                     valueModifier: strongestValue?.1 ?? 0)
+    }
 
     static let suppleCoat = Recipe(
         id: "supple_coat", displayName: "Supple Coat", catalogFallback: "guard_padded",
@@ -493,6 +547,7 @@ enum PhysicalGearCraftingRules {
             ? qualityRank : min(max(1, qualityRank), constructionCap(for: recipe, in: state))
         let averageInsulation = chosen.map(\.sample.properties.insulation).reduce(0, +) / Double(chosen.count)
         let averageReactivity = chosen.map(\.sample.properties.reactivity).reduce(0, +) / Double(chosen.count)
+        let materialEffects = materialEffects(for: recipe, selections: chosen)
         let rawEssence = essenceCost(for: uncapped ? max(1, qualityRank) : output)
         let station = ContentCatalog.shared.station(recipe.station)
         let paidEssence = station.map { StationStaffingRules.discounted(rawEssence, at: $0, in: state) }
@@ -506,6 +561,11 @@ enum PhysicalGearCraftingRules {
                        outputTier: output, rawEssence: rawEssence,
                        essence: paidEssence, homeDiscountRate: discount,
                        insulation: averageInsulation, reactivity: averageReactivity,
+                       appliedContributionIDs: materialEffects.contributionIDs,
+                       materialPowerOffset: materialEffects.powerOffset,
+                       materialInitiativeModifier: materialEffects.initiativeModifier,
+                       materialHeatWard: materialEffects.heatWard,
+                       materialValueModifier: materialEffects.valueModifier,
                        expectedInstanceID: expectedID, destination: destination)
     }
 
@@ -575,7 +635,12 @@ enum PhysicalGearCraftingRules {
                     authorityVersion: 1)
             : nil
         output.gearProfile?.freezeGameplayFacts(
-            powerOffset: preview.recipe.station == Stations.weaponsmith ? 0.5 : 0,
+            powerOffset: (preview.recipe.station == Stations.weaponsmith ? 0.5 : 0)
+                + preview.materialPowerOffset,
+            initiativeModifier: preview.materialInitiativeModifier,
+            heatWard: preview.materialHeatWard,
+            valueModifier: preview.materialValueModifier,
+            appliedContributionIDs: preview.appliedContributionIDs,
             toolCapability: toolCapability)
         let origin = preview.selections.map(\.sample.source).filter { !$0.isEmpty }
         output.gearProfile?.displayProvenance = origin.isEmpty

@@ -482,13 +482,26 @@ enum Migrations {
             "sourceRevisionOrdinal", "sourceRevisionDigest", "slot", "qualityBand",
             "constructionTier", "powerOffset", "protectivePowerOffset", "damageKind", "reach",
             "insulation", "reactivity", "specialRule", "toolCapability"]
+        let componentEffectFactKeys = gameplayFactKeys.union([
+            "initiativeModifier", "heatWard", "valueModifier", "appliedContributionIDs"
+        ])
         func validateGameplayFacts(_ value: Any) throws {
-            guard let facts = value as? [String: Any], Set(facts.keys) == gameplayFactKeys,
+            guard let facts = value as? [String: Any],
+                  Set(facts.keys) == gameplayFactKeys || Set(facts.keys) == componentEffectFactKeys,
                   try exactInt(facts["version"]) == 1,
                   let digest = facts["sourceRevisionDigest"] as? String,
                   digest.count == 64,
                   digest.allSatisfy({ $0.isHexDigit && !$0.isUppercase }) else {
                 throw CocoaError(.coderInvalidValue)
+            }
+            if Set(facts.keys) == componentEffectFactKeys {
+                guard let initiative = try? exactInt(facts["initiativeModifier"]),
+                      let ward = try? exactInt(facts["heatWard"]), (0...50).contains(ward),
+                      let value = facts["valueModifier"] as? NSNumber,
+                      value.doubleValue.isFinite,
+                      let ids = facts["appliedContributionIDs"] as? [String],
+                      ids.allSatisfy({ !$0.isEmpty }), Set(ids).count == ids.count,
+                      initiative >= Int.min else { throw CocoaError(.coderInvalidValue) }
             }
         }
         func validateReceipt(_ value: Any) throws {

@@ -256,6 +256,11 @@ struct GearGameplayFactsV1: Codable, Equatable, Sendable {
     var reach: Reach
     var insulation: Double
     var reactivity: Double
+    /// Frozen canonical component consequences. Optional preserves pre-component-effect receipts.
+    var initiativeModifier: Int? = nil
+    var heatWard: Int? = nil
+    var valueModifier: Double? = nil
+    var appliedContributionIDs: [String]? = nil
     var specialRule: WildGearGameplayRuleV1?
     var toolCapability: GearToolCapabilityV1?
 
@@ -267,6 +272,9 @@ struct GearGameplayFactsV1: Codable, Equatable, Sendable {
             && constructionTier == profile.constructionTier
             && [powerOffset, protectivePowerOffset, insulation, reactivity]
                 .allSatisfy(\.isFinite)
+            && (valueModifier?.isFinite ?? true)
+            && (heatWard.map { (0...50).contains($0) } ?? true)
+            && (appliedContributionIDs?.allSatisfy { !$0.isEmpty } ?? true)
             && (toolCapability?.validates() ?? true)
     }
 }
@@ -742,6 +750,10 @@ struct GearInstanceProfile: Codable, Equatable, Sendable {
 
     mutating func freezeGameplayFacts(powerOffset: Double = 0,
                                       protectivePowerOffset: Double = 0,
+                                      initiativeModifier: Int? = nil,
+                                      heatWard: Int? = nil,
+                                      valueModifier: Double? = nil,
+                                      appliedContributionIDs: [String]? = nil,
                                       toolCapability: GearToolCapabilityV1? = nil) {
         let priorSpecialRule = gameplayFacts?.specialRule
         let priorToolCapability = gameplayFacts?.toolCapability
@@ -760,6 +772,9 @@ struct GearInstanceProfile: Codable, Equatable, Sendable {
                               protectivePowerOffset: protectivePowerOffset,
                               damageKind: damage, reach: reach,
                               insulation: insulation, reactivity: reactivity,
+                              initiativeModifier: initiativeModifier,
+                              heatWard: heatWard, valueModifier: valueModifier,
+                              appliedContributionIDs: appliedContributionIDs,
                               specialRule: priorSpecialRule,
                               toolCapability: toolCapability ?? priorToolCapability)
         if var receipt = physicalReceipt, !receipt.revisions.isEmpty {
@@ -843,6 +858,10 @@ struct GearGameplayProjectionV1: Codable, Equatable, Sendable {
     var reach: Reach
     var insulation: Double
     var reactivity: Double
+    var initiativeModifier: Int? = nil
+    var heatWard: Int? = nil
+    var valueModifier: Double? = nil
+    var appliedContributionIDs: [String]? = nil
     var specialRule: WildGearGameplayRuleV1?
     var toolCapability: GearToolCapabilityV1?
     var inscriptionDisposition: GearInscriptionDispositionV1
@@ -863,6 +882,8 @@ struct GearLoadoutProjectionV1: Codable, Equatable, Sendable {
                   entry.version == 1 && entry.owner == owner && entry.slot == slot
                       && entry.effectivePower.isFinite && entry.protectivePower.isFinite
                       && entry.insulation.isFinite && entry.reactivity.isFinite
+                      && (entry.valueModifier?.isFinite ?? true)
+                      && (entry.heatWard.map { (0...50).contains($0) } ?? true)
                       && entry.sourceRevisionDigest.count == 64
               }) else { return false }
         let encoder = JSONEncoder()
@@ -937,6 +958,10 @@ enum GearGameplayProjectionRulesV1 {
                                   effectivePower: effective, protectivePower: protective,
                                   damageKind: facts.damageKind, reach: facts.reach,
                                   insulation: facts.insulation, reactivity: facts.reactivity,
+                                  initiativeModifier: facts.initiativeModifier,
+                                  heatWard: facts.heatWard,
+                                  valueModifier: facts.valueModifier,
+                                  appliedContributionIDs: facts.appliedContributionIDs,
                                   specialRule: facts.specialRule,
                                   toolCapability: facts.toolCapability,
                                   inscriptionDisposition: inscription,
