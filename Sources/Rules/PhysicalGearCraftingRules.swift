@@ -264,58 +264,64 @@ enum PhysicalGearCraftingRules {
     }
     static let fittedPoint = Recipe(
         id: "weaponsmith_fitted_point", displayName: "Fitted Point", catalogFallback: "blade_chipped",
-        station: Stations.weaponsmith, stationCap: 4, specialistHeadlineTier: 3,
+        station: Stations.weaponsmith, stationCap: 5, specialistHeadlineTier: 3,
         slot: .weapon, damage: .pierce, reach: .close,
         requirements: [
-            SampleRequirement(id: "hard_point", allowedKinds: nil,
-                              floors: [PropertyFloor(property: .hardness, minimum: 65)]),
-            SampleRequirement(id: "flexible_grip", allowedKinds: nil,
-                              floors: [PropertyFloor(property: .flexibility, minimum: 55)]),
-            SampleRequirement(id: "lustrous_or_dense", allowedKinds: nil, floors: [],
-                              alternativeFloors: [PropertyFloor(property: .lustre, minimum: 40),
-                                                  PropertyFloor(property: .density, minimum: 40)])
-        ])
+            weaponsmithRequirement("point.0", [.ore, .adamant, .obsidian, .quartz,
+                                   .fang, .quill, .bone, .tusk, .horn]),
+            weaponsmithRequirement("grip.0", [.fibre, .timber, .copper, .silver, .gold,
+                                   .hide, .pelt, .fin, .bone, .horn]),
+            weaponsmithRequirement("fitting.0", [.copper, .silver, .gold, .quartz, .adamant,
+                                   .bone, .horn, .quill])
+        ], primaryRequirementIDs: ["point.0"])
     static let fittedEdge = Recipe(
         id: "weaponsmith_fitted_edge", displayName: "Fitted Edge", catalogFallback: "blade_chipped",
-        station: Stations.weaponsmith, stationCap: 4, minimumEffectiveTier: 1,
+        station: Stations.weaponsmith, stationCap: 5, minimumEffectiveTier: 1,
         specialistHeadlineTier: 3, slot: .weapon, damage: .rend, reach: .close,
         requirements: [
-            SampleRequirement(id: "hard_edge", allowedKinds: nil,
-                              floors: [PropertyFloor(property: .hardness, minimum: 65)]),
-            SampleRequirement(id: "flexible_grip", allowedKinds: nil,
-                              floors: [PropertyFloor(property: .flexibility, minimum: 55)]),
-            SampleRequirement(id: "reactive_or_lustrous", allowedKinds: nil, floors: [],
-                              alternativeFloors: [PropertyFloor(property: .reactivity, minimum: 40),
-                                                  PropertyFloor(property: .lustre, minimum: 40)])
-        ])
+            weaponsmithRequirement("edge.0", [.ore, .adamant, .obsidian, .claw, .chitin,
+                                   .quill, .bone, .shell]),
+            weaponsmithRequirement("grip.0", [.fibre, .timber, .copper, .silver, .gold,
+                                   .hide, .pelt, .fin, .bone, .horn]),
+            weaponsmithRequirement("fitting.0", [.copper, .silver, .gold, .quartz, .adamant,
+                                   .bone, .horn, .quill])
+        ], primaryRequirementIDs: ["edge.0"])
     static let fittedMaul = Recipe(
         id: "weaponsmith_fitted_maul", displayName: "Fitted Maul", catalogFallback: "field_maul",
-        station: Stations.weaponsmith, stationCap: 4, minimumEffectiveTier: 1,
+        station: Stations.weaponsmith, stationCap: 5, minimumEffectiveTier: 1,
         specialistHeadlineTier: 3, slot: .weapon, damage: .crush, reach: .close,
         requirements: [
-            SampleRequirement(id: "dense_head", allowedKinds: nil,
-                              floors: [PropertyFloor(property: .density, minimum: 70)]),
-            SampleRequirement(id: "hard_face", allowedKinds: nil,
-                              floors: [PropertyFloor(property: .hardness, minimum: 55)]),
-            SampleRequirement(id: "flexible_grip", allowedKinds: nil,
-                              floors: [PropertyFloor(property: .flexibility, minimum: 45)])
-        ])
+            weaponsmithRequirement("head.0", [.rubble, .ore, .copper, .adamant, .bone,
+                                   .tusk, .horn, .plate, .shell]),
+            weaponsmithRequirement("brace.0", [.timber, .ore, .adamant, .bone, .horn]),
+            weaponsmithRequirement("grip.0", [.fibre, .timber, .copper, .silver, .gold,
+                                   .hide, .pelt, .fin, .bone, .horn])
+        ], primaryRequirementIDs: ["head.0", "brace.0"])
 
     static func fittedPolearm(damage: DamageKind) -> Recipe {
-        let head = damage == .crush
-            ? PropertyFloor(property: .density, minimum: 65)
-            : PropertyFloor(property: .hardness, minimum: 65)
         return Recipe(id: "weaponsmith_fitted_polearm", displayName: "Fitted Polearm",
             catalogFallback: damage == .crush ? "field_maul" : "long_pick",
-            station: Stations.weaponsmith, stationCap: 4, specialistHeadlineTier: 3,
+            station: Stations.weaponsmith, stationCap: 5, specialistHeadlineTier: 3,
             slot: .weapon, damage: damage, reach: .mid,
             requirements: [
-                SampleRequirement(id: "chosen_head", allowedKinds: nil, floors: [head]),
-                SampleRequirement(id: "flexible_haft", allowedKinds: [.timber, .bone],
-                                  floors: [PropertyFloor(property: .flexibility, minimum: 55)]),
-                SampleRequirement(id: "flexible_binding", allowedKinds: nil,
-                                  floors: [PropertyFloor(property: .flexibility, minimum: 55)])
-            ])
+                weaponsmithRequirement("head.0", damage == .crush
+                    ? [.rubble, .ore, .copper, .adamant, .bone, .tusk, .horn, .plate, .shell]
+                    : damage == .rend
+                        ? [.ore, .adamant, .obsidian, .claw, .chitin, .quill, .bone, .shell]
+                        : [.ore, .adamant, .obsidian, .quartz, .fang, .quill, .bone, .tusk, .horn]),
+                weaponsmithRequirement("haft.0", [.timber, .ore, .adamant, .bone, .horn]),
+                weaponsmithRequirement("binding.0", [.fibre, .resin, .copper, .silver, .gold,
+                                       .hide, .fin])
+            ], primaryRequirementIDs: ["head.0", "haft.0"])
+    }
+
+    private static func weaponsmithRequirement(_ id: String,
+                                               _ families: Set<MaterialFamilyID>)
+        -> SampleRequirement {
+        SampleRequirement(id: id, allowedKinds: families,
+                          allowedIdentities: Set(families.map {
+                              MaterialIdentity(domain: .forFamily($0), family: $0)
+                          }), floors: [])
     }
 
     static let weaponsmithRecipes: [Recipe] = [fittedPoint, fittedEdge, fittedMaul]
@@ -363,9 +369,7 @@ enum PhysicalGearCraftingRules {
         if recipe.station == Stations.bowyer {
             return recipe.stationCap
         }
-        if recipe.station == Stations.weaponsmith {
-            return min(effectiveTier(for: recipe, in: state) >= 2 ? 4 : 3, recipe.stationCap)
-        }
+        if recipe.station == Stations.weaponsmith { return recipe.stationCap }
         return recipe.stationCap
     }
 
@@ -468,12 +472,12 @@ enum PhysicalGearCraftingRules {
             ? primary : Double(secondaryRanks.reduce(0, +)) / Double(secondaryRanks.count)
         let qualityRank = Int((0.7 * primary + 0.3 * secondary).rounded())
         let qualityBand = CraftMaterialQualityBand(rawValue: qualityRank) ?? .rough
-        let output = recipe.station == Stations.bowyer
+        let uncapped = recipe.station == Stations.bowyer || recipe.station == Stations.weaponsmith
+        let output = uncapped
             ? qualityRank : min(max(1, qualityRank), constructionCap(for: recipe, in: state))
         let averageInsulation = chosen.map(\.sample.properties.insulation).reduce(0, +) / Double(chosen.count)
         let averageReactivity = chosen.map(\.sample.properties.reactivity).reduce(0, +) / Double(chosen.count)
-        let rawEssence = essenceCost(for: recipe.station == Stations.bowyer
-            ? max(1, qualityRank) : output)
+        let rawEssence = essenceCost(for: uncapped ? max(1, qualityRank) : output)
         let station = ContentCatalog.shared.station(recipe.station)
         let paidEssence = station.map { StationStaffingRules.discounted(rawEssence, at: $0, in: state) }
             ?? rawEssence
@@ -554,7 +558,9 @@ enum PhysicalGearCraftingRules {
                     authorityID: GearToolCapabilityV1.extractionAuthorityID,
                     authorityVersion: 1)
             : nil
-        output.gearProfile?.freezeGameplayFacts(toolCapability: toolCapability)
+        output.gearProfile?.freezeGameplayFacts(
+            powerOffset: preview.recipe.station == Stations.weaponsmith ? 0.5 : 0,
+            toolCapability: toolCapability)
         let origin = preview.selections.map(\.sample.source).filter { !$0.isEmpty }
         output.gearProfile?.displayProvenance = origin.isEmpty
             ? preview.recipe.displayName

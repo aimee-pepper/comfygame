@@ -64,18 +64,26 @@ final class WeaponsmithTests: XCTestCase {
         state.base.capabilities.insert(PhysicalGearCraftingRules.weaponsmithPointCapability)
         state.base.essence = 1_000
         if pattern { state.reality.library.knownPatterns.insert(PhysicalGearCraftingRules.maudFittingPattern) }
-        let samples = [
-            CraftMaterialUnitV1(kind: .plate, properties: .init(hardness: 80, density: 80, flexibility: 60, lustre: 60, reactivity: 60), grade: grade, source: "head"),
-            CraftMaterialUnitV1(kind: .bone, properties: .init(hardness: 75, density: 75, flexibility: 65, lustre: 55, reactivity: 55), grade: grade, source: "haft"),
-            CraftMaterialUnitV1(kind: .timber, properties: .init(hardness: 70, density: 70, flexibility: 65, lustre: 50, reactivity: 50), grade: grade, source: "binding"),
-            CraftMaterialUnitV1(kind: .hide, properties: .init(hardness: 70, density: 70, flexibility: 65, lustre: 50, reactivity: 50), grade: grade, source: "spare")
-        ]
-        state.base.inventory.add(ItemStack(id: InstanceID(rawValue: 800), catalogID: Items.material,
-                                           materials: samples))
+        let samples: [CraftMaterialUnitV1] = [
+            CraftMaterialUnitV1(kind: .ore, properties: .init(hardness: 80), grade: grade, source: "point"),
+            CraftMaterialUnitV1(kind: .obsidian, properties: .init(hardness: 80), grade: grade, source: "edge"),
+            CraftMaterialUnitV1(kind: .rubble, properties: .init(density: 80), grade: grade, source: "maul"),
+            CraftMaterialUnitV1(kind: .timber, properties: .init(flexibility: 60), grade: grade, source: "haft"),
+            CraftMaterialUnitV1(kind: .fibre, properties: .init(flexibility: 60), grade: grade, source: "binding"),
+            CraftMaterialUnitV1(kind: .copper, properties: .init(lustre: 60), grade: grade, source: "fitting"),
+            CraftMaterialUnitV1(kind: .hide, properties: .init(flexibility: 60), grade: grade, source: "grip")
+        ].enumerated().map {
+            $0.element.withStableID(.init(rawValue: "weaponsmith-fixture-\($0.offset)"))
+        }
+        for unit in samples {
+            let holding = CraftMaterialHoldingV1(unit: unit, protectedReturn: false)
+            if unit.domain == .world { state.base.worldMaterialReserve.add(holding) }
+            else { state.base.creatureMaterialReserve.add(holding) }
+        }
         return state
     }
 
-    func testTierMatrixKindsReachLeanAndCaps() throws {
+    func testTierMatrixKindsReachLeanAndUncappedQuality() throws {
         let zero = state(tier: 0)
         XCTAssertNotNil(PhysicalGearCraftingRules.preview(PhysicalGearCraftingRules.fittedPoint, in: zero))
         XCTAssertNil(PhysicalGearCraftingRules.preview(PhysicalGearCraftingRules.fittedEdge, in: zero))
@@ -90,12 +98,13 @@ final class WeaponsmithTests: XCTestCase {
         XCTAssertEqual(fixed.map(\.intendedLean), ["Finesse", "Finesse", "Might"])
         for recipe in fixed {
             let preview = try XCTUnwrap(PhysicalGearCraftingRules.preview(recipe, in: one))
-            XCTAssertEqual(preview.outputTier, 3)
-            XCTAssertEqual(preview.qualityBand, .superior)
+            XCTAssertEqual(preview.outputTier, 5)
+            XCTAssertEqual(preview.qualityBand, .peerless)
+            XCTAssertEqual(preview.rawEssence, 80)
         }
         let two = state(tier: 2, grade: 90)
         XCTAssertEqual(PhysicalGearCraftingRules.preview(PhysicalGearCraftingRules.fittedPoint,
-                                                         in: two)?.outputTier, 4)
+                                                         in: two)?.outputTier, 5)
         let low = state(tier: 2, grade: 30)
         XCTAssertTrue(try XCTUnwrap(PhysicalGearCraftingRules.preview(
             PhysicalGearCraftingRules.fittedPoint, in: low)).isBelowSpecialistHeadline)
@@ -120,7 +129,7 @@ final class WeaponsmithTests: XCTestCase {
             PhysicalGearCraftingRules.fittedPolearm(damage: .pierce), in: built))
     }
 
-    func testAllPolearmKindsAreMidAndHeadPropertyMatchesChoice() throws {
+    func testAllPolearmKindsAreMidAndHeadFamiliesMatchChoice() throws {
         let state = state(pattern: true)
         for kind in DamageKind.allCases {
             let recipe = PhysicalGearCraftingRules.fittedPolearm(damage: kind)
@@ -128,7 +137,10 @@ final class WeaponsmithTests: XCTestCase {
             XCTAssertEqual(recipe.reach, .mid)
             XCTAssertEqual(recipe.intendedLean, kind == .crush ? "Might" : "Finesse")
             let head = try XCTUnwrap(recipe.requirements.first)
-            XCTAssertEqual(head.floors.first?.property, kind == .crush ? .density : .hardness)
+            XCTAssertTrue(head.floors.isEmpty)
+            XCTAssertTrue(try XCTUnwrap(head.allowedIdentities).contains(
+                .init(domain: .world,
+                      family: kind == .crush ? .rubble : kind == .rend ? .obsidian : .ore)))
             XCTAssertNotNil(PhysicalGearCraftingRules.preview(recipe, in: state))
 
             var crafting = self.state(pattern: true)
@@ -136,7 +148,90 @@ final class WeaponsmithTests: XCTestCase {
             let output = try XCTUnwrap(PhysicalGearCraftingRules.craft(preview, in: &crafting))
             XCTAssertEqual(output.gearProfile?.damage, kind)
             XCTAssertEqual(output.gearProfile?.reach, .mid)
+            XCTAssertEqual(output.gearProfile?.gameplayFacts?.powerOffset, 0.5)
+            XCTAssertEqual(output.effectivePower, Double(preview.qualityBand.rawValue) + 0.5)
         }
+    }
+
+    func testCanonicalSocketsRejectCrossDomainLookalikes() {
+        let point = PhysicalGearCraftingRules.fittedPoint.requirements[0]
+        var creatureOre = CraftMaterialUnitV1(kind: .ore, properties: .init(), grade: 50,
+                                               source: "forged creature ore")
+        creatureOre.domain = .creature
+        XCTAssertFalse(PhysicalGearCraftingRules.qualifies(creatureOre, for: point))
+
+        let fitting = PhysicalGearCraftingRules.fittedPoint.requirements[2]
+        var worldHorn = CraftMaterialUnitV1(kind: .horn, properties: .init(), grade: 50,
+                                            source: "forged world horn")
+        worldHorn.domain = .world
+        XCTAssertFalse(PhysicalGearCraftingRules.qualifies(worldHorn, for: fitting))
+    }
+
+    func testCanonicalSocketOrderAndClosedFamilyTables() {
+        let point = PhysicalGearCraftingRules.fittedPoint
+        XCTAssertEqual(point.requirements.map(\.id), ["point.0", "grip.0", "fitting.0"])
+        XCTAssertEqual(point.primaryRequirementIDs, ["point.0"])
+        XCTAssertEqual(point.requirements[0].allowedKinds,
+                       [.ore, .adamant, .obsidian, .quartz, .fang, .quill, .bone, .tusk, .horn])
+        XCTAssertEqual(point.requirements[1].allowedKinds,
+                       [.fibre, .timber, .copper, .silver, .gold,
+                        .hide, .pelt, .fin, .bone, .horn])
+        XCTAssertEqual(point.requirements[2].allowedKinds,
+                       [.copper, .silver, .gold, .quartz, .adamant, .bone, .horn, .quill])
+
+        let edge = PhysicalGearCraftingRules.fittedEdge
+        XCTAssertEqual(edge.requirements.map(\.id), ["edge.0", "grip.0", "fitting.0"])
+        XCTAssertEqual(edge.primaryRequirementIDs, ["edge.0"])
+        XCTAssertEqual(edge.requirements[0].allowedKinds,
+                       [.ore, .adamant, .obsidian, .claw, .chitin, .quill, .bone, .shell])
+
+        let maul = PhysicalGearCraftingRules.fittedMaul
+        XCTAssertEqual(maul.requirements.map(\.id), ["head.0", "brace.0", "grip.0"])
+        XCTAssertEqual(maul.primaryRequirementIDs, ["head.0", "brace.0"])
+        XCTAssertEqual(maul.requirements[0].allowedKinds,
+                       [.rubble, .ore, .copper, .adamant, .bone, .tusk, .horn, .plate, .shell])
+        XCTAssertEqual(maul.requirements[1].allowedKinds,
+                       [.timber, .ore, .adamant, .bone, .horn])
+
+        let polearm = PhysicalGearCraftingRules.fittedPolearm(damage: .pierce)
+        XCTAssertEqual(polearm.requirements.map(\.id), ["head.0", "haft.0", "binding.0"])
+        XCTAssertEqual(polearm.primaryRequirementIDs, ["head.0", "haft.0"])
+        XCTAssertEqual(polearm.requirements[2].allowedKinds,
+                       [.fibre, .resin, .copper, .silver, .gold, .hide, .fin])
+    }
+
+    func testRoughAndPeerlessUseUncappedQualityPriceAndHalfPointOffset() throws {
+        for (grade, band, price) in [(10.0, CraftMaterialQualityBand.rough, 12),
+                                     (90.0, .peerless, 80)] {
+            var crafting = state(grade: grade)
+            let preview = try XCTUnwrap(PhysicalGearCraftingRules.preview(
+                PhysicalGearCraftingRules.fittedPoint, in: crafting))
+            XCTAssertEqual(preview.qualityBand, band)
+            XCTAssertEqual(preview.outputTier, band.rawValue)
+            XCTAssertEqual(preview.rawEssence, price)
+            let output = try XCTUnwrap(PhysicalGearCraftingRules.craft(preview, in: &crafting))
+            XCTAssertEqual(output.gearProfile?.qualityBand, band)
+            XCTAssertEqual(output.effectivePower, Double(band.rawValue) + 0.5)
+
+            let restored = try SaveCodec.decode(SaveCodec.encode(crafting))
+            let restoredOutput = try XCTUnwrap(restored.base.inventory.stacks.first {
+                $0.id == output.id
+            })
+            XCTAssertEqual(restoredOutput.gearProfile?.physicalReceipt,
+                           output.gearProfile?.physicalReceipt)
+            XCTAssertEqual(restoredOutput.effectivePower, output.effectivePower)
+        }
+    }
+
+    func testIdentityExhaustionRefusesBeforePreviewOrMutation() {
+        var exhausted = state()
+        var terminal = ItemStack(id: .init(rawValue: UInt64.max), catalogID: "blade_chipped")
+        terminal.gearProfile?.stableInstanceID = terminal.id
+        exhausted.base.inventory.stacks.append(terminal)
+        let before = exhausted
+        XCTAssertNil(PhysicalGearCraftingRules.preview(
+            PhysicalGearCraftingRules.fittedPoint, in: exhausted))
+        XCTAssertEqual(exhausted, before)
     }
 
     func testAuthoredStationAndTierRungEconomy() throws {
@@ -179,14 +274,19 @@ final class WeaponsmithTests: XCTestCase {
         var state = state(tier: 1)
         let recipe = PhysicalGearCraftingRules.fittedEdge
         let preview = try XCTUnwrap(PhysicalGearCraftingRules.preview(recipe, in: state))
-        let beforeCount = state.base.inventory.stacks.first { $0.id.rawValue == 800 }!.count
+        let beforeCount = state.base.worldMaterialReserve.count
+            + state.base.creatureMaterialReserve.count
         let output = try XCTUnwrap(PhysicalGearCraftingRules.craft(preview, in: &state))
         XCTAssertEqual(output.gearProfile?.familyID, recipe.id)
         XCTAssertEqual(output.gearProfile?.damage, .rend)
         XCTAssertEqual(output.gearProfile?.reach, .close)
         XCTAssertEqual(output.gearProfile?.reforgeRank, 0)
         XCTAssertEqual(output.gearProfile?.consumedSamples, preview.selections.map(\.sample))
-        XCTAssertEqual(state.base.inventory.stacks.first { $0.id.rawValue == 800 }?.count,
+        XCTAssertEqual(output.gearProfile?.physicalReceipt?.revisions.first?.components.map(\.unit),
+                       preview.selections.map(\.sample))
+        XCTAssertEqual(output.gearProfile?.gameplayFacts?.powerOffset, 0.5)
+        XCTAssertEqual(state.base.worldMaterialReserve.count
+                       + state.base.creatureMaterialReserve.count,
                        beforeCount - recipe.requirements.count)
         let after = state
         XCTAssertNil(PhysicalGearCraftingRules.craft(preview, in: &state))
@@ -236,6 +336,7 @@ final class WeaponsmithTests: XCTestCase {
         }
         XCTAssertFalse(store.craftPhysicalGear(preview))
         XCTAssertEqual(store.state.base.essence, 1_000)
-        XCTAssertEqual(store.state.base.inventory.stacks.first { $0.id.rawValue == 800 }?.count, 4)
+        XCTAssertEqual(store.state.base.worldMaterialReserve.count
+                       + store.state.base.creatureMaterialReserve.count, 7)
     }
 }
