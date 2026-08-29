@@ -88,6 +88,8 @@ enum Migrations {
                   encounter.keys.contains("partyNames"), !(encounter["partyNames"] is NSNull),
                   let order = encounter["order"] as? [Any], !order.isEmpty,
                   let slots = encounter["turnSlots"] as? [Any], !slots.isEmpty,
+                  encounter.keys.contains("pressureOwners"),
+                  !(encounter["pressureOwners"] is NSNull),
                   encounter.keys.contains("animalParticipants"),
                   !(encounter["animalParticipants"] is NSNull),
                   encounter.keys.contains("gearProjections"),
@@ -199,11 +201,55 @@ enum Migrations {
         case 17: return try migrate17to18(data)
         case 18: return try migrate18to19(data)
         case 19: return try migrate19to20(data)
+        case 20: return try migrate20to21(data)
         default:
             // No migration registered. Tolerant decoding is the fallback; if the save is genuinely
             // incompatible, `SaveFileIO.load()` quarantines it rather than losing it.
             return data
         }
+    }
+
+    private static func migrate20to21(_ data: Data) throws -> Data {
+        var state = try SaveCodec.makeDecoder().decode(GameState.self, from: data)
+        guard state.schemaVersion == 20 else { throw CocoaError(.coderInvalidValue) }
+
+        func install(in run: inout WorldRun) throws {
+            guard var encounter = run.activeEncounter else { return }
+            let expectedCount = encounter.scalingPreview?.wholePressureSlots ?? 0
+            let rawPressure = encounter.turnSlots.filter {
+                if case .ordinaryPressureFollowUp = $0.kind { return true }
+                return false
+            }
+            guard rawPressure.count == expectedCount else { throw CocoaError(.coderInvalidValue) }
+            let entries = try rawPressure.map { slot
+                -> EncounterState.EncounterPressureOwnerReceiptV1.Entry in
+                guard case .ordinaryPressureFollowUp(let ordinal) = slot.kind,
+                      case .foe(let foeID) = slot.actor,
+                      slot.strengthMultiplier == 0.55, slot.suppressesAfflictions,
+                      encounter.foes.contains(where: { $0.id == foeID && !$0.isApex })
+                else { throw CocoaError(.coderInvalidValue) }
+                return .init(ordinal: ordinal, foeID: foeID)
+            }.sorted { $0.ordinal < $1.ordinal }
+            guard Set(entries.map(\.ordinal)).count == entries.count,
+                  entries.map(\.ordinal) == Array(1..<(expectedCount + 1)) else {
+                throw CocoaError(.coderInvalidValue)
+            }
+            encounter.pressureOwners = .init(entries: entries)
+            run.activeEncounter = encounter
+        }
+
+        if var run = state.worlds.activeRun {
+            try install(in: &run)
+            state.worlds.activeRun = run
+        }
+        for index in state.worlds.anchoredRealms.indices {
+            try install(in: &state.worlds.anchoredRealms[index].world)
+        }
+        state.schemaVersion = 21
+        guard EncounterSnapshotRulesV1.validatesAll(in: state) else {
+            throw CocoaError(.coderInvalidValue)
+        }
+        return try SaveCodec.encode(state)
     }
 
     private static func migrate19to20(_ data: Data) throws -> Data {

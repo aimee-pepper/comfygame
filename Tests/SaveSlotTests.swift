@@ -44,7 +44,7 @@ final class SaveSlotTests: XCTestCase {
         return state
     }
 
-    private func currentPressureEncounterState() throws -> GameState {
+    private func currentPressureEncounterState(foeCount: Int = 2) throws -> GameState {
         var state = GameState.newGame()
         for ordinal in 1...3 {
             let id = PersistentPartyMemberID.generated("pressure-slot-\(ordinal)")
@@ -59,15 +59,15 @@ final class SaveSlotTests: XCTestCase {
                            map: .init(width: 2, height: 1,
                                       tiles: [Tile(isRevealed: true), Tile(isRevealed: true)], entry: point),
                            playerPosition: point)
-        let enemies = [WorldEnemy(id: .init(rawValue: 93_101), creatureID: "paper_moth",
+        let enemies = Array([WorldEnemy(id: .init(rawValue: 93_101), creatureID: "paper_moth",
                                   position: point, isAwake: true),
                        WorldEnemy(id: .init(rawValue: 93_102), creatureID: "paper_moth",
-                                  position: adjacent, isAwake: true)]
+                                  position: adjacent, isAwake: true)].prefix(foeCount))
         run.enemies = enemies; state.worlds.activeRun = run
         guard case .started = WorldRules.beginEncounter(triggerID: enemies[0].id,
             expected: enemies[0], runsAutomaticTurns: false, in: &state),
               var encounter = state.worlds.activeRun?.activeEncounter,
-              encounter.foes.count == 2,
+              encounter.foes.count == foeCount,
               var preview = encounter.scalingPreview else {
             throw CocoaError(.coderInvalidValue)
         }
@@ -75,6 +75,11 @@ final class SaveSlotTests: XCTestCase {
         encounter.scalingPreview = preview
         encounter.turnSlots = CombatRules.turnSlots(order: encounter.order, foes: encounter.foes,
             apexActionSlots: [:], ordinaryPressureSlots: 2)
+        encounter.pressureOwners = .init(entries: encounter.turnSlots.compactMap { slot in
+            guard case .ordinaryPressureFollowUp(let ordinal) = slot.kind,
+                  case .foe(let foeID) = slot.actor else { return nil }
+            return .init(ordinal: ordinal, foeID: foeID)
+        }.sorted { $0.ordinal < $1.ordinal })
         state.worlds.activeRun?.activeEncounter = encounter
         guard EncounterSnapshotRulesV1.validatesAll(in: state) else {
             throw CocoaError(.coderInvalidValue)
@@ -243,6 +248,42 @@ final class SaveSlotTests: XCTestCase {
                            state.worlds.activeRun?.activeEncounter?.turnSlots)
             XCTAssertEqual(loaded.worlds.activeRun?.activeEncounter?.order,
                            state.worlds.activeRun?.activeEncounter?.order)
+        }
+    }
+
+    func testSchema20PressureOwnerMigrationAndCurrentReceiptFailuresPreserveRealEnvelope() async throws {
+        let root = directory(); defer { try? FileManager.default.removeItem(at: root) }
+        let slots = SaveSlotFileIO(directory: root)
+        var legacy = try currentPressureEncounterState(foeCount: 1)
+        legacy.schemaVersion = 20
+        legacy.worlds.activeRun?.activeEncounter?.pressureOwners = nil
+        let created = try await slots.create(name: "Pressure migration", state: legacy)
+        let loaded = try await slots.load(created.metadata.id).state
+        XCTAssertEqual(loaded.schemaVersion, 21)
+        XCTAssertEqual(loaded.worlds.activeRun?.activeEncounter?.pressureOwners?.entries.count, 2)
+        XCTAssertEqual(Set(try XCTUnwrap(loaded.worlds.activeRun?.activeEncounter?
+            .pressureOwners).entries.map(\.foeID)).count, 1)
+
+        let url = try await slots.exportURL(for: created.metadata.id)
+        var valid = try SaveCodec.makeDecoder().decode(SaveSlotEnvelope.self,
+            from: Data(contentsOf: url))
+        valid.payload = try SaveCodec.makeEncoder().encode(loaded)
+        let validBytes = try encoder().encode(valid)
+        try validBytes.write(to: url, options: .atomic)
+        let mutations: [(String, (inout [String: Any]) -> Void)] = [
+            ("missing", { $0.removeValue(forKey: "pressureOwners") }),
+            ("null", { $0["pressureOwners"] = NSNull() }),
+            ("future", { var r = $0["pressureOwners"] as! [String: Any]; r["version"] = 99; $0["pressureOwners"] = r }),
+            ("duplicate", { var r = $0["pressureOwners"] as! [String: Any]; var e = r["entries"] as! [[String: Any]]; e[1]["ordinal"] = 1; r["entries"] = e; $0["pressureOwners"] = r })
+        ]
+        for (name, mutation) in mutations {
+            var envelope = valid
+            envelope.payload = try mutatingActiveEncounter(in: valid.payload, mutation)
+            let bytes = try encoder().encode(envelope)
+            try bytes.write(to: url, options: .atomic)
+            do { _ = try await slots.load(created.metadata.id); XCTFail("accepted \(name)") }
+            catch { }
+            XCTAssertEqual(try Data(contentsOf: url), bytes, name)
         }
     }
 

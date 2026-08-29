@@ -530,6 +530,15 @@ struct EncounterState: Codable, Equatable, Sendable {
         var strengthMultiplier: Double = 1
         var suppressesAfflictions = false
     }
+    struct EncounterPressureOwnerReceiptV1: Codable, Equatable, Sendable {
+        static let currentVersion = 1
+        struct Entry: Codable, Equatable, Sendable {
+            var ordinal: Int
+            var foeID: InstanceID
+        }
+        var version = currentVersion
+        var entries: [Entry]
+    }
     var id: InstanceID
     var foes: [FoeState]
     /// **What everyone in the party is called**, resolved when the fight starts and kept.
@@ -583,6 +592,8 @@ struct EncounterState: Codable, Equatable, Sendable {
     var order: [Combatant]
     /// Exact resolved round schedule. `order` remains as a tolerant compatibility mirror.
     var turnSlots: [TurnSlot] = []
+    /// Immutable ordinal-to-ordinary-foe authority. Dynamic effects may move slots, never rewrite it.
+    var pressureOwners: EncounterPressureOwnerReceiptV1?
     /// Targets already chosen by each apex this round, for distinct-target follow-up preference.
     var apexTargetsThisRound: [InstanceID: [Combatant]] = [:]
     var turnIndex: Int = 0
@@ -762,6 +773,7 @@ struct EncounterState: Codable, Equatable, Sendable {
 
     init(id: InstanceID, foes: [FoeState], partyNames: [PersistentPartyMemberID: String] = [:],
          order: [Combatant], turnSlots: [TurnSlot] = [],
+         pressureOwners: EncounterPressureOwnerReceiptV1? = nil,
          initiallyUnrecordedSpecies: Set<String> = [],
          debugV2BinderAttack: DebugV2BinderAttackReceipt? = nil,
          debugV2Initiative: DebugV2InitiativeReceipt? = nil,
@@ -779,6 +791,7 @@ struct EncounterState: Codable, Equatable, Sendable {
         self.partyNames = partyNames
         self.order = order
         self.turnSlots = turnSlots.isEmpty ? order.map { TurnSlot(actor: $0) } : turnSlots
+        self.pressureOwners = pressureOwners
         self.initiallyUnrecordedSpecies = initiallyUnrecordedSpecies
         self.debugV2BinderAttack = debugV2BinderAttack
         self.debugV2Initiative = debugV2Initiative
@@ -866,6 +879,8 @@ struct EncounterState: Codable, Equatable, Sendable {
         order = try c.decodeIfPresent([Combatant].self, forKey: .order) ?? [.binder, .companion(0)]
         turnSlots = try c.decodeIfPresent([TurnSlot].self, forKey: .turnSlots)
             ?? order.map { TurnSlot(actor: $0) }
+        pressureOwners = try c.decodeIfPresent(EncounterPressureOwnerReceiptV1.self,
+                                                forKey: .pressureOwners)
         apexTargetsThisRound = try c.decodeIfPresent([InstanceID: [Combatant]].self,
                                                       forKey: .apexTargetsThisRound) ?? [:]
         turnIndex = try c.decodeIfPresent(Int.self, forKey: .turnIndex) ?? 0

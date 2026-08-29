@@ -122,6 +122,12 @@ enum CombatRules {
 
         let slots = turnSlots(order: order, foes: foes, apexActionSlots: apexActionSlots,
                               ordinaryPressureSlots: ordinaryPressureSlots)
+        let pressureOwners = EncounterState.EncounterPressureOwnerReceiptV1(entries:
+            slots.compactMap { slot in
+                guard case .ordinaryPressureFollowUp(let ordinal) = slot.kind,
+                      case .foe(let foeID) = slot.actor else { return nil }
+                return .init(ordinal: ordinal, foeID: foeID)
+            }.sorted { $0.ordinal < $1.ordinal })
         var opening = [foes.count == 1 ? "A \(foes[0].stats.displayName) notices you."
                                        : "They close in around you."]
         if let relentless = apexActionSlots.values.max(), relentless > 1 {
@@ -154,6 +160,7 @@ enum CombatRules {
             partyNames: names,
             order: order,
             turnSlots: slots,
+            pressureOwners: pressureOwners,
             initiallyUnrecordedSpecies: initiallyUnrecordedSpecies,
             debugV2BinderAttack: debugV2BinderAttack,
             debugV2Initiative: finalizedInitiative,

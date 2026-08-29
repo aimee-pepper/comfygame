@@ -272,18 +272,22 @@ enum EncounterSnapshotRulesV1 {
             guard case .ordinaryPressureFollowUp(let ordinal) = slot.kind else { return nil }
             return (ordinal, slot.actor)
         }
-        let ordinaryFoeIDs = encounter.foes.filter { !$0.isApex }.map(\.id).sorted { lhs, rhs in
-            let left = encounter.debugV2Initiative?.entry(for: .foe(lhs))?.finalPosition
-                ?? encounter.order.firstIndex(of: .foe(lhs)).map { $0 + 1 } ?? Int.max
-            let right = encounter.debugV2Initiative?.entry(for: .foe(rhs))?.finalPosition
-                ?? encounter.order.firstIndex(of: .foe(rhs)).map { $0 + 1 } ?? Int.max
-            if left != right { return left < right }
-            return lhs.rawValue < rhs.rawValue
+        let expectedPressure: [(Int, Combatant)]
+        if state.schemaVersion >= 21 {
+            guard let receipt = encounter.pressureOwners,
+                  receipt.version == EncounterState.EncounterPressureOwnerReceiptV1.currentVersion,
+                  receipt.entries.count == ordinaryPressureSlots,
+                  Set(receipt.entries.map(\.ordinal)).count == receipt.entries.count,
+                  receipt.entries.map(\.ordinal).sorted()
+                    == Array(1..<(ordinaryPressureSlots + 1)),
+                  receipt.entries.allSatisfy({ entry in
+                      encounter.foes.contains { $0.id == entry.foeID && !$0.isApex }
+                  }) else { return false }
+            expectedPressure = receipt.entries.map { ($0.ordinal, .foe($0.foeID)) }
+        } else {
+            // Schema 20 compatibility exists only so migration can decode and prevalidate it.
+            expectedPressure = pressure.sorted { $0.0 < $1.0 }
         }
-        let expectedPressure: [(Int, Combatant)] = ordinaryFoeIDs.isEmpty ? []
-            : (1..<(ordinaryPressureSlots + 1)).map { ordinal in
-                (ordinal, .foe(ordinaryFoeIDs[(ordinal - 1) % ordinaryFoeIDs.count]))
-            }
         guard pressure.count == ordinaryPressureSlots,
               pressure.map(\.0).sorted() == Array(1..<(ordinaryPressureSlots + 1)),
               pressure.sorted(by: { $0.0 < $1.0 }).elementsEqual(expectedPressure, by: {

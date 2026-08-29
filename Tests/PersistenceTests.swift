@@ -45,7 +45,7 @@ final class PersistenceTests: XCTestCase {
         return state
     }
 
-    private func currentPressureEncounterState() throws -> GameState {
+    private func currentPressureEncounterState(foeCount: Int = 2) throws -> GameState {
         var state = GameState.newGame()
         for ordinal in 1...3 {
             let id = PersistentPartyMemberID.generated("pressure-raw-\(ordinal)")
@@ -60,15 +60,15 @@ final class PersistenceTests: XCTestCase {
                            map: .init(width: 2, height: 1,
                                       tiles: [Tile(isRevealed: true), Tile(isRevealed: true)], entry: point),
                            playerPosition: point)
-        let enemies = [WorldEnemy(id: .init(rawValue: 93_001), creatureID: "paper_moth",
+        let enemies = Array([WorldEnemy(id: .init(rawValue: 93_001), creatureID: "paper_moth",
                                   position: point, isAwake: true),
                        WorldEnemy(id: .init(rawValue: 93_002), creatureID: "paper_moth",
-                                  position: adjacent, isAwake: true)]
+                                  position: adjacent, isAwake: true)].prefix(foeCount))
         run.enemies = enemies; state.worlds.activeRun = run
         guard case .started = WorldRules.beginEncounter(triggerID: enemies[0].id,
             expected: enemies[0], runsAutomaticTurns: false, in: &state),
               var encounter = state.worlds.activeRun?.activeEncounter,
-              encounter.foes.count == 2,
+              encounter.foes.count == foeCount,
               var preview = encounter.scalingPreview else {
             throw CocoaError(.coderInvalidValue)
         }
@@ -78,6 +78,11 @@ final class PersistenceTests: XCTestCase {
         encounter.scalingPreview = preview
         encounter.turnSlots = CombatRules.turnSlots(order: encounter.order, foes: encounter.foes,
             apexActionSlots: [:], ordinaryPressureSlots: 2)
+        encounter.pressureOwners = .init(entries: encounter.turnSlots.compactMap { slot in
+            guard case .ordinaryPressureFollowUp(let ordinal) = slot.kind,
+                  case .foe(let foeID) = slot.actor else { return nil }
+            return .init(ordinal: ordinal, foeID: foeID)
+        }.sorted { $0.ordinal < $1.ordinal })
         state.worlds.activeRun?.activeEncounter = encounter
         guard EncounterSnapshotRulesV1.validatesAll(in: state) else {
             throw CocoaError(.coderInvalidValue)
@@ -229,6 +234,38 @@ final class PersistenceTests: XCTestCase {
             CombatRules.runAutomaticTurns(in: &direct)
             CombatRules.runAutomaticTurns(in: &relaunched)
             XCTAssertEqual(relaunched.worlds.activeRun, direct.worlds.activeRun)
+        }
+    }
+
+    func testSchema20EncounterPressureOwnersMigrateFromExactSlotsAndCurrentRejectsMalformed() throws {
+        var legacy = try currentPressureEncounterState(foeCount: 1)
+        legacy.schemaVersion = 20
+        legacy.worlds.activeRun?.activeEncounter?.pressureOwners = nil
+        let migratedBytes = try Migrations.migrateIfNeeded(SaveCodec.encode(legacy))
+        let migrated = try SaveCodec.decode(migratedBytes)
+        XCTAssertEqual(migrated.schemaVersion, 21)
+        let receipt = try XCTUnwrap(migrated.worlds.activeRun?.activeEncounter?.pressureOwners)
+        XCTAssertEqual(receipt.entries.map(\.ordinal), [1, 2])
+        XCTAssertEqual(Set(receipt.entries.map(\.foeID)).count, 1)
+        XCTAssertEqual(receipt.entries.map(\.foeID), migrated.worlds.activeRun?.activeEncounter?
+            .turnSlots.compactMap { slot in
+                guard case .ordinaryPressureFollowUp = slot.kind else { return nil }
+                return slot.actor.foeID
+            })
+        XCTAssertEqual(try Migrations.migrateIfNeeded(migratedBytes), migratedBytes)
+
+        let current = try SaveCodec.encode(migrated)
+        let malformed: [(String, (inout [String: Any]) -> Void)] = [
+            ("missing", { $0.removeValue(forKey: "pressureOwners") }),
+            ("null", { $0["pressureOwners"] = NSNull() }),
+            ("future", { var r = $0["pressureOwners"] as! [String: Any]; r["version"] = 2; $0["pressureOwners"] = r }),
+            ("empty", { var r = $0["pressureOwners"] as! [String: Any]; r["entries"] = []; $0["pressureOwners"] = r }),
+            ("duplicate ordinal", { var r = $0["pressureOwners"] as! [String: Any]; var e = r["entries"] as! [[String: Any]]; e[1]["ordinal"] = 1; r["entries"] = e; $0["pressureOwners"] = r }),
+            ("wrong owner", { var r = $0["pressureOwners"] as! [String: Any]; var e = r["entries"] as! [[String: Any]]; e[0]["foeID"] = 999_999; r["entries"] = e; $0["pressureOwners"] = r })
+        ]
+        for (name, mutation) in malformed {
+            let bytes = try mutatingActiveEncounter(in: current, mutation)
+            XCTAssertThrowsError(try Migrations.migrateIfNeeded(bytes), name)
         }
     }
 
