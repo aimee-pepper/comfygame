@@ -1078,6 +1078,14 @@ struct WorldView: View {
     @State private var isShowingDiagnostics = false
 #endif
 
+    init() {}
+
+#if DEBUG
+    init(debugTutorialLesson: TutorialLessonID?) {
+        _tutorialLesson = State(initialValue: debugTutorialLesson)
+    }
+#endif
+
     private var run: WorldRun? { store.state.worlds.activeRun }
 
     var body: some View {
@@ -1148,6 +1156,24 @@ struct WorldView: View {
                         carriedStrip(presentation)
                             .padding(.horizontal, 12)
                             .padding(.vertical, 6)
+                    }
+                    .tutorialHoverOverlay(
+                        isPresented: tutorialLesson != nil && !tutorialSuppressed,
+                        alignment: .bottom
+                    ) {
+                        if let id = tutorialLesson, let lesson = TutorialRules.definition(id) {
+                            TutorialCard(lesson: lesson,
+                                         gotIt: {
+                                             dismissedTutorials.insert(id)
+                                             tutorialLesson = nil
+                                         },
+                                         notNow: {
+                                             dismissedTutorials.insert(id)
+                                             store.deferTutorial(id)
+                                             tutorialLesson = nil
+                                         })
+                                .transition(.opacity)
+                        }
                     }
 
                     controls(run)
@@ -1233,21 +1259,6 @@ struct WorldView: View {
             Button("Keep what I have", role: .cancel) { pendingWorldPageSwap = nil }
         } message: {
             Text("Your satchel is full. Choose the exact slot to leave behind, or keep what you have.")
-        }
-        .tutorialHoverOverlay(
-            isPresented: tutorialLesson != nil && !tutorialSuppressed,
-            alignment: .bottom
-        ) {
-            if let id = tutorialLesson, let lesson = TutorialRules.definition(id) {
-                TutorialCard(lesson: lesson,
-                             gotIt: { dismissedTutorials.insert(id); tutorialLesson = nil },
-                             notNow: {
-                                 dismissedTutorials.insert(id)
-                                 store.deferTutorial(id)
-                                 tutorialLesson = nil
-                             })
-                    .transition(.opacity)
-            }
         }
         .onAppear { presentNextWorldLesson() }
         .onChange(of: run?.playerPosition) { old, new in

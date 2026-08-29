@@ -109,11 +109,13 @@ struct WritingDeskView: View {
 #if DEBUG
     init(debugInitialPane: String, debugBornAnchored: Bool = false,
          debugSelectedWorldPageID: InstanceID? = nil,
+         debugTutorialLesson: TutorialLessonID? = nil,
          debugBindRailProbe: ((Bool, String) -> Void)? = nil,
          debugBindRailFrameProbe: ((String, CGRect) -> Void)? = nil) {
         _pane = State(initialValue: Pane(rawValue: debugInitialPane) ?? .write)
         _bornAnchored = State(initialValue: debugBornAnchored)
         _selectedWorldPageID = State(initialValue: debugSelectedWorldPageID)
+        _tutorialLesson = State(initialValue: debugTutorialLesson)
         self.debugBindRailProbe = debugBindRailProbe
         self.debugBindRailFrameProbe = debugBindRailFrameProbe
     }
@@ -187,6 +189,13 @@ struct WritingDeskView: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(WritingDeskPaperBackground())
         .accessibilityIdentifier("writing.desk.modern")
+        .tutorialHoverOverlay(isPresented: tutorialLesson != nil) {
+            if let id = tutorialLesson, let lesson = TutorialRules.definition(id) {
+                TutorialCard(lesson: lesson,
+                             gotIt: { tutorialLesson = nil },
+                             notNow: { store.deferTutorial(id); tutorialLesson = nil })
+            }
+        }
         .safeAreaInset(edge: .bottom, spacing: 0) {
             if pane == .world { bindBar }
         }
@@ -224,13 +233,6 @@ struct WritingDeskView: View {
             case .inkWell:
                 InkWellSheet()
                     .environmentObject(store)
-            }
-        }
-        .tutorialHoverOverlay(isPresented: tutorialLesson != nil) {
-            if let id = tutorialLesson, let lesson = TutorialRules.definition(id) {
-                TutorialCard(lesson: lesson,
-                             gotIt: { tutorialLesson = nil },
-                             notNow: { store.deferTutorial(id); tutorialLesson = nil })
             }
         }
         .onAppear {
@@ -338,6 +340,7 @@ struct WritingDeskView: View {
                     .zIndex(100)
             }
         }
+        .accessibilityIdentifier("writing.header")
         .zIndex(showsPageActions ? 100 : 1)
     }
 
@@ -364,6 +367,7 @@ struct WritingDeskView: View {
         .padding(.horizontal, 10)
         .padding(.vertical, 6)
         .background(PixelUITheme.screen)
+        .accessibilityIdentifier("writing.pane-tabs")
     }
 
     // MARK: Pane 1 — writing
@@ -383,6 +387,7 @@ struct WritingDeskView: View {
                              side: metrics.cellSide, pageInset: metrics.pageInset,
                              dismissalToken: pageInteractionDismissalToken)
                     .frame(width: metrics.pageOuterSide, height: metrics.pageOuterSide)
+                    .accessibilityIdentifier("writing.page-grid")
                 inkWellBar
                 binTabs
                 ScrollView { binContents(columns: metrics.paletteColumns).padding(.bottom, 8) }
@@ -390,6 +395,7 @@ struct WritingDeskView: View {
                     .background(Color.clear.contentShape(Rectangle()).onTapGesture {
                         cancelPageInteraction(.outsidePage)
                     })
+                    .accessibilityIdentifier("writing.palette")
             }
             .padding(.horizontal, 12)
             .padding(.vertical, 10)

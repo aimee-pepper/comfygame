@@ -1,5 +1,33 @@
 import SwiftUI
 
+#if DEBUG
+@MainActor enum TutorialHoverOverlayMeasurement {
+    static var ownerFrame: CGRect = .zero
+    static var cardFrame: CGRect = .zero
+    static func reset() { ownerFrame = .zero; cardFrame = .zero }
+}
+
+private struct TutorialHoverFrameProbe: UIViewRepresentable {
+    enum Kind { case owner, card }
+    let kind: Kind
+    final class ProbeView: UIView {
+        var kind: Kind = .owner
+        override func layoutSubviews() {
+            super.layoutSubviews()
+            let frame = convert(bounds, to: nil)
+            switch kind {
+            case .owner: TutorialHoverOverlayMeasurement.ownerFrame = frame
+            case .card: TutorialHoverOverlayMeasurement.cardFrame = frame
+            }
+        }
+    }
+    func makeUIView(context: Context) -> ProbeView {
+        let view = ProbeView(frame: .zero); view.kind = kind; return view
+    }
+    func updateUIView(_ uiView: ProbeView, context: Context) { uiView.kind = kind }
+}
+#endif
+
 /// Tutorial help is transient chrome, never page content. `overlay` receives the primary view's
 /// resolved size and cannot feed the card's size back into that proposal, so showing a lesson does
 /// not resize maps, pages, grids, scroll content, or fixed controls.
@@ -42,6 +70,9 @@ private struct TutorialHoverOverlayContainer<Content: View>: View {
                     content
                         .fixedSize(horizontal: false, vertical: true)
                         .frame(maxWidth: .infinity)
+#if DEBUG
+                        .background(TutorialHoverFrameProbe(kind: .card))
+#endif
 
                     // Only oversized accessibility content becomes internally scrollable.
                     ScrollView {
@@ -50,12 +81,18 @@ private struct TutorialHoverOverlayContainer<Content: View>: View {
                             .frame(maxWidth: .infinity)
                     }
                     .scrollBounceBehavior(.basedOnSize)
+#if DEBUG
+                    .background(TutorialHoverFrameProbe(kind: .card))
+#endif
                 }
                 .frame(maxWidth: .infinity, maxHeight: maximumHeight, alignment: alignment)
                 .padding(.horizontal, 12)
                 .padding(.top, proxy.safeAreaInsets.top + 8)
                 .padding(.bottom, proxy.safeAreaInsets.bottom + 8)
             }
+#if DEBUG
+            .background(TutorialHoverFrameProbe(kind: .owner))
+#endif
         }
     }
 }
@@ -86,6 +123,7 @@ struct TutorialCard: View {
         .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 16))
         .overlay(RoundedRectangle(cornerRadius: 16).stroke(.tint.opacity(0.35)))
         .shadow(radius: 8, y: 3)
+        .accessibilityIdentifier("tutorial.card")
         .accessibilityElement(children: .contain)
     }
 }
