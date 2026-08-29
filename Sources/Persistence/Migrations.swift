@@ -36,6 +36,7 @@ enum Migrations {
             try validateCurrentAnimalCompanionCombat(in: data)
             try validateCurrentPhysicalGearReceipts(in: data)
             try validateCurrentPhysicalGearOwnership(in: data)
+            try validateCurrentRunExitCustody(in: data)
             return data
         }
 
@@ -53,6 +54,7 @@ enum Migrations {
         try validateCurrentAnimalCompanionCombat(in: working)
         try validateCurrentPhysicalGearReceipts(in: working)
         try validateCurrentPhysicalGearOwnership(in: working)
+        try validateCurrentRunExitCustody(in: working)
         return working
     }
 
@@ -158,11 +160,60 @@ enum Migrations {
         case 15: return try migrate15to16(data)
         case 16: return try migrate16to17(data)
         case 17: return try migrate17to18(data)
+        case 18: return try migrate18to19(data)
         default:
             // No migration registered. Tolerant decoding is the fallback; if the save is genuinely
             // incompatible, `SaveFileIO.load()` quarantines it rather than losing it.
             return data
         }
+    }
+
+    private static func migrate18to19(_ data: Data) throws -> Data {
+        guard var root = try JSONSerialization.jsonObject(with: data) as? [String: Any],
+              try exactInt(root["schemaVersion"]) == 18 else {
+            throw CocoaError(.coderInvalidValue)
+        }
+        func migrate(_ value: Any) throws -> Any {
+            if var object = value as? [String: Any] {
+                let isSummary = object["runIndex"] != nil && object["haulKeptFraction"] != nil
+                    && object["recoveredLines"] != nil && object["lostLines"] != nil
+                if isSummary {
+                    guard object["custodyReceiptVersion"] == nil else {
+                        throw CocoaError(.coderInvalidValue)
+                    }
+                    object["custodyReceiptVersion"] = RunExitSummary.legacyCustodyReceiptVersion
+                }
+                for (key, child) in object { object[key] = try migrate(child) }
+                return object
+            }
+            if let array = value as? [Any] { return try array.map(migrate) }
+            return value
+        }
+        root = try migrate(root) as! [String: Any]
+        root["schemaVersion"] = 19
+        return try JSONSerialization.data(withJSONObject: root, options: [.sortedKeys])
+    }
+
+    private static func validateCurrentRunExitCustody(in data: Data) throws {
+        let root = try JSONSerialization.jsonObject(with: data)
+        func walk(_ value: Any) throws {
+            if let array = value as? [Any] {
+                for child in array { try walk(child) }
+                return
+            }
+            guard let object = value as? [String: Any] else { return }
+            let isSummary = object["runIndex"] != nil && object["haulKeptFraction"] != nil
+                && object["recoveredLines"] != nil && object["lostLines"] != nil
+            if isSummary {
+                let version = try exactInt(object["custodyReceiptVersion"])
+                guard version == RunExitSummary.legacyCustodyReceiptVersion
+                        || version == RunExitSummary.custodyReceiptVersionV1 else {
+                    throw CocoaError(.coderInvalidValue)
+                }
+            }
+            for child in object.values { try walk(child) }
+        }
+        try walk(root)
     }
 
     private static func migrate16to17(_ data: Data) throws -> Data {

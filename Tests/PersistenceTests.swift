@@ -449,8 +449,10 @@ final class PersistenceTests: XCTestCase {
             worlds["runIndex"] = 17
             worlds["outcomeSequence"] = 0
             if let receipt {
-                worlds["lastExit"] = try JSONSerialization.jsonObject(
-                    with: SaveCodec.makeEncoder().encode(receipt))
+                var legacyReceipt = try XCTUnwrap(JSONSerialization.jsonObject(
+                    with: SaveCodec.makeEncoder().encode(receipt)) as? [String: Any])
+                legacyReceipt.removeValue(forKey: "custodyReceiptVersion")
+                worlds["lastExit"] = legacyReceipt
             }
             root["worlds"] = worlds
             return try JSONSerialization.data(withJSONObject: root, options: [.sortedKeys])
@@ -486,6 +488,37 @@ final class PersistenceTests: XCTestCase {
             withJSONObject: transitionalRoot, options: [.sortedKeys])
         XCTAssertThrowsError(try SaveCodec.decode(transitional),
                              "schema 11 has one queue authority and rejects legacy duplication")
+    }
+
+    func testSchemaEighteenPromotesEveryExitSummaryToExplicitLegacyCustodyV0() throws {
+        var state = GameState.newGame()
+        let first = RunExitSummary(runIndex: 3, outcomeID: 1, kind: .portal,
+                                   reason: "home", turnsTaken: 4, haulKeptFraction: 1)
+        let second = RunExitSummary(runIndex: 4, outcomeID: 2, kind: .collapse,
+                                    reason: "collapse", turnsTaken: 9, haulKeptFraction: 0.5)
+        XCTAssertTrue(state.worlds.appendExpeditionReview(first))
+        XCTAssertTrue(state.worlds.appendExpeditionReview(second))
+        var root = try XCTUnwrap(JSONSerialization.jsonObject(
+            with: SaveCodec.encode(state)) as? [String: Any])
+        root["schemaVersion"] = 18
+        func removeCustodyVersion(_ value: Any) -> Any {
+            if var object = value as? [String: Any] {
+                object.removeValue(forKey: "custodyReceiptVersion")
+                for (key, child) in object { object[key] = removeCustodyVersion(child) }
+                return object
+            }
+            if let array = value as? [Any] { return array.map(removeCustodyVersion) }
+            return value
+        }
+        root = removeCustodyVersion(root) as! [String: Any]
+        let source = try JSONSerialization.data(withJSONObject: root, options: [.sortedKeys])
+        let migrated = try Migrations.migrateIfNeeded(source)
+        let decoded = try SaveCodec.makeDecoder().decode(GameState.self, from: migrated)
+        XCTAssertEqual(decoded.schemaVersion, 19)
+        XCTAssertEqual(decoded.worlds.expeditionReviewQueue.pending.map {
+            $0.summary.custodyReceiptVersion
+        }, [0, 0])
+        XCTAssertEqual(try Migrations.migrateIfNeeded(migrated), migrated)
     }
 
     func testB111AQueueValidationRejectsMalformedIdentityAndOrdering() throws {

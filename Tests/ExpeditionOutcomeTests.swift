@@ -730,6 +730,33 @@ final class ExpeditionOutcomeTests: XCTestCase {
                       "lost-side receipt lines retain their existing Return disposition")
     }
 
+    func testCustodyV1RejectsDuplicateGearAndWrongRecoveredDestination() throws {
+        let gear = ItemStack(id: InstanceID(rawValue: 711), catalogID: "blade_keen")
+        let item = RunExitSummary.ReceiptLine.Item(
+            lineID: "gear-711", instanceID: gear.id, snapshot: gear, quantity: 1,
+            fallbackName: gear.displayName, fallbackIcon: gear.icon,
+            recoveredDestination: .stored)
+        let valid = RunExitSummary(runIndex: 9, outcomeID: 4, kind: .portal,
+                                   reason: "home", turnsTaken: 7, haulKeptFraction: 1,
+                                   recoveredLines: [.uniqueItem(item)], lostLines: [])
+        XCTAssertTrue(valid.validatesPhysicalGearCustody())
+
+        let duplicate = RunExitSummary(runIndex: 9, outcomeID: 4, kind: .portal,
+                                       reason: "home", turnsTaken: 7, haulKeptFraction: 1,
+                                       recoveredLines: [.uniqueItem(item), .uniqueItem(item)],
+                                       lostLines: [])
+        XCTAssertFalse(duplicate.validatesPhysicalGearCustody())
+        var missingDestination = item
+        missingDestination.recoveredDestination = nil
+        let malformed = RunExitSummary(runIndex: 9, outcomeID: 4, kind: .portal,
+                                       reason: "home", turnsTaken: 7, haulKeptFraction: 1,
+                                       recoveredLines: [.uniqueItem(missingDestination)],
+                                       lostLines: [])
+        XCTAssertFalse(malformed.validatesPhysicalGearCustody())
+        XCTAssertThrowsError(try SaveCodec.makeDecoder().decode(
+            RunExitSummary.self, from: SaveCodec.makeEncoder().encode(malformed)))
+    }
+
     func testRecoveredMaterialDestinationsAreFrozenWithoutChangingReserveBanking() throws {
         var run = departureRun()
         let sample = CraftMaterialUnitV1(kind: .hide, properties: .init(flexibility: 55),

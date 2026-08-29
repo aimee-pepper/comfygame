@@ -119,8 +119,9 @@ extension GameState {
             return true
         }
         for stack in base.inventory.stacks + base.spillover {
-            if let profile = stack.gearProfile, !validate(profile, expectedStackID: stack.id) {
-                return false
+            if let profile = stack.gearProfile {
+                guard stack.protectedReturnCount == 0,
+                      validate(profile, expectedStackID: stack.id) else { return false }
             }
         }
         var stockLineIDs = Set<UInt64>()
@@ -165,9 +166,24 @@ extension GameState {
         }
         let runs = [worlds.activeRun].compactMap { $0 } + worlds.anchoredRealms.map(\.world)
         for stack in runs.flatMap({ $0.satchelItems.stacks + $0.offeredItems }) {
-            if let profile = stack.gearProfile, !validate(profile, expectedStackID: stack.id) {
-                return false
+            if let profile = stack.gearProfile {
+                guard (0...1).contains(stack.protectedReturnCount),
+                      validate(profile, expectedStackID: stack.id) else { return false }
             }
+        }
+        return true
+    }
+
+    func validatesLiveSeamwardCustody() -> Bool {
+        guard let run = worlds.activeRun, let receipt = run.seamwardExpedition else { return true }
+        for contributor in receipt.contributors {
+            guard let piece = base.worn(contributor.slot, by: contributor.member),
+                  let profile = piece.gearProfile,
+                  profile.stableInstanceID == contributor.gearStableInstanceID,
+                  let inscription = profile.inscription, inscription.isActiveSeamward,
+                  inscription.definitionID == contributor.definitionID,
+                  inscription.rulesVersion == contributor.rulesVersion,
+                  inscription.inkRecipe == contributor.inkRecipe else { return false }
         }
         return true
     }

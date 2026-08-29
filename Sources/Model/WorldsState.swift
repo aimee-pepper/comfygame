@@ -200,6 +200,8 @@ struct WorldsState: Codable, Equatable, Sendable {
 
     @discardableResult
     mutating func appendExpeditionReview(_ summary: RunExitSummary) -> Bool {
+        guard summary.custodyReceiptVersion == RunExitSummary.custodyReceiptVersionV1,
+              summary.validatesPhysicalGearCustody() else { return false }
         guard let outcomeID = summary.outcomeID else { return false }
         let reviewID = ExpeditionReviewID.outcome(outcomeID)
         guard !expeditionReviewQueue.acknowledged.contains(reviewID) else { return true }
@@ -415,6 +417,8 @@ enum WorldDepartureState: String, Codable, Equatable, Sendable {
 }
 
 struct RunExitSummary: Codable, Equatable, Identifiable, Sendable {
+    static let legacyCustodyReceiptVersion = 0
+    static let custodyReceiptVersionV1 = 1
     /// Frozen, typed receipt authority. The older name/icon/count arrays remain compatibility
     /// projections for existing presentation; they are never used to reconstruct identity.
     enum ReceiptLine: Codable, Equatable, Identifiable, Sendable {
@@ -612,6 +616,7 @@ struct RunExitSummary: Codable, Equatable, Identifiable, Sendable {
     }
 
     var runIndex: Int
+    var custodyReceiptVersion: Int
     var outcomeID: ExpeditionOutcomeID?
     var kind: Kind
     var reason: String
@@ -645,6 +650,7 @@ struct RunExitSummary: Codable, Equatable, Identifiable, Sendable {
     }
 
     init(runIndex: Int, outcomeID: ExpeditionOutcomeID? = nil,
+         custodyReceiptVersion: Int = Self.custodyReceiptVersionV1,
          kind: Kind, reason: String, departureState: WorldDepartureState? = nil,
          turnsTaken: Int, haulKeptFraction: Double,
          resources: [RunExitGain] = [], items: [RunExitGain] = [],
@@ -658,6 +664,7 @@ struct RunExitSummary: Codable, Equatable, Identifiable, Sendable {
          creatureMaterialRewardReceipts: [CreatureMaterialRewardReceiptV1] = [],
          essenceEconomy: EssenceEconomy = EssenceEconomy()) {
         self.runIndex = runIndex
+        self.custodyReceiptVersion = custodyReceiptVersion
         self.outcomeID = outcomeID
         self.kind = kind
         self.reason = reason
@@ -698,6 +705,11 @@ struct RunExitSummary: Codable, Equatable, Identifiable, Sendable {
     init(from decoder: Decoder) throws {
         let c = try decoder.container(keyedBy: CodingKeys.self)
         runIndex = try c.decode(Int.self, forKey: .runIndex)
+        custodyReceiptVersion = try c.decode(Int.self, forKey: .custodyReceiptVersion)
+        guard custodyReceiptVersion == Self.legacyCustodyReceiptVersion
+                || custodyReceiptVersion == Self.custodyReceiptVersionV1 else {
+            throw CocoaError(.coderInvalidValue)
+        }
         outcomeID = try c.decodeIfPresent(ExpeditionOutcomeID.self, forKey: .outcomeID)
         let fraction = try c.decode(Double.self, forKey: .haulKeptFraction)
         kind = try c.decodeIfPresent(Kind.self, forKey: .kind) ?? (fraction >= 1 ? .portal : .collapse)
@@ -747,6 +759,46 @@ struct RunExitSummary: Codable, Equatable, Identifiable, Sendable {
         creatureMaterialRewardReceipts = try c.decodeIfPresent(
             [CreatureMaterialRewardReceiptV1].self,
             forKey: .creatureMaterialRewardReceipts) ?? []
+        guard validatesPhysicalGearCustody() else { throw CocoaError(.coderInvalidValue) }
+    }
+
+    func validatesPhysicalGearCustody() -> Bool {
+        guard custodyReceiptVersion == Self.legacyCustodyReceiptVersion
+                || custodyReceiptVersion == Self.custodyReceiptVersionV1 else { return false }
+        var lineIDs = Set<String>()
+        var recoveredGearIDs = Set<InstanceID>()
+        var lostGearIDs = Set<InstanceID>()
+        func validate(_ line: ReceiptLine, recovered: Bool) -> Bool {
+            let lineID: String
+            switch line {
+            case .resource(let value): lineID = value.lineID
+            case .stackableItem(let value):
+                lineID = value.lineID
+                if custodyReceiptVersion == Self.custodyReceiptVersionV1,
+                   value.snapshot.gearProfile != nil { return false }
+            case .uniqueItem(let value):
+                lineID = value.lineID
+                if let profile = value.snapshot.gearProfile {
+                    guard custodyReceiptVersion == Self.custodyReceiptVersionV1,
+                          value.quantity == 1, value.snapshot.count == 1,
+                          value.instanceID == value.snapshot.id,
+                          value.snapshot.id == profile.stableInstanceID,
+                          profile.physicalReceipt?.validates(profile: profile) ?? true,
+                          recovered ? value.recoveredDestination != nil
+                                    : value.recoveredDestination == nil else { return false }
+                    let inserted = recovered
+                        ? recoveredGearIDs.insert(profile.stableInstanceID).inserted
+                        : lostGearIDs.insert(profile.stableInstanceID).inserted
+                    guard inserted else { return false }
+                }
+            case .materialSample(let value): lineID = value.lineID
+            case .legacy(let value): lineID = value.stableID
+            }
+            return !lineID.isEmpty && lineIDs.insert(lineID).inserted
+        }
+        guard recoveredLines.allSatisfy({ validate($0, recovered: true) }),
+              lostLines.allSatisfy({ validate($0, recovered: false) }) else { return false }
+        return recoveredGearIDs.isDisjoint(with: lostGearIDs)
     }
 }
 
