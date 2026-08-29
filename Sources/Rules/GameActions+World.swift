@@ -838,7 +838,8 @@ extension GameStore {
         }
 
         var events: [WorldRules.Event] = []
-        mutate("travel", scope: .expedition) { state in
+        let committed = mutateIf("travel", scope: .expedition) { state in
+            var madeProgress = false
             for next in route {
                 if let current = state.worlds.activeRun,
                    WorldRules.automaticTravelMustStop(before: next, in: current,
@@ -855,14 +856,19 @@ extension GameStore {
                     events.append(.blocked("\(current.map[next].ground.displayName.capitalized) ahead. Something dangerous is nearby; step into it deliberately."))
                     break
                 }
+                let runBeforeStep = state.worlds.activeRun
                 let stepEvents = WorldRules.step(to: next, in: &state)
                 events.append(contentsOf: stepEvents)
+                if state.worlds.activeRun != runBeforeStep { madeProgress = true }
                 if stepEvents.contains(where: \.interruptsTravel) { break }
                 if state.worlds.activeRun == nil { break }
             }
+            return madeProgress
         }
         finishTurn(events, attempt: attempt)
-        presentTravellerSpeechAfterMovement(from: priorPosition, sourceAction: .travel)
+        if committed {
+            presentTravellerSpeechAfterMovement(from: priorPosition, sourceAction: .travel)
+        }
     }
 
     /// One pull from the node underfoot.

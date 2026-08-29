@@ -3803,6 +3803,97 @@ final class WorldTests: XCTestCase {
                       "path weights ignored the zero-extra-turn run snapshot")
     }
 
+    func testAutomaticTravelUsesOnlyRevealedHazardsAsRouteKnowledge() {
+        let start = GridPoint(x: 0, y: 1)
+        let destination = GridPoint(x: 4, y: 1)
+        let hazard = GridPoint(x: 2, y: 1)
+        var hiddenHazard = WorldMap(width: 5, height: 3,
+                                    tiles: Array(repeating: Tile(), count: 15), entry: start)
+        hiddenHazard[hazard].content = .hazard
+        var hiddenEmpty = hiddenHazard
+        hiddenEmpty[hazard].content = .empty
+
+        let hiddenRoute = WorldRules.path(from: start, to: destination, in: hiddenHazard)
+        XCTAssertEqual(hiddenRoute,
+                       WorldRules.path(from: start, to: destination, in: hiddenEmpty),
+                       "an unrevealed hazard must not leak into deterministic routing")
+        XCTAssertTrue(hiddenRoute.contains(hazard))
+
+        hiddenHazard[hazard].isRevealed = true
+        let revealedRoute = WorldRules.path(from: start, to: destination, in: hiddenHazard)
+        XCTAssertFalse(revealedRoute.contains(hazard))
+        XCTAssertEqual(revealedRoute.last, destination)
+
+        hiddenHazard[destination].content = .hazard
+        hiddenHazard[destination].isRevealed = true
+        XCTAssertEqual(WorldRules.path(from: start, to: destination, in: hiddenHazard).last,
+                       destination, "a deliberate hazard destination remains enterable")
+    }
+
+    @MainActor
+    func testAutomaticTravelPublishesOnlyAfterAtLeastOneStepCommits() throws {
+        let io = SaveFileIO.temporary(name: "travel-atomic-\(UUID().uuidString)")
+        let store = GameStore(io: io)
+        let start = GridPoint(x: 0, y: 0)
+        let occupied = GridPoint(x: 1, y: 0)
+        let destination = GridPoint(x: 2, y: 0)
+        let map = WorldMap(width: 3, height: 1,
+                           tiles: Array(repeating: Tile(isRevealed: true), count: 3), entry: start)
+        let blocker = WorldEnemy(id: InstanceID(rawValue: 38_201), creatureID: "paper_moth",
+                                 position: occupied, isSessile: true)
+        var fixture = GameState.newGame()
+        fixture.worlds.activeRun = WorldRun(
+            runIndex: 1, book: book(["terrain": "plains"]), mapSeed: 38_201,
+            rng: SeededRNG(seed: 38_201), map: map, playerPosition: start, enemies: [blocker])
+        store.mutate("travel atomic fixture", flush: true) { $0 = fixture }
+        let stateBytes = try SaveCodec.encode(store.state)
+        let fileBytes = try Data(contentsOf: io.saveURL)
+        let diagnostics = store.diagnostics
+
+        store.travel(to: destination)
+
+        XCTAssertEqual(store.recentEvents,
+                       [.blocked("Something dangerous occupies that tile. Step onto it deliberately.")])
+        XCTAssertEqual(try SaveCodec.encode(store.state), stateBytes)
+        XCTAssertEqual(try Data(contentsOf: io.saveURL), fileBytes)
+        XCTAssertEqual(store.diagnostics.writeCount, diagnostics.writeCount)
+        XCTAssertEqual(store.diagnostics.savedMutationCount, diagnostics.savedMutationCount)
+        XCTAssertEqual(store.diagnostics.hasPendingWrite, diagnostics.hasPendingWrite)
+    }
+
+    @MainActor
+    func testAutomaticTravelPartialProgressPublishesOnceAndRelaunchesAtStop() throws {
+        let io = SaveFileIO.temporary(name: "travel-partial-\(UUID().uuidString)")
+        let store = GameStore(io: io)
+        let start = GridPoint(x: 0, y: 0)
+        let occupied = GridPoint(x: 3, y: 0)
+        let map = WorldMap(width: 4, height: 1,
+                           tiles: Array(repeating: Tile(isRevealed: true), count: 4), entry: start)
+        let blocker = WorldEnemy(id: InstanceID(rawValue: 38_202), creatureID: "paper_moth",
+                                 position: occupied, isSessile: true)
+        var fixture = GameState.newGame()
+        fixture.worlds.activeRun = WorldRun(
+            runIndex: 1, book: book(["terrain": "plains"]), mapSeed: 38_202,
+            rng: SeededRNG(seed: 38_202), map: map, playerPosition: start, enemies: [blocker])
+        store.mutate("travel partial fixture", flush: true) { $0 = fixture }
+        let mutationBefore = store.state.meta.mutationCount
+        let historyBefore = store.state.meta.semanticActionTrail.count
+
+        store.travel(to: occupied)
+
+        XCTAssertEqual(store.activeRun?.playerPosition, GridPoint(x: 1, y: 0))
+        XCTAssertEqual(store.activeRun?.turnsTaken, 1)
+        XCTAssertEqual(store.state.meta.mutationCount, mutationBefore + 1)
+        XCTAssertEqual(store.state.meta.semanticActionTrail.count, historyBefore + 1)
+        XCTAssertEqual(store.state.meta.semanticActionTrail.last, "travel")
+        XCTAssertTrue(store.diagnostics.hasPendingWrite)
+        store.flushNow()
+        let relaunched = GameStore(io: io)
+        XCTAssertEqual(relaunched.activeRun?.playerPosition, GridPoint(x: 1, y: 0))
+        XCTAssertEqual(relaunched.activeRun?.turnsTaken, 1)
+        XCTAssertNil(relaunched.activeRun?.activeEncounter)
+    }
+
     func testNonAdjacentStepsAreRefused() {
         var state = startedRun(book(["terrain": "plains"]), seed: 13)
         let run = state.worlds.activeRun!

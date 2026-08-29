@@ -467,7 +467,8 @@ enum WorldRules {
             for next in map.neighbours(of: current) {
                 guard canEnter(next, in: map) else { continue }
                 // The destination is always enterable even if it's the hazard you're aiming at.
-                if avoidingHazards, next != destination, map[next].content == .hazard { continue }
+                if avoidingHazards, next != destination, map[next].isRevealed,
+                   map[next].content == .hazard { continue }
                 let candidate = cost[current, default: .max]
                     + movementCost(map[next].ground, slowGroundExtraTurns: slowGroundExtraTurns)
                 if candidate < cost[next, default: .max] {

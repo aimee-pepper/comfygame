@@ -111,6 +111,39 @@ final class SaveSlotTests: XCTestCase {
         XCTAssertFalse(store.diagnostics.hasPendingWrite)
     }
 
+    @MainActor
+    func testZeroProgressAutomaticTravelPreservesRealSlotEnvelope() async throws {
+        let root = directory(); defer { try? FileManager.default.removeItem(at: root) }
+        let slots = SaveSlotFileIO(directory: root)
+        let start = GridPoint(x: 0, y: 0)
+        let occupied = GridPoint(x: 1, y: 0)
+        let destination = GridPoint(x: 2, y: 0)
+        let map = WorldMap(width: 3, height: 1,
+                           tiles: Array(repeating: Tile(isRevealed: true), count: 3), entry: start)
+        let blocker = WorldEnemy(id: .init(rawValue: 701_101), creatureID: "paper_moth",
+                                 position: occupied, isSessile: true)
+        var state = GameState.newGame()
+        state.worlds.activeRun = WorldRun(
+            runIndex: 702, book: .init(written: [], essencePaid: 0), mapSeed: 702_001,
+            rng: .init(seed: 702_001), map: map, playerPosition: start, enemies: [blocker])
+        let created = try await slots.create(name: "Travel refusal", state: state)
+        _ = try await slots.acquireWriterLease(for: created.metadata.id)
+        let store = GameStore(io: try await slots.payloadIOForLeasedSlot())
+        let url = try await slots.exportURL(for: created.metadata.id)
+        let envelope = try Data(contentsOf: url)
+        let stateBefore = store.state
+        let diagnostics = store.diagnostics
+
+        store.travel(to: destination)
+
+        XCTAssertEqual(store.state, stateBefore)
+        XCTAssertEqual(try SaveCodec.encode(store.state), try SaveCodec.encode(stateBefore))
+        XCTAssertEqual(try Data(contentsOf: url), envelope)
+        XCTAssertEqual(store.diagnostics.writeCount, diagnostics.writeCount)
+        XCTAssertEqual(store.diagnostics.savedMutationCount, diagnostics.savedMutationCount)
+        XCTAssertEqual(store.diagnostics.hasPendingWrite, diagnostics.hasPendingWrite)
+    }
+
     private func currentEncounterState() throws -> GameState {
         var state = GameState.newGame()
         let point = GridPoint(x: 0, y: 0)
