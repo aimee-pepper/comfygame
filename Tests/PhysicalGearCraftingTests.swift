@@ -384,7 +384,8 @@ final class PhysicalGearCraftingTests: XCTestCase {
             }
 
             let first = try XCTUnwrap(preview.selections.first)
-            _ = state.base.worldMaterialReserve.consume([try XCTUnwrap(first.reserveSelection)])
+            XCTAssertNotNil(state.base.consumeCraftMaterials(
+                [try XCTUnwrap(first.reserveSelection)]), recipe.id)
             let afterExternalChange = state
             XCTAssertNil(PhysicalGearCraftingRules.craft(preview, in: &state), recipe.id)
             XCTAssertEqual(state, afterExternalChange, "\(recipe.id) stale preview debited state")
