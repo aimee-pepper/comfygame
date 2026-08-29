@@ -14,6 +14,7 @@ enum ArmouryRules {
         var allowedSlots: Set<GearSlot>
         var physicalOffset: Double
         var requirements: [Requirement]
+        var primaryRequirementIDs: Set<String>
     }
 
     enum Target: Identifiable, Equatable, Sendable {
@@ -67,33 +68,44 @@ enum ArmouryRules {
     static let protectiveSlots: Set<GearSlot> = [.offhand, .head, .armor, .hands, .feet]
 
     static let rigid = Profile(
-        id: "armoury_rigid_shell_v1", name: "Rigid shell", minimumEffectiveTier: 0,
+        id: "armoury_rigid_shell", name: "Rigid shell", minimumEffectiveTier: 0,
+        allowedSlots: protectiveSlots, physicalOffset: 0.5,
+        requirements: [
+            requirement("body.0", [.ore, .copper, .adamant, .bone, .scale, .plate,
+                                    .chitin, .shell, .quill]),
+            requirement("body.1", [.ore, .copper, .adamant, .bone, .scale, .plate,
+                                    .chitin, .shell, .quill]),
+            requirement("binding.0", [.fibre, .resin, .copper, .silver, .gold, .hide, .fin])
+        ], primaryRequirementIDs: ["body.0", "body.1"])
+    static let insulated = Profile(
+        id: "armoury_insulated_layer", name: "Insulated layer", minimumEffectiveTier: 1,
+        allowedSlots: [.head, .armor, .hands, .feet], physicalOffset: -0.5,
+        requirements: [
+            requirement("lining.0", [.fibre, .hide, .pelt, .down, .feather, .fin]),
+            requirement("lining.1", [.fibre, .hide, .pelt, .down, .feather, .fin]),
+            requirement("outer.0", [.ore, .copper, .adamant, .timber, .bone, .hide,
+                                     .scale, .plate, .chitin, .shell])
+        ], primaryRequirementIDs: ["lining.0", "lining.1"])
+    static let balanced = Profile(
+        id: "armoury_balanced_laminate", name: "Balanced laminate", minimumEffectiveTier: 1,
         allowedSlots: protectiveSlots, physicalOffset: 0,
         requirements: [
-            Requirement(id: "hard_shell_1", allowedKinds: nil, floors: [Floor(property: .hardness, minimum: 65)]),
-            Requirement(id: "hard_shell_2", allowedKinds: nil, floors: [Floor(property: .hardness, minimum: 65)]),
-            Requirement(id: "dense_frame", allowedKinds: nil, floors: [Floor(property: .density, minimum: 55)]),
-            Requirement(id: "flexible_joint", allowedKinds: nil, floors: [Floor(property: .flexibility, minimum: 45)])
-        ])
-    static let insulated = Profile(
-        id: "armoury_insulated_layer_v1", name: "Insulated layer", minimumEffectiveTier: 1,
-        allowedSlots: [.head, .armor, .hands, .feet], physicalOffset: -1,
-        requirements: [
-            Requirement(id: "insulation_1", allowedKinds: nil, floors: [Floor(property: .insulation, minimum: 65)]),
-            Requirement(id: "insulation_2", allowedKinds: nil, floors: [Floor(property: .insulation, minimum: 65)]),
-            Requirement(id: "flexible_layer", allowedKinds: nil, floors: [Floor(property: .flexibility, minimum: 55)]),
-            Requirement(id: "hard_outer", allowedKinds: nil, floors: [Floor(property: .hardness, minimum: 45)])
-        ])
-    static let balanced = Profile(
-        id: "armoury_balanced_laminate_v1", name: "Balanced laminate", minimumEffectiveTier: 1,
-        allowedSlots: protectiveSlots, physicalOffset: -0.5,
-        requirements: [
-            Requirement(id: "hard_layer", allowedKinds: nil, floors: [Floor(property: .hardness, minimum: 60)]),
-            Requirement(id: "insulated_layer", allowedKinds: nil, floors: [Floor(property: .insulation, minimum: 55)]),
-            Requirement(id: "flexible_layer", allowedKinds: nil, floors: [Floor(property: .flexibility, minimum: 55)]),
-            Requirement(id: "dense_layer", allowedKinds: nil, floors: [Floor(property: .density, minimum: 45)])
-        ])
+            requirement("body.0", [.ore, .copper, .adamant, .timber, .bone, .hide,
+                                    .scale, .plate, .chitin, .shell]),
+            requirement("lining.0", [.fibre, .hide, .pelt, .down, .feather, .fin]),
+            requirement("binding.0", [.fibre, .resin, .copper, .silver, .gold, .hide, .fin]),
+            requirement("fitting.0", [.copper, .silver, .gold, .quartz, .adamant,
+                                       .bone, .horn, .quill])
+        ], primaryRequirementIDs: ["body.0", "lining.0"])
     static let profiles = [rigid, insulated, balanced]
+
+    private static func requirement(_ id: String, _ families: Set<MaterialFamilyID>)
+        -> Requirement {
+        Requirement(id: id, allowedKinds: families,
+                    allowedIdentities: Set(families.map {
+                        .init(domain: .forFamily($0), family: $0)
+                    }), floors: [])
+    }
 
     static func effectiveTier(in state: GameState) -> Int {
         guard let station = ContentCatalog.shared.station(Stations.armoury) else { return 0 }
@@ -122,7 +134,13 @@ enum ArmouryRules {
 
     static func eligible(_ target: Target, includeLegacy: Bool) -> Bool {
         guard let profile = target.gearProfile, protectiveSlots.contains(profile.slot),
-              profile.authoredUniqueRuleID == nil else { return false }
+              profile.authoredUniqueRuleID == nil,
+              target.catalogID != Items.conduitFixture,
+              let definition = ContentCatalog.shared.item(target.catalogID),
+              definition.gear?.breaks == nil,
+              definition.gearCatalogueDisposition?.classification != .wildApexOnly,
+              definition.gearCatalogueDisposition?.foundReceipt?.mode != .fixedSpecial
+        else { return false }
         return includeLegacy || !target.isLegacyMasterwork
     }
 
@@ -168,17 +186,20 @@ enum ArmouryRules {
         guard let chosen, chosen.allSatisfy({ $0.reserveSelection != nil }),
               PhysicalGearCraftingRules.preview(selectionRecipe(profile), selections: chosen, in: state) != nil
         else { return nil }
-        let ranks = chosen.map { $0.sample.qualityBand.rawValue }
-        let primary = Double(ranks.first ?? 0)
-        let secondary = ranks.dropFirst().isEmpty
+        let primaryRanks = chosen.filter { profile.primaryRequirementIDs.contains($0.requirementID) }
+            .map { $0.sample.qualityBand.rawValue }
+        let secondaryRanks = chosen.filter { !profile.primaryRequirementIDs.contains($0.requirementID) }
+            .map { $0.sample.qualityBand.rawValue }
+        guard !primaryRanks.isEmpty else { return nil }
+        let primary = Double(primaryRanks.reduce(0, +)) / Double(primaryRanks.count)
+        let secondary = secondaryRanks.isEmpty
             ? primary
-            : Double(ranks.dropFirst().reduce(0, +)) / Double(ranks.count - 1)
+            : Double(secondaryRanks.reduce(0, +)) / Double(secondaryRanks.count)
         let qualityRank = Int((0.7 * primary + 0.3 * secondary).rounded())
         let qualityBand = CraftMaterialQualityBand(rawValue: qualityRank) ?? .rough
-        let cap = effectiveTier(in: state) >= 2 ? 4 : 3
-        let output = min(max(1, qualityRank), cap)
+        let output = qualityRank
         let station = ContentCatalog.shared.station(Stations.armoury)!
-        let raw = PhysicalGearCraftingRules.essenceCost(for: output)
+        let raw = PhysicalGearCraftingRules.essenceCost(for: max(1, output))
         let paid = StationStaffingRules.discounted(raw, at: station, in: state)
         let insulation = chosen.map(\.sample.properties.insulation).reduce(0, +) / Double(chosen.count)
         let reactivity = chosen.map(\.sample.properties.reactivity).reduce(0, +) / Double(chosen.count)
@@ -186,7 +207,7 @@ enum ArmouryRules {
                        outputTier: output, rawEssence: raw, essence: paid,
                        insulation: insulation, reactivity: reactivity,
                        currentPhysical: target.gearProfile?.protectivePower ?? 0,
-                       rebuiltPhysical: max(0, Double(output) + profile.physicalOffset),
+                       rebuiltPhysical: max(0, Double(qualityRank) + profile.physicalOffset),
                        currentInsulation: target.gearProfile?.insulation ?? 0)
     }
 
@@ -239,7 +260,8 @@ enum ArmouryRules {
         PhysicalGearCraftingRules.Recipe(id: profile.id, displayName: profile.name,
             catalogFallback: "guard_padded", station: Stations.armoury, stationCap: 4,
             specialistHeadlineTier: 3, slot: .armor, damage: nil, reach: .close,
-            requirements: profile.requirements)
+            requirements: profile.requirements,
+            primaryRequirementIDs: profile.primaryRequirementIDs)
     }
 
     private static func currentTarget(matching target: Target, in state: GameState) -> Target? {
