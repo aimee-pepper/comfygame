@@ -124,7 +124,7 @@ struct MaterialProperties: Codable, Equatable, Sendable {
     }
 }
 
-enum CraftMaterialDomain: String, Codable, CaseIterable, Sendable {
+enum CraftMaterialDomain: String, Codable, CaseIterable, Hashable, Sendable {
     case world, creature
 
     static func forFamily(_ family: MaterialFamilyID) -> Self {

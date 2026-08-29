@@ -18,19 +18,24 @@ final class PhysicalGearCraftingTests: XCTestCase {
         var state = GameState.newGame()
         state.base.stations[Stations.bowyer] = StationState(isUnlocked: true, tier: tier)
         state.base.essence = 200
-        state.base.inventory.add(ItemStack(id: InstanceID(rawValue: 73), catalogID: Items.material,
-            materials: [
-                sample(.timber, grade: 90, flexibility: 70, source: "spring limb"),
-                sample(.fibre, grade: 90, flexibility: 70, source: "woven limb"),
-                sample(.fang, grade: 90, hardness: 70, source: "white point"),
-                sample(.hide, grade: 90, flexibility: 70, source: "sling cord"),
-                sample(.bone, grade: 90, density: 70, source: "sling stone"),
-                sample(.claw, grade: 90, hardness: 70, source: "edge one"),
-                sample(.chitin, grade: 90, hardness: 70, source: "edge two"),
-                sample(.pelt, grade: 90, flexibility: 60, source: "carrier")
-            ]))
-        state.base.worldMaterialReserve.migrateLegacyStacks(&state.base.inventory.stacks,
-                                                       location: "fixture.bowyer")
+        let units = [
+            sample(.timber, grade: 90, flexibility: 70, source: "spring limb"),
+            sample(.timber, grade: 90, flexibility: 70, source: "second limb"),
+            sample(.fibre, grade: 90, flexibility: 70, source: "woven string"),
+            sample(.rubble, grade: 90, density: 70, source: "sling stone"),
+            sample(.ore, grade: 90, hardness: 70, source: "edge one"),
+            sample(.adamant, grade: 90, hardness: 70, source: "edge two"),
+            sample(.hide, grade: 90, flexibility: 70, source: "sling cord"),
+            sample(.pelt, grade: 90, flexibility: 60, source: "sling pouch"),
+            sample(.fin, grade: 90, flexibility: 60, source: "carrier")
+        ].enumerated().map {
+            $0.element.withStableID(.init(rawValue: "bowyer-fixture-\($0.offset)"))
+        }
+        for unit in units {
+            let holding = CraftMaterialHoldingV1(unit: unit, protectedReturn: false)
+            if unit.domain == .world { state.base.worldMaterialReserve.add(holding) }
+            else { state.base.creatureMaterialReserve.add(holding) }
+        }
         return state
     }
 
@@ -279,6 +284,49 @@ final class PhysicalGearCraftingTests: XCTestCase {
         XCTAssertEqual(throwing.primaryRequirementIDs, ["edge.0", "edge.1"])
     }
 
+    func testBowyerSocketsRejectCrossDomainLookalikes() {
+        let limb = PhysicalGearCraftingRules.longbow.requirements[0]
+        var forgedHorn = sample(.horn, grade: 50, source: "forged world horn")
+        forgedHorn.domain = .world
+        XCTAssertFalse(PhysicalGearCraftingRules.qualifies(forgedHorn, for: limb))
+
+        let projectile = PhysicalGearCraftingRules.sling.requirements[1]
+        var forgedOre = sample(.ore, grade: 50, source: "forged creature ore")
+        forgedOre.domain = .creature
+        XCTAssertFalse(PhysicalGearCraftingRules.qualifies(forgedOre, for: projectile))
+        XCTAssertTrue(PhysicalGearCraftingRules.qualifies(
+            sample(.ore, grade: 50, source: "ordinary ore"), for: projectile))
+    }
+
+    func testEveryBowyerSchematicPreviewsCommitsAndFreezesExactReceipt() throws {
+        for recipe in PhysicalGearCraftingRules.bowyerRecipes {
+            var state = bowyerState(tier: 1)
+            let preview = try XCTUnwrap(PhysicalGearCraftingRules.preview(recipe, in: state), recipe.id)
+            XCTAssertEqual(preview.selections.count, recipe.requirements.count, recipe.id)
+            XCTAssertTrue(preview.selections.contains { $0.sample.domain == .world }, recipe.id)
+            let selected = preview.selections.map(\.sample)
+            let output = try XCTUnwrap(PhysicalGearCraftingRules.craft(preview, in: &state), recipe.id)
+            let revision = try XCTUnwrap(output.gearProfile?.physicalReceipt?.revisions.first)
+            XCTAssertEqual(revision.authority,
+                           .construction(stationID: Stations.bowyer,
+                                         schematicID: recipe.id, rulesVersion: 1))
+            XCTAssertEqual(revision.components.map(\.role),
+                           recipe.requirements.map { .authoredSocket($0.id) })
+            XCTAssertEqual(revision.components.map(\.unit), selected)
+            XCTAssertEqual(revision.resultingQualityBand, preview.qualityBand)
+            XCTAssertEqual(revision.resultingConstructionTier, preview.outputTier)
+            XCTAssertTrue(state.validatesPhysicalGearReceipts())
+        }
+    }
+
+    func testBowyerUncappedCostDoesNotRetuneCappedBlacksmith() throws {
+        var state = readyState()
+        let preview = try XCTUnwrap(PhysicalGearCraftingRules.preview(
+            PhysicalGearCraftingRules.pointedBlade, in: state))
+        XCTAssertEqual(preview.outputTier, 2)
+        XCTAssertEqual(preview.rawEssence, 24)
+    }
+
     func testBowyerTierZeroIsUsefulAndTierOneBroadensTheFamilies() {
         var state = bowyerState()
         guard case .ready = PhysicalGearCraftingRules.readiness(
@@ -313,12 +361,19 @@ final class PhysicalGearCraftingTests: XCTestCase {
     func testEveryBowyerFamilyAllowsLowGradePreviewButRejectsAStaleCommit() throws {
         for recipe in PhysicalGearCraftingRules.bowyerRecipes {
             var state = bowyerState(tier: 1)
-            let original = state.base.worldMaterialReserve.units
+            let originalWorld = state.base.worldMaterialReserve.units
+            let originalCreature = state.base.creatureMaterialReserve.units
             XCTAssertEqual(state.base.worldMaterialReserve.consume(
-                state.base.worldMaterialReserve.selections()), original.map(\.sample))
-            for var unit in original {
+                state.base.worldMaterialReserve.selections()), originalWorld.map(\.sample))
+            XCTAssertEqual(state.base.creatureMaterialReserve.consume(
+                state.base.creatureMaterialReserve.selections()), originalCreature.map(\.sample))
+            for var unit in originalWorld {
                 unit.unit.qualityBand = .rough
-                _ = state.base.worldMaterialReserve.add(unit)
+                state.base.worldMaterialReserve.add(unit)
+            }
+            for var unit in originalCreature {
+                unit.unit.qualityBand = .rough
+                state.base.creatureMaterialReserve.add(unit)
             }
             let preview = try XCTUnwrap(PhysicalGearCraftingRules.preview(recipe, in: state), recipe.id)
             XCTAssertEqual(preview.outputTier, 0, recipe.id)

@@ -6,6 +6,11 @@ import Foundation
 /// full 21-family contract: requirements may constrain kinds and multiple properties, preview owns
 /// exact sample choice, and the crafted instance freezes both its inputs and combat shape.
 enum PhysicalGearCraftingRules {
+    struct MaterialIdentity: Hashable, Sendable {
+        var domain: CraftMaterialDomain
+        var family: MaterialFamilyID
+    }
+
     struct PropertyFloor: Equatable, Sendable {
         var property: MaterialProperty
         var minimum: Double
@@ -14,6 +19,7 @@ enum PhysicalGearCraftingRules {
     struct SampleRequirement: Identifiable, Equatable, Sendable {
         var id: String
         var allowedKinds: Set<MaterialFamilyID>?
+        var allowedIdentities: Set<MaterialIdentity>? = nil
         var floors: [PropertyFloor]
         var alternativeFloors: [PropertyFloor] = []
     }
@@ -219,9 +225,9 @@ enum PhysicalGearCraftingRules {
         station: Stations.bowyer, stationCap: 5, specialistHeadlineTier: 3,
         slot: .weapon, damage: .pierce, reach: .far,
         requirements: [
-            SampleRequirement(id: "limb.0", allowedKinds: [.timber, .horn, .quill, .bone], floors: []),
-            SampleRequirement(id: "limb.1", allowedKinds: [.timber, .horn, .quill, .bone], floors: []),
-            SampleRequirement(id: "string.0", allowedKinds: [.fibre, .hide, .fin], floors: [])
+            bowyerRequirement("limb.0", [.timber, .horn, .quill, .bone]),
+            bowyerRequirement("limb.1", [.timber, .horn, .quill, .bone]),
+            bowyerRequirement("string.0", [.fibre, .hide, .fin])
         ], primaryRequirementIDs: ["limb.0", "limb.1"])
 
     static let sling = Recipe(
@@ -229,10 +235,10 @@ enum PhysicalGearCraftingRules {
         station: Stations.bowyer, stationCap: 5, minimumEffectiveTier: 1, specialistHeadlineTier: 3,
         slot: .weapon, damage: .crush, reach: .far,
         requirements: [
-            SampleRequirement(id: "cord.0", allowedKinds: [.fibre, .hide, .fin], floors: []),
-            SampleRequirement(id: "projectile.0", allowedKinds: [.rubble, .clay, .ore, .copper,
-                              .adamant, .bone, .tusk, .horn, .shell], floors: []),
-            SampleRequirement(id: "pouch.0", allowedKinds: [.fibre, .hide, .pelt], floors: [])
+            bowyerRequirement("cord.0", [.fibre, .hide, .fin]),
+            bowyerRequirement("projectile.0", [.rubble, .clay, .ore, .copper,
+                              .adamant, .bone, .tusk, .horn, .shell]),
+            bowyerRequirement("pouch.0", [.fibre, .hide, .pelt])
         ], primaryRequirementIDs: ["cord.0", "projectile.0"])
 
     static let throwingSet = Recipe(
@@ -240,14 +246,22 @@ enum PhysicalGearCraftingRules {
         station: Stations.bowyer, stationCap: 5, minimumEffectiveTier: 1, specialistHeadlineTier: 3,
         slot: .weapon, damage: .rend, reach: .far,
         requirements: [
-            SampleRequirement(id: "edge.0", allowedKinds: [.ore, .adamant, .obsidian, .claw,
-                              .chitin, .quill, .bone, .shell], floors: []),
-            SampleRequirement(id: "edge.1", allowedKinds: [.ore, .adamant, .obsidian, .claw,
-                              .chitin, .quill, .bone, .shell], floors: []),
-            SampleRequirement(id: "carrier.0", allowedKinds: [.fibre, .hide, .pelt, .fin], floors: [])
+            bowyerRequirement("edge.0", [.ore, .adamant, .obsidian, .claw,
+                              .chitin, .quill, .bone, .shell]),
+            bowyerRequirement("edge.1", [.ore, .adamant, .obsidian, .claw,
+                              .chitin, .quill, .bone, .shell]),
+            bowyerRequirement("carrier.0", [.fibre, .hide, .pelt, .fin])
         ], primaryRequirementIDs: ["edge.0", "edge.1"])
 
     static let bowyerRecipes: [Recipe] = [longbow, sling, throwingSet]
+
+    private static func bowyerRequirement(_ id: String, _ families: Set<MaterialFamilyID>)
+        -> SampleRequirement {
+        SampleRequirement(id: id, allowedKinds: families,
+                          allowedIdentities: Set(families.map {
+                              MaterialIdentity(domain: .forFamily($0), family: $0)
+                          }), floors: [])
+    }
     static let fittedPoint = Recipe(
         id: "weaponsmith_fitted_point", displayName: "Fitted Point", catalogFallback: "blade_chipped",
         station: Stations.weaponsmith, stationCap: 4, specialistHeadlineTier: 3,
@@ -365,6 +379,10 @@ enum PhysicalGearCraftingRules {
 
     static func rejectionReason(for sample: CraftMaterialUnitV1,
                                 requirement: SampleRequirement) -> String? {
+        if let identities = requirement.allowedIdentities,
+           !identities.contains(.init(domain: sample.domain, family: sample.familyID)) {
+            return "That material does not belong in this part."
+        }
         if let kinds = requirement.allowedKinds, !kinds.contains(sample.kind) {
             let allowed = kinds.map(\.displayName).sorted().joined(separator: ", ")
             return "Needs \(allowed)."
@@ -454,7 +472,8 @@ enum PhysicalGearCraftingRules {
             ? qualityRank : min(max(1, qualityRank), constructionCap(for: recipe, in: state))
         let averageInsulation = chosen.map(\.sample.properties.insulation).reduce(0, +) / Double(chosen.count)
         let averageReactivity = chosen.map(\.sample.properties.reactivity).reduce(0, +) / Double(chosen.count)
-        let rawEssence = essenceCost(for: max(1, qualityRank))
+        let rawEssence = essenceCost(for: recipe.station == Stations.bowyer
+            ? max(1, qualityRank) : output)
         let station = ContentCatalog.shared.station(recipe.station)
         let paidEssence = station.map { StationStaffingRules.discounted(rawEssence, at: $0, in: state) }
             ?? rawEssence
