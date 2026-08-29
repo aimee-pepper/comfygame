@@ -2,6 +2,43 @@ import XCTest
 @testable import Bookbinder
 
 final class SaveSlotTests: XCTestCase {
+    func testForgedGameplayContributionFailsWithoutRewritingRealSlotEnvelope() async throws {
+        let root = directory()
+        defer { try? FileManager.default.removeItem(at: root) }
+        let io = SaveSlotFileIO(directory: root)
+        let created = try await io.create(name: "Forged contribution")
+        let url = try await io.exportURL(for: created.metadata.id)
+        var envelope = try SaveCodec.makeDecoder().decode(
+            SaveSlotEnvelope.self, from: Data(contentsOf: url))
+        var state = created.state
+        state.base.inventory.add(ItemStack(id: .init(rawValue: 81_091), catalogID: "guard_padded"))
+        var payload = try XCTUnwrap(JSONSerialization.jsonObject(
+            with: SaveCodec.encode(state)) as? [String: Any])
+        var base = payload["base"] as! [String: Any]
+        var inventory = base["inventory"] as! [String: Any]
+        var stacks = inventory["stacks"] as! [[String: Any]]
+        var profile = stacks.last!["gearProfile"] as! [String: Any]
+        var facts = profile["gameplayFacts"] as! [String: Any]
+        facts["initiativeModifier"] = 999
+        facts["heatWard"] = 0
+        facts["valueModifier"] = 0.0
+        facts["appliedContributionIDs"] = []
+        profile["gameplayFacts"] = facts
+        stacks[stacks.count - 1]["gearProfile"] = profile
+        inventory["stacks"] = stacks
+        base["inventory"] = inventory
+        payload["base"] = base
+        envelope.payload = try JSONSerialization.data(withJSONObject: payload, options: [.sortedKeys])
+        let forgedEnvelope = try SaveCodec.makeEncoder().encode(envelope)
+        try forgedEnvelope.write(to: url, options: .atomic)
+
+        do {
+            _ = try await io.load(created.metadata.id)
+            XCTFail("forged contribution must fail closed")
+        } catch {}
+        XCTAssertEqual(try Data(contentsOf: url), forgedEnvelope)
+    }
+
     func testSchemaEighteenPhysicalCustodyRealSlotMigratesWithoutRewritingEnvelope() async throws {
         let root = directory()
         defer { try? FileManager.default.removeItem(at: root) }

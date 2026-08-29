@@ -607,9 +607,46 @@ final class PhysicalGearCraftingTests: XCTestCase {
             location: .stored, stackID: output.id, serviceTier: 3, in: state.base))
         XCTAssertEqual(recycler.snapshot.gearProfile?.gameplayFacts, facts)
         XCTAssertEqual(recycler.returnedSamples, [adamant])
+        XCTAssertEqual(CombatRules.heatWard(of: .binder, in: state), 0,
+                       "stored gear is not part of the equipped loadout")
+
+        state.base.inventory.remove(output.id)
+        state.base.binderEquipped[.weapon] = EquippedPiece(output)
+        let projection: GearLoadoutProjectionV1
+        guard case .projected(let frozen) = GearGameplayProjectionRulesV1.project(
+            owner: .binder, in: state.base) else { return XCTFail("missing exact loadout") }
+        projection = frozen
+        XCTAssertEqual(projection.frozenInitiativeModifier, -1)
+        XCTAssertEqual(projection.frozenHeatWard, 10)
+        XCTAssertEqual(CombatRules.heatWard(of: .binder, in: state), 0.10, accuracy: 0.0001)
+
+        var foeStats = CombatStats(displayName: "Equal initiative", icon: "circle", maxHP: 10,
+                                   attack: 1, armour: 0, damageKind: .pierce,
+                                   initiative: Tuning.Encounter.binderInitiative)
+        foeStats.strikesFirst = false
+        let foe = FoeState(id: .init(rawValue: 919), stats: foeStats, currentHP: 10)
+        var rng = SeededRNG(seed: 1)
+        let encounter = CombatRules.makeEncounter(id: .init(rawValue: 920), foes: [foe],
+            party: [.binder], gearProjections: [.binder: projection], rng: &rng)
+        XCTAssertEqual(encounter.order.first, .foe(foe.id),
+                       "the frozen Heavy penalty must affect actual encounter order")
+
+        let mitigation = CombatRules.heatMitigation(of: .binder, in: state)
+        let withoutWard = max(0, mitigation - 0.10)
+        let resistance = EncounterState.DebugV2ResistanceReceipt(entries: [
+            .init(actor: .binder, insulationChoice: nil)
+        ])
+        let wardedDamage = CombatDerivedStatsRules.emanationDamage(
+            raw: 100, element: .heat, receiver: .binder, receipt: resistance,
+            wornInsulationMultiplier: 1 - mitigation)
+        let controlDamage = CombatDerivedStatsRules.emanationDamage(
+            raw: 100, element: .heat, receiver: .binder, receipt: resistance,
+            wornInsulationMultiplier: 1 - withoutWard)
+        XCTAssertEqual(controlDamage.roundedDamage - wardedDamage.roundedDamage, 10,
+                       "the persisted 10-point ward must prevent ten heat damage at raw 100")
 
         let restored = try SaveCodec.decode(SaveCodec.encode(state))
-        let relaunched = try XCTUnwrap(restored.base.inventory.stacks.first { $0.id == output.id })
+        let relaunched = try XCTUnwrap(restored.base.binderEquipped[.weapon])
         XCTAssertEqual(relaunched.gearProfile?.gameplayFacts, facts)
         XCTAssertEqual(relaunched.gearProfile?.physicalReceipt,
                        output.gearProfile?.physicalReceipt)

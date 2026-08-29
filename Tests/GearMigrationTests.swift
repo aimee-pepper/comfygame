@@ -2,6 +2,39 @@ import XCTest
 @testable import Bookbinder
 
 final class GearMigrationTests: XCTestCase {
+    func testCurrentGameplayContributionAuthorityRejectsForgedRawTuples() throws {
+        var state = GameState.newGame()
+        state.base.inventory.add(ItemStack(id: .init(rawValue: 81_090), catalogID: "guard_padded"))
+        let encoded = try SaveCodec.encode(state)
+
+        for (key, forged): (String, Any) in [
+            ("appliedContributionIDs", ["fabricated"]),
+            ("initiativeModifier", 999),
+            ("valueModifier", -100.0),
+            ("heatWard", 7)
+        ] {
+            var root = try XCTUnwrap(JSONSerialization.jsonObject(with: encoded) as? [String: Any])
+            var base = root["base"] as! [String: Any]
+            var inventory = base["inventory"] as! [String: Any]
+            var stacks = inventory["stacks"] as! [[String: Any]]
+            var profile = stacks[0]["gearProfile"] as! [String: Any]
+            var facts = profile["gameplayFacts"] as! [String: Any]
+            facts["initiativeModifier"] = key == "initiativeModifier" ? forged : 0
+            facts["heatWard"] = key == "heatWard" ? forged : 0
+            facts["valueModifier"] = key == "valueModifier" ? forged : 0.0
+            facts["appliedContributionIDs"] = key == "appliedContributionIDs" ? forged : []
+            profile["gameplayFacts"] = facts
+            stacks[0]["gearProfile"] = profile
+            inventory["stacks"] = stacks
+            base["inventory"] = inventory
+            root["base"] = base
+            let bytes = try JSONSerialization.data(withJSONObject: root, options: [.sortedKeys])
+            XCTAssertThrowsError(try SaveCodec.decode(bytes), "forged \(key) must fail closed")
+            XCTAssertEqual(bytes, try JSONSerialization.data(withJSONObject: root,
+                                                               options: [.sortedKeys]))
+        }
+    }
+
     func testSchemaSeventeenStoredAndWornGearMigrateThroughRawAndRealSlot() async throws {
         var state = GameState.newGame()
         state.base.inventory.add(ItemStack(id: .init(rawValue: 81_201),

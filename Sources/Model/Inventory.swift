@@ -272,9 +272,7 @@ struct GearGameplayFactsV1: Codable, Equatable, Sendable {
             && constructionTier == profile.constructionTier
             && [powerOffset, protectivePowerOffset, insulation, reactivity]
                 .allSatisfy(\.isFinite)
-            && (valueModifier?.isFinite ?? true)
-            && (heatWard.map { (0...50).contains($0) } ?? true)
-            && (appliedContributionIDs?.allSatisfy { !$0.isEmpty } ?? true)
+            && PhysicalGearContributionAuthorityV1.validates(self, profile: profile)
             && (toolCapability?.validates() ?? true)
     }
 }
@@ -330,6 +328,95 @@ struct PhysicalGearReceiptV1: Codable, Equatable, Sendable {
 
     var flattenedUnits: [CraftMaterialUnitV1] {
         revisions.flatMap { $0.components.map(\.unit) }
+    }
+}
+
+/// Closed validation authority for frozen component effects. Runtime consumers read only the
+/// validated numbers; this table is used at construction/decode boundaries, never to reproject an
+/// already-valid item after content changes.
+enum PhysicalGearContributionAuthorityV1 {
+    private struct Effects: Equatable {
+        var ids: [String] = []
+        var power: Double = 0
+        var initiative = 0
+        var heatWard = 0
+        var value: Double = 0
+    }
+
+    static func validates(_ facts: GearGameplayFactsV1, profile: GearInstanceProfile) -> Bool {
+        let values = (facts.initiativeModifier, facts.heatWard,
+                      facts.valueModifier, facts.appliedContributionIDs)
+        if values.0 == nil && values.1 == nil && values.2 == nil && values.3 == nil { return true }
+        guard let initiative = values.0, let heatWard = values.1,
+              let value = values.2, let ids = values.3,
+              (-1...0).contains(initiative), [0, 5, 10, 15].contains(heatWard),
+              [0.0, 0.10, 0.20, 0.30].contains(value),
+              ids == Array(Set(ids)).sorted(),
+              Set(ids).isSubset(of: ["forceful", "heavy", "insulated", "keen"]),
+              let revision = profile.physicalReceipt?.revisions.last else { return false }
+
+        guard case .construction(let station, let schematic, let rules) = revision.authority,
+              station == Stations.blacksmith, schematic == "pointed_blade", rules == 1 else {
+            return initiative == 0 && heatWard == 0 && value == 0 && ids.isEmpty
+        }
+        guard revision.components.count == 2,
+              case .authoredSocket("point.0") = revision.components[0].role,
+              case .authoredSocket("grip.0") = revision.components[1].role else { return false }
+
+        let point = revision.components[0].unit
+        let grip = revision.components[1].unit
+        func major(_ band: CraftMaterialQualityBand) -> Double {
+            band.rawValue <= 1 ? 0.25 : band.rawValue <= 3 ? 0.50 : 0.75
+        }
+        func ward(_ band: CraftMaterialQualityBand) -> Int {
+            band.rawValue <= 1 ? 5 : band.rawValue <= 3 ? 10 : 15
+        }
+        func valueMagnitude(_ band: CraftMaterialQualityBand) -> Double {
+            band.rawValue <= 1 ? 0.10 : band.rawValue <= 3 ? 0.20 : 0.30
+        }
+        var expected = Effects()
+        if point.domain == .world, point.familyID == .adamant {
+            expected.ids += ["forceful", "heavy"]
+            expected.power = major(point.qualityBand)
+            expected.initiative = -1
+            expected.value = valueMagnitude(point.qualityBand)
+        } else if point.domain == .creature, point.familyID == .fang {
+            expected.ids.append("keen")
+            expected.power = major(point.qualityBand)
+        }
+        if grip.domain == .creature, grip.familyID == .pelt {
+            expected.ids.append("insulated")
+            expected.heatWard = ward(grip.qualityBand)
+        }
+        expected.ids.sort()
+        return ids == expected.ids && initiative == expected.initiative
+            && heatWard == expected.heatWard && value == expected.value
+            && facts.powerOffset == expected.power
+    }
+
+    static func validates(_ projection: GearGameplayProjectionV1) -> Bool {
+        let values = (projection.initiativeModifier, projection.heatWard,
+                      projection.valueModifier, projection.appliedContributionIDs)
+        if values.0 == nil && values.1 == nil && values.2 == nil && values.3 == nil { return true }
+        guard let initiative = values.0, let heatWard = values.1,
+              let value = values.2, let ids = values.3 else { return false }
+        switch ids {
+        case []:
+            return initiative == 0 && heatWard == 0 && value == 0
+        case ["keen"]:
+            return initiative == 0 && heatWard == 0 && value == 0
+        case ["insulated"]:
+            return initiative == 0 && [5, 10, 15].contains(heatWard) && value == 0
+        case ["insulated", "keen"]:
+            return initiative == 0 && [5, 10, 15].contains(heatWard) && value == 0
+        case ["forceful", "heavy"]:
+            return initiative == -1 && heatWard == 0 && [0.10, 0.20, 0.30].contains(value)
+        case ["forceful", "heavy", "insulated"]:
+            return initiative == -1 && [5, 10, 15].contains(heatWard)
+                && [0.10, 0.20, 0.30].contains(value)
+        default:
+            return false
+        }
     }
 }
 
@@ -875,6 +962,14 @@ struct GearLoadoutProjectionV1: Codable, Equatable, Sendable {
     var entries: [GearSlot: GearGameplayProjectionV1]
     var canonicalDigest: String
 
+    var frozenInitiativeModifier: Int {
+        entries.values.reduce(0) { $0 + ($1.initiativeModifier ?? 0) }
+    }
+
+    var frozenHeatWard: Int {
+        min(50, entries.values.reduce(0) { $0 + ($1.heatWard ?? 0) })
+    }
+
     func validates() -> Bool {
         guard version == 1, canonicalDigest.count == 64,
               canonicalDigest.allSatisfy({ $0.isHexDigit && !$0.isUppercase }),
@@ -882,8 +977,7 @@ struct GearLoadoutProjectionV1: Codable, Equatable, Sendable {
                   entry.version == 1 && entry.owner == owner && entry.slot == slot
                       && entry.effectivePower.isFinite && entry.protectivePower.isFinite
                       && entry.insulation.isFinite && entry.reactivity.isFinite
-                      && (entry.valueModifier?.isFinite ?? true)
-                      && (entry.heatWard.map { (0...50).contains($0) } ?? true)
+                      && PhysicalGearContributionAuthorityV1.validates(entry)
                       && entry.sourceRevisionDigest.count == 64
               }) else { return false }
         let encoder = JSONEncoder()

@@ -86,10 +86,20 @@ enum CombatRules {
                               debugV2OwnedNodeIDs: [Combatant: Set<CombatNodeID>]? = nil,
                               partyRanks: [Combatant: Rank] = [:],
                               rng: inout SeededRNG) -> EncounterState {
+        var resolvedInitiativeReceipt = debugV2Initiative
+        if var receipt = resolvedInitiativeReceipt {
+            for index in receipt.entries.indices {
+                let actor = receipt.entries[index].actor
+                receipt.entries[index].total += gearProjections?[actor]?.frozenInitiativeModifier ?? 0
+            }
+            resolvedInitiativeReceipt = receipt
+        }
         var ranked: [(actor: Combatant, initiative: Int, first: Bool)] = party.map { member in
-            let frozen = debugV2Initiative?.entry(for: member)
-            return (member, frozen?.total ?? (member == .binder ? Tuning.Encounter.binderInitiative
-                                                                : Tuning.Encounter.companionInitiative),
+            let frozen = resolvedInitiativeReceipt?.entry(for: member)
+            let ordinary = (member == .binder ? Tuning.Encounter.binderInitiative
+                                               : Tuning.Encounter.companionInitiative)
+                + (gearProjections?[member]?.frozenInitiativeModifier ?? 0)
+            return (member, frozen?.total ?? ordinary,
                     frozen?.strikesFirst ?? false)
         }
         for foe in foes {
@@ -145,7 +155,7 @@ enum CombatRules {
         if ordinaryPressureSlots > 0 {
             opening.append("Pressed — \(ordinaryPressureSlots) lighter follow-up\(ordinaryPressureSlots == 1 ? "" : "s").")
         }
-        var finalizedInitiative = debugV2Initiative
+        var finalizedInitiative = resolvedInitiativeReceipt
         if var receipt = finalizedInitiative {
             for index in receipt.entries.indices {
                 receipt.entries[index].finalPosition = order.firstIndex(
@@ -369,6 +379,24 @@ enum CombatRules {
             .filter(\.isProtective)
             .compactMap { equipped($0, for: actor, in: state)?.frozenInsulation }
             .reduce(0, +) / Tuning.Pressure.scaleMaximum
+    }
+
+    /// Exact frozen component ward, capped across the equipped loadout. Ten points is ten percent
+    /// heat mitigation; no material table is consulted after the encounter projection is frozen.
+    static func heatWard(of actor: Combatant, in state: GameState) -> Double {
+        if let projected = state.worlds.activeRun?.activeEncounter?.gearProjections?[actor] {
+            return Double(projected.frozenHeatWard) / 100
+        }
+        let points = GearSlot.allCases.compactMap {
+            equipped($0, for: actor, in: state)?.gearProfile?.gameplayFacts?.heatWard
+        }.reduce(0, +)
+        return Double(min(50, points)) / 100
+    }
+
+    static func heatMitigation(of actor: Combatant, in state: GameState) -> Double {
+        min(Tuning.Encounter.maximumInsulation,
+            insulation(of: actor, in: state) * Tuning.Encounter.insulationPerPoint
+                + heatWard(of: actor, in: state))
     }
 
     /// What the weapon in somebody's hand is volatile enough to leave behind.
@@ -3168,8 +3196,7 @@ enum CombatRules {
             // wear could stop.
             if let element = foe.stats.element, !isSnuffed(foeID, in: encounter) {
                 let wornMultiplier = element == .heat
-                    ? 1 - min(Tuning.Encounter.maximumInsulation,
-                              insulation(of: target, in: state) * Tuning.Encounter.insulationPerPoint)
+                    ? 1 - heatMitigation(of: target, in: state)
                     : 1
                 if let receipt = encounter.debugV2Resistance {
                     let reduced = CombatDerivedStatsRules.emanationDamage(

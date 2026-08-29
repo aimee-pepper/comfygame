@@ -496,12 +496,15 @@ enum Migrations {
             }
             if Set(facts.keys) == componentEffectFactKeys {
                 guard let initiative = try? exactInt(facts["initiativeModifier"]),
-                      let ward = try? exactInt(facts["heatWard"]), (0...50).contains(ward),
+                      (-1...0).contains(initiative),
+                      let ward = try? exactInt(facts["heatWard"]),
+                      [0, 5, 10, 15].contains(ward),
                       let value = facts["valueModifier"] as? NSNumber,
-                      value.doubleValue.isFinite,
+                      [0.0, 0.10, 0.20, 0.30].contains(value.doubleValue),
                       let ids = facts["appliedContributionIDs"] as? [String],
-                      ids.allSatisfy({ !$0.isEmpty }), Set(ids).count == ids.count,
-                      initiative >= Int.min else { throw CocoaError(.coderInvalidValue) }
+                      ids == Array(Set(ids)).sorted(),
+                      Set(ids).isSubset(of: ["forceful", "heavy", "insulated", "keen"])
+                else { throw CocoaError(.coderInvalidValue) }
             }
         }
         func validateReceipt(_ value: Any) throws {
