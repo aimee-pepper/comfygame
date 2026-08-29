@@ -41,8 +41,11 @@ enum ArmouryRules {
             }
         }
         var legacyPowerCredit: Int { gearProfile?.legacyPowerCredit ?? 0 }
+        var legacyEffectivePowerCredit: Int { gearProfile?.legacyEffectivePowerCredit ?? 0 }
         var reforgeRank: Int { gearProfile?.reforgeRank ?? 0 }
-        var hasLegacyCredit: Bool { legacyPowerCredit > 0 }
+        var hasLegacyCredit: Bool {
+            legacyPowerCredit > 0 || legacyEffectivePowerCredit > 0
+        }
         var hasReforgeWork: Bool { reforgeRank > 0 }
         var isLegacyMasterwork: Bool { hasLegacyCredit }
     }
@@ -229,6 +232,7 @@ enum ArmouryRules {
         rebuilt.qualityBand = preview.qualityBand
         rebuilt.reforgeRank = 0
         rebuilt.legacyPowerCredit = 0
+        rebuilt.legacyEffectivePowerCredit = 0
         rebuilt.specialistProfile = preview.profile.id
         rebuilt.insulation = preview.insulation
         rebuilt.reactivity = preview.reactivity

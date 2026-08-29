@@ -2,7 +2,8 @@ import XCTest
 @testable import Bookbinder
 
 final class ArmouryTests: XCTestCase {
-    private func preparedState(reforge: Int = 0, legacy: Int = 0, essence: Int = 200,
+    private func preparedState(reforge: Int = 0, legacy: Int = 0, legacyEffective: Int = 0,
+                               essence: Int = 200,
                                tier: Int = 1, grade: Double = 70) throws -> GameState {
         var state = GameState.newGame()
         state.base.stations[Stations.armoury] = StationState(isUnlocked: true, tier: tier)
@@ -10,6 +11,7 @@ final class ArmouryTests: XCTestCase {
         var gear = ItemStack(id: InstanceID(rawValue: 700), catalogID: "guard_padded")
         gear.gearProfile?.reforgeRank = reforge
         gear.gearProfile?.legacyPowerCredit = legacy
+        gear.gearProfile?.legacyEffectivePowerCredit = legacyEffective
         state.base.inventory.add(gear)
         let samples = [
             CraftMaterialUnitV1(kind: .ore, properties: .init(hardness: 80), grade: grade, source: "ore body"),
@@ -226,6 +228,45 @@ final class ArmouryTests: XCTestCase {
         XCTAssertEqual(state, before)
         XCTAssertTrue(ArmouryRules.rebuild(preview, allowLegacyLoss: true, in: &state))
         XCTAssertEqual(state.base.inventory.stacks.first { $0.id.rawValue == 700 }?.gearProfile?.legacyPowerCredit, 0)
+    }
+
+    func testStoredAndWornLegacyCreditsRequireConfirmationAndClearAtomically() throws {
+        for worn in [false, true] {
+            var state = try preparedState(reforge: 2, legacy: 3, legacyEffective: 4)
+            if worn {
+                let stack = try XCTUnwrap(state.base.inventory.stacks.first { $0.id.rawValue == 700 })
+                state.base.inventory.stacks.removeAll { $0.id == stack.id }
+                state.base.binderEquipped[.armor] = EquippedPiece(stack)
+            }
+            XCTAssertTrue(ArmouryRules.targets(in: state).isEmpty)
+            let target = try XCTUnwrap(ArmouryRules.targets(in: state, includeLegacy: true).first)
+            XCTAssertTrue(target.hasLegacyCredit)
+            XCTAssertEqual(target.legacyPowerCredit, 3)
+            XCTAssertEqual(target.legacyEffectivePowerCredit, 4)
+            let preview = try XCTUnwrap(ArmouryRules.preview(
+                ArmouryRules.rigid, target: target, includeLegacy: true, in: state))
+
+            let before = try SaveCodec.encode(state)
+            XCTAssertFalse(ArmouryRules.rebuild(preview, in: &state))
+            XCTAssertEqual(try SaveCodec.encode(state), before)
+
+            XCTAssertTrue(ArmouryRules.rebuild(preview, allowLegacyLoss: true, in: &state))
+            let rebuilt = worn
+                ? state.base.binderEquipped[.armor]?.gearProfile
+                : state.base.inventory.stacks.first { $0.id.rawValue == 700 }?.gearProfile
+            XCTAssertEqual(rebuilt?.legacyPowerCredit, 0)
+            XCTAssertEqual(rebuilt?.legacyEffectivePowerCredit, 0)
+            XCTAssertEqual(rebuilt?.reforgeRank, 0)
+            XCTAssertEqual(rebuilt?.protectivePower, preview.rebuiltPhysical)
+
+            let restored = try SaveCodec.decode(SaveCodec.encode(state))
+            let relaunched = worn
+                ? restored.base.binderEquipped[.armor]?.gearProfile
+                : restored.base.inventory.stacks.first { $0.id.rawValue == 700 }?.gearProfile
+            XCTAssertEqual(relaunched, rebuilt)
+            XCTAssertEqual(relaunched?.legacyPowerCredit, 0)
+            XCTAssertEqual(relaunched?.legacyEffectivePowerCredit, 0)
+        }
     }
 
     func testInsufficientEssenceAndStalePreviewAreAtomicFailures() throws {
