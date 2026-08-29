@@ -143,28 +143,33 @@ enum Migrations {
             guard Set(ids).count == ids.count else { throw CocoaError(.coderInvalidValue) }
             return Set(ids)
         }
-        func exactPrecisionMap(_ value: Any?, owners: Set<String>) throws {
+        func exactPrecisionMap(_ value: Any?, owners: Set<String>) throws -> [String: Int] {
             guard let values = value as? [String: Any], Set(values.keys) == owners else {
                 throw CocoaError(.coderInvalidValue)
             }
-            for precision in values.values {
-                guard (1...3).contains(try exactInt(precision)) else {
+            var result: [String: Int] = [:]
+            for (subject, value) in values {
+                let precision = try exactInt(value)
+                guard (1...3).contains(precision) else {
                     throw CocoaError(.coderInvalidValue)
                 }
+                result[subject] = precision
             }
+            return result
         }
 
         let owned = try exactIDSet(reality["instruments"])
-        try exactPrecisionMap(reality["instrumentPrecisions"], owners: owned)
+        let ownedPrecisions = try exactPrecisionMap(reality["instrumentPrecisions"], owners: owned)
         guard let observations = reality["observations"] as? [String: Any],
-              Set(observations.keys).isSubset(of: allowed) else {
+              Set(observations.keys).isSubset(of: owned) else {
             throw CocoaError(.coderInvalidValue)
         }
-        for value in observations.values {
+        for (subject, value) in observations {
             guard let observation = value as? [String: Any],
                   Set(observation.keys) == Set(["count", "lowest", "highest", "bestPrecision"]),
                   try exactInt(observation["count"]) > 0,
-                  (1...3).contains(try exactInt(observation["bestPrecision"])),
+                  let ownedPrecision = ownedPrecisions[subject],
+                  (1...ownedPrecision).contains(try exactInt(observation["bestPrecision"])),
                   let low = observation["lowest"] as? NSNumber,
                   let high = observation["highest"] as? NSNumber,
                   CFGetTypeID(low) != CFBooleanGetTypeID(),
@@ -186,7 +191,12 @@ enum Migrations {
         for value in rawRuns {
             guard let run = value as? [String: Any] else { throw CocoaError(.coderInvalidValue) }
             let carried = try exactIDSet(run["carriedInstruments"])
-            try exactPrecisionMap(run["carriedInstrumentPrecisions"], owners: carried)
+            guard carried.isSubset(of: owned) else { throw CocoaError(.coderInvalidValue) }
+            let carriedPrecisions = try exactPrecisionMap(
+                run["carriedInstrumentPrecisions"], owners: carried)
+            guard carriedPrecisions.allSatisfy({ subject, precision in
+                ownedPrecisions[subject].map { precision <= $0 } ?? false
+            }) else { throw CocoaError(.coderInvalidValue) }
         }
         let state = try SaveCodec.makeDecoder().decode(GameState.self, from: data)
         guard state.validatesFieldSurveyAuthority() else { throw CocoaError(.coderInvalidValue) }

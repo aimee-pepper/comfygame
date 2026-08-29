@@ -135,10 +135,14 @@ struct RealityState: Codable, Equatable, Sendable {
               allowed.count == 8,
               instruments.isSubset(of: allowed),
               Set(instrumentPrecisions.keys) == instruments,
-              Set(observations.keys).isSubset(of: allowed) else { return false }
-        return observations.values.allSatisfy {
-            $0.count > 0 && $0.lowest.isFinite && $0.highest.isFinite
-                && $0.lowest >= 0 && $0.highest <= 100 && $0.lowest <= $0.highest
+              Set(observations.keys).isSubset(of: instruments) else { return false }
+        return observations.allSatisfy { subject, observation in
+            guard let ownedPrecision = instrumentPrecisions[subject] else { return false }
+            return observation.count > 0
+                && observation.lowest.isFinite && observation.highest.isFinite
+                && observation.lowest >= 0 && observation.highest <= 100
+                && observation.lowest <= observation.highest
+                && observation.bestPrecision <= ownedPrecision
         }
     }
     /// Rare currency; spent only on Constellation nodes.

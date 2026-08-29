@@ -168,7 +168,11 @@ struct GameState: Codable, Equatable, Sendable {
         let runs = [worlds.activeRun].compactMap { $0 } + worlds.anchoredRealms.map(\.world)
         return runs.allSatisfy { run in
             run.carriedInstruments.isSubset(of: allowed)
+                && run.carriedInstruments.isSubset(of: reality.instruments)
                 && Set(run.carriedInstrumentPrecisions.keys) == run.carriedInstruments
+                && run.carriedInstrumentPrecisions.allSatisfy { subject, precision in
+                    reality.instrumentPrecisions[subject].map { precision <= $0 } ?? false
+                }
         }
     }
 

@@ -4316,6 +4316,69 @@ final class WorldTests: XCTestCase {
         XCTAssertEqual(store.worldFieldContext, context)
     }
 
+    @MainActor
+    func testFieldSurveyRejectsUnownedAndOverPrecisionCustodyWithoutPublishing() throws {
+        let target = RealityState.surveySubjectIDsInOrder[0]
+        let unowned = RealityState.surveySubjectIDsInOrder[1]
+        let cases: [(String, (inout GameState) -> Void)] = [
+            ("active unowned", { state in
+                state.reality.instruments = [target]
+                state.reality.instrumentPrecisions = [target: .good]
+                state.worlds.activeRun!.carriedInstruments = [unowned]
+                state.worlds.activeRun!.carriedInstrumentPrecisions = [unowned: .crude]
+            }),
+            ("active above owned", { state in
+                state.reality.instruments = [target]
+                state.reality.instrumentPrecisions = [target: .good]
+                state.worlds.activeRun!.carriedInstruments = [target]
+                state.worlds.activeRun!.carriedInstrumentPrecisions = [target: .fine]
+            }),
+            ("observation above owned", { state in
+                state.reality.instruments = [target]
+                state.reality.instrumentPrecisions = [target: .good]
+                state.reality.observations = [
+                    target: .init(count: 1, lowest: 10, highest: 20,
+                                  bestPrecision: .fine)
+                ]
+            }),
+            ("anchored unowned", { state in
+                state.reality.instruments = [target]
+                state.reality.instrumentPrecisions = [target: .good]
+                var archived = state.worlds.activeRun!
+                archived.runIndex += 1; archived.mapSeed += 1
+                archived.carriedInstruments = [unowned]
+                archived.carriedInstrumentPrecisions = [unowned: .crude]
+                state.worlds.anchoredRealms = [
+                    .init(runIndex: archived.runIndex, name: "Invalid survey archive",
+                          route: .bornAnchored, world: archived)
+                ]
+            }),
+        ]
+
+        for (name, mutate) in cases {
+            let store = GameStore(io: .temporary(name:
+                "field-survey-custody-\(name)-\(UUID().uuidString)"))
+            store.mutate("install malformed survey custody", flush: true) { state in
+                state = startedRun(book([:]), seed: 93_003)
+                mutate(&state)
+            }
+            store.refreshWorldFieldContext()
+            let before = store.state
+            let bytes = try SaveCodec.encode(before)
+            let diagnostics = store.diagnostics
+            let context = store.worldFieldContext
+            XCTAssertEqual(store.fieldSurveyEvaluation,
+                           .refused(.invalidInstrumentAuthority), name)
+            XCTAssertEqual(store.survey(), .refused(.invalidInstrumentAuthority), name)
+            XCTAssertEqual(store.state, before, name)
+            XCTAssertEqual(try SaveCodec.encode(store.state), bytes, name)
+            XCTAssertEqual(store.diagnostics.writeCount, diagnostics.writeCount, name)
+            XCTAssertEqual(store.diagnostics.hasPendingWrite,
+                           diagnostics.hasPendingWrite, name)
+            XCTAssertEqual(store.worldFieldContext, context, name)
+        }
+    }
+
     func testNonAdjacentStepsAreRefused() {
         var state = startedRun(book(["terrain": "plains"]), seed: 13)
         let run = state.worlds.activeRun!

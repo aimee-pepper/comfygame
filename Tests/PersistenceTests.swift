@@ -22,6 +22,7 @@ final class PersistenceTests: XCTestCase {
         active.carriedInstrumentPrecisions = [ids[0]: .good, ids[1]: .fine]
         var anchored = active; anchored.runIndex = 822; anchored.mapSeed = 822_001
         anchored.rng = .init(seed: 822_001)
+        anchored.carriedInstrumentPrecisions = [ids[0]: .crude, ids[1]: .good]
         state.worlds.activeRun = active
         state.worlds.anchoredRealms = [
             .init(runIndex: anchored.runIndex, name: "Survey realm", route: .bornAnchored,
@@ -1396,6 +1397,7 @@ final class PersistenceTests: XCTestCase {
         let state = fieldSurveyAuthorityState()
         let valid = try SaveCodec.encode(state)
         XCTAssertEqual(try SaveCodec.decode(valid), state)
+        let unowned = RealityState.surveySubjectIDsInOrder[2].rawValue
         let cases: [(String, (inout [String: Any]) -> Void)] = [
             ("unknown owned subject", { root in
                 var reality = root["reality"] as! [String: Any]
@@ -1420,11 +1422,61 @@ final class PersistenceTests: XCTestCase {
                 ]
                 reality["observations"] = observations; root["reality"] = reality
             }),
+            ("legal but unowned observation", { root in
+                var reality = root["reality"] as! [String: Any]
+                var observations = reality["observations"] as! [String: Any]
+                observations[unowned] = [
+                    "count": 1, "lowest": 1, "highest": 2, "bestPrecision": 1
+                ]
+                reality["observations"] = observations; root["reality"] = reality
+            }),
+            ("observation above owned precision", { root in
+                var reality = root["reality"] as! [String: Any]
+                var observations = reality["observations"] as! [String: Any]
+                var observation = observations["illumination"] as! [String: Any]
+                observation["bestPrecision"] = 3
+                observations["illumination"] = observation
+                reality["observations"] = observations; root["reality"] = reality
+            }),
+            ("active legal but unowned carried subject", { root in
+                var worlds = root["worlds"] as! [String: Any]
+                var run = worlds["activeRun"] as! [String: Any]
+                run["carriedInstruments"] = [unowned]
+                run["carriedInstrumentPrecisions"] = [unowned: 1]
+                worlds["activeRun"] = run; root["worlds"] = worlds
+            }),
+            ("active carried precision above ownership", { root in
+                var worlds = root["worlds"] as! [String: Any]
+                var run = worlds["activeRun"] as! [String: Any]
+                var precisions = run["carriedInstrumentPrecisions"] as! [String: Any]
+                precisions["illumination"] = 3
+                run["carriedInstrumentPrecisions"] = precisions
+                worlds["activeRun"] = run; root["worlds"] = worlds
+            }),
             ("anchored precision mismatch", { root in
                 var worlds = root["worlds"] as! [String: Any]
                 var realms = worlds["anchoredRealms"] as! [[String: Any]]
                 var run = realms[0]["world"] as! [String: Any]
                 run["carriedInstrumentPrecisions"] = ["illumination": 2]
+                realms[0]["world"] = run; worlds["anchoredRealms"] = realms
+                root["worlds"] = worlds
+            }),
+            ("anchored legal but unowned carried subject", { root in
+                var worlds = root["worlds"] as! [String: Any]
+                var realms = worlds["anchoredRealms"] as! [[String: Any]]
+                var run = realms[0]["world"] as! [String: Any]
+                run["carriedInstruments"] = [unowned]
+                run["carriedInstrumentPrecisions"] = [unowned: 1]
+                realms[0]["world"] = run; worlds["anchoredRealms"] = realms
+                root["worlds"] = worlds
+            }),
+            ("anchored carried precision above ownership", { root in
+                var worlds = root["worlds"] as! [String: Any]
+                var realms = worlds["anchoredRealms"] as! [[String: Any]]
+                var run = realms[0]["world"] as! [String: Any]
+                var precisions = run["carriedInstrumentPrecisions"] as! [String: Any]
+                precisions["illumination"] = 3
+                run["carriedInstrumentPrecisions"] = precisions
                 realms[0]["world"] = run; worlds["anchoredRealms"] = realms
                 root["worlds"] = worlds
             })

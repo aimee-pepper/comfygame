@@ -87,6 +87,9 @@ final class SaveSlotTests: XCTestCase {
         let target = RealityState.surveySubjectIDsInOrder[0]
         state.reality.instruments = [target]
         state.reality.instrumentPrecisions = [target: .good]
+        state.reality.observations = [
+            target: .init(count: 1, lowest: 10, highest: 20, bestPrecision: .good)
+        ]
         state.base.instrumentLoadout = [target]
         let point = GridPoint(x: 0, y: 0)
         var run = WorldRun(runIndex: 823, book: .init(written: [], essencePaid: 0),
@@ -97,22 +100,64 @@ final class SaveSlotTests: XCTestCase {
         run.carriedInstruments = [target]
         run.carriedInstrumentPrecisions = [target: .good]
         state.worlds.activeRun = run
+        var anchored = run
+        anchored.runIndex = 824; anchored.mapSeed = 824_001
+        anchored.rng = .init(seed: 824_001)
+        anchored.carriedInstrumentPrecisions = [target: .crude]
+        state.worlds.anchoredRealms = [
+            .init(runIndex: anchored.runIndex, name: "Lower precision archive",
+                  route: .bornAnchored, world: anchored)
+        ]
         let created = try await slots.create(name: "Survey authority", state: state)
         let url = try await slots.exportURL(for: created.metadata.id)
         let validBytes = try Data(contentsOf: url)
-        var envelope = try SaveCodec.makeDecoder().decode(SaveSlotEnvelope.self, from: validBytes)
-        var payload = try XCTUnwrap(
-            JSONSerialization.jsonObject(with: envelope.payload) as? [String: Any])
-        var worlds = try XCTUnwrap(payload["worlds"] as? [String: Any])
-        var active = try XCTUnwrap(worlds["activeRun"] as? [String: Any])
-        active["carriedInstrumentPrecisions"] = [:]
-        worlds["activeRun"] = active; payload["worlds"] = worlds
-        envelope.payload = try JSONSerialization.data(withJSONObject: payload, options: [.sortedKeys])
-        let malformed = try encoder().encode(envelope)
-        try malformed.write(to: url, options: .atomic)
-        do { _ = try await slots.load(created.metadata.id); XCTFail("accepted mismatched precision") }
-        catch { }
-        XCTAssertEqual(try Data(contentsOf: url), malformed)
+        let unowned = RealityState.surveySubjectIDsInOrder[1].rawValue
+        let cases: [(String, (inout [String: Any]) -> Void)] = [
+            ("active unowned", { payload in
+                var worlds = payload["worlds"] as! [String: Any]
+                var active = worlds["activeRun"] as! [String: Any]
+                active["carriedInstruments"] = [unowned]
+                active["carriedInstrumentPrecisions"] = [unowned: 1]
+                worlds["activeRun"] = active; payload["worlds"] = worlds
+            }),
+            ("active above owned", { payload in
+                var worlds = payload["worlds"] as! [String: Any]
+                var active = worlds["activeRun"] as! [String: Any]
+                active["carriedInstrumentPrecisions"] = [target.rawValue: 3]
+                worlds["activeRun"] = active; payload["worlds"] = worlds
+            }),
+            ("observation above owned", { payload in
+                var reality = payload["reality"] as! [String: Any]
+                var observations = reality["observations"] as! [String: Any]
+                var observation = observations[target.rawValue] as! [String: Any]
+                observation["bestPrecision"] = 3
+                observations[target.rawValue] = observation
+                reality["observations"] = observations; payload["reality"] = reality
+            }),
+            ("anchored unowned", { payload in
+                var worlds = payload["worlds"] as! [String: Any]
+                var realms = worlds["anchoredRealms"] as! [[String: Any]]
+                var archived = realms[0]["world"] as! [String: Any]
+                archived["carriedInstruments"] = [unowned]
+                archived["carriedInstrumentPrecisions"] = [unowned: 1]
+                realms[0]["world"] = archived; worlds["anchoredRealms"] = realms
+                payload["worlds"] = worlds
+            }),
+        ]
+        for (name, mutate) in cases {
+            var envelope = try SaveCodec.makeDecoder().decode(
+                SaveSlotEnvelope.self, from: validBytes)
+            var payload = try XCTUnwrap(
+                JSONSerialization.jsonObject(with: envelope.payload) as? [String: Any])
+            mutate(&payload)
+            envelope.payload = try JSONSerialization.data(
+                withJSONObject: payload, options: [.sortedKeys])
+            let malformed = try encoder().encode(envelope)
+            try malformed.write(to: url, options: .atomic)
+            do { _ = try await slots.load(created.metadata.id); XCTFail("accepted \(name)") }
+            catch { }
+            XCTAssertEqual(try Data(contentsOf: url), malformed, name)
+        }
     }
 
     @MainActor
