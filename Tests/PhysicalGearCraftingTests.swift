@@ -39,6 +39,31 @@ final class PhysicalGearCraftingTests: XCTestCase {
         return state
     }
 
+    private func tanneryState(grade: Double = 90) -> GameState {
+        var state = GameState.newGame()
+        state.base.stations[Stations.tannery] = StationState(isUnlocked: true, tier: 0)
+        state.base.completedResearch.insert(PhysicalGearCraftingRules.tanneryWearRoot)
+        state.base.capabilities.insert(PhysicalGearCraftingRules.tanneryWearCapability)
+        state.base.essence = 200
+        let units = [
+            sample(.fibre, grade: grade, flexibility: 70, source: "outer fiber"),
+            sample(.timber, grade: grade, density: 70, source: "sole timber"),
+            sample(.resin, grade: grade, source: "binding resin"),
+            sample(.hide, grade: grade, flexibility: 70, insulation: 60, source: "body hide"),
+            sample(.pelt, grade: grade, flexibility: 70, insulation: 60, source: "lining pelt"),
+            sample(.bone, grade: grade, hardness: 70, source: "facing bone"),
+            sample(.scale, grade: grade, hardness: 70, source: "spare scale")
+        ].enumerated().map {
+            $0.element.withStableID(.init(rawValue: "tannery-fixture-\($0.offset)"))
+        }
+        for unit in units {
+            let holding = CraftMaterialHoldingV1(unit: unit, protectedReturn: false)
+            if unit.domain == .world { state.base.worldMaterialReserve.add(holding) }
+            else { state.base.creatureMaterialReserve.add(holding) }
+        }
+        return state
+    }
+
     private func readyState() -> GameState {
         var state = GameState.newGame()
         state.base.stations[Stations.blacksmith] = StationState(isUnlocked: true, tier: 0)
@@ -174,42 +199,48 @@ final class PhysicalGearCraftingTests: XCTestCase {
         XCTAssertEqual(output.gearProfile?.consumedSamples.map(\.source), ["great wolf", "reed"])
     }
 
-    func testTanneryHasThreeAuthoredFamiliesAndAlternativeSoleRequirement() throws {
+    func testTanneryHasThreeCanonicalDomainQualifiedWearForms() throws {
         let recipes = PhysicalGearCraftingRules.tanneryRecipes
         XCTAssertEqual(recipes.map(\.id), ["supple_coat", "working_gloves", "working_boots"])
         XCTAssertEqual(Set(recipes.map(\.slot)), [.armor, .hands, .feet])
-        XCTAssertTrue(recipes.allSatisfy { $0.station == Stations.tannery && $0.stationCap == 2 })
+        XCTAssertTrue(recipes.allSatisfy { $0.station == Stations.tannery && $0.stationCap == 5 })
+        XCTAssertEqual(PhysicalGearCraftingRules.suppleCoat.requirements.map(\.id),
+                       ["outer.0", "lining.0"])
+        XCTAssertEqual(PhysicalGearCraftingRules.workingGloves.requirements.map(\.id),
+                       ["hand.0", "facing.0"])
+        XCTAssertEqual(PhysicalGearCraftingRules.workingBoots.requirements.map(\.id),
+                       ["upper.0", "sole.0", "binding.0"])
+        XCTAssertEqual(PhysicalGearCraftingRules.workingBoots.primaryRequirementIDs,
+                       ["upper.0", "sole.0"])
 
-        let sole = try XCTUnwrap(PhysicalGearCraftingRules.workingBoots.requirements.last)
-        XCTAssertTrue(PhysicalGearCraftingRules.qualifies(
-            sample(.bone, grade: 30, hardness: 31, source: "hard"), for: sole))
-        XCTAssertTrue(PhysicalGearCraftingRules.qualifies(
-            CraftMaterialUnitV1(kind: .bone, properties: MaterialProperties(density: 31),
-                           grade: 30, source: "dense"), for: sole))
+        let sole = PhysicalGearCraftingRules.workingBoots.requirements[1]
+        var creatureTimber = sample(.timber, grade: 30, source: "forged creature timber")
+        creatureTimber.domain = .creature
+        XCTAssertFalse(PhysicalGearCraftingRules.qualifies(creatureTimber, for: sole))
+        let body = PhysicalGearCraftingRules.suppleCoat.requirements[0]
+        var worldHide = sample(.hide, grade: 30, source: "forged world hide")
+        worldHide.domain = .world
+        XCTAssertFalse(PhysicalGearCraftingRules.qualifies(worldHide, for: body))
         XCTAssertFalse(PhysicalGearCraftingRules.qualifies(
-            sample(.bone, grade: 30, hardness: 29, source: "soft"), for: sole))
+            sample(.down, grade: 30, source: "lining only"), for: body))
     }
 
     func testTanneryCraftFreezesSpecialistAndConsumesChosenSamples() throws {
-        var state = GameState.newGame()
-        state.base.stations[Stations.tannery] = StationState(isUnlocked: true, tier: 0)
-        state.base.completedResearch.insert(PhysicalGearCraftingRules.tanneryWearRoot)
-        state.base.capabilities.insert(PhysicalGearCraftingRules.tanneryWearCapability)
-        state.base.essence = 100
-        state.base.inventory.add(ItemStack(id: InstanceID(rawValue: 71), catalogID: Items.material,
-            materials: [
-                sample(.hide, grade: 50, flexibility: 50, insulation: 30, source: "hide one"),
-                sample(.pelt, grade: 55, flexibility: 45, insulation: 35, source: "pelt two")
-            ]))
-        state.base.worldMaterialReserve.migrateLegacyStacks(&state.base.inventory.stacks,
-                                                       location: "fixture.tannery.craft")
-        let preview = try XCTUnwrap(PhysicalGearCraftingRules.preview(
-            PhysicalGearCraftingRules.suppleCoat, in: state))
-        let output = try XCTUnwrap(PhysicalGearCraftingRules.craft(preview, in: &state))
-        XCTAssertEqual(output.gearProfile?.specialistProfile, "tannery")
-        XCTAssertEqual(output.gearProfile?.familyID, "supple_coat")
-        XCTAssertEqual(output.gearProfile?.consumedSamples.count, 2)
-        XCTAssertFalse(state.base.inventory.stacks.contains { $0.id == InstanceID(rawValue: 71) })
+        for recipe in PhysicalGearCraftingRules.tanneryRecipes {
+            var state = tanneryState()
+            let preview = try XCTUnwrap(PhysicalGearCraftingRules.preview(recipe, in: state))
+            let selected = preview.selections.map(\.sample)
+            let output = try XCTUnwrap(PhysicalGearCraftingRules.craft(preview, in: &state))
+            XCTAssertEqual(output.gearProfile?.specialistProfile, "tannery")
+            XCTAssertEqual(output.gearProfile?.familyID, recipe.id)
+            XCTAssertEqual(output.gearProfile?.qualityBand, .peerless)
+            XCTAssertEqual(output.gearProfile?.gameplayFacts?.powerOffset, 0)
+            XCTAssertEqual(output.gearProfile?.physicalReceipt?.flattenedUnits, selected)
+            XCTAssertEqual(output.gearProfile?.physicalReceipt?.revisions.first?.components.map(\.role),
+                           recipe.requirements.map { .authoredSocket($0.id) })
+            let restored = try SaveCodec.decode(SaveCodec.encode(state))
+            XCTAssertEqual(restored.base.inventory.stacks.first { $0.id == output.id }, output)
+        }
     }
 
     func testTanneryFamiliesRequireWearCapabilityEvenWhenCompletionHistoryExists() {
@@ -228,25 +259,78 @@ final class PhysicalGearCraftingTests: XCTestCase {
                           .researchLocked(PhysicalGearCraftingRules.tanneryWearRoot))
     }
 
-    func testTanneryTierTwoRequiresTheSecondWearRung() throws {
-        var state = GameState.newGame()
-        state.base.stations[Stations.tannery] = StationState(isUnlocked: true, tier: 0)
-        state.base.completedResearch.insert(PhysicalGearCraftingRules.tanneryWearRoot)
-        state.base.capabilities.insert(PhysicalGearCraftingRules.tanneryWearCapability)
-        state.base.essence = 100
-        state.base.inventory.add(ItemStack(id: InstanceID(rawValue: 72), catalogID: Items.material,
-            materials: [
-                sample(.hide, grade: 70, flexibility: 70, insulation: 60, source: "one"),
-                sample(.pelt, grade: 70, flexibility: 70, insulation: 60, source: "two")
-            ]))
-        state.base.worldMaterialReserve.migrateLegacyStacks(&state.base.inventory.stacks,
-                                                       location: "fixture.tannery.tier")
-        XCTAssertEqual(try XCTUnwrap(PhysicalGearCraftingRules.preview(
-            PhysicalGearCraftingRules.suppleCoat, in: state)).outputTier, 1)
+    func testTanneryTierTwoEntitlementIsInertAndNeverCapsQuality() throws {
+        var state = tanneryState()
+        let before = try XCTUnwrap(PhysicalGearCraftingRules.preview(
+            PhysicalGearCraftingRules.suppleCoat, in: state))
+        XCTAssertEqual(before.outputTier, 5)
+        XCTAssertEqual(before.rawEssence, 80)
         state.base.completedResearch.insert(PhysicalGearCraftingRules.tanneryWearTierTwo)
         state.base.capabilities.insert(PhysicalGearCraftingRules.tanneryTierTwoCapability)
-        XCTAssertEqual(try XCTUnwrap(PhysicalGearCraftingRules.preview(
-            PhysicalGearCraftingRules.suppleCoat, in: state)).outputTier, 2)
+        let after = try XCTUnwrap(PhysicalGearCraftingRules.preview(
+            PhysicalGearCraftingRules.suppleCoat, in: state))
+        XCTAssertEqual(after.outputTier, before.outputTier)
+        XCTAssertEqual(after.qualityBand, before.qualityBand)
+        XCTAssertEqual(after.rawEssence, before.rawEssence)
+    }
+
+    func testWorkingBootsAveragesTwoPrimaryUnitsBeforeSeventyThirtyWeighting() throws {
+        var state = tanneryState()
+        let world = state.base.worldMaterialReserve.units
+        let creature = state.base.creatureMaterialReserve.units
+        XCTAssertNotNil(state.base.worldMaterialReserve.consume(
+            state.base.worldMaterialReserve.selections()))
+        XCTAssertNotNil(state.base.creatureMaterialReserve.consume(
+            state.base.creatureMaterialReserve.selections()))
+        for var holding in world + creature {
+            switch holding.unit.source {
+            case "body hide", "binding resin": holding.unit.qualityBand = .peerless
+            case "sole timber": holding.unit.qualityBand = .standard
+            default: holding.unit.qualityBand = .rough
+            }
+            if holding.unit.domain == .world { state.base.worldMaterialReserve.add(holding) }
+            else { state.base.creatureMaterialReserve.add(holding) }
+        }
+        let recipe = PhysicalGearCraftingRules.workingBoots
+        let chosenSources = ["body hide", "sole timber", "binding resin"]
+        let selections = try recipe.requirements.enumerated().map { index, requirement in
+            try XCTUnwrap(PhysicalGearCraftingRules.candidates(for: requirement, in: state)
+                .first { $0.sample.source == chosenSources[index] })
+        }
+        let preview = try XCTUnwrap(PhysicalGearCraftingRules.preview(
+            recipe, selections: selections, in: state))
+        XCTAssertEqual(preview.qualityBand, .exceptional)
+        XCTAssertEqual(preview.outputTier, 4)
+        XCTAssertEqual(preview.rawEssence, 80)
+    }
+
+    func testTanneryReceiptDrivesRecyclerOrderAndOriginalDomains() throws {
+        var state = tanneryState()
+        let preview = try XCTUnwrap(PhysicalGearCraftingRules.preview(
+            PhysicalGearCraftingRules.workingBoots, in: state))
+        let selected = preview.selections.map(\.sample)
+        let output = try XCTUnwrap(PhysicalGearCraftingRules.craft(preview, in: &state))
+        let recycle = try XCTUnwrap(RecyclerRules.preview(
+            location: .stored, stackID: output.id, serviceTier: 3, in: state.base))
+        XCTAssertEqual(recycle.route, .constructionReceipt)
+        XCTAssertEqual(recycle.recoveryCapacity, 2)
+        XCTAssertEqual(recycle.returnedSamples, Array(selected.prefix(2)))
+        XCTAssertEqual(recycle.returnedSamples.map(\.stableUnitID),
+                       selected.prefix(2).map(\.stableUnitID))
+        XCTAssertEqual(recycle.returnedSamples.map(\.domain),
+                       selected.prefix(2).map(\.domain))
+    }
+
+    func testEveryTanneryFormRejectsStaleExactUnitWithoutMutation() throws {
+        for recipe in PhysicalGearCraftingRules.tanneryRecipes {
+            var state = tanneryState()
+            let preview = try XCTUnwrap(PhysicalGearCraftingRules.preview(recipe, in: state))
+            let first = try XCTUnwrap(preview.selections.first?.reserveSelection)
+            XCTAssertNotNil(state.base.consumeCraftMaterials([first]))
+            let afterExternalChange = state
+            XCTAssertNil(PhysicalGearCraftingRules.craft(preview, in: &state))
+            XCTAssertEqual(state, afterExternalChange)
+        }
     }
 
     func testBowyerCoversPhysicalTriangleAtFarReach() {

@@ -187,38 +187,38 @@ enum PhysicalGearCraftingRules {
 
     static let suppleCoat = Recipe(
         id: "supple_coat", displayName: "Supple Coat", catalogFallback: "guard_padded",
-        station: Stations.tannery, stationCap: 2, slot: .armor, damage: nil, reach: .close,
+        station: Stations.tannery, stationCap: 5, slot: .armor, damage: nil, reach: .close,
         requirements: [
-            SampleRequirement(id: "flexible_layer_1", allowedKinds: [.hide, .pelt, .down, .fibre],
-                              floors: [PropertyFloor(property: .flexibility, minimum: 40),
-                                       PropertyFloor(property: .insulation, minimum: 25)]),
-            SampleRequirement(id: "flexible_layer_2", allowedKinds: [.hide, .pelt, .down, .fibre],
-                              floors: [PropertyFloor(property: .flexibility, minimum: 40),
-                                       PropertyFloor(property: .insulation, minimum: 25)])
-        ])
+            tanneryRequirement("outer.0", [.fibre, .hide, .pelt, .fin, .scale]),
+            tanneryRequirement("lining.0", [.fibre, .hide, .pelt, .down, .feather, .fin])
+        ], primaryRequirementIDs: ["outer.0"])
 
     static let workingGloves = Recipe(
         id: "working_gloves", displayName: "Working Gloves", catalogFallback: "wrapped_hands",
-        station: Stations.tannery, stationCap: 2, slot: .hands, damage: nil, reach: .close,
+        station: Stations.tannery, stationCap: 5, slot: .hands, damage: nil, reach: .close,
         requirements: [
-            SampleRequirement(id: "flexible_hand", allowedKinds: nil,
-                              floors: [PropertyFloor(property: .flexibility, minimum: 40)]),
-            SampleRequirement(id: "hard_facing", allowedKinds: nil,
-                              floors: [PropertyFloor(property: .hardness, minimum: 25)])
-        ])
+            tanneryRequirement("hand.0", [.fibre, .hide, .pelt, .fin, .scale]),
+            tanneryRequirement("facing.0", [.hide, .scale, .chitin, .quill, .bone])
+        ], primaryRequirementIDs: ["hand.0"])
 
     static let workingBoots = Recipe(
         id: "working_boots", displayName: "Working Boots", catalogFallback: "worn_boots",
-        station: Stations.tannery, stationCap: 2, slot: .feet, damage: nil, reach: .close,
+        station: Stations.tannery, stationCap: 5, slot: .feet, damage: nil, reach: .close,
         requirements: [
-            SampleRequirement(id: "flexible_upper", allowedKinds: nil,
-                              floors: [PropertyFloor(property: .flexibility, minimum: 35)]),
-            SampleRequirement(id: "dense_or_hard_sole", allowedKinds: nil, floors: [],
-                              alternativeFloors: [PropertyFloor(property: .density, minimum: 30),
-                                                  PropertyFloor(property: .hardness, minimum: 30)])
-        ])
+            tanneryRequirement("upper.0", [.fibre, .hide, .pelt, .fin, .scale]),
+            tanneryRequirement("sole.0", [.timber, .hide, .bone, .scale, .chitin, .plate, .shell]),
+            tanneryRequirement("binding.0", [.fibre, .resin, .copper, .silver, .gold, .hide, .fin])
+        ], primaryRequirementIDs: ["upper.0", "sole.0"])
 
     static let tanneryRecipes: [Recipe] = [suppleCoat, workingGloves, workingBoots]
+
+    private static func tanneryRequirement(_ id: String, _ families: Set<MaterialFamilyID>)
+        -> SampleRequirement {
+        SampleRequirement(id: id, allowedKinds: families,
+                          allowedIdentities: Set(families.map {
+                              MaterialIdentity(domain: .forFamily($0), family: $0)
+                          }), floors: [])
+    }
 
     static let longbow = Recipe(
         id: "longbow", displayName: "Longbow", catalogFallback: "long_pick",
@@ -362,10 +362,7 @@ enum PhysicalGearCraftingRules {
     }
 
     static func constructionCap(for recipe: Recipe, in state: GameState) -> Int {
-        if recipe.station == Stations.tannery {
-            return state.base.hasCapability(tanneryTierTwoCapability)
-                ? recipe.stationCap : min(1, recipe.stationCap)
-        }
+        if recipe.station == Stations.tannery { return recipe.stationCap }
         if recipe.station == Stations.bowyer {
             return recipe.stationCap
         }
@@ -472,7 +469,9 @@ enum PhysicalGearCraftingRules {
             ? primary : Double(secondaryRanks.reduce(0, +)) / Double(secondaryRanks.count)
         let qualityRank = Int((0.7 * primary + 0.3 * secondary).rounded())
         let qualityBand = CraftMaterialQualityBand(rawValue: qualityRank) ?? .rough
-        let uncapped = recipe.station == Stations.bowyer || recipe.station == Stations.weaponsmith
+        let uncapped = recipe.station == Stations.bowyer
+            || recipe.station == Stations.weaponsmith
+            || recipe.station == Stations.tannery
         let output = uncapped
             ? qualityRank : min(max(1, qualityRank), constructionCap(for: recipe, in: state))
         let averageInsulation = chosen.map(\.sample.properties.insulation).reduce(0, +) / Double(chosen.count)
