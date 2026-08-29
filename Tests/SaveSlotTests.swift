@@ -2,6 +2,37 @@ import XCTest
 @testable import Bookbinder
 
 final class SaveSlotTests: XCTestCase {
+    @MainActor
+    func testWorldFieldItemRefusalPreservesRealSlotEnvelope() async throws {
+        let root = directory(); defer { try? FileManager.default.removeItem(at: root) }
+        let slots = SaveSlotFileIO(directory: root)
+        var state = GameState.newGame()
+        let point = GridPoint(x: 0, y: 0)
+        var run = WorldRun(runIndex: 701, book: .init(written: [], essencePaid: 0),
+                           mapSeed: 701_001, rng: .init(seed: 701_001),
+                           map: .init(width: 1, height: 1,
+                                      tiles: [Tile(isRevealed: true)], entry: point),
+                           playerPosition: point)
+        let lure = ItemStack(id: .init(rawValue: 701_002), catalogID: "lure")
+        XCTAssertTrue(run.satchelItems.add(lure))
+        state.worlds.activeRun = run
+        let created = try await slots.create(name: "Field item refusal", state: state)
+        _ = try await slots.acquireWriterLease(for: created.metadata.id)
+        let store = GameStore(io: try await slots.payloadIOForLeasedSlot())
+        let quote = try store.worldFieldItemUseEvaluation(lure, on: .binder).get()
+        let url = try await slots.exportURL(for: created.metadata.id)
+        let envelope = try Data(contentsOf: url)
+        let before = store.state
+        let diagnostics = store.diagnostics
+
+        XCTAssertEqual(store.commitWorldFieldItemUse(quote), .refused(.noEligibleEffect))
+        XCTAssertEqual(store.state, before)
+        XCTAssertEqual(try Data(contentsOf: url), envelope)
+        XCTAssertEqual(store.diagnostics.writeCount, diagnostics.writeCount)
+        XCTAssertEqual(store.diagnostics.savedMutationCount, diagnostics.savedMutationCount)
+        XCTAssertFalse(store.diagnostics.hasPendingWrite)
+    }
+
     private func currentEncounterState() throws -> GameState {
         var state = GameState.newGame()
         let point = GridPoint(x: 0, y: 0)

@@ -374,6 +374,96 @@ final class ConsumableCraftingTests: XCTestCase {
         XCTAssertNotNil(onlyHidden.worlds.activeRun?.satchelItems.stacks.first)
     }
 
+    func testWorldFieldItemBlockedLureAndForgedTargetAreByteAndWriteInert() throws {
+        let io = SaveFileIO.temporary(name: "field-item-refusal-\(UUID().uuidString)")
+        defer { io.deleteEverything() }
+        let store = GameStore(io: io)
+        var state = fieldState(item: "lure")
+        state.worlds.activeRun?.enemies = []
+        store.mutate("stage blocked lure", flush: true) { $0 = state }
+        let lure = try XCTUnwrap(store.activeRun?.satchelItems.stacks.first)
+        let quote = try store.worldFieldItemUseEvaluation(lure, on: .binder).get()
+        let before = store.state
+        let bytes = try SaveCodec.encode(before)
+        let file = try Data(contentsOf: store.diagnostics.saveURL)
+        let diagnostics = store.diagnostics
+
+        XCTAssertEqual(store.commitWorldFieldItemUse(quote), .refused(.noEligibleEffect))
+        XCTAssertEqual(store.state, before)
+        XCTAssertEqual(try SaveCodec.encode(store.state), bytes)
+        XCTAssertEqual(try Data(contentsOf: store.diagnostics.saveURL), file)
+        XCTAssertEqual(store.diagnostics.writeCount, diagnostics.writeCount)
+        XCTAssertEqual(store.diagnostics.savedMutationCount, diagnostics.savedMutationCount)
+        XCTAssertFalse(store.diagnostics.hasPendingWrite)
+
+        let forged = PartyMember.member(.generated("not-travelling"))
+        XCTAssertEqual(store.worldFieldItemUseEvaluation(lure, on: forged),
+                       .failure(.targetUnavailable))
+        XCTAssertNil(store.activeRun?.companionHP[try XCTUnwrap(forged.persistentID)])
+        XCTAssertEqual(store.state, before)
+    }
+
+    func testWorldFieldItemExactQuoteCommitsOnceAndStaleTurnTargetAndStackRefuse() throws {
+        let io = SaveFileIO.temporary(name: "field-item-quote-\(UUID().uuidString)")
+        defer { io.deleteEverything() }
+        let store = GameStore(io: io)
+        var state = fieldState(item: "salve_lesser")
+        state.worlds.activeRun?.binderHP = 5
+        store.mutate("stage exact heal", flush: true) { $0 = state }
+        let salve = try XCTUnwrap(store.activeRun?.satchelItems.stacks.first)
+        let quote = try store.worldFieldItemUseEvaluation(salve, on: .binder).get()
+        let turn = try XCTUnwrap(store.activeRun?.turnsTaken)
+
+        guard case .committed = store.commitWorldFieldItemUse(quote) else {
+            return XCTFail("exact field heal did not commit")
+        }
+        XCTAssertEqual(store.activeRun?.binderHP, 15)
+        XCTAssertEqual(store.activeRun?.turnsTaken, turn + 1)
+        XCTAssertNil(store.activeRun?.satchelItems.stacks.first { $0.id == salve.id })
+        let committed = store.state
+        let relaunched = try SaveCodec.decode(Data(contentsOf: store.diagnostics.saveURL))
+        XCTAssertEqual(relaunched.worlds.activeRun, committed.worlds.activeRun)
+        XCTAssertEqual(relaunched.meta.mutationCount, committed.meta.mutationCount)
+        XCTAssertEqual(relaunched.meta.semanticActionTrail, committed.meta.semanticActionTrail)
+
+        let bytes = try SaveCodec.encode(committed)
+        let file = try Data(contentsOf: store.diagnostics.saveURL)
+        guard case .refused = store.commitWorldFieldItemUse(quote) else {
+            return XCTFail("replayed field-item quote committed twice")
+        }
+        XCTAssertEqual(try SaveCodec.encode(store.state), bytes)
+        XCTAssertEqual(try Data(contentsOf: store.diagnostics.saveURL), file)
+
+        var staleState = fieldState(item: "salve_lesser")
+        staleState.worlds.activeRun?.binderHP = 5
+        let staleStack = try XCTUnwrap(staleState.worlds.activeRun?.satchelItems.stacks.first)
+        let staleQuote = try WorldFieldItemUseRulesV1.evaluate(stack: staleStack, target: .binder,
+                                                               in: staleState).get()
+        staleState.worlds.activeRun?.turnsTaken += 1
+        let beforeStale = staleState
+        XCTAssertEqual(WorldFieldItemUseRulesV1.commit(staleQuote, in: &staleState),
+                       .refused(.staleTurn))
+        XCTAssertEqual(staleState, beforeStale)
+
+        for mutation in [
+            { (state: inout GameState) in state.worlds.activeRun?.satchelItems.stacks[0].count = 2 },
+            { (state: inout GameState) in state.worlds.activeRun?.binderHP = 6 },
+            { (state: inout GameState) in state.worlds.activeRun?.mapSeed += 1 }
+        ] {
+            var changed = fieldState(item: "salve_lesser")
+            changed.worlds.activeRun?.binderHP = 5
+            let stack = try XCTUnwrap(changed.worlds.activeRun?.satchelItems.stacks.first)
+            let exact = try WorldFieldItemUseRulesV1.evaluate(stack: stack, target: .binder,
+                                                              in: changed).get()
+            mutation(&changed)
+            let beforeChanged = changed
+            guard case .refused = WorldFieldItemUseRulesV1.commit(exact, in: &changed) else {
+                return XCTFail("changed field-item authority committed")
+            }
+            XCTAssertEqual(changed, beforeChanged)
+        }
+    }
+
     func testApothecaryHasNessaLifecycleAndExactBuildCost() throws {
         let station = try XCTUnwrap(ContentCatalog.shared.station(Stations.apothecary))
         XCTAssertFalse(station.unlockedAtStart)

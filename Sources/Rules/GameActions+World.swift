@@ -1,5 +1,152 @@
 import Foundation
 
+enum WorldFieldItemUseRouteV1: Equatable, Sendable {
+    case identifiedFieldUse
+    case unidentifiedCurioTry
+    case seamlight
+}
+
+struct WorldFieldItemUseQuoteV1: Equatable, Sendable {
+    static let currentVersion = 1
+    var version: Int = Self.currentVersion
+    var worldRunIdentity: String
+    var expectedTurn: Int
+    var sourceStack: ItemStack
+    var effect: ConsumableDef.Effect
+    var target: PartyMember
+    var targetCurrentHP: Int
+    var targetMaxHP: Int
+    var route: WorldFieldItemUseRouteV1
+}
+
+enum WorldFieldItemUseRefusalV1: Error, Equatable, Sendable {
+    case noActiveRun
+    case encounterActive
+    case staleRun
+    case staleTurn
+    case staleItem
+    case targetUnavailable
+    case unsupportedFieldUse
+    case noEligibleEffect
+    case nestedCurioRefusal
+    case nestedSeamlightRefusal
+}
+
+enum WorldFieldItemUseCommitResultV1: Equatable, Sendable {
+    case committed(events: [WorldRules.Event])
+    case refused(WorldFieldItemUseRefusalV1)
+}
+
+enum WorldFieldItemUseRulesV1 {
+    static func evaluate(stack: ItemStack, target: PartyMember, in state: GameState)
+        -> Result<WorldFieldItemUseQuoteV1, WorldFieldItemUseRefusalV1> {
+        guard let run = state.worlds.activeRun else { return .failure(.noActiveRun) }
+        guard run.activeEncounter == nil else { return .failure(.encounterActive) }
+        guard run.satchelItems.stacks.filter({ $0.id == stack.id }).count == 1,
+              run.satchelItems.stacks.first(where: { $0.id == stack.id }) == stack,
+              stack.count > 0 else { return .failure(.staleItem) }
+
+        let route: WorldFieldItemUseRouteV1
+        let effect: ConsumableDef.Effect
+        if stack.identified {
+            guard let item = ContentCatalog.shared.item(stack.catalogID), item.kind == .consumable,
+                  let consumable = item.consumable else { return .failure(.staleItem) }
+            effect = consumable.effect
+            route = effect == .seamlightGuidance ? .seamlight : .identifiedFieldUse
+        } else {
+            guard let item = EconomyRules.identification(of: stack), item.kind == .consumable,
+                  let consumable = item.consumable, consumable.effect == .heal else {
+                return .failure(.nestedCurioRefusal)
+            }
+            effect = consumable.effect
+            route = .unidentifiedCurioTry
+        }
+
+        let targeted = effect == .heal
+        if targeted {
+            guard state.base.partyMembers.contains(target) else { return .failure(.targetUnavailable) }
+        } else if target != .binder {
+            return .failure(.targetUnavailable)
+        }
+        let health = CombatRules.health(of: target.combatant, in: run)
+        if route == .unidentifiedCurioTry, health.current >= health.max {
+            return .failure(.noEligibleEffect)
+        }
+        if route == .identifiedFieldUse,
+           ![.heal, .restoreStability, .lightWorld, .farsight, .lureCreature].contains(effect) {
+            return .failure(.unsupportedFieldUse)
+        }
+        return .success(.init(worldRunIdentity: "\(run.runIndex):\(run.mapSeed)",
+                              expectedTurn: run.turnsTaken, sourceStack: stack, effect: effect,
+                              target: target, targetCurrentHP: health.current,
+                              targetMaxHP: health.max, route: route))
+    }
+
+    static func commit(_ quote: WorldFieldItemUseQuoteV1, in state: inout GameState)
+        -> WorldFieldItemUseCommitResultV1 {
+        guard quote.version == WorldFieldItemUseQuoteV1.currentVersion else {
+            return .refused(.staleItem)
+        }
+        let evaluation = evaluate(stack: quote.sourceStack, target: quote.target, in: state)
+        guard case .success(let current) = evaluation else {
+            guard case .failure(let refusal) = evaluation else { return .refused(.staleItem) }
+            return .refused(refusal)
+        }
+        guard current == quote else {
+            if current.worldRunIdentity != quote.worldRunIdentity { return .refused(.staleRun) }
+            if current.expectedTurn != quote.expectedTurn { return .refused(.staleTurn) }
+            if current.sourceStack != quote.sourceStack { return .refused(.staleItem) }
+            if current.target != quote.target || current.targetCurrentHP != quote.targetCurrentHP
+                || current.targetMaxHP != quote.targetMaxHP { return .refused(.targetUnavailable) }
+            return .refused(.unsupportedFieldUse)
+        }
+
+        var candidate = state
+        var events: [WorldRules.Event]
+        switch quote.route {
+        case .identifiedFieldUse:
+            events = WorldRules.useItem(quote.sourceStack.id, on: quote.target, in: &candidate)
+        case .unidentifiedCurioTry:
+            guard var run = candidate.worlds.activeRun,
+                  let index = run.satchelItems.stacks.firstIndex(where: { $0.id == quote.sourceStack.id }),
+                  run.satchelItems.stacks[index] == quote.sourceStack,
+                  let revealed = EconomyRules.identification(of: quote.sourceStack),
+                  revealed.consumable?.effect == .heal else {
+                return .refused(.nestedCurioRefusal)
+            }
+            run.satchelItems.stacks[index].catalogID = revealed.id
+            run.satchelItems.stacks[index].identified = true
+            candidate.worlds.activeRun = run
+            events = WorldRules.useItem(quote.sourceStack.id, on: quote.target, in: &candidate)
+            guard !events.contains(where: { if case .blocked = $0 { return true }; return false }),
+                  EconomyRules.recordCurioResolution(familyID: quote.sourceStack.catalogID,
+                                                     in: &candidate)
+                    || candidate.reality.curioFamilyKnowledge[quote.sourceStack.catalogID] != nil else {
+                return .refused(.nestedCurioRefusal)
+            }
+        case .seamlight:
+            switch SeamlightRules.evaluate(sourceItemInstanceID: quote.sourceStack.id, in: candidate) {
+            case .failure: return .refused(.nestedSeamlightRefusal)
+            case .success(let seamlightQuote):
+                switch SeamlightRules.commit(seamlightQuote, in: &candidate) {
+                case .activated(_, let committed): events = committed
+                case .refused: return .refused(.nestedSeamlightRefusal)
+                }
+            }
+        }
+        guard !events.contains(where: { if case .blocked = $0 { return true }; return false }) else {
+            return .refused(.noEligibleEffect)
+        }
+        let remaining = candidate.worlds.activeRun?.satchelItems.stacks
+            .first(where: { $0.id == quote.sourceStack.id })?.count ?? 0
+        guard remaining == quote.sourceStack.count - 1, candidate != state else {
+            return .refused(.noEligibleEffect)
+        }
+        state = candidate
+        return .committed(events: events)
+    }
+}
+
 enum CurrentStateCommitResult: Equatable, Sendable {
     case committed
     case refused(String)
@@ -604,52 +751,31 @@ extension GameStore {
         if committed { finishTurn(events, attempt: attempt) }
     }
 
+    func worldFieldItemUseEvaluation(_ stack: ItemStack, on member: PartyMember)
+        -> Result<WorldFieldItemUseQuoteV1, WorldFieldItemUseRefusalV1> {
+        WorldFieldItemUseRulesV1.evaluate(stack: stack, target: member, in: state)
+    }
+
+    @discardableResult
+    func commitWorldFieldItemUse(_ quote: WorldFieldItemUseQuoteV1)
+        -> WorldFieldItemUseCommitResultV1 {
+        guard let attempt = beginWorldFieldAttempt(.useItem) else {
+            return .refused(activeRun == nil ? .noActiveRun : .encounterActive)
+        }
+        var result: WorldFieldItemUseCommitResultV1 = .refused(.staleItem)
+        let published = mutateIf("use \(quote.sourceStack.catalogID.rawValue)", flush: true,
+                                 scope: .expedition) { candidate in
+            result = WorldFieldItemUseRulesV1.commit(quote, in: &candidate)
+            if case .committed = result { return true }
+            return false
+        }
+        guard published, case .committed(let events) = result else { return result }
+        finishTurn(events, attempt: attempt)
+        return result
+    }
+
     /// Use something out here. Costs a turn, like everything else the world charges for.
     func useItemInWorld(_ stack: ItemStack, on member: PartyMember) {
-        if !stack.identified {
-            guard activeRun?.activeEncounter == nil,
-                  activeRun?.satchelItems.stacks.first(where: { $0.id == stack.id }) == stack,
-                  curioTryTargets(stack).contains(member),
-                  let attempt = beginWorldFieldAttempt(.useItem) else { return }
-            var events: [WorldRules.Event] = []
-            mutate("try unidentified curio", flush: true, scope: .expedition) { state in
-                var candidate = state
-                guard var run = candidate.worlds.activeRun,
-                      let index = run.satchelItems.stacks.firstIndex(where: { $0.id == stack.id }),
-                      run.satchelItems.stacks[index] == stack,
-                      let revealed = EconomyRules.identification(of: stack),
-                      revealed.consumable?.effect == .heal else { return }
-                run.satchelItems.stacks[index].catalogID = revealed.id
-                run.satchelItems.stacks[index].identified = true
-                candidate.worlds.activeRun = run
-                let committed = WorldRules.useItem(stack.id, on: member, in: &candidate)
-                guard !committed.contains(where: { if case .blocked = $0 { return true }; return false }),
-                      EconomyRules.recordCurioResolution(familyID: stack.catalogID, in: &candidate)
-                        || candidate.reality.curioFamilyKnowledge[stack.catalogID] != nil else { return }
-                events = committed
-                state = candidate
-            }
-            finishTurn(events, attempt: attempt)
-            return
-        }
-        if ContentCatalog.shared.item(stack.catalogID)?.consumable?.effect == .seamlightGuidance {
-            guard let attempt = beginWorldFieldAttempt(.useItem) else { return }
-            var events: [WorldRules.Event] = []
-            mutate("use seamlight", flush: true, scope: .expedition) { state in
-                switch SeamlightRules.evaluate(sourceItemInstanceID: stack.id, in: state) {
-                case .failure(let refusal):
-                    events = [.blocked(SeamlightRules.playerCopy(for: refusal))]
-                case .success(let quote):
-                    switch SeamlightRules.commit(quote, in: &state) {
-                    case .activated(_, let committed): events = committed
-                    case .refused(let refusal):
-                        events = [.blocked(SeamlightRules.playerCopy(for: refusal))]
-                    }
-                }
-            }
-            finishTurn(events, attempt: attempt)
-            return
-        }
         guard activeRun?.activeEncounter == nil else { return }
         if ContentCatalog.shared.item(stack.catalogID)?.consumable?.effect == .returnHome {
             returnHomeWithFullHaul(
@@ -658,12 +784,10 @@ extension GameStore {
                 consuming: stack.id)
             return
         }
-        guard let attempt = beginWorldFieldAttempt(.useItem) else { return }
-        var events: [WorldRules.Event] = []
-        mutate("use \(stack.catalogID.rawValue)", flush: true, scope: .expedition) { state in
-            events = WorldRules.useItem(stack.id, on: member, in: &state)
+        guard case .success(let quote) = worldFieldItemUseEvaluation(stack, on: member) else {
+            return
         }
-        finishTurn(events, attempt: attempt)
+        _ = commitWorldFieldItemUse(quote)
     }
 
     /// **Whoever you're standing on**, so the world screen can open the scene.
