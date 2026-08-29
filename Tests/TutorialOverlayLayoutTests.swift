@@ -27,8 +27,18 @@ final class TutorialOverlayLayoutTests: XCTestCase {
     }
 
     func testEveryCurrentTutorialPromptUsesOverlayRatherThanInsetOrInlineContent() throws {
+        let presentationSites = [
+            "Sources/App/RootView.swift",
+            "Sources/Screens/BaseView.swift",
+            "Sources/Screens/WritingDeskView.swift",
+            "Sources/Screens/WorldView.swift",
+            "Sources/Screens/LibraryView.swift",
+        ]
+        for site in presentationSites {
+            XCTAssertTrue(try read(site).contains(".tutorialHoverOverlay"), site)
+        }
+
         let writing = try read("Sources/Screens/WritingDeskView.swift")
-        XCTAssertTrue(writing.contains(".tutorialHoverOverlay"))
         XCTAssertFalse(writing.contains(".safeAreaInset(edge: .bottom)"))
 
         let root = try read("Sources/App/RootView.swift")
@@ -36,9 +46,28 @@ final class TutorialOverlayLayoutTests: XCTestCase {
         XCTAssertTrue(root.contains(".tutorialHoverOverlay("))
 
         let base = try read("Sources/Screens/BaseView.swift")
-        XCTAssertTrue(base.contains(".overlay(alignment: .top)"))
+        XCTAssertTrue(base.contains(".tutorialHoverOverlay(isPresented: showsFirstReturnRouteCard"))
+        let primaryStart = try XCTUnwrap(base.range(of: "VStack(spacing: 0) {"))
+        let pagerStart = try XCTUnwrap(base.range(of: "ZStack(alignment: .top) {",
+                                                  range: primaryStart.upperBound..<base.endIndex))
+        XCTAssertFalse(base[primaryStart.upperBound..<pagerStart.lowerBound]
+            .contains("firstReturnRouteCard"),
+            "Base's transient first-return card must not be a primary-stack child")
         let world = try read("Sources/Screens/WorldView.swift")
         XCTAssertTrue(world.contains(".tutorialHoverOverlay("))
+    }
+
+    @MainActor
+    func testBasePromptDoesNotMoveContextSectionMapOrDepartureAtPhoneAndAccessibilityText() {
+        for typeSize in [DynamicTypeSize.large, .accessibility3] {
+            let absent = baseFrames(promptVisible: false, typeSize: typeSize)
+            let present = baseFrames(promptVisible: true, typeSize: typeSize)
+            XCTAssertEqual(present.underlying, absent.underlying, "Underlying Base geometry moved at \(typeSize)")
+            XCTAssertNotNil(present.card)
+            XCTAssertNil(absent.card)
+            XCTAssertGreaterThan(present.card?.width ?? 0, 44)
+            XCTAssertGreaterThan(present.card?.height ?? 0, 44)
+        }
     }
 
     func testAccessibility3PromptIsSafeAreaBoundedAndInternallyScrollable() {
@@ -122,6 +151,46 @@ final class TutorialOverlayLayoutTests: XCTestCase {
         .environment(\.dynamicTypeSize, typeSize)
         let host = UIHostingController(rootView: root)
         return host.sizeThatFits(in: CGSize(width: 390, height: 800))
+    }
+
+    @MainActor
+    private func baseFrames(promptVisible: Bool, typeSize: DynamicTypeSize)
+        -> (underlying: [String: CGRect], card: CGRect?) {
+        let store = GameStore(io: .temporary(name: "base-overlay-\(UUID().uuidString)"))
+        if promptVisible {
+            store.mutate("fixture: present Base route prompt") { state in
+                state.tutorial.firstReturnContext = .init(
+                    runIndex: 1, route: .writingDesk, reason: .ordinaryReturn, writingID: nil)
+                state.tutorial.complete(.returnPersistenceBoundary, fact: "fixture_return")
+            }
+        }
+        let host = UIHostingController(rootView: BaseView()
+            .environmentObject(store)
+            .environment(\.dynamicTypeSize, typeSize))
+        let window = UIWindow(frame: CGRect(x: 0, y: 0, width: 390, height: 844))
+        window.rootViewController = host
+        window.makeKeyAndVisible()
+        defer { window.isHidden = true }
+        host.view.frame = window.bounds
+        host.view.setNeedsLayout()
+        host.view.layoutIfNeeded()
+        RunLoop.current.run(until: Date().addingTimeInterval(0.05))
+        host.view.layoutIfNeeded()
+
+        let ids = ["base-context-row", "base-section-picker", "base-district-pager", "base-departure"]
+        let frames = Dictionary(uniqueKeysWithValues: ids.compactMap { id in
+            descendants(of: host.view).first(where: { $0.accessibilityIdentifier == id })
+                .map { (id, $0.convert($0.bounds, to: host.view)) }
+        })
+        XCTAssertEqual(frames.count, ids.count)
+        let card = descendants(of: host.view)
+            .first(where: { $0.accessibilityIdentifier == "base-first-return-route-card" })
+            .map { $0.convert($0.bounds, to: host.view) }
+        if promptVisible {
+            XCTAssertNotNil(descendants(of: host.view)
+                .first(where: { $0.accessibilityIdentifier == "base-first-return-open" }))
+        }
+        return (frames, card)
     }
 
     private func read(_ relativePath: String) throws -> String {

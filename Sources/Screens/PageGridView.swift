@@ -181,8 +181,7 @@ struct PageGridView: View {
                 assetsReady = true
             } catch {
                 blankPageImage = nil
-                assetsReady = false
-                ghost = nil
+                assetsReady = true
                 interaction.cancel()
                 assetFailure()
             }
@@ -449,6 +448,7 @@ struct PageGridView: View {
             anchor = nil
         }
         .gesture(markDrag(mark, side: side, pageSize: pageSize))
+        .accessibilityIdentifier("writing.mark.\(mark.id.rawValue)")
         .accessibilityLabel("\(mark.displayName), Sigil, \(mark.cells.count) cells. Drag to move, or off the page to erase.")
     }
 
@@ -694,6 +694,7 @@ struct PageGridView: View {
                     }
                 }
         )
+        .accessibilityIdentifier("writing.ghost")
         .accessibilityLabel("Not yet written. Drag to place.")
     }
 
@@ -800,6 +801,9 @@ private struct WritingDeskPackMarkArtwork: View {
         ZStack {
             if let rgba {
                 Image(uiImage: rgba).interpolation(.none).resizable()
+            } else {
+                RuneGlyph(id: mark.rendererAssetKey, lineWidth: 1.5)
+                    .foregroundStyle(Color.accentColor)
             }
             if let tintMask, let recipe = mark.inkRecipe {
                 let rgb = recipe.resolvedSRGB

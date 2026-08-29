@@ -1,4 +1,5 @@
 import SwiftUI
+import OSLog
 
 enum WritingDeskSourceRules {
     static func selectedPage(afterEnteringWrite: Bool, current: InstanceID?) -> InstanceID? {
@@ -61,6 +62,8 @@ private enum WritingDeskSheet: String, Identifiable {
 /// do both at once left the page squeezed into a third of the screen and the projection half
 /// off-stage.
 struct WritingDeskView: View {
+    private static let visualLog = Logger(subsystem: "com.aimeepepper.bookbinder",
+                                          category: "writing-desk-visuals")
     @EnvironmentObject private var store: GameStore
     @Environment(\.dismiss) private var dismiss
     @Environment(\.displayScale) private var displayScale
@@ -183,6 +186,7 @@ struct WritingDeskView: View {
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(WritingDeskPaperBackground())
+        .accessibilityIdentifier("writing.desk.modern")
         .safeAreaInset(edge: .bottom, spacing: 0) {
             if pane == .world { bindBar }
         }
@@ -314,7 +318,7 @@ struct WritingDeskView: View {
                     clear: {
                         showsPageActions = false
                         isConfirmingClear = true
-                    }, assetFailure: writingPackFailed)
+                    }, assetFailure: writingSurfaceAssetFailed)
                     .offset(x: -8, y: 44)
                     .zIndex(100)
             } else if showsPageActions {
@@ -375,7 +379,7 @@ struct WritingDeskView: View {
             VStack(spacing: 6) {
                 PageGridView(ghost: $ghost, assetsReady: $writingAssetsReady,
                              productionPack: productionPack,
-                             assetFailure: writingPackFailed,
+                             assetFailure: writingSurfaceAssetFailed,
                              side: metrics.cellSide, pageInset: metrics.pageInset,
                              dismissalToken: pageInteractionDismissalToken)
                     .frame(width: metrics.pageOuterSide, height: metrics.pageOuterSide)
@@ -423,11 +427,20 @@ struct WritingDeskView: View {
     }
 
     private func writingPackFailed() {
+        Self.visualLog.error("Writing Desk production pack could not open; using compatibility visuals")
         productionPack = nil
         // Visual failure must never disable the gameplay-owned writing surface.
         writingAssetsReady = true
         writingPackUnavailable = true
         cancelPageInteraction(.outsidePage)
+    }
+
+    /// A missing or interrupted child asset may degrade that one piece of artwork, but it must
+    /// never replace the mounted production Desk or discard an armed/placed Sigil.
+    private func writingSurfaceAssetFailed() {
+        Self.visualLog.error("Writing Desk child asset failed; retaining production surface and draft")
+        writingAssetsReady = true
+        writingPackUnavailable = true
     }
 
     private var inkWellBar: some View {
@@ -442,7 +455,7 @@ struct WritingDeskView: View {
                     action: {
                         cancelPageInteraction(.handOrInk)
                         presentedSheet = .inkWell
-                    }, failed: writingPackFailed)
+                    }, failed: writingSurfaceAssetFailed)
             } else {
                 Button {
                     cancelPageInteraction(.handOrInk)
@@ -489,6 +502,7 @@ struct WritingDeskView: View {
                     }
                     .buttonStyle(.plain)
                     .fullFacePressFeedback("writing.bin.\(entry.id)")
+                    .accessibilityIdentifier("writing.bin.\(entry.id)")
                 }
             }
             .padding(.horizontal, 4)
@@ -896,7 +910,7 @@ struct WritingDeskView: View {
                             detail: item.blockedBy != nil ? "taken" : paletteDetail(item),
                             isEnabled: fits && writingAssetsReady,
                             action: { selectPaletteItem(item, pack: productionPack) },
-                            failed: writingPackFailed)
+                            failed: writingSurfaceAssetFailed)
                     } else {
                         Button {
                             cancelPageInteraction(.outsidePage)
@@ -923,34 +937,18 @@ struct WritingDeskView: View {
     }
 
     private func selectPaletteItem(_ item: Chip, pack: WritingDeskProductionPack) {
-        let candidate = WritingDeskFallbackSelection.arm(
+        let candidate = WritingDeskPaletteSelection.arm(
             glyph: item.glyph, content: item.content,
             origin: firstFreeOrigin(for: item.content))
-        guard let shape = PageRules.shape(for: item.content, hand: state.base.bestHand) else { return }
-        let visualKind: WritingDeskVisibleMark.AuthoredKind = switch item.content {
-        case .target: .target
-        case .source, .rune: .source
-        case .qualifier: .qualifier
-        case .compound: .compound
-        }
-        let visible = WritingDeskVisibleMark(
-            rendererAssetKey: item.glyph,
-            visualRoute: .authored(visualKind), id: .init(rawValue: 0), hand: state.base.bestHand,
-            origin: candidate.origin, shapeID: shape.id,
-            cells: shape.offsets.map { .init(column: candidate.origin.column + $0.column,
-                                             row: candidate.origin.row + $0.row) },
-            inkRecipe: nil, displayName: "", accessibilityName: "", isReadable: true)
         do {
-            guard case let .authored(key) = try pack.route(for: visible) else { return }
-            let roles = try pack.markAssets(for: key)
-            _ = try pack.assetData(sha256: roles.rgba.sha256)
-            for state in ["legal", "illegal"] {
-                let overlay = try pack.overlayAsset(shapeID: shape.id, state: state)
-                _ = try pack.assetData(sha256: overlay.sha256)
-            }
-            cancelPageInteraction(.outsidePage)
-            ghost = candidate
-        } catch { writingPackFailed() }
+            try WritingDeskPaletteSelection.preflight(candidate, hand: state.base.bestHand, pack: pack)
+        } catch {
+            // The exact gameplay selection remains authoritative even if its optional bitmap is
+            // unavailable. Keep the modern Desk mounted and let the native Sigil glyph carry it.
+            writingSurfaceAssetFailed()
+        }
+        cancelPageInteraction(.outsidePage)
+        ghost = candidate
     }
 
     private func chipColumns(_ count: Int) -> [GridItem] {
@@ -1170,6 +1168,38 @@ struct WritingDeskView: View {
 enum WritingDeskFallbackSelection {
     static func arm(glyph: String, content: MarkContent, origin: PageCell) -> GhostRune {
         GhostRune(glyph: glyph, content: content, origin: origin)
+    }
+}
+
+enum WritingDeskPaletteSelection {
+    static func arm(glyph: String, content: MarkContent, origin: PageCell) -> GhostRune {
+        WritingDeskFallbackSelection.arm(glyph: glyph, content: content, origin: origin)
+    }
+
+    /// Exact production UI preflight. Gameplay ownership remains the returned GhostRune; a visual
+    /// failure is reportable but cannot turn this into a different Desk or erase earlier marks.
+    static func preflight(_ candidate: GhostRune, hand: Hand,
+                          pack: WritingDeskProductionPack) throws {
+        guard let shape = PageRules.shape(for: candidate.content, hand: hand) else { return }
+        let visualKind: WritingDeskVisibleMark.AuthoredKind = switch candidate.content {
+        case .target: .target
+        case .source, .rune: .source
+        case .qualifier: .qualifier
+        case .compound: .compound
+        }
+        let visible = WritingDeskVisibleMark(
+            rendererAssetKey: candidate.glyph, visualRoute: .authored(visualKind),
+            id: .init(rawValue: 0), hand: hand, origin: candidate.origin, shapeID: shape.id,
+            cells: shape.offsets.map { .init(column: candidate.origin.column + $0.column,
+                                             row: candidate.origin.row + $0.row) },
+            inkRecipe: nil, displayName: "", accessibilityName: "", isReadable: true)
+        guard case let .authored(key) = try pack.route(for: visible) else { return }
+        let roles = try pack.markAssets(for: key)
+        _ = try pack.assetData(sha256: roles.rgba.sha256)
+        for state in ["legal", "illegal"] {
+            let overlay = try pack.overlayAsset(shapeID: shape.id, state: state)
+            _ = try pack.assetData(sha256: overlay.sha256)
+        }
     }
 }
 
@@ -1846,7 +1876,8 @@ private struct WritingDeskPackVocabularyTile: View {
         }
         .buttonStyle(.plain)
         .fullFacePressFeedback("writing.vocabulary.\(kind).\(id)")
-        .disabled(image == nil || !isEnabled)
+        .accessibilityIdentifier("writing.vocabulary.\(kind).\(id)")
+        .disabled(!isEnabled)
         .frame(height: 58)
         .task(id: "\(kind)-\(id)-\(hand)-\(state)") { load() }
     }

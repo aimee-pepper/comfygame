@@ -103,10 +103,7 @@ struct BaseView: View {
     var body: some View {
         GeometryReader { geometry in
             VStack(spacing: 0) {
-                VStack(spacing: 0) {
-                    contextRow
-                    firstReturnRouteCard
-                }
+                contextRow
                 ZStack(alignment: .top) {
                     districtPager(containerSize: geometry.size)
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -144,6 +141,9 @@ struct BaseView: View {
         .sheet(item: $foundationStation) { station in
             StationFoundationSheet(station: station)
                 .environmentObject(store)
+        }
+        .tutorialHoverOverlay(isPresented: showsFirstReturnRouteCard, alignment: .top) {
+            firstReturnRouteCard
         }
     }
 
@@ -184,6 +184,7 @@ struct BaseView: View {
         .overlay(alignment: .bottom) {
             Rectangle().fill(PixelUITheme.edge).frame(height: 2)
         }
+        .accessibilityIdentifier("base-context-row")
     }
 
     @ViewBuilder private var firstReturnRouteCard: some View {
@@ -200,10 +201,12 @@ struct BaseView: View {
                         store.deferTutorial(.baseFirstResultRoute)
                         routeCardHidden = true
                     }
+                    .accessibilityIdentifier("base-first-return-not-now")
                     Spacer()
                     NavigationLink(value: route) {
                         Text("Open \(destinationName(context.route))")
                     }
+                    .accessibilityIdentifier("base-first-return-open")
                     .buttonStyle(.borderedProminent)
                     .simultaneousGesture(TapGesture().onEnded {
                         if let station = ContentCatalog.shared.stations.first(where: { $0.route == route.rawValue }) {
@@ -216,7 +219,15 @@ struct BaseView: View {
             .padding(14)
             .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 16))
             .overlay(RoundedRectangle(cornerRadius: 16).stroke(.tint.opacity(0.35)))
+            .accessibilityIdentifier("base-first-return-route-card")
         }
+    }
+
+    private var showsFirstReturnRouteCard: Bool {
+        !routeCardHidden
+            && state.tutorial.firstReturnContext != nil
+            && state.tutorial[.returnPersistenceBoundary].status == .completed
+            && state.tutorial[.baseFirstResultRoute].status != .completed
     }
 
     private func destinationName(_ route: FirstReturnTutorialContext.Route) -> String {
@@ -414,6 +425,7 @@ struct BaseView: View {
             }
         }
         .padding(.top, 2)
+        .accessibilityIdentifier("base-departure")
     }
 
     @ViewBuilder private var baseActionButtons: some View {

@@ -28,6 +28,36 @@ final class WritingDeskProductionPackTests: XCTestCase {
         XCTAssertEqual(reads.urls.map(\.lastPathComponent), ["manifest.json"])
     }
 
+    @MainActor
+    func testLiteralPalettePreflightAndPlacementAppendsSecondSigilOnMountedModernDesk() throws {
+        let store = GameStore(io: .temporary(name: "writing-native-second-sigil-\(UUID().uuidString)"))
+        let pack = WritingDeskProductionPack(rootURL: packRoot)
+        store.beginWritingDeskSession()
+
+        let first = WritingDeskPaletteSelection.arm(
+            glyph: "illumination", content: .target("illumination"),
+            origin: .init(column: 0, row: 0))
+        try WritingDeskPaletteSelection.preflight(first, hand: store.state.base.bestHand, pack: pack)
+        XCTAssertTrue(store.write(first.content, glyph: first.glyph, at: first.origin))
+        let firstReceipt = try XCTUnwrap(store.writingDeskPage.runes.first)
+
+        let second = WritingDeskPaletteSelection.arm(
+            glyph: "sun", content: .source("sun"), origin: .init(column: 3, row: 3))
+        try WritingDeskPaletteSelection.preflight(second, hand: store.state.base.bestHand, pack: pack)
+        XCTAssertTrue(store.write(second.content, glyph: second.glyph, at: second.origin))
+
+        XCTAssertEqual(store.writingDeskPage.runes.count, 2)
+        XCTAssertEqual(store.writingDeskPage.runes.first, firstReceipt)
+        let review = try XCTUnwrap(store.writingDeskReviewModel())
+        XCTAssertEqual(review.visibleMarks.count, 2)
+        for mark in review.visibleMarks {
+            guard case let .authored(key) = try pack.route(for: mark) else {
+                return XCTFail("A canonical palette mark entered the compatibility route")
+            }
+            _ = try pack.markAssets(for: key)
+        }
+    }
+
     func testRetainedAcceptedHashesCannotAuthorizeTamperedLookup() throws {
         let original = try String(contentsOf: packRoot.appendingPathComponent("manifest.json"),
                                   encoding: .utf8)

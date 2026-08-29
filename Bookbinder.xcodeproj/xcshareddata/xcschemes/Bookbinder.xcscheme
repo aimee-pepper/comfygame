@@ -50,6 +50,17 @@
                ReferencedContainer = "container:Bookbinder.xcodeproj">
             </BuildableReference>
          </TestableReference>
+         <TestableReference
+            skipped = "NO"
+            parallelizable = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "A7A7F447EB5007AB28349008"
+               BuildableName = "BookbinderUITests.xctest"
+               BlueprintName = "BookbinderUITests"
+               ReferencedContainer = "container:Bookbinder.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
       </Testables>
       <CommandLineArguments>
       </CommandLineArguments>

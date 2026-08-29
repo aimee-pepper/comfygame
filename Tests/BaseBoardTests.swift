@@ -102,11 +102,12 @@ final class BaseBoardTests: XCTestCase {
         XCTAssertTrue(source.contains("NavigationLink(value: AppRoute.settings)"))
         XCTAssertTrue(source.contains(".accessibilityLabel(\"Settings and save games\")"))
         XCTAssertFalse(source.contains("Menu {\n                NavigationLink(value: AppRoute.settings)"))
-        let context = try XCTUnwrap(source.range(of: "contextRow"))
-        let route = try XCTUnwrap(source.range(of: "firstReturnRouteCard",
-                                               range: context.upperBound..<source.endIndex))
-        XCTAssertNotNil(source.range(of: "sectionPicker", range: route.upperBound..<source.endIndex))
-        XCTAssertFalse(source.contains(".overlay(alignment: .top) {\n            firstReturnRouteCard"))
+        XCTAssertTrue(source.contains(".tutorialHoverOverlay(isPresented: showsFirstReturnRouteCard"))
+        let primaryStack = try XCTUnwrap(source.range(of: "VStack(spacing: 0)"))
+        let overlay = try XCTUnwrap(source.range(of: ".tutorialHoverOverlay",
+                                                 range: primaryStack.upperBound..<source.endIndex))
+        let stackBody = source[primaryStack.upperBound..<overlay.lowerBound]
+        XCTAssertFalse(stackBody.contains("firstReturnRouteCard"))
     }
 
     func testEveryCurrentStationAuthorsOneUniqueBoardPosition() throws {

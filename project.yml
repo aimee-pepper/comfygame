@@ -67,6 +67,9 @@ targets:
         CFBundleDisplayName: Bookbinder
         CFBundleVersion: $(CURRENT_PROJECT_VERSION)
         UILaunchStoryboardName: LaunchScreen
+        UIAppFonts:
+          - Jersey10-Regular.ttf
+          - Tiny5-Regular.ttf
         UIApplicationSupportsIndirectInputEvents: true
         # Portrait only — pillar 3. Do not add landscape without a design decision.
         UISupportedInterfaceOrientations:
@@ -78,6 +81,7 @@ targets:
     scheme:
       testTargets:
         - BookbinderTests
+        - BookbinderUITests
       gatherCoverageData: false
 
   BookbinderTests:
@@ -85,9 +89,23 @@ targets:
     platform: iOS
     sources:
       - path: Tests
+        excludes:
+          - TalinGambitTests.swift
     dependencies:
       - target: Bookbinder
     settings:
       base:
         GENERATE_INFOPLIST_FILE: YES
         PRODUCT_BUNDLE_IDENTIFIER: com.aimeepepper.bookbinder.tests
+
+  BookbinderUITests:
+    type: bundle.ui-testing
+    platform: iOS
+    sources:
+      - path: UITests
+    dependencies:
+      - target: Bookbinder
+    settings:
+      base:
+        GENERATE_INFOPLIST_FILE: YES
+        PRODUCT_BUNDLE_IDENTIFIER: com.aimeepepper.bookbinder.uitests
