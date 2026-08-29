@@ -236,7 +236,52 @@ enum EncounterSnapshotRulesV1 {
         let expectedSlots = CombatRules.turnSlots(order: encounter.order, foes: encounter.foes,
                                                    apexActionSlots: apexActionSlots,
                                                    ordinaryPressureSlots: ordinaryPressureSlots)
-        guard encounter.turnSlots == expectedSlots else { return false }
+        // Cascade reorders primary slots while deliberately leaving follow-up positions in place;
+        // Stagger moves a foe's persisted slots later without rebuilding the schedule. Validate the
+        // frozen authority carried by every actor's slot sequence, not a fresh global interleaving.
+        // The primary projection still has to be the exact persisted actor order.
+        guard encounter.turnSlots.filter({ $0.kind == .primary }).map(\.actor) == encounter.order else {
+            return false
+        }
+        guard encounter.turnSlots.allSatisfy({ slot in
+            switch slot.kind {
+            case .primary:
+                return slot.strengthMultiplier == 1 && !slot.suppressesAfflictions
+            case .apexFollowUp:
+                guard case .foe(let id) = slot.actor else { return false }
+                return apexActionSlots[id] != nil
+            case .ordinaryPressureFollowUp:
+                guard case .foe(let id) = slot.actor else { return false }
+                return encounter.foes.contains { $0.id == id && !$0.isApex }
+            }
+        }) else { return false }
+        for actor in closedActors {
+            let actualPrimary = encounter.turnSlots.filter { $0.actor == actor && $0.kind == .primary }
+            guard actualPrimary == [.init(actor: actor)] else { return false }
+            if case .foe(let id) = actor, apexActionSlots[id] != nil {
+                let actual = encounter.turnSlots.filter { $0.actor == actor }
+                let expected = expectedSlots.filter { $0.actor == actor }
+                guard actual == expected else { return false }
+            } else if actor.foeID == nil || encounter.foes.contains(where: {
+                $0.id == actor.foeID && $0.isApex
+            }) {
+                guard encounter.turnSlots.filter({ $0.actor == actor }).count == 1 else { return false }
+            }
+        }
+        let pressure = encounter.turnSlots.compactMap { slot -> (Int, Combatant)? in
+            guard case .ordinaryPressureFollowUp(let ordinal) = slot.kind else { return nil }
+            return (ordinal, slot.actor)
+        }
+        guard pressure.count == ordinaryPressureSlots,
+              pressure.map(\.0).sorted() == Array(1..<(ordinaryPressureSlots + 1)),
+              pressure.allSatisfy({ ordinal, actor in
+                  guard actor.foeID != nil,
+                        encounter.foes.contains(where: { $0.id == actor.foeID && !$0.isApex }),
+                        let slot = encounter.turnSlots.first(where: {
+                            $0.actor == actor && $0.kind == .ordinaryPressureFollowUp(ordinal)
+                        }) else { return false }
+                  return slot.strengthMultiplier == 0.55 && slot.suppressesAfflictions
+              }) else { return false }
 
         let expectedNames = state.base.activeParty.reduce(into: [PersistentPartyMemberID: String]()) {
             if let animal = state.base.animalCompanion(for: $1) {

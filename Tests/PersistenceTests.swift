@@ -57,6 +57,47 @@ final class PersistenceTests: XCTestCase {
         return try JSONSerialization.data(withJSONObject: root, options: [.sortedKeys])
     }
 
+    private func dynamicallyReorderedApexState(staggered: Bool) throws -> GameState {
+        var state = try currentApexEncounterState()
+        guard var run = state.worlds.activeRun, var encounter = run.activeEncounter,
+              let apex = encounter.foes.first, let preview = encounter.scalingPreview else {
+            throw CocoaError(.coderInvalidValue)
+        }
+        if staggered {
+            encounter.pendingStaggers[apex.id] = .init(
+                foeID: apex.id, applyingRound: encounter.roundNumber,
+                sourceActors: [.binder], sourceNodeIDs: [CombatDerivedStatsRules.Node.stagger],
+                automatic: true)
+            CombatRules.applyPendingStaggers(for: encounter.roundNumber, run: run,
+                                              encounter: &encounter)
+        } else {
+            let owner = try XCTUnwrap(encounter.order.first(where: {
+                $0.persistentPartyMemberID != nil
+            }))
+            let otherActors = encounter.order.filter { $0 != owner && $0 != .foe(apex.id) }
+            let canonicalOrder = Array(otherActors.prefix(1)) + [.foe(apex.id), owner]
+                + Array(otherActors.dropFirst())
+            encounter.order = canonicalOrder
+            encounter.turnSlots = CombatRules.turnSlots(
+                order: canonicalOrder, foes: encounter.foes,
+                apexActionSlots: [apex.id: preview.apexActionSlots], ordinaryPressureSlots: 0)
+            encounter.turnIndex = 0
+            var owned = encounter.debugV2OwnedNodeIDs ?? [:]
+            owned[owner, default: []].insert("combat.offense.swiftness.cascade")
+            encounter.debugV2OwnedNodeIDs = owned
+            encounter.debugV2Initiative = .init(entries: canonicalOrder.enumerated().map { index, actor in
+                .init(actor: actor, baseline: actor == owner ? 90 : 80 - index,
+                      components: [], total: actor == owner ? 90 : 80 - index,
+                      strikesFirst: false, finalPosition: index + 1)
+            })
+            encounter.foes[0].currentHP = 1
+            _ = CombatRules.applyFoeDamage(foeID: apex.id, amount: 1, sourceActor: owner,
+                                            provenance: .direct, run: &run, encounter: &encounter)
+        }
+        run.activeEncounter = encounter; state.worlds.activeRun = run
+        return state
+    }
+
     func testCurrentEncounterIdentityShapeRawRejectionIsBytePreserving() throws {
         let valid = try SaveCodec.encode(currentEncounterState())
         XCTAssertNoThrow(try Migrations.migrateIfNeeded(valid))
@@ -90,6 +131,10 @@ final class PersistenceTests: XCTestCase {
             ("wrong ordinal", { $0.turnSlots[$0.turnSlots.count - 1].kind = .apexFollowUp(3) }),
             ("wrong multiplier", { $0.turnSlots[$0.turnSlots.count - 1].strengthMultiplier = 99 }),
             ("wrong suppression", { $0.turnSlots[$0.turnSlots.count - 1].suppressesAfflictions = false }),
+            ("follow-up before primary", {
+                let followUp = $0.turnSlots.removeLast()
+                $0.turnSlots.insert(followUp, at: 0)
+            }),
             ("duplicate follow-up", { $0.turnSlots.append(.init(actor: .foe(apexID),
                 kind: .apexFollowUp(2), strengthMultiplier: 0.60, suppressesAfflictions: true)) })
         ]
@@ -111,6 +156,25 @@ final class PersistenceTests: XCTestCase {
             strengthMultiplier: 0.60, suppressesAfflictions: true))
         let ordinaryBytes = try SaveCodec.encode(ordinary)
         XCTAssertThrowsError(try Migrations.migrateIfNeeded(ordinaryBytes))
+    }
+
+    func testCurrentEncounterLiveCascadeAndStaggerRawRoundTrip() throws {
+        for state in [try dynamicallyReorderedApexState(staggered: false),
+                      try dynamicallyReorderedApexState(staggered: true)] {
+            XCTAssertTrue(EncounterSnapshotRulesV1.validatesAll(in: state))
+            let bytes = try SaveCodec.encode(state)
+            let migrated = try Migrations.migrateIfNeeded(bytes)
+            let resumed = try SaveCodec.decode(migrated)
+            XCTAssertEqual(resumed.worlds.activeRun?.activeEncounter?.turnSlots,
+                           state.worlds.activeRun?.activeEncounter?.turnSlots)
+            XCTAssertEqual(resumed.worlds.activeRun?.activeEncounter?.order,
+                           state.worlds.activeRun?.activeEncounter?.order)
+            var direct = try SaveCodec.decode(migrated)
+            var relaunched = try SaveCodec.decode(migrated)
+            CombatRules.runAutomaticTurns(in: &direct)
+            CombatRules.runAutomaticTurns(in: &relaunched)
+            XCTAssertEqual(relaunched.worlds.activeRun, direct.worlds.activeRun)
+        }
     }
 
     @MainActor
