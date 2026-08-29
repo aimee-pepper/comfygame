@@ -44,6 +44,44 @@ final class SaveSlotTests: XCTestCase {
         return state
     }
 
+    private func currentPressureEncounterState() throws -> GameState {
+        var state = GameState.newGame()
+        for ordinal in 1...3 {
+            let id = PersistentPartyMemberID.generated("pressure-slot-\(ordinal)")
+            var member = CompanionState(); member.persistentID = id; member.name = "P\(ordinal)"
+            state.base.roster.append(member); state.base.activeParty.append(id)
+        }
+        state.base.binderCharacter.level = 8
+        for index in state.base.roster.indices { state.base.roster[index].character.level = 8 }
+        let point = GridPoint(x: 0, y: 0), adjacent = GridPoint(x: 1, y: 0)
+        var run = WorldRun(runIndex: 93, book: .init(written: [], essencePaid: 0),
+                           mapSeed: 93_101, rng: .init(seed: 93_101),
+                           map: .init(width: 2, height: 1,
+                                      tiles: [Tile(isRevealed: true), Tile(isRevealed: true)], entry: point),
+                           playerPosition: point)
+        let enemies = [WorldEnemy(id: .init(rawValue: 93_101), creatureID: "paper_moth",
+                                  position: point, isAwake: true),
+                       WorldEnemy(id: .init(rawValue: 93_102), creatureID: "paper_moth",
+                                  position: adjacent, isAwake: true)]
+        run.enemies = enemies; state.worlds.activeRun = run
+        guard case .started = WorldRules.beginEncounter(triggerID: enemies[0].id,
+            expected: enemies[0], runsAutomaticTurns: false, in: &state),
+              var encounter = state.worlds.activeRun?.activeEncounter,
+              encounter.foes.count == 2,
+              var preview = encounter.scalingPreview else {
+            throw CocoaError(.coderInvalidValue)
+        }
+        preview.wholePressureSlots = 2
+        encounter.scalingPreview = preview
+        encounter.turnSlots = CombatRules.turnSlots(order: encounter.order, foes: encounter.foes,
+            apexActionSlots: [:], ordinaryPressureSlots: 2)
+        state.worlds.activeRun?.activeEncounter = encounter
+        guard EncounterSnapshotRulesV1.validatesAll(in: state) else {
+            throw CocoaError(.coderInvalidValue)
+        }
+        return state
+    }
+
     private func mutatingActiveEncounter(
         in data: Data, _ mutation: (inout [String: Any]) -> Void
     ) throws -> Data {
@@ -169,6 +207,24 @@ final class SaveSlotTests: XCTestCase {
         do { _ = try await slots.load(created.metadata.id); XCTFail("accepted ordinary foe follow-up") }
         catch { }
         XCTAssertEqual(try Data(contentsOf: url), ordinaryBytes)
+
+        var pressure = try currentPressureEncounterState()
+        var pressureEncounter = try XCTUnwrap(pressure.worlds.activeRun?.activeEncounter)
+        let secondOwner = try XCTUnwrap(pressureEncounter.turnSlots.first(where: {
+            $0.kind == .ordinaryPressureFollowUp(2)
+        })?.actor)
+        let firstIndex = try XCTUnwrap(pressureEncounter.turnSlots.firstIndex(where: {
+            $0.kind == .ordinaryPressureFollowUp(1)
+        }))
+        pressureEncounter.turnSlots[firstIndex].actor = secondOwner
+        pressure.worlds.activeRun?.activeEncounter = pressureEncounter
+        var pressureEnvelope = validEnvelope
+        pressureEnvelope.payload = try SaveCodec.encode(pressure)
+        let pressureBytes = try encoder().encode(pressureEnvelope)
+        try pressureBytes.write(to: url, options: .atomic)
+        do { _ = try await slots.load(created.metadata.id); XCTFail("accepted forged pressure owner") }
+        catch { }
+        XCTAssertEqual(try Data(contentsOf: url), pressureBytes)
 
         try (try encoder().encode(validEnvelope)).write(to: url, options: .atomic)
         let reloaded = try await slots.load(created.metadata.id).state

@@ -272,8 +272,23 @@ enum EncounterSnapshotRulesV1 {
             guard case .ordinaryPressureFollowUp(let ordinal) = slot.kind else { return nil }
             return (ordinal, slot.actor)
         }
+        let ordinaryFoeIDs = encounter.foes.filter { !$0.isApex }.map(\.id).sorted { lhs, rhs in
+            let left = encounter.debugV2Initiative?.entry(for: .foe(lhs))?.finalPosition
+                ?? encounter.order.firstIndex(of: .foe(lhs)).map { $0 + 1 } ?? Int.max
+            let right = encounter.debugV2Initiative?.entry(for: .foe(rhs))?.finalPosition
+                ?? encounter.order.firstIndex(of: .foe(rhs)).map { $0 + 1 } ?? Int.max
+            if left != right { return left < right }
+            return lhs.rawValue < rhs.rawValue
+        }
+        let expectedPressure: [(Int, Combatant)] = ordinaryFoeIDs.isEmpty ? []
+            : (1..<(ordinaryPressureSlots + 1)).map { ordinal in
+                (ordinal, .foe(ordinaryFoeIDs[(ordinal - 1) % ordinaryFoeIDs.count]))
+            }
         guard pressure.count == ordinaryPressureSlots,
               pressure.map(\.0).sorted() == Array(1..<(ordinaryPressureSlots + 1)),
+              pressure.sorted(by: { $0.0 < $1.0 }).elementsEqual(expectedPressure, by: {
+                  $0.0 == $1.0 && $0.1 == $1.1
+              }),
               pressure.allSatisfy({ ordinal, actor in
                   guard actor.foeID != nil,
                         encounter.foes.contains(where: { $0.id == actor.foeID && !$0.isApex }),

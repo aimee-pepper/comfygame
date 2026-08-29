@@ -45,6 +45,46 @@ final class PersistenceTests: XCTestCase {
         return state
     }
 
+    private func currentPressureEncounterState() throws -> GameState {
+        var state = GameState.newGame()
+        for ordinal in 1...3 {
+            let id = PersistentPartyMemberID.generated("pressure-raw-\(ordinal)")
+            var member = CompanionState(); member.persistentID = id; member.name = "P\(ordinal)"
+            state.base.roster.append(member); state.base.activeParty.append(id)
+        }
+        state.base.binderCharacter.level = 8
+        for index in state.base.roster.indices { state.base.roster[index].character.level = 8 }
+        let point = GridPoint(x: 0, y: 0), adjacent = GridPoint(x: 1, y: 0)
+        var run = WorldRun(runIndex: 93, book: .init(written: [], essencePaid: 0),
+                           mapSeed: 93_001, rng: .init(seed: 93_001),
+                           map: .init(width: 2, height: 1,
+                                      tiles: [Tile(isRevealed: true), Tile(isRevealed: true)], entry: point),
+                           playerPosition: point)
+        let enemies = [WorldEnemy(id: .init(rawValue: 93_001), creatureID: "paper_moth",
+                                  position: point, isAwake: true),
+                       WorldEnemy(id: .init(rawValue: 93_002), creatureID: "paper_moth",
+                                  position: adjacent, isAwake: true)]
+        run.enemies = enemies; state.worlds.activeRun = run
+        guard case .started = WorldRules.beginEncounter(triggerID: enemies[0].id,
+            expected: enemies[0], runsAutomaticTurns: false, in: &state),
+              var encounter = state.worlds.activeRun?.activeEncounter,
+              encounter.foes.count == 2,
+              var preview = encounter.scalingPreview else {
+            throw CocoaError(.coderInvalidValue)
+        }
+        // Frozen additive-pressure receipts may lawfully retain two slots even when today's
+        // catalogue/tuning would allocate fewer. Build the exact canonical frozen schedule.
+        preview.wholePressureSlots = 2
+        encounter.scalingPreview = preview
+        encounter.turnSlots = CombatRules.turnSlots(order: encounter.order, foes: encounter.foes,
+            apexActionSlots: [:], ordinaryPressureSlots: 2)
+        state.worlds.activeRun?.activeEncounter = encounter
+        guard EncounterSnapshotRulesV1.validatesAll(in: state) else {
+            throw CocoaError(.coderInvalidValue)
+        }
+        return state
+    }
+
     private func mutatingActiveEncounter(
         in data: Data, _ mutation: (inout [String: Any]) -> Void
     ) throws -> Data {
@@ -156,6 +196,21 @@ final class PersistenceTests: XCTestCase {
             strengthMultiplier: 0.60, suppressesAfflictions: true))
         let ordinaryBytes = try SaveCodec.encode(ordinary)
         XCTAssertThrowsError(try Migrations.migrateIfNeeded(ordinaryBytes))
+
+        var pressure = try currentPressureEncounterState()
+        var pressureEncounter = try XCTUnwrap(pressure.worlds.activeRun?.activeEncounter)
+        let secondOwner = try XCTUnwrap(pressureEncounter.turnSlots.first(where: {
+            $0.kind == .ordinaryPressureFollowUp(2)
+        })?.actor)
+        let firstIndex = try XCTUnwrap(pressureEncounter.turnSlots.firstIndex(where: {
+            $0.kind == .ordinaryPressureFollowUp(1)
+        }))
+        pressureEncounter.turnSlots[firstIndex].actor = secondOwner
+        pressure.worlds.activeRun?.activeEncounter = pressureEncounter
+        let pressureBytes = try SaveCodec.encode(pressure)
+        let pressureOriginal = pressureBytes
+        XCTAssertThrowsError(try Migrations.migrateIfNeeded(pressureBytes))
+        XCTAssertEqual(pressureBytes, pressureOriginal)
     }
 
     func testCurrentEncounterLiveCascadeAndStaggerRawRoundTrip() throws {
