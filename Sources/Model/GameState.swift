@@ -97,7 +97,8 @@ struct GameState: Codable, Equatable, Sendable {
         if schemaVersion >= 19 {
             guard worlds.expeditionReviewQueue.pending.allSatisfy({
                 $0.summary.validatesPhysicalGearCustody()
-            }), validatesPhysicalGearReceipts(), validatesLiveSeamwardCustody() else {
+            }), validatesPhysicalGearReceipts(), validatesLiveSeamwardCustody(),
+                  RosterPlacementRules.validatesCurrentState(self) else {
                 throw CocoaError(.coderInvalidValue)
             }
         }
@@ -132,7 +133,7 @@ struct GameState: Codable, Equatable, Sendable {
             reconciled.reconcile(with: self)
             tutorial = reconciled
         }
-        if RosterPlacementRules.reconcileLegacyProjections(in: &self) {
+        if schemaVersion < 19, RosterPlacementRules.reconcileLegacyProjections(in: &self) {
 #if DEBUG
             print("[older-save placement update] Repaired conflicting traveller locations between the party and Village.")
 #endif

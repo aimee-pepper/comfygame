@@ -2,6 +2,13 @@ import XCTest
 @testable import Bookbinder
 
 final class StationStaffingTests: XCTestCase {
+    private func emptyRun(seed: UInt64 = 77) -> WorldRun {
+        let book = BoundBook(symbols: [:], randomlyFilled: [], essencePaid: 0)
+        let generated = Worldgen.generate(book: book, seed: seed)
+        return WorldRun(runIndex: Int(seed), book: book, mapSeed: seed,
+                        rng: SeededRNG(seed: seed), map: generated.map,
+                        playerPosition: generated.start)
+    }
     private func stateWithHalloway(level: Int = 1) throws -> (GameState, Int, StationDef) {
         var state = GameState.newGame()
         XCTAssertTrue(state.base.seat("halloway"))
@@ -34,6 +41,47 @@ final class StationStaffingTests: XCTestCase {
         XCTAssertTrue(state.base.seat("mara"))
         XCTAssertEqual(StationStaffingRules.homeDiscountRate(for: station, in: state), 0.10,
                        "A non-owner at Home must not alter the owner's discount")
+    }
+
+    func testForgedStationDefinitionCannotClaimKeeperAuthority() throws {
+        let (state, _, canonical) = try stateWithHalloway(level: 12)
+        var forged = canonical
+        forged.homeDiscountBase = canonical.homeDiscountBase + 0.25
+        XCTAssertEqual(StationStaffingRules.keeperEarnedTier(for: forged, in: state), 0)
+        XCTAssertEqual(StationStaffingRules.homeDiscountRate(for: forged, in: state), 0)
+        XCTAssertEqual(StationStaffingRules.effectiveTier(for: forged, in: state), 0)
+    }
+
+    @MainActor func testStableIDQuoteSurvivesRosterReorderAndCommitsExactMember() throws {
+        let store = GameStore(io: .temporary(name: "stable-placement-\(UUID().uuidString)"))
+        store.mutate("prepare stable roster") { state in
+            XCTAssertTrue(state.base.seat("halloway"))
+            let id = PersistentPartyMemberID.traveller("halloway")
+            state.base.activeParty.removeAll { $0 == id }
+        }
+        let id = PersistentPartyMemberID.traveller(TravellerID(rawValue: "halloway"))
+        let quote = try XCTUnwrap(try? store.rosterPlacementQuote(
+            for: id, destination: .activeParty).get())
+        store.mutate("presentation reorder") { $0.base.roster.reverse() }
+        XCTAssertEqual(store.commitRosterPlacement(quote), .committed)
+        XCTAssertTrue(store.state.base.activeParty.contains(id))
+    }
+
+    @MainActor func testExpeditionAndStaleQuoteRefusalsPublishNothing() throws {
+        let store = GameStore(io: .temporary(name: "placement-inert-\(UUID().uuidString)"))
+        store.mutate("prepare stable roster") { state in
+            XCTAssertTrue(state.base.seat("halloway"))
+            state.base.activeParty.removeAll { $0 == .traveller("halloway") }
+        }
+        let id = PersistentPartyMemberID.traveller(TravellerID(rawValue: "halloway"))
+        let quote = try XCTUnwrap(try? store.rosterPlacementQuote(
+            for: id, destination: .activeParty).get())
+        store.mutate("begin expedition") { $0.worlds.activeRun = self.emptyRun() }
+        let before = try JSONEncoder().encode(store.state)
+        let mutationCount = store.state.meta.mutationCount
+        XCTAssertEqual(store.commitRosterPlacement(quote), .refused(.expeditionActive))
+        XCTAssertEqual(try JSONEncoder().encode(store.state), before)
+        XCTAssertEqual(store.state.meta.mutationCount, mutationCount)
     }
 
     func testKeeperTierAndDiscountSurviveSaveLoadWithoutDuplicatingPurchasedTier() throws {

@@ -4,9 +4,18 @@ import Foundation
 /// places: active party, an anchored realm, or Home. A traveller owns at most one current station,
 /// so being at Home unambiguously means being available to that building.
 enum StationStaffingRules {
+    private static func canonical(_ station: StationDef) -> StationDef? {
+        guard let canonical = ContentCatalog.shared.station(station.id), canonical == station else { return nil }
+        return canonical
+    }
+
     static func keeperIndex(for station: StationDef, in state: GameState) -> Int? {
-        guard let owner = station.builtBy else { return nil }
-        return state.base.roster.firstIndex { $0.traveller == owner }
+        guard let station = canonical(station), let owner = station.builtBy else { return nil }
+        let memberID = PersistentPartyMemberID.traveller(owner)
+        guard let index = state.base.rosterIndex(for: memberID),
+              state.base.persistentID(forRosterIndex: index) == memberID,
+              state.base.roster[index].traveller == owner else { return nil }
+        return index
     }
 
     static func keeperIsHome(for station: StationDef, in state: GameState) -> Bool {
@@ -24,11 +33,14 @@ enum StationStaffingRules {
     }
 
     static func effectiveTier(for station: StationDef, in state: GameState) -> Int {
-        min(station.maxTier,
-            max(state.base.station(station.id).tier, keeperEarnedTier(for: station, in: state)))
+        guard let station = canonical(station) else { return 0 }
+        return min(station.maxTier,
+                   max(state.base.station(station.id).tier,
+                       keeperEarnedTier(for: station, in: state)))
     }
 
     static func homeDiscountRate(for station: StationDef, in state: GameState) -> Double {
+        guard let station = canonical(station) else { return 0 }
         guard keeperIsHome(for: station, in: state),
               let index = keeperIndex(for: station, in: state) else { return 0 }
         let level = state.base.roster[index].character.level

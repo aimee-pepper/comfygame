@@ -292,7 +292,14 @@ struct AnchorageView: View {
                                         }
                                         Spacer()
                                         Button("Return Home") {
-                                            store.unassignCompanion(index, fromAnchoredRealm: realm.id)
+                                            switch store.rosterPlacementQuote(for: memberID,
+                                                                              destination: .home) {
+                                            case .success(let quote):
+                                                if case .refused(let refusal) = store.commitRosterPlacement(quote) {
+                                                    actionFailure = refusal.copy
+                                                }
+                                            case .failure(let refusal): actionFailure = refusal.copy
+                                            }
                                         }
                                             .font(.caption.weight(.semibold))
                                             .buttonStyle(.bordered)
@@ -303,12 +310,22 @@ struct AnchorageView: View {
                             }
                             if !realm.isDormant && !store.state.base.roster.isEmpty {
                                 Menu {
-                                    ForEach(store.state.base.roster.indices, id: \.self) { index in
-                                        Button(store.state.base.roster[index].name) {
-                                            if store.assignCompanion(index, toAnchoredRealm: realm.id) {
-                                                actionFailure = nil
-                                            } else {
-                                                actionFailure = "That traveller or realm changed. Review the current assignments and try again."
+                                    ForEach(store.state.base.roster.indices.compactMap {
+                                        store.state.base.persistentID(forRosterIndex: $0)
+                                    }, id: \.self) { memberID in
+                                        Button(store.state.base.rosterIndex(for: memberID).map {
+                                            store.state.base.roster[$0].name
+                                        } ?? "Unavailable traveller") {
+                                            switch store.rosterPlacementQuote(
+                                                for: memberID,
+                                                destination: .anchoredRealm(id: realm.id, name: realm.name)) {
+                                            case .success(let quote):
+                                                if case .committed = store.commitRosterPlacement(quote) {
+                                                    actionFailure = nil
+                                                } else {
+                                                    actionFailure = RosterPlacementRefusalV1.staleQuote.copy
+                                                }
+                                            case .failure(let refusal): actionFailure = refusal.copy
                                             }
                                         }
                                     }

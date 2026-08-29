@@ -214,7 +214,8 @@ final class NamedCharacterVisualAdapterTests: XCTestCase {
         XCTAssertTrue(stations.contains("Text(worker.name)"))
         XCTAssertTrue(stations.contains("Worldwork \\(worker.worldwork) · +\\(contribution)"),
                       "Character pixels must not alter assignment contribution copy")
-        XCTAssertTrue(stations.contains("store.unassignCompanion(index, fromAnchoredRealm: realm.id)"))
+        XCTAssertTrue(stations.contains("store.rosterPlacementQuote(for: memberID,"))
+        XCTAssertTrue(stations.contains("destination: .home"))
     }
 
     func testEssenceSpringUnlearningUsesExactRosterIdentityButKeepsBinderSeparate() throws {

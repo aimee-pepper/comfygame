@@ -1033,32 +1033,6 @@ extension GameStore {
         return true
     }
 
-    func assignCompanion(_ companion: Int, toAnchoredRealm id: Int) -> Bool {
-        guard let memberID = state.base.persistentID(forRosterIndex: companion),
-              state.worlds.anchoredRealms.contains(where: { $0.id == id && !$0.isDormant }) else {
-            return false
-        }
-        mutate("assign companion to anchored realm", flush: true, scope: .expedition) { state in
-            state.base.activeParty.removeAll { $0 == memberID }
-            for index in state.worlds.anchoredRealms.indices {
-                state.worlds.anchoredRealms[index].assignedCompanions.removeAll { $0 == memberID }
-            }
-            guard let target = state.worlds.anchoredRealms.firstIndex(where: { $0.id == id }) else { return }
-            state.worlds.anchoredRealms[target].assignedCompanions.append(memberID)
-            Self.recalculateAnchorProduction(in: &state)
-        }
-        return true
-    }
-
-    func unassignCompanion(_ companion: Int, fromAnchoredRealm id: Int) {
-        guard let memberID = state.base.persistentID(forRosterIndex: companion) else { return }
-        mutate("return companion from anchored realm", flush: true, scope: .expedition) { state in
-            guard let target = state.worlds.anchoredRealms.firstIndex(where: { $0.id == id }) else { return }
-            state.worlds.anchoredRealms[target].assignedCompanions.removeAll { $0 == memberID }
-            Self.recalculateAnchorProduction(in: &state)
-        }
-    }
-
     nonisolated static func recalculateAnchorProduction(in state: inout GameState) {
         RosterPlacementRules.recalculateRealmProduction(in: &state)
     }

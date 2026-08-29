@@ -559,8 +559,9 @@ final class EconomyTests: XCTestCase {
             "Sources/Screens/StationViews.swift"), encoding: .utf8)
 
         XCTAssertTrue(source.contains("Button(\"Return Home\")"))
-        XCTAssertTrue(source.contains("store.unassignCompanion(index, fromAnchoredRealm: realm.id)"))
-        XCTAssertFalse(source.contains("Button(\"Return\") { store.unassignCompanion"))
+        XCTAssertTrue(source.contains("store.rosterPlacementQuote(for: memberID,"))
+        XCTAssertTrue(source.contains("destination: .home"))
+        XCTAssertFalse(source.contains("store.unassignCompanion("))
     }
 
     func testLootDecisionConfirmsTheExactItemBeforeLeavingItBehind() throws {

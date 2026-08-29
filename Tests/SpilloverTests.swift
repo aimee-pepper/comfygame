@@ -109,13 +109,15 @@ final class SpilloverTests: XCTestCase {
         ))
         let anchorage = String(source[start.lowerBound..<end.lowerBound])
 
-        XCTAssertTrue(anchorage.contains("if store.assignCompanion(index, toAnchoredRealm: realm.id)"))
+        XCTAssertTrue(anchorage.contains("store.rosterPlacementQuote("))
+        XCTAssertTrue(anchorage.contains("destination: .anchoredRealm(id: realm.id, name: realm.name)"))
+        XCTAssertTrue(anchorage.contains("store.commitRosterPlacement(quote)"))
         XCTAssertTrue(anchorage.contains("if store.revisitAnchoredRealm(realm.id)"))
         XCTAssertTrue(anchorage.contains("if store.reactivateAnchoredRealm(realm.id)"))
         XCTAssertTrue(anchorage.contains("Anchorage action not completed"))
         XCTAssertTrue(anchorage.contains("if store.craftAnchorFrame()"))
         XCTAssertTrue(anchorage.contains("The stock, Essence, or Storehouse space changed."))
-        XCTAssertFalse(anchorage.contains("Button(store.state.base.roster[index].name) {\n                                            store.assignCompanion"))
+        XCTAssertFalse(anchorage.contains("store.assignCompanion("))
         XCTAssertFalse(anchorage.contains("Button {\n                        store.craftAnchorFrame()"))
     }
 

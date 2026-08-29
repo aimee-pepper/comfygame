@@ -6079,14 +6079,19 @@ final class WorldTests: XCTestCase {
             ]
         }
 
-        XCTAssertTrue(store.assignCompanion(0, toAnchoredRealm: 1))
-        XCTAssertFalse(store.state.base.activeParty.contains(0))
+        let memberID = PersistentPartyMemberID.founderQuill
+        let first = try! store.rosterPlacementQuote(
+            for: memberID, destination: .anchoredRealm(id: 1, name: "One")).get()
+        XCTAssertEqual(store.commitRosterPlacement(first), .committed)
+        XCTAssertFalse(store.state.base.activeParty.contains(memberID))
         XCTAssertEqual(store.state.worlds.anchoredRealms[0].productionContribution,
                        Tuning.Anchoring.worldworkBaseContribution + store.state.base.roster[0].worldwork)
-        XCTAssertTrue(store.assignCompanion(0, toAnchoredRealm: 2))
+        let second = try! store.rosterPlacementQuote(
+            for: memberID, destination: .anchoredRealm(id: 2, name: "Two")).get()
+        XCTAssertEqual(store.commitRosterPlacement(second), .committed)
         XCTAssertTrue(store.state.worlds.anchoredRealms[0].assignedCompanions.isEmpty)
         XCTAssertEqual(store.state.worlds.anchoredRealms[0].productionContribution, 0)
-        XCTAssertEqual(store.state.worlds.anchoredRealms[1].assignedCompanions, [0])
+        XCTAssertEqual(store.state.worlds.anchoredRealms[1].assignedCompanions, [memberID])
     }
 
     @MainActor
@@ -6184,7 +6189,7 @@ final class WorldTests: XCTestCase {
         XCTAssertFalse(StationStaffingRules.keeperIsHome(for: blacksmith, in: store.state))
     }
 
-    func testLegacyContradictoryPersonPlacementsReconcileDeterministically() throws {
+    func testCurrentContradictoryPersonPlacementsFailClosed() throws {
         let blank = book([:])
         let generated = Worldgen.generate(book: blank, seed: 14)
         let run = WorldRun(runIndex: 1, book: blank, mapSeed: 14, rng: SeededRNG(seed: 14),
@@ -6201,13 +6206,9 @@ final class WorldTests: XCTestCase {
                           assignedCompanions: [0], world: run),
         ]
 
-        let decoded = try JSONDecoder().decode(GameState.self, from: JSONEncoder().encode(state))
-        XCTAssertEqual(decoded.base.activeParty, [1], "party wins and duplicates/invalid IDs are removed")
-        XCTAssertTrue(decoded.worlds.anchoredRealms[0].assignedCompanions.isEmpty)
-        XCTAssertEqual(decoded.worlds.anchoredRealms[1].assignedCompanions, [0, 2],
-                       "lowest stable realm ID wins a contradictory posting")
-        XCTAssertTrue(decoded.worlds.anchoredRealms[2].assignedCompanions.isEmpty)
-        XCTAssertEqual(decoded.worlds.anchoredRealms[1].productionContribution, 4)
+        let bytes = try JSONEncoder().encode(state)
+        XCTAssertThrowsError(try JSONDecoder().decode(GameState.self, from: bytes))
+        XCTAssertEqual(try JSONEncoder().encode(state), bytes)
     }
 
     private func minimapEvidenceRun() -> WorldRun {

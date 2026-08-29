@@ -235,18 +235,47 @@ private extension JSONEncoder {
     }
 }
 
-struct PartyTransferPreview: Identifiable, Equatable, Sendable {
-    let index: Int
+enum RosterPlacementDestinationV1: Equatable, Sendable {
+    case home
+    case activeParty
+    case anchoredRealm(id: Int, name: String)
+}
+
+enum RosterPlacementRefusalV1: Error, Equatable, Sendable {
+    case expeditionActive, memberUnavailable, destinationUnavailable, partyFull
+    case staleQuote, invalidPersistedState, noChange
+
+    var copy: String {
+        switch self {
+        case .expeditionActive: "Return Home before changing party placement."
+        case .partyFull: "The active party is full."
+        case .noChange: "That traveller is already there."
+        default: "Party or realm staffing changed. Review the current impact and try again."
+        }
+    }
+}
+
+enum RosterPlacementCommitResultV1: Equatable, Sendable {
+    case committed
+    case refused(RosterPlacementRefusalV1)
+}
+
+struct RosterPlacementQuoteV1: Identifiable, Equatable, Sendable {
+    let version: Int = 1
+    let memberID: PersistentPartyMemberID
     let name: String
     let source: RosterPlacement
+    let destination: RosterPlacementDestinationV1
     let stationNames: [String]
     let realmProductionBefore: Int?
     let realmProductionAfter: Int?
     let realmShortfallBefore: Int?
     let realmShortfallAfter: Int?
 
-    var id: Int { index }
+    var id: PersistentPartyMemberID { memberID }
 }
+
+typealias PartyTransferPreview = RosterPlacementQuoteV1
 
 enum RosterPlacementRules {
     static func placement(of index: Int, in state: GameState) -> RosterPlacement {
@@ -278,6 +307,76 @@ enum RosterPlacementRules {
                     total + contribution(of: companion, in: state)
                 }
         }
+    }
+
+    static func validatesCurrentState(_ state: GameState) -> Bool {
+        let ids = state.base.roster.indices.compactMap(state.base.persistentID(forRosterIndex:))
+        guard ids.count == state.base.roster.count, Set(ids).count == ids.count else { return false }
+        let known = Set(ids)
+        let validActiveIDs = known.union(state.base.tamedAnimalCompanions.compactMap { animalID, animal in
+            animal.posting == .activeParty ? PersistentPartyMemberID.animal(animalID.rawValue) : nil
+        })
+        guard state.base.activeParty.count <= Tuning.Party.maximumSize - 1,
+              Set(state.base.activeParty).count == state.base.activeParty.count,
+              state.base.activeParty.allSatisfy(validActiveIDs.contains) else { return false }
+        var placed = Set(state.base.activeParty)
+        for realm in state.worlds.anchoredRealms {
+            guard !realm.isDormant || realm.assignedCompanions.isEmpty,
+                  Set(realm.assignedCompanions).count == realm.assignedCompanions.count,
+                  realm.assignedCompanions.allSatisfy(known.contains) else { return false }
+            for id in realm.assignedCompanions where !placed.insert(id).inserted { return false }
+            let expected = realm.assignedCompanions.reduce(0) {
+                $0 + contribution(of: $1, in: state)
+            }
+            guard expected == realm.productionContribution else { return false }
+        }
+        return true
+    }
+
+    static func evaluate(memberID: PersistentPartyMemberID,
+                         destination: RosterPlacementDestinationV1,
+                         in state: GameState) -> Result<RosterPlacementQuoteV1, RosterPlacementRefusalV1> {
+        guard state.worlds.activeRun == nil else { return .failure(.expeditionActive) }
+        guard validatesCurrentState(state) else { return .failure(.invalidPersistedState) }
+        guard let index = state.base.rosterIndex(for: memberID),
+              state.base.persistentID(forRosterIndex: index) == memberID else {
+            return .failure(.memberUnavailable)
+        }
+        let source = placement(of: memberID, in: state)
+        if (source == .home && destination == .home)
+            || (source == .activeParty && destination == .activeParty) {
+            return .failure(.noChange)
+        }
+        if case .anchoredRealm(let sourceID, _) = source,
+           case .anchoredRealm(let destinationID, _) = destination, sourceID == destinationID {
+            return .failure(.noChange)
+        }
+        if destination == .activeParty && !state.base.activeParty.contains(memberID)
+            && !state.base.canTakeAnother { return .failure(.partyFull) }
+        if case .anchoredRealm(let id, let name) = destination {
+            guard state.worlds.anchoredRealms.contains(where: {
+                $0.id == id && $0.name == name && !$0.isDormant
+            }) else { return .failure(.destinationUnavailable) }
+        }
+        let person = state.base.roster[index]
+        let stations = ContentCatalog.shared.stationsInOrder.filter {
+            $0.builtBy == person.traveller && state.base.station($0.id).isUnlocked
+        }.map(\.name)
+        var before: Int?
+        var after: Int?
+        var shortfallBefore: Int?
+        var shortfallAfter: Int?
+        if case .anchoredRealm(let id, _) = source,
+           let realm = state.worlds.anchoredRealms.first(where: { $0.id == id }) {
+            before = realm.productionContribution
+            after = max(0, realm.productionContribution - contribution(of: memberID, in: state))
+            shortfallBefore = realm.projectedShortfall
+            shortfallAfter = max(0, realm.sustainObligation - (after ?? 0))
+        }
+        return .success(.init(memberID: memberID, name: person.name, source: source,
+                              destination: destination, stationNames: stations,
+                              realmProductionBefore: before, realmProductionAfter: after,
+                              realmShortfallBefore: shortfallBefore, realmShortfallAfter: shortfallAfter))
     }
 
     /// Repairs the old independent index arrays once at decode. Party wins; otherwise the earliest
@@ -1161,81 +1260,77 @@ extension GameStore {
 
     // MARK: - The party
 
+    func placement(of memberID: PersistentPartyMemberID) -> RosterPlacement {
+        RosterPlacementRules.placement(of: memberID, in: state)
+    }
+
+    @available(*, deprecated, message: "Use stable PersistentPartyMemberID")
     func placement(of index: Int) -> RosterPlacement {
         RosterPlacementRules.placement(of: index, in: state)
     }
 
-    func partyTransferPreview(for index: Int) -> PartyTransferPreview? {
-        guard state.base.roster.indices.contains(index) else { return nil }
-        let source = placement(of: index)
-        let person = state.base.roster[index]
-        let stations = ContentCatalog.shared.stationsInOrder.filter {
-            $0.builtBy == person.traveller && state.base.station($0.id).isUnlocked
-        }.map(\.name)
-        var before: Int?
-        var after: Int?
-        var shortfallBefore: Int?
-        var shortfallAfter: Int?
-        if case .anchoredRealm(let id, _) = source,
-           let realm = state.worlds.anchoredRealms.first(where: { $0.id == id }) {
-            before = realm.productionContribution
-            after = max(0, realm.productionContribution - RosterPlacementRules.contribution(
-                of: state.base.persistentID(forRosterIndex: index) ?? .founderQuill, in: state))
-            shortfallBefore = realm.projectedShortfall
-            shortfallAfter = max(0, realm.sustainObligation - (after ?? 0))
-        }
-        return PartyTransferPreview(index: index, name: person.name, source: source,
-                                    stationNames: stations, realmProductionBefore: before,
-                                    realmProductionAfter: after, realmShortfallBefore: shortfallBefore,
-                                    realmShortfallAfter: shortfallAfter)
-    }
-
-    /// **Who comes with you.** One atomic transfer: taking removes every realm posting; returning
-    /// always means Home. Expected placement rejects a stale confirmation instead of moving the
-    /// wrong projection.
-    @discardableResult
-    func setComing(_ index: Int, _ coming: Bool, expected: RosterPlacement? = nil) -> Bool {
-        guard let memberID = state.base.persistentID(forRosterIndex: index),
-              expected == nil || placement(of: index) == expected else { return false }
-        if coming {
-            guard !state.base.activeParty.contains(memberID), state.base.canTakeAnother else { return false }
-        } else {
-            guard state.base.activeParty.contains(memberID) else { return false }
-        }
-        let name = state.base.roster[index].name
-        var committed = false
-        mutate(coming ? "take \(name)" : "leave \(name)", flush: true) {
-            guard expected == nil || RosterPlacementRules.placement(of: index, in: $0) == expected else { return }
-            if coming {
-                guard !$0.base.activeParty.contains(memberID), $0.base.canTakeAnother else { return }
-                for realmIndex in $0.worlds.anchoredRealms.indices {
-                    $0.worlds.anchoredRealms[realmIndex].assignedCompanions.removeAll { $0 == memberID }
-                }
-                $0.base.activeParty.append(memberID)
-            } else {
-                guard $0.base.activeParty.contains(memberID) else { return }
-                $0.base.activeParty.removeAll { $0 == memberID }
-                for realmIndex in $0.worlds.anchoredRealms.indices {
-                    $0.worlds.anchoredRealms[realmIndex].assignedCompanions.removeAll { $0 == memberID }
-                }
-            }
-            RosterPlacementRules.recalculateRealmProduction(in: &$0)
-            committed = true
-        }
-        return committed
+    func rosterPlacementQuote(for memberID: PersistentPartyMemberID,
+                              destination: RosterPlacementDestinationV1)
+        -> Result<RosterPlacementQuoteV1, RosterPlacementRefusalV1> {
+        RosterPlacementRules.evaluate(memberID: memberID, destination: destination, in: state)
     }
 
     /// Commits the exact transfer facts the confirmation displayed. If station staffing, realm
     /// production, placement, or capacity changed while the alert was open, nothing moves.
     @discardableResult
-    func setComing(_ quote: PartyTransferPreview) -> CurrentStateCommitResult {
-        guard partyTransferPreview(for: quote.index) == quote else {
-            return .refused("Party or realm staffing changed. Review the current impact and try again.")
+    func commitRosterPlacement(_ quote: RosterPlacementQuoteV1) -> RosterPlacementCommitResultV1 {
+        guard case .success(let current) = RosterPlacementRules.evaluate(
+            memberID: quote.memberID, destination: quote.destination, in: state), current == quote else {
+            return .refused(state.worlds.activeRun == nil ? .staleQuote : .expeditionActive)
         }
-        guard state.base.canTakeAnother else { return .refused("The active party is full.") }
-        return setComing(quote.index, true, expected: quote.source)
-            ? .committed
-            : .refused("Party or realm staffing changed. Review the current impact and try again.")
+        let committed = mutateIf("place \(quote.name)", flush: true) { candidate in
+            guard case .success(let refreshed) = RosterPlacementRules.evaluate(
+                memberID: quote.memberID, destination: quote.destination, in: candidate),
+                  refreshed == quote else { return false }
+            candidate.base.activeParty.removeAll { $0 == quote.memberID }
+            for index in candidate.worlds.anchoredRealms.indices {
+                candidate.worlds.anchoredRealms[index].assignedCompanions.removeAll { $0 == quote.memberID }
+            }
+            switch quote.destination {
+            case .home: break
+            case .activeParty: candidate.base.activeParty.append(quote.memberID)
+            case .anchoredRealm(let id, _):
+                guard let index = candidate.worlds.anchoredRealms.firstIndex(where: {
+                    $0.id == id && !$0.isDormant
+                }) else { return false }
+                candidate.worlds.anchoredRealms[index].assignedCompanions.append(quote.memberID)
+            }
+            RosterPlacementRules.recalculateRealmProduction(in: &candidate)
+            return RosterPlacementRules.validatesCurrentState(candidate)
+        }
+        return committed ? .committed : .refused(.staleQuote)
+    }
+
+    @available(*, deprecated, message: "Use rosterPlacementQuote with stable identity")
+    func partyTransferPreview(for index: Int) -> PartyTransferPreview? {
+        guard let id = state.base.persistentID(forRosterIndex: index),
+              case .success(let quote) = rosterPlacementQuote(for: id, destination: .activeParty)
+        else { return nil }
+        return quote
+    }
+
+    @available(*, deprecated, message: "Use typed roster placement quote/commit")
+    @discardableResult
+    func setComing(_ index: Int, _ coming: Bool, expected: RosterPlacement? = nil) -> Bool {
+        guard let id = state.base.persistentID(forRosterIndex: index),
+              expected == nil || placement(of: id) == expected,
+              case .success(let quote) = rosterPlacementQuote(
+                for: id, destination: coming ? .activeParty : .home)
+        else { return false }
+        return commitRosterPlacement(quote) == .committed
+    }
+
+    @available(*, deprecated, message: "Use commitRosterPlacement")
+    func setComing(_ quote: PartyTransferPreview) -> CurrentStateCommitResult {
+        switch commitRosterPlacement(quote) {
+        case .committed: .committed
+        case .refused(let refusal): .refused(refusal.copy)
+        }
     }
 
     /// Returns one player-facing result for the reverse transfer instead of making callers infer
@@ -1250,8 +1345,8 @@ extension GameStore {
             : .refused("Party placement changed. Review the current roster and try again.")
     }
 
-    func isComing(_ index: Int) -> Bool {
-        state.base.persistentID(forRosterIndex: index).map(state.base.activeParty.contains) ?? false
+    func isComing(_ memberID: PersistentPartyMemberID) -> Bool {
+        state.base.activeParty.contains(memberID)
     }
 
     /// What unlearning everything would cost this person, and whether you can afford it.

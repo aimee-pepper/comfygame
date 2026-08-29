@@ -44,18 +44,24 @@ struct FirepitView: View {
     @State private var transferRefusal: String?
 
     private var roster: [CompanionState] { store.state.base.roster }
-    private var coming: [(index: Int, member: CompanionState)] {
-        roster.enumerated().filter { store.isComing($0.offset) }.map { ($0.offset, $0.element) }
+    private var coming: [(id: PersistentPartyMemberID, member: CompanionState)] {
+        roster.enumerated().compactMap { index, member in
+            guard let id = store.state.base.persistentID(forRosterIndex: index), store.isComing(id) else { return nil }
+            return (id, member)
+        }
     }
-    private var home: [(index: Int, member: CompanionState)] {
-        roster.enumerated().filter { store.placement(of: $0.offset) == .home }
-            .map { ($0.offset, $0.element) }
+    private var home: [(id: PersistentPartyMemberID, member: CompanionState)] {
+        roster.enumerated().compactMap { index, member in
+            guard let id = store.state.base.persistentID(forRosterIndex: index), store.placement(of: id) == .home else { return nil }
+            return (id, member)
+        }
     }
-    private var posted: [(index: Int, member: CompanionState)] {
-        roster.enumerated().filter {
-            if case .anchoredRealm = store.placement(of: $0.offset) { return true }
-            return false
-        }.map { ($0.offset, $0.element) }
+    private var posted: [(id: PersistentPartyMemberID, member: CompanionState)] {
+        roster.enumerated().compactMap { index, member in
+            guard let id = store.state.base.persistentID(forRosterIndex: index),
+                  case .anchoredRealm = store.placement(of: id) else { return nil }
+            return (id, member)
+        }
     }
     /// You count as one of the five, so four is as many as can come with you.
     private var seatsLeft: Int {
@@ -102,7 +108,10 @@ struct FirepitView: View {
         .sheet(item: $pendingTransfer) { preview in
             PartyTransferConfirmationSheet(preview: preview,
                                            message: transferMessage(preview)) {
-                store.setComing(preview)
+                switch store.commitRosterPlacement(preview) {
+                case .committed: return .committed
+                case .refused(let refusal): return .refused(refusal.copy)
+                }
             }
         }
         .overlay(alignment: .bottom) {
@@ -121,7 +130,7 @@ struct FirepitView: View {
 
     @ViewBuilder
     private func communitySection(_ title: String, icon: String,
-                                  entries: [(index: Int, member: CompanionState)],
+                                  entries: [(id: PersistentPartyMemberID, member: CompanionState)],
                                   empty: String) -> some View {
         VStack(alignment: .leading, spacing: 10) {
             Label("\(title) · \(entries.count)", systemImage: icon)
@@ -136,19 +145,19 @@ struct FirepitView: View {
                     .background(Color(.secondarySystemGroupedBackground),
                                 in: RoundedRectangle(cornerRadius: 14))
             } else if let entry = entries.first, entries.count == 1 {
-                singleMemberRow(entry.member, index: entry.index)
+                singleMemberRow(entry.member, id: entry.id)
             } else {
                 LazyVGrid(columns: columns(entryCount: entries.count), spacing: 10) {
-                    ForEach(entries, id: \.index) { entry in
-                        memberTile(entry.member, index: entry.index)
+                    ForEach(entries, id: \.id) { entry in
+                        memberTile(entry.member, id: entry.id)
                     }
                 }
             }
         }
     }
 
-    private func singleMemberRow(_ member: CompanionState, index: Int) -> some View {
-        let placement = FirepitPlacementPresentation(store.placement(of: index))
+    private func singleMemberRow(_ member: CompanionState, id: PersistentPartyMemberID) -> some View {
+        let placement = FirepitPlacementPresentation(store.placement(of: id))
         return HStack(spacing: 12) {
             NamedCharacterPixelIdentity(
                 travellerID: member.traveller,
@@ -174,7 +183,7 @@ struct FirepitView: View {
             }
 
             Spacer(minLength: 4)
-            transferButton(index: index)
+            transferButton(id: id)
                 .frame(minWidth: 96)
         }
         .padding(12)
@@ -184,8 +193,8 @@ struct FirepitView: View {
     }
 
     /// Location and departure choice only; detailed character management remains on Party.
-    private func memberTile(_ member: CompanionState, index: Int) -> some View {
-        let placement = FirepitPlacementPresentation(store.placement(of: index))
+    private func memberTile(_ member: CompanionState, id: PersistentPartyMemberID) -> some View {
+        let placement = FirepitPlacementPresentation(store.placement(of: id))
         return VStack(alignment: .leading, spacing: 8) {
             HStack(alignment: .top) {
                 NamedCharacterPixelIdentity(
@@ -212,7 +221,7 @@ struct FirepitView: View {
                 .foregroundStyle(.secondary)
                 .lineLimit(1)
             Spacer(minLength: 0)
-            transferButton(index: index)
+            transferButton(id: id)
                 .frame(maxWidth: .infinity)
         }
         .padding(12)
@@ -224,18 +233,27 @@ struct FirepitView: View {
     }
 
     @ViewBuilder
-    private func transferButton(index: Int) -> some View {
-        if store.isComing(index) {
+    private func transferButton(id: PersistentPartyMemberID) -> some View {
+        if store.isComing(id) {
             Button("Send Home") {
-                if case .refused(let message) = store.setComingHome(index) {
-                    transferRefusal = message
+                switch store.rosterPlacementQuote(for: id, destination: .home) {
+                case .success(let quote):
+                    if case .refused(let refusal) = store.commitRosterPlacement(quote) {
+                        transferRefusal = refusal.copy
+                    }
+                case .failure(let refusal): transferRefusal = refusal.copy
                 }
             }
             .font(.caption.weight(.semibold))
             .buttonStyle(.bordered)
             .frame(minHeight: 44)
         } else {
-            Button("Take them") { pendingTransfer = store.partyTransferPreview(for: index) }
+            Button("Take them") {
+                switch store.rosterPlacementQuote(for: id, destination: .activeParty) {
+                case .success(let quote): pendingTransfer = quote
+                case .failure(let refusal): transferRefusal = refusal.copy
+                }
+            }
                 .font(.caption.weight(.semibold))
                 .buttonStyle(.borderedProminent)
                 .disabled(seatsLeft == 0)
