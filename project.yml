@@ -32,6 +32,35 @@ targets:
       - path: RuntimePacks/TerrainSouthWallPack-v1
         buildPhase: resources
         type: folder
+      - path: RuntimePacks/ExplorationMapIdentities-v1
+        buildPhase: resources
+        type: folder
+      - path: RuntimePacks/ExplorationLooseItems-v1
+        buildPhase: resources
+        type: folder
+      - path: RuntimePacks/ExplorationCatalogueObjects-v1
+        buildPhase: resources
+        type: folder
+      - path: RuntimePacks/ExplorationLooseEssence-v1
+        buildPhase: resources
+        type: folder
+      - path: AssetLab/integration/writing-desk-production-pack-v1/runtime
+        name: WritingDeskProductionPack-v1
+        buildPhase: resources
+        type: folder
+      - path: AssetLab/artifacts/writing-parchment-v1/runtime/writing.parchment.handmade-v1-172x172.png
+        buildPhase: resources
+      - path: AssetLab/fonts/Jersey10-Regular.ttf
+        buildPhase: resources
+      - path: AssetLab/fonts/Tiny5-Regular.ttf
+        buildPhase: resources
+      - path: AssetLab/integration/starting-town-home-v1/starting-town-home-v1.json
+        buildPhase: resources
+      - path: AssetLab/integration/starting-town-home-v1/town-starting-home-v1-phone-v2.png
+        buildPhase: resources
+      - path: AssetLab/integration/named-character-placeholders-v1/manifest.json
+        name: named-character-placeholders-v1.json
+        buildPhase: resources
     preBuildScripts:
       - name: Verify generated combat-v2 authority
         basedOnDependencyAnalysis: false
@@ -44,6 +73,16 @@ targets:
           - $(SRCROOT)/docs/combat-tree-node-copy-current.md
           - $(SRCROOT)/Sources/Content/Data/combat_trees.json
           - $(SRCROOT)/Sources/Content/Data/combat_tree_v2.json
+    postBuildScripts:
+      - name: Preserve named-character runtime filename
+        basedOnDependencyAnalysis: false
+        script: |
+          mv -f "$TARGET_BUILD_DIR/$UNLOCALIZED_RESOURCES_FOLDER_PATH/manifest.json" \
+            "$TARGET_BUILD_DIR/$UNLOCALIZED_RESOURCES_FOLDER_PATH/named-character-placeholders-v1.json"
+        inputFiles:
+          - $(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/manifest.json
+        outputFiles:
+          - $(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/named-character-placeholders-v1.json
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.aimeepepper.bookbinder
