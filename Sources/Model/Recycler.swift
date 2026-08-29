@@ -25,6 +25,7 @@ enum RecyclerRecoveryRoute: Equatable, Sendable {
 
 struct RecyclerPreview: Equatable, Sendable {
     var revision: UInt64
+    var ownershipRevision: UInt64 = 0
     var location: TradingPostItemLocation
     var stackID: InstanceID
     var snapshot: ItemStack

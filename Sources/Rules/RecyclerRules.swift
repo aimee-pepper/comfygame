@@ -2,7 +2,7 @@ import Foundation
 
 enum RecyclerRules {
     enum Ineligibility: String, CaseIterable, Hashable, Sendable {
-        case stacked, unidentified, favorite, locked, equipped, notGear, unique, apex
+        case stacked, unidentified, favorite, locked, protectedReturn, equipped, notGear, unique, apex
         case narrative, channelworks, legacyCredit, noRecoveryProfile
         case foundReceiptRecoveryUndefined
 
@@ -12,6 +12,7 @@ enum RecyclerRules {
             case .unidentified: "Identify it before deciding what should be recovered."
             case .favorite: "Favorite pieces are protected. Remove Favorite first."
             case .locked: "Locked pieces are protected. Unlock it first."
+            case .protectedReturn: "Protected return gear must be banked before dismantling."
             case .equipped: "Worn gear must be taken off before dismantling."
             case .notGear: "The Recycler accepts eligible gear, not other belongings."
             case .unique: "One-of-a-kind gear cannot be dismantled."
@@ -113,14 +114,18 @@ enum RecyclerRules {
               ineligibility(of: stack) == nil,
               let definition = ContentCatalog.shared.item(stack.catalogID), definition.gear != nil else { return nil }
 
-        let receipt = stack.gearProfile?.consumedSamples ?? []
-        if !receipt.isEmpty {
+        if let profile = stack.gearProfile, let physicalReceipt = profile.physicalReceipt {
+            guard stack.id == profile.stableInstanceID,
+                  physicalReceipt.validates(profile: profile) else { return nil }
+            let receipt = physicalReceipt.flattenedUnits
+            guard !receipt.isEmpty else { return nil }
             let capacity = recoveryCapacity(receiptCount: receipt.count, serviceTier: tier)
             let selected = selectedReceiptIndices
                 ?? defaultReceiptSelection(for: receipt, capacity: capacity)
             guard selected.count <= capacity, Set(selected).count == selected.count,
                   selected.allSatisfy(receipt.indices.contains) else { return nil }
             return RecyclerPreview(revision: base.recycler.inventoryRevision,
+                                   ownershipRevision: base.physicalGearOwnershipRevision,
                                    location: location, stackID: stackID, snapshot: stack,
                                    serviceTier: tier, route: .constructionReceipt,
                                    selectedReceiptIndices: selected.sorted(), recoveryCapacity: capacity,
@@ -142,6 +147,7 @@ enum RecyclerRules {
             }
         }
         return RecyclerPreview(revision: base.recycler.inventoryRevision,
+                               ownershipRevision: base.physicalGearOwnershipRevision,
                                location: location, stackID: stackID, snapshot: stack,
                                serviceTier: tier, route: .authoredSalvage(profileID: profile.id),
                                selectedReceiptIndices: [], recoveryCapacity: 0,
@@ -153,10 +159,13 @@ enum RecyclerRules {
         if !stack.identified { return .unidentified }
         if stack.isFavorite { return .favorite }
         if stack.isLocked { return .locked }
+        if stack.protectedReturnCount != 0 { return .protectedReturn }
         if stack.catalogID == Items.conduitFixture { return .channelworks }
         guard let definition = ContentCatalog.shared.item(stack.catalogID), definition.gear != nil
         else { return .notGear }
         if definition.gear?.breaks != nil { return .apex }
+        if definition.gearCatalogueDisposition?.classification == .wildApexOnly { return .apex }
+        if definition.gearCatalogueDisposition?.foundReceipt?.mode == .fixedSpecial { return .unique }
         if let unique = stack.gearProfile?.authoredUniqueRuleID {
             return unique.contains("narrative") ? .narrative : .unique
         }
@@ -171,6 +180,7 @@ enum RecyclerRules {
 
     static func commit(_ preview: RecyclerPreview, in base: inout BaseState) -> RecyclerCommitResult {
         guard preview.revision == base.recycler.inventoryRevision else { return .stale }
+        guard preview.ownershipRevision == base.physicalGearOwnershipRevision else { return .stale }
         let selection: [Int]? = preview.route == .constructionReceipt
             ? preview.selectedReceiptIndices : nil
         guard let current = self.preview(location: preview.location, stackID: preview.stackID,
@@ -180,6 +190,9 @@ enum RecyclerRules {
 
         var candidate = base
         guard candidate.recycler.inventoryRevision < UInt64.max else { return .invalid }
+        if preview.route == .constructionReceipt, preview.stackID.rawValue == UInt64.max {
+            return .invalid
+        }
         let returnedUnits = preview.returnedSamples.map {
             CraftMaterialHoldingV1(unit: $0, protectedReturn: false)
         }
@@ -188,6 +201,10 @@ enum RecyclerRules {
             return .invalid
         }
         guard remove(preview.stackID, at: preview.location, in: &candidate) else { return .invalid }
+        if preview.route == .constructionReceipt {
+            candidate.nextPhysicalGearInstanceID = max(
+                candidate.nextPhysicalGearInstanceID, preview.stackID.rawValue + 1)
+        }
         candidate.resources.add(contentsOf: preview.returnedResources)
         let world = returnedUnits.filter { $0.unit.domain == .world }
         let creature = returnedUnits.filter { $0.unit.domain == .creature }
@@ -197,6 +214,45 @@ enum RecyclerRules {
         candidate.recycler.inventoryRevision += 1
         candidate.physicalGearOwnershipRevision += 1
         base = candidate
+        return .committed
+    }
+
+    /// Live physical-receipt authority. Base-only preview helpers remain the separate authored
+    /// salvage seam; this route cannot bypass Home, station or full graph validation.
+    static func previewPhysicalReceipt(location: TradingPostItemLocation, stackID: InstanceID,
+                                       selectedReceiptIndices: [Int]? = nil,
+                                       in state: GameState) -> RecyclerPreview? {
+        guard state.worlds.activeRun == nil,
+              state.base.station(Stations.recycler).isUnlocked,
+              state.validatesPhysicalGearReceipts() else { return nil }
+        let tier = min(3, max(1, state.base.station(Stations.recycler).tier + 1))
+        guard let result = preview(location: location, stackID: stackID, serviceTier: tier,
+                                   selectedReceiptIndices: selectedReceiptIndices, in: state.base),
+              result.route == .constructionReceipt,
+              result.returnedResources.isEmpty else { return nil }
+        return result
+    }
+
+    static func commitPhysicalReceipt(_ preview: RecyclerPreview,
+                                      in state: inout GameState) -> RecyclerCommitResult {
+        guard preview.route == .constructionReceipt,
+              state.worlds.activeRun == nil,
+              state.base.station(Stations.recycler).isUnlocked,
+              state.validatesPhysicalGearReceipts() else { return .invalid }
+        guard preview.revision == state.base.recycler.inventoryRevision,
+              preview.ownershipRevision == state.base.physicalGearOwnershipRevision else {
+            return .stale
+        }
+        guard let current = previewPhysicalReceipt(
+            location: preview.location, stackID: preview.stackID,
+            selectedReceiptIndices: preview.selectedReceiptIndices, in: state),
+              current == preview else { return .invalid }
+        var candidate = state
+        let result = commit(preview, in: &candidate.base)
+        guard result == .committed, candidate.validatesPhysicalGearReceipts() else {
+            return result == .stale ? .stale : .invalid
+        }
+        state = candidate
         return .committed
     }
 

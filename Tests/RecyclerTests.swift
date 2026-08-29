@@ -207,7 +207,16 @@ final class RecyclerTests: XCTestCase {
         var result = ItemStack(id: InstanceID(rawValue: id), catalogID: catalogID)
         result.gearProfile?.constructionTier = tier
         result.gearProfile?.consumedSamples = receipt
+        if !receipt.isEmpty { result.gearProfile?.freezeGameplayFacts() }
         return result
+    }
+
+    private func state(containing stack: ItemStack, overflow: Bool = false,
+                       recyclerTier: Int = 0) -> GameState {
+        var state = GameState.newGame()
+        state.base = base(containing: stack, overflow: overflow)
+        state.base.stations[Stations.recycler] = .init(isUnlocked: true, tier: recyclerTier)
+        return state
     }
 
     private func base(containing stack: ItemStack, overflow: Bool = false) -> BaseState {
@@ -284,6 +293,94 @@ final class RecyclerTests: XCTestCase {
         XCTAssertFalse(committedBase.creatureMaterialReserve.units.contains {
             $0.id.rawValue.hasPrefix("recycler-")
         })
+    }
+
+    func testLivePhysicalReceiptRouteRequiresHomeStationAndBindsBothRevisions() throws {
+        let receipt = [sample(.plate, grade: 50, source: "creature plate"),
+                       sample(.fibre, grade: 60, source: "world binding")]
+        let stack = gear(receipt: receipt)
+        var state = state(containing: stack)
+        let quote = try XCTUnwrap(RecyclerRules.previewPhysicalReceipt(
+            location: .stored, stackID: stack.id, in: state))
+        XCTAssertEqual(quote.revision, state.base.recycler.inventoryRevision)
+        XCTAssertEqual(quote.ownershipRevision, state.base.physicalGearOwnershipRevision)
+        XCTAssertEqual(quote.returnedSamples, [receipt[0]])
+        XCTAssertTrue(quote.returnedResources.isEmpty)
+
+        var stale = state
+        stale.base.physicalGearOwnershipRevision += 1
+        let staleBytes = try SaveCodec.encode(stale)
+        XCTAssertEqual(RecyclerRules.commitPhysicalReceipt(quote, in: &stale), .stale)
+        XCTAssertEqual(try SaveCodec.encode(stale), staleBytes)
+
+        var away = state
+        let point = GridPoint(x: 0, y: 0)
+        away.worlds.activeRun = WorldRun(
+            runIndex: 1, book: .init(written: [], essencePaid: 0), mapSeed: 77,
+            rng: .init(seed: 78),
+            map: .init(width: 1, height: 1, tiles: [.init(isRevealed: true)], entry: point),
+            playerPosition: point, sourceDangerReceipt: .init(sourceBand: 1))
+        XCTAssertNil(RecyclerRules.previewPhysicalReceipt(
+            location: .stored, stackID: stack.id, in: away))
+        away.worlds.activeRun = nil
+        away.base.stations[Stations.recycler] = .init(isUnlocked: false, tier: 0)
+        XCTAssertNil(RecyclerRules.previewPhysicalReceipt(
+            location: .stored, stackID: stack.id, in: away))
+
+        XCTAssertEqual(RecyclerRules.commitPhysicalReceipt(quote, in: &state), .committed)
+        XCTAssertFalse(state.base.inventory.stacks.contains { $0.id == stack.id })
+        XCTAssertEqual(state.base.creatureMaterialReserve.units.map(\.unit), [receipt[0]])
+        XCTAssertEqual(state.base.creatureMaterialReserve.units.map(\.id),
+                       [receipt[0].stableUnitID])
+        XCTAssertGreaterThan(state.base.nextPhysicalGearInstanceID, stack.id.rawValue)
+        let committedBytes = try SaveCodec.encode(state)
+        XCTAssertEqual(RecyclerRules.commitPhysicalReceipt(quote, in: &state), .stale)
+        XCTAssertEqual(try SaveCodec.encode(state), committedBytes)
+    }
+
+    func testPhysicalReceiptSelectionPreservesRevisionOrderDomainsAndDestroysInscription() throws {
+        let receipt = [sample(.plate, grade: 20, source: "revision zero creature"),
+                       sample(.fibre, grade: 30, source: "revision zero world"),
+                       sample(.hide, grade: 40, source: "revision one creature"),
+                       sample(.timber, grade: 50, source: "revision one world")]
+        var stack = gear(id: 701, receipt: Array(receipt.prefix(2)))
+        var profile = try XCTUnwrap(stack.gearProfile)
+        let prior = try XCTUnwrap(profile.physicalReceipt?.revisions.first)
+        profile.physicalReceipt?.revisions.append(.init(
+            ordinal: 1,
+            authority: .rebuild(stationID: Stations.armoury,
+                                profileID: "armoury_rigid_shell", rulesVersion: 1),
+            components: Array(receipt.suffix(2)).enumerated().map {
+                .init(ordinal: $0.offset, role: .authoredSocket("rebuild-\($0.offset)"),
+                      unit: $0.element)
+            }, resultingQualityBand: profile.qualityBand,
+            resultingConstructionTier: profile.constructionTier))
+        profile.freezeGameplayFacts()
+        XCTAssertEqual(profile.physicalReceipt?.revisions.first, prior)
+        profile.inscription = .init(version: 1, definitionID: "future-inert", sourceItemID: "future-source",
+                                    rulesVersion: 1, inkRecipe: nil)
+        stack.gearProfile = profile
+        var state = state(containing: stack, overflow: true, recyclerTier: 2)
+        let quote = try XCTUnwrap(RecyclerRules.previewPhysicalReceipt(
+            location: .overflow, stackID: stack.id, selectedReceiptIndices: [3, 1], in: state))
+        XCTAssertEqual(quote.selectedReceiptIndices, [1, 3])
+        XCTAssertEqual(quote.returnedSamples, [receipt[1], receipt[3]])
+        XCTAssertEqual(RecyclerRules.commitPhysicalReceipt(quote, in: &state), .committed)
+        XCTAssertEqual(state.base.worldMaterialReserve.units.map(\.unit), [receipt[1], receipt[3]])
+        XCTAssertTrue(state.base.creatureMaterialReserve.isEmpty)
+        XCTAssertTrue(state.base.spillover.isEmpty)
+    }
+
+    func testPhysicalReceiptGraphCollisionRefusesBeforeQuote() throws {
+        let receipt = [sample(.plate, grade: 30, source: "one"),
+                       sample(.fibre, grade: 60, source: "two")]
+        let stack = gear(receipt: receipt)
+        var state = state(containing: stack)
+        state.base.creatureMaterialReserve.add(.init(unit: receipt[0], protectedReturn: false))
+        let bytes = try SaveCodec.makeEncoder().encode(state.base)
+        XCTAssertNil(RecyclerRules.previewPhysicalReceipt(
+            location: .stored, stackID: stack.id, in: state))
+        XCTAssertEqual(try SaveCodec.makeEncoder().encode(state.base), bytes)
     }
 
     func testReceiptSelectionRejectsDuplicatesOutOfRangeAndOverCapacity() {
