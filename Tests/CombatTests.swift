@@ -475,6 +475,119 @@ final class CombatTests: XCTestCase {
         XCTAssertTrue(finished || store.actingCombatant == .binder)
     }
 
+    func testFirstPlayerCombatActionRefusalsAreByteAndWriteInert() throws {
+        let store = inFight(["paper_moth"])
+        store.flushNow()
+        let beforeState = store.state
+        let beforeBytes = try SaveCodec.encode(beforeState)
+        let beforeFile = try Data(contentsOf: store.diagnostics.saveURL)
+        let beforeWrites = store.diagnostics.writeCount
+        let beforeSavedMutation = store.diagnostics.savedMutationCount
+
+        XCTAssertEqual(store.takeCombatAction(.attack(foe: .init(rawValue: UInt64.max))),
+                       .refused(.targetUnavailable))
+        XCTAssertEqual(store.state, beforeState)
+        XCTAssertEqual(try SaveCodec.encode(store.state), beforeBytes)
+        XCTAssertEqual(try Data(contentsOf: store.diagnostics.saveURL), beforeFile)
+        XCTAssertEqual(store.diagnostics.writeCount, beforeWrites)
+        XCTAssertEqual(store.diagnostics.savedMutationCount, beforeSavedMutation)
+        XCTAssertFalse(store.diagnostics.hasPendingWrite)
+    }
+
+    func testFirstPlayerCombatActionQuoteCommitsOnceWithAutomaticContinuationAndRelaunch() throws {
+        let store = inFight(["paper_moth"])
+        store.flushNow()
+        let foe = try XCTUnwrap(store.activeEncounter?.livingFoes.first)
+        let quote = try store.combatPlayerActionEvaluation(.attack(foe: foe.id)).get()
+        let mutationBefore = store.state.meta.mutationCount
+        let actionsBefore = store.state.meta.semanticActionTrail.count
+
+        XCTAssertEqual(store.commitCombatPlayerAction(quote), .committed)
+        XCTAssertEqual(store.state.meta.mutationCount, mutationBefore + 1)
+        XCTAssertEqual(store.state.meta.semanticActionTrail.count, actionsBefore + 1)
+        XCTAssertFalse(store.diagnostics.hasPendingWrite)
+        let committed = store.state
+        let relaunched = try SaveCodec.decode(Data(contentsOf: store.diagnostics.saveURL))
+        XCTAssertEqual(relaunched.worlds.activeRun, committed.worlds.activeRun)
+        XCTAssertEqual(relaunched.meta.mutationCount, committed.meta.mutationCount)
+        XCTAssertEqual(relaunched.meta.semanticActionTrail, committed.meta.semanticActionTrail)
+
+        let bytesAfter = try SaveCodec.encode(committed)
+        let fileAfter = try Data(contentsOf: store.diagnostics.saveURL)
+        let writesAfter = store.diagnostics.writeCount
+        XCTAssertNotEqual(store.commitCombatPlayerAction(quote), .committed)
+        XCTAssertEqual(try SaveCodec.encode(store.state), bytesAfter)
+        XCTAssertEqual(try Data(contentsOf: store.diagnostics.saveURL), fileAfter)
+        XCTAssertEqual(store.diagnostics.writeCount, writesAfter)
+        XCTAssertFalse(store.diagnostics.hasPendingWrite)
+    }
+
+    func testFirstPlayerCombatActionStaleQuoteMatrixIsByteAndWriteInert() throws {
+        enum Drift {
+            case targetDefeated
+            case turnChanged
+            case encounterFinished
+        }
+
+        for drift in [Drift.targetDefeated, .turnChanged, .encounterFinished] {
+            let store = inFight(["paper_moth"])
+            let foe = try XCTUnwrap(store.activeEncounter?.livingFoes.first)
+            let quote = try store.combatPlayerActionEvaluation(.attack(foe: foe.id)).get()
+            store.mutate("test: drift after combat presentation", flush: true) { state in
+                switch drift {
+                case .targetDefeated:
+                    state.worlds.activeRun?.activeEncounter?.foes[0].currentHP = 0
+                case .turnChanged:
+                    state.worlds.activeRun?.activeEncounter?.turnIndex += 1
+                case .encounterFinished:
+                    state.worlds.activeRun?.activeEncounter?.outcome = .fled
+                }
+            }
+            store.flushNow()
+            let beforeState = store.state
+            let beforeBytes = try SaveCodec.encode(beforeState)
+            let beforeFile = try Data(contentsOf: store.diagnostics.saveURL)
+            let beforeWrites = store.diagnostics.writeCount
+            let beforeSavedMutation = store.diagnostics.savedMutationCount
+
+            XCTAssertNotEqual(store.commitCombatPlayerAction(quote), .committed)
+            XCTAssertEqual(store.state, beforeState)
+            XCTAssertEqual(try SaveCodec.encode(store.state), beforeBytes)
+            XCTAssertEqual(try Data(contentsOf: store.diagnostics.saveURL), beforeFile)
+            XCTAssertEqual(store.diagnostics.writeCount, beforeWrites)
+            XCTAssertEqual(store.diagnostics.savedMutationCount, beforeSavedMutation)
+            XCTAssertFalse(store.diagnostics.hasPendingWrite)
+        }
+    }
+
+    func testFirstPlayerCombatActionDirectPipelineRejectsForgedActorTurnActionAndAllyAtomically() throws {
+        let store = inFight(["paper_moth"])
+        let foe = try XCTUnwrap(store.activeEncounter?.livingFoes.first)
+        let quote = try store.combatPlayerActionEvaluation(.attack(foe: foe.id)).get()
+
+        var forgedActor = quote
+        forgedActor.actor = .foe(foe.id)
+        var candidate = store.state
+        let original = candidate
+        XCTAssertEqual(CombatRules.commitPlayerAction(forgedActor, in: &candidate),
+                       .refused(.wrongActor))
+        XCTAssertEqual(candidate, original)
+
+        var staleTurn = quote
+        staleTurn.turnIndex += 1
+        XCTAssertEqual(CombatRules.commitPlayerAction(staleTurn, in: &candidate),
+                       .refused(.notWaitingForPlayer))
+        XCTAssertEqual(candidate, original)
+
+        XCTAssertEqual(CombatRules.evaluatePlayerAction(
+            .skill("not_a_skill", foe: foe.id, ally: nil), actor: .binder, in: candidate),
+            .failure(.actionUnavailable))
+        XCTAssertEqual(CombatRules.evaluatePlayerAction(
+            .healSkill(ally: .companion(.generated("not-travelling"))),
+            actor: .binder, in: candidate), .failure(.invalidAlly))
+        XCTAssertEqual(candidate, original)
+    }
+
     func testWinningRemovesTheEnemyFromTheMapAndPaysOut() throws {
         let store = inFight()
         var guardCount = 0

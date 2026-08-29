@@ -288,6 +288,36 @@ final class SaveSlotTests: XCTestCase {
     }
 
     @MainActor
+    func testFirstPlayerCombatActionRefusalPreservesRealSlotEnvelopeAndSuccessRelaunches() async throws {
+        let root = directory(); defer { try? FileManager.default.removeItem(at: root) }
+        let slots = SaveSlotFileIO(directory: root)
+        let created = try await slots.create(name: "Combat action", state: currentEncounterState())
+        _ = try await slots.acquireWriterLease(for: created.metadata.id)
+        let store = GameStore(io: try await slots.payloadIOForLeasedSlot())
+        let url = try await slots.exportURL(for: created.metadata.id)
+        let envelopeBefore = try Data(contentsOf: url)
+        let stateBefore = store.state
+        let diagnosticsBefore = store.diagnostics
+
+        XCTAssertEqual(store.takeCombatAction(.attack(foe: .init(rawValue: UInt64.max))),
+                       .refused(.targetUnavailable))
+        XCTAssertEqual(store.state, stateBefore)
+        XCTAssertEqual(try Data(contentsOf: url), envelopeBefore)
+        XCTAssertEqual(store.diagnostics.writeCount, diagnosticsBefore.writeCount)
+        XCTAssertEqual(store.diagnostics.savedMutationCount, diagnosticsBefore.savedMutationCount)
+        XCTAssertEqual(store.diagnostics.lastError, diagnosticsBefore.lastError)
+        XCTAssertFalse(store.diagnostics.hasPendingWrite)
+
+        let foe = try XCTUnwrap(store.activeEncounter?.livingFoes.first)
+        let quote = try store.combatPlayerActionEvaluation(.attack(foe: foe.id)).get()
+        XCTAssertEqual(store.commitCombatPlayerAction(quote), .committed)
+        let relaunched = try await slots.load(created.metadata.id).state
+        XCTAssertEqual(relaunched.worlds.activeRun, store.state.worlds.activeRun)
+        XCTAssertEqual(relaunched.meta.mutationCount, store.state.meta.mutationCount)
+        XCTAssertEqual(relaunched.meta.semanticActionTrail, store.state.meta.semanticActionTrail)
+    }
+
+    @MainActor
     private func authoredStarterPromisedGearState() throws -> GameState {
         let store = GameStore(io: .temporary(name: "slot-starter-gear-\(UUID().uuidString)"))
         store.mutate("test: fund authored starter") { $0.base.essence = 1_000 }

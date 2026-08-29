@@ -170,13 +170,19 @@ extension GameStore {
                                        selecting: quote.afflictionReceipt,
                                        expectedActor: quote.actor) {
         case .ready:
-            let countBefore = state.worlds.activeRun?.satchelItems.stacks
-                .first(where: { $0.id == quote.stack.id })?.count
-            takeCombatAction(.useItem(stack: quote.stack.id, ally: quote.ally,
-                                      afflictionReceipt: quote.afflictionReceipt))
+            let action = CombatAction.useItem(stack: quote.stack.id, ally: quote.ally,
+                                              afflictionReceipt: quote.afflictionReceipt)
+            guard case .success(let actionQuote) = combatPlayerActionEvaluation(
+                action, expectedActor: quote.actor), actionQuote.itemSnapshot == quote.stack else {
+                return .refused(quote.afflictionReceipt == nil ? .staleItem : .staleAffliction)
+            }
+            let countBefore = quote.stack.count
+            guard commitCombatPlayerAction(actionQuote) == .committed else {
+                return .refused(quote.afflictionReceipt == nil ? .staleItem : .staleAffliction)
+            }
             let countAfter = state.worlds.activeRun?.satchelItems.stacks
                 .first(where: { $0.id == quote.stack.id })?.count ?? 0
-            guard let countBefore, countAfter == countBefore - 1 else {
+            guard countAfter == countBefore - 1 else {
                 return .refused(quote.afflictionReceipt == nil ? .staleItem : .staleAffliction)
             }
             return .committed
@@ -219,7 +225,8 @@ extension GameStore {
         GambitEngine.decide(for: .binder, in: state) != nil
     }
 
-    func takeCombatAction(_ action: CombatAction) {
+    func combatPlayerActionEvaluation(_ action: CombatAction, expectedActor: Combatant? = nil)
+        -> Result<CombatPlayerActionQuoteV1, CombatPlayerActionRefusalV1> {
         let actor: Combatant?
         if let waiting = actingCombatant {
             actor = waiting
@@ -234,15 +241,30 @@ extension GameStore {
         } else {
             actor = nil
         }
-        guard let actor else { return }
-        mutate("combat: \(label(for: action))", flush: true, scope: .expedition) { state in
-            let before = state.worlds.activeRun?.activeEncounter
-            CombatRules.perform(action, by: actor, in: &state)
-            // A stale exact selection is a refusal, not permission to let the rest of the fight
-            // advance. This also keeps companion-current typed actions atomic when their receipt
-            // disappears between presentation and commit.
-            guard state.worlds.activeRun?.activeEncounter != before else { return }
-            CombatRules.runAutomaticTurns(in: &state)
+        guard let actor else { return .failure(.notWaitingForPlayer) }
+        guard expectedActor == nil || expectedActor == actor else { return .failure(.wrongActor) }
+        return CombatRules.evaluatePlayerAction(action, actor: actor, in: state)
+    }
+
+    @discardableResult
+    func commitCombatPlayerAction(_ quote: CombatPlayerActionQuoteV1)
+        -> CombatPlayerActionCommitResultV1 {
+        var result: CombatPlayerActionCommitResultV1 = .refused(.noStateChange)
+        let published = mutateIf("combat: \(label(for: quote.action))", flush: true,
+                                 scope: .expedition) { candidate in
+            result = CombatRules.commitPlayerAction(quote, in: &candidate)
+            guard result == .committed else { return false }
+            CombatRules.runAutomaticTurns(in: &candidate)
+            return true
+        }
+        return published ? .committed : result
+    }
+
+    @discardableResult
+    func takeCombatAction(_ action: CombatAction) -> CombatPlayerActionCommitResultV1 {
+        switch combatPlayerActionEvaluation(action) {
+        case .success(let quote): return commitCombatPlayerAction(quote)
+        case .failure(let refusal): return .refused(refusal)
         }
     }
 

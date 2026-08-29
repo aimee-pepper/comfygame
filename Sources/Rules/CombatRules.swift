@@ -1,5 +1,41 @@
 import Foundation
 
+enum CombatPlayerActionRefusalV1: Error, Equatable, Sendable {
+    case noActiveEncounter
+    case encounterFinished
+    case notWaitingForPlayer
+    case wrongActor
+    case actorUnavailable
+    case targetUnavailable
+    case actionUnavailable
+    case staleItem
+    case invalidAlly
+    case staleAffliction
+    case noStateChange
+}
+
+enum CombatPlayerActionCommitResultV1: Equatable, Sendable {
+    case committed
+    case refused(CombatPlayerActionRefusalV1)
+}
+
+struct CombatPlayerActionQuoteV1: Equatable, Sendable {
+    var encounterID: InstanceID
+    var roundNumber: Int
+    var turnIndex: Int
+    var turnSlot: EncounterState.TurnSlot
+    var actor: Combatant
+    var actorCurrentHP: Int
+    var actorMaxHP: Int
+    var action: CombatAction
+    var skillSnapshot: SkillDef?
+    var itemSnapshot: ItemStack?
+    var foeSnapshot: FoeState?
+    var ally: Combatant?
+    var allyCurrentHP: Int?
+    var allyMaxHP: Int?
+}
+
 struct BeneficialItemEffectQuoteV1: Equatable, Sendable {
     var stack: ItemStack
     var usingActor: Combatant
@@ -1502,11 +1538,106 @@ enum CombatRules {
 
     // MARK: Resolving one action
 
+    static func evaluatePlayerAction(_ action: CombatAction, actor: Combatant,
+                                     in state: GameState) -> Result<CombatPlayerActionQuoteV1,
+                                                                            CombatPlayerActionRefusalV1> {
+        guard let run = state.worlds.activeRun, let encounter = run.activeEncounter else {
+            return .failure(.noActiveEncounter)
+        }
+        guard encounter.outcome == nil else { return .failure(.encounterFinished) }
+        guard encounter.current == actor else { return .failure(.wrongActor) }
+        let quenchOverride = if case .quench = action {
+            actor.persistentPartyMemberID != nil
+        } else { false }
+        guard needsPlayerInput(state) || quenchOverride else {
+            return .failure(.notWaitingForPlayer)
+        }
+        guard party(of: state).contains(actor), isAlive(actor, in: run) else {
+            return .failure(.actorUnavailable)
+        }
+
+        let foeID: InstanceID? = switch action {
+        case .attack(let id), .damageSkill(let id): id
+        case .skill(_, let id, _): id
+        default: nil
+        }
+        let foe = foeID.flatMap { id in encounter.foes.first { $0.id == id && $0.isAlive } }
+        if foeID != nil, foe == nil { return .failure(.targetUnavailable) }
+
+        let ally: Combatant? = switch action {
+        case .skill(_, _, let ally): ally
+        case .healSkill(let ally), .useItem(_, let ally, _), .quench(let ally, _): ally
+        default: nil
+        }
+        if let ally, (!party(of: state).contains(ally) || !isAlive(ally, in: run)) {
+            return .failure(.invalidAlly)
+        }
+
+        let skill: SkillDef? = switch action {
+        case .skill(let id, _, _): ContentCatalog.shared.skill(id)
+        case .ward: ContentCatalog.shared.skill("ward")
+        default: nil
+        }
+        if case .skill = action, skill == nil { return .failure(.actionUnavailable) }
+        if case .ward = action, skill == nil { return .failure(.actionUnavailable) }
+
+        let item: ItemStack? = if case .useItem(let id, _, _) = action {
+            run.satchelItems.stacks.first { $0.id == id }
+        } else { nil }
+        if case .useItem = action, item == nil { return .failure(.staleItem) }
+
+        let actorHealth = health(of: actor, in: run)
+        let allyHealth = ally.map { health(of: $0, in: run) }
+        return .success(.init(encounterID: encounter.id, roundNumber: encounter.roundNumber,
+                              turnIndex: encounter.turnIndex, turnSlot: encounter.currentTurnSlot,
+                              actor: actor, actorCurrentHP: actorHealth.current,
+                              actorMaxHP: actorHealth.max, action: action, skillSnapshot: skill,
+                              itemSnapshot: item, foeSnapshot: foe, ally: ally,
+                              allyCurrentHP: allyHealth?.current, allyMaxHP: allyHealth?.max))
+    }
+
+    static func commitPlayerAction(_ quote: CombatPlayerActionQuoteV1,
+                                   in state: inout GameState) -> CombatPlayerActionCommitResultV1 {
+        let evaluation = evaluatePlayerAction(quote.action, actor: quote.actor, in: state)
+        guard case .success(let current) = evaluation else {
+            guard case .failure(let refusal) = evaluation else { return .refused(.noStateChange) }
+            return .refused(refusal)
+        }
+        guard current == quote else {
+            if current.itemSnapshot != quote.itemSnapshot { return .refused(.staleItem) }
+            if current.foeSnapshot != quote.foeSnapshot { return .refused(.targetUnavailable) }
+            if current.ally != quote.ally { return .refused(.invalidAlly) }
+            if current.skillSnapshot != quote.skillSnapshot { return .refused(.actionUnavailable) }
+            if current.actor != quote.actor { return .refused(.wrongActor) }
+            if current.actorCurrentHP != quote.actorCurrentHP
+                || current.actorMaxHP != quote.actorMaxHP { return .refused(.actorUnavailable) }
+            if current.allyCurrentHP != quote.allyCurrentHP
+                || current.allyMaxHP != quote.allyMaxHP { return .refused(.invalidAlly) }
+            return .refused(.notWaitingForPlayer)
+        }
+        var candidate = state
+        let performed = perform(quote.action, by: quote.actor, in: &candidate)
+        guard performed == .committed else { return performed }
+        if let item = quote.itemSnapshot {
+            let remaining = candidate.worlds.activeRun?.satchelItems.stacks
+                .first(where: { $0.id == item.id })?.count ?? 0
+            guard remaining == item.count - 1 else { return .refused(.staleItem) }
+        }
+        guard candidate != state else { return .refused(.noStateChange) }
+        state = candidate
+        return .committed
+    }
+
     /// Applies an action and hands the turn on. The only way an encounter advances.
-    static func perform(_ action: CombatAction, by actor: Combatant, in state: inout GameState) {
-        guard var run = state.worlds.activeRun, var encounter = run.activeEncounter, encounter.outcome == nil
-        else { return }
-        guard encounter.current == actor, isAlive(actor, in: run) else { return }
+    @discardableResult
+    static func perform(_ action: CombatAction, by actor: Combatant,
+                        in state: inout GameState) -> CombatPlayerActionCommitResultV1 {
+        guard var run = state.worlds.activeRun, var encounter = run.activeEncounter else {
+            return .refused(.noActiveEncounter)
+        }
+        guard encounter.outcome == nil else { return .refused(.encounterFinished) }
+        guard encounter.current == actor else { return .refused(.wrongActor) }
+        guard isAlive(actor, in: run) else { return .refused(.actorUnavailable) }
         adoptV2ReceiptLedgers(in: &encounter)
         normalizeV2EvasionState(&encounter)
         normalizePersonalTurn(&encounter, actor: actor)
@@ -1517,7 +1648,7 @@ enum CombatRules {
             else {
                 // Saved palette selections and old Rout actions remain decodable, but an action
                 // the actor no longer owns cannot spend a turn during one-way migration.
-                return
+                return .refused(.actionUnavailable)
             }
         }
         if case .ward(let harm) = action {
@@ -1525,7 +1656,7 @@ enum CombatRules {
                   let skill = ContentCatalog.shared.skill("ward"),
                   isReady(skill, for: actor, in: encounter),
                   disclosedWardHarms(in: encounter).contains(harm)
-            else { return }
+            else { return .refused(.actionUnavailable) }
         }
         if case .quench(let ally, let receipt) = action {
             guard let skill = modernQuenchSkill(for: actor, encounter: encounter),
@@ -1533,7 +1664,7 @@ enum CombatRules {
                   isAlive(ally, in: run),
                   quenchEligibleAfflictions(on: ally, in: encounter).contains(where: {
                       $0.applicationReceipt == receipt
-                  }) else { return }
+                  }) else { return .refused(.staleAffliction) }
         }
         if action == .blur {
             guard encounter.debugV2OwnedNodeIDs?[actor]?.contains(blurNode) == true,
@@ -1541,17 +1672,21 @@ enum CombatRules {
                   encounter.personalTurn?.setupAvailable == true,
                   encounter.personalTurn?.normalCreditsRemaining == 1,
                   encounter.personalTurn?.expansionSource == nil,
-                  encounter.blurSpent?.contains(actor) == false else { return }
+                  encounter.blurSpent?.contains(actor) == false else { return .refused(.actionUnavailable) }
         }
 
         let actionCost = combatActionCost(action)
         if usesPersonalTurnAuthority(encounter), encounter.personalTurn?.owner == actor {
             if actionCost == .normal {
-                guard (encounter.personalTurn?.normalCreditsRemaining ?? 0) > 0 else { return }
+                guard (encounter.personalTurn?.normalCreditsRemaining ?? 0) > 0 else {
+                    return .refused(.actionUnavailable)
+                }
             } else if isPersonalSetup(action) {
                 guard encounter.personalTurn?.setupAvailable == true,
                       encounter.personalTurn?.normalCreditsRemaining == 1,
-                      encounter.personalTurn?.expansionSource == nil else { return }
+                      encounter.personalTurn?.expansionSource == nil else {
+                    return .refused(.actionUnavailable)
+                }
             }
         }
         let feintWasActive = encounter.feintActive?.contains(actor) == true
@@ -1663,7 +1798,16 @@ enum CombatRules {
             outcome = .committed(cost: .normal, completedDirectAttack: false)
         }
 
-        guard case .committed(let committedCost, let completedDirectAttack) = outcome else { return }
+        guard case .committed(let committedCost, let completedDirectAttack) = outcome else {
+            let refusal: CombatPlayerActionRefusalV1 = switch action {
+            case .attack, .damageSkill: .targetUnavailable
+            case .healSkill: .invalidAlly
+            case .useItem: .staleItem
+            case .quench: .staleAffliction
+            default: .actionUnavailable
+            }
+            return .refused(refusal)
+        }
 
         if actor.isParty, let target = hostileAttemptTarget(of: action) {
             WorldRules.recordAnimalHostility(against: target, run: &run,
@@ -1707,6 +1851,7 @@ enum CombatRules {
             advanceTurn(in: &state, completedAction: committedCost == .normal)
         }
         checkOutcome(in: &state)
+        return .committed
     }
 
     private static func isDirectAttack(_ kind: SkillDef.Kind) -> Bool {
