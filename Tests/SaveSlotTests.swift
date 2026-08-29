@@ -2,6 +2,51 @@ import XCTest
 @testable import Bookbinder
 
 final class SaveSlotTests: XCTestCase {
+    func testSchemaEighteenPhysicalCustodyRealSlotMigratesWithoutRewritingEnvelope() async throws {
+        let root = directory()
+        defer { try? FileManager.default.removeItem(at: root) }
+        let slots = SaveSlotFileIO(directory: root)
+        let created = try await slots.create(name: "Legacy physical custody")
+        let url = try await slots.exportURL(for: created.metadata.id)
+        var envelope = try SaveCodec.makeDecoder().decode(
+            SaveSlotEnvelope.self, from: Data(contentsOf: url))
+        var state = GameState.newGame()
+        let gear = ItemStack(id: InstanceID(rawValue: 19_181), catalogID: "blade_keen")
+        let line = RunExitSummary.ReceiptLine.uniqueItem(.init(
+            lineID: "legacy-lost-gear", instanceID: gear.id, snapshot: gear, quantity: 1,
+            fallbackName: gear.displayName, fallbackIcon: gear.icon,
+            recoveredDestination: nil))
+        XCTAssertTrue(state.worlds.appendExpeditionReview(.init(
+            runIndex: 8, outcomeID: 1, kind: .collapse, reason: "lost",
+            turnsTaken: 12, haulKeptFraction: 0.5, recoveredLines: [], lostLines: [line])))
+        var payload = try XCTUnwrap(JSONSerialization.jsonObject(
+            with: SaveCodec.encode(state)) as? [String: Any])
+        payload["schemaVersion"] = 18
+        func strip(_ value: Any) -> Any {
+            if var object = value as? [String: Any] {
+                object.removeValue(forKey: "custodyReceiptVersion")
+                for (key, child) in object { object[key] = strip(child) }
+                return object
+            }
+            if let array = value as? [Any] { return array.map(strip) }
+            return value
+        }
+        payload = strip(payload) as! [String: Any]
+        envelope.payload = try JSONSerialization.data(withJSONObject: payload, options: [.sortedKeys])
+        let originalBytes = try encoder().encode(envelope)
+        try originalBytes.write(to: url, options: .atomic)
+
+        let loaded = try await slots.load(created.metadata.id).state
+        XCTAssertEqual(loaded.schemaVersion, 19)
+        XCTAssertEqual(loaded.worlds.pendingExpeditionReview?.summary.custodyReceiptVersion, 0)
+        guard case .uniqueItem(let migrated) = loaded.worlds.pendingExpeditionReview?
+            .summary.lostLines.first else { return XCTFail("legacy lost gear missing") }
+        XCTAssertEqual(migrated.snapshot, gear)
+        XCTAssertNil(migrated.recoveredDestination)
+        XCTAssertEqual(try Data(contentsOf: url), originalBytes,
+                       "read-only slot migration must preserve the envelope bytes")
+    }
+
     func testCurioKnowledgeSchemaTwelveRealSlotMigratesEmpty() async throws {
         let root = directory()
         defer { try? FileManager.default.removeItem(at: root) }

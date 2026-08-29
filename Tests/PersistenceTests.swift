@@ -492,8 +492,14 @@ final class PersistenceTests: XCTestCase {
 
     func testSchemaEighteenPromotesEveryExitSummaryToExplicitLegacyCustodyV0() throws {
         var state = GameState.newGame()
+        let gear = ItemStack(id: InstanceID(rawValue: 7_181), catalogID: "blade_keen")
+        let gearLine = RunExitSummary.ReceiptLine.uniqueItem(.init(
+            lineID: "legacy-return-gear", instanceID: gear.id, snapshot: gear, quantity: 1,
+            fallbackName: gear.displayName, fallbackIcon: gear.icon,
+            recoveredDestination: .stored))
         let first = RunExitSummary(runIndex: 3, outcomeID: 1, kind: .portal,
-                                   reason: "home", turnsTaken: 4, haulKeptFraction: 1)
+                                   reason: "home", turnsTaken: 4, haulKeptFraction: 1,
+                                   recoveredLines: [gearLine], lostLines: [])
         let second = RunExitSummary(runIndex: 4, outcomeID: 2, kind: .collapse,
                                     reason: "collapse", turnsTaken: 9, haulKeptFraction: 0.5)
         XCTAssertTrue(state.worlds.appendExpeditionReview(first))
@@ -518,6 +524,12 @@ final class PersistenceTests: XCTestCase {
         XCTAssertEqual(decoded.worlds.expeditionReviewQueue.pending.map {
             $0.summary.custodyReceiptVersion
         }, [0, 0])
+        guard case .uniqueItem(let migratedGear) = decoded.worlds.expeditionReviewQueue
+            .pending[0].summary.recoveredLines[0] else {
+            return XCTFail("legacy physical custody line was not preserved")
+        }
+        XCTAssertEqual(migratedGear.snapshot, gear)
+        XCTAssertEqual(migratedGear.recoveredDestination, .stored)
         XCTAssertEqual(try Migrations.migrateIfNeeded(migrated), migrated)
     }
 

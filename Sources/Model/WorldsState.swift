@@ -779,13 +779,17 @@ struct RunExitSummary: Codable, Equatable, Identifiable, Sendable {
             case .uniqueItem(let value):
                 lineID = value.lineID
                 if let profile = value.snapshot.gearProfile {
-                    guard custodyReceiptVersion == Self.custodyReceiptVersionV1,
-                          value.quantity == 1, value.snapshot.count == 1,
+                    guard value.quantity > 0, value.snapshot.count > 0,
                           value.instanceID == value.snapshot.id,
                           value.snapshot.id == profile.stableInstanceID,
-                          profile.physicalReceipt?.validates(profile: profile) ?? true,
-                          recovered ? value.recoveredDestination != nil
-                                    : value.recoveredDestination == nil else { return false }
+                          profile.physicalReceipt?.validates(profile: profile) ?? true else {
+                        return false
+                    }
+                    if custodyReceiptVersion == Self.custodyReceiptVersionV1 {
+                        guard value.quantity == 1, value.snapshot.count == 1,
+                              recovered ? value.recoveredDestination != nil
+                                        : value.recoveredDestination == nil else { return false }
+                    }
                     let inserted = recovered
                         ? recoveredGearIDs.insert(profile.stableInstanceID).inserted
                         : lostGearIDs.insert(profile.stableInstanceID).inserted
