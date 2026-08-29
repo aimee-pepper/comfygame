@@ -2,6 +2,61 @@ import XCTest
 @testable import Bookbinder
 
 final class SaveSlotTests: XCTestCase {
+    private func currentEncounterState() throws -> GameState {
+        var state = GameState.newGame()
+        let point = GridPoint(x: 0, y: 0)
+        var run = WorldRun(runIndex: 91, book: .init(written: [], essencePaid: 0),
+                           mapSeed: 91_101, rng: .init(seed: 91_101),
+                           map: .init(width: 1, height: 1,
+                                      tiles: [Tile(isRevealed: true)], entry: point),
+                           playerPosition: point)
+        let enemy = WorldEnemy(id: .init(rawValue: 91_101), creatureID: "paper_moth",
+                               position: run.playerPosition)
+        run.enemies = [enemy]; state.worlds.activeRun = run
+        guard case .started = WorldRules.beginEncounter(triggerID: enemy.id,
+            expected: enemy, runsAutomaticTurns: false, in: &state) else {
+            throw CocoaError(.coderInvalidValue)
+        }
+        return state
+    }
+
+    private func mutatingActiveEncounter(
+        in data: Data, _ mutation: (inout [String: Any]) -> Void
+    ) throws -> Data {
+        var root = try XCTUnwrap(JSONSerialization.jsonObject(with: data) as? [String: Any])
+        var worlds = try XCTUnwrap(root["worlds"] as? [String: Any])
+        var run = try XCTUnwrap(worlds["activeRun"] as? [String: Any])
+        var encounter = try XCTUnwrap(run["activeEncounter"] as? [String: Any])
+        mutation(&encounter); run["activeEncounter"] = encounter
+        worlds["activeRun"] = run; root["worlds"] = worlds
+        return try JSONSerialization.data(withJSONObject: root, options: [.sortedKeys])
+    }
+
+    func testCurrentEncounterMalformedIdentityGraphPreservesRealEnvelope() async throws {
+        let root = directory(); defer { try? FileManager.default.removeItem(at: root) }
+        let slots = SaveSlotFileIO(directory: root)
+        let created = try await slots.create(name: "Encounter identity", state: currentEncounterState())
+        let url = try await slots.exportURL(for: created.metadata.id)
+        let validBytes = try Data(contentsOf: url)
+        let valid = try SaveCodec.makeDecoder().decode(SaveSlotEnvelope.self, from: validBytes)
+        let mutations: [(String, (inout [String: Any]) -> Void)] = [
+            ("omitted foes", { $0.removeValue(forKey: "foes") }),
+            ("empty order", { $0["order"] = [] }),
+            ("omitted slots", { $0.removeValue(forKey: "turnSlots") }),
+            ("omitted names", { $0.removeValue(forKey: "partyNames") }),
+            ("omitted animals", { $0.removeValue(forKey: "animalParticipants") })
+        ]
+        for (name, mutation) in mutations {
+            var envelope = valid
+            envelope.payload = try mutatingActiveEncounter(in: valid.payload, mutation)
+            let bytes = try encoder().encode(envelope)
+            try bytes.write(to: url, options: .atomic)
+            do { _ = try await slots.load(created.metadata.id); XCTFail("accepted \(name)") }
+            catch { }
+            XCTAssertEqual(try Data(contentsOf: url), bytes, name)
+        }
+    }
+
     @MainActor
     private func authoredStarterPromisedGearState() throws -> GameState {
         let store = GameStore(io: .temporary(name: "slot-starter-gear-\(UUID().uuidString)"))

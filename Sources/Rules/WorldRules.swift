@@ -1111,7 +1111,10 @@ enum WorldRules {
         state.worlds.activeRun = run
 
         if let bumped = enemyOnPlayer(in: run) {
-            if beginEncounter(triggeredBy: bumped, preContact: preContact, in: &state) {
+            if case .started = beginEncounter(triggerID: bumped.id,
+                                              expected: bumped,
+                                              preContact: preContact,
+                                              in: &state) {
                 events.append(.encounterBegan)
             }
         }
@@ -1612,15 +1615,81 @@ enum WorldRules {
 
     /// Opens an encounter with the bumped enemy plus anything awake standing next to it, up to the
     /// party's limit. Milestone 4 replaces the combat itself, not this trigger.
+    enum EncounterInitiationRefusalV1: Equatable, Sendable {
+        case noActiveRun
+        case encounterAlreadyActive
+        case triggerMissingOrChanged
+        case triggerNotAtParty
+        case duplicateWorldEnemyIdentity
+        case emptyEligibleGroup
+        case invalidDiscoveryReceipt
+        case invalidPartyIdentity
+        case invalidParticipantProjection
+        case invalidSnapshot
+    }
+
+    enum EncounterInitiationResultV1: Equatable, Sendable {
+        case started(encounterID: InstanceID)
+        case deferredByGrace
+        case refused(EncounterInitiationRefusalV1)
+    }
+
+    /// Exact persisted enemy identity is the only encounter authority. All encounter-owned
+    /// changes are staged in `candidate`; a late projection/snapshot refusal publishes nothing.
+    @discardableResult
+    static func beginEncounter(triggerID: InstanceID,
+                               expected: WorldEnemy? = nil,
+                               preContact suppliedSnapshot: PreContactSnapshot? = nil,
+                               runsAutomaticTurns: Bool = true,
+                               debugGodModeEnabled suppliedDebugGodMode: Bool? = nil,
+                               in state: inout GameState) -> EncounterInitiationResultV1 {
+        guard let sourceRun = state.worlds.activeRun else { return .refused(.noActiveRun) }
+        guard sourceRun.activeEncounter == nil else { return .refused(.encounterAlreadyActive) }
+        guard sourceRun.encounterGraceTurns == 0 else { return .deferredByGrace }
+        let matches = sourceRun.enemies.filter { $0.id == triggerID }
+        guard matches.count <= 1 else { return .refused(.duplicateWorldEnemyIdentity) }
+        guard let live = matches.first, expected == nil || expected == live else {
+            return .refused(.triggerMissingOrChanged)
+        }
+        guard live.position == sourceRun.playerPosition else { return .refused(.triggerNotAtParty) }
+
+        var candidate = state
+        if let refusal = buildEncounter(triggeredBy: live, preContact: suppliedSnapshot,
+                                        runsAutomaticTurns: runsAutomaticTurns,
+                                        debugGodModeEnabled: suppliedDebugGodMode,
+                                        in: &candidate) {
+            return .refused(refusal)
+        }
+        guard let encounter = candidate.worlds.activeRun?.activeEncounter,
+              EncounterSnapshotRulesV1.validates(encounter: encounter, in: candidate) else {
+            return .refused(.invalidSnapshot)
+        }
+        state = candidate
+        return .started(encounterID: encounter.id)
+    }
+
     @discardableResult
     static func beginEncounter(triggeredBy enemy: WorldEnemy,
                                preContact suppliedSnapshot: PreContactSnapshot? = nil,
                                runsAutomaticTurns: Bool = true,
                                debugGodModeEnabled suppliedDebugGodMode: Bool? = nil,
                                in state: inout GameState) -> Bool {
-        guard var run = state.worlds.activeRun, run.activeEncounter == nil else { return false }
+        if case .started = beginEncounter(triggerID: enemy.id, expected: enemy,
+                                          preContact: suppliedSnapshot,
+                                          runsAutomaticTurns: runsAutomaticTurns,
+                                          debugGodModeEnabled: suppliedDebugGodMode,
+                                          in: &state) { return true }
+        return false
+    }
+
+    private static func buildEncounter(triggeredBy enemy: WorldEnemy,
+                               preContact suppliedSnapshot: PreContactSnapshot? = nil,
+                               runsAutomaticTurns: Bool = true,
+                               debugGodModeEnabled suppliedDebugGodMode: Bool? = nil,
+                               in state: inout GameState) -> EncounterInitiationRefusalV1? {
+        guard var run = state.worlds.activeRun, run.activeEncounter == nil else { return .invalidSnapshot }
         // Just fled? You get a moment before anything else can catch you.
-        guard run.encounterGraceTurns == 0 else { return false }
+        guard run.encounterGraceTurns == 0 else { return .invalidSnapshot }
 
         let partyLevels = EncounterScalingRules.partyLevels(in: state)
         let usesAdditiveScaling = run.tuning.encounterScalingProfile == .recommended
@@ -1722,7 +1791,9 @@ enum WorldRules {
             if isNewSpecies { initiallyUnrecordedSpecies.insert(member.identityKey) }
             if let habitat = member.habitatPlacement?.habitat {
                 guard candidateDiscovery.recordSpecies(
-                    member.identityKey, habitat: habitat, runIndex: run.runIndex) else { return false }
+                    member.identityKey, habitat: habitat, runIndex: run.runIndex) else {
+                    return .invalidDiscoveryReceipt
+                }
             } else {
                 // Legacy/authored bodies remain visible in Bestiary detail but unclassified on
                 // the physical habitat shelves.
@@ -1736,7 +1807,7 @@ enum WorldRules {
                 candidateDiscovery.recordCreature(legacy, runIndex: run.runIndex)
             }
         }
-        guard !foes.isEmpty else { return false }
+        guard !foes.isEmpty else { return .emptyEligibleGroup }
         state.reality.discovery = candidateDiscovery
         for _ in initiallyUnrecordedSpecies {
             awardDiscovery(.species, run: &run, in: &state)
@@ -1918,7 +1989,7 @@ enum WorldRules {
             }
             guard case .projected(let projection) =
                     GearGameplayProjectionRulesV1.project(owner: owner, in: state.base)
-            else { return false }
+            else { return .invalidParticipantProjection }
             gearProjections[actor] = projection
         }
         run.activeEncounter = CombatRules.makeEncounter(id: InstanceID(rawValue: run.rng.next()),
@@ -1996,7 +2067,7 @@ enum WorldRules {
         // otherwise sit there waiting on nobody: the player's buttons do nothing, because it isn't
         // their turn, and nothing else is running.
         if runsAutomaticTurns { CombatRules.runAutomaticTurns(in: &state) }
-        return true
+        return nil
     }
 
 }

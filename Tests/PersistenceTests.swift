@@ -3,6 +3,55 @@ import XCTest
 
 /// The interruptibility pillar, tested. Anything that breaks here breaks pillar 2.
 final class PersistenceTests: XCTestCase {
+    private func currentEncounterState() throws -> GameState {
+        var state = GameState.newGame()
+        let point = GridPoint(x: 0, y: 0)
+        var run = WorldRun(runIndex: 91, book: .init(written: [], essencePaid: 0),
+                           mapSeed: 91_001, rng: .init(seed: 91_001),
+                           map: .init(width: 1, height: 1,
+                                      tiles: [Tile(isRevealed: true)], entry: point),
+                           playerPosition: point)
+        let enemy = WorldEnemy(id: .init(rawValue: 91_001), creatureID: "paper_moth",
+                               position: run.playerPosition)
+        run.enemies = [enemy]; state.worlds.activeRun = run
+        guard case .started = WorldRules.beginEncounter(triggerID: enemy.id,
+            expected: enemy, runsAutomaticTurns: false, in: &state) else {
+            throw CocoaError(.coderInvalidValue)
+        }
+        return state
+    }
+
+    private func mutatingActiveEncounter(
+        in data: Data, _ mutation: (inout [String: Any]) -> Void
+    ) throws -> Data {
+        var root = try XCTUnwrap(JSONSerialization.jsonObject(with: data) as? [String: Any])
+        var worlds = try XCTUnwrap(root["worlds"] as? [String: Any])
+        var run = try XCTUnwrap(worlds["activeRun"] as? [String: Any])
+        var encounter = try XCTUnwrap(run["activeEncounter"] as? [String: Any])
+        mutation(&encounter); run["activeEncounter"] = encounter
+        worlds["activeRun"] = run; root["worlds"] = worlds
+        return try JSONSerialization.data(withJSONObject: root, options: [.sortedKeys])
+    }
+
+    func testCurrentEncounterIdentityShapeRawRejectionIsBytePreserving() throws {
+        let valid = try SaveCodec.encode(currentEncounterState())
+        XCTAssertNoThrow(try Migrations.migrateIfNeeded(valid))
+        let mutations: [(String, (inout [String: Any]) -> Void)] = [
+            ("missing foes", { $0.removeValue(forKey: "foes") }),
+            ("empty foes", { $0["foes"] = [] }),
+            ("missing names", { $0.removeValue(forKey: "partyNames") }),
+            ("missing order", { $0.removeValue(forKey: "order") }),
+            ("empty slots", { $0["turnSlots"] = [] }),
+            ("missing gear projection", { $0.removeValue(forKey: "gearProjections") })
+        ]
+        for (name, mutation) in mutations {
+            let bytes = try mutatingActiveEncounter(in: valid, mutation)
+            let original = bytes
+            XCTAssertThrowsError(try Migrations.migrateIfNeeded(bytes), name)
+            XCTAssertEqual(bytes, original, name)
+        }
+    }
+
     @MainActor
     private func authoredStarterPromisedGearState() throws -> GameState {
         let store = GameStore(io: .temporary(name: "starter-promised-gear-\(UUID().uuidString)"))

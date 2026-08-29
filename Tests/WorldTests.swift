@@ -4723,6 +4723,86 @@ final class WorldTests: XCTestCase {
                        .partyApproach, "an apex never gains an ordinary creature ambush")
     }
 
+    func testEncounterInitiationRequiresExactLiveEnemyContactAndRefusalsAreAtomic() throws {
+        var state = startedRun(book(["terrain": "plains"]), seed: 81_001)
+        var run = try XCTUnwrap(state.worlds.activeRun)
+        let live = WorldEnemy(id: .init(rawValue: 81_001), creatureID: "paper_moth",
+                              position: run.playerPosition)
+        run.enemies = [live]
+        state.worlds.activeRun = run
+
+        func assertAtomic(_ expected: WorldRules.EncounterInitiationResultV1,
+                          _ operation: (inout GameState) -> WorldRules.EncounterInitiationResultV1,
+                          file: StaticString = #filePath, line: UInt = #line) throws {
+            var candidate = state
+            let before = try SaveCodec.encode(candidate)
+            let result = operation(&candidate)
+            XCTAssertEqual(result, expected, file: file, line: line)
+            XCTAssertEqual(try SaveCodec.encode(candidate), before, file: file, line: line)
+        }
+
+        try assertAtomic(.refused(.triggerMissingOrChanged)) {
+            WorldRules.beginEncounter(triggerID: .init(rawValue: 999_001), in: &$0)
+        }
+        var changed = live; changed.creatureID = "glass_crab"
+        try assertAtomic(.refused(.triggerMissingOrChanged)) {
+            WorldRules.beginEncounter(triggerID: live.id, expected: changed, in: &$0)
+        }
+        try assertAtomic(.refused(.triggerMissingOrChanged)) {
+            WorldRules.beginEncounter(triggeredBy: changed, in: &$0)
+                ? .started(encounterID: $0.worlds.activeRun!.activeEncounter!.id)
+                : .refused(.triggerMissingOrChanged)
+        }
+
+        var moved = state
+        moved.worlds.activeRun?.enemies[0].position = .init(x: run.playerPosition.x + 1,
+                                                            y: run.playerPosition.y)
+        let movedBytes = try SaveCodec.encode(moved)
+        XCTAssertEqual(WorldRules.beginEncounter(triggerID: live.id, in: &moved),
+                       .refused(.triggerNotAtParty))
+        XCTAssertEqual(try SaveCodec.encode(moved), movedBytes)
+
+        var duplicate = state
+        duplicate.worlds.activeRun?.enemies.append(live)
+        let duplicateBytes = try SaveCodec.encode(duplicate)
+        XCTAssertEqual(WorldRules.beginEncounter(triggerID: live.id, in: &duplicate),
+                       .refused(.duplicateWorldEnemyIdentity))
+        XCTAssertEqual(try SaveCodec.encode(duplicate), duplicateBytes)
+    }
+
+    func testEncounterInitiationCommitsExactSnapshotOnceAndRelaunchDoesNotRegroup() throws {
+        var state = startedRun(book(["terrain": "plains"]), seed: 81_010)
+        var run = try XCTUnwrap(state.worlds.activeRun)
+        let trigger = WorldEnemy(id: .init(rawValue: 81_010), creatureID: "paper_moth",
+                                 position: run.playerPosition)
+        let grouped = WorldEnemy(id: .init(rawValue: 81_011), creatureID: "paper_moth",
+                                 position: run.playerPosition, isAwake: true)
+        run.enemies = [trigger, grouped]
+        state.worlds.activeRun = run
+
+        let result = WorldRules.beginEncounter(triggerID: trigger.id, expected: trigger,
+            preContact: .init(disclosedEnemyIDs: [trigger.id], approachedEnemyID: trigger.id),
+            runsAutomaticTurns: false, in: &state)
+        guard case .started(let encounterID) = result else {
+            return XCTFail("exact live contact did not start: \(result)")
+        }
+        let encounter = try XCTUnwrap(state.worlds.activeRun?.activeEncounter)
+        XCTAssertEqual(encounter.id, encounterID)
+        XCTAssertEqual(Set(encounter.foes.map(\.id)), [trigger.id, grouped.id])
+        XCTAssertEqual(Set(encounter.order),
+                       Set(CombatRules.party(of: state) + [.foe(trigger.id), .foe(grouped.id)]))
+        XCTAssertTrue(EncounterSnapshotRulesV1.validatesAll(in: state))
+
+        let bytes = try SaveCodec.encode(state)
+        let reloaded = try SaveCodec.decode(bytes)
+        XCTAssertEqual(reloaded, state)
+        XCTAssertEqual(reloaded.worlds.activeRun?.activeEncounter, encounter)
+        var repeated = reloaded
+        XCTAssertEqual(WorldRules.beginEncounter(triggerID: trigger.id, in: &repeated),
+                       .refused(.encounterAlreadyActive))
+        XCTAssertEqual(repeated, reloaded)
+    }
+
     func testRealStepUsesThePresentationBeforeMovementAndReveal() throws {
         var state = startedRun(book(["terrain": "plains"]), seed: 8_105)
         var run = try XCTUnwrap(state.worlds.activeRun)

@@ -38,6 +38,7 @@ enum Migrations {
             try validateCurrentPhysicalGearOwnership(in: data)
             try validateCurrentRunExitCustody(in: data)
             try validateCurrentDebugVisibilityWorldIsolation(in: data)
+            try validateCurrentEncounterSnapshots(in: data)
             return data
         }
 
@@ -57,6 +58,7 @@ enum Migrations {
         try validateCurrentPhysicalGearOwnership(in: working)
         try validateCurrentRunExitCustody(in: working)
         try validateCurrentDebugVisibilityWorldIsolation(in: working)
+        try validateCurrentEncounterSnapshots(in: working)
         return working
     }
 
@@ -64,6 +66,39 @@ enum Migrations {
     static func probeSchemaVersion(_ data: Data) -> Int? {
         struct Probe: Decodable { var schemaVersion: Int? }
         return (try? JSONDecoder().decode(Probe.self, from: data))?.schemaVersion
+    }
+
+    /// Current saves must carry the identity-bearing encounter graph explicitly. Tolerant
+    /// `EncounterState` defaults remain available only while an older schema is being migrated.
+    private static func validateCurrentEncounterSnapshots(in data: Data) throws {
+        guard let root = try JSONSerialization.jsonObject(with: data) as? [String: Any],
+              let worlds = root["worlds"] as? [String: Any] else {
+            throw CocoaError(.coderInvalidValue)
+        }
+        var runValues: [Any] = []
+        if let active = worlds["activeRun"], !(active is NSNull) { runValues.append(active) }
+        if let realms = worlds["anchoredRealms"] as? [[String: Any]] {
+            runValues.append(contentsOf: realms.compactMap { $0["world"] })
+        }
+        for value in runValues {
+            guard let run = value as? [String: Any] else { throw CocoaError(.coderInvalidValue) }
+            guard let rawEncounter = run["activeEncounter"], !(rawEncounter is NSNull) else { continue }
+            guard let encounter = rawEncounter as? [String: Any],
+                  let foes = encounter["foes"] as? [Any], !foes.isEmpty,
+                  encounter.keys.contains("partyNames"), !(encounter["partyNames"] is NSNull),
+                  let order = encounter["order"] as? [Any], !order.isEmpty,
+                  let slots = encounter["turnSlots"] as? [Any], !slots.isEmpty,
+                  encounter.keys.contains("animalParticipants"),
+                  !(encounter["animalParticipants"] is NSNull),
+                  encounter.keys.contains("gearProjections"),
+                  !(encounter["gearProjections"] is NSNull) else {
+                throw CocoaError(.coderInvalidValue)
+            }
+        }
+        let state = try SaveCodec.makeDecoder().decode(GameState.self, from: data)
+        guard EncounterSnapshotRulesV1.validatesAll(in: state) else {
+            throw CocoaError(.coderInvalidValue)
+        }
     }
 
     private static func exactInt(_ value: Any?) throws -> Int {

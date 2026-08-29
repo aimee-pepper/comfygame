@@ -106,7 +106,9 @@ struct GameState: Codable, Equatable, Sendable {
             guard !base.collectedWorldPages.contains(where: {
                 $0.id == LegacyDebugVisibilityWorldV19.instanceID
                     || $0.definition.id == LegacyDebugVisibilityWorldV19.definitionID
-            }) else { throw CocoaError(.coderInvalidValue) }
+            }), EncounterSnapshotRulesV1.validatesAll(in: self) else {
+                throw CocoaError(.coderInvalidValue)
+            }
         }
         if schemaVersion >= 4 {
             let runs = [worlds.activeRun].compactMap { $0 } + worlds.anchoredRealms.map(\.world)
@@ -164,6 +166,81 @@ struct GameState: Codable, Equatable, Sendable {
         self.base = base
         self.worlds = worlds
         self.tutorial = tutorial
+    }
+}
+
+/// Composed current-save authority for the exact live bodies and actors frozen into a fight.
+/// Dynamic HP/status/combat receipts remain encounter-owned and are deliberately not rederived.
+enum EncounterSnapshotRulesV1 {
+    static func validatesAll(in state: GameState) -> Bool {
+        let runs = [state.worlds.activeRun].compactMap { $0 }
+            + state.worlds.anchoredRealms.map(\.world)
+        return runs.allSatisfy { run in
+            guard let encounter = run.activeEncounter else { return true }
+            return validates(encounter: encounter, run: run, in: state)
+        }
+    }
+
+    static func validates(encounter: EncounterState, in state: GameState) -> Bool {
+        guard let run = state.worlds.activeRun,
+              run.activeEncounter?.id == encounter.id else { return false }
+        return validates(encounter: encounter, run: run, in: state)
+    }
+
+    private static func validates(encounter: EncounterState, run: WorldRun,
+                                  in state: GameState) -> Bool {
+        guard !encounter.foes.isEmpty,
+              Set(encounter.foes.map(\.id)).count == encounter.foes.count,
+              Set(run.enemies.map(\.id)).count == run.enemies.count else { return false }
+        for foe in encounter.foes {
+            guard let enemy = run.enemies.first(where: { $0.id == foe.id }),
+                  foe.speciesID == enemy.speciesID,
+                  foe.creatureID == enemy.creatureID,
+                  foe.identityKey == enemy.identityKey,
+                  foe.traits == enemy.traits,
+                  foe.isApex == enemy.isApex else { return false }
+        }
+
+        let party = CombatRules.party(of: state)
+        guard party.first == .binder, Set(party).count == party.count else { return false }
+        let foeActors = encounter.foes.map { Combatant.foe($0.id) }
+        let closedActors = Set(party + foeActors)
+        guard encounter.order.count == closedActors.count,
+              Set(encounter.order) == closedActors,
+              !encounter.turnSlots.isEmpty,
+              encounter.turnSlots.allSatisfy({ closedActors.contains($0.actor) }) else { return false }
+        let primaryActors = encounter.turnSlots.compactMap { slot -> Combatant? in
+            if case .primary = slot.kind { return slot.actor }
+            return nil
+        }
+        guard primaryActors.count == closedActors.count,
+              Set(primaryActors) == closedActors else { return false }
+
+        let expectedNames = state.base.activeParty.reduce(into: [PersistentPartyMemberID: String]()) {
+            if let animal = state.base.animalCompanion(for: $1) {
+                $0[$1] = animal.originReceipt.frozenDisplayName
+            } else if let index = state.base.rosterIndex(for: $1) {
+                $0[$1] = state.base.roster[index].name
+            }
+        }
+        guard encounter.partyNames == expectedNames else { return false }
+        let animalActors = Set(party.filter {
+            guard case .companion(let id) = $0 else { return false }
+            return state.base.animalCompanion(for: id) != nil
+        })
+        guard let animals = encounter.animalParticipants,
+              Set(animals.keys) == animalActors,
+              animals.allSatisfy({ $0.key == .companion($0.value.memberID) }) else { return false }
+        let humanActors = Set(party).subtracting(animalActors)
+        guard let projections = encounter.gearProjections,
+              Set(projections.keys) == humanActors,
+              projections.allSatisfy({ $0.value.owner.combatant == $0.key && $0.value.validates() })
+        else { return false }
+        if let trigger = encounter.scalingPreview?.triggerFoeID {
+            guard foeActors.filter({ $0 == .foe(trigger) }).count == 1,
+                  run.enemies.filter({ $0.id == trigger }).count == 1 else { return false }
+        }
+        return true
     }
 }
 
