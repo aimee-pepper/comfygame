@@ -1247,12 +1247,12 @@ struct WorldView: View {
             if let run, let quote = pendingWorldPageSwap {
                 ForEach(run.satchelItems.stacks, id: \.id) { stack in
                     Button("Leave \(stack.displayName) ×\(stack.count)") {
-                        completeWorldPageSwap(quote, discarding: .itemStack(stack.id))
+                        completeWorldPageSwap(quote, discarding: .itemStack(stack))
                     }
                 }
                 ForEach(run.carriedWorldPages, id: \.id) { page in
                     Button("Leave \(page.inspected ? page.definition.title : "Unknown page")") {
-                        completeWorldPageSwap(quote, discarding: .worldPage(page.id))
+                        completeWorldPageSwap(quote, discarding: .worldPage(page))
                     }
                 }
             }
@@ -1668,7 +1668,7 @@ struct WorldView: View {
             case .stale, .notHere, .duplicateIdentity:
                 fieldPageMessage = "That page is no longer available here."
                 return .refused(.stale)
-            case .inspected, .swapped:
+            case .inspected, .alreadyInspected, .swapped:
                 return .refused(.rules("That page action is no longer current."))
             }
         } else if store.canExtractResource || hasActionableExtractionRefusal {
@@ -1720,7 +1720,7 @@ struct WorldView: View {
         case .swapped: break
         case .stale, .notHere, .duplicateIdentity, .satchelFull:
             fieldPageMessage = "That choice is no longer current. Nothing was changed."
-        case .inspected, .taken: break
+        case .inspected, .alreadyInspected, .taken: break
         }
     }
 

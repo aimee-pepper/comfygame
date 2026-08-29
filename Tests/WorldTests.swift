@@ -1500,6 +1500,9 @@ final class WorldTests: XCTestCase {
 
         run.playerPosition = GridPoint(x: 0, y: 0)
         XCTAssertNil(WildWorldPageFieldRules.quote(page.id, in: run))
+        let away = run
+        XCTAssertEqual(WildWorldPageFieldRules.take(quote, in: &run), .notHere)
+        XCTAssertEqual(run, away)
         run.playerPosition = position
         run.satchelItems.slots = 0
         let full = run
@@ -1531,11 +1534,19 @@ final class WorldTests: XCTestCase {
 
         let staleBefore = run
         XCTAssertEqual(WildWorldPageFieldRules.swap(
-            quote, discarding: .itemStack(InstanceID(rawValue: 999)), in: &run), .stale)
+            quote, discarding: .itemStack(ItemStack(
+                id: InstanceID(rawValue: 999), catalogID: "salve", count: 1)), in: &run), .stale)
         XCTAssertEqual(run, staleBefore)
 
+        run.satchelItems.stacks[0].count = 1
+        let changedBefore = run
         XCTAssertEqual(WildWorldPageFieldRules.swap(
-            quote, discarding: .itemStack(stack.id), in: &run),
+            quote, discarding: .itemStack(stack), in: &run), .stale)
+        XCTAssertEqual(run, changedBefore)
+        run.satchelItems.stacks[0] = stack
+
+        XCTAssertEqual(WildWorldPageFieldRules.swap(
+            quote, discarding: .itemStack(stack), in: &run),
             .swapped(offered, discarded: .itemStack(stack)))
         XCTAssertEqual(run.carriedWorldPages, [offered])
         XCTAssertTrue(run.offeredWorldPages.isEmpty)
@@ -1555,8 +1566,9 @@ final class WorldTests: XCTestCase {
         run.playerPosition = position
         run.map[position].isRevealed = true
         run.offeredWorldPages = [page]
-        let store = GameStore(io: .temporary(name: "wild-page-field-\(UUID().uuidString)"))
-        store.mutate("install wild page fixture") { $0.worlds.activeRun = run }
+        let io = SaveFileIO.temporary(name: "wild-page-field-\(UUID().uuidString)")
+        let store = GameStore(io: io)
+        store.mutate("install wild page fixture", flush: true) { $0.worlds.activeRun = run }
 
         let quote = try XCTUnwrap(store.offeredWorldPageQuote(page.id))
         XCTAssertEqual(store.state.reality.encounteredLexemes, [])
@@ -1565,6 +1577,23 @@ final class WorldTests: XCTestCase {
         }
         XCTAssertEqual(store.state.reality.encounteredLexemes,
                        definition.page.encounteredLexemes)
+        let inspected = try XCTUnwrap(store.activeRun?.offeredWorldPages.first)
+        let freshQuote = try XCTUnwrap(store.offeredWorldPageQuote(page.id))
+        let stateAfterInspect = store.state
+        let bytesAfterInspect = try SaveCodec.encode(store.state)
+        let rawAfterInspect = try Data(contentsOf: io.saveURL)
+        let diagnosticsAfterInspect = store.diagnostics
+        let contextAfterInspect = store.worldFieldContext
+        XCTAssertEqual(store.inspectOfferedWorldPage(freshQuote), .alreadyInspected(inspected))
+        XCTAssertEqual(store.state, stateAfterInspect)
+        XCTAssertEqual(try SaveCodec.encode(store.state), bytesAfterInspect)
+        XCTAssertEqual(try Data(contentsOf: io.saveURL), rawAfterInspect)
+        XCTAssertEqual(store.diagnostics.writeCount, diagnosticsAfterInspect.writeCount)
+        XCTAssertEqual(store.diagnostics.savedMutationCount,
+                       diagnosticsAfterInspect.savedMutationCount)
+        XCTAssertEqual(store.diagnostics.hasPendingWrite,
+                       diagnosticsAfterInspect.hasPendingWrite)
+        XCTAssertEqual(store.worldFieldContext, contextAfterInspect)
 
         let afterInspectionRun = store.state.worlds.activeRun
         let afterInspectionLexemes = store.state.reality.encounteredLexemes
@@ -1624,8 +1653,10 @@ final class WorldTests: XCTestCase {
 
         try assertInert(.satchelFull) { store.takeOfferedWorldPage(quote) }
         try assertInert(.stale) {
-            store.swapOfferedWorldPage(quote,
-                                       discarding: .itemStack(InstanceID(rawValue: 999_883)))
+            store.swapOfferedWorldPage(
+                quote,
+                discarding: .itemStack(ItemStack(
+                    id: InstanceID(rawValue: 999_883), catalogID: "salve", count: 1)))
         }
 
         store.mutate("duplicate loose page identity", flush: true) { state in
@@ -1695,6 +1726,67 @@ final class WorldTests: XCTestCase {
         XCTAssertEqual(relaunched.state, relaunchedState)
         XCTAssertEqual(relaunched.diagnostics.writeCount, diagnostics.writeCount)
         XCTAssertFalse(relaunched.diagnostics.hasPendingWrite)
+    }
+
+    @MainActor
+    func testLooseWorldPageNotHereAndChangedOccupantSnapshotsAreWriteInert() throws {
+        let definition = try XCTUnwrap(WorldPageCatalog.definition("wild_storm_coast"))
+        let carriedDefinition = try XCTUnwrap(WorldPageCatalog.definition("wild_moss_and_mist"))
+        let position = GridPoint(x: 1, y: 1)
+        let page = WorldPageInstance(
+            id: InstanceID(rawValue: 885), definition: definition,
+            fieldProvenance: .init(originRunIndex: 3, originWorldSeed: 48,
+                                   generationSeed: 59, position: position))
+        let carried = WorldPageInstance(id: InstanceID(rawValue: 886),
+                                        definition: carriedDefinition)
+        var run = wildPageRun(seed: 48)
+        run.playerPosition = position
+        run.map[position].isRevealed = true
+        run.offeredWorldPages = [page]
+        run.carriedWorldPages = [carried]
+        run.satchelItems.slots = 1
+        let io = SaveFileIO.temporary(name: "wild-page-snapshot-refusal-\(UUID().uuidString)")
+        let store = GameStore(io: io)
+        store.mutate("install occupant snapshot fixture", flush: true) {
+            $0.worlds.activeRun = run
+        }
+        let quote = try XCTUnwrap(store.offeredWorldPageQuote(page.id))
+
+        func assertInert(_ expected: WildWorldPageFieldRules.Result,
+                         _ operation: () -> WildWorldPageFieldRules.Result,
+                         file: StaticString = #filePath, line: UInt = #line) throws {
+            let state = store.state
+            let bytes = try SaveCodec.encode(state)
+            let raw = try Data(contentsOf: io.saveURL)
+            let diagnostics = store.diagnostics
+            let context = store.worldFieldContext
+            XCTAssertEqual(operation(), expected, file: file, line: line)
+            XCTAssertEqual(store.state, state, file: file, line: line)
+            XCTAssertEqual(try SaveCodec.encode(store.state), bytes, file: file, line: line)
+            XCTAssertEqual(try Data(contentsOf: io.saveURL), raw, file: file, line: line)
+            XCTAssertEqual(store.diagnostics.writeCount, diagnostics.writeCount,
+                           file: file, line: line)
+            XCTAssertEqual(store.diagnostics.savedMutationCount, diagnostics.savedMutationCount,
+                           file: file, line: line)
+            XCTAssertEqual(store.diagnostics.hasPendingWrite, diagnostics.hasPendingWrite,
+                           file: file, line: line)
+            XCTAssertEqual(store.worldFieldContext, context, file: file, line: line)
+        }
+
+        store.mutate("move away from quoted page", flush: true) {
+            $0.worlds.activeRun?.playerPosition = GridPoint(x: 0, y: 0)
+        }
+        store.refreshWorldFieldContext()
+        try assertInert(.notHere) { store.takeOfferedWorldPage(quote) }
+
+        store.mutate("return and change carried page snapshot", flush: true) { state in
+            state.worlds.activeRun?.playerPosition = position
+            state.worlds.activeRun?.carriedWorldPages[0].inspected = true
+        }
+        store.refreshWorldFieldContext()
+        try assertInert(.stale) {
+            store.swapOfferedWorldPage(quote, discarding: .worldPage(carried))
+        }
     }
 
     func testWildPagesShareOneFailureBudgetWithItemsAndBankIdempotently() throws {

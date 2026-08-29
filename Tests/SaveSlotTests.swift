@@ -174,7 +174,8 @@ final class SaveSlotTests: XCTestCase {
         let diagnosticsBefore = store.diagnostics
 
         XCTAssertEqual(store.swapOfferedWorldPage(
-            quote, discarding: .itemStack(.init(rawValue: 999_702))), .stale)
+            quote, discarding: .itemStack(ItemStack(
+                id: .init(rawValue: 999_702), catalogID: "salve", count: 1))), .stale)
         XCTAssertEqual(store.state, stateBefore)
         XCTAssertEqual(try Data(contentsOf: url), envelopeBefore)
         XCTAssertEqual(store.diagnostics.writeCount, diagnosticsBefore.writeCount)
@@ -182,11 +183,55 @@ final class SaveSlotTests: XCTestCase {
                        diagnosticsBefore.savedMutationCount)
         XCTAssertFalse(store.diagnostics.hasPendingWrite)
 
+        store.mutate("change same-ID swap occupant", flush: true) {
+            $0.worlds.activeRun?.satchelItems.stacks[0].count = 1
+        }
+        var inertEnvelope = try Data(contentsOf: url)
+        var inertState = store.state
+        var inertDiagnostics = store.diagnostics
+        XCTAssertEqual(store.swapOfferedWorldPage(
+            quote, discarding: .itemStack(carried)), .stale)
+        XCTAssertEqual(store.state, inertState)
+        XCTAssertEqual(try Data(contentsOf: url), inertEnvelope)
+        XCTAssertEqual(store.diagnostics.writeCount, inertDiagnostics.writeCount)
+        XCTAssertFalse(store.diagnostics.hasPendingWrite)
+
+        store.mutate("restore occupant and move away", flush: true) { state in
+            state.worlds.activeRun?.satchelItems.stacks[0] = carried
+            state.worlds.activeRun?.playerPosition = GridPoint(x: 0, y: 0)
+        }
+        store.refreshWorldFieldContext()
+        inertEnvelope = try Data(contentsOf: url)
+        inertState = store.state
+        inertDiagnostics = store.diagnostics
+        XCTAssertEqual(store.takeOfferedWorldPage(quote), .notHere)
+        XCTAssertEqual(store.state, inertState)
+        XCTAssertEqual(try Data(contentsOf: url), inertEnvelope)
+        XCTAssertEqual(store.diagnostics.writeCount, inertDiagnostics.writeCount)
+        XCTAssertEqual(store.worldFieldContext, WorldFieldContextReceiptV1.make(from: inertState))
+
+        store.mutate("return to loose page", flush: true) {
+            $0.worlds.activeRun?.playerPosition = point
+        }
+        guard case .inspected(let inspectedPage) = store.inspectOfferedWorldPage(quote) else {
+            return XCTFail("first inspection must commit")
+        }
+        let inspectedQuote = try XCTUnwrap(store.offeredWorldPageQuote(page.id))
+        inertEnvelope = try Data(contentsOf: url)
+        inertState = store.state
+        inertDiagnostics = store.diagnostics
+        XCTAssertEqual(store.inspectOfferedWorldPage(inspectedQuote),
+                       .alreadyInspected(inspectedPage))
+        XCTAssertEqual(store.state, inertState)
+        XCTAssertEqual(try Data(contentsOf: url), inertEnvelope)
+        XCTAssertEqual(store.diagnostics.writeCount, inertDiagnostics.writeCount)
+        XCTAssertFalse(store.diagnostics.hasPendingWrite)
+
         guard case .swapped(let taken, discarded: .itemStack(let removed)) =
-                store.swapOfferedWorldPage(quote, discarding: .itemStack(carried.id)) else {
+                store.swapOfferedWorldPage(inspectedQuote, discarding: .itemStack(carried)) else {
             return XCTFail("exact swap must commit")
         }
-        XCTAssertEqual(taken, page)
+        XCTAssertEqual(taken, inspectedPage)
         XCTAssertEqual(removed, carried)
         XCTAssertEqual(store.activeRun?.turnsTaken, run.turnsTaken)
         XCTAssertEqual(store.activeRun?.rng, run.rng)
@@ -207,7 +252,7 @@ final class SaveSlotTests: XCTestCase {
         let envelopeAfter = try Data(contentsOf: url)
         let diagnosticsAfter = store.diagnostics
         XCTAssertEqual(store.swapOfferedWorldPage(
-            quote, discarding: .itemStack(carried.id)), .stale)
+            inspectedQuote, discarding: .itemStack(carried)), .stale)
         XCTAssertEqual(store.state, committed)
         XCTAssertEqual(try Data(contentsOf: url), envelopeAfter)
         XCTAssertEqual(store.diagnostics.writeCount, diagnosticsAfter.writeCount)

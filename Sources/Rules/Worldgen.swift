@@ -115,13 +115,13 @@ enum WildWorldPageFieldRules {
     }
 
     enum SlotOccupant: Equatable, Sendable, Identifiable {
-        case itemStack(InstanceID)
-        case worldPage(InstanceID)
+        case itemStack(ItemStack)
+        case worldPage(WorldPageInstance)
 
         var id: String {
             switch self {
-            case .itemStack(let id): "item-\(id.rawValue)"
-            case .worldPage(let id): "page-\(id.rawValue)"
+            case .itemStack(let stack): "item-\(stack.id.rawValue)"
+            case .worldPage(let page): "page-\(page.id.rawValue)"
             }
         }
     }
@@ -132,6 +132,7 @@ enum WildWorldPageFieldRules {
 
     enum Result: Equatable, Sendable {
         case inspected(WorldPageInstance)
+        case alreadyInspected(WorldPageInstance)
         case taken(WorldPageInstance)
         case swapped(WorldPageInstance, discarded: DiscardedPayload)
         case stale
@@ -151,25 +152,36 @@ enum WildWorldPageFieldRules {
         return Quote(instance: instance, position: position)
     }
 
+    private static func refusalValidating(_ quote: Quote, in run: WorldRun) -> Result? {
+        let matches = run.offeredWorldPages.filter { $0.id == quote.instance.id }
+        guard matches.count <= 1 else { return .duplicateIdentity }
+        guard let current = matches.first, current == quote.instance,
+              current.fieldProvenance?.position == quote.position,
+              run.map.contains(quote.position), run.map[quote.position].isRevealed,
+              WorldPageCatalog.definition(current.definition.id) == current.definition
+        else { return .stale }
+        guard run.playerPosition == quote.position else { return .notHere }
+        return nil
+    }
+
     @discardableResult
     static func inspect(_ quote: Quote, in run: inout WorldRun) -> Result {
-        guard let current = self.quote(quote.instance.id, in: run), current == quote else {
-            return .stale
-        }
+        if let refusal = refusalValidating(quote, in: run) { return refusal }
         guard !run.carriedWorldPages.contains(where: { $0.id == quote.instance.id }) else {
             return .duplicateIdentity
         }
         guard let index = run.offeredWorldPages.firstIndex(where: { $0.id == quote.instance.id })
         else { return .stale }
+        guard !run.offeredWorldPages[index].inspected else {
+            return .alreadyInspected(run.offeredWorldPages[index])
+        }
         run.offeredWorldPages[index].inspected = true
         return .inspected(run.offeredWorldPages[index])
     }
 
     @discardableResult
     static func take(_ quote: Quote, in run: inout WorldRun) -> Result {
-        guard let current = self.quote(quote.instance.id, in: run), current == quote else {
-            return .stale
-        }
+        if let refusal = refusalValidating(quote, in: run) { return refusal }
         guard !run.carriedWorldPages.contains(where: { $0.id == quote.instance.id }) else {
             return .duplicateIdentity
         }
@@ -183,26 +195,29 @@ enum WildWorldPageFieldRules {
 
     static func swap(_ quote: Quote, discarding occupant: SlotOccupant,
                      in run: inout WorldRun) -> Result {
-        guard let current = self.quote(quote.instance.id, in: run), current == quote,
-              run.freeSatchelSlots == 0,
-              !run.carriedWorldPages.contains(where: { $0.id == quote.instance.id }),
-              let offeredIndex = run.offeredWorldPages.firstIndex(where: {
-                  $0.id == quote.instance.id
-              })
-        else { return .stale }
+        if let refusal = refusalValidating(quote, in: run) { return refusal }
+        guard run.freeSatchelSlots == 0 else { return .stale }
+        guard !run.carriedWorldPages.contains(where: { $0.id == quote.instance.id }) else {
+            return .duplicateIdentity
+        }
+        guard let offeredIndex = run.offeredWorldPages.firstIndex(where: {
+            $0.id == quote.instance.id
+        }) else { return .stale }
         let discarded: DiscardedPayload
         switch occupant {
-        case .itemStack(let id):
+        case .itemStack(let expected):
             let matches = run.satchelItems.stacks.indices.filter {
-                run.satchelItems.stacks[$0].id == id
+                run.satchelItems.stacks[$0].id == expected.id
             }
-            guard matches.count == 1 else { return .stale }
+            guard matches.count == 1,
+                  run.satchelItems.stacks[matches[0]] == expected else { return .stale }
             discarded = .itemStack(run.satchelItems.stacks.remove(at: matches[0]))
-        case .worldPage(let id):
+        case .worldPage(let expected):
             let matches = run.carriedWorldPages.indices.filter {
-                run.carriedWorldPages[$0].id == id
+                run.carriedWorldPages[$0].id == expected.id
             }
-            guard matches.count == 1 else { return .stale }
+            guard matches.count == 1,
+                  run.carriedWorldPages[matches[0]] == expected else { return .stale }
             discarded = .worldPage(run.carriedWorldPages.remove(at: matches[0]))
         }
         let taken = run.offeredWorldPages.remove(at: offeredIndex)

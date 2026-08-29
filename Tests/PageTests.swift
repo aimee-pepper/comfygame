@@ -3410,7 +3410,10 @@ final class PageTests: XCTestCase {
                        cancelledState.reality.encounteredLexemes)
         let itemID = try XCTUnwrap(full.store.activeRun?.satchelItems.stacks.first?.id)
         guard case .swapped(let taken, discarded: .itemStack(let discarded)) =
-                full.store.swapOfferedWorldPage(swapQuote, discarding: .itemStack(itemID)) else {
+                full.store.swapOfferedWorldPage(
+                    swapQuote,
+                    discarding: .itemStack(try XCTUnwrap(
+                        full.store.activeRun?.satchelItems.stacks.first { $0.id == itemID }))) else {
             return XCTFail("expected exact item-to-page swap")
         }
         XCTAssertEqual(taken.id, fullPage.id)
