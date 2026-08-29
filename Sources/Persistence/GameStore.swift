@@ -121,21 +121,28 @@ struct WorldFieldContextReceiptV1: Equatable, Sendable {
             content = .site(name: site?.definition?.name ?? "Unknown site")
             let isNaturalAnchor = site?.definition?.providesNaturalAnchor == true
             interaction = isNaturalAnchor ? .useAnchor : .searchSite
-            let guarded = run.enemies.contains { $0.position == run.playerPosition }
             let premium = GameStore.bornAnchoredPremium(forBookCost: run.book.essencePaid)
             let anchorCost = max(Tuning.Anchoring.naturalAnchorMinimumCost,
                 (premium + Tuning.Anchoring.naturalAnchorPremiumDivisor - 1)
                     / Tuning.Anchoring.naturalAnchorPremiumDivisor)
-            if encounterBlocksInteraction || guarded {
+            if !isNaturalAnchor {
+                switch WorldRules.evaluateSiteSearch(in: state) {
+                case .available:
+                    interactionState = .available
+                case .refused(let refusal):
+                    interactionState = .unavailable(
+                        reason: WorldRules.siteSearchPlayerCopy(for: refusal))
+                }
+            } else if encounterBlocksInteraction || run.enemies.contains(where: {
+                $0.position == run.playerPosition
+            }) {
                 interactionState = .unavailable(reason: "Not while something is standing over you.")
-            } else if isNaturalAnchor && !state.base.station(Stations.anchorage).isUnlocked {
+            } else if !state.base.station(Stations.anchorage).isUnlocked {
                 interactionState = .unavailable(reason: "Unlock the Anchorage first.")
-            } else if isNaturalAnchor && state.base.essenceCrystalCount < anchorCost {
+            } else if state.base.essenceCrystalCount < anchorCost {
                 interactionState = .unavailable(reason: "You need \(anchorCost) essence.")
-            } else if isNaturalAnchor && state.worlds.anchoredRealms.contains(where: { $0.runIndex == run.runIndex }) {
+            } else if state.worlds.anchoredRealms.contains(where: { $0.runIndex == run.runIndex }) {
                 interactionState = .unavailable(reason: "This world is already anchored.")
-            } else if !isNaturalAnchor && site?.isLooted == true {
-                interactionState = .unavailable(reason: "Nothing remains here.")
             } else {
                 interactionState = .available
             }

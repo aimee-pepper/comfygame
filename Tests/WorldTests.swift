@@ -4105,6 +4105,122 @@ final class WorldTests: XCTestCase {
         XCTAssertNil(relaunched.activeRun?.activeEncounter)
     }
 
+    private func siteSearchFixture(siteID: SiteID = "wayfarers_camp",
+                                   remaining: Int? = nil) throws -> GameState {
+        let definition = try XCTUnwrap(ContentCatalog.shared.site(siteID))
+        let point = GridPoint(x: 1, y: 1)
+        var map = WorldMap(width: 3, height: 3,
+                           tiles: Array(repeating: Tile(isRevealed: true), count: 9), entry: point)
+        let placed = PlacedSite(id: .init(rawValue: 83_001), siteID: siteID, position: point,
+                                searchTurnsRemaining: remaining ?? definition.contents.searchTurns)
+        map[point].content = .site(placed.id)
+        var state = GameState.newGame()
+        var run = WorldRun(
+            runIndex: 83, book: book(["terrain": "plains"]), mapSeed: 83_001,
+            rng: .init(seed: 83_001), map: map, playerPosition: point, sites: [placed])
+        run.satchelItems.slots = 0
+        state.worlds.activeRun = run
+        return state
+    }
+
+    @MainActor
+    func testSiteSearchGuardianInvalidProgressAndStaleQuoteAreWriteInert() throws {
+        let io = SaveFileIO.temporary(name: "site-search-refusal-\(UUID().uuidString)")
+        let store = GameStore(io: io)
+        store.mutate("site search fixture", flush: true) { $0 = try! self.siteSearchFixture() }
+        store.refreshWorldFieldContext()
+        guard case .available(let admitted) = store.siteSearchEvaluation else {
+            return XCTFail("fixture must admit one exact site search")
+        }
+
+        func assertInert(_ expected: WorldRules.SiteSearchCommitResultV1,
+                         file: StaticString = #filePath, line: UInt = #line) throws {
+            let state = store.state
+            let bytes = try SaveCodec.encode(state)
+            let raw = try Data(contentsOf: io.saveURL)
+            let diagnostics = store.diagnostics
+            let context = store.worldFieldContext
+            XCTAssertEqual(store.searchSite(admitted), expected, file: file, line: line)
+            XCTAssertEqual(store.state, state, file: file, line: line)
+            XCTAssertEqual(try SaveCodec.encode(store.state), bytes, file: file, line: line)
+            XCTAssertEqual(try Data(contentsOf: io.saveURL), raw, file: file, line: line)
+            XCTAssertEqual(store.diagnostics.writeCount, diagnostics.writeCount, file: file, line: line)
+            XCTAssertEqual(store.diagnostics.hasPendingWrite, diagnostics.hasPendingWrite,
+                           file: file, line: line)
+            XCTAssertEqual(store.worldFieldContext, context, file: file, line: line)
+        }
+
+        store.mutate("guardian arrives", flush: true) { state in
+            let point = state.worlds.activeRun!.playerPosition
+            state.worlds.activeRun!.enemies = [WorldEnemy(
+                id: .init(rawValue: 83_002), creatureID: "paper_moth", position: point)]
+        }
+        store.refreshWorldFieldContext()
+        XCTAssertEqual(store.siteSearchEvaluation, .refused(.guarded(enemyID: .init(rawValue: 83_002))))
+        XCTAssertEqual(store.worldFieldContext?.interactionState,
+                       .unavailable(reason: "Not while something is standing over you."))
+        try assertInert(.refused(.stale))
+
+        store.mutate("invalid zero progress", flush: true) { state in
+            state.worlds.activeRun!.enemies = []
+            state.worlds.activeRun!.sites[0].searchTurnsRemaining = 0
+        }
+        store.refreshWorldFieldContext()
+        XCTAssertEqual(store.siteSearchEvaluation, .refused(.invalidProgress))
+        XCTAssertNil(store.searchableHere)
+        try assertInert(.refused(.stale))
+    }
+
+    @MainActor
+    func testSiteSearchPartialAndFinalPullCommitOnceAndRelaunchExactly() throws {
+        let io = SaveFileIO.temporary(name: "site-search-success-\(UUID().uuidString)")
+        let store = GameStore(io: io)
+        store.mutate("site search fixture", flush: true) { $0 = try! self.siteSearchFixture() }
+        let definition = try XCTUnwrap(ContentCatalog.shared.site("wayfarers_camp"))
+        guard case .available(let first) = store.siteSearchEvaluation else {
+            return XCTFail("fixture must admit the first pull")
+        }
+        let resourcesBefore = store.activeRun!.satchel
+
+        XCTAssertEqual(store.searchSite(first), .committed)
+        XCTAssertEqual(store.activeRun?.sites[0].searchTurnsRemaining,
+                       definition.contents.searchTurns - 1)
+        XCTAssertFalse(store.activeRun?.sites[0].isLooted ?? true)
+        XCTAssertEqual(store.activeRun?.satchel, resourcesBefore)
+        XCTAssertEqual(store.activeRun?.turnsTaken, 1)
+        store.flushNow()
+
+        let partial = GameStore(io: io)
+        XCTAssertEqual(partial.activeRun?.sites[0].searchTurnsRemaining,
+                       definition.contents.searchTurns - 1)
+        guard case .available(let finalQuote) = partial.siteSearchEvaluation else {
+            return XCTFail("partial search must resume with an exact quote")
+        }
+        XCTAssertEqual(partial.searchSite(finalQuote), .committed)
+        XCTAssertTrue(partial.activeRun?.sites[0].isLooted == true)
+        XCTAssertEqual(partial.activeRun?.sites[0].searchTurnsRemaining, 0)
+        XCTAssertEqual(partial.activeRun?.turnsTaken, 2)
+        for (resource, amount) in definition.contents.yields {
+            XCTAssertEqual(partial.activeRun?.satchel[resource], amount)
+        }
+        XCTAssertEqual(partial.activeRun?.offeredItems.count, definition.contents.items.count,
+                       "the zero-slot satchel must preserve every exact authored item as an offer")
+        partial.flushNow()
+
+        let committedRun = partial.activeRun
+        let relaunched = GameStore(io: io)
+        XCTAssertEqual(relaunched.activeRun, committedRun)
+        let relaunchedState = relaunched.state
+        let relaunchedBytes = try SaveCodec.encode(relaunched.state)
+        let relaunchedDiagnostics = relaunched.diagnostics
+        XCTAssertEqual(relaunched.searchSite(finalQuote), .refused(.stale))
+        XCTAssertEqual(relaunched.state, relaunchedState)
+        XCTAssertEqual(try SaveCodec.encode(relaunched.state), relaunchedBytes)
+        XCTAssertEqual(relaunched.diagnostics.writeCount, relaunchedDiagnostics.writeCount)
+        XCTAssertEqual(relaunched.diagnostics.hasPendingWrite,
+                       relaunchedDiagnostics.hasPendingWrite)
+    }
+
     func testNonAdjacentStepsAreRefused() {
         var state = startedRun(book(["terrain": "plains"]), seed: 13)
         let run = state.worlds.activeRun!

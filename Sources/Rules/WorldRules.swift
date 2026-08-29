@@ -897,28 +897,112 @@ enum WorldRules {
         return events
     }
 
+    struct SiteSearchQuoteV1: Equatable, Sendable {
+        var version = 1
+        var worldRunID: String
+        var turnBefore: Int
+        var position: GridPoint
+        var tile: Tile
+        var site: PlacedSite
+        var definition: SiteDef
+    }
+
+    enum SiteSearchRefusalV1: Equatable, Sendable {
+        case noActiveWorld
+        case encounterActive
+        case noSiteHere
+        case missingOrAmbiguousSite
+        case naturalAnchor
+        case alreadyLooted
+        case invalidProgress
+        case guarded(enemyID: InstanceID)
+        case invalidAuthoredContents
+        case stale
+    }
+
+    enum SiteSearchEvaluationV1: Equatable, Sendable {
+        case available(SiteSearchQuoteV1)
+        case refused(SiteSearchRefusalV1)
+    }
+
+    enum SiteSearchCommitResultV1: Equatable, Sendable {
+        case committed
+        case refused(SiteSearchRefusalV1)
+    }
+
+    struct SiteSearchCommitOutcomeV1: Equatable, Sendable {
+        var result: SiteSearchCommitResultV1
+        var events: [Event]
+    }
+
+    static func siteSearchPlayerCopy(for refusal: SiteSearchRefusalV1) -> String {
+        switch refusal {
+        case .encounterActive:
+            "Finish the encounter first."
+        case .guarded:
+            "Not while something is standing over you."
+        case .invalidAuthoredContents:
+            "This site's authored contents are invalid."
+        case .stale:
+            "That action is no longer available."
+        case .noActiveWorld, .noSiteHere, .missingOrAmbiguousSite, .naturalAnchor,
+             .alreadyLooted, .invalidProgress:
+            "Nothing here to search."
+        }
+    }
+
+    static func evaluateSiteSearch(in state: GameState) -> SiteSearchEvaluationV1 {
+        guard let run = state.worlds.activeRun else { return .refused(.noActiveWorld) }
+        guard run.activeEncounter == nil else { return .refused(.encounterActive) }
+        guard run.map.contains(run.playerPosition),
+              case .site(let instanceID) = run.map[run.playerPosition].content else {
+            return .refused(.noSiteHere)
+        }
+        let matches = run.sites.enumerated().filter { $0.element.id == instanceID }
+        guard matches.count == 1, let site = matches.first?.element,
+              site.position == run.playerPosition else {
+            return .refused(.missingOrAmbiguousSite)
+        }
+        guard let definition = site.definition else { return .refused(.invalidAuthoredContents) }
+        guard !definition.providesNaturalAnchor else { return .refused(.naturalAnchor) }
+        guard !site.isLooted else { return .refused(.alreadyLooted) }
+        guard definition.contents.searchTurns > 0,
+              (1...definition.contents.searchTurns).contains(site.searchTurnsRemaining) else {
+            return .refused(.invalidProgress)
+        }
+        if let guardian = run.enemies.filter({ $0.position == site.position }).sorted(by: {
+            $0.id.rawValue < $1.id.rawValue
+        }).first {
+            return .refused(.guarded(enemyID: guardian.id))
+        }
+        guard definition.contents.yields.allSatisfy({ resource, amount in
+            amount > 0 && ContentCatalog.shared.resource(resource) != nil
+        }), definition.contents.items.allSatisfy({ itemID in
+            GearCatalogueDispositionRules.makeAcquiredStack(
+                id: InstanceID(rawValue: 1), catalogID: itemID, route: .authoredSite) != nil
+        }), definition.contents.teaches.allSatisfy({ ContentCatalog.shared.symbol($0) != nil }),
+        definition.contents.teachesFocuses.allSatisfy({
+            ContentCatalog.shared.pressureSource($0) != nil
+        }), definition.contents.essence >= 0,
+        definition.contents.guardian.map({ ContentCatalog.shared.creature($0) != nil }) ?? true
+        else { return .refused(.invalidAuthoredContents) }
+        return .available(.init(
+            worldRunID: "\(run.runIndex):\(run.mapSeed)", turnBefore: run.turnsTaken,
+            position: run.playerPosition, tile: run.map[run.playerPosition], site: site,
+            definition: definition))
+    }
+
     /// Searches the site under the player. One turn per pull, like harvesting — a site is worth
     /// walking to *and* worth standing still for.
     ///
     /// Contents land only on the turn the search completes, so a force-quit part-way through
     /// resumes mid-search with nothing yet granted and nothing lost (pillar 2).
-    static func searchSite(in state: inout GameState) -> [Event] {
-        guard var run = state.worlds.activeRun,
-              case .site(let instance) = run.map[run.playerPosition].content,
-              let index = run.sites.firstIndex(where: { $0.id == instance }),
-              !run.sites[index].isLooted
-        else { return [.blocked("Nothing here to search.")] }
-
-        guard !run.enemies.contains(where: { $0.position == run.playerPosition }) else {
-            return [.blocked("Not while that's standing over you.")]
-        }
-
-        if let definition = run.sites[index].definition {
-            guard definition.contents.items.allSatisfy({ itemID in
-                GearCatalogueDispositionRules.makeAcquiredStack(
-                    id: InstanceID(rawValue: 1), catalogID: itemID, route: .authoredSite) != nil
-            }) else { return [.blocked("This site's authored contents are invalid.")] }
-        }
+    static func commitSiteSearch(_ quote: SiteSearchQuoteV1,
+                                 in state: inout GameState) -> SiteSearchCommitOutcomeV1 {
+        guard case .available(let current) = evaluateSiteSearch(in: state), current == quote,
+              var run = state.worlds.activeRun,
+              let index = run.sites.firstIndex(where: { $0.id == quote.site.id })
+        else { return .init(result: .refused(.stale), events: []) }
 
         run.sites[index].searchTurnsRemaining -= 1
         let site = run.sites[index]
@@ -980,7 +1064,20 @@ enum WorldRules {
 
         state.worlds.activeRun = run
         events.append(contentsOf: advanceTurn(in: &state))
-        return events
+        return .init(result: .committed, events: events)
+    }
+
+    static func searchSite(in state: inout GameState) -> [Event] {
+        switch evaluateSiteSearch(in: state) {
+        case .refused(let refusal):
+            return [.blocked(siteSearchPlayerCopy(for: refusal))]
+        case .available(let quote):
+            let outcome = commitSiteSearch(quote, in: &state)
+            switch outcome.result {
+            case .committed: return outcome.events
+            case .refused(let refusal): return [.blocked(siteSearchPlayerCopy(for: refusal))]
+            }
+        }
     }
 
     private static func recoverSiteTeaching(_ id: RecoveredTeachingID, run: WorldRun,

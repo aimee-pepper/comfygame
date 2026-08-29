@@ -531,13 +531,12 @@ extension GameStore {
 
     /// The site under the player, if there's one still worth searching.
     var searchableHere: PlacedSite? {
-        guard let run = activeRun,
-              case .site(let instance) = tileUnderPlayer?.content,
-              let site = run.sites.first(where: { $0.id == instance }),
-              site.definition?.providesNaturalAnchor != true,
-              !site.isLooted
-        else { return nil }
-        return site
+        guard case .available(let quote) = siteSearchEvaluation else { return nil }
+        return quote.site
+    }
+
+    var siteSearchEvaluation: WorldRules.SiteSearchEvaluationV1 {
+        WorldRules.evaluateSiteSearch(in: state)
     }
 
     /// Loot that wouldn't fit and is waiting on a decision.
@@ -897,14 +896,33 @@ extension GameStore {
     }
 
     /// One turn of searching the site underfoot. Contents land on the turn it completes.
-    func searchSite() {
-        guard searchableHere != nil, activeRun?.activeEncounter == nil else { return }
-        guard let attempt = beginWorldFieldAttempt(.searchSite) else { return }
-        var events: [WorldRules.Event] = []
-        mutate("search site", flush: true, scope: .expedition) { state in
-            events = WorldRules.searchSite(in: &state)
+    @discardableResult
+    func searchSite(_ admittedQuote: WorldRules.SiteSearchQuoteV1? = nil)
+        -> WorldRules.SiteSearchCommitResultV1 {
+        let quote: WorldRules.SiteSearchQuoteV1
+        if let admittedQuote {
+            quote = admittedQuote
+        } else {
+            guard case .available(let current) = siteSearchEvaluation else {
+                if case .refused(let refusal) = siteSearchEvaluation { return .refused(refusal) }
+                return .refused(.stale)
+            }
+            quote = current
         }
+        guard let attempt = beginWorldFieldAttempt(.searchSite) else { return .refused(.stale) }
+        var events: [WorldRules.Event] = []
+        var result: WorldRules.SiteSearchCommitResultV1 = .refused(.stale)
+        let published = mutateIf("search site", flush: true, scope: .expedition) { state in
+            let outcome = WorldRules.commitSiteSearch(quote, in: &state)
+            result = outcome.result
+            guard case .committed = result else { return false }
+            events = outcome.events
+            return true
+        }
+        guard published else { return result }
         finishTurn(events, attempt: attempt)
+        refreshWorldFieldContext()
+        return .committed
     }
 
     var canSurvey: Bool {

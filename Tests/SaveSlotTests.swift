@@ -259,6 +259,47 @@ final class SaveSlotTests: XCTestCase {
         XCTAssertFalse(store.diagnostics.hasPendingWrite)
     }
 
+    @MainActor
+    func testSiteSearchGuardianRefusalPreservesRealSlotAndContextBytes() async throws {
+        let root = directory(); defer { try? FileManager.default.removeItem(at: root) }
+        let slots = SaveSlotFileIO(directory: root)
+        let definition = try XCTUnwrap(ContentCatalog.shared.site("wayfarers_camp"))
+        let point = GridPoint(x: 1, y: 1)
+        var map = WorldMap(width: 3, height: 3,
+                           tiles: Array(repeating: Tile(isRevealed: true), count: 9), entry: point)
+        let site = PlacedSite(id: .init(rawValue: 84_001), siteID: definition.id,
+                              position: point,
+                              searchTurnsRemaining: definition.contents.searchTurns)
+        map[point].content = .site(site.id)
+        let guardian = WorldEnemy(id: .init(rawValue: 84_002), creatureID: "paper_moth",
+                                  position: point)
+        var state = GameState.newGame()
+        state.worlds.activeRun = WorldRun(
+            runIndex: 84, book: .init(written: [], essencePaid: 0), mapSeed: 84_001,
+            rng: .init(seed: 84_001), map: map, playerPosition: point,
+            enemies: [guardian], sites: [site])
+        let created = try await slots.create(name: "Site search refusal", state: state)
+        _ = try await slots.acquireWriterLease(for: created.metadata.id)
+        let store = GameStore(io: try await slots.payloadIOForLeasedSlot())
+        let url = try await slots.exportURL(for: created.metadata.id)
+        let envelope = try Data(contentsOf: url)
+        let stateBefore = store.state
+        let bytes = try SaveCodec.encode(store.state)
+        let diagnostics = store.diagnostics
+        let context = store.worldFieldContext
+
+        XCTAssertEqual(store.searchSite(), .refused(.guarded(enemyID: guardian.id)))
+        XCTAssertEqual(store.state, stateBefore)
+        XCTAssertEqual(try SaveCodec.encode(store.state), bytes)
+        XCTAssertEqual(try Data(contentsOf: url), envelope)
+        XCTAssertEqual(store.diagnostics.writeCount, diagnostics.writeCount)
+        XCTAssertEqual(store.diagnostics.savedMutationCount, diagnostics.savedMutationCount)
+        XCTAssertEqual(store.diagnostics.hasPendingWrite, diagnostics.hasPendingWrite)
+        XCTAssertEqual(store.worldFieldContext, context)
+        XCTAssertEqual(context?.interactionState,
+                       .unavailable(reason: "Not while something is standing over you."))
+    }
+
     private func currentEncounterState() throws -> GameState {
         var state = GameState.newGame()
         let point = GridPoint(x: 0, y: 0)
