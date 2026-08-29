@@ -3,6 +3,111 @@ import XCTest
 
 /// The interruptibility pillar, tested. Anything that breaks here breaks pillar 2.
 final class PersistenceTests: XCTestCase {
+    @MainActor
+    private func authoredStarterPromisedGearState() throws -> GameState {
+        let store = GameStore(io: .temporary(name: "starter-promised-gear-\(UUID().uuidString)"))
+        store.mutate("test: fund authored starter") { $0.base.essence = 1_000 }
+        XCTAssertTrue(store.bindAndDepart(
+            worldPageInstanceID: WorldPageCatalog.starterInstances[0].id))
+        let expectedID = StarterKnownFindPlacementRules.stableInstanceID(
+            for: try XCTUnwrap(store.activeRun?.book.worldPageUseReceipt))
+        XCTAssertTrue(store.activeRun?.map.tiles.contains(where: {
+            guard case .item(let stack) = $0.content else { return false }
+            return stack.id == expectedID && stack.gearProfile?.stableInstanceID == expectedID
+        }) == true)
+        return store.state
+    }
+
+    private func mutatingFirstGameplayFacts(
+        in data: Data, _ mutation: (inout [String: Any]) -> Void
+    ) throws -> Data {
+        var root = try XCTUnwrap(JSONSerialization.jsonObject(with: data) as? [String: Any])
+        func mutate(_ value: Any) -> (Any, Bool) {
+            if var array = value as? [Any] {
+                for index in array.indices {
+                    let result = mutate(array[index])
+                    array[index] = result.0
+                    if result.1 { return (array, true) }
+                }
+                return (array, false)
+            }
+            guard var object = value as? [String: Any] else { return (value, false) }
+            if var profile = object["gearProfile"] as? [String: Any],
+               var facts = profile["gameplayFacts"] as? [String: Any] {
+                mutation(&facts)
+                profile["gameplayFacts"] = facts
+                object["gearProfile"] = profile
+                return (object, true)
+            }
+            for key in object.keys.sorted() {
+                let result = mutate(object[key] as Any)
+                object[key] = result.0
+                if result.1 { return (object, true) }
+            }
+            return (object, false)
+        }
+        let result = mutate(root)
+        root = try XCTUnwrap(result.0 as? [String: Any])
+        XCTAssertTrue(result.1)
+        return try JSONSerialization.data(withJSONObject: root, options: [.sortedKeys])
+    }
+
+    @MainActor
+    func testAuthoredStarterPromisedGearOptionalFactsRoundTripAndRelaunch() throws {
+        let state = try authoredStarterPromisedGearState()
+        let bytes = try SaveCodec.encode(state)
+        let root = try XCTUnwrap(JSONSerialization.jsonObject(with: bytes) as? [String: Any])
+        var foundFacts: [String: Any]?
+        func inspect(_ value: Any) {
+            if let array = value as? [Any] { array.forEach(inspect); return }
+            guard let object = value as? [String: Any] else { return }
+            if let profile = object["gearProfile"] as? [String: Any],
+               let facts = profile["gameplayFacts"] as? [String: Any] { foundFacts = facts }
+            object.values.forEach(inspect)
+        }
+        inspect(root)
+        let facts = try XCTUnwrap(foundFacts)
+        XCTAssertNil(facts["specialRule"])
+        XCTAssertNil(facts["toolCapability"])
+        XCTAssertNil(facts["initiativeModifier"])
+        XCTAssertNil(facts["heatWard"])
+        XCTAssertNil(facts["valueModifier"])
+        XCTAssertNil(facts["appliedContributionIDs"])
+        let decoded = try SaveCodec.decode(bytes)
+        let reencoded = try SaveCodec.encode(decoded)
+        let redecode = try SaveCodec.decode(reencoded)
+        XCTAssertEqual(redecode, decoded)
+
+        let io = SaveFileIO.temporary(name: "starter-promised-relaunch-\(UUID().uuidString)")
+        try io.write(reencoded)
+        let relaunched = GameStore(io: io)
+        XCTAssertEqual(relaunched.state, redecode)
+        XCTAssertEqual(try Data(contentsOf: io.saveURL), reencoded)
+    }
+
+    @MainActor
+    func testCurrentGearGameplayFactShapeRejectsMalformedRawBytesWithoutMutation() throws {
+        let valid = try SaveCodec.encode(authoredStarterPromisedGearState())
+        let mutations: [(String, (inout [String: Any]) -> Void)] = [
+            ("omitted required", { $0.removeValue(forKey: "sourceRevisionDigest") }),
+            ("wrong optional type", { $0["specialRule"] = 7 }),
+            ("malformed optional payload", { $0["toolCapability"] = ["rank": 1] }),
+            ("contradictory identity", { $0["stableGearID"] = ["rawValue": 9_999_991] }),
+            ("partial contribution tuple", { $0["initiativeModifier"] = -1 })
+        ]
+        for (name, mutation) in mutations {
+            let bytes = try mutatingFirstGameplayFacts(in: valid, mutation)
+            let original = bytes
+            XCTAssertThrowsError(try SaveCodec.decode(bytes), name)
+            XCTAssertEqual(bytes, original, name)
+
+            let io = SaveFileIO.temporary(name: "invalid-gear-facts-\(name)-\(UUID().uuidString)")
+            try io.write(bytes)
+            XCTAssertNil(io.load().state, name)
+            XCTAssertEqual(try Data(contentsOf: io.saveURL), bytes, name)
+        }
+    }
+
     private func currentRosterPlacementState() -> GameState {
         var state = GameState.newGame()
         var keeper = CompanionState()

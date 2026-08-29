@@ -2,6 +2,81 @@ import XCTest
 @testable import Bookbinder
 
 final class SaveSlotTests: XCTestCase {
+    @MainActor
+    private func authoredStarterPromisedGearState() throws -> GameState {
+        let store = GameStore(io: .temporary(name: "slot-starter-gear-\(UUID().uuidString)"))
+        store.mutate("test: fund authored starter") { $0.base.essence = 1_000 }
+        XCTAssertTrue(store.bindAndDepart(
+            worldPageInstanceID: WorldPageCatalog.starterInstances[0].id))
+        return store.state
+    }
+
+    private func mutatingFirstGameplayFacts(
+        in data: Data, _ mutation: (inout [String: Any]) -> Void
+    ) throws -> Data {
+        let root = try XCTUnwrap(JSONSerialization.jsonObject(with: data))
+        func mutate(_ value: Any) -> (Any, Bool) {
+            if var array = value as? [Any] {
+                for index in array.indices {
+                    let result = mutate(array[index]); array[index] = result.0
+                    if result.1 { return (array, true) }
+                }
+                return (array, false)
+            }
+            guard var object = value as? [String: Any] else { return (value, false) }
+            if var profile = object["gearProfile"] as? [String: Any],
+               var facts = profile["gameplayFacts"] as? [String: Any] {
+                mutation(&facts); profile["gameplayFacts"] = facts
+                object["gearProfile"] = profile
+                return (object, true)
+            }
+            for key in object.keys.sorted() {
+                let result = mutate(object[key] as Any); object[key] = result.0
+                if result.1 { return (object, true) }
+            }
+            return (object, false)
+        }
+        let result = mutate(root)
+        XCTAssertTrue(result.1)
+        return try JSONSerialization.data(withJSONObject: result.0, options: [.sortedKeys])
+    }
+
+    @MainActor
+    func testAuthoredStarterPromisedGearRealSlotRoundTripAndMalformedFactsPreserveEnvelope()
+        async throws {
+        let root = directory()
+        defer { try? FileManager.default.removeItem(at: root) }
+        let slots = SaveSlotFileIO(directory: root)
+        let state = try authoredStarterPromisedGearState()
+        let created = try await slots.create(name: "Starter promised gear", state: state)
+        let url = try await slots.exportURL(for: created.metadata.id)
+        let validBytes = try Data(contentsOf: url)
+        let validEnvelope = try SaveCodec.makeDecoder().decode(
+            SaveSlotEnvelope.self, from: validBytes)
+        let canonicalState = try SaveCodec.decode(validEnvelope.payload)
+        let loaded = try await slots.load(created.metadata.id).state
+        XCTAssertEqual(loaded, canonicalState)
+        XCTAssertEqual(try Data(contentsOf: url), validBytes)
+
+        let mutations: [(String, (inout [String: Any]) -> Void)] = [
+            ("omitted required", { $0.removeValue(forKey: "sourceRevisionDigest") }),
+            ("wrong optional type", { $0["damageKind"] = 44 }),
+            ("malformed optional payload", { $0["specialRule"] = ["rule": "unknown"] }),
+            ("contradictory facts", { $0["constructionTier"] = 999 }),
+            ("partial contribution tuple", { $0["heatWard"] = 10 })
+        ]
+        for (name, mutation) in mutations {
+            var envelope = validEnvelope
+            envelope.payload = try mutatingFirstGameplayFacts(
+                in: validEnvelope.payload, mutation)
+            let bytes = try encoder().encode(envelope)
+            try bytes.write(to: url, options: .atomic)
+            do { _ = try await slots.load(created.metadata.id); XCTFail("accepted \(name)") }
+            catch { }
+            XCTAssertEqual(try Data(contentsOf: url), bytes, name)
+        }
+    }
+
     private func firstReturnTutorialSlotState() -> GameState {
         var state = GameState.newGame()
         state.reality.library.foundWritings = [

@@ -486,15 +486,26 @@ enum Migrations {
             "initiativeModifier", "heatWard", "valueModifier", "appliedContributionIDs"
         ])
         func validateGameplayFacts(_ value: Any) throws {
-            guard let facts = value as? [String: Any],
-                  Set(facts.keys) == gameplayFactKeys || Set(facts.keys) == componentEffectFactKeys,
+            let nullableFactKeys: Set<String> = ["damageKind", "specialRule", "toolCapability"]
+            let contributionKeys: Set<String> = [
+                "initiativeModifier", "heatWard", "valueModifier", "appliedContributionIDs"
+            ]
+            let requiredKeys = gameplayFactKeys.subtracting(nullableFactKeys)
+            guard let facts = value as? [String: Any] else {
+                throw CocoaError(.coderInvalidValue)
+            }
+            let keys = Set(facts.keys)
+            guard requiredKeys.isSubset(of: keys), keys.isSubset(of: componentEffectFactKeys),
+                  keys.intersection(contributionKeys).isEmpty
+                    || contributionKeys.isSubset(of: keys),
+                  nullableFactKeys.allSatisfy({ facts[$0].map { !($0 is NSNull) } ?? true }),
                   try exactInt(facts["version"]) == 1,
                   let digest = facts["sourceRevisionDigest"] as? String,
                   digest.count == 64,
                   digest.allSatisfy({ $0.isHexDigit && !$0.isUppercase }) else {
                 throw CocoaError(.coderInvalidValue)
             }
-            if Set(facts.keys) == componentEffectFactKeys {
+            if contributionKeys.isSubset(of: keys) {
                 guard let initiative = try? exactInt(facts["initiativeModifier"]),
                       (-1...0).contains(initiative),
                       let ward = try? exactInt(facts["heatWard"]),
