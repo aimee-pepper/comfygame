@@ -882,8 +882,9 @@ final class WorldTests: XCTestCase {
         for lesson in TutorialLessonID.allCases {
             store.completeTutorial(lesson, fact: "visual_fixture")
         }
+        store.mutate("test: fund authored starter bind") { $0.base.essence = 1_000 }
         XCTAssertTrue(store.bindAndDepart(
-            worldPageInstanceID: WorldPageCatalog.earthlikeTestInstance.id),
+            worldPageInstanceID: WorldPageCatalog.starterInstances[0].id),
             "evidence must exercise a real bound world with its production terrain receipt")
         store.mutate("test: exploration final art") { saved in
             guard var run = saved.worlds.activeRun else { return }
@@ -948,8 +949,9 @@ final class WorldTests: XCTestCase {
         for lesson in TutorialLessonID.allCases {
             store.completeTutorial(lesson, fact: "loose_essence_visual_fixture")
         }
+        store.mutate("test: fund authored starter bind") { $0.base.essence = 1_000 }
         XCTAssertTrue(store.bindAndDepart(
-            worldPageInstanceID: WorldPageCatalog.earthlikeTestInstance.id))
+            worldPageInstanceID: WorldPageCatalog.starterInstances[0].id))
         let arrivalID = try XCTUnwrap(store.state.worlds.pendingWorldArrivalReceiptID)
         XCTAssertTrue(store.enterPendingWorld(arrivalReceiptID: arrivalID))
         store.mutate("test mounted Loose Raw Essence", flush: true) { state in
@@ -2398,8 +2400,9 @@ final class WorldTests: XCTestCase {
         for lesson in TutorialLessonID.allCases {
             store.completeTutorial(lesson, fact: "mining_local_rise_visual_fixture")
         }
+        store.mutate("test: fund authored starter bind") { $0.base.essence = 1_000 }
         XCTAssertTrue(store.bindAndDepart(
-            worldPageInstanceID: WorldPageCatalog.earthlikeTestInstance.id))
+            worldPageInstanceID: WorldPageCatalog.starterInstances[0].id))
         let arrivalID = try XCTUnwrap(store.state.worlds.pendingWorldArrivalReceiptID)
         XCTAssertTrue(store.enterPendingWorld(arrivalReceiptID: arrivalID))
         store.mutate("test mounted mining", flush: true) { state in
@@ -2466,8 +2469,9 @@ final class WorldTests: XCTestCase {
             for lesson in TutorialLessonID.allCases {
                 store.completeTutorial(lesson, fact: "world_mining_asset_evidence")
             }
+            store.mutate("test: fund authored starter bind") { $0.base.essence = 1_000 }
             XCTAssertTrue(store.bindAndDepart(
-                worldPageInstanceID: WorldPageCatalog.earthlikeTestInstance.id))
+                worldPageInstanceID: WorldPageCatalog.starterInstances[0].id))
             let arrivalID = try XCTUnwrap(store.state.worlds.pendingWorldArrivalReceiptID)
             XCTAssertTrue(store.enterPendingWorld(arrivalReceiptID: arrivalID))
             store.mutate("test: actual production mining evidence", flush: true) { state in

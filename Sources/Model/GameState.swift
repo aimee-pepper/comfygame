@@ -102,6 +102,12 @@ struct GameState: Codable, Equatable, Sendable {
                 throw CocoaError(.coderInvalidValue)
             }
         }
+        if schemaVersion >= 20 {
+            guard !base.collectedWorldPages.contains(where: {
+                $0.id == LegacyDebugVisibilityWorldV19.instanceID
+                    || $0.definition.id == LegacyDebugVisibilityWorldV19.definitionID
+            }) else { throw CocoaError(.coderInvalidValue) }
+        }
         if schemaVersion >= 4 {
             let runs = [worlds.activeRun].compactMap { $0 } + worlds.anchoredRealms.map(\.world)
             for run in runs {

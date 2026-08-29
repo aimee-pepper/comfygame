@@ -761,34 +761,21 @@ extension GameStore {
     /// A progressed campaign is marked reconciled without receiving retroactive physical stock.
     func reconcileStarterWorldPageBundle() {
         guard state.worlds.activeRun == nil else { return }
-        let earth = WorldPageCatalog.earthlikeTestInstance
-        let earthMatches = state.base.collectedWorldPages.filter {
-            $0.id == earth.id || $0.definition.id == earth.definition.id
-        }
-        let needsEarth = earthMatches != [earth]
-        guard needsEarth || !state.base.starterWorldPageBundleFulfilled else { return }
+        guard !state.base.starterWorldPageBundleFulfilled else { return }
         mutate("reconcile starter World Pages", flush: true) { state in
-            if needsEarth {
-                state.base.collectedWorldPages.removeAll {
-                    $0.id == earth.id || $0.definition.id == earth.definition.id
-                }
-                state.base.collectedWorldPages.append(earth)
+            let mayAdopt = state.worlds.runIndex == 0
+                && state.worlds.activeRun == nil
+                && state.reality.library.visitedWorlds.isEmpty
+                && state.reality.visitedWorldSeeds.isEmpty
+                && state.reality.library.foundPages.isEmpty
+                && state.reality.library.foundWritings.isEmpty
+                && state.reality.library.foundTravellers.isEmpty
+                && state.reality.lifetime.runsStarted == 0
+                && state.base.collectedWorldPages.isEmpty
+            if mayAdopt {
+                state.base.collectedWorldPages = WorldPageCatalog.starterInstances
             }
-            if !state.base.starterWorldPageBundleFulfilled {
-                let mayAdopt = state.worlds.runIndex == 0
-                    && state.worlds.activeRun == nil
-                    && state.reality.library.visitedWorlds.isEmpty
-                    && state.reality.visitedWorldSeeds.isEmpty
-                    && state.reality.library.foundPages.isEmpty
-                    && state.reality.library.foundWritings.isEmpty
-                    && state.reality.library.foundTravellers.isEmpty
-                    && state.reality.lifetime.runsStarted == 0
-                    && state.base.collectedWorldPages == [earth]
-                if mayAdopt {
-                    state.base.collectedWorldPages = WorldPageCatalog.starterInstances + [earth]
-                }
-                state.base.starterWorldPageBundleFulfilled = true
-            }
+            state.base.starterWorldPageBundleFulfilled = true
         }
     }
 
@@ -1114,7 +1101,7 @@ extension GameStore {
             // the one consumed here. World generation and visual resolution use isolated streams.
             precondition(state.worlds.seeds.nextSeed() == reservedCampaignSeed,
                          "Bind seed changed inside one synchronous commitment")
-            if let selectedIndex, selectedWorldPage?.definition.disposition.isReusable != true {
+            if let selectedIndex {
                 state.base.collectedWorldPages.remove(at: selectedIndex)
             }
             state.reality.library.applyTravellerArrival(world.diagnostics.travellerArrival)

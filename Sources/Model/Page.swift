@@ -885,13 +885,15 @@ enum WorldPageCatalog {
                         baseWeightMultiplier: 0.35)
     ]
     // END GENERATED STARTER WORLD PAGES
+}
 
-    /// A stable, ordinary-campaign control page for repeatedly checking World presentation and
-    /// traversal. Unlike physical finds it is never consumed by a successful bind.
-    static let earthlikeTestID: WorldPageDefinitionID = "earthlike_test_world"
-    static let earthlikeTestInstanceID = InstanceID(rawValue: 0x5750_0000_0000_00EE)
-    static let earthlikeTestDefinition = WorldPageDefinition(
-        id: earthlikeTestID,
+/// Frozen schema-19 migration truth. It is deliberately outside `WorldPageCatalog`, so production
+/// collection, projection and bind rules cannot resolve or newly grant this DEBUG-only fixture.
+enum LegacyDebugVisibilityWorldV19 {
+    static let definitionID: WorldPageDefinitionID = "earthlike_test_world"
+    static let instanceID = InstanceID(rawValue: 0x5750_0000_0000_00EE)
+    static let definition = WorldPageDefinition(
+        id: definitionID,
         title: "Earth-like Test World",
         disposition: .reusable,
         provenance: "A permanent reference page for testing an ordinary living world.",
@@ -930,15 +932,17 @@ enum WorldPageCatalog {
         seed: 101,
         promise: "Ordinary daylight and clear calm air, with deliberately limited plant and animal growth for visibility testing."
     )
-    static let earthlikeTestInstance = WorldPageInstance(
-        id: earthlikeTestInstanceID, definition: earthlikeTestDefinition, inspected: true)
+    static let instance = WorldPageInstance(
+        id: instanceID, definition: definition, inspected: true)
+}
 
+extension WorldPageCatalog {
     static func definition(_ id: WorldPageDefinitionID) -> WorldPageDefinition? {
         definitions.first { $0.id == id }
     }
 
     static var definitions: [WorldPageDefinition] {
-        starterDefinitions + [earthlikeTestDefinition] + repeatableDefinitions
+        starterDefinitions + repeatableDefinitions
     }
 
     private static func definition(

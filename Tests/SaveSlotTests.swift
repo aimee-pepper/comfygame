@@ -77,6 +77,62 @@ final class SaveSlotTests: XCTestCase {
         }
     }
 
+    private func schemaNineteenEarthSlotState() -> GameState {
+        var state = GameState.newGame()
+        state.schemaVersion = 19
+        state.base.collectedWorldPages.append(LegacyDebugVisibilityWorldV19.instance)
+        return state
+    }
+
+    func testSchemaNineteenEarthSlotMigratesReadOnlyAndMalformedCopiesPreserveEnvelope() async throws {
+        let root = directory()
+        defer { try? FileManager.default.removeItem(at: root) }
+        let slots = SaveSlotFileIO(directory: root)
+        let created = try await slots.create(name: "Legacy DEBUG Earth")
+        let url = try await slots.exportURL(for: created.metadata.id)
+        var envelope = try SaveCodec.makeDecoder().decode(
+            SaveSlotEnvelope.self, from: Data(contentsOf: url))
+        envelope.payload = try SaveCodec.encode(schemaNineteenEarthSlotState())
+        let validEnvelope = try SaveCodec.makeEncoder().encode(envelope)
+        try validEnvelope.write(to: url, options: .atomic)
+
+        let loaded = try await slots.load(created.metadata.id).state
+        XCTAssertEqual(loaded.schemaVersion, 20)
+        XCTAssertEqual(loaded.base.collectedWorldPages, WorldPageCatalog.starterInstances)
+        XCTAssertEqual(try Data(contentsOf: url), validEnvelope)
+
+        let mutations: [(String, (inout [[String: Any]]) -> Void)] = [
+            ("duplicate", { $0.append($0.last!) }),
+            ("alias instance", { $0[$0.count - 1]["id"] = 91_919 }),
+            ("reserved ID alias definition", {
+                var definition = $0[$0.count - 1]["definition"] as! [String: Any]
+                definition["id"] = "starter_open_meadow"
+                $0[$0.count - 1]["definition"] = definition
+            }),
+            ("tampered definition", {
+                var definition = $0[$0.count - 1]["definition"] as! [String: Any]
+                definition["promise"] = "tampered"
+                $0[$0.count - 1]["definition"] = definition
+            })
+        ]
+        for (name, mutation) in mutations {
+            var malformed = envelope
+            var payload = try XCTUnwrap(JSONSerialization.jsonObject(
+                with: envelope.payload) as? [String: Any])
+            var base = try XCTUnwrap(payload["base"] as? [String: Any])
+            var pages = try XCTUnwrap(base["collectedWorldPages"] as? [[String: Any]])
+            mutation(&pages)
+            base["collectedWorldPages"] = pages; payload["base"] = base
+            malformed.payload = try JSONSerialization.data(
+                withJSONObject: payload, options: [.sortedKeys])
+            let malformedEnvelope = try SaveCodec.makeEncoder().encode(malformed)
+            try malformedEnvelope.write(to: url, options: .atomic)
+            do { _ = try await slots.load(created.metadata.id); XCTFail("accepted \(name)") }
+            catch { }
+            XCTAssertEqual(try Data(contentsOf: url), malformedEnvelope, name)
+        }
+    }
+
     private func firstReturnTutorialSlotState() -> GameState {
         var state = GameState.newGame()
         state.reality.library.foundWritings = [
@@ -349,7 +405,7 @@ final class SaveSlotTests: XCTestCase {
         try originalBytes.write(to: url, options: .atomic)
 
         let loaded = try await slots.load(created.metadata.id).state
-        XCTAssertEqual(loaded.schemaVersion, 19)
+        XCTAssertEqual(loaded.schemaVersion, Tuning.saveSchemaVersion)
         XCTAssertEqual(loaded.worlds.pendingExpeditionReview?.summary.custodyReceiptVersion, 0)
         guard case .uniqueItem(let migrated) = loaded.worlds.pendingExpeditionReview?
             .summary.lostLines.first else { return XCTFail("legacy lost gear missing") }

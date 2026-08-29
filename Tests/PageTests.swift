@@ -10,6 +10,11 @@ import XCTest
 /// sits never changes what it says — and **refinement is literacy, not power** — a better hand lets
 /// you say the same thing in less space and never unlocks a meaning.
 final class PageTests: XCTestCase {
+    @MainActor
+    private func fundAuthoredStarterBind(_ store: GameStore) {
+        store.mutate("test: fund authored starter bind") { $0.base.essence = 1_000 }
+    }
+
     func testNativeWorldArrivalRendererMatchesAllAcceptedCorpusCasesByteForByte() throws {
         struct Corpus: Decodable {
             struct Canvas: Decodable { var width: Int; var height: Int }
@@ -190,8 +195,9 @@ final class PageTests: XCTestCase {
     func testMountedWorldSplashPreparesExactDestinationWithoutSaveOrTurnMutation() throws {
         let io = SaveFileIO.temporary(name: "world-preload-mounted-\(UUID().uuidString)")
         let store = GameStore(io: io)
+        fundAuthoredStarterBind(store)
         XCTAssertTrue(store.bindAndDepart(
-            worldPageInstanceID: WorldPageCatalog.earthlikeTestInstance.id))
+            worldPageInstanceID: WorldPageCatalog.starterInstances[0].id))
         let receipt = try XCTUnwrap(store.state.worlds.pendingWorldArrivalReceipt)
         let run = try XCTUnwrap(store.activeRun)
         let beforeBytes = try SaveCodec.encode(store.state)
@@ -264,8 +270,9 @@ final class PageTests: XCTestCase {
     func testWorldDestinationPreparationIsTransientAndDeterministicAcrossRelaunch() throws {
         let io = SaveFileIO.temporary(name: "world-preload-relaunch-\(UUID().uuidString)")
         var store: GameStore? = GameStore(io: io)
+        if let store { fundAuthoredStarterBind(store) }
         XCTAssertTrue(store?.bindAndDepart(
-            worldPageInstanceID: WorldPageCatalog.earthlikeTestInstance.id) == true)
+            worldPageInstanceID: WorldPageCatalog.starterInstances[0].id) == true)
         let before = try XCTUnwrap(store?.activeRun)
         let beforeState = try XCTUnwrap(store?.state)
         let beforeRequest = WorldDestinationPreloader.request(
@@ -379,8 +386,9 @@ final class PageTests: XCTestCase {
             }
         }
         let store = GameStore(io: .temporary(name: "arrival-layout-\(UUID().uuidString)"))
+        fundAuthoredStarterBind(store)
         XCTAssertTrue(store.bindAndDepart(
-            worldPageInstanceID: WorldPageCatalog.earthlikeTestInstance.id))
+            worldPageInstanceID: WorldPageCatalog.starterInstances[0].id))
         var receipt = try XCTUnwrap(store.state.worlds.pendingWorldArrivalReceipt)
         receipt.sourcePagePhysicalReceipt.title =
             "The Exceptionally Long Chronicle of the Rain-Washed Archipelago Beyond the Stone Horizon"
@@ -594,9 +602,7 @@ final class PageTests: XCTestCase {
         enum Fixture: String, CaseIterable { case staleHash, duplicateID }
 
         for fixture in Fixture.allCases {
-            var selected = try XCTUnwrap(WorldPageCatalog.starterInstances.first {
-                $0.definition.id != WorldPageCatalog.earthlikeTestInstance.definition.id
-            })
+            var selected = try XCTUnwrap(WorldPageCatalog.starterInstances.first)
             selected.id = InstanceID(rawValue: 9_000_001)
             let store = GameStore(io: .temporary(
                 name: "writing-invalid-\(fixture.rawValue)-\(UUID().uuidString)"))
@@ -609,11 +615,10 @@ final class PageTests: XCTestCase {
                 case .staleHash:
                     var stale = selected
                     stale.definition.title += " stale"
-                    state.base.collectedWorldPages = WorldPageCatalog.starterInstances
-                        + [WorldPageCatalog.earthlikeTestInstance, stale]
+                    state.base.collectedWorldPages = WorldPageCatalog.starterInstances + [stale]
                 case .duplicateID:
                     state.base.collectedWorldPages = WorldPageCatalog.starterInstances
-                        + [WorldPageCatalog.earthlikeTestInstance, selected, selected]
+                        + [selected, selected]
                 }
                 state.base.starterWorldPageBundleFulfilled = true
             }
@@ -927,60 +932,40 @@ final class PageTests: XCTestCase {
                       "a previously selected Template must not become the next ordinary visit")
     }
     @MainActor
-    func testEarthlikeTestWorldIsPermanentAndAddedToExistingCampaigns() throws {
-        let earth = WorldPageCatalog.earthlikeTestInstance
-        XCTAssertEqual(earth.definition.id, "earthlike_test_world")
-        XCTAssertEqual(earth.definition.disposition, .reusable)
-        XCTAssertEqual(earth.definition.worldPageCost, 0)
-        XCTAssertEqual(earth.definition.seed, 101)
-        XCTAssertEqual(Set(earth.definition.page.symbolIDs),
-                       Set(["plains", "archipelago", "common_ore"]))
-        let earthReadings = BookRules.readings(
-            for: BookRules.resolveBook(worldPage: earth), seed: earth.definition.seed)
-        XCTAssertEqual(earthReadings["illumination"].peak, 60.36, accuracy: 0.0001)
-        XCTAssertEqual(earthReadings["atmosphere"].peak, 51)
-        XCTAssertEqual(earthReadings["atmosphere"].aspect("clarity"), 78)
-        XCTAssertLessThanOrEqual(earthReadings["vitality"].peak, 30)
-        XCTAssertFalse(
-            DescriptionRules.describe(earthReadings).sentence
-                .localizedCaseInsensitiveContains("want of light"))
-        XCTAssertTrue(earth.inspected)
+    func testDebugVisibilityWorldIsAbsentFromProductionCatalogueAndCannotRebind() throws {
+        XCTAssertNil(WorldPageCatalog.definition(LegacyDebugVisibilityWorldV19.definitionID))
+        XCTAssertFalse(WorldPageCatalog.definitions.contains {
+            $0.id == LegacyDebugVisibilityWorldV19.definitionID
+        })
+        let state = GameState.newGame()
+        XCTAssertEqual(state.base.collectedWorldPages, WorldPageCatalog.starterInstances)
+        XCTAssertFalse(state.base.collectedWorldPages.contains {
+            $0.id == LegacyDebugVisibilityWorldV19.instanceID
+                || $0.definition.id == LegacyDebugVisibilityWorldV19.definitionID
+        })
 
-        let store = GameStore(io: .temporary(name: "earthlike-page-\(UUID().uuidString)"))
-        store.mutate("simulate existing campaign without Earth page", flush: true) {
-            $0.base.collectedWorldPages.removeAll { $0.definition.id == earth.definition.id }
-            $0.base.starterWorldPageBundleFulfilled = true
-        }
-        store.reconcileStarterWorldPageBundle()
-        XCTAssertEqual(store.state.base.collectedWorldPages.filter {
-            $0.definition.id == earth.definition.id
-        }, [earth])
-
-        let essenceBeforeTestDeparture = store.state.base.essence
-        XCTAssertTrue(store.bindAndDepart(worldPageInstanceID: earth.id))
-        XCTAssertEqual(store.state.base.essence, essenceBeforeTestDeparture,
-                       "the reusable testing page must never charge Essence")
-        XCTAssertEqual(store.activeRun?.mapSeed, earth.definition.seed)
-        XCTAssertEqual(store.activeRun?.book.worldPageUseReceipt?.instanceID, earth.id)
-        XCTAssertEqual(store.activeRun?.worldVisualReceipt?.request.atmosphere.medium, "none")
-        XCTAssertEqual(store.activeRun?.worldVisualReceipt?.request.atmosphere.density, 0)
-        let visibility = try XCTUnwrap(store.activeRun.map { WorldRules.visibilityProfile(in: $0) })
-        XCTAssertEqual(visibility.illumination, 60.36, accuracy: 0.0001)
-        XCTAssertEqual(visibility.obscurantDensity, 0)
-        XCTAssertEqual(visibility.fringeWidth, Tuning.Visibility.defaultFringeWidth)
-        let diagnostics = try XCTUnwrap(store.activeRun?.generationDiagnostics)
-        XCTAssertEqual(diagnostics.creatureSpeciesCount, 2)
-        XCTAssertEqual(diagnostics.creatureInstancesPlaced, 1)
-        XCTAssertEqual(diagnostics.floraSpeciesCount, 0)
-        XCTAssertEqual(diagnostics.floraInstancesPlaced, 0)
-        XCTAssertTrue(store.state.base.collectedWorldPages.contains { $0 == earth },
-                      "the permanent Earth-like page must survive every successful bind")
+        let io = SaveFileIO.temporary(name: "debug-earth-isolated-\(UUID().uuidString)")
+        try io.write(SaveCodec.encode(state))
+        let store = GameStore(io: io)
+        let before = try SaveCodec.encode(store.state)
+        let seedBefore = store.state.worlds.seeds
+        let essenceBefore = store.state.base.essenceCrystalCount
+        XCTAssertNil(store.collectedWorldPage(LegacyDebugVisibilityWorldV19.instanceID))
+        XCTAssertNil(store.worldPageProjection(LegacyDebugVisibilityWorldV19.instanceID))
+        XCTAssertFalse(store.bindAndDepart(
+            worldPageInstanceID: LegacyDebugVisibilityWorldV19.instanceID))
+        XCTAssertEqual(try SaveCodec.encode(store.state), before)
+        XCTAssertEqual(store.state.worlds.seeds, seedBefore)
+        XCTAssertEqual(store.state.base.essenceCrystalCount, essenceBefore)
+        XCTAssertNil(store.activeRun)
+        XCTAssertFalse(store.diagnostics.hasPendingWrite)
     }
 
     @MainActor
     func testNewBindFreezesOneArrivalReceiptAcrossRunAndHistoryAndOwnsPendingRoot() throws {
         let store = GameStore(io: .temporary(name: "arrival-receipt-\(UUID().uuidString)"))
-        let earth = WorldPageCatalog.earthlikeTestInstance
+        let earth = WorldPageCatalog.starterInstances[0]
+        fundAuthoredStarterBind(store)
         XCTAssertTrue(store.bindAndDepart(worldPageInstanceID: earth.id))
 
         let runReceipt = try XCTUnwrap(store.activeRun?.worldArrivalReceipt)
@@ -1116,8 +1101,9 @@ final class PageTests: XCTestCase {
     @MainActor
     func testWorldSplashV3MalformedOptionalPayloadsFailClosedWithoutQuarantiningRun() throws {
         let store = GameStore(io: .temporary(name: "splash-v3-fail-closed-\(UUID().uuidString)"))
+        fundAuthoredStarterBind(store)
         XCTAssertTrue(store.bindAndDepart(
-            worldPageInstanceID: WorldPageCatalog.earthlikeTestInstance.id))
+            worldPageInstanceID: WorldPageCatalog.starterInstances[0].id))
         let accepted = try XCTUnwrap(store.activeRun?.worldArrivalReceipt)
         let splash = try XCTUnwrap(accepted.worldSplashReceiptV3)
 
@@ -1445,8 +1431,9 @@ final class PageTests: XCTestCase {
     @MainActor
     func testWorldSplashPlaceholderIsCanonicalOneXAndRetainsMixedRegionalFacts() throws {
         let store = GameStore(io: .temporary(name: "splash-v3-pixels-\(UUID().uuidString)"))
+        fundAuthoredStarterBind(store)
         XCTAssertTrue(store.bindAndDepart(
-            worldPageInstanceID: WorldPageCatalog.earthlikeTestInstance.id))
+            worldPageInstanceID: WorldPageCatalog.starterInstances[0].id))
         let run = try XCTUnwrap(store.activeRun)
         let outer = try XCTUnwrap(run.worldArrivalReceipt)
         let original = try XCTUnwrap(outer.worldSplashReceiptV3)
@@ -2419,8 +2406,9 @@ final class PageTests: XCTestCase {
         XCTAssertEqual(neutralAsh.count, 5)
 
         let store = GameStore(io: .temporary(name: "splash-deposit-palette-\(UUID().uuidString)"))
+        fundAuthoredStarterBind(store)
         XCTAssertTrue(store.bindAndDepart(
-            worldPageInstanceID: WorldPageCatalog.earthlikeTestInstance.id))
+            worldPageInstanceID: WorldPageCatalog.starterInstances[0].id))
         var neutralReceipt = try XCTUnwrap(
             store.activeRun?.worldArrivalReceipt?.worldSplashReceiptV3)
         func band(_ count: Int, _ total: Int) -> WorldSplashReceiptV3.CoverageBand {
@@ -2513,8 +2501,9 @@ final class PageTests: XCTestCase {
     @MainActor
     func testWorldSplashEnvironmentStatesOwnDistinctCommandsAndPixels() throws {
         let store = GameStore(io: .temporary(name: "splash-environment-\(UUID().uuidString)"))
+        fundAuthoredStarterBind(store)
         XCTAssertTrue(store.bindAndDepart(
-            worldPageInstanceID: WorldPageCatalog.earthlikeTestInstance.id))
+            worldPageInstanceID: WorldPageCatalog.starterInstances[0].id))
         let base = try XCTUnwrap(store.activeRun?.worldArrivalReceipt?.worldSplashReceiptV3)
         func variant(_ edit: (inout WorldSplashReceiptV3.EnvironmentProfile) -> Void)
             throws -> WorldSplashReceiptV3 {
@@ -2637,7 +2626,8 @@ final class PageTests: XCTestCase {
     func testWorldArrivalPendingLifecycleSurvivesRelaunchAndEnterIsZeroMutation() throws {
         let io = SaveFileIO.temporary(name: "arrival-relaunch-\(UUID().uuidString)")
         var store: GameStore? = GameStore(io: io)
-        let page = WorldPageCatalog.earthlikeTestInstance
+        let page = WorldPageCatalog.starterInstances[0]
+        if let store { fundAuthoredStarterBind(store) }
         XCTAssertTrue(store?.bindAndDepart(worldPageInstanceID: page.id) == true)
         let receipt = try XCTUnwrap(store?.activeRun?.worldArrivalReceipt)
         let runBefore = store?.activeRun
@@ -2664,8 +2654,9 @@ final class PageTests: XCTestCase {
     func testArrivalOrphansFailOpenDurablyAndRunExitClearsOwnership() throws {
         let io = SaveFileIO.temporary(name: "arrival-orphan-\(UUID().uuidString)")
         var store: GameStore? = GameStore(io: io)
+        if let store { fundAuthoredStarterBind(store) }
         XCTAssertTrue(store?.bindAndDepart(
-            worldPageInstanceID: WorldPageCatalog.earthlikeTestInstance.id) == true)
+            worldPageInstanceID: WorldPageCatalog.starterInstances[0].id) == true)
         store?.mutate("stage mismatched arrival", flush: true, scope: .arrivalLifecycle) {
             $0.worlds.pendingWorldArrivalReceiptID = .init(rawValue: "mismatch")
         }
@@ -2688,8 +2679,9 @@ final class PageTests: XCTestCase {
 
         let invalidIO = SaveFileIO.temporary(name: "arrival-invalid-\(UUID().uuidString)")
         var invalidStore: GameStore? = GameStore(io: invalidIO)
+        if let invalidStore { fundAuthoredStarterBind(invalidStore) }
         XCTAssertTrue(invalidStore?.bindAndDepart(
-            worldPageInstanceID: WorldPageCatalog.earthlikeTestInstance.id) == true)
+            worldPageInstanceID: WorldPageCatalog.starterInstances[0].id) == true)
         invalidStore?.mutate("corrupt persisted arrival", flush: true,
                              scope: .arrivalLifecycle) { state in
             state.worlds.activeRun?.worldArrivalReceipt?.sceneReceipt?.canonicalSHA256 = "bad"
@@ -3510,8 +3502,7 @@ final class PageTests: XCTestCase {
         XCTAssertTrue(definitions.allSatisfy { $0.seed == 0 && $0.disposition.isRandom })
         XCTAssertEqual(WorldPageCatalog.definitions.count,
                        WorldPageCatalog.starterDefinitions.count
-                           + WorldPageCatalog.repeatableDefinitions.count + 1,
-                       "the permanent Earthlike testing page is additional to authored starter and wild pages")
+                           + WorldPageCatalog.repeatableDefinitions.count)
         XCTAssertEqual(WorldPageCatalog.definition("wild_storm_coast")?.title, "Storm Coast")
 
         let page = try XCTUnwrap(WorldPageCatalog.definition("wild_storm_coast"))

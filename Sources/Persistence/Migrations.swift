@@ -37,6 +37,7 @@ enum Migrations {
             try validateCurrentPhysicalGearReceipts(in: data)
             try validateCurrentPhysicalGearOwnership(in: data)
             try validateCurrentRunExitCustody(in: data)
+            try validateCurrentDebugVisibilityWorldIsolation(in: data)
             return data
         }
 
@@ -55,6 +56,7 @@ enum Migrations {
         try validateCurrentPhysicalGearReceipts(in: working)
         try validateCurrentPhysicalGearOwnership(in: working)
         try validateCurrentRunExitCustody(in: working)
+        try validateCurrentDebugVisibilityWorldIsolation(in: working)
         return working
     }
 
@@ -161,10 +163,64 @@ enum Migrations {
         case 16: return try migrate16to17(data)
         case 17: return try migrate17to18(data)
         case 18: return try migrate18to19(data)
+        case 19: return try migrate19to20(data)
         default:
             // No migration registered. Tolerant decoding is the fallback; if the save is genuinely
             // incompatible, `SaveFileIO.load()` quarantines it rather than losing it.
             return data
+        }
+    }
+
+    private static func migrate19to20(_ data: Data) throws -> Data {
+        guard var root = try JSONSerialization.jsonObject(with: data) as? [String: Any],
+              try exactInt(root["schemaVersion"]) == 19,
+              var base = root["base"] as? [String: Any],
+              var pages = base["collectedWorldPages"] as? [Any] else {
+            throw CocoaError(.coderInvalidValue)
+        }
+        var legacyIndices: [Int] = []
+        for (index, value) in pages.enumerated() {
+            guard let object = value as? [String: Any] else {
+                throw CocoaError(.coderInvalidValue)
+            }
+            let reservedID = (try? exactInt(object["id"]))
+                == Int(LegacyDebugVisibilityWorldV19.instanceID.rawValue)
+            let definitionID = (object["definition"] as? [String: Any])?["id"] as? String
+            let earthDefinition = definitionID == LegacyDebugVisibilityWorldV19.definitionID.rawValue
+            guard reservedID || earthDefinition else { continue }
+            let encoded = try JSONSerialization.data(withJSONObject: object, options: [.sortedKeys])
+            let instance = try SaveCodec.makeDecoder().decode(WorldPageInstance.self, from: encoded)
+            guard instance == LegacyDebugVisibilityWorldV19.instance else {
+                throw CocoaError(.coderInvalidValue)
+            }
+            legacyIndices.append(index)
+        }
+        guard legacyIndices.count <= 1 else { throw CocoaError(.coderInvalidValue) }
+        if let index = legacyIndices.first { pages.remove(at: index) }
+        base["collectedWorldPages"] = pages
+        root["base"] = base
+        root["schemaVersion"] = 20
+        return try JSONSerialization.data(withJSONObject: root, options: [.sortedKeys])
+    }
+
+    private static func validateCurrentDebugVisibilityWorldIsolation(in data: Data) throws {
+        guard let root = try JSONSerialization.jsonObject(with: data) as? [String: Any],
+              let base = root["base"] as? [String: Any],
+              let pages = base["collectedWorldPages"] as? [Any] else {
+            throw CocoaError(.coderInvalidValue)
+        }
+        for value in pages {
+            guard let object = value as? [String: Any] else {
+                throw CocoaError(.coderInvalidValue)
+            }
+            if (try? exactInt(object["id"]))
+                    == Int(LegacyDebugVisibilityWorldV19.instanceID.rawValue) {
+                throw CocoaError(.coderInvalidValue)
+            }
+            if (object["definition"] as? [String: Any])?["id"] as? String
+                    == LegacyDebugVisibilityWorldV19.definitionID.rawValue {
+                throw CocoaError(.coderInvalidValue)
+            }
         }
     }
 

@@ -108,6 +108,96 @@ final class PersistenceTests: XCTestCase {
         }
     }
 
+    private func schemaNineteenEarthStateWithFrozenHistory() -> GameState {
+        var state = GameState.newGame()
+        state.schemaVersion = 19
+        state.base.collectedWorldPages.append(LegacyDebugVisibilityWorldV19.instance)
+        let receipt = WorldPageUseReceipt(
+            instanceID: LegacyDebugVisibilityWorldV19.instanceID,
+            definition: LegacyDebugVisibilityWorldV19.definition,
+            essencePaid: 0)
+        var book = BoundBook(written: ["plains"], essencePaid: 0)
+        book.worldPageUseReceipt = receipt
+        let generated = Worldgen.generate(book: book, seed: 20_019)
+        let active = WorldRun(
+            runIndex: 1, book: book, mapSeed: 20_019, rng: SeededRNG(seed: 20_019),
+            map: generated.map, playerPosition: generated.start)
+        var anchored = active
+        anchored.runIndex = 2
+        state.worlds.activeRun = active
+        state.worlds.anchoredRealms = [
+            AnchoredRealm(runIndex: 2, name: "Legacy Earth", route: .bornAnchored, world: anchored)
+        ]
+        state.reality.library.visitedWorlds = [VisitedWorld(
+            id: InstanceID(rawValue: 20_019), seed: 20_019, runIndex: 1,
+            descriptionSentence: "Frozen legacy world", written: ["plains"],
+            inertModifiers: [], readings: [:], travellersPresent: [],
+            worldPageUseReceipt: receipt)]
+        return state
+    }
+
+    func testSchemaNineteenEarthEntitlementMigratesWithoutRewritingFrozenWorldReceipts() throws {
+        let legacy = schemaNineteenEarthStateWithFrozenHistory()
+        let source = try SaveCodec.encode(legacy)
+        let migrated = try Migrations.migrateIfNeeded(source)
+        let state = try SaveCodec.decode(migrated)
+        XCTAssertEqual(state.schemaVersion, 20)
+        XCTAssertEqual(state.base.collectedWorldPages, WorldPageCatalog.starterInstances)
+        XCTAssertEqual(state.worlds.activeRun?.book.worldPageUseReceipt,
+                       legacy.worlds.activeRun?.book.worldPageUseReceipt)
+        XCTAssertEqual(state.worlds.anchoredRealms.first?.world.book.worldPageUseReceipt,
+                       legacy.worlds.anchoredRealms.first?.world.book.worldPageUseReceipt)
+        XCTAssertEqual(state.reality.library.visitedWorlds.first?.worldPageUseReceipt,
+                       legacy.reality.library.visitedWorlds.first?.worldPageUseReceipt)
+        XCTAssertEqual(try Migrations.migrateIfNeeded(migrated), migrated)
+
+        var absent = GameState.newGame()
+        absent.schemaVersion = 19
+        let seedsBefore = absent.worlds.seeds
+        let absentMigrated = try Migrations.migrateIfNeeded(SaveCodec.encode(absent))
+        let absentState = try SaveCodec.decode(absentMigrated)
+        XCTAssertEqual(absentState.schemaVersion, 20)
+        XCTAssertEqual(absentState.base.collectedWorldPages, WorldPageCatalog.starterInstances)
+        XCTAssertEqual(absentState.worlds.seeds, seedsBefore)
+    }
+
+    func testSchemaNineteenEarthAliasDuplicateAndTamperingFailWithoutChangingRawBytes() throws {
+        let valid = try SaveCodec.encode(schemaNineteenEarthStateWithFrozenHistory())
+        let mutations: [(String, (inout [[String: Any]]) -> Void)] = [
+            ("duplicate", { $0.append($0.last!) }),
+            ("alias instance", { $0[$0.count - 1]["id"] = 91_919 }),
+            ("reserved ID alias definition", {
+                var definition = $0[$0.count - 1]["definition"] as! [String: Any]
+                definition["id"] = "starter_open_meadow"
+                $0[$0.count - 1]["definition"] = definition
+            }),
+            ("tampered definition", {
+                var definition = $0[$0.count - 1]["definition"] as! [String: Any]
+                definition["title"] = "Not the frozen fixture"
+                $0[$0.count - 1]["definition"] = definition
+            })
+        ]
+        for (name, mutation) in mutations {
+            var root = try XCTUnwrap(JSONSerialization.jsonObject(with: valid) as? [String: Any])
+            var base = try XCTUnwrap(root["base"] as? [String: Any])
+            var pages = try XCTUnwrap(base["collectedWorldPages"] as? [[String: Any]])
+            mutation(&pages)
+            base["collectedWorldPages"] = pages; root["base"] = base
+            let bytes = try JSONSerialization.data(withJSONObject: root, options: [.sortedKeys])
+            let original = bytes
+            XCTAssertThrowsError(try Migrations.migrateIfNeeded(bytes), name)
+            XCTAssertEqual(bytes, original, name)
+        }
+    }
+
+    func testCurrentSchemaRejectsReintroducedEarthEntitlement() throws {
+        var state = GameState.newGame()
+        state.base.collectedWorldPages.append(LegacyDebugVisibilityWorldV19.instance)
+        let bytes = try SaveCodec.encode(state)
+        XCTAssertThrowsError(try Migrations.migrateIfNeeded(bytes))
+        XCTAssertThrowsError(try SaveCodec.makeDecoder().decode(GameState.self, from: bytes))
+    }
+
     private func currentRosterPlacementState() -> GameState {
         var state = GameState.newGame()
         var keeper = CompanionState()
@@ -753,7 +843,7 @@ final class PersistenceTests: XCTestCase {
         let source = try JSONSerialization.data(withJSONObject: root, options: [.sortedKeys])
         let migrated = try Migrations.migrateIfNeeded(source)
         let decoded = try SaveCodec.makeDecoder().decode(GameState.self, from: migrated)
-        XCTAssertEqual(decoded.schemaVersion, 19)
+        XCTAssertEqual(decoded.schemaVersion, Tuning.saveSchemaVersion)
         XCTAssertEqual(decoded.worlds.expeditionReviewQueue.pending.map {
             $0.summary.custodyReceiptVersion
         }, [0, 0])

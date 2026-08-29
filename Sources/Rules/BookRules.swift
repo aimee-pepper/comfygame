@@ -41,16 +41,8 @@ enum BookRules {
     static func resolveBook(worldPage instance: WorldPageInstance) -> BoundBook {
         var book = resolveBook(page: instance.definition.page)
         book.essencePaid -= inkCost(of: instance.definition.page)
-        if instance.definition.disposition.isReusable {
-            // The permanent Earth-like testing page intentionally bypasses the ordinary authored
-            // price while retaining the same resolved book and generation path.
-            precondition(instance.definition.worldPageCost == 0,
-                         "Reusable testing World Pages must remain free")
-            book.essencePaid = 0
-        } else {
-            precondition(book.essencePaid == instance.definition.worldPageCost,
-                         "Authored World Page price drifted from the rules-owned resolved price")
-        }
+        precondition(book.essencePaid == instance.definition.worldPageCost,
+                     "Authored World Page price drifted from the rules-owned resolved price")
         book.worldPageUseReceipt = WorldPageUseReceipt(
             instanceID: instance.id, definition: instance.definition, essencePaid: book.essencePaid)
         return book
