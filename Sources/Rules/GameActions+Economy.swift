@@ -312,6 +312,11 @@ enum RosterPlacementRules {
     static func validatesCurrentState(_ state: GameState) -> Bool {
         let ids = state.base.roster.indices.compactMap(state.base.persistentID(forRosterIndex:))
         guard ids.count == state.base.roster.count, Set(ids).count == ids.count else { return false }
+        for index in state.base.roster.indices {
+            guard let id = state.base.persistentID(forRosterIndex: index) else { return false }
+            if let traveller = state.base.roster[index].traveller,
+               id != .traveller(traveller) { return false }
+        }
         let known = Set(ids)
         let validActiveIDs = known.union(state.base.tamedAnimalCompanions.compactMap { animalID, animal in
             animal.posting == .activeParty ? PersistentPartyMemberID.animal(animalID.rawValue) : nil

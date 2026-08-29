@@ -3,6 +3,55 @@ import XCTest
 
 /// The interruptibility pillar, tested. Anything that breaks here breaks pillar 2.
 final class PersistenceTests: XCTestCase {
+    private func currentRosterPlacementState() -> GameState {
+        var state = GameState.newGame()
+        var keeper = CompanionState()
+        keeper.name = "Halloway"
+        keeper.traveller = "halloway"
+        keeper.persistentID = .traveller("halloway")
+        state.base.roster.append(keeper)
+        let book = BoundBook(written: [], essencePaid: 0)
+        let generated = Worldgen.generate(book: book, seed: 91)
+        let run = WorldRun(runIndex: 91, book: book, mapSeed: 91,
+                           rng: SeededRNG(seed: 91), map: generated.map,
+                           playerPosition: generated.start)
+        state.worlds.anchoredRealms = [
+            AnchoredRealm(runIndex: 91, name: "Roster validation", route: .bornAnchored,
+                          assignedCompanions: [.traveller("halloway")], world: run)
+        ]
+        GameStore.recalculateAnchorProduction(in: &state)
+        return state
+    }
+
+    private func activeAnimalState() throws -> GameState {
+        var state = GameState.newGame()
+        let enemyID = InstanceID(rawValue: 90_501)
+        let seed: UInt64 = 90_001
+        let condition = RealityState.AnimalTrustConditionV1.usefulOffering(
+            property: .hardness, threshold: 0)
+        let trust = RealityState.AnimalTrustRecordV1(
+            worldSeed: seed, enemyID: enemyID, speciesID: .init(rawValue: 77), creatureID: nil,
+            traits: CreatureTraits(), condition: condition, progress: 1,
+            firstAttendedRunIndex: 1, firstAttendedTurn: 2, lastProgressTurn: nil,
+            interactionCount: 1, completed: true)
+        let rawID = "tamed:\(seed):\(enemyID.rawValue)"
+        let animal = RealityState.TamedAnimalV1(
+            id: rawID, originWorldSeed: seed, originEnemyID: enemyID,
+            speciesID: .init(rawValue: 77), creatureID: nil, traits: trust.traits,
+            trustCondition: condition, joinedRunIndex: 1, joinedTurn: 4)
+        let id = TamedAnimalID(rawValue: rawID)
+        let receipt = try XCTUnwrap(AnimalCompanionCombatRules.originReceipt(
+            animal: animal, displayName: "Stable animal", icon: "questionmark",
+            level: 1, provenance: .legacySchema14LevelOne))
+        state.reality.animalTrustRecords[trust.key] = trust
+        state.reality.tamedAnimals[rawID] = animal
+        state.base.tamedAnimalCompanions[id] = .init(
+            id: id, originReceipt: receipt, level: 1, experience: 0,
+            gambits: [], posting: .activeParty)
+        state.base.activeParty.append(.animal(rawID))
+        return state
+    }
+
     private func assertQuarantinedSavePreserves(_ bytes: Data, io: SaveFileIO,
                                                 file: StaticString = #filePath,
                                                 line: UInt = #line) throws {
@@ -11,6 +60,63 @@ final class PersistenceTests: XCTestCase {
                 $0.lastPathComponent.hasPrefix(io.fileName + ".corrupt-")
             }, file: file, line: line)
         XCTAssertEqual(try Data(contentsOf: quarantined), bytes, file: file, line: line)
+    }
+
+    func testCurrentRosterPlacementCorruptionRejectsRawBytesWithoutMutation() throws {
+        let mutations: [(String, (inout [String: Any]) throws -> Void)] = [
+            ("duplicate persistent ID", { root in
+                var base = try XCTUnwrap(root["base"] as? [String: Any])
+                var roster = try XCTUnwrap(base["roster"] as? [[String: Any]])
+                roster[1]["persistentID"] = "founder:quill"
+                base["roster"] = roster; root["base"] = base
+            }),
+            ("party and realm double placement", { root in
+                var base = try XCTUnwrap(root["base"] as? [String: Any])
+                base["activeParty"] = ["founder:quill", "traveller:halloway"]
+                root["base"] = base
+            }),
+            ("dangling realm placement", { root in
+                var worlds = try XCTUnwrap(root["worlds"] as? [String: Any])
+                var realms = try XCTUnwrap(worlds["anchoredRealms"] as? [[String: Any]])
+                realms[0]["assignedCompanions"] = ["generated:missing"]
+                worlds["anchoredRealms"] = realms; root["worlds"] = worlds
+            }),
+            ("dormant realm placement", { root in
+                var worlds = try XCTUnwrap(root["worlds"] as? [String: Any])
+                var realms = try XCTUnwrap(worlds["anchoredRealms"] as? [[String: Any]])
+                realms[0]["isDormant"] = true
+                worlds["anchoredRealms"] = realms; root["worlds"] = worlds
+            }),
+            ("keeper identity mismatch", { root in
+                var base = try XCTUnwrap(root["base"] as? [String: Any])
+                var roster = try XCTUnwrap(base["roster"] as? [[String: Any]])
+                roster[1]["persistentID"] = "generated:not-halloway"
+                base["roster"] = roster; root["base"] = base
+                var worlds = try XCTUnwrap(root["worlds"] as? [String: Any])
+                var realms = try XCTUnwrap(worlds["anchoredRealms"] as? [[String: Any]])
+                realms[0]["assignedCompanions"] = ["generated:not-halloway"]
+                worlds["anchoredRealms"] = realms; root["worlds"] = worlds
+            })
+        ]
+        for (name, mutation) in mutations {
+            var root = try XCTUnwrap(JSONSerialization.jsonObject(
+                with: SaveCodec.encode(currentRosterPlacementState())) as? [String: Any])
+            try mutation(&root)
+            let bytes = try JSONSerialization.data(withJSONObject: root, options: [.sortedKeys])
+            let original = bytes
+            XCTAssertThrowsError(try SaveCodec.decode(bytes), name)
+            XCTAssertEqual(bytes, original, name)
+        }
+    }
+
+    func testCurrentActiveTamedAnimalStableIdentityRawRoundTrip() throws {
+        let state = try activeAnimalState()
+        let bytes = try SaveCodec.encode(state)
+        let decoded = try SaveCodec.decode(bytes)
+        XCTAssertEqual(decoded, state)
+        XCTAssertEqual(decoded.base.activeParty.last, state.base.activeParty.last)
+        XCTAssertTrue(decoded.validatesAnimalCompanionCombat())
+        XCTAssertEqual(try SaveCodec.encode(decoded), bytes)
     }
 
     func testCurioKnowledgeSchemaTwelveMigrationStartsEmptyWithoutBackwardInference() throws {

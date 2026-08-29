@@ -2,6 +2,127 @@ import XCTest
 @testable import Bookbinder
 
 final class SaveSlotTests: XCTestCase {
+    private func currentRosterPlacementState() -> GameState {
+        var state = GameState.newGame()
+        var keeper = CompanionState()
+        keeper.name = "Halloway"
+        keeper.traveller = "halloway"
+        keeper.persistentID = .traveller("halloway")
+        state.base.roster.append(keeper)
+        let book = BoundBook(written: [], essencePaid: 0)
+        let generated = Worldgen.generate(book: book, seed: 92)
+        let run = WorldRun(runIndex: 92, book: book, mapSeed: 92,
+                           rng: SeededRNG(seed: 92), map: generated.map,
+                           playerPosition: generated.start)
+        state.worlds.anchoredRealms = [
+            AnchoredRealm(runIndex: 92, name: "Slot roster validation", route: .bornAnchored,
+                          assignedCompanions: [.traveller("halloway")], world: run)
+        ]
+        GameStore.recalculateAnchorProduction(in: &state)
+        return state
+    }
+
+    private func activeAnimalState() throws -> GameState {
+        var state = GameState.newGame()
+        let enemyID = InstanceID(rawValue: 92_501)
+        let seed: UInt64 = 92_001
+        let condition = RealityState.AnimalTrustConditionV1.usefulOffering(
+            property: .hardness, threshold: 0)
+        let trust = RealityState.AnimalTrustRecordV1(
+            worldSeed: seed, enemyID: enemyID, speciesID: .init(rawValue: 77), creatureID: nil,
+            traits: CreatureTraits(), condition: condition, progress: 1,
+            firstAttendedRunIndex: 1, firstAttendedTurn: 2, lastProgressTurn: nil,
+            interactionCount: 1, completed: true)
+        let rawID = "tamed:\(seed):\(enemyID.rawValue)"
+        let animal = RealityState.TamedAnimalV1(
+            id: rawID, originWorldSeed: seed, originEnemyID: enemyID,
+            speciesID: .init(rawValue: 77), creatureID: nil, traits: trust.traits,
+            trustCondition: condition, joinedRunIndex: 1, joinedTurn: 4)
+        let id = TamedAnimalID(rawValue: rawID)
+        let receipt = try XCTUnwrap(AnimalCompanionCombatRules.originReceipt(
+            animal: animal, displayName: "Stable slot animal", icon: "questionmark",
+            level: 1, provenance: .legacySchema14LevelOne))
+        state.reality.animalTrustRecords[trust.key] = trust
+        state.reality.tamedAnimals[rawID] = animal
+        state.base.tamedAnimalCompanions[id] = .init(
+            id: id, originReceipt: receipt, level: 1, experience: 0,
+            gambits: [], posting: .activeParty)
+        state.base.activeParty.append(.animal(rawID))
+        return state
+    }
+
+    func testCurrentRosterPlacementCorruptionPreservesRealSlotEnvelopeBytes() async throws {
+        let mutations: [(String, (inout [String: Any]) throws -> Void)] = [
+            ("duplicate persistent ID", { root in
+                var base = try XCTUnwrap(root["base"] as? [String: Any])
+                var roster = try XCTUnwrap(base["roster"] as? [[String: Any]])
+                roster[1]["persistentID"] = "founder:quill"
+                base["roster"] = roster; root["base"] = base
+            }),
+            ("party and realm double placement", { root in
+                var base = try XCTUnwrap(root["base"] as? [String: Any])
+                base["activeParty"] = ["founder:quill", "traveller:halloway"]
+                root["base"] = base
+            }),
+            ("dangling realm placement", { root in
+                var worlds = try XCTUnwrap(root["worlds"] as? [String: Any])
+                var realms = try XCTUnwrap(worlds["anchoredRealms"] as? [[String: Any]])
+                realms[0]["assignedCompanions"] = ["generated:missing"]
+                worlds["anchoredRealms"] = realms; root["worlds"] = worlds
+            }),
+            ("dormant realm placement", { root in
+                var worlds = try XCTUnwrap(root["worlds"] as? [String: Any])
+                var realms = try XCTUnwrap(worlds["anchoredRealms"] as? [[String: Any]])
+                realms[0]["isDormant"] = true
+                worlds["anchoredRealms"] = realms; root["worlds"] = worlds
+            }),
+            ("keeper identity mismatch", { root in
+                var base = try XCTUnwrap(root["base"] as? [String: Any])
+                var roster = try XCTUnwrap(base["roster"] as? [[String: Any]])
+                roster[1]["persistentID"] = "generated:not-halloway"
+                base["roster"] = roster; root["base"] = base
+                var worlds = try XCTUnwrap(root["worlds"] as? [String: Any])
+                var realms = try XCTUnwrap(worlds["anchoredRealms"] as? [[String: Any]])
+                realms[0]["assignedCompanions"] = ["generated:not-halloway"]
+                worlds["anchoredRealms"] = realms; root["worlds"] = worlds
+            })
+        ]
+        for (name, mutation) in mutations {
+            let rootDirectory = directory()
+            defer { try? FileManager.default.removeItem(at: rootDirectory) }
+            let slots = SaveSlotFileIO(directory: rootDirectory)
+            let created = try await slots.create(name: "Invalid roster \(name)")
+            let url = try await slots.exportURL(for: created.metadata.id)
+            var envelope = try SaveCodec.makeDecoder().decode(
+                SaveSlotEnvelope.self, from: Data(contentsOf: url))
+            var payload = try XCTUnwrap(JSONSerialization.jsonObject(
+                with: SaveCodec.encode(currentRosterPlacementState())) as? [String: Any])
+            try mutation(&payload)
+            envelope.payload = try JSONSerialization.data(
+                withJSONObject: payload, options: [.sortedKeys])
+            let bytes = try encoder().encode(envelope)
+            try bytes.write(to: url, options: .atomic)
+            do { _ = try await slots.load(created.metadata.id); XCTFail("accepted \(name)") }
+            catch { }
+            XCTAssertEqual(try Data(contentsOf: url), bytes, name)
+        }
+    }
+
+    func testCurrentActiveTamedAnimalStableIdentityRealSlotRoundTrip() async throws {
+        let root = directory()
+        defer { try? FileManager.default.removeItem(at: root) }
+        let slots = SaveSlotFileIO(directory: root)
+        let state = try activeAnimalState()
+        let created = try await slots.create(name: "Active stable animal", state: state)
+        let url = try await slots.exportURL(for: created.metadata.id)
+        let bytes = try Data(contentsOf: url)
+        let loaded = try await slots.load(created.metadata.id).state
+        XCTAssertEqual(loaded, state)
+        XCTAssertEqual(loaded.base.activeParty.last, state.base.activeParty.last)
+        XCTAssertTrue(loaded.validatesAnimalCompanionCombat())
+        XCTAssertEqual(try Data(contentsOf: url), bytes)
+    }
+
     func testForgedGameplayContributionFailsWithoutRewritingRealSlotEnvelope() async throws {
         let root = directory()
         defer { try? FileManager.default.removeItem(at: root) }

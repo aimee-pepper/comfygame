@@ -6101,36 +6101,40 @@ final class WorldTests: XCTestCase {
         let run = WorldRun(runIndex: 1, book: blank, mapSeed: 13, rng: SeededRNG(seed: 13),
                            map: generated.map, playerPosition: generated.start)
         let store = GameStore(io: .temporary(name: "realm-party-transfer-\(UUID().uuidString)"))
+        let workerID = PersistentPartyMemberID.generated("realm-worker")
         store.mutate("prepare worker") { state in
             var worker = CompanionState()
             worker.name = "Worker"
+            worker.persistentID = workerID
             worker.worldwork = 2
             state.base.roster = [CompanionState(), worker]
-            state.base.activeParty = [0]
+            state.base.activeParty = [.founderQuill]
             state.worlds.anchoredRealms = [
                 AnchoredRealm(runIndex: 1, name: "Moss Archive", route: .bornAnchored,
-                              sustainObligation: 10, assignedCompanions: [1], world: run),
+                              sustainObligation: 10, assignedCompanions: [workerID], world: run),
             ]
             GameStore.recalculateAnchorProduction(in: &state)
         }
 
-        let preview = try XCTUnwrap(store.partyTransferPreview(for: 1))
+        let preview = try store.rosterPlacementQuote(
+            for: workerID, destination: .activeParty).get()
         XCTAssertEqual(preview.source, .anchoredRealm(id: 1, name: "Moss Archive"))
         XCTAssertEqual(preview.realmProductionBefore, 3)
         XCTAssertEqual(preview.realmProductionAfter, 0)
         XCTAssertEqual(preview.realmShortfallBefore, 7)
         XCTAssertEqual(preview.realmShortfallAfter, 10)
 
-        XCTAssertFalse(store.setComing(1, true, expected: .home), "stale source must not transfer")
-        XCTAssertEqual(store.state.worlds.anchoredRealms[0].assignedCompanions, [1])
+        XCTAssertEqual(store.state.worlds.anchoredRealms[0].assignedCompanions, [workerID])
         XCTAssertEqual(store.setComing(preview), .committed)
-        XCTAssertEqual(store.state.base.activeParty, [0, 1])
+        XCTAssertEqual(store.state.base.activeParty, [.founderQuill, workerID])
         XCTAssertTrue(store.state.worlds.anchoredRealms[0].assignedCompanions.isEmpty)
         XCTAssertEqual(store.state.worlds.anchoredRealms[0].productionContribution, 0)
 
-        XCTAssertTrue(store.setComing(1, false, expected: .activeParty))
-        XCTAssertEqual(store.placement(of: 1), .home)
-        XCTAssertFalse(store.state.base.activeParty.contains(1))
+        let home = try XCTUnwrap(store.rosterPlacementQuote(
+            for: workerID, destination: .home).get())
+        XCTAssertEqual(store.commitRosterPlacement(home), .committed)
+        XCTAssertEqual(store.placement(of: workerID), .home)
+        XCTAssertFalse(store.state.base.activeParty.contains(workerID))
         XCTAssertTrue(store.state.worlds.anchoredRealms[0].assignedCompanions.isEmpty,
                       "returning Home must not restore the old realm posting")
     }
@@ -6142,20 +6146,23 @@ final class WorldTests: XCTestCase {
         let run = WorldRun(runIndex: 1, book: blank, mapSeed: 13, rng: SeededRNG(seed: 13),
                            map: generated.map, playerPosition: generated.start)
         let store = GameStore(io: .temporary(name: "stale-party-impact-\(UUID().uuidString)"))
+        let workerID = PersistentPartyMemberID.generated("stale-realm-worker")
         store.mutate("prepare realm worker") { state in
             var worker = CompanionState()
             worker.name = "Worker"
+            worker.persistentID = workerID
             worker.worldwork = 2
             state.base.roster = [CompanionState(), worker]
-            state.base.activeParty = [0]
+            state.base.activeParty = [.founderQuill]
             state.worlds.anchoredRealms = [
                 AnchoredRealm(runIndex: 1, name: "Moss Archive", route: .bornAnchored,
-                              sustainObligation: 10, assignedCompanions: [1],
+                              sustainObligation: 10, assignedCompanions: [workerID],
                               world: run)
             ]
             GameStore.recalculateAnchorProduction(in: &state)
         }
-        let quote = try XCTUnwrap(store.partyTransferPreview(for: 1))
+        let quote = try store.rosterPlacementQuote(
+            for: workerID, destination: .activeParty).get()
         store.mutate("change contribution behind confirmation") { state in
             state.base.roster[1].worldwork = 6
             GameStore.recalculateAnchorProduction(in: &state)
@@ -6164,28 +6171,32 @@ final class WorldTests: XCTestCase {
         guard case .refused = store.setComing(quote) else {
             return XCTFail("A stale production quote moved the worker")
         }
-        XCTAssertEqual(store.placement(of: 1), .anchoredRealm(id: 1, name: "Moss Archive"))
-        XCTAssertFalse(store.state.base.activeParty.contains(1))
+        XCTAssertEqual(store.placement(of: workerID),
+                       .anchoredRealm(id: 1, name: "Moss Archive"))
+        XCTAssertFalse(store.state.base.activeParty.contains(workerID))
     }
 
     @MainActor
     func testTakingHomeKeeperPreviewsAndSuspendsStationBenefit() throws {
         let store = GameStore(io: .temporary(name: "keeper-party-transfer-\(UUID().uuidString)"))
+        let keeperID = PersistentPartyMemberID.traveller("halloway")
         store.mutate("prepare keeper") { state in
             var keeper = CompanionState()
             keeper.name = "Halloway"
             keeper.traveller = "halloway"
+            keeper.persistentID = keeperID
             state.base.roster = [CompanionState(), keeper]
-            state.base.activeParty = [0]
+            state.base.activeParty = [.founderQuill]
             state.base.stations[Stations.blacksmith] = StationState(isUnlocked: true, tier: 0)
         }
         let blacksmith = try XCTUnwrap(ContentCatalog.shared.stations.first { $0.id == Stations.blacksmith })
         XCTAssertTrue(StationStaffingRules.keeperIsHome(for: blacksmith, in: store.state))
 
-        let preview = try XCTUnwrap(store.partyTransferPreview(for: 1))
+        let preview = try store.rosterPlacementQuote(
+            for: keeperID, destination: .activeParty).get()
         XCTAssertEqual(preview.source, .home)
         XCTAssertEqual(preview.stationNames, ["Blacksmith"])
-        XCTAssertTrue(store.setComing(1, true, expected: .home))
+        XCTAssertEqual(store.setComing(preview), .committed)
         XCTAssertFalse(StationStaffingRules.keeperIsHome(for: blacksmith, in: store.state))
     }
 
