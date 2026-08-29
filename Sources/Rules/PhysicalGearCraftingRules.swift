@@ -94,14 +94,23 @@ enum PhysicalGearCraftingRules {
 
     static let pointedBlade = Recipe(
         id: "pointed_blade", displayName: "Pointed Blade", catalogFallback: "blade_chipped",
-        station: Stations.blacksmith, stationCap: 2, slot: .weapon, damage: .pierce,
+        station: Stations.blacksmith, stationCap: 5, slot: .weapon, damage: .pierce,
         reach: .close,
         requirements: [
-            SampleRequirement(id: "hard_point", allowedKinds: [.fang, .quill, .bone],
-                              floors: [PropertyFloor(property: .hardness, minimum: 35)]),
-            SampleRequirement(id: "flexible_grip", allowedKinds: nil,
-                              floors: [PropertyFloor(property: .flexibility, minimum: 30)])
-        ])
+            blacksmithRequirement("point.0", [.ore, .adamant, .obsidian, .quartz,
+                                   .fang, .quill, .bone, .tusk, .horn]),
+            blacksmithRequirement("grip.0", [.fibre, .timber, .copper, .silver, .gold,
+                                   .hide, .pelt, .fin, .bone, .horn])
+        ], primaryRequirementIDs: ["point.0"])
+
+    private static func blacksmithRequirement(_ id: String,
+                                              _ families: Set<MaterialFamilyID>)
+        -> SampleRequirement {
+        SampleRequirement(id: id, allowedKinds: families,
+                          allowedIdentities: Set(families.map {
+                              MaterialIdentity(domain: .forFamily($0), family: $0)
+                          }), floors: [])
+    }
 
     static let cuttingBlade = Recipe(
         id: "cutting_blade", displayName: "Cutting Blade", catalogFallback: "blade_chipped",
@@ -184,6 +193,7 @@ enum PhysicalGearCraftingRules {
     static let recipes: [Recipe] = [
         pointedBlade, cuttingBlade, handMaul, longSpear, shield, helm, rigidGuard, fieldPick
     ]
+    static let blacksmithLiveRecipes: [Recipe] = [pointedBlade]
 
     static let suppleCoat = Recipe(
         id: "supple_coat", displayName: "Supple Coat", catalogFallback: "guard_padded",
@@ -347,6 +357,12 @@ enum PhysicalGearCraftingRules {
     }
 
     static func isUnlocked(_ recipe: Recipe, in state: GameState) -> Bool {
+        if recipe.station == Stations.blacksmith {
+            guard recipe.id == pointedBlade.id,
+                  state.reality.library.knownSchematics.contains("pointed_blade") else {
+                return false
+            }
+        }
         if let required = requiredCapability(for: recipe),
            !state.base.hasCapability(required) { return false }
         if recipe.id == "weaponsmith_fitted_polearm",
@@ -472,6 +488,7 @@ enum PhysicalGearCraftingRules {
         let uncapped = recipe.station == Stations.bowyer
             || recipe.station == Stations.weaponsmith
             || recipe.station == Stations.tannery
+            || (recipe.station == Stations.blacksmith && recipe.id == pointedBlade.id)
         let output = uncapped
             ? qualityRank : min(max(1, qualityRank), constructionCap(for: recipe, in: state))
         let averageInsulation = chosen.map(\.sample.properties.insulation).reduce(0, +) / Double(chosen.count)

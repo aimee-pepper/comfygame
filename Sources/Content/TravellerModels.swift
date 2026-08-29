@@ -303,6 +303,7 @@ enum SchematicRegistry {
     }
 
     static let definitions: [Definition] = [
+        Definition(id: "pointed_blade", name: "Pointed Blade"),
         Definition(id: "emanation_housing", name: "Emanation housing")
     ]
 

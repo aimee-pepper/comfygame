@@ -142,6 +142,11 @@ struct GameState: Codable, Equatable, Sendable {
         if reality.library.hasFound("oda_emanation_housing") {
             reality.library.knownSchematics.insert("emanation_housing")
         }
+        // The Blacksmith's opening construction teaching is bundled with its paid build.
+        // Reconcile older built saves idempotently; item ownership never teaches it.
+        if base.station(Stations.blacksmith).isUnlocked {
+            reality.library.knownSchematics.insert("pointed_blade")
+        }
     }
 
     init(schemaVersion: Int, meta: SaveMeta, reality: RealityState, base: BaseState, worlds: WorldsState,

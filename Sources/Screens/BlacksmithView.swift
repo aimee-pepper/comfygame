@@ -94,7 +94,7 @@ struct BlacksmithView: View {
 
     private var makeGrid: some View {
         LazyVGrid(columns: recipeColumns, spacing: 10) {
-            ForEach(PhysicalGearCraftingRules.recipes) { recipe in
+            ForEach(PhysicalGearCraftingRules.blacksmithLiveRecipes) { recipe in
                 MakerRecipeTile(recipe: recipe,
                                 readiness: store.physicalGearReadiness(recipe)) {
                     chosenRecipe = recipe

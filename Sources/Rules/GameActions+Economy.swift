@@ -1404,6 +1404,9 @@ extension GameStore {
                 // screen. Learning is permanent, idempotent, and grants no prepared item.
                 state.base.knownConsumableRecipes.insert("salve_lesser")
             }
+            if canonical.id == Stations.blacksmith {
+                state.reality.library.knownSchematics.insert("pointed_blade")
+            }
             if let bundled = ContentCatalog.shared.constructionBundledResearch(for: canonical.id) {
                 // Construction and its authored free teaching are one atomic transaction.
                 EconomyRules.complete(bundled, in: &state)

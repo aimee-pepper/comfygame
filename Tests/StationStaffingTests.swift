@@ -163,6 +163,7 @@ final class StationStaffingTests: XCTestCase {
     func testCraftPreviewAndDebitUseSameDiscountedEssence() throws {
         var (state, _, _) = try stateWithHalloway(level: 1)
         state.base.stations[Stations.blacksmith] = StationState(isUnlocked: true, tier: 0)
+        state.reality.library.knownSchematics.insert("pointed_blade")
         state.base.essence = 11
         let samples = [
             CraftMaterialUnitV1(kind: .bone,

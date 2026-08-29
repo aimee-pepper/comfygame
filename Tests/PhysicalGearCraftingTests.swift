@@ -67,6 +67,7 @@ final class PhysicalGearCraftingTests: XCTestCase {
     private func readyState() -> GameState {
         var state = GameState.newGame()
         state.base.stations[Stations.blacksmith] = StationState(isUnlocked: true, tier: 0)
+        state.reality.library.knownSchematics.insert("pointed_blade")
         state.base.essence = 200
         state.base.inventory.add(ItemStack(id: InstanceID(rawValue: 10), catalogID: Items.material,
             materials: [
@@ -176,12 +177,64 @@ final class PhysicalGearCraftingTests: XCTestCase {
         let recipes = PhysicalGearCraftingRules.recipes
         XCTAssertEqual(recipes.count, 8)
         XCTAssertEqual(Set(recipes.map(\.id)).count, 8)
-        XCTAssertTrue(recipes.allSatisfy { $0.station == Stations.blacksmith && $0.stationCap == 2 })
+        XCTAssertEqual(PhysicalGearCraftingRules.blacksmithLiveRecipes.map(\.id), ["pointed_blade"])
+        XCTAssertTrue(recipes.allSatisfy { $0.station == Stations.blacksmith })
         XCTAssertEqual(Set(recipes.map(\.slot)), [.weapon, .offhand, .head, .armor, .tool])
         XCTAssertEqual(Set(recipes.compactMap(\.damage)), [.pierce, .rend, .crush])
         XCTAssertTrue(recipes.flatMap(\.requirements).allSatisfy {
             !$0.floors.isEmpty || !$0.alternativeFloors.isEmpty || $0.allowedKinds != nil
         })
+    }
+
+    func testOnlyPointedBladeIsLiveAndRequiresDurableKnowledge() {
+        var state = readyState()
+        XCTAssertTrue(PhysicalGearCraftingRules.isUnlocked(
+            PhysicalGearCraftingRules.pointedBlade, in: state))
+        for recipe in PhysicalGearCraftingRules.recipes.dropFirst() {
+            XCTAssertFalse(PhysicalGearCraftingRules.isUnlocked(recipe, in: state), recipe.id)
+            XCTAssertNil(PhysicalGearCraftingRules.preview(recipe, in: state), recipe.id)
+        }
+        state.reality.library.knownSchematics.remove("pointed_blade")
+        XCTAssertFalse(PhysicalGearCraftingRules.isUnlocked(
+            PhysicalGearCraftingRules.pointedBlade, in: state))
+    }
+
+    func testPointedBladeSocketsAreDomainQualifiedAndPropertyFloorFree() {
+        let recipe = PhysicalGearCraftingRules.pointedBlade
+        XCTAssertEqual(recipe.requirements.map(\.id), ["point.0", "grip.0"])
+        XCTAssertEqual(recipe.primaryRequirementIDs, ["point.0"])
+        XCTAssertTrue(recipe.requirements.allSatisfy { $0.floors.isEmpty })
+        XCTAssertEqual(recipe.requirements[0].allowedKinds,
+                       [.ore, .adamant, .obsidian, .quartz,
+                        .fang, .quill, .bone, .tusk, .horn])
+        XCTAssertEqual(recipe.requirements[1].allowedKinds,
+                       [.fibre, .timber, .copper, .silver, .gold,
+                        .hide, .pelt, .fin, .bone, .horn])
+        var creatureOre = sample(.ore, grade: 50, source: "creature ore")
+        creatureOre.domain = .creature
+        XCTAssertFalse(PhysicalGearCraftingRules.qualifies(
+            creatureOre, for: recipe.requirements[0]))
+        var worldHorn = sample(.horn, grade: 50, source: "world horn")
+        worldHorn.domain = .world
+        XCTAssertFalse(PhysicalGearCraftingRules.qualifies(
+            worldHorn, for: recipe.requirements[0]))
+    }
+
+    @MainActor func testBlacksmithBuildGrantsPointedBladeKnowledgeAtomically() throws {
+        let store = GameStore(io: .temporary(name: "pointed-build-\(UUID().uuidString)"))
+        let station = try XCTUnwrap(ContentCatalog.shared.station(Stations.blacksmith))
+        store.mutate("prepare Halloway") { state in
+            state.reality.library.foundTravellers.insert("halloway")
+            state.base.essence = station.buildCost!.essence
+            for (id, amount) in station.buildCost!.resources {
+                state.base.resources.add(amount, of: id)
+            }
+        }
+        XCTAssertFalse(store.state.reality.library.knownSchematics.contains("pointed_blade"))
+        XCTAssertTrue(store.build(station))
+        XCTAssertTrue(store.state.reality.library.knownSchematics.contains("pointed_blade"))
+        let restored = try SaveCodec.decode(SaveCodec.encode(store.state))
+        XCTAssertTrue(restored.reality.library.knownSchematics.contains("pointed_blade"))
     }
 
     func testManualSampleReplacementChangesPreviewAndCraftedProvenance() throws {
@@ -192,7 +245,7 @@ final class PhysicalGearCraftingTests: XCTestCase {
             PhysicalGearCraftingRules.candidates(for: recipe.requirements[0], in: state)
                 .first { $0.sample.source == "great wolf" }
         )
-        let chosen = defaults.map { $0.requirementID == "hard_point" ? strongerPoint : $0 }
+        let chosen = defaults.map { $0.requirementID == "point.0" ? strongerPoint : $0 }
         let preview = try XCTUnwrap(PhysicalGearCraftingRules.preview(recipe, selections: chosen, in: state))
         XCTAssertEqual(preview.selections.map(\.sample.source), ["great wolf", "reed"])
         let output = try XCTUnwrap(PhysicalGearCraftingRules.craft(preview, in: &state))
@@ -403,12 +456,13 @@ final class PhysicalGearCraftingTests: XCTestCase {
         }
     }
 
-    func testBowyerUncappedCostDoesNotRetuneCappedBlacksmith() throws {
+    func testPointedBladeUsesItsOwnUncappedQualityAndCost() throws {
         var state = readyState()
         let preview = try XCTUnwrap(PhysicalGearCraftingRules.preview(
             PhysicalGearCraftingRules.pointedBlade, in: state))
-        XCTAssertEqual(preview.outputTier, 2)
-        XCTAssertEqual(preview.rawEssence, 24)
+        XCTAssertEqual(preview.outputTier, preview.qualityBand.rawValue)
+        XCTAssertEqual(preview.rawEssence,
+                       PhysicalGearCraftingRules.essenceCost(for: max(1, preview.outputTier)))
     }
 
     func testBowyerTierZeroIsUsefulAndTierOneBroadensTheFamilies() {
@@ -476,7 +530,7 @@ final class PhysicalGearCraftingTests: XCTestCase {
         }
     }
 
-    func testQualityUsesPrimarySeventySecondaryThirtyAndPreservesStationTierCap() throws {
+    func testPointedBladeQualityUsesPrimarySeventySecondaryThirtyWithoutCap() throws {
         var state = readyState()
         let recipe = PhysicalGearCraftingRules.pointedBlade
         let selections = [
@@ -488,8 +542,8 @@ final class PhysicalGearCraftingTests: XCTestCase {
         let preview = try XCTUnwrap(PhysicalGearCraftingRules.preview(recipe, selections: selections,
                                                                       in: state))
         XCTAssertEqual(preview.qualityBand, .superior)
-        XCTAssertEqual(preview.outputTier, 2)
-        XCTAssertEqual(preview.essence, 24)
+        XCTAssertEqual(preview.outputTier, 3)
+        XCTAssertEqual(preview.rawEssence, 48)
     }
 
     func testCraftConsumesExactlyPreviewedInputsAndFreezesProvenance() throws {
@@ -507,7 +561,14 @@ final class PhysicalGearCraftingTests: XCTestCase {
         XCTAssertEqual(output.gearProfile?.reach, .close)
         XCTAssertEqual(output.gearProfile?.consumedSamples, preview.selections.map(\.sample))
         XCTAssertEqual(output.gearProfile?.recipeVersion, 1)
-        XCTAssertEqual(output.displayName, "Pointed Blade · reed grazer + reed · Tier 2")
+        XCTAssertTrue(output.displayName.hasPrefix("Pointed Blade · reed grazer + reed"))
+        XCTAssertNil(output.gearProfile?.inscription)
+        XCTAssertEqual(output.gearProfile?.reforgeRank, 0)
+        XCTAssertEqual(output.gearProfile?.legacyPowerCredit, 0)
+        let recycler = try XCTUnwrap(RecyclerRules.preview(
+            location: .stored, stackID: output.id, serviceTier: 3, in: state.base))
+        XCTAssertEqual(recycler.returnedSamples,
+                       Array(preview.selections.map(\.sample).prefix(1)))
     }
 
     func testStaleOrDuplicateSelectionCannotConsumeOrCraft() throws {
