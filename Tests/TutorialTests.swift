@@ -2,6 +2,21 @@ import XCTest
 @testable import Bookbinder
 
 final class TutorialTests: XCTestCase {
+    private func firstReturnState(
+        route: FirstReturnTutorialContext.Route = .library,
+        reason: FirstReturnTutorialContext.Reason = .fieldNote,
+        writingID: String? = "selected"
+    ) -> GameState {
+        var state = GameState.newGame()
+        state.reality.library.foundWritings = [
+            FoundWritingRecord(id: "selected", family: .fieldNote, prose: "Words.",
+                               position: GridPoint(x: 0, y: 0))
+        ]
+        state.tutorial.firstReturnContext = .init(
+            runIndex: 1, route: route, reason: reason, writingID: writingID)
+        return state
+    }
+
     private func makeRun(index: Int = 1) -> WorldRun {
         let book = BoundBook(symbols: [:], randomlyFilled: [], essencePaid: 0)
         let generated = Worldgen.generate(book: book, seed: 991)
@@ -175,20 +190,135 @@ final class TutorialTests: XCTestCase {
         XCTAssertNil(TutorialRules.libraryCopy(missing, in: .newGame()))
     }
 
-    @MainActor func testOpeningLibraryRouteDoesNotCompleteWritingUntilRecordDisplays() {
-        let store = GameStore(io: .temporary(name: "tutorial-library-\(UUID().uuidString)"))
-        store.mutate("context") { state in
-            state.reality.library.foundWritings = [
-                FoundWritingRecord(id: "selected", family: .fieldNote, prose: "Words.", position: GridPoint(x: 0, y: 0))
-            ]
-            state.tutorial.firstReturnContext = .init(runIndex: 1, route: .library,
-                                                      reason: .fieldNote, writingID: "selected")
-        }
-        store.openedFirstReturnDestination(.library)
+    @MainActor func testOpeningLibraryRouteDoesNotCompleteWritingUntilRecordDisplays() throws {
+        let io = SaveFileIO.temporary(name: "tutorial-library-\(UUID().uuidString)")
+        try io.write(SaveCodec.encode(firstReturnState()))
+        let store = GameStore(io: io)
+        XCTAssertEqual(store.openedFirstReturnDestination(.library), .committed)
         XCTAssertEqual(store.state.tutorial[.baseFirstResultRoute].status, .completed)
         XCTAssertNotEqual(store.state.tutorial[.libraryFirstWriting].status, .completed)
-        store.displayedFirstReturnWriting()
+        let context = try XCTUnwrap(store.state.tutorial.firstReturnContext)
+        XCTAssertEqual(store.displayedFirstReturnWriting(context), .committed)
         XCTAssertEqual(store.state.tutorial[.libraryFirstWriting].status, .completed)
+        store.flushNow()
+
+        let committedBytes = try Data(contentsOf: io.saveURL)
+        let committedState = store.state
+        let mutationCount = store.state.meta.mutationCount
+        let actionHistory = store.state.meta.semanticActionTrail
+        let lastSavedAt = store.state.meta.lastSavedAt
+        let writeCount = store.diagnostics.writeCount
+        XCTAssertEqual(store.openedFirstReturnDestination(.library), .alreadyCompleted)
+        XCTAssertEqual(store.displayedFirstReturnWriting(context), .alreadyCompleted)
+        XCTAssertEqual(store.state, committedState)
+        XCTAssertEqual(store.state.meta.mutationCount, mutationCount)
+        XCTAssertEqual(store.state.meta.semanticActionTrail, actionHistory)
+        XCTAssertEqual(store.state.meta.lastSavedAt, lastSavedAt)
+        XCTAssertEqual(store.diagnostics.writeCount, writeCount)
+        XCTAssertFalse(store.diagnostics.hasPendingWrite)
+        XCTAssertEqual(try Data(contentsOf: io.saveURL), committedBytes)
+        let relaunched = GameStore(io: io).state
+        XCTAssertEqual(relaunched.tutorial, committedState.tutorial)
+        XCTAssertEqual(relaunched.meta.mutationCount, committedState.meta.mutationCount)
+        XCTAssertEqual(relaunched.meta.semanticActionTrail, committedState.meta.semanticActionTrail)
+    }
+
+    @MainActor func testFirstReturnRouteRefusalsAreSaveAndWriteInert() throws {
+        let io = SaveFileIO.temporary(name: "tutorial-route-refusal-\(UUID().uuidString)")
+        try io.write(SaveCodec.encode(firstReturnState()))
+        let store = GameStore(io: io)
+        let state = store.state
+        let encoded = try SaveCodec.encode(state)
+        let fileBytes = try Data(contentsOf: io.saveURL)
+        let diagnostics = store.diagnostics
+
+        XCTAssertEqual(store.openedFirstReturnDestination(.storehouse),
+                       .refused(.wrongDestination(expected: .library, actual: .storehouse)))
+        XCTAssertEqual(store.state, state)
+        XCTAssertEqual(try SaveCodec.encode(store.state), encoded)
+        XCTAssertEqual(store.state.meta.mutationCount, state.meta.mutationCount)
+        XCTAssertEqual(store.state.meta.semanticActionTrail, state.meta.semanticActionTrail)
+        XCTAssertEqual(store.state.meta.lastSavedAt, state.meta.lastSavedAt)
+        XCTAssertEqual(store.diagnostics.writeCount, diagnostics.writeCount)
+        XCTAssertEqual(store.diagnostics.savedMutationCount, diagnostics.savedMutationCount)
+        XCTAssertEqual(store.diagnostics.lastError, diagnostics.lastError)
+        XCTAssertFalse(store.diagnostics.hasPendingWrite)
+        XCTAssertEqual(try Data(contentsOf: io.saveURL), fileBytes)
+
+        var noContext = state
+        noContext.tutorial.firstReturnContext = nil
+        try io.write(SaveCodec.encode(noContext))
+        let noContextStore = GameStore(io: io)
+        let noContextBytes = try Data(contentsOf: io.saveURL)
+        XCTAssertEqual(noContextStore.openedFirstReturnDestination(.library),
+                       .refused(.noFrozenContext))
+        XCTAssertEqual(try Data(contentsOf: io.saveURL), noContextBytes)
+        XCTAssertFalse(noContextStore.diagnostics.hasPendingWrite)
+    }
+
+    @MainActor func testFirstReturnWritingRequiresExactRenderedContextAndRecord() throws {
+        let io = SaveFileIO.temporary(name: "tutorial-writing-refusal-\(UUID().uuidString)")
+        var state = firstReturnState()
+        let rendered = try XCTUnwrap(state.tutorial.firstReturnContext)
+        state.tutorial.firstReturnContext = .init(
+            runIndex: 2, route: .library, reason: .fieldNote, writingID: "selected")
+        try io.write(SaveCodec.encode(state))
+        let staleStore = GameStore(io: io)
+        let staleBytes = try Data(contentsOf: io.saveURL)
+        let staleState = staleStore.state
+        XCTAssertEqual(staleStore.displayedFirstReturnWriting(rendered), .refused(.staleContext))
+        XCTAssertEqual(staleStore.state, staleState)
+        XCTAssertEqual(try Data(contentsOf: io.saveURL), staleBytes)
+        XCTAssertFalse(staleStore.diagnostics.hasPendingWrite)
+
+        var missing = firstReturnState(writingID: "missing")
+        let missingContext = try XCTUnwrap(missing.tutorial.firstReturnContext)
+        try io.write(SaveCodec.encode(missing))
+        let missingStore = GameStore(io: io)
+        let missingBytes = try Data(contentsOf: io.saveURL)
+        XCTAssertEqual(missingStore.displayedFirstReturnWriting(missingContext),
+                       .refused(.recoveredRecordUnavailable))
+        XCTAssertEqual(missingStore.state, missing)
+        XCTAssertEqual(try Data(contentsOf: io.saveURL), missingBytes)
+        XCTAssertFalse(missingStore.diagnostics.hasPendingWrite)
+    }
+
+    @MainActor func testEveryRecoveredWritingFamilyAndDiaryPageCommitsExactFactOnce() throws {
+        for (family, reason) in [
+            (FoundWritingRecord.Family.fieldNote, FirstReturnTutorialContext.Reason.fieldNote),
+            (.routeMark, .routeMark), (.siteFragment, .siteFragment), (.workingScrap, .workingScrap)
+        ] {
+            let io = SaveFileIO.temporary(name: "tutorial-family-\(family)-\(UUID().uuidString)")
+            var state = firstReturnState(reason: reason)
+            state.reality.library.foundWritings[0].family = family
+            try io.write(SaveCodec.encode(state))
+            let store = GameStore(io: io)
+            let context = try XCTUnwrap(store.state.tutorial.firstReturnContext)
+            XCTAssertEqual(store.displayedFirstReturnWriting(context), .committed)
+            XCTAssertEqual(store.state.tutorial[.libraryFirstWriting].completedByFact,
+                           "first_writing_displayed")
+            store.flushNow()
+            let relaunched = GameStore(io: io).state
+            XCTAssertEqual(relaunched.tutorial, store.state.tutorial)
+            XCTAssertEqual(relaunched.meta.mutationCount, store.state.meta.mutationCount)
+            XCTAssertEqual(relaunched.meta.semanticActionTrail, store.state.meta.semanticActionTrail)
+        }
+
+        let page = try XCTUnwrap(ContentCatalog.shared.diaryPages.first)
+        let io = SaveFileIO.temporary(name: "tutorial-diary-\(UUID().uuidString)")
+        var state = GameState.newGame()
+        state.reality.library.foundPages.append(page.id)
+        state.tutorial.firstReturnContext = .init(
+            runIndex: 1, route: .library, reason: .diaryPage, writingID: page.id.rawValue)
+        try io.write(SaveCodec.encode(state))
+        let store = GameStore(io: io)
+        let context = try XCTUnwrap(store.state.tutorial.firstReturnContext)
+        XCTAssertEqual(store.displayedFirstReturnWriting(context), .committed)
+        store.flushNow()
+        let relaunched = GameStore(io: io).state
+        XCTAssertEqual(relaunched.tutorial, store.state.tutorial)
+        XCTAssertEqual(relaunched.meta.mutationCount, store.state.meta.mutationCount)
+        XCTAssertEqual(relaunched.meta.semanticActionTrail, store.state.meta.semanticActionTrail)
     }
 
     func testUnknownFutureFirstReturnRouteAndReasonRoundTripRaw() throws {

@@ -1,5 +1,18 @@
 import Foundation
 
+enum FirstReturnTutorialFactResultV1: Equatable, Sendable {
+    case committed
+    case alreadyCompleted
+    case refused(FirstReturnTutorialFactRefusalV1)
+}
+
+enum FirstReturnTutorialFactRefusalV1: Equatable, Sendable {
+    case noFrozenContext
+    case wrongDestination(expected: AppRoute, actual: AppRoute)
+    case recoveredRecordUnavailable
+    case staleContext
+}
+
 struct TutorialLessonDefinition: Identifiable, Sendable {
     enum Group: String, CaseIterable, Sendable { case writing = "Writing", worlds = "Worlds" }
     let id: TutorialLessonID
@@ -293,20 +306,52 @@ extension GameStore {
         return acknowledgeExpeditionReview(reviewID)
     }
 
-    func openedFirstReturnDestination(_ route: AppRoute) {
-        mutate("opened first return destination") { state in
-            guard let context = state.tutorial.firstReturnContext,
-                  TutorialRules.destination(for: context.route) == route else { return }
-            state.tutorial.complete(.baseFirstResultRoute, fact: "first_result_destination_opened")
+    @discardableResult
+    func openedFirstReturnDestination(_ route: AppRoute) -> FirstReturnTutorialFactResultV1 {
+        guard let context = state.tutorial.firstReturnContext else {
+            return .refused(.noFrozenContext)
         }
+        let expected = TutorialRules.destination(for: context.route)
+        guard expected == route else {
+            return .refused(.wrongDestination(expected: expected, actual: route))
+        }
+        guard state.tutorial[.baseFirstResultRoute].status != .completed else {
+            return .alreadyCompleted
+        }
+        let committed = mutateIf("opened first return destination") { state in
+            guard state.tutorial.firstReturnContext == context,
+                  TutorialRules.destination(for: context.route) == route,
+                  state.tutorial[.baseFirstResultRoute].status != .completed else { return false }
+            state.tutorial.complete(.baseFirstResultRoute, fact: "first_result_destination_opened")
+            return true
+        }
+        return committed ? .committed : .refused(.staleContext)
     }
 
-    func displayedFirstReturnWriting() {
-        mutate("displayed first return writing") { state in
-            guard let context = state.tutorial.firstReturnContext,
-                  TutorialRules.libraryCopy(context, in: state) != nil else { return }
-            state.tutorial.complete(.libraryFirstWriting, fact: "first_writing_displayed")
+    @discardableResult
+    func displayedFirstReturnWriting(
+        _ renderedContext: FirstReturnTutorialContext
+    ) -> FirstReturnTutorialFactResultV1 {
+        guard let context = state.tutorial.firstReturnContext else {
+            return .refused(.noFrozenContext)
         }
+        guard context == renderedContext else { return .refused(.staleContext) }
+        guard context.route == .library,
+              TutorialRules.libraryCopy(context, in: state) != nil else {
+            return .refused(.recoveredRecordUnavailable)
+        }
+        guard state.tutorial[.libraryFirstWriting].status != .completed else {
+            return .alreadyCompleted
+        }
+        let committed = mutateIf("displayed first return writing") { state in
+            guard state.tutorial.firstReturnContext == renderedContext,
+                  renderedContext.route == .library,
+                  TutorialRules.libraryCopy(renderedContext, in: state) != nil,
+                  state.tutorial[.libraryFirstWriting].status != .completed else { return false }
+            state.tutorial.complete(.libraryFirstWriting, fact: "first_writing_displayed")
+            return true
+        }
+        return committed ? .committed : .refused(.staleContext)
     }
 
     func openedComparisonPreview() {

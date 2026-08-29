@@ -457,7 +457,9 @@ struct LibraryView: View {
         firstReturnPrompt = context
         // Completion records that the exact recovered text was displayed. Keeping a local copy
         // lets the hovering card remain readable until dismissed without re-entering scroll layout.
-        store.displayedFirstReturnWriting()
+        if TutorialRules.libraryCopy(context, in: store.state) != nil {
+            store.displayedFirstReturnWriting(context)
+        }
     }
 
     private func tutorialNotice<Content: View>(title: String, icon: String,

@@ -2,6 +2,17 @@ import XCTest
 @testable import Bookbinder
 
 final class SaveSlotTests: XCTestCase {
+    private func firstReturnTutorialSlotState() -> GameState {
+        var state = GameState.newGame()
+        state.reality.library.foundWritings = [
+            FoundWritingRecord(id: "slot-selected", family: .fieldNote, prose: "Words.",
+                               position: GridPoint(x: 0, y: 0))
+        ]
+        state.tutorial.firstReturnContext = .init(
+            runIndex: 1, route: .library, reason: .fieldNote, writingID: "slot-selected")
+        return state
+    }
+
     private func currentRosterPlacementState() -> GameState {
         var state = GameState.newGame()
         var keeper = CompanionState()
@@ -144,6 +155,51 @@ final class SaveSlotTests: XCTestCase {
         XCTAssertEqual(loaded.base.activeParty.last, state.base.activeParty.last)
         XCTAssertTrue(loaded.validatesAnimalCompanionCombat())
         XCTAssertEqual(try Data(contentsOf: url), bytes)
+    }
+
+    @MainActor func testFirstReturnTutorialRefusalPreservesRealSlotEnvelopeAndCommitRelaunches() async throws {
+        let root = directory()
+        defer { try? FileManager.default.removeItem(at: root) }
+        let slots = SaveSlotFileIO(directory: root)
+        let created = try await slots.create(
+            name: "First return fact", state: firstReturnTutorialSlotState())
+        _ = try await slots.acquireWriterLease(for: created.metadata.id)
+        let payloadIO = try await slots.payloadIOForLeasedSlot()
+        let store = GameStore(io: payloadIO)
+        let url = try await slots.exportURL(for: created.metadata.id)
+        let envelopeBefore = try Data(contentsOf: url)
+        let stateBefore = store.state
+        let diagnosticsBefore = store.diagnostics
+
+        XCTAssertEqual(store.openedFirstReturnDestination(.storehouse),
+                       .refused(.wrongDestination(expected: .library, actual: .storehouse)))
+        XCTAssertEqual(store.state, stateBefore)
+        XCTAssertEqual(try SaveCodec.encode(store.state), try SaveCodec.encode(stateBefore))
+        XCTAssertEqual(store.state.meta.mutationCount, stateBefore.meta.mutationCount)
+        XCTAssertEqual(store.state.meta.semanticActionTrail, stateBefore.meta.semanticActionTrail)
+        XCTAssertEqual(store.state.meta.lastSavedAt, stateBefore.meta.lastSavedAt)
+        XCTAssertEqual(store.diagnostics.writeCount, diagnosticsBefore.writeCount)
+        XCTAssertEqual(store.diagnostics.savedMutationCount, diagnosticsBefore.savedMutationCount)
+        XCTAssertEqual(store.diagnostics.lastError, diagnosticsBefore.lastError)
+        XCTAssertFalse(store.diagnostics.hasPendingWrite)
+        XCTAssertEqual(try Data(contentsOf: url), envelopeBefore)
+
+        XCTAssertEqual(store.openedFirstReturnDestination(.library), .committed)
+        let context = try XCTUnwrap(store.state.tutorial.firstReturnContext)
+        XCTAssertEqual(store.displayedFirstReturnWriting(context), .committed)
+        store.flushNow()
+        let committed = store.state
+        let envelopeAfterCommit = try Data(contentsOf: url)
+        let loaded = try await slots.load(created.metadata.id).state
+        XCTAssertEqual(loaded.tutorial, committed.tutorial)
+        XCTAssertEqual(loaded.meta.mutationCount, committed.meta.mutationCount)
+        XCTAssertEqual(loaded.meta.semanticActionTrail, committed.meta.semanticActionTrail)
+
+        XCTAssertEqual(store.openedFirstReturnDestination(.library), .alreadyCompleted)
+        XCTAssertEqual(store.displayedFirstReturnWriting(context), .alreadyCompleted)
+        XCTAssertEqual(store.state, committed)
+        XCTAssertFalse(store.diagnostics.hasPendingWrite)
+        XCTAssertEqual(try Data(contentsOf: url), envelopeAfterCommit)
     }
 
     func testForgedGameplayContributionFailsWithoutRewritingRealSlotEnvelope() async throws {
