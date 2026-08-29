@@ -1,4 +1,5 @@
 import Foundation
+import CryptoKit
 
 /// What happens when a player takes a turn in a world.
 ///
@@ -333,10 +334,131 @@ enum WorldRules {
         return "Animal"
     }
 
-    struct SurveyReading: Equatable, Sendable {
+    struct SurveyReading: Codable, Equatable, Sendable {
         var target: PressureTargetID
         var name: String
         var text: String
+    }
+
+    struct FieldSurveyInstrumentSnapshotV1: Codable, Equatable, Sendable {
+        var target: PressureTargetID
+        var precision: RealityState.InstrumentPrecision
+    }
+
+    struct FieldSurveyQuoteV1: Codable, Equatable, Sendable {
+        static let version = 1
+        var version: Int = Self.version
+        var worldRunID: String
+        var position: GridPoint
+        var turnBefore: Int
+        var rngBefore: SeededRNG
+        var instruments: [FieldSurveyInstrumentSnapshotV1]
+        var observationsBefore: [PressureTargetID: RealityState.SubjectObservation]
+        var readings: [SurveyReading]
+        var inputStateHash: String
+    }
+
+    enum FieldSurveyRefusalV1: Equatable, Sendable {
+        case noActiveRun
+        case encounterActive
+        case invalidInstrumentAuthority
+        case noValidInstrument
+        case staleQuote
+    }
+
+    enum FieldSurveyEvaluationV1: Equatable, Sendable {
+        case available(FieldSurveyQuoteV1)
+        case refused(FieldSurveyRefusalV1)
+    }
+
+    enum FieldSurveyCommitResultV1: Equatable, Sendable {
+        case committed
+        case refused(FieldSurveyRefusalV1)
+    }
+
+    struct FieldSurveyCommitOutcomeV1: Equatable, Sendable {
+        var result: FieldSurveyCommitResultV1
+        var events: [Event]
+    }
+
+    static func fieldSurveyPlayerCopy(for refusal: FieldSurveyRefusalV1) -> String {
+        switch refusal {
+        case .noActiveRun: "There is no active expedition."
+        case .encounterActive: "Finish the encounter first."
+        case .invalidInstrumentAuthority: "The field instruments could not be read safely."
+        case .noValidInstrument: "You brought no field instruments."
+        case .staleQuote: "The field kit changed. Review the survey and try again."
+        }
+    }
+
+    static func evaluateFieldSurvey(in state: GameState) -> FieldSurveyEvaluationV1 {
+        guard let run = state.worlds.activeRun else { return .refused(.noActiveRun) }
+        guard run.activeEncounter == nil else { return .refused(.encounterActive) }
+        guard state.validatesFieldSurveyAuthority() else {
+            return .refused(.invalidInstrumentAuthority)
+        }
+        let instruments: [FieldSurveyInstrumentSnapshotV1] =
+            RealityState.surveySubjectIDsInOrder.compactMap { target in
+            guard run.carriedInstruments.contains(target),
+                  let precision = run.carriedInstrumentPrecisions[target] else { return nil }
+            return FieldSurveyInstrumentSnapshotV1(target: target, precision: precision)
+        }
+        guard !instruments.isEmpty else { return .refused(.noValidInstrument) }
+        let worldReadings = BookRules.readings(for: run.book, seed: run.mapSeed)
+        let report = instruments.compactMap { instrument -> SurveyReading? in
+            guard let definition = ContentCatalog.shared.pressureTarget(instrument.target) else {
+                return nil
+            }
+            let value = worldReadings[instrument.target]
+            return SurveyReading(
+                target: instrument.target, name: definition.name,
+                text: WorldDescription.Reading.text(
+                    peak: value.peak, floor: value.floor, hasFloor: definition.dualValued,
+                    precision: instrument.precision))
+        }
+        guard report.count == instruments.count else {
+            return .refused(.invalidInstrumentAuthority)
+        }
+        guard let bytes = try? SaveCodec.encode(state) else {
+            return .refused(.invalidInstrumentAuthority)
+        }
+        let hash = SHA256.hash(data: bytes).map { String(format: "%02x", $0) }.joined()
+        return .available(.init(
+            worldRunID: "\(run.runIndex):\(run.mapSeed)", position: run.playerPosition,
+            turnBefore: run.turnsTaken, rngBefore: run.rng, instruments: instruments,
+            observationsBefore: state.reality.observations, readings: report,
+            inputStateHash: hash))
+    }
+
+    static func commitFieldSurvey(_ quote: FieldSurveyQuoteV1,
+                                  in state: inout GameState) -> FieldSurveyCommitOutcomeV1 {
+        guard case .available(let current) = evaluateFieldSurvey(in: state), current == quote else {
+            let refusal: FieldSurveyRefusalV1
+            if case .refused(let exact) = evaluateFieldSurvey(in: state) { refusal = exact }
+            else { refusal = .staleQuote }
+            return .init(result: .refused(refusal), events: [])
+        }
+        guard let run = state.worlds.activeRun else {
+            return .init(result: .refused(.noActiveRun), events: [])
+        }
+        let worldReadings = BookRules.readings(for: run.book, seed: run.mapSeed)
+        for instrument in quote.instruments {
+            let value = worldReadings[instrument.target]
+            if var known = state.reality.observations[instrument.target] {
+                known.add(peak: value.peak, floor: value.floor, precision: instrument.precision)
+                state.reality.observations[instrument.target] = known
+            } else {
+                state.reality.observations[instrument.target] = .init(
+                    count: 1, lowest: value.floor, highest: value.peak,
+                    bestPrecision: instrument.precision)
+            }
+        }
+        var events: [Event] = [.surveyed(quote.readings)]
+        events.append(contentsOf: advanceTurn(in: &state))
+        guard state.validatesFieldSurveyAuthority() else {
+            return .init(result: .refused(.invalidInstrumentAuthority), events: [])
+        }
+        return .init(result: .committed, events: events)
     }
 
     // MARK: - Vision
@@ -801,33 +923,16 @@ enum WorldRules {
     /// Use every instrument in the field kit at once. The readings become permanent knowledge and
     /// the world advances exactly once, however many subjects were measured.
     static func survey(in state: inout GameState) -> [Event] {
-        guard let run = state.worlds.activeRun, run.activeEncounter == nil else {
-            return [.blocked("You can't survey now.")]
-        }
-        let readings = BookRules.readings(for: run.book, seed: run.mapSeed)
-        var report: [SurveyReading] = []
-        for target in ContentCatalog.shared.pressureTargetsInOrder
-        where run.carriedInstruments.contains(target.id) {
-            let value = readings[target.id]
-            let precision = run.carriedInstrumentPrecisions[target.id] ?? .crude
-            if var known = state.reality.observations[target.id] {
-                known.add(peak: value.peak, floor: value.floor, precision: precision)
-                state.reality.observations[target.id] = known
-            } else {
-                state.reality.observations[target.id] = .init(count: 1, lowest: value.floor,
-                                                               highest: value.peak,
-                                                               bestPrecision: precision)
+        switch evaluateFieldSurvey(in: state) {
+        case .available(let quote):
+            let outcome = commitFieldSurvey(quote, in: &state)
+            if case .refused(let refusal) = outcome.result {
+                return [.blocked(fieldSurveyPlayerCopy(for: refusal))]
             }
-            report.append(SurveyReading(
-                target: target.id, name: target.name,
-                text: WorldDescription.Reading.text(peak: value.peak, floor: value.floor,
-                                                    hasFloor: target.dualValued,
-                                                    precision: precision)))
+            return outcome.events
+        case .refused(let refusal):
+            return [.blocked(fieldSurveyPlayerCopy(for: refusal))]
         }
-        guard !report.isEmpty else { return [.blocked("You brought no field instruments.")] }
-        var events: [Event] = [.surveyed(report)]
-        events.append(contentsOf: advanceTurn(in: &state))
-        return events
     }
 
 

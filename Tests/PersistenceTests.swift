@@ -3,6 +3,33 @@ import XCTest
 
 /// The interruptibility pillar, tested. Anything that breaks here breaks pillar 2.
 final class PersistenceTests: XCTestCase {
+    private func fieldSurveyAuthorityState() -> GameState {
+        var state = GameState.newGame()
+        let ids = Array(RealityState.surveySubjectIDsInOrder.prefix(2))
+        state.reality.instruments = Set(ids)
+        state.reality.instrumentPrecisions = [ids[0]: .good, ids[1]: .fine]
+        state.reality.observations = [
+            ids[0]: .init(count: 2, lowest: 10, highest: 80, bestPrecision: .good)
+        ]
+        state.base.instrumentLoadout = Set(ids)
+        let point = GridPoint(x: 0, y: 0)
+        var active = WorldRun(runIndex: 821, book: .init(written: [], essencePaid: 0),
+                              mapSeed: 821_001, rng: .init(seed: 821_001),
+                              map: .init(width: 1, height: 1,
+                                         tiles: [Tile(isRevealed: true)], entry: point),
+                              playerPosition: point)
+        active.carriedInstruments = Set(ids)
+        active.carriedInstrumentPrecisions = [ids[0]: .good, ids[1]: .fine]
+        var anchored = active; anchored.runIndex = 822; anchored.mapSeed = 822_001
+        anchored.rng = .init(seed: 822_001)
+        state.worlds.activeRun = active
+        state.worlds.anchoredRealms = [
+            .init(runIndex: anchored.runIndex, name: "Survey realm", route: .bornAnchored,
+                  world: anchored)
+        ]
+        return state
+    }
+
     private func resourceNodeAuthorityState() -> GameState {
         var state = GameState.newGame()
         let point = GridPoint(x: 0, y: 0)
@@ -1359,6 +1386,53 @@ final class PersistenceTests: XCTestCase {
                     node["extractionRequirement"] = value
                 }
             }
+            let original = bytes
+            XCTAssertThrowsError(try SaveCodec.decode(bytes), name)
+            XCTAssertEqual(bytes, original, name)
+        }
+    }
+
+    func testCurrentFieldSurveyAuthorityRoundTripsAndRejectsMalformedRawGraphs() throws {
+        let state = fieldSurveyAuthorityState()
+        let valid = try SaveCodec.encode(state)
+        XCTAssertEqual(try SaveCodec.decode(valid), state)
+        let cases: [(String, (inout [String: Any]) -> Void)] = [
+            ("unknown owned subject", { root in
+                var reality = root["reality"] as! [String: Any]
+                reality["instruments"] = ["illumination", "unknown_subject"]
+                root["reality"] = reality
+            }),
+            ("precision mismatch", { root in
+                var reality = root["reality"] as! [String: Any]
+                reality["instrumentPrecisions"] = ["illumination": 2]
+                root["reality"] = reality
+            }),
+            ("duplicate loadout", { root in
+                var base = root["base"] as! [String: Any]
+                base["instrumentLoadout"] = ["illumination", "illumination"]
+                root["base"] = base
+            }),
+            ("unknown observation", { root in
+                var reality = root["reality"] as! [String: Any]
+                var observations = reality["observations"] as! [String: Any]
+                observations["unknown_subject"] = [
+                    "count": 1, "lowest": 1, "highest": 2, "bestPrecision": 1
+                ]
+                reality["observations"] = observations; root["reality"] = reality
+            }),
+            ("anchored precision mismatch", { root in
+                var worlds = root["worlds"] as! [String: Any]
+                var realms = worlds["anchoredRealms"] as! [[String: Any]]
+                var run = realms[0]["world"] as! [String: Any]
+                run["carriedInstrumentPrecisions"] = ["illumination": 2]
+                realms[0]["world"] = run; worlds["anchoredRealms"] = realms
+                root["worlds"] = worlds
+            })
+        ]
+        for (name, mutate) in cases {
+            var root = try XCTUnwrap(JSONSerialization.jsonObject(with: valid) as? [String: Any])
+            mutate(&root)
+            let bytes = try JSONSerialization.data(withJSONObject: root, options: [.sortedKeys])
             let original = bytes
             XCTAssertThrowsError(try SaveCodec.decode(bytes), name)
             XCTAssertEqual(bytes, original, name)

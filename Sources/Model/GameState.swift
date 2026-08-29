@@ -110,6 +110,9 @@ struct GameState: Codable, Equatable, Sendable {
                 throw CocoaError(.coderInvalidValue)
             }
         }
+        if schemaVersion >= 21, !validatesFieldSurveyAuthority() {
+            throw CocoaError(.coderInvalidValue)
+        }
         if schemaVersion >= 4 {
             let runs = [worlds.activeRun].compactMap { $0 } + worlds.anchoredRealms.map(\.world)
             for run in runs {
@@ -155,6 +158,17 @@ struct GameState: Codable, Equatable, Sendable {
         // Reconcile older built saves idempotently; item ownership never teaches it.
         if base.station(Stations.blacksmith).isUnlocked {
             reality.library.knownSchematics.insert("pointed_blade")
+        }
+    }
+
+    func validatesFieldSurveyAuthority() -> Bool {
+        guard reality.validatesSurveyAuthority(),
+              base.instrumentLoadout.isSubset(of: reality.instruments) else { return false }
+        let allowed = RealityState.surveySubjectIDs
+        let runs = [worlds.activeRun].compactMap { $0 } + worlds.anchoredRealms.map(\.world)
+        return runs.allSatisfy { run in
+            run.carriedInstruments.isSubset(of: allowed)
+                && Set(run.carriedInstrumentPrecisions.keys) == run.carriedInstruments
         }
     }
 

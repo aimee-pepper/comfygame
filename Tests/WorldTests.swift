@@ -4221,6 +4221,101 @@ final class WorldTests: XCTestCase {
                        relaunchedDiagnostics.hasPendingWrite)
     }
 
+    @MainActor
+    func testFieldSurveyCommitsAllExactInstrumentsOnceAndRelaunches() throws {
+        let io = SaveFileIO.temporary(name: "field-survey-success-\(UUID().uuidString)")
+        let store = GameStore(io: io)
+        let targets = Array(RealityState.surveySubjectIDsInOrder.prefix(2))
+        store.mutate("survey fixture", flush: true) { state in
+            state = startedRun(book([:]), seed: 93_001)
+            state.reality.instruments = Set(targets)
+            state.reality.instrumentPrecisions = [targets[0]: .good, targets[1]: .fine]
+            state.base.instrumentLoadout = Set(targets)
+            state.worlds.activeRun!.carriedInstruments = Set(targets)
+            state.worlds.activeRun!.carriedInstrumentPrecisions = [
+                targets[0]: .good, targets[1]: .fine
+            ]
+        }
+        store.refreshWorldFieldContext()
+        guard case .available(let quote) = store.fieldSurveyEvaluation else {
+            return XCTFail("exact carried kit must admit Survey")
+        }
+        let turn = try XCTUnwrap(store.activeRun?.turnsTaken)
+        let mutation = store.state.meta.mutationCount
+        XCTAssertEqual(store.survey(quote), .committed)
+        XCTAssertEqual(store.activeRun?.turnsTaken, turn + 1)
+        XCTAssertEqual(store.state.meta.mutationCount, mutation + 1)
+        XCTAssertEqual(Set(store.state.reality.observations.keys), Set(targets))
+        XCTAssertEqual(store.state.reality.observations[targets[0]]?.count, 1)
+        XCTAssertEqual(store.state.reality.observations[targets[1]]?.bestPrecision, .fine)
+        store.flushNow()
+
+        let committed = store.state
+        let relaunched = GameStore(io: io)
+        XCTAssertEqual(relaunched.state.reality.observations,
+                       committed.reality.observations)
+        XCTAssertEqual(relaunched.activeRun?.turnsTaken,
+                       committed.worlds.activeRun?.turnsTaken)
+        XCTAssertEqual(relaunched.activeRun?.rng,
+                       committed.worlds.activeRun?.rng)
+        XCTAssertEqual(relaunched.activeRun?.carriedInstruments,
+                       committed.worlds.activeRun?.carriedInstruments)
+        XCTAssertEqual(relaunched.activeRun?.carriedInstrumentPrecisions,
+                       committed.worlds.activeRun?.carriedInstrumentPrecisions)
+        let bytes = try SaveCodec.encode(relaunched.state)
+        let diagnostics = relaunched.diagnostics
+        XCTAssertEqual(relaunched.survey(quote), .refused(.staleQuote))
+        XCTAssertEqual(try SaveCodec.encode(relaunched.state), bytes)
+        XCTAssertEqual(relaunched.diagnostics.writeCount, diagnostics.writeCount)
+    }
+
+    @MainActor
+    func testFieldSurveyNoInstrumentAndStaleQuoteAreWriteAndContextInert() throws {
+        let io = SaveFileIO.temporary(name: "field-survey-refusal-\(UUID().uuidString)")
+        let store = GameStore(io: io)
+        store.mutate("empty survey fixture", flush: true) {
+            $0 = startedRun(book([:]), seed: 93_002)
+        }
+        store.refreshWorldFieldContext()
+        let emptyState = store.state
+        let emptyBytes = try SaveCodec.encode(emptyState)
+        let emptyDiagnostics = store.diagnostics
+        let emptyContext = store.worldFieldContext
+        XCTAssertEqual(store.survey(), .refused(.noValidInstrument))
+        XCTAssertEqual(store.state, emptyState)
+        XCTAssertEqual(try SaveCodec.encode(store.state), emptyBytes)
+        XCTAssertEqual(store.diagnostics.writeCount, emptyDiagnostics.writeCount)
+        XCTAssertEqual(store.worldFieldContext, emptyContext)
+
+        let target = RealityState.surveySubjectIDsInOrder[0]
+        store.mutate("install survey instrument", flush: true) { state in
+            state.reality.instruments = [target]
+            state.reality.instrumentPrecisions = [target: .crude]
+            state.base.instrumentLoadout = [target]
+            state.worlds.activeRun!.carriedInstruments = [target]
+            state.worlds.activeRun!.carriedInstrumentPrecisions = [target: .crude]
+        }
+        guard case .available(let stale) = store.fieldSurveyEvaluation else {
+            return XCTFail("fixture must admit exact Survey quote")
+        }
+        store.mutate("advance unrelated state", flush: true) {
+            $0.worlds.activeRun!.turnsTaken += 1
+        }
+        store.refreshWorldFieldContext()
+        let before = store.state
+        let bytes = try SaveCodec.encode(before)
+        let raw = try Data(contentsOf: io.saveURL)
+        let diagnostics = store.diagnostics
+        let context = store.worldFieldContext
+        XCTAssertEqual(store.survey(stale), .refused(.staleQuote))
+        XCTAssertEqual(store.state, before)
+        XCTAssertEqual(try SaveCodec.encode(store.state), bytes)
+        XCTAssertEqual(try Data(contentsOf: io.saveURL), raw)
+        XCTAssertEqual(store.diagnostics.writeCount, diagnostics.writeCount)
+        XCTAssertEqual(store.diagnostics.hasPendingWrite, diagnostics.hasPendingWrite)
+        XCTAssertEqual(store.worldFieldContext, context)
+    }
+
     func testNonAdjacentStepsAreRefused() {
         var state = startedRun(book(["terrain": "plains"]), seed: 13)
         let run = state.worlds.activeRun!

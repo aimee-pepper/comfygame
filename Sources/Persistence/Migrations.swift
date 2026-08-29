@@ -40,6 +40,7 @@ enum Migrations {
             try validateCurrentDebugVisibilityWorldIsolation(in: data)
             try validateCurrentEncounterSnapshots(in: data)
             try validateCurrentResourceNodeAuthority(in: data)
+            try validateCurrentFieldSurveyAuthority(in: data)
             return data
         }
 
@@ -61,6 +62,7 @@ enum Migrations {
         try validateCurrentDebugVisibilityWorldIsolation(in: working)
         try validateCurrentEncounterSnapshots(in: working)
         try validateCurrentResourceNodeAuthority(in: working)
+        try validateCurrentFieldSurveyAuthority(in: working)
         return working
     }
 
@@ -116,6 +118,78 @@ enum Migrations {
             throw CocoaError(.coderInvalidValue)
         }
         return parsed
+    }
+
+    /// Current survey knowledge and live field kits are one closed eight-subject identity graph.
+    /// Tolerant model defaults remain migration-only; current bytes must state the graph exactly.
+    private static func validateCurrentFieldSurveyAuthority(in data: Data) throws {
+        guard let root = try JSONSerialization.jsonObject(with: data) as? [String: Any],
+              let reality = root["reality"] as? [String: Any],
+              let base = root["base"] as? [String: Any],
+              let worlds = root["worlds"] as? [String: Any] else {
+            throw CocoaError(.coderInvalidValue)
+        }
+        let allowed = Set(RealityState.surveySubjectIDsInOrder.map(\.rawValue))
+        guard allowed.count == 8 else { throw CocoaError(.coderInvalidValue) }
+
+        func exactIDSet(_ value: Any?) throws -> Set<String> {
+            guard let values = value as? [Any] else { throw CocoaError(.coderInvalidValue) }
+            let ids = try values.map { value -> String in
+                guard let id = value as? String, allowed.contains(id) else {
+                    throw CocoaError(.coderInvalidValue)
+                }
+                return id
+            }
+            guard Set(ids).count == ids.count else { throw CocoaError(.coderInvalidValue) }
+            return Set(ids)
+        }
+        func exactPrecisionMap(_ value: Any?, owners: Set<String>) throws {
+            guard let values = value as? [String: Any], Set(values.keys) == owners else {
+                throw CocoaError(.coderInvalidValue)
+            }
+            for precision in values.values {
+                guard (1...3).contains(try exactInt(precision)) else {
+                    throw CocoaError(.coderInvalidValue)
+                }
+            }
+        }
+
+        let owned = try exactIDSet(reality["instruments"])
+        try exactPrecisionMap(reality["instrumentPrecisions"], owners: owned)
+        guard let observations = reality["observations"] as? [String: Any],
+              Set(observations.keys).isSubset(of: allowed) else {
+            throw CocoaError(.coderInvalidValue)
+        }
+        for value in observations.values {
+            guard let observation = value as? [String: Any],
+                  Set(observation.keys) == Set(["count", "lowest", "highest", "bestPrecision"]),
+                  try exactInt(observation["count"]) > 0,
+                  (1...3).contains(try exactInt(observation["bestPrecision"])),
+                  let low = observation["lowest"] as? NSNumber,
+                  let high = observation["highest"] as? NSNumber,
+                  CFGetTypeID(low) != CFBooleanGetTypeID(),
+                  CFGetTypeID(high) != CFBooleanGetTypeID(),
+                  low.doubleValue.isFinite, high.doubleValue.isFinite,
+                  low.doubleValue >= 0, high.doubleValue <= 100,
+                  low.doubleValue <= high.doubleValue else {
+                throw CocoaError(.coderInvalidValue)
+            }
+        }
+        let loadout = try exactIDSet(base["instrumentLoadout"])
+        guard loadout.isSubset(of: owned) else { throw CocoaError(.coderInvalidValue) }
+
+        var rawRuns: [Any] = []
+        if let active = worlds["activeRun"], !(active is NSNull) { rawRuns.append(active) }
+        if let realms = worlds["anchoredRealms"] as? [[String: Any]] {
+            rawRuns.append(contentsOf: realms.compactMap { $0["world"] })
+        }
+        for value in rawRuns {
+            guard let run = value as? [String: Any] else { throw CocoaError(.coderInvalidValue) }
+            let carried = try exactIDSet(run["carriedInstruments"])
+            try exactPrecisionMap(run["carriedInstrumentPrecisions"], owners: carried)
+        }
+        let state = try SaveCodec.makeDecoder().decode(GameState.self, from: data)
+        guard state.validatesFieldSurveyAuthority() else { throw CocoaError(.coderInvalidValue) }
     }
 
     /// Current worlds must carry the extraction authority frozen by schema 3 -> 4. `ResourceNode`
@@ -2224,6 +2298,39 @@ enum Migrations {
             worlds["activeRun"] = activeRun
             root["worlds"] = worlds
         }
+        // Schema 1 introduced the field instruments with tolerant collection defaults. This
+        // owned transition is the only place that may make those legacy defaults explicit.
+        if var reality = root["reality"] as? [String: Any] {
+            let owned = reality["instruments"] as? [String] ?? []
+            if reality["instrumentPrecisions"] == nil {
+                reality["instrumentPrecisions"] = Dictionary(
+                    uniqueKeysWithValues: owned.map { ($0, RealityState.InstrumentPrecision.crude.rawValue) })
+            }
+            if reality["observations"] == nil { reality["observations"] = [String: Any]() }
+            root["reality"] = reality
+        }
+        if var migratedBase = root["base"] as? [String: Any],
+           migratedBase["instrumentLoadout"] == nil {
+            migratedBase["instrumentLoadout"] = [String]()
+            root["base"] = migratedBase
+        }
+        func canonicalizeRun(_ value: Any) -> Any {
+            if let array = value as? [Any] { return array.map(canonicalizeRun) }
+            guard var object = value as? [String: Any] else { return value }
+            if object["runIndex"] != nil, object["mapSeed"] != nil, object["map"] != nil {
+                let carried = object["carriedInstruments"] as? [String] ?? []
+                object["carriedInstruments"] = carried
+                if object["carriedInstrumentPrecisions"] == nil {
+                    object["carriedInstrumentPrecisions"] = Dictionary(
+                        uniqueKeysWithValues: carried.map {
+                            ($0, RealityState.InstrumentPrecision.crude.rawValue)
+                        })
+                }
+            }
+            for (key, child) in object { object[key] = canonicalizeRun(child) }
+            return object
+        }
+        root = canonicalizeRun(root) as? [String: Any] ?? root
         root["schemaVersion"] = 2
         return try JSONSerialization.data(withJSONObject: root, options: [.sortedKeys])
     }

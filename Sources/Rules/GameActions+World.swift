@@ -926,17 +926,35 @@ extension GameStore {
     }
 
     var canSurvey: Bool {
-        activeRun?.activeEncounter == nil && !(activeRun?.carriedInstruments.isEmpty ?? true)
+        if case .available = WorldRules.evaluateFieldSurvey(in: state) { return true }
+        return false
     }
 
-    func survey() {
-        guard canSurvey else { return }
-        guard let attempt = beginWorldFieldAttempt(.survey) else { return }
+    var fieldSurveyEvaluation: WorldRules.FieldSurveyEvaluationV1 {
+        WorldRules.evaluateFieldSurvey(in: state)
+    }
+
+    @discardableResult
+    func survey(_ admittedQuote: WorldRules.FieldSurveyQuoteV1? = nil)
+        -> WorldRules.FieldSurveyCommitResultV1 {
+        let quote: WorldRules.FieldSurveyQuoteV1
+        if let admittedQuote { quote = admittedQuote }
+        else if case .available(let current) = fieldSurveyEvaluation { quote = current }
+        else if case .refused(let refusal) = fieldSurveyEvaluation { return .refused(refusal) }
+        else { return .refused(.staleQuote) }
+        guard let attempt = beginWorldFieldAttempt(.survey) else { return .refused(.staleQuote) }
         var events: [WorldRules.Event] = []
-        mutate("survey world", flush: true, scope: .expedition) { state in
-            events = WorldRules.survey(in: &state)
+        var result: WorldRules.FieldSurveyCommitResultV1 = .refused(.staleQuote)
+        let published = mutateIf("survey world", flush: true, scope: .expedition) { state in
+            let outcome = WorldRules.commitFieldSurvey(quote, in: &state)
+            result = outcome.result
+            guard case .committed = result else { return false }
+            events = outcome.events
+            return true
         }
+        guard published else { return result }
         finishTurn(events, attempt: attempt)
+        return .committed
     }
 
     var attendableAnimals: [WorldRules.AttendProjection] {

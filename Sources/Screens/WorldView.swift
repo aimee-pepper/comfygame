@@ -1705,8 +1705,13 @@ struct WorldView: View {
             completeInteraction(); isConfirmingAnchorFrame = true
             return .completed(.usedTile("Opened frame confirmation"))
         } else if store.canSurvey {
-            completeInteraction(); store.survey()
-            return .completed(.usedTile("Surveyed"))
+            switch store.survey() {
+            case .committed:
+                completeInteraction()
+                return .completed(.usedTile("Surveyed"))
+            case .refused(let refusal):
+                return .refused(.disabled(WorldRules.fieldSurveyPlayerCopy(for: refusal)))
+            }
         }
         return .refused(.disabled(useTileUnavailableReason))
     }

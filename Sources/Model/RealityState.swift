@@ -118,6 +118,29 @@ struct RealityState: Codable, Equatable, Sendable {
             bestPrecision = max(bestPrecision, precision)
         }
     }
+
+    /// The current field-survey authority is the catalogue's closed, ordered eight-subject set.
+    /// Persisted ownership, precision and observations may only name these subjects.
+    static var surveySubjectIDsInOrder: [PressureTargetID] {
+        ContentCatalog.shared.pressureTargetsInOrder.map(\.id)
+    }
+
+    static var surveySubjectIDs: Set<PressureTargetID> {
+        Set(surveySubjectIDsInOrder)
+    }
+
+    func validatesSurveyAuthority() -> Bool {
+        let allowed = Self.surveySubjectIDs
+        guard Self.surveySubjectIDsInOrder.count == 8,
+              allowed.count == 8,
+              instruments.isSubset(of: allowed),
+              Set(instrumentPrecisions.keys) == instruments,
+              Set(observations.keys).isSubset(of: allowed) else { return false }
+        return observations.values.allSatisfy {
+            $0.count > 0 && $0.lowest.isFinite && $0.highest.isFinite
+                && $0.lowest >= 0 && $0.highest <= 100 && $0.lowest <= $0.highest
+        }
+    }
     /// Rare currency; spent only on Constellation nodes.
     var motes: Int = 0
     /// Purchased rank per Constellation node (absent = unpurchased). Data-driven: node

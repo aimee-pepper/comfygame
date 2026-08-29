@@ -80,6 +80,41 @@ final class SaveSlotTests: XCTestCase {
         }
     }
 
+    func testFieldSurveyAuthorityRealSlotRejectsMalformedPayloadWithoutEnvelopeRewrite() async throws {
+        let root = directory(); defer { try? FileManager.default.removeItem(at: root) }
+        let slots = SaveSlotFileIO(directory: root)
+        var state = GameState.newGame()
+        let target = RealityState.surveySubjectIDsInOrder[0]
+        state.reality.instruments = [target]
+        state.reality.instrumentPrecisions = [target: .good]
+        state.base.instrumentLoadout = [target]
+        let point = GridPoint(x: 0, y: 0)
+        var run = WorldRun(runIndex: 823, book: .init(written: [], essencePaid: 0),
+                           mapSeed: 823_001, rng: .init(seed: 823_001),
+                           map: .init(width: 1, height: 1,
+                                      tiles: [Tile(isRevealed: true)], entry: point),
+                           playerPosition: point)
+        run.carriedInstruments = [target]
+        run.carriedInstrumentPrecisions = [target: .good]
+        state.worlds.activeRun = run
+        let created = try await slots.create(name: "Survey authority", state: state)
+        let url = try await slots.exportURL(for: created.metadata.id)
+        let validBytes = try Data(contentsOf: url)
+        var envelope = try SaveCodec.makeDecoder().decode(SaveSlotEnvelope.self, from: validBytes)
+        var payload = try XCTUnwrap(
+            JSONSerialization.jsonObject(with: envelope.payload) as? [String: Any])
+        var worlds = try XCTUnwrap(payload["worlds"] as? [String: Any])
+        var active = try XCTUnwrap(worlds["activeRun"] as? [String: Any])
+        active["carriedInstrumentPrecisions"] = [:]
+        worlds["activeRun"] = active; payload["worlds"] = worlds
+        envelope.payload = try JSONSerialization.data(withJSONObject: payload, options: [.sortedKeys])
+        let malformed = try encoder().encode(envelope)
+        try malformed.write(to: url, options: .atomic)
+        do { _ = try await slots.load(created.metadata.id); XCTFail("accepted mismatched precision") }
+        catch { }
+        XCTAssertEqual(try Data(contentsOf: url), malformed)
+    }
+
     @MainActor
     func testWorldFieldItemRefusalPreservesRealSlotEnvelope() async throws {
         let root = directory(); defer { try? FileManager.default.removeItem(at: root) }

@@ -78,9 +78,15 @@ struct WorldFieldContextReceiptV1: Equatable, Sendable {
             if canPlace {
                 interaction = .placeAnchor
                 interactionState = .available
-            } else if !run.carriedInstruments.isEmpty && !encounterBlocksInteraction {
+            } else if !run.carriedInstruments.isEmpty {
                 interaction = .survey
-                interactionState = .available
+                switch WorldRules.evaluateFieldSurvey(in: state) {
+                case .available:
+                    interactionState = .available
+                case .refused(let refusal):
+                    interactionState = .unavailable(
+                        reason: WorldRules.fieldSurveyPlayerCopy(for: refusal))
+                }
             } else {
                 interaction = .none
                 interactionState = .unavailable(reason: encounterBlocksInteraction
@@ -166,6 +172,7 @@ struct WorldFieldContextReceiptV1: Equatable, Sendable {
             "content=\(canonicalContent(content, tile: tile, offeredPage: offeredPages.first))",
             "interaction=\(interaction.rawValue)",
             "state=\(canonicalInteractionState(interactionState))",
+            "survey=\(surveyInputHash(in: state, interaction: interaction))",
         ])
         return Self(
             worldRunID: "\(run.runIndex):\(run.mapSeed)", position: run.playerPosition,
@@ -175,6 +182,14 @@ struct WorldFieldContextReceiptV1: Equatable, Sendable {
             floraStableID: tile.flora, floraDisplayName: floraName,
             contentSummary: content, interaction: interaction,
             interactionState: interactionState, inputStateHash: Self.sha256(payload))
+    }
+
+    private static func surveyInputHash(in state: GameState, interaction: Interaction) -> String {
+        guard interaction == .survey,
+              case .available(let quote) = WorldRules.evaluateFieldSurvey(in: state) else {
+            return "none"
+        }
+        return quote.inputStateHash
     }
 
     private static func sha256(_ value: String) -> String {
