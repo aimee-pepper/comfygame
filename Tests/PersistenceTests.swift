@@ -3,6 +3,65 @@ import XCTest
 
 /// The interruptibility pillar, tested. Anything that breaks here breaks pillar 2.
 final class PersistenceTests: XCTestCase {
+    private func resourceNodeAuthorityState() -> GameState {
+        var state = GameState.newGame()
+        let point = GridPoint(x: 0, y: 0)
+        let mineral = ResourceNode(resource: Resources.ore,
+                                   extractionRequirement: .init(
+                                    resourceID: Resources.ore, disposition: .mineralNode,
+                                    requiredExtractionRank: 4),
+                                   remainingHarvests: 2, yieldPerHarvest: 3)
+        let flora = ResourceNode(resource: Resources.fiber,
+                                 extractionRequirement: .init(
+                                    resourceID: Resources.fiber, disposition: .floraPrimary,
+                                    requiredExtractionRank: nil),
+                                 remainingHarvests: 2, yieldPerHarvest: 2)
+        let active = WorldRun(runIndex: 801, book: .init(written: [], essencePaid: 0),
+                              mapSeed: 801_001, rng: .init(seed: 801_001),
+                              map: .init(width: 1, height: 1,
+                                         tiles: [Tile(content: .node(mineral), isRevealed: true)],
+                                         entry: point), playerPosition: point)
+        let anchored = WorldRun(runIndex: 802, book: .init(written: [], essencePaid: 0),
+                                mapSeed: 802_001, rng: .init(seed: 802_001),
+                                map: .init(width: 1, height: 1,
+                                           tiles: [Tile(content: .node(flora), isRevealed: true)],
+                                           entry: point), playerPosition: point)
+        state.worlds.activeRun = active
+        state.worlds.anchoredRealms = [
+            .init(runIndex: anchored.runIndex, name: "Frozen grove", route: .bornAnchored,
+                  world: anchored)
+        ]
+        return state
+    }
+
+    private func mutatingResourceNode(
+        in data: Data, anchored: Bool = false,
+        _ mutation: (inout [String: Any]) -> Void
+    ) throws -> Data {
+        var root = try XCTUnwrap(JSONSerialization.jsonObject(with: data) as? [String: Any])
+        var worlds = try XCTUnwrap(root["worlds"] as? [String: Any])
+        var run: [String: Any]
+        var realms = worlds["anchoredRealms"] as? [[String: Any]] ?? []
+        if anchored {
+            run = try XCTUnwrap(realms[0]["world"] as? [String: Any])
+        } else {
+            run = try XCTUnwrap(worlds["activeRun"] as? [String: Any])
+        }
+        var map = try XCTUnwrap(run["map"] as? [String: Any])
+        var tiles = try XCTUnwrap(map["tiles"] as? [[String: Any]])
+        var content = try XCTUnwrap(tiles[0]["content"] as? [String: Any])
+        var associated = try XCTUnwrap(content["node"] as? [String: Any])
+        var node = try XCTUnwrap(associated["_0"] as? [String: Any])
+        mutation(&node)
+        associated["_0"] = node; content["node"] = associated; tiles[0]["content"] = content
+        map["tiles"] = tiles; run["map"] = map
+        if anchored {
+            realms[0]["world"] = run; worlds["anchoredRealms"] = realms
+        } else { worlds["activeRun"] = run }
+        root["worlds"] = worlds
+        return try JSONSerialization.data(withJSONObject: root, options: [.sortedKeys])
+    }
+
     private func currentEncounterState() throws -> GameState {
         var state = GameState.newGame()
         let point = GridPoint(x: 0, y: 0)
@@ -1223,19 +1282,87 @@ final class PersistenceTests: XCTestCase {
 
     func testSchemaThreeExtractionReceiptMigrationFreezesCatalogueTruthAndFailsUnknown() throws {
         let legacy = Data(#"{"schemaVersion":3,"nested":{"resource":"gold","remainingHarvests":2,"yieldPerHarvest":3}}"#.utf8)
-        let migrated = try Migrations.migrateIfNeeded(legacy)
+        let migrated = try Migrations.migrateSchemaThreeResourceNodesForTesting(legacy)
         let root = try XCTUnwrap(JSONSerialization.jsonObject(with: migrated) as? [String: Any])
-        XCTAssertEqual(root["schemaVersion"] as? Int, Tuning.saveSchemaVersion)
+        XCTAssertEqual(root["schemaVersion"] as? Int, 4)
         let node = try XCTUnwrap(root["nested"] as? [String: Any])
         let receipt = try XCTUnwrap(node["extractionRequirement"] as? [String: Any])
         XCTAssertEqual(receipt["rulesVersion"] as? String, "resource-extraction-1")
         XCTAssertEqual(receipt["resourceID"] as? String, "gold")
         XCTAssertEqual(receipt["disposition"] as? String, "mineral_node")
         XCTAssertEqual(receipt["requiredExtractionRank"] as? Int, 2)
-        XCTAssertEqual(try Migrations.migrateIfNeeded(migrated), migrated)
+        XCTAssertEqual(try Migrations.migrateSchemaThreeResourceNodesForTesting(migrated), migrated)
 
         let unknown = Data(#"{"schemaVersion":3,"nested":{"resource":"unknown_future","remainingHarvests":1,"yieldPerHarvest":1}}"#.utf8)
-        XCTAssertThrowsError(try Migrations.migrateIfNeeded(unknown))
+        XCTAssertThrowsError(try Migrations.migrateSchemaThreeResourceNodesForTesting(unknown))
+    }
+
+    func testCurrentResourceNodeAuthorityAcceptsFrozenCatalogueDriftAndAnchoredRoundTrip() throws {
+        let state = resourceNodeAuthorityState()
+        let bytes = try SaveCodec.encode(state)
+        XCTAssertEqual(try Migrations.migrateIfNeeded(bytes), bytes)
+        let decoded = try SaveCodec.decode(bytes)
+        guard case .node(let mineral) = try XCTUnwrap(decoded.worlds.activeRun)
+            .map[.init(x: 0, y: 0)].content,
+              case .node(let flora) = try XCTUnwrap(decoded.worlds.anchoredRealms.first)
+                .world.map[.init(x: 0, y: 0)].content else {
+            return XCTFail("expected active and anchored nodes")
+        }
+        XCTAssertEqual(mineral.extractionRequirement?.requiredExtractionRank, 4,
+                       "the frozen rank remains authoritative despite current catalogue tuning")
+        XCTAssertEqual(ResourceExtractionRules.validatedRequirement(of: mineral),
+                       mineral.extractionRequirement)
+        XCTAssertEqual(flora.extractionRequirement?.disposition, .floraPrimary)
+    }
+
+    func testCurrentResourceNodeAuthorityRejectsMalformedActiveAndAnchoredRawBytes() throws {
+        let valid = try SaveCodec.encode(resourceNodeAuthorityState())
+        let mutations: [(String, (inout [String: Any]) -> Void)] = [
+            ("missing", { $0.removeValue(forKey: "extractionRequirement") }),
+            ("null", { $0["extractionRequirement"] = NSNull() }),
+            ("future rules", { var value = $0["extractionRequirement"] as! [String: Any]
+                value["rulesVersion"] = "resource-extraction-2"
+                $0["extractionRequirement"] = value }),
+            ("wrong resource", { var value = $0["extractionRequirement"] as! [String: Any]
+                value["resourceID"] = "gold"; $0["extractionRequirement"] = value }),
+            ("unknown resource", { $0["resource"] = "unknown_future" }),
+            ("missing rank", { var value = $0["extractionRequirement"] as! [String: Any]
+                value.removeValue(forKey: "requiredExtractionRank"); $0["extractionRequirement"] = value }),
+            ("null rank", { var value = $0["extractionRequirement"] as! [String: Any]
+                value["requiredExtractionRank"] = NSNull(); $0["extractionRequirement"] = value }),
+            ("boolean rank", { var value = $0["extractionRequirement"] as! [String: Any]
+                value["requiredExtractionRank"] = true; $0["extractionRequirement"] = value }),
+            ("string rank", { var value = $0["extractionRequirement"] as! [String: Any]
+                value["requiredExtractionRank"] = "2"; $0["extractionRequirement"] = value }),
+            ("fractional rank", { var value = $0["extractionRequirement"] as! [String: Any]
+                value["requiredExtractionRank"] = 1.5; $0["extractionRequirement"] = value }),
+            ("negative rank", { var value = $0["extractionRequirement"] as! [String: Any]
+                value["requiredExtractionRank"] = -1; $0["extractionRequirement"] = value }),
+            ("rank five", { var value = $0["extractionRequirement"] as! [String: Any]
+                value["requiredExtractionRank"] = 5; $0["extractionRequirement"] = value }),
+            ("forbidden disposition", { var value = $0["extractionRequirement"] as! [String: Any]
+                value["disposition"] = "direct_pickup"; $0["extractionRequirement"] = value })
+        ]
+        for (name, mutation) in mutations {
+            let bytes = try mutatingResourceNode(in: valid, mutation)
+            let original = bytes
+            XCTAssertThrowsError(try SaveCodec.decode(bytes), name)
+            XCTAssertEqual(bytes, original, name)
+        }
+        for name in ["missing", "null", "rank on flora"] {
+            let bytes = try mutatingResourceNode(in: valid, anchored: true) { node in
+                if name == "missing" { node.removeValue(forKey: "extractionRequirement") }
+                else if name == "null" { node["extractionRequirement"] = NSNull() }
+                else {
+                    var value = node["extractionRequirement"] as! [String: Any]
+                    value["requiredExtractionRank"] = 1
+                    node["extractionRequirement"] = value
+                }
+            }
+            let original = bytes
+            XCTAssertThrowsError(try SaveCodec.decode(bytes), name)
+            XCTAssertEqual(bytes, original, name)
+        }
     }
 
     func testSchemaOneEssenceMigrationCombinesScalarAndOwnedPhysicalExactlyOnce() throws {

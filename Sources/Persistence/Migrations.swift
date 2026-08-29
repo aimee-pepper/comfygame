@@ -39,6 +39,7 @@ enum Migrations {
             try validateCurrentRunExitCustody(in: data)
             try validateCurrentDebugVisibilityWorldIsolation(in: data)
             try validateCurrentEncounterSnapshots(in: data)
+            try validateCurrentResourceNodeAuthority(in: data)
             return data
         }
 
@@ -59,6 +60,7 @@ enum Migrations {
         try validateCurrentRunExitCustody(in: working)
         try validateCurrentDebugVisibilityWorldIsolation(in: working)
         try validateCurrentEncounterSnapshots(in: working)
+        try validateCurrentResourceNodeAuthority(in: working)
         return working
     }
 
@@ -71,8 +73,11 @@ enum Migrations {
     /// Current saves must carry the identity-bearing encounter graph explicitly. Tolerant
     /// `EncounterState` defaults remain available only while an older schema is being migrated.
     private static func validateCurrentEncounterSnapshots(in data: Data) throws {
-        guard let root = try JSONSerialization.jsonObject(with: data) as? [String: Any],
-              let worlds = root["worlds"] as? [String: Any] else {
+        guard let root = try JSONSerialization.jsonObject(with: data) as? [String: Any] else {
+            throw CocoaError(.coderInvalidValue)
+        }
+        guard let rawWorlds = root["worlds"] else { return }
+        guard let worlds = rawWorlds as? [String: Any] else {
             throw CocoaError(.coderInvalidValue)
         }
         var runValues: [Any] = []
@@ -111,6 +116,78 @@ enum Migrations {
             throw CocoaError(.coderInvalidValue)
         }
         return parsed
+    }
+
+    /// Current worlds must carry the extraction authority frozen by schema 3 -> 4. `ResourceNode`
+    /// keeps tolerant optional decoding for isolated legacy values, but a live current world may
+    /// never reach gameplay without the exact closed receipt.
+    private static func validateCurrentResourceNodeAuthority(in data: Data) throws {
+        guard let root = try JSONSerialization.jsonObject(with: data) as? [String: Any],
+              let worlds = root["worlds"] as? [String: Any] else {
+            throw CocoaError(.coderInvalidValue)
+        }
+
+        var runs: [[String: Any]] = []
+        if let active = worlds["activeRun"], !(active is NSNull) {
+            guard let run = active as? [String: Any] else { throw CocoaError(.coderInvalidValue) }
+            runs.append(run)
+        }
+        if let rawRealms = worlds["anchoredRealms"] {
+            guard let realms = rawRealms as? [[String: Any]] else {
+                throw CocoaError(.coderInvalidValue)
+            }
+            for realm in realms {
+                guard let run = realm["world"] as? [String: Any] else {
+                    throw CocoaError(.coderInvalidValue)
+                }
+                runs.append(run)
+            }
+        }
+
+        for run in runs {
+            guard let map = run["map"] as? [String: Any],
+                  let tiles = map["tiles"] as? [[String: Any]] else {
+                throw CocoaError(.coderInvalidValue)
+            }
+            for tile in tiles {
+                guard let content = tile["content"] as? [String: Any] else { continue }
+                guard let rawNode = content["node"] else { continue }
+                guard content.count == 1,
+                      let associated = rawNode as? [String: Any],
+                      associated.count == 1,
+                      let node = associated["_0"] as? [String: Any],
+                      let resourceRaw = node["resource"] as? String,
+                      ContentCatalog.shared.resource(ResourceID(rawValue: resourceRaw)) != nil,
+                      let rawReceipt = node["extractionRequirement"], !(rawReceipt is NSNull),
+                      let receipt = rawReceipt as? [String: Any],
+                      receipt["rulesVersion"] as? String
+                        == ResourceExtractionRequirementReceiptV1.currentRulesVersion,
+                      receipt["resourceID"] as? String == resourceRaw,
+                      let dispositionRaw = receipt["disposition"] as? String,
+                      let disposition = ResourceExtractionDisposition(rawValue: dispositionRaw) else {
+                    throw CocoaError(.coderInvalidValue)
+                }
+
+                switch disposition {
+                case .mineralNode:
+                    guard Set(receipt.keys) == Set([
+                        "rulesVersion", "resourceID", "disposition", "requiredExtractionRank"
+                    ]),
+                    let rank = try? exactInt(receipt["requiredExtractionRank"]),
+                    (0...4).contains(rank) else {
+                        throw CocoaError(.coderInvalidValue)
+                    }
+                case .floraPrimary:
+                    guard Set(receipt.keys) == Set([
+                        "rulesVersion", "resourceID", "disposition"
+                    ]) else {
+                        throw CocoaError(.coderInvalidValue)
+                    }
+                case .floraSecondary, .directPickup, .realityAward, .creatureMaterialOnly:
+                    throw CocoaError(.coderInvalidValue)
+                }
+            }
+        }
     }
 
     private static func validateCurrentCombatOpening(in data: Data) throws {
@@ -2036,6 +2113,15 @@ enum Migrations {
         root = migrated
         return try JSONSerialization.data(withJSONObject: root, options: [.sortedKeys])
     }
+
+#if DEBUG
+    /// Narrow executable seam for the historical schema-3 node fixture. Full legacy campaign
+    /// fixtures continue through `migrateIfNeeded`; this keeps the original owned synthesis step
+    /// independently provable without manufacturing unrelated schema-3 gameplay fields.
+    static func migrateSchemaThreeResourceNodesForTesting(_ data: Data) throws -> Data {
+        try migrate3to4(data)
+    }
+#endif
 
     /// Makes the existing physical `essence_crystal` item the sole durable Essence authority.
     /// Historical scalar spend is not replayed: the balance present at migration time is simply

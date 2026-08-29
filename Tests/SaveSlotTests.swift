@@ -2,6 +2,84 @@ import XCTest
 @testable import Bookbinder
 
 final class SaveSlotTests: XCTestCase {
+    private func resourceNodeSlotState() -> GameState {
+        var state = GameState.newGame()
+        let point = GridPoint(x: 0, y: 0)
+        func run(index: Int, resource: ResourceID) -> WorldRun {
+            let node = ResourceNode(resource: resource, remainingHarvests: 2, yieldPerHarvest: 3)
+            return WorldRun(runIndex: index, book: .init(written: [], essencePaid: 0),
+                            mapSeed: UInt64(index * 1_000 + 1), rng: .init(seed: UInt64(index * 1_000 + 1)),
+                            map: .init(width: 1, height: 1,
+                                       tiles: [Tile(content: .node(node), isRevealed: true)],
+                                       entry: point), playerPosition: point)
+        }
+        state.worlds.activeRun = run(index: 811, resource: Resources.ore)
+        let anchored = run(index: 812, resource: Resources.fiber)
+        state.worlds.anchoredRealms = [
+            .init(runIndex: anchored.runIndex, name: "Node realm", route: .bornAnchored,
+                  world: anchored)
+        ]
+        return state
+    }
+
+    private func malformedResourceNodePayload(_ data: Data, anchored: Bool,
+                                              mutation: (inout [String: Any]) -> Void) throws -> Data {
+        var root = try XCTUnwrap(JSONSerialization.jsonObject(with: data) as? [String: Any])
+        var worlds = try XCTUnwrap(root["worlds"] as? [String: Any])
+        var realms = worlds["anchoredRealms"] as? [[String: Any]] ?? []
+        var run = anchored
+            ? try XCTUnwrap(realms[0]["world"] as? [String: Any])
+            : try XCTUnwrap(worlds["activeRun"] as? [String: Any])
+        var map = try XCTUnwrap(run["map"] as? [String: Any])
+        var tiles = try XCTUnwrap(map["tiles"] as? [[String: Any]])
+        var content = try XCTUnwrap(tiles[0]["content"] as? [String: Any])
+        var associated = try XCTUnwrap(content["node"] as? [String: Any])
+        var node = try XCTUnwrap(associated["_0"] as? [String: Any])
+        mutation(&node)
+        associated["_0"] = node; content["node"] = associated; tiles[0]["content"] = content
+        map["tiles"] = tiles; run["map"] = map
+        if anchored { realms[0]["world"] = run; worlds["anchoredRealms"] = realms }
+        else { worlds["activeRun"] = run }
+        root["worlds"] = worlds
+        return try JSONSerialization.data(withJSONObject: root, options: [.sortedKeys])
+    }
+
+    func testResourceNodeAuthorityRealSlotRoundTripAndMalformedEnvelopePreservation() async throws {
+        let root = directory(); defer { try? FileManager.default.removeItem(at: root) }
+        let slots = SaveSlotFileIO(directory: root)
+        let state = resourceNodeSlotState()
+        let created = try await slots.create(name: "Frozen nodes", state: state)
+        let url = try await slots.exportURL(for: created.metadata.id)
+        let validBytes = try Data(contentsOf: url)
+        let validEnvelope = try SaveCodec.makeDecoder().decode(SaveSlotEnvelope.self, from: validBytes)
+        let loaded = try await slots.load(created.metadata.id)
+        XCTAssertEqual(loaded.state.worlds.activeRun, state.worlds.activeRun)
+
+        let cases: [(String, Bool, (inout [String: Any]) -> Void)] = [
+            ("active missing", false, { $0.removeValue(forKey: "extractionRequirement") }),
+            ("active null", false, { $0["extractionRequirement"] = NSNull() }),
+            ("active contradiction", false, {
+                var receipt = $0["extractionRequirement"] as! [String: Any]
+                receipt["resourceID"] = "gold"; $0["extractionRequirement"] = receipt
+            }),
+            ("anchored missing", true, { $0.removeValue(forKey: "extractionRequirement") }),
+            ("anchored malformed", true, {
+                var receipt = $0["extractionRequirement"] as! [String: Any]
+                receipt["requiredExtractionRank"] = 1; $0["extractionRequirement"] = receipt
+            })
+        ]
+        for (name, anchored, mutation) in cases {
+            var envelope = validEnvelope
+            envelope.payload = try malformedResourceNodePayload(
+                validEnvelope.payload, anchored: anchored, mutation: mutation)
+            let bytes = try encoder().encode(envelope)
+            try bytes.write(to: url, options: .atomic)
+            do { _ = try await slots.load(created.metadata.id); XCTFail("accepted \(name)") }
+            catch { }
+            XCTAssertEqual(try Data(contentsOf: url), bytes, name)
+        }
+    }
+
     @MainActor
     func testWorldFieldItemRefusalPreservesRealSlotEnvelope() async throws {
         let root = directory(); defer { try? FileManager.default.removeItem(at: root) }
