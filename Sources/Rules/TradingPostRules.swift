@@ -331,8 +331,9 @@ enum TradingPostRules {
         case .quill, .feather, .fin: (.flexibility, .hardness)
         case .pelt, .down: (.insulation, .flexibility)
         case .hide: (.flexibility, .hardness)
-        case .timber: (.density, .hardness)
-        case .fibre: (.flexibility, .insulation)
+        case .timber, .rubble, .clay, .ore, .copper, .adamant, .obsidian,
+             .silver, .gold, .quartz: (.density, .hardness)
+        case .fibre, .resin: (.flexibility, .insulation)
         case .pulp: (.flexibility, .reactivity)
         case .ichor, .oil, .venom, .toxin, .reagent: (.reactivity, .density)
         }
@@ -474,7 +475,8 @@ enum TradingPostRules {
         case .pelt, .scale, .quill, .fang, .claw, .oil: 2
         case .plate, .chitin, .shell, .tusk, .horn, .venom: 3
         case .ichor: 4
-        case .timber, .fibre, .pulp, .toxin, .reagent: nil
+        case .timber, .fibre, .pulp, .toxin, .reagent, .rubble, .clay, .ore,
+             .copper, .adamant, .obsidian, .resin, .silver, .gold, .quartz: nil
         }
     }
 
@@ -492,7 +494,8 @@ enum TradingPostRules {
         case .plate, .chitin, .shell: (.hardness, .density)
         case .tusk, .horn: (.density, .hardness)
         case .venom, .ichor: (.reactivity, .lustre)
-        case .timber, .fibre, .pulp, .toxin, .reagent: nil
+        case .timber, .fibre, .pulp, .toxin, .reagent, .rubble, .clay, .ore,
+             .copper, .adamant, .obsidian, .resin, .silver, .gold, .quartz: nil
         }
     }
 

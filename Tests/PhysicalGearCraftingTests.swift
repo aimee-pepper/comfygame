@@ -253,6 +253,32 @@ final class PhysicalGearCraftingTests: XCTestCase {
         })
     }
 
+    func testBowyerCanonicalSocketsAndClosedFamilies() {
+        let longbow = PhysicalGearCraftingRules.longbow
+        XCTAssertEqual(longbow.requirements.map(\.id), ["limb.0", "limb.1", "string.0"])
+        XCTAssertEqual(longbow.requirements[0].allowedKinds, [.timber, .horn, .quill, .bone])
+        XCTAssertEqual(longbow.requirements[1].allowedKinds, longbow.requirements[0].allowedKinds)
+        XCTAssertEqual(longbow.requirements[2].allowedKinds, [.fibre, .hide, .fin])
+        XCTAssertEqual(longbow.primaryRequirementIDs, ["limb.0", "limb.1"])
+
+        let sling = PhysicalGearCraftingRules.sling
+        XCTAssertEqual(sling.requirements.map(\.id), ["cord.0", "projectile.0", "pouch.0"])
+        XCTAssertEqual(sling.requirements[0].allowedKinds, [.fibre, .hide, .fin])
+        XCTAssertEqual(sling.requirements[1].allowedKinds,
+                       [.rubble, .clay, .ore, .copper, .adamant, .bone, .tusk, .horn, .shell])
+        XCTAssertEqual(sling.requirements[2].allowedKinds, [.fibre, .hide, .pelt])
+        XCTAssertEqual(sling.primaryRequirementIDs, ["cord.0", "projectile.0"])
+
+        let throwing = PhysicalGearCraftingRules.throwingSet
+        XCTAssertEqual(throwing.requirements.map(\.id), ["edge.0", "edge.1", "carrier.0"])
+        XCTAssertEqual(throwing.requirements[0].allowedKinds,
+                       [.ore, .adamant, .obsidian, .claw, .chitin, .quill, .bone, .shell])
+        XCTAssertEqual(throwing.requirements[1].allowedKinds,
+                       throwing.requirements[0].allowedKinds)
+        XCTAssertEqual(throwing.requirements[2].allowedKinds, [.fibre, .hide, .pelt, .fin])
+        XCTAssertEqual(throwing.primaryRequirementIDs, ["edge.0", "edge.1"])
+    }
+
     func testBowyerTierZeroIsUsefulAndTierOneBroadensTheFamilies() {
         var state = bowyerState()
         guard case .ready = PhysicalGearCraftingRules.readiness(
@@ -264,19 +290,21 @@ final class PhysicalGearCraftingTests: XCTestCase {
             PhysicalGearCraftingRules.sling, in: state) else { return XCTFail("tier 1 stayed inert") }
     }
 
-    func testBowyerTierTwoAlonePermitsTierFour() throws {
+    func testBowyerQualityIsUncappedAndTierDoesNotInflateIt() throws {
         var state = bowyerState(tier: 0)
         XCTAssertEqual(try XCTUnwrap(PhysicalGearCraftingRules.preview(
-            PhysicalGearCraftingRules.longbow, in: state)).outputTier, 3)
+            PhysicalGearCraftingRules.longbow, in: state)).qualityBand, .peerless)
         state.base.stations[Stations.bowyer]?.tier = 1
         XCTAssertEqual(try XCTUnwrap(PhysicalGearCraftingRules.preview(
-            PhysicalGearCraftingRules.longbow, in: state)).outputTier, 3)
+            PhysicalGearCraftingRules.longbow, in: state)).outputTier, 5)
         state.base.stations[Stations.bowyer]?.tier = 2
         let preview = try XCTUnwrap(PhysicalGearCraftingRules.preview(
             PhysicalGearCraftingRules.longbow, in: state))
-        XCTAssertEqual(preview.outputTier, 4)
+        XCTAssertEqual(preview.outputTier, 5)
+        XCTAssertEqual(preview.rawEssence, 80)
         let output = try XCTUnwrap(PhysicalGearCraftingRules.craft(preview, in: &state))
-        XCTAssertEqual(output.gearProfile?.constructionTier, 4)
+        XCTAssertEqual(output.gearProfile?.qualityBand, .peerless)
+        XCTAssertEqual(output.gearProfile?.constructionTier, 5)
         XCTAssertEqual(output.gearProfile?.reach, .far)
         XCTAssertEqual(output.gearProfile?.damage, .pierce)
         XCTAssertEqual(output.gearProfile?.specialistProfile, "bowyer")
@@ -293,7 +321,8 @@ final class PhysicalGearCraftingTests: XCTestCase {
                 _ = state.base.worldMaterialReserve.add(unit)
             }
             let preview = try XCTUnwrap(PhysicalGearCraftingRules.preview(recipe, in: state), recipe.id)
-            XCTAssertEqual(preview.outputTier, 1, recipe.id)
+            XCTAssertEqual(preview.outputTier, 0, recipe.id)
+            XCTAssertEqual(preview.rawEssence, 12, recipe.id)
             XCTAssertTrue(preview.isBelowSpecialistHeadline, recipe.id)
             guard case .ready = PhysicalGearCraftingRules.readiness(recipe, in: state) else {
                 return XCTFail("\(recipe.id) incorrectly blocked low-tier specialist output")

@@ -1442,10 +1442,10 @@ extension GameStore {
     @discardableResult
     func craftPhysicalGear(_ preview: PhysicalGearCraftingRules.Preview) -> Bool {
         var output: ItemStack?
-        mutate("craft \(preview.recipe.id)", flush: true) { state in
+        return mutateIf("craft \(preview.recipe.id)", flush: true) { state in
             output = PhysicalGearCraftingRules.craft(preview, in: &state)
+            return output != nil
         }
-        return output != nil
     }
 
     @discardableResult

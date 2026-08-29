@@ -10,6 +10,8 @@ import Foundation
 /// plates are not interchangeable. That's the whole economy of this: what you can make depends on
 /// where you've been.
 enum MaterialFamilyID: String, Codable, CaseIterable, Equatable, Hashable, Sendable {
+    // Canonical ordinary world construction stock.
+    case rubble, clay, ore, copper, adamant, obsidian, resin, silver, gold, quartz
     // From covering
     case plate, quill, pelt, down, hide, chitin, feather, fin, scale, oil, shell, horn, venom
     // From armament
@@ -30,7 +32,8 @@ enum MaterialFamilyID: String, Codable, CaseIterable, Equatable, Hashable, Senda
         case .plate, .quill, .pelt, .down, .hide, .chitin, .feather, .fin, .scale,
              .oil, .shell, .horn, .venom, .fang, .tusk, .claw, .bone, .ichor:
             true
-        case .timber, .fibre, .pulp, .toxin, .reagent:
+        case .rubble, .clay, .ore, .copper, .adamant, .obsidian, .resin, .silver, .gold,
+             .quartz, .timber, .fibre, .pulp, .toxin, .reagent:
             false
         }
     }
@@ -55,11 +58,13 @@ enum MaterialFamilyID: String, Codable, CaseIterable, Equatable, Hashable, Senda
         case .pelt, .down, .hide: "square.stack.3d.down.right"
         case .fang, .claw: "triangle"
         case .tusk, .horn, .bone: "oval"
-        case .ichor, .oil, .venom, .toxin, .reagent: "drop"
+        case .ichor, .oil, .venom, .toxin, .reagent, .resin: "drop"
         case .fin: "water.waves"
         case .timber: "rectangle.portrait"
         case .fibre: "scribble"
         case .pulp: "circle.dotted"
+        case .rubble, .clay, .ore, .copper, .adamant, .obsidian, .silver, .gold, .quartz:
+            "diamond.fill"
         }
     }
 }
@@ -124,7 +129,8 @@ enum CraftMaterialDomain: String, Codable, CaseIterable, Sendable {
 
     static func forFamily(_ family: MaterialFamilyID) -> Self {
         switch family {
-        case .timber, .fibre, .pulp, .toxin, .reagent: .world
+        case .rubble, .clay, .ore, .copper, .adamant, .obsidian, .resin, .silver, .gold,
+             .quartz, .timber, .fibre, .pulp, .toxin, .reagent: .world
         default: .creature
         }
     }

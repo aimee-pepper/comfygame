@@ -30,6 +30,8 @@ enum PhysicalGearCraftingRules {
         var damage: DamageKind?
         var reach: Reach
         var requirements: [SampleRequirement]
+        /// Empty preserves the legacy first-primary rule. Canonical schematics name every primary.
+        var primaryRequirementIDs: Set<String> = []
 
         var intendedLean: String? {
             guard slot == .weapon, let damage else { return nil }
@@ -214,40 +216,36 @@ enum PhysicalGearCraftingRules {
 
     static let longbow = Recipe(
         id: "longbow", displayName: "Longbow", catalogFallback: "long_pick",
-        station: Stations.bowyer, stationCap: 4, specialistHeadlineTier: 3,
+        station: Stations.bowyer, stationCap: 5, specialistHeadlineTier: 3,
         slot: .weapon, damage: .pierce, reach: .far,
         requirements: [
-            SampleRequirement(id: "flexible_limb_1", allowedKinds: [.timber, .quill, .fibre],
-                              floors: [PropertyFloor(property: .flexibility, minimum: 60)]),
-            SampleRequirement(id: "flexible_limb_2", allowedKinds: [.timber, .quill, .fibre],
-                              floors: [PropertyFloor(property: .flexibility, minimum: 60)]),
-            SampleRequirement(id: "hard_point", allowedKinds: [.fang, .quill, .bone, .tusk],
-                              floors: [PropertyFloor(property: .hardness, minimum: 50)])
-        ])
+            SampleRequirement(id: "limb.0", allowedKinds: [.timber, .horn, .quill, .bone], floors: []),
+            SampleRequirement(id: "limb.1", allowedKinds: [.timber, .horn, .quill, .bone], floors: []),
+            SampleRequirement(id: "string.0", allowedKinds: [.fibre, .hide, .fin], floors: [])
+        ], primaryRequirementIDs: ["limb.0", "limb.1"])
 
     static let sling = Recipe(
         id: "sling", displayName: "Sling", catalogFallback: "field_maul",
-        station: Stations.bowyer, stationCap: 4, minimumEffectiveTier: 1, specialistHeadlineTier: 3,
+        station: Stations.bowyer, stationCap: 5, minimumEffectiveTier: 1, specialistHeadlineTier: 3,
         slot: .weapon, damage: .crush, reach: .far,
         requirements: [
-            SampleRequirement(id: "flexible_cord", allowedKinds: nil,
-                              floors: [PropertyFloor(property: .flexibility, minimum: 60)]),
-            SampleRequirement(id: "dense_projectile", allowedKinds: nil,
-                              floors: [PropertyFloor(property: .density, minimum: 60)])
-        ])
+            SampleRequirement(id: "cord.0", allowedKinds: [.fibre, .hide, .fin], floors: []),
+            SampleRequirement(id: "projectile.0", allowedKinds: [.rubble, .clay, .ore, .copper,
+                              .adamant, .bone, .tusk, .horn, .shell], floors: []),
+            SampleRequirement(id: "pouch.0", allowedKinds: [.fibre, .hide, .pelt], floors: [])
+        ], primaryRequirementIDs: ["cord.0", "projectile.0"])
 
     static let throwingSet = Recipe(
         id: "throwing_set", displayName: "Throwing Set", catalogFallback: "blade_chipped",
-        station: Stations.bowyer, stationCap: 4, minimumEffectiveTier: 1, specialistHeadlineTier: 3,
+        station: Stations.bowyer, stationCap: 5, minimumEffectiveTier: 1, specialistHeadlineTier: 3,
         slot: .weapon, damage: .rend, reach: .far,
         requirements: [
-            SampleRequirement(id: "hard_edge_1", allowedKinds: [.claw, .quill, .chitin],
-                              floors: [PropertyFloor(property: .hardness, minimum: 55)]),
-            SampleRequirement(id: "hard_edge_2", allowedKinds: [.claw, .quill, .chitin],
-                              floors: [PropertyFloor(property: .hardness, minimum: 55)]),
-            SampleRequirement(id: "flexible_carrier", allowedKinds: nil,
-                              floors: [PropertyFloor(property: .flexibility, minimum: 45)])
-        ])
+            SampleRequirement(id: "edge.0", allowedKinds: [.ore, .adamant, .obsidian, .claw,
+                              .chitin, .quill, .bone, .shell], floors: []),
+            SampleRequirement(id: "edge.1", allowedKinds: [.ore, .adamant, .obsidian, .claw,
+                              .chitin, .quill, .bone, .shell], floors: []),
+            SampleRequirement(id: "carrier.0", allowedKinds: [.fibre, .hide, .pelt, .fin], floors: [])
+        ], primaryRequirementIDs: ["edge.0", "edge.1"])
 
     static let bowyerRecipes: [Recipe] = [longbow, sling, throwingSet]
     static let fittedPoint = Recipe(
@@ -349,7 +347,7 @@ enum PhysicalGearCraftingRules {
                 ? recipe.stationCap : min(1, recipe.stationCap)
         }
         if recipe.station == Stations.bowyer {
-            return min(effectiveTier(for: recipe, in: state) >= 2 ? 4 : 3, recipe.stationCap)
+            return recipe.stationCap
         }
         if recipe.station == Stations.weaponsmith {
             return min(effectiveTier(for: recipe, in: state) >= 2 ? 4 : 3, recipe.stationCap)
@@ -408,8 +406,8 @@ enum PhysicalGearCraftingRules {
             let scoringFloors = requirement.floors + requirement.alternativeFloors
             let left = scoringFloors.map { lhs.sample.properties[$0.property] }.reduce(0, +)
             let right = scoringFloors.map { rhs.sample.properties[$0.property] }.reduce(0, +)
-            return (left, lhs.sample.qualityBand.rawValue, lhs.stockKey)
-                < (right, rhs.sample.qualityBand.rawValue, rhs.stockKey)
+            return (left, lhs.sample.qualityBand.rawValue, lhs.sample.domain.rawValue, lhs.stockKey)
+                < (right, rhs.sample.qualityBand.rawValue, rhs.sample.domain.rawValue, rhs.stockKey)
         }
     }
 
@@ -440,17 +438,23 @@ enum PhysicalGearCraftingRules {
         }
         let unique = Set(chosen.map(\.stockKey))
         guard unique.count == chosen.count else { return nil }
-        let ranks = chosen.map { $0.sample.qualityBand.rawValue }
-        let primary = Double(ranks.first ?? 0)
-        let secondary = ranks.dropFirst().isEmpty
-            ? primary
-            : Double(ranks.dropFirst().reduce(0, +)) / Double(ranks.count - 1)
+        let primaryIDs = recipe.primaryRequirementIDs.isEmpty
+            ? Set(recipe.requirements.prefix(1).map(\.id)) : recipe.primaryRequirementIDs
+        let primaryRanks = chosen.filter { primaryIDs.contains($0.requirementID) }
+            .map { $0.sample.qualityBand.rawValue }
+        let secondaryRanks = chosen.filter { !primaryIDs.contains($0.requirementID) }
+            .map { $0.sample.qualityBand.rawValue }
+        guard !primaryRanks.isEmpty else { return nil }
+        let primary = Double(primaryRanks.reduce(0, +)) / Double(primaryRanks.count)
+        let secondary = secondaryRanks.isEmpty
+            ? primary : Double(secondaryRanks.reduce(0, +)) / Double(secondaryRanks.count)
         let qualityRank = Int((0.7 * primary + 0.3 * secondary).rounded())
         let qualityBand = CraftMaterialQualityBand(rawValue: qualityRank) ?? .rough
-        let output = min(max(1, qualityRank), constructionCap(for: recipe, in: state))
+        let output = recipe.station == Stations.bowyer
+            ? qualityRank : min(max(1, qualityRank), constructionCap(for: recipe, in: state))
         let averageInsulation = chosen.map(\.sample.properties.insulation).reduce(0, +) / Double(chosen.count)
         let averageReactivity = chosen.map(\.sample.properties.reactivity).reduce(0, +) / Double(chosen.count)
-        let rawEssence = essenceCost(for: output)
+        let rawEssence = essenceCost(for: max(1, qualityRank))
         let station = ContentCatalog.shared.station(recipe.station)
         let paidEssence = station.map { StationStaffingRules.discounted(rawEssence, at: $0, in: state) }
             ?? rawEssence
