@@ -142,9 +142,15 @@ struct RootView: View {
             case .base:
                 NavigationStack(path: $debugAuditPath) {
                     BaseView()
+                        .environment(\.phoneRouteAction) { route in
+                            debugAuditPath.append(route)
+                        }
                         .navigationDestination(for: AppRoute.self) { route in
                             destination(for: route)
-                                .onAppear { debugBaseRoute = route }
+                                .onAppear {
+                                    debugBaseRoute = route
+                                    _ = store.openedFirstReturnDestination(route)
+                                }
                                 .onDisappear { debugBaseRoute = .base }
                         }
                 }

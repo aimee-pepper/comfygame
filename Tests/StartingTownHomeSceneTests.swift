@@ -3,6 +3,55 @@ import XCTest
 @testable import Bookbinder
 
 final class StartingTownHomeSceneTests: XCTestCase {
+    @MainActor
+    func testPhoneAdmissionTouchDownIsInertAndTenReleasesInvokeOnce() async throws {
+        let admission = PhoneControlAdmissionV1()
+        var state = GameState.newGame()
+        let before = try SaveCodec.encode(state)
+        let essenceBefore = state.base.essence
+        admission.touchDown()
+        XCTAssertEqual(admission.state, .touchDown)
+        XCTAssertEqual(try SaveCodec.encode(state), before)
+
+        var invocations = 0
+        var admitted = 0
+        var busy = 0
+        for _ in 0..<10 {
+            switch admission.release({
+                invocations += 1
+                state.base.essence += 1
+                return .success(.committed)
+            }) {
+            case .success: admitted += 1
+            case .failure(.busy): busy += 1
+            case .failure: XCTFail("unexpected refusal")
+            }
+        }
+        await Task.yield()
+        XCTAssertEqual(admitted, 1)
+        XCTAssertEqual(busy, 9)
+        XCTAssertEqual(invocations, 1)
+        XCTAssertEqual(state.base.essence, essenceBefore + 1)
+        guard case .completed(_, .committed) = admission.state else {
+            return XCTFail("authoritative completion must own feedback")
+        }
+    }
+
+    func testHomeDestinationQuoteStalesWithoutMutatingCampaign() throws {
+        var state = GameState.newGame()
+        let quote = try XCTUnwrap(HomeDestinationRulesV1.quote(.route(.settings), in: state))
+        let before = try SaveCodec.encode(state)
+        state.meta.mutationCount += 1
+        XCTAssertNotEqual(HomeDestinationRulesV1.quote(.route(.settings), in: state), quote)
+        state.meta.mutationCount -= 1
+        XCTAssertEqual(try SaveCodec.encode(state), before)
+        state.worlds.activeRun = WorldRun(
+            runIndex: 1, book: .init(written: [], essencePaid: 0), mapSeed: 1,
+            rng: .init(seed: 1),
+            map: .init(width: 1, height: 1, tiles: [.init()], entry: .init(x: 0, y: 0)),
+            playerPosition: .init(x: 0, y: 0))
+        XCTAssertNil(HomeDestinationRulesV1.quote(.route(.settings), in: state))
+    }
     func testSourceArtworkStillMatchesTheAuthoredIdentityHash() throws {
         let root = URL(fileURLWithPath: #filePath)
             .deletingLastPathComponent().deletingLastPathComponent()
@@ -137,9 +186,9 @@ final class StartingTownHomeSceneTests: XCTestCase {
         XCTAssertTrue(scene.contains(".frame(width: geometry.size.width, height: geometry.size.height)"))
         XCTAssertTrue(scene.contains(".frame(width: imageRect.width, height: imageRect.height)"))
         XCTAssertTrue(scene.contains("StartingTownHomeRules.hotspotRect("))
-        XCTAssertTrue(scene.contains("NavigationLink(value: route)"))
+        XCTAssertTrue(scene.contains("Button {"))
         XCTAssertTrue(scene.contains(".zIndex(1)"))
-        XCTAssertTrue(scene.contains("openedRoute(route)"))
+        XCTAssertTrue(scene.contains("openedRoute(route, destinationQuotes[route])"))
         XCTAssertTrue(scene.contains(".clipped()"))
         XCTAssertFalse(scene.contains("clipShape(RoundedRectangle"))
         XCTAssertFalse(scene.contains("overlay(RoundedRectangle"))

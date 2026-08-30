@@ -31,6 +31,9 @@ enum StartingTownHomeRules {
     static let displayAssetName = "town-starting-home-v1-phone-v2"
     static let displayPixelSize = CGSize(width: 941, height: 1672)
     static let displayAssetSHA256 = "ddc4b29ecda5428378e86aaa0dd3abe7b58dc9db7d6b956dcf4e2df708cf07f2"
+    static let homeRoutes: [AppRoute] = [
+        .writingDesk, .workshop, .storehouse, .essenceSpring, .firepit
+    ]
 
     static func load(manifestURL: URL, assetURL: URL) -> Scene? {
         guard let data = try? Data(contentsOf: manifestURL),
@@ -111,7 +114,9 @@ enum StartingTownHomeRules {
 
 struct StartingTownHomeScene: View {
     let scene: (definition: StartingTownHomeRules.Scene, image: UIImage)
-    let openedRoute: (AppRoute) -> Void
+    let destinationQuotes: [AppRoute: HomeDestinationQuoteV1]
+    let admission: PhoneControlAdmissionV1
+    let openedRoute: (AppRoute, HomeDestinationQuoteV1?) -> Void
 
     var body: some View {
         GeometryReader { geometry in
@@ -130,7 +135,9 @@ struct StartingTownHomeScene: View {
                     if let route = hotspot.appRoute {
                         let hitRect = StartingTownHomeRules.hotspotRect(
                             hotspot, imageRect: imageRect, containerSize: geometry.size)
-                        NavigationLink(value: route) {
+                        Button {
+                            openedRoute(route, destinationQuotes[route])
+                        } label: {
                             ZStack {
                                 Color.clear
                                 TownHotspotSign(title: hotspot.label,
@@ -139,8 +146,9 @@ struct StartingTownHomeScene: View {
                             .contentShape(Rectangle())
                         }
                         .buttonStyle(.plain)
+                        .fullFacePressFeedback("village.route.\(route.rawValue)",
+                                               admission: admission)
                         .accessibilityIdentifier("base-town-\(route.rawValue)")
-                        .simultaneousGesture(TapGesture().onEnded { openedRoute(route) })
                         .zIndex(1)
                         .frame(width: hitRect.width, height: hitRect.height)
                         .position(x: hitRect.midX, y: hitRect.midY)

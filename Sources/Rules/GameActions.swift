@@ -907,6 +907,26 @@ extension GameStore {
         })
     }
 
+    /// UI entry point: the review and fixed rail must commit the exact quote they displayed.
+    /// Bool wrappers below remain for rules/tests that intentionally request a fresh synchronous
+    /// transaction outside retained presentation.
+    @discardableResult
+    func bindAndDepart(_ exactQuote: WritingDeskBindQuote) -> WritingDeskBindEntryResultV1 {
+        let selectedID: InstanceID? = switch exactQuote.sourceKey {
+        case .draft: nil
+        case .collected(let instanceID, _, _): instanceID
+        }
+        let committed = bindAndDepart(
+            worldPageInstanceID: selectedID,
+            bornAnchored: exactQuote.anchorageReceipt.bornAnchored,
+            exactQuote: exactQuote,
+            openColorResolver: { scope, sigil, seed in
+                try WorldGrade2BindAdapter.openColor(
+                    scope: scope, selectedSigilID: sigil.id, mapSeed: seed)
+            })
+        return committed ? .committed : .refused
+    }
+
     /// Binds the current draft and departs into the world it describes.
     ///
     /// Flushed to disk before it returns: this is the commitment point where essence turns into a
@@ -935,15 +955,18 @@ extension GameStore {
     @discardableResult
     func bindAndDepart(
         worldPageInstanceID: InstanceID?, bornAnchored: Bool = false,
+        exactQuote: WritingDeskBindQuote? = nil,
         openColorResolver: WorldGrade2BindAdapter.OpenColorResolver,
         forcePlayableEntryRefusalForTesting: Bool = false
     ) -> Bool {
         bindError = nil
-        guard let stagedBindQuote = writingDeskBindQuote(
-            selectedWorldPageID: worldPageInstanceID, bornAnchored: bornAnchored) else {
+        guard let currentQuote = writingDeskBindQuote(
+            selectedWorldPageID: worldPageInstanceID, bornAnchored: bornAnchored),
+              exactQuote == nil || exactQuote == currentQuote else {
             bindError = "The binding changed before departure. Nothing was spent."
             return false
         }
+        let stagedBindQuote = exactQuote ?? currentQuote
         let selectedWorldPage = worldPageInstanceID.flatMap { collectedWorldPage($0) }
         guard stagedBindQuote.availability.isReady else {
             bindError = stagedBindQuote.availability.refusalMessage
@@ -1071,6 +1094,11 @@ extension GameStore {
         writingDeskBeforeCommitForTesting = nil
         beforeCommitForTesting?()
 #endif
+        guard writingDeskBindQuote(selectedWorldPageID: worldPageInstanceID,
+                                   bornAnchored: bornAnchored) == stagedBindQuote else {
+            bindError = "The binding changed before departure. Nothing was spent."
+            return false
+        }
         let currentDraftAtCommit = writingDeskDraft
         let didCommit = mutateIf("bind book & depart", flush: true) { state in
             var quoteState = state

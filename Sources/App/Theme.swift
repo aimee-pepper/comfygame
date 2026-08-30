@@ -121,8 +121,83 @@ enum PixelUITheme {
 /// The pressed treatment is deliberately immediate: it is direct acknowledgement of a finger
 /// going down, not an animation or a gameplay outcome. Disabled controls keep their existing
 /// appearance and never borrow the enabled pressed treatment.
+enum PhoneControlOutcomeV1: Equatable, Sendable {
+    case committed
+    case noChange
+    case navigationAccepted(AppRoute)
+}
+
+enum PhoneControlRefusalV1: Error, Equatable, Sendable {
+    case busy
+    case stale
+    case disabled(String)
+}
+
+/// One session-only admission owner for fixed-phone controls. Attempt IDs never enter GameState.
+@MainActor
+final class PhoneControlAdmissionV1: ObservableObject {
+    typealias AttemptID = UInt64
+    enum State: Equatable {
+        case available
+        case touchDown
+        case accepted(AttemptID)
+        case inFlight(AttemptID)
+        case completed(AttemptID, PhoneControlOutcomeV1)
+        case refused(AttemptID, PhoneControlRefusalV1)
+        case disabled(String)
+    }
+
+    @Published private(set) var state: State = .available
+    private var nextAttemptID: AttemptID = 1
+    private var touchedControlID: String?
+
+    func touchDown(controlID: String? = nil, disabledReason: String? = nil) {
+        guard !isBusy else { return }
+        touchedControlID = controlID
+        state = disabledReason.map(State.disabled) ?? .touchDown
+    }
+
+    @discardableResult
+    func release(controlID: String? = nil,
+                 _ operation: @escaping @MainActor () -> Result<PhoneControlOutcomeV1,
+                                                                 PhoneControlRefusalV1>)
+        -> Result<AttemptID, PhoneControlRefusalV1> {
+        guard !isBusy else { return .failure(.busy) }
+        if case .disabled(let reason) = state { return .failure(.disabled(reason)) }
+        if let touchedControlID, let controlID, touchedControlID != controlID {
+            return .failure(.stale)
+        }
+        let attemptID = nextAttemptID
+        nextAttemptID &+= 1
+        state = .accepted(attemptID)
+        Task { @MainActor [weak self] in
+            guard let self, self.state == .accepted(attemptID) else { return }
+            self.state = .inFlight(attemptID)
+            switch operation() {
+            case .success(let outcome): self.state = .completed(attemptID, outcome)
+            case .failure(let reason): self.state = .refused(attemptID, reason)
+            }
+        }
+        return .success(attemptID)
+    }
+
+    func reset() {
+        guard !isBusy else { return }
+        touchedControlID = nil
+        state = .available
+    }
+
+    var isBusy: Bool {
+        switch state {
+        case .accepted, .inFlight: true
+        default: false
+        }
+    }
+}
+
 private struct FullFacePressFeedbackModifier: ViewModifier {
     let id: String
+    var admission: PhoneControlAdmissionV1? = nil
     @Environment(\.isEnabled) private var isEnabled
     @GestureState private var isPressed = false
 #if DEBUG
@@ -147,6 +222,7 @@ private struct FullFacePressFeedbackModifier: ViewModifier {
             }
             .simultaneousGesture(
                 DragGesture(minimumDistance: 0)
+                    .onChanged { _ in admission?.touchDown(controlID: id) }
                     .updating($isPressed) { _, pressed, _ in pressed = true },
                 isEnabled: isEnabled
             )
@@ -160,6 +236,10 @@ private struct FullFacePressFeedbackModifier: ViewModifier {
 extension View {
     func fullFacePressFeedback(_ id: String) -> some View {
         modifier(FullFacePressFeedbackModifier(id: id))
+    }
+
+    func fullFacePressFeedback(_ id: String, admission: PhoneControlAdmissionV1) -> some View {
+        modifier(FullFacePressFeedbackModifier(id: id, admission: admission))
     }
 }
 

@@ -417,6 +417,76 @@ struct WritingDeskBindQuote: Equatable, Sendable {
     var totalCost: Int { pageCost + anchorageReceipt.premium }
 }
 
+enum WritingDeskBindEntryResultV1: Equatable, Sendable {
+    case committed
+    case refused
+}
+
+enum WritingDeskVocabularyChoiceReasonV1: Equatable, Sendable {
+    case exclusivePrimary(String)
+    case doesNotFit
+    case unavailable
+
+    var playerCopy: String {
+        switch self {
+        case .exclusivePrimary(let name): "\(name) already decides this subject."
+        case .doesNotFit: "This Sigil does not fit in the current hand/page"
+        case .unavailable: "This Sigil is not currently known."
+        }
+    }
+}
+
+enum WritingDeskVocabularyChoiceAvailabilityV1: Equatable, Sendable {
+    case available
+    case refused(WritingDeskVocabularyChoiceReasonV1)
+}
+
+struct WritingDeskVocabularyChoiceQuoteV1: Equatable, Sendable {
+    var content: MarkContent
+    var glyph: String
+    var knownAndOwned: Bool
+    var bestHand: Hand
+    var draftRevision: String
+    var exclusivityOwner: String?
+    var firstLegalOrigin: PageCell?
+    var availability: WritingDeskVocabularyChoiceAvailabilityV1
+}
+
+enum WritingDeskVocabularyChoiceRulesV1 {
+    static func evaluate(content: MarkContent, glyph: String, state: GameState,
+                         draft: Page) -> WritingDeskVocabularyChoiceQuoteV1? {
+        guard let revision = WritingDeskReviewModelFactory.canonicalHash(draft) else { return nil }
+        let catalogue = ContentCatalog.shared
+        let owned: Bool = switch content {
+        case .target(let id): catalogue.pressureTarget(id) != nil
+        case .source(let id): state.base.ownedSources.contains(id)
+            && catalogue.pressureSource(id) != nil
+        case .qualifier(let id): PageRules.writableQualifiers().contains(where: { $0.id == id })
+            && catalogue.qualifier(id) != nil
+        case .compound(let id): state.base.ownedSymbols.contains(id) && catalogue.symbol(id) != nil
+        case .rune(let sigil): state.base.ownedSources.contains(sigil.source)
+            && catalogue.pressureSource(sigil.source) != nil
+            && catalogue.pressureTarget(sigil.target) != nil
+        }
+        let conflict: String? = if case .compound(let id) = content,
+                                   let symbol = catalogue.symbol(id) {
+            PageRules.exclusivityConflict(writing: symbol, on: draft,
+                                          chainingUnlocked: state.base.hasChainingUnlock)?.name
+        } else { nil }
+        let shape = PageRules.shape(for: content, hand: state.base.bestHand)
+        let origin = shape.flatMap { PageRules.validOrigins(for: $0, on: draft).first }
+        let availability: WritingDeskVocabularyChoiceAvailabilityV1
+        if !owned { availability = .refused(.unavailable) }
+        else if let conflict { availability = .refused(.exclusivePrimary(conflict)) }
+        else if shape == nil || origin == nil { availability = .refused(.doesNotFit) }
+        else { availability = .available }
+        return .init(content: content, glyph: glyph, knownAndOwned: owned,
+                     bestHand: state.base.bestHand, draftRevision: revision,
+                     exclusivityOwner: conflict, firstLegalOrigin: origin,
+                     availability: availability)
+    }
+}
+
 enum WritingDeskBindQuoteFactory {
     @MainActor
     static func make(state: GameState, selectedWorldPageID: InstanceID? = nil,

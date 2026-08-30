@@ -223,6 +223,77 @@ final class EconomyTests: XCTestCase {
         XCTAssertNil(store.state.worlds.activeRun)
     }
 
+    func testVocabularyChoiceQuoteOwnsPackFallbackStaleCapacityAndExclusivityTruth() throws {
+        var state = GameState.newGame()
+        state.base.ownedHands.insert(.refined)
+        let content = MarkContent.target("illumination")
+        let packQuote = try XCTUnwrap(WritingDeskVocabularyChoiceRulesV1.evaluate(
+            content: content, glyph: "illumination", state: state, draft: state.base.page))
+        let fallbackQuote = try XCTUnwrap(WritingDeskVocabularyChoiceRulesV1.evaluate(
+            content: content, glyph: "illumination", state: state, draft: state.base.page))
+        XCTAssertEqual(packQuote, fallbackQuote)
+        XCTAssertEqual(packQuote.availability, .available)
+
+        var changed = state.base.page
+        changed.runes.append(.init(id: .init(rawValue: 900), content: .target("thermal"),
+                                   hand: .refined, origin: .init(column: 5, row: 5),
+                                   shapeID: "refined_dot"))
+        XCTAssertNotEqual(WritingDeskVocabularyChoiceRulesV1.evaluate(
+            content: content, glyph: "illumination", state: state, draft: changed), packQuote)
+
+        let filled = Page(runes: (0..<6).flatMap { row in
+            (0..<6).map { column in
+                PlacedRune(id: .init(rawValue: UInt64(1 + row * 6 + column)),
+                           content: .target("thermal"), hand: .refined,
+                           origin: .init(column: column, row: row), shapeID: "refined_dot")
+            }
+        })
+        let full = try XCTUnwrap(WritingDeskVocabularyChoiceRulesV1.evaluate(
+            content: content, glyph: "illumination", state: state, draft: filled))
+        XCTAssertEqual(full.availability, .refused(.doesNotFit))
+
+        let grouped = Dictionary(grouping: ContentCatalog.shared.symbols,
+                                 by: { $0.primaryTarget })
+        let pair = try XCTUnwrap(grouped.values.first(where: { $0.count > 1 }))
+        state.base.ownedSymbols.formUnion(pair.prefix(2).map(\.id))
+        let first = try XCTUnwrap(PageRules.placeAnywhere(
+            pair[0], hand: state.base.bestHand, on: Page()))
+        let exclusive = try XCTUnwrap(WritingDeskVocabularyChoiceRulesV1.evaluate(
+            content: .compound(pair[1].id), glyph: pair[1].id.rawValue,
+            state: state, draft: first))
+        XCTAssertEqual(exclusive.availability, .refused(.exclusivePrimary(pair[0].name)))
+    }
+
+    @MainActor
+    func testDisplayedBindQuoteRefusesAfterDriftAndCommitsOnlyOnce() throws {
+        let stale = GameStore(io: .temporary(name: "displayed-bind-stale-\(UUID().uuidString)"))
+        stale.mutate("prepare displayed quote") { state in
+            state.base.essence = 100
+            state.base.preparationLoadout = []
+            state.base.preparationLoadoutNeedsReview = false
+        }
+        let quote = try XCTUnwrap(stale.writingDeskBindQuote())
+        stale.mutate("drift displayed quote") { $0.base.essence = 99 }
+        let before = try SaveCodec.encode(stale.state)
+        let diagnostics = stale.diagnostics
+        XCTAssertEqual(stale.bindAndDepart(quote), .refused)
+        XCTAssertEqual(try SaveCodec.encode(stale.state), before)
+        XCTAssertEqual(stale.diagnostics.writeCount, diagnostics.writeCount)
+
+        let valid = GameStore(io: .temporary(name: "displayed-bind-valid-\(UUID().uuidString)"))
+        valid.mutate("prepare exact displayed quote") { state in
+            state.base.essence = 100
+            state.base.preparationLoadout = []
+            state.base.preparationLoadoutNeedsReview = false
+        }
+        let validQuote = try XCTUnwrap(valid.writingDeskBindQuote())
+        XCTAssertEqual(valid.bindAndDepart(validQuote), .committed)
+        XCTAssertNotNil(valid.state.worlds.activeRun)
+        let after = try SaveCodec.encode(valid.state)
+        XCTAssertEqual(valid.bindAndDepart(validQuote), .refused)
+        XCTAssertEqual(try SaveCodec.encode(valid.state), after)
+    }
+
     func testInkReceiptOrdersEqualChannelsByConversionVersionThenStableVialID() throws {
         let old = InkRecipe(cyan: 25, magenta: 25, yellow: 25, depth: 25,
                             conversionVersion: "a-version")

@@ -92,6 +92,7 @@ struct WritingDeskView: View {
     @State private var writingAssetsReady = false
     @State private var productionPack: WritingDeskProductionPack?
     @State private var writingPackUnavailable = false
+    @StateObject private var phoneAdmission = PhoneControlAdmissionV1()
 #if DEBUG
     private var debugBindRailProbe: ((Bool, String) -> Void)?
     private var debugBindRailFrameProbe: ((String, CGRect) -> Void)?
@@ -352,7 +353,14 @@ struct WritingDeskView: View {
     private var writingPaneTabs: some View {
         HStack(spacing: 3) {
             ForEach(Pane.allCases) { entry in
-                Button { pane = entry } label: {
+                Button {
+                    let same = pane == entry
+                    _ = phoneAdmission.release {
+                        guard !same else { return .success(.noChange) }
+                        pane = entry
+                        return .success(.committed)
+                    }
+                } label: {
                     Text(entry.rawValue)
                         .font(.custom("Tiny5", size: 10))
                         .frame(maxWidth: .infinity, minHeight: 38)
@@ -361,7 +369,7 @@ struct WritingDeskView: View {
                         .overlay(Rectangle().stroke(PixelUITheme.edge, lineWidth: 2))
                 }
                 .buttonStyle(.plain)
-                .fullFacePressFeedback("writing.pane.\(entry.id)")
+                .fullFacePressFeedback("writing.pane.\(entry.id)", admission: phoneAdmission)
             }
         }
         .padding(.horizontal, 10)
@@ -905,7 +913,9 @@ struct WritingDeskView: View {
         // a scrolling chore rather than a palette. Still a 44pt-plus target.
         LazyVGrid(columns: chipColumns(columns), spacing: 8) {
             ForEach(items) { item in
-                let fits = item.blockedBy == nil && store.canWrite(item.content)
+                let quote = WritingDeskVocabularyChoiceRulesV1.evaluate(
+                    content: item.content, glyph: item.glyph, state: state, draft: draft)
+                let fits = quote?.availability == .available
                 Group {
                     if let productionPack {
                         WritingDeskPackVocabularyTile(
@@ -915,14 +925,15 @@ struct WritingDeskView: View {
                             title: item.name,
                             detail: item.blockedBy != nil ? "taken" : paletteDetail(item),
                             isEnabled: fits && writingAssetsReady,
-                            action: { selectPaletteItem(item, pack: productionPack) },
+                            admission: phoneAdmission,
+                            action: {
+                                if let quote { selectPaletteItem(item, quote: quote,
+                                                                 pack: productionPack) }
+                            },
                             failed: writingSurfaceAssetFailed)
                     } else {
                         Button {
-                            cancelPageInteraction(.outsidePage)
-                            ghost = WritingDeskFallbackSelection.arm(
-                                glyph: item.glyph, content: item.content,
-                                origin: firstFreeOrigin(for: item.content))
+                            if let quote { selectPaletteItem(item, quote: quote, pack: nil) }
                         } label: {
                             WritingDeskNativeVocabularyLabel(
                                 title: item.name,
@@ -930,6 +941,8 @@ struct WritingDeskView: View {
                                 unavailable: true)
                         }
                         .buttonStyle(.plain)
+                        .fullFacePressFeedback(
+                            "writing.vocabulary.native.\(item.glyph)", admission: phoneAdmission)
                         .disabled(!fits)
                     }
                 }
@@ -942,19 +955,30 @@ struct WritingDeskView: View {
         .frame(maxWidth: .infinity)
     }
 
-    private func selectPaletteItem(_ item: Chip, pack: WritingDeskProductionPack) {
-        let candidate = WritingDeskPaletteSelection.arm(
-            glyph: item.glyph, content: item.content,
-            origin: firstFreeOrigin(for: item.content))
-        do {
-            try WritingDeskPaletteSelection.preflight(candidate, hand: state.base.bestHand, pack: pack)
-        } catch {
-            // The exact gameplay selection remains authoritative even if its optional bitmap is
-            // unavailable. Keep the modern Desk mounted and let the native Sigil glyph carry it.
-            writingSurfaceAssetFailed()
+    private func selectPaletteItem(_ item: Chip, quote: WritingDeskVocabularyChoiceQuoteV1,
+                                   pack: WritingDeskProductionPack?) {
+        let controlID = pack == nil
+            ? "writing.vocabulary.native.\(item.glyph)"
+            : "writing.vocabulary.\(packKind(item.content)).\(item.glyph)"
+        _ = phoneAdmission.release(controlID: controlID) {
+            guard WritingDeskVocabularyChoiceRulesV1.evaluate(
+                content: item.content, glyph: item.glyph, state: store.state, draft: draft
+            ) == quote, quote.availability == .available,
+                  let origin = quote.firstLegalOrigin else { return .failure(.stale) }
+            let candidate = WritingDeskPaletteSelection.arm(
+                glyph: item.glyph, content: item.content, origin: origin)
+            if let pack {
+                do {
+                    try WritingDeskPaletteSelection.preflight(
+                        candidate, hand: quote.bestHand, pack: pack)
+                } catch {
+                    writingSurfaceAssetFailed()
+                }
+            }
+            cancelPageInteraction(.outsidePage)
+            ghost = candidate
+            return .success(.committed)
         }
-        cancelPageInteraction(.outsidePage)
-        ghost = candidate
     }
 
     private func chipColumns(_ count: Int) -> [GridItem] {
@@ -1006,7 +1030,9 @@ struct WritingDeskView: View {
     }
 
     private var bindBar: some View {
-        VStack(spacing: 6) {
+        let displayedQuote = store.writingDeskBindQuote(
+            selectedWorldPageID: selectedWorldPageID, bornAnchored: bornAnchored)
+        return VStack(spacing: 6) {
             if state.base.station(Stations.anchorage).isUnlocked {
                 Toggle(isOn: $bornAnchored) {
                     VStack(alignment: .leading, spacing: 2) {
@@ -1024,14 +1050,12 @@ struct WritingDeskView: View {
                     .foregroundStyle(.secondary)
             }
             Button {
-                let committed = if let id = selectedWorldPageID {
-                    store.bindAndDepart(worldPageInstanceID: id, bornAnchored: bornAnchored)
-                } else {
-                    store.bindAndDepart(bornAnchored: bornAnchored)
-                }
-                if committed {
-                    store.completeTutorial(.writingPageRequest, fact: "first_bind")
-                    store.completeTutorial(.writingBind, fact: "first_run_created")
+                guard let displayedQuote else { return }
+                _ = phoneAdmission.release(controlID: "writing.bind-depart") {
+                    switch store.bindAndDepart(displayedQuote) {
+                    case .committed: return .success(.committed)
+                    case .refused: return .failure(.stale)
+                    }
                 }
             } label: {
                 HStack {
@@ -1042,7 +1066,7 @@ struct WritingDeskView: View {
                 .padding(.horizontal, 4)
             }
             .buttonStyle(.borderedProminent)
-            .fullFacePressFeedback("writing.bind-depart")
+            .fullFacePressFeedback("writing.bind-depart", admission: phoneAdmission)
             .accessibilityIdentifier("writing.bind-depart")
             .disabled(!activeBindAvailability.isReady)
             .background { debugBindFrame("capsule") }
@@ -1866,6 +1890,7 @@ private struct WritingDeskPackVocabularyTile: View {
     let title: String
     let detail: String
     let isEnabled: Bool
+    let admission: PhoneControlAdmissionV1
     let action: () -> Void
     let failed: () -> Void
     @State private var image: UIImage?
@@ -1881,7 +1906,7 @@ private struct WritingDeskPackVocabularyTile: View {
             }
         }
         .buttonStyle(.plain)
-        .fullFacePressFeedback("writing.vocabulary.\(kind).\(id)")
+        .fullFacePressFeedback("writing.vocabulary.\(kind).\(id)", admission: admission)
         .accessibilityIdentifier("writing.vocabulary.\(kind).\(id)")
         .disabled(!isEnabled)
         .frame(height: 58)

@@ -1,6 +1,58 @@
 import SwiftUI
 import UIKit
 
+private struct PhoneRouteActionKey: EnvironmentKey {
+    static let defaultValue: @MainActor @Sendable (AppRoute) -> Void = { _ in }
+}
+
+extension EnvironmentValues {
+    var phoneRouteAction: @MainActor @Sendable (AppRoute) -> Void {
+        get { self[PhoneRouteActionKey.self] }
+        set { self[PhoneRouteActionKey.self] = newValue }
+    }
+}
+
+enum HomeDestinationV1: Equatable, Sendable {
+    case route(AppRoute)
+    case foundation(StationID)
+}
+
+struct HomeDestinationQuoteV1: Equatable, Sendable {
+    var destination: HomeDestinationV1
+    var stationID: StationID?
+    var stationState: StationState?
+    var mutationCount: Int
+    var hasActiveRun: Bool
+}
+
+enum HomeDestinationRulesV1 {
+    static func quote(_ destination: HomeDestinationV1,
+                      in state: GameState) -> HomeDestinationQuoteV1? {
+        guard state.worlds.activeRun == nil else { return nil }
+        switch destination {
+        case .route(let route):
+            let station = ContentCatalog.shared.stations.first { $0.route == route.rawValue }
+            if let station {
+                let current = state.base.station(station.id)
+                guard current.isUnlocked else { return nil }
+                return .init(destination: destination, stationID: station.id,
+                             stationState: current, mutationCount: state.meta.mutationCount,
+                             hasActiveRun: false)
+            }
+            guard route == .settings || route == .party || route == .writingDesk else { return nil }
+            return .init(destination: destination, stationID: nil, stationState: nil,
+                         mutationCount: state.meta.mutationCount, hasActiveRun: false)
+        case .foundation(let stationID):
+            guard let station = ContentCatalog.shared.station(stationID) else { return nil }
+            let current = state.base.station(station.id)
+            guard !current.isUnlocked else { return nil }
+            return .init(destination: destination, stationID: station.id,
+                         stationState: current, mutationCount: state.meta.mutationCount,
+                         hasActiveRun: false)
+        }
+    }
+}
+
 enum BaseBoardRules {
     static func destinations(from stations: [StationDef]) -> [StationDef] {
         stations.filter {
@@ -92,11 +144,13 @@ enum BaseBoardRules {
 /// never a new button welded into this file.
 struct BaseView: View {
     @EnvironmentObject private var store: GameStore
+    @Environment(\.phoneRouteAction) private var navigate
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     @State private var routeCardHidden = false
     @State private var selectedSection: StationHomeSection = .home
     @State private var townPageBySection: [StationHomeSection: Int] = [:]
     @State private var foundationStation: StationDef?
+    @StateObject private var phoneAdmission = PhoneControlAdmissionV1()
 
     private var state: GameState { store.state }
 
@@ -150,7 +204,8 @@ struct BaseView: View {
     // MARK: Purse
 
     private var contextRow: some View {
-        HStack(spacing: 12) {
+        let settingsQuote = HomeDestinationRulesV1.quote(.route(.settings), in: state)
+        return HStack(spacing: 12) {
             Text("Village")
                 .font(.custom("Jersey 10", size: 26))
                 .accessibilityAddTraits(.isHeader)
@@ -161,12 +216,15 @@ struct BaseView: View {
                 Text("·").foregroundStyle(PixelUITheme.muted)
                 CompactCurrency(icon: "star.fill", label: "Motes",
                                 value: state.reality.motes, tint: .purple)
-                NavigationLink(value: AppRoute.settings) {
+                Button {
+                    admitRoute(.settings, quote: settingsQuote)
+                } label: {
                     Image(systemName: "gearshape.fill")
                         .font(.system(size: 9, weight: .bold))
                         .frame(width: 24, height: 28)
                 }
                 .buttonStyle(.plain)
+                .fullFacePressFeedback("village.route.settings", admission: phoneAdmission)
                 .contentShape(Rectangle())
                 .accessibilityLabel("Settings and save games")
             }
@@ -193,6 +251,7 @@ struct BaseView: View {
            state.tutorial[.returnPersistenceBoundary].status == .completed,
            state.tutorial[.baseFirstResultRoute].status != .completed {
             let route = TutorialRules.destination(for: context.route)
+            let routeQuote = HomeDestinationRulesV1.quote(.route(route), in: state)
             VStack(alignment: .leading, spacing: 10) {
                 Text("Follow what returned").font(.headline)
                 Text(TutorialRules.routeCopy(context, in: state)).font(.subheadline)
@@ -203,17 +262,20 @@ struct BaseView: View {
                     }
                     .accessibilityIdentifier("base-first-return-not-now")
                     Spacer()
-                    NavigationLink(value: route) {
+                    Button {
+                        if let station = ContentCatalog.shared.stations.first(where: {
+                            $0.route == route.rawValue
+                        }) {
+                            selectedSection = station.resolvedBoardPlacement.section
+                        }
+                        admitRoute(route, quote: routeQuote)
+                    } label: {
                         Text("Open \(destinationName(context.route))")
                     }
                     .accessibilityIdentifier("base-first-return-open")
                     .buttonStyle(.borderedProminent)
-                    .simultaneousGesture(TapGesture().onEnded {
-                        if let station = ContentCatalog.shared.stations.first(where: { $0.route == route.rawValue }) {
-                            selectedSection = station.resolvedBoardPlacement.section
-                        }
-                        store.openedFirstReturnDestination(route)
-                    })
+                    .fullFacePressFeedback("village.route.\(route.rawValue)",
+                                           admission: phoneAdmission)
                 }
             }
             .padding(14)
@@ -247,7 +309,9 @@ struct BaseView: View {
         HStack(spacing: 3) {
             ForEach(availableSections, id: \.self) { section in
                 Button {
-                    selectedSection = section
+                    admitLocalChange(noChange: section == selectedSection) {
+                        selectedSection = section
+                    }
                 } label: {
                     Text(section.title)
                         .font(.custom("Tiny5", size: 10))
@@ -268,7 +332,8 @@ struct BaseView: View {
                         }
                 }
                 .buttonStyle(.plain)
-                .fullFacePressFeedback("village.tab.\(section.rawValue)")
+                .fullFacePressFeedback("village.tab.\(section.rawValue)",
+                                       admission: phoneAdmission)
                 .accessibilityAddTraits(section == selectedSection ? .isSelected : [])
             }
         }
@@ -303,7 +368,9 @@ struct BaseView: View {
             if section == .home,
                let scene = StartingTownHomeResource.scene() {
                 StartingTownHomeScene(scene: scene,
-                                      openedRoute: { store.openedFirstReturnDestination($0) })
+                                      destinationQuotes: homeRouteQuotes,
+                                      admission: phoneAdmission,
+                                      openedRoute: admitRoute)
             } else if section != .home,
                       TownVisualResource.image(named: "town-empty-v1") != nil {
                 townDistrictBoard(section: section, containerSize: containerSize)
@@ -319,18 +386,36 @@ struct BaseView: View {
         let populatedPages = BaseBoardRules.townPages(destinations)
         let pages = populatedPages.isEmpty ? [[]] : populatedPages
         let selectedPage = min(townPageBySection[section, default: 0], pages.count - 1)
+        let visibleStations = pages[selectedPage]
+        let routeQuotes: [AppRoute: HomeDestinationQuoteV1] = Dictionary(
+            uniqueKeysWithValues: visibleStations.compactMap { station in
+                guard let route = AppRoute(rawValue: station.route),
+                      let quote = HomeDestinationRulesV1.quote(.route(route), in: state)
+                else { return nil }
+                return (route, quote)
+            })
+        let foundationQuotes: [StationID: HomeDestinationQuoteV1] = Dictionary(
+            uniqueKeysWithValues: visibleStations.compactMap { station in
+                HomeDestinationRulesV1.quote(.foundation(station.id), in: state)
+                    .map { (station.id, $0) }
+            })
         return VStack(spacing: 0) {
             TownDistrictScene(
                 section: section,
-                stations: pages[selectedPage],
+                stations: visibleStations,
                 stationState: { state.base.station($0) },
-                openFoundation: { foundationStation = $0 },
-                openedRoute: { store.openedFirstReturnDestination($0) }
+                routeQuotes: routeQuotes,
+                foundationQuotes: foundationQuotes,
+                admission: phoneAdmission,
+                openFoundation: admitFoundation,
+                openedRoute: admitRoute
             )
             if pages.count > 1 {
                 HStack(spacing: 12) {
                     Button("Previous") {
-                        townPageBySection[section] = max(0, selectedPage - 1)
+                        admitLocalChange(noChange: selectedPage == 0) {
+                            townPageBySection[section] = max(0, selectedPage - 1)
+                        }
                     }
                     .disabled(selectedPage == 0)
                     Spacer()
@@ -339,7 +424,9 @@ struct BaseView: View {
                         .foregroundStyle(.secondary)
                     Spacer()
                     Button("Next") {
-                        townPageBySection[section] = min(pages.count - 1, selectedPage + 1)
+                        admitLocalChange(noChange: selectedPage == pages.count - 1) {
+                            townPageBySection[section] = min(pages.count - 1, selectedPage + 1)
+                        }
                     }
                     .disabled(selectedPage == pages.count - 1)
                 }
@@ -377,14 +464,18 @@ struct BaseView: View {
     @ViewBuilder private func stationDestination(_ station: StationDef) -> some View {
         if state.base.station(station.id).isUnlocked {
             let route = AppRoute(rawValue: station.route) ?? .base
-            NavigationLink(value: route) {
+            let quote = HomeDestinationRulesV1.quote(.route(route), in: state)
+            Button {
+                admitRoute(route, quote: quote)
+            } label: {
                 StationTile(station: station, tier: state.base.station(station.id).tier,
                             isFoundation: false)
             }
             .buttonStyle(.plain)
-            .simultaneousGesture(TapGesture().onEnded { store.openedFirstReturnDestination(route) })
+            .fullFacePressFeedback("village.route.\(route.rawValue)", admission: phoneAdmission)
         } else {
-            Button { foundationStation = station } label: {
+            let quote = HomeDestinationRulesV1.quote(.foundation(station.id), in: state)
+            Button { admitFoundation(station, quote: quote) } label: {
                 StationTile(station: station, tier: 0, isFoundation: true)
             }
             .buttonStyle(.plain)
@@ -429,7 +520,11 @@ struct BaseView: View {
     }
 
     @ViewBuilder private var baseActionButtons: some View {
-        NavigationLink(value: AppRoute.party) {
+        let partyQuote = HomeDestinationRulesV1.quote(.route(.party), in: state)
+        let writingQuote = HomeDestinationRulesV1.quote(.route(.writingDesk), in: state)
+        Button {
+            admitRoute(.party, quote: partyQuote)
+        } label: {
             Label("Party", systemImage: "person.2.fill")
                 .font(.custom("Jersey 10", size: 16))
                 .foregroundStyle(PixelUITheme.text)
@@ -445,10 +540,12 @@ struct BaseView: View {
                 }
         }
         .buttonStyle(.plain)
-        .fullFacePressFeedback("village.party")
+        .fullFacePressFeedback("village.route.party", admission: phoneAdmission)
         .accessibilityHint("Manage party members, gear and gambits")
 
-        NavigationLink(value: AppRoute.writingDesk) {
+        Button {
+            admitRoute(.writingDesk, quote: writingQuote)
+        } label: {
             Label("Bind & Depart", systemImage: "arrow.up.forward.circle.fill")
                 .font(.custom("Tiny5", size: 12))
                 .foregroundStyle(.white)
@@ -461,11 +558,8 @@ struct BaseView: View {
                 }
         }
         .buttonStyle(.plain)
-        .fullFacePressFeedback("village.bind-depart")
+        .fullFacePressFeedback("village.route.writingDesk", admission: phoneAdmission)
         .accessibilityHint(departureHint)
-        .simultaneousGesture(TapGesture().onEnded {
-            store.openedFirstReturnDestination(.writingDesk)
-        })
     }
 
     /// **Counted in marks and subjects**, because that is what a page is made of.
@@ -486,6 +580,47 @@ struct BaseView: View {
         }
         return "\(written); \(rolled) subject\(rolled == 1 ? "" : "s") still to roll."
     }
+
+    private var homeRouteQuotes: [AppRoute: HomeDestinationQuoteV1] {
+        Dictionary(uniqueKeysWithValues: StartingTownHomeRules.homeRoutes.compactMap { route in
+            HomeDestinationRulesV1.quote(.route(route), in: state).map { (route, $0) }
+        })
+    }
+
+    private func admitRoute(_ route: AppRoute, quote: HomeDestinationQuoteV1?) {
+        guard let quote else {
+            phoneAdmission.touchDown(disabledReason: "That destination is unavailable.")
+            return
+        }
+        _ = phoneAdmission.release(controlID: "village.route.\(route.rawValue)") {
+            guard HomeDestinationRulesV1.quote(.route(route), in: store.state) == quote else {
+                return .failure(.stale)
+            }
+            navigate(route)
+            return .success(.navigationAccepted(route))
+        }
+    }
+
+    private func admitFoundation(_ station: StationDef, quote: HomeDestinationQuoteV1?) {
+        guard let quote else {
+            phoneAdmission.touchDown(disabledReason: "That foundation is unavailable.")
+            return
+        }
+        _ = phoneAdmission.release(controlID: "village.foundation.\(station.id)") {
+            guard HomeDestinationRulesV1.quote(.foundation(station.id), in: store.state) == quote
+            else { return .failure(.stale) }
+            foundationStation = station
+            return .success(.navigationAccepted(.base))
+        }
+    }
+
+    private func admitLocalChange(noChange: Bool, action: @escaping @MainActor () -> Void) {
+        _ = phoneAdmission.release {
+            guard !noChange else { return .success(.noChange) }
+            action()
+            return .success(.committed)
+        }
+    }
 }
 
 // MARK: - Pieces
@@ -494,8 +629,11 @@ private struct TownDistrictScene: View {
     let section: StationHomeSection
     let stations: [StationDef]
     let stationState: (StationID) -> StationState
-    let openFoundation: (StationDef) -> Void
-    let openedRoute: (AppRoute) -> Void
+    let routeQuotes: [AppRoute: HomeDestinationQuoteV1]
+    let foundationQuotes: [StationID: HomeDestinationQuoteV1]
+    let admission: PhoneControlAdmissionV1
+    let openFoundation: (StationDef, HomeDestinationQuoteV1?) -> Void
+    let openedRoute: (AppRoute, HomeDestinationQuoteV1?) -> Void
 
     var body: some View {
         GeometryReader { geometry in
@@ -523,7 +661,13 @@ private struct TownDistrictScene: View {
                         position, imageSize: backdropSize, containerSize: geometry.size)
                     TownStationPlot(station: station,
                                     stationState: stationState(station.id),
-                                    openFoundation: { openFoundation(station) },
+                                    routeQuote: AppRoute(rawValue: station.route)
+                                        .flatMap { routeQuotes[$0] },
+                                    foundationQuote: foundationQuotes[station.id],
+                                    admission: admission,
+                                    openFoundation: {
+                                        openFoundation(station, foundationQuotes[station.id])
+                                    },
                                     openedRoute: openedRoute)
                         .frame(width: min(132, geometry.size.width * 0.38), height: 132)
                         .position(renderedPoint)
@@ -552,20 +696,26 @@ private struct TownDistrictScene: View {
 private struct TownStationPlot: View {
     let station: StationDef
     let stationState: StationState
+    let routeQuote: HomeDestinationQuoteV1?
+    let foundationQuote: HomeDestinationQuoteV1?
+    let admission: PhoneControlAdmissionV1
     let openFoundation: () -> Void
-    let openedRoute: (AppRoute) -> Void
+    let openedRoute: (AppRoute, HomeDestinationQuoteV1?) -> Void
 
     var body: some View {
         Group {
             if stationState.isUnlocked {
                 let route = AppRoute(rawValue: station.route) ?? .base
-                NavigationLink(value: route) {
+                Button {
+                    openedRoute(route, routeQuote)
+                } label: {
                     content(isFoundation: false)
                 }
                 .accessibilityIdentifier("base-town-\(route.rawValue)")
-                .simultaneousGesture(TapGesture().onEnded { openedRoute(route) })
+                .fullFacePressFeedback("village.route.\(route.rawValue)", admission: admission)
             } else {
                 Button(action: openFoundation) { content(isFoundation: true) }
+                    .fullFacePressFeedback("village.foundation.\(station.id)", admission: admission)
             }
         }
         .buttonStyle(.plain)
