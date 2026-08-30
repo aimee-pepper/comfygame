@@ -666,7 +666,7 @@ struct WorldFieldFeedbackRow: View {
     private struct ExpiryTask: Hashable { let batchID: String? }
     @EnvironmentObject private var store: GameStore
     @State private var expansion: Expansion?
-    @State private var eventVisibleSince = DispatchTime.now().uptimeNanoseconds
+    @StateObject private var phoneAdmission = PhoneControlAdmissionV1()
     let contextOverlapsPlayer: Bool
 
     init(initiallyExpandedBatchID: String? = nil, contextOverlapsPlayer: Bool = false) {
@@ -709,13 +709,18 @@ struct WorldFieldFeedbackRow: View {
 #endif
         }
         .task(id: ExpiryTask(batchID: store.currentWorldFieldEventBatch?.batchID)) {
-            guard let batchID = store.currentWorldFieldEventBatch?.batchID else { return }
-            try? await Task.sleep(nanoseconds: WorldFieldFeedbackLayout.eventLifetimeNanoseconds)
+            guard let batch = store.currentWorldFieldEventBatch else { return }
+            let now = DispatchTime.now().uptimeNanoseconds
+            guard let remaining = store.remainingWorldFieldFeedbackLifetime(
+                for: batch.batchID, now: now), remaining > 0 else {
+                store.expireWorldFieldFeedback(ifCurrent: batch.batchID, now: now)
+                return
+            }
+            try? await Task.sleep(nanoseconds: remaining)
             guard !Task.isCancelled else { return }
-            store.expireWorldFieldFeedback(ifCurrent: batchID)
+            store.expireWorldFieldFeedback(ifCurrent: batch.batchID)
         }
         .onChange(of: store.currentWorldFieldEventBatch?.batchID) { _, newBatchID in
-            eventVisibleSince = DispatchTime.now().uptimeNanoseconds
             if case let .events(expandedID) = expansion, expandedID != newBatchID {
                 expansion = nil
             }
@@ -724,7 +729,14 @@ struct WorldFieldFeedbackRow: View {
 
     @ViewBuilder private var contextPane: some View {
         if let context = store.worldFieldContext {
-            Button { expansion = .context } label: {
+            let controlID = "world-field.context.\(context.inputStateHash)"
+            Button {
+                performPhoneControl(controlID) {
+                    guard store.worldFieldContext == context else { return .failure(.stale) }
+                    expansion = .context
+                    return .success(.noChange)
+                }
+            } label: {
                 VStack(alignment: .leading, spacing: 1) {
                     Text("AT THIS PLACE")
                         .font(.custom("Tiny5", size: 10)).foregroundStyle(PixelUITheme.muted)
@@ -740,6 +752,7 @@ struct WorldFieldFeedbackRow: View {
                 .contentShape(Rectangle())
             }
             .buttonStyle(.plain)
+            .fullFacePressFeedback(controlID, admission: phoneAdmission)
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
             .background(PixelUITheme.edgeDark.opacity(contextOverlapsPlayer ? 0.25 : 0.50))
             .overlay(Rectangle().stroke(PixelUITheme.edge, lineWidth: 2))
@@ -758,19 +771,35 @@ struct WorldFieldFeedbackRow: View {
                 HStack(spacing: 6) {
                     if batch.orderedNarrations.count > 1 {
                         Button("Read all \(batch.orderedNarrations.count)") {
-                            expansion = .events(batch.batchID)
+                            let controlID = "world-field.read-all.\(batch.batchID)"
+                            performPhoneControl(controlID) {
+                                guard store.currentWorldFieldEventBatch?.batchID == batch.batchID
+                                else { return .failure(.stale) }
+                                expansion = .events(batch.batchID)
+                                return .success(.noChange)
+                            }
                         }
                         .frame(maxWidth: .infinity, minHeight: 28)
                         .contentShape(Rectangle())
                         .background(PixelUITheme.surfaceRaised.opacity(0.9))
+                        .fullFacePressFeedback("world-field.read-all.\(batch.batchID)",
+                                               admission: phoneAdmission)
                     }
                     Button("Dismiss") {
-                        expansion = nil
-                        store.dismissWorldFieldFeedback(expectedBatchID: batch.batchID)
+                        let controlID = "world-field.dismiss.\(batch.batchID)"
+                        performPhoneControl(controlID) {
+                            guard store.currentWorldFieldEventBatch?.batchID == batch.batchID
+                            else { return .failure(.stale) }
+                            expansion = nil
+                            store.dismissWorldFieldFeedback(expectedBatchID: batch.batchID)
+                            return .success(.noChange)
+                        }
                     }
                     .frame(maxWidth: .infinity, minHeight: 28)
                     .contentShape(Rectangle())
                     .background(PixelUITheme.surfaceRaised.opacity(0.9))
+                    .fullFacePressFeedback("world-field.dismiss.\(batch.batchID)",
+                                           admission: phoneAdmission)
                 }
                 .font(.custom("Tiny5", size: 13))
                 .buttonStyle(.plain)
@@ -787,7 +816,7 @@ struct WorldFieldFeedbackRow: View {
             .opacity({
                 let now = DispatchTime.now().uptimeNanoseconds
                 return WorldFieldFeedbackLayout.eventOpacity(
-                    elapsedNanoseconds: now &- min(now, eventVisibleSince))
+                    elapsedNanoseconds: now &- min(now, batch.createdAtMonotonicTime))
             }())
             }
         }
@@ -803,11 +832,21 @@ struct WorldFieldFeedbackRow: View {
             Text(interactionLine(context))
                 .font(.custom("Tiny5", size: 15)).foregroundStyle(PixelUITheme.muted)
                 .fixedSize(horizontal: false, vertical: true)
-            Button("Close") { expansion = nil }
+            Button("Close") {
+                let controlID = "world-field.context-close.\(context.inputStateHash)"
+                performPhoneControl(controlID) {
+                    guard store.worldFieldContext == context, expansion == .context
+                    else { return .failure(.stale) }
+                    expansion = nil
+                    return .success(.noChange)
+                }
+            }
                 .font(.custom("Tiny5", size: 15))
                 .frame(maxWidth: .infinity, minHeight: 40)
                 .contentShape(Rectangle())
                 .background(PixelUITheme.surfaceRaised.opacity(0.94))
+                .fullFacePressFeedback("world-field.context-close.\(context.inputStateHash)",
+                                       admission: phoneAdmission)
         }
         .padding(10)
         .background(PixelUITheme.edgeDark.opacity(0.96))
@@ -828,14 +867,33 @@ struct WorldFieldFeedbackRow: View {
                 }
             }
             HStack {
-                Button("Close") { expansion = nil }
+                Button("Close") {
+                    let controlID = "world-field.events-close.\(batch.batchID)"
+                    performPhoneControl(controlID) {
+                        guard store.currentWorldFieldEventBatch?.batchID == batch.batchID,
+                              expansion == .events(batch.batchID)
+                        else { return .failure(.stale) }
+                        expansion = nil
+                        return .success(.noChange)
+                    }
+                }
                     .frame(maxWidth: .infinity, minHeight: 40).contentShape(Rectangle())
+                    .fullFacePressFeedback("world-field.events-close.\(batch.batchID)",
+                                           admission: phoneAdmission)
                 Spacer()
                 Button("Dismiss") {
-                    expansion = nil
-                    store.dismissWorldFieldFeedback(expectedBatchID: batch.batchID)
+                    let controlID = "world-field.expanded-dismiss.\(batch.batchID)"
+                    performPhoneControl(controlID) {
+                        guard store.currentWorldFieldEventBatch?.batchID == batch.batchID
+                        else { return .failure(.stale) }
+                        expansion = nil
+                        store.dismissWorldFieldFeedback(expectedBatchID: batch.batchID)
+                        return .success(.noChange)
+                    }
                 }
                 .frame(maxWidth: .infinity, minHeight: 40).contentShape(Rectangle())
+                .fullFacePressFeedback("world-field.expanded-dismiss.\(batch.batchID)",
+                                       admission: phoneAdmission)
             }
             .font(.custom("Tiny5", size: 15)).buttonStyle(.plain)
         }
@@ -875,6 +933,13 @@ struct WorldFieldFeedbackRow: View {
         case .useAnchor: "Use Atlas Seam"
         case .placeAnchor: "Place Anchor Frame"
         }
+    }
+
+    private func performPhoneControl(
+        _ controlID: String,
+        operation: @escaping @MainActor () -> Result<PhoneControlOutcomeV1, PhoneControlRefusalV1>
+    ) {
+        _ = phoneAdmission.release(controlID: controlID, operation)
     }
 }
 

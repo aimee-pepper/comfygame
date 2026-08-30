@@ -252,15 +252,33 @@ struct WorldFieldEventBatchV1: Equatable {
         case step, travel, harvest, searchSite, interact, useItem, survey, otherWorldAction
     }
 
+    enum Disposition: Equatable, Sendable {
+        case committed
+        case blocked(String)
+        case refused(String)
+        case busy
+
+        var isCommitted: Bool {
+            if case .committed = self { return true }
+            return false
+        }
+    }
+
     let batchID: String
+    let sessionEpoch: UInt64
     let worldRunID: String
     let attemptID: UInt64
     let sourceAction: SourceAction
+    let sourcePoint: GridPoint
     let turnBefore: Int
     let turnAfter: Int
+    let beforeContext: WorldFieldContextReceiptV1
+    let afterContext: WorldFieldContextReceiptV1?
+    let disposition: Disposition
     let orderedEvents: [WorldRules.Event]
     let orderedNarrations: [String]
     let createdAtMonotonicTime: UInt64
+    let deadlineMonotonicTime: UInt64
 }
 
 struct WorldMiningFeedbackGroupV1: Equatable {
@@ -471,8 +489,8 @@ final class GameStore: ObservableObject {
     private let writeQueue = DispatchQueue(label: "com.aimeepepper.bookbinder.save", qos: .userInitiated)
     private var debounceTask: Task<Void, Never>?
     private var nextWorldFieldAttemptID: UInt64 = 1
+    private var worldFieldSessionEpoch: UInt64 = 1
     private var seenWorldFieldBatchIDs: Set<String> = []
-    private var visibleWorldFieldBatchSince: UInt64?
     private var seenWorldMiningBatchIDs: Set<String> = []
     private var travellerSpeechWorldRunID: String?
     private var shownTravellerSpeechIDs: Set<TravellerID> = []
@@ -552,20 +570,30 @@ final class GameStore: ObservableObject {
     }
 
     var currentWorldFieldEventBatch: WorldFieldEventBatchV1? { worldFieldEventQueue.first }
-    var currentWorldFieldEventVisibleSince: UInt64? { visibleWorldFieldBatchSince }
+    var currentWorldFieldEventVisibleSince: UInt64? {
+        currentWorldFieldEventBatch?.createdAtMonotonicTime
+    }
 
     struct WorldFieldAttempt: Equatable, Sendable {
-        let id: UInt64
+        let sessionEpoch: UInt64
+        let attemptID: UInt64
         let sourceAction: WorldFieldEventBatchV1.SourceAction
+        let beforeContext: WorldFieldContextReceiptV1
         let worldRunID: String
+        let sourcePoint: GridPoint
         let turnBefore: Int
+
+        var id: UInt64 { attemptID }
     }
 
     func beginWorldFieldAttempt(_ sourceAction: WorldFieldEventBatchV1.SourceAction) -> WorldFieldAttempt? {
-        guard let run = activeRun else { return nil }
+        guard let run = activeRun,
+              let beforeContext = WorldFieldContextReceiptV1.make(from: state) else { return nil }
         let attempt = WorldFieldAttempt(
-            id: nextWorldFieldAttemptID, sourceAction: sourceAction,
-            worldRunID: "\(run.runIndex):\(run.mapSeed)", turnBefore: run.turnsTaken)
+            sessionEpoch: worldFieldSessionEpoch, attemptID: nextWorldFieldAttemptID,
+            sourceAction: sourceAction, beforeContext: beforeContext,
+            worldRunID: "\(run.runIndex):\(run.mapSeed)", sourcePoint: run.playerPosition,
+            turnBefore: run.turnsTaken)
         nextWorldFieldAttemptID &+= 1
         return attempt
     }
@@ -573,51 +601,69 @@ final class GameStore: ObservableObject {
     /// Cancels transient speech only once the rules-owned action has actually committed.
     /// Refused/no-op attempts must not consume a bubble that has already entered the shown set.
     func acceptWorldFieldAttempt(_ attempt: WorldFieldAttempt) {
-        guard let run = activeRun,
+        guard attempt.sessionEpoch == worldFieldSessionEpoch, let run = activeRun,
               "\(run.runIndex):\(run.mapSeed)" == attempt.worldRunID else { return }
         clearWorldTravellerSpeechPresentation()
     }
 
     func submitWorldFieldEvents(_ events: [WorldRules.Event], for attempt: WorldFieldAttempt,
+                                disposition: WorldFieldEventBatchV1.Disposition,
                                 now: UInt64 = DispatchTime.now().uptimeNanoseconds) {
-        if events.contains(where: { event in
-            if case .blocked = event { return false }
-            return true
-        }) {
+        guard attempt.sessionEpoch == worldFieldSessionEpoch,
+              let run = activeRun,
+              "\(run.runIndex):\(run.mapSeed)" == attempt.worldRunID else { return }
+        guard disposition != .busy else { return }
+        let afterContext = WorldFieldContextReceiptV1.make(from: state)
+        if !disposition.isCommitted {
+            guard afterContext == attempt.beforeContext else { return }
+        } else {
+            guard run.turnsTaken != attempt.turnBefore || afterContext != attempt.beforeContext
+            else { return }
+        }
+        if disposition.isCommitted {
             acceptWorldFieldAttempt(attempt)
         }
         let narrations = events.compactMap(WorldFieldNarration.text)
         guard !narrations.isEmpty else { return }
-        let turnAfter = activeRun?.turnsTaken ?? attempt.turnBefore
+        let turnAfter = run.turnsTaken
         let canonicalFields = ([
-            "v1", attempt.worldRunID, String(attempt.id), attempt.sourceAction.rawValue,
-            String(attempt.turnBefore), String(turnAfter),
+            "v2", String(attempt.sessionEpoch), attempt.worldRunID, String(attempt.id),
+            attempt.sourceAction.rawValue, String(attempt.sourcePoint.x), String(attempt.sourcePoint.y),
+            String(attempt.turnBefore), String(turnAfter), attempt.beforeContext.inputStateHash,
+            afterContext?.inputStateHash ?? "none", Self.canonicalDisposition(disposition),
         ] + events.map(Self.canonicalWorldFieldEvent))
         let canonical = canonicalFields.map { "\($0.utf8.count):\($0)" }.joined()
         let hash = SHA256.hash(data: Data(canonical.utf8)).map { String(format: "%02x", $0) }.joined()
         let batch = WorldFieldEventBatchV1(
-            batchID: "\(attempt.id):\(hash)", worldRunID: attempt.worldRunID,
+            batchID: "\(attempt.sessionEpoch):\(attempt.id):\(hash)",
+            sessionEpoch: attempt.sessionEpoch, worldRunID: attempt.worldRunID,
             attemptID: attempt.id, sourceAction: attempt.sourceAction,
+            sourcePoint: attempt.sourcePoint,
             turnBefore: attempt.turnBefore, turnAfter: turnAfter,
+            beforeContext: attempt.beforeContext, afterContext: afterContext,
+            disposition: disposition,
             orderedEvents: events, orderedNarrations: narrations,
-            createdAtMonotonicTime: now)
+            createdAtMonotonicTime: now,
+            deadlineMonotonicTime: now &+ WorldFieldFeedbackLayout.eventLifetimeNanoseconds)
         enqueueWorldFieldBatch(batch, now: now)
     }
 
     func enqueueWorldFieldBatch(_ batch: WorldFieldEventBatchV1,
                                 now: UInt64 = DispatchTime.now().uptimeNanoseconds) {
+        guard batch.sessionEpoch == worldFieldSessionEpoch,
+              activeRun.map({ "\($0.runIndex):\($0.mapSeed)" }) == batch.worldRunID,
+              now < batch.deadlineMonotonicTime else { return }
         guard seenWorldFieldBatchIDs.insert(batch.batchID).inserted else { return }
         // A newly committed interaction owns the visible socket immediately. A preempted receipt
         // is retired instead of resurfacing with a newly reset lifetime.
         worldFieldEventQueue.removeAll(keepingCapacity: true)
         worldFieldEventQueue.append(batch)
-        visibleWorldFieldBatchSince = now
         claimWorldMiningFeedback(for: batch, now: now)
     }
 
     func claimWorldMiningFeedback(for batch: WorldFieldEventBatchV1,
         now: UInt64 = DispatchTime.now().uptimeNanoseconds) {
-        guard batch.sourceAction == .harvest,
+        guard batch.sourceAction == .harvest, batch.disposition.isCommitted,
               let run = activeRun, batch.worldRunID == "\(run.runIndex):\(run.mapSeed)",
               seenWorldMiningBatchIDs.insert(batch.batchID).inserted else { return }
         var order: [ResourceID] = []; var totals: [ResourceID: Int] = [:]
@@ -636,7 +682,7 @@ final class GameStore: ObservableObject {
         guard subjects.count == 1 else { return }
         let group = WorldMiningFeedbackGroupV1(
             batchID: batch.batchID, worldRunID: batch.worldRunID,
-            sourcePoint: run.playerPosition, subjects: subjects,
+            sourcePoint: batch.sourcePoint, subjects: subjects,
             startedAtMonotonicTime: now)
         worldMiningFeedbackPresentations.append(group)
     }
@@ -649,21 +695,28 @@ final class GameStore: ObservableObject {
                                    now: UInt64 = DispatchTime.now().uptimeNanoseconds) {
         guard worldFieldEventQueue.first?.batchID == expectedBatchID else { return }
         worldFieldEventQueue.removeFirst()
-        visibleWorldFieldBatchSince = worldFieldEventQueue.isEmpty ? nil : now
     }
 
     func expireWorldFieldFeedback(ifCurrent batchID: String,
                                   now: UInt64 = DispatchTime.now().uptimeNanoseconds) {
         guard currentWorldFieldEventBatch?.batchID == batchID,
-              let visibleWorldFieldBatchSince,
-              now >= visibleWorldFieldBatchSince + 2_000_000_000 else { return }
+              let deadline = currentWorldFieldEventBatch?.deadlineMonotonicTime,
+              now >= deadline else { return }
         dismissWorldFieldFeedback(expectedBatchID: batchID, now: now)
     }
 
+    func remainingWorldFieldFeedbackLifetime(
+        for batchID: String,
+        now: UInt64 = DispatchTime.now().uptimeNanoseconds
+    ) -> UInt64? {
+        guard let batch = currentWorldFieldEventBatch, batch.batchID == batchID else { return nil }
+        return now < batch.deadlineMonotonicTime ? batch.deadlineMonotonicTime - now : 0
+    }
+
     func clearWorldFieldFeedback() {
+        worldFieldSessionEpoch &+= 1
         worldFieldEventQueue.removeAll()
         seenWorldFieldBatchIDs.removeAll()
-        visibleWorldFieldBatchSince = nil
         worldMiningFeedbackPresentations.removeAll()
         seenWorldMiningBatchIDs.removeAll()
         clearWorldTravellerSpeechSession()
@@ -811,6 +864,16 @@ final class GameStore: ObservableObject {
         case .collapsed: tagged("collapsed")
         case .floorGaveWay: tagged("floor")
         case .ejected(let reason): tagged("ejected", reason)
+        }
+    }
+
+    private static func canonicalDisposition(_ disposition: WorldFieldEventBatchV1.Disposition)
+        -> String {
+        switch disposition {
+        case .committed: "committed"
+        case .blocked(let reason): "blocked:\(reason.utf8.count):\(reason)"
+        case .refused(let reason): "refused:\(reason.utf8.count):\(reason)"
+        case .busy: "busy"
         }
     }
 

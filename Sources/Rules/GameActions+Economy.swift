@@ -869,7 +869,7 @@ extension GameStore {
             let bonus = bonusName.map { " A wild weapon was tucked beside it: \($0)." } ?? ""
             let events: [WorldRules.Event] = [.cacheOpened(EconomyRules.describe(reward) + bonus)]
             recentEvents = events
-            submitWorldFieldEvents(events, for: attempt)
+            submitWorldFieldEvents(events, for: attempt, disposition: .committed)
             refreshWorldFieldContext()
         }
         return reward

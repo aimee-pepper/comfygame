@@ -1497,6 +1497,67 @@ final class ExpeditionOutcomeTests: XCTestCase {
         }
     }
 
+    @MainActor
+    func testReviewContinueControlIdentityRejectsSameHeadTailAndTutorialReplacement() throws {
+        func makeStore(_ suffix: String) throws
+            -> (GameStore, ExpeditionReviewContinueQuoteV1) {
+            let store = GameStore(io: .temporary(
+                name: "review-control-identity-\(suffix)-\(UUID().uuidString)"))
+            store.mutate("fixture: identity-bound review") { state in
+                state.worlds.outcomeSequence = 3
+                for (id, reason) in [(1, "head"), (2, "tail-a"), (3, "tail-b")] {
+                    XCTAssertTrue(state.worlds.appendExpeditionReview(.init(
+                        runIndex: id, outcomeID: ExpeditionOutcomeID(rawValue: UInt64(id)),
+                        kind: .portal, reason: reason, turnsTaken: id,
+                        haulKeptFraction: 1)))
+                }
+                state.tutorial.firstReturnContext = .init(
+                    runIndex: 1, route: .library, reason: .fieldNote, writingID: "note-a")
+            }
+            return (store, try XCTUnwrap(store.expeditionReviewContinueQuote()))
+        }
+        func assertReleaseIsInert(
+            store: GameStore, old: ExpeditionReviewContinueQuoteV1,
+            current: ExpeditionReviewContinueQuoteV1,
+            file: StaticString = #filePath, line: UInt = #line
+        ) throws {
+            XCTAssertNotEqual(old.controlID, current.controlID, file: file, line: line)
+            let admission = PhoneControlAdmissionV1()
+            admission.touchDown(controlID: old.controlID)
+            let bytes = try SaveCodec.encode(store.state)
+            let meta = store.state.meta
+            let diagnostics = store.diagnostics
+            var invoked = 0
+            XCTAssertEqual(admission.release(controlID: current.controlID) {
+                invoked += 1
+                return .success(.committed)
+            }, .failure(.stale), file: file, line: line)
+            XCTAssertEqual(invoked, 0, file: file, line: line)
+            XCTAssertEqual(try SaveCodec.encode(store.state), bytes, file: file, line: line)
+            XCTAssertEqual(store.state.meta, meta, file: file, line: line)
+            XCTAssertEqual(store.diagnostics.writeCount, diagnostics.writeCount,
+                           file: file, line: line)
+            XCTAssertEqual(store.diagnostics.hasPendingWrite, diagnostics.hasPendingWrite,
+                           file: file, line: line)
+        }
+
+        let (tails, oldTailQuote) = try makeStore("tails")
+        tails.mutate("fixture: reorder retained tails") {
+            $0.worlds.expeditionReviewQueue.pending.swapAt(1, 2)
+        }
+        try assertReleaseIsInert(
+            store: tails, old: oldTailQuote,
+            current: try XCTUnwrap(tails.expeditionReviewContinueQuote()))
+
+        let (tutorial, oldTutorialQuote) = try makeStore("tutorial")
+        tutorial.mutate("fixture: replace retained tutorial context") {
+            $0.tutorial.firstReturnContext?.writingID = "note-b"
+        }
+        try assertReleaseIsInert(
+            store: tutorial, old: oldTutorialQuote,
+            current: try XCTUnwrap(tutorial.expeditionReviewContinueQuote()))
+    }
+
     func testRunExitProductionUsesExactQuoteIdentityAndStateDrivenHeadTransition() throws {
         let root = URL(fileURLWithPath: #filePath).deletingLastPathComponent()
             .deletingLastPathComponent()

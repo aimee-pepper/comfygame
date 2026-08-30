@@ -140,7 +140,7 @@ enum ExpeditionReviewAcknowledgementResult: Equatable, Sendable {
     case stale(expected: ExpeditionReviewID?, actual: ExpeditionReviewID)
 }
 
-struct ExpeditionReviewContinueQuoteV1: Equatable, Sendable {
+struct ExpeditionReviewContinueQuoteV1: Codable, Equatable, Sendable {
     static let version = 1
     var version: Int = Self.version
     var headOrdinal: Int
@@ -154,7 +154,8 @@ struct ExpeditionReviewContinueQuoteV1: Equatable, Sendable {
         case .outcome(let id): "outcome-\(id.rawValue)"
         case .legacy(let key): "legacy-\(key)"
         }
-        return "run-exit.continue.\(review).\(headFingerprintSHA256)"
+        let presentationFingerprint = Self.fingerprint(self) ?? "invalid"
+        return "run-exit.continue.\(review).\(presentationFingerprint)"
     }
 
     static func make(from state: GameState) -> Self? {

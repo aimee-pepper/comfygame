@@ -722,20 +722,21 @@ extension GameStore {
         guard WorldRules.isAdjacent(run.playerPosition, point) else {
             let events: [WorldRules.Event] = [.blocked("That's not a step away.")]
             recentEvents = events
-            submitWorldFieldEvents(events, for: attempt)
+            submitWorldFieldEvents(events, for: attempt,
+                                   disposition: .blocked("That's not a step away."))
             return
         }
         if let refusal = WorldRules.blockedMovementRefusal(to: point, in: run.map) {
             let events: [WorldRules.Event] = [.blocked(refusal)]
             recentEvents = events
-            submitWorldFieldEvents(events, for: attempt)
+            submitWorldFieldEvents(events, for: attempt, disposition: .blocked(refusal))
             return
         }
         var events: [WorldRules.Event] = []
         mutate("step", scope: .expedition) { state in
             events = WorldRules.step(to: point, in: &state)
         }
-        finishTurn(events, attempt: attempt)
+        finishTurn(events, attempt: attempt, disposition: .committed)
         presentTravellerSpeechAfterMovement(from: priorPosition, sourceAction: .step)
     }
 
@@ -850,7 +851,7 @@ extension GameStore {
             state = candidate
             return true
         }
-        if committed { finishTurn(events, attempt: attempt) }
+        if committed { finishTurn(events, attempt: attempt, disposition: .committed) }
     }
 
     func worldFieldItemUseEvaluation(_ stack: ItemStack, on member: PartyMember)
@@ -872,7 +873,7 @@ extension GameStore {
             return false
         }
         guard published, case .committed(let events) = result else { return result }
-        finishTurn(events, attempt: attempt)
+        finishTurn(events, attempt: attempt, disposition: .committed)
         return result
     }
 
@@ -894,7 +895,7 @@ extension GameStore {
             mutate("use \(stack.catalogID.rawValue)", flush: true, scope: .expedition) { state in
                 events = WorldRules.useItem(stack.id, on: member, in: &state)
             }
-            finishTurn(events, attempt: attempt)
+            finishTurn(events, attempt: attempt, disposition: .committed)
             return
         }
         guard case .success(let quote) = worldFieldItemUseEvaluation(stack, on: member) else {
@@ -918,7 +919,7 @@ extension GameStore {
             events = WorldRules.recruit(id, in: &state)
         }
         recentEvents = events
-        submitWorldFieldEvents(events, for: attempt)
+        submitWorldFieldEvents(events, for: attempt, disposition: .committed)
         refreshWorldFieldContext()
     }
 
@@ -935,7 +936,7 @@ extension GameStore {
         guard !route.isEmpty else {
             let events: [WorldRules.Event] = [.blocked("No way through.")]
             recentEvents = events
-            submitWorldFieldEvents(events, for: attempt)
+            submitWorldFieldEvents(events, for: attempt, disposition: .blocked("No way through."))
             return
         }
 
@@ -967,7 +968,13 @@ extension GameStore {
             }
             return madeProgress
         }
-        finishTurn(events, attempt: attempt)
+        let disposition: WorldFieldEventBatchV1.Disposition = committed
+            ? .committed
+            : .blocked(events.compactMap { event in
+                if case .blocked(let reason) = event { return reason }
+                return nil
+            }.first ?? "Travel made no progress.")
+        finishTurn(events, attempt: attempt, disposition: disposition)
         if committed {
             presentTravellerSpeechAfterMovement(from: priorPosition, sourceAction: .travel)
         }
@@ -984,15 +991,15 @@ extension GameStore {
         if case .refused(let refusal) = evaluation {
             let name = ResourceExtractionRules.selectedDisclosedNode(in: state)
                 .flatMap { ContentCatalog.shared.resource($0.1.resource)?.name }
-            finishTurn([.blocked(ResourceExtractionRules.playerCopy(
-                for: refusal, resourceName: name))], attempt: attempt)
+            let copy = ResourceExtractionRules.playerCopy(for: refusal, resourceName: name)
+            finishTurn([.blocked(copy)], attempt: attempt, disposition: .refused(copy))
             return
         }
         var events: [WorldRules.Event] = []
         mutate("harvest", flush: true, scope: .expedition) { state in
             events = WorldRules.harvest(in: &state)
         }
-        finishTurn(events, attempt: attempt)
+        finishTurn(events, attempt: attempt, disposition: .committed)
     }
 
     /// One turn of searching the site underfoot. Contents land on the turn it completes.
@@ -1020,7 +1027,7 @@ extension GameStore {
             return true
         }
         guard published else { return result }
-        finishTurn(events, attempt: attempt)
+        finishTurn(events, attempt: attempt, disposition: .committed)
         refreshWorldFieldContext()
         return .committed
     }
@@ -1053,7 +1060,7 @@ extension GameStore {
             return true
         }
         guard published else { return result }
-        finishTurn(events, attempt: attempt)
+        finishTurn(events, attempt: attempt, disposition: .committed)
         return .committed
     }
 
@@ -1073,7 +1080,7 @@ extension GameStore {
         mutate("attend to animal", flush: true, scope: .expedition) { state in
             events = WorldRules.attend(enemyID, in: &state)
         }
-        finishTurn(events, attempt: attempt)
+        finishTurn(events, attempt: attempt, disposition: .committed)
     }
 
     @discardableResult
@@ -1320,9 +1327,10 @@ extension GameStore {
     // MARK: - Turn bookkeeping
 
     /// Applies the consequences a turn's events imply, and hands the rest to the UI.
-    private func finishTurn(_ events: [WorldRules.Event], attempt: WorldFieldAttempt) {
+    private func finishTurn(_ events: [WorldRules.Event], attempt: WorldFieldAttempt,
+                            disposition: WorldFieldEventBatchV1.Disposition) {
         // Capture the complete rules array before the legacy suffix retained for current callers.
-        submitWorldFieldEvents(events, for: attempt)
+        submitWorldFieldEvents(events, for: attempt, disposition: disposition)
         recentEvents = Array(events.suffix(GameStore.eventLimit))
         refreshWorldFieldContext()
 

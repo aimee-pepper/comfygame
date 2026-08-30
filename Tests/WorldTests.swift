@@ -462,16 +462,20 @@ final class WorldTests: XCTestCase {
         store.mutate("test: start field feedback") { $0 = startedRun(book([:]), seed: 901) }
         let first = try XCTUnwrap(store.beginWorldFieldAttempt(.step))
         let duplicateEvents: [WorldRules.Event] = [.blocked("Still blocked."), .blocked("Still blocked.")]
-        store.submitWorldFieldEvents(duplicateEvents, for: first, now: 100)
-        store.submitWorldFieldEvents(duplicateEvents, for: first, now: 200)
+        store.submitWorldFieldEvents(duplicateEvents, for: first,
+                                     disposition: .blocked("Still blocked."), now: 100)
+        store.submitWorldFieldEvents(duplicateEvents, for: first,
+                                     disposition: .blocked("Still blocked."), now: 200)
         XCTAssertEqual(store.worldFieldEventQueue.count, 1, "batchID is the only dedupe key")
         XCTAssertEqual(store.worldFieldEventQueue[0].orderedEvents, duplicateEvents)
         XCTAssertEqual(store.worldFieldEventQueue[0].orderedNarrations.count, 2)
 
         let second = try XCTUnwrap(store.beginWorldFieldAttempt(.step))
-        store.submitWorldFieldEvents([.blocked("Still blocked.")], for: second, now: 300)
+        store.submitWorldFieldEvents([.blocked("Still blocked.")], for: second,
+                                     disposition: .blocked("Still blocked."), now: 300)
         let third = try XCTUnwrap(store.beginWorldFieldAttempt(.step))
-        store.submitWorldFieldEvents([.blocked("Third batch.")], for: third, now: 400)
+        store.submitWorldFieldEvents([.blocked("Third batch.")], for: third,
+                                     disposition: .blocked("Third batch."), now: 400)
         XCTAssertEqual(store.worldFieldEventQueue.map(\.orderedNarrations), [
             ["Third batch."],
         ], "the newest interaction is immediate and preempted receipts retire")
@@ -487,6 +491,111 @@ final class WorldTests: XCTestCase {
         XCTAssertNil(store.currentWorldFieldEventBatch)
         XCTAssertEqual(try SaveCodec.encode(store.state), frozenState)
         XCTAssertEqual(store.worldFieldContext, frozenContext)
+    }
+
+    @MainActor
+    func testWorldFieldAttemptBindsContextEpochDispositionAndMiningSourceCoordinate() throws {
+        let store = GameStore(io: .temporary(name: "field-attempt-v1-\(UUID().uuidString)"))
+        store.mutate("fixture: exact field attempt") { $0 = startedRun(book([:]), seed: 9_011) }
+        let original = try XCTUnwrap(store.activeRun?.playerPosition)
+        let attempt = try XCTUnwrap(store.beginWorldFieldAttempt(.harvest))
+        let expectedContext = try XCTUnwrap(WorldFieldContextReceiptV1.make(from: store.state))
+        XCTAssertEqual(attempt.sourcePoint, original)
+        XCTAssertEqual(attempt.beforeContext, expectedContext)
+        XCTAssertEqual(attempt.worldRunID, expectedContext.worldRunID)
+        XCTAssertNil(store.worldFieldContext, "touch admission derives but does not publish context")
+
+        let beforeTransient = try SaveCodec.encode(store.state)
+        let beforeMeta = store.state.meta
+        let beforeDiagnostics = store.diagnostics
+        store.submitWorldFieldEvents([.blocked("Busy")], for: attempt,
+                                     disposition: .busy, now: 10)
+        XCTAssertTrue(store.worldFieldEventQueue.isEmpty)
+        XCTAssertEqual(try SaveCodec.encode(store.state), beforeTransient)
+        XCTAssertEqual(store.state.meta, beforeMeta)
+        XCTAssertEqual(store.diagnostics.writeCount, beforeDiagnostics.writeCount)
+
+        let adjacent = try XCTUnwrap(store.activeRun?.map.neighbours(of: original).first)
+        store.mutate("fixture: drift before refusal") {
+            $0.worlds.activeRun?.playerPosition = adjacent
+        }
+        let driftBytes = try SaveCodec.encode(store.state)
+        let driftMeta = store.state.meta
+        let driftDiagnostics = store.diagnostics
+        store.submitWorldFieldEvents([.blocked("Stale")], for: attempt,
+                                     disposition: .refused("Stale"), now: 20)
+        XCTAssertTrue(store.worldFieldEventQueue.isEmpty)
+        XCTAssertEqual(try SaveCodec.encode(store.state), driftBytes)
+        XCTAssertEqual(store.state.meta, driftMeta)
+        XCTAssertEqual(store.diagnostics.writeCount, driftDiagnostics.writeCount)
+
+        store.clearWorldFieldFeedback()
+        store.submitWorldFieldEvents([.harvested(Resources.ore, amount: 2, exhausted: false)],
+                                     for: attempt, disposition: .committed, now: 30)
+        XCTAssertTrue(store.worldFieldEventQueue.isEmpty, "old epochs cannot resurface")
+
+        let currentAttempt = try XCTUnwrap(store.beginWorldFieldAttempt(.harvest))
+        let receiptPoint = currentAttempt.sourcePoint
+        store.mutate("fixture: committed harvest consequences") { state in
+            state.worlds.activeRun?.turnsTaken += 1
+            state.worlds.activeRun?.playerPosition = original
+        }
+        store.submitWorldFieldEvents(
+            [.harvested(Resources.ore, amount: 2, exhausted: false)],
+            for: currentAttempt, disposition: .committed, now: 100)
+        let batch = try XCTUnwrap(store.currentWorldFieldEventBatch)
+        XCTAssertEqual(batch.sessionEpoch, currentAttempt.sessionEpoch)
+        XCTAssertEqual(batch.beforeContext, currentAttempt.beforeContext)
+        XCTAssertEqual(batch.sourcePoint, receiptPoint)
+        XCTAssertEqual(batch.disposition, .committed)
+        XCTAssertEqual(batch.createdAtMonotonicTime, 100)
+        XCTAssertEqual(batch.deadlineMonotonicTime, 2_000_000_100)
+        XCTAssertEqual(store.worldMiningFeedbackPresentations.first?.sourcePoint, receiptPoint)
+    }
+
+    @MainActor
+    func testWorldFieldFeedbackDeadlineSurvivesRemountAndRetainedIdentityCannotRemoveReplacement()
+        throws {
+        let store = GameStore(io: .temporary(name: "field-deadline-v1-\(UUID().uuidString)"))
+        store.mutate("fixture: feedback deadline") { $0 = startedRun(book([:]), seed: 9_012) }
+        let first = try XCTUnwrap(store.beginWorldFieldAttempt(.step))
+        store.submitWorldFieldEvents([.blocked("A")], for: first,
+                                     disposition: .blocked("A"), now: 100)
+        let a = try XCTUnwrap(store.currentWorldFieldEventBatch)
+        XCTAssertEqual(store.remainingWorldFieldFeedbackLifetime(
+            for: a.batchID, now: 1_700_000_100), 300_000_000)
+        XCTAssertEqual(store.remainingWorldFieldFeedbackLifetime(
+            for: a.batchID, now: 2_000_000_100), 0)
+
+        let second = try XCTUnwrap(store.beginWorldFieldAttempt(.step))
+        store.submitWorldFieldEvents([.blocked("B")], for: second,
+                                     disposition: .blocked("B"), now: 200)
+        let b = try XCTUnwrap(store.currentWorldFieldEventBatch)
+        XCTAssertNotEqual(a.batchID, b.batchID)
+        let bytes = try SaveCodec.encode(store.state)
+        let meta = store.state.meta
+        let diagnostics = store.diagnostics
+        store.expireWorldFieldFeedback(ifCurrent: a.batchID, now: 3_000_000_000)
+        store.dismissWorldFieldFeedback(expectedBatchID: a.batchID)
+        XCTAssertEqual(store.currentWorldFieldEventBatch?.batchID, b.batchID)
+        XCTAssertEqual(try SaveCodec.encode(store.state), bytes)
+        XCTAssertEqual(store.state.meta, meta)
+        XCTAssertEqual(store.diagnostics.writeCount, diagnostics.writeCount)
+    }
+
+    func testWorldFieldFeedbackPopupControlsUseExactPhoneAdmissionIdentities() throws {
+        let source = try String(contentsOf: URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent().deletingLastPathComponent()
+            .appending(path: "Sources/Screens/WorldView.swift"), encoding: .utf8)
+        XCTAssertTrue(source.contains("world-field.context.\\(context.inputStateHash)"))
+        XCTAssertTrue(source.contains("world-field.read-all.\\(batch.batchID)"))
+        XCTAssertTrue(source.contains("world-field.dismiss.\\(batch.batchID)"))
+        XCTAssertTrue(source.contains("world-field.context-close.\\(context.inputStateHash)"))
+        XCTAssertTrue(source.contains("world-field.events-close.\\(batch.batchID)"))
+        XCTAssertTrue(source.contains("world-field.expanded-dismiss.\\(batch.batchID)"))
+        XCTAssertTrue(source.contains("admission: phoneAdmission"))
+        XCTAssertEqual(WorldFieldFeedbackLayout.compactHeight, 78)
+        XCTAssertEqual(WorldFieldFeedbackLayout.expandedEventMaximumHeight, 260)
     }
 
     func testWORLD03Through05FeedbackTimingGradientAndContextOverlapTruth() {
@@ -513,11 +622,13 @@ final class WorldTests: XCTestCase {
         store.mutate("test: start field feedback") { $0 = startedRun(book([:]), seed: 902) }
         let first = try XCTUnwrap(store.beginWorldFieldAttempt(.interact))
         store.submitWorldFieldEvents(
-            [.readFoundWriting(FoundWritingID(rawValue: "a:b"), "c;d")], for: first, now: 1)
+            [.readFoundWriting(FoundWritingID(rawValue: "a:b"), "c;d")], for: first,
+            disposition: .blocked("fixture"), now: 1)
         let firstBatchID = try XCTUnwrap(store.worldFieldEventQueue.first?.batchID)
         let second = try XCTUnwrap(store.beginWorldFieldAttempt(.interact))
         store.submitWorldFieldEvents(
-            [.readFoundWriting(FoundWritingID(rawValue: "a"), "b:c;d")], for: second, now: 2)
+            [.readFoundWriting(FoundWritingID(rawValue: "a"), "b:c;d")], for: second,
+            disposition: .blocked("fixture"), now: 2)
         XCTAssertEqual(store.worldFieldEventQueue.count, 1)
         XCTAssertNotEqual(firstBatchID, store.worldFieldEventQueue[0].batchID)
     }
@@ -549,7 +660,7 @@ final class WorldTests: XCTestCase {
         store.submitWorldFieldEvents([
             .blocked("First complete narration."), .hazardHit(damage: 2),
             .poisonWorking(damage: 1),
-        ], for: attempt, now: 10)
+        ], for: attempt, disposition: .committed, now: 10)
         RunLoop.main.run(until: Date().addingTimeInterval(0.08))
         controller.view.layoutIfNeeded()
         let mapFrameAfter = WorldMapStageMeasurement.latestFrame
@@ -591,7 +702,7 @@ final class WorldTests: XCTestCase {
         store.submitWorldFieldEvents([
             .blocked("First complete narration."), .hazardHit(damage: 2),
             .poisonWorking(damage: 1),
-        ], for: attempt, now: 10)
+        ], for: attempt, disposition: .committed, now: 10)
         let batch = try XCTUnwrap(store.currentWorldFieldEventBatch)
         let controller = UIHostingController(rootView:
             WorldFieldFeedbackRow(initiallyExpandedBatchID: batch.batchID)
@@ -619,7 +730,8 @@ final class WorldTests: XCTestCase {
         let first = GameStore(io: io)
         first.mutate("test: persisted run", flush: true) { $0 = startedRun(book([:]), seed: 904) }
         let attempt = try XCTUnwrap(first.beginWorldFieldAttempt(.step))
-        first.submitWorldFieldEvents([.blocked("Visible now.")], for: attempt, now: 1)
+        first.submitWorldFieldEvents([.blocked("Visible now.")], for: attempt,
+                                     disposition: .blocked("Visible now."), now: 1)
         XCTAssertFalse(first.worldFieldEventQueue.isEmpty)
         let expectedContext = WorldFieldContextReceiptV1.make(from: first.state)
         let relaunched = GameStore(io: io)
@@ -692,7 +804,8 @@ final class WorldTests: XCTestCase {
         encounterState.worlds.activeRun = encounterRun
         encounterStore.mutate("test: encounter ownership") { $0 = encounterState }
         let queued = try XCTUnwrap(encounterStore.beginWorldFieldAttempt(.interact))
-        encounterStore.submitWorldFieldEvents([.blocked("Old feedback.")], for: queued, now: 1)
+        encounterStore.submitWorldFieldEvents([.blocked("Old feedback.")], for: queued,
+                                              disposition: .blocked("Old feedback."), now: 1)
         encounterStore.step(to: target)
         XCTAssertNotNil(encounterStore.activeRun?.activeEncounter)
         XCTAssertTrue(encounterStore.worldFieldEventQueue.isEmpty)
@@ -703,7 +816,8 @@ final class WorldTests: XCTestCase {
             $0 = startedRun(book(["terrain": "plains"]), seed: 63)
         }
         let returnAttempt = try XCTUnwrap(returnStore.beginWorldFieldAttempt(.interact))
-        returnStore.submitWorldFieldEvents([.blocked("Old feedback.")], for: returnAttempt, now: 1)
+        returnStore.submitWorldFieldEvents([.blocked("Old feedback.")], for: returnAttempt,
+                                           disposition: .blocked("Old feedback."), now: 1)
         returnStore.mutate("stand on the return portal") { state in
             guard let entry = state.worlds.activeRun?.map.entry else { return }
             state.worlds.activeRun?.playerPosition = entry
@@ -2333,15 +2447,19 @@ final class WorldTests: XCTestCase {
 
     @MainActor
     func testLR01CommittedHarvestCoalescesExactIdentityAndAmountBeforePresentation() throws {
+        let state = startedRun(book([:]), seed: 2)
+        let context = try XCTUnwrap(WorldFieldContextReceiptV1.make(from: state))
         let batch = WorldFieldEventBatchV1(
-            batchID: "mining-a", worldRunID: "1:2", attemptID: 4,
-            sourceAction: .harvest, turnBefore: 8, turnAfter: 9,
+            batchID: "mining-a", sessionEpoch: 1, worldRunID: "1:2", attemptID: 4,
+            sourceAction: .harvest, sourcePoint: context.position, turnBefore: 8, turnAfter: 9,
+            beforeContext: context, afterContext: context, disposition: .committed,
             orderedEvents: [
                 .harvested(Resources.ore, amount: 2, exhausted: false),
                 .harvested(Resources.fiber, amount: 1, exhausted: false),
                 .harvested(Resources.ore, amount: 3, exhausted: true),
                 .harvested(Resources.ore, amount: 0, exhausted: true),
-            ], orderedNarrations: ["Harvested."], createdAtMonotonicTime: 10)
+            ], orderedNarrations: ["Harvested."], createdAtMonotonicTime: 10,
+            deadlineMonotonicTime: 2_000_000_010)
         let group = WorldMiningFeedbackGroupV1(
             batchID: batch.batchID, worldRunID: batch.worldRunID,
             sourcePoint: GridPoint(x: 4, y: 5),
@@ -2478,18 +2596,22 @@ final class WorldTests: XCTestCase {
     }
 
     @MainActor
-    func testLR05SessionDedupesRejectsWrongRunAndCannotReplayAfterRelaunch() {
+    func testLR05SessionDedupesRejectsWrongRunAndCannotReplayAfterRelaunch() throws {
         let io = SaveFileIO.temporary(name: "mining-session-\(UUID().uuidString)")
         let store = GameStore(io: io)
         store.mutate("test mining run", flush: true) { state in
             state.worlds.activeRun = self.wildPageRun(seed: 2)
         }
+        let context = try XCTUnwrap(WorldFieldContextReceiptV1.make(from: store.state))
         func batch(_ id: String, resource: ResourceID, runID: String = "3:2")
             -> WorldFieldEventBatchV1 {
-            .init(batchID: id, worldRunID: runID, attemptID: 1, sourceAction: .harvest,
-                  turnBefore: 0, turnAfter: 1,
+            .init(batchID: id, sessionEpoch: 1, worldRunID: runID, attemptID: 1,
+                  sourceAction: .harvest, sourcePoint: context.position,
+                  turnBefore: 0, turnAfter: 1, beforeContext: context,
+                  afterContext: context, disposition: .committed,
                   orderedEvents: [.harvested(resource, amount: 2, exhausted: false)],
-                  orderedNarrations: ["Harvested."], createdAtMonotonicTime: 1)
+                  orderedNarrations: ["Harvested."], createdAtMonotonicTime: 1,
+                  deadlineMonotonicTime: 2_000_000_001)
         }
         let first = batch("first", resource: Resources.ore)
         store.claimWorldMiningFeedback(for: first, now: 10)
@@ -2515,19 +2637,24 @@ final class WorldTests: XCTestCase {
     }
 
     @MainActor
-    func testLR06IndependentTransactionsCoexistWithoutFIFOOrStagger() {
+    func testLR06IndependentTransactionsCoexistWithoutFIFOOrStagger() throws {
         let store = GameStore(io: .temporary(name: "mining-independent-\(UUID().uuidString)"))
         store.mutate("test mining independent", flush: true) { state in
             state.worlds.activeRun = self.wildPageRun(seed: 2)
         }
+        let context = try XCTUnwrap(WorldFieldContextReceiptV1.make(from: store.state))
         func batch(_ id: String, action: WorldFieldEventBatchV1.SourceAction,
                    resource: ResourceID = Resources.ore) -> WorldFieldEventBatchV1 {
-            .init(batchID: id, worldRunID: "3:2", attemptID: UInt64(id.utf8.count),
-                  sourceAction: action, turnBefore: 0, turnAfter: 1,
+            .init(batchID: id, sessionEpoch: 1, worldRunID: "3:2",
+                  attemptID: UInt64(id.utf8.count), sourceAction: action,
+                  sourcePoint: context.position, turnBefore: 0, turnAfter: 1,
+                  beforeContext: context, afterContext: context,
+                  disposition: action == .harvest ? .committed : .blocked("Older narration"),
                   orderedEvents: action == .harvest
                     ? [.harvested(resource, amount: 1, exhausted: false)]
                     : [.blocked("Older narration")],
-                  orderedNarrations: ["Narration"], createdAtMonotonicTime: 1)
+                  orderedNarrations: ["Narration"], createdAtMonotonicTime: 1,
+                  deadlineMonotonicTime: 2_000_000_001)
         }
         let older = batch("older", action: .step)
         let a = batch("A", action: .harvest)
@@ -2551,15 +2678,19 @@ final class WorldTests: XCTestCase {
     }
 
     @MainActor
-    func testLR07MultiKindAnimationFailsClosedWithoutChangingCommittedRewards() {
+    func testLR07MultiKindAnimationFailsClosedWithoutChangingCommittedRewards() throws {
         let store = GameStore(io: .temporary(name: "mining-multikind-\(UUID().uuidString)"))
         store.mutate("test mining multikind", flush: true) { $0.worlds.activeRun = self.wildPageRun(seed: 2) }
+        let context = try XCTUnwrap(WorldFieldContextReceiptV1.make(from: store.state))
         let batch = WorldFieldEventBatchV1(
-            batchID: "multi", worldRunID: "3:2", attemptID: 1, sourceAction: .harvest,
-            turnBefore: 0, turnAfter: 1,
+            batchID: "multi", sessionEpoch: 1, worldRunID: "3:2", attemptID: 1,
+            sourceAction: .harvest, sourcePoint: context.position,
+            turnBefore: 0, turnAfter: 1, beforeContext: context,
+            afterContext: context, disposition: .committed,
             orderedEvents: [.harvested(Resources.ore, amount: 2, exhausted: false),
                             .harvested(Resources.fiber, amount: 1, exhausted: false)],
-            orderedNarrations: ["Harvested."], createdAtMonotonicTime: 1)
+            orderedNarrations: ["Harvested."], createdAtMonotonicTime: 1,
+            deadlineMonotonicTime: 2_000_000_001)
         let bytes = try? SaveCodec.encode(store.state)
         store.claimWorldMiningFeedback(for: batch, now: 2)
         XCTAssertTrue(store.worldMiningFeedbackPresentations.isEmpty)
@@ -2571,15 +2702,19 @@ final class WorldTests: XCTestCase {
         let store = GameStore(io: .temporary(name: "mining-refused-\(UUID().uuidString)"))
         store.mutate("test mining refused", flush: true) { $0.worlds.activeRun = self.wildPageRun(seed: 2) }
         let before = try SaveCodec.encode(store.state)
+        let context = try XCTUnwrap(WorldFieldContextReceiptV1.make(from: store.state))
         for (id, action, events) in [
             ("blocked", WorldFieldEventBatchV1.SourceAction.harvest, [WorldRules.Event.blocked("No yield")]),
             ("zero", .harvest, [.harvested(Resources.ore, amount: 0, exhausted: true)]),
             ("step", .step, [.harvested(Resources.ore, amount: 2, exhausted: false)]),
         ] {
             store.claimWorldMiningFeedback(for: .init(
-                batchID: id, worldRunID: "3:2", attemptID: 1, sourceAction: action,
-                turnBefore: 0, turnAfter: 0, orderedEvents: events,
-                orderedNarrations: [], createdAtMonotonicTime: 1))
+                batchID: id, sessionEpoch: 1, worldRunID: "3:2", attemptID: 1,
+                sourceAction: action, sourcePoint: context.position,
+                turnBefore: 0, turnAfter: 0, beforeContext: context,
+                afterContext: context, disposition: .refused("No yield"),
+                orderedEvents: events, orderedNarrations: [], createdAtMonotonicTime: 1,
+                deadlineMonotonicTime: 2_000_000_001))
         }
         XCTAssertTrue(store.worldMiningFeedbackPresentations.isEmpty)
         XCTAssertEqual(try SaveCodec.encode(store.state), before)
@@ -2745,11 +2880,15 @@ final class WorldTests: XCTestCase {
     func testLR12OwnershipExitCancelsPresentationWithoutGameplayOrSaveMutation() throws {
         let store = GameStore(io: .temporary(name: "mining-cancel-\(UUID().uuidString)"))
         store.mutate("test mining cancel", flush: true) { $0.worlds.activeRun = self.wildPageRun(seed: 2) }
+        let context = try XCTUnwrap(WorldFieldContextReceiptV1.make(from: store.state))
         let batch = WorldFieldEventBatchV1(
-            batchID: "cancel", worldRunID: "3:2", attemptID: 1, sourceAction: .harvest,
-            turnBefore: 0, turnAfter: 1,
+            batchID: "cancel", sessionEpoch: 1, worldRunID: "3:2", attemptID: 1,
+            sourceAction: .harvest, sourcePoint: context.position,
+            turnBefore: 0, turnAfter: 1, beforeContext: context,
+            afterContext: context, disposition: .committed,
             orderedEvents: [.harvested(Resources.ore, amount: 2, exhausted: false)],
-            orderedNarrations: ["Harvested."], createdAtMonotonicTime: 1)
+            orderedNarrations: ["Harvested."], createdAtMonotonicTime: 1,
+            deadlineMonotonicTime: 2_000_000_001)
         store.claimWorldMiningFeedback(for: batch, now: 2)
         let before = try SaveCodec.encode(store.state)
         store.clearWorldFieldFeedback()
@@ -3776,7 +3915,8 @@ final class WorldTests: XCTestCase {
             store.completeTutorial(lesson, fact: "b18b_event_fixture")
         }
         let attempt = try XCTUnwrap(store.beginWorldFieldAttempt(.step))
-        store.submitWorldFieldEvents([.blocked("A visible event.")], for: attempt, now: 1)
+        store.submitWorldFieldEvents([.blocked("A visible event.")], for: attempt,
+                                     disposition: .blocked("A visible event."), now: 1)
         WorldMapStageMeasurement.layoutReceipt = WorldScreenLayoutReceipt()
         let frozen = try SaveCodec.encode(store.state)
         let controller = UIHostingController(rootView: WorldView().environmentObject(store))
