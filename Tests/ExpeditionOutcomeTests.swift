@@ -1331,4 +1331,181 @@ final class ExpeditionOutcomeTests: XCTestCase {
                        first.runIndex)
         XCTAssertEqual(store.state.worlds.pendingExpeditionReview?.summary.runIndex, second.runIndex)
     }
+
+    func testExactPresentedReviewQuoteCommitsOneHeadAndTombstoneAcrossRelaunch() throws {
+        let io = SaveFileIO.temporary(name: "review-quote-relaunch-\(UUID().uuidString)")
+        let store = GameStore(io: io)
+        let first = RunExitSummary(runIndex: 11, outcomeID: 1, kind: .portal,
+                                   reason: "first", turnsTaken: 3, haulKeptFraction: 1)
+        let second = RunExitSummary(runIndex: 22, outcomeID: 2, kind: .collapse,
+                                    reason: "second", turnsTaken: 8, haulKeptFraction: 0.5)
+        store.mutate("fixture: exact presented reviews", flush: true) { state in
+            state.worlds.outcomeSequence = 2
+            XCTAssertTrue(state.worlds.appendExpeditionReview(first))
+            XCTAssertTrue(state.worlds.appendExpeditionReview(second))
+            state.tutorial.firstReturnContext = .init(
+                runIndex: first.runIndex, route: .writingDesk, reason: .ordinaryReturn,
+                writingID: nil)
+        }
+        let firstQuote = try XCTUnwrap(store.expeditionReviewContinueQuote())
+        XCTAssertEqual(firstQuote.headOrdinal, 0)
+        XCTAssertEqual(firstQuote.head.summary, first)
+        XCTAssertFalse(firstQuote.headFingerprintSHA256.isEmpty)
+        XCTAssertFalse(firstQuote.queueRevisionSHA256.isEmpty)
+
+        var nestedResult: ExpeditionReviewContinueResultV1?
+        store.expeditionReviewBeforeCommitForTesting = {
+            nestedResult = store.acknowledgeExpeditionReview(quote: firstQuote)
+        }
+        XCTAssertEqual(store.acknowledgeExpeditionReview(quote: firstQuote), .acknowledged)
+        store.expeditionReviewBeforeCommitForTesting = nil
+        XCTAssertEqual(nestedResult, .busy)
+        XCTAssertEqual(store.state.worlds.expeditionReviewQueue.acknowledged, [.outcome(1)])
+        XCTAssertEqual(store.state.worlds.pendingExpeditionReview?.summary, second)
+        XCTAssertEqual(store.state.tutorial[.returnPersistenceBoundary].status, .completed)
+        XCTAssertEqual(store.state.tutorial[.baseFirstResultRoute].firstEligibleRunIndex,
+                       first.runIndex)
+        let secondQuote = try XCTUnwrap(store.expeditionReviewContinueQuote())
+        XCTAssertNotEqual(secondQuote.controlID, firstQuote.controlID)
+
+        let replayBytes = try SaveCodec.encode(store.state)
+        let replayMeta = store.state.meta
+        let replayDiagnostics = store.diagnostics
+        XCTAssertEqual(store.acknowledgeExpeditionReview(quote: firstQuote), .alreadyAcknowledged)
+        XCTAssertEqual(try SaveCodec.encode(store.state), replayBytes)
+        XCTAssertEqual(store.state.meta, replayMeta)
+        XCTAssertEqual(store.diagnostics.writeCount, replayDiagnostics.writeCount)
+        XCTAssertEqual(store.diagnostics.hasPendingWrite, replayDiagnostics.hasPendingWrite)
+
+        XCTAssertEqual(store.acknowledgeExpeditionReview(quote: secondQuote), .acknowledged)
+        XCTAssertNil(store.state.worlds.pendingExpeditionReview)
+        store.flushNow()
+        let relaunched = GameStore(io: io)
+        XCTAssertEqual(relaunched.state.worlds.expeditionReviewQueue.acknowledged,
+                       [.outcome(1), .outcome(2)])
+        XCTAssertNil(relaunched.expeditionReviewContinueQuote())
+        XCTAssertEqual(relaunched.acknowledgeExpeditionReview(quote: secondQuote),
+                       .alreadyAcknowledged)
+    }
+
+    func testRetainedReviewQuoteDriftAndMissingHeadAreByteAndWriteInert() throws {
+        func prepared(_ suffix: String) throws
+            -> (GameStore, ExpeditionReviewContinueQuoteV1) {
+            let store = GameStore(io: .temporary(name: "review-stale-\(suffix)-\(UUID().uuidString)"))
+            store.mutate("fixture: retained review") { state in
+                state.worlds.outcomeSequence = 2
+                XCTAssertTrue(state.worlds.appendExpeditionReview(.init(
+                    runIndex: 7, outcomeID: 1, kind: .defeat, reason: "shown",
+                    turnsTaken: 4, haulKeptFraction: 0.5)))
+                state.tutorial.firstReturnContext = .init(
+                    runIndex: 7, route: .library, reason: .fieldNote, writingID: "note-a")
+            }
+            return (store, try XCTUnwrap(store.expeditionReviewContinueQuote()))
+        }
+        func assertInert(_ store: GameStore, quote: ExpeditionReviewContinueQuoteV1,
+                         expected: ExpeditionReviewContinueResultV1,
+                         file: StaticString = #filePath, line: UInt = #line) throws {
+            let bytes = try SaveCodec.encode(store.state)
+            let meta = store.state.meta
+            let diagnostics = store.diagnostics
+            XCTAssertEqual(store.acknowledgeExpeditionReview(quote: quote), expected,
+                           file: file, line: line)
+            XCTAssertEqual(try SaveCodec.encode(store.state), bytes, file: file, line: line)
+            XCTAssertEqual(store.state.meta, meta, file: file, line: line)
+            XCTAssertEqual(store.diagnostics.writeCount, diagnostics.writeCount,
+                           file: file, line: line)
+            XCTAssertEqual(store.diagnostics.savedMutationCount, diagnostics.savedMutationCount,
+                           file: file, line: line)
+            XCTAssertEqual(store.diagnostics.hasPendingWrite, diagnostics.hasPendingWrite,
+                           file: file, line: line)
+        }
+
+        let (changed, changedQuote) = try prepared("summary")
+        changed.mutate("fixture: same identity changed summary") { state in
+            state.worlds.expeditionReviewQueue.pending[0].summary.reason = "replaced"
+        }
+        try assertInert(changed, quote: changedQuote, expected: .stale(.changedReview))
+
+        let (queued, queuedQuote) = try prepared("queue")
+        queued.mutate("fixture: queue revision changed") { state in
+            XCTAssertTrue(state.worlds.appendExpeditionReview(.init(
+                runIndex: 8, outcomeID: 2, kind: .portal, reason: "later",
+                turnsTaken: 5, haulKeptFraction: 1)))
+        }
+        try assertInert(queued, quote: queuedQuote, expected: .stale(.changedReview))
+
+        let (tutorial, tutorialQuote) = try prepared("tutorial")
+        tutorial.mutate("fixture: tutorial context changed") {
+            $0.tutorial.firstReturnContext?.writingID = "note-b"
+        }
+        try assertInert(tutorial, quote: tutorialQuote,
+                        expected: .stale(.changedTutorialContext))
+
+        let (missing, missingQuote) = try prepared("missing")
+        missing.mutate("fixture: review removed without tombstone") {
+            $0.worlds.expeditionReviewQueue.pending.removeAll()
+        }
+        try assertInert(missing, quote: missingQuote, expected: .stale(.noPresentedReview))
+
+        var forged = queuedQuote
+        forged.headOrdinal = 1
+        try assertInert(queued, quote: forged, expected: .refused(.invalidQuote))
+    }
+
+    @MainActor
+    func testReviewContinuePhoneAdmissionOneTwoAndTwentyTapsCommitOnce() async throws {
+        for tapCount in [1, 2, 20] {
+            let store = GameStore(io: .temporary(
+                name: "review-phone-\(tapCount)-\(UUID().uuidString)"))
+            store.mutate("fixture: phone review") { state in
+                state.worlds.outcomeSequence = 1
+                XCTAssertTrue(state.worlds.appendExpeditionReview(.init(
+                    runIndex: tapCount, outcomeID: 1, kind: .portal, reason: "phone",
+                    turnsTaken: 1, haulKeptFraction: 1)))
+            }
+            let quote = try XCTUnwrap(store.expeditionReviewContinueQuote())
+            let admission = PhoneControlAdmissionV1()
+            let beforeTouch = try SaveCodec.encode(store.state)
+            admission.touchDown(controlID: quote.controlID)
+            XCTAssertEqual(try SaveCodec.encode(store.state), beforeTouch)
+            var admitted = 0
+            var busy = 0
+            for _ in 0..<tapCount {
+                let release = admission.release(controlID: quote.controlID) {
+                    switch store.acknowledgeExpeditionReview(quote: quote) {
+                    case .acknowledged: .success(.committed)
+                    case .alreadyAcknowledged: .success(.noChange)
+                    case .stale: .failure(.stale)
+                    case .refused(let reason): .failure(.disabled(reason.playerCopy))
+                    case .busy: .failure(.busy)
+                    }
+                }
+                switch release {
+                case .success: admitted += 1
+                case .failure(.busy): busy += 1
+                case .failure: XCTFail("unexpected admission refusal")
+                }
+            }
+            await Task.yield()
+            XCTAssertEqual(admitted, 1)
+            XCTAssertEqual(busy, tapCount - 1)
+            XCTAssertNil(store.state.worlds.pendingExpeditionReview)
+            XCTAssertEqual(store.state.worlds.expeditionReviewQueue.acknowledged, [.outcome(1)])
+            guard case .completed(_, .committed) = admission.state else {
+                return XCTFail("acknowledged result must exclusively complete admission")
+            }
+        }
+    }
+
+    func testRunExitProductionUsesExactQuoteIdentityAndStateDrivenHeadTransition() throws {
+        let root = URL(fileURLWithPath: #filePath).deletingLastPathComponent()
+            .deletingLastPathComponent()
+        let source = try String(contentsOf: root.appending(path: "Sources/App/RootView.swift"),
+                                encoding: .utf8)
+        XCTAssertTrue(source.contains("RunExitSummaryView(quote: quote)"))
+        XCTAssertTrue(source.contains(".id(quote.controlID)"))
+        XCTAssertTrue(source.contains("continueQuote?.controlID ?? \"run-exit.continue\""))
+        XCTAssertTrue(source.contains(".fullFacePressFeedback(continueControlID, admission:"))
+        XCTAssertFalse(source.contains("store.acknowledgeExpeditionReview(review.reviewID)"))
+    }
 }

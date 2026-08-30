@@ -230,6 +230,59 @@ enum TutorialRules {
 }
 
 extension GameStore {
+    func expeditionReviewContinueQuote() -> ExpeditionReviewContinueQuoteV1? {
+        ExpeditionReviewContinueQuoteV1.make(from: state)
+    }
+
+    @discardableResult
+    func acknowledgeExpeditionReview(
+        quote: ExpeditionReviewContinueQuoteV1
+    ) -> ExpeditionReviewContinueResultV1 {
+        guard !expeditionReviewAcknowledgementInFlight else { return .busy }
+        guard quote.version == ExpeditionReviewContinueQuoteV1.version,
+              quote.headOrdinal == 0,
+              !quote.headFingerprintSHA256.isEmpty,
+              !quote.queueRevisionSHA256.isEmpty else { return .refused(.invalidQuote) }
+        if state.worlds.expeditionReviewQueue.acknowledged.contains(quote.head.reviewID) {
+            return .alreadyAcknowledged
+        }
+        guard let currentHead = state.worlds.pendingExpeditionReview else {
+            return .stale(.noPresentedReview)
+        }
+        guard currentHead == quote.head else { return .stale(.changedReview) }
+        guard state.tutorial.firstReturnContext == quote.firstReturnContext else {
+            return .stale(.changedTutorialContext)
+        }
+        guard quote.exactlyMatches(state) else { return .stale(.changedReview) }
+
+        expeditionReviewAcknowledgementInFlight = true
+        defer { expeditionReviewAcknowledgementInFlight = false }
+#if DEBUG
+        expeditionReviewBeforeCommitForTesting?()
+#endif
+        let committed = mutateIf("acknowledge expedition review", flush: true) { state in
+            guard quote.exactlyMatches(state),
+                  let removed = state.worlds.expeditionReviewQueue.pending.first,
+                  removed == quote.head else { return false }
+            state.worlds.expeditionReviewQueue.pending.removeFirst()
+            state.worlds.expeditionReviewQueue.acknowledged.append(removed.reviewID)
+            if state.worlds.expeditionReviewQueue.acknowledged.count
+                > ExpeditionReviewQueueV1.acknowledgedLimit {
+                state.worlds.expeditionReviewQueue.acknowledged.removeFirst(
+                    state.worlds.expeditionReviewQueue.acknowledged.count
+                        - ExpeditionReviewQueueV1.acknowledgedLimit)
+            }
+            if quote.firstReturnContext != nil {
+                state.tutorial.complete(.returnPersistenceBoundary,
+                                        fact: "first_recap_acknowledged")
+                state.tutorial.becameEligible(.baseFirstResultRoute,
+                                              runIndex: removed.summary.runIndex)
+            }
+            return true
+        }
+        return committed ? .acknowledged : .stale(.changedReview)
+    }
+
     func tutorialEligible(_ id: TutorialLessonID) {
         mutate("tutorial eligible: \(id.rawValue)") { state in
             state.tutorial.becameEligible(id, runIndex: state.worlds.runIndex)
@@ -273,29 +326,16 @@ extension GameStore {
             }
             return .stale(expected: presented.reviewID, actual: reviewID)
         }
-        let acknowledged = mutateIf("acknowledge expedition review", flush: true) { state in
-            guard let head = state.worlds.expeditionReviewQueue.pending.first,
-                  head.reviewID == reviewID else { return false }
-            let summary = head.summary
-            state.worlds.expeditionReviewQueue.pending.removeFirst()
-            state.worlds.expeditionReviewQueue.acknowledged.append(reviewID)
-            if state.worlds.expeditionReviewQueue.acknowledged.count
-                > ExpeditionReviewQueueV1.acknowledgedLimit {
-                state.worlds.expeditionReviewQueue.acknowledged.removeFirst(
-                    state.worlds.expeditionReviewQueue.acknowledged.count
-                        - ExpeditionReviewQueueV1.acknowledgedLimit)
-            }
-            if state.tutorial.firstReturnContext != nil {
-                state.tutorial.complete(.returnPersistenceBoundary,
-                                        fact: "first_recap_acknowledged")
-                state.tutorial.becameEligible(.baseFirstResultRoute,
-                                              runIndex: summary.runIndex)
-            }
-            return true
+        guard let quote = expeditionReviewContinueQuote() else {
+            return .stale(expected: nil, actual: reviewID)
         }
-        return acknowledged ? .acknowledged
-                            : .stale(expected: state.worlds.pendingExpeditionReview?.reviewID,
-                                     actual: reviewID)
+        switch acknowledgeExpeditionReview(quote: quote) {
+        case .acknowledged: return .acknowledged
+        case .alreadyAcknowledged: return .alreadyAcknowledged
+        case .stale, .refused, .busy:
+            return .stale(expected: state.worlds.pendingExpeditionReview?.reviewID,
+                          actual: reviewID)
+        }
     }
 
     @discardableResult

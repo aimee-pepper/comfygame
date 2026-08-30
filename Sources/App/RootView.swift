@@ -162,8 +162,11 @@ struct RootView: View {
             // dismiss. That is not player acknowledgement. Only the recap's Continue action may
             // consume this durable receipt.
         })) { review in
-            RunExitSummaryView(summary: review.summary) {
-                store.acknowledgeExpeditionReview(review.reviewID)
+            if let quote = store.expeditionReviewContinueQuote(), quote.head == review {
+                RunExitSummaryView(quote: quote) { retainedQuote in
+                    store.acknowledgeExpeditionReview(quote: retainedQuote)
+                }
+                .id(quote.controlID)
             }
         }
         .sheet(isPresented: Binding(
@@ -368,14 +371,30 @@ struct RunExitSummaryView: View {
     @EnvironmentObject private var store: GameStore
     @State private var tutorialHidden = false
     @State private var selectedReceipt: RunExitSummary.ReceiptLine?
+    @State private var continueRefusalCopy: String?
+    @StateObject private var continueAdmission = PhoneControlAdmissionV1()
     let summary: RunExitSummary
     let dismiss: () -> Void
+    let continueQuote: ExpeditionReviewContinueQuoteV1?
+    let continueAction: ((ExpeditionReviewContinueQuoteV1)
+                         -> ExpeditionReviewContinueResultV1)?
 
     init(summary: RunExitSummary, dismiss: @escaping () -> Void,
          selectedReceipt: RunExitSummary.ReceiptLine? = nil) {
         self.summary = summary
         self.dismiss = dismiss
+        self.continueQuote = nil
+        self.continueAction = nil
         _selectedReceipt = State(initialValue: selectedReceipt)
+    }
+
+    init(quote: ExpeditionReviewContinueQuoteV1,
+         continueAction: @escaping (ExpeditionReviewContinueQuoteV1)
+            -> ExpeditionReviewContinueResultV1) {
+        summary = quote.head.summary
+        dismiss = {}
+        continueQuote = quote
+        self.continueAction = continueAction
     }
 
     var body: some View {
@@ -409,14 +428,20 @@ struct RunExitSummaryView: View {
 #endif
 
             VStack {
-                Button("Return to Village", action: dismiss)
+                if let continueRefusalCopy {
+                    Text(continueRefusalCopy)
+                        .font(.custom("Tiny5", size: 10))
+                        .foregroundStyle(PixelUITheme.text)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+                Button("Return to Village", action: continueTapped)
                     .font(.custom("Tiny5", size: 13))
                     .foregroundStyle(Color.white)
                     .frame(maxWidth: .infinity, minHeight: 54)
                     .background(PixelUITheme.primary)
                     .overlay(Rectangle().stroke(PixelUITheme.edgeDark, lineWidth: 2))
                     .buttonStyle(.plain)
-                    .fullFacePressFeedback("run-exit.continue")
+                    .fullFacePressFeedback(continueControlID, admission: continueAdmission)
                     .accessibilityIdentifier("run-exit.continue")
             }
             .padding(.horizontal, 12)
@@ -450,6 +475,35 @@ struct RunExitSummaryView: View {
                                  store.deferTutorial(.returnPersistenceBoundary)
                                  tutorialHidden = true
                              })
+            }
+        }
+    }
+
+    private var continueControlID: String {
+        continueQuote?.controlID ?? "run-exit.continue"
+    }
+
+    private func continueTapped() {
+        guard let continueQuote, let continueAction else {
+            dismiss()
+            return
+        }
+        _ = continueAdmission.release(controlID: continueControlID) {
+            switch continueAction(continueQuote) {
+            case .acknowledged:
+                continueRefusalCopy = nil
+                return .success(.committed)
+            case .alreadyAcknowledged:
+                continueRefusalCopy = "This expedition recap was already continued."
+                return .success(.noChange)
+            case .stale(let reason):
+                continueRefusalCopy = reason.playerCopy
+                return .failure(.stale)
+            case .refused(let reason):
+                continueRefusalCopy = reason.playerCopy
+                return .failure(.disabled(reason.playerCopy))
+            case .busy:
+                return .failure(.busy)
             }
         }
     }

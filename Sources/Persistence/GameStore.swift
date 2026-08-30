@@ -464,6 +464,7 @@ final class GameStore: ObservableObject {
 #if DEBUG
     /// Test-only interruption at the exact staged-quote/atomic-commit boundary.
     var writingDeskBeforeCommitForTesting: (() -> Void)?
+    var expeditionReviewBeforeCommitForTesting: (() -> Void)?
 #endif
 
     private let io: any GamePersistenceIO
@@ -475,6 +476,7 @@ final class GameStore: ObservableObject {
     private var seenWorldMiningBatchIDs: Set<String> = []
     private var travellerSpeechWorldRunID: String?
     private var shownTravellerSpeechIDs: Set<TravellerID> = []
+    var expeditionReviewAcknowledgementInFlight = false
 
     var diagnosticCampaignReference: String? { io.diagnosticCampaignReference }
 

@@ -1,3 +1,4 @@
+import CryptoKit
 import Foundation
 
 /// One campaign-local receipt for an expedition-to-Base transition. Unlike `runIndex`, this
@@ -137,6 +138,73 @@ enum ExpeditionReviewAcknowledgementResult: Equatable, Sendable {
     case acknowledged
     case alreadyAcknowledged
     case stale(expected: ExpeditionReviewID?, actual: ExpeditionReviewID)
+}
+
+struct ExpeditionReviewContinueQuoteV1: Equatable, Sendable {
+    static let version = 1
+    var version: Int = Self.version
+    var headOrdinal: Int
+    var head: PendingExpeditionReviewV1
+    var headFingerprintSHA256: String
+    var queueRevisionSHA256: String
+    var firstReturnContext: FirstReturnTutorialContext?
+
+    var controlID: String {
+        let review = switch head.reviewID {
+        case .outcome(let id): "outcome-\(id.rawValue)"
+        case .legacy(let key): "legacy-\(key)"
+        }
+        return "run-exit.continue.\(review).\(headFingerprintSHA256)"
+    }
+
+    static func make(from state: GameState) -> Self? {
+        guard let head = state.worlds.expeditionReviewQueue.pending.first,
+              let headFingerprint = fingerprint(head),
+              let queueRevision = fingerprint(state.worlds.expeditionReviewQueue) else {
+            return nil
+        }
+        return .init(headOrdinal: 0, head: head,
+                     headFingerprintSHA256: headFingerprint,
+                     queueRevisionSHA256: queueRevision,
+                     firstReturnContext: state.tutorial.firstReturnContext)
+    }
+
+    func exactlyMatches(_ state: GameState) -> Bool {
+        guard version == Self.version, headOrdinal == 0,
+              let current = Self.make(from: state) else { return false }
+        return current == self
+    }
+
+    private static func fingerprint<T: Encodable>(_ value: T) -> String? {
+        let encoder = JSONEncoder()
+        encoder.outputFormatting = [.sortedKeys, .withoutEscapingSlashes]
+        guard let data = try? encoder.encode(value) else { return nil }
+        return SHA256.hash(data: data).map { String(format: "%02x", $0) }.joined()
+    }
+}
+
+enum ExpeditionReviewContinueRefusalV1: Equatable, Sendable {
+    case noPresentedReview
+    case changedReview
+    case changedTutorialContext
+    case invalidQuote
+
+    var playerCopy: String {
+        switch self {
+        case .noPresentedReview: "This expedition recap is no longer pending."
+        case .changedReview: "This expedition recap changed. Review it again."
+        case .changedTutorialContext: "The return guidance changed. Review this recap again."
+        case .invalidQuote: "This expedition recap could not be continued."
+        }
+    }
+}
+
+enum ExpeditionReviewContinueResultV1: Equatable, Sendable {
+    case acknowledged
+    case alreadyAcknowledged
+    case stale(ExpeditionReviewContinueRefusalV1)
+    case refused(ExpeditionReviewContinueRefusalV1)
+    case busy
 }
 
 /// Layer 3 — Authored Worlds. Instanced expeditions plus realms rebound into the Atlas.

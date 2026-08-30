@@ -2,6 +2,38 @@ import XCTest
 @testable import Bookbinder
 
 final class SaveSlotTests: XCTestCase {
+    func testExpeditionReviewContinueQuoteAndTombstoneRealSlotRoundTrip() async throws {
+        let root = directory(); defer { try? FileManager.default.removeItem(at: root) }
+        let slots = SaveSlotFileIO(directory: root)
+        var state = GameState.newGame()
+        state.worlds.outcomeSequence = 1
+        XCTAssertTrue(state.worlds.appendExpeditionReview(.init(
+            runIndex: 3, outcomeID: 1, kind: .portal, reason: "slot review",
+            turnsTaken: 2, haulKeptFraction: 1)))
+        state.tutorial.firstReturnContext = .init(
+            runIndex: 3, route: .writingDesk, reason: .ordinaryReturn, writingID: nil)
+        let quote = try XCTUnwrap(ExpeditionReviewContinueQuoteV1.make(from: state))
+        let created = try await slots.create(name: "Review Continue", state: state)
+        let url = try await slots.exportURL(for: created.metadata.id)
+        let envelopeBefore = try Data(contentsOf: url)
+        let loaded = try await slots.load(created.metadata.id)
+        XCTAssertEqual(ExpeditionReviewContinueQuoteV1.make(from: loaded.state), quote)
+
+        var stale = loaded.state
+        stale.worlds.expeditionReviewQueue.pending[0].summary.reason = "changed"
+        XCTAssertFalse(quote.exactlyMatches(stale))
+        XCTAssertEqual(try Data(contentsOf: url), envelopeBefore)
+
+        var acknowledged = loaded.state
+        acknowledged.worlds.expeditionReviewQueue.pending.removeFirst()
+        acknowledged.worlds.expeditionReviewQueue.acknowledged.append(.outcome(1))
+        let committed = try await slots.create(name: "Review Continued", state: acknowledged)
+        let relaunched = try await slots.load(committed.metadata.id)
+        XCTAssertTrue(relaunched.state.worlds.expeditionReviewQueue.pending.isEmpty)
+        XCTAssertEqual(relaunched.state.worlds.expeditionReviewQueue.acknowledged, [.outcome(1)])
+        XCTAssertNil(ExpeditionReviewContinueQuoteV1.make(from: relaunched.state))
+    }
+
     func testTorchCraftRealSlotRoundTripAndStaleIdentityIsEnvelopeInert() async throws {
         let root = directory(); defer { try? FileManager.default.removeItem(at: root) }
         let slots = SaveSlotFileIO(directory: root)
