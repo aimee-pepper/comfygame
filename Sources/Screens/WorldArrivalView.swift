@@ -15,17 +15,33 @@ import SwiftUI
         let runIndex: Int
         let mapSeed: UInt64
     }
-    enum Phase: Equatable { case idle, preparing(Key), ready(Key), failed(Key) }
+    enum Phase: Equatable {
+        case presenting(Key), preparingDestination(Key), readyToEnter(Key)
+        case transitioning(Key), preparationFailed(Key)
+    }
+    enum Event: Equatable {
+        case presented(Key), destinationPreparationStarted(Key)
+        case destinationReady(Key), destinationPreparationFailed(Key)
+        case transitionStarted(Key), transitionCompleted(Key)
+        case transitionRefused(Key)
+    }
 
-    @Published private(set) var phase: Phase = .idle
+    @Published private(set) var phase: Phase
+    @Published private(set) var events: [Event]
     private(set) var startedPreparationCount = 0
     private var generation: UInt64 = 0
     private var preparationTask: Task<Bool, Never>?
 
-    func prepare(key: Key, operation: @escaping @MainActor () async -> Bool) async -> Bool {
-        if phase == .ready(key) { return true }
-        if phase == .failed(key) { return false }
-        if phase == .preparing(key), let preparationTask {
+    init(key: Key) {
+        phase = .presenting(key)
+        events = [.presented(key)]
+    }
+
+    func prepare(key: Key, retry: Bool,
+                 operation: @escaping @MainActor () async -> Bool) async -> Bool {
+        if phase == .readyToEnter(key) { return true }
+        if phase == .preparationFailed(key), !retry { return false }
+        if phase == .preparingDestination(key), let preparationTask {
             return await preparationTask.value
         }
 
@@ -33,7 +49,8 @@ import SwiftUI
         generation &+= 1
         let ownedGeneration = generation
         startedPreparationCount += 1
-        phase = .preparing(key)
+        phase = .preparingDestination(key)
+        events.append(.destinationPreparationStarted(key))
 #if DEBUG
         WorldDestinationPreparationMeasurement.startedKeys.append(key)
 #endif
@@ -42,7 +59,8 @@ import SwiftUI
         let succeeded = await task.value
         guard generation == ownedGeneration else { return false }
         preparationTask = nil
-        phase = succeeded ? .ready(key) : .failed(key)
+        phase = succeeded ? .readyToEnter(key) : .preparationFailed(key)
+        events.append(succeeded ? .destinationReady(key) : .destinationPreparationFailed(key))
 #if DEBUG
         if succeeded {
             WorldDestinationPreparationMeasurement.readyKeys.append(key)
@@ -53,15 +71,37 @@ import SwiftUI
         return succeeded
     }
 
+    func beginTransition(key: Key) -> Bool {
+        guard phase == .readyToEnter(key) else { return false }
+        phase = .transitioning(key)
+        events.append(.transitionStarted(key))
+        return true
+    }
+
+    func completeWorldSplashTransition(
+        receiptID: WorldArrivalReceiptID, runIndex: Int, mapSeed: UInt64,
+        destinationStillReady: () -> Bool, commit: () -> Bool
+    ) -> Bool {
+        let key = Key(receiptID: receiptID, runIndex: runIndex, mapSeed: mapSeed)
+        guard phase == .transitioning(key), destinationStillReady(), commit() else {
+            events.append(.transitionRefused(key))
+            return false
+        }
+        events.append(.transitionCompleted(key))
+        return true
+    }
+
     func cancel(key: Key? = nil) {
         if let key {
-            guard phase == .preparing(key) || phase == .ready(key) || phase == .failed(key)
+            guard phase == .preparingDestination(key) || phase == .readyToEnter(key)
+                    || phase == .preparationFailed(key) || phase == .transitioning(key)
+                    || phase == .presenting(key)
             else { return }
         }
         generation &+= 1
         preparationTask?.cancel()
         preparationTask = nil
-        phase = .idle
+        if let key { phase = .presenting(key) }
     }
 }
 
@@ -87,15 +127,35 @@ struct WorldArrivalView: View {
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     @Environment(\.displayScale) private var displayScale
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
-    @StateObject private var destinationPreparation = WorldDestinationPreparationCoordinator()
-    let receipt: WorldArrivalReceipt
+    @StateObject private var destinationPreparation: WorldDestinationPreparationCoordinator
+    let presentation: WorldSplashNativePresentationV1
 
-    private var preparationKey: WorldDestinationPreparationCoordinator.Key? {
-        guard let run = store.activeRun, run.worldArrivalReceipt?.id == receipt.id else { return nil }
-        return .init(receiptID: receipt.id, runIndex: run.runIndex, mapSeed: run.mapSeed)
+    init(presentation: WorldSplashNativePresentationV1) {
+        self.presentation = presentation
+        let identity = presentation.identity
+        _destinationPreparation = StateObject(wrappedValue:
+            WorldDestinationPreparationCoordinator(key: .init(
+                receiptID: identity.receiptID, runIndex: identity.runIndex,
+                mapSeed: identity.mapSeed)))
     }
 
-    @MainActor private func prepareDestination(containerSize: CGSize) async -> Bool {
+    init(receipt: WorldArrivalReceipt) {
+        guard let presentation = WorldSplashNativePresentationV1.make(receipt: receipt) else {
+            preconditionFailure("WorldArrivalView requires a validated native Splash projection")
+        }
+        self.init(presentation: presentation)
+    }
+
+    private var preparationKey: WorldDestinationPreparationCoordinator.Key? {
+        guard let run = store.activeRun,
+              presentation.identity.receiptID == run.worldArrivalReceipt?.id,
+              presentation.identity.runIndex == run.runIndex,
+              presentation.identity.mapSeed == run.mapSeed else { return nil }
+        return .init(receiptID: presentation.identity.receiptID,
+                     runIndex: run.runIndex, mapSeed: run.mapSeed)
+    }
+
+    @MainActor private func prepareDestination(containerSize: CGSize, retry: Bool) async -> Bool {
         guard let key = preparationKey, let run = store.activeRun else { return false }
         let state = store.state
         let request = WorldDestinationPreloader.request(
@@ -103,19 +163,20 @@ struct WorldArrivalView: View {
             displayScale: displayScale,
             presentationTick: TerrainPresentationClock.shared.tick,
             reduceMotion: reduceMotion)
-        return await destinationPreparation.prepare(key: key) {
+        return await destinationPreparation.prepare(key: key, retry: retry) {
             await WorldDestinationPreloader.prepare(request: request)
         }
     }
 
-    private var rendered: WorldArrivalRenderedSceneReceipt? { receipt.renderedSceneReceipt }
     private func sceneImage(size: CGSize) -> UIImage? {
-        if let splash = receipt.worldSplashReceiptV3,
-           let image = WorldArrivalNativeRenderer.placeholderImage(for: splash, size: size) { return image }
-        return rendered.flatMap(WorldArrivalNativeRenderer.image(for:))
+        switch presentation.contentKind {
+        case .comprehensiveV3(let splash, _):
+            WorldArrivalNativeRenderer.placeholderImage(for: splash, size: size)
+        case .validatedV2(_, let rendered): WorldArrivalNativeRenderer.image(for: rendered)
+        }
     }
     private var disclosedMarkLabels: [String] {
-        receipt.sourcePagePhysicalReceipt.marks.map {
+        presentation.sourcePage.marks.map {
             $0.isReadable && !$0.visibleLabel.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
                 ? $0.visibleLabel : "??"
         }
@@ -138,12 +199,21 @@ struct WorldArrivalView: View {
                 .frame(maxWidth: .infinity)
                 .frame(height: decisionHeight)
 
+                if case .preparationFailed = destinationPreparation.phase {
+                    Text("World preparation failed. Try Enter World again.")
+                        .foregroundStyle(PixelUITheme.text)
+                        .padding(.horizontal, metrics.sideInset)
+                        .padding(.bottom, 8)
+                }
+
                 Button("Enter World") {
                     Task { @MainActor in
-                        _ = await prepareDestination(containerSize: proxy.size)
-                        guard store.state.worlds.pendingWorldArrivalReceiptID == receipt.id,
-                              store.activeRun?.worldArrivalReceipt?.id == receipt.id else { return }
-                        _ = store.enterPendingWorld(arrivalReceiptID: receipt.id)
+                        guard await prepareDestination(containerSize: proxy.size, retry: true),
+                              let key = preparationKey,
+                              destinationPreparation.beginTransition(key: key) else { return }
+                        _ = completeWorldSplashTransition(
+                            receiptID: key.receiptID, runIndex: key.runIndex,
+                            mapSeed: key.mapSeed)
                     }
                 }
                 .font(.custom("Tiny5", size: 15, relativeTo: .headline))
@@ -159,24 +229,39 @@ struct WorldArrivalView: View {
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .background(PixelUITheme.screen.ignoresSafeArea())
-            .task(id: receipt.id) {
-                _ = await prepareDestination(containerSize: proxy.size)
+            .task(id: presentation.identity.receiptID) {
+                _ = await prepareDestination(containerSize: proxy.size, retry: false)
             }
         }
 #if DEBUG
         .preference(key: DebugBugReporterSuppressedPreferenceKey.self, value: true)
 #endif
         .onDisappear {
-            guard store.state.worlds.pendingWorldArrivalReceiptID == receipt.id,
+            guard store.state.worlds.pendingWorldArrivalReceiptID == presentation.identity.receiptID,
                   let key = preparationKey else { return }
             destinationPreparation.cancel(key: key)
         }
     }
 
+    @MainActor private func completeWorldSplashTransition(
+        receiptID: WorldArrivalReceiptID, runIndex: Int, mapSeed: UInt64
+    ) -> Bool {
+        destinationPreparation.completeWorldSplashTransition(
+            receiptID: receiptID, runIndex: runIndex, mapSeed: mapSeed,
+            destinationStillReady: {
+                store.state.worlds.pendingWorldSplashPresentation?.identity
+                    == presentation.identity
+                    && destinationPreparation.phase == .transitioning(.init(
+                        receiptID: receiptID, runIndex: runIndex, mapSeed: mapSeed))
+            }, commit: {
+                store.enterPendingWorld(arrivalReceiptID: receiptID)
+            })
+    }
+
     @ViewBuilder
     private func arrivalContent(sceneWidth: CGFloat) -> some View {
         VStack(alignment: .leading, spacing: 14) {
-                    Text(receipt.sourcePagePhysicalReceipt.title)
+                    Text(presentation.title)
                         .font(.custom("Tiny5", size: 25, relativeTo: .title))
                         .foregroundStyle(PixelUITheme.text)
                         .fixedSize(horizontal: false, vertical: true)
@@ -194,22 +279,22 @@ struct WorldArrivalView: View {
                     .overlay(Rectangle().stroke(PixelUITheme.edgeDark, lineWidth: 3))
                     .frame(maxWidth: .infinity, alignment: .center)
                     .accessibilityElement(children: .ignore)
-                    .accessibilityLabel("Generated view of \(receipt.sourcePagePhysicalReceipt.title)")
+                    .accessibilityLabel("Generated view of \(presentation.sourcePage.title)")
 
-                    Text(receipt.finalDescription)
+                    Text(presentation.finalDescription)
                         .font(.custom("Tiny5", size: 13, relativeTo: .body))
                         .foregroundStyle(PixelUITheme.text)
                         .lineSpacing(3)
                         .fixedSize(horizontal: false, vertical: true)
 
                     HStack(spacing: 12) {
-                        WorldArrivalPageThumbnail(page: receipt.sourcePagePhysicalReceipt)
+                        WorldArrivalPageThumbnail(page: presentation.sourcePage)
                             .frame(width: 54, height: 54)
                         VStack(alignment: .leading, spacing: 3) {
                             Text("WRITTEN FROM")
                                 .font(.custom("Tiny5", size: 9, relativeTo: .caption2))
                                 .foregroundStyle(PixelUITheme.muted)
-                            Text(receipt.sourcePagePhysicalReceipt.title)
+                            Text(presentation.sourcePage.title)
                                 .font(.custom("Tiny5", size: 12, relativeTo: .callout))
                                 .foregroundStyle(PixelUITheme.text)
                                 .fixedSize(horizontal: false, vertical: true)
@@ -220,7 +305,7 @@ struct WorldArrivalView: View {
                         }
                     }
                     .accessibilityElement(children: .ignore)
-                    .accessibilityLabel("Written from \(receipt.sourcePagePhysicalReceipt.title). \(disclosedMarkLabels.joined(separator: ", "))")
+                    .accessibilityLabel("Written from \(presentation.sourcePage.title). \(disclosedMarkLabels.joined(separator: ", "))")
         }
     }
 }

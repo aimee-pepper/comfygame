@@ -226,8 +226,16 @@ struct WorldsState: Codable, Equatable, Sendable {
     var pendingWorldArrivalReceipt: WorldArrivalReceipt? {
         guard let receipt = activeRun?.worldArrivalReceipt,
               pendingWorldArrivalReceiptID == receipt.id,
-              receipt.isNativePresentationEligible else { return nil }
+              let run = activeRun,
+              WorldSplashNativePresentationV1.make(receipt: receipt, run: run) != nil
+        else { return nil }
         return receipt
+    }
+
+    var pendingWorldSplashPresentation: WorldSplashNativePresentationV1? {
+        guard let run = activeRun, let receipt = run.worldArrivalReceipt,
+              pendingWorldArrivalReceiptID == receipt.id else { return nil }
+        return WorldSplashNativePresentationV1.make(receipt: receipt, run: run)
     }
 
     init(activeRun: WorldRun?, runIndex: Int, seeds: SeedSequence, lastExit: RunExitSummary? = nil,

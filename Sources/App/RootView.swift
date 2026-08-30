@@ -123,17 +123,14 @@ struct RootView: View {
     }()
 
     var body: some View {
-        let receipt = store.state.worlds.pendingWorldArrivalReceipt
-        let validArrival = receipt.flatMap { receipt in
-            receipt.renderedSceneReceipt.flatMap { WorldArrivalNativeRenderer.image(for: $0) }
-        } != nil
+        let splash = store.state.worlds.pendingWorldSplashPresentation
         return Group {
-            switch RootPresentationRules.surface(hasArrival: validArrival,
+            switch RootPresentationRules.surface(hasArrival: splash != nil,
                                                  hasEncounter: store.activeEncounter != nil,
                                                  isInRun: store.state.worlds.isInRun) {
             case .arrival:
-                if let receipt {
-                WorldArrivalView(receipt: receipt)
+                if let splash {
+                    WorldArrivalView(presentation: splash)
                 }
             case .encounter:
                 EncounterView()
@@ -199,13 +196,7 @@ struct RootView: View {
     }
 
     private func reconcileArrivalPresentation() {
-        if let receipt = store.state.worlds.pendingWorldArrivalReceipt,
-           let rendered = receipt.renderedSceneReceipt,
-           WorldArrivalNativeRenderer.image(for: rendered) == nil {
-            _ = store.reconcileUnrenderableWorldArrival(receipt.id)
-        } else {
-            _ = store.reconcileOrphanWorldArrival()
-        }
+        _ = store.reconcileOrphanWorldArrival()
     }
 }
 

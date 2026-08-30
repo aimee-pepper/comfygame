@@ -106,13 +106,50 @@ final class PageTests: XCTestCase {
     }
 
     @MainActor
+    func testWorldSplashProjectionPrefersV3WithoutV2AndFallsBackToValidatedV2() throws {
+        let store = GameStore(io: .temporary(name: "splash-projection-\(UUID().uuidString)"))
+        fundAuthoredStarterBind(store)
+        XCTAssertTrue(store.bindAndDepart(
+            worldPageInstanceID: WorldPageCatalog.starterInstances[0].id))
+        let run = try XCTUnwrap(store.activeRun)
+        let accepted = try XCTUnwrap(run.worldArrivalReceipt)
+
+        var v3Only = accepted
+        v3Only.sceneReceipt = nil
+        v3Only.renderedSceneReceipt = nil
+        let native = try XCTUnwrap(WorldSplashNativePresentationV1.make(receipt: v3Only))
+        guard case .comprehensiveV3(let receipt, let commands) = native.contentKind else {
+            return XCTFail("valid V3 must be the native authority without a legacy raster")
+        }
+        XCTAssertEqual(receipt, accepted.worldSplashReceiptV3)
+        XCTAssertFalse(commands.isEmpty)
+        XCTAssertEqual(native.firstMapCropReceipt,
+                       .comprehensiveV3(receipt.firstMapCropReceipt))
+
+        var fallback = accepted
+        fallback.worldSplashReceiptV3?.version = "invalid-future-v3"
+        let legacy = try XCTUnwrap(WorldSplashNativePresentationV1.make(receipt: fallback))
+        guard case .validatedV2 = legacy.contentKind else {
+            return XCTFail("an invalid optional V3 must fall back to validated V2")
+        }
+        XCTAssertEqual(legacy.firstMapCropReceipt,
+                       fallback.sceneReceipt.map {
+                           .validatedV2($0.payload.firstMapCropReceipt)
+                       })
+
+        fallback.sceneReceipt = nil
+        fallback.renderedSceneReceipt = nil
+        XCTAssertNil(WorldSplashNativePresentationV1.make(receipt: fallback))
+    }
+
+    @MainActor
     func testWorldDestinationPreparationStartsOnceAndReusesTheSameResult() async {
-        let coordinator = WorldDestinationPreparationCoordinator()
         let key = WorldDestinationPreparationCoordinator.Key(
             receiptID: .init(rawValue: "prepared-a"), runIndex: 4, mapSeed: 44)
+        let coordinator = WorldDestinationPreparationCoordinator(key: key)
         var calls = 0
         let first = Task { @MainActor in
-            await coordinator.prepare(key: key) {
+            await coordinator.prepare(key: key, retry: false) {
                 calls += 1
                 try? await Task.sleep(for: .milliseconds(40))
                 return !Task.isCancelled
@@ -120,7 +157,7 @@ final class PageTests: XCTestCase {
         }
         await Task.yield()
         let second = Task { @MainActor in
-            await coordinator.prepare(key: key) {
+            await coordinator.prepare(key: key, retry: false) {
                 XCTFail("a peer waiter must reuse the one owned preparation")
                 return false
             }
@@ -131,8 +168,8 @@ final class PageTests: XCTestCase {
         XCTAssertTrue(secondResult)
         XCTAssertEqual(calls, 1)
         XCTAssertEqual(coordinator.startedPreparationCount, 1)
-        XCTAssertEqual(coordinator.phase, .ready(key))
-        let reused = await coordinator.prepare(key: key) {
+        XCTAssertEqual(coordinator.phase, .readyToEnter(key))
+        let reused = await coordinator.prepare(key: key, retry: false) {
             XCTFail("a ready destination must not prepare twice")
             return false
         }
@@ -142,53 +179,87 @@ final class PageTests: XCTestCase {
 
     @MainActor
     func testWorldDestinationPreparationCancelsStaleDestinationAndIgnoresItsCallback() async {
-        let coordinator = WorldDestinationPreparationCoordinator()
         let old = WorldDestinationPreparationCoordinator.Key(
             receiptID: .init(rawValue: "prepared-old"), runIndex: 4, mapSeed: 44)
         let current = WorldDestinationPreparationCoordinator.Key(
             receiptID: .init(rawValue: "prepared-current"), runIndex: 5, mapSeed: 55)
+        let coordinator = WorldDestinationPreparationCoordinator(key: old)
         let stale = Task { @MainActor in
-            await coordinator.prepare(key: old) {
+            await coordinator.prepare(key: old, retry: false) {
                 try? await Task.sleep(for: .milliseconds(80))
                 return !Task.isCancelled
             }
         }
         await Task.yield()
-        let currentResult = await coordinator.prepare(key: current) { true }
+        let currentResult = await coordinator.prepare(key: current, retry: false) { true }
         let staleResult = await stale.value
         XCTAssertTrue(currentResult)
         XCTAssertFalse(staleResult)
-        XCTAssertEqual(coordinator.phase, .ready(current))
+        XCTAssertEqual(coordinator.phase, .readyToEnter(current))
         XCTAssertEqual(coordinator.startedPreparationCount, 2)
 
         coordinator.cancel(key: old)
-        XCTAssertEqual(coordinator.phase, .ready(current),
+        XCTAssertEqual(coordinator.phase, .readyToEnter(current),
                        "an obsolete route callback cannot cancel the selected destination")
         coordinator.cancel(key: current)
-        XCTAssertEqual(coordinator.phase, .idle)
+        XCTAssertEqual(coordinator.phase, .presenting(current))
     }
 
     @MainActor
     func testWorldDestinationPreparationFailureIsOneShotForTheSelectedDestination() async {
-        let coordinator = WorldDestinationPreparationCoordinator()
         let key = WorldDestinationPreparationCoordinator.Key(
             receiptID: .init(rawValue: "prepared-failure"), runIndex: 6, mapSeed: 66)
+        let coordinator = WorldDestinationPreparationCoordinator(key: key)
         var calls = 0
 
-        let failed = await coordinator.prepare(key: key) {
+        let failed = await coordinator.prepare(key: key, retry: false) {
             calls += 1
             return false
         }
         XCTAssertFalse(failed)
-        XCTAssertEqual(coordinator.phase, .failed(key))
+        XCTAssertEqual(coordinator.phase, .preparationFailed(key))
 
-        let reusedFailure = await coordinator.prepare(key: key) {
+        let reusedFailure = await coordinator.prepare(key: key, retry: false) {
             XCTFail("a failed destination must not start an implicit second preparation")
             return true
         }
         XCTAssertFalse(reusedFailure)
         XCTAssertEqual(calls, 1)
         XCTAssertEqual(coordinator.startedPreparationCount, 1)
+
+        let retry = await coordinator.prepare(key: key, retry: true) {
+            calls += 1
+            return true
+        }
+        XCTAssertTrue(retry)
+        XCTAssertEqual(calls, 2)
+        XCTAssertEqual(coordinator.phase, .readyToEnter(key))
+    }
+
+    @MainActor
+    func testWorldSplashTransitionRequiresExactReadyIdentityAndCommitsOnce() async {
+        let key = WorldDestinationPreparationCoordinator.Key(
+            receiptID: .init(rawValue: "transition"), runIndex: 7, mapSeed: 77)
+        let coordinator = WorldDestinationPreparationCoordinator(key: key)
+        let prepared = await coordinator.prepare(key: key, retry: false) { true }
+        XCTAssertTrue(prepared)
+        XCTAssertTrue(coordinator.beginTransition(key: key))
+        var commits = 0
+        XCTAssertTrue(coordinator.completeWorldSplashTransition(
+            receiptID: key.receiptID, runIndex: key.runIndex, mapSeed: key.mapSeed,
+            destinationStillReady: { true }, commit: { commits += 1; return true }))
+        XCTAssertEqual(commits, 1)
+        XCTAssertFalse(coordinator.completeWorldSplashTransition(
+            receiptID: key.receiptID, runIndex: key.runIndex, mapSeed: key.mapSeed,
+            destinationStillReady: { false }, commit: { commits += 1; return true }))
+        XCTAssertEqual(commits, 1)
+
+        let stale = WorldDestinationPreparationCoordinator.Key(
+            receiptID: .init(rawValue: "stale"), runIndex: 8, mapSeed: 88)
+        XCTAssertFalse(coordinator.completeWorldSplashTransition(
+            receiptID: stale.receiptID, runIndex: stale.runIndex, mapSeed: stale.mapSeed,
+            destinationStillReady: { true }, commit: { commits += 1; return true }))
+        XCTAssertEqual(commits, 1)
     }
 
     @MainActor
