@@ -179,6 +179,92 @@ enum FieldKitDepartureEvaluation: Equatable, Sendable {
     case refused(String)
 }
 
+struct HomeInstrumentLoadoutQuoteV1: Equatable, Sendable {
+    static let currentVersion = 1
+
+    var version: Int = Self.currentVersion
+    var target: PressureTargetID
+    var ownedInstruments: Set<PressureTargetID>
+    var storedLoadoutBefore: Set<PressureTargetID>
+    var effectiveLoadoutBefore: Set<PressureTargetID>
+    var wasConfigured: Bool
+    var desiredCarried: Bool
+    var storedLoadoutAfter: Set<PressureTargetID>
+    var expectsNoActiveRun: Bool = true
+}
+
+enum HomeInstrumentLoadoutRefusalV1: Error, Equatable, Sendable {
+    case notAtHome
+    case notOwned
+    case staleQuote
+    case invalidAuthority
+}
+
+enum HomeInstrumentLoadoutEvaluationV1: Equatable, Sendable {
+    case change(HomeInstrumentLoadoutQuoteV1)
+    case alreadyApplied
+    case refused(HomeInstrumentLoadoutRefusalV1)
+}
+
+enum HomeInstrumentLoadoutCommitResultV1: Equatable, Sendable {
+    case committed
+    case alreadyApplied
+    case refused(HomeInstrumentLoadoutRefusalV1)
+}
+
+private enum HomeInstrumentLoadoutRulesV1 {
+    static func evaluate(target: PressureTargetID, carried: Bool, in state: GameState)
+        -> HomeInstrumentLoadoutEvaluationV1 {
+        guard state.worlds.activeRun == nil else { return .refused(.notAtHome) }
+        guard state.validatesFieldSurveyAuthority() else { return .refused(.invalidAuthority) }
+
+        let owned = state.reality.instruments
+        guard owned.contains(target) else { return .refused(.notOwned) }
+        let configured = state.base.hasConfiguredInstrumentLoadout
+        let stored = state.base.instrumentLoadout
+        let effective = configured ? stored : owned
+        guard effective.contains(target) != carried else { return .alreadyApplied }
+
+        var result = configured ? stored : owned
+        if carried { result.insert(target) } else { result.remove(target) }
+        return .change(.init(target: target, ownedInstruments: owned,
+                             storedLoadoutBefore: stored, effectiveLoadoutBefore: effective,
+                             wasConfigured: configured, desiredCarried: carried,
+                             storedLoadoutAfter: result))
+    }
+
+    static func commit(_ quote: HomeInstrumentLoadoutQuoteV1, in state: inout GameState)
+        -> HomeInstrumentLoadoutCommitResultV1 {
+        guard quote.version == HomeInstrumentLoadoutQuoteV1.currentVersion,
+              quote.expectsNoActiveRun else { return .refused(.staleQuote) }
+        guard state.worlds.activeRun == nil else { return .refused(.notAtHome) }
+        guard state.validatesFieldSurveyAuthority() else { return .refused(.invalidAuthority) }
+        guard state.reality.instruments.contains(quote.target) else { return .refused(.notOwned) }
+
+        // A successfully applied quote is deliberately idempotent. It is the only state other
+        // than its exact pre-state that the quote may recognize.
+        if state.reality.instruments == quote.ownedInstruments,
+           state.base.hasConfiguredInstrumentLoadout,
+           state.base.instrumentLoadout == quote.storedLoadoutAfter,
+           quote.storedLoadoutAfter.contains(quote.target) == quote.desiredCarried {
+            return .alreadyApplied
+        }
+
+        guard case .change(let current) = evaluate(
+            target: quote.target, carried: quote.desiredCarried, in: state),
+            current == quote else { return .refused(.staleQuote) }
+
+        var candidate = state
+        candidate.base.instrumentLoadout = quote.storedLoadoutAfter
+        candidate.base.hasConfiguredInstrumentLoadout = true
+        guard candidate.validatesFieldSurveyAuthority(), candidate != state else {
+            return .refused(.invalidAuthority)
+        }
+        state = candidate
+        return .committed
+    }
+}
+
 /// Player actions inside a world. Each one is a turn, and each one is saved.
 extension GameStore {
     func animalPartyQuote(_ animalID: TamedAnimalID)
@@ -379,15 +465,29 @@ extension GameStore {
             : state.reality.instruments
     }
 
-    func setInstrument(_ target: PressureTargetID, carried: Bool) {
-        guard state.reality.instruments.contains(target), activeRun == nil else { return }
-        mutate("change field kit", flush: true, scope: .expedition) { state in
-            if !state.base.hasConfiguredInstrumentLoadout {
-                state.base.instrumentLoadout = state.reality.instruments
-                state.base.hasConfiguredInstrumentLoadout = true
-            }
-            if carried { state.base.instrumentLoadout.insert(target) }
-            else { state.base.instrumentLoadout.remove(target) }
+    func instrumentLoadoutQuote(_ target: PressureTargetID, carried: Bool)
+        -> HomeInstrumentLoadoutEvaluationV1 {
+        HomeInstrumentLoadoutRulesV1.evaluate(target: target, carried: carried, in: state)
+    }
+
+    @discardableResult
+    func commitInstrumentLoadout(_ quote: HomeInstrumentLoadoutQuoteV1)
+        -> HomeInstrumentLoadoutCommitResultV1 {
+        var result: HomeInstrumentLoadoutCommitResultV1 = .refused(.staleQuote)
+        mutateIf("change field kit", flush: true, scope: .ordinary) { state in
+            result = HomeInstrumentLoadoutRulesV1.commit(quote, in: &state)
+            return result == .committed
+        }
+        return result
+    }
+
+    @discardableResult
+    func setInstrument(_ target: PressureTargetID, carried: Bool)
+        -> HomeInstrumentLoadoutCommitResultV1 {
+        switch instrumentLoadoutQuote(target, carried: carried) {
+        case .change(let quote): return commitInstrumentLoadout(quote)
+        case .alreadyApplied: return .alreadyApplied
+        case .refused(let refusal): return .refused(refusal)
         }
     }
 

@@ -1575,7 +1575,7 @@ struct SurveyPostView: View {
                         }) { target in
                             Toggle(isOn: Binding(
                                 get: { store.selectedInstrumentLoadout.contains(target.id) },
-                                set: { store.setInstrument(target.id, carried: $0) }
+                                set: { _ = store.setInstrument(target.id, carried: $0) }
                             )) {
                                 Label(target.name, systemImage: target.icon)
                             }

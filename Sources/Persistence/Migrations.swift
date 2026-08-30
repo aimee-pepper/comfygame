@@ -182,6 +182,12 @@ enum Migrations {
         }
         let loadout = try exactIDSet(base["instrumentLoadout"])
         guard loadout.isSubset(of: owned) else { throw CocoaError(.coderInvalidValue) }
+        if base.keys.contains("hasConfiguredInstrumentLoadout") {
+            guard let configured = base["hasConfiguredInstrumentLoadout"] as? NSNumber,
+                  CFGetTypeID(configured) == CFBooleanGetTypeID() else {
+                throw CocoaError(.coderInvalidValue)
+            }
+        }
 
         var rawRuns: [Any] = []
         if let active = worlds["activeRun"], !(active is NSNull) { rawRuns.append(active) }

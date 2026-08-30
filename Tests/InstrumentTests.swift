@@ -209,6 +209,116 @@ final class InstrumentTests: XCTestCase {
         XCTAssertEqual(store.activeRun?.carriedInstruments, ["illumination"])
     }
 
+    func testHomeInstrumentLoadoutCommitsOnceAndPreservesUnconfiguredMeaning() throws {
+        let store = richStore()
+        let illumination: PressureTargetID = "illumination"
+        let thermal: PressureTargetID = "thermal"
+        store.mutate("owned instruments", flush: true) { state in
+            state.reality.instruments = [illumination, thermal]
+            state.reality.instrumentPrecisions = [illumination: .good, thermal: .fine]
+        }
+
+        let initialBytes = try SaveCodec.encode(store.state)
+        let initialMeta = store.state.meta
+        let initialDiagnostics = store.diagnostics
+        XCTAssertEqual(store.setInstrument(illumination, carried: true), .alreadyApplied)
+        XCTAssertFalse(store.state.base.hasConfiguredInstrumentLoadout)
+        XCTAssertEqual(try SaveCodec.encode(store.state), initialBytes)
+        XCTAssertEqual(store.state.meta, initialMeta)
+        assertDiagnosticsEqual(store.diagnostics, initialDiagnostics)
+
+        guard case .change(let quote) = store.instrumentLoadoutQuote(
+            illumination, carried: false) else {
+            return XCTFail("the first actual removal needs an exact quote")
+        }
+        XCTAssertFalse(quote.wasConfigured)
+        XCTAssertEqual(quote.ownedInstruments, [illumination, thermal])
+        XCTAssertEqual(quote.effectiveLoadoutBefore, [illumination, thermal])
+        XCTAssertEqual(quote.storedLoadoutAfter, [thermal])
+        XCTAssertEqual(store.commitInstrumentLoadout(quote), .committed)
+        XCTAssertTrue(store.state.base.hasConfiguredInstrumentLoadout)
+        XCTAssertEqual(store.state.base.instrumentLoadout, [thermal])
+        XCTAssertEqual(try SaveCodec.decode(SaveCodec.encode(store.state)).base.instrumentLoadout,
+                       [thermal])
+
+        let committedBytes = try SaveCodec.encode(store.state)
+        let committedMeta = store.state.meta
+        let committedDiagnostics = store.diagnostics
+        XCTAssertEqual(store.commitInstrumentLoadout(quote), .alreadyApplied)
+        XCTAssertEqual(try SaveCodec.encode(store.state), committedBytes)
+        XCTAssertEqual(store.state.meta, committedMeta)
+        assertDiagnosticsEqual(store.diagnostics, committedDiagnostics)
+
+        XCTAssertEqual(store.setInstrument(thermal, carried: false), .committed)
+        XCTAssertTrue(store.state.base.hasConfiguredInstrumentLoadout)
+        XCTAssertTrue(store.state.base.instrumentLoadout.isEmpty,
+                      "an intentional empty kit must not become unconfigured")
+    }
+
+    func testHomeInstrumentLoadoutStaleAndAwayRefusalsAreByteAndWriteInert() throws {
+        let store = richStore()
+        let illumination: PressureTargetID = "illumination"
+        let thermal: PressureTargetID = "thermal"
+        store.mutate("owned instruments", flush: true) { state in
+            state.reality.instruments = [illumination, thermal]
+            state.reality.instrumentPrecisions = [illumination: .good, thermal: .crude]
+        }
+        guard case .change(let quote) = store.instrumentLoadoutQuote(
+            illumination, carried: false) else { return XCTFail("missing quote") }
+
+        let substrate: PressureTargetID = "substrate"
+        store.mutate("newly owned instrument", flush: true) { state in
+            state.reality.instruments.insert(substrate)
+            state.reality.instrumentPrecisions[substrate] = .crude
+        }
+        var before = try SaveCodec.encode(store.state)
+        var meta = store.state.meta
+        var diagnostics = store.diagnostics
+        XCTAssertEqual(store.commitInstrumentLoadout(quote), .refused(.staleQuote))
+        XCTAssertEqual(try SaveCodec.encode(store.state), before)
+        XCTAssertEqual(store.state.meta, meta)
+        assertDiagnosticsEqual(store.diagnostics, diagnostics)
+
+        let unknown = PressureTargetID(rawValue: "not_a_survey_subject")
+        XCTAssertEqual(store.setInstrument(unknown, carried: true), .refused(.notOwned))
+        XCTAssertEqual(try SaveCodec.encode(store.state), before)
+        XCTAssertEqual(store.state.meta, meta)
+        assertDiagnosticsEqual(store.diagnostics, diagnostics)
+
+        guard case .change(let awayQuote) = store.instrumentLoadoutQuote(
+            illumination, carried: false) else { return XCTFail("missing away quote") }
+        let point = GridPoint(x: 0, y: 0)
+        store.mutate("departed elsewhere", flush: true) { state in
+            state.worlds.activeRun = WorldRun(
+                runIndex: 901, book: .init(written: [], essencePaid: 0), mapSeed: 901_001,
+                rng: .init(seed: 901_001),
+                map: .init(width: 1, height: 1, tiles: [Tile(isRevealed: true)], entry: point),
+                playerPosition: point)
+        }
+        before = try SaveCodec.encode(store.state)
+        meta = store.state.meta
+        diagnostics = store.diagnostics
+        XCTAssertEqual(store.commitInstrumentLoadout(awayQuote), .refused(.notAtHome))
+        XCTAssertEqual(store.setInstrument(illumination, carried: false), .refused(.notAtHome))
+        XCTAssertEqual(try SaveCodec.encode(store.state), before)
+        XCTAssertEqual(store.state.meta, meta)
+        assertDiagnosticsEqual(store.diagnostics, diagnostics)
+    }
+
+    func testDepartureFreezesConfiguredInstrumentIDsAndCurrentPrecisions() throws {
+        let store = richStore()
+        let illumination: PressureTargetID = "illumination"
+        let thermal: PressureTargetID = "thermal"
+        store.mutate("owned instruments", flush: true) { state in
+            state.reality.instruments = [illumination, thermal]
+            state.reality.instrumentPrecisions = [illumination: .fine, thermal: .good]
+        }
+        XCTAssertEqual(store.setInstrument(thermal, carried: false), .committed)
+        XCTAssertTrue(store.bindAndDepart())
+        XCTAssertEqual(store.activeRun?.carriedInstruments, [illumination])
+        XCTAssertEqual(store.activeRun?.carriedInstrumentPrecisions, [illumination: .fine])
+    }
+
     func testSurveyKnowledgeSurvivesTheRunAndAccumulatesCompactly() throws {
         let store = richStore()
         store.mutate("field kit") { $0.reality.instruments = ["illumination"] }
@@ -344,6 +454,15 @@ final class InstrumentTests: XCTestCase {
             for resource in ContentCatalog.shared.resources { state.base.resources.add(999, of: resource.id) }
         }
         return store
+    }
+
+    private func assertDiagnosticsEqual(_ actual: SaveDiagnostics, _ expected: SaveDiagnostics,
+                                        file: StaticString = #filePath, line: UInt = #line) {
+        XCTAssertEqual(actual.savedMutationCount, expected.savedMutationCount, file: file, line: line)
+        XCTAssertEqual(actual.saveFileByteCount, expected.saveFileByteCount, file: file, line: line)
+        XCTAssertEqual(actual.hasPendingWrite, expected.hasPendingWrite, file: file, line: line)
+        XCTAssertEqual(actual.writeCount, expected.writeCount, file: file, line: line)
+        XCTAssertEqual(actual.lastError, expected.lastError, file: file, line: line)
     }
 
     private func sunPage() -> Page {

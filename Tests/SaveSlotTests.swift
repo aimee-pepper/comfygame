@@ -160,6 +160,48 @@ final class SaveSlotTests: XCTestCase {
         }
     }
 
+    func testInstrumentLoadoutConfigurationFlagRealSlotStrictnessAndLegacyAbsence() async throws {
+        let root = directory(); defer { try? FileManager.default.removeItem(at: root) }
+        let slots = SaveSlotFileIO(directory: root)
+        var state = GameState.newGame()
+        let target = RealityState.surveySubjectIDsInOrder[0]
+        state.reality.instruments = [target]
+        state.reality.instrumentPrecisions = [target: .good]
+        let created = try await slots.create(name: "Instrument preference", state: state)
+        let url = try await slots.exportURL(for: created.metadata.id)
+        let validBytes = try Data(contentsOf: url)
+        let validEnvelope = try SaveCodec.makeDecoder().decode(
+            SaveSlotEnvelope.self, from: validBytes)
+
+        func envelopeBytes(flag: Any?, omit: Bool = false) throws -> Data {
+            var envelope = validEnvelope
+            var payload = try XCTUnwrap(
+                JSONSerialization.jsonObject(with: envelope.payload) as? [String: Any])
+            var base = try XCTUnwrap(payload["base"] as? [String: Any])
+            if omit { base.removeValue(forKey: "hasConfiguredInstrumentLoadout") }
+            else { base["hasConfiguredInstrumentLoadout"] = flag }
+            payload["base"] = base
+            envelope.payload = try JSONSerialization.data(
+                withJSONObject: payload, options: [.sortedKeys])
+            return try encoder().encode(envelope)
+        }
+
+        let absent = try envelopeBytes(flag: nil, omit: true)
+        try absent.write(to: url, options: .atomic)
+        let legacyLoaded = try await slots.load(created.metadata.id)
+        XCTAssertFalse(legacyLoaded.state.base.hasConfiguredInstrumentLoadout)
+        XCTAssertEqual(try Data(contentsOf: url), absent)
+
+        for (name, value) in [("null", NSNull() as Any), ("number", 0 as Any),
+                              ("string", "true" as Any)] {
+            let malformed = try envelopeBytes(flag: value)
+            try malformed.write(to: url, options: .atomic)
+            do { _ = try await slots.load(created.metadata.id); XCTFail("accepted \(name)") }
+            catch { }
+            XCTAssertEqual(try Data(contentsOf: url), malformed, name)
+        }
+    }
+
     @MainActor
     func testWorldFieldItemRefusalPreservesRealSlotEnvelope() async throws {
         let root = directory(); defer { try? FileManager.default.removeItem(at: root) }

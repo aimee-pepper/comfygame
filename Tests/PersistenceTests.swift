@@ -1491,6 +1491,33 @@ final class PersistenceTests: XCTestCase {
         }
     }
 
+    func testCurrentInstrumentLoadoutConfigurationFlagIsStrictButLegacyAbsenceIsCompatible() throws {
+        var state = fieldSurveyAuthorityState()
+        state.worlds.activeRun = nil
+        state.worlds.anchoredRealms = []
+        let valid = try SaveCodec.encode(state)
+        var root = try XCTUnwrap(JSONSerialization.jsonObject(with: valid) as? [String: Any])
+        var base = try XCTUnwrap(root["base"] as? [String: Any])
+        base.removeValue(forKey: "hasConfiguredInstrumentLoadout")
+        root["base"] = base
+        let absent = try JSONSerialization.data(withJSONObject: root, options: [.sortedKeys])
+        let decoded = try SaveCodec.decode(absent)
+        XCTAssertFalse(decoded.base.hasConfiguredInstrumentLoadout)
+
+        for (name, value) in [("null", NSNull() as Any), ("number", 1 as Any),
+                              ("string", "false" as Any)] {
+            var malformedRoot = root
+            var malformedBase = base
+            malformedBase["hasConfiguredInstrumentLoadout"] = value
+            malformedRoot["base"] = malformedBase
+            let bytes = try JSONSerialization.data(
+                withJSONObject: malformedRoot, options: [.sortedKeys])
+            let original = bytes
+            XCTAssertThrowsError(try SaveCodec.decode(bytes), name)
+            XCTAssertEqual(bytes, original, name)
+        }
+    }
+
     func testSchemaOneEssenceMigrationCombinesScalarAndOwnedPhysicalExactlyOnce() throws {
         let legacy = Data(#"""
         {
