@@ -276,15 +276,18 @@ final class BaseBoardTests: XCTestCase {
             .deletingLastPathComponent().deletingLastPathComponent()
         let source = try String(contentsOf: root.appending(path: "Sources/Screens/BaseView.swift"),
                                 encoding: .utf8)
-        XCTAssertTrue(source.contains("TabView(selection: $selectedSection)"))
+        XCTAssertTrue(source.contains("TabView(selection: Binding("))
         XCTAssertTrue(source.contains(".tag(section)"))
         XCTAssertTrue(source.contains("base-district-pager"))
-        XCTAssertTrue(source.contains("selectedSection = section"))
+        XCTAssertTrue(source.contains("admitSectionChange(to: section"))
         XCTAssertTrue(source.contains("base-section-picker"))
         XCTAssertTrue(source.contains("base-district-caption"))
         XCTAssertTrue(source.contains("townPageBySection[section]"))
         XCTAssertTrue(source.contains("Button(\"Previous\")"))
         XCTAssertTrue(source.contains("Button(\"Next\")"))
+        XCTAssertTrue(source.contains("village.page.\\(section.rawValue).previous"))
+        XCTAssertTrue(source.contains("village.page.\\(section.rawValue).next"))
+        XCTAssertTrue(source.contains("village.foundation.\\(station.id)"))
         XCTAssertEqual(source.components(separatedBy: "TabView").count - 1, 1,
                        "Station pagination must not compete with district swipe paging")
     }

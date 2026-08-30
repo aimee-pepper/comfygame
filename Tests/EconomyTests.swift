@@ -262,6 +262,14 @@ final class EconomyTests: XCTestCase {
             content: .compound(pair[1].id), glyph: pair[1].id.rawValue,
             state: state, draft: first))
         XCTAssertEqual(exclusive.availability, .refused(.exclusivePrimary(pair[0].name)))
+        XCTAssertEqual(full.availability.detailCopy(availableDetail: "unused"),
+                       WritingDeskVocabularyChoiceReasonV1.doesNotFit.playerCopy)
+        XCTAssertEqual(exclusive.availability.detailCopy(availableDetail: "unused"),
+                       WritingDeskVocabularyChoiceReasonV1.exclusivePrimary(pair[0].name).playerCopy)
+        XCTAssertEqual(
+            WritingDeskVocabularyChoiceAvailabilityV1.refused(.unavailable)
+                .detailCopy(availableDetail: "unused"),
+            WritingDeskVocabularyChoiceReasonV1.unavailable.playerCopy)
     }
 
     @MainActor

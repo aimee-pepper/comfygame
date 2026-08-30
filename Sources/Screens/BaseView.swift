@@ -25,6 +25,19 @@ struct HomeDestinationQuoteV1: Equatable, Sendable {
     var hasActiveRun: Bool
 }
 
+struct HomeSectionSelectionQuoteV1: Equatable, Sendable {
+    var displayedSection: StationHomeSection
+    var desiredSection: StationHomeSection
+    var availableSections: [StationHomeSection]
+}
+
+struct HomeTownPageSelectionQuoteV1: Equatable, Sendable {
+    var section: StationHomeSection
+    var displayedPage: Int
+    var desiredPage: Int
+    var pageCount: Int
+}
+
 enum HomeDestinationRulesV1 {
     static func quote(_ destination: HomeDestinationV1,
                       in state: GameState) -> HomeDestinationQuoteV1? {
@@ -263,12 +276,12 @@ struct BaseView: View {
                     .accessibilityIdentifier("base-first-return-not-now")
                     Spacer()
                     Button {
-                        if let station = ContentCatalog.shared.stations.first(where: {
+                        let intendedSection = ContentCatalog.shared.stations.first(where: {
                             $0.route == route.rawValue
-                        }) {
-                            selectedSection = station.resolvedBoardPlacement.section
-                        }
-                        admitRoute(route, quote: routeQuote)
+                        })?.resolvedBoardPlacement.section
+                        admitRoute(route, quote: routeQuote,
+                                   intendedSection: intendedSection,
+                                   displayedSection: selectedSection)
                     } label: {
                         Text("Open \(destinationName(context.route))")
                     }
@@ -309,9 +322,7 @@ struct BaseView: View {
         HStack(spacing: 3) {
             ForEach(availableSections, id: \.self) { section in
                 Button {
-                    admitLocalChange(noChange: section == selectedSection) {
-                        selectedSection = section
-                    }
+                    admitSectionChange(to: section, displayedSection: selectedSection)
                 } label: {
                     Text(section.title)
                         .font(.custom("Tiny5", size: 10))
@@ -352,7 +363,15 @@ struct BaseView: View {
     }
 
     private func districtPager(containerSize: CGSize) -> some View {
-        TabView(selection: $selectedSection) {
+        TabView(selection: Binding(
+            get: { selectedSection },
+            set: { desiredSection in
+                let displayedSection = selectedSection
+                phoneAdmission.touchDown(
+                    controlID: "village.pager.\(displayedSection.rawValue).\(desiredSection.rawValue)")
+                admitSectionChange(to: desiredSection, displayedSection: displayedSection,
+                                   controlID: "village.pager.\(displayedSection.rawValue).\(desiredSection.rawValue)")
+            })) {
             ForEach(availableSections, id: \.self) { section in
                 districtBoard(section: section, containerSize: containerSize)
                     .tag(section)
@@ -370,7 +389,9 @@ struct BaseView: View {
                 StartingTownHomeScene(scene: scene,
                                       destinationQuotes: homeRouteQuotes,
                                       admission: phoneAdmission,
-                                      openedRoute: admitRoute)
+                                      openedRoute: { route, quote in
+                                          admitRoute(route, quote: quote)
+                                      })
             } else if section != .home,
                       TownVisualResource.image(named: "town-empty-v1") != nil {
                 townDistrictBoard(section: section, containerSize: containerSize)
@@ -408,27 +429,31 @@ struct BaseView: View {
                 foundationQuotes: foundationQuotes,
                 admission: phoneAdmission,
                 openFoundation: admitFoundation,
-                openedRoute: admitRoute
+                openedRoute: { route, quote in admitRoute(route, quote: quote) }
             )
             if pages.count > 1 {
                 HStack(spacing: 12) {
                     Button("Previous") {
-                        admitLocalChange(noChange: selectedPage == 0) {
-                            townPageBySection[section] = max(0, selectedPage - 1)
-                        }
+                        admitTownPageChange(section: section, displayedPage: selectedPage,
+                                            desiredPage: max(0, selectedPage - 1),
+                                            pageCount: pages.count, direction: "previous")
                     }
                     .disabled(selectedPage == 0)
+                    .fullFacePressFeedback("village.page.\(section.rawValue).previous",
+                                           admission: phoneAdmission)
                     Spacer()
                     Text("\(selectedPage + 1) of \(pages.count)")
                         .font(.caption.monospacedDigit())
                         .foregroundStyle(.secondary)
                     Spacer()
                     Button("Next") {
-                        admitLocalChange(noChange: selectedPage == pages.count - 1) {
-                            townPageBySection[section] = min(pages.count - 1, selectedPage + 1)
-                        }
+                        admitTownPageChange(section: section, displayedPage: selectedPage,
+                                            desiredPage: min(pages.count - 1, selectedPage + 1),
+                                            pageCount: pages.count, direction: "next")
                     }
                     .disabled(selectedPage == pages.count - 1)
+                    .fullFacePressFeedback("village.page.\(section.rawValue).next",
+                                           admission: phoneAdmission)
                 }
                 .frame(minHeight: 44)
                 .padding(.horizontal, 12)
@@ -479,6 +504,8 @@ struct BaseView: View {
                 StationTile(station: station, tier: 0, isFoundation: true)
             }
             .buttonStyle(.plain)
+            .fullFacePressFeedback("village.foundation.\(station.id)",
+                                   admission: phoneAdmission)
         }
     }
 
@@ -587,7 +614,9 @@ struct BaseView: View {
         })
     }
 
-    private func admitRoute(_ route: AppRoute, quote: HomeDestinationQuoteV1?) {
+    private func admitRoute(_ route: AppRoute, quote: HomeDestinationQuoteV1?,
+                            intendedSection: StationHomeSection? = nil,
+                            displayedSection: StationHomeSection? = nil) {
         guard let quote else {
             phoneAdmission.touchDown(disabledReason: "That destination is unavailable.")
             return
@@ -595,6 +624,14 @@ struct BaseView: View {
         _ = phoneAdmission.release(controlID: "village.route.\(route.rawValue)") {
             guard HomeDestinationRulesV1.quote(.route(route), in: store.state) == quote else {
                 return .failure(.stale)
+            }
+            if let intendedSection {
+                guard selectedSection == displayedSection,
+                      ContentCatalog.shared.stations.first(where: {
+                          $0.route == route.rawValue
+                      })?.resolvedBoardPlacement.section == intendedSection
+                else { return .failure(.stale) }
+                selectedSection = intendedSection
             }
             navigate(route)
             return .success(.navigationAccepted(route))
@@ -614,10 +651,41 @@ struct BaseView: View {
         }
     }
 
-    private func admitLocalChange(noChange: Bool, action: @escaping @MainActor () -> Void) {
-        _ = phoneAdmission.release {
-            guard !noChange else { return .success(.noChange) }
-            action()
+    private func admitSectionChange(to desiredSection: StationHomeSection,
+                                    displayedSection: StationHomeSection,
+                                    controlID: String? = nil) {
+        let quote = HomeSectionSelectionQuoteV1(
+            displayedSection: displayedSection, desiredSection: desiredSection,
+            availableSections: availableSections)
+        let resolvedControlID = controlID ?? "village.tab.\(desiredSection.rawValue)"
+        _ = phoneAdmission.release(controlID: resolvedControlID) {
+            let current = HomeSectionSelectionQuoteV1(
+                displayedSection: selectedSection, desiredSection: desiredSection,
+                availableSections: availableSections)
+            guard current == quote else { return .failure(.stale) }
+            guard desiredSection != displayedSection else { return .success(.noChange) }
+            selectedSection = desiredSection
+            return .success(.committed)
+        }
+    }
+
+    private func admitTownPageChange(section: StationHomeSection, displayedPage: Int,
+                                     desiredPage: Int, pageCount: Int, direction: String) {
+        let quote = HomeTownPageSelectionQuoteV1(
+            section: section, displayedPage: displayedPage,
+            desiredPage: desiredPage, pageCount: pageCount)
+        _ = phoneAdmission.release(controlID: "village.page.\(section.rawValue).\(direction)") {
+            let currentStations = stations(in: section)
+            let currentPageCount = max(1, BaseBoardRules.townPages(currentStations).count)
+            let currentDisplayedPage = min(townPageBySection[section, default: 0],
+                                           currentPageCount - 1)
+            let current = HomeTownPageSelectionQuoteV1(
+                section: selectedSection, displayedPage: currentDisplayedPage,
+                desiredPage: desiredPage, pageCount: currentPageCount)
+            guard current == quote else { return .failure(.stale) }
+            guard desiredPage != displayedPage else { return .success(.noChange) }
+            guard (0..<pageCount).contains(desiredPage) else { return .failure(.stale) }
+            townPageBySection[section] = desiredPage
             return .success(.committed)
         }
     }

@@ -439,6 +439,13 @@ enum WritingDeskVocabularyChoiceReasonV1: Equatable, Sendable {
 enum WritingDeskVocabularyChoiceAvailabilityV1: Equatable, Sendable {
     case available
     case refused(WritingDeskVocabularyChoiceReasonV1)
+
+    func detailCopy(availableDetail: String) -> String {
+        switch self {
+        case .available: availableDetail
+        case .refused(let reason): reason.playerCopy
+        }
+    }
 }
 
 struct WritingDeskVocabularyChoiceQuoteV1: Equatable, Sendable {

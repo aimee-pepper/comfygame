@@ -916,6 +916,7 @@ struct WritingDeskView: View {
                 let quote = WritingDeskVocabularyChoiceRulesV1.evaluate(
                     content: item.content, glyph: item.glyph, state: state, draft: draft)
                 let fits = quote?.availability == .available
+                let detail = paletteDetail(item, availability: quote?.availability)
                 Group {
                     if let productionPack {
                         WritingDeskPackVocabularyTile(
@@ -923,7 +924,7 @@ struct WritingDeskView: View {
                             hand: state.base.bestHand,
                             state: !fits ? "unavailable" : (ghost?.glyph == item.glyph ? "selected" : "known"),
                             title: item.name,
-                            detail: item.blockedBy != nil ? "taken" : paletteDetail(item),
+                            detail: detail,
                             isEnabled: fits && writingAssetsReady,
                             admission: phoneAdmission,
                             action: {
@@ -937,7 +938,7 @@ struct WritingDeskView: View {
                         } label: {
                             WritingDeskNativeVocabularyLabel(
                                 title: item.name,
-                                detail: item.blockedBy != nil ? "taken" : paletteDetail(item),
+                                detail: detail,
                                 unavailable: true)
                         }
                         .buttonStyle(.plain)
@@ -998,6 +999,12 @@ struct WritingDeskView: View {
         let footprint = "\(store.footprint(item.content))"
         guard let stability = item.stability, stability != 0 else { return footprint }
         return "\(footprint) · \(stability > 0 ? "+" : "")\(stability)"
+    }
+
+    private func paletteDetail(
+        _ item: Chip, availability: WritingDeskVocabularyChoiceAvailabilityV1?
+    ) -> String {
+        availability?.detailCopy(availableDetail: paletteDetail(item)) ?? paletteDetail(item)
     }
 
     private func firstFreeOrigin(for content: MarkContent) -> PageCell {

@@ -52,6 +52,59 @@ final class StartingTownHomeSceneTests: XCTestCase {
             playerPosition: .init(x: 0, y: 0))
         XCTAssertNil(HomeDestinationRulesV1.quote(.route(.settings), in: state))
     }
+
+    @MainActor
+    func testRetainedHomeSelectionQuoteAndRapidDuplicateAreInert() async {
+        let admission = PhoneControlAdmissionV1()
+        let quote = HomeSectionSelectionQuoteV1(
+            displayedSection: .home, desiredSection: .make,
+            availableSections: StationHomeSection.allCases)
+        var displayed = StationHomeSection.home
+        var commits = 0
+        admission.touchDown(controlID: "village.tab.make")
+        XCTAssertNoThrow(try admission.release(controlID: "village.tab.make") {
+            guard HomeSectionSelectionQuoteV1(
+                displayedSection: displayed, desiredSection: .make,
+                availableSections: StationHomeSection.allCases) == quote
+            else { return .failure(.stale) }
+            displayed = .make
+            commits += 1
+            return .success(.committed)
+        }.get())
+        XCTAssertEqual(admission.release(controlID: "village.tab.make") {
+            commits += 1
+            return .success(.committed)
+        }, .failure(.busy))
+        await Task.yield()
+        XCTAssertEqual(displayed, .make)
+        XCTAssertEqual(commits, 1)
+
+        let stale = PhoneControlAdmissionV1()
+        displayed = .study
+        stale.touchDown(controlID: "village.tab.make")
+        XCTAssertNoThrow(try stale.release(controlID: "village.tab.make") {
+            guard HomeSectionSelectionQuoteV1(
+                displayedSection: displayed, desiredSection: .make,
+                availableSections: StationHomeSection.allCases) == quote
+            else { return .failure(.stale) }
+            displayed = .make
+            return .success(.committed)
+        }.get())
+        await Task.yield()
+        XCTAssertEqual(displayed, .study)
+        guard case .refused(_, .stale) = stale.state else {
+            return XCTFail("retained district quote must refuse after presentation drift")
+        }
+    }
+
+    func testHomePageQuoteBindsDisplayedPageAndCount() {
+        let quote = HomeTownPageSelectionQuoteV1(
+            section: .make, displayedPage: 0, desiredPage: 1, pageCount: 2)
+        XCTAssertNotEqual(quote, .init(section: .make, displayedPage: 1,
+                                      desiredPage: 1, pageCount: 2))
+        XCTAssertNotEqual(quote, .init(section: .make, displayedPage: 0,
+                                      desiredPage: 1, pageCount: 3))
+    }
     func testSourceArtworkStillMatchesTheAuthoredIdentityHash() throws {
         let root = URL(fileURLWithPath: #filePath)
             .deletingLastPathComponent().deletingLastPathComponent()
