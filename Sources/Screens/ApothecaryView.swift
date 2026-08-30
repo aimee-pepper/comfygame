@@ -196,13 +196,14 @@ struct ApothecaryView: View {
                 scentMaskPreparationActionBar
             } else {
             let missing = ConsumableCraftingRules.shortfall(recipe, in: store.state)
+            let quote = store.consumableCraftQuote(for: recipe.output)
             let name = ConsumableRecipePresentation.displayName(for: recipe.output)
             PersistentActionBar(
                 message: missing.isEmpty ? "Exact stock is ready." : missing.joined(separator: " · "),
                 messageTint: missing.isEmpty ? .secondary : .orange
             ) {
                 Button {
-                    if store.craftConsumable(recipe) {
+                    if let quote, case .committed = store.craftConsumable(quote) {
                         preparationFailure = nil
                     } else {
                         preparationFailure = "The required stock changed. Review the exact recipe and try again."

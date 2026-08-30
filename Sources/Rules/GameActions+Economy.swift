@@ -691,12 +691,27 @@ extension GameStore {
 
     @discardableResult
     func craftConsumable(_ recipe: ConsumableCraftingRules.Recipe) -> Bool {
-        guard ConsumableCraftingRules.shortfall(recipe, in: state).isEmpty else { return false }
-        var crafted = false
-        mutate("prepare \(recipe.output.rawValue)", flush: true) {
-            crafted = ConsumableCraftingRules.craft(recipe, in: &$0)
+        guard ConsumableCraftingRules.recipe(recipe.output) == recipe,
+              let quote = consumableCraftQuote(for: recipe.output) else { return false }
+        if case .committed = craftConsumable(quote) { return true }
+        return false
+    }
+
+    func consumableCraftQuote(for output: ItemID)
+        -> ConsumableCraftingRules.ConsumableCraftQuoteV1? {
+        ConsumableCraftingRules.preview(output, in: state)
+    }
+
+    @discardableResult
+    func craftConsumable(_ quote: ConsumableCraftingRules.ConsumableCraftQuoteV1)
+        -> ConsumableCraftingRules.ConsumableCraftCommitResultV1 {
+        var result: ConsumableCraftingRules.ConsumableCraftCommitResultV1 = .refused(.staleQuote)
+        let committed = mutateIf("prepare \(quote.output.rawValue)", flush: true) { candidate in
+            result = ConsumableCraftingRules.commit(quote, in: &candidate)
+            if case .committed = result { return true }
+            return false
         }
-        return crafted
+        return committed ? result : .refused(.staleQuote)
     }
 
     func scentMaskQuote(using animalResource: CraftMaterialSelection)

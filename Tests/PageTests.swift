@@ -143,6 +143,102 @@ final class PageTests: XCTestCase {
     }
 
     @MainActor
+    func testWorldSplashSameTripleV3ReplacementInvalidatesRetainedPresentation() throws {
+        let io = SaveFileIO.temporary(name: "splash-v3-replacement-\(UUID().uuidString)")
+        let store = GameStore(io: io)
+        fundAuthoredStarterBind(store)
+        XCTAssertTrue(store.bindAndDepart(
+            worldPageInstanceID: WorldPageCatalog.starterInstances[0].id))
+        let current = try XCTUnwrap(store.state.worlds.pendingWorldSplashPresentation)
+        var replacement = try XCTUnwrap(store.activeRun?.worldArrivalReceipt)
+        let changedDescription = replacement.finalDescription + " "
+        replacement.finalDescription = changedDescription
+        var v3 = try XCTUnwrap(replacement.worldSplashReceiptV3)
+        v3.finalDescription = changedDescription
+        v3.seal()
+        replacement.worldSplashReceiptV3 = v3
+        if var payload = replacement.sceneReceipt?.payload {
+            payload.description = changedDescription
+            let scene = WorldArrivalSceneReceipt(payload: payload)
+            replacement.sceneReceipt = scene
+            replacement.renderedSceneReceipt = try WorldArrivalNativeRenderer.makeRenderedReceipt(
+                scene: scene)
+        }
+        let retained = try XCTUnwrap(WorldSplashNativePresentationV1.make(receipt: replacement))
+        XCTAssertNotEqual(current.identity, retained.identity)
+        let before = try SaveCodec.encode(store.state)
+        let beforeMeta = store.state.meta
+        let beforeDiagnostics = store.diagnostics
+        XCTAssertFalse(store.enterPendingWorld(presentation: retained))
+        XCTAssertEqual(try SaveCodec.encode(store.state), before)
+        XCTAssertEqual(store.state.meta, beforeMeta)
+        XCTAssertEqual(store.diagnostics.writeCount, beforeDiagnostics.writeCount)
+        XCTAssertEqual(store.diagnostics.savedMutationCount,
+                       beforeDiagnostics.savedMutationCount)
+        XCTAssertEqual(store.diagnostics.hasPendingWrite, beforeDiagnostics.hasPendingWrite)
+        XCTAssertEqual(store.state.worlds.pendingWorldSplashPresentation, current)
+
+        store.flushNow()
+        let relaunched = GameStore(io: io)
+        XCTAssertEqual(relaunched.state.worlds.pendingWorldSplashPresentation, current)
+        XCTAssertTrue(relaunched.enterPendingWorld(presentation: current))
+    }
+
+    @MainActor
+    func testWorldSplashSameTripleV2ReplacementInvalidatesPreparationAndEnter() async throws {
+        let io = SaveFileIO.temporary(name: "splash-v2-replacement-\(UUID().uuidString)")
+        let store = GameStore(io: io)
+        fundAuthoredStarterBind(store)
+        XCTAssertTrue(store.bindAndDepart(
+            worldPageInstanceID: WorldPageCatalog.starterInstances[0].id))
+        var firstReceipt = try XCTUnwrap(store.activeRun?.worldArrivalReceipt)
+        firstReceipt.worldSplashReceiptV3 = nil
+        let retained = try XCTUnwrap(WorldSplashNativePresentationV1.make(receipt: firstReceipt))
+        let oldKey = WorldDestinationPreparationCoordinator.Key(
+            receiptID: retained.identity.receiptID, runIndex: retained.identity.runIndex,
+            mapSeed: retained.identity.mapSeed,
+            contentFingerprintSHA256: retained.identity.contentFingerprintSHA256)
+        let coordinator = WorldDestinationPreparationCoordinator(key: oldKey)
+        let stalePreparation = Task { @MainActor in
+            await coordinator.prepare(key: oldKey, retry: false) {
+                try? await Task.sleep(for: .milliseconds(40))
+                return !Task.isCancelled
+            }
+        }
+        await Task.yield()
+
+        var replacement = firstReceipt
+        var payload = try XCTUnwrap(replacement.sceneReceipt?.payload)
+        let changedDescription = payload.description + " "
+        payload.description = changedDescription
+        let scene = WorldArrivalSceneReceipt(payload: payload)
+        replacement.finalDescription = changedDescription
+        replacement.sceneReceipt = scene
+        replacement.renderedSceneReceipt = try WorldArrivalNativeRenderer.makeRenderedReceipt(
+            scene: scene)
+        let current = try XCTUnwrap(WorldSplashNativePresentationV1.make(receipt: replacement))
+        let newKey = WorldDestinationPreparationCoordinator.Key(
+            receiptID: current.identity.receiptID, runIndex: current.identity.runIndex,
+            mapSeed: current.identity.mapSeed,
+            contentFingerprintSHA256: current.identity.contentFingerprintSHA256)
+        XCTAssertNotEqual(oldKey, newKey)
+        let currentPrepared = await coordinator.prepare(key: newKey, retry: false) { true }
+        let stalePrepared = await stalePreparation.value
+        XCTAssertTrue(currentPrepared)
+        XCTAssertFalse(stalePrepared)
+        XCTAssertEqual(coordinator.phase, .readyToEnter(newKey))
+        XCTAssertTrue(coordinator.beginTransition(key: newKey))
+        var commits = 0
+        XCTAssertFalse(coordinator.completeWorldSplashTransition(
+            receiptID: retained.identity.receiptID, runIndex: retained.identity.runIndex,
+            mapSeed: retained.identity.mapSeed,
+            contentFingerprintSHA256: retained.identity.contentFingerprintSHA256,
+            destinationStillReady: { current == retained },
+            commit: { commits += 1; return true }))
+        XCTAssertEqual(commits, 0)
+    }
+
+    @MainActor
     func testWorldDestinationPreparationStartsOnceAndReusesTheSameResult() async {
         let key = WorldDestinationPreparationCoordinator.Key(
             receiptID: .init(rawValue: "prepared-a"), runIndex: 4, mapSeed: 44)
@@ -290,8 +386,11 @@ final class PageTests: XCTestCase {
         while WorldDestinationPreparationMeasurement.readyKeys.isEmpty, Date() < deadline {
             RunLoop.main.run(until: Date().addingTimeInterval(0.01))
         }
+        let expectedPresentation = try XCTUnwrap(
+            WorldSplashNativePresentationV1.make(receipt: receipt, run: run))
         let expectedKey = WorldDestinationPreparationCoordinator.Key(
-            receiptID: receipt.id, runIndex: run.runIndex, mapSeed: run.mapSeed)
+            receiptID: receipt.id, runIndex: run.runIndex, mapSeed: run.mapSeed,
+            contentFingerprintSHA256: expectedPresentation.identity.contentFingerprintSHA256)
         XCTAssertEqual(WorldDestinationPreparationMeasurement.startedKeys, [expectedKey])
         XCTAssertEqual(WorldDestinationPreparationMeasurement.readyKeys, [expectedKey])
         let preloadedFrame = try XCTUnwrap(WorldMapFirstFrameMeasurement.preloaded)

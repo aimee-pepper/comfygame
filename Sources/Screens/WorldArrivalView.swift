@@ -14,6 +14,15 @@ import SwiftUI
         let receiptID: WorldArrivalReceiptID
         let runIndex: Int
         let mapSeed: UInt64
+        let contentFingerprintSHA256: String
+
+        init(receiptID: WorldArrivalReceiptID, runIndex: Int, mapSeed: UInt64,
+             contentFingerprintSHA256: String = "") {
+            self.receiptID = receiptID
+            self.runIndex = runIndex
+            self.mapSeed = mapSeed
+            self.contentFingerprintSHA256 = contentFingerprintSHA256
+        }
     }
     enum Phase: Equatable {
         case presenting(Key), preparingDestination(Key), readyToEnter(Key)
@@ -80,9 +89,11 @@ import SwiftUI
 
     func completeWorldSplashTransition(
         receiptID: WorldArrivalReceiptID, runIndex: Int, mapSeed: UInt64,
+        contentFingerprintSHA256: String = "",
         destinationStillReady: () -> Bool, commit: () -> Bool
     ) -> Bool {
-        let key = Key(receiptID: receiptID, runIndex: runIndex, mapSeed: mapSeed)
+        let key = Key(receiptID: receiptID, runIndex: runIndex, mapSeed: mapSeed,
+                      contentFingerprintSHA256: contentFingerprintSHA256)
         guard phase == .transitioning(key), destinationStillReady(), commit() else {
             events.append(.transitionRefused(key))
             return false
@@ -136,7 +147,8 @@ struct WorldArrivalView: View {
         _destinationPreparation = StateObject(wrappedValue:
             WorldDestinationPreparationCoordinator(key: .init(
                 receiptID: identity.receiptID, runIndex: identity.runIndex,
-                mapSeed: identity.mapSeed)))
+                mapSeed: identity.mapSeed,
+                contentFingerprintSHA256: identity.contentFingerprintSHA256)))
     }
 
     init(receipt: WorldArrivalReceipt) {
@@ -148,11 +160,10 @@ struct WorldArrivalView: View {
 
     private var preparationKey: WorldDestinationPreparationCoordinator.Key? {
         guard let run = store.activeRun,
-              presentation.identity.receiptID == run.worldArrivalReceipt?.id,
-              presentation.identity.runIndex == run.runIndex,
-              presentation.identity.mapSeed == run.mapSeed else { return nil }
+              store.state.worlds.pendingWorldSplashPresentation == presentation else { return nil }
         return .init(receiptID: presentation.identity.receiptID,
-                     runIndex: run.runIndex, mapSeed: run.mapSeed)
+                     runIndex: run.runIndex, mapSeed: run.mapSeed,
+                     contentFingerprintSHA256: presentation.identity.contentFingerprintSHA256)
     }
 
     @MainActor private func prepareDestination(containerSize: CGSize, retry: Bool) async -> Bool {
@@ -213,7 +224,8 @@ struct WorldArrivalView: View {
                               destinationPreparation.beginTransition(key: key) else { return }
                         _ = completeWorldSplashTransition(
                             receiptID: key.receiptID, runIndex: key.runIndex,
-                            mapSeed: key.mapSeed)
+                            mapSeed: key.mapSeed,
+                            contentFingerprintSHA256: key.contentFingerprintSHA256)
                     }
                 }
                 .font(.custom("Tiny5", size: 15, relativeTo: .headline))
@@ -229,7 +241,7 @@ struct WorldArrivalView: View {
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .background(PixelUITheme.screen.ignoresSafeArea())
-            .task(id: presentation.identity.receiptID) {
+            .task(id: presentation.identity.contentFingerprintSHA256) {
                 _ = await prepareDestination(containerSize: proxy.size, retry: false)
             }
         }
@@ -244,17 +256,20 @@ struct WorldArrivalView: View {
     }
 
     @MainActor private func completeWorldSplashTransition(
-        receiptID: WorldArrivalReceiptID, runIndex: Int, mapSeed: UInt64
+        receiptID: WorldArrivalReceiptID, runIndex: Int, mapSeed: UInt64,
+        contentFingerprintSHA256: String
     ) -> Bool {
         destinationPreparation.completeWorldSplashTransition(
             receiptID: receiptID, runIndex: runIndex, mapSeed: mapSeed,
+            contentFingerprintSHA256: contentFingerprintSHA256,
             destinationStillReady: {
                 store.state.worlds.pendingWorldSplashPresentation?.identity
                     == presentation.identity
                     && destinationPreparation.phase == .transitioning(.init(
-                        receiptID: receiptID, runIndex: runIndex, mapSeed: mapSeed))
+                        receiptID: receiptID, runIndex: runIndex, mapSeed: mapSeed,
+                        contentFingerprintSHA256: contentFingerprintSHA256))
             }, commit: {
-                store.enterPendingWorld(arrivalReceiptID: receiptID)
+                store.enterPendingWorld(presentation: presentation)
             })
     }
 

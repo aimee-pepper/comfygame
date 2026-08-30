@@ -124,10 +124,8 @@ final class ConsumableCraftingTests: XCTestCase {
         XCTAssertTrue(source.contains(".safeAreaInset(edge: .bottom, spacing: 0) { preparationActionBar }"))
         XCTAssertTrue(source.contains("PersistentActionBar("))
         XCTAssertTrue(source.contains("Label(\"Prepare \\(name)\", systemImage: \"cross.vial.fill\")"))
-        XCTAssertTrue(source.contains("store.craftConsumable(recipe)"))
-        XCTAssertEqual(source.components(separatedBy: "store.craftConsumable(recipe)").count - 1, 1,
-                       "the persistent action bar should own the sole preparation mutation")
-        XCTAssertTrue(source.contains("if store.craftConsumable(recipe)"))
+        XCTAssertTrue(source.contains("store.consumableCraftQuote(for: recipe.output)"))
+        XCTAssertTrue(source.contains("store.craftConsumable(quote)"))
         XCTAssertTrue(source.contains("Preparation not made"))
         XCTAssertTrue(source.contains("The required stock changed."))
     }
@@ -203,6 +201,151 @@ final class ConsumableCraftingTests: XCTestCase {
         _ = WorldRules.useItem(id, on: .binder, in: &state)
 
         XCTAssertEqual(state.worlds.activeRun.map { WorldRules.visionRadius(in: $0) }, before + 2)
+    }
+
+    func testTorchCanonicalQuoteConsumesWeakestExactSampleAndNamedStockOnce() throws {
+        var state = torchCraftingState()
+        let weak = CraftMaterialHoldingV1(id: .init(rawValue: "torch-weak"),
+            sample: sample(.reactivity, 31))
+        let strong = CraftMaterialHoldingV1(id: .init(rawValue: "torch-strong"),
+            sample: sample(.reactivity, 80))
+        state.base.worldMaterialReserve.add(strong)
+        state.base.worldMaterialReserve.add(weak)
+        let quote = try XCTUnwrap(ConsumableCraftingRules.preview("torch", in: state))
+
+        XCTAssertEqual(quote.version, 1)
+        XCTAssertEqual(quote.selectedMaterials.map(\.unitID), [weak.id])
+        XCTAssertEqual(quote.resourceCosts.map { ($0.id.rawValue, $0.amount) }
+            .map { "\($0.0):\($0.1)" }, ["resin:1", "timber:2"])
+        XCTAssertEqual(quote.moteCost, 0)
+        XCTAssertEqual(quote.essenceCost, 0)
+        XCTAssertEqual(quote.outputDefinition.consumable?.effect, .lightWorld)
+        XCTAssertEqual(quote.outputDefinition.consumable?.potency, 2)
+        XCTAssertEqual(quote.outputPlacement, .storehouseNew(stack: quote.expectedOutput))
+
+        XCTAssertEqual(ConsumableCraftingRules.commit(quote, in: &state),
+                       .committed(output: quote.expectedOutput, destination: .storehouse))
+        XCTAssertEqual(state.base.resources["resin"], 0)
+        XCTAssertEqual(state.base.resources["timber"], 0)
+        XCTAssertEqual(state.base.worldMaterialReserve.selections().map(\.unitID), [strong.id])
+        XCTAssertEqual(state.base.inventory.stacks.first { $0.catalogID == "torch" },
+                       quote.expectedOutput)
+        let committed = state
+        XCTAssertEqual(ConsumableCraftingRules.commit(quote, in: &state), .refused(.staleQuote))
+        XCTAssertEqual(state, committed)
+    }
+
+    func testTorchFullStorehouseQuotesWaitingAndRoundTripsWithoutAlias() throws {
+        var state = torchCraftingState()
+        state.base.inventory = Inventory(slots: 0)
+        state.base.worldMaterialReserve.add(.init(id: .init(rawValue: "torch-material"),
+                                                  sample: sample(.reactivity, 30)))
+        let quote = try XCTUnwrap(ConsumableCraftingRules.preview("torch", in: state))
+        XCTAssertEqual(quote.destination, .waiting)
+        XCTAssertEqual(quote.outputPlacement, .waitingNew(stack: quote.expectedOutput))
+        XCTAssertEqual(ConsumableCraftingRules.commit(quote, in: &state),
+                       .committed(output: quote.expectedOutput, destination: .waiting))
+        XCTAssertEqual(state.base.spillover, [quote.expectedOutput])
+        let restored = try SaveCodec.decode(SaveCodec.encode(state))
+        XCTAssertEqual(restored.base.spillover, [quote.expectedOutput])
+        XCTAssertEqual(restored.base.spillover.first?.catalogID, "torch")
+        XCTAssertNotEqual(restored.base.spillover.first?.catalogID, Items.seamlight)
+        XCTAssertNotEqual(restored.base.spillover.first?.catalogID, Items.lightCore)
+        XCTAssertNil(ContentCatalog.shared.item("lantern"))
+    }
+
+    func testTorchCompatibleStorehouseMergeReturnsPersistedTargetIdentityAndRelaunches() throws {
+        var state = torchCraftingState()
+        let existing = ItemStack(id: .init(rawValue: 880), catalogID: "torch",
+                                 count: 2, identified: true)
+        state.base.inventory.stacks = [existing]
+        state.base.worldMaterialReserve.add(.init(id: .init(rawValue: "torch-merge-material"),
+                                                  sample: sample(.reactivity, 30)))
+        let quote = try XCTUnwrap(ConsumableCraftingRules.preview("torch", in: state))
+        var resulting = existing
+        resulting.count = 3
+        XCTAssertEqual(quote.outputPlacement,
+                       .storehouseMerge(targetBefore: existing, resultingStack: resulting))
+        XCTAssertNotEqual(quote.expectedOutput.id, existing.id)
+
+        XCTAssertEqual(ConsumableCraftingRules.commit(quote, in: &state),
+                       .committed(output: resulting, destination: .storehouse))
+        XCTAssertEqual(state.base.inventory.stacks, [resulting])
+        XCTAssertFalse(state.base.inventory.stacks.contains { $0.id == quote.expectedOutput.id })
+        let restored = try SaveCodec.decode(SaveCodec.encode(state))
+        XCTAssertEqual(restored.base.inventory.stacks, [resulting])
+    }
+
+    func testTorchMergeTargetCountAndProfileDriftRefuseByteAndWriteInertly() throws {
+        for change in ["count", "profile"] {
+            let store = GameStore(io: .temporary(name: "torch-merge-drift-\(change)-\(UUID())"))
+            store.mutate("fixture merge", flush: true) { state in
+                state = self.torchCraftingState()
+                state.base.inventory.stacks = [
+                    .init(id: .init(rawValue: 881), catalogID: "torch",
+                          count: 2, identified: true)
+                ]
+                state.base.worldMaterialReserve.add(.init(
+                    id: .init(rawValue: "torch-merge-drift-material"),
+                    sample: self.sample(.reactivity, 30)))
+            }
+            let quote = try XCTUnwrap(store.consumableCraftQuote(for: "torch"))
+            store.mutate("drift exact merge bin", flush: true) { state in
+                if change == "count" { state.base.inventory.stacks[0].count = 4 }
+                else { state.base.inventory.stacks[0].isFavorite = true }
+            }
+            let before = store.state
+            let bytes = try SaveCodec.encode(before)
+            let diagnostics = store.diagnostics
+            XCTAssertEqual(store.craftConsumable(quote), .refused(.staleQuote))
+            XCTAssertEqual(store.state, before)
+            XCTAssertEqual(try SaveCodec.encode(store.state), bytes)
+            XCTAssertEqual(store.diagnostics.writeCount, diagnostics.writeCount)
+            XCTAssertEqual(store.diagnostics.hasPendingWrite, diagnostics.hasPendingWrite)
+        }
+    }
+
+    func testTorchForgedRecipeAndStaleQuoteAreStorePublicationInert() throws {
+        let store = GameStore(io: .temporary(name: "torch-atomic-\(UUID().uuidString)"))
+        store.mutate("fixture torch stock", flush: true) { $0 = self.torchCraftingState() }
+        store.mutate("fixture torch material", flush: true) { state in
+            state.base.worldMaterialReserve.add(.init(id: .init(rawValue: "torch-material"),
+                                                      sample: self.sample(.reactivity, 30)))
+        }
+        let canonical = try XCTUnwrap(ConsumableCraftingRules.recipe("torch"))
+        var forged = canonical
+        forged.resources = [:]
+        let beforeForged = store.state
+        let diagnosticsBeforeForged = store.diagnostics
+        XCTAssertFalse(store.craftConsumable(forged))
+        XCTAssertEqual(store.state, beforeForged)
+        XCTAssertEqual(store.diagnostics.writeCount, diagnosticsBeforeForged.writeCount)
+
+        let quote = try XCTUnwrap(store.consumableCraftQuote(for: "torch"))
+        store.mutate("external resin drift", flush: true) { $0.base.resources.add(1, of: "resin") }
+        let beforeRefusal = store.state
+        let bytes = try SaveCodec.encode(beforeRefusal)
+        let diagnostics = store.diagnostics
+        XCTAssertEqual(store.craftConsumable(quote), .refused(.staleQuote))
+        XCTAssertEqual(store.state, beforeRefusal)
+        XCTAssertEqual(try SaveCodec.encode(store.state), bytes)
+        XCTAssertEqual(store.diagnostics.writeCount, diagnostics.writeCount)
+        XCTAssertEqual(store.diagnostics.hasPendingWrite, diagnostics.hasPendingWrite)
+    }
+
+    func testTorchPreviewRequiresHomeApothecaryCanonicalKnownOutputAndExactStock() {
+        var state = torchCraftingState()
+        state.base.worldMaterialReserve.add(.init(id: .init(rawValue: "torch-material"),
+                                                  sample: sample(.reactivity, 30)))
+        XCTAssertNotNil(ConsumableCraftingRules.preview("torch", in: state))
+        XCTAssertNil(ConsumableCraftingRules.preview(Items.seamlight, in: state))
+        XCTAssertNil(ConsumableCraftingRules.preview(Items.lightCore, in: state))
+        XCTAssertNil(ConsumableCraftingRules.preview("lantern", in: state))
+        state.base.stations[Stations.apothecary] = .init(isUnlocked: false, tier: 0)
+        XCTAssertNil(ConsumableCraftingRules.preview("torch", in: state))
+        state.base.stations[Stations.apothecary] = .init(isUnlocked: true, tier: 0)
+        state.worlds.activeRun = fieldState(item: "torch").worlds.activeRun
+        XCTAssertNil(ConsumableCraftingRules.preview("torch", in: state))
     }
 
     func testWaystoneReturnsTheWholeHaulAndNamesTheExit() throws {
@@ -642,6 +785,14 @@ final class ConsumableCraftingTests: XCTestCase {
         state.base.essence = 500
         state.base.inventory.slots = 20
         state.base.knownConsumableRecipes.insert(recipe)
+        return state
+    }
+
+    private func torchCraftingState() -> GameState {
+        var state = stockedState(for: "torch")
+        state.base.stations[Stations.apothecary] = .init(isUnlocked: true, tier: 0)
+        state.base.resources.add(1, of: "resin")
+        state.base.resources.add(2, of: "timber")
         return state
     }
 

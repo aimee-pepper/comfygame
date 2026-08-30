@@ -1,8 +1,76 @@
 import Foundation
+import CryptoKit
 
 /// Apothecary recipes combine named reagents with property-matched natural stock. Named resources
 /// keep their authored chemical jobs; animal and plant samples remain freely substitutable.
 enum ConsumableCraftingRules {
+    static let craftRulesVersion = 1
+
+    struct NamedResourceCostV1: Equatable, Sendable {
+        var id: ResourceID
+        var amount: Int
+        var amountBefore: Int
+    }
+
+    enum OutputDestinationV1: Equatable, Sendable {
+        case storehouse
+        case waiting
+    }
+
+    enum OutputPlacementV1: Equatable, Sendable {
+        case storehouseMerge(targetBefore: ItemStack, resultingStack: ItemStack)
+        case storehouseNew(stack: ItemStack)
+        case waitingNew(stack: ItemStack)
+
+        var destination: OutputDestinationV1 {
+            switch self {
+            case .storehouseMerge, .storehouseNew: .storehouse
+            case .waitingNew: .waiting
+            }
+        }
+
+        var persistedOutput: ItemStack {
+            switch self {
+            case .storehouseMerge(_, let resultingStack): resultingStack
+            case .storehouseNew(let stack), .waitingNew(let stack): stack
+            }
+        }
+    }
+
+    struct ConsumableCraftQuoteV1: Equatable, Sendable {
+        var version: Int
+        var output: ItemID
+        var recipeFingerprint: String
+        var selectedMaterials: [CraftMaterialSelection]
+        var resourceCosts: [NamedResourceCostV1]
+        var moteCost: Int
+        var essenceCost: Int
+        var stateRevision: Int
+        var inventoryBefore: Inventory
+        var waitingBefore: [ItemStack]
+        var materialHoldingsBefore: [CraftMaterialHoldingV1]
+        var motesBefore: Int
+        var essenceBefore: Int
+        var apothecaryState: StationState
+        var knownRecipes: Set<ItemID>
+        var outputDefinition: ItemDef
+        var expectedOutput: ItemStack
+        var outputPlacement: OutputPlacementV1
+        var destination: OutputDestinationV1
+        var inventoryAfter: Inventory
+        var waitingAfter: [ItemStack]
+        var noActiveRun: Bool
+    }
+
+    enum ConsumableCraftRefusalV1: Equatable, Sendable {
+        case noCanonicalRecipe, notAtHome, apothecaryUnavailable, recipeUnknown
+        case unavailableStock, staleQuote, invalidCatalogue, invalidAuthority
+    }
+
+    enum ConsumableCraftCommitResultV1: Equatable, Sendable {
+        case committed(output: ItemStack, destination: OutputDestinationV1)
+        case refused(ConsumableCraftRefusalV1)
+    }
     enum Family: String, Codable, Sendable { case treatments, coatings, fieldwork }
     static let scentMaskDuration = 12
     static let scentMaskFamilies: Set<MaterialFamilyID> = [.hide, .pelt, .down, .oil]
@@ -77,6 +145,114 @@ enum ConsumableCraftingRules {
 
     static func recipe(_ id: ItemID) -> Recipe? { recipes.first { $0.output == id } }
 
+    static func recipeFingerprint(_ recipe: Recipe) -> String {
+        let material = recipe.material.map {
+            "\($0.property.rawValue):\($0.minimum):\($0.count)"
+        } ?? "none"
+        let resources = recipe.resources.sorted { $0.key.rawValue < $1.key.rawValue }
+            .map { "\($0.key.rawValue):\($0.value)" }.joined(separator: ",")
+        let canonical = ["v\(craftRulesVersion)", recipe.output.rawValue, material, resources,
+                         "m\(recipe.motes)", "e\(recipe.essence)", recipe.family.rawValue]
+            .joined(separator: "|")
+        return SHA256.hash(data: Data(canonical.utf8))
+            .map { String(format: "%02x", $0) }.joined()
+    }
+
+    private static func validOutput(_ definition: ItemDef, for output: ItemID) -> Bool {
+        guard definition.id == output, definition.kind == .consumable,
+              definition.consumable != nil else { return false }
+        if output == "torch" {
+            return definition.rarity == .common
+                && definition.consumable?.effect == .lightWorld
+                && definition.consumable?.potency == 2
+        }
+        return true
+    }
+
+    private static func evaluated(_ output: ItemID, in source: GameState)
+        -> (ConsumableCraftQuoteV1, GameState)? {
+        guard source.worlds.activeRun == nil,
+              let canonical = recipe(output), canonical.output != Items.scentMask,
+              source.base.station(Stations.apothecary).isUnlocked,
+              source.base.knownConsumableRecipes.contains(output),
+              let definition = ContentCatalog.shared.item(output),
+              validOutput(definition, for: output),
+              shortfall(canonical, in: source).isEmpty else { return nil }
+
+        let selected: [SmithRules.Candidate]
+        if let need = canonical.material {
+            selected = Array(qualifyingSamples(for: canonical, in: source).prefix(need.count))
+            guard selected.count == need.count else { return nil }
+        } else {
+            selected = []
+        }
+        let expectedOutput = ItemStack(id: .init(rawValue: source.base.nextItemID()),
+                                       catalogID: output, count: 1, identified: true)
+        let mergeTarget = source.base.inventory.stacks.first {
+            $0.binKey == expectedOutput.binKey
+        }
+        var candidate = source
+        if !selected.isEmpty {
+            guard SmithRules.consume(selected, in: &candidate) else { return nil }
+        } else if canonical.material != nil {
+            return nil
+        }
+        for (id, amount) in canonical.resources {
+            guard candidate.base.resources.spend(amount, of: id) else { return nil }
+        }
+        guard candidate.reality.motes >= canonical.motes,
+              candidate.base.spendEssenceCrystals(canonical.essence) else { return nil }
+        candidate.reality.motes -= canonical.motes
+        candidate.base.store(expectedOutput)
+        let outputPlacement: OutputPlacementV1
+        if let mergeTarget,
+           let resulting = candidate.base.inventory.stacks.first(where: {
+               $0.id == mergeTarget.id
+           }) {
+            outputPlacement = .storehouseMerge(targetBefore: mergeTarget,
+                                               resultingStack: resulting)
+        } else if candidate.base.spillover != source.base.spillover {
+            outputPlacement = .waitingNew(stack: expectedOutput)
+        } else {
+            outputPlacement = .storehouseNew(stack: expectedOutput)
+        }
+        let holdings = source.base.worldMaterialReserve.units
+            + source.base.creatureMaterialReserve.units
+        let costs = canonical.resources.sorted { $0.key.rawValue < $1.key.rawValue }.map {
+            NamedResourceCostV1(id: $0.key, amount: $0.value,
+                                amountBefore: source.base.resources[$0.key])
+        }
+        let quote = ConsumableCraftQuoteV1(
+            version: craftRulesVersion, output: output,
+            recipeFingerprint: recipeFingerprint(canonical),
+            selectedMaterials: selected.map(\.reserveSelection), resourceCosts: costs,
+            moteCost: canonical.motes, essenceCost: canonical.essence,
+            stateRevision: source.meta.mutationCount, inventoryBefore: source.base.inventory,
+            waitingBefore: source.base.spillover, materialHoldingsBefore: holdings,
+            motesBefore: source.reality.motes, essenceBefore: source.base.essenceCrystalCount,
+            apothecaryState: source.base.station(Stations.apothecary),
+            knownRecipes: source.base.knownConsumableRecipes, outputDefinition: definition,
+            expectedOutput: expectedOutput, outputPlacement: outputPlacement,
+            destination: outputPlacement.destination,
+            inventoryAfter: candidate.base.inventory, waitingAfter: candidate.base.spillover,
+            noActiveRun: true)
+        return (quote, candidate)
+    }
+
+    static func preview(_ output: ItemID, in state: GameState) -> ConsumableCraftQuoteV1? {
+        evaluated(output, in: state)?.0
+    }
+
+    static func commit(_ quote: ConsumableCraftQuoteV1, in state: inout GameState)
+        -> ConsumableCraftCommitResultV1 {
+        guard quote.version == craftRulesVersion,
+              let (current, candidate) = evaluated(quote.output, in: state),
+              current == quote else { return .refused(.staleQuote) }
+        state = candidate
+        return .committed(output: quote.outputPlacement.persistedOutput,
+                          destination: quote.outputPlacement.destination)
+    }
+
     static func qualifyingSamples(for recipe: Recipe, in state: GameState) -> [SmithRules.Candidate] {
         if recipe.output == Items.scentMask { return [] }
         guard let need = recipe.material else { return [] }
@@ -124,7 +300,8 @@ enum ConsumableCraftingRules {
     static func craft(_ recipe: Recipe, in state: inout GameState) -> Bool {
         // Scent Mask has an exact-instance commit API. Refuse the legacy automatic-sample path so
         // presentation can never quote one animal resource and silently consume another.
-        guard recipe.output != Items.scentMask else { return false }
+        guard recipe.output != Items.scentMask,
+              Self.recipe(recipe.output) == recipe else { return false }
         if recipe.output == Items.seamlight {
             var candidate = state
             guard candidate.base.knownConsumableRecipes.contains(Items.seamlight),

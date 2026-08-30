@@ -1299,11 +1299,17 @@ extension GameStore {
             }
             return false
         }
-        return mutateIf("enter pending world", flush: true, scope: .arrivalLifecycle) { state in
-            guard state.worlds.pendingWorldArrivalReceiptID == arrivalReceiptID,
-                  state.worlds.activeRun?.worldArrivalReceipt?.id == arrivalReceiptID else {
-                return false
-            }
+        guard let presentation = state.worlds.pendingWorldSplashPresentation,
+              presentation.identity.receiptID == arrivalReceiptID else { return false }
+        return enterPendingWorld(presentation: presentation)
+    }
+
+    /// A prepared Splash may enter only while its complete selected native content remains exact.
+    /// Replacing V3/V2 content under the same persisted tuple makes the retained action stale.
+    @discardableResult
+    func enterPendingWorld(presentation: WorldSplashNativePresentationV1) -> Bool {
+        mutateIf("enter pending world", flush: true, scope: .arrivalLifecycle) { state in
+            guard state.worlds.pendingWorldSplashPresentation == presentation else { return false }
             state.worlds.pendingWorldArrivalReceiptID = nil
             return true
         }

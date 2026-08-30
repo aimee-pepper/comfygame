@@ -20,6 +20,7 @@ struct WorldSplashNativePresentationV1: Equatable, Sendable {
         var receiptID: WorldArrivalReceiptID
         var runIndex: Int
         var mapSeed: UInt64
+        var contentFingerprintSHA256: String
     }
     enum ContentKind: Equatable, Sendable {
         case comprehensiveV3(receipt: WorldSplashReceiptV3,
@@ -47,31 +48,76 @@ struct WorldSplashNativePresentationV1: Equatable, Sendable {
     }
 
     static func make(receipt: WorldArrivalReceipt) -> Self? {
-        let identity = Identity(receiptID: receipt.id, runIndex: receipt.runIndex,
-                                mapSeed: receipt.generationSeed)
         if let v3 = receipt.worldSplashReceiptV3, v3.validates(),
            v3.receiptID == receipt.id,
            v3.worldSeed == receipt.generationSeed,
            let commands = WorldArrivalNativeRenderer.splashCommands(for: v3) {
-            return .init(identity: identity,
-                         contentKind: .comprehensiveV3(receipt: v3,
-                                                       semanticCommands: commands),
+            let contentKind = ContentKind.comprehensiveV3(receipt: v3,
+                                                           semanticCommands: commands)
+            let firstCrop = FirstCrop.comprehensiveV3(v3.firstMapCropReceipt)
+            return .init(identity: identity(receipt: receipt, contentKind: contentKind),
+                         contentKind: contentKind,
                          title: receipt.sourcePagePhysicalReceipt.title,
                          finalDescription: receipt.finalDescription,
                          sourcePage: receipt.sourcePagePhysicalReceipt,
-                         firstMapCropReceipt: .comprehensiveV3(v3.firstMapCropReceipt))
+                         firstMapCropReceipt: firstCrop)
         }
         guard let scene = receipt.sceneReceipt, scene.validatesCanonicalHash(),
               scene.validatesSchema(),
               let rendered = receipt.renderedSceneReceipt, rendered.validates(),
               rendered.inputSceneReceiptSHA256 == scene.canonicalSHA256,
               receipt.finalDescription == scene.payload.description else { return nil }
-        return .init(identity: identity,
-                     contentKind: .validatedV2(scene: scene, rendered: rendered),
+        let contentKind = ContentKind.validatedV2(scene: scene, rendered: rendered)
+        let firstCrop = FirstCrop.validatedV2(scene.payload.firstMapCropReceipt)
+        return .init(identity: identity(receipt: receipt, contentKind: contentKind),
+                     contentKind: contentKind,
                      title: receipt.sourcePagePhysicalReceipt.title,
                      finalDescription: receipt.finalDescription,
                      sourcePage: receipt.sourcePagePhysicalReceipt,
-                     firstMapCropReceipt: .validatedV2(scene.payload.firstMapCropReceipt))
+                     firstMapCropReceipt: firstCrop)
+    }
+
+    private static func identity(receipt: WorldArrivalReceipt, contentKind: ContentKind) -> Identity {
+        let data: Data
+        switch contentKind {
+        case .comprehensiveV3(let selected, _):
+            data = fingerprintData(SelectedV3Fingerprint(
+                receipt: selected, title: receipt.sourcePagePhysicalReceipt.title,
+                finalDescription: receipt.finalDescription,
+                sourcePage: receipt.sourcePagePhysicalReceipt,
+                firstMapCropReceipt: selected.firstMapCropReceipt))
+        case .validatedV2(let scene, let rendered):
+            data = fingerprintData(SelectedV2Fingerprint(
+                scene: scene, rendered: rendered, title: receipt.sourcePagePhysicalReceipt.title,
+                finalDescription: receipt.finalDescription,
+                sourcePage: receipt.sourcePagePhysicalReceipt,
+                firstMapCropReceipt: scene.payload.firstMapCropReceipt))
+        }
+        return .init(receiptID: receipt.id, runIndex: receipt.runIndex,
+                     mapSeed: receipt.generationSeed,
+                     contentFingerprintSHA256: SHA256.hash(data: data)
+                        .map { String(format: "%02x", $0) }.joined())
+    }
+
+    private struct SelectedV3Fingerprint: Codable {
+        var receipt: WorldSplashReceiptV3
+        var title: String
+        var finalDescription: String
+        var sourcePage: WorldArrivalReceipt.SourcePage
+        var firstMapCropReceipt: WorldArrivalReceipt.FirstMapCrop
+    }
+    private struct SelectedV2Fingerprint: Codable {
+        var scene: WorldArrivalSceneReceipt
+        var rendered: WorldArrivalRenderedSceneReceipt
+        var title: String
+        var finalDescription: String
+        var sourcePage: WorldArrivalReceipt.SourcePage
+        var firstMapCropReceipt: WorldArrivalSceneReceipt.FirstMapCrop
+    }
+    private static func fingerprintData<T: Encodable>(_ value: T) -> Data {
+        let encoder = JSONEncoder()
+        encoder.outputFormatting = [.sortedKeys, .withoutEscapingSlashes]
+        return (try? encoder.encode(value)) ?? Data()
     }
 }
 

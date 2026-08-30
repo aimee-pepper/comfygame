@@ -2,6 +2,78 @@ import XCTest
 @testable import Bookbinder
 
 final class SaveSlotTests: XCTestCase {
+    func testTorchCraftRealSlotRoundTripAndStaleIdentityIsEnvelopeInert() async throws {
+        let root = directory(); defer { try? FileManager.default.removeItem(at: root) }
+        let slots = SaveSlotFileIO(directory: root)
+        var state = GameState.newGame()
+        state.base.inventory.slots = 20
+        state.base.knownConsumableRecipes.insert("torch")
+        state.base.stations[Stations.apothecary] = .init(isUnlocked: true, tier: 0)
+        state.base.resources.add(1, of: "resin")
+        state.base.resources.add(2, of: "timber")
+        var properties = MaterialProperties()
+        properties[.reactivity] = 30
+        state.base.worldMaterialReserve.add(.init(
+            id: .init(rawValue: "torch-slot-sample"),
+            sample: .init(kind: .reagent, properties: properties, grade: 30, source: "slot test")
+        ))
+        let quote = try XCTUnwrap(ConsumableCraftingRules.preview("torch", in: state))
+        XCTAssertEqual(ConsumableCraftingRules.commit(quote, in: &state),
+                       .committed(output: quote.expectedOutput, destination: .storehouse))
+
+        let created = try await slots.create(name: "Canonical Torch", state: state)
+        let loaded = try await slots.load(created.metadata.id)
+        XCTAssertEqual(loaded.state.base.inventory.stacks.filter { $0.catalogID == "torch" },
+                       [quote.expectedOutput])
+        XCTAssertEqual(loaded.state.base.resources["resin"], 0)
+        XCTAssertEqual(loaded.state.base.resources["timber"], 0)
+        XCTAssertTrue(loaded.state.base.worldMaterialReserve.selections().isEmpty)
+        XCTAssertNil(loaded.state.worlds.activeRun)
+
+        let url = try await slots.exportURL(for: created.metadata.id)
+        let envelopeBefore = try Data(contentsOf: url)
+        var replayState = loaded.state
+        XCTAssertEqual(ConsumableCraftingRules.commit(quote, in: &replayState),
+                       .refused(.staleQuote))
+        XCTAssertEqual(replayState, loaded.state)
+        XCTAssertEqual(try Data(contentsOf: url), envelopeBefore)
+    }
+
+    func testTorchMergedResultIdentityEqualsRealSlotCustody() async throws {
+        let root = directory(); defer { try? FileManager.default.removeItem(at: root) }
+        let slots = SaveSlotFileIO(directory: root)
+        var state = GameState.newGame()
+        state.base.inventory.slots = 20
+        let existing = ItemStack(id: .init(rawValue: 990), catalogID: "torch",
+                                 count: 2, identified: true)
+        state.base.inventory.stacks = [existing]
+        state.base.knownConsumableRecipes.insert("torch")
+        state.base.stations[Stations.apothecary] = .init(isUnlocked: true, tier: 0)
+        state.base.resources.add(1, of: "resin")
+        state.base.resources.add(2, of: "timber")
+        var properties = MaterialProperties()
+        properties[.reactivity] = 30
+        state.base.worldMaterialReserve.add(.init(
+            id: .init(rawValue: "torch-slot-merge-sample"),
+            sample: .init(kind: .reagent, properties: properties, grade: 30,
+                          source: "slot merge test")))
+        let quote = try XCTUnwrap(ConsumableCraftingRules.preview("torch", in: state))
+        let result = ConsumableCraftingRules.commit(quote, in: &state)
+        guard case .committed(let persistedOutput, .storehouse) = result else {
+            return XCTFail("expected merged Storehouse output")
+        }
+        XCTAssertEqual(persistedOutput.id, existing.id)
+        XCTAssertEqual(persistedOutput.count, 3)
+
+        let created = try await slots.create(name: "Merged Torch", state: state)
+        let loaded = try await slots.load(created.metadata.id)
+        XCTAssertEqual(loaded.state.base.inventory.stacks.first { $0.id == existing.id },
+                       persistedOutput)
+        XCTAssertFalse(loaded.state.base.inventory.stacks.contains {
+            $0.id == quote.expectedOutput.id
+        })
+    }
+
     private func resourceNodeSlotState() -> GameState {
         var state = GameState.newGame()
         let point = GridPoint(x: 0, y: 0)
