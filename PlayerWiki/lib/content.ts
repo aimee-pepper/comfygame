@@ -60,6 +60,28 @@ export interface Traveller {
   diaryPages: Array<{ kind: string; prose: string; reward: string | null }>;
 }
 
+export interface CastDiaryPage {
+  sequence: string;
+  title: string;
+  detail: string | null;
+  worldHint: boolean;
+}
+
+export interface CastPerson {
+  slug: string;
+  name: string;
+  calling: string;
+  order: number;
+  meetingContext: string;
+  contribution: string;
+  roleLabel: 'Service' | 'Role';
+  role: string;
+  diaryReward: string;
+  diaryPageLabel: string;
+  diaryPages: CastDiaryPage[];
+  assetURL: string | null;
+}
+
 export interface Station {
   id: string;
   slug: string;
@@ -145,6 +167,7 @@ interface PlayerContent {
   resources: Resource[];
   items: Item[];
   travellers: Traveller[];
+  cast: CastPerson[];
   stations: Station[];
   researchBranches: ResearchBranch[];
   researchNodes: ResearchNode[];

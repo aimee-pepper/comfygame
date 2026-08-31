@@ -5,10 +5,10 @@ import { PageIntro } from '@/components/page-intro';
 import { PixelImage } from '@/components/pixel-image';
 import { GuideBreadcrumbs, RelatedGuides } from '@/components/guide-navigation';
 import { SiteFrame } from '@/components/site-frame';
-import { content, humanize } from '@/lib/content';
+import { content } from '@/lib/content';
 
 export function generateStaticParams() {
-  return content.travellers.map((person) => ({ slug: person.slug }));
+  return content.cast.map((person) => ({ slug: person.slug }));
 }
 export async function generateMetadata({
   params,
@@ -16,8 +16,8 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const person = content.travellers.find((entry) => entry.slug === slug);
-  return person ? { title: person.name, description: person.summary } : {};
+  const person = content.cast.find((entry) => entry.slug === slug);
+  return person ? { title: person.name, description: person.contribution } : {};
 }
 
 export default async function PersonDetail({
@@ -26,8 +26,9 @@ export default async function PersonDetail({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const person = content.travellers.find((entry) => entry.slug === slug);
+  const person = content.cast.find((entry) => entry.slug === slug);
   if (!person) notFound();
+  const station = content.stations.find((entry) => person.role.includes(entry.name));
   return (
     <SiteFrame sidebar>
       <GuideBreadcrumbs items={[{ label: 'Reference', href: '/people' }, { label: 'People', href: '/people' }, { label: person.name }]} />
@@ -40,99 +41,65 @@ export default async function PersonDetail({
         <PageIntro
           eyebrow={person.calling}
           title={person.name}
-          summary={person.summary}
+          summary={person.contribution}
         />
       </div>
       <nav className="person-record-navigation" aria-label={`${person.name} records`}>
-        <a href="#location-hints">
-          <strong>Location hints</strong>
-          <span>{person.hints.length} published</span>
+        <a href="#meeting">
+          <strong>Meeting</strong>
+          <span>Campaign order {person.order}</span>
         </a>
         <a href="#diary-pages">
           <strong>Diary pages</strong>
-          <span>{person.diaryPages.length} published</span>
+          <span>{person.diaryPageLabel}</span>
         </a>
       </nav>
-      <section className="article-section">
+      <section className="article-section note-card">
+        <h2>Spoiler boundary</h2>
+        <p>Use this page after the Library names {person.name} as someone to seek. A page headed “Where someone is” remains a world hint: recover that exact diary page before using its details.</p>
+      </section>
+      <section className="article-section" id="meeting">
         <h2>At a glance</h2>
         <dl className="fact-grid">
           <div>
-            <dt>Campaign phase</dt>
-            <dd>{humanize(person.campaignPhase)}</dd>
+            <dt>Campaign order</dt>
+            <dd>{person.order}</dd>
           </div>
           <div>
-            <dt>Arrival</dt>
-            <dd>
-              {person.storyArrivalBand === 0
-                ? 'Opening campaign'
-                : `Campaign band ${person.storyArrivalBand}`}
-            </dd>
+            <dt>Meeting context</dt>
+            <dd>{person.meetingContext}</dd>
           </div>
           <div>
-            <dt>Diary pages</dt>
-            <dd>{person.pageCount}</dd>
+            <dt>{person.roleLabel}</dt>
+            <dd>{person.role}</dd>
           </div>
           <div>
-            <dt>Story clues</dt>
-            <dd>{person.clueCount}</dd>
+            <dt>Diary reward</dt>
+            <dd>{person.diaryReward}</dd>
           </div>
         </dl>
       </section>
       <section className="article-section">
-        <h2>Where to find {person.name}</h2>
-        {person.station ? (
+        <h2>After meeting</h2>
+        <p>{person.contribution}</p>
+        {station && (
           <p>
-            {person.name} is associated with the{' '}
-            <Link href={`/places/${person.station.slug}`}>
-              {person.station.name}
-            </Link>{' '}
-            in {person.station.zone}.
+            Their current village route is the <Link href={`/places/${station.slug}`}>{station.name}</Link>.
           </p>
-        ) : (
-          <p>
-            {person.name} is encountered while travelling rather than at a
-            permanent village station.
-          </p>
-        )}
-      </section>
-      <section className="article-section" id="location-hints">
-        <h2>Hints for finding them</h2>
-        {person.hints.length ? (
-          <ol className="finding-list">
-            {person.hints.map((hint, index) => (
-              <li key={`${person.id}-hint-${index}`}>{hint}</li>
-            ))}
-          </ol>
-        ) : (
-          <p>No authored location hint is currently available.</p>
         )}
       </section>
       <section className="article-section" id="diary-pages">
-        <h2>Diary pages</h2>
+        <h2>Diary sequence</h2>
         <div className="diary-grid">
-          {person.diaryPages.map((page, index) => (
-            <article className="note-card" key={`${person.id}-page-${index}`}>
-              <p className="eyebrow">Diary page {index + 1} of {person.diaryPages.length} · {humanize(page.kind)}</p>
-              <p>{page.prose}</p>
-              {page.reward && (
-                <p>
-                  <strong>{humanize(page.reward)}</strong>
-                </p>
-              )}
+          {person.diaryPages.map((page) => (
+            <article className="note-card" key={`${person.slug}-page-${page.sequence}`}>
+              <p className="eyebrow">Page {page.sequence} · {page.title}</p>
+              {page.worldHint ? <p>This is a world hint. Its details become useful only after this exact diary page is recovered.</p> : <p>{page.detail ?? ''}</p>}
             </article>
           ))}
         </div>
       </section>
-      {person.teaching && (
-        <section className="article-section">
-          <h2>What they can teach</h2>
-          <p>
-            {person.name} can contribute a {humanize(person.teaching.kind)}{' '}
-            connected to {humanize(person.teaching.field)}.
-          </p>
-        </section>
-      )}
-      <RelatedGuides links={[{ label: 'All people', href: '/people' }, ...(person.station ? [{ label: `Visit ${person.station.name}`, href: `/places/${person.station.slug}` }] : []), { label: 'Village services', href: '/services' }, { label: 'All systems', href: '/systems' }]} />
+      <RelatedGuides links={[{ label: 'All people', href: '/people' }, ...(station ? [{ label: `Visit ${station.name}`, href: `/places/${station.slug}` }] : []), { label: 'Village services', href: '/services' }, { label: 'All systems', href: '/systems' }]} />
     </SiteFrame>
   );
 }

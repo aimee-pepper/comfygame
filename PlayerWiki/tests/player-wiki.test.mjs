@@ -251,53 +251,50 @@ test('crafting guide links retained Village visuals to their place references', 
   assert.match(source, /\/places\/\$\{station\.slug\}/);
 });
 
-test('every live person includes every authored diary page and every authored location hint', async () => {
+test('full cast pages preserve player-facing sequence and withhold unrecovered world-hint details', async () => {
   const content = JSON.parse(await read('data/player-content.json'));
-  const authored = JSON.parse(
-    await read('../Sources/Content/Data/travellers.json'),
-  );
-  for (const person of content.travellers) {
-    const authoredPerson = authored.travellers.find(
-      (entry) => entry.id === person.id,
-    );
-    const pages = authored.pages.filter((page) => page.diary === person.id);
-    assert.ok(authoredPerson, person.id);
-    assert.deepEqual(
-      person.hints,
-      authoredPerson.signature.map((entry) => entry.passage),
-      `${person.id} hints`,
-    );
-    assert.equal(
-      person.diaryPages.length,
-      pages.length,
-      `${person.id} diary pages`,
-    );
-    assert.deepEqual(
-      person.diaryPages.map((page) => page.prose),
-      pages.map((page) => page.prose),
-      `${person.id} diary prose`,
-    );
+  const castGuide = await read('../docs/player-wiki-full-cast-current.md');
+  const sync = await read('scripts/sync-content.mjs');
+  assert.equal(content.cast.length, 29);
+  assert.deepEqual(content.cast.map((person) => person.order), Array.from({ length: 29 }, (_, index) => index + 1));
+  for (const name of ['Vance', 'Noll', 'Mara', 'Oda', 'Auber', 'Ashe', 'Tovin', 'Perren', 'Nine']) {
+    assert.match(castGuide, new RegExp(`\\| \\d+ \\| ${name},`));
+    assert.ok(content.cast.find((person) => person.name === name), name);
   }
-  const personPage = await read('app/people/[slug]/page.tsx');
-  const peopleDirectory = await read('app/people/page.tsx');
-  assert.match(personPage, /PixelImage/);
-  assert.match(personPage, /character cameo/);
-  assert.match(personPage, /Hints for finding them/);
-  assert.match(personPage, /Diary pages/);
-  assert.match(personPage, /person-record-navigation/);
-  assert.match(personPage, /#location-hints/);
-  assert.match(personPage, /#diary-pages/);
-  assert.match(personPage, /Diary page \{index \+ 1\} of/);
-  assert.match(peopleDirectory, /people-directory/);
-  assert.match(peopleDirectory, /#location-hints/);
-  assert.match(peopleDirectory, /#diary-pages/);
-  for (const person of content.travellers) {
+  for (const person of content.cast) {
+    assert.ok(person.meetingContext, `${person.name} meeting context`);
+    assert.ok(person.role, `${person.name} service or role`);
+    assert.ok(person.diaryReward, `${person.name} diary reward`);
+    assert.ok(person.diaryPages.length, `${person.name} diary sequence`);
+    for (const page of person.diaryPages) {
+      assert.ok(page.sequence && page.title, `${person.name} diary title`);
+      if (page.worldHint) assert.equal(page.detail, null, `${person.name} ${page.sequence} world hint withheld`);
+      else assert.ok(page.detail, `${person.name} ${page.sequence} diary detail`);
+    }
     assert.ok(person.assetURL, `${person.name} cameo URL`);
     assert.match(person.assetURL, /^\/game-assets\/people\/.+-cameo\.svg$/);
     const cameo = await read(`public${person.assetURL}`);
     assert.match(cameo, /viewBox="0 0 16 16"/);
     assert.match(cameo, /shape-rendering="crispEdges"/);
   }
+  assert.match(sync, /player-wiki-full-cast-current\.md/);
+  assert.match(sync, /castRows\.length !== 29/);
+  assert.doesNotMatch(JSON.stringify(content.cast), /unusually open land where a load can cross the horizon/);
+  const personPage = await read('app/people/[slug]/page.tsx');
+  const peopleDirectory = await read('app/people/page.tsx');
+  assert.match(personPage, /PixelImage/);
+  assert.match(personPage, /character cameo/);
+  assert.match(personPage, /content\.cast/);
+  assert.match(personPage, /Spoiler boundary/);
+  assert.match(personPage, /world hint/);
+  assert.match(personPage, /Diary pages/);
+  assert.match(personPage, /person-record-navigation/);
+  assert.match(personPage, /#meeting/);
+  assert.match(personPage, /#diary-pages/);
+  assert.match(peopleDirectory, /people-directory/);
+  assert.match(peopleDirectory, /content\.cast/);
+  assert.match(peopleDirectory, /#meeting/);
+  assert.match(peopleDirectory, /#diary-pages/);
 });
 
 test('village services have a hub, individual guides and place cross-links', async () => {

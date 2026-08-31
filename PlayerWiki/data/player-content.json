@@ -2983,6 +2983,1331 @@
       "assetURL": "/game-assets/people/tovin-cameo.svg"
     }
   ],
+  "cast": [
+    {
+      "slug": "vance",
+      "name": "Vance",
+      "calling": "trader and appraiser",
+      "order": 1,
+      "meetingContext": "An open route where goods and their repairs can be traced",
+      "contribution": "Trading Post: appraisal and rotating buy/sell stock",
+      "roleLabel": "Service",
+      "role": "Trading Post",
+      "diaryReward": "Amber focus",
+      "diaryPageLabel": "six pages",
+      "diaryPages": [
+        {
+          "sequence": "1",
+          "title": "Where someone is",
+          "detail": null,
+          "worldHint": true
+        },
+        {
+          "sequence": "2",
+          "title": "A world worth writing",
+          "detail": "useful ground confined to visible seams.",
+          "worldHint": false
+        },
+        {
+          "sequence": "3",
+          "title": "A world worth writing",
+          "detail": "living things gathered in separate pockets.",
+          "worldHint": false
+        },
+        {
+          "sequence": "4",
+          "title": "A focus",
+          "detail": "Amber, preservation through removal from circulation.",
+          "worldHint": false
+        },
+        {
+          "sequence": "5",
+          "title": "Word of someone",
+          "detail": "Orsa and debts made visible around a shared fire.",
+          "worldHint": false
+        },
+        {
+          "sequence": "6",
+          "title": "Somewhere built",
+          "detail": "a Binder's Workshop whose changed handles record several owners.",
+          "worldHint": false
+        }
+      ],
+      "assetURL": "/game-assets/people/vance-cameo.svg"
+    },
+    {
+      "slug": "noll",
+      "name": "Noll",
+      "calling": "salvager",
+      "order": 2,
+      "meetingContext": "A failed object kept partly joined so its maker's expectation remains visible",
+      "contribution": "Recycler: previewed recovery from ordinary gear",
+      "roleLabel": "Service",
+      "role": "Recycler",
+      "diaryReward": "none currently published",
+      "diaryPageLabel": "six authored pages; five currently publishable",
+      "diaryPages": [
+        {
+          "sequence": "1–2",
+          "title": "Where someone is",
+          "detail": null,
+          "worldHint": true
+        },
+        {
+          "sequence": "3",
+          "title": "Word of someone",
+          "detail": "Vance and the difference between price and provenance.",
+          "worldHint": false
+        },
+        {
+          "sequence": "4",
+          "title": "Word of someone",
+          "detail": "Halloway and patience before declaring repair impossible.",
+          "worldHint": false
+        },
+        {
+          "sequence": "5",
+          "title": "A world worth writing",
+          "detail": "a place where removal must answer to a visible boundary.",
+          "worldHint": false
+        },
+        {
+          "sequence": "6",
+          "title": "A Schematic",
+          "detail": "a single-use Field Separation Kit for one ordinary piece of gear.",
+          "worldHint": false
+        }
+      ],
+      "assetURL": "/game-assets/people/noll-cameo.svg"
+    },
+    {
+      "slug": "halloway",
+      "name": "Halloway",
+      "calling": "smith",
+      "order": 3,
+      "meetingContext": "A forge kept alive by someone who stayed with it",
+      "contribution": "Blacksmith: foundational gear and reforging",
+      "roleLabel": "Service",
+      "role": "Blacksmith",
+      "diaryReward": "Gold Ore focus and one line of Pen Brush study",
+      "diaryPageLabel": "six pages",
+      "diaryPages": [
+        {
+          "sequence": "1–2",
+          "title": "Where someone is",
+          "detail": null,
+          "worldHint": true
+        },
+        {
+          "sequence": "3",
+          "title": "A focus",
+          "detail": "Gold Ore.",
+          "worldHint": false
+        },
+        {
+          "sequence": "4",
+          "title": "A world worth writing",
+          "detail": "patient heat keeping material workable.",
+          "worldHint": false
+        },
+        {
+          "sequence": "5",
+          "title": "A line of study",
+          "detail": "a ferrule holding every brush hair under equal pressure.",
+          "worldHint": false
+        },
+        {
+          "sequence": "6",
+          "title": "Word of someone",
+          "detail": "Dagg waiting until recovery has a shape.",
+          "worldHint": false
+        }
+      ],
+      "assetURL": "/game-assets/people/halloway-cameo.svg"
+    },
+    {
+      "slug": "mara",
+      "name": "Mara",
+      "calling": "surveyor",
+      "order": 4,
+      "meetingContext": "A world with one fixed line worth measuring twice",
+      "contribution": "Survey Post: instruments, readings and field loadout",
+      "roleLabel": "Service",
+      "role": "Survey Post",
+      "diaryReward": "Scarp focus",
+      "diaryPageLabel": "six pages",
+      "diaryPages": [
+        {
+          "sequence": "1",
+          "title": "Where someone is",
+          "detail": null,
+          "worldHint": true
+        },
+        {
+          "sequence": "2",
+          "title": "A focus",
+          "detail": "Scarp.",
+          "worldHint": false
+        },
+        {
+          "sequence": "3",
+          "title": "Word of someone",
+          "detail": "Sela's routes and habit of leaving.",
+          "worldHint": false
+        },
+        {
+          "sequence": "4",
+          "title": "A world worth writing",
+          "detail": "begin with the line that stays put.",
+          "worldHint": false
+        },
+        {
+          "sequence": "5",
+          "title": "Somewhere built",
+          "detail": "Crystal Cavern and its repeated crooked horizon.",
+          "worldHint": false
+        },
+        {
+          "sequence": "6",
+          "title": "Word of someone",
+          "detail": "Tovin measuring return in bindings rather than miles.",
+          "worldHint": false
+        }
+      ],
+      "assetURL": "/game-assets/people/mara-cameo.svg"
+    },
+    {
+      "slug": "edren",
+      "name": "Edren",
+      "calling": "archaeologist",
+      "order": 5,
+      "meetingContext": "Worked layers where “nowhere” was once somewhere",
+      "contribution": "Reliquary: site records and interpreted finds",
+      "roleLabel": "Service",
+      "role": "Reliquary",
+      "diaryReward": "Ruin focus and a line of Growth study",
+      "diaryPageLabel": "seven pages",
+      "diaryPages": [
+        {
+          "sequence": "1–2",
+          "title": "Where someone is",
+          "detail": null,
+          "worldHint": true
+        },
+        {
+          "sequence": "3",
+          "title": "A focus",
+          "detail": "Ruin.",
+          "worldHint": false
+        },
+        {
+          "sequence": "4",
+          "title": "Somewhere built",
+          "detail": "the Glacial Vault.",
+          "worldHint": false
+        },
+        {
+          "sequence": "5",
+          "title": "A line of study",
+          "detail": "Growth research from layered evidence.",
+          "worldHint": false
+        },
+        {
+          "sequence": "6",
+          "title": "A world worth writing",
+          "detail": "ground used more than once.",
+          "worldHint": false
+        },
+        {
+          "sequence": "7",
+          "title": "Word of someone",
+          "detail": "Lys preserving revisions beside a first ordering.",
+          "worldHint": false
+        }
+      ],
+      "assetURL": "/game-assets/people/edren-cameo.svg"
+    },
+    {
+      "slug": "isolde",
+      "name": "Isolde",
+      "calling": "calligrapher",
+      "order": 6,
+      "meetingContext": "A precise hand teaching itself against stone and weather",
+      "contribution": "Scriptorium: hands, ink practice and writing study",
+      "roleLabel": "Service",
+      "role": "Scriptorium",
+      "diaryReward": "Hush focus and one line of Pen Brush study",
+      "diaryPageLabel": "seven pages",
+      "diaryPages": [
+        {
+          "sequence": "1–2",
+          "title": "Where someone is",
+          "detail": null,
+          "worldHint": true
+        },
+        {
+          "sequence": "3",
+          "title": "A focus",
+          "detail": "Hush.",
+          "worldHint": false
+        },
+        {
+          "sequence": "4",
+          "title": "A world worth writing",
+          "detail": "pressure made legible in a line.",
+          "worldHint": false
+        },
+        {
+          "sequence": "5",
+          "title": "A line of study",
+          "detail": "a brush hand releasing pressure without losing the mark.",
+          "worldHint": false
+        },
+        {
+          "sequence": "6",
+          "title": "Word of someone",
+          "detail": "Tovin's neat closures and poor stopping judgement.",
+          "worldHint": false
+        },
+        {
+          "sequence": "7",
+          "title": "Word of someone",
+          "detail": "Lys arranging pages by disagreement rather than date.",
+          "worldHint": false
+        }
+      ],
+      "assetURL": "/game-assets/people/isolde-cameo.svg"
+    },
+    {
+      "slug": "sela",
+      "name": "Sela",
+      "calling": "wanderer",
+      "order": 7,
+      "meetingContext": "Connected routes, usable water and room to leave",
+      "contribution": "Wayfarer's Table: packing and fieldcraft",
+      "roleLabel": "Service",
+      "role": "Wayfarer's Table",
+      "diaryReward": "Pond focus",
+      "diaryPageLabel": "seven pages",
+      "diaryPages": [
+        {
+          "sequence": "1–3",
+          "title": "Where someone is",
+          "detail": null,
+          "worldHint": true
+        },
+        {
+          "sequence": "4",
+          "title": "A focus",
+          "detail": "Pond.",
+          "worldHint": false
+        },
+        {
+          "sequence": "5",
+          "title": "Word of someone",
+          "detail": "Halloway.",
+          "worldHint": false
+        },
+        {
+          "sequence": "6",
+          "title": "A world worth writing",
+          "detail": "a route left usable for the next traveller.",
+          "worldHint": false
+        },
+        {
+          "sequence": "7",
+          "title": "Word of someone",
+          "detail": "Orsa, whose shared stopping places still feel temporary.",
+          "worldHint": false
+        }
+      ],
+      "assetURL": "/game-assets/people/sela-cameo.svg"
+    },
+    {
+      "slug": "bryn",
+      "name": "Bryn",
+      "calling": "warden",
+      "order": 8,
+      "meetingContext": "A watched approach where standing first is a choice",
+      "contribution": "Formation knowledge for protecting exposed allies",
+      "roleLabel": "Role",
+      "role": "formation warden",
+      "diaryReward": "a gambit phrase for an exposed back-rank ally",
+      "diaryPageLabel": "seven pages",
+      "diaryPages": [
+        {
+          "sequence": "1–3",
+          "title": "Where someone is",
+          "detail": null,
+          "worldHint": true
+        },
+        {
+          "sequence": "4",
+          "title": "A gambit phrase",
+          "detail": "protect the ally placed where harm reaches before help.",
+          "worldHint": false
+        },
+        {
+          "sequence": "5",
+          "title": "Word of someone",
+          "detail": "Marrick and the unfilled place in a practiced formation.",
+          "worldHint": false
+        },
+        {
+          "sequence": "6",
+          "title": "A world worth writing",
+          "detail": "a narrow approach with two exits.",
+          "worldHint": false
+        },
+        {
+          "sequence": "7",
+          "title": "Somewhere built",
+          "detail": "Wayfarer's Camp.",
+          "worldHint": false
+        }
+      ],
+      "assetURL": "/game-assets/people/bryn-cameo.svg"
+    },
+    {
+      "slug": "orsa",
+      "name": "Orsa",
+      "calling": "keeper",
+      "order": 9,
+      "meetingContext": "A sheltered gathering place with more than one exit",
+      "contribution": "Firepit stewardship and the later Tavern",
+      "roleLabel": "Service",
+      "role": "Firepit stewardship and later Tavern",
+      "diaryReward": "Hive focus",
+      "diaryPageLabel": "seven pages",
+      "diaryPages": [
+        {
+          "sequence": "1–3",
+          "title": "Where someone is",
+          "detail": null,
+          "worldHint": true
+        },
+        {
+          "sequence": "4",
+          "title": "A focus",
+          "detail": "Hive.",
+          "worldHint": false
+        },
+        {
+          "sequence": "5",
+          "title": "Word of someone",
+          "detail": "Sela's marked routes back.",
+          "worldHint": false
+        },
+        {
+          "sequence": "6",
+          "title": "Word of someone",
+          "detail": "Vance reading a room through repaired objects.",
+          "worldHint": false
+        },
+        {
+          "sequence": "7",
+          "title": "Somewhere built",
+          "detail": "Wayfarer's Camp and its repeatedly rebuilt fire ring.",
+          "worldHint": false
+        }
+      ],
+      "assetURL": "/game-assets/people/orsa-cameo.svg"
+    },
+    {
+      "slug": "talin",
+      "name": "Talin",
+      "calling": "blade fighter",
+      "order": 10,
+      "meetingContext": "Hard, open ground where an opening can close while you think",
+      "contribution": "Techniques for answering heavily armoured foes",
+      "roleLabel": "Role",
+      "role": "blade fighter",
+      "diaryReward": "a gambit phrase for genuinely armoured foes",
+      "diaryPageLabel": "seven pages",
+      "diaryPages": [
+        {
+          "sequence": "1–3",
+          "title": "Where someone is",
+          "detail": null,
+          "worldHint": true
+        },
+        {
+          "sequence": "4",
+          "title": "A gambit phrase",
+          "detail": "reserve the narrow point for armour that defeats an ordinary blow.",
+          "worldHint": false
+        },
+        {
+          "sequence": "5",
+          "title": "Word of someone",
+          "detail": "Dagg's deliberate commitment.",
+          "worldHint": false
+        },
+        {
+          "sequence": "6",
+          "title": "Word of someone",
+          "detail": "Bryn's fast choices for other people's danger.",
+          "worldHint": false
+        },
+        {
+          "sequence": "7",
+          "title": "A world worth writing",
+          "detail": "one clear edge seen early enough to act.",
+          "worldHint": false
+        }
+      ],
+      "assetURL": "/game-assets/people/talin-cameo.svg"
+    },
+    {
+      "slug": "nessa",
+      "name": "Nessa",
+      "calling": "apothecary",
+      "order": 11,
+      "meetingContext": "A living, reactive world where dose matters more than labels",
+      "contribution": "Apothecary: remedies and prepared coatings",
+      "roleLabel": "Service",
+      "role": "Apothecary",
+      "diaryReward": "Thorn focus",
+      "diaryPageLabel": "eight pages",
+      "diaryPages": [
+        {
+          "sequence": "1–4",
+          "title": "Where someone is",
+          "detail": null,
+          "worldHint": true
+        },
+        {
+          "sequence": "5",
+          "title": "A focus",
+          "detail": "Thorn.",
+          "worldHint": false
+        },
+        {
+          "sequence": "6",
+          "title": "Word of someone",
+          "detail": "Auber and useful remainders.",
+          "worldHint": false
+        },
+        {
+          "sequence": "7",
+          "title": "A world worth writing",
+          "detail": "one substance nourishing one body and harming another.",
+          "worldHint": false
+        },
+        {
+          "sequence": "8",
+          "title": "Somewhere built",
+          "detail": "Geyser Basin, where heat, water and mineral arrive together.",
+          "worldHint": false
+        }
+      ],
+      "assetURL": "/game-assets/people/nessa-cameo.svg"
+    },
+    {
+      "slug": "corrin",
+      "name": "Corrin",
+      "calling": "tanner",
+      "order": 12,
+      "meetingContext": "Wet, living ground that tests every fastening through repetition",
+      "contribution": "Tannery: flexible protective gear",
+      "roleLabel": "Service",
+      "role": "Tannery",
+      "diaryReward": "Chitin focus",
+      "diaryPageLabel": "eight pages",
+      "diaryPages": [
+        {
+          "sequence": "1–4",
+          "title": "Where someone is",
+          "detail": null,
+          "worldHint": true
+        },
+        {
+          "sequence": "5",
+          "title": "A focus",
+          "detail": "Chitin.",
+          "worldHint": false
+        },
+        {
+          "sequence": "6",
+          "title": "Word of someone",
+          "detail": "Bracken and protection that still permits movement.",
+          "worldHint": false
+        },
+        {
+          "sequence": "7",
+          "title": "Word of someone",
+          "detail": "Kestrel and permission before usefulness.",
+          "worldHint": false
+        },
+        {
+          "sequence": "8",
+          "title": "A world worth writing",
+          "detail": "wet, living motion tested through repeated contact.",
+          "worldHint": false
+        }
+      ],
+      "assetURL": "/game-assets/people/corrin-cameo.svg"
+    },
+    {
+      "slug": "dagg",
+      "name": "Dagg",
+      "calling": "hammer fighter",
+      "order": 13,
+      "meetingContext": "Hard ground, large changes and enough quiet to prepare",
+      "contribution": "Techniques built around completing recovery",
+      "roleLabel": "Role",
+      "role": "hammer fighter",
+      "diaryReward": "a gambit phrase for completed recovery",
+      "diaryPageLabel": "eight pages",
+      "diaryPages": [
+        {
+          "sequence": "1–4",
+          "title": "Where someone is",
+          "detail": null,
+          "worldHint": true
+        },
+        {
+          "sequence": "5",
+          "title": "A gambit phrase",
+          "detail": "recovery ends when choice becomes possible again.",
+          "worldHint": false
+        },
+        {
+          "sequence": "6",
+          "title": "Word of someone",
+          "detail": "Halloway listening after every strike.",
+          "worldHint": false
+        },
+        {
+          "sequence": "7",
+          "title": "Word of someone",
+          "detail": "Talin acting while an opening remains true.",
+          "worldHint": false
+        },
+        {
+          "sequence": "8",
+          "title": "A world worth writing",
+          "detail": "ground crossed once by waiting, not twice by rushing.",
+          "worldHint": false
+        }
+      ],
+      "assetURL": "/game-assets/people/dagg-cameo.svg"
+    },
+    {
+      "slug": "rook",
+      "name": "Rook",
+      "calling": "spear fighter",
+      "order": 14,
+      "meetingContext": "A visible approach where distance can remain a warning",
+      "contribution": "Reach techniques and legible boundaries",
+      "roleLabel": "Role",
+      "role": "spear fighter",
+      "diaryReward": "a gambit phrase for a foe unable to reach the user",
+      "diaryPageLabel": "eight pages",
+      "diaryPages": [
+        {
+          "sequence": "1–4",
+          "title": "Where someone is",
+          "detail": null,
+          "worldHint": true
+        },
+        {
+          "sequence": "5",
+          "title": "A gambit phrase",
+          "detail": "check reach before spending distance.",
+          "worldHint": false
+        },
+        {
+          "sequence": "6",
+          "title": "Word of someone",
+          "detail": "Fen and what crosses a warning line.",
+          "worldHint": false
+        },
+        {
+          "sequence": "7",
+          "title": "Word of someone",
+          "detail": "Mara's corrected horizons.",
+          "worldHint": false
+        },
+        {
+          "sequence": "8",
+          "title": "A world worth writing",
+          "detail": "a visible approach with a narrow crossing.",
+          "worldHint": false
+        }
+      ],
+      "assetURL": "/game-assets/people/rook-cameo.svg"
+    },
+    {
+      "slug": "lys",
+      "name": "Lys",
+      "calling": "archivist",
+      "order": 15,
+      "meetingContext": "Layered ruins whose contradictory records remain readable",
+      "contribution": "Library stewardship, search and cross-reference",
+      "roleLabel": "Service",
+      "role": "Library stewardship",
+      "diaryReward": "Echo focus",
+      "diaryPageLabel": "nine pages",
+      "diaryPages": [
+        {
+          "sequence": "1–4",
+          "title": "Where someone is",
+          "detail": null,
+          "worldHint": true
+        },
+        {
+          "sequence": "5",
+          "title": "A focus",
+          "detail": "Echo.",
+          "worldHint": false
+        },
+        {
+          "sequence": "6",
+          "title": "Word of someone",
+          "detail": "Edren's layers and revisions.",
+          "worldHint": false
+        },
+        {
+          "sequence": "7",
+          "title": "Word of someone",
+          "detail": "Isolde's pressure and refusals.",
+          "worldHint": false
+        },
+        {
+          "sequence": "8",
+          "title": "Word of someone",
+          "detail": "Perren and instructions that make obedience feel discovered.",
+          "worldHint": false
+        },
+        {
+          "sequence": "9",
+          "title": "Somewhere built",
+          "detail": "a Binder's Workshop whose inventory contradicts its table.",
+          "worldHint": false
+        }
+      ],
+      "assetURL": "/game-assets/people/lys-cameo.svg"
+    },
+    {
+      "slug": "bracken",
+      "name": "Bracken",
+      "calling": "armorer",
+      "order": 16,
+      "meetingContext": "Hard ground and changing temperatures that expose every seam",
+      "contribution": "Armoury: advanced defensive profiles",
+      "roleLabel": "Service",
+      "role": "Armoury",
+      "diaryReward": "Bone focus",
+      "diaryPageLabel": "eight pages",
+      "diaryPages": [
+        {
+          "sequence": "1–5",
+          "title": "Where someone is",
+          "detail": null,
+          "worldHint": true
+        },
+        {
+          "sequence": "6",
+          "title": "A focus",
+          "detail": "Bone.",
+          "worldHint": false
+        },
+        {
+          "sequence": "7",
+          "title": "Word of someone",
+          "detail": "Halloway listening to changing metal.",
+          "worldHint": false
+        },
+        {
+          "sequence": "8",
+          "title": "Word of someone",
+          "detail": "Corrin beginning where protection touches and moves.",
+          "worldHint": false
+        }
+      ],
+      "assetURL": "/game-assets/people/bracken-cameo.svg"
+    },
+    {
+      "slug": "fen",
+      "name": "Fen",
+      "calling": "bowyer",
+      "order": 17,
+      "meetingContext": "Open distance, moving air and repeatable intervals",
+      "contribution": "Bowyer: advanced ranged construction",
+      "roleLabel": "Service",
+      "role": "Bowyer",
+      "diaryReward": "Silk focus",
+      "diaryPageLabel": "eight pages",
+      "diaryPages": [
+        {
+          "sequence": "1–5",
+          "title": "Where someone is",
+          "detail": null,
+          "worldHint": true
+        },
+        {
+          "sequence": "6",
+          "title": "A focus",
+          "detail": "Silk.",
+          "worldHint": false
+        },
+        {
+          "sequence": "7",
+          "title": "Word of someone",
+          "detail": "Rook keeping distance open for warning.",
+          "worldHint": false
+        },
+        {
+          "sequence": "8",
+          "title": "Word of someone",
+          "detail": "Oda making the carrier part of the instrument.",
+          "worldHint": false
+        }
+      ],
+      "assetURL": "/game-assets/people/fen-cameo.svg"
+    },
+    {
+      "slug": "wren",
+      "name": "Wren",
+      "calling": "skirmisher",
+      "order": 18,
+      "meetingContext": "A world opening another route before the first closes",
+      "contribution": "Tempo techniques for crowded encounters",
+      "roleLabel": "Role",
+      "role": "skirmisher",
+      "diaryReward": "a gambit phrase for encounters with at least three foes",
+      "diaryPageLabel": "nine pages",
+      "diaryPages": [
+        {
+          "sequence": "1–5",
+          "title": "Where someone is",
+          "detail": null,
+          "worldHint": true
+        },
+        {
+          "sequence": "6",
+          "title": "A gambit phrase",
+          "detail": "count the exits three foes close before moving.",
+          "worldHint": false
+        },
+        {
+          "sequence": "7",
+          "title": "Word of someone",
+          "detail": "Sela's routes as shared knowledge.",
+          "worldHint": false
+        },
+        {
+          "sequence": "8",
+          "title": "Word of someone",
+          "detail": "Dagg giving recovery a shape.",
+          "worldHint": false
+        },
+        {
+          "sequence": "9",
+          "title": "Word of someone",
+          "detail": "Marrick and the person forced to improvise.",
+          "worldHint": false
+        }
+      ],
+      "assetURL": "/game-assets/people/wren-cameo.svg"
+    },
+    {
+      "slug": "kestrel",
+      "name": "Kestrel",
+      "calling": "field naturalist",
+      "order": 19,
+      "meetingContext": "A rich ecology whose tracks defeat the convenient story",
+      "contribution": "Bestiary practice and first-observation techniques",
+      "roleLabel": "Role",
+      "role": "field naturalist",
+      "diaryReward": "a gambit phrase for an unrecorded species",
+      "diaryPageLabel": "nine pages",
+      "diaryPages": [
+        {
+          "sequence": "1–5",
+          "title": "Where someone is",
+          "detail": null,
+          "worldHint": true
+        },
+        {
+          "sequence": "6",
+          "title": "A gambit phrase",
+          "detail": "make the first careful action part of an unknown species' record.",
+          "worldHint": false
+        },
+        {
+          "sequence": "7",
+          "title": "Word of someone",
+          "detail": "Sabine observing after a creature learns her routine.",
+          "worldHint": false
+        },
+        {
+          "sequence": "8",
+          "title": "Word of someone",
+          "detail": "Corrin and what remains useful after a life.",
+          "worldHint": false
+        },
+        {
+          "sequence": "9",
+          "title": "Word of someone",
+          "detail": "Fen's clean line and the evidence left behind.",
+          "worldHint": false
+        }
+      ],
+      "assetURL": "/game-assets/people/kestrel-cameo.svg"
+    },
+    {
+      "slug": "maud",
+      "name": "Maud",
+      "calling": "weaponsmith",
+      "order": 20,
+      "meetingContext": "Materials and terrain that make fit a moving measurement",
+      "contribution": "Weaponsmith and an earned polearm fitting pattern",
+      "roleLabel": "Service",
+      "role": "Weaponsmith",
+      "diaryReward": "Fitted Polearm Schematic",
+      "diaryPageLabel": "nine pages",
+      "diaryPages": [
+        {
+          "sequence": "1–5",
+          "title": "Where someone is",
+          "detail": null,
+          "worldHint": true
+        },
+        {
+          "sequence": "6",
+          "title": "A Schematic",
+          "detail": "fit a polearm to motion the body can repeat.",
+          "worldHint": false
+        },
+        {
+          "sequence": "7",
+          "title": "Word of someone",
+          "detail": "Halloway hearing material during change.",
+          "worldHint": false
+        },
+        {
+          "sequence": "8",
+          "title": "Word of someone",
+          "detail": "Bracken distributing force before impact.",
+          "worldHint": false
+        },
+        {
+          "sequence": "9",
+          "title": "Word of someone",
+          "detail": "Dagg testing recovery after a weapon's invitation.",
+          "worldHint": false
+        }
+      ],
+      "assetURL": "/game-assets/people/maud-cameo.svg"
+    },
+    {
+      "slug": "marrick",
+      "name": "Marrick",
+      "calling": "formation leader",
+      "order": 21,
+      "meetingContext": "Shared ground where a routine can be tested by the person it forgot",
+      "contribution": "Mature formation support",
+      "roleLabel": "Role",
+      "role": "formation leader",
+      "diaryReward": "a gambit phrase triggered when any ally is below full health",
+      "diaryPageLabel": "ten pages",
+      "diaryPages": [
+        {
+          "sequence": "1–6",
+          "title": "Where someone is",
+          "detail": null,
+          "worldHint": true
+        },
+        {
+          "sequence": "7",
+          "title": "A gambit phrase",
+          "detail": "make room when any ally crosses the threshold.",
+          "worldHint": false
+        },
+        {
+          "sequence": "8",
+          "title": "Word of someone",
+          "detail": "Bryn rescuing the person a plan described too late.",
+          "worldHint": false
+        },
+        {
+          "sequence": "9",
+          "title": "Word of someone",
+          "detail": "Rook making a boundary legible from both sides.",
+          "worldHint": false
+        },
+        {
+          "sequence": "10",
+          "title": "An account",
+          "detail": "a successful formation that forgot the unassigned porters.",
+          "worldHint": false
+        }
+      ],
+      "assetURL": "/game-assets/people/marrick-cameo.svg"
+    },
+    {
+      "slug": "sabine",
+      "name": "Sabine",
+      "calling": "menagerist",
+      "order": 22,
+      "meetingContext": "An ecology with room to approach, refuse and return",
+      "contribution": "Menagerie: voluntary trust, housing and assignment",
+      "roleLabel": "Service",
+      "role": "Menagerie",
+      "diaryReward": "Coral focus",
+      "diaryPageLabel": "ten pages",
+      "diaryPages": [
+        {
+          "sequence": "1–7",
+          "title": "Where someone is",
+          "detail": null,
+          "worldHint": true
+        },
+        {
+          "sequence": "8",
+          "title": "A focus",
+          "detail": "Coral.",
+          "worldHint": false
+        },
+        {
+          "sequence": "9",
+          "title": "Word of someone",
+          "detail": "Kestrel reading tracks from before an animal noticed anyone.",
+          "worldHint": false
+        },
+        {
+          "sequence": "10",
+          "title": "Word of someone",
+          "detail": "Marrick revising a formation so refusal has a place.",
+          "worldHint": false
+        }
+      ],
+      "assetURL": "/game-assets/people/sabine-cameo.svg"
+    },
+    {
+      "slug": "grimmond",
+      "name": "Grimmond",
+      "calling": "deep miner",
+      "order": 23,
+      "meetingContext": "Rich seams under load, poor light and thinner breath",
+      "contribution": "Deep Works: depth sounding and discovered-sign records",
+      "roleLabel": "Service",
+      "role": "Deep Works",
+      "diaryReward": "Mercury focus",
+      "diaryPageLabel": "eleven pages",
+      "diaryPages": [
+        {
+          "sequence": "1–7",
+          "title": "Where someone is",
+          "detail": null,
+          "worldHint": true
+        },
+        {
+          "sequence": "8",
+          "title": "A focus",
+          "detail": "Mercury.",
+          "worldHint": false
+        },
+        {
+          "sequence": "9",
+          "title": "Word of someone",
+          "detail": "Edren reading layers as history.",
+          "worldHint": false
+        },
+        {
+          "sequence": "10",
+          "title": "Word of someone",
+          "detail": "Auber separating a carrier whose absence may support a hill.",
+          "worldHint": false
+        },
+        {
+          "sequence": "11",
+          "title": "An account",
+          "detail": "a correct yield beside an “unexpected” empty chamber.",
+          "worldHint": false
+        }
+      ],
+      "assetURL": "/game-assets/people/grimmond-cameo.svg"
+    },
+    {
+      "slug": "oda",
+      "name": "Oda",
+      "calling": "magic weaponsmith",
+      "order": 24,
+      "meetingContext": "Unlike forces held near enough for their routes to be followed",
+      "contribution": "Channelworks and Emanation Housing",
+      "roleLabel": "Service",
+      "role": "Channelworks",
+      "diaryReward": "Emanation Housing Schematic",
+      "diaryPageLabel": "twelve pages",
+      "diaryPages": [
+        {
+          "sequence": "1–8",
+          "title": "Where someone is",
+          "detail": null,
+          "worldHint": true
+        },
+        {
+          "sequence": "9",
+          "title": "A Schematic",
+          "detail": "give an emanation a route, limit and disclosed failure point.",
+          "worldHint": false
+        },
+        {
+          "sequence": "10",
+          "title": "Word of someone",
+          "detail": "Ashe and the body at the end of a release path.",
+          "worldHint": false
+        },
+        {
+          "sequence": "11",
+          "title": "Word of someone",
+          "detail": "Fen making stored work's carrier visible.",
+          "worldHint": false
+        },
+        {
+          "sequence": "12",
+          "title": "Word of someone",
+          "detail": "Auber preparing a property before Oda routes it.",
+          "worldHint": false
+        }
+      ],
+      "assetURL": "/game-assets/people/oda-cameo.svg"
+    },
+    {
+      "slug": "auber",
+      "name": "Auber",
+      "calling": "distiller",
+      "order": 25,
+      "meetingContext": "Water, mineral, heat and residue separating at different rates",
+      "contribution": "Distillery: crystallising and attuning prepared cores",
+      "roleLabel": "Service",
+      "role": "Distillery",
+      "diaryReward": "Brine focus",
+      "diaryPageLabel": "twelve pages",
+      "diaryPages": [
+        {
+          "sequence": "1–8",
+          "title": "Where someone is",
+          "detail": null,
+          "worldHint": true
+        },
+        {
+          "sequence": "9",
+          "title": "A focus",
+          "detail": "Brine.",
+          "worldHint": false
+        },
+        {
+          "sequence": "10",
+          "title": "Word of someone",
+          "detail": "Nessa asking what concentration does to a body.",
+          "worldHint": false
+        },
+        {
+          "sequence": "11",
+          "title": "Word of someone",
+          "detail": "Grimmond accounting for carrier and support.",
+          "worldHint": false
+        },
+        {
+          "sequence": "12",
+          "title": "Word of someone",
+          "detail": "Oda requiring exact concentration and carrier.",
+          "worldHint": false
+        }
+      ],
+      "assetURL": "/game-assets/people/auber-cameo.svg"
+    },
+    {
+      "slug": "ashe",
+      "name": "Ashe",
+      "calling": "emanation specialist",
+      "order": 26,
+      "meetingContext": "Warning stones around a body already carrying visible force",
+      "contribution": "Active-release combat knowledge",
+      "roleLabel": "Role",
+      "role": "emanation specialist",
+      "diaryReward": "an active-emanation gambit phrase and the Spent Emanation Housing site lead",
+      "diaryPageLabel": "twelve pages",
+      "diaryPages": [
+        {
+          "sequence": "1–8",
+          "title": "Where someone is",
+          "detail": null,
+          "worldHint": true
+        },
+        {
+          "sequence": "9",
+          "title": "A gambit phrase",
+          "detail": "identify a foe whose emanation is active now.",
+          "worldHint": false
+        },
+        {
+          "sequence": "10",
+          "title": "Word of someone",
+          "detail": "Oda mapping where a failed housing sends force.",
+          "worldHint": false
+        },
+        {
+          "sequence": "11",
+          "title": "An account",
+          "detail": "a warning dismissed until endurance became convenient to praise.",
+          "worldHint": false
+        },
+        {
+          "sequence": "12",
+          "title": "Somewhere built",
+          "detail": "the Spent Emanation Housing and ground still receiving its release.",
+          "worldHint": false
+        }
+      ],
+      "assetURL": "/game-assets/people/ashe-cameo.svg"
+    },
+    {
+      "slug": "tovin",
+      "name": "Tovin",
+      "calling": "binder",
+      "order": 27,
+      "meetingContext": "A dark, enclosed world whose exact timing cannot cure desire",
+      "contribution": "Anchorage: permanent-realm portfolio and return work",
+      "roleLabel": "Service",
+      "role": "Anchorage",
+      "diaryReward": "Drift focus and the Atlas Seam site lead",
+      "diaryPageLabel": "fourteen pages",
+      "diaryPages": [
+        {
+          "sequence": "1–8",
+          "title": "Where someone is",
+          "detail": null,
+          "worldHint": true
+        },
+        {
+          "sequence": "9",
+          "title": "A focus",
+          "detail": "Drift.",
+          "worldHint": false
+        },
+        {
+          "sequence": "10",
+          "title": "Word of someone",
+          "detail": "Edren choosing cold because layers remain undisturbed.",
+          "worldHint": false
+        },
+        {
+          "sequence": "11",
+          "title": "Where someone is",
+          "detail": null,
+          "worldHint": true
+        },
+        {
+          "sequence": "12",
+          "title": "A world worth writing",
+          "detail": "a stripped world whose blue mineral rain still matters.",
+          "worldHint": false
+        },
+        {
+          "sequence": "13",
+          "title": "A world worth writing",
+          "detail": "a generous world lost while caution made the choice.",
+          "worldHint": false
+        },
+        {
+          "sequence": "14",
+          "title": "Somewhere built",
+          "detail": "an Atlas Seam where an old binding still catches.",
+          "worldHint": false
+        }
+      ],
+      "assetURL": "/game-assets/people/tovin-cameo.svg"
+    },
+    {
+      "slug": "perren",
+      "name": "Perren",
+      "calling": "interpreter",
+      "order": 28,
+      "meetingContext": "Ruined ritual fragments that support more than one arrangement",
+      "contribution": "Mirror focus and interpretive endgame story",
+      "roleLabel": "Role",
+      "role": "interpreter",
+      "diaryReward": "Mirror focus. Perren's pages have no canonical chronology",
+      "diaryPageLabel": "twelve pages",
+      "diaryPages": [
+        {
+          "sequence": "1–9",
+          "title": "Where someone is",
+          "detail": null,
+          "worldHint": true
+        },
+        {
+          "sequence": "10",
+          "title": "A focus",
+          "detail": "Mirror.",
+          "worldHint": false
+        },
+        {
+          "sequence": "11",
+          "title": "Word of someone",
+          "detail": "Lys preserving contradiction without forced disappearance.",
+          "worldHint": false
+        },
+        {
+          "sequence": "12",
+          "title": "A turn",
+          "detail": "questions Perren stopped discarding, without one marked conversion.",
+          "worldHint": false
+        }
+      ],
+      "assetURL": "/game-assets/people/perren-cameo.svg"
+    },
+    {
+      "slug": "nine",
+      "name": "Nine",
+      "calling": "continuity keeper",
+      "order": 29,
+      "meetingContext": "A verified arrangement revised by the person living with it now",
+      "contribution": "Dream focus and the continuity arc",
+      "roleLabel": "Role",
+      "role": "continuity keeper",
+      "diaryReward": "Dream focus",
+      "diaryPageLabel": "thirteen pages",
+      "diaryPages": [
+        {
+          "sequence": "1–9",
+          "title": "Where someone is",
+          "detail": null,
+          "worldHint": true
+        },
+        {
+          "sequence": "10",
+          "title": "A focus",
+          "detail": "Dream.",
+          "worldHint": false
+        },
+        {
+          "sequence": "11",
+          "title": "Word of someone",
+          "detail": "Isolde recognising discipline without claiming a whole identity.",
+          "worldHint": false
+        },
+        {
+          "sequence": "12",
+          "title": "Word of someone",
+          "detail": "Ashe retaining authorship while treated as evidence.",
+          "worldHint": false
+        },
+        {
+          "sequence": "13",
+          "title": "Word of someone",
+          "detail": "Tovin preserving return without pretending it is restoration.",
+          "worldHint": false
+        }
+      ],
+      "assetURL": "/game-assets/people/nine-cameo.svg"
+    }
+  ],
   "stations": [
     {
       "id": "writing_desk",

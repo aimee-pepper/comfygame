@@ -59,6 +59,10 @@ const gambitComponentSource = JSON.parse(
     'utf8',
   ),
 );
+const fullCastGuide = await readFile(
+  path.join(repositoryRoot, 'docs', 'player-wiki-full-cast-current.md'),
+  'utf8',
+);
 const namedCharacterPack = JSON.parse(
   await readFile(
     path.join(
@@ -94,6 +98,9 @@ const runtimeAsset = (familyID, semanticKey) =>
 
 const safeFileName = (value) =>
   `${String(value).replaceAll(/[^a-zA-Z0-9_-]/g, '-')}.png`;
+const compactCopy = (value) => value.replaceAll(/\s+/g, ' ').trim();
+const slugFor = (name) =>
+  name.toLowerCase().replaceAll(/[^a-z0-9]+/g, '-').replaceAll(/(^-|-$)/g, '');
 const resourceDefinitionByID = new Map(
   resourceSource.resources.map((resource) => [resource.id, resource]),
 );
@@ -267,6 +274,72 @@ async function publishTownVisual(sourcePath, destination) {
   );
   return `/game-assets/places/${destination}`;
 }
+
+const castRows = [...fullCastGuide.matchAll(
+  /^\| (\d+) \| ([^,|]+), ([^|]+?) \| ([^|]+) \| ([^|]+) \|$/gm,
+)].map(([, order, name, calling, meetingContext, contribution]) => ({
+  order: Number(order),
+  name: compactCopy(name),
+  calling: compactCopy(calling),
+  meetingContext: compactCopy(meetingContext),
+  contribution: compactCopy(contribution),
+}));
+const diarySections = new Map(
+  [...fullCastGuide.matchAll(
+    /^### \d+\. ([^—\n]+) — ([^\n]+)\n\n([\s\S]*?)(?=^### |^## Progression summary)/gm,
+  )].map(([, name, pageLabel, body]) => [compactCopy(name), { pageLabel, body }]),
+);
+const travellerIDByName = new Map(
+  travellerSource.travellers.map((traveller) => [traveller.name, traveller.id]),
+);
+if (castRows.length !== 29 || diarySections.size !== 29) {
+  throw new Error('Player Wiki full-cast guide must retain all 29 campaign entries');
+}
+const cast = await Promise.all(castRows.map(async (row) => {
+  const diary = diarySections.get(row.name);
+  const travellerID = travellerIDByName.get(row.name);
+  if (!diary || !travellerID) {
+    throw new Error(`Full-cast guide has no matching authored traveller for ${row.name}`);
+  }
+  const serviceLine = diary.body.match(
+    /^\*\*(Service|Role):\*\* ([\s\S]*?)\. \*\*Diary rewards?:\*\* ([\s\S]*?)\.\n\n/,
+  );
+  if (!serviceLine) {
+    throw new Error(`Full-cast guide has no service or role line for ${row.name}`);
+  }
+  const pageStarts = [...diary.body.matchAll(/^([\d]+(?:–[\d]+)?)\. \*\*([^*]+)\*\* — /gm)];
+  if (!pageStarts.length) {
+    throw new Error(`Full-cast guide has no diary sequence for ${row.name}`);
+  }
+  const diaryPages = pageStarts.map((match, index) => {
+    const next = pageStarts[index + 1];
+    const end = next ? next.index : diary.body.length;
+    const rawDetail = diary.body.slice((match.index ?? 0) + match[0].length, end)
+      .split(/\n\n(?=(?:Keep|Nine's))/)[0];
+    const title = compactCopy(match[2]);
+    const worldHint = title === 'Where someone is';
+    return {
+      sequence: match[1],
+      title,
+      detail: worldHint ? null : compactCopy(rawDetail),
+      worldHint,
+    };
+  });
+  return {
+    slug: slugFor(row.name),
+    name: row.name,
+    calling: row.calling,
+    order: row.order,
+    meetingContext: row.meetingContext,
+    contribution: row.contribution,
+    roleLabel: serviceLine[1],
+    role: compactCopy(serviceLine[2]),
+    diaryReward: compactCopy(serviceLine[3]),
+    diaryPageLabel: compactCopy(diary.pageLabel),
+    diaryPages,
+    assetURL: await publishTravellerCameo(travellerID, slugFor(row.name)),
+  };
+}));
 
 const startingTownAssetURL = await publishTownVisual(
   'AssetLab/integration/starting-town-home-v1/town-starting-home-v1-phone-v2.png',
@@ -479,6 +552,7 @@ const playerContent = {
   resources,
   items,
   travellers,
+  cast,
   stations,
   researchBranches: researchSource.branches
     .map((branch) => ({
@@ -536,5 +610,5 @@ await writeFile(
   'utf8',
 );
 console.log(
-  `Synced ${resources.length} resources, ${items.length} items, ${travellers.length} live people and ${stations.length} current places.`,
+  `Synced ${resources.length} resources, ${items.length} items, ${cast.length} published cast pages, and ${stations.length} current places.`,
 );

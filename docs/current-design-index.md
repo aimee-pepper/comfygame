@@ -159,6 +159,7 @@ When two documents disagree:
 | Noll / Recycler identity | `traveller-identity-noll-recycler-current.md` | Complete working identity, signature, six-page diary, meeting, field-kit teaching and migration boundary |
 | Noll opening review packet | `noll-opening-review-packet-current.md` | Compact approval recommendations for identity, voice delta, signature, Recycler cost and held field-kit question |
 | Trading Post economy | `trading-post-recycler-economy-current.md` | Merchant trade bands, rotating stock snapshot, conversion rates and cumulative salvage receipt |
+| Player Wiki full cast | `player-wiki-full-cast-current.md` | Publishable 29-character campaign directory, meeting context, services, rewards, complete diary sequences, world hints and spoiler boundaries without internal IDs |
 | Essence continuation economy | `essence-continuation-economy-current.md` | Authored-world continuation invariant, temporary Raw Essence profiles and required runway telemetry |
 | Slot-free harvest reserve foundation | `world-resource-reserve-current.md` | Exact property-bearing harvests are slot-free; current combined category is transitional |
 | Creature ecology and materials | `creature-ecology-and-materials-overhaul-current.md` | Habitat-aware pressure-generated life including deep water and body-derived Creature materials |
