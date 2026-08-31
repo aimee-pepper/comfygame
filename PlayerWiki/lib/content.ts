@@ -219,6 +219,48 @@ export function consumableValue(item: Item, field: string) {
   return humanize(item.consumable?.[field]);
 }
 
+export function consumableEffect(item: Item) {
+  switch (item.consumable?.effect) {
+    case 'heal': return 'Restore health';
+    case 'clearPoison': return 'Clear poison';
+    case 'clearElemental': return 'Clear burning and dazzled';
+    case 'clearAnyStatus': return 'Clear one current status';
+    case 'preventStatus': return 'Prevent one current status';
+    case 'coatPoison': return 'Prepare a poison coating';
+    case 'coatBurn': return 'Prepare a burning coating';
+    case 'coatBleed': return 'Prepare a bleeding coating';
+    case 'coatDazzle': return 'Prepare a dazzling coating';
+    case 'identifyCurio': return 'Identify one carried curio';
+    case 'lureCreature': return 'Draw the nearest creature';
+    case 'maskScent': return 'Mask scent';
+    case 'seamlightGuidance': return 'Light Seamlight';
+    case 'restoreStability': return 'Restore Stability';
+    case 'returnHome': return 'Return home with the haul';
+    case 'lightWorld': return 'Raise the party’s vision';
+    case 'farsight': return 'Reveal the nearest site';
+    default: return humanize(item.consumable?.effect);
+  }
+}
+
+export function consumableTarget(item: Item) {
+  switch (item.consumable?.effect) {
+    case 'heal': return 'One party member';
+    case 'coatPoison':
+    case 'coatBurn':
+    case 'coatBleed':
+    case 'coatDazzle': return 'One party member’s current weapon';
+    case 'identifyCurio': return 'One carried unidentified curio';
+    case 'maskScent': return 'The party';
+    default: return 'No separate target';
+  }
+}
+
+export function consumableDuration(item: Item) {
+  return item.consumable?.beneficialScalingField === 'timedDuration'
+    ? `${humanize(item.consumable.potency)} turns`
+    : 'No duration listed';
+}
+
 export function itemProperties(item: Item) {
   if (!item.gear) return [];
   return Object.entries(item.gear)

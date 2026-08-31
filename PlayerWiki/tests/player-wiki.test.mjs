@@ -91,6 +91,24 @@ test('equipment routes retain slot, recipe, frozen-piece and custody guidance', 
   assert.match(detail, /\/crafting\/armoury/);
 });
 
+test('consumable routes keep current effect, target, preparation, carrying, and committed-use facts together', async () => {
+  const index = await read('app/consumables/page.tsx');
+  const detail = await read('app/items/[slug]/page.tsx');
+  const supplies = await read('app/systems/field-supplies/page.tsx');
+  const contentSource = await read('lib/content.ts');
+  assert.match(index, /Current recipe route/);
+  assert.match(index, /Carry and use/);
+  assert.match(index, /Target/);
+  assert.match(detail, /Field Kit and carrying/);
+  assert.match(detail, /Commit the shown use/);
+  assert.match(detail, /\/systems\/field-supplies/);
+  assert.match(supplies, /timed effect/);
+  assert.match(supplies, /remaining turns/);
+  assert.match(contentSource, /function consumableEffect/);
+  assert.match(contentSource, /function consumableTarget/);
+  assert.match(contentSource, /function consumableDuration/);
+});
+
 test('player navigation excludes internal wiki architecture', async () => {
   const source = `${await read('components/site-frame.tsx')}\n${await read('app/page.tsx')}\n${await read('app/people/page.tsx')}`;
   for (const forbidden of [
