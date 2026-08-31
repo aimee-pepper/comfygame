@@ -1,0 +1,29 @@
+{
+  "$schema": "AssetEvidence/_templates/evidence-receipt-v1.schema.json",
+  "schemaVersion": "asset-evidence-receipt-v1",
+  "family": "combat-tree",
+  "version": "v2",
+  "variant": "route-audit",
+  "classification": "generated-test-artifact",
+  "accepted": false,
+  "sourceAuthorship": false,
+  "runtimeAuthority": false,
+  "gameplayAuthority": false,
+  "finalArtAcceptance": false,
+  "gameWikiDisclosure": "withheld",
+  "authorityPaths": [
+    "docs/combat-tree-v2-authority.json"
+  ],
+  "producerPaths": [
+    "AssetLab/scripts/audit-combat-v2-routes.mjs",
+    "AssetLab/tests/combat-tree-v2-route-audit.test.js"
+  ],
+  "files": [
+    {
+      "path": "AssetEvidence/combat-tree/v2/route-audit/review/combat-tree-v2-route-audit.json",
+      "role": "test-report",
+      "sha256": "6d9b0fb3e6ee10fc805d08d7a5b48d0239a3efe62b3c25c62b8d117135c8d31b"
+    }
+  ]
+}
+

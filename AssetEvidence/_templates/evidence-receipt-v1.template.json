@@ -1,0 +1,24 @@
+{
+  "$schema": "AssetEvidence/_templates/evidence-receipt-v1.schema.json",
+  "schemaVersion": "asset-evidence-receipt-v1",
+  "family": "<family>",
+  "version": "<version>",
+  "variant": "<variant>",
+  "classification": "<review-evidence|reference|candidate-output|generated-test-artifact|blocked>",
+  "accepted": false,
+  "sourceAuthorship": false,
+  "runtimeAuthority": false,
+  "gameplayAuthority": false,
+  "finalArtAcceptance": false,
+  "gameWikiDisclosure": "withheld",
+  "authorityPaths": ["<existing-authority-path>"],
+  "producerPaths": ["<existing-producer-or-test-path>"],
+  "files": [
+    {
+      "path": "AssetEvidence/<family>/<version>/<variant>/review/<semantic-name>.<ext>",
+      "role": "<render|metadata|interactive-proof|test-report>",
+      "sha256": "<64-lowercase-hex>"
+    }
+  ]
+}
+

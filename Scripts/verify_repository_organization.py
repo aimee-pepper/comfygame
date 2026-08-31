@@ -27,6 +27,7 @@ ALLOWED_GENERATORS = {
     "Scripts/generate_combat_tree_v2.py",
     "Scripts/generate_draft_meeting_corpus.py",
 }
+ASSET_EVIDENCE_CHECK = "Scripts/verify_asset_evidence.py"
 
 
 def git(root: Path, *arguments: str) -> str:
@@ -278,6 +279,15 @@ def main() -> int:
 
     root = Path(git(Path.cwd(), "rev-parse", "--show-toplevel").strip())
     violations = repository_violations(root, changed_paths(root))
+    evidence_check = root / ASSET_EVIDENCE_CHECK
+    if evidence_check.is_file():
+        result = subprocess.run(
+            [sys.executable, ASSET_EVIDENCE_CHECK, "--check"], cwd=root, text=True,
+            stdout=subprocess.PIPE, stderr=subprocess.STDOUT, timeout=30, check=False,
+        )
+        if result.returncode != 0:
+            detail = result.stdout.strip().splitlines()[-1:] or ["no diagnostic"]
+            violations.append(f"AssetEvidence boundary failed: {detail[0]}")
     if violations:
         print("repository organization check failed:", file=sys.stderr)
         for violation in violations:

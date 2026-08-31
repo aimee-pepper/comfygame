@@ -7,7 +7,7 @@
   "largeTextPNG_SHA256": "c6b0097f0695ad4a1c1d33a33c154484264c1215fa3866e89d01581ab477297f",
   "phoneBounds": { "width": 368, "height": 800 },
   "profiles": ["color", "literal grayscale", "five-position topology-preserving Large Text"],
-  "routeAudit": "combat-tree-v2-route-audit.json",
+  "routeAudit": "AssetEvidence/combat-tree/v2/route-audit/review/combat-tree-v2-route-audit.json",
   "supersedes": "combat-tree-graph-proof-v0.2.json (historical only)",
   "nativeClaims": []
 }
