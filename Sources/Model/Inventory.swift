@@ -104,6 +104,40 @@ enum PhysicalGearIdentityAuthority {
 }
 
 extension GameState {
+    /// Stable IDs held by every live allocator/custody owner. Transaction receipts use this one
+    /// census so a satchel object cannot share an identity with Home, a frozen offer, another
+    /// run, a map drop, or worn physical gear. Review and preview snapshots are historical and
+    /// intentionally excluded.
+    func liveItemInstanceIDs() -> [InstanceID] {
+        let runs = [worlds.activeRun].compactMap { $0 } + worlds.anchoredRealms.map(\.world)
+        var stacks = base.inventory.stacks + base.spillover
+        if let essence = base.essenceCrystals { stacks.append(essence) }
+        stacks += base.tradingPost.stock.flatMap(\.frozenUnits)
+        for run in runs {
+            stacks += run.satchelItems.stacks
+            stacks += run.offeredItems
+            stacks += run.map.tiles.compactMap { tile in
+                if case .item(let stack) = tile.content { return stack }
+                return nil
+            }
+        }
+        // Physical gear normally shares its stack ID. A malformed profile may disagree; retain
+        // both identities in that case so neither side can hide a collision before validation
+        // rejects the malformed graph.
+        var ids: [InstanceID] = []
+        for stack in stacks {
+            ids.append(stack.id)
+            if let stableID = stack.gearProfile?.stableInstanceID, stableID != stack.id {
+                ids.append(stableID)
+            }
+        }
+        ids += base.binderEquipped.values.compactMap { $0.gearProfile?.stableInstanceID }
+        ids += base.roster.flatMap { member in
+            member.equipped.values.compactMap { $0.gearProfile?.stableInstanceID }
+        }
+        return ids
+    }
+
     func validatesPhysicalGearReceipts() -> Bool {
         var gearIDs = Set<InstanceID>()
         var materialIDs = Set(base.craftMaterialHoldings.map(\.id))

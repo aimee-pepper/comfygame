@@ -42,6 +42,157 @@ enum WorldFieldItemUseCommitResultV1: Equatable, Sendable {
     case refused(WorldFieldItemUseRefusalV1)
 }
 
+/// Ephemeral common authority for every later field-item route. It deliberately binds only the
+/// source custody and world frame; route mechanics remain in their individual rule owners.
+struct WorldFieldItemSourceReceiptV1: Equatable, Sendable {
+    static let currentVersion = 1
+
+    /// A source may be used only when its stable ID occurs exactly once in all *live* item
+    /// custody. The selected owner is separately bound to the active expedition satchel.
+    /// Historical review/preview snapshots deliberately do not enter this census.
+    struct UniqueLiveInstanceIdentityProofV1: Equatable, Sendable {
+        let worldRunIdentity: String
+        let instanceID: InstanceID
+        let matchingLiveInstanceCount: Int
+    }
+
+    let version: Int
+    let worldRunIdentity: String
+    let expectedTurn: Int
+    let expectedPosition: GridPoint
+    let beforeContext: WorldFieldContextReceiptV1
+    let rngBefore: SeededRNG
+    let sourceStack: ItemStack
+    let liveInstanceIdentityProof: UniqueLiveInstanceIdentityProofV1
+}
+
+/// Admission-owned and transient. The mounted item route creates it once, retains it through
+/// retries, and never serializes it with the deterministic source receipt.
+struct WorldFieldItemSourceCommitAttemptV1: Equatable, Sendable {
+    let id: UUID
+    let stagedAt: Date
+
+    init(id: UUID, stagedAt: Date) {
+        self.id = id
+        self.stagedAt = stagedAt
+    }
+}
+
+enum WorldFieldItemSourceRefusalV1: Error, Equatable, Sendable {
+    case noActiveRun
+    case encounterActive
+    case staleRun
+    case staleTurn
+    case stalePosition
+    case staleContext
+    case staleRNG
+    case sourceMissing
+    case duplicateSource
+    case wrongCustody
+    case staleSource
+}
+
+enum WorldFieldItemSourceCommitRefusalV1<RouteRefusal> {
+    case source(WorldFieldItemSourceRefusalV1)
+    case route(RouteRefusal)
+    case persistence(PersistedCommitRefusalV1)
+}
+
+struct WorldFieldItemRouteCandidateV1<Value> {
+    let value: Value
+    let events: [WorldRules.Event]
+
+    init(value: Value, events: [WorldRules.Event]) {
+        self.value = value
+        self.events = events
+    }
+}
+
+enum WorldFieldItemSourceCommitResultV1<Value, RouteRefusal> {
+    case committedNow(Value, PersistedCommitPresentationTokenV1)
+    case recoveredDurable(PersistenceCommitReceiptV1)
+    case alreadyCommitted(PersistenceCommitReceiptV1)
+    case refused(WorldFieldItemSourceCommitRefusalV1<RouteRefusal>)
+}
+
+extension WorldFieldItemRouteCandidateV1: Equatable where Value: Equatable {}
+extension WorldFieldItemRouteCandidateV1: Sendable where Value: Sendable {}
+extension WorldFieldItemSourceCommitRefusalV1: Equatable where RouteRefusal: Equatable {}
+extension WorldFieldItemSourceCommitRefusalV1: Sendable where RouteRefusal: Sendable {}
+extension WorldFieldItemSourceCommitResultV1: Equatable
+    where Value: Equatable, RouteRefusal: Equatable {}
+extension WorldFieldItemSourceCommitResultV1: Sendable
+    where Value: Sendable, RouteRefusal: Sendable {}
+
+enum WorldFieldItemSourceRulesV1 {
+    /// This header is presentation-safe: it allocates no feedback attempt. Phone control
+    /// admission creates the attempt only when an accepted release enters durable commit.
+    static func evaluate(sourceStack: ItemStack, in state: GameState)
+        -> Result<WorldFieldItemSourceReceiptV1, WorldFieldItemSourceRefusalV1> {
+        guard let run = state.worlds.activeRun else { return .failure(.noActiveRun) }
+        guard run.activeEncounter == nil else { return .failure(.encounterActive) }
+
+        guard sourceStack.id.rawValue > 0 else { return .failure(.wrongCustody) }
+        let matching = run.satchelItems.stacks.filter { $0.id == sourceStack.id }
+        let liveCount = state.liveItemInstanceIDs().filter { $0 == sourceStack.id }.count
+        guard !matching.isEmpty else {
+            switch liveCount {
+            case 0: return .failure(.sourceMissing)
+            case 1: return .failure(.wrongCustody)
+            default: return .failure(.duplicateSource)
+            }
+        }
+        guard matching.count == 1 else { return .failure(.duplicateSource) }
+        guard matching[0] == sourceStack else { return .failure(.staleSource) }
+        guard sourceStack.count > 0 else { return .failure(.wrongCustody) }
+        guard liveCount == 1 else { return .failure(.duplicateSource) }
+        let worldRunIdentity = "\(run.runIndex):\(run.mapSeed)"
+        guard let context = WorldFieldContextReceiptV1.make(from: state) else {
+            return .failure(.staleContext)
+        }
+
+        return .success(.init(
+            version: WorldFieldItemSourceReceiptV1.currentVersion,
+            worldRunIdentity: worldRunIdentity,
+            expectedTurn: run.turnsTaken,
+            expectedPosition: run.playerPosition,
+            beforeContext: context,
+            rngBefore: run.rng,
+            sourceStack: sourceStack,
+            liveInstanceIdentityProof: .init(
+                worldRunIdentity: worldRunIdentity,
+                instanceID: sourceStack.id,
+                matchingLiveInstanceCount: liveCount)))
+    }
+
+    static func revalidate(_ receipt: WorldFieldItemSourceReceiptV1, in state: GameState)
+        -> Result<WorldFieldItemSourceReceiptV1, WorldFieldItemSourceRefusalV1> {
+        guard receipt.version == WorldFieldItemSourceReceiptV1.currentVersion else {
+            return .failure(.staleSource)
+        }
+        guard let run = state.worlds.activeRun else { return .failure(.noActiveRun) }
+        guard "\(run.runIndex):\(run.mapSeed)" == receipt.worldRunIdentity else {
+            return .failure(.staleRun)
+        }
+        guard run.turnsTaken == receipt.expectedTurn else { return .failure(.staleTurn) }
+        guard run.playerPosition == receipt.expectedPosition else { return .failure(.stalePosition) }
+        guard WorldFieldContextReceiptV1.make(from: state) == receipt.beforeContext else {
+            return .failure(.staleContext)
+        }
+        let evaluated = evaluate(sourceStack: receipt.sourceStack, in: state)
+        guard case .success(let current) = evaluated else {
+            guard case .failure(let refusal) = evaluated else { return .failure(.staleSource) }
+            return .failure(refusal)
+        }
+        guard current.liveInstanceIdentityProof == receipt.liveInstanceIdentityProof else {
+            return .failure(.wrongCustody)
+        }
+        guard current.rngBefore == receipt.rngBefore else { return .failure(.staleRNG) }
+        return .success(current)
+    }
+
+}
+
 enum WorldFieldItemUseRulesV1 {
     static func evaluate(stack: ItemStack, target: PartyMember, in state: GameState)
         -> Result<WorldFieldItemUseQuoteV1, WorldFieldItemUseRefusalV1> {
@@ -865,6 +1016,74 @@ extension GameStore {
     func worldFieldItemUseEvaluation(_ stack: ItemStack, on member: PartyMember)
         -> Result<WorldFieldItemUseQuoteV1, WorldFieldItemUseRefusalV1> {
         WorldFieldItemUseRulesV1.evaluate(stack: stack, target: member, in: state)
+    }
+
+    /// Evaluates only the exact live source custody. Individual routes add their own target and
+    /// effect authority above this receipt; they must retain this result rather than reselecting a
+    /// stack at commit time.
+    func worldFieldItemSourceEvaluation(_ stack: ItemStack)
+        -> Result<WorldFieldItemSourceReceiptV1, WorldFieldItemSourceRefusalV1> {
+        WorldFieldItemSourceRulesV1.evaluate(sourceStack: stack, in: state)
+    }
+
+    /// The route closure is deliberately the only place that may apply an item effect, consume a
+    /// source, advance a turn, or draw run RNG. This adapter owns durable publication and the
+    /// committed-only transient handoff without inventing a second item-mechanics authority.
+    @discardableResult
+    func commitWorldFieldItemSource<Value, RouteRefusal>(
+        _ receipt: WorldFieldItemSourceReceiptV1,
+        attempt durableAttempt: WorldFieldItemSourceCommitAttemptV1,
+        label: String,
+        route: (inout GameState, WorldFieldItemSourceReceiptV1)
+            -> Result<WorldFieldItemRouteCandidateV1<Value>, RouteRefusal>
+    ) -> WorldFieldItemSourceCommitResultV1<Value, RouteRefusal> {
+        // The transient attempt is admission-owned. Display/evaluation above cannot increment its
+        // session counter merely by presenting an item sheet.
+        guard let attempt = beginWorldFieldAttempt(.useItem) else {
+            return .refused(.source(activeRun == nil ? .noActiveRun : .encounterActive))
+        }
+        var sourceRefusal: WorldFieldItemSourceRefusalV1?
+        var routeRefusal: RouteRefusal?
+        let durable = commitPersistedIf(
+            label, attemptID: durableAttempt.id, stagedAt: durableAttempt.stagedAt, scope: .expedition
+        ) { candidate -> WorldFieldItemRouteCandidateV1<Value>? in
+            guard attempt.worldRunID == receipt.worldRunIdentity,
+                  attempt.turnBefore == receipt.expectedTurn,
+                  attempt.sourcePoint == receipt.expectedPosition,
+                  attempt.beforeContext == receipt.beforeContext else {
+                sourceRefusal = .staleContext
+                return nil
+            }
+            switch WorldFieldItemSourceRulesV1.revalidate(receipt, in: candidate) {
+            case .success:
+                break
+            case .failure(let refusal):
+                sourceRefusal = refusal
+                return nil
+            }
+            switch route(&candidate, receipt) {
+            case .success(let committed): return committed
+            case .failure(let refusal):
+                routeRefusal = refusal
+                return nil
+            }
+        }
+
+        switch durable {
+        case .committedNow(let committed, let token):
+            // Never route through `finishTurn`: the candidate already owns exact turn/RNG/events.
+            submitWorldFieldEvents(committed.events, for: attempt, disposition: .committed)
+            refreshWorldFieldContext()
+            return .committedNow(committed.value, token)
+        case .recoveredDurable(let persisted):
+            return .recoveredDurable(persisted)
+        case .alreadyCommitted(let persisted):
+            return .alreadyCommitted(persisted)
+        case .refused(let refusal):
+            if let sourceRefusal { return .refused(.source(sourceRefusal)) }
+            if let routeRefusal { return .refused(.route(routeRefusal)) }
+            return .refused(.persistence(refusal))
+        }
     }
 
     @discardableResult

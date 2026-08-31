@@ -338,6 +338,46 @@ final class SaveSlotTests: XCTestCase {
     }
 
     @MainActor
+    func testWorldFieldItemSourceRouteRefusalPreservesRealSlotEnvelope() async throws {
+        let root = directory(); defer { try? FileManager.default.removeItem(at: root) }
+        let slots = SaveSlotFileIO(directory: root)
+        let point = GridPoint(x: 0, y: 0)
+        var state = GameState.newGame()
+        var run = WorldRun(runIndex: 711, book: .init(written: [], essencePaid: 0),
+                           mapSeed: 711_001, rng: .init(seed: 711_001),
+                           map: .init(width: 1, height: 1,
+                                      tiles: [Tile(isRevealed: true)], entry: point),
+                           playerPosition: point)
+        let source = ItemStack(id: .init(rawValue: 711_002), catalogID: "salve_lesser")
+        XCTAssertTrue(run.satchelItems.add(source))
+        state.worlds.activeRun = run
+        let created = try await slots.create(name: "Field source refusal", state: state)
+        _ = try await slots.acquireWriterLease(for: created.metadata.id)
+        let store = GameStore(io: try await slots.payloadIOForLeasedSlot())
+        let quote = try store.worldFieldItemSourceEvaluation(source).get()
+        let url = try await slots.exportURL(for: created.metadata.id)
+        let envelope = try Data(contentsOf: url)
+        let before = store.state, diagnostics = store.diagnostics
+
+        let result = store.commitWorldFieldItemSource(
+            quote,
+            attempt: .init(id: UUID(), stagedAt: Date(timeIntervalSince1970: 711)),
+            label: "field source route refusal") { _, _
+                -> Result<WorldFieldItemRouteCandidateV1<Bool>, WorldFieldItemSourceRefusalV1> in
+                .failure(.sourceMissing)
+            }
+        guard case .refused(.route(.sourceMissing)) = result else {
+            return XCTFail("route authority must remain exact")
+        }
+        XCTAssertEqual(store.state, before)
+        XCTAssertEqual(try Data(contentsOf: url), envelope)
+        XCTAssertEqual(store.diagnostics.writeCount, diagnostics.writeCount)
+        XCTAssertEqual(store.diagnostics.savedMutationCount, diagnostics.savedMutationCount)
+        XCTAssertFalse(store.diagnostics.hasPendingWrite)
+        XCTAssertNil(store.currentWorldFieldEventBatch)
+    }
+
+    @MainActor
     func testZeroProgressAutomaticTravelPreservesRealSlotEnvelope() async throws {
         let root = directory(); defer { try? FileManager.default.removeItem(at: root) }
         let slots = SaveSlotFileIO(directory: root)

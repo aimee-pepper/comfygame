@@ -7403,6 +7403,263 @@ final class WorldTests: XCTestCase {
     }
 
     @MainActor
+    func testWorldFieldItemSourceReceiptRejectsDriftAndToleratesSatchelReorder() throws {
+        let store = GameStore(io: .temporary(name: "field-item-source-\(UUID().uuidString)"))
+        let fixture = fieldItemSourceFixture(seed: 88_001)
+        store.mutate("stage field-item source") { $0 = fixture.state }
+        let source = try store.worldFieldItemSourceEvaluation(fixture.source).get()
+        XCTAssertEqual(try store.worldFieldItemSourceEvaluation(fixture.source).get(), source,
+                       "the presentation-safe header must be deterministic")
+        XCTAssertEqual(try XCTUnwrap(store.beginWorldFieldAttempt(.useItem)).attemptID, 1,
+                       "display-safe source evaluation must not allocate a feedback attempt")
+
+        store.mutate("reorder satchel fixture") { state in
+            state.worlds.activeRun?.satchelItems.stacks.swapAt(0, 1)
+        }
+        XCTAssertNoThrow(try WorldFieldItemSourceRulesV1.revalidate(source, in: store.state).get())
+
+        store.mutate("change source snapshot") {
+            guard let index = $0.worlds.activeRun?.satchelItems.stacks
+                .firstIndex(where: { $0.id == fixture.source.id }) else { return }
+            $0.worlds.activeRun?.satchelItems.stacks[index].count = 2
+        }
+        XCTAssertEqual(WorldFieldItemSourceRulesV1.revalidate(source, in: store.state),
+                       .failure(.staleSource))
+
+        let fresh = try store.worldFieldItemSourceEvaluation(
+            try XCTUnwrap(store.activeRun?.satchelItems.stacks.first { $0.id == fixture.source.id })).get()
+        store.mutate("advance field-item rng fixture") { _ = $0.worlds.activeRun?.rng.next() }
+        XCTAssertEqual(WorldFieldItemSourceRulesV1.revalidate(fresh, in: store.state),
+                       .failure(.staleRNG))
+
+        let duplicateFixture = fieldItemSourceFixture(seed: 88_002)
+        let duplicateStore = GameStore(io: .temporary(name: "field-item-duplicate-\(UUID().uuidString)"))
+        duplicateStore.mutate("stage duplicate field-item source") { $0 = duplicateFixture.state }
+        var duplicate = duplicateFixture.state
+        duplicate.worlds.activeRun?.satchelItems.stacks.append(duplicateFixture.source)
+        XCTAssertEqual(WorldFieldItemSourceRulesV1.evaluate(
+            sourceStack: duplicateFixture.source, in: duplicate),
+            .failure(.duplicateSource))
+
+        var equippedCollision = duplicateFixture.state
+        equippedCollision.base.binderEquipped[.weapon] = EquippedPiece(ItemStack(
+            id: duplicateFixture.source.id, catalogID: "blade_keen"))
+        XCTAssertEqual(WorldFieldItemSourceRulesV1.evaluate(
+            sourceStack: duplicateFixture.source, in: equippedCollision),
+            .failure(.duplicateSource),
+            "the shared identity census must include equipped stable gear IDs")
+
+        func assertCollision(_ name: String,
+                             _ change: (inout GameState, ItemStack) -> Void) {
+            var state = duplicateFixture.state
+            change(&state, duplicateFixture.source)
+            XCTAssertEqual(WorldFieldItemSourceRulesV1.evaluate(
+                sourceStack: duplicateFixture.source, in: state), .failure(.duplicateSource), name)
+        }
+        assertCollision("Storehouse") { $0.base.inventory.stacks.append($1) }
+        assertCollision("Waiting") { $0.base.spillover.append($1) }
+        assertCollision("Essence") { $0.base.essenceCrystals = $1 }
+        assertCollision("merchant") {
+            $0.base.tradingPost.stock = [.init(id: 1, kind: .item($1.catalogID),
+                                                remainingQuantity: 1, unitPrice: 1,
+                                                frozenUnits: [$1])]
+        }
+        assertCollision("active offer") { $0.worlds.activeRun?.offeredItems = [$1] }
+        assertCollision("anchored satchel") { state, source in
+            guard var anchored = state.worlds.activeRun else { return }
+            anchored.runIndex += 1; anchored.mapSeed += 1
+            anchored.satchelItems.stacks.append(source)
+            state.worlds.anchoredRealms = [.init(runIndex: anchored.runIndex, name: "collision",
+                                                  route: .bornAnchored, world: anchored)]
+        }
+        assertCollision("anchored offer") { state, source in
+            guard var anchored = state.worlds.activeRun else { return }
+            anchored.runIndex += 2; anchored.mapSeed += 2; anchored.offeredItems = [source]
+            state.worlds.anchoredRealms = [.init(runIndex: anchored.runIndex, name: "offer collision",
+                                                  route: .bornAnchored, world: anchored)]
+        }
+        assertCollision("map item") { state, source in
+            state.worlds.activeRun?.map.tiles[0].content = .item(source)
+        }
+
+        var moved = duplicateFixture.state
+        moved.worlds.activeRun?.satchelItems.stacks.removeAll { $0.id == duplicateFixture.source.id }
+        moved.base.inventory.stacks.append(duplicateFixture.source)
+        XCTAssertEqual(WorldFieldItemSourceRulesV1.evaluate(
+            sourceStack: duplicateFixture.source, in: moved), .failure(.wrongCustody))
+
+        var zero = duplicateFixture.state
+        zero.worlds.activeRun?.satchelItems.stacks[0].id = .init(rawValue: 0)
+        var zeroSource = duplicateFixture.source; zeroSource.id = .init(rawValue: 0)
+        XCTAssertEqual(WorldFieldItemSourceRulesV1.evaluate(sourceStack: zeroSource, in: zero),
+                       .failure(.wrongCustody))
+        var empty = duplicateFixture.state
+        empty.worlds.activeRun?.satchelItems.stacks[0].count = 0
+        var emptySource = duplicateFixture.source; emptySource.count = 0
+        XCTAssertEqual(WorldFieldItemSourceRulesV1.evaluate(sourceStack: emptySource, in: empty),
+                       .failure(.wrongCustody))
+
+        var mismatchedGear = duplicateFixture.state
+        var gear = ItemStack(id: .init(rawValue: 88_099), catalogID: "blade_keen")
+        gear.gearProfile?.stableInstanceID = duplicateFixture.source.id
+        mismatchedGear.base.inventory.stacks.append(gear)
+        XCTAssertEqual(WorldFieldItemSourceRulesV1.evaluate(
+            sourceStack: duplicateFixture.source, in: mismatchedGear), .failure(.duplicateSource),
+            "the profile identity, not a mismatched containing stack ID, owns gear allocation")
+        var mismatchedGearStackID = duplicateFixture.state
+        var secondGear = ItemStack(id: duplicateFixture.source.id, catalogID: "blade_keen")
+        secondGear.gearProfile?.stableInstanceID = .init(rawValue: 88_100)
+        mismatchedGearStackID.base.inventory.stacks.append(secondGear)
+        XCTAssertEqual(WorldFieldItemSourceRulesV1.evaluate(
+            sourceStack: duplicateFixture.source, in: mismatchedGearStackID), .failure(.duplicateSource),
+            "the containing ItemStack identity remains live when malformed gear differs")
+    }
+
+    func testWorldFieldItemSourceClosedContextAndRunRefusalsAreExact() throws {
+        let fixture = fieldItemSourceFixture(seed: 88_004)
+        let receipt = try WorldFieldItemSourceRulesV1.evaluate(sourceStack: fixture.source,
+                                                                in: fixture.state).get()
+        var noRun = fixture.state; noRun.worlds.activeRun = nil
+        XCTAssertEqual(WorldFieldItemSourceRulesV1.evaluate(sourceStack: fixture.source, in: noRun),
+                       .failure(.noActiveRun))
+
+        var encounter = fixture.state
+        encounter.worlds.activeRun?.activeEncounter = .init(id: .init(rawValue: 88_040), foes: [], order: [])
+        XCTAssertEqual(WorldFieldItemSourceRulesV1.evaluate(sourceStack: fixture.source, in: encounter),
+                       .failure(.encounterActive))
+
+        var changedRun = fixture.state; changedRun.worlds.activeRun?.runIndex += 1
+        XCTAssertEqual(WorldFieldItemSourceRulesV1.revalidate(receipt, in: changedRun), .failure(.staleRun))
+        var changedTurn = fixture.state; changedTurn.worlds.activeRun?.turnsTaken += 1
+        XCTAssertEqual(WorldFieldItemSourceRulesV1.revalidate(receipt, in: changedTurn), .failure(.staleTurn))
+        var changedPosition = fixture.state; changedPosition.worlds.activeRun?.playerPosition = .init(x: 1, y: 0)
+        XCTAssertEqual(WorldFieldItemSourceRulesV1.revalidate(receipt, in: changedPosition),
+                       .failure(.stalePosition))
+        var changedContext = fixture.state
+        changedContext.worlds.activeRun?.map.tiles[0].content = .hazard
+        XCTAssertEqual(WorldFieldItemSourceRulesV1.revalidate(receipt, in: changedContext),
+                       .failure(.staleContext))
+
+        var missing = fixture.state
+        missing.worlds.activeRun?.satchelItems.stacks.removeAll { $0.id == fixture.source.id }
+        XCTAssertEqual(WorldFieldItemSourceRulesV1.revalidate(receipt, in: missing),
+                       .failure(.sourceMissing))
+        func assertSnapshotDrift(_ change: (inout ItemStack) -> Void) {
+            var state = fixture.state
+            change(&state.worlds.activeRun!.satchelItems.stacks[0])
+            XCTAssertEqual(WorldFieldItemSourceRulesV1.revalidate(receipt, in: state),
+                           .failure(.staleSource))
+        }
+        assertSnapshotDrift { $0.catalogID = "lure" }
+        assertSnapshotDrift { $0.identified = false }
+        assertSnapshotDrift { $0.protectedReturnCount = 1 }
+        assertSnapshotDrift {
+            $0.gearProfile = ItemStack(id: $0.id, catalogID: "blade_keen").gearProfile
+        }
+        assertSnapshotDrift { $0.count = 2 }
+    }
+
+    @MainActor
+    func testWorldFieldItemSourceDurableAdapterPublishesOnlyCommittedNowOnce() throws {
+        let io = SaveFileIO.temporary(name: "field-item-source-commit-\(UUID().uuidString)")
+        defer { io.deleteEverything() }
+        let store = GameStore(io: io)
+        let fixture = fieldItemSourceFixture(seed: 88_003)
+        store.mutate("stage durable field item", flush: true) { $0 = fixture.state }
+        let receipt = try store.worldFieldItemSourceEvaluation(fixture.source).get()
+        let durableAttempt = WorldFieldItemSourceCommitAttemptV1(
+            id: UUID(), stagedAt: Date(timeIntervalSince1970: 88_003))
+        var routeCalls = 0
+        let route: (inout GameState, WorldFieldItemSourceReceiptV1)
+            -> Result<WorldFieldItemRouteCandidateV1<String>, WorldFieldItemSourceRefusalV1> = {
+                candidate, source in
+                routeCalls += 1
+                guard var run = candidate.worlds.activeRun,
+                      let index = run.satchelItems.stacks.firstIndex(where: { $0.id == source.sourceStack.id })
+                else { return .failure(.sourceMissing) }
+                _ = run.satchelItems.stacks[index].removing(1)
+                run.satchelItems.stacks.removeAll { $0.isEmpty }
+                candidate.worlds.activeRun = run
+                var events: [WorldRules.Event] = [.usedItem("Fixture", on: .binder)]
+                events.append(contentsOf: WorldRules.advanceTurn(in: &candidate))
+                return .success(.init(value: "done", events: events))
+            }
+
+        let committed = store.commitWorldFieldItemSource(receipt, attempt: durableAttempt,
+                                                          label: "field item fixture",
+                                                          route: route)
+        guard case .committedNow(let value, let token) = committed else {
+            return XCTFail("expected committed durable field-item route")
+        }
+        XCTAssertEqual(value, "done"); _ = token
+        XCTAssertEqual(routeCalls, 1)
+        let batchID = try XCTUnwrap(store.currentWorldFieldEventBatch?.batchID)
+        let durableState = store.state
+        let durableBytes = try Data(contentsOf: io.saveURL)
+
+        let replay = store.commitWorldFieldItemSource(receipt, attempt: durableAttempt,
+                                                       label: "field item fixture",
+                                                       route: route)
+        guard case .alreadyCommitted = replay else { return XCTFail("expected inert replay") }
+        XCTAssertEqual(routeCalls, 1)
+        XCTAssertEqual(store.state, durableState)
+        XCTAssertEqual(try Data(contentsOf: io.saveURL), durableBytes)
+        XCTAssertEqual(store.currentWorldFieldEventBatch?.batchID, batchID)
+    }
+
+    @MainActor
+    func testWorldFieldItemSourceCommitTimeRefusalIsFullyInert() throws {
+        let io = SaveFileIO.temporary(name: "field-item-source-stale-\(UUID().uuidString)")
+        defer { io.deleteEverything() }
+        let store = GameStore(io: io)
+        let fixture = fieldItemSourceFixture(seed: 88_005)
+        store.mutate("stage stale field item", flush: true) { $0 = fixture.state }
+        let receipt = try store.worldFieldItemSourceEvaluation(fixture.source).get()
+        store.mutate("replace quoted source") { state in
+            state.worlds.activeRun?.satchelItems.stacks[0].count = 2
+        }
+        let beforeState = store.state
+        let beforeBytes = try SaveCodec.encode(beforeState)
+        let beforeDiagnostics = store.diagnostics
+        let beforeContext = store.worldFieldContext
+        var routeCalls = 0
+        let result = store.commitWorldFieldItemSource(
+            receipt,
+            attempt: .init(id: UUID(), stagedAt: Date(timeIntervalSince1970: 88_005)),
+            label: "stale field source") { _, _
+                -> Result<WorldFieldItemRouteCandidateV1<Bool>, WorldFieldItemSourceRefusalV1> in
+                routeCalls += 1
+                return .success(.init(value: true, events: []))
+            }
+        guard case .refused(.source(.staleSource)) = result else {
+            return XCTFail("expected exact candidate source refusal")
+        }
+        XCTAssertEqual(routeCalls, 0)
+        XCTAssertEqual(store.state, beforeState)
+        XCTAssertEqual(try SaveCodec.encode(store.state), beforeBytes)
+        XCTAssertEqual(store.diagnostics.writeCount, beforeDiagnostics.writeCount)
+        XCTAssertEqual(store.diagnostics.savedMutationCount, beforeDiagnostics.savedMutationCount)
+        XCTAssertEqual(store.diagnostics.hasPendingWrite, beforeDiagnostics.hasPendingWrite)
+        XCTAssertEqual(store.worldFieldContext, beforeContext)
+        XCTAssertNil(store.currentWorldFieldEventBatch)
+    }
+
+    private func fieldItemSourceFixture(seed: UInt64) -> (state: GameState, source: ItemStack) {
+        let point = GridPoint(x: 0, y: 0)
+        var state = GameState.newGame()
+        var run = WorldRun(runIndex: Int(seed), book: .init(written: [], essencePaid: 0),
+                           mapSeed: seed, rng: .init(seed: seed),
+                           map: .init(width: 2, height: 1,
+                                      tiles: [Tile(isRevealed: true), Tile(isRevealed: true)], entry: point),
+                           playerPosition: point)
+        let source = ItemStack(id: .init(rawValue: seed &+ 1), catalogID: "salve_lesser")
+        let filler = ItemStack(id: .init(rawValue: seed &+ 2), catalogID: "lure")
+        XCTAssertTrue(run.satchelItems.add(source)); XCTAssertTrue(run.satchelItems.add(filler))
+        state.worlds.activeRun = run
+        return (state, source)
+    }
+
+    @MainActor
     private func minimapImage(run: WorldRun, scheme: ColorScheme, size: CGSize) -> UIImage {
         let controller = UIHostingController(rootView:
             MinimapView(run: run).environment(\.colorScheme, scheme)

@@ -3,6 +3,20 @@ import XCTest
 
 /// The interruptibility pillar, tested. Anything that breaks here breaks pillar 2.
 final class PersistenceTests: XCTestCase {
+    private func fieldItemSourceState() -> (state: GameState, source: ItemStack) {
+        let point = GridPoint(x: 0, y: 0)
+        var state = GameState.newGame()
+        var run = WorldRun(runIndex: 891, book: .init(written: [], essencePaid: 0),
+                           mapSeed: 891_001, rng: .init(seed: 891_001),
+                           map: .init(width: 1, height: 1,
+                                      tiles: [Tile(isRevealed: true)], entry: point),
+                           playerPosition: point)
+        let source = ItemStack(id: .init(rawValue: 891_002), catalogID: "salve_lesser")
+        XCTAssertTrue(run.satchelItems.add(source))
+        state.worlds.activeRun = run
+        return (state, source)
+    }
+
     private func fieldSurveyAuthorityState() -> GameState {
         var state = GameState.newGame()
         let ids = Array(RealityState.surveySubjectIDsInOrder.prefix(2))
@@ -2171,6 +2185,61 @@ final class PersistenceTests: XCTestCase {
             }
         guard case .alreadyCommitted = retry else { return XCTFail("expected inert retry") }
         XCTAssertEqual(io.casWrites, writes); XCTAssertEqual(store.state, state)
+    }
+
+    @MainActor
+    func testWorldFieldItemSourcePersistsOnlyCommittedNowAndKeepsFailureRecoveryPresentationInert() throws {
+        func route(_ candidate: inout GameState, _ receipt: WorldFieldItemSourceReceiptV1)
+            -> Result<WorldFieldItemRouteCandidateV1<String>, WorldFieldItemSourceRefusalV1> {
+            guard var run = candidate.worlds.activeRun,
+                  let index = run.satchelItems.stacks.firstIndex(where: { $0.id == receipt.sourceStack.id })
+            else { return .failure(.sourceMissing) }
+            _ = run.satchelItems.stacks[index].removing(1)
+            run.satchelItems.stacks.removeAll { $0.isEmpty }
+            candidate.worlds.activeRun = run
+            let events = WorldRules.advanceTurn(in: &candidate)
+            return .success(.init(value: "committed", events: events))
+        }
+
+        let fixture = fieldItemSourceState()
+        let failingIO = try PersistedCASProbeIO(state: fixture.state, mode: .failBeforeWrite)
+        let failingStore = GameStore(io: failingIO)
+        let failingReceipt = try failingStore.worldFieldItemSourceEvaluation(fixture.source).get()
+        let failingAttempt = WorldFieldItemSourceCommitAttemptV1(
+            id: UUID(), stagedAt: Date(timeIntervalSince1970: 891))
+        let failingState = failingStore.state
+        let failingDiagnostics = failingStore.diagnostics
+        let failingBytes = failingIO.durableBytes
+        let failed = failingStore.commitWorldFieldItemSource(
+            failingReceipt, attempt: failingAttempt, label: "field source persistence failure", route: route)
+        guard case .refused(.persistence(.persistence(.writeFailed))) = failed else {
+            return XCTFail("expected exact persistence refusal")
+        }
+        XCTAssertEqual(failingStore.state, failingState)
+        XCTAssertEqual(failingStore.diagnostics.writeCount, failingDiagnostics.writeCount)
+        XCTAssertEqual(failingStore.diagnostics.savedMutationCount, failingDiagnostics.savedMutationCount)
+        XCTAssertFalse(failingStore.diagnostics.hasPendingWrite)
+        XCTAssertEqual(failingIO.durableBytes, failingBytes)
+        XCTAssertNil(failingStore.currentWorldFieldEventBatch)
+
+        let recoveredIO = try PersistedCASProbeIO(state: fixture.state, mode: .recoverAfterWrite)
+        let recoveredStore = GameStore(io: recoveredIO)
+        let recoveredReceipt = try recoveredStore.worldFieldItemSourceEvaluation(fixture.source).get()
+        let recoveredAttempt = WorldFieldItemSourceCommitAttemptV1(
+            id: UUID(), stagedAt: Date(timeIntervalSince1970: 892))
+        let recovered = recoveredStore.commitWorldFieldItemSource(
+            recoveredReceipt, attempt: recoveredAttempt, label: "field source recovered write", route: route)
+        guard case .recoveredDurable = recovered else {
+            return XCTFail("expected durable recovery without a presentation token")
+        }
+        XCTAssertNil(recoveredStore.currentWorldFieldEventBatch)
+        XCTAssertEqual(try SaveCodec.decode(recoveredIO.durableBytes), recoveredStore.state)
+        let bytes = recoveredIO.durableBytes
+        let retry = recoveredStore.commitWorldFieldItemSource(
+            recoveredReceipt, attempt: recoveredAttempt, label: "field source recovered write", route: route)
+        guard case .alreadyCommitted = retry else { return XCTFail("expected inert replay") }
+        XCTAssertEqual(recoveredIO.durableBytes, bytes)
+        XCTAssertNil(recoveredStore.currentWorldFieldEventBatch)
     }
 
     func testRawCompareAndSwapBindsPrimaryAndPreservesBackupOnStaleAuthority() throws {
