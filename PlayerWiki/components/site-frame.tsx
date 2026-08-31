@@ -14,6 +14,7 @@ const systemLinks = [
   ['/bestiary', 'Bestiary records'],
   ['/systems/crafting', 'Crafting basics'],
   ['/systems/economy-exchange', 'Economy & exchange'],
+  ['/systems/knowledge-records', 'Knowledge & records'],
 ];
 
 const prepareLinks = [

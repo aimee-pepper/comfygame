@@ -43,7 +43,7 @@ export default function SystemsHub() {
       summary: 'Open the concise tables when you need the exact current item, resource, curio, or term rather than a broader guide.',
       visualURL: resource?.assetURL ?? null,
       visualAlt: resource ? `${resource.name} inventory icon` : 'Resource reference',
-      links: [['Resources', '/resources'], ['Equipment', '/equipment'], ['Curios and key items', '/curios'], ['Glossary', '/glossary']],
+      links: [['Knowledge and records', '/systems/knowledge-records'], ['Resources', '/resources'], ['Equipment', '/equipment'], ['Curios and key items', '/curios'], ['Glossary', '/glossary']],
     },
   ];
 

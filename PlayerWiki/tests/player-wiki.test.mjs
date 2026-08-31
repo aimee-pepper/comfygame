@@ -498,3 +498,22 @@ test('Economy guide keeps current listings, refinement, and recycling player-fac
   assert.match(systems, /\/systems\/economy-exchange/);
   assert.match(frame, /\/systems\/economy-exchange/);
 });
+
+test('Knowledge guide connects only recovered Library, people, Research, and Bestiary records', async () => {
+  await access(path.join(root, 'app/systems/knowledge-records/page.tsx'));
+  const knowledge = await read('app/systems/knowledge-records/page.tsx');
+  const systems = await read('app/systems/page.tsx');
+  const frame = await read('components/site-frame.tsx');
+  assert.match(knowledge, /Current Library collections/);
+  assert.match(knowledge, /Diaries/);
+  assert.match(knowledge, /People/);
+  assert.match(knowledge, /Dictionary/);
+  assert.match(knowledge, /Notes and History/);
+  assert.match(knowledge, /Research and records/);
+  assert.match(knowledge, /does not reveal unseen creatures or traits/);
+  assert.match(knowledge, /\/services\/library/);
+  assert.match(knowledge, /\/people/);
+  assert.match(knowledge, /\/bestiary/);
+  assert.match(systems, /\/systems\/knowledge-records/);
+  assert.match(frame, /\/systems\/knowledge-records/);
+});
