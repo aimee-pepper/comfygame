@@ -1,5 +1,6 @@
 import SwiftUI
 import UIKit
+import CryptoKit
 
 #if DEBUG
 struct WorldScreenLayoutReceipt: Equatable {
@@ -382,6 +383,7 @@ enum WorldControlOutcome: Equatable, Sendable {
     case travelEnded(finalPosition: GridPoint, turnsSpent: Int, reachedDestination: Bool)
     case openedFieldKit
     case lookArmed(Bool)
+    case pendingConfirmation(String)
     case expeditionEnded
 }
 
@@ -406,19 +408,54 @@ enum WorldControlExecution: Equatable, Sendable {
     case refused(WorldControlRefusal)
 }
 
-struct WorldControlSnapshot: Equatable, Sendable {
-    let mutationCount: Int
-    let runIndex: Int?
-    let mapSeed: UInt64?
-    let turn: Int?
-    let position: GridPoint?
-
-    static func make(from state: GameState) -> Self {
-        let run = state.worlds.activeRun
-        return Self(mutationCount: state.meta.mutationCount, runIndex: run?.runIndex,
-                    mapSeed: run?.mapSeed, turn: run?.turnsTaken,
-                    position: run?.playerPosition)
+/// The exact rendered world-control authority retained from touch down through release.
+/// It is transient: no attempt or quote is part of campaign persistence.
+struct WorldControlQuoteV1: Equatable, Sendable {
+    enum Payload: Equatable, Sendable {
+        case step(destination: GridPoint, tile: Tile)
+        case travel(destination: GridPoint, tile: Tile)
+        case inspect(point: GridPoint, tile: Tile)
+        case setLook(expected: Bool, newValue: Bool)
+        case useTile(WorldUseTileQuoteV1)
+        case fieldKit
     }
+
+    let version = 1
+    let runID: String
+    let mutationCount: Int
+    let turn: Int
+    let origin: GridPoint
+    let contextInputStateHash: String
+    let payload: Payload
+
+    var fingerprint: String {
+        let bytes = Data(String(reflecting: self).utf8)
+        return SHA256.hash(data: bytes).map { String(format: "%02x", $0) }.joined()
+    }
+    var controlID: String { "world-control-v1:\(fingerprint)" }
+
+    static func make(payload: Payload, state: GameState) -> Self? {
+        guard let run = state.worlds.activeRun,
+              let context = WorldFieldContextReceiptV1.make(from: state) else { return nil }
+        return .init(runID: "\(run.runIndex):\(run.mapSeed)",
+                     mutationCount: state.meta.mutationCount, turn: run.turnsTaken,
+                     origin: run.playerPosition,
+                     contextInputStateHash: context.inputStateHash, payload: payload)
+    }
+}
+
+/// One frozen downstream route. The Use Tile face never re-runs its precedence chain at release.
+enum WorldUseTileQuoteV1: Equatable, Sendable {
+    case loosePage(WildWorldPageFieldRules.Quote)
+    case harvest(ResourceExtractionRules.ResourceExtractionQuoteV1)
+    case extractionRefusal(ResourceExtractionRules.ResourceExtractionRefusal, copy: String)
+    case search(WorldRules.SiteSearchQuoteV1)
+    case portal(tile: Tile)
+    case malformedExit(tile: Tile)
+    case lockedCache(tile: Tile, key: ItemStack)
+    case naturalAnchor(site: PlacedSite, cost: Int)
+    case anchorFrame(tile: Tile, frame: ItemStack)
+    case survey(WorldRules.FieldSurveyQuoteV1)
 }
 
 @MainActor enum WorldControlRulesExecution {
@@ -456,129 +493,17 @@ struct WorldControlSnapshot: Equatable, Sendable {
     }
 }
 
-@MainActor final class WorldControlAttemptCoordinator: ObservableObject {
-    struct Attempt: Equatable, Sendable {
-        let id: UInt64
-        let action: WorldControlAction
-        let snapshot: WorldControlSnapshot
-    }
-    enum Lifecycle: Equatable, Sendable {
-        case available
-        case touchDown(WorldControlAction)
-        case accepted(Attempt)
-        case inFlight(Attempt)
-        case completed(UInt64, WorldControlOutcome)
-        case refused(WorldControlAction, UInt64?, WorldControlRefusal)
-        case disabled(WorldControlAction, String)
-    }
-    enum Admission: Equatable, Sendable { case accepted(Attempt), refused(WorldControlRefusal) }
-    struct RefusalReceipt: Equatable, Sendable {
-        let action: WorldControlAction
-        let attemptID: UInt64?
-        let reason: WorldControlRefusal
-        let activeOwnerID: UInt64?
-    }
-
-    @Published private(set) var lifecycle: Lifecycle = .available
-    @Published private(set) var latestRefusal: RefusalReceipt?
-    private var active: Attempt?
-    private var nextID: UInt64 = 1
-
-    func touchDown(_ action: WorldControlAction, disabledReason: String? = nil) {
-        guard active == nil else { return }
-        if let disabledReason { lifecycle = .disabled(action, disabledReason); return }
-        lifecycle = .touchDown(action)
-    }
-
-    func cancelTouch(_ action: WorldControlAction) {
-        guard active == nil, lifecycle == .touchDown(action) else { return }
-        lifecycle = .available
-    }
-
-    func accept(_ action: WorldControlAction, snapshot: WorldControlSnapshot,
-                disabledReason: String? = nil) -> Admission {
-        guard active == nil else {
-            let refusedID = nextID
-            nextID &+= 1
-            latestRefusal = .init(action: action, attemptID: refusedID, reason: .busy,
-                                  activeOwnerID: active?.id)
-            return .refused(.busy)
-        }
-        if let disabledReason {
-            lifecycle = .disabled(action, disabledReason)
-            latestRefusal = .init(action: action, attemptID: nil,
-                                  reason: .disabled(disabledReason), activeOwnerID: nil)
-            return .refused(.disabled(disabledReason))
-        }
-        let attempt = Attempt(id: nextID, action: action, snapshot: snapshot)
-        nextID &+= 1
-        active = attempt
-        latestRefusal = nil
-        lifecycle = .accepted(attempt)
-        return .accepted(attempt)
-    }
-
-    @discardableResult
-    func begin(_ attempt: Attempt) -> Bool {
-        guard active == attempt else { return false }
-        lifecycle = .inFlight(attempt)
-        return true
-    }
-
-    func resolve(_ attempt: Attempt, execution: WorldControlExecution) {
-        guard active == attempt else { return }
-        active = nil
-        if latestRefusal?.reason == .busy, latestRefusal?.activeOwnerID == attempt.id {
-            latestRefusal = nil
-        }
-        switch execution {
-        case .completed(let outcome): lifecycle = .completed(attempt.id, outcome)
-        case .refused(let reason):
-            lifecycle = .refused(attempt.action, attempt.id, reason)
-            latestRefusal = .init(action: attempt.action, attemptID: attempt.id, reason: reason,
-                                  activeOwnerID: nil)
-        }
-    }
-
-    @discardableResult
-    func execute(_ attempt: Attempt, current: WorldControlSnapshot,
-                 operation: () -> WorldControlExecution) -> Bool {
-        guard active == attempt else { return false }
-        guard current == attempt.snapshot else {
-            active = nil
-            lifecycle = .refused(attempt.action, attempt.id, .stale)
-            latestRefusal = .init(action: attempt.action, attemptID: attempt.id, reason: .stale,
-                                  activeOwnerID: nil)
-            return false
-        }
-        resolve(attempt, execution: operation())
-        return true
-    }
-
-    func statusCopy(for action: WorldControlAction) -> String? {
-        switch lifecycle {
-        case .inFlight(let attempt) where attempt.action == action: "Working…"
-        case .refused(let refusedAction, _, let reason) where refusedAction == action:
-            reason.playerCopy
-        case .disabled(let disabledAction, let reason) where disabledAction == action: reason
-        default:
-            if latestRefusal?.action == action { latestRefusal?.reason.playerCopy } else { nil }
-        }
-    }
-}
-
 struct WorldWholeFaceControl<Label: View>: View {
-    @ObservedObject var coordinator: WorldControlAttemptCoordinator
+    @ObservedObject var admission: PhoneControlAdmissionV1
     let action: WorldControlAction
-    let snapshot: () -> WorldControlSnapshot
+    let quote: () -> WorldControlQuoteV1?
     let disabledReason: String?
-    let operation: () -> WorldControlExecution
+    let operation: (WorldControlQuoteV1) -> WorldControlExecution
     @ViewBuilder let label: () -> Label
+    @State private var retainedQuote: WorldControlQuoteV1?
 
     var body: some View {
-        let isPressed = if case .touchDown(let pressedAction) = coordinator.lifecycle {
-            pressedAction == action
-        } else { false }
+        let isPressed = if case .touchDown = admission.state { retainedQuote != nil } else { false }
         label().frame(maxWidth: .infinity)
                 .contentShape(Rectangle())
                 .brightness(isPressed ? -0.18 : 0)
@@ -590,7 +515,7 @@ struct WorldWholeFaceControl<Label: View>: View {
                     }
                 }
                 .overlay(alignment: .bottom) {
-                    if disabledReason == nil, let status = coordinator.statusCopy(for: action) {
+                    if disabledReason == nil, let status = statusCopy {
                         Text(status).font(.custom("Tiny5", size: 10))
                             .foregroundStyle(PixelUITheme.text)
                             .padding(.horizontal, 4).padding(.vertical, 2)
@@ -602,20 +527,38 @@ struct WorldWholeFaceControl<Label: View>: View {
                 .overlay {
                     WorldControlHitOwner(action: action, disabledReason: disabledReason,
                         onTouchDown: {
-                            coordinator.touchDown(action, disabledReason: disabledReason)
+                            retainedQuote = quote()
+                            admission.touchDown(controlID: retainedQuote?.controlID,
+                                                disabledReason: disabledReason)
                         }, onCancel: {
-                            coordinator.cancelTouch(action)
+                            retainedQuote = nil
+                            admission.reset()
                         }, onActivate: {
-                            guard case .accepted(let attempt) = coordinator.accept(
-                                action, snapshot: snapshot(), disabledReason: disabledReason)
-                            else { return }
-                            Task { @MainActor in
-                                guard coordinator.begin(attempt) else { return }
-                                _ = coordinator.execute(
-                                    attempt, current: snapshot(), operation: operation)
+                            guard let retainedQuote else { return }
+                            let current = quote()
+                            _ = admission.release(controlID: current?.controlID) {
+                                guard current == retainedQuote else { return .failure(.stale) }
+                                switch operation(retainedQuote) {
+                                case .completed(.pendingConfirmation): return .success(.noChange)
+                                case .completed: return .success(.committed)
+                                case .refused(.busy): return .failure(.busy)
+                                case .refused(.disabled(let copy)):
+                                    return .failure(.disabled(copy))
+                                case .refused: return .failure(.stale)
+                                }
                             }
                         })
                 }
+    }
+
+    private var statusCopy: String? {
+        switch admission.state {
+        case .inFlight: "Working…"
+        case .refused(_, .busy): WorldControlRefusal.busy.playerCopy
+        case .refused(_, .stale): WorldControlRefusal.stale.playerCopy
+        case .refused(_, .disabled(let copy)), .disabled(let copy): copy
+        default: nil
+        }
     }
 }
 
@@ -1138,7 +1081,7 @@ struct WorldView: View {
     @State private var pendingWorldPageSwap: WildWorldPageFieldRules.Quote?
     @State private var tutorialLesson: TutorialLessonID?
     @State private var dismissedTutorials: Set<TutorialLessonID> = []
-    @StateObject private var controlCoordinator = WorldControlAttemptCoordinator()
+    @StateObject private var controlAdmission = PhoneControlAdmissionV1()
 #if DEBUG
     @State private var isShowingDiagnostics = false
 #endif
@@ -1345,17 +1288,31 @@ struct WorldView: View {
 
     /// Tap an adjacent tile to step; tap anywhere else to walk there turn by turn.
     private func tapped(_ point: GridPoint, in run: WorldRun) {
-        isLookArmed = false
+        if isLookArmed, run.map.contains(point),
+           let quote = WorldControlQuoteV1.make(
+            payload: .inspect(point: point, tile: run.map[point]), state: store.state) {
+            controlAdmission.touchDown(controlID: quote.controlID)
+            _ = controlAdmission.release(controlID: quote.controlID) {
+                switch executeControl(quote) {
+                case .completed: return .success(.noChange)
+                case .refused(.disabled(let copy)): return .failure(.disabled(copy))
+                case .refused(.busy): return .failure(.busy)
+                case .refused: return .failure(.stale)
+                }
+            }
+            return
+        }
         var routedAction: WorldControlAction?
         WorldMapPlanningAction.route(from: run.playerPosition, to: point) { routedAction = $0 }
         guard let planningAction = routedAction else { return }
-        if case .move = planningAction {
-            performControl(planningAction) {
-                WorldControlRulesExecution.step(store: store, to: point)
-            }
-        } else {
-            performControl(planningAction) {
-                WorldControlRulesExecution.travel(store: store, from: run.playerPosition, to: point)
+        guard let quote = movementQuote(for: planningAction, destination: point) else { return }
+        controlAdmission.touchDown(controlID: quote.controlID)
+        _ = controlAdmission.release(controlID: quote.controlID) {
+            switch executeControl(quote) {
+            case .completed: return .success(.committed)
+            case .refused(.disabled(let copy)): return .failure(.disabled(copy))
+            case .refused(.busy): return .failure(.busy)
+            case .refused: return .failure(.stale)
             }
         }
     }
@@ -1458,9 +1415,9 @@ struct WorldView: View {
                 .frame(maxWidth: .infinity)
             }
             WorldWholeFaceControl(
-                coordinator: controlCoordinator, action: .fieldKit,
-                snapshot: controlSnapshot, disabledReason: nil,
-                operation: {
+                admission: controlAdmission, action: .fieldKit,
+                quote: { WorldControlQuoteV1.make(payload: .fieldKit, state: store.state) },
+                disabledReason: nil, operation: { _ in
                     store.clearWorldTravellerSpeechPresentation()
                     isShowingFieldKit = true
                     return .completed(.openedFieldKit)
@@ -1555,20 +1512,8 @@ struct WorldView: View {
 
     private func controls(_ run: WorldRun) -> some View {
         HStack(alignment: .center, spacing: WorldControlsLayout.navigationSpacing) {
-            DirectionPad(isLooking: isLookArmed, coordinator: controlCoordinator,
-                         snapshot: controlSnapshot) { direction in
-                let point = GridPoint(x: run.playerPosition.x + direction.dx,
-                                      y: run.playerPosition.y + direction.dy)
-                if isLookArmed {
-                    store.clearWorldTravellerSpeechPresentation()
-                    inspection = InspectionPresentation(value: WorldRules.inspect(
-                        point, in: run, base: store.state.base))
-                    isLookArmed = false
-                    return .completed(.inspected(point))
-                } else {
-                    return WorldControlRulesExecution.step(store: store, to: point)
-                }
-            }
+            DirectionPad(isLooking: isLookArmed, admission: controlAdmission,
+                         quote: directionQuote, execute: executeControl)
             .frame(maxWidth: .infinity)
 #if DEBUG
             .background(WorldRegionProbe(region: .directionPad))
@@ -1585,10 +1530,9 @@ struct WorldView: View {
 
                 WorldActionRow {
                     AnyView(WorldWholeFaceControl(
-                        coordinator: controlCoordinator, action: .useTile,
-                        snapshot: controlSnapshot,
+                        admission: controlAdmission, action: .useTile, quote: useTileControlQuote,
                         disabledReason: canInteract ? nil : useTileUnavailableReason,
-                        operation: performInteraction) {
+                        operation: executeControl) {
                         Text("Use Tile")
                             .font(.custom("Tiny5", size: 10))
                             .lineLimit(1).minimumScaleFactor(0.85)
@@ -1608,13 +1552,8 @@ struct WorldView: View {
                     )
                 } look: {
                     AnyView(WorldWholeFaceControl(
-                        coordinator: controlCoordinator, action: .armLook,
-                        snapshot: controlSnapshot, disabledReason: nil,
-                        operation: {
-                            store.clearWorldTravellerSpeechPresentation()
-                            isLookArmed.toggle()
-                            return .completed(.lookArmed(isLookArmed))
-                        }) {
+                        admission: controlAdmission, action: .armLook, quote: lookToggleQuote,
+                        disabledReason: nil, operation: executeControl) {
                         Text(isLookArmed ? "Cancel" : "Look")
                             .font(.custom("Tiny5", size: 10))
                             .lineLimit(1).minimumScaleFactor(0.85)
@@ -1652,19 +1591,109 @@ struct WorldView: View {
         }
     }
 
-    private func controlSnapshot() -> WorldControlSnapshot {
-        WorldControlSnapshot.make(from: store.state)
+    private func movementQuote(for action: WorldControlAction,
+                               destination: GridPoint) -> WorldControlQuoteV1? {
+        guard let run, run.map.contains(destination) else { return nil }
+        let payload: WorldControlQuoteV1.Payload
+        switch action {
+        case .move: payload = .step(destination: destination, tile: run.map[destination])
+        case .travel: payload = .travel(destination: destination, tile: run.map[destination])
+        default: return nil
+        }
+        return WorldControlQuoteV1.make(payload: payload, state: store.state)
     }
 
-    private func performControl(_ action: WorldControlAction,
-                                operation: @escaping () -> WorldControlExecution) {
-        guard case .accepted(let attempt) = controlCoordinator.accept(
-            action, snapshot: controlSnapshot()) else { return }
-        Task { @MainActor in
-            await Task.yield()
-            guard controlCoordinator.begin(attempt) else { return }
-            await Task.yield()
-            _ = controlCoordinator.execute(attempt, current: controlSnapshot(), operation: operation)
+    private func directionQuote(_ direction: Direction) -> WorldControlQuoteV1? {
+        guard let run else { return nil }
+        let point = GridPoint(x: run.playerPosition.x + direction.dx,
+                              y: run.playerPosition.y + direction.dy)
+        guard run.map.contains(point) else { return nil }
+        let payload: WorldControlQuoteV1.Payload = isLookArmed
+            ? .inspect(point: point, tile: run.map[point])
+            : .step(destination: point, tile: run.map[point])
+        return WorldControlQuoteV1.make(payload: payload, state: store.state)
+    }
+
+    private func lookToggleQuote() -> WorldControlQuoteV1? {
+        WorldControlQuoteV1.make(
+            payload: .setLook(expected: isLookArmed, newValue: !isLookArmed),
+            state: store.state)
+    }
+
+    private func useTileControlQuote() -> WorldControlQuoteV1? {
+        guard let downstream = useTileQuote() else { return nil }
+        return WorldControlQuoteV1.make(payload: .useTile(downstream), state: store.state)
+    }
+
+    private func useTileQuote() -> WorldUseTileQuoteV1? {
+        if let page = store.offeredWorldPageHere,
+           let quote = store.offeredWorldPageQuote(page.id) { return .loosePage(quote) }
+        switch store.resourceExtractionEvaluation {
+        case .available(let quote): return .harvest(quote)
+        case .refused(let refusal) where hasActionableExtractionRefusal:
+            let name = ResourceExtractionRules.selectedDisclosedNode(in: store.state)
+                .flatMap { ContentCatalog.shared.resource($0.1.resource)?.name }
+            return .extractionRefusal(refusal,
+                copy: ResourceExtractionRules.playerCopy(for: refusal, resourceName: name))
+        default: break
+        }
+        if case .available(let quote) = store.siteSearchEvaluation { return .search(quote) }
+        if store.canPortalHere, let tile = store.tileUnderPlayer { return .portal(tile: tile) }
+        if store.canLeaveMalformedOlderWorld, let tile = store.tileUnderPlayer {
+            return .malformedExit(tile: tile)
+        }
+        if store.isOnLockedCache, let key = store.carriedCacheKey,
+           let tile = store.tileUnderPlayer { return .lockedCache(tile: tile, key: key) }
+        if store.canUseNaturalAnchor, let site = store.naturalAnchorHere {
+            return .naturalAnchor(site: site, cost: store.naturalAnchorCost)
+        }
+        if store.canPlaceAnchorFrame, let frame = store.carriedAnchorFrame,
+           let tile = store.tileUnderPlayer { return .anchorFrame(tile: tile, frame: frame) }
+        if case .available(let quote) = store.fieldSurveyEvaluation { return .survey(quote) }
+        return nil
+    }
+
+    private func executeControl(_ quote: WorldControlQuoteV1) -> WorldControlExecution {
+        let current: WorldControlQuoteV1?
+        switch quote.payload {
+        case .step(let point, _): current = movementQuote(for: .move(dx: 0, dy: 0), destination: point)
+        case .travel(let point, _): current = movementQuote(for: .travel(point), destination: point)
+        case .inspect(let point, _):
+            guard let run, run.map.contains(point) else { return .refused(.stale) }
+            current = WorldControlQuoteV1.make(payload: .inspect(point: point, tile: run.map[point]),
+                                               state: store.state)
+        case .setLook(let expected, let newValue):
+            current = WorldControlQuoteV1.make(
+                payload: .setLook(expected: isLookArmed, newValue: !isLookArmed),
+                state: store.state)
+            guard expected == isLookArmed, newValue == !isLookArmed else { return .refused(.stale) }
+        case .useTile:
+            current = useTileControlQuote()
+        case .fieldKit:
+            current = WorldControlQuoteV1.make(payload: .fieldKit, state: store.state)
+        }
+        guard current == quote else { return .refused(.stale) }
+
+        switch quote.payload {
+        case .step(let destination, _):
+            return WorldControlRulesExecution.step(store: store, to: destination)
+        case .travel(let destination, _):
+            return WorldControlRulesExecution.travel(store: store, from: quote.origin,
+                                                      to: destination)
+        case .inspect(let point, _):
+            guard let run else { return .refused(.stale) }
+            inspection = InspectionPresentation(value: WorldRules.inspect(
+                point, in: run, base: store.state.base))
+            isLookArmed = false
+            return .completed(.inspected(point))
+        case .setLook(_, let newValue):
+            isLookArmed = newValue
+            return .completed(.lookArmed(newValue))
+        case .useTile(let downstream):
+            return performInteraction(downstream)
+        case .fieldKit:
+            isShowingFieldKit = true
+            return .completed(.openedFieldKit)
         }
     }
 
@@ -1720,57 +1749,62 @@ struct WorldView: View {
         return hint(for: run)
     }
 
-    private func performInteraction() -> WorldControlExecution {
-        store.clearWorldTravellerSpeechPresentation()
-        if let page = store.offeredWorldPageHere,
-           let quote = store.offeredWorldPageQuote(page.id) {
+    private func performInteraction(_ admitted: WorldUseTileQuoteV1) -> WorldControlExecution {
+        switch admitted {
+        case .loosePage(let quote):
             switch store.takeOfferedWorldPage(quote) {
             case .taken:
+                store.clearWorldTravellerSpeechPresentation()
+                completeInteraction()
                 return .completed(.usedTile("Took World Page"))
             case .satchelFull:
                 pendingWorldPageSwap = quote
-                return .completed(.usedTile("Choose a satchel slot"))
+                return .completed(.pendingConfirmation("Choose a satchel slot"))
             case .stale, .notHere, .duplicateIdentity:
                 fieldPageMessage = "That page is no longer available here."
                 return .refused(.stale)
             case .inspected, .alreadyInspected, .swapped:
                 return .refused(.rules("That page action is no longer current."))
             }
-        } else if store.canExtractResource || hasActionableExtractionRefusal {
-            let wasAvailable = store.canExtractResource
-            let refusalCopy: String? = {
-                guard case .refused(let refusal) = store.resourceExtractionEvaluation,
-                      let (_, node) = ResourceExtractionRules.selectedDisclosedNode(in: store.state)
-                else { return nil }
-                return ResourceExtractionRules.playerCopy(
-                    for: refusal,
-                    resourceName: ContentCatalog.shared.resource(node.resource)?.name)
-            }()
-            if wasAvailable { completeInteraction() }
-            store.harvest()
-            if wasAvailable { return .completed(.usedTile("Harvested")) }
-            return .refused(.rules(refusalCopy ?? useTileUnavailableReason))
-        } else if store.searchableHere != nil {
-            completeInteraction(); store.searchSite()
-            return .completed(.usedTile("Searched site"))
-        } else if store.canPortalHere {
+        case .harvest(let quote):
+            switch store.harvest(quote) {
+            case .committed:
+                completeInteraction()
+                return .completed(.usedTile("Harvested"))
+            case .refused(let refusal):
+                return .refused(.rules(ResourceExtractionRules.playerCopy(for: refusal)))
+            }
+        case .extractionRefusal(_, let copy):
+            return .refused(.rules(copy))
+        case .search(let quote):
+            switch store.searchSite(quote) {
+            case .committed:
+                completeInteraction()
+                return .completed(.usedTile("Searched site"))
+            case .refused(let refusal):
+                return .refused(.rules(WorldRules.siteSearchPlayerCopy(for: refusal)))
+            }
+        case .portal:
+            guard store.portalHome() == .committed else { return .refused(.stale) }
             store.completeTutorial(.worldReturn, fact: "first_expedition_outcome")
-            store.portalHome()
             return .completed(.usedTile("Returned Home"))
-        } else if store.canLeaveMalformedOlderWorld {
-            store.leaveMalformedOlderWorld()
+        case .malformedExit:
+            guard store.leaveMalformedOlderWorld() == .committed else { return .refused(.stale) }
             return .completed(.usedTile("Left older world"))
-        } else if store.isOnLockedCache, store.carriedCacheKey != nil {
-            completeInteraction(); store.openCacheHere()
+        case .lockedCache(_, let key):
+            guard case .committed = store.openCacheHere(expectedKey: key) else {
+                return .refused(.stale)
+            }
+            completeInteraction()
             return .completed(.usedTile("Opened cache"))
-        } else if store.canUseNaturalAnchor {
-            completeInteraction(); isConfirmingAtlasSeam = true
-            return .completed(.usedTile("Opened anchor confirmation"))
-        } else if store.canPlaceAnchorFrame {
-            completeInteraction(); isConfirmingAnchorFrame = true
-            return .completed(.usedTile("Opened frame confirmation"))
-        } else if store.canSurvey {
-            switch store.survey() {
+        case .naturalAnchor:
+            isConfirmingAtlasSeam = true
+            return .completed(.pendingConfirmation("Anchor realm"))
+        case .anchorFrame:
+            isConfirmingAnchorFrame = true
+            return .completed(.pendingConfirmation("Place Anchor Frame"))
+        case .survey(let quote):
+            switch store.survey(quote) {
             case .committed:
                 completeInteraction()
                 return .completed(.usedTile("Surveyed"))
@@ -1778,7 +1812,6 @@ struct WorldView: View {
                 return .refused(.disabled(WorldRules.fieldSurveyPlayerCopy(for: refusal)))
             }
         }
-        return .refused(.disabled(useTileUnavailableReason))
     }
 
     private func completeWorldPageSwap(
@@ -2989,9 +3022,9 @@ private enum Direction: CaseIterable {
 /// 14×14 grid of 27pt tiles can't be.
 private struct DirectionPad: View {
     var isLooking = false
-    @ObservedObject var coordinator: WorldControlAttemptCoordinator
-    let snapshot: () -> WorldControlSnapshot
-    let onStep: (Direction) -> WorldControlExecution
+    @ObservedObject var admission: PhoneControlAdmissionV1
+    let quote: (Direction) -> WorldControlQuoteV1?
+    let execute: (WorldControlQuoteV1) -> WorldControlExecution
 
     var body: some View {
         VStack(spacing: 4) {
@@ -3006,12 +3039,12 @@ private struct DirectionPad: View {
     }
 
     private func padButton(_ direction: Direction) -> some View {
-        let action: WorldControlAction = isLooking
-            ? .look(dx: direction.dx, dy: direction.dy)
-            : .move(dx: direction.dx, dy: direction.dy)
         return WorldWholeFaceControl(
-            coordinator: coordinator, action: action, snapshot: snapshot,
-            disabledReason: nil, operation: { onStep(direction) }) {
+            admission: admission,
+            action: isLooking ? .look(dx: direction.dx, dy: direction.dy)
+                              : .move(dx: direction.dx, dy: direction.dy),
+            quote: { quote(direction) },
+            disabledReason: nil, operation: execute) {
             Image(systemName: direction.icon)
                 .font(.headline)
                 .frame(width: 46, height: 46) // ≥44pt

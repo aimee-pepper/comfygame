@@ -1,5 +1,10 @@
 import Foundation
 
+enum WorldExitCommitResultV1: Equatable, Sendable {
+    case committed
+    case refused
+}
+
 enum WorldFieldItemUseRouteV1: Equatable, Sendable {
     case identifiedFieldUse
     case unidentifiedCurioTry
@@ -1002,6 +1007,27 @@ extension GameStore {
         finishTurn(events, attempt: attempt, disposition: .committed)
     }
 
+    /// Commits the exact extraction authority shown by Use Tile. Refusal publishes nothing.
+    @discardableResult
+    func harvest(_ admittedQuote: ResourceExtractionRules.ResourceExtractionQuoteV1)
+        -> ResourceExtractionRules.ResourceExtractionCommitResult {
+        guard let attempt = beginWorldFieldAttempt(.harvest) else {
+            return .refused(activeRun == nil ? .noActiveWorld : .encounterActive)
+        }
+        var result: ResourceExtractionRules.ResourceExtractionCommitResult = .refused(.stale)
+        var events: [WorldRules.Event] = []
+        let published = mutateIf("harvest", flush: true, scope: .expedition) { candidate in
+            let outcome = ResourceExtractionRules.commit(admittedQuote, in: &candidate)
+            result = outcome.result
+            guard case .committed = result else { return false }
+            events = outcome.events
+            return true
+        }
+        guard published else { return result }
+        finishTurn(events, attempt: attempt, disposition: .committed)
+        return result
+    }
+
     /// One turn of searching the site underfoot. Contents land on the turn it completes.
     @discardableResult
     func searchSite(_ admittedQuote: WorldRules.SiteSearchQuoteV1? = nil)
@@ -1108,23 +1134,27 @@ extension GameStore {
     }
 
     /// Leave through a portal, keeping the whole haul. The good ending.
-    func portalHome(reason: String = "You returned through a portal.") {
-        guard canPortalHere, activeRun?.activeEncounter == nil else { return }
-        returnHomeWithFullHaul(reason: reason, kind: .portal)
+    @discardableResult
+    func portalHome(reason: String = "You returned through a portal.") -> WorldExitCommitResultV1 {
+        guard canPortalHere, activeRun?.activeEncounter == nil else { return .refused }
+        return returnHomeWithFullHaul(reason: reason, kind: .portal) ? .committed : .refused
     }
 
-    func leaveMalformedOlderWorld() {
-        guard canLeaveMalformedOlderWorld else { return }
-        returnHomeWithFullHaul(
+    @discardableResult
+    func leaveMalformedOlderWorld() -> WorldExitCommitResultV1 {
+        guard canLeaveMalformedOlderWorld else { return .refused }
+        return returnHomeWithFullHaul(
             reason: "This older world had no traversable way home.", kind: .abandon)
+            ? .committed : .refused
     }
 
     /// Banks a successful return as one save transaction. Waystones can call this away from a
     /// portal and are consumed inside the same mutation, so a crash cannot leave the stone gone
     /// while the party remains stranded in the world.
+    @discardableResult
     private func returnHomeWithFullHaul(reason: String, kind: RunExitSummary.Kind,
-                                        consuming stackID: InstanceID? = nil) {
-        mutateIf("return home", flush: true, scope: .expedition) { state in
+                                        consuming stackID: InstanceID? = nil) -> Bool {
+        let committed = mutateIf("return home", flush: true, scope: .expedition) { state in
             guard var run = state.worlds.activeRun else { return false }
             Self.discardUnanchoredIncompleteAnimalTrust(for: run, in: &state)
             AnimalCompanionCombatRules.returnTravellingAnimals(runIndex: run.runIndex, in: &state)
@@ -1170,9 +1200,12 @@ extension GameStore {
             Self.prepareAnchorSettlement(for: outcomeID, in: &state)
             return true
         }
-        recentEvents = []
-        clearWorldFieldFeedback()
-        refreshWorldFieldContext()
+        if committed {
+            recentEvents = []
+            clearWorldFieldFeedback()
+            refreshWorldFieldContext()
+        }
+        return committed
     }
 
     /// Caught by the collapse (or carried out unconscious): keep a fraction, chosen at random.

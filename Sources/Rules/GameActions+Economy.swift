@@ -1,6 +1,11 @@
 import Foundation
 import CryptoKit
 
+enum LockedCacheCommitResultV1: Equatable, Sendable {
+    case committed(EconomyRules.CacheReward)
+    case refused
+}
+
 enum RosterPlacement: Equatable, Sendable {
     case home
     case activeParty
@@ -873,6 +878,13 @@ extension GameStore {
             refreshWorldFieldContext()
         }
         return reward
+    }
+
+    @discardableResult
+    func openCacheHere(expectedKey: ItemStack) -> LockedCacheCommitResultV1 {
+        guard carriedCacheKey == expectedKey else { return .refused }
+        guard let reward = openCacheHere() else { return .refused }
+        return .committed(reward)
     }
 
     // MARK: - Spillover

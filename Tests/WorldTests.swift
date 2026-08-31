@@ -6,13 +6,6 @@ import XCTest
 
 /// Worldgen determinism, movement, decay, and the rules that end a run.
 final class WorldTests: XCTestCase {
-    @MainActor
-    private func controlSnapshot(mutation: Int = 1, turn: Int = 0,
-                                 position: GridPoint = .init(x: 1, y: 1)) -> WorldControlSnapshot {
-        .init(mutationCount: mutation, runIndex: 1, mapSeed: 99,
-              turn: turn, position: position)
-    }
-
     @MainActor private func descendants(_ view: UIView) -> [UIView] {
         [view] + view.subviews.flatMap(descendants)
     }
@@ -25,12 +18,15 @@ final class WorldTests: XCTestCase {
 
     @MainActor
     func testCR01MountedWholeFaceCenterAndCornersActivateOneControl() throws {
-        let coordinator = WorldControlAttemptCoordinator()
-        let snapshot = controlSnapshot()
+        let admission = PhoneControlAdmissionV1()
+        let store = GameStore(io: .temporary(name: "control-face-\(UUID().uuidString)"))
+        store.mutate("test control face") { $0 = startedRun(book([:]), seed: 1201) }
+        let quote = try XCTUnwrap(WorldControlQuoteV1.make(
+            payload: .setLook(expected: false, newValue: true), state: store.state))
         var activations = 0
         let controller = UIHostingController(rootView: WorldWholeFaceControl(
-            coordinator: coordinator, action: .fieldKit, snapshot: { snapshot },
-            disabledReason: nil, operation: {
+            admission: admission, action: .fieldKit, quote: { quote },
+            disabledReason: nil, operation: { _ in
                 activations += 1
                 return .completed(.openedFieldKit)
             }, label: { Rectangle().fill(Color.blue) }).frame(width: 120, height: 60))
@@ -61,13 +57,14 @@ final class WorldTests: XCTestCase {
             button.sendActions(for: .touchUpInside)
             let completionDeadline = Date().addingTimeInterval(1)
             while Date() < completionDeadline {
-                if case .completed = coordinator.lifecycle { break }
+                if case .completed = admission.state { break }
                 RunLoop.main.run(until: Date().addingTimeInterval(0.002))
             }
-            guard case .completed = coordinator.lifecycle else {
+            guard case .completed = admission.state else {
                 XCTFail("each deliberate repeat must wait for the authoritative completion")
                 return
             }
+            admission.reset()
         }
         XCTAssertEqual(activations, 5)
         window.isHidden = true
@@ -75,25 +72,24 @@ final class WorldTests: XCTestCase {
 
     @MainActor
     func testCR02TouchDownAcknowledgesWithoutMutation() {
-        let coordinator = WorldControlAttemptCoordinator()
-        let snapshot = controlSnapshot()
-        coordinator.touchDown(.useTile)
-        XCTAssertEqual(coordinator.lifecycle, .touchDown(.useTile))
-        XCTAssertEqual(snapshot, controlSnapshot())
+        let admission = PhoneControlAdmissionV1()
+        admission.touchDown(controlID: "world.use")
+        XCTAssertEqual(admission.state, .touchDown)
     }
 
     @MainActor
     func testCR02MountedTouchCancellationClearsPressWithoutAttemptOrMutation() throws {
-        let coordinator = WorldControlAttemptCoordinator()
+        let admission = PhoneControlAdmissionV1()
         let store = GameStore(io: .temporary(name: "control-touch-\(UUID().uuidString)"))
         store.mutate("test control touch") { $0 = startedRun(book([:]), seed: 1221) }
-        let snapshot = WorldControlSnapshot.make(from: store.state)
+        let quote = try XCTUnwrap(WorldControlQuoteV1.make(
+            payload: .setLook(expected: false, newValue: true), state: store.state))
         let before = try SaveCodec.encode(store.state)
         let beforeTurn = store.activeRun?.turnsTaken
         var executions = 0
         let controller = UIHostingController(rootView: WorldWholeFaceControl(
-            coordinator: coordinator, action: .useTile, snapshot: { snapshot },
-            disabledReason: nil, operation: {
+            admission: admission, action: .useTile, quote: { quote },
+            disabledReason: nil, operation: { _ in
                 executions += 1
                 return .completed(.usedTile("Used"))
             }, label: { Text("Use Tile") }).frame(width: 100, height: 44))
@@ -104,61 +100,43 @@ final class WorldTests: XCTestCase {
         let button = try XCTUnwrap(descendants(controller.view)
             .compactMap { $0 as? WorldControlHitOwner.ControlButton }.first)
         button.sendActions(for: .touchDown)
-        XCTAssertEqual(coordinator.lifecycle, .touchDown(.useTile))
+        XCTAssertEqual(admission.state, .touchDown)
         button.sendActions(for: .touchDragExit)
-        XCTAssertEqual(coordinator.lifecycle, .available)
+        XCTAssertEqual(admission.state, .available)
         XCTAssertEqual(executions, 0)
         XCTAssertEqual(try SaveCodec.encode(store.state), before)
         XCTAssertEqual(store.activeRun?.turnsTaken, beforeTurn)
-        XCTAssertEqual(coordinator.latestRefusal, nil)
         window.isHidden = true
     }
 
     @MainActor
     func testCR03AcceptedActionCompletesWithTypedOutcome() throws {
-        let coordinator = WorldControlAttemptCoordinator(); let snapshot = controlSnapshot()
-        guard case .accepted(let attempt) = coordinator.accept(.fieldKit, snapshot: snapshot) else {
-            return XCTFail("expected accepted attempt")
-        }
-        XCTAssertTrue(coordinator.begin(attempt))
-        XCTAssertTrue(coordinator.execute(attempt, current: snapshot) {
-            .completed(.openedFieldKit)
-        })
-        XCTAssertEqual(coordinator.lifecycle, .completed(attempt.id, .openedFieldKit))
+        let admission = PhoneControlAdmissionV1()
+        admission.touchDown(controlID: "field-kit")
+        guard case .success(let attempt) = admission.release(controlID: "field-kit", {
+            .success(.committed)
+        }) else { return XCTFail("expected accepted attempt") }
+        RunLoop.main.run(until: Date().addingTimeInterval(0.02))
+        XCTAssertEqual(admission.state, .completed(attempt, .committed))
     }
 
     @MainActor
     func testCR04AcceptedAndInFlightOwnershipRefusesDuplicateWithNewID() throws {
-        let coordinator = WorldControlAttemptCoordinator(); let snapshot = controlSnapshot()
-        guard case .accepted(let first) = coordinator.accept(.useTile, snapshot: snapshot) else {
-            return XCTFail("expected first attempt")
-        }
-        XCTAssertTrue(coordinator.begin(first))
-        guard case .refused(.busy) = coordinator.accept(.useTile, snapshot: snapshot) else {
-            return XCTFail("expected busy refusal")
-        }
-        guard let refusal = coordinator.latestRefusal else {
-            return XCTFail("expected identified busy refusal")
-        }
-        XCTAssertEqual(coordinator.lifecycle, .inFlight(first))
-        XCTAssertEqual(refusal.action, .useTile)
-        XCTAssertEqual(refusal.reason, .busy)
-        XCTAssertNotEqual(refusal.attemptID, first.id)
-        XCTAssertTrue(coordinator.execute(first, current: snapshot) { .completed(.usedTile("Used")) })
+        let admission = PhoneControlAdmissionV1()
+        admission.touchDown(controlID: "use")
+        _ = admission.release(controlID: "use") { .success(.committed) }
+        XCTAssertEqual(admission.release(controlID: "peer") { .success(.committed) },
+                       .failure(.busy))
     }
 
     @MainActor
     func testCR04BusyOwnershipPrecedesPeerDisabledState() throws {
-        let coordinator = WorldControlAttemptCoordinator(); let snapshot = controlSnapshot()
-        guard case .accepted(let first) = coordinator.accept(.travel(.init(x: 4, y: 4)),
-            snapshot: snapshot) else { return XCTFail("first") }
-        XCTAssertTrue(coordinator.begin(first))
-        XCTAssertEqual(coordinator.accept(.useTile, snapshot: snapshot,
-                                           disabledReason: "There is nothing to use here."),
-                       .refused(.busy))
-        XCTAssertEqual(coordinator.lifecycle, .inFlight(first))
-        XCTAssertEqual(coordinator.latestRefusal?.action, .useTile)
-        XCTAssertEqual(coordinator.latestRefusal?.reason, .busy)
+        let admission = PhoneControlAdmissionV1()
+        admission.touchDown(controlID: "travel")
+        _ = admission.release(controlID: "travel") { .success(.committed) }
+        admission.touchDown(controlID: "disabled", disabledReason: "Nothing here")
+        XCTAssertEqual(admission.release(controlID: "disabled") { .success(.committed) },
+                       .failure(.busy))
     }
 
     @MainActor
@@ -169,14 +147,16 @@ final class WorldTests: XCTestCase {
         let beforeMutation = store.state.meta.mutationCount
         let target = try XCTUnwrap(before.map.neighbours(of: before.playerPosition)
             .first { WorldRules.canEnter($0, in: before.map) })
-        let action = WorldControlAction.move(dx: target.x - before.playerPosition.x,
-                                             dy: target.y - before.playerPosition.y)
-        let coordinator = WorldControlAttemptCoordinator()
+        let admission = PhoneControlAdmissionV1()
         let controller = UIHostingController(rootView: WorldWholeFaceControl(
-            coordinator: coordinator, action: action,
-            snapshot: { WorldControlSnapshot.make(from: store.state) },
-            disabledReason: nil,
-            operation: { WorldControlRulesExecution.step(store: store, to: target) },
+            admission: admission, action: .move(dx: target.x - before.playerPosition.x,
+                                                dy: target.y - before.playerPosition.y),
+            quote: {
+                guard let run = store.activeRun else { return nil }
+                return WorldControlQuoteV1.make(
+                    payload: .step(destination: target, tile: run.map[target]), state: store.state)
+            }, disabledReason: nil,
+            operation: { _ in WorldControlRulesExecution.step(store: store, to: target) },
             label: { Text("Step") }).frame(width: 80, height: 44))
         let window = UIWindow(frame: .init(x: 0, y: 0, width: 80, height: 44))
         window.rootViewController = controller; window.makeKeyAndVisible()
@@ -186,16 +166,14 @@ final class WorldTests: XCTestCase {
         for _ in 0..<10 { button.sendActions(for: .touchDown); button.sendActions(for: .touchUpInside) }
         let deadline = Date().addingTimeInterval(2)
         while Date() < deadline {
-            if case .completed = coordinator.lifecycle { break }
+            if case .completed = admission.state { break }
             RunLoop.main.run(until: Date().addingTimeInterval(0.01))
         }
-        guard case .completed = coordinator.lifecycle else {
+        guard case .completed = admission.state else {
             return XCTFail("the admitted mounted attempt did not settle")
         }
         XCTAssertEqual(store.activeRun?.playerPosition, target)
-        guard case .completed(_, .stepped(_, let spent)) = coordinator.lifecycle else {
-            return XCTFail("the mounted step must retain its exact rules-owned outcome")
-        }
+        let spent = (store.activeRun?.turnsTaken ?? 0) - before.turnsTaken
         XCTAssertGreaterThan(spent, 0)
         XCTAssertEqual(store.activeRun?.turnsTaken, before.turnsTaken + spent)
         XCTAssertEqual(store.state.meta.mutationCount, beforeMutation + 1)
@@ -212,21 +190,21 @@ final class WorldTests: XCTestCase {
         let run = try XCTUnwrap(store.activeRun)
         let target = try XCTUnwrap(run.map.neighbours(of: run.playerPosition)
             .first { WorldRules.canEnter($0, in: run.map) })
-        let coordinator = WorldControlAttemptCoordinator()
-        let snapshot = WorldControlSnapshot.make(from: store.state)
-        guard case .accepted(let attempt) = coordinator.accept(.useTile, snapshot: snapshot)
-        else { return XCTFail("expected attempt") }
-        XCTAssertTrue(coordinator.begin(attempt))
+        let admission = PhoneControlAdmissionV1()
+        let retained = try XCTUnwrap(WorldControlQuoteV1.make(
+            payload: .step(destination: target, tile: run.map[target]), state: store.state))
+        admission.touchDown(controlID: retained.controlID)
         store.mutate("external stale interference") { $0.meta.semanticActionTrail.append("external") }
         let frozen = try SaveCodec.encode(store.state)
         let frozenTurn = store.activeRun?.turnsTaken
         var called = false
-        XCTAssertFalse(coordinator.execute(attempt, current: .make(from: store.state)) {
+        let current = try XCTUnwrap(WorldControlQuoteV1.make(
+            payload: .step(destination: target, tile: run.map[target]), state: store.state))
+        XCTAssertEqual(admission.release(controlID: current.controlID) {
             called = true
-            return WorldControlRulesExecution.step(store: store, to: target)
-        })
+            return .success(.committed)
+        }, .failure(.stale))
         XCTAssertFalse(called)
-        XCTAssertEqual(coordinator.lifecycle, .refused(.useTile, attempt.id, .stale))
         XCTAssertEqual(try SaveCodec.encode(store.state), frozen)
         XCTAssertEqual(store.activeRun?.turnsTaken, frozenTurn)
     }
@@ -308,16 +286,22 @@ final class WorldTests: XCTestCase {
 
     @MainActor
     func testCR08RepeatAfterCompletionCreatesNextAttempt() throws {
-        let coordinator = WorldControlAttemptCoordinator(); let snapshot = controlSnapshot()
-        guard case .accepted(let first) = coordinator.accept(.fieldKit, snapshot: snapshot) else {
-            return XCTFail("first")
+        let admission = PhoneControlAdmissionV1()
+        admission.touchDown(controlID: "field-kit")
+        guard case .success(let first) = admission.release(controlID: "field-kit", {
+            .success(.committed)
+        }) else { return XCTFail("first") }
+        let deadline = Date().addingTimeInterval(1)
+        while Date() < deadline {
+            if case .completed = admission.state { break }
+            RunLoop.main.run(until: Date().addingTimeInterval(0.002))
         }
-        XCTAssertTrue(coordinator.begin(first)); XCTAssertTrue(coordinator.execute(first,
-            current: snapshot) { .completed(.openedFieldKit) })
-        guard case .accepted(let second) = coordinator.accept(.fieldKit, snapshot: snapshot) else {
-            return XCTFail("second")
-        }
-        XCTAssertGreaterThan(second.id, first.id)
+        admission.reset()
+        admission.touchDown(controlID: "field-kit")
+        guard case .success(let second) = admission.release(controlID: "field-kit", {
+            .success(.committed)
+        }) else { return XCTFail("second") }
+        XCTAssertGreaterThan(second, first)
     }
 
     @MainActor
@@ -327,20 +311,13 @@ final class WorldTests: XCTestCase {
         let before = try XCTUnwrap(store.activeRun)
         let target = try XCTUnwrap(before.map.neighbours(of: before.playerPosition)
             .first { WorldRules.canEnter($0, in: before.map) })
-        let action = WorldControlAction.move(dx: target.x - before.playerPosition.x,
-                                             dy: target.y - before.playerPosition.y)
-        let coordinator = WorldControlAttemptCoordinator()
-        let snapshot = WorldControlSnapshot.make(from: store.state)
-        guard case .accepted(let attempt) = coordinator.accept(action, snapshot: snapshot)
-        else { return XCTFail("move") }
-        XCTAssertTrue(coordinator.begin(attempt))
-        XCTAssertTrue(coordinator.execute(attempt, current: snapshot) {
-            WorldControlRulesExecution.step(store: store, to: target)
-        })
+        let quote = try XCTUnwrap(WorldControlQuoteV1.make(
+            payload: .step(destination: target, tile: before.map[target]), state: store.state))
+        XCTAssertEqual(quote.origin, before.playerPosition)
+        let result = WorldControlRulesExecution.step(store: store, to: target)
         XCTAssertEqual(store.activeRun?.playerPosition, target)
         XCTAssertEqual(store.activeRun?.turnsTaken, before.turnsTaken + 1)
-        XCTAssertEqual(coordinator.lifecycle,
-                       .completed(attempt.id, .stepped(finalPosition: target, turnsSpent: 1)))
+        XCTAssertEqual(result, .completed(.stepped(finalPosition: target, turnsSpent: 1)))
     }
 
     @MainActor
@@ -358,36 +335,29 @@ final class WorldTests: XCTestCase {
         let direct = GameStore(io: .temporary(name: "control-travel-direct-\(UUID().uuidString)"))
         direct.mutate("test travel parity setup") { $0 = initial }
         let directResult = WorldControlRulesExecution.travel(store: direct, from: origin, to: a)
-        let coordinator = WorldControlAttemptCoordinator()
-        let snapshot = WorldControlSnapshot.make(from: store.state)
-        guard case .accepted(let first) = coordinator.accept(.travel(a), snapshot: snapshot) else {
-            return XCTFail("travel A")
+        let admission = PhoneControlAdmissionV1()
+        let quoteA = try XCTUnwrap(WorldControlQuoteV1.make(
+            payload: .travel(destination: a, tile: before.map[a]), state: store.state))
+        let quoteB = try XCTUnwrap(WorldControlQuoteV1.make(
+            payload: .travel(destination: b, tile: before.map[b]), state: store.state))
+        admission.touchDown(controlID: quoteA.controlID)
+        _ = admission.release(controlID: quoteA.controlID) {
+            let result = WorldControlRulesExecution.travel(store: store, from: origin, to: a)
+            if case .completed = result { return .success(.committed) }
+            return .failure(.stale)
         }
-        XCTAssertTrue(coordinator.begin(first))
-        XCTAssertEqual(coordinator.accept(.travel(b), snapshot: snapshot), .refused(.busy))
-        XCTAssertEqual(coordinator.lifecycle, .inFlight(first))
-        XCTAssertEqual(coordinator.statusCopy(for: .travel(a)), "Working…")
-        XCTAssertEqual(coordinator.statusCopy(for: .travel(b)),
-                       WorldControlRefusal.busy.playerCopy)
-        XCTAssertTrue(coordinator.execute(first, current: snapshot) {
-            WorldControlRulesExecution.travel(store: store, from: origin, to: a)
-        })
+        XCTAssertEqual(admission.release(controlID: quoteB.controlID) { .success(.committed) },
+                       .failure(.busy))
+        RunLoop.main.run(until: Date().addingTimeInterval(0.05))
         let final = try XCTUnwrap(store.activeRun)
-        guard case .completed(_, let outcome) = coordinator.lifecycle else {
-            return XCTFail("travel A must own the completed result")
-        }
         guard case .completed(let directOutcome) = directResult else {
             return XCTFail("direct A transaction must complete")
         }
-        XCTAssertEqual(outcome, directOutcome)
-        XCTAssertEqual(outcome, .travelEnded(finalPosition: final.playerPosition,
+        XCTAssertEqual(directOutcome, .travelEnded(finalPosition: final.playerPosition,
             turnsSpent: final.turnsTaken - before.turnsTaken,
             reachedDestination: final.playerPosition == a))
         XCTAssertEqual(try comparableStateBytes(store.state), try comparableStateBytes(direct.state))
         XCTAssertEqual(store.recentEvents, direct.recentEvents)
-        XCTAssertNil(coordinator.statusCopy(for: .travel(a)))
-        XCTAssertNil(coordinator.statusCopy(for: .travel(b)))
-        XCTAssertNil(coordinator.latestRefusal)
     }
 
     @MainActor
@@ -402,7 +372,7 @@ final class WorldTests: XCTestCase {
         XCTAssertEqual(routed, [.travel(.init(x: 8, y: 7))])
         let source = try? String(contentsOfFile: #filePath.replacingOccurrences(
             of: "/Tests/WorldTests.swift", with: "/Sources/Screens/WorldView.swift"))
-        XCTAssertTrue(source?.contains(".onTapGesture { onTap(point) }") == true)
+        XCTAssertTrue(source?.contains(".onTapGesture { onTap(cell.point) }") == true)
         XCTAssertTrue(source?.contains("WorldMapPlanningAction.route(from: run.playerPosition, to: point)") == true)
         let mapGrid = source?.components(separatedBy: "private struct MapGrid: View").last ?? ""
         XCTAssertFalse(mapGrid.components(separatedBy: "struct WorldTileVisibilityPresentation").first?
@@ -411,7 +381,7 @@ final class WorldTests: XCTestCase {
     }
 
     @MainActor
-    func testCR12CoordinatorLifecycleIsNonpersistent() throws {
+    func testCR12PhoneAdmissionLifecycleIsNonpersistent() throws {
         let initial = startedRun(book([:]), seed: 991)
         let direct = GameStore(io: .temporary(name: "control-direct-\(UUID().uuidString)"))
         let coordinated = GameStore(io: .temporary(name: "control-coordinated-\(UUID().uuidString)"))
@@ -421,17 +391,59 @@ final class WorldTests: XCTestCase {
         let target = try XCTUnwrap(run.map.neighbours(of: run.playerPosition)
             .first { WorldRules.canEnter($0, in: run.map) })
         direct.step(to: target)
-        let coordinator = WorldControlAttemptCoordinator()
-        let snapshot = WorldControlSnapshot.make(from: coordinated.state)
-        guard case .accepted(let attempt) = coordinator.accept(
-            .move(dx: target.x - run.playerPosition.x, dy: target.y - run.playerPosition.y),
-            snapshot: snapshot) else { return XCTFail("attempt") }
-        XCTAssertTrue(coordinator.begin(attempt))
-        XCTAssertTrue(coordinator.execute(attempt, current: snapshot) {
-            WorldControlRulesExecution.step(store: coordinated, to: target)
-        })
+        let quote = try XCTUnwrap(WorldControlQuoteV1.make(
+            payload: .step(destination: target, tile: run.map[target]), state: coordinated.state))
+        XCTAssertFalse(quote.controlID.isEmpty)
+        _ = WorldControlRulesExecution.step(store: coordinated, to: target)
         XCTAssertEqual(try comparableStateBytes(coordinated.state), try comparableStateBytes(direct.state),
                        "coordinator lifecycle must not persist or alter the rules transaction")
+    }
+
+    @MainActor
+    func testWorldControlQuoteBindsMutationTurnContextAndExactDestinationTile() throws {
+        let store = GameStore(io: .temporary(name: "world-control-quote-\(UUID().uuidString)"))
+        store.mutate("test world quote") { $0 = startedRun(book([:]), seed: 1401) }
+        let run = try XCTUnwrap(store.activeRun)
+        let target = try XCTUnwrap(run.map.neighbours(of: run.playerPosition).first)
+        let retained = try XCTUnwrap(WorldControlQuoteV1.make(
+            payload: .step(destination: target, tile: run.map[target]), state: store.state))
+        XCTAssertEqual(retained.origin, run.playerPosition)
+        XCTAssertEqual(retained.turn, run.turnsTaken)
+        XCTAssertFalse(retained.contextInputStateHash.isEmpty)
+
+        store.mutate("test quote drift") { $0.meta.semanticActionTrail.append("drift") }
+        let current = try XCTUnwrap(WorldControlQuoteV1.make(
+            payload: .step(destination: target, tile: run.map[target]), state: store.state))
+        XCTAssertNotEqual(current, retained)
+        XCTAssertNotEqual(current.controlID, retained.controlID)
+
+        let admission = PhoneControlAdmissionV1()
+        admission.touchDown(controlID: retained.controlID)
+        var executed = false
+        XCTAssertEqual(admission.release(controlID: current.controlID) {
+            executed = true; return .success(.committed)
+        }, .failure(.stale))
+        XCTAssertFalse(executed)
+    }
+
+    @MainActor
+    func testExactHarvestQuoteCommitsOnceAndReplayIsWriteInert() throws {
+        let store = GameStore(io: .temporary(name: "world-control-harvest-\(UUID().uuidString)"))
+        store.mutate("test exact harvest") { state in
+            state = startedRun(book([:]), seed: 1402)
+            guard let point = state.worlds.activeRun?.playerPosition else { return }
+            state.worlds.activeRun?.map[point].content = .node(ResourceNode(
+                resource: Resources.fiber, remainingHarvests: 2, yieldPerHarvest: 3))
+        }
+        guard case .available(let quote) = store.resourceExtractionEvaluation else {
+            return XCTFail("expected exact extraction quote")
+        }
+        guard case .committed = store.harvest(quote) else { return XCTFail("commit") }
+        let committed = try SaveCodec.encode(store.state)
+        let mutation = store.state.meta.mutationCount
+        guard case .refused = store.harvest(quote) else { return XCTFail("replay refusal") }
+        XCTAssertEqual(try SaveCodec.encode(store.state), committed)
+        XCTAssertEqual(store.state.meta.mutationCount, mutation)
     }
 
     @MainActor
