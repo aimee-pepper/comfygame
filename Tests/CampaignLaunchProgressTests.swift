@@ -228,15 +228,20 @@ final class CampaignLaunchProgressTests: XCTestCase {
         XCTAssertTrue(retirementStarted)
         let stateAfterCommit = store.state
         let diagnosticsAfterCommit = store.diagnostics
+        let bytesAfterCommit = try Data(contentsOf: io.saveURL)
         store.mutate("retained callback after return") { $0.base.essence += 99 }
+        store.flushNow()
 
         XCTAssertEqual(store.state, stateAfterCommit)
+        XCTAssertEqual(try Data(contentsOf: io.saveURL), bytesAfterCommit)
         XCTAssertEqual(store.diagnostics.savedMutationCount,
                        diagnosticsAfterCommit.savedMutationCount)
         XCTAssertEqual(store.diagnostics.writeCount, diagnosticsAfterCommit.writeCount)
         XCTAssertEqual(store.diagnostics.hasPendingWrite,
                        diagnosticsAfterCommit.hasPendingWrite)
         XCTAssertEqual(store.diagnostics.lastError, diagnosticsAfterCommit.lastError)
+        XCTAssertEqual(store.diagnostics.saveFileByteCount,
+                       diagnosticsAfterCommit.saveFileByteCount)
         if case .closing = coordinator.phase {} else { XCTFail("Closing must remain noninteractive") }
 
         await gate.resume()

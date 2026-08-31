@@ -2238,6 +2238,93 @@ final class PersistenceTests: XCTestCase {
                        "the injection proves backup rotation landed before primary failure")
     }
 
+    func testRawAuthorityDistinguishesAbsenceFromUnreadablePrimary() throws {
+        let directory = FileManager.default.temporaryDirectory
+            .appending(path: "raw-snapshot-authority-\(UUID().uuidString)",
+                       directoryHint: .isDirectory)
+        defer { try? FileManager.default.removeItem(at: directory) }
+        let absent = SaveFileIO(directory: directory)
+        XCTAssertEqual(try absent.persistenceAuthority(), .init(
+            owner: .raw, primarySHA256: nil, primaryByteCount: 0, payloadSHA256: nil))
+
+        try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+        let bytes = Data("present".utf8)
+        try bytes.write(to: absent.saveURL)
+        let unreadable = SaveFileIO(directory: directory,
+            casFaults: .init(unreadablePrimaryAtAuthorityCapture: true))
+        XCTAssertThrowsError(try unreadable.persistenceAuthority())
+        XCTAssertEqual(try Data(contentsOf: absent.saveURL), bytes)
+    }
+
+    func testRawCASPreservesGenuinePrimaryAndBackupAbsenceOnPrewriteFailure() throws {
+        let directory = FileManager.default.temporaryDirectory
+            .appending(path: "raw-snapshot-absent-\(UUID().uuidString)",
+                       directoryHint: .isDirectory)
+        defer { try? FileManager.default.removeItem(at: directory) }
+        let setup = SaveFileIO(directory: directory)
+        let authority = try setup.persistenceAuthority()
+        var candidate = GameState.newGame(); candidate.base.essence = 30
+        let injected = SaveFileIO(directory: directory,
+            casFaults: .init(failBeforePrimaryReplacement: true))
+
+        XCTAssertEqual(injected.compareAndSwap(
+            expected: authority, candidate: try SaveCodec.encode(candidate)),
+            .refused(.writeFailed))
+        XCTAssertFalse(FileManager.default.fileExists(atPath: setup.saveURL.path(percentEncoded: false)))
+        XCTAssertFalse(FileManager.default.fileExists(atPath: setup.backupURL.path(percentEncoded: false)))
+    }
+
+    func testRawCASRejectsUnreadablePrimaryOrBackupWithoutChangingBytes() throws {
+        let directory = FileManager.default.temporaryDirectory
+            .appending(path: "raw-snapshot-cas-\(UUID().uuidString)",
+                       directoryHint: .isDirectory)
+        defer { try? FileManager.default.removeItem(at: directory) }
+        let setup = SaveFileIO(directory: directory)
+        let oldest = try SaveCodec.encode(.newGame())
+        var next = GameState.newGame(); next.base.essence = 31
+        let prior = try SaveCodec.encode(next)
+        try setup.write(oldest); try setup.write(prior)
+        let authority = try setup.persistenceAuthority()
+        let primaryBefore = try Data(contentsOf: setup.saveURL)
+        let backupBefore = try Data(contentsOf: setup.backupURL)
+        var changed = GameState.newGame(); changed.base.essence = 32
+        let candidate = try SaveCodec.encode(changed)
+
+        for faults in [
+            SaveFileCASFaultsV1(unreadablePrimaryAtCASCapture: true),
+            SaveFileCASFaultsV1(unreadableBackupAtCASCapture: true),
+        ] {
+            let injected = SaveFileIO(directory: directory, casFaults: faults)
+            XCTAssertEqual(injected.compareAndSwap(expected: authority, candidate: candidate),
+                           .refused(.corruptAuthority))
+            XCTAssertEqual(try Data(contentsOf: setup.saveURL), primaryBefore)
+            XCTAssertEqual(try Data(contentsOf: setup.backupURL), backupBefore)
+        }
+    }
+
+    func testRawPostRestoreUnreadabilityIsExplicitAmbiguity() throws {
+        let directory = FileManager.default.temporaryDirectory
+            .appending(path: "raw-snapshot-restore-\(UUID().uuidString)",
+                       directoryHint: .isDirectory)
+        defer { try? FileManager.default.removeItem(at: directory) }
+        let setup = SaveFileIO(directory: directory)
+        var oldest = GameState.newGame(); oldest.base.essence = 41
+        var prior = GameState.newGame(); prior.base.essence = 42
+        try setup.write(SaveCodec.encode(oldest)); try setup.write(SaveCodec.encode(prior))
+        let authority = try setup.persistenceAuthority()
+        let primaryBefore = try Data(contentsOf: setup.saveURL)
+        let backupBefore = try Data(contentsOf: setup.backupURL)
+        var candidate = GameState.newGame(); candidate.base.essence = 43
+        let injected = SaveFileIO(directory: directory, casFaults: .init(
+            failBeforePrimaryReplacement: true, unreadableBackupAfterRestore: true))
+
+        XCTAssertEqual(injected.compareAndSwap(
+            expected: authority, candidate: try SaveCodec.encode(candidate)),
+            .refused(.ambiguousReadback))
+        XCTAssertEqual(try Data(contentsOf: setup.saveURL), primaryBefore)
+        XCTAssertEqual(try Data(contentsOf: setup.backupURL), backupBefore)
+    }
+
     private func legacyMaterialRun() -> WorldRun {
         let book = BoundBook(symbols: [:], randomlyFilled: [], essencePaid: 0)
         let generated = Worldgen.generate(book: book, seed: 812)

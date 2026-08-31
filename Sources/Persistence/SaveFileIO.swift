@@ -41,8 +41,46 @@ struct SaveFileCASFaultsV1: Sendable {
     var failBeforePrimaryReplacement = false
     var failPrimaryRestore = false
     var failBackupRestore = false
+    var unreadablePrimaryAtAuthorityCapture = false
+    var unreadablePrimaryAtCASCapture = false
+    var unreadableBackupAtCASCapture = false
+    var unreadablePrimaryAfterRestore = false
+    var unreadableBackupAfterRestore = false
 
     static let none = Self()
+}
+
+private enum RawFileSnapshotV1: Equatable {
+    case absent
+    case bytes(Data)
+    case unreadable
+
+    static func capture(_ url: URL, forcedUnreadable: Bool = false) -> Self {
+        guard FileManager.default.fileExists(atPath: url.path(percentEncoded: false)) else {
+            return .absent
+        }
+        guard !forcedUnreadable else { return .unreadable }
+        do { return .bytes(try Data(contentsOf: url)) }
+        catch { return .unreadable }
+    }
+
+}
+
+private struct RawFileSnapshotUnreadableV1: Error {}
+
+private func rawPersistenceAuthority(_ snapshot: RawFileSnapshotV1) throws
+    -> PersistenceAuthorityV1 {
+    switch snapshot {
+    case .absent:
+        return .init(owner: .raw, primarySHA256: nil, primaryByteCount: 0,
+                     payloadSHA256: nil)
+    case .bytes(let data):
+        let digest = PersistenceDigestV1.sha256(data)
+        return .init(owner: .raw, primarySHA256: digest, primaryByteCount: data.count,
+                     payloadSHA256: digest)
+    case .unreadable:
+        throw RawFileSnapshotUnreadableV1()
+    }
 }
 
 enum SaveLoadOutcome {
@@ -83,10 +121,7 @@ extension GamePersistenceIO {
     var diagnosticCampaignReference: String? { nil }
 
     func persistenceAuthority() throws -> PersistenceAuthorityV1 {
-        let data = try? Data(contentsOf: saveURL)
-        return .init(owner: .raw, primarySHA256: data.map(PersistenceDigestV1.sha256),
-                     primaryByteCount: data?.count ?? 0,
-                     payloadSHA256: data.map(PersistenceDigestV1.sha256))
+        try rawPersistenceAuthority(.capture(saveURL))
     }
 
     func compareAndSwap(expected: PersistenceAuthorityV1,
@@ -188,35 +223,32 @@ struct SaveFileIO: GamePersistenceIO {
     }
 
     func persistenceAuthority() throws -> PersistenceAuthorityV1 {
-        let primary = try? Data(contentsOf: saveURL)
-        return .init(owner: .raw,
-                     primarySHA256: primary.map(PersistenceDigestV1.sha256),
-                     primaryByteCount: primary?.count ?? 0,
-                     payloadSHA256: primary.map(PersistenceDigestV1.sha256))
+        try rawPersistenceAuthority(.capture(
+            saveURL, forcedUnreadable: casFaults.unreadablePrimaryAtAuthorityCapture))
     }
 
     func compareAndSwap(expected: PersistenceAuthorityV1,
-                        candidate: Data) -> PersistenceCASResultV1 {
+        candidate: Data) -> PersistenceCASResultV1 {
         guard expected.owner == .raw else { return .refused(.staleAuthority) }
-        let priorPrimary = try? Data(contentsOf: saveURL)
-        let priorBackup = try? Data(contentsOf: backupURL)
-        let actual = PersistenceAuthorityV1(
-            owner: .raw, primarySHA256: priorPrimary.map(PersistenceDigestV1.sha256),
-            primaryByteCount: priorPrimary?.count ?? 0,
-            payloadSHA256: priorPrimary.map(PersistenceDigestV1.sha256))
+        let priorPrimary = RawFileSnapshotV1.capture(
+            saveURL, forcedUnreadable: casFaults.unreadablePrimaryAtCASCapture)
+        let priorBackup = RawFileSnapshotV1.capture(
+            backupURL, forcedUnreadable: casFaults.unreadableBackupAtCASCapture)
+        guard priorPrimary != .unreadable, priorBackup != .unreadable else {
+            return .refused(.corruptAuthority)
+        }
+        guard let actual = try? rawPersistenceAuthority(priorPrimary) else {
+            return .refused(.corruptAuthority)
+        }
         guard actual == expected else { return .refused(.staleAuthority) }
         let receipt = PersistenceCommitReceiptV1(
             owner: .raw, payloadSHA256: PersistenceDigestV1.sha256(candidate),
             payloadByteCount: candidate.count, envelopeSHA256: nil, envelopeByteCount: nil)
-        if priorPrimary == candidate { return .alreadyCommitted(receipt) }
+        if priorPrimary == .bytes(candidate) { return .alreadyCommitted(receipt) }
         do {
             try FileManager.default.createDirectory(at: directory,
                                                     withIntermediateDirectories: true)
-            if let priorPrimary {
-                try priorPrimary.write(to: backupURL, options: .atomic)
-            } else if FileManager.default.fileExists(atPath: backupURL.path(percentEncoded: false)) {
-                try FileManager.default.removeItem(at: backupURL)
-            }
+            try restore(priorPrimary, at: backupURL)
             if casFaults.failBeforePrimaryReplacement { throw CocoaError(.fileWriteUnknown) }
             try candidate.write(to: saveURL,
                 options: [.atomic, .completeFileProtectionUntilFirstUserAuthentication])
@@ -225,13 +257,20 @@ struct SaveFileIO: GamePersistenceIO {
             }
             return .committed(receipt)
         } catch {
-            if (try? Data(contentsOf: saveURL)) == candidate {
+            let landed = RawFileSnapshotV1.capture(saveURL)
+            if landed == .bytes(candidate) {
                 return .recoveredDurable(receipt)
             }
+            if landed == .unreadable { return .refused(.ambiguousReadback) }
             if !casFaults.failPrimaryRestore { try? restore(priorPrimary, at: saveURL) }
             if !casFaults.failBackupRestore { try? restore(priorBackup, at: backupURL) }
-            let restoredPrimary = try? Data(contentsOf: saveURL)
-            let restoredBackup = try? Data(contentsOf: backupURL)
+            let restoredPrimary = RawFileSnapshotV1.capture(
+                saveURL, forcedUnreadable: casFaults.unreadablePrimaryAfterRestore)
+            let restoredBackup = RawFileSnapshotV1.capture(
+                backupURL, forcedUnreadable: casFaults.unreadableBackupAfterRestore)
+            guard restoredPrimary != .unreadable, restoredBackup != .unreadable else {
+                return .refused(.ambiguousReadback)
+            }
             guard restoredPrimary == priorPrimary, restoredBackup == priorBackup else {
                 return .refused(.ambiguousReadback)
             }
@@ -239,10 +278,16 @@ struct SaveFileIO: GamePersistenceIO {
         }
     }
 
-    private func restore(_ data: Data?, at url: URL) throws {
-        if let data { try data.write(to: url, options: .atomic) }
-        else if FileManager.default.fileExists(atPath: url.path(percentEncoded: false)) {
-            try FileManager.default.removeItem(at: url)
+    private func restore(_ snapshot: RawFileSnapshotV1, at url: URL) throws {
+        switch snapshot {
+        case .bytes(let data):
+            try data.write(to: url, options: .atomic)
+        case .absent:
+            if FileManager.default.fileExists(atPath: url.path(percentEncoded: false)) {
+                try FileManager.default.removeItem(at: url)
+            }
+        case .unreadable:
+            throw RawFileSnapshotUnreadableV1()
         }
     }
 

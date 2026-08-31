@@ -1187,6 +1187,7 @@ final class GameStore: ObservableObject {
     /// Cancels any pending debounce and writes now, blocking until the bytes are handed to the
     /// filesystem. Called on every scene-phase change out of `.active`.
     func flushNow() {
+        guard !persistenceClosing else { return }
         debounceTask?.cancel()
         debounceTask = nil
         performWrite(synchronously: true)
@@ -1203,6 +1204,7 @@ final class GameStore: ObservableObject {
     }
 
     private func performWrite(synchronously: Bool) {
+        guard !persistenceClosing else { return }
         let snapshot = state
         let data: Data
         do {
