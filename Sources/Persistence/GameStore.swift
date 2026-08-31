@@ -290,12 +290,33 @@ struct WorldMiningFeedbackGroupV1: Equatable {
     let startedAtMonotonicTime: UInt64
 }
 
-struct WorldTravellerSpeechBubbleV1: Equatable, Identifiable {
+struct WorldTravellerSpeechSessionIDV1: Equatable, Hashable, Sendable {
+    let rawValue: UInt64
+}
+
+struct WorldTravellerSpeechPresentationIDV1: Equatable, Hashable, Sendable {
+    let sessionID: WorldTravellerSpeechSessionIDV1
+    let ordinal: Int
+}
+
+struct WorldTravellerSpeechBubbleV1: Equatable, Identifiable, Sendable {
+    let presentationID: WorldTravellerSpeechPresentationIDV1
     let travellerID: TravellerID
     let worldRunID: String
     let point: GridPoint
     let text: String
-    var id: TravellerID { travellerID }
+    let visibleSinceMonotonicTime: UInt64?
+    let deadlineMonotonicTime: UInt64?
+
+    var id: WorldTravellerSpeechPresentationIDV1 { presentationID }
+
+    func promoted(at now: UInt64) -> Self {
+        Self(
+            presentationID: presentationID, travellerID: travellerID,
+            worldRunID: worldRunID, point: point, text: text,
+            visibleSinceMonotonicTime: now,
+            deadlineMonotonicTime: now &+ GameStore.worldTravellerSpeechLifetimeNanoseconds)
+    }
 }
 
 enum TravellerAdjacentSpeechV1Registry {
@@ -493,6 +514,8 @@ final class GameStore: ObservableObject {
     private var seenWorldFieldBatchIDs: Set<String> = []
     private var seenWorldMiningBatchIDs: Set<String> = []
     private var travellerSpeechWorldRunID: String?
+    private var nextTravellerSpeechSessionID: UInt64 = 1
+    private var currentTravellerSpeechSessionID: WorldTravellerSpeechSessionIDV1?
     private var shownTravellerSpeechIDs: Set<TravellerID> = []
     var expeditionReviewAcknowledgementInFlight = false
 
@@ -582,6 +605,7 @@ final class GameStore: ObservableObject {
         let worldRunID: String
         let sourcePoint: GridPoint
         let turnBefore: Int
+        let observedTravellerSpeechSessionID: WorldTravellerSpeechSessionIDV1?
 
         var id: UInt64 { attemptID }
     }
@@ -593,7 +617,8 @@ final class GameStore: ObservableObject {
             sessionEpoch: worldFieldSessionEpoch, attemptID: nextWorldFieldAttemptID,
             sourceAction: sourceAction, beforeContext: beforeContext,
             worldRunID: "\(run.runIndex):\(run.mapSeed)", sourcePoint: run.playerPosition,
-            turnBefore: run.turnsTaken)
+            turnBefore: run.turnsTaken,
+            observedTravellerSpeechSessionID: currentTravellerSpeechSessionID)
         nextWorldFieldAttemptID &+= 1
         return attempt
     }
@@ -603,7 +628,8 @@ final class GameStore: ObservableObject {
     func acceptWorldFieldAttempt(_ attempt: WorldFieldAttempt) {
         guard attempt.sessionEpoch == worldFieldSessionEpoch, let run = activeRun,
               "\(run.runIndex):\(run.mapSeed)" == attempt.worldRunID else { return }
-        clearWorldTravellerSpeechPresentation()
+        clearWorldTravellerSpeechPresentation(
+            expectedSessionID: attempt.observedTravellerSpeechSessionID)
     }
 
     func submitWorldFieldEvents(_ events: [WorldRules.Event], for attempt: WorldFieldAttempt,
@@ -722,47 +748,86 @@ final class GameStore: ObservableObject {
         clearWorldTravellerSpeechSession()
     }
 
-    func clearWorldTravellerSpeechPresentation() {
+    nonisolated static let worldTravellerSpeechLifetimeNanoseconds: UInt64 = 5_140_000_000
+
+    var worldTravellerSpeechSessionID: WorldTravellerSpeechSessionIDV1? {
+        currentTravellerSpeechSessionID
+    }
+
+    func clearWorldTravellerSpeechPresentation(
+        expectedSessionID: WorldTravellerSpeechSessionIDV1?
+    ) {
+        guard let expectedSessionID,
+              currentTravellerSpeechSessionID == expectedSessionID else { return }
         worldTravellerSpeech = nil
         worldTravellerSpeechQueue.removeAll()
+        currentTravellerSpeechSessionID = nil
     }
 
     func clearWorldTravellerSpeechSession() {
-        clearWorldTravellerSpeechPresentation()
+        worldTravellerSpeech = nil
+        worldTravellerSpeechQueue.removeAll()
+        currentTravellerSpeechSessionID = nil
         travellerSpeechWorldRunID = nil
         shownTravellerSpeechIDs.removeAll()
     }
 
-    func finishWorldTravellerSpeech(expectedTravellerID: TravellerID) {
-        guard worldTravellerSpeech?.travellerID == expectedTravellerID else { return }
-        if worldTravellerSpeechQueue.isEmpty { worldTravellerSpeech = nil }
-        else {
-            worldTravellerSpeech = worldTravellerSpeechQueue.removeFirst()
-            if let travellerID = worldTravellerSpeech?.travellerID {
-                shownTravellerSpeechIDs.insert(travellerID)
-            }
+    func remainingWorldTravellerSpeechLifetime(
+        for presentationID: WorldTravellerSpeechPresentationIDV1,
+        now: UInt64 = DispatchTime.now().uptimeNanoseconds
+    ) -> UInt64? {
+        guard let speech = worldTravellerSpeech,
+              speech.presentationID == presentationID,
+              let deadline = speech.deadlineMonotonicTime else { return nil }
+        return now < deadline ? deadline - now : 0
+    }
+
+    func expireWorldTravellerSpeech(
+        ifCurrent presentationID: WorldTravellerSpeechPresentationIDV1,
+        now: UInt64 = DispatchTime.now().uptimeNanoseconds
+    ) {
+        guard let speech = worldTravellerSpeech,
+              speech.presentationID == presentationID,
+              let deadline = speech.deadlineMonotonicTime,
+              now >= deadline else { return }
+        promoteNextWorldTravellerSpeech(now: now)
+    }
+
+    private func promoteNextWorldTravellerSpeech(now: UInt64) {
+        guard !worldTravellerSpeechQueue.isEmpty else {
+            worldTravellerSpeech = nil
+            currentTravellerSpeechSessionID = nil
+            return
         }
+        let next = worldTravellerSpeechQueue.removeFirst().promoted(at: now)
+        worldTravellerSpeech = next
+        shownTravellerSpeechIDs.insert(next.travellerID)
     }
 
     func presentTravellerSpeechAfterMovement(
-        from priorPosition: GridPoint,
-        sourceAction: WorldFieldEventBatchV1.SourceAction
+        committedFinalPosition: GridPoint,
+        from attempt: WorldFieldAttempt,
+        now: UInt64 = DispatchTime.now().uptimeNanoseconds
     ) {
-        guard let run = activeRun, run.activeEncounter == nil,
-              run.playerPosition != priorPosition,
-              sourceAction == .travel
-                || (sourceAction == .step
-                    && run.playerPosition.manhattanDistance(to: priorPosition) == 1)
+        guard attempt.sessionEpoch == worldFieldSessionEpoch,
+              let run = activeRun, run.activeEncounter == nil,
+              "\(run.runIndex):\(run.mapSeed)" == attempt.worldRunID,
+              run.playerPosition == committedFinalPosition,
+              committedFinalPosition != attempt.sourcePoint,
+              attempt.sourceAction == .travel
+                || (attempt.sourceAction == .step
+                    && committedFinalPosition.manhattanDistance(to: attempt.sourcePoint) == 1)
         else { return }
-        let worldRunID = "\(run.runIndex):\(run.mapSeed)"
+        guard currentTravellerSpeechSessionID == nil else { return }
+        let worldRunID = attempt.worldRunID
         if travellerSpeechWorldRunID != worldRunID {
             clearWorldTravellerSpeechSession()
             travellerSpeechWorldRunID = worldRunID
         }
         let directions = [(0, -1), (1, 0), (0, 1), (-1, 0)]
         let previouslyAdjacent = Set(directions.compactMap { direction -> TravellerID? in
-            let point = GridPoint(x: priorPosition.x + direction.0,
-                                  y: priorPosition.y + direction.1)
+            let point = GridPoint(x: attempt.sourcePoint.x + direction.0,
+                                  y: attempt.sourcePoint.y + direction.1)
             guard run.map.contains(point), case .traveller(let id) = run.map[point].content else {
                 return nil
             }
@@ -771,13 +836,15 @@ final class GameStore: ObservableObject {
         let alreadyPresented = Set(
             ([worldTravellerSpeech].compactMap { $0 } + worldTravellerSpeechQueue)
                 .map(\.travellerID))
+        let sessionID = WorldTravellerSpeechSessionIDV1(
+            rawValue: nextTravellerSpeechSessionID)
         var admitted: [WorldTravellerSpeechBubbleV1] = []
         for direction in directions {
-            let point = GridPoint(x: run.playerPosition.x + direction.0,
-                                  y: run.playerPosition.y + direction.1)
+            let point = GridPoint(x: committedFinalPosition.x + direction.0,
+                                  y: committedFinalPosition.y + direction.1)
             guard run.map.contains(point), run.map[point].isRevealed,
                   !run.map[point].isCrumbled,
-                  WorldRules.visibility(of: point, from: run.playerPosition, in: run.map,
+                  WorldRules.visibility(of: point, from: committedFinalPosition, in: run.map,
                                         profile: WorldRules.visibilityProfile(
                                             in: run, party: WorldRules.sightBonus(in: state))) == .full,
                   case .traveller(let id) = run.map[point].content,
@@ -785,16 +852,16 @@ final class GameStore: ObservableObject {
                   !alreadyPresented.contains(id),
                   let text = TravellerAdjacentSpeechV1Registry.textByTravellerID[id.rawValue]
             else { continue }
-            admitted.append(.init(travellerID: id, worldRunID: worldRunID,
-                                  point: point, text: text))
+            admitted.append(.init(
+                presentationID: .init(sessionID: sessionID, ordinal: admitted.count),
+                travellerID: id, worldRunID: worldRunID, point: point, text: text,
+                visibleSinceMonotonicTime: nil, deadlineMonotonicTime: nil))
         }
         guard !admitted.isEmpty else { return }
-        if worldTravellerSpeech == nil {
-            worldTravellerSpeech = admitted.removeFirst()
-            if let travellerID = worldTravellerSpeech?.travellerID {
-                shownTravellerSpeechIDs.insert(travellerID)
-            }
-        }
+        nextTravellerSpeechSessionID &+= 1
+        currentTravellerSpeechSessionID = sessionID
+        worldTravellerSpeech = admitted.removeFirst().promoted(at: now)
+        shownTravellerSpeechIDs.insert(worldTravellerSpeech!.travellerID)
         worldTravellerSpeechQueue.append(contentsOf: admitted)
     }
 

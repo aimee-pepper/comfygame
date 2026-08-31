@@ -3083,10 +3083,14 @@ final class WorldTests: XCTestCase {
         XCTAssertEqual(store.worldTravellerSpeechQueue.map { $0.travellerID }, ["tovin"],
                        "new adjacency is queued North then East")
         let gameplay = try SaveCodec.encode(store.state)
-        store.finishWorldTravellerSpeech(expectedTravellerID: "mara")
+        let mara = try XCTUnwrap(store.worldTravellerSpeech)
+        let maraDeadline = try XCTUnwrap(mara.deadlineMonotonicTime)
+        XCTAssertEqual(maraDeadline - (mara.visibleSinceMonotonicTime ?? maraDeadline),
+                       GameStore.worldTravellerSpeechLifetimeNanoseconds)
+        store.expireWorldTravellerSpeech(ifCurrent: mara.presentationID, now: maraDeadline)
         XCTAssertEqual(store.worldTravellerSpeech?.travellerID, "tovin")
         XCTAssertEqual(try SaveCodec.encode(store.state), gameplay)
-        store.finishWorldTravellerSpeech(expectedTravellerID: "mara")
+        store.expireWorldTravellerSpeech(ifCurrent: mara.presentationID, now: maraDeadline)
         XCTAssertEqual(store.worldTravellerSpeech?.travellerID, "tovin",
                        "stale expiry cannot advance a successor")
 
@@ -3133,6 +3137,136 @@ final class WorldTests: XCTestCase {
     }
 
     @MainActor
+    func testTravellerSpeechAttemptObservationReplacementAndStoreLifetimeAreExact() throws {
+        let store = GameStore(io: .temporary(
+            name: "traveller-speech-session-\(UUID().uuidString)"))
+        var fixture = startedRun(book([:]), seed: 7_705)
+        var run = try XCTUnwrap(fixture.worlds.activeRun)
+        for index in run.map.tiles.indices {
+            run.map.tiles[index].ground = .soil
+            run.map.tiles[index].isRevealed = true
+            run.map.tiles[index].content = .empty
+        }
+        let origin = GridPoint(x: 5, y: 6)
+        let destination = GridPoint(x: 5, y: 5)
+        run.playerPosition = origin
+        run.map[GridPoint(x: 5, y: 4)].content = .traveller("mara")
+        fixture.worlds.activeRun = run
+        store.mutate("test exact speech session") { $0 = fixture }
+
+        let firstAttempt = try XCTUnwrap(store.beginWorldFieldAttempt(.step))
+        store.mutate("test first committed position") {
+            $0.worlds.activeRun?.playerPosition = destination
+        }
+        store.presentTravellerSpeechAfterMovement(
+            committedFinalPosition: destination, from: firstAttempt, now: 100)
+        let first = try XCTUnwrap(store.worldTravellerSpeech)
+        XCTAssertEqual(first.visibleSinceMonotonicTime, 100)
+        XCTAssertEqual(first.deadlineMonotonicTime,
+                       100 + GameStore.worldTravellerSpeechLifetimeNanoseconds)
+
+        let observingFirst = try XCTUnwrap(store.beginWorldFieldAttempt(.interact))
+        XCTAssertEqual(observingFirst.observedTravellerSpeechSessionID,
+                       first.presentationID.sessionID)
+        store.clearWorldTravellerSpeechSession()
+        let observingNone = try XCTUnwrap(store.beginWorldFieldAttempt(.interact))
+        XCTAssertNil(observingNone.observedTravellerSpeechSessionID)
+
+        store.mutate("test replacement origin") {
+            $0.worlds.activeRun?.playerPosition = origin
+        }
+        let replacementAttempt = try XCTUnwrap(store.beginWorldFieldAttempt(.step))
+        store.mutate("test replacement committed position") {
+            $0.worlds.activeRun?.playerPosition = destination
+        }
+        store.presentTravellerSpeechAfterMovement(
+            committedFinalPosition: destination, from: replacementAttempt, now: 1_000)
+        let replacement = try XCTUnwrap(store.worldTravellerSpeech)
+        XCTAssertEqual(replacement.travellerID, first.travellerID)
+        XCTAssertNotEqual(replacement.presentationID, first.presentationID)
+
+        let frozen = try SaveCodec.encode(store.state)
+        store.acceptWorldFieldAttempt(observingFirst)
+        store.acceptWorldFieldAttempt(observingNone)
+        store.expireWorldTravellerSpeech(
+            ifCurrent: first.presentationID,
+            now: try XCTUnwrap(first.deadlineMonotonicTime))
+        XCTAssertEqual(store.worldTravellerSpeech, replacement,
+                       "old attempts and timers cannot clear a same-traveller replacement")
+        XCTAssertEqual(try SaveCodec.encode(store.state), frozen)
+
+        XCTAssertEqual(store.remainingWorldTravellerSpeechLifetime(
+            for: replacement.presentationID, now: 1_100),
+            GameStore.worldTravellerSpeechLifetimeNanoseconds - 100)
+        let replacementDeadline = try XCTUnwrap(replacement.deadlineMonotonicTime)
+        store.expireWorldTravellerSpeech(
+            ifCurrent: replacement.presentationID, now: replacementDeadline - 1)
+        XCTAssertEqual(store.worldTravellerSpeech, replacement)
+        store.expireWorldTravellerSpeech(
+            ifCurrent: replacement.presentationID, now: replacementDeadline)
+        XCTAssertNil(store.worldTravellerSpeech)
+        XCTAssertNil(store.worldTravellerSpeechSessionID)
+        XCTAssertEqual(try SaveCodec.encode(store.state), frozen)
+    }
+
+    @MainActor
+    func testTravellerSpeechClearsOnlyForMatchingCommittedDispositionAndReceiptPosition() throws {
+        let store = GameStore(io: .temporary(
+            name: "traveller-speech-disposition-\(UUID().uuidString)"))
+        var fixture = startedRun(book([:]), seed: 7_706)
+        var run = try XCTUnwrap(fixture.worlds.activeRun)
+        for index in run.map.tiles.indices {
+            run.map.tiles[index].ground = .soil
+            run.map.tiles[index].isRevealed = true
+            run.map.tiles[index].content = .empty
+        }
+        let origin = GridPoint(x: 5, y: 6)
+        let destination = GridPoint(x: 5, y: 5)
+        run.playerPosition = origin
+        run.map[GridPoint(x: 5, y: 4)].content = .traveller("mara")
+        fixture.worlds.activeRun = run
+        store.mutate("test speech disposition") { $0 = fixture }
+        let movement = try XCTUnwrap(store.beginWorldFieldAttempt(.step))
+        store.mutate("test speech destination") {
+            $0.worlds.activeRun?.playerPosition = destination
+        }
+        store.presentTravellerSpeechAfterMovement(
+            committedFinalPosition: destination, from: movement, now: 10)
+        let speech = try XCTUnwrap(store.worldTravellerSpeech)
+        let blocked = try XCTUnwrap(store.beginWorldFieldAttempt(.interact))
+        let bytes = try SaveCodec.encode(store.state)
+        store.submitWorldFieldEvents([.blocked("Not now.")], for: blocked,
+                                     disposition: .blocked("Not now."), now: 20)
+        store.submitWorldFieldEvents([], for: blocked, disposition: .busy, now: 30)
+        XCTAssertEqual(store.worldTravellerSpeech, speech)
+        XCTAssertEqual(try SaveCodec.encode(store.state), bytes)
+
+        store.acceptWorldFieldAttempt(blocked)
+        XCTAssertNil(store.worldTravellerSpeech,
+                     "only explicit accepted/committed ownership clears the observed session")
+
+        store.clearWorldTravellerSpeechSession()
+        store.mutate("test delayed movement origin") {
+            $0.worlds.activeRun?.playerPosition = origin
+        }
+        let delayed = try XCTUnwrap(store.beginWorldFieldAttempt(.step))
+        store.mutate("test state moved beyond committed receipt") {
+            $0.worlds.activeRun?.playerPosition = GridPoint(x: 6, y: 5)
+        }
+        store.presentTravellerSpeechAfterMovement(
+            committedFinalPosition: destination, from: delayed, now: 40)
+        XCTAssertNil(store.worldTravellerSpeech,
+                     "speech cannot be projected from a later activeRun position")
+
+        let resetBytes = try SaveCodec.encode(store.state)
+        store.clearWorldFieldFeedback()
+        XCTAssertNil(store.worldTravellerSpeechSessionID)
+        XCTAssertTrue(store.worldTravellerSpeechQueue.isEmpty)
+        XCTAssertEqual(try SaveCodec.encode(store.state), resetBytes,
+                       "full transient reset has no persisted representation")
+    }
+
+    @MainActor
     func testTravellerAdjacentSpeechFailsClosedForDisclosureEncounterAndRetainedAdjacency() throws {
         let store = GameStore(io: .temporary(name: "traveller-speech-closed-\(UUID().uuidString)"))
         var fixture = startedRun(book([:]), seed: 7_702)
@@ -3148,25 +3282,34 @@ final class WorldTests: XCTestCase {
         run.map[north].content = .traveller("mara")
         fixture.worlds.activeRun = run
         store.mutate("test traveller disclosure", flush: true) { $0 = fixture }
-        store.presentTravellerSpeechAfterMovement(from: before, sourceAction: .step)
+        func present(from origin: GridPoint, as source: WorldFieldEventBatchV1.SourceAction,
+                     now: UInt64 = 10) throws {
+            store.mutate("test speech origin") { $0.worlds.activeRun?.playerPosition = origin }
+            let attempt = try XCTUnwrap(store.beginWorldFieldAttempt(source))
+            store.mutate("test committed speech position") {
+                $0.worlds.activeRun?.playerPosition = after
+            }
+            store.presentTravellerSpeechAfterMovement(
+                committedFinalPosition: after, from: attempt, now: now)
+        }
+        try present(from: before, as: .step)
         XCTAssertEqual(store.worldTravellerSpeech?.travellerID, "mara")
         store.clearWorldTravellerSpeechSession()
         store.mutate("hide traveller") { state in
             state.worlds.activeRun?.map[north].isRevealed = false
         }
-        store.presentTravellerSpeechAfterMovement(from: before, sourceAction: .step)
+        try present(from: before, as: .step)
         XCTAssertNil(store.worldTravellerSpeech)
         store.mutate("reveal traveller") { state in
             state.worlds.activeRun?.map[north].isRevealed = true
             state.worlds.activeRun?.map[north].isCrumbled = true
         }
-        store.presentTravellerSpeechAfterMovement(from: before, sourceAction: .step)
+        try present(from: before, as: .step)
         XCTAssertNil(store.worldTravellerSpeech, "crumbled traveller tiles fail closed")
         store.mutate("restore traveller tile") { state in
             state.worlds.activeRun?.map[north].isCrumbled = false
         }
-        store.presentTravellerSpeechAfterMovement(from: GridPoint(x: 5, y: 3),
-                                                   sourceAction: .travel)
+        try present(from: GridPoint(x: 5, y: 3), as: .travel)
         XCTAssertNil(store.worldTravellerSpeech,
                      "retained adjacency is not newly created by the presented movement")
 
@@ -3177,15 +3320,27 @@ final class WorldTests: XCTestCase {
             state.worlds.activeRun?.map[GridPoint(x: 5, y: 6)].content = .traveller("oda")
             state.worlds.activeRun?.map[GridPoint(x: 4, y: 5)].content = .traveller("noll")
         }
-        store.presentTravellerSpeechAfterMovement(from: GridPoint(x: 5, y: 8),
-                                                   sourceAction: .step)
+        try present(from: GridPoint(x: 5, y: 8), as: .step)
         XCTAssertNil(store.worldTravellerSpeech,
                      "a step candidate must be exactly one cardinal move")
-        store.presentTravellerSpeechAfterMovement(from: GridPoint(x: 5, y: 8),
-                                                   sourceAction: .travel)
+        try present(from: GridPoint(x: 5, y: 8), as: .travel)
         XCTAssertEqual(store.worldTravellerSpeech?.travellerID, "mara")
         XCTAssertEqual(store.worldTravellerSpeechQueue.map { $0.travellerID },
                        ["tovin", "oda", "noll"], "ordering is North, East, South, West")
+        let session = try XCTUnwrap(store.worldTravellerSpeech?.presentationID.sessionID)
+        for (ordinal, traveller) in ["mara", "tovin", "oda", "noll"].enumerated() {
+            let speech = try XCTUnwrap(store.worldTravellerSpeech)
+            XCTAssertEqual(speech.travellerID, TravellerID(rawValue: traveller))
+            XCTAssertEqual(speech.presentationID,
+                           .init(sessionID: session, ordinal: ordinal))
+            let visibleSince = try XCTUnwrap(speech.visibleSinceMonotonicTime)
+            let deadline = try XCTUnwrap(speech.deadlineMonotonicTime)
+            XCTAssertEqual(deadline - visibleSince,
+                           GameStore.worldTravellerSpeechLifetimeNanoseconds)
+            store.expireWorldTravellerSpeech(ifCurrent: speech.presentationID, now: deadline)
+        }
+        XCTAssertNil(store.worldTravellerSpeech)
+        XCTAssertTrue(store.worldTravellerSpeechQueue.isEmpty)
     }
 
     @MainActor

@@ -1138,9 +1138,9 @@ struct WorldView: View {
                                 run: run,
                                 frameRequest: frameRequest,
                                 travellerSpeech: store.worldTravellerSpeech,
-                                onTravellerSpeechFinished: { travellerID in
-                                    store.finishWorldTravellerSpeech(
-                                        expectedTravellerID: travellerID)
+                                onTravellerSpeechFinished: { presentationID in
+                                    store.expireWorldTravellerSpeech(
+                                        ifCurrent: presentationID)
                                 },
                                 onCellTouchDown: mapCellTouchDown,
                                 onCellCancel: mapCellCancel,
@@ -1431,7 +1431,9 @@ struct WorldView: View {
                 admission: controlAdmission, action: .fieldKit,
                 quote: { WorldControlQuoteV1.make(payload: .fieldKit, state: store.state) },
                 disabledReason: nil, operation: { _ in
-                    store.clearWorldTravellerSpeechPresentation()
+                    let observedSpeech = store.worldTravellerSpeechSessionID
+                    store.clearWorldTravellerSpeechPresentation(
+                        expectedSessionID: observedSpeech)
                     isShowingFieldKit = true
                     return .completed(.openedFieldKit)
                 }) {
@@ -1765,9 +1767,11 @@ struct WorldView: View {
     private func performInteraction(_ admitted: WorldUseTileQuoteV1) -> WorldControlExecution {
         switch admitted {
         case .loosePage(let quote):
+            let observedSpeech = store.worldTravellerSpeechSessionID
             switch store.takeOfferedWorldPage(quote) {
             case .taken:
-                store.clearWorldTravellerSpeechPresentation()
+                store.clearWorldTravellerSpeechPresentation(
+                    expectedSessionID: observedSpeech)
                 completeInteraction()
                 return .completed(.usedTile("Took World Page"))
             case .satchelFull:
@@ -2413,18 +2417,23 @@ private struct TravellerAdjacentSpeechBubbleView: View {
         .opacity(isVisible ? 1 : 0)
         .animation(.easeOut(duration: isVisible ? 0.18 : 0.16), value: isVisible)
         .allowsHitTesting(false)
-        .task(id: speech.travellerID) {
-            isVisible = true
+        .task(id: speech.presentationID) {
+            let now = DispatchTime.now().uptimeNanoseconds
+            guard let deadline = speech.deadlineMonotonicTime else { return }
+            let fadeStart = deadline &- min(deadline, 160_000_000)
             isSettled = true
-            do { try await Task.sleep(nanoseconds: 180_000_000) }
-            catch { return }
-            guard !Task.isCancelled else { return }
-            do { try await Task.sleep(nanoseconds: 4_800_000_000) }
-            catch { return }
-            guard !Task.isCancelled else { return }
-            isVisible = false
-            do { try await Task.sleep(nanoseconds: 160_000_000) }
-            catch { return }
+            isVisible = now < fadeStart
+            if now < fadeStart {
+                do { try await Task.sleep(nanoseconds: fadeStart - now) }
+                catch { return }
+                guard !Task.isCancelled else { return }
+                isVisible = false
+            }
+            let beforeExpiry = DispatchTime.now().uptimeNanoseconds
+            if beforeExpiry < deadline {
+                do { try await Task.sleep(nanoseconds: deadline - beforeExpiry) }
+                catch { return }
+            }
             guard !Task.isCancelled else { return }
             onFinished()
         }
@@ -2435,7 +2444,7 @@ private struct MapGrid: View {
     let run: WorldRun
     let frameRequest: WorldMapFrameRequestAuthority.Request
     let travellerSpeech: WorldTravellerSpeechBubbleV1?
-    let onTravellerSpeechFinished: (TravellerID) -> Void
+    let onTravellerSpeechFinished: (WorldTravellerSpeechPresentationIDV1) -> Void
     let onCellTouchDown: (GridPoint) -> Void
     let onCellCancel: () -> Void
     let onCellActivate: (GridPoint) -> Void
@@ -2499,7 +2508,7 @@ private struct MapGrid: View {
                     anchor: anchor, stageSize: proxy.size)
                 TravellerAdjacentSpeechBubbleView(
                     speech: speech, placement: placement,
-                    onFinished: { onTravellerSpeechFinished(speech.travellerID) })
+                    onFinished: { onTravellerSpeechFinished(speech.presentationID) })
                     .frame(width: placement.width, height: placement.height)
                     .position(x: placement.center.x, y: placement.center.y)
                     .transition(.opacity)

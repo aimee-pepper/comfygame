@@ -722,7 +722,6 @@ extension GameStore {
     func step(to point: GridPoint) {
         guard activeRun?.activeEncounter == nil else { return }
         guard let run = activeRun else { return }
-        let priorPosition = run.playerPosition
         guard let attempt = beginWorldFieldAttempt(.step) else { return }
         guard WorldRules.isAdjacent(run.playerPosition, point) else {
             let events: [WorldRules.Event] = [.blocked("That's not a step away.")]
@@ -741,8 +740,12 @@ extension GameStore {
         mutate("step", scope: .expedition) { state in
             events = WorldRules.step(to: point, in: &state)
         }
+        let committedFinalPosition = activeRun?.playerPosition
         finishTurn(events, attempt: attempt, disposition: .committed)
-        presentTravellerSpeechAfterMovement(from: priorPosition, sourceAction: .step)
+        if let committedFinalPosition {
+            presentTravellerSpeechAfterMovement(
+                committedFinalPosition: committedFinalPosition, from: attempt)
+        }
     }
 
     /// What's in the satchel that could be used right now, out in the world.
@@ -932,7 +935,6 @@ extension GameStore {
     /// stopping for — an enemy waking, a hazard, a threshold, a fight (SPD-style, locked decision).
     func travel(to destination: GridPoint) {
         guard let run = activeRun, run.activeEncounter == nil else { return }
-        let priorPosition = run.playerPosition
         guard destination != run.playerPosition else { return }
         guard let attempt = beginWorldFieldAttempt(.travel) else { return }
 
@@ -979,9 +981,13 @@ extension GameStore {
                 if case .blocked(let reason) = event { return reason }
                 return nil
             }.first ?? "Travel made no progress.")
+        let committedFinalPosition = committed ? activeRun?.playerPosition : nil
         finishTurn(events, attempt: attempt, disposition: disposition)
         if committed {
-            presentTravellerSpeechAfterMovement(from: priorPosition, sourceAction: .travel)
+            if let committedFinalPosition {
+                presentTravellerSpeechAfterMovement(
+                    committedFinalPosition: committedFinalPosition, from: attempt)
+            }
         }
     }
 
