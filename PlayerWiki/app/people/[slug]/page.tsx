@@ -43,6 +43,16 @@ export default async function PersonDetail({
           summary={person.summary}
         />
       </div>
+      <nav className="person-record-navigation" aria-label={`${person.name} records`}>
+        <a href="#location-hints">
+          <strong>Location hints</strong>
+          <span>{person.hints.length} published</span>
+        </a>
+        <a href="#diary-pages">
+          <strong>Diary pages</strong>
+          <span>{person.diaryPages.length} published</span>
+        </a>
+      </nav>
       <section className="article-section">
         <h2>At a glance</h2>
         <dl className="fact-grid">
@@ -85,7 +95,7 @@ export default async function PersonDetail({
           </p>
         )}
       </section>
-      <section className="article-section">
+      <section className="article-section" id="location-hints">
         <h2>Hints for finding them</h2>
         {person.hints.length ? (
           <ol className="finding-list">
@@ -97,12 +107,12 @@ export default async function PersonDetail({
           <p>No authored location hint is currently available.</p>
         )}
       </section>
-      <section className="article-section">
+      <section className="article-section" id="diary-pages">
         <h2>Diary pages</h2>
         <div className="diary-grid">
           {person.diaryPages.map((page, index) => (
             <article className="note-card" key={`${person.id}-page-${index}`}>
-              <p className="eyebrow">Entry {index + 1} · {humanize(page.kind)}</p>
+              <p className="eyebrow">Diary page {index + 1} of {person.diaryPages.length} · {humanize(page.kind)}</p>
               <p>{page.prose}</p>
               {page.reward && (
                 <p>

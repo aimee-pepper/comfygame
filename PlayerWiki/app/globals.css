@@ -866,6 +866,87 @@ footer {
 .person-intro .article-intro {
   min-width: 0;
 }
+.people-directory {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  margin-top: 34px;
+}
+.person-directory-card {
+  display: grid;
+  grid-template-columns: 64px minmax(0, 1fr);
+  gap: 14px;
+  padding: 16px;
+  border: 1px solid var(--line);
+  background: rgb(255 250 240 / 82%);
+}
+.person-directory-card > .pixel-image {
+  border: 1px solid rgb(185 148 97 / 55%);
+  background: var(--paper-light);
+}
+.person-directory-card h2 {
+  margin: 2px 0 7px;
+  font: 700 22px Georgia, serif;
+}
+.person-directory-card h2 a {
+  color: inherit;
+  text-decoration-color: rgb(47 92 116 / 42%);
+}
+.person-directory-card > div > p:not(.eyebrow) {
+  margin: 0;
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.45;
+}
+.person-directory-card dl {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin: 12px 0;
+}
+.person-directory-card dt {
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.person-directory-card dd {
+  margin: 3px 0 0;
+  font-size: 13px;
+  font-weight: 700;
+}
+.person-directory-card nav,
+.person-record-navigation {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+.person-directory-card nav a,
+.person-record-navigation a {
+  padding: 6px 8px;
+  border: 1px solid var(--line);
+  background: var(--paper-light);
+  color: var(--blue);
+  font-size: 12px;
+}
+.person-record-navigation {
+  margin-top: 26px;
+}
+.person-record-navigation a {
+  display: grid;
+  min-width: 150px;
+  gap: 3px;
+  color: inherit;
+  text-decoration: none;
+}
+.person-record-navigation a:hover {
+  background: var(--paper-deep);
+}
+.person-record-navigation span {
+  color: var(--muted);
+  font-size: 12px;
+}
 .finding-list {
   display: grid;
   gap: 10px;
@@ -978,6 +1059,9 @@ footer {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
   .systems-hub-grid {
+    grid-template-columns: 1fr;
+  }
+  .people-directory {
     grid-template-columns: 1fr;
   }
   .journey-strip {

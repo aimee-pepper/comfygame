@@ -25,17 +25,19 @@ test('World Writing teaches the authored player order', async () => {
   assert.match(source, /content\.writingVisuals/);
 });
 
-test('player reference indexes are tables linked to individual pages', async () => {
+test('player reference indexes link to individual pages', async () => {
   for (const relative of [
     'app/resources/page.tsx',
     'app/equipment/page.tsx',
-    'app/people/page.tsx',
     'app/places/page.tsx',
   ]) {
     const source = await read(relative);
     assert.match(source, /<table>/);
     assert.match(source, /<Link/);
   }
+  const people = await read('app/people/page.tsx');
+  assert.match(people, /people-directory/);
+  assert.match(people, /<Link/);
   for (const relative of [
     'app/resources/[slug]/page.tsx',
     'app/equipment/[slug]/page.tsx',
@@ -215,10 +217,18 @@ test('every live person includes every authored diary page and every authored lo
     );
   }
   const personPage = await read('app/people/[slug]/page.tsx');
+  const peopleDirectory = await read('app/people/page.tsx');
   assert.match(personPage, /PixelImage/);
   assert.match(personPage, /character cameo/);
   assert.match(personPage, /Hints for finding them/);
   assert.match(personPage, /Diary pages/);
+  assert.match(personPage, /person-record-navigation/);
+  assert.match(personPage, /#location-hints/);
+  assert.match(personPage, /#diary-pages/);
+  assert.match(personPage, /Diary page \{index \+ 1\} of/);
+  assert.match(peopleDirectory, /people-directory/);
+  assert.match(peopleDirectory, /#location-hints/);
+  assert.match(peopleDirectory, /#diary-pages/);
   for (const person of content.travellers) {
     assert.ok(person.assetURL, `${person.name} cameo URL`);
     assert.match(person.assetURL, /^\/game-assets\/people\/.+-cameo\.svg$/);
