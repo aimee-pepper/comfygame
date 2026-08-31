@@ -272,3 +272,13 @@ test('search groups player references and uses retained thumbnails only where av
   assert.match(search, /PixelImage/);
   assert.match(search, /!groups\.length/);
 });
+
+test('glossary combines related player domains and points to useful guides', async () => {
+  const glossary = await read('app/glossary/page.tsx');
+  assert.match(glossary, /Writing a world/);
+  assert.match(glossary, /Combat and party/);
+  assert.match(glossary, /Village, resources and progression/);
+  assert.match(glossary, /\/systems\/world-writing/);
+  assert.match(glossary, /\/services\/party-and-gear/);
+  assert.match(glossary, /glossary-group-heading/);
+});

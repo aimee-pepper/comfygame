@@ -1,9 +1,48 @@
+import Link from 'next/link';
 import { PageIntro } from '@/components/page-intro';
 import { SiteFrame } from '@/components/site-frame';
 import { content } from '@/lib/content';
 
+const domainGroups = [
+  {
+    label: 'Writing a world',
+    domains: ['Writing'],
+    links: [['World Writing', '/systems/world-writing'], ['Exploration guide', '/systems/exploration']],
+  },
+  {
+    label: 'Worlds and exploration',
+    domains: ['Exploration', 'World generation'],
+    links: [['Exploration guide', '/systems/exploration'], ['Resources', '/resources']],
+  },
+  {
+    label: 'Combat and party',
+    domains: ['Combat planning', 'Combat progression', 'Gear', 'Party'],
+    links: [['Combat guide', '/systems/combat'], ['Equipment', '/equipment'], ['Party and Gear service', '/services/party-and-gear']],
+  },
+  {
+    label: 'Village, resources and progression',
+    domains: ['Home and return', 'Essence', 'Research', 'Campaign progression'],
+    links: [['Village services', '/services'], ['Crafting', '/systems/crafting'], ['Resources', '/resources']],
+  },
+  {
+    label: 'Campaign records and return',
+    domains: ['Persistence', 'Compatibility', 'Return', 'Expeditions'],
+    links: [['Getting started', '/getting-started'], ['Library service', '/services/library']],
+  },
+  {
+    label: 'People',
+    domains: ['People'],
+    links: [['People', '/people'], ['Village services', '/services']],
+  },
+];
+
 export default function GlossaryPage() {
+  const groupedTerms = domainGroups.map((group) => ({
+    ...group,
+    terms: content.terminology.filter((term) => group.domains.includes(term.domain)),
+  })).filter((group) => group.terms.length);
+
   return <SiteFrame sidebar><PageIntro eyebrow="Reference" title="Glossary" summary="Plain-language definitions for Bookbinder's recurring terms, grouped by the part of the game where you encounter them." />
-    {[...new Set(content.terminology.map(term => term.domain))].map(domain => <section className="article-section" key={domain}><h2>{domain}</h2><dl className="definition-grid">{content.terminology.filter(term => term.domain === domain).map(term => <div id={term.slug} key={term.id}><dt><strong>{term.name}</strong></dt><dd>{term.summary}{term.aliases.length ? <small> Also called: {term.aliases.join(', ')}.</small> : null}</dd></div>)}</dl></section>)}
+    {groupedTerms.map(group => <section className="article-section glossary-group" key={group.label}><div className="glossary-group-heading"><h2>{group.label}</h2><nav aria-label={`${group.label} guides`}>{group.links.map(([label, href]) => <Link href={href} key={href}>{label}</Link>)}</nav></div><dl className="definition-grid">{group.terms.map(term => <div id={term.slug} key={term.id}><dt><strong>{term.name}</strong></dt><dd>{term.summary}{term.aliases.length ? <small> Also called: {term.aliases.join(', ')}.</small> : null}</dd></div>)}</dl></section>)}
   </SiteFrame>;
 }

@@ -342,6 +342,26 @@ h2 {
   font-size: 13px;
   font-style: italic;
 }
+.glossary-group-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+.glossary-group-heading h2 {
+  margin: 0;
+}
+.glossary-group-heading nav {
+  gap: 7px;
+}
+.glossary-group-heading nav a {
+  padding: 6px 9px;
+  border: 1px solid var(--line);
+  background: var(--paper-light);
+  color: var(--blue);
+  font-size: 12px;
+}
 .table-wrap {
   overflow-x: auto;
   border: 1px solid var(--line);
@@ -918,5 +938,9 @@ footer {
   }
   .entity-heading {
     grid-template-columns: 1fr;
+  }
+  .glossary-group-heading {
+    align-items: flex-start;
+    flex-direction: column;
   }
 }
