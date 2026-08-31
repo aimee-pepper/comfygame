@@ -19,11 +19,19 @@ COPY_SUFFIX = re.compile(r"(?: |\()\d+\)?(?=\.[^.]+$)")
 CLASSES = {"review-evidence", "reference", "candidate-output", "generated-test-artifact", "blocked"}
 ROLES = {"render", "metadata", "interactive-proof", "test-report"}
 APPROVED_ACCEPTED_EVIDENCE_FINGERPRINTS: set[str] = set()
+RECEIPT_KEYS = {
+    "$schema", "schemaVersion", "family", "version", "variant", "classification",
+    "accepted", "sourceAuthorship", "runtimeAuthority", "gameplayAuthority",
+    "finalArtAcceptance", "gameWikiDisclosure", "authorityPaths", "producerPaths",
+    "files",
+}
+REQUIRED_RECEIPT_KEYS = RECEIPT_KEYS - {"$schema"}
+FILE_KEYS = {"path", "role", "sha256"}
 
 def sha(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
-def fingerprint(receipt: dict[str, object]) -> str | None:
+def fingerprint(root: Path, receipt: dict[str, object]) -> str | None:
     files = receipt.get("files")
     if not isinstance(files, list) or not all(isinstance(item, dict) for item in files):
         return None
@@ -37,7 +45,14 @@ def fingerprint(receipt: dict[str, object]) -> str | None:
         if not isinstance(values, list) or not all(isinstance(value, str) for value in values):
             return None
         fields.append(key)
-        fields.extend(sorted(values))
+        bound_paths: list[tuple[str, str]] = []
+        for value in values:
+            path = root / value
+            if not safe_repo_path(root, value):
+                return None
+            bound_paths.append((value, sha(path)))
+        for value, digest in sorted(bound_paths):
+            fields.extend((value, digest))
     for item in sorted(files, key=lambda value: str(value.get("path", ""))):
         fields.extend(str(item.get(key, "")) for key in ("path", "role", "sha256"))
     payload = b"".join(f"{len(value.encode())}:{value}".encode() for value in fields)
@@ -62,6 +77,10 @@ def validate(root: Path, approved: set[str] = APPROVED_ACCEPTED_EVIDENCE_FINGERP
         except Exception as error:
             errors.append(f"invalid receipt JSON: {receipt_path}: {error}"); continue
         if not isinstance(receipt, dict): errors.append(f"receipt is not an object: {receipt_path}"); continue
+        unexpected = set(receipt) - RECEIPT_KEYS
+        missing = REQUIRED_RECEIPT_KEYS - set(receipt)
+        if unexpected: errors.append(f"unsupported receipt fields {sorted(unexpected)}: {receipt_path}")
+        if missing: errors.append(f"missing receipt fields {sorted(missing)}: {receipt_path}")
         family, version, variant = receipt_path.relative_to(evidence).parts[:3]
         exact = {
             "schemaVersion": "asset-evidence-receipt-v1", "family": family,
@@ -85,6 +104,10 @@ def validate(root: Path, approved: set[str] = APPROVED_ACCEPTED_EVIDENCE_FINGERP
         if not isinstance(files, list) or not files: errors.append(f"receipt has no files: {receipt_path}"); continue
         for item in files:
             if not isinstance(item, dict): errors.append(f"invalid file entry: {receipt_path}"); continue
+            unexpected = set(item) - FILE_KEYS
+            missing = FILE_KEYS - set(item)
+            if unexpected: errors.append(f"unsupported file-entry fields {sorted(unexpected)}: {receipt_path}")
+            if missing: errors.append(f"missing file-entry fields {sorted(missing)}: {receipt_path}")
             value, role, expected = item.get("path"), item.get("role"), item.get("sha256")
             prefix = f"AssetEvidence/{family}/{version}/{variant}/review/"
             if not isinstance(value, str) or not value.startswith(prefix) or len(PurePosixPath(value).parts) != 6:
@@ -100,7 +123,7 @@ def validate(root: Path, approved: set[str] = APPROVED_ACCEPTED_EVIDENCE_FINGERP
             declared.add(value)
         accepted = receipt.get("accepted")
         if accepted not in {True, False}: errors.append(f"accepted must be boolean: {receipt_path}")
-        fp = fingerprint(receipt)
+        fp = fingerprint(root, receipt)
         if accepted is True and (fp is None or fp not in approved):
             errors.append(f"accepted evidence lacks reviewed fingerprint: {receipt_path} ({fp})")
     actual = {path.relative_to(root).as_posix() for path in evidence.glob("*/*/*/review/*") if path.is_file()}
@@ -124,7 +147,8 @@ def self_test() -> None:
         rp=root/"AssetEvidence/a/v1/b/evidence-receipt.json"; rp.write_text(json.dumps(receipt))
         assert not validate(root)
         receipt["accepted"]=True; rp.write_text(json.dumps(receipt)); assert validate(root)
-        fp=fingerprint(receipt); assert fp and not validate(root,{fp})
+        assert validate(root,{"a" * 64})  # A structurally valid forged receipt is not approval.
+        fp=fingerprint(root, receipt); assert fp and not validate(root,{fp})
         receipt["authorityPaths"]=["docs/b.json"]; rp.write_text(json.dumps(receipt))
         assert validate(root,{fp})
         receipt["authorityPaths"]=["docs/a.json"]
@@ -132,7 +156,17 @@ def self_test() -> None:
         assert validate(root,{fp})
         receipt["producerPaths"]=["Scripts/make.mjs"]; rp.write_text(json.dumps(receipt))
         assert not validate(root,{fp})
+        authority.write_text('{"changed":true}'); assert validate(root,{fp})
+        authority.write_text("{}"); assert not validate(root,{fp})
+        producer.write_text("// changed fixture"); assert validate(root,{fp})
+        producer.write_text("// fixture"); assert not validate(root,{fp})
         file.write_text("changed"); assert validate(root,{fp})
+        file.write_text("{}"); assert not validate(root,{fp})
+        receipt["runtimeApproval"]="forged"; rp.write_text(json.dumps(receipt)); assert validate(root,{fp})
+        del receipt["runtimeApproval"]
+        receipt["files"][0]["approval"]="forged"; rp.write_text(json.dumps(receipt)); assert validate(root,{fp})
+        del receipt["files"][0]["approval"]
+        rp.write_text(json.dumps(receipt)); assert not validate(root,{fp})
 
 def main() -> int:
     parser=argparse.ArgumentParser(); parser.add_argument("--check",action="store_true"); parser.add_argument("--self-test",action="store_true"); args=parser.parse_args()
