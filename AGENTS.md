@@ -72,10 +72,11 @@ During a P0 lane:
   review of an exact committed P0 revision may interrupt that work when mechanics, state, persistence,
   identity, content, or interaction truth genuinely require Game Design authority; afterward it returns to
   design and content creation.
-- Asset remains primarily an asset-production and human-authoring role. It may continue an exact implemented
-  or scheduled native consumer that does not conflict with the P0 worktree, including the player-requested
-  human-authoring source lane. A brief bounded review or literal correction of an exact committed P0 consumer
-  may interrupt that work; afterward it returns to production.
+- Asset remains primarily an asset-production and human-authoring role. It maintains a rolling queue of exact
+  implemented or scheduled native consumers that do not conflict with the P0 worktree, including the
+  player-requested human-authoring source lane, and does not stop merely because earlier committed packets
+  await integration. A brief bounded review or literal correction of an exact committed P0 consumer may
+  interrupt that work; afterward it returns to production.
 - Reviews are secondary responsibilities for both leads. Do not turn either task into a standing audit queue.
 - Every concurrent Design or Asset assignment must name its roadmap authority, exact deliverable, integration
   dependency, persistent worktree, and bounded commit boundary. Asset assignments must additionally name the
@@ -94,8 +95,8 @@ The three leads are builders. Their default work is creating the game, not evalu
   implementation packets in campaign and roadmap order. Do not stop at an arbitrary packet count, and do not
   manufacture design questions merely to stay active.
 - **Asset Lead:** create approved consumer-backed art, typography, motion, composition, and human-authoring
-  tools/source organization; prepare assets only for exact implemented or scheduled consumers. Do not replace
-  making assets with broad UI audits.
+  tools/source organization; maintain a rolling queue for exact implemented or scheduled consumers. Do not
+  stop at an arbitrary packet count, and do not replace making assets with broad UI audits.
 - Review is a change-specific gate, not any lead's primary queue. Game Design reviews mechanics/content truth;
   Asset reviews literal player-visible treatment. Once a bounded review is complete, resume creation work.
 - When production work is blocked by a real dependency, choose the next explicit nonconflicting roadmap item
