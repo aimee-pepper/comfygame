@@ -817,10 +817,12 @@ final class WorldTests: XCTestCase {
         let before = image()
         let frozen = try SaveCodec.encode(store.state)
         let attempt = try XCTUnwrap(store.beginWorldFieldAttempt(.step))
+        let presentedAt = DispatchTime.now().uptimeNanoseconds
         store.submitWorldFieldEvents([
-            .blocked("First complete narration."), .hazardHit(damage: 2),
-            .poisonWorking(damage: 1),
-        ], for: attempt, disposition: .committed, now: 10)
+            .blocked("First complete narration."),
+            .blocked("Second complete narration."),
+            .blocked("Third complete narration."),
+        ], for: attempt, disposition: .blocked("fixture"), now: presentedAt)
         RunLoop.main.run(until: Date().addingTimeInterval(0.08))
         controller.view.layoutIfNeeded()
         let mapFrameAfter = WorldMapStageMeasurement.latestFrame
@@ -859,10 +861,12 @@ final class WorldTests: XCTestCase {
         store.mutate("test: expanded feedback") { $0 = startedRun(book([:]), seed: 906) }
         let frozen = try SaveCodec.encode(store.state)
         let attempt = try XCTUnwrap(store.beginWorldFieldAttempt(.step))
+        let presentedAt = DispatchTime.now().uptimeNanoseconds
         store.submitWorldFieldEvents([
-            .blocked("First complete narration."), .hazardHit(damage: 2),
-            .poisonWorking(damage: 1),
-        ], for: attempt, disposition: .committed, now: 10)
+            .blocked("First complete narration."),
+            .blocked("Second complete narration."),
+            .blocked("Third complete narration."),
+        ], for: attempt, disposition: .blocked("fixture"), now: presentedAt)
         let batch = try XCTUnwrap(store.currentWorldFieldEventBatch)
         let controller = UIHostingController(rootView:
             WorldFieldFeedbackRow(initiallyExpandedBatchID: batch.batchID)
@@ -878,7 +882,9 @@ final class WorldTests: XCTestCase {
         let attachment = XCTAttachment(image: image)
         attachment.name = "world-field-feedback-expanded-three-lines"
         attachment.lifetime = .keepAlways; add(attachment)
-        store.expireWorldFieldFeedback(ifCurrent: batch.batchID, now: 2_000_000_010)
+        store.expireWorldFieldFeedback(
+            ifCurrent: batch.batchID,
+            now: presentedAt + WorldFieldFeedbackLayout.eventLifetimeNanoseconds)
         XCTAssertNil(store.currentWorldFieldEventBatch,
                      "expanded presentation must not extend the event's 1.7s hold + 0.3s fade")
         window.isHidden = true
