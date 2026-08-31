@@ -100,6 +100,11 @@ interface PlayerContent {
   terminology: Term[];
   terrain: Array<{ name: string; assetURL: string }>;
   writingAssetURL: string | null;
+  explorationVisuals: {
+    entryPortal: string | null;
+    unsearchedSite: string | null;
+    searchedSite: string | null;
+  };
 }
 
 export const content = rawContent as PlayerContent;

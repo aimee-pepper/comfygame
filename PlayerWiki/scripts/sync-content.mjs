@@ -66,6 +66,7 @@ await mkdir(path.join(publicAssetRoot, 'terrain'), { recursive: true });
 await mkdir(path.join(publicAssetRoot, 'writing'), { recursive: true });
 await mkdir(path.join(publicAssetRoot, 'people'), { recursive: true });
 await mkdir(path.join(publicAssetRoot, 'places'), { recursive: true });
+await mkdir(path.join(publicAssetRoot, 'exploration'), { recursive: true });
 
 async function publishAsset(asset, directory, fileName) {
   if (!asset?.sourcePath) return null;
@@ -286,6 +287,19 @@ const writingAssetURL = await publishAsset(
   'writing-parchment.png',
 );
 
+const explorationVisuals = await Promise.all([
+  ['entryPortal', 'entry_portal/ordinary/frame-0', 'entry-portal.png'],
+  ['unsearchedSite', 'wayfarers_camp/unlooted/frame-0', 'site-unsearched.png'],
+  ['searchedSite', 'wayfarers_camp/looted/frame-0', 'site-searched.png'],
+].map(async ([name, semanticKey, fileName]) => [
+  name,
+  await publishAsset(
+    runtimeAsset('exploration-map-identities-v1', semanticKey),
+    'exploration',
+    fileName,
+  ),
+]));
+
 const playerContent = {
   schemaVersion: 1,
   resources,
@@ -302,6 +316,7 @@ const playerContent = {
   })),
   terrain,
   writingAssetURL,
+  explorationVisuals: Object.fromEntries(explorationVisuals),
 };
 
 await writeFile(

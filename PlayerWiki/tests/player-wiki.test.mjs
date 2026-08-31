@@ -124,6 +124,18 @@ test('places publish only current retained town and building visuals inline', as
   assert.match(detail, /town context/);
 });
 
+test('exploration guide publishes retained portal and site-state visuals inline', async () => {
+  const content = JSON.parse(await read('data/player-content.json'));
+  for (const assetURL of Object.values(content.explorationVisuals)) {
+    assert.match(assetURL, /^\/game-assets\/exploration\//);
+    await access(path.join(root, 'public', assetURL));
+  }
+  const exploration = await read('app/systems/exploration/page.tsx');
+  assert.match(exploration, /exploration-state-strip/);
+  assert.match(exploration, /Entry portal/);
+  assert.match(exploration, /Searched site/);
+});
+
 test('every live person includes every authored diary page and every authored location hint', async () => {
   const content = JSON.parse(await read('data/player-content.json'));
   const authored = JSON.parse(
