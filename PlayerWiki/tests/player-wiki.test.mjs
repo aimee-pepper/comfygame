@@ -571,3 +571,21 @@ test('Animals guide documents current Attend, trust, companion placement, combat
   assert.match(systems, /\/systems\/animals-companionship/);
   assert.match(frame, /\/systems\/animals-companionship/);
 });
+
+test('Equipment and material-effects guide keeps current slots, ownership, samples, and reforge routes player-facing', async () => {
+  const guide = await read('app/systems/equipment-materials/page.tsx');
+  const systems = await read('app/systems/page.tsx');
+  const frame = await read('components/site-frame.tsx');
+  await access(path.join(root, 'app/systems/equipment-materials/page.tsx'));
+  for (const slot of ['Weapon', 'Off-hand', 'Head', 'Body', 'Hands', 'Feet', 'Tool', 'Keepsake']) assert.match(guide, new RegExp(slot));
+  assert.match(guide, /worn by another person/);
+  assert.match(guide, /cannot be changed until you return Home/);
+  assert.match(guide, /provenance and grade/);
+  assert.match(guide, /select one exact eligible stock sample/);
+  assert.match(guide, /construction tier remains with that piece/);
+  assert.match(guide, /changed piece, stock, or cost/);
+  assert.match(guide, /\/crafting\/blacksmith/);
+  assert.match(guide, /\/systems\/party-preparation/);
+  assert.match(systems, /\/systems\/equipment-materials/);
+  assert.match(frame, /\/systems\/equipment-materials/);
+});
