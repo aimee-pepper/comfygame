@@ -22,7 +22,7 @@ export default function SystemsHub() {
       summary: 'Read the encounter, prepare the travelling party, then compare the gear and supplies available before you depart.',
       visualURL: weapon?.assetURL ?? partyMember?.assetURL ?? null,
       visualAlt: weapon ? `${weapon.name} icon` : partyMember ? `${partyMember.name} character visual` : 'Combat reference',
-      links: [['Combat', '/systems/combat'], ['Party, Gear and Gambits', '/systems/party-preparation'], ['Equipment and material effects', '/systems/equipment-materials'], ['Inventory and custody', '/systems/inventory-custody'], ['Field supplies', '/systems/field-supplies'], ['Equipment', '/equipment'], ['Consumables', '/consumables']],
+      links: [['Combat', '/systems/combat'], ['Combat techniques and Gambits', '/systems/combat-techniques-gambits'], ['Party, Gear and Gambits', '/systems/party-preparation'], ['Equipment and material effects', '/systems/equipment-materials'], ['Inventory and custody', '/systems/inventory-custody'], ['Field supplies', '/systems/field-supplies'], ['Equipment', '/equipment'], ['Consumables', '/consumables']],
     },
     {
       title: 'Crafting and materials',

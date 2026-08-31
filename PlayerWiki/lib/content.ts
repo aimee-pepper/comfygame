@@ -123,6 +123,23 @@ export interface PressureTarget {
   order: number;
 }
 
+export interface CombatTechnique {
+  name: string;
+  blurb: string;
+  effect: string;
+  target: string;
+  cooldown: string;
+  availability: string;
+  trainingRole: string | null;
+  trainingDepth: number | null;
+}
+
+export interface GambitComponent {
+  kind: 'subject' | 'property' | 'comparator' | 'threshold' | 'action';
+  name: string;
+  blurb: string;
+}
+
 interface PlayerContent {
   schemaVersion: number;
   resources: Resource[];
@@ -132,6 +149,8 @@ interface PlayerContent {
   researchBranches: ResearchBranch[];
   researchNodes: ResearchNode[];
   pressureTargets: PressureTarget[];
+  combatTechniques: CombatTechnique[];
+  gambitComponents: GambitComponent[];
   terminology: Term[];
   terrain: Array<{ name: string; assetURL: string }>;
   writingAssetURL: string | null;

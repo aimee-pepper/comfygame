@@ -403,6 +403,24 @@ test('combat guide integrates retained party and gear references without a visua
   assert.match(combat, /\/systems\/field-supplies/);
 });
 
+test('combat techniques and Gambits enumerate only current grants and owned rule parts', async () => {
+  await access(path.join(root, 'app/systems/combat-techniques-gambits/page.tsx'));
+  const guide = await read('app/systems/combat-techniques-gambits/page.tsx');
+  const content = JSON.parse(await read('data/player-content.json'));
+  assert.equal(content.combatTechniques.length, 25);
+  assert.equal(content.combatTechniques.some((entry) => entry.name === 'Rout'), false);
+  assert.equal(content.combatTechniques.some((entry) => entry.name === 'Steady'), false);
+  assert.equal(content.combatTechniques.some((entry) => entry.name === 'Blur'), true);
+  assert.equal(content.gambitComponents.length, 27);
+  assert.deepEqual([...new Set(content.gambitComponents.map((entry) => entry.kind))].sort(), ['action', 'comparator', 'property', 'subject', 'threshold']);
+  assert.match(guide, /one Combat Point/);
+  assert.match(guide, /no separate technique currency/);
+  assert.match(guide, /The first enabled rule that fits is the one that fires/);
+  assert.match(guide, /only their owned components/);
+  assert.match(await read('app/systems/page.tsx'), /\/systems\/combat-techniques-gambits/);
+  assert.match(await read('components/site-frame.tsx'), /\/systems\/combat-techniques-gambits/);
+});
+
 test('all requested player detail routes have shared breadcrumbs and related guides', async () => {
   for (const relative of [
     'app/systems/world-writing/page.tsx',

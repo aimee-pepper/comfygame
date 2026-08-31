@@ -5327,6 +5327,395 @@
       "constructionBundledWith": null
     }
   ],
+  "combatTechniques": [
+    {
+      "name": "Ambush",
+      "blurb": "The fight starts with your turn.",
+      "effect": "In an eligible opening, make one shared free direct attack before your first normal-cost action.",
+      "target": "Choose a living foe",
+      "cooldown": "5-round cooldown",
+      "availability": "Learn the named Training node for that person",
+      "trainingRole": "developmentB",
+      "trainingDepth": 3
+    },
+    {
+      "name": "Blur",
+      "blurb": "Two whole turns, once, when it matters.",
+      "effect": "Once per encounter, take two ordinary actions without spending this action; cannot combine with Quicken this turn.",
+      "target": "No card target",
+      "cooldown": "Once per encounter",
+      "availability": "Learn the named Training node for that person",
+      "trainingRole": "capstone",
+      "trainingDepth": 5
+    },
+    {
+      "name": "Brace",
+      "blurb": "You take the next one properly.",
+      "effect": "Reduce direct damage by 35% through the next hostile action slot that damages you.",
+      "target": "No card target",
+      "cooldown": "3-round cooldown",
+      "availability": "Learn the named Training node for that person",
+      "trainingRole": "fundamentalB",
+      "trainingDepth": 2
+    },
+    {
+      "name": "Conceal",
+      "blurb": "Not there, for a moment.",
+      "effect": "Through next round, prevent direct targeting while another legal target exists; attacking or intervening reveals you.",
+      "target": "No card target",
+      "cooldown": "4-round cooldown",
+      "availability": "Learn the named Training node for that person",
+      "trainingRole": "fundamentalB",
+      "trainingDepth": 2
+    },
+    {
+      "name": "Draw Off",
+      "blurb": "Make yourself the obvious problem.",
+      "effect": "Choose one foe; while Draw Off lasts, it targets you whenever legally able.",
+      "target": "Choose a living foe",
+      "cooldown": "3-round cooldown",
+      "availability": "Learn the named Training node for that person",
+      "trainingRole": "fundamentalB",
+      "trainingDepth": 2
+    },
+    {
+      "name": "Emanation Strike",
+      "blurb": "Strike through a ward with a searing emanation.",
+      "effect": "Make a 9-power Heat, Caustic or Light attack, carrying Burn 4×2, Poison 2×4 or Dazzle 0×2.",
+      "target": "Choose a living foe",
+      "cooldown": "3-round cooldown",
+      "availability": "Learn the named Training node for that person",
+      "trainingRole": "fundamentalB",
+      "trainingDepth": 2
+    },
+    {
+      "name": "Envenom",
+      "blurb": "Properly coated, for a while.",
+      "effect": "Arm your next 3 landed physical-weapon hits with Poison 2×3; misses spend no charge.",
+      "target": "No card target",
+      "cooldown": "4-round cooldown",
+      "availability": "Learn the named Training node for that person",
+      "trainingRole": "fundamentalB",
+      "trainingDepth": 2
+    },
+    {
+      "name": "Fall Back",
+      "blurb": "Change where you're standing, and still get your turn.",
+      "effect": "As zero-turn setup, change Front↔Back and keep your ordinary action; this ends Bracing Stance.",
+      "target": "No card target",
+      "cooldown": "3-round cooldown",
+      "availability": "Learn the named Training node for that person",
+      "trainingRole": "developmentB",
+      "trainingDepth": 3
+    },
+    {
+      "name": "Finish",
+      "blurb": "It was nearly over.",
+      "effect": "Strike one foe at full power below the shown HP threshold, or one-third power above it.",
+      "target": "Choose a living foe",
+      "cooldown": "3-round cooldown",
+      "availability": "Learn the named Training node for that person",
+      "trainingRole": "masteryA",
+      "trainingDepth": 4
+    },
+    {
+      "name": "First Strike",
+      "blurb": "Before it has decided anything.",
+      "effect": "As your first normal-cost action, attack for +4 raw damage without allowing retaliation.",
+      "target": "No card target",
+      "cooldown": "4-round cooldown",
+      "availability": "Learn the named Training node for that person",
+      "trainingRole": "masteryA",
+      "trainingDepth": 4
+    },
+    {
+      "name": "Flense",
+      "blurb": "Open it, and keep it open.",
+      "effect": "Apply 3 Bleed ticks at 9% of covering insulation, rounded to at least 1 damage per tick.",
+      "target": "Choose a living foe",
+      "cooldown": "3-round cooldown",
+      "availability": "Learn the named Training node for that person",
+      "trainingRole": "developmentB",
+      "trainingDepth": 3
+    },
+    {
+      "name": "Ground",
+      "blurb": "Receive the next emanation meant for somebody else.",
+      "effect": "Receive the next emanation meant for somebody else.",
+      "target": "No card target",
+      "cooldown": "4-round cooldown",
+      "availability": "Inherent to Ashe",
+      "trainingRole": null,
+      "trainingDepth": null
+    },
+    {
+      "name": "Interpose",
+      "blurb": "Not them.",
+      "effect": "Receive the next legal hit meant for an ally, then the effect ends.",
+      "target": "Choose a living ally",
+      "cooldown": "3-round cooldown",
+      "availability": "Learn the named Training node for that person",
+      "trainingRole": "masteryA",
+      "trainingDepth": 4
+    },
+    {
+      "name": "Mend",
+      "blurb": "Close what's open. Briefly.",
+      "effect": "Close what's open. Briefly.",
+      "target": "Choose a living ally",
+      "cooldown": "3-round cooldown",
+      "availability": "Inherent to Quill",
+      "trainingRole": null,
+      "trainingDepth": null
+    },
+    {
+      "name": "Overbear",
+      "blurb": "Everything you have, and you're out of position after.",
+      "effect": "Make a heavy Crush attack now, then skip your next personal turn.",
+      "target": "Choose a living foe",
+      "cooldown": "4-round cooldown",
+      "availability": "Learn the named Training node for that person",
+      "trainingRole": "fundamentalB",
+      "trainingDepth": 2
+    },
+    {
+      "name": "Pry",
+      "blurb": "Find the gap and lever it open.",
+      "effect": "Make a lower-power Pierce attack that ignores armour.",
+      "target": "Choose a living foe",
+      "cooldown": "3-round cooldown",
+      "availability": "Learn the named Training node for that person",
+      "trainingRole": "fundamentalB",
+      "trainingDepth": 2
+    },
+    {
+      "name": "Quench",
+      "blurb": "Remove one burn, poison or dazzle.",
+      "effect": "Choose one ally and remove one selected Burn, Poison or Dazzle; Bleed and unchosen conditions remain.",
+      "target": "Choose a living ally",
+      "cooldown": "2-round cooldown",
+      "availability": "Learn the named Training node for that person",
+      "trainingRole": "masteryA",
+      "trainingDepth": 4
+    },
+    {
+      "name": "Quicken",
+      "blurb": "Twice now, nothing next.",
+      "effect": "As zero-turn setup, take two ordinary actions now, then skip your next personal turn; cannot combine with Blur.",
+      "target": "No card target",
+      "cooldown": "4-round cooldown",
+      "availability": "Learn the named Training node for that person",
+      "trainingRole": "fundamentalB",
+      "trainingDepth": 2
+    },
+    {
+      "name": "Read",
+      "blurb": "Take it in properly. You'll know it again.",
+      "effect": "Take it in properly. You'll know it again.",
+      "target": "Choose a living foe",
+      "cooldown": "3-round cooldown",
+      "availability": "Inherent to Quill",
+      "trainingRole": null,
+      "trainingDepth": null
+    },
+    {
+      "name": "Shatter",
+      "blurb": "What it was wearing is not what it is wearing now.",
+      "effect": "Strike one foe and permanently reduce its armour for this encounter, to a minimum of 0.",
+      "target": "Choose a living foe",
+      "cooldown": "3-round cooldown",
+      "availability": "Learn the named Training node for that person",
+      "trainingRole": "masteryA",
+      "trainingDepth": 4
+    },
+    {
+      "name": "Sidestep",
+      "blurb": "That one misses.",
+      "effect": "The next otherwise legal attack against you misses; its affliction also fails.",
+      "target": "No card target",
+      "cooldown": "3-round cooldown",
+      "availability": "Learn the named Training node for that person",
+      "trainingRole": "fundamentalB",
+      "trainingDepth": 2
+    },
+    {
+      "name": "Sight",
+      "blurb": "Look at it properly.",
+      "effect": "Look at it properly.",
+      "target": "Choose a living foe",
+      "cooldown": "2-round cooldown",
+      "availability": "Inherent to Binder",
+      "trainingRole": null,
+      "trainingDepth": null
+    },
+    {
+      "name": "Snuff",
+      "blurb": "Put out whatever it's giving off.",
+      "effect": "Suppress one foe's active emanation through its next 2 complete hostile turns.",
+      "target": "Choose a living foe",
+      "cooldown": "4-round cooldown",
+      "availability": "Learn the named Training node for that person",
+      "trainingRole": "developmentB",
+      "trainingDepth": 3
+    },
+    {
+      "name": "Unbind",
+      "blurb": "Pull at the seam holding a thing together.",
+      "effect": "Pull at the seam holding a thing together.",
+      "target": "Choose a living foe",
+      "cooldown": "2-round cooldown",
+      "availability": "Inherent to Binder",
+      "trainingRole": null,
+      "trainingDepth": null
+    },
+    {
+      "name": "Ward",
+      "blurb": "Set yourself against one kind of harm.",
+      "effect": "Choose one disclosed harm kind; reduce matching direct harm by 60% this round and next round.",
+      "target": "No card target",
+      "cooldown": "3-round cooldown",
+      "availability": "Learn the named Training node for that person",
+      "trainingRole": "masteryA",
+      "trainingDepth": 4
+    }
+  ],
+  "gambitComponents": [
+    {
+      "kind": "subject",
+      "name": "Foe: any",
+      "blurb": "Whichever enemy is nearest to hand."
+    },
+    {
+      "kind": "subject",
+      "name": "Foe: lowest HP",
+      "blurb": "Finish what's already hurt."
+    },
+    {
+      "kind": "subject",
+      "name": "Foe: armour above",
+      "blurb": "The first living foe whose current armour is strictly above the chosen Armour threshold."
+    },
+    {
+      "kind": "subject",
+      "name": "Foe: highest HP",
+      "blurb": "Go at the biggest thing in the room."
+    },
+    {
+      "kind": "subject",
+      "name": "Ally: any",
+      "blurb": "Anyone on your side, yourself included."
+    },
+    {
+      "kind": "subject",
+      "name": "Ally: rank = back",
+      "blurb": "Whichever ally in the back rank is worst off."
+    },
+    {
+      "kind": "subject",
+      "name": "Self",
+      "blurb": "Reason about your own condition."
+    },
+    {
+      "kind": "subject",
+      "name": "Self: recovery complete",
+      "blurb": "The first action after all skipped-turn recovery has been paid."
+    },
+    {
+      "kind": "subject",
+      "name": "Foe: cannot reach me",
+      "blurb": "A foe whose currently usable attacks cannot reach your rank."
+    },
+    {
+      "kind": "subject",
+      "name": "Foes present: at least 3",
+      "blurb": "Any relevant foe while at least three hostile foes are still standing."
+    },
+    {
+      "kind": "subject",
+      "name": "Foe: unrecorded species",
+      "blurb": "A species absent from the bestiary when this encounter began."
+    },
+    {
+      "kind": "subject",
+      "name": "Foe: emanating",
+      "blurb": "A foe whose emanation is active right now."
+    },
+    {
+      "kind": "subject",
+      "name": "Ally: HP below threshold, any",
+      "blurb": "True when any living ally is below the threshold; action targeting remains separate."
+    },
+    {
+      "kind": "property",
+      "name": "health",
+      "blurb": "How much is left of someone."
+    },
+    {
+      "kind": "comparator",
+      "name": "below",
+      "blurb": "Less than the threshold."
+    },
+    {
+      "kind": "comparator",
+      "name": "above",
+      "blurb": "More than the threshold."
+    },
+    {
+      "kind": "threshold",
+      "name": "50%",
+      "blurb": "Half."
+    },
+    {
+      "kind": "threshold",
+      "name": "70%",
+      "blurb": "A little worn."
+    },
+    {
+      "kind": "threshold",
+      "name": "30%",
+      "blurb": "Badly hurt."
+    },
+    {
+      "kind": "threshold",
+      "name": "10%",
+      "blurb": "Nearly gone."
+    },
+    {
+      "kind": "threshold",
+      "name": "Armour threshold 1",
+      "blurb": "Current armour strictly above 1."
+    },
+    {
+      "kind": "threshold",
+      "name": "Armour threshold 3",
+      "blurb": "Current armour strictly above 3."
+    },
+    {
+      "kind": "threshold",
+      "name": "Armour threshold 5",
+      "blurb": "Current armour strictly above 5."
+    },
+    {
+      "kind": "action",
+      "name": "Attack",
+      "blurb": "Hit it."
+    },
+    {
+      "kind": "action",
+      "name": "Heal",
+      "blurb": "Use the mending skill, if it's ready."
+    },
+    {
+      "kind": "action",
+      "name": "Skill",
+      "blurb": "Whatever skill they carry, when it's off cooldown."
+    },
+    {
+      "kind": "action",
+      "name": "Flee",
+      "blurb": "Break away. Costs the world some stability."
+    }
+  ],
   "pressureTargets": [
     {
       "id": "illumination",

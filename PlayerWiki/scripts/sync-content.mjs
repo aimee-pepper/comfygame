@@ -41,6 +41,24 @@ const pressureTargetSource = JSON.parse(
     'utf8',
   ),
 );
+const skillSource = JSON.parse(
+  await readFile(
+    path.join(repositoryRoot, 'Sources', 'Content', 'Data', 'skills.json'),
+    'utf8',
+  ),
+);
+const combatGraphSource = JSON.parse(
+  await readFile(
+    path.join(repositoryRoot, 'Sources', 'Content', 'Data', 'combat_tree_v2.json'),
+    'utf8',
+  ),
+);
+const gambitComponentSource = JSON.parse(
+  await readFile(
+    path.join(repositoryRoot, 'Sources', 'Content', 'Data', 'gambit_components.json'),
+    'utf8',
+  ),
+);
 const namedCharacterPack = JSON.parse(
   await readFile(
     path.join(
@@ -102,6 +120,83 @@ const tradeStatus = (resource) => {
   if (resource.tradeBand === 'nontradeable') return 'Not traded';
   return `${resource.tradeBand[0].toUpperCase()}${resource.tradeBand.slice(1)} trade band`;
 };
+const currentInherentTechniqueOwners = new Map([
+  ['unbind', 'Binder'],
+  ['sight', 'Binder'],
+  ['mend', 'Quill'],
+  ['read', 'Quill'],
+  ['ground', 'Ashe'],
+]);
+const foeTargetTechniqueKinds = new Set([
+  'damage',
+  'armourIgnoring',
+  'overbear',
+  'bleed',
+  'reveal',
+  'taunt',
+  'snuff',
+  'read',
+  'sunder',
+  'execute',
+  'ambush',
+  'elemental',
+]);
+const allyTargetTechniqueKinds = new Set(['heal', 'cleanse', 'intercept']);
+const techniqueTarget = (kind) =>
+  foeTargetTechniqueKinds.has(kind)
+    ? 'Choose a living foe'
+    : allyTargetTechniqueKinds.has(kind)
+      ? 'Choose a living ally'
+      : 'No card target';
+const graphTechniqueNodes = combatGraphSource.trees
+  .flatMap((tree) => tree.disciplines)
+  .flatMap((discipline) => discipline.nodes)
+  .filter((node) => node.techniqueID);
+const graphTechniqueByID = new Map(
+  graphTechniqueNodes.map((node) => [node.techniqueID, node]),
+);
+const currentTechniqueIDs = new Set([
+  ...currentInherentTechniqueOwners.keys(),
+  ...graphTechniqueByID.keys(),
+]);
+const skillByID = new Map(skillSource.skills.map((skill) => [skill.id, skill]));
+const combatTechniques = [...currentTechniqueIDs]
+  .map((id) => {
+    const graphNode = graphTechniqueByID.get(id);
+    const skill = skillByID.get(id);
+    if (id === 'blur' && graphNode) {
+      return {
+        name: graphNode.name,
+        blurb: graphNode.blurb,
+        effect: graphNode.effectCopy,
+        target: 'No card target',
+        cooldown: 'Once per encounter',
+        availability: 'Learn the named Training node for that person',
+        trainingRole: graphNode.role,
+        trainingDepth: graphNode.depth,
+      };
+    }
+    if (!skill) return null;
+    return {
+      name: skill.name,
+      blurb: skill.blurb,
+      effect: graphNode?.effectCopy ?? skill.blurb,
+      target: techniqueTarget(skill.kind),
+      cooldown: `${skill.cooldownRounds}-round cooldown`,
+      availability: currentInherentTechniqueOwners.has(id)
+        ? `Inherent to ${currentInherentTechniqueOwners.get(id)}`
+        : 'Learn the named Training node for that person',
+      trainingRole: graphNode?.role ?? null,
+      trainingDepth: graphNode?.depth ?? null,
+    };
+  })
+  .filter(Boolean)
+  .sort((left, right) => left.name.localeCompare(right.name));
+const gambitComponents = gambitComponentSource.components.map((component) => ({
+  kind: component.kind,
+  name: component.name,
+  blurb: component.blurb,
+}));
 
 await mkdir(path.dirname(outputDataPath), { recursive: true });
 await mkdir(path.join(publicAssetRoot, 'resources'), { recursive: true });
@@ -409,6 +504,8 @@ const playerContent = {
     needsLifetimeRawRefined: node.needsLifetimeRawRefined ?? 0,
     constructionBundledWith: node.constructionBundledWith ?? null,
   })),
+  combatTechniques,
+  gambitComponents,
   pressureTargets: pressureTargetSource.targets
     .map((target) => ({
       id: target.id,

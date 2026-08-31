@@ -12,6 +12,7 @@ const systemLinks = [
   ['/systems/animals-companionship', 'Animals & companionship'],
   ['/systems/research', 'Research'],
   ['/systems/combat', 'Combat'],
+  ['/systems/combat-techniques-gambits', 'Combat techniques & Gambits'],
   ['/systems/party-preparation', 'Party, Gear & Gambits'],
   ['/systems/equipment-materials', 'Equipment & material effects'],
   ['/systems/inventory-custody', 'Inventory & custody'],
