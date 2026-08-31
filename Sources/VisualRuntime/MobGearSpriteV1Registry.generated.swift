@@ -55,6 +55,13 @@ enum MobGearSpriteV1Registry {
 struct CatalogueGearSpriteV1Registry: NativeVisualRuntime.Registry {
     let manifestSHA256 = "eff8f3bdb8d50fa15242ee75aea457f674c75f9e3af1640e5dbd598ebe9f87d4"
     let pipelineVersion = "mob-gear-sprites-v1"
+    let artProvenance: NativeVisualRuntime.ArtProductionProvenanceV1 = .frozenLegacy(
+        .init(
+            packID: "mob-gear-sprites-v1",
+            manifestSHA256: "eff8f3bdb8d50fa15242ee75aea457f674c75f9e3af1640e5dbd598ebe9f87d4",
+            registryContentSHA256: "1edc9814e108be9f1ee00d2f393b71331b21ad232de538c760c784969a1be0fe"
+        )
+    )
     let canvasWidth: UInt8 = 32
     let canvasHeight: UInt8 = 32
 
@@ -367,8 +374,15 @@ struct CatalogueGearSpriteV1Registry: NativeVisualRuntime.Registry {
 }
 
 struct CatalogueItemCompositeV1Registry: NativeVisualRuntime.Registry {
+    static let packID = "catalogue-item-compatibility-composite-v1"
     let manifestSHA256 = "eff8f3bdb8d50fa15242ee75aea457f674c75f9e3af1640e5dbd598ebe9f87d4"
     let pipelineVersion = "catalogue-consumables-placeholder-v1+mob-gear-sprites-v1"
+    let artProvenance: NativeVisualRuntime.ArtProductionProvenanceV1 =
+        .frozenCompatibilityComposite(.init(
+            packID: Self.packID,
+            manifestSHA256: "eff8f3bdb8d50fa15242ee75aea457f674c75f9e3af1640e5dbd598ebe9f87d4",
+            registryContentSHA256: "17f7d5428b3bc910c7f0700aea5d64f925cd53a9df7108746ef0a5aa321dfc20"
+        ))
     let canvasWidth: UInt8 = 32
     let canvasHeight: UInt8 = 32
 

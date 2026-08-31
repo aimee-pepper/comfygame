@@ -62,6 +62,12 @@ targets:
         name: named-character-placeholders-v1.json
         buildPhase: resources
     preBuildScripts:
+      - name: Verify repository organization
+        basedOnDependencyAnalysis: false
+        script: |
+          python3 "$SRCROOT/Scripts/verify_repository_organization.py" --check
+        inputFiles:
+          - $(SRCROOT)/Scripts/verify_repository_organization.py
       - name: Verify generated combat-v2 authority
         basedOnDependencyAnalysis: false
         script: |

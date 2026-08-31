@@ -12,6 +12,13 @@ struct CatalogueConsumablesPlaceholderV1Registry: NativeVisualRuntime.Registry {
 
     let manifestSHA256 = "70a6d7c6c71f93c9c8488969439aed051e35a47a3579d3c219d556c160fee4a9"
     let pipelineVersion = "catalogue-consumables-functional-placeholder-1.0.0"
+    let artProvenance: NativeVisualRuntime.ArtProductionProvenanceV1 = .functionalPlaceholder(
+        .init(
+            packID: Self.packID,
+            manifestSHA256: "70a6d7c6c71f93c9c8488969439aed051e35a47a3579d3c219d556c160fee4a9",
+            registryContentSHA256: "54566ac920549ee0b75fe1a2662ccbd4548ce2f507dde5142ea8eaff882b4481"
+        )
+    )
     let canvasWidth: UInt8 = 32
     let canvasHeight: UInt8 = 32
 
@@ -170,7 +177,7 @@ struct CatalogueConsumablesPlaceholderV1Registry: NativeVisualRuntime.Registry {
     ]
 
     private static let unsupportedIDs = """
-    essence_crystal heat_core caustic_core light_core conduit_fixture seamlight
+    essence_crystal heat_core caustic_core light_core conduit_fixture seamlight scent_mask
     curio_humming_shard curio_bound_knot cache_key anchor_frame
     blade_chipped blade_keen ripping_hook the_long_grievance bone_awl raking_edge
     blade_binders hairsplitter field_maul banded_mace anvilfall the_settled_argument

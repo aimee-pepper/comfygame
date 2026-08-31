@@ -16,6 +16,17 @@ extension NativeVisualRuntime {
         case incompleteCoverage([String])
         case unexpectedCoverage([String])
         case invalidManifestMetadata
+        case unapprovedFunctionalPlaceholder(String)
+        case finalArtMustUseImageGeneration(String)
+        case invalidGeneratedFinalArtReceipt
+        case generatedFinalAssetReceiptMismatch
+        case unapprovedGeneratedFinalArt(String)
+        case invalidAimeeAuthoredFinalArtReceipt
+        case aimeeAuthoredFinalAssetReceiptMismatch
+        case unapprovedAimeeAuthoredFinalArt(String)
+        case unapprovedLegacyArtPack(String)
+        case unapprovedCompatibilityPack(String)
+        case artPackIdentityMismatch(String)
     }
 
     struct GeneratedPixelAsset: Codable, Equatable, Sendable {

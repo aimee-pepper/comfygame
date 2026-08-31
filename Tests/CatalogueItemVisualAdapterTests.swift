@@ -5,7 +5,8 @@ import XCTest
 final class CatalogueItemVisualAdapterTests: XCTestCase {
     private struct Registry: NativeVisualRuntime.Registry {
         let manifestSHA256 = String(repeating: "b", count: 64)
-        let pipelineVersion = "aimee-authored-catalogue-items-v1-test"
+        let pipelineVersion = "catalogue-items-placeholder-v1-test"
+        let artProvenance: NativeVisualRuntime.ArtProductionProvenanceV1 = .testOnly
         let canvasWidth: UInt8 = 2
         let canvasHeight: UInt8 = 2
         var assets: [NativeVisualRuntime.Entry]
@@ -64,6 +65,26 @@ final class CatalogueItemVisualAdapterTests: XCTestCase {
                      "Identified gear art must not disclose an unidentified variant")
         XCTAssertNil(adapter.asset(for: "blade_chipped", identified: false),
                      "Existing identified gear art must not disclose an unidentified variant")
+    }
+
+    func testLiveRegistryPassesProvenanceAndCoverageValidation() throws {
+        XCTAssertEqual(
+            NativeVisualRuntime.Pack.registryContentSHA256(
+                CatalogueConsumablesPlaceholderV1Registry()),
+            "54566ac920549ee0b75fe1a2662ccbd4548ce2f507dde5142ea8eaff882b4481"
+        )
+        XCTAssertEqual(
+            NativeVisualRuntime.Pack.registryContentSHA256(CatalogueGearSpriteV1Registry()),
+            "1edc9814e108be9f1ee00d2f393b71331b21ad232de538c760c784969a1be0fe"
+        )
+        XCTAssertEqual(
+            NativeVisualRuntime.Pack.registryContentSHA256(CatalogueItemCompositeV1Registry()),
+            "17f7d5428b3bc910c7f0700aea5d64f925cd53a9df7108746ef0a5aa321dfc20"
+        )
+        _ = try NativeVisualRuntime.Pack(
+            registry: GeneratedCatalogueItemVisualRegistry.registry,
+            requiredCatalogueIDs: Set(ContentCatalog.shared.items.map(\.id.rawValue))
+        )
     }
 
     func testLiveRegistryCoversEveryLiveGearCatalogueID() throws {

@@ -1263,6 +1263,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = D12ACBC9C3AA63A284E68D97 /* Build configuration list for PBXNativeTarget "Bookbinder" */;
 			buildPhases = (
+				A1B2C3D4E5F60718293A4B5C /* Verify repository organization */,
 				8902EAFB98EB638C8DAB4A79 /* Verify generated combat-v2 authority */,
 				509F16D3D09C39C6391DEF93 /* Sources */,
 				F9EB483A0C481DEB209626BD /* Resources */,
@@ -1386,6 +1387,26 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
+		A1B2C3D4E5F60718293A4B5C /* Verify repository organization */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"$(SRCROOT)/Scripts/verify_repository_organization.py",
+			);
+			name = "Verify repository organization";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "python3 \"$SRCROOT/Scripts/verify_repository_organization.py\" --check\n";
+		};
 		8902EAFB98EB638C8DAB4A79 /* Verify generated combat-v2 authority */ = {
 			isa = PBXShellScriptBuildPhase;
 			alwaysOutOfDate = 1;
