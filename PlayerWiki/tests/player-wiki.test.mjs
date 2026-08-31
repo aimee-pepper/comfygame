@@ -262,3 +262,13 @@ test('resource progression compares every current trade band and consumer family
   assert.match(page, /buildingUses/);
   assert.match(page, /implemented game/);
 });
+
+test('search groups player references and uses retained thumbnails only where available', async () => {
+  const search = await read('app/search/page.tsx');
+  assert.match(search, /label: 'Resources'/);
+  assert.match(search, /label: 'Village services'/);
+  assert.match(search, /serviceGuides/);
+  assert.match(search, /const groups = q/);
+  assert.match(search, /PixelImage/);
+  assert.match(search, /!groups\.length/);
+});
