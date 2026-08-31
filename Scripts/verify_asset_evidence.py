@@ -27,6 +27,9 @@ RECEIPT_KEYS = {
 }
 REQUIRED_RECEIPT_KEYS = RECEIPT_KEYS - {"$schema"}
 FILE_KEYS = {"path", "role", "sha256"}
+FALSE_AUTHORITY_FIELDS = (
+    "sourceAuthorship", "runtimeAuthority", "gameplayAuthority", "finalArtAcceptance",
+)
 
 def sha(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
@@ -84,12 +87,14 @@ def validate(root: Path, approved: set[str] = APPROVED_ACCEPTED_EVIDENCE_FINGERP
         family, version, variant = receipt_path.relative_to(evidence).parts[:3]
         exact = {
             "schemaVersion": "asset-evidence-receipt-v1", "family": family,
-            "version": version, "variant": variant, "sourceAuthorship": False,
-            "runtimeAuthority": False, "gameplayAuthority": False,
-            "finalArtAcceptance": False,
+            "version": version, "variant": variant,
         }
         for key, value in exact.items():
             if receipt.get(key) != value: errors.append(f"receipt {key} must equal {value!r}: {receipt_path}")
+        for key in FALSE_AUTHORITY_FIELDS:
+            value = receipt.get(key)
+            if type(value) is not bool or value is not False:
+                errors.append(f"receipt {key} must be boolean false: {receipt_path}")
         if not TOKEN.fullmatch(family) or not VERSION.fullmatch(version) or not TOKEN.fullmatch(variant):
             errors.append(f"non-semantic evidence route: {receipt_path}")
         if receipt.get("classification") not in CLASSES: errors.append(f"invalid classification: {receipt_path}")
@@ -146,6 +151,13 @@ def self_test() -> None:
         receipt={"schemaVersion":"asset-evidence-receipt-v1","family":"a","version":"v1","variant":"b","classification":"generated-test-artifact","accepted":False,"sourceAuthorship":False,"runtimeAuthority":False,"gameplayAuthority":False,"finalArtAcceptance":False,"gameWikiDisclosure":"withheld","authorityPaths":["docs/a.json"],"producerPaths":["Scripts/make.mjs"],"files":[{"path":"AssetEvidence/a/v1/b/review/report.json","role":"test-report","sha256":sha(file)}]}
         rp=root/"AssetEvidence/a/v1/b/evidence-receipt.json"; rp.write_text(json.dumps(receipt))
         assert not validate(root)
+        for key in FALSE_AUTHORITY_FIELDS:
+            for invalid in (0, 1, "false", None, [], {}):
+                receipt[key] = invalid
+                rp.write_text(json.dumps(receipt))
+                errors = validate(root)
+                assert any(f"receipt {key} must be boolean false" in error for error in errors)
+            receipt[key] = False
         for invalid in (0, 1, "true", None, [], {}):
             receipt["accepted"] = invalid
             rp.write_text(json.dumps(receipt))
