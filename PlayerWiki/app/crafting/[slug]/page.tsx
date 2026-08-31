@@ -7,6 +7,7 @@ import { GuideBreadcrumbs, RelatedGuides } from '@/components/guide-navigation';
 import { SiteFrame } from '@/components/site-frame';
 import { craftingSystems, recipesFor, systemFor } from '@/lib/crafting';
 import { content, humanize } from '@/lib/content';
+import { serviceForStation } from '@/lib/services';
 
 export function generateStaticParams() {
   return craftingSystems.map((system) => ({ slug: system.slug }));
@@ -57,6 +58,18 @@ function resultLink(item: NonNullable<ReturnType<typeof resultItem>>) {
   return item.gear ? `/equipment/${item.slug}` : `/items/${item.slug}`;
 }
 
+function constructionCost(station: (typeof content.stations)[number]) {
+  if (station.unlockedAtStart) return 'Available at the start of a campaign.';
+  if (!station.buildCost.length) return 'No current construction cost is published.';
+  return <>{station.buildCost.map((cost, index) => {
+    const id = cost.id ?? cost.resource ?? cost.resourceID;
+    const resource = id ? content.resources.find((entry) => entry.id === id) : null;
+    const quantity = cost.quantity ?? cost.amount ?? '?';
+    const label = resource?.name ?? humanize(id);
+    return <span key={`${station.id}-${id}-${index}`}>{index ? ', ' : ''}{quantity} {resource ? <Link href={`/resources/${resource.slug}`}>{label}</Link> : label}</span>;
+  })}</>;
+}
+
 export default async function CraftingSystemDetail({
   params,
 }: {
@@ -67,6 +80,8 @@ export default async function CraftingSystemDetail({
   if (!system) notFound();
   const recipes = recipesFor(slug);
   const station = content.stations.find((entry) => system.station.includes(entry.name));
+  const service = station ? serviceForStation(station.id) : null;
+  const relatedResources = [...new Set(recipes.flatMap((recipe) => recipe.ingredients.map((ingredient) => ingredient.resourceID).filter(Boolean)))].map((id) => content.resources.find((resource) => resource.id === id)).filter(Boolean);
   return (
     <SiteFrame sidebar>
       <GuideBreadcrumbs items={[{ label: 'Systems', href: '/systems' }, { label: 'Crafting systems', href: '/crafting' }, { label: system.name }]} />
@@ -77,12 +92,23 @@ export default async function CraftingSystemDetail({
       />
       <section className="article-section">
         {station?.assetURL && <div className="crafting-station"><PixelImage src={station.assetURL} alt={`${station.name} building visual`} size={72} /><p><strong>{station.name}</strong> is the current station visual for this system.</p></div>}
-        <h2>How it works</h2>
+        <h2>Access and readiness</h2>
+        <dl className="fact-grid">
+          <div><dt>Station access</dt><dd>{station ? constructionCost(station) : 'Open the station named above.'}</dd></div>
+          <div><dt>Current route</dt><dd><ul className="compact-list">{system.access.map((fact) => <li key={fact}>{fact}</li>)}</ul></dd></div>
+        </dl>
+      </section>
+      <section className="article-section">
+        <h2>Current workflow</h2>
         <ol className="numbered-guide">
           {system.howItWorks.map((step) => (
             <li key={step}>{step}</li>
           ))}
         </ol>
+      </section>
+      <section className="article-section">
+        <h2>Material choices</h2>
+        <p>{system.materialChoice}</p>
       </section>
       <section className="article-section">
         <h2>Recipes and requirements</h2>
@@ -92,9 +118,9 @@ export default async function CraftingSystemDetail({
               <tr>
                 <th>Recipe</th>
                 <th aria-label="Result image" />
-                <th>Result</th>
-                <th>Requirements</th>
-                <th>Notes</th>
+                <th>Output</th>
+                <th>Exact inputs</th>
+                <th>Recipe-specific effect</th>
               </tr>
             </thead>
             <tbody>
@@ -113,8 +139,7 @@ export default async function CraftingSystemDetail({
                     </ul>
                   </td>
                   <td>
-                    {recipe.notes ??
-                      'Use the exact stock shown by the station preview.'}
+                    {recipe.notes ?? 'The station-wide material and result rule above applies to this recipe.'}
                   </td>
                 </>; })()}</tr>
               ))}
@@ -122,7 +147,11 @@ export default async function CraftingSystemDetail({
           </table>
         </div>
       </section>
-      <RelatedGuides links={[{ label: 'All crafting systems', href: '/crafting' }, { label: 'Crafting basics', href: '/systems/crafting' }, { label: 'Resources', href: '/resources' }, { label: 'Village services', href: '/services' }]} />
+      <section className="article-section note-card">
+        <h2>Commit and result</h2>
+        <p>{system.commitResult}</p>
+      </section>
+      <RelatedGuides links={[{ label: 'All crafting systems', href: '/crafting' }, { label: 'Crafting basics', href: '/systems/crafting' }, ...(service ? [{ label: `Use ${service.name}`, href: `/services/${service.slug}` }] : []), ...relatedResources.slice(0, 3).flatMap((resource) => resource ? [{ label: resource.name, href: `/resources/${resource.slug}` }] : []), { label: 'All resources', href: '/resources' }]} />
     </SiteFrame>
   );
 }

@@ -136,6 +136,12 @@ test('crafting has a linked system index and complete resource cross-reference s
   assert.match(craftingDetail, /recipe-ingredient/);
   assert.match(craftingDetail, /Result image/);
   assert.match(craftingDetail, /crafting-station/);
+  assert.match(craftingDetail, /Access and readiness/);
+  assert.match(craftingDetail, /Material choices/);
+  assert.match(craftingDetail, /Commit and result/);
+  assert.match(craftingDetail, /serviceForStation/);
+  assert.match(crafting, /materialChoice/);
+  assert.match(crafting, /commitResult/);
 });
 
 test('places publish only current retained town and building visuals inline', async () => {

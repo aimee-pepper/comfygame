@@ -3,6 +3,9 @@ export interface CraftingSystem {
   name: string;
   station: string;
   summary: string;
+  access: string[];
+  materialChoice: string;
+  commitResult: string;
   howItWorks: string[];
 }
 
@@ -28,6 +31,9 @@ export const craftingSystems: CraftingSystem[] = [
     station: 'The Apothecary',
     summary:
       'Make remedies, coatings and field supplies from named resources and property-matched natural samples.',
+    access: ['Build the Apothecary.', 'Use a recipe that is currently known.'],
+    materialChoice: 'When a preparation asks for a sample, choose the exact weakest qualifying sample shown by that recipe. Scent Mask uses its separate exact creature-material selection.',
+    commitResult: 'A committed preparation spends the named scalar resources, current Essence or Mote cost, and selected input only when output room is available; it produces the listed item.',
     howItWorks: [
       'Learn or infer the preparation.',
       'Choose any required natural sample that meets the shown property floor.',
@@ -40,6 +46,9 @@ export const craftingSystems: CraftingSystem[] = [
     station: 'Blacksmith',
     summary:
       'Construct a Pointed Blade from an exact point and grip; material quality and family shape the finished weapon.',
+    access: ['Build the Blacksmith.', 'Use the stable Pointed Blade schematic.'],
+    materialChoice: 'Choose one exact point and one exact grip from the family allowed by each socket; the selected materials shape the current quality and combat form.',
+    commitResult: 'A committed construction spends the selected point, grip, and shown Essence cost, then creates one persistent weapon.',
     howItWorks: [
       'Select one eligible point and one eligible grip.',
       'Review the resulting quality, combat shape and Essence cost.',
@@ -52,6 +61,9 @@ export const craftingSystems: CraftingSystem[] = [
     station: 'The Tannery',
     summary:
       'Turn flexible, living and structural samples into coats, gloves and boots.',
+    access: ['Build the Tannery.', 'Meet the current wear research or tier gate for the chosen pattern.'],
+    materialChoice: 'Every named outer, lining, palm, binding, upper, and sole socket accepts only its shown families and properties; the primary selected pieces contribute most strongly to the result.',
+    commitResult: 'A committed construction spends the selected exact stock and shown Essence together, then creates the selected protective item.',
     howItWorks: [
       'Choose a distinct sample for every named part.',
       'Higher-quality primary pieces contribute most strongly to the result.',
@@ -64,6 +76,9 @@ export const craftingSystems: CraftingSystem[] = [
     station: 'The Bowyer',
     summary:
       'Build far-reaching physical weapons without maintaining a separate ammunition inventory.',
+    access: ['Build the Bowyer.', 'Meet the current broaden or masterwork research gate for the chosen design.'],
+    materialChoice: 'Choose the limbs, cord, projectile, edges, pouch, or grip only from the families accepted by that socket; the current preview shows the quality supported by those selections.',
+    commitResult: 'A committed construction consumes the shown exact components and creates the selected longbow, sling, or throwing set.',
     howItWorks: [
       'Choose the limbs, cord, projectile or edges required by the design.',
       'The preview shows the quality the selected stock can support.',
@@ -76,6 +91,9 @@ export const craftingSystems: CraftingSystem[] = [
     station: 'The Weaponsmith',
     summary:
       'Fit advanced points, edges, mauls and polearms around exact components and a learned fitting pattern.',
+    access: ['Build the Weaponsmith.', 'Use the learned fitting pattern for the selected design.'],
+    materialChoice: 'Choose the head or edge, supporting structure, and fitting from the exact metal or creature-material families accepted by each socket.',
+    commitResult: 'A committed construction creates the chosen fitted weapon and freezes its selected material facts into the finished result.',
     howItWorks: [
       'Select the head or edge, supporting structure and fitting.',
       'Choose the polearm consequence where that design is available.',
@@ -88,6 +106,9 @@ export const craftingSystems: CraftingSystem[] = [
     station: 'The Armoury',
     summary:
       'Rebuild one existing protective item in place as a rigid, insulated or balanced construction.',
+    access: ['Build the Armoury.', 'Choose an eligible stored or worn protective item.'],
+    materialChoice: 'Choose the exact body, layer, lining, binding, and fitting samples accepted by the selected Rigid, Insulated, or Balanced profile.',
+    commitResult: 'A committed rebuild spends the selected samples and shown Essence, replaces the protection profile, and preserves the item’s stable physical history.',
     howItWorks: [
       'Choose an eligible stored or worn protective item.',
       'Choose one exact sample for each layer, body, binding or fitting.',
@@ -100,6 +121,9 @@ export const craftingSystems: CraftingSystem[] = [
     station: 'Workshop',
     summary:
       'Improve the precision of owned world-reading instruments with property-matched samples and Essence.',
+    access: ['Open the Workshop with an owned world-reading instrument.'],
+    materialChoice: 'The selected samples must meet the exact property the instrument measures: two samples at 35+ for Good, or three at 65+ for Fine.',
+    commitResult: 'A committed improvement spends the selected samples and 20 or 50 Essence, then raises that owned instrument to the chosen current grade.',
     howItWorks: [
       'Each instrument asks for the property it measures best.',
       'Crude to Good uses two 35+ samples and 20 Essence.',
@@ -112,6 +136,9 @@ export const craftingSystems: CraftingSystem[] = [
     station: 'The Distillery / Channelworks',
     summary:
       'Attune Essence through a world-made sample, then give a Heat core a physical conduit at the Channelworks.',
+    access: ['Build the Distillery for core preparation.', 'Use the Channelworks for a valid Heat Core conduit fixture.'],
+    materialChoice: 'Choose the qualifying provenance-bearing sample and exact catalyst named by Heat, Caustic, or Light attunement; Caustic uses one displayed catalyst option.',
+    commitResult: 'A committed core preparation spends 16 Essence and its listed inputs to create the selected core. A committed conduit fixture consumes one valid current Heat Core.',
     howItWorks: [
       'Choose Heat, Caustic or Light attunement.',
       'Select a qualifying provenance-bearing sample and the exact catalyst.',
@@ -124,6 +151,9 @@ export const craftingSystems: CraftingSystem[] = [
     station: 'Essence Spring',
     summary:
       'Convert Raw Essence into spendable Essence Crystals at the current refinement rate.',
+    access: ['Open the Essence Spring.'],
+    materialChoice: 'Choose a stored Raw Essence amount or use the available refine-all action.',
+    commitResult: 'A committed refinement converts the chosen Raw Essence at the exact rate shown in the current preview; later capability can improve that rate.',
     howItWorks: [
       'Choose an amount of stored Raw Essence or refine all.',
       'The preview shows the exact Crystal return.',
@@ -136,6 +166,9 @@ export const craftingSystems: CraftingSystem[] = [
     station: 'Writing Desk',
     summary:
       'Prepare CMY and Depth ink applications for eligible source marks on a Page.',
+    access: ['Open the Writing Desk and choose eligible source marks on a Page.'],
+    materialChoice: 'Choose Cyan, Magenta, Yellow, and Depth proportions from Copper, Ichor, Sulfur, and Obsidian stock; Resin seals the vial.',
+    commitResult: 'A committed preparation creates a 12-application vial. Binding spends one matching application for each inked source it uses.',
     howItWorks: [
       'Choose Cyan, Magenta, Yellow and Depth proportions.',
       'Copper, Ichor, Sulfur and Obsidian supply those channels; Resin seals the vial.',
