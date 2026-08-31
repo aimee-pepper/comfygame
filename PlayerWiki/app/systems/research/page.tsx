@@ -4,6 +4,7 @@ import { GuideBreadcrumbs, RelatedGuides } from '@/components/guide-navigation';
 import { PageIntro } from '@/components/page-intro';
 import { SiteFrame } from '@/components/site-frame';
 import { content, humanize } from '@/lib/content';
+import { researchNodeSlug } from '@/lib/research';
 
 const systemGuideForBranch: Record<string, { label: string; href: string }> = {
   instruction: { label: 'Party, Gear and Gambits', href: '/services/party-and-gear' },
@@ -58,8 +59,9 @@ export default function ResearchGuide() {
       const nodes = nodesFor(branch.id);
       const station = branch.stationID ? content.stations.find((entry) => entry.id === branch.stationID) : null;
       const guide = systemGuideForBranch[branch.id];
-      return <article className="article-section" key={branch.id}><h3>{branch.name}</h3><p>{branch.blurb}</p><p>{station ? <>Taught at <Link href={`/places/${station.slug}`}>{station.name}</Link>.</> : 'Available through the Workshop Research screen.'} {guide && <><Link href={guide.href}>See {guide.label}</Link>.</>}</p><div className="table-wrap data-table"><table><thead><tr><th>Node</th><th>Earlier upgrades and other requirements</th><th>Published base cost</th><th>Current result</th></tr></thead><tbody>{nodes.map((node) => <tr key={node.id}><td>{node.name}</td><td>{requirements(node, names)}</td><td>{publishedCost(node)}</td><td>{node.blurb}</td></tr>)}</tbody></table></div></article>;
+      return <article className="article-section" key={branch.id}><h3>{branch.name}</h3><p>{branch.blurb}</p><p>{station ? <>Taught at <Link href={`/places/${station.slug}`}>{station.name}</Link>.</> : 'Available through the Workshop Research screen.'} {guide && <><Link href={guide.href}>See {guide.label}</Link>.</>}</p><div className="table-wrap data-table"><table><thead><tr><th>Node</th><th>Earlier upgrades and other requirements</th><th>Published base cost</th><th>Current result</th></tr></thead><tbody>{nodes.map((node) => <tr key={node.id}><td><Link href={`/research/${researchNodeSlug(node)}`}>{node.name}</Link></td><td>{requirements(node, names)}</td><td>{publishedCost(node)}</td><td>{node.blurb}</td></tr>)}</tbody></table></div></article>;
     })}</section>
-    <RelatedGuides links={[{ label: 'Workshop and Research', href: '/places/workshop' }, { label: 'Library collections', href: '/services/library' }, { label: 'Resources', href: '/resources' }, { label: 'Crafting systems', href: '/crafting' }, { label: 'World Writing', href: '/systems/world-writing' }, { label: 'All systems', href: '/systems' }]} />
+    <section className="article-section note-card"><h2>Need one node’s full reference?</h2><p><Link href="/research">Open the Research directory</Link> for linked node pages with exact prerequisites, costs, result and bundled-construction facts.</p></section>
+    <RelatedGuides links={[{ label: 'Research directory', href: '/research' }, { label: 'Workshop and Research', href: '/places/workshop' }, { label: 'Library collections', href: '/services/library' }, { label: 'Resources', href: '/resources' }, { label: 'Crafting systems', href: '/crafting' }, { label: 'World Writing', href: '/systems/world-writing' }, { label: 'All systems', href: '/systems' }]} />
   </SiteFrame>;
 }

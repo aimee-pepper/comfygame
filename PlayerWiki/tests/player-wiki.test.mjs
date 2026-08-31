@@ -76,6 +76,26 @@ test('item details link published recipes and resources without guessing absent 
   assert.match(craftingGuide, /writing-ink/);
 });
 
+test('Research directory provides stable semantic node routes with complete current node facts', async () => {
+  await access(path.join(root, 'app/research/page.tsx'));
+  await access(path.join(root, 'app/research/[slug]/page.tsx'));
+  const directory = await read('app/research/page.tsx');
+  const detail = await read('app/research/[slug]/page.tsx');
+  const guide = await read('app/systems/research/page.tsx');
+  const helpers = await read('lib/research.ts');
+  assert.match(directory, /Research directory/);
+  assert.match(directory, /Base cost/);
+  assert.match(directory, /Ready when/);
+  assert.match(detail, /Current node details/);
+  assert.match(detail, /Bundled construction/);
+  assert.match(detail, /Study and retain/);
+  assert.match(detail, /\/services\/library/);
+  assert.match(guide, /Open the Research directory/);
+  assert.match(helpers, /researchNodeSlug/);
+  assert.match(helpers, /branch\?\.name/);
+  assert.match(helpers, /slugify\(node\.name\)/);
+});
+
 test('equipment routes retain slot, recipe, frozen-piece and custody guidance', async () => {
   const index = await read('app/equipment/page.tsx');
   const detail = await read('app/equipment/[slug]/page.tsx');
