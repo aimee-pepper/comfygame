@@ -109,6 +109,22 @@ test('consumable routes keep current effect, target, preparation, carrying, and 
   assert.match(contentSource, /function consumableDuration/);
 });
 
+test('curio routes explain recognition and custody without exposing an unknown result', async () => {
+  const index = await read('app/curios/page.tsx');
+  const detail = await read('app/items/[slug]/page.tsx');
+  assert.match(index, /Keep unknown results unknown/);
+  assert.match(index, /study one safely at Home/);
+  assert.match(index, /Current route/);
+  assert.match(index, /Identified and transferable/);
+  assert.match(detail, /Identification and knowledge/);
+  assert.match(detail, /identified with Solvent while carried/);
+  assert.match(detail, /does not treat this object as recyclable gear/);
+  assert.match(detail, /\/systems\/knowledge-records/);
+  assert.match(detail, /\/services\/storehouse/);
+  assert.match(detail, /\/services\/recycler/);
+  assert.match(detail, /\/services\/trading-post/);
+});
+
 test('player navigation excludes internal wiki architecture', async () => {
   const source = `${await read('components/site-frame.tsx')}\n${await read('app/page.tsx')}\n${await read('app/people/page.tsx')}`;
   for (const forbidden of [
