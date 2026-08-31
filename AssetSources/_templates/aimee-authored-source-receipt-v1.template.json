@@ -1,0 +1,20 @@
+{
+  "$schema": "../_templates/aimee-authored-source-receipt-v1.schema.json",
+  "schemaVersion": "aimee-authored-source-receipt-v1",
+  "packID": "<SemanticPack-v1>",
+  "provenanceClass": "human-authored-editable-source",
+  "author": "aimee-pepper",
+  "aimeeAuthorshipReceiptSHA256": "<64-lowercase-hex-sha256>",
+  "runtimeAuthority": false,
+  "gameplayAuthority": false,
+  "gameWikiDisclosure": "withheld",
+  "sources": [
+    {
+      "stableID": "<stable-id>",
+      "variant": "<variant>",
+      "path": "AssetSources/<SemanticPack-v1>/<stable-id>/<variant>/source/<semantic-name>.<ext>",
+      "sourceFileSHA256": "<64-lowercase-hex-sha256>"
+    }
+  ]
+}
+

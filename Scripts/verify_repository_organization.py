@@ -28,6 +28,7 @@ ALLOWED_GENERATORS = {
     "Scripts/generate_draft_meeting_corpus.py",
 }
 ASSET_EVIDENCE_CHECK = "Scripts/verify_asset_evidence.py"
+ASSET_SOURCE_INTAKE_CHECK = "Scripts/verify_asset_source_intake.py"
 
 
 def git(root: Path, *arguments: str) -> str:
@@ -288,6 +289,20 @@ def main() -> int:
         if result.returncode != 0:
             detail = result.stdout.strip().splitlines()[-1:] or ["no diagnostic"]
             violations.append(f"AssetEvidence boundary failed: {detail[0]}")
+    intake_check = root / ASSET_SOURCE_INTAKE_CHECK
+    if intake_check.is_file():
+        result = subprocess.run(
+            [sys.executable, ASSET_SOURCE_INTAKE_CHECK, "--check"],
+            cwd=root,
+            text=True,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+            timeout=30,
+            check=False,
+        )
+        if result.returncode != 0:
+            detail = result.stdout.strip().splitlines()[-1:] or ["no diagnostic"]
+            violations.append(f"AssetSources intake boundary failed: {detail[0]}")
     if violations:
         print("repository organization check failed:", file=sys.stderr)
         for violation in violations:

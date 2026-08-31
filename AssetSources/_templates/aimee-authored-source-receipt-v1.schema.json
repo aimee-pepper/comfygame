@@ -1,0 +1,46 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "bookbinder://asset-sources/aimee-authored-source-receipt-v1",
+  "title": "Bookbinder Aimee-authored editable visual source receipt V1",
+  "description": "Non-gameplay intake metadata. Validation does not approve or promote art.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "packID",
+    "provenanceClass",
+    "author",
+    "aimeeAuthorshipReceiptSHA256",
+    "runtimeAuthority",
+    "gameplayAuthority",
+    "gameWikiDisclosure",
+    "sources"
+  ],
+  "properties": {
+    "$schema": { "type": "string" },
+    "schemaVersion": { "const": "aimee-authored-source-receipt-v1" },
+    "packID": { "pattern": "^[A-Z][A-Za-z0-9]*-v[1-9][0-9]*$" },
+    "provenanceClass": { "const": "human-authored-editable-source" },
+    "author": { "const": "aimee-pepper" },
+    "aimeeAuthorshipReceiptSHA256": { "pattern": "^[0-9a-f]{64}$" },
+    "runtimeAuthority": { "const": false },
+    "gameplayAuthority": { "const": false },
+    "gameWikiDisclosure": { "enum": ["withheld", "disclosed"] },
+    "sources": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["stableID", "variant", "path", "sourceFileSHA256"],
+        "properties": {
+          "stableID": { "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$" },
+          "variant": { "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$" },
+          "path": { "type": "string" },
+          "sourceFileSHA256": { "pattern": "^[0-9a-f]{64}$" }
+        }
+      }
+    }
+  }
+}
+
