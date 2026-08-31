@@ -71,7 +71,10 @@ test('sanitized player snapshot has useful implemented coverage and inline visua
   assert.ok(content.terrain.length > 0);
   assert.ok(content.writingAssetURL);
   await access(path.join(root, 'public', content.writingAssetURL));
-  assert.deepEqual(content.writingVisuals.map((visual) => visual.id), ['tool', 'mark', 'link']);
+  assert.deepEqual(
+    content.writingVisuals.map((visual) => visual.id),
+    ['tool', 'mark', 'link'],
+  );
   for (const visual of content.writingVisuals) {
     assert.match(visual.assetURL, /^\/game-assets\/writing\//);
     await access(path.join(root, 'public', visual.assetURL));
@@ -243,4 +246,13 @@ test('village services have a hub, individual guides and place cross-links', asy
   const place = await read('app/places/[slug]/page.tsx');
   assert.match(place, /serviceForStation/);
   assert.match(place, /How to use/);
+});
+
+test('resource progression compares every current trade band and consumer family', async () => {
+  const page = await read('app/resources/progression/page.tsx');
+  for (const band of ['Staple', 'Uncommon', 'Rare', 'Precious', 'Nontradeable'])
+    assert.match(page, new RegExp(`'${band}'`));
+  assert.match(page, /recipesUsingResource/);
+  assert.match(page, /buildingUses/);
+  assert.match(page, /implemented game/);
 });

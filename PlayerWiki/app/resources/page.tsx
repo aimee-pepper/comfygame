@@ -81,6 +81,12 @@ export default function ResourcesPage() {
           </tbody>
         </table>
       </div>
+      <nav className="next-links">
+        <Link href="/resources/progression">
+          Compare resource roles and progression
+        </Link>
+        <Link href="/crafting">Crafting systems</Link>
+      </nav>
     </SiteFrame>
   );
 }
