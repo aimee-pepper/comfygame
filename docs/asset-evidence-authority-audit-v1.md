@@ -95,3 +95,13 @@ The move is byte-identical. The producer, focused test, and true-graph metadata 
 the semantic path. The other 97 files remain in place. Their classifications above are an audit,
 not relocation or acceptance authority.
 
+## Verification receipt
+
+- Before SHA-256 at `5e1ee40c`: `6d9b0fb3e6ee10fc805d08d7a5b48d0239a3efe62b3c25c62b8d117135c8d31b`.
+- After SHA-256 at the semantic path: `6d9b0fb3e6ee10fc805d08d7a5b48d0239a3efe62b3c25c62b8d117135c8d31b`.
+- Live repository references to `AssetLab/artifacts/combat-tree-v2-route-audit.json`: zero.
+- GameWiki: 336 inputs remain fresh; 4,838 routes, 4,820 searchable facts, 24 station pages, and
+  4,339 manifested visual records are unchanged. The withheld evidence receipt is not a wiki input.
+- App resources: `AssetEvidence` appears in neither `project.yml` nor
+  `Bookbinder.xcodeproj/project.pbxproj`.
+- Accepted-evidence fingerprint allowlist: empty.

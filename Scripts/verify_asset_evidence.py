@@ -29,8 +29,15 @@ def fingerprint(receipt: dict[str, object]) -> str | None:
         return None
     fields = ["bookbinder-accepted-evidence-v1"]
     for key in ("schemaVersion", "family", "version", "variant", "classification",
-                "gameWikiDisclosure"):
+                "gameWikiDisclosure", "sourceAuthorship", "runtimeAuthority",
+                "gameplayAuthority", "finalArtAcceptance"):
         fields.append(str(receipt.get(key, "")))
+    for key in ("authorityPaths", "producerPaths"):
+        values = receipt.get(key)
+        if not isinstance(values, list) or not all(isinstance(value, str) for value in values):
+            return None
+        fields.append(key)
+        fields.extend(sorted(values))
     for item in sorted(files, key=lambda value: str(value.get("path", ""))):
         fields.extend(str(item.get(key, "")) for key in ("path", "role", "sha256"))
     payload = b"".join(f"{len(value.encode())}:{value}".encode() for value in fields)
@@ -109,12 +116,22 @@ def self_test() -> None:
         (root/"project.yml").write_text("sources: []")
         (root/"Bookbinder.xcodeproj").mkdir(); (root/"Bookbinder.xcodeproj/project.pbxproj").write_text("Sources")
         authority=root/"docs/a.json"; authority.parent.mkdir(); authority.write_text("{}")
+        alternate_authority=root/"docs/b.json"; alternate_authority.write_text("{}")
+        producer=root/"Scripts/make.mjs"; producer.parent.mkdir(); producer.write_text("// fixture")
+        alternate_producer=root/"Scripts/other.mjs"; alternate_producer.write_text("// fixture")
         file=root/"AssetEvidence/a/v1/b/review/report.json"; file.write_text("{}")
-        receipt={"schemaVersion":"asset-evidence-receipt-v1","family":"a","version":"v1","variant":"b","classification":"generated-test-artifact","accepted":False,"sourceAuthorship":False,"runtimeAuthority":False,"gameplayAuthority":False,"finalArtAcceptance":False,"gameWikiDisclosure":"withheld","authorityPaths":["docs/a.json"],"producerPaths":[],"files":[{"path":"AssetEvidence/a/v1/b/review/report.json","role":"test-report","sha256":sha(file)}]}
+        receipt={"schemaVersion":"asset-evidence-receipt-v1","family":"a","version":"v1","variant":"b","classification":"generated-test-artifact","accepted":False,"sourceAuthorship":False,"runtimeAuthority":False,"gameplayAuthority":False,"finalArtAcceptance":False,"gameWikiDisclosure":"withheld","authorityPaths":["docs/a.json"],"producerPaths":["Scripts/make.mjs"],"files":[{"path":"AssetEvidence/a/v1/b/review/report.json","role":"test-report","sha256":sha(file)}]}
         rp=root/"AssetEvidence/a/v1/b/evidence-receipt.json"; rp.write_text(json.dumps(receipt))
         assert not validate(root)
         receipt["accepted"]=True; rp.write_text(json.dumps(receipt)); assert validate(root)
         fp=fingerprint(receipt); assert fp and not validate(root,{fp})
+        receipt["authorityPaths"]=["docs/b.json"]; rp.write_text(json.dumps(receipt))
+        assert validate(root,{fp})
+        receipt["authorityPaths"]=["docs/a.json"]
+        receipt["producerPaths"]=["Scripts/other.mjs"]; rp.write_text(json.dumps(receipt))
+        assert validate(root,{fp})
+        receipt["producerPaths"]=["Scripts/make.mjs"]; rp.write_text(json.dumps(receipt))
+        assert not validate(root,{fp})
         file.write_text("changed"); assert validate(root,{fp})
 
 def main() -> int:
@@ -129,4 +146,3 @@ def main() -> int:
     print("AssetEvidence check passed; accepted-evidence allowlist is empty")
     return 0
 if __name__ == "__main__": raise SystemExit(main())
-
