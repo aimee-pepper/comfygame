@@ -408,6 +408,22 @@ enum WorldControlExecution: Equatable, Sendable {
     case refused(WorldControlRefusal)
 }
 
+func phoneControlResult(for execution: WorldControlExecution)
+    -> Result<PhoneControlOutcomeV1, PhoneControlRefusalV1> {
+    switch execution {
+    case .completed(.pendingConfirmation), .completed(.blocked):
+        return .success(.noChange)
+    case .completed:
+        return .success(.committed)
+    case .refused(.busy):
+        return .failure(.busy)
+    case .refused(.disabled(let copy)), .refused(.rules(let copy)):
+        return .failure(.disabled(copy))
+    case .refused(.stale):
+        return .failure(.stale)
+    }
+}
+
 /// The exact rendered world-control authority retained from touch down through release.
 /// It is transient: no attempt or quote is part of campaign persistence.
 struct WorldControlQuoteV1: Equatable, Sendable {
@@ -538,14 +554,7 @@ struct WorldWholeFaceControl<Label: View>: View {
                             let current = quote()
                             _ = admission.release(controlID: current?.controlID) {
                                 guard current == retainedQuote else { return .failure(.stale) }
-                                switch operation(retainedQuote) {
-                                case .completed(.pendingConfirmation): return .success(.noChange)
-                                case .completed: return .success(.committed)
-                                case .refused(.busy): return .failure(.busy)
-                                case .refused(.disabled(let copy)):
-                                    return .failure(.disabled(copy))
-                                case .refused: return .failure(.stale)
-                                }
+                                return phoneControlResult(for: operation(retainedQuote))
                             }
                         })
                 }
@@ -1076,6 +1085,7 @@ struct WorldView: View {
     @State private var isConfirmingAtlasSeam = false
     @State private var isConfirmingAnchorFrame = false
     @State private var isLookArmed = false
+    @State private var retainedMapQuote: WorldControlQuoteV1?
     @State private var inspection: InspectionPresentation?
     @State private var fieldPageMessage: String?
     @State private var pendingWorldPageSwap: WildWorldPageFieldRules.Quote?
@@ -1131,10 +1141,10 @@ struct WorldView: View {
                                 onTravellerSpeechFinished: { travellerID in
                                     store.finishWorldTravellerSpeech(
                                         expectedTravellerID: travellerID)
-                                }
-                            ) { point in
-                                tapped(point, in: run)
-                            }
+                                },
+                                onCellTouchDown: mapCellTouchDown,
+                                onCellCancel: mapCellCancel,
+                                onCellActivate: mapCellActivate)
                             .id("world-map-\(mapViewport.columns)x\(mapViewport.rows)-\(mapViewport.width)")
                             .overlay(alignment: .bottom) {
                                 WorldFieldFeedbackRow(contextOverlapsPlayer:
@@ -1286,35 +1296,38 @@ struct WorldView: View {
         }
     }
 
-    /// Tap an adjacent tile to step; tap anywhere else to walk there turn by turn.
-    private func tapped(_ point: GridPoint, in run: WorldRun) {
-        if isLookArmed, run.map.contains(point),
-           let quote = WorldControlQuoteV1.make(
-            payload: .inspect(point: point, tile: run.map[point]), state: store.state) {
-            controlAdmission.touchDown(controlID: quote.controlID)
-            _ = controlAdmission.release(controlID: quote.controlID) {
-                switch executeControl(quote) {
-                case .completed: return .success(.noChange)
-                case .refused(.disabled(let copy)): return .failure(.disabled(copy))
-                case .refused(.busy): return .failure(.busy)
-                case .refused: return .failure(.stale)
-                }
-            }
-            return
+    /// Each rendered map cell owns its hit geometry. The shared admission owner retains the exact
+    /// rules quote from physical touch down through release.
+    private func mapCellQuote(_ point: GridPoint) -> WorldControlQuoteV1? {
+        guard let run, run.map.contains(point) else { return nil }
+        if isLookArmed {
+            return WorldControlQuoteV1.make(
+                payload: .inspect(point: point, tile: run.map[point]), state: store.state)
         }
         var routedAction: WorldControlAction?
         WorldMapPlanningAction.route(from: run.playerPosition, to: point) { routedAction = $0 }
-        guard let planningAction = routedAction else { return }
-        guard let quote = movementQuote(for: planningAction, destination: point) else { return }
-        controlAdmission.touchDown(controlID: quote.controlID)
-        _ = controlAdmission.release(controlID: quote.controlID) {
-            switch executeControl(quote) {
-            case .completed: return .success(.committed)
-            case .refused(.disabled(let copy)): return .failure(.disabled(copy))
-            case .refused(.busy): return .failure(.busy)
-            case .refused: return .failure(.stale)
-            }
+        guard let planningAction = routedAction else { return nil }
+        return movementQuote(for: planningAction, destination: point)
+    }
+
+    private func mapCellTouchDown(_ point: GridPoint) {
+        retainedMapQuote = mapCellQuote(point)
+        controlAdmission.touchDown(controlID: retainedMapQuote?.controlID)
+    }
+
+    private func mapCellCancel() {
+        retainedMapQuote = nil
+        controlAdmission.reset()
+    }
+
+    private func mapCellActivate(_ point: GridPoint) {
+        guard let retained = retainedMapQuote else { return }
+        let current = mapCellQuote(point)
+        _ = controlAdmission.release(controlID: current?.controlID) {
+            guard current == retained else { return .failure(.stale) }
+            return phoneControlResult(for: executeControl(retained))
         }
+        retainedMapQuote = nil
     }
 
     // Event copy is single-sourced by WorldFieldNarration and consumed by WorldFieldFeedbackRow.
@@ -2423,7 +2436,9 @@ private struct MapGrid: View {
     let frameRequest: WorldMapFrameRequestAuthority.Request
     let travellerSpeech: WorldTravellerSpeechBubbleV1?
     let onTravellerSpeechFinished: (TravellerID) -> Void
-    let onTap: (GridPoint) -> Void
+    let onCellTouchDown: (GridPoint) -> Void
+    let onCellCancel: () -> Void
+    let onCellActivate: (GridPoint) -> Void
     @Environment(\.scenePhase) private var scenePhase
     @StateObject private var terrainClock = TerrainPresentationClock.shared
 #if DEBUG
@@ -2461,7 +2476,15 @@ private struct MapGrid: View {
                                      side: side,
 									 presentationTick: frameRequest.presentationTick,
                                      useSimpleRenderer: simpleRenderer)
-                                .onTapGesture { onTap(cell.point) }
+                                .overlay {
+                                    WorldControlHitOwner(
+                                        action: WorldMapPlanningAction.action(
+                                            from: run.playerPosition, to: cell.point),
+                                        disabledReason: nil,
+                                        onTouchDown: { onCellTouchDown(cell.point) },
+                                        onCancel: { onCellCancel() },
+                                        onActivate: { onCellActivate(cell.point) })
+                                }
                         }
                     }
                     .zIndex(Double(row))
@@ -3003,7 +3026,7 @@ private struct SimpleCrackShape: Shape {
 
 // MARK: - Controls
 
-private enum Direction: CaseIterable {
+enum Direction: CaseIterable {
     case up, right, down, left
 
     var dx: Int { switch self { case .left: -1; case .right: 1; default: 0 } }
@@ -3020,7 +3043,7 @@ private enum Direction: CaseIterable {
 
 /// The one-handed movement control. Optional in the brief; here it's the primary one, because a
 /// 14×14 grid of 27pt tiles can't be.
-private struct DirectionPad: View {
+struct DirectionPad: View {
     var isLooking = false
     @ObservedObject var admission: PhoneControlAdmissionV1
     let quote: (Direction) -> WorldControlQuoteV1?

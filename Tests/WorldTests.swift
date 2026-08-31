@@ -372,12 +372,160 @@ final class WorldTests: XCTestCase {
         XCTAssertEqual(routed, [.travel(.init(x: 8, y: 7))])
         let source = try? String(contentsOfFile: #filePath.replacingOccurrences(
             of: "/Tests/WorldTests.swift", with: "/Sources/Screens/WorldView.swift"))
-        XCTAssertTrue(source?.contains(".onTapGesture { onTap(cell.point) }") == true)
+        XCTAssertTrue(source?.contains("onCellTouchDown(cell.point)") == true)
+        XCTAssertTrue(source?.contains("onCellActivate(cell.point)") == true)
         XCTAssertTrue(source?.contains("WorldMapPlanningAction.route(from: run.playerPosition, to: point)") == true)
         let mapGrid = source?.components(separatedBy: "private struct MapGrid: View").last ?? ""
         XCTAssertFalse(mapGrid.components(separatedBy: "struct WorldTileVisibilityPresentation").first?
             .contains("WorldWholeFaceControl") == true,
             "16px map cells remain the explicit geometry-owned planning exception")
+    }
+
+    @MainActor
+    func testCR11MountedMapCellRetainsPhysicalTouchDownQuoteAcrossDrift() throws {
+        let io = SaveFileIO.temporary(name: "map-cell-touch-drift-\(UUID().uuidString)")
+        let store = GameStore(io: io)
+        var fixture = startedRun(book([:]), seed: 12_111)
+        var run = try XCTUnwrap(fixture.worlds.activeRun)
+        for point in run.map.allPoints {
+            run.map[point].ground = .soil
+            run.map[point].isRevealed = true
+            run.map[point].content = .empty
+        }
+        let origin = run.playerPosition
+        let target = GridPoint(x: origin.x + 1, y: origin.y)
+        fixture.worlds.activeRun = run
+        store.mutate("test map touch baseline", flush: true) { $0 = fixture }
+
+        let controller = UIHostingController(rootView:
+            WorldView().environmentObject(store).frame(width: 368, height: 800))
+        let window = UIWindow(frame: .init(x: 0, y: 0, width: 368, height: 800))
+        window.rootViewController = controller; window.makeKeyAndVisible()
+        controller.view.frame = window.bounds; controller.view.layoutIfNeeded()
+        RunLoop.main.run(until: Date().addingTimeInterval(0.04))
+        let cell = try XCTUnwrap(descendants(controller.view)
+            .compactMap { $0 as? WorldControlHitOwner.ControlButton }
+            .first { $0.worldAction == .move(dx: 1, dy: 0) && $0.bounds.width < 44 })
+        cell.sendActions(for: .touchDown)
+        store.mutate("test map touch destination drift") { state in
+            state.worlds.activeRun?.map[target].content = .lockedCache
+        }
+        let drifted = try SaveCodec.encode(store.state)
+        let turn = store.activeRun?.turnsTaken
+        let position = store.activeRun?.playerPosition
+        cell.sendActions(for: .touchUpInside)
+        RunLoop.main.run(until: Date().addingTimeInterval(0.04))
+        XCTAssertEqual(try SaveCodec.encode(store.state), drifted)
+        XCTAssertEqual(store.activeRun?.turnsTaken, turn)
+        XCTAssertEqual(store.activeRun?.playerPosition, position)
+        XCTAssertEqual(store.activeRun?.map[target].content, .lockedCache)
+        window.isHidden = true
+    }
+
+    @MainActor
+    func testCR11MountedDPadBlockedIsNoChangeAndRapidMapPressAdmitsOnce() throws {
+        XCTAssertEqual(phoneControlResult(for: .completed(.blocked(
+            finalPosition: .init(x: 1, y: 1), turnsSpent: 0, reason: "Deep Water"))),
+            .success(.noChange))
+        let store = GameStore(io: .temporary(name: "blocked-dpad-\(UUID().uuidString)"))
+        var fixture = startedRun(book([:]), seed: 12_112)
+        var run = try XCTUnwrap(fixture.worlds.activeRun)
+        for point in run.map.allPoints {
+            run.map[point].ground = .soil
+            run.map[point].isRevealed = true
+            run.map[point].content = .empty
+        }
+        let origin = run.playerPosition
+        let blocked = GridPoint(x: origin.x + 1, y: origin.y)
+        run.map[blocked].ground = .deepWater
+        fixture.worlds.activeRun = run
+        for lesson in TutorialLessonID.allCases {
+            fixture.tutorial.complete(lesson, fact: "phone_control_hold_fixture")
+        }
+        store.mutate("test blocked dpad baseline", flush: true) { $0 = fixture }
+        let before = try SaveCodec.encode(store.state)
+        let mutation = store.state.meta.mutationCount
+        let admission = PhoneControlAdmissionV1()
+        let controller = UIHostingController(rootView: DirectionPad(
+            admission: admission,
+            quote: { direction in
+                guard direction == .right, let current = store.activeRun else { return nil }
+                return WorldControlQuoteV1.make(
+                    payload: .step(destination: blocked, tile: current.map[blocked]),
+                    state: store.state)
+            }, execute: { quote in
+                guard case .step(let destination, _) = quote.payload else {
+                    return .refused(.stale)
+                }
+                return WorldControlRulesExecution.step(store: store, to: destination)
+            }).frame(width: 184, height: 146))
+        let window = UIWindow(frame: .init(x: 0, y: 0, width: 368, height: 800))
+        window.rootViewController = controller; window.makeKeyAndVisible()
+        controller.view.frame = .init(x: 92, y: 560, width: 184, height: 146)
+        controller.view.layoutIfNeeded()
+        RunLoop.main.run(until: Date().addingTimeInterval(0.04))
+        let buttons = descendants(controller.view)
+            .compactMap { $0 as? WorldControlHitOwner.ControlButton }
+        let dpad = try XCTUnwrap(buttons.first { $0.worldAction == .move(dx: 1, dy: 0) })
+        dpad.sendActions(for: .touchDown); dpad.sendActions(for: .touchUpInside)
+        RunLoop.main.run(until: Date().addingTimeInterval(0.04))
+        XCTAssertEqual(try SaveCodec.encode(store.state), before)
+        XCTAssertEqual(store.state.meta.mutationCount, mutation)
+        XCTAssertEqual(store.activeRun?.playerPosition, origin)
+        let blockedCopy = try XCTUnwrap(WorldRules.blockedMovementRefusal(
+            to: blocked, in: try XCTUnwrap(store.activeRun).map))
+        XCTAssertTrue(store.recentEvents.contains(.blocked(blockedCopy)))
+
+        store.mutate("test rapid map opens destination") { state in
+            state.worlds.activeRun?.map[blocked].ground = .soil
+        }
+        let mapController = UIHostingController(rootView:
+            WorldView().environmentObject(store).frame(width: 368, height: 800))
+        window.rootViewController = mapController
+        mapController.view.frame = window.bounds; mapController.view.layoutIfNeeded()
+        RunLoop.main.run(until: Date().addingTimeInterval(0.02))
+        let mapCell = try XCTUnwrap(descendants(mapController.view)
+            .compactMap { $0 as? WorldControlHitOwner.ControlButton }
+            .first { $0.worldAction == .move(dx: 1, dy: 0) && $0.bounds.width < 44 })
+        let beforeRapidMutation = store.state.meta.mutationCount
+        for _ in 0..<10 {
+            mapCell.sendActions(for: .touchDown); mapCell.sendActions(for: .touchUpInside)
+        }
+        RunLoop.main.run(until: Date().addingTimeInterval(0.08))
+        XCTAssertEqual(store.activeRun?.playerPosition, blocked)
+        XCTAssertEqual(store.state.meta.mutationCount, beforeRapidMutation + 1)
+        window.isHidden = true
+    }
+
+    @MainActor
+    func testCR11MountedUseTilePreservesExactRulesRefusalCopy() throws {
+        let copy = "Finish the encounter first."
+        XCTAssertEqual(phoneControlResult(for: .refused(.rules(copy))),
+                       .failure(.disabled(copy)))
+        let admission = PhoneControlAdmissionV1()
+        let store = GameStore(io: .temporary(name: "use-tile-copy-\(UUID().uuidString)"))
+        store.mutate("test use tile copy baseline") { $0 = startedRun(book([:]), seed: 12_113) }
+        let quote = try XCTUnwrap(WorldControlQuoteV1.make(
+            payload: .setLook(expected: false, newValue: true), state: store.state))
+        let before = try SaveCodec.encode(store.state)
+        let controller = UIHostingController(rootView: WorldWholeFaceControl(
+            admission: admission, action: .useTile, quote: { quote }, disabledReason: nil,
+            operation: { _ in .refused(.rules(copy)) }, label: { Text("Use Tile") })
+            .frame(width: 120, height: 44))
+        let window = UIWindow(frame: .init(x: 0, y: 0, width: 120, height: 44))
+        window.rootViewController = controller; window.makeKeyAndVisible()
+        controller.view.frame = window.bounds; controller.view.layoutIfNeeded()
+        let button = try XCTUnwrap(descendants(controller.view)
+            .compactMap { $0 as? WorldControlHitOwner.ControlButton }.first)
+        button.sendActions(for: .touchDown); button.sendActions(for: .touchUpInside)
+        RunLoop.main.run(until: Date().addingTimeInterval(0.04))
+        guard case .refused(_, .disabled(let renderedCopy)) = admission.state else {
+            window.isHidden = true
+            return XCTFail("expected the exact rules-owned refusal")
+        }
+        XCTAssertEqual(renderedCopy, copy)
+        XCTAssertEqual(try SaveCodec.encode(store.state), before)
+        window.isHidden = true
     }
 
     @MainActor
