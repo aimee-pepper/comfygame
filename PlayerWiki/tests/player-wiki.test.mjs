@@ -283,6 +283,20 @@ test('glossary combines related player domains and points to useful guides', asy
   assert.match(glossary, /glossary-group-heading/);
 });
 
+test('systems hub groups every current player guide into useful routes', async () => {
+  const hub = await read('app/systems/page.tsx');
+  await access(path.join(root, 'app/systems/page.tsx'));
+  for (const label of [
+    'Journey and worlds',
+    'Combat and preparation',
+    'Crafting and materials',
+    'Village services',
+    'Reference',
+  ]) assert.match(hub, new RegExp(label));
+  for (const href of ['/getting-started', '/systems/world-writing', '/systems/exploration', '/systems/combat', '/services', '/resources', '/glossary']) assert.match(hub, new RegExp(href.replaceAll('/', '\\/')));
+  assert.match(hub, /PixelImage/);
+});
+
 test('home and getting-started guide the live route with inline retained visuals', async () => {
   for (const relative of ['app/page.tsx', 'app/getting-started/page.tsx']) {
     const source = await read(relative);
