@@ -497,6 +497,36 @@ footer {
 .combat-reference-card .pixel-image {
   flex: 0 0 auto;
 }
+.writing-visual-guide > p {
+  max-width: 760px;
+}
+.writing-visual-strip {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 18px;
+}
+.writing-visual-strip figure {
+  display: grid;
+  min-height: 102px;
+  place-items: center;
+  gap: 10px;
+  margin: 0;
+  padding: 14px;
+  border: 1px solid var(--line);
+  background: var(--paper-light);
+}
+.writing-visual-strip img {
+  width: min(100%, 140px);
+  height: 58px;
+  object-fit: contain;
+  image-rendering: pixelated;
+}
+.writing-visual-strip figcaption {
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 700;
+}
 .exploration-state-strip {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -702,6 +732,9 @@ footer {
     grid-template-columns: 1fr;
   }
   .combat-reference-strip {
+    grid-template-columns: 1fr;
+  }
+  .writing-visual-strip {
     grid-template-columns: 1fr;
   }
   .wiki-layout {

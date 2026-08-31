@@ -3858,6 +3858,26 @@
     }
   ],
   "writingAssetURL": "/game-assets/writing/writing-parchment.png",
+  "writingVisuals": [
+    {
+      "id": "tool",
+      "label": "Writing tool",
+      "alt": "A retained Writing Desk tool",
+      "assetURL": "/game-assets/writing/writing-tool-brush.png"
+    },
+    {
+      "id": "mark",
+      "label": "Mark",
+      "alt": "A retained Writing Desk mark",
+      "assetURL": "/game-assets/writing/writing-mark-bloom.png"
+    },
+    {
+      "id": "link",
+      "label": "Link",
+      "alt": "A retained Writing Desk link",
+      "assetURL": "/game-assets/writing/writing-link-brush-horizontal.png"
+    }
+  ],
   "explorationVisuals": {
     "entryPortal": "/game-assets/exploration/entry-portal.png",
     "unsearchedSite": "/game-assets/exploration/site-unsearched.png",

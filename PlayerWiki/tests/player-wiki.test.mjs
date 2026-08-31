@@ -21,6 +21,8 @@ test('World Writing teaches the authored player order', async () => {
     [...positions].sort((a, b) => a - b),
     positions,
   );
+  assert.match(source, /writing-visual-strip/);
+  assert.match(source, /content\.writingVisuals/);
 });
 
 test('player reference indexes are tables linked to individual pages', async () => {
@@ -69,6 +71,11 @@ test('sanitized player snapshot has useful implemented coverage and inline visua
   assert.ok(content.terrain.length > 0);
   assert.ok(content.writingAssetURL);
   await access(path.join(root, 'public', content.writingAssetURL));
+  assert.deepEqual(content.writingVisuals.map((visual) => visual.id), ['tool', 'mark', 'link']);
+  for (const visual of content.writingVisuals) {
+    assert.match(visual.assetURL, /^\/game-assets\/writing\//);
+    await access(path.join(root, 'public', visual.assetURL));
+  }
 });
 
 test('PlayerWiki remains a separate application from the internal GameWiki', async () => {

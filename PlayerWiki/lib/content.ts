@@ -100,6 +100,12 @@ interface PlayerContent {
   terminology: Term[];
   terrain: Array<{ name: string; assetURL: string }>;
   writingAssetURL: string | null;
+  writingVisuals: Array<{
+    id: string;
+    label: string;
+    alt: string;
+    assetURL: string | null;
+  }>;
   explorationVisuals: {
     entryPortal: string | null;
     unsearchedSite: string | null;

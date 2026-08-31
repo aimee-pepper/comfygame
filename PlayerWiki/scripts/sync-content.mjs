@@ -286,6 +286,38 @@ const writingAssetURL = await publishAsset(
   'writing',
   'writing-parchment.png',
 );
+const writingVisuals = await Promise.all([
+  [
+    'tool',
+    'Writing tool',
+    'A retained Writing Desk tool',
+    'parts/tools/brush/asset',
+    'writing-tool-brush.png',
+  ],
+  [
+    'mark',
+    'Mark',
+    'A retained Writing Desk mark',
+    'lookups/marks/mark/source/bloom/brush/0/roles/rgba/bloom',
+    'writing-mark-bloom.png',
+  ],
+  [
+    'link',
+    'Link',
+    'A retained Writing Desk link',
+    'lookups/links/link/brush/horizontal/asset',
+    'writing-link-brush-horizontal.png',
+  ],
+].map(async ([id, label, alt, semanticKey, fileName]) => ({
+  id,
+  label,
+  alt,
+  assetURL: await publishAsset(
+    runtimeAsset('writing-desk-production-pack-v1', semanticKey),
+    'writing',
+    fileName,
+  ),
+})));
 
 const explorationVisuals = await Promise.all([
   ['entryPortal', 'entry_portal/ordinary/frame-0', 'entry-portal.png'],
@@ -316,6 +348,7 @@ const playerContent = {
   })),
   terrain,
   writingAssetURL,
+  writingVisuals,
   explorationVisuals: Object.fromEntries(explorationVisuals),
 };
 
