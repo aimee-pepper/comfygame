@@ -1,5 +1,76 @@
 # Bookbinder Agent Instructions
 
+## Delivery Over Activity — Direct Aimee Override
+
+The objective is a finished, playable game. Never optimize for visible activity, agent utilization, audit
+volume, document volume, evaluator construction, or the appearance of progress.
+
+- Work on the highest-priority user-visible blocker until it is implemented, durably preserved,
+  focused-tested, and delivered to Aimee for testing.
+- "Keep everyone working" means assign only work that materially advances the current blocker or its next
+  already-approved implementation dependency. It never authorizes invented audits, speculative queues, or
+  unrelated work merely to keep a task active.
+- When no role-appropriate work advances the current blocker, leave that role paused. Useful idleness is
+  better than manufactured work.
+- Actual game construction, debugging, mounted playtesting, and phone delivery outrank evidence tooling,
+  audit frameworks, documentation, and broad source censuses.
+- Do not build an evidence evaluator, verifier, harness, catalogue, checklist engine, or generalized
+  framework unless the current implementation cannot be tested safely without it. Use the smallest direct
+  test that proves the behavior.
+- Source inspection and unit tests do not substitute for playing the implemented flow. Every player-visible
+  or progression-critical correction requires a bounded mounted playtest through the real native consumer at
+  368×800/default text.
+- Do not describe source work, a dirty checkout, a test plan, or an audit packet as delivered implementation.
+  Report implementation progress only with an exact durable commit.
+- If coordination or task messaging fails twice, stop assigning unrelated work and report the blocker
+  immediately.
+
+## Persistent Worktrees and Checkpoint Commits — Direct Aimee Override
+
+- Always perform implementation in a named Git worktree. Do not implement directly in the shared dirty
+  checkout.
+- Never create a worktree in `/tmp`, `/private/tmp`, a cache directory, or any other disposable location.
+- Persistent Bookbinder worktrees live under `/Users/aimeepepper/Documents/comfygame-worktrees/` with
+  plain-language task names.
+- Temporary directories may contain only disposable build products or scratch output whose loss cannot
+  destroy source work.
+- Every bounded correction must be committed to its task branch before the implementing turn ends or before
+  changing tasks. An explicit `WIP:` checkpoint commit is required when the correction is incomplete or tests
+  are failing.
+- A clean-review or promotion commit may wait for tests; a preservation commit may not. Never conflate "not
+  ready to review" with "not ready to commit."
+- Do not use Git stash as the only preservation mechanism for agent-authored work.
+- Every Engineering handoff must state the exact worktree path, branch, HEAD commit, tree, clean/dirty status,
+  tests run, and whether the revision is installable.
+- No implementation may be called retained, complete, ready, or recoverable unless its commit is reachable
+  from a named branch.
+- Before stopping, verify that the branch points at the reported commit and that no agent-authored source
+  change exists only in the working tree.
+
+## P0 Delivery Lane — Direct Aimee Override
+
+When Aimee names a phone-visible blocker or cannot progress through the game, that blocker owns the execution
+lane until a corrected build is on her phone.
+
+1. Split the blocker into the smallest independently committable gameplay corrections.
+2. Implement and checkpoint each correction on persistent storage.
+3. Run focused automated tests proportional to the risk.
+4. Play the corrected path through the real mounted app at 368×800/default text.
+5. Fix failures found by play rather than replacing play with more evaluators.
+6. Produce one clean cumulative candidate with exact provenance.
+7. Install that candidate on Aimee's phone promptly. A longer milestone playthrough continues afterward and
+   does not gate her access unless an already-observed crash, corruption, or data-loss defect makes
+   installation unsafe.
+
+During a P0 lane:
+
+- Engineering implements the blocker.
+- Game Design reviews only mechanics, state, persistence, identity, and interaction truth needed by that
+  blocker.
+- Asset reviews or creates only literal treatment for the exact blocker consumer.
+- Unrelated roadmap audits and presentation sweeps remain queued but inactive.
+- Evidence tooling is supporting work, never the primary deliverable.
+
 ## Fixed UI Configuration — Direct Aimee Override
 
 Bookbinder is designed, implemented, reviewed, and tested for one fixed UI configuration only: native
