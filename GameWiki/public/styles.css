@@ -49,6 +49,22 @@ h3 { margin: 0 0 8px; font-size: 17px; }
 .cost span { padding: 5px 8px; background: #efe0b9; border: 1px solid #c3a26f; }
 .provenance { margin-top: 28px; padding: 14px; color: #5b4b3f; background: #e9dcc0; border-left: 4px solid var(--accent); font-size: 12px; overflow-wrap: anywhere; }
 .empty { padding: 24px; color: var(--muted); background: rgba(255,248,229,.62); border: 2px dashed #aa906b; }
+.asset-family-group { margin-top: 36px; }
+.asset-card-heading { display: flex; align-items: start; justify-content: space-between; gap: 12px; }
+.asset-card-heading h3 { font-family: Georgia, serif; font-size: 21px; }
+.blocked-copy { color: #65301d !important; }
+.callout { margin: 24px 0; padding: 16px 18px; background: #dcebe3; border: 1px solid #6d947f; border-left-width: 5px; }
+.callout.danger { color: #542817; background: #f3d8c7; border-color: #a6603b; }
+.path-list { padding: 12px 12px 12px 34px; overflow-wrap: anywhere; background: rgba(255,248,229,.75); border: 1px solid #b89b70; }
+.path-list li + li { margin-top: 8px; }
+.asset-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 14px; }
+.asset-record { min-width: 0; display: grid; grid-template-columns: 96px minmax(0, 1fr); gap: 14px; padding: 14px; background: var(--panel); border: 1px solid #b89b70; }
+.asset-record p, .asset-record dd { overflow-wrap: anywhere; }
+.asset-record details { font-size: 12px; }
+.asset-record dl { margin-bottom: 0; }
+.asset-record dd { margin: 2px 0 8px; }
+.asset-preview { width: 96px; height: 96px; display: grid; place-items: center; overflow: hidden; color: var(--muted); background: repeating-conic-gradient(#ded1b5 0 25%, #f5ead0 0 50%) 50% / 16px 16px; border: 1px solid #9f896a; font-size: 11px; text-align: center; }
+.asset-preview img { width: 100%; height: 100%; object-fit: contain; image-rendering: pixelated; }
 .progression-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
 .sprite-slots { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; }
 .sprite-slot { min-height: 130px; display: grid; place-items: center; color: var(--muted); background: #ddd0b2; border: 2px dashed #9c8667; text-align: center; }
@@ -72,5 +88,7 @@ th { background: var(--paper-2); }
   .grid { grid-template-columns: minmax(0, 1fr); }
   .progression-grid { grid-template-columns: 1fr; }
   .sprite-slots { grid-template-columns: 1fr; }
+  .asset-record { grid-template-columns: 72px minmax(0, 1fr); }
+  .asset-preview { width: 72px; height: 72px; }
   h1 { font-size: 36px; }
 }

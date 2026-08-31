@@ -1,6 +1,6 @@
 import { createHash } from "node:crypto";
 import { mkdir, readFile, readdir, writeFile } from "node:fs/promises";
-import { dirname, join, relative, resolve } from "node:path";
+import { basename, dirname, join, relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const wikiRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
@@ -54,6 +54,116 @@ async function walk(path) {
     else results.push(child);
   }
   return results;
+}
+
+const unique = values => [...new Set(values)].sort();
+
+function familyIDFromManifestPath(path) {
+  const parts = path.split("/");
+  const rootIndex = parts.findIndex(part => part === "artifacts" || part === "integration");
+  if (rootIndex >= 0 && parts[rootIndex + 1]) return parts[rootIndex + 1];
+  const runtimeIndex = parts.indexOf("RuntimePacks");
+  if (runtimeIndex >= 0 && parts[runtimeIndex + 1]) return parts[runtimeIndex + 1];
+  return basename(dirname(path));
+}
+
+function pngReferences(value, trail = [], records = []) {
+  if (Array.isArray(value)) {
+    value.forEach((item, index) => pngReferences(item, [...trail, String(index)], records));
+    return records;
+  }
+  if (!value || typeof value !== "object") return records;
+
+  const pathCandidates = [
+    [value.path, null],
+    [value.file, null],
+    [value.assetPath, null],
+    [value.sourcePath, "source"],
+    [value.referencePath, "reference"],
+    [value.evidencePath, "evidence"]
+  ].filter(([candidate]) => typeof candidate === "string" && /\.png$/i.test(candidate));
+  for (const [rawPath, forcedRole] of new Map(pathCandidates.map(candidate => [`${candidate[0]}\0${candidate[1]}`, candidate])).values()) {
+    const assetsByKeyIndex = trail.indexOf("assetsByKey");
+    const semanticKey = value.stableKey
+      ?? value.key
+      ?? value.id
+      ?? (assetsByKeyIndex >= 0 ? trail[assetsByKeyIndex + 1] : null)
+      ?? trail.filter(part => !/^\d+$/.test(part)).join("/")
+      ?? basename(rawPath, ".png");
+    const context = trail.join("/").toLowerCase();
+    const contextTokens = trail.map(token => String(token).toLowerCase());
+    const role = forcedRole ?? (contextTokens.some(token => /^(source-?references?|references?)$/.test(token)) ? "reference"
+      : contextTokens.some(token => /^(evidence|proofs?|contact-?sheets?|review-?evidence)$/.test(token)) ? "evidence"
+      : /^(source|sources|editable-?sources?)$/.test(contextTokens[0] ?? "") ? "source"
+      : "runtime");
+    records.push({
+      semanticKey: String(semanticKey),
+      rawPath,
+      role,
+      context: trail.join("/"),
+      declaredSHA256: forcedRole === "source"
+        ? value.sourceSHA256 ?? value.sourceFileSHA256 ?? null
+        : value.fileSHA256 ?? value.sha256 ?? value.pngSHA256 ?? null,
+      decodedRGBASHA256: value.decodedRGBASHA256 ?? value.rgbaSHA256 ?? value.pixelSHA256 ?? null,
+      width: value.width ?? value.pixelWidth ?? null,
+      height: value.height ?? value.pixelHeight ?? null
+    });
+  }
+  for (const [key, child] of Object.entries(value)) pngReferences(child, [...trail, key], records);
+  return records;
+}
+
+const packPNGCache = new Map();
+
+async function packPNGPaths(manifestPath) {
+  const manifestDirectory = dirname(manifestPath);
+  const packDirectory = manifestDirectory.endsWith("/runtime") ? dirname(manifestDirectory) : manifestDirectory;
+  if (!packPNGCache.has(packDirectory)) {
+    packPNGCache.set(packDirectory, (await walk(packDirectory)).filter(path => /\.png$/i.test(path)).sort());
+  }
+  return packPNGCache.get(packDirectory);
+}
+
+async function resolveAssetPath(manifestPath, rawPath, context = "") {
+  const normalized = rawPath.replaceAll("\\", "/");
+  const manifestDirectory = dirname(manifestPath);
+  const candidates = normalized.startsWith("AssetLab/") || normalized.startsWith("RuntimePacks/")
+    ? [normalized]
+    : unique([
+        join(manifestDirectory, normalized),
+        manifestDirectory.endsWith("/runtime") ? join(dirname(manifestDirectory), normalized) : null,
+        normalized
+      ].filter(Boolean).map(candidate => candidate.replaceAll("\\", "/")));
+  for (const candidate of candidates) {
+    try {
+      await readFile(join(repoRoot, candidate));
+      return candidate;
+    } catch {}
+  }
+  const packPNGs = await packPNGPaths(manifestPath);
+  const profileDirectory = context.startsWith("profiles/mobDropInventory/") ? "mob-drops"
+    : context.startsWith("profiles/gearInventory/") ? "gear-families"
+    : context.startsWith("profiles/catalogueGear/") ? "catalogue-gear"
+    : null;
+  if (profileDirectory) {
+    const profileMatch = packPNGs.find(path => path.endsWith(`/${profileDirectory}/${normalized}`));
+    if (profileMatch) return profileMatch;
+  }
+  const suffixMatches = packPNGs.filter(path => path.endsWith(`/${normalized}`));
+  if (suffixMatches.length === 1) return suffixMatches[0];
+  const basenameMatches = packPNGs.filter(path => basename(path) === basename(normalized));
+  if (basenameMatches.length === 1) return basenameMatches[0];
+  return null;
+}
+
+function visualClassification(path, manifests) {
+  const statuses = manifests.map(manifest => String(manifest.status ?? manifest.evidenceRole ?? "")).join(" ").toLowerCase();
+  if (manifests.some(manifest => manifest.evidenceRole === "functionalPlaceholderConformancePack" || manifest.finalArt === false)) return "functional-placeholder";
+  if (/frozen/.test(statuses)) return "frozen-legacy";
+  if (path.startsWith("AssetLab/artifacts/")) return "review-only";
+  if (/candidate|unapproved|visual-review/.test(statuses) || manifests.some(manifest => manifest.integrationReady === false)) return "candidate";
+  if (manifests.some(manifest => manifest.integrationReady === true)) return "runtime-integrated";
+  return "unresolved";
 }
 
 function titleOf(markdown, fallback) {
@@ -204,7 +314,17 @@ const authorityPaths = [...new Set([
   "docs/village-progression-and-asset-matrix-current.md",
   ...linkedAuthorities
 ])].sort();
-const allInputs = [...new Set([...coreInputs, ...authorityPaths, ...historyPaths])].sort();
+const assetLabManifestPaths = unique([
+  ...(await walk("AssetLab/artifacts")).filter(path => /\/manifest(?: \d+)?\.json$/.test(path)),
+  ...(await walk("AssetLab/integration")).filter(path => /\/manifest(?: \d+)?\.json$/.test(path))
+]);
+const runtimePackManifestPaths = (await walk("RuntimePacks")).filter(path => /\/manifest\.json$/.test(path)).sort();
+const assetReceiptPaths = unique([
+  ...(await walk("AssetLab/artifacts")).filter(path => /\/(?:promotion|review|source|deterministic)-receipt\.json$/.test(path)),
+  ...(await walk("AssetLab/integration")).filter(path => /\/(?:promotion|review|source|deterministic)-receipt\.json$/.test(path))
+]);
+const visualAuthorityPaths = unique([...assetLabManifestPaths, ...runtimePackManifestPaths, ...assetReceiptPaths]);
+const allInputs = unique([...coreInputs, ...authorityPaths, ...historyPaths, ...visualAuthorityPaths]);
 
 const contents = {};
 const hashes = {};
@@ -720,6 +840,136 @@ const history = historyPaths.map(path => ({
   provenance: provenance([path], null, "history", hashes, aggregateHash)
 }));
 
+const manifestRecords = assetLabManifestPaths.map(path => ({
+  path,
+  fileSHA256: hashes[path],
+  familyID: familyIDFromManifestPath(path),
+  manifest: JSON.parse(contents[path])
+}));
+const runtimeManifestRecords = runtimePackManifestPaths.map(path => ({
+  path,
+  fileSHA256: hashes[path],
+  manifest: JSON.parse(contents[path])
+}));
+const receiptRecords = assetReceiptPaths.map(path => ({
+  path,
+  fileSHA256: hashes[path],
+  receipt: JSON.parse(contents[path])
+}));
+const manifestGroups = Object.groupBy(manifestRecords, record => record.familyID);
+const visualAssetFamilies = [];
+
+for (const familyID of Object.keys(manifestGroups).sort()) {
+  const records = manifestGroups[familyID];
+  const manifests = records.map(record => record.manifest);
+  const classification = visualClassification(records[0].path, manifests);
+  const runtimeMirrors = runtimeManifestRecords.filter(runtime => records.some(record => record.fileSHA256 === runtime.fileSHA256));
+  const receipts = receiptRecords.filter(record => {
+    if (record.path.includes(`/${familyID}/`)) return true;
+    return Boolean(record.receipt.packs?.[familyID]);
+  });
+  const approvalReceipts = receipts.filter(record => {
+    const status = String(record.receipt.status ?? "").toLowerCase();
+    return /approved/.test(status) && !/(unapproved|not.*approved)/.test(status);
+  });
+  const evidenceReceipts = receipts.filter(record => !approvalReceipts.includes(record));
+  const rawAssets = records.flatMap(record => pngReferences(record.manifest).map(asset => ({ ...asset, manifestPath: record.path })));
+  const seenAssets = new Map();
+  const assets = [];
+  const previewNames = new Map();
+  const contextPriority = context => context.startsWith("lookups/") || context.startsWith("parts/") || context.includes("assetsByKey/") ? 0
+    : context.startsWith("profiles/") ? 1
+    : context.startsWith("assets/") ? 3
+    : 2;
+  for (const rawAsset of rawAssets.sort((left, right) => `${contextPriority(left.context)}\0${left.semanticKey}\0${left.rawPath}`.localeCompare(`${contextPriority(right.context)}\0${right.semanticKey}\0${right.rawPath}`))) {
+    const resolvedPath = await resolveAssetPath(rawAsset.manifestPath, rawAsset.rawPath, rawAsset.context);
+    let actualSHA256 = null;
+    if (resolvedPath) actualSHA256 = sha(await readFile(join(repoRoot, resolvedPath)));
+    let role = rawAsset.role;
+    if (records[0].path.startsWith("AssetLab/artifacts/") && role === "runtime" && !/^runtime\//i.test(rawAsset.context)) role = "evidence";
+    const dedupeKey = `${resolvedPath ?? `${rawAsset.manifestPath}:${rawAsset.rawPath}`}\0${role}`;
+    const duplicate = seenAssets.get(dedupeKey);
+    if (duplicate) {
+      duplicate.aliases = unique([...duplicate.aliases, rawAsset.semanticKey]);
+      continue;
+    }
+    const semanticSlug = slug(rawAsset.semanticKey) || "asset";
+    const nextCount = (previewNames.get(semanticSlug) ?? 0) + 1;
+    previewNames.set(semanticSlug, nextCount);
+    const previewName = `${semanticSlug}${nextCount === 1 ? "" : `--${nextCount}`}.png`;
+    const asset = {
+      semanticKey: rawAsset.semanticKey,
+      aliases: [rawAsset.semanticKey],
+      role,
+      sourcePath: resolvedPath,
+      declaredSHA256: rawAsset.declaredSHA256,
+      actualSHA256,
+      decodedRGBASHA256: rawAsset.decodedRGBASHA256,
+      width: rawAsset.width,
+      height: rawAsset.height,
+      integrity: !resolvedPath ? "missing"
+        : rawAsset.declaredSHA256 && rawAsset.declaredSHA256 !== actualSHA256 ? "hash-mismatch"
+        : rawAsset.declaredSHA256 ? "verified" : "unverified",
+      previewURL: resolvedPath ? `visual-assets/${slug(familyID)}/${previewName}` : null
+    };
+    assets.push(asset);
+    seenAssets.set(dedupeKey, asset);
+  }
+  const distinctManifestHashes = unique(records.map(record => record.fileSHA256));
+  const authorityConflict = distinctManifestHashes.length > 1 ? {
+    status: "unresolved",
+    manifests: records.map(record => ({
+      path: record.path,
+      fileSHA256: record.fileSHA256,
+      canonicalManifestSHA256: record.manifest.canonicalManifestSha256 ?? record.manifest.canonicalManifestSHA256 ?? null,
+      outputCount: Array.isArray(record.manifest.outputs) ? record.manifest.outputs.length : null
+    }))
+  } : null;
+  const blockers = [];
+  if (authorityConflict) blockers.push("multiple divergent manifests claim this family");
+  if (assets.some(asset => asset.integrity === "missing")) blockers.push("one or more manifest image paths are missing");
+  if (assets.some(asset => asset.integrity === "hash-mismatch")) blockers.push("one or more encoded image hashes do not match");
+  if (classification === "functional-placeholder") blockers.push("functional placeholder; final art is not represented");
+  if (classification === "frozen-legacy") blockers.push("frozen legacy or conformance boundary");
+  if (classification === "review-only") blockers.push("review evidence is not production art");
+  if (classification === "candidate") blockers.push("candidate is not approved by classification alone");
+  if (classification === "unresolved") blockers.push("manifest does not establish a safe visual disposition");
+  if (!assets.length) blockers.push("manifest exposes no directly renderable PNG path");
+  visualAssetFamilies.push({
+    id: familyID,
+    slug: slug(familyID),
+    name: familyID.replace(/-v\d+(?:\.\d+)?$/i, "").replaceAll("-", " ").replace(/\b\w/g, character => character.toUpperCase()),
+    classification,
+    status: unique(manifests.map(manifest => String(manifest.status ?? manifest.evidenceRole ?? (manifest.integrationReady === true ? "integrationReady:true" : manifest.integrationReady === false ? "integrationReady:false" : "unlabelled")))),
+    manifestPaths: records.map(record => record.path),
+    runtimeMirrorPaths: runtimeMirrors.map(record => record.path),
+    sourcePaths: unique(assets.filter(asset => asset.role === "source").map(asset => asset.sourcePath).filter(Boolean)),
+    runtimePaths: unique(assets.filter(asset => asset.role === "runtime").map(asset => asset.sourcePath).filter(Boolean)),
+    referencePaths: unique(assets.filter(asset => asset.role === "reference").map(asset => asset.sourcePath).filter(Boolean)),
+    evidencePaths: unique([
+      ...assets.filter(asset => asset.role === "evidence").map(asset => asset.sourcePath).filter(Boolean),
+      ...evidenceReceipts.map(record => record.path)
+    ]),
+    approvalReceipts: approvalReceipts.map(record => ({
+      path: record.path,
+      fileSHA256: record.fileSHA256,
+      status: record.receipt.status ?? "unlabelled",
+      authority: record.receipt.approvalAuthority ?? record.receipt.approvals ?? null,
+      date: record.receipt.approvalDate ?? null
+    })),
+    authorityConflict,
+    blockers: unique(blockers),
+    assets
+  });
+}
+
+const visualAssetSummary = {
+  familyCount: visualAssetFamilies.length,
+  renderedAssetCount: visualAssetFamilies.reduce((sum, family) => sum + family.assets.filter(asset => asset.previewURL).length, 0),
+  blockedFamilyCount: visualAssetFamilies.filter(family => family.blockers.length).length,
+  classifications: Object.fromEntries(Object.entries(Object.groupBy(visualAssetFamilies, family => family.classification)).map(([key, families]) => [key, families.length]))
+};
+
 const routes = [
   "overview", "core-loop", "world-writing", "exploration", "combat", "people", "terminology",
   "village-buildings", "resources-crafting", "catalogue", "catalogue/gear", "catalogue/consumables",
@@ -728,8 +978,21 @@ const routes = [
   ...items.map(item => `item/${item.slug}`), ...resources.map(resource => `resource/${resource.slug}`),
   ...creatureMaterials.map(material => `creature-material/${material.slug}`),
   ...symbols.map(symbol => `lexeme/${symbol.slug}`), ...roadmap.map(item => `roadmap/${item.slug}`),
-  ...terminology.map(term => `terminology/${term.slug}`)
+  ...terminology.map(term => `terminology/${term.slug}`),
+  ...visualAssetFamilies.map(family => `asset-family/${family.slug}`)
 ];
+const visualAssetSearch = visualAssetFamilies.map(family => ({
+  type: "visualAssetFamily",
+  id: family.id,
+  name: family.name,
+  summary: `${family.classification}; ${family.assets.length} manifested visual records`,
+  category: "Visual assets",
+  route: `asset-family/${family.slug}`,
+  searchText: [family.name, family.id, family.classification, ...family.assets.map(asset => asset.semanticKey)].join(" ").toLowerCase(),
+  exactSearchTerms: [family.name, family.id].map(value => value.toLowerCase()),
+  disposition: family.blockers.length ? "blocked or review-gated" : family.status.join(" · "),
+  provenance: provenance(family.manifestPaths, family.id, family.classification, hashes, aggregateHash)
+}));
 const search = [...stations, ...travellers, ...resources, ...creatureMaterials, ...items, ...symbols, ...roadmap, ...terminology].map(entity => ({
   type: entity.type,
   id: entity.id,
@@ -741,7 +1004,7 @@ const search = [...stations, ...travellers, ...resources, ...creatureMaterials, 
   exactSearchTerms: entity.exactSearchTerms ?? [entity.name].map(value => String(value).toLowerCase()),
   disposition: entity.disposition,
   provenance: entity.provenance
-}));
+})).concat(visualAssetSearch);
 
 const wikiData = {
   schemaVersion: 1,
@@ -749,6 +1012,10 @@ const wikiData = {
   routes,
   counts: { stations: stations.length, travellers: travellers.length, resources: resources.length, items: items.length, runes: symbols.length, roadmap: roadmap.length },
   stations, travellers, resources, creatureMaterials, items, symbols, roadmap, terminology, authorities, history, search, currentTruth,
+  visualAssets: {
+    summary: visualAssetSummary,
+    families: visualAssetFamilies
+  },
   assetGallery: {
     acceptedAssets: [],
     reviewEvidence: [],

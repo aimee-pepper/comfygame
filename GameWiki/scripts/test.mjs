@@ -42,8 +42,9 @@ for (const type of ["station", "traveller", "resource", "creatureMaterial", "gea
   assert(data.search.some(item => item.searchText.includes(query)), `search cannot find representative ${type}`);
 }
 const itemCounts = Object.fromEntries(["gear", "consumable", "curio", "treasure", "key"].map(kind => [kind, data.items.filter(item => item.category === kind).length]));
-assert(JSON.stringify(itemCounts) === JSON.stringify({ gear: 75, consumable: 18, curio: 2, treasure: 5, key: 2 }), "all 102 live items must partition exactly by kind");
-assert(data.items.length === itemsAuthority.items.length && new Set(data.items.map(item => item.id)).size === 102, "item catalogue coverage must be exact and unique");
+const authorityItemCounts = Object.fromEntries(["gear", "consumable", "curio", "treasure", "key"].map(kind => [kind, itemsAuthority.items.filter(item => item.kind === kind).length]));
+assert(JSON.stringify(itemCounts) === JSON.stringify(authorityItemCounts), "live items must partition exactly by the current authored kinds");
+assert(data.items.length === itemsAuthority.items.length && new Set(data.items.map(item => item.id)).size === itemsAuthority.items.length, "item catalogue coverage must be exact and unique");
 const gearSlots = Object.fromEntries(["weapon", "offhand", "head", "armor", "hands", "feet", "tool", "keepsake"].map(slot => [slot, data.items.filter(item => item.gear?.slot === slot).length]));
 assert(JSON.stringify(gearSlots) === JSON.stringify({ weapon: 34, offhand: 6, head: 6, armor: 6, hands: 5, feet: 5, tool: 5, keepsake: 8 }), "gear slots must match the exact live catalogue");
 assert(data.items.filter(item => item.gear?.slot === "weapon").every(item => item.gear.damage && item.gear.reach), "every weapon detail must expose damage and reach");
@@ -57,7 +58,7 @@ for (const leak of ["None authored in items.json", "sellable", "recyclable"]) {
 assert(data.resources.length === 23 && data.resources.length === resourcesAuthority.resources.length && new Set(data.resources.map(item => item.id)).size === 23, "all 23 resource IDs must be accounted for exactly once");
 assert(data.resources.every(item => ["worldResource", "currencyEssence"].includes(item.category) && ["World resource", "Currency & Essence"].includes(item.domain) && item.summary && item.currentUses.length && data.routes.includes(`resource/${item.slug}`)), "every resource needs one domain, explanation, uses and stable detail route");
 assert(data.resources.filter(item => item.category === "worldResource").length + data.resources.filter(item => item.category === "currencyEssence").length === 23, "resource domains must form an exact partition");
-assert(data.creatureMaterials.some(item => item.status === "live legacy material model") && data.creatureMaterials.some(item => item.status === "current design / not yet live"), "live and designed creature-material families must remain visibly separate");
+assert(data.creatureMaterials.every(item => item.status === "current design / not yet live"), "Creature Materials must retain their current non-live design disposition");
 const designedCreatureFamilies = data.creatureMaterials.filter(item => item.disposition === "proposed").map(item => item.familyID).sort();
 assert(JSON.stringify(designedCreatureFamilies) === JSON.stringify(["bone", "chitin", "claw", "down", "fang", "feather", "fin", "hide", "horn", "ichor", "oil", "pelt", "plate", "quill", "scale", "shell", "tusk", "venom"]), "designed Creature Materials must be the exact 18-family ComponentProfile register");
 assert(!designedCreatureFamilies.includes("table") && !designedCreatureFamilies.includes("families"), "Markdown table labels leaked into Creature Materials");
@@ -180,6 +181,23 @@ assert(binderHouseRoot?.assetPath === null, "Binder House root must not invent a
 assert(!data.assetGallery.slots.some(slot => slot.key.startsWith("binder_house.") && slot.key !== "binder_house.root"), "Binder House must not invent independent state or attention asset IDs");
 assert(data.assetGallery.slots.filter(slot => slot.status === "Game Design accepted candidate / native integration not yet accepted").length === 14, "only the five Built candidates, eight checkpoint-3 states and Binder House root may be candidate-accepted");
 assert(data.assetGallery.slots.every(slot => slot.assetPath === null), "no unaccepted art path may enter a stable slot");
+assert(data.visualAssets.families.length === 27 && data.visualAssets.summary.familyCount === 27, "Visual Assets must account for every unique AssetLab manifest family");
+assert(new Set(data.visualAssets.families.map(family => family.id)).size === data.visualAssets.families.length, "visual family IDs must remain unique");
+assert(data.visualAssets.families.every(family => data.routes.includes(`asset-family/${family.slug}`)), "every visual family needs a semantic detail route");
+assert(data.visualAssets.families.every(family => data.search.some(item => item.type === "visualAssetFamily" && item.id === family.id && item.route === `asset-family/${family.slug}`)), "every visual family must be searchable by semantic identity");
+assert(data.visualAssets.families.every(family => family.manifestPaths.length && (family.assets.length || family.blockers.length)), "every visual family must render manifested records or state an explicit blocker");
+assert(data.visualAssets.families.flatMap(family => family.assets).every(asset => ["source", "runtime", "reference", "evidence"].includes(asset.role)), "visual records must preserve source/runtime/reference/evidence ownership");
+assert(data.visualAssets.families.flatMap(family => family.assets).filter(asset => asset.previewURL).every(asset => !/[0-9a-f]{64}/.test(asset.previewURL)), "wiki preview navigation must never expose hash filenames");
+assert(data.visualAssets.families.reduce((sum, family) => sum + family.runtimeMirrorPaths.length, 0) === 6, "all six RuntimePacks mirrors must remain associated with their semantic families");
+for (const id of ["catalogue-consumables-placeholder-v1", "named-character-placeholders-v1"]) {
+  const family = data.visualAssets.families.find(candidate => candidate.id === id);
+  assert(family?.classification === "functional-placeholder" && family.blockers.length, `${id} must remain visibly blocked placeholder material`);
+}
+const mapSlice = data.visualAssets.families.find(family => family.id === "map-slice-v1");
+assert(mapSlice?.authorityConflict?.status === "unresolved", "map-slice divergent manifests must remain a visible unresolved authority conflict");
+assert(JSON.stringify(mapSlice.authorityConflict.manifests.map(manifest => manifest.outputCount).sort((left, right) => left - right)) === JSON.stringify([195, 198]), "map-slice conflict must retain its exact 195/198 output split");
+assert(data.visualAssets.families.every(family => family.approvalReceipts.every(receipt => receipt.path && receipt.status)), "approval receipts must remain explicit path-backed records");
+assert(data.visualAssets.families.flatMap(family => family.approvalReceipts).every(receipt => !/(unapproved|not.*approved)/i.test(receipt.status)), "candidate and unapproved receipts must never appear as approvals");
 assert(data.currentTruth.writing.status === "readyToTest", "Writing must remain source-integrated and pending ordinary-phone acceptance");
 assert(data.currentTruth.writing.isPrimary === false, "Writing phone acceptance must not block the active canonical terminology work");
 assert(data.currentTruth.writing.acceptanceGate.includes("Install every verified phone-ready update promptly in place") && data.currentTruth.writing.acceptanceGate.includes("do not auto-launch"), "Writing must retain the corrected default phone-install/no-auto-launch authority");

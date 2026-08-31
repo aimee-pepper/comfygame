@@ -11,7 +11,7 @@ const navItems = [
   ["terminology", "Terminology"],
   ["village-buildings", "Home & Village"], ["resources-crafting", "Resources & Crafting"],
   ["catalogue", "Catalogue"], ["roadmap", "Roadmap"], ["history", "Decisions / History"],
-  ["asset-gallery", "Asset Gallery"]
+  ["asset-gallery", "Visual Assets"]
 ];
 
 const escapeHTML = value => String(value ?? "").replace(/[&<>'"]/g, character => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#39;", '"': "&quot;" })[character]);
@@ -25,7 +25,8 @@ function provenance(record) {
 }
 
 function layout(route, content) {
-  const nav = navItems.map(([id, label]) => `<a class="${route === id ? "active" : ""}" href="#/${id}">${label}</a>`).join("");
+  const activeRoute = route === "asset-family" ? "asset-gallery" : route;
+  const nav = navItems.map(([id, label]) => `<a class="${activeRoute === id ? "active" : ""}" href="#/${id}">${label}</a>`).join("");
   return `<div class="shell">
     <aside class="sidebar">
       <div class="brand"><div class="brand-mark">B</div><div><strong>Bookbinder</strong><small>Internal source wiki</small></div></div>
@@ -315,11 +316,32 @@ function history() {
 }
 
 function assets() {
-  const writing = data.currentTruth.writing;
-  const terrain = data.currentTruth.terrain;
-  return header("Evidence only", "Asset Gallery", "Acceptance, committed source integration, and native/phone acceptance are separate records. Candidate art is never promoted by implication.")
-    + `<h2>Current non-building records</h2><div class="facts"><dl class="fact"><dt>Writing parchment</dt><dd>${badge(writing.status)} <code>${escapeHTML(writing.parchment.stableKey)}</code> is hash-pinned in the native source and bundle; ordinary-phone acceptance remains pending.</dd></dl><dl class="fact"><dt>Layered Terrain</dt><dd>${badge(terrain.layeredPresentation.status)} ${escapeHTML(terrain.layeredPresentation.nativeStatus)}</dd></dl></div>`
-    + `<h2>Home & Village slots</h2><div class="empty"><strong>No native-ready building art registered.</strong><p>${escapeHTML(data.assetGallery.note)}</p></div><div class="grid">${data.assetGallery.slots.map(slot => `<article class="card"><h3><code>${escapeHTML(slot.key)}</code></h3>${badge(slot.status)}<p>${slot.assetPath ? escapeHTML(slot.assetPath) : "No accepted native asset path."}</p></article>`).join("")}</div>`;
+  const groups = Object.groupBy(data.visualAssets.families, family => family.classification);
+  const summary = data.visualAssets.summary;
+  return header("Pack-local authorities", "Visual Assets", "Browse every manifested visual family by semantic name. Source, runtime, reference, evidence and approval remain separate; existence never implies acceptance.")
+    + `<div class="facts"><dl class="fact"><dt>Families</dt><dd>${summary.familyCount}</dd></dl><dl class="fact"><dt>Renderable records</dt><dd>${summary.renderedAssetCount}</dd></dl><dl class="fact"><dt>Blocked or gated</dt><dd>${summary.blockedFamilyCount}</dd></dl></div>`
+    + Object.entries(groups).sort(([left], [right]) => left.localeCompare(right)).map(([classification, families]) => `<section class="asset-family-group"><h2>${escapeHTML(titleCase(classification))} · ${families.length}</h2><div class="grid">${families.map(family => `<a class="card asset-family-card" href="#/asset-family/${escapeHTML(family.slug)}"><div class="asset-card-heading"><h3>${escapeHTML(family.name)}</h3>${badge(family.classification)}</div><p><code>${escapeHTML(family.id)}</code></p><p>${family.assets.length} manifested records · ${family.runtimeMirrorPaths.length ? `${family.runtimeMirrorPaths.length} runtime mirror${family.runtimeMirrorPaths.length === 1 ? "" : "s"}` : "no runtime mirror"}</p>${family.blockers.length ? `<p class="blocked-copy">${escapeHTML(family.blockers.join(" · "))}</p>` : ""}</a>`).join("")}</div></section>`).join("")
+    + `<h2>Unpackaged Home & Village slots</h2><div class="empty"><strong>${data.assetGallery.slots.length} semantic slots have no accepted asset path.</strong><p>${escapeHTML(data.assetGallery.note)}</p></div>`;
+}
+
+function assetFamilyDetail(slugValue) {
+  const family = data.visualAssets.families.find(candidate => candidate.slug === slugValue);
+  if (!family) return notFound();
+  const pathList = (title, paths) => `<h2>${escapeHTML(title)}</h2>${paths.length ? `<ul class="path-list">${paths.map(path => `<li><code>${escapeHTML(path)}</code></li>`).join("")}</ul>` : `<div class="empty">None registered.</div>`}`;
+  const approval = family.approvalReceipts.length ? family.approvalReceipts.map(receipt => `<article class="card"><h3>${escapeHTML(receipt.status)}</h3><p><code>${escapeHTML(receipt.path)}</code></p><p>Authority: ${escapeHTML(typeof receipt.authority === "string" ? receipt.authority : JSON.stringify(receipt.authority))}${receipt.date ? ` · ${escapeHTML(receipt.date)}` : ""}</p></article>`).join("") : `<div class="empty">No approval receipt is registered. This family must not be promoted by implication.</div>`;
+  const conflict = family.authorityConflict ? `<h2>Authority conflict</h2><div class="callout danger"><strong>Blocked: ${escapeHTML(family.authorityConflict.status)}</strong>${family.authorityConflict.manifests.map(manifest => `<p><code>${escapeHTML(manifest.path)}</code><br>Manifest SHA ${escapeHTML(manifest.fileSHA256)}${manifest.outputCount == null ? "" : ` · ${manifest.outputCount} outputs`}</p>`).join("")}</div>` : "";
+  const assetsMarkup = family.assets.length ? `<div class="asset-grid">${family.assets.map(asset => `<article class="asset-record"><div class="asset-preview">${asset.previewURL ? `<img loading="lazy" src="${escapeHTML(asset.previewURL)}" alt="${escapeHTML(asset.semanticKey)}">` : `<span>No renderable path</span>`}</div><div><h3>${escapeHTML(asset.semanticKey)}</h3><p>${badge(asset.role)} ${badge(asset.integrity)}</p><p><code>${escapeHTML(asset.sourcePath ?? "Missing path")}</code></p>${asset.width && asset.height ? `<p>${asset.width}×${asset.height}</p>` : ""}<details><summary>Integrity metadata</summary><dl><dt>Encoded SHA-256</dt><dd><code>${escapeHTML(asset.actualSHA256 ?? asset.declaredSHA256 ?? "unrecorded")}</code></dd><dt>Decoded RGBA SHA-256</dt><dd><code>${escapeHTML(asset.decodedRGBASHA256 ?? "unrecorded")}</code></dd></dl></details></div></article>`).join("")}</div>` : `<div class="empty">This manifest exposes no directly renderable PNG. The family remains visible and blocked rather than receiving invented metadata.</div>`;
+  return header(family.classification, family.name, `${family.assets.length} manifested visual records. Repository paths remain authoritative; this wiki is a read-only presentation.`)
+    + `<div class="facts"><dl class="fact"><dt>Pack ID</dt><dd><code>${escapeHTML(family.id)}</code></dd></dl><dl class="fact"><dt>Status</dt><dd>${family.status.map(value => badge(value)).join(" ")}</dd></dl><dl class="fact"><dt>Runtime mirrors</dt><dd>${family.runtimeMirrorPaths.length}</dd></dl></div>`
+    + (family.blockers.length ? `<div class="callout danger"><strong>Blocked or review-gated</strong><ul>${family.blockers.map(reason => `<li>${escapeHTML(reason)}</li>`).join("")}</ul></div>` : `<div class="callout"><strong>No structural blocker found.</strong><p>This does not substitute for visual approval.</p></div>`)
+    + conflict
+    + pathList("Pack manifests", family.manifestPaths)
+    + pathList("Editable sources", family.sourcePaths)
+    + pathList("Generated runtime derivatives", family.runtimePaths)
+    + pathList("References", family.referencePaths)
+    + pathList("Evidence", family.evidencePaths)
+    + `<h2>Approval records</h2>${approval}`
+    + `<h2>Manifested assets</h2>${assetsMarkup}<p>${hashLink("asset-gallery", "← Visual Assets")}</p>`;
 }
 
 function notFound() { return header("404", "Page not found", "This internal route is not registered."); }
@@ -347,6 +369,7 @@ function render({ resetScroll = false } = {}) {
   else if (root === "roadmap") content = detail ? roadmapDetail(detail) : roadmap();
   else if (root === "history") content = history();
   else if (root === "asset-gallery") content = assets();
+  else if (root === "asset-family") content = assetFamilyDetail(detail);
   else content = notFound();
   document.querySelector("#app").innerHTML = layout(root, content);
   const input = document.querySelector("#wiki-search");
