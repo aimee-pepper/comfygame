@@ -624,3 +624,22 @@ test('Sites and hazards reference documents only current Look profiles, search s
   assert.match(systems, /\/systems\/sites-hazards/);
   assert.match(frame, /\/systems\/sites-hazards/);
 });
+
+test('Inventory and custody guide preserves current locations, selected holdings, and refusal boundaries', async () => {
+  const guide = await read('app/systems/inventory-custody/page.tsx');
+  const systems = await read('app/systems/page.tsx');
+  const frame = await read('components/site-frame.tsx');
+  await access(path.join(root, 'app/systems/inventory-custody/page.tsx'));
+  for (const label of ['Stored', 'Waiting', 'Carried', 'Worn']) assert.match(guide, new RegExp(`<h3>${label}</h3>`));
+  assert.match(guide, /not silently discarded/);
+  assert.match(guide, /worn by another person is marked/);
+  assert.match(guide, /Instruments are listed separately from supplies/);
+  assert.match(guide, /Previewing changes nothing/);
+  assert.match(guide, /price, stock, funds, capacity, or identity changes/);
+  assert.match(guide, /changed item, target, turn, or world state leaves the shown use uncommitted/);
+  assert.match(guide, /\/services\/storehouse/);
+  assert.match(guide, /\/services\/trading-post/);
+  assert.match(guide, /\/services\/recycler/);
+  assert.match(systems, /\/systems\/inventory-custody/);
+  assert.match(frame, /\/systems\/inventory-custody/);
+});
