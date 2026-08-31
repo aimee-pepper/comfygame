@@ -282,3 +282,13 @@ test('glossary combines related player domains and points to useful guides', asy
   assert.match(glossary, /\/services\/party-and-gear/);
   assert.match(glossary, /glossary-group-heading/);
 });
+
+test('home and getting-started guide the live route with inline retained visuals', async () => {
+  for (const relative of ['app/page.tsx', 'app/getting-started/page.tsx']) {
+    const source = await read(relative);
+    assert.match(source, /journey-strip/);
+    assert.match(source, /content\.writingAssetURL/);
+    assert.match(source, /content\.explorationVisuals\.entryPortal/);
+    assert.match(source, /PixelImage/);
+  }
+});

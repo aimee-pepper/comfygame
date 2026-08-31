@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { PageIntro } from '@/components/page-intro';
-import { SiteFrame } from '@/components/site-frame';
 import { PixelImage } from '@/components/pixel-image';
+import { SiteFrame } from '@/components/site-frame';
 import { content } from '@/lib/content';
 
 const steps = [

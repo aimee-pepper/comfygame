@@ -342,6 +342,48 @@ h2 {
   font-size: 13px;
   font-style: italic;
 }
+.journey-strip {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+.journey-strip > a {
+  display: grid;
+  grid-template-columns: 72px minmax(0, 1fr);
+  align-items: center;
+  gap: 14px;
+  min-height: 104px;
+  padding: 14px;
+  border: 1px solid var(--line);
+  background: rgb(255 250 240 / 86%);
+  color: inherit;
+  text-decoration: none;
+}
+.journey-strip > a:hover {
+  background: var(--paper-deep);
+}
+.journey-strip > a > img,
+.journey-strip > a .pixel-image {
+  width: 64px;
+  height: 64px;
+  object-fit: contain;
+  image-rendering: pixelated;
+}
+.journey-strip span {
+  display: grid;
+  gap: 5px;
+}
+.journey-strip strong {
+  font: 700 18px Georgia, serif;
+}
+.journey-strip small {
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.4;
+}
+.first-trip-visuals {
+  margin-top: 32px;
+}
 .glossary-group-heading {
   display: flex;
   align-items: center;
