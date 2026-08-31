@@ -13,12 +13,57 @@ const basenameWithoutExtension = path => String(path).replaceAll("\\", "/").spli
 
 export function extractPNGReferences(value) {
   const records = [];
+  const isTerrainContinuityManifest = value?.schemaVersion === "terrain-region-continuity-v1";
+  const isWritingParchmentManifest = value?.schemaVersion === "writing-parchment-v1";
+  const isWorldMaterialCorrectionManifest = value?.schema === "bookbinder.world-material-pixel-correction-v1.manifest";
+  const appendRecord = ({
+    rawPath, forcedRole, node, trail, disclosed, inheritedSemanticIdentity, variant,
+    semanticKeyOverride = null
+  }) => {
+    const metadata = node && typeof node === "object" ? node : {};
+    const normalizedPath = isWorldMaterialCorrectionManifest
+      && trail[0] === "evidence"
+      && !String(rawPath).includes("/")
+      ? `AssetLab/artifacts/world-material-pixel-correction-v1/${rawPath}`
+      : rawPath;
+    const assetsByKeyIndex = trail.indexOf("assetsByKey");
+    const inferredSemanticKey = trail.filter(part => !/^\d+$/.test(part)).join("/");
+    const fileSemanticKey = basenameWithoutExtension(normalizedPath);
+    const explicitSemanticKey = metadata.stableKey ?? metadata.key ?? metadata.id
+      ?? (assetsByKeyIndex >= 0 ? trail[assetsByKeyIndex + 1] : null)
+      ?? inheritedSemanticIdentity;
+    const semanticKey = semanticKeyOverride ?? (explicitSemanticKey != null
+      ? (inferredSemanticKey && !inferredSemanticKey.endsWith(String(explicitSemanticKey)) ? `${inferredSemanticKey}/${explicitSemanticKey}` : explicitSemanticKey)
+      : (/^\d+$/.test(trail.at(-1) ?? "") && !/^[0-9a-f]{32,}$/i.test(fileSemanticKey) ? fileSemanticKey : inferredSemanticKey || "opaque-asset"));
+    const contextTokens = trail.map(token => String(token).toLowerCase());
+    const role = forcedRole ?? (contextTokens.some(token => /^(source-?references?|references?)$/.test(token)) ? "reference"
+      : contextTokens.some(token => /^(evidence|proofs?|contact-?sheets?|review-?evidence)$/.test(token)) ? "evidence"
+      : /^(source|sources|editable-?sources?)$/.test(contextTokens[0] ?? "") ? "source"
+      : "runtime");
+    records.push({
+      semanticKey: String(semanticKey), rawPath: normalizedPath, role, variant, disclosed,
+      integrityIndexOnly: /^(assets|files|images|pngs)\/\d+$/i.test(trail.join("/")) && explicitSemanticKey == null,
+      context: trail.join("/"),
+      declaredSHA256: forcedRole === "source" ? metadata.sourceSHA256 ?? metadata.sourceFileSHA256 ?? null : metadata.fileSHA256 ?? metadata.sha256 ?? metadata.pngSHA256 ?? null,
+      decodedRGBASHA256: metadata.decodedRGBASHA256 ?? metadata.rgbaSHA256 ?? metadata.pixelSHA256 ?? null,
+      width: metadata.width ?? metadata.pixelWidth ?? null,
+      height: metadata.height ?? metadata.pixelHeight ?? null
+    });
+  };
   const visit = (node, trail = [], inheritedDisclosed = true, inheritedSemanticIdentity = null, inheritedVariant = "default") => {
     if (Array.isArray(node)) {
       node.forEach((item, index) => visit(item, [...trail, String(index)], inheritedDisclosed, inheritedSemanticIdentity, inheritedVariant));
       return;
     }
-    if (!node || typeof node !== "object") return;
+    if (!node || typeof node !== "object") {
+      if (isWritingParchmentManifest && trail[0] === "evidence" && typeof node === "string" && /\.png$/i.test(node)) {
+        appendRecord({
+          rawPath: `evidence/${node}`, forcedRole: "evidence", node: null, trail,
+          disclosed: inheritedDisclosed, inheritedSemanticIdentity, variant: inheritedVariant
+        });
+      }
+      return;
+    }
     const explicitlyHidden = node.identified === false || node.hidden === true || node.disclosed === false
       || node.visibility === "hidden" || node.disclosure === false || node.disclosure === "hidden";
     const disclosed = inheritedDisclosed && !explicitlyHidden;
@@ -29,27 +74,19 @@ export function extractPNGReferences(value) {
       [node.path, null], [node.file, null], [node.assetPath, null], [node.sourcePath, "source"],
       [node.referencePath, "reference"], [node.evidencePath, "evidence"]
     ].filter(([candidate]) => typeof candidate === "string" && /\.png$/i.test(candidate));
+    if (isTerrainContinuityManifest && trail[0] === "outputs" && typeof node.name === "string" && /\.png$/i.test(node.name)) {
+      pathCandidates.push([node.name, "evidence"]);
+    }
+    if (isWritingParchmentManifest && trail.join("/") === "productionSource" && typeof node.reference === "string" && /\.png$/i.test(node.reference)) {
+      pathCandidates.push([node.reference, "reference"]);
+    }
     for (const [rawPath, forcedRole] of new Map(pathCandidates.map(candidate => [`${candidate[0]}\0${candidate[1]}`, candidate])).values()) {
-      const assetsByKeyIndex = trail.indexOf("assetsByKey");
-      const inferredSemanticKey = trail.filter(part => !/^\d+$/.test(part)).join("/");
-      const fileSemanticKey = basenameWithoutExtension(rawPath);
-      const explicitSemanticKey = node.stableKey ?? node.key ?? node.id ?? (assetsByKeyIndex >= 0 ? trail[assetsByKeyIndex + 1] : null) ?? inheritedSemanticIdentity;
-      const semanticKey = explicitSemanticKey != null
-        ? (inferredSemanticKey && !inferredSemanticKey.endsWith(String(explicitSemanticKey)) ? `${inferredSemanticKey}/${explicitSemanticKey}` : explicitSemanticKey)
-        : (/^\d+$/.test(trail.at(-1) ?? "") && !/^[0-9a-f]{32,}$/i.test(fileSemanticKey) ? fileSemanticKey : inferredSemanticKey || "opaque-asset");
-      const contextTokens = trail.map(token => String(token).toLowerCase());
-      const role = forcedRole ?? (contextTokens.some(token => /^(source-?references?|references?)$/.test(token)) ? "reference"
-        : contextTokens.some(token => /^(evidence|proofs?|contact-?sheets?|review-?evidence)$/.test(token)) ? "evidence"
-        : /^(source|sources|editable-?sources?)$/.test(contextTokens[0] ?? "") ? "source"
-        : "runtime");
-      records.push({
-        semanticKey: String(semanticKey), rawPath, role, variant: effectiveVariant, disclosed,
-        integrityIndexOnly: /^(assets|files|images|pngs)\/\d+$/i.test(trail.join("/")) && explicitSemanticKey == null,
-        context: trail.join("/"),
-        declaredSHA256: forcedRole === "source" ? node.sourceSHA256 ?? node.sourceFileSHA256 ?? null : node.fileSHA256 ?? node.sha256 ?? node.pngSHA256 ?? null,
-        decodedRGBASHA256: node.decodedRGBASHA256 ?? node.rgbaSHA256 ?? node.pixelSHA256 ?? null,
-        width: node.width ?? node.pixelWidth ?? null,
-        height: node.height ?? node.pixelHeight ?? null
+      appendRecord({
+        rawPath, forcedRole, node, trail, disclosed, inheritedSemanticIdentity,
+        variant: effectiveVariant,
+        semanticKeyOverride: isWritingParchmentManifest && trail.join("/") === "productionSource"
+          ? basenameWithoutExtension(rawPath)
+          : null
       });
     }
     for (const [key, child] of Object.entries(node)) visit(child, [...trail, key], disclosed, ownSemanticIdentity, effectiveVariant);

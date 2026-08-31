@@ -31,6 +31,9 @@ const resourcesAuthority = JSON.parse(await readFile(resolve(root, "../Sources/C
 const travellersAuthority = JSON.parse(await readFile(resolve(root, "../Sources/Content/Data/travellers.json"), "utf8"));
 const terminologyAuthority = JSON.parse(await readFile(resolve(root, "../docs/canonical-game-terminology.json"), "utf8"));
 const roadmapAuthority = JSON.parse(await readFile(resolve(root, "../Sources/Content/Data/playability-roadmap.json"), "utf8"));
+const terrainContinuityManifest = JSON.parse(await readFile(resolve(root, "../AssetLab/artifacts/terrain-region-continuity-v1/manifest.json"), "utf8"));
+const writingParchmentManifest = JSON.parse(await readFile(resolve(root, "../AssetLab/artifacts/writing-parchment-v1/manifest.json"), "utf8"));
+const worldMaterialCorrectionManifest = JSON.parse(await readFile(resolve(root, "../AssetLab/integration/world-material-pixel-correction-v1/manifest.json"), "utf8"));
 const topLevelRoutes = ["overview", "core-loop", "world-writing", "exploration", "combat", "people", "village-buildings", "resources-crafting", "catalogue", "roadmap", "history", "asset-gallery"];
 assert(topLevelRoutes.length === 12 && topLevelRoutes.every(route => data.routes.includes(route)), "all 12 top-level routes must remain registered");
 for (const renderer of ["overview", "coreLoop", "worldWriting", "exploration", "combat", "people", "village", "resources", "catalogue", "roadmap", "history", "assets"]) {
@@ -197,6 +200,22 @@ assert(new Set(visualRecords.map(asset => asset.route)).size === visualRecords.l
 assert(visualRecords.every(asset => asset.route === visualRecordIdentity({ familyID: asset.route.split("/")[1], role: asset.role, semanticKey: asset.semanticKey, variant: asset.variant }).route), "visual routes must derive only from family, role, semantic key and explicit variant");
 assert(visualRecords.every(asset => !/--\d+(?:\/|$)/.test(asset.route) && !/[0-9a-f]{64}/.test(`${asset.route} ${asset.sourceRoute} ${asset.previewURL ?? ""}`)), "semantic navigation must never use order suffixes or hash names");
 assert(data.search.filter(item => item.type === "visualAssetRecord").length === visualRecords.length, "every disclosed visual record must have an individual search entry");
+const terrainContinuityFamily = data.visualAssets.families.find(family => family.id === "terrain-region-continuity-v1");
+const expectedTerrainEvidencePaths = terrainContinuityManifest.outputs.map(output => `AssetLab/artifacts/terrain-region-continuity-v1/${output.name}`);
+const terrainEvidenceRecords = terrainContinuityFamily.assets.filter(asset => expectedTerrainEvidencePaths.includes(asset.sourcePath));
+assert(terrainEvidenceRecords.length === 43 && terrainEvidenceRecords.every(asset => asset.role === "evidence" && asset.integrity === "verified"), "terrain continuity must expose all 43 pack-declared output records as verified evidence");
+const writingParchmentFamily = data.visualAssets.families.find(family => family.id === "writing-parchment-v1");
+const expectedWritingEvidencePaths = writingParchmentManifest.evidence.map(file => `AssetLab/artifacts/writing-parchment-v1/evidence/${file}`);
+const expectedWritingReferencePath = `AssetLab/artifacts/writing-parchment-v1/${writingParchmentManifest.productionSource.reference}`;
+assert(expectedWritingEvidencePaths.every(path => writingParchmentFamily.assets.some(asset => asset.sourcePath === path && asset.role === "evidence")), "Writing Parchment must expose all nine pack-declared review files as evidence");
+assert(writingParchmentFamily.assets.some(asset => asset.sourcePath === expectedWritingReferencePath && asset.role === "reference"), "Writing Parchment must expose its generated comparison raster as a reference, never a source or approval");
+const worldMaterialFamily = data.visualAssets.families.find(family => family.id === "world-material-pixel-correction-v1");
+const expectedWorldMaterialEvidencePaths = Object.values(worldMaterialCorrectionManifest.evidence).map(entry => `AssetLab/artifacts/world-material-pixel-correction-v1/${entry.file}`);
+assert(expectedWorldMaterialEvidencePaths.every(path => worldMaterialFamily.assets.some(asset => asset.sourcePath === path && asset.role === "evidence" && asset.integrity === "verified")), "World Material must resolve its three explicitly declared phone proofs through the documented family evidence base");
+const disclosedPackPaths = new Set([...expectedTerrainEvidencePaths, ...expectedWritingEvidencePaths, expectedWritingReferencePath, ...expectedWorldMaterialEvidencePaths]);
+const preexistingCrossFamilyPaths = expectedTerrainEvidencePaths.filter(path => data.visualAssets.families.some(family => family.id !== "terrain-region-continuity-v1" && family.assets.some(asset => asset.sourcePath === path)));
+assert(disclosedPackPaths.size === 56 && preexistingCrossFamilyPaths.length === 1 && disclosedPackPaths.size - preexistingCrossFamilyPaths.length === 55, "the wiki-only closure must add links for the exact 55 previously unlinked disclosed files without crawling loose proofs");
+assert(visualRecords.every(asset => !asset.sourcePath?.startsWith("AssetEvidence/") && !asset.sourcePath?.startsWith("AssetSources/")), "withheld AssetEvidence and unapproved AssetSources must remain absent from wiki records");
 assert(data.search.filter(item => item.type === "visualAssetRecord").every(item => !/[0-9a-f]{64}/.test(`${item.route} ${item.name} ${item.searchText}`)), "visual record search must exclude blob/hash paths");
 const rawReorderManifest = outputs => ({ outputs });
 const rawReorderEntries = [

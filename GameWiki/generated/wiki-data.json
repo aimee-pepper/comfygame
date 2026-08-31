@@ -1483,7 +1483,50 @@
     "asset-record/terrain-production-pack-v1/runtime/assets-edge-west-1/default",
     "asset-record/terrain-production-pack-v1/runtime/assets-edge-west-2/default",
     "asset-record/terrain-production-pack-v1/runtime/assets-edge-west-3/default",
+    "asset-record/terrain-region-continuity-v1/evidence/cluster-growth-2x/default",
+    "asset-record/terrain-region-continuity-v1/evidence/cluster-growth-400pct/default",
+    "asset-record/terrain-region-continuity-v1/evidence/cluster-growth-grayscale-400pct/default",
+    "asset-record/terrain-region-continuity-v1/evidence/cluster-growth-native/default",
+    "asset-record/terrain-region-continuity-v1/evidence/cluster-soil-2x/default",
+    "asset-record/terrain-region-continuity-v1/evidence/cluster-soil-400pct/default",
+    "asset-record/terrain-region-continuity-v1/evidence/cluster-soil-grayscale-400pct/default",
+    "asset-record/terrain-region-continuity-v1/evidence/cluster-soil-native/default",
+    "asset-record/terrain-region-continuity-v1/evidence/cluster-stone-2x/default",
+    "asset-record/terrain-region-continuity-v1/evidence/cluster-stone-400pct/default",
+    "asset-record/terrain-region-continuity-v1/evidence/cluster-stone-grayscale-400pct/default",
+    "asset-record/terrain-region-continuity-v1/evidence/cluster-stone-native/default",
+    "asset-record/terrain-region-continuity-v1/evidence/cluster-water-2x/default",
+    "asset-record/terrain-region-continuity-v1/evidence/cluster-water-400pct/default",
+    "asset-record/terrain-region-continuity-v1/evidence/cluster-water-grayscale-400pct/default",
+    "asset-record/terrain-region-continuity-v1/evidence/cluster-water-native/default",
     "asset-record/terrain-region-continuity-v1/evidence/contactsheet/default",
+    "asset-record/terrain-region-continuity-v1/evidence/corridor-1-2x/default",
+    "asset-record/terrain-region-continuity-v1/evidence/corridor-1-400pct/default",
+    "asset-record/terrain-region-continuity-v1/evidence/corridor-1-grayscale-400pct/default",
+    "asset-record/terrain-region-continuity-v1/evidence/corridor-1-native/default",
+    "asset-record/terrain-region-continuity-v1/evidence/corridor-2-2x/default",
+    "asset-record/terrain-region-continuity-v1/evidence/corridor-2-400pct/default",
+    "asset-record/terrain-region-continuity-v1/evidence/corridor-2-grayscale-400pct/default",
+    "asset-record/terrain-region-continuity-v1/evidence/corridor-2-native/default",
+    "asset-record/terrain-region-continuity-v1/evidence/equal-height-vs-south-wall-400pct/default",
+    "asset-record/terrain-region-continuity-v1/evidence/equal-height-vs-south-wall-grayscale-400pct/default",
+    "asset-record/terrain-region-continuity-v1/evidence/junction-t-cross-2x/default",
+    "asset-record/terrain-region-continuity-v1/evidence/junction-t-cross-400pct/default",
+    "asset-record/terrain-region-continuity-v1/evidence/junction-t-cross-grayscale-400pct/default",
+    "asset-record/terrain-region-continuity-v1/evidence/junction-t-cross-native/default",
+    "asset-record/terrain-region-continuity-v1/evidence/macro-11x11-redraw-a-2x/default",
+    "asset-record/terrain-region-continuity-v1/evidence/macro-11x11-redraw-b-2x/default",
+    "asset-record/terrain-region-continuity-v1/evidence/phone-old-current-corrected-368x800/default",
+    "asset-record/terrain-region-continuity-v1/evidence/phone-old-current-corrected-grayscale-368x800/default",
+    "asset-record/terrain-region-continuity-v1/evidence/phone-visibility-368x800/default",
+    "asset-record/terrain-region-continuity-v1/evidence/pool-deep-2x/default",
+    "asset-record/terrain-region-continuity-v1/evidence/pool-deep-400pct/default",
+    "asset-record/terrain-region-continuity-v1/evidence/pool-deep-grayscale-400pct/default",
+    "asset-record/terrain-region-continuity-v1/evidence/pool-deep-native/default",
+    "asset-record/terrain-region-continuity-v1/evidence/stone-rubble-2x/default",
+    "asset-record/terrain-region-continuity-v1/evidence/stone-rubble-400pct/default",
+    "asset-record/terrain-region-continuity-v1/evidence/stone-rubble-grayscale-400pct/default",
+    "asset-record/terrain-region-continuity-v1/evidence/stone-rubble-native/default",
     "asset-record/terrain-south-wall-v1/reference/reference/profile-object-object",
     "asset-record/terrain-south-wall-v1/runtime/assets-mask-ash-d1-isolated-v0/profile-object-object",
     "asset-record/terrain-south-wall-v1/runtime/assets-mask-ash-d1-isolated-v1/profile-object-object",
@@ -4839,6 +4882,16 @@
     "asset-record/writing-page-a2-v0-1/evidence/vocabulary-plains-fountain-selected-52x29/default",
     "asset-record/writing-page-a2-v0-1/evidence/vocabulary-plains-fountain-unavailable-52x29/default",
     "asset-record/writing-page-a2-v0-1/evidence/vocabulary-plains-fountain-unknown-52x29/default",
+    "asset-record/writing-parchment-v1/reference/generated-parchment-reference/default",
+    "asset-record/writing-parchment-v1/evidence/parchment-2x-344x344/default",
+    "asset-record/writing-parchment-v1/evidence/parchment-400pct-688x688/default",
+    "asset-record/writing-parchment-v1/evidence/parchment-dark-empty-writing-desk-368x800/default",
+    "asset-record/writing-parchment-v1/evidence/parchment-dark-ink-state-writing-desk-368x800/default",
+    "asset-record/writing-parchment-v1/evidence/parchment-empty-writing-desk-368x800/default",
+    "asset-record/writing-parchment-v1/evidence/parchment-grayscale-2x-344x344/default",
+    "asset-record/writing-parchment-v1/evidence/parchment-native-172x172/default",
+    "asset-record/writing-parchment-v1/evidence/parchment-phone-368x800/default",
+    "asset-record/writing-parchment-v1/evidence/parchment-phone-grayscale-368x800/default",
     "asset-record/writing-parchment-v1/evidence/runtime-writing-parchment-handmade-v1/default"
   ],
   "counts": {
@@ -33594,10 +33647,10 @@
       "type": "visualAssetFamily",
       "id": "terrain-region-continuity-v1",
       "name": "Terrain Region Continuity",
-      "summary": "review-only; 1 manifested visual records",
+      "summary": "review-only; 44 manifested visual records",
       "category": "Visual assets",
       "route": "asset-family/terrain-region-continuity-v1",
-      "searchText": "terrain region continuity terrain-region-continuity-v1 review-only contactsheet",
+      "searchText": "terrain region continuity terrain-region-continuity-v1 review-only cluster-growth-2x cluster-growth-400pct cluster-growth-grayscale-400pct cluster-growth-native cluster-soil-2x cluster-soil-400pct cluster-soil-grayscale-400pct cluster-soil-native cluster-stone-2x cluster-stone-400pct cluster-stone-grayscale-400pct cluster-stone-native cluster-water-2x cluster-water-400pct cluster-water-grayscale-400pct cluster-water-native contactsheet corridor-1-2x corridor-1-400pct corridor-1-grayscale-400pct corridor-1-native corridor-2-2x corridor-2-400pct corridor-2-grayscale-400pct corridor-2-native equal-height-vs-south-wall-400pct equal-height-vs-south-wall-grayscale-400pct junction-t-cross-2x junction-t-cross-400pct junction-t-cross-grayscale-400pct junction-t-cross-native macro-11x11-redraw-a-2x macro-11x11-redraw-b-2x phone-old-current-corrected-368x800 phone-old-current-corrected-grayscale-368x800 phone-visibility-368x800 pool-deep-2x pool-deep-400pct pool-deep-grayscale-400pct pool-deep-native stone-rubble-2x stone-rubble-400pct stone-rubble-grayscale-400pct stone-rubble-native",
       "exactSearchTerms": [
         "terrain region continuity",
         "terrain-region-continuity-v1"
@@ -33894,10 +33947,10 @@
       "type": "visualAssetFamily",
       "id": "writing-parchment-v1",
       "name": "Writing Parchment",
-      "summary": "review-only; 1 manifested visual records",
+      "summary": "review-only; 11 manifested visual records",
       "category": "Visual assets",
       "route": "asset-family/writing-parchment-v1",
-      "searchText": "writing parchment writing-parchment-v1 review-only runtime/writing.parchment.handmade-v1",
+      "searchText": "writing parchment writing-parchment-v1 review-only generated-parchment-reference parchment-2x-344x344 parchment-400pct-688x688 parchment-dark-empty-writing-desk-368x800 parchment-dark-ink-state-writing-desk-368x800 parchment-empty-writing-desk-368x800 parchment-grayscale-2x-344x344 parchment-native-172x172 parchment-phone-368x800 parchment-phone-grayscale-368x800 runtime/writing.parchment.handmade-v1",
       "exactSearchTerms": [
         "writing parchment",
         "writing-parchment-v1"
@@ -60592,6 +60645,406 @@
     },
     {
       "type": "visualAssetRecord",
+      "id": "terrain-region-continuity-v1/evidence/cluster-growth-2x/default",
+      "name": "cluster-growth-2x",
+      "summary": "Terrain Region Continuity · evidence · default",
+      "category": "Visual asset record",
+      "route": "asset-record/terrain-region-continuity-v1/evidence/cluster-growth-2x/default",
+      "searchText": "cluster-growth-2x terrain region continuity terrain-region-continuity-v1 evidence default terrain-region-continuity-v1/evidence/cluster-growth-2x/default",
+      "exactSearchTerms": [
+        "cluster-growth-2x",
+        "terrain-region-continuity-v1/evidence/cluster-growth-2x/default"
+      ],
+      "disposition": "blocked or review-gated",
+      "provenance": {
+        "sourcePaths": [
+          "AssetLab/artifacts/terrain-region-continuity-v1/manifest.json"
+        ],
+        "stableID": "terrain-region-continuity-v1/evidence/cluster-growth-2x/default",
+        "disposition": "review-only",
+        "generatedAtSourceHash": "1196192b4ab9f79c45a4344f8b29d46f239cac5bdf512b3cac46a9033801fbd2",
+        "sourceHashes": {
+          "AssetLab/artifacts/terrain-region-continuity-v1/manifest.json": "67321d789578f42cf059e7354fa3268fc0fc6d4912d17afe87b7509462185d72"
+        }
+      }
+    },
+    {
+      "type": "visualAssetRecord",
+      "id": "terrain-region-continuity-v1/evidence/cluster-growth-400pct/default",
+      "name": "cluster-growth-400pct",
+      "summary": "Terrain Region Continuity · evidence · default",
+      "category": "Visual asset record",
+      "route": "asset-record/terrain-region-continuity-v1/evidence/cluster-growth-400pct/default",
+      "searchText": "cluster-growth-400pct terrain region continuity terrain-region-continuity-v1 evidence default terrain-region-continuity-v1/evidence/cluster-growth-400pct/default",
+      "exactSearchTerms": [
+        "cluster-growth-400pct",
+        "terrain-region-continuity-v1/evidence/cluster-growth-400pct/default"
+      ],
+      "disposition": "blocked or review-gated",
+      "provenance": {
+        "sourcePaths": [
+          "AssetLab/artifacts/terrain-region-continuity-v1/manifest.json"
+        ],
+        "stableID": "terrain-region-continuity-v1/evidence/cluster-growth-400pct/default",
+        "disposition": "review-only",
+        "generatedAtSourceHash": "1196192b4ab9f79c45a4344f8b29d46f239cac5bdf512b3cac46a9033801fbd2",
+        "sourceHashes": {
+          "AssetLab/artifacts/terrain-region-continuity-v1/manifest.json": "67321d789578f42cf059e7354fa3268fc0fc6d4912d17afe87b7509462185d72"
+        }
+      }
+    },
+    {
+      "type": "visualAssetRecord",
+      "id": "terrain-region-continuity-v1/evidence/cluster-growth-grayscale-400pct/default",
+      "name": "cluster-growth-grayscale-400pct",
+      "summary": "Terrain Region Continuity · evidence · default",
+      "category": "Visual asset record",
+      "route": "asset-record/terrain-region-continuity-v1/evidence/cluster-growth-grayscale-400pct/default",
+      "searchText": "cluster-growth-grayscale-400pct terrain region continuity terrain-region-continuity-v1 evidence default terrain-region-continuity-v1/evidence/cluster-growth-grayscale-400pct/default",
+      "exactSearchTerms": [
+        "cluster-growth-grayscale-400pct",
+        "terrain-region-continuity-v1/evidence/cluster-growth-grayscale-400pct/default"
+      ],
+      "disposition": "blocked or review-gated",
+      "provenance": {
+        "sourcePaths": [
+          "AssetLab/artifacts/terrain-region-continuity-v1/manifest.json"
+        ],
+        "stableID": "terrain-region-continuity-v1/evidence/cluster-growth-grayscale-400pct/default",
+        "disposition": "review-only",
+        "generatedAtSourceHash": "1196192b4ab9f79c45a4344f8b29d46f239cac5bdf512b3cac46a9033801fbd2",
+        "sourceHashes": {
+          "AssetLab/artifacts/terrain-region-continuity-v1/manifest.json": "67321d789578f42cf059e7354fa3268fc0fc6d4912d17afe87b7509462185d72"
+        }
+      }
+    },
+    {
+      "type": "visualAssetRecord",
+      "id": "terrain-region-continuity-v1/evidence/cluster-growth-native/default",
+      "name": "cluster-growth-native",
+      "summary": "Terrain Region Continuity · evidence · default",
+      "category": "Visual asset record",
+      "route": "asset-record/terrain-region-continuity-v1/evidence/cluster-growth-native/default",
+      "searchText": "cluster-growth-native terrain region continuity terrain-region-continuity-v1 evidence default terrain-region-continuity-v1/evidence/cluster-growth-native/default",
+      "exactSearchTerms": [
+        "cluster-growth-native",
+        "terrain-region-continuity-v1/evidence/cluster-growth-native/default"
+      ],
+      "disposition": "blocked or review-gated",
+      "provenance": {
+        "sourcePaths": [
+          "AssetLab/artifacts/terrain-region-continuity-v1/manifest.json"
+        ],
+        "stableID": "terrain-region-continuity-v1/evidence/cluster-growth-native/default",
+        "disposition": "review-only",
+        "generatedAtSourceHash": "1196192b4ab9f79c45a4344f8b29d46f239cac5bdf512b3cac46a9033801fbd2",
+        "sourceHashes": {
+          "AssetLab/artifacts/terrain-region-continuity-v1/manifest.json": "67321d789578f42cf059e7354fa3268fc0fc6d4912d17afe87b7509462185d72"
+        }
+      }
+    },
+    {
+      "type": "visualAssetRecord",
+      "id": "terrain-region-continuity-v1/evidence/cluster-soil-2x/default",
+      "name": "cluster-soil-2x",
+      "summary": "Terrain Region Continuity · evidence · default",
+      "category": "Visual asset record",
+      "route": "asset-record/terrain-region-continuity-v1/evidence/cluster-soil-2x/default",
+      "searchText": "cluster-soil-2x terrain region continuity terrain-region-continuity-v1 evidence default terrain-region-continuity-v1/evidence/cluster-soil-2x/default",
+      "exactSearchTerms": [
+        "cluster-soil-2x",
+        "terrain-region-continuity-v1/evidence/cluster-soil-2x/default"
+      ],
+      "disposition": "blocked or review-gated",
+      "provenance": {
+        "sourcePaths": [
+          "AssetLab/artifacts/terrain-region-continuity-v1/manifest.json"
+        ],
+        "stableID": "terrain-region-continuity-v1/evidence/cluster-soil-2x/default",
+        "disposition": "review-only",
+        "generatedAtSourceHash": "1196192b4ab9f79c45a4344f8b29d46f239cac5bdf512b3cac46a9033801fbd2",
+        "sourceHashes": {
+          "AssetLab/artifacts/terrain-region-continuity-v1/manifest.json": "67321d789578f42cf059e7354fa3268fc0fc6d4912d17afe87b7509462185d72"
+        }
+      }
+    },
+    {
+      "type": "visualAssetRecord",
+      "id": "terrain-region-continuity-v1/evidence/cluster-soil-400pct/default",
+      "name": "cluster-soil-400pct",
+      "summary": "Terrain Region Continuity · evidence · default",
+      "category": "Visual asset record",
+      "route": "asset-record/terrain-region-continuity-v1/evidence/cluster-soil-400pct/default",
+      "searchText": "cluster-soil-400pct terrain region continuity terrain-region-continuity-v1 evidence default terrain-region-continuity-v1/evidence/cluster-soil-400pct/default",
+      "exactSearchTerms": [
+        "cluster-soil-400pct",
+        "terrain-region-continuity-v1/evidence/cluster-soil-400pct/default"
+      ],
+      "disposition": "blocked or review-gated",
+      "provenance": {
+        "sourcePaths": [
+          "AssetLab/artifacts/terrain-region-continuity-v1/manifest.json"
+        ],
+        "stableID": "terrain-region-continuity-v1/evidence/cluster-soil-400pct/default",
+        "disposition": "review-only",
+        "generatedAtSourceHash": "1196192b4ab9f79c45a4344f8b29d46f239cac5bdf512b3cac46a9033801fbd2",
+        "sourceHashes": {
+          "AssetLab/artifacts/terrain-region-continuity-v1/manifest.json": "67321d789578f42cf059e7354fa3268fc0fc6d4912d17afe87b7509462185d72"
+        }
+      }
+    },
+    {
+      "type": "visualAssetRecord",
+      "id": "terrain-region-continuity-v1/evidence/cluster-soil-grayscale-400pct/default",
+      "name": "cluster-soil-grayscale-400pct",
+      "summary": "Terrain Region Continuity · evidence · default",
+      "category": "Visual asset record",
+      "route": "asset-record/terrain-region-continuity-v1/evidence/cluster-soil-grayscale-400pct/default",
+      "searchText": "cluster-soil-grayscale-400pct terrain region continuity terrain-region-continuity-v1 evidence default terrain-region-continuity-v1/evidence/cluster-soil-grayscale-400pct/default",
+      "exactSearchTerms": [
+        "cluster-soil-grayscale-400pct",
+        "terrain-region-continuity-v1/evidence/cluster-soil-grayscale-400pct/default"
+      ],
+      "disposition": "blocked or review-gated",
+      "provenance": {
+        "sourcePaths": [
+          "AssetLab/artifacts/terrain-region-continuity-v1/manifest.json"
+        ],
+        "stableID": "terrain-region-continuity-v1/evidence/cluster-soil-grayscale-400pct/default",
+        "disposition": "review-only",
+        "generatedAtSourceHash": "1196192b4ab9f79c45a4344f8b29d46f239cac5bdf512b3cac46a9033801fbd2",
+        "sourceHashes": {
+          "AssetLab/artifacts/terrain-region-continuity-v1/manifest.json": "67321d789578f42cf059e7354fa3268fc0fc6d4912d17afe87b7509462185d72"
+        }
+      }
+    },
+    {
+      "type": "visualAssetRecord",
+      "id": "terrain-region-continuity-v1/evidence/cluster-soil-native/default",
+      "name": "cluster-soil-native",
+      "summary": "Terrain Region Continuity · evidence · default",
+      "category": "Visual asset record",
+      "route": "asset-record/terrain-region-continuity-v1/evidence/cluster-soil-native/default",
+      "searchText": "cluster-soil-native terrain region continuity terrain-region-continuity-v1 evidence default terrain-region-continuity-v1/evidence/cluster-soil-native/default",
+      "exactSearchTerms": [
+        "cluster-soil-native",
+        "terrain-region-continuity-v1/evidence/cluster-soil-native/default"
+      ],
+      "disposition": "blocked or review-gated",
+      "provenance": {
+        "sourcePaths": [
+          "AssetLab/artifacts/terrain-region-continuity-v1/manifest.json"
+        ],
+        "stableID": "terrain-region-continuity-v1/evidence/cluster-soil-native/default",
+        "disposition": "review-only",
+        "generatedAtSourceHash": "1196192b4ab9f79c45a4344f8b29d46f239cac5bdf512b3cac46a9033801fbd2",
+        "sourceHashes": {
+          "AssetLab/artifacts/terrain-region-continuity-v1/manifest.json": "67321d789578f42cf059e7354fa3268fc0fc6d4912d17afe87b7509462185d72"
+        }
+      }
+    },
+    {
+      "type": "visualAssetRecord",
+      "id": "terrain-region-continuity-v1/evidence/cluster-stone-2x/default",
+      "name": "cluster-stone-2x",
+      "summary": "Terrain Region Continuity · evidence · default",
+      "category": "Visual asset record",
+      "route": "asset-record/terrain-region-continuity-v1/evidence/cluster-stone-2x/default",
+      "searchText": "cluster-stone-2x terrain region continuity terrain-region-continuity-v1 evidence default terrain-region-continuity-v1/evidence/cluster-stone-2x/default",
+      "exactSearchTerms": [
+        "cluster-stone-2x",
+        "terrain-region-continuity-v1/evidence/cluster-stone-2x/default"
+      ],
+      "disposition": "blocked or review-gated",
+      "provenance": {
+        "sourcePaths": [
+          "AssetLab/artifacts/terrain-region-continuity-v1/manifest.json"
+        ],
+        "stableID": "terrain-region-continuity-v1/evidence/cluster-stone-2x/default",
+        "disposition": "review-only",
+        "generatedAtSourceHash": "1196192b4ab9f79c45a4344f8b29d46f239cac5bdf512b3cac46a9033801fbd2",
+        "sourceHashes": {
+          "AssetLab/artifacts/terrain-region-continuity-v1/manifest.json": "67321d789578f42cf059e7354fa3268fc0fc6d4912d17afe87b7509462185d72"
+        }
+      }
+    },
+    {
+      "type": "visualAssetRecord",
+      "id": "terrain-region-continuity-v1/evidence/cluster-stone-400pct/default",
+      "name": "cluster-stone-400pct",
+      "summary": "Terrain Region Continuity · evidence · default",
+      "category": "Visual asset record",
+      "route": "asset-record/terrain-region-continuity-v1/evidence/cluster-stone-400pct/default",
+      "searchText": "cluster-stone-400pct terrain region continuity terrain-region-continuity-v1 evidence default terrain-region-continuity-v1/evidence/cluster-stone-400pct/default",
+      "exactSearchTerms": [
+        "cluster-stone-400pct",
+        "terrain-region-continuity-v1/evidence/cluster-stone-400pct/default"
+      ],
+      "disposition": "blocked or review-gated",
+      "provenance": {
+        "sourcePaths": [
+          "AssetLab/artifacts/terrain-region-continuity-v1/manifest.json"
+        ],
+        "stableID": "terrain-region-continuity-v1/evidence/cluster-stone-400pct/default",
+        "disposition": "review-only",
+        "generatedAtSourceHash": "1196192b4ab9f79c45a4344f8b29d46f239cac5bdf512b3cac46a9033801fbd2",
+        "sourceHashes": {
+          "AssetLab/artifacts/terrain-region-continuity-v1/manifest.json": "67321d789578f42cf059e7354fa3268fc0fc6d4912d17afe87b7509462185d72"
+        }
+      }
+    },
+    {
+      "type": "visualAssetRecord",
+      "id": "terrain-region-continuity-v1/evidence/cluster-stone-grayscale-400pct/default",
+      "name": "cluster-stone-grayscale-400pct",
+      "summary": "Terrain Region Continuity · evidence · default",
+      "category": "Visual asset record",
+      "route": "asset-record/terrain-region-continuity-v1/evidence/cluster-stone-grayscale-400pct/default",
+      "searchText": "cluster-stone-grayscale-400pct terrain region continuity terrain-region-continuity-v1 evidence default terrain-region-continuity-v1/evidence/cluster-stone-grayscale-400pct/default",
+      "exactSearchTerms": [
+        "cluster-stone-grayscale-400pct",
+        "terrain-region-continuity-v1/evidence/cluster-stone-grayscale-400pct/default"
+      ],
+      "disposition": "blocked or review-gated",
+      "provenance": {
+        "sourcePaths": [
+          "AssetLab/artifacts/terrain-region-continuity-v1/manifest.json"
+        ],
+        "stableID": "terrain-region-continuity-v1/evidence/cluster-stone-grayscale-400pct/default",
+        "disposition": "review-only",
+        "generatedAtSourceHash": "1196192b4ab9f79c45a4344f8b29d46f239cac5bdf512b3cac46a9033801fbd2",
+        "sourceHashes": {
+          "AssetLab/artifacts/terrain-region-continuity-v1/manifest.json": "67321d789578f42cf059e7354fa3268fc0fc6d4912d17afe87b7509462185d72"
+        }
+      }
+    },
+    {
+      "type": "visualAssetRecord",
+      "id": "terrain-region-continuity-v1/evidence/cluster-stone-native/default",
+      "name": "cluster-stone-native",
+      "summary": "Terrain Region Continuity · evidence · default",
+      "category": "Visual asset record",
+      "route": "asset-record/terrain-region-continuity-v1/evidence/cluster-stone-native/default",
+      "searchText": "cluster-stone-native terrain region continuity terrain-region-continuity-v1 evidence default terrain-region-continuity-v1/evidence/cluster-stone-native/default",
+      "exactSearchTerms": [
+        "cluster-stone-native",
+        "terrain-region-continuity-v1/evidence/cluster-stone-native/default"
+      ],
+      "disposition": "blocked or review-gated",
+      "provenance": {
+        "sourcePaths": [
+          "AssetLab/artifacts/terrain-region-continuity-v1/manifest.json"
+        ],
+        "stableID": "terrain-region-continuity-v1/evidence/cluster-stone-native/default",
+        "disposition": "review-only",
+        "generatedAtSourceHash": "1196192b4ab9f79c45a4344f8b29d46f239cac5bdf512b3cac46a9033801fbd2",
+        "sourceHashes": {
+          "AssetLab/artifacts/terrain-region-continuity-v1/manifest.json": "67321d789578f42cf059e7354fa3268fc0fc6d4912d17afe87b7509462185d72"
+        }
+      }
+    },
+    {
+      "type": "visualAssetRecord",
+      "id": "terrain-region-continuity-v1/evidence/cluster-water-2x/default",
+      "name": "cluster-water-2x",
+      "summary": "Terrain Region Continuity · evidence · default",
+      "category": "Visual asset record",
+      "route": "asset-record/terrain-region-continuity-v1/evidence/cluster-water-2x/default",
+      "searchText": "cluster-water-2x terrain region continuity terrain-region-continuity-v1 evidence default terrain-region-continuity-v1/evidence/cluster-water-2x/default",
+      "exactSearchTerms": [
+        "cluster-water-2x",
+        "terrain-region-continuity-v1/evidence/cluster-water-2x/default"
+      ],
+      "disposition": "blocked or review-gated",
+      "provenance": {
+        "sourcePaths": [
+          "AssetLab/artifacts/terrain-region-continuity-v1/manifest.json"
+        ],
+        "stableID": "terrain-region-continuity-v1/evidence/cluster-water-2x/default",
+        "disposition": "review-only",
+        "generatedAtSourceHash": "1196192b4ab9f79c45a4344f8b29d46f239cac5bdf512b3cac46a9033801fbd2",
+        "sourceHashes": {
+          "AssetLab/artifacts/terrain-region-continuity-v1/manifest.json": "67321d789578f42cf059e7354fa3268fc0fc6d4912d17afe87b7509462185d72"
+        }
+      }
+    },
+    {
+      "type": "visualAssetRecord",
+      "id": "terrain-region-continuity-v1/evidence/cluster-water-400pct/default",
+      "name": "cluster-water-400pct",
+      "summary": "Terrain Region Continuity · evidence · default",
+      "category": "Visual asset record",
+      "route": "asset-record/terrain-region-continuity-v1/evidence/cluster-water-400pct/default",
+      "searchText": "cluster-water-400pct terrain region continuity terrain-region-continuity-v1 evidence default terrain-region-continuity-v1/evidence/cluster-water-400pct/default",
+      "exactSearchTerms": [
+        "cluster-water-400pct",
+        "terrain-region-continuity-v1/evidence/cluster-water-400pct/default"
+      ],
+      "disposition": "blocked or review-gated",
+      "provenance": {
+        "sourcePaths": [
+          "AssetLab/artifacts/terrain-region-continuity-v1/manifest.json"
+        ],
+        "stableID": "terrain-region-continuity-v1/evidence/cluster-water-400pct/default",
+        "disposition": "review-only",
+        "generatedAtSourceHash": "1196192b4ab9f79c45a4344f8b29d46f239cac5bdf512b3cac46a9033801fbd2",
+        "sourceHashes": {
+          "AssetLab/artifacts/terrain-region-continuity-v1/manifest.json": "67321d789578f42cf059e7354fa3268fc0fc6d4912d17afe87b7509462185d72"
+        }
+      }
+    },
+    {
+      "type": "visualAssetRecord",
+      "id": "terrain-region-continuity-v1/evidence/cluster-water-grayscale-400pct/default",
+      "name": "cluster-water-grayscale-400pct",
+      "summary": "Terrain Region Continuity · evidence · default",
+      "category": "Visual asset record",
+      "route": "asset-record/terrain-region-continuity-v1/evidence/cluster-water-grayscale-400pct/default",
+      "searchText": "cluster-water-grayscale-400pct terrain region continuity terrain-region-continuity-v1 evidence default terrain-region-continuity-v1/evidence/cluster-water-grayscale-400pct/default",
+      "exactSearchTerms": [
+        "cluster-water-grayscale-400pct",
+        "terrain-region-continuity-v1/evidence/cluster-water-grayscale-400pct/default"
+      ],
+      "disposition": "blocked or review-gated",
+      "provenance": {
+        "sourcePaths": [
+          "AssetLab/artifacts/terrain-region-continuity-v1/manifest.json"
+        ],
+        "stableID": "terrain-region-continuity-v1/evidence/cluster-water-grayscale-400pct/default",
+        "disposition": "review-only",
+        "generatedAtSourceHash": "1196192b4ab9f79c45a4344f8b29d46f239cac5bdf512b3cac46a9033801fbd2",
+        "sourceHashes": {
+          "AssetLab/artifacts/terrain-region-continuity-v1/manifest.json": "67321d789578f42cf059e7354fa3268fc0fc6d4912d17afe87b7509462185d72"
+        }
+      }
+    },
+    {
+      "type": "visualAssetRecord",
+      "id": "terrain-region-continuity-v1/evidence/cluster-water-native/default",
+      "name": "cluster-water-native",
+      "summary": "Terrain Region Continuity · evidence · default",
+      "category": "Visual asset record",
+      "route": "asset-record/terrain-region-continuity-v1/evidence/cluster-water-native/default",
+      "searchText": "cluster-water-native terrain region continuity terrain-region-continuity-v1 evidence default terrain-region-continuity-v1/evidence/cluster-water-native/default",
+      "exactSearchTerms": [
+        "cluster-water-native",
+        "terrain-region-continuity-v1/evidence/cluster-water-native/default"
+      ],
+      "disposition": "blocked or review-gated",
+      "provenance": {
+        "sourcePaths": [
+          "AssetLab/artifacts/terrain-region-continuity-v1/manifest.json"
+        ],
+        "stableID": "terrain-region-continuity-v1/evidence/cluster-water-native/default",
+        "disposition": "review-only",
+        "generatedAtSourceHash": "1196192b4ab9f79c45a4344f8b29d46f239cac5bdf512b3cac46a9033801fbd2",
+        "sourceHashes": {
+          "AssetLab/artifacts/terrain-region-continuity-v1/manifest.json": "67321d789578f42cf059e7354fa3268fc0fc6d4912d17afe87b7509462185d72"
+        }
+      }
+    },
+    {
+      "type": "visualAssetRecord",
       "id": "terrain-region-continuity-v1/evidence/contactsheet/default",
       "name": "contactSheet",
       "summary": "Terrain Region Continuity · evidence · default",
@@ -60608,6 +61061,681 @@
           "AssetLab/artifacts/terrain-region-continuity-v1/manifest.json"
         ],
         "stableID": "terrain-region-continuity-v1/evidence/contactsheet/default",
+        "disposition": "review-only",
+        "generatedAtSourceHash": "1196192b4ab9f79c45a4344f8b29d46f239cac5bdf512b3cac46a9033801fbd2",
+        "sourceHashes": {
+          "AssetLab/artifacts/terrain-region-continuity-v1/manifest.json": "67321d789578f42cf059e7354fa3268fc0fc6d4912d17afe87b7509462185d72"
+        }
+      }
+    },
+    {
+      "type": "visualAssetRecord",
+      "id": "terrain-region-continuity-v1/evidence/corridor-1-2x/default",
+      "name": "corridor-1-2x",
+      "summary": "Terrain Region Continuity · evidence · default",
+      "category": "Visual asset record",
+      "route": "asset-record/terrain-region-continuity-v1/evidence/corridor-1-2x/default",
+      "searchText": "corridor-1-2x terrain region continuity terrain-region-continuity-v1 evidence default terrain-region-continuity-v1/evidence/corridor-1-2x/default",
+      "exactSearchTerms": [
+        "corridor-1-2x",
+        "terrain-region-continuity-v1/evidence/corridor-1-2x/default"
+      ],
+      "disposition": "blocked or review-gated",
+      "provenance": {
+        "sourcePaths": [
+          "AssetLab/artifacts/terrain-region-continuity-v1/manifest.json"
+        ],
+        "stableID": "terrain-region-continuity-v1/evidence/corridor-1-2x/default",
+        "disposition": "review-only",
+        "generatedAtSourceHash": "1196192b4ab9f79c45a4344f8b29d46f239cac5bdf512b3cac46a9033801fbd2",
+        "sourceHashes": {
+          "AssetLab/artifacts/terrain-region-continuity-v1/manifest.json": "67321d789578f42cf059e7354fa3268fc0fc6d4912d17afe87b7509462185d72"
+        }
+      }
+    },
+    {
+      "type": "visualAssetRecord",
+      "id": "terrain-region-continuity-v1/evidence/corridor-1-400pct/default",
+      "name": "corridor-1-400pct",
+      "summary": "Terrain Region Continuity · evidence · default",
+      "category": "Visual asset record",
+      "route": "asset-record/terrain-region-continuity-v1/evidence/corridor-1-400pct/default",
+      "searchText": "corridor-1-400pct terrain region continuity terrain-region-continuity-v1 evidence default terrain-region-continuity-v1/evidence/corridor-1-400pct/default",
+      "exactSearchTerms": [
+        "corridor-1-400pct",
+        "terrain-region-continuity-v1/evidence/corridor-1-400pct/default"
+      ],
+      "disposition": "blocked or review-gated",
+      "provenance": {
+        "sourcePaths": [
+          "AssetLab/artifacts/terrain-region-continuity-v1/manifest.json"
+        ],
+        "stableID": "terrain-region-continuity-v1/evidence/corridor-1-400pct/default",
+        "disposition": "review-only",
+        "generatedAtSourceHash": "1196192b4ab9f79c45a4344f8b29d46f239cac5bdf512b3cac46a9033801fbd2",
+        "sourceHashes": {
+          "AssetLab/artifacts/terrain-region-continuity-v1/manifest.json": "67321d789578f42cf059e7354fa3268fc0fc6d4912d17afe87b7509462185d72"
+        }
+      }
+    },
+    {
+      "type": "visualAssetRecord",
+      "id": "terrain-region-continuity-v1/evidence/corridor-1-grayscale-400pct/default",
+      "name": "corridor-1-grayscale-400pct",
+      "summary": "Terrain Region Continuity · evidence · default",
+      "category": "Visual asset record",
+      "route": "asset-record/terrain-region-continuity-v1/evidence/corridor-1-grayscale-400pct/default",
+      "searchText": "corridor-1-grayscale-400pct terrain region continuity terrain-region-continuity-v1 evidence default terrain-region-continuity-v1/evidence/corridor-1-grayscale-400pct/default",
+      "exactSearchTerms": [
+        "corridor-1-grayscale-400pct",
+        "terrain-region-continuity-v1/evidence/corridor-1-grayscale-400pct/default"
+      ],
+      "disposition": "blocked or review-gated",
+      "provenance": {
+        "sourcePaths": [
+          "AssetLab/artifacts/terrain-region-continuity-v1/manifest.json"
+        ],
+        "stableID": "terrain-region-continuity-v1/evidence/corridor-1-grayscale-400pct/default",
+        "disposition": "review-only",
+        "generatedAtSourceHash": "1196192b4ab9f79c45a4344f8b29d46f239cac5bdf512b3cac46a9033801fbd2",
+        "sourceHashes": {
+          "AssetLab/artifacts/terrain-region-continuity-v1/manifest.json": "67321d789578f42cf059e7354fa3268fc0fc6d4912d17afe87b7509462185d72"
+        }
+      }
+    },
+    {
+      "type": "visualAssetRecord",
+      "id": "terrain-region-continuity-v1/evidence/corridor-1-native/default",
+      "name": "corridor-1-native",
+      "summary": "Terrain Region Continuity · evidence · default",
+      "category": "Visual asset record",
+      "route": "asset-record/terrain-region-continuity-v1/evidence/corridor-1-native/default",
+      "searchText": "corridor-1-native terrain region continuity terrain-region-continuity-v1 evidence default terrain-region-continuity-v1/evidence/corridor-1-native/default",
+      "exactSearchTerms": [
+        "corridor-1-native",
+        "terrain-region-continuity-v1/evidence/corridor-1-native/default"
+      ],
+      "disposition": "blocked or review-gated",
+      "provenance": {
+        "sourcePaths": [
+          "AssetLab/artifacts/terrain-region-continuity-v1/manifest.json"
+        ],
+        "stableID": "terrain-region-continuity-v1/evidence/corridor-1-native/default",
+        "disposition": "review-only",
+        "generatedAtSourceHash": "1196192b4ab9f79c45a4344f8b29d46f239cac5bdf512b3cac46a9033801fbd2",
+        "sourceHashes": {
+          "AssetLab/artifacts/terrain-region-continuity-v1/manifest.json": "67321d789578f42cf059e7354fa3268fc0fc6d4912d17afe87b7509462185d72"
+        }
+      }
+    },
+    {
+      "type": "visualAssetRecord",
+      "id": "terrain-region-continuity-v1/evidence/corridor-2-2x/default",
+      "name": "corridor-2-2x",
+      "summary": "Terrain Region Continuity · evidence · default",
+      "category": "Visual asset record",
+      "route": "asset-record/terrain-region-continuity-v1/evidence/corridor-2-2x/default",
+      "searchText": "corridor-2-2x terrain region continuity terrain-region-continuity-v1 evidence default terrain-region-continuity-v1/evidence/corridor-2-2x/default",
+      "exactSearchTerms": [
+        "corridor-2-2x",
+        "terrain-region-continuity-v1/evidence/corridor-2-2x/default"
+      ],
+      "disposition": "blocked or review-gated",
+      "provenance": {
+        "sourcePaths": [
+          "AssetLab/artifacts/terrain-region-continuity-v1/manifest.json"
+        ],
+        "stableID": "terrain-region-continuity-v1/evidence/corridor-2-2x/default",
+        "disposition": "review-only",
+        "generatedAtSourceHash": "1196192b4ab9f79c45a4344f8b29d46f239cac5bdf512b3cac46a9033801fbd2",
+        "sourceHashes": {
+          "AssetLab/artifacts/terrain-region-continuity-v1/manifest.json": "67321d789578f42cf059e7354fa3268fc0fc6d4912d17afe87b7509462185d72"
+        }
+      }
+    },
+    {
+      "type": "visualAssetRecord",
+      "id": "terrain-region-continuity-v1/evidence/corridor-2-400pct/default",
+      "name": "corridor-2-400pct",
+      "summary": "Terrain Region Continuity · evidence · default",
+      "category": "Visual asset record",
+      "route": "asset-record/terrain-region-continuity-v1/evidence/corridor-2-400pct/default",
+      "searchText": "corridor-2-400pct terrain region continuity terrain-region-continuity-v1 evidence default terrain-region-continuity-v1/evidence/corridor-2-400pct/default",
+      "exactSearchTerms": [
+        "corridor-2-400pct",
+        "terrain-region-continuity-v1/evidence/corridor-2-400pct/default"
+      ],
+      "disposition": "blocked or review-gated",
+      "provenance": {
+        "sourcePaths": [
+          "AssetLab/artifacts/terrain-region-continuity-v1/manifest.json"
+        ],
+        "stableID": "terrain-region-continuity-v1/evidence/corridor-2-400pct/default",
+        "disposition": "review-only",
+        "generatedAtSourceHash": "1196192b4ab9f79c45a4344f8b29d46f239cac5bdf512b3cac46a9033801fbd2",
+        "sourceHashes": {
+          "AssetLab/artifacts/terrain-region-continuity-v1/manifest.json": "67321d789578f42cf059e7354fa3268fc0fc6d4912d17afe87b7509462185d72"
+        }
+      }
+    },
+    {
+      "type": "visualAssetRecord",
+      "id": "terrain-region-continuity-v1/evidence/corridor-2-grayscale-400pct/default",
+      "name": "corridor-2-grayscale-400pct",
+      "summary": "Terrain Region Continuity · evidence · default",
+      "category": "Visual asset record",
+      "route": "asset-record/terrain-region-continuity-v1/evidence/corridor-2-grayscale-400pct/default",
+      "searchText": "corridor-2-grayscale-400pct terrain region continuity terrain-region-continuity-v1 evidence default terrain-region-continuity-v1/evidence/corridor-2-grayscale-400pct/default",
+      "exactSearchTerms": [
+        "corridor-2-grayscale-400pct",
+        "terrain-region-continuity-v1/evidence/corridor-2-grayscale-400pct/default"
+      ],
+      "disposition": "blocked or review-gated",
+      "provenance": {
+        "sourcePaths": [
+          "AssetLab/artifacts/terrain-region-continuity-v1/manifest.json"
+        ],
+        "stableID": "terrain-region-continuity-v1/evidence/corridor-2-grayscale-400pct/default",
+        "disposition": "review-only",
+        "generatedAtSourceHash": "1196192b4ab9f79c45a4344f8b29d46f239cac5bdf512b3cac46a9033801fbd2",
+        "sourceHashes": {
+          "AssetLab/artifacts/terrain-region-continuity-v1/manifest.json": "67321d789578f42cf059e7354fa3268fc0fc6d4912d17afe87b7509462185d72"
+        }
+      }
+    },
+    {
+      "type": "visualAssetRecord",
+      "id": "terrain-region-continuity-v1/evidence/corridor-2-native/default",
+      "name": "corridor-2-native",
+      "summary": "Terrain Region Continuity · evidence · default",
+      "category": "Visual asset record",
+      "route": "asset-record/terrain-region-continuity-v1/evidence/corridor-2-native/default",
+      "searchText": "corridor-2-native terrain region continuity terrain-region-continuity-v1 evidence default terrain-region-continuity-v1/evidence/corridor-2-native/default",
+      "exactSearchTerms": [
+        "corridor-2-native",
+        "terrain-region-continuity-v1/evidence/corridor-2-native/default"
+      ],
+      "disposition": "blocked or review-gated",
+      "provenance": {
+        "sourcePaths": [
+          "AssetLab/artifacts/terrain-region-continuity-v1/manifest.json"
+        ],
+        "stableID": "terrain-region-continuity-v1/evidence/corridor-2-native/default",
+        "disposition": "review-only",
+        "generatedAtSourceHash": "1196192b4ab9f79c45a4344f8b29d46f239cac5bdf512b3cac46a9033801fbd2",
+        "sourceHashes": {
+          "AssetLab/artifacts/terrain-region-continuity-v1/manifest.json": "67321d789578f42cf059e7354fa3268fc0fc6d4912d17afe87b7509462185d72"
+        }
+      }
+    },
+    {
+      "type": "visualAssetRecord",
+      "id": "terrain-region-continuity-v1/evidence/equal-height-vs-south-wall-400pct/default",
+      "name": "equal-height-vs-south-wall-400pct",
+      "summary": "Terrain Region Continuity · evidence · default",
+      "category": "Visual asset record",
+      "route": "asset-record/terrain-region-continuity-v1/evidence/equal-height-vs-south-wall-400pct/default",
+      "searchText": "equal-height-vs-south-wall-400pct terrain region continuity terrain-region-continuity-v1 evidence default terrain-region-continuity-v1/evidence/equal-height-vs-south-wall-400pct/default",
+      "exactSearchTerms": [
+        "equal-height-vs-south-wall-400pct",
+        "terrain-region-continuity-v1/evidence/equal-height-vs-south-wall-400pct/default"
+      ],
+      "disposition": "blocked or review-gated",
+      "provenance": {
+        "sourcePaths": [
+          "AssetLab/artifacts/terrain-region-continuity-v1/manifest.json"
+        ],
+        "stableID": "terrain-region-continuity-v1/evidence/equal-height-vs-south-wall-400pct/default",
+        "disposition": "review-only",
+        "generatedAtSourceHash": "1196192b4ab9f79c45a4344f8b29d46f239cac5bdf512b3cac46a9033801fbd2",
+        "sourceHashes": {
+          "AssetLab/artifacts/terrain-region-continuity-v1/manifest.json": "67321d789578f42cf059e7354fa3268fc0fc6d4912d17afe87b7509462185d72"
+        }
+      }
+    },
+    {
+      "type": "visualAssetRecord",
+      "id": "terrain-region-continuity-v1/evidence/equal-height-vs-south-wall-grayscale-400pct/default",
+      "name": "equal-height-vs-south-wall-grayscale-400pct",
+      "summary": "Terrain Region Continuity · evidence · default",
+      "category": "Visual asset record",
+      "route": "asset-record/terrain-region-continuity-v1/evidence/equal-height-vs-south-wall-grayscale-400pct/default",
+      "searchText": "equal-height-vs-south-wall-grayscale-400pct terrain region continuity terrain-region-continuity-v1 evidence default terrain-region-continuity-v1/evidence/equal-height-vs-south-wall-grayscale-400pct/default",
+      "exactSearchTerms": [
+        "equal-height-vs-south-wall-grayscale-400pct",
+        "terrain-region-continuity-v1/evidence/equal-height-vs-south-wall-grayscale-400pct/default"
+      ],
+      "disposition": "blocked or review-gated",
+      "provenance": {
+        "sourcePaths": [
+          "AssetLab/artifacts/terrain-region-continuity-v1/manifest.json"
+        ],
+        "stableID": "terrain-region-continuity-v1/evidence/equal-height-vs-south-wall-grayscale-400pct/default",
+        "disposition": "review-only",
+        "generatedAtSourceHash": "1196192b4ab9f79c45a4344f8b29d46f239cac5bdf512b3cac46a9033801fbd2",
+        "sourceHashes": {
+          "AssetLab/artifacts/terrain-region-continuity-v1/manifest.json": "67321d789578f42cf059e7354fa3268fc0fc6d4912d17afe87b7509462185d72"
+        }
+      }
+    },
+    {
+      "type": "visualAssetRecord",
+      "id": "terrain-region-continuity-v1/evidence/junction-t-cross-2x/default",
+      "name": "junction-t-cross-2x",
+      "summary": "Terrain Region Continuity · evidence · default",
+      "category": "Visual asset record",
+      "route": "asset-record/terrain-region-continuity-v1/evidence/junction-t-cross-2x/default",
+      "searchText": "junction-t-cross-2x terrain region continuity terrain-region-continuity-v1 evidence default terrain-region-continuity-v1/evidence/junction-t-cross-2x/default",
+      "exactSearchTerms": [
+        "junction-t-cross-2x",
+        "terrain-region-continuity-v1/evidence/junction-t-cross-2x/default"
+      ],
+      "disposition": "blocked or review-gated",
+      "provenance": {
+        "sourcePaths": [
+          "AssetLab/artifacts/terrain-region-continuity-v1/manifest.json"
+        ],
+        "stableID": "terrain-region-continuity-v1/evidence/junction-t-cross-2x/default",
+        "disposition": "review-only",
+        "generatedAtSourceHash": "1196192b4ab9f79c45a4344f8b29d46f239cac5bdf512b3cac46a9033801fbd2",
+        "sourceHashes": {
+          "AssetLab/artifacts/terrain-region-continuity-v1/manifest.json": "67321d789578f42cf059e7354fa3268fc0fc6d4912d17afe87b7509462185d72"
+        }
+      }
+    },
+    {
+      "type": "visualAssetRecord",
+      "id": "terrain-region-continuity-v1/evidence/junction-t-cross-400pct/default",
+      "name": "junction-t-cross-400pct",
+      "summary": "Terrain Region Continuity · evidence · default",
+      "category": "Visual asset record",
+      "route": "asset-record/terrain-region-continuity-v1/evidence/junction-t-cross-400pct/default",
+      "searchText": "junction-t-cross-400pct terrain region continuity terrain-region-continuity-v1 evidence default terrain-region-continuity-v1/evidence/junction-t-cross-400pct/default",
+      "exactSearchTerms": [
+        "junction-t-cross-400pct",
+        "terrain-region-continuity-v1/evidence/junction-t-cross-400pct/default"
+      ],
+      "disposition": "blocked or review-gated",
+      "provenance": {
+        "sourcePaths": [
+          "AssetLab/artifacts/terrain-region-continuity-v1/manifest.json"
+        ],
+        "stableID": "terrain-region-continuity-v1/evidence/junction-t-cross-400pct/default",
+        "disposition": "review-only",
+        "generatedAtSourceHash": "1196192b4ab9f79c45a4344f8b29d46f239cac5bdf512b3cac46a9033801fbd2",
+        "sourceHashes": {
+          "AssetLab/artifacts/terrain-region-continuity-v1/manifest.json": "67321d789578f42cf059e7354fa3268fc0fc6d4912d17afe87b7509462185d72"
+        }
+      }
+    },
+    {
+      "type": "visualAssetRecord",
+      "id": "terrain-region-continuity-v1/evidence/junction-t-cross-grayscale-400pct/default",
+      "name": "junction-t-cross-grayscale-400pct",
+      "summary": "Terrain Region Continuity · evidence · default",
+      "category": "Visual asset record",
+      "route": "asset-record/terrain-region-continuity-v1/evidence/junction-t-cross-grayscale-400pct/default",
+      "searchText": "junction-t-cross-grayscale-400pct terrain region continuity terrain-region-continuity-v1 evidence default terrain-region-continuity-v1/evidence/junction-t-cross-grayscale-400pct/default",
+      "exactSearchTerms": [
+        "junction-t-cross-grayscale-400pct",
+        "terrain-region-continuity-v1/evidence/junction-t-cross-grayscale-400pct/default"
+      ],
+      "disposition": "blocked or review-gated",
+      "provenance": {
+        "sourcePaths": [
+          "AssetLab/artifacts/terrain-region-continuity-v1/manifest.json"
+        ],
+        "stableID": "terrain-region-continuity-v1/evidence/junction-t-cross-grayscale-400pct/default",
+        "disposition": "review-only",
+        "generatedAtSourceHash": "1196192b4ab9f79c45a4344f8b29d46f239cac5bdf512b3cac46a9033801fbd2",
+        "sourceHashes": {
+          "AssetLab/artifacts/terrain-region-continuity-v1/manifest.json": "67321d789578f42cf059e7354fa3268fc0fc6d4912d17afe87b7509462185d72"
+        }
+      }
+    },
+    {
+      "type": "visualAssetRecord",
+      "id": "terrain-region-continuity-v1/evidence/junction-t-cross-native/default",
+      "name": "junction-t-cross-native",
+      "summary": "Terrain Region Continuity · evidence · default",
+      "category": "Visual asset record",
+      "route": "asset-record/terrain-region-continuity-v1/evidence/junction-t-cross-native/default",
+      "searchText": "junction-t-cross-native terrain region continuity terrain-region-continuity-v1 evidence default terrain-region-continuity-v1/evidence/junction-t-cross-native/default",
+      "exactSearchTerms": [
+        "junction-t-cross-native",
+        "terrain-region-continuity-v1/evidence/junction-t-cross-native/default"
+      ],
+      "disposition": "blocked or review-gated",
+      "provenance": {
+        "sourcePaths": [
+          "AssetLab/artifacts/terrain-region-continuity-v1/manifest.json"
+        ],
+        "stableID": "terrain-region-continuity-v1/evidence/junction-t-cross-native/default",
+        "disposition": "review-only",
+        "generatedAtSourceHash": "1196192b4ab9f79c45a4344f8b29d46f239cac5bdf512b3cac46a9033801fbd2",
+        "sourceHashes": {
+          "AssetLab/artifacts/terrain-region-continuity-v1/manifest.json": "67321d789578f42cf059e7354fa3268fc0fc6d4912d17afe87b7509462185d72"
+        }
+      }
+    },
+    {
+      "type": "visualAssetRecord",
+      "id": "terrain-region-continuity-v1/evidence/macro-11x11-redraw-a-2x/default",
+      "name": "macro-11x11-redraw-a-2x",
+      "summary": "Terrain Region Continuity · evidence · default",
+      "category": "Visual asset record",
+      "route": "asset-record/terrain-region-continuity-v1/evidence/macro-11x11-redraw-a-2x/default",
+      "searchText": "macro-11x11-redraw-a-2x terrain region continuity terrain-region-continuity-v1 evidence default terrain-region-continuity-v1/evidence/macro-11x11-redraw-a-2x/default",
+      "exactSearchTerms": [
+        "macro-11x11-redraw-a-2x",
+        "terrain-region-continuity-v1/evidence/macro-11x11-redraw-a-2x/default"
+      ],
+      "disposition": "blocked or review-gated",
+      "provenance": {
+        "sourcePaths": [
+          "AssetLab/artifacts/terrain-region-continuity-v1/manifest.json"
+        ],
+        "stableID": "terrain-region-continuity-v1/evidence/macro-11x11-redraw-a-2x/default",
+        "disposition": "review-only",
+        "generatedAtSourceHash": "1196192b4ab9f79c45a4344f8b29d46f239cac5bdf512b3cac46a9033801fbd2",
+        "sourceHashes": {
+          "AssetLab/artifacts/terrain-region-continuity-v1/manifest.json": "67321d789578f42cf059e7354fa3268fc0fc6d4912d17afe87b7509462185d72"
+        }
+      }
+    },
+    {
+      "type": "visualAssetRecord",
+      "id": "terrain-region-continuity-v1/evidence/macro-11x11-redraw-b-2x/default",
+      "name": "macro-11x11-redraw-b-2x",
+      "summary": "Terrain Region Continuity · evidence · default",
+      "category": "Visual asset record",
+      "route": "asset-record/terrain-region-continuity-v1/evidence/macro-11x11-redraw-b-2x/default",
+      "searchText": "macro-11x11-redraw-b-2x terrain region continuity terrain-region-continuity-v1 evidence default terrain-region-continuity-v1/evidence/macro-11x11-redraw-b-2x/default",
+      "exactSearchTerms": [
+        "macro-11x11-redraw-b-2x",
+        "terrain-region-continuity-v1/evidence/macro-11x11-redraw-b-2x/default"
+      ],
+      "disposition": "blocked or review-gated",
+      "provenance": {
+        "sourcePaths": [
+          "AssetLab/artifacts/terrain-region-continuity-v1/manifest.json"
+        ],
+        "stableID": "terrain-region-continuity-v1/evidence/macro-11x11-redraw-b-2x/default",
+        "disposition": "review-only",
+        "generatedAtSourceHash": "1196192b4ab9f79c45a4344f8b29d46f239cac5bdf512b3cac46a9033801fbd2",
+        "sourceHashes": {
+          "AssetLab/artifacts/terrain-region-continuity-v1/manifest.json": "67321d789578f42cf059e7354fa3268fc0fc6d4912d17afe87b7509462185d72"
+        }
+      }
+    },
+    {
+      "type": "visualAssetRecord",
+      "id": "terrain-region-continuity-v1/evidence/phone-old-current-corrected-368x800/default",
+      "name": "phone-old-current-corrected-368x800",
+      "summary": "Terrain Region Continuity · evidence · default",
+      "category": "Visual asset record",
+      "route": "asset-record/terrain-region-continuity-v1/evidence/phone-old-current-corrected-368x800/default",
+      "searchText": "phone-old-current-corrected-368x800 terrain region continuity terrain-region-continuity-v1 evidence default terrain-region-continuity-v1/evidence/phone-old-current-corrected-368x800/default",
+      "exactSearchTerms": [
+        "phone-old-current-corrected-368x800",
+        "terrain-region-continuity-v1/evidence/phone-old-current-corrected-368x800/default"
+      ],
+      "disposition": "blocked or review-gated",
+      "provenance": {
+        "sourcePaths": [
+          "AssetLab/artifacts/terrain-region-continuity-v1/manifest.json"
+        ],
+        "stableID": "terrain-region-continuity-v1/evidence/phone-old-current-corrected-368x800/default",
+        "disposition": "review-only",
+        "generatedAtSourceHash": "1196192b4ab9f79c45a4344f8b29d46f239cac5bdf512b3cac46a9033801fbd2",
+        "sourceHashes": {
+          "AssetLab/artifacts/terrain-region-continuity-v1/manifest.json": "67321d789578f42cf059e7354fa3268fc0fc6d4912d17afe87b7509462185d72"
+        }
+      }
+    },
+    {
+      "type": "visualAssetRecord",
+      "id": "terrain-region-continuity-v1/evidence/phone-old-current-corrected-grayscale-368x800/default",
+      "name": "phone-old-current-corrected-grayscale-368x800",
+      "summary": "Terrain Region Continuity · evidence · default",
+      "category": "Visual asset record",
+      "route": "asset-record/terrain-region-continuity-v1/evidence/phone-old-current-corrected-grayscale-368x800/default",
+      "searchText": "phone-old-current-corrected-grayscale-368x800 terrain region continuity terrain-region-continuity-v1 evidence default terrain-region-continuity-v1/evidence/phone-old-current-corrected-grayscale-368x800/default",
+      "exactSearchTerms": [
+        "phone-old-current-corrected-grayscale-368x800",
+        "terrain-region-continuity-v1/evidence/phone-old-current-corrected-grayscale-368x800/default"
+      ],
+      "disposition": "blocked or review-gated",
+      "provenance": {
+        "sourcePaths": [
+          "AssetLab/artifacts/terrain-region-continuity-v1/manifest.json"
+        ],
+        "stableID": "terrain-region-continuity-v1/evidence/phone-old-current-corrected-grayscale-368x800/default",
+        "disposition": "review-only",
+        "generatedAtSourceHash": "1196192b4ab9f79c45a4344f8b29d46f239cac5bdf512b3cac46a9033801fbd2",
+        "sourceHashes": {
+          "AssetLab/artifacts/terrain-region-continuity-v1/manifest.json": "67321d789578f42cf059e7354fa3268fc0fc6d4912d17afe87b7509462185d72"
+        }
+      }
+    },
+    {
+      "type": "visualAssetRecord",
+      "id": "terrain-region-continuity-v1/evidence/phone-visibility-368x800/default",
+      "name": "phone-visibility-368x800",
+      "summary": "Terrain Region Continuity · evidence · default",
+      "category": "Visual asset record",
+      "route": "asset-record/terrain-region-continuity-v1/evidence/phone-visibility-368x800/default",
+      "searchText": "phone-visibility-368x800 terrain region continuity terrain-region-continuity-v1 evidence default terrain-region-continuity-v1/evidence/phone-visibility-368x800/default",
+      "exactSearchTerms": [
+        "phone-visibility-368x800",
+        "terrain-region-continuity-v1/evidence/phone-visibility-368x800/default"
+      ],
+      "disposition": "blocked or review-gated",
+      "provenance": {
+        "sourcePaths": [
+          "AssetLab/artifacts/terrain-region-continuity-v1/manifest.json"
+        ],
+        "stableID": "terrain-region-continuity-v1/evidence/phone-visibility-368x800/default",
+        "disposition": "review-only",
+        "generatedAtSourceHash": "1196192b4ab9f79c45a4344f8b29d46f239cac5bdf512b3cac46a9033801fbd2",
+        "sourceHashes": {
+          "AssetLab/artifacts/terrain-region-continuity-v1/manifest.json": "67321d789578f42cf059e7354fa3268fc0fc6d4912d17afe87b7509462185d72"
+        }
+      }
+    },
+    {
+      "type": "visualAssetRecord",
+      "id": "terrain-region-continuity-v1/evidence/pool-deep-2x/default",
+      "name": "pool-deep-2x",
+      "summary": "Terrain Region Continuity · evidence · default",
+      "category": "Visual asset record",
+      "route": "asset-record/terrain-region-continuity-v1/evidence/pool-deep-2x/default",
+      "searchText": "pool-deep-2x terrain region continuity terrain-region-continuity-v1 evidence default terrain-region-continuity-v1/evidence/pool-deep-2x/default",
+      "exactSearchTerms": [
+        "pool-deep-2x",
+        "terrain-region-continuity-v1/evidence/pool-deep-2x/default"
+      ],
+      "disposition": "blocked or review-gated",
+      "provenance": {
+        "sourcePaths": [
+          "AssetLab/artifacts/terrain-region-continuity-v1/manifest.json"
+        ],
+        "stableID": "terrain-region-continuity-v1/evidence/pool-deep-2x/default",
+        "disposition": "review-only",
+        "generatedAtSourceHash": "1196192b4ab9f79c45a4344f8b29d46f239cac5bdf512b3cac46a9033801fbd2",
+        "sourceHashes": {
+          "AssetLab/artifacts/terrain-region-continuity-v1/manifest.json": "67321d789578f42cf059e7354fa3268fc0fc6d4912d17afe87b7509462185d72"
+        }
+      }
+    },
+    {
+      "type": "visualAssetRecord",
+      "id": "terrain-region-continuity-v1/evidence/pool-deep-400pct/default",
+      "name": "pool-deep-400pct",
+      "summary": "Terrain Region Continuity · evidence · default",
+      "category": "Visual asset record",
+      "route": "asset-record/terrain-region-continuity-v1/evidence/pool-deep-400pct/default",
+      "searchText": "pool-deep-400pct terrain region continuity terrain-region-continuity-v1 evidence default terrain-region-continuity-v1/evidence/pool-deep-400pct/default",
+      "exactSearchTerms": [
+        "pool-deep-400pct",
+        "terrain-region-continuity-v1/evidence/pool-deep-400pct/default"
+      ],
+      "disposition": "blocked or review-gated",
+      "provenance": {
+        "sourcePaths": [
+          "AssetLab/artifacts/terrain-region-continuity-v1/manifest.json"
+        ],
+        "stableID": "terrain-region-continuity-v1/evidence/pool-deep-400pct/default",
+        "disposition": "review-only",
+        "generatedAtSourceHash": "1196192b4ab9f79c45a4344f8b29d46f239cac5bdf512b3cac46a9033801fbd2",
+        "sourceHashes": {
+          "AssetLab/artifacts/terrain-region-continuity-v1/manifest.json": "67321d789578f42cf059e7354fa3268fc0fc6d4912d17afe87b7509462185d72"
+        }
+      }
+    },
+    {
+      "type": "visualAssetRecord",
+      "id": "terrain-region-continuity-v1/evidence/pool-deep-grayscale-400pct/default",
+      "name": "pool-deep-grayscale-400pct",
+      "summary": "Terrain Region Continuity · evidence · default",
+      "category": "Visual asset record",
+      "route": "asset-record/terrain-region-continuity-v1/evidence/pool-deep-grayscale-400pct/default",
+      "searchText": "pool-deep-grayscale-400pct terrain region continuity terrain-region-continuity-v1 evidence default terrain-region-continuity-v1/evidence/pool-deep-grayscale-400pct/default",
+      "exactSearchTerms": [
+        "pool-deep-grayscale-400pct",
+        "terrain-region-continuity-v1/evidence/pool-deep-grayscale-400pct/default"
+      ],
+      "disposition": "blocked or review-gated",
+      "provenance": {
+        "sourcePaths": [
+          "AssetLab/artifacts/terrain-region-continuity-v1/manifest.json"
+        ],
+        "stableID": "terrain-region-continuity-v1/evidence/pool-deep-grayscale-400pct/default",
+        "disposition": "review-only",
+        "generatedAtSourceHash": "1196192b4ab9f79c45a4344f8b29d46f239cac5bdf512b3cac46a9033801fbd2",
+        "sourceHashes": {
+          "AssetLab/artifacts/terrain-region-continuity-v1/manifest.json": "67321d789578f42cf059e7354fa3268fc0fc6d4912d17afe87b7509462185d72"
+        }
+      }
+    },
+    {
+      "type": "visualAssetRecord",
+      "id": "terrain-region-continuity-v1/evidence/pool-deep-native/default",
+      "name": "pool-deep-native",
+      "summary": "Terrain Region Continuity · evidence · default",
+      "category": "Visual asset record",
+      "route": "asset-record/terrain-region-continuity-v1/evidence/pool-deep-native/default",
+      "searchText": "pool-deep-native terrain region continuity terrain-region-continuity-v1 evidence default terrain-region-continuity-v1/evidence/pool-deep-native/default",
+      "exactSearchTerms": [
+        "pool-deep-native",
+        "terrain-region-continuity-v1/evidence/pool-deep-native/default"
+      ],
+      "disposition": "blocked or review-gated",
+      "provenance": {
+        "sourcePaths": [
+          "AssetLab/artifacts/terrain-region-continuity-v1/manifest.json"
+        ],
+        "stableID": "terrain-region-continuity-v1/evidence/pool-deep-native/default",
+        "disposition": "review-only",
+        "generatedAtSourceHash": "1196192b4ab9f79c45a4344f8b29d46f239cac5bdf512b3cac46a9033801fbd2",
+        "sourceHashes": {
+          "AssetLab/artifacts/terrain-region-continuity-v1/manifest.json": "67321d789578f42cf059e7354fa3268fc0fc6d4912d17afe87b7509462185d72"
+        }
+      }
+    },
+    {
+      "type": "visualAssetRecord",
+      "id": "terrain-region-continuity-v1/evidence/stone-rubble-2x/default",
+      "name": "stone-rubble-2x",
+      "summary": "Terrain Region Continuity · evidence · default",
+      "category": "Visual asset record",
+      "route": "asset-record/terrain-region-continuity-v1/evidence/stone-rubble-2x/default",
+      "searchText": "stone-rubble-2x terrain region continuity terrain-region-continuity-v1 evidence default terrain-region-continuity-v1/evidence/stone-rubble-2x/default",
+      "exactSearchTerms": [
+        "stone-rubble-2x",
+        "terrain-region-continuity-v1/evidence/stone-rubble-2x/default"
+      ],
+      "disposition": "blocked or review-gated",
+      "provenance": {
+        "sourcePaths": [
+          "AssetLab/artifacts/terrain-region-continuity-v1/manifest.json"
+        ],
+        "stableID": "terrain-region-continuity-v1/evidence/stone-rubble-2x/default",
+        "disposition": "review-only",
+        "generatedAtSourceHash": "1196192b4ab9f79c45a4344f8b29d46f239cac5bdf512b3cac46a9033801fbd2",
+        "sourceHashes": {
+          "AssetLab/artifacts/terrain-region-continuity-v1/manifest.json": "67321d789578f42cf059e7354fa3268fc0fc6d4912d17afe87b7509462185d72"
+        }
+      }
+    },
+    {
+      "type": "visualAssetRecord",
+      "id": "terrain-region-continuity-v1/evidence/stone-rubble-400pct/default",
+      "name": "stone-rubble-400pct",
+      "summary": "Terrain Region Continuity · evidence · default",
+      "category": "Visual asset record",
+      "route": "asset-record/terrain-region-continuity-v1/evidence/stone-rubble-400pct/default",
+      "searchText": "stone-rubble-400pct terrain region continuity terrain-region-continuity-v1 evidence default terrain-region-continuity-v1/evidence/stone-rubble-400pct/default",
+      "exactSearchTerms": [
+        "stone-rubble-400pct",
+        "terrain-region-continuity-v1/evidence/stone-rubble-400pct/default"
+      ],
+      "disposition": "blocked or review-gated",
+      "provenance": {
+        "sourcePaths": [
+          "AssetLab/artifacts/terrain-region-continuity-v1/manifest.json"
+        ],
+        "stableID": "terrain-region-continuity-v1/evidence/stone-rubble-400pct/default",
+        "disposition": "review-only",
+        "generatedAtSourceHash": "1196192b4ab9f79c45a4344f8b29d46f239cac5bdf512b3cac46a9033801fbd2",
+        "sourceHashes": {
+          "AssetLab/artifacts/terrain-region-continuity-v1/manifest.json": "67321d789578f42cf059e7354fa3268fc0fc6d4912d17afe87b7509462185d72"
+        }
+      }
+    },
+    {
+      "type": "visualAssetRecord",
+      "id": "terrain-region-continuity-v1/evidence/stone-rubble-grayscale-400pct/default",
+      "name": "stone-rubble-grayscale-400pct",
+      "summary": "Terrain Region Continuity · evidence · default",
+      "category": "Visual asset record",
+      "route": "asset-record/terrain-region-continuity-v1/evidence/stone-rubble-grayscale-400pct/default",
+      "searchText": "stone-rubble-grayscale-400pct terrain region continuity terrain-region-continuity-v1 evidence default terrain-region-continuity-v1/evidence/stone-rubble-grayscale-400pct/default",
+      "exactSearchTerms": [
+        "stone-rubble-grayscale-400pct",
+        "terrain-region-continuity-v1/evidence/stone-rubble-grayscale-400pct/default"
+      ],
+      "disposition": "blocked or review-gated",
+      "provenance": {
+        "sourcePaths": [
+          "AssetLab/artifacts/terrain-region-continuity-v1/manifest.json"
+        ],
+        "stableID": "terrain-region-continuity-v1/evidence/stone-rubble-grayscale-400pct/default",
+        "disposition": "review-only",
+        "generatedAtSourceHash": "1196192b4ab9f79c45a4344f8b29d46f239cac5bdf512b3cac46a9033801fbd2",
+        "sourceHashes": {
+          "AssetLab/artifacts/terrain-region-continuity-v1/manifest.json": "67321d789578f42cf059e7354fa3268fc0fc6d4912d17afe87b7509462185d72"
+        }
+      }
+    },
+    {
+      "type": "visualAssetRecord",
+      "id": "terrain-region-continuity-v1/evidence/stone-rubble-native/default",
+      "name": "stone-rubble-native",
+      "summary": "Terrain Region Continuity · evidence · default",
+      "category": "Visual asset record",
+      "route": "asset-record/terrain-region-continuity-v1/evidence/stone-rubble-native/default",
+      "searchText": "stone-rubble-native terrain region continuity terrain-region-continuity-v1 evidence default terrain-region-continuity-v1/evidence/stone-rubble-native/default",
+      "exactSearchTerms": [
+        "stone-rubble-native",
+        "terrain-region-continuity-v1/evidence/stone-rubble-native/default"
+      ],
+      "disposition": "blocked or review-gated",
+      "provenance": {
+        "sourcePaths": [
+          "AssetLab/artifacts/terrain-region-continuity-v1/manifest.json"
+        ],
+        "stableID": "terrain-region-continuity-v1/evidence/stone-rubble-native/default",
         "disposition": "review-only",
         "generatedAtSourceHash": "1196192b4ab9f79c45a4344f8b29d46f239cac5bdf512b3cac46a9033801fbd2",
         "sourceHashes": {
@@ -144492,6 +145620,256 @@
     },
     {
       "type": "visualAssetRecord",
+      "id": "writing-parchment-v1/reference/generated-parchment-reference/default",
+      "name": "generated-parchment-reference",
+      "summary": "Writing Parchment · reference · default",
+      "category": "Visual asset record",
+      "route": "asset-record/writing-parchment-v1/reference/generated-parchment-reference/default",
+      "searchText": "generated-parchment-reference writing parchment writing-parchment-v1 reference default writing-parchment-v1/reference/generated-parchment-reference/default",
+      "exactSearchTerms": [
+        "generated-parchment-reference",
+        "writing-parchment-v1/reference/generated-parchment-reference/default"
+      ],
+      "disposition": "blocked or review-gated",
+      "provenance": {
+        "sourcePaths": [
+          "AssetLab/artifacts/writing-parchment-v1/manifest.json"
+        ],
+        "stableID": "writing-parchment-v1/reference/generated-parchment-reference/default",
+        "disposition": "review-only",
+        "generatedAtSourceHash": "1196192b4ab9f79c45a4344f8b29d46f239cac5bdf512b3cac46a9033801fbd2",
+        "sourceHashes": {
+          "AssetLab/artifacts/writing-parchment-v1/manifest.json": "9ef9c41f8d4f4b12e5bbb725e9f1ea5e52a77a3175de758016bb58cd170c499f"
+        }
+      }
+    },
+    {
+      "type": "visualAssetRecord",
+      "id": "writing-parchment-v1/evidence/parchment-2x-344x344/default",
+      "name": "parchment-2x-344x344",
+      "summary": "Writing Parchment · evidence · default",
+      "category": "Visual asset record",
+      "route": "asset-record/writing-parchment-v1/evidence/parchment-2x-344x344/default",
+      "searchText": "parchment-2x-344x344 writing parchment writing-parchment-v1 evidence default writing-parchment-v1/evidence/parchment-2x-344x344/default",
+      "exactSearchTerms": [
+        "parchment-2x-344x344",
+        "writing-parchment-v1/evidence/parchment-2x-344x344/default"
+      ],
+      "disposition": "blocked or review-gated",
+      "provenance": {
+        "sourcePaths": [
+          "AssetLab/artifacts/writing-parchment-v1/manifest.json"
+        ],
+        "stableID": "writing-parchment-v1/evidence/parchment-2x-344x344/default",
+        "disposition": "review-only",
+        "generatedAtSourceHash": "1196192b4ab9f79c45a4344f8b29d46f239cac5bdf512b3cac46a9033801fbd2",
+        "sourceHashes": {
+          "AssetLab/artifacts/writing-parchment-v1/manifest.json": "9ef9c41f8d4f4b12e5bbb725e9f1ea5e52a77a3175de758016bb58cd170c499f"
+        }
+      }
+    },
+    {
+      "type": "visualAssetRecord",
+      "id": "writing-parchment-v1/evidence/parchment-400pct-688x688/default",
+      "name": "parchment-400pct-688x688",
+      "summary": "Writing Parchment · evidence · default",
+      "category": "Visual asset record",
+      "route": "asset-record/writing-parchment-v1/evidence/parchment-400pct-688x688/default",
+      "searchText": "parchment-400pct-688x688 writing parchment writing-parchment-v1 evidence default writing-parchment-v1/evidence/parchment-400pct-688x688/default",
+      "exactSearchTerms": [
+        "parchment-400pct-688x688",
+        "writing-parchment-v1/evidence/parchment-400pct-688x688/default"
+      ],
+      "disposition": "blocked or review-gated",
+      "provenance": {
+        "sourcePaths": [
+          "AssetLab/artifacts/writing-parchment-v1/manifest.json"
+        ],
+        "stableID": "writing-parchment-v1/evidence/parchment-400pct-688x688/default",
+        "disposition": "review-only",
+        "generatedAtSourceHash": "1196192b4ab9f79c45a4344f8b29d46f239cac5bdf512b3cac46a9033801fbd2",
+        "sourceHashes": {
+          "AssetLab/artifacts/writing-parchment-v1/manifest.json": "9ef9c41f8d4f4b12e5bbb725e9f1ea5e52a77a3175de758016bb58cd170c499f"
+        }
+      }
+    },
+    {
+      "type": "visualAssetRecord",
+      "id": "writing-parchment-v1/evidence/parchment-dark-empty-writing-desk-368x800/default",
+      "name": "parchment-dark-empty-writing-desk-368x800",
+      "summary": "Writing Parchment · evidence · default",
+      "category": "Visual asset record",
+      "route": "asset-record/writing-parchment-v1/evidence/parchment-dark-empty-writing-desk-368x800/default",
+      "searchText": "parchment-dark-empty-writing-desk-368x800 writing parchment writing-parchment-v1 evidence default writing-parchment-v1/evidence/parchment-dark-empty-writing-desk-368x800/default",
+      "exactSearchTerms": [
+        "parchment-dark-empty-writing-desk-368x800",
+        "writing-parchment-v1/evidence/parchment-dark-empty-writing-desk-368x800/default"
+      ],
+      "disposition": "blocked or review-gated",
+      "provenance": {
+        "sourcePaths": [
+          "AssetLab/artifacts/writing-parchment-v1/manifest.json"
+        ],
+        "stableID": "writing-parchment-v1/evidence/parchment-dark-empty-writing-desk-368x800/default",
+        "disposition": "review-only",
+        "generatedAtSourceHash": "1196192b4ab9f79c45a4344f8b29d46f239cac5bdf512b3cac46a9033801fbd2",
+        "sourceHashes": {
+          "AssetLab/artifacts/writing-parchment-v1/manifest.json": "9ef9c41f8d4f4b12e5bbb725e9f1ea5e52a77a3175de758016bb58cd170c499f"
+        }
+      }
+    },
+    {
+      "type": "visualAssetRecord",
+      "id": "writing-parchment-v1/evidence/parchment-dark-ink-state-writing-desk-368x800/default",
+      "name": "parchment-dark-ink-state-writing-desk-368x800",
+      "summary": "Writing Parchment · evidence · default",
+      "category": "Visual asset record",
+      "route": "asset-record/writing-parchment-v1/evidence/parchment-dark-ink-state-writing-desk-368x800/default",
+      "searchText": "parchment-dark-ink-state-writing-desk-368x800 writing parchment writing-parchment-v1 evidence default writing-parchment-v1/evidence/parchment-dark-ink-state-writing-desk-368x800/default",
+      "exactSearchTerms": [
+        "parchment-dark-ink-state-writing-desk-368x800",
+        "writing-parchment-v1/evidence/parchment-dark-ink-state-writing-desk-368x800/default"
+      ],
+      "disposition": "blocked or review-gated",
+      "provenance": {
+        "sourcePaths": [
+          "AssetLab/artifacts/writing-parchment-v1/manifest.json"
+        ],
+        "stableID": "writing-parchment-v1/evidence/parchment-dark-ink-state-writing-desk-368x800/default",
+        "disposition": "review-only",
+        "generatedAtSourceHash": "1196192b4ab9f79c45a4344f8b29d46f239cac5bdf512b3cac46a9033801fbd2",
+        "sourceHashes": {
+          "AssetLab/artifacts/writing-parchment-v1/manifest.json": "9ef9c41f8d4f4b12e5bbb725e9f1ea5e52a77a3175de758016bb58cd170c499f"
+        }
+      }
+    },
+    {
+      "type": "visualAssetRecord",
+      "id": "writing-parchment-v1/evidence/parchment-empty-writing-desk-368x800/default",
+      "name": "parchment-empty-writing-desk-368x800",
+      "summary": "Writing Parchment · evidence · default",
+      "category": "Visual asset record",
+      "route": "asset-record/writing-parchment-v1/evidence/parchment-empty-writing-desk-368x800/default",
+      "searchText": "parchment-empty-writing-desk-368x800 writing parchment writing-parchment-v1 evidence default writing-parchment-v1/evidence/parchment-empty-writing-desk-368x800/default",
+      "exactSearchTerms": [
+        "parchment-empty-writing-desk-368x800",
+        "writing-parchment-v1/evidence/parchment-empty-writing-desk-368x800/default"
+      ],
+      "disposition": "blocked or review-gated",
+      "provenance": {
+        "sourcePaths": [
+          "AssetLab/artifacts/writing-parchment-v1/manifest.json"
+        ],
+        "stableID": "writing-parchment-v1/evidence/parchment-empty-writing-desk-368x800/default",
+        "disposition": "review-only",
+        "generatedAtSourceHash": "1196192b4ab9f79c45a4344f8b29d46f239cac5bdf512b3cac46a9033801fbd2",
+        "sourceHashes": {
+          "AssetLab/artifacts/writing-parchment-v1/manifest.json": "9ef9c41f8d4f4b12e5bbb725e9f1ea5e52a77a3175de758016bb58cd170c499f"
+        }
+      }
+    },
+    {
+      "type": "visualAssetRecord",
+      "id": "writing-parchment-v1/evidence/parchment-grayscale-2x-344x344/default",
+      "name": "parchment-grayscale-2x-344x344",
+      "summary": "Writing Parchment · evidence · default",
+      "category": "Visual asset record",
+      "route": "asset-record/writing-parchment-v1/evidence/parchment-grayscale-2x-344x344/default",
+      "searchText": "parchment-grayscale-2x-344x344 writing parchment writing-parchment-v1 evidence default writing-parchment-v1/evidence/parchment-grayscale-2x-344x344/default",
+      "exactSearchTerms": [
+        "parchment-grayscale-2x-344x344",
+        "writing-parchment-v1/evidence/parchment-grayscale-2x-344x344/default"
+      ],
+      "disposition": "blocked or review-gated",
+      "provenance": {
+        "sourcePaths": [
+          "AssetLab/artifacts/writing-parchment-v1/manifest.json"
+        ],
+        "stableID": "writing-parchment-v1/evidence/parchment-grayscale-2x-344x344/default",
+        "disposition": "review-only",
+        "generatedAtSourceHash": "1196192b4ab9f79c45a4344f8b29d46f239cac5bdf512b3cac46a9033801fbd2",
+        "sourceHashes": {
+          "AssetLab/artifacts/writing-parchment-v1/manifest.json": "9ef9c41f8d4f4b12e5bbb725e9f1ea5e52a77a3175de758016bb58cd170c499f"
+        }
+      }
+    },
+    {
+      "type": "visualAssetRecord",
+      "id": "writing-parchment-v1/evidence/parchment-native-172x172/default",
+      "name": "parchment-native-172x172",
+      "summary": "Writing Parchment · evidence · default",
+      "category": "Visual asset record",
+      "route": "asset-record/writing-parchment-v1/evidence/parchment-native-172x172/default",
+      "searchText": "parchment-native-172x172 writing parchment writing-parchment-v1 evidence default writing-parchment-v1/evidence/parchment-native-172x172/default",
+      "exactSearchTerms": [
+        "parchment-native-172x172",
+        "writing-parchment-v1/evidence/parchment-native-172x172/default"
+      ],
+      "disposition": "blocked or review-gated",
+      "provenance": {
+        "sourcePaths": [
+          "AssetLab/artifacts/writing-parchment-v1/manifest.json"
+        ],
+        "stableID": "writing-parchment-v1/evidence/parchment-native-172x172/default",
+        "disposition": "review-only",
+        "generatedAtSourceHash": "1196192b4ab9f79c45a4344f8b29d46f239cac5bdf512b3cac46a9033801fbd2",
+        "sourceHashes": {
+          "AssetLab/artifacts/writing-parchment-v1/manifest.json": "9ef9c41f8d4f4b12e5bbb725e9f1ea5e52a77a3175de758016bb58cd170c499f"
+        }
+      }
+    },
+    {
+      "type": "visualAssetRecord",
+      "id": "writing-parchment-v1/evidence/parchment-phone-368x800/default",
+      "name": "parchment-phone-368x800",
+      "summary": "Writing Parchment · evidence · default",
+      "category": "Visual asset record",
+      "route": "asset-record/writing-parchment-v1/evidence/parchment-phone-368x800/default",
+      "searchText": "parchment-phone-368x800 writing parchment writing-parchment-v1 evidence default writing-parchment-v1/evidence/parchment-phone-368x800/default",
+      "exactSearchTerms": [
+        "parchment-phone-368x800",
+        "writing-parchment-v1/evidence/parchment-phone-368x800/default"
+      ],
+      "disposition": "blocked or review-gated",
+      "provenance": {
+        "sourcePaths": [
+          "AssetLab/artifacts/writing-parchment-v1/manifest.json"
+        ],
+        "stableID": "writing-parchment-v1/evidence/parchment-phone-368x800/default",
+        "disposition": "review-only",
+        "generatedAtSourceHash": "1196192b4ab9f79c45a4344f8b29d46f239cac5bdf512b3cac46a9033801fbd2",
+        "sourceHashes": {
+          "AssetLab/artifacts/writing-parchment-v1/manifest.json": "9ef9c41f8d4f4b12e5bbb725e9f1ea5e52a77a3175de758016bb58cd170c499f"
+        }
+      }
+    },
+    {
+      "type": "visualAssetRecord",
+      "id": "writing-parchment-v1/evidence/parchment-phone-grayscale-368x800/default",
+      "name": "parchment-phone-grayscale-368x800",
+      "summary": "Writing Parchment · evidence · default",
+      "category": "Visual asset record",
+      "route": "asset-record/writing-parchment-v1/evidence/parchment-phone-grayscale-368x800/default",
+      "searchText": "parchment-phone-grayscale-368x800 writing parchment writing-parchment-v1 evidence default writing-parchment-v1/evidence/parchment-phone-grayscale-368x800/default",
+      "exactSearchTerms": [
+        "parchment-phone-grayscale-368x800",
+        "writing-parchment-v1/evidence/parchment-phone-grayscale-368x800/default"
+      ],
+      "disposition": "blocked or review-gated",
+      "provenance": {
+        "sourcePaths": [
+          "AssetLab/artifacts/writing-parchment-v1/manifest.json"
+        ],
+        "stableID": "writing-parchment-v1/evidence/parchment-phone-grayscale-368x800/default",
+        "disposition": "review-only",
+        "generatedAtSourceHash": "1196192b4ab9f79c45a4344f8b29d46f239cac5bdf512b3cac46a9033801fbd2",
+        "sourceHashes": {
+          "AssetLab/artifacts/writing-parchment-v1/manifest.json": "9ef9c41f8d4f4b12e5bbb725e9f1ea5e52a77a3175de758016bb58cd170c499f"
+        }
+      }
+    },
+    {
+      "type": "visualAssetRecord",
       "id": "writing-parchment-v1/evidence/runtime-writing-parchment-handmade-v1/default",
       "name": "runtime/writing.parchment.handmade-v1",
       "summary": "Writing Parchment · evidence · default",
@@ -144595,7 +145973,7 @@
   "visualAssets": {
     "summary": {
       "familyCount": 27,
-      "renderedAssetCount": 4339,
+      "renderedAssetCount": 4395,
       "blockedFamilyCount": 25,
       "classifications": {
         "review-only": 11,
@@ -162086,6 +163464,49 @@
         "runtimePaths": [],
         "referencePaths": [],
         "evidencePaths": [
+          "AssetLab/artifacts/terrain-region-continuity-v1/evidence/cluster-growth-2x.png",
+          "AssetLab/artifacts/terrain-region-continuity-v1/evidence/cluster-growth-400pct.png",
+          "AssetLab/artifacts/terrain-region-continuity-v1/evidence/cluster-growth-grayscale-400pct.png",
+          "AssetLab/artifacts/terrain-region-continuity-v1/evidence/cluster-growth-native.png",
+          "AssetLab/artifacts/terrain-region-continuity-v1/evidence/cluster-soil-2x.png",
+          "AssetLab/artifacts/terrain-region-continuity-v1/evidence/cluster-soil-400pct.png",
+          "AssetLab/artifacts/terrain-region-continuity-v1/evidence/cluster-soil-grayscale-400pct.png",
+          "AssetLab/artifacts/terrain-region-continuity-v1/evidence/cluster-soil-native.png",
+          "AssetLab/artifacts/terrain-region-continuity-v1/evidence/cluster-stone-2x.png",
+          "AssetLab/artifacts/terrain-region-continuity-v1/evidence/cluster-stone-400pct.png",
+          "AssetLab/artifacts/terrain-region-continuity-v1/evidence/cluster-stone-grayscale-400pct.png",
+          "AssetLab/artifacts/terrain-region-continuity-v1/evidence/cluster-stone-native.png",
+          "AssetLab/artifacts/terrain-region-continuity-v1/evidence/cluster-water-2x.png",
+          "AssetLab/artifacts/terrain-region-continuity-v1/evidence/cluster-water-400pct.png",
+          "AssetLab/artifacts/terrain-region-continuity-v1/evidence/cluster-water-grayscale-400pct.png",
+          "AssetLab/artifacts/terrain-region-continuity-v1/evidence/cluster-water-native.png",
+          "AssetLab/artifacts/terrain-region-continuity-v1/evidence/corridor-1-2x.png",
+          "AssetLab/artifacts/terrain-region-continuity-v1/evidence/corridor-1-400pct.png",
+          "AssetLab/artifacts/terrain-region-continuity-v1/evidence/corridor-1-grayscale-400pct.png",
+          "AssetLab/artifacts/terrain-region-continuity-v1/evidence/corridor-1-native.png",
+          "AssetLab/artifacts/terrain-region-continuity-v1/evidence/corridor-2-2x.png",
+          "AssetLab/artifacts/terrain-region-continuity-v1/evidence/corridor-2-400pct.png",
+          "AssetLab/artifacts/terrain-region-continuity-v1/evidence/corridor-2-grayscale-400pct.png",
+          "AssetLab/artifacts/terrain-region-continuity-v1/evidence/corridor-2-native.png",
+          "AssetLab/artifacts/terrain-region-continuity-v1/evidence/equal-height-vs-south-wall-400pct.png",
+          "AssetLab/artifacts/terrain-region-continuity-v1/evidence/equal-height-vs-south-wall-grayscale-400pct.png",
+          "AssetLab/artifacts/terrain-region-continuity-v1/evidence/junction-t-cross-2x.png",
+          "AssetLab/artifacts/terrain-region-continuity-v1/evidence/junction-t-cross-400pct.png",
+          "AssetLab/artifacts/terrain-region-continuity-v1/evidence/junction-t-cross-grayscale-400pct.png",
+          "AssetLab/artifacts/terrain-region-continuity-v1/evidence/junction-t-cross-native.png",
+          "AssetLab/artifacts/terrain-region-continuity-v1/evidence/macro-11x11-redraw-a-2x.png",
+          "AssetLab/artifacts/terrain-region-continuity-v1/evidence/macro-11x11-redraw-b-2x.png",
+          "AssetLab/artifacts/terrain-region-continuity-v1/evidence/phone-old-current-corrected-368x800.png",
+          "AssetLab/artifacts/terrain-region-continuity-v1/evidence/phone-old-current-corrected-grayscale-368x800.png",
+          "AssetLab/artifacts/terrain-region-continuity-v1/evidence/phone-visibility-368x800.png",
+          "AssetLab/artifacts/terrain-region-continuity-v1/evidence/pool-deep-2x.png",
+          "AssetLab/artifacts/terrain-region-continuity-v1/evidence/pool-deep-400pct.png",
+          "AssetLab/artifacts/terrain-region-continuity-v1/evidence/pool-deep-grayscale-400pct.png",
+          "AssetLab/artifacts/terrain-region-continuity-v1/evidence/pool-deep-native.png",
+          "AssetLab/artifacts/terrain-region-continuity-v1/evidence/stone-rubble-2x.png",
+          "AssetLab/artifacts/terrain-region-continuity-v1/evidence/stone-rubble-400pct.png",
+          "AssetLab/artifacts/terrain-region-continuity-v1/evidence/stone-rubble-grayscale-400pct.png",
+          "AssetLab/artifacts/terrain-region-continuity-v1/evidence/stone-rubble-native.png",
           "AssetLab/artifacts/terrain-region-continuity-v1/review-contact-sheet.png"
         ],
         "approvalReceipts": [],
@@ -162095,6 +163516,246 @@
           "review evidence is not production art"
         ],
         "assets": [
+          {
+            "semanticKey": "cluster-growth-2x",
+            "role": "evidence",
+            "variant": "default",
+            "sourcePath": "AssetLab/artifacts/terrain-region-continuity-v1/evidence/cluster-growth-2x.png",
+            "declaredSHA256": "9d9f5c361b16a6781a3eca4a5312117183ccb5ac29f15cbbdda35742ce455697",
+            "actualSHA256": "9d9f5c361b16a6781a3eca4a5312117183ccb5ac29f15cbbdda35742ce455697",
+            "decodedRGBASHA256": null,
+            "width": 160,
+            "height": 160,
+            "integrity": "verified",
+            "route": "asset-record/terrain-region-continuity-v1/evidence/cluster-growth-2x/default",
+            "sourceRoute": "terrain-region-continuity-v1/evidence/cluster-growth-2x/default",
+            "previewURL": "visual-assets/terrain-region-continuity-v1/evidence/cluster-growth-2x/default.png"
+          },
+          {
+            "semanticKey": "cluster-growth-400pct",
+            "role": "evidence",
+            "variant": "default",
+            "sourcePath": "AssetLab/artifacts/terrain-region-continuity-v1/evidence/cluster-growth-400pct.png",
+            "declaredSHA256": "8dca48f8adb8e487b2877a0944bc88cae3f7cd8516b6855d07bc38c372e6c35e",
+            "actualSHA256": "8dca48f8adb8e487b2877a0944bc88cae3f7cd8516b6855d07bc38c372e6c35e",
+            "decodedRGBASHA256": null,
+            "width": 320,
+            "height": 320,
+            "integrity": "verified",
+            "route": "asset-record/terrain-region-continuity-v1/evidence/cluster-growth-400pct/default",
+            "sourceRoute": "terrain-region-continuity-v1/evidence/cluster-growth-400pct/default",
+            "previewURL": "visual-assets/terrain-region-continuity-v1/evidence/cluster-growth-400pct/default.png"
+          },
+          {
+            "semanticKey": "cluster-growth-grayscale-400pct",
+            "role": "evidence",
+            "variant": "default",
+            "sourcePath": "AssetLab/artifacts/terrain-region-continuity-v1/evidence/cluster-growth-grayscale-400pct.png",
+            "declaredSHA256": "4a8e014c7a8b248abe08e98b5adaf8792cc3f68e916649186683df7370669f55",
+            "actualSHA256": "4a8e014c7a8b248abe08e98b5adaf8792cc3f68e916649186683df7370669f55",
+            "decodedRGBASHA256": null,
+            "width": 320,
+            "height": 320,
+            "integrity": "verified",
+            "route": "asset-record/terrain-region-continuity-v1/evidence/cluster-growth-grayscale-400pct/default",
+            "sourceRoute": "terrain-region-continuity-v1/evidence/cluster-growth-grayscale-400pct/default",
+            "previewURL": "visual-assets/terrain-region-continuity-v1/evidence/cluster-growth-grayscale-400pct/default.png"
+          },
+          {
+            "semanticKey": "cluster-growth-native",
+            "role": "evidence",
+            "variant": "default",
+            "sourcePath": "AssetLab/artifacts/terrain-region-continuity-v1/evidence/cluster-growth-native.png",
+            "declaredSHA256": "2cdb317b16cd17b7bb05ce7fc84ab575c88cb95376bad093e091093262ade0c5",
+            "actualSHA256": "2cdb317b16cd17b7bb05ce7fc84ab575c88cb95376bad093e091093262ade0c5",
+            "decodedRGBASHA256": null,
+            "width": 80,
+            "height": 80,
+            "integrity": "verified",
+            "route": "asset-record/terrain-region-continuity-v1/evidence/cluster-growth-native/default",
+            "sourceRoute": "terrain-region-continuity-v1/evidence/cluster-growth-native/default",
+            "previewURL": "visual-assets/terrain-region-continuity-v1/evidence/cluster-growth-native/default.png"
+          },
+          {
+            "semanticKey": "cluster-soil-2x",
+            "role": "evidence",
+            "variant": "default",
+            "sourcePath": "AssetLab/artifacts/terrain-region-continuity-v1/evidence/cluster-soil-2x.png",
+            "declaredSHA256": "3b9c698c54056b917b665046c393a10ed6b852bc6a53a5a47ec621cc9836d2c2",
+            "actualSHA256": "3b9c698c54056b917b665046c393a10ed6b852bc6a53a5a47ec621cc9836d2c2",
+            "decodedRGBASHA256": null,
+            "width": 160,
+            "height": 160,
+            "integrity": "verified",
+            "route": "asset-record/terrain-region-continuity-v1/evidence/cluster-soil-2x/default",
+            "sourceRoute": "terrain-region-continuity-v1/evidence/cluster-soil-2x/default",
+            "previewURL": "visual-assets/terrain-region-continuity-v1/evidence/cluster-soil-2x/default.png"
+          },
+          {
+            "semanticKey": "cluster-soil-400pct",
+            "role": "evidence",
+            "variant": "default",
+            "sourcePath": "AssetLab/artifacts/terrain-region-continuity-v1/evidence/cluster-soil-400pct.png",
+            "declaredSHA256": "cb95b7c4778e8fe78564435b95a100e900237df688dba908546657c28c71efc3",
+            "actualSHA256": "cb95b7c4778e8fe78564435b95a100e900237df688dba908546657c28c71efc3",
+            "decodedRGBASHA256": null,
+            "width": 320,
+            "height": 320,
+            "integrity": "verified",
+            "route": "asset-record/terrain-region-continuity-v1/evidence/cluster-soil-400pct/default",
+            "sourceRoute": "terrain-region-continuity-v1/evidence/cluster-soil-400pct/default",
+            "previewURL": "visual-assets/terrain-region-continuity-v1/evidence/cluster-soil-400pct/default.png"
+          },
+          {
+            "semanticKey": "cluster-soil-grayscale-400pct",
+            "role": "evidence",
+            "variant": "default",
+            "sourcePath": "AssetLab/artifacts/terrain-region-continuity-v1/evidence/cluster-soil-grayscale-400pct.png",
+            "declaredSHA256": "69a0d35f637e0311e10dc6963014672f7fde9aa405949d52bc9ea11b8a1eaa0d",
+            "actualSHA256": "69a0d35f637e0311e10dc6963014672f7fde9aa405949d52bc9ea11b8a1eaa0d",
+            "decodedRGBASHA256": null,
+            "width": 320,
+            "height": 320,
+            "integrity": "verified",
+            "route": "asset-record/terrain-region-continuity-v1/evidence/cluster-soil-grayscale-400pct/default",
+            "sourceRoute": "terrain-region-continuity-v1/evidence/cluster-soil-grayscale-400pct/default",
+            "previewURL": "visual-assets/terrain-region-continuity-v1/evidence/cluster-soil-grayscale-400pct/default.png"
+          },
+          {
+            "semanticKey": "cluster-soil-native",
+            "role": "evidence",
+            "variant": "default",
+            "sourcePath": "AssetLab/artifacts/terrain-region-continuity-v1/evidence/cluster-soil-native.png",
+            "declaredSHA256": "23ba7f03a0bb2ba2dc95a80498dcafe90fb34841722dff1ff886204a8d369cfe",
+            "actualSHA256": "23ba7f03a0bb2ba2dc95a80498dcafe90fb34841722dff1ff886204a8d369cfe",
+            "decodedRGBASHA256": null,
+            "width": 80,
+            "height": 80,
+            "integrity": "verified",
+            "route": "asset-record/terrain-region-continuity-v1/evidence/cluster-soil-native/default",
+            "sourceRoute": "terrain-region-continuity-v1/evidence/cluster-soil-native/default",
+            "previewURL": "visual-assets/terrain-region-continuity-v1/evidence/cluster-soil-native/default.png"
+          },
+          {
+            "semanticKey": "cluster-stone-2x",
+            "role": "evidence",
+            "variant": "default",
+            "sourcePath": "AssetLab/artifacts/terrain-region-continuity-v1/evidence/cluster-stone-2x.png",
+            "declaredSHA256": "cbc3857446b2bf7556d34cab58ec205d1c750ad013a3c7c41b8b5cffe600d04d",
+            "actualSHA256": "cbc3857446b2bf7556d34cab58ec205d1c750ad013a3c7c41b8b5cffe600d04d",
+            "decodedRGBASHA256": null,
+            "width": 160,
+            "height": 160,
+            "integrity": "verified",
+            "route": "asset-record/terrain-region-continuity-v1/evidence/cluster-stone-2x/default",
+            "sourceRoute": "terrain-region-continuity-v1/evidence/cluster-stone-2x/default",
+            "previewURL": "visual-assets/terrain-region-continuity-v1/evidence/cluster-stone-2x/default.png"
+          },
+          {
+            "semanticKey": "cluster-stone-400pct",
+            "role": "evidence",
+            "variant": "default",
+            "sourcePath": "AssetLab/artifacts/terrain-region-continuity-v1/evidence/cluster-stone-400pct.png",
+            "declaredSHA256": "a55bec3e210f18ac32511272d6f77d4f36f21e5fe8ff4229160f843526486af3",
+            "actualSHA256": "a55bec3e210f18ac32511272d6f77d4f36f21e5fe8ff4229160f843526486af3",
+            "decodedRGBASHA256": null,
+            "width": 320,
+            "height": 320,
+            "integrity": "verified",
+            "route": "asset-record/terrain-region-continuity-v1/evidence/cluster-stone-400pct/default",
+            "sourceRoute": "terrain-region-continuity-v1/evidence/cluster-stone-400pct/default",
+            "previewURL": "visual-assets/terrain-region-continuity-v1/evidence/cluster-stone-400pct/default.png"
+          },
+          {
+            "semanticKey": "cluster-stone-grayscale-400pct",
+            "role": "evidence",
+            "variant": "default",
+            "sourcePath": "AssetLab/artifacts/terrain-region-continuity-v1/evidence/cluster-stone-grayscale-400pct.png",
+            "declaredSHA256": "17eedc11fddc8fbf21974599ff01920e95bc6978b98284e755535234f4044a5d",
+            "actualSHA256": "17eedc11fddc8fbf21974599ff01920e95bc6978b98284e755535234f4044a5d",
+            "decodedRGBASHA256": null,
+            "width": 320,
+            "height": 320,
+            "integrity": "verified",
+            "route": "asset-record/terrain-region-continuity-v1/evidence/cluster-stone-grayscale-400pct/default",
+            "sourceRoute": "terrain-region-continuity-v1/evidence/cluster-stone-grayscale-400pct/default",
+            "previewURL": "visual-assets/terrain-region-continuity-v1/evidence/cluster-stone-grayscale-400pct/default.png"
+          },
+          {
+            "semanticKey": "cluster-stone-native",
+            "role": "evidence",
+            "variant": "default",
+            "sourcePath": "AssetLab/artifacts/terrain-region-continuity-v1/evidence/cluster-stone-native.png",
+            "declaredSHA256": "131bf8ef7b42ea2c40cd48438f130fb7284348472d46b0d6650efc5f2fd53ac6",
+            "actualSHA256": "131bf8ef7b42ea2c40cd48438f130fb7284348472d46b0d6650efc5f2fd53ac6",
+            "decodedRGBASHA256": null,
+            "width": 80,
+            "height": 80,
+            "integrity": "verified",
+            "route": "asset-record/terrain-region-continuity-v1/evidence/cluster-stone-native/default",
+            "sourceRoute": "terrain-region-continuity-v1/evidence/cluster-stone-native/default",
+            "previewURL": "visual-assets/terrain-region-continuity-v1/evidence/cluster-stone-native/default.png"
+          },
+          {
+            "semanticKey": "cluster-water-2x",
+            "role": "evidence",
+            "variant": "default",
+            "sourcePath": "AssetLab/artifacts/terrain-region-continuity-v1/evidence/cluster-water-2x.png",
+            "declaredSHA256": "9b03c04dc4ca568e929c956c2ec01c81c31be4c1761cb1606cb4eabb13156cf2",
+            "actualSHA256": "9b03c04dc4ca568e929c956c2ec01c81c31be4c1761cb1606cb4eabb13156cf2",
+            "decodedRGBASHA256": null,
+            "width": 160,
+            "height": 160,
+            "integrity": "verified",
+            "route": "asset-record/terrain-region-continuity-v1/evidence/cluster-water-2x/default",
+            "sourceRoute": "terrain-region-continuity-v1/evidence/cluster-water-2x/default",
+            "previewURL": "visual-assets/terrain-region-continuity-v1/evidence/cluster-water-2x/default.png"
+          },
+          {
+            "semanticKey": "cluster-water-400pct",
+            "role": "evidence",
+            "variant": "default",
+            "sourcePath": "AssetLab/artifacts/terrain-region-continuity-v1/evidence/cluster-water-400pct.png",
+            "declaredSHA256": "f88f15f47c01eb8937daaafa59ec4c96fc79229b94b1ee373ab4783387d1934f",
+            "actualSHA256": "f88f15f47c01eb8937daaafa59ec4c96fc79229b94b1ee373ab4783387d1934f",
+            "decodedRGBASHA256": null,
+            "width": 320,
+            "height": 320,
+            "integrity": "verified",
+            "route": "asset-record/terrain-region-continuity-v1/evidence/cluster-water-400pct/default",
+            "sourceRoute": "terrain-region-continuity-v1/evidence/cluster-water-400pct/default",
+            "previewURL": "visual-assets/terrain-region-continuity-v1/evidence/cluster-water-400pct/default.png"
+          },
+          {
+            "semanticKey": "cluster-water-grayscale-400pct",
+            "role": "evidence",
+            "variant": "default",
+            "sourcePath": "AssetLab/artifacts/terrain-region-continuity-v1/evidence/cluster-water-grayscale-400pct.png",
+            "declaredSHA256": "c32245b911ebc9a7a2a6c3141ded66e8adab7b86f73f6bae64ab40dc952a382c",
+            "actualSHA256": "c32245b911ebc9a7a2a6c3141ded66e8adab7b86f73f6bae64ab40dc952a382c",
+            "decodedRGBASHA256": null,
+            "width": 320,
+            "height": 320,
+            "integrity": "verified",
+            "route": "asset-record/terrain-region-continuity-v1/evidence/cluster-water-grayscale-400pct/default",
+            "sourceRoute": "terrain-region-continuity-v1/evidence/cluster-water-grayscale-400pct/default",
+            "previewURL": "visual-assets/terrain-region-continuity-v1/evidence/cluster-water-grayscale-400pct/default.png"
+          },
+          {
+            "semanticKey": "cluster-water-native",
+            "role": "evidence",
+            "variant": "default",
+            "sourcePath": "AssetLab/artifacts/terrain-region-continuity-v1/evidence/cluster-water-native.png",
+            "declaredSHA256": "8b9682ba2343c6af82fa14c2d76aa6aca2fcf6b6dc311c8ef60be9b2b0fc6db1",
+            "actualSHA256": "8b9682ba2343c6af82fa14c2d76aa6aca2fcf6b6dc311c8ef60be9b2b0fc6db1",
+            "decodedRGBASHA256": null,
+            "width": 80,
+            "height": 80,
+            "integrity": "verified",
+            "route": "asset-record/terrain-region-continuity-v1/evidence/cluster-water-native/default",
+            "sourceRoute": "terrain-region-continuity-v1/evidence/cluster-water-native/default",
+            "previewURL": "visual-assets/terrain-region-continuity-v1/evidence/cluster-water-native/default.png"
+          },
           {
             "semanticKey": "contactSheet",
             "role": "evidence",
@@ -162109,6 +163770,411 @@
             "route": "asset-record/terrain-region-continuity-v1/evidence/contactsheet/default",
             "sourceRoute": "terrain-region-continuity-v1/evidence/contactsheet/default",
             "previewURL": "visual-assets/terrain-region-continuity-v1/evidence/contactsheet/default.png"
+          },
+          {
+            "semanticKey": "corridor-1-2x",
+            "role": "evidence",
+            "variant": "default",
+            "sourcePath": "AssetLab/artifacts/terrain-region-continuity-v1/evidence/corridor-1-2x.png",
+            "declaredSHA256": "917be3c4e00d70b659227f0269fe359794c9dbfc633bf11493c450c83c9592b0",
+            "actualSHA256": "917be3c4e00d70b659227f0269fe359794c9dbfc633bf11493c450c83c9592b0",
+            "decodedRGBASHA256": null,
+            "width": 224,
+            "height": 160,
+            "integrity": "verified",
+            "route": "asset-record/terrain-region-continuity-v1/evidence/corridor-1-2x/default",
+            "sourceRoute": "terrain-region-continuity-v1/evidence/corridor-1-2x/default",
+            "previewURL": "visual-assets/terrain-region-continuity-v1/evidence/corridor-1-2x/default.png"
+          },
+          {
+            "semanticKey": "corridor-1-400pct",
+            "role": "evidence",
+            "variant": "default",
+            "sourcePath": "AssetLab/artifacts/terrain-region-continuity-v1/evidence/corridor-1-400pct.png",
+            "declaredSHA256": "5296027a5b56ea569cc4dbdf7b1fa7a99ec34b5f29717d89ed90dc15b4b23f09",
+            "actualSHA256": "5296027a5b56ea569cc4dbdf7b1fa7a99ec34b5f29717d89ed90dc15b4b23f09",
+            "decodedRGBASHA256": null,
+            "width": 448,
+            "height": 320,
+            "integrity": "verified",
+            "route": "asset-record/terrain-region-continuity-v1/evidence/corridor-1-400pct/default",
+            "sourceRoute": "terrain-region-continuity-v1/evidence/corridor-1-400pct/default",
+            "previewURL": "visual-assets/terrain-region-continuity-v1/evidence/corridor-1-400pct/default.png"
+          },
+          {
+            "semanticKey": "corridor-1-grayscale-400pct",
+            "role": "evidence",
+            "variant": "default",
+            "sourcePath": "AssetLab/artifacts/terrain-region-continuity-v1/evidence/corridor-1-grayscale-400pct.png",
+            "declaredSHA256": "a1fde0101c937a40ba3a7db6af38a149418837d26951d29ddb92ea90a5a4a4c1",
+            "actualSHA256": "a1fde0101c937a40ba3a7db6af38a149418837d26951d29ddb92ea90a5a4a4c1",
+            "decodedRGBASHA256": null,
+            "width": 448,
+            "height": 320,
+            "integrity": "verified",
+            "route": "asset-record/terrain-region-continuity-v1/evidence/corridor-1-grayscale-400pct/default",
+            "sourceRoute": "terrain-region-continuity-v1/evidence/corridor-1-grayscale-400pct/default",
+            "previewURL": "visual-assets/terrain-region-continuity-v1/evidence/corridor-1-grayscale-400pct/default.png"
+          },
+          {
+            "semanticKey": "corridor-1-native",
+            "role": "evidence",
+            "variant": "default",
+            "sourcePath": "AssetLab/artifacts/terrain-region-continuity-v1/evidence/corridor-1-native.png",
+            "declaredSHA256": "16cab8c1723bd4f5062a7679802ffde812c3fde4b0b1e19b165c8f62bcf9d69a",
+            "actualSHA256": "16cab8c1723bd4f5062a7679802ffde812c3fde4b0b1e19b165c8f62bcf9d69a",
+            "decodedRGBASHA256": null,
+            "width": 112,
+            "height": 80,
+            "integrity": "verified",
+            "route": "asset-record/terrain-region-continuity-v1/evidence/corridor-1-native/default",
+            "sourceRoute": "terrain-region-continuity-v1/evidence/corridor-1-native/default",
+            "previewURL": "visual-assets/terrain-region-continuity-v1/evidence/corridor-1-native/default.png"
+          },
+          {
+            "semanticKey": "corridor-2-2x",
+            "role": "evidence",
+            "variant": "default",
+            "sourcePath": "AssetLab/artifacts/terrain-region-continuity-v1/evidence/corridor-2-2x.png",
+            "declaredSHA256": "7abb0021c775ca04a0840197708380a2397af149942434ade06d32d2482190de",
+            "actualSHA256": "7abb0021c775ca04a0840197708380a2397af149942434ade06d32d2482190de",
+            "decodedRGBASHA256": null,
+            "width": 256,
+            "height": 192,
+            "integrity": "verified",
+            "route": "asset-record/terrain-region-continuity-v1/evidence/corridor-2-2x/default",
+            "sourceRoute": "terrain-region-continuity-v1/evidence/corridor-2-2x/default",
+            "previewURL": "visual-assets/terrain-region-continuity-v1/evidence/corridor-2-2x/default.png"
+          },
+          {
+            "semanticKey": "corridor-2-400pct",
+            "role": "evidence",
+            "variant": "default",
+            "sourcePath": "AssetLab/artifacts/terrain-region-continuity-v1/evidence/corridor-2-400pct.png",
+            "declaredSHA256": "54b5a9e216ccf8501cf58d8609f4fcc1fcbd51078d49fce64ce25edb770920e9",
+            "actualSHA256": "54b5a9e216ccf8501cf58d8609f4fcc1fcbd51078d49fce64ce25edb770920e9",
+            "decodedRGBASHA256": null,
+            "width": 512,
+            "height": 384,
+            "integrity": "verified",
+            "route": "asset-record/terrain-region-continuity-v1/evidence/corridor-2-400pct/default",
+            "sourceRoute": "terrain-region-continuity-v1/evidence/corridor-2-400pct/default",
+            "previewURL": "visual-assets/terrain-region-continuity-v1/evidence/corridor-2-400pct/default.png"
+          },
+          {
+            "semanticKey": "corridor-2-grayscale-400pct",
+            "role": "evidence",
+            "variant": "default",
+            "sourcePath": "AssetLab/artifacts/terrain-region-continuity-v1/evidence/corridor-2-grayscale-400pct.png",
+            "declaredSHA256": "d0b2b0d562c774a4cf38b4fbf388fb61fe674e0414f396f306a9c255df89c91b",
+            "actualSHA256": "d0b2b0d562c774a4cf38b4fbf388fb61fe674e0414f396f306a9c255df89c91b",
+            "decodedRGBASHA256": null,
+            "width": 512,
+            "height": 384,
+            "integrity": "verified",
+            "route": "asset-record/terrain-region-continuity-v1/evidence/corridor-2-grayscale-400pct/default",
+            "sourceRoute": "terrain-region-continuity-v1/evidence/corridor-2-grayscale-400pct/default",
+            "previewURL": "visual-assets/terrain-region-continuity-v1/evidence/corridor-2-grayscale-400pct/default.png"
+          },
+          {
+            "semanticKey": "corridor-2-native",
+            "role": "evidence",
+            "variant": "default",
+            "sourcePath": "AssetLab/artifacts/terrain-region-continuity-v1/evidence/corridor-2-native.png",
+            "declaredSHA256": "bd2a12986d3bf3b866f4ab9caf8e172449c632f53872786052d77f7ab61994a2",
+            "actualSHA256": "bd2a12986d3bf3b866f4ab9caf8e172449c632f53872786052d77f7ab61994a2",
+            "decodedRGBASHA256": null,
+            "width": 128,
+            "height": 96,
+            "integrity": "verified",
+            "route": "asset-record/terrain-region-continuity-v1/evidence/corridor-2-native/default",
+            "sourceRoute": "terrain-region-continuity-v1/evidence/corridor-2-native/default",
+            "previewURL": "visual-assets/terrain-region-continuity-v1/evidence/corridor-2-native/default.png"
+          },
+          {
+            "semanticKey": "equal-height-vs-south-wall-400pct",
+            "role": "evidence",
+            "variant": "default",
+            "sourcePath": "AssetLab/artifacts/terrain-region-continuity-v1/evidence/equal-height-vs-south-wall-400pct.png",
+            "declaredSHA256": "450f90a656628744635266dc99cf38552835d5e81dbb633c383b77999e8d26af",
+            "actualSHA256": "450f90a656628744635266dc99cf38552835d5e81dbb633c383b77999e8d26af",
+            "decodedRGBASHA256": null,
+            "width": 900,
+            "height": 360,
+            "integrity": "verified",
+            "route": "asset-record/terrain-region-continuity-v1/evidence/equal-height-vs-south-wall-400pct/default",
+            "sourceRoute": "terrain-region-continuity-v1/evidence/equal-height-vs-south-wall-400pct/default",
+            "previewURL": "visual-assets/terrain-region-continuity-v1/evidence/equal-height-vs-south-wall-400pct/default.png"
+          },
+          {
+            "semanticKey": "equal-height-vs-south-wall-grayscale-400pct",
+            "role": "evidence",
+            "variant": "default",
+            "sourcePath": "AssetLab/artifacts/terrain-region-continuity-v1/evidence/equal-height-vs-south-wall-grayscale-400pct.png",
+            "declaredSHA256": "e43b77a51d8bdc4c59e39a9e318b41934b21ac25d59bfe0c248eae7557ee4796",
+            "actualSHA256": "e43b77a51d8bdc4c59e39a9e318b41934b21ac25d59bfe0c248eae7557ee4796",
+            "decodedRGBASHA256": null,
+            "width": 900,
+            "height": 360,
+            "integrity": "verified",
+            "route": "asset-record/terrain-region-continuity-v1/evidence/equal-height-vs-south-wall-grayscale-400pct/default",
+            "sourceRoute": "terrain-region-continuity-v1/evidence/equal-height-vs-south-wall-grayscale-400pct/default",
+            "previewURL": "visual-assets/terrain-region-continuity-v1/evidence/equal-height-vs-south-wall-grayscale-400pct/default.png"
+          },
+          {
+            "semanticKey": "junction-t-cross-2x",
+            "role": "evidence",
+            "variant": "default",
+            "sourcePath": "AssetLab/artifacts/terrain-region-continuity-v1/evidence/junction-t-cross-2x.png",
+            "declaredSHA256": "7bf81e06f79ac9466ec2f582ec9c5234155fdb6723d12da05bd369981f21f8e4",
+            "actualSHA256": "7bf81e06f79ac9466ec2f582ec9c5234155fdb6723d12da05bd369981f21f8e4",
+            "decodedRGBASHA256": null,
+            "width": 224,
+            "height": 224,
+            "integrity": "verified",
+            "route": "asset-record/terrain-region-continuity-v1/evidence/junction-t-cross-2x/default",
+            "sourceRoute": "terrain-region-continuity-v1/evidence/junction-t-cross-2x/default",
+            "previewURL": "visual-assets/terrain-region-continuity-v1/evidence/junction-t-cross-2x/default.png"
+          },
+          {
+            "semanticKey": "junction-t-cross-400pct",
+            "role": "evidence",
+            "variant": "default",
+            "sourcePath": "AssetLab/artifacts/terrain-region-continuity-v1/evidence/junction-t-cross-400pct.png",
+            "declaredSHA256": "adb41f055886fb0e6c7bf5cab91d6261678d32cc2417821f57597f4ac5e3642d",
+            "actualSHA256": "adb41f055886fb0e6c7bf5cab91d6261678d32cc2417821f57597f4ac5e3642d",
+            "decodedRGBASHA256": null,
+            "width": 448,
+            "height": 448,
+            "integrity": "verified",
+            "route": "asset-record/terrain-region-continuity-v1/evidence/junction-t-cross-400pct/default",
+            "sourceRoute": "terrain-region-continuity-v1/evidence/junction-t-cross-400pct/default",
+            "previewURL": "visual-assets/terrain-region-continuity-v1/evidence/junction-t-cross-400pct/default.png"
+          },
+          {
+            "semanticKey": "junction-t-cross-grayscale-400pct",
+            "role": "evidence",
+            "variant": "default",
+            "sourcePath": "AssetLab/artifacts/terrain-region-continuity-v1/evidence/junction-t-cross-grayscale-400pct.png",
+            "declaredSHA256": "dd4e0a4d60afca507fb3d4b86ce63ab31083246fb79c61392ee552b8bc449c85",
+            "actualSHA256": "dd4e0a4d60afca507fb3d4b86ce63ab31083246fb79c61392ee552b8bc449c85",
+            "decodedRGBASHA256": null,
+            "width": 448,
+            "height": 448,
+            "integrity": "verified",
+            "route": "asset-record/terrain-region-continuity-v1/evidence/junction-t-cross-grayscale-400pct/default",
+            "sourceRoute": "terrain-region-continuity-v1/evidence/junction-t-cross-grayscale-400pct/default",
+            "previewURL": "visual-assets/terrain-region-continuity-v1/evidence/junction-t-cross-grayscale-400pct/default.png"
+          },
+          {
+            "semanticKey": "junction-t-cross-native",
+            "role": "evidence",
+            "variant": "default",
+            "sourcePath": "AssetLab/artifacts/terrain-region-continuity-v1/evidence/junction-t-cross-native.png",
+            "declaredSHA256": "f7d5017725070861d8993f5df616c0195d2312ca811b83850fb4275956b0b056",
+            "actualSHA256": "f7d5017725070861d8993f5df616c0195d2312ca811b83850fb4275956b0b056",
+            "decodedRGBASHA256": null,
+            "width": 112,
+            "height": 112,
+            "integrity": "verified",
+            "route": "asset-record/terrain-region-continuity-v1/evidence/junction-t-cross-native/default",
+            "sourceRoute": "terrain-region-continuity-v1/evidence/junction-t-cross-native/default",
+            "previewURL": "visual-assets/terrain-region-continuity-v1/evidence/junction-t-cross-native/default.png"
+          },
+          {
+            "semanticKey": "macro-11x11-redraw-a-2x",
+            "role": "evidence",
+            "variant": "default",
+            "sourcePath": "AssetLab/artifacts/terrain-region-continuity-v1/evidence/macro-11x11-redraw-a-2x.png",
+            "declaredSHA256": "88270d061fb9480e6df1684cf77710c50765004777a8388b9583f04457c68b82",
+            "actualSHA256": "88270d061fb9480e6df1684cf77710c50765004777a8388b9583f04457c68b82",
+            "decodedRGBASHA256": null,
+            "width": 352,
+            "height": 352,
+            "integrity": "verified",
+            "route": "asset-record/terrain-region-continuity-v1/evidence/macro-11x11-redraw-a-2x/default",
+            "sourceRoute": "terrain-region-continuity-v1/evidence/macro-11x11-redraw-a-2x/default",
+            "previewURL": "visual-assets/terrain-region-continuity-v1/evidence/macro-11x11-redraw-a-2x/default.png"
+          },
+          {
+            "semanticKey": "macro-11x11-redraw-b-2x",
+            "role": "evidence",
+            "variant": "default",
+            "sourcePath": "AssetLab/artifacts/terrain-region-continuity-v1/evidence/macro-11x11-redraw-b-2x.png",
+            "declaredSHA256": "88270d061fb9480e6df1684cf77710c50765004777a8388b9583f04457c68b82",
+            "actualSHA256": "88270d061fb9480e6df1684cf77710c50765004777a8388b9583f04457c68b82",
+            "decodedRGBASHA256": null,
+            "width": 352,
+            "height": 352,
+            "integrity": "verified",
+            "route": "asset-record/terrain-region-continuity-v1/evidence/macro-11x11-redraw-b-2x/default",
+            "sourceRoute": "terrain-region-continuity-v1/evidence/macro-11x11-redraw-b-2x/default",
+            "previewURL": "visual-assets/terrain-region-continuity-v1/evidence/macro-11x11-redraw-b-2x/default.png"
+          },
+          {
+            "semanticKey": "phone-old-current-corrected-368x800",
+            "role": "evidence",
+            "variant": "default",
+            "sourcePath": "AssetLab/artifacts/terrain-region-continuity-v1/evidence/phone-old-current-corrected-368x800.png",
+            "declaredSHA256": "2078f521a1c933a52e05f2a0cfbc017c37edb479b598495f29e37520e521acda",
+            "actualSHA256": "2078f521a1c933a52e05f2a0cfbc017c37edb479b598495f29e37520e521acda",
+            "decodedRGBASHA256": null,
+            "width": 368,
+            "height": 800,
+            "integrity": "verified",
+            "route": "asset-record/terrain-region-continuity-v1/evidence/phone-old-current-corrected-368x800/default",
+            "sourceRoute": "terrain-region-continuity-v1/evidence/phone-old-current-corrected-368x800/default",
+            "previewURL": "visual-assets/terrain-region-continuity-v1/evidence/phone-old-current-corrected-368x800/default.png"
+          },
+          {
+            "semanticKey": "phone-old-current-corrected-grayscale-368x800",
+            "role": "evidence",
+            "variant": "default",
+            "sourcePath": "AssetLab/artifacts/terrain-region-continuity-v1/evidence/phone-old-current-corrected-grayscale-368x800.png",
+            "declaredSHA256": "cdd6e5be6a707c256f8c443fb6312d3335eb32816df5e7bcdb96c6e4b12ea8a1",
+            "actualSHA256": "cdd6e5be6a707c256f8c443fb6312d3335eb32816df5e7bcdb96c6e4b12ea8a1",
+            "decodedRGBASHA256": null,
+            "width": 368,
+            "height": 800,
+            "integrity": "verified",
+            "route": "asset-record/terrain-region-continuity-v1/evidence/phone-old-current-corrected-grayscale-368x800/default",
+            "sourceRoute": "terrain-region-continuity-v1/evidence/phone-old-current-corrected-grayscale-368x800/default",
+            "previewURL": "visual-assets/terrain-region-continuity-v1/evidence/phone-old-current-corrected-grayscale-368x800/default.png"
+          },
+          {
+            "semanticKey": "phone-visibility-368x800",
+            "role": "evidence",
+            "variant": "default",
+            "sourcePath": "AssetLab/artifacts/terrain-region-continuity-v1/evidence/phone-visibility-368x800.png",
+            "declaredSHA256": "06ba9c05989c58ad7e4202a518a643a0b76fa44c238e3dcd5cedc3d80f0898f2",
+            "actualSHA256": "06ba9c05989c58ad7e4202a518a643a0b76fa44c238e3dcd5cedc3d80f0898f2",
+            "decodedRGBASHA256": null,
+            "width": 368,
+            "height": 800,
+            "integrity": "verified",
+            "route": "asset-record/terrain-region-continuity-v1/evidence/phone-visibility-368x800/default",
+            "sourceRoute": "terrain-region-continuity-v1/evidence/phone-visibility-368x800/default",
+            "previewURL": "visual-assets/terrain-region-continuity-v1/evidence/phone-visibility-368x800/default.png"
+          },
+          {
+            "semanticKey": "pool-deep-2x",
+            "role": "evidence",
+            "variant": "default",
+            "sourcePath": "AssetLab/artifacts/terrain-region-continuity-v1/evidence/pool-deep-2x.png",
+            "declaredSHA256": "061fa91a27f3b9f571d61c08723a47656088efd7349a843239d7064cedea9351",
+            "actualSHA256": "061fa91a27f3b9f571d61c08723a47656088efd7349a843239d7064cedea9351",
+            "decodedRGBASHA256": null,
+            "width": 288,
+            "height": 224,
+            "integrity": "verified",
+            "route": "asset-record/terrain-region-continuity-v1/evidence/pool-deep-2x/default",
+            "sourceRoute": "terrain-region-continuity-v1/evidence/pool-deep-2x/default",
+            "previewURL": "visual-assets/terrain-region-continuity-v1/evidence/pool-deep-2x/default.png"
+          },
+          {
+            "semanticKey": "pool-deep-400pct",
+            "role": "evidence",
+            "variant": "default",
+            "sourcePath": "AssetLab/artifacts/terrain-region-continuity-v1/evidence/pool-deep-400pct.png",
+            "declaredSHA256": "fe8c901168a7956eff46f67db001cd495d44f3fca693f790211d16529026339a",
+            "actualSHA256": "fe8c901168a7956eff46f67db001cd495d44f3fca693f790211d16529026339a",
+            "decodedRGBASHA256": null,
+            "width": 576,
+            "height": 448,
+            "integrity": "verified",
+            "route": "asset-record/terrain-region-continuity-v1/evidence/pool-deep-400pct/default",
+            "sourceRoute": "terrain-region-continuity-v1/evidence/pool-deep-400pct/default",
+            "previewURL": "visual-assets/terrain-region-continuity-v1/evidence/pool-deep-400pct/default.png"
+          },
+          {
+            "semanticKey": "pool-deep-grayscale-400pct",
+            "role": "evidence",
+            "variant": "default",
+            "sourcePath": "AssetLab/artifacts/terrain-region-continuity-v1/evidence/pool-deep-grayscale-400pct.png",
+            "declaredSHA256": "73f03b8e75f30e3987e7f23bf497af8852c114199cca4d03ae7b46161f249fa9",
+            "actualSHA256": "73f03b8e75f30e3987e7f23bf497af8852c114199cca4d03ae7b46161f249fa9",
+            "decodedRGBASHA256": null,
+            "width": 576,
+            "height": 448,
+            "integrity": "verified",
+            "route": "asset-record/terrain-region-continuity-v1/evidence/pool-deep-grayscale-400pct/default",
+            "sourceRoute": "terrain-region-continuity-v1/evidence/pool-deep-grayscale-400pct/default",
+            "previewURL": "visual-assets/terrain-region-continuity-v1/evidence/pool-deep-grayscale-400pct/default.png"
+          },
+          {
+            "semanticKey": "pool-deep-native",
+            "role": "evidence",
+            "variant": "default",
+            "sourcePath": "AssetLab/artifacts/terrain-region-continuity-v1/evidence/pool-deep-native.png",
+            "declaredSHA256": "b37d6c465dbc19ab1954cf85f044b8ab370a455d465436939f1de690beeba4c3",
+            "actualSHA256": "b37d6c465dbc19ab1954cf85f044b8ab370a455d465436939f1de690beeba4c3",
+            "decodedRGBASHA256": null,
+            "width": 144,
+            "height": 112,
+            "integrity": "verified",
+            "route": "asset-record/terrain-region-continuity-v1/evidence/pool-deep-native/default",
+            "sourceRoute": "terrain-region-continuity-v1/evidence/pool-deep-native/default",
+            "previewURL": "visual-assets/terrain-region-continuity-v1/evidence/pool-deep-native/default.png"
+          },
+          {
+            "semanticKey": "stone-rubble-2x",
+            "role": "evidence",
+            "variant": "default",
+            "sourcePath": "AssetLab/artifacts/terrain-region-continuity-v1/evidence/stone-rubble-2x.png",
+            "declaredSHA256": "eb156a8b6c6dd187b9a2883a25fc8481469e09281eb5f3fd7247bf646a064ae9",
+            "actualSHA256": "eb156a8b6c6dd187b9a2883a25fc8481469e09281eb5f3fd7247bf646a064ae9",
+            "decodedRGBASHA256": null,
+            "width": 256,
+            "height": 192,
+            "integrity": "verified",
+            "route": "asset-record/terrain-region-continuity-v1/evidence/stone-rubble-2x/default",
+            "sourceRoute": "terrain-region-continuity-v1/evidence/stone-rubble-2x/default",
+            "previewURL": "visual-assets/terrain-region-continuity-v1/evidence/stone-rubble-2x/default.png"
+          },
+          {
+            "semanticKey": "stone-rubble-400pct",
+            "role": "evidence",
+            "variant": "default",
+            "sourcePath": "AssetLab/artifacts/terrain-region-continuity-v1/evidence/stone-rubble-400pct.png",
+            "declaredSHA256": "ef01d3f36ddba0d215b0fe7c13bb56f54425d810b92201a975db939463de7f43",
+            "actualSHA256": "ef01d3f36ddba0d215b0fe7c13bb56f54425d810b92201a975db939463de7f43",
+            "decodedRGBASHA256": null,
+            "width": 512,
+            "height": 384,
+            "integrity": "verified",
+            "route": "asset-record/terrain-region-continuity-v1/evidence/stone-rubble-400pct/default",
+            "sourceRoute": "terrain-region-continuity-v1/evidence/stone-rubble-400pct/default",
+            "previewURL": "visual-assets/terrain-region-continuity-v1/evidence/stone-rubble-400pct/default.png"
+          },
+          {
+            "semanticKey": "stone-rubble-grayscale-400pct",
+            "role": "evidence",
+            "variant": "default",
+            "sourcePath": "AssetLab/artifacts/terrain-region-continuity-v1/evidence/stone-rubble-grayscale-400pct.png",
+            "declaredSHA256": "fad944bfd53c9ed8ec13afa0908ba86674eb02a532033e1533a41f6c750a9f7d",
+            "actualSHA256": "fad944bfd53c9ed8ec13afa0908ba86674eb02a532033e1533a41f6c750a9f7d",
+            "decodedRGBASHA256": null,
+            "width": 512,
+            "height": 384,
+            "integrity": "verified",
+            "route": "asset-record/terrain-region-continuity-v1/evidence/stone-rubble-grayscale-400pct/default",
+            "sourceRoute": "terrain-region-continuity-v1/evidence/stone-rubble-grayscale-400pct/default",
+            "previewURL": "visual-assets/terrain-region-continuity-v1/evidence/stone-rubble-grayscale-400pct/default.png"
+          },
+          {
+            "semanticKey": "stone-rubble-native",
+            "role": "evidence",
+            "variant": "default",
+            "sourcePath": "AssetLab/artifacts/terrain-region-continuity-v1/evidence/stone-rubble-native.png",
+            "declaredSHA256": "a8b90d68267956d8d0ff3eb5c8e654b1b4ac48c3d5e83e0edd260b7631377d79",
+            "actualSHA256": "a8b90d68267956d8d0ff3eb5c8e654b1b4ac48c3d5e83e0edd260b7631377d79",
+            "decodedRGBASHA256": null,
+            "width": 128,
+            "height": 96,
+            "integrity": "verified",
+            "route": "asset-record/terrain-region-continuity-v1/evidence/stone-rubble-native/default",
+            "sourceRoute": "terrain-region-continuity-v1/evidence/stone-rubble-native/default",
+            "previewURL": "visual-assets/terrain-region-continuity-v1/evidence/stone-rubble-native/default.png"
           }
         ]
       },
@@ -168117,60 +170183,62 @@
         ],
         "referencePaths": [],
         "evidencePaths": [
+          "AssetLab/artifacts/world-material-pixel-correction-v1/world-carried-materials-dark-368x800.png",
+          "AssetLab/artifacts/world-material-pixel-correction-v1/world-carried-materials-grayscale-368x800.png",
+          "AssetLab/artifacts/world-material-pixel-correction-v1/world-carried-materials-light-368x800.png",
           "AssetLab/integration/world-material-pixel-correction-v1/deterministic-receipt.json"
         ],
         "approvalReceipts": [],
         "authorityConflict": null,
         "withheldCounts": {},
         "blockers": [
-          "candidate is not approved by classification alone",
-          "one or more manifest image paths are missing"
+          "candidate is not approved by classification alone"
         ],
         "assets": [
           {
             "semanticKey": "evidence/dark",
             "role": "evidence",
             "variant": "default",
-            "sourcePath": null,
+            "sourcePath": "AssetLab/artifacts/world-material-pixel-correction-v1/world-carried-materials-dark-368x800.png",
             "declaredSHA256": "8b6bc6e3f122b9839bc6353a65db12167a33b2cf963579a0a5138c42e1cfb890",
-            "actualSHA256": null,
+            "actualSHA256": "8b6bc6e3f122b9839bc6353a65db12167a33b2cf963579a0a5138c42e1cfb890",
             "decodedRGBASHA256": null,
             "width": 368,
             "height": 800,
-            "integrity": "missing",
+            "integrity": "verified",
             "route": "asset-record/world-material-pixel-correction-v1/evidence/evidence-dark/default",
             "sourceRoute": "world-material-pixel-correction-v1/evidence/evidence-dark/default",
-            "previewURL": null
+            "previewURL": "visual-assets/world-material-pixel-correction-v1/evidence/evidence-dark/default.png"
           },
           {
             "semanticKey": "evidence/grayscale",
             "role": "evidence",
             "variant": "default",
-            "sourcePath": null,
+            "sourcePath": "AssetLab/artifacts/world-material-pixel-correction-v1/world-carried-materials-grayscale-368x800.png",
             "declaredSHA256": "a6ef61e1d297e485edf5ac7ce8ebb1981a25c353290c1ca9fbf5e02ba4a84e50",
-            "actualSHA256": null,
+            "actualSHA256": "a6ef61e1d297e485edf5ac7ce8ebb1981a25c353290c1ca9fbf5e02ba4a84e50",
             "decodedRGBASHA256": null,
             "width": 368,
             "height": 800,
-            "integrity": "missing",
+            "integrity": "verified",
             "route": "asset-record/world-material-pixel-correction-v1/evidence/evidence-grayscale/default",
             "sourceRoute": "world-material-pixel-correction-v1/evidence/evidence-grayscale/default",
-            "previewURL": null
+            "previewURL": "visual-assets/world-material-pixel-correction-v1/evidence/evidence-grayscale/default.png"
           },
           {
             "semanticKey": "evidence/light",
             "role": "evidence",
             "variant": "default",
-            "sourcePath": null,
+            "sourcePath": "AssetLab/artifacts/world-material-pixel-correction-v1/world-carried-materials-light-368x800.png",
             "declaredSHA256": "539f01b73dc876fe731a4a0bdf6c127bce296427ad9931c8290fae0254f8440c",
-            "actualSHA256": null,
+            "actualSHA256": "539f01b73dc876fe731a4a0bdf6c127bce296427ad9931c8290fae0254f8440c",
             "decodedRGBASHA256": null,
             "width": 368,
             "height": 800,
-            "integrity": "missing",
+            "integrity": "verified",
             "route": "asset-record/world-material-pixel-correction-v1/evidence/evidence-light/default",
             "sourceRoute": "world-material-pixel-correction-v1/evidence/evidence-light/default",
-            "previewURL": null
+            "previewURL": "visual-assets/world-material-pixel-correction-v1/evidence/evidence-light/default.png"
           },
           {
             "semanticKey": "sourceRecords/feather",
@@ -215275,8 +217343,19 @@
         "runtimeMirrorPaths": [],
         "sourcePaths": [],
         "runtimePaths": [],
-        "referencePaths": [],
+        "referencePaths": [
+          "AssetLab/artifacts/writing-parchment-v1/reference/generated-parchment-reference.png"
+        ],
         "evidencePaths": [
+          "AssetLab/artifacts/writing-parchment-v1/evidence/parchment-2x-344x344.png",
+          "AssetLab/artifacts/writing-parchment-v1/evidence/parchment-400pct-688x688.png",
+          "AssetLab/artifacts/writing-parchment-v1/evidence/parchment-dark-empty-writing-desk-368x800.png",
+          "AssetLab/artifacts/writing-parchment-v1/evidence/parchment-dark-ink-state-writing-desk-368x800.png",
+          "AssetLab/artifacts/writing-parchment-v1/evidence/parchment-empty-writing-desk-368x800.png",
+          "AssetLab/artifacts/writing-parchment-v1/evidence/parchment-grayscale-2x-344x344.png",
+          "AssetLab/artifacts/writing-parchment-v1/evidence/parchment-native-172x172.png",
+          "AssetLab/artifacts/writing-parchment-v1/evidence/parchment-phone-368x800.png",
+          "AssetLab/artifacts/writing-parchment-v1/evidence/parchment-phone-grayscale-368x800.png",
           "AssetLab/artifacts/writing-parchment-v1/runtime/writing.parchment.handmade-v1-172x172.png"
         ],
         "approvalReceipts": [],
@@ -215286,6 +217365,156 @@
           "review evidence is not production art"
         ],
         "assets": [
+          {
+            "semanticKey": "generated-parchment-reference",
+            "role": "reference",
+            "variant": "default",
+            "sourcePath": "AssetLab/artifacts/writing-parchment-v1/reference/generated-parchment-reference.png",
+            "declaredSHA256": null,
+            "actualSHA256": "6e0b2e508fc20ae2b376da95605cd44a701e97d78372e24d0da8b0ae9fe725f8",
+            "decodedRGBASHA256": null,
+            "width": null,
+            "height": null,
+            "integrity": "unverified",
+            "route": "asset-record/writing-parchment-v1/reference/generated-parchment-reference/default",
+            "sourceRoute": "writing-parchment-v1/reference/generated-parchment-reference/default",
+            "previewURL": "visual-assets/writing-parchment-v1/reference/generated-parchment-reference/default.png"
+          },
+          {
+            "semanticKey": "parchment-2x-344x344",
+            "role": "evidence",
+            "variant": "default",
+            "sourcePath": "AssetLab/artifacts/writing-parchment-v1/evidence/parchment-2x-344x344.png",
+            "declaredSHA256": null,
+            "actualSHA256": "600714f87fab764b575d0c976c2817bf3c85323d777c3e0bc48aa9104e2e9c14",
+            "decodedRGBASHA256": null,
+            "width": null,
+            "height": null,
+            "integrity": "unverified",
+            "route": "asset-record/writing-parchment-v1/evidence/parchment-2x-344x344/default",
+            "sourceRoute": "writing-parchment-v1/evidence/parchment-2x-344x344/default",
+            "previewURL": "visual-assets/writing-parchment-v1/evidence/parchment-2x-344x344/default.png"
+          },
+          {
+            "semanticKey": "parchment-400pct-688x688",
+            "role": "evidence",
+            "variant": "default",
+            "sourcePath": "AssetLab/artifacts/writing-parchment-v1/evidence/parchment-400pct-688x688.png",
+            "declaredSHA256": null,
+            "actualSHA256": "798028519bd6d19e9b5d6521d9724438921bac43b44c8a9991251877c17b8d26",
+            "decodedRGBASHA256": null,
+            "width": null,
+            "height": null,
+            "integrity": "unverified",
+            "route": "asset-record/writing-parchment-v1/evidence/parchment-400pct-688x688/default",
+            "sourceRoute": "writing-parchment-v1/evidence/parchment-400pct-688x688/default",
+            "previewURL": "visual-assets/writing-parchment-v1/evidence/parchment-400pct-688x688/default.png"
+          },
+          {
+            "semanticKey": "parchment-dark-empty-writing-desk-368x800",
+            "role": "evidence",
+            "variant": "default",
+            "sourcePath": "AssetLab/artifacts/writing-parchment-v1/evidence/parchment-dark-empty-writing-desk-368x800.png",
+            "declaredSHA256": null,
+            "actualSHA256": "aed049ee9faf28347ecc9e40faacabcc226935be2acc98d8771a34380056135a",
+            "decodedRGBASHA256": null,
+            "width": null,
+            "height": null,
+            "integrity": "unverified",
+            "route": "asset-record/writing-parchment-v1/evidence/parchment-dark-empty-writing-desk-368x800/default",
+            "sourceRoute": "writing-parchment-v1/evidence/parchment-dark-empty-writing-desk-368x800/default",
+            "previewURL": "visual-assets/writing-parchment-v1/evidence/parchment-dark-empty-writing-desk-368x800/default.png"
+          },
+          {
+            "semanticKey": "parchment-dark-ink-state-writing-desk-368x800",
+            "role": "evidence",
+            "variant": "default",
+            "sourcePath": "AssetLab/artifacts/writing-parchment-v1/evidence/parchment-dark-ink-state-writing-desk-368x800.png",
+            "declaredSHA256": null,
+            "actualSHA256": "f5dcb3517d565839ac87c3f52f6fc1fcb88142802f122351891566bdb5567079",
+            "decodedRGBASHA256": null,
+            "width": null,
+            "height": null,
+            "integrity": "unverified",
+            "route": "asset-record/writing-parchment-v1/evidence/parchment-dark-ink-state-writing-desk-368x800/default",
+            "sourceRoute": "writing-parchment-v1/evidence/parchment-dark-ink-state-writing-desk-368x800/default",
+            "previewURL": "visual-assets/writing-parchment-v1/evidence/parchment-dark-ink-state-writing-desk-368x800/default.png"
+          },
+          {
+            "semanticKey": "parchment-empty-writing-desk-368x800",
+            "role": "evidence",
+            "variant": "default",
+            "sourcePath": "AssetLab/artifacts/writing-parchment-v1/evidence/parchment-empty-writing-desk-368x800.png",
+            "declaredSHA256": null,
+            "actualSHA256": "31850d5c84824400c5f49138c9218a1fdb95e048d876fcf6733f9668765030a0",
+            "decodedRGBASHA256": null,
+            "width": null,
+            "height": null,
+            "integrity": "unverified",
+            "route": "asset-record/writing-parchment-v1/evidence/parchment-empty-writing-desk-368x800/default",
+            "sourceRoute": "writing-parchment-v1/evidence/parchment-empty-writing-desk-368x800/default",
+            "previewURL": "visual-assets/writing-parchment-v1/evidence/parchment-empty-writing-desk-368x800/default.png"
+          },
+          {
+            "semanticKey": "parchment-grayscale-2x-344x344",
+            "role": "evidence",
+            "variant": "default",
+            "sourcePath": "AssetLab/artifacts/writing-parchment-v1/evidence/parchment-grayscale-2x-344x344.png",
+            "declaredSHA256": null,
+            "actualSHA256": "19c71e526e620d492bc35132b09e4c6f20d736ac18189d40ef1f1dcf51e438a5",
+            "decodedRGBASHA256": null,
+            "width": null,
+            "height": null,
+            "integrity": "unverified",
+            "route": "asset-record/writing-parchment-v1/evidence/parchment-grayscale-2x-344x344/default",
+            "sourceRoute": "writing-parchment-v1/evidence/parchment-grayscale-2x-344x344/default",
+            "previewURL": "visual-assets/writing-parchment-v1/evidence/parchment-grayscale-2x-344x344/default.png"
+          },
+          {
+            "semanticKey": "parchment-native-172x172",
+            "role": "evidence",
+            "variant": "default",
+            "sourcePath": "AssetLab/artifacts/writing-parchment-v1/evidence/parchment-native-172x172.png",
+            "declaredSHA256": null,
+            "actualSHA256": "01d6d596c147f2787a1d9f5199740e7444f236402f3567e81242681b5076ce48",
+            "decodedRGBASHA256": null,
+            "width": null,
+            "height": null,
+            "integrity": "unverified",
+            "route": "asset-record/writing-parchment-v1/evidence/parchment-native-172x172/default",
+            "sourceRoute": "writing-parchment-v1/evidence/parchment-native-172x172/default",
+            "previewURL": "visual-assets/writing-parchment-v1/evidence/parchment-native-172x172/default.png"
+          },
+          {
+            "semanticKey": "parchment-phone-368x800",
+            "role": "evidence",
+            "variant": "default",
+            "sourcePath": "AssetLab/artifacts/writing-parchment-v1/evidence/parchment-phone-368x800.png",
+            "declaredSHA256": null,
+            "actualSHA256": "7fe0145748339f328837aca0cad7a921ecbc82dd5ea1650021c3c5a88477bd42",
+            "decodedRGBASHA256": null,
+            "width": null,
+            "height": null,
+            "integrity": "unverified",
+            "route": "asset-record/writing-parchment-v1/evidence/parchment-phone-368x800/default",
+            "sourceRoute": "writing-parchment-v1/evidence/parchment-phone-368x800/default",
+            "previewURL": "visual-assets/writing-parchment-v1/evidence/parchment-phone-368x800/default.png"
+          },
+          {
+            "semanticKey": "parchment-phone-grayscale-368x800",
+            "role": "evidence",
+            "variant": "default",
+            "sourcePath": "AssetLab/artifacts/writing-parchment-v1/evidence/parchment-phone-grayscale-368x800.png",
+            "declaredSHA256": null,
+            "actualSHA256": "0138d832c947b62031901df41866fb76e84273512554c00a6a430957e4afadd3",
+            "decodedRGBASHA256": null,
+            "width": null,
+            "height": null,
+            "integrity": "unverified",
+            "route": "asset-record/writing-parchment-v1/evidence/parchment-phone-grayscale-368x800/default",
+            "sourceRoute": "writing-parchment-v1/evidence/parchment-phone-grayscale-368x800/default",
+            "previewURL": "visual-assets/writing-parchment-v1/evidence/parchment-phone-grayscale-368x800/default.png"
+          },
           {
             "semanticKey": "runtime/writing.parchment.handmade-v1",
             "role": "evidence",
