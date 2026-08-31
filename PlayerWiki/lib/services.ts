@@ -5,6 +5,9 @@ export interface ServiceGuide {
   summary: string;
   useFor: string[];
   workflow: string[];
+  selection: string;
+  result: string;
+  relatedGuides: Array<{ label: string; href: string }>;
   remember: string[];
 }
 
@@ -26,6 +29,15 @@ export const serviceGuides: ServiceGuide[] = [
       'Inspect the exact stack or resource entry.',
       'Choose the available action and review its current destination or capacity.',
       'If the Storehouse is full, make an explicit keep-or-replace decision; returned loot is not silently discarded.',
+    ],
+    selection:
+      'Choose the exact stack, resource, or waiting item shown on the current Storehouse screen. Item capacity and the resource reserve are shown separately.',
+    result:
+      'Only the confirmed transfer or keep-or-replace choice changes custody. If there is no room or the shown choice is no longer available, the current holdings stay where they are.',
+    relatedGuides: [
+      { label: 'Resources', href: '/resources' },
+      { label: 'Consumables', href: '/consumables' },
+      { label: 'Curios', href: '/curios' },
     ],
     remember: [
       'Resources use their own reserve and do not consume item slots.',
@@ -50,6 +62,15 @@ export const serviceGuides: ServiceGuide[] = [
       'Review price, quantity and current stock.',
       'Confirm the transaction; a changed or unaffordable listing remains uncommitted.',
     ],
+    selection:
+      'Choose the exact current listing, identified holding, or material quantity. The displayed price, quantity, and stock describe that choice.',
+    result:
+      'A completed purchase or sale updates the shown holding and currency. If stock, funds, identity, or capacity no longer match, the displayed offer stays uncommitted.',
+    relatedGuides: [
+      { label: 'Resources', href: '/resources' },
+      { label: 'Consumables', href: '/consumables' },
+      { label: 'Curios', href: '/curios' },
+    ],
     remember: [
       'The shop stock can rotate.',
       'Unidentified objects are not ordinary sale listings.',
@@ -70,6 +91,14 @@ export const serviceGuides: ServiceGuide[] = [
       'Choose an eligible stored item.',
       'Review the exact dismantling preview and resulting quantities.',
       'Commit Dismantle only when the shown item and available capacity still match.',
+    ],
+    selection:
+      'Choose an eligible stored gear item and read the exact preview before dismantling it.',
+    result:
+      'Only a completed dismantle removes the shown gear and adds its previewed yield. A changed selection or unavailable capacity leaves the gear in place.',
+    relatedGuides: [
+      { label: 'Equipment', href: '/equipment' },
+      { label: 'Resources', href: '/resources' },
     ],
     remember: [
       'Previewing does not consume the item.',
@@ -94,6 +123,15 @@ export const serviceGuides: ServiceGuide[] = [
       'Open a shelf or record.',
       'Read the recovered wording and any explicitly attached teaching.',
     ],
+    selection:
+      'Choose the current collection and then the exact shelf or record you want to read.',
+    result:
+      'Opening a record changes what you are reading, not what the recovered record says. Unavailable wording remains unavailable rather than being filled in.',
+    relatedGuides: [
+      { label: 'People', href: '/people' },
+      { label: 'Bestiary', href: '/bestiary' },
+      { label: 'World Writing', href: '/systems/world-writing' },
+    ],
     remember: [
       'The Library preserves recovered words; it does not translate clues into a checklist.',
       'Unknown meanings remain unknown until learned.',
@@ -115,6 +153,15 @@ export const serviceGuides: ServiceGuide[] = [
       'Select a person at the fire.',
       'Review whether they are travelling or at home.',
       'Confirm the exact placement change.',
+    ],
+    selection:
+      'Choose the exact recruited person and review their current travelling or home placement before confirming a change.',
+    result:
+      'A completed placement change updates that person’s current location. If party capacity or the shown placement prevents it, their existing placement remains intact.',
+    relatedGuides: [
+      { label: 'People', href: '/people' },
+      { label: 'Party, Gear and Gambits', href: '/services/party-and-gear' },
+      { label: 'Equipment', href: '/equipment' },
     ],
     remember: [
       'The Firepit chooses placement; Party owns stats, gear, rank and Gambits.',
@@ -138,6 +185,15 @@ export const serviceGuides: ServiceGuide[] = [
       'Choose the character section, rank, Gear or Gambit editor you need.',
       'Make changes at home before the next encounter.',
     ],
+    selection:
+      'Choose one party member, then the exact Gear or Gambit face you intend to change. Gear and Gambits keep their displayed slot and priority context.',
+    result:
+      'A completed change keeps the shown equipped item or Gambit order for later preparation. An ineligible gear choice or unfinished edit leaves the current setup unchanged.',
+    relatedGuides: [
+      { label: 'People', href: '/people' },
+      { label: 'Equipment', href: '/equipment' },
+      { label: 'Combat', href: '/systems/combat' },
+    ],
     remember: [
       'Gear must satisfy its slot and ownership rules.',
       'Gambits are evaluated in their displayed priority order.',
@@ -160,6 +216,15 @@ export const serviceGuides: ServiceGuide[] = [
       'Review the exact Crystal return at the current rate.',
       'Commit the refinement.',
     ],
+    selection:
+      'Choose the exact Raw Essence amount or the available refine-all option, then read the current Crystal return.',
+    result:
+      'Only a completed refinement exchanges the selected Raw Essence for the shown Essence Crystals. If the amount or rate no longer matches, the current reserve remains unchanged.',
+    relatedGuides: [
+      { label: 'Raw Essence', href: '/resources/raw-essence' },
+      { label: 'Crafting systems', href: '/crafting' },
+      { label: 'Combat', href: '/systems/combat' },
+    ],
     remember: [
       'Raw Essence and spendable Essence are distinct.',
       'Progression can improve the refinement rate and returned-essence behavior.',
@@ -181,6 +246,15 @@ export const serviceGuides: ServiceGuide[] = [
       'Open a recorded creature family.',
       'Choose an encountered species or record.',
       'Compare the observed individual with the retained species information.',
+    ],
+    selection:
+      'Choose an already recorded creature family and then an encountered species or record within it.',
+    result:
+      'The selected record changes the comparison you are viewing. It does not reveal creatures or traits that have not been encountered.',
+    relatedGuides: [
+      { label: 'Combat', href: '/systems/combat' },
+      { label: 'Exploration', href: '/systems/exploration' },
+      { label: 'Library collections', href: '/services/library' },
     ],
     remember: [
       'The Bestiary records disclosed encounters rather than revealing unseen creatures.',

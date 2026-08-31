@@ -71,6 +71,14 @@ export default async function ServiceDetail({
         </ol>
       </section>
       <section className="article-section">
+        <h2>Choose the current entry</h2>
+        <p>{guide.selection}</p>
+      </section>
+      <section className="article-section">
+        <h2>What happens after you confirm</h2>
+        <p>{guide.result}</p>
+      </section>
+      <section className="article-section">
         <h2>Worth remembering</h2>
         <div className="definition-grid">
           {guide.remember.map((item) => (
@@ -78,7 +86,12 @@ export default async function ServiceDetail({
           ))}
         </div>
       </section>
-      <RelatedGuides links={[{ label: 'All village services', href: '/services' }, { label: `${station.name} construction and keeper`, href: `/places/${station.slug}` }, { label: 'All systems', href: '/systems' }]} />
+      <RelatedGuides links={[
+        { label: 'All village services', href: '/services' },
+        { label: `${station.name} construction and keeper`, href: `/places/${station.slug}` },
+        ...guide.relatedGuides,
+        { label: 'All systems', href: '/systems' },
+      ]} />
     </SiteFrame>
   );
 }

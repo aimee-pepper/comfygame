@@ -304,6 +304,12 @@ test('village services have a hub, individual guides and place cross-links', asy
   assert.match(index, /PixelImage/);
   assert.match(detail, /station\.assetURL \?\? station\.contextAssetURL/);
   assert.match(detail, /service-visual-note/);
+  assert.match(detail, /Choose the current entry/);
+  assert.match(detail, /What happens after you confirm/);
+  assert.match(detail, /guide\.relatedGuides/);
+  assert.match(services, /selection:/);
+  assert.match(services, /result:/);
+  assert.match(services, /relatedGuides:/);
 });
 
 test('resource progression compares every current trade band and consumer family', async () => {
