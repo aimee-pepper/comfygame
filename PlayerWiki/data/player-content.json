@@ -1,0 +1,3449 @@
+{
+  "schemaVersion": 1,
+  "resources": [
+    {
+      "id": "rubble",
+      "slug": "rubble",
+      "name": "Rubble",
+      "summary": "Mostly shaped by Substrate pressure.",
+      "drivenBy": "Substrate pressure",
+      "requires": [
+        "Substrate pressure must reach at least 5/100."
+      ],
+      "favours": [
+        "Hard Substrate helps at 30/100 or more.",
+        "Relief pressure helps at 30/100 or more."
+      ],
+      "tradeBand": "Staple",
+      "isRealityCurrency": false,
+      "currentUses": [
+        "No current Village construction recipe uses this resource."
+      ],
+      "assetURL": "/game-assets/resources/rubble.png"
+    },
+    {
+      "id": "clay",
+      "slug": "clay",
+      "name": "Clay",
+      "summary": "Mostly shaped by Substrate pressure.",
+      "drivenBy": "Substrate pressure",
+      "requires": [
+        "Substrate pressure must reach at least 5/100."
+      ],
+      "favours": [
+        "Available water helps at 30/100 or more.",
+        "Hard Substrate helps at 25/100 or less."
+      ],
+      "tradeBand": "Staple",
+      "isRealityCurrency": false,
+      "currentUses": [
+        "Used to construct the Armoury.",
+        "Used to construct the Scriptorium.",
+        "Used to construct the Apothecary.",
+        "Used to construct the Reliquary.",
+        "Used to construct the Distillery."
+      ],
+      "assetURL": "/game-assets/resources/clay.png"
+    },
+    {
+      "id": "ore",
+      "slug": "ore",
+      "name": "Iron Ore",
+      "summary": "Mostly shaped by Substrate pressure.",
+      "drivenBy": "Substrate pressure",
+      "requires": [
+        "Substrate pressure must reach at least 8/100."
+      ],
+      "favours": [
+        "Hard Substrate helps at 25/100 or more.",
+        "Ductile Substrate helps at 25/100 or more."
+      ],
+      "tradeBand": "Staple",
+      "isRealityCurrency": false,
+      "currentUses": [
+        "Used to construct the Blacksmith.",
+        "Used to construct the Armoury.",
+        "Used to construct the Weaponsmith.",
+        "Used to construct the Survey Post.",
+        "Used to construct the Reliquary.",
+        "Used to construct the Channelworks.",
+        "Used to construct the Anchorage."
+      ],
+      "assetURL": "/game-assets/resources/ore.png"
+    },
+    {
+      "id": "copper",
+      "slug": "copper",
+      "name": "Copper",
+      "summary": "Mostly shaped by Substrate pressure.",
+      "drivenBy": "Substrate pressure",
+      "requires": [
+        "Ductile Substrate must reach at least 20/100.",
+        "Volatile Substrate must reach at least 12/100."
+      ],
+      "favours": [
+        "Substrate pressure helps at 35/100 or more."
+      ],
+      "tradeBand": "Uncommon",
+      "isRealityCurrency": false,
+      "currentUses": [
+        "Used to construct the Armoury.",
+        "Used to construct the Weaponsmith."
+      ],
+      "assetURL": "/game-assets/resources/copper.png"
+    },
+    {
+      "id": "silver",
+      "slug": "silver",
+      "name": "Silver",
+      "summary": "Mostly shaped by Substrate pressure.",
+      "drivenBy": "Substrate pressure",
+      "requires": [
+        "Substrate pressure must reach at least 45/100.",
+        "Ductile Substrate must reach at least 25/100."
+      ],
+      "favours": [
+        "Valuable Substrate helps when present.",
+        "Substrate dispersion helps at 40/100 or less."
+      ],
+      "tradeBand": "Rare",
+      "isRealityCurrency": false,
+      "currentUses": [
+        "Used to construct the Distillery.",
+        "Used to construct the Channelworks."
+      ],
+      "assetURL": "/game-assets/resources/silver.png"
+    },
+    {
+      "id": "gold",
+      "slug": "gold",
+      "name": "Gold",
+      "summary": "Mostly shaped by Substrate pressure.",
+      "drivenBy": "Substrate pressure",
+      "requires": [
+        "Substrate pressure must reach at least 65/100.",
+        "Ductile Substrate must reach at least 30/100."
+      ],
+      "favours": [
+        "Valuable Substrate helps when present."
+      ],
+      "tradeBand": "Precious",
+      "isRealityCurrency": false,
+      "currentUses": [
+        "Used to construct the Weaponsmith."
+      ],
+      "assetURL": "/game-assets/resources/gold.png"
+    },
+    {
+      "id": "quartz",
+      "slug": "quartz",
+      "name": "Quartz",
+      "summary": "Mostly shaped by Substrate pressure.",
+      "drivenBy": "Substrate pressure",
+      "requires": [
+        "Substrate pressure must reach at least 38/100.",
+        "Hard Substrate must reach at least 30/100."
+      ],
+      "favours": [
+        "Atmospheric clarity helps at 70/100 or more.",
+        "Illumination pressure helps at 50/100 or more."
+      ],
+      "tradeBand": "Uncommon",
+      "isRealityCurrency": false,
+      "currentUses": [
+        "Used to construct the Survey Post.",
+        "Used to construct the Apothecary.",
+        "Used to construct the Distillery.",
+        "Used to construct the Channelworks.",
+        "Used to construct the Anchorage."
+      ],
+      "assetURL": "/game-assets/resources/quartz.png"
+    },
+    {
+      "id": "obsidian",
+      "slug": "obsidian",
+      "name": "Obsidian",
+      "summary": "Mostly shaped by Substrate pressure.",
+      "drivenBy": "Substrate pressure",
+      "requires": [
+        "Hard Substrate must reach at least 25/100.",
+        "Thermal pressure must reach at least 55/100."
+      ],
+      "favours": [
+        "Geothermal heat helps when present."
+      ],
+      "tradeBand": "Uncommon",
+      "isRealityCurrency": false,
+      "currentUses": [
+        "No current Village construction recipe uses this resource."
+      ],
+      "assetURL": "/game-assets/resources/obsidian.png"
+    },
+    {
+      "id": "salt",
+      "slug": "salt",
+      "name": "Salt",
+      "summary": "Mostly shaped by Substrate pressure.",
+      "drivenBy": "Substrate pressure",
+      "requires": [
+        "Volatile Substrate must reach at least 18/100."
+      ],
+      "favours": [
+        "Water salinity helps at 45/100 or more.",
+        "Briny water helps when present.",
+        "Available water helps at 25/100 or less."
+      ],
+      "tradeBand": "Staple",
+      "isRealityCurrency": false,
+      "currentUses": [
+        "Used to construct the Tannery."
+      ],
+      "assetURL": "/game-assets/resources/salt.png"
+    },
+    {
+      "id": "sulfur",
+      "slug": "sulfur",
+      "name": "Sulfur",
+      "summary": "Mostly shaped by Substrate pressure.",
+      "drivenBy": "Substrate pressure",
+      "requires": [
+        "Volatile Substrate must reach at least 22/100.",
+        "Thermal pressure must reach at least 50/100."
+      ],
+      "favours": [
+        "Geothermal heat helps when present."
+      ],
+      "tradeBand": "Uncommon",
+      "isRealityCurrency": false,
+      "currentUses": [
+        "No current Village construction recipe uses this resource."
+      ],
+      "assetURL": "/game-assets/resources/sulfur.png"
+    },
+    {
+      "id": "mercury",
+      "slug": "mercury",
+      "name": "Mercury",
+      "summary": "Mostly shaped by Substrate pressure.",
+      "drivenBy": "Substrate pressure",
+      "requires": [
+        "Substrate pressure must reach at least 50/100.",
+        "Ductile Substrate must reach at least 22/100.",
+        "Volatile Substrate must reach at least 22/100."
+      ],
+      "favours": [
+        "Valuable Substrate helps when present."
+      ],
+      "tradeBand": "Rare",
+      "isRealityCurrency": false,
+      "currentUses": [
+        "No current Village construction recipe uses this resource."
+      ],
+      "assetURL": "/game-assets/resources/mercury.png"
+    },
+    {
+      "id": "adamant",
+      "slug": "adamant",
+      "name": "Adamant",
+      "summary": "Mostly shaped by Substrate pressure.",
+      "drivenBy": "Substrate pressure",
+      "requires": [
+        "Substrate pressure must reach at least 78/100.",
+        "Hard Substrate must reach at least 30/100."
+      ],
+      "favours": [
+        "Unstable ground helps when present.",
+        "Valuable Substrate helps when present."
+      ],
+      "tradeBand": "Precious",
+      "isRealityCurrency": false,
+      "currentUses": [
+        "No current Village construction recipe uses this resource."
+      ],
+      "assetURL": "/game-assets/resources/adamant.png"
+    },
+    {
+      "id": "fiber",
+      "slug": "fiber",
+      "name": "Fibre",
+      "summary": "Mostly shaped by Growth pressure.",
+      "drivenBy": "Growth pressure",
+      "requires": [
+        "Growth production must reach at least 3/100."
+      ],
+      "favours": [
+        "Growth trophic depth helps at 20/100 or more.",
+        "Available water helps at 25/100 or more."
+      ],
+      "tradeBand": "Staple",
+      "isRealityCurrency": false,
+      "currentUses": [
+        "Used to construct the Blacksmith.",
+        "Used to construct the Tannery.",
+        "Used to construct the Bowyer.",
+        "Used to construct the Wayfarer's Table."
+      ],
+      "assetURL": "/game-assets/resources/fiber.png"
+    },
+    {
+      "id": "timber",
+      "slug": "timber",
+      "name": "Timber",
+      "summary": "Mostly shaped by Growth pressure.",
+      "drivenBy": "Growth pressure",
+      "requires": [
+        "Growth production must reach at least 25/100."
+      ],
+      "favours": [
+        "Relief verticality helps at 40/100 or more.",
+        "Available water helps at 30/100 or more."
+      ],
+      "tradeBand": "Staple",
+      "isRealityCurrency": false,
+      "currentUses": [
+        "Used to construct the Tannery.",
+        "Used to construct the Bowyer.",
+        "Used to construct the Scriptorium.",
+        "Used to construct the Survey Post.",
+        "Used to construct the Wayfarer's Table."
+      ],
+      "assetURL": "/game-assets/resources/timber.png"
+    },
+    {
+      "id": "pulp",
+      "slug": "pulp",
+      "name": "Pulp",
+      "summary": "Mostly shaped by Growth pressure.",
+      "drivenBy": "Growth pressure",
+      "requires": [
+        "Growth production must reach at least 18/100."
+      ],
+      "favours": [
+        "Available water helps at 40/100 or more.",
+        "Growth trophic depth helps at 30/100 or more."
+      ],
+      "tradeBand": "Staple",
+      "isRealityCurrency": false,
+      "currentUses": [
+        "Used to construct the Wayfarer's Table.",
+        "Used to construct the Anchorage."
+      ],
+      "assetURL": "/game-assets/resources/pulp.png"
+    },
+    {
+      "id": "resin",
+      "slug": "resin",
+      "name": "Resin",
+      "summary": "Mostly shaped by Growth pressure.",
+      "drivenBy": "Growth pressure",
+      "requires": [
+        "Growth production must reach at least 25/100.",
+        "Thermal pressure must reach at least 45/100."
+      ],
+      "favours": [
+        "Growth dispersion helps at 40/100 or less."
+      ],
+      "tradeBand": "Staple",
+      "isRealityCurrency": false,
+      "currentUses": [
+        "Used to construct the Bowyer."
+      ],
+      "assetURL": "/game-assets/resources/resin.png"
+    },
+    {
+      "id": "toxin",
+      "slug": "toxin",
+      "name": "Toxin",
+      "summary": "Mostly shaped by Growth pressure.",
+      "drivenBy": "Growth pressure",
+      "requires": [
+        "Growth production must reach at least 18/100."
+      ],
+      "favours": [
+        "Toxic Growth helps when present.",
+        "Toxic air helps when present."
+      ],
+      "tradeBand": "Uncommon",
+      "isRealityCurrency": false,
+      "currentUses": [
+        "No current Village construction recipe uses this resource."
+      ],
+      "assetURL": "/game-assets/resources/toxin.png"
+    },
+    {
+      "id": "spore",
+      "slug": "spore",
+      "name": "Spore",
+      "summary": "Mostly shaped by Growth pressure.",
+      "drivenBy": "Growth pressure",
+      "requires": [
+        "Fungal Growth must be present."
+      ],
+      "favours": [
+        "Illumination pressure helps at 25/100 or less.",
+        "Decaying Growth helps when present."
+      ],
+      "tradeBand": "Uncommon",
+      "isRealityCurrency": false,
+      "currentUses": [
+        "No current Village construction recipe uses this resource."
+      ],
+      "assetURL": "/game-assets/resources/spore.png"
+    },
+    {
+      "id": "reagent",
+      "slug": "reagent",
+      "name": "Reagent",
+      "summary": "Mostly shaped by Substrate pressure.",
+      "drivenBy": "Substrate pressure",
+      "requires": [
+        "Volatile Substrate must reach at least 35/100.",
+        "Substrate pressure must reach at least 20/100."
+      ],
+      "favours": [
+        "Chemosynthetic Growth helps when present.",
+        "Toxic air helps when present."
+      ],
+      "tradeBand": "Uncommon",
+      "isRealityCurrency": false,
+      "currentUses": [
+        "Used to construct the Apothecary."
+      ],
+      "assetURL": "/game-assets/resources/reagent.png"
+    },
+    {
+      "id": "ichor",
+      "slug": "ichor",
+      "name": "Ichor",
+      "summary": "Mostly shaped by Growth pressure.",
+      "drivenBy": "Growth pressure",
+      "requires": [
+        "Growth pressure must reach at least 38/100."
+      ],
+      "favours": [
+        "Sourceless light helps when present."
+      ],
+      "tradeBand": "Rare",
+      "isRealityCurrency": false,
+      "currentUses": [
+        "No current Village construction recipe uses this resource."
+      ],
+      "assetURL": "/game-assets/resources/ichor.png"
+    },
+    {
+      "id": "rift_glass",
+      "slug": "rift-glass",
+      "name": "Rift-glass",
+      "summary": "Mostly shaped by Substrate pressure.",
+      "drivenBy": "Substrate pressure",
+      "requires": [
+        "Unstable ground must be present.",
+        "Substrate pressure must reach at least 45/100."
+      ],
+      "favours": [
+        "Valuable Substrate helps when present.",
+        "Irregular World cycle helps when present."
+      ],
+      "tradeBand": "Rare",
+      "isRealityCurrency": false,
+      "currentUses": [
+        "No current Village construction recipe uses this resource."
+      ],
+      "assetURL": "/game-assets/resources/rift_glass.png"
+    },
+    {
+      "id": "essence_raw",
+      "slug": "essence-raw",
+      "name": "Raw Essence",
+      "summary": "Mostly shaped by Illumination pressure.",
+      "drivenBy": "Illumination pressure",
+      "requires": [],
+      "favours": [
+        "Sourceless light helps when present.",
+        "Irregular World cycle helps when present."
+      ],
+      "tradeBand": "Nontradeable",
+      "isRealityCurrency": false,
+      "currentUses": [
+        "No current Village construction recipe uses this resource."
+      ],
+      "assetURL": "/game-assets/resources/essence_raw.png"
+    },
+    {
+      "id": "mote",
+      "slug": "mote",
+      "name": "Mote",
+      "summary": "Mostly shaped by Substrate pressure.",
+      "drivenBy": "Substrate pressure",
+      "requires": [
+        "Substrate pressure must reach at least 45/100."
+      ],
+      "favours": [
+        "Volatile Substrate helps at 20/100 or more.",
+        "Valuable Substrate helps when present."
+      ],
+      "tradeBand": "Nontradeable",
+      "isRealityCurrency": true,
+      "currentUses": [
+        "No current Village construction recipe uses this resource."
+      ],
+      "assetURL": "/game-assets/resources/mote.png"
+    }
+  ],
+  "items": [
+    {
+      "id": "essence_crystal",
+      "slug": "essence-crystal",
+      "name": "Essence Crystal",
+      "type": "treasure",
+      "category": "treasure",
+      "summary": "Essence held in a stable quartz lattice. Auber records what made it possible.",
+      "rarity": "rare",
+      "gear": null,
+      "consumable": null,
+      "tradingPostDisposition": "protected",
+      "recyclerDisposition": "notGear",
+      "assetURL": "/game-assets/items/essence_crystal.png"
+    },
+    {
+      "id": "heat_core",
+      "slug": "heat-core",
+      "name": "Heat Core",
+      "type": "treasure",
+      "category": "treasure",
+      "summary": "A provenanced concentration of heat, prepared for a Channelworks housing.",
+      "rarity": "rare",
+      "gear": null,
+      "consumable": null,
+      "tradingPostDisposition": "protected",
+      "recyclerDisposition": "notGear",
+      "assetURL": "/game-assets/items/heat_core.png"
+    },
+    {
+      "id": "caustic_core",
+      "slug": "caustic-core",
+      "name": "Caustic Core",
+      "type": "treasure",
+      "category": "treasure",
+      "summary": "A provenanced caustic concentration, prepared for a Channelworks housing.",
+      "rarity": "rare",
+      "gear": null,
+      "consumable": null,
+      "tradingPostDisposition": "protected",
+      "recyclerDisposition": "notGear",
+      "assetURL": "/game-assets/items/caustic_core.png"
+    },
+    {
+      "id": "light_core",
+      "slug": "light-core",
+      "name": "Light Core",
+      "type": "treasure",
+      "category": "treasure",
+      "summary": "A provenanced concentration of light, prepared for a Channelworks housing.",
+      "rarity": "rare",
+      "gear": null,
+      "consumable": null,
+      "tradingPostDisposition": "protected",
+      "recyclerDisposition": "notGear",
+      "assetURL": "/game-assets/items/light_core.png"
+    },
+    {
+      "id": "conduit_fixture",
+      "slug": "conduit-fixture",
+      "name": "Heat Conduit Fixture",
+      "type": "treasure",
+      "category": "treasure",
+      "summary": "Oda's first contained Conduit housing, carrying the recorded origin of the core inside it.",
+      "rarity": "rare",
+      "gear": null,
+      "consumable": null,
+      "tradingPostDisposition": "protected",
+      "recyclerDisposition": "protected",
+      "assetURL": "/game-assets/items/conduit_fixture.png"
+    },
+    {
+      "id": "curio_humming_shard",
+      "slug": "curio-humming-shard",
+      "name": "Humming Shard",
+      "type": "curio",
+      "category": "curio",
+      "summary": "It hums when you are not listening.",
+      "rarity": "uncommon",
+      "gear": null,
+      "consumable": null,
+      "tradingPostDisposition": "sellable",
+      "recyclerDisposition": "notGear",
+      "assetURL": "/game-assets/items/curio_humming_shard.png"
+    },
+    {
+      "id": "curio_bound_knot",
+      "slug": "curio-bound-knot",
+      "name": "Bound Knot",
+      "type": "curio",
+      "category": "curio",
+      "summary": "Tied by someone who meant it to stay tied.",
+      "rarity": "rare",
+      "gear": null,
+      "consumable": null,
+      "tradingPostDisposition": "sellable",
+      "recyclerDisposition": "notGear",
+      "assetURL": "/game-assets/items/curio_bound_knot.png"
+    },
+    {
+      "id": "salve_lesser",
+      "slug": "salve-lesser",
+      "name": "Lesser Salve",
+      "type": "consumable",
+      "category": "consumable",
+      "summary": "Restores a little health to one party member.",
+      "rarity": "common",
+      "gear": null,
+      "consumable": {
+        "effect": "heal",
+        "potency": 10,
+        "beneficialScalingField": "healingMagnitude"
+      },
+      "tradingPostDisposition": "sellable",
+      "recyclerDisposition": "notGear",
+      "assetURL": "/game-assets/items/salve_lesser.png"
+    },
+    {
+      "id": "salve",
+      "slug": "salve",
+      "name": "Salve",
+      "type": "consumable",
+      "category": "consumable",
+      "summary": "Restores a useful measure of health to one party member.",
+      "rarity": "uncommon",
+      "gear": null,
+      "consumable": {
+        "effect": "heal",
+        "potency": 24,
+        "beneficialScalingField": "healingMagnitude"
+      },
+      "tradingPostDisposition": "sellable",
+      "recyclerDisposition": "notGear",
+      "assetURL": "/game-assets/items/salve.png"
+    },
+    {
+      "id": "salve_greater",
+      "slug": "salve-greater",
+      "name": "Greater Salve",
+      "type": "consumable",
+      "category": "consumable",
+      "summary": "Enough medicine to turn a grave injury into a survivable one.",
+      "rarity": "rare",
+      "gear": null,
+      "consumable": {
+        "effect": "heal",
+        "potency": 45,
+        "beneficialScalingField": "healingMagnitude"
+      },
+      "tradingPostDisposition": "sellable",
+      "recyclerDisposition": "notGear",
+      "assetURL": "/game-assets/items/salve_greater.png"
+    },
+    {
+      "id": "draught_clearing",
+      "slug": "draught-clearing",
+      "name": "Draught of Clearing",
+      "type": "consumable",
+      "category": "consumable",
+      "summary": "Clears poison and closes a bleeding wound.",
+      "rarity": "uncommon",
+      "gear": null,
+      "consumable": {
+        "effect": "clearPoison",
+        "potency": 0,
+        "beneficialScalingField": "none"
+      },
+      "tradingPostDisposition": "sellable",
+      "recyclerDisposition": "notGear",
+      "assetURL": "/game-assets/items/draught_clearing.png"
+    },
+    {
+      "id": "draught_quenching",
+      "slug": "draught-quenching",
+      "name": "Quenching Draught",
+      "type": "consumable",
+      "category": "consumable",
+      "summary": "Quenches burning and clears the eyes after a dazzling emanation.",
+      "rarity": "uncommon",
+      "gear": null,
+      "consumable": {
+        "effect": "clearElemental",
+        "potency": 0,
+        "beneficialScalingField": "none"
+      },
+      "tradingPostDisposition": "sellable",
+      "recyclerDisposition": "notGear",
+      "assetURL": "/game-assets/items/draught_quenching.png"
+    },
+    {
+      "id": "antidote_broad",
+      "slug": "antidote-broad",
+      "name": "Broad Antidote",
+      "type": "consumable",
+      "category": "consumable",
+      "summary": "Draws out one affliction, whatever shape it took.",
+      "rarity": "rare",
+      "gear": null,
+      "consumable": {
+        "effect": "clearAnyStatus",
+        "potency": 0,
+        "beneficialScalingField": "none"
+      },
+      "tradingPostDisposition": "sellable",
+      "recyclerDisposition": "notGear",
+      "assetURL": "/game-assets/items/antidote_broad.png"
+    },
+    {
+      "id": "stonebark_tonic",
+      "slug": "stonebark-tonic",
+      "name": "Stonebark Tonic",
+      "type": "consumable",
+      "category": "consumable",
+      "summary": "Turns aside the next affliction that would take hold.",
+      "rarity": "uncommon",
+      "gear": null,
+      "consumable": {
+        "effect": "preventStatus",
+        "potency": 1,
+        "beneficialScalingField": "none"
+      },
+      "tradingPostDisposition": "sellable",
+      "recyclerDisposition": "notGear",
+      "assetURL": "/game-assets/items/stonebark_tonic.png"
+    },
+    {
+      "id": "venom",
+      "slug": "venom",
+      "name": "Venom",
+      "type": "consumable",
+      "category": "consumable",
+      "summary": "Coats one weapon so its next strike leaves poison behind.",
+      "rarity": "uncommon",
+      "gear": null,
+      "consumable": {
+        "effect": "coatPoison",
+        "potency": 0,
+        "beneficialScalingField": "none"
+      },
+      "tradingPostDisposition": "sellable",
+      "recyclerDisposition": "notGear",
+      "assetURL": "/game-assets/items/venom.png"
+    },
+    {
+      "id": "firebrand",
+      "slug": "firebrand",
+      "name": "Firebrand",
+      "type": "consumable",
+      "category": "consumable",
+      "summary": "Coats one weapon so its next strike keeps burning.",
+      "rarity": "uncommon",
+      "gear": null,
+      "consumable": {
+        "effect": "coatBurn",
+        "potency": 0,
+        "beneficialScalingField": "none"
+      },
+      "tradingPostDisposition": "sellable",
+      "recyclerDisposition": "notGear",
+      "assetURL": "/game-assets/items/firebrand.png"
+    },
+    {
+      "id": "briar_oil",
+      "slug": "briar-oil",
+      "name": "Briar Oil",
+      "type": "consumable",
+      "category": "consumable",
+      "summary": "Coats one weapon so its next strike leaves a stubborn wound.",
+      "rarity": "uncommon",
+      "gear": null,
+      "consumable": {
+        "effect": "coatBleed",
+        "potency": 0,
+        "beneficialScalingField": "none"
+      },
+      "tradingPostDisposition": "sellable",
+      "recyclerDisposition": "notGear",
+      "assetURL": "/game-assets/items/briar_oil.png"
+    },
+    {
+      "id": "flashsalt",
+      "slug": "flashsalt",
+      "name": "Flashsalt",
+      "type": "consumable",
+      "category": "consumable",
+      "summary": "Coats one weapon so its next strike dazzles its target.",
+      "rarity": "uncommon",
+      "gear": null,
+      "consumable": {
+        "effect": "coatDazzle",
+        "potency": 0,
+        "beneficialScalingField": "none"
+      },
+      "tradingPostDisposition": "sellable",
+      "recyclerDisposition": "notGear",
+      "assetURL": "/game-assets/items/flashsalt.png"
+    },
+    {
+      "id": "solvent",
+      "slug": "solvent",
+      "name": "Solvent",
+      "type": "consumable",
+      "category": "consumable",
+      "summary": "Reveals one unidentified curio while still in the field.",
+      "rarity": "uncommon",
+      "gear": null,
+      "consumable": {
+        "effect": "identifyCurio",
+        "potency": 0,
+        "beneficialScalingField": "none"
+      },
+      "tradingPostDisposition": "sellable",
+      "recyclerDisposition": "notGear",
+      "assetURL": "/game-assets/items/solvent.png"
+    },
+    {
+      "id": "lure",
+      "slug": "lure",
+      "name": "Lure",
+      "type": "consumable",
+      "category": "consumable",
+      "summary": "Wakes the nearest roaming creature and draws it toward you.",
+      "rarity": "uncommon",
+      "gear": null,
+      "consumable": {
+        "effect": "lureCreature",
+        "potency": 0,
+        "beneficialScalingField": "none"
+      },
+      "tradingPostDisposition": "sellable",
+      "recyclerDisposition": "notGear",
+      "assetURL": "/game-assets/items/lure.png"
+    },
+    {
+      "id": "scent_mask",
+      "slug": "scent-mask",
+      "name": "Scent Mask",
+      "type": "consumable",
+      "category": "consumable",
+      "summary": "Animals relying on scent hesitate; other senses and close contact do not.",
+      "rarity": "common",
+      "gear": null,
+      "consumable": {
+        "effect": "maskScent",
+        "potency": 12,
+        "beneficialScalingField": "timedDuration"
+      },
+      "tradingPostDisposition": "sellable",
+      "recyclerDisposition": "notGear",
+      "assetURL": "/game-assets/items/scent_mask.png"
+    },
+    {
+      "id": "seamlight",
+      "slug": "seamlight",
+      "name": "Seamlight",
+      "type": "consumable",
+      "category": "consumable",
+      "summary": "Its light leans toward the nearest usable portal seam.",
+      "rarity": "uncommon",
+      "gear": null,
+      "consumable": {
+        "effect": "seamlightGuidance",
+        "potency": 0,
+        "beneficialScalingField": "none"
+      },
+      "tradingPostDisposition": "sellable",
+      "recyclerDisposition": "notGear",
+      "assetURL": null
+    },
+    {
+      "id": "stillwater",
+      "slug": "stillwater",
+      "name": "Stillwater",
+      "type": "consumable",
+      "category": "consumable",
+      "summary": "Coaxes a failing world into holding together a little longer.",
+      "rarity": "rare",
+      "gear": null,
+      "consumable": {
+        "effect": "restoreStability",
+        "potency": 25,
+        "beneficialScalingField": "none"
+      },
+      "tradingPostDisposition": "sellable",
+      "recyclerDisposition": "notGear",
+      "assetURL": "/game-assets/items/stillwater.png"
+    },
+    {
+      "id": "waystone",
+      "slug": "waystone",
+      "name": "Waystone",
+      "type": "consumable",
+      "category": "consumable",
+      "summary": "Forces a way home immediately, carrying the whole haul with you.",
+      "rarity": "mythic",
+      "gear": null,
+      "consumable": {
+        "effect": "returnHome",
+        "potency": 0,
+        "beneficialScalingField": "none"
+      },
+      "tradingPostDisposition": "sellable",
+      "recyclerDisposition": "notGear",
+      "assetURL": "/game-assets/items/waystone.png"
+    },
+    {
+      "id": "torch",
+      "slug": "torch",
+      "name": "Torch",
+      "type": "consumable",
+      "category": "consumable",
+      "summary": "Pushes the dark back for the rest of this journey.",
+      "rarity": "common",
+      "gear": null,
+      "consumable": {
+        "effect": "lightWorld",
+        "potency": 2,
+        "beneficialScalingField": "none"
+      },
+      "tradingPostDisposition": "sellable",
+      "recyclerDisposition": "notGear",
+      "assetURL": "/game-assets/items/torch.png"
+    },
+    {
+      "id": "farsight_draught",
+      "slug": "farsight-draught",
+      "name": "Farsight Draught",
+      "type": "consumable",
+      "category": "consumable",
+      "summary": "Reveals the nearest site and a little of the country around it.",
+      "rarity": "rare",
+      "gear": null,
+      "consumable": {
+        "effect": "farsight",
+        "potency": 2,
+        "beneficialScalingField": "none"
+      },
+      "tradingPostDisposition": "sellable",
+      "recyclerDisposition": "notGear",
+      "assetURL": "/game-assets/items/farsight_draught.png"
+    },
+    {
+      "id": "cache_key",
+      "slug": "cache-key",
+      "name": "Cache Key",
+      "type": "key",
+      "category": "key",
+      "summary": "Fits a lock in a world that is not this one.",
+      "rarity": "rare",
+      "gear": null,
+      "consumable": null,
+      "tradingPostDisposition": "protected",
+      "recyclerDisposition": "notGear",
+      "assetURL": "/game-assets/items/cache_key.png"
+    },
+    {
+      "id": "anchor_frame",
+      "slug": "anchor-frame",
+      "name": "Anchor Frame",
+      "type": "key",
+      "category": "key",
+      "summary": "A carried binding strong enough to fasten one world back into the Atlas.",
+      "rarity": "mythic",
+      "gear": null,
+      "consumable": null,
+      "tradingPostDisposition": "protected",
+      "recyclerDisposition": "notGear",
+      "assetURL": "/game-assets/items/anchor_frame.png"
+    },
+    {
+      "id": "blade_chipped",
+      "slug": "blade-chipped",
+      "name": "Chipped Blade",
+      "type": "gear",
+      "category": "gear",
+      "summary": "Somebody's, once. It still holds an edge on one side.",
+      "rarity": "common",
+      "gear": {
+        "slot": "weapon",
+        "tier": 1,
+        "damage": "rend",
+        "reach": "close"
+      },
+      "consumable": null,
+      "tradingPostDisposition": "sellable",
+      "recyclerDisposition": "recyclable",
+      "assetURL": "/game-assets/items/blade_chipped.png"
+    },
+    {
+      "id": "blade_keen",
+      "slug": "blade-keen",
+      "name": "Keen Blade",
+      "type": "gear",
+      "category": "gear",
+      "summary": "Balanced, and cared for. Whoever left it did not mean to.",
+      "rarity": "uncommon",
+      "gear": {
+        "slot": "weapon",
+        "tier": 2,
+        "damage": "pierce",
+        "reach": "close"
+      },
+      "consumable": null,
+      "tradingPostDisposition": "sellable",
+      "recyclerDisposition": "recyclable",
+      "assetURL": "/game-assets/items/blade_keen.png"
+    },
+    {
+      "id": "ripping_hook",
+      "slug": "ripping-hook",
+      "name": "Ripping Hook",
+      "type": "gear",
+      "category": "gear",
+      "summary": "It was made to open things that did not want opening.",
+      "rarity": "rare",
+      "gear": {
+        "slot": "weapon",
+        "tier": 3,
+        "damage": "rend",
+        "reach": "close"
+      },
+      "consumable": null,
+      "tradingPostDisposition": "sellable",
+      "recyclerDisposition": "recyclable",
+      "assetURL": "/game-assets/items/ripping_hook.png"
+    },
+    {
+      "id": "the_long_grievance",
+      "slug": "the-long-grievance",
+      "name": "The Long Grievance",
+      "type": "gear",
+      "category": "gear",
+      "summary": "Nobody agrees on what it was first used for.",
+      "rarity": "mythic",
+      "gear": {
+        "slot": "weapon",
+        "tier": 4,
+        "damage": "rend",
+        "reach": "close",
+        "reactivity": 70
+      },
+      "consumable": null,
+      "tradingPostDisposition": "sellable",
+      "recyclerDisposition": "recyclable",
+      "assetURL": "/game-assets/items/the_long_grievance.png"
+    },
+    {
+      "id": "bone_awl",
+      "slug": "bone-awl",
+      "name": "Bone Awl",
+      "type": "gear",
+      "category": "gear",
+      "summary": "Ground to a point against something harder.",
+      "rarity": "common",
+      "gear": {
+        "slot": "weapon",
+        "tier": 1,
+        "damage": "pierce",
+        "reach": "close"
+      },
+      "consumable": null,
+      "tradingPostDisposition": "sellable",
+      "recyclerDisposition": "recyclable",
+      "assetURL": "/game-assets/items/bone_awl.png"
+    },
+    {
+      "id": "raking_edge",
+      "slug": "raking-edge",
+      "name": "Raking Edge",
+      "type": "gear",
+      "category": "gear",
+      "summary": "Notched all along one side, and the notches are the point.",
+      "rarity": "uncommon",
+      "gear": {
+        "slot": "weapon",
+        "tier": 2,
+        "damage": "rend",
+        "reach": "close"
+      },
+      "consumable": null,
+      "tradingPostDisposition": "sellable",
+      "recyclerDisposition": "recyclable",
+      "assetURL": "/game-assets/items/raking_edge.png"
+    },
+    {
+      "id": "blade_binders",
+      "slug": "blade-binders",
+      "name": "Binder's Edge",
+      "type": "gear",
+      "category": "gear",
+      "summary": "Marked along the spine in a hand you almost recognise.",
+      "rarity": "rare",
+      "gear": {
+        "slot": "weapon",
+        "tier": 3,
+        "damage": "pierce",
+        "reach": "mid"
+      },
+      "consumable": null,
+      "tradingPostDisposition": "sellable",
+      "recyclerDisposition": "recyclable",
+      "assetURL": "/game-assets/items/blade_binders.png"
+    },
+    {
+      "id": "hairsplitter",
+      "slug": "hairsplitter",
+      "name": "Hairsplitter",
+      "type": "gear",
+      "category": "gear",
+      "summary": "It has never once been resharpened.",
+      "rarity": "mythic",
+      "gear": {
+        "slot": "weapon",
+        "tier": 4,
+        "damage": "pierce",
+        "reach": "close",
+        "reactivity": 70
+      },
+      "consumable": null,
+      "tradingPostDisposition": "sellable",
+      "recyclerDisposition": "recyclable",
+      "assetURL": "/game-assets/items/hairsplitter.png"
+    },
+    {
+      "id": "field_maul",
+      "slug": "field-maul",
+      "name": "Field Maul",
+      "type": "gear",
+      "category": "gear",
+      "summary": "A weight on a handle. It asks nothing of you.",
+      "rarity": "common",
+      "gear": {
+        "slot": "weapon",
+        "tier": 1,
+        "damage": "crush",
+        "reach": "close"
+      },
+      "consumable": null,
+      "tradingPostDisposition": "sellable",
+      "recyclerDisposition": "recyclable",
+      "assetURL": "/game-assets/items/field_maul.png"
+    },
+    {
+      "id": "banded_mace",
+      "slug": "banded-mace",
+      "name": "Banded Mace",
+      "type": "gear",
+      "category": "gear",
+      "summary": "Ringed against the shock of its own work.",
+      "rarity": "uncommon",
+      "gear": {
+        "slot": "weapon",
+        "tier": 2,
+        "damage": "crush",
+        "reach": "close"
+      },
+      "consumable": null,
+      "tradingPostDisposition": "sellable",
+      "recyclerDisposition": "recyclable",
+      "assetURL": "/game-assets/items/banded_mace.png"
+    },
+    {
+      "id": "anvilfall",
+      "slug": "anvilfall",
+      "name": "Anvilfall",
+      "type": "gear",
+      "category": "gear",
+      "summary": "Two hands, and a moment's warning.",
+      "rarity": "rare",
+      "gear": {
+        "slot": "weapon",
+        "tier": 3,
+        "damage": "crush",
+        "reach": "close"
+      },
+      "consumable": null,
+      "tradingPostDisposition": "sellable",
+      "recyclerDisposition": "recyclable",
+      "assetURL": "/game-assets/items/anvilfall.png"
+    },
+    {
+      "id": "the_settled_argument",
+      "slug": "the-settled-argument",
+      "name": "The Settled Argument",
+      "type": "gear",
+      "category": "gear",
+      "summary": "Heavier than it looks, and it looks heavy.",
+      "rarity": "mythic",
+      "gear": {
+        "slot": "weapon",
+        "tier": 4,
+        "damage": "crush",
+        "reach": "close",
+        "reactivity": 70
+      },
+      "consumable": null,
+      "tradingPostDisposition": "sellable",
+      "recyclerDisposition": "recyclable",
+      "assetURL": "/game-assets/items/the_settled_argument.png"
+    },
+    {
+      "id": "long_pick",
+      "slug": "long-pick",
+      "name": "Long Pick",
+      "type": "gear",
+      "category": "gear",
+      "summary": "Reach, at the cost of everything else.",
+      "rarity": "common",
+      "gear": {
+        "slot": "weapon",
+        "tier": 1,
+        "damage": "pierce",
+        "reach": "mid"
+      },
+      "consumable": null,
+      "tradingPostDisposition": "sellable",
+      "recyclerDisposition": "recyclable",
+      "assetURL": "/game-assets/items/long_pick.png"
+    },
+    {
+      "id": "warded_spear",
+      "slug": "warded-spear",
+      "name": "Warded Spear",
+      "type": "gear",
+      "category": "gear",
+      "summary": "Keeps the thing you are fighting where it is.",
+      "rarity": "uncommon",
+      "gear": {
+        "slot": "weapon",
+        "tier": 2,
+        "damage": "pierce",
+        "reach": "mid"
+      },
+      "consumable": null,
+      "tradingPostDisposition": "sellable",
+      "recyclerDisposition": "recyclable",
+      "assetURL": "/game-assets/items/warded_spear.png"
+    },
+    {
+      "id": "parting_needle",
+      "slug": "parting-needle",
+      "name": "Parting Needle",
+      "type": "gear",
+      "category": "gear",
+      "summary": "Goes in where there is no gap, and makes one.",
+      "rarity": "rare",
+      "gear": {
+        "slot": "weapon",
+        "tier": 3,
+        "damage": "pierce",
+        "reach": "close"
+      },
+      "consumable": null,
+      "tradingPostDisposition": "sellable",
+      "recyclerDisposition": "recyclable",
+      "assetURL": "/game-assets/items/parting_needle.png"
+    },
+    {
+      "id": "the_kept_distance",
+      "slug": "the-kept-distance",
+      "name": "The Kept Distance",
+      "type": "gear",
+      "category": "gear",
+      "summary": "Whoever carried this was never touched.",
+      "rarity": "mythic",
+      "gear": {
+        "slot": "weapon",
+        "tier": 4,
+        "damage": "pierce",
+        "reach": "mid",
+        "reactivity": 70
+      },
+      "consumable": null,
+      "tradingPostDisposition": "sellable",
+      "recyclerDisposition": "recyclable",
+      "assetURL": "/game-assets/items/the_kept_distance.png"
+    },
+    {
+      "id": "split_board",
+      "slug": "split-board",
+      "name": "Split Board",
+      "type": "gear",
+      "category": "gear",
+      "summary": "Held together by habit.",
+      "rarity": "common",
+      "gear": {
+        "slot": "offhand",
+        "tier": 1
+      },
+      "consumable": null,
+      "tradingPostDisposition": "sellable",
+      "recyclerDisposition": "recyclable",
+      "assetURL": "/game-assets/items/split_board.png"
+    },
+    {
+      "id": "banded_buckler",
+      "slug": "banded-buckler",
+      "name": "Banded Buckler",
+      "type": "gear",
+      "category": "gear",
+      "summary": "Small, quick, and enough.",
+      "rarity": "uncommon",
+      "gear": {
+        "slot": "offhand",
+        "tier": 2
+      },
+      "consumable": null,
+      "tradingPostDisposition": "sellable",
+      "recyclerDisposition": "recyclable",
+      "assetURL": "/game-assets/items/banded_buckler.png"
+    },
+    {
+      "id": "tower_guard",
+      "slug": "tower-guard",
+      "name": "Tower Guard",
+      "type": "gear",
+      "category": "gear",
+      "summary": "You can put the whole world behind it.",
+      "rarity": "rare",
+      "gear": {
+        "slot": "offhand",
+        "tier": 3
+      },
+      "consumable": null,
+      "tradingPostDisposition": "sellable",
+      "recyclerDisposition": "recyclable",
+      "assetURL": "/game-assets/items/tower_guard.png"
+    },
+    {
+      "id": "the_unarguable",
+      "slug": "the-unarguable",
+      "name": "The Unarguable",
+      "type": "gear",
+      "category": "gear",
+      "summary": "Nothing has got past it yet.",
+      "rarity": "mythic",
+      "gear": {
+        "slot": "offhand",
+        "tier": 4
+      },
+      "consumable": null,
+      "tradingPostDisposition": "sellable",
+      "recyclerDisposition": "recyclable",
+      "assetURL": "/game-assets/items/the_unarguable.png"
+    },
+    {
+      "id": "padded_cap",
+      "slug": "padded-cap",
+      "name": "Padded Cap",
+      "type": "gear",
+      "category": "gear",
+      "summary": "Better than the alternative.",
+      "rarity": "common",
+      "gear": {
+        "slot": "head",
+        "tier": 1,
+        "insulation": 65
+      },
+      "consumable": null,
+      "tradingPostDisposition": "sellable",
+      "recyclerDisposition": "recyclable",
+      "assetURL": "/game-assets/items/padded_cap.png"
+    },
+    {
+      "id": "ridged_helm",
+      "slug": "ridged-helm",
+      "name": "Ridged Helm",
+      "type": "gear",
+      "category": "gear",
+      "summary": "Turns a blow rather than taking it.",
+      "rarity": "uncommon",
+      "gear": {
+        "slot": "head",
+        "tier": 2
+      },
+      "consumable": null,
+      "tradingPostDisposition": "sellable",
+      "recyclerDisposition": "recyclable",
+      "assetURL": "/game-assets/items/ridged_helm.png"
+    },
+    {
+      "id": "visored_casque",
+      "slug": "visored-casque",
+      "name": "Visored Casque",
+      "type": "gear",
+      "category": "gear",
+      "summary": "You see less, and you keep seeing.",
+      "rarity": "rare",
+      "gear": {
+        "slot": "head",
+        "tier": 3
+      },
+      "consumable": null,
+      "tradingPostDisposition": "sellable",
+      "recyclerDisposition": "recyclable",
+      "assetURL": "/game-assets/items/visored_casque.png"
+    },
+    {
+      "id": "crown_of_quiet",
+      "slug": "crown-of-quiet",
+      "name": "Crown of Quiet",
+      "type": "gear",
+      "category": "gear",
+      "summary": "It muffles more than sound.",
+      "rarity": "mythic",
+      "gear": {
+        "slot": "head",
+        "tier": 4
+      },
+      "consumable": null,
+      "tradingPostDisposition": "sellable",
+      "recyclerDisposition": "recyclable",
+      "assetURL": "/game-assets/items/crown_of_quiet.png"
+    },
+    {
+      "id": "guard_padded",
+      "slug": "guard-padded",
+      "name": "Padded Guard",
+      "type": "gear",
+      "category": "gear",
+      "summary": "Layered cloth and patience. Better than nothing, which is what you had.",
+      "rarity": "common",
+      "gear": {
+        "slot": "armor",
+        "tier": 1,
+        "insulation": 65
+      },
+      "consumable": null,
+      "tradingPostDisposition": "sellable",
+      "recyclerDisposition": "recyclable",
+      "assetURL": "/game-assets/items/guard_padded.png"
+    },
+    {
+      "id": "guard_banded",
+      "slug": "guard-banded",
+      "name": "Banded Guard",
+      "type": "gear",
+      "category": "gear",
+      "summary": "Someone spent a winter on this.",
+      "rarity": "uncommon",
+      "gear": {
+        "slot": "armor",
+        "tier": 2
+      },
+      "consumable": null,
+      "tradingPostDisposition": "sellable",
+      "recyclerDisposition": "recyclable",
+      "assetURL": "/game-assets/items/guard_banded.png"
+    },
+    {
+      "id": "guard_vault",
+      "slug": "guard-vault",
+      "name": "Vaultplate",
+      "type": "gear",
+      "category": "gear",
+      "summary": "Cold to the touch, and stays cold.",
+      "rarity": "rare",
+      "gear": {
+        "slot": "armor",
+        "tier": 3
+      },
+      "consumable": null,
+      "tradingPostDisposition": "sellable",
+      "recyclerDisposition": "recyclable",
+      "assetURL": "/game-assets/items/guard_vault.png"
+    },
+    {
+      "id": "the_standing_wall",
+      "slug": "the-standing-wall",
+      "name": "The Standing Wall",
+      "type": "gear",
+      "category": "gear",
+      "summary": "It has outlived several people who deserved better.",
+      "rarity": "mythic",
+      "gear": {
+        "slot": "armor",
+        "tier": 4
+      },
+      "consumable": null,
+      "tradingPostDisposition": "sellable",
+      "recyclerDisposition": "recyclable",
+      "assetURL": "/game-assets/items/the_standing_wall.png"
+    },
+    {
+      "id": "wrapped_hands",
+      "slug": "wrapped-hands",
+      "name": "Wrapped Hands",
+      "type": "gear",
+      "category": "gear",
+      "summary": "Cloth, and knots you tied yourself.",
+      "rarity": "common",
+      "gear": {
+        "slot": "hands",
+        "tier": 1,
+        "insulation": 65
+      },
+      "consumable": null,
+      "tradingPostDisposition": "sellable",
+      "recyclerDisposition": "recyclable",
+      "assetURL": "/game-assets/items/wrapped_hands.png"
+    },
+    {
+      "id": "studded_gloves",
+      "slug": "studded-gloves",
+      "name": "Studded Gloves",
+      "type": "gear",
+      "category": "gear",
+      "summary": "For holding things that object.",
+      "rarity": "uncommon",
+      "gear": {
+        "slot": "hands",
+        "tier": 2
+      },
+      "consumable": null,
+      "tradingPostDisposition": "sellable",
+      "recyclerDisposition": "recyclable",
+      "assetURL": "/game-assets/items/studded_gloves.png"
+    },
+    {
+      "id": "gauntlets_of_hold",
+      "slug": "gauntlets-of-hold",
+      "name": "Gauntlets of Hold",
+      "type": "gear",
+      "category": "gear",
+      "summary": "Your grip is no longer the weak part.",
+      "rarity": "rare",
+      "gear": {
+        "slot": "hands",
+        "tier": 3
+      },
+      "consumable": null,
+      "tradingPostDisposition": "sellable",
+      "recyclerDisposition": "recyclable",
+      "assetURL": "/game-assets/items/gauntlets_of_hold.png"
+    },
+    {
+      "id": "the_sure_hands",
+      "slug": "the-sure-hands",
+      "name": "The Sure Hands",
+      "type": "gear",
+      "category": "gear",
+      "summary": "They do not shake. You still might.",
+      "rarity": "mythic",
+      "gear": {
+        "slot": "hands",
+        "tier": 4
+      },
+      "consumable": null,
+      "tradingPostDisposition": "sellable",
+      "recyclerDisposition": "recyclable",
+      "assetURL": "/game-assets/items/the_sure_hands.png"
+    },
+    {
+      "id": "worn_boots",
+      "slug": "worn-boots",
+      "name": "Worn Boots",
+      "type": "gear",
+      "category": "gear",
+      "summary": "They have been further than you have.",
+      "rarity": "common",
+      "gear": {
+        "slot": "feet",
+        "tier": 1
+      },
+      "consumable": null,
+      "tradingPostDisposition": "sellable",
+      "recyclerDisposition": "recyclable",
+      "assetURL": "/game-assets/items/worn_boots.png"
+    },
+    {
+      "id": "shod_boots",
+      "slug": "shod-boots",
+      "name": "Shod Boots",
+      "type": "gear",
+      "category": "gear",
+      "summary": "Iron at the toe, for ground that bites.",
+      "rarity": "uncommon",
+      "gear": {
+        "slot": "feet",
+        "tier": 2
+      },
+      "consumable": null,
+      "tradingPostDisposition": "sellable",
+      "recyclerDisposition": "recyclable",
+      "assetURL": "/game-assets/items/shod_boots.png"
+    },
+    {
+      "id": "longstriders",
+      "slug": "longstriders",
+      "name": "Longstriders",
+      "type": "gear",
+      "category": "gear",
+      "summary": "The map got smaller when you put them on.",
+      "rarity": "rare",
+      "gear": {
+        "slot": "feet",
+        "tier": 3
+      },
+      "consumable": null,
+      "tradingPostDisposition": "sellable",
+      "recyclerDisposition": "recyclable",
+      "assetURL": "/game-assets/items/longstriders.png"
+    },
+    {
+      "id": "the_unhurried",
+      "slug": "the-unhurried",
+      "name": "The Unhurried",
+      "type": "gear",
+      "category": "gear",
+      "summary": "You arrive when you meant to.",
+      "rarity": "mythic",
+      "gear": {
+        "slot": "feet",
+        "tier": 4
+      },
+      "consumable": null,
+      "tradingPostDisposition": "sellable",
+      "recyclerDisposition": "recyclable",
+      "assetURL": "/game-assets/items/the_unhurried.png"
+    },
+    {
+      "id": "bent_pick",
+      "slug": "bent-pick",
+      "name": "Bent Pick",
+      "type": "gear",
+      "category": "gear",
+      "summary": "It works. That is the whole of its case.",
+      "rarity": "common",
+      "gear": {
+        "slot": "tool",
+        "tier": 1
+      },
+      "consumable": null,
+      "tradingPostDisposition": "sellable",
+      "recyclerDisposition": "recyclable",
+      "assetURL": "/game-assets/items/bent_pick.png"
+    },
+    {
+      "id": "balanced_pick",
+      "slug": "balanced-pick",
+      "name": "Balanced Pick",
+      "type": "gear",
+      "category": "gear",
+      "summary": "Swings where you meant it to.",
+      "rarity": "uncommon",
+      "gear": {
+        "slot": "tool",
+        "tier": 2
+      },
+      "consumable": null,
+      "tradingPostDisposition": "sellable",
+      "recyclerDisposition": "recyclable",
+      "assetURL": "/game-assets/items/balanced_pick.png"
+    },
+    {
+      "id": "corebreaker",
+      "slug": "corebreaker",
+      "name": "Corebreaker",
+      "type": "gear",
+      "category": "gear",
+      "summary": "Hard ground stopped being an argument.",
+      "rarity": "rare",
+      "gear": {
+        "slot": "tool",
+        "tier": 3
+      },
+      "consumable": null,
+      "tradingPostDisposition": "sellable",
+      "recyclerDisposition": "recyclable",
+      "assetURL": "/game-assets/items/corebreaker.png"
+    },
+    {
+      "id": "the_willing_edge",
+      "slug": "the-willing-edge",
+      "name": "The Willing Edge",
+      "type": "gear",
+      "category": "gear",
+      "summary": "It seems to know what you were about to do.",
+      "rarity": "mythic",
+      "gear": {
+        "slot": "tool",
+        "tier": 4
+      },
+      "consumable": null,
+      "tradingPostDisposition": "sellable",
+      "recyclerDisposition": "recyclable",
+      "assetURL": "/game-assets/items/the_willing_edge.png"
+    },
+    {
+      "id": "pressed_leaf",
+      "slug": "pressed-leaf",
+      "name": "Pressed Leaf",
+      "type": "gear",
+      "category": "gear",
+      "summary": "From somewhere. You remember which.",
+      "rarity": "common",
+      "gear": {
+        "slot": "keepsake",
+        "tier": 1
+      },
+      "consumable": null,
+      "tradingPostDisposition": "sellable",
+      "recyclerDisposition": "recyclable",
+      "assetURL": "/game-assets/items/pressed_leaf.png"
+    },
+    {
+      "id": "cold_compass",
+      "slug": "cold-compass",
+      "name": "Cold Compass",
+      "type": "gear",
+      "category": "gear",
+      "summary": "It does not point north. It points somewhere.",
+      "rarity": "uncommon",
+      "gear": {
+        "slot": "keepsake",
+        "tier": 2
+      },
+      "consumable": null,
+      "tradingPostDisposition": "sellable",
+      "recyclerDisposition": "recyclable",
+      "assetURL": "/game-assets/items/cold_compass.png"
+    },
+    {
+      "id": "someones_ring",
+      "slug": "someones-ring",
+      "name": "Someone's Ring",
+      "type": "gear",
+      "category": "gear",
+      "summary": "Too small for you. You keep it anyway.",
+      "rarity": "rare",
+      "gear": {
+        "slot": "keepsake",
+        "tier": 3
+      },
+      "consumable": null,
+      "tradingPostDisposition": "sellable",
+      "recyclerDisposition": "recyclable",
+      "assetURL": "/game-assets/items/someones_ring.png"
+    },
+    {
+      "id": "the_first_page",
+      "slug": "the-first-page",
+      "name": "The First Page",
+      "type": "gear",
+      "category": "gear",
+      "summary": "Torn out, and kept, and never read aloud.",
+      "rarity": "mythic",
+      "gear": {
+        "slot": "keepsake",
+        "tier": 4
+      },
+      "consumable": null,
+      "tradingPostDisposition": "sellable",
+      "recyclerDisposition": "recyclable",
+      "assetURL": "/game-assets/items/the_first_page.png"
+    },
+    {
+      "id": "two_natured_blade",
+      "slug": "two-natured-blade",
+      "name": "Two-Natured Blade",
+      "type": "gear",
+      "category": "gear",
+      "summary": "One edge bites and the other tears. Nothing you could forge is two things at once.",
+      "rarity": "rare",
+      "gear": {
+        "slot": "weapon",
+        "tier": 3,
+        "damage": "pierce",
+        "reach": "close",
+        "breaks": "twoNatured"
+      },
+      "consumable": null,
+      "tradingPostDisposition": "protected",
+      "recyclerDisposition": "protected",
+      "assetURL": "/game-assets/items/two_natured_blade.png"
+    },
+    {
+      "id": "long_fang",
+      "slug": "long-fang",
+      "name": "Long Fang",
+      "type": "gear",
+      "category": "gear",
+      "summary": "A tooth as long as your forearm, hafted short. It should not reach as far as it does.",
+      "rarity": "rare",
+      "gear": {
+        "slot": "weapon",
+        "tier": 3,
+        "damage": "pierce",
+        "reach": "far",
+        "breaks": "reachWithoutHaft"
+      },
+      "consumable": null,
+      "tradingPostDisposition": "protected",
+      "recyclerDisposition": "protected",
+      "assetURL": "/game-assets/items/long_fang.png"
+    },
+    {
+      "id": "ranked_spear",
+      "slug": "ranked-spear",
+      "name": "Ranked Spear",
+      "type": "gear",
+      "category": "gear",
+      "summary": "It goes through, and keeps going. Whoever was standing behind finds that out.",
+      "rarity": "rare",
+      "gear": {
+        "slot": "weapon",
+        "tier": 3,
+        "damage": "pierce",
+        "reach": "mid",
+        "breaks": "bothRanks"
+      },
+      "consumable": null,
+      "tradingPostDisposition": "protected",
+      "recyclerDisposition": "protected",
+      "assetURL": "/game-assets/items/ranked_spear.png"
+    },
+    {
+      "id": "rimed_edge",
+      "slug": "rimed-edge",
+      "name": "Barbed Edge",
+      "type": "gear",
+      "category": "gear",
+      "summary": "Its backward thorns stay in the wound. Nothing needs to be spread on them first.",
+      "rarity": "rare",
+      "gear": {
+        "slot": "weapon",
+        "tier": 3,
+        "damage": "rend",
+        "reach": "close",
+        "breaks": "innateStatus",
+        "statusKind": "bleed"
+      },
+      "consumable": null,
+      "tradingPostDisposition": "protected",
+      "recyclerDisposition": "protected",
+      "assetURL": "/game-assets/items/rimed_edge.png"
+    },
+    {
+      "id": "living_hook",
+      "slug": "living-hook",
+      "name": "Living Hook",
+      "type": "gear",
+      "category": "gear",
+      "summary": "It is sharper than it was last week. You have not sharpened it.",
+      "rarity": "mythic",
+      "gear": {
+        "slot": "weapon",
+        "tier": 2,
+        "damage": "rend",
+        "reach": "close",
+        "breaks": "growingGrade"
+      },
+      "consumable": null,
+      "tradingPostDisposition": "protected",
+      "recyclerDisposition": "protected",
+      "assetURL": "/game-assets/items/living_hook.png"
+    },
+    {
+      "id": "quiet_knife",
+      "slug": "quiet-knife",
+      "name": "Quiet Knife",
+      "type": "gear",
+      "category": "gear",
+      "summary": "It makes no sound going in and none coming out. Nothing notices you using it.",
+      "rarity": "rare",
+      "gear": {
+        "slot": "weapon",
+        "tier": 2,
+        "damage": "pierce",
+        "reach": "close",
+        "breaks": "quietStrike"
+      },
+      "consumable": null,
+      "tradingPostDisposition": "protected",
+      "recyclerDisposition": "protected",
+      "assetURL": "/game-assets/items/quiet_knife.png"
+    },
+    {
+      "id": "bloodletter",
+      "slug": "bloodletter",
+      "name": "Bloodletter",
+      "type": "gear",
+      "category": "gear",
+      "summary": "What it opens does not close. Not on its own, and not in time.",
+      "rarity": "rare",
+      "gear": {
+        "slot": "weapon",
+        "tier": 3,
+        "damage": "rend",
+        "reach": "close",
+        "breaks": "endlessBleed"
+      },
+      "consumable": null,
+      "tradingPostDisposition": "protected",
+      "recyclerDisposition": "protected",
+      "assetURL": "/game-assets/items/bloodletter.png"
+    },
+    {
+      "id": "warded_haft",
+      "slug": "warded-haft",
+      "name": "Warded Haft",
+      "type": "gear",
+      "category": "gear",
+      "summary": "Something is written down the shaft in a hand older than yours. Crush blows slide off it.",
+      "rarity": "rare",
+      "gear": {
+        "slot": "weapon",
+        "tier": 3,
+        "damage": "crush",
+        "reach": "mid",
+        "breaks": "wardWhileHeld",
+        "wardsAgainst": "crush"
+      },
+      "consumable": null,
+      "tradingPostDisposition": "protected",
+      "recyclerDisposition": "protected",
+      "assetURL": "/game-assets/items/warded_haft.png"
+    },
+    {
+      "id": "rubble_sling",
+      "slug": "rubble-sling",
+      "name": "Rubble Sling",
+      "type": "gear",
+      "category": "gear",
+      "summary": "A broad sling and a pouch of carefully matched roadside stone.",
+      "rarity": "common",
+      "gear": {
+        "slot": "weapon",
+        "tier": 1,
+        "damage": "crush",
+        "reach": "far",
+        "visualFamilyID": "sling",
+        "materialProfileID": "world:rubble"
+      },
+      "consumable": null,
+      "tradingPostDisposition": "sellable",
+      "recyclerDisposition": "recyclable",
+      "assetURL": "/game-assets/items/rubble_sling.png"
+    },
+    {
+      "id": "fired_clay_guard",
+      "slug": "fired-clay-guard",
+      "name": "Fired-Clay Guard",
+      "type": "gear",
+      "category": "gear",
+      "summary": "Layered fired plates tied over a wooden brace; brittle, but honest protection.",
+      "rarity": "common",
+      "gear": {
+        "slot": "offhand",
+        "tier": 1,
+        "visualFamilyID": "buckler",
+        "materialProfileID": "world:clay"
+      },
+      "consumable": null,
+      "tradingPostDisposition": "sellable",
+      "recyclerDisposition": "recyclable",
+      "assetURL": "/game-assets/items/fired_clay_guard.png"
+    },
+    {
+      "id": "ironwork_blade",
+      "slug": "ironwork-blade",
+      "name": "Ironwork Blade",
+      "type": "gear",
+      "category": "gear",
+      "summary": "A practical iron chopping blade with enough weight to keep its cut moving.",
+      "rarity": "uncommon",
+      "gear": {
+        "slot": "weapon",
+        "tier": 2,
+        "damage": "rend",
+        "reach": "close",
+        "visualFamilyID": "cutting_blade",
+        "materialProfileID": "world:ore"
+      },
+      "consumable": null,
+      "tradingPostDisposition": "sellable",
+      "recyclerDisposition": "recyclable",
+      "assetURL": "/game-assets/items/ironwork_blade.png"
+    },
+    {
+      "id": "copper_buckler",
+      "slug": "copper-buckler",
+      "name": "Copper Buckler",
+      "type": "gear",
+      "category": "gear",
+      "summary": "A work-hardened copper face over a resilient timber core.",
+      "rarity": "uncommon",
+      "gear": {
+        "slot": "offhand",
+        "tier": 2,
+        "visualFamilyID": "buckler",
+        "materialProfileID": "world:copper"
+      },
+      "consumable": null,
+      "tradingPostDisposition": "sellable",
+      "recyclerDisposition": "recyclable",
+      "assetURL": "/game-assets/items/copper_buckler.png"
+    },
+    {
+      "id": "silvered_helm",
+      "slug": "silvered-helm",
+      "name": "Silvered Helm",
+      "type": "gear",
+      "category": "gear",
+      "summary": "A close helm whose pale fitted plates turn a glancing blow cleanly aside.",
+      "rarity": "rare",
+      "gear": {
+        "slot": "head",
+        "tier": 3,
+        "visualFamilyID": "enclosed_helm",
+        "materialProfileID": "world:silver"
+      },
+      "consumable": null,
+      "tradingPostDisposition": "sellable",
+      "recyclerDisposition": "recyclable",
+      "assetURL": "/game-assets/items/silvered_helm.png"
+    },
+    {
+      "id": "golden_keepsake",
+      "slug": "golden-keepsake",
+      "name": "Golden Keepsake",
+      "type": "gear",
+      "category": "gear",
+      "summary": "A small worked-gold pendant, made to outlast the story attached to it.",
+      "rarity": "rare",
+      "gear": {
+        "slot": "keepsake",
+        "tier": 3,
+        "visualFamilyID": "keepsake",
+        "materialProfileID": "world:gold"
+      },
+      "consumable": null,
+      "tradingPostDisposition": "sellable",
+      "recyclerDisposition": "recyclable",
+      "assetURL": "/game-assets/items/golden_keepsake.png"
+    },
+    {
+      "id": "quartz_point",
+      "slug": "quartz-point",
+      "name": "Quartz Point",
+      "type": "gear",
+      "category": "gear",
+      "summary": "A clear mineral point fitted to a long shaft and kept away from lateral strain.",
+      "rarity": "uncommon",
+      "gear": {
+        "slot": "weapon",
+        "tier": 2,
+        "damage": "pierce",
+        "reach": "mid",
+        "visualFamilyID": "long_spear",
+        "materialProfileID": "world:quartz"
+      },
+      "consumable": null,
+      "tradingPostDisposition": "sellable",
+      "recyclerDisposition": "recyclable",
+      "assetURL": "/game-assets/items/quartz_point.png"
+    },
+    {
+      "id": "obsidian_edge",
+      "slug": "obsidian-edge",
+      "name": "Obsidian Edge",
+      "type": "gear",
+      "category": "gear",
+      "summary": "A dark glass edge assembled from replaceable flakes rather than one fragile length.",
+      "rarity": "rare",
+      "gear": {
+        "slot": "weapon",
+        "tier": 3,
+        "damage": "rend",
+        "reach": "close",
+        "visualFamilyID": "fitted_edge",
+        "materialProfileID": "world:obsidian"
+      },
+      "consumable": null,
+      "tradingPostDisposition": "sellable",
+      "recyclerDisposition": "recyclable",
+      "assetURL": "/game-assets/items/obsidian_edge.png"
+    },
+    {
+      "id": "saltward_pendant",
+      "slug": "saltward-pendant",
+      "name": "Saltward Pendant",
+      "type": "gear",
+      "category": "gear",
+      "summary": "A sealed salt crystal worn close enough to cloud when the air changes.",
+      "rarity": "common",
+      "gear": {
+        "slot": "keepsake",
+        "tier": 1,
+        "visualFamilyID": "keepsake",
+        "materialProfileID": "world:salt"
+      },
+      "consumable": null,
+      "tradingPostDisposition": "sellable",
+      "recyclerDisposition": "recyclable",
+      "assetURL": "/game-assets/items/saltward_pendant.png"
+    },
+    {
+      "id": "sulfurous_maul",
+      "slug": "sulfurous-maul",
+      "name": "Sulfurous Maul",
+      "type": "gear",
+      "category": "gear",
+      "summary": "A dense hammer whose sealed yellow fitting leaves a reactive trace in a split surface.",
+      "rarity": "uncommon",
+      "gear": {
+        "slot": "weapon",
+        "tier": 2,
+        "damage": "crush",
+        "reach": "close",
+        "reactivity": 28,
+        "visualFamilyID": "hand_maul",
+        "materialProfileID": "world:sulfur"
+      },
+      "consumable": null,
+      "tradingPostDisposition": "sellable",
+      "recyclerDisposition": "recyclable",
+      "assetURL": "/game-assets/items/sulfurous_maul.png"
+    },
+    {
+      "id": "mercurial_gloves",
+      "slug": "mercurial-gloves",
+      "name": "Mercurial Gloves",
+      "type": "gear",
+      "category": "gear",
+      "summary": "Jointed gloves balanced with enclosed liquid-metal weights.",
+      "rarity": "rare",
+      "gear": {
+        "slot": "hands",
+        "tier": 3,
+        "visualFamilyID": "working_gloves",
+        "materialProfileID": "world:mercury"
+      },
+      "consumable": null,
+      "tradingPostDisposition": "sellable",
+      "recyclerDisposition": "recyclable",
+      "assetURL": "/game-assets/items/mercurial_gloves.png"
+    },
+    {
+      "id": "adamant_cuirass",
+      "slug": "adamant-cuirass",
+      "name": "Adamant Cuirass",
+      "type": "gear",
+      "category": "gear",
+      "summary": "A fitted green-metal shell whose thin plates carry more force than their weight suggests.",
+      "rarity": "mythic",
+      "gear": {
+        "slot": "armor",
+        "tier": 4,
+        "visualFamilyID": "rigid_guard",
+        "materialProfileID": "world:adamant"
+      },
+      "consumable": null,
+      "tradingPostDisposition": "protected",
+      "recyclerDisposition": "recyclable",
+      "assetURL": "/game-assets/items/adamant_cuirass.png"
+    },
+    {
+      "id": "woven_sling",
+      "slug": "woven-sling",
+      "name": "Woven Sling",
+      "type": "gear",
+      "category": "gear",
+      "summary": "Long fibres braided into a broad pocket and cords that release cleanly.",
+      "rarity": "common",
+      "gear": {
+        "slot": "weapon",
+        "tier": 1,
+        "damage": "crush",
+        "reach": "far",
+        "visualFamilyID": "sling",
+        "materialProfileID": "world:fiber"
+      },
+      "consumable": null,
+      "tradingPostDisposition": "sellable",
+      "recyclerDisposition": "recyclable",
+      "assetURL": "/game-assets/items/woven_sling.png"
+    },
+    {
+      "id": "timber_longbow",
+      "slug": "timber-longbow",
+      "name": "Timber Longbow",
+      "type": "gear",
+      "category": "gear",
+      "summary": "A tall stave cut along the grain and backed where the bend asks most of it.",
+      "rarity": "common",
+      "gear": {
+        "slot": "weapon",
+        "tier": 1,
+        "damage": "pierce",
+        "reach": "far",
+        "visualFamilyID": "longbow",
+        "materialProfileID": "world:timber"
+      },
+      "consumable": null,
+      "tradingPostDisposition": "sellable",
+      "recyclerDisposition": "recyclable",
+      "assetURL": "/game-assets/items/timber_longbow.png"
+    },
+    {
+      "id": "pressed_pulp_cap",
+      "slug": "pressed-pulp-cap",
+      "name": "Pressed-Pulp Cap",
+      "type": "gear",
+      "category": "gear",
+      "summary": "Layered pulp pressed into a light shell and sealed against rain.",
+      "rarity": "common",
+      "gear": {
+        "slot": "head",
+        "tier": 1,
+        "insulation": 18,
+        "visualFamilyID": "padded_cap",
+        "materialProfileID": "world:pulp"
+      },
+      "consumable": null,
+      "tradingPostDisposition": "sellable",
+      "recyclerDisposition": "recyclable",
+      "assetURL": "/game-assets/items/pressed_pulp_cap.png"
+    },
+    {
+      "id": "resinbound_boots",
+      "slug": "resinbound-boots",
+      "name": "Resinbound Boots",
+      "type": "gear",
+      "category": "gear",
+      "summary": "Working boots whose seams and soles have been repeatedly sealed with resin.",
+      "rarity": "common",
+      "gear": {
+        "slot": "feet",
+        "tier": 1,
+        "insulation": 14,
+        "visualFamilyID": "working_boots",
+        "materialProfileID": "world:resin"
+      },
+      "consumable": null,
+      "tradingPostDisposition": "sellable",
+      "recyclerDisposition": "recyclable",
+      "assetURL": "/game-assets/items/resinbound_boots.png"
+    },
+    {
+      "id": "toxin_edge",
+      "slug": "toxin-edge",
+      "name": "Toxin Edge",
+      "type": "gear",
+      "category": "gear",
+      "summary": "A fitted cutting edge with a sealed channel for a stable toxic preparation.",
+      "rarity": "uncommon",
+      "gear": {
+        "slot": "weapon",
+        "tier": 2,
+        "damage": "rend",
+        "reach": "close",
+        "reactivity": 34,
+        "visualFamilyID": "fitted_edge",
+        "materialProfileID": "world:toxin"
+      },
+      "consumable": null,
+      "tradingPostDisposition": "sellable",
+      "recyclerDisposition": "recyclable",
+      "assetURL": "/game-assets/items/toxin_edge.png"
+    },
+    {
+      "id": "sporeward_coat",
+      "slug": "sporeward-coat",
+      "name": "Sporeward Coat",
+      "type": "gear",
+      "category": "gear",
+      "summary": "A supple coat quilted with dry spore-felt and kept behind a tight outer weave.",
+      "rarity": "uncommon",
+      "gear": {
+        "slot": "armor",
+        "tier": 2,
+        "insulation": 38,
+        "visualFamilyID": "supple_coat",
+        "materialProfileID": "world:spore"
+      },
+      "consumable": null,
+      "tradingPostDisposition": "sellable",
+      "recyclerDisposition": "recyclable",
+      "assetURL": "/game-assets/items/sporeward_coat.png"
+    },
+    {
+      "id": "reagent_field_pick",
+      "slug": "reagent-field-pick",
+      "name": "Reagent Field Pick",
+      "type": "gear",
+      "category": "gear",
+      "summary": "A field pick with a treated head that shows fresh mineral under its first strike.",
+      "rarity": "uncommon",
+      "gear": {
+        "slot": "tool",
+        "tier": 2,
+        "visualFamilyID": "field_pick",
+        "materialProfileID": "world:reagent"
+      },
+      "consumable": null,
+      "tradingPostDisposition": "sellable",
+      "recyclerDisposition": "recyclable",
+      "assetURL": "/game-assets/items/reagent_field_pick.png"
+    },
+    {
+      "id": "ichor_hook",
+      "slug": "ichor-hook",
+      "name": "Ichor Hook",
+      "type": "gear",
+      "category": "gear",
+      "summary": "A hooked edge whose reactive reservoir is isolated from the grip.",
+      "rarity": "uncommon",
+      "gear": {
+        "slot": "weapon",
+        "tier": 2,
+        "damage": "rend",
+        "reach": "close",
+        "reactivity": 42,
+        "visualFamilyID": "wild_hook",
+        "materialProfileID": "world:ichor"
+      },
+      "consumable": null,
+      "tradingPostDisposition": "sellable",
+      "recyclerDisposition": "recyclable",
+      "assetURL": "/game-assets/items/ichor_hook.png"
+    },
+    {
+      "id": "riftglass_rapier",
+      "slug": "riftglass-rapier",
+      "name": "Rift-glass Rapier",
+      "type": "gear",
+      "category": "gear",
+      "summary": "A narrow blue-glass point braced along facets that never quite meet.",
+      "rarity": "mythic",
+      "gear": {
+        "slot": "weapon",
+        "tier": 4,
+        "damage": "pierce",
+        "reach": "close",
+        "visualFamilyID": "fitted_point",
+        "materialProfileID": "world:rift_glass"
+      },
+      "consumable": null,
+      "tradingPostDisposition": "protected",
+      "recyclerDisposition": "recyclable",
+      "assetURL": "/game-assets/items/riftglass_rapier.png"
+    },
+    {
+      "id": "raw_essence_pendant",
+      "slug": "raw-essence-pendant",
+      "name": "Raw-Essence Pendant",
+      "type": "gear",
+      "category": "gear",
+      "summary": "Unrefined Essence held inside a fitted lattice rather than allowed to disperse.",
+      "rarity": "mythic",
+      "gear": {
+        "slot": "keepsake",
+        "tier": 4,
+        "visualFamilyID": "keepsake",
+        "materialProfileID": "world:essence_raw"
+      },
+      "consumable": null,
+      "tradingPostDisposition": "protected",
+      "recyclerDisposition": "protected",
+      "assetURL": "/game-assets/items/raw_essence_pendant.png"
+    },
+    {
+      "id": "mote_compass",
+      "slug": "mote-compass",
+      "name": "Mote Compass",
+      "type": "gear",
+      "category": "gear",
+      "summary": "A singular compass whose captive Mote points toward changes that persist across the campaign, not north.",
+      "rarity": "mythic",
+      "gear": {
+        "slot": "keepsake",
+        "tier": 4,
+        "visualFamilyID": "keepsake",
+        "materialProfileID": "world:mote"
+      },
+      "consumable": null,
+      "tradingPostDisposition": "protected",
+      "recyclerDisposition": "protected",
+      "assetURL": "/game-assets/items/mote_compass.png"
+    }
+  ],
+  "travellers": [
+    {
+      "id": "noll",
+      "slug": "noll",
+      "name": "Noll",
+      "calling": "a salvager",
+      "summary": "Knows where an object will part before touching it. Keeps a ledger of the pieces that should not have been separated.",
+      "authoredOrder": 2,
+      "storyArrivalBand": 0,
+      "campaignPhase": "opening",
+      "station": {
+        "id": "recycler",
+        "slug": "recycler",
+        "name": "Recycler",
+        "zone": "Commerce Row",
+        "destinationKind": "villageBuilding"
+      },
+      "pageCount": 5,
+      "clueCount": 2,
+      "teaching": null
+    },
+    {
+      "id": "halloway",
+      "slug": "halloway",
+      "name": "Halloway",
+      "calling": "a smith",
+      "summary": "Kept the fire in. Says a forge is only a fire someone stayed with.",
+      "authoredOrder": 3,
+      "storyArrivalBand": 0,
+      "campaignPhase": "opening",
+      "station": {
+        "id": "blacksmith",
+        "slug": "blacksmith",
+        "name": "Blacksmith",
+        "zone": "Makers' Row",
+        "destinationKind": "villageBuilding"
+      },
+      "pageCount": 5,
+      "clueCount": 2,
+      "teaching": {
+        "pageID": "halloway_gold_ore",
+        "kind": "focus",
+        "field": "teachesFocus",
+        "stableID": "gold_ore"
+      }
+    },
+    {
+      "id": "mara",
+      "slug": "mara",
+      "name": "Mara",
+      "calling": "a surveyor",
+      "summary": "Measured things for a living. Still does, out of habit.",
+      "authoredOrder": 4,
+      "storyArrivalBand": 1,
+      "campaignPhase": "opening",
+      "station": {
+        "id": "survey_post",
+        "slug": "survey-post",
+        "name": "The Survey Post",
+        "zone": "Commons",
+        "destinationKind": "villageBuilding"
+      },
+      "pageCount": 6,
+      "clueCount": 1,
+      "teaching": {
+        "pageID": "mara_scarp",
+        "kind": "focus",
+        "field": "teachesFocus",
+        "stableID": "scarp"
+      }
+    },
+    {
+      "id": "edren",
+      "slug": "edren",
+      "name": "Edren",
+      "calling": "an archaeologist",
+      "summary": "Was digging when it happened. Has not stopped.",
+      "authoredOrder": 5,
+      "storyArrivalBand": 1,
+      "campaignPhase": "opening",
+      "station": {
+        "id": "reliquary",
+        "slug": "reliquary",
+        "name": "The Reliquary",
+        "zone": "Commons",
+        "destinationKind": "villageBuilding"
+      },
+      "pageCount": 6,
+      "clueCount": 2,
+      "teaching": {
+        "pageID": "edren_ruin",
+        "kind": "focus",
+        "field": "teachesFocus",
+        "stableID": "ruin"
+      }
+    },
+    {
+      "id": "isolde",
+      "slug": "isolde",
+      "name": "Isolde",
+      "calling": "a calligrapher",
+      "summary": "Taught the Art before there was anything left to write about. Still teaching, to nobody.",
+      "authoredOrder": 6,
+      "storyArrivalBand": 2,
+      "campaignPhase": "startOfMid",
+      "station": {
+        "id": "scriptorium",
+        "slug": "scriptorium",
+        "name": "The Scriptorium",
+        "zone": "Makers' Row",
+        "destinationKind": "villageBuilding"
+      },
+      "pageCount": 6,
+      "clueCount": 2,
+      "teaching": {
+        "pageID": "isolde_hush",
+        "kind": "focus",
+        "field": "teachesFocus",
+        "stableID": "hush"
+      }
+    },
+    {
+      "id": "sela",
+      "slug": "sela",
+      "name": "Sela",
+      "calling": "a wanderer",
+      "summary": "Was always leaving. This time it took.",
+      "authoredOrder": 7,
+      "storyArrivalBand": 2,
+      "campaignPhase": "mid",
+      "station": {
+        "id": "wayfarers_table",
+        "slug": "wayfarers-table",
+        "name": "The Wayfarer's Table",
+        "zone": "Commons",
+        "destinationKind": "villageBuilding"
+      },
+      "pageCount": 6,
+      "clueCount": 3,
+      "teaching": {
+        "pageID": "sela_pond",
+        "kind": "focus",
+        "field": "teachesFocus",
+        "stableID": "pond"
+      }
+    },
+    {
+      "id": "auber",
+      "slug": "auber",
+      "name": "Auber",
+      "calling": "a distiller",
+      "summary": "Separates a thing from what carried it. Never calls what remains nothing.",
+      "authoredOrder": 25,
+      "storyArrivalBand": 5,
+      "campaignPhase": "late",
+      "station": {
+        "id": "distillery",
+        "slug": "distillery",
+        "name": "The Distillery",
+        "zone": "Makers' Row",
+        "destinationKind": "villageBuilding"
+      },
+      "pageCount": 12,
+      "clueCount": 8,
+      "teaching": {
+        "pageID": "auber_brine",
+        "kind": "focus",
+        "field": "teachesFocus",
+        "stableID": "brine"
+      }
+    },
+    {
+      "id": "tovin",
+      "slug": "tovin",
+      "name": "Tovin",
+      "calling": "a binder",
+      "summary": "Wrote worlds before you did. Knows what that costs.",
+      "authoredOrder": 27,
+      "storyArrivalBand": 6,
+      "campaignPhase": "late",
+      "station": {
+        "id": "anchorage",
+        "slug": "anchorage",
+        "name": "The Anchorage",
+        "zone": "Commons",
+        "destinationKind": "villageBuilding"
+      },
+      "pageCount": 14,
+      "clueCount": 9,
+      "teaching": {
+        "pageID": "tovin_drift",
+        "kind": "focus",
+        "field": "teachesFocus",
+        "stableID": "drift"
+      }
+    }
+  ],
+  "stations": [
+    {
+      "id": "writing_desk",
+      "slug": "writing-desk",
+      "name": "Writing Desk",
+      "blurb": "Compose a book and bind a world.",
+      "zone": "Binder House · writing study",
+      "lifecycle": "opening infrastructure",
+      "keeper": null,
+      "keeperID": null,
+      "unlockedAtStart": true,
+      "startingTier": 0,
+      "catalogueMaxTier": 1,
+      "buildCost": [],
+      "buildBlurb": null
+    },
+    {
+      "id": "storehouse",
+      "slug": "storehouse",
+      "name": "Storehouse",
+      "blurb": "What you hauled back. Identify the strange things.",
+      "zone": "Commons",
+      "lifecycle": "opening infrastructure",
+      "keeper": null,
+      "keeperID": null,
+      "unlockedAtStart": true,
+      "startingTier": 0,
+      "catalogueMaxTier": 9,
+      "buildCost": [],
+      "buildBlurb": null
+    },
+    {
+      "id": "party",
+      "slug": "party",
+      "name": "Party",
+      "blurb": "Gear and gambits. Edited here, never mid-fight.",
+      "zone": "Binder House · common room",
+      "lifecycle": "opening infrastructure",
+      "keeper": null,
+      "keeperID": null,
+      "unlockedAtStart": true,
+      "startingTier": 0,
+      "catalogueMaxTier": 1,
+      "buildCost": [],
+      "buildBlurb": null
+    },
+    {
+      "id": "essence_spring",
+      "slug": "essence-spring",
+      "name": "Essence Spring",
+      "blurb": "Refine Raw Essence, deepen the return trickle, and unlearn combat techniques.",
+      "zone": "Binder House · yard",
+      "lifecycle": "opening infrastructure",
+      "keeper": null,
+      "keeperID": null,
+      "unlockedAtStart": true,
+      "startingTier": 0,
+      "catalogueMaxTier": 1,
+      "buildCost": [],
+      "buildBlurb": null
+    },
+    {
+      "id": "library",
+      "slug": "library",
+      "name": "The Library",
+      "blurb": "Everything anybody wrote down about where they went.",
+      "zone": "Binder House · Library corner",
+      "lifecycle": "existing room, later keeper",
+      "keeper": null,
+      "keeperID": null,
+      "unlockedAtStart": true,
+      "startingTier": 0,
+      "catalogueMaxTier": 1,
+      "buildCost": [],
+      "buildBlurb": null
+    },
+    {
+      "id": "trading_post",
+      "slug": "trading-post",
+      "name": "Trading Post",
+      "blurb": "Sell identified holdings and buy from Vance's rotating ordinary stock.",
+      "zone": "Commerce Row",
+      "lifecycle": "found then built",
+      "keeper": "Vance",
+      "keeperID": "vance",
+      "unlockedAtStart": false,
+      "startingTier": 0,
+      "catalogueMaxTier": 0,
+      "buildCost": [
+        {
+          "id": "essence",
+          "quantity": 10
+        }
+      ],
+      "buildBlurb": "Vance can set out a ledger and a table here for anything your household should not keep."
+    },
+    {
+      "id": "recycler",
+      "slug": "recycler",
+      "name": "Recycler",
+      "blurb": "Take eligible gear apart without inventing where its useful material came from.",
+      "zone": "Commerce Row",
+      "lifecycle": "found then built",
+      "keeper": "Noll",
+      "keeperID": "noll",
+      "unlockedAtStart": false,
+      "startingTier": 0,
+      "catalogueMaxTier": 2,
+      "buildCost": [
+        {
+          "id": "essence",
+          "quantity": 15
+        }
+      ],
+      "buildBlurb": "Noll can fit a sorting bench here, leaving failed joins intact until their evidence has been recorded."
+    },
+    {
+      "id": "blacksmith",
+      "slug": "blacksmith",
+      "name": "Blacksmith",
+      "blurb": "Reforge what you carry into something better.",
+      "zone": "Makers' Row",
+      "lifecycle": "found then built",
+      "keeper": "Halloway",
+      "keeperID": "halloway",
+      "unlockedAtStart": false,
+      "startingTier": 0,
+      "catalogueMaxTier": 1,
+      "buildCost": [
+        {
+          "id": "essence",
+          "quantity": 30
+        },
+        {
+          "id": "ore",
+          "quantity": 12
+        },
+        {
+          "id": "fiber",
+          "quantity": 6
+        }
+      ],
+      "buildBlurb": "Halloway will raise a forge here, if you can find the stone and the iron for it."
+    },
+    {
+      "id": "tannery",
+      "slug": "tannery",
+      "name": "The Tannery",
+      "blurb": "Fit flexible living material into protection and carrying work.",
+      "zone": "Makers' Row",
+      "lifecycle": "found then built",
+      "keeper": "Corrin",
+      "keeperID": "corrin",
+      "unlockedAtStart": false,
+      "startingTier": 0,
+      "catalogueMaxTier": 1,
+      "buildCost": [
+        {
+          "id": "essence",
+          "quantity": 80
+        },
+        {
+          "id": "timber",
+          "quantity": 12
+        },
+        {
+          "id": "fiber",
+          "quantity": 20
+        },
+        {
+          "id": "salt",
+          "quantity": 8
+        }
+      ],
+      "buildBlurb": "Corrin needs beams, fibre and salt enough to prepare a clean working room."
+    },
+    {
+      "id": "bowyer",
+      "slug": "bowyer",
+      "name": "The Bowyer",
+      "blurb": "Fit far-reaching physical weapons without an ammunition inventory.",
+      "zone": "Makers' Row",
+      "lifecycle": "found then built",
+      "keeper": "Fen",
+      "keeperID": "fen",
+      "unlockedAtStart": false,
+      "startingTier": 0,
+      "catalogueMaxTier": 2,
+      "buildCost": [
+        {
+          "id": "essence",
+          "quantity": 110
+        },
+        {
+          "id": "timber",
+          "quantity": 24
+        },
+        {
+          "id": "fiber",
+          "quantity": 18
+        },
+        {
+          "id": "resin",
+          "quantity": 8
+        }
+      ],
+      "buildBlurb": "Fen needs straight stock, patient fibres and enough resin to make every draw hold."
+    },
+    {
+      "id": "armoury",
+      "slug": "armoury",
+      "name": "The Armoury",
+      "blurb": "Rebuild one familiar protective piece around a deliberate defensive Construction.",
+      "zone": "Makers' Row",
+      "lifecycle": "found then built",
+      "keeper": "Bracken",
+      "keeperID": "bracken",
+      "unlockedAtStart": false,
+      "startingTier": 0,
+      "catalogueMaxTier": 2,
+      "buildCost": [
+        {
+          "id": "essence",
+          "quantity": 120
+        },
+        {
+          "id": "ore",
+          "quantity": 28
+        },
+        {
+          "id": "clay",
+          "quantity": 12
+        },
+        {
+          "id": "copper",
+          "quantity": 8
+        }
+      ],
+      "buildBlurb": "Bracken needs iron, clay and copper enough to rebuild protection without pretending its old shape was sacred."
+    },
+    {
+      "id": "weaponsmith",
+      "slug": "weaponsmith",
+      "name": "The Weaponsmith",
+      "blurb": "Fit advanced physical weapons to repeatable motion, reach and consequence.",
+      "zone": "Makers' Row",
+      "lifecycle": "found then built",
+      "keeper": "Maud",
+      "keeperID": "maud",
+      "unlockedAtStart": false,
+      "startingTier": 0,
+      "catalogueMaxTier": 2,
+      "buildCost": [
+        {
+          "id": "essence",
+          "quantity": 150
+        },
+        {
+          "id": "ore",
+          "quantity": 32
+        },
+        {
+          "id": "copper",
+          "quantity": 12
+        },
+        {
+          "id": "gold",
+          "quantity": 4
+        }
+      ],
+      "buildBlurb": "Maud needs enough iron and copper to test the alteration, and a little gold for the measures that must not drift."
+    },
+    {
+      "id": "scriptorium",
+      "slug": "scriptorium",
+      "name": "The Scriptorium",
+      "blurb": "Learn to write smaller, and to say more with less.",
+      "zone": "Makers' Row",
+      "lifecycle": "found then built",
+      "keeper": "Isolde",
+      "keeperID": "isolde",
+      "unlockedAtStart": false,
+      "startingTier": 0,
+      "catalogueMaxTier": 2,
+      "buildCost": [
+        {
+          "id": "essence",
+          "quantity": 60
+        },
+        {
+          "id": "timber",
+          "quantity": 14
+        },
+        {
+          "id": "clay",
+          "quantity": 10
+        }
+      ],
+      "buildBlurb": "Isolde needs a room with good light and a table that doesn't rock. She is very specific about the table."
+    },
+    {
+      "id": "firepit",
+      "slug": "firepit",
+      "name": "The Firepit",
+      "blurb": "Somewhere for the people you bring home.",
+      "zone": "Commons",
+      "lifecycle": "opening infrastructure, later upgrade",
+      "keeper": null,
+      "keeperID": null,
+      "unlockedAtStart": true,
+      "startingTier": 0,
+      "catalogueMaxTier": 1,
+      "buildCost": [],
+      "buildBlurb": null
+    },
+    {
+      "id": "bestiary",
+      "slug": "bestiary",
+      "name": "The Bestiary",
+      "blurb": "Everything you have met out there, and how the one you met compared.",
+      "zone": "Library · Bestiary shelf",
+      "lifecycle": "opening infrastructure",
+      "keeper": null,
+      "keeperID": null,
+      "unlockedAtStart": true,
+      "startingTier": 0,
+      "catalogueMaxTier": 1,
+      "buildCost": [],
+      "buildBlurb": null
+    },
+    {
+      "id": "survey_post",
+      "slug": "survey-post",
+      "name": "The Survey Post",
+      "blurb": "Instruments for reading a world you are standing in.",
+      "zone": "Commons",
+      "lifecycle": "found then built",
+      "keeper": "Mara",
+      "keeperID": "mara",
+      "unlockedAtStart": false,
+      "startingTier": 0,
+      "catalogueMaxTier": 1,
+      "buildCost": [
+        {
+          "id": "essence",
+          "quantity": 50
+        },
+        {
+          "id": "timber",
+          "quantity": 10
+        },
+        {
+          "id": "ore",
+          "quantity": 8
+        },
+        {
+          "id": "quartz",
+          "quantity": 2
+        }
+      ],
+      "buildBlurb": "Mara wants somewhere flat, out of the wind, with a clear line to the horizon. She has been carrying the lenses this whole time."
+    },
+    {
+      "id": "apothecary",
+      "slug": "apothecary",
+      "name": "The Apothecary",
+      "blurb": "Remedies and preparations made from what the worlds grew.",
+      "zone": "Makers' Row",
+      "lifecycle": "found then built",
+      "keeper": "Nessa",
+      "keeperID": "nessa",
+      "unlockedAtStart": false,
+      "startingTier": 0,
+      "catalogueMaxTier": 1,
+      "buildCost": [
+        {
+          "id": "essence",
+          "quantity": 85
+        },
+        {
+          "id": "clay",
+          "quantity": 16
+        },
+        {
+          "id": "quartz",
+          "quantity": 6
+        },
+        {
+          "id": "reagent",
+          "quantity": 12
+        }
+      ],
+      "buildBlurb": "Nessa needs a clean room, vessels that can take heat, and shelves for what the worlds grew. Raising it makes Lesser Salve available immediately."
+    },
+    {
+      "id": "reliquary",
+      "slug": "reliquary",
+      "name": "The Reliquary",
+      "blurb": "Edren's record of where people once stood, and what they left behind.",
+      "zone": "Commons",
+      "lifecycle": "found then built",
+      "keeper": "Edren",
+      "keeperID": "edren",
+      "unlockedAtStart": false,
+      "startingTier": 0,
+      "catalogueMaxTier": 1,
+      "buildCost": [
+        {
+          "id": "essence",
+          "quantity": 45
+        },
+        {
+          "id": "ore",
+          "quantity": 12
+        },
+        {
+          "id": "clay",
+          "quantity": 8
+        }
+      ],
+      "buildBlurb": "Edren needs shelves for fragments, broad tables for plans, and somewhere every recovered thing can keep its place."
+    },
+    {
+      "id": "wayfarers_table",
+      "slug": "wayfarers-table",
+      "name": "The Wayfarer's Table",
+      "blurb": "Field notes and packing methods for bringing home more of what the worlds grow.",
+      "zone": "Commons",
+      "lifecycle": "found then built",
+      "keeper": "Sela",
+      "keeperID": "sela",
+      "unlockedAtStart": false,
+      "startingTier": 0,
+      "catalogueMaxTier": 1,
+      "buildCost": [
+        {
+          "id": "essence",
+          "quantity": 70
+        },
+        {
+          "id": "timber",
+          "quantity": 14
+        },
+        {
+          "id": "fiber",
+          "quantity": 12
+        },
+        {
+          "id": "pulp",
+          "quantity": 6
+        }
+      ],
+      "buildBlurb": "Sela wants one broad table for field guides, samples and careful packing—not a counter, and not somewhere she is expected to stay."
+    },
+    {
+      "id": "distillery",
+      "slug": "distillery",
+      "name": "The Distillery",
+      "blurb": "Attune Essence Crystals through world-made samples.",
+      "zone": "Makers' Row",
+      "lifecycle": "found then built",
+      "keeper": "Auber",
+      "keeperID": "auber",
+      "unlockedAtStart": false,
+      "startingTier": 0,
+      "catalogueMaxTier": 1,
+      "buildCost": [
+        {
+          "id": "essence",
+          "quantity": 200
+        },
+        {
+          "id": "quartz",
+          "quantity": 30
+        },
+        {
+          "id": "silver",
+          "quantity": 20
+        },
+        {
+          "id": "clay",
+          "quantity": 30
+        }
+      ],
+      "buildBlurb": "Auber needs vessels that make every fraction visible, and shelves where no residue is mistaken for nothing."
+    },
+    {
+      "id": "channelworks",
+      "slug": "channelworks",
+      "name": "The Channelworks",
+      "blurb": "Oda gives concentrated emanations a route and a boundary.",
+      "zone": "Makers' Row",
+      "lifecycle": "found then built",
+      "keeper": "Oda",
+      "keeperID": "oda",
+      "unlockedAtStart": false,
+      "startingTier": 0,
+      "catalogueMaxTier": 1,
+      "buildCost": [
+        {
+          "id": "essence",
+          "quantity": 200
+        },
+        {
+          "id": "ore",
+          "quantity": 50
+        },
+        {
+          "id": "quartz",
+          "quantity": 20
+        },
+        {
+          "id": "silver",
+          "quantity": 20
+        }
+      ],
+      "buildBlurb": "Oda needs a bench where a live core can be contained before it is given reach."
+    },
+    {
+      "id": "anchorage",
+      "slug": "anchorage",
+      "name": "The Anchorage",
+      "blurb": "Worlds rebound into the Atlas, kept where they can be reached again.",
+      "zone": "Commons",
+      "lifecycle": "found then built",
+      "keeper": "Tovin",
+      "keeperID": "tovin",
+      "unlockedAtStart": false,
+      "startingTier": 0,
+      "catalogueMaxTier": 1,
+      "buildCost": [
+        {
+          "id": "essence",
+          "quantity": 200
+        },
+        {
+          "id": "ore",
+          "quantity": 40
+        },
+        {
+          "id": "quartz",
+          "quantity": 20
+        },
+        {
+          "id": "pulp",
+          "quantity": 18
+        }
+      ],
+      "buildBlurb": "Tovin needs a quiet room for the Atlas and a frame stout enough to hold open a way that should have closed."
+    }
+  ],
+  "terminology": [
+    {
+      "id": "writtenWorldSymbol",
+      "slug": "writtenworldsymbol",
+      "name": "Sigil",
+      "summary": "A written symbol placed on a Page to help describe a world.",
+      "domain": "Writing",
+      "aliases": [
+        "mark",
+        "rune"
+      ]
+    },
+    {
+      "id": "pageSubject",
+      "slug": "pagesubject",
+      "name": "Subject",
+      "summary": "The part of a written request that says what the request is about.",
+      "domain": "Writing",
+      "aliases": [
+        "target"
+      ]
+    },
+    {
+      "id": "pageFocus",
+      "slug": "pagefocus",
+      "name": "Focus",
+      "summary": "A linked Sigil that asks the world to change its Subject.",
+      "domain": "Writing",
+      "aliases": [
+        "source",
+        "cause"
+      ]
+    },
+    {
+      "id": "pageModifier",
+      "slug": "pagemodifier",
+      "name": "Modifier",
+      "summary": "A Sigil that changes how a connected Focus is applied.",
+      "domain": "Writing",
+      "aliases": [
+        "qualifier"
+      ]
+    },
+    {
+      "id": "assembledSigil",
+      "slug": "assembledsigil",
+      "name": "Compound",
+      "summary": "A reusable Sigil that preserves one complete written statement in a smaller footprint.",
+      "domain": "Writing",
+      "aliases": [
+        "atom bundle",
+        "precomposed symbol"
+      ]
+    },
+    {
+      "id": "foundRouteWriting",
+      "slug": "foundroutewriting",
+      "name": "Route sketch",
+      "summary": "Found writing that preserves one short path without revealing its destination.",
+      "domain": "Exploration",
+      "aliases": [
+        "Route mark",
+        "Route marks"
+      ]
+    },
+    {
+      "id": "worldResourceDeposit",
+      "slug": "worldresourcedeposit",
+      "name": "Resource deposit",
+      "summary": "A harvestable concentration of one world resource at a specific place.",
+      "domain": "Exploration",
+      "aliases": [
+        "resource node"
+      ]
+    },
+    {
+      "id": "foeArmourThreshold",
+      "slug": "foearmourthreshold",
+      "name": "Armour threshold",
+      "summary": "The armour value above which a Gambit condition becomes true.",
+      "domain": "Combat planning",
+      "aliases": [
+        "armour mark"
+      ]
+    },
+    {
+      "id": "homeHub",
+      "slug": "homehub",
+      "name": "Village",
+      "summary": "The home hub where the player prepares, builds, researches, and meets people between expeditions.",
+      "domain": "Home and return",
+      "aliases": [
+        "Base"
+      ]
+    },
+    {
+      "id": "accountPersistentLayer",
+      "slug": "accountpersistentlayer",
+      "name": "Shared progress",
+      "summary": "Motes, Bestiary entries, and lifetime statistics kept across saves.",
+      "domain": "Persistence",
+      "aliases": [
+        "Reality"
+      ]
+    },
+    {
+      "id": "predictedWorld",
+      "slug": "predictedworld",
+      "name": "World preview",
+      "summary": "A disclosure-safe preview of the world a Page may create before binding.",
+      "domain": "Writing",
+      "aliases": [
+        "projection"
+      ]
+    },
+    {
+      "id": "generatedWorldInput",
+      "slug": "generatedworldinput",
+      "name": "World pressure",
+      "summary": "One named input—such as Hydrology, Illumination, or Growth—that helps shape generation without promising exact tiles or contents.",
+      "domain": "World generation",
+      "aliases": [
+        "pressure value",
+        "generated input"
+      ]
+    },
+    {
+      "id": "ordinaryWorld",
+      "slug": "ordinaryworld",
+      "name": "Normal world",
+      "summary": "A standard generated world without a special authored starter identity.",
+      "domain": "World generation",
+      "aliases": [
+        "ordinary world"
+      ]
+    },
+    {
+      "id": "availableEssence",
+      "slug": "availableessence",
+      "name": "Essence available",
+      "summary": "The amount of refined Essence available at the point described. When a displayed total includes Raw Essence that could be refined, the copy must say ‘after refining’.",
+      "domain": "Essence",
+      "aliases": [
+        "spendable runway",
+        "Essence runway"
+      ]
+    },
+    {
+      "id": "affordableWorldCount",
+      "slug": "affordableworldcount",
+      "name": "Worlds you can afford",
+      "summary": "An advisory estimate based on stated Essence and a stated recent or current world cost.",
+      "domain": "Essence",
+      "aliases": [
+        "binding runway",
+        "authored binds remaining"
+      ]
+    },
+    {
+      "id": "playerWrittenWorld",
+      "slug": "playerwrittenworld",
+      "name": "World written by you",
+      "summary": "A world created from the player’s own Page rather than a system-authored comparison.",
+      "domain": "Writing",
+      "aliases": [
+        "authored bind"
+      ]
+    },
+    {
+      "id": "upgradeGraphEntry",
+      "slug": "upgradegraphentry",
+      "name": "Upgrade",
+      "summary": "One learnable entry in Research, where every listed earlier Upgrade is required.",
+      "domain": "Research",
+      "aliases": [
+        "node"
+      ]
+    },
+    {
+      "id": "combatGraphEntry",
+      "slug": "combatgraphentry",
+      "name": "Skill",
+      "summary": "One learnable combat ability; alternative earlier Skills may offer different legal routes.",
+      "domain": "Combat progression",
+      "aliases": [
+        "node"
+      ]
+    },
+    {
+      "id": "constellationMastery",
+      "slug": "constellationmastery",
+      "name": "Mastery",
+      "summary": "A permanent campaign-wide improvement purchased with Motes through the Constellation.",
+      "domain": "Campaign progression",
+      "aliases": [
+        "Constellation node"
+      ]
+    },
+    {
+      "id": "itemConstructionChoice",
+      "slug": "itemconstructionchoice",
+      "name": "Construction",
+      "summary": "The physical build chosen for a piece of gear, determining its parts, appearance, and construction-dependent stats.",
+      "domain": "Gear",
+      "aliases": [
+        "profile"
+      ]
+    },
+    {
+      "id": "savedOutcomeRecord",
+      "slug": "savedoutcomerecord",
+      "name": "Expedition record",
+      "summary": "The saved account of one expedition’s outcome and returned gains.",
+      "domain": "Expeditions",
+      "aliases": [
+        "receipt"
+      ]
+    },
+    {
+      "id": "persistedAtEventTime",
+      "slug": "persistedateventtime",
+      "name": "Saved at the time",
+      "summary": "A value preserved when an event happened so later tuning cannot rewrite history.",
+      "domain": "Persistence",
+      "aliases": [
+        "frozen"
+      ]
+    },
+    {
+      "id": "olderSaveContent",
+      "slug": "oldersavecontent",
+      "name": "From an older save",
+      "summary": "Content retained from an earlier app version without pretending every current detail is available.",
+      "domain": "Compatibility",
+      "aliases": [
+        "legacy"
+      ]
+    },
+    {
+      "id": "recoveredKnowledge",
+      "slug": "recoveredknowledge",
+      "name": "Writing found",
+      "summary": "Writing brought home and retained as knowledge after an expedition.",
+      "domain": "Return",
+      "aliases": [
+        "marks",
+        "current draft"
+      ]
+    },
+    {
+      "id": "newCommunityMember",
+      "slug": "newcommunitymember",
+      "name": "Joined the village",
+      "summary": "A person newly welcomed into the community after an expedition.",
+      "domain": "People",
+      "aliases": [
+        "returned"
+      ]
+    },
+    {
+      "id": "partyExperience",
+      "slug": "partyexperience",
+      "name": "XP earned",
+      "summary": "Experience earned by each party member, including any level-ups.",
+      "domain": "Party",
+      "aliases": [
+        "progress",
+        "party total"
+      ]
+    }
+  ],
+  "terrain": [
+    {
+      "name": "ash",
+      "assetURL": "/game-assets/terrain/ash.png"
+    },
+    {
+      "name": "chasm",
+      "assetURL": "/game-assets/terrain/chasm.png"
+    },
+    {
+      "name": "deepWater",
+      "assetURL": "/game-assets/terrain/deepWater.png"
+    },
+    {
+      "name": "groundcover",
+      "assetURL": "/game-assets/terrain/groundcover.png"
+    },
+    {
+      "name": "growth",
+      "assetURL": "/game-assets/terrain/growth.png"
+    },
+    {
+      "name": "ice",
+      "assetURL": "/game-assets/terrain/ice.png"
+    },
+    {
+      "name": "mud",
+      "assetURL": "/game-assets/terrain/mud.png"
+    },
+    {
+      "name": "rubble",
+      "assetURL": "/game-assets/terrain/rubble.png"
+    },
+    {
+      "name": "sand",
+      "assetURL": "/game-assets/terrain/sand.png"
+    },
+    {
+      "name": "snow-cover",
+      "assetURL": "/game-assets/terrain/snow-cover.png"
+    },
+    {
+      "name": "soil",
+      "assetURL": "/game-assets/terrain/soil.png"
+    },
+    {
+      "name": "stone",
+      "assetURL": "/game-assets/terrain/stone.png"
+    },
+    {
+      "name": "water",
+      "assetURL": "/game-assets/terrain/water.png"
+    }
+  ],
+  "writingAssetURL": "/game-assets/writing/writing-parchment.png"
+}

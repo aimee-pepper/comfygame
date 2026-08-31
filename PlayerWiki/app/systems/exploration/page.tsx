@@ -1,0 +1,14 @@
+import Link from 'next/link';
+import { PageIntro } from '@/components/page-intro';
+import { SiteFrame } from '@/components/site-frame';
+import { content } from '@/lib/content';
+
+export default function Exploration() {
+  return <SiteFrame sidebar><PageIntro eyebrow="System guide" title="Exploration" summary="Every expedition begins at an entry portal in a generated world. Reveal what is nearby, inspect uncertain terrain, gather what you can carry, and decide when to leave." />
+    <div className="terrain-strip" aria-label="Examples of world terrain">{content.terrain.slice(0, 8).map(tile => <figure key={tile.name}><img src={tile.assetURL} alt={`${tile.name} terrain`} /><figcaption>{tile.name.replaceAll(/([a-z])([A-Z])/g, '$1 $2')}</figcaption></figure>)}</div>
+    <section className="article-section"><h2>Reading the map</h2><ul><li><strong>Unrevealed tiles stay unknown.</strong> Sites, portals, creatures, and deposits do not become reference facts until the game reveals them.</li><li><strong>The entry portal marks your arrival.</strong> It remains the identity of the tile beneath the starting position.</li><li><strong>Sites remain on their tiles.</strong> Searching may change a site from unlooted to depleted, but walking onto it does not erase what is there.</li><li><strong>Look is free.</strong> Inspect an adjacent tile to learn disclosed movement, terrain, growth, and danger information without spending a turn.</li></ul></section>
+    <section className="article-section two-column"><div><h2>Flora and danger</h2><p>Ordinary flora is safe to enter. Dangerous flora is a separate generated placement. Depending on its danger profile, entering it may cause contact damage, poison, or both. Use Look when a plant or tile is unfamiliar.</p></div><div><h2>Resources and sites</h2><p>Resource deposits hold one resource at a specific place. Sites can be searched once their conditions are met; a searched site keeps its identity while showing its depleted state.</p><p><Link href="/resources">Compare all resources</Link></p></div></section>
+    <section className="article-section"><h2>Turns, movement, and returning</h2><p>A successful step or travel action advances the world under the movement rules. A blocked move does not spend a turn. Use Tile interacts only with the exact feature under the party. Return through a valid exit to resolve the expedition; defeat also returns the party through the expedition-outcome flow.</p></section>
+    <nav className="next-links"><Link href="/systems/combat">Next: Combat</Link><Link href="/resources">Resource reference</Link></nav>
+  </SiteFrame>;
+}
