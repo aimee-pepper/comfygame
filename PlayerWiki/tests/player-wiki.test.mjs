@@ -537,3 +537,22 @@ test('Field supplies guide documents current preparation, targets, Scent Mask, c
   assert.match(systems, /\/systems\/field-supplies/);
   assert.match(frame, /\/systems\/field-supplies/);
 });
+
+test('Animals guide documents current Attend, trust, companion placement, combat, and Bestiary boundaries', async () => {
+  await access(path.join(root, 'app/systems/animals-companionship/page.tsx'));
+  const animals = await read('app/systems/animals-companionship/page.tsx');
+  const systems = await read('app/systems/page.tsx');
+  const frame = await read('components/site-frame.tsx');
+  assert.match(animals, /Recruit Sabine and build the Menagerie/);
+  assert.match(animals, /within two tiles/);
+  assert.match(animals, /not immediately adjacent/);
+  assert.match(animals, /patient presence/);
+  assert.match(animals, /returns to the Menagerie/);
+  assert.match(animals, /Interpose, Harrier, Slip Away, Warning Display, or Commit/);
+  assert.match(animals, /do not use human equipment or combat trees/);
+  assert.match(animals, /does not reveal an animal you have not encountered/);
+  assert.match(animals, /\/places\/menagerie/);
+  assert.match(animals, /\/bestiary/);
+  assert.match(systems, /\/systems\/animals-companionship/);
+  assert.match(frame, /\/systems\/animals-companionship/);
+});
