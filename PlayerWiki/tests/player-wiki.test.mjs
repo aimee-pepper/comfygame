@@ -176,3 +176,23 @@ test('every live person includes every authored diary page and every authored lo
     assert.match(cameo, /shape-rendering="crispEdges"/);
   }
 });
+
+test('village services have a hub, individual guides and place cross-links', async () => {
+  await access(path.join(root, 'app/services/page.tsx'));
+  await access(path.join(root, 'app/services/[slug]/page.tsx'));
+  const services = await read('lib/services.ts');
+  for (const id of [
+    'storehouse',
+    'trading_post',
+    'recycler',
+    'library',
+    'firepit',
+    'party',
+    'essence_spring',
+    'bestiary',
+  ])
+    assert.match(services, new RegExp(`stationID: '${id}'`));
+  const place = await read('app/places/[slug]/page.tsx');
+  assert.match(place, /serviceForStation/);
+  assert.match(place, /How to use/);
+});

@@ -9,6 +9,7 @@ const systemLinks = [
   ['/systems/combat', 'Combat'],
   ['/systems/crafting', 'Crafting basics'],
   ['/crafting', 'Crafting systems'],
+  ['/services', 'Village services'],
 ];
 
 const referenceLinks = [
@@ -58,6 +59,7 @@ export function SiteFrame({
           <Link href="/resources">Resources</Link>
           <Link href="/equipment">Equipment</Link>
           <Link href="/crafting">Crafting</Link>
+          <Link href="/services">Services</Link>
           <Link href="/people">People</Link>
           <Link href="/places">Places</Link>
         </nav>
