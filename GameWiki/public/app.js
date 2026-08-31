@@ -25,7 +25,7 @@ function provenance(record) {
 }
 
 function layout(route, content) {
-  const activeRoute = route === "asset-family" ? "asset-gallery" : route;
+  const activeRoute = ["asset-family", "asset-record"].includes(route) ? "asset-gallery" : route;
   const nav = navItems.map(([id, label]) => `<a class="${activeRoute === id ? "active" : ""}" href="#/${id}">${label}</a>`).join("");
   return `<div class="shell">
     <aside class="sidebar">
@@ -107,7 +107,7 @@ function worldWriting() {
     + `<h2>Current visual boundary</h2><div class="card">${badge(current.status)}<p>The current native source bundles and hash-validates <code>${escapeHTML(current.parchment.stableKey)}</code>; that proves source integration, not ordinary-phone acceptance. The standalone artifact still records <code>integrationReady:${escapeHTML(current.parchment.artifactIntegrationReady)}</code>, so the wiki preserves both records instead of silently promoting either one.</p><p>${escapeHTML(current.markArtStatus)}. ${escapeHTML(current.vocabularyLabelStatus)}.</p></div>`
     + `<h2>Knowledge and disclosure</h2><div class="card"><p><strong>Known</strong> licenses a readable name and meaning. <strong>Encountered</strong> only proves that the Sigil was seen and may display <code>??</code>. Subjects and writable Modifiers are rules-known; Focuses and Compounds become known through campaign ownership. An unread Sigil never contributes hidden names, icons, sorting text, accessibility text, ecology claims, sight bands, or narrow collapse estimates.</p></div>`
     + `<h2>Page states and consumption</h2><div class="facts"><dl class="fact"><dt>Draft</dt><dd>Reusable after bind; its revision and Page hash saved at the time participate in the quote.</dd></dl><dl class="fact"><dt>Collected / wild Page</dt><dd>One physical instance with a saved definition. Binding consumes only that selected instance; a saved definition that no longer matches refuses safely.</dd></dl><dl class="fact"><dt>Starter Pages</dt><dd>Authored World Pages promise a known starting identity, price, and seed. Their exact current World records remain data-owned.</dd></dl><dl class="fact"><dt>Costs</dt><dd>Essence, exact ink-vial deductions, and Field Kit stack moves are saved in one quote. Any sufficient-but-different wallet, vial, or stack state requires a fresh review.</dd></dl></div>`
-    + `<h2>Canonical Writing entries · ${data.symbols.length}</h2><p>Each detail labels what may be disclosed to a player.</p>`
+    + `<h2>Disclosed Writing entries · ${data.symbols.length}</h2><p>Only currently disclosed identities are emitted. ${data.withheldVocabulary.count} additional entries remain anonymous and withheld by gameplay disclosure.</p>`
     + groups.map(kind => { const playerKind = ({ target: "Subject", source: "Focus", qualifier: "Modifier", compound: "Compound" })[kind]; return `<h3>${playerKind} · ${data.symbols.filter(item => item.category === kind).length}</h3><div class="grid">${data.symbols.filter(item => item.category === kind).map(item => `<a class="card" href="#/lexeme/${item.slug}"><h3>${escapeHTML(item.name)}</h3>${badge(playerKind)}<p>${escapeHTML(item.summary)}</p><code>${escapeHTML(item.stableID)}</code></a>`).join("")}</div>`; }).join("")
     + sourceReceipt(["docs/writing-desk-b1-implementation-packet-current.md", "docs/world-pages-templates-dictionary-current.md"]);
 }
@@ -327,21 +327,50 @@ function assets() {
 function assetFamilyDetail(slugValue) {
   const family = data.visualAssets.families.find(candidate => candidate.slug === slugValue);
   if (!family) return notFound();
-  const pathList = (title, paths) => `<h2>${escapeHTML(title)}</h2>${paths.length ? `<ul class="path-list">${paths.map(path => `<li><code>${escapeHTML(path)}</code></li>`).join("")}</ul>` : `<div class="empty">None registered.</div>`}`;
+  const integrityPathList = (title, paths) => paths.length ? `<details class="integrity-paths"><summary>${escapeHTML(title)} · ${paths.length}</summary><ul class="path-list">${paths.map(path => `<li><code>${escapeHTML(path)}</code></li>`).join("")}</ul></details>` : "";
   const approval = family.approvalReceipts.length ? family.approvalReceipts.map(receipt => `<article class="card"><h3>${escapeHTML(receipt.status)}</h3><p><code>${escapeHTML(receipt.path)}</code></p><p>Authority: ${escapeHTML(typeof receipt.authority === "string" ? receipt.authority : JSON.stringify(receipt.authority))}${receipt.date ? ` · ${escapeHTML(receipt.date)}` : ""}</p></article>`).join("") : `<div class="empty">No approval receipt is registered. This family must not be promoted by implication.</div>`;
-  const conflict = family.authorityConflict ? `<h2>Authority conflict</h2><div class="callout danger"><strong>Blocked: ${escapeHTML(family.authorityConflict.status)}</strong>${family.authorityConflict.manifests.map(manifest => `<p><code>${escapeHTML(manifest.path)}</code><br>Manifest SHA ${escapeHTML(manifest.fileSHA256)}${manifest.outputCount == null ? "" : ` · ${manifest.outputCount} outputs`}</p>`).join("")}</div>` : "";
-  const assetsMarkup = family.assets.length ? `<div class="asset-grid">${family.assets.map(asset => `<article class="asset-record"><div class="asset-preview">${asset.previewURL ? `<img loading="lazy" src="${escapeHTML(asset.previewURL)}" alt="${escapeHTML(asset.semanticKey)}">` : `<span>No renderable path</span>`}</div><div><h3>${escapeHTML(asset.semanticKey)}</h3><p>${badge(asset.role)} ${badge(asset.integrity)}</p><p><code>${escapeHTML(asset.sourcePath ?? "Missing path")}</code></p>${asset.width && asset.height ? `<p>${asset.width}×${asset.height}</p>` : ""}<details><summary>Integrity metadata</summary><dl><dt>Encoded SHA-256</dt><dd><code>${escapeHTML(asset.actualSHA256 ?? asset.declaredSHA256 ?? "unrecorded")}</code></dd><dt>Decoded RGBA SHA-256</dt><dd><code>${escapeHTML(asset.decodedRGBASHA256 ?? "unrecorded")}</code></dd></dl></details></div></article>`).join("")}</div>` : `<div class="empty">This manifest exposes no directly renderable PNG. The family remains visible and blocked rather than receiving invented metadata.</div>`;
+  const conflict = family.authorityConflict ? `<h2>Authority conflict</h2><div class="callout danger"><strong>Blocked: ${escapeHTML(family.authorityConflict.status)}</strong><p>${family.authorityConflict.manifests.map(manifest => manifest.outputCount == null ? "unknown output count" : `${manifest.outputCount} outputs`).join(" versus ")}. No record from either authority is browseable until the conflict is resolved.</p><details><summary>Integrity conflict metadata</summary>${family.authorityConflict.manifests.map(manifest => `<p><code>${escapeHTML(manifest.path)}</code><br>Manifest SHA ${escapeHTML(manifest.fileSHA256)}</p>`).join("")}</details></div>` : "";
+  const withheld = Object.values(family.withheldCounts).reduce((sum, count) => sum + count, 0);
+  const assetsMarkup = family.assets.length ? `<div class="asset-browser" data-asset-family="${escapeHTML(family.slug)}"><div class="asset-browser-controls"><label>Filter records <input type="search" data-asset-query placeholder="Semantic identity"></label><label>Role <select data-asset-role><option value="all">All roles</option>${[...new Set(family.assets.map(asset => asset.role))].sort().map(role => `<option value="${escapeHTML(role)}">${escapeHTML(titleCase(role))}</option>`).join("")}</select></label></div><p data-asset-count></p><div class="asset-grid" data-asset-results></div><button type="button" data-asset-more>Show more</button></div>` : `<div class="empty">This manifest exposes no directly renderable PNG. The family remains visible and blocked rather than receiving invented metadata.</div>`;
   return header(family.classification, family.name, `${family.assets.length} manifested visual records. Repository paths remain authoritative; this wiki is a read-only presentation.`)
     + `<div class="facts"><dl class="fact"><dt>Pack ID</dt><dd><code>${escapeHTML(family.id)}</code></dd></dl><dl class="fact"><dt>Status</dt><dd>${family.status.map(value => badge(value)).join(" ")}</dd></dl><dl class="fact"><dt>Runtime mirrors</dt><dd>${family.runtimeMirrorPaths.length}</dd></dl></div>`
     + (family.blockers.length ? `<div class="callout danger"><strong>Blocked or review-gated</strong><ul>${family.blockers.map(reason => `<li>${escapeHTML(reason)}</li>`).join("")}</ul></div>` : `<div class="callout"><strong>No structural blocker found.</strong><p>This does not substitute for visual approval.</p></div>`)
     + conflict
-    + pathList("Pack manifests", family.manifestPaths)
-    + pathList("Editable sources", family.sourcePaths)
-    + pathList("Generated runtime derivatives", family.runtimePaths)
-    + pathList("References", family.referencePaths)
-    + pathList("Evidence", family.evidencePaths)
+    + (withheld ? `<div class="callout"><strong>${withheld} records withheld</strong><p>Gameplay disclosure, unresolved authority, and integrity-only blob indexes remain anonymous and are not searchable or previewable.</p></div>` : "")
+    + `<h2>Repository integrity metadata</h2>${integrityPathList("Pack manifests", family.manifestPaths)}${integrityPathList("Editable source paths", family.sourcePaths)}${integrityPathList("Generated runtime paths", family.runtimePaths)}${integrityPathList("Reference paths", family.referencePaths)}${integrityPathList("Evidence paths", family.evidencePaths)}`
     + `<h2>Approval records</h2>${approval}`
     + `<h2>Manifested assets</h2>${assetsMarkup}<p>${hashLink("asset-gallery", "← Visual Assets")}</p>`;
+}
+
+function assetRecordDetail(route) {
+  const family = data.visualAssets.families.find(candidate => candidate.assets.some(asset => asset.route === route));
+  const asset = family?.assets.find(candidate => candidate.route === route);
+  if (!family || !asset) return notFound();
+  return header(asset.role, asset.semanticKey, `Semantic source route: ${asset.sourceRoute}`)
+    + `<article class="asset-record asset-record-detail"><div class="asset-preview">${asset.previewURL ? `<img src="${escapeHTML(asset.previewURL)}" alt="${escapeHTML(asset.semanticKey)} · ${escapeHTML(asset.variant)}">` : `<span>No renderable path</span>`}</div><div><h2>${escapeHTML(asset.semanticKey)}</h2><p>${badge(asset.role)} ${badge(asset.integrity)}</p><dl><dt>Semantic source route</dt><dd><code>${escapeHTML(asset.sourceRoute)}</code></dd><dt>Explicit variant</dt><dd>${escapeHTML(asset.variant)}</dd>${asset.width && asset.height ? `<dt>Dimensions</dt><dd>${asset.width}×${asset.height}</dd>` : ""}</dl><details><summary>Integrity metadata</summary><dl><dt>Repository/blob path</dt><dd><code>${escapeHTML(asset.sourcePath ?? "missing")}</code></dd><dt>Encoded SHA-256</dt><dd><code>${escapeHTML(asset.actualSHA256 ?? asset.declaredSHA256 ?? "unrecorded")}</code></dd><dt>Decoded RGBA SHA-256</dt><dd><code>${escapeHTML(asset.decodedRGBASHA256 ?? "unrecorded")}</code></dd></dl></details></div></article><p>${hashLink(`asset-family/${family.slug}`, `← ${family.name}`)}</p>`;
+}
+
+function setupAssetBrowser(familySlug) {
+  const family = data.visualAssets.families.find(candidate => candidate.slug === familySlug);
+  const browser = document.querySelector("[data-asset-family]");
+  if (!family || !browser) return;
+  const query = browser.querySelector("[data-asset-query]");
+  const role = browser.querySelector("[data-asset-role]");
+  const results = browser.querySelector("[data-asset-results]");
+  const count = browser.querySelector("[data-asset-count]");
+  const more = browser.querySelector("[data-asset-more]");
+  let limit = 48;
+  const draw = () => {
+    const needle = query.value.trim().toLowerCase();
+    const filtered = family.assets.filter(asset => (role.value === "all" || asset.role === role.value) && (!needle || `${asset.semanticKey} ${asset.variant} ${asset.sourceRoute}`.toLowerCase().includes(needle)));
+    count.textContent = `${Math.min(limit, filtered.length)} of ${filtered.length} disclosed records`;
+    results.innerHTML = filtered.slice(0, limit).map(asset => `<a class="asset-record" href="#/${asset.route}"><div class="asset-preview">${asset.previewURL ? `<img loading="lazy" src="${escapeHTML(asset.previewURL)}" alt="${escapeHTML(asset.semanticKey)} · ${escapeHTML(asset.variant)}">` : `<span>No renderable path</span>`}</div><div><h3>${escapeHTML(asset.semanticKey)}</h3><p>${badge(asset.role)} ${badge(asset.integrity)}</p><p><code>${escapeHTML(asset.sourceRoute)}</code></p></div></a>`).join("");
+    more.hidden = filtered.length <= limit;
+  };
+  query.addEventListener("input", () => { limit = 48; draw(); });
+  role.addEventListener("change", () => { limit = 48; draw(); });
+  more.addEventListener("click", () => { limit += 48; draw(); });
+  draw();
 }
 
 function notFound() { return header("404", "Page not found", "This internal route is not registered."); }
@@ -370,8 +399,10 @@ function render({ resetScroll = false } = {}) {
   else if (root === "history") content = history();
   else if (root === "asset-gallery") content = assets();
   else if (root === "asset-family") content = assetFamilyDetail(detail);
+  else if (root === "asset-record") content = assetRecordDetail(route);
   else content = notFound();
   document.querySelector("#app").innerHTML = layout(root, content);
+  if (root === "asset-family") setupAssetBrowser(detail);
   const input = document.querySelector("#wiki-search");
   const results = document.querySelector("#search-results");
   input.addEventListener("input", () => {

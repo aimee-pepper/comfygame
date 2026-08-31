@@ -3,6 +3,7 @@ import { readFile } from "node:fs/promises";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { spawnSync } from "node:child_process";
+import { assertUniqueVisualRoutes, partitionVisualRecords, publicVisualRecord, visualRecordIdentity } from "./visual-assets.mjs";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const dataPath = join(root, "generated/wiki-data.json");
@@ -75,14 +76,16 @@ assert(data.travellers.filter(person => person.meetingStatus === "live").length 
 assert(data.travellers.every(person => person.recruitmentStatus && person.visualStatus && person.provenance.sourcePaths.length >= 5), "People detail status/provenance must be complete");
 assert(data.search.filter(item => item.type === "traveller").every(item => item.route.startsWith("person/") && item.category === "traveller"), "traveller search must open exact person detail routes");
 const lexemeCounts = Object.fromEntries(["target", "source", "qualifier", "compound"].map(kind => [kind, data.symbols.filter(item => item.category === kind).length]));
-assert(JSON.stringify(lexemeCounts) === JSON.stringify({ target: 8, source: 62, qualifier: 17, compound: 21 }), "World Writing must exactly partition all 108 canonical lexemes");
+assert(data.symbols.length + data.withheldVocabulary.count === 108, "World Writing must account for all 108 canonical lexemes without emitting hidden identities");
+assert(JSON.stringify(lexemeCounts) === JSON.stringify({ target: 8, source: 15, qualifier: 17, compound: 12 }), "World Writing must emit only always-visible and starter vocabulary");
+assert(data.withheldVocabulary.count === 56 && JSON.stringify(data.withheldVocabulary.byPlayerKind) === JSON.stringify({ Focus: 47, Compound: 9 }), "hidden vocabulary must be represented only by anonymous aggregate counts");
 assert(data.symbols.every(item => item.stableID && item.summary && item.writability && item.disclosure && data.routes.includes(`lexeme/${item.slug}`)), "every lexeme needs typed facts, disclosure state and a stable detail route");
 assert(data.symbols.filter(item => ["source", "compound"].includes(item.category)).every(item => item.writability === `Writable after this ${item.playerKind} is learned`), "learned Focus and Compound writability must use canonical player kinds");
 assert(data.symbols.every(item => !/campaign owns this|\bsource\b|\bqualifier\b/i.test(item.writability)), "lexeme writability must not expose internal ownership or player-kind names");
 assert(data.symbols.every(item => ["Found in a world", "Learned through an Upgrade", "Learned from diary writing", "Known at the start", "Always available vocabulary"].includes(item.acquisition)), "lexeme acquisition must use the closed player-copy mapping");
-assert(data.symbols.some(item => item.internalAcquisition === "worldDrop" && item.acquisition === "Found in a world") && data.symbols.some(item => item.internalAcquisition === "research" && item.acquisition === "Learned through an Upgrade") && data.symbols.some(item => item.internalAcquisition === "diary" && item.acquisition === "Learned from diary writing") && data.symbols.some(item => item.internalAcquisition === "starter" && item.acquisition === "Known at the start") && data.symbols.some(item => item.internalAcquisition === "always" && item.acquisition === "Always available vocabulary"), "every authored acquisition kind needs exact plain display copy");
-assert(data.routes.filter(route => route.startsWith("lexeme/")).length === 108, "World Writing must retain exactly 108 lexeme detail routes");
-assert(data.search.filter(item => item.type === "rune").length === 108, "World Writing must retain exactly 108 lexeme search routes");
+assert(data.symbols.every(item => ["starter", "always"].includes(item.internalAcquisition)), "undisclosed acquisition kinds must never enter generated vocabulary records");
+assert(data.routes.filter(route => route.startsWith("lexeme/")).length === data.symbols.length, "World Writing must register routes only for disclosed lexemes");
+assert(data.search.filter(item => item.type === "rune").length === data.symbols.length, "World Writing must search only disclosed lexemes");
 assert(data.search.filter(item => item.type === "rune").every(item => item.route.startsWith("lexeme/") && ["Subject", "Focus", "Modifier", "Compound"].includes(item.category)), "Sigil search must open exact player-kind lexeme routes");
 const resourceByID = Object.fromEntries(data.resources.map(item => [item.id, item]));
 assert(resourceByID.ore.summary === "Mostly shaped by Substrate pressure.", "resource detail must lead with a plain pressure explanation");
@@ -188,6 +191,43 @@ assert(data.visualAssets.families.every(family => data.search.some(item => item.
 assert(data.visualAssets.families.every(family => family.manifestPaths.length && (family.assets.length || family.blockers.length)), "every visual family must render manifested records or state an explicit blocker");
 assert(data.visualAssets.families.flatMap(family => family.assets).every(asset => ["source", "runtime", "reference", "evidence"].includes(asset.role)), "visual records must preserve source/runtime/reference/evidence ownership");
 assert(data.visualAssets.families.flatMap(family => family.assets).filter(asset => asset.previewURL).every(asset => !/[0-9a-f]{64}/.test(asset.previewURL)), "wiki preview navigation must never expose hash filenames");
+const visualRecords = data.visualAssets.families.flatMap(family => family.assets);
+assert(visualRecords.every(asset => data.routes.filter(route => route === asset.route).length === 1), "every disclosed visual record needs exactly one registered route");
+assert(new Set(visualRecords.map(asset => asset.route)).size === visualRecords.length, "visual record routes must be globally collision-free");
+assert(visualRecords.every(asset => asset.route === visualRecordIdentity({ familyID: asset.route.split("/")[1], role: asset.role, semanticKey: asset.semanticKey, variant: asset.variant }).route), "visual routes must derive only from family, role, semantic key and explicit variant");
+assert(visualRecords.every(asset => !/--\d+(?:\/|$)/.test(asset.route) && !/[0-9a-f]{64}/.test(`${asset.route} ${asset.sourceRoute} ${asset.previewURL ?? ""}`)), "semantic navigation must never use order suffixes or hash names");
+assert(data.search.filter(item => item.type === "visualAssetRecord").length === visualRecords.length, "every disclosed visual record must have an individual search entry");
+assert(data.search.filter(item => item.type === "visualAssetRecord").every(item => !/[0-9a-f]{64}/.test(`${item.route} ${item.name} ${item.searchText}`)), "visual record search must exclude blob/hash paths");
+const reorderProbe = [
+  { familyID: "family", role: "runtime", semanticKey: "alpha", variant: "north" },
+  { familyID: "family", role: "reference", semanticKey: "beta", variant: "default" }
+];
+const routesFor = records => records.map(visualRecordIdentity).map(record => record.route).sort();
+assert(JSON.stringify(routesFor(reorderProbe)) === JSON.stringify(routesFor([...reorderProbe].reverse())), "visual routes must remain invariant under manifest reorder");
+assertUniqueVisualRoutes(routesFor(reorderProbe).map(route => ({ route, semanticKey: route })));
+let collisionRejected = false;
+try { assertUniqueVisualRoutes([{ route: "asset-record/a/runtime/b/default", semanticKey: "first" }, { route: "asset-record/a/runtime/b/default", semanticKey: "second" }]); } catch { collisionRejected = true; }
+assert(collisionRejected, "semantic route collisions must fail instead of acquiring order suffixes");
+const hiddenSentinel = {
+  semanticKey: "NEVER_REVEAL_SIGIL_SENTINEL",
+  context: "lookups/marks/mark/source/never-reveal-sigil-sentinel",
+  sourcePath: "secret/NEVER_REVEAL_PATH.png",
+  description: "NEVER_REVEAL_DESCRIPTION",
+  bytes: "NEVER_REVEAL_BYTES",
+  disclosed: false
+};
+const sentinelPartition = partitionVisualRecords([hiddenSentinel]);
+assert(sentinelPartition.disclosed.length === 0 && sentinelPartition.withheldCounts["gameplay-disclosure"] === 1, "hidden visual sentinels must fail closed before emission");
+const sentinelSurfaces = {
+  json: sentinelPartition.disclosed.map(publicVisualRecord),
+  previewURLs: sentinelPartition.disclosed.map(record => record.previewURL),
+  altText: sentinelPartition.disclosed.map(record => `${record.semanticKey} · ${record.variant}`),
+  search: sentinelPartition.disclosed.map(record => `${record.semanticKey} ${record.sourceRoute}`)
+};
+const sentinelPublicJSON = JSON.stringify(sentinelSurfaces);
+for (const sentinel of [hiddenSentinel.semanticKey, hiddenSentinel.sourcePath, hiddenSentinel.description, hiddenSentinel.bytes]) assert(!sentinelPublicJSON.includes(sentinel), `hidden sentinel leaked into generated JSON, preview URLs, alt text, or search: ${sentinel}`);
+assert(appSource.includes("data-asset-query") && appSource.includes("data-asset-role") && appSource.includes("Show more"), "large visual families need record search, grouping and pagination");
+assert(appSource.includes("function assetRecordDetail(") && appSource.includes("Semantic source route") && appSource.includes("Integrity metadata"), "record detail must lead with semantic identity and collapse physical integrity metadata");
 assert(data.visualAssets.families.reduce((sum, family) => sum + family.runtimeMirrorPaths.length, 0) === 6, "all six RuntimePacks mirrors must remain associated with their semantic families");
 for (const id of ["catalogue-consumables-placeholder-v1", "named-character-placeholders-v1"]) {
   const family = data.visualAssets.families.find(candidate => candidate.id === id);
@@ -196,6 +236,7 @@ for (const id of ["catalogue-consumables-placeholder-v1", "named-character-place
 const mapSlice = data.visualAssets.families.find(family => family.id === "map-slice-v1");
 assert(mapSlice?.authorityConflict?.status === "unresolved", "map-slice divergent manifests must remain a visible unresolved authority conflict");
 assert(JSON.stringify(mapSlice.authorityConflict.manifests.map(manifest => manifest.outputCount).sort((left, right) => left - right)) === JSON.stringify([195, 198]), "map-slice conflict must retain its exact 195/198 output split");
+assert(mapSlice.assets.length === 0 && mapSlice.withheldCounts["authority-conflict"] > 0, "conflicted map-slice records must fail closed while preserving anonymous withheld count");
 assert(data.visualAssets.families.every(family => family.approvalReceipts.every(receipt => receipt.path && receipt.status)), "approval receipts must remain explicit path-backed records");
 assert(data.visualAssets.families.flatMap(family => family.approvalReceipts).every(receipt => !/(unapproved|not.*approved)/i.test(receipt.status)), "candidate and unapproved receipts must never appear as approvals");
 assert(data.currentTruth.writing.status === "readyToTest", "Writing must remain source-integrated and pending ordinary-phone acceptance");

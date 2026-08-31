@@ -2,6 +2,7 @@ import { createHash } from "node:crypto";
 import { mkdir, readFile, readdir, writeFile } from "node:fs/promises";
 import { basename, dirname, join, relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import { assertUniqueVisualRoutes, partitionVisualRecords, visualRecordIdentity, visualVariant } from "./visual-assets.mjs";
 
 const wikiRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const repoRoot = resolve(wikiRoot, "..");
@@ -67,12 +68,17 @@ function familyIDFromManifestPath(path) {
   return basename(dirname(path));
 }
 
-function pngReferences(value, trail = [], records = []) {
+function pngReferences(value, trail = [], records = [], inheritedDisclosed = true, inheritedSemanticIdentity = null) {
   if (Array.isArray(value)) {
-    value.forEach((item, index) => pngReferences(item, [...trail, String(index)], records));
+    value.forEach((item, index) => pngReferences(item, [...trail, String(index)], records, inheritedDisclosed, inheritedSemanticIdentity));
     return records;
   }
   if (!value || typeof value !== "object") return records;
+
+  const explicitlyHidden = value.identified === false || value.hidden === true || value.disclosed === false
+    || value.visibility === "hidden" || value.disclosure === false || value.disclosure === "hidden";
+  const disclosed = inheritedDisclosed && !explicitlyHidden;
+  const ownSemanticIdentity = value.stableKey ?? value.key ?? value.id ?? inheritedSemanticIdentity;
 
   const pathCandidates = [
     [value.path, null],
@@ -84,12 +90,12 @@ function pngReferences(value, trail = [], records = []) {
   ].filter(([candidate]) => typeof candidate === "string" && /\.png$/i.test(candidate));
   for (const [rawPath, forcedRole] of new Map(pathCandidates.map(candidate => [`${candidate[0]}\0${candidate[1]}`, candidate])).values()) {
     const assetsByKeyIndex = trail.indexOf("assetsByKey");
-    const semanticKey = value.stableKey
-      ?? value.key
-      ?? value.id
-      ?? (assetsByKeyIndex >= 0 ? trail[assetsByKeyIndex + 1] : null)
-      ?? trail.filter(part => !/^\d+$/.test(part)).join("/")
-      ?? basename(rawPath, ".png");
+    const inferredSemanticKey = trail.filter(part => !/^\d+$/.test(part)).join("/");
+    const fileSemanticKey = basename(rawPath, ".png");
+    const explicitSemanticKey = value.stableKey ?? value.key ?? value.id ?? (assetsByKeyIndex >= 0 ? trail[assetsByKeyIndex + 1] : null) ?? inheritedSemanticIdentity;
+    const semanticKey = explicitSemanticKey != null
+      ? (inferredSemanticKey && !inferredSemanticKey.endsWith(String(explicitSemanticKey)) ? `${inferredSemanticKey}/${explicitSemanticKey}` : explicitSemanticKey)
+      : (/^\d+$/.test(trail.at(-1) ?? "") && !/^[0-9a-f]{32,}$/i.test(fileSemanticKey) ? fileSemanticKey : inferredSemanticKey || "opaque-asset");
     const context = trail.join("/").toLowerCase();
     const contextTokens = trail.map(token => String(token).toLowerCase());
     const role = forcedRole ?? (contextTokens.some(token => /^(source-?references?|references?)$/.test(token)) ? "reference"
@@ -100,6 +106,9 @@ function pngReferences(value, trail = [], records = []) {
       semanticKey: String(semanticKey),
       rawPath,
       role,
+      variant: visualVariant(value, trail),
+      disclosed,
+      integrityIndexOnly: /^(assets|files|images|pngs)\/\d+$/i.test(trail.join("/")) && explicitSemanticKey == null,
       context: trail.join("/"),
       declaredSHA256: forcedRole === "source"
         ? value.sourceSHA256 ?? value.sourceFileSHA256 ?? null
@@ -109,7 +118,7 @@ function pngReferences(value, trail = [], records = []) {
       height: value.height ?? value.pixelHeight ?? null
     });
   }
-  for (const [key, child] of Object.entries(value)) pngReferences(child, [...trail, key], records);
+  for (const [key, child] of Object.entries(value)) pngReferences(child, [...trail, key], records, disclosed, ownSemanticIdentity);
   return records;
 }
 
@@ -694,12 +703,18 @@ function lexemeRecord(kind, item, sourcePath, disposition) {
   };
 }
 
-const symbols = [
+const allSymbols = [
   ...targetsJSON.targets.map(item => lexemeRecord("target", item, "Sources/Content/Data/pressure_targets.json", targetsJSON._authority.defaultDisposition)),
   ...sourcesJSON.sources.map(item => lexemeRecord("source", item, "Sources/Content/Data/pressure_sources.json", sourcesJSON._authority.defaultDisposition)),
   ...qualifiersJSON.qualifiers.map(item => lexemeRecord("qualifier", item, "Sources/Content/Data/qualifiers.json", qualifiersJSON._authority?.defaultDisposition ?? "live")),
   ...symbolsJSON.symbols.map(item => lexemeRecord("compound", item, "Sources/Content/Data/symbols.json", symbolsJSON._authority.defaultDisposition))
 ];
+const symbols = allSymbols.filter(symbol => ["always", "starter"].includes(symbol.internalAcquisition));
+const withheldVocabulary = {
+  count: allSymbols.length - symbols.length,
+  byPlayerKind: Object.fromEntries(Object.entries(Object.groupBy(allSymbols.filter(symbol => !symbols.includes(symbol)), symbol => symbol.playerKind)).map(([kind, entries]) => [kind, entries.length]))
+};
+const hiddenLexemeIDs = new Set(allSymbols.filter(symbol => !symbols.includes(symbol)).map(symbol => `${symbol.category}:${symbol.stableID}`));
 const roadmap = normalize(roadmapJSON.items, "roadmap", "Sources/Content/Data/playability-roadmap.json", "operational");
 const roadmapTitleOverrides = {
   "rune-dictionary": "Known and unknown Sigil Dictionary",
@@ -874,47 +889,12 @@ for (const familyID of Object.keys(manifestGroups).sort()) {
   });
   const evidenceReceipts = receipts.filter(record => !approvalReceipts.includes(record));
   const rawAssets = records.flatMap(record => pngReferences(record.manifest).map(asset => ({ ...asset, manifestPath: record.path })));
-  const seenAssets = new Map();
   const assets = [];
-  const previewNames = new Map();
+  const assetsByRoute = new Map();
   const contextPriority = context => context.startsWith("lookups/") || context.startsWith("parts/") || context.includes("assetsByKey/") ? 0
     : context.startsWith("profiles/") ? 1
     : context.startsWith("assets/") ? 3
     : 2;
-  for (const rawAsset of rawAssets.sort((left, right) => `${contextPriority(left.context)}\0${left.semanticKey}\0${left.rawPath}`.localeCompare(`${contextPriority(right.context)}\0${right.semanticKey}\0${right.rawPath}`))) {
-    const resolvedPath = await resolveAssetPath(rawAsset.manifestPath, rawAsset.rawPath, rawAsset.context);
-    let actualSHA256 = null;
-    if (resolvedPath) actualSHA256 = sha(await readFile(join(repoRoot, resolvedPath)));
-    let role = rawAsset.role;
-    if (records[0].path.startsWith("AssetLab/artifacts/") && role === "runtime" && !/^runtime\//i.test(rawAsset.context)) role = "evidence";
-    const dedupeKey = `${resolvedPath ?? `${rawAsset.manifestPath}:${rawAsset.rawPath}`}\0${role}`;
-    const duplicate = seenAssets.get(dedupeKey);
-    if (duplicate) {
-      duplicate.aliases = unique([...duplicate.aliases, rawAsset.semanticKey]);
-      continue;
-    }
-    const semanticSlug = slug(rawAsset.semanticKey) || "asset";
-    const nextCount = (previewNames.get(semanticSlug) ?? 0) + 1;
-    previewNames.set(semanticSlug, nextCount);
-    const previewName = `${semanticSlug}${nextCount === 1 ? "" : `--${nextCount}`}.png`;
-    const asset = {
-      semanticKey: rawAsset.semanticKey,
-      aliases: [rawAsset.semanticKey],
-      role,
-      sourcePath: resolvedPath,
-      declaredSHA256: rawAsset.declaredSHA256,
-      actualSHA256,
-      decodedRGBASHA256: rawAsset.decodedRGBASHA256,
-      width: rawAsset.width,
-      height: rawAsset.height,
-      integrity: !resolvedPath ? "missing"
-        : rawAsset.declaredSHA256 && rawAsset.declaredSHA256 !== actualSHA256 ? "hash-mismatch"
-        : rawAsset.declaredSHA256 ? "verified" : "unverified",
-      previewURL: resolvedPath ? `visual-assets/${slug(familyID)}/${previewName}` : null
-    };
-    assets.push(asset);
-    seenAssets.set(dedupeKey, asset);
-  }
   const distinctManifestHashes = unique(records.map(record => record.fileSHA256));
   const authorityConflict = distinctManifestHashes.length > 1 ? {
     status: "unresolved",
@@ -925,6 +905,41 @@ for (const familyID of Object.keys(manifestGroups).sort()) {
       outputCount: Array.isArray(record.manifest.outputs) ? record.manifest.outputs.length : null
     }))
   } : null;
+  const disclosure = partitionVisualRecords(rawAssets, hiddenLexemeIDs, authorityConflict ? "authority-conflict" : null);
+  const withheldCounts = disclosure.withheldCounts;
+  for (const rawAsset of disclosure.disclosed.sort((left, right) => `${contextPriority(left.context)}\0${left.semanticKey}\0${left.rawPath}`.localeCompare(`${contextPriority(right.context)}\0${right.semanticKey}\0${right.rawPath}`))) {
+    const resolvedPath = await resolveAssetPath(rawAsset.manifestPath, rawAsset.rawPath, rawAsset.context);
+    let actualSHA256 = null;
+    if (resolvedPath) actualSHA256 = sha(await readFile(join(repoRoot, resolvedPath)));
+    let role = rawAsset.role;
+    if (records[0].path.startsWith("AssetLab/artifacts/") && role === "runtime" && !/^runtime\//i.test(rawAsset.context)) role = "evidence";
+    const identity = visualRecordIdentity({ familyID, role, semanticKey: rawAsset.semanticKey, variant: rawAsset.variant });
+    const asset = {
+      semanticKey: rawAsset.semanticKey,
+      role,
+      variant: rawAsset.variant,
+      sourcePath: resolvedPath,
+      declaredSHA256: rawAsset.declaredSHA256,
+      actualSHA256,
+      decodedRGBASHA256: rawAsset.decodedRGBASHA256,
+      width: rawAsset.width,
+      height: rawAsset.height,
+      integrity: !resolvedPath ? "missing"
+        : rawAsset.declaredSHA256 && rawAsset.declaredSHA256 !== actualSHA256 ? "hash-mismatch"
+        : rawAsset.declaredSHA256 ? "verified" : "unverified",
+      route: identity.route,
+      sourceRoute: identity.sourceRoute,
+      previewURL: resolvedPath ? identity.previewURL : null
+    };
+    const existing = assetsByRoute.get(asset.route);
+    if (existing) {
+      if (existing.sourcePath === asset.sourcePath && existing.actualSHA256 === asset.actualSHA256) continue;
+      throw new Error(`Visual route collision: ${asset.route} (${existing.sourcePath ?? existing.semanticKey} and ${asset.sourcePath ?? asset.semanticKey})`);
+    }
+    assets.push(asset);
+    assetsByRoute.set(asset.route, asset);
+  }
+  assertUniqueVisualRoutes(assets);
   const blockers = [];
   if (authorityConflict) blockers.push("multiple divergent manifests claim this family");
   if (assets.some(asset => asset.integrity === "missing")) blockers.push("one or more manifest image paths are missing");
@@ -958,6 +973,7 @@ for (const familyID of Object.keys(manifestGroups).sort()) {
       date: record.receipt.approvalDate ?? null
     })),
     authorityConflict,
+    withheldCounts,
     blockers: unique(blockers),
     assets
   });
@@ -979,7 +995,8 @@ const routes = [
   ...creatureMaterials.map(material => `creature-material/${material.slug}`),
   ...symbols.map(symbol => `lexeme/${symbol.slug}`), ...roadmap.map(item => `roadmap/${item.slug}`),
   ...terminology.map(term => `terminology/${term.slug}`),
-  ...visualAssetFamilies.map(family => `asset-family/${family.slug}`)
+  ...visualAssetFamilies.map(family => `asset-family/${family.slug}`),
+  ...visualAssetFamilies.flatMap(family => family.assets.map(asset => asset.route))
 ];
 const visualAssetSearch = visualAssetFamilies.map(family => ({
   type: "visualAssetFamily",
@@ -993,6 +1010,18 @@ const visualAssetSearch = visualAssetFamilies.map(family => ({
   disposition: family.blockers.length ? "blocked or review-gated" : family.status.join(" · "),
   provenance: provenance(family.manifestPaths, family.id, family.classification, hashes, aggregateHash)
 }));
+const visualRecordSearch = visualAssetFamilies.flatMap(family => family.assets.map(asset => ({
+  type: "visualAssetRecord",
+  id: asset.sourceRoute,
+  name: asset.semanticKey,
+  summary: `${family.name} · ${asset.role} · ${asset.variant}`,
+  category: "Visual asset record",
+  route: asset.route,
+  searchText: [asset.semanticKey, family.name, family.id, asset.role, asset.variant, asset.sourceRoute].join(" ").toLowerCase(),
+  exactSearchTerms: [asset.semanticKey, asset.sourceRoute].map(value => value.toLowerCase()),
+  disposition: family.blockers.length ? "blocked or review-gated" : family.status.join(" · "),
+  provenance: provenance(family.manifestPaths, asset.sourceRoute, family.classification, hashes, aggregateHash)
+})));
 const search = [...stations, ...travellers, ...resources, ...creatureMaterials, ...items, ...symbols, ...roadmap, ...terminology].map(entity => ({
   type: entity.type,
   id: entity.id,
@@ -1004,14 +1033,14 @@ const search = [...stations, ...travellers, ...resources, ...creatureMaterials, 
   exactSearchTerms: entity.exactSearchTerms ?? [entity.name].map(value => String(value).toLowerCase()),
   disposition: entity.disposition,
   provenance: entity.provenance
-})).concat(visualAssetSearch);
+})).concat(visualAssetSearch, visualRecordSearch);
 
 const wikiData = {
   schemaVersion: 1,
   generatedAtSourceHash: aggregateHash,
   routes,
   counts: { stations: stations.length, travellers: travellers.length, resources: resources.length, items: items.length, runes: symbols.length, roadmap: roadmap.length },
-  stations, travellers, resources, creatureMaterials, items, symbols, roadmap, terminology, authorities, history, search, currentTruth,
+  stations, travellers, resources, creatureMaterials, items, symbols, withheldVocabulary, roadmap, terminology, authorities, history, search, currentTruth,
   visualAssets: {
     summary: visualAssetSummary,
     families: visualAssetFamilies

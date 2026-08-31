@@ -65,6 +65,14 @@ h3 { margin: 0 0 8px; font-size: 17px; }
 .asset-record dd { margin: 2px 0 8px; }
 .asset-preview { width: 96px; height: 96px; display: grid; place-items: center; overflow: hidden; color: var(--muted); background: repeating-conic-gradient(#ded1b5 0 25%, #f5ead0 0 50%) 50% / 16px 16px; border: 1px solid #9f896a; font-size: 11px; text-align: center; }
 .asset-preview img { width: 100%; height: 100%; object-fit: contain; image-rendering: pixelated; }
+.asset-browser-controls { display: flex; flex-wrap: wrap; gap: 12px; align-items: end; margin-bottom: 12px; }
+.asset-browser-controls label { display: grid; gap: 4px; min-width: min(240px, 100%); color: var(--muted); }
+.asset-browser-controls input, .asset-browser-controls select, [data-asset-more] { min-height: 42px; border: 1px solid #9f896a; background: var(--panel); color: inherit; padding: 8px 10px; }
+.asset-grid > a.asset-record { color: inherit; text-decoration: none; }
+.asset-grid > a.asset-record:hover { border-color: var(--accent); }
+.integrity-paths { margin: 8px 0; }
+.asset-record-detail { max-width: 760px; grid-template-columns: 160px minmax(0, 1fr); }
+.asset-record-detail .asset-preview { width: 160px; height: 160px; }
 .progression-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
 .sprite-slots { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; }
 .sprite-slot { min-height: 130px; display: grid; place-items: center; color: var(--muted); background: #ddd0b2; border: 2px dashed #9c8667; text-align: center; }
