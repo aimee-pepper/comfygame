@@ -8,6 +8,7 @@ const systemLinks = [
   ['/systems', 'Systems overview'],
   ['/systems/world-writing', 'World Writing'],
   ['/systems/exploration', 'Exploration'],
+  ['/systems/sites-hazards', 'Sites & hazards'],
   ['/systems/animals-companionship', 'Animals & companionship'],
   ['/systems/research', 'Research'],
   ['/systems/combat', 'Combat'],

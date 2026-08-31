@@ -603,3 +603,24 @@ test('Equipment and material-effects guide keeps current slots, ownership, sampl
   assert.match(systems, /\/systems\/equipment-materials/);
   assert.match(frame, /\/systems\/equipment-materials/);
 });
+
+test('Sites and hazards reference documents only current Look profiles, search states, and disclosed rewards', async () => {
+  const guide = await read('app/systems/sites-hazards/page.tsx');
+  const systems = await read('app/systems/page.tsx');
+  const frame = await read('components/site-frame.tsx');
+  await access(path.join(root, 'app/systems/sites-hazards/page.tsx'));
+  assert.match(guide, /Look does not move the party or spend a turn/);
+  assert.match(guide, /Visible ordinary growth has no entry harm/);
+  assert.match(guide, /Entering will hurt the party/);
+  assert.match(guide, /Entering carries a lingering hazard/);
+  assert.match(guide, /Entering will start an encounter/);
+  assert.match(guide, /renews that poison rather than stacking/);
+  assert.match(guide, /current Look copy keeps contact, chemical poison, and active encounter as distinct profiles/);
+  assert.match(guide, /Brood Warren/);
+  assert.match(guide, /Atlas Seam/);
+  assert.match(guide, /on completion it becomes depleted/);
+  assert.match(guide, /do not promise that an undiscovered site is present in every world/);
+  assert.match(guide, /\/bestiary/);
+  assert.match(systems, /\/systems\/sites-hazards/);
+  assert.match(frame, /\/systems\/sites-hazards/);
+});
