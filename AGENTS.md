@@ -8,8 +8,9 @@ volume, document volume, evaluator construction, or the appearance of progress.
 - Work on the highest-priority user-visible blocker until it is implemented, durably preserved,
   focused-tested, and delivered to Aimee for testing.
 - "Keep everyone working" means assign only work that materially advances the current blocker or its next
-  already-approved implementation dependency. It never authorizes invented audits, speculative queues, or
-  unrelated work merely to keep a task active.
+  already-approved implementation dependency, or real nonconflicting game-production work already present
+  in the roadmap. It never authorizes invented audits, speculative queues, or unrelated work merely to keep
+  a task active.
 - When no role-appropriate work advances the current blocker, leave that role paused. Useful idleness is
   better than manufactured work.
 - Actual game construction, debugging, mounted playtesting, and phone delivery outrank evidence tooling,
@@ -65,11 +66,39 @@ lane until a corrected build is on her phone.
 During a P0 lane:
 
 - Engineering implements the blocker.
-- Game Design reviews only mechanics, state, persistence, identity, and interaction truth needed by that
-  blocker.
-- Asset reviews or creates only literal treatment for the exact blocker consumer.
+- Game Design remains primarily a system-design and game-content-authoring role. It may keep at most two
+  explicit, nonconflicting roadmap packets in production while Engineering fixes the P0. A brief bounded
+  review of an exact committed P0 revision may interrupt that work when mechanics, state, persistence,
+  identity, content, or interaction truth genuinely require Game Design authority; afterward it returns to
+  design and content creation.
+- Asset remains primarily an asset-production and human-authoring role. It may continue an exact implemented
+  or scheduled native consumer that does not conflict with the P0 worktree, including the player-requested
+  human-authoring source lane. A brief bounded review or literal correction of an exact committed P0 consumer
+  may interrupt that work; afterward it returns to production.
+- Reviews are secondary responsibilities for both leads. Do not turn either task into a standing audit queue.
+- Every concurrent Design or Asset assignment must name its roadmap authority, exact deliverable, integration
+  dependency, persistent worktree, and bounded commit boundary. Asset assignments must additionally name the
+  exact native consumer or stable content ID, visible deficiency, output dimensions/format, and fixed-phone
+  acceptance route.
 - Unrelated roadmap audits and presentation sweeps remain queued but inactive.
 - Evidence tooling is supporting work, never the primary deliverable.
+
+## Primary Lead Roles — Direct Aimee Override
+
+The three leads are builders. Their default work is creating the game, not evaluating other people's work.
+
+- **Engineering Lead:** implement, debug, integrate, mount, playtest, and deliver working game systems.
+- **Game Design Lead:** design mechanics and progression; author production dialogue, diaries, characters,
+  encounters, worlds, items, recipes, and other playable content; keep at most two real implementation packets
+  prepared ahead of Engineering. Do not manufacture design questions merely to stay active.
+- **Asset Lead:** create approved consumer-backed art, typography, motion, composition, and human-authoring
+  tools/source organization; prepare assets only for exact implemented or scheduled consumers. Do not replace
+  making assets with broad UI audits.
+- Review is a change-specific gate, not any lead's primary queue. Game Design reviews mechanics/content truth;
+  Asset reviews literal player-visible treatment. Once a bounded review is complete, resume creation work.
+- When production work is blocked by a real dependency, choose the next explicit nonconflicting roadmap item
+  within the two-packet limit. If none exists, pause rather than inventing audits, evaluators, or speculative
+  content.
 
 ## Fixed UI Configuration — Direct Aimee Override
 
