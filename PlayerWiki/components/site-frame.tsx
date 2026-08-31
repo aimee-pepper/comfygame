@@ -4,6 +4,7 @@ import type { ReactNode } from 'react';
 
 const systemLinks = [
   ['/getting-started', 'Start here'],
+  ['/journey', 'Your current journey'],
   ['/systems', 'Systems overview'],
   ['/systems/world-writing', 'World Writing'],
   ['/systems/exploration', 'Exploration'],

@@ -407,3 +407,24 @@ test('home and getting-started guide the live route with inline retained visuals
     assert.match(source, /PixelImage/);
   }
 });
+
+test('current journey publishes only present Writing, world, Village, and Research routes', async () => {
+  await access(path.join(root, 'app/journey/page.tsx'));
+  const journey = await read('app/journey/page.tsx');
+  const systems = await read('app/systems/page.tsx');
+  const frame = await read('components/site-frame.tsx');
+  assert.match(journey, /Write, review, and Bind/);
+  assert.match(journey, /Enter and explore the generated world/);
+  assert.match(journey, /Current Village construction/);
+  assert.match(journey, /Services, crafting, and Research/);
+  assert.match(journey, /does not prescribe a future building or Research order/);
+  assert.match(journey, /constructionCost/);
+  assert.match(journey, /\/systems\/world-writing/);
+  assert.match(journey, /\/systems\/exploration/);
+  assert.match(journey, /\/systems\/crafting/);
+  assert.match(systems, /Your current journey/);
+  assert.match(frame, /\/journey/);
+  assert.equal(journey.includes('Stage 0'), false);
+  assert.equal(journey.includes('Stage 1'), false);
+  assert.equal(journey.includes('Aimee decision'), false);
+});
