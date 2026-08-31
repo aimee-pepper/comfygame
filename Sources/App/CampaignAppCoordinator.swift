@@ -60,6 +60,7 @@ final class CampaignAppCoordinator: ObservableObject {
         case recoveryAvailable(CampaignRecoveryAssessmentV1)
         case opening
         case playing(GameStore)
+        case closing
         case failed(String)
     }
 
@@ -79,6 +80,7 @@ final class CampaignAppCoordinator: ObservableObject {
         any GamePersistenceIO,
         @escaping @Sendable (GameStore.PreparationStep) -> Void
     ) async throws -> GameStore.PreparedLaunch
+    private let retireWriterLeaseOverride: (@Sendable () async -> Void)?
 
     var store: GameStore? {
         if case .playing(let store) = phase { return store }
@@ -96,11 +98,13 @@ final class CampaignAppCoordinator: ObservableObject {
              try await Task.detached(priority: .userInitiated) {
                  try GameStore.prepareLaunch(io: io, progress: progress)
              }.value
-         }) {
+         },
+         retireWriterLease: (@Sendable () async -> Void)? = nil) {
         slots = SaveSlotFileIO(directory: directory)
         phase = readyStore.map(Phase.playing) ?? .idle
         self.minimumInitialDisplay = minimumInitialDisplay
         self.prepare = prepare
+        retireWriterLeaseOverride = retireWriterLease
     }
 
     func start() {
@@ -245,13 +249,16 @@ final class CampaignAppCoordinator: ObservableObject {
             "write active campaign", attemptID: attempt.id, stagedAt: attempt.stagedAt) { _ in () }
         guard case .committedNow(_, let presentationToken) = result else { return }
         returnWriteAttempt = nil
+        store.beginPersistenceClosing()
+        loadingPhase = .inspectingCampaigns(completed: 0, total: 0)
+        phase = .closing
         let acceptedToken = presentationToken
         let token = UUID(); generation = token
         task = Task { [weak self] in
             guard let self else { return }
-            await slots.releaseWriterLeaseAfterCommittedWrite()
+            if let retireWriterLeaseOverride { await retireWriterLeaseOverride() }
+            else { await slots.releaseWriterLeaseAfterCommittedWrite() }
             guard generation == token, acceptedToken == presentationToken else { return }
-            loadingPhase = .inspectingCampaigns(completed: 0, total: 0)
             phase = .choosing(await slots.inspect())
             task = nil
         }
@@ -360,7 +367,7 @@ struct CampaignAppRootView: View {
     var body: some View {
         Group {
             switch coordinator.phase {
-            case .idle, .loading, .opening:
+            case .idle, .loading, .opening, .closing:
                 LaunchSurface(progress: coordinator.loadingPhase.progress,
                               progressDescription: coordinator.loadingPhase.accessibilityDescription)
                     .onAppear {

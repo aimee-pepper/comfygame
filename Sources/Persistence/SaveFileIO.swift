@@ -36,6 +36,15 @@ enum PersistenceDigestV1 {
     }
 }
 
+/// Deterministic failure seams for persistence tests. Production uses `.none`.
+struct SaveFileCASFaultsV1: Sendable {
+    var failBeforePrimaryReplacement = false
+    var failPrimaryRestore = false
+    var failBackupRestore = false
+
+    static let none = Self()
+}
+
 enum SaveLoadOutcome {
     case newGame
     case loaded(GameState)
@@ -129,10 +138,13 @@ extension GamePersistenceIO where Self == SaveFileIO {
 struct SaveFileIO: GamePersistenceIO {
     let directory: URL
     let fileName: String
+    let casFaults: SaveFileCASFaultsV1
 
-    init(directory: URL, fileName: String = "bookbinder-save.json") {
+    init(directory: URL, fileName: String = "bookbinder-save.json",
+         casFaults: SaveFileCASFaultsV1 = .none) {
         self.directory = directory
         self.fileName = fileName
+        self.casFaults = casFaults
     }
 
     /// The real location: `Documents/`. Exposed over USB via `UIFileSharingEnabled` so a save can
@@ -205,6 +217,7 @@ struct SaveFileIO: GamePersistenceIO {
             } else if FileManager.default.fileExists(atPath: backupURL.path(percentEncoded: false)) {
                 try FileManager.default.removeItem(at: backupURL)
             }
+            if casFaults.failBeforePrimaryReplacement { throw CocoaError(.fileWriteUnknown) }
             try candidate.write(to: saveURL,
                 options: [.atomic, .completeFileProtectionUntilFirstUserAuthentication])
             guard (try? Data(contentsOf: saveURL)) == candidate else {
@@ -215,8 +228,13 @@ struct SaveFileIO: GamePersistenceIO {
             if (try? Data(contentsOf: saveURL)) == candidate {
                 return .recoveredDurable(receipt)
             }
-            try? restore(priorPrimary, at: saveURL)
-            try? restore(priorBackup, at: backupURL)
+            if !casFaults.failPrimaryRestore { try? restore(priorPrimary, at: saveURL) }
+            if !casFaults.failBackupRestore { try? restore(priorBackup, at: backupURL) }
+            let restoredPrimary = try? Data(contentsOf: saveURL)
+            let restoredBackup = try? Data(contentsOf: backupURL)
+            guard restoredPrimary == priorPrimary, restoredBackup == priorBackup else {
+                return .refused(.ambiguousReadback)
+            }
             return .refused(.writeFailed)
         }
     }

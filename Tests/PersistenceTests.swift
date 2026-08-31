@@ -2208,6 +2208,36 @@ final class PersistenceTests: XCTestCase {
         XCTAssertEqual(cold, candidate)
     }
 
+    func testRawBackupRotationWithFailedRestorationIsExplicitlyAmbiguous() throws {
+        let directory = FileManager.default.temporaryDirectory
+            .appending(path: "raw-rollback-failure-\(UUID().uuidString)",
+                       directoryHint: .isDirectory)
+        defer { try? FileManager.default.removeItem(at: directory) }
+        let setup = SaveFileIO(directory: directory)
+        var oldest = GameState.newGame(); oldest.base.essence = 21
+        var prior = GameState.newGame(); prior.base.essence = 22
+        try setup.write(SaveCodec.encode(oldest))
+        try setup.write(SaveCodec.encode(prior))
+        let primaryBefore = try Data(contentsOf: setup.saveURL)
+        let backupBefore = try Data(contentsOf: setup.backupURL)
+        let authority = try setup.persistenceAuthority()
+        let injected = SaveFileIO(
+            directory: directory,
+            casFaults: .init(failBeforePrimaryReplacement: true,
+                             failPrimaryRestore: false,
+                             failBackupRestore: true))
+        var candidate = GameState.newGame(); candidate.base.essence = 23
+
+        guard case .refused(.ambiguousReadback) = injected.compareAndSwap(
+            expected: authority, candidate: try SaveCodec.encode(candidate)) else {
+            return XCTFail("Changed backup after failed restoration must be explicit ambiguity")
+        }
+        XCTAssertEqual(try Data(contentsOf: setup.saveURL), primaryBefore)
+        XCTAssertNotEqual(try Data(contentsOf: setup.backupURL), backupBefore)
+        XCTAssertEqual(try Data(contentsOf: setup.backupURL), primaryBefore,
+                       "the injection proves backup rotation landed before primary failure")
+    }
+
     private func legacyMaterialRun() -> WorldRun {
         let book = BoundBook(symbols: [:], randomlyFilled: [], essencePaid: 0)
         let generated = Worldgen.generate(book: book, seed: 812)

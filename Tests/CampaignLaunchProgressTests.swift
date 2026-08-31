@@ -11,6 +11,18 @@ final class CampaignLaunchProgressTests: XCTestCase {
         func next() -> Int { value += 1; return value }
     }
 
+    private actor RetirementGate {
+        private var started = false
+        private var continuation: CheckedContinuation<Void, Never>?
+
+        func suspend() async {
+            started = true
+            await withCheckedContinuation { continuation = $0 }
+        }
+        func hasStarted() -> Bool { started }
+        func resume() { continuation?.resume(); continuation = nil }
+    }
+
     private final class CampaignWriteProbeIO: GamePersistenceIO, @unchecked Sendable {
         enum Mode: Equatable { case refuse, recover }
         let saveURL = FileManager.default.temporaryDirectory
@@ -195,6 +207,44 @@ final class CampaignLaunchProgressTests: XCTestCase {
                                "a prewrite failure may retry the exact staged attempt")
             }
         }
+    }
+
+    func testAcceptedReturnClosesMutationsBeforeSuspendedLeaseRetirement() async throws {
+        let directory = temporaryDirectory("suspended-retirement")
+        let io = SaveFileIO(directory: directory)
+        let store = GameStore(io: io)
+        let gate = RetirementGate()
+        let coordinator = CampaignAppCoordinator(
+            directory: directory, readyStore: store, minimumInitialDisplay: .zero,
+            retireWriterLease: { await gate.suspend() })
+
+        coordinator.returnToCampaigns()
+        try await waitUntil { if case .closing = coordinator.phase { true } else { false } }
+        for _ in 0..<400 {
+            if await gate.hasStarted() { break }
+            try await Task.sleep(for: .milliseconds(5))
+        }
+        let retirementStarted = await gate.hasStarted()
+        XCTAssertTrue(retirementStarted)
+        let stateAfterCommit = store.state
+        let diagnosticsAfterCommit = store.diagnostics
+        store.mutate("retained callback after return") { $0.base.essence += 99 }
+
+        XCTAssertEqual(store.state, stateAfterCommit)
+        XCTAssertEqual(store.diagnostics.savedMutationCount,
+                       diagnosticsAfterCommit.savedMutationCount)
+        XCTAssertEqual(store.diagnostics.writeCount, diagnosticsAfterCommit.writeCount)
+        XCTAssertEqual(store.diagnostics.hasPendingWrite,
+                       diagnosticsAfterCommit.hasPendingWrite)
+        XCTAssertEqual(store.diagnostics.lastError, diagnosticsAfterCommit.lastError)
+        if case .closing = coordinator.phase {} else { XCTFail("Closing must remain noninteractive") }
+
+        await gate.resume()
+        try await waitUntil { if case .choosing = coordinator.phase { true } else { false } }
+        coordinator.returnToCampaigns()
+        try await Task.sleep(for: .milliseconds(20))
+        if case .choosing = coordinator.phase {} else { XCTFail("Navigation must occur once") }
+        XCTAssertEqual(try SaveCodec.decode(Data(contentsOf: io.saveURL)), stateAfterCommit)
     }
 
     func testAppOwnsOneGlobalNonElasticVerticalScrollBoundary() throws {

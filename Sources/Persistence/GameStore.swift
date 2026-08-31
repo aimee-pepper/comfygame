@@ -528,6 +528,7 @@ final class GameStore: ObservableObject {
     private var nextPersistenceWriteGeneration: UInt64 = 1
     private var minimumAcceptedWriteGeneration: UInt64 = 0
     private var completedPersistedAttempts: [UUID: PersistenceCommitReceiptV1] = [:]
+    private var persistenceClosing = false
     private var nextWorldFieldAttemptID: UInt64 = 1
     private var worldFieldSessionEpoch: UInt64 = 1
     private var seenWorldFieldBatchIDs: Set<String> = []
@@ -1156,6 +1157,15 @@ final class GameStore: ObservableObject {
         }
     }
 
+    /// Synchronously closes every gameplay mutation seam after the durable campaign write and
+    /// before coordinator lease retirement can suspend.
+    func beginPersistenceClosing() {
+        persistenceClosing = true
+        debounceTask?.cancel()
+        debounceTask = nil
+        diagnostics.hasPendingWrite = false
+    }
+
     private func recordAuthoritativeCommit(_ receipt: PersistenceCommitReceiptV1,
                                            generation: UInt64) {
         guard generation >= minimumAcceptedWriteGeneration else { return }
@@ -1169,6 +1179,7 @@ final class GameStore: ObservableObject {
     /// One centralized gate covers every stale/debug action path while the arrival owns root
     /// presentation. Only the exact idempotent dismissal or orphan reconciliation may mutate.
     private func permitsMutationWhileArrivalOwnsRoot(_ scope: MutationScope) -> Bool {
+        guard !persistenceClosing else { return false }
         guard state.worlds.pendingWorldArrivalReceipt != nil else { return true }
         return scope == .arrivalLifecycle
     }
