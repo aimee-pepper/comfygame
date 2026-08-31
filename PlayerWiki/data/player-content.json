@@ -16,11 +16,21 @@
       ],
       "tradeBand": "Staple",
       "isRealityCurrency": false,
-      "acquisition": "World mineral node · Extraction rank 0",
+      "acquisition": "Rank-0 mineral node; hard Substrate/Relief; staple trade",
       "tradeStatus": "Staple trade band",
       "currentUses": [
         "No current Village construction recipe uses this resource."
       ],
+      "consumerAuthority": {
+        "acquisition": "Rank-0 mineral node; hard Substrate/Relief; staple trade",
+        "buildingConsumers": [],
+        "recipeConsumers": [
+          "exact units may satisfy compatible physical sockets"
+        ],
+        "otherConsumers": [
+          "scalar stock can only be sold"
+        ]
+      },
       "assetURL": "/game-assets/resources/rubble.png"
     },
     {
@@ -38,7 +48,7 @@
       ],
       "tradeBand": "Staple",
       "isRealityCurrency": false,
-      "acquisition": "World mineral node · Extraction rank 0",
+      "acquisition": "Rank-0 wet, soft Substrate node; staple trade",
       "tradeStatus": "Staple trade band",
       "currentUses": [
         "Used to construct the Armoury.",
@@ -47,6 +57,18 @@
         "Used to construct the Reliquary.",
         "Used to construct the Distillery."
       ],
+      "consumerAuthority": {
+        "acquisition": "Rank-0 wet, soft Substrate node; staple trade",
+        "buildingConsumers": [
+          "Reliquary 8, Scriptorium 10, Armoury 12, Apothecary 16, Distillery 30"
+        ],
+        "recipeConsumers": [
+          "compatible exact units in physical making"
+        ],
+        "otherConsumers": [
+          "Armoury research totals 22"
+        ]
+      },
       "assetURL": "/game-assets/resources/clay.png"
     },
     {
@@ -64,7 +86,7 @@
       ],
       "tradeBand": "Staple",
       "isRealityCurrency": false,
-      "acquisition": "World mineral node · Extraction rank 0",
+      "acquisition": "Rank-0 mineral node; current sites; staple trade; legacy Recycler",
       "tradeStatus": "Staple trade band",
       "currentUses": [
         "Used to construct the Blacksmith.",
@@ -75,6 +97,18 @@
         "Used to construct the Channelworks.",
         "Used to construct the Anchorage."
       ],
+      "consumerAuthority": {
+        "acquisition": "Rank-0 mineral node; current sites; staple trade; legacy Recycler",
+        "buildingConsumers": [
+          "Blacksmith 12, Survey Post 8, Reliquary 12, Armoury 28, Weaponsmith 32, Channelworks 50, Anchorage 40"
+        ],
+        "recipeConsumers": [
+          "compatible exact units across physical makers"
+        ],
+        "otherConsumers": [
+          "Spring, Hold, Satchel, Bargain, instruction and permanence research"
+        ]
+      },
       "assetURL": "/game-assets/resources/ore.png"
     },
     {
@@ -92,12 +126,25 @@
       ],
       "tradeBand": "Uncommon",
       "isRealityCurrency": false,
-      "acquisition": "World mineral node · Extraction rank 1",
+      "acquisition": "Rank-1 ductile/volatile seam; uncommon trade",
       "tradeStatus": "Uncommon trade band",
       "currentUses": [
         "Used to construct the Armoury.",
         "Used to construct the Weaponsmith."
       ],
+      "consumerAuthority": {
+        "acquisition": "Rank-1 ductile/volatile seam; uncommon trade",
+        "buildingConsumers": [
+          "Armoury 8, Weaponsmith 12"
+        ],
+        "recipeConsumers": [
+          "Cyan pigment",
+          "compatible fittings/bindings/grips"
+        ],
+        "otherConsumers": [
+          "maker progression, Brush, Ink Mixing, Sunglass and Level"
+        ]
+      },
       "assetURL": "/game-assets/resources/copper.png"
     },
     {
@@ -116,12 +163,25 @@
       ],
       "tradeBand": "Rare",
       "isRealityCurrency": false,
-      "acquisition": "World mineral node · Extraction rank 2",
+      "acquisition": "Rank-2 rich ductile seam; rare sale",
       "tradeStatus": "Rare trade band",
       "currentUses": [
         "Used to construct the Distillery.",
         "Used to construct the Channelworks."
       ],
+      "consumerAuthority": {
+        "acquisition": "Rank-2 rich ductile seam; rare sale",
+        "buildingConsumers": [
+          "Distillery 20, Channelworks 20"
+        ],
+        "recipeConsumers": [
+          "Light Core catalyst 2",
+          "compatible fittings"
+        ],
+        "otherConsumers": [
+          "Ruling Frame, Fountain Pen, four precision instruments and every Page Lens tier"
+        ]
+      },
       "assetURL": "/game-assets/resources/silver.png"
     },
     {
@@ -139,11 +199,23 @@
       ],
       "tradeBand": "Precious",
       "isRealityCurrency": false,
-      "acquisition": "World mineral node · Extraction rank 2",
+      "acquisition": "Rank-2 very rich ductile seam; precious sale",
       "tradeStatus": "Precious trade band",
       "currentUses": [
         "Used to construct the Weaponsmith."
       ],
+      "consumerAuthority": {
+        "acquisition": "Rank-2 very rich ductile seam; precious sale",
+        "buildingConsumers": [
+          "Weaponsmith 4"
+        ],
+        "recipeConsumers": [
+          "compatible fittings/bindings/grips"
+        ],
+        "otherConsumers": [
+          "Weaponsmith broaden/masterwork 6 total"
+        ]
+      },
       "assetURL": "/game-assets/resources/gold.png"
     },
     {
@@ -162,7 +234,7 @@
       ],
       "tradeBand": "Uncommon",
       "isRealityCurrency": false,
-      "acquisition": "World mineral node · Extraction rank 1",
+      "acquisition": "Rank-1 hard seam; clear air/high light; uncommon trade",
       "tradeStatus": "Uncommon trade band",
       "currentUses": [
         "Used to construct the Survey Post.",
@@ -171,6 +243,18 @@
         "Used to construct the Channelworks.",
         "Used to construct the Anchorage."
       ],
+      "consumerAuthority": {
+        "acquisition": "Rank-1 hard seam; clear air/high light; uncommon trade",
+        "buildingConsumers": [
+          "Survey Post 2, Apothecary 6, Distillery 30, Channelworks 20, Anchorage 20"
+        ],
+        "recipeConsumers": [
+          "Seamlight 1, Farsight 1, exact optical/Light Core selection"
+        ],
+        "otherConsumers": [
+          "Spring 22, pen work 14, seven instruments, four Page Lens tiers"
+        ]
+      },
       "assetURL": "/game-assets/resources/quartz.png"
     },
     {
@@ -188,11 +272,20 @@
       ],
       "tradeBand": "Uncommon",
       "isRealityCurrency": false,
-      "acquisition": "World mineral node · Extraction rank 1",
+      "acquisition": "Rank-1 ash/geothermal seam; uncommon trade",
       "tradeStatus": "Uncommon trade band",
       "currentUses": [
         "No current Village construction recipe uses this resource."
       ],
+      "consumerAuthority": {
+        "acquisition": "Rank-1 ash/geothermal seam; uncommon trade",
+        "buildingConsumers": [],
+        "recipeConsumers": [
+          "Depth pigment",
+          "compatible exact edges/points"
+        ],
+        "otherConsumers": []
+      },
       "assetURL": "/game-assets/resources/obsidian.png"
     },
     {
@@ -211,11 +304,23 @@
       ],
       "tradeBand": "Staple",
       "isRealityCurrency": false,
-      "acquisition": "World mineral node · Extraction rank 0",
+      "acquisition": "Rank-0 saline/briny/low-water deposit; staple trade",
       "tradeStatus": "Staple trade band",
       "currentUses": [
         "Used to construct the Tannery."
       ],
+      "consumerAuthority": {
+        "acquisition": "Rank-0 saline/briny/low-water deposit; staple trade",
+        "buildingConsumers": [
+          "Tannery 8"
+        ],
+        "recipeConsumers": [
+          "Clearing Draught 1, Solvent 1"
+        ],
+        "otherConsumers": [
+          "Fitted Layers 4"
+        ]
+      },
       "assetURL": "/game-assets/resources/salt.png"
     },
     {
@@ -233,11 +338,19 @@
       ],
       "tradeBand": "Uncommon",
       "isRealityCurrency": false,
-      "acquisition": "World mineral node · Extraction rank 0",
+      "acquisition": "Rank-0 hot volatile/geothermal deposit; uncommon trade",
       "tradeStatus": "Uncommon trade band",
       "currentUses": [
         "No current Village construction recipe uses this resource."
       ],
+      "consumerAuthority": {
+        "acquisition": "Rank-0 hot volatile/geothermal deposit; uncommon trade",
+        "buildingConsumers": [],
+        "recipeConsumers": [
+          "Firebrand 1, Heat Core 2, Yellow pigment"
+        ],
+        "otherConsumers": []
+      },
       "assetURL": "/game-assets/resources/sulfur.png"
     },
     {
@@ -256,11 +369,21 @@
       ],
       "tradeBand": "Rare",
       "isRealityCurrency": false,
-      "acquisition": "World mineral node · Extraction rank 3",
+      "acquisition": "Rank-3 rich ductile/volatile mineral; rare sale",
       "tradeStatus": "Rare trade band",
       "currentUses": [
         "No current Village construction recipe uses this resource."
       ],
+      "consumerAuthority": {
+        "acquisition": "Rank-3 rich ductile/volatile mineral; rare sale",
+        "buildingConsumers": [],
+        "recipeConsumers": [
+          "Flashsalt 1, Stillwater 1"
+        ],
+        "otherConsumers": [
+          "Chaining 2, Thermoscope 2, Barometer 3, Silvered Back 2"
+        ]
+      },
       "assetURL": "/game-assets/resources/mercury.png"
     },
     {
@@ -279,11 +402,21 @@
       ],
       "tradeBand": "Precious",
       "isRealityCurrency": false,
-      "acquisition": "World mineral node · Extraction rank 4",
+      "acquisition": "Rank-4 extreme hard/valuable unstable seam; precious sale",
       "tradeStatus": "Precious trade band",
       "currentUses": [
         "No current Village construction recipe uses this resource."
       ],
+      "consumerAuthority": {
+        "acquisition": "Rank-4 extreme hard/valuable unstable seam; precious sale",
+        "buildingConsumers": [],
+        "recipeConsumers": [
+          "compatible high-grade exact stock"
+        ],
+        "otherConsumers": [
+          "Chronometer 2, Fine Scale 2, Long Glass 4"
+        ]
+      },
       "assetURL": "/game-assets/resources/adamant.png"
     },
     {
@@ -301,7 +434,7 @@
       ],
       "tradeBand": "Staple",
       "isRealityCurrency": false,
-      "acquisition": "Primary flora harvest",
+      "acquisition": "fibrous/small woody flora; Wayfarer organic bonus; current sites; staple trade; legacy Recycler",
       "tradeStatus": "Staple trade band",
       "currentUses": [
         "Used to construct the Blacksmith.",
@@ -309,6 +442,19 @@
         "Used to construct the Bowyer.",
         "Used to construct the Wayfarer's Table."
       ],
+      "consumerAuthority": {
+        "acquisition": "fibrous/small woody flora; Wayfarer organic bonus; current sites; staple trade; legacy Recycler",
+        "buildingConsumers": [
+          "Blacksmith 6, Tannery 20, Bowyer 18, Wayfarer's Table 12"
+        ],
+        "recipeConsumers": [
+          "Seamlight 1, Venom 1, Briar Oil 1",
+          "compatible physical sockets"
+        ],
+        "otherConsumers": [
+          "Tannery/Bowyer and many instruction, Focus, Bargain, Hold and Satchel nodes"
+        ]
+      },
       "assetURL": "/game-assets/resources/fiber.png"
     },
     {
@@ -326,7 +472,7 @@
       ],
       "tradeBand": "Staple",
       "isRealityCurrency": false,
-      "acquisition": "Primary flora harvest",
+      "acquisition": "tall woody flora; Wayfarer organic bonus; staple trade; legacy Recycler",
       "tradeStatus": "Staple trade band",
       "currentUses": [
         "Used to construct the Tannery.",
@@ -335,6 +481,19 @@
         "Used to construct the Survey Post.",
         "Used to construct the Wayfarer's Table."
       ],
+      "consumerAuthority": {
+        "acquisition": "tall woody flora; Wayfarer organic bonus; staple trade; legacy Recycler",
+        "buildingConsumers": [
+          "Tannery 12, Bowyer 24, Scriptorium 14, Survey Post 10, Wayfarer's Table 14"
+        ],
+        "recipeConsumers": [
+          "Stonebark 1, Torch 2",
+          "compatible limbs/hafts/grips"
+        ],
+        "otherConsumers": [
+          "Bowyer, Brush, Desk and Level research"
+        ]
+      },
       "assetURL": "/game-assets/resources/timber.png"
     },
     {
@@ -352,12 +511,25 @@
       ],
       "tradeBand": "Staple",
       "isRealityCurrency": false,
-      "acquisition": "Primary flora harvest",
+      "acquisition": "fleshy flora; Wayfarer organic bonus; staple trade; legacy Recycler",
       "tradeStatus": "Staple trade band",
       "currentUses": [
         "Used to construct the Wayfarer's Table.",
         "Used to construct the Anchorage."
       ],
+      "consumerAuthority": {
+        "acquisition": "fleshy flora; Wayfarer organic bonus; staple trade; legacy Recycler",
+        "buildingConsumers": [
+          "Wayfarer's Table 6, Anchorage 18"
+        ],
+        "recipeConsumers": [
+          "Salve 2, Clearing 1, Lure 1",
+          "personal compound formalization"
+        ],
+        "otherConsumers": [
+          "Continuous Settling 8, Compound Assembly 4"
+        ]
+      },
       "assetURL": "/game-assets/resources/pulp.png"
     },
     {
@@ -375,11 +547,30 @@
       ],
       "tradeBand": "Staple",
       "isRealityCurrency": false,
-      "acquisition": "Secondary harvest from qualifying flora",
+      "acquisition": "secondary yield from qualifying woody defended flora; staple trade",
       "tradeStatus": "Staple trade band",
       "currentUses": [
         "Used to construct the Bowyer."
       ],
+      "consumerAuthority": {
+        "acquisition": "secondary yield from qualifying woody defended flora; staple trade",
+        "buildingConsumers": [
+          "Bowyer 8"
+        ],
+        "recipeConsumers": [
+          "Seamlight",
+          "three Salves",
+          "Quenching",
+          "Stonebark",
+          "Briar Oil",
+          "Torch",
+          "every ink vial",
+          "compatible bindings"
+        ],
+        "otherConsumers": [
+          "Bowyer, Ink Mixing, Compounds, Fountain Pen, Vivometer"
+        ]
+      },
       "assetURL": "/game-assets/resources/resin.png"
     },
     {
@@ -397,11 +588,20 @@
       ],
       "tradeBand": "Uncommon",
       "isRealityCurrency": false,
-      "acquisition": "Primary flora harvest",
+      "acquisition": "chemically defended flora; uncommon trade",
       "tradeStatus": "Uncommon trade band",
       "currentUses": [
         "No current Village construction recipe uses this resource."
       ],
+      "consumerAuthority": {
+        "acquisition": "chemically defended flora; uncommon trade",
+        "buildingConsumers": [],
+        "recipeConsumers": [
+          "Venom 1, Lure 1, Caustic Core option 2",
+          "compatible specialist exact stock"
+        ],
+        "otherConsumers": []
+      },
       "assetURL": "/game-assets/resources/toxin.png"
     },
     {
@@ -419,11 +619,19 @@
       ],
       "tradeBand": "Uncommon",
       "isRealityCurrency": false,
-      "acquisition": "Primary flora harvest",
+      "acquisition": "fungal flora favoured by dark/decay; uncommon trade",
       "tradeStatus": "Uncommon trade band",
       "currentUses": [
         "No current Village construction recipe uses this resource."
       ],
+      "consumerAuthority": {
+        "acquisition": "fungal flora favoured by dark/decay; uncommon trade",
+        "buildingConsumers": [],
+        "recipeConsumers": [
+          "Salve 1, Greater Salve 2, Broad Antidote 1"
+        ],
+        "otherConsumers": []
+      },
       "assetURL": "/game-assets/resources/spore.png"
     },
     {
@@ -442,11 +650,22 @@
       ],
       "tradeBand": "Uncommon",
       "isRealityCurrency": false,
-      "acquisition": "Primary flora harvest",
+      "acquisition": "chemosynthetic flora in volatile substrate/toxic air; uncommon trade",
       "tradeStatus": "Uncommon trade band",
       "currentUses": [
         "Used to construct the Apothecary."
       ],
+      "consumerAuthority": {
+        "acquisition": "chemosynthetic flora in volatile substrate/toxic air; uncommon trade",
+        "buildingConsumers": [
+          "Apothecary 12"
+        ],
+        "recipeConsumers": [
+          "Scent Mask, Quenching, Broad Antidote, Firebrand, Flashsalt, Solvent",
+          "exact specialist stock"
+        ],
+        "otherConsumers": []
+      },
       "assetURL": "/game-assets/resources/reagent.png"
     },
     {
@@ -463,11 +682,22 @@
       ],
       "tradeBand": "Rare",
       "isRealityCurrency": false,
-      "acquisition": "Exact creature-material reward",
+      "acquisition": "scalar definition is creature-only/no ordinary node; exact units come from creature outcomes/merchant; rare sale",
       "tradeStatus": "Rare trade band",
       "currentUses": [
         "No current Village construction recipe uses this resource."
       ],
+      "consumerAuthority": {
+        "acquisition": "scalar definition is creature-only/no ordinary node; exact units come from creature outcomes/merchant; rare sale",
+        "buildingConsumers": [],
+        "recipeConsumers": [
+          "Greater Salve, Broad Antidote, Farsight, Magenta pigment, Caustic Core option",
+          "compatible exact stock"
+        ],
+        "otherConsumers": [
+          "Vivometer 2, Long Glass 4"
+        ]
+      },
       "assetURL": "/game-assets/resources/ichor.png"
     },
     {
@@ -486,11 +716,21 @@
       ],
       "tradeBand": "Rare",
       "isRealityCurrency": false,
-      "acquisition": "World mineral node · Extraction rank 3",
+      "acquisition": "Rank-3 seam beside chasms in unstable worlds; rare sale",
       "tradeStatus": "Rare trade band",
       "currentUses": [
         "No current Village construction recipe uses this resource."
       ],
+      "consumerAuthority": {
+        "acquisition": "Rank-3 seam beside chasms in unstable worlds; rare sale",
+        "buildingConsumers": [],
+        "recipeConsumers": [
+          "Stillwater 1, Waystone 1"
+        ],
+        "otherConsumers": [
+          "Fine Scale 1"
+        ]
+      },
       "assetURL": "/game-assets/resources/rift_glass.png"
     },
     {
@@ -506,11 +746,22 @@
       ],
       "tradeBand": "Nontradeable",
       "isRealityCurrency": false,
-      "acquisition": "Direct world pickup",
+      "acquisition": "direct wild pickup; current site JSON also pays it; nontradeable",
       "tradeStatus": "Not traded",
       "currentUses": [
         "No current Village construction recipe uses this resource."
       ],
+      "consumerAuthority": {
+        "acquisition": "direct wild pickup; current site JSON also pays it; nontradeable",
+        "buildingConsumers": [],
+        "recipeConsumers": [
+          "Essence Spring refinement at 2:1, then 3:1 after Second Pass",
+          "optional Continuous Settling"
+        ],
+        "otherConsumers": [
+          "continuation precursor"
+        ]
+      },
       "assetURL": "/game-assets/resources/essence_raw.png"
     },
     {
@@ -528,11 +779,21 @@
       ],
       "tradeBand": "Nontradeable",
       "isRealityCurrency": true,
-      "acquisition": "Reality award",
+      "acquisition": "Reality-layer authored site/cache/permanent awards; nontradeable",
       "tradeStatus": "Reality currency · not traded",
       "currentUses": [
         "No current Village construction recipe uses this resource."
       ],
+      "consumerAuthority": {
+        "acquisition": "Reality-layer authored site/cache/permanent awards; nontradeable",
+        "buildingConsumers": [],
+        "recipeConsumers": [
+          "Waystone 1"
+        ],
+        "otherConsumers": [
+          "Constellation"
+        ]
+      },
       "assetURL": "/game-assets/resources/mote.png"
     }
   ],

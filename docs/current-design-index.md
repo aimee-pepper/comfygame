@@ -294,6 +294,7 @@ When two documents disagree:
 | Instruments | `instrument-system-audit.md` and current crafting/research data |
 | Apex encounters | `apex-system-audit.md`, then `apex-encounters.md` for implementation context |
 | Crafting / Apothecary | `crafting-spec (1).md` + `consumable-economy-field-kit-current.md` | Coating/Stonebark effects plus sustainable recipe costs, explicit saved packing and compact station/use surfaces |
+| Resource consumer authority map | `resource-consumer-authority-map-current.md` | Source-pinned acquisition/consumer ledger for all 23 resources, with orphan/overload/fiction findings separated from proposed changes |
 | Apothecary coating identity | `apothecary-coating-identity-current.md` | Final four names/effects, exact zero-Essence recipes and live `fibre` correctness catch |
 | Combat growth | `combat-trees-full.md`; identity docs may deliberately hold exact teachings |
 | Research economy shape | `research-economy-shape-audit-current.md` | Separates core expressive unlocks, optional capabilities and long-horizon capacity; Penmanship is the current outlier and no blanket rescale is authorized |

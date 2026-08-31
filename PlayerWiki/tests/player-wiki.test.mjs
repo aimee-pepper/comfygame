@@ -97,8 +97,15 @@ test('sanitized player snapshot has useful implemented coverage and inline visua
   assert.equal(content.travellers.length, 8);
   assert.equal(
     content.resources.find((resource) => resource.id === 'rubble')?.acquisition,
-    'World mineral node · Extraction rank 0',
+    'Rank-0 mineral node; hard Substrate/Relief; staple trade',
   );
+  for (const resource of content.resources) {
+    assert.ok(resource.consumerAuthority, `${resource.id} consumer authority`);
+    assert.ok(resource.consumerAuthority.acquisition, `${resource.id} acquisition`);
+    assert.ok(Array.isArray(resource.consumerAuthority.buildingConsumers));
+    assert.ok(Array.isArray(resource.consumerAuthority.recipeConsumers));
+    assert.ok(Array.isArray(resource.consumerAuthority.otherConsumers));
+  }
   assert.equal(
     content.resources.find((resource) => resource.id === 'mote')?.tradeStatus,
     'Reality currency · not traded',
@@ -144,7 +151,9 @@ test('crafting has a linked system index and complete resource cross-reference s
     assert.match(crafting, new RegExp(`slug: '${system}'`));
   }
   const resourceIndex = await read('app/resources/page.tsx');
-  assert.match(resourceIndex, /Crafts used in/);
+  assert.match(resourceIndex, /Current crafting and service uses/);
+  assert.match(resourceIndex, /consumerAuthority\.recipeConsumers/);
+  assert.match(resourceIndex, /consumerAuthority\.otherConsumers/);
   assert.match(resourceIndex, /Building material\?/);
   assert.match(resourceIndex, /How obtained/);
   assert.match(resourceIndex, /Trade status/);

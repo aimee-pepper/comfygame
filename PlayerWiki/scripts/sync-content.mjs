@@ -29,6 +29,10 @@ const resourceSource = JSON.parse(
     'utf8',
   ),
 );
+const resourceConsumerAuthoritySource = await readFile(
+  path.join(repositoryRoot, 'docs', 'resource-consumer-authority-map-current.md'),
+  'utf8',
+);
 const researchSource = JSON.parse(
   await readFile(
     path.join(repositoryRoot, 'Sources', 'Content', 'Data', 'research.json'),
@@ -104,6 +108,32 @@ const slugFor = (name) =>
 const resourceDefinitionByID = new Map(
   resourceSource.resources.map((resource) => [resource.id, resource]),
 );
+const implementedResourceConsumerTable = resourceConsumerAuthoritySource
+  .split('## Complete resource-to-consumer map — IMPLEMENTED')[1]
+  ?.split('## Implemented construction pattern')[0];
+if (!implementedResourceConsumerTable) {
+  throw new Error('Resource consumer authority must retain its implemented table');
+}
+const resourceConsumerAuthorityByID = new Map(
+  implementedResourceConsumerTable
+    .split('\n')
+    .filter((line) => /^\| .+ \|/.test(line) && !line.startsWith('| Resource') && !line.startsWith('|---'))
+    .map((line) => line.split('|').slice(1, -1).map((cell) => compactCopy(cell)))
+    .map(([resource, acquisition, buildings, recipes, other]) => {
+      const id = resource.match(/`([^`]+)`/)?.[1];
+      if (!id) throw new Error(`Resource consumer authority row has no stable resource id: ${resource}`);
+      const values = (value) => (value === '—' ? [] : value.split(/;\s*/).map(compactCopy));
+      return [id, {
+        acquisition,
+        buildingConsumers: values(buildings),
+        recipeConsumers: values(recipes),
+        otherConsumers: values(other),
+      }];
+    }),
+);
+if (resourceConsumerAuthorityByID.size !== resourceSource.resources.length) {
+  throw new Error('Resource consumer authority must cover every current resource exactly once');
+}
 const acquisitionLabel = (resource) => {
   switch (resource.extractionDisposition) {
     case 'mineral_node':
@@ -353,6 +383,10 @@ const districtAssetURL = await publishTownVisual(
 const resources = [];
 for (const resource of source.resources) {
   const definition = resourceDefinitionByID.get(resource.id) ?? {};
+  const consumerAuthority = resourceConsumerAuthorityByID.get(resource.id);
+  if (!consumerAuthority) {
+    throw new Error(`Resource consumer authority is missing ${resource.id}`);
+  }
   const asset = runtimeAsset(
     'resource-sprites-v1',
     `resources/profiles/inventory/${resource.id}`,
@@ -367,9 +401,10 @@ for (const resource of source.resources) {
     favours: resource.favours,
     tradeBand: resource.tradeBand,
     isRealityCurrency: resource.isRealityCurrency,
-    acquisition: acquisitionLabel(definition),
+    acquisition: consumerAuthority.acquisition || acquisitionLabel(definition),
     tradeStatus: tradeStatus(definition),
     currentUses: resource.currentUses,
+    consumerAuthority,
     assetURL: await publishAsset(asset, 'resources', safeFileName(resource.id)),
   });
 }

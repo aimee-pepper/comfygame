@@ -30,7 +30,7 @@ export default function ResourcesPage() {
               <th aria-label="Image" />
               <th>Resource</th>
               <th>How obtained</th>
-              <th>Crafts used in</th>
+              <th>Current crafting and service uses</th>
               <th>Building material?</th>
               <th>Trade status</th>
             </tr>
@@ -53,27 +53,15 @@ export default function ResourcesPage() {
                     </Link>
                     <small>{resource.summary}</small>
                   </td>
-                  <td>{resource.acquisition}</td>
+                  <td>{resource.consumerAuthority.acquisition}</td>
                   <td>
-                    {recipes.length ? (
-                      <>
-                        {recipes.slice(0, 3).map((recipe, index) => (
-                          <span key={recipe.id}>
-                            {index ? ', ' : ''}
-                            <Link href={`/crafting/${recipe.system}`}>
-                              {recipe.name}
-                            </Link>
-                          </span>
-                        ))}
-                        {recipes.length > 3
-                          ? ` +${recipes.length - 3} more`
-                          : ''}
-                      </>
-                    ) : (
-                      'No current recipe'
-                    )}
+                    <ul className="compact-list">
+                      <li><strong>Craft / process:</strong> {resource.consumerAuthority.recipeConsumers.length ? resource.consumerAuthority.recipeConsumers.join('; ') : 'No current process listed'}</li>
+                      <li><strong>Service / research:</strong> {resource.consumerAuthority.otherConsumers.length ? resource.consumerAuthority.otherConsumers.join('; ') : 'No other current sink listed'}</li>
+                      {recipes.length > 0 && <li><strong>Recipe pages:</strong> {recipes.map((recipe, index) => <span key={recipe.id}>{index ? ', ' : ''}<Link href={`/crafting/${recipe.system}`}>{recipe.name}</Link></span>)}</li>}
+                    </ul>
                   </td>
-                  <td>{buildings.length ? <>Yes — {buildings.slice(0, 2).map((station, index) => <span key={station.id}>{index ? ', ' : ''}<Link href={`/places/${station.slug}`}>{station.name}</Link></span>)}{buildings.length > 2 ? ` +${buildings.length - 2} more` : ''}</> : 'No'}</td>
+                  <td>{buildings.length ? <><strong>Yes</strong><ul className="compact-list">{buildings.map((station) => { const cost = station.buildCost.find((entry) => (entry.id ?? entry.resource ?? entry.resourceID) === resource.id); return <li key={station.id}><Link href={`/places/${station.slug}`}>{station.name}</Link> · {cost?.quantity ?? cost?.amount ?? '?'}</li>; })}</ul></> : <strong>No</strong>}</td>
                   <td>{resource.tradeStatus}</td>
                 </tr>
               );

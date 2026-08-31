@@ -13,6 +13,12 @@ export interface Resource {
   acquisition: string;
   tradeStatus: string;
   currentUses: string[];
+  consumerAuthority: {
+    acquisition: string;
+    buildingConsumers: string[];
+    recipeConsumers: string[];
+    otherConsumers: string[];
+  };
   assetURL: string | null;
 }
 
