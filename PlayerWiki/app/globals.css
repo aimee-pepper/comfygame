@@ -1004,6 +1004,45 @@ footer {
 .crafting-station p {
   margin: 0;
 }
+.recipe-directory > p {
+  max-width: 780px;
+}
+.recipe-directory-group {
+  margin-top: 30px;
+}
+.recipe-directory-heading,
+.recipe-directory-heading > div {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.recipe-directory-heading {
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+.recipe-directory-heading > div > div {
+  display: block;
+}
+.recipe-directory-heading .pixel-image {
+  border: 1px solid rgb(185 148 97 / 55%);
+  background: var(--paper-light);
+}
+.recipe-directory-heading h3,
+.recipe-directory-heading p {
+  margin: 0;
+}
+.recipe-directory-heading p {
+  margin-top: 4px;
+  color: var(--muted);
+  font-size: 13px;
+}
+.recipe-directory-heading > span {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
 .fact-grid {
   margin: 0;
 }
@@ -1149,6 +1188,11 @@ footer {
   }
   .entity-heading {
     grid-template-columns: 1fr;
+  }
+  .recipe-directory-heading,
+  .recipe-directory-heading > div {
+    align-items: flex-start;
+    flex-direction: column;
   }
   .glossary-group-heading {
     align-items: flex-start;

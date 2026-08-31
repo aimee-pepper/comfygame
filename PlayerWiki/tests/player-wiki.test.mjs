@@ -116,6 +116,10 @@ test('crafting has a linked system index and complete resource cross-reference s
   const craftingIndex = await read('app/crafting/page.tsx');
   const craftingDetail = await read('app/crafting/[slug]/page.tsx');
   assert.match(craftingIndex, /PixelImage/);
+  assert.match(craftingIndex, /All current recipes by station/);
+  assert.match(craftingIndex, /Exact ingredients and costs/);
+  assert.match(craftingIndex, /Primary use/);
+  assert.match(craftingIndex, /resultHref/);
   assert.match(craftingDetail, /recipe-ingredient/);
   assert.match(craftingDetail, /Result image/);
   assert.match(craftingDetail, /crafting-station/);
