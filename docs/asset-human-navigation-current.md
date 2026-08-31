@@ -1,6 +1,6 @@
 # Visual asset human navigation — current organization audit
 
-**Audited revision:** `f1570abd85985885f838ce835a4fdb2ccea38921`  
+**Audited revision:** `92bd529016a67b57c19891ed1657cadcf12ea598`
 **Scope:** repository organization only; no art, runtime, project, schema, or GameWiki authority change.
 
 ## Finder and Xcode paths for humans
