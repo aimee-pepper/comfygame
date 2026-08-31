@@ -463,3 +463,20 @@ test('exploration’s current pressure guide is sourced from all implemented tar
     'illumination', 'thermal', 'hydrology', 'substrate', 'relief', 'vitality', 'atmosphere', 'cycle',
   ]);
 });
+
+test('Party preparation documents the current party limit, gear slots, Gambits, and retained outcomes', async () => {
+  await access(path.join(root, 'app/systems/party-preparation/page.tsx'));
+  const party = await read('app/systems/party-preparation/page.tsx');
+  const systems = await read('app/systems/page.tsx');
+  const frame = await read('components/site-frame.tsx');
+  assert.match(party, /five-person party/);
+  assert.match(party, /up to four recruited companions/);
+  assert.match(party, /Weapon', 'Off-hand', 'Head', 'Body', 'Hands', 'Feet', 'Tool', 'Keepsake/);
+  assert.match(party, /first enabled rule that fits/);
+  assert.match(party, /The existing list and its priority stay unchanged/);
+  assert.match(party, /\/services\/firepit/);
+  assert.match(party, /\/equipment/);
+  assert.match(party, /\/systems\/combat/);
+  assert.match(systems, /\/systems\/party-preparation/);
+  assert.match(frame, /\/systems\/party-preparation/);
+});

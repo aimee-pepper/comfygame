@@ -10,6 +10,7 @@ const systemLinks = [
   ['/systems/exploration', 'Exploration'],
   ['/systems/research', 'Research'],
   ['/systems/combat', 'Combat'],
+  ['/systems/party-preparation', 'Party, Gear & Gambits'],
   ['/bestiary', 'Bestiary records'],
   ['/systems/crafting', 'Crafting basics'],
 ];
