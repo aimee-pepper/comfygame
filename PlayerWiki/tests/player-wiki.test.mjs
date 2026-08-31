@@ -76,6 +76,21 @@ test('item details link published recipes and resources without guessing absent 
   assert.match(craftingGuide, /writing-ink/);
 });
 
+test('equipment routes retain slot, recipe, frozen-piece and custody guidance', async () => {
+  const index = await read('app/equipment/page.tsx');
+  const detail = await read('app/equipment/[slug]/page.tsx');
+  assert.match(index, /Current combat facts/);
+  assert.match(index, /Current recipe route/);
+  assert.match(index, /No current recipe published/);
+  assert.match(index, /Worn by another person/);
+  assert.match(detail, /frozen piece profile/);
+  assert.match(detail, /Reforge rank and provenance/);
+  assert.match(detail, /same-slot swap/);
+  assert.match(detail, /carried in the active world/);
+  assert.match(detail, /\/crafting\/blacksmith/);
+  assert.match(detail, /\/crafting\/armoury/);
+});
+
 test('player navigation excludes internal wiki architecture', async () => {
   const source = `${await read('components/site-frame.tsx')}\n${await read('app/page.tsx')}\n${await read('app/people/page.tsx')}`;
   for (const forbidden of [
