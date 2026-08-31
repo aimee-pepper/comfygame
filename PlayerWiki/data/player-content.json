@@ -2391,7 +2391,38 @@
       },
       "pageCount": 5,
       "clueCount": 2,
-      "teaching": null
+      "teaching": null,
+      "hints": [
+        "Hard stone and compacted ground keep sharp edges when they break. The pieces could be fitted together again after the whole fails.",
+        "Useful material is concentrated in a few narrow seams rather than spread across the ground. Separate pieces should be easy to recover."
+      ],
+      "diaryPages": [
+        {
+          "kind": "locationClue",
+          "prose": "Hard stone and compacted ground keep sharp edges when they break. The pieces could be fitted together again after the whole fails.",
+          "reward": null
+        },
+        {
+          "kind": "locationClue",
+          "prose": "Useful material is concentrated in a few narrow seams rather than spread across the ground. Separate pieces should be easy to recover.",
+          "reward": null
+        },
+        {
+          "kind": "whereabouts",
+          "prose": "Vance prices the whole object. I price the sound parts, subtract the work of separating them, and ask why the damaged joint is being hidden. Our totals usually agree. He finds this irritating.",
+          "reward": null
+        },
+        {
+          "kind": "whereabouts",
+          "prose": "Halloway repairs objects I would dismantle. When she says a piece can be mended, let her try. When she says it cannot, stop asking. She has already tried in her head three times.",
+          "reward": null
+        },
+        {
+          "kind": "worldWorthWriting",
+          "prose": "Write hard material in a few clear seams. I can separate a clean boundary, count what came out, and leave the rest intact. Scattered fragments take longer and encourage sloppy sorting.",
+          "reward": null
+        }
+      ]
     },
     {
       "id": "halloway",
@@ -2416,7 +2447,38 @@
         "kind": "focus",
         "field": "teachesFocus",
         "stableID": "gold_ore"
-      }
+      },
+      "hints": [
+        "The heat here does half the work for you.",
+        "The ground gives when it is worked, and holds when it cools."
+      ],
+      "diaryPages": [
+        {
+          "kind": "locationClue",
+          "prose": "The heat here does half the work for you.",
+          "reward": null
+        },
+        {
+          "kind": "locationClue",
+          "prose": "The ground gives when it is worked, and holds when it cools.",
+          "reward": null
+        },
+        {
+          "kind": "worldWorthWriting",
+          "prose": "Give me heat and ground I can shape. I can carry tools, fuel and iron; I cannot carry a workable floor in my pockets.",
+          "reward": null
+        },
+        {
+          "kind": "focus",
+          "prose": "A few gold flecks will waste an afternoon. A continuous vein can be cut, weighed and worked. Follow the stone before celebrating the shine.",
+          "reward": "Teaches Focus: gold_ore"
+        },
+        {
+          "kind": "researchLead",
+          "prose": "A brush needs a thin ferrule that grips an even bundle without cutting the fibres. Bring Isolde workable metal; I will test the seam and replace it if it slips.",
+          "reward": "Research lead: pen_brush"
+        }
+      ]
     },
     {
       "id": "mara",
@@ -2441,7 +2503,42 @@
         "kind": "focus",
         "field": "teachesFocus",
         "stableID": "scarp"
-      }
+      },
+      "hints": [
+        "At its brightest, the horizon burns white enough to swallow my sighting line."
+      ],
+      "diaryPages": [
+        {
+          "kind": "locationClue",
+          "prose": "At its brightest, the horizon burns white enough to swallow my sighting line.",
+          "reward": null
+        },
+        {
+          "kind": "whereabouts",
+          "prose": "Sela took the north path with two days of food and enough confidence for four. If the path was wrong, she will have found a better one by now.",
+          "reward": null
+        },
+        {
+          "kind": "focus",
+          "prose": "I tried to sight across the slope and found the ground had stopped pretending to be gradual. A scarp: steep face, abrupt rise, no sensible route straight up.",
+          "reward": "Teaches Focus: scarp"
+        },
+        {
+          "kind": "worldWorthWriting",
+          "prose": "Give me one fixed horizon, ridge or shoreline and I can measure the rest against it. Write that reference first; interpretation can wait until we have observations.",
+          "reward": null
+        },
+        {
+          "kind": "ruin",
+          "prose": "A crystal cut in the stone repeats the same crooked horizon from every face. I checked the instrument twice. The distortion belongs to the cavern.",
+          "reward": null
+        },
+        {
+          "kind": "whereabouts",
+          "prose": "Tovin counted distance by the bindings needed to return. His figures were excellent. His habit of staying when the return grew expensive was not.",
+          "reward": null
+        }
+      ]
     },
     {
       "id": "edren",
@@ -2466,7 +2563,43 @@
         "kind": "focus",
         "field": "teachesFocus",
         "stableID": "ruin"
-      }
+      },
+      "hints": [
+        "More hard stone than loose ground. My trowel complains before I do.",
+        "The cold settles low enough to numb my fingers through the cloth."
+      ],
+      "diaryPages": [
+        {
+          "kind": "locationClue",
+          "prose": "More hard stone than loose ground. My trowel complains before I do.",
+          "reward": null
+        },
+        {
+          "kind": "locationClue",
+          "prose": "The cold settles low enough to numb my fingers through the cloth.",
+          "reward": null
+        },
+        {
+          "kind": "ruin",
+          "prose": "The walls beneath the ice meet at worked corners. This was a room before it froze, though I cannot yet date either event.",
+          "reward": null
+        },
+        {
+          "kind": "researchLead",
+          "prose": "The lead seams repeat at measured intervals and terminate beside worked sockets. Natural deposition is possible, but deliberate placement better fits the evidence.",
+          "reward": "Research lead: study_growth"
+        },
+        {
+          "kind": "focus",
+          "prose": "Ruin: a constructed place whose use has ended or become unclear. Record the surviving work before assigning a story to the absent workers.",
+          "reward": "Teaches Focus: ruin"
+        },
+        {
+          "kind": "worldWorthWriting",
+          "prose": "Write a place with construction over older construction. The lower floor establishes first use; repairs and additions above it show later occupation without requiring a clean beginning.",
+          "reward": null
+        }
+      ]
     },
     {
       "id": "isolde",
@@ -2491,7 +2624,43 @@
         "kind": "focus",
         "field": "teachesFocus",
         "stableID": "hush"
-      }
+      },
+      "hints": [
+        "The land rises until every line I rule looks level by comparison.",
+        "Stone and packed ground cover most of this place. Even the horizon feels written in it."
+      ],
+      "diaryPages": [
+        {
+          "kind": "locationClue",
+          "prose": "The land rises until every line I rule looks level by comparison.",
+          "reward": null
+        },
+        {
+          "kind": "locationClue",
+          "prose": "Stone and packed ground cover most of this place. Even the horizon feels written in it.",
+          "reward": null
+        },
+        {
+          "kind": "worldWorthWriting",
+          "prose": "Your hand is the repeated motion behind the mark. A better tool can make that motion smaller or cleaner, but it cannot practise on your behalf.",
+          "reward": null
+        },
+        {
+          "kind": "focus",
+          "prose": "Hush the air, settle your sleeve, then draw. If the line still trembles, the movement came from your hand and you can work on it.",
+          "reward": "Teaches Focus: hush"
+        },
+        {
+          "kind": "researchLead",
+          "prose": "Rough charcoal makes every correction visible. Learn to commit the stroke. Then use a brush, where pressure and angle let you revise the shape while you draw it.",
+          "reward": "Research lead: pen_brush"
+        },
+        {
+          "kind": "whereabouts",
+          "prose": "Tovin closes a binding with excellent control and terrible judgement about when to stop. Fear steadies his hand. He remains annoyingly proud of the wrong half of that assessment.",
+          "reward": null
+        }
+      ]
     },
     {
       "id": "sela",
@@ -2516,7 +2685,44 @@
         "kind": "focus",
         "field": "teachesFocus",
         "stableID": "pond"
-      }
+      },
+      "hints": [
+        "Enough water that I can choose the next crossing instead of rationing the last.",
+        "You can see for a very long way.",
+        "Plants grow thickly across much of the ground. That is a mercy."
+      ],
+      "diaryPages": [
+        {
+          "kind": "locationClue",
+          "prose": "Enough water that I can choose the next crossing instead of rationing the last.",
+          "reward": null
+        },
+        {
+          "kind": "locationClue",
+          "prose": "You can see for a very long way.",
+          "reward": null
+        },
+        {
+          "kind": "locationClue",
+          "prose": "Plants grow thickly across much of the ground. That is a mercy.",
+          "reward": null
+        },
+        {
+          "kind": "worldWorthWriting",
+          "prose": "Write somewhere the weather makes decisions for you. Pack for the forecast you wanted, then pack for the one that will actually turn up.",
+          "reward": null
+        },
+        {
+          "kind": "focus",
+          "prose": "A pond is a small body of still water you can walk around. Check the bank before drinking. Check what is already drinking before choosing a bank.",
+          "reward": "Teaches Focus: pond"
+        },
+        {
+          "kind": "whereabouts",
+          "prose": "Halloway is tending a banked fire somewhere warm. She said she would keep it alive until we arrived, so bring dry fuel and do not make her prove how long she can wait.",
+          "reward": null
+        }
+      ]
     },
     {
       "id": "auber",
@@ -2541,7 +2747,79 @@
         "kind": "focus",
         "field": "teachesFocus",
         "stableID": "brine"
-      }
+      },
+      "hints": [
+        "Water leaves a white mineral crust when it dries, and the next water carries the same sharp taste. Separation changes the carrier that follows.",
+        "Water gathers into distinct bodies. A mixture needs an edge before its layers can be compared.",
+        "Most of the water stands in broad, still bodies long enough for sediment to settle. Patience separates some things and merely postpones others.",
+        "Heat and cold take turns carrying different parts. Neither interval tells the whole composition.",
+        "Much of the ground reacts strongly to heat or water by changing colour, shape or state. Any vessel used here must resist the same reactions.",
+        "The workable matter keeps to narrow seams. Precision can spare the ground or simply make taking more efficient.",
+        "Vapour keeps the farther edge uncertain. What leaves the vessel remains part of the process even when nobody collects it.",
+        "Conditions change sharply from one interval to the next, enough to alter the mixture each time. Repetition is not purification by itself."
+      ],
+      "diaryPages": [
+        {
+          "kind": "locationClue",
+          "prose": "Water leaves a white mineral crust when it dries, and the next water carries the same sharp taste. Separation changes the carrier that follows.",
+          "reward": null
+        },
+        {
+          "kind": "locationClue",
+          "prose": "Water gathers into distinct bodies. A mixture needs an edge before its layers can be compared.",
+          "reward": null
+        },
+        {
+          "kind": "locationClue",
+          "prose": "Most of the water stands in broad, still bodies long enough for sediment to settle. Patience separates some things and merely postpones others.",
+          "reward": null
+        },
+        {
+          "kind": "locationClue",
+          "prose": "Heat and cold take turns carrying different parts. Neither interval tells the whole composition.",
+          "reward": null
+        },
+        {
+          "kind": "locationClue",
+          "prose": "Much of the ground reacts strongly to heat or water by changing colour, shape or state. Any vessel used here must resist the same reactions.",
+          "reward": null
+        },
+        {
+          "kind": "locationClue",
+          "prose": "The workable matter keeps to narrow seams. Precision can spare the ground or simply make taking more efficient.",
+          "reward": null
+        },
+        {
+          "kind": "locationClue",
+          "prose": "Vapour keeps the farther edge uncertain. What leaves the vessel remains part of the process even when nobody collects it.",
+          "reward": null
+        },
+        {
+          "kind": "locationClue",
+          "prose": "Conditions change sharply from one interval to the next, enough to alter the mixture each time. Repetition is not purification by itself.",
+          "reward": null
+        },
+        {
+          "kind": "focus",
+          "prose": "Brine is water carrying enough dissolved salt to taste sharp and leave crystals as it dries. Reduce it slowly. Scorched salt ruins the finish and the room smells dreadful.",
+          "reward": "Teaches Focus: brine"
+        },
+        {
+          "kind": "whereabouts",
+          "prose": "Nessa asks what the extract does to a particular body at a particular dose. I tell her what was concentrated and what remains dissolved. Then she stops me tasting it, usually correctly.",
+          "reward": null
+        },
+        {
+          "kind": "whereabouts",
+          "prose": "Grimmond brings me ore with stone, water and occasionally half a support brace attached. I separate the useful fraction. He insists I label the residue by weight. He is right and graceless.",
+          "reward": null
+        },
+        {
+          "kind": "whereabouts",
+          "prose": "Oda needs an output whose concentration and carrier are exact enough to contain. If my pure fraction hides its remaining vapour, she sends it back with annotations sharp enough to cut glass.",
+          "reward": null
+        }
+      ]
     },
     {
       "id": "tovin",
@@ -2566,7 +2844,89 @@
         "kind": "focus",
         "field": "teachesFocus",
         "stableID": "drift"
-      }
+      },
+      "hints": [
+        "Even at its brightest, the world remains dark. The dark is not empty.",
+        "Fungal growth spreads without sunlight. It has made the dark its own.",
+        "Stone and packed earth dominate the world—floor, wall, ceiling, and the dust between.",
+        "Everything is close. I do not like it.",
+        "The water leaves a white seam wherever it withdraws.",
+        "Even the deepest hours never soften the cold.",
+        "No draft reaches the loose corner of this page.",
+        "Every interval arrives exactly when the last one promised."
+      ],
+      "diaryPages": [
+        {
+          "kind": "locationClue",
+          "prose": "Even at its brightest, the world remains dark. The dark is not empty.",
+          "reward": null
+        },
+        {
+          "kind": "locationClue",
+          "prose": "Fungal growth spreads without sunlight. It has made the dark its own.",
+          "reward": null
+        },
+        {
+          "kind": "locationClue",
+          "prose": "Stone and packed earth dominate the world—floor, wall, ceiling, and the dust between.",
+          "reward": null
+        },
+        {
+          "kind": "locationClue",
+          "prose": "Everything is close. I do not like it.",
+          "reward": null
+        },
+        {
+          "kind": "locationClue",
+          "prose": "The water leaves a white seam wherever it withdraws.",
+          "reward": null
+        },
+        {
+          "kind": "locationClue",
+          "prose": "Even the deepest hours never soften the cold.",
+          "reward": null
+        },
+        {
+          "kind": "locationClue",
+          "prose": "No draft reaches the loose corner of this page.",
+          "reward": null
+        },
+        {
+          "kind": "locationClue",
+          "prose": "Every interval arrives exactly when the last one promised.",
+          "reward": null
+        },
+        {
+          "kind": "focus",
+          "prose": "Drift is the change between one measured interval and the next when the world does not keep our expected pace. Record both clocks. I learned this after trusting only one.",
+          "reward": "Teaches Focus: drift"
+        },
+        {
+          "kind": "whereabouts",
+          "prose": "Edren chose a cold world because the layers remain undisturbed. He will be delighted, underdressed, and unwilling to admit either fact.",
+          "reward": null
+        },
+        {
+          "kind": "locationClue",
+          "prose": "The ground rises into high ridges and steep slopes. Isolde always chose stone she could see by, far from a flickering fire.",
+          "reward": null
+        },
+        {
+          "kind": "worldWorthWriting",
+          "prose": "The fourth world yielded enough Essence to fund the next binding. I called that self-sustaining while stripping it. Blue mineral rain fell on empty ground. I still miss the sound, which is not an excuse.",
+          "reward": null
+        },
+        {
+          "kind": "worldWorthWriting",
+          "prose": "I wrote a generous world and refused to bind it because I distrusted my motive. The page was lost unused. I can explain the caution clearly; that does not recover the world.",
+          "reward": null
+        },
+        {
+          "kind": "ruin",
+          "prose": "Some worlds contain a natural anchor where the old binding still catches. The page pulls taut near it. Mark the seam first; decide what to attach only after you know the return route.",
+          "reward": null
+        }
+      ]
     }
   ],
   "stations": [

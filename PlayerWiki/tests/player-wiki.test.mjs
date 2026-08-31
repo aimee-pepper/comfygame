@@ -5,30 +5,55 @@ import test from 'node:test';
 import { fileURLToPath } from 'node:url';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const read = relative => readFile(path.join(root, relative), 'utf8');
+const read = (relative) => readFile(path.join(root, relative), 'utf8');
 
 test('World Writing teaches the authored player order', async () => {
   const source = await read('app/systems/world-writing/page.tsx');
-  const titles = ['Choose a hand', 'Choose ink', 'Place and connect', 'Review and Bind'];
-  const positions = titles.map(title => source.indexOf(title));
-  assert.ok(positions.every(position => position >= 0));
-  assert.deepEqual([...positions].sort((a, b) => a - b), positions);
+  const titles = [
+    'Choose a hand',
+    'Choose ink',
+    'Place and connect',
+    'Review and Bind',
+  ];
+  const positions = titles.map((title) => source.indexOf(title));
+  assert.ok(positions.every((position) => position >= 0));
+  assert.deepEqual(
+    [...positions].sort((a, b) => a - b),
+    positions,
+  );
 });
 
 test('player reference indexes are tables linked to individual pages', async () => {
-  for (const relative of ['app/resources/page.tsx', 'app/equipment/page.tsx', 'app/people/page.tsx', 'app/places/page.tsx']) {
+  for (const relative of [
+    'app/resources/page.tsx',
+    'app/equipment/page.tsx',
+    'app/people/page.tsx',
+    'app/places/page.tsx',
+  ]) {
     const source = await read(relative);
     assert.match(source, /<table>/);
     assert.match(source, /<Link/);
   }
-  for (const relative of ['app/resources/[slug]/page.tsx', 'app/equipment/[slug]/page.tsx', 'app/people/[slug]/page.tsx', 'app/places/[slug]/page.tsx']) {
+  for (const relative of [
+    'app/resources/[slug]/page.tsx',
+    'app/equipment/[slug]/page.tsx',
+    'app/people/[slug]/page.tsx',
+    'app/places/[slug]/page.tsx',
+  ]) {
     await access(path.join(root, relative));
   }
 });
 
 test('player navigation excludes internal wiki architecture', async () => {
   const source = `${await read('components/site-frame.tsx')}\n${await read('app/page.tsx')}\n${await read('app/people/page.tsx')}`;
-  for (const forbidden of ['Visual Assets', 'Decisions / History', 'Roadmap', 'Stable ID', 'Source path', 'Provenance']) {
+  for (const forbidden of [
+    'Visual Assets',
+    'Decisions / History',
+    'Roadmap',
+    'Stable ID',
+    'Source path',
+    'Provenance',
+  ]) {
     assert.equal(source.includes(forbidden), false, forbidden);
   }
 });
@@ -39,8 +64,8 @@ test('sanitized player snapshot has useful implemented coverage and inline visua
   assert.equal(content.items.length, 103);
   assert.equal(content.travellers.length, 8);
   assert.equal(content.stations.length, 22);
-  assert.ok(content.resources.some(entry => entry.assetURL));
-  assert.ok(content.items.some(entry => entry.assetURL));
+  assert.ok(content.resources.some((entry) => entry.assetURL));
+  assert.ok(content.items.some((entry) => entry.assetURL));
   assert.ok(content.terrain.length > 0);
   assert.ok(content.writingAssetURL);
   await access(path.join(root, 'public', content.writingAssetURL));
@@ -50,4 +75,62 @@ test('PlayerWiki remains a separate application from the internal GameWiki', asy
   const readme = await read('README.md');
   assert.match(readme, /separate from `GameWiki`/);
   assert.match(readme, /player-facing/);
+});
+
+test('crafting has a linked system index and complete resource cross-reference surfaces', async () => {
+  await access(path.join(root, 'app/crafting/page.tsx'));
+  await access(path.join(root, 'app/crafting/[slug]/page.tsx'));
+  const crafting = await read('lib/crafting.ts');
+  for (const system of [
+    'apothecary',
+    'blacksmith',
+    'tannery',
+    'bowyer',
+    'weaponsmith',
+    'armoury',
+    'instruments',
+    'distillery',
+    'refinery',
+    'writing-ink',
+  ]) {
+    assert.match(crafting, new RegExp(`slug: '${system}'`));
+  }
+  const resourceIndex = await read('app/resources/page.tsx');
+  assert.match(resourceIndex, /Crafts used in/);
+  assert.match(resourceIndex, /Building material\?/);
+  const resourceDetail = await read('app/resources/[slug]/page.tsx');
+  assert.match(resourceDetail, /Craft recipes/);
+  assert.match(resourceDetail, /Building recipes/);
+});
+
+test('every live person includes every authored diary page and every authored location hint', async () => {
+  const content = JSON.parse(await read('data/player-content.json'));
+  const authored = JSON.parse(
+    await read('../Sources/Content/Data/travellers.json'),
+  );
+  for (const person of content.travellers) {
+    const authoredPerson = authored.travellers.find(
+      (entry) => entry.id === person.id,
+    );
+    const pages = authored.pages.filter((page) => page.diary === person.id);
+    assert.ok(authoredPerson, person.id);
+    assert.deepEqual(
+      person.hints,
+      authoredPerson.signature.map((entry) => entry.passage),
+      `${person.id} hints`,
+    );
+    assert.equal(
+      person.diaryPages.length,
+      pages.length,
+      `${person.id} diary pages`,
+    );
+    assert.deepEqual(
+      person.diaryPages.map((page) => page.prose),
+      pages.map((page) => page.prose),
+      `${person.id} diary prose`,
+    );
+  }
+  const personPage = await read('app/people/[slug]/page.tsx');
+  assert.match(personPage, /Hints for finding them/);
+  assert.match(personPage, /Diary pages/);
 });
