@@ -31,13 +31,17 @@ export default async function ServiceDetail({
     (entry) => entry.id === guide.stationID,
   );
   if (!station) notFound();
+  const visualURL = station.assetURL ?? station.contextAssetURL;
+  const visualLabel = station.assetURL
+    ? `${station.name} building visual`
+    : `${station.zone} town setting`;
   return (
     <SiteFrame sidebar>
       <div className="entity-heading">
-        {station.assetURL && (
+        {visualURL && (
           <PixelImage
-            src={station.assetURL}
-            alt={`${station.name} visual`}
+            src={visualURL}
+            alt={visualLabel}
             size={96}
           />
         )}
@@ -47,6 +51,7 @@ export default async function ServiceDetail({
           summary={guide.summary}
         />
       </div>
+      <p className="service-visual-note">{station.assetURL ? `The current retained building visual for ${station.name}.` : `The current retained ${station.zone} setting for this service.`}</p>
       <section className="article-section">
         <h2>Use it for</h2>
         <ul>

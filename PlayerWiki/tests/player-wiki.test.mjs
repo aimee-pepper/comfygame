@@ -246,6 +246,12 @@ test('village services have a hub, individual guides and place cross-links', asy
   const place = await read('app/places/[slug]/page.tsx');
   assert.match(place, /serviceForStation/);
   assert.match(place, /How to use/);
+  const index = await read('app/services/page.tsx');
+  const detail = await read('app/services/[slug]/page.tsx');
+  assert.match(index, /station\?\.assetURL \?\? station\?\.contextAssetURL/);
+  assert.match(index, /PixelImage/);
+  assert.match(detail, /station\.assetURL \?\? station\.contextAssetURL/);
+  assert.match(detail, /service-visual-note/);
 });
 
 test('resource progression compares every current trade band and consumer family', async () => {

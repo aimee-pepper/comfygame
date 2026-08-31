@@ -331,6 +331,17 @@ h2 {
   font-size: 13px;
   line-height: 1.35;
 }
+.service-card .pixel-image {
+  flex: 0 0 auto;
+  border: 1px solid rgb(185 148 97 / 55%);
+  background: var(--paper-light);
+}
+.service-visual-note {
+  margin: -12px 0 0;
+  color: var(--muted);
+  font-size: 13px;
+  font-style: italic;
+}
 .table-wrap {
   overflow-x: auto;
   border: 1px solid var(--line);

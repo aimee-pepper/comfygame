@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { PageIntro } from '@/components/page-intro';
+import { PixelImage } from '@/components/pixel-image';
 import { SiteFrame } from '@/components/site-frame';
 import { content } from '@/lib/content';
 import { serviceGuides } from '@/lib/services';
@@ -18,12 +19,17 @@ export default function ServicesPage() {
             const station = content.stations.find(
               (entry) => entry.id === guide.stationID,
             );
+            const visualURL = station?.assetURL ?? station?.contextAssetURL;
+            const visualLabel = station?.assetURL
+              ? `${station.name} building visual`
+              : `${station?.zone ?? 'Village'} town setting`;
             return (
               <Link
-                className="topic-card"
+                className="topic-card service-card"
                 href={`/services/${guide.slug}`}
                 key={guide.slug}
               >
+                {visualURL && <PixelImage src={visualURL} alt={visualLabel} size={56} />}
                 <span>
                   <strong>{guide.name}</strong>
                   <small>
