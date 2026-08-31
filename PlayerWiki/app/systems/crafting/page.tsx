@@ -1,8 +1,15 @@
 import Link from 'next/link';
 import { PageIntro } from '@/components/page-intro';
+import { PixelImage } from '@/components/pixel-image';
 import { SiteFrame } from '@/components/site-frame';
+import { content } from '@/lib/content';
 
 export default function Crafting() {
+  const stationNames = ['Storehouse', 'The Apothecary', 'Essence Spring'];
+  const stationReferences = stationNames
+    .map((name) => content.stations.find((station) => station.name === name))
+    .filter((station) => station?.assetURL);
+
   return (
     <SiteFrame sidebar>
       <PageIntro
@@ -10,6 +17,13 @@ export default function Crafting() {
         title="Crafting and materials"
         summary="Returned resources support construction, supplies, equipment, research, and station work. Recipes describe the base object; its materials determine many of the useful differences."
       />
+      <section className="article-section crafting-route-guide">
+        <h2>Follow the material through the Village</h2>
+        <p>These retained place visuals point to the three screens most useful when deciding what to make: check what you carry, choose a preparation, then refine the currency a result requires.</p>
+        <div className="crafting-route-strip">
+          {stationReferences.map((station) => station && <Link key={station.id} href={`/places/${station.slug}`}><PixelImage src={station.assetURL} alt={`${station.name} building visual`} size={64} /><span><strong>{station.name}</strong><small>{station.blurb}</small></span></Link>)}
+        </div>
+      </section>
       <section className="article-section">
         <h2>Where crafting happens</h2>
         <div className="step-grid">

@@ -295,6 +295,42 @@ h2 {
 .first-trip-visuals {
   margin-top: 32px;
 }
+.crafting-route-guide > p {
+  max-width: 760px;
+}
+.crafting-route-strip {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 18px;
+}
+.crafting-route-strip > a {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 13px;
+  padding: 13px;
+  border: 1px solid var(--line);
+  background: var(--paper-light);
+  color: inherit;
+  text-decoration: none;
+}
+.crafting-route-strip > a:hover {
+  background: var(--paper-deep);
+}
+.crafting-route-strip span {
+  display: grid;
+  min-width: 0;
+  gap: 4px;
+}
+.crafting-route-strip strong {
+  font: 700 17px Georgia, serif;
+}
+.crafting-route-strip small {
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.35;
+}
 .table-wrap {
   overflow-x: auto;
   border: 1px solid var(--line);
@@ -787,6 +823,9 @@ footer {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
   .journey-strip {
+    grid-template-columns: 1fr;
+  }
+  .crafting-route-strip {
     grid-template-columns: 1fr;
   }
   .exploration-state-strip {

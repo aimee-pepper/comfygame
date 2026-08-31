@@ -176,6 +176,14 @@ test('home and getting-started guide the live route with inline retained visuals
   }
 });
 
+test('crafting guide links retained Village visuals to their place references', async () => {
+  const source = await read('app/systems/crafting/page.tsx');
+  assert.match(source, /crafting-route-strip/);
+  assert.match(source, /PixelImage/);
+  assert.match(source, /station\.assetURL/);
+  assert.match(source, /\/places\/\$\{station\.slug\}/);
+});
+
 test('every live person includes every authored diary page and every authored location hint', async () => {
   const content = JSON.parse(await read('data/player-content.json'));
   const authored = JSON.parse(
