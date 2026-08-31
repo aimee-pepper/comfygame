@@ -3,20 +3,24 @@ import { Search } from 'lucide-react';
 import type { ReactNode } from 'react';
 
 const systemLinks = [
-  ['/getting-started', 'Getting started'],
+  ['/getting-started', 'Start here'],
+  ['/systems', 'Systems overview'],
   ['/systems/world-writing', 'World Writing'],
   ['/systems/exploration', 'Exploration'],
   ['/systems/combat', 'Combat'],
   ['/systems/crafting', 'Crafting basics'],
+];
+
+const prepareLinks = [
   ['/crafting', 'Crafting systems'],
   ['/services', 'Village services'],
+  ['/equipment', 'Equipment'],
+  ['/consumables', 'Consumables'],
+  ['/curios', 'Curios & key items'],
 ];
 
 const referenceLinks = [
   ['/resources', 'Resources'],
-  ['/equipment', 'Equipment'],
-  ['/consumables', 'Consumables'],
-  ['/curios', 'Curios & key items'],
   ['/people', 'People'],
   ['/places', 'Places & stations'],
   ['/glossary', 'Glossary'],
@@ -55,13 +59,12 @@ export function SiteFrame({
           />
         </form>
         <nav aria-label="Primary navigation">
-          <Link href="/getting-started">Getting started</Link>
-          <Link href="/resources">Resources</Link>
-          <Link href="/equipment">Equipment</Link>
+          <Link href="/getting-started">Start here</Link>
+          <Link href="/systems">Systems</Link>
+          <Link href="/services">Village</Link>
           <Link href="/crafting">Crafting</Link>
-          <Link href="/services">Services</Link>
+          <Link href="/resources">Resources</Link>
           <Link href="/people">People</Link>
-          <Link href="/places">Places</Link>
         </nav>
       </header>
       {sidebar ? (
@@ -69,6 +72,12 @@ export function SiteFrame({
           <aside className="wiki-sidebar" aria-label="Wiki sections">
             <p>Learn</p>
             {systemLinks.map(([href, label]) => (
+              <Link key={href} href={href}>
+                {label}
+              </Link>
+            ))}
+            <p>Prepare</p>
+            {prepareLinks.map(([href, label]) => (
               <Link key={href} href={href}>
                 {label}
               </Link>

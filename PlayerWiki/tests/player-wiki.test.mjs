@@ -317,6 +317,16 @@ test('all requested player detail routes have shared breadcrumbs and related gui
   await access(path.join(root, 'components/guide-navigation.tsx'));
 });
 
+test('shared navigation exposes the player Systems hub alongside major tasks', async () => {
+  const frame = await read('components/site-frame.tsx');
+  assert.match(frame, /\['\/systems', 'Systems overview'\]/);
+  assert.match(frame, /href="\/systems">Systems<\/Link>/);
+  assert.match(frame, /<p>Prepare<\/p>/);
+  for (const href of ['/getting-started', '/systems', '/services', '/crafting', '/resources', '/people']) {
+    assert.match(frame, new RegExp(href.replaceAll('/', '\\/')));
+  }
+});
+
 test('home and getting-started guide the live route with inline retained visuals', async () => {
   for (const relative of ['app/page.tsx', 'app/getting-started/page.tsx']) {
     const source = await read(relative);
