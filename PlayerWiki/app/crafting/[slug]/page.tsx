@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { PageIntro } from '@/components/page-intro';
+import { PixelImage } from '@/components/pixel-image';
 import { SiteFrame } from '@/components/site-frame';
 import { craftingSystems, recipesFor, systemFor } from '@/lib/crafting';
 import { content, humanize } from '@/lib/content';
@@ -38,12 +39,21 @@ function ingredientLabel(ingredient: {
       label
     );
   return (
-    <>
+    <span className="recipe-ingredient">
+      {resource?.assetURL && <PixelImage src={resource.assetURL} alt={`${resource.name} icon`} size={24} />}
       {amount}
       {body}
       {ingredient.role ? <small> — {ingredient.role}</small> : null}
-    </>
+    </span>
   );
+}
+
+function resultItem(recipe: ReturnType<typeof recipesFor>[number]) {
+  return content.items.find((item) => item.name === recipe.result) ?? null;
+}
+
+function resultLink(item: NonNullable<ReturnType<typeof resultItem>>) {
+  return item.gear ? `/equipment/${item.slug}` : `/items/${item.slug}`;
 }
 
 export default async function CraftingSystemDetail({
@@ -55,6 +65,7 @@ export default async function CraftingSystemDetail({
   const system = systemFor(slug);
   if (!system) notFound();
   const recipes = recipesFor(slug);
+  const station = content.stations.find((entry) => system.station.includes(entry.name));
   return (
     <SiteFrame sidebar>
       <PageIntro
@@ -63,6 +74,7 @@ export default async function CraftingSystemDetail({
         summary={system.summary}
       />
       <section className="article-section">
+        {station?.assetURL && <div className="crafting-station"><PixelImage src={station.assetURL} alt={`${station.name} building visual`} size={72} /><p><strong>{station.name}</strong> is the current station visual for this system.</p></div>}
         <h2>How it works</h2>
         <ol className="numbered-guide">
           {system.howItWorks.map((step) => (
@@ -77,6 +89,7 @@ export default async function CraftingSystemDetail({
             <thead>
               <tr>
                 <th>Recipe</th>
+                <th aria-label="Result image" />
                 <th>Result</th>
                 <th>Requirements</th>
                 <th>Notes</th>
@@ -84,11 +97,10 @@ export default async function CraftingSystemDetail({
             </thead>
             <tbody>
               {recipes.map((recipe) => (
-                <tr key={recipe.id}>
-                  <td>
-                    <strong>{recipe.name}</strong>
-                  </td>
-                  <td>{recipe.result}</td>
+                <tr key={recipe.id}>{(() => { const item = resultItem(recipe); return <>
+                  <td><strong>{recipe.name}</strong></td>
+                  <td>{item?.assetURL && <PixelImage src={item.assetURL} alt={`${item.name} icon`} size={32} />}</td>
+                  <td>{item ? <Link href={resultLink(item)}>{recipe.result}</Link> : recipe.result}</td>
                   <td>
                     <ul className="compact-list">
                       {recipe.ingredients.map((ingredient, index) => (
@@ -102,7 +114,7 @@ export default async function CraftingSystemDetail({
                     {recipe.notes ??
                       'Use the exact stock shown by the station preview.'}
                   </td>
-                </tr>
+                </>; })()}</tr>
               ))}
             </tbody>
           </table>

@@ -101,6 +101,12 @@ test('crafting has a linked system index and complete resource cross-reference s
   const resourceDetail = await read('app/resources/[slug]/page.tsx');
   assert.match(resourceDetail, /Craft recipes/);
   assert.match(resourceDetail, /Building recipes/);
+  const craftingIndex = await read('app/crafting/page.tsx');
+  const craftingDetail = await read('app/crafting/[slug]/page.tsx');
+  assert.match(craftingIndex, /PixelImage/);
+  assert.match(craftingDetail, /recipe-ingredient/);
+  assert.match(craftingDetail, /Result image/);
+  assert.match(craftingDetail, /crafting-station/);
 });
 
 test('places publish only current retained town and building visuals inline', async () => {

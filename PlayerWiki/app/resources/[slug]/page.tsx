@@ -95,6 +95,7 @@ export default async function ResourceDetail({
               <thead>
                 <tr>
                   <th>Recipe</th>
+                  <th aria-label="Result image" />
                   <th>System</th>
                   <th>How this resource is used</th>
                 </tr>
@@ -105,6 +106,7 @@ export default async function ResourceDetail({
                     (entry) => entry.resourceID === resource.id,
                   )!;
                   const system = systemFor(recipe.system);
+                  const result = content.items.find((item) => item.name === recipe.result);
                   return (
                     <tr key={recipe.id}>
                       <td>
@@ -112,6 +114,7 @@ export default async function ResourceDetail({
                           {recipe.name}
                         </Link>
                       </td>
+                      <td>{result?.assetURL && <PixelImage src={result.assetURL} alt={`${result.name} icon`} size={32} />}</td>
                       <td>{system?.name ?? humanize(recipe.system)}</td>
                       <td>
                         {ingredient.amount

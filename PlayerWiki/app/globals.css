@@ -560,6 +560,24 @@ footer {
   font-size: 13px;
   line-height: 1.4;
 }
+.recipe-ingredient {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 24px;
+}
+.crafting-station {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 22px;
+  padding: 12px;
+  border: 1px solid var(--line);
+  background: rgb(255 250 240 / 82%);
+}
+.crafting-station p {
+  margin: 0;
+}
 .fact-grid {
   margin: 0;
 }
@@ -629,6 +647,9 @@ footer {
   }
   .place-visual {
     max-width: none;
+  }
+  .crafting-station {
+    align-items: flex-start;
   }
   .wiki-sidebar p {
     display: none;

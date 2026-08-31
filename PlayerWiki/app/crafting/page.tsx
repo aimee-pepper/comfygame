@@ -1,7 +1,13 @@
 import Link from 'next/link';
 import { PageIntro } from '@/components/page-intro';
+import { PixelImage } from '@/components/pixel-image';
 import { SiteFrame } from '@/components/site-frame';
 import { craftingSystems, recipesFor } from '@/lib/crafting';
+import { content } from '@/lib/content';
+
+function stationVisual(system: (typeof craftingSystems)[number]) {
+  return content.stations.find((station) => system.station.includes(station.name));
+}
 
 export default function CraftingSystemsPage() {
   return (
@@ -19,6 +25,7 @@ export default function CraftingSystemsPage() {
               href={`/crafting/${system.slug}`}
               key={system.slug}
             >
+              {stationVisual(system)?.assetURL && <PixelImage src={stationVisual(system)!.assetURL} alt={`${stationVisual(system)!.name} building visual`} size={56} />}
               <span>
                 <strong>{system.name}</strong>
                 <small>
