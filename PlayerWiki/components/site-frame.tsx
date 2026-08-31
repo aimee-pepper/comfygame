@@ -8,6 +8,7 @@ const systemLinks = [
   ['/systems/world-writing', 'World Writing'],
   ['/systems/exploration', 'Exploration'],
   ['/systems/combat', 'Combat'],
+  ['/bestiary', 'Bestiary records'],
   ['/systems/crafting', 'Crafting basics'],
 ];
 

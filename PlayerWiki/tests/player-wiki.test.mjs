@@ -277,6 +277,19 @@ test('resource progression compares every current trade band and consumer family
   assert.match(page, /implemented game/);
 });
 
+test('bestiary navigation preserves undiscovered creature privacy while linking current player guides', async () => {
+  const bestiary = await read('app/bestiary/page.tsx');
+  const frame = await read('components/site-frame.tsx');
+  const search = await read('app/search/page.tsx');
+  assert.match(bestiary, /Individual records/);
+  assert.match(bestiary, /No individual creature record is currently published/);
+  assert.match(bestiary, /\/systems\/combat/);
+  assert.match(bestiary, /\/systems\/exploration/);
+  assert.match(bestiary, /PixelImage/);
+  assert.match(frame, /\/bestiary/);
+  assert.match(search, /World records/);
+});
+
 test('search groups player references and uses retained thumbnails only where available', async () => {
   const search = await read('app/search/page.tsx');
   assert.match(search, /label: 'Resources'/);
