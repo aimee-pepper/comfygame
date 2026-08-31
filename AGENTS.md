@@ -66,8 +66,9 @@ lane until a corrected build is on her phone.
 During a P0 lane:
 
 - Engineering implements the blocker.
-- Game Design remains primarily a system-design and game-content-authoring role. It may keep at most two
-  explicit, nonconflicting roadmap packets in production while Engineering fixes the P0. A brief bounded
+- Game Design remains primarily a system-design and game-content-authoring role. It keeps a rolling queue of
+  explicit, nonconflicting roadmap packets in campaign and roadmap order while Engineering fixes the P0; it
+  does not stop merely because earlier committed packets await integration. A brief bounded
   review of an exact committed P0 revision may interrupt that work when mechanics, state, persistence,
   identity, content, or interaction truth genuinely require Game Design authority; afterward it returns to
   design and content creation.
@@ -89,16 +90,18 @@ The three leads are builders. Their default work is creating the game, not evalu
 
 - **Engineering Lead:** implement, debug, integrate, mount, playtest, and deliver working game systems.
 - **Game Design Lead:** design mechanics and progression; author production dialogue, diaries, characters,
-  encounters, worlds, items, recipes, and other playable content; keep at most two real implementation packets
-  prepared ahead of Engineering. Do not manufacture design questions merely to stay active.
+  encounters, worlds, items, recipes, and other playable content; maintain a rolling queue of bounded real
+  implementation packets in campaign and roadmap order. Do not stop at an arbitrary packet count, and do not
+  manufacture design questions merely to stay active.
 - **Asset Lead:** create approved consumer-backed art, typography, motion, composition, and human-authoring
   tools/source organization; prepare assets only for exact implemented or scheduled consumers. Do not replace
   making assets with broad UI audits.
 - Review is a change-specific gate, not any lead's primary queue. Game Design reviews mechanics/content truth;
   Asset reviews literal player-visible treatment. Once a bounded review is complete, resume creation work.
 - When production work is blocked by a real dependency, choose the next explicit nonconflicting roadmap item
-  within the two-packet limit. If none exists, pause rather than inventing audits, evaluators, or speculative
-  content.
+  in order. Keep each commit bounded and avoid speculative breadth, but do not idle solely because other
+  committed packets await integration. If no legitimate item exists, pause rather than inventing audits,
+  evaluators, or speculative content.
 
 ## Fixed UI Configuration — Direct Aimee Override
 
