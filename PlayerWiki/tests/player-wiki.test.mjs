@@ -421,10 +421,30 @@ test('current journey publishes only present Writing, world, Village, and Resear
   assert.match(journey, /constructionCost/);
   assert.match(journey, /\/systems\/world-writing/);
   assert.match(journey, /\/systems\/exploration/);
-  assert.match(journey, /\/systems\/crafting/);
+  assert.match(journey, /\/systems\/research/);
   assert.match(systems, /Your current journey/);
   assert.match(frame, /\/journey/);
   assert.equal(journey.includes('Stage 0'), false);
   assert.equal(journey.includes('Stage 1'), false);
   assert.equal(journey.includes('Aimee decision'), false);
+});
+
+test('Research publishes current branches, node requirements, base costs, and retained study behavior', async () => {
+  await access(path.join(root, 'app/systems/research/page.tsx'));
+  const content = JSON.parse(await read('data/player-content.json'));
+  const research = await read('app/systems/research/page.tsx');
+  const sync = await read('scripts/sync-content.mjs');
+  assert.equal(content.researchBranches.length, 15);
+  assert.equal(content.researchNodes.length, 87);
+  assert.match(research, /Current branches and nodes/);
+  assert.match(research, /Published base cost/);
+  assert.match(research, /Earlier upgrades and other requirements/);
+  assert.match(research, /no partial cost is taken/);
+  assert.match(research, /\/services\/library/);
+  assert.match(research, /\/places\/workshop/);
+  assert.match(sync, /researchSource/);
+  assert.match(sync, /researchBranches/);
+  assert.match(sync, /researchNodes/);
+  assert.equal(research.includes('Stage 0'), false);
+  assert.equal(research.includes('Aimee decision'), false);
 });

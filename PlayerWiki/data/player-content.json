@@ -3578,6 +3578,1755 @@
       "contextAssetURL": "/game-assets/places/town-district.png"
     }
   ],
+  "researchBranches": [
+    {
+      "id": "instruction",
+      "name": "Instruction",
+      "blurb": "Teaching a hand to act without you. Rules are assembled from what you learn here.",
+      "order": 0,
+      "stationID": null
+    },
+    {
+      "id": "hand",
+      "name": "The Hand",
+      "blurb": "What you are able to write, and how precisely.",
+      "order": 1,
+      "stationID": null
+    },
+    {
+      "id": "hold",
+      "name": "The Hold",
+      "blurb": "What you can carry, store and keep.",
+      "order": 2,
+      "stationID": null
+    },
+    {
+      "id": "lexicon",
+      "name": "The Lexicon",
+      "blurb": "Words for the page. Every one of them is a thing you could already see; what you buy here is the way to say it.",
+      "order": 3,
+      "stationID": null
+    },
+    {
+      "id": "bargain",
+      "name": "The Bargain",
+      "blurb": "Trading a world's peace for its time, and back again.",
+      "order": 4,
+      "stationID": null
+    },
+    {
+      "id": "penmanship",
+      "name": "Penmanship",
+      "blurb": "Writing smaller, and saying more than one thing at a time. Taught, never worked out alone.",
+      "order": 5,
+      "stationID": "scriptorium"
+    },
+    {
+      "id": "instruments",
+      "name": "Field Instruments",
+      "blurb": "One for each subject. Each reads the world you are standing in.",
+      "order": 6,
+      "stationID": "survey_post"
+    },
+    {
+      "id": "spring",
+      "name": "The Spring",
+      "blurb": "Refine what comes home, deepen its return, and eventually settle new Raw automatically.",
+      "order": 7,
+      "stationID": "essence_spring"
+    },
+    {
+      "id": "lens",
+      "name": "The Page Lens",
+      "blurb": "Read a page before you spend it. It shows you only what you have already been out and measured.",
+      "order": 8,
+      "stationID": "scriptorium"
+    },
+    {
+      "id": "tannery_wear",
+      "name": "Wear",
+      "blurb": "Fit flexible living material into useful protection.",
+      "order": 9,
+      "stationID": "tannery"
+    },
+    {
+      "id": "tannery_carry",
+      "name": "Carry",
+      "blurb": "Prepare fitted straps and expansions for a deeper field pack.",
+      "order": 10,
+      "stationID": "tannery"
+    },
+    {
+      "id": "tannery_keep",
+      "name": "Keep",
+      "blurb": "Line and bind storage so the room can safely hold more.",
+      "order": 11,
+      "stationID": "tannery"
+    },
+    {
+      "id": "bowyer_craft",
+      "name": "The Bowyer's Craft",
+      "blurb": "Broaden the far-reaching forms Fen can fit, then learn to carry their best stock honestly.",
+      "order": 12,
+      "stationID": "bowyer"
+    },
+    {
+      "id": "armoury_craft",
+      "name": "Defensive Constructions",
+      "blurb": "Broaden Bracken's defensive choices, then retain the finest stock honestly.",
+      "order": 13,
+      "stationID": "armoury"
+    },
+    {
+      "id": "weaponsmith_craft",
+      "name": "Fitting and Leverage",
+      "blurb": "Broaden Maud's close forms, then retain exceptional stock without changing what fitting means.",
+      "order": 14,
+      "stationID": "weaponsmith"
+    }
+  ],
+  "researchNodes": [
+    {
+      "id": "tannery_wear_root",
+      "branch": "tannery_wear",
+      "name": "A fitted beginning",
+      "blurb": "Corrin can fit a supple coat, working gloves and working boots from the exact stock you choose.",
+      "cost": {
+        "essence": 12,
+        "resources": {
+          "fiber": 4
+        }
+      },
+      "requires": [],
+      "needsStationTier": 0,
+      "needsInstruments": 0,
+      "needsLifetimeRawRefined": 0,
+      "constructionBundledWith": "tannery"
+    },
+    {
+      "id": "bowyer_broaden",
+      "branch": "bowyer_craft",
+      "name": "Three answers at range",
+      "blurb": "Add the sling and throwing set while keeping every result within Tier 3.",
+      "cost": {
+        "essence": 55,
+        "resources": {
+          "timber": 12,
+          "fiber": 8,
+          "resin": 4
+        }
+      },
+      "requires": [],
+      "needsStationTier": 0,
+      "needsInstruments": 0,
+      "needsLifetimeRawRefined": 0,
+      "constructionBundledWith": null
+    },
+    {
+      "id": "armoury_broaden",
+      "branch": "armoury_craft",
+      "name": "Protection by purpose",
+      "blurb": "Add Insulated layer and Balanced laminate while keeping every result within Tier 3.",
+      "cost": {
+        "essence": 60,
+        "resources": {
+          "ore": 12,
+          "clay": 8,
+          "copper": 4
+        }
+      },
+      "requires": [],
+      "needsStationTier": 0,
+      "needsInstruments": 0,
+      "needsLifetimeRawRefined": 0,
+      "constructionBundledWith": null
+    },
+    {
+      "id": "weaponsmith_point_root",
+      "branch": "weaponsmith_craft",
+      "name": "Fitted point",
+      "blurb": "Fit a close piercing point around repeatable Finesse-led motion.",
+      "cost": {
+        "essence": 0,
+        "resources": {}
+      },
+      "requires": [],
+      "needsStationTier": 0,
+      "needsInstruments": 0,
+      "needsLifetimeRawRefined": 0,
+      "constructionBundledWith": "weaponsmith"
+    },
+    {
+      "id": "weaponsmith_broaden",
+      "branch": "weaponsmith_craft",
+      "name": "Balance and consequence",
+      "blurb": "Add fitted edge and maul forms while keeping results within Tier 3.",
+      "cost": {
+        "essence": 75,
+        "resources": {
+          "ore": 16,
+          "copper": 6,
+          "gold": 2
+        }
+      },
+      "requires": [
+        "weaponsmith_point_root"
+      ],
+      "needsStationTier": 0,
+      "needsInstruments": 0,
+      "needsLifetimeRawRefined": 0,
+      "constructionBundledWith": null
+    },
+    {
+      "id": "weaponsmith_masterwork",
+      "branch": "weaponsmith_craft",
+      "name": "Masterwork leverage",
+      "blurb": "Let exceptional selected stock retain its natural Tier 4 construction quality.",
+      "cost": {
+        "essence": 150,
+        "resources": {
+          "ore": 28,
+          "copper": 10,
+          "gold": 4
+        }
+      },
+      "requires": [
+        "weaponsmith_broaden"
+      ],
+      "needsStationTier": 0,
+      "needsInstruments": 0,
+      "needsLifetimeRawRefined": 0,
+      "constructionBundledWith": null
+    },
+    {
+      "id": "armoury_masterwork",
+      "branch": "armoury_craft",
+      "name": "Masterwork protection",
+      "blurb": "Let exceptional selected stock retain its natural Tier 4 construction quality.",
+      "cost": {
+        "essence": 120,
+        "resources": {
+          "ore": 22,
+          "clay": 14,
+          "copper": 8
+        }
+      },
+      "requires": [
+        "armoury_broaden"
+      ],
+      "needsStationTier": 0,
+      "needsInstruments": 0,
+      "needsLifetimeRawRefined": 0,
+      "constructionBundledWith": null
+    },
+    {
+      "id": "bowyer_masterwork",
+      "branch": "bowyer_craft",
+      "name": "Masterwork draw",
+      "blurb": "Let exceptional selected stock retain its natural Tier 4 construction quality.",
+      "cost": {
+        "essence": 110,
+        "resources": {
+          "timber": 20,
+          "fiber": 14,
+          "resin": 8
+        }
+      },
+      "requires": [
+        "bowyer_broaden"
+      ],
+      "needsStationTier": 0,
+      "needsInstruments": 0,
+      "needsLifetimeRawRefined": 0,
+      "constructionBundledWith": null
+    },
+    {
+      "id": "tannery_carry_root",
+      "branch": "tannery_carry",
+      "name": "Fitted expansion",
+      "blurb": "Corrin can prepare the bindings required by advanced satchel projects.",
+      "cost": {
+        "essence": 18,
+        "resources": {
+          "fiber": 6
+        }
+      },
+      "requires": [],
+      "needsStationTier": 0,
+      "needsInstruments": 0,
+      "needsLifetimeRawRefined": 0,
+      "constructionBundledWith": null
+    },
+    {
+      "id": "tannery_wear_tier_two",
+      "branch": "tannery_wear",
+      "name": "Fitted layers",
+      "blurb": "Fit several qualities together closely enough for Tier 2 flexible construction.",
+      "cost": {
+        "essence": 28,
+        "resources": {
+          "fiber": 10,
+          "salt": 4
+        }
+      },
+      "requires": [
+        "tannery_wear_root"
+      ],
+      "needsStationTier": 0,
+      "needsInstruments": 0,
+      "needsLifetimeRawRefined": 0,
+      "constructionBundledWith": null
+    },
+    {
+      "id": "tannery_keep_root",
+      "branch": "tannery_keep",
+      "name": "Lined storage",
+      "blurb": "Corrin can prepare the lining and bindings required by advanced Storehouse projects.",
+      "cost": {
+        "essence": 18,
+        "resources": {
+          "fiber": 6
+        }
+      },
+      "requires": [],
+      "needsStationTier": 0,
+      "needsInstruments": 0,
+      "needsLifetimeRawRefined": 0,
+      "constructionBundledWith": null
+    },
+    {
+      "id": "reason_about_targets",
+      "branch": "instruction",
+      "name": "Choosing a target",
+      "blurb": "Tell a rule which enemy it means.",
+      "cost": {
+        "essence": 12,
+        "resources": {
+          "fiber": 3
+        }
+      },
+      "requires": [],
+      "needsStationTier": 0,
+      "needsInstruments": 0,
+      "needsLifetimeRawRefined": 0,
+      "constructionBundledWith": null
+    },
+    {
+      "id": "reason_about_the_large",
+      "branch": "instruction",
+      "name": "Choosing the largest",
+      "blurb": "Go at the biggest thing in the room, on purpose.",
+      "cost": {
+        "essence": 20,
+        "resources": {
+          "fiber": 5
+        }
+      },
+      "requires": [
+        "reason_about_targets"
+      ],
+      "needsStationTier": 0,
+      "needsInstruments": 0,
+      "needsLifetimeRawRefined": 0,
+      "constructionBundledWith": null
+    },
+    {
+      "id": "reason_about_self",
+      "branch": "instruction",
+      "name": "Reasoning about yourself",
+      "blurb": "A rule that looks inward before it looks out.",
+      "cost": {
+        "essence": 18,
+        "resources": {
+          "fiber": 4
+        }
+      },
+      "requires": [],
+      "needsStationTier": 0,
+      "needsInstruments": 0,
+      "needsLifetimeRawRefined": 0,
+      "constructionBundledWith": null
+    },
+    {
+      "id": "notice_thirty",
+      "branch": "instruction",
+      "name": "Noticing 30%",
+      "blurb": "A finer threshold than half.",
+      "cost": {
+        "essence": 15,
+        "resources": {}
+      },
+      "requires": [],
+      "needsStationTier": 0,
+      "needsInstruments": 0,
+      "needsLifetimeRawRefined": 0,
+      "constructionBundledWith": null
+    },
+    {
+      "id": "notice_seventy",
+      "branch": "instruction",
+      "name": "Noticing 70%",
+      "blurb": "Act before things are dire.",
+      "cost": {
+        "essence": 15,
+        "resources": {}
+      },
+      "requires": [],
+      "needsStationTier": 0,
+      "needsInstruments": 0,
+      "needsLifetimeRawRefined": 0,
+      "constructionBundledWith": null
+    },
+    {
+      "id": "notice_ten",
+      "branch": "instruction",
+      "name": "Noticing 10%",
+      "blurb": "The last moment anything can be done.",
+      "cost": {
+        "essence": 30,
+        "resources": {
+          "fiber": 6
+        }
+      },
+      "requires": [
+        "notice_thirty"
+      ],
+      "needsStationTier": 0,
+      "needsInstruments": 0,
+      "needsLifetimeRawRefined": 0,
+      "constructionBundledWith": null
+    },
+    {
+      "id": "reason_upward",
+      "branch": "instruction",
+      "name": "Reasoning upward",
+      "blurb": "Conditions that trigger on plenty rather than on lack.",
+      "cost": {
+        "essence": 25,
+        "resources": {
+          "fiber": 5
+        }
+      },
+      "requires": [
+        "notice_seventy"
+      ],
+      "needsStationTier": 0,
+      "needsInstruments": 0,
+      "needsLifetimeRawRefined": 0,
+      "constructionBundledWith": null
+    },
+    {
+      "id": "instruct_skill",
+      "branch": "instruction",
+      "name": "Instructing a skill",
+      "blurb": "Rules that reach for something better than a swing.",
+      "cost": {
+        "essence": 22,
+        "resources": {
+          "ore": 4
+        }
+      },
+      "requires": [
+        "reason_about_targets"
+      ],
+      "needsStationTier": 0,
+      "needsInstruments": 0,
+      "needsLifetimeRawRefined": 0,
+      "constructionBundledWith": null
+    },
+    {
+      "id": "instruct_retreat",
+      "branch": "instruction",
+      "name": "Instructing retreat",
+      "blurb": "Knowing when to stop is a rule like any other.",
+      "cost": {
+        "essence": 26,
+        "resources": {
+          "fiber": 6
+        }
+      },
+      "requires": [
+        "reason_about_self"
+      ],
+      "needsStationTier": 0,
+      "needsInstruments": 0,
+      "needsLifetimeRawRefined": 0,
+      "constructionBundledWith": null
+    },
+    {
+      "id": "longer_instruction",
+      "branch": "instruction",
+      "name": "A longer instruction",
+      "blurb": "One more rule your companion will follow.",
+      "cost": {
+        "essence": 30,
+        "resources": {
+          "fiber": 8
+        }
+      },
+      "requires": [
+        "reason_about_targets"
+      ],
+      "needsStationTier": 0,
+      "needsInstruments": 0,
+      "needsLifetimeRawRefined": 0,
+      "constructionBundledWith": null
+    },
+    {
+      "id": "longer_instruction_two",
+      "branch": "instruction",
+      "name": "A longer instruction, again",
+      "blurb": "And one more after that.",
+      "cost": {
+        "essence": 65,
+        "resources": {
+          "fiber": 18,
+          "ore": 6
+        }
+      },
+      "requires": [
+        "longer_instruction"
+      ],
+      "needsStationTier": 0,
+      "needsInstruments": 0,
+      "needsLifetimeRawRefined": 0,
+      "constructionBundledWith": null
+    },
+    {
+      "id": "automate_self",
+      "branch": "instruction",
+      "name": "Write your own hand",
+      "blurb": "Your own rules, followed without you. The hardest thing to teach.",
+      "cost": {
+        "essence": 70,
+        "resources": {
+          "ore": 12,
+          "fiber": 12
+        }
+      },
+      "requires": [
+        "reason_about_self",
+        "longer_instruction"
+      ],
+      "needsStationTier": 0,
+      "needsInstruments": 0,
+      "needsLifetimeRawRefined": 0,
+      "constructionBundledWith": null
+    },
+    {
+      "id": "study_growth",
+      "branch": "hand",
+      "name": "Study: growth",
+      "blurb": "Copper-green bloom over everything it touches.",
+      "cost": {
+        "essence": 20,
+        "resources": {
+          "fiber": 8
+        }
+      },
+      "requires": [],
+      "needsStationTier": 0,
+      "needsInstruments": 0,
+      "needsLifetimeRawRefined": 0,
+      "constructionBundledWith": null
+    },
+    {
+      "id": "study_permanence",
+      "branch": "hand",
+      "name": "Study: permanence",
+      "blurb": "Something that shouldn't be buried, buried anyway.",
+      "cost": {
+        "essence": 60,
+        "resources": {
+          "ore": 20
+        }
+      },
+      "requires": [
+        "study_growth"
+      ],
+      "needsStationTier": 0,
+      "needsInstruments": 0,
+      "needsLifetimeRawRefined": 0,
+      "constructionBundledWith": null
+    },
+    {
+      "id": "shelving_one",
+      "branch": "hold",
+      "name": "Shelving",
+      "blurb": "Room at home for more of what you drag back.",
+      "cost": {
+        "essence": 20,
+        "resources": {
+          "ore": 4
+        }
+      },
+      "requires": [],
+      "needsStationTier": 0,
+      "needsInstruments": 0,
+      "needsLifetimeRawRefined": 0,
+      "constructionBundledWith": null
+    },
+    {
+      "id": "shelving_two",
+      "branch": "hold",
+      "name": "Shelving, deeper",
+      "blurb": "More still.",
+      "cost": {
+        "essence": 40,
+        "resources": {
+          "ore": 10,
+          "fiber": 6
+        }
+      },
+      "requires": [
+        "shelving_one"
+      ],
+      "needsStationTier": 0,
+      "needsInstruments": 0,
+      "needsLifetimeRawRefined": 0,
+      "constructionBundledWith": null
+    },
+    {
+      "id": "shelving_three",
+      "branch": "hold",
+      "name": "Shelving, to the rafters",
+      "blurb": "There is no more wall.",
+      "cost": {
+        "essence": 75,
+        "resources": {
+          "ore": 20,
+          "fiber": 14
+        }
+      },
+      "requires": [
+        "shelving_two"
+      ],
+      "needsStationTier": 0,
+      "needsInstruments": 0,
+      "needsLifetimeRawRefined": 0,
+      "constructionBundledWith": null
+    },
+    {
+      "id": "satchel_one",
+      "branch": "hold",
+      "name": "Satchel stitching",
+      "blurb": "Carry more out of a world before you have to choose.",
+      "cost": {
+        "essence": 15,
+        "resources": {
+          "fiber": 5
+        }
+      },
+      "requires": [],
+      "needsStationTier": 0,
+      "needsInstruments": 0,
+      "needsLifetimeRawRefined": 0,
+      "constructionBundledWith": null
+    },
+    {
+      "id": "satchel_two",
+      "branch": "hold",
+      "name": "Satchel, reinforced",
+      "blurb": "It holds. Mostly.",
+      "cost": {
+        "essence": 35,
+        "resources": {
+          "fiber": 12,
+          "ore": 4
+        }
+      },
+      "requires": [
+        "satchel_one"
+      ],
+      "needsStationTier": 0,
+      "needsInstruments": 0,
+      "needsLifetimeRawRefined": 0,
+      "constructionBundledWith": null
+    },
+    {
+      "id": "deepen_spring",
+      "branch": "spring",
+      "name": "Deepen the spring",
+      "blurb": "More essence waiting each time you come home.",
+      "cost": {
+        "essence": 45,
+        "resources": {
+          "ore": 8,
+          "fiber": 8
+        }
+      },
+      "requires": [],
+      "needsStationTier": 0,
+      "needsInstruments": 0,
+      "needsLifetimeRawRefined": 0,
+      "constructionBundledWith": null
+    },
+    {
+      "id": "essence_second_pass",
+      "branch": "spring",
+      "name": "Second pass",
+      "blurb": "Practice the ordinary conversion until each Raw Essence yields three instead of two.",
+      "cost": {
+        "essence": 80,
+        "resources": {
+          "quartz": 10
+        }
+      },
+      "requires": [],
+      "needsStationTier": 0,
+      "needsInstruments": 0,
+      "needsLifetimeRawRefined": 50,
+      "constructionBundledWith": null
+    },
+    {
+      "id": "essence_continuous_settling",
+      "branch": "spring",
+      "name": "Continuous settling",
+      "blurb": "Automatically refine only the Raw retained by each new expedition outcome.",
+      "cost": {
+        "essence": 120,
+        "resources": {
+          "quartz": 12,
+          "pulp": 8
+        }
+      },
+      "requires": [
+        "essence_second_pass"
+      ],
+      "needsStationTier": 1,
+      "needsInstruments": 0,
+      "needsLifetimeRawRefined": 0,
+      "constructionBundledWith": null
+    },
+    {
+      "id": "bargain_root",
+      "branch": "bargain",
+      "name": "The trade",
+      "blurb": "A world that crawls with things holds together longer. Learn to ask for that on purpose.",
+      "cost": {
+        "essence": 18,
+        "resources": {
+          "ore": 4
+        }
+      },
+      "requires": [],
+      "needsStationTier": 0,
+      "needsInstruments": 0,
+      "needsLifetimeRawRefined": 0,
+      "constructionBundledWith": null
+    },
+    {
+      "id": "bargain_weather",
+      "branch": "bargain",
+      "name": "Foul weather",
+      "blurb": "Let the sky do the work.",
+      "cost": {
+        "essence": 26,
+        "resources": {
+          "ore": 6
+        }
+      },
+      "requires": [
+        "bargain_root"
+      ],
+      "needsStationTier": 0,
+      "needsInstruments": 0,
+      "needsLifetimeRawRefined": 0,
+      "constructionBundledWith": null
+    },
+    {
+      "id": "bargain_ground",
+      "branch": "bargain",
+      "name": "Unsettled ground",
+      "blurb": "The most stability the trade can buy, and the ground you have to cross for it.",
+      "cost": {
+        "essence": 40,
+        "resources": {
+          "ore": 12
+        }
+      },
+      "requires": [
+        "bargain_weather"
+      ],
+      "needsStationTier": 0,
+      "needsInstruments": 0,
+      "needsLifetimeRawRefined": 0,
+      "constructionBundledWith": null
+    },
+    {
+      "id": "bargain_teeth",
+      "branch": "bargain",
+      "name": "Fewer, worse",
+      "blurb": "Thin them out, and make what remains a problem.",
+      "cost": {
+        "essence": 30,
+        "resources": {
+          "fiber": 8
+        }
+      },
+      "requires": [
+        "bargain_root"
+      ],
+      "needsStationTier": 0,
+      "needsInstruments": 0,
+      "needsLifetimeRawRefined": 0,
+      "constructionBundledWith": null
+    },
+    {
+      "id": "bargain_rot",
+      "branch": "bargain",
+      "name": "Bad ground",
+      "blurb": "What grows here is wrong, and it spreads.",
+      "cost": {
+        "essence": 28,
+        "resources": {
+          "fiber": 6
+        }
+      },
+      "requires": [
+        "bargain_teeth"
+      ],
+      "needsStationTier": 0,
+      "needsInstruments": 0,
+      "needsLifetimeRawRefined": 0,
+      "constructionBundledWith": null
+    },
+    {
+      "id": "bargain_air",
+      "branch": "bargain",
+      "name": "Bad air",
+      "blurb": "It costs you a little every turn you stay.",
+      "cost": {
+        "essence": 34,
+        "resources": {
+          "fiber": 10
+        }
+      },
+      "requires": [
+        "bargain_rot"
+      ],
+      "needsStationTier": 0,
+      "needsInstruments": 0,
+      "needsLifetimeRawRefined": 0,
+      "constructionBundledWith": null
+    },
+    {
+      "id": "bargain_peace",
+      "branch": "bargain",
+      "name": "Peace",
+      "blurb": "The trade run backwards: a quiet world, and less of it. For somewhere you mean to keep.",
+      "cost": {
+        "essence": 48,
+        "resources": {
+          "ore": 10,
+          "fiber": 10
+        }
+      },
+      "requires": [
+        "bargain_ground",
+        "bargain_air"
+      ],
+      "needsStationTier": 0,
+      "needsInstruments": 0,
+      "needsLifetimeRawRefined": 0,
+      "constructionBundledWith": null
+    },
+    {
+      "id": "shelving_four",
+      "branch": "hold",
+      "name": "Shelving, wall to wall",
+      "blurb": "Every wall is shelf now. You stopped noticing when.",
+      "cost": {
+        "essence": 130,
+        "resources": {
+          "ore": 34,
+          "fiber": 24
+        }
+      },
+      "requires": [
+        "shelving_three",
+        "tannery_keep_root"
+      ],
+      "needsStationTier": 0,
+      "needsInstruments": 0,
+      "needsLifetimeRawRefined": 0,
+      "constructionBundledWith": null
+    },
+    {
+      "id": "shelving_five",
+      "branch": "hold",
+      "name": "A second room",
+      "blurb": "The room next door was never used for anything else anyway.",
+      "cost": {
+        "essence": 210,
+        "resources": {
+          "ore": 55,
+          "fiber": 40
+        }
+      },
+      "requires": [
+        "shelving_four"
+      ],
+      "needsStationTier": 0,
+      "needsInstruments": 0,
+      "needsLifetimeRawRefined": 0,
+      "constructionBundledWith": null
+    },
+    {
+      "id": "shelving_six",
+      "branch": "hold",
+      "name": "The undercroft",
+      "blurb": "Cold, dry, and further down than you remembered digging.",
+      "cost": {
+        "essence": 340,
+        "resources": {
+          "ore": 90,
+          "fiber": 65
+        }
+      },
+      "requires": [
+        "shelving_five"
+      ],
+      "needsStationTier": 0,
+      "needsInstruments": 0,
+      "needsLifetimeRawRefined": 0,
+      "constructionBundledWith": null
+    },
+    {
+      "id": "shelving_seven",
+      "branch": "hold",
+      "name": "The undercroft, extended",
+      "blurb": "It goes back further than the house above it.",
+      "cost": {
+        "essence": 550,
+        "resources": {
+          "ore": 145,
+          "fiber": 105
+        }
+      },
+      "requires": [
+        "shelving_six"
+      ],
+      "needsStationTier": 0,
+      "needsInstruments": 0,
+      "needsLifetimeRawRefined": 0,
+      "constructionBundledWith": null
+    },
+    {
+      "id": "shelving_eight",
+      "branch": "hold",
+      "name": "A hall for it",
+      "blurb": "You could lose something in here and find it again years later.",
+      "cost": {
+        "essence": 890,
+        "resources": {
+          "ore": 235,
+          "fiber": 170
+        }
+      },
+      "requires": [
+        "shelving_seven"
+      ],
+      "needsStationTier": 0,
+      "needsInstruments": 0,
+      "needsLifetimeRawRefined": 0,
+      "constructionBundledWith": null
+    },
+    {
+      "id": "shelving_nine",
+      "branch": "hold",
+      "name": "More than you can carry",
+      "blurb": "There is no longer a question of whether to keep a thing.",
+      "cost": {
+        "essence": 1440,
+        "resources": {
+          "ore": 380,
+          "fiber": 275
+        }
+      },
+      "requires": [
+        "shelving_eight"
+      ],
+      "needsStationTier": 0,
+      "needsInstruments": 0,
+      "needsLifetimeRawRefined": 0,
+      "constructionBundledWith": null
+    },
+    {
+      "id": "satchel_three",
+      "branch": "hold",
+      "name": "Satchel, deepened",
+      "blurb": "Deeper than it looks, which was the point.",
+      "cost": {
+        "essence": 70,
+        "resources": {
+          "ore": 24,
+          "fiber": 8
+        }
+      },
+      "requires": [
+        "satchel_two",
+        "tannery_carry_root"
+      ],
+      "needsStationTier": 0,
+      "needsInstruments": 0,
+      "needsLifetimeRawRefined": 0,
+      "constructionBundledWith": null
+    },
+    {
+      "id": "satchel_four",
+      "branch": "hold",
+      "name": "A second strap",
+      "blurb": "Across the other shoulder. Heavier, and worth it.",
+      "cost": {
+        "essence": 140,
+        "resources": {
+          "ore": 46,
+          "fiber": 18
+        }
+      },
+      "requires": [
+        "satchel_three"
+      ],
+      "needsStationTier": 0,
+      "needsInstruments": 0,
+      "needsLifetimeRawRefined": 0,
+      "constructionBundledWith": null
+    },
+    {
+      "id": "satchel_five",
+      "branch": "hold",
+      "name": "Panniers",
+      "blurb": "Slung either side. You walk differently now.",
+      "cost": {
+        "essence": 280,
+        "resources": {
+          "ore": 88,
+          "fiber": 36
+        }
+      },
+      "requires": [
+        "satchel_four"
+      ],
+      "needsStationTier": 0,
+      "needsInstruments": 0,
+      "needsLifetimeRawRefined": 0,
+      "constructionBundledWith": null
+    },
+    {
+      "id": "pen_brush",
+      "branch": "penmanship",
+      "name": "A brush",
+      "blurb": "A copper ferrule holds fibre bristles to a timber handle. Half the room, and Isolde will not stop calling it a beginning.",
+      "cost": {
+        "essence": 45,
+        "resources": {
+          "copper": 2,
+          "fiber": 6,
+          "timber": 4
+        }
+      },
+      "requires": [],
+      "needsStationTier": 0,
+      "needsInstruments": 0,
+      "needsLifetimeRawRefined": 0,
+      "constructionBundledWith": null
+    },
+    {
+      "id": "pen_desk",
+      "branch": "penmanship",
+      "name": "A table that doesn't rock",
+      "blurb": "Isolde's first condition, and she was right about it. Raises the Scriptorium.",
+      "cost": {
+        "essence": 70,
+        "resources": {
+          "clay": 6,
+          "timber": 8
+        }
+      },
+      "requires": [
+        "pen_brush"
+      ],
+      "needsStationTier": 0,
+      "needsInstruments": 0,
+      "needsLifetimeRawRefined": 0,
+      "constructionBundledWith": null
+    },
+    {
+      "id": "pen_ink_mixing",
+      "branch": "penmanship",
+      "name": "Ink Mixing",
+      "blurb": "Prepare deliberate liquid inks without changing the hand that lays them down.",
+      "cost": {
+        "essence": 40,
+        "resources": {
+          "copper": 2,
+          "quartz": 2,
+          "resin": 4
+        }
+      },
+      "requires": [
+        "pen_brush"
+      ],
+      "needsStationTier": 1,
+      "needsInstruments": 0,
+      "needsLifetimeRawRefined": 0,
+      "constructionBundledWith": null
+    },
+    {
+      "id": "pen_compounds",
+      "branch": "penmanship",
+      "name": "Compound Assembly",
+      "blurb": "Assemble learned Sigils without confusing their meaning with their shape.",
+      "cost": {
+        "essence": 55,
+        "resources": {
+          "pulp": 4,
+          "resin": 4,
+          "quartz": 2
+        }
+      },
+      "requires": [
+        "pen_brush"
+      ],
+      "needsStationTier": 1,
+      "needsInstruments": 0,
+      "needsLifetimeRawRefined": 0,
+      "constructionBundledWith": null
+    },
+    {
+      "id": "pen_chaining",
+      "branch": "penmanship",
+      "name": "Chaining",
+      "blurb": "Joining one statement to another, so a world can have two kinds of land in it.",
+      "cost": {
+        "essence": 90,
+        "resources": {
+          "mercury": 2,
+          "mote": 1
+        }
+      },
+      "requires": [
+        "pen_brush"
+      ],
+      "needsStationTier": 1,
+      "needsInstruments": 0,
+      "needsLifetimeRawRefined": 0,
+      "constructionBundledWith": null
+    },
+    {
+      "id": "pen_press",
+      "branch": "penmanship",
+      "name": "A ruling frame",
+      "blurb": "Lines true enough to write a hair's width between them. Raises the Scriptorium again.",
+      "cost": {
+        "essence": 140,
+        "resources": {
+          "quartz": 6,
+          "silver": 4
+        }
+      },
+      "requires": [
+        "pen_chaining"
+      ],
+      "needsStationTier": 1,
+      "needsInstruments": 0,
+      "needsLifetimeRawRefined": 0,
+      "constructionBundledWith": null
+    },
+    {
+      "id": "pen_fountain",
+      "branch": "penmanship",
+      "name": "A fountain pen",
+      "blurb": "A nib ground to nothing and a barrel that holds its ink. Everything, in a quarter of the room.",
+      "cost": {
+        "essence": 220,
+        "resources": {
+          "quartz": 4,
+          "resin": 8,
+          "silver": 6
+        }
+      },
+      "requires": [
+        "pen_chaining"
+      ],
+      "needsStationTier": 2,
+      "needsInstruments": 0,
+      "needsLifetimeRawRefined": 0,
+      "constructionBundledWith": null
+    },
+    {
+      "id": "study_starlight",
+      "branch": "lexicon",
+      "name": "Starlight",
+      "blurb": "The faintest mark that a world has a sky at all.",
+      "cost": {
+        "essence": 14,
+        "resources": {
+          "fiber": 3
+        }
+      },
+      "requires": [],
+      "needsStationTier": 0,
+      "needsInstruments": 0,
+      "needsLifetimeRawRefined": 0,
+      "constructionBundledWith": null
+    },
+    {
+      "id": "study_weather",
+      "branch": "lexicon",
+      "name": "Weather",
+      "blurb": "Mist, and the river it becomes.",
+      "cost": {
+        "essence": 18,
+        "resources": {
+          "fiber": 4
+        }
+      },
+      "requires": [],
+      "needsStationTier": 0,
+      "needsInstruments": 0,
+      "needsLifetimeRawRefined": 0,
+      "constructionBundledWith": null
+    },
+    {
+      "id": "study_rivers",
+      "branch": "lexicon",
+      "name": "Rivers",
+      "blurb": "Water that goes somewhere.",
+      "cost": {
+        "essence": 22,
+        "resources": {
+          "fiber": 5
+        }
+      },
+      "requires": [
+        "study_weather"
+      ],
+      "needsStationTier": 0,
+      "needsInstruments": 0,
+      "needsLifetimeRawRefined": 0,
+      "constructionBundledWith": null
+    },
+    {
+      "id": "study_wetland",
+      "branch": "lexicon",
+      "name": "Wetland",
+      "blurb": "Ground that never decides whether it is water.",
+      "cost": {
+        "essence": 28,
+        "resources": {
+          "fiber": 6
+        }
+      },
+      "requires": [
+        "study_rivers"
+      ],
+      "needsStationTier": 0,
+      "needsInstruments": 0,
+      "needsLifetimeRawRefined": 0,
+      "constructionBundledWith": null
+    },
+    {
+      "id": "study_springs",
+      "branch": "lexicon",
+      "name": "Springs",
+      "blurb": "Water arriving from underneath, hot.",
+      "cost": {
+        "essence": 34,
+        "resources": {
+          "fiber": 8
+        }
+      },
+      "requires": [
+        "study_wetland"
+      ],
+      "needsStationTier": 0,
+      "needsInstruments": 0,
+      "needsLifetimeRawRefined": 0,
+      "constructionBundledWith": null
+    },
+    {
+      "id": "study_thin_air",
+      "branch": "lexicon",
+      "name": "Thin air",
+      "blurb": "Air that is barely there. Nothing else thins a sky.",
+      "cost": {
+        "essence": 26,
+        "resources": {
+          "fiber": 6
+        }
+      },
+      "requires": [],
+      "needsStationTier": 0,
+      "needsInstruments": 0,
+      "needsLifetimeRawRefined": 0,
+      "constructionBundledWith": null
+    },
+    {
+      "id": "study_burning",
+      "branch": "lexicon",
+      "name": "Burning",
+      "blurb": "Fire in a landscape, and what it takes with it.",
+      "cost": {
+        "essence": 24,
+        "resources": {
+          "fiber": 5
+        }
+      },
+      "requires": [],
+      "needsStationTier": 0,
+      "needsInstruments": 0,
+      "needsLifetimeRawRefined": 0,
+      "constructionBundledWith": null
+    },
+    {
+      "id": "study_the_vent",
+      "branch": "lexicon",
+      "name": "The vent",
+      "blurb": "Rock that has not finished moving.",
+      "cost": {
+        "essence": 38,
+        "resources": {
+          "fiber": 9
+        }
+      },
+      "requires": [
+        "study_burning"
+      ],
+      "needsStationTier": 0,
+      "needsInstruments": 0,
+      "needsLifetimeRawRefined": 0,
+      "constructionBundledWith": null
+    },
+    {
+      "id": "study_the_melt",
+      "branch": "lexicon",
+      "name": "The melt",
+      "blurb": "Stone as a liquid.",
+      "cost": {
+        "essence": 44,
+        "resources": {
+          "fiber": 10
+        }
+      },
+      "requires": [
+        "study_the_vent"
+      ],
+      "needsStationTier": 0,
+      "needsInstruments": 0,
+      "needsLifetimeRawRefined": 0,
+      "constructionBundledWith": null
+    },
+    {
+      "id": "study_salt",
+      "branch": "lexicon",
+      "name": "Salt",
+      "blurb": "What is left where water was, and what it does to life.",
+      "cost": {
+        "essence": 20,
+        "resources": {
+          "fiber": 4
+        }
+      },
+      "requires": [],
+      "needsStationTier": 0,
+      "needsInstruments": 0,
+      "needsLifetimeRawRefined": 0,
+      "constructionBundledWith": null
+    },
+    {
+      "id": "study_brimstone",
+      "branch": "lexicon",
+      "name": "Brimstone",
+      "blurb": "The yellow rock, and the air around it.",
+      "cost": {
+        "essence": 28,
+        "resources": {
+          "fiber": 6
+        }
+      },
+      "requires": [
+        "study_salt"
+      ],
+      "needsStationTier": 0,
+      "needsInstruments": 0,
+      "needsLifetimeRawRefined": 0,
+      "constructionBundledWith": null
+    },
+    {
+      "id": "study_silt",
+      "branch": "lexicon",
+      "name": "Silt",
+      "blurb": "Ground sorted fine and washed through.",
+      "cost": {
+        "essence": 20,
+        "resources": {
+          "fiber": 5
+        }
+      },
+      "requires": [],
+      "needsStationTier": 0,
+      "needsInstruments": 0,
+      "needsLifetimeRawRefined": 0,
+      "constructionBundledWith": null
+    },
+    {
+      "id": "study_decay",
+      "branch": "lexicon",
+      "name": "Decay",
+      "blurb": "What happens after. It is not nothing.",
+      "cost": {
+        "essence": 22,
+        "resources": {
+          "fiber": 5
+        }
+      },
+      "requires": [],
+      "needsStationTier": 0,
+      "needsInstruments": 0,
+      "needsLifetimeRawRefined": 0,
+      "constructionBundledWith": null
+    },
+    {
+      "id": "study_mycology",
+      "branch": "lexicon",
+      "name": "Mycology",
+      "blurb": "What grows where there is no sun to grow by.",
+      "cost": {
+        "essence": 32,
+        "resources": {
+          "fiber": 8
+        }
+      },
+      "requires": [
+        "study_decay"
+      ],
+      "needsStationTier": 0,
+      "needsInstruments": 0,
+      "needsLifetimeRawRefined": 0,
+      "constructionBundledWith": null
+    },
+    {
+      "id": "study_the_swarm",
+      "branch": "lexicon",
+      "name": "The swarm",
+      "blurb": "Small things, and a great many of them.",
+      "cost": {
+        "essence": 24,
+        "resources": {
+          "fiber": 5
+        }
+      },
+      "requires": [
+        "study_decay"
+      ],
+      "needsStationTier": 0,
+      "needsInstruments": 0,
+      "needsLifetimeRawRefined": 0,
+      "constructionBundledWith": null
+    },
+    {
+      "id": "study_the_foul",
+      "branch": "lexicon",
+      "name": "The foul air",
+      "blurb": "Air that does not want you in it.",
+      "cost": {
+        "essence": 36,
+        "resources": {
+          "fiber": 8
+        }
+      },
+      "requires": [
+        "study_thin_air"
+      ],
+      "needsStationTier": 0,
+      "needsInstruments": 0,
+      "needsLifetimeRawRefined": 0,
+      "constructionBundledWith": null
+    },
+    {
+      "id": "study_the_pull",
+      "branch": "lexicon",
+      "name": "The pull",
+      "blurb": "A world that rises and falls to something.",
+      "cost": {
+        "essence": 30,
+        "resources": {
+          "fiber": 7
+        }
+      },
+      "requires": [],
+      "needsStationTier": 0,
+      "needsInstruments": 0,
+      "needsLifetimeRawRefined": 0,
+      "constructionBundledWith": null
+    },
+    {
+      "id": "study_clockwork",
+      "branch": "lexicon",
+      "name": "Clockwork",
+      "blurb": "Somebody built a thing that keeps time, and it runs still.",
+      "cost": {
+        "essence": 42,
+        "resources": {
+          "fiber": 10
+        }
+      },
+      "requires": [
+        "study_the_pull"
+      ],
+      "needsStationTier": 0,
+      "needsInstruments": 0,
+      "needsLifetimeRawRefined": 0,
+      "constructionBundledWith": null
+    },
+    {
+      "id": "study_lattice",
+      "branch": "lexicon",
+      "name": "Lattice",
+      "blurb": "Stone that grew rather than settled, and holds a light without being lit.",
+      "cost": {
+        "essence": 30,
+        "resources": {
+          "fiber": 7
+        }
+      },
+      "requires": [],
+      "needsStationTier": 0,
+      "needsInstruments": 0,
+      "needsLifetimeRawRefined": 0,
+      "constructionBundledWith": null
+    },
+    {
+      "id": "sunglass",
+      "branch": "instruments",
+      "name": "Sunglass",
+      "blurb": "Smoked quartz in a copper ring. You can look at a sky and put a number to it.",
+      "cost": {
+        "essence": 30,
+        "resources": {
+          "copper": 3,
+          "quartz": 2
+        }
+      },
+      "requires": [],
+      "needsStationTier": 0,
+      "needsInstruments": 0,
+      "needsLifetimeRawRefined": 0,
+      "constructionBundledWith": null
+    },
+    {
+      "id": "level",
+      "branch": "instruments",
+      "name": "Level",
+      "blurb": "A bubble in a tube of oil, in a timber frame. How much of this country is uphill.",
+      "cost": {
+        "essence": 35,
+        "resources": {
+          "copper": 2,
+          "timber": 6
+        }
+      },
+      "requires": [],
+      "needsStationTier": 0,
+      "needsInstruments": 0,
+      "needsLifetimeRawRefined": 0,
+      "constructionBundledWith": null
+    },
+    {
+      "id": "thermoscope",
+      "branch": "instruments",
+      "name": "Thermoscope",
+      "blurb": "Mercury in a sealed stem. It reads the cold as readily as the heat, which is the hard part.",
+      "cost": {
+        "essence": 55,
+        "resources": {
+          "mercury": 2,
+          "quartz": 3
+        }
+      },
+      "requires": [],
+      "needsStationTier": 0,
+      "needsInstruments": 0,
+      "needsLifetimeRawRefined": 0,
+      "constructionBundledWith": null
+    },
+    {
+      "id": "hygrometer",
+      "branch": "instruments",
+      "name": "Hygrometer",
+      "blurb": "A hair under tension, and a silver needle. It measures how much water a world will actually give you.",
+      "cost": {
+        "essence": 55,
+        "resources": {
+          "fiber": 8,
+          "silver": 2
+        }
+      },
+      "requires": [],
+      "needsStationTier": 0,
+      "needsInstruments": 0,
+      "needsLifetimeRawRefined": 0,
+      "constructionBundledWith": null
+    },
+    {
+      "id": "loupe",
+      "branch": "instruments",
+      "name": "Loupe",
+      "blurb": "Close work. What the ground is made of, seen properly rather than guessed at from the colour.",
+      "cost": {
+        "essence": 60,
+        "resources": {
+          "quartz": 4,
+          "silver": 2
+        }
+      },
+      "requires": [],
+      "needsStationTier": 0,
+      "needsInstruments": 0,
+      "needsLifetimeRawRefined": 0,
+      "constructionBundledWith": null
+    },
+    {
+      "id": "vivometer",
+      "branch": "instruments",
+      "name": "Vivometer",
+      "blurb": "Resin, ichor and a lens. It answers the only question that matters about a world: what does it feed.",
+      "cost": {
+        "essence": 90,
+        "resources": {
+          "ichor": 2,
+          "quartz": 4,
+          "resin": 4
+        }
+      },
+      "requires": [],
+      "needsStationTier": 0,
+      "needsInstruments": 0,
+      "needsLifetimeRawRefined": 0,
+      "constructionBundledWith": null
+    },
+    {
+      "id": "barometer",
+      "branch": "instruments",
+      "name": "Barometer",
+      "blurb": "A column of mercury against a silvered scale. Air has a weight, and the weight tells you the rest.",
+      "cost": {
+        "essence": 95,
+        "resources": {
+          "mercury": 3,
+          "quartz": 3,
+          "silver": 3
+        }
+      },
+      "requires": [],
+      "needsStationTier": 0,
+      "needsInstruments": 0,
+      "needsLifetimeRawRefined": 0,
+      "constructionBundledWith": null
+    },
+    {
+      "id": "chronometer",
+      "branch": "instruments",
+      "name": "Chronometer",
+      "blurb": "Adamant escapement, silver train. **Reading time is the hardest thing to learn**, so it is the last.",
+      "cost": {
+        "essence": 150,
+        "resources": {
+          "adamant": 2,
+          "quartz": 5,
+          "silver": 5
+        }
+      },
+      "requires": [],
+      "needsStationTier": 0,
+      "needsInstruments": 0,
+      "needsLifetimeRawRefined": 0,
+      "constructionBundledWith": null
+    },
+    {
+      "id": "lens_targets",
+      "branch": "lens",
+      "name": "Ground and true",
+      "blurb": "Flat glass, honestly worked. The page starts giving you numbers — for the subjects you have been out and measured, and no others.",
+      "cost": {
+        "essence": 70,
+        "resources": {
+          "quartz": 6,
+          "silver": 2
+        }
+      },
+      "requires": [],
+      "needsStationTier": 0,
+      "needsInstruments": 2,
+      "needsLifetimeRawRefined": 0,
+      "constructionBundledWith": null
+    },
+    {
+      "id": "lens_attribution",
+      "branch": "lens",
+      "name": "Silvered back",
+      "blurb": "Which of the things you wrote did what, secondaries included. The page stops being a list and starts being an argument.",
+      "cost": {
+        "essence": 120,
+        "resources": {
+          "mercury": 2,
+          "quartz": 8,
+          "silver": 4
+        }
+      },
+      "requires": [
+        "lens_targets"
+      ],
+      "needsStationTier": 0,
+      "needsInstruments": 4,
+      "needsLifetimeRawRefined": 0,
+      "constructionBundledWith": null
+    },
+    {
+      "id": "lens_instability",
+      "branch": "lens",
+      "name": "The fine scale",
+      "blurb": "Greed on one side of the beam and contradiction on the other. You can finally see which of the two is eating your world.",
+      "cost": {
+        "essence": 180,
+        "resources": {
+          "adamant": 2,
+          "quartz": 10,
+          "rift_glass": 1
+        }
+      },
+      "requires": [
+        "lens_attribution"
+      ],
+      "needsStationTier": 0,
+      "needsInstruments": 6,
+      "needsLifetimeRawRefined": 0,
+      "constructionBundledWith": null
+    },
+    {
+      "id": "lens_living",
+      "branch": "lens",
+      "name": "The long glass",
+      "blurb": "What a world will grow, before it has grown it. The last thing a page can be made to say.",
+      "cost": {
+        "essence": 260,
+        "resources": {
+          "adamant": 4,
+          "ichor": 4,
+          "quartz": 14
+        }
+      },
+      "requires": [
+        "lens_instability"
+      ],
+      "needsStationTier": 0,
+      "needsInstruments": 8,
+      "needsLifetimeRawRefined": 0,
+      "constructionBundledWith": null
+    }
+  ],
   "terminology": [
     {
       "id": "writtenWorldSymbol",

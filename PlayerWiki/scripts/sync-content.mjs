@@ -29,6 +29,12 @@ const resourceSource = JSON.parse(
     'utf8',
   ),
 );
+const researchSource = JSON.parse(
+  await readFile(
+    path.join(repositoryRoot, 'Sources', 'Content', 'Data', 'research.json'),
+    'utf8',
+  ),
+);
 const namedCharacterPack = JSON.parse(
   await readFile(
     path.join(
@@ -373,6 +379,30 @@ const playerContent = {
   items,
   travellers,
   stations,
+  researchBranches: researchSource.branches
+    .map((branch) => ({
+      id: branch.id,
+      name: branch.name,
+      blurb: branch.blurb,
+      order: branch.order,
+      stationID: branch.station ?? null,
+    }))
+    .sort((left, right) => left.order - right.order),
+  researchNodes: researchSource.nodes.map((node) => ({
+    id: node.id,
+    branch: node.branch,
+    name: node.name,
+    blurb: node.blurb,
+    cost: {
+      essence: node.cost?.essence ?? 0,
+      resources: node.cost?.resources ?? {},
+    },
+    requires: node.requires ?? [],
+    needsStationTier: node.needsStationTier ?? 0,
+    needsInstruments: node.needsInstruments ?? 0,
+    needsLifetimeRawRefined: node.needsLifetimeRawRefined ?? 0,
+    constructionBundledWith: node.constructionBundledWith ?? null,
+  })),
   terminology: source.terminology.map((term) => ({
     id: term.id,
     slug: term.slug,

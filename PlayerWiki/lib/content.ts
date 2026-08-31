@@ -93,12 +93,35 @@ export interface Term {
   aliases: string[];
 }
 
+export interface ResearchBranch {
+  id: string;
+  name: string;
+  blurb: string;
+  order: number;
+  stationID: string | null;
+}
+
+export interface ResearchNode {
+  id: string;
+  branch: string;
+  name: string;
+  blurb: string;
+  cost: { essence: number; resources: Record<string, number> };
+  requires: string[];
+  needsStationTier: number;
+  needsInstruments: number;
+  needsLifetimeRawRefined: number;
+  constructionBundledWith: string | null;
+}
+
 interface PlayerContent {
   schemaVersion: number;
   resources: Resource[];
   items: Item[];
   travellers: Traveller[];
   stations: Station[];
+  researchBranches: ResearchBranch[];
+  researchNodes: ResearchNode[];
   terminology: Term[];
   terrain: Array<{ name: string; assetURL: string }>;
   writingAssetURL: string | null;

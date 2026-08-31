@@ -94,7 +94,7 @@ export default function Crafting() {
             yield.
           </li>
           <li>
-            <strong>Research:</strong> spends the shown cost to unlock a
+            <strong><Link href="/systems/research">Research</Link>:</strong> spends the shown cost to unlock a
             selected node.
           </li>
           <li>

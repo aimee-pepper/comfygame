@@ -62,7 +62,7 @@ export default function JourneyGuide() {
         <div className="definition-grid">
           <div><h3><Link href="/services">Village services</Link></h3><p>Use the current service screens for storage, party preparation, trade, refinement, records, and other everyday Village work.</p></div>
           <div><h3><Link href="/crafting">Crafting systems</Link></h3><p>Open a current station guide to compare its published inputs, material choices, output, and access facts before you commit a recipe.</p></div>
-          <div><h3><Link href="/systems/crafting">Research</Link></h3><p>Open the current Research screen to choose a listed node and spend its shown cost. Earlier listed upgrades are required when the node says so; this guide does not predict an order beyond those current requirements.</p></div>
+          <div><h3><Link href="/systems/research">Research</Link></h3><p>Open the current Research screen to choose a listed node and spend its shown cost. Earlier listed upgrades are required when the node says so; this guide does not predict an order beyond those current requirements.</p></div>
         </div>
       </section>
       <RelatedGuides links={[

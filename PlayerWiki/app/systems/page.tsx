@@ -15,7 +15,7 @@ export default function SystemsHub() {
       summary: 'Start a campaign, write the next world, then learn what remains visible and useful once you enter it.',
       visualURL: content.writingAssetURL,
       visualAlt: 'Writing Desk parchment',
-      links: [['Getting started', '/getting-started'], ['Your current journey', '/journey'], ['World Writing', '/systems/world-writing'], ['Exploration', '/systems/exploration']],
+      links: [['Getting started', '/getting-started'], ['Your current journey', '/journey'], ['World Writing', '/systems/world-writing'], ['Exploration', '/systems/exploration'], ['Research', '/systems/research']],
     },
     {
       title: 'Combat and preparation',
