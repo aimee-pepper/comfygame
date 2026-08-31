@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "aggregateSourceHash": "87f6804afb98a094bc37b3938d1b8576670f74957831057b5ef585a7d3676297",
+  "aggregateSourceHash": "1196192b4ab9f79c45a4344f8b29d46f239cac5bdf512b3cac46a9033801fbd2",
   "inputs": {
     "AssetLab/artifacts/atmosphere-presentation-v0.1/manifest.json": "b402400f57b55c92f79b3cda43a36fb77738dce2ce2c3c11a06746fb6f874ee9",
     "AssetLab/artifacts/dynamic-terrain-style-v0.2/manifest.json": "5e70b17c91c8601ed895455364f2cd8a51e010e2cb2201f09dc2c02c826f3892",
@@ -36,7 +36,7 @@
     "AssetLab/integration/world-material-pixel-correction-v1/deterministic-receipt.json": "9fd7b89fe1ee15c069734ce32dab7fb504bf01645399c6615dd74086551d288f",
     "AssetLab/integration/world-material-pixel-correction-v1/manifest.json": "0644e1c83a0c2b948331658dc5afec889bbe4867dc3abbc48eb4a21d9b130cee",
     "AssetLab/integration/writing-desk-production-pack-v1/runtime/manifest.json": "0257bb94d0e180dfa40008f7143a89e75dec49263e4d08e9249eadfe6f232f96",
-    "Bookbinder.xcodeproj/project.pbxproj": "c0dc1ca1cf2ea1f416ca4473ffe7e154137922a966f92a46682b5af97718006f",
+    "Bookbinder.xcodeproj/project.pbxproj": "e352c870d6ac811b4f39743246577c67f651dccfe30a32cccbce06ea294011db",
     "RuntimePacks/ExplorationCatalogueObjects-v1/manifest.json": "71dcb608dae62dc6503f9333f0114ac6b9d75871f39a1c3f222b9645d027e239",
     "RuntimePacks/ExplorationLooseEssence-v1/manifest.json": "58daa8282f5f4312bbbece64325aadd343e4551f0792999680e3ebaf9550fb6e",
     "RuntimePacks/ExplorationLooseItems-v1/manifest.json": "a0c8251adde90797a64d43ef87668af65d235b93b16a1aecb13f8aeb235ae48d",
@@ -340,7 +340,7 @@
     "docs/writing-tool-progression-current.md": "be17fe07aa89aaaab7117a2faca43d7e1eb1be23202d19106c67c42547b23bb0"
   },
   "outputs": {
-    "generated/wiki-data.json": "a2baaf6ce8e84ce2ce8d3946a39c501235bee23b524504752eda5d69384015a6",
-    "generated/source-registry.json": "c3b6c149eb115a5e114aab3a640115ca4f0b58b283a2627a3b33d4d0b4350bfa"
+    "generated/wiki-data.json": "956ebb884b3b44fb84215cad4fbd4358a75ef3b6f773763019fcc638e6a238fd",
+    "generated/source-registry.json": "b32436ae86829c8a51eb3cfe59cac64e1673baeafd6256f0df8ba6585240b55a"
   }
 }
