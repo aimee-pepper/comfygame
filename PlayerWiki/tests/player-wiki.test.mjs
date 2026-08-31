@@ -374,6 +374,21 @@ test('systems hub groups every current player guide into useful routes', async (
   assert.match(hub, /PixelImage/);
 });
 
+test('combat guide integrates retained party and gear references without a visual gallery', async () => {
+  const combat = await read('app/systems/combat/page.tsx');
+  assert.match(combat, /combat-reference-strip/);
+  assert.match(combat, /PixelImage/);
+  assert.match(combat, /\/people\/\$\{traveller\.slug\}/);
+  assert.match(combat, /\/equipment\/\$\{weapon\.slug\}/);
+  assert.match(combat, /Prepare before an encounter/);
+  assert.match(combat, /Attack, Techniques, Item, and Withdraw/);
+  assert.match(combat, /second-tap prompt/);
+  assert.match(combat, /no separate Defend key/);
+  assert.match(combat, /first enabled rule whose condition is true has priority/);
+  assert.match(combat, /current expedition review/);
+  assert.match(combat, /\/systems\/field-supplies/);
+});
+
 test('all requested player detail routes have shared breadcrumbs and related guides', async () => {
   for (const relative of [
     'app/systems/world-writing/page.tsx',
