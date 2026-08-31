@@ -42,6 +42,8 @@ export default async function ResourceDetail({
         quantity: cost.quantity ?? cost.amount ?? '?',
       })),
   );
+  const resultHref = (item: NonNullable<(typeof content.items)[number]>) =>
+    item.gear ? `/equipment/${item.slug}` : `/items/${item.slug}`;
   return (
     <SiteFrame sidebar>
       <GuideBreadcrumbs items={[{ label: 'Reference', href: '/resources' }, { label: 'Resources', href: '/resources' }, { label: resource.name }]} />
@@ -52,13 +54,17 @@ export default async function ResourceDetail({
           size={96}
         />
         <PageIntro
-          eyebrow={`${resource.tradeBand} resource`}
+          eyebrow={resource.tradeStatus}
           title={resource.name}
           summary={resource.summary}
         />
       </div>
       <section className="article-section">
-        <h2>Where it tends to appear</h2>
+        <h2>How to obtain it</h2>
+        <dl className="fact-grid">
+          <div><dt>Current route</dt><dd>{resource.acquisition}</dd></div>
+          <div><dt>Trade</dt><dd>{resource.tradeStatus}</dd></div>
+        </dl>
         <p>
           <strong>Primary pressure:</strong> {resource.drivenBy}
         </p>
@@ -82,7 +88,7 @@ export default async function ResourceDetail({
         </div>
       </section>
       <section className="article-section">
-        <h2>Current uses</h2>
+        <h2>Other current consumers</h2>
         <ul>
           {resource.currentUses.map((line) => (
             <li key={line}>{line}</li>
@@ -97,9 +103,9 @@ export default async function ResourceDetail({
               <thead>
                 <tr>
                   <th>Recipe</th>
-                  <th aria-label="Result image" />
+                  <th>Output</th>
                   <th>System</th>
-                  <th>How this resource is used</th>
+                  <th>Exact resource use</th>
                 </tr>
               </thead>
               <tbody>
@@ -116,7 +122,7 @@ export default async function ResourceDetail({
                           {recipe.name}
                         </Link>
                       </td>
-                      <td>{result?.assetURL && <PixelImage src={result.assetURL} alt={`${result.name} icon`} size={32} />}</td>
+                      <td>{result?.assetURL && <PixelImage src={result.assetURL} alt={`${result.name} icon`} size={32} />} {result ? <Link href={resultHref(result)}>{result.name}</Link> : recipe.result}</td>
                       <td>{system?.name ?? humanize(recipe.system)}</td>
                       <td>
                         {ingredient.amount

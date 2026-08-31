@@ -16,6 +16,8 @@
       ],
       "tradeBand": "Staple",
       "isRealityCurrency": false,
+      "acquisition": "World mineral node · Extraction rank 0",
+      "tradeStatus": "Staple trade band",
       "currentUses": [
         "No current Village construction recipe uses this resource."
       ],
@@ -36,6 +38,8 @@
       ],
       "tradeBand": "Staple",
       "isRealityCurrency": false,
+      "acquisition": "World mineral node · Extraction rank 0",
+      "tradeStatus": "Staple trade band",
       "currentUses": [
         "Used to construct the Armoury.",
         "Used to construct the Scriptorium.",
@@ -60,6 +64,8 @@
       ],
       "tradeBand": "Staple",
       "isRealityCurrency": false,
+      "acquisition": "World mineral node · Extraction rank 0",
+      "tradeStatus": "Staple trade band",
       "currentUses": [
         "Used to construct the Blacksmith.",
         "Used to construct the Armoury.",
@@ -86,6 +92,8 @@
       ],
       "tradeBand": "Uncommon",
       "isRealityCurrency": false,
+      "acquisition": "World mineral node · Extraction rank 1",
+      "tradeStatus": "Uncommon trade band",
       "currentUses": [
         "Used to construct the Armoury.",
         "Used to construct the Weaponsmith."
@@ -108,6 +116,8 @@
       ],
       "tradeBand": "Rare",
       "isRealityCurrency": false,
+      "acquisition": "World mineral node · Extraction rank 2",
+      "tradeStatus": "Rare trade band",
       "currentUses": [
         "Used to construct the Distillery.",
         "Used to construct the Channelworks."
@@ -129,6 +139,8 @@
       ],
       "tradeBand": "Precious",
       "isRealityCurrency": false,
+      "acquisition": "World mineral node · Extraction rank 2",
+      "tradeStatus": "Precious trade band",
       "currentUses": [
         "Used to construct the Weaponsmith."
       ],
@@ -150,6 +162,8 @@
       ],
       "tradeBand": "Uncommon",
       "isRealityCurrency": false,
+      "acquisition": "World mineral node · Extraction rank 1",
+      "tradeStatus": "Uncommon trade band",
       "currentUses": [
         "Used to construct the Survey Post.",
         "Used to construct the Apothecary.",
@@ -174,6 +188,8 @@
       ],
       "tradeBand": "Uncommon",
       "isRealityCurrency": false,
+      "acquisition": "World mineral node · Extraction rank 1",
+      "tradeStatus": "Uncommon trade band",
       "currentUses": [
         "No current Village construction recipe uses this resource."
       ],
@@ -195,6 +211,8 @@
       ],
       "tradeBand": "Staple",
       "isRealityCurrency": false,
+      "acquisition": "World mineral node · Extraction rank 0",
+      "tradeStatus": "Staple trade band",
       "currentUses": [
         "Used to construct the Tannery."
       ],
@@ -215,6 +233,8 @@
       ],
       "tradeBand": "Uncommon",
       "isRealityCurrency": false,
+      "acquisition": "World mineral node · Extraction rank 0",
+      "tradeStatus": "Uncommon trade band",
       "currentUses": [
         "No current Village construction recipe uses this resource."
       ],
@@ -236,6 +256,8 @@
       ],
       "tradeBand": "Rare",
       "isRealityCurrency": false,
+      "acquisition": "World mineral node · Extraction rank 3",
+      "tradeStatus": "Rare trade band",
       "currentUses": [
         "No current Village construction recipe uses this resource."
       ],
@@ -257,6 +279,8 @@
       ],
       "tradeBand": "Precious",
       "isRealityCurrency": false,
+      "acquisition": "World mineral node · Extraction rank 4",
+      "tradeStatus": "Precious trade band",
       "currentUses": [
         "No current Village construction recipe uses this resource."
       ],
@@ -277,6 +301,8 @@
       ],
       "tradeBand": "Staple",
       "isRealityCurrency": false,
+      "acquisition": "Primary flora harvest",
+      "tradeStatus": "Staple trade band",
       "currentUses": [
         "Used to construct the Blacksmith.",
         "Used to construct the Tannery.",
@@ -300,6 +326,8 @@
       ],
       "tradeBand": "Staple",
       "isRealityCurrency": false,
+      "acquisition": "Primary flora harvest",
+      "tradeStatus": "Staple trade band",
       "currentUses": [
         "Used to construct the Tannery.",
         "Used to construct the Bowyer.",
@@ -324,6 +352,8 @@
       ],
       "tradeBand": "Staple",
       "isRealityCurrency": false,
+      "acquisition": "Primary flora harvest",
+      "tradeStatus": "Staple trade band",
       "currentUses": [
         "Used to construct the Wayfarer's Table.",
         "Used to construct the Anchorage."
@@ -345,6 +375,8 @@
       ],
       "tradeBand": "Staple",
       "isRealityCurrency": false,
+      "acquisition": "Secondary harvest from qualifying flora",
+      "tradeStatus": "Staple trade band",
       "currentUses": [
         "Used to construct the Bowyer."
       ],
@@ -365,6 +397,8 @@
       ],
       "tradeBand": "Uncommon",
       "isRealityCurrency": false,
+      "acquisition": "Primary flora harvest",
+      "tradeStatus": "Uncommon trade band",
       "currentUses": [
         "No current Village construction recipe uses this resource."
       ],
@@ -385,6 +419,8 @@
       ],
       "tradeBand": "Uncommon",
       "isRealityCurrency": false,
+      "acquisition": "Primary flora harvest",
+      "tradeStatus": "Uncommon trade band",
       "currentUses": [
         "No current Village construction recipe uses this resource."
       ],
@@ -406,6 +442,8 @@
       ],
       "tradeBand": "Uncommon",
       "isRealityCurrency": false,
+      "acquisition": "Primary flora harvest",
+      "tradeStatus": "Uncommon trade band",
       "currentUses": [
         "Used to construct the Apothecary."
       ],
@@ -425,6 +463,8 @@
       ],
       "tradeBand": "Rare",
       "isRealityCurrency": false,
+      "acquisition": "Exact creature-material reward",
+      "tradeStatus": "Rare trade band",
       "currentUses": [
         "No current Village construction recipe uses this resource."
       ],
@@ -446,6 +486,8 @@
       ],
       "tradeBand": "Rare",
       "isRealityCurrency": false,
+      "acquisition": "World mineral node · Extraction rank 3",
+      "tradeStatus": "Rare trade band",
       "currentUses": [
         "No current Village construction recipe uses this resource."
       ],
@@ -464,6 +506,8 @@
       ],
       "tradeBand": "Nontradeable",
       "isRealityCurrency": false,
+      "acquisition": "Direct world pickup",
+      "tradeStatus": "Not traded",
       "currentUses": [
         "No current Village construction recipe uses this resource."
       ],
@@ -484,6 +528,8 @@
       ],
       "tradeBand": "Nontradeable",
       "isRealityCurrency": true,
+      "acquisition": "Reality award",
+      "tradeStatus": "Reality currency · not traded",
       "currentUses": [
         "No current Village construction recipe uses this resource."
       ],

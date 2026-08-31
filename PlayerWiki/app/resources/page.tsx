@@ -5,12 +5,14 @@ import { SiteFrame } from '@/components/site-frame';
 import { content } from '@/lib/content';
 import { recipesUsingResource } from '@/lib/crafting';
 
-function buildingCount(resourceID: string) {
-  return content.stations.filter((station) =>
+function buildingUses(resourceID: string) {
+  return content.stations.flatMap((station) =>
     station.buildCost.some(
       (cost) => (cost.id ?? cost.resource ?? cost.resourceID) === resourceID,
-    ),
-  ).length;
+    )
+      ? [station]
+      : [],
+  );
 }
 
 export default function ResourcesPage() {
@@ -27,15 +29,16 @@ export default function ResourcesPage() {
             <tr>
               <th aria-label="Image" />
               <th>Resource</th>
-              <th>Trade band</th>
+              <th>How obtained</th>
               <th>Crafts used in</th>
               <th>Building material?</th>
+              <th>Trade status</th>
             </tr>
           </thead>
           <tbody>
             {content.resources.map((resource) => {
               const recipes = recipesUsingResource(resource.id);
-              const buildings = buildingCount(resource.id);
+              const buildings = buildingUses(resource.id);
               return (
                 <tr key={resource.id}>
                   <td>
@@ -50,7 +53,7 @@ export default function ResourcesPage() {
                     </Link>
                     <small>{resource.summary}</small>
                   </td>
-                  <td>{resource.tradeBand}</td>
+                  <td>{resource.acquisition}</td>
                   <td>
                     {recipes.length ? (
                       <>
@@ -70,11 +73,8 @@ export default function ResourcesPage() {
                       'No current recipe'
                     )}
                   </td>
-                  <td>
-                    {buildings
-                      ? `Yes — ${buildings} ${buildings === 1 ? 'building' : 'buildings'}`
-                      : 'No'}
-                  </td>
+                  <td>{buildings.length ? <>Yes — {buildings.slice(0, 2).map((station, index) => <span key={station.id}>{index ? ', ' : ''}<Link href={`/places/${station.slug}`}>{station.name}</Link></span>)}{buildings.length > 2 ? ` +${buildings.length - 2} more` : ''}</> : 'No'}</td>
+                  <td>{resource.tradeStatus}</td>
                 </tr>
               );
             })}

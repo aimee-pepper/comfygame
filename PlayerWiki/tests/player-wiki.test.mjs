@@ -67,6 +67,14 @@ test('sanitized player snapshot has useful implemented coverage and inline visua
   assert.equal(content.resources.length, 23);
   assert.equal(content.items.length, 103);
   assert.equal(content.travellers.length, 8);
+  assert.equal(
+    content.resources.find((resource) => resource.id === 'rubble')?.acquisition,
+    'World mineral node · Extraction rank 0',
+  );
+  assert.equal(
+    content.resources.find((resource) => resource.id === 'mote')?.tradeStatus,
+    'Reality currency · not traded',
+  );
   assert.equal(content.stations.length, 22);
   assert.ok(content.resources.some((entry) => entry.assetURL));
   assert.ok(content.items.some((entry) => entry.assetURL));
@@ -110,9 +118,14 @@ test('crafting has a linked system index and complete resource cross-reference s
   const resourceIndex = await read('app/resources/page.tsx');
   assert.match(resourceIndex, /Crafts used in/);
   assert.match(resourceIndex, /Building material\?/);
+  assert.match(resourceIndex, /How obtained/);
+  assert.match(resourceIndex, /Trade status/);
   const resourceDetail = await read('app/resources/[slug]/page.tsx');
   assert.match(resourceDetail, /Craft recipes/);
   assert.match(resourceDetail, /Building recipes/);
+  assert.match(resourceDetail, /How to obtain it/);
+  assert.match(resourceDetail, /Other current consumers/);
+  assert.match(resourceDetail, /Exact resource use/);
   const craftingIndex = await read('app/crafting/page.tsx');
   const craftingDetail = await read('app/crafting/[slug]/page.tsx');
   assert.match(craftingIndex, /PixelImage/);

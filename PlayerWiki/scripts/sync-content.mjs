@@ -23,6 +23,12 @@ const travellerSource = JSON.parse(
     'utf8',
   ),
 );
+const resourceSource = JSON.parse(
+  await readFile(
+    path.join(repositoryRoot, 'Sources', 'Content', 'Data', 'resources.json'),
+    'utf8',
+  ),
+);
 const namedCharacterPack = JSON.parse(
   await readFile(
     path.join(
@@ -58,6 +64,32 @@ const runtimeAsset = (familyID, semanticKey) =>
 
 const safeFileName = (value) =>
   `${String(value).replaceAll(/[^a-zA-Z0-9_-]/g, '-')}.png`;
+const resourceDefinitionByID = new Map(
+  resourceSource.resources.map((resource) => [resource.id, resource]),
+);
+const acquisitionLabel = (resource) => {
+  switch (resource.extractionDisposition) {
+    case 'mineral_node':
+      return `World mineral node · Extraction rank ${resource.requiredExtractionRank ?? 0}`;
+    case 'flora_primary':
+      return 'Primary flora harvest';
+    case 'flora_secondary':
+      return 'Secondary harvest from qualifying flora';
+    case 'creature_material_only':
+      return 'Exact creature-material reward';
+    case 'direct_pickup':
+      return 'Direct world pickup';
+    case 'reality_award':
+      return 'Reality award';
+    default:
+      return 'Current source not published';
+  }
+};
+const tradeStatus = (resource) => {
+  if (resource.isRealityCurrency) return 'Reality currency · not traded';
+  if (resource.tradeBand === 'nontradeable') return 'Not traded';
+  return `${resource.tradeBand[0].toUpperCase()}${resource.tradeBand.slice(1)} trade band`;
+};
 
 await mkdir(path.dirname(outputDataPath), { recursive: true });
 await mkdir(path.join(publicAssetRoot, 'resources'), { recursive: true });
@@ -140,6 +172,7 @@ const districtAssetURL = await publishTownVisual(
 
 const resources = [];
 for (const resource of source.resources) {
+  const definition = resourceDefinitionByID.get(resource.id) ?? {};
   const asset = runtimeAsset(
     'resource-sprites-v1',
     `resources/profiles/inventory/${resource.id}`,
@@ -154,6 +187,8 @@ for (const resource of source.resources) {
     favours: resource.favours,
     tradeBand: resource.tradeBand,
     isRealityCurrency: resource.isRealityCurrency,
+    acquisition: acquisitionLabel(definition),
+    tradeStatus: tradeStatus(definition),
     currentUses: resource.currentUses,
     assetURL: await publishAsset(asset, 'resources', safeFileName(resource.id)),
   });

@@ -10,6 +10,8 @@ export interface Resource {
   favours: string[];
   tradeBand: string;
   isRealityCurrency: boolean;
+  acquisition: string;
+  tradeStatus: string;
   currentUses: string[];
   assetURL: string | null;
 }
