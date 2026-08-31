@@ -35,6 +35,20 @@ const namedCharacterPack = JSON.parse(
     'utf8',
   ),
 );
+const townBuildingRegistry = await readFile(
+  path.join(
+    repositoryRoot,
+    'Sources',
+    'VisualRuntime',
+    'TownBuildingVisualRegistry.generated.swift',
+  ),
+  'utf8',
+);
+const townBuildingAssetByStationID = new Map(
+  [...townBuildingRegistry.matchAll(/^\s*"([a-z_]+)": "([a-z0-9-]+)"/gm)].map(
+    ([, stationID, assetName]) => [stationID, assetName],
+  ),
+);
 const family = (id) =>
   source.visualAssets.families.find((entry) => entry.id === id);
 const runtimeAsset = (familyID, semanticKey) =>
@@ -51,6 +65,7 @@ await mkdir(path.join(publicAssetRoot, 'items'), { recursive: true });
 await mkdir(path.join(publicAssetRoot, 'terrain'), { recursive: true });
 await mkdir(path.join(publicAssetRoot, 'writing'), { recursive: true });
 await mkdir(path.join(publicAssetRoot, 'people'), { recursive: true });
+await mkdir(path.join(publicAssetRoot, 'places'), { recursive: true });
 
 async function publishAsset(asset, directory, fileName) {
   if (!asset?.sourcePath) return null;
@@ -104,6 +119,23 @@ async function publishTravellerCameo(travellerID, slug) {
   );
   return `/game-assets/people/${destination}`;
 }
+
+async function publishTownVisual(sourcePath, destination) {
+  await copyFile(
+    path.join(repositoryRoot, sourcePath),
+    path.join(publicAssetRoot, 'places', destination),
+  );
+  return `/game-assets/places/${destination}`;
+}
+
+const startingTownAssetURL = await publishTownVisual(
+  'AssetLab/integration/starting-town-home-v1/town-starting-home-v1-phone-v2.png',
+  'starting-town-home.png',
+);
+const districtAssetURL = await publishTownVisual(
+  'Sources/Content/TownVisuals/town-empty-v1.png',
+  'town-district.png',
+);
 
 const resources = [];
 for (const resource of source.resources) {
@@ -191,13 +223,28 @@ for (const traveller of source.travellers.filter(
     });
 }
 
-const stations = source.stations
+const homeStationIDs = new Set([
+  'writing_desk',
+  'workshop',
+  'storehouse',
+  'essence_spring',
+  'firepit',
+]);
+const stations = await Promise.all(source.stations
   .filter(
     (station) =>
       station.disposition === 'settled' &&
       station.lifecycle !== 'removedCompatibility',
   )
-  .map((station) => ({
+  .map(async (station) => {
+    const assetName = townBuildingAssetByStationID.get(station.id);
+    const assetURL = assetName
+      ? await publishTownVisual(
+          `Sources/Content/TownVisuals/${assetName}.png`,
+          `${station.slug}.png`,
+        )
+      : null;
+    return {
     id: station.id,
     slug: station.slug,
     name: station.name,
@@ -211,6 +258,11 @@ const stations = source.stations
     catalogueMaxTier: station.catalogueMaxTier,
     buildCost: station.buildCost,
     buildBlurb: station.buildBlurb,
+      assetURL,
+      contextAssetURL: homeStationIDs.has(station.id)
+        ? startingTownAssetURL
+        : districtAssetURL,
+    };
   }));
 
 const terrain = [];

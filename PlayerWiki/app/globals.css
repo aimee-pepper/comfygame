@@ -533,6 +533,33 @@ footer {
   border-left: 3px solid var(--blue);
   background: rgb(255 250 240 / 72%);
 }
+.place-visuals {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px;
+}
+.place-visual {
+  flex: 1 1 250px;
+  max-width: 460px;
+  margin: 0;
+  padding: 14px;
+  border: 1px solid var(--line);
+  background: var(--paper-light);
+  box-shadow: var(--shadow);
+}
+.place-visual img {
+  display: block;
+  width: 100%;
+  max-height: 300px;
+  object-fit: contain;
+  image-rendering: pixelated;
+}
+.place-visual figcaption {
+  margin-top: 10px;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.4;
+}
 .fact-grid {
   margin: 0;
 }
@@ -599,6 +626,9 @@ footer {
   }
   .person-intro {
     grid-template-columns: 1fr;
+  }
+  .place-visual {
+    max-width: none;
   }
   .wiki-sidebar p {
     display: none;

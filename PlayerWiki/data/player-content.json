@@ -2951,7 +2951,9 @@
       "startingTier": 0,
       "catalogueMaxTier": 1,
       "buildCost": [],
-      "buildBlurb": null
+      "buildBlurb": null,
+      "assetURL": null,
+      "contextAssetURL": "/game-assets/places/starting-town-home.png"
     },
     {
       "id": "storehouse",
@@ -2966,7 +2968,9 @@
       "startingTier": 0,
       "catalogueMaxTier": 9,
       "buildCost": [],
-      "buildBlurb": null
+      "buildBlurb": null,
+      "assetURL": "/game-assets/places/storehouse.png",
+      "contextAssetURL": "/game-assets/places/starting-town-home.png"
     },
     {
       "id": "party",
@@ -2981,7 +2985,9 @@
       "startingTier": 0,
       "catalogueMaxTier": 1,
       "buildCost": [],
-      "buildBlurb": null
+      "buildBlurb": null,
+      "assetURL": null,
+      "contextAssetURL": "/game-assets/places/town-district.png"
     },
     {
       "id": "essence_spring",
@@ -2996,7 +3002,9 @@
       "startingTier": 0,
       "catalogueMaxTier": 1,
       "buildCost": [],
-      "buildBlurb": null
+      "buildBlurb": null,
+      "assetURL": "/game-assets/places/essence-spring.png",
+      "contextAssetURL": "/game-assets/places/starting-town-home.png"
     },
     {
       "id": "library",
@@ -3011,7 +3019,9 @@
       "startingTier": 0,
       "catalogueMaxTier": 1,
       "buildCost": [],
-      "buildBlurb": null
+      "buildBlurb": null,
+      "assetURL": "/game-assets/places/library.png",
+      "contextAssetURL": "/game-assets/places/town-district.png"
     },
     {
       "id": "trading_post",
@@ -3031,7 +3041,9 @@
           "quantity": 10
         }
       ],
-      "buildBlurb": "Vance can set out a ledger and a table here for anything your household should not keep."
+      "buildBlurb": "Vance can set out a ledger and a table here for anything your household should not keep.",
+      "assetURL": null,
+      "contextAssetURL": "/game-assets/places/town-district.png"
     },
     {
       "id": "recycler",
@@ -3051,7 +3063,9 @@
           "quantity": 15
         }
       ],
-      "buildBlurb": "Noll can fit a sorting bench here, leaving failed joins intact until their evidence has been recorded."
+      "buildBlurb": "Noll can fit a sorting bench here, leaving failed joins intact until their evidence has been recorded.",
+      "assetURL": null,
+      "contextAssetURL": "/game-assets/places/town-district.png"
     },
     {
       "id": "blacksmith",
@@ -3079,7 +3093,9 @@
           "quantity": 6
         }
       ],
-      "buildBlurb": "Halloway will raise a forge here, if you can find the stone and the iron for it."
+      "buildBlurb": "Halloway will raise a forge here, if you can find the stone and the iron for it.",
+      "assetURL": null,
+      "contextAssetURL": "/game-assets/places/town-district.png"
     },
     {
       "id": "tannery",
@@ -3111,7 +3127,9 @@
           "quantity": 8
         }
       ],
-      "buildBlurb": "Corrin needs beams, fibre and salt enough to prepare a clean working room."
+      "buildBlurb": "Corrin needs beams, fibre and salt enough to prepare a clean working room.",
+      "assetURL": null,
+      "contextAssetURL": "/game-assets/places/town-district.png"
     },
     {
       "id": "bowyer",
@@ -3143,7 +3161,9 @@
           "quantity": 8
         }
       ],
-      "buildBlurb": "Fen needs straight stock, patient fibres and enough resin to make every draw hold."
+      "buildBlurb": "Fen needs straight stock, patient fibres and enough resin to make every draw hold.",
+      "assetURL": null,
+      "contextAssetURL": "/game-assets/places/town-district.png"
     },
     {
       "id": "armoury",
@@ -3175,7 +3195,9 @@
           "quantity": 8
         }
       ],
-      "buildBlurb": "Bracken needs iron, clay and copper enough to rebuild protection without pretending its old shape was sacred."
+      "buildBlurb": "Bracken needs iron, clay and copper enough to rebuild protection without pretending its old shape was sacred.",
+      "assetURL": null,
+      "contextAssetURL": "/game-assets/places/town-district.png"
     },
     {
       "id": "weaponsmith",
@@ -3207,7 +3229,9 @@
           "quantity": 4
         }
       ],
-      "buildBlurb": "Maud needs enough iron and copper to test the alteration, and a little gold for the measures that must not drift."
+      "buildBlurb": "Maud needs enough iron and copper to test the alteration, and a little gold for the measures that must not drift.",
+      "assetURL": null,
+      "contextAssetURL": "/game-assets/places/town-district.png"
     },
     {
       "id": "scriptorium",
@@ -3235,7 +3259,9 @@
           "quantity": 10
         }
       ],
-      "buildBlurb": "Isolde needs a room with good light and a table that doesn't rock. She is very specific about the table."
+      "buildBlurb": "Isolde needs a room with good light and a table that doesn't rock. She is very specific about the table.",
+      "assetURL": "/game-assets/places/scriptorium.png",
+      "contextAssetURL": "/game-assets/places/town-district.png"
     },
     {
       "id": "firepit",
@@ -3250,7 +3276,9 @@
       "startingTier": 0,
       "catalogueMaxTier": 1,
       "buildCost": [],
-      "buildBlurb": null
+      "buildBlurb": null,
+      "assetURL": null,
+      "contextAssetURL": "/game-assets/places/starting-town-home.png"
     },
     {
       "id": "bestiary",
@@ -3265,7 +3293,9 @@
       "startingTier": 0,
       "catalogueMaxTier": 1,
       "buildCost": [],
-      "buildBlurb": null
+      "buildBlurb": null,
+      "assetURL": "/game-assets/places/bestiary.png",
+      "contextAssetURL": "/game-assets/places/town-district.png"
     },
     {
       "id": "survey_post",
@@ -3297,7 +3327,9 @@
           "quantity": 2
         }
       ],
-      "buildBlurb": "Mara wants somewhere flat, out of the wind, with a clear line to the horizon. She has been carrying the lenses this whole time."
+      "buildBlurb": "Mara wants somewhere flat, out of the wind, with a clear line to the horizon. She has been carrying the lenses this whole time.",
+      "assetURL": "/game-assets/places/survey-post.png",
+      "contextAssetURL": "/game-assets/places/town-district.png"
     },
     {
       "id": "apothecary",
@@ -3329,7 +3361,9 @@
           "quantity": 12
         }
       ],
-      "buildBlurb": "Nessa needs a clean room, vessels that can take heat, and shelves for what the worlds grew. Raising it makes Lesser Salve available immediately."
+      "buildBlurb": "Nessa needs a clean room, vessels that can take heat, and shelves for what the worlds grew. Raising it makes Lesser Salve available immediately.",
+      "assetURL": "/game-assets/places/apothecary.png",
+      "contextAssetURL": "/game-assets/places/town-district.png"
     },
     {
       "id": "reliquary",
@@ -3357,7 +3391,9 @@
           "quantity": 8
         }
       ],
-      "buildBlurb": "Edren needs shelves for fragments, broad tables for plans, and somewhere every recovered thing can keep its place."
+      "buildBlurb": "Edren needs shelves for fragments, broad tables for plans, and somewhere every recovered thing can keep its place.",
+      "assetURL": "/game-assets/places/reliquary.png",
+      "contextAssetURL": "/game-assets/places/town-district.png"
     },
     {
       "id": "wayfarers_table",
@@ -3389,7 +3425,9 @@
           "quantity": 6
         }
       ],
-      "buildBlurb": "Sela wants one broad table for field guides, samples and careful packing—not a counter, and not somewhere she is expected to stay."
+      "buildBlurb": "Sela wants one broad table for field guides, samples and careful packing—not a counter, and not somewhere she is expected to stay.",
+      "assetURL": null,
+      "contextAssetURL": "/game-assets/places/town-district.png"
     },
     {
       "id": "distillery",
@@ -3421,7 +3459,9 @@
           "quantity": 30
         }
       ],
-      "buildBlurb": "Auber needs vessels that make every fraction visible, and shelves where no residue is mistaken for nothing."
+      "buildBlurb": "Auber needs vessels that make every fraction visible, and shelves where no residue is mistaken for nothing.",
+      "assetURL": null,
+      "contextAssetURL": "/game-assets/places/town-district.png"
     },
     {
       "id": "channelworks",
@@ -3453,7 +3493,9 @@
           "quantity": 20
         }
       ],
-      "buildBlurb": "Oda needs a bench where a live core can be contained before it is given reach."
+      "buildBlurb": "Oda needs a bench where a live core can be contained before it is given reach.",
+      "assetURL": null,
+      "contextAssetURL": "/game-assets/places/town-district.png"
     },
     {
       "id": "anchorage",
@@ -3485,7 +3527,9 @@
           "quantity": 18
         }
       ],
-      "buildBlurb": "Tovin needs a quiet room for the Atlas and a frame stout enough to hold open a way that should have closed."
+      "buildBlurb": "Tovin needs a quiet room for the Atlas and a frame stout enough to hold open a way that should have closed.",
+      "assetURL": null,
+      "contextAssetURL": "/game-assets/places/town-district.png"
     }
   ],
   "terminology": [

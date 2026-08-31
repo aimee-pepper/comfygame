@@ -78,6 +78,8 @@ export interface Station {
     amount?: number;
   }>;
   buildBlurb: string | null;
+  assetURL: string | null;
+  contextAssetURL: string;
 }
 
 export interface Term {

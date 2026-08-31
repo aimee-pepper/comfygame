@@ -103,6 +103,21 @@ test('crafting has a linked system index and complete resource cross-reference s
   assert.match(resourceDetail, /Building recipes/);
 });
 
+test('places publish only current retained town and building visuals inline', async () => {
+  const content = JSON.parse(await read('data/player-content.json'));
+  const mappedBuildings = content.stations.filter((place) => place.assetURL);
+  assert.equal(mappedBuildings.length, 8);
+  for (const place of content.stations) {
+    assert.match(place.contextAssetURL, /^\/game-assets\/places\//);
+    await access(path.join(root, 'public', place.contextAssetURL));
+    if (place.assetURL) await access(path.join(root, 'public', place.assetURL));
+  }
+  const detail = await read('app/places/[slug]/page.tsx');
+  assert.match(detail, /place-visuals/);
+  assert.match(detail, /building visual/);
+  assert.match(detail, /town context/);
+});
+
 test('every live person includes every authored diary page and every authored location hint', async () => {
   const content = JSON.parse(await read('data/player-content.json'));
   const authored = JSON.parse(
