@@ -9,7 +9,9 @@ import {
   Sparkles,
   Users,
 } from 'lucide-react';
+import { PixelImage } from '@/components/pixel-image';
 import { SiteFrame } from '@/components/site-frame';
+import { content } from '@/lib/content';
 
 const sections = [
   { href: '/getting-started', label: 'Getting started', detail: 'Begin a campaign and understand the core loop.', icon: BookOpenText },
@@ -28,6 +30,8 @@ const resources = [
 ];
 
 export default function Home() {
+  const firstSupply = content.items.find((item) => item.consumable && item.assetURL);
+
   return (
     <SiteFrame>
         <section className="welcome" aria-labelledby="welcome-title">
@@ -48,6 +52,15 @@ export default function Home() {
             <Link href="/curios">Curios & key items</Link>
             <Link href="/people"><Users size={16} /> People</Link>
           </aside>
+        </section>
+
+        <section className="page-section journey-section" aria-labelledby="journey-heading">
+          <div className="section-heading"><div><p className="eyebrow">The first journey</p><h2 id="journey-heading">Prepare, write, and step through</h2></div><Link href="/getting-started">Read the full first-trip guide</Link></div>
+          <div className="journey-strip">
+            <Link href="/systems/world-writing"><img src={content.writingAssetURL} alt="Writing Desk parchment" /><span><strong>Write a Page</strong><small>Use the Writing Desk to review, shape, and Bind the next world.</small></span></Link>
+            <Link href="/systems/exploration"><img src={content.explorationVisuals.entryPortal} alt="Entry portal" /><span><strong>Enter the world</strong><small>The entry portal stays on the map as the route back through the expedition.</small></span></Link>
+            {firstSupply && <Link href={`/items/${firstSupply.slug}`}><PixelImage src={firstSupply.assetURL} alt={`${firstSupply.name} icon`} size={58} /><span><strong>Carry a supply</strong><small>Open an item entry to understand its exact use before the field.</small></span></Link>}
+          </div>
         </section>
 
         <section className="page-section" aria-labelledby="browse-heading">

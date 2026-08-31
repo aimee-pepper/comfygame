@@ -166,6 +166,16 @@ test('item indexes keep retained thumbnails compact and link each one to its ent
   }
 });
 
+test('home and getting-started guide the live route with inline retained visuals', async () => {
+  for (const relative of ['app/page.tsx', 'app/getting-started/page.tsx']) {
+    const source = await read(relative);
+    assert.match(source, /journey-strip/);
+    assert.match(source, /content\.writingAssetURL/);
+    assert.match(source, /content\.explorationVisuals\.entryPortal/);
+    assert.match(source, /PixelImage/);
+  }
+});
+
 test('every live person includes every authored diary page and every authored location hint', async () => {
   const content = JSON.parse(await read('data/player-content.json'));
   const authored = JSON.parse(
