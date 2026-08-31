@@ -421,6 +421,23 @@ test('combat techniques and Gambits enumerate only current grants and owned rule
   assert.match(await read('components/site-frame.tsx'), /\/systems\/combat-techniques-gambits/);
 });
 
+test('Village construction lists every current destination with its exact foundation and player route', async () => {
+  await access(path.join(root, 'app/systems/village-construction/page.tsx'));
+  const guide = await read('app/systems/village-construction/page.tsx');
+  const content = JSON.parse(await read('data/player-content.json'));
+  assert.equal(content.stations.length, 22);
+  assert.match(guide, /Every current Village destination/);
+  assert.match(guide, /Meet \{station\.keeper\}/);
+  assert.match(guide, /buildCost\(station\)/);
+  assert.match(guide, /constructionBundledWith === station\.id/);
+  assert.match(guide, /Trading Post, Recycler, Blacksmith/);
+  assert.match(guide, /No separate recipe list is currently published/);
+  assert.equal(guide.includes('Stage 0'), false);
+  assert.equal(guide.includes('Aimee decision'), false);
+  assert.match(await read('app/systems/page.tsx'), /\/systems\/village-construction/);
+  assert.match(await read('components/site-frame.tsx'), /\/systems\/village-construction/);
+});
+
 test('all requested player detail routes have shared breadcrumbs and related guides', async () => {
   for (const relative of [
     'app/systems/world-writing/page.tsx',

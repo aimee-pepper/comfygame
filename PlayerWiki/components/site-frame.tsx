@@ -21,6 +21,7 @@ const systemLinks = [
   ['/systems/crafting', 'Crafting basics'],
   ['/systems/economy-exchange', 'Economy & exchange'],
   ['/systems/knowledge-records', 'Knowledge & records'],
+  ['/systems/village-construction', 'Village construction'],
 ];
 
 const prepareLinks = [

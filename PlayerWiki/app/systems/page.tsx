@@ -36,7 +36,7 @@ export default function SystemsHub() {
       summary: 'Use the everyday Village screens to manage storage, party placement, refinement, records, and preparation.',
       visualURL: content.stations.find((place) => place.id === 'storehouse')?.assetURL ?? null,
       visualAlt: 'Storehouse building visual',
-      links: [['All services', '/services'], ['Places and stations', '/places'], ['People', '/people']],
+      links: [['Village construction', '/systems/village-construction'], ['All services', '/services'], ['Places and stations', '/places'], ['People', '/people']],
     },
     {
       title: 'Reference',
