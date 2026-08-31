@@ -643,11 +643,18 @@ final class GameStore: ObservableObject {
         return attempt
     }
 
+    /// Internal transient authority for callers that retain an admitted field attempt through a
+    /// later durable transaction. This intentionally binds only the session epoch and live world
+    /// identity; individual action owners bind their own turn, position, context, and payload.
+    func worldFieldAttemptIsCurrent(_ attempt: WorldFieldAttempt) -> Bool {
+        guard attempt.sessionEpoch == worldFieldSessionEpoch, let run = activeRun else { return false }
+        return "\(run.runIndex):\(run.mapSeed)" == attempt.worldRunID
+    }
+
     /// Cancels transient speech only once the rules-owned action has actually committed.
     /// Refused/no-op attempts must not consume a bubble that has already entered the shown set.
     func acceptWorldFieldAttempt(_ attempt: WorldFieldAttempt) {
-        guard attempt.sessionEpoch == worldFieldSessionEpoch, let run = activeRun,
-              "\(run.runIndex):\(run.mapSeed)" == attempt.worldRunID else { return }
+        guard worldFieldAttemptIsCurrent(attempt) else { return }
         clearWorldTravellerSpeechPresentation(
             expectedSessionID: attempt.observedTravellerSpeechSessionID)
     }
@@ -655,9 +662,7 @@ final class GameStore: ObservableObject {
     func submitWorldFieldEvents(_ events: [WorldRules.Event], for attempt: WorldFieldAttempt,
                                 disposition: WorldFieldEventBatchV1.Disposition,
                                 now: UInt64 = DispatchTime.now().uptimeNanoseconds) {
-        guard attempt.sessionEpoch == worldFieldSessionEpoch,
-              let run = activeRun,
-              "\(run.runIndex):\(run.mapSeed)" == attempt.worldRunID else { return }
+        guard worldFieldAttemptIsCurrent(attempt), let run = activeRun else { return }
         guard disposition != .busy else { return }
         let afterContext = WorldFieldContextReceiptV1.make(from: state)
         if !disposition.isCommitted {

@@ -2206,7 +2206,8 @@ final class PersistenceTests: XCTestCase {
         let failingStore = GameStore(io: failingIO)
         let failingReceipt = try failingStore.worldFieldItemSourceEvaluation(fixture.source).get()
         let failingAttempt = WorldFieldItemSourceCommitAttemptV1(
-            id: UUID(), stagedAt: Date(timeIntervalSince1970: 891))
+            id: UUID(), stagedAt: Date(timeIntervalSince1970: 891),
+            fieldAttempt: try XCTUnwrap(failingStore.beginWorldFieldAttempt(.useItem)))
         let failingState = failingStore.state
         let failingDiagnostics = failingStore.diagnostics
         let failingBytes = failingIO.durableBytes
@@ -2226,7 +2227,8 @@ final class PersistenceTests: XCTestCase {
         let recoveredStore = GameStore(io: recoveredIO)
         let recoveredReceipt = try recoveredStore.worldFieldItemSourceEvaluation(fixture.source).get()
         let recoveredAttempt = WorldFieldItemSourceCommitAttemptV1(
-            id: UUID(), stagedAt: Date(timeIntervalSince1970: 892))
+            id: UUID(), stagedAt: Date(timeIntervalSince1970: 892),
+            fieldAttempt: try XCTUnwrap(recoveredStore.beginWorldFieldAttempt(.useItem)))
         let recovered = recoveredStore.commitWorldFieldItemSource(
             recoveredReceipt, attempt: recoveredAttempt, label: "field source recovered write", route: route)
         guard case .recoveredDurable = recovered else {

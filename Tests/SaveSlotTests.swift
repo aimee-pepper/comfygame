@@ -361,7 +361,8 @@ final class SaveSlotTests: XCTestCase {
 
         let result = store.commitWorldFieldItemSource(
             quote,
-            attempt: .init(id: UUID(), stagedAt: Date(timeIntervalSince1970: 711)),
+            attempt: .init(id: UUID(), stagedAt: Date(timeIntervalSince1970: 711),
+                           fieldAttempt: try XCTUnwrap(store.beginWorldFieldAttempt(.useItem))),
             label: "field source route refusal") { _, _
                 -> Result<WorldFieldItemRouteCandidateV1<Bool>, WorldFieldItemSourceRefusalV1> in
                 .failure(.sourceMissing)

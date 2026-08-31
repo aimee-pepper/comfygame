@@ -71,10 +71,15 @@ struct WorldFieldItemSourceReceiptV1: Equatable, Sendable {
 struct WorldFieldItemSourceCommitAttemptV1: Equatable, Sendable {
     let id: UUID
     let stagedAt: Date
+    /// Created only after the mounted control accepts its retained source receipt. Keeping this
+    /// exact attempt binds the speech presentation the player actually acted through; commit
+    /// must never observe a later transient session by allocating a replacement here.
+    let fieldAttempt: GameStore.WorldFieldAttempt
 
-    init(id: UUID, stagedAt: Date) {
+    init(id: UUID, stagedAt: Date, fieldAttempt: GameStore.WorldFieldAttempt) {
         self.id = id
         self.stagedAt = stagedAt
+        self.fieldAttempt = fieldAttempt
     }
 }
 
@@ -1038,20 +1043,23 @@ extension GameStore {
             -> Result<WorldFieldItemRouteCandidateV1<Value>, RouteRefusal>
     ) -> WorldFieldItemSourceCommitResultV1<Value, RouteRefusal> {
         // The transient attempt is admission-owned. Display/evaluation above cannot increment its
-        // session counter merely by presenting an item sheet.
-        guard let attempt = beginWorldFieldAttempt(.useItem) else {
-            return .refused(.source(activeRun == nil ? .noActiveRun : .encounterActive))
+        // session counter merely by presenting an item sheet, and commit must not manufacture a
+        // later attempt that observes a replacement traveller-speech session.
+        let attempt = durableAttempt.fieldAttempt
+        if let admissionRefusal = worldFieldItemSourceAttemptRefusal(
+            attempt: attempt, receipt: receipt
+        ) {
+            return .refused(.source(admissionRefusal))
         }
         var sourceRefusal: WorldFieldItemSourceRefusalV1?
         var routeRefusal: RouteRefusal?
         let durable = commitPersistedIf(
             label, attemptID: durableAttempt.id, stagedAt: durableAttempt.stagedAt, scope: .expedition
         ) { candidate -> WorldFieldItemRouteCandidateV1<Value>? in
-            guard attempt.worldRunID == receipt.worldRunIdentity,
-                  attempt.turnBefore == receipt.expectedTurn,
-                  attempt.sourcePoint == receipt.expectedPosition,
-                  attempt.beforeContext == receipt.beforeContext else {
-                sourceRefusal = .staleContext
+            if let admissionRefusal = worldFieldItemSourceCurrentFrameRefusal(
+                attempt: attempt, receipt: receipt
+            ) {
+                sourceRefusal = admissionRefusal
                 return nil
             }
             switch WorldFieldItemSourceRulesV1.revalidate(receipt, in: candidate) {
@@ -1084,6 +1092,42 @@ extension GameStore {
             if let routeRefusal { return .refused(.route(routeRefusal)) }
             return .refused(.persistence(refusal))
         }
+    }
+
+    /// The admitted attempt must describe the exact, deterministic source receipt, but a durable
+    /// replay is allowed to short-circuit inside `commitPersistedIf` after the world has advanced.
+    /// Therefore current-state revalidation remains inside the candidate closure below.
+    private func worldFieldItemSourceAttemptRefusal(
+        attempt: WorldFieldAttempt,
+        receipt: WorldFieldItemSourceReceiptV1
+    ) -> WorldFieldItemSourceRefusalV1? {
+        guard worldFieldAttemptIsCurrent(attempt),
+              attempt.sourceAction == .useItem,
+              attempt.worldRunID == receipt.worldRunIdentity,
+              attempt.turnBefore == receipt.expectedTurn,
+              attempt.sourcePoint == receipt.expectedPosition,
+              attempt.beforeContext == receipt.beforeContext else { return .staleContext }
+        return nil
+    }
+
+    /// This exact current-world check runs only for a fresh durable candidate. The observed
+    /// speech session intentionally remains excluded: a replacement bubble is not source drift.
+    private func worldFieldItemSourceCurrentFrameRefusal(
+        attempt: WorldFieldAttempt,
+        receipt: WorldFieldItemSourceReceiptV1
+    ) -> WorldFieldItemSourceRefusalV1? {
+        guard let run = activeRun else { return .noActiveRun }
+        guard "\(run.runIndex):\(run.mapSeed)" == receipt.worldRunIdentity,
+              attempt.worldRunID == receipt.worldRunIdentity else { return .staleRun }
+        guard run.turnsTaken == receipt.expectedTurn,
+              attempt.turnBefore == receipt.expectedTurn else { return .staleTurn }
+        guard run.playerPosition == receipt.expectedPosition,
+              attempt.sourcePoint == receipt.expectedPosition else { return .stalePosition }
+        guard attempt.beforeContext == receipt.beforeContext,
+              WorldFieldContextReceiptV1.make(from: state) == receipt.beforeContext else {
+            return .staleContext
+        }
+        return nil
     }
 
     @discardableResult

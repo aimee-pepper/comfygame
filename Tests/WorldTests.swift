@@ -7568,7 +7568,8 @@ final class WorldTests: XCTestCase {
         store.mutate("stage durable field item", flush: true) { $0 = fixture.state }
         let receipt = try store.worldFieldItemSourceEvaluation(fixture.source).get()
         let durableAttempt = WorldFieldItemSourceCommitAttemptV1(
-            id: UUID(), stagedAt: Date(timeIntervalSince1970: 88_003))
+            id: UUID(), stagedAt: Date(timeIntervalSince1970: 88_003),
+            fieldAttempt: try XCTUnwrap(store.beginWorldFieldAttempt(.useItem)))
         var routeCalls = 0
         let route: (inout GameState, WorldFieldItemSourceReceiptV1)
             -> Result<WorldFieldItemRouteCandidateV1<String>, WorldFieldItemSourceRefusalV1> = {
@@ -7608,6 +7609,85 @@ final class WorldTests: XCTestCase {
     }
 
     @MainActor
+    func testWorldFieldItemSourceRetainsAdmittedSpeechAttemptAcrossReplacement() throws {
+        let io = SaveFileIO.temporary(name: "field-item-source-speech-\(UUID().uuidString)")
+        defer { io.deleteEverything() }
+        let store = GameStore(io: io)
+        let origin = GridPoint(x: 0, y: 1)
+        let destination = GridPoint(x: 1, y: 1)
+        let traveller = GridPoint(x: 1, y: 0)
+        var state = GameState.newGame()
+        var run = WorldRun(
+            runIndex: 88_006, book: .init(written: [], essencePaid: 0), mapSeed: 88_006,
+            rng: .init(seed: 88_006),
+            map: .init(width: 2, height: 2,
+                       tiles: Array(repeating: Tile(isRevealed: true), count: 4), entry: origin),
+            playerPosition: origin)
+        run.map[traveller].content = .traveller("mara")
+        let source = ItemStack(id: .init(rawValue: 88_007), catalogID: "salve_lesser", count: 2)
+        XCTAssertTrue(run.satchelItems.add(source))
+        state.worlds.activeRun = run
+        store.mutate("stage source speech fixture", flush: true) { $0 = state }
+
+        let firstMovement = try XCTUnwrap(store.beginWorldFieldAttempt(.step))
+        store.mutate("move for first speech") { $0.worlds.activeRun?.playerPosition = destination }
+        store.presentTravellerSpeechAfterMovement(
+            committedFinalPosition: destination, from: firstMovement, now: 100)
+        let firstSpeech = try XCTUnwrap(store.worldTravellerSpeech)
+        let firstReceipt = try store.worldFieldItemSourceEvaluation(source).get()
+        let firstAdmission = try XCTUnwrap(store.beginWorldFieldAttempt(.useItem))
+        XCTAssertEqual(firstAdmission.observedTravellerSpeechSessionID,
+                       firstSpeech.presentationID.sessionID)
+        let firstAttempt = WorldFieldItemSourceCommitAttemptV1(
+            id: UUID(), stagedAt: Date(timeIntervalSince1970: 88_006), fieldAttempt: firstAdmission)
+
+        // A different presentation session can replace the old bubble without altering the
+        // source world's final frame. The retained admission must not observe this new session.
+        store.clearWorldTravellerSpeechSession()
+        store.mutate("move for replacement speech origin") { $0.worlds.activeRun?.playerPosition = origin }
+        let replacementMovement = try XCTUnwrap(store.beginWorldFieldAttempt(.step))
+        store.mutate("move for replacement speech") { $0.worlds.activeRun?.playerPosition = destination }
+        store.presentTravellerSpeechAfterMovement(
+            committedFinalPosition: destination, from: replacementMovement, now: 200)
+        let replacementSpeech = try XCTUnwrap(store.worldTravellerSpeech)
+        XCTAssertNotEqual(replacementSpeech.presentationID.sessionID, firstSpeech.presentationID.sessionID)
+        XCTAssertNoThrow(try WorldFieldItemSourceRulesV1.revalidate(firstReceipt, in: store.state).get())
+
+        func route(_ candidate: inout GameState, _ receipt: WorldFieldItemSourceReceiptV1)
+            -> Result<WorldFieldItemRouteCandidateV1<String>, WorldFieldItemSourceRefusalV1> {
+            guard var candidateRun = candidate.worlds.activeRun,
+                  let index = candidateRun.satchelItems.stacks.firstIndex(
+                    where: { $0.id == receipt.sourceStack.id && $0 == receipt.sourceStack }
+                  ) else { return .failure(.sourceMissing) }
+            _ = candidateRun.satchelItems.stacks[index].removing(1)
+            candidateRun.satchelItems.stacks.removeAll(where: \.isEmpty)
+            candidate.worlds.activeRun = candidateRun
+            var events: [WorldRules.Event] = [.usedItem("Fixture", on: .binder)]
+            events.append(contentsOf: WorldRules.advanceTurn(in: &candidate))
+            return .success(.init(value: "committed", events: events))
+        }
+
+        guard case .committedNow = store.commitWorldFieldItemSource(
+            firstReceipt, attempt: firstAttempt, label: "source speech first", route: route
+        ) else { return XCTFail("expected admitted first source commit") }
+        XCTAssertEqual(store.worldTravellerSpeech, replacementSpeech,
+                       "a replacement session promoted after admission must survive")
+
+        let remaining = try XCTUnwrap(store.activeRun?.satchelItems.stacks.first)
+        let secondReceipt = try store.worldFieldItemSourceEvaluation(remaining).get()
+        let secondAdmission = try XCTUnwrap(store.beginWorldFieldAttempt(.useItem))
+        XCTAssertEqual(secondAdmission.observedTravellerSpeechSessionID,
+                       replacementSpeech.presentationID.sessionID)
+        let secondAttempt = WorldFieldItemSourceCommitAttemptV1(
+            id: UUID(), stagedAt: Date(timeIntervalSince1970: 88_007), fieldAttempt: secondAdmission)
+        guard case .committedNow = store.commitWorldFieldItemSource(
+            secondReceipt, attempt: secondAttempt, label: "source speech second", route: route
+        ) else { return XCTFail("expected second source commit") }
+        XCTAssertNil(store.worldTravellerSpeech,
+                     "a committed route clears only the exact session its admission observed")
+    }
+
+    @MainActor
     func testWorldFieldItemSourceCommitTimeRefusalIsFullyInert() throws {
         let io = SaveFileIO.temporary(name: "field-item-source-stale-\(UUID().uuidString)")
         defer { io.deleteEverything() }
@@ -7625,7 +7705,8 @@ final class WorldTests: XCTestCase {
         var routeCalls = 0
         let result = store.commitWorldFieldItemSource(
             receipt,
-            attempt: .init(id: UUID(), stagedAt: Date(timeIntervalSince1970: 88_005)),
+            attempt: .init(id: UUID(), stagedAt: Date(timeIntervalSince1970: 88_005),
+                           fieldAttempt: try XCTUnwrap(store.beginWorldFieldAttempt(.useItem))),
             label: "stale field source") { _, _
                 -> Result<WorldFieldItemRouteCandidateV1<Bool>, WorldFieldItemSourceRefusalV1> in
                 routeCalls += 1
@@ -7641,6 +7722,41 @@ final class WorldTests: XCTestCase {
         XCTAssertEqual(store.diagnostics.savedMutationCount, beforeDiagnostics.savedMutationCount)
         XCTAssertEqual(store.diagnostics.hasPendingWrite, beforeDiagnostics.hasPendingWrite)
         XCTAssertEqual(store.worldFieldContext, beforeContext)
+        XCTAssertNil(store.currentWorldFieldEventBatch)
+    }
+
+    @MainActor
+    func testWorldFieldItemSourceRetiredAdmissionEpochRefusesBeforePersistence() throws {
+        let io = SaveFileIO.temporary(name: "field-item-source-retired-\(UUID().uuidString)")
+        defer { io.deleteEverything() }
+        let store = GameStore(io: io)
+        let fixture = fieldItemSourceFixture(seed: 88_008)
+        store.mutate("stage retired source attempt", flush: true) { $0 = fixture.state }
+        let receipt = try store.worldFieldItemSourceEvaluation(fixture.source).get()
+        let retained = WorldFieldItemSourceCommitAttemptV1(
+            id: UUID(), stagedAt: Date(timeIntervalSince1970: 88_008),
+            fieldAttempt: try XCTUnwrap(store.beginWorldFieldAttempt(.useItem)))
+        store.clearWorldFieldFeedback()
+        let before = store.state
+        let bytes = try SaveCodec.encode(before)
+        let diagnostics = store.diagnostics
+        var routeCalls = 0
+
+        let result = store.commitWorldFieldItemSource(
+            receipt, attempt: retained, label: "retired source admission") { _, _
+                -> Result<WorldFieldItemRouteCandidateV1<Bool>, WorldFieldItemSourceRefusalV1> in
+                routeCalls += 1
+                return .success(.init(value: true, events: []))
+            }
+        guard case .refused(.source(.staleContext)) = result else {
+            return XCTFail("a retired field-attempt epoch must refuse before persistence")
+        }
+        XCTAssertEqual(routeCalls, 0)
+        XCTAssertEqual(store.state, before)
+        XCTAssertEqual(try SaveCodec.encode(store.state), bytes)
+        XCTAssertEqual(store.diagnostics.writeCount, diagnostics.writeCount)
+        XCTAssertEqual(store.diagnostics.savedMutationCount, diagnostics.savedMutationCount)
+        XCTAssertEqual(store.diagnostics.hasPendingWrite, diagnostics.hasPendingWrite)
         XCTAssertNil(store.currentWorldFieldEventBatch)
     }
 
