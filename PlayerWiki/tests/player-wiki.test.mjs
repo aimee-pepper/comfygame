@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { access, readFile } from 'node:fs/promises';
+import { access, readFile, readdir } from 'node:fs/promises';
 import path from 'node:path';
 import test from 'node:test';
 import { fileURLToPath } from 'node:url';
@@ -376,16 +376,41 @@ test('glossary combines related player domains and points to useful guides', asy
 
 test('systems hub groups every current player guide into useful routes', async () => {
   const hub = await read('app/systems/page.tsx');
+  const navigation = await read('lib/system-guides.ts');
   await access(path.join(root, 'app/systems/page.tsx'));
   for (const label of [
     'Journey and worlds',
     'Combat and preparation',
-    'Crafting and materials',
-    'Village services',
-    'Reference',
-  ]) assert.match(hub, new RegExp(label));
-  for (const href of ['/getting-started', '/systems/world-writing', '/systems/exploration', '/systems/combat', '/services', '/resources', '/glossary']) assert.match(hub, new RegExp(href.replaceAll('/', '\\/')));
+    'Village, crafting and records',
+  ]) assert.match(navigation, new RegExp(label));
+  for (const href of ['/getting-started', '/systems/world-writing', '/systems/exploration', '/systems/combat', '/systems/village-construction', '/systems/knowledge-records']) assert.match(navigation, new RegExp(href.replaceAll('/', '\\/')));
+  assert.match(hub, /systemGuideCategories/);
   assert.match(hub, /PixelImage/);
+});
+
+test('shared guide navigation assigns every published system route to one player category', async () => {
+  const navigation = await read('lib/system-guides.ts');
+  const hub = await read('app/systems/page.tsx');
+  const sidebar = await read('components/site-frame.tsx');
+  const search = await read('app/search/page.tsx');
+  const glossary = await read('app/glossary/page.tsx');
+  const routes = (await readdir(path.join(root, 'app', 'systems'), { withFileTypes: true }))
+    .filter((entry) => entry.isDirectory())
+    .map((entry) => `/systems/${entry.name}`)
+    .sort();
+  const registered = [...navigation.matchAll(/href: '(\/systems\/[^']+)'/g)].map((match) => match[1]).sort();
+  assert.deepEqual(registered, routes);
+  assert.equal(new Set(registered).size, registered.length);
+  assert.match(hub, /systemGuideCategories/);
+  assert.match(sidebar, /systemGuideCategories/);
+  assert.match(search, /systemGuides/);
+  assert.match(search, /Player guides/);
+  assert.match(glossary, /Player guides by task/);
+  for (const route of routes) {
+    const page = await read(`app${route}/page.tsx`);
+    assert.match(page, /GuideBreadcrumbs/, route);
+    assert.match(page, /RelatedGuides/, route);
+  }
 });
 
 test('combat guide integrates retained party and gear references without a visual gallery', async () => {
@@ -417,8 +442,8 @@ test('combat techniques and Gambits enumerate only current grants and owned rule
   assert.match(guide, /no separate technique currency/);
   assert.match(guide, /The first enabled rule that fits is the one that fires/);
   assert.match(guide, /only their owned components/);
-  assert.match(await read('app/systems/page.tsx'), /\/systems\/combat-techniques-gambits/);
-  assert.match(await read('components/site-frame.tsx'), /\/systems\/combat-techniques-gambits/);
+  assert.match(await read('lib/system-guides.ts'), /\/systems\/combat-techniques-gambits/);
+  assert.match(await read('components/site-frame.tsx'), /systemGuideCategories/);
 });
 
 test('Village construction lists every current destination with its exact foundation and player route', async () => {
@@ -434,8 +459,8 @@ test('Village construction lists every current destination with its exact founda
   assert.match(guide, /No separate recipe list is currently published/);
   assert.equal(guide.includes('Stage 0'), false);
   assert.equal(guide.includes('Aimee decision'), false);
-  assert.match(await read('app/systems/page.tsx'), /\/systems\/village-construction/);
-  assert.match(await read('components/site-frame.tsx'), /\/systems\/village-construction/);
+  assert.match(await read('lib/system-guides.ts'), /\/systems\/village-construction/);
+  assert.match(await read('components/site-frame.tsx'), /systemGuideCategories/);
 });
 
 test('all requested player detail routes have shared breadcrumbs and related guides', async () => {
@@ -460,9 +485,11 @@ test('all requested player detail routes have shared breadcrumbs and related gui
 
 test('shared navigation exposes the player Systems hub alongside major tasks', async () => {
   const frame = await read('components/site-frame.tsx');
-  assert.match(frame, /\['\/systems', 'Systems overview'\]/);
+  const navigation = await read('lib/system-guides.ts');
+  assert.match(frame, /systemGuideCategories/);
   assert.match(frame, /href="\/systems">Systems<\/Link>/);
   assert.match(frame, /<p>Prepare<\/p>/);
+  assert.match(navigation, /\/systems\/world-writing/);
   for (const href of ['/getting-started', '/systems', '/services', '/crafting', '/resources', '/people']) {
     assert.match(frame, new RegExp(href.replaceAll('/', '\\/')));
   }
@@ -481,8 +508,8 @@ test('home and getting-started guide the live route with inline retained visuals
 test('current journey publishes only present Writing, world, Village, and Research routes', async () => {
   await access(path.join(root, 'app/journey/page.tsx'));
   const journey = await read('app/journey/page.tsx');
-  const systems = await read('app/systems/page.tsx');
-  const frame = await read('components/site-frame.tsx');
+  const systems = await read('lib/system-guides.ts');
+  const frame = systems;
   assert.match(journey, /Write, review, and Bind/);
   assert.match(journey, /Enter and explore the generated world/);
   assert.match(journey, /Current Village construction/);
@@ -531,8 +558,8 @@ test('exploration’s current pressure guide is sourced from all implemented tar
 test('Party preparation documents the current party limit, gear slots, Gambits, and retained outcomes', async () => {
   await access(path.join(root, 'app/systems/party-preparation/page.tsx'));
   const party = await read('app/systems/party-preparation/page.tsx');
-  const systems = await read('app/systems/page.tsx');
-  const frame = await read('components/site-frame.tsx');
+  const systems = await read('lib/system-guides.ts');
+  const frame = systems;
   assert.match(party, /five-person party/);
   assert.match(party, /up to four recruited companions/);
   assert.match(party, /Weapon', 'Off-hand', 'Head', 'Body', 'Hands', 'Feet', 'Tool', 'Keepsake/);
@@ -548,8 +575,8 @@ test('Party preparation documents the current party limit, gear slots, Gambits, 
 test('Economy guide keeps current listings, refinement, and recycling player-facing', async () => {
   await access(path.join(root, 'app/systems/economy-exchange/page.tsx'));
   const economy = await read('app/systems/economy-exchange/page.tsx');
-  const systems = await read('app/systems/page.tsx');
-  const frame = await read('components/site-frame.tsx');
+  const systems = await read('lib/system-guides.ts');
+  const frame = systems;
   assert.match(economy, /current listing/);
   assert.match(economy, /item, quantity, price, and stock/);
   assert.match(economy, /Material sales use that reserve/);
@@ -566,8 +593,8 @@ test('Economy guide keeps current listings, refinement, and recycling player-fac
 test('Knowledge guide connects only recovered Library, people, Research, and Bestiary records', async () => {
   await access(path.join(root, 'app/systems/knowledge-records/page.tsx'));
   const knowledge = await read('app/systems/knowledge-records/page.tsx');
-  const systems = await read('app/systems/page.tsx');
-  const frame = await read('components/site-frame.tsx');
+  const systems = await read('lib/system-guides.ts');
+  const frame = systems;
   assert.match(knowledge, /Current Library collections/);
   assert.match(knowledge, /Diaries/);
   assert.match(knowledge, /People/);
@@ -585,8 +612,8 @@ test('Knowledge guide connects only recovered Library, people, Research, and Bes
 test('Field supplies guide documents current preparation, targets, Scent Mask, curios, and retained choices', async () => {
   await access(path.join(root, 'app/systems/field-supplies/page.tsx'));
   const supplies = await read('app/systems/field-supplies/page.tsx');
-  const systems = await read('app/systems/page.tsx');
-  const frame = await read('components/site-frame.tsx');
+  const systems = await read('lib/system-guides.ts');
+  const frame = systems;
   assert.match(supplies, /Prepare the next Field Kit at home/);
   assert.match(supplies, /visible bin count is the current capacity/);
   assert.match(supplies, /Healing and other direct supplies/);
@@ -605,8 +632,8 @@ test('Field supplies guide documents current preparation, targets, Scent Mask, c
 test('Animals guide documents current Attend, trust, companion placement, combat, and Bestiary boundaries', async () => {
   await access(path.join(root, 'app/systems/animals-companionship/page.tsx'));
   const animals = await read('app/systems/animals-companionship/page.tsx');
-  const systems = await read('app/systems/page.tsx');
-  const frame = await read('components/site-frame.tsx');
+  const systems = await read('lib/system-guides.ts');
+  const frame = systems;
   assert.match(animals, /Recruit Sabine and build the Menagerie/);
   assert.match(animals, /within two tiles/);
   assert.match(animals, /not immediately adjacent/);
@@ -623,8 +650,8 @@ test('Animals guide documents current Attend, trust, companion placement, combat
 
 test('Equipment and material-effects guide keeps current slots, ownership, samples, and reforge routes player-facing', async () => {
   const guide = await read('app/systems/equipment-materials/page.tsx');
-  const systems = await read('app/systems/page.tsx');
-  const frame = await read('components/site-frame.tsx');
+  const systems = await read('lib/system-guides.ts');
+  const frame = systems;
   await access(path.join(root, 'app/systems/equipment-materials/page.tsx'));
   for (const slot of ['Weapon', 'Off-hand', 'Head', 'Body', 'Hands', 'Feet', 'Tool', 'Keepsake']) assert.match(guide, new RegExp(slot));
   assert.match(guide, /worn by another person/);
@@ -641,8 +668,8 @@ test('Equipment and material-effects guide keeps current slots, ownership, sampl
 
 test('Sites and hazards reference documents only current Look profiles, search states, and disclosed rewards', async () => {
   const guide = await read('app/systems/sites-hazards/page.tsx');
-  const systems = await read('app/systems/page.tsx');
-  const frame = await read('components/site-frame.tsx');
+  const systems = await read('lib/system-guides.ts');
+  const frame = systems;
   await access(path.join(root, 'app/systems/sites-hazards/page.tsx'));
   assert.match(guide, /Look does not move the party or spend a turn/);
   assert.match(guide, /Visible ordinary growth has no entry harm/);
@@ -662,8 +689,8 @@ test('Sites and hazards reference documents only current Look profiles, search s
 
 test('Inventory and custody guide preserves current locations, selected holdings, and refusal boundaries', async () => {
   const guide = await read('app/systems/inventory-custody/page.tsx');
-  const systems = await read('app/systems/page.tsx');
-  const frame = await read('components/site-frame.tsx');
+  const systems = await read('lib/system-guides.ts');
+  const frame = systems;
   await access(path.join(root, 'app/systems/inventory-custody/page.tsx'));
   for (const label of ['Stored', 'Waiting', 'Carried', 'Worn']) assert.match(guide, new RegExp(`<h3>${label}</h3>`));
   assert.match(guide, /not silently discarded/);

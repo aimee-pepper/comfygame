@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { PageIntro } from '@/components/page-intro';
 import { SiteFrame } from '@/components/site-frame';
 import { content } from '@/lib/content';
+import { systemGuideCategories } from '@/lib/system-guides';
 
 const domainGroups = [
   {
@@ -44,5 +45,6 @@ export default function GlossaryPage() {
 
   return <SiteFrame sidebar><PageIntro eyebrow="Reference" title="Glossary" summary="Plain-language definitions for Bookbinder's recurring terms, grouped by the part of the game where you encounter them." />
     {groupedTerms.map(group => <section className="article-section glossary-group" key={group.label}><div className="glossary-group-heading"><h2>{group.label}</h2><nav aria-label={`${group.label} guides`}>{group.links.map(([label, href]) => <Link href={href} key={href}>{label}</Link>)}</nav></div><dl className="definition-grid">{group.terms.map(term => <div id={term.slug} key={term.id}><dt><strong>{term.name}</strong></dt><dd>{term.summary}{term.aliases.length ? <small> Also called: {term.aliases.join(', ')}.</small> : null}</dd></div>)}</dl></section>)}
+    <section className="article-section glossary-group"><div className="glossary-group-heading"><h2>Player guides by task</h2><Link href="/systems">Open the Systems hub</Link></div><div className="definition-grid">{systemGuideCategories.map((category) => <div key={category.id}><dt><strong>{category.label}</strong></dt><dd><nav aria-label={`${category.label} player guides`}>{category.guides.map((guide) => <Link href={guide.href} key={guide.href}>{guide.label}</Link>)}</nav></dd></div>)}</div></section>
   </SiteFrame>;
 }

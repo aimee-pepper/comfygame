@@ -7,5 +7,8 @@ export function GuideBreadcrumbs({ items }: { items: GuideLink[] }) {
 }
 
 export function RelatedGuides({ links }: { links: GuideLink[] }) {
-  return <nav className="related-guides" aria-label="Related guides"><span>Related guides</span>{links.map((link) => <Link href={link.href ?? '/systems'} key={link.href ?? link.label}>{link.label}</Link>)}</nav>;
+  const resolvedLinks = links.some((link) => link.href === '/systems')
+    ? links
+    : [...links, { label: 'All systems', href: '/systems' }];
+  return <nav className="related-guides" aria-label="Related guides"><span>Related guides</span>{resolvedLinks.map((link) => <Link href={link.href ?? '/systems'} key={link.href ?? link.label}>{link.label}</Link>)}</nav>;
 }

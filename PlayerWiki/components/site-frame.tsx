@@ -1,28 +1,7 @@
 import Link from 'next/link';
 import { Search } from 'lucide-react';
 import type { ReactNode } from 'react';
-
-const systemLinks = [
-  ['/getting-started', 'Start here'],
-  ['/journey', 'Your current journey'],
-  ['/systems', 'Systems overview'],
-  ['/systems/world-writing', 'World Writing'],
-  ['/systems/exploration', 'Exploration'],
-  ['/systems/sites-hazards', 'Sites & hazards'],
-  ['/systems/animals-companionship', 'Animals & companionship'],
-  ['/systems/research', 'Research'],
-  ['/systems/combat', 'Combat'],
-  ['/systems/combat-techniques-gambits', 'Combat techniques & Gambits'],
-  ['/systems/party-preparation', 'Party, Gear & Gambits'],
-  ['/systems/equipment-materials', 'Equipment & material effects'],
-  ['/systems/inventory-custody', 'Inventory & custody'],
-  ['/systems/field-supplies', 'Field supplies'],
-  ['/bestiary', 'Bestiary records'],
-  ['/systems/crafting', 'Crafting basics'],
-  ['/systems/economy-exchange', 'Economy & exchange'],
-  ['/systems/knowledge-records', 'Knowledge & records'],
-  ['/systems/village-construction', 'Village construction'],
-];
+import { playerStartGuides, systemGuideCategories } from '@/lib/system-guides';
 
 const prepareLinks = [
   ['/crafting', 'Crafting systems'],
@@ -34,6 +13,7 @@ const prepareLinks = [
 
 const referenceLinks = [
   ['/resources', 'Resources'],
+  ['/bestiary', 'Bestiary records'],
   ['/people', 'People'],
   ['/places', 'Places & stations'],
   ['/glossary', 'Glossary'],
@@ -84,11 +64,9 @@ export function SiteFrame({
         <div className="wiki-layout">
           <aside className="wiki-sidebar" aria-label="Wiki sections">
             <p>Learn</p>
-            {systemLinks.map(([href, label]) => (
-              <Link key={href} href={href}>
-                {label}
-              </Link>
-            ))}
+            <Link href="/systems">Systems overview</Link>
+            {playerStartGuides.map((guide) => <Link key={guide.href} href={guide.href}>{guide.label}</Link>)}
+            {systemGuideCategories.map((category) => <div key={category.id} className="sidebar-guide-group"><p>{category.label}</p>{category.guides.map((guide) => <Link key={guide.href} href={guide.href}>{guide.label}</Link>)}</div>)}
             <p>Prepare</p>
             {prepareLinks.map(([href, label]) => (
               <Link key={href} href={href}>

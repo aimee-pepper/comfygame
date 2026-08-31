@@ -4,10 +4,12 @@ import { PixelImage } from '@/components/pixel-image';
 import { SiteFrame } from '@/components/site-frame';
 import { content } from '@/lib/content';
 import { serviceGuides } from '@/lib/services';
+import { playerStartGuides, systemGuides } from '@/lib/system-guides';
 
 export default async function SearchPage({ searchParams }: { searchParams: Promise<{ q?: string }> }) {
   const q = ((await searchParams).q ?? '').trim().toLowerCase();
   const categories = [
+    { label: 'Player guides', entries: [...playerStartGuides, ...systemGuides].map((entry) => ({ name: entry.label, summary: entry.summary, href: entry.href, type: 'Player guide', assetURL: null, alt: '' })) },
     { label: 'Resources', entries: content.resources.map(entry => ({ name: entry.name, summary: entry.summary, href: `/resources/${entry.slug}`, type: 'Resource', assetURL: entry.assetURL, alt: `${entry.name} inventory icon` })) },
     { label: 'Equipment', entries: content.items.filter(entry => entry.gear).map(entry => ({ name: entry.name, summary: entry.summary, href: `/equipment/${entry.slug}`, type: 'Equipment', assetURL: entry.assetURL, alt: `${entry.name} icon` })) },
     { label: 'Supplies', entries: content.items.filter(entry => !entry.gear && entry.consumable).map(entry => ({ name: entry.name, summary: entry.summary, href: `/items/${entry.slug}`, type: 'Supply', assetURL: entry.assetURL, alt: `${entry.name} icon` })) },
