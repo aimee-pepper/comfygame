@@ -136,6 +136,16 @@ test('exploration guide publishes retained portal and site-state visuals inline'
   assert.match(exploration, /Searched site/);
 });
 
+test('combat guide uses retained party and equipment visuals as player-reference links', async () => {
+  const combatGuide = await read('app/systems/combat/page.tsx');
+  assert.match(combatGuide, /PixelImage/);
+  assert.match(combatGuide, /\/people\/\$\{traveller\.slug\}/);
+  assert.match(combatGuide, /\/equipment\/\$\{weapon\.slug\}/);
+  assert.match(combatGuide, /\/equipment\/\$\{guard\.slug\}/);
+  assert.match(combatGuide, /slot === 'weapon'/);
+  assert.match(combatGuide, /slot === 'armor'/);
+});
+
 test('every live person includes every authored diary page and every authored location hint', async () => {
   const content = JSON.parse(await read('data/player-content.json'));
   const authored = JSON.parse(

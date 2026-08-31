@@ -457,6 +457,46 @@ footer {
   object-fit: contain;
   image-rendering: pixelated;
 }
+.combat-reference > p {
+  max-width: 760px;
+}
+.combat-reference-strip {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 18px;
+}
+.combat-reference-card {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  border: 1px solid var(--line);
+  background: var(--paper-light);
+  color: inherit;
+  text-decoration: none;
+}
+.combat-reference-card:hover {
+  background: var(--paper-deep);
+}
+.combat-reference-card span {
+  display: grid;
+  min-width: 0;
+  gap: 3px;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.3;
+}
+.combat-reference-card strong {
+  color: var(--ink);
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.combat-reference-card .pixel-image {
+  flex: 0 0 auto;
+}
 .exploration-state-strip {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -659,6 +699,9 @@ footer {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
   .exploration-state-strip {
+    grid-template-columns: 1fr;
+  }
+  .combat-reference-strip {
     grid-template-columns: 1fr;
   }
   .wiki-layout {
