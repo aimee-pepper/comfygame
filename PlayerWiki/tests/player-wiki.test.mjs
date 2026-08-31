@@ -170,6 +170,11 @@ test('places publish only current retained town and building visuals inline', as
   const detail = await read('app/places/[slug]/page.tsx');
   assert.match(detail, /place-visuals/);
   assert.match(detail, /building visual/);
+  assert.match(detail, /Exact construction/);
+  assert.match(detail, /What this place currently offers/);
+  assert.match(detail, /Current crafting at this place/);
+  assert.match(detail, /constructionRequirements/);
+  assert.match(detail, /recipesFor/);
   assert.match(detail, /town context/);
 });
 
