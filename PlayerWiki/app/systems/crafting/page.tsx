@@ -4,6 +4,7 @@ import { PageIntro } from '@/components/page-intro';
 import { PixelImage } from '@/components/pixel-image';
 import { SiteFrame } from '@/components/site-frame';
 import { content } from '@/lib/content';
+import { craftingSystems } from '@/lib/crafting';
 
 export default function Crafting() {
   const stationNames = ['Storehouse', 'The Apothecary', 'Essence Spring'];
@@ -79,6 +80,11 @@ export default function Crafting() {
             <Link href="/places">Browse places and stations</Link>
           </p>
         </div>
+      </section>
+      <section className="article-section">
+        <h2>Instruments and prepared ink</h2>
+        <p>Current instruments and prepared ink are documented as station processes rather than standalone catalogue item records. Their exact inputs, outputs, and material rules stay with the station that prepares or improves them.</p>
+        <div className="definition-grid">{craftingSystems.filter((system) => ['instruments', 'writing-ink'].includes(system.slug)).map((system) => <div key={system.slug}><h3><Link href={`/crafting/${system.slug}`}>{system.name}</Link></h3><p>{system.summary}</p></div>)}</div>
       </section>
       <section className="article-section">
         <h2>Other useful stations</h2>

@@ -48,6 +48,20 @@ test('player reference indexes link to individual pages', async () => {
   }
 });
 
+test('item details link published recipes and resources without guessing absent acquisition routes', async () => {
+  const routes = await read('components/item-crafting-routes.tsx');
+  const itemDetail = await read('app/items/[slug]/page.tsx');
+  const equipmentDetail = await read('app/equipment/[slug]/page.tsx');
+  const craftingGuide = await read('app/systems/crafting/page.tsx');
+  assert.match(routes, /Current acquisition/);
+  assert.match(routes, /No current station preparation or construction recipe is published/);
+  assert.match(routes, /Related resources/);
+  assert.match(itemDetail, /ItemCraftingRoutes/);
+  assert.match(equipmentDetail, /ItemCraftingRoutes/);
+  assert.match(craftingGuide, /Instruments and prepared ink/);
+  assert.match(craftingGuide, /writing-ink/);
+});
+
 test('player navigation excludes internal wiki architecture', async () => {
   const source = `${await read('components/site-frame.tsx')}\n${await read('app/page.tsx')}\n${await read('app/people/page.tsx')}`;
   for (const forbidden of [
