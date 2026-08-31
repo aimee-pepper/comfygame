@@ -32,6 +32,9 @@ export default async function ResourceDetail({
   const resource = content.resources.find((entry) => entry.slug === slug);
   if (!resource) notFound();
   const craftUses = recipesUsingResource(resource.id);
+  const craftSystems = [...new Set(craftUses.map((recipe) => recipe.system))]
+    .map((slug) => systemFor(slug))
+    .filter(Boolean);
   const buildUses = content.stations.flatMap((station) =>
     station.buildCost
       .filter(
@@ -62,7 +65,7 @@ export default async function ResourceDetail({
       <section className="article-section">
         <h2>How to obtain it</h2>
         <dl className="fact-grid">
-          <div><dt>Current route</dt><dd>{resource.acquisition}</dd></div>
+          <div><dt>Current route</dt><dd>{resource.consumerAuthority.acquisition}</dd></div>
           <div><dt>Trade</dt><dd>{resource.tradeStatus}</dd></div>
         </dl>
         <p>
@@ -88,12 +91,17 @@ export default async function ResourceDetail({
         </div>
       </section>
       <section className="article-section">
-        <h2>Other current consumers</h2>
-        <ul>
-          {resource.currentUses.map((line) => (
-            <li key={line}>{line}</li>
-          ))}
-        </ul>
+        <h2>Current service and research uses</h2>
+        {resource.consumerAuthority.otherConsumers.length ? (
+          <ul>
+            {resource.consumerAuthority.otherConsumers.map((line) => <li key={line}>{line}</li>)}
+          </ul>
+        ) : <p>No current service or research sink is listed for this resource.</p>}
+      </section>
+      <section className="article-section">
+        <h2>Material role in current recipes</h2>
+        <p>Scalar stock pays only the fixed costs shown below. When a recipe instead asks for an exact physical or creature material, the recipe names that selection; a scalar count never silently replaces it.</p>
+        {craftUses.length ? <ul className="compact-list">{craftUses.map((recipe) => { const ingredient = recipe.ingredients.find((entry) => entry.resourceID === resource.id)!; const system = systemFor(recipe.system); return <li key={`${recipe.id}-role`}><Link href={`/crafting/${recipe.system}`}>{recipe.name}</Link> · {ingredient.role ?? 'fixed cost'}{ingredient.amount ? ` · ${ingredient.amount} required` : ''}{system ? ` at ${system.name}` : ''}</li>; })}</ul> : <p>This resource has no currently documented scalar recipe cost.</p>}
       </section>
       <section className="article-section">
         <h2>Craft recipes</h2>
@@ -123,7 +131,7 @@ export default async function ResourceDetail({
                         </Link>
                       </td>
                       <td>{result?.assetURL && <PixelImage src={result.assetURL} alt={`${result.name} icon`} size={32} />} {result ? <Link href={resultHref(result)}>{result.name}</Link> : recipe.result}</td>
-                      <td>{system?.name ?? humanize(recipe.system)}</td>
+                      <td>{system ? <Link href={`/crafting/${system.slug}`}>{system.name}</Link> : humanize(recipe.system)}</td>
                       <td>
                         {ingredient.amount
                           ? `${ingredient.amount} required`
@@ -174,7 +182,7 @@ export default async function ResourceDetail({
           <p>This resource is not a material in a current building recipe.</p>
         )}
       </section>
-      <RelatedGuides links={[{ label: 'All resources', href: '/resources' }, { label: 'Crafting systems', href: '/crafting' }, { label: 'Village services', href: '/services' }, { label: 'All systems', href: '/systems' }]} />
+      <RelatedGuides links={[{ label: 'All resources', href: '/resources' }, ...craftSystems.flatMap((system) => system ? [{ label: system.name, href: `/crafting/${system.slug}` }] : []), ...buildUses.map(({ station }) => ({ label: station.name, href: `/places/${station.slug}` })), { label: 'Village services', href: '/services' }, { label: 'All systems', href: '/systems' }]} />
     </SiteFrame>
   );
 }
