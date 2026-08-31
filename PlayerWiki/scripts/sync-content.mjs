@@ -35,6 +35,12 @@ const researchSource = JSON.parse(
     'utf8',
   ),
 );
+const pressureTargetSource = JSON.parse(
+  await readFile(
+    path.join(repositoryRoot, 'Sources', 'Content', 'Data', 'pressure_targets.json'),
+    'utf8',
+  ),
+);
 const namedCharacterPack = JSON.parse(
   await readFile(
     path.join(
@@ -403,6 +409,16 @@ const playerContent = {
     needsLifetimeRawRefined: node.needsLifetimeRawRefined ?? 0,
     constructionBundledWith: node.constructionBundledWith ?? null,
   })),
+  pressureTargets: pressureTargetSource.targets
+    .map((target) => ({
+      id: target.id,
+      name: target.name,
+      blurb: target.blurb,
+      highLabel: target.highLabel,
+      lowLabel: target.lowLabel,
+      order: target.order,
+    }))
+    .sort((left, right) => left.order - right.order),
   terminology: source.terminology.map((term) => ({
     id: term.id,
     slug: term.slug,

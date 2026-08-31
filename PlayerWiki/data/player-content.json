@@ -5327,6 +5327,72 @@
       "constructionBundledWith": null
     }
   ],
+  "pressureTargets": [
+    {
+      "id": "illumination",
+      "name": "Illumination",
+      "blurb": "How much light, from what, and when.",
+      "highLabel": "blazing",
+      "lowLabel": "lightless",
+      "order": 0
+    },
+    {
+      "id": "thermal",
+      "name": "Thermal",
+      "blurb": "Temperature, and how far it swings.",
+      "highLabel": "scorching",
+      "lowLabel": "frozen",
+      "order": 1
+    },
+    {
+      "id": "hydrology",
+      "name": "Hydrology",
+      "blurb": "Water: how much, what form, where.",
+      "highLabel": "drowned",
+      "lowLabel": "parched",
+      "order": 2
+    },
+    {
+      "id": "substrate",
+      "name": "Substrate",
+      "blurb": "What the ground is made of, and what it's worth.",
+      "highLabel": "rich",
+      "lowLabel": "barren",
+      "order": 3
+    },
+    {
+      "id": "relief",
+      "name": "Relief",
+      "blurb": "The shape and openness of the land.",
+      "highLabel": "broken",
+      "lowLabel": "flat",
+      "order": 4
+    },
+    {
+      "id": "vitality",
+      "name": "Vitality",
+      "blurb": "How much life the world can carry.",
+      "highLabel": "teeming",
+      "lowLabel": "sterile",
+      "order": 5
+    },
+    {
+      "id": "atmosphere",
+      "name": "Atmosphere",
+      "blurb": "Air: density, motion, and what's in it.",
+      "highLabel": "thick",
+      "lowLabel": "thin",
+      "order": 6
+    },
+    {
+      "id": "cycle",
+      "name": "Cycle",
+      "blurb": "Time: how long things take, and how reliably.",
+      "highLabel": "restless",
+      "lowLabel": "still",
+      "order": 7
+    }
+  ],
   "terminology": [
     {
       "id": "writtenWorldSymbol",

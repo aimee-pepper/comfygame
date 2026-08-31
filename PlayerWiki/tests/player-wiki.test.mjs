@@ -188,6 +188,12 @@ test('exploration guide publishes retained portal and site-state visuals inline'
   assert.match(exploration, /exploration-state-strip/);
   assert.match(exploration, /Entry portal/);
   assert.match(exploration, /Searched site/);
+  assert.match(exploration, /What your Page can describe/);
+  assert.match(exploration, /Ordinary flora is safe to enter/);
+  assert.match(exploration, /Return and defeat/);
+  assert.match(exploration, /Continue the same world/);
+  assert.match(exploration, /pressureTargets/);
+  assert.match(exploration, /writingAssetURL/);
 });
 
 test('combat guide uses retained party and equipment visuals as player-reference links', async () => {
@@ -445,6 +451,15 @@ test('Research publishes current branches, node requirements, base costs, and re
   assert.match(sync, /researchSource/);
   assert.match(sync, /researchBranches/);
   assert.match(sync, /researchNodes/);
+  assert.match(sync, /pressureTargetSource/);
   assert.equal(research.includes('Stage 0'), false);
   assert.equal(research.includes('Aimee decision'), false);
+});
+
+test('exploration’s current pressure guide is sourced from all implemented targets', async () => {
+  const content = JSON.parse(await read('data/player-content.json'));
+  assert.equal(content.pressureTargets.length, 8);
+  assert.deepEqual(content.pressureTargets.map((target) => target.id), [
+    'illumination', 'thermal', 'hydrology', 'substrate', 'relief', 'vitality', 'atmosphere', 'cycle',
+  ]);
 });

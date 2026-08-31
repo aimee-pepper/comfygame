@@ -114,6 +114,15 @@ export interface ResearchNode {
   constructionBundledWith: string | null;
 }
 
+export interface PressureTarget {
+  id: string;
+  name: string;
+  blurb: string;
+  highLabel: string;
+  lowLabel: string;
+  order: number;
+}
+
 interface PlayerContent {
   schemaVersion: number;
   resources: Resource[];
@@ -122,6 +131,7 @@ interface PlayerContent {
   stations: Station[];
   researchBranches: ResearchBranch[];
   researchNodes: ResearchNode[];
+  pressureTargets: PressureTarget[];
   terminology: Term[];
   terrain: Array<{ name: string; assetURL: string }>;
   writingAssetURL: string | null;
