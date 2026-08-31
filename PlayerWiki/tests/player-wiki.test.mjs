@@ -25,6 +25,20 @@ test('World Writing teaches the authored player order', async () => {
   assert.match(source, /content\.writingVisuals/);
 });
 
+test('World Writing reference keeps current vocabulary, connection, compound, and prepared-ink facts player-facing', async () => {
+  const writing = await read('app/systems/world-writing/page.tsx');
+  assert.match(writing, /eight current Subjects/);
+  assert.match(writing, /only Focuses that can attach to it/);
+  assert.match(writing, /Connect a readable request/);
+  assert.match(writing, /unconnected mark is not treated as the same request/);
+  assert.match(writing, /My Runebook/);
+  assert.match(writing, /Copper supplies Cyan, Ichor Magenta, Sulfur Yellow, and Obsidian Depth/);
+  assert.match(writing, /12-application vial/);
+  assert.match(writing, /changes a Focus’s authored colour, not its meaning/);
+  assert.match(writing, /\/crafting\/writing-ink/);
+  assert.match(writing, /\/resources/);
+});
+
 test('player reference indexes link to individual pages', async () => {
   for (const relative of [
     'app/resources/page.tsx',
