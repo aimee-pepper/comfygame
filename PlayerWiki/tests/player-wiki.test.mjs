@@ -153,6 +153,19 @@ test('combat guide uses retained party and equipment visuals as player-reference
   assert.match(combatGuide, /slot === 'armor'/);
 });
 
+test('item indexes keep retained thumbnails compact and link each one to its entry', async () => {
+  for (const relative of [
+    'app/equipment/page.tsx',
+    'app/consumables/page.tsx',
+    'app/curios/page.tsx',
+  ]) {
+    const source = await read(relative);
+    assert.match(source, /catalogue-summary/);
+    assert.match(source, /aria-label=\{`Open \$\{item\.name\}`\}/);
+    assert.match(source, /<PixelImage/);
+  }
+});
+
 test('every live person includes every authored diary page and every authored location hint', async () => {
   const content = JSON.parse(await read('data/player-content.json'));
   const authored = JSON.parse(

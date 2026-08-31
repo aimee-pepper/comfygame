@@ -573,6 +573,22 @@ footer {
   margin-top: 4px;
   color: var(--muted);
 }
+.catalogue-guidance {
+  margin: 8px 0 14px;
+  color: var(--muted);
+}
+.catalogue-summary tbody tr {
+  transition: background-color 120ms ease;
+}
+.catalogue-summary tbody tr:hover {
+  background: rgb(234 211 162 / 42%);
+}
+.catalogue-summary td:first-child a {
+  display: grid;
+  width: 44px;
+  height: 44px;
+  place-items: center;
+}
 .pixel-image {
   width: 44px;
   height: 44px;
