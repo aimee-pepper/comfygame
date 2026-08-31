@@ -1,7 +1,7 @@
-+# Asset source organization — Phase 1 migration map
+# Asset source organization — Phase 1 migration map
 
-**Base:** `fdcf307d869696b01efbe58f58b81bf815e2424d`  
-**Scope:** tracked human-facing visual files currently mixed under `AssetLab/artifacts`; legitimate `RuntimePacks/*/assets/<sha>` blobs are excluded.  
+**Base:** `fdcf307d869696b01efbe58f58b81bf815e2424d`
+**Scope:** tracked human-facing visual files currently mixed under `AssetLab/artifacts`; legitimate `RuntimePacks/*/assets/<sha>` blobs are excluded.
 **Disposition:** source mutation blocked by provenance; this is an exact migration receipt, not a runtime catalogue or approval record.
 
 ## Exact census
@@ -1245,4 +1245,3 @@ Every tracked non-manifest file under `AssetLab/artifacts` appears exactly once 
 2. Assign the 98 loose proof files to explicit pack-local evidence owners before moving them.
 3. Classify candidate `production/`, `parts/`, `scenes/`, and `sprites/` derivatives before assigning a human source destination.
 4. Perform one pack-bounded byte-preserving move at a time; never combine it with runtime blobs, terrain, Lantern, schema, or GameWiki work.
-
