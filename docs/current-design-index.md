@@ -295,6 +295,9 @@ When two documents disagree:
 | Apex encounters | `apex-system-audit.md`, then `apex-encounters.md` for implementation context |
 | Crafting / Apothecary | `crafting-spec (1).md` + `consumable-economy-field-kit-current.md` | Coating/Stonebark effects plus sustainable recipe costs, explicit saved packing and compact station/use surfaces |
 | Resource consumer authority map | `resource-consumer-authority-map-current.md` | Source-pinned acquisition/consumer ledger for all 23 resources, with orphan/overload/fiction findings separated from proposed changes |
+| Player Wiki crafting systems source | `player-wiki-crafting-systems-source-current.md` | Publishable implemented-only station, recipe, material-effect and readiness copy for every current making/processing family |
+| Player Wiki resource source copy | `player-wiki-resource-source-copy-current.md` | Spoiler-bounded acquisition, building, recipe, research and service copy for all 23 implemented resources, with proposed uses excluded |
+| Player Wiki resource/crafting publication manifest | `player-wiki-resource-crafting-publication-manifest-current.md` | Implementation-only mapping from approved copy to existing station/item/resource routes, with unsupported claims fail-closed |
 | Apothecary coating identity | `apothecary-coating-identity-current.md` | Final four names/effects, exact zero-Essence recipes and live `fibre` correctness catch |
 | Combat growth | `combat-trees-full.md`; identity docs may deliberately hold exact teachings |
 | Research economy shape | `research-economy-shape-audit-current.md` | Separates core expressive unlocks, optional capabilities and long-horizon capacity; Penmanship is the current outlier and no blanket rescale is authorized |

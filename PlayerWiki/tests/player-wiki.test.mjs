@@ -145,6 +145,8 @@ test('crafting has a linked system index and complete resource cross-reference s
     'armoury',
     'instruments',
     'distillery',
+    'channelworks',
+    'anchorage',
     'refinery',
     'writing-ink',
   ]) {
@@ -171,6 +173,7 @@ test('crafting has a linked system index and complete resource cross-reference s
   assert.match(craftingIndex, /All current recipes by station/);
   assert.match(craftingIndex, /Exact ingredients and costs/);
   assert.match(craftingIndex, /Primary use/);
+  assert.match(craftingIndex, /Ready when/);
   assert.match(craftingIndex, /resultHref/);
   assert.match(craftingDetail, /recipe-ingredient/);
   assert.match(craftingDetail, /Result image/);
@@ -181,6 +184,15 @@ test('crafting has a linked system index and complete resource cross-reference s
   assert.match(craftingDetail, /serviceForStation/);
   assert.match(crafting, /materialChoice/);
   assert.match(crafting, /commitResult/);
+  assert.match(crafting, /name: 'Heat Conduit Fixture'/);
+  assert.match(crafting, /name: 'Anchor Frame'/);
+  const placeDetail = await read('app/places/[slug]/page.tsx');
+  assert.match(placeDetail, /Exact inputs/);
+  assert.match(placeDetail, /Ready when/);
+  assert.match(placeDetail, /Material choices/);
+  const craftingGuide = await read('app/systems/crafting/page.tsx');
+  assert.match(craftingGuide, /Keep cost forms distinct/);
+  assert.match(craftingGuide, /A counted resource cannot replace an exact/);
 });
 
 test('places publish only current retained town and building visuals inline', async () => {

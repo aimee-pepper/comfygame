@@ -19,6 +19,15 @@ function constructionRequirements(place: (typeof content.stations)[number]) {
   })}</>;
 }
 
+function recipeRequirements(recipe: ReturnType<typeof recipesFor>[number]) {
+  return <ul className="compact-list">{recipe.ingredients.map((ingredient, index) => {
+    const resource = ingredient.resourceID ? content.resources.find((entry) => entry.id === ingredient.resourceID) : null;
+    const amount = ingredient.amount === undefined ? '' : `${ingredient.amount} × `;
+    const label = resource?.name ?? humanize(ingredient.label);
+    return <li key={`${recipe.id}-${index}`}>{amount}{resource ? <Link href={`/resources/${resource.slug}`}>{label}</Link> : label}{ingredient.role ? ` — ${ingredient.role}` : ''}</li>;
+  })}</ul>;
+}
+
 export function generateStaticParams() {
   return content.stations.map((place) => ({ slug: place.slug }));
 }
@@ -110,8 +119,9 @@ export default async function PlaceDetail({
       </section>
       <section className="article-section">
         <h2>Current crafting at this place</h2>
-        {recipes.length ? <div className="table-wrap"><table><thead><tr><th>Recipe</th><th>Output</th><th>Crafting system</th></tr></thead><tbody>{recipes.map((recipe) => { const system = systems.find((entry) => entry.slug === recipe.system); const item = content.items.find((entry) => entry.name === recipe.result); const outputHref = item ? (item.gear ? `/equipment/${item.slug}` : `/items/${item.slug}`) : null; return <tr key={recipe.id}><td><Link href={`/crafting/${recipe.system}`}>{recipe.name}</Link></td><td>{outputHref ? <Link href={outputHref}>{recipe.result}</Link> : recipe.result}</td><td>{system?.name ?? humanize(recipe.system)}</td></tr>; })}</tbody></table></div> : <p>No current crafting recipe is published for this place.</p>}
+        {recipes.length ? <div className="table-wrap"><table><thead><tr><th>Recipe</th><th>Output</th><th>Exact inputs</th><th>Ready when</th></tr></thead><tbody>{recipes.map((recipe) => { const system = systems.find((entry) => entry.slug === recipe.system); const item = content.items.find((entry) => entry.name === recipe.result); const outputHref = item ? (item.gear ? `/equipment/${item.slug}` : `/items/${item.slug}`) : null; return <tr key={recipe.id}><td><Link href={`/crafting/${recipe.system}`}>{recipe.name}</Link></td><td>{outputHref ? <Link href={outputHref}>{recipe.result}</Link> : recipe.result}</td><td>{recipeRequirements(recipe)}</td><td>{system ? <ul className="compact-list">{system.access.map((fact) => <li key={fact}>{fact}</li>)}</ul> : 'Use the current station preview.'}</td></tr>; })}</tbody></table></div> : <p>No current crafting recipe is published for this place.</p>}
       </section>
+      {systems.length > 0 && <section className="article-section two-column"><div><h2>Material choices</h2>{systems.map((system) => <p key={system.slug}><strong><Link href={`/crafting/${system.slug}`}>{system.name}:</Link></strong> {system.materialChoice}</p>)}</div><div><h2>Result and custody</h2>{systems.map((system) => <p key={system.slug}>{system.commitResult}</p>)}</div></section>}
       <RelatedGuides links={[{ label: 'All places', href: '/places' }, ...(service ? [{ label: `How to use ${service.name}`, href: `/services/${service.slug}` }] : []), ...systems.map((system) => ({ label: system.name, href: `/crafting/${system.slug}` })), { label: 'All village services', href: '/services' }, { label: 'All resources', href: '/resources' }]} />
     </SiteFrame>
   );

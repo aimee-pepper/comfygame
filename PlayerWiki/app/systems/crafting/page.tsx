@@ -18,7 +18,7 @@ export default function Crafting() {
       <PageIntro
         eyebrow="System guide"
         title="Crafting and materials"
-        summary="Returned resources support construction, supplies, equipment, research, and station work. Recipes describe the base object; its materials determine many of the useful differences."
+        summary="Returned resources support construction, supplies, equipment, research, and station work. A recipe identifies its base output, then shows whether it needs counted stock, an exact material, Essence Crystals, or a Reality Mote."
       />
       <section className="article-section crafting-route-guide">
         <h2>Follow the material through the Village</h2>
@@ -28,30 +28,32 @@ export default function Crafting() {
         </div>
       </section>
       <section className="article-section">
-        <h2>Where crafting happens</h2>
+        <h2>Read the current preview before making</h2>
         <div className="step-grid">
           <article>
             <span>1</span>
-            <h3>Choose a station</h3>
+            <h3>Choose a revealed station</h3>
             <p>
-              Different stations own different recipes: medicine, metalwork,
-              recycling, preparation, and other specialist work.
+              A station, known recipe or schematic, and its access rule must all
+              be available before its current preview can be used.
             </p>
           </article>
           <article>
             <span>2</span>
-            <h3>Review exact stock</h3>
+            <h3>Keep cost forms distinct</h3>
             <p>
-              The action uses the quantities and materials shown when the recipe
-              is prepared.
+              Stored resources, exact materials, Essence Crystals, and Motes are
+              different kinds of cost. A counted resource cannot replace an exact
+              selected material.
             </p>
           </article>
           <article>
             <span>3</span>
-            <h3>Commit the result</h3>
+            <h3>Commit the quoted result</h3>
             <p>
-              Resources are consumed only when the station accepts and completes
-              the exact recipe.
+              The station rechecks ingredients, the selected material, recipe,
+              and legal Storehouse or Waiting destination. A changed quote needs
+              a fresh preview.
             </p>
           </article>
         </div>
@@ -60,10 +62,10 @@ export default function Crafting() {
         <div>
           <h2>Material effects</h2>
           <p>
-            Material choice can change an item’s combat values, durability,
-            reactivity, or other properties. The item tables show the finished
-            catalogue entries; resource pages show where each material tends to
-            appear.
+            A recipe separates its base output from material selection. Exact
+            materials can determine whether a component fits and which current
+            qualities it carries; the station page names those rules separately
+            from the fixed resource cost.
           </p>
           <p>
             <Link href="/resources">Browse resources</Link>

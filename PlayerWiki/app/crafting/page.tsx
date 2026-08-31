@@ -59,6 +59,7 @@ export default function CraftingSystemsPage() {
                   recipes
                 </small>
                 <small>{system.summary}</small>
+                <small><strong>Ready when:</strong> {system.access[0]}</small>
               </span>
             </Link>
           ))}
