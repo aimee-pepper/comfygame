@@ -2804,4 +2804,50 @@ final class SaveSlotTests: XCTestCase {
         XCTAssertFalse(firstID.description.lowercased().contains(firstReference))
         XCTAssertFalse(firstReference.contains(firstID.description.lowercased()))
     }
+
+    func testLeasedSlotCompareAndSwapRejectsOlderAuthorityAndReturnsExactColdReloadReceipt() async throws {
+        let root = directory()
+        defer { try? FileManager.default.removeItem(at: root) }
+        let slots = SaveSlotFileIO(directory: root)
+        let created = try await slots.create(name: "CAS authority")
+        _ = try await slots.acquireWriterLease(for: created.metadata.id)
+        let adapter = try await slots.payloadIOForLeasedSlot()
+        let originalEnvelope = try Data(contentsOf: adapter.saveURL)
+        let older = try adapter.persistenceAuthority()
+        let current = try adapter.persistenceAuthority()
+        var changed = created.state
+        changed.base.essence = 818
+        changed.meta.mutationCount += 1
+        let candidate = try SaveCodec.encode(changed)
+
+        guard case .refused(.staleAuthority) = adapter.compareAndSwap(
+            expected: older, candidate: candidate) else {
+            return XCTFail("An older lease generation must not write")
+        }
+        XCTAssertEqual(try Data(contentsOf: adapter.saveURL), originalEnvelope)
+
+        guard case .committed(let receipt) = adapter.compareAndSwap(
+            expected: current, candidate: candidate) else {
+            return XCTFail("Expected exact leased compare-and-swap commit")
+        }
+        let durableEnvelope = try Data(contentsOf: adapter.saveURL)
+        XCTAssertEqual(receipt.owner, current.owner)
+        XCTAssertEqual(receipt.payloadSHA256, PersistenceDigestV1.sha256(candidate))
+        XCTAssertEqual(receipt.payloadByteCount, candidate.count)
+        XCTAssertEqual(receipt.envelopeSHA256, PersistenceDigestV1.sha256(durableEnvelope))
+        XCTAssertEqual(receipt.envelopeByteCount, durableEnvelope.count)
+        let envelopeDecoder = JSONDecoder()
+        envelopeDecoder.dateDecodingStrategy = .iso8601
+        XCTAssertEqual(try SaveCodec.decode(try envelopeDecoder.decode(
+            SaveSlotEnvelope.self, from: durableEnvelope).payload), changed)
+
+        await slots.releaseWriterLeaseAfterCommittedWrite()
+        guard case .refused(.retiredWriter) = adapter.compareAndSwap(
+            expected: current, candidate: candidate) else {
+            return XCTFail("A retired writer must remain inert")
+        }
+        XCTAssertEqual(try Data(contentsOf: adapter.saveURL), durableEnvelope)
+        let coldReload = try await slots.load(created.metadata.id)
+        XCTAssertEqual(coldReload.state, changed)
+    }
 }

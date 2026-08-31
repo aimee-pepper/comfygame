@@ -3,6 +3,22 @@ import SwiftUI
 import OSLog
 import CryptoKit
 
+struct PersistedCommitPresentationTokenV1: Equatable, Hashable, Sendable {
+    let rawValue: UUID
+}
+
+enum PersistedCommitRefusalV1: Equatable, Sendable {
+    case mutationUnavailable, candidateRefused, invalidCandidate
+    case persistence(PersistenceCommitRefusalV1)
+}
+
+enum PersistedCommitResultV1<Value> {
+    case committedNow(Value, PersistedCommitPresentationTokenV1)
+    case recoveredDurable(PersistenceCommitReceiptV1)
+    case alreadyCommitted(PersistenceCommitReceiptV1)
+    case refused(PersistedCommitRefusalV1)
+}
+
 struct WorldFieldContextReceiptV1: Equatable, Sendable {
     enum ContentSummary: Equatable, Sendable {
         case none
@@ -509,6 +525,9 @@ final class GameStore: ObservableObject {
     private let io: any GamePersistenceIO
     private let writeQueue = DispatchQueue(label: "com.aimeepepper.bookbinder.save", qos: .userInitiated)
     private var debounceTask: Task<Void, Never>?
+    private var nextPersistenceWriteGeneration: UInt64 = 1
+    private var minimumAcceptedWriteGeneration: UInt64 = 0
+    private var completedPersistedAttempts: [UUID: PersistenceCommitReceiptV1] = [:]
     private var nextWorldFieldAttemptID: UInt64 = 1
     private var worldFieldSessionEpoch: UInt64 = 1
     private var seenWorldFieldBatchIDs: Set<String> = []
@@ -1060,6 +1079,93 @@ final class GameStore: ObservableObject {
         return true
     }
 
+    func commitPersistedIf<Value>(
+        _ label: String, attemptID: UUID, stagedAt: Date,
+        scope: MutationScope = .ordinary,
+        _ body: (inout GameState) -> Value?
+    ) -> PersistedCommitResultV1<Value> {
+        if let receipt = completedPersistedAttempts[attemptID] {
+            return .alreadyCommitted(receipt)
+        }
+        guard permitsMutationWhileArrivalOwnsRoot(scope) else {
+            return .refused(.mutationUnavailable)
+        }
+        var candidate = state
+        guard let value = body(&candidate) else { return .refused(.candidateRefused) }
+        EconomyRules.normalizeRecognizedCurios(in: &candidate)
+        candidate.meta.mutationCount += 1
+        candidate.meta.recordSemanticAction(label)
+        candidate.meta.lastSavedAt = stagedAt
+
+        let candidateData: Data
+        let normalized: GameState
+        do {
+            let stagedData = try SaveCodec.encode(candidate)
+            normalized = try SaveCodec.decode(stagedData)
+            candidateData = try SaveCodec.encode(normalized)
+            guard try SaveCodec.decode(candidateData) == normalized else {
+                return .refused(.invalidCandidate)
+            }
+        } catch { return .refused(.invalidCandidate) }
+
+        let hadPendingWrite = diagnostics.hasPendingWrite
+        let diagnosticsBefore = diagnostics
+        debounceTask?.cancel()
+        debounceTask = nil
+        writeQueue.sync {}
+        let generation = nextPersistenceWriteGeneration
+        nextPersistenceWriteGeneration &+= 1
+        minimumAcceptedWriteGeneration = generation
+
+        let authority: PersistenceAuthorityV1
+        do { authority = try io.persistenceAuthority() }
+        catch {
+            diagnostics = diagnosticsBefore
+            if hadPendingWrite { scheduleSave() }
+            return .refused(.persistence(.corruptAuthority))
+        }
+        let result = writeQueue.sync {
+            io.compareAndSwap(expected: authority, candidate: candidateData)
+        }
+        switch result {
+        case .committed(let receipt):
+            state = normalized
+            completedPersistedAttempts[attemptID] = receipt
+            recordAuthoritativeCommit(receipt, generation: generation)
+            return .committedNow(value, .init(rawValue: UUID()))
+        case .recoveredDurable(let receipt):
+            state = normalized
+            completedPersistedAttempts[attemptID] = receipt
+            recordAuthoritativeCommit(receipt, generation: generation)
+            return .recoveredDurable(receipt)
+        case .alreadyCommitted(let receipt):
+            if normalized != state {
+                state = normalized
+                completedPersistedAttempts[attemptID] = receipt
+                recordAuthoritativeCommit(receipt, generation: generation)
+                return .recoveredDurable(receipt)
+            }
+            completedPersistedAttempts[attemptID] = receipt
+            diagnostics = diagnosticsBefore
+            if hadPendingWrite { scheduleSave() }
+            return .alreadyCommitted(receipt)
+        case .refused(let refusal):
+            diagnostics = diagnosticsBefore
+            if hadPendingWrite { scheduleSave() }
+            return .refused(.persistence(refusal))
+        }
+    }
+
+    private func recordAuthoritativeCommit(_ receipt: PersistenceCommitReceiptV1,
+                                           generation: UInt64) {
+        guard generation >= minimumAcceptedWriteGeneration else { return }
+        diagnostics.savedMutationCount = state.meta.mutationCount
+        diagnostics.writeCount += 1
+        diagnostics.lastError = nil
+        diagnostics.hasPendingWrite = false
+        diagnostics.saveFileByteCount = receipt.envelopeByteCount ?? receipt.payloadByteCount
+    }
+
     /// One centralized gate covers every stale/debug action path while the arrival owns root
     /// presentation. Only the exact idempotent dismissal or orphan reconciliation may mutate.
     private func permitsMutationWhileArrivalOwnsRoot(_ scope: MutationScope) -> Bool {
@@ -1097,20 +1203,26 @@ final class GameStore: ObservableObject {
         }
 
         let io = self.io
+        let generation = nextPersistenceWriteGeneration
+        nextPersistenceWriteGeneration &+= 1
         if synchronously {
             let result = writeQueue.sync { Result { try io.write(data) } }
-            recordWriteResult(result, mutationCount: snapshot.meta.mutationCount)
+            recordWriteResult(result, mutationCount: snapshot.meta.mutationCount,
+                              generation: generation)
         } else {
             writeQueue.async { [weak self] in
                 let result = Result { try io.write(data) }
                 Task { @MainActor [weak self] in
-                    self?.recordWriteResult(result, mutationCount: snapshot.meta.mutationCount)
+                    self?.recordWriteResult(result, mutationCount: snapshot.meta.mutationCount,
+                                            generation: generation)
                 }
             }
         }
     }
 
-    private func recordWriteResult(_ result: Result<Void, Error>, mutationCount: Int) {
+    private func recordWriteResult(_ result: Result<Void, Error>, mutationCount: Int,
+                                   generation: UInt64) {
+        guard generation >= minimumAcceptedWriteGeneration else { return }
         switch result {
         case .success:
             // Guard against an out-of-order report from a slower earlier write.

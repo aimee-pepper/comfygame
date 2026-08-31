@@ -2037,6 +2037,177 @@ final class PersistenceTests: XCTestCase {
         func deleteEverything() { wrapped.deleteEverything() }
     }
 
+    private final class PersistedCASProbeIO: GamePersistenceIO, @unchecked Sendable {
+        enum Mode { case commit, failBeforeWrite, recoverAfterWrite }
+        let saveURL = FileManager.default.temporaryDirectory
+            .appending(path: "active-write-probe-\(UUID().uuidString).json")
+        private let lock = NSLock()
+        private var bytes: Data
+        private var mode: Mode
+        private var casWritesStorage = 0
+        private var ordinaryWritesStorage = 0
+
+        init(state: GameState = .newGame(), mode: Mode = .commit) throws {
+            bytes = try SaveCodec.encode(state); self.mode = mode
+        }
+        var saveFileByteCount: Int? { lock.withLock { bytes.count } }
+        var casWrites: Int { lock.withLock { casWritesStorage } }
+        var ordinaryWrites: Int { lock.withLock { ordinaryWritesStorage } }
+        var durableBytes: Data { lock.withLock { bytes } }
+        func setMode(_ value: Mode) { lock.withLock { mode = value } }
+        func load() -> SaveLoadOutcome {
+            lock.withLock { (try? SaveCodec.decode(bytes)).map(SaveLoadOutcome.loaded)
+                ?? .unrecoverable(reason: "probe") }
+        }
+        func write(_ data: Data) throws {
+            lock.withLock { ordinaryWritesStorage += 1; bytes = data }
+        }
+        func deleteEverything() {}
+        func persistenceAuthority() throws -> PersistenceAuthorityV1 {
+            lock.withLock { .init(owner: .raw,
+                primarySHA256: PersistenceDigestV1.sha256(bytes),
+                primaryByteCount: bytes.count,
+                payloadSHA256: PersistenceDigestV1.sha256(bytes)) }
+        }
+        func compareAndSwap(expected: PersistenceAuthorityV1,
+                            candidate: Data) -> PersistenceCASResultV1 {
+            lock.withLock {
+                guard expected.primarySHA256 == PersistenceDigestV1.sha256(bytes),
+                      expected.primaryByteCount == bytes.count else {
+                    return .refused(.staleAuthority)
+                }
+                let receipt = PersistenceCommitReceiptV1(
+                    owner: .raw, payloadSHA256: PersistenceDigestV1.sha256(candidate),
+                    payloadByteCount: candidate.count, envelopeSHA256: nil,
+                    envelopeByteCount: nil)
+                if bytes == candidate { return .alreadyCommitted(receipt) }
+                casWritesStorage += 1
+                switch mode {
+                case .commit: bytes = candidate; return .committed(receipt)
+                case .failBeforeWrite: return .refused(.writeFailed)
+                case .recoverAfterWrite: bytes = candidate; return .recoveredDurable(receipt)
+                }
+            }
+        }
+    }
+
+    @MainActor
+    func testCommitPersistedIfPublishesOnlyVerifiedCommitAndReplayIsInert() throws {
+        let io = try PersistedCASProbeIO()
+        let store = GameStore(io: io)
+        let attempt = UUID(), stagedAt = Date(timeIntervalSince1970: 700)
+        let result = store.commitPersistedIf(
+            "active campaign write", attemptID: attempt, stagedAt: stagedAt) { state -> Int? in
+                state.base.essence = 707; return 707
+            }
+        guard case .committedNow(let value, let token) = result else {
+            return XCTFail("expected committedNow")
+        }
+        XCTAssertEqual(value, 707); _ = token
+        XCTAssertEqual(try SaveCodec.decode(io.durableBytes), store.state)
+        let committedState = store.state, diagnostics = store.diagnostics, writes = io.casWrites
+        let replay = store.commitPersistedIf(
+            "active campaign write", attemptID: attempt, stagedAt: stagedAt) { state -> Int? in
+                state.base.essence = 999; return 999
+            }
+        guard case .alreadyCommitted = replay else { return XCTFail("expected replay") }
+        XCTAssertEqual(store.state, committedState)
+        XCTAssertEqual(store.diagnostics.savedMutationCount, diagnostics.savedMutationCount)
+        XCTAssertEqual(store.diagnostics.writeCount, diagnostics.writeCount)
+        XCTAssertEqual(store.diagnostics.hasPendingWrite, diagnostics.hasPendingWrite)
+        XCTAssertEqual(store.diagnostics.lastError, diagnostics.lastError)
+        XCTAssertEqual(io.casWrites, writes)
+    }
+
+    @MainActor
+    func testCommitPersistedIfFailureAndInvalidCandidateAreFullyInert() throws {
+        let io = try PersistedCASProbeIO(mode: .failBeforeWrite)
+        let store = GameStore(io: io)
+        let bytes = io.durableBytes, state = store.state, diagnostics = store.diagnostics
+        let result = store.commitPersistedIf(
+            "failed write", attemptID: UUID(), stagedAt: Date(timeIntervalSince1970: 701)) {
+                candidate -> Bool? in candidate.base.essence = 701; return true
+            }
+        guard case .refused(.persistence(.writeFailed)) = result else {
+            return XCTFail("expected write failure")
+        }
+        XCTAssertEqual(store.state, state)
+        XCTAssertEqual(store.diagnostics.savedMutationCount, diagnostics.savedMutationCount)
+        XCTAssertEqual(store.diagnostics.writeCount, diagnostics.writeCount)
+        XCTAssertEqual(store.diagnostics.hasPendingWrite, diagnostics.hasPendingWrite)
+        XCTAssertEqual(store.diagnostics.lastError, diagnostics.lastError)
+        XCTAssertEqual(io.durableBytes, bytes)
+
+        let invalid = store.commitPersistedIf(
+            "invalid candidate", attemptID: UUID(), stagedAt: Date(timeIntervalSince1970: 702)) {
+                candidate -> Bool? in
+                candidate.schemaVersion = Tuning.saveSchemaVersion + 1; return true
+            }
+        guard case .refused(.invalidCandidate) = invalid else {
+            return XCTFail("expected strict candidate rejection")
+        }
+        XCTAssertEqual(io.casWrites, 1, "invalid candidate never reaches persistence")
+        XCTAssertEqual(store.state, state); XCTAssertEqual(io.durableBytes, bytes)
+    }
+
+    @MainActor
+    func testCommitPersistedIfRecoveredDurablePublishesWithoutReusablePresentation() throws {
+        let io = try PersistedCASProbeIO(mode: .recoverAfterWrite)
+        let store = GameStore(io: io)
+        let attempt = UUID(), stagedAt = Date(timeIntervalSince1970: 703)
+        let recovered = store.commitPersistedIf(
+            "ambiguous active write", attemptID: attempt, stagedAt: stagedAt) {
+                candidate -> Bool? in candidate.base.essence = 703; return true
+            }
+        guard case .recoveredDurable(let receipt) = recovered else {
+            return XCTFail("expected recovered durability")
+        }
+        XCTAssertEqual(receipt.payloadSHA256, PersistenceDigestV1.sha256(io.durableBytes))
+        XCTAssertEqual(store.state.base.essence, 703)
+        let writes = io.casWrites, state = store.state
+        let retry = store.commitPersistedIf(
+            "ambiguous active write", attemptID: attempt, stagedAt: stagedAt) {
+                candidate -> Bool? in candidate.base.essence = 999; return true
+            }
+        guard case .alreadyCommitted = retry else { return XCTFail("expected inert retry") }
+        XCTAssertEqual(io.casWrites, writes); XCTAssertEqual(store.state, state)
+    }
+
+    func testRawCompareAndSwapBindsPrimaryAndPreservesBackupOnStaleAuthority() throws {
+        let io = SaveFileIO.temporary(name: "raw-active-write-\(UUID().uuidString)")
+        defer { io.deleteEverything() }
+        var first = GameState.newGame(); first.base.essence = 11
+        var second = GameState.newGame(); second.base.essence = 12
+        let firstBytes = try SaveCodec.encode(first), secondBytes = try SaveCodec.encode(second)
+        try io.write(firstBytes); try io.write(secondBytes)
+        let staleAuthority = try io.persistenceAuthority()
+
+        var external = GameState.newGame(); external.base.essence = 13
+        let externalBytes = try SaveCodec.encode(external)
+        try externalBytes.write(to: io.saveURL, options: .atomic)
+        let backupBefore = try Data(contentsOf: io.backupURL)
+        var candidate = GameState.newGame(); candidate.base.essence = 14
+        let candidateBytes = try SaveCodec.encode(candidate)
+
+        guard case .refused(.staleAuthority) = io.compareAndSwap(
+            expected: staleAuthority, candidate: candidateBytes) else {
+            return XCTFail("Expected exact raw-primary authority refusal")
+        }
+        XCTAssertEqual(try Data(contentsOf: io.saveURL), externalBytes)
+        XCTAssertEqual(try Data(contentsOf: io.backupURL), backupBefore)
+
+        let currentAuthority = try io.persistenceAuthority()
+        guard case .committed(let receipt) = io.compareAndSwap(
+            expected: currentAuthority, candidate: candidateBytes) else {
+            return XCTFail("Expected raw compare-and-swap commit")
+        }
+        XCTAssertEqual(receipt.payloadSHA256, PersistenceDigestV1.sha256(candidateBytes))
+        XCTAssertEqual(try Data(contentsOf: io.saveURL), candidateBytes)
+        XCTAssertEqual(try Data(contentsOf: io.backupURL), externalBytes)
+        guard case .loaded(let cold) = io.load() else { return XCTFail("Expected cold reload") }
+        XCTAssertEqual(cold, candidate)
+    }
+
     private func legacyMaterialRun() -> WorldRun {
         let book = BoundBook(symbols: [:], randomlyFilled: [], essencePaid: 0)
         let generated = Worldgen.generate(book: book, seed: 812)

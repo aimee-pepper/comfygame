@@ -11,6 +11,42 @@ final class CampaignLaunchProgressTests: XCTestCase {
         func next() -> Int { value += 1; return value }
     }
 
+    private final class CampaignWriteProbeIO: GamePersistenceIO, @unchecked Sendable {
+        enum Mode: Equatable { case refuse, recover }
+        let saveURL = FileManager.default.temporaryDirectory
+            .appending(path: "campaign-write-probe-\(UUID().uuidString).json")
+        private let lock = NSLock()
+        private var bytes: Data
+        private let mode: Mode
+        private var attemptsStorage = 0
+
+        init(mode: Mode) throws { self.mode = mode; bytes = try SaveCodec.encode(.newGame()) }
+        var saveFileByteCount: Int? { lock.withLock { bytes.count } }
+        var attempts: Int { lock.withLock { attemptsStorage } }
+        func load() -> SaveLoadOutcome { lock.withLock { .loaded(try! SaveCodec.decode(bytes)) } }
+        func write(_ data: Data) throws { lock.withLock { bytes = data } }
+        func deleteEverything() {}
+        func persistenceAuthority() throws -> PersistenceAuthorityV1 { lock.withLock {
+            .init(owner: .raw, primarySHA256: PersistenceDigestV1.sha256(bytes),
+                  primaryByteCount: bytes.count,
+                  payloadSHA256: PersistenceDigestV1.sha256(bytes))
+        } }
+        func compareAndSwap(expected: PersistenceAuthorityV1,
+                            candidate: Data) -> PersistenceCASResultV1 { lock.withLock {
+            attemptsStorage += 1
+            guard expected.primarySHA256 == PersistenceDigestV1.sha256(bytes) else {
+                return .refused(.staleAuthority)
+            }
+            let receipt = PersistenceCommitReceiptV1(
+                owner: .raw, payloadSHA256: PersistenceDigestV1.sha256(candidate),
+                payloadByteCount: candidate.count, envelopeSHA256: nil, envelopeByteCount: nil)
+            switch mode {
+            case .refuse: return .refused(.writeFailed)
+            case .recover: bytes = candidate; return .recoveredDurable(receipt)
+            }
+        } }
+    }
+
     func testInitialInspectionPublishesHonestProgressBeforeChooser() async throws {
         let directory = temporaryDirectory("initial")
         let coordinator = CampaignAppCoordinator(directory: directory, minimumInitialDisplay: .zero)
@@ -134,6 +170,31 @@ final class CampaignLaunchProgressTests: XCTestCase {
                       "Campaign inspection must begin after the branded first-frame transaction")
         XCTAssertTrue(source.contains("campaign phase="),
                       "Every published production phase must carry elapsed-time evidence")
+    }
+
+    func testReturnToCampaignsDoesNotNavigateWithoutCommittedNowToken() async throws {
+        for mode in [CampaignWriteProbeIO.Mode.refuse, .recover] {
+            let io = try CampaignWriteProbeIO(mode: mode)
+            let store = GameStore(io: io)
+            let coordinator = CampaignAppCoordinator(
+                directory: temporaryDirectory("return-inert"), readyStore: store,
+                minimumInitialDisplay: .zero)
+            coordinator.returnToCampaigns()
+            try await Task.sleep(for: .milliseconds(20))
+            XCTAssertTrue(coordinator.store === store)
+            XCTAssertEqual(io.attempts, 1)
+
+            coordinator.returnToCampaigns()
+            try await Task.sleep(for: .milliseconds(20))
+            XCTAssertTrue(coordinator.store === store)
+            if mode == .recover {
+                XCTAssertEqual(io.attempts, 1,
+                               "durable recovery retry must be alreadyCommitted")
+            } else {
+                XCTAssertEqual(io.attempts, 2,
+                               "a prewrite failure may retry the exact staged attempt")
+            }
+        }
     }
 
     func testAppOwnsOneGlobalNonElasticVerticalScrollBoundary() throws {

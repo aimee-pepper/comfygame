@@ -1,5 +1,40 @@
 import Foundation
 import OSLog
+import CryptoKit
+
+struct PersistenceAuthorityV1: Equatable, Sendable {
+    enum Owner: Equatable, Sendable { case raw, slot(SaveSlotID, generation: UInt64) }
+    let owner: Owner
+    let primarySHA256: String?
+    let primaryByteCount: Int
+    let payloadSHA256: String?
+}
+
+struct PersistenceCommitReceiptV1: Equatable, Sendable {
+    let owner: PersistenceAuthorityV1.Owner
+    let payloadSHA256: String
+    let payloadByteCount: Int
+    let envelopeSHA256: String?
+    let envelopeByteCount: Int?
+}
+
+enum PersistenceCommitRefusalV1: Error, Equatable, Sendable {
+    case staleAuthority, retiredWriter, wrongSlot, corruptAuthority, futureAuthority
+    case writeFailed, ambiguousReadback
+}
+
+enum PersistenceCASResultV1: Equatable, Sendable {
+    case committed(PersistenceCommitReceiptV1)
+    case recoveredDurable(PersistenceCommitReceiptV1)
+    case alreadyCommitted(PersistenceCommitReceiptV1)
+    case refused(PersistenceCommitRefusalV1)
+}
+
+enum PersistenceDigestV1 {
+    static func sha256(_ data: Data) -> String {
+        SHA256.hash(data: data).map { String(format: "%02x", $0) }.joined()
+    }
+}
 
 enum SaveLoadOutcome {
     case newGame
@@ -28,6 +63,8 @@ protocol GamePersistenceIO: Sendable {
     var saveURL: URL { get }
     var saveFileByteCount: Int? { get }
     func write(_ data: Data) throws
+    func persistenceAuthority() throws -> PersistenceAuthorityV1
+    func compareAndSwap(expected: PersistenceAuthorityV1, candidate: Data) -> PersistenceCASResultV1
     func load() -> SaveLoadOutcome
     func deleteEverything()
     var diagnosticCampaignReference: String? { get }
@@ -35,6 +72,41 @@ protocol GamePersistenceIO: Sendable {
 
 extension GamePersistenceIO {
     var diagnosticCampaignReference: String? { nil }
+
+    func persistenceAuthority() throws -> PersistenceAuthorityV1 {
+        let data = try? Data(contentsOf: saveURL)
+        return .init(owner: .raw, primarySHA256: data.map(PersistenceDigestV1.sha256),
+                     primaryByteCount: data?.count ?? 0,
+                     payloadSHA256: data.map(PersistenceDigestV1.sha256))
+    }
+
+    func compareAndSwap(expected: PersistenceAuthorityV1,
+                        candidate: Data) -> PersistenceCASResultV1 {
+        do {
+            guard try persistenceAuthority() == expected else { return .refused(.staleAuthority) }
+            let candidateSHA = PersistenceDigestV1.sha256(candidate)
+            if expected.payloadSHA256 == candidateSHA,
+               expected.primaryByteCount == candidate.count {
+                return .alreadyCommitted(.init(owner: expected.owner,
+                    payloadSHA256: candidateSHA, payloadByteCount: candidate.count,
+                    envelopeSHA256: nil, envelopeByteCount: nil))
+            }
+            try write(candidate)
+            guard let landed = try? Data(contentsOf: saveURL), landed == candidate else {
+                return .refused(.ambiguousReadback)
+            }
+            return .committed(.init(owner: expected.owner, payloadSHA256: candidateSHA,
+                payloadByteCount: candidate.count, envelopeSHA256: nil, envelopeByteCount: nil))
+        } catch {
+            if let landed = try? Data(contentsOf: saveURL), landed == candidate {
+                return .recoveredDurable(.init(owner: expected.owner,
+                    payloadSHA256: PersistenceDigestV1.sha256(candidate),
+                    payloadByteCount: candidate.count, envelopeSHA256: nil,
+                    envelopeByteCount: nil))
+            }
+            return .refused(.writeFailed)
+        }
+    }
 }
 
 // Preserve concise call sites after GameStore began accepting any persistence adapter.
@@ -101,6 +173,59 @@ struct SaveFileIO: GamePersistenceIO {
         // File protection: readable after first unlock, so a save can land while the phone is
         // locked in a pocket (a `.complete` class would fail exactly then).
         try data.write(to: saveURL, options: [.atomic, .completeFileProtectionUntilFirstUserAuthentication])
+    }
+
+    func persistenceAuthority() throws -> PersistenceAuthorityV1 {
+        let primary = try? Data(contentsOf: saveURL)
+        return .init(owner: .raw,
+                     primarySHA256: primary.map(PersistenceDigestV1.sha256),
+                     primaryByteCount: primary?.count ?? 0,
+                     payloadSHA256: primary.map(PersistenceDigestV1.sha256))
+    }
+
+    func compareAndSwap(expected: PersistenceAuthorityV1,
+                        candidate: Data) -> PersistenceCASResultV1 {
+        guard expected.owner == .raw else { return .refused(.staleAuthority) }
+        let priorPrimary = try? Data(contentsOf: saveURL)
+        let priorBackup = try? Data(contentsOf: backupURL)
+        let actual = PersistenceAuthorityV1(
+            owner: .raw, primarySHA256: priorPrimary.map(PersistenceDigestV1.sha256),
+            primaryByteCount: priorPrimary?.count ?? 0,
+            payloadSHA256: priorPrimary.map(PersistenceDigestV1.sha256))
+        guard actual == expected else { return .refused(.staleAuthority) }
+        let receipt = PersistenceCommitReceiptV1(
+            owner: .raw, payloadSHA256: PersistenceDigestV1.sha256(candidate),
+            payloadByteCount: candidate.count, envelopeSHA256: nil, envelopeByteCount: nil)
+        if priorPrimary == candidate { return .alreadyCommitted(receipt) }
+        do {
+            try FileManager.default.createDirectory(at: directory,
+                                                    withIntermediateDirectories: true)
+            if let priorPrimary {
+                try priorPrimary.write(to: backupURL, options: .atomic)
+            } else if FileManager.default.fileExists(atPath: backupURL.path(percentEncoded: false)) {
+                try FileManager.default.removeItem(at: backupURL)
+            }
+            try candidate.write(to: saveURL,
+                options: [.atomic, .completeFileProtectionUntilFirstUserAuthentication])
+            guard (try? Data(contentsOf: saveURL)) == candidate else {
+                throw CocoaError(.fileReadCorruptFile)
+            }
+            return .committed(receipt)
+        } catch {
+            if (try? Data(contentsOf: saveURL)) == candidate {
+                return .recoveredDurable(receipt)
+            }
+            try? restore(priorPrimary, at: saveURL)
+            try? restore(priorBackup, at: backupURL)
+            return .refused(.writeFailed)
+        }
+    }
+
+    private func restore(_ data: Data?, at url: URL) throws {
+        if let data { try data.write(to: url, options: .atomic) }
+        else if FileManager.default.fileExists(atPath: url.path(percentEncoded: false)) {
+            try FileManager.default.removeItem(at: url)
+        }
     }
 
     // MARK: - Loading

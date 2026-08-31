@@ -70,6 +70,9 @@ final class CampaignAppCoordinator: ObservableObject {
     private let slots: SaveSlotFileIO
     private var task: Task<Void, Never>?
     private var generation = UUID()
+    /// A durability recovery is deliberately presentation-inert. Retaining the attempt makes a
+    /// retry an idempotent acknowledgement rather than minting a second navigation token.
+    private var returnWriteAttempt: (id: UUID, stagedAt: Date)?
     private var didLogFirstFrame = false
     private let minimumInitialDisplay: Duration
     private let prepare: @Sendable (
@@ -236,21 +239,20 @@ final class CampaignAppCoordinator: ObservableObject {
     /// Flushes the active autosave, retires its write capability, then returns to the chooser.
     func returnToCampaigns() {
         guard case .playing(let store) = phase, task == nil else { return }
-        store.flushNow()
-        let finalState = store.state
-        loadingPhase = .inspectingCampaigns(completed: 0, total: 0)
-        phase = .loading
+        let attempt = returnWriteAttempt ?? (UUID(), Date())
+        returnWriteAttempt = attempt
+        let result: PersistedCommitResultV1<Void> = store.commitPersistedIf(
+            "write active campaign", attemptID: attempt.id, stagedAt: attempt.stagedAt) { _ in () }
+        guard case .committedNow(_, let presentationToken) = result else { return }
+        returnWriteAttempt = nil
+        let acceptedToken = presentationToken
         let token = UUID(); generation = token
         task = Task { [weak self] in
             guard let self else { return }
-            do {
-                _ = try await slots.releaseWriterLease(flushing: finalState)
-                guard generation == token else { return }
-                phase = .choosing(await slots.inspect())
-            } catch {
-                guard generation == token else { return }
-                phase = .failed("The active campaign could not be closed safely: \(error.localizedDescription)")
-            }
+            await slots.releaseWriterLeaseAfterCommittedWrite()
+            guard generation == token, acceptedToken == presentationToken else { return }
+            loadingPhase = .inspectingCampaigns(completed: 0, total: 0)
+            phase = .choosing(await slots.inspect())
             task = nil
         }
     }

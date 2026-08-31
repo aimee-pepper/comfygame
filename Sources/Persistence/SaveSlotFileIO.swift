@@ -288,6 +288,14 @@ actor SaveSlotFileIO {
         leasedSlotID = nil
     }
 
+    /// Retires the capability after GameStore's typed compare-and-swap has already proven the
+    /// exact envelope durable. This path must never perform a second untyped write.
+    func releaseWriterLeaseAfterCommittedWrite() {
+        leasedWriter?.retire()
+        leasedWriter = nil
+        leasedSlotID = nil
+    }
+
     /// Return to the campaign chooser after the active GameStore has finished its own pending
     /// queue. This final exact save and lease retirement are serialized; selection remains as the
     /// honest most-recently active campaign hint.
