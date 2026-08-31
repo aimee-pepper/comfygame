@@ -23,6 +23,18 @@ const travellerSource = JSON.parse(
     'utf8',
   ),
 );
+const namedCharacterPack = JSON.parse(
+  await readFile(
+    path.join(
+      repositoryRoot,
+      'AssetLab',
+      'integration',
+      'named-character-placeholders-v1',
+      'manifest.json',
+    ),
+    'utf8',
+  ),
+);
 const family = (id) =>
   source.visualAssets.families.find((entry) => entry.id === id);
 const runtimeAsset = (familyID, semanticKey) =>
@@ -38,6 +50,7 @@ await mkdir(path.join(publicAssetRoot, 'resources'), { recursive: true });
 await mkdir(path.join(publicAssetRoot, 'items'), { recursive: true });
 await mkdir(path.join(publicAssetRoot, 'terrain'), { recursive: true });
 await mkdir(path.join(publicAssetRoot, 'writing'), { recursive: true });
+await mkdir(path.join(publicAssetRoot, 'people'), { recursive: true });
 
 async function publishAsset(asset, directory, fileName) {
   if (!asset?.sourcePath) return null;
@@ -45,6 +58,51 @@ async function publishAsset(asset, directory, fileName) {
   const destinationPath = path.join(publicAssetRoot, directory, fileName);
   await copyFile(sourcePath, destinationPath);
   return `/game-assets/${directory}/${fileName}`;
+}
+
+async function publishTravellerCameo(travellerID, slug) {
+  const asset = namedCharacterPack.assets.find(
+    (entry) =>
+      entry.key?.travellerID === travellerID &&
+      entry.key?.profile === 'compactCameo' &&
+      !entry.key?.facing,
+  );
+  if (
+    !asset ||
+    asset.width !== 16 ||
+    asset.height !== 16 ||
+    !Array.isArray(asset.commands) ||
+    asset.commands.some(
+      (command) =>
+        command.op !== 'rect' ||
+        !Number.isInteger(command.x) ||
+        !Number.isInteger(command.y) ||
+        !Number.isInteger(command.w) ||
+        !Number.isInteger(command.h) ||
+        command.x < 0 ||
+        command.y < 0 ||
+        command.w < 1 ||
+        command.h < 1 ||
+        command.x + command.w > 16 ||
+        command.y + command.h > 16 ||
+        !/^#[0-9a-f]{6}$/i.test(command.color),
+    )
+  ) {
+    return null;
+  }
+  const body = asset.commands
+    .map(
+      (command) =>
+        `<rect x="${command.x}" y="${command.y}" width="${command.w}" height="${command.h}" fill="${command.color}"/>`,
+    )
+    .join('');
+  const destination = `${slug}-cameo.svg`;
+  await writeFile(
+    path.join(publicAssetRoot, 'people', destination),
+    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" shape-rendering="crispEdges">${body}</svg>\n`,
+    'utf8',
+  );
+  return `/game-assets/people/${destination}`;
 }
 
 const resources = [];
@@ -92,9 +150,10 @@ for (const item of source.items) {
   });
 }
 
-const travellers = source.travellers
-  .filter((traveller) => traveller.meetingStatus === 'live')
-  .map((traveller) => {
+const travellers = [];
+for (const traveller of source.travellers.filter(
+  (entry) => entry.meetingStatus === 'live',
+)) {
     const authoredTraveller = travellerSource.travellers.find(
       (entry) => entry.id === traveller.id,
     );
@@ -107,7 +166,7 @@ const travellers = source.travellers
       if (page.researchNode) return `Research lead: ${page.researchNode}`;
       return null;
     };
-    return {
+    travellers.push({
       id: traveller.id,
       slug: traveller.slug,
       name: traveller.name,
@@ -128,8 +187,9 @@ const travellers = source.travellers
           prose: page.prose,
           reward: rewardFor(page),
         })),
-    };
-  });
+      assetURL: await publishTravellerCameo(traveller.id, traveller.slug),
+    });
+}
 
 const stations = source.stations
   .filter(

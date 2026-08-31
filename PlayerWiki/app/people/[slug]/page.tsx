@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { PageIntro } from '@/components/page-intro';
+import { PixelImage } from '@/components/pixel-image';
 import { SiteFrame } from '@/components/site-frame';
 import { content, humanize } from '@/lib/content';
 
@@ -28,11 +29,18 @@ export default async function PersonDetail({
   if (!person) notFound();
   return (
     <SiteFrame sidebar>
-      <PageIntro
-        eyebrow={person.calling}
-        title={person.name}
-        summary={person.summary}
-      />
+      <div className="person-intro">
+        <PixelImage
+          src={person.assetURL}
+          alt={`${person.name} character cameo`}
+          size={112}
+        />
+        <PageIntro
+          eyebrow={person.calling}
+          title={person.name}
+          summary={person.summary}
+        />
+      </div>
       <section className="article-section">
         <h2>At a glance</h2>
         <dl className="fact-grid">
@@ -78,11 +86,11 @@ export default async function PersonDetail({
       <section className="article-section">
         <h2>Hints for finding them</h2>
         {person.hints.length ? (
-          <ul>
+          <ol className="finding-list">
             {person.hints.map((hint, index) => (
               <li key={`${person.id}-hint-${index}`}>{hint}</li>
             ))}
-          </ul>
+          </ol>
         ) : (
           <p>No authored location hint is currently available.</p>
         )}
@@ -92,7 +100,7 @@ export default async function PersonDetail({
         <div className="diary-grid">
           {person.diaryPages.map((page, index) => (
             <article className="note-card" key={`${person.id}-page-${index}`}>
-              <p className="eyebrow">{humanize(page.kind)}</p>
+              <p className="eyebrow">Entry {index + 1} · {humanize(page.kind)}</p>
               <p>{page.prose}</p>
               {page.reward && (
                 <p>

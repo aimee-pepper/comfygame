@@ -503,6 +503,36 @@ footer {
   width: 96px;
   height: 96px;
 }
+.person-intro {
+  display: grid;
+  grid-template-columns: 132px minmax(0, 1fr);
+  gap: 24px;
+  align-items: center;
+}
+.person-intro > .pixel-image,
+.person-intro > .image-missing {
+  width: 112px;
+  height: 112px;
+  padding: 8px;
+  border: 1px solid var(--line);
+  background: var(--paper-light);
+  box-shadow: 4px 4px 0 rgb(117 81 45 / 14%);
+}
+.person-intro .article-intro {
+  min-width: 0;
+}
+.finding-list {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style-position: inside;
+}
+.finding-list li {
+  padding: 13px 15px;
+  border-left: 3px solid var(--blue);
+  background: rgb(255 250 240 / 72%);
+}
 .fact-grid {
   margin: 0;
 }
@@ -566,6 +596,9 @@ footer {
     padding: 12px 0 0;
     overflow-x: auto;
     gap: 4px;
+  }
+  .person-intro {
+    grid-template-columns: 1fr;
   }
   .wiki-sidebar p {
     display: none;

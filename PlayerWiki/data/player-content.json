@@ -2422,7 +2422,8 @@
           "prose": "Write hard material in a few clear seams. I can separate a clean boundary, count what came out, and leave the rest intact. Scattered fragments take longer and encourage sloppy sorting.",
           "reward": null
         }
-      ]
+      ],
+      "assetURL": "/game-assets/people/noll-cameo.svg"
     },
     {
       "id": "halloway",
@@ -2478,7 +2479,8 @@
           "prose": "A brush needs a thin ferrule that grips an even bundle without cutting the fibres. Bring Isolde workable metal; I will test the seam and replace it if it slips.",
           "reward": "Research lead: pen_brush"
         }
-      ]
+      ],
+      "assetURL": "/game-assets/people/halloway-cameo.svg"
     },
     {
       "id": "mara",
@@ -2538,7 +2540,8 @@
           "prose": "Tovin counted distance by the bindings needed to return. His figures were excellent. His habit of staying when the return grew expensive was not.",
           "reward": null
         }
-      ]
+      ],
+      "assetURL": "/game-assets/people/mara-cameo.svg"
     },
     {
       "id": "edren",
@@ -2599,7 +2602,8 @@
           "prose": "Write a place with construction over older construction. The lower floor establishes first use; repairs and additions above it show later occupation without requiring a clean beginning.",
           "reward": null
         }
-      ]
+      ],
+      "assetURL": "/game-assets/people/edren-cameo.svg"
     },
     {
       "id": "isolde",
@@ -2660,7 +2664,8 @@
           "prose": "Tovin closes a binding with excellent control and terrible judgement about when to stop. Fear steadies his hand. He remains annoyingly proud of the wrong half of that assessment.",
           "reward": null
         }
-      ]
+      ],
+      "assetURL": "/game-assets/people/isolde-cameo.svg"
     },
     {
       "id": "sela",
@@ -2722,7 +2727,8 @@
           "prose": "Halloway is tending a banked fire somewhere warm. She said she would keep it alive until we arrived, so bring dry fuel and do not make her prove how long she can wait.",
           "reward": null
         }
-      ]
+      ],
+      "assetURL": "/game-assets/people/sela-cameo.svg"
     },
     {
       "id": "auber",
@@ -2819,7 +2825,8 @@
           "prose": "Oda needs an output whose concentration and carrier are exact enough to contain. If my pure fraction hides its remaining vapour, she sends it back with annotations sharp enough to cut glass.",
           "reward": null
         }
-      ]
+      ],
+      "assetURL": "/game-assets/people/auber-cameo.svg"
     },
     {
       "id": "tovin",
@@ -2926,7 +2933,8 @@
           "prose": "Some worlds contain a natural anchor where the old binding still catches. The page pulls taut near it. Mark the seam first; decide what to attach only after you know the return route.",
           "reward": null
         }
-      ]
+      ],
+      "assetURL": "/game-assets/people/tovin-cameo.svg"
     }
   ],
   "stations": [

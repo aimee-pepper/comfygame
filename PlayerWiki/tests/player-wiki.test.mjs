@@ -131,6 +131,15 @@ test('every live person includes every authored diary page and every authored lo
     );
   }
   const personPage = await read('app/people/[slug]/page.tsx');
+  assert.match(personPage, /PixelImage/);
+  assert.match(personPage, /character cameo/);
   assert.match(personPage, /Hints for finding them/);
   assert.match(personPage, /Diary pages/);
+  for (const person of content.travellers) {
+    assert.ok(person.assetURL, `${person.name} cameo URL`);
+    assert.match(person.assetURL, /^\/game-assets\/people\/.+-cameo\.svg$/);
+    const cameo = await read(`public${person.assetURL}`);
+    assert.match(cameo, /viewBox="0 0 16 16"/);
+    assert.match(cameo, /shape-rendering="crispEdges"/);
+  }
 });

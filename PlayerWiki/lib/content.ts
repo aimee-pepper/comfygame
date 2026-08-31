@@ -53,6 +53,7 @@ export interface Traveller {
     field: string;
     stableID: string;
   } | null;
+  assetURL: string | null;
   hints: string[];
   diaryPages: Array<{ kind: string; prose: string; reward: string | null }>;
 }
