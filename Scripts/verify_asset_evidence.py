@@ -122,7 +122,7 @@ def validate(root: Path, approved: set[str] = APPROVED_ACCEPTED_EVIDENCE_FINGERP
             if value in declared: errors.append(f"duplicate evidence path: {value}")
             declared.add(value)
         accepted = receipt.get("accepted")
-        if accepted not in {True, False}: errors.append(f"accepted must be boolean: {receipt_path}")
+        if type(accepted) is not bool: errors.append(f"accepted must be boolean: {receipt_path}")
         fp = fingerprint(root, receipt)
         if accepted is True and (fp is None or fp not in approved):
             errors.append(f"accepted evidence lacks reviewed fingerprint: {receipt_path} ({fp})")
@@ -146,6 +146,14 @@ def self_test() -> None:
         receipt={"schemaVersion":"asset-evidence-receipt-v1","family":"a","version":"v1","variant":"b","classification":"generated-test-artifact","accepted":False,"sourceAuthorship":False,"runtimeAuthority":False,"gameplayAuthority":False,"finalArtAcceptance":False,"gameWikiDisclosure":"withheld","authorityPaths":["docs/a.json"],"producerPaths":["Scripts/make.mjs"],"files":[{"path":"AssetEvidence/a/v1/b/review/report.json","role":"test-report","sha256":sha(file)}]}
         rp=root/"AssetEvidence/a/v1/b/evidence-receipt.json"; rp.write_text(json.dumps(receipt))
         assert not validate(root)
+        for invalid in (0, 1, "true", None, [], {}):
+            receipt["accepted"] = invalid
+            rp.write_text(json.dumps(receipt))
+            errors = validate(root)
+            assert any("accepted must be boolean" in error for error in errors)
+        receipt["accepted"] = 1
+        rp.write_text(json.dumps(receipt))
+        assert validate(root, APPROVED_ACCEPTED_EVIDENCE_FINGERPRINTS)  # Empty allowlist cannot be bypassed by numeric truth.
         receipt["accepted"]=True; rp.write_text(json.dumps(receipt)); assert validate(root)
         assert validate(root,{"a" * 64})  # A structurally valid forged receipt is not approval.
         fp=fingerprint(root, receipt); assert fp and not validate(root,{fp})
