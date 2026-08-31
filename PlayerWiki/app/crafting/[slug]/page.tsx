@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { PageIntro } from '@/components/page-intro';
 import { PixelImage } from '@/components/pixel-image';
+import { GuideBreadcrumbs, RelatedGuides } from '@/components/guide-navigation';
 import { SiteFrame } from '@/components/site-frame';
 import { craftingSystems, recipesFor, systemFor } from '@/lib/crafting';
 import { content, humanize } from '@/lib/content';
@@ -68,6 +69,7 @@ export default async function CraftingSystemDetail({
   const station = content.stations.find((entry) => system.station.includes(entry.name));
   return (
     <SiteFrame sidebar>
+      <GuideBreadcrumbs items={[{ label: 'Systems', href: '/systems' }, { label: 'Crafting systems', href: '/crafting' }, { label: system.name }]} />
       <PageIntro
         eyebrow={system.station}
         title={system.name}
@@ -120,10 +122,7 @@ export default async function CraftingSystemDetail({
           </table>
         </div>
       </section>
-      <nav className="next-links">
-        <Link href="/crafting">All crafting systems</Link>
-        <Link href="/resources">Resources</Link>
-      </nav>
+      <RelatedGuides links={[{ label: 'All crafting systems', href: '/crafting' }, { label: 'Crafting basics', href: '/systems/crafting' }, { label: 'Resources', href: '/resources' }, { label: 'Village services', href: '/services' }]} />
     </SiteFrame>
   );
 }

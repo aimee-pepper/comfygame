@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { PageIntro } from '@/components/page-intro';
 import { PixelImage } from '@/components/pixel-image';
+import { GuideBreadcrumbs, RelatedGuides } from '@/components/guide-navigation';
 import { SiteFrame } from '@/components/site-frame';
 import { content } from '@/lib/content';
 import { serviceForSlug, serviceGuides } from '@/lib/services';
@@ -37,6 +38,7 @@ export default async function ServiceDetail({
     : `${station.zone} town setting`;
   return (
     <SiteFrame sidebar>
+      <GuideBreadcrumbs items={[{ label: 'Systems', href: '/systems' }, { label: 'Village services', href: '/services' }, { label: guide.name }]} />
       <div className="entity-heading">
         {visualURL && (
           <PixelImage
@@ -76,12 +78,7 @@ export default async function ServiceDetail({
           ))}
         </div>
       </section>
-      <nav className="next-links">
-        <Link href="/services">All village services</Link>
-        <Link href={`/places/${station.slug}`}>
-          {station.name} construction and keeper
-        </Link>
-      </nav>
+      <RelatedGuides links={[{ label: 'All village services', href: '/services' }, { label: `${station.name} construction and keeper`, href: `/places/${station.slug}` }, { label: 'All systems', href: '/systems' }]} />
     </SiteFrame>
   );
 }

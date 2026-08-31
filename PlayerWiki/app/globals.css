@@ -446,6 +446,46 @@ h2 {
   color: var(--blue);
   font-size: 12px;
 }
+.guide-breadcrumbs,
+.related-guides {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  color: var(--muted);
+  font-size: 13px;
+}
+.guide-breadcrumbs {
+  margin-bottom: 18px;
+}
+.guide-breadcrumbs a,
+.related-guides a {
+  color: var(--blue);
+  text-decoration: none;
+}
+.guide-breadcrumbs a:hover,
+.related-guides a:hover {
+  text-decoration: underline;
+}
+.related-guides {
+  margin-top: 42px;
+  padding-top: 20px;
+  border-top: 1px solid var(--line);
+}
+.related-guides > span {
+  margin-right: 5px;
+  color: var(--ink);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.related-guides a {
+  padding: 7px 9px;
+  border: 1px solid var(--line);
+  background: var(--paper-light);
+  font-weight: 700;
+}
 .table-wrap {
   overflow-x: auto;
   border: 1px solid var(--line);

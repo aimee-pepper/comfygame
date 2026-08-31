@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { PageIntro } from '@/components/page-intro';
 import { PixelImage } from '@/components/pixel-image';
+import { GuideBreadcrumbs, RelatedGuides } from '@/components/guide-navigation';
 import { SiteFrame } from '@/components/site-frame';
 import { content, humanize } from '@/lib/content';
 
@@ -29,6 +30,7 @@ export default async function PersonDetail({
   if (!person) notFound();
   return (
     <SiteFrame sidebar>
+      <GuideBreadcrumbs items={[{ label: 'Reference', href: '/people' }, { label: 'People', href: '/people' }, { label: person.name }]} />
       <div className="person-intro">
         <PixelImage
           src={person.assetURL}
@@ -120,14 +122,7 @@ export default async function PersonDetail({
           </p>
         </section>
       )}
-      <nav className="next-links">
-        <Link href="/people">Back to all people</Link>
-        {person.station && (
-          <Link href={`/places/${person.station.slug}`}>
-            Visit {person.station.name}
-          </Link>
-        )}
-      </nav>
+      <RelatedGuides links={[{ label: 'All people', href: '/people' }, ...(person.station ? [{ label: `Visit ${person.station.name}`, href: `/places/${person.station.slug}` }] : []), { label: 'Village services', href: '/services' }, { label: 'All systems', href: '/systems' }]} />
     </SiteFrame>
   );
 }

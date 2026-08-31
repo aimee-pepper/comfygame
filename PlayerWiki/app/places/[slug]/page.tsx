@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { PageIntro } from '@/components/page-intro';
+import { GuideBreadcrumbs, RelatedGuides } from '@/components/guide-navigation';
 import { SiteFrame } from '@/components/site-frame';
 import { buildCost, content } from '@/lib/content';
 import { serviceForStation } from '@/lib/services';
@@ -30,6 +31,7 @@ export default async function PlaceDetail({
   const service = serviceForStation(place.id);
   return (
     <SiteFrame sidebar>
+      <GuideBreadcrumbs items={[{ label: 'Village services', href: '/services' }, { label: 'Places and stations', href: '/places' }, { label: place.name }]} />
       <PageIntro
         eyebrow={place.zone}
         title={place.name}
@@ -98,14 +100,7 @@ export default async function PlaceDetail({
           the exact actions and requirements that are available now.
         </p>
       </section>
-      <nav className="next-links">
-        <Link href="/places">Back to all places</Link>
-        {service && (
-          <Link href={`/services/${service.slug}`}>
-            How to use {service.name}
-          </Link>
-        )}
-      </nav>
+      <RelatedGuides links={[{ label: 'All places', href: '/places' }, ...(service ? [{ label: `How to use ${service.name}`, href: `/services/${service.slug}` }] : []), { label: 'All village services', href: '/services' }, { label: 'Crafting systems', href: '/crafting' }]} />
     </SiteFrame>
   );
 }

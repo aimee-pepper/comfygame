@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { PageIntro } from '@/components/page-intro';
 import { PixelImage } from '@/components/pixel-image';
+import { GuideBreadcrumbs, RelatedGuides } from '@/components/guide-navigation';
 import { SiteFrame } from '@/components/site-frame';
 import { content, humanize } from '@/lib/content';
 import { recipesUsingResource, systemFor } from '@/lib/crafting';
@@ -43,6 +44,7 @@ export default async function ResourceDetail({
   );
   return (
     <SiteFrame sidebar>
+      <GuideBreadcrumbs items={[{ label: 'Reference', href: '/resources' }, { label: 'Resources', href: '/resources' }, { label: resource.name }]} />
       <div className="entity-heading">
         <PixelImage
           src={resource.assetURL}
@@ -166,10 +168,7 @@ export default async function ResourceDetail({
           <p>This resource is not a material in a current building recipe.</p>
         )}
       </section>
-      <nav className="next-links">
-        <Link href="/resources">Back to all resources</Link>
-        <Link href="/crafting">Crafting systems</Link>
-      </nav>
+      <RelatedGuides links={[{ label: 'All resources', href: '/resources' }, { label: 'Crafting systems', href: '/crafting' }, { label: 'Village services', href: '/services' }, { label: 'All systems', href: '/systems' }]} />
     </SiteFrame>
   );
 }

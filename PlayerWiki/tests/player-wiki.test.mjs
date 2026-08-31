@@ -297,6 +297,26 @@ test('systems hub groups every current player guide into useful routes', async (
   assert.match(hub, /PixelImage/);
 });
 
+test('all requested player detail routes have shared breadcrumbs and related guides', async () => {
+  for (const relative of [
+    'app/systems/world-writing/page.tsx',
+    'app/systems/exploration/page.tsx',
+    'app/systems/combat/page.tsx',
+    'app/systems/crafting/page.tsx',
+    'app/services/[slug]/page.tsx',
+    'app/crafting/[slug]/page.tsx',
+    'app/resources/[slug]/page.tsx',
+    'app/equipment/[slug]/page.tsx',
+    'app/people/[slug]/page.tsx',
+    'app/places/[slug]/page.tsx',
+  ]) {
+    const source = await read(relative);
+    assert.match(source, /GuideBreadcrumbs/);
+    assert.match(source, /RelatedGuides/);
+  }
+  await access(path.join(root, 'components/guide-navigation.tsx'));
+});
+
 test('home and getting-started guide the live route with inline retained visuals', async () => {
   for (const relative of ['app/page.tsx', 'app/getting-started/page.tsx']) {
     const source = await read(relative);

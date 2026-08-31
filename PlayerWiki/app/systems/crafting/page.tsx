@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { GuideBreadcrumbs, RelatedGuides } from '@/components/guide-navigation';
 import { PageIntro } from '@/components/page-intro';
 import { PixelImage } from '@/components/pixel-image';
 import { SiteFrame } from '@/components/site-frame';
@@ -12,6 +13,7 @@ export default function Crafting() {
 
   return (
     <SiteFrame sidebar>
+      <GuideBreadcrumbs items={[{ label: 'Systems', href: '/systems' }, { label: 'Crafting and materials' }]} />
       <PageIntro
         eyebrow="System guide"
         title="Crafting and materials"
@@ -99,11 +101,7 @@ export default function Crafting() {
           </li>
         </ul>
       </section>
-      <nav className="next-links">
-        <Link href="/crafting">Open every crafting system and recipe</Link>
-        <Link href="/resources">Resource table</Link>
-        <Link href="/equipment">Equipment table</Link>
-      </nav>
+      <RelatedGuides links={[{ label: 'Crafting systems', href: '/crafting' }, { label: 'Village services', href: '/services' }, { label: 'Resource table', href: '/resources' }, { label: 'Equipment table', href: '/equipment' }]} />
     </SiteFrame>
   );
 }
