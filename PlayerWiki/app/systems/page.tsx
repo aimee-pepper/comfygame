@@ -29,7 +29,7 @@ export default function SystemsHub() {
       summary: 'Follow a material from its world source to a current recipe, station, and finished item.',
       visualURL: station?.assetURL ?? resource?.assetURL ?? null,
       visualAlt: station?.assetURL ? `${station.name} building visual` : resource ? `${resource.name} inventory icon` : 'Crafting reference',
-      links: [['Crafting basics', '/systems/crafting'], ['Crafting systems', '/crafting'], ['Resources', '/resources']],
+      links: [['Crafting basics', '/systems/crafting'], ['Economy and exchange', '/systems/economy-exchange'], ['Crafting systems', '/crafting'], ['Resources', '/resources']],
     },
     {
       title: 'Village services',

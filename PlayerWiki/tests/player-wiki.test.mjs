@@ -480,3 +480,21 @@ test('Party preparation documents the current party limit, gear slots, Gambits, 
   assert.match(systems, /\/systems\/party-preparation/);
   assert.match(frame, /\/systems\/party-preparation/);
 });
+
+test('Economy guide keeps current listings, refinement, and recycling player-facing', async () => {
+  await access(path.join(root, 'app/systems/economy-exchange/page.tsx'));
+  const economy = await read('app/systems/economy-exchange/page.tsx');
+  const systems = await read('app/systems/page.tsx');
+  const frame = await read('components/site-frame.tsx');
+  assert.match(economy, /current listing/);
+  assert.match(economy, /item, quantity, price, and stock/);
+  assert.match(economy, /Material sales use that reserve/);
+  assert.match(economy, /Raw Essence and spendable Essence are distinct/);
+  assert.match(economy, /authored material yield/);
+  assert.match(economy, /current holdings stay where they are/);
+  assert.match(economy, /\/services\/trading-post/);
+  assert.match(economy, /\/services\/recycler/);
+  assert.match(economy, /\/services\/essence-spring/);
+  assert.match(systems, /\/systems\/economy-exchange/);
+  assert.match(frame, /\/systems\/economy-exchange/);
+});

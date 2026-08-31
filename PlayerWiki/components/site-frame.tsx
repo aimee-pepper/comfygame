@@ -13,6 +13,7 @@ const systemLinks = [
   ['/systems/party-preparation', 'Party, Gear & Gambits'],
   ['/bestiary', 'Bestiary records'],
   ['/systems/crafting', 'Crafting basics'],
+  ['/systems/economy-exchange', 'Economy & exchange'],
 ];
 
 const prepareLinks = [
