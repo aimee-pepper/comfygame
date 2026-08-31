@@ -517,3 +517,23 @@ test('Knowledge guide connects only recovered Library, people, Research, and Bes
   assert.match(systems, /\/systems\/knowledge-records/);
   assert.match(frame, /\/systems\/knowledge-records/);
 });
+
+test('Field supplies guide documents current preparation, targets, Scent Mask, curios, and retained choices', async () => {
+  await access(path.join(root, 'app/systems/field-supplies/page.tsx'));
+  const supplies = await read('app/systems/field-supplies/page.tsx');
+  const systems = await read('app/systems/page.tsx');
+  const frame = await read('components/site-frame.tsx');
+  assert.match(supplies, /Prepare the next Field Kit at home/);
+  assert.match(supplies, /visible bin count is the current capacity/);
+  assert.match(supplies, /Healing and other direct supplies/);
+  assert.match(supplies, /Scent Mask/);
+  assert.match(supplies, /12 turns/);
+  assert.match(supplies, /Solvent and carried curios/);
+  assert.match(supplies, /Trying an unknown curio/);
+  assert.match(supplies, /Cancel leaves the curio unused/);
+  assert.match(supplies, /does not turn the selection into a completed use/);
+  assert.match(supplies, /\/consumables/);
+  assert.match(supplies, /\/curios/);
+  assert.match(systems, /\/systems\/field-supplies/);
+  assert.match(frame, /\/systems\/field-supplies/);
+});

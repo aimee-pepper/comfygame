@@ -11,6 +11,7 @@ const systemLinks = [
   ['/systems/research', 'Research'],
   ['/systems/combat', 'Combat'],
   ['/systems/party-preparation', 'Party, Gear & Gambits'],
+  ['/systems/field-supplies', 'Field supplies'],
   ['/bestiary', 'Bestiary records'],
   ['/systems/crafting', 'Crafting basics'],
   ['/systems/economy-exchange', 'Economy & exchange'],
