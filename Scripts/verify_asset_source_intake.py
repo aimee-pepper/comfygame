@@ -25,6 +25,9 @@ ALLOWED_TEMPLATE_FILES = {
     "aimee-authored-source-receipt-v1.schema.json",
     "aimee-authored-source-receipt-v1.template.json",
 }
+# Empty by design. Aimee may later approve one exact canonical intake fingerprint in review.
+# This source-intake authority must never be reused as runtime/final-art approval.
+APPROVED_AIMEE_AUTHORED_SOURCE_RECEIPT_SHA256: set[str] = set()
 
 
 def file_sha256(path: Path) -> str:
@@ -41,7 +44,44 @@ def load_object(path: Path) -> tuple[dict[str, object] | None, str | None]:
     return value, None
 
 
-def validate_pack(root: Path, pack: Path) -> list[str]:
+def length_prefixed_sha256(fields: list[str]) -> str:
+    payload = b"".join(
+        f"{len(field.encode('utf-8'))}:{field}".encode("utf-8") for field in fields
+    )
+    return hashlib.sha256(payload).hexdigest()
+
+
+def canonical_receipt_fingerprint(receipt: dict[str, object]) -> str | None:
+    sources = receipt.get("sources")
+    if not isinstance(sources, list) or not all(isinstance(entry, dict) for entry in sources):
+        return None
+    fields = [
+        "bookbinder-aimee-authored-source-intake-v1",
+        str(receipt.get("schemaVersion", "")),
+        str(receipt.get("packID", "")),
+        str(receipt.get("provenanceClass", "")),
+        str(receipt.get("author", "")),
+        str(receipt.get("aimeeAuthorshipReceiptSHA256", "")),
+        "true" if receipt.get("runtimeAuthority") is True else "false",
+        "true" if receipt.get("gameplayAuthority") is True else "false",
+        str(receipt.get("gameWikiDisclosure", "")),
+    ]
+    normalized = [
+        tuple(str(entry.get(key, "")) for key in (
+            "stableID", "variant", "path", "sourceFileSHA256"
+        ))
+        for entry in sources
+    ]
+    for entry in sorted(normalized):
+        fields.extend(entry)
+    return length_prefixed_sha256(fields)
+
+
+def validate_pack(
+    root: Path,
+    pack: Path,
+    approved_fingerprints: set[str] = APPROVED_AIMEE_AUTHORED_SOURCE_RECEIPT_SHA256,
+) -> list[str]:
     errors: list[str] = []
     if not PACK.fullmatch(pack.name):
         return [f"non-semantic pack directory: {pack.relative_to(root)}"]
@@ -134,6 +174,13 @@ def validate_pack(root: Path, pack: Path) -> list[str]:
         if not (root / relative).is_file():
             continue
         errors.append(f"receipt/source accounting mismatch: {relative}")
+    fingerprint = canonical_receipt_fingerprint(receipt)
+    if fingerprint is None or fingerprint not in approved_fingerprints:
+        suffix = f" (canonical fingerprint {fingerprint})" if fingerprint is not None else ""
+        errors.append(
+            f"Aimee-authored intake receipt is not explicitly approved: "
+            f"{pack.relative_to(root)}{suffix}"
+        )
     return errors
 
 
@@ -146,7 +193,10 @@ def project_exclusion_errors(root: Path) -> list[str]:
     return errors
 
 
-def validate(root: Path) -> list[str]:
+def validate(
+    root: Path,
+    approved_fingerprints: set[str] = APPROVED_AIMEE_AUTHORED_SOURCE_RECEIPT_SHA256,
+) -> list[str]:
     intake = root / "AssetSources"
     if not intake.is_dir():
         return ["AssetSources intake root is missing"]
@@ -163,7 +213,7 @@ def validate(root: Path) -> list[str]:
             errors.append("AssetSources/_templates does not match the reviewed scaffold")
     for child in sorted(intake.iterdir()):
         if child.is_dir() and child.name != "_templates":
-            errors.extend(validate_pack(root, child))
+            errors.extend(validate_pack(root, child, approved_fingerprints))
     return errors
 
 
@@ -206,26 +256,40 @@ def self_test() -> None:
         root = Path(directory)
         seed(root)
         receipt = write_valid_pack(root)
-        assert not validate(root)
-
         payload = json.loads(receipt.read_text())
+        fingerprint = canonical_receipt_fingerprint(payload)
+        assert fingerprint is not None
+
+        # A structurally valid self-assertion is still forged with the reviewed allowlist empty.
+        forged_errors = validate(root)
+        assert any("not explicitly approved" in error for error in forged_errors)
+        # Only the exact content-bound fingerprint closes the intake gate.
+        assert not validate(root, {fingerprint})
+
         payload["author"] = "generator"
         receipt.write_text(json.dumps(payload))
-        assert validate(root)
+        assert validate(root, {fingerprint})
         payload["author"] = "aimee-pepper"
         payload["provenanceClass"] = "procedural"
         receipt.write_text(json.dumps(payload))
-        assert validate(root)
+        assert validate(root, {fingerprint})
         payload["provenanceClass"] = "human-authored-editable-source"
         payload["runtimeAuthority"] = True
         receipt.write_text(json.dumps(payload))
-        assert validate(root)
+        assert validate(root, {fingerprint})
         payload["runtimeAuthority"] = False
         payload["sources"][0]["sourceFileSHA256"] = "b" * 64
         receipt.write_text(json.dumps(payload))
-        assert validate(root)
+        assert validate(root, {fingerprint})
+        payload["sources"][0]["sourceFileSHA256"] = file_sha256(
+            root / payload["sources"][0]["path"]
+        )
+        receipt.write_text(json.dumps(payload))
+        source = root / payload["sources"][0]["path"]
+        source.write_bytes(b"wrong-bytes-after-approval")
+        assert any("byte hash does not match" in error for error in validate(root, {fingerprint}))
         (root / "project.yml").write_text("resources:\n  - AssetSources\n")
-        assert validate(root)
+        assert validate(root, {fingerprint})
 
     with tempfile.TemporaryDirectory(prefix="bookbinder-asset-source-intake-") as directory:
         root = Path(directory)
@@ -260,4 +324,3 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
-

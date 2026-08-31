@@ -24,9 +24,12 @@ Existing files with ambiguous provenance must remain where they are until author
 ## Authority boundary
 
 This root is editable source intake, not a runtime resource, gameplay catalogue, approval record, or
-promotion mechanism. `project.yml` and the generated Xcode project must not package it. A valid
-receipt establishes only explicit Aimee authorship of the listed source bytes; runtime promotion
-still requires the separate content-bound provenance and approval gates.
+promotion mechanism. `project.yml` and the generated Xcode project must not package it. A receipt's
+author string and evidence hash do not prove authorship by themselves. The intake validator
+computes a canonical fingerprint over the semantic pack/source paths and exact source hashes, then
+requires that fingerprint in a deliberately empty reviewed allowlist. Only Aimee's later explicit
+approval may add the exact fingerprint. Even an allowlisted intake establishes only reviewed source
+authorship; runtime/final-art promotion remains a separate, empty approval gate.
 
 GameWiki may read entries whose receipt explicitly sets `gameWikiDisclosure` to `disclosed`, but
 that view is derived and read-only. It never becomes gameplay or source authority.
@@ -37,4 +40,3 @@ Run both checks after adding a pack:
 python3 Scripts/verify_asset_source_intake.py --check
 python3 Scripts/verify_repository_organization.py --check
 ```
-
