@@ -3,7 +3,7 @@ import { readFile } from "node:fs/promises";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { spawnSync } from "node:child_process";
-import { assertUniqueVisualRoutes, partitionVisualRecords, publicVisualRecord, visualRecordIdentity } from "./visual-assets.mjs";
+import { assertUniqueVisualRoutes, extractPNGReferences, partitionVisualRecords, publicVisualRecord, visualRecordIdentity, visualVariant } from "./visual-assets.mjs";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const dataPath = join(root, "generated/wiki-data.json");
@@ -198,13 +198,18 @@ assert(visualRecords.every(asset => asset.route === visualRecordIdentity({ famil
 assert(visualRecords.every(asset => !/--\d+(?:\/|$)/.test(asset.route) && !/[0-9a-f]{64}/.test(`${asset.route} ${asset.sourceRoute} ${asset.previewURL ?? ""}`)), "semantic navigation must never use order suffixes or hash names");
 assert(data.search.filter(item => item.type === "visualAssetRecord").length === visualRecords.length, "every disclosed visual record must have an individual search entry");
 assert(data.search.filter(item => item.type === "visualAssetRecord").every(item => !/[0-9a-f]{64}/.test(`${item.route} ${item.name} ${item.searchText}`)), "visual record search must exclude blob/hash paths");
-const reorderProbe = [
-  { familyID: "family", role: "runtime", semanticKey: "alpha", variant: "north" },
-  { familyID: "family", role: "reference", semanticKey: "beta", variant: "default" }
+const rawReorderManifest = outputs => ({ outputs });
+const rawReorderEntries = [
+  { id: "alpha", state: "known", asset: { file: "assets/alpha.png" } },
+  { id: "beta", state: "selected", asset: { file: "assets/beta.png" } }
 ];
-const routesFor = records => records.map(visualRecordIdentity).map(record => record.route).sort();
-assert(JSON.stringify(routesFor(reorderProbe)) === JSON.stringify(routesFor([...reorderProbe].reverse())), "visual routes must remain invariant under manifest reorder");
-assertUniqueVisualRoutes(routesFor(reorderProbe).map(route => ({ route, semanticKey: route })));
+const routesFromRawManifest = manifest => extractPNGReferences(manifest).map(record => visualRecordIdentity({ familyID: "reorder-probe", ...record }).route).sort();
+const forwardRawRoutes = routesFromRawManifest(rawReorderManifest(rawReorderEntries));
+const reversedRawRoutes = routesFromRawManifest(rawReorderManifest([...rawReorderEntries].reverse()));
+assert(JSON.stringify(forwardRawRoutes) === JSON.stringify(reversedRawRoutes), "visual routes must remain invariant when the raw manifest array is reordered before extraction");
+assert(forwardRawRoutes.every(route => !/outputs-\d+/.test(route)), "manifest ordinals must never become route or variant authority");
+assert(visualVariant({}, ["outputs", "27"]) === "default", "an array index must not synthesize a visual variant");
+assertUniqueVisualRoutes(forwardRawRoutes.map(route => ({ route, semanticKey: route })));
 let collisionRejected = false;
 try { assertUniqueVisualRoutes([{ route: "asset-record/a/runtime/b/default", semanticKey: "first" }, { route: "asset-record/a/runtime/b/default", semanticKey: "second" }]); } catch { collisionRejected = true; }
 assert(collisionRejected, "semantic route collisions must fail instead of acquiring order suffixes");
@@ -226,6 +231,26 @@ const sentinelSurfaces = {
 };
 const sentinelPublicJSON = JSON.stringify(sentinelSurfaces);
 for (const sentinel of [hiddenSentinel.semanticKey, hiddenSentinel.sourcePath, hiddenSentinel.description, hiddenSentinel.bytes]) assert(!sentinelPublicJSON.includes(sentinel), `hidden sentinel leaked into generated JSON, preview URLs, alt text, or search: ${sentinel}`);
+const realVocabularyTileManifest = {
+  lookups: {
+    vocabularyTiles: {
+      "tile/compound/blight/brush/known": {
+        kind: "compound", id: "blight", hand: "brush", state: "known",
+        asset: { file: "assets/NEVER_REVEAL_BLIGHT_BYTES.png", sha256: "NEVER_REVEAL_BLIGHT_HASH" }
+      }
+    }
+  }
+};
+const realVocabularyRecords = extractPNGReferences(realVocabularyTileManifest);
+assert(realVocabularyRecords.length === 1 && realVocabularyRecords[0].context.includes("lookups/vocabularyTiles/tile/compound/blight"), "disclosure test must traverse the real vocabularyTiles manifest shape");
+const hiddenVocabularyPartition = partitionVisualRecords(realVocabularyRecords, new Set(["compound:blight"]));
+assert(hiddenVocabularyPartition.disclosed.length === 0 && hiddenVocabularyPartition.withheldCounts["gameplay-disclosure"] === 1, "research-owned vocabulary tile must be withheld before path resolution");
+const writingVisualFamily = data.visualAssets.families.find(family => family.id === "writing-desk-production-pack-v1");
+const writingVisualSurfaces = JSON.stringify({
+  records: writingVisualFamily.assets.map(publicVisualRecord),
+  search: data.search.filter(item => item.type === "visualAssetRecord" && item.route.includes("writing-desk-production-pack-v1"))
+});
+assert(!/blight/i.test(writingVisualSurfaces) && !writingVisualSurfaces.includes("NEVER_REVEAL_BLIGHT"), "hidden Blight vocabulary must not reach generated records, routes, previews, alt sources, or search");
 assert(appSource.includes("data-asset-query") && appSource.includes("data-asset-role") && appSource.includes("Show more"), "large visual families need record search, grouping and pagination");
 assert(appSource.includes("function assetRecordDetail(") && appSource.includes("Semantic source route") && appSource.includes("Integrity metadata"), "record detail must lead with semantic identity and collapse physical integrity metadata");
 assert(data.visualAssets.families.reduce((sum, family) => sum + family.runtimeMirrorPaths.length, 0) === 6, "all six RuntimePacks mirrors must remain associated with their semantic families");

@@ -2,7 +2,7 @@ import { createHash } from "node:crypto";
 import { mkdir, readFile, readdir, writeFile } from "node:fs/promises";
 import { basename, dirname, join, relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
-import { assertUniqueVisualRoutes, partitionVisualRecords, visualRecordIdentity, visualVariant } from "./visual-assets.mjs";
+import { assertUniqueVisualRoutes, extractPNGReferences, partitionVisualRecords, visualRecordIdentity } from "./visual-assets.mjs";
 
 const wikiRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const repoRoot = resolve(wikiRoot, "..");
@@ -66,60 +66,6 @@ function familyIDFromManifestPath(path) {
   const runtimeIndex = parts.indexOf("RuntimePacks");
   if (runtimeIndex >= 0 && parts[runtimeIndex + 1]) return parts[runtimeIndex + 1];
   return basename(dirname(path));
-}
-
-function pngReferences(value, trail = [], records = [], inheritedDisclosed = true, inheritedSemanticIdentity = null) {
-  if (Array.isArray(value)) {
-    value.forEach((item, index) => pngReferences(item, [...trail, String(index)], records, inheritedDisclosed, inheritedSemanticIdentity));
-    return records;
-  }
-  if (!value || typeof value !== "object") return records;
-
-  const explicitlyHidden = value.identified === false || value.hidden === true || value.disclosed === false
-    || value.visibility === "hidden" || value.disclosure === false || value.disclosure === "hidden";
-  const disclosed = inheritedDisclosed && !explicitlyHidden;
-  const ownSemanticIdentity = value.stableKey ?? value.key ?? value.id ?? inheritedSemanticIdentity;
-
-  const pathCandidates = [
-    [value.path, null],
-    [value.file, null],
-    [value.assetPath, null],
-    [value.sourcePath, "source"],
-    [value.referencePath, "reference"],
-    [value.evidencePath, "evidence"]
-  ].filter(([candidate]) => typeof candidate === "string" && /\.png$/i.test(candidate));
-  for (const [rawPath, forcedRole] of new Map(pathCandidates.map(candidate => [`${candidate[0]}\0${candidate[1]}`, candidate])).values()) {
-    const assetsByKeyIndex = trail.indexOf("assetsByKey");
-    const inferredSemanticKey = trail.filter(part => !/^\d+$/.test(part)).join("/");
-    const fileSemanticKey = basename(rawPath, ".png");
-    const explicitSemanticKey = value.stableKey ?? value.key ?? value.id ?? (assetsByKeyIndex >= 0 ? trail[assetsByKeyIndex + 1] : null) ?? inheritedSemanticIdentity;
-    const semanticKey = explicitSemanticKey != null
-      ? (inferredSemanticKey && !inferredSemanticKey.endsWith(String(explicitSemanticKey)) ? `${inferredSemanticKey}/${explicitSemanticKey}` : explicitSemanticKey)
-      : (/^\d+$/.test(trail.at(-1) ?? "") && !/^[0-9a-f]{32,}$/i.test(fileSemanticKey) ? fileSemanticKey : inferredSemanticKey || "opaque-asset");
-    const context = trail.join("/").toLowerCase();
-    const contextTokens = trail.map(token => String(token).toLowerCase());
-    const role = forcedRole ?? (contextTokens.some(token => /^(source-?references?|references?)$/.test(token)) ? "reference"
-      : contextTokens.some(token => /^(evidence|proofs?|contact-?sheets?|review-?evidence)$/.test(token)) ? "evidence"
-      : /^(source|sources|editable-?sources?)$/.test(contextTokens[0] ?? "") ? "source"
-      : "runtime");
-    records.push({
-      semanticKey: String(semanticKey),
-      rawPath,
-      role,
-      variant: visualVariant(value, trail),
-      disclosed,
-      integrityIndexOnly: /^(assets|files|images|pngs)\/\d+$/i.test(trail.join("/")) && explicitSemanticKey == null,
-      context: trail.join("/"),
-      declaredSHA256: forcedRole === "source"
-        ? value.sourceSHA256 ?? value.sourceFileSHA256 ?? null
-        : value.fileSHA256 ?? value.sha256 ?? value.pngSHA256 ?? null,
-      decodedRGBASHA256: value.decodedRGBASHA256 ?? value.rgbaSHA256 ?? value.pixelSHA256 ?? null,
-      width: value.width ?? value.pixelWidth ?? null,
-      height: value.height ?? value.pixelHeight ?? null
-    });
-  }
-  for (const [key, child] of Object.entries(value)) pngReferences(child, [...trail, key], records, disclosed, ownSemanticIdentity);
-  return records;
 }
 
 const packPNGCache = new Map();
@@ -888,7 +834,7 @@ for (const familyID of Object.keys(manifestGroups).sort()) {
     return /approved/.test(status) && !/(unapproved|not.*approved)/.test(status);
   });
   const evidenceReceipts = receipts.filter(record => !approvalReceipts.includes(record));
-  const rawAssets = records.flatMap(record => pngReferences(record.manifest).map(asset => ({ ...asset, manifestPath: record.path })));
+  const rawAssets = records.flatMap(record => extractPNGReferences(record.manifest).map(asset => ({ ...asset, manifestPath: record.path })));
   const assets = [];
   const assetsByRoute = new Map();
   const contextPriority = context => context.startsWith("lookups/") || context.startsWith("parts/") || context.includes("assetsByKey/") ? 0
