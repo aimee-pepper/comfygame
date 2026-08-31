@@ -670,6 +670,12 @@ test('Economy guide keeps current listings, refinement, and recycling player-fac
   assert.match(economy, /item, quantity, price, and stock/);
   assert.match(economy, /Material sales use that reserve/);
   assert.match(economy, /Raw Essence and spendable Essence are distinct/);
+  assert.match(economy, /Current material trade bands/);
+  assert.match(economy, /Trade bands describe the current material catalogue/);
+  assert.match(economy, /Keep Essence forms distinct/);
+  assert.match(economy, /Reality currency and is not traded/);
+  assert.match(economy, /Keep the exact holding/);
+  assert.match(economy, /\/systems\/inventory-custody/);
   assert.match(economy, /authored material yield/);
   assert.match(economy, /current holdings stay where they are/);
   assert.match(economy, /\/services\/trading-post/);
