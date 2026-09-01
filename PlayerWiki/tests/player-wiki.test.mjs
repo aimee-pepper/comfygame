@@ -329,6 +329,25 @@ test('Recycler directory keeps authored salvage profiles separate from current p
   assert.match(sync, /salvageProfileID/);
 });
 
+test('Recycler first use keeps Noll, the 15-Essence bench, empty state, exact preview, and destructive boundary distinct', async () => {
+  const [directory, service, building, journey] = await Promise.all([
+    'app/recycling/page.tsx',
+    'app/services/[slug]/page.tsx',
+    'app/buildings/[slug]/page.tsx',
+    'lib/recycler-first-use.ts',
+  ].map(read));
+  for (const stableID of ['recycler', 'noll']) assert.match(journey, new RegExp(stableID));
+  assert.match(journey, /15 Essence/);
+  assert.match(journey, /No gear to dismantle/);
+  assert.match(journey, /Dismantle without recovery/);
+  assert.match(journey, /Field Separation Kit remains absent/);
+  assert.match(journey, /stale, invalid, busy, or save-failed recovery keeps the preview open/);
+  for (const source of [directory, service, building]) assert.match(source, /recyclerFirstUse/);
+  assert.match(directory, /Noll’s first Recycler/);
+  assert.match(service, /First use with Noll/);
+  assert.match(building, /Build the Recycler with Noll/);
+});
+
 test('economy references are reachable from current player tasks without claiming rotating transactions are permanent', async () => {
   const sources = await Promise.all([
     'app/systems/economy-exchange/page.tsx',
