@@ -199,6 +199,25 @@ test('conditions reference separates the four encounter afflictions from current
   assert.match(detail, /\/items\/\$\{item\.slug\}/);
 });
 
+test('technique reference gives each current technique and Gambit component a stable player route', async () => {
+  await access(path.join(root, 'app/techniques/page.tsx'));
+  await access(path.join(root, 'app/techniques/[slug]/page.tsx'));
+  const reference = await read('lib/technique-reference.ts');
+  const directory = await read('app/techniques/page.tsx');
+  const detail = await read('app/techniques/[slug]/page.tsx');
+  const snapshot = JSON.parse(await read('data/player-content.json'));
+  assert.match(reference, /technique-\$\{slugify\(technique\.name\)\}/);
+  assert.match(reference, /gambit-\$\{component\.kind\}/);
+  assert.match(reference, /There is no separate technique currency/);
+  assert.match(reference, /the next enabled rule can be considered/);
+  assert.match(directory, /Techniques and Gambits/);
+  assert.match(directory, /Gambit action/);
+  assert.match(detail, /Source or grant/);
+  assert.match(detail, /Costs, cooldowns, and limits/);
+  assert.equal(snapshot.combatTechniques.length, 25);
+  assert.equal(snapshot.gambitComponents.length, 27);
+});
+
 test('equipment routes retain slot, recipe, frozen-piece and custody guidance', async () => {
   const index = await read('app/equipment/page.tsx');
   const detail = await read('app/equipment/[slug]/page.tsx');
