@@ -29,6 +29,12 @@ const resourceSource = JSON.parse(
     'utf8',
   ),
 );
+const itemSource = JSON.parse(
+  await readFile(
+    path.join(repositoryRoot, 'Sources', 'Content', 'Data', 'items.json'),
+    'utf8',
+  ),
+);
 const resourceConsumerAuthoritySource = await readFile(
   path.join(repositoryRoot, 'docs', 'resource-consumer-authority-map-current.md'),
   'utf8',
@@ -129,6 +135,9 @@ const conditionLabel = (condition) => {
 };
 const resourceDefinitionByID = new Map(
   resourceSource.resources.map((resource) => [resource.id, resource]),
+);
+const itemDefinitionByID = new Map(
+  itemSource.items.map((item) => [item.id, item]),
 );
 const implementedResourceConsumerTable = resourceConsumerAuthoritySource
   .split('## Complete resource-to-consumer map — IMPLEMENTED')[1]
@@ -462,6 +471,7 @@ for (const resource of source.resources) {
 
 const items = [];
 for (const item of source.items) {
+  const definition = itemDefinitionByID.get(item.id) ?? {};
   const asset =
     runtimeAsset('exploration-loose-items-v1', `catalogue-item/${item.id}`) ??
     runtimeAsset(
@@ -480,6 +490,12 @@ for (const item of source.items) {
     consumable: item.consumable,
     tradingPostDisposition: item.tradingPostDisposition,
     recyclerDisposition: item.recyclerDisposition,
+    merchantStockAccess: definition.consumableMerchantStockAccess ?? null,
+    ordinaryMerchantGear: Boolean(
+      definition.gear &&
+      definition.gearCatalogueDisposition?.classification === 'ordinaryFound' &&
+      !definition.gear.breaks,
+    ),
     assetURL: await publishAsset(asset, 'items', safeFileName(item.id)),
   });
 }

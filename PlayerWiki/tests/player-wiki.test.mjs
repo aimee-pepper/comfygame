@@ -256,6 +256,23 @@ test('People directory keeps campaign order, meeting context, and current Villag
   assert.match(directory, /diary-pages/);
 });
 
+test('Trading directory distinguishes rotating offer pools from durable player routes', async () => {
+  await access(path.join(root, 'app/trading/page.tsx'));
+  const directory = await read('app/trading/page.tsx');
+  const reference = await read('lib/trading-reference.ts');
+  const sync = await read('scripts/sync-content.mjs');
+  assert.match(directory, /no durable player-facing listing identity/);
+  assert.match(directory, /Current resource offer pools/);
+  assert.match(directory, /Known consumables that may enter the pool/);
+  assert.match(directory, /Ordinary gear that may enter the pool/);
+  assert.match(directory, /Cancel, refusal, and stock changes/);
+  assert.match(reference, /buyableResourceBands/);
+  assert.match(reference, /merchantConsumables/);
+  assert.match(reference, /ordinaryMerchantGear/);
+  assert.match(sync, /ordinaryMerchantGear/);
+  assert.match(sync, /merchantStockAccess/);
+});
+
 test('complete people records are discoverable through player-facing Library, site, glossary, search, and navigation routes', async () => {
   const [search, glossary, knowledge, service, place, sites, frame] = await Promise.all([
     'app/search/page.tsx',

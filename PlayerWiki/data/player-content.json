@@ -810,6 +810,8 @@
       "consumable": null,
       "tradingPostDisposition": "protected",
       "recyclerDisposition": "notGear",
+      "merchantStockAccess": null,
+      "ordinaryMerchantGear": false,
       "assetURL": "/game-assets/items/essence_crystal.png"
     },
     {
@@ -824,6 +826,8 @@
       "consumable": null,
       "tradingPostDisposition": "protected",
       "recyclerDisposition": "notGear",
+      "merchantStockAccess": null,
+      "ordinaryMerchantGear": false,
       "assetURL": "/game-assets/items/heat_core.png"
     },
     {
@@ -838,6 +842,8 @@
       "consumable": null,
       "tradingPostDisposition": "protected",
       "recyclerDisposition": "notGear",
+      "merchantStockAccess": null,
+      "ordinaryMerchantGear": false,
       "assetURL": "/game-assets/items/caustic_core.png"
     },
     {
@@ -852,6 +858,8 @@
       "consumable": null,
       "tradingPostDisposition": "protected",
       "recyclerDisposition": "notGear",
+      "merchantStockAccess": null,
+      "ordinaryMerchantGear": false,
       "assetURL": "/game-assets/items/light_core.png"
     },
     {
@@ -866,6 +874,8 @@
       "consumable": null,
       "tradingPostDisposition": "protected",
       "recyclerDisposition": "protected",
+      "merchantStockAccess": null,
+      "ordinaryMerchantGear": false,
       "assetURL": "/game-assets/items/conduit_fixture.png"
     },
     {
@@ -880,6 +890,8 @@
       "consumable": null,
       "tradingPostDisposition": "sellable",
       "recyclerDisposition": "notGear",
+      "merchantStockAccess": null,
+      "ordinaryMerchantGear": false,
       "assetURL": "/game-assets/items/curio_humming_shard.png"
     },
     {
@@ -894,6 +906,8 @@
       "consumable": null,
       "tradingPostDisposition": "sellable",
       "recyclerDisposition": "notGear",
+      "merchantStockAccess": null,
+      "ordinaryMerchantGear": false,
       "assetURL": "/game-assets/items/curio_bound_knot.png"
     },
     {
@@ -912,6 +926,8 @@
       },
       "tradingPostDisposition": "sellable",
       "recyclerDisposition": "notGear",
+      "merchantStockAccess": null,
+      "ordinaryMerchantGear": false,
       "assetURL": "/game-assets/items/salve_lesser.png"
     },
     {
@@ -930,6 +946,8 @@
       },
       "tradingPostDisposition": "sellable",
       "recyclerDisposition": "notGear",
+      "merchantStockAccess": null,
+      "ordinaryMerchantGear": false,
       "assetURL": "/game-assets/items/salve.png"
     },
     {
@@ -948,6 +966,8 @@
       },
       "tradingPostDisposition": "sellable",
       "recyclerDisposition": "notGear",
+      "merchantStockAccess": null,
+      "ordinaryMerchantGear": false,
       "assetURL": "/game-assets/items/salve_greater.png"
     },
     {
@@ -966,6 +986,8 @@
       },
       "tradingPostDisposition": "sellable",
       "recyclerDisposition": "notGear",
+      "merchantStockAccess": null,
+      "ordinaryMerchantGear": false,
       "assetURL": "/game-assets/items/draught_clearing.png"
     },
     {
@@ -984,6 +1006,8 @@
       },
       "tradingPostDisposition": "sellable",
       "recyclerDisposition": "notGear",
+      "merchantStockAccess": null,
+      "ordinaryMerchantGear": false,
       "assetURL": "/game-assets/items/draught_quenching.png"
     },
     {
@@ -1002,6 +1026,8 @@
       },
       "tradingPostDisposition": "sellable",
       "recyclerDisposition": "notGear",
+      "merchantStockAccess": null,
+      "ordinaryMerchantGear": false,
       "assetURL": "/game-assets/items/antidote_broad.png"
     },
     {
@@ -1020,6 +1046,8 @@
       },
       "tradingPostDisposition": "sellable",
       "recyclerDisposition": "notGear",
+      "merchantStockAccess": null,
+      "ordinaryMerchantGear": false,
       "assetURL": "/game-assets/items/stonebark_tonic.png"
     },
     {
@@ -1038,6 +1066,8 @@
       },
       "tradingPostDisposition": "sellable",
       "recyclerDisposition": "notGear",
+      "merchantStockAccess": null,
+      "ordinaryMerchantGear": false,
       "assetURL": "/game-assets/items/venom.png"
     },
     {
@@ -1056,6 +1086,8 @@
       },
       "tradingPostDisposition": "sellable",
       "recyclerDisposition": "notGear",
+      "merchantStockAccess": null,
+      "ordinaryMerchantGear": false,
       "assetURL": "/game-assets/items/firebrand.png"
     },
     {
@@ -1074,6 +1106,8 @@
       },
       "tradingPostDisposition": "sellable",
       "recyclerDisposition": "notGear",
+      "merchantStockAccess": null,
+      "ordinaryMerchantGear": false,
       "assetURL": "/game-assets/items/briar_oil.png"
     },
     {
@@ -1092,6 +1126,8 @@
       },
       "tradingPostDisposition": "sellable",
       "recyclerDisposition": "notGear",
+      "merchantStockAccess": null,
+      "ordinaryMerchantGear": false,
       "assetURL": "/game-assets/items/flashsalt.png"
     },
     {
@@ -1110,6 +1146,8 @@
       },
       "tradingPostDisposition": "sellable",
       "recyclerDisposition": "notGear",
+      "merchantStockAccess": null,
+      "ordinaryMerchantGear": false,
       "assetURL": "/game-assets/items/solvent.png"
     },
     {
@@ -1128,6 +1166,8 @@
       },
       "tradingPostDisposition": "sellable",
       "recyclerDisposition": "notGear",
+      "merchantStockAccess": null,
+      "ordinaryMerchantGear": false,
       "assetURL": "/game-assets/items/lure.png"
     },
     {
@@ -1146,6 +1186,8 @@
       },
       "tradingPostDisposition": "sellable",
       "recyclerDisposition": "notGear",
+      "merchantStockAccess": null,
+      "ordinaryMerchantGear": false,
       "assetURL": "/game-assets/items/scent_mask.png"
     },
     {
@@ -1164,6 +1206,8 @@
       },
       "tradingPostDisposition": "sellable",
       "recyclerDisposition": "notGear",
+      "merchantStockAccess": "independent",
+      "ordinaryMerchantGear": false,
       "assetURL": null
     },
     {
@@ -1182,6 +1226,8 @@
       },
       "tradingPostDisposition": "sellable",
       "recyclerDisposition": "notGear",
+      "merchantStockAccess": null,
+      "ordinaryMerchantGear": false,
       "assetURL": "/game-assets/items/stillwater.png"
     },
     {
@@ -1200,6 +1246,8 @@
       },
       "tradingPostDisposition": "sellable",
       "recyclerDisposition": "notGear",
+      "merchantStockAccess": null,
+      "ordinaryMerchantGear": false,
       "assetURL": "/game-assets/items/waystone.png"
     },
     {
@@ -1218,6 +1266,8 @@
       },
       "tradingPostDisposition": "sellable",
       "recyclerDisposition": "notGear",
+      "merchantStockAccess": null,
+      "ordinaryMerchantGear": false,
       "assetURL": "/game-assets/items/torch.png"
     },
     {
@@ -1236,6 +1286,8 @@
       },
       "tradingPostDisposition": "sellable",
       "recyclerDisposition": "notGear",
+      "merchantStockAccess": null,
+      "ordinaryMerchantGear": false,
       "assetURL": "/game-assets/items/farsight_draught.png"
     },
     {
@@ -1250,6 +1302,8 @@
       "consumable": null,
       "tradingPostDisposition": "protected",
       "recyclerDisposition": "notGear",
+      "merchantStockAccess": null,
+      "ordinaryMerchantGear": false,
       "assetURL": "/game-assets/items/cache_key.png"
     },
     {
@@ -1264,6 +1318,8 @@
       "consumable": null,
       "tradingPostDisposition": "protected",
       "recyclerDisposition": "notGear",
+      "merchantStockAccess": null,
+      "ordinaryMerchantGear": false,
       "assetURL": "/game-assets/items/anchor_frame.png"
     },
     {
@@ -1283,6 +1339,8 @@
       "consumable": null,
       "tradingPostDisposition": "sellable",
       "recyclerDisposition": "recyclable",
+      "merchantStockAccess": null,
+      "ordinaryMerchantGear": true,
       "assetURL": "/game-assets/items/blade_chipped.png"
     },
     {
@@ -1302,6 +1360,8 @@
       "consumable": null,
       "tradingPostDisposition": "sellable",
       "recyclerDisposition": "recyclable",
+      "merchantStockAccess": null,
+      "ordinaryMerchantGear": true,
       "assetURL": "/game-assets/items/blade_keen.png"
     },
     {
@@ -1321,6 +1381,8 @@
       "consumable": null,
       "tradingPostDisposition": "sellable",
       "recyclerDisposition": "recyclable",
+      "merchantStockAccess": null,
+      "ordinaryMerchantGear": true,
       "assetURL": "/game-assets/items/ripping_hook.png"
     },
     {
@@ -1341,6 +1403,8 @@
       "consumable": null,
       "tradingPostDisposition": "sellable",
       "recyclerDisposition": "recyclable",
+      "merchantStockAccess": null,
+      "ordinaryMerchantGear": true,
       "assetURL": "/game-assets/items/the_long_grievance.png"
     },
     {
@@ -1360,6 +1424,8 @@
       "consumable": null,
       "tradingPostDisposition": "sellable",
       "recyclerDisposition": "recyclable",
+      "merchantStockAccess": null,
+      "ordinaryMerchantGear": true,
       "assetURL": "/game-assets/items/bone_awl.png"
     },
     {
@@ -1379,6 +1445,8 @@
       "consumable": null,
       "tradingPostDisposition": "sellable",
       "recyclerDisposition": "recyclable",
+      "merchantStockAccess": null,
+      "ordinaryMerchantGear": true,
       "assetURL": "/game-assets/items/raking_edge.png"
     },
     {
@@ -1398,6 +1466,8 @@
       "consumable": null,
       "tradingPostDisposition": "sellable",
       "recyclerDisposition": "recyclable",
+      "merchantStockAccess": null,
+      "ordinaryMerchantGear": true,
       "assetURL": "/game-assets/items/blade_binders.png"
     },
     {
@@ -1418,6 +1488,8 @@
       "consumable": null,
       "tradingPostDisposition": "sellable",
       "recyclerDisposition": "recyclable",
+      "merchantStockAccess": null,
+      "ordinaryMerchantGear": true,
       "assetURL": "/game-assets/items/hairsplitter.png"
     },
     {
@@ -1437,6 +1509,8 @@
       "consumable": null,
       "tradingPostDisposition": "sellable",
       "recyclerDisposition": "recyclable",
+      "merchantStockAccess": null,
+      "ordinaryMerchantGear": true,
       "assetURL": "/game-assets/items/field_maul.png"
     },
     {
@@ -1456,6 +1530,8 @@
       "consumable": null,
       "tradingPostDisposition": "sellable",
       "recyclerDisposition": "recyclable",
+      "merchantStockAccess": null,
+      "ordinaryMerchantGear": true,
       "assetURL": "/game-assets/items/banded_mace.png"
     },
     {
@@ -1475,6 +1551,8 @@
       "consumable": null,
       "tradingPostDisposition": "sellable",
       "recyclerDisposition": "recyclable",
+      "merchantStockAccess": null,
+      "ordinaryMerchantGear": true,
       "assetURL": "/game-assets/items/anvilfall.png"
     },
     {
@@ -1495,6 +1573,8 @@
       "consumable": null,
       "tradingPostDisposition": "sellable",
       "recyclerDisposition": "recyclable",
+      "merchantStockAccess": null,
+      "ordinaryMerchantGear": true,
       "assetURL": "/game-assets/items/the_settled_argument.png"
     },
     {
@@ -1514,6 +1594,8 @@
       "consumable": null,
       "tradingPostDisposition": "sellable",
       "recyclerDisposition": "recyclable",
+      "merchantStockAccess": null,
+      "ordinaryMerchantGear": true,
       "assetURL": "/game-assets/items/long_pick.png"
     },
     {
@@ -1533,6 +1615,8 @@
       "consumable": null,
       "tradingPostDisposition": "sellable",
       "recyclerDisposition": "recyclable",
+      "merchantStockAccess": null,
+      "ordinaryMerchantGear": true,
       "assetURL": "/game-assets/items/warded_spear.png"
     },
     {
@@ -1552,6 +1636,8 @@
       "consumable": null,
       "tradingPostDisposition": "sellable",
       "recyclerDisposition": "recyclable",
+      "merchantStockAccess": null,
+      "ordinaryMerchantGear": true,
       "assetURL": "/game-assets/items/parting_needle.png"
     },
     {
@@ -1572,6 +1658,8 @@
       "consumable": null,
       "tradingPostDisposition": "sellable",
       "recyclerDisposition": "recyclable",
+      "merchantStockAccess": null,
+      "ordinaryMerchantGear": true,
       "assetURL": "/game-assets/items/the_kept_distance.png"
     },
     {
@@ -1589,6 +1677,8 @@
       "consumable": null,
       "tradingPostDisposition": "sellable",
       "recyclerDisposition": "recyclable",
+      "merchantStockAccess": null,
+      "ordinaryMerchantGear": true,
       "assetURL": "/game-assets/items/split_board.png"
     },
     {
@@ -1606,6 +1696,8 @@
       "consumable": null,
       "tradingPostDisposition": "sellable",
       "recyclerDisposition": "recyclable",
+      "merchantStockAccess": null,
+      "ordinaryMerchantGear": true,
       "assetURL": "/game-assets/items/banded_buckler.png"
     },
     {
@@ -1623,6 +1715,8 @@
       "consumable": null,
       "tradingPostDisposition": "sellable",
       "recyclerDisposition": "recyclable",
+      "merchantStockAccess": null,
+      "ordinaryMerchantGear": true,
       "assetURL": "/game-assets/items/tower_guard.png"
     },
     {
@@ -1640,6 +1734,8 @@
       "consumable": null,
       "tradingPostDisposition": "sellable",
       "recyclerDisposition": "recyclable",
+      "merchantStockAccess": null,
+      "ordinaryMerchantGear": true,
       "assetURL": "/game-assets/items/the_unarguable.png"
     },
     {
@@ -1658,6 +1754,8 @@
       "consumable": null,
       "tradingPostDisposition": "sellable",
       "recyclerDisposition": "recyclable",
+      "merchantStockAccess": null,
+      "ordinaryMerchantGear": true,
       "assetURL": "/game-assets/items/padded_cap.png"
     },
     {
@@ -1675,6 +1773,8 @@
       "consumable": null,
       "tradingPostDisposition": "sellable",
       "recyclerDisposition": "recyclable",
+      "merchantStockAccess": null,
+      "ordinaryMerchantGear": true,
       "assetURL": "/game-assets/items/ridged_helm.png"
     },
     {
@@ -1692,6 +1792,8 @@
       "consumable": null,
       "tradingPostDisposition": "sellable",
       "recyclerDisposition": "recyclable",
+      "merchantStockAccess": null,
+      "ordinaryMerchantGear": true,
       "assetURL": "/game-assets/items/visored_casque.png"
     },
     {
@@ -1709,6 +1811,8 @@
       "consumable": null,
       "tradingPostDisposition": "sellable",
       "recyclerDisposition": "recyclable",
+      "merchantStockAccess": null,
+      "ordinaryMerchantGear": true,
       "assetURL": "/game-assets/items/crown_of_quiet.png"
     },
     {
@@ -1727,6 +1831,8 @@
       "consumable": null,
       "tradingPostDisposition": "sellable",
       "recyclerDisposition": "recyclable",
+      "merchantStockAccess": null,
+      "ordinaryMerchantGear": true,
       "assetURL": "/game-assets/items/guard_padded.png"
     },
     {
@@ -1744,6 +1850,8 @@
       "consumable": null,
       "tradingPostDisposition": "sellable",
       "recyclerDisposition": "recyclable",
+      "merchantStockAccess": null,
+      "ordinaryMerchantGear": true,
       "assetURL": "/game-assets/items/guard_banded.png"
     },
     {
@@ -1761,6 +1869,8 @@
       "consumable": null,
       "tradingPostDisposition": "sellable",
       "recyclerDisposition": "recyclable",
+      "merchantStockAccess": null,
+      "ordinaryMerchantGear": true,
       "assetURL": "/game-assets/items/guard_vault.png"
     },
     {
@@ -1778,6 +1888,8 @@
       "consumable": null,
       "tradingPostDisposition": "sellable",
       "recyclerDisposition": "recyclable",
+      "merchantStockAccess": null,
+      "ordinaryMerchantGear": true,
       "assetURL": "/game-assets/items/the_standing_wall.png"
     },
     {
@@ -1796,6 +1908,8 @@
       "consumable": null,
       "tradingPostDisposition": "sellable",
       "recyclerDisposition": "recyclable",
+      "merchantStockAccess": null,
+      "ordinaryMerchantGear": true,
       "assetURL": "/game-assets/items/wrapped_hands.png"
     },
     {
@@ -1813,6 +1927,8 @@
       "consumable": null,
       "tradingPostDisposition": "sellable",
       "recyclerDisposition": "recyclable",
+      "merchantStockAccess": null,
+      "ordinaryMerchantGear": true,
       "assetURL": "/game-assets/items/studded_gloves.png"
     },
     {
@@ -1830,6 +1946,8 @@
       "consumable": null,
       "tradingPostDisposition": "sellable",
       "recyclerDisposition": "recyclable",
+      "merchantStockAccess": null,
+      "ordinaryMerchantGear": true,
       "assetURL": "/game-assets/items/gauntlets_of_hold.png"
     },
     {
@@ -1847,6 +1965,8 @@
       "consumable": null,
       "tradingPostDisposition": "sellable",
       "recyclerDisposition": "recyclable",
+      "merchantStockAccess": null,
+      "ordinaryMerchantGear": true,
       "assetURL": "/game-assets/items/the_sure_hands.png"
     },
     {
@@ -1864,6 +1984,8 @@
       "consumable": null,
       "tradingPostDisposition": "sellable",
       "recyclerDisposition": "recyclable",
+      "merchantStockAccess": null,
+      "ordinaryMerchantGear": true,
       "assetURL": "/game-assets/items/worn_boots.png"
     },
     {
@@ -1881,6 +2003,8 @@
       "consumable": null,
       "tradingPostDisposition": "sellable",
       "recyclerDisposition": "recyclable",
+      "merchantStockAccess": null,
+      "ordinaryMerchantGear": true,
       "assetURL": "/game-assets/items/shod_boots.png"
     },
     {
@@ -1898,6 +2022,8 @@
       "consumable": null,
       "tradingPostDisposition": "sellable",
       "recyclerDisposition": "recyclable",
+      "merchantStockAccess": null,
+      "ordinaryMerchantGear": true,
       "assetURL": "/game-assets/items/longstriders.png"
     },
     {
@@ -1915,6 +2041,8 @@
       "consumable": null,
       "tradingPostDisposition": "sellable",
       "recyclerDisposition": "recyclable",
+      "merchantStockAccess": null,
+      "ordinaryMerchantGear": true,
       "assetURL": "/game-assets/items/the_unhurried.png"
     },
     {
@@ -1932,6 +2060,8 @@
       "consumable": null,
       "tradingPostDisposition": "sellable",
       "recyclerDisposition": "recyclable",
+      "merchantStockAccess": null,
+      "ordinaryMerchantGear": true,
       "assetURL": "/game-assets/items/bent_pick.png"
     },
     {
@@ -1949,6 +2079,8 @@
       "consumable": null,
       "tradingPostDisposition": "sellable",
       "recyclerDisposition": "recyclable",
+      "merchantStockAccess": null,
+      "ordinaryMerchantGear": true,
       "assetURL": "/game-assets/items/balanced_pick.png"
     },
     {
@@ -1966,6 +2098,8 @@
       "consumable": null,
       "tradingPostDisposition": "sellable",
       "recyclerDisposition": "recyclable",
+      "merchantStockAccess": null,
+      "ordinaryMerchantGear": true,
       "assetURL": "/game-assets/items/corebreaker.png"
     },
     {
@@ -1983,6 +2117,8 @@
       "consumable": null,
       "tradingPostDisposition": "sellable",
       "recyclerDisposition": "recyclable",
+      "merchantStockAccess": null,
+      "ordinaryMerchantGear": true,
       "assetURL": "/game-assets/items/the_willing_edge.png"
     },
     {
@@ -2000,6 +2136,8 @@
       "consumable": null,
       "tradingPostDisposition": "sellable",
       "recyclerDisposition": "recyclable",
+      "merchantStockAccess": null,
+      "ordinaryMerchantGear": true,
       "assetURL": "/game-assets/items/pressed_leaf.png"
     },
     {
@@ -2017,6 +2155,8 @@
       "consumable": null,
       "tradingPostDisposition": "sellable",
       "recyclerDisposition": "recyclable",
+      "merchantStockAccess": null,
+      "ordinaryMerchantGear": true,
       "assetURL": "/game-assets/items/cold_compass.png"
     },
     {
@@ -2034,6 +2174,8 @@
       "consumable": null,
       "tradingPostDisposition": "sellable",
       "recyclerDisposition": "recyclable",
+      "merchantStockAccess": null,
+      "ordinaryMerchantGear": true,
       "assetURL": "/game-assets/items/someones_ring.png"
     },
     {
@@ -2051,6 +2193,8 @@
       "consumable": null,
       "tradingPostDisposition": "sellable",
       "recyclerDisposition": "recyclable",
+      "merchantStockAccess": null,
+      "ordinaryMerchantGear": true,
       "assetURL": "/game-assets/items/the_first_page.png"
     },
     {
@@ -2071,6 +2215,8 @@
       "consumable": null,
       "tradingPostDisposition": "protected",
       "recyclerDisposition": "protected",
+      "merchantStockAccess": null,
+      "ordinaryMerchantGear": false,
       "assetURL": "/game-assets/items/two_natured_blade.png"
     },
     {
@@ -2091,6 +2237,8 @@
       "consumable": null,
       "tradingPostDisposition": "protected",
       "recyclerDisposition": "protected",
+      "merchantStockAccess": null,
+      "ordinaryMerchantGear": false,
       "assetURL": "/game-assets/items/long_fang.png"
     },
     {
@@ -2111,6 +2259,8 @@
       "consumable": null,
       "tradingPostDisposition": "protected",
       "recyclerDisposition": "protected",
+      "merchantStockAccess": null,
+      "ordinaryMerchantGear": false,
       "assetURL": "/game-assets/items/ranked_spear.png"
     },
     {
@@ -2132,6 +2282,8 @@
       "consumable": null,
       "tradingPostDisposition": "protected",
       "recyclerDisposition": "protected",
+      "merchantStockAccess": null,
+      "ordinaryMerchantGear": false,
       "assetURL": "/game-assets/items/rimed_edge.png"
     },
     {
@@ -2152,6 +2304,8 @@
       "consumable": null,
       "tradingPostDisposition": "protected",
       "recyclerDisposition": "protected",
+      "merchantStockAccess": null,
+      "ordinaryMerchantGear": false,
       "assetURL": "/game-assets/items/living_hook.png"
     },
     {
@@ -2172,6 +2326,8 @@
       "consumable": null,
       "tradingPostDisposition": "protected",
       "recyclerDisposition": "protected",
+      "merchantStockAccess": null,
+      "ordinaryMerchantGear": false,
       "assetURL": "/game-assets/items/quiet_knife.png"
     },
     {
@@ -2192,6 +2348,8 @@
       "consumable": null,
       "tradingPostDisposition": "protected",
       "recyclerDisposition": "protected",
+      "merchantStockAccess": null,
+      "ordinaryMerchantGear": false,
       "assetURL": "/game-assets/items/bloodletter.png"
     },
     {
@@ -2213,6 +2371,8 @@
       "consumable": null,
       "tradingPostDisposition": "protected",
       "recyclerDisposition": "protected",
+      "merchantStockAccess": null,
+      "ordinaryMerchantGear": false,
       "assetURL": "/game-assets/items/warded_haft.png"
     },
     {
@@ -2234,6 +2394,8 @@
       "consumable": null,
       "tradingPostDisposition": "sellable",
       "recyclerDisposition": "recyclable",
+      "merchantStockAccess": null,
+      "ordinaryMerchantGear": false,
       "assetURL": "/game-assets/items/rubble_sling.png"
     },
     {
@@ -2253,6 +2415,8 @@
       "consumable": null,
       "tradingPostDisposition": "sellable",
       "recyclerDisposition": "recyclable",
+      "merchantStockAccess": null,
+      "ordinaryMerchantGear": false,
       "assetURL": "/game-assets/items/fired_clay_guard.png"
     },
     {
@@ -2274,6 +2438,8 @@
       "consumable": null,
       "tradingPostDisposition": "sellable",
       "recyclerDisposition": "recyclable",
+      "merchantStockAccess": null,
+      "ordinaryMerchantGear": false,
       "assetURL": "/game-assets/items/ironwork_blade.png"
     },
     {
@@ -2293,6 +2459,8 @@
       "consumable": null,
       "tradingPostDisposition": "sellable",
       "recyclerDisposition": "recyclable",
+      "merchantStockAccess": null,
+      "ordinaryMerchantGear": false,
       "assetURL": "/game-assets/items/copper_buckler.png"
     },
     {
@@ -2312,6 +2480,8 @@
       "consumable": null,
       "tradingPostDisposition": "sellable",
       "recyclerDisposition": "recyclable",
+      "merchantStockAccess": null,
+      "ordinaryMerchantGear": false,
       "assetURL": "/game-assets/items/silvered_helm.png"
     },
     {
@@ -2331,6 +2501,8 @@
       "consumable": null,
       "tradingPostDisposition": "sellable",
       "recyclerDisposition": "recyclable",
+      "merchantStockAccess": null,
+      "ordinaryMerchantGear": false,
       "assetURL": "/game-assets/items/golden_keepsake.png"
     },
     {
@@ -2352,6 +2524,8 @@
       "consumable": null,
       "tradingPostDisposition": "sellable",
       "recyclerDisposition": "recyclable",
+      "merchantStockAccess": null,
+      "ordinaryMerchantGear": false,
       "assetURL": "/game-assets/items/quartz_point.png"
     },
     {
@@ -2373,6 +2547,8 @@
       "consumable": null,
       "tradingPostDisposition": "sellable",
       "recyclerDisposition": "recyclable",
+      "merchantStockAccess": null,
+      "ordinaryMerchantGear": false,
       "assetURL": "/game-assets/items/obsidian_edge.png"
     },
     {
@@ -2392,6 +2568,8 @@
       "consumable": null,
       "tradingPostDisposition": "sellable",
       "recyclerDisposition": "recyclable",
+      "merchantStockAccess": null,
+      "ordinaryMerchantGear": false,
       "assetURL": "/game-assets/items/saltward_pendant.png"
     },
     {
@@ -2414,6 +2592,8 @@
       "consumable": null,
       "tradingPostDisposition": "sellable",
       "recyclerDisposition": "recyclable",
+      "merchantStockAccess": null,
+      "ordinaryMerchantGear": false,
       "assetURL": "/game-assets/items/sulfurous_maul.png"
     },
     {
@@ -2433,6 +2613,8 @@
       "consumable": null,
       "tradingPostDisposition": "sellable",
       "recyclerDisposition": "recyclable",
+      "merchantStockAccess": null,
+      "ordinaryMerchantGear": false,
       "assetURL": "/game-assets/items/mercurial_gloves.png"
     },
     {
@@ -2452,6 +2634,8 @@
       "consumable": null,
       "tradingPostDisposition": "protected",
       "recyclerDisposition": "recyclable",
+      "merchantStockAccess": null,
+      "ordinaryMerchantGear": false,
       "assetURL": "/game-assets/items/adamant_cuirass.png"
     },
     {
@@ -2473,6 +2657,8 @@
       "consumable": null,
       "tradingPostDisposition": "sellable",
       "recyclerDisposition": "recyclable",
+      "merchantStockAccess": null,
+      "ordinaryMerchantGear": false,
       "assetURL": "/game-assets/items/woven_sling.png"
     },
     {
@@ -2494,6 +2680,8 @@
       "consumable": null,
       "tradingPostDisposition": "sellable",
       "recyclerDisposition": "recyclable",
+      "merchantStockAccess": null,
+      "ordinaryMerchantGear": false,
       "assetURL": "/game-assets/items/timber_longbow.png"
     },
     {
@@ -2514,6 +2702,8 @@
       "consumable": null,
       "tradingPostDisposition": "sellable",
       "recyclerDisposition": "recyclable",
+      "merchantStockAccess": null,
+      "ordinaryMerchantGear": false,
       "assetURL": "/game-assets/items/pressed_pulp_cap.png"
     },
     {
@@ -2534,6 +2724,8 @@
       "consumable": null,
       "tradingPostDisposition": "sellable",
       "recyclerDisposition": "recyclable",
+      "merchantStockAccess": null,
+      "ordinaryMerchantGear": false,
       "assetURL": "/game-assets/items/resinbound_boots.png"
     },
     {
@@ -2556,6 +2748,8 @@
       "consumable": null,
       "tradingPostDisposition": "sellable",
       "recyclerDisposition": "recyclable",
+      "merchantStockAccess": null,
+      "ordinaryMerchantGear": false,
       "assetURL": "/game-assets/items/toxin_edge.png"
     },
     {
@@ -2576,6 +2770,8 @@
       "consumable": null,
       "tradingPostDisposition": "sellable",
       "recyclerDisposition": "recyclable",
+      "merchantStockAccess": null,
+      "ordinaryMerchantGear": false,
       "assetURL": "/game-assets/items/sporeward_coat.png"
     },
     {
@@ -2595,6 +2791,8 @@
       "consumable": null,
       "tradingPostDisposition": "sellable",
       "recyclerDisposition": "recyclable",
+      "merchantStockAccess": null,
+      "ordinaryMerchantGear": false,
       "assetURL": "/game-assets/items/reagent_field_pick.png"
     },
     {
@@ -2617,6 +2815,8 @@
       "consumable": null,
       "tradingPostDisposition": "sellable",
       "recyclerDisposition": "recyclable",
+      "merchantStockAccess": null,
+      "ordinaryMerchantGear": false,
       "assetURL": "/game-assets/items/ichor_hook.png"
     },
     {
@@ -2638,6 +2838,8 @@
       "consumable": null,
       "tradingPostDisposition": "protected",
       "recyclerDisposition": "recyclable",
+      "merchantStockAccess": null,
+      "ordinaryMerchantGear": false,
       "assetURL": "/game-assets/items/riftglass_rapier.png"
     },
     {
@@ -2657,6 +2859,8 @@
       "consumable": null,
       "tradingPostDisposition": "protected",
       "recyclerDisposition": "protected",
+      "merchantStockAccess": null,
+      "ordinaryMerchantGear": false,
       "assetURL": "/game-assets/items/raw_essence_pendant.png"
     },
     {
@@ -2676,6 +2880,8 @@
       "consumable": null,
       "tradingPostDisposition": "protected",
       "recyclerDisposition": "protected",
+      "merchantStockAccess": null,
+      "ordinaryMerchantGear": false,
       "assetURL": "/game-assets/items/mote_compass.png"
     }
   ],
