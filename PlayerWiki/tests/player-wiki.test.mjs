@@ -330,6 +330,9 @@ test('crafting has a linked system index and complete resource cross-reference s
   assert.match(craftingIndex, /Exact ingredients and costs/);
   assert.match(craftingIndex, /Primary use/);
   assert.match(craftingIndex, /Ready when/);
+  assert.match(craftingIndex, /What is available now/);
+  assert.match(craftingIndex, /Defined or scheduled is not available now/);
+  assert.match(craftingIndex, /crafting-reachability-grid/);
   assert.match(craftingIndex, /resultHref/);
   assert.match(craftingDetail, /recipe-ingredient/);
   assert.match(craftingDetail, /Result image/);
@@ -338,8 +341,15 @@ test('crafting has a linked system index and complete resource cross-reference s
   assert.match(craftingDetail, /Material choices/);
   assert.match(craftingDetail, /Commit and result/);
   assert.match(craftingDetail, /serviceForStation/);
+  assert.match(craftingDetail, /recipeReadiness/);
   assert.match(crafting, /materialChoice/);
   assert.match(crafting, /commitResult/);
+  assert.match(crafting, /stationID/);
+  assert.match(crafting, /definedButNotLiveCrafting/);
+  assert.match(crafting, /Fitted Polearm/);
+  assert.doesNotMatch(crafting, /id: 'fitted-polearm'/);
+  assert.doesNotMatch(crafting, /id: 'caustic-core'/);
+  assert.doesNotMatch(crafting, /id: 'light-core'/);
   assert.match(crafting, /name: 'Heat Conduit Fixture'/);
   assert.match(crafting, /name: 'Anchor Frame'/);
   const placeDetail = await read('app/places/[slug]/page.tsx');

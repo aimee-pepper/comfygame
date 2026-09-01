@@ -13,7 +13,7 @@ export function buildingStatus(building: Station) {
 }
 
 export function systemsForBuilding(building: Station) {
-  return craftingSystems.filter((system) => system.station.includes(building.name));
+  return craftingSystems.filter((system) => system.stationID === building.id);
 }
 
 export function buildingActions(building: Station) {

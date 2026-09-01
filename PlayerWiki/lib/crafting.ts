@@ -2,6 +2,7 @@ export interface CraftingSystem {
   slug: string;
   name: string;
   station: string;
+  stationID: string;
   summary: string;
   access: string[];
   materialChoice: string;
@@ -22,6 +23,7 @@ export interface CraftRecipe {
   result: string;
   ingredients: CraftIngredient[];
   notes?: string;
+  readiness?: string;
 }
 
 export const craftingSystems: CraftingSystem[] = [
@@ -29,6 +31,7 @@ export const craftingSystems: CraftingSystem[] = [
     slug: 'apothecary',
     name: 'Apothecary preparations',
     station: 'The Apothecary',
+    stationID: 'apothecary',
     summary:
       'Make remedies, coatings and field supplies from named resources and property-matched natural samples.',
     access: ['Build the Apothecary.', 'Use a recipe that is currently known.'],
@@ -44,6 +47,7 @@ export const craftingSystems: CraftingSystem[] = [
     slug: 'blacksmith',
     name: 'Blacksmith construction',
     station: 'Blacksmith',
+    stationID: 'blacksmith',
     summary:
       'Construct a Pointed Blade from an exact point and grip; material quality and family shape the finished weapon.',
     access: ['Build the Blacksmith.', 'Use the stable Pointed Blade schematic.'],
@@ -59,6 +63,7 @@ export const craftingSystems: CraftingSystem[] = [
     slug: 'tannery',
     name: 'Tannery construction',
     station: 'The Tannery',
+    stationID: 'tannery',
     summary:
       'Turn flexible, living and structural samples into coats, gloves and boots.',
     access: ['Build the Tannery.', 'Meet the current wear research or tier gate for the chosen pattern.'],
@@ -74,6 +79,7 @@ export const craftingSystems: CraftingSystem[] = [
     slug: 'bowyer',
     name: 'Bowyer construction',
     station: 'The Bowyer',
+    stationID: 'bowyer',
     summary:
       'Build far-reaching physical weapons without maintaining a separate ammunition inventory.',
     access: ['Build the Bowyer.', 'Meet the current broaden or masterwork research gate for the chosen design.'],
@@ -89,14 +95,15 @@ export const craftingSystems: CraftingSystem[] = [
     slug: 'weaponsmith',
     name: 'Weaponsmith construction',
     station: 'The Weaponsmith',
+    stationID: 'weaponsmith',
     summary:
-      'Fit advanced points, edges, mauls and polearms around exact components and a learned fitting pattern.',
+      'Fit current points, edges and mauls around exact components and a learned fitting pattern.',
     access: ['Build the Weaponsmith.', 'Use the learned fitting pattern for the selected design.'],
     materialChoice: 'Choose the head or edge, supporting structure, and fitting from the exact metal or creature-material families accepted by each socket.',
     commitResult: 'A committed construction creates the chosen fitted weapon and freezes its selected material facts into the finished result.',
     howItWorks: [
       'Select the head or edge, supporting structure and fitting.',
-      'Choose the polearm consequence where that design is available.',
+      'Choose the current fitted design shown by the station.',
       'The finished weapon freezes its selected materials and resulting combat facts.',
     ],
   },
@@ -104,6 +111,7 @@ export const craftingSystems: CraftingSystem[] = [
     slug: 'armoury',
     name: 'Armoury rebuilding',
     station: 'The Armoury',
+    stationID: 'armoury',
     summary:
       'Rebuild one existing protective item in place as a rigid, insulated or balanced construction.',
     access: ['Build the Armoury.', 'Choose an eligible stored or worn protective item.'],
@@ -118,10 +126,11 @@ export const craftingSystems: CraftingSystem[] = [
   {
     slug: 'instruments',
     name: 'Instrument improvement',
-    station: 'Workshop',
+    station: 'The Survey Post',
+    stationID: 'survey_post',
     summary:
       'Improve the precision of owned world-reading instruments with property-matched samples and Essence.',
-    access: ['Open the Workshop with an owned world-reading instrument.'],
+    access: ['Build the Survey Post and research the named owned world-reading instrument.'],
     materialChoice: 'The selected samples must meet the exact property the instrument measures: two samples at 35+ for Good, or three at 65+ for Fine.',
     commitResult: 'A committed improvement spends the selected samples and 20 or 50 Essence, then raises that owned instrument to the chosen current grade.',
     howItWorks: [
@@ -134,13 +143,14 @@ export const craftingSystems: CraftingSystem[] = [
     slug: 'distillery',
     name: 'Distilled Cores',
     station: 'The Distillery',
+    stationID: 'distillery',
     summary:
-      'Attune Essence through a qualifying exact material and named catalyst to make a provenance-bearing Heat, Caustic, or Light Core.',
-    access: ['Auber has enabled and the Distillery is built.', 'The current attunement recipe, its exact material, catalyst, Essence, and output storage are available.'],
-    materialChoice: 'Choose the qualifying provenance-bearing sample and exact catalyst named by Heat, Caustic, or Light attunement; Caustic uses one displayed catalyst option.',
-    commitResult: 'A committed core preparation spends 16 Essence and its listed inputs to create the selected core. Caustic and Light Cores are currently stored and recovered by their existing custody paths; no further playable housing or effect is listed.',
+      'Attune Essence through a qualifying exact material and named catalyst to make the current Heat Core.',
+    access: ['Auber has enabled and the Distillery is built.', 'The current Heat attunement recipe, its exact material, catalyst, Essence, and output storage are available.'],
+    materialChoice: 'Choose the qualifying provenance-bearing sample and exact catalyst named by the Heat attunement preview.',
+    commitResult: 'A committed Heat Core preparation spends 16 Essence and its listed inputs to create one Heat Core. Caustic and Light Cores may be held through their existing custody paths, but are not current Distillery preparations.',
     howItWorks: [
-      'Choose Heat, Caustic or Light attunement.',
+      'Choose the current Heat attunement.',
       'Select a qualifying provenance-bearing sample and the exact catalyst.',
       'Spend 16 Essence to create the selected Core.',
     ],
@@ -149,6 +159,7 @@ export const craftingSystems: CraftingSystem[] = [
     slug: 'channelworks',
     name: 'Heat Conduit Fixture',
     station: 'The Channelworks',
+    stationID: 'channelworks',
     summary: 'Convert one valid player-made Heat Core into one stored Heat Conduit Fixture.',
     access: ['Oda has enabled and the Channelworks is built.', 'One valid Heat Core remains in the quoted custody and the Fixture has room.'],
     materialChoice: 'The process accepts the exact valid Heat Core named by the preview; it has no substitute catalyst or generic material selection.',
@@ -163,6 +174,7 @@ export const craftingSystems: CraftingSystem[] = [
     slug: 'anchorage',
     name: 'Anchor Frame',
     station: 'The Anchorage',
+    stationID: 'anchorage',
     summary: 'Assemble one portable Anchor Frame from six distinct exact materials and Essence.',
     access: ['Tovin has enabled and the Anchorage is built.', 'Six distinct selected materials, 60 Essence, and output custody remain valid.'],
     materialChoice: 'Choose two materials with hardness 65+, two with density 65+, one with flexibility 55+, and one with reactivity 65+. No selected material may fill two positions.',
@@ -177,6 +189,7 @@ export const craftingSystems: CraftingSystem[] = [
     slug: 'refinery',
     name: 'Raw Essence refining',
     station: 'Essence Spring',
+    stationID: 'essence_spring',
     summary:
       'Convert Raw Essence into spendable Essence Crystals at the current refinement rate.',
     access: ['Open the Essence Spring.'],
@@ -192,6 +205,7 @@ export const craftingSystems: CraftingSystem[] = [
     slug: 'writing-ink',
     name: 'Prepared writing ink',
     station: 'Writing Desk',
+    stationID: 'writing_desk',
     summary:
       'Prepare CMY and Depth ink applications for eligible source marks on a Page.',
     access: ['Open the Writing Desk and choose eligible source marks on a Page.'],
@@ -244,6 +258,7 @@ export const craftingRecipes: CraftRecipe[] = [
       r('resin', 1),
       { label: '1 flexible 25+ sample', role: 'selected sample' },
     ],
+    readiness: 'Current once the Apothecary is built; this is the immediate prepared remedy at construction.',
   },
   {
     id: 'salve',
@@ -475,6 +490,7 @@ export const craftingRecipes: CraftRecipe[] = [
     ingredients: [...e('Limbs', ['timber']), ...e('String', ['fiber'])],
     notes:
       'Horn, Quill, Bone, Hide and Fin can substitute in eligible sockets.',
+    readiness: 'Current Tier 0 Bowyer recipe once the Bowyer is built.',
   },
   {
     id: 'sling',
@@ -486,6 +502,7 @@ export const craftingRecipes: CraftRecipe[] = [
       ...e('Projectile', ['rubble', 'clay', 'ore', 'copper', 'adamant']),
       ...e('Pouch', ['fiber']),
     ],
+    readiness: 'Current Tier 1 Bowyer recipe after the named Broaden capability is available.',
   },
   {
     id: 'throwing-set',
@@ -496,6 +513,7 @@ export const craftingRecipes: CraftRecipe[] = [
       ...e('Edges', ['ore', 'adamant', 'obsidian']),
       ...e('Carrier', ['fiber']),
     ],
+    readiness: 'Current Tier 1 Bowyer recipe after the named Broaden capability is available.',
   },
   {
     id: 'fitted-point',
@@ -507,6 +525,7 @@ export const craftingRecipes: CraftRecipe[] = [
       ...e('Grip', ['fiber', 'timber', 'copper', 'silver', 'gold']),
       ...e('Fitting', ['copper', 'silver', 'gold', 'quartz', 'adamant']),
     ],
+    readiness: 'Current Tier 0 Weaponsmith recipe once the Weaponsmith is built.',
   },
   {
     id: 'fitted-edge',
@@ -518,6 +537,7 @@ export const craftingRecipes: CraftRecipe[] = [
       ...e('Grip', ['fiber', 'timber', 'copper', 'silver', 'gold']),
       ...e('Fitting', ['copper', 'silver', 'gold', 'quartz', 'adamant']),
     ],
+    readiness: 'Current Tier 1 Weaponsmith recipe after the named Broaden capability is available.',
   },
   {
     id: 'fitted-maul',
@@ -529,24 +549,7 @@ export const craftingRecipes: CraftRecipe[] = [
       ...e('Brace', ['timber', 'ore', 'adamant']),
       ...e('Grip', ['fiber', 'timber', 'copper', 'silver', 'gold']),
     ],
-  },
-  {
-    id: 'fitted-polearm',
-    name: 'Fitted Polearm',
-    system: 'weaponsmith',
-    result: 'Fitted Polearm',
-    ingredients: [
-      ...e('Head', [
-        'rubble',
-        'ore',
-        'copper',
-        'adamant',
-        'obsidian',
-        'quartz',
-      ]),
-      ...e('Haft', ['timber', 'ore', 'adamant']),
-      ...e('Binding', ['fiber', 'resin', 'copper', 'silver', 'gold']),
-    ],
+    readiness: 'Current Tier 1 Weaponsmith recipe after the named Broaden capability is available.',
   },
   {
     id: 'rigid-shell',
@@ -557,6 +560,7 @@ export const craftingRecipes: CraftRecipe[] = [
       ...e('Bodies', ['ore', 'copper', 'adamant']),
       ...e('Binding', ['fiber', 'resin', 'copper', 'silver', 'gold']),
     ],
+    readiness: 'Current Tier 0 Armoury profile once the Armoury is built.',
   },
   {
     id: 'insulated-layer',
@@ -568,6 +572,7 @@ export const craftingRecipes: CraftRecipe[] = [
       ...e('Outer', ['ore', 'copper', 'adamant', 'timber']),
     ],
     notes: 'Many creature materials also qualify for the exact layers shown.',
+    readiness: 'Current Tier 1 Armoury profile after the named Broaden capability is available.',
   },
   {
     id: 'balanced-laminate',
@@ -580,6 +585,7 @@ export const craftingRecipes: CraftRecipe[] = [
       ...e('Binding', ['fiber', 'resin', 'copper', 'silver', 'gold']),
       ...e('Fitting', ['copper', 'silver', 'gold', 'quartz', 'adamant']),
     ],
+    readiness: 'Current Tier 1 Armoury profile after the named Broaden capability is available.',
   },
   {
     id: 'good-instrument',
@@ -620,34 +626,6 @@ export const craftingRecipes: CraftRecipe[] = [
         label: '1 reactive 60+ and insulating 25+ sample',
         role: 'selected sample',
       },
-      { label: '16 Essence', role: 'currency' },
-    ],
-  },
-  {
-    id: 'caustic-core',
-    name: 'Caustic Core',
-    system: 'distillery',
-    result: 'Caustic Core',
-    ingredients: [
-      r('toxin', 2, 'catalyst option'),
-      r('ichor', 1, 'catalyst option'),
-      {
-        label: '1 reactive 60+ Reagent, Toxin or Ichor sample',
-        role: 'selected sample',
-      },
-      { label: '16 Essence', role: 'currency' },
-    ],
-    notes:
-      'Choose one catalyst option: 2 Toxin or 1 Ichor. They are not both spent.',
-  },
-  {
-    id: 'light-core',
-    name: 'Light Core',
-    system: 'distillery',
-    result: 'Light Core',
-    ingredients: [
-      r('silver', 2),
-      { label: '1 lustrous 60+ and hard 30+ sample', role: 'selected sample' },
       { label: '16 Essence', role: 'currency' },
     ],
   },
@@ -723,3 +701,26 @@ export function systemFor(slug: string) {
 export function recipesFor(slug: string) {
   return craftingRecipes.filter((recipe) => recipe.system === slug);
 }
+
+export function recipeReadiness(recipe: CraftRecipe) {
+  return recipe.readiness ?? 'Current once the named station, recipe knowledge, exact inputs, and output custody shown by its preview are ready.';
+}
+
+export const definedButNotLiveCrafting = [
+  {
+    name: 'Fitted Polearm',
+    detail: 'Defined for the Weaponsmith, but not a current player recipe.',
+  },
+  {
+    name: 'Caustic Core',
+    detail: 'May appear through current custody, but is not a current Distillery preparation.',
+  },
+  {
+    name: 'Light Core',
+    detail: 'May appear through current custody, but is not a current Distillery preparation.',
+  },
+] as const;
+
+export const scheduledButNotLiveStations = [
+  'Menagerie and Deep Works are scheduled construction concepts, not current player stations or recipe routes.',
+] as const;

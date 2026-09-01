@@ -5,7 +5,7 @@ import { PageIntro } from '@/components/page-intro';
 import { PixelImage } from '@/components/pixel-image';
 import { GuideBreadcrumbs, RelatedGuides } from '@/components/guide-navigation';
 import { SiteFrame } from '@/components/site-frame';
-import { craftingSystems, recipesFor, systemFor } from '@/lib/crafting';
+import { craftingSystems, recipeReadiness, recipesFor, systemFor } from '@/lib/crafting';
 import { content, humanize } from '@/lib/content';
 import { serviceForStation } from '@/lib/services';
 
@@ -79,7 +79,7 @@ export default async function CraftingSystemDetail({
   const system = systemFor(slug);
   if (!system) notFound();
   const recipes = recipesFor(slug);
-  const station = content.stations.find((entry) => system.station.includes(entry.name));
+  const station = content.stations.find((entry) => entry.id === system.stationID);
   const service = station ? serviceForStation(station.id) : null;
   const relatedResources = [...new Set(recipes.flatMap((recipe) => recipe.ingredients.map((ingredient) => ingredient.resourceID).filter(Boolean)))].map((id) => content.resources.find((resource) => resource.id === id)).filter(Boolean);
   return (
@@ -120,6 +120,7 @@ export default async function CraftingSystemDetail({
                 <th aria-label="Result image" />
                 <th>Output</th>
                 <th>Exact inputs</th>
+                <th>Ready when</th>
                 <th>Recipe-specific effect</th>
               </tr>
             </thead>
@@ -138,6 +139,7 @@ export default async function CraftingSystemDetail({
                       ))}
                     </ul>
                   </td>
+                  <td>{recipeReadiness(recipe)}</td>
                   <td>
                     {recipe.notes ?? 'The station-wide material and result rule above applies to this recipe.'}
                   </td>
