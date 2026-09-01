@@ -140,6 +140,40 @@ export const serviceGuides: ServiceGuide[] = [
     ],
   },
   {
+    slug: 'blacksmith',
+    name: 'Blacksmith',
+    stationID: 'blacksmith',
+    summary:
+      'Work with Halloway to make one exact Pointed Blade from current stock; Reforge remains an exact-piece route with its own quoted boundary.',
+    useFor: [
+      'Reviewing the live Pointed Blade maker quote',
+      'Selecting one exact point and one distinct exact grip',
+      'Checking whether one Home-owned physical piece can receive a current Reforge quote',
+    ],
+    workflow: [
+      'Recruit Halloway, then build the Blacksmith foundation in Home → Make.',
+      'Open Make, choose Pointed Blade, and review the exact two material sockets, cost, result, and destination.',
+      'Confirm only the current retained Make quote.',
+      'Use Reforge only with a current exact-piece quote; it does not sell, dismantle, repair, or replace a gear identity.',
+    ],
+    selection:
+      'Choose the exact Pointed Blade materials or one exact Home-owned physical piece shown by the current quote. Blacksmith Stock includes qualifying World and Creature Materials.',
+    result:
+      'Only a durable Make receipt creates the one quoted physical weapon and moves it to the actual Storehouse or Waiting destination. A refusal, cancel, stale quote, or failed write leaves the displayed stock and target unchanged.',
+    relatedGuides: [
+      { label: 'Halloway', href: '/people/halloway' },
+      { label: 'Blacksmith construction', href: '/buildings/blacksmith' },
+      { label: 'Pointed Blade construction', href: '/crafting/blacksmith' },
+      { label: 'Equipment and material effects', href: '/systems/equipment-materials' },
+      { label: 'Recycler', href: '/services/recycler' },
+    ],
+    remember: [
+      'The foundation teaches Pointed Blade but gives no gear or material stock.',
+      'Trading, Recycler, and Blacksmith are separate actions: sell, dismantle, and make or work on one exact piece.',
+      'Reforge success is not published until its one-step typed quote can show the exact useful result before confirmation.',
+    ],
+  },
+  {
     slug: 'anchorage',
     name: 'The Anchorage',
     stationID: 'anchorage',

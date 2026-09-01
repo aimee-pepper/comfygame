@@ -373,6 +373,32 @@ test('Anchorage first anchor keeps Tovin, exact construction, Frame custody, Atl
   assert.match(site, /Anchor one exact world/);
 });
 
+test('Blacksmith first use keeps Halloway, exact foundation, Pointed Blade custody, complete stock, and useful Reforge publication boundary distinct', async () => {
+  const [service, building, place, crafting, journey] = await Promise.all([
+    read('app/services/[slug]/page.tsx'),
+    read('app/buildings/[slug]/page.tsx'),
+    read('app/places/[slug]/page.tsx'),
+    read('app/crafting/[slug]/page.tsx'),
+    read('lib/blacksmith-first-use.ts'),
+  ]);
+  assert.match(journey, /travellerID: 'halloway'/);
+  assert.match(journey, /stationID: 'blacksmith'/);
+  assert.match(journey, /schematicID: 'pointed_blade'/);
+  assert.match(journey, /30 Essence · 12 Iron Ore · 6 Fibre/);
+  assert.match(journey, /Iron enough for the work, fibre enough to bind the frame/);
+  assert.doesNotMatch(journey, /stone and iron/i);
+  assert.match(journey, /World or Creature Material/);
+  assert.match(journey, /two exact property-30\+ materials and 8 Essence/);
+  assert.match(journey, /does not promise a paid Reforge success/);
+  assert.match(journey, /Same-name gear is never substituted/);
+  for (const source of [service, building, place, crafting]) assert.match(source, /blacksmithFirstUse/);
+  assert.match(service, /Third opening find: Halloway to Pointed Blade/);
+  assert.match(building, /Build the Blacksmith with Halloway/);
+  assert.match(place, /Build it with Halloway/);
+  assert.match(crafting, /Pointed Blade is the first live maker family/);
+  for (const source of [building, place]) assert.doesNotMatch(source, /stone and the iron/);
+});
+
 test('economy references are reachable from current player tasks without claiming rotating transactions are permanent', async () => {
   const sources = await Promise.all([
     'app/systems/economy-exchange/page.tsx',

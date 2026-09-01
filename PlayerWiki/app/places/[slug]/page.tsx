@@ -9,6 +9,7 @@ import { craftingSystems, recipeReadiness, recipesFor } from '@/lib/crafting';
 import { serviceForStation } from '@/lib/services';
 import { actionForSlug, actionsForStation } from '@/lib/action-reference';
 import { apothecaryFirstUse } from '@/lib/apothecary-first-use';
+import { blacksmithFirstUse } from '@/lib/blacksmith-first-use';
 
 function constructionRequirements(place: (typeof content.stations)[number]) {
   if (place.unlockedAtStart) return 'Available at the start of a campaign.';
@@ -115,13 +116,14 @@ export default async function PlaceDetail({
             </dd>
           </div>
         </dl>
-        {place.buildBlurb && <p>{place.buildBlurb}</p>}
+        {place.id === 'blacksmith' ? <p>Halloway will raise a forge here when you bring iron and fibre for the work.</p> : place.buildBlurb && <p>{place.buildBlurb}</p>}
       </section>
       <section className="article-section">
         <h2>What this place currently offers</h2>
         {service ? <div className="definition-grid">{service.useFor.map((action) => <div key={action}>{action}</div>)}</div> : <p>No separate service action list is currently published for this place.</p>}
       </section>
       {place.id === 'apothecary' && <section className="article-section"><h2>Build it with Nessa</h2><p>Recruiting <Link href="/people/nessa">Nessa</Link> reveals this foundation in Home → Make. Its complete current requirement is <strong>{apothecaryFirstUse.construction}</strong>.</p><div className="definition-grid"><div><h3>Completion teaches, not grants</h3><p>The first committed construction teaches Lesser Salve. It does not create an item or prepay its Resin and selected material.</p></div><div><h3>Review again after a refusal</h3><p>A shortfall, changed requirements, unavailable builder, or failed save does not spend stock or teach the recipe. Review the displayed foundation again before trying.</p></div></div><p><Link href="/services/apothecary">Follow the first-use journey</Link> · <Link href="/crafting/apothecary">Open Apothecary preparations</Link></p></section>}
+      {place.id === 'blacksmith' && <section className="article-section"><h2>Build it with Halloway</h2><p>Recruiting <Link href="/people/halloway">Halloway</Link> reveals this foundation in Home → Make. Its complete current requirement is <strong>{blacksmithFirstUse.construction}</strong>.</p><div className="definition-grid"><div><h3>Completion teaches, not grants</h3><p>The first durable construction teaches Pointed Blade only. It does not create gear, grant material stock, infer salvage, or complete a Reforge.</p></div><div><h3>Review again after a refusal</h3><p>A shortfall, changed requirements, unavailable Halloway, or failed save does not spend stock or teach the Schematic. Review the displayed foundation again before trying.</p></div></div><p><Link href="/services/blacksmith">Follow the first-use journey</Link> · <Link href="/crafting/blacksmith">Open Pointed Blade construction</Link></p></section>}
       {place.id === 'library' && <section className="article-section note-card"><h2>People and complete records</h2><p>Use the Library’s collections for recovered records, then open a person’s Player Wiki page to read their complete current authored book pages. Location-hint stages stay clearly marked as spoilers.</p><p><Link href="/people">Browse complete people records</Link></p></section>}
       {actions.length > 0 && <section className="article-section">
         <h2>Current actions here</h2>

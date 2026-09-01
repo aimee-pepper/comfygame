@@ -10,6 +10,7 @@ import { content, humanize } from '@/lib/content';
 import { serviceForStation } from '@/lib/services';
 import { apothecaryFirstUse } from '@/lib/apothecary-first-use';
 import { anchorageFirstAnchor } from '@/lib/anchorage-first-anchor';
+import { blacksmithFirstUse } from '@/lib/blacksmith-first-use';
 
 export function generateStaticParams() {
   return craftingSystems.map((system) => ({ slug: system.slug }));
@@ -115,6 +116,8 @@ export default async function CraftingSystemDetail({
         </ol>
       </section>
       {system.slug === 'apothecary' && <section className="article-section"><h2>Lesser Salve is the first known preparation</h2><div className="definition-grid"><div><h3>What construction gives you</h3><p>The completed Apothecary teaches the Lesser Salve recipe only. It does not give a Salve, spend a flexible material, or consume Resin.</p><p><Link href="/places/apothecary">Read the foundation journey</Link></p></div><div><h3>What preparation needs</h3><p>{apothecaryFirstUse.firstRecipe}</p><p>A flexible material means one exact eligible Home material, not a generic count or any named object.</p></div></div><h3>Current shortfalls stay specific</h3><ul className="compact-list">{apothecaryFirstUse.shortfalls.map((line) => <li key={line}>{line}</li>)}</ul><p>{apothecaryFirstUse.inference}</p></section>}
+      {system.slug === 'blacksmith' && <section className="article-section"><h2>Pointed Blade is the first live maker family</h2><p>Halloway’s completed foundation teaches this Schematic and no finished gear. The recipe uses one exact point and one different exact grip; its current quality quote sets the real Essence cost before confirmation.</p><ul className="compact-list">{blacksmithFirstUse.pointedBlade.map((line) => <li key={line}>{line}</li>)}</ul><p>{blacksmithFirstUse.stockBoundary}</p><p><Link href="/services/blacksmith">Follow Halloway’s first-use journey</Link> · <Link href="/buildings/blacksmith">Review the foundation</Link></p></section>}
+      {system.slug === 'blacksmith' && <section className="article-section note-card"><h2>Reforge remains an exact-piece boundary</h2><ul className="compact-list">{blacksmithFirstUse.reforgeBoundary.map((line) => <li key={line}>{line}</li>)}</ul></section>}
       {system.slug === 'anchorage' && <section className="article-section"><h2>Anchor Frame is a separate carried route</h2><p>Build the Anchorage after <Link href="/people/tovin">Tovin</Link> joins the Village, then satisfy every exact requirement for one Frame:</p><ul className="compact-list">{anchorageFirstAnchor.frameRequirements.map((line) => <li key={line}>{line}</li>)}</ul><p>One material cannot fill two positions. The completed Frame goes to its quoted Storehouse or Waiting destination; it is packed later through the Field Kit. It is useful on valid clear ground, while a discovered <Link href="/sites/atlas-seam">Atlas Seam</Link> is an independent route that does not require a Frame.</p><p><Link href="/services/anchorage">Read the first-anchor journey and confirmation boundary</Link></p></section>}
       <section className="article-section">
         <h2>Material choices</h2>
