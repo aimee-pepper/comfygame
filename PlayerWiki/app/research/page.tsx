@@ -31,8 +31,8 @@ export default function ResearchDirectory() {
     {content.researchBranches.map((branch) => {
       const nodes = content.researchNodes.filter((node) => node.branch === branch.id);
       const station = branch.stationID ? content.stations.find((entry) => entry.id === branch.stationID) : null;
-      return <section className="article-section" key={branch.id}><h2>{branch.name}</h2><p>{branch.blurb} {station ? <>Taught at <Link href={`/places/${station.slug}`}>{station.name}</Link>.</> : 'Available through the Workshop Research screen.'}</p><div className="table-wrap data-table"><table><thead><tr><th>Node</th><th>Ready when</th><th>Base cost</th><th>Current result</th></tr></thead><tbody>{nodes.map((node) => <tr key={node.id}><td><Link href={`/research/${researchNodeSlug(node)}`}>{node.name}</Link></td><td>{readiness(node)}</td><td>{cost(node)}</td><td>{node.blurb}</td></tr>)}</tbody></table></div></section>;
+      return <section className="article-section" key={branch.id}><h2>{branch.name}</h2><p>{branch.blurb} {station ? <>Taught at <Link href={`/places/${station.slug}`}>{station.name}</Link>.</> : 'Available through the current Research screen.'}</p><div className="table-wrap data-table"><table><thead><tr><th>Node</th><th>Ready when</th><th>Base cost</th><th>Current result</th></tr></thead><tbody>{nodes.map((node) => <tr key={node.id}><td><Link href={`/research/${researchNodeSlug(node)}`}>{node.name}</Link></td><td>{readiness(node)}</td><td>{cost(node)}</td><td>{node.blurb}</td></tr>)}</tbody></table></div></section>;
     })}
-    <RelatedGuides links={[{ label: 'Research guide', href: '/systems/research' }, { label: 'Workshop and Research', href: '/places/workshop' }, { label: 'Library collections', href: '/services/library' }, { label: 'Resources', href: '/resources' }, { label: 'Crafting systems', href: '/crafting' }]} />
+    <RelatedGuides links={[{ label: 'Research guide', href: '/systems/research' }, { label: 'Library collections', href: '/services/library' }, { label: 'Resources', href: '/resources' }, { label: 'Crafting systems', href: '/crafting' }]} />
   </SiteFrame>;
 }

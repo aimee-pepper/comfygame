@@ -23,7 +23,7 @@ const domainGroups = [
   {
     label: 'Village, resources and progression',
     domains: ['Home and return', 'Essence', 'Research', 'Campaign progression'],
-    links: [['Village buildings', '/village'], ['Village services', '/services'], ['Crafting', '/systems/crafting'], ['Resources', '/resources']],
+    links: [['Village buildings', '/village'], ['Village services', '/services'], ['Current crafting recipes', '/crafting'], ['Crafting basics', '/systems/crafting'], ['Resources', '/resources'], ['Current progression', '/resources/progression']],
   },
   {
     label: 'Campaign records and return',
@@ -45,6 +45,7 @@ export default function GlossaryPage() {
 
   return <SiteFrame sidebar><PageIntro eyebrow="Reference" title="Glossary" summary="Plain-language definitions for Bookbinder's recurring terms, grouped by the part of the game where you encounter them." />
     {groupedTerms.map(group => <section className="article-section glossary-group" key={group.label}><div className="glossary-group-heading"><h2>{group.label}</h2><nav aria-label={`${group.label} guides`}>{group.links.map(([label, href]) => <Link href={href} key={href}>{label}</Link>)}</nav></div><dl className="definition-grid">{group.terms.map(term => <div id={term.slug} key={term.id}><dt><strong>{term.name}</strong></dt><dd>{term.summary}{term.aliases.length ? <small> Also called: {term.aliases.join(', ')}.</small> : null}</dd></div>)}</dl></section>)}
+    <section className="article-section note-card"><h2>Current recipe availability</h2><p>The Crafting directory lists only current player recipes and station processes. A named station, design, or result is not a playable route until its own page marks it current and shows its readiness.</p><p><Link href="/crafting">Open current crafting recipes</Link> · <Link href="/village">Open Village buildings</Link></p></section>
     <section className="article-section glossary-group"><div className="glossary-group-heading"><h2>Player guides by task</h2><Link href="/systems">Open the Systems hub</Link></div><div className="definition-grid">{systemGuideCategories.map((category) => <div key={category.id}><dt><strong>{category.label}</strong></dt><dd><nav aria-label={`${category.label} player guides`}>{category.guides.map((guide) => <Link href={guide.href} key={guide.href}>{guide.label}</Link>)}</nav></dd></div>)}</div></section>
   </SiteFrame>;
 }

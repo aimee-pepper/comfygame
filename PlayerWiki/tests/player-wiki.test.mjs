@@ -309,7 +309,7 @@ test('crafting has a linked system index and complete resource cross-reference s
     assert.match(crafting, new RegExp(`slug: '${system}'`));
   }
   const resourceIndex = await read('app/resources/page.tsx');
-  assert.match(resourceIndex, /Current crafting and service uses/);
+  assert.match(resourceIndex, /Current recipe and service uses/);
   assert.match(resourceIndex, /consumerAuthority\.recipeConsumers/);
   assert.match(resourceIndex, /consumerAuthority\.otherConsumers/);
   assert.match(resourceIndex, /Building material\?/);
@@ -362,6 +362,21 @@ test('crafting has a linked system index and complete resource cross-reference s
   const craftingGuide = await read('app/systems/crafting/page.tsx');
   assert.match(craftingGuide, /Keep cost forms distinct/);
   assert.match(craftingGuide, /A counted resource cannot replace an exact/);
+  const search = await read('app/search/page.tsx');
+  assert.match(search, /Current crafting/);
+  assert.match(search, /recipeReadiness/);
+  const glossary = await read('app/glossary/page.tsx');
+  assert.match(glossary, /Current recipe availability/);
+  const progression = await read('app/resources/progression/page.tsx');
+  assert.match(progression, /Crafting matrix lists only current recipe routes/);
+  const equipment = await read('app/equipment/page.tsx');
+  assert.match(equipment, /recipeReadiness/);
+  assert.match(equipment, /does not have a matching current craft output/);
+  for (const source of [
+    await read('app/research/page.tsx'),
+    await read('app/research/[slug]/page.tsx'),
+    await read('app/systems/research/page.tsx'),
+  ]) assert.doesNotMatch(source, /places\/workshop|Workshop and Research/);
 });
 
 test('places publish only current retained town and building visuals inline', async () => {
@@ -766,7 +781,8 @@ test('Research publishes current branches, node requirements, base costs, and re
   assert.match(research, /Earlier upgrades and other requirements/);
   assert.match(research, /no partial cost is taken/);
   assert.match(research, /\/services\/library/);
-  assert.match(research, /\/places\/workshop/);
+  assert.match(research, /current Research screen/);
+  assert.doesNotMatch(research, /\/places\/workshop/);
   assert.match(sync, /researchSource/);
   assert.match(sync, /researchBranches/);
   assert.match(sync, /researchNodes/);
