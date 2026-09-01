@@ -69,6 +69,12 @@ const creatureSource = JSON.parse(
     'utf8',
   ),
 );
+const siteSource = JSON.parse(
+  await readFile(
+    path.join(repositoryRoot, 'Sources', 'Content', 'Data', 'sites.json'),
+    'utf8',
+  ),
+);
 const fullCastGuide = await readFile(
   path.join(repositoryRoot, 'docs', 'player-wiki-full-cast-current.md'),
   'utf8',
@@ -465,6 +471,25 @@ const creatures = creatureSource.creatures.map((creature) => ({
   favours: (creature.favours ?? []).map(conditionLabel),
 }));
 
+// A site directory explains only current authored profiles. It does not expose a
+// particular world's rolled contents or whether a campaign has already found one.
+const sites = siteSource.sites.map((site) => ({
+  id: site.id,
+  slug: slugFor(site.name),
+  name: site.name,
+  blurb: site.blurb,
+  category: site.category,
+  conditions: (site.conditions ?? []).map(conditionLabel),
+  placement: site.placement?.rule ?? 'anywhere',
+  minimumDistanceFromEntry: site.placement?.minimumDistanceFromEntry ?? null,
+  searchTurns: site.contents?.searchTurns ?? 0,
+  yields: Object.entries(site.contents?.yields ?? {}).map(([resourceID, quantity]) => ({ resourceID, quantity })),
+  itemIDs: site.contents?.items ?? [],
+  teaches: site.contents?.teaches ?? [],
+  guardianID: site.contents?.guardian ?? null,
+  isNaturalAnchor: Boolean(site.isNaturalAnchor),
+}));
+
 const travellers = [];
 for (const traveller of source.travellers.filter(
   (entry) => entry.meetingStatus === 'live',
@@ -619,6 +644,7 @@ const playerContent = {
   resources,
   items,
   creatures,
+  sites,
   travellers,
   cast,
   stations,

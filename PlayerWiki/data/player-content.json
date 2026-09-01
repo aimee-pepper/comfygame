@@ -2728,6 +2728,249 @@
       ]
     }
   ],
+  "sites": [
+    {
+      "id": "wayfarers_camp",
+      "slug": "wayfarer-s-camp",
+      "name": "Wayfarer's Camp",
+      "blurb": "Someone slept here, and left in a hurry. The ash is cold.",
+      "category": "recentRuin",
+      "conditions": [
+        "thermal at or above 15",
+        "vitality at or above 8"
+      ],
+      "placement": "anywhere",
+      "minimumDistanceFromEntry": 3,
+      "searchTurns": 2,
+      "yields": [
+        {
+          "resourceID": "fiber",
+          "quantity": 4
+        },
+        {
+          "resourceID": "essence_raw",
+          "quantity": 2
+        }
+      ],
+      "itemIDs": [
+        "curio_bound_knot",
+        "blade_chipped"
+      ],
+      "teaches": [],
+      "guardianID": null,
+      "isNaturalAnchor": false
+    },
+    {
+      "id": "binders_workshop",
+      "slug": "binder-s-workshop",
+      "name": "Binder's Workshop",
+      "blurb": "A dry stone room, and a hand that wrote before yours.",
+      "category": "oldRuin",
+      "conditions": [
+        "substrate hard at or above 30",
+        "illumination at or above 25",
+        "thermal at or above 10"
+      ],
+      "placement": "interior",
+      "minimumDistanceFromEntry": 5,
+      "searchTurns": 3,
+      "yields": [],
+      "itemIDs": [
+        "cache_key",
+        "blade_binders"
+      ],
+      "teaches": [
+        "verdigris_bloom"
+      ],
+      "guardianID": null,
+      "isNaturalAnchor": false
+    },
+    {
+      "id": "glacial_vault",
+      "slug": "glacial-vault",
+      "name": "Glacial Vault",
+      "blurb": "Held in the ice, and better preserved for it.",
+      "category": "oldRuin",
+      "conditions": [
+        "thermal at or below 20",
+        "hydrology frozen at or above 30"
+      ],
+      "placement": "interior",
+      "minimumDistanceFromEntry": 5,
+      "searchTurns": 3,
+      "yields": [
+        {
+          "resourceID": "essence_raw",
+          "quantity": 3
+        }
+      ],
+      "itemIDs": [
+        "curio_humming_shard",
+        "guard_vault"
+      ],
+      "teaches": [
+        "frostbound"
+      ],
+      "guardianID": null,
+      "isNaturalAnchor": false
+    },
+    {
+      "id": "spent_emanation_housing",
+      "slug": "spent-emanation-housing",
+      "name": "Spent Emanation Housing",
+      "blurb": "The housing is empty. The stone around it is not.",
+      "category": "oldRuin",
+      "conditions": [
+        "thermal at or above 65",
+        "substrate volatile at or above 35",
+        "atmosphere motion at or below 30"
+      ],
+      "placement": "interior",
+      "minimumDistanceFromEntry": 5,
+      "searchTurns": 2,
+      "yields": [
+        {
+          "resourceID": "essence_raw",
+          "quantity": 3
+        },
+        {
+          "resourceID": "ore",
+          "quantity": 2
+        }
+      ],
+      "itemIDs": [],
+      "teaches": [],
+      "guardianID": null,
+      "isNaturalAnchor": false
+    },
+    {
+      "id": "crystal_cavern",
+      "slug": "crystal-cavern",
+      "name": "Crystal Cavern",
+      "blurb": "It makes its own light, and it is worth more than the world around it.",
+      "category": "landmark",
+      "conditions": [
+        "relief openness at or below 45",
+        "substrate at or above 35"
+      ],
+      "placement": "interior",
+      "minimumDistanceFromEntry": 4,
+      "searchTurns": 3,
+      "yields": [
+        {
+          "resourceID": "ore",
+          "quantity": 12
+        },
+        {
+          "resourceID": "mote",
+          "quantity": 1
+        }
+      ],
+      "itemIDs": [
+        "guard_banded"
+      ],
+      "teaches": [],
+      "guardianID": null,
+      "isNaturalAnchor": false
+    },
+    {
+      "id": "geyser_basin",
+      "slug": "geyser-basin",
+      "name": "Geyser Basin",
+      "blurb": "The ground breathes out, on its own schedule.",
+      "category": "landmark",
+      "conditions": [
+        "thermal geothermal is present",
+        "hydrology at or above 15"
+      ],
+      "placement": "anywhere",
+      "minimumDistanceFromEntry": 3,
+      "searchTurns": 2,
+      "yields": [
+        {
+          "resourceID": "essence_raw",
+          "quantity": 6
+        },
+        {
+          "resourceID": "ore",
+          "quantity": 3
+        }
+      ],
+      "itemIDs": [
+        "guard_padded"
+      ],
+      "teaches": [],
+      "guardianID": null,
+      "isNaturalAnchor": false
+    },
+    {
+      "id": "brood_warren",
+      "slug": "brood-warren",
+      "name": "Brood Warren",
+      "blurb": "Something dug this, and something is still using it.",
+      "category": "living",
+      "conditions": [
+        "vitality at or above 45",
+        "vitality trophicDepth at or above 30"
+      ],
+      "placement": "anywhere",
+      "minimumDistanceFromEntry": 4,
+      "searchTurns": 2,
+      "yields": [
+        {
+          "resourceID": "fiber",
+          "quantity": 10
+        },
+        {
+          "resourceID": "essence_raw",
+          "quantity": 2
+        }
+      ],
+      "itemIDs": [
+        "blade_keen"
+      ],
+      "teaches": [],
+      "guardianID": "ink_hound",
+      "isNaturalAnchor": false
+    },
+    {
+      "id": "the_tear",
+      "slug": "tear",
+      "name": "Tear",
+      "blurb": "Where the world argues with itself, it comes apart.",
+      "category": "hazard",
+      "conditions": [],
+      "placement": "anywhere",
+      "minimumDistanceFromEntry": 2,
+      "searchTurns": 1,
+      "yields": [
+        {
+          "resourceID": "mote",
+          "quantity": 1
+        }
+      ],
+      "itemIDs": [],
+      "teaches": [],
+      "guardianID": null,
+      "isNaturalAnchor": false
+    },
+    {
+      "id": "natural_anchor",
+      "slug": "atlas-seam",
+      "name": "Atlas Seam",
+      "blurb": "The world is already fastened here. Tovin's binding can follow the old join.",
+      "category": "landmark",
+      "conditions": [],
+      "placement": "anywhere",
+      "minimumDistanceFromEntry": 5,
+      "searchTurns": 0,
+      "yields": [],
+      "itemIDs": [],
+      "teaches": [],
+      "guardianID": null,
+      "isNaturalAnchor": true
+    }
+  ],
   "travellers": [
     {
       "id": "noll",

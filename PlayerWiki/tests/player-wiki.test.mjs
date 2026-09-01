@@ -62,6 +62,34 @@ test('player reference indexes link to individual pages', async () => {
   }
 });
 
+test('Bestiary publishes stable named encounter profiles without claiming save discovery or individual trust', async () => {
+  await access(path.join(root, 'app/bestiary/[slug]/page.tsx'));
+  const index = await read('app/bestiary/page.tsx');
+  const detail = await read('app/bestiary/[slug]/page.tsx');
+  const snapshot = JSON.parse(await read('data/player-content.json'));
+  assert.equal(snapshot.creatures.length, 3);
+  assert.match(index, /never marks a creature as discovered for your own save/);
+  assert.match(index, /does not promise that a named encounter profile is tameable/);
+  assert.match(detail, /does not promise companionship or disclose any individual’s trust state/);
+  assert.match(detail, /No separate fixed status or drop is published for this profile/);
+  assert.ok(snapshot.creatures.every((entry) => entry.slug && entry.name));
+});
+
+test('site directory keeps current conditions, disclosed results, and depletion separate from world discovery', async () => {
+  await access(path.join(root, 'app/sites/page.tsx'));
+  await access(path.join(root, 'app/sites/[slug]/page.tsx'));
+  const directory = await read('app/sites/page.tsx');
+  const detail = await read('app/sites/[slug]/page.tsx');
+  const guide = await read('app/systems/sites-hazards/page.tsx');
+  const snapshot = JSON.parse(await read('data/player-content.json'));
+  assert.equal(snapshot.sites.length, 9);
+  assert.match(directory, /never promises an undiscovered site in a particular world/);
+  assert.match(detail, /does not reveal whether it was rolled into an undiscovered world/);
+  assert.match(detail, /remains unavailable rather than silently awarding a replacement result/);
+  assert.match(guide, /Open the full site directory/);
+  assert.match(guide, /disclosedResult/);
+});
+
 test('item details link published recipes and resources without guessing absent acquisition routes', async () => {
   const routes = await read('components/item-crafting-routes.tsx');
   const itemDetail = await read('app/items/[slug]/page.tsx');
@@ -791,11 +819,12 @@ test('Sites and hazards reference documents only current Look profiles, search s
   assert.match(guide, /Entering will start an encounter/);
   assert.match(guide, /renews that poison rather than stacking/);
   assert.match(guide, /current Look copy keeps contact, chemical poison, and active encounter as distinct profiles/);
-  assert.match(guide, /Brood Warren/);
-  assert.match(guide, /Atlas Seam/);
+  assert.match(guide, /content\.sites/);
+  assert.match(guide, /disclosedResult/);
   assert.match(guide, /on completion it becomes depleted/);
   assert.match(guide, /do not promise that an undiscovered site is present in every world/);
   assert.match(guide, /\/bestiary/);
+  assert.match(guide, /\/sites/);
   assert.match(systems, /\/systems\/sites-hazards/);
   assert.match(frame, /\/systems\/sites-hazards/);
 });

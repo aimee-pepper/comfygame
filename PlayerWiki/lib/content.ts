@@ -181,11 +181,29 @@ export interface Creature {
   favours: string[];
 }
 
+export interface Site {
+  id: string;
+  slug: string;
+  name: string;
+  blurb: string;
+  category: string;
+  conditions: string[];
+  placement: string;
+  minimumDistanceFromEntry: number | null;
+  searchTurns: number;
+  yields: Array<{ resourceID: string; quantity: number }>;
+  itemIDs: string[];
+  teaches: string[];
+  guardianID: string | null;
+  isNaturalAnchor: boolean;
+}
+
 interface PlayerContent {
   schemaVersion: number;
   resources: Resource[];
   items: Item[];
   creatures: Creature[];
+  sites: Site[];
   travellers: Traveller[];
   cast: CastPerson[];
   stations: Station[];
