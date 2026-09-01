@@ -34,6 +34,7 @@ export interface Item {
   consumable: Record<string, unknown> | null;
   tradingPostDisposition: string;
   recyclerDisposition: string;
+  salvageProfileID: string | null;
   merchantStockAccess: 'recipeKnown' | 'independent' | null;
   ordinaryMerchantGear: boolean;
   assetURL: string | null;

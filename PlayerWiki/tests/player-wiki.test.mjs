@@ -273,6 +273,21 @@ test('Trading directory distinguishes rotating offer pools from durable player r
   assert.match(sync, /merchantStockAccess/);
 });
 
+test('Recycler directory keeps authored salvage profiles separate from current physical previews', async () => {
+  await access(path.join(root, 'app/recycling/page.tsx'));
+  const directory = await read('app/recycling/page.tsx');
+  const reference = await read('lib/recycling-reference.ts');
+  const sync = await read('scripts/sync-content.mjs');
+  assert.match(directory, /no durable player-facing transaction ID/);
+  assert.match(directory, /Standard salvage profiles/);
+  assert.match(directory, /Construction-receipt recovery/);
+  assert.match(directory, /When a piece stays protected/);
+  assert.match(directory, /Confirm only the displayed preview/);
+  for (const profile of ['forged_edge_v1', 'headed_tool_v1', 'long_haft_v1', 'board_guard_v1', 'rigid_protection_v1', 'padded_protection_v1', 'boots_v1', 'keepsake_v1']) assert.match(reference, new RegExp(profile));
+  assert.match(reference, /standardRecyclerGear/);
+  assert.match(sync, /salvageProfileID/);
+});
+
 test('complete people records are discoverable through player-facing Library, site, glossary, search, and navigation routes', async () => {
   const [search, glossary, knowledge, service, place, sites, frame] = await Promise.all([
     'app/search/page.tsx',

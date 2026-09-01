@@ -490,6 +490,7 @@ for (const item of source.items) {
     consumable: item.consumable,
     tradingPostDisposition: item.tradingPostDisposition,
     recyclerDisposition: item.recyclerDisposition,
+    salvageProfileID: definition.salvageProfileID ?? null,
     merchantStockAccess: definition.consumableMerchantStockAccess ?? null,
     ordinaryMerchantGear: Boolean(
       definition.gear &&
