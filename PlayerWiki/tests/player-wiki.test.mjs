@@ -39,6 +39,23 @@ test('World Writing reference keeps current vocabulary, connection, compound, an
   assert.match(writing, /\/resources/);
 });
 
+test('World Writing resource-pursuit Pages keep opening, mid-reach, and late recipes ordered and uncertain', async () => {
+  const writing = await read('app/systems/world-writing/page.tsx');
+  const recipes = await read('lib/world-writing-recipes.ts');
+  const ids = ['starter_stone_hollow', 'wild_gilded_caverns', 'world_recipe_high_vent_v1'];
+  for (const id of ids) assert.match(recipes, new RegExp(id));
+  const titles = ['Stone Hollow', 'Gilded Caverns', 'High Vent'];
+  const positions = titles.map((title) => recipes.indexOf(title));
+  assert.deepEqual([...positions].sort((left, right) => left - right), positions);
+  assert.match(recipes, /not promise a deposit, route, map shape/);
+  assert.match(recipes, /not promised/);
+  assert.match(recipes, /not an owned World Page or automatic Template/);
+  assert.match(recipes, /Fountain pen/);
+  assert.match(writing, /Three resource-pursuit Pages/);
+  assert.match(writing, /never guarantees a particular terrain, resource, route, or safe approach/);
+  for (const id of ids) assert.doesNotMatch(writing, new RegExp(id));
+});
+
 test('player reference indexes link to individual pages', async () => {
   for (const relative of [
     'app/resources/page.tsx',
