@@ -178,7 +178,7 @@ export const craftingSystems: CraftingSystem[] = [
     summary: 'Assemble one portable Anchor Frame from six distinct exact materials and Essence.',
     access: ['Tovin has enabled and the Anchorage is built.', 'Six distinct selected materials, 60 Essence, and output custody remain valid.'],
     materialChoice: 'Choose two materials with hardness 65+, two with density 65+, one with flexibility 55+, and one with reactivity 65+. No selected material may fill two positions.',
-    commitResult: 'A committed frame keeps the selected material history. Its later field use belongs to a valid natural anchoring point.',
+    commitResult: 'A committed frame spends its exact six selected units and 60 Essence, then stores one Frame in the quoted Storehouse or Waiting destination. Its later field use belongs to a valid natural anchoring route.',
     howItWorks: [
       'Fill each of the six distinct property positions.',
       'Review the selected material history and 60 Essence cost.',

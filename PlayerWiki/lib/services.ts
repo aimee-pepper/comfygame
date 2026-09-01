@@ -140,6 +140,40 @@ export const serviceGuides: ServiceGuide[] = [
     ],
   },
   {
+    slug: 'anchorage',
+    name: 'The Anchorage',
+    stationID: 'anchorage',
+    summary:
+      'Work with Tovin to keep exact anchored realms in one portfolio and construct an Anchor Frame for a valid field route.',
+    useFor: [
+      'Reviewing realms you have already held permanently',
+      'Constructing one quoted Anchor Frame from exact world-made stock',
+      'Starting a valid revisit from a saved realm snapshot',
+    ],
+    workflow: [
+      'Recruit Tovin, then build the Anchorage foundation in Home → Realms.',
+      'Review the empty portfolio or one already anchored realm.',
+      'Craft an Anchor Frame only from the exact six distinct qualifying materials and current Essence quote.',
+      'Use a revealed Atlas Seam or a valid carried Frame route in a world; review and confirm its exact current quote.',
+    ],
+    selection:
+      'Choose the exact realm, current Anchor Frame construction quote, or revealed Atlas Seam shown by the current surface. A Frame and a Seam are separate anchoring routes.',
+    result:
+      'Only a durable construction, frame craft, or anchor confirmation changes its named holding. A cancelled, stale, refused, or failed quote leaves the current foundation, stock, realm, and expedition state unchanged.',
+    relatedGuides: [
+      { label: 'Tovin', href: '/people/tovin' },
+      { label: 'Anchorage construction', href: '/buildings/anchorage' },
+      { label: 'Anchor Frame', href: '/crafting/anchorage' },
+      { label: 'Atlas Seam', href: '/sites/atlas-seam' },
+      { label: 'Exploration', href: '/systems/exploration' },
+    ],
+    remember: [
+      'Building the station grants no realm or Anchor Frame.',
+      'Anchoring preserves a realm; it does not end an expedition or bank the current haul.',
+      'This route does not publish Work or Deliveries, and it does not promise passive production.',
+    ],
+  },
+  {
     slug: 'library',
     name: 'Library collections',
     stationID: 'library',

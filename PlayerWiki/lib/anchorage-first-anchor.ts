@@ -1,0 +1,46 @@
+export const anchorageFirstAnchor = {
+  travellerID: 'tovin',
+  stationID: 'anchorage',
+  frameID: 'anchor_frame',
+  seamID: 'natural_anchor',
+  construction: '200 Essence · 40 Iron Ore · 20 Quartz · 18 Pulp',
+  frameRequirements: [
+    '2 distinct exact world-material units with Hardness 65+',
+    '2 distinct exact world-material units with Density 65+',
+    '1 exact world-material unit with Flexibility 55+',
+    '1 exact world-material unit with Reactivity 65+',
+    '60 Essence',
+  ],
+  journey: [
+    'Recruit Tovin. His arrival reveals one Anchorage foundation in Home → Realms.',
+    'Build the foundation only when the exact 200 Essence, 40 Iron Ore, 20 Quartz, and 18 Pulp quote is ready.',
+    'Enter the Anchorage. Its empty portfolio keeps no realm and produces nothing merely because the room exists.',
+    'For a carried alternative to a Seam, craft one Anchor Frame from six distinct qualifying exact material units and 60 Essence; construction stores it in the quoted Storehouse or Waiting destination, not the Field Kit automatically.',
+    'On a revealed Atlas Seam, use Look and review that Seam’s current Essence quote. A Seam is one discovered site, not a promise about fogged ground elsewhere.',
+    'Confirm one exact Atlas Seam, realm, and displayed cost. Only the durable confirmation holds the realm; the expedition and current haul continue.',
+    'After the ordinary expedition return and review, revisit the same saved realm from the Anchorage when its current departure quote is valid.',
+  ],
+  frameCustody: [
+    'An Anchor Frame is not required at an Atlas Seam. An unused Frame remains carried if the natural Seam route is used.',
+    'A Frame is transferred to expedition custody only through the Field Kit plan. Crafting it does not pack it automatically.',
+    'One Frame uses six different qualifying material units; counted Iron Ore, Quartz, Pulp, or another scalar resource cannot substitute for one of those units.',
+    'The current result records its actual Storehouse or Waiting destination. This guide does not claim that an inspected completed Frame exposes its selected-material history.',
+  ],
+  seamConfirmation: [
+    'Look and finding the Atlas Seam cost no turn, give no reward, and do not anchor a realm automatically.',
+    'The confirmation spends only its displayed Essence cost and retains the current exact Seam, realm, and quote together.',
+    'Cancel, a stale quote, a busy control, insufficient Essence, or a failed durable write spends nothing and leaves the current confirmation or Look truth in place.',
+    'A realm already held in the Anchorage cannot be paid for or anchored a second time.',
+  ],
+  firstRealm: [
+    'All current routes—Born anchored, Atlas Seam, and Anchor Frame—hold the same kind of realm. The route is history, not quality or production rank.',
+    'Anchoring preserves the realm’s saved identity and state. It does not end the expedition, bank the current haul, reset the world, duplicate a Frame, or create a delivery.',
+    'The first held realm has no current sustain obligation and no posted person. Sustain or Let rest is a later explicit settlement choice for due realms, not an automatic first-anchor result.',
+    'Work and Deliveries are not published by this first-use route: no renewable work is selected and no passive production is promised.',
+  ],
+  relaunch: [
+    'Before a durable build or anchor, relaunch restores the current requirements or Look truth with no spend.',
+    'After a durable build, Frame craft, or anchor, relaunch restores that one saved result without a second cost, success message, realm, or navigation.',
+    'A later revisit uses the same saved realm snapshot; it does not regenerate the map, restore depleted unique sites, or collect a delivery.',
+  ],
+} as const;

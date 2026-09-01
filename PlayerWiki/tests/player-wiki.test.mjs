@@ -348,6 +348,31 @@ test('Recycler first use keeps Noll, the 15-Essence bench, empty state, exact pr
   assert.match(building, /Build the Recycler with Noll/);
 });
 
+test('Anchorage first anchor keeps Tovin, exact construction, Frame custody, Atlas Seam confirmation, and unpublished work separate', async () => {
+  const [service, building, crafting, site, journey] = await Promise.all([
+    read('app/services/[slug]/page.tsx'),
+    read('app/buildings/[slug]/page.tsx'),
+    read('app/crafting/[slug]/page.tsx'),
+    read('app/sites/[slug]/page.tsx'),
+    read('lib/anchorage-first-anchor.ts'),
+  ]);
+  assert.match(journey, /travellerID: 'tovin'/);
+  assert.match(journey, /stationID: 'anchorage'/);
+  assert.match(journey, /frameID: 'anchor_frame'/);
+  assert.match(journey, /seamID: 'natural_anchor'/);
+  assert.match(journey, /200 Essence · 40 Iron Ore · 20 Quartz · 18 Pulp/);
+  assert.match(journey, /60 Essence/);
+  assert.match(journey, /Work and Deliveries are not published/);
+  assert.match(journey, /Cancel, a stale quote, a busy control, insufficient Essence, or a failed durable write spends nothing/);
+  assert.match(journey, /does not end the expedition, bank the current haul, reset the world, duplicate a Frame, or create a delivery/);
+  assert.match(journey, /Sustain or Let rest is a later explicit settlement choice/);
+  for (const source of [service, building, crafting, site]) assert.match(source, /anchorageFirstAnchor/);
+  assert.match(service, /First held realm: Tovin to Atlas Seam/);
+  assert.match(building, /Build the Anchorage with Tovin/);
+  assert.match(crafting, /Anchor Frame is a separate carried route/);
+  assert.match(site, /Anchor one exact world/);
+});
+
 test('economy references are reachable from current player tasks without claiming rotating transactions are permanent', async () => {
   const sources = await Promise.all([
     'app/systems/economy-exchange/page.tsx',
