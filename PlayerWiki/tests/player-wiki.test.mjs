@@ -247,6 +247,18 @@ test('action reference keeps current player actions, costs, results, and unavail
   assert.match(detail, /When it cannot complete/);
 });
 
+test('action reference is discoverable from player navigation and the affected current system guides', async () => {
+  const sources = await Promise.all([
+    'components/site-frame.tsx', 'app/search/page.tsx', 'app/glossary/page.tsx', 'app/getting-started/page.tsx', 'app/journey/page.tsx',
+    'app/systems/world-writing/page.tsx', 'app/systems/exploration/page.tsx', 'app/systems/combat/page.tsx',
+    'app/systems/inventory-custody/page.tsx', 'app/systems/research/page.tsx', 'app/systems/animals-companionship/page.tsx',
+  ].map(read));
+  for (const source of sources) assert.match(source, /\/actions/);
+  assert.match(sources[1], /label: 'Actions'/);
+  assert.match(sources[2], /Action reference/);
+  assert.match(sources[3], /Action reference/);
+});
+
 test('equipment routes retain slot, recipe, frozen-piece and custody guidance', async () => {
   const index = await read('app/equipment/page.tsx');
   const detail = await read('app/equipment/[slug]/page.tsx');

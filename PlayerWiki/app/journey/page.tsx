@@ -70,6 +70,7 @@ export default function JourneyGuide() {
       </section>
       <RelatedGuides links={[
         { label: 'Getting started', href: '/getting-started' },
+        { label: 'Action reference', href: '/actions' },
         { label: 'Current progression checklist', href: '/resources/progression' },
         { label: 'World Writing', href: '/systems/world-writing' },
         { label: 'Exploration', href: '/systems/exploration' },
