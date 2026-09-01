@@ -44,6 +44,8 @@ export default function ServicesPage() {
       <nav className="next-links">
         <Link href="/places">Places and construction</Link>
         <Link href="/crafting">Crafting systems</Link>
+        <Link href="/trading">Trading offers</Link>
+        <Link href="/recycling">Recycler returns</Link>
       </nav>
     </SiteFrame>
   );

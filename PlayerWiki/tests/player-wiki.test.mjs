@@ -288,6 +288,28 @@ test('Recycler directory keeps authored salvage profiles separate from current p
   assert.match(sync, /salvageProfileID/);
 });
 
+test('economy references are reachable from current player tasks without claiming rotating transactions are permanent', async () => {
+  const sources = await Promise.all([
+    'app/systems/economy-exchange/page.tsx',
+    'app/resources/[slug]/page.tsx',
+    'app/items/[slug]/page.tsx',
+    'app/equipment/[slug]/page.tsx',
+    'app/systems/crafting/page.tsx',
+    'app/resources/progression/page.tsx',
+    'app/village/page.tsx',
+    'app/services/page.tsx',
+    'app/services/[slug]/page.tsx',
+    'app/buildings/[slug]/page.tsx',
+    'app/search/page.tsx',
+    'app/glossary/page.tsx',
+    'components/site-frame.tsx',
+  ].map(read));
+  for (const source of sources) assert.match(source, /\/trading|\/recycling/);
+  assert.match(sources[0], /Trading offer reference/);
+  assert.match(sources[10], /Economy references/);
+  assert.match(sources[12], /Trading offers/);
+});
+
 test('complete people records are discoverable through player-facing Library, site, glossary, search, and navigation routes', async () => {
   const [search, glossary, knowledge, service, place, sites, frame] = await Promise.all([
     'app/search/page.tsx',

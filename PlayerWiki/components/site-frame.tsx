@@ -15,6 +15,8 @@ const referenceLinks = [
   ['/world', 'World reference'],
   ['/village', 'Village buildings'],
   ['/resources', 'Resources'],
+  ['/trading', 'Trading offers'],
+  ['/recycling', 'Recycler returns'],
   ['/bestiary', 'Bestiary records'],
   ['/sites', 'Site directory'],
   ['/statuses', 'Conditions & effects'],

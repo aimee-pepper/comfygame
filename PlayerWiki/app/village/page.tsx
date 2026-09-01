@@ -18,6 +18,6 @@ export default function VillageDirectory() {
       </article>;
     })}</div></section>
     <section className="article-section note-card"><h2>Scheduled, not live</h2><p>Scheduled entries preserve only their current published identity and placement. They do not promise a usable screen, cost, recipe, or reward until that route is implemented.</p></section>
-    <RelatedGuides links={[{ label: 'Village services', href: '/services' }, { label: 'Crafting directory', href: '/crafting' }, { label: 'Resources', href: '/resources' }, { label: 'Current progression', href: '/resources/progression' }, { label: 'Village construction guide', href: '/systems/village-construction' }]} />
+    <RelatedGuides links={[{ label: 'Village services', href: '/services' }, { label: 'Trading offer reference', href: '/trading' }, { label: 'Recycler return reference', href: '/recycling' }, { label: 'Crafting directory', href: '/crafting' }, { label: 'Resources', href: '/resources' }, { label: 'Current progression', href: '/resources/progression' }, { label: 'Village construction guide', href: '/systems/village-construction' }]} />
   </SiteFrame>;
 }

@@ -92,7 +92,7 @@ export default function Crafting() {
         <h2>Other useful stations</h2>
         <ul>
           <li>
-            <strong>Recycler:</strong> dismantles eligible gear into a previewed
+            <strong><Link href="/recycling">Recycler:</Link></strong> dismantles eligible gear into a previewed
             yield.
           </li>
           <li>
@@ -100,7 +100,7 @@ export default function Crafting() {
             selected node.
           </li>
           <li>
-            <strong>Trading Post:</strong> buys and sells eligible stock using
+            <strong><Link href="/trading">Trading Post:</Link></strong> buys and sells eligible stock using
             the current listing and quantity.
           </li>
           <li>
@@ -109,7 +109,7 @@ export default function Crafting() {
           </li>
         </ul>
       </section>
-      <RelatedGuides links={[{ label: 'Crafting systems', href: '/crafting' }, { label: 'Village services', href: '/services' }, { label: 'Resource table', href: '/resources' }, { label: 'Equipment table', href: '/equipment' }]} />
+      <RelatedGuides links={[{ label: 'Crafting systems', href: '/crafting' }, { label: 'Trading offer reference', href: '/trading' }, { label: 'Recycler return reference', href: '/recycling' }, { label: 'Village services', href: '/services' }, { label: 'Resource table', href: '/resources' }, { label: 'Equipment table', href: '/equipment' }]} />
     </SiteFrame>
   );
 }

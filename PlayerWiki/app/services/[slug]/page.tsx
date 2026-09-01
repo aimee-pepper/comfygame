@@ -92,6 +92,8 @@ export default async function ServiceDetail({
         { label: `${station.name} construction and keeper`, href: `/places/${station.slug}` },
         ...guide.relatedGuides,
         ...(guide.slug === 'library' ? [{ label: 'People and complete records', href: '/people' }] : []),
+        ...(guide.slug === 'trading-post' ? [{ label: 'Trading offer and sale terms', href: '/trading' }] : []),
+        ...(guide.slug === 'recycler' ? [{ label: 'Recycler return reference', href: '/recycling' }] : []),
         { label: 'All systems', href: '/systems' },
       ]} />
     </SiteFrame>

@@ -182,7 +182,7 @@ export default async function ResourceDetail({
           <p>This resource is not a material in a current building recipe.</p>
         )}
       </section>
-      <RelatedGuides links={[{ label: 'All resources', href: '/resources' }, ...craftSystems.flatMap((system) => system ? [{ label: system.name, href: `/crafting/${system.slug}` }] : []), ...buildUses.map(({ station }) => ({ label: station.name, href: `/buildings/${station.slug}` })), { label: 'Village buildings', href: '/village' }, { label: 'Village services', href: '/services' }, { label: 'Site directory', href: '/sites' }, { label: 'All systems', href: '/systems' }]} />
+      <RelatedGuides links={[{ label: 'All resources', href: '/resources' }, ...(resource.tradeBand !== 'Nontradeable' ? [{ label: 'Trading offer and sale terms', href: '/trading' }] : []), ...craftSystems.flatMap((system) => system ? [{ label: system.name, href: `/crafting/${system.slug}` }] : []), ...buildUses.map(({ station }) => ({ label: station.name, href: `/buildings/${station.slug}` })), { label: 'Village buildings', href: '/village' }, { label: 'Village services', href: '/services' }, { label: 'Site directory', href: '/sites' }, { label: 'All systems', href: '/systems' }]} />
     </SiteFrame>
   );
 }
