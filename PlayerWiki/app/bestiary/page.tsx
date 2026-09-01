@@ -40,7 +40,7 @@ export default function BestiaryPage() {
         <div className="table-wrap data-table"><table><thead><tr><th>Creature</th><th>Field profile</th><th>Combat</th></tr></thead><tbody>{content.creatures.map((creature) => <tr key={creature.id}><td><Link href={`/bestiary/${creature.slug}`}>{creature.name}</Link></td><td>{creature.isNocturnal ? 'Night profile' : 'Day profile'} · Sight {creature.sightRadius}</td><td>Tier {creature.tier} · {creature.maxHP} health · {creature.attack} attack</td></tr>)}</tbody></table></div>
       </section>
       <section className="article-section">
-        <h2>Companionship stays individual</h2>
+        <h2>Individual records stay private</h2>
         <p>Animal attendance is decided by the exact visible individual in an active world. This directory does not promise that a named encounter profile is tameable or reveal a specimen’s current trust state.</p>
         <p><Link href="/systems/animals-companionship">Read Animals and companionship</Link></p>
       </section>

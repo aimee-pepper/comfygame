@@ -463,7 +463,7 @@ test('bestiary navigation preserves undiscovered creature privacy while linking 
   const frame = await read('components/site-frame.tsx');
   const search = await read('app/search/page.tsx');
   assert.match(bestiary, /Individual records/);
-  assert.match(bestiary, /No individual creature record is currently published/);
+  assert.match(bestiary, /does not promise that a named encounter profile is tameable or reveal a specimen’s current trust state/);
   assert.match(bestiary, /\/systems\/combat/);
   assert.match(bestiary, /\/systems\/exploration/);
   assert.match(bestiary, /PixelImage/);
