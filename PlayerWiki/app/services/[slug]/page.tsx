@@ -6,6 +6,7 @@ import { PixelImage } from '@/components/pixel-image';
 import { GuideBreadcrumbs, RelatedGuides } from '@/components/guide-navigation';
 import { SiteFrame } from '@/components/site-frame';
 import { content } from '@/lib/content';
+import { apothecaryFirstUse } from '@/lib/apothecary-first-use';
 import { serviceForSlug, serviceGuides } from '@/lib/services';
 
 export function generateStaticParams() {
@@ -86,6 +87,9 @@ export default async function ServiceDetail({
           ))}
         </div>
       </section>
+      {guide.slug === 'apothecary' && <section className="article-section"><h2>First remedy: Nessa to Lesser Salve</h2><p>Start this route only after <Link href="/people/nessa">Nessa</Link> has joined the Village. Her arrival reveals the foundation; recovering her diary pages or meeting another traveller does not replace that step.</p><ol className="numbered-guide">{apothecaryFirstUse.journey.map((step) => <li key={step}>{step}</li>)}</ol><div className="definition-grid"><div><h3>Build bundle</h3><p>{apothecaryFirstUse.construction}</p><p>Construction teaches Lesser Salve but grants no prepared item.</p></div><div><h3>First preparation</h3><p>{apothecaryFirstUse.firstRecipe}</p><p>The selected exact material and Resin are consumed only after preparation succeeds.</p></div></div><p><Link href="/places/apothecary">Review the Apothecary foundation</Link> · <Link href="/crafting/apothecary">Review current preparations</Link> · <Link href="/items/salve-lesser">Read Lesser Salve</Link></p></section>}
+      {guide.slug === 'apothecary' && <section className="article-section two-column"><div><h2>Read the exact stock</h2><ul className="compact-list">{apothecaryFirstUse.shortfalls.map((line) => <li key={line}>{line}</li>)}</ul><p>{apothecaryFirstUse.inference}</p></div><div><h2>Keep these boundaries clear</h2><ul className="compact-list">{apothecaryFirstUse.boundaries.map((line) => <li key={line}>{line}</li>)}</ul><p>{apothecaryFirstUse.catalogueBoundary}</p></div></section>}
+      {guide.slug === 'apothecary' && <section className="article-section note-card"><h2>Preparation costs are separate from construction</h2><ul className="compact-list">{apothecaryFirstUse.costs.map((line) => <li key={line}>{line}</li>)}</ul></section>}
       {guide.slug === 'library' && <section className="article-section note-card"><h2>People and records</h2><p>The Library helps you return to recovered records. The Player Wiki keeps each person’s complete current authored book pages together and separates location-hint stages with a clear spoiler boundary.</p><p><Link href="/people">Browse complete people records</Link></p></section>}
       <RelatedGuides links={[
         { label: 'All village services', href: '/services' },
@@ -94,6 +98,7 @@ export default async function ServiceDetail({
         ...(guide.slug === 'library' ? [{ label: 'People and complete records', href: '/people' }] : []),
         ...(guide.slug === 'trading-post' ? [{ label: 'Trading offer and sale terms', href: '/trading' }] : []),
         ...(guide.slug === 'recycler' ? [{ label: 'Recycler return reference', href: '/recycling' }] : []),
+        ...(guide.slug === 'apothecary' ? [{ label: 'Nessa', href: '/people/nessa' }, { label: 'Apothecary construction', href: '/places/apothecary' }, { label: 'Apothecary preparations', href: '/crafting/apothecary' }, { label: 'Lesser Salve', href: '/items/salve-lesser' }] : []),
         { label: 'All systems', href: '/systems' },
       ]} />
     </SiteFrame>

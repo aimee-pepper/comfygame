@@ -56,6 +56,30 @@ test('World Writing resource-pursuit Pages keep opening, mid-reach, and late rec
   for (const id of ids) assert.doesNotMatch(writing, new RegExp(id));
 });
 
+test('Apothecary first-use journey keeps Nessa, construction, Lesser Salve, inference, and cost boundaries distinct', async () => {
+  const [service, place, crafting, journey] = await Promise.all([
+    'app/services/[slug]/page.tsx',
+    'app/places/[slug]/page.tsx',
+    'app/crafting/[slug]/page.tsx',
+    'lib/apothecary-first-use.ts',
+  ].map(read));
+  for (const stableID of ['apothecary', 'nessa', 'lesser-salve', 'salve_lesser']) assert.match(journey, new RegExp(stableID));
+  assert.match(journey, /85 Essence · 16 Clay · 6 Quartz · 12 Reagent/);
+  assert.match(journey, /1 flexible material at 25\+ · 1 Resin · 0 Essence/);
+  assert.match(journey, /Construction teaches Lesser Salve but spends no recipe material and creates no item/);
+  assert.match(journey, /Needs 1 flexible material at 25\+ and 1 Resin/);
+  assert.match(journey, /does not reveal Scent Mask, Stillwater, Waystone/);
+  assert.match(journey, /Writing ink and vial preparation remain at the Scriptorium/);
+  assert.match(journey, /Stillwater adds 6 Essence/);
+  assert.match(journey, /Waystone adds 12 Essence and 1 Mote/);
+  for (const source of [service, place, crafting]) assert.match(source, /apothecaryFirstUse/);
+  assert.match(service, /First remedy: Nessa to Lesser Salve/);
+  assert.match(await read('lib/services.ts'), /slug: 'apothecary'/);
+  await access(path.join(root, 'app/services/[slug]/page.tsx'));
+  assert.match(place, /Build it with Nessa/);
+  assert.match(crafting, /Lesser Salve is the first known preparation/);
+});
+
 test('player reference indexes link to individual pages', async () => {
   for (const relative of [
     'app/resources/page.tsx',

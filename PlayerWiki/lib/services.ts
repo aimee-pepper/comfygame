@@ -107,6 +107,39 @@ export const serviceGuides: ServiceGuide[] = [
     ],
   },
   {
+    slug: 'apothecary',
+    name: 'Apothecary',
+    stationID: 'apothecary',
+    summary:
+      'Work with Nessa to prepare known remedies, coatings, and field supplies from exact natural materials and named stock.',
+    useFor: [
+      'Reviewing a known preparation and its exact current stock',
+      'Choosing the shown qualifying material for a property-based recipe',
+      'Preparing one quoted supply for Storehouse or Waiting custody',
+    ],
+    workflow: [
+      'Recruit Nessa, then build the Apothecary foundation in Home → Make.',
+      'Choose one currently known preparation and review every listed requirement.',
+      'Select the exact eligible material if the recipe asks for one.',
+      'Prepare only when the current stock and output destination agree.',
+    ],
+    selection:
+      'Choose one known preparation and, when required, the exact qualifying material shown by its current quote. A partial holding can reveal another current recipe but does not make a preparation ready by itself.',
+    result:
+      'Only a completed preparation consumes the selected material and named stock, then stores the one prepared item in Storehouse or Waiting according to the current output space. A changed quote, shortfall, or refusal leaves the displayed holdings and recipe knowledge unchanged.',
+    relatedGuides: [
+      { label: 'Nessa', href: '/people/nessa' },
+      { label: 'Apothecary construction', href: '/places/apothecary' },
+      { label: 'Apothecary preparations', href: '/crafting/apothecary' },
+      { label: 'Field supplies', href: '/systems/field-supplies' },
+    ],
+    remember: [
+      'The first completed build teaches Lesser Salve but does not prepare one.',
+      'Writing ink and vial preparation remain at the Scriptorium.',
+      'Unknown recipes stay absent until current inference or another legitimate discovery adds them.',
+    ],
+  },
+  {
     slug: 'library',
     name: 'Library collections',
     stationID: 'library',

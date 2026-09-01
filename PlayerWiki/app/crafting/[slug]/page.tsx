@@ -8,6 +8,7 @@ import { SiteFrame } from '@/components/site-frame';
 import { craftingSystems, definedButNotLiveForSystem, recipeReadiness, recipesFor, systemFor } from '@/lib/crafting';
 import { content, humanize } from '@/lib/content';
 import { serviceForStation } from '@/lib/services';
+import { apothecaryFirstUse } from '@/lib/apothecary-first-use';
 
 export function generateStaticParams() {
   return craftingSystems.map((system) => ({ slug: system.slug }));
@@ -112,6 +113,7 @@ export default async function CraftingSystemDetail({
           ))}
         </ol>
       </section>
+      {system.slug === 'apothecary' && <section className="article-section"><h2>Lesser Salve is the first known preparation</h2><div className="definition-grid"><div><h3>What construction gives you</h3><p>The completed Apothecary teaches the Lesser Salve recipe only. It does not give a Salve, spend a flexible material, or consume Resin.</p><p><Link href="/places/apothecary">Read the foundation journey</Link></p></div><div><h3>What preparation needs</h3><p>{apothecaryFirstUse.firstRecipe}</p><p>A flexible material means one exact eligible Home material, not a generic count or any named object.</p></div></div><h3>Current shortfalls stay specific</h3><ul className="compact-list">{apothecaryFirstUse.shortfalls.map((line) => <li key={line}>{line}</li>)}</ul><p>{apothecaryFirstUse.inference}</p></section>}
       <section className="article-section">
         <h2>Material choices</h2>
         <p>{system.materialChoice}</p>
@@ -167,6 +169,7 @@ export default async function CraftingSystemDetail({
         </div>
       </section>
       {notLive.length ? <section className="article-section note-card crafting-boundary"><h2>Defined, but not a current recipe</h2><ul className="compact-list">{notLive.map((entry) => <li key={entry.name}><strong>{entry.name}:</strong> {entry.detail}</li>)}</ul></section> : null}
+      {system.slug === 'apothecary' && <section className="article-section note-card"><h2>What the first build does not grant</h2><p>{apothecaryFirstUse.catalogueBoundary}</p><ul className="compact-list">{apothecaryFirstUse.costs.map((line) => <li key={line}>{line}</li>)}</ul></section>}
       <section className="article-section note-card">
         <h2>Commit and result</h2>
         <p>{system.commitResult}</p>
