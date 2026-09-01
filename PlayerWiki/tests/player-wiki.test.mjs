@@ -554,10 +554,11 @@ test('crafting guide links retained Village visuals to their place references', 
   assert.match(source, /\/places\/\$\{station\.slug\}/);
 });
 
-test('full cast pages preserve player-facing sequence and withhold unrecovered world-hint details', async () => {
+test('full cast pages publish complete exact book text with a clear location-hint boundary', async () => {
   const content = JSON.parse(await read('data/player-content.json'));
   const castGuide = await read('../docs/player-wiki-full-cast-current.md');
   const sync = await read('scripts/sync-content.mjs');
+  const travellerSource = JSON.parse(await read('../Sources/Content/Data/travellers.json'));
   assert.equal(content.cast.length, 29);
   assert.deepEqual(content.cast.map((person) => person.order), Array.from({ length: 29 }, (_, index) => index + 1));
   for (const name of ['Vance', 'Noll', 'Mara', 'Oda', 'Auber', 'Ashe', 'Tovin', 'Perren', 'Nine']) {
@@ -571,8 +572,13 @@ test('full cast pages preserve player-facing sequence and withhold unrecovered w
     assert.ok(person.diaryPages.length, `${person.name} diary sequence`);
     for (const page of person.diaryPages) {
       assert.ok(page.sequence && page.title, `${person.name} diary title`);
-      if (page.worldHint) assert.equal(page.detail, null, `${person.name} ${page.sequence} world hint withheld`);
-      else assert.ok(page.detail, `${person.name} ${page.sequence} diary detail`);
+      assert.ok(page.sourceID, `${person.name} ${page.sequence} source id`);
+      assert.ok(page.prose, `${person.name} ${page.sequence} exact authored prose`);
+    }
+    const traveller = travellerSource.travellers.find((entry) => entry.name === person.name);
+    for (const sourcePage of travellerSource.pages.filter((page) => page.diary === traveller.id)) {
+      const published = person.diaryPages.find((page) => page.sourceID === sourcePage.id);
+      assert.equal(published?.prose, sourcePage.prose, `${person.name} retains ${sourcePage.id}`);
     }
     assert.ok(person.assetURL, `${person.name} cameo URL`);
     assert.match(person.assetURL, /^\/game-assets\/people\/.+-cameo\.svg$/);
@@ -582,15 +588,22 @@ test('full cast pages preserve player-facing sequence and withhold unrecovered w
   }
   assert.match(sync, /player-wiki-full-cast-current\.md/);
   assert.match(sync, /castRows\.length !== 29/);
-  assert.doesNotMatch(JSON.stringify(content.cast), /unusually open land where a load can cross the horizon/);
+  assert.match(sync, /auber_word_grimmond/);
+  const sabine = content.cast.find((person) => person.name === 'Sabine');
+  const grimmond = content.cast.find((person) => person.name === 'Grimmond');
+  assert.equal(sabine.diaryPages.length, 10);
+  assert.equal(grimmond.diaryPages.length, 11);
+  assert.equal(grimmond.diaryPages[9].sourceID, 'auber_word_grimmond');
+  assert.equal(grimmond.diaryPages[10].sourceID, 'grimmond_account_empty_support');
   const personPage = await read('app/people/[slug]/page.tsx');
   const peopleDirectory = await read('app/people/page.tsx');
   assert.match(personPage, /PixelImage/);
   assert.match(personPage, /character cameo/);
   assert.match(personPage, /content\.cast/);
   assert.match(personPage, /Spoiler boundary/);
-  assert.match(personPage, /world hint/);
-  assert.match(personPage, /Diary pages/);
+  assert.match(personPage, /location-hints/);
+  assert.match(personPage, /Book pages beyond location hints/);
+  assert.match(personPage, /page\.prose/);
   assert.match(personPage, /person-record-navigation/);
   assert.match(personPage, /#meeting/);
   assert.match(personPage, /#diary-pages/);

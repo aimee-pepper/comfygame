@@ -68,8 +68,11 @@ export interface Traveller {
 
 export interface CastDiaryPage {
   sequence: string;
+  sourceID: string;
+  kind: string;
   title: string;
-  detail: string | null;
+  prose: string;
+  reward: string | null;
   worldHint: boolean;
 }
 

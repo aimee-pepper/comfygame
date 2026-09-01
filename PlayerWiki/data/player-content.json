@@ -3547,42 +3547,69 @@
       "roleLabel": "Service",
       "role": "Trading Post",
       "diaryReward": "Amber focus",
-      "diaryPageLabel": "six pages",
+      "diaryPageLabel": "7 authored pages",
       "diaryPages": [
         {
           "sequence": "1",
+          "sourceID": "vance_where_0",
+          "kind": "locationClue",
           "title": "Where someone is",
-          "detail": null,
+          "prose": "The land is broad and open, with few barriers between one horizon and the next. A loaded cart could cross without the ground inventing a toll.",
+          "reward": null,
           "worldHint": true
         },
         {
           "sequence": "2",
+          "sourceID": "vance_where_1",
+          "kind": "worldWorthWriting",
           "title": "A world worth writing",
-          "detail": "useful ground confined to visible seams.",
+          "prose": "Useful material runs in visible seams here. Good. If buyer and seller can point to the same boundary, we can argue about price instead of quantity.",
+          "reward": null,
           "worldHint": false
         },
         {
           "sequence": "3",
+          "sourceID": "vance_where_2",
+          "kind": "worldWorthWriting",
           "title": "A world worth writing",
-          "detail": "living things gathered in separate pockets.",
+          "prose": "Plants and animals gather in separate pockets. Something common in one pocket may be scarce in the next; transport changes the price even when the goods arrive unchanged.",
+          "reward": null,
           "worldHint": false
         },
         {
           "sequence": "4",
+          "sourceID": "vance_amber",
+          "kind": "focus",
           "title": "A focus",
-          "detail": "Amber, preservation through removal from circulation.",
+          "prose": "Amber seals small things against air and handling. That can preserve a specimen—or preserve evidence that somebody took it. Ask where it came from before pricing it.",
+          "reward": "Teaches Focus: amber",
           "worldHint": false
         },
         {
           "sequence": "5",
+          "sourceID": "vance_word_orsa",
+          "kind": "whereabouts",
           "title": "Word of someone",
-          "detail": "Orsa and debts made visible around a shared fire.",
+          "prose": "Orsa never charged for a place by the fire. Her rate was noticing who still needed a blanket, a bowl or the chair nearest the door. Cheap lodging, expensive attention.",
+          "reward": null,
           "worldHint": false
         },
         {
           "sequence": "6",
+          "sourceID": "vance_world_repaired_handle",
+          "kind": "worldWorthWriting",
+          "title": "A world worth writing",
+          "prose": "Write one plentiful material and one scarce one. Repairs will show what people could replace, what they had to conserve, and what a trader might profitably bring next.",
+          "reward": null,
+          "worldHint": false
+        },
+        {
+          "sequence": "7",
+          "sourceID": "vance_site_binders_workshop",
+          "kind": "ruin",
           "title": "Somewhere built",
-          "detail": "a Binder's Workshop whose changed handles record several owners.",
+          "prose": "Six people altered the handles in the old binder's room: new wrapping, shortened grips, two repairs and one left-handed guard. The last owner is only one line in the appraisal.",
+          "reward": null,
           "worldHint": false
         }
       ],
@@ -3598,36 +3625,51 @@
       "roleLabel": "Service",
       "role": "Recycler",
       "diaryReward": "none currently published",
-      "diaryPageLabel": "six authored pages; five currently publishable",
+      "diaryPageLabel": "5 authored pages",
       "diaryPages": [
         {
-          "sequence": "1–2",
+          "sequence": "1",
+          "sourceID": "noll_where_0",
+          "kind": "locationClue",
           "title": "Where someone is",
-          "detail": null,
+          "prose": "Hard stone and compacted ground keep sharp edges when they break. The pieces could be fitted together again after the whole fails.",
+          "reward": null,
+          "worldHint": true
+        },
+        {
+          "sequence": "2",
+          "sourceID": "noll_where_1",
+          "kind": "locationClue",
+          "title": "Where someone is",
+          "prose": "Useful material is concentrated in a few narrow seams rather than spread across the ground. Separate pieces should be easy to recover.",
+          "reward": null,
           "worldHint": true
         },
         {
           "sequence": "3",
+          "sourceID": "noll_word_vance",
+          "kind": "whereabouts",
           "title": "Word of someone",
-          "detail": "Vance and the difference between price and provenance.",
+          "prose": "Vance prices the whole object. I price the sound parts, subtract the work of separating them, and ask why the damaged joint is being hidden. Our totals usually agree. He finds this irritating.",
+          "reward": null,
           "worldHint": false
         },
         {
           "sequence": "4",
+          "sourceID": "noll_word_halloway",
+          "kind": "whereabouts",
           "title": "Word of someone",
-          "detail": "Halloway and patience before declaring repair impossible.",
+          "prose": "Halloway repairs objects I would dismantle. When she says a piece can be mended, let her try. When she says it cannot, stop asking. She has already tried in her head three times.",
+          "reward": null,
           "worldHint": false
         },
         {
           "sequence": "5",
+          "sourceID": "noll_world_join",
+          "kind": "worldWorthWriting",
           "title": "A world worth writing",
-          "detail": "a place where removal must answer to a visible boundary.",
-          "worldHint": false
-        },
-        {
-          "sequence": "6",
-          "title": "A Schematic",
-          "detail": "a single-use Field Separation Kit for one ordinary piece of gear.",
+          "prose": "Write hard material in a few clear seams. I can separate a clean boundary, count what came out, and leave the rest intact. Scattered fragments take longer and encourage sloppy sorting.",
+          "reward": null,
           "worldHint": false
         }
       ],
@@ -3643,36 +3685,51 @@
       "roleLabel": "Service",
       "role": "Blacksmith",
       "diaryReward": "Gold Ore focus and one line of Pen Brush study",
-      "diaryPageLabel": "six pages",
+      "diaryPageLabel": "5 authored pages",
       "diaryPages": [
         {
-          "sequence": "1–2",
+          "sequence": "1",
+          "sourceID": "halloway_where_0",
+          "kind": "locationClue",
           "title": "Where someone is",
-          "detail": null,
+          "prose": "The heat here does half the work for you.",
+          "reward": null,
+          "worldHint": true
+        },
+        {
+          "sequence": "2",
+          "sourceID": "halloway_where_1",
+          "kind": "locationClue",
+          "title": "Where someone is",
+          "prose": "The ground gives when it is worked, and holds when it cools.",
+          "reward": null,
           "worldHint": true
         },
         {
           "sequence": "3",
-          "title": "A focus",
-          "detail": "Gold Ore.",
+          "sourceID": "halloway_world",
+          "kind": "worldWorthWriting",
+          "title": "A world worth writing",
+          "prose": "Give me heat and ground I can shape. I can carry tools, fuel and iron; I cannot carry a workable floor in my pockets.",
+          "reward": null,
           "worldHint": false
         },
         {
           "sequence": "4",
-          "title": "A world worth writing",
-          "detail": "patient heat keeping material workable.",
+          "sourceID": "halloway_gold_ore",
+          "kind": "focus",
+          "title": "A focus",
+          "prose": "A few gold flecks will waste an afternoon. A continuous vein can be cut, weighed and worked. Follow the stone before celebrating the shine.",
+          "reward": "Teaches Focus: gold_ore",
           "worldHint": false
         },
         {
           "sequence": "5",
+          "sourceID": "halloway_brush_ferrule",
+          "kind": "researchLead",
           "title": "A line of study",
-          "detail": "a ferrule holding every brush hair under equal pressure.",
-          "worldHint": false
-        },
-        {
-          "sequence": "6",
-          "title": "Word of someone",
-          "detail": "Dagg waiting until recovery has a shape.",
+          "prose": "A brush needs a thin ferrule that grips an even bundle without cutting the fibres. Bring Isolde workable metal; I will test the seam and replace it if it slips.",
+          "reward": "Research lead: pen_brush",
           "worldHint": false
         }
       ],
@@ -3688,42 +3745,60 @@
       "roleLabel": "Service",
       "role": "Survey Post",
       "diaryReward": "Scarp focus",
-      "diaryPageLabel": "six pages",
+      "diaryPageLabel": "6 authored pages",
       "diaryPages": [
         {
           "sequence": "1",
+          "sourceID": "mara_where_0",
+          "kind": "locationClue",
           "title": "Where someone is",
-          "detail": null,
+          "prose": "At its brightest, the horizon burns white enough to swallow my sighting line.",
+          "reward": null,
           "worldHint": true
         },
         {
           "sequence": "2",
-          "title": "A focus",
-          "detail": "Scarp.",
+          "sourceID": "mara_word_sela",
+          "kind": "whereabouts",
+          "title": "Word of someone",
+          "prose": "Sela took the north path with two days of food and enough confidence for four. If the path was wrong, she will have found a better one by now.",
+          "reward": null,
           "worldHint": false
         },
         {
           "sequence": "3",
-          "title": "Word of someone",
-          "detail": "Sela's routes and habit of leaving.",
+          "sourceID": "mara_scarp",
+          "kind": "focus",
+          "title": "A focus",
+          "prose": "I tried to sight across the slope and found the ground had stopped pretending to be gradual. A scarp: steep face, abrupt rise, no sensible route straight up.",
+          "reward": "Teaches Focus: scarp",
           "worldHint": false
         },
         {
           "sequence": "4",
+          "sourceID": "mara_world_fixed_line",
+          "kind": "worldWorthWriting",
           "title": "A world worth writing",
-          "detail": "begin with the line that stays put.",
+          "prose": "Give me one fixed horizon, ridge or shoreline and I can measure the rest against it. Write that reference first; interpretation can wait until we have observations.",
+          "reward": null,
           "worldHint": false
         },
         {
           "sequence": "5",
+          "sourceID": "mara_site_crystal_cavern",
+          "kind": "ruin",
           "title": "Somewhere built",
-          "detail": "Crystal Cavern and its repeated crooked horizon.",
+          "prose": "A crystal cut in the stone repeats the same crooked horizon from every face. I checked the instrument twice. The distortion belongs to the cavern.",
+          "reward": null,
           "worldHint": false
         },
         {
           "sequence": "6",
+          "sourceID": "mara_word_tovin",
+          "kind": "whereabouts",
           "title": "Word of someone",
-          "detail": "Tovin measuring return in bindings rather than miles.",
+          "prose": "Tovin counted distance by the bindings needed to return. His figures were excellent. His habit of staying when the return grew expensive was not.",
+          "reward": null,
           "worldHint": false
         }
       ],
@@ -3739,42 +3814,60 @@
       "roleLabel": "Service",
       "role": "Reliquary",
       "diaryReward": "Ruin focus and a line of Growth study",
-      "diaryPageLabel": "seven pages",
+      "diaryPageLabel": "6 authored pages",
       "diaryPages": [
         {
-          "sequence": "1–2",
+          "sequence": "1",
+          "sourceID": "edren_where_0",
+          "kind": "locationClue",
           "title": "Where someone is",
-          "detail": null,
+          "prose": "More hard stone than loose ground. My trowel complains before I do.",
+          "reward": null,
+          "worldHint": true
+        },
+        {
+          "sequence": "2",
+          "sourceID": "edren_where_1",
+          "kind": "locationClue",
+          "title": "Where someone is",
+          "prose": "The cold settles low enough to numb my fingers through the cloth.",
+          "reward": null,
           "worldHint": true
         },
         {
           "sequence": "3",
-          "title": "A focus",
-          "detail": "Ruin.",
+          "sourceID": "edren_ruin_workshop",
+          "kind": "ruin",
+          "title": "Somewhere built",
+          "prose": "The walls beneath the ice meet at worked corners. This was a room before it froze, though I cannot yet date either event.",
+          "reward": null,
           "worldHint": false
         },
         {
           "sequence": "4",
-          "title": "Somewhere built",
-          "detail": "the Glacial Vault.",
+          "sourceID": "edren_lead",
+          "kind": "researchLead",
+          "title": "A line of study",
+          "prose": "The lead seams repeat at measured intervals and terminate beside worked sockets. Natural deposition is possible, but deliberate placement better fits the evidence.",
+          "reward": "Research lead: study_growth",
           "worldHint": false
         },
         {
           "sequence": "5",
-          "title": "A line of study",
-          "detail": "Growth research from layered evidence.",
+          "sourceID": "edren_ruin",
+          "kind": "focus",
+          "title": "A focus",
+          "prose": "Ruin: a constructed place whose use has ended or become unclear. Record the surviving work before assigning a story to the absent workers.",
+          "reward": "Teaches Focus: ruin",
           "worldHint": false
         },
         {
           "sequence": "6",
+          "sourceID": "edren_world_second_floor",
+          "kind": "worldWorthWriting",
           "title": "A world worth writing",
-          "detail": "ground used more than once.",
-          "worldHint": false
-        },
-        {
-          "sequence": "7",
-          "title": "Word of someone",
-          "detail": "Lys preserving revisions beside a first ordering.",
+          "prose": "Write a place with construction over older construction. The lower floor establishes first use; repairs and additions above it show later occupation without requiring a clean beginning.",
+          "reward": null,
           "worldHint": false
         }
       ],
@@ -3790,42 +3883,60 @@
       "roleLabel": "Service",
       "role": "Scriptorium",
       "diaryReward": "Hush focus and one line of Pen Brush study",
-      "diaryPageLabel": "seven pages",
+      "diaryPageLabel": "6 authored pages",
       "diaryPages": [
         {
-          "sequence": "1–2",
+          "sequence": "1",
+          "sourceID": "isolde_where_0",
+          "kind": "locationClue",
           "title": "Where someone is",
-          "detail": null,
+          "prose": "The land rises until every line I rule looks level by comparison.",
+          "reward": null,
+          "worldHint": true
+        },
+        {
+          "sequence": "2",
+          "sourceID": "isolde_where_1",
+          "kind": "locationClue",
+          "title": "Where someone is",
+          "prose": "Stone and packed ground cover most of this place. Even the horizon feels written in it.",
+          "reward": null,
           "worldHint": true
         },
         {
           "sequence": "3",
-          "title": "A focus",
-          "detail": "Hush.",
+          "sourceID": "isolde_worth_0",
+          "kind": "worldWorthWriting",
+          "title": "A world worth writing",
+          "prose": "Your hand is the repeated motion behind the mark. A better tool can make that motion smaller or cleaner, but it cannot practise on your behalf.",
+          "reward": null,
           "worldHint": false
         },
         {
           "sequence": "4",
-          "title": "A world worth writing",
-          "detail": "pressure made legible in a line.",
+          "sourceID": "isolde_hush",
+          "kind": "focus",
+          "title": "A focus",
+          "prose": "Hush the air, settle your sleeve, then draw. If the line still trembles, the movement came from your hand and you can work on it.",
+          "reward": "Teaches Focus: hush",
           "worldHint": false
         },
         {
           "sequence": "5",
+          "sourceID": "isolde_brush_hand",
+          "kind": "researchLead",
           "title": "A line of study",
-          "detail": "a brush hand releasing pressure without losing the mark.",
+          "prose": "Rough charcoal makes every correction visible. Learn to commit the stroke. Then use a brush, where pressure and angle let you revise the shape while you draw it.",
+          "reward": "Research lead: pen_brush",
           "worldHint": false
         },
         {
           "sequence": "6",
+          "sourceID": "isolde_word_tovin",
+          "kind": "whereabouts",
           "title": "Word of someone",
-          "detail": "Tovin's neat closures and poor stopping judgement.",
-          "worldHint": false
-        },
-        {
-          "sequence": "7",
-          "title": "Word of someone",
-          "detail": "Lys arranging pages by disagreement rather than date.",
+          "prose": "Tovin closes a binding with excellent control and terrible judgement about when to stop. Fear steadies his hand. He remains annoyingly proud of the wrong half of that assessment.",
+          "reward": null,
           "worldHint": false
         }
       ],
@@ -3841,36 +3952,60 @@
       "roleLabel": "Service",
       "role": "Wayfarer's Table",
       "diaryReward": "Pond focus",
-      "diaryPageLabel": "seven pages",
+      "diaryPageLabel": "6 authored pages",
       "diaryPages": [
         {
-          "sequence": "1–3",
+          "sequence": "1",
+          "sourceID": "sela_where_0",
+          "kind": "locationClue",
           "title": "Where someone is",
-          "detail": null,
+          "prose": "Enough water that I can choose the next crossing instead of rationing the last.",
+          "reward": null,
+          "worldHint": true
+        },
+        {
+          "sequence": "2",
+          "sourceID": "sela_where_1",
+          "kind": "locationClue",
+          "title": "Where someone is",
+          "prose": "You can see for a very long way.",
+          "reward": null,
+          "worldHint": true
+        },
+        {
+          "sequence": "3",
+          "sourceID": "sela_where_2",
+          "kind": "locationClue",
+          "title": "Where someone is",
+          "prose": "Plants grow thickly across much of the ground. That is a mercy.",
+          "reward": null,
           "worldHint": true
         },
         {
           "sequence": "4",
-          "title": "A focus",
-          "detail": "Pond.",
+          "sourceID": "sela_world",
+          "kind": "worldWorthWriting",
+          "title": "A world worth writing",
+          "prose": "Write somewhere the weather makes decisions for you. Pack for the forecast you wanted, then pack for the one that will actually turn up.",
+          "reward": null,
           "worldHint": false
         },
         {
           "sequence": "5",
-          "title": "Word of someone",
-          "detail": "Halloway.",
+          "sourceID": "sela_pond",
+          "kind": "focus",
+          "title": "A focus",
+          "prose": "A pond is a small body of still water you can walk around. Check the bank before drinking. Check what is already drinking before choosing a bank.",
+          "reward": "Teaches Focus: pond",
           "worldHint": false
         },
         {
           "sequence": "6",
-          "title": "A world worth writing",
-          "detail": "a route left usable for the next traveller.",
-          "worldHint": false
-        },
-        {
-          "sequence": "7",
+          "sourceID": "sela_word_halloway",
+          "kind": "whereabouts",
           "title": "Word of someone",
-          "detail": "Orsa, whose shared stopping places still feel temporary.",
+          "prose": "Halloway is tending a banked fire somewhere warm. She said she would keep it alive until we arrived, so bring dry fuel and do not make her prove how long she can wait.",
+          "reward": null,
           "worldHint": false
         }
       ],
@@ -3886,36 +4021,60 @@
       "roleLabel": "Role",
       "role": "formation warden",
       "diaryReward": "a gambit phrase for an exposed back-rank ally",
-      "diaryPageLabel": "seven pages",
+      "diaryPageLabel": "6 authored pages",
       "diaryPages": [
         {
-          "sequence": "1–3",
+          "sequence": "1",
+          "sourceID": "bryn_where_0",
+          "kind": "locationClue",
           "title": "Where someone is",
-          "detail": null,
+          "prose": "Close walls and bends block long views along nearly every path. I could watch one approach at a time here.",
+          "reward": null,
+          "worldHint": true
+        },
+        {
+          "sequence": "2",
+          "sourceID": "bryn_where_1",
+          "kind": "locationClue",
+          "title": "Where someone is",
+          "prose": "Hard stone covers much of the ground and does not yield under a loaded step. Good footing matters when somebody has to hold position.",
+          "reward": null,
+          "worldHint": true
+        },
+        {
+          "sequence": "3",
+          "sourceID": "bryn_where_2",
+          "kind": "locationClue",
+          "title": "Where someone is",
+          "prose": "The air becomes unusually dense and heavy at its peak. Everyone breathes harder in it, including the person standing first.",
+          "reward": null,
           "worldHint": true
         },
         {
           "sequence": "4",
+          "sourceID": "bryn_teach_back_rank",
+          "kind": "gambit",
           "title": "A gambit phrase",
-          "detail": "protect the ally placed where harm reaches before help.",
+          "prose": "Watch the back rank. If an ally there can be reached before we can answer, protect that position first. Their strength is not the problem; our formation is.",
+          "reward": "Teaches Gambit: subject_ally_back_rank",
           "worldHint": false
         },
         {
           "sequence": "5",
-          "title": "Word of someone",
-          "detail": "Marrick and the unfilled place in a practiced formation.",
+          "sourceID": "bryn_world_two_exits",
+          "kind": "worldWorthWriting",
+          "title": "A world worth writing",
+          "prose": "Write a narrow approach with two exits. I can hold the approach while everyone leaves through the second. If there is only one exit, we are not defending a route; we are sealing it.",
+          "reward": null,
           "worldHint": false
         },
         {
           "sequence": "6",
-          "title": "A world worth writing",
-          "detail": "a narrow approach with two exits.",
-          "worldHint": false
-        },
-        {
-          "sequence": "7",
+          "sourceID": "bryn_site_wayfarers_camp",
+          "kind": "ruin",
           "title": "Somewhere built",
-          "detail": "Wayfarer's Camp.",
+          "prose": "The camp had a guard post but no alarm within reach. Put a bell, line or loose stones beside the watch. Waking people should not require a speech.",
+          "reward": null,
           "worldHint": false
         }
       ],
@@ -3931,36 +4090,69 @@
       "roleLabel": "Service",
       "role": "Firepit stewardship and later Tavern",
       "diaryReward": "Hive focus",
-      "diaryPageLabel": "seven pages",
+      "diaryPageLabel": "7 authored pages",
       "diaryPages": [
         {
-          "sequence": "1–3",
+          "sequence": "1",
+          "sourceID": "orsa_where_0",
+          "kind": "locationClue",
           "title": "Where someone is",
-          "detail": null,
+          "prose": "Thick plant growth and fresh animal traces fill nearly every usable patch of ground. Even a cleared place is occupied again by morning.",
+          "reward": null,
+          "worldHint": true
+        },
+        {
+          "sequence": "2",
+          "sourceID": "orsa_where_1",
+          "kind": "locationClue",
+          "title": "Where someone is",
+          "prose": "Close ridges and sheltered hollows divide the ground into small spaces with short views. Several still have more than one way out.",
+          "reward": null,
+          "worldHint": true
+        },
+        {
+          "sequence": "3",
+          "sourceID": "orsa_where_2",
+          "kind": "locationClue",
+          "title": "Where someone is",
+          "prose": "The air remains almost completely still, and smoke rises straight upward. A fire could be placed without its smoke crossing every bedroll.",
+          "reward": null,
           "worldHint": true
         },
         {
           "sequence": "4",
+          "sourceID": "orsa_hive",
+          "kind": "focus",
           "title": "A focus",
-          "detail": "Hive.",
+          "prose": "A hive is a shared structure built and supplied by many animals returning to it. Admire from outside. Its residents have not mistaken your curiosity for an invitation.",
+          "reward": "Teaches Focus: hive",
           "worldHint": false
         },
         {
           "sequence": "5",
+          "sourceID": "orsa_word_sela",
+          "kind": "whereabouts",
           "title": "Word of someone",
-          "detail": "Sela's marked routes back.",
+          "prose": "Sela leaves early and marks the return route carefully. She dislikes settling down, not returning. Save her a dry seat and do not make a ceremony of it.",
+          "reward": null,
           "worldHint": false
         },
         {
           "sequence": "6",
+          "sourceID": "orsa_word_vance",
+          "kind": "whereabouts",
           "title": "Word of someone",
-          "detail": "Vance reading a room through repaired objects.",
+          "prose": "Vance reads a room by its repaired objects. He calls that trade knowledge because 'noticing everyone's broken kettle' sounds nosy. He is both useful and nosy.",
+          "reward": null,
           "worldHint": false
         },
         {
           "sequence": "7",
+          "sourceID": "orsa_site_wayfarers_camp",
+          "kind": "ruin",
           "title": "Somewhere built",
-          "detail": "Wayfarer's Camp and its repeatedly rebuilt fire ring.",
+          "prose": "This camp's fire ring was rebuilt three times, each one smaller. Later travellers reused the shelter and changed it to fit. Leave dry kindling for the fourth group.",
+          "reward": null,
           "worldHint": false
         }
       ],
@@ -3976,36 +4168,69 @@
       "roleLabel": "Role",
       "role": "blade fighter",
       "diaryReward": "a gambit phrase for genuinely armoured foes",
-      "diaryPageLabel": "seven pages",
+      "diaryPageLabel": "7 authored pages",
       "diaryPages": [
         {
-          "sequence": "1–3",
+          "sequence": "1",
+          "sourceID": "talin_where_0",
+          "kind": "locationClue",
           "title": "Where someone is",
-          "detail": null,
+          "prose": "Hard ground breaks into rigid plates with clean edges. A blade or claw would glance away from the shallow angles.",
+          "reward": null,
+          "worldHint": true
+        },
+        {
+          "sequence": "2",
+          "sourceID": "talin_where_1",
+          "kind": "locationClue",
+          "title": "Where someone is",
+          "prose": "Nothing here hides an approach. That does not make deciding when to meet it easier.",
+          "reward": null,
+          "worldHint": true
+        },
+        {
+          "sequence": "3",
+          "sourceID": "talin_where_2",
+          "kind": "locationClue",
+          "title": "Where someone is",
+          "prose": "At the brightest interval every edge separates from the surface behind it. A visible opening can still close while you consider it.",
+          "reward": null,
           "worldHint": true
         },
         {
           "sequence": "4",
+          "sourceID": "talin_teach_armour",
+          "kind": "gambit",
           "title": "A gambit phrase",
-          "detail": "reserve the narrow point for armour that defeats an ordinary blow.",
+          "prose": "Save the narrow point for armour an ordinary strike cannot pierce. Check the target, choose the seam, strike, recover. Do not waste precision on a target already open.",
+          "reward": "Teaches Gambit: subject_foe_armour_above",
           "worldHint": false
         },
         {
           "sequence": "5",
+          "sourceID": "talin_word_dagg",
+          "kind": "whereabouts",
           "title": "Word of someone",
-          "detail": "Dagg's deliberate commitment.",
+          "prose": "Dagg chooses ground where a rushed swing ruins the recovery. He will wait for the perfect moment. Remind him the rest of the party is still being attacked while he admires it.",
+          "reward": null,
           "worldHint": false
         },
         {
           "sequence": "6",
+          "sourceID": "talin_word_bryn",
+          "kind": "whereabouts",
           "title": "Word of someone",
-          "detail": "Bryn's fast choices for other people's danger.",
+          "prose": "Bryn moves immediately when someone else is exposed. When only she is at risk, she checks every exit twice. Plan for both habits; arguing with either one takes too long.",
+          "reward": null,
           "worldHint": false
         },
         {
           "sequence": "7",
+          "sourceID": "talin_world_one_clear_edge",
+          "kind": "worldWorthWriting",
           "title": "A world worth writing",
-          "detail": "one clear edge seen early enough to act.",
+          "prose": "Write one clear edge visible from a distance. Choose before you reach it: cross, stop or turn. A perfect answer made after the opening closes is still late.",
+          "reward": null,
           "worldHint": false
         }
       ],
@@ -4021,36 +4246,69 @@
       "roleLabel": "Service",
       "role": "Apothecary",
       "diaryReward": "Thorn focus",
-      "diaryPageLabel": "eight pages",
+      "diaryPageLabel": "7 authored pages",
       "diaryPages": [
         {
-          "sequence": "1–4",
+          "sequence": "1",
+          "sourceID": "nessa_where_0",
+          "kind": "locationClue",
           "title": "Where someone is",
-          "detail": null,
+          "prose": "The air carries a toxic trace that leaves a bitter taste after the first breath. Exposure begins before the smell becomes obvious.",
+          "reward": null,
+          "worldHint": true
+        },
+        {
+          "sequence": "2",
+          "sourceID": "nessa_where_1",
+          "kind": "locationClue",
+          "title": "Where someone is",
+          "prose": "Dense plant growth and abundant animal signs show that life thrives across this world. Where so much survives, some species may also tolerate its poisons.",
+          "reward": null,
+          "worldHint": true
+        },
+        {
+          "sequence": "3",
+          "sourceID": "nessa_where_2",
+          "kind": "locationClue",
+          "title": "Where someone is",
+          "prose": "There is water to work with. That is not the same as water safe to drink, and neither fact tells me what it can carry.",
+          "reward": null,
+          "worldHint": true
+        },
+        {
+          "sequence": "4",
+          "sourceID": "nessa_where_3",
+          "kind": "locationClue",
+          "title": "Where someone is",
+          "prose": "Much of the exposed ground reacts to moisture by changing colour, venting or shifting. I need to test which reactions are dangerous.",
+          "reward": null,
           "worldHint": true
         },
         {
           "sequence": "5",
+          "sourceID": "nessa_thorn",
+          "kind": "focus",
           "title": "A focus",
-          "detail": "Thorn.",
+          "prose": "A thorn is a rigid point that breaks or irritates tissue on contact. Record where it entered, how deep, and what reaction follows. 'Cruel' is not a useful symptom.",
+          "reward": "Teaches Focus: thorn",
           "worldHint": false
         },
         {
           "sequence": "6",
-          "title": "Word of someone",
-          "detail": "Auber and useful remainders.",
+          "sourceID": "nessa_world_same_substance",
+          "kind": "worldWorthWriting",
+          "title": "A world worth writing",
+          "prose": "Write the same substance beside two different living things. Record dose, route, time and response for each. Do not label it remedy or poison until you can finish that sentence.",
+          "reward": null,
           "worldHint": false
         },
         {
           "sequence": "7",
-          "title": "A world worth writing",
-          "detail": "one substance nourishing one body and harming another.",
-          "worldHint": false
-        },
-        {
-          "sequence": "8",
+          "sourceID": "nessa_site_geyser_basin",
+          "kind": "ruin",
           "title": "Somewhere built",
-          "detail": "Geyser Basin, where heat, water and mineral arrive together.",
+          "prose": "The basin releases hot water carrying dissolved mineral. Test temperature, water and sediment separately before bottling any of it. One convenient pulse is three possible causes.",
+          "reward": null,
           "worldHint": false
         }
       ],
@@ -4066,36 +4324,60 @@
       "roleLabel": "Service",
       "role": "Tannery",
       "diaryReward": "Chitin focus",
-      "diaryPageLabel": "eight pages",
+      "diaryPageLabel": "6 authored pages",
       "diaryPages": [
         {
-          "sequence": "1–4",
+          "sequence": "1",
+          "sourceID": "corrin_where_0",
+          "kind": "locationClue",
           "title": "Where someone is",
-          "detail": null,
+          "prose": "Fresh growth returns quickly beside old cut and feeding marks. Replacement does not excuse taking, but it means useful material is being produced steadily.",
+          "reward": null,
+          "worldHint": true
+        },
+        {
+          "sequence": "2",
+          "sourceID": "corrin_where_1",
+          "kind": "locationClue",
+          "title": "Where someone is",
+          "prose": "Plant feeding marks, predator tracks and scavenger traces overlap in every patch. Several layers of the food chain are active here.",
+          "reward": null,
+          "worldHint": true
+        },
+        {
+          "sequence": "3",
+          "sourceID": "corrin_where_2",
+          "kind": "locationClue",
+          "title": "Where someone is",
+          "prose": "Strong winds keep broad leaves and flexible growth bending. Each returns and shows where the strain travelled.",
+          "reward": null,
+          "worldHint": true
+        },
+        {
+          "sequence": "4",
+          "sourceID": "corrin_where_3",
+          "kind": "locationClue",
+          "title": "Where someone is",
+          "prose": "Films, puddles and shallow crossings spread water across nearly the whole route. Leather fastenings would swell repeatedly here.",
+          "reward": null,
           "worldHint": true
         },
         {
           "sequence": "5",
+          "sourceID": "corrin_chitin",
+          "kind": "focus",
           "title": "A focus",
-          "detail": "Chitin.",
+          "prose": "Chitin forms hard protective plates joined by flexible tissue. Copy the overlap, not just the plate. A guard that cannot bend is a box with ambitions.",
+          "reward": "Teaches Focus: chitin",
           "worldHint": false
         },
         {
           "sequence": "6",
-          "title": "Word of someone",
-          "detail": "Bracken and protection that still permits movement.",
-          "worldHint": false
-        },
-        {
-          "sequence": "7",
-          "title": "Word of someone",
-          "detail": "Kestrel and permission before usefulness.",
-          "worldHint": false
-        },
-        {
-          "sequence": "8",
+          "sourceID": "corrin_world_repeated_contact",
+          "kind": "worldWorthWriting",
           "title": "A world worth writing",
-          "detail": "wet, living motion tested through repeated contact.",
+          "prose": "Write a wet place with constant movement. Fit one binding, use it for ten crossings, then inspect the swollen edge and repeated rub points. The bench cannot tell you where a body will complain.",
+          "reward": null,
           "worldHint": false
         }
       ],
@@ -4111,36 +4393,78 @@
       "roleLabel": "Role",
       "role": "hammer fighter",
       "diaryReward": "a gambit phrase for completed recovery",
-      "diaryPageLabel": "eight pages",
+      "diaryPageLabel": "8 authored pages",
       "diaryPages": [
         {
-          "sequence": "1–4",
+          "sequence": "1",
+          "sourceID": "dagg_where_0",
+          "kind": "locationClue",
           "title": "Where someone is",
-          "detail": null,
+          "prose": "The ground is hard and unyielding under every step. Good. An honest consequence can be prepared for.",
+          "reward": null,
+          "worldHint": true
+        },
+        {
+          "sequence": "2",
+          "sourceID": "dagg_where_1",
+          "kind": "locationClue",
+          "title": "Where someone is",
+          "prose": "Steep climbs and drops interrupt most routes, and many landings cannot be seen from above. A hurried step will not make the landing arrive sooner.",
+          "reward": null,
+          "worldHint": true
+        },
+        {
+          "sequence": "3",
+          "sourceID": "dagg_where_2",
+          "kind": "locationClue",
+          "title": "Where someone is",
+          "prose": "Conditions swing from long quiet periods to sudden, extreme changes. Both extremes demand preparation.",
+          "reward": null,
+          "worldHint": true
+        },
+        {
+          "sequence": "4",
+          "sourceID": "dagg_where_3",
+          "kind": "locationClue",
+          "title": "Where someone is",
+          "prose": "Strong gusts move through the world, then briefly fall still. Swinging is not different because the weapon has a name.",
+          "reward": null,
           "worldHint": true
         },
         {
           "sequence": "5",
+          "sourceID": "dagg_teach_recovery_complete",
+          "kind": "gambit",
           "title": "A gambit phrase",
-          "detail": "recovery ends when choice becomes possible again.",
+          "prose": "Recovery ends when your feet are set and you can choose the next action. Decide that action before the swing. Heavy weapons are excellent at making hesitation visible.",
+          "reward": "Teaches Gambit: subject_self_recovery_complete",
           "worldHint": false
         },
         {
           "sequence": "6",
+          "sourceID": "dagg_word_halloway",
+          "kind": "whereabouts",
           "title": "Word of someone",
-          "detail": "Halloway listening after every strike.",
+          "prose": "Halloway listens after every hammer strike and adjusts to the metal. Opponents adjust back. That is why I left the forge—and why she says I am wasting a perfectly good hammer arm.",
+          "reward": null,
           "worldHint": false
         },
         {
           "sequence": "7",
+          "sourceID": "dagg_word_talin",
+          "kind": "whereabouts",
           "title": "Word of someone",
-          "detail": "Talin acting while an opening remains true.",
+          "prose": "Talin takes the first usable opening. I wait for one worth the recovery. If we disagree during the fight, somebody else pays for the delay, so settle the signal beforehand.",
+          "reward": null,
           "worldHint": false
         },
         {
           "sequence": "8",
+          "sourceID": "dagg_world_wait_once",
+          "kind": "worldWorthWriting",
           "title": "A world worth writing",
-          "detail": "ground crossed once by waiting, not twice by rushing.",
+          "prose": "Write ground that punishes a rushed crossing. Wait through one change, then cross once with room to recover. If waiting only makes everyone else hold the danger longer, move.",
+          "reward": null,
           "worldHint": false
         }
       ],
@@ -4156,36 +4480,69 @@
       "roleLabel": "Role",
       "role": "spear fighter",
       "diaryReward": "a gambit phrase for a foe unable to reach the user",
-      "diaryPageLabel": "eight pages",
+      "diaryPageLabel": "7 authored pages",
       "diaryPages": [
         {
-          "sequence": "1–4",
+          "sequence": "1",
+          "sourceID": "rook_where_0",
+          "kind": "locationClue",
           "title": "Where someone is",
-          "detail": null,
+          "prose": "The land is extremely open, with an unobstructed view almost to the horizon. An approaching creature would be visible from far away.",
+          "reward": null,
+          "worldHint": true
+        },
+        {
+          "sequence": "2",
+          "sourceID": "rook_where_1",
+          "kind": "locationClue",
+          "title": "Where someone is",
+          "prose": "The ground offers no rise high enough to erase what is coming. Warning is possible here.",
+          "reward": null,
+          "worldHint": true
+        },
+        {
+          "sequence": "3",
+          "sourceID": "rook_where_2",
+          "kind": "locationClue",
+          "title": "Where someone is",
+          "prose": "Most water gathers in broad, still lakes and pools rather than flowing channels. Every crossing becomes a deliberate route around or through them.",
+          "reward": null,
+          "worldHint": true
+        },
+        {
+          "sequence": "4",
+          "sourceID": "rook_where_3",
+          "kind": "locationClue",
+          "title": "Where someone is",
+          "prose": "Grass tips remain still enough to show the smallest disturbance. Distance speaks before the person crossing it does.",
+          "reward": null,
           "worldHint": true
         },
         {
           "sequence": "5",
+          "sourceID": "rook_teach_cannot_reach",
+          "kind": "gambit",
           "title": "A gambit phrase",
-          "detail": "check reach before spending distance.",
+          "prose": "Check the foe's reach before giving up distance. If it cannot cross the line this turn, keep the line unless moving creates a better one for the whole party.",
+          "reward": "Teaches Gambit: subject_foe_cannot_reach_self",
           "worldHint": false
         },
         {
           "sequence": "6",
+          "sourceID": "rook_word_mara",
+          "kind": "whereabouts",
           "title": "Word of someone",
-          "detail": "Fen and what crosses a warning line.",
+          "prose": "Mara marks every place her sightline fails. If a horizon has three corrections, use the newest mark and expect a fourth. She updates faster than she explains.",
+          "reward": null,
           "worldHint": false
         },
         {
           "sequence": "7",
-          "title": "Word of someone",
-          "detail": "Mara's corrected horizons.",
-          "worldHint": false
-        },
-        {
-          "sequence": "8",
+          "sourceID": "rook_world_warning_line",
+          "kind": "worldWorthWriting",
           "title": "A world worth writing",
-          "detail": "a visible approach with a narrow crossing.",
+          "prose": "Write a visible approach with one narrow crossing. Place the warning far enough out that a traveller can see it, understand it and turn back before entering reach.",
+          "reward": null,
           "worldHint": false
         }
       ],
@@ -4201,42 +4558,78 @@
       "roleLabel": "Service",
       "role": "Library stewardship",
       "diaryReward": "Echo focus",
-      "diaryPageLabel": "nine pages",
+      "diaryPageLabel": "8 authored pages",
       "diaryPages": [
         {
-          "sequence": "1–4",
+          "sequence": "1",
+          "sourceID": "lys_where_0",
+          "kind": "locationClue",
           "title": "Where someone is",
-          "detail": null,
+          "prose": "Ruined walls, foundations and worked stone have been broken and rebuilt across the ground. Several periods of construction remain visible.",
+          "reward": null,
+          "worldHint": true
+        },
+        {
+          "sequence": "2",
+          "sourceID": "lys_where_1",
+          "kind": "locationClue",
+          "title": "Where someone is",
+          "prose": "Light, weather and other world changes return on a highly predictable schedule. That makes one interval easy to compare with the next.",
+          "reward": null,
+          "worldHint": true
+        },
+        {
+          "sequence": "3",
+          "sourceID": "lys_where_2",
+          "kind": "locationClue",
+          "title": "Where someone is",
+          "prose": "The light never leaves completely. Even an unfinished record remains readable, which is not the same as remaining understood.",
+          "reward": null,
+          "worldHint": true
+        },
+        {
+          "sequence": "4",
+          "sourceID": "lys_where_3",
+          "kind": "locationClue",
+          "title": "Where someone is",
+          "prose": "The air is so still that a loose page remains open to the same line. Any movement on the page can be attributed to something nearby.",
+          "reward": null,
           "worldHint": true
         },
         {
           "sequence": "5",
+          "sourceID": "lys_echo",
+          "kind": "focus",
           "title": "A focus",
-          "detail": "Echo.",
+          "prose": "Echo: a returned sound altered by distance, delay and the surfaces it crossed. Catalogue the original call separately; otherwise the room gets credited as co-author.",
+          "reward": "Teaches Focus: echo",
           "worldHint": false
         },
         {
           "sequence": "6",
+          "sourceID": "lys_word_edren",
+          "kind": "whereabouts",
           "title": "Word of someone",
-          "detail": "Edren's layers and revisions.",
+          "prose": "Edren indexes each fragment by its layer. I index his notes by revision. Cross-reference both or you will know where an object was found but not when he stopped being wrong about it.",
+          "reward": null,
           "worldHint": false
         },
         {
           "sequence": "7",
+          "sourceID": "lys_word_isolde",
+          "kind": "whereabouts",
           "title": "Word of someone",
-          "detail": "Isolde's pressure and refusals.",
+          "prose": "Isolde identifies a hand by pressure, spacing and omitted strokes. She objects to my catalogue of her objections. I have filed this under 'recurring, well-supported.'",
+          "reward": null,
           "worldHint": false
         },
         {
           "sequence": "8",
-          "title": "Word of someone",
-          "detail": "Perren and instructions that make obedience feel discovered.",
-          "worldHint": false
-        },
-        {
-          "sequence": "9",
+          "sourceID": "lys_site_binders_workshop",
+          "kind": "ruin",
           "title": "Somewhere built",
-          "detail": "a Binder's Workshop whose inventory contradicts its table.",
+          "prose": "The workshop inventory names three missing tools and omits five present ones. Preserve the written list, add an observed list, and date both. Correction without the original erases the discrepancy.",
+          "reward": null,
           "worldHint": false
         }
       ],
@@ -4252,30 +4645,78 @@
       "roleLabel": "Service",
       "role": "Armoury",
       "diaryReward": "Bone focus",
-      "diaryPageLabel": "eight pages",
+      "diaryPageLabel": "8 authored pages",
       "diaryPages": [
         {
-          "sequence": "1–5",
+          "sequence": "1",
+          "sourceID": "bracken_where_0",
+          "kind": "locationClue",
           "title": "Where someone is",
-          "detail": null,
+          "prose": "A tool skates before it bites. Hardness protects the surface by sending the effort back through the hand.",
+          "reward": null,
+          "worldHint": true
+        },
+        {
+          "sequence": "2",
+          "sourceID": "bracken_where_1",
+          "kind": "locationClue",
+          "title": "Where someone is",
+          "prose": "At the hot interval every fastening asks for more room. Armour that cannot change has chosen where it will split.",
+          "reward": null,
+          "worldHint": true
+        },
+        {
+          "sequence": "3",
+          "sourceID": "bracken_where_2",
+          "kind": "locationClue",
+          "title": "Where someone is",
+          "prose": "Cold draws the same joints tight. Protection becomes a promise the material may no longer be able to keep.",
+          "reward": null,
+          "worldHint": true
+        },
+        {
+          "sequence": "4",
+          "sourceID": "bracken_where_3",
+          "kind": "locationClue",
+          "title": "Where someone is",
+          "prose": "Steep ledges and sloping routes repeatedly tilt the body away from level ground. Armour fitted only for level footing would catch and shift here.",
+          "reward": null,
+          "worldHint": true
+        },
+        {
+          "sequence": "5",
+          "sourceID": "bracken_where_4",
+          "kind": "locationClue",
+          "title": "Where someone is",
+          "prose": "The air is dense enough to press against every seam and gap. The body underneath will not call a weak join negligible.",
+          "reward": null,
           "worldHint": true
         },
         {
           "sequence": "6",
+          "sourceID": "bracken_bone",
+          "kind": "focus",
           "title": "A focus",
-          "detail": "Bone.",
+          "prose": "Bone carries load without being solid all the way through. Copy the thick supports and the lighter spaces between them. Do not copy the fracture.",
+          "reward": "Teaches Focus: bone",
           "worldHint": false
         },
         {
           "sequence": "7",
+          "sourceID": "bracken_word_halloway",
+          "kind": "whereabouts",
           "title": "Word of someone",
-          "detail": "Halloway listening to changing metal.",
+          "prose": "Halloway can make metal hold almost any shape. I make her put it on and climb stairs before calling the shape useful. She grumbles; the armour improves.",
+          "reward": null,
           "worldHint": false
         },
         {
           "sequence": "8",
+          "sourceID": "bracken_word_corrin",
+          "kind": "whereabouts",
           "title": "Word of someone",
-          "detail": "Corrin beginning where protection touches and moves.",
+          "prose": "Corrin checks every place armour rubs or catches. I check where the blow lands. Between us, the wearer may survive and still want to wear the thing again.",
+          "reward": null,
           "worldHint": false
         }
       ],
@@ -4291,30 +4732,69 @@
       "roleLabel": "Service",
       "role": "Bowyer",
       "diaryReward": "Silk focus",
-      "diaryPageLabel": "eight pages",
+      "diaryPageLabel": "7 authored pages",
       "diaryPages": [
         {
-          "sequence": "1–5",
+          "sequence": "1",
+          "sourceID": "fen_where_0",
+          "kind": "locationClue",
           "title": "Where someone is",
-          "detail": null,
+          "prose": "The land is extremely open, with almost no nearby obstruction between one position and the horizon. A shot could travel a long way before striking anything.",
+          "reward": null,
+          "worldHint": true
+        },
+        {
+          "sequence": "2",
+          "sourceID": "fen_where_1",
+          "kind": "locationClue",
+          "title": "Where someone is",
+          "prose": "A long string bows with the moving air even while both ends insist it is straight.",
+          "reward": null,
+          "worldHint": true
+        },
+        {
+          "sequence": "3",
+          "sourceID": "fen_where_2",
+          "kind": "locationClue",
+          "title": "Where someone is",
+          "prose": "Plants and other living growth gather in a few separated stands, leaving broad clear gaps between them. Those gaps provide long, unobstructed lines.",
+          "reward": null,
+          "worldHint": true
+        },
+        {
+          "sequence": "4",
+          "sourceID": "fen_where_3",
+          "kind": "locationClue",
+          "title": "Where someone is",
+          "prose": "Water is concentrated in a few broad bodies instead of spread through many channels and puddles. Their edges can be planned around from a distance.",
+          "reward": null,
+          "worldHint": true
+        },
+        {
+          "sequence": "5",
+          "sourceID": "fen_where_4",
+          "kind": "locationClue",
+          "title": "Where someone is",
+          "prose": "Light, wind and other world changes return on a predictable schedule. Repeating a shot under the same interval could produce a useful comparison.",
+          "reward": null,
           "worldHint": true
         },
         {
           "sequence": "6",
+          "sourceID": "fen_silk",
+          "kind": "focus",
           "title": "A focus",
-          "detail": "Silk.",
+          "prose": "Silk spreads tension along one continuous thread. Light, strong, honest about a bad knot. Good string material if kept dry.",
+          "reward": "Teaches Focus: silk",
           "worldHint": false
         },
         {
           "sequence": "7",
+          "sourceID": "fen_word_rook",
+          "kind": "whereabouts",
           "title": "Word of someone",
-          "detail": "Rook keeping distance open for warning.",
-          "worldHint": false
-        },
-        {
-          "sequence": "8",
-          "title": "Word of someone",
-          "detail": "Oda making the carrier part of the instrument.",
+          "prose": "Rook uses distance to warn. I use it to land a shot. We mark which line is which before I string anything. Saves arguments. Occasionally saves Rook.",
+          "reward": null,
           "worldHint": false
         }
       ],
@@ -4330,36 +4810,78 @@
       "roleLabel": "Role",
       "role": "skirmisher",
       "diaryReward": "a gambit phrase for encounters with at least three foes",
-      "diaryPageLabel": "nine pages",
+      "diaryPageLabel": "8 authored pages",
       "diaryPages": [
         {
-          "sequence": "1–5",
+          "sequence": "1",
+          "sourceID": "wren_where_0",
+          "kind": "locationClue",
           "title": "Where someone is",
-          "detail": null,
+          "prose": "The ground is open enough to keep several routes in sight at once. Keep seeing the others after you decide which one to take.",
+          "reward": null,
+          "worldHint": true
+        },
+        {
+          "sequence": "2",
+          "sourceID": "wren_where_1",
+          "kind": "locationClue",
+          "title": "Where someone is",
+          "prose": "Strong, shifting winds begin a new movement before the last has finished. A plan may do the same if its exits remain honest.",
+          "reward": null,
+          "worldHint": true
+        },
+        {
+          "sequence": "3",
+          "sourceID": "wren_where_2",
+          "kind": "locationClue",
+          "title": "Where someone is",
+          "prose": "Shallow water interrupts nearly every route. None is impossible; all charge attention.",
+          "reward": null,
+          "worldHint": true
+        },
+        {
+          "sequence": "4",
+          "sourceID": "wren_where_3",
+          "kind": "locationClue",
+          "title": "Where someone is",
+          "prose": "Dense growth quickly fills cleared ground behind each passage. Mobility is the work of leaving room in a place that keeps using it.",
+          "reward": null,
+          "worldHint": true
+        },
+        {
+          "sequence": "5",
+          "sourceID": "wren_where_4",
+          "kind": "locationClue",
+          "title": "Where someone is",
+          "prose": "The quiet and the rush demand different routes through the same ground. Remembering only the dramatic one is how exits disappear.",
+          "reward": null,
           "worldHint": true
         },
         {
           "sequence": "6",
+          "sourceID": "wren_teach_foes_three",
+          "kind": "gambit",
           "title": "A gambit phrase",
-          "detail": "count the exits three foes close before moving.",
+          "prose": "Three foes: count which exits they close, spot the gap, move now. Do not solve three fights when one open route solves the position.",
+          "reward": "Teaches Gambit: subject_foes_present_at_least_3",
           "worldHint": false
         },
         {
           "sequence": "7",
+          "sourceID": "wren_word_sela",
+          "kind": "whereabouts",
           "title": "Word of someone",
-          "detail": "Sela's routes as shared knowledge.",
+          "prose": "Sela leaves excellent route notes. I leave several routes open and forget to label any of them. Follow hers if you are arriving after me.",
+          "reward": null,
           "worldHint": false
         },
         {
           "sequence": "8",
+          "sourceID": "wren_word_dagg",
+          "kind": "whereabouts",
           "title": "Word of someone",
-          "detail": "Dagg giving recovery a shape.",
-          "worldHint": false
-        },
-        {
-          "sequence": "9",
-          "title": "Word of someone",
-          "detail": "Marrick and the person forced to improvise.",
+          "prose": "Dagg wants one committed strike with a planned recovery. I want two exits and permission to change my mind. We work well together when he stops calling the second exit cowardice.",
+          "reward": null,
           "worldHint": false
         }
       ],
@@ -4375,36 +4897,78 @@
       "roleLabel": "Role",
       "role": "field naturalist",
       "diaryReward": "a gambit phrase for an unrecorded species",
-      "diaryPageLabel": "nine pages",
+      "diaryPageLabel": "8 authored pages",
       "diaryPages": [
         {
-          "sequence": "1–5",
+          "sequence": "1",
+          "sourceID": "kestrel_where_0",
+          "kind": "locationClue",
           "title": "Where someone is",
-          "detail": null,
+          "prose": "Fresh growth beneath older feeding marks proves the account begins before the animal I came to find.",
+          "reward": null,
+          "worldHint": true
+        },
+        {
+          "sequence": "2",
+          "sourceID": "kestrel_where_1",
+          "kind": "locationClue",
+          "title": "Where someone is",
+          "prose": "Too many tracks use this ground for one creature to explain it. Good evidence first defeats the convenient story.",
+          "reward": null,
+          "worldHint": true
+        },
+        {
+          "sequence": "3",
+          "sourceID": "kestrel_where_2",
+          "kind": "locationClue",
+          "title": "Where someone is",
+          "prose": "Grazing crosses pursuit, scavenging crosses both, and smaller traces live inside the margins. A body is never the whole system.",
+          "reward": null,
+          "worldHint": true
+        },
+        {
+          "sequence": "4",
+          "sourceID": "kestrel_where_3",
+          "kind": "locationClue",
+          "title": "Where someone is",
+          "prose": "Close ridges, walls and bends hide what lies beyond them. Absence past the fold is not proof of departure.",
+          "reward": null,
+          "worldHint": true
+        },
+        {
+          "sequence": "5",
+          "sourceID": "kestrel_where_4",
+          "kind": "locationClue",
+          "title": "Where someone is",
+          "prose": "Fine disturbance stays visible at range. Observation becomes easier; interpretation does not.",
+          "reward": null,
           "worldHint": true
         },
         {
           "sequence": "6",
+          "sourceID": "kestrel_teach_unrecorded",
+          "kind": "gambit",
           "title": "A gambit phrase",
-          "detail": "make the first careful action part of an unknown species' record.",
+          "prose": "Unrecorded species: observe before assuming the familiar response. Note posture, range and first action. Surviving the introduction is useful data for both parties.",
+          "reward": "Teaches Gambit: subject_foe_unrecorded_species",
           "worldHint": false
         },
         {
           "sequence": "7",
+          "sourceID": "kestrel_word_corrin",
+          "kind": "whereabouts",
           "title": "Word of someone",
-          "detail": "Sabine observing after a creature learns her routine.",
+          "prose": "Corrin uses every workable part of a carcass. I record what took it, what fed afterward and whether collecting the remains would interrupt either. She waits for the answer.",
+          "reward": null,
           "worldHint": false
         },
         {
           "sequence": "8",
+          "sourceID": "kestrel_word_fen",
+          "kind": "whereabouts",
           "title": "Word of someone",
-          "detail": "Corrin and what remains useful after a life.",
-          "worldHint": false
-        },
-        {
-          "sequence": "9",
-          "title": "Word of someone",
-          "detail": "Fen's clean line and the evidence left behind.",
+          "prose": "Fen reads a moving animal across open distance. I read the tracks after it leaves. His shots are clean; the scavenger evidence afterward rarely is.",
+          "reward": null,
           "worldHint": false
         }
       ],
@@ -4420,36 +4984,87 @@
       "roleLabel": "Service",
       "role": "Weaponsmith",
       "diaryReward": "Fitted Polearm Schematic",
-      "diaryPageLabel": "nine pages",
+      "diaryPageLabel": "9 authored pages",
       "diaryPages": [
         {
-          "sequence": "1–5",
+          "sequence": "1",
+          "sourceID": "maud_where_0",
+          "kind": "locationClue",
           "title": "Where someone is",
-          "detail": null,
+          "prose": "Much of the ground is hard enough to hold a sharp edge instead of bending or crumbling. Useful, if the edge suits the motion asked of it.",
+          "reward": null,
+          "worldHint": true
+        },
+        {
+          "sequence": "2",
+          "sourceID": "maud_where_1",
+          "kind": "locationClue",
+          "title": "Where someone is",
+          "prose": "Another part bends and keeps the new shape. Adjustment is a material property before it is a virtue.",
+          "reward": null,
+          "worldHint": true
+        },
+        {
+          "sequence": "3",
+          "sourceID": "maud_where_2",
+          "kind": "locationClue",
+          "title": "Where someone is",
+          "prose": "Steep climbs, drops and ledges change posture along nearly every route. The same weapon reach feels long on one ledge and short on the next.",
+          "reward": null,
+          "worldHint": true
+        },
+        {
+          "sequence": "4",
+          "sourceID": "maud_where_3",
+          "kind": "locationClue",
+          "title": "Where someone is",
+          "prose": "The air is almost completely still, and loose measures remain where they are placed. That lets me separate a weapon's balance from interference by wind.",
+          "reward": null,
+          "worldHint": true
+        },
+        {
+          "sequence": "5",
+          "sourceID": "maud_where_4",
+          "kind": "locationClue",
+          "title": "Where someone is",
+          "prose": "The same light and weather conditions return at a highly predictable time. I can test each alteration under matching conditions.",
+          "reward": null,
           "worldHint": true
         },
         {
           "sequence": "6",
-          "title": "A Schematic",
-          "detail": "fit a polearm to motion the body can repeat.",
+          "sourceID": "maud_fitting_pattern",
+          "kind": "pattern",
+          "title": "A pattern",
+          "prose": "Fit the weapon to a motion the wielder can repeat. Mark grip width, reach, recovery clearance and every allowance. A heroic pose is not a measurement.",
+          "reward": "Teaches pattern: maud_fitting_pattern",
           "worldHint": false
         },
         {
           "sequence": "7",
+          "sourceID": "maud_word_halloway",
+          "kind": "whereabouts",
           "title": "Word of someone",
-          "detail": "Halloway hearing material during change.",
+          "prose": "Halloway asks the material whether a change will hold. I hand the result to a wielder and ask whether it should. Her answer is usually prettier. Mine is usually louder.",
+          "reward": null,
           "worldHint": false
         },
         {
           "sequence": "8",
+          "sourceID": "maud_word_bracken",
+          "kind": "whereabouts",
           "title": "Word of someone",
-          "detail": "Bracken distributing force before impact.",
+          "prose": "Bracken spreads incoming force across armour. I adjust the weapon's leverage before that force arrives. If either of us ignores comfort, the user compensates and ruins both calculations.",
+          "reward": null,
           "worldHint": false
         },
         {
           "sequence": "9",
+          "sourceID": "maud_word_dagg",
+          "kind": "whereabouts",
           "title": "Word of someone",
-          "detail": "Dagg testing recovery after a weapon's invitation.",
+          "prose": "Dagg tests whether the wielder can recover from the swing a weapon encourages. I shortened the grip. He came back with three objections instead of seven. Progress.",
+          "reward": null,
           "worldHint": false
         }
       ],
@@ -4465,36 +5080,96 @@
       "roleLabel": "Role",
       "role": "formation leader",
       "diaryReward": "a gambit phrase triggered when any ally is below full health",
-      "diaryPageLabel": "ten pages",
+      "diaryPageLabel": "10 authored pages",
       "diaryPages": [
         {
-          "sequence": "1–6",
+          "sequence": "1",
+          "sourceID": "marrick_where_0",
+          "kind": "locationClue",
           "title": "Where someone is",
-          "detail": null,
+          "prose": "The ground is hard and level enough to hold firm beneath several sets of feet. A shared instruction can begin here without becoming shared judgement.",
+          "reward": null,
+          "worldHint": true
+        },
+        {
+          "sequence": "2",
+          "sourceID": "marrick_where_1",
+          "kind": "locationClue",
+          "title": "Where someone is",
+          "prose": "There is room to stand together and still see the edges. Too much room dissolves the signal; too little makes agreement irrelevant.",
+          "reward": null,
+          "worldHint": true
+        },
+        {
+          "sequence": "3",
+          "sourceID": "marrick_where_2",
+          "kind": "locationClue",
+          "title": "Where someone is",
+          "prose": "Strong wind reaches every position across the whole line. Equal exposure does not mean equal effort, no matter how neatly the positions are counted.",
+          "reward": null,
+          "worldHint": true
+        },
+        {
+          "sequence": "4",
+          "sourceID": "marrick_where_3",
+          "kind": "locationClue",
+          "title": "Where someone is",
+          "prose": "Temperature stays within a narrow range from the coldest interval to the warmest. That makes fatigue easier to compare across every position.",
+          "reward": null,
+          "worldHint": true
+        },
+        {
+          "sequence": "5",
+          "sourceID": "marrick_where_4",
+          "kind": "locationClue",
+          "title": "Where someone is",
+          "prose": "Light, weather and other world changes return on a highly predictable schedule. Everyone can practise the same routine against the same timing.",
+          "reward": null,
+          "worldHint": true
+        },
+        {
+          "sequence": "6",
+          "sourceID": "marrick_where_5",
+          "kind": "locationClue",
+          "title": "Where someone is",
+          "prose": "There is water along the route. No one person must carry enough for everyone, which is how a provision becomes part of the formation.",
+          "reward": null,
           "worldHint": true
         },
         {
           "sequence": "7",
+          "sourceID": "marrick_teach_ally_hp_any",
+          "kind": "gambit",
           "title": "A gambit phrase",
-          "detail": "make room when any ally crosses the threshold.",
+          "prose": "Write the response for any ally below the health threshold, not a favoured name. Nearest member opens space; rear member covers; injured member chooses the exit.",
+          "reward": "Teaches Gambit: subject_ally_hp_below_any",
           "worldHint": false
         },
         {
           "sequence": "8",
+          "sourceID": "marrick_word_bryn",
+          "kind": "whereabouts",
           "title": "Word of someone",
-          "detail": "Bryn rescuing the person a plan described too late.",
+          "prose": "Bryn rescues the person my formation failed to protect. I am revising the formation. She is revising my definition of 'unexpected.' Both tasks are overdue.",
+          "reward": null,
           "worldHint": false
         },
         {
           "sequence": "9",
+          "sourceID": "marrick_word_rook",
+          "kind": "whereabouts",
           "title": "Word of someone",
-          "detail": "Rook making a boundary legible from both sides.",
+          "prose": "Rook's boundary is readable from the approach. Mine was readable only to trained people already inside it. I have redrawn every marker and added an outside-facing signal.",
+          "reward": null,
           "worldHint": false
         },
         {
           "sequence": "10",
+          "sourceID": "marrick_account_missing_position",
+          "kind": "account",
           "title": "An account",
-          "detail": "a successful formation that forgot the unassigned porters.",
+          "prose": "Report: the formation held and every assigned position returned. Omission: two porters were never assigned positions and were counted with the supplies. Revision: no person enters the next exercise as cargo.",
+          "reward": null,
           "worldHint": false
         }
       ],
@@ -4510,30 +5185,96 @@
       "roleLabel": "Service",
       "role": "Menagerie",
       "diaryReward": "Coral focus",
-      "diaryPageLabel": "ten pages",
+      "diaryPageLabel": "10 authored pages",
       "diaryPages": [
         {
-          "sequence": "1–7",
+          "sequence": "1",
+          "sourceID": "sabine_where_0",
+          "kind": "locationClue",
           "title": "Where someone is",
-          "detail": null,
+          "prose": "New shoots bitten down at dusk grow above the old cut by morning. Plant matter is being produced quickly enough to support repeated feeding.",
+          "reward": null,
+          "worldHint": true
+        },
+        {
+          "sequence": "2",
+          "sourceID": "sabine_where_1",
+          "kind": "locationClue",
+          "title": "Where someone is",
+          "prose": "Every shelter is occupied, and fresh tracks stop at the entrances before turning away. More creatures live here than one keeper could gather.",
+          "reward": null,
+          "worldHint": true
+        },
+        {
+          "sequence": "3",
+          "sourceID": "sabine_where_2",
+          "kind": "locationClue",
+          "title": "Where someone is",
+          "prose": "Small grazers crowd the new growth. Larger tracks circle them, and scavengers follow what the hunt leaves behind. Feed one creature here and three others change their route.",
+          "reward": null,
+          "worldHint": true
+        },
+        {
+          "sequence": "4",
+          "sourceID": "sabine_where_3",
+          "kind": "locationClue",
+          "title": "Where someone is",
+          "prose": "The same hollows are pressed flat each night while nearby ground goes untouched. Return often enough and absence becomes part of the pattern.",
+          "reward": null,
+          "worldHint": true
+        },
+        {
+          "sequence": "5",
+          "sourceID": "sabine_where_4",
+          "kind": "locationClue",
+          "title": "Where someone is",
+          "prose": "Hoofprints, paws and dragging tails reach the water by different banks. No creature has to pass another's shelter to drink.",
+          "reward": null,
+          "worldHint": true
+        },
+        {
+          "sequence": "6",
+          "sourceID": "sabine_where_5",
+          "kind": "locationClue",
+          "title": "Where someone is",
+          "prose": "There is open ground enough to approach and cover near enough to refuse. I could work here without making nearness the only safe choice.",
+          "reward": null,
+          "worldHint": true
+        },
+        {
+          "sequence": "7",
+          "sourceID": "sabine_where_6",
+          "kind": "locationClue",
+          "title": "Where someone is",
+          "prose": "The same calls begin at the same interval, and the same paths fill soon after. They can learn when I return; that does not mean they must come.",
+          "reward": null,
           "worldHint": true
         },
         {
           "sequence": "8",
+          "sourceID": "sabine_coral",
+          "kind": "focus",
           "title": "A focus",
-          "detail": "Coral.",
+          "prose": "Coral is a shared structure built by many tiny animals that remain very much alive and very bad at introductions. Observe the colony; do not pry off a souvenir.",
+          "reward": "Teaches Focus: coral",
           "worldHint": false
         },
         {
           "sequence": "9",
+          "sourceID": "sabine_word_kestrel",
+          "kind": "whereabouts",
           "title": "Word of someone",
-          "detail": "Kestrel reading tracks from before an animal noticed anyone.",
+          "prose": "Kestrel reads tracks made before an animal noticed us. I watch what changes after it learns my routine. Between us, the animal is usually several observations ahead.",
+          "reward": null,
           "worldHint": false
         },
         {
           "sequence": "10",
+          "sourceID": "sabine_word_marrick",
+          "kind": "whereabouts",
           "title": "Word of someone",
-          "detail": "Marrick revising a formation so refusal has a place.",
+          "prose": "Marrick builds routines that still work when people panic. I asked where an animal may stand if it refuses the assigned position. He has been revising the diagram ever since.",
+          "reward": null,
           "worldHint": false
         }
       ],
@@ -4549,36 +5290,105 @@
       "roleLabel": "Service",
       "role": "Deep Works",
       "diaryReward": "Mercury focus",
-      "diaryPageLabel": "eleven pages",
+      "diaryPageLabel": "11 authored pages",
       "diaryPages": [
         {
-          "sequence": "1–7",
+          "sequence": "1",
+          "sourceID": "grimmond_where_0",
+          "kind": "locationClue",
           "title": "Where someone is",
-          "detail": null,
+          "prose": "Even the brightest interval leaves the lowest face unreadable. Value does not make a place consent to inspection.",
+          "reward": null,
+          "worldHint": true
+        },
+        {
+          "sequence": "2",
+          "sourceID": "grimmond_where_1",
+          "kind": "locationClue",
+          "title": "Where someone is",
+          "prose": "Stone and packed earth make up nearly all of this place. The ledger may call the material between seams waste; the roof disagrees.",
+          "reward": null,
+          "worldHint": true
+        },
+        {
+          "sequence": "3",
+          "sourceID": "grimmond_where_2",
+          "kind": "locationClue",
+          "title": "Where someone is",
+          "prose": "The richest matter keeps to a narrow seam. Following it is easy. Knowing where to stop is the work.",
+          "reward": null,
+          "worldHint": true
+        },
+        {
+          "sequence": "4",
+          "sourceID": "grimmond_where_3",
+          "kind": "locationClue",
+          "title": "Where someone is",
+          "prose": "Hard stone surrounds each seam and carries the weight above it. Removal has already begun before the valuable piece moves.",
+          "reward": null,
+          "worldHint": true
+        },
+        {
+          "sequence": "5",
+          "sourceID": "grimmond_where_4",
+          "kind": "locationClue",
+          "title": "Where someone is",
+          "prose": "Every route closes behind another wall. Extraction makes an opening and assigns its absence somewhere else.",
+          "reward": null,
+          "worldHint": true
+        },
+        {
+          "sequence": "6",
+          "sourceID": "grimmond_where_5",
+          "kind": "locationClue",
+          "title": "Where someone is",
+          "prose": "Deep drops, high faces and steep shafts divide the ground vertically. Every route carries weight above it and open space below.",
+          "reward": null,
+          "worldHint": true
+        },
+        {
+          "sequence": "7",
+          "sourceID": "grimmond_where_6",
+          "kind": "locationClue",
+          "title": "Where someone is",
+          "prose": "Breath thins before stone yields. A body is the first support the plan spends.",
+          "reward": null,
           "worldHint": true
         },
         {
           "sequence": "8",
+          "sourceID": "grimmond_mercury",
+          "kind": "focus",
           "title": "A focus",
-          "detail": "Mercury.",
+          "prose": "Mercury runs to the lowest gap and joins pools through cracks you missed. Build the tray before opening the seam. Chasing it afterward is expensive and poisonous.",
+          "reward": "Teaches Focus: mercury",
           "worldHint": false
         },
         {
           "sequence": "9",
+          "sourceID": "grimmond_word_edren",
+          "kind": "whereabouts",
           "title": "Word of someone",
-          "detail": "Edren reading layers as history.",
+          "prose": "Edren wants every layer left readable. I need to know which layer holds the roof. We mark the record, photograph the face, then argue about whether I may remove it.",
+          "reward": null,
           "worldHint": false
         },
         {
           "sequence": "10",
+          "sourceID": "auber_word_grimmond",
+          "kind": "whereabouts",
           "title": "Word of someone",
-          "detail": "Auber separating a carrier whose absence may support a hill.",
+          "prose": "Grimmond brings me ore with stone, water and occasionally half a support brace attached. I separate the useful fraction. He insists I label the residue by weight. He is right and graceless.",
+          "reward": null,
           "worldHint": false
         },
         {
           "sequence": "11",
+          "sourceID": "grimmond_account_empty_support",
+          "kind": "account",
           "title": "An account",
-          "detail": "a correct yield beside an “unexpected” empty chamber.",
+          "prose": "Ore yield: as estimated. Empty chamber: as estimated. Supports requested: denied because the chamber was listed as a by-product. The roof has not read the ledger.",
+          "reward": null,
           "worldHint": false
         }
       ],
@@ -4594,36 +5404,96 @@
       "roleLabel": "Service",
       "role": "Channelworks",
       "diaryReward": "Emanation Housing Schematic",
-      "diaryPageLabel": "twelve pages",
+      "diaryPageLabel": "10 authored pages",
       "diaryPages": [
         {
-          "sequence": "1–8",
+          "sequence": "1",
+          "sourceID": "oda_where_0",
+          "kind": "locationClue",
           "title": "Where someone is",
-          "detail": null,
+          "prose": "Much of the ground is hard enough to keep its shape under force. A housing begins with what refuses to travel.",
+          "reward": null,
+          "worldHint": true
+        },
+        {
+          "sequence": "2",
+          "sourceID": "oda_where_1",
+          "kind": "locationClue",
+          "title": "Where someone is",
+          "prose": "Other parts of the ground react to pressure by shifting, venting or changing shape. Calling that instability does not explain the route.",
+          "reward": null,
+          "worldHint": true
+        },
+        {
+          "sequence": "3",
+          "sourceID": "oda_where_2",
+          "kind": "locationClue",
+          "title": "Where someone is",
+          "prose": "The world is enclosed by close walls and narrow passages. Sounds echo nearby instead of carrying into the distance.",
+          "reward": null,
+          "worldHint": true
+        },
+        {
+          "sequence": "4",
+          "sourceID": "oda_where_3",
+          "kind": "locationClue",
+          "title": "Where someone is",
+          "prose": "Still air leaves the effect where it was released. At last the instrument cannot blame the weather.",
+          "reward": null,
+          "worldHint": true
+        },
+        {
+          "sequence": "5",
+          "sourceID": "oda_where_4",
+          "kind": "locationClue",
+          "title": "Where someone is",
+          "prose": "A harmful trace remains after the visible source is gone. Invisible continuation is still part of the discharge.",
+          "reward": null,
+          "worldHint": true
+        },
+        {
+          "sequence": "6",
+          "sourceID": "oda_where_5",
+          "kind": "locationClue",
+          "title": "Where someone is",
+          "prose": "Heat gathers at every join intended to hold it. The housing reports its design through the first place it hurts.",
+          "reward": null,
+          "worldHint": true
+        },
+        {
+          "sequence": "7",
+          "sourceID": "oda_where_6",
+          "kind": "locationClue",
+          "title": "Where someone is",
+          "prose": "Light persists between bright intervals. A carrier can continue after its dramatic moment has passed.",
+          "reward": null,
+          "worldHint": true
+        },
+        {
+          "sequence": "8",
+          "sourceID": "oda_where_7",
+          "kind": "locationClue",
+          "title": "Where someone is",
+          "prose": "Light, weather and other world changes return on a highly predictable schedule. Repeating a test under the same interval can distinguish containment from luck.",
+          "reward": null,
           "worldHint": true
         },
         {
           "sequence": "9",
-          "title": "A Schematic",
-          "detail": "give an emanation a route, limit and disclosed failure point.",
+          "sourceID": "oda_emanation_housing",
+          "kind": "schematic",
+          "title": "A schematic",
+          "prose": "Housing requirements: defined inlet, constrained route, rated stop and visible failure point. The force remains hazardous. The housing makes its path inspectable.",
+          "reward": "Teaches schematic: emanation_housing",
           "worldHint": false
         },
         {
           "sequence": "10",
+          "sourceID": "oda_word_fen",
+          "kind": "whereabouts",
           "title": "Word of someone",
-          "detail": "Ashe and the body at the end of a release path.",
-          "worldHint": false
-        },
-        {
-          "sequence": "11",
-          "title": "Word of someone",
-          "detail": "Fen making stored work's carrier visible.",
-          "worldHint": false
-        },
-        {
-          "sequence": "12",
-          "title": "Word of someone",
-          "detail": "Auber preparing a property before Oda routes it.",
+          "prose": "Fen stores work in a drawn string and releases it along a visible carrier. My carrier may be heat, light or caustic charge. It must be equally traceable, though Fen objects to my use of 'equally.'",
+          "reward": null,
           "worldHint": false
         }
       ],
@@ -4639,36 +5509,114 @@
       "roleLabel": "Service",
       "role": "Distillery",
       "diaryReward": "Brine focus",
-      "diaryPageLabel": "twelve pages",
+      "diaryPageLabel": "12 authored pages",
       "diaryPages": [
         {
-          "sequence": "1–8",
+          "sequence": "1",
+          "sourceID": "auber_where_0",
+          "kind": "locationClue",
           "title": "Where someone is",
-          "detail": null,
+          "prose": "Water leaves a white mineral crust when it dries, and the next water carries the same sharp taste. Separation changes the carrier that follows.",
+          "reward": null,
+          "worldHint": true
+        },
+        {
+          "sequence": "2",
+          "sourceID": "auber_where_1",
+          "kind": "locationClue",
+          "title": "Where someone is",
+          "prose": "Water gathers into distinct bodies. A mixture needs an edge before its layers can be compared.",
+          "reward": null,
+          "worldHint": true
+        },
+        {
+          "sequence": "3",
+          "sourceID": "auber_where_2",
+          "kind": "locationClue",
+          "title": "Where someone is",
+          "prose": "Most of the water stands in broad, still bodies long enough for sediment to settle. Patience separates some things and merely postpones others.",
+          "reward": null,
+          "worldHint": true
+        },
+        {
+          "sequence": "4",
+          "sourceID": "auber_where_3",
+          "kind": "locationClue",
+          "title": "Where someone is",
+          "prose": "Heat and cold take turns carrying different parts. Neither interval tells the whole composition.",
+          "reward": null,
+          "worldHint": true
+        },
+        {
+          "sequence": "5",
+          "sourceID": "auber_where_4",
+          "kind": "locationClue",
+          "title": "Where someone is",
+          "prose": "Much of the ground reacts strongly to heat or water by changing colour, shape or state. Any vessel used here must resist the same reactions.",
+          "reward": null,
+          "worldHint": true
+        },
+        {
+          "sequence": "6",
+          "sourceID": "auber_where_5",
+          "kind": "locationClue",
+          "title": "Where someone is",
+          "prose": "The workable matter keeps to narrow seams. Precision can spare the ground or simply make taking more efficient.",
+          "reward": null,
+          "worldHint": true
+        },
+        {
+          "sequence": "7",
+          "sourceID": "auber_where_6",
+          "kind": "locationClue",
+          "title": "Where someone is",
+          "prose": "Vapour keeps the farther edge uncertain. What leaves the vessel remains part of the process even when nobody collects it.",
+          "reward": null,
+          "worldHint": true
+        },
+        {
+          "sequence": "8",
+          "sourceID": "auber_where_7",
+          "kind": "locationClue",
+          "title": "Where someone is",
+          "prose": "Conditions change sharply from one interval to the next, enough to alter the mixture each time. Repetition is not purification by itself.",
+          "reward": null,
           "worldHint": true
         },
         {
           "sequence": "9",
+          "sourceID": "auber_brine",
+          "kind": "focus",
           "title": "A focus",
-          "detail": "Brine.",
+          "prose": "Brine is water carrying enough dissolved salt to taste sharp and leave crystals as it dries. Reduce it slowly. Scorched salt ruins the finish and the room smells dreadful.",
+          "reward": "Teaches Focus: brine",
           "worldHint": false
         },
         {
           "sequence": "10",
+          "sourceID": "auber_word_nessa",
+          "kind": "whereabouts",
           "title": "Word of someone",
-          "detail": "Nessa asking what concentration does to a body.",
+          "prose": "Nessa asks what the extract does to a particular body at a particular dose. I tell her what was concentrated and what remains dissolved. Then she stops me tasting it, usually correctly.",
+          "reward": null,
           "worldHint": false
         },
         {
           "sequence": "11",
+          "sourceID": "auber_word_grimmond",
+          "kind": "whereabouts",
           "title": "Word of someone",
-          "detail": "Grimmond accounting for carrier and support.",
+          "prose": "Grimmond brings me ore with stone, water and occasionally half a support brace attached. I separate the useful fraction. He insists I label the residue by weight. He is right and graceless.",
+          "reward": null,
           "worldHint": false
         },
         {
           "sequence": "12",
+          "sourceID": "auber_word_oda",
+          "kind": "whereabouts",
           "title": "Word of someone",
-          "detail": "Oda requiring exact concentration and carrier.",
+          "prose": "Oda needs an output whose concentration and carrier are exact enough to contain. If my pure fraction hides its remaining vapour, she sends it back with annotations sharp enough to cut glass.",
+          "reward": null,
           "worldHint": false
         }
       ],
@@ -4684,36 +5632,114 @@
       "roleLabel": "Role",
       "role": "emanation specialist",
       "diaryReward": "an active-emanation gambit phrase and the Spent Emanation Housing site lead",
-      "diaryPageLabel": "twelve pages",
+      "diaryPageLabel": "12 authored pages",
       "diaryPages": [
         {
-          "sequence": "1–8",
+          "sequence": "1",
+          "sourceID": "ashe_where_0",
+          "kind": "locationClue",
           "title": "Where someone is",
-          "detail": null,
+          "prose": "Heat rises through my feet before the sky changes. The body notices direction even when the instrument reports only amount.",
+          "reward": null,
+          "worldHint": true
+        },
+        {
+          "sequence": "2",
+          "sourceID": "ashe_where_1",
+          "kind": "locationClue",
+          "title": "Where someone is",
+          "prose": "The world swings sharply between heat and cold. My joints notice the change before the scale finishes moving.",
+          "reward": null,
+          "worldHint": true
+        },
+        {
+          "sequence": "3",
+          "sourceID": "ashe_where_2",
+          "kind": "locationClue",
+          "title": "Where someone is",
+          "prose": "Light remains without a visible sky-source. Absence of a lamp does not make the sensation imaginary.",
+          "reward": null,
+          "worldHint": true
+        },
+        {
+          "sequence": "4",
+          "sourceID": "ashe_where_3",
+          "kind": "locationClue",
+          "title": "Where someone is",
+          "prose": "The ground reacts to pressure by shifting, cracking or changing shape instead of merely holding it. I recognise the reply because mine is also mistaken for obedience.",
+          "reward": null,
+          "worldHint": true
+        },
+        {
+          "sequence": "5",
+          "sourceID": "ashe_where_4",
+          "kind": "locationClue",
+          "title": "Where someone is",
+          "prose": "The harmful trace stays in the breath after its cause disappears. Danger does not owe anyone a dramatic entrance.",
+          "reward": null,
+          "worldHint": true
+        },
+        {
+          "sequence": "6",
+          "sourceID": "ashe_where_5",
+          "kind": "locationClue",
+          "title": "Where someone is",
+          "prose": "The air brings the effect from several directions. A body cannot face every source, but it can name what that costs.",
+          "reward": null,
+          "worldHint": true
+        },
+        {
+          "sequence": "7",
+          "sourceID": "ashe_where_6",
+          "kind": "locationClue",
+          "title": "Where someone is",
+          "prose": "Growth continues beneath conditions called hostile. Survival proves capacity, not comfort.",
+          "reward": null,
+          "worldHint": true
+        },
+        {
+          "sequence": "8",
+          "sourceID": "ashe_where_7",
+          "kind": "locationClue",
+          "title": "Where someone is",
+          "prose": "Heat, light, wind and other conditions swing between mild and extreme states. Even a predictable return to the extreme is a burden on the body.",
+          "reward": null,
           "worldHint": true
         },
         {
           "sequence": "9",
+          "sourceID": "ashe_teach_foe_emanating",
+          "kind": "gambit",
           "title": "A gambit phrase",
-          "detail": "identify a foe whose emanation is active now.",
+          "prose": "If a foe is emanating, the release is already happening around the visible attack. Ground or interrupt that active force first. The body producing it is not the whole hazard.",
+          "reward": "Teaches Gambit: subject_foe_emanating",
           "worldHint": false
         },
         {
           "sequence": "10",
+          "sourceID": "ashe_word_oda",
+          "kind": "whereabouts",
           "title": "Word of someone",
-          "detail": "Oda mapping where a failed housing sends force.",
+          "prose": "Oda asks where a failed housing sends the force. I ask who is standing in that path and whether they agreed to be there. We need both answers before a test.",
+          "reward": null,
           "worldHint": false
         },
         {
           "sequence": "11",
+          "sourceID": "ashe_account_praised_endurance",
+          "kind": "account",
           "title": "An account",
-          "detail": "a warning dismissed until endurance became convenient to praise.",
+          "prose": "I warned them the release was building. They called me sensitive. After I absorbed it, they called me strong. I needed them to move the first time.",
+          "reward": null,
           "worldHint": false
         },
         {
           "sequence": "12",
+          "sourceID": "ashe_site_spent_housing",
+          "kind": "ruin",
           "title": "Somewhere built",
-          "detail": "the Spent Emanation Housing and ground still receiving its release.",
+          "prose": "The housing is empty. The surrounding stone is still hot and my hands are tingling. The device finished releasing; this place has not finished receiving it.",
+          "reward": null,
           "worldHint": false
         }
       ],
@@ -4729,48 +5755,132 @@
       "roleLabel": "Service",
       "role": "Anchorage",
       "diaryReward": "Drift focus and the Atlas Seam site lead",
-      "diaryPageLabel": "fourteen pages",
+      "diaryPageLabel": "14 authored pages",
       "diaryPages": [
         {
-          "sequence": "1–8",
+          "sequence": "1",
+          "sourceID": "tovin_where_0",
+          "kind": "locationClue",
           "title": "Where someone is",
-          "detail": null,
+          "prose": "Even at its brightest, the world remains dark. The dark is not empty.",
+          "reward": null,
+          "worldHint": true
+        },
+        {
+          "sequence": "2",
+          "sourceID": "tovin_where_1",
+          "kind": "locationClue",
+          "title": "Where someone is",
+          "prose": "Fungal growth spreads without sunlight. It has made the dark its own.",
+          "reward": null,
+          "worldHint": true
+        },
+        {
+          "sequence": "3",
+          "sourceID": "tovin_where_2",
+          "kind": "locationClue",
+          "title": "Where someone is",
+          "prose": "Stone and packed earth dominate the world—floor, wall, ceiling, and the dust between.",
+          "reward": null,
+          "worldHint": true
+        },
+        {
+          "sequence": "4",
+          "sourceID": "tovin_where_3",
+          "kind": "locationClue",
+          "title": "Where someone is",
+          "prose": "Everything is close. I do not like it.",
+          "reward": null,
+          "worldHint": true
+        },
+        {
+          "sequence": "5",
+          "sourceID": "tovin_where_4",
+          "kind": "locationClue",
+          "title": "Where someone is",
+          "prose": "The water leaves a white seam wherever it withdraws.",
+          "reward": null,
+          "worldHint": true
+        },
+        {
+          "sequence": "6",
+          "sourceID": "tovin_where_5",
+          "kind": "locationClue",
+          "title": "Where someone is",
+          "prose": "Even the deepest hours never soften the cold.",
+          "reward": null,
+          "worldHint": true
+        },
+        {
+          "sequence": "7",
+          "sourceID": "tovin_where_6",
+          "kind": "locationClue",
+          "title": "Where someone is",
+          "prose": "No draft reaches the loose corner of this page.",
+          "reward": null,
+          "worldHint": true
+        },
+        {
+          "sequence": "8",
+          "sourceID": "tovin_where_7",
+          "kind": "locationClue",
+          "title": "Where someone is",
+          "prose": "Every interval arrives exactly when the last one promised.",
+          "reward": null,
           "worldHint": true
         },
         {
           "sequence": "9",
+          "sourceID": "tovin_drift",
+          "kind": "focus",
           "title": "A focus",
-          "detail": "Drift.",
+          "prose": "Drift is the change between one measured interval and the next when the world does not keep our expected pace. Record both clocks. I learned this after trusting only one.",
+          "reward": "Teaches Focus: drift",
           "worldHint": false
         },
         {
           "sequence": "10",
+          "sourceID": "tovin_word_edren",
+          "kind": "whereabouts",
           "title": "Word of someone",
-          "detail": "Edren choosing cold because layers remain undisturbed.",
+          "prose": "Edren chose a cold world because the layers remain undisturbed. He will be delighted, underdressed, and unwilling to admit either fact.",
+          "reward": null,
           "worldHint": false
         },
         {
           "sequence": "11",
+          "sourceID": "tovin_about_isolde",
+          "kind": "locationClue",
           "title": "Where someone is",
-          "detail": null,
+          "prose": "The ground rises into high ridges and steep slopes. Isolde always chose stone she could see by, far from a flickering fire.",
+          "reward": null,
           "worldHint": true
         },
         {
           "sequence": "12",
+          "sourceID": "tovin_world_held_four",
+          "kind": "worldWorthWriting",
           "title": "A world worth writing",
-          "detail": "a stripped world whose blue mineral rain still matters.",
+          "prose": "The fourth world yielded enough Essence to fund the next binding. I called that self-sustaining while stripping it. Blue mineral rain fell on empty ground. I still miss the sound, which is not an excuse.",
+          "reward": null,
           "worldHint": false
         },
         {
           "sequence": "13",
+          "sourceID": "tovin_world_left_open",
+          "kind": "worldWorthWriting",
           "title": "A world worth writing",
-          "detail": "a generous world lost while caution made the choice.",
+          "prose": "I wrote a generous world and refused to bind it because I distrusted my motive. The page was lost unused. I can explain the caution clearly; that does not recover the world.",
+          "reward": null,
           "worldHint": false
         },
         {
           "sequence": "14",
+          "sourceID": "tovin_site_atlas_seam",
+          "kind": "ruin",
           "title": "Somewhere built",
-          "detail": "an Atlas Seam where an old binding still catches.",
+          "prose": "Some worlds contain a natural anchor where the old binding still catches. The page pulls taut near it. Mark the seam first; decide what to attach only after you know the return route.",
+          "reward": null,
           "worldHint": false
         }
       ],
@@ -4786,30 +5896,114 @@
       "roleLabel": "Role",
       "role": "interpreter",
       "diaryReward": "Mirror focus. Perren's pages have no canonical chronology",
-      "diaryPageLabel": "twelve pages",
+      "diaryPageLabel": "12 authored pages",
       "diaryPages": [
         {
-          "sequence": "1–9",
+          "sequence": "1",
+          "sourceID": "perren_where_0",
+          "kind": "locationClue",
           "title": "Where someone is",
-          "detail": null,
+          "prose": "Bright light and deep shadow are both strong here, often side by side. They taught that conflict reveals the truer source; it may only reveal who selected the frame.",
+          "reward": null,
+          "worldHint": true
+        },
+        {
+          "sequence": "2",
+          "sourceID": "perren_where_1",
+          "kind": "locationClue",
+          "title": "Where someone is",
+          "prose": "Heat and cold press into the same interval. A forced choice between them would make either answer feel discovered.",
+          "reward": null,
+          "worldHint": true
+        },
+        {
+          "sequence": "3",
+          "sourceID": "perren_where_2",
+          "kind": "locationClue",
+          "title": "Where someone is",
+          "prose": "Growth and suppression are both active. The bare patch is evidence of relation, not proof that one side was always barren.",
+          "reward": null,
+          "worldHint": true
+        },
+        {
+          "sequence": "4",
+          "sourceID": "perren_where_3",
+          "kind": "locationClue",
+          "title": "Where someone is",
+          "prose": "Ruins and repeatedly broken structures cover the ground. One history has been built directly over another.",
+          "reward": null,
+          "worldHint": true
+        },
+        {
+          "sequence": "5",
+          "sourceID": "perren_where_4",
+          "kind": "locationClue",
+          "title": "Where someone is",
+          "prose": "Close walls and narrow corridors restrict both sight and travel. The next choice can resemble the only one once the corridor is built.",
+          "reward": null,
+          "worldHint": true
+        },
+        {
+          "sequence": "6",
+          "sourceID": "perren_where_5",
+          "kind": "locationClue",
+          "title": "Where someone is",
+          "prose": "Worked matter is spread evenly. Any chosen sample can represent the whole if no one asks who chose it.",
+          "reward": null,
+          "worldHint": true
+        },
+        {
+          "sequence": "7",
+          "sourceID": "perren_where_6",
+          "kind": "locationClue",
+          "title": "Where someone is",
+          "prose": "Haze obscures distant ground long before nearby objects disappear. Distance removes context before it removes the object.",
+          "reward": null,
+          "worldHint": true
+        },
+        {
+          "sequence": "8",
+          "sourceID": "perren_where_7",
+          "kind": "locationClue",
+          "title": "Where someone is",
+          "prose": "The same interval returns at a regular, predictable time. Repetition can teach expectation and then present fulfilment as revelation.",
+          "reward": null,
+          "worldHint": true
+        },
+        {
+          "sequence": "9",
+          "sourceID": "perren_where_8",
+          "kind": "locationClue",
+          "title": "Where someone is",
+          "prose": "Retreating water leaves a bright white mineral line along every bank. It looks inevitable after it appears; the water remembers otherwise.",
+          "reward": null,
           "worldHint": true
         },
         {
           "sequence": "10",
+          "sourceID": "perren_mirror",
+          "kind": "focus",
           "title": "A focus",
-          "detail": "Mirror.",
+          "prose": "A mirror offers exactness after reversing the image and cutting away everything beyond its edge. Useful, therefore, as an accusation against the frame—not as its witness.",
+          "reward": "Teaches Focus: mirror",
           "worldHint": false
         },
         {
           "sequence": "11",
+          "sourceID": "perren_word_lys",
+          "kind": "whereabouts",
           "title": "Word of someone",
-          "detail": "Lys preserving contradiction without forced disappearance.",
+          "prose": "Lys preserves contradictory accounts without forcing one to disappear. I once named that cowardice. The doctrine had trained me to fear any archive in which its victory was not inevitable.",
+          "reward": null,
           "worldHint": false
         },
         {
           "sequence": "12",
+          "sourceID": "perren_turn_unframed",
+          "kind": "turn",
           "title": "A turn",
-          "detail": "questions Perren stopped discarding, without one marked conversion.",
+          "prose": "There is no sentence I can underline and call the moment belief became departure. I merely stopped discarding the questions the lesson announced it had already answered.",
+          "reward": null,
           "worldHint": false
         }
       ],
@@ -4825,36 +6019,123 @@
       "roleLabel": "Role",
       "role": "continuity keeper",
       "diaryReward": "Dream focus",
-      "diaryPageLabel": "thirteen pages",
+      "diaryPageLabel": "13 authored pages",
       "diaryPages": [
         {
-          "sequence": "1–9",
+          "sequence": "1",
+          "sourceID": "nine_where_0",
+          "kind": "locationClue",
           "title": "Where someone is",
-          "detail": null,
+          "prose": "No interval arrives when the last one taught me to expect it. I can record surprise without treating it as failure.",
+          "reward": null,
+          "worldHint": true
+        },
+        {
+          "sequence": "2",
+          "sourceID": "nine_where_1",
+          "kind": "locationClue",
+          "title": "Where someone is",
+          "prose": "The world changes dramatically from one interval to the next. Both accounts belong to the person who wrote them.",
+          "reward": null,
+          "worldHint": true
+        },
+        {
+          "sequence": "3",
+          "sourceID": "nine_where_2",
+          "kind": "locationClue",
+          "title": "Where someone is",
+          "prose": "A little light persists without naming its source. Continuity does not require a complete origin.",
+          "reward": null,
+          "worldHint": true
+        },
+        {
+          "sequence": "4",
+          "sourceID": "nine_where_3",
+          "kind": "locationClue",
+          "title": "Where someone is",
+          "prose": "Temperature stays within a narrow range even while other conditions change. I can use that stable range as a reference without calling it the whole world.",
+          "reward": null,
+          "worldHint": true
+        },
+        {
+          "sequence": "5",
+          "sourceID": "nine_where_4",
+          "kind": "locationClue",
+          "title": "Where someone is",
+          "prose": "Water reaches nearly every route and never the same point twice. Repetition may preserve a relation without preserving a shape.",
+          "reward": null,
+          "worldHint": true
+        },
+        {
+          "sequence": "6",
+          "sourceID": "nine_where_5",
+          "kind": "locationClue",
+          "title": "Where someone is",
+          "prose": "The same material is spread widely and evenly while the surface changes. Familiarity can be verified without pretending it is recollection.",
+          "reward": null,
+          "worldHint": true
+        },
+        {
+          "sequence": "7",
+          "sourceID": "nine_where_6",
+          "kind": "locationClue",
+          "title": "Where someone is",
+          "prose": "The land is neither cramped nor completely open; a clear horizon remains within visible bounds. I can use it to check my place without asking it to become an escape.",
+          "reward": null,
+          "worldHint": true
+        },
+        {
+          "sequence": "8",
+          "sourceID": "nine_where_7",
+          "kind": "locationClue",
+          "title": "Where someone is",
+          "prose": "New growth stands beside what the last interval damaged. The later life is not a repair pretending nothing happened.",
+          "reward": null,
+          "worldHint": true
+        },
+        {
+          "sequence": "9",
+          "sourceID": "nine_where_8",
+          "kind": "locationClue",
+          "title": "Where someone is",
+          "prose": "A loose marker remains where I placed it. I trust the choice again when I see it, even if I cannot recover making it.",
+          "reward": null,
           "worldHint": true
         },
         {
           "sequence": "10",
+          "sourceID": "nine_dream",
+          "kind": "focus",
           "title": "A focus",
-          "detail": "Dream.",
+          "prose": "A dream joins things without proving they once happened together. It can make a possibility inhabitable without turning it into recovered fact.",
+          "reward": "Teaches Focus: dream",
           "worldHint": false
         },
         {
           "sequence": "11",
+          "sourceID": "nine_word_isolde",
+          "kind": "whereabouts",
           "title": "Word of someone",
-          "detail": "Isolde recognising discipline without claiming a whole identity.",
+          "prose": "Isolde reads discipline in the pressure of a hand. She does not claim the pressure tells her who the hand truly was. This is why I let her teach me.",
+          "reward": null,
           "worldHint": false
         },
         {
           "sequence": "12",
+          "sourceID": "nine_word_ashe",
+          "kind": "whereabouts",
           "title": "Word of someone",
-          "detail": "Ashe retaining authorship while treated as evidence.",
+          "prose": "Ashe is treated as evidence of a force larger than them. We agree that being evidence does not surrender authorship of what happens next.",
+          "reward": null,
           "worldHint": false
         },
         {
           "sequence": "13",
+          "sourceID": "nine_word_tovin",
+          "kind": "whereabouts",
           "title": "Word of someone",
-          "detail": "Tovin preserving return without pretending it is restoration.",
+          "prose": "Tovin binds a world so return remains possible. I bind a marker to a choice for the same reason: return, not restoration.",
+          "reward": null,
           "worldHint": false
         }
       ],

@@ -344,6 +344,32 @@ const diarySections = new Map(
 const travellerIDByName = new Map(
   travellerSource.travellers.map((traveller) => [traveller.name, traveller.id]),
 );
+const diaryTitleForKind = {
+  locationClue: 'Where someone is',
+  focus: 'A focus',
+  ruin: 'Somewhere built',
+  researchLead: 'A line of study',
+  worldWorthWriting: 'A world worth writing',
+  gambit: 'A gambit phrase',
+  pattern: 'A pattern',
+  account: 'An account',
+  schematic: 'A schematic',
+  turn: 'A turn',
+  whereabouts: 'Word of someone',
+};
+const rewardForPage = (page) => {
+  if (page.teachesFocus) return `Teaches Focus: ${page.teachesFocus}`;
+  if (page.teachesGambit) return `Teaches Gambit: ${page.teachesGambit}`;
+  if (page.teachesPattern) return `Teaches pattern: ${page.teachesPattern}`;
+  if (page.teachesSchematic) return `Teaches schematic: ${page.teachesSchematic}`;
+  if (page.researchNode) return `Research lead: ${page.researchNode}`;
+  return null;
+};
+// The player-facing full-cast guide assigns Auber's carrier record to Grimmond's
+// eleven-page book; preserve the existing authored source record verbatim.
+const bookSupplementsByTraveller = new Map([
+  ['grimmond', [{ id: 'auber_word_grimmond', after: 'grimmond_word_edren' }]],
+]);
 if (castRows.length !== 29 || diarySections.size !== 29) {
   throw new Error('Player Wiki full-cast guide must retain all 29 campaign entries');
 }
@@ -359,24 +385,27 @@ const cast = await Promise.all(castRows.map(async (row) => {
   if (!serviceLine) {
     throw new Error(`Full-cast guide has no service or role line for ${row.name}`);
   }
-  const pageStarts = [...diary.body.matchAll(/^([\d]+(?:–[\d]+)?)\. \*\*([^*]+)\*\* — /gm)];
-  if (!pageStarts.length) {
-    throw new Error(`Full-cast guide has no diary sequence for ${row.name}`);
+  const sourcePages = [...travellerSource.pages.filter((page) => page.diary === travellerID)];
+  const supplementPlans = bookSupplementsByTraveller.get(travellerID) ?? [];
+  const supplements = supplementPlans.map((plan) => ({ ...plan, page: travellerSource.pages.find((page) => page.id === plan.id) }));
+  if (supplements.some((supplement) => !supplement.page)) {
+    throw new Error(`Full-cast book supplement is missing for ${row.name}`);
   }
-  const diaryPages = pageStarts.map((match, index) => {
-    const next = pageStarts[index + 1];
-    const end = next ? next.index : diary.body.length;
-    const rawDetail = diary.body.slice((match.index ?? 0) + match[0].length, end)
-      .split(/\n\n(?=(?:Keep|Nine's))/)[0];
-    const title = compactCopy(match[2]);
-    const worldHint = title === 'Where someone is';
-    return {
-      sequence: match[1],
-      title,
-      detail: worldHint ? null : compactCopy(rawDetail),
-      worldHint,
-    };
-  });
+  for (const supplement of supplements) {
+    const insertionIndex = sourcePages.findIndex((page) => page.id === supplement.after);
+    if (insertionIndex < 0) throw new Error(`Full-cast book supplement has no ordered anchor for ${row.name}`);
+    sourcePages.splice(insertionIndex + 1, 0, supplement.page);
+  }
+  const diaryPages = sourcePages.map((page, index) => ({
+    sequence: String(index + 1),
+    sourceID: page.id,
+    kind: page.kind,
+    title: diaryTitleForKind[page.kind] ?? compactCopy(page.kind),
+    prose: page.prose,
+    reward: rewardForPage(page),
+    worldHint: page.kind === 'locationClue',
+  }));
+  if (!diaryPages.length) throw new Error(`Full-cast guide has no authored diary source for ${row.name}`);
   return {
     slug: slugFor(row.name),
     name: row.name,
@@ -387,7 +416,7 @@ const cast = await Promise.all(castRows.map(async (row) => {
     roleLabel: serviceLine[1],
     role: compactCopy(serviceLine[2]),
     diaryReward: compactCopy(serviceLine[3]),
-    diaryPageLabel: compactCopy(diary.pageLabel),
+    diaryPageLabel: `${diaryPages.length} authored ${diaryPages.length === 1 ? 'page' : 'pages'}`,
     diaryPages,
     assetURL: await publishTravellerCameo(travellerID, slugFor(row.name)),
   };
@@ -497,15 +526,6 @@ for (const traveller of source.travellers.filter(
     const authoredTraveller = travellerSource.travellers.find(
       (entry) => entry.id === traveller.id,
     );
-    const rewardFor = (page) => {
-      if (page.teachesFocus) return `Teaches Focus: ${page.teachesFocus}`;
-      if (page.teachesGambit) return `Teaches Gambit: ${page.teachesGambit}`;
-      if (page.teachesPattern) return `Teaches pattern: ${page.teachesPattern}`;
-      if (page.teachesSchematic)
-        return `Teaches schematic: ${page.teachesSchematic}`;
-      if (page.researchNode) return `Research lead: ${page.researchNode}`;
-      return null;
-    };
     travellers.push({
       id: traveller.id,
       slug: traveller.slug,
@@ -525,7 +545,7 @@ for (const traveller of source.travellers.filter(
         .map((page) => ({
           kind: page.kind,
           prose: page.prose,
-          reward: rewardFor(page),
+          reward: rewardForPage(page),
         })),
       assetURL: await publishTravellerCameo(traveller.id, traveller.slug),
     });

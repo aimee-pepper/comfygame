@@ -6,6 +6,7 @@ import { PixelImage } from '@/components/pixel-image';
 import { GuideBreadcrumbs, RelatedGuides } from '@/components/guide-navigation';
 import { SiteFrame } from '@/components/site-frame';
 import { content } from '@/lib/content';
+import { serviceForStation } from '@/lib/services';
 
 export function generateStaticParams() {
   return content.cast.map((person) => ({ slug: person.slug }));
@@ -29,6 +30,9 @@ export default async function PersonDetail({
   const person = content.cast.find((entry) => entry.slug === slug);
   if (!person) notFound();
   const station = content.stations.find((entry) => person.role.includes(entry.name));
+  const service = station ? serviceForStation(station.id) : null;
+  const hintPages = person.diaryPages.filter((page) => page.worldHint);
+  const bookPages = person.diaryPages.filter((page) => !page.worldHint);
   return (
     <SiteFrame sidebar>
       <GuideBreadcrumbs items={[{ label: 'Reference', href: '/people' }, { label: 'People', href: '/people' }, { label: person.name }]} />
@@ -50,13 +54,14 @@ export default async function PersonDetail({
           <span>Campaign order {person.order}</span>
         </a>
         <a href="#diary-pages">
-          <strong>Diary pages</strong>
+          <strong>Book pages</strong>
           <span>{person.diaryPageLabel}</span>
         </a>
+        {hintPages.length > 0 && <a href="#location-hints"><strong>Location hints</strong><span>{hintPages.length} spoiler-marked stage{hintPages.length === 1 ? '' : 's'}</span></a>}
       </nav>
       <section className="article-section note-card">
         <h2>Spoiler boundary</h2>
-        <p>Use this page after the Library names {person.name} as someone to seek. A page headed “Where someone is” remains a world hint: recover that exact diary page before using its details.</p>
+        <p>This page includes the complete currently authored book and location-hint text for {person.name}. The location-hint stages are separated below so you can stop before reading them; they are not a substitute for recovering records in play.</p>
       </section>
       <section className="article-section" id="meeting">
         <h2>At a glance</h2>
@@ -85,21 +90,25 @@ export default async function PersonDetail({
         {station && (
           <p>
             Their current village route is the <Link href={`/places/${station.slug}`}>{station.name}</Link>.
+            {service && <> Its current player guide is <Link href={`/services/${service.slug}`}>{service.name}</Link>.</>}
           </p>
         )}
       </section>
       <section className="article-section" id="diary-pages">
-        <h2>Diary sequence</h2>
+        <h2>Book pages beyond location hints</h2>
+        <p>{person.diaryPageLabel}. The complete authored record is divided into these book pages and the spoiler-marked location-hint stages below; each keeps the current source text in order.</p>
         <div className="diary-grid">
-          {person.diaryPages.map((page) => (
+          {bookPages.map((page) => (
             <article className="note-card" key={`${person.slug}-page-${page.sequence}`}>
               <p className="eyebrow">Page {page.sequence} · {page.title}</p>
-              {page.worldHint ? <p>This is a world hint. Its details become useful only after this exact diary page is recovered.</p> : <p>{page.detail ?? ''}</p>}
+              <p>{page.prose}</p>
+              {page.reward && <small>{page.reward}</small>}
             </article>
           ))}
         </div>
       </section>
-      <RelatedGuides links={[{ label: 'All people', href: '/people' }, ...(station ? [{ label: `Visit ${station.name}`, href: `/places/${station.slug}` }] : []), { label: 'Village services', href: '/services' }, { label: 'All systems', href: '/systems' }]} />
+      {hintPages.length > 0 && <section className="article-section spoiler-boundary" id="location-hints"><h2>Spoilers — location-hint stages</h2><p>These authored pages describe conditions and related observations. Read them only when you want the complete player-reference material.</p><div className="diary-grid">{hintPages.map((page) => <article className="note-card" key={`${person.slug}-hint-${page.sequence}`}><p className="eyebrow">Page {page.sequence} · {page.title}</p><p>{page.prose}</p></article>)}</div></section>}
+      <RelatedGuides links={[{ label: 'All people', href: '/people' }, ...(station ? [{ label: `Visit ${station.name}`, href: `/places/${station.slug}` }] : []), ...(service ? [{ label: service.name, href: `/services/${service.slug}` }] : []), { label: 'Site directory', href: '/sites' }, { label: 'Knowledge and records', href: '/systems/knowledge-records' }, { label: 'Exploration', href: '/systems/exploration' }, { label: 'Village services', href: '/services' }, { label: 'All systems', href: '/systems' }]} />
     </SiteFrame>
   );
 }
