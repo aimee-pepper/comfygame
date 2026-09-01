@@ -5,6 +5,7 @@ import { SiteFrame } from '@/components/site-frame';
 import { content } from '@/lib/content';
 import { serviceGuides } from '@/lib/services';
 import { playerStartGuides, systemGuides } from '@/lib/system-guides';
+import { villageBuildings } from '@/lib/village';
 
 export default async function SearchPage({ searchParams }: { searchParams: Promise<{ q?: string }> }) {
   const q = ((await searchParams).q ?? '').trim().toLowerCase();
@@ -15,7 +16,7 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
     { label: 'Supplies', entries: content.items.filter(entry => !entry.gear && entry.consumable).map(entry => ({ name: entry.name, summary: entry.summary, href: `/items/${entry.slug}`, type: 'Supply', assetURL: entry.assetURL, alt: `${entry.name} icon` })) },
     { label: 'Curios and key items', entries: content.items.filter(entry => !entry.gear && !entry.consumable).map(entry => ({ name: entry.name, summary: entry.summary, href: `/items/${entry.slug}`, type: 'Curio or key item', assetURL: entry.assetURL, alt: `${entry.name} icon` })) },
     { label: 'People', entries: content.cast.map(entry => ({ name: entry.name, summary: entry.contribution, href: `/people/${entry.slug}`, type: 'Person', assetURL: entry.assetURL, alt: `${entry.name} character visual` })) },
-    { label: 'Village places', entries: content.stations.map(entry => ({ name: entry.name, summary: entry.blurb, href: `/places/${entry.slug}`, type: 'Place', assetURL: entry.assetURL ?? entry.contextAssetURL, alt: entry.assetURL ? `${entry.name} building visual` : `${entry.zone} town setting` })) },
+    { label: 'Village buildings', entries: villageBuildings.map(entry => ({ name: entry.name, summary: entry.status === 'scheduled' ? `${entry.blurb} Scheduled; not yet a live player route.` : entry.blurb, href: `/buildings/${entry.slug}`, type: entry.status === 'scheduled' ? 'Scheduled building' : 'Current Village building', assetURL: entry.assetURL ?? entry.contextAssetURL, alt: entry.assetURL ? `${entry.name} building visual` : `${entry.zone} town setting` })) },
     { label: 'Village services', entries: serviceGuides.map(entry => { const station = content.stations.find((candidate) => candidate.id === entry.stationID); return { name: entry.name, summary: entry.summary, href: `/services/${entry.slug}`, type: 'Service guide', assetURL: station?.assetURL ?? station?.contextAssetURL ?? null, alt: station?.assetURL ? `${station.name} building visual` : `${station?.zone ?? 'Village'} town setting` }; }) },
     { label: 'World records', entries: (() => { const guide = serviceGuides.find((entry) => entry.slug === 'bestiary'); const station = content.stations.find((entry) => entry.id === 'bestiary'); return guide ? [{ name: 'Bestiary', summary: guide.summary, href: '/bestiary', type: 'World record guide', assetURL: station?.assetURL ?? station?.contextAssetURL ?? null, alt: station?.assetURL ? `${station.name} building visual` : 'Village setting' }] : []; })() },
     { label: 'Creatures and threats', entries: content.creatures.map(entry => ({ name: entry.name, summary: `Tier ${entry.tier} · ${entry.isNocturnal ? 'night' : 'day'} profile · ${entry.maxHP} health`, href: `/bestiary/${entry.slug}`, type: 'Current encounter profile', assetURL: null, alt: '' })) },

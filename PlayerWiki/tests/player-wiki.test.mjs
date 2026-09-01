@@ -106,6 +106,25 @@ test('Village directory separates live buildings from scheduled entries and give
   assert.match(detail, /Related materials and next steps/);
 });
 
+test('Village building routes are discoverable from player navigation and material workflows', async () => {
+  const sources = await Promise.all([
+    'components/site-frame.tsx',
+    'app/search/page.tsx',
+    'app/glossary/page.tsx',
+    'app/systems/page.tsx',
+    'app/resources/progression/page.tsx',
+    'app/resources/page.tsx',
+    'app/resources/[slug]/page.tsx',
+    'app/crafting/page.tsx',
+    'app/crafting/[slug]/page.tsx',
+  ].map(read));
+  for (const source of sources) assert.match(source, /\/village|\/buildings\//);
+  assert.match(sources[1], /Scheduled building/);
+  assert.match(sources[4], /Browse Village buildings/);
+  assert.match(sources[5], /\/buildings\/\$\{station\.slug\}/);
+  assert.match(sources[7], /Village buildings/);
+});
+
 test('item details link published recipes and resources without guessing absent acquisition routes', async () => {
   const routes = await read('components/item-crafting-routes.tsx');
   const itemDetail = await read('app/items/[slug]/page.tsx');
@@ -522,7 +541,7 @@ test('creature and site directories are discoverable from shared navigation and 
   for (const source of [frame, systems, glossary, exploration, animals, records, resource]) {
     assert.match(source, /\/bestiary|\/sites/);
   }
-  assert.match(systems, /Field reference directories/);
+  assert.match(systems, /Field and Village reference directories/);
   assert.match(frame, /Site directory/);
   assert.match(records, /without marking one as discovered/);
 });

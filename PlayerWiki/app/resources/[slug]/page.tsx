@@ -168,7 +168,7 @@ export default async function ResourceDetail({
                 {buildUses.map(({ station, quantity }) => (
                   <tr key={station.id}>
                     <td>
-                      <Link href={`/places/${station.slug}`}>
+                      <Link href={`/buildings/${station.slug}`}>
                         {station.name}
                       </Link>
                     </td>
@@ -182,7 +182,7 @@ export default async function ResourceDetail({
           <p>This resource is not a material in a current building recipe.</p>
         )}
       </section>
-      <RelatedGuides links={[{ label: 'All resources', href: '/resources' }, ...craftSystems.flatMap((system) => system ? [{ label: system.name, href: `/crafting/${system.slug}` }] : []), ...buildUses.map(({ station }) => ({ label: station.name, href: `/places/${station.slug}` })), { label: 'Site directory', href: '/sites' }, { label: 'Village services', href: '/services' }, { label: 'All systems', href: '/systems' }]} />
+      <RelatedGuides links={[{ label: 'All resources', href: '/resources' }, ...craftSystems.flatMap((system) => system ? [{ label: system.name, href: `/crafting/${system.slug}` }] : []), ...buildUses.map(({ station }) => ({ label: station.name, href: `/buildings/${station.slug}` })), { label: 'Village buildings', href: '/village' }, { label: 'Village services', href: '/services' }, { label: 'Site directory', href: '/sites' }, { label: 'All systems', href: '/systems' }]} />
     </SiteFrame>
   );
 }

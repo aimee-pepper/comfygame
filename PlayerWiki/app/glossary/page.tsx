@@ -23,7 +23,7 @@ const domainGroups = [
   {
     label: 'Village, resources and progression',
     domains: ['Home and return', 'Essence', 'Research', 'Campaign progression'],
-    links: [['Village services', '/services'], ['Crafting', '/systems/crafting'], ['Resources', '/resources']],
+    links: [['Village buildings', '/village'], ['Village services', '/services'], ['Crafting', '/systems/crafting'], ['Resources', '/resources']],
   },
   {
     label: 'Campaign records and return',

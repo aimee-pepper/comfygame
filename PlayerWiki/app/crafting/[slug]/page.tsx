@@ -94,7 +94,7 @@ export default async function CraftingSystemDetail({
         {station?.assetURL && <div className="crafting-station"><PixelImage src={station.assetURL} alt={`${station.name} building visual`} size={72} /><p><strong>{station.name}</strong> is the current station visual for this system.</p></div>}
         <h2>Access and readiness</h2>
         <dl className="fact-grid">
-          <div><dt>Station access</dt><dd>{station ? constructionCost(station) : 'Open the station named above.'}</dd></div>
+          <div><dt>Station access</dt><dd>{station ? <><Link href={`/buildings/${station.slug}`}>{station.name}</Link> · {constructionCost(station)}</> : 'Open the station named above.'}</dd></div>
           <div><dt>Current route</dt><dd><ul className="compact-list">{system.access.map((fact) => <li key={fact}>{fact}</li>)}</ul></dd></div>
         </dl>
       </section>
@@ -151,7 +151,7 @@ export default async function CraftingSystemDetail({
         <h2>Commit and result</h2>
         <p>{system.commitResult}</p>
       </section>
-      <RelatedGuides links={[{ label: 'All crafting systems', href: '/crafting' }, { label: 'Crafting basics', href: '/systems/crafting' }, ...(service ? [{ label: `Use ${service.name}`, href: `/services/${service.slug}` }] : []), ...relatedResources.slice(0, 3).flatMap((resource) => resource ? [{ label: resource.name, href: `/resources/${resource.slug}` }] : []), { label: 'All resources', href: '/resources' }]} />
+      <RelatedGuides links={[{ label: 'All crafting systems', href: '/crafting' }, ...(station ? [{ label: station.name, href: `/buildings/${station.slug}` }] : []), { label: 'Village buildings', href: '/village' }, { label: 'Crafting basics', href: '/systems/crafting' }, ...(service ? [{ label: `Use ${service.name}`, href: `/services/${service.slug}` }] : []), ...relatedResources.slice(0, 3).flatMap((resource) => resource ? [{ label: resource.name, href: `/resources/${resource.slug}` }] : []), { label: 'All resources', href: '/resources' }]} />
     </SiteFrame>
   );
 }

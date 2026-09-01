@@ -12,6 +12,7 @@ const prepareLinks = [
 ];
 
 const referenceLinks = [
+  ['/village', 'Village buildings'],
   ['/resources', 'Resources'],
   ['/bestiary', 'Bestiary records'],
   ['/sites', 'Site directory'],
@@ -55,7 +56,7 @@ export function SiteFrame({
         <nav aria-label="Primary navigation">
           <Link href="/getting-started">Start here</Link>
           <Link href="/systems">Systems</Link>
-          <Link href="/services">Village</Link>
+          <Link href="/village">Village</Link>
           <Link href="/crafting">Crafting</Link>
           <Link href="/resources">Resources</Link>
           <Link href="/people">People</Link>
