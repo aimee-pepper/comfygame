@@ -232,6 +232,21 @@ test('conditions and techniques are discoverable through combat, preparation, eq
   assert.match(sources[7], /\/statuses\/scent-mask/);
 });
 
+test('action reference keeps current player actions, costs, results, and unavailable states together', async () => {
+  await access(path.join(root, 'app/actions/page.tsx'));
+  await access(path.join(root, 'app/actions/[slug]/page.tsx'));
+  const reference = await read('lib/action-reference.ts');
+  const directory = await read('app/actions/page.tsx');
+  const detail = await read('app/actions/[slug]/page.tsx');
+  for (const stableID of ['writing-bind-world', 'world-move', 'world-search-site', 'combat-attack', 'custody-transfer', 'research-study', 'companion-attend']) assert.match(reference, new RegExp(stableID));
+  assert.match(reference, /craftingSystems\.map/);
+  assert.match(reference, /serviceGuides\.map/);
+  assert.match(directory, /Action reference/);
+  assert.match(directory, /Current station transaction/);
+  assert.match(detail, /Available when/);
+  assert.match(detail, /When it cannot complete/);
+});
+
 test('equipment routes retain slot, recipe, frozen-piece and custody guidance', async () => {
   const index = await read('app/equipment/page.tsx');
   const detail = await read('app/equipment/[slug]/page.tsx');
