@@ -2679,6 +2679,55 @@
       "assetURL": "/game-assets/items/mote_compass.png"
     }
   ],
+  "creatures": [
+    {
+      "id": "paper_moth",
+      "slug": "paper-moth",
+      "name": "Paper Moth",
+      "tier": 1,
+      "maxHP": 8,
+      "attack": 2,
+      "sightRadius": 2,
+      "isNocturnal": false,
+      "requires": [],
+      "favours": [
+        "vitality at or above 20",
+        "illumination at or above 25"
+      ]
+    },
+    {
+      "id": "ink_hound",
+      "slug": "ink-hound",
+      "name": "Ink Hound",
+      "tier": 2,
+      "maxHP": 16,
+      "attack": 4,
+      "sightRadius": 2,
+      "isNocturnal": false,
+      "requires": [
+        "vitality at or above 15"
+      ],
+      "favours": [
+        "vitality trophicDepth at or above 30",
+        "relief openness at or above 55"
+      ]
+    },
+    {
+      "id": "margin_wraith",
+      "slug": "margin-wraith",
+      "name": "Margin Wraith",
+      "tier": 3,
+      "maxHP": 26,
+      "attack": 6,
+      "sightRadius": 2,
+      "isNocturnal": true,
+      "requires": [],
+      "favours": [
+        "illumination at or below 25",
+        "cycle arrhythmic is present"
+      ]
+    }
+  ],
   "travellers": [
     {
       "id": "noll",

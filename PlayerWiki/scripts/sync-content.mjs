@@ -63,6 +63,12 @@ const gambitComponentSource = JSON.parse(
     'utf8',
   ),
 );
+const creatureSource = JSON.parse(
+  await readFile(
+    path.join(repositoryRoot, 'Sources', 'Content', 'Data', 'creatures.json'),
+    'utf8',
+  ),
+);
 const fullCastGuide = await readFile(
   path.join(repositoryRoot, 'docs', 'player-wiki-full-cast-current.md'),
   'utf8',
@@ -105,6 +111,16 @@ const safeFileName = (value) =>
 const compactCopy = (value) => value.replaceAll(/\s+/g, ' ').trim();
 const slugFor = (name) =>
   name.toLowerCase().replaceAll(/[^a-z0-9]+/g, '-').replaceAll(/(^-|-$)/g, '');
+const conditionLabel = (condition) => {
+  const target = compactCopy(condition.target ?? 'world');
+  const key = condition.key ? ` ${compactCopy(condition.key)}` : '';
+  const subject = `${target}${key}`;
+  const limit = condition.minimum ?? condition.maximum;
+  if (condition.measure === 'tag') return `${subject} is present`;
+  if (condition.maximum !== undefined) return `${subject} at or below ${limit}`;
+  if (condition.minimum !== undefined) return `${subject} at or above ${limit}`;
+  return subject;
+};
 const resourceDefinitionByID = new Map(
   resourceSource.resources.map((resource) => [resource.id, resource]),
 );
@@ -433,6 +449,22 @@ for (const item of source.items) {
   });
 }
 
+// The Player Wiki publishes only the live, named encounter profiles. It intentionally
+// has no per-save discovery state: the mounted Bestiary remains the record of what a
+// particular campaign has encountered.
+const creatures = creatureSource.creatures.map((creature) => ({
+  id: creature.id,
+  slug: slugFor(creature.name),
+  name: creature.name,
+  tier: creature.tier,
+  maxHP: creature.maxHP,
+  attack: creature.attack,
+  sightRadius: creature.sightRadius,
+  isNocturnal: Boolean(creature.isNocturnal),
+  requires: (creature.requires ?? []).map(conditionLabel),
+  favours: (creature.favours ?? []).map(conditionLabel),
+}));
+
 const travellers = [];
 for (const traveller of source.travellers.filter(
   (entry) => entry.meetingStatus === 'live',
@@ -586,6 +618,7 @@ const playerContent = {
   schemaVersion: 1,
   resources,
   items,
+  creatures,
   travellers,
   cast,
   stations,

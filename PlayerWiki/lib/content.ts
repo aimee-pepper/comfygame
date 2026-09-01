@@ -168,10 +168,24 @@ export interface GambitComponent {
   blurb: string;
 }
 
+export interface Creature {
+  id: string;
+  slug: string;
+  name: string;
+  tier: number;
+  maxHP: number;
+  attack: number;
+  sightRadius: number;
+  isNocturnal: boolean;
+  requires: string[];
+  favours: string[];
+}
+
 interface PlayerContent {
   schemaVersion: number;
   resources: Resource[];
   items: Item[];
+  creatures: Creature[];
   travellers: Traveller[];
   cast: CastPerson[];
   stations: Station[];
