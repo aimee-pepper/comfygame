@@ -1,7 +1,8 @@
 import Link, { wikiHref } from '@/components/wiki-link';
-import { Search } from 'lucide-react';
+import { Menu, Search } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { playerStartGuides, systemGuideCategories } from '@/lib/system-guides';
+import { ThemeToggle } from '@/components/theme-toggle';
 
 const prepareLinks = [
   ['/crafting', 'Crafting systems'],
@@ -27,6 +28,15 @@ const referenceLinks = [
   ['/glossary', 'Glossary'],
 ];
 
+const primaryLinks = [
+  ['/getting-started', 'Start here'],
+  ['/systems', 'Systems'],
+  ['/village', 'Village'],
+  ['/crafting', 'Crafting'],
+  ['/resources', 'Resources'],
+  ['/people', 'People'],
+];
+
 export function SiteFrame({
   children,
   sidebar = false,
@@ -37,21 +47,30 @@ export function SiteFrame({
   return (
     <div className="site-shell">
       <header className="site-header">
-        <Link
-          className="brand"
-          href="/"
-          aria-label="Bookbinder Player Wiki home"
-        >
-          <span className="brand-mark" aria-hidden="true">
-            B
-          </span>
-          <span>
-            <strong>Bookbinder</strong>
-            <small>Player Wiki</small>
-          </span>
-        </Link>
+        <div className="brand-tools">
+          <Link
+            className="brand"
+            href="/"
+            aria-label="Bookbinder Player Wiki home"
+          >
+            <span className="brand-mark" aria-hidden="true">
+              B
+            </span>
+            <span>
+              <strong>Bookbinder</strong>
+              <small>Player Wiki</small>
+            </span>
+          </Link>
+          <ThemeToggle />
+        </div>
         <form className="wiki-search" action={wikiHref('/search')}>
-          <Search size={16} aria-hidden="true" />
+          <button
+            className="wiki-search-submit"
+            type="submit"
+            aria-label="Search the Player Wiki"
+          >
+            <Search size={16} aria-hidden="true" />
+          </button>
           <input
             name="q"
             type="search"
@@ -59,22 +78,46 @@ export function SiteFrame({
             aria-label="Search the Player Wiki"
           />
         </form>
-        <nav aria-label="Primary navigation">
-          <Link href="/getting-started">Start here</Link>
-          <Link href="/systems">Systems</Link>
-          <Link href="/village">Village</Link>
-          <Link href="/crafting">Crafting</Link>
-          <Link href="/resources">Resources</Link>
-          <Link href="/people">People</Link>
+        <nav className="desktop-navigation" aria-label="Primary navigation">
+          {primaryLinks.map(([href, label]) => (
+            <Link key={href} href={href}>
+              {label}
+            </Link>
+          ))}
         </nav>
+        <details className="mobile-navigation">
+          <summary>
+            <Menu size={17} aria-hidden="true" /> Browse the wiki
+          </summary>
+          <nav aria-label="Primary navigation">
+            {primaryLinks.map(([href, label]) => (
+              <Link key={href} href={href}>
+                {label}
+              </Link>
+            ))}
+          </nav>
+        </details>
       </header>
       {sidebar ? (
         <div className="wiki-layout">
           <aside className="wiki-sidebar" aria-label="Wiki sections">
             <p>Learn</p>
             <Link href="/systems">Systems overview</Link>
-            {playerStartGuides.map((guide) => <Link key={guide.href} href={guide.href}>{guide.label}</Link>)}
-            {systemGuideCategories.map((category) => <div key={category.id} className="sidebar-guide-group"><p>{category.label}</p>{category.guides.map((guide) => <Link key={guide.href} href={guide.href}>{guide.label}</Link>)}</div>)}
+            {playerStartGuides.map((guide) => (
+              <Link key={guide.href} href={guide.href}>
+                {guide.label}
+              </Link>
+            ))}
+            {systemGuideCategories.map((category) => (
+              <div key={category.id} className="sidebar-guide-group">
+                <p>{category.label}</p>
+                {category.guides.map((guide) => (
+                  <Link key={guide.href} href={guide.href}>
+                    {guide.label}
+                  </Link>
+                ))}
+              </div>
+            ))}
             <p>Prepare</p>
             {prepareLinks.map(([href, label]) => (
               <Link key={href} href={href}>

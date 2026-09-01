@@ -7,18 +7,109 @@
   --ink: #251b18;
   --muted: #6e5949;
   --line: #b99461;
+  --line-soft: #decba4;
   --forest: #173b36;
   --forest-soft: #315b52;
+  --action: #173b36;
   --blue: #2f6f87;
+  --green: #2f6f55;
+  --footer-ink: #fff9e9;
+  --on-accent: #fff9e9;
+  --input-surface: #fffdf7;
+  --surface-95: rgb(255 250 240 / 95%);
+  --surface-90: rgb(255 250 240 / 90%);
+  --surface-88: rgb(255 250 240 / 88%);
+  --surface-86: rgb(255 250 240 / 86%);
+  --surface-82: rgb(255 250 240 / 82%);
+  --surface-75: rgb(255 250 240 / 75%);
+  --surface-72: rgb(255 250 240 / 72%);
+  --pixel-line: rgb(185 148 97 / 55%);
+  --pixel-line-soft: rgb(185 148 97 / 36%);
+  --wood-shadow: rgb(117 81 45 / 14%);
+  --wood-shadow-soft: rgb(117 81 45 / 12%);
+  --row-hover: rgb(234 211 162 / 42%);
   --shadow: 0 10px 28px rgb(61 40 23 / 12%);
+}
+
+:root[data-theme='dark'] {
+  --paper: #111b19;
+  --paper-light: #192825;
+  --paper-deep: #284039;
+  --ink: #f5ead4;
+  --muted: #c8bba6;
+  --line: #8c7048;
+  --line-soft: #4c493d;
+  --forest: #0c302b;
+  --forest-soft: #62a091;
+  --action: #6faa9c;
+  --blue: #7ec1d0;
+  --green: #79b994;
+  --footer-ink: #fff4dc;
+  --on-accent: #0e1d1a;
+  --input-surface: #182724;
+  --surface-95: rgb(24 39 36 / 97%);
+  --surface-90: rgb(24 39 36 / 92%);
+  --surface-88: rgb(24 39 36 / 90%);
+  --surface-86: rgb(24 39 36 / 88%);
+  --surface-82: rgb(24 39 36 / 84%);
+  --surface-75: rgb(24 39 36 / 78%);
+  --surface-72: rgb(24 39 36 / 74%);
+  --pixel-line: rgb(163 132 83 / 65%);
+  --pixel-line-soft: rgb(163 132 83 / 42%);
+  --wood-shadow: rgb(0 0 0 / 34%);
+  --wood-shadow-soft: rgb(0 0 0 / 26%);
+  --row-hover: rgb(53 76 68 / 74%);
+  --shadow: 0 12px 34px rgb(0 0 0 / 32%);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --paper: #111b19;
+    --paper-light: #192825;
+    --paper-deep: #284039;
+    --ink: #f5ead4;
+    --muted: #c8bba6;
+    --line: #8c7048;
+    --line-soft: #4c493d;
+    --forest: #0c302b;
+    --forest-soft: #62a091;
+    --action: #6faa9c;
+    --blue: #7ec1d0;
+    --green: #79b994;
+    --footer-ink: #fff4dc;
+    --on-accent: #0e1d1a;
+    --input-surface: #182724;
+    --surface-95: rgb(24 39 36 / 97%);
+    --surface-90: rgb(24 39 36 / 92%);
+    --surface-88: rgb(24 39 36 / 90%);
+    --surface-86: rgb(24 39 36 / 88%);
+    --surface-82: rgb(24 39 36 / 84%);
+    --surface-75: rgb(24 39 36 / 78%);
+    --surface-72: rgb(24 39 36 / 74%);
+    --pixel-line: rgb(163 132 83 / 65%);
+    --pixel-line-soft: rgb(163 132 83 / 42%);
+    --wood-shadow: rgb(0 0 0 / 34%);
+    --wood-shadow-soft: rgb(0 0 0 / 26%);
+    --row-hover: rgb(53 76 68 / 74%);
+    --shadow: 0 12px 34px rgb(0 0 0 / 32%);
+  }
 }
 
 * {
   box-sizing: border-box;
 }
 html {
-  background: #2e241e;
+  background: var(--paper);
   color: var(--ink);
+  color-scheme: light;
+}
+:root[data-theme='dark'] {
+  color-scheme: dark;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    color-scheme: dark;
+  }
 }
 body {
   margin: 0;
@@ -55,7 +146,7 @@ a {
   min-height: 76px;
   padding: 12px max(24px, calc((100vw - 1180px) / 2));
   border-bottom: 2px solid var(--line);
-  background: rgb(255 250 240 / 95%);
+  background: var(--surface-95);
   backdrop-filter: blur(10px);
 }
 .brand {
@@ -64,6 +155,12 @@ a {
   gap: 10px;
   text-decoration: none;
 }
+.brand-tools {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 8px;
+}
 .brand-mark {
   display: grid;
   width: 42px;
@@ -71,7 +168,7 @@ a {
   place-items: center;
   border: 2px solid var(--forest);
   background: var(--forest);
-  color: var(--paper-light);
+  color: var(--footer-ink);
   font:
     700 25px Georgia,
     serif;
@@ -108,6 +205,17 @@ nav a {
 nav a:hover {
   background: var(--paper-deep);
 }
+.theme-toggle {
+  border: 1px solid var(--line);
+  background: var(--paper-light);
+  color: var(--ink);
+}
+.theme-toggle:hover {
+  background: var(--paper-deep);
+}
+.mobile-navigation {
+  display: none;
+}
 main {
   width: min(1180px, calc(100% - 40px));
   margin: 0 auto;
@@ -120,7 +228,7 @@ main {
   align-items: stretch;
   padding: 42px;
   border: 2px solid var(--line);
-  background: rgb(255 250 240 / 90%);
+  background: var(--surface-90);
   box-shadow: var(--shadow);
 }
 .eyebrow {
@@ -163,17 +271,17 @@ h2 {
   min-height: 44px;
   align-items: center;
   padding: 10px 15px;
-  border: 2px solid var(--forest);
+  border: 2px solid var(--action);
   font-weight: 750;
   text-decoration: none;
 }
 .primary-action {
-  background: var(--forest);
-  color: var(--paper-light);
+  background: var(--action);
+  color: var(--on-accent);
 }
 .secondary-action {
   background: transparent;
-  color: var(--forest);
+  color: var(--action);
 }
 .quick-reference {
   display: grid;
@@ -197,7 +305,7 @@ h2 {
   align-items: center;
   gap: 8px;
   padding: 11px 0;
-  border-bottom: 1px solid #d9c49c;
+  border-bottom: 1px solid var(--line-soft);
   font-weight: 700;
 }
 .page-section {
@@ -226,8 +334,8 @@ h2 {
   align-items: flex-start;
   padding: 22px;
   border: 1px solid var(--line);
-  background: rgb(255 250 240 / 86%);
-  box-shadow: 0 4px 0 rgb(117 81 45 / 14%);
+  background: var(--surface-86);
+  box-shadow: 0 4px 0 var(--wood-shadow);
   text-decoration: none;
 }
 .topic-card:hover {
@@ -266,7 +374,7 @@ h2 {
   min-height: 104px;
   padding: 14px;
   border: 1px solid var(--line);
-  background: rgb(255 250 240 / 86%);
+  background: var(--surface-86);
   color: inherit;
   text-decoration: none;
 }
@@ -285,7 +393,9 @@ h2 {
   gap: 5px;
 }
 .journey-strip strong {
-  font: 700 18px Georgia, serif;
+  font:
+    700 18px Georgia,
+    serif;
 }
 .journey-strip small {
   color: var(--muted);
@@ -324,7 +434,9 @@ h2 {
   gap: 4px;
 }
 .crafting-route-strip strong {
-  font: 700 17px Georgia, serif;
+  font:
+    700 17px Georgia,
+    serif;
 }
 .crafting-route-strip small {
   color: var(--muted);
@@ -333,7 +445,7 @@ h2 {
 }
 .service-card .pixel-image {
   flex: 0 0 auto;
-  border: 1px solid rgb(185 148 97 / 55%);
+  border: 1px solid var(--pixel-line);
   background: var(--paper-light);
 }
 .service-visual-note {
@@ -355,7 +467,7 @@ h2 {
   min-height: 104px;
   padding: 14px;
   border: 1px solid var(--line);
-  background: rgb(255 250 240 / 86%);
+  background: var(--surface-86);
   color: inherit;
   text-decoration: none;
 }
@@ -374,7 +486,9 @@ h2 {
   gap: 5px;
 }
 .journey-strip strong {
-  font: 700 18px Georgia, serif;
+  font:
+    700 18px Georgia,
+    serif;
 }
 .journey-strip small {
   color: var(--muted);
@@ -416,11 +530,11 @@ h2 {
   gap: 16px;
   padding: 18px;
   border: 1px solid var(--line);
-  background: rgb(255 250 240 / 86%);
+  background: var(--surface-86);
 }
 .system-hub-card > .pixel-image {
   flex: 0 0 auto;
-  border: 1px solid rgb(185 148 97 / 55%);
+  border: 1px solid var(--pixel-line);
   background: var(--paper-light);
 }
 .system-hub-card > div {
@@ -500,12 +614,12 @@ table {
 th,
 td {
   padding: 13px 15px;
-  border-bottom: 1px solid #decba4;
+  border-bottom: 1px solid var(--line-soft);
   vertical-align: top;
 }
 th {
   background: var(--forest);
-  color: #fff9e9;
+  color: var(--footer-ink);
   font-size: 12px;
   letter-spacing: 0.06em;
   text-transform: uppercase;
@@ -528,7 +642,7 @@ footer {
   padding: 24px max(24px, calc((100vw - 1180px) / 2));
   border-top: 2px solid var(--line);
   background: var(--forest);
-  color: #fff9e9;
+  color: var(--footer-ink);
 }
 .wiki-search {
   display: flex;
@@ -539,7 +653,7 @@ footer {
   gap: 8px;
   padding: 0 12px;
   border: 1px solid var(--line);
-  background: #fffdf7;
+  background: var(--input-surface);
 }
 .wiki-search input {
   width: 100%;
@@ -549,6 +663,22 @@ footer {
   background: transparent;
   color: var(--ink);
   font: inherit;
+}
+.wiki-search-submit {
+  display: grid;
+  width: 32px;
+  height: 32px;
+  flex: 0 0 32px;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+}
+.wiki-search-submit:hover,
+.wiki-search-submit:focus-visible {
+  color: var(--blue);
 }
 .wiki-layout {
   display: grid;
@@ -579,7 +709,7 @@ footer {
 }
 .wiki-sidebar a:hover {
   border-left-color: var(--forest);
-  background: rgb(255 250 240 / 75%);
+  background: var(--surface-75);
 }
 .wiki-main {
   width: 100%;
@@ -626,7 +756,7 @@ footer {
 .fact-grid > div {
   padding: 18px;
   border: 1px solid var(--line);
-  background: rgb(255 250 240 / 82%);
+  background: var(--surface-82);
 }
 .numbered-guide {
   padding-left: 26px;
@@ -814,7 +944,7 @@ footer {
   transition: background-color 120ms ease;
 }
 .catalogue-summary tbody tr:hover {
-  background: rgb(234 211 162 / 42%);
+  background: var(--row-hover);
 }
 .catalogue-summary td:first-child a {
   display: grid;
@@ -830,8 +960,8 @@ footer {
 .village-directory-card {
   padding: 18px;
   border: 1px solid var(--line);
-  background: rgb(255 250 240 / 88%);
-  box-shadow: 0 4px 0 rgb(117 81 45 / 12%);
+  background: var(--surface-88);
+  box-shadow: 0 4px 0 var(--wood-shadow-soft);
 }
 .village-card-heading {
   display: flex;
@@ -856,7 +986,9 @@ footer {
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
-.village-status.scheduled { color: var(--blue); }
+.village-status.scheduled {
+  color: var(--blue);
+}
 .village-card-facts {
   display: grid;
   gap: 8px;
@@ -867,14 +999,18 @@ footer {
   grid-template-columns: 92px minmax(0, 1fr);
   gap: 8px;
   padding-top: 8px;
-  border-top: 1px solid #decba4;
+  border-top: 1px solid var(--line-soft);
 }
 .village-card-facts dt {
   color: var(--muted);
   font-size: 12px;
   font-weight: 800;
 }
-.village-card-facts dd { margin: 0; font-size: 13px; line-height: 1.4; }
+.village-card-facts dd {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.4;
+}
 .world-reference-grid,
 .terrain-directory,
 .flora-directory {
@@ -888,11 +1024,18 @@ footer {
   display: block;
   padding: 16px;
   border: 1px solid var(--line);
-  background: rgb(255 250 240 / 88%);
-  box-shadow: 0 4px 0 rgb(117 81 45 / 12%);
+  background: var(--surface-88);
+  box-shadow: 0 4px 0 var(--wood-shadow-soft);
 }
-.world-reference-grid h2 { margin: 0 0 8px; font-size: 22px; }
-.world-reference-grid p { margin: 0 0 12px; color: var(--muted); line-height: 1.45; }
+.world-reference-grid h2 {
+  margin: 0 0 8px;
+  font-size: 22px;
+}
+.world-reference-grid p {
+  margin: 0 0 12px;
+  color: var(--muted);
+  line-height: 1.45;
+}
 .terrain-directory-card,
 .flora-directory-card,
 .terrain-detail-heading {
@@ -901,11 +1044,22 @@ footer {
   align-items: flex-start;
 }
 .terrain-directory-card span,
-.flora-directory-card span { display: grid; gap: 4px; min-width: 0; }
+.flora-directory-card span {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
 .terrain-directory-card small,
-.flora-directory-card small { color: var(--muted); line-height: 1.35; }
-.terrain-detail-heading > div { min-width: 0; }
-.terrain-detail-heading h2 { margin-top: 0; }
+.flora-directory-card small {
+  color: var(--muted);
+  line-height: 1.35;
+}
+.terrain-detail-heading > div {
+  min-width: 0;
+}
+.terrain-detail-heading h2 {
+  margin-top: 0;
+}
 .pixel-image {
   width: 44px;
   height: 44px;
@@ -945,7 +1099,7 @@ footer {
   padding: 8px;
   border: 1px solid var(--line);
   background: var(--paper-light);
-  box-shadow: 4px 4px 0 rgb(117 81 45 / 14%);
+  box-shadow: 4px 4px 0 var(--wood-shadow);
 }
 .person-intro .article-intro {
   min-width: 0;
@@ -962,15 +1116,17 @@ footer {
   gap: 14px;
   padding: 16px;
   border: 1px solid var(--line);
-  background: rgb(255 250 240 / 82%);
+  background: var(--surface-82);
 }
 .person-directory-card > .pixel-image {
-  border: 1px solid rgb(185 148 97 / 55%);
+  border: 1px solid var(--pixel-line);
   background: var(--paper-light);
 }
 .person-directory-card h2 {
   margin: 2px 0 7px;
-  font: 700 22px Georgia, serif;
+  font:
+    700 22px Georgia,
+    serif;
 }
 .person-directory-card h2 a {
   color: inherit;
@@ -1041,7 +1197,7 @@ footer {
 .finding-list li {
   padding: 13px 15px;
   border-left: 3px solid var(--blue);
-  background: rgb(255 250 240 / 72%);
+  background: var(--surface-72);
 }
 .place-visuals {
   display: flex;
@@ -1083,7 +1239,7 @@ footer {
   margin-bottom: 22px;
   padding: 12px;
   border: 1px solid var(--line);
-  background: rgb(255 250 240 / 82%);
+  background: var(--surface-82);
 }
 .crafting-station p {
   margin: 0;
@@ -1103,7 +1259,7 @@ footer {
   min-width: 0;
   padding: 14px;
   border: 1px solid var(--line);
-  background: rgb(255 250 240 / 82%);
+  background: var(--surface-82);
 }
 .crafting-reachability-heading {
   display: flex;
@@ -1112,7 +1268,7 @@ footer {
 }
 .crafting-reachability-heading .pixel-image {
   flex: 0 0 auto;
-  border: 1px solid rgb(185 148 97 / 55%);
+  border: 1px solid var(--pixel-line);
   background: var(--paper-light);
 }
 .crafting-reachability-heading h3,
@@ -1160,7 +1316,7 @@ footer {
   min-width: 0;
   gap: 2px;
   padding-top: 8px;
-  border-top: 1px solid rgb(185 148 97 / 36%);
+  border-top: 1px solid var(--pixel-line-soft);
   font-size: 13px;
 }
 .crafting-reachability-recipes span {
@@ -1192,7 +1348,7 @@ footer {
   display: block;
 }
 .recipe-directory-heading .pixel-image {
-  border: 1px solid rgb(185 148 97 / 55%);
+  border: 1px solid var(--pixel-line);
   background: var(--paper-light);
 }
 .recipe-directory-heading h3,
@@ -1272,8 +1428,61 @@ footer {
 @media (max-width: 860px) {
   .site-header {
     position: static;
-    align-items: flex-start;
-    flex-direction: column;
+    display: grid;
+    grid-template-columns: 1fr;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 16px 14px;
+  }
+  .brand-tools {
+    width: 100%;
+    justify-content: space-between;
+  }
+  .wiki-search {
+    width: 100%;
+    min-width: 0;
+    max-width: none;
+    flex: none;
+  }
+  .desktop-navigation {
+    display: none;
+  }
+  .mobile-navigation {
+    display: block;
+    width: 100%;
+  }
+  .mobile-navigation summary {
+    display: flex;
+    min-height: 42px;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 8px 12px;
+    border: 1px solid var(--line);
+    background: var(--paper-light);
+    font-size: 14px;
+    font-weight: 750;
+    cursor: pointer;
+    list-style: none;
+  }
+  .mobile-navigation summary::-webkit-details-marker {
+    display: none;
+  }
+  .mobile-navigation[open] summary {
+    background: var(--paper-deep);
+  }
+  .mobile-navigation nav {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 6px;
+    padding-top: 8px;
+  }
+  .mobile-navigation nav a {
+    min-height: 42px;
+    padding: 10px 12px;
+    border: 1px solid var(--line);
+    background: var(--surface-86);
+    text-align: center;
   }
   .welcome {
     grid-template-columns: 1fr;
@@ -1287,11 +1496,17 @@ footer {
   .topic-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
-  .crafting-reachability-grid { grid-template-columns: 1fr; }
-  .village-directory { grid-template-columns: 1fr; }
+  .crafting-reachability-grid {
+    grid-template-columns: 1fr;
+  }
+  .village-directory {
+    grid-template-columns: 1fr;
+  }
   .world-reference-grid,
   .terrain-directory,
-  .flora-directory { grid-template-columns: 1fr; }
+  .flora-directory {
+    grid-template-columns: 1fr;
+  }
   .systems-hub-grid {
     grid-template-columns: 1fr;
   }
@@ -1322,6 +1537,7 @@ footer {
     padding: 12px 0 0;
     overflow-x: auto;
     gap: 4px;
+    scrollbar-width: thin;
   }
   .person-intro {
     grid-template-columns: 1fr;
@@ -1335,6 +1551,9 @@ footer {
   .wiki-sidebar p {
     display: none;
   }
+  .sidebar-guide-group {
+    display: contents;
+  }
   .wiki-sidebar a {
     flex: 0 0 auto;
     border: 0;
@@ -1346,15 +1565,69 @@ footer {
     width: min(100% - 24px, 1180px);
     padding-top: 18px;
   }
-  nav {
-    width: 100%;
+  .brand-mark {
+    width: 38px;
+    height: 38px;
+    font-size: 22px;
   }
-  nav a {
-    flex: 1 1 42%;
-    padding-inline: 0;
+  .brand strong {
+    font-size: 19px;
+  }
+  .brand small {
+    font-size: 10px;
+  }
+  .theme-toggle {
+    min-width: 42px;
+    min-height: 42px;
   }
   .welcome {
-    padding: 22px;
+    gap: 24px;
+    padding: 18px;
+  }
+  h1 {
+    font-size: clamp(34px, 10vw, 42px);
+  }
+  h2 {
+    font-size: clamp(27px, 8vw, 34px);
+  }
+  .lede {
+    font-size: 17px;
+    line-height: 1.65;
+  }
+  .page-section {
+    margin-top: 42px;
+  }
+  .topic-card {
+    min-height: 0;
+    padding: 18px;
+  }
+  .journey-strip > a {
+    grid-template-columns: 58px minmax(0, 1fr);
+    gap: 12px;
+    min-height: 92px;
+    padding: 12px;
+  }
+  .journey-strip > a > img,
+  .journey-strip > a .pixel-image {
+    width: 52px;
+    height: 52px;
+  }
+  .article-intro {
+    padding-bottom: 22px;
+  }
+  .article-intro h1 {
+    font-size: clamp(34px, 10vw, 42px);
+  }
+  .article-section {
+    margin-top: 32px;
+  }
+  .article-section h2 {
+    font-size: 28px;
+  }
+  .article-section p,
+  .article-section li {
+    font-size: 16px;
+    line-height: 1.72;
   }
   .topic-grid {
     grid-template-columns: 1fr;
@@ -1370,9 +1643,9 @@ footer {
   .wiki-layout {
     width: min(100% - 24px, 1180px);
   }
-  .wiki-search {
-    max-width: none;
-    width: 100%;
+  .wiki-sidebar a {
+    min-height: 40px;
+    padding: 10px 11px;
   }
   .two-column,
   .step-grid,
@@ -1392,5 +1665,10 @@ footer {
   .glossary-group-heading {
     align-items: flex-start;
     flex-direction: column;
+  }
+  footer {
+    align-items: flex-start;
+    flex-direction: column;
+    padding: 22px 16px;
   }
 }
