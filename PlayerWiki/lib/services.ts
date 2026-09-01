@@ -240,6 +240,40 @@ export const serviceGuides: ServiceGuide[] = [
     ],
   },
   {
+    slug: 'survey-post',
+    name: 'Survey Post',
+    stationID: 'survey_post',
+    summary:
+      'Work with Mara to study permanent field-instrument capabilities, choose the next trip’s loadout, and record one-turn world readings.',
+    useFor: [
+      'Studying one of the eight current Field Instruments from its exact Research preview',
+      'Choosing which owned instruments are packed for the next expedition',
+      'Reviewing observations recorded by a carried instrument in the world',
+    ],
+    workflow: [
+      'Recruit Mara, then build the Survey Post foundation in Home → Study.',
+      'Study an affordable named instrument; its subject becomes a permanent Crude capability rather than a physical item.',
+      'Choose the next-trip loadout at Home, then Bind and depart.',
+      'Use Survey in the world when no encounter is active to record the carried instruments’ readings for one turn.',
+    ],
+    selection:
+      'Choose the exact named Research node or one owned subject in the current Home loadout. The Field Kit only displays the exact instruments that were frozen when this expedition began.',
+    result:
+      'Only a durable Research, loadout, or Survey receipt changes its named fact. A refused or stale action leaves the station, owned capabilities, packed set, observations, and turn unchanged.',
+    relatedGuides: [
+      { label: 'Mara', href: '/people/mara' },
+      { label: 'Survey Post construction', href: '/buildings/survey-post' },
+      { label: 'Instrument study and improvement boundary', href: '/crafting/instruments' },
+      { label: 'Field supplies and Field Kit', href: '/systems/field-supplies' },
+      { label: 'World conditions', href: '/world' },
+    ],
+    remember: [
+      'An instrument is a permanent Reality capability, never a Storehouse, Field Kit supply, or equipment object.',
+      'A Survey advances one turn and records observations; it does not promise a coordinate, resource, site, traveller, or map reveal.',
+      'Precision improvements are not published as completed paid actions until their exact typed quote and receipt owner is live.',
+    ],
+  },
+  {
     slug: 'firepit',
     name: 'Firepit and travelling party',
     stationID: 'firepit',

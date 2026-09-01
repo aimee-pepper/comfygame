@@ -399,6 +399,32 @@ test('Blacksmith first use keeps Halloway, exact foundation, Pointed Blade custo
   for (const source of [building, place]) assert.doesNotMatch(source, /stone and the iron/);
 });
 
+test('Survey Post first-reading journey keeps Mara, permanent capabilities, loadout, Survey, and withheld paid improvement distinct', async () => {
+  const [service, building, place, crafting, journey, services] = await Promise.all([
+    'app/services/[slug]/page.tsx',
+    'app/buildings/[slug]/page.tsx',
+    'app/places/[slug]/page.tsx',
+    'app/crafting/[slug]/page.tsx',
+    'lib/survey-post-first-use.ts',
+    'lib/services.ts',
+  ].map(read));
+  for (const stableID of ['survey_post', 'mara', 'instruments', 'sunglass', 'level', 'thermoscope', 'hygrometer', 'loupe', 'vivometer', 'barometer', 'chronometer']) assert.match(journey, new RegExp(stableID));
+  assert.match(journey, /50 Essence · 10 Timber · 8 Iron Ore · 2 Quartz/);
+  assert.match(journey, /permanent Reality capabilities/);
+  assert.match(journey, /not Storehouse stacks, Field Kit supply entries, equipment, or output-bin objects/);
+  assert.match(journey, /advances one ordinary turn/);
+  assert.match(journey, /no coordinate, resource, site, traveller, fog reveal, or map completion/);
+  assert.match(journey, /full Storehouse or Waiting pile cannot block studying or improving one/);
+  assert.match(journey, /does not promise a paid improvement/);
+  for (const source of [service, building, place, crafting]) assert.match(source, /surveyPostFirstUse/);
+  assert.match(services, /slug: 'survey-post'/);
+  assert.match(service, /First reading: Mara to Survey/);
+  assert.match(building, /Build the Survey Post with Mara/);
+  assert.match(place, /Completion opens research, not a tool bin/);
+  assert.match(crafting, /Precision improvement remains a transaction boundary/);
+  assert.doesNotMatch(crafting, /Good instrument.*Current recipes and requirements/s);
+});
+
 test('economy references are reachable from current player tasks without claiming rotating transactions are permanent', async () => {
   const sources = await Promise.all([
     'app/systems/economy-exchange/page.tsx',

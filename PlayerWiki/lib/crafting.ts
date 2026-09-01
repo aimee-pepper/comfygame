@@ -125,18 +125,18 @@ export const craftingSystems: CraftingSystem[] = [
   },
   {
     slug: 'instruments',
-    name: 'Instrument improvement',
+    name: 'Field Instruments',
     station: 'The Survey Post',
     stationID: 'survey_post',
     summary:
-      'Improve the precision of owned world-reading instruments with property-matched samples and Essence.',
-    access: ['Build the Survey Post and research the named owned world-reading instrument.'],
-    materialChoice: 'The selected samples must meet the exact property the instrument measures: two samples at 35+ for Good, or three at 65+ for Fine.',
-    commitResult: 'A committed improvement spends the selected samples and 20 or 50 Essence, then raises that owned instrument to the chosen current grade.',
+      'Study permanent world-reading capabilities at the Survey Post; paid precision improvement remains withheld until its exact typed receipt is live.',
+    access: ['Build the Survey Post and study one of the eight named Research nodes.'],
+    materialChoice: 'Future improvement materials are property-matched, but no paid precision result is published until the exact selected-material quote and receipt exist.',
+    commitResult: 'A durable Research purchase grants one named subject at Crude precision and packs it for the next expedition. No paid improvement result is promised yet.',
     howItWorks: [
-      'Each instrument asks for the property it measures best.',
-      'Crude to Good uses two 35+ samples and 20 Essence.',
-      'Good to Fine uses three 65+ samples and 50 Essence.',
+      'Study one named instrument from Field Instruments Research; it becomes a permanent capability rather than an item.',
+      'Choose the owned subjects to pack at Home; departure freezes their set and precision for that world.',
+      'Use Survey in the world to record every valid carried subject for one turn.',
     ],
   },
   {
