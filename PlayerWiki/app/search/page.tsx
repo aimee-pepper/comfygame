@@ -8,6 +8,8 @@ import { playerStartGuides, systemGuides } from '@/lib/system-guides';
 import { villageBuildings } from '@/lib/village';
 import { floraHarvestProfiles, terrainProfiles, worldConditions } from '@/lib/world-reference';
 import { craftingSystems, recipeReadiness, recipesFor } from '@/lib/crafting';
+import { statusReferences } from '@/lib/status-reference';
+import { techniqueReferences } from '@/lib/technique-reference';
 
 export default async function SearchPage({ searchParams }: { searchParams: Promise<{ q?: string }> }) {
   const q = ((await searchParams).q ?? '').trim().toLowerCase();
@@ -27,6 +29,8 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
     { label: 'World records', entries: (() => { const guide = serviceGuides.find((entry) => entry.slug === 'bestiary'); const station = content.stations.find((entry) => entry.id === 'bestiary'); return guide ? [{ name: 'Bestiary', summary: guide.summary, href: '/bestiary', type: 'World record guide', assetURL: station?.assetURL ?? station?.contextAssetURL ?? null, alt: station?.assetURL ? `${station.name} building visual` : 'Village setting' }] : []; })() },
     { label: 'Creatures and threats', entries: content.creatures.map(entry => ({ name: entry.name, summary: `Tier ${entry.tier} · ${entry.isNocturnal ? 'night' : 'day'} profile · ${entry.maxHP} health`, href: `/bestiary/${entry.slug}`, type: 'Current encounter profile', assetURL: null, alt: '' })) },
     { label: 'Sites', entries: content.sites.map(entry => ({ name: entry.name, summary: entry.blurb, href: `/sites/${entry.slug}`, type: 'Current site profile', assetURL: null, alt: '' })) },
+    { label: 'Conditions and effects', entries: statusReferences.map(entry => ({ name: entry.name, summary: `${entry.category}. ${entry.summary}`, href: `/statuses/${entry.slug}`, type: 'Current condition or effect', assetURL: null, alt: '' })) },
+    { label: 'Techniques and Gambits', entries: techniqueReferences.map(entry => ({ name: entry.name, summary: `${entry.group}. ${entry.result}`, href: `/techniques/${entry.slug}`, type: entry.group, assetURL: null, alt: '' })) },
     { label: 'Glossary', entries: content.terminology.map(entry => ({ name: entry.name, summary: entry.summary, href: `/glossary#${entry.slug}`, type: 'Term', assetURL: null, alt: '' })) },
   ];
   const groups = q ? categories.map((category) => ({ ...category, entries: category.entries.filter(entry => `${entry.name} ${entry.summary} ${entry.type} ${category.label}`.toLowerCase().includes(q)) })).filter((category) => category.entries.length) : [];

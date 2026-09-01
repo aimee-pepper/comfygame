@@ -17,6 +17,8 @@ const referenceLinks = [
   ['/resources', 'Resources'],
   ['/bestiary', 'Bestiary records'],
   ['/sites', 'Site directory'],
+  ['/statuses', 'Conditions & effects'],
+  ['/techniques', 'Techniques & Gambits'],
   ['/people', 'People'],
   ['/places', 'Places & stations'],
   ['/glossary', 'Glossary'],

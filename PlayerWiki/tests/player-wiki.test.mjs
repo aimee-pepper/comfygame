@@ -218,6 +218,20 @@ test('technique reference gives each current technique and Gambit component a st
   assert.equal(snapshot.gambitComponents.length, 27);
 });
 
+test('conditions and techniques are discoverable through combat, preparation, equipment, field supplies, search, and glossary', async () => {
+  const sources = await Promise.all([
+    'components/site-frame.tsx', 'app/search/page.tsx', 'app/glossary/page.tsx',
+    'app/systems/combat/page.tsx', 'app/systems/party-preparation/page.tsx',
+    'app/equipment/page.tsx', 'app/equipment/[slug]/page.tsx',
+    'app/systems/field-supplies/page.tsx', 'app/systems/combat-techniques-gambits/page.tsx',
+  ].map(read));
+  for (const source of sources) assert.match(source, /\/statuses|\/techniques/);
+  assert.match(sources[1], /label: 'Conditions and effects'/);
+  assert.match(sources[1], /label: 'Techniques and Gambits'/);
+  assert.match(sources[2], /Combat reference shortcuts/);
+  assert.match(sources[7], /\/statuses\/scent-mask/);
+});
+
 test('equipment routes retain slot, recipe, frozen-piece and custody guidance', async () => {
   const index = await read('app/equipment/page.tsx');
   const detail = await read('app/equipment/[slug]/page.tsx');
