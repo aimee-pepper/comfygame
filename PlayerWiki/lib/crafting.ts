@@ -709,14 +709,17 @@ export function recipeReadiness(recipe: CraftRecipe) {
 export const definedButNotLiveCrafting = [
   {
     name: 'Fitted Polearm',
+    system: 'weaponsmith',
     detail: 'Defined for the Weaponsmith, but not a current player recipe.',
   },
   {
     name: 'Caustic Core',
+    system: 'distillery',
     detail: 'May appear through current custody, but is not a current Distillery preparation.',
   },
   {
     name: 'Light Core',
+    system: 'distillery',
     detail: 'May appear through current custody, but is not a current Distillery preparation.',
   },
 ] as const;
@@ -724,3 +727,7 @@ export const definedButNotLiveCrafting = [
 export const scheduledButNotLiveStations = [
   'Menagerie and Deep Works are scheduled construction concepts, not current player stations or recipe routes.',
 ] as const;
+
+export function definedButNotLiveForSystem(slug: string) {
+  return definedButNotLiveCrafting.filter((entry) => entry.system === slug);
+}

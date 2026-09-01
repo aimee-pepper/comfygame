@@ -342,6 +342,9 @@ test('crafting has a linked system index and complete resource cross-reference s
   assert.match(craftingDetail, /Commit and result/);
   assert.match(craftingDetail, /serviceForStation/);
   assert.match(craftingDetail, /recipeReadiness/);
+  assert.match(craftingDetail, /Current recipes and requirements/);
+  assert.match(craftingDetail, /Results and their use/);
+  assert.match(craftingDetail, /definedButNotLiveForSystem/);
   assert.match(crafting, /materialChoice/);
   assert.match(crafting, /commitResult/);
   assert.match(crafting, /stationID/);

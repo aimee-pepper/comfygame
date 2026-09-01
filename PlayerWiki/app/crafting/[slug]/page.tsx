@@ -5,7 +5,7 @@ import { PageIntro } from '@/components/page-intro';
 import { PixelImage } from '@/components/pixel-image';
 import { GuideBreadcrumbs, RelatedGuides } from '@/components/guide-navigation';
 import { SiteFrame } from '@/components/site-frame';
-import { craftingSystems, recipeReadiness, recipesFor, systemFor } from '@/lib/crafting';
+import { craftingSystems, definedButNotLiveForSystem, recipeReadiness, recipesFor, systemFor } from '@/lib/crafting';
 import { content, humanize } from '@/lib/content';
 import { serviceForStation } from '@/lib/services';
 
@@ -82,6 +82,11 @@ export default async function CraftingSystemDetail({
   const station = content.stations.find((entry) => entry.id === system.stationID);
   const service = station ? serviceForStation(station.id) : null;
   const relatedResources = [...new Set(recipes.flatMap((recipe) => recipe.ingredients.map((ingredient) => ingredient.resourceID).filter(Boolean)))].map((id) => content.resources.find((resource) => resource.id === id)).filter(Boolean);
+  const outputItems = [...new Map(recipes.map((recipe) => {
+    const item = resultItem(recipe);
+    return [item?.id ?? recipe.result, { recipe, item }];
+  })).values()];
+  const notLive = definedButNotLiveForSystem(system.slug);
   return (
     <SiteFrame sidebar>
       <GuideBreadcrumbs items={[{ label: 'Systems', href: '/systems' }, { label: 'Crafting systems', href: '/crafting' }, { label: system.name }]} />
@@ -94,6 +99,7 @@ export default async function CraftingSystemDetail({
         {station?.assetURL && <div className="crafting-station"><PixelImage src={station.assetURL} alt={`${station.name} building visual`} size={72} /><p><strong>{station.name}</strong> is the current station visual for this system.</p></div>}
         <h2>Access and readiness</h2>
         <dl className="fact-grid">
+          <div><dt>Current state</dt><dd>Current player station process</dd></div>
           <div><dt>Station access</dt><dd>{station ? <><Link href={`/buildings/${station.slug}`}>{station.name}</Link> · {constructionCost(station)}</> : 'Open the station named above.'}</dd></div>
           <div><dt>Current route</dt><dd><ul className="compact-list">{system.access.map((fact) => <li key={fact}>{fact}</li>)}</ul></dd></div>
         </dl>
@@ -111,7 +117,8 @@ export default async function CraftingSystemDetail({
         <p>{system.materialChoice}</p>
       </section>
       <section className="article-section">
-        <h2>Recipes and requirements</h2>
+        <h2>Current recipes and requirements</h2>
+        <p>Each row below is currently available only when its listed readiness, exact inputs, and the station’s final preview all agree. Material alternatives appear only where the current recipe exposes that socket.</p>
         <div className="table-wrap">
           <table>
             <thead>
@@ -149,6 +156,17 @@ export default async function CraftingSystemDetail({
           </table>
         </div>
       </section>
+      <section className="article-section two-column crafting-output-guide">
+        <div>
+          <h2>Results and their use</h2>
+          {outputItems.length ? <ul className="compact-list">{outputItems.map(({ recipe, item }) => <li key={recipe.id}>{item ? <><Link href={resultLink(item)}>{recipe.result}</Link> — {item.summary}</> : <><strong>{recipe.result}</strong> — use the station’s quoted destination and result description.</>}</li>)}</ul> : <p>No separately published result entry is available for this current station process.</p>}
+        </div>
+        <div>
+          <h2>Related routes</h2>
+          <p>{station ? <><Link href={`/buildings/${station.slug}`}>{station.name}</Link> holds this station. </> : null}Open each linked resource for its current acquisition and other published consumers; the item or equipment guide retains the result’s player-facing facts.</p>
+        </div>
+      </section>
+      {notLive.length ? <section className="article-section note-card crafting-boundary"><h2>Defined, but not a current recipe</h2><ul className="compact-list">{notLive.map((entry) => <li key={entry.name}><strong>{entry.name}:</strong> {entry.detail}</li>)}</ul></section> : null}
       <section className="article-section note-card">
         <h2>Commit and result</h2>
         <p>{system.commitResult}</p>
