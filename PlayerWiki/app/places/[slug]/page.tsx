@@ -7,6 +7,7 @@ import { SiteFrame } from '@/components/site-frame';
 import { content, humanize } from '@/lib/content';
 import { craftingSystems, recipeReadiness, recipesFor } from '@/lib/crafting';
 import { serviceForStation } from '@/lib/services';
+import { actionForSlug, actionsForStation } from '@/lib/action-reference';
 
 function constructionRequirements(place: (typeof content.stations)[number]) {
   if (place.unlockedAtStart) return 'Available at the start of a campaign.';
@@ -52,6 +53,10 @@ export default async function PlaceDetail({
   const service = serviceForStation(place.id);
   const systems = craftingSystems.filter((system) => system.stationID === place.id);
   const recipes = systems.flatMap((system) => recipesFor(system.slug));
+  const actions = [
+    ...(!place.unlockedAtStart ? [actionForSlug('build-foundation')] : []),
+    ...actionsForStation(place.id),
+  ].filter((action): action is NonNullable<typeof action> => Boolean(action));
   return (
     <SiteFrame sidebar>
       <GuideBreadcrumbs items={[{ label: 'Village services', href: '/services' }, { label: 'Places and stations', href: '/places' }, { label: place.name }]} />
@@ -115,12 +120,16 @@ export default async function PlaceDetail({
         <h2>What this place currently offers</h2>
         {service ? <div className="definition-grid">{service.useFor.map((action) => <div key={action}>{action}</div>)}</div> : <p>No separate service action list is currently published for this place.</p>}
       </section>
+      {actions.length > 0 && <section className="article-section">
+        <h2>Current actions here</h2>
+        <div className="definition-grid">{actions.map((action) => <div key={action.id}><h3><Link href={`/actions/${action.slug}`}>{action.name}</Link></h3><p>{action.availability}</p><small>{action.unavailable}</small></div>)}</div>
+      </section>}
       <section className="article-section">
         <h2>Current crafting at this place</h2>
         {recipes.length ? <div className="table-wrap"><table><thead><tr><th>Recipe</th><th>Output</th><th>Exact inputs</th><th>Ready when</th></tr></thead><tbody>{recipes.map((recipe) => { const item = content.items.find((entry) => entry.name === recipe.result); const outputHref = item ? (item.gear ? `/equipment/${item.slug}` : `/items/${item.slug}`) : null; return <tr key={recipe.id}><td><Link href={`/crafting/${recipe.system}`}>{recipe.name}</Link></td><td>{outputHref ? <Link href={outputHref}>{recipe.result}</Link> : recipe.result}</td><td>{recipeRequirements(recipe)}</td><td>{recipeReadiness(recipe)}</td></tr>; })}</tbody></table></div> : <p>No current crafting recipe is published for this place.</p>}
       </section>
       {systems.length > 0 && <section className="article-section two-column"><div><h2>Material choices</h2>{systems.map((system) => <p key={system.slug}><strong><Link href={`/crafting/${system.slug}`}>{system.name}:</Link></strong> {system.materialChoice}</p>)}</div><div><h2>Result and custody</h2>{systems.map((system) => <p key={system.slug}>{system.commitResult}</p>)}</div></section>}
-      <RelatedGuides links={[{ label: 'All places', href: '/places' }, ...(service ? [{ label: `How to use ${service.name}`, href: `/services/${service.slug}` }] : []), ...systems.map((system) => ({ label: system.name, href: `/crafting/${system.slug}` })), { label: 'All village services', href: '/services' }, { label: 'All resources', href: '/resources' }]} />
+      <RelatedGuides links={[{ label: 'All places', href: '/places' }, ...(actions.length ? [{ label: 'Action reference', href: '/actions' }] : []), ...(service ? [{ label: `How to use ${service.name}`, href: `/services/${service.slug}` }] : []), ...systems.map((system) => ({ label: system.name, href: `/crafting/${system.slug}` })), { label: 'All village services', href: '/services' }, { label: 'All resources', href: '/resources' }]} />
     </SiteFrame>
   );
 }

@@ -185,3 +185,4 @@ const stationActions: ActionReference[] = craftingSystems.map((system) => ({
 
 export const actionReferences = [...coreActions, ...serviceActions, ...stationActions];
 export const actionForSlug = (slug: string) => actionReferences.find((action) => action.slug === slug);
+export const actionsForStation = (stationID: string) => actionReferences.filter((action) => action.id === `service-${stationID}` || action.id === `station-${stationID}`);

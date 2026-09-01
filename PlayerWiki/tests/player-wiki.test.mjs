@@ -259,6 +259,16 @@ test('action reference is discoverable from player navigation and the affected c
   assert.match(sources[3], /Action reference/);
 });
 
+test('place details expose only their current construction, service, and station actions', async () => {
+  const reference = await read('lib/action-reference.ts');
+  const detail = await read('app/places/[slug]/page.tsx');
+  assert.match(reference, /actionsForStation/);
+  assert.match(detail, /Current actions here/);
+  assert.match(detail, /actionsForStation\(place.id\)/);
+  assert.match(detail, /build-foundation/);
+  assert.match(detail, /Action reference/);
+});
+
 test('equipment routes retain slot, recipe, frozen-piece and custody guidance', async () => {
   const index = await read('app/equipment/page.tsx');
   const detail = await read('app/equipment/[slug]/page.tsx');
