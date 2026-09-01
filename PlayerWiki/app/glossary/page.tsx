@@ -13,7 +13,7 @@ const domainGroups = [
   {
     label: 'Worlds and exploration',
     domains: ['Exploration', 'World generation'],
-    links: [['Exploration guide', '/systems/exploration'], ['Site directory', '/sites'], ['Bestiary', '/bestiary'], ['Resources', '/resources']],
+    links: [['World reference', '/world'], ['Terrain', '/terrain'], ['Flora harvesting', '/flora'], ['Exploration guide', '/systems/exploration'], ['Site directory', '/sites'], ['Bestiary', '/bestiary'], ['Resources', '/resources']],
   },
   {
     label: 'Combat and party',

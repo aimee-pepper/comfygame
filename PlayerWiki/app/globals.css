@@ -875,6 +875,37 @@ footer {
   font-weight: 800;
 }
 .village-card-facts dd { margin: 0; font-size: 13px; line-height: 1.4; }
+.world-reference-grid,
+.terrain-directory,
+.flora-directory {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+.world-reference-grid article,
+.terrain-directory-card,
+.flora-directory-card {
+  display: block;
+  padding: 16px;
+  border: 1px solid var(--line);
+  background: rgb(255 250 240 / 88%);
+  box-shadow: 0 4px 0 rgb(117 81 45 / 12%);
+}
+.world-reference-grid h2 { margin: 0 0 8px; font-size: 22px; }
+.world-reference-grid p { margin: 0 0 12px; color: var(--muted); line-height: 1.45; }
+.terrain-directory-card,
+.flora-directory-card,
+.terrain-detail-heading {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+.terrain-directory-card span,
+.flora-directory-card span { display: grid; gap: 4px; min-width: 0; }
+.terrain-directory-card small,
+.flora-directory-card small { color: var(--muted); line-height: 1.35; }
+.terrain-detail-heading > div { min-width: 0; }
+.terrain-detail-heading h2 { margin-top: 0; }
 .pixel-image {
   width: 44px;
   height: 44px;
@@ -1173,6 +1204,9 @@ footer {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
   .village-directory { grid-template-columns: 1fr; }
+  .world-reference-grid,
+  .terrain-directory,
+  .flora-directory { grid-template-columns: 1fr; }
   .systems-hub-grid {
     grid-template-columns: 1fr;
   }

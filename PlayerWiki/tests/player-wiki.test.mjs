@@ -125,6 +125,30 @@ test('Village building routes are discoverable from player navigation and materi
   assert.match(sources[7], /Village buildings/);
 });
 
+test('world reference publishes current terrain, pressure, resource-host, and harvest facts without promising hidden map results', async () => {
+  for (const relative of [
+    'app/world/page.tsx',
+    'app/world/conditions/[slug]/page.tsx',
+    'app/terrain/page.tsx',
+    'app/terrain/[slug]/page.tsx',
+    'app/flora/page.tsx',
+    'app/flora/[slug]/page.tsx',
+  ]) await access(path.join(root, relative));
+  const reference = await read('lib/world-reference.ts');
+  const world = await read('app/world/page.tsx');
+  const flora = await read('app/flora/page.tsx');
+  const snapshot = JSON.parse(await read('data/player-content.json'));
+  assert.equal(snapshot.pressureTargets.length, 8);
+  assert.equal(snapshot.terrain.length, 13);
+  assert.match(reference, /Shallow Water/);
+  assert.match(reference, /Deep Water/);
+  assert.match(reference, /Tall Growth/);
+  assert.match(reference, /resourceHostingGroups/);
+  assert.match(reference, /Rift-glass/);
+  assert.match(world, /rather than one guaranteed tile, plant, deposit, site, or animal/);
+  assert.match(flora, /never predicts an unseen plant/);
+});
+
 test('item details link published recipes and resources without guessing absent acquisition routes', async () => {
   const routes = await read('components/item-crafting-routes.tsx');
   const itemDetail = await read('app/items/[slug]/page.tsx');
@@ -358,7 +382,8 @@ test('exploration guide publishes retained portal and site-state visuals inline'
   assert.match(exploration, /Entry portal/);
   assert.match(exploration, /Searched site/);
   assert.match(exploration, /What your Page can describe/);
-  assert.match(exploration, /Ordinary flora is safe to enter/);
+  assert.match(exploration, /Field Guide identifies a revealed Flora harvest/);
+  assert.match(exploration, /without predicting a hidden map/);
   assert.match(exploration, /Return and defeat/);
   assert.match(exploration, /Continue the same world/);
   assert.match(exploration, /pressureTargets/);

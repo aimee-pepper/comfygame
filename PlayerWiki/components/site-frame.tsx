@@ -12,6 +12,7 @@ const prepareLinks = [
 ];
 
 const referenceLinks = [
+  ['/world', 'World reference'],
   ['/village', 'Village buildings'],
   ['/resources', 'Resources'],
   ['/bestiary', 'Bestiary records'],
