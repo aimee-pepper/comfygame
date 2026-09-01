@@ -608,11 +608,29 @@ test('current journey publishes only present Writing, world, Village, and Resear
   assert.match(journey, /\/systems\/world-writing/);
   assert.match(journey, /\/systems\/exploration/);
   assert.match(journey, /\/systems\/research/);
+  assert.match(journey, /Current task checklist/);
+  assert.match(journey, /\/resources\/progression/);
+  assert.match(journey, /\/research/);
   assert.match(systems, /Your current journey/);
   assert.match(frame, /\/journey/);
   assert.equal(journey.includes('Stage 0'), false);
   assert.equal(journey.includes('Stage 1'), false);
   assert.equal(journey.includes('Aimee decision'), false);
+});
+
+test('current progression is a task-oriented implemented-truth reference without proposed gates', async () => {
+  await access(path.join(root, 'app/resources/progression/page.tsx'));
+  const progression = await read('app/resources/progression/page.tsx');
+  const starts = await read('lib/system-guides.ts');
+  assert.match(progression, /Current task checklist/);
+  assert.match(progression, /Read the next Page before Binding/);
+  assert.match(progression, /Use the world to recover what you need now/);
+  assert.match(progression, /Choose one current Village improvement/);
+  assert.match(progression, /Study a ready Research node/);
+  assert.match(progression, /Prepare people, gear, and supplies/);
+  assert.match(progression, /does not promise that a particular construction/);
+  assert.match(progression, /\/research/);
+  assert.match(starts, /\/resources\/progression/);
 });
 
 test('Research publishes current branches, node requirements, base costs, and retained study behavior', async () => {

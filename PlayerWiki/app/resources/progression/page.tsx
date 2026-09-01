@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { GuideBreadcrumbs, RelatedGuides } from '@/components/guide-navigation';
 import { PageIntro } from '@/components/page-intro';
 import { PixelImage } from '@/components/pixel-image';
 import { SiteFrame } from '@/components/site-frame';
@@ -15,90 +16,18 @@ function buildingUses(resourceID: string) {
   );
 }
 
-export default function ResourceProgressionPage() {
-  return (
-    <SiteFrame sidebar>
-      <PageIntro
-        eyebrow="Planning reference"
-        title="Resource roles and progression"
-        summary="Compare every current material by availability band and by the crafting and construction systems that consume it. This page describes the implemented game; proposed future progression will be labelled separately when approved."
-      />
-      {bandOrder.map((band) => {
-        const resources = content.resources.filter(
-          (resource) => resource.tradeBand === band,
-        );
-        return (
-          <section className="article-section" key={band}>
-            <h2>{band}</h2>
-            <div className="table-wrap data-table">
-              <table>
-                <thead>
-                  <tr>
-                    <th aria-label="Image" />
-                    <th>Resource</th>
-                    <th>Craft recipes</th>
-                    <th>Building recipes</th>
-                    <th>World conditions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {resources.map((resource) => {
-                    const crafts = recipesUsingResource(resource.id);
-                    const buildings = buildingUses(resource.id);
-                    return (
-                      <tr key={resource.id}>
-                        <td>
-                          <PixelImage
-                            src={resource.assetURL}
-                            alt={`${resource.name} inventory icon`}
-                          />
-                        </td>
-                        <td>
-                          <Link href={`/resources/${resource.slug}`}>
-                            {resource.name}
-                          </Link>
-                        </td>
-                        <td>
-                          {crafts.length
-                            ? `${crafts.length} — ${crafts
-                                .slice(0, 2)
-                                .map((recipe) => recipe.name)
-                                .join(', ')}${crafts.length > 2 ? '…' : ''}`
-                            : 'No documented craft recipe'}
-                        </td>
-                        <td>
-                          {buildings.length
-                            ? `${buildings.length} — ${buildings
-                                .slice(0, 2)
-                                .map((station) => station.name)
-                                .join(', ')}${buildings.length > 2 ? '…' : ''}`
-                            : 'Not currently a building material'}
-                        </td>
-                        <td>{resource.drivenBy}</td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
-          </section>
-        );
-      })}
-      <section className="article-section note-card">
-        <h2>How to read this</h2>
-        <p>
-          A low consumer count is not automatically a flaw: a rare or
-          nontradeable resource can support one distinctive late-game purpose.
-          The useful question is whether its acquisition challenge and its
-          result feel deliberate. Each resource page lists the exact current
-          recipes and buildings so you can inspect that relationship directly.
-        </p>
-      </section>
-      <nav className="next-links">
-        <Link href="/resources">All resources</Link>
-        <Link href="/crafting">Crafting systems</Link>
-        <Link href="/places">Building costs</Link>
-      </nav>
-    </SiteFrame>
-  );
+export default function ProgressionReference() {
+  const storehouse = content.stations.find((station) => station.id === 'storehouse');
+  const firstGear = content.items.find((item) => item.gear && item.assetURL);
+  return <SiteFrame sidebar>
+    <GuideBreadcrumbs items={[{ label: 'Resources', href: '/resources' }, { label: 'Current progression' }]} />
+    <PageIntro eyebrow="Player reference" title="Current progression" summary="Use this checklist to choose a currently available next task. It follows the live route from Writing and Binding through exploration, return, Village work, Research, party preparation, and the next expedition—without prescribing a future gate order." />
+    <section className="article-section journey-strip"><Link href="/systems/world-writing"><img src={content.writingAssetURL} alt="Writing Desk parchment" /><span><strong>Write and Bind</strong><small>Shape the next Page and read its current preview.</small></span></Link><Link href="/systems/exploration"><img src={content.explorationVisuals.entryPortal} alt="Entry portal" /><span><strong>Explore and return</strong><small>Use the entry portal, current sites, and return route.</small></span></Link>{storehouse?.assetURL && <Link href="/services/storehouse"><PixelImage src={storehouse.assetURL} alt="Storehouse building visual" size={58} /><span><strong>Review what returned</strong><small>Check storage, Waiting, and the next Field Kit plan.</small></span></Link>}{firstGear?.assetURL && <Link href={`/equipment/${firstGear.slug}`}><PixelImage src={firstGear.assetURL} alt={`${firstGear.name} icon`} size={58} /><span><strong>Prepare the party</strong><small>Compare the current piece, slot, and custody before departure.</small></span></Link>}</section>
+    <section className="article-section"><h2>Current task checklist</h2><ol className="numbered-guide"><li><span><strong>Read the next Page before Binding</strong><p>Choose a hand and ink, place and connect the current marks, review the world preview, then Bind only when the screen is ready.</p><p><Link href="/systems/world-writing">Open World Writing</Link></p></span></li><li><span><strong>Use the world to recover what you need now</strong><p>Enter through the portal, Look at unfamiliar terrain or flora, search revealed sites, and choose only the current resources, items, and haul you can keep.</p><p><Link href="/systems/exploration">Open Exploration</Link> · <Link href="/resources">Browse resources</Link></p></span></li><li><span><strong>Resolve the return before planning again</strong><p>Read the current expedition result, resolve any Waiting or capacity choice, then check the returned holdings in Storehouse. The next Field Kit is a separate plan.</p><p><Link href="/services/storehouse">Open Storehouse and inventory</Link> · <Link href="/systems/inventory-custody">Read custody guidance</Link></p></span></li><li><span><strong>Choose one current Village improvement</strong><p>Compare the exact foundation, station action, recipe, or service you can satisfy now. Place and crafting guides keep the shown inputs, output, and readiness together.</p><p><Link href="/places">Browse Village places</Link> · <Link href="/crafting">Browse crafting systems</Link></p></span></li><li><span><strong>Study a ready Research node</strong><p>Open the visible node, confirm its earlier upgrades and current cost, then Study the node only when the detail is ready.</p><p><Link href="/research">Open the Research directory</Link> · <Link href="/services/library">Open Library collections</Link></p></span></li><li><span><strong>Prepare people, gear, and supplies for the next trip</strong><p>Choose the current party, compare gear by the exact slot and location, arrange Gambits if needed, and pack identified field supplies deliberately before the next Bind.</p><p><Link href="/services/party-and-gear">Open party and gear</Link> · <Link href="/systems/field-supplies">Read Field supplies</Link> · <Link href="/systems/combat">Read Combat</Link></p></span></li></ol></section>
+    <section className="article-section two-column"><div><h2>Use the live detail as the final check</h2><p>This reference connects current tasks; it does not promise that a particular construction, recipe, Research node, or world route is ready. Read the live detail for the exact current requirement, cost, result, and refusal before committing.</p></div><div><h2>Keep durable and expedition holdings separate</h2><p>Village holdings, learned records, and completed upgrades support later choices. Field Kit contents and expedition haul remain tied to their current custody and return presentation until the relevant screen resolves them.</p></div></section>
+    <section className="article-section"><h2>Current resource roles</h2><p>Compare every implemented material by trade band, current crafting consumers, building uses, and the world conditions associated with it.</p></section>
+    {bandOrder.map((band) => { const resources = content.resources.filter((resource) => resource.tradeBand === band); return <section className="article-section" key={band}><h2>{band}</h2><div className="table-wrap data-table"><table><thead><tr><th aria-label="Image" /><th>Resource</th><th>Craft recipes</th><th>Building recipes</th><th>World conditions</th></tr></thead><tbody>{resources.map((resource) => { const crafts = recipesUsingResource(resource.id); const buildings = buildingUses(resource.id); return <tr key={resource.id}><td><PixelImage src={resource.assetURL} alt={`${resource.name} inventory icon`} /></td><td><Link href={`/resources/${resource.slug}`}>{resource.name}</Link></td><td>{crafts.length ? `${crafts.length} — ${crafts.slice(0, 2).map((recipe) => recipe.name).join(', ')}${crafts.length > 2 ? '…' : ''}` : 'No documented craft recipe'}</td><td>{buildings.length ? `${buildings.length} — ${buildings.slice(0, 2).map((station) => station.name).join(', ')}${buildings.length > 2 ? '…' : ''}` : 'Not currently a building material'}</td><td>{resource.drivenBy}</td></tr>; })}</tbody></table></div></section>; })}
+    <section className="article-section note-card"><h2>How to read the resource table</h2><p>A low consumer count is not automatically a flaw: a rare or nontradeable resource can support one distinctive late-game purpose. Each resource page lists the exact current recipes and buildings so you can inspect that relationship directly.</p></section>
+    <RelatedGuides links={[{ label: 'Your current journey', href: '/journey' }, { label: 'Getting started', href: '/getting-started' }, { label: 'World Writing', href: '/systems/world-writing' }, { label: 'Exploration', href: '/systems/exploration' }, { label: 'Village construction', href: '/systems/village-construction' }, { label: 'Research directory', href: '/research' }, { label: 'Party, Gear and Gambits', href: '/systems/party-preparation' }]} />
+  </SiteFrame>;
 }

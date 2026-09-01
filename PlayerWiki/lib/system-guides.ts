@@ -14,6 +14,7 @@ export type SystemGuideCategory = {
 export const playerStartGuides: PlayerGuide[] = [
   { label: 'Getting started', href: '/getting-started', summary: 'Create a campaign and begin the current route.' },
   { label: 'Your current journey', href: '/journey', summary: 'Move from Writing through a world and back to the Village.' },
+  { label: 'Current progression', href: '/resources/progression', summary: 'Choose a current next task without assuming a future gate order.' },
 ];
 
 // The player-facing home for each published /systems route. Keep every route in exactly one

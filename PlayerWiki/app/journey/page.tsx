@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { GuideBreadcrumbs, RelatedGuides } from '@/components/guide-navigation';
 import { PageIntro } from '@/components/page-intro';
+import { PixelImage } from '@/components/pixel-image';
 import { SiteFrame } from '@/components/site-frame';
 import { content, humanize } from '@/lib/content';
 
@@ -17,6 +18,7 @@ function constructionCost(station: (typeof content.stations)[number]) {
 export default function JourneyGuide() {
   const startingPlaces = content.stations.filter((station) => station.unlockedAtStart);
   const buildablePlaces = content.stations.filter((station) => !station.unlockedAtStart);
+  const firstGear = content.items.find((item) => item.gear && item.assetURL);
   return (
     <SiteFrame sidebar>
       <GuideBreadcrumbs items={[{ label: 'Systems', href: '/systems' }, { label: 'Current journey' }]} />
@@ -34,6 +36,7 @@ export default function JourneyGuide() {
           <li><span><strong>Review the return at the Village</strong><p>Use the expedition result to review what came back, resolve any capacity decision, then prepare the next trip or put returned resources toward a current construction, recipe, or Research cost.</p></span></li>
         </ol>
       </section>
+      <section className="article-section journey-strip"><Link href="/resources/progression"><img src={content.writingAssetURL} alt="Writing Desk parchment" /><span><strong>Current task checklist</strong><small>Move from the next Page through resources, Village work, Research, party preparation, and return.</small></span></Link><Link href="/systems/exploration"><img src={content.explorationVisuals.entryPortal} alt="Entry portal" /><span><strong>World route</strong><small>Use the entry portal and current world detail as you explore.</small></span></Link>{firstGear?.assetURL && <Link href={`/equipment/${firstGear.slug}`}><PixelImage src={firstGear.assetURL} alt={`${firstGear.name} icon`} size={58} /><span><strong>Party preparation</strong><small>Compare custody and the current slot before equipping.</small></span></Link>}</section>
       <section className="article-section two-column">
         <div>
           <h2>What this guide does not promise</h2>
@@ -62,16 +65,18 @@ export default function JourneyGuide() {
         <div className="definition-grid">
           <div><h3><Link href="/services">Village services</Link></h3><p>Use the current service screens for storage, party preparation, trade, refinement, records, and other everyday Village work.</p></div>
           <div><h3><Link href="/crafting">Crafting systems</Link></h3><p>Open a current station guide to compare its published inputs, material choices, output, and access facts before you commit a recipe.</p></div>
-          <div><h3><Link href="/systems/research">Research</Link></h3><p>Open the current Research screen to choose a listed node and spend its shown cost. Earlier listed upgrades are required when the node says so; this guide does not predict an order beyond those current requirements.</p></div>
+          <div><h3><Link href="/research">Research</Link></h3><p>Open the current Research node to compare listed prerequisites, base cost, and current result. Earlier listed upgrades are required when the node says so; this guide does not predict an order beyond those current requirements.</p></div>
         </div>
       </section>
       <RelatedGuides links={[
         { label: 'Getting started', href: '/getting-started' },
+        { label: 'Current progression checklist', href: '/resources/progression' },
         { label: 'World Writing', href: '/systems/world-writing' },
         { label: 'Exploration', href: '/systems/exploration' },
         { label: 'Village services', href: '/services' },
         { label: 'Places and stations', href: '/places' },
         { label: 'Crafting systems', href: '/crafting' },
+        { label: 'Research guide', href: '/systems/research' },
       ]} />
     </SiteFrame>
   );
