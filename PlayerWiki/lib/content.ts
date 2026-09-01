@@ -93,6 +93,10 @@ export interface Station {
   slug: string;
   name: string;
   blurb: string;
+  status: 'implemented' | 'scheduled';
+  route: string | null;
+  destinationKind: string | null;
+  purpose: string | null;
   zone: string;
   lifecycle: string;
   keeper: string | null;
@@ -109,7 +113,7 @@ export interface Station {
   }>;
   buildBlurb: string | null;
   assetURL: string | null;
-  contextAssetURL: string;
+  contextAssetURL: string | null;
 }
 
 export interface Term {
@@ -207,6 +211,7 @@ interface PlayerContent {
   travellers: Traveller[];
   cast: CastPerson[];
   stations: Station[];
+  scheduledStations: Station[];
   researchBranches: ResearchBranch[];
   researchNodes: ResearchNode[];
   pressureTargets: PressureTarget[];

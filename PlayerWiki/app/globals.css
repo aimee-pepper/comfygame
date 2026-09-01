@@ -822,6 +822,59 @@ footer {
   height: 44px;
   place-items: center;
 }
+.village-directory {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+.village-directory-card {
+  padding: 18px;
+  border: 1px solid var(--line);
+  background: rgb(255 250 240 / 88%);
+  box-shadow: 0 4px 0 rgb(117 81 45 / 12%);
+}
+.village-card-heading {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+.village-card-heading h2 {
+  margin: 0;
+  font-size: 24px;
+}
+.village-card-heading p:last-child {
+  margin: 6px 0 0;
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.45;
+}
+.village-status {
+  margin: 0 0 5px;
+  color: var(--forest);
+  font-size: 11px;
+  font-weight: 850;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.village-status.scheduled { color: var(--blue); }
+.village-card-facts {
+  display: grid;
+  gap: 8px;
+  margin: 16px 0 0;
+}
+.village-card-facts div {
+  display: grid;
+  grid-template-columns: 92px minmax(0, 1fr);
+  gap: 8px;
+  padding-top: 8px;
+  border-top: 1px solid #decba4;
+}
+.village-card-facts dt {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 800;
+}
+.village-card-facts dd { margin: 0; font-size: 13px; line-height: 1.4; }
 .pixel-image {
   width: 44px;
   height: 44px;
@@ -1119,6 +1172,7 @@ footer {
   .topic-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
+  .village-directory { grid-template-columns: 1fr; }
   .systems-hub-grid {
     grid-template-columns: 1fr;
   }

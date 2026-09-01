@@ -557,6 +557,10 @@ const stations = await Promise.all(source.stations
     slug: station.slug,
     name: station.name,
     blurb: station.blurb,
+    status: 'implemented',
+    route: station.route ?? null,
+    destinationKind: station.destinationKind ?? null,
+    purpose: station.purpose ?? null,
     zone: station.zone,
     lifecycle: station.lifecycle,
     keeper: station.keeper,
@@ -572,6 +576,30 @@ const stations = await Promise.all(source.stations
         : districtAssetURL,
     };
   }));
+
+const scheduledStations = await Promise.all(source.stations
+  .filter((station) => station.disposition === 'provisional')
+  .map(async (station) => ({
+    id: station.id,
+    slug: station.slug,
+    name: station.name,
+    blurb: station.blurb,
+    status: 'scheduled',
+    route: station.route ?? null,
+    destinationKind: station.destinationKind ?? null,
+    purpose: station.purpose ?? null,
+    zone: station.zone,
+    lifecycle: station.lifecycle,
+    keeper: station.keeper,
+    keeperID: station.keeperID,
+    unlockedAtStart: station.unlockedAtStart,
+    startingTier: station.startingTier,
+    catalogueMaxTier: station.catalogueMaxTier,
+    buildCost: station.buildCost,
+    buildBlurb: station.buildBlurb,
+    assetURL: null,
+    contextAssetURL: null,
+  })));
 
 const terrain = [];
 for (const asset of family('terrain-production-pack-v1')?.assets.filter(
@@ -648,6 +676,7 @@ const playerContent = {
   travellers,
   cast,
   stations,
+  scheduledStations,
   researchBranches: researchSource.branches
     .map((branch) => ({
       id: branch.id,

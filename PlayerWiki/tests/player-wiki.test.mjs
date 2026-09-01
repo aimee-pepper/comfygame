@@ -90,6 +90,22 @@ test('site directory keeps current conditions, disclosed results, and depletion 
   assert.match(guide, /disclosedResult/);
 });
 
+test('Village directory separates live buildings from scheduled entries and gives each a semantic route', async () => {
+  await access(path.join(root, 'app/village/page.tsx'));
+  await access(path.join(root, 'app/buildings/[slug]/page.tsx'));
+  const directory = await read('app/village/page.tsx');
+  const detail = await read('app/buildings/[slug]/page.tsx');
+  const snapshot = JSON.parse(await read('data/player-content.json'));
+  assert.equal(snapshot.stations.length, 22);
+  assert.equal(snapshot.scheduledStations.length, 1);
+  assert.match(directory, /buildingStatus/);
+  assert.match(directory, /Scheduled, not live/);
+  assert.match(directory, /No live action or recipe is published/);
+  assert.match(detail, /This entry is not a live player route/);
+  assert.match(detail, /Exact construction/);
+  assert.match(detail, /Related materials and next steps/);
+});
+
 test('item details link published recipes and resources without guessing absent acquisition routes', async () => {
   const routes = await read('components/item-crafting-routes.tsx');
   const itemDetail = await read('app/items/[slug]/page.tsx');
