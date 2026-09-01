@@ -247,6 +247,15 @@ test('action reference keeps current player actions, costs, results, and unavail
   assert.match(detail, /When it cannot complete/);
 });
 
+test('People directory keeps campaign order, meeting context, and current Village relationships together', async () => {
+  const directory = await read('app/people/page.tsx');
+  assert.match(directory, /Campaign-order people directory/);
+  assert.match(directory, /meetingContext/);
+  assert.match(directory, /serviceForStation/);
+  assert.match(directory, /\/people\/\$\{person.slug\}/);
+  assert.match(directory, /diary-pages/);
+});
+
 test('action reference is discoverable from player navigation and the affected current system guides', async () => {
   const sources = await Promise.all([
     'components/site-frame.tsx', 'app/search/page.tsx', 'app/glossary/page.tsx', 'app/getting-started/page.tsx', 'app/journey/page.tsx',
