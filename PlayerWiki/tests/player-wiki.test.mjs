@@ -183,6 +183,22 @@ test('Research directory provides stable semantic node routes with complete curr
   assert.match(helpers, /slugify\(node\.name\)/);
 });
 
+test('conditions reference separates the four encounter afflictions from current field effects', async () => {
+  await access(path.join(root, 'app/statuses/page.tsx'));
+  await access(path.join(root, 'app/statuses/[slug]/page.tsx'));
+  const reference = await read('lib/status-reference.ts');
+  const directory = await read('app/statuses/page.tsx');
+  const detail = await read('app/statuses/[slug]/page.tsx');
+  for (const stableID of ['affliction-burn', 'affliction-poison', 'affliction-dazzle', 'affliction-bleed', 'world-flora-poison', 'world-scent-mask', 'guard-stonebark']) assert.match(reference, new RegExp(stableID));
+  assert.match(reference, /Combat Poison is distinct from poison left by chemical flora/);
+  assert.match(reference, /Quench does not clear Bleed/);
+  assert.match(reference, /does not hide creatures or affect apexes/);
+  assert.match(directory, /Conditions and effects/);
+  assert.match(directory, /Encounter afflictions/);
+  assert.match(detail, /Keep the boundary clear/);
+  assert.match(detail, /\/items\/\$\{item\.slug\}/);
+});
+
 test('equipment routes retain slot, recipe, frozen-piece and custody guidance', async () => {
   const index = await read('app/equipment/page.tsx');
   const detail = await read('app/equipment/[slug]/page.tsx');
