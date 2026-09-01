@@ -20,7 +20,7 @@ const referenceLinks = [
   ['/statuses', 'Conditions & effects'],
   ['/techniques', 'Techniques & Gambits'],
   ['/actions', 'Action reference'],
-  ['/people', 'People'],
+  ['/people', 'People & records'],
   ['/places', 'Places & stations'],
   ['/glossary', 'Glossary'],
 ];

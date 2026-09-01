@@ -28,7 +28,7 @@ const domainGroups = [
   {
     label: 'Campaign records and return',
     domains: ['Persistence', 'Compatibility', 'Return', 'Expeditions'],
-    links: [['Getting started', '/getting-started'], ['Library service', '/services/library']],
+    links: [['Getting started', '/getting-started'], ['Library service', '/services/library'], ['People and records', '/people']],
   },
   {
     label: 'People',

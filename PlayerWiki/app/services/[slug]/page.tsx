@@ -86,10 +86,12 @@ export default async function ServiceDetail({
           ))}
         </div>
       </section>
+      {guide.slug === 'library' && <section className="article-section note-card"><h2>People and records</h2><p>The Library helps you return to recovered records. The Player Wiki keeps each person’s complete current authored book pages together and separates location-hint stages with a clear spoiler boundary.</p><p><Link href="/people">Browse complete people records</Link></p></section>}
       <RelatedGuides links={[
         { label: 'All village services', href: '/services' },
         { label: `${station.name} construction and keeper`, href: `/places/${station.slug}` },
         ...guide.relatedGuides,
+        ...(guide.slug === 'library' ? [{ label: 'People and complete records', href: '/people' }] : []),
         { label: 'All systems', href: '/systems' },
       ]} />
     </SiteFrame>

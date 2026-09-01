@@ -120,6 +120,7 @@ export default async function PlaceDetail({
         <h2>What this place currently offers</h2>
         {service ? <div className="definition-grid">{service.useFor.map((action) => <div key={action}>{action}</div>)}</div> : <p>No separate service action list is currently published for this place.</p>}
       </section>
+      {place.id === 'library' && <section className="article-section note-card"><h2>People and complete records</h2><p>Use the Library’s collections for recovered records, then open a person’s Player Wiki page to read their complete current authored book pages. Location-hint stages stay clearly marked as spoilers.</p><p><Link href="/people">Browse complete people records</Link></p></section>}
       {actions.length > 0 && <section className="article-section">
         <h2>Current actions here</h2>
         <div className="definition-grid">{actions.map((action) => <div key={action.id}><h3><Link href={`/actions/${action.slug}`}>{action.name}</Link></h3><p>{action.availability}</p><small>{action.unavailable}</small></div>)}</div>
@@ -129,7 +130,7 @@ export default async function PlaceDetail({
         {recipes.length ? <div className="table-wrap"><table><thead><tr><th>Recipe</th><th>Output</th><th>Exact inputs</th><th>Ready when</th></tr></thead><tbody>{recipes.map((recipe) => { const item = content.items.find((entry) => entry.name === recipe.result); const outputHref = item ? (item.gear ? `/equipment/${item.slug}` : `/items/${item.slug}`) : null; return <tr key={recipe.id}><td><Link href={`/crafting/${recipe.system}`}>{recipe.name}</Link></td><td>{outputHref ? <Link href={outputHref}>{recipe.result}</Link> : recipe.result}</td><td>{recipeRequirements(recipe)}</td><td>{recipeReadiness(recipe)}</td></tr>; })}</tbody></table></div> : <p>No current crafting recipe is published for this place.</p>}
       </section>
       {systems.length > 0 && <section className="article-section two-column"><div><h2>Material choices</h2>{systems.map((system) => <p key={system.slug}><strong><Link href={`/crafting/${system.slug}`}>{system.name}:</Link></strong> {system.materialChoice}</p>)}</div><div><h2>Result and custody</h2>{systems.map((system) => <p key={system.slug}>{system.commitResult}</p>)}</div></section>}
-      <RelatedGuides links={[{ label: 'All places', href: '/places' }, ...(actions.length ? [{ label: 'Action reference', href: '/actions' }] : []), ...(service ? [{ label: `How to use ${service.name}`, href: `/services/${service.slug}` }] : []), ...systems.map((system) => ({ label: system.name, href: `/crafting/${system.slug}` })), { label: 'All village services', href: '/services' }, { label: 'All resources', href: '/resources' }]} />
+      <RelatedGuides links={[{ label: 'All places', href: '/places' }, ...(actions.length ? [{ label: 'Action reference', href: '/actions' }] : []), ...(service ? [{ label: `How to use ${service.name}`, href: `/services/${service.slug}` }] : []), ...(place.id === 'library' ? [{ label: 'People and complete records', href: '/people' }] : []), ...systems.map((system) => ({ label: system.name, href: `/crafting/${system.slug}` })), { label: 'All village services', href: '/services' }, { label: 'All resources', href: '/resources' }]} />
     </SiteFrame>
   );
 }

@@ -20,7 +20,17 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
     { label: 'Equipment', entries: content.items.filter(entry => entry.gear).map(entry => ({ name: entry.name, summary: entry.summary, href: `/equipment/${entry.slug}`, type: 'Equipment', assetURL: entry.assetURL, alt: `${entry.name} icon` })) },
     { label: 'Supplies', entries: content.items.filter(entry => !entry.gear && entry.consumable).map(entry => ({ name: entry.name, summary: entry.summary, href: `/items/${entry.slug}`, type: 'Supply', assetURL: entry.assetURL, alt: `${entry.name} icon` })) },
     { label: 'Curios and key items', entries: content.items.filter(entry => !entry.gear && !entry.consumable).map(entry => ({ name: entry.name, summary: entry.summary, href: `/items/${entry.slug}`, type: 'Curio or key item', assetURL: entry.assetURL, alt: `${entry.name} icon` })) },
-    { label: 'People', entries: content.cast.map(entry => ({ name: entry.name, summary: entry.contribution, href: `/people/${entry.slug}`, type: 'Person', assetURL: entry.assetURL, alt: `${entry.name} character visual` })) },
+    { label: 'People and records', entries: content.cast.flatMap((entry) => [
+      { name: entry.name, summary: `${entry.meetingContext} ${entry.contribution}`, href: `/people/${entry.slug}`, type: 'Person', assetURL: entry.assetURL, alt: `${entry.name} character visual` },
+      ...entry.diaryPages.map((page) => ({
+        name: `${entry.name}: ${page.title} — page ${page.sequence}`,
+        summary: page.prose,
+        href: `/people/${entry.slug}#${page.worldHint ? 'location-hints' : 'diary-pages'}`,
+        type: page.worldHint ? 'Spoiler-marked location hint' : 'Authored book page',
+        assetURL: null,
+        alt: '',
+      })),
+    ]) },
     { label: 'Village buildings', entries: villageBuildings.map(entry => ({ name: entry.name, summary: entry.status === 'scheduled' ? `${entry.blurb} Scheduled; not yet a live player route.` : entry.blurb, href: `/buildings/${entry.slug}`, type: entry.status === 'scheduled' ? 'Scheduled building' : 'Current Village building', assetURL: entry.assetURL ?? entry.contextAssetURL, alt: entry.assetURL ? `${entry.name} building visual` : `${entry.zone} town setting` })) },
     { label: 'Village services', entries: serviceGuides.map(entry => { const station = content.stations.find((candidate) => candidate.id === entry.stationID); return { name: entry.name, summary: entry.summary, href: `/services/${entry.slug}`, type: 'Service guide', assetURL: station?.assetURL ?? station?.contextAssetURL ?? null, alt: station?.assetURL ? `${station.name} building visual` : `${station?.zone ?? 'Village'} town setting` }; }) },
     { label: 'Current crafting', entries: craftingSystems.flatMap(system => [{ name: system.name, summary: `${system.station}. ${system.access[0]}`, href: `/crafting/${system.slug}`, type: 'Current station process', assetURL: content.stations.find(station => station.id === system.stationID)?.assetURL ?? null, alt: `${system.station} building visual` }, ...recipesFor(system.slug).map(recipe => ({ name: recipe.name, summary: `${recipe.result}. ${recipeReadiness(recipe)}`, href: `/crafting/${system.slug}`, type: 'Current recipe', assetURL: content.items.find(item => item.name === recipe.result)?.assetURL ?? null, alt: `${recipe.result} icon` }))]) },
@@ -39,6 +49,6 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
   const resultCount = groups.reduce((total, group) => total + group.entries.length, 0);
   return <SiteFrame sidebar><PageIntro eyebrow="Player Wiki" title={q ? `Search results for “${q}”` : 'Search'} summary={q ? `${resultCount} matching player-facing entries.` : 'Enter a name, item, resource, place, or game term in the search field.'} />
     {q && !groups.length && <section className="article-section note-card"><h2>No matching player entries</h2><p>Try a shorter name, an item type, a resource, or a Village service.</p></section>}
-    {groups.map(group => <section className="article-section search-group" key={group.label}><h2>{group.label} <span>{group.entries.length}</span></h2><div className="table-wrap data-table catalogue-summary"><table><thead><tr><th aria-label="Image" /><th>Result</th><th>Type</th><th>Summary</th></tr></thead><tbody>{group.entries.map(result => <tr key={result.href}><td>{result.assetURL ? <Link href={result.href} aria-label={`Open ${result.name}`}><PixelImage src={result.assetURL} alt={result.alt} /></Link> : '—'}</td><td><Link href={result.href}>{result.name}</Link></td><td>{result.type}</td><td>{result.summary}</td></tr>)}</tbody></table></div></section>)}
+    {groups.map(group => <section className="article-section search-group" key={group.label}><h2>{group.label} <span>{group.entries.length}</span></h2><div className="table-wrap data-table catalogue-summary"><table><thead><tr><th aria-label="Image" /><th>Result</th><th>Type</th><th>Summary</th></tr></thead><tbody>{group.entries.map(result => <tr key={`${result.href}-${result.type}-${result.name}`}><td>{result.assetURL ? <Link href={result.href} aria-label={`Open ${result.name}`}><PixelImage src={result.assetURL} alt={result.alt} /></Link> : '—'}</td><td><Link href={result.href}>{result.name}</Link></td><td>{result.type}</td><td>{result.summary}</td></tr>)}</tbody></table></div></section>)}
   </SiteFrame>;
 }

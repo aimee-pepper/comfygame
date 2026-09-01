@@ -256,6 +256,29 @@ test('People directory keeps campaign order, meeting context, and current Villag
   assert.match(directory, /diary-pages/);
 });
 
+test('complete people records are discoverable through player-facing Library, site, glossary, search, and navigation routes', async () => {
+  const [search, glossary, knowledge, service, place, sites, frame] = await Promise.all([
+    'app/search/page.tsx',
+    'app/glossary/page.tsx',
+    'app/systems/knowledge-records/page.tsx',
+    'app/services/[slug]/page.tsx',
+    'app/places/[slug]/page.tsx',
+    'app/sites/page.tsx',
+    'components/site-frame.tsx',
+  ].map(read));
+  assert.match(search, /People and records/);
+  assert.match(search, /Authored book page/);
+  assert.match(search, /Spoiler-marked location hint/);
+  assert.match(search, /page\.prose/);
+  assert.match(search, /location-hints/);
+  assert.match(glossary, /People and records/);
+  assert.match(knowledge, /complete current authored book record/);
+  assert.match(service, /guide\.slug === 'library'/);
+  assert.match(place, /place\.id === 'library'/);
+  assert.match(sites, /People’s location records/);
+  assert.match(frame, /People & records/);
+});
+
 test('action reference is discoverable from player navigation and the affected current system guides', async () => {
   const sources = await Promise.all([
     'components/site-frame.tsx', 'app/search/page.tsx', 'app/glossary/page.tsx', 'app/getting-started/page.tsx', 'app/journey/page.tsx',
