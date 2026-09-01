@@ -475,6 +475,10 @@ test('search groups player references and uses retained thumbnails only where av
   const search = await read('app/search/page.tsx');
   assert.match(search, /label: 'Resources'/);
   assert.match(search, /label: 'Village services'/);
+  assert.match(search, /label: 'Creatures and threats'/);
+  assert.match(search, /label: 'Sites'/);
+  assert.match(search, /content\.creatures/);
+  assert.match(search, /content\.sites/);
   assert.match(search, /serviceGuides/);
   assert.match(search, /const groups = q/);
   assert.match(search, /PixelImage/);
@@ -489,6 +493,22 @@ test('glossary combines related player domains and points to useful guides', asy
   assert.match(glossary, /\/systems\/world-writing/);
   assert.match(glossary, /\/services\/party-and-gear/);
   assert.match(glossary, /glossary-group-heading/);
+});
+
+test('creature and site directories are discoverable from shared navigation and reciprocal player guides', async () => {
+  const frame = await read('components/site-frame.tsx');
+  const systems = await read('app/systems/page.tsx');
+  const glossary = await read('app/glossary/page.tsx');
+  const exploration = await read('app/systems/exploration/page.tsx');
+  const animals = await read('app/systems/animals-companionship/page.tsx');
+  const records = await read('app/systems/knowledge-records/page.tsx');
+  const resource = await read('app/resources/[slug]/page.tsx');
+  for (const source of [frame, systems, glossary, exploration, animals, records, resource]) {
+    assert.match(source, /\/bestiary|\/sites/);
+  }
+  assert.match(systems, /Field reference directories/);
+  assert.match(frame, /Site directory/);
+  assert.match(records, /without marking one as discovered/);
 });
 
 test('systems hub groups every current player guide into useful routes', async () => {
@@ -731,7 +751,7 @@ test('Economy guide keeps current listings, refinement, and recycling player-fac
   assert.match(frame, /\/systems\/economy-exchange/);
 });
 
-test('Knowledge guide connects only recovered Library, people, Research, and Bestiary records', async () => {
+test('Knowledge guide connects recovered Library, people, Research, and spoiler-safe Bestiary references', async () => {
   await access(path.join(root, 'app/systems/knowledge-records/page.tsx'));
   const knowledge = await read('app/systems/knowledge-records/page.tsx');
   const systems = await read('lib/system-guides.ts');
@@ -742,7 +762,7 @@ test('Knowledge guide connects only recovered Library, people, Research, and Bes
   assert.match(knowledge, /Dictionary/);
   assert.match(knowledge, /Notes and History/);
   assert.match(knowledge, /Research and records/);
-  assert.match(knowledge, /does not reveal unseen creatures or traits/);
+  assert.match(knowledge, /without marking one as discovered/);
   assert.match(knowledge, /\/services\/library/);
   assert.match(knowledge, /\/people/);
   assert.match(knowledge, /\/bestiary/);
@@ -782,7 +802,7 @@ test('Animals guide documents current Attend, trust, companion placement, combat
   assert.match(animals, /returns to the Menagerie/);
   assert.match(animals, /Interpose, Harrier, Slip Away, Warning Display, or Commit/);
   assert.match(animals, /do not use human equipment or combat trees/);
-  assert.match(animals, /does not reveal an animal you have not encountered/);
+  assert.match(animals, /neither reference marks an animal as encountered/);
   assert.match(animals, /\/places\/menagerie/);
   assert.match(animals, /\/bestiary/);
   assert.match(systems, /\/systems\/animals-companionship/);

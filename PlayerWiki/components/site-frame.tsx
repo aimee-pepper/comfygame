@@ -14,6 +14,7 @@ const prepareLinks = [
 const referenceLinks = [
   ['/resources', 'Resources'],
   ['/bestiary', 'Bestiary records'],
+  ['/sites', 'Site directory'],
   ['/people', 'People'],
   ['/places', 'Places & stations'],
   ['/glossary', 'Glossary'],
