@@ -15,6 +15,7 @@ const sourceDataPath = path.join(
 );
 const outputDataPath = path.join(playerWikiRoot, 'data', 'player-content.json');
 const publicAssetRoot = path.join(playerWikiRoot, 'public', 'game-assets');
+const siteBasePath = (process.env.NEXT_PUBLIC_BASE_PATH ?? '').replace(/\/+$/, '');
 
 const source = JSON.parse(await readFile(sourceDataPath, 'utf8'));
 const travellerSource = JSON.parse(
@@ -280,7 +281,7 @@ async function publishAsset(asset, directory, fileName) {
   const sourcePath = path.join(repositoryRoot, asset.sourcePath);
   const destinationPath = path.join(publicAssetRoot, directory, fileName);
   await copyFile(sourcePath, destinationPath);
-  return `/game-assets/${directory}/${fileName}`;
+  return `${siteBasePath}/game-assets/${directory}/${fileName}`;
 }
 
 async function publishTravellerCameo(travellerID, slug) {
@@ -325,7 +326,7 @@ async function publishTravellerCameo(travellerID, slug) {
     `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" shape-rendering="crispEdges">${body}</svg>\n`,
     'utf8',
   );
-  return `/game-assets/people/${destination}`;
+  return `${siteBasePath}/game-assets/people/${destination}`;
 }
 
 async function publishTownVisual(sourcePath, destination) {
@@ -333,7 +334,7 @@ async function publishTownVisual(sourcePath, destination) {
     path.join(repositoryRoot, sourcePath),
     path.join(publicAssetRoot, 'places', destination),
   );
-  return `/game-assets/places/${destination}`;
+  return `${siteBasePath}/game-assets/places/${destination}`;
 }
 
 const castRows = [...fullCastGuide.matchAll(

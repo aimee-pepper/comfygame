@@ -1,4 +1,4 @@
-import Link from 'next/link';
+import Link, { wikiHref } from '@/components/wiki-link';
 import { Search } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { playerStartGuides, systemGuideCategories } from '@/lib/system-guides';
@@ -50,7 +50,7 @@ export function SiteFrame({
             <small>Player Wiki</small>
           </span>
         </Link>
-        <form className="wiki-search" action="/search">
+        <form className="wiki-search" action={wikiHref('/search')}>
           <Search size={16} aria-hidden="true" />
           <input
             name="q"

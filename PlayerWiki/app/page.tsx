@@ -1,4 +1,4 @@
-import Link from 'next/link';
+import Link from '@/components/wiki-link';
 import {
   BookOpenText,
   Compass,
@@ -86,9 +86,10 @@ export default function Home() {
             <table>
               <thead><tr><th>Resource</th><th>Rarity</th><th>Mostly found</th><th>Useful for</th></tr></thead>
               <tbody>
-                {resources.map(([name, rarity, found, use]) => (
-                  <tr key={name}><td><Link href={`/resources/${name.toLowerCase().replaceAll(' ', '-')}`}>{name}</Link></td><td>{rarity}</td><td>{found}</td><td>{use}</td></tr>
-                ))}
+                {resources.map(([name, rarity, found, use]) => {
+                  const resource = content.resources.find((entry) => entry.name === name);
+                  return <tr key={name}><td><Link href={resource ? `/resources/${resource.slug}` : '/resources'}>{name}</Link></td><td>{rarity}</td><td>{found}</td><td>{use}</td></tr>;
+                })}
               </tbody>
             </table>
           </div>

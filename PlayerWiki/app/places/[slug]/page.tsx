@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import Link from 'next/link';
+import Link from '@/components/wiki-link';
 import { notFound } from 'next/navigation';
 import { PageIntro } from '@/components/page-intro';
 import { GuideBreadcrumbs, RelatedGuides } from '@/components/guide-navigation';

@@ -9,6 +9,7 @@
     "sync-content": "node scripts/sync-content.mjs",
     "dev": "npm run sync-content && vinext dev",
     "build": "npm run sync-content && vinext build",
+    "build:pages": "npm run build && node scripts/prepare-pages.mjs",
     "start": "wrangler dev --config dist/server/wrangler.json",
     "test": "node --test tests/player-wiki.test.mjs",
     "lint": "oxlint",

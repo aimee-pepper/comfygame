@@ -1,4 +1,4 @@
-import Link from 'next/link';
+import Link from '@/components/wiki-link';
 import { craftingRecipes, systemFor } from '@/lib/crafting';
 import { type Item, content, humanize } from '@/lib/content';
 

@@ -1,4 +1,4 @@
-import Link from 'next/link';
+import Link from '@/components/wiki-link';
 import { GuideBreadcrumbs, RelatedGuides } from '@/components/guide-navigation';
 import { PageIntro } from '@/components/page-intro';
 import { PixelImage } from '@/components/pixel-image';

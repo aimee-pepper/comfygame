@@ -1,4 +1,4 @@
-import Link from 'next/link';
+import Link from '@/components/wiki-link';
 import { PageIntro } from '@/components/page-intro';
 import { SiteFrame } from '@/components/site-frame';
 import { content } from '@/lib/content';

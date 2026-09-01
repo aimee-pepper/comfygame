@@ -356,7 +356,7 @@ export const serviceGuides: ServiceGuide[] = [
     result:
       'Only a completed refinement exchanges the selected Raw Essence for the shown Essence Crystals. If the amount or rate no longer matches, the current reserve remains unchanged.',
     relatedGuides: [
-      { label: 'Raw Essence', href: '/resources/raw-essence' },
+      { label: 'Raw Essence', href: '/resources/essence-raw' },
       { label: 'Crafting systems', href: '/crafting' },
       { label: 'Combat', href: '/systems/combat' },
     ],

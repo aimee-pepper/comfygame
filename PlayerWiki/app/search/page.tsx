@@ -1,4 +1,7 @@
-import Link from 'next/link';
+"use client";
+
+import { useSyncExternalStore } from 'react';
+import Link from '@/components/wiki-link';
 import { PageIntro } from '@/components/page-intro';
 import { PixelImage } from '@/components/pixel-image';
 import { SiteFrame } from '@/components/site-frame';
@@ -12,8 +15,12 @@ import { statusReferences } from '@/lib/status-reference';
 import { techniqueReferences } from '@/lib/technique-reference';
 import { actionReferences } from '@/lib/action-reference';
 
-export default async function SearchPage({ searchParams }: { searchParams: Promise<{ q?: string }> }) {
-  const q = ((await searchParams).q ?? '').trim().toLowerCase();
+export default function SearchPage() {
+  const q = useSyncExternalStore(
+    () => () => {},
+    () => (new URLSearchParams(window.location.search).get('q') ?? '').trim().toLowerCase(),
+    () => '',
+  );
   const categories = [
     { label: 'Player guides', entries: [...playerStartGuides, ...systemGuides].map((entry) => ({ name: entry.label, summary: entry.summary, href: entry.href, type: 'Player guide', assetURL: null, alt: '' })) },
     { label: 'Resources', entries: content.resources.map(entry => ({ name: entry.name, summary: entry.summary, href: `/resources/${entry.slug}`, type: 'Resource', assetURL: entry.assetURL, alt: `${entry.name} inventory icon` })) },
