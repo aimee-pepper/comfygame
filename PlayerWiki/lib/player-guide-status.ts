@@ -83,7 +83,7 @@ export const lootPaths = [
     current:
       'A creature’s saved body already determines familiar material families such as Hide, Pelt, Scale, Bone, Venom, and Ichor. Those rewards are still stored as individual source-bearing samples.',
     accepted:
-      'Creatures emit a recognizable physical type or precise subtype. Matching species variants share a type-and-quality stack, while species, colour, and inherited values remain visible in expanded history.',
+      'Creatures emit a recognizable physical type and subtype. Species-specific items of the same subtype and quality share a default stack, while species, colour, and inherited values remain visible in expanded history.',
   },
   {
     name: 'Named threats and guardians',
@@ -97,7 +97,7 @@ export const lootPaths = [
     current:
       'Each placed discovery keeps its own Search, depletion, and custody rules. A depleted site remains part of that world’s history rather than turning into another reward.',
     accepted:
-      'Placed identity and discovery boundaries stay unchanged. Only physical material custody moves to type-or-subtype plus quality stacks.',
+      'Placed identity and discovery boundaries stay unchanged. Only physical material custody moves to subtype plus quality default stacks.',
   },
   {
     name: 'Nearby territory finds',
@@ -309,8 +309,8 @@ export const openDecisions = [
     body: 'Aimee has settled the hierarchy: broad category, specific physical type, optional precise subtype, species/source variant, and four resource qualities. The complete type/subtype registry and every recipe eligibility list still need joint review.',
   },
   {
-    title: 'Rubble',
-    body: 'Rubble will not remain a finished resource with no physical identity. Aimee will choose between removing it or retaining a renamed mixed find that processes only into materials supported by its source region.',
+    title: 'Mixed geological find',
+    body: 'Aimee prefers replacing finished Rubble with a region-causal mixed find that can yield a bounded grab bag from its source zone, including an occasional material the player could not yet reach or harvest. Its name, frequency, output count, regional weighting, quality inheritance, and processing owner remain open.',
   },
   {
     title: 'Harvest and facility progression',
@@ -334,7 +334,7 @@ export const correctionStatus = [
   {
     label: 'Must change',
     title: 'Material custody',
-    body: 'The current game mixes counted World resources, individual material samples, and family-only summaries. The intended replacement is one physical type-or-subtype plus quality stack, with species and colour in expanded detail.',
+    body: 'The current game mixes counted World resources, individual material samples, and family-only summaries. The intended default is one subtype plus quality stack, with species-specific items and colour in expanded detail and alternate inventory views that never change custody.',
   },
   {
     label: 'Must change',

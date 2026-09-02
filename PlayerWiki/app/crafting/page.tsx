@@ -5,7 +5,7 @@ import { SiteFrame } from '@/components/site-frame';
 import { TruthPair } from '@/components/truth-pair';
 import { definedButNotLiveCrafting, craftingSystems, recipeReadiness, recipesFor, scheduledButNotLiveStations } from '@/lib/crafting';
 import { craftingFamilyStatus } from '@/lib/player-guide-status';
-import { canonicalStackExample, coatingLifecycle, materialCustodyFlow, materialIdentityHierarchy, materialPricing, materialPropertyProblems, progressionPlan, qualityRules, starterRuneFlow, worldGenerationPlan } from '@/lib/crafting-overview';
+import { canonicalStackExample, coatingLifecycle, incrementalDelivery, inventoryViews, materialCustodyFlow, materialIdentityHierarchy, materialPricing, materialPropertyProblems, progressionPlan, qualityRules, starterRuneFlow, worldGenerationPlan } from '@/lib/crafting-overview';
 import { content, humanize } from '@/lib/content';
 
 function stationVisual(system: (typeof craftingSystems)[number]) {
@@ -63,11 +63,13 @@ export default function CraftingSystemsPage() {
       </section>
       <section className="article-section">
         <h2>The intended material inventory</h2>
-        <p>Materials remain genuinely different physical things. Species-specific drops matter, but species names do not create needless inventory types. A broad recipe can accept Scales, a narrower one can accept Fish Scales, and an advanced one can require Armoured Fish Scales. Any generated species variant inside that eligible type can be used. A complete stack can read <strong>{canonicalStackExample}</strong>.</p>
+        <p>Materials remain genuinely different physical things. The hierarchy is broad category, type, subtype, quality, then the species-specific items inside that stack. A broad recipe can accept Scales, a narrower one can accept Fish Scales, and an advanced one can require Armoured Fish Scales. Any generated species item inside that eligible subtype can be used. A complete default stack can read <strong>{canonicalStackExample}</strong>.</p>
         <div className="table-wrap"><table><thead><tr><th>Identity level</th><th>Example</th><th>How it is used</th></tr></thead><tbody>{materialIdentityHierarchy.map(([level, example, use]) => <tr key={level}><td><strong>{level}</strong></td><td>{example}</td><td>{use}</td></tr>)}</tbody></table></div>
         <h3>Quality and stacks</h3>
         <div className="table-wrap"><table><thead><tr><th>Resource quality</th><th>Inventory behavior</th><th>Intended sale price</th></tr></thead><tbody>{qualityRules.map(([band, behavior], index) => <tr key={band}><td><strong>{band}</strong></td><td>{behavior}</td><td>{materialPricing[index][1]}</td></tr>)}</tbody></table></div>
-        <ul className="compact-list"><li>The same physical type or precise subtype and quality combine into one quantity stack.</li><li>Species, world, encounter, inherited colour, and acquisition source remain available in expanded history without splitting otherwise identical stock.</li><li>Materials never occupy ordinary item slots or spill into Waiting because the item grid is full.</li><li>When quality changes the result, the player chooses the exact quality and quantity. The game does not decide whether to save or spend the player's best materials.</li><li>Peerless is reserved for legendary equipment, not raw resources.</li></ul>
+        <ul className="compact-list"><li>Anything of the same subtype and quality combines into one default quantity stack.</li><li>Species-specific items, world, encounter, inherited colour, and acquisition source remain available in expanded history.</li><li>Materials never occupy ordinary item slots or spill into Waiting because the item grid is full.</li><li>When quality changes the result, the player chooses the exact quality and quantity. The game does not decide whether to save or spend the player's best materials.</li><li>Peerless is reserved for legendary equipment, not raw resources.</li></ul>
+        <h3>Choose how to browse</h3>
+        <div className="table-wrap"><table><thead><tr><th>View</th><th>Grouping</th><th>What it changes</th></tr></thead><tbody>{inventoryViews.map(([view, grouping, meaning]) => <tr key={view}><td><strong>{view}</strong></td><td>{grouping}</td><td>{meaning}</td></tr>)}</tbody></table></div>
       </section>
       <section className="article-section">
         <h2>One material identity from discovery to reuse</h2>
@@ -86,7 +88,12 @@ export default function CraftingSystemsPage() {
         <h2>How generated worlds will support crafting</h2>
         <p>Resources will come from the world that generated them rather than feeling randomly scattered. The existing deterministic seed, frozen receipt, reachability protection, and useful land/water work remain foundations for the overhaul.</p>
         <div className="definition-grid">{worldGenerationPlan.map(([name, body]) => <article key={name}><h3>{name}</h3><p>{body}</p></article>)}</div>
-        <p><strong>Rubble is unresolved:</strong> it will not remain a finished resource with no physical identity. Aimee will choose between removing it or turning a renamed mixed find into a world-causal processing input.</p>
+        <p><strong>Mixed geological find:</strong> finished Rubble will be replaced by a renamed, region-causal find that processes into a bounded grab bag of materials actually present in its source zone. It may occasionally recover something seen but not yet reachable or harvestable. Its name, frequency, output count, weighting, and processing owner remain under discussion.</p>
+      </section>
+      <section className="article-section">
+        <h2>How the overhaul will reach the playable game</h2>
+        <p>The new economy will arrive in safe, useful slices rather than waiting for every building and world system to change at once.</p>
+        <div className="definition-grid">{incrementalDelivery.map(([name, body]) => <article key={name}><h3>{name}</h3><p>{body}</p></article>)}</div>
       </section>
       <section className="article-section two-column">
         <div className="note-card"><h2>Weapon coatings</h2><TruthPair current={coatingLifecycle.current} accepted={coatingLifecycle.intended} acceptedLabel="Locked intended rule" /><p><strong>Existing saves:</strong> {coatingLifecycle.migration}</p></div>
@@ -156,7 +163,7 @@ export default function CraftingSystemsPage() {
       </section>
       <section className="article-section note-card">
         <h2>Will discuss with Aimee</h2>
-        <ul className="compact-list"><li>The final material type/subtype catalogue and every recipe's broad, specific, or precise substitution list.</li><li>Rubble removal or processing.</li><li>The processed-material list and which facilities own smelting, glassmaking, tanning, weaving, carpentry, and extraction.</li><li>Exact harvesting tool tiers, facility levels, and recipe-tier unlocks.</li><li>Material-to-stat values, multi-input crafted quality, and colour blending.</li><li>Peerless equipment chance, alpha eligibility, and whether matching-NPC staffing improves a maximum-level craft.</li><li>Ground-layout names, granular terrain/liquid catalogue, world-size values, and environmental compatibility.</li><li><strong>Waystone body:</strong> Adamant, Obsidian, or a closed choice between them.</li></ul>
+        <ul className="compact-list"><li>The final material type/subtype catalogue and every recipe's broad, type, or subtype substitution list.</li><li>The mixed geological find's final name, acquisition frequency, region-weighted output rule, quality inheritance, and processing owner.</li><li>The processed-material list and which facilities own smelting, glassmaking, tanning, weaving, carpentry, and extraction.</li><li>Exact harvesting tool tiers, facility levels, and recipe-tier unlocks.</li><li>Material-to-stat values, multi-input crafted quality, and colour blending.</li><li>Peerless equipment chance, alpha eligibility, and whether matching-NPC staffing improves a maximum-level craft.</li><li>Ground-layout names, granular terrain/liquid catalogue, world-size values, and environmental compatibility.</li><li><strong>Waystone body:</strong> Adamant, Obsidian, or a closed choice between them.</li></ul>
       </section>
       <nav className="next-links">
         <Link href="/systems/crafting">How crafting works</Link>

@@ -106,6 +106,10 @@ export default function Home() {
               <LibraryBig aria-hidden="true" />
               <span><strong>Asset Splash List</strong><small>Open the five-layer World Splash asset inventory and its required asset families.</small></span>
             </Link>
+            <Link className="topic-card" href="/references">
+              <LibraryBig aria-hidden="true" />
+              <span><strong>Resource, crafting, and world plans</strong><small>Read the complete intended system, structural overhaul, and incremental implementation roadmap.</small></span>
+            </Link>
           </div>
         </section>
 

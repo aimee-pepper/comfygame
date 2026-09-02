@@ -746,6 +746,37 @@ footer {
 .article-section li + li {
   margin-top: 7px;
 }
+.markdown-reference > p:first-of-type {
+  padding: 12px 14px;
+  border-left: 3px solid var(--blue);
+  background: var(--surface-82);
+}
+.markdown-reference h2 {
+  margin-top: 46px;
+  padding-top: 22px;
+  border-top: 1px solid var(--line);
+}
+.markdown-reference h3 {
+  margin-top: 28px;
+}
+.markdown-reference h4 {
+  margin: 22px 0 8px;
+  font-size: 16px;
+}
+.markdown-reference ul,
+.markdown-reference ol {
+  padding-left: 26px;
+}
+.markdown-reference .table-wrap,
+.markdown-reference blockquote {
+  margin: 18px 0 24px;
+}
+.markdown-reference code {
+  padding: 2px 5px;
+  border: 1px solid var(--line-soft);
+  background: var(--paper-light);
+  font-size: 0.9em;
+}
 .two-column {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));

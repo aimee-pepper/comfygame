@@ -9,11 +9,11 @@ export const materialPropertyProblems = [
 
 export const materialCustodyFlow = [
   ['Field and combat rewards', 'Current holdings mix counted resources with individual, source-bearing samples.', 'Receive a recognizable physical type or subtype immediately, with species, colour, world, and inherited values retained in expandable detail.'],
-  ['Expedition Return', 'The return can divide counted resources and exact samples through different paths.', 'Freeze one quantity outcome for every physical type-or-subtype and quality stack. Recovered plus lost must equal the exact carried amount.'],
-  ['Storehouse', 'World stock and creature samples are not yet one complete material inventory.', 'Stack by physical type or precise subtype plus quality. Materials never consume item slots; expanding a stack shows its species/source variants.'],
-  ['Trading Post', 'Exact samples use hidden traits in their price and merchant stock.', 'Buy and sell an exact family, quality band, and quantity. Resold stock keeps its band and history.'],
+  ['Expedition Return', 'The return can divide counted resources and exact samples through different paths.', 'Freeze one quantity outcome for every precise subtype and quality stack. Recovered plus lost must equal the exact carried amount.'],
+  ['Storehouse', 'World stock and creature samples are not yet one complete material inventory.', 'Default-stack by precise subtype plus quality. Materials never consume item slots; expanding a stack shows its species-specific items and sources.'],
+  ['Trading Post', 'Exact samples use hidden traits in their price and merchant stock.', 'Buy and sell an exact subtype, quality band, and quantity. Resold stock keeps its band and species/source history.'],
   ['Crafting pickers', 'Several makers select exact samples by numerical trait thresholds.', 'Recipes list broad, specific, or precise physical categories. Where quality affects the result, the player deliberately chooses the exact stack and quantity.'],
-  ['Recycler', 'Dismantling returns exact recorded samples or fixed salvage.', 'Return the family, quality, and quantity in the construction receipt. Older fixed salvage must migrate losslessly through a published four-band mapping; it must never silently default to a made-up grade.'],
+  ['Recycler', 'Dismantling returns exact recorded samples or fixed salvage.', 'Return the subtype, quality, species-specific items, and quantity in the construction receipt. Older fixed salvage must migrate losslessly through a published four-band mapping; it must never silently default to a made-up grade.'],
   ['Cold relaunch', 'Old and new custody forms can coexist in a save.', 'Every stack, quantity, source-history link, pending return, trade line, and construction receipt reloads exactly once.'],
 ] as const;
 
@@ -43,10 +43,17 @@ export const canonicalStackExample = 'Rare Armoured Fish Scales × 3';
 
 export const materialIdentityHierarchy = [
   ['Broad category', 'Scales', 'A flexible recipe can accept several physically related scale types.'],
-  ['Specific type', 'Fish Scales', 'A narrower recipe accepts fish-scale variants but not every scale.'],
-  ['Precise subtype', 'Armoured Fish Scales', 'An advanced recipe requires this materially distinct subtype.'],
-  ['Species variant', 'Scales from a generated species', 'Shown inside expanded stack history; it contributes colour and values without creating another item type.'],
-  ['Quality', 'Poor, Common, Rare, Exceptional', 'Creates separate stacks within the physical type or subtype.'],
+  ['Type', 'Fish Scales', 'A narrower recipe accepts fish-scale subtypes but not every scale.'],
+  ['Subtype', 'Armoured Fish Scales', 'An advanced recipe can require this materially distinct subtype.'],
+  ['Quality', 'Poor, Common, Rare, Exceptional', 'Creates the default separate stacks within each subtype.'],
+  ['Species-specific item', 'Armoured scales from one generated fish species', 'Lives inside its subtype-and-quality stack while retaining colour, values, source, and history.'],
+] as const;
+
+export const inventoryViews = [
+  ['Default', 'Subtype + quality', 'Rare Armoured Fish Scales stack together; expand the stack to inspect each species-specific item.'],
+  ['Material', 'Category, type, or subtype', 'Browse related physical materials without merging their owned stacks.'],
+  ['Quality', 'Poor, Common, Rare, Exceptional', 'Compare the grades available for deliberate crafting selection.'],
+  ['Origin', 'Species, source world, or recent acquisition', 'Find the exact units and inherited colours behind a stack.'],
 ] as const;
 
 export const progressionPlan = [
@@ -62,6 +69,13 @@ export const worldGenerationPlan = [
   ['Ground and liquid types', 'Use multiple recognizable dirt, sand, stone, mineral, and liquid types. Granite regions can host Granite; Sand can become a glassmaking input.'],
   ['Flora', 'Terrain, light, atmosphere, weather, water, and temperature all constrain what can grow. Trees gain real canopy and trunk behavior.'],
   ['Creatures', 'Readable body plans and habitat rules support aquatic, land, amphibious, flying, and hybrid forms. Anatomy determines useful material types and subtypes.'],
-  ['Environment', 'Incompatible conditions resolve coherently. Some combinations transform, such as rain and miasma becoming acid rain when that rule is approved.'],
+  ['Environment', 'When condition candidates are incompatible, temperature or another relevant pressure deterministically selects one; the world itself is not rejected. Compatible authored combinations may transform, such as rain and miasma becoming acid rain when that rule is approved.'],
   ['World size', 'Writing can eventually request smaller or larger worlds. Exact dimensions and costs will be discussed with Aimee.'],
+] as const;
+
+export const incrementalDelivery = [
+  ['One useful path at a time', 'A first slice can take one canonical material from a current producer through Field acquisition, Return, Storehouse, and one useful recipe or service.'],
+  ['Legacy compatibility', 'Untouched buildings may keep their current rules until their own slice is replaced. Their current limitation is shown honestly instead of delaying every update.'],
+  ['Safe migration', 'Each slice migrates only the stock and receipts it owns, idempotently and without loss, duplication, silent quality changes, or unreadable saves.'],
+  ['Continuous publication', 'The Wiki changes with every delivered slice so implemented and intended behavior never blur together.'],
 ] as const;

@@ -7,17 +7,38 @@ import { fileURLToPath } from 'node:url';
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const read = (relative) => readFile(path.join(root, relative), 'utf8');
 
-test('review references publish the Asset Splash List as a durable wiki link', async () => {
-  const [home, references, preparation] = await Promise.all([
+test('review references publish the Asset Splash List and three Game Design plans as readable Wiki pages', async () => {
+  const [home, references, preparation, route, source] = await Promise.all([
     read('app/page.tsx'),
     read('app/references/page.tsx'),
     read('scripts/prepare-pages.mjs'),
+    read('app/references/[slug]/page.tsx'),
+    read('lib/design-references.ts'),
   ]);
   assert.match(home, /References for Aimee/);
   assert.match(home, /Asset Splash List/);
+  assert.match(home, /Resource, crafting, and world plans/);
   assert.match(references, /reference-assets\/world-splash-five-layer-inventory-v1\.html/);
   assert.match(preparation, /world-splash-five-layer-inventory-v1\.html/);
   assert.match(preparation, /world-splash-five-layer-inventory-v1-app\.js/);
+  for (const file of [
+    'resource-crafting-world-ecology-cohesive-plan-v1.md',
+    'resource-crafting-world-overhaul-structure-v1.md',
+    'resource-crafting-world-implementation-roadmap-v1.md',
+  ]) {
+    assert.match(source, new RegExp(file.replace('.', '\\.')));
+    await access(path.resolve(root, '../docs', file));
+  }
+  for (const slug of [
+    'resource-crafting-world-ecology-plan',
+    'resource-crafting-world-overhaul',
+    'resource-crafting-world-roadmap',
+  ]) assert.match(source, new RegExp(slug));
+  assert.match(references, /\/references\/\$\{reference\.slug\}/);
+  assert.match(route, /ReactMarkdown/);
+  assert.match(route, /remarkGfm/);
+  assert.match(route, /markdown-reference/);
+  assert.doesNotMatch(preparation, /resource-crafting-world-ecology-cohesive-plan-v1\.md/);
   await access(path.resolve(root, '../AssetLab/world-splash-five-layer-inventory-v1.html'));
   await access(path.resolve(root, '../AssetLab/src/world-splash-five-layer-inventory-v1.js'));
 });
@@ -32,15 +53,23 @@ test('crafting overview separates the current property model from the intended p
   ]);
   for (const term of ['Hardness', 'Density', 'Insulation', 'Flexibility', 'Lustre', 'Reactivity'])
     assert.match(overview, new RegExp(term));
-  for (const level of ['Broad category', 'Specific type', 'Precise subtype', 'Species variant', 'Quality'])
-    assert.match(overview, new RegExp(level));
+  const hierarchy = overview.slice(overview.indexOf('export const materialIdentityHierarchy'), overview.indexOf('export const inventoryViews'));
+  let priorLevel = -1;
+  for (const level of ['Broad category', 'Type', 'Subtype', 'Quality', 'Species-specific item']) {
+    const nextLevel = hierarchy.indexOf(`['${level}'`);
+    assert.ok(nextLevel > priorLevel, `${level} must follow the prior material identity level`);
+    priorLevel = nextLevel;
+  }
   for (const quality of ['Poor', 'Common', 'Rare', 'Exceptional'])
     assert.match(status, new RegExp(`'${quality}'`));
   assert.doesNotMatch(status.slice(status.indexOf('export const qualityBands'), status.indexOf('export const worldMaterialFamilies')), /Peerless/);
   assert.match(page, /Peerless is reserved for legendary equipment, not raw resources/);
   assert.match(page, /Bookbinder will not add an equipment durability system/);
   assert.match(page, /How generated worlds will support crafting/);
-  assert.match(page, /Rubble is unresolved/);
+  assert.match(page, /Mixed geological find/);
+  assert.match(page, /Anything of the same subtype and quality combines into one default quantity stack/);
+  assert.match(overview, /the world itself is not rejected/);
+  assert.match(page, /safe, useful slices rather than waiting for every building and world system to change at once/);
   assert.match(resources, /Intended material identity/);
   assert.match(loot, /The intended material hierarchy/);
 });
@@ -930,7 +959,7 @@ test('public loot, resources, and crafting guides separate implemented truth fro
   assert.match(status, /creatureMaterialFamilies/);
   assert.match(status, /Poor/);
   assert.match(status, /Exceptional/);
-  assert.match(status, /Matching species variants share a type-and-quality stack/);
+  assert.match(status, /same subtype and quality share a default stack/);
   assert.match(status, /another grade is never silently/);
   assert.match(status, /Waystone’s hard body/);
 });
