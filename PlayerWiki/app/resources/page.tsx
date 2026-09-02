@@ -4,6 +4,8 @@ import { PixelImage } from '@/components/pixel-image';
 import { SiteFrame } from '@/components/site-frame';
 import { content } from '@/lib/content';
 import { recipesUsingResource } from '@/lib/crafting';
+import { TruthPair } from '@/components/truth-pair';
+import { creatureMaterialFamilies, qualityBands, worldMaterialFamilies } from '@/lib/player-guide-status';
 
 function buildingUses(resourceID: string) {
   return content.stations.flatMap((station) =>
@@ -23,6 +25,14 @@ export default function ResourcesPage() {
         title="Resources"
         summary="World resources are shaped by pressures in the Page and the world that Binding generates. Use this table to compare where each resource tends to appear and what it currently builds."
       />
+      <section className="article-section">
+        <h2>Resources today and the approved material update</h2>
+        <TruthPair
+          current="The game currently mixes counted World resources with individual, source-bearing material samples. The table below describes those live acquisition and spending routes."
+          accepted="Physical stock will use real material families and six quality bands everywhere it travels. Source species and place remain available as history, but will not split otherwise identical material into needless item types."
+        />
+        <p><Link href="/loot">Follow loot from the world to the Cottage</Link> · <Link href="/guide-status">See what is changing</Link></p>
+      </section>
       <div className="table-wrap data-table">
         <table>
           <thead>
@@ -69,6 +79,16 @@ export default function ResourcesPage() {
           </tbody>
         </table>
       </div>
+      <section className="article-section">
+        <h2>Approved material families</h2>
+        <p>This is the accepted replacement, not the inventory model in the current build.</p>
+        <div className="definition-grid">
+          <div><h3>World materials</h3><p>{worldMaterialFamilies.map(([name]) => name).join(' · ')}</p></div>
+          <div><h3>Creature materials</h3><p>{creatureMaterialFamilies.map(([name]) => name).join(' · ')}</p></div>
+          <div><h3>Quality bands</h3><p>{qualityBands.join(' · ')}</p></div>
+          <div><h3>How a stack reads</h3><p><strong>Fine Hide ×3</strong>, under Creature materials. A material stack never uses an item slot, and a recipe never silently spends a higher grade than the one you approved.</p></div>
+        </div>
+      </section>
       <nav className="next-links">
         <Link href="/resources/progression">
           Compare resource roles and progression

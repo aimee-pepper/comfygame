@@ -570,21 +570,16 @@ test('Survey Post first-reading journey keeps Mara, permanent capabilities, load
     journey,
     /full Storehouse or Waiting pile cannot block studying or improving one/,
   );
-  assert.match(journey, /does not promise a paid improvement/);
+  assert.match(journey, /Crude → Good is playable now/);
   for (const source of [service, building, place, crafting])
     assert.match(source, /surveyPostFirstUse/);
   assert.match(services, /slug: 'survey-post'/);
   assert.match(service, /First reading: Mara to Survey/);
   assert.match(building, /Build the Survey Post with Mara/);
   assert.match(place, /Completion opens research, not a tool bin/);
-  assert.match(
-    crafting,
-    /Precision improvement remains a transaction boundary/,
-  );
-  assert.doesNotMatch(
-    crafting,
-    /Good instrument.*Current recipes and requirements/s,
-  );
+  assert.match(crafting, /Good and Fine precision are playable now/);
+  assert.match(crafting, /publishedRecipes = recipes/);
+  assert.match(await read('lib/crafting.ts'), /name: 'Good instrument'/);
 });
 
 test('economy references are reachable from current player tasks without claiming rotating transactions are permanent', async () => {
@@ -839,9 +834,9 @@ test('crafting has a linked system index and complete resource cross-reference s
   assert.match(crafting, /stationID/);
   assert.match(crafting, /definedButNotLiveCrafting/);
   assert.match(crafting, /Fitted Polearm/);
-  assert.doesNotMatch(crafting, /id: 'fitted-polearm'/);
-  assert.doesNotMatch(crafting, /id: 'caustic-core'/);
-  assert.doesNotMatch(crafting, /id: 'light-core'/);
+  assert.match(crafting, /id: 'fitted-polearm'/);
+  assert.match(crafting, /id: 'caustic-core'/);
+  assert.match(crafting, /id: 'light-core'/);
   assert.match(crafting, /name: 'Heat Conduit Fixture'/);
   assert.match(crafting, /name: 'Anchor Frame'/);
   const placeDetail = await read('app/places/[slug]/page.tsx');
@@ -867,6 +862,35 @@ test('crafting has a linked system index and complete resource cross-reference s
     await read('app/systems/research/page.tsx'),
   ])
     assert.doesNotMatch(source, /places\/workshop|Workshop and Research/);
+});
+
+test('public loot, resources, and crafting guides separate playable truth from approved changes', async () => {
+  const [home, frame, loot, resources, resourceDetail, crafting, craftingDetail, guide, status, truthPair] = await Promise.all([
+    read('app/page.tsx'),
+    read('components/site-frame.tsx'),
+    read('app/loot/page.tsx'),
+    read('app/resources/page.tsx'),
+    read('app/resources/[slug]/page.tsx'),
+    read('app/crafting/page.tsx'),
+    read('app/crafting/[slug]/page.tsx'),
+    read('app/guide-status/page.tsx'),
+    read('lib/player-guide-status.ts'),
+    read('components/truth-pair.tsx'),
+  ]);
+  assert.match(home, /References for Aimee/);
+  assert.match(frame, /Review references/);
+  for (const source of [loot, resources, resourceDetail, crafting, craftingDetail, guide]) {
+    assert.match(source, /TruthPair/);
+  }
+  assert.match(status, /Playable now/);
+  assert.match(truthPair, /Approved for a future update/);
+  assert.match(status, /worldMaterialFamilies/);
+  assert.match(status, /creatureMaterialFamilies/);
+  assert.match(status, /Rough/);
+  assert.match(status, /Peerless/);
+  assert.match(status, /Different species can add to the same family-and-quality stack/);
+  assert.match(status, /A better grade is never silently/);
+  assert.match(status, /Waystone’s hard body/);
 });
 
 test('places publish only current retained town and building visuals inline', async () => {

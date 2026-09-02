@@ -14,6 +14,8 @@ const prepareLinks = [
 
 const referenceLinks = [
   ['/references', 'Review references'],
+  ['/guide-status', "What's playable now"],
+  ['/loot', 'Loot & materials'],
   ['/world', 'World reference'],
   ['/village', 'Village buildings'],
   ['/resources', 'Resources'],
@@ -35,6 +37,7 @@ const primaryLinks = [
   ['/village', 'Village'],
   ['/crafting', 'Crafting'],
   ['/resources', 'Resources'],
+  ['/guide-status', "What's changing"],
   ['/people', 'People'],
 ];
 

@@ -2,11 +2,17 @@ import Link from '@/components/wiki-link';
 import { PageIntro } from '@/components/page-intro';
 import { PixelImage } from '@/components/pixel-image';
 import { SiteFrame } from '@/components/site-frame';
+import { TruthPair } from '@/components/truth-pair';
 import { definedButNotLiveCrafting, craftingSystems, recipeReadiness, recipesFor, scheduledButNotLiveStations } from '@/lib/crafting';
+import { craftingFamilyStatus } from '@/lib/player-guide-status';
 import { content, humanize } from '@/lib/content';
 
 function stationVisual(system: (typeof craftingSystems)[number]) {
   return content.stations.find((station) => station.id === system.stationID);
+}
+
+function statusHref(slug: string) {
+  return slug === 'recycler' ? '/recycling' : `/crafting/${slug}`;
 }
 
 function resultItem(recipe: ReturnType<typeof recipesFor>[number]) {
@@ -43,6 +49,11 @@ export default function CraftingSystemsPage() {
         title="Crafting systems"
         summary="Each workshop has its own inputs, selection rules and finished results. Open a system for its complete current recipe list and links back to the resources it uses."
       />
+      <section className="article-section">
+        <h2>What you can make now—and what is changing</h2>
+        <p>The live recipe directory remains below. These paired notes keep approved future ingredient and progression changes from being mistaken for current recipes.</p>
+        <div className="status-card-grid">{craftingFamilyStatus.map((entry) => <article className="status-card" key={entry.slug}><p className="status-pill">{entry.status}</p><h3><Link href={statusHref(entry.slug)}>{entry.name}</Link></h3><TruthPair current={entry.current} accepted={entry.accepted} /></article>)}</div>
+      </section>
       <section className="article-section">
         <div className="topic-grid">
           {craftingSystems.map((system) => (
@@ -99,6 +110,11 @@ export default function CraftingSystemsPage() {
           if (!recipes.length) return null;
           return <section className="recipe-directory-group" id={system.slug} key={system.slug}><div className="recipe-directory-heading"><div>{station?.assetURL && <PixelImage src={station.assetURL} alt={`${station.name} building visual`} size={48} />}<div><h3>{system.name}</h3><p>{station ? <Link href={`/buildings/${station.slug}`}>{station.name}</Link> : system.station} · <Link href={`/crafting/${system.slug}`}>How this station works</Link></p></div></div><span>{recipes.length} {recipes.length === 1 ? 'recipe' : 'recipes'}</span></div><div className="table-wrap"><table><thead><tr><th>Recipe</th><th>Output</th><th>Exact ingredients and costs</th><th>Ready when</th><th>Primary use</th></tr></thead><tbody>{recipes.map((recipe) => { const item = resultItem(recipe); return <tr key={recipe.id}><td><strong>{recipe.name}</strong></td><td>{item?.assetURL && <PixelImage src={item.assetURL} alt={`${item.name} icon`} size={32} />} {item ? <Link href={resultHref(item)}>{recipe.result}</Link> : recipe.result}</td><td><ul className="compact-list">{recipe.ingredients.map((ingredient, index) => <li key={`${recipe.id}-${index}`}>{ingredientLabel(ingredient)}</li>)}</ul></td><td>{recipeReadiness(recipe)}</td><td>{item?.summary ?? recipe.notes ?? 'No published player-facing use is currently listed.'}</td></tr>; })}</tbody></table></div></section>;
         })}
+      </section>
+      <section className="article-section">
+        <h2>Complete current-to-intended recipe comparison</h2>
+        <p>Every accepted recipe or service change is listed here beside the behavior in the current build. “Approved for a future update” never means that ingredient or action is available today.</p>
+        {craftingFamilyStatus.map((entry) => <section className="recipe-directory-group" id={`${entry.slug}-comparison`} key={`${entry.slug}-comparison`}><div className="recipe-directory-heading"><div><div><h3><Link href={statusHref(entry.slug)}>{entry.name}</Link></h3><p className="status-pill">{entry.status}</p></div></div><span>{entry.changes.length} {entry.changes.length === 1 ? 'entry' : 'entries'}</span></div><div className="status-card-grid">{entry.changes.map((change) => <article className="status-card" key={`${entry.slug}-${change.name}`}><h3>{change.name}</h3><TruthPair current={change.current} accepted={change.accepted} /></article>)}</div></section>)}
       </section>
       <nav className="next-links">
         <Link href="/systems/crafting">How crafting works</Link>

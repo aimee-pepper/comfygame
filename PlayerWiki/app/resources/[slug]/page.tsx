@@ -5,8 +5,10 @@ import { PageIntro } from '@/components/page-intro';
 import { PixelImage } from '@/components/pixel-image';
 import { GuideBreadcrumbs, RelatedGuides } from '@/components/guide-navigation';
 import { SiteFrame } from '@/components/site-frame';
+import { TruthPair } from '@/components/truth-pair';
 import { content, humanize } from '@/lib/content';
 import { recipesUsingResource, systemFor } from '@/lib/crafting';
+import { futureResourceCopy } from '@/lib/player-guide-status';
 
 export function generateStaticParams() {
   return content.resources.map((resource) => ({ slug: resource.slug }));
@@ -62,6 +64,10 @@ export default async function ResourceDetail({
           summary={resource.summary}
         />
       </div>
+      <section className="article-section">
+        <h2>Current custody and approved direction</h2>
+        <TruthPair current={`${resource.name} currently follows the acquisition, storage, trade, and recipe rules described on this page.`} accepted={futureResourceCopy(resource.name)} />
+      </section>
       <section className="article-section">
         <h2>How to obtain it</h2>
         <dl className="fact-grid">

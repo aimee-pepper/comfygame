@@ -108,6 +108,19 @@ export default function Home() {
             </Link>
           </div>
         </section>
+
+        <section className="page-section" aria-labelledby="changing-heading">
+          <div className="section-heading">
+            <div><p className="eyebrow">Clear, honest guidance</p><h2 id="changing-heading">Playable now—and what is changing</h2></div>
+            <Link href="/guide-status">Open the status guide</Link>
+          </div>
+          <div className="topic-grid">
+            <Link className="topic-card" href="/loot">
+              <PackageOpen aria-hidden="true" />
+              <span><strong>Loot &amp; materials</strong><small>See how resources move today and how the approved material update will simplify them.</small></span>
+            </Link>
+          </div>
+        </section>
     </SiteFrame>
   );
 }

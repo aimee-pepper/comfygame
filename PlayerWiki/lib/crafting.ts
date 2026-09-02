@@ -129,14 +129,15 @@ export const craftingSystems: CraftingSystem[] = [
     station: 'The Survey Post',
     stationID: 'survey_post',
     summary:
-      'Study permanent world-reading capabilities at the Survey Post; paid precision improvement remains withheld until its exact typed receipt is live.',
+      'Study permanent world-reading capabilities at the Survey Post, then improve them to Good or Fine precision.',
     access: ['Build the Survey Post and study one of the eight named Research nodes.'],
-    materialChoice: 'Future improvement materials are property-matched, but no paid precision result is published until the exact selected-material quote and receipt exist.',
-    commitResult: 'A durable Research purchase grants one named subject at Crude precision and packs it for the next expedition. No paid improvement result is promised yet.',
+    materialChoice: 'Good and Fine improvements automatically use the weakest exact samples that meet the instrument’s displayed property requirement.',
+    commitResult: 'Research grants one named subject at Crude precision. A committed improvement spends its shown Essence and qualifying samples, then raises that permanent capability to Good or Fine.',
     howItWorks: [
       'Study one named instrument from Field Instruments Research; it becomes a permanent capability rather than an item.',
       'Choose the owned subjects to pack at Home; departure freezes their set and precision for that world.',
       'Use Survey in the world to record every valid carried subject for one turn.',
+      'At the Survey Post, review and commit a Good or Fine precision improvement when the exact costs are ready.',
     ],
   },
   {
@@ -145,12 +146,12 @@ export const craftingSystems: CraftingSystem[] = [
     station: 'The Distillery',
     stationID: 'distillery',
     summary:
-      'Attune Essence through a qualifying exact material and named catalyst to make the current Heat Core.',
-    access: ['Auber has enabled and the Distillery is built.', 'The current Heat attunement recipe, its exact material, catalyst, Essence, and output storage are available.'],
-    materialChoice: 'Choose the qualifying provenance-bearing sample and exact catalyst named by the Heat attunement preview.',
-    commitResult: 'A committed Heat Core preparation spends 16 Essence and its listed inputs to create one Heat Core. Caustic and Light Cores may be held through their existing custody paths, but are not current Distillery preparations.',
+      'Directly attune Heat, Caustic, or Light through qualifying exact materials and 16 Essence.',
+    access: ['Auber has enabled and the Distillery is built.', 'The selected attunement, its exact material, catalyst, 16 Essence, and output storage are available.'],
+    materialChoice: 'Choose the qualifying provenance-bearing sample and exact catalyst named by the selected attunement preview.',
+    commitResult: 'A committed attunement spends 16 Essence and its listed inputs to create the selected Heat, Caustic, or Light Core. There is no blank-core step.',
     howItWorks: [
-      'Choose the current Heat attunement.',
+      'Choose Heat, Caustic, or Light attunement.',
       'Select a qualifying provenance-bearing sample and the exact catalyst.',
       'Spend 16 Essence to create the selected Core.',
     ],
@@ -552,6 +553,18 @@ export const craftingRecipes: CraftRecipe[] = [
     readiness: 'Current Tier 1 Weaponsmith recipe after the named Broaden capability is available.',
   },
   {
+    id: 'fitted-polearm',
+    name: 'Fitted Polearm',
+    system: 'weaponsmith',
+    result: 'Fitted Polearm',
+    ingredients: [
+      ...e('Point', ['ore', 'adamant', 'obsidian', 'quartz']),
+      ...e('Haft', ['timber', 'ore', 'adamant']),
+      ...e('Fitting', ['copper', 'silver', 'gold', 'quartz', 'adamant']),
+    ],
+    readiness: 'Current Weaponsmith recipe after Maud’s fitting pattern is known.',
+  },
+  {
     id: 'rigid-shell',
     name: 'Rigid shell rebuild',
     system: 'armoury',
@@ -626,6 +639,28 @@ export const craftingRecipes: CraftRecipe[] = [
         label: '1 reactive 60+ and insulating 25+ sample',
         role: 'selected sample',
       },
+      { label: '16 Essence', role: 'currency' },
+    ],
+  },
+  {
+    id: 'caustic-core',
+    name: 'Caustic Core',
+    system: 'distillery',
+    result: 'Caustic Core',
+    ingredients: [
+      { label: 'Toxin or Ichor catalyst', role: 'exact catalyst' },
+      { label: '1 qualifying Reagent, Toxin, or Ichor sample', role: 'selected sample' },
+      { label: '16 Essence', role: 'currency' },
+    ],
+  },
+  {
+    id: 'light-core',
+    name: 'Light Core',
+    system: 'distillery',
+    result: 'Light Core',
+    ingredients: [
+      r('silver', 2),
+      { label: '1 qualifying lustrous and hard sample', role: 'selected sample' },
       { label: '16 Essence', role: 'currency' },
     ],
   },
@@ -707,21 +742,6 @@ export function recipeReadiness(recipe: CraftRecipe) {
 }
 
 export const definedButNotLiveCrafting = [
-  {
-    name: 'Fitted Polearm',
-    system: 'weaponsmith',
-    detail: 'Defined for the Weaponsmith, but not a current player recipe.',
-  },
-  {
-    name: 'Caustic Core',
-    system: 'distillery',
-    detail: 'May appear through current custody, but is not a current Distillery preparation.',
-  },
-  {
-    name: 'Light Core',
-    system: 'distillery',
-    detail: 'May appear through current custody, but is not a current Distillery preparation.',
-  },
 ] as const;
 
 export const scheduledButNotLiveStations = [

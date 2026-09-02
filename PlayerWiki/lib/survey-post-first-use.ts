@@ -35,8 +35,8 @@ export const surveyPostFirstUse = {
     'After relaunch, the station, completed Research, explicit Home loadout, frozen expedition instruments, and observations retain their durable truth without a duplicate grant, reading, or spend.',
   ],
   improvementBoundary: [
-    'Current material thresholds describe a future exact-instrument improvement: Crude → Good needs two property-35+ Home materials and 20 Essence; Good → Fine needs three property-65+ materials and 50 Essence.',
-    'The visible improvement surface does not yet own a typed quote, exact selected-material receipt, or exact refusal result. This guide therefore does not promise a paid improvement, consumed material, or precision success.',
-    'When that bounded transaction lands, it must preserve the same permanent instrument identity and affect only future departures; it must never place a physical output in Storehouse or alter an active run.',
+    'Crude → Good is playable now and needs two property-35+ Home materials and 20 Essence; Good → Fine needs three property-65+ materials and 50 Essence.',
+    'The current improvement automatically selects the weakest exact qualifying Home samples. Its preview and commitment own the exact Essence, material spend, and resulting precision.',
+    'Improvement preserves the same permanent instrument identity and affects only future departures; it never places a physical output in Storehouse or alters an active run.',
   ],
 } as const;

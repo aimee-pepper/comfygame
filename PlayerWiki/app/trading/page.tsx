@@ -3,6 +3,7 @@ import { GuideBreadcrumbs, RelatedGuides } from '@/components/guide-navigation';
 import { PageIntro } from '@/components/page-intro';
 import { PixelImage } from '@/components/pixel-image';
 import { SiteFrame } from '@/components/site-frame';
+import { TruthPair } from '@/components/truth-pair';
 import {
   buyableResourceBands,
   itemRoute,
@@ -28,6 +29,7 @@ export default function TradingDirectory() {
       {tradingStation?.assetURL && <PixelImage src={tradingStation.assetURL} alt="Trading Post building visual" size={96} />}
       <PageIntro eyebrow="Current Village reference" title="Trading Post offers" summary="See the exact current offer pools, purchase terms, and sale rules before comparing them with the stock on Vance’s screen." />
     </div>
+    <section className="article-section"><h2>Material offers today and after the approved update</h2><TruthPair current="The Trading Post currently mixes counted resource lines with exact material samples. The shelf and confirmation show the exact stock, quantity, and price that can be committed now." accepted="Physical materials will be bought and sold by domain, family, quality band, and exact quantity. Source history remains inspectable, but does not split the stock. A better grade is never silently sold or purchased in place of the quoted band." /></section>
     <section className="article-section note-card">
       <h2>Check the current shelf before buying</h2>
       <p>The Trading Post is available after its 10-Essence foundation is complete. Its stock refreshes after an expedition resolves, not while you browse. A shelf line has no durable player-facing listing identity, so this directory records the live offer pools and fixed terms instead of claiming that a particular item is always for sale.</p>

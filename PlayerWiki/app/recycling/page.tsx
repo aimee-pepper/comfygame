@@ -3,6 +3,7 @@ import { GuideBreadcrumbs, RelatedGuides } from '@/components/guide-navigation';
 import { PageIntro } from '@/components/page-intro';
 import { PixelImage } from '@/components/pixel-image';
 import { SiteFrame } from '@/components/site-frame';
+import { TruthPair } from '@/components/truth-pair';
 import {
   authoredSalvageProfiles,
   recyclerOutputForTier,
@@ -27,6 +28,7 @@ export default function RecyclingDirectory() {
       {recyclerStation?.assetURL && <PixelImage src={recyclerStation.assetURL} alt="Recycler building visual" size={96} />}
       <PageIntro eyebrow="Current Village reference" title="Recycler returns" summary="Compare the standard salvage profiles and the exact preview rules before choosing one eligible piece to dismantle." />
     </div>
+    <section className="article-section"><h2>Materials returned today and after the approved update</h2><TruthPair current="The Recycler dismantles one exact eligible piece. Receipt-backed gear returns selected source samples; older standard gear follows its stated salvage profile." accepted="The same exact-piece rules remain, but returned physical stock becomes exact material-family, quality-band, and quantity stacks. The Recycler will never silently substitute a better band." /></section>
     <section className="article-section note-card">
       <h2>Noll’s first Recycler</h2>
       <p>Recruit <Link href="/people/noll">Noll</Link> to reveal the Recycler foundation in Home → Make. Its complete build cost is <strong>{recyclerFirstUse.buildCost}</strong>. Building it creates the bench, not a dismantling result.</p>
