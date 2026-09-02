@@ -8,6 +8,7 @@ import {
   Shield,
   Sparkles,
   Users,
+  LibraryBig,
 } from 'lucide-react';
 import { PixelImage } from '@/components/pixel-image';
 import { SiteFrame } from '@/components/site-frame';
@@ -92,6 +93,19 @@ export default function Home() {
                 })}
               </tbody>
             </table>
+          </div>
+        </section>
+
+        <section className="page-section" aria-labelledby="review-references-heading">
+          <div className="section-heading">
+            <div><p className="eyebrow">Review references</p><h2 id="review-references-heading">References for Aimee</h2></div>
+            <Link href="/references">See all review references</Link>
+          </div>
+          <div className="topic-grid">
+            <Link className="topic-card" href="/references">
+              <LibraryBig aria-hidden="true" />
+              <span><strong>Asset Splash List</strong><small>Open the five-layer World Splash asset inventory and its required asset families.</small></span>
+            </Link>
           </div>
         </section>
     </SiteFrame>

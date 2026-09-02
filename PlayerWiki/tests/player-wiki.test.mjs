@@ -7,6 +7,21 @@ import { fileURLToPath } from 'node:url';
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const read = (relative) => readFile(path.join(root, relative), 'utf8');
 
+test('review references publish the Asset Splash List as a durable wiki link', async () => {
+  const [home, references, preparation] = await Promise.all([
+    read('app/page.tsx'),
+    read('app/references/page.tsx'),
+    read('scripts/prepare-pages.mjs'),
+  ]);
+  assert.match(home, /References for Aimee/);
+  assert.match(home, /Asset Splash List/);
+  assert.match(references, /reference-assets\/world-splash-five-layer-inventory-v1\.html/);
+  assert.match(preparation, /world-splash-five-layer-inventory-v1\.html/);
+  assert.match(preparation, /world-splash-five-layer-inventory-v1-app\.js/);
+  await access(path.resolve(root, '../AssetLab/world-splash-five-layer-inventory-v1.html'));
+  await access(path.resolve(root, '../AssetLab/src/world-splash-five-layer-inventory-v1.js'));
+});
+
 test('World Writing teaches the authored player order', async () => {
   const source = await read('app/systems/world-writing/page.tsx');
   const titles = [

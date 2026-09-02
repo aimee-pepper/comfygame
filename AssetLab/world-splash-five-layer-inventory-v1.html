@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>World Splash five-layer asset inventory · candidate</title>
+  <link rel="stylesheet" href="world-splash-five-layer-inventory-v1.css">
+</head>
+<body>
+  <main class="phone-review" aria-label="World Splash five-layer asset inventory">
+    <header class="topbar">
+      <div>
+        <p class="eyebrow">SPLASH-01 · PLANNING ONLY</p>
+        <h1>World Splash asset inventory</h1>
+        <p id="coverage-count" class="coverage-count"></p>
+      </div>
+      <div class="candidate-state">Candidate<br><span>not approved</span></div>
+    </header>
+
+    <aside class="motion-note">
+      <strong>Motion is already settled.</strong>
+      Foreground, Midground 1, Midground 2 and Background move. Sky alone is static.
+      This page does not edit timing, easing or offsets.
+    </aside>
+
+    <section id="inventory" class="inventory" aria-label="Required asset families"></section>
+
+    <footer class="receipt-bar">
+      <p id="receipt-status" aria-live="polite">All rows begin collapsed. No asset bytes are included.</p>
+      <div class="receipt-actions">
+        <button id="collapse-all" type="button">Collapse all</button>
+        <button id="copy-receipt" type="button">Copy receipt</button>
+        <button id="download-receipt" type="button">Download</button>
+      </div>
+    </footer>
+  </main>
+  <script type="module" src="src/world-splash-five-layer-inventory-v1-app.js"></script>
+</body>
+</html>
+
