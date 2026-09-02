@@ -20,12 +20,10 @@ export interface CraftingFamilyStatus {
 }
 
 export const qualityBands = [
-  'Rough',
-  'Standard',
-  'Fine',
-  'Superior',
+  'Poor',
+  'Common',
+  'Rare',
   'Exceptional',
-  'Peerless',
 ] as const;
 
 export const worldMaterialFamilies = [
@@ -85,7 +83,7 @@ export const lootPaths = [
     current:
       'A creature’s saved body already determines familiar material families such as Hide, Pelt, Scale, Bone, Venom, and Ichor. Those rewards are still stored as individual source-bearing samples.',
     accepted:
-      'Creatures emit the correct physical family from the start. Different species can add to the same family-and-quality stack; the species remains visible in history instead of becoming a new item type.',
+      'Creatures emit a recognizable physical type or precise subtype. Matching species variants share a type-and-quality stack, while species, colour, and inherited values remain visible in expanded history.',
   },
   {
     name: 'Named threats and guardians',
@@ -99,7 +97,7 @@ export const lootPaths = [
     current:
       'Each placed discovery keeps its own Search, depletion, and custody rules. A depleted site remains part of that world’s history rather than turning into another reward.',
     accepted:
-      'Placed identity and discovery boundaries stay unchanged. Only physical material custody moves to family-and-quality stacks.',
+      'Placed identity and discovery boundaries stay unchanged. Only physical material custody moves to type-or-subtype plus quality stacks.',
   },
   {
     name: 'Nearby territory finds',
@@ -120,7 +118,7 @@ export const lootPaths = [
     current:
       'Each current service follows its own mix of counted resources, exact samples, and physical items.',
     accepted:
-      'Every material transaction names one exact family, quality band, and quantity. A better grade is never silently sold, crafted, or recycled in place of the quoted stock.',
+      'Every material transaction names one exact physical type or subtype, quality, and quantity. When quality matters, the player chooses it; another grade is never silently sold, crafted, or recycled.',
   },
 ] as const;
 
@@ -142,7 +140,7 @@ const apothecaryChanges: CraftingChange[] = ([
   ['Waystone', 'One hard sample at 70 or better, 1 Rift-glass, 1 Mote, and 12 Essence.', 'Rift-glass, Mote, and Essence stay; its permanent hard World material is still being chosen.'],
   ['Torch', 'One reactive sample at 30 or better, 1 Resin, and 2 Timber.', '2 Timber and 1 Resin.'],
   ['Farsight Draught', 'One lustrous sample at 50 or better, 1 Quartz, and 1 Ichor.', '1 Quartz and 1 Creature Ichor.'],
-  ['Scent Mask', 'One exact creature Hide, Pelt, Down, or Oil, plus 1 Reagent.', 'The same physical families and Reagent, selected from family-and-quality stock.'],
+  ['Scent Mask', 'One exact creature Hide, Pelt, Down, or Oil, plus 1 Reagent.', 'A visible scent-bearing creature-material category and Reagent; the final eligible type/subtype list will be reviewed with Aimee.'],
   ['Seamlight', '1 Quartz, 1 Resin, and 1 Fibre. It can be made, but its Field Kit route is incomplete.', 'The recipe stays the same; the completed field action will guide toward a portal without creating light.'],
 ] as const).map(([name, current, accepted]) => ({ name, current, accepted }));
 
@@ -163,8 +161,8 @@ export const craftingFamilyStatus: CraftingFamilyStatus[] = [
     slug: 'apothecary',
     name: 'Apothecary',
     status: 'Partly playable',
-    current: 'Nineteen preparations can be learned and made. Scent Mask and Seamlight still lack their complete World Field Kit route.',
-    accepted: 'Keep all nineteen results, replace arbitrary hidden-property samples with physical ingredients, and complete every field-use route.',
+    current: 'Nineteen preparations can be learned and made. Scent Mask has its animal-material Field route, and Seamlight has its portal-guidance Field route.',
+    accepted: 'Keep all nineteen results and their completed field-use routes, while replacing arbitrary hidden-property samples with recognizable physical ingredients.',
     changes: apothecaryChanges,
   },
   {
@@ -190,16 +188,16 @@ export const craftingFamilyStatus: CraftingFamilyStatus[] = [
     name: 'Tannery',
     status: 'Changing in a future update',
     current: 'Supple Coat, Working Gloves, and Working Boots use physically restricted exact samples.',
-    accepted: 'The same three patterns keep their family rules and move to family-and-quality stack selection.',
-    changes: ['Supple Coat', 'Working Gloves', 'Working Boots'].map((name) => ({ name, current: 'Playable with the current exact-sample recipe.', accepted: 'Same physical sockets, selected from family-and-quality stacks.' })),
+    accepted: 'The same three patterns move to player-selected physical type/subtype and four-band quality stacks. Their final category lists and stat contributions remain under design review.',
+    changes: ['Supple Coat', 'Working Gloves', 'Working Boots'].map((name) => ({ name, current: 'Playable with the current exact-sample recipe.', accepted: 'Use visible physical part categories and player-selected quality; preview the exact Armour and other real stat contributions.' })),
   },
   {
     slug: 'bowyer',
     name: 'Bowyer',
     status: 'Changing in a future update',
     current: 'Longbow, Sling, and Throwing Set are playable through their current station and study gates.',
-    accepted: 'The same three weapons keep their sockets and use family-and-quality stacks.',
-    changes: ['Longbow', 'Sling', 'Throwing Set'].map((name) => ({ name, current: 'Playable with exact selected samples.', accepted: 'The same parts selected from family-and-quality stacks.' })),
+    accepted: 'The same three weapons keep their recognizable parts and use player-selected physical types/subtypes and four-band quality stacks.',
+    changes: ['Longbow', 'Sling', 'Throwing Set'].map((name) => ({ name, current: 'Playable with exact selected samples.', accepted: 'The same parts selected from visible physical categories, with direct previewed stat contributions.' })),
   },
   {
     slug: 'weaponsmith',
@@ -207,7 +205,7 @@ export const craftingFamilyStatus: CraftingFamilyStatus[] = [
     status: 'Changing in a future update',
     current: 'Fitted Point, Fitted Edge, Fitted Maul, and Fitted Polearm are playable. Polearm appears after Maud’s fitting pattern is known.',
     accepted: 'All four keep their damage choices and use closed physical family sockets.',
-    changes: ['Fitted Point', 'Fitted Edge', 'Fitted Maul', 'Fitted Polearm'].map((name) => ({ name, current: 'Playable with the current exact head, support, and fitting selections.', accepted: 'The same form uses named family-and-quality component stacks.' })),
+    changes: ['Fitted Point', 'Fitted Edge', 'Fitted Maul', 'Fitted Polearm'].map((name) => ({ name, current: 'Playable with the current exact head, support, and fitting selections.', accepted: 'The same form uses visible head, support, and fitting categories plus a player-chosen quality stack.' })),
   },
   {
     slug: 'armoury',
@@ -215,14 +213,14 @@ export const craftingFamilyStatus: CraftingFamilyStatus[] = [
     status: 'Changing in a future update',
     current: 'Rigid Shell, Insulated Layer, and Balanced Laminate rebuild one exact eligible protective item.',
     accepted: 'Each profile keeps the item’s identity and replaces hidden property samples with named body, lining, binding, and fitting families.',
-    changes: ['Rigid Shell', 'Insulated Layer', 'Balanced Laminate'].map((name) => ({ name, current: 'Playable as an exact-item rebuild.', accepted: 'The same rebuild uses named family-and-quality components.' })),
+    changes: ['Rigid Shell', 'Insulated Layer', 'Balanced Laminate'].map((name) => ({ name, current: 'Playable as an exact-item rebuild.', accepted: 'The same rebuild uses recognizable layer categories and player-selected quality, with exact resulting stats shown before commit.' })),
   },
   {
     slug: 'instruments',
     name: 'Field Instruments',
     status: 'Changing in a future update',
     current: 'All eight instruments are permanent Research capabilities. Good and Fine precision upgrades are playable and automatically use the weakest qualifying exact samples.',
-    accepted: 'Good uses two Standard-or-better materials plus 20 Essence; Fine uses three Fine-or-better materials plus 50 Essence. The player chooses from named eligible families.',
+    accepted: 'Keep the current instrument precision tiers and costs unless separately changed. Replace hidden property searches with visible physical categories; the player chooses the contributing resource quality.',
     changes: [
       { name: 'Sunglass and Chronometer', current: 'Use qualifying lustrous samples.', accepted: 'Quartz, Silver, Gold, Feather, or Quill.' },
       { name: 'Thermoscope', current: 'Uses qualifying insulating samples.', accepted: 'Fibre, Resin, Pelt, Down, Hide, or Oil.' },
@@ -255,8 +253,8 @@ export const craftingFamilyStatus: CraftingFamilyStatus[] = [
     name: 'Recycler',
     status: 'Changing in a future update',
     current: 'Dismantles one exact eligible, unequipped piece and returns its current receipt-backed samples or stated salvage.',
-    accepted: 'Returns the exact family, quality band, and quantity recorded by construction. Older stated salvage returns Standard World stock only.',
-    changes: [{ name: 'Dismantle gear', current: 'One exact eligible piece; protected, equipped, malformed, and undefined pieces refuse.', accepted: 'The same refusal rules, returning exact family-and-quality quantities.' }],
+    accepted: 'Returns the exact physical type/subtype, resource quality, colour/source detail, and quantity recorded by construction. The old-salvage migration mapping remains to be designed.',
+    changes: [{ name: 'Dismantle gear', current: 'One exact eligible piece; protected, equipped, malformed, and undefined pieces refuse.', accepted: 'The same refusal rules, returning the exact selected material types, qualities, and quantities in the construction receipt.' }],
   },
   {
     slug: 'distillery',
@@ -288,8 +286,8 @@ export const craftingFamilyStatus: CraftingFamilyStatus[] = [
     name: 'Anchorage',
     status: 'Changing in a future update',
     current: 'Anchor Frame automatically chooses six different qualifying samples and spends 60 Essence. Its field placement route is playable.',
-    accepted: 'The player selects six Fine-or-better World material quantities across four named roles; no better band is silently spent.',
-    changes: [{ name: 'Anchor Frame', current: 'Two hard, two dense, one flexible, and one reactive exact sample, plus 60 Essence.', accepted: 'Two rigid members, two load-bearing members, one binding or hinge, and one responsive key from the approved World families, plus 60 Essence.' }],
+    accepted: 'Replace six hidden numerical searches with visible structural categories. The final eligible types, quality rule, and role wording will be reviewed with Aimee before implementation.',
+    changes: [{ name: 'Anchor Frame', current: 'Two hard, two dense, one flexible, and one reactive exact sample, plus 60 Essence.', accepted: 'Visible structural-member, load-bearing, binding, and responsive-component selections plus 60 Essence; exact category lists remain under review.' }],
   },
 ];
 
@@ -300,18 +298,35 @@ export function craftingStatusFor(slug: string) {
 export function futureResourceCopy(name: string) {
   if (name === 'Raw Essence') return 'Raw Essence remains a quality-free precursor. Return it to the Cottage and refine it at the Essence Spring.';
   if (name === 'Mote') return 'Motes remain permanent Reality currency, with no material quality or storage slot.';
-  if (name === 'Ichor') return 'New Ichor becomes a Creature material. Older World Ichor is preserved separately as Legacy Ichor until compatible stock is used or sold.';
-  return `${name} becomes a World material stack separated by quality band. Its origin remains available in history without splitting otherwise identical stock.`;
+  if (name === 'Ichor') return 'Ichor will use its settled physical source category and one of four resource qualities. Older stock must migrate losslessly without inventing creature provenance.';
+  if (name === 'Rubble') return 'Rubble will not remain a finished resource with no physical identity. Aimee will choose removal or a renamed mixed find processed only into materials supported by its source region.';
+  return `${name} will use a recognizable physical type or subtype and one of four resource qualities. Source world, species where relevant, and inherited colour remain available in expanded history without needlessly splitting the stack.`;
 }
 
 export const openDecisions = [
   {
-    title: 'Waystone’s hard body',
-    body: 'The current Waystone accepts any sufficiently hard sample. Its approved recipe keeps Rift-glass, one Mote, and 12 Essence, but its permanent hard World material still needs a final choice: Adamant, Obsidian, or either of those two.',
+    title: 'Final material and recipe taxonomy',
+    body: 'Aimee has settled the hierarchy: broad category, specific physical type, optional precise subtype, species/source variant, and four resource qualities. The complete type/subtype registry and every recipe eligibility list still need joint review.',
   },
   {
-    title: 'How often nearby territory finds appear',
-    body: 'The future reward and “Found nearby” wording are settled. Its frequency after ordinary victorious encounters is still a tuning choice, so the Player Wiki does not claim it is available now.',
+    title: 'Rubble',
+    body: 'Rubble will not remain a finished resource with no physical identity. Aimee will choose between removing it or retaining a renamed mixed find that processes only into materials supported by its source region.',
+  },
+  {
+    title: 'Harvest and facility progression',
+    body: 'The intended progression uses better Picks, Axes, and Scythes, processing facilities, facility levels, and later recipe tiers. Exact tools, materials per tier, processed goods, facility owners, and upgrade costs remain open.',
+  },
+  {
+    title: 'Crafted statistics and Peerless equipment',
+    body: 'Resource quality directly improves real item statistics. Exact contributions, the multi-input result-quality rule, alpha drops, maximum-facility Peerless chance, and a possible matching-NPC bonus remain open.',
+  },
+  {
+    title: 'World generation and direct targeting',
+    body: 'Aimee has settled that players can directly call at least some terrain and base resources and can pressure ecological materials such as Chitin. Exact ground/liquid catalogues, layout styles, world sizes, compatibility rules, and guarantee strength remain open.',
+  },
+  {
+    title: 'Waystone’s hard body',
+    body: 'The current Waystone accepts any sufficiently hard sample. Its intended recipe keeps Rift-glass, one Mote, and 12 Essence, but its permanent hard World material still needs a final choice.',
   },
 ] as const;
 
@@ -319,12 +334,12 @@ export const correctionStatus = [
   {
     label: 'Must change',
     title: 'Material custody',
-    body: 'The current game mixes counted World resources, individual material samples, and family-only summaries. The approved replacement is one real family-and-quality stack everywhere materials travel.',
+    body: 'The current game mixes counted World resources, individual material samples, and family-only summaries. The intended replacement is one physical type-or-subtype plus quality stack, with species and colour in expanded detail.',
   },
   {
     label: 'Must change',
     title: 'Physically arbitrary recipe samples',
-    body: 'Several recipes still accept unrelated materials because a hidden property number is high enough. Their approved replacements name the physical families that make sense.',
+    body: 'Several recipes still accept unrelated materials because a hidden property number is high enough. Their replacements will use visible broad, specific, or precise physical categories.',
   },
   {
     label: 'Must change',
@@ -343,7 +358,7 @@ export const correctionStatus = [
   },
   {
     label: 'Decision complete',
-    title: 'Anchor Frame materials',
-    body: 'The future Frame uses six Fine-or-better World-material quantities across rigid, load-bearing, binding, and responsive roles. Older wording that calls those family choices unresolved is obsolete.',
+    title: 'Anchor Frame ingredient model',
+    body: 'The future Frame replaces hidden property searches with visible physical roles. Its final category lists and quality rule still require Aimee review and must not be published as implemented.',
   },
 ] as const;

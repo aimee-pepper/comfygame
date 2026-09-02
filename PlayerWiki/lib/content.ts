@@ -299,9 +299,16 @@ export function consumableTarget(item: Item) {
 }
 
 export function consumableDuration(item: Item) {
+  if (isWeaponCoating(item)) return 'Until the next eligible successful strike (current build)';
   return item.consumable?.beneficialScalingField === 'timedDuration'
     ? `${humanize(item.consumable.potency)} turns`
     : 'No duration listed';
+}
+
+export function isWeaponCoating(item: Item) {
+  return ['coatPoison', 'coatBurn', 'coatBleed', 'coatDazzle'].includes(
+    item.consumable?.effect ?? '',
+  );
 }
 
 export function itemProperties(item: Item) {

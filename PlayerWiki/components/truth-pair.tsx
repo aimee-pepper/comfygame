@@ -1,18 +1,22 @@
 export function TruthPair({
   current,
   accepted,
+  currentLabel = 'Implemented now',
+  acceptedLabel = 'Intended implementation',
 }: {
   current: string;
   accepted: string;
+  currentLabel?: string;
+  acceptedLabel?: string;
 }) {
   return (
     <div className="truth-pair">
       <section className="truth-panel truth-panel-current">
-        <p className="truth-label">Playable now</p>
+        <p className="truth-label">{currentLabel}</p>
         <p>{current}</p>
       </section>
       <section className="truth-panel truth-panel-accepted">
-        <p className="truth-label">Approved for a future update</p>
+        <p className="truth-label">{acceptedLabel}</p>
         <p>{accepted}</p>
       </section>
     </div>

@@ -5,7 +5,8 @@ import { SiteFrame } from '@/components/site-frame';
 import { content } from '@/lib/content';
 import { recipesUsingResource } from '@/lib/crafting';
 import { TruthPair } from '@/components/truth-pair';
-import { creatureMaterialFamilies, qualityBands, worldMaterialFamilies } from '@/lib/player-guide-status';
+import { qualityBands } from '@/lib/player-guide-status';
+import { canonicalStackExample, materialIdentityHierarchy } from '@/lib/crafting-overview';
 
 function buildingUses(resourceID: string) {
   return content.stations.flatMap((station) =>
@@ -26,10 +27,11 @@ export default function ResourcesPage() {
         summary="World resources are shaped by pressures in the Page and the world that Binding generates. Use this table to compare where each resource tends to appear and what it currently builds."
       />
       <section className="article-section">
-        <h2>Resources today and the approved material update</h2>
+        <h2>Resources today and the intended material overhaul</h2>
         <TruthPair
           current="The game currently mixes counted World resources with individual, source-bearing material samples. The table below describes those live acquisition and spending routes."
-          accepted="Physical stock will use real material families and six quality bands everywhere it travels. Source species and place remain available as history, but will not split otherwise identical material into needless item types."
+          accepted="Physical stock will use recognizable broad categories, specific types, and precise subtypes with four resource qualities. Species, world, colour, and inherited values remain available in expanded history without needlessly splitting otherwise identical stock."
+          acceptedLabel="Intended design"
         />
         <p><Link href="/loot">Follow loot from the world to the Cottage</Link> · <Link href="/guide-status">See what is changing</Link></p>
       </section>
@@ -80,14 +82,10 @@ export default function ResourcesPage() {
         </table>
       </div>
       <section className="article-section">
-        <h2>Approved material families</h2>
-        <p>This is the accepted replacement, not the inventory model in the current build.</p>
-        <div className="definition-grid">
-          <div><h3>World materials</h3><p>{worldMaterialFamilies.map(([name]) => name).join(' · ')}</p></div>
-          <div><h3>Creature materials</h3><p>{creatureMaterialFamilies.map(([name]) => name).join(' · ')}</p></div>
-          <div><h3>Quality bands</h3><p>{qualityBands.join(' · ')}</p></div>
-          <div><h3>How a stack reads</h3><p><strong>Fine Hide ×3</strong>, under Creature materials. A material stack never uses an item slot, and a recipe never silently spends a higher grade than the one you approved.</p></div>
-        </div>
+        <h2>Intended material identity</h2>
+        <p>The hierarchy is settled; the complete physical type/subtype catalogue is still being designed with Aimee.</p>
+        <div className="table-wrap"><table><thead><tr><th>Level</th><th>Example</th><th>Player meaning</th></tr></thead><tbody>{materialIdentityHierarchy.map(([level, example, meaning]) => <tr key={level}><td><strong>{level}</strong></td><td>{example}</td><td>{meaning}</td></tr>)}</tbody></table></div>
+        <div className="definition-grid"><div><h3>Resource qualities</h3><p>{qualityBands.join(' · ')}</p><p>White, green, blue, and purple respectively. Each quality has its own stack.</p></div><div><h3>How a stack reads</h3><p><strong>{canonicalStackExample}</strong>. Expand it to inspect species, source world, inherited colour, quantity, and visible stat contribution.</p></div><div><h3>Selection</h3><p>When quality affects the result, the player chooses which quality to spend. No recipe silently substitutes another grade.</p></div><div><h3>Peerless</h3><p>Peerless is reserved for legendary equipment, not raw resources.</p></div></div>
       </section>
       <nav className="next-links">
         <Link href="/resources/progression">

@@ -117,7 +117,7 @@ export default function Home() {
           <div className="topic-grid">
             <Link className="topic-card" href="/loot">
               <PackageOpen aria-hidden="true" />
-              <span><strong>Loot &amp; materials</strong><small>See how resources move today and how the approved material update will simplify them.</small></span>
+              <span><strong>Loot &amp; materials</strong><small>See how resources move today and how the intended physical-material overhaul will change them.</small></span>
             </Link>
           </div>
         </section>

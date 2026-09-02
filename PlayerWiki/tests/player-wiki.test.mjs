@@ -22,6 +22,47 @@ test('review references publish the Asset Splash List as a durable wiki link', a
   await access(path.resolve(root, '../AssetLab/src/world-splash-five-layer-inventory-v1.js'));
 });
 
+test('crafting overview separates the current property model from the intended physical system', async () => {
+  const [page, overview, status, resources, loot] = await Promise.all([
+    read('app/crafting/page.tsx'),
+    read('lib/crafting-overview.ts'),
+    read('lib/player-guide-status.ts'),
+    read('app/resources/page.tsx'),
+    read('app/loot/page.tsx'),
+  ]);
+  for (const term of ['Hardness', 'Density', 'Insulation', 'Flexibility', 'Lustre', 'Reactivity'])
+    assert.match(overview, new RegExp(term));
+  for (const level of ['Broad category', 'Specific type', 'Precise subtype', 'Species variant', 'Quality'])
+    assert.match(overview, new RegExp(level));
+  for (const quality of ['Poor', 'Common', 'Rare', 'Exceptional'])
+    assert.match(status, new RegExp(`'${quality}'`));
+  assert.doesNotMatch(status.slice(status.indexOf('export const qualityBands'), status.indexOf('export const worldMaterialFamilies')), /Peerless/);
+  assert.match(page, /Peerless is reserved for legendary equipment, not raw resources/);
+  assert.match(page, /Bookbinder will not add an equipment durability system/);
+  assert.match(page, /How generated worlds will support crafting/);
+  assert.match(page, /Rubble is unresolved/);
+  assert.match(resources, /Intended material identity/);
+  assert.match(loot, /The intended material hierarchy/);
+});
+
+test('locked coating and starter-rune rules remain separate from the current build', async () => {
+  const [overview, consumables, item, writing, gettingStarted] = await Promise.all([
+    read('lib/crafting-overview.ts'),
+    read('app/consumables/page.tsx'),
+    read('app/items/[slug]/page.tsx'),
+    read('app/systems/world-writing/page.tsx'),
+    read('app/getting-started/page.tsx'),
+  ]);
+  assert.match(overview, /lasts for exactly one world excursion/);
+  assert.match(overview, /begins with no known runes/);
+  assert.match(overview, /Illumination and Sun guaranteed on a safe unavoidable path/);
+  assert.match(overview, /Existing campaigns keep every known rune and owned World Page/);
+  assert.match(consumables, /Locked intended rule/);
+  assert.match(item, /Current and intended coating duration/);
+  assert.match(writing, /Locked intended opening/);
+  assert.match(gettingStarted, /If the introduction is interrupted/);
+});
+
 test('World Writing teaches the authored player order', async () => {
   const source = await read('app/systems/world-writing/page.tsx');
   const titles = [
@@ -864,7 +905,7 @@ test('crafting has a linked system index and complete resource cross-reference s
     assert.doesNotMatch(source, /places\/workshop|Workshop and Research/);
 });
 
-test('public loot, resources, and crafting guides separate playable truth from approved changes', async () => {
+test('public loot, resources, and crafting guides separate implemented truth from intended changes', async () => {
   const [home, frame, loot, resources, resourceDetail, crafting, craftingDetail, guide, status, truthPair] = await Promise.all([
     read('app/page.tsx'),
     read('components/site-frame.tsx'),
@@ -883,13 +924,14 @@ test('public loot, resources, and crafting guides separate playable truth from a
     assert.match(source, /TruthPair/);
   }
   assert.match(status, /Playable now/);
-  assert.match(truthPair, /Approved for a future update/);
+  assert.match(truthPair, /Implemented now/);
+  assert.match(truthPair, /Intended implementation/);
   assert.match(status, /worldMaterialFamilies/);
   assert.match(status, /creatureMaterialFamilies/);
-  assert.match(status, /Rough/);
-  assert.match(status, /Peerless/);
-  assert.match(status, /Different species can add to the same family-and-quality stack/);
-  assert.match(status, /A better grade is never silently/);
+  assert.match(status, /Poor/);
+  assert.match(status, /Exceptional/);
+  assert.match(status, /Matching species variants share a type-and-quality stack/);
+  assert.match(status, /another grade is never silently/);
   assert.match(status, /Waystone’s hard body/);
 });
 

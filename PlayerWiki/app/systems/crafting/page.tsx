@@ -3,6 +3,7 @@ import { GuideBreadcrumbs, RelatedGuides } from '@/components/guide-navigation';
 import { PageIntro } from '@/components/page-intro';
 import { PixelImage } from '@/components/pixel-image';
 import { SiteFrame } from '@/components/site-frame';
+import { TruthPair } from '@/components/truth-pair';
 import { content } from '@/lib/content';
 import { craftingSystems } from '@/lib/crafting';
 
@@ -18,7 +19,7 @@ export default function Crafting() {
       <PageIntro
         eyebrow="System guide"
         title="Crafting and materials"
-        summary="Returned resources support construction, supplies, equipment, research, and station work. A recipe identifies its base output, then shows whether it needs counted stock, an exact material, Essence Crystals, or a Reality Mote."
+        summary="Returned resources support construction, processing, supplies, equipment, research, and station work. This guide separates today's exact-sample system from the intended physical-material recipe system."
       />
       <section className="article-section crafting-route-guide">
         <h2>Follow the material through the Village</h2>
@@ -26,6 +27,11 @@ export default function Crafting() {
         <div className="crafting-route-strip">
           {stationReferences.map((station) => station && <Link key={station.id} href={`/places/${station.slug}`}><PixelImage src={station.assetURL} alt={`${station.name} building visual`} size={64} /><span><strong>{station.name}</strong><small>{station.blurb}</small></span></Link>)}
         </div>
+      </section>
+      <section className="article-section">
+        <h2>Current game and intended replacement</h2>
+        <TruthPair current="Current makers combine counted resources, exact source-bearing samples, fixed costs, and hidden hardness, density, insulation, flexibility, lustre, or reactivity thresholds. Each station's current page lists the exact live rule." accepted="Recipes use static ingredients plus visible broad, specific, or precise physical categories. The player selects a physical type or subtype and Poor, Common, Rare, or Exceptional quality; the preview shows direct contributions to real item statistics." acceptedLabel="Intended design" />
+        <p><Link href="/crafting">Open the complete system-by-system and recipe-by-recipe comparison</Link></p>
       </section>
       <section className="article-section">
         <h2>Read the current preview before making</h2>
@@ -60,12 +66,11 @@ export default function Crafting() {
       </section>
       <section className="article-section two-column">
         <div>
-          <h2>Material effects</h2>
+        <h2>Material effects</h2>
           <p>
-            A recipe separates its base output from material selection. Exact
-            materials can determine whether a component fits and which current
-            qualities it carries; the station page names those rules separately
-            from the fixed resource cost.
+            The intended recipe fixes the item's function, while the selected
+            physical material and resource quality contribute directly to its
+            visible statistics. There is no equipment durability system.
           </p>
           <p>
             <Link href="/resources">Browse resources</Link>
