@@ -4,7 +4,9 @@ Status: ordered Game Design roadmap. This roadmap does not dispatch Engineering 
 
 ## Delivery principle
 
-This program is larger than a recipe correction. It changes generation, loot, inventory, crafting, equipment, World Writing, saves, and the public Wiki. Work may be developed behind internal boundaries, but no player build may expose a half-migrated economy in which one producer writes new material stacks while another current consumer still expects legacy samples.
+This program is larger than a recipe correction. It changes generation, loot, inventory, crafting, equipment, World Writing, saves, and the public Wiki. It will ship as small compatible vertical slices rather than one long all-or-nothing cutover. A slice may move one producer and its immediate custody/consumer path to the new model while untouched buildings continue using explicit legacy compatibility.
+
+Aimee is currently the primary tester and does not need every building overhaul to finish before receiving another update. A partial rollout is acceptable when its current boundary is visible and understood. It is never acceptable for a partial rollout to lose stock, make a save unreadable, substitute quality silently, publish intended behavior as live, or leave a touched transaction split between incompatible identities.
 
 Every phase has four states:
 
@@ -13,14 +15,29 @@ Every phase has four states:
 3. **Focused verified** - deterministic generation, atomic transactions, migration, and refusals pass.
 4. **Mounted verified** - Game Design plays the real fixed 368x800/default-text journey through production controls.
 
-The public Player Wiki updates at each delivered state, not only when the entire program ends.
+The public Player Wiki updates at each delivered state, not only when the entire program ends. Phase numbers below describe dependency lanes, not mandatory release barriers; a bounded vertical slice may cross several phases and ship as soon as its own path is complete.
+
+## First playable vertical slice
+
+After the minimum registries and compatibility bridge exist, ship one representative path before broad conversion:
+
+1. One canonical physical subtype from one existing producer.
+2. One quality band assignment and species-specific unit beneath its default subtype + quality stack.
+3. Field acquisition, Expedition Return, and Storehouse custody for that material.
+4. One recipe using a static ingredient plus a broad, type, or subtype category slot.
+5. Explicit player quality selection if that recipe's result changes with quality.
+6. One trade or Recycler round trip where currently reachable.
+7. One old-save/current-reserve migration example.
+8. Cold relaunch and exact quantity preservation.
+
+That slice is useful proof and may be phone-delivered even though other resources, recipes, and buildings still use the prior model.
 
 ## Phase 0 - Close the remaining design choices
 
 ### Decisions to settle with Aimee
 
 1. Final physical material category/type/subtype registry.
-2. Rubble removal versus world-causal processing.
+2. Mixed geological find name, collection frequency, region-weighted outputs, and processing owner.
 3. Ground and liquid type catalogue.
 4. Ground layout style set.
 5. World size tiers and dimensions.
@@ -153,22 +170,28 @@ Encounter and inspect one naturally generated member of each accepted body-plan/
 
 Play a progression from basic gathering through at least one blocked advanced node, acquire the required tool, revisit, harvest, return, and cold relaunch.
 
-## Phase 5 - Global material custody migration
+## Phase 5 - Incremental material custody migration
 
-### Build as one cumulative cutover
+### Build one retained-owner path at a time
 
 - New physical type/subtype + four-band material stack authority.
 - Source-species/world/colour sub-lot history under each stack.
-- Field and combat reward writers.
-- Carried inventory presentation.
-- Partial and full Expedition Return.
-- Storehouse.
-- Trading Post buy/sell stock and pricing.
-- Every current crafting picker and quote.
-- Equipment construction receipts.
-- Recycler.
-- Active and anchored worlds.
-- Old-save and legacy reserve migration.
+- A compatibility reader that can project untouched legacy stock into an exact current consumer without rewriting or losing it.
+- A new writer only for the producer promoted in the current slice.
+- The smallest complete connected path for that producer: carried presentation, partial/full Return, Storehouse, then each promoted trade, crafting, equipment-receipt, or Recycler consumer.
+- Idempotent old-save and legacy-reserve migration scoped to the owners in that slice.
+- Active and anchored worlds remain on their saved generation versions until a specific world-compatible slice owns their migration.
+
+Suggested custody delivery order:
+
+1. One generated creature material or one terrain material end to end.
+2. Field and combat reward writers, one producer family at a time.
+3. Carried inventory and Expedition Return for promoted materials.
+4. Storehouse default stacks plus alternate views.
+5. Trading Post lines for promoted materials.
+6. One crafting family at a time.
+7. Equipment receipts and Recycler for the corresponding crafted family.
+8. Repeat until every legacy producer and consumer has been retired.
 
 ### Migration rules
 
@@ -188,6 +211,7 @@ Play a progression from basic gathering through at least one blocked advanced no
 - Partial Return proves recovered plus lost equals carried.
 - Trade, craft, recycle, and relaunch cannot duplicate or delete stock.
 - Materials never consume item slots.
+- A still-legacy building remains usable under its prior rule or truthfully unavailable for that exact route; it never consumes a promoted stack through an unverified projection.
 
 ### Mounted gate
 
@@ -390,15 +414,15 @@ Old-save decoding remains as long as supported saves require it.
 
 ## Recommended delivery grouping
 
-The safest program groups are:
+The safest rolling program groups are:
 
 1. **Design and registries** - no gameplay mutation.
-2. **Versioned generation foundation** - new worlds only, old worlds frozen.
-3. **Harvest and global custody cutover** - all material producers/consumers together.
-4. **Processing and recipe-engine cutover** - compatibility until every maker migrates.
-5. **Crafted statistics and Peerless** - after deterministic ordinary output is stable.
-6. **World Writing targeting** - after the new generator and resources can honor it.
-7. **Atmosphere and compatibility** - one resolved environment receipt.
-8. **Legacy removal and end-to-end promotion**.
+2. **First material vertical slice** - one producer through custody and one useful consumer.
+3. **Producer expansion** - creature, terrain, flora, and tree families one coherent path at a time.
+4. **Processing and recipes** - one facility family at a time with compatibility for the rest.
+5. **Crafted statistics and Peerless** - after deterministic ordinary outputs exist for the affected family.
+6. **World generation and Writing targeting** - incremental generation versions; old worlds remain frozen.
+7. **Atmosphere resolution** - condition candidates choose or transform from saved pressures without rejecting the world.
+8. **Legacy removal** - only after each old caller has been independently replaced.
 
-No phone delivery should strand a player between old and new material identities, invalidate an existing world, or make a live recipe impossible.
+Phone deliveries may contain both migrated and explicitly legacy systems. No delivery may strand a player inside one touched transaction, invalidate an existing world, corrupt a save, silently change quality, or make an otherwise supported live recipe impossible.

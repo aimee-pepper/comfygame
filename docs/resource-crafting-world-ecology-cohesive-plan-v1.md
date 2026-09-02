@@ -33,15 +33,15 @@ The intended hierarchy is:
 1. **Broad category** - a physical class used by flexible recipes, such as Scales.
 2. **Specific material type** - a recognizable physical kind, such as Fish Scales.
 3. **Precise subtype** - a materially different version required by advanced recipes, such as Armoured Fish Scales.
-4. **Species variant** - the generated species that produced the material, shown in expanded history and contributing its inherited values without becoming a separate stack key.
-5. **Quality** - Poor, Common, Rare, or Exceptional, which creates a separate stack.
+4. **Quality** - Poor, Common, Rare, or Exceptional, which creates a separate default stack within the subtype.
+5. **Species-specific item** - the generated species unit inside that quality stack, retaining its inherited colour, values, source, and history.
 
 Example:
 
 - **Scales** is a broad recipe category.
 - **Fish Scales** and **Lizard Scales** are specific material types.
 - **Armoured Fish Scales** is a precise subtype.
-- Scales from two different generated fish species may share one Armoured Fish Scales stack when their quality matches.
+- Scales from two different generated fish species share one Armoured Fish Scales stack by default when their quality matches.
 - Expanding that stack shows the contributing species, source worlds, colours, quantities, and inherited values.
 
 This retains the connection between world pressures, generated species, and useful loot without forcing players to manage one item type per species.
@@ -71,9 +71,9 @@ Peerless is not a resource quality.
 
 ### Stack key
 
-The player-facing material stack key is:
+The default player-facing material stack key is:
 
-> Physical material type or precise subtype + resource quality
+> Precise material subtype + resource quality
 
 Examples:
 
@@ -91,7 +91,13 @@ Expanded detail shows:
 - the visible statistics the selected units would contribute to a craft;
 - discovery history where disclosure is allowed.
 
-The source species does not split the stack. A materially different subtype does.
+The source species does not split the default stack. A materially different subtype or quality does.
+
+### Inventory views and sorting
+
+The player should not be locked to one presentation. Inventory can offer alternate views or sorting by broad category, material type, subtype, quality, species, source world, colour, quantity, or recent acquisition. These are projections over the same owned material units; changing the view never moves, merges, spends, or duplicates anything.
+
+The default remains subtype + quality because it keeps common crafting stock compact while preserving each species-specific item one level beneath it. A recipe picker may temporarily group by the ingredient scope it needs, but the confirmation still names the exact subtype, quality, species-specific units, and quantity that will be consumed.
 
 ### Player-controlled selection
 
@@ -331,8 +337,9 @@ Atmospheric and weather conditions must be visible beyond lighting changes. Mias
 
 Generation needs an explicit compatibility and transformation pass:
 
-- incompatible conditions cannot simply coexist;
-- temperature or another relevant pressure resolves rain versus snow;
+- incompatible conditions cannot simply coexist in the resolved world;
+- an impossible candidate combination does not reject the world or reroll its whole receipt;
+- temperature or another relevant pressure deterministically selects rain versus snow and preserves the selected condition;
 - rain plus miasma may become acid rain when that combination is authorized;
 - ash and snow may coexist only when their physical source and temperature logic support it;
 - the resolved combined condition owns its gameplay effect and visible presentation.
@@ -341,14 +348,30 @@ The exact compatibility matrix, gameplay effects, and visual requirements remain
 
 ## Rubble
 
-Rubble is not an acceptable name for a specific finished resource.
+Rubble is not an acceptable name for a specific finished resource. Aimee's preferred direction is now a mixed, region-causal raw find because it can provide a fun bounded grab bag from a zone the player could not fully explore or harvest with current tools.
 
-Two coherent options remain:
+The intended behavior is:
 
-1. Remove Rubble as an inventory resource and let broken ground expose specific stone and mineral yields.
-2. Retain it only as an explicitly mixed raw find, rename it if necessary, and process it into a world-causal selection of real stone, ore, or other mineral materials.
+- broken terrain can yield a renamed mixed geological find such as Unsorted Stone or Mineral Debris;
+- its frozen source-region receipt defines the real stone, ore, mineral, or glass-bearing materials it can contain;
+- processing produces a bounded selection from that receipt, never a global bag of unrelated resources;
+- the result may include a material the player saw in that region but could not reach or harvest directly, making the find useful without replacing tools or exploration;
+- processing consumes the mixed find, so save/reload cannot reroll it indefinitely.
 
-If processed, its outputs must come from the source region's geology rather than a global bag of unrelated results. The final choice is **Will discuss with Aimee**.
+**Will discuss with Aimee:** final player-facing name, where it is collected, output count, how strongly the source receipt favors common versus inaccessible regional materials, and which facility processes it.
+
+## Incremental delivery
+
+This overhaul does not need to wait for one economy-wide release. Each bounded vertical slice may ship when it is coherent, save-safe, and truthful:
+
+1. Introduce one canonical material producer or one world-region yield.
+2. Carry that material through the exact Field, Return, and Storehouse path it needs.
+3. Connect one useful recipe, trade, processing, or Recycler consumer.
+4. Preserve untouched buildings through explicit legacy compatibility until their own slice is replaced.
+5. Migrate only the stock and receipts owned by the promoted slice, idempotently and without loss.
+6. Update the Player Wiki to show which parts are implemented and which still use the earlier system.
+
+Aimee is the current tester and may knowingly enter an unlocked building whose overhaul has not arrived yet. That temporary limitation is acceptable when the page remains functional under its old rules or clearly explains its current boundary. It is not acceptable to corrupt stock, consume the wrong quality, break an existing save, or silently advertise intended behavior as live.
 
 ## Public Wiki contract
 

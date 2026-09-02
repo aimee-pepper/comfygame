@@ -2,7 +2,7 @@
 
 Status: implementation-planning authority derived from Aimee's Top Level Notes.
 
-This document separates current runtime foundations from the intended system. It is not an Engineering dispatch and does not authorize partial implementation. Every **Will discuss with Aimee** section is deliberately unresolved.
+This document separates current runtime foundations from the intended system. It is not an Engineering dispatch. It authorizes bounded, compatible vertical slices, not incoherent partial mechanics. Every **Will discuss with Aimee** section is deliberately unresolved.
 
 ## Scope
 
@@ -32,8 +32,9 @@ The Player Wiki is an eleventh cross-system publication owner. It changes with e
 
 ### Intended structure
 
-- Separate physical hierarchy: broad category, specific type, optional precise subtype, species/source variant, quality.
-- Stack by physical material type or precise subtype plus Poor/Common/Rare/Exceptional.
+- Separate physical hierarchy: broad category, specific type, optional precise subtype, quality, then species-specific item/unit.
+- Default-stack by precise subtype plus Poor/Common/Rare/Exceptional.
+- Provide alternate sorting and views by category, type, subtype, quality, species, source world, colour, quantity, or recency without changing custody.
 - Expand a stack to inspect source species, world, inherited colour, quantities, and stat contributions.
 - Preserve source identity without making every species a separate item type.
 - Materials remain outside ordinary item-slot capacity.
@@ -41,7 +42,7 @@ The Player Wiki is an eleventh cross-system publication owner. It changes with e
 
 ### Structural change
 
-This is a global save and transaction migration. Field holdings, Return, Storehouse, Trading Post, all crafting pickers, equipment receipts, Recycler, active worlds, anchored worlds, pending transactions, and old reserves must move together or through a read-old/write-new compatibility bridge.
+The final model spans Field holdings, Return, Storehouse, Trading Post, crafting pickers, equipment receipts, Recycler, active worlds, anchored worlds, pending transactions, and old reserves. Delivery is incremental: each promoted owner moves through a read-old/write-new compatibility bridge, while untouched owners keep their current representation until their own coherent slice ships.
 
 ### Will discuss with Aimee
 
@@ -185,7 +186,7 @@ World placement, Look, harvesting, tool custody/equipment, depletion, carried ma
 - Axe and Scythe tiers.
 - Starting tool ownership versus early discovery/crafting.
 - Node yields, harvest turn costs, tool effects, and whether tools are equipped or persistent capabilities.
-- Rubble removal versus local-geology processing.
+- Mixed geological find name, collection frequency, regional output weighting, and processing owner.
 
 ## 6. Processing facilities and intermediates
 
@@ -320,7 +321,8 @@ New Sigils require vocabulary acquisition, Rune Dictionary disclosure, Page gram
 ### Intended structure
 
 - Resolve incompatible conditions through a deterministic compatibility layer.
-- Let a relevant pressure, such as temperature, decide rain versus snow.
+- Never reject an otherwise valid world merely because two raw condition candidates conflict.
+- Let relevant pressures, such as temperature, deterministically select rain or snow and retain only the winner in the resolved receipt.
 - Transform authorized combinations, such as rain plus miasma becoming acid rain.
 - Permit unusual combinations such as ash and snow only when their causes and temperature can coexist.
 - Give every resolved condition matching gameplay behavior, arrival disclosure, world presentation, exploration feedback, and persistence.
@@ -336,23 +338,20 @@ The resolved environment receipt must own both mechanics and visuals. Rendering 
 - Exact damage/status/visibility/movement/harvest effects.
 - Animation, haze, particle, colour, and sound requirements.
 
-## 11. Rubble decision boundary
+## 11. Mixed geological find
 
 Rubble cannot remain a specific final crafting resource.
 
-### Option A - remove it
+Aimee prefers a region-causal mixed raw find because it can give the player a bounded grab bag from a zone they could not fully explore or harvest yet.
 
-- Broken terrain remains a map condition.
-- Harvesting exposes specific local stone, sand, ore, or debris materials.
-- Existing Rubble stock migrates into a conservative real material only after Aimee chooses the mapping.
+- Rename it to an intuitive mixed find such as Unsorted Stone or Mineral Debris.
+- Its exact source-region receipt freezes which local materials are eligible before the player obtains it.
+- A processing facility separates it into only those supported materials.
+- It may yield an otherwise inaccessible regional material, but cannot yield anything absent from that region.
+- It never rerolls on preview, refusal, relaunch, or repeated inspection.
+- It supplements exploration and harvesting tools rather than replacing their dependable yields.
 
-### Option B - process it
-
-- Rename it to an intuitive mixed raw find such as Unsorted Stone or Mineral Debris.
-- A processing facility separates it into only those materials supported by the source region's generated composition.
-- The saved source receipt freezes its possible outputs; processing cannot reroll indefinitely.
-
-Final choice: **Will discuss with Aimee**.
+**Will discuss with Aimee:** name, acquisition frequency, output count, regional weighting, quality inheritance, and processing-facility owner.
 
 ## 12. Player Wiki publication owner
 
@@ -385,3 +384,4 @@ The Wiki cannot be postponed until the end of the overhaul. Aimee uses it to ins
 - Advanced resources are not suppressed merely because the player's tool is too weak.
 - Rare ordinary resources have multiple meaningful consumers.
 - Every unsuccessful, stale, cancelled, or failed write is presentation- and inventory-inert.
+- Compatible vertical slices may ship independently. Untouched consumers remain on explicit legacy behavior until migrated; no slice may require every building overhaul to finish first.
