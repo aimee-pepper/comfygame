@@ -6,7 +6,7 @@ import { content } from '@/lib/content';
 import { recipesUsingResource } from '@/lib/crafting';
 import { TruthPair } from '@/components/truth-pair';
 import { qualityBands } from '@/lib/player-guide-status';
-import { canonicalStackExample, materialIdentityHierarchy } from '@/lib/crafting-overview';
+import { canonicalStackExample, floraMaterialPropertyDerivations, materialIdentityHierarchy, materialScoreBoundary } from '@/lib/crafting-overview';
 
 function buildingUses(resourceID: string) {
   return content.stations.flatMap((station) =>
@@ -86,6 +86,12 @@ export default function ResourcesPage() {
         <p>The hierarchy is settled; the complete physical type/subtype catalogue is still being designed with Aimee.</p>
         <div className="table-wrap"><table><thead><tr><th>Level</th><th>Example</th><th>Player meaning</th></tr></thead><tbody>{materialIdentityHierarchy.map(([level, example, meaning]) => <tr key={level}><td><strong>{level}</strong></td><td>{example}</td><td>{meaning}</td></tr>)}</tbody></table></div>
         <div className="definition-grid"><div><h3>Resource qualities</h3><p>{qualityBands.join(' · ')}</p><p>White, green, blue, and purple respectively. Each subtype and quality has its own default stack.</p></div><div><h3>How a stack reads</h3><p><strong>{canonicalStackExample}</strong>. Expand it to inspect every species-specific item, source world, inherited colour, quantity, and visible stat contribution.</p></div><div><h3>Inventory views</h3><p>The default groups subtype + quality. Alternate views can sort by material, quality, species, source, colour, quantity, or recency without moving or merging stock.</p></div><div><h3>Selection</h3><p>When quality affects the result, the player chooses which quality to spend. No recipe silently substitutes another grade.</p></div><div><h3>Peerless</h3><p>Peerless is reserved for legendary equipment, not raw resources.</p></div></div>
+      </section>
+      <section className="article-section">
+        <h2>Flora materials inherit their plant</h2>
+        <p>Current harvested plant samples already derive properties from the saved plant traits. These values remain part of the intended material system and will contribute to concrete crafted-item statistics rather than acting as universal recipe passwords.</p>
+        <div className="table-wrap"><table><thead><tr><th>Property</th><th>Current Flora-derived calculation</th></tr></thead><tbody>{floraMaterialPropertyDerivations.map(([property, calculation]) => <tr key={property}><td><strong>{property}</strong></td><td>{calculation}</td></tr>)}</tbody></table></div>
+        <p className="note-card"><strong>Current exceptions:</strong> {materialScoreBoundary.currentExceptions}</p>
       </section>
       <nav className="next-links">
         <Link href="/resources/progression">

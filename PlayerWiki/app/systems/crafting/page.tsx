@@ -6,6 +6,7 @@ import { SiteFrame } from '@/components/site-frame';
 import { TruthPair } from '@/components/truth-pair';
 import { content } from '@/lib/content';
 import { craftingSystems } from '@/lib/crafting';
+import { materialIdentityHierarchy, materialPropertyProblems, materialScoreBoundary, qualityRules } from '@/lib/crafting-overview';
 
 export default function Crafting() {
   const stationNames = ['Storehouse', 'The Apothecary', 'Essence Spring'];
@@ -31,7 +32,23 @@ export default function Crafting() {
       <section className="article-section">
         <h2>Current game and intended replacement</h2>
         <TruthPair current="Current makers combine counted resources, exact source-bearing samples, fixed costs, and hidden hardness, density, insulation, flexibility, lustre, or reactivity thresholds. Each station's current page lists the exact live rule." accepted="Recipes use static ingredients plus visible broad, specific, or precise physical categories. The player selects a physical type or subtype and Poor, Common, Rare, or Exceptional quality; the preview shows direct contributions to real item statistics." acceptedLabel="Intended design" />
-        <p><Link href="/crafting">Open the complete system-by-system and recipe-by-recipe comparison</Link></p>
+        <p><Link href="/crafting">Choose an individual crafting system</Link></p>
+      </section>
+      <section className="article-section">
+        <h2>How intended recipes name ingredients</h2>
+        <p>A recipe can combine fixed ingredients with one or more material choices. A fixed ingredient names one exact resource, such as Resin. A category ingredient accepts any owned material from its displayed broad category, type, or subtype. A recipe may narrow a choice only when the physical job genuinely requires it.</p>
+        <div className="table-wrap"><table><thead><tr><th>Ingredient scope</th><th>Example</th><th>Recipe meaning</th></tr></thead><tbody>{materialIdentityHierarchy.map(([level, example, use]) => <tr key={level}><td><strong>{level}</strong></td><td>{example}</td><td>{use}</td></tr>)}</tbody></table></div>
+        <ul className="compact-list"><li>The ingredient picker shows only compatible owned stacks.</li><li>The player chooses the exact subtype, quality, and quantity when more than one valid option exists.</li><li>A recipe never silently spends a higher quality than the one confirmed.</li><li>Species history can remain visible without turning every species into a separate recipe ingredient.</li></ul>
+      </section>
+      <section className="article-section">
+        <h2>The properties stay; recipe eligibility changes</h2>
+        <p>Several current recipes accept an object merely because an internal score crosses a threshold. The intended system keeps all six numerical properties and uses them to calculate concrete finished-item statistics. Only the eligibility rule changes: the recipe asks for a recognizable physical material, type, or subtype.</p>
+        <div className="table-wrap"><table><thead><tr><th>Property</th><th>What it does now</th><th>Intended job</th></tr></thead><tbody>{materialPropertyProblems.map(([name, current, intended]) => <tr key={name}><td><strong>{name}</strong></td><td>{current}</td><td>{intended}</td></tr>)}</tbody></table></div>
+        <TruthPair current={materialScoreBoundary.currentGrade} accepted={materialScoreBoundary.intended} acceptedLabel="Intended design" />
+      </section>
+      <section className="article-section two-column">
+        <div><h2>Quality is a deliberate choice</h2><ul className="compact-list">{qualityRules.map(([band, behavior]) => <li key={band}><strong>{band}:</strong> {behavior}</li>)}</ul><p><Link href="/systems/inventory-custody">Read quality, stacks, and custody</Link></p></div>
+        <div><h2>Every station owns its own recipes</h2><p>The Apothecary, equipment makers, Survey Post, Distillery, Channelworks, Anchorage, Essence Spring, and Writing ink pages each contain only that system's current recipes and intended changes.</p><p><Link href="/crafting">Choose a crafting system</Link></p></div>
       </section>
       <section className="article-section">
         <h2>Read the current preview before making</h2>

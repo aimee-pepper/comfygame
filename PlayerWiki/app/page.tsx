@@ -98,8 +98,8 @@ export default function Home() {
 
         <section className="page-section" aria-labelledby="review-references-heading">
           <div className="section-heading">
-            <div><p className="eyebrow">Review references</p><h2 id="review-references-heading">References for Aimee</h2></div>
-            <Link href="/references">See all review references</Link>
+            <div><p className="eyebrow">Project reference</p><h2 id="review-references-heading">Aimee Reference</h2></div>
+            <Link href="/references">Open Aimee Reference</Link>
           </div>
           <div className="topic-grid">
             <Link className="topic-card" href="/references">
@@ -108,7 +108,7 @@ export default function Home() {
             </Link>
             <Link className="topic-card" href="/references">
               <LibraryBig aria-hidden="true" />
-              <span><strong>Resource, crafting, and world plans</strong><small>Read the complete intended system, structural overhaul, and incremental implementation roadmap.</small></span>
+              <span><strong>Resource, crafting, and world plans</strong><small>Open the system directories and incremental implementation roadmap without combining every subject on one page.</small></span>
             </Link>
           </div>
         </section>

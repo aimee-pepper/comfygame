@@ -13,7 +13,7 @@ const prepareLinks = [
 ];
 
 const referenceLinks = [
-  ['/references', 'Review references'],
+  ['/references', 'Aimee Reference'],
   ['/guide-status', "What's playable now"],
   ['/loot', 'Loot & materials'],
   ['/world', 'World reference'],
@@ -39,6 +39,7 @@ const primaryLinks = [
   ['/resources', 'Resources'],
   ['/guide-status', "What's changing"],
   ['/people', 'People'],
+  ['/references', 'Aimee Reference'],
 ];
 
 export function SiteFrame({
@@ -142,6 +143,7 @@ export function SiteFrame({
       )}
       <footer>
         <span>Bookbinder Player Wiki</span>
+        <Link href="/references">Aimee Reference</Link>
         <Link href="/glossary">Glossary</Link>
       </footer>
     </div>

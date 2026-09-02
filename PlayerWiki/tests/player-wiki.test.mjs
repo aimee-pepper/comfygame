@@ -7,7 +7,7 @@ import { fileURLToPath } from 'node:url';
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const read = (relative) => readFile(path.join(root, relative), 'utf8');
 
-test('review references publish the Asset Splash List and three Game Design plans as readable Wiki pages', async () => {
+test('Aimee Reference publishes the Asset Splash List and three organized Game Design plan routes', async () => {
   const [home, references, preparation, route, source] = await Promise.all([
     read('app/page.tsx'),
     read('app/references/page.tsx'),
@@ -15,7 +15,7 @@ test('review references publish the Asset Splash List and three Game Design plan
     read('app/references/[slug]/page.tsx'),
     read('lib/design-references.ts'),
   ]);
-  assert.match(home, /References for Aimee/);
+  assert.match(home, /Aimee Reference/);
   assert.match(home, /Asset Splash List/);
   assert.match(home, /Resource, crafting, and world plans/);
   assert.match(references, /reference-assets\/world-splash-five-layer-inventory-v1\.html/);
@@ -38,18 +38,27 @@ test('review references publish the Asset Splash List and three Game Design plan
   assert.match(route, /ReactMarkdown/);
   assert.match(route, /remarkGfm/);
   assert.match(route, /markdown-reference/);
+  assert.match(route, /reference\.systemLinks/);
+  assert.match(route, /Open the system you need/);
+  assert.match(source, /systemLinks/);
   assert.doesNotMatch(preparation, /resource-crafting-world-ecology-cohesive-plan-v1\.md/);
   await access(path.resolve(root, '../AssetLab/world-splash-five-layer-inventory-v1.html'));
   await access(path.resolve(root, '../AssetLab/src/world-splash-five-layer-inventory-v1.js'));
 });
 
 test('crafting overview separates the current property model from the intended physical system', async () => {
-  const [page, overview, status, resources, loot] = await Promise.all([
+  const [page, overview, status, resources, loot, craftingGuide, inventory, equipment, world, progression, bestiary] = await Promise.all([
     read('app/crafting/page.tsx'),
     read('lib/crafting-overview.ts'),
     read('lib/player-guide-status.ts'),
     read('app/resources/page.tsx'),
     read('app/loot/page.tsx'),
+    read('app/systems/crafting/page.tsx'),
+    read('app/systems/inventory-custody/page.tsx'),
+    read('app/systems/equipment-materials/page.tsx'),
+    read('app/world/page.tsx'),
+    read('app/resources/progression/page.tsx'),
+    read('app/bestiary/page.tsx'),
   ]);
   for (const term of ['Hardness', 'Density', 'Insulation', 'Flexibility', 'Lustre', 'Reactivity'])
     assert.match(overview, new RegExp(term));
@@ -63,13 +72,19 @@ test('crafting overview separates the current property model from the intended p
   for (const quality of ['Poor', 'Common', 'Rare', 'Exceptional'])
     assert.match(status, new RegExp(`'${quality}'`));
   assert.doesNotMatch(status.slice(status.indexOf('export const qualityBands'), status.indexOf('export const worldMaterialFamilies')), /Peerless/);
-  assert.match(page, /Peerless is reserved for legendary equipment, not raw resources/);
-  assert.match(page, /Bookbinder will not add an equipment durability system/);
-  assert.match(page, /How generated worlds will support crafting/);
-  assert.match(page, /Mixed geological find/);
-  assert.match(page, /Anything of the same subtype and quality combines into one default quantity stack/);
+  assert.match(page, /Use this page as a directory/);
+  assert.match(page, /Every system now has its own page/);
+  assert.doesNotMatch(page, /All current recipes by station/);
+  assert.match(craftingGuide, /The properties stay; recipe eligibility changes/);
+  assert.match(craftingGuide, /numerical properties and uses them to calculate concrete finished-item statistics/);
+  assert.match(inventory, /default material stack is subtype plus quality/);
+  assert.match(equipment, /Intended material stats/);
+  assert.match(world, /Current generator and intended ecology/);
+  assert.match(progression, /Current progression and intended expansion/);
+  assert.match(bestiary, /Creature materials inherit real anatomy/);
+  assert.match(overview, /Because unusually low traits can raise this grade/);
+  assert.match(overview, /Trading Post supplier samples instead synthesize property ranges/);
   assert.match(overview, /the world itself is not rejected/);
-  assert.match(page, /safe, useful slices rather than waiting for every building and world system to change at once/);
   assert.match(resources, /Intended material identity/);
   assert.match(loot, /The intended material hierarchy/);
 });
@@ -880,14 +895,13 @@ test('crafting has a linked system index and complete resource cross-reference s
   const craftingIndex = await read('app/crafting/page.tsx');
   const craftingDetail = await read('app/crafting/[slug]/page.tsx');
   assert.match(craftingIndex, /PixelImage/);
-  assert.match(craftingIndex, /All current recipes by station/);
-  assert.match(craftingIndex, /Exact ingredients and costs/);
-  assert.match(craftingIndex, /Primary use/);
-  assert.match(craftingIndex, /Ready when/);
-  assert.match(craftingIndex, /What is available now/);
-  assert.match(craftingIndex, /Defined or scheduled is not available now/);
-  assert.match(craftingIndex, /crafting-reachability-grid/);
-  assert.match(craftingIndex, /resultHref/);
+  assert.match(craftingIndex, /Use this page as a directory/);
+  assert.match(craftingIndex, /Preparations and processing/);
+  assert.match(craftingIndex, /Weapons, clothing, and protection/);
+  assert.match(craftingIndex, /Expedition tools and worldwork/);
+  assert.match(craftingIndex, /Open the complete/);
+  assert.doesNotMatch(craftingIndex, /All current recipes by station/);
+  assert.doesNotMatch(craftingIndex, /Complete current-to-intended recipe comparison/);
   assert.match(craftingDetail, /recipe-ingredient/);
   assert.match(craftingDetail, /Result image/);
   assert.match(craftingDetail, /crafting-station/);
@@ -947,8 +961,8 @@ test('public loot, resources, and crafting guides separate implemented truth fro
     read('lib/player-guide-status.ts'),
     read('components/truth-pair.tsx'),
   ]);
-  assert.match(home, /References for Aimee/);
-  assert.match(frame, /Review references/);
+  assert.match(home, /Aimee Reference/);
+  assert.match(frame, /Aimee Reference/);
   for (const source of [loot, resources, resourceDetail, crafting, craftingDetail, guide]) {
     assert.match(source, /TruthPair/);
   }

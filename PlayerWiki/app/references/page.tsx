@@ -9,8 +9,8 @@ const basePath = (process.env.NEXT_PUBLIC_BASE_PATH ?? '').replace(/\/+$/, '');
 const assetSplashListHref = `${basePath}/reference-assets/world-splash-five-layer-inventory-v1.html`;
 export default function ReferencesPage() {
   return <SiteFrame sidebar>
-    <GuideBreadcrumbs items={[{ label: 'Home', href: '/' }, { label: 'References' }]} />
-    <PageIntro eyebrow="Review references" title="References for Aimee" summary="Working visual inventories and review surfaces kept together for quick access." />
+    <GuideBreadcrumbs items={[{ label: 'Home', href: '/' }, { label: 'Aimee Reference' }]} />
+    <PageIntro eyebrow="Project reference" title="Aimee Reference" summary="A clearly labelled home for Aimee's system plans, implementation roadmaps, and visual production references." />
     <section className="article-section note-card" aria-labelledby="asset-splash-list-heading">
       <h2 id="asset-splash-list-heading">Asset Splash List</h2>
       <p>Open the five-layer World Splash asset inventory, including every required asset family and the locked moving/static layer split.</p>
@@ -21,7 +21,7 @@ export default function ReferencesPage() {
     </section>
     <section className="article-section" aria-labelledby="resource-crafting-plans-heading">
       <h2 id="resource-crafting-plans-heading">Resource, crafting, and generated-world plans</h2>
-      <p>Read these three complete plans as normal Wiki pages. They preserve Aimee's accepted direction, clearly marked open decisions, and the incremental implementation order.</p>
+      <p>Use these plans for the accepted direction, clearly marked open decisions, and implementation order. Player-facing system details live on their existing Wiki pages instead of being repeated here.</p>
       <div className="topic-grid">
         {designReferences.map((reference) => <Link className="topic-card" href={`/references/${reference.slug}`} key={reference.slug}><span><strong>{reference.title}</strong><small>{reference.summary}</small></span></Link>)}
       </div>

@@ -3,7 +3,10 @@ import { GuideBreadcrumbs, RelatedGuides } from '@/components/guide-navigation';
 import { PageIntro } from '@/components/page-intro';
 import { PixelImage } from '@/components/pixel-image';
 import { SiteFrame } from '@/components/site-frame';
+import { TruthPair } from '@/components/truth-pair';
 import { content } from '@/lib/content';
+import { creatureMaterialPropertyDerivations, materialScoreBoundary } from '@/lib/crafting-overview';
+import { creatureMaterialFamilies } from '@/lib/player-guide-status';
 import { serviceForSlug } from '@/lib/services';
 
 export default function BestiaryPage() {
@@ -44,6 +47,13 @@ export default function BestiaryPage() {
         <p>Animal attendance is decided by the exact visible individual in an active world. This directory does not promise that a named encounter profile is tameable or reveal a specimen’s current trust state.</p>
         <p><Link href="/systems/animals-companionship">Read Animals and companionship</Link></p>
       </section>
+      <section className="article-section">
+        <h2>Creature materials inherit real anatomy</h2>
+        <TruthPair current="Generated creature drops already calculate their six material properties from the defeated creature’s saved covering, skeleton, armament, finish, and emanation. The current family list and grade model are older and incomplete, but the property values are not arbitrary labels." accepted="The canonical family, type, and subtype decide which recipe socket accepts the material. Its inherited numerical properties then contribute to concrete item statistics, while its four-band quality controls the strength of those contributions." acceptedLabel="Intended design" />
+        <div className="table-wrap"><table><thead><tr><th>Material property</th><th>Current creature-derived calculation</th></tr></thead><tbody>{creatureMaterialPropertyDerivations.map(([property, calculation]) => <tr key={property}><td><strong>{property}</strong></td><td>{calculation}</td></tr>)}</tbody></table></div>
+        <p className="note-card"><strong>Quality is separate:</strong> {materialScoreBoundary.currentGrade}</p>
+      </section>
+      <section className="article-section"><h2>Intended physical material families</h2><p>Generated species can still leave species-specific items, colours, values, and histories. Those units sit inside recognizable physical families and subtypes so recipes can ask for Scales, Fish Scales, or Armoured Fish Scales without requiring one named species.</p><div className="table-wrap"><table><thead><tr><th>Family</th><th>Physical meaning</th></tr></thead><tbody>{creatureMaterialFamilies.map(([family, meaning]) => <tr key={family}><td><strong>{family}</strong></td><td>{meaning}</td></tr>)}</tbody></table></div></section>
       <section className="article-section">
         <h2>Typical record flow</h2>
         <ol className="numbered-guide">{guide.workflow.map((step) => <li key={step}>{step}</li>)}</ol>

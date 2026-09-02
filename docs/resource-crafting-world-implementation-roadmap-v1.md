@@ -410,7 +410,7 @@ Old-save decoding remains as long as supported saves require it.
 - Every future recipe remains visibly future until implemented.
 - Every material links to acquisition, processing, recipes, equipment, storage, trade, Return, recycling, relevant terrain/flora/creatures, and World Writing.
 - No internal IDs or hidden numerical property requirements appear as player instructions.
-- The References for Aimee section remains available.
+- The Aimee Reference section remains available.
 
 ## Recommended delivery grouping
 

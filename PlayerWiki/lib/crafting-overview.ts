@@ -1,11 +1,35 @@
 export const materialPropertyProblems = [
-  ['Hardness', 'A hidden score currently used to decide whether some exact samples can fill a recipe slot.', 'A visible physical slot such as an edge, shell, plate, point, or structural member.'],
-  ['Density', 'A hidden score currently used for some weights and load-bearing selections.', 'A visible material category such as a load-bearing stone, metal, bone, plate, or shell.'],
-  ['Insulation', 'A hidden score currently used for warm layers and several unrelated recipes.', 'A visible lining category such as pelt, down, cloth, hide, or oil where oil physically makes sense.'],
-  ['Flexibility', 'A hidden score currently used for grips, bindings, and some preparations.', 'A visible grip, binding, cord, cloth, hide, or other flexible physical category.'],
-  ['Lustre', 'A hidden score currently used for optical and reflective selections.', 'A visible optical or reflective category such as quartz, silver, gold, feather, or quill.'],
-  ['Reactivity', 'A hidden score currently used across chemical and magical recipes.', 'A visible ingredient category such as resin, toxin, spore, reagent, oil, venom, or ichor.'],
+  ['Hardness', 'Currently used as a hidden eligibility threshold by several recipes.', 'Family/type/subtype decides eligibility; Hardness remains and contributes to appropriate concrete item stats.'],
+  ['Density', 'Currently used as a hidden eligibility threshold for some weights and load-bearing selections.', 'Physical construction decides eligibility; Density remains and contributes to appropriate weight, force, or structural stats.'],
+  ['Insulation', 'Currently used as a hidden eligibility threshold for warm layers and several unrelated recipes.', 'A physical lining or insulating material decides eligibility; Insulation remains and contributes to concrete protection or resistance stats.'],
+  ['Flexibility', 'Currently used as a hidden eligibility threshold for grips, bindings, and some preparations.', 'A physical grip, binding, cord, cloth, hide, or similar subtype decides eligibility; Flexibility remains and contributes to appropriate handling stats.'],
+  ['Lustre', 'Currently used as a hidden eligibility threshold for optical and reflective selections.', 'A physical optical or reflective material decides eligibility; Lustre remains and contributes only to an approved concrete stat or effect.'],
+  ['Reactivity', 'Currently used as a hidden eligibility threshold across chemical and magical recipes.', 'A physical reactive ingredient decides eligibility; Reactivity remains and contributes to an approved potency, status, or magical stat.'],
 ] as const;
+
+export const creatureMaterialPropertyDerivations = [
+  ['Hardness', 'Covering material keeps the creature’s exact covering Hardness. Fang and Claw use 70% of total armament; Tusk uses 40%. Bone uses 60% of Bone Density.'],
+  ['Density', 'Hard covering uses 60% covering Hardness + 40% Bone Density; soft covering uses 30% coverage. Tusk uses 80% total armament; Fang/Claw use 60% Bone Density. Bone keeps exact Bone Density.'],
+  ['Insulation', 'Covering Insulation is covering length × coverage ÷ 100. Armament, Bone, and Ichor currently contribute zero Insulation.'],
+  ['Flexibility', 'Covering Flexibility is (100 − covering Hardness) × (0.5 + covering length ÷ 200), floored at zero. Bone uses 60 − half Bone Density, floored at zero.'],
+  ['Lustre', 'The creature finish supplies Lustre as shine + schiller. Covering and armament keep it; Bone keeps 40%; Ichor keeps the full value.'],
+  ['Reactivity', 'Ichor keeps the creature’s emanation strength as Reactivity. Ordinary covering, armament, and Bone currently contribute zero Reactivity.'],
+] as const;
+
+export const floraMaterialPropertyDerivations = [
+  ['Hardness', 'Woody tissue × 0.8.'],
+  ['Density', 'Woody tissue × 0.6.'],
+  ['Insulation', 'Fleshy tissue × 0.7.'],
+  ['Flexibility', 'Fibrous tissue × 0.9.'],
+  ['Lustre', 'The plant’s exact finish Lustre.'],
+  ['Reactivity', 'Chemical defence strength when present, plus 45 for chemosynthetic metabolism, capped at 100.'],
+] as const;
+
+export const materialScoreBoundary = {
+  currentGrade: 'The live 0–100 grade is separate from the six properties. It averages each contributing trait’s distance from 50, multiplies that extremity by 85, adds up to 25 from Lustre, then clamps the result to 0–100. Because unusually low traits can raise this grade, it must not become the new four-band quality formula.',
+  intended: 'Keep every concrete property derived from the source creature, plant, or World material. Use physical family/type/subtype for recipe eligibility. Use Poor, Common, Rare, or Exceptional quality to scale the selected material’s previewed contribution to the finished item. The exact per-property, per-component stat conversion still needs to be settled with Aimee before implementation.',
+  currentExceptions: 'Current creature and Flora harvests are morphology-derived. Trading Post supplier samples instead synthesize property ranges, and some Recycler returns use fixed property records. Those paths must emit or preserve canonical material receipts rather than inventing unrelated values.',
+} as const;
 
 export const materialCustodyFlow = [
   ['Field and combat rewards', 'Current holdings mix counted resources with individual, source-bearing samples.', 'Receive a recognizable physical type or subtype immediately, with species, colour, world, and inherited values retained in expandable detail.'],
