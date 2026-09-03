@@ -83,7 +83,7 @@ When two documents disagree:
 | Gambit stat thresholds | `gambit-stat-thresholds-current.md` | HP percentages remain fractional; Talin uses typed absolute armour marks |
 | Ashe Ground technique | `ashe-ground-technique-current.md` | Protective emanation interception; values remain playtest tuning |
 | Traveller authoring | `traveller-template.md` | Required structure and validation |
-| Character background and voice | `full-cast-background-and-voice-guide-current.md` | Settled 29-person background anchors, voice differentiation and the plain-world-fact boundary for later clue rewrites |
+| Character background and voice | `full-cast-background-and-voice-guide-current.md` | Human-first 29-person background anchors, social and emotional voice differentiation, and the plain-world-fact boundary for later clue rewrites |
 | Implemented six | `traveller-identities-existing-six-current.md` | Honest clue replacements and expansion targets |
 | Implemented-six diary packets | `implemented-six-diary-packets-current.md` | Complete 6/7/6/7/7/14 page plans and authored additions |
 | Early–mid signatures | `traveller-signatures-early-mid-current.md` | Bryn, Orsa, Vance and Talin; playtest thresholds |
@@ -313,7 +313,7 @@ When two documents disagree:
 | Combat-node glyphs | `combat-node-glyph-vocabulary-current.md` | Handmade-art semantic referents and collision requirements for all 72 graph nodes; temporary proof marks are not final art |
 | Traveller meeting content audit | `traveller-meeting-content-audit-current.md` | Speaker/logic audit and remaining human-review questions for 22 draft meetings plus Auber revision |
 | Traveller meeting voice audit | `traveller-meeting-voice-differentiation-audit-current.md` | Independent corpus-wide voice map, convergence risks and paired atlas review order; recommendations only |
-| Full-cast voice authority | `full-cast-voice-authority-current.md` | Settled 29-character personality/voice matrix, Nine-only 100% loftiness rule and campaign-order production rewrite gates |
+| Full-cast voice authority | `full-cast-voice-authority-current.md` | Settled 29-character human personality/voice matrix, profession-versus-person boundary and production rewrite gates |
 | Traveller meeting voice revisions | `traveller-meeting-voice-revision-packet-current.md` | Exact side-by-side replacement candidates for Rook, Marrick, Ashe, Auber/Noll, Grimmond and Nine; review-only |
 | Traveller meeting voice revisions II | `traveller-meeting-voice-revision-packet-second-current.md` | Exact side-by-side candidates for Dagg, Lys, Wren, Kestrel and Oda; review-only |
 | Traveller meeting voice revisions III | `traveller-meeting-voice-revision-packet-early-hinge-current.md` | Exact Bryn, Talin and Nessa cadence corrections grounded in remembered action, timing evidence and changed labels; review-only |

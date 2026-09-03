@@ -4,25 +4,46 @@
 
 ## What this review found
 
-Yes: all twenty-nine travellers already have a distinct speaking style, a reason for doing their
-work, relationships with other members of the cast, and a personal tension that can support later
-story scenes.
+All twenty-nine travellers have useful background material, relationships and a personal tension
+that can support later story scenes. The first voice pass did **not** finish the job, however. It
+often distinguished people by listing the specialist words attached to their work. That made them
+sound like professions speaking through human bodies, rather than people who happen to be good at
+particular things.
 
-The earlier material was not equally complete, however. Twenty-one people already had a clear
-formative event or deliberate present-day mystery. Eight had a strong theme but described the past
-too abstractly. This guide gives those eight a concrete background anchor without adding a named
-country, organization, historical event, or other unsupported lore.
+This guide replaces that approach. Each person now has a social temperament, an emotional habit, a
+sense of humour and a conversational rhythm that work in an ordinary conversation. Their expertise
+still matters when the subject calls for it; it no longer supplies their entire vocabulary.
 
-This means the cast is ready to guide a later clue rewrite. It does **not** mean their personal
-history belongs inside location clues.
+No location clue has been rewritten as part of this correction. The cast guide must be reviewed
+first, because the later clue rewrite will depend on it.
+
+## People first, professions second
+
+A character's job determines what they know. Their personality determines how they speak.
+
+Remove every profession-related noun from a line and the speaker should still feel recognisable.
+Vance is not Vance merely because he mentions a price. Halloway is not Halloway merely because she
+mentions heat. Mara is not Mara merely because she lists measurements. Their warmth, defensiveness,
+curiosity, humour, patience, pride, discomfort and ways of relating to the player do the real work.
+
+Every character must be able to greet someone, joke, disagree, admit uncertainty, ask for help,
+comfort another person and enjoy an ordinary moment without turning it into a lecture about their
+trade. Specialist terms appear only when they are genuinely useful and understandable in context.
+
+The background beneath each profile explains one experience that shaped the person; it is not the
+only thing that has ever happened to them and not the subject of every future scene. Later story
+beats can show friendships, irritation, comfort, play, disagreement and ordinary daily life without
+having to restate that formative event.
 
 ## The rule for clues
 
 A world clue is useful because it tells the player something they can recognise in a generated
-world. Character voice should affect the observation, vocabulary, rhythm, and practical advice—not
-replace the observation with a confession, moral, or unrelated anecdote.
+world. Character voice should affect the attitude and delivery—not replace the observation with a
+confession, moral, unrelated anecdote or list of occupational terms.
 
 Each rewritten clue will follow this order:
+
+**The world fact comes first.**
 
 1. State the visible or otherwise observable world condition in plain language.
 2. Add a practical interpretation when it helps the player understand the cue.
@@ -45,13 +66,14 @@ changes of ownership. He once kept a vital object in circulation by hiding why i
 had refused to sell it. The object remained useful, but the next buyer was denied information that
 should have belonged to the choice.
 
-**Personality and voice.** Cordial, attentive, brisk, and dryly funny. He speaks in complete
-sentences about price, condition, quantity, buyers, sellers, and provenance. He is sociable without
-being slick.
+**Personality and voice.** Vance is outgoing, attentive and practically optimistic. He remembers
+small preferences, asks follow-up questions and is good at helping a stranger feel included without
+acting overly familiar. When emotion makes him uncomfortable, he is tempted to turn it into a
+problem he can solve. His humour is gentle and dry; under pressure he becomes brisk rather than cold.
 
-**In world clues.** Vance notices open routes, visible seams, transport difficulty, scarcity, and
-whether two people could point to the same quantity. A small bargaining joke may follow. His clues
-must not become speeches about the morality of markets.
+**In world clues.** Vance gives the useful observation first, then explains why it may matter to the
+player. His friendliness may appear as an easy aside or a small joke, but he does not force every
+landscape into the language of buying and selling.
 
 ### Noll — settled with a newly concrete background anchor
 
@@ -60,13 +82,14 @@ pieces in removal order. They keep a ledger of things whose useful parts were re
 of making the original whole—and its history—impossible to read. That ledger is why they sometimes
 leave one failed joint intact as evidence.
 
-**Personality and voice.** Blunt, patient with objects, impatient with vanity, and quietly deadpan.
-They use short clauses, concrete verbs, and practical questions about joins, breakage, separation,
-repair, and reuse.
+**Personality and voice.** Noll is quiet, blunt, unshowy and deeply dependable. They listen without
+rushing to fill silence and usually show care by doing something useful. Praise and grand claims
+make them suspicious, especially when either feels performative. Their deadpan replies are short but
+never deliberately cryptic. Irritation makes them more literal, not more technical.
 
-**In world clues.** Noll notices clean break lines, concentrated seams, intact boundaries, and
-whether material can be separated without destroying the rest. Their clue should sound like a
-salvager's diagnosis, not a manifesto about waste.
+**In world clues.** Noll says what is there, what the player can do with that information and what
+they do not know. A clue may carry their dry understatement. It should sound like a quiet person
+pointing something out, not a catalogue of repair terms.
 
 ### Halloway — settled with a newly concrete background anchor
 
@@ -75,12 +98,14 @@ because it was the one process she knew how to control. The work survived. Other
 unanswered while she stayed with it. She still values endurance, but no longer treats keeping one
 thing alive as proof that staying was the right choice.
 
-**Personality and voice.** Steady, quietly protective, gentle, and decisive. She speaks about heat,
-weight, fit, cooling, failure, and whether something remains useful after force has acted on it.
+**Personality and voice.** Halloway is calm, patient, nurturing without fuss and slow to judge. She
+makes room for other people and notices who has quietly been left carrying too much. She prefers
+private kindness to public thanks. Her speech is steady and plain, with gentle understatement.
+Anger comes rarely, but when it does there is no mistaking it.
 
-**In world clues.** Halloway notices workable ground, sustained heat, continuous veins, stable
-surfaces, and signs that material can be shaped. Her warmth comes through practical reassurance,
-not a metaphor about forging people.
+**In world clues.** Halloway explains the visible condition and offers a reassuring next step when
+one is warranted. Her steadiness should make the player feel capable, not make every sentence sound
+like it came from a forge.
 
 ### Mara — settled with a newly concrete background anchor
 
@@ -89,13 +114,14 @@ later measurement around it. The observations were careful; the reference itself
 learned that measurement does not remove judgement—the surveyor is responsible for what they decide
 to trust first.
 
-**Personality and voice.** Curious, collaborative, persistent, and willing to correct herself out
-loud. Her sentences move quickly through bearings, samples, comparisons, landmarks, and revised
-estimates.
+**Personality and voice.** Mara is curious, excitable, collaborative and resilient. She thinks aloud,
+invites other people into a question and is genuinely pleased when good evidence changes her mind.
+Enthusiasm sometimes makes her interrupt, including interrupting herself. Her humour is quick and
+friendly. Worry makes her talk faster until she catches herself and pauses.
 
-**In world clues.** Mara plainly names horizons, slopes, sightlines, brightness, landmarks, and
-repeatable references. She may revise an estimate or make a quick joke about checking the instrument,
-but the player should never have to decode a surveying parable.
+**In world clues.** Mara sounds delighted to have noticed something and invites the player to look
+with her. She may correct her first assumption in plain language. Measurements and specialist terms
+appear only when they clarify the actual cue, not as her substitute for personality.
 
 ### Edren — settled with a newly concrete background anchor
 
@@ -104,12 +130,14 @@ survived. Later evidence showed that different people had returned, repaired, re
 the site across separate periods. He learned that preservation can make discontinuous lives look
 like one uninterrupted intention.
 
-**Personality and voice.** Patient with traces, courteous, scholarly, and exacting about unsupported
-claims. He qualifies conclusions and distinguishes what is present from what it might mean.
+**Personality and voice.** Edren is thoughtful, courteous, softly amused and conscientious. He gives
+people time to finish and dislikes speaking over anyone. His care can become such caution that he
+misses the emotional point in front of him; when he notices, he apologises without hiding behind a
+long explanation. His answers are considered and warm rather than ceremonious.
 
-**In world clues.** Edren notices worked corners, layers, repairs, material placement, cold
-preservation, and signs of later reuse. A clue should state the evidence first. Possible history may
-follow as a possibility, never as a guaranteed story.
+**In world clues.** Edren separates what the player can see from what it might mean, using ordinary
+language before any specialised interpretation. His natural caution may soften a conclusion, but it
+must not bury the useful fact or turn it into a miniature historical essay.
 
 ### Isolde — settled with a newly concrete background anchor
 
@@ -118,13 +146,14 @@ destination for every writer. A student became more technically exact and less a
 clear, living manner that had been their own. Isolde still believes in practice and demanding tools;
 she no longer confuses uniformity with mastery.
 
-**Personality and voice.** Exact, sensory, demanding, cuttingly playful, and generous toward genuine
-effort. She demonstrates pressure, spacing, motion, angle, and tool behaviour before discussing
-larger ideas.
+**Personality and voice.** Isolde is confident, intense, demanding and fiercely encouraging. She has
+little patience for posturing and tremendous patience for someone making an honest effort. She can
+be too sharp, but will correct herself without making the apology another performance. Her humour is
+razor-playful, and both her excitement and annoyance are easy to hear.
 
-**In world clues.** Isolde notices still air, clean edges, repeated marks, relief, and conditions
-that make fine movement visible. Her clue may correct the player's hand or attention, but it must
-still tell them what the world is doing.
+**In world clues.** Isolde is quick to tell the player exactly where to look and may challenge them
+to look again. Her standards and playful sharpness carry the voice. She does not need to turn every
+observation into a lesson about writing or the movement of a hand.
 
 ### Sela — settled with a newly concrete background anchor
 
@@ -133,13 +162,14 @@ becoming fixed around her. On at least one route she treated departure as resolu
 unfinished work to people who had fewer ways out. She still wanders; she now takes responsibility
 for what a useful exit leaves behind.
 
-**Personality and voice.** Informal, observant, tired in an honest way, warm, and frequently wry. She
-talks about weather, food, water, distance, footing, shortcuts, and what someone will need on the
-return trip.
+**Personality and voice.** Sela is relaxed, restless, warm and resistant to ceremony. She makes easy
+company, appreciates small comforts and is good at helping people feel less self-conscious. When she
+fears being pinned down, she jokes or changes the subject. Her conversation is loose and frequently
+wry; when something truly matters, she becomes briefly and strikingly direct.
 
-**In world clues.** Sela notices traversable routes, drinking water, shelter, weather, ordinary
-flora, and practical packing consequences. Her humour should feel like advice from the trail, not a
-reflection on why she cannot settle down.
+**In world clues.** Sela gives advice as one traveller helping another, with an easy aside when it
+fits. Her clue stays focused on what the player can recognise or prepare for. It does not need a
+story about her own departures or a string of trail vocabulary to sound like her.
 
 ## Early and middle travellers
 
@@ -149,12 +179,14 @@ reflection on why she cannot settle down.
 themself. Bryn mistook that growing dependence for proof that continued intervention was necessary.
 She still moves immediately when harm is imminent, but makes a point of returning choice afterward.
 
-**Personality and voice.** Reserved, responsible, compact, and direct, with sparse gallows humour.
-She thinks in sightlines, footing, cover, watch positions, exposed allies, and escape routes.
+**Personality and voice.** Bryn is reserved, protective, steady and emotionally private. She watches
+before speaking and shows care through reliable action. Acting can feel safer to her than asking
+what help someone wants, which is both a strength and a flaw. Her speech is compact and direct, with
+sparse dark humour. She softens noticeably in private conversation.
 
-**In world clues.** Bryn identifies defensible approaches, cover, exits, exposure, and the direction
-danger can arrive from. Her clue can recommend a safe position; it should not retell the person she
-once overprotected.
+**In world clues.** Bryn calmly tells the player what is exposed, what looks safer and why. The
+reassurance comes from her certainty that the player can choose what to do next. She does not retell
+her personal history or turn every clue into a guard's command.
 
 ### Orsa — settled
 
@@ -163,12 +195,14 @@ along something told to her privately because doing so solved an urgent problem,
 good outcome for proof that the breach was justified. She now asks what may be repeated, to whom,
 and for what purpose.
 
-**Personality and voice.** Warm, perceptive, inclusive, and gently teasing. She notices seating,
-light, exits, food, arrivals, habits, and who wants company without conversation.
+**Personality and voice.** Orsa is warm, perceptive, inclusive and comfortably affectionate. She
+remembers details, welcomes silence as readily as chatter and notices who is being left out.
+Sometimes she oversteps because she notices more than people meant to share. Her teasing is gentle,
+and when she is wrong she apologises directly rather than defending her good intention.
 
-**In world clues.** Orsa notices shelter, gathering points, shared routes, safe pauses, and the
-practical signs that several lives use one place. The clue may feel welcoming, but it must describe
-the place rather than Orsa's social philosophy.
+**In world clues.** Orsa makes the player feel as though they are looking at the place together. She
+may notice whether it feels welcoming, exposed or well used, but the clue remains about the place.
+Her warmth is enough; it does not need a list of household observations.
 
 ### Talin — settled
 
@@ -176,12 +210,14 @@ the place rather than Orsa's social philosophy.
 came from lucky outcomes that made hurried reasoning look more certain than it really was. She
 remains decisive, but now names the uncertainty she accepted instead of letting success rewrite it.
 
-**Personality and voice.** Competitive without cruelty, clipped, precise, and fond of practical
-corrections. She speaks in sequences: check the edge, choose the opening, strike, recover.
+**Personality and voice.** Talin is energetic, competitive, proud and decisive. She enjoys a friendly
+challenge, respects someone who admits uncertainty quickly and hates being patronised. Impatience
+can make her answer before another person has finished. Her banter is brisk and her sentences are
+clipped but ordinary. Tension makes her more focused, not more dramatic.
 
-**In world clues.** Talin notices narrow openings, hard edges, timing windows, crossings, and what
-will become unavailable after the next change. Her clue can challenge the player to decide, but it
-must state the physical cue first.
+**In world clues.** Talin points out the fact, names the choice it creates and may challenge the
+player to commit. The energy comes from her impatience and confidence. She does not have to describe
+every landscape as a fight or issue orders when no immediate action is required.
 
 ### Nessa — settled
 
@@ -190,12 +226,15 @@ person receiving it withdrew cooperation. She had treated their participation as
 rather than part of whether the treatment worked. She now counts refusal and lived effect alongside
 dose and outcome.
 
-**Personality and voice.** Calm, unsentimental, consent-minded, and morbidly dry. She asks a
-diagnostic question and then answers it with dose, route, symptom, interaction, time, and uncertainty.
+**Personality and voice.** Nessa is calm, skeptical, compassionate and unsentimental. She asks the
+direct question other people avoid, respects a clear boundary and takes pain seriously without
+making a performance of sympathy. Her humour is dry and occasionally morbid. She is impatient with
+drama, never with suffering, and answers in straightforward language unless medical precision is
+actually needed.
 
-**In world clues.** Nessa notices reactions, contact hazards, temperature, living responses, and
-whether the same substance acts differently in different conditions. Her clue should read like a
-clear field note, not a moral diagnosis.
+**In world clues.** Nessa names a danger or useful reaction plainly and says what the player can
+safely infer. Her dry tone may cut through panic, but the clue should sound like one person warning
+another—not a case report or a moral judgement.
 
 ### Corrin — settled
 
@@ -204,12 +243,14 @@ whose differences should have remained visible. The result worked, but evidence 
 should not have been processed together was discarded. She now preserves meaningful provenance and
 does not use “nothing wasted” as the end of the question.
 
-**Personality and voice.** Tactile, grounded, quietly opinionated, and earthy. She speaks through
-grain, stretch, scar, swelling, wear, rub points, and what a body will reveal after repeated use.
+**Personality and voice.** Corrin is grounded, patient, stubborn and quietly affectionate. She
+trusts consistency more than charm, forms opinions slowly and then holds them hard. Care appears as
+practical attention and remembered needs. Her dry humour is earthy and her statements can sound
+final; sometimes she seems judgemental because she has forgotten to show how she reached her view.
 
-**In world clues.** Corrin notices wetness, repeated movement, flexible joins, living surfaces, and
-how material changes under use. Her clue should make the condition feel touchable without turning
-the landscape into a lesson about guilt.
+**In world clues.** Corrin makes the condition easy to picture and gives a practical interpretation
+without overexplaining. Her firmness and understated warmth carry the voice. Materials vocabulary is
+welcome when a material is actually the subject, not as a filter over every world cue.
 
 ### Dagg — settled
 
@@ -217,12 +258,14 @@ the landscape into a lesson about guilt.
 people endured the danger before that moment arrived. He still values footing, commitment, and
 recovery, but no longer calculates timing only from the eventual blow.
 
-**Personality and voice.** Exuberant, accountable, physically expressive, and funny about his own
-mistakes. He uses forceful short lines about stance, impact, follow-through, and recovery.
+**Personality and voice.** Dagg is big-hearted, exuberant, accountable and physically expressive.
+He enjoys a clear challenge, celebrates other people's courage loudly and admits his own mistakes
+without shrinking from them. His laughter is large and his self-mockery genuine. Under pressure he
+gets simpler and more sincere rather than more theatrical.
 
-**In world clues.** Dagg notices unstable footing, repeated impacts, pressure and release, and
-whether waiting improves the next action or merely prolongs danger. The clue should remain physical;
-the joke can carry the personality.
+**In world clues.** Dagg reacts openly to what he sees, then gives the player the useful fact. A
+bold encouragement or joke can make the clue his. It does not need a procession of combat terms or
+a lecture about the right moment to act.
 
 ### Rook — settled with a newly concrete background anchor
 
@@ -231,12 +274,14 @@ its legibility as proof that the boundary was fair. The people approaching could
 line perfectly and still had no reasonable alternative. Rook now asks who controls the route before
 calling a warning sufficient.
 
-**Personality and voice.** Watchful, spare, dry, and formal mainly under threat. They use direct
-statements about range, lines, crossings, warnings, reach, and commitment.
+**Personality and voice.** Rook is watchful, private, principled and careful with trust. They observe
+a group before joining it, value fairness and dislike casual intrusion. Formality often covers
+uncertainty rather than superiority. Their humour is very dry and their ordinary words are chosen
+carefully. Fear can make them rigid when they are trying hardest to be fair.
 
-**In world clues.** Rook identifies approaches, sight distance, narrow crossings, retreat space, and
-the point where contact becomes unavoidable. Their clue should feel measured and legible, not like
-a philosophical test.
+**In world clues.** Rook gives a spare, clear warning or observation and leaves the decision with the
+player. Their restraint carries the voice. They need not translate every landscape into boundaries,
+lines or a philosophical test.
 
 ### Lys — settled
 
@@ -245,13 +290,14 @@ equal care to the living person it continued to define. She still keeps contradi
 accepts that access, arrangement, emphasis, and silence are editorial choices rather than neutral
 procedures.
 
-**Personality and voice.** Patient, precise, delighted by connections, and fond of bookish wordplay.
-Her sentences can be nested, but remain lucid and grounded in sources, categories, contradictions,
-and margins.
+**Personality and voice.** Lys is enthusiastic, patient, intellectually playful and generous. She
+loves sharing discoveries, follows interesting connections and sometimes offers far more context
+than anyone requested. She can notice that habit and rein herself in. Her bookish jokes still make
+sense to ordinary people; excitement produces lucid digressions, not riddles.
 
-**In world clues.** Lys notices repetition, variation, echoes, mismatched records, and features that
-change when compared. Her clue may distinguish observation from cataloguing, but it must not require
-the player to solve an archival metaphor.
+**In world clues.** Lys may be delighted by a pattern or contradiction, but she states it in terms
+the player can immediately use. If extra context does not help recognise the world cue, she leaves
+it for a longer conversation or diary page.
 
 ## Later specialists and fighters
 
@@ -261,12 +307,14 @@ the player to solve an archival metaphor.
 alive, while also preventing them from escaping, breathing freely, or admitting distress. He still
 believes in protection, but no longer accepts survival as the only measure of success.
 
-**Personality and voice.** Gruff, reassuring, pragmatic, and quietly affectionate. He speaks about
-coverage, load, flex, padding, seams, repair, and where a body compensates for poor fit.
+**Personality and voice.** Bracken is gruff, practical, steady and quietly tender. He complains while
+helping, distrusts bravado and keeps an unobtrusive eye on people's comfort. Worry can make him
+bossier and a little paternal; he becomes sheepish when someone points it out. His affection arrives
+through dry grumbling and simple, dependable statements.
 
-**In world clues.** Bracken notices pressure, coverage, harsh temperature changes, rigid and flexible
-layers, and weak seams. The clue can sound like a fitting check; it should not make the world wear a
-suit of armour in an extended metaphor.
+**In world clues.** Bracken gives a plain warning or reassurance and does not dramatise it. Concern
+may make him sound gruff, but the player should always understand the fact and the useful next step.
+Armour language belongs only in clues that are genuinely about protection or equipment.
 
 ### Fen — settled
 
@@ -274,12 +322,14 @@ suit of armour in an extended metaphor.
 well. It failed because the living target chose something Fen had never allowed for. Fen remains
 meticulous, but deliberately leaves room for surprise.
 
-**Personality and voice.** Laconic, attentive, independent, and quietly mischievous. They use few
-words and exact nouns about tension, arc, balance, distance, dryness, and wind.
+**Personality and voice.** Fen is laconic, independent, calm and quietly mischievous. They are
+comfortable with shared silence, dislike being fussed over and notice more than they announce. A
+look or a small act often carries the joke. Their answers are brief but relevant; they never withhold
+necessary information merely to seem mysterious.
 
-**In world clues.** Fen notices long sightlines, moving air, clear trajectories, tension-bearing
-materials, and what interrupts a path. Their clue should be short and exact, with no philosophical
-postscript.
+**In world clues.** Fen uses few words, names the observable fact and stops when the player has what
+they need. Quiet mischief may appear in the phrasing. The clue should not become a list of bowmaking
+terms just because Fen is the speaker.
 
 ### Wren — settled
 
@@ -287,12 +337,14 @@ postscript.
 once, somebody with fewer exits had to finish the aftermath he left behind. He still keeps options
 open, but now distinguishes an exit from an abandonment.
 
-**Personality and voice.** Quick, socially agile, wry, and honest about fatigue. He speaks in fast
-fragments that count threats, gaps, exits, changing attention, and the recovery owed after a burst.
+**Personality and voice.** Wren is charming, quick, socially adaptable and restless. He reads a room
+rapidly and can make tense company feel lighter, but uses charm to dodge accountability when he
+feels cornered. His teasing is fast and playful. When he is sincere, his speech slows down and loses
+some of its polish.
 
-**In world clues.** Wren notices several routes at once, closing gaps, moving pressures, and places
-where the safest option will change. The clue should give the player the usable route information
-before making a joke about leaving.
+**In world clues.** Wren gives the player the useful information quickly and may lighten it with a
+joke. The player should never have to chase the clue through verbal feints. His social agility, not a
+list of escape routes, makes him sound like Wren.
 
 ### Kestrel — settled
 
@@ -300,12 +352,14 @@ before making a joke about leaving.
 its situation. Her efficient response still caused avoidable harm. She remains a hunter and
 naturalist, but is explicit about what tracks prove and what she has only inferred.
 
-**Personality and voice.** Patient, observant, practical about predation, fond of animals without
-romanticising them, and firm about evidence. She lists behaviour before conclusions.
+**Personality and voice.** Kestrel is patient, observant, calm and fond without being sentimental.
+She prefers to watch and listen before deciding, treats correction as useful and becomes chilly when
+someone protects a good story from inconvenient facts. Her humour is understated and her ordinary
+speech measured. She grows firmer when evidence is dismissed.
 
-**In world clues.** Kestrel notices tracks, feeding signs, range, season, habitat use, interrupted
-behaviour, and evidence of nearby life. She may offer a field inference, but labels it as an
-inference and never reveals an undiscovered creature as fact.
+**In world clues.** Kestrel clearly separates what the player can observe from what she thinks it
+may mean. Her patience and restraint shape the clue. Naturalist terms appear only when they improve
+accuracy, and she never names an undiscovered creature as fact.
 
 ### Maud — settled
 
@@ -313,13 +367,14 @@ inference and never reveals an undiscovered creature as fact.
 at doing something she had assumed they would never choose. She still fits weapons to real bodies;
 she no longer treats the maker's expectation as control over the user's decision.
 
-**Personality and voice.** Candid, skeptical, acerbic but fair, and pleased by a good objection. She
-uses challenge-and-response statements about grip, reach, balance, leverage, clearance, failure, and
-repair.
+**Personality and voice.** Maud is candid, sharp, fair and delighted by a worthy objection. She
+enjoys arguing when both people are allowed to change their minds, values competence over status and
+has no patience for flattery. Her humour is acerbic without being cruel. Affection often arrives
+disguised as useful criticism.
 
-**In world clues.** Maud notices repeated motion, reachable distance, usable leverage, clearance,
-and material behaviour under force. Her clue should challenge a practical assumption, not imply the
-world is a weapon or its traveller a wielder.
+**In world clues.** Maud may challenge the player's first assumption, but she tells them exactly what
+she has noticed and why she doubts it. Her candid pushback supplies the personality. Weapon language
+is not required unless the clue is actually about a weapon or its use.
 
 ### Marrick — settled
 
@@ -327,13 +382,14 @@ world is a weapon or its traveller a wielder.
 excluded people who could not take the assigned positions. He now begins planning by asking who
 cannot use the routine and what alternative they control.
 
-**Personality and voice.** Disciplined, consultative, steady, and occasionally dry in a barracks way.
-He uses structured lists about formation, signals, fatigue, rotation, fallback positions, and who is
-missing from the count.
+**Personality and voice.** Marrick is organised, calm, consultative and responsible. He asks before
+assuming, makes space for quieter voices and feels safer when everyone understands what comes next.
+Anxiety can turn an ordinary chat into a briefing until someone calls him on it. His humour is dry
+and communal rather than commanding.
 
-**In world clues.** Marrick notices routes that support one another, defensible pauses, relay
-sightlines, and hazards that require coordinated movement. The clue should sound like a usable group
-plan, not a doctrine about belonging.
+**In world clues.** Marrick gives the group a clear shared understanding of the visible condition.
+If coordination genuinely matters, he suggests it in everyday words. He does not automatically turn
+every observation into a formation or a structured list.
 
 ## Late travellers
 
@@ -344,13 +400,14 @@ mistaken compliance for trust when an animal had no real alternative. She still 
 can build companionship, but expects the Menagerie and her own judgements to remain open to
 question.
 
-**Personality and voice.** Affectionate, animated, observant, fiercely against coercion, and playful
-about failed negotiations with animals. She speaks through appetite, posture, routine, distance,
-choice, and vivid but brief stories.
+**Personality and voice.** Sabine is animated, affectionate, expressive and fiercely protective of
+choice. She tells lively stories, readily admits when she has been corrected and can overwhelm a
+quieter person with enthusiasm. When reminded, she makes room without taking offence. Her playfulness
+vanishes immediately if someone is being coerced.
 
-**In world clues.** Sabine notices healthy habitat, approach and refusal behaviour, feeding space,
-paths animals can leave by, and changes after a creature notices the party. Any anecdote must explain
-the visible animal cue rather than become personal flavour unrelated to the world.
+**In world clues.** Sabine may react vividly to a creature or habitat cue, but the fact remains easy
+to separate from her reaction. An anecdote is included only when it helps the player recognise the
+same behaviour. Animal vocabulary is expertise, not her entire way of speaking.
 
 ### Grimmond — settled
 
@@ -358,13 +415,14 @@ the visible animal cue rather than become personal flavour unrelated to the worl
 while treating the people who needed the material as an abstraction outside his site plan. He keeps
 strict extraction limits, but now accounts for scarcity and alternatives alongside collapse risk.
 
-**Personality and voice.** Dour, methodical, protective of workers, and capable of very black humour.
-He builds slow statements from load, seam, support, depth, air, light, and the delayed evidence of
-movement underground.
+**Personality and voice.** Grimmond is dour, patient, reliable and pessimistic without being hopeless.
+He prepares for the worst so other people do not have to, dislikes praise and shows care through
+precautions he rarely announces. Caution can become the only responsible mood in his mind. His
+statements are slow and plain, and his humour is very black.
 
-**In world clues.** Grimmond notices concentrated seams, overhead load, hollow sound, breathable
-space, support points, and what removal would destabilise. The clue may end with a grim practical
-joke, not an essay about extraction ethics.
+**In world clues.** Grimmond tells the player what worries him and what would make the situation
+safer. A grim aside may follow. The clue does not need mining vocabulary unless the visible fact is
+actually geological or structural.
 
 ### Oda — settled with a newly concrete background anchor
 
@@ -373,13 +431,14 @@ safe operating conditions. Later users treated the presence of a handle as proof
 harmless and used it beyond those conditions. She still makes channels and housings, but refuses to
 hide the path, failure point, or consequence.
 
-**Personality and voice.** Intensely technical, socially literal, direct, and accidentally funny.
-She speaks in specification-like clauses about inlet, carrier, housing, discharge, boundary, stop,
-and failure.
+**Personality and voice.** Oda is earnest, intensely focused, literal and socially awkward rather
+than cold. She answers the exact question asked, requests clarification instead of pretending and
+shows care by preventing avoidable harm. She may miss an implied feeling. Her humour is usually
+accidental, and unfamiliar social situations produce more questions—not a flood of jargon.
 
-**In world clues.** Oda notices forces moving through visible carriers, where they gather, where they
-escape, and what contains them. Her clue should read like a clear field specification, not ask the
-player to infer an ethical principle from a conduit.
+**In world clues.** Oda states the observed condition, asks for clarification when the evidence is
+ambiguous and gives a direct warning when it is not. Technical language appears only if ordinary
+words would be dangerously imprecise, and is explained by the sentence around it.
 
 ### Auber — settled
 
@@ -387,12 +446,14 @@ player to infer an ethical principle from a conduit.
 concentrated waste and lost context were treated as somebody else's problem. He still separates
 mixtures, but every finished account names its carrier, catalyst, useful fraction, and remainder.
 
-**Personality and voice.** Meticulous, hospitable, sensuous, and sly. He uses balanced sentences rich
-in material detail: vapour, sediment, temperature, taste, aroma, clarity, and residue.
+**Personality and voice.** Auber is polished, hospitable, patient and fond of pleasure and ritual. He
+likes making an occasion of shared food and conversation, puts people at ease and sometimes uses
+charm to avoid an unpleasantly direct answer. His humour is sly and refined. Under real pressure,
+the elegance falls away and reveals blunt concern.
 
-**In world clues.** Auber notices separation, dissolved material, condensation, mineral traces,
-temperature gradients, and what a process leaves behind. Sensory detail should clarify the world,
-not decorate an abstract lesson about purity.
+**In world clues.** Auber can make a useful observation vivid through an ordinary sensory detail,
+then lets it stand. He does not decorate a clue until its meaning disappears, and he does not turn
+every landscape into a tasting note or lesson about refinement.
 
 ### Ashe — settled
 
@@ -400,12 +461,14 @@ not decorate an abstract lesson about purity.
 endurance while ignoring warnings until Ashe personally absorbed the danger. They still choose to
 help, but insist that capacity, permission, pain, and limits remain separate facts.
 
-**Personality and voice.** Candid, emotionally perceptive, warm, and sharp about euphemism. They
-describe power through bodily sensation—breath, pressure, pain, heat, fatigue, and direction.
+**Personality and voice.** Ashe is warm, candid, emotionally perceptive and sharp about euphemism.
+They make people feel seen, state boundaries cleanly and often recognise another person's discomfort
+before naming their own. Their humour breaks tension without dismissing it. Anger is clearest when
+suffering is being prettified or ignored.
 
-**In world clues.** Ashe notices embodied warning signs around active emanation and the direction a
-release is already travelling. Their clue can describe how a condition feels, but should not become
-a speech about how other people treated them.
+**In world clues.** Ashe may describe how a condition feels when that sensation is genuinely useful
+to the player. Their warmth and refusal to minimise danger carry the voice. The clue must not become
+a speech about their history or force every observation through bodily imagery.
 
 ### Tovin — settled
 
@@ -414,13 +477,14 @@ self-sustaining while stripping enough Essence from it to fund the next binding;
 world was lost unused because he distrusted his own motive. He can explain the danger clearly and is
 still tempted to repeat it.
 
-**Personality and voice.** Capable, candid, earnest, and self-effacing. His sentences often begin as
-questions and become firmer as he reaches a decision. He speaks about margins, pressure,
-connections, clocks, binding, return, and revision.
+**Personality and voice.** Tovin is earnest, thoughtful, anxious and increasingly self-aware. He
+wants connection, overexplains when afraid and can recognise a harmful pattern while still feeling
+its pull. He accepts correction without turning it into self-punishment. His humour is gently
+self-deprecating; tentative openings become firmer as he chooses what he actually means.
 
-**In world clues.** Tovin notices time, enclosure, return paths, natural anchors, page tension, and
-conditions that affect whether a world can be revisited. His history belongs in personal pages; a
-clue should first tell the player what this world is doing.
+**In world clues.** Tovin tells the player what the world is doing before he reflects on what it may
+mean. A moment of hesitation can sound like him, but the information stays clear. His personal
+history and binding vocabulary do not belong in every clue.
 
 ### Perren — settled, with proper-name lore deliberately open
 
@@ -430,13 +494,14 @@ discovery. He later stopped discarding the questions the doctrine claimed were a
 The group's final name, origin, and exact place in the Sundering remain open for the broader story
 pass.
 
-**Personality and voice.** Charismatic, polished, sardonic, adversarial toward false certainty, and
-deliberately the most rhetorical member of the ordinary cast. He speaks about frames, doctrine,
-selection, contradiction, and omitted alternatives.
+**Personality and voice.** Perren is charismatic, theatrical, witty and suspicious of certainty. He
+enjoys verbal sparring, tests assumptions and can turn an ordinary exchange into a debate to avoid
+being known too easily. His humour is sardonic and his reversals are polished, but he must answer the
+human question before challenging its premise. Not every line is an argument.
 
-**In world clues.** Perren may point out simultaneous pressures, repeated intervals, narrow framing,
-or evidence selected to stand for a whole. The first sentence must still name the observable fact.
-His argument may sharpen it afterward, never conceal it.
+**In world clues.** Perren states the observable fact first. He may then question an easy conclusion
+or point out a second possibility, but the player never has to untangle rhetoric to discover what he
+saw. His intelligence should sharpen information, not withhold it.
 
 ### Nine — settled, with the missing past deliberately preserved
 
@@ -445,33 +510,37 @@ replace with a “real” person. Their present life is built through verifiable
 agreements, repeated practices, placed objects, and promises that can be reconsidered when
 circumstances change. That chosen continuity is their background and their ongoing work.
 
-**Personality and voice.** Observant, practical, intimate, gently funny, and genuinely elliptical.
-Nine alone may sustain the cast's strangest register, using recurrence, recognition, absence, and
-choice. Even so, a direct player question still deserves a relevant answer.
+**Personality and voice.** Nine is gentle, curious, practical, intimate and quietly funny. They build
+trust through present choices, openly admit uncertainty and can enjoy a simple preference without
+making every moment about missing memory. Their associations may become unusual in reflective
+moments, but a direct question still receives a clear answer. Strangeness is never an excuse for
+withholding useful information.
 
-**In world clues.** Nine notices reliable reference points, large irregular changes, repeating
-material, persistent markers, and new growth beside damage. The world fact comes first. Elliptical
-reflection may follow, but the clue cannot require the player to reconstruct Nine's memory.
+**In world clues.** Nine states the world fact first in language the player can repeat. A brief
+elliptical reflection may follow when it adds feeling without changing the meaning. The clue never
+requires the player to reconstruct Nine's memory or decode a private symbol system.
 
 ## Voice differentiation checks
 
-The later rewrite must preserve these contrasts:
+The later rewrite must preserve human contrasts, even when two characters discuss exactly the same
+fact:
 
-- Vance prices and traces circulation; Noll separates usable parts; Auber separates phases and names
-  the remainder.
-- Bryn intervenes for one exposed person; Rook manages the space before contact; Ashe describes what
-  dangerous force does to a living body.
-- Kestrel infers from tracks before a creature notices her; Sabine watches what changes after an
-  animal learns her routine.
-- Dagg commits and recovers; Wren keeps options open in a changing moment; Marrick builds a routine a
-  whole group can still use.
-- Halloway makes foundational objects; Bracken protects bodies; Maud fits weapons to users; Oda
-  contains dangerous forces.
-- Lys preserves records and contradictions; Perren challenges the frame that arranges them; Nine
-  creates present continuity without recovering a lost original.
+- Vance draws the player into easy conversation; Noll is comfortable leaving silence alone; Auber
+  makes conversation feel like an occasion.
+- Bryn cares by acting; Rook cares by being fair and restrained; Ashe cares by naming discomfort
+  that everyone else is avoiding.
+- Kestrel grows quiet while deciding; Sabine shares excitement immediately; Mara thinks aloud and
+  happily revises herself.
+- Dagg meets tension with open courage; Wren meets it with charm and movement; Marrick meets it by
+  making sure everyone understands the plan.
+- Halloway reassures without fuss; Bracken grumbles while helping; Maud challenges people because
+  she respects them.
+- Lys follows connections with generous enthusiasm; Perren tests certainty to keep people from
+  settling too easily; Nine is comfortable admitting that an answer is not available yet.
 
 No line should be accepted merely because it is elegant. If the same sentence could be moved to
-another traveller by changing one profession noun, it has not passed the voice check.
+another traveller by changing one profession noun, it has failed. If the line remains distinctive
+after every profession noun is removed, it may actually belong to a person.
 
 ## Background boundaries for future story work
 
@@ -488,6 +557,6 @@ Three deliberate boundaries remain:
 - No background detail may silently create a new faction, region, species, building, reward, or
   gameplay system.
 
-There is no unresolved choice that prevents the world-clue pass. The next step is to review each
-clue against this guide and keep personal history on the pages designed to hold it.
-
+There is no unresolved choice that prevents the world-clue pass. The next step is to let Aimee
+review these human character foundations, then review every clue against the accepted guide while
+keeping personal history on the pages designed to hold it.

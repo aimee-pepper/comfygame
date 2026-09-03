@@ -40,7 +40,7 @@ export const designReferences: DesignReference[] = [
   {
     slug: 'character-background-and-voice',
     title: 'Character Background and Voice Guide',
-    summary: 'The settled background, personality, speaking style, and world-clue boundaries for all twenty-nine travellers.',
+    summary: 'The human background, personality, social habits, humour, speaking style, and world-clue boundaries for all twenty-nine travellers.',
     source: characterBackgroundVoice,
     systemLinks: characterLinks,
   },

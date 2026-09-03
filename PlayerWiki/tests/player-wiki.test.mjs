@@ -8,7 +8,7 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const read = (relative) => readFile(path.join(root, relative), 'utf8');
 
 test('Aimee Reference publishes the audited World Splash inventory, three system plans, and the full-cast background and voice guide', async () => {
-  const [home, references, splashAssets, preparation, route, source, characterGuide] = await Promise.all([
+  const [home, references, splashAssets, preparation, route, source, characterGuide, voiceAuthority] = await Promise.all([
     read('app/page.tsx'),
     read('app/references/page.tsx'),
     read('app/references/world-splash-assets/page.tsx'),
@@ -16,6 +16,7 @@ test('Aimee Reference publishes the audited World Splash inventory, three system
     read('app/references/[slug]/page.tsx'),
     read('lib/design-references.ts'),
     read('../docs/full-cast-background-and-voice-guide-current.md'),
+    read('../docs/full-cast-voice-authority-current.md'),
   ]);
   assert.match(home, /Aimee Reference/);
   assert.match(home, /World Splash Asset Inventory/);
@@ -64,6 +65,20 @@ test('Aimee Reference publishes the audited World Splash inventory, three system
   assert.match(characterGuide, /75% warm, clear English/);
   assert.match(characterGuide, /world fact comes first/i);
   assert.match(characterGuide, /Personal memories, relationship stories/);
+  assert.match(characterGuide, /A character's job determines what they know\. Their personality determines how they speak\./);
+  assert.match(characterGuide, /Remove every profession-related noun/);
+  assert.match(characterGuide, /Every character must be able to greet someone, joke, disagree/);
+  assert.doesNotMatch(characterGuide, /practical questions about joins, breakage, separation/);
+  assert.doesNotMatch(characterGuide, /speaks about heat,\s*weight, fit, cooling, failure/);
+  assert.doesNotMatch(characterGuide, /sentences move quickly through bearings, samples, comparisons/);
+  const personalityProfiles = characterGuide.match(/\*\*Personality and voice\.\*\*/g) ?? [];
+  const clueProfiles = characterGuide.match(/\*\*In world clues\.\*\*/g) ?? [];
+  assert.equal(personalityProfiles.length, 29);
+  assert.equal(clueProfiles.length, 29);
+  assert.match(voiceAuthority, /A profession supplies knowledge, not a personality/);
+  assert.match(voiceAuthority, /existing clue and dialogue corpus still requires a separate rewrite/);
+  for (const name of ['Vance', 'Noll', 'Halloway', 'Mara', 'Edren', 'Isolde', 'Sela', 'Bryn', 'Orsa', 'Talin', 'Nessa', 'Corrin', 'Dagg', 'Rook', 'Lys', 'Bracken', 'Fen', 'Wren', 'Kestrel', 'Maud', 'Marrick', 'Sabine', 'Grimmond', 'Oda', 'Auber', 'Ashe', 'Tovin', 'Perren', 'Nine'])
+    assert.match(voiceAuthority, new RegExp(`\\| \\d+ \\| ${name} \\|`));
   assert.match(source, /systemLinks/);
   assert.doesNotMatch(preparation, /resource-crafting-world-ecology-cohesive-plan-v1\.md/);
   await access(path.resolve(root, '../AssetLab/world-splash-five-layer-inventory-v1.html'));

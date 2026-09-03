@@ -1,207 +1,165 @@
-# Full-cast voice authority — current
+# Full-cast human voice authority — current
 
-**Status:** full-cast meeting and diary voice production is source-complete; all coherent copy is
-production-authorized and remains subordinate to playability implementation
-**Date:** 14 August 2026
-**Roadmap position:** Band 6.8; this authority must not pre-empt opening playability work
+**Status:** personality and conversational voice are settled for all twenty-nine travellers; the
+existing clue and dialogue corpus still requires a separate rewrite against this authority
+**Date:** 3 September 2026
+**Roadmap position:** voice foundation before further clue rewriting
 
-## Purpose
+## Why this authority changed
 
-Bookbinder's characters must not sound like one writer distributing aphorisms among different job
-titles. Their work can shape what they notice without forcing everybody into the same lofty,
-withholding, riddle-like register. A line should first sound like a person talking to another
-person, and only then carry worldbuilding or theme.
+The earlier matrix made a serious mistake: it often described a person's voice as a list of words
+from their job. That is not a personality. A smith does not naturally discuss heat and fit in every
+conversation, just as a doctor does not speak in medical terms whenever they greet a friend.
 
-`Loftiness` below is a ceiling and frequency guide, not a quota. Ten percent means an occasional
-image or reflective turn; ninety percent means highly figurative speech that still answers direct
-questions. **Nine alone owns 100%**: their unusual relation to memory makes a consistently
-elliptical voice character truth rather than the game's default tone.
+This version supersedes that profession-led model. A traveller's work determines what they know.
+Their personality determines how they relate to the player, what makes them laugh, what they avoid,
+how they disagree, how they show care, and what happens to their speech when they are worried or
+excited.
 
-Location clues have a stricter invariant than any character voice: the first sentence states an
-observable world condition plainly enough to paraphrase after one reading. Character reflection
-may follow it, never conceal it.
+No location clue has been rewritten as part of this correction. The existing clue corpus remains
+source material, not approved final voice copy.
 
-## Cast matrix
+## The governing rule
 
-| Order | Character | Motive and social manner | Diction and rhythm | Humour / warmth / directness | Loftiness |
-|---:|---|---|---|---|---:|
-| 1 | Vance | Make exchange dependable; cordial, attentive, never oily | Prices, condition, provenance; brisk complete sentences | Dry bargaining humour / high / high | 10% |
-| 2 | Noll | Rescue usefulness from waste; blunt, patient with objects, less so with vanity | Concrete verbs, joins, breakage; short clauses and practical questions | Deadpan / medium / very high | 10% |
-| 3 | Halloway | Make tools people can trust; steady and quietly protective | Weight, heat, fit, failure; measured sentences with decisive endings | Gentle understatement / high / high | 15% |
-| 4 | Mara | Turn uncertainty into observations; curious and collaborative | Bearings, samples, comparisons; quick clauses that revise themselves | Curious wit / high / high | 20% |
-| 5 | Edren | Preserve context before extracting conclusions; courteous but exacting | Layers, dates, placement, evidence; careful qualifying sentences | Scholarly dryness / medium-high / medium-high | 35% |
-| 6 | Isolde | Treat writing as embodied craft; exact, impatient with pretence, generous with effort | Hands, pressure, spacing, tools; sensory demonstrations before abstractions | Cutting playfulness / medium / high | 45% |
-| 7 | Sela | Keep people supplied and routes open; informal, observant, anti-ceremonial | Weather, distance, food, shortcuts; loose conversational rhythm | Frequent wry humour / very high / high | 15% |
-| 8 | Bryn | Put themself between danger and others; reserved until responsibility is clear | Sightlines, footing, watch, cover; compact conditional statements | Sparse gallows humour / medium / high | 25% |
-| 9 | Orsa | Make Home hospitable without making it compulsory; welcoming and perceptive | Rooms, meals, arrivals, habits; inclusive sentences and remembered details | Warm teasing / very high / medium-high | 20% |
-| 10 | Talin | Refine timing and precision; competitive without cruelty | Edge, angle, opening, recovery; clipped sequences and corrections | Competitive banter / medium / very high | 15% |
-| 11 | Nessa | Prevent avoidable harm; calm, unsentimental, consent-minded | Dose, symptom, interaction, uncertainty; diagnostic question then answer | Morbidly dry / high / very high | 20% |
-| 12 | Corrin | Use living materials responsibly and completely; tactile, quietly opinionated | Grain, stretch, scar, wear; grounded sensory comparisons | Earthy understatement / medium-high / high | 25% |
-| 13 | Dagg | Make force honest and controlled; exuberant, accountable, physically expressive | Impact, stance, follow-through; forceful short lines punctuated by checks | Big, self-aware humour / high / very high | 10% |
-| 14 | Rook | Keep contested approaches readable; watchful, formal only under threat | Range, line, warning, commitment; spare declarative cadence | Very dry / medium-low / high | 30% |
-| 15 | Lys | Make knowledge findable and revisable; patient, precise, delighted by connections | Citation, category, contradiction, margin; nested but lucid sentences | Bookish wordplay / high / medium-high | 40% |
-| 16 | Bracken | Protect bodies without pretending armour is invulnerability; pragmatic and reassuring | Coverage, load, flex, repair; sturdy parallel clauses | Gruff affection / high / high | 15% |
-| 17 | Fen | Make ranged tools fit their user and terrain; laconic, attentive, independent | Tension, arc, balance, wind; few words with exact physical nouns | Quiet mischief / medium / high | 20% |
-| 18 | Wren | Keep choices alive in crowded fights; quick, socially agile, hates being cornered | Tempo, gaps, exits, attention; fast fragments that resolve into a plan | Nimble teasing / medium-high / high | 20% |
-| 19 | Kestrel | Understand creatures without romanticising them; patient in the field, firm about evidence | Tracks, feeding, range, season; observational sequences before conclusions | Fond, unsentimental humour / high / medium-high | 30% |
-| 20 | Maud | Test weapons against real use; skeptical, candid, enjoys good objections | Grip, reach, failure, repair; challenge-and-response rhythm | Acerbic but fair / medium / very high | 15% |
-| 21 | Marrick | Make groups safer without erasing individuals; disciplined and consultative | Formation, signal, fatigue, rotation; structured lists softened by questions | Rare barracks wit / medium-high / high | 30% |
-| 22 | Sabine | Build voluntary trust across species; affectionate, animated, fiercely anti-coercion | Appetite, posture, routine, choice; vivid anecdotes and plain corrections | Playful animal stories / very high / high | 20% |
-| 23 | Grimmond | Extract without lying about cost; dour, methodical, protective of workers | Load, seam, support, depth; slow cumulative statements | Black humour / medium / high | 45% |
-| 24 | Oda | Contain dangerous forces without obscuring their path; intensely technical, socially literal | Housing, discharge, carrier, boundary; specification-like clauses and exact follow-ups | Accidental literal humour / low-medium / very high | 35% |
-| 25 | Auber | Separate mixtures while respecting what is lost; meticulous, hospitable, sensuous | Vapour, sediment, temperature, taste; balanced clauses with material detail | Refined, sly humour / medium-high / medium-high | 55% |
-| 26 | Ashe | Centre the body in discussions of power; candid, emotionally perceptive, intolerant of euphemism | Breath, pain, endurance, direction; embodied first-person statements | Warm but sharp / high / very high | 50% |
-| 27 | Tovin | Understand binding without repeating its harms; tentative, earnest, increasingly resolute | Margins, pressure, connection, revision; starts with questions and ends more firmly | Self-effacing / high / medium | 60% |
-| 28 | Perren | Dismantle inherited interpretations; charismatic, adversarial toward false certainty | Frame, doctrine, contradiction, selection; polished argument and pointed reversals | Sardonic / low-medium / medium | 90% |
-| 29 | Nine | Preserve chosen continuities across broken memory; intimate but genuinely elliptical | Recurrence, recognition, absence, choice; image-led fragments and recursive echoes | Strange gentle wit / high / low | **100%** |
+**A profession supplies knowledge, not a personality.**
 
-## Rewrite rules
+A character may use a specialist term when the subject genuinely requires it. They do not use their
+trade as a metaphor generator for ordinary life, and they do not fill unrelated conversations with
+occupational nouns merely to signal who is speaking.
 
-1. Rewrite in campaign-order batches so opening characters become testable first: Vance–Sela,
-   Bryn–Lys, Bracken–Marrick, then Sabine–Nine.
-2. Meetings must answer the player's selected prompt. Optional replies are branches, not reordered
-   paragraphs from a predetermined monologue.
-3. Every character gets ordinary social language: greetings, requests, uncertainty, disagreement,
-   gratitude and humour where appropriate. World lore cannot consume every line.
-4. Job vocabulary may recur within one character, but no signature metaphor may become a global
-   house style. Ban repeated corpus-wide constructions such as “X is not Y,” “that does not mean,”
-   and aphoristic final reversals unless the speaker's profile licenses them.
-5. Diary prose may be more composed than live dialogue, but it preserves the same nouns, rhythm,
-   temperament and degree of directness.
-6. Do not alter stable IDs, page mechanics, clue indices, teachings, meeting conditions or rewards
-   during a voice-only promotion.
+A voice passes only if it remains recognisable after every profession-related noun is removed.
+Character recognition should come from:
 
-## Opening meeting batch disposition — Vance through Sela
+- social energy and comfort with closeness;
+- emotional openness and the feelings they tend to hide;
+- humour, playfulness and what they find funny;
+- conversational rhythm, including whether they interrupt, pause, ramble or answer briefly;
+- how they respond to uncertainty, disagreement, praise, failure and requests for help;
+- the ordinary ways they show care, irritation, interest and trust; and
+- the specific human contradiction they carry, rather than a repeated philosophical thesis.
 
-The first seven live meetings now pass the role-specific dialogue review:
+Every traveller must be able to greet someone, make small talk, disagree, ask for help, admit they
+do not know, comfort another person and enjoy an ordinary moment without turning the exchange into a
+lecture about their job.
 
-| Character | Disposition |
-|---|---|
-| Vance | Rewritten: direct price/buyer/stock language and dry bargaining humour; no aphoristic worth lecture |
-| Noll | Rewritten: break/repair/reusable-part diagnosis and blunt questions; no abstract salvage manifesto |
-| Halloway | Retained: concrete fire, stone, iron and work needs already match her measured warmth |
-| Mara | Retained: quick observations, self-correction and stick/sighting humour are distinct and readable |
-| Edren | Retained: careful material evidence plus moderate reflection fits his 35% ceiling |
-| Isolde | Retained revised replies; corrected the player's stale Pencil-material invitation to promise a Brush and Scriptorium |
-| Sela | Rewritten route answers: ridge, water, footing, food, slope, wind, tracks and plants replace abstract “going on” riddles |
+## Human personality matrix
 
-This disposition covers meetings, not every diary page. Diary/hint voice remains a separate
-campaign-order pass. Stable exchange IDs and recruitment facts are unchanged.
+| Order | Character | Human personality | Social and emotional habits | Humour, pressure and conversational rhythm |
+|---:|---|---|---|---|
+| 1 | Vance | Outgoing, attentive and practically optimistic | Remembers small preferences, asks follow-up questions and makes strangers feel included; when emotion becomes uncomfortable, he is tempted to turn it into a problem he can solve | Gentle dry humour; easy complete sentences; becomes brisk rather than cold under pressure |
+| 2 | Noll | Quiet, blunt, unshowy and deeply dependable | Listens without filling silence and shows care by doing useful things; distrusts praise and grand claims, especially when either seems performative | Deadpan; short replies that are never deliberately cryptic; irritation makes them more literal, not more technical |
+| 3 | Halloway | Calm, patient, nurturing without fuss and slow to judge | Makes room for other people, notices who has been left carrying too much and prefers private kindness to public gratitude | Gentle understatement; speaks steadily and plainly; anger arrives rarely but with unmistakable firmness |
+| 4 | Mara | Curious, excitable, collaborative and resilient | Thinks aloud, invites people into the question and is genuinely pleased when good evidence changes her mind; enthusiasm can make her interrupt | Quick friendly humour; lively sentences with self-corrections; fear makes her talk faster before she makes herself pause |
+| 5 | Edren | Thoughtful, courteous, softly amused and conscientious | Gives people time to finish, dislikes speaking over anyone and can become so careful that he misses the emotional point in front of him | Warm, restrained wit; considered answers with natural pauses; apologises plainly when caution becomes distance |
+| 6 | Isolde | Confident, intense, demanding and fiercely encouraging | Has little patience for posturing but tremendous patience for sincere effort; can speak too sharply, then correct herself without making the apology theatrical | Razor-playful humour; clear, energetic speech; excitement and annoyance are both easy to hear |
+| 7 | Sela | Relaxed, restless, warm and resistant to ceremony | Makes easy company, appreciates small comforts and is good at helping people feel less self-conscious; jokes or changes the subject when she fears being pinned down | Frequent wry humour; loose conversational rhythm; becomes briefly, strikingly direct when something truly matters |
+| 8 | Bryn | Reserved, protective, steady and emotionally private | Watches before speaking and shows care through reliable action; can forget to ask what help is wanted because acting feels safer than discussing it | Sparse dark humour; compact direct sentences; softens noticeably in private conversation |
+| 9 | Orsa | Warm, perceptive, inclusive and comfortably affectionate | Remembers details, welcomes silence as readily as chatter and notices who is being left out; sometimes oversteps because she notices more than people meant to share | Gentle teasing; inviting questions and easy pauses; apologises directly rather than defending a good intention |
+| 10 | Talin | Energetic, competitive, proud and decisive | Enjoys friendly challenges, respects quick honesty and hates being patronised; impatience can make her answer before another person is finished | Brisk banter; clipped but ordinary sentences; tension makes her more focused, not grander |
+| 11 | Nessa | Calm, skeptical, compassionate and unsentimental | Asks the direct question other people avoid, respects a clear boundary and takes pain seriously without making a performance of sympathy | Dry and occasionally morbid humour; straightforward answers; impatience is aimed at drama, never at suffering |
+| 12 | Corrin | Grounded, patient, stubborn and quietly affectionate | Trusts consistency more than charm, forms opinions slowly and then holds them hard; care appears as practical attention and remembered needs | Earthy dry humour; plain, final-sounding statements; can seem judgemental when she has merely forgotten to show her reasoning |
+| 13 | Dagg | Big-hearted, exuberant, accountable and physically expressive | Enjoys clear challenges, celebrates other people's courage loudly and admits his own mistakes without shrinking from them; can make waiting into a performance | Loud laughter and self-mockery; forceful short lines; under pressure he gets simpler and more sincere |
+| 14 | Rook | Watchful, private, principled and careful with trust | Observes a group before joining it, values fairness and dislikes casual intrusion; formality often covers uncertainty rather than superiority | Very dry humour; few carefully chosen ordinary words; becomes rigid when afraid of making an unfair choice |
+| 15 | Lys | Enthusiastic, patient, intellectually playful and generous | Loves sharing discoveries, follows interesting connections and sometimes gives more context than anyone requested; notices and corrects that habit when prompted | Bookish jokes that still make sense; flowing but lucid speech; excitement causes digressions, not riddles |
+| 16 | Bracken | Gruff, practical, steady and quietly tender | Complains while helping, distrusts bravado and keeps an unobtrusive eye on people's comfort; can become paternal when worried | Dry, affectionate grumbling; sturdy plain sentences; concern makes him bossier, then sheepish about it |
+| 17 | Fen | Laconic, independent, calm and quietly mischievous | Is comfortable with shared silence, dislikes being fussed over and notices more than they announce; a look or a small act often carries the joke | Understated mischief; brief relevant answers; never withholds necessary information merely to seem mysterious |
+| 18 | Wren | Charming, quick, socially adaptable and restless | Reads a room rapidly and can make tense company feel lighter; uses charm to avoid accountability when he feels cornered | Fast teasing and playful deflection; lively fragments in excitement; sincerity becomes slower and less polished |
+| 19 | Kestrel | Patient, observant, calm and fond without sentimentality | Prefers to watch and listen before deciding, treats correction as useful and becomes chilly when somebody protects a good story from inconvenient facts | Understated humour; measured ordinary speech; firmness increases when evidence is dismissed |
+| 20 | Maud | Candid, sharp, fair and delighted by a worthy objection | Enjoys arguing when both people are allowed to change their minds, values competence over status and has no patience for flattery | Acerbic humour without cruelty; quick challenge and honest response; affection often arrives disguised as useful criticism |
+| 21 | Marrick | Organised, calm, consultative and responsible | Asks before assuming, makes space for quieter voices and feels safer when everyone understands what comes next; can over-structure ordinary life | Dry group humour; orderly but conversational speech; anxiety turns a chat into a briefing until someone calls him on it |
+| 22 | Sabine | Animated, affectionate, expressive and fiercely protective of choice | Tells lively stories, admits correction readily and can overwhelm quieter people with enthusiasm; becomes immediately serious when anyone is coerced | Playful humour and vivid reactions; energetic sentences; makes room when reminded rather than taking offence |
+| 23 | Grimmond | Dour, patient, reliable and pessimistic without being hopeless | Prepares for the worst so others do not have to, dislikes praise and shows care through unasked-for precautions; can treat caution as the only responsible mood | Black humour; slow plain statements; fear makes him quieter and more protective, not more poetic |
+| 24 | Oda | Earnest, intensely focused, literal and socially awkward rather than cold | Answers the exact question asked, requests clarification instead of pretending and shows care by preventing avoidable harm; may miss implied feelings | Accidental humour; precise ordinary grammar; unfamiliar social situations produce more questions, not a flood of jargon |
+| 25 | Auber | Polished, hospitable, patient and fond of pleasure and ritual | Likes making an occasion of shared food and conversation, puts people at ease and can use charm to avoid an unpleasantly direct answer | Sly refined humour; balanced but natural sentences; pressure strips away the elegance and reveals blunt concern |
+| 26 | Ashe | Warm, candid, emotionally perceptive and sharp about euphemism | Makes people feel seen, states boundaries cleanly and often recognises another person's discomfort before naming their own | Tension-breaking humour; direct conversational speech; anger is clearest when suffering is being prettified or ignored |
+| 27 | Tovin | Earnest, thoughtful, anxious and increasingly self-aware | Wants connection, overexplains when afraid and is capable of recognising a harmful pattern while still feeling its pull; accepts correction without collapsing into self-punishment | Gentle self-deprecating humour; tentative openings that gain confidence; stress makes him ramble until he chooses a plain sentence |
+| 28 | Perren | Charismatic, theatrical, witty and suspicious of certainty | Enjoys verbal sparring, tests assumptions and can turn an ordinary exchange into a debate to avoid being known too easily | Sardonic humour; polished reversals in moderation; must answer the human question before challenging its premise |
+| 29 | Nine | Gentle, curious, practical, intimate and quietly funny | Builds trust through present choices, openly admits uncertainty and can enjoy simple preferences without making every moment about missing memory | Unusual associations in reflective moments; direct questions still receive clear answers; strangeness is never an excuse for withholding useful information |
 
-## Early-to-mid meeting batch disposition — Bryn through Lys
+## Expertise and speech
 
-The next eight meetings are production-authorized and no longer wait for separate Atlas approval.
-The Atlas records them as `Playable / unreviewed` so Aimee can review them naturally during play.
+Expertise may enter a line only when all three conditions are true:
 
-| Character | Voice correction |
-|---|---|
-| Bryn | Reserved, protective field language; dry physical humour replaces moral aphorisms |
-| Orsa | Warm host language, practical comfort checks and teasing about furniture |
-| Talin | Clipped timing, reach and recovery observations; no abstract certainty lecture |
-| Nessa | Plain dose, route and outcome language with medically dry scepticism |
-| Corrin | Tactile hide, grain, stretch and wear language; ethical view stated directly |
-| Dagg | Forceful stance, impact and recovery language with blunt self-accountability |
-| Rook | Spare range, marker and warning language; choices named without riddling |
-| Lys | Lucid record, source and disagreement language; complexity without obscurity |
+1. the current subject actually concerns that field;
+2. the term makes the information more accurate than ordinary language would; and
+3. the player either already knows the term or can understand it from the sentence.
 
-Stable exchange IDs, recruitment facts, mechanics and rewards remain unchanged. This disposition
-covers meetings only; their diary pages and location clues remain a separate campaign-order pass.
+When those conditions are not met, the character uses ordinary language. Halloway can ask whether
+someone slept. Nessa can say that she is worried. Mara can enjoy a joke without measuring it. Oda
+can be awkward at dinner without describing the table as a system. Nine can say that they like
+something.
 
-## Mid-campaign meeting batch disposition — Bracken through Marrick
+Occupational metaphors are occasional tools, never default voices. No one repeatedly treats people
+as objects from their profession. The cast should not sound like twenty-nine lecturers using
+different glossaries.
 
-The next six meetings are production-authorized with `Playable / unreviewed` Atlas state:
+## World-clue voice rule
 
-| Character | Voice correction |
-|---|---|
-| Bracken | Gruff, reassuring armour diagnosis stated through force, padding and fit |
-| Fen | Laconic bowyer language about string stretch, wind and physical trajectory |
-| Wren | Fast tactical fragments and mobile humour replace abstract tempo claims |
-| Kestrel | Patient field observations clearly separate evidence from a good story |
-| Maud | Candid weapon-fit challenges use grip, balance, reach and intended use |
-| Marrick | Structured formation review keeps what worked and directly repairs exclusions |
+World clues are not personal flavour slots. A clue exists to help the player interpret an actual
+world cue.
 
-Stable exchange IDs, recruitment facts, mechanics and rewards remain unchanged. Sabine and Grimmond
-remain in the following campaign-order batch even though they share the specialists source file.
+Each future clue rewrite must:
 
-## Final meeting batch disposition — Sabine through Nine
+1. state the observable fact in plain language;
+2. explain what that fact may mean for the player's next decision when useful;
+3. preserve uncertainty and discovery boundaries; and
+4. add no more character flavour than the fact can naturally carry.
 
-The final seven authored-review meetings are production-authorized with `Playable / unreviewed`
-Atlas state. Tovin's already-live meeting remains a separate retained object.
+The target is at least 75% plain, warm, immediately understandable English and no more than 25%
+stylisation. Personality appears through attitude: Mara may be delighted, Bryn reassuring, Noll
+deadpan, Wren lightly teasing. It does not appear as a forced word list from their job.
 
-| Character | Voice correction |
-|---|---|
-| Sabine | Animated animal anecdotes, practical care and playful failed-negotiation humour replace consent treatises |
-| Grimmond | Dour load/support language and black humour replace abstract extraction ethics |
-| Oda | Specification-like fault reports and literal follow-ups replace philosophical weapon language |
-| Auber | Taste, smell, temperature and sly hospitality replace general moral aphorisms |
-| Ashe | Plain embodied answers and warm, direct boundaries replace doctrine-like reversals |
-| Perren | Retains deliberately lofty adversarial argument, but answers the selected question first |
-| Nine | Retains the sole 100% elliptical register by settled character design |
+Personal memories, relationship stories, moral conclusions and autobiographical parallels stay in
+meetings, diaries and later story scenes unless one directly explains the visible cue. Even there,
+the world fact comes first.
 
-Stable exchange IDs, recruitment facts, mechanics and rewards remain unchanged. This closes meeting
-voice production; diary voice remains a separate later campaign-order pass.
+## Dialogue and diary rules
 
-## Opening diary batch disposition — Vance through Sela
+1. A reply answers the player's question before it expands, reflects or jokes.
+2. Characters use contractions, simple connective language and ordinary human reactions where
+   natural. Formality is a personal trait for a few people, not the game's house style.
+3. No line earns approval simply because it is elegant. Aphorisms, symmetrical reversals and
+   “X is not Y” constructions should be rare.
+4. A specialist term is explained by context and disappears when the topic changes.
+5. Diary prose may be more composed than live dialogue, but it must still sound like the same human
+   being rather than a themed lore entry.
+6. Humour arises from temperament and circumstance. It is not a compulsory quip and is not confined
+   to work jokes.
+7. Direct emotion is permitted. Characters may say “I was frightened,” “I was wrong,” “I missed
+   you,” or “I do not want that” without hiding the meaning inside imagery.
+8. Stable IDs, triggers, mechanical facts, rewards and discovery boundaries do not change during a
+   voice-only rewrite.
 
-The first seven travellers' reflective diary pages now use their settled registers while every
-location clue keeps its already-approved plain observable description:
+## Recognition checks
 
-| Character | Diary register |
-|---|---|
-| Vance | Appraisal, transport, scarcity and dry price humour |
-| Noll | Separation steps, sound parts and blunt repair judgements |
-| Halloway | Workable ground, heat, tool fit and steady practical instruction |
-| Mara | Measurement, fixed references and candid self-correction |
-| Edren | Evidence, dating, layers and qualified conclusions |
-| Isolde | Hand, pressure and tool demonstrations with cutting assessments |
-| Sela | Weather, water, routes and informal field advice |
+Before any dialogue, diary page or clue is promoted:
 
-This is a prose-only revision. Page IDs, owners, kinds, clue indices, teachings, targets, research
-leads, whereabouts references and condition preferences are unchanged. The previous prose remains
-recoverable in version history; location-clue clarity is not traded for personality.
+- remove the profession nouns and confirm the speaker is still identifiable by social behaviour,
+  humour, emotional habit and rhythm;
+- confirm a person from another profession could discuss the same world fact without becoming this
+  character;
+- confirm every direct question receives a direct answer;
+- confirm the line sounds speakable aloud, not like a catalogue, specification or thesis abstract;
+- confirm expertise appears because the subject needs it, not because the author needs a label;
+- confirm no personal anecdote displaces the useful world information in a clue; and
+- confirm the cast sample contains greetings, small talk, care, disagreement and uncertainty—not
+  only instruction and lore.
 
-## Early-to-mid diary batch disposition — Bryn through Lys
+## Production disposition
 
-Twenty-seven reflective pages now distinguish the next eight voices: Bryn gives compact formation
-instructions; Orsa offers warm practical hospitality; Talin uses clipped timing sequences; Nessa
-records dose/route/symptom; Corrin writes through fit and material wear; Dagg is forceful and
-self-aware; Rook states range and warning rules; Lys uses lucid catalogue humour. Their 29 location
-clues remain unchanged.
+The stable IDs, meeting conditions, diary ownership, clue ownership, teachings and rewards remain
+authoritative. The earlier profession-led voice approval does not. Existing prose may be useful
+source material, but it is not automatically approved merely because a prior packet called it
+production-ready.
 
-As with the opening batch, this is prose-only. Stable page identity and every mechanical field are
-unchanged, and the previous copy remains in version history.
+The next prose pass begins only after this personality authority is visible for review. It should
+review meetings and diary pages as well as clues, because occupational wordbanks may have shaped all
+three. No mechanic or runtime change is part of that pass.
 
-## Mid-campaign diary batch disposition — Bracken through Marrick
+## Deliberate background boundaries
 
-Nineteen reflective pages now distinguish six more voices: Bracken gives sturdy fitting advice;
-Fen is laconic and trajectory-minded; Wren writes fast tactical fragments; Kestrel separates field
-evidence from assumptions; Maud challenges grip, leverage and repeatability; Marrick records explicit
-formation procedures and revisions. Their 31 location clues remain unchanged.
-
-The batch changes prose only. Stable page identity and all teaching, relationship and condition
-metadata remain unchanged.
-
-## Final diary batch disposition — Sabine through Nine
-
-Twenty-four reflective pages now distinguish Tovin, Sabine, Grimmond, Oda, Auber, Ashe and Perren:
-Tovin is tentative and accountable; Sabine affectionate and animated; Grimmond dour and practical;
-Oda specification-like and literal; Auber sensuous and sly; Ashe embodied and direct; Perren
-deliberately rhetorical but responsive. Nine's existing reflective pages are retained as the sole
-100% elliptical register. All 65 final-batch location clues remain unchanged.
-
-This closes the full-cast diary voice pass. Stable page identity and every mechanical field remain
-unchanged; prior prose remains available in version history.
-
-## Promotion gate
-
-For each batch, retain old and candidate copy in the authored-text review history, then test:
-
-- five unlabeled meeting excerpts are attributable above chance by voice alone;
-- five unlabeled diary excerpts are attributable above chance by voice alone;
-- every player prompt receives a relevant response before optional elaboration;
-- every location clue's first sentence passes the plain-world-description paraphrase test;
-- corpus search shows no newly dominant rhetorical template; and
-- catalogue decode, stable-ID census and mechanic equality remain unchanged.
-
-Atlas review remains useful but is not a release gate: coherent copy enters the game and Aimee
-reviews it during play.
+- Perren's former group's name, origin and exact Sundering history remain open for the wider story
+  pass.
+- Nine does not receive a recovered “true biography” that overrides the person the player knows.
+- New ordinary-life details may deepen a character, but may not silently create a faction, region,
+  species, building, reward or gameplay system.
