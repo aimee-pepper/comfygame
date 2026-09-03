@@ -400,6 +400,9 @@ Trees become real world structures rather than an absent resource abstraction.
   clear line of sight.
 - Concealment is owned by the world rules and frozen receipt, not created accidentally by drawing leaves over
   information the rules consider visible. Look, movement, the minimap, discovery, and rendering must agree.
+- Once a concealed feature is revealed, it registers in the minimap according to that feature's normal map
+  rules. Canopy can cover the feature in the main world view again, but it cannot restore fog, remove the
+  revealed minimap state, or make the player rediscover it.
 - A dangerous placement can be concealed at a distance, but it must receive its proper warning before the
   player commits an avoidable contact action. Forest cover cannot create unexplained invisible damage.
 - A known portal or discovered site remains known. Canopy may obstruct the immediate view, but cannot erase its
@@ -445,6 +448,8 @@ World generation first chooses how ground is arranged, then chooses the physical
 
 The recommended initial regional-arrangement families are:
 
+- **Homogeneous** — one physical ground composition fills every ground socket in the world. Hydrology,
+  deposits, flora, sites, and occupied tiles remain separate layers and do not count as a second ground type;
 - **Dominant** — one main composition with a small number of subordinate inclusions;
 - **Banded** — long readable bands or layers;
 - **Patchwork** — several separated patches of comparable importance;
@@ -611,7 +616,7 @@ not a choice Engineering should improvise.
 
 1. **Physical vocabulary.** Approve or revise the starting registry, especially Skin versus Hide versus Pelt,
    and the proposed removal of generic Plate, Fin, Reagent, Toxin, Timber, Pulp-as-a-drop, and world Ichor.
-2. **Land vocabulary.** Approve or revise the six regional arrangements and the initial geology, surface,
+2. **Land vocabulary.** Approve or revise the seven regional arrangements and the initial geology, surface,
    liquid, and deposit catalogue.
 3. **Written guarantee.** Confirm the recommendation that a directly written ground or base resource guarantees
    at least one start-connected source, while tool access, amount, distance, and danger remain generated.

@@ -101,7 +101,7 @@ Body-plan, habitat, material-yield, naming, Bestiary, encounter disclosure, map 
 ### Intended structure
 
 - Separate regional arrangement from material composition.
-- Add authored layout styles such as Uniform, Striated, Scattered, Clustered, Graded, and Fractured after Aimee approves final terms.
+- Add the accepted layout styles Homogeneous, Dominant, Banded, Patchwork, Clustered, Gradient, and Fractured. Homogeneous means every ground socket uses one physical ground composition; Dominant still permits smaller subordinate inclusions.
 - Fill layout regions with granular ground and liquid types: multiple dirt, sand, stone, mineral, and liquid identities.
 - Let each physical region host matching harvest nodes and ecological opportunities.
 - Add written world-size control from slightly below the current map to approximately four times its current area.
@@ -144,6 +144,7 @@ Map receipts need versioned layout style, world dimensions, region identities, p
 - Trees occupy real canopy and trunk structures.
 - Canopy view changes when the player moves beneath it, revealing the trunk and ground below.
 - Dense canopy intentionally limits distant visibility for ground, resources, creatures, sites, and undiscovered passages. Look, movement, map knowledge, and rendering use the same saved visibility state.
+- Once a concealed feature is revealed, its appropriate minimap state remains revealed even if canopy later covers it in the main world view again.
 - Immediate dangerous contact remains truthfully warned before commitment, while known portals and discovered sites retain their saved identity even when foliage obstructs the local view.
 - Tree harvesting requires an appropriate Axe tier; small plants use a Scythe tier; difficult or dangerous plants require better tools.
 

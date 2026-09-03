@@ -36,7 +36,7 @@ const layerPlan = [
 
 const coverageAudit = [
   ['Five-layer parallax structure', 'Sound foundation', 'Four independently moving depth planes plus one static Sky can support a modular final renderer. The exact canvas, overscan, movement, and crop still need to be authored for that renderer.'],
-  ['Landscape arrangements', 'Not covered', 'Uniform, Striated, Scattered, Clustered, Graded, and Fractured are only working design terms. The inventory has no masks, transition grammar, weighting, or final accepted arrangement catalogue.'],
+  ['Landscape arrangements', 'Not covered', 'The accepted starting arrangements are Homogeneous, Dominant, Banded, Patchwork, Clustered, Gradient, and Fractured. Homogeneous uses one ground composition throughout; the inventory still has no complete masks, transition grammar, or weighting for this catalogue.'],
   ['Granular ground materials', 'Not covered', 'One generic ground row per depth cannot portray the intended range of distinct dirts, sands, stones, mineral surfaces, muds, ice, Ash, and later accepted terrain materials.'],
   ['Granular liquids and hydrology', 'Partly covered', 'Banks, pools, channels, shelves, islands, and shallow/deep water are useful foundations. Distinct liquid identities, salinity, flow, freeze states, shore materials, and legal transitions are not a finished catalogue.'],
   ['Relief and region boundaries', 'Partly covered', 'Near, middle, and distant relief rows exist, but there is no final vocabulary for ridges, shelves, cliffs, enclosed basins, fractures, blends, and other accepted topography.'],

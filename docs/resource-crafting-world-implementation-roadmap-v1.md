@@ -174,6 +174,7 @@ Encounter and inspect one naturally generated member of each accepted body-plan/
 - Ordinary flora remains safe.
 - Dangerous flora contact/poison identity remains explicit.
 - Canopies may deliberately conceal distant sites, creatures, resources, and undiscovered paths through one saved visibility rule. They cannot overwrite placed identities, erase established knowledge, disagree with Look or the minimap, or cause avoidable contact damage before the required warning.
+- Once the player reveals a concealed feature, its appropriate minimap state remains revealed even when canopy later hides it in the main world view.
 
 ### Focused gates
 
@@ -183,6 +184,7 @@ Encounter and inspect one naturally generated member of each accepted body-plan/
 - Stale node, moved player, changed tool, full/invalid custody, replay, and write failure are inert.
 - Relaunch preserves live and depleted placements.
 - Relaunch preserves canopy concealment, revealed areas, discovered site/portal knowledge, and any visibility change caused by harvesting a tree.
+- A reveal, leave, return, and cold-relaunch check proves that canopy can obscure the main view again without removing the feature's revealed minimap state.
 
 ### Mounted gate
 

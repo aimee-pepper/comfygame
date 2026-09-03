@@ -153,6 +153,8 @@ test('crafting overview separates the current property model from the intended p
   assert.match(overview, /Because unusually low traits can raise this grade/);
   assert.match(overview, /Trading Post samples instead generate values from a range/);
   assert.match(overview, /the world itself is not rejected/);
+  assert.match(overview, /Homogeneous uses one ground composition throughout/);
+  assert.match(overview, /keeps its appropriate minimap record/);
   assert.match(resources, /Intended material identity/);
   assert.match(resources, /Gathering, return, and storage/);
   assert.match(loot, /href="\/resources#loot-and-custody"/);
