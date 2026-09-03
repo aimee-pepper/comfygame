@@ -8,8 +8,9 @@ import { buildingActions, buildingStatus, villageBuildings } from '@/lib/village
 
 export default function VillageDirectory() {
   return <SiteFrame sidebar>
-    <GuideBreadcrumbs items={[{ label: 'Village services', href: '/services' }, { label: 'Village directory' }]} />
-    <PageIntro eyebrow="Village reference" title="Village buildings and services" summary="Find each current Village destination, when it becomes usable, its published foundation requirement, and the service, station work, or Research it connects to." />
+    <GuideBreadcrumbs items={[{ label: 'Home', href: '/' }, { label: 'Village' }]} />
+    <PageIntro eyebrow="Village" title="Village buildings and services" summary="Find each current Village destination, when it becomes usable, its published foundation requirement, and the service, station work, or Research it connects to." />
+    <section className="article-section note-card"><h2>Find your way around the Village</h2><nav aria-label="Village sections"><Link href="/places">Places and stations</Link><Link href="/services">Village services</Link><Link href="/systems/village-construction">Construction and unlocks</Link></nav></section>
     <section className="article-section"><h2>Current Village</h2><p>Open a building for its exact current requirement, actions, recipes, and related resources. A displayed live entry is a current player route; a scheduled entry is clearly marked and is not an available screen.</p><div className="village-directory">{villageBuildings.map((building) => {
       const { service, systems, recipes } = buildingActions(building);
       return <article className="village-directory-card" key={building.id}>

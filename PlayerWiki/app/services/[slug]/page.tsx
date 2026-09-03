@@ -43,7 +43,7 @@ export default async function ServiceDetail({
     : `${station.zone} town setting`;
   return (
     <SiteFrame sidebar>
-      <GuideBreadcrumbs items={[{ label: 'Systems', href: '/systems' }, { label: 'Village services', href: '/services' }, { label: guide.name }]} />
+      <GuideBreadcrumbs items={[{ label: 'Village', href: '/village' }, { label: 'Village services', href: '/services' }, { label: guide.name }]} />
       <div className="entity-heading">
         {visualURL && (
           <PixelImage

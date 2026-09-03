@@ -9,25 +9,34 @@ export default function SystemsHub() {
   const partyMember = content.travellers.find((person) => person.assetURL);
   const weapon = content.items.find((item) => item.gear?.slot === 'weapon' && item.assetURL);
   const station = content.stations.find((place) => place.id === 'apothecary');
+  const library = content.stations.find((place) => place.id === 'library');
   const resource = content.resources.find((item) => item.assetURL);
   const visuals = {
-    journey: {
+    worlds: {
       visualURL: content.writingAssetURL,
       visualAlt: 'Writing Desk parchment',
     },
-    combat: {
+    characters: {
       visualURL: weapon?.assetURL ?? partyMember?.assetURL ?? null,
       visualAlt: weapon ? `${weapon.name} icon` : partyMember ? `${partyMember.name} character visual` : 'Combat reference',
     },
     village: {
       visualURL: station?.assetURL ?? resource?.assetURL ?? null,
-      visualAlt: station?.assetURL ? `${station.name} building visual` : resource ? `${resource.name} inventory icon` : 'Crafting reference',
+      visualAlt: station?.assetURL ? `${station.name} building visual` : resource ? `${resource.name} inventory icon` : 'Village reference',
+    },
+    crafting: {
+      visualURL: resource?.assetURL ?? weapon?.assetURL ?? null,
+      visualAlt: resource ? `${resource.name} inventory icon` : weapon ? `${weapon.name} icon` : 'Crafting reference',
+    },
+    knowledge: {
+      visualURL: library?.assetURL ?? library?.contextAssetURL ?? null,
+      visualAlt: library?.assetURL ? `${library.name} building visual` : 'Library and records reference',
     },
   };
 
   return <SiteFrame sidebar><PageIntro eyebrow="Player guides" title="Systems" summary="Choose a guide by the question you have right now: how to begin, what to prepare, where to craft, or which Village screen and reference table you need." />
     <section className="article-section note-card"><h2>Begin the current route</h2><nav aria-label="Starting guides">{playerStartGuides.map((guide) => <Link href={guide.href} key={guide.href}>{guide.label}</Link>)}</nav></section>
-    <section className="article-section note-card"><h2>Field and Village references</h2><p>When a revealed world feature, Village foundation, or encounter needs a name, open the current profile first; neither directory marks it as discovered in your own campaign.</p><nav aria-label="Field and Village reference directories"><Link href="/world">World conditions</Link><Link href="/terrain">Terrain</Link><Link href="/flora">Flora harvesting</Link><Link href="/village">Village buildings</Link><Link href="/bestiary">Bestiary profiles</Link><Link href="/sites">Site directory</Link><Link href="/resources">Resources</Link></nav></section>
+    <section className="article-section note-card"><h2>Browse the Wiki by subject</h2><p>Directories collect the named things you encounter. Opening a World, site, creature, or Village entry here does not mark it as discovered in your campaign.</p><div className="definition-grid"><div><h3>Worlds</h3><nav aria-label="World directories"><Link href="/world">World conditions</Link><Link href="/terrain">Terrain</Link><Link href="/flora">Flora</Link><Link href="/sites">Sites</Link><Link href="/bestiary">Bestiary</Link></nav></div><div><h3>Characters</h3><nav aria-label="Character directories"><Link href="/people">People</Link><Link href="/techniques">Techniques and Gambits</Link><Link href="/statuses">Conditions and effects</Link></nav></div><div><h3>Village</h3><nav aria-label="Village directories"><Link href="/village">Village overview</Link><Link href="/places">Places and stations</Link><Link href="/services">Village services</Link></nav></div><div><h3>Crafting and items</h3><nav aria-label="Crafting and item directories"><Link href="/crafting">Crafting</Link><Link href="/resources">Resources</Link><Link href="/equipment">Equipment</Link><Link href="/consumables">Consumables</Link><Link href="/curios">Curios</Link><Link href="/trading">Trading</Link><Link href="/recycling">Recycler</Link></nav></div><div><h3>Knowledge</h3><nav aria-label="Knowledge directories"><Link href="/research">Research</Link><Link href="/services/library">Library</Link></nav></div></div></section>
     <section className="article-section systems-hub-grid">{systemGuideCategories.map((category) => { const visual = visuals[category.id]; return <article className="system-hub-card" key={category.id}>{visual.visualURL && <PixelImage src={visual.visualURL} alt={visual.visualAlt} size={64} />}<div><h2>{category.label}</h2><p>{category.summary}</p><nav aria-label={`${category.label} guides`}>{category.guides.map((guide) => <Link href={guide.href} key={guide.href}>{guide.label}</Link>)}</nav></div></article>; })}</section>
   </SiteFrame>;
 }

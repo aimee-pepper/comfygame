@@ -20,7 +20,7 @@ const sections = [
   { href: '/systems/exploration', label: 'Exploration', detail: 'Travel through unstable worlds, inspect terrain, and return with what you find.', icon: Compass },
   { href: '/systems/combat', label: 'Combat', detail: 'Read encounters, choose actions, and manage your party.', icon: Shield },
   { href: '/systems/crafting', label: 'Crafting', detail: 'Turn resources into supplies, equipment, and village improvements.', icon: Hammer },
-  { href: '/places', label: 'Places & stations', detail: 'Find services, construction costs, and the people who work there.', icon: Map },
+  { href: '/village', label: 'Village', detail: 'Find places, services, construction costs, and the people who work there.', icon: Map },
 ];
 
 const resources = [
@@ -46,7 +46,7 @@ export default function Home() {
             </div>
           </div>
           <aside className="quick-reference" aria-label="Quick reference">
-            <span><PackageOpen size={18} /> Reference</span>
+            <span><PackageOpen size={18} /> Browse the game</span>
             <Link href="/resources">Resources</Link>
             <Link href="/equipment">Equipment</Link>
             <Link href="/consumables">Consumables</Link>

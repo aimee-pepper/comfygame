@@ -1,4 +1,5 @@
 import Link from '@/components/wiki-link';
+import { GuideBreadcrumbs, RelatedGuides } from '@/components/guide-navigation';
 import { PageIntro } from '@/components/page-intro';
 import { PixelImage } from '@/components/pixel-image';
 import { SiteFrame } from '@/components/site-frame';
@@ -8,9 +9,10 @@ import { serviceGuides } from '@/lib/services';
 export default function ServicesPage() {
   return (
     <SiteFrame sidebar>
+      <GuideBreadcrumbs items={[{ label: 'Home', href: '/' }, { label: 'Village', href: '/village' }, { label: 'Village services' }]} />
       <PageIntro
         eyebrow="Village guide"
-        title="Services and preparation"
+        title="Village services"
         summary="Understand what each everyday village screen does, what it changes, and where to prepare before the next expedition."
       />
       <section className="article-section">
@@ -47,6 +49,7 @@ export default function ServicesPage() {
         <Link href="/trading">Trading offers</Link>
         <Link href="/recycling">Recycler returns</Link>
       </nav>
+      <RelatedGuides links={[{ label: 'Village overview', href: '/village' }, { label: 'Places and stations', href: '/places' }, { label: 'Village construction', href: '/systems/village-construction' }]} />
     </SiteFrame>
   );
 }

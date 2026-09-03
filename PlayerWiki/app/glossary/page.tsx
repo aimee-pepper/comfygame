@@ -21,9 +21,14 @@ const domainGroups = [
     links: [['Combat guide', '/systems/combat'], ['Action reference', '/actions'], ['Conditions and effects', '/statuses'], ['Techniques and Gambits', '/techniques'], ['Equipment', '/equipment'], ['Party and Gear service', '/services/party-and-gear']],
   },
   {
-    label: 'Village, resources and progression',
-    domains: ['Home and return', 'Essence', 'Research', 'Campaign progression'],
-    links: [['Village buildings', '/village'], ['Village services', '/services'], ['Trading offers', '/trading'], ['Recycler returns', '/recycling'], ['Action reference', '/actions'], ['Current crafting recipes', '/crafting'], ['Crafting basics', '/systems/crafting'], ['Resources', '/resources'], ['Current progression', '/resources/progression']],
+    label: 'Village and facilities',
+    domains: ['Home and return'],
+    links: [['Village overview', '/village'], ['Places and stations', '/places'], ['Village services', '/services'], ['Village construction', '/systems/village-construction']],
+  },
+  {
+    label: 'Crafting, resources and progression',
+    domains: ['Essence', 'Research', 'Campaign progression'],
+    links: [['Current crafting recipes', '/crafting'], ['Crafting basics', '/systems/crafting'], ['Resources', '/resources'], ['Trading offers', '/trading'], ['Recycler returns', '/recycling'], ['Current progression', '/resources/progression']],
   },
   {
     label: 'Campaign records and return',

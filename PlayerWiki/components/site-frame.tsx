@@ -1,46 +1,8 @@
 import Link, { wikiHref } from '@/components/wiki-link';
 import { Menu, Search } from 'lucide-react';
 import type { ReactNode } from 'react';
-import { playerStartGuides, systemGuideCategories } from '@/lib/system-guides';
 import { ThemeToggle } from '@/components/theme-toggle';
-
-const prepareLinks = [
-  ['/crafting', 'Crafting systems'],
-  ['/services', 'Village services'],
-  ['/equipment', 'Equipment'],
-  ['/consumables', 'Consumables'],
-  ['/curios', 'Curios & key items'],
-];
-
-const referenceLinks = [
-  ['/references', 'Aimee Reference'],
-  ['/guide-status', "What's playable now"],
-  ['/loot', 'Loot & materials'],
-  ['/world', 'World reference'],
-  ['/village', 'Village buildings'],
-  ['/resources', 'Resources'],
-  ['/trading', 'Trading offers'],
-  ['/recycling', 'Recycler returns'],
-  ['/bestiary', 'Bestiary records'],
-  ['/sites', 'Site directory'],
-  ['/statuses', 'Conditions & effects'],
-  ['/techniques', 'Techniques & Gambits'],
-  ['/actions', 'Action reference'],
-  ['/people', 'People & records'],
-  ['/places', 'Places & stations'],
-  ['/glossary', 'Glossary'],
-];
-
-const primaryLinks = [
-  ['/getting-started', 'Start here'],
-  ['/systems', 'Systems'],
-  ['/village', 'Village'],
-  ['/crafting', 'Crafting'],
-  ['/resources', 'Resources'],
-  ['/guide-status', "What's changing"],
-  ['/people', 'People'],
-  ['/references', 'Aimee Reference'],
-];
+import { primaryWikiLinks, wikiNavigationSections } from '@/lib/wiki-navigation';
 
 export function SiteFrame({
   children,
@@ -84,7 +46,7 @@ export function SiteFrame({
           />
         </form>
         <nav className="desktop-navigation" aria-label="Primary navigation">
-          {primaryLinks.map(([href, label]) => (
+          {primaryWikiLinks.map(({ href, label }) => (
             <Link key={href} href={href}>
               {label}
             </Link>
@@ -95,7 +57,7 @@ export function SiteFrame({
             <Menu size={17} aria-hidden="true" /> Browse the wiki
           </summary>
           <nav aria-label="Primary navigation">
-            {primaryLinks.map(([href, label]) => (
+            {primaryWikiLinks.map(({ href, label }) => (
               <Link key={href} href={href}>
                 {label}
               </Link>
@@ -106,34 +68,15 @@ export function SiteFrame({
       {sidebar ? (
         <div className="wiki-layout">
           <aside className="wiki-sidebar" aria-label="Wiki sections">
-            <p>Learn</p>
-            <Link href="/systems">Systems overview</Link>
-            {playerStartGuides.map((guide) => (
-              <Link key={guide.href} href={guide.href}>
-                {guide.label}
-              </Link>
-            ))}
-            {systemGuideCategories.map((category) => (
-              <div key={category.id} className="sidebar-guide-group">
-                <p>{category.label}</p>
-                {category.guides.map((guide) => (
-                  <Link key={guide.href} href={guide.href}>
-                    {guide.label}
+            {wikiNavigationSections.map((section) => (
+              <div key={section.label} className="sidebar-guide-group">
+                <p>{section.label}</p>
+                {section.links.map(({ href, label }) => (
+                  <Link key={href} href={href}>
+                    {label}
                   </Link>
                 ))}
               </div>
-            ))}
-            <p>Prepare</p>
-            {prepareLinks.map(([href, label]) => (
-              <Link key={href} href={href}>
-                {label}
-              </Link>
-            ))}
-            <p>Reference</p>
-            {referenceLinks.map(([href, label]) => (
-              <Link key={href} href={href}>
-                {label}
-              </Link>
             ))}
           </aside>
           <main className="wiki-main">{children}</main>

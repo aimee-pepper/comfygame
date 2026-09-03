@@ -307,7 +307,7 @@ test('Village directory separates live buildings from scheduled entries and give
 test('Village building routes are discoverable from player navigation and material workflows', async () => {
   const sources = await Promise.all(
     [
-      'components/site-frame.tsx',
+      'lib/wiki-navigation.ts',
       'app/search/page.tsx',
       'app/glossary/page.tsx',
       'app/systems/page.tsx',
@@ -440,7 +440,7 @@ test('technique reference gives each current technique and Gambit component a st
 test('conditions and techniques are discoverable through combat, preparation, equipment, field supplies, search, and glossary', async () => {
   const sources = await Promise.all(
     [
-      'components/site-frame.tsx',
+      'lib/wiki-navigation.ts',
       'app/search/page.tsx',
       'app/glossary/page.tsx',
       'app/systems/combat/page.tsx',
@@ -693,13 +693,13 @@ test('economy references are reachable from current player tasks without claimin
       'app/buildings/[slug]/page.tsx',
       'app/search/page.tsx',
       'app/glossary/page.tsx',
-      'components/site-frame.tsx',
+      'lib/wiki-navigation.ts',
     ].map(read),
   );
   for (const source of sources) assert.match(source, /\/trading|\/recycling/);
   assert.match(sources[0], /Trading offer reference/);
   assert.match(sources[10], /Economy references/);
-  assert.match(sources[12], /Trading offers/);
+  assert.match(sources[12], /label: 'Trading'/);
 });
 
 test('complete people records are discoverable through player-facing Library, site, glossary, search, and navigation routes', async () => {
@@ -712,7 +712,7 @@ test('complete people records are discoverable through player-facing Library, si
         'app/services/[slug]/page.tsx',
         'app/places/[slug]/page.tsx',
         'app/sites/page.tsx',
-        'components/site-frame.tsx',
+        'lib/wiki-navigation.ts',
       ].map(read),
     );
   assert.match(search, /People and records/);
@@ -725,13 +725,13 @@ test('complete people records are discoverable through player-facing Library, si
   assert.match(service, /guide\.slug === 'library'/);
   assert.match(place, /place\.id === 'library'/);
   assert.match(sites, /People’s location records/);
-  assert.match(frame, /People & records/);
+  assert.match(frame, /label: 'People'/);
 });
 
 test('action reference is discoverable from player navigation and the affected current system guides', async () => {
   const sources = await Promise.all(
     [
-      'components/site-frame.tsx',
+      'lib/wiki-navigation.ts',
       'app/search/page.tsx',
       'app/glossary/page.tsx',
       'app/getting-started/page.tsx',
@@ -1205,7 +1205,7 @@ test('resource progression compares every current trade band and consumer family
 
 test('bestiary navigation preserves undiscovered creature privacy while linking current player guides', async () => {
   const bestiary = await read('app/bestiary/page.tsx');
-  const frame = await read('components/site-frame.tsx');
+  const navigation = await read('lib/wiki-navigation.ts');
   const search = await read('app/search/page.tsx');
   assert.match(bestiary, /Individual records/);
   assert.match(
@@ -1215,7 +1215,7 @@ test('bestiary navigation preserves undiscovered creature privacy while linking 
   assert.match(bestiary, /\/systems\/combat/);
   assert.match(bestiary, /\/systems\/exploration/);
   assert.match(bestiary, /PixelImage/);
-  assert.match(frame, /\/bestiary/);
+  assert.match(navigation, /\/bestiary/);
   assert.match(search, /World records/);
 });
 
@@ -1237,14 +1237,15 @@ test('glossary combines related player domains and points to useful guides', asy
   const glossary = await read('app/glossary/page.tsx');
   assert.match(glossary, /Writing a world/);
   assert.match(glossary, /Combat and party/);
-  assert.match(glossary, /Village, resources and progression/);
+  assert.match(glossary, /Village and facilities/);
+  assert.match(glossary, /Crafting, resources and progression/);
   assert.match(glossary, /\/systems\/world-writing/);
   assert.match(glossary, /\/services\/party-and-gear/);
   assert.match(glossary, /glossary-group-heading/);
 });
 
 test('creature and site directories are discoverable from shared navigation and reciprocal player guides', async () => {
-  const frame = await read('components/site-frame.tsx');
+  const navigation = await read('lib/wiki-navigation.ts');
   const systems = await read('app/systems/page.tsx');
   const glossary = await read('app/glossary/page.tsx');
   const exploration = await read('app/systems/exploration/page.tsx');
@@ -1252,7 +1253,7 @@ test('creature and site directories are discoverable from shared navigation and 
   const records = await read('app/systems/knowledge-records/page.tsx');
   const resource = await read('app/resources/[slug]/page.tsx');
   for (const source of [
-    frame,
+    navigation,
     systems,
     glossary,
     exploration,
@@ -1262,8 +1263,8 @@ test('creature and site directories are discoverable from shared navigation and 
   ]) {
     assert.match(source, /\/bestiary|\/sites/);
   }
-  assert.match(systems, /Field and Village reference directories/);
-  assert.match(frame, /Site directory/);
+  assert.match(systems, /Browse the Wiki by subject/);
+  assert.match(navigation, /Site directory/);
   assert.match(records, /without marking one as discovered/);
 });
 
@@ -1272,9 +1273,11 @@ test('systems hub groups every current player guide into useful routes', async (
   const navigation = await read('lib/system-guides.ts');
   await access(path.join(root, 'app/systems/page.tsx'));
   for (const label of [
-    'Journey and worlds',
-    'Combat and preparation',
-    'Village, crafting and records',
+    'Worlds and exploration',
+    'Characters and combat',
+    'Village and facilities',
+    'Crafting and items',
+    'Knowledge and records',
   ])
     assert.match(navigation, new RegExp(label));
   for (const href of [
@@ -1293,7 +1296,7 @@ test('systems hub groups every current player guide into useful routes', async (
 test('shared guide navigation assigns every published system route to one player category', async () => {
   const navigation = await read('lib/system-guides.ts');
   const hub = await read('app/systems/page.tsx');
-  const sidebar = await read('components/site-frame.tsx');
+  const sidebar = await read('lib/wiki-navigation.ts');
   const search = await read('app/search/page.tsx');
   const glossary = await read('app/glossary/page.tsx');
   const routes = (
@@ -1308,7 +1311,9 @@ test('shared guide navigation assigns every published system route to one player
   assert.deepEqual(registered, routes);
   assert.equal(new Set(registered).size, registered.length);
   assert.match(hub, /systemGuideCategories/);
-  assert.match(sidebar, /systemGuideCategories/);
+  assert.match(sidebar, /Worlds and exploration/);
+  assert.match(sidebar, /Village and facilities/);
+  assert.match(sidebar, /Crafting and items/);
   assert.match(search, /systemGuides/);
   assert.match(search, /Player guides/);
   assert.match(glossary, /Player guides by task/);
@@ -1370,8 +1375,8 @@ test('combat techniques and Gambits enumerate only current grants and owned rule
     /\/systems\/combat-techniques-gambits/,
   );
   assert.match(
-    await read('components/site-frame.tsx'),
-    /systemGuideCategories/,
+    await read('lib/wiki-navigation.ts'),
+    /\/systems\/combat-techniques-gambits/,
   );
 });
 
@@ -1393,8 +1398,8 @@ test('Village construction lists every current destination with its exact founda
     /\/systems\/village-construction/,
   );
   assert.match(
-    await read('components/site-frame.tsx'),
-    /systemGuideCategories/,
+    await read('lib/wiki-navigation.ts'),
+    /\/systems\/village-construction/,
   );
 });
 
@@ -1420,11 +1425,11 @@ test('all requested player detail routes have shared breadcrumbs and related gui
 
 test('shared navigation exposes the player Systems hub alongside major tasks', async () => {
   const frame = await read('components/site-frame.tsx');
-  const navigation = await read('lib/system-guides.ts');
-  assert.match(frame, /systemGuideCategories/);
-  assert.match(frame, /\['\/systems', 'Systems'\]/);
-  assert.match(frame, /<p>Prepare<\/p>/);
-  assert.match(navigation, /\/systems\/world-writing/);
+  const navigation = await read('lib/wiki-navigation.ts');
+  assert.match(frame, /wikiNavigationSections/);
+  assert.match(frame, /primaryWikiLinks/);
+  assert.match(navigation, /label: 'Game systems'/);
+  assert.match(navigation, /label: 'Aimee Reference'/);
   for (const href of [
     '/getting-started',
     '/systems',
@@ -1433,8 +1438,49 @@ test('shared navigation exposes the player Systems hub alongside major tasks', a
     '/resources',
     '/people',
   ]) {
-    assert.match(frame, new RegExp(href.replaceAll('/', '\\/')));
+    assert.match(navigation, new RegExp(href.replaceAll('/', '\\/')));
   }
+});
+
+test('wiki navigation uses a standard subject hierarchy without a duplicate reference dump', async () => {
+  const navigation = await read('lib/wiki-navigation.ts');
+  const frame = await read('components/site-frame.tsx');
+  const systems = await read('lib/system-guides.ts');
+  const village = await read('app/village/page.tsx');
+  const places = await read('app/places/page.tsx');
+  const services = await read('app/services/page.tsx');
+  const sidebar = navigation.slice(navigation.indexOf('export const wikiNavigationSections'));
+  const sidebarHrefs = [...sidebar.matchAll(/href: '([^']+)'/g)].map((match) => match[1]);
+
+  assert.equal(new Set(sidebarHrefs).size, sidebarHrefs.length);
+  for (const label of [
+    'Start here',
+    'Worlds and exploration',
+    'Characters and combat',
+    'Village and facilities',
+    'Crafting and items',
+    'Knowledge and records',
+    'Quick reference',
+    'Aimee Reference',
+  ]) assert.match(sidebar, new RegExp(`label: '${label}'`));
+
+  const villageSection = sidebar.slice(
+    sidebar.indexOf("label: 'Village and facilities'"),
+    sidebar.indexOf("label: 'Crafting and items'"),
+  );
+  for (const href of ['/village', '/places', '/services', '/systems/village-construction'])
+    assert.match(villageSection, new RegExp(href.replaceAll('/', '\\/')));
+
+  const aimeeSection = sidebar.slice(sidebar.lastIndexOf("label: 'Aimee Reference'"));
+  assert.deepEqual(
+    [...aimeeSection.matchAll(/href: '([^']+)'/g)].map((match) => match[1]),
+    ['/references'],
+  );
+  assert.doesNotMatch(frame, /prepareLinks|referenceLinks|<p>Reference<\/p>/);
+  assert.doesNotMatch(systems, /Village, crafting and records/);
+  assert.match(village, /Find your way around the Village/);
+  assert.match(places, /label: 'Village', href: '\/village'/);
+  assert.match(services, /label: 'Village', href: '\/village'/);
 });
 
 test('home and getting-started guide the live route with inline retained visuals', async () => {

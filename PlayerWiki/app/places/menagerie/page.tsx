@@ -6,7 +6,7 @@ import { SiteFrame } from '@/components/site-frame';
 export default function MenageriePage() {
   return (
     <SiteFrame sidebar>
-      <GuideBreadcrumbs items={[{ label: 'Village services', href: '/services' }, { label: 'Places and stations', href: '/places' }, { label: 'Menagerie' }]} />
+      <GuideBreadcrumbs items={[{ label: 'Village', href: '/village' }, { label: 'Places and stations', href: '/places' }, { label: 'Menagerie' }]} />
       <PageIntro
         eyebrow="Animal companions"
         title="Menagerie"

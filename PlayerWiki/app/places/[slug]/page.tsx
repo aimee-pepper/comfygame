@@ -63,7 +63,7 @@ export default async function PlaceDetail({
   ].filter((action): action is NonNullable<typeof action> => Boolean(action));
   return (
     <SiteFrame sidebar>
-      <GuideBreadcrumbs items={[{ label: 'Village services', href: '/services' }, { label: 'Places and stations', href: '/places' }, { label: place.name }]} />
+      <GuideBreadcrumbs items={[{ label: 'Village', href: '/village' }, { label: 'Places and stations', href: '/places' }, { label: place.name }]} />
       <PageIntro
         eyebrow={place.zone}
         title={place.name}
