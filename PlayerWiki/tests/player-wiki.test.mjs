@@ -84,6 +84,10 @@ test('Aimee Reference publishes the World Splash inventory, system plans, voice 
   assert.match(firstPassTuning, /Mined resources do not use this table/);
   assert.match(firstPassTuning, /generated creature body plans/);
   assert.match(firstPassTuning, /Sigil acquisition order/);
+  assert.match(firstPassTuning, /Where processing belongs/);
+  for (const owner of ['Noll · Recycler', 'Halloway · Blacksmith', 'Corrin · Tannery', 'Fen · Bowyer', 'Isolde · Scriptorium', 'Nessa · Apothecary', 'Grimmond · Deep Works'])
+    assert.match(firstPassTuning, new RegExp(owner.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')));
+  assert.match(firstPassTuning, /ownership decision itself is closed/);
   for (const name of ['Vance', 'Noll', 'Halloway', 'Mara', 'Edren', 'Isolde', 'Sela', 'Bryn', 'Orsa', 'Talin', 'Nessa', 'Corrin', 'Dagg', 'Rook', 'Lys', 'Bracken', 'Fen', 'Wren', 'Kestrel', 'Maud', 'Marrick', 'Sabine', 'Grimmond', 'Oda', 'Auber', 'Ashe', 'Tovin', 'Perren', 'Nine'])
     assert.match(characterGuide, new RegExp(`### ${name} —`));
   assert.match(characterGuide, /75% warm, clear English/);
@@ -484,10 +488,9 @@ test('world reference publishes current terrain, pressure, resource-host, and ha
   assert.match(reference, /Tall Growth/);
   assert.match(reference, /resourceHostingGroups/);
   assert.match(reference, /Rift-glass/);
-  assert.match(
-    world,
-    /rather than one guaranteed tile, plant, deposit, site, or animal/,
-  );
+  assert.match(world, /directly written ground or base resource guarantees one start-connected truthful source/);
+  assert.match(world, /exact distance, amount, hazards, and required tool remain part of the generated result/);
+  assert.match(world, /Ecological pressures do not promise one species, plant, site, or animal/);
   assert.match(flora, /never predicts an unseen plant/);
 });
 

@@ -36,7 +36,7 @@ export default function RecyclingDirectory() {
         accepted="Rubble remains one simple, ungraded mixed resource. A separate Recycler action will let you choose an amount and preview the materials hidden in those exact units. The source region controls what can appear: common local materials appear most often, uncommon finds appear less often, and a genuinely rare local material is only a small bonus chance."
         acceptedLabel="Intended design"
       />
-      <p>The Recycler will never produce a material that was absent from the Rubble’s source region. Once shown, a preview cannot be changed by cancelling, reopening, or relaunching. Exact quantities, odds, unlock requirements, and any processing cost are still being balanced.</p>
+      <p>The Recycler will never produce a material that was absent from the Rubble’s source region. Once shown, a preview cannot be changed by cancelling, reopening, or relaunching. The first-pass batch, output, odds, access, and cost are now settled in <Link href="/references/resource-world-numbers-decided-so-far">Resource, Harvesting, and World Numbers Decided So Far</Link>; this action is still planned rather than playable.</p>
     </section>
     <section className="article-section note-card">
       <h2>Noll’s first Recycler</h2>

@@ -27,7 +27,7 @@ export const floraMaterialPropertyDerivations = [
 
 export const materialScoreBoundary = {
   currentGrade: 'The current 0–100 grade is separate from the six properties. It averages each contributing trait’s distance from 50, multiplies that extremity by 85, adds up to 25 from Lustre, then limits the result to 0–100. Because unusually low traits can raise this grade, it must not become the new four-band quality formula.',
-  intended: 'Keep every concrete property derived from the creature or plant that produced a biological material. Use physical family, type, or subtype to decide whether it fits a recipe. Poor, Common, Rare, or Exceptional quality can scale an approved biological material’s previewed contribution. Mined materials such as Sand, Gold, and Granite have no quality and use a fixed authored contribution. The exact conversion into item statistics still needs to be settled with Aimee before this change is made.',
+  intended: 'Keep every concrete property derived from the creature or plant that produced a biological material. Use physical family, type, or subtype to decide whether it fits a recipe. The accepted calculation combines the recipe component’s stat ceiling, the source creature’s relevant measurement, and the selected biological quality multiplier. Mined materials such as Sand, Gold, and Granite have no quality and use a fixed authored contribution.',
   currentExceptions: 'Current creature and Flora harvests derive their values from the body or plant that produced them. Trading Post samples instead generate values from a range, and some Recycler returns use fixed records. The intended system must give those materials values supported by their real source rather than unrelated numbers.',
 } as const;
 
@@ -82,7 +82,7 @@ export const inventoryViews = [
 
 export const progressionPlan = [
   ['Harvesting tools', 'Better Picks, Axes, and Scythes let the player collect increasingly difficult metals, trees, and plants. Advanced resources may exist before the player can harvest them.'],
-  ['Processing facilities', 'Raw materials become a modest set of useful intermediates such as glass, leather, cloth, cord, planks, prepared extracts, and processed metal forms only where real recipes need them. The exact list and owners remain under discussion.'],
+  ['Processing facilities', 'Noll sorts Rubble; Halloway owns metal and Glass furnace work; Corrin makes Leather, Cord, and Cloth; Fen shapes Planks and Hafts; Isolde makes Pulp, Paper, pigments, and writing ink; Nessa makes named extracts; Grimmond owns later Dressed Stone. Each process arrives with real recipe consumers.'],
   ['Facility levels', 'Upgrading a facility opens later processing and recipe tiers instead of preventing advanced worlds from generating.'],
   ['Recipe tiers', 'Later recipes can ask for narrower or precise material subtypes and produce stronger results.'],
   ['World Writing', 'Players can directly call at least some ground, liquid, base resources, world sizes, and ecological material pressures such as Chitin. Unwritten facets remain generated.'],
@@ -94,7 +94,7 @@ export const worldGenerationPlan = [
   ['Flora', 'Terrain, light, atmosphere, weather, water, and temperature all constrain what can grow. Dense tree canopy can conceal distant features until the party approaches or moves beneath it. Once revealed, a feature keeps its appropriate minimap record even if canopy hides it in the main view again.'],
   ['Creatures', 'Readable body plans and habitat rules support aquatic, land, amphibious, flying, and hybrid forms. Aquatic creatures can use shallow and deep water when their bodies suit that depth. Flying creatures follow relevant feeding, weather, and resting needs; perches are not universally required. Anatomy determines useful material types and subtypes.'],
   ['Environment', 'When two possible conditions conflict, temperature or another relevant pressure chooses which one appears; the world itself is not rejected. Compatible written combinations may transform, such as rain and miasma becoming acid rain when that rule is approved.'],
-  ['World size', 'Writing can eventually request smaller or larger worlds. Exact dimensions and costs will be discussed with Aimee.'],
+  ['World size', 'Writing can eventually request worlds on the accepted 12×12, 15×15, 18×18, 26×26, and 36×36 size ladder. The later Sigil pass will set acquisition and writing costs.'],
 ] as const;
 
 export const incrementalDelivery = [

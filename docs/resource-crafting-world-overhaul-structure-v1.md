@@ -203,10 +203,24 @@ World placement, Look, harvesting, tool custody/equipment, depletion, carried ma
 ### Intended structure
 
 - Raw materials become a modest set of recognizable, reusable intermediates.
-- Examples under consideration include processed metal forms where a real recipe needs them, plus Glass, Leather, Cloth, Cord, Planks, and Prepared Extracts. Ingots are not a mandatory extra identity for every metal.
+- The accepted first set is matching refined metal stock only where a real recipe needs it, plus Glass, Leather, Cord, Cloth, Planks, Hafts where a recipe uses them, Pulp, Paper, named prepared extracts, writing pigments/ink, and later Dressed Stone where it has real consumers. Ingots are not a mandatory extra identity for every metal.
 - Each intermediate has several physically sensible consumers.
 - Processing facilities gain upgrade tiers that unlock later material transformations and recipe tiers.
 - Processing adds capability, not repetitive busywork.
+
+Accepted ownership is:
+
+- Noll's Recycler sorts region-backed Rubble;
+- Halloway's Blacksmith performs named-metal furnace work and ordinary Glass making;
+- Corrin's Tannery makes Leather, Cord, and Cloth;
+- Fen's Bowyer shapes Logs into Planks and recipe-specific Hafts;
+- Isolde's Scriptorium makes Pulp, Paper, writing pigments, and prepared ink;
+- Nessa's Apothecary makes physically named plant and creature extracts; and
+- Grimmond's Deep Works dresses named stone only for later recipes that genuinely require it.
+
+Auber's Distillery retains Essence/Core distillation rather than absorbing ordinary extracts. Sela's
+Wayfarer's Table remains a field workspace. Bracken's Armoury and Maud's Weaponsmith consume appropriate
+stock but do not duplicate its general production. No process returns to the standalone Workshop.
 
 ### Structural change
 
@@ -214,8 +228,6 @@ Each process needs an exact input category, accepted subtypes, applicable qualit
 
 ### Will discuss with Aimee
 
-- Final intermediate list.
-- Which current or new facilities own smelting, glassmaking, tanning, milling, weaving, carpentry, extraction, and sorting.
 - Conversion ratios and quality inheritance.
 - Facility upgrade count, construction costs, NPC staffing contribution, and campaign unlock order.
 

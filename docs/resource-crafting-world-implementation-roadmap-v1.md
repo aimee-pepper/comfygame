@@ -49,25 +49,28 @@ material and land model they describe is stable. Close Phase 0 in this order:
 The rewritten traveller clues remain the prose-quality benchmark. Their mechanical conditions are provisional
 until step 6 proves the player has learned the terms and can deliberately produce the described land.
 
-### Decisions to settle with Aimee
+### Closed foundations and remaining design work
 
-1. Final physical material category/type/subtype registry.
-2. Rubble collection frequency, batch size, region-weighted outputs, Recycler tier or unlock, and processing cost.
-3. Ground and liquid type catalogue.
-4. Ground layout style set.
-5. World size tiers and dimensions.
-6. Creature body-plan and habitat grammar.
-7. Terrain/flora compatibility matrix.
-8. Pick, Axe, and Scythe tiers and starting tool route.
-9. Processed-material list and facility ownership.
-10. Facility upgrade depth and recipe-tier progression.
-11. Exact category eligibility for every recipe.
-12. Material-to-stat contribution table.
-13. Multi-input crafted-quality formula.
-14. Peerless alpha/crafting chance and matching-NPC staffing effect.
-15. Direct World Writing resource vocabulary and guarantee strength.
-16. Weather/atmosphere compatibility and transformation matrix.
-17. Colour inheritance, selection, and crafted appearance behavior.
+Closed by Aimee's resource/world decisions:
+
+1. Physical material category/type/subtype registry and ungraded mined-resource rule.
+2. Rubble batch, region-backed output weights, initial Recycler access, and processing cost.
+3. Initial ground and liquid catalogue.
+4. Homogeneous, Dominant, Banded, Patchwork, Clustered, Gradient, and Fractured layout set.
+5. 12×12, 15×15, 18×18, 26×26, and 36×36 world sizes.
+6. Pick, Axe, and Scythe starting tiers, first material groups, harvest timing, and persistent field-tool selection.
+7. Processed-material ownership across Recycler, Blacksmith, Tannery, Bowyer, Scriptorium, Apothecary, and Deep Works.
+8. Material-to-stat ceilings, multi-input crafted quality, and maximum-facility Peerless chance/staffing rule.
+9. A directly written ground or base resource guarantees one start-connected truthful source while exact distance, quantity, hazards, and tool access remain generated.
+
+Still to author with Aimee where the later slice needs it:
+
+1. Creature body-plan and habitat grammar.
+2. Terrain/flora compatibility matrix.
+3. Facility upgrade depth, process conversion ratios, and recipe-tier progression.
+4. Exact category eligibility and quantities for every recipe.
+5. Weather/atmosphere compatibility and transformation matrix.
+6. Colour inheritance, selection, and crafted appearance behavior.
 
 ### Deliverables
 
@@ -243,13 +246,16 @@ Collect several species variants and qualities, inspect carried detail, partiall
 
 Recommended first vertical slices after Phase 0 decisions:
 
-1. Rubble sorting at Noll's Recycler, with common-first regional results and a low-chance rare local bonus
-2. One metal-processing route only if Phase 0 proves that a real recipe needs a distinct processed form
-3. Hide to Leather
-4. Fibre to Cord/Cloth
-5. Timber to Planks/Hafts
-6. Sand or suitable mineral input to Glass
-7. Biological/mineral inputs to Prepared Extracts
+1. Rubble sorting at Noll's Recycler, with the accepted common-first regional result and rare local bonus
+2. One named-metal refining route at Halloway's Blacksmith only when its first two real consumers ship with it
+3. Hide or Skin to Leather at Corrin's Tannery
+4. Plant Fibre to Cord or Cloth at Corrin's Tannery
+5. Log to Planks or a recipe-specific Haft at Fen's Bowyer
+6. Sand or Quartz to ordinary Glass at Halloway's Blacksmith furnace
+7. Fibrous plant stock to Pulp and Pulp to Paper at Isolde's Scriptorium
+8. Named biological or botanical inputs to named prepared extracts at Nessa's Apothecary
+9. Named structural stone to Dressed Stone at Grimmond's Deep Works only when a later recipe needs it
+10. Mineral or botanical colour sources to writing pigment/ink at Isolde's Scriptorium
 
 Each process defines:
 
@@ -302,7 +308,7 @@ Each process defines:
 15. Cottage construction and Research material costs.
 16. Recycler compatibility for every new construction receipt.
 
-This order may change after Phase 0 resolves facility ownership, but every live maker must be included before legacy recipe eligibility is removed.
+The order within a facility may follow its first reachable consumers, but ownership does not change. Every live maker must be included before legacy recipe eligibility is removed.
 
 ### Focused gates for each maker
 
@@ -321,7 +327,7 @@ This order may change after Phase 0 resolves facility ownership, but every live 
 - Deterministic multi-input result-quality calculation.
 - Rough/Fine/Superior/Exceptional crafted names.
 - Peerless alpha-drop route.
-- If approved, maximum-facility all-high-quality Peerless craft chance and matching-NPC modifier.
+- Apply the accepted maximum-facility all-high-quality Peerless chance, matching-specialist modifier, and twentieth-craft protection.
 
 ### Prohibited
 
@@ -335,7 +341,7 @@ This order may change after Phase 0 resolves facility ownership, but every live 
 - Each biological quality band raises its intended contribution; Sand, Gold, Granite and other mined materials have no band to raise.
 - Peerless never exists as raw material.
 - Peerless production cannot be save-scummed through an unfrozen random result.
-- Staffing affects chance only if Aimee approves it and the exact staffed state is durably owned.
+- Staffing affects chance only through the accepted matching-specialist rule, and the exact staffed state is durably owned.
 
 ## Phase 9 - World Writing targeting and world size
 
@@ -351,7 +357,7 @@ This order may change after Phase 0 resolves facility ownership, but every live 
 
 - Written facts have a strong, truthful effect.
 - Unwritten facts remain generated.
-- Direct base-resource targeting provides the accepted guarantee strength.
+- A directly written ground or base resource produces at least one start-connected truthful source. Exact distance, quantity, hazards, and tool access remain generated.
 - Ecological material targeting pressures anatomy/habitat without forcing one named species.
 - Tool requirements still govern harvesting.
 - Existing campaigns and Pages remain valid.

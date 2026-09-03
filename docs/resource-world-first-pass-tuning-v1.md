@@ -1,6 +1,6 @@
 # Resource, Harvesting, and World Numbers Decided So Far
 
-> **Review status:** This is the complete first-pass tuning proposal for the resource, harvesting, terrain, canopy, and Rubble decisions Aimee has discussed so far. It describes the intended game, not what the current build already does. Nothing on this page should be presented as implemented until its own game slice has shipped and been tested.
+> **Status:** These are the accepted first-pass values and ownership decisions for the resource, harvesting, terrain, canopy, and Rubble subjects Aimee has discussed so far. They describe the intended game, not what the current build already does. Nothing on this page should be presented as implemented until its own game slice has shipped and been tested.
 
 This page keeps the proposed values in one place so they can be read and adjusted together. It deliberately stops before the next design subjects: generated creature body plans, the full flora catalogue, Sigil acquisition order, clue progression, complete recipes, processing chains, facility upgrades, and the final parallax-world art catalogue.
 
@@ -90,7 +90,7 @@ Each world receives a mineral-node budget of:
 
 Each ordinary node slot chooses only among materials supported by its resolved region. The starting rarity weights are 70% common, 25% uncommon, and 5% rare.
 
-If the player's writing directly names a ground or mined resource, the world guarantees one eligible, start-connected source between 3 and 8 movement steps from entry. That source counts against the ordinary node budget and keeps its ordinary yield; it is not a bonus cache.
+If the player's writing directly names a ground or mined resource, the world guarantees one eligible, start-connected source between 3 and 8 movement steps from entry. That source counts against the ordinary node budget and keeps its ordinary yield; it is not a bonus cache. The amount, exact distance, hazards, and required tool remain part of the generated result.
 
 An advanced node may exist before the player owns the required Pick. Look names the required Pick level. Trying the wrong or insufficient tool costs no turn and does not reduce the node.
 
@@ -180,6 +180,29 @@ The ordinary inventory still shows one Rubble stack. Inside the Recycler, retain
 
 The preview freezes the result for those four exact units. Confirming consumes exactly four Rubble and grants the previewed materials exactly once. Cancelling, refusing, backgrounding, or relaunching never rerolls the preview. A full destination, stale stock, changed batch, or failed save spends nothing and grants nothing.
 
+## Where processing belongs
+
+There is no universal processing station and no return of the standalone Workshop. Each transformation belongs to the existing specialist whose work makes it easiest to understand.
+
+| Processed material or action | Source | Owner and place |
+|---|---|---|
+| Sort Rubble into region-supported finds | Rubble from one retained region batch | Noll · Recycler |
+| Make matching refined metal stock when a real recipe needs it | Exact named smeltable metal | Halloway · Blacksmith |
+| Make ordinary Glass | Sand or Quartz with the recipe's named fuel or flux | Halloway · Blacksmith furnace |
+| Make Leather | Hide or Skin | Corrin · Tannery |
+| Make Cord or Cloth | Exact eligible Plant Fibre | Corrin · Tannery |
+| Make Planks or recipe-specific Hafts | Exact eligible Log | Fen · Bowyer |
+| Make Pulp and Paper | Exact eligible fibrous plant stock, then Pulp | Isolde · Scriptorium |
+| Make named prepared extracts | Exact eligible plant or creature substance | Nessa · Apothecary |
+| Dress named structural stone when a later recipe needs it | Exact named stone | Grimmond · Deep Works |
+| Make writing pigments and prepared ink | Exact eligible mineral or botanical colour source | Isolde · Scriptorium |
+
+The processed output keeps a recognizable identity. There is no universal Metal, Reagent, Toxin, or Prepared Extract item. Leather retains applicable biological quality, inherited colour, and source detail. Pelt remains Pelt unless a later recipe has a real need for a distinct cured form. Rift-glass remains Rift-glass rather than becoming ordinary Glass.
+
+Auber's Distillery keeps its separate Essence and Core work. Sela's Wayfarer's Table keeps field packing, flora knowledge, and organic-yield work. Armoury and Weaponsmith recipes may consume processed stock but do not duplicate its general production.
+
+Exact conversion quantities, prices, and upgrade levels will be set with each process's first two real recipe consumers. The ownership decision itself is closed.
+
 ## What remains for the next design passes
 
 The following subjects are intentionally not filled with guessed numbers here:
@@ -189,7 +212,7 @@ The following subjects are intentionally not filled with guessed numbers here:
 - complete flora species and harvest catalogues beyond the size-and-tool rules above;
 - Sigil acquisition order, teachable land vocabulary, and clue progression;
 - every recipe's exact ingredients, output statistics, price, station tier, and unlock;
-- processing conversions other than Rubble sorting;
+- processing conversion quantities and prices other than the settled Rubble sorting values;
 - tool acquisition and upgrade recipes;
 - the full compatibility matrix for combined environmental pressures; and
 - final parallax-world visual assets and geometry.

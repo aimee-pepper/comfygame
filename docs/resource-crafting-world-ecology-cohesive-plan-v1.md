@@ -307,7 +307,10 @@ Potential sources are:
 - equipment dropped by high-level alpha creatures; and
 - a small chance for a maximum-level crafting facility to produce a Peerless result when the recipe uses the required high-quality inputs.
 
-Whether staffing the facility with its matching NPC improves that chance remains **Will discuss with Aimee**. Peerless chance, eligible input requirement, and bad-luck protection also remain open tuning decisions.
+At a maximum level-3 facility, an eligible craft using only Rare or Exceptional quality-bearing inputs has the
+accepted Peerless chance in the tuning reference. Staffing the facility with its matching specialist improves
+that chance, and the accepted bad-luck protection guarantees the twentieth consecutive eligible craft. Any
+Peerless result resets that facility's counter.
 
 ### No arbitrary single-use materials
 
@@ -336,7 +339,31 @@ Processing should deepen facility use without creating busywork. A processing st
 - creates a reusable intermediate shared by several recipes; or
 - gives a facility a meaningful progression role.
 
-The exact processed-material list and facility ownership remain **Will discuss with Aimee** before implementation.
+Processing belongs to the specialist whose ordinary work makes the transformation understandable. It does not
+return to a universal Workshop and does not require a new catch-all processing building.
+
+| Processed material or action | Source material | Owning specialist and facility | Boundary |
+|---|---|---|---|
+| Region-supported stone, metal, mineral, or glass-bearing finds from Rubble | Rubble from one retained source-region batch | Noll · Recycler | A separate sorting action from gear dismantling; it cannot produce a material absent from that region |
+| Matching refined metal stock, only where a real recipe needs a processed form | The exact named smeltable metal | Halloway · Blacksmith | The output keeps its metal name; there is no universal Metal or Ore ingredient. Mercury remains Mercury, and non-metal minerals are not silently smelted |
+| Glass | Sand or Quartz plus the exact recipe's authored fuel or flux | Halloway · Blacksmith furnace | Furnace work, not a generic mineral conversion. Rift-glass remains its own material rather than becoming ordinary Glass |
+| Leather | Hide or Skin | Corrin · Tannery | Keeps applicable biological quality, colour, and provenance. Pelt remains Pelt unless a later recipe explicitly needs a distinct cured form |
+| Cord and Cloth | The exact eligible Plant Fibre | Corrin · Tannery | Corrin owns flexible organic stock and bindings; Cord and Cloth remain separate outputs with separate consumers |
+| Planks and Hafts | The exact eligible Log | Fen · Bowyer | Fen owns timber selection and shaping. Planks may serve construction; Hafts exist only where weapon or tool recipes consume them |
+| Pulp and Paper | The exact eligible fibrous plant stock, then Pulp | Isolde · Scriptorium | Pulp stops dropping ready-made from plants. The Scriptorium owns paper stock as well as writing tools and ink |
+| Named prepared extracts | The exact eligible leaf, root, flower, spore, sap, resin, venom, oil, or other named substance | Nessa · Apothecary | `Prepared Extract`, `Reagent`, and `Toxin` are recipe categories, not universal inventory items; the output keeps a useful physical name |
+| Dressed Stone, only when a later recipe genuinely needs it | The exact named structural stone | Grimmond · Deep Works | Early construction may continue to use raw named stone. A later dressed form cannot become an opening-game dependency before Grimmond is reachable |
+| Writing pigments and prepared ink | Exact eligible mineral pigment or botanical colour source | Isolde · Scriptorium | Scriptorium retains exclusive CMY+Depth writing-ink ownership; this does not move reactive stains or remedies from the Apothecary |
+
+Auber's Distillery keeps its separate Raw Essence, blank Core, and attunement role. It does not become the owner
+of ordinary plant extracts merely because “distilling” could describe both actions. Sela's Wayfarer's Table
+supports field packing, visible-flora knowledge, and organic yield; it is not turned into an unrelated mill.
+Bracken's Armoury and Maud's Weaponsmith consume appropriate processed stock in their own recipes but do not
+manufacture the general-purpose stock first.
+
+Exact input quantities, conversion ratios, facility levels, and prices are authored with each process's first
+two real consumers. Ownership and output identity are settled now; those later values are recipe balance, not
+another product-ownership question.
 
 ## Harvesting and progression
 
@@ -526,7 +553,7 @@ The final World Writing vocabulary should distinguish:
 
 Direct requests must matter. They need not make every exact node safe, adjacent, or guaranteed unless the authored rule explicitly says so.
 
-Recommended guarantee for a directly written physical ground or base resource: the frozen world must contain
+Accepted guarantee for a directly written physical ground or base resource: the frozen world must contain
 at least one start-connected truthful source of it. If the player's tool is too weak, that source still appears
 and Look explains the missing tool; writing cannot quietly fail merely because progression blocks extraction.
 Amount, distance, hazards, and additional deposits remain generated. Ecological requests such as Chitin bias
@@ -627,27 +654,18 @@ The intended behavior is:
 how the player selects among underlying source-region batches, Recycler unlock or tier requirement, and whether
 processing has an additional cost.
 
-## Decisions to close before Sigil and clue design
+## Closed foundations before Sigil and clue design
 
-The dependency audit leaves six genuine product decisions. Everything else above is a structural correction,
-not a choice Engineering should improvise.
+Aimee has now closed the six foundation questions from this plan:
 
-1. **Physical vocabulary.** Approve or revise the starting registry, especially Skin versus Hide versus Pelt,
-   and the proposed removal of generic Plate, Fin, Reagent, Toxin, Timber, Pulp-as-a-drop, and world Ichor.
-2. **Land vocabulary.** Approve or revise the seven regional arrangements and the initial geology, surface,
-   liquid, and deposit catalogue.
-3. **Written guarantee.** Confirm the recommendation that a directly written ground or base resource guarantees
-   at least one start-connected source, while tool access, amount, distance, and danger remain generated.
-4. **World sizes.** Confirm whether the intended 12/15/18/26/36 ladder should replace the current
-   12/15/18/23/28 ladder.
-5. **Material arithmetic.** Set the four biological-material quality thresholds/multipliers and the recipe-slot formulas that turn
-   frozen creature measurements into concrete item statistics. Mined materials instead use fixed authored
-   contributions with no quality roll. These are balance tables, not recipe eligibility.
-6. **Processing ownership.** Rubble sorting belongs to the Recycler. Set the first remaining processed-material
-   list and which existing or planned Cottage facility owns any metal processing that real recipes require,
-   plus glass, leather, cloth/cord, planks/pulp, and plant extracts.
+1. **Physical vocabulary** uses the category → type → optional subtype hierarchy above, with source/species detail beneath it.
+2. **Land vocabulary** uses the seven accepted regional arrangements and the expanded physical geology, surface, liquid, and deposit catalogue.
+3. **Written guarantee** gives a directly written ground or base resource at least one start-connected truthful source while ordinary quantity, exact distance, hazards, and tool access remain part of the generated world.
+4. **World sizes** use the intended 12/15/18/26/36 ladder.
+5. **Material arithmetic** uses the accepted four biological quality bands and direct stat-contribution formula; mined materials remain ungraded and use fixed authored contributions.
+6. **Processing ownership** follows the specialist-and-facility matrix above, with no universal Workshop or catch-all processing station.
 
-After those six choices, Game Design can produce the complete terrain→resource→flora→creature host matrix,
+With those foundations closed, Game Design can produce the complete terrain→resource→flora→creature host matrix,
 the exact recipe eligibility lists, and the harvesting tiers without guessing. Only then should the project
 decide which land/material concepts deserve Sigils, when those Sigils drop, and which traveller clues are fair.
 

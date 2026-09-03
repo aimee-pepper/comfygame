@@ -309,24 +309,16 @@ export function futureResourceCopy(name: string) {
 
 export const openDecisions = [
   {
-    title: 'Final material and recipe taxonomy',
-    body: 'Aimee has settled the hierarchy: broad category, specific physical type, optional precise subtype, then species/source and four quality bands only where biological variation matters. Mined resources use plain exact names, one normal/green presentation, and no quality. The complete type/subtype registry and every recipe eligibility list still need joint review.',
+    title: 'Complete recipe mappings and processing balance',
+    body: 'The material hierarchy and processing owners are settled. Each recipe still needs its exact ingredient eligibility, quantities, processed-input requirements, conversion ratios, prices, facility level, and first two meaningful consumers authored before its overhaul slice ships.',
   },
   {
-    title: 'Mixed geological find',
-    body: 'Rubble remains the simple, ungraded name for a mixed find shaped by its source region. Noll’s Recycler will sort a selected quantity into mostly common local materials, with uncommon results appearing less often and a rare local material possible only as a low-chance bonus. Collection frequency, batch size, exact weights and quantities, Recycler unlock or tier, and any processing cost still need to be settled.',
+    title: 'Creature generation and alpha rewards',
+    body: 'Biological quality and ordinary crafted-stat arithmetic are settled. Creature body plans, habitat grammar, body-part quantities, encounter populations, and the separate frequency and conditions for Peerless alpha drops belong to the next creature-generation pass.',
   },
   {
-    title: 'Harvest and facility progression',
-    body: 'The intended progression uses better Picks, Axes, and Scythes, processing facilities, facility levels, and later recipe tiers. Exact tools, materials per tier, processed goods, facility owners, and upgrade costs remain open.',
-  },
-  {
-    title: 'Crafted statistics and Peerless equipment',
-    body: 'Biological-material quality directly improves real item statistics. Mined materials use fixed authored contributions with no quality roll. Exact contributions, the multi-input result-quality rule, alpha drops, maximum-facility Peerless chance, and a possible matching-NPC bonus remain open.',
-  },
-  {
-    title: 'World generation and direct targeting',
-    body: 'Aimee has settled that players can directly call at least some terrain and base resources and can pressure ecological materials such as Chitin. Exact ground/liquid catalogues, layout styles, world sizes, compatibility rules, and guarantee strength remain open.',
+    title: 'World ecology and pressure compatibility',
+    body: 'The starting ground catalogue, seven regional arrangements, world-size ladder, and direct written source guarantee are settled. The complete terrain-to-flora compatibility table, creature ecology, transformed weather combinations, and later Sigil acquisition order still need their own passes.',
   },
   {
     title: 'Waystone’s hard body',
