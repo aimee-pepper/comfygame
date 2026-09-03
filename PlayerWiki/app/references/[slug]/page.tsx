@@ -39,13 +39,7 @@ export default async function DesignReferencePage({
   return <SiteFrame sidebar>
     <GuideBreadcrumbs items={[{ label: 'Home', href: '/' }, { label: 'Aimee Reference', href: '/references' }, { label: reference.title }]} />
     <PageIntro eyebrow="Game Design reference" title={reference.title} summary={reference.summary} />
-    {reference.systemLinks.length ? <section className="article-section">
-      <h2>Open the system you need</h2>
-      <p>The accepted plan is organized through the Wiki's existing subject pages. Crafting stations keep their own recipes; materials, custody, progression, worlds, creatures, and equipment each keep their own rules.</p>
-      <div className="topic-grid">
-        {reference.systemLinks.map((entry) => <Link className="topic-card" href={entry.href} key={entry.href}><span><strong>{entry.title}</strong><small>{entry.summary}</small></span></Link>)}
-      </div>
-    </section> : <article className="article-section markdown-reference">
+    <article className="article-section markdown-reference">
       <ReactMarkdown
         remarkPlugins={[remarkGfm]}
         components={{
@@ -54,7 +48,14 @@ export default async function DesignReferencePage({
           blockquote: ({ node: _node, ...props }) => <blockquote className="note-card" {...props} />,
         }}
       >{reference.source}</ReactMarkdown>
-    </article>}
+    </article>
+    {reference.systemLinks.length ? <section className="article-section">
+      <h2>Related player-facing system pages</h2>
+      <p>The complete plan is above. These links lead to the subject-specific Wiki pages when you want current gameplay and intended design compared in that system's own context.</p>
+      <div className="topic-grid">
+        {reference.systemLinks.map((entry) => <Link className="topic-card" href={entry.href} key={`${entry.href}-${entry.title}`}><span><strong>{entry.title}</strong><small>{entry.summary}</small></span></Link>)}
+      </div>
+    </section> : null}
     <nav className="next-links" aria-label="Game Design references">
       {previous ? <Link href={`/references/${previous.slug}`}>Previous: {previous.title}</Link> : <Link href="/references">All references</Link>}
       {next ? <Link href={`/references/${next.slug}`}>Next: {next.title}</Link> : <Link href="/crafting">Crafting systems</Link>}

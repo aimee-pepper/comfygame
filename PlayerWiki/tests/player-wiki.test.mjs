@@ -50,7 +50,11 @@ test('Aimee Reference publishes the audited parallax World Splash inventory and 
   assert.match(route, /remarkGfm/);
   assert.match(route, /markdown-reference/);
   assert.match(route, /reference\.systemLinks/);
-  assert.match(route, /Open the system you need/);
+  assert.match(route, /Related player-facing system pages/);
+  assert.match(route, /The complete plan is above/);
+  assert.ok(route.indexOf('<article className="article-section markdown-reference">') < route.indexOf('{reference.systemLinks.length'));
+  assert.doesNotMatch(route, /reference\.systemLinks\.length\s*\?\s*<section[\s\S]*:\s*<article/);
+  assert.match(references, /Each page contains its complete authored plan/);
   assert.match(source, /systemLinks/);
   assert.doesNotMatch(preparation, /resource-crafting-world-ecology-cohesive-plan-v1\.md/);
   await access(path.resolve(root, '../AssetLab/world-splash-five-layer-inventory-v1.html'));

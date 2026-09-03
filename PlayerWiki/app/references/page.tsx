@@ -25,7 +25,7 @@ export default function ReferencesPage() {
     </section>
     <section className="article-section" aria-labelledby="resource-crafting-plans-heading">
       <h2 id="resource-crafting-plans-heading">Resource, crafting, and generated-world plans</h2>
-      <p>Use these plans for the accepted direction, clearly marked open decisions, and implementation order. Player-facing system details live on their existing Wiki pages instead of being repeated here.</p>
+      <p>Each page contains its complete authored plan, clearly marked open decisions, and implementation order. Related subject pages remain linked beneath the plan for deeper current-game reference.</p>
       <div className="topic-grid">
         {designReferences.map((reference) => <Link className="topic-card" href={`/references/${reference.slug}`} key={reference.slug}><span><strong>{reference.title}</strong><small>{reference.summary}</small></span></Link>)}
       </div>
