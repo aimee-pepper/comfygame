@@ -608,6 +608,7 @@ h2 {
   font-weight: 700;
 }
 .table-wrap {
+  width: min(94%, 1680px);
   overflow-x: auto;
   border: 1px solid var(--line);
   background: var(--paper-light);
@@ -694,7 +695,7 @@ footer {
   max-width: none;
   height: 100%;
   margin: 0;
-  padding: 0 clamp(20px, 2vw, 32px);
+  padding: 0 0 0 clamp(20px, 2vw, 32px);
   grid-template-columns: clamp(220px, 16vw, 280px) minmax(0, 1fr);
   gap: clamp(28px, 3vw, 52px);
 }
@@ -732,6 +733,7 @@ footer {
 .wiki-content-column {
   min-width: 0;
   min-height: 0;
+  padding-right: clamp(28px, 2.5vw, 48px);
   overflow-y: auto;
   overscroll-behavior: contain;
   scrollbar-gutter: stable;
@@ -1266,9 +1268,7 @@ footer {
   min-width: 0;
 }
 .people-directory {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 16px;
+  display: block;
   margin-top: 34px;
 }
 .person-directory-card {
@@ -1726,6 +1726,7 @@ footer {
     display: contents;
   }
   .wiki-content-column {
+    padding-right: 0;
     overflow: visible;
   }
   .wiki-sidebar a {
@@ -1817,6 +1818,9 @@ footer {
   .wiki-layout {
     width: 100%;
     padding: 0 12px;
+  }
+  .table-wrap {
+    width: 100%;
   }
   .wiki-sidebar a {
     min-height: 40px;

@@ -1058,8 +1058,11 @@ test('wiki uses the full desktop width with left-anchored navigation and indepen
   assert.match(styles, /\.site-shell-with-sidebar\s*{[^}]*height: 100dvh;[^}]*overflow: hidden;/s);
   assert.match(styles, /\.wiki-sidebar\s*{[^}]*overflow-y: auto;/s);
   assert.match(styles, /\.wiki-content-column\s*{[^}]*overflow-y: auto;/s);
-  assert.match(styles, /\.wiki-layout\s*{[^}]*width: 100%;[^}]*max-width: none;[^}]*margin: 0;[^}]*padding: 0 clamp\(20px, 2vw, 32px\);/s);
+  assert.match(styles, /\.wiki-layout\s*{[^}]*width: 100%;[^}]*max-width: none;[^}]*margin: 0;[^}]*padding: 0 0 0 clamp\(20px, 2vw, 32px\);/s);
   assert.match(styles, /\.wiki-layout\s*{[^}]*grid-template-columns: clamp\(220px, 16vw, 280px\) minmax\(0, 1fr\);/s);
+  assert.match(styles, /\.wiki-content-column\s*{[^}]*padding-right: clamp\(28px, 2\.5vw, 48px\);[^}]*overflow-y: auto;/s);
+  assert.match(styles, /\.table-wrap\s*{[^}]*width: min\(94%, 1680px\);/s);
+  assert.match(styles, /\.people-directory\s*{[^}]*display: block;/s);
   assert.doesNotMatch(styles, /\.wiki-layout\s*{[^}]*width: min\(1280px,/s);
   assert.doesNotMatch(styles, /\.wiki-layout\s*{[^}]*margin: 0 auto;/s);
   assert.match(styles, /@media \(max-width: 860px\)[\s\S]*\.site-shell-with-sidebar\s*{[^}]*height: auto;[^}]*overflow: visible;/);
