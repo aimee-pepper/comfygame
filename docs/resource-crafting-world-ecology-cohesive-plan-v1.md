@@ -547,9 +547,12 @@ Examples:
 
 - solid stone supports mosses, crusts, fissure growth, or rare rooted forms rather than arbitrary giant trees;
 - sand can support adapted scrub or selected trees, but not every canopy form;
-- deep water supports aquatic creatures;
-- shore and shallow-water regions support amphibious or crocodile-like creatures;
-- flying creatures can cross ground and water while still needing sensible perches, prey, or weather tolerance.
+- both shallow and deep water support aquatic creatures, with each generated creature's body plan and movement
+  deciding which depths suit it;
+- shore and shallow-water regions also support amphibious or crocodile-like creatures that can use both water
+  and nearby land; and
+- flying creatures can cross ground and water. Their habitats still need to suit their feeding, weather, and
+  resting needs, but a perch is required only when that particular creature's body plan calls for one.
 
 ## Creature generation
 
@@ -570,8 +573,7 @@ The intended generator separates:
 Habitat access includes at least:
 
 - land;
-- shallow water;
-- deep water;
+- aquatic shallow and deep water, with per-creature depth suitability;
 - amphibious land and shallow water;
 - flying or broadly traversing;
 - any later explicitly authored special habitat.

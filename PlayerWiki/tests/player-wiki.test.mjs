@@ -155,6 +155,8 @@ test('crafting overview separates the current property model from the intended p
   assert.match(overview, /the world itself is not rejected/);
   assert.match(overview, /Homogeneous uses one ground composition throughout/);
   assert.match(overview, /keeps its appropriate minimap record/);
+  assert.match(overview, /Aquatic creatures can use shallow and deep water/);
+  assert.match(overview, /perches are not universally required/);
   assert.match(resources, /Intended material identity/);
   assert.match(resources, /Gathering, return, and storage/);
   assert.match(loot, /href="\/resources#loot-and-custody"/);

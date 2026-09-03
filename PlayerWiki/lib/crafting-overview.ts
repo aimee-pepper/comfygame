@@ -92,7 +92,7 @@ export const worldGenerationPlan = [
   ['Ground layout', 'Choose Homogeneous, Dominant, Banded, Patchwork, Clustered, Gradient, or Fractured, then fill the arrangement with recognizable ground types. Homogeneous uses one ground composition throughout; Dominant uses one main composition with smaller inclusions.'],
   ['Ground and liquid types', 'Use multiple recognizable dirt, sand, stone, mineral, and liquid types. Granite regions can host Granite; Sand can become a glassmaking input.'],
   ['Flora', 'Terrain, light, atmosphere, weather, water, and temperature all constrain what can grow. Dense tree canopy can conceal distant features until the party approaches or moves beneath it. Once revealed, a feature keeps its appropriate minimap record even if canopy hides it in the main view again.'],
-  ['Creatures', 'Readable body plans and habitat rules support aquatic, land, amphibious, flying, and hybrid forms. Anatomy determines useful material types and subtypes.'],
+  ['Creatures', 'Readable body plans and habitat rules support aquatic, land, amphibious, flying, and hybrid forms. Aquatic creatures can use shallow and deep water when their bodies suit that depth. Flying creatures follow relevant feeding, weather, and resting needs; perches are not universally required. Anatomy determines useful material types and subtypes.'],
   ['Environment', 'When two possible conditions conflict, temperature or another relevant pressure chooses which one appears; the world itself is not rejected. Compatible written combinations may transform, such as rain and miasma becoming acid rain when that rule is approved.'],
   ['World size', 'Writing can eventually request smaller or larger worlds. Exact dimensions and costs will be discussed with Aimee.'],
 ] as const;
