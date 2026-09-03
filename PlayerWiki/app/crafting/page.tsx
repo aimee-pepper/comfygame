@@ -1,5 +1,6 @@
 import Link from '@/components/wiki-link';
 import { DirectoryDetailsIntro, DirectoryIndex } from '@/components/directory-navigation';
+import { GuideBreadcrumbs, RelatedGuides } from '@/components/guide-navigation';
 import { PageIntro } from '@/components/page-intro';
 import { PixelImage } from '@/components/pixel-image';
 import { SiteFrame } from '@/components/site-frame';
@@ -7,6 +8,7 @@ import { TruthPair } from '@/components/truth-pair';
 import { craftingSystems } from '@/lib/crafting';
 import { content } from '@/lib/content';
 import { craftingFamilyStatus } from '@/lib/player-guide-status';
+import { materialIdentityHierarchy, materialPropertyProblems, materialScoreBoundary, qualityRules } from '@/lib/crafting-overview';
 
 const systemGroups = [
   {
@@ -36,6 +38,7 @@ function statusFor(slug: string) {
 
 export default function CraftingSystemsPage() {
   return <SiteFrame sidebar>
+    <GuideBreadcrumbs items={[{ label: 'Home', href: '/' }, { label: 'Crafting' }]} />
     <PageIntro
       eyebrow="Production directory"
       title="Crafting systems"
@@ -63,25 +66,18 @@ export default function CraftingSystemsPage() {
               </div>
             </div>
             <p>{system.summary}</p>
+            {station && <p><Link href={`/buildings/${station.slug}`}>Open {station.name}</Link></p>}
             <p><Link href={`/crafting/${slug}`}>Open the complete {system.name} guide</Link></p>
           </article>;
         })}
       </div>
     </section>)}
 
-    <section className="article-section note-card">
-      <h2>Rules shared by crafting systems</h2>
-      <p>Each full system page keeps the recipes, inputs, outputs, access, limitations, and accepted intended material behavior for that one family. Shared ingredient, quality, result, progression, and world-acquisition rules live in the guides below instead of being repeated in every directory card.</p>
-      <TruthPair current="Each system page lists the recipes, inputs, outputs, access, and limitations available in the current game." accepted="Each same system page separately explains its accepted physical-material categories, quality behavior, result statistics, and changes that are not implemented yet." acceptedLabel="Intended organization" />
-      <nav aria-label="Shared crafting rules">
-        <Link href="/systems/crafting">Recipe and ingredient rules</Link>
-        <Link href="/resources">Materials and acquisition</Link>
-        <Link href="/systems/inventory-custody">Quality, stacks, and custody</Link>
-        <Link href="/systems/equipment-materials">Equipment results and material effects</Link>
-        <Link href="/resources/progression">Resource and facility progression</Link>
-        <Link href="/world">World generation and harvesting</Link>
-      </nav>
-    </section>
+    <section className="article-section"><h2>Current game and intended recipe system</h2><TruthPair current="Current makers combine counted resources, exact source-bearing samples, fixed costs, and hidden hardness, density, insulation, flexibility, lustre, or reactivity thresholds. Each station page lists its exact live rule." accepted="Recipes use static ingredients plus visible broad, specific, or precise physical categories. The player selects a physical type or subtype and Poor, Common, Rare, or Exceptional quality; the preview shows direct contributions to real item statistics." acceptedLabel="Intended design" /></section>
+    <section className="article-section"><h2>How recipes name ingredients</h2><p>A recipe can combine fixed ingredients with one or more material choices. A fixed ingredient names one exact resource, such as Resin. A category ingredient accepts any owned material from its displayed broad category, type, or subtype. A recipe narrows a choice only when the physical job genuinely requires it.</p><div className="table-wrap"><table><thead><tr><th>Ingredient scope</th><th>Example</th><th>Recipe meaning</th></tr></thead><tbody>{materialIdentityHierarchy.map(([level, example, use]) => <tr key={level}><td><strong>{level}</strong></td><td>{example}</td><td>{use}</td></tr>)}</tbody></table></div><ul className="compact-list"><li>The picker shows only compatible owned stacks.</li><li>The player chooses the exact subtype, quality, and quantity when more than one valid option exists.</li><li>A recipe never silently spends a higher quality than the one confirmed.</li><li>Species history can remain visible without turning every species into a separate recipe ingredient.</li></ul></section>
+    <section className="article-section"><h2>Properties affect the result, not eligibility</h2><p>Several current recipes accept an object merely because an internal score crosses a threshold. The intended system keeps all six numerical properties and uses them to calculate concrete finished-item statistics. The recipe itself asks for a recognizable physical material, type, or subtype.</p><div className="table-wrap"><table><thead><tr><th>Property</th><th>What it does now</th><th>Intended job</th></tr></thead><tbody>{materialPropertyProblems.map(([name, current, intended]) => <tr key={name}><td><strong>{name}</strong></td><td>{current}</td><td>{intended}</td></tr>)}</tbody></table></div><TruthPair current={materialScoreBoundary.currentGrade} accepted={materialScoreBoundary.intended} acceptedLabel="Intended design" /></section>
+    <section className="article-section two-column"><div><h2>Quality is a deliberate choice</h2><ul className="compact-list">{qualityRules.map(([band, behavior]) => <li key={band}><strong>{band}:</strong> {behavior}</li>)}</ul><p><Link href="/systems/inventory-custody">Read quality, stacks, and custody</Link></p></div><div><h2>Read the complete station page</h2><p>Every station page owns its recipes, access, exact inputs, outputs, limitations, refusals, current behavior, and intended changes. The directory above is only the concise comparison layer.</p><p><Link href="/resources">Browse materials and acquisition</Link></p></div></section>
+    <section className="article-section"><h2>Preview before making</h2><div className="step-grid"><article><span>1</span><h3>Choose a revealed station</h3><p>The station, known recipe or schematic, and its access rule must all be available before its current preview can be used.</p></article><article><span>2</span><h3>Keep cost forms distinct</h3><p>Stored resources, exact materials, Essence Crystals, and Motes are different costs. One cannot silently replace another.</p></article><article><span>3</span><h3>Commit the quoted result</h3><p>The station rechecks ingredients, selected materials, recipe, and legal Storehouse or Waiting destination. A changed quote needs a fresh preview.</p></article></div></section>
 
     <section className="article-section">
       <h2>Reuse and adjacent services</h2>
@@ -92,5 +88,6 @@ export default function CraftingSystemsPage() {
         <article className="status-card"><h3><Link href="/trading">Trading Post</Link></h3><p>Buy and sell exact eligible holdings through its own price, stock, quantity, quality, and custody rules.</p></article>
       </div>
     </section>
+    <RelatedGuides links={[{ label: 'Resources', href: '/resources' }, { label: 'Inventory and custody', href: '/systems/inventory-custody' }, { label: 'Equipment', href: '/equipment' }, { label: 'Current progression', href: '/resources/progression' }, { label: 'Village', href: '/village' }, { label: 'Worlds and harvesting', href: '/world' }]} />
   </SiteFrame>;
 }

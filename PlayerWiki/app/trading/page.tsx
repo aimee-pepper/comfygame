@@ -4,6 +4,7 @@ import { PageIntro } from '@/components/page-intro';
 import { PixelImage } from '@/components/pixel-image';
 import { SiteFrame } from '@/components/site-frame';
 import { TruthPair } from '@/components/truth-pair';
+import { content } from '@/lib/content';
 import {
   buyableResourceBands,
   itemRoute,
@@ -15,6 +16,10 @@ import {
 } from '@/lib/trading-reference';
 
 export default function TradingDirectory() {
+  const recycler = content.stations.find((station) => station.id === 'recycler');
+  const spring = content.stations.find((station) => station.id === 'essence_spring');
+  const rawEssence = content.resources.find((resource) => resource.id === 'raw_essence');
+  const mote = content.resources.find((resource) => resource.id === 'mote');
   const gearBySlot = ordinaryMerchantGear.reduce<Record<string, typeof ordinaryMerchantGear>>(
     (groups, item) => {
       const slot = String(item.gear?.slot ?? 'other');
@@ -24,16 +29,17 @@ export default function TradingDirectory() {
     {},
   );
   return <SiteFrame sidebar>
-    <GuideBreadcrumbs items={[{ label: 'Systems', href: '/systems' }, { label: 'Economy and exchange', href: '/systems/economy-exchange' }, { label: 'Trading Post offers' }]} />
+    <GuideBreadcrumbs items={[{ label: 'Home', href: '/' }, { label: 'Economy and exchange' }]} />
     <div className="entity-heading">
       {tradingStation?.assetURL && <PixelImage src={tradingStation.assetURL} alt="Trading Post building visual" size={96} />}
-      <PageIntro eyebrow="Current Village reference" title="Trading Post offers" summary="See the exact current offer pools, purchase terms, and sale rules before comparing them with the stock on Vance’s screen." />
+      <PageIntro eyebrow="Current Village reference" title="Economy and exchange" summary="Use one economy guide for Trading Post offers, Essence refinement, and Recycler returns. Each linked facility or item page holds its complete individual details." />
     </div>
+    <section className="article-section journey-strip">{tradingStation?.assetURL && <Link href="/buildings/trading-post"><PixelImage src={tradingStation.assetURL} alt="Trading Post building visual" size={64} /><span><strong>Trading Post</strong><small>Buy current stock or sell an exact eligible holding.</small></span></Link>}{spring?.assetURL && <Link href="/buildings/essence-spring"><PixelImage src={spring.assetURL} alt="Essence Spring building visual" size={64} /><span><strong>Essence Spring</strong><small>Refine Raw Essence into spendable Essence Crystals.</small></span></Link>}{recycler?.assetURL && <Link href="/recycling"><PixelImage src={recycler.assetURL} alt="Recycler building visual" size={64} /><span><strong>Recycler</strong><small>Preview the return from one exact eligible piece.</small></span></Link>}</section>
     <section className="article-section"><h2>Material offers today and after the approved update</h2><TruthPair current="The Trading Post currently mixes counted resource lines with exact material samples. The shelf and confirmation show the exact stock, quantity, and price that can be committed now." accepted="Physical materials will be bought and sold by exact subtype, quality band, and quantity. Species-specific items and source history remain inspectable inside that stock. A different grade is never silently sold or purchased in place of the quoted band." /></section>
     <section className="article-section note-card">
       <h2>Check the current shelf before buying</h2>
       <p>The Trading Post is available after its 10-Essence foundation is complete. Its stock refreshes after an expedition resolves, not while you browse. A shelf line has no durable player-facing listing identity, so this directory records the live offer pools and fixed terms instead of claiming that a particular item is always for sale.</p>
-      <p><Link href="/buildings/trading-post">Trading Post construction</Link> · <Link href="/services/trading-post">Use the Trading Post</Link></p>
+      <p><Link href="/buildings/trading-post">Open the complete Trading Post entry</Link></p>
     </section>
     <section className="article-section">
       <h2>Current resource offer pools</h2>
@@ -69,6 +75,8 @@ export default function TradingDirectory() {
       </tbody></table></div>
     </section>
     <section className="article-section note-card"><h2>Cancel, refusal, and stock changes</h2><p>Opening a listing, changing quantity, Cancel, or Back does not move currency, resources, items, or material samples. If funds, stock, identity, capacity, or the current revision changes before confirmation, review the refreshed line: the previous offer stays uncommitted.</p></section>
-    <RelatedGuides links={[{ label: 'Economy and exchange', href: '/systems/economy-exchange' }, { label: 'Trading Post service', href: '/services/trading-post' }, { label: 'Trading Post building', href: '/buildings/trading-post' }, { label: 'Resources', href: '/resources' }, { label: 'Equipment', href: '/equipment' }, { label: 'Consumables', href: '/consumables' }, { label: 'Storehouse and inventory', href: '/systems/inventory-custody' }]} />
+    <section className="article-section two-column"><div><h2>Refine Raw Essence</h2><p>At the Essence Spring, choose an amount of {rawEssence ? <Link href={`/resources/${rawEssence.slug}`}>Raw Essence</Link> : 'Raw Essence'}, review the exact current Crystal return, then commit. Raw Essence and spendable Essence remain distinct.</p><p>A changed amount or rate leaves the reserve unchanged.</p></div><div><h2>Recycle one exact piece</h2><p>Select eligible Stored gear and read its dismantling preview. Previewing changes nothing; only a completed dismantle removes that selected piece and adds its shown yield.</p><p><Link href="/recycling">Open the complete Recycler entry</Link></p></div></section>
+    <section className="article-section note-card"><h2>Keep currencies and holdings distinct</h2><p>Gold, spendable Essence, Raw Essence, resources, physical materials, and items are different holdings. {mote ? <><Link href={`/resources/${mote.slug}`}>{mote.name}</Link> is a Reality currency and is not ordinarily traded. </> : null}The current confirmation names exactly what will move; another holding is never substituted.</p></section>
+    <RelatedGuides links={[{ label: 'Trading Post', href: '/buildings/trading-post' }, { label: 'Recycler', href: '/recycling' }, { label: 'Essence Spring', href: '/buildings/essence-spring' }, { label: 'Resources', href: '/resources' }, { label: 'Equipment', href: '/equipment' }, { label: 'Consumables', href: '/consumables' }, { label: 'Inventory and custody', href: '/systems/inventory-custody' }]} />
   </SiteFrame>;
 }

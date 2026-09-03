@@ -12,6 +12,7 @@ import { blacksmithFirstUse } from '@/lib/blacksmith-first-use';
 import { recyclerFirstUse } from '@/lib/recycler-first-use';
 import { surveyPostFirstUse } from '@/lib/survey-post-first-use';
 import { serviceForSlug, serviceGuides } from '@/lib/services';
+import { CanonicalPageRedirect } from '@/components/canonical-page-redirect';
 
 export function generateStaticParams() {
   return serviceGuides.map((guide) => ({ slug: guide.slug }));
@@ -25,7 +26,18 @@ export async function generateMetadata({
   const guide = serviceForSlug(slug);
   return guide ? { title: guide.name, description: guide.summary } : {};
 }
-export default async function ServiceDetail({
+export default async function ServiceDetailRedirect({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}) {
+  const { slug } = await params;
+  const guide = serviceForSlug(slug);
+  const station = guide ? content.stations.find((entry) => entry.id === guide.stationID) : null;
+  return <CanonicalPageRedirect formerTitle={`${station?.name ?? guide?.name ?? 'Village facility'} service page`} href={`/buildings/${station?.slug ?? slug}`} label={station?.name ?? guide?.name ?? 'Village facility'} />;
+}
+
+async function PreservedFormerServiceDetail({
   params,
 }: {
   params: Promise<{ slug: string }>;

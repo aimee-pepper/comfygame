@@ -129,9 +129,9 @@ export const serviceGuides: ServiceGuide[] = [
       'Only a completed preparation consumes the selected material and named stock, then stores the one prepared item in Storehouse or Waiting according to the current output space. A changed quote, shortfall, or refusal leaves the displayed holdings and recipe knowledge unchanged.',
     relatedGuides: [
       { label: 'Nessa', href: '/people/nessa' },
-      { label: 'Apothecary construction', href: '/places/apothecary' },
+      { label: 'Apothecary', href: '/buildings/apothecary' },
       { label: 'Apothecary preparations', href: '/crafting/apothecary' },
-      { label: 'Field supplies', href: '/systems/field-supplies' },
+      { label: 'Field supplies', href: '/consumables' },
     ],
     remember: [
       'The first completed build teaches Lesser Salve but does not prepare one.',
@@ -164,8 +164,8 @@ export const serviceGuides: ServiceGuide[] = [
       { label: 'Halloway', href: '/people/halloway' },
       { label: 'Blacksmith construction', href: '/buildings/blacksmith' },
       { label: 'Pointed Blade construction', href: '/crafting/blacksmith' },
-      { label: 'Equipment and material effects', href: '/systems/equipment-materials' },
-      { label: 'Recycler', href: '/services/recycler' },
+      { label: 'Equipment and material effects', href: '/equipment' },
+      { label: 'Recycler', href: '/buildings/recycler' },
     ],
     remember: [
       'The foundation teaches Pointed Blade but gives no gear or material stock.',
@@ -264,7 +264,7 @@ export const serviceGuides: ServiceGuide[] = [
       { label: 'Mara', href: '/people/mara' },
       { label: 'Survey Post construction', href: '/buildings/survey-post' },
       { label: 'Instrument study and improvement boundary', href: '/crafting/instruments' },
-      { label: 'Field supplies and Field Kit', href: '/systems/field-supplies' },
+      { label: 'Field supplies and Field Kit', href: '/consumables' },
       { label: 'World conditions', href: '/world' },
     ],
     remember: [
@@ -295,7 +295,7 @@ export const serviceGuides: ServiceGuide[] = [
       'A completed placement change updates that person’s current location. If party capacity or the shown placement prevents it, their existing placement remains intact.',
     relatedGuides: [
       { label: 'People', href: '/people' },
-      { label: 'Party, Gear and Gambits', href: '/services/party-and-gear' },
+      { label: 'Party and Gear', href: '/buildings/party' },
       { label: 'Equipment', href: '/equipment' },
     ],
     remember: [
@@ -389,7 +389,7 @@ export const serviceGuides: ServiceGuide[] = [
     relatedGuides: [
       { label: 'Combat', href: '/systems/combat' },
       { label: 'Exploration', href: '/systems/exploration' },
-      { label: 'Library collections', href: '/services/library' },
+      { label: 'Library collections', href: '/buildings/library' },
     ],
     remember: [
       'The Bestiary records disclosed encounters rather than revealing unseen creatures.',

@@ -64,9 +64,9 @@ test('crafting overview separates the current property model from the intended p
     read('lib/player-guide-status.ts'),
     read('app/resources/page.tsx'),
     read('app/loot/page.tsx'),
-    read('app/systems/crafting/page.tsx'),
+    read('app/crafting/page.tsx'),
     read('app/systems/inventory-custody/page.tsx'),
-    read('app/systems/equipment-materials/page.tsx'),
+    read('app/equipment/page.tsx'),
     read('app/world/page.tsx'),
     read('app/resources/progression/page.tsx'),
     read('app/bestiary/page.tsx'),
@@ -83,13 +83,13 @@ test('crafting overview separates the current property model from the intended p
   for (const quality of ['Poor', 'Common', 'Rare', 'Exceptional'])
     assert.match(status, new RegExp(`'${quality}'`));
   assert.doesNotMatch(status.slice(status.indexOf('export const qualityBands'), status.indexOf('export const worldMaterialFamilies')), /Peerless/);
-  assert.match(page, /Rules shared by crafting systems/);
+  assert.match(page, /Current game and intended recipe system/);
   assert.match(page, /Every system now has its own page/);
   assert.doesNotMatch(page, /All current recipes by station/);
-  assert.match(craftingGuide, /The properties stay; recipe eligibility changes/);
+  assert.match(craftingGuide, /Properties affect the result, not eligibility/);
   assert.match(craftingGuide, /numerical properties and uses them to calculate concrete finished-item statistics/);
   assert.match(inventory, /default material stack is subtype plus quality/);
-  assert.match(equipment, /Intended material stats/);
+  assert.match(equipment, /actual numerical properties change concrete finished-item statistics/);
   assert.match(world, /Current generator and intended ecology/);
   assert.match(progression, /Current progression and intended expansion/);
   assert.match(bestiary, /Creature materials inherit real anatomy/);
@@ -98,7 +98,7 @@ test('crafting overview separates the current property model from the intended p
   assert.match(overview, /the world itself is not rejected/);
   assert.match(resources, /Intended material identity/);
   assert.match(resources, /Loot, return, and custody/);
-  assert.match(loot, /Open Resources at Loot, return, and custody/);
+  assert.match(loot, /href="\/resources#loot-and-custody"/);
 });
 
 test('locked coating and starter-rune rules remain separate from the current build', async () => {
@@ -230,13 +230,10 @@ test('player reference directories provide a quick index, an at-a-glance layer, 
     'app/equipment/page.tsx',
     'app/flora/page.tsx',
     'app/people/page.tsx',
-    'app/places/page.tsx',
     'app/research/page.tsx',
     'app/resources/page.tsx',
-    'app/services/page.tsx',
     'app/sites/page.tsx',
     'app/statuses/page.tsx',
-    'app/systems/village-construction/page.tsx',
     'app/techniques/page.tsx',
     'app/terrain/page.tsx',
     'app/village/page.tsx',
@@ -262,7 +259,7 @@ test('player reference directories provide a quick index, an at-a-glance layer, 
     'app/resources/[slug]/page.tsx',
     'app/equipment/[slug]/page.tsx',
     'app/people/[slug]/page.tsx',
-    'app/places/[slug]/page.tsx',
+    'app/buildings/[slug]/page.tsx',
   ]) {
     await access(path.join(root, relative));
   }
@@ -283,14 +280,13 @@ test('wiki formatting standard makes detail pages complete while category pages 
   const completeDetailContracts = {
     'app/actions/[slug]/page.tsx': ['Surface', 'Available when', 'Committed change', 'Cost', 'What the result keeps', 'When it cannot complete'],
     'app/bestiary/[slug]/page.tsx': ['Combat profile', 'Health', 'Attack', 'Notice range', 'World conditions required', 'World conditions that help', 'Encounter and companionship'],
-    'app/buildings/[slug]/page.tsx': ['Access and foundation', 'Village area', 'Current route', 'When usable', 'Exact construction', 'Actions and services', 'Results and research', 'Related materials and next steps'],
+    'components/facility-detail.tsx': ['Access and foundation', 'Village area', 'Current route', 'When usable', 'Exact construction', 'What this facility currently offers', 'Current crafting and Research', 'Related materials and next steps'],
     'app/crafting/[slug]/page.tsx': ['Current station and approved direction', 'Access and readiness', 'Current recipes and requirements', 'Material choices', 'Commit and result', 'Results and their use'],
     'app/equipment/[slug]/page.tsx': ['Current equipment facts', 'Eligibility', 'Material and reforge facts', 'ItemCraftingRoutes', 'Custody and swapping', 'Trading and recycling'],
     'app/items/[slug]/page.tsx': ['Current use', 'Field Kit and carrying', 'Identification and knowledge', 'Use and custody', 'ItemCraftingRoutes', 'Trading', 'Recycler'],
     'app/people/[slug]/page.tsx': ['Campaign order', 'Meeting context', 'Diary reward', 'After meeting', 'Book pages beyond location hints', 'location-hint stages'],
     'app/research/[slug]/page.tsx': ['Current node details', 'Earlier upgrades', 'Other requirements', 'Base cost', 'Result', 'Study and retain'],
     'app/resources/[slug]/page.tsx': ['How to obtain it', 'Trade', 'Primary pressure', 'Required conditions', 'Conditions that help', 'Current service and research uses', 'Craft recipes', 'Building recipes'],
-    'app/services/[slug]/page.tsx': ['Use it for', 'Typical flow', 'Choose the current entry', 'What happens after you confirm', 'Worth remembering'],
     'app/sites/[slug]/page.tsx': ['Current world association', 'Placement', 'Search', 'Conditions', 'Disclosed result after completion', 'Look and depletion'],
     'app/statuses/[slug]/page.tsx': ['Current rule', 'Source', 'Effect', 'Duration', 'Where it applies', 'Clear or prevent', 'Keep the boundary clear'],
     'app/techniques/[slug]/page.tsx': ['Current use', 'Source or grant', 'Who can use it', 'Trigger', 'Target', 'Exact current result', 'Costs, cooldowns, and limits'],
@@ -331,7 +327,7 @@ test('site directory keeps current conditions, disclosed results, and depletion 
   await access(path.join(root, 'app/sites/[slug]/page.tsx'));
   const directory = await read('app/sites/page.tsx');
   const detail = await read('app/sites/[slug]/page.tsx');
-  const guide = await read('app/systems/sites-hazards/page.tsx');
+  const guide = directory;
   const snapshot = JSON.parse(await read('data/player-content.json'));
   assert.equal(snapshot.sites.length, 9);
   assert.match(
@@ -346,7 +342,7 @@ test('site directory keeps current conditions, disclosed results, and depletion 
     detail,
     /remains unavailable rather than silently awarding a replacement result/,
   );
-  assert.match(guide, /Open the full site directory/);
+  assert.match(guide, /Current named site profiles/);
   assert.match(guide, /disclosedResult/);
 });
 
@@ -354,14 +350,14 @@ test('Village directory separates live buildings from scheduled entries and give
   await access(path.join(root, 'app/village/page.tsx'));
   await access(path.join(root, 'app/buildings/[slug]/page.tsx'));
   const directory = await read('app/village/page.tsx');
-  const detail = await read('app/buildings/[slug]/page.tsx');
+  const detail = await read('components/facility-detail.tsx');
   const snapshot = JSON.parse(await read('data/player-content.json'));
   assert.equal(snapshot.stations.length, 22);
   assert.equal(snapshot.scheduledStations.length, 1);
   assert.match(directory, /buildingStatus/);
   assert.match(directory, /Scheduled, not live/);
-  assert.match(directory, /No live action or recipe is published/);
-  assert.match(detail, /This entry is not a live player route/);
+  assert.match(directory, /No live action, service, recipe, or reward is published/);
+  assert.match(detail, /This destination is not a live player route/);
   assert.match(detail, /Exact construction/);
   assert.match(detail, /Related materials and next steps/);
 });
@@ -381,7 +377,7 @@ test('Village building routes are discoverable from player navigation and materi
     ].map(read),
   );
   for (const source of sources) assert.match(source, /\/village|\/buildings\//);
-  assert.match(sources[1], /Scheduled building/);
+  assert.match(sources[1], /Scheduled destination/);
   assert.match(sources[4], /Browse Village buildings/);
   assert.match(sources[5], /\/buildings\/\$\{station\.slug\}/);
   assert.match(sources[7], /Village buildings/);
@@ -419,7 +415,7 @@ test('item details link published recipes and resources without guessing absent 
   const routes = await read('components/item-crafting-routes.tsx');
   const itemDetail = await read('app/items/[slug]/page.tsx');
   const equipmentDetail = await read('app/equipment/[slug]/page.tsx');
-  const craftingGuide = await read('app/systems/crafting/page.tsx');
+  const craftingGuide = await read('app/crafting/page.tsx');
   assert.match(routes, /Current acquisition/);
   assert.match(
     routes,
@@ -428,7 +424,7 @@ test('item details link published recipes and resources without guessing absent 
   assert.match(routes, /Related resources/);
   assert.match(itemDetail, /ItemCraftingRoutes/);
   assert.match(equipmentDetail, /ItemCraftingRoutes/);
-  assert.match(craftingGuide, /Instruments and prepared ink/);
+  assert.match(craftingGuide, /Expedition tools and worldwork/);
   assert.match(craftingGuide, /writing-ink/);
 });
 
@@ -437,16 +433,16 @@ test('Research directory provides stable semantic node routes with complete curr
   await access(path.join(root, 'app/research/[slug]/page.tsx'));
   const directory = await read('app/research/page.tsx');
   const detail = await read('app/research/[slug]/page.tsx');
-  const guide = await read('app/systems/research/page.tsx');
+  const guide = await read('app/research/page.tsx');
   const helpers = await read('lib/research.ts');
-  assert.match(directory, /Research directory/);
+  assert.match(directory, /Compare Research by branch/);
   assert.match(directory, /Base cost/);
   assert.match(directory, /Ready when/);
   assert.match(detail, /Current node details/);
   assert.match(detail, /Bundled construction/);
   assert.match(detail, /Study and retain/);
-  assert.match(detail, /\/services\/library/);
-  assert.match(guide, /Open the Research directory/);
+  assert.match(detail, /\/buildings\/library/);
+  assert.match(guide, /How to access Research/);
   assert.match(helpers, /researchNodeSlug/);
   assert.match(helpers, /branch\?\.name/);
   assert.match(helpers, /slugify\(node\.name\)/);
@@ -509,8 +505,8 @@ test('conditions and techniques are discoverable through combat, preparation, eq
       'app/systems/party-preparation/page.tsx',
       'app/equipment/page.tsx',
       'app/equipment/[slug]/page.tsx',
-      'app/systems/field-supplies/page.tsx',
-      'app/systems/combat-techniques-gambits/page.tsx',
+      'app/consumables/page.tsx',
+      'app/techniques/page.tsx',
     ].map(read),
   );
   for (const source of sources) assert.match(source, /\/statuses|\/techniques/);
@@ -743,25 +739,23 @@ test('Survey Post first-reading journey keeps Mara, permanent capabilities, load
 test('economy references are reachable from current player tasks without claiming rotating transactions are permanent', async () => {
   const sources = await Promise.all(
     [
-      'app/systems/economy-exchange/page.tsx',
+      'app/trading/page.tsx',
       'app/resources/[slug]/page.tsx',
       'app/items/[slug]/page.tsx',
       'app/equipment/[slug]/page.tsx',
-      'app/systems/crafting/page.tsx',
+      'app/crafting/page.tsx',
       'app/resources/progression/page.tsx',
       'app/village/page.tsx',
-      'app/services/page.tsx',
-      'app/services/[slug]/page.tsx',
-      'app/buildings/[slug]/page.tsx',
+      'components/facility-detail.tsx',
       'app/search/page.tsx',
       'app/glossary/page.tsx',
       'lib/wiki-navigation.ts',
     ].map(read),
   );
   for (const source of sources) assert.match(source, /\/trading|\/recycling/);
-  assert.match(sources[0], /Trading offer reference/);
-  assert.match(sources[10], /Economy references/);
-  assert.match(sources[12], /label: 'Trading'/);
+  assert.match(sources[0], /Check the current shelf before buying/);
+  assert.match(sources[8], /Current economy reference/);
+  assert.match(sources[10], /label: 'Economy and exchange'/);
 });
 
 test('complete people records are discoverable through player-facing Library, site, glossary, search, and navigation routes', async () => {
@@ -802,7 +796,7 @@ test('action reference is discoverable from player navigation and the affected c
       'app/systems/exploration/page.tsx',
       'app/systems/combat/page.tsx',
       'app/systems/inventory-custody/page.tsx',
-      'app/systems/research/page.tsx',
+      'app/research/page.tsx',
       'app/systems/animals-companionship/page.tsx',
     ].map(read),
   );
@@ -840,16 +834,16 @@ test('equipment routes retain slot, recipe, frozen-piece and custody guidance', 
 test('consumable routes keep current effect, target, preparation, carrying, and committed-use facts together', async () => {
   const index = await read('app/consumables/page.tsx');
   const detail = await read('app/items/[slug]/page.tsx');
-  const supplies = await read('app/systems/field-supplies/page.tsx');
+  const supplies = await read('app/consumables/page.tsx');
   const contentSource = await read('lib/content.ts');
   assert.match(index, /Current recipe route/);
-  assert.match(index, /Carry and use/);
+  assert.match(index, /Prepare the next Field Kit at Home/);
   assert.match(index, /Target/);
   assert.match(detail, /Field Kit and carrying/);
   assert.match(detail, /Commit the shown use/);
-  assert.match(detail, /\/systems\/field-supplies/);
-  assert.match(supplies, /timed effect/);
-  assert.match(supplies, /remaining turns/);
+  assert.match(detail, /href: '\/consumables'/);
+  assert.match(supplies, /12-turn field effect/);
+  assert.match(supplies, /Commit only the shown use/);
   assert.match(contentSource, /function consumableEffect/);
   assert.match(contentSource, /function consumableTarget/);
   assert.match(contentSource, /function consumableDuration/);
@@ -865,10 +859,10 @@ test('curio routes explain recognition and custody without exposing an unknown r
   assert.match(detail, /Identification and knowledge/);
   assert.match(detail, /identified with Solvent while carried/);
   assert.match(detail, /does not treat this object as recyclable gear/);
-  assert.match(detail, /\/systems\/knowledge-records/);
-  assert.match(detail, /\/services\/storehouse/);
-  assert.match(detail, /\/services\/recycler/);
-  assert.match(detail, /\/services\/trading-post/);
+  assert.match(detail, /\/buildings\/library/);
+  assert.match(detail, /\/buildings\/storehouse/);
+  assert.match(detail, /href: '\/recycling'/);
+  assert.match(detail, /href: '\/trading'/);
 });
 
 test('player navigation excludes internal wiki architecture', async () => {
@@ -968,7 +962,7 @@ test('crafting has a linked system index and complete resource cross-reference s
   const craftingIndex = await read('app/crafting/page.tsx');
   const craftingDetail = await read('app/crafting/[slug]/page.tsx');
   assert.match(craftingIndex, /PixelImage/);
-  assert.match(craftingIndex, /Rules shared by crafting systems/);
+  assert.match(craftingIndex, /Current game and intended recipe system/);
   assert.match(craftingIndex, /Preparations and processing/);
   assert.match(craftingIndex, /Weapons, clothing, and protection/);
   assert.match(craftingIndex, /Expedition tools and worldwork/);
@@ -996,13 +990,13 @@ test('crafting has a linked system index and complete resource cross-reference s
   assert.match(crafting, /id: 'light-core'/);
   assert.match(crafting, /name: 'Heat Conduit Fixture'/);
   assert.match(crafting, /name: 'Anchor Frame'/);
-  const placeDetail = await read('app/places/[slug]/page.tsx');
-  assert.match(placeDetail, /Exact inputs/);
-  assert.match(placeDetail, /Ready when/);
-  assert.match(placeDetail, /Material choices/);
-  const craftingGuide = await read('app/systems/crafting/page.tsx');
+  const facilityDetail = await read('components/facility-detail.tsx');
+  assert.match(facilityDetail, /Current crafting and Research/);
+  assert.match(facilityDetail, /Material choices/);
+  assert.match(facilityDetail, /Result and custody/);
+  const craftingGuide = await read('app/crafting/page.tsx');
   assert.match(craftingGuide, /Keep cost forms distinct/);
-  assert.match(craftingGuide, /A counted resource cannot replace an exact/);
+  assert.match(craftingGuide, /One cannot silently replace another/);
   const search = await read('app/search/page.tsx');
   assert.match(search, /Current crafting/);
   assert.match(search, /recipeReadiness/);
@@ -1012,11 +1006,11 @@ test('crafting has a linked system index and complete resource cross-reference s
   assert.match(progression, /Crafting matrix lists only current recipe routes/);
   const equipment = await read('app/equipment/page.tsx');
   assert.match(equipment, /recipeReadiness/);
-  assert.match(equipment, /does not have a matching current craft output/);
+  assert.match(equipment, /No current recipe published/);
   for (const source of [
     await read('app/research/page.tsx'),
     await read('app/research/[slug]/page.tsx'),
-    await read('app/systems/research/page.tsx'),
+    await read('app/research/page.tsx'),
   ])
     assert.doesNotMatch(source, /places\/workshop|Workshop and Research/);
 });
@@ -1040,7 +1034,7 @@ test('public loot, resources, and crafting guides separate implemented truth fro
     assert.match(source, /TruthPair/);
   }
   assert.doesNotMatch(frame, /href="\/loot"/);
-  assert.match(loot, /Open Resources at Loot, return, and custody/);
+  assert.match(loot, /href="\/resources#loot-and-custody"/);
   assert.match(resources, /lootPaths/);
   assert.match(status, /Playable now/);
   assert.match(truthPair, /Implemented now/);
@@ -1054,7 +1048,7 @@ test('public loot, resources, and crafting guides separate implemented truth fro
   assert.match(status, /Waystone’s hard body/);
 });
 
-test('sidebar and article are independent desktop scroll regions with a single mobile flow', async () => {
+test('wiki uses the full desktop width with left-anchored navigation and independent scrolling', async () => {
   const [frame, styles] = await Promise.all([
     read('components/site-frame.tsx'),
     read('app/globals.css'),
@@ -1064,6 +1058,10 @@ test('sidebar and article are independent desktop scroll regions with a single m
   assert.match(styles, /\.site-shell-with-sidebar\s*{[^}]*height: 100dvh;[^}]*overflow: hidden;/s);
   assert.match(styles, /\.wiki-sidebar\s*{[^}]*overflow-y: auto;/s);
   assert.match(styles, /\.wiki-content-column\s*{[^}]*overflow-y: auto;/s);
+  assert.match(styles, /\.wiki-layout\s*{[^}]*width: 100%;[^}]*max-width: none;[^}]*margin: 0;[^}]*padding: 0 clamp\(20px, 2vw, 32px\);/s);
+  assert.match(styles, /\.wiki-layout\s*{[^}]*grid-template-columns: clamp\(220px, 16vw, 280px\) minmax\(0, 1fr\);/s);
+  assert.doesNotMatch(styles, /\.wiki-layout\s*{[^}]*width: min\(1280px,/s);
+  assert.doesNotMatch(styles, /\.wiki-layout\s*{[^}]*margin: 0 auto;/s);
   assert.match(styles, /@media \(max-width: 860px\)[\s\S]*\.site-shell-with-sidebar\s*{[^}]*height: auto;[^}]*overflow: visible;/);
 });
 
@@ -1139,12 +1137,12 @@ test('home and getting-started guide the live route with inline retained visuals
   }
 });
 
-test('crafting guide links retained Village visuals to their place references', async () => {
-  const source = await read('app/systems/crafting/page.tsx');
-  assert.match(source, /crafting-route-strip/);
+test('crafting guide links retained Village visuals to their canonical facility entries', async () => {
+  const source = await read('app/crafting/page.tsx');
+  assert.match(source, /crafting-system-card/);
   assert.match(source, /PixelImage/);
   assert.match(source, /station\.assetURL/);
-  assert.match(source, /\/places\/\$\{station\.slug\}/);
+  assert.match(source, /\/buildings\/\$\{station\.slug\}/);
 });
 
 test('full cast pages publish complete exact book text with a clear location-hint boundary', async () => {
@@ -1240,7 +1238,7 @@ test('full cast pages publish complete exact book text with a clear location-hin
   assert.match(peopleDirectory, /#diary-pages/);
 });
 
-test('village services have a hub, individual guides and place cross-links', async () => {
+test('Village facilities have one complete canonical detail owner and legacy redirects', async () => {
   await access(path.join(root, 'app/services/page.tsx'));
   await access(path.join(root, 'app/services/[slug]/page.tsx'));
   const services = await read('lib/services.ts');
@@ -1255,18 +1253,20 @@ test('village services have a hub, individual guides and place cross-links', asy
     'bestiary',
   ])
     assert.match(services, new RegExp(`stationID: '${id}'`));
-  const place = await read('app/places/[slug]/page.tsx');
-  assert.match(place, /serviceForStation/);
-  assert.match(place, /How to use/);
-  const index = await read('app/services/page.tsx');
-  const detail = await read('app/services/[slug]/page.tsx');
-  assert.match(index, /station\?\.assetURL \?\? station\?\.contextAssetURL/);
-  assert.match(index, /PixelImage/);
-  assert.match(detail, /station\.assetURL \?\? station\.contextAssetURL/);
-  assert.match(detail, /service-visual-note/);
-  assert.match(detail, /Choose the current entry/);
-  assert.match(detail, /What happens after you confirm/);
-  assert.match(detail, /guide\.relatedGuides/);
+  const facility = await read('components/facility-detail.tsx');
+  const serviceIndex = await read('app/services/page.tsx');
+  const serviceDetail = await read('app/services/[slug]/page.tsx');
+  const placeIndex = await read('app/places/page.tsx');
+  const placeDetail = await read('app/places/[slug]/page.tsx');
+  assert.match(facility, /buildingActions/);
+  assert.match(facility, /How to use it/);
+  assert.match(facility, /Choose the current entry/);
+  assert.match(facility, /After you confirm/);
+  assert.match(facility, /Worth remembering/);
+  assert.match(serviceIndex, /VillageIndexRedirect/);
+  assert.match(placeIndex, /VillageIndexRedirect/);
+  assert.match(serviceDetail, /href={`\/buildings\/\$\{station\?\.slug \?\? slug\}`}/);
+  assert.match(placeDetail, /href={`\/buildings\/\$\{slug\}`}/);
   assert.match(services, /selection:/);
   assert.match(services, /result:/);
   assert.match(services, /relatedGuides:/);
@@ -1300,7 +1300,7 @@ test('bestiary navigation preserves undiscovered creature privacy while linking 
 test('search groups player references and uses retained thumbnails only where available', async () => {
   const search = await read('app/search/page.tsx');
   assert.match(search, /label: 'Resources'/);
-  assert.match(search, /label: 'Village services'/);
+  assert.match(search, /label: 'Village'/);
   assert.match(search, /label: 'Creatures and threats'/);
   assert.match(search, /label: 'Sites'/);
   assert.match(search, /content\.creatures/);
@@ -1318,7 +1318,7 @@ test('glossary combines related player domains and points to useful guides', asy
   assert.match(glossary, /Village and facilities/);
   assert.match(glossary, /Crafting, resources and progression/);
   assert.match(glossary, /\/systems\/world-writing/);
-  assert.match(glossary, /\/services\/party-and-gear/);
+  assert.match(glossary, /\/systems\/party-preparation/);
   assert.match(glossary, /glossary-group-heading/);
 });
 
@@ -1342,8 +1342,8 @@ test('creature and site directories are discoverable from shared navigation and 
     assert.match(source, /\/bestiary|\/sites/);
   }
   assert.match(systems, /Browse the Wiki by subject/);
-  assert.match(navigation, /Site directory/);
-  assert.match(records, /without marking one as discovered/);
+  assert.match(navigation, /Sites and hazards/);
+  assert.match(records, /href="\/buildings\/library"/);
 });
 
 test('systems hub groups every current player guide into useful routes', async () => {
@@ -1363,26 +1363,38 @@ test('systems hub groups every current player guide into useful routes', async (
     '/systems/world-writing',
     '/systems/exploration',
     '/systems/combat',
-    '/systems/village-construction',
-    '/systems/knowledge-records',
+    '/village',
+    '/buildings/library',
   ])
     assert.match(navigation, new RegExp(href.replaceAll('/', '\\/')));
   assert.match(hub, /systemGuideCategories/);
   assert.match(hub, /PixelImage/);
 });
 
-test('shared guide navigation assigns every published system route to one player category', async () => {
+test('shared guide navigation assigns canonical guides once and preserves legacy system redirects', async () => {
   const navigation = await read('lib/system-guides.ts');
   const hub = await read('app/systems/page.tsx');
   const sidebar = await read('lib/wiki-navigation.ts');
   const search = await read('app/search/page.tsx');
   const glossary = await read('app/glossary/page.tsx');
-  const routes = (
+  const allRoutes = (
     await readdir(path.join(root, 'app', 'systems'), { withFileTypes: true })
   )
     .filter((entry) => entry.isDirectory())
     .map((entry) => `/systems/${entry.name}`)
     .sort();
+  const redirects = new Set([
+    '/systems/combat-techniques-gambits',
+    '/systems/crafting',
+    '/systems/economy-exchange',
+    '/systems/equipment-materials',
+    '/systems/field-supplies',
+    '/systems/knowledge-records',
+    '/systems/research',
+    '/systems/sites-hazards',
+    '/systems/village-construction',
+  ]);
+  const routes = allRoutes.filter((route) => !redirects.has(route));
   const registered = [...navigation.matchAll(/href: '(\/systems\/[^']+)'/g)]
     .map((match) => match[1])
     .sort();
@@ -1399,6 +1411,10 @@ test('shared guide navigation assigns every published system route to one player
     const page = await read(`app${route}/page.tsx`);
     assert.match(page, /GuideBreadcrumbs/, route);
     assert.match(page, /RelatedGuides/, route);
+  }
+  for (const route of redirects) {
+    const page = await read(`app${route}/page.tsx`);
+    assert.match(page, /CanonicalPageRedirect|VillageIndexRedirect/, route);
   }
 });
 
@@ -1417,14 +1433,14 @@ test('combat guide integrates retained party and gear references without a visua
     /first enabled rule whose condition is true has priority/,
   );
   assert.match(combat, /current expedition review/);
-  assert.match(combat, /\/systems\/field-supplies/);
+  assert.match(combat, /\/consumables/);
 });
 
 test('combat techniques and Gambits enumerate only current grants and owned rule parts', async () => {
   await access(
-    path.join(root, 'app/systems/combat-techniques-gambits/page.tsx'),
+    path.join(root, 'app/techniques/page.tsx'),
   );
-  const guide = await read('app/systems/combat-techniques-gambits/page.tsx');
+  const guide = await read('app/techniques/page.tsx');
   const content = JSON.parse(await read('data/player-content.json'));
   assert.equal(content.combatTechniques.length, 25);
   assert.equal(
@@ -1445,39 +1461,39 @@ test('combat techniques and Gambits enumerate only current grants and owned rule
     ['action', 'comparator', 'property', 'subject', 'threshold'],
   );
   assert.match(guide, /one Combat Point/);
-  assert.match(guide, /no separate technique currency/);
-  assert.match(guide, /The first enabled rule that fits is the one that fires/);
-  assert.match(guide, /only their owned components/);
+  assert.match(guide, /one Combat Point/);
+  assert.match(guide, /The first enabled rule that fits fires/);
+  assert.match(guide, /offers only their owned parts/);
   assert.match(
     await read('lib/system-guides.ts'),
-    /\/systems\/combat-techniques-gambits/,
+    /\/techniques/,
   );
   assert.match(
     await read('lib/wiki-navigation.ts'),
-    /\/systems\/combat-techniques-gambits/,
+    /\/techniques/,
   );
 });
 
-test('Village construction lists every current destination with its exact foundation and player route', async () => {
-  await access(path.join(root, 'app/systems/village-construction/page.tsx'));
-  const guide = await read('app/systems/village-construction/page.tsx');
+test('Village lists every current destination with its exact foundation and canonical player route', async () => {
+  await access(path.join(root, 'app/village/page.tsx'));
+  const guide = await read('app/village/page.tsx');
   const content = JSON.parse(await read('data/player-content.json'));
   assert.equal(content.stations.length, 22);
-  assert.match(guide, /Every current Village destination/);
-  assert.match(guide, /Meet \{station\.keeper\}/);
-  assert.match(guide, /buildCost\(station\)/);
-  assert.match(guide, /constructionBundledWith === station\.id/);
-  assert.match(guide, /content\.stations\.map/);
-  assert.match(guide, /Follow the building, service, crafting, or Research link for deeper facts/);
+  assert.match(guide, /Village at a glance/);
+  assert.match(guide, /if \(building\.keeper\) return <>Meet/);
+  assert.match(guide, /buildCost\(building\)/);
+  assert.match(guide, /villageBuildings\.map/);
+  assert.match(guide, /\/buildings\/\$\{building\.slug\}/);
+  assert.match(guide, /Each facility has one complete entry/);
   assert.equal(guide.includes('Stage 0'), false);
   assert.equal(guide.includes('Aimee decision'), false);
   assert.match(
     await read('lib/system-guides.ts'),
-    /\/systems\/village-construction/,
+    /href: '\/village'/,
   );
   assert.match(
     await read('lib/wiki-navigation.ts'),
-    /\/systems\/village-construction/,
+    /href: '\/village'/,
   );
 });
 
@@ -1486,7 +1502,7 @@ test('all requested player detail routes have shared breadcrumbs and related gui
     'app/systems/world-writing/page.tsx',
     'app/systems/exploration/page.tsx',
     'app/systems/combat/page.tsx',
-    'app/systems/crafting/page.tsx',
+    'app/crafting/page.tsx',
     'app/services/[slug]/page.tsx',
     'app/crafting/[slug]/page.tsx',
     'app/resources/[slug]/page.tsx',
@@ -1511,7 +1527,7 @@ test('shared navigation exposes the player Systems hub alongside major tasks', a
   for (const href of [
     '/getting-started',
     '/systems',
-    '/services',
+    '/village',
     '/crafting',
     '/resources',
     '/people',
@@ -1546,8 +1562,10 @@ test('wiki navigation uses a standard subject hierarchy without a duplicate refe
     sidebar.indexOf("label: 'Village and facilities'"),
     sidebar.indexOf("label: 'Crafting and items'"),
   );
-  for (const href of ['/village', '/places', '/services', '/systems/village-construction'])
-    assert.match(villageSection, new RegExp(href.replaceAll('/', '\\/')));
+  assert.deepEqual(
+    [...villageSection.matchAll(/href: '([^']+)'/g)].map((match) => match[1]),
+    ['/village'],
+  );
 
   const aimeeSection = sidebar.slice(sidebar.lastIndexOf("label: 'Aimee Reference'"));
   assert.deepEqual(
@@ -1556,10 +1574,10 @@ test('wiki navigation uses a standard subject hierarchy without a duplicate refe
   );
   assert.doesNotMatch(frame, /prepareLinks|referenceLinks|<p>Reference<\/p>/);
   assert.doesNotMatch(systems, /Village, crafting and records/);
-  assert.match(village, /Rules and related Village guides/);
-  assert.match(village, /Compare Village buildings/);
-  assert.match(places, /label: 'Village', href: '\/village'/);
-  assert.match(services, /label: 'Village', href: '\/village'/);
+  assert.match(village, /Village at a glance/);
+  assert.match(village, /Each facility has one complete entry/);
+  assert.match(places, /VillageIndexRedirect/);
+  assert.match(services, /VillageIndexRedirect/);
 });
 
 test('home and getting-started guide the live route with inline retained visuals', async () => {
@@ -1588,7 +1606,7 @@ test('current journey publishes only present Writing, world, Village, and Resear
   assert.match(journey, /constructionCost/);
   assert.match(journey, /\/systems\/world-writing/);
   assert.match(journey, /\/systems\/exploration/);
-  assert.match(journey, /\/systems\/research/);
+  assert.match(journey, /\/research/);
   assert.match(journey, /Current task checklist/);
   assert.match(journey, /\/resources\/progression/);
   assert.match(journey, /\/research/);
@@ -1615,17 +1633,17 @@ test('current progression is a task-oriented implemented-truth reference without
 });
 
 test('Research publishes current branches, node requirements, base costs, and retained study behavior', async () => {
-  await access(path.join(root, 'app/systems/research/page.tsx'));
+  await access(path.join(root, 'app/research/page.tsx'));
   const content = JSON.parse(await read('data/player-content.json'));
-  const research = await read('app/systems/research/page.tsx');
+  const research = await read('app/research/page.tsx');
   const sync = await read('scripts/sync-content.mjs');
   assert.equal(content.researchBranches.length, 15);
   assert.equal(content.researchNodes.length, 87);
-  assert.match(research, /Current branches and nodes/);
-  assert.match(research, /Published base cost/);
-  assert.match(research, /Earlier upgrades and other requirements/);
+  assert.match(research, /Compare Research by branch/);
+  assert.match(research, /Base cost/);
+  assert.match(research, /earlier upgrades/);
   assert.match(research, /no partial cost is taken/);
-  assert.match(research, /\/services\/library/);
+  assert.match(research, /\/buildings\/library/);
   assert.match(research, /current Research screen/);
   assert.doesNotMatch(research, /\/places\/workshop/);
   assert.match(sync, /researchSource/);
@@ -1667,7 +1685,7 @@ test('Party preparation documents the current party limit, gear slots, Gambits, 
   );
   assert.match(party, /first enabled rule that fits/);
   assert.match(party, /The existing list and its priority stay unchanged/);
-  assert.match(party, /\/services\/firepit/);
+  assert.match(party, /\/buildings\/firepit/);
   assert.match(party, /\/equipment/);
   assert.match(party, /\/systems\/combat/);
   assert.match(systems, /\/systems\/party-preparation/);
@@ -1675,66 +1693,65 @@ test('Party preparation documents the current party limit, gear slots, Gambits, 
 });
 
 test('Economy guide keeps current listings, refinement, and recycling player-facing', async () => {
-  await access(path.join(root, 'app/systems/economy-exchange/page.tsx'));
-  const economy = await read('app/systems/economy-exchange/page.tsx');
+  await access(path.join(root, 'app/trading/page.tsx'));
+  const economy = await read('app/trading/page.tsx');
   const systems = await read('lib/system-guides.ts');
   const frame = systems;
-  assert.match(economy, /current listing/);
-  assert.match(economy, /item, quantity, price, and stock/);
-  assert.match(economy, /Material sales use that reserve/);
-  assert.match(economy, /Raw Essence and spendable Essence are distinct/);
-  assert.match(economy, /Current material trade bands/);
-  assert.match(economy, /Trade bands describe the current material catalogue/);
-  assert.match(economy, /Keep Essence forms distinct/);
-  assert.match(economy, /Reality currency and is not traded/);
-  assert.match(economy, /Keep the exact holding/);
+  assert.match(economy, /Check the current shelf before buying/);
+  assert.match(economy, /stock, quantity, and price/);
+  assert.match(economy, /Choose a quantity from the resource reserve/);
+  assert.match(economy, /Raw Essence and spendable Essence remain distinct/);
+  assert.match(economy, /Current resource offer pools/);
+  assert.match(economy, /Material offers today and after the approved update/);
+  assert.match(economy, /Keep currencies and holdings distinct/);
+  assert.match(economy, /is a Reality currency and is not ordinarily traded/);
+  assert.match(economy, /Sell from the exact holding shown/);
   assert.match(economy, /\/systems\/inventory-custody/);
-  assert.match(economy, /authored material yield/);
-  assert.match(economy, /current holdings stay where they are/);
-  assert.match(economy, /\/services\/trading-post/);
-  assert.match(economy, /\/services\/recycler/);
-  assert.match(economy, /\/services\/essence-spring/);
-  assert.match(systems, /\/systems\/economy-exchange/);
-  assert.match(frame, /\/systems\/economy-exchange/);
+  assert.match(economy, /shown yield/);
+  assert.match(economy, /previous offer stays uncommitted/);
+  assert.match(economy, /\/buildings\/trading-post/);
+  assert.match(economy, /href="\/recycling"/);
+  assert.match(economy, /\/buildings\/essence-spring/);
+  assert.match(systems, /href: '\/trading'/);
+  assert.match(frame, /href: '\/trading'/);
 });
 
-test('Knowledge guide connects recovered Library, people, Research, and spoiler-safe Bestiary references', async () => {
-  await access(path.join(root, 'app/systems/knowledge-records/page.tsx'));
-  const knowledge = await read('app/systems/knowledge-records/page.tsx');
+test('Library facility connects recovered records, people, Research, and spoiler-safe Bestiary references', async () => {
+  await access(path.join(root, 'components/facility-detail.tsx'));
+  const knowledge = await read('components/facility-detail.tsx');
   const systems = await read('lib/system-guides.ts');
   const frame = systems;
-  assert.match(knowledge, /Current Library collections/);
+  assert.match(knowledge, /Library collections/);
   assert.match(knowledge, /Diaries/);
   assert.match(knowledge, /People/);
   assert.match(knowledge, /Dictionary/);
   assert.match(knowledge, /Notes and History/);
   assert.match(knowledge, /Research and records/);
-  assert.match(knowledge, /without marking one as discovered/);
-  assert.match(knowledge, /\/services\/library/);
+  assert.match(knowledge, /Unknown meanings remain unknown/);
+  assert.match(knowledge, /building\.id === 'library'/);
   assert.match(knowledge, /\/people/);
   assert.match(knowledge, /\/bestiary/);
-  assert.match(systems, /\/systems\/knowledge-records/);
-  assert.match(frame, /\/systems\/knowledge-records/);
+  assert.match(systems, /\/buildings\/library/);
+  assert.match(frame, /\/buildings\/library/);
 });
 
 test('Field supplies guide documents current preparation, targets, Scent Mask, curios, and retained choices', async () => {
-  await access(path.join(root, 'app/systems/field-supplies/page.tsx'));
-  const supplies = await read('app/systems/field-supplies/page.tsx');
+  await access(path.join(root, 'app/consumables/page.tsx'));
+  const supplies = await read('app/consumables/page.tsx');
   const systems = await read('lib/system-guides.ts');
   const frame = systems;
-  assert.match(supplies, /Prepare the next Field Kit at home/);
-  assert.match(supplies, /visible bin count is the current capacity/);
-  assert.match(supplies, /Healing and other direct supplies/);
+  assert.match(supplies, /Prepare the next Field Kit at Home/);
+  assert.match(supplies, /current capacity/);
+  assert.match(supplies, /Healing and direct supplies/);
   assert.match(supplies, /Scent Mask/);
-  assert.match(supplies, /12 turns/);
-  assert.match(supplies, /Solvent and carried curios/);
+  assert.match(supplies, /12-turn/);
+  assert.match(supplies, /Solvent and unidentified curios/);
   assert.match(supplies, /Trying an unknown curio/);
-  assert.match(supplies, /Cancel leaves the curio unused/);
-  assert.match(supplies, /does not turn the selection into a completed use/);
-  assert.match(supplies, /\/consumables/);
+  assert.match(supplies, /Cancel leaves it unused/);
+  assert.match(supplies, /losing the shown target changes nothing/);
   assert.match(supplies, /\/curios/);
-  assert.match(systems, /\/systems\/field-supplies/);
-  assert.match(frame, /\/systems\/field-supplies/);
+  assert.match(systems, /href: '\/consumables'/);
+  assert.match(frame, /href: '\/consumables'/);
 });
 
 test('Animals guide documents current Attend, trust, companion placement, combat, and Bestiary boundaries', async () => {
@@ -1760,59 +1777,59 @@ test('Animals guide documents current Attend, trust, companion placement, combat
 });
 
 test('Equipment and material-effects guide keeps current slots, ownership, samples, and reforge routes player-facing', async () => {
-  const guide = await read('app/systems/equipment-materials/page.tsx');
+  const guide = await read('app/equipment/page.tsx');
   const systems = await read('lib/system-guides.ts');
   const frame = systems;
-  await access(path.join(root, 'app/systems/equipment-materials/page.tsx'));
+  await access(path.join(root, 'app/equipment/page.tsx'));
   for (const slot of [
-    'Weapon',
-    'Off-hand',
-    'Head',
-    'Body',
-    'Hands',
-    'Feet',
-    'Tool',
-    'Keepsake',
+    'weapon',
+    'offhand',
+    'head',
+    'armor',
+    'hands',
+    'feet',
+    'tool',
+    'keepsake',
   ])
     assert.match(guide, new RegExp(slot));
-  assert.match(guide, /worn by another person/);
-  assert.match(guide, /cannot be changed until you return Home/);
-  assert.match(guide, /provenance and grade/);
-  assert.match(guide, /select one exact eligible stock sample/);
-  assert.match(guide, /construction tier remains with that piece/);
-  assert.match(guide, /changed piece, stock, or cost/);
+  assert.match(guide, /Worn by another person/);
+  assert.match(guide, /stays read-only until the party returns/);
+  assert.match(guide, /provenance, grade, and current result/);
+  assert.match(guide, /one exact eligible sample/);
+  assert.match(guide, /keeps its construction history/);
+  assert.match(guide, /changed piece, stock, or quote/);
   assert.match(guide, /\/crafting\/blacksmith/);
   assert.match(guide, /\/systems\/party-preparation/);
-  assert.match(systems, /\/systems\/equipment-materials/);
-  assert.match(frame, /\/systems\/equipment-materials/);
+  assert.match(systems, /href: '\/equipment'/);
+  assert.match(frame, /href: '\/equipment'/);
 });
 
 test('Sites and hazards reference documents only current Look profiles, search states, and disclosed rewards', async () => {
-  const guide = await read('app/systems/sites-hazards/page.tsx');
+  const guide = await read('app/sites/page.tsx');
   const systems = await read('lib/system-guides.ts');
   const frame = systems;
-  await access(path.join(root, 'app/systems/sites-hazards/page.tsx'));
+  await access(path.join(root, 'app/sites/page.tsx'));
   assert.match(guide, /Look does not move the party or spend a turn/);
-  assert.match(guide, /Visible ordinary growth has no entry harm/);
-  assert.match(guide, /Entering will hurt the party/);
-  assert.match(guide, /Entering carries a lingering hazard/);
-  assert.match(guide, /Entering will start an encounter/);
-  assert.match(guide, /renews that poison rather than stacking/);
+  assert.match(guide, /Visible ordinary growth is safe to enter/);
+  assert.match(guide, /entry will hurt the party/);
+  assert.match(guide, /Chemical growth warns of lingering danger/);
+  assert.match(guide, /entry will start an encounter/);
+  assert.match(guide, /renews the displayed poison rather than stacking/);
   assert.match(
     guide,
-    /current Look copy keeps contact, chemical poison, and active encounter as distinct profiles/,
+    /Thorn growth|Chemical growth|Coiled growth/,
   );
   assert.match(guide, /content\.sites/);
   assert.match(guide, /disclosedResult/);
-  assert.match(guide, /on completion it becomes depleted/);
+  assert.match(guide, /becomes depleted only when its final current Search completes/);
   assert.match(
     guide,
-    /do not promise that an undiscovered site is present in every world/,
+    /does not promise that a site is already present in an undiscovered world/,
   );
   assert.match(guide, /\/bestiary/);
   assert.match(guide, /\/sites/);
-  assert.match(systems, /\/systems\/sites-hazards/);
-  assert.match(frame, /\/systems\/sites-hazards/);
+  assert.match(systems, /href: '\/sites'/);
+  assert.match(frame, /href: '\/sites'/);
 });
 
 test('Inventory and custody guide preserves current locations, selected holdings, and refusal boundaries', async () => {
@@ -1831,9 +1848,9 @@ test('Inventory and custody guide preserves current locations, selected holdings
     guide,
     /changed item, target, turn, or world state leaves the shown use uncommitted/,
   );
-  assert.match(guide, /\/services\/storehouse/);
-  assert.match(guide, /\/services\/trading-post/);
-  assert.match(guide, /\/services\/recycler/);
+  assert.match(guide, /\/buildings\/storehouse/);
+  assert.match(guide, /href: '\/trading'/);
+  assert.match(guide, /<h3>Recycler<\/h3>/);
   assert.match(systems, /\/systems\/inventory-custody/);
   assert.match(frame, /\/systems\/inventory-custody/);
 });

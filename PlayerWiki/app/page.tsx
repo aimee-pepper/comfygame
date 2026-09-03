@@ -19,7 +19,7 @@ const sections = [
   { href: '/systems/world-writing', label: 'World Writing', detail: 'Choose a hand and ink, place glyphs, connect them, and bind a world.', icon: Sparkles },
   { href: '/systems/exploration', label: 'Exploration', detail: 'Travel through unstable worlds, inspect terrain, and return with what you find.', icon: Compass },
   { href: '/systems/combat', label: 'Combat', detail: 'Read encounters, choose actions, and manage your party.', icon: Shield },
-  { href: '/systems/crafting', label: 'Crafting', detail: 'Turn resources into supplies, equipment, and village improvements.', icon: Hammer },
+  { href: '/crafting', label: 'Crafting', detail: 'Turn resources into supplies, equipment, and village improvements.', icon: Hammer },
   { href: '/village', label: 'Village', detail: 'Find places, services, construction costs, and the people who work there.', icon: Map },
 ];
 

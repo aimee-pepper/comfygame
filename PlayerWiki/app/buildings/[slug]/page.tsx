@@ -12,6 +12,7 @@ import { blacksmithFirstUse } from '@/lib/blacksmith-first-use';
 import { surveyPostFirstUse } from '@/lib/survey-post-first-use';
 import { buildingActions, buildingForSlug, buildingStatus, villageBuildings } from '@/lib/village';
 import { researchNodeSlug } from '@/lib/research';
+import { FacilityDetail } from '@/components/facility-detail';
 
 export function generateStaticParams() { return villageBuildings.map((building) => ({ slug: building.slug })); }
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
@@ -20,6 +21,12 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 }
 
 export default async function BuildingDetail({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
+  if (!buildingForSlug(slug)) notFound();
+  return <FacilityDetail slug={slug} />;
+}
+
+async function PreservedFormerBuildingDetail({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params; const building = buildingForSlug(slug); if (!building) notFound();
   const { service, systems, recipes } = buildingActions(building);
   const publishedRecipes = building.id === 'survey_post' ? [] : recipes;

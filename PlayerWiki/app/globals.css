@@ -151,7 +151,7 @@ a {
   justify-content: space-between;
   gap: 24px;
   min-height: 76px;
-  padding: 12px max(24px, calc((100vw - 1180px) / 2));
+  padding: 12px clamp(20px, 2vw, 32px);
   border-bottom: 2px solid var(--line);
   background: var(--surface-95);
   backdrop-filter: blur(10px);
@@ -690,11 +690,13 @@ footer {
 .wiki-layout {
   display: grid;
   min-height: 0;
-  width: min(1280px, calc(100% - 40px));
+  width: 100%;
+  max-width: none;
   height: 100%;
-  margin: 0 auto;
-  grid-template-columns: 210px minmax(0, 1fr);
-  gap: 34px;
+  margin: 0;
+  padding: 0 clamp(20px, 2vw, 32px);
+  grid-template-columns: clamp(220px, 16vw, 280px) minmax(0, 1fr);
+  gap: clamp(28px, 3vw, 52px);
 }
 .wiki-sidebar {
   min-height: 0;
@@ -1695,7 +1697,9 @@ footer {
   }
   .wiki-layout {
     height: auto;
+    padding: 0 16px;
     grid-template-columns: 1fr;
+    gap: 0;
   }
   .wiki-sidebar {
     display: flex;
@@ -1811,7 +1815,8 @@ footer {
     min-width: 130px;
   }
   .wiki-layout {
-    width: min(100% - 24px, 1180px);
+    width: 100%;
+    padding: 0 12px;
   }
   .wiki-sidebar a {
     min-height: 40px;

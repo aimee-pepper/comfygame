@@ -50,20 +50,20 @@ export default function JourneyGuide() {
       <section className="article-section">
         <h2>Available from the start</h2>
         <div className="definition-grid">
-          {startingPlaces.map((station) => <div key={station.id}><h3><Link href={`/places/${station.slug}`}>{station.name}</Link></h3><p>{station.blurb}</p></div>)}
+          {startingPlaces.map((station) => <div key={station.id}><h3><Link href={`/buildings/${station.slug}`}>{station.name}</Link></h3><p>{station.blurb}</p></div>)}
         </div>
       </section>
       <section className="article-section">
         <h2>Current Village construction</h2>
         <p>Each row is a current building with its published construction requirements. Open the place page to see its current service and any current crafting it owns.</p>
         <div className="table-wrap data-table"><table><thead><tr><th>Building</th><th>Construction requirements</th><th>Current use</th></tr></thead><tbody>
-          {buildablePlaces.map((station) => <tr key={station.id}><td><Link href={`/places/${station.slug}`}>{station.name}</Link></td><td>{constructionCost(station)}</td><td>{station.blurb}</td></tr>)}
+          {buildablePlaces.map((station) => <tr key={station.id}><td><Link href={`/buildings/${station.slug}`}>{station.name}</Link></td><td>{constructionCost(station)}</td><td>{station.blurb}</td></tr>)}
         </tbody></table></div>
       </section>
       <section className="article-section">
         <h2>Services, crafting, and Research</h2>
         <div className="definition-grid">
-          <div><h3><Link href="/services">Village services</Link></h3><p>Use the current service screens for storage, party preparation, trade, refinement, records, and other everyday Village work.</p></div>
+          <div><h3><Link href="/village">Village</Link></h3><p>Use the one Village guide to find storage, party preparation, trade, refinement, records, construction, and each current station.</p></div>
           <div><h3><Link href="/crafting">Crafting systems</Link></h3><p>Open a current station guide to compare its published inputs, material choices, output, and access facts before you commit a recipe.</p></div>
           <div><h3><Link href="/research">Research</Link></h3><p>Open the current Research node to compare listed prerequisites, base cost, and current result. Earlier listed upgrades are required when the node says so; this guide does not predict an order beyond those current requirements.</p></div>
         </div>
@@ -74,10 +74,9 @@ export default function JourneyGuide() {
         { label: 'Current progression checklist', href: '/resources/progression' },
         { label: 'World Writing', href: '/systems/world-writing' },
         { label: 'Exploration', href: '/systems/exploration' },
-        { label: 'Village services', href: '/services' },
-        { label: 'Places and stations', href: '/places' },
+        { label: 'Village', href: '/village' },
         { label: 'Crafting systems', href: '/crafting' },
-        { label: 'Research guide', href: '/systems/research' },
+        { label: 'Research', href: '/research' },
       ]} />
     </SiteFrame>
   );

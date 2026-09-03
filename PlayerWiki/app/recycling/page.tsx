@@ -23,7 +23,7 @@ export default function RecyclingDirectory() {
     {},
   );
   return <SiteFrame sidebar>
-    <GuideBreadcrumbs items={[{ label: 'Systems', href: '/systems' }, { label: 'Economy and exchange', href: '/systems/economy-exchange' }, { label: 'Recycler returns' }]} />
+    <GuideBreadcrumbs items={[{ label: 'Economy and exchange', href: '/trading' }, { label: 'Recycler returns' }]} />
     <div className="entity-heading">
       {recyclerStation?.assetURL && <PixelImage src={recyclerStation.assetURL} alt="Recycler building visual" size={96} />}
       <PageIntro eyebrow="Current Village reference" title="Recycler returns" summary="Compare the standard salvage profiles and the exact preview rules before choosing one eligible piece to dismantle." />
@@ -35,7 +35,7 @@ export default function RecyclingDirectory() {
       <ol className="numbered-guide">{recyclerFirstUse.journey.map((step) => <li key={step}>{step}</li>)}</ol>
       <p>{recyclerFirstUse.emptyState}</p>
       <p>A recovery preview belongs to one current Stored or Waiting physical piece and its current state, so it has no durable player-facing transaction ID. This directory records authored standard profiles; use Noll’s current preview for the exact selected holding.</p>
-      <p><Link href="/buildings/recycler">Recycler construction</Link> · <Link href="/services/recycler">Use the Recycler</Link></p>
+      <p><Link href="/buildings/recycler">Open the complete Recycler entry</Link></p>
     </section>
     <section className="article-section">
       <h2>Standard salvage profiles</h2>
@@ -52,6 +52,6 @@ export default function RecyclingDirectory() {
       <div className="definition-grid"><div><h3>Prepare the piece</h3><p>Separate a stack, identify the piece, remove Favorite and Lock, and take worn gear off before opening the Recycler preview.</p></div><div><h3>Keep protected gear intact</h3><p>Protected returns, one-of-a-kind and apex gear, story items, Channelworks property, and legacy-powered gear are not dismantled here.</p></div><div><h3>Use a defined return</h3><p>Non-gear belongings, pieces without recorded construction stock or standard salvage, and found receipts with no recoverable units remain unavailable.</p></div></div>
     </section>
     <section className="article-section note-card"><h2>Confirm only the displayed preview</h2><p>{recyclerFirstUse.zeroOutput}</p><ul className="compact-list">{recyclerFirstUse.boundaries.map((line) => <li key={line}>{line}</li>)}</ul><p>{recyclerFirstUse.exclusion}</p></section>
-    <RelatedGuides links={[{ label: 'Economy and exchange', href: '/systems/economy-exchange' }, { label: 'Recycler service', href: '/services/recycler' }, { label: 'Recycler building', href: '/buildings/recycler' }, { label: 'Equipment', href: '/equipment' }, { label: 'Resources', href: '/resources' }, { label: 'Storehouse and inventory', href: '/systems/inventory-custody' }]} />
+    <RelatedGuides links={[{ label: 'Economy and exchange', href: '/trading' }, { label: 'Recycler facility', href: '/buildings/recycler' }, { label: 'Equipment', href: '/equipment' }, { label: 'Resources', href: '/resources' }, { label: 'Inventory and custody', href: '/systems/inventory-custody' }]} />
   </SiteFrame>;
 }

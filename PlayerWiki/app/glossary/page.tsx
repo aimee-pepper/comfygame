@@ -18,27 +18,27 @@ const domainGroups = [
   {
     label: 'Combat and party',
     domains: ['Combat planning', 'Combat progression', 'Gear', 'Party'],
-    links: [['Combat guide', '/systems/combat'], ['Action reference', '/actions'], ['Conditions and effects', '/statuses'], ['Techniques and Gambits', '/techniques'], ['Equipment', '/equipment'], ['Party and Gear service', '/services/party-and-gear']],
+    links: [['Combat guide', '/systems/combat'], ['Action reference', '/actions'], ['Conditions and effects', '/statuses'], ['Techniques and Gambits', '/techniques'], ['Equipment', '/equipment'], ['Party preparation', '/systems/party-preparation']],
   },
   {
     label: 'Village and facilities',
     domains: ['Home and return'],
-    links: [['Village overview', '/village'], ['Places and stations', '/places'], ['Village services', '/services'], ['Village construction', '/systems/village-construction']],
+    links: [['Village buildings, services, and construction', '/village']],
   },
   {
     label: 'Crafting, resources and progression',
     domains: ['Essence', 'Research', 'Campaign progression'],
-    links: [['Current crafting recipes', '/crafting'], ['Crafting basics', '/systems/crafting'], ['Resources', '/resources'], ['Trading offers', '/trading'], ['Recycler returns', '/recycling'], ['Current progression', '/resources/progression']],
+    links: [['Crafting', '/crafting'], ['Resources', '/resources'], ['Economy and exchange', '/trading'], ['Recycler', '/recycling'], ['Current progression', '/resources/progression']],
   },
   {
     label: 'Campaign records and return',
     domains: ['Persistence', 'Compatibility', 'Return', 'Expeditions'],
-    links: [['Getting started', '/getting-started'], ['Library service', '/services/library'], ['People and records', '/people']],
+    links: [['Getting started', '/getting-started'], ['Library and records', '/buildings/library'], ['People and records', '/people']],
   },
   {
     label: 'People',
     domains: ['People'],
-    links: [['People', '/people'], ['Village services', '/services']],
+    links: [['People', '/people'], ['Village', '/village']],
   },
 ];
 

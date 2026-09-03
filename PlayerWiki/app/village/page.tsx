@@ -7,21 +7,32 @@ import { SiteFrame } from '@/components/site-frame';
 import { buildCost } from '@/lib/content';
 import { buildingActions, buildingStatus, villageBuildings } from '@/lib/village';
 
+function accessSummary(building: (typeof villageBuildings)[number]) {
+  if (building.status === 'scheduled') return 'Not yet implemented.';
+  if (building.unlockedAtStart) return 'Available from the beginning of a campaign.';
+  if (building.keeper) return <>Meet <Link href={`/people/${building.keeperID?.replaceAll('_', '-')}`}>{building.keeper}</Link>, then complete the foundation.</>;
+  return 'Use its current Village route.';
+}
+
 export default function VillageDirectory() {
   return <SiteFrame sidebar>
     <GuideBreadcrumbs items={[{ label: 'Home', href: '/' }, { label: 'Village' }]} />
-    <PageIntro eyebrow="Village" title="Village buildings and services" summary="Find each current Village destination, when it becomes usable, its published foundation requirement, and the service, station work, or Research it connects to." />
-    <DirectoryIndex label="Browse Village buildings" entries={villageBuildings.map((building) => ({ href: `/buildings/${building.slug}`, name: building.name, imageURL: building.assetURL, imageAlt: `${building.name} building visual` }))} />
-    <DirectoryDetailsIntro title="Compare Village buildings" summary="Each card keeps access, foundation, current work, and a short output preview together. The building page holds the full construction record; the service page holds the full workflow." />
-    <section className="article-section"><h2>Current Village</h2><p>Open a building for its exact current requirement, actions, recipes, and related resources. A displayed live entry is a current player route; a scheduled entry is clearly marked and is not an available screen.</p><div className="village-directory">{villageBuildings.map((building) => {
-      const { service, systems, recipes } = buildingActions(building);
-      return <article className="village-directory-card" key={building.id}>
-        <div className="village-card-heading">{building.assetURL ? <PixelImage src={building.assetURL} alt={`${building.name} building visual`} size={48} /> : null}<div><p className={`village-status ${building.status}`}>{buildingStatus(building)}</p><h2><Link href={`/buildings/${building.slug}`}>{building.name}</Link></h2><p>{building.blurb}</p></div></div>
-        <dl className="village-card-facts"><div><dt>Access</dt><dd>{building.status === 'scheduled' ? 'Not yet implemented' : building.unlockedAtStart ? 'Available at the start' : building.keeper ? <>Meet <Link href={`/people/${building.keeperID?.replaceAll('_', '-')}`}>{building.keeper}</Link>, then build</> : 'Use the current Village route'}</dd></div><div><dt>Foundation</dt><dd>{building.status === 'scheduled' ? 'No live construction action published' : buildCost(building)}</dd></div><div><dt>Current work</dt><dd>{building.status === 'scheduled' ? 'No live action or recipe is published' : service ? <Link href={`/services/${service.slug}`}>{service.name}</Link> : systems.length ? systems.map((system, index) => <span key={system.slug}>{index ? ' · ' : ''}<Link href={`/crafting/${system.slug}`}>{system.name}</Link></span>) : 'Open the current building detail'}</dd></div><div><dt>Outputs</dt><dd>{building.status === 'scheduled' ? 'Not published as live' : recipes.length ? recipes.slice(0, 3).map((recipe, index) => <span key={recipe.id}>{index ? ' · ' : ''}<Link href={`/crafting/${recipe.system}`}>{recipe.result}</Link></span>) : service ? 'See the service detail' : 'No separate current output list published'}</dd></div></dl>
-      </article>;
-    })}</div></section>
-    <section className="article-section note-card"><h2>Rules and related Village guides</h2><p>The cards above summarize each destination. Use the dedicated guides for rules shared by more than one place rather than repeating them in every building card.</p><nav aria-label="Village rules and guides"><Link href="/services">Browse service workflows</Link><Link href="/systems/village-construction">Understand construction and unlocks</Link></nav></section>
-    <section className="article-section note-card"><h2>Scheduled, not live</h2><p>Scheduled entries preserve only their current published identity and placement. They do not promise a usable screen, cost, recipe, or reward until that route is implemented.</p></section>
-    <RelatedGuides links={[{ label: 'Village services', href: '/services' }, { label: 'Trading offer reference', href: '/trading' }, { label: 'Recycler return reference', href: '/recycling' }, { label: 'Crafting directory', href: '/crafting' }, { label: 'Resources', href: '/resources' }, { label: 'Current progression', href: '/resources/progression' }, { label: 'Village construction guide', href: '/systems/village-construction' }]} />
+    <PageIntro eyebrow="Village" title="Village buildings and services" summary="Find every Village destination in one place: what it is for, where it stands, when it opens, and where to read its complete building, service, crafting, and Research details." />
+    <DirectoryIndex label="Browse the Village" entries={villageBuildings.map((building) => ({ href: `/buildings/${building.slug}`, name: building.name, imageURL: building.assetURL, imageAlt: `${building.name} building visual` }))} />
+    <DirectoryDetailsIntro title="Village at a glance" summary="This is the useful middle layer: one concise entry per destination. Open a building name for its complete construction, actions, services, recipes, results, custody, and related materials." />
+    <section className="article-section"><div className="table-wrap data-table"><table><thead><tr><th aria-label="Visual" /><th>Destination</th><th>At a glance</th><th>Access and foundation</th><th>What it opens</th></tr></thead><tbody>{villageBuildings.map((building) => {
+      const { service, systems } = buildingActions(building);
+      return <tr key={building.id}>
+        <td>{building.assetURL ? <PixelImage src={building.assetURL} alt={`${building.name} building visual`} /> : '—'}</td>
+        <td><Link href={`/buildings/${building.slug}`}>{building.name}</Link><br /><small>{buildingStatus(building)}</small></td>
+        <td><strong>{building.zone}.</strong> {building.blurb}</td>
+        <td>{accessSummary(building)}{building.status === 'implemented' && !building.unlockedAtStart ? <><br /><strong>{buildCost(building)}</strong></> : null}</td>
+        <td>{building.status === 'scheduled' ? 'No live action, service, recipe, or reward is published.' : service ? <><Link href={`/buildings/${building.slug}`}>{service.name}</Link> — {service.summary}</> : systems.length ? systems.map((system, index) => <span key={system.slug}>{index ? ' · ' : ''}<Link href={`/crafting/${system.slug}`}>{system.name}</Link> — {system.summary}</span>) : <Link href={`/buildings/${building.slug}`}>Read the complete destination entry</Link>}</td>
+      </tr>;
+    })}</tbody></table></div></section>
+    <section className="article-section two-column"><div><h2>How a foundation appears</h2><p>Places that are already open are available from the beginning. For a locked current place, meet its named keeper first. Its foundation then appears at THE COTTAGE, where the current preview names the exact materials, Essence, area, and any shortfall.</p></div><div><h2>What construction changes</h2><p>Completing a foundation opens that place at its current starting tier. The building’s complete entry then links to its service, crafting, or Research work. Construction does not silently grant an item, recipe output, or unrelated capability unless that entry says it does.</p></div></section>
+    <section className="article-section two-column"><div><h2>Confirm the current requirement</h2><p>The mounted foundation is the final authority for current cost and readiness. If stock, keeper, space, or the quoted requirement changes before completion, the build remains uncommitted and the named inputs stay where they are.</p></div><div><h2>Each facility has one complete entry</h2><p>Open a destination for its construction, keeper, service workflow, current actions, crafting and Research, results, custody, and first-use journey. A separate crafting-family page remains only when several recipes need their own comparison.</p></div></section>
+    <section className="article-section note-card"><h2>Scheduled, not live</h2><p>Scheduled entries preserve only their accepted identity and placement. They do not promise a usable screen, construction cost, recipe, action, or reward until that route is implemented.</p></section>
+    <RelatedGuides links={[{ label: 'Trading', href: '/trading' }, { label: 'Recycler', href: '/recycling' }, { label: 'Crafting', href: '/crafting' }, { label: 'Research', href: '/research' }, { label: 'Resources', href: '/resources' }, { label: 'Current progression', href: '/resources/progression' }]} />
   </SiteFrame>;
 }

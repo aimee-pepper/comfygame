@@ -89,8 +89,8 @@ export default async function PersonDetail({
         <p>{person.contribution}</p>
         {station && (
           <p>
-            Their current village route is the <Link href={`/places/${station.slug}`}>{station.name}</Link>.
-            {service && <> Its current player guide is <Link href={`/services/${service.slug}`}>{service.name}</Link>.</>}
+            Their current Village route is <Link href={`/buildings/${station.slug}`}>{station.name}</Link>.
+            {service && <> {service.summary}</>}
           </p>
         )}
       </section>
@@ -108,7 +108,7 @@ export default async function PersonDetail({
         </div>
       </section>
       {hintPages.length > 0 && <section className="article-section spoiler-boundary" id="location-hints"><h2>Spoilers — location-hint stages</h2><p>These authored pages describe conditions and related observations. Read them only when you want the complete player-reference material.</p><div className="diary-grid">{hintPages.map((page) => <article className="note-card" key={`${person.slug}-hint-${page.sequence}`}><p className="eyebrow">Page {page.sequence} · {page.title}</p><p>{page.prose}</p></article>)}</div></section>}
-      <RelatedGuides links={[{ label: 'All people', href: '/people' }, ...(station ? [{ label: `Visit ${station.name}`, href: `/places/${station.slug}` }] : []), ...(service ? [{ label: service.name, href: `/services/${service.slug}` }] : []), { label: 'Site directory', href: '/sites' }, { label: 'Knowledge and records', href: '/systems/knowledge-records' }, { label: 'Exploration', href: '/systems/exploration' }, { label: 'Village services', href: '/services' }, { label: 'All systems', href: '/systems' }]} />
+      <RelatedGuides links={[{ label: 'All people', href: '/people' }, ...(station ? [{ label: `Visit ${station.name}`, href: `/buildings/${station.slug}` }] : []), { label: 'Site directory', href: '/sites' }, { label: 'Library and records', href: '/buildings/library' }, { label: 'Exploration', href: '/systems/exploration' }, { label: 'Village', href: '/village' }, { label: 'All systems', href: '/systems' }]} />
     </SiteFrame>
   );
 }

@@ -61,7 +61,7 @@ export default function BestiaryPage() {
         <h2>Typical record flow</h2>
         <ol className="numbered-guide">{guide.workflow.map((step) => <li key={step}>{step}</li>)}</ol>
       </section>
-      <RelatedGuides links={[{ label: 'Bestiary service guide', href: '/services/bestiary' }, { label: 'Combat guide', href: '/systems/combat' }, { label: 'Exploration guide', href: '/systems/exploration' }, { label: 'Animals and companionship', href: '/systems/animals-companionship' }, { label: 'All systems', href: '/systems' }]} />
+      <RelatedGuides links={[{ label: 'Bestiary facility', href: '/buildings/bestiary' }, { label: 'Combat guide', href: '/systems/combat' }, { label: 'Exploration guide', href: '/systems/exploration' }, { label: 'Animals and companionship', href: '/systems/animals-companionship' }, { label: 'All systems', href: '/systems' }]} />
     </SiteFrame>
   );
 }

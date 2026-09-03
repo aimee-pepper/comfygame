@@ -21,6 +21,6 @@ export default function StatusDirectory() {
       </section>;
     })}
     <section className="article-section note-card"><h2>Use the shown state</h2><p>Choose a remedy, guard, or Field Kit action only for the state shown on its own current screen. An unavailable choice does not become a different use, and cancelling leaves the current condition unchanged.</p></section>
-    <RelatedGuides links={[{ label: 'Combat', href: '/systems/combat' }, { label: 'Combat techniques and Gambits', href: '/systems/combat-techniques-gambits' }, { label: 'Field supplies', href: '/systems/field-supplies' }, { label: 'Consumables', href: '/consumables' }, { label: 'Exploration', href: '/systems/exploration' }]} />
+    <RelatedGuides links={[{ label: 'Combat', href: '/systems/combat' }, { label: 'Techniques and Gambits', href: '/techniques' }, { label: 'Consumables and Field Kit', href: '/consumables' }, { label: 'Exploration', href: '/systems/exploration' }]} />
   </SiteFrame>;
 }

@@ -58,7 +58,7 @@ const coreActions: ActionReference[] = [
     availability: 'Arm Look and choose a revealed adjacent tile.',
     change: 'Shows the current tile’s disclosed ground, feature, movement, and entry information without moving the party.', cost: 'Look does not spend a world turn.',
     persistence: 'It changes the inspected detail, not the party position.',
-    unavailable: 'An unrevealed or non-adjacent tile does not invent a site, plant, or danger fact.', related: [{ label: 'Sites and hazards', href: '/systems/sites-hazards' }, { label: 'Conditions and effects', href: '/statuses' }],
+    unavailable: 'An unrevealed or non-adjacent tile does not invent a site, plant, or danger fact.', related: [{ label: 'Sites and hazards', href: '/sites' }, { label: 'Conditions and effects', href: '/statuses' }],
   },
   {
     id: 'world-use-tile', slug: 'use-tile', name: 'Use Tile', group: 'World', surface: 'World · Use Tile control',
@@ -72,7 +72,7 @@ const coreActions: ActionReference[] = [
     availability: 'Stand on a discovered, unguarded, unlooted site with search turns remaining.',
     change: 'Spends one search turn. The final current turn depletes the site and awards its disclosed contents.', cost: 'One world turn per Search.',
     persistence: 'The active world keeps the current search counter and depleted state.',
-    unavailable: 'An encounter, guardian, changed tile, or depleted site does not consume a turn or award a substitute result.', related: [{ label: 'Sites and hazards', href: '/systems/sites-hazards' }, { label: 'Site directory', href: '/sites' }],
+    unavailable: 'An encounter, guardian, changed tile, or depleted site does not consume a turn or award a substitute result.', related: [{ label: 'Sites and hazards', href: '/sites' }],
   },
   {
     id: 'world-return-home', slug: 'return-home', name: 'Return home', group: 'World', surface: 'World · Return control',
@@ -100,7 +100,7 @@ const coreActions: ActionReference[] = [
     availability: 'An eligible carried combat item and its exact legal ally or foe target are present.',
     change: 'Uses the selected item only after the shown target and confirmation complete.', cost: 'Consumes one carried item only on the committed use.',
     persistence: 'The encounter and active Field Kit retain the committed item result.',
-    unavailable: 'A missing item or changed target leaves the item unspent and the encounter unchanged.', related: [{ label: 'Field supplies', href: '/systems/field-supplies' }, { label: 'Conditions and effects', href: '/statuses' }],
+    unavailable: 'A missing item or changed target leaves the item unspent and the encounter unchanged.', related: [{ label: 'Field supplies', href: '/consumables' }, { label: 'Conditions and effects', href: '/statuses' }],
   },
   {
     id: 'combat-withdraw', slug: 'withdraw', name: 'Withdraw', group: 'Combat', surface: 'Encounter · Withdraw confirmation',
@@ -114,14 +114,14 @@ const coreActions: ActionReference[] = [
     availability: 'Choose eligible identified supplies with the visible capacity and stock.',
     change: 'Records the shown next-trip supply plan after confirmation.', cost: 'Uses the selected available holdings; the visible bin count is the current capacity.',
     persistence: 'The confirmed plan is used for the next departure.',
-    unavailable: 'Changed stock or an over-capacity plan remains uncommitted.', related: [{ label: 'Field supplies', href: '/systems/field-supplies' }, { label: 'Storehouse', href: '/services/storehouse' }],
+    unavailable: 'Changed stock or an over-capacity plan remains uncommitted.', related: [{ label: 'Field supplies', href: '/consumables' }, { label: 'Storehouse', href: '/buildings/storehouse' }],
   },
   {
     id: 'custody-transfer', slug: 'transfer-custody', name: 'Transfer custody', group: 'Preparation and custody', surface: 'Storehouse · selected item, material, or Waiting decision',
     availability: 'Select the exact shown holding and a current legal destination.',
     change: 'Moves only the confirmed holding to the displayed destination, or resolves its keep-or-replace decision.', cost: 'The current capacity and selected quantity control the transaction.',
     persistence: 'A completed transfer retains the holding at its new displayed location.',
-    unavailable: 'No room, an unavailable selection, or Cancel leaves current holdings where they are.', related: [{ label: 'Inventory and custody', href: '/systems/inventory-custody' }, { label: 'Storehouse', href: '/services/storehouse' }],
+    unavailable: 'No room, an unavailable selection, or Cancel leaves current holdings where they are.', related: [{ label: 'Inventory and custody', href: '/systems/inventory-custody' }, { label: 'Storehouse', href: '/buildings/storehouse' }],
   },
   {
     id: 'equipment-equip', slug: 'equip', name: 'Equip or take off gear', group: 'Preparation and custody', surface: 'Party · Gear detail',
@@ -142,14 +142,14 @@ const coreActions: ActionReference[] = [
     availability: 'Choose a visible node after its listed earlier upgrades, station, readings, and current cost are ready.',
     change: 'Applies that node’s documented result once.', cost: 'The selected node’s displayed Essence and named resource cost.',
     persistence: 'A completed Study keeps the upgrade; it is not a repeating purchase.',
-    unavailable: 'Missing requirements or a changed cost take no partial payment and leave Research unchanged.', related: [{ label: 'Research directory', href: '/research' }, { label: 'Research guide', href: '/systems/research' }],
+    unavailable: 'Missing requirements or a changed cost take no partial payment and leave Research unchanged.', related: [{ label: 'Research', href: '/research' }],
   },
   {
     id: 'village-build-foundation', slug: 'build-foundation', name: 'Build a foundation', group: 'Research and Village', surface: 'Village · selected building detail',
     availability: 'Choose a current building whose exact foundation requirements are ready.',
     change: 'Builds that current destination and opens its service or station route.', cost: 'The selected foundation’s displayed resources and other current requirements.',
     persistence: 'A completed foundation remains a current Village destination.',
-    unavailable: 'Missing requirements or a changed quote leave the foundation unbuilt and inputs intact.', related: [{ label: 'Village buildings', href: '/village' }, { label: 'Village construction', href: '/systems/village-construction' }],
+    unavailable: 'Missing requirements or a changed quote leave the foundation unbuilt and inputs intact.', related: [{ label: 'Village', href: '/village' }],
   },
   {
     id: 'companion-attend', slug: 'attend-animal', name: 'Attend an animal', group: 'Companions', surface: 'Active world · animal interaction',

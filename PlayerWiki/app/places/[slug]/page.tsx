@@ -11,6 +11,7 @@ import { actionForSlug, actionsForStation } from '@/lib/action-reference';
 import { apothecaryFirstUse } from '@/lib/apothecary-first-use';
 import { blacksmithFirstUse } from '@/lib/blacksmith-first-use';
 import { surveyPostFirstUse } from '@/lib/survey-post-first-use';
+import { CanonicalPageRedirect } from '@/components/canonical-page-redirect';
 
 function constructionRequirements(place: (typeof content.stations)[number]) {
   if (place.unlockedAtStart) return 'Available at the start of a campaign.';
@@ -45,7 +46,17 @@ export async function generateMetadata({
   return place ? { title: place.name, description: place.blurb } : {};
 }
 
-export default async function PlaceDetail({
+export default async function PlaceDetailRedirect({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}) {
+  const { slug } = await params;
+  const place = content.stations.find((entry) => entry.slug === slug);
+  return <CanonicalPageRedirect formerTitle={`${place?.name ?? 'Village destination'} place page`} href={`/buildings/${slug}`} label={place?.name ?? 'Village destination'} />;
+}
+
+async function PreservedFormerPlaceDetail({
   params,
 }: {
   params: Promise<{ slug: string }>;

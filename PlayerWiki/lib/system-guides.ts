@@ -17,8 +17,8 @@ export const playerStartGuides: PlayerGuide[] = [
   { label: 'Current progression', href: '/resources/progression', summary: 'Choose a current next task without assuming a future gate order.' },
 ];
 
-// The player-facing home for each published /systems route. Keep every route in exactly one
-// category so the Systems hub, sidebar, search, and glossary agree about where it belongs.
+// The player-facing home for each distinct system or canonical category. Redirect-only legacy
+// routes are intentionally absent so the Systems hub, sidebar, search, and glossary agree.
 export const systemGuideCategories: SystemGuideCategory[] = [
   {
     id: 'worlds',
@@ -27,7 +27,7 @@ export const systemGuideCategories: SystemGuideCategory[] = [
     guides: [
       { label: 'World Writing', href: '/systems/world-writing', summary: 'Prepare Pages, marks, links, and inks before Binding.' },
       { label: 'Exploration', href: '/systems/exploration', summary: 'Enter a world, move, Look, use tiles, and return.' },
-      { label: 'Sites and hazards', href: '/systems/sites-hazards', summary: 'Read current sites and disclosed flora profiles before entering.' },
+      { label: 'Sites and hazards', href: '/sites', summary: 'Read current sites, Search rules, and disclosed entry hazards.' },
     ],
   },
   {
@@ -36,7 +36,7 @@ export const systemGuideCategories: SystemGuideCategory[] = [
     summary: 'Prepare the travelling party, understand an encounter, and choose the supplies that support it.',
     guides: [
       { label: 'Combat', href: '/systems/combat', summary: 'Read turns, targets, techniques, items, Withdraw, and defeat.' },
-      { label: 'Combat techniques and Gambits', href: '/systems/combat-techniques-gambits', summary: 'Compare current technique targets and cooldowns, then arrange rule parts.' },
+      { label: 'Techniques and Gambits', href: '/techniques', summary: 'Compare current technique targets and cooldowns, then arrange rule parts.' },
       { label: 'Party, Gear and Gambits', href: '/systems/party-preparation', summary: 'Choose companions, equip them, and prepare their priorities.' },
       { label: 'Animals and companionship', href: '/systems/animals-companionship', summary: 'Meet animals, build trust, and prepare a companion.' },
     ],
@@ -46,7 +46,7 @@ export const systemGuideCategories: SystemGuideCategory[] = [
     label: 'Village and facilities',
     summary: 'Find the Village places, keepers, and foundations that make new work available.',
     guides: [
-      { label: 'Village construction', href: '/systems/village-construction', summary: 'Meet a keeper and review each current foundation requirement.' },
+      { label: 'Village', href: '/village', summary: 'Compare every destination, keeper, foundation, and current service in one guide.' },
     ],
   },
   {
@@ -54,11 +54,11 @@ export const systemGuideCategories: SystemGuideCategory[] = [
     label: 'Crafting and items',
     summary: 'Work with materials, recipes, equipment, supplies, storage, trade, and recycling.',
     guides: [
-      { label: 'Crafting basics', href: '/systems/crafting', summary: 'Choose a station, exact inputs, and the current result.' },
-      { label: 'Equipment and material effects', href: '/systems/equipment-materials', summary: 'Compare eight slots, material selections, and reforge routes.' },
+      { label: 'Crafting', href: '/crafting', summary: 'Choose a station, exact inputs, material rules, and the current result.' },
+      { label: 'Equipment', href: '/equipment', summary: 'Compare eight slots, item facts, material effects, and reforge routes.' },
       { label: 'Inventory and custody', href: '/systems/inventory-custody', summary: 'Follow current items between storage, the Field Kit, and worn gear.' },
-      { label: 'Field supplies', href: '/systems/field-supplies', summary: 'Prepare carried supplies and choose their current use targets.' },
-      { label: 'Economy and exchange', href: '/systems/economy-exchange', summary: 'Trade, refine, and recycle through the current Village screens.' },
+      { label: 'Consumables and Field Kit', href: '/consumables', summary: 'Prepare carried supplies and choose their current use targets.' },
+      { label: 'Economy and exchange', href: '/trading', summary: 'Trade, refine, and recycle through the current Village screens.' },
     ],
   },
   {
@@ -66,8 +66,8 @@ export const systemGuideCategories: SystemGuideCategory[] = [
     label: 'Knowledge and records',
     summary: 'Study Research, recovered teachings, the Library, and the records that preserve what you learn.',
     guides: [
-      { label: 'Research', href: '/systems/research', summary: 'Study current branches, requirements, costs, and results.' },
-      { label: 'Knowledge and records', href: '/systems/knowledge-records', summary: 'Use Library, people, Research, and Bestiary records together.' },
+      { label: 'Research', href: '/research', summary: 'Study current branches, requirements, costs, and results.' },
+      { label: 'Library and records', href: '/buildings/library', summary: 'Use Library, people, Research, and Bestiary records together.' },
     ],
   },
 ];
