@@ -426,7 +426,7 @@ const cast = await Promise.all(castRows.map(async (row) => {
     roleLabel: serviceLine[1],
     role: compactCopy(serviceLine[2]),
     diaryReward: compactCopy(serviceLine[3]),
-    diaryPageLabel: `${diaryPages.length} authored ${diaryPages.length === 1 ? 'page' : 'pages'}`,
+    diaryPageLabel: `${diaryPages.length} book ${diaryPages.length === 1 ? 'page' : 'pages'}`,
     diaryPages,
     assetURL: await publishTravellerCameo(travellerID, slugFor(row.name)),
   };

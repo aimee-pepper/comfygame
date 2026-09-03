@@ -288,7 +288,7 @@ test('wiki formatting standard makes detail pages complete while category pages 
     'app/crafting/[slug]/page.tsx': ['Current station and approved direction', 'Access and readiness', 'Current recipes and requirements', 'Material choices', 'Commit and result', 'Results and their use'],
     'app/equipment/[slug]/page.tsx': ['Current equipment facts', 'Eligibility', 'Material and reforge facts', 'ItemCraftingRoutes', 'Custody and swapping', 'Trading and recycling'],
     'app/items/[slug]/page.tsx': ['Current use', 'Field Kit and carrying', 'Identification and knowledge', 'Use and custody', 'ItemCraftingRoutes', 'Trading', 'Recycler'],
-    'app/people/[slug]/page.tsx': ['Campaign order', 'Meeting context', 'Diary reward', 'After meeting', 'Book pages beyond location hints', 'location-hint stages'],
+    'app/people/[slug]/page.tsx': ['Campaign order', 'Meeting context', 'Diary reward', 'At the Cottage', 'Book pages', 'location clues'],
     'app/research/[slug]/page.tsx': ['Current node details', 'Earlier upgrades', 'Other requirements', 'Base cost', 'Result', 'Study and retain'],
     'app/resources/[slug]/page.tsx': ['How to obtain it', 'Trade', 'Primary pressure', 'Required conditions', 'Conditions that help', 'Current service and research uses', 'Craft recipes', 'Building recipes'],
     'app/sites/[slug]/page.tsx': ['Current world association', 'Placement', 'Search', 'Conditions', 'Disclosed result after completion', 'Look and depletion'],
@@ -1234,7 +1234,7 @@ test('full cast pages publish complete exact book text with a clear location-hin
   assert.match(personPage, /content\.cast/);
   assert.match(personPage, /Spoiler boundary/);
   assert.match(personPage, /location-hints/);
-  assert.match(personPage, /Book pages beyond location hints/);
+  assert.match(personPage, /<h2>Book pages<\/h2>/);
   assert.match(personPage, /page\.prose/);
   assert.match(personPage, /person-record-navigation/);
   assert.match(personPage, /#meeting/);

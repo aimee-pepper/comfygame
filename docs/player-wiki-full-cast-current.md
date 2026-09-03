@@ -18,35 +18,35 @@ exposing hidden people before the game does.
 
 | Order | Traveller | Meeting context | What they add after recruitment |
 |---:|---|---|---|
-| 1 | Vance, trader and appraiser | An open route where goods and their repairs can be traced | Trading Post: appraisal and rotating buy/sell stock |
-| 2 | Noll, salvager | A failed object kept partly joined so its maker's expectation remains visible | Recycler: previewed recovery from ordinary gear |
-| 3 | Halloway, smith | A forge kept alive by someone who stayed with it | Blacksmith: foundational gear and reforging |
-| 4 | Mara, surveyor | A world with one fixed line worth measuring twice | Survey Post: instruments, readings and field loadout |
-| 5 | Edren, archaeologist | Worked layers where “nowhere” was once somewhere | Reliquary: site records and interpreted finds |
-| 6 | Isolde, calligrapher | A precise hand teaching itself against stone and weather | Scriptorium: hands, ink practice and writing study |
-| 7 | Sela, wanderer | Connected routes, usable water and room to leave | Wayfarer's Table: packing and fieldcraft |
-| 8 | Bryn, warden | A watched approach where standing first is a choice | Formation knowledge for protecting exposed allies |
-| 9 | Orsa, keeper | A sheltered gathering place with more than one exit | Firepit stewardship and the later Tavern |
-| 10 | Talin, blade fighter | Hard, open ground where an opening can close while you think | Techniques for answering heavily armoured foes |
-| 11 | Nessa, apothecary | A living, reactive world where dose matters more than labels | Apothecary: remedies and prepared coatings |
-| 12 | Corrin, tanner | Wet, living ground that tests every fastening through repetition | Tannery: flexible protective gear |
-| 13 | Dagg, hammer fighter | Hard ground, large changes and enough quiet to prepare | Techniques built around completing recovery |
-| 14 | Rook, spear fighter | A visible approach where distance can remain a warning | Reach techniques and legible boundaries |
-| 15 | Lys, archivist | Layered ruins whose contradictory records remain readable | Library stewardship, search and cross-reference |
-| 16 | Bracken, armorer | Hard ground and changing temperatures that expose every seam | Armoury: advanced defensive profiles |
-| 17 | Fen, bowyer | Open distance, moving air and repeatable intervals | Bowyer: advanced ranged construction |
-| 18 | Wren, skirmisher | A world opening another route before the first closes | Tempo techniques for crowded encounters |
-| 19 | Kestrel, field naturalist | A rich ecology whose tracks defeat the convenient story | Bestiary practice and first-observation techniques |
-| 20 | Maud, weaponsmith | Materials and terrain that make fit a moving measurement | Weaponsmith and an earned polearm fitting pattern |
-| 21 | Marrick, formation leader | Shared ground where a routine can be tested by the person it forgot | Mature formation support |
-| 22 | Sabine, menagerist | An ecology with room to approach, refuse and return | Menagerie: voluntary trust, housing and assignment |
-| 23 | Grimmond, deep miner | Rich seams under load, poor light and thinner breath | Deep Works: depth sounding and discovered-sign records |
-| 24 | Oda, magic weaponsmith | Unlike forces held near enough for their routes to be followed | Channelworks and Emanation Housing |
-| 25 | Auber, distiller | Water, mineral, heat and residue separating at different rates | Distillery: crystallising and attuning prepared cores |
-| 26 | Ashe, emanation specialist | Warning stones around a body already carrying visible force | Active-release combat knowledge |
-| 27 | Tovin, binder | A dark, enclosed world whose exact timing cannot cure desire | Anchorage: permanent-realm portfolio and return work |
-| 28 | Perren, interpreter | Ruined ritual fragments that support more than one arrangement | Mirror focus and interpretive endgame story |
-| 29 | Nine, continuity keeper | A verified arrangement revised by the person living with it now | Dream focus and the continuity arc |
+| 1 | Vance, trader and appraiser | Look for Vance in a wide, open world where a heavily laden traveller can move safely. | Vance runs the Trading Post, appraises goods, and buys or sells the stock currently on offer. |
+| 2 | Noll, salvager | Noll is drawn to worlds scattered with damaged things that may still be useful. | Noll runs the Recycler, where unwanted ordinary gear can be previewed and dismantled for useful materials. |
+| 3 | Halloway, smith | Look for Halloway near a working forge in a world rich in hard ground and deep heat. | Halloway runs the Blacksmith, where you can make foundational weapons and improve eligible gear. |
+| 4 | Mara, surveyor | Mara prefers a world with clear landmarks and a reliable horizon she can measure. | Mara runs the Survey Post, where you study field instruments, choose a loadout, and record readings during expeditions. |
+| 5 | Edren, archaeologist | Edren searches cold, worked ground where old layers and ruins are easy to read. | Edren runs the Reliquary, which helps you recognise discovered sites and understand what their finds mean. |
+| 6 | Isolde, calligrapher | Isolde can be found where high stone, strong relief, and weather leave clear marks. | Isolde runs the Scriptorium, where you improve writing tools, prepare ink, and study World Writing. |
+| 7 | Sela, wanderer | Sela looks for connected paths, usable water, and plenty of room to keep moving. | Sela runs the Wayfarer's Table, which improves packing and helps you recognise useful ordinary flora in the field. |
+| 8 | Bryn, warden | Bryn chooses guarded approaches with solid footing, where protecting someone is a deliberate choice. | Bryn will teach protective party formations and Draw Off tactics for shielding exposed allies. |
+| 9 | Orsa, keeper | Orsa is most at home in sheltered places with room for people to gather and more than one way out. | Orsa tends the Firepit, helping you decide who travels and who stays at the Cottage; a fuller Tavern role is planned for later. |
+| 10 | Talin, blade fighter | Talin seeks hard, open ground where timing matters and a missed opening closes quickly. | Talin will teach blade techniques for dealing with heavily armoured enemies. |
+| 11 | Nessa, apothecary | Nessa studies lively, reactive worlds where careful preparation matters more than a simple label. | Nessa runs the Apothecary, where you prepare remedies, coatings, and field supplies from known recipes. |
+| 12 | Corrin, tanner | Corrin looks for wet, living ground where repeated use quickly reveals whether gear will hold. | Corrin runs the Tannery, where you make flexible protective gear and improve carrying capacity. |
+| 13 | Dagg, hammer fighter | Dagg favours hard ground, powerful changes, and enough quiet to prepare each strike. | Dagg will teach hammer tactics focused on committing to an attack and recovering safely. |
+| 14 | Rook, spear fighter | Rook chooses open approaches where distance gives everyone time to read the danger. | Rook will teach spear and reach tactics for keeping enemies at a safer distance. |
+| 15 | Lys, archivist | Lys follows layered ruins whose conflicting records can still be compared and understood. | Lys tends the Library, where you can search recovered records, compare accounts, and revisit what you have learned. |
+| 16 | Bracken, armorer | Bracken seeks harsh ground and changing temperatures that reveal weak seams in armour. | Bracken runs the Armoury, where you make advanced defensive equipment. |
+| 17 | Fen, bowyer | Fen prefers long sightlines, moving air, and distances that can be tested again and again. | Fen runs the Bowyer, where you make advanced ranged weapons. |
+| 18 | Wren, skirmisher | Wren thrives in worlds with several open routes and room to change direction quickly. | Wren will teach mobile skirmishing tactics for fights with several enemies. |
+| 19 | Kestrel, field naturalist | Kestrel follows rich ecosystems where tracks and behaviour tell a truer story than first impressions. | Kestrel will expand Bestiary study and teach careful first-observation tactics for unfamiliar species. |
+| 20 | Maud, weaponsmith | Maud studies how materials, terrain, and movement change the way a weapon fits its wielder. | Maud runs the Weaponsmith and will teach the polearm fitting pattern when its requirements are met. |
+| 21 | Marrick, formation leader | Marrick looks for shared ground where formations can be tested and improved around real people. | Marrick will teach formation support that helps the whole party adapt when someone is hurt. |
+| 22 | Sabine, menagerist | Sabine seeks healthy ecosystems where animals have space to approach, refuse, and return on their own terms. | Sabine will run the Menagerie, where animals can build trust, be housed, and join the party by choice. |
+| 23 | Grimmond, deep miner | Grimmond follows deep, mineral-rich seams where support, light, and breathable air all matter. | Grimmond will run the Deep Works, where you sound depth, follow known underground signs, and take finite pulls from buried seams. |
+| 24 | Oda, magic weaponsmith | Oda studies unlike forces that can be held close enough to trace how they travel. | Oda runs the Channelworks and Emanation Housing, where prepared forces can be contained and used safely. |
+| 25 | Auber, distiller | Auber looks for worlds where water, minerals, heat, and residue separate cleanly. | Auber runs the Distillery, where you crystallise blank cores and attune them to known forces. |
+| 26 | Ashe, emanation specialist | Ashe follows visible warning signs around creatures already carrying an active force. | Ashe will teach combat techniques for recognising and responding to active emanations. |
+| 27 | Tovin, binder | Tovin can be found in a dark, enclosed world where time is precise but leaving is difficult. | Tovin runs the Anchorage, where you keep a portfolio of anchored realms and prepare ways to return to them. |
+| 28 | Perren, interpreter | Perren studies ruined rituals that can be understood in more than one valid way. | Perren's later story will teach Mirror and help interpret ritual fragments without forcing a single answer. |
+| 29 | Nine, continuity keeper | Nine helps revisit a settled arrangement and revise it around the person living with it now. | Nine's later story will teach Dream and carry the player's choices into the continuity ending. |
 
 ## Diary guide
 

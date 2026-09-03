@@ -6,6 +6,7 @@ import { PixelImage } from '@/components/pixel-image';
 import { GuideBreadcrumbs, RelatedGuides } from '@/components/guide-navigation';
 import { SiteFrame } from '@/components/site-frame';
 import { content } from '@/lib/content';
+import { stationForPerson } from '@/lib/people';
 import { serviceForStation } from '@/lib/services';
 
 export function generateStaticParams() {
@@ -29,7 +30,7 @@ export default async function PersonDetail({
   const { slug } = await params;
   const person = content.cast.find((entry) => entry.slug === slug);
   if (!person) notFound();
-  const station = content.stations.find((entry) => person.role.includes(entry.name));
+  const station = stationForPerson(person, content.stations);
   const service = station ? serviceForStation(station.id) : null;
   const hintPages = person.diaryPages.filter((page) => page.worldHint);
   const bookPages = person.diaryPages.filter((page) => !page.worldHint);
@@ -61,7 +62,7 @@ export default async function PersonDetail({
       </nav>
       <section className="article-section note-card">
         <h2>Spoiler boundary</h2>
-        <p>This page includes the complete currently authored book and location-hint text for {person.name}. The location-hint stages are separated below so you can stop before reading them; they are not a substitute for recovering records in play.</p>
+        <p>This page includes all of {person.name}’s currently available book pages and location clues. The clues are separated below so you can stop before reading spoilers and discover the pages naturally in the game.</p>
       </section>
       <section className="article-section" id="meeting">
         <h2>At a glance</h2>
@@ -85,18 +86,18 @@ export default async function PersonDetail({
         </dl>
       </section>
       <section className="article-section">
-        <h2>After meeting</h2>
+        <h2>At the Cottage</h2>
         <p>{person.contribution}</p>
-        {station && (
+        {station ? (
           <p>
-            Their current Village route is <Link href={`/buildings/${station.slug}`}>{station.name}</Link>.
+            You can work with {person.name} at <Link href={`/buildings/${station.slug}`}>{station.name}</Link>.
             {service && <> {service.summary}</>}
           </p>
-        )}
+        ) : <p><strong>Planned:</strong> This role is part of the intended game but is not available to use yet.</p>}
       </section>
       <section className="article-section" id="diary-pages">
-        <h2>Book pages beyond location hints</h2>
-        <p>{person.diaryPageLabel}. The complete authored record is divided into these book pages and the spoiler-marked location-hint stages below; each keeps the current source text in order.</p>
+        <h2>Book pages</h2>
+        <p>{person.diaryPageLabel}. Story pages are listed here in reading order; location clues are kept in the spoiler section below.</p>
         <div className="diary-grid">
           {bookPages.map((page) => (
             <article className="note-card" key={`${person.slug}-page-${page.sequence}`}>
@@ -107,7 +108,7 @@ export default async function PersonDetail({
           ))}
         </div>
       </section>
-      {hintPages.length > 0 && <section className="article-section spoiler-boundary" id="location-hints"><h2>Spoilers — location-hint stages</h2><p>These authored pages describe conditions and related observations. Read them only when you want the complete player-reference material.</p><div className="diary-grid">{hintPages.map((page) => <article className="note-card" key={`${person.slug}-hint-${page.sequence}`}><p className="eyebrow">Page {page.sequence} · {page.title}</p><p>{page.prose}</p></article>)}</div></section>}
+      {hintPages.length > 0 && <section className="article-section spoiler-boundary" id="location-hints"><h2>Spoilers — location clues</h2><p>These pages describe the kind of world where {person.name} can be found. Read them only if you want help with the search.</p><div className="diary-grid">{hintPages.map((page) => <article className="note-card" key={`${person.slug}-hint-${page.sequence}`}><p className="eyebrow">Page {page.sequence} · {page.title}</p><p>{page.prose}</p></article>)}</div></section>}
       <RelatedGuides links={[{ label: 'All people', href: '/people' }, ...(station ? [{ label: `Visit ${station.name}`, href: `/buildings/${station.slug}` }] : []), { label: 'Site directory', href: '/sites' }, { label: 'Library and records', href: '/buildings/library' }, { label: 'Exploration', href: '/systems/exploration' }, { label: 'Village', href: '/village' }, { label: 'All systems', href: '/systems' }]} />
     </SiteFrame>
   );

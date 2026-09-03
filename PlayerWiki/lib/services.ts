@@ -17,31 +17,31 @@ export const serviceGuides: ServiceGuide[] = [
     name: 'Storehouse and inventory',
     stationID: 'storehouse',
     summary:
-      'Review everything brought home, identify unknown objects, move supplies into the Field Kit, and resolve returns that arrived while storage was full.',
+      'Review everything you have brought home, identify unknown objects, pack supplies into the Field Kit, and make room for anything waiting after a full return.',
     useFor: [
-      'Browsing stored items and reserve-backed resources',
+      'Browsing stored items and materials',
       'Identifying eligible unknown objects',
       'Moving eligible supplies between storage and the Field Kit',
       'Resolving the waiting pile when a return exceeds current space',
     ],
     workflow: [
       'Open Items or Materials.',
-      'Inspect the exact stack or resource entry.',
-      'Choose the available action and review its current destination or capacity.',
+      'Inspect the stack, material, or item you want to manage.',
+      'Choose an available action and check where the item will go and whether there is room.',
       'If the Storehouse is full, make an explicit keep-or-replace decision; returned loot is not silently discarded.',
     ],
     selection:
-      'Choose the exact stack, resource, or waiting item shown on the current Storehouse screen. Item capacity and the resource reserve are shown separately.',
+      'Choose the stack, material, or waiting item shown in the Storehouse. Items and materials use separate kinds of storage.',
     result:
-      'Only the confirmed transfer or keep-or-replace choice changes custody. If there is no room or the shown choice is no longer available, the current holdings stay where they are.',
+      'Nothing moves until you confirm. If there is no room or the item has changed, your belongings stay where they are.',
     relatedGuides: [
       { label: 'Resources', href: '/resources' },
       { label: 'Consumables', href: '/consumables' },
       { label: 'Curios', href: '/curios' },
     ],
     remember: [
-      'Resources use their own reserve and do not consume item slots.',
-      'Identification and transfers use the exact object currently shown.',
+      'Materials have their own storage and do not use item slots.',
+      'Identification and transfers always apply to the object you selected.',
       'Storehouse upgrades increase available storage.',
     ],
   },
@@ -50,7 +50,7 @@ export const serviceGuides: ServiceGuide[] = [
     name: 'Trading Post',
     stationID: 'trading_post',
     summary:
-      'Buy from Vance’s current ordinary stock and sell eligible identified holdings or reserve-backed materials.',
+      'Buy from Vance’s changing stock, or sell identified items and materials that the Trading Post accepts.',
     useFor: [
       'Buying a currently listed item',
       'Selling eligible identified holdings',
@@ -58,14 +58,14 @@ export const serviceGuides: ServiceGuide[] = [
     ],
     workflow: [
       'Choose Buy or Sell.',
-      'Open the exact listing or material row.',
-      'Review price, quantity and current stock.',
-      'Confirm the transaction; a changed or unaffordable listing remains uncommitted.',
+      'Open the item or material you want to trade.',
+      'Check the price, quantity, and available stock.',
+      'Confirm the trade. If the stock or price has changed, you will be asked to review it again.',
     ],
     selection:
-      'Choose the exact current listing, identified holding, or material quantity. The displayed price, quantity, and stock describe that choice.',
+      'Choose a listed item, one of your identified belongings, or the quantity of material you want to sell. The price and stock shown apply to that choice.',
     result:
-      'A completed purchase or sale updates the shown holding and currency. If stock, funds, identity, or capacity no longer match, the displayed offer stays uncommitted.',
+      'A completed trade updates your goods and currency together. If the stock, price, funds, item, or storage space has changed, nothing is exchanged.',
     relatedGuides: [
       { label: 'Resources', href: '/resources' },
       { label: 'Consumables', href: '/consumables' },
@@ -74,7 +74,7 @@ export const serviceGuides: ServiceGuide[] = [
     remember: [
       'The shop stock can rotate.',
       'Unidentified objects are not ordinary sale listings.',
-      'Material sales draw from the resource reserve rather than Storehouse item slots.',
+      'Material sales come from material storage rather than Storehouse item slots.',
     ],
   },
   {
@@ -82,28 +82,28 @@ export const serviceGuides: ServiceGuide[] = [
     name: 'Recycler',
     stationID: 'recycler',
     summary:
-      'Dismantle eligible gear into a previewed material yield without inventing material provenance.',
+      'Preview and dismantle eligible gear to recover the materials it can actually return.',
     useFor: [
       'Previewing the return from eligible gear',
       'Recovering useful material from equipment you no longer need',
     ],
     workflow: [
       'Choose an eligible stored item.',
-      'Review the exact dismantling preview and resulting quantities.',
-      'Commit Dismantle only when the shown item and available capacity still match.',
+      'Review the dismantling preview and the quantities you will receive.',
+      'Confirm only when you are ready to give up that item and have room for the result.',
     ],
     selection:
-      'Choose an eligible stored gear item and read the exact preview before dismantling it.',
+      'Choose an eligible piece of stored gear and read its preview before dismantling it.',
     result:
-      'Only a completed dismantle removes the shown gear and adds its previewed yield. A changed selection or unavailable capacity leaves the gear in place.',
+      'The gear is removed only after a successful dismantle, and you receive exactly the materials shown. If the selection or available space changes, the gear stays intact.',
     relatedGuides: [
       { label: 'Equipment', href: '/equipment' },
       { label: 'Resources', href: '/resources' },
     ],
     remember: [
       'Previewing does not consume the item.',
-      'Only a committed dismantle removes the source item.',
-      'The Recycler returns authored yields; it does not infer arbitrary ingredients from an item name.',
+      'Only a confirmed dismantle removes the item.',
+      'The Recycler returns the materials defined for that item; it does not guess ingredients from the item’s name.',
     ],
   },
   {
@@ -111,22 +111,22 @@ export const serviceGuides: ServiceGuide[] = [
     name: 'Apothecary',
     stationID: 'apothecary',
     summary:
-      'Work with Nessa to prepare known remedies, coatings, and field supplies from exact natural materials and named stock.',
+      'Work with Nessa to prepare known remedies, coatings, and field supplies from the ingredients each recipe names.',
     useFor: [
-      'Reviewing a known preparation and its exact current stock',
-      'Choosing the shown qualifying material for a property-based recipe',
-      'Preparing one quoted supply for Storehouse or Waiting custody',
+      'Reviewing a known preparation and the ingredients you have available',
+      'Choosing a suitable material when a recipe allows more than one option',
+      'Preparing one supply for the Storehouse or the waiting area if storage is full',
     ],
     workflow: [
       'Recruit Nessa, then build the Apothecary foundation in Home → Make.',
       'Choose one currently known preparation and review every listed requirement.',
-      'Select the exact eligible material if the recipe asks for one.',
-      'Prepare only when the current stock and output destination agree.',
+      'Select the ingredient you want to use if the recipe offers a choice.',
+      'Check the ingredients and destination, then prepare the item.',
     ],
     selection:
-      'Choose one known preparation and, when required, the exact qualifying material shown by its current quote. A partial holding can reveal another current recipe but does not make a preparation ready by itself.',
+      'Choose a known preparation and, when required, one suitable ingredient. Having part of another recipe may help you recognise it, but you still need every required ingredient before you can make it.',
     result:
-      'Only a completed preparation consumes the selected material and named stock, then stores the one prepared item in Storehouse or Waiting according to the current output space. A changed quote, shortfall, or refusal leaves the displayed holdings and recipe knowledge unchanged.',
+      'A successful preparation uses the ingredients you selected and places the finished item in the Storehouse, or in Waiting if storage is full. Cancelling or lacking ingredients changes nothing.',
     relatedGuides: [
       { label: 'Nessa', href: '/people/nessa' },
       { label: 'Apothecary', href: '/buildings/apothecary' },
@@ -144,22 +144,22 @@ export const serviceGuides: ServiceGuide[] = [
     name: 'Blacksmith',
     stationID: 'blacksmith',
     summary:
-      'Work with Halloway to make one exact Pointed Blade from current stock; Reforge remains an exact-piece route with its own quoted boundary.',
+      'Work with Halloway to make a Pointed Blade from selected materials and inspect an eligible piece of gear before reforging it.',
     useFor: [
-      'Reviewing the live Pointed Blade maker quote',
-      'Selecting one exact point and one distinct exact grip',
-      'Checking whether one Home-owned physical piece can receive a current Reforge quote',
+      'Previewing a Pointed Blade before making it',
+      'Selecting one material for the point and a different piece for the grip',
+      'Checking whether a piece of gear stored at the Cottage can be reforged',
     ],
     workflow: [
       'Recruit Halloway, then build the Blacksmith foundation in Home → Make.',
-      'Open Make, choose Pointed Blade, and review the exact two material sockets, cost, result, and destination.',
-      'Confirm only the current retained Make quote.',
-      'Use Reforge only with a current exact-piece quote; it does not sell, dismantle, repair, or replace a gear identity.',
+      'Open Make, choose Pointed Blade, and review its two material slots, cost, result, and destination.',
+      'Confirm the preview when the chosen materials and result are correct.',
+      'Use Reforge only on the selected eligible item. It does not sell, dismantle, or silently replace a different piece of gear.',
     ],
     selection:
-      'Choose the exact Pointed Blade materials or one exact Home-owned physical piece shown by the current quote. Blacksmith Stock includes qualifying World and Creature Materials.',
+      'Choose the materials for a Pointed Blade or the stored piece of gear you want Halloway to inspect. Blacksmith stock can include suitable materials gathered from worlds and creatures.',
     result:
-      'Only a durable Make receipt creates the one quoted physical weapon and moves it to the actual Storehouse or Waiting destination. A refusal, cancel, stale quote, or failed write leaves the displayed stock and target unchanged.',
+      'A finished craft creates one weapon and sends it to the Storehouse, or to Waiting if storage is full. Cancelling, losing an ingredient, or failing to save leaves the materials and selected item unchanged.',
     relatedGuides: [
       { label: 'Halloway', href: '/people/halloway' },
       { label: 'Blacksmith construction', href: '/buildings/blacksmith' },
@@ -169,8 +169,8 @@ export const serviceGuides: ServiceGuide[] = [
     ],
     remember: [
       'The foundation teaches Pointed Blade but gives no gear or material stock.',
-      'Trading, Recycler, and Blacksmith are separate actions: sell, dismantle, and make or work on one exact piece.',
-      'Reforge success is not published until its one-step typed quote can show the exact useful result before confirmation.',
+      'The Trading Post sells, the Recycler dismantles, and the Blacksmith makes or improves gear.',
+      'Reforging will remain marked as planned until the game can show its full result before you confirm.',
     ],
   },
   {
@@ -178,22 +178,22 @@ export const serviceGuides: ServiceGuide[] = [
     name: 'The Anchorage',
     stationID: 'anchorage',
     summary:
-      'Work with Tovin to keep exact anchored realms in one portfolio and construct an Anchor Frame for a valid field route.',
+      'Work with Tovin to keep anchored realms in one portfolio and construct an Anchor Frame for a supported return journey.',
     useFor: [
       'Reviewing realms you have already held permanently',
-      'Constructing one quoted Anchor Frame from exact world-made stock',
+      'Constructing an Anchor Frame from the required world materials',
       'Starting a valid revisit from a saved realm snapshot',
     ],
     workflow: [
       'Recruit Tovin, then build the Anchorage foundation in Home → Realms.',
       'Review the empty portfolio or one already anchored realm.',
-      'Craft an Anchor Frame only from the exact six distinct qualifying materials and current Essence quote.',
-      'Use a revealed Atlas Seam or a valid carried Frame route in a world; review and confirm its exact current quote.',
+      'Craft an Anchor Frame from six different suitable materials and the Essence shown in the preview.',
+      'At a revealed Atlas Seam, or when carrying a usable Frame, review the anchoring cost and confirm when you are ready.',
     ],
     selection:
-      'Choose the exact realm, current Anchor Frame construction quote, or revealed Atlas Seam shown by the current surface. A Frame and a Seam are separate anchoring routes.',
+      'Choose the realm, Anchor Frame preview, or revealed Atlas Seam shown on the page. A Frame and a Seam are two different ways to anchor a realm.',
     result:
-      'Only a durable construction, frame craft, or anchor confirmation changes its named holding. A cancelled, stale, refused, or failed quote leaves the current foundation, stock, realm, and expedition state unchanged.',
+      'Nothing is built, spent, or anchored until you confirm and the action succeeds. Cancelling or encountering a changed requirement leaves the building, materials, realm, and expedition unchanged.',
     relatedGuides: [
       { label: 'Tovin', href: '/people/tovin' },
       { label: 'Anchorage construction', href: '/buildings/anchorage' },
@@ -204,7 +204,7 @@ export const serviceGuides: ServiceGuide[] = [
     remember: [
       'Building the station grants no realm or Anchor Frame.',
       'Anchoring preserves a realm; it does not end an expedition or bank the current haul.',
-      'This route does not publish Work or Deliveries, and it does not promise passive production.',
+      'Work assignments, deliveries, and passive production are not available yet.',
     ],
   },
   {
@@ -244,22 +244,22 @@ export const serviceGuides: ServiceGuide[] = [
     name: 'Survey Post',
     stationID: 'survey_post',
     summary:
-      'Work with Mara to study permanent field-instrument capabilities, choose the next trip’s loadout, and record one-turn world readings.',
+      'Work with Mara to learn field instruments, choose which ones to take, and record readings during an expedition.',
     useFor: [
-      'Studying one of the eight current Field Instruments from its exact Research preview',
+      'Studying one of the eight available Field Instruments',
       'Choosing which owned instruments are packed for the next expedition',
       'Reviewing observations recorded by a carried instrument in the world',
     ],
     workflow: [
       'Recruit Mara, then build the Survey Post foundation in Home → Study.',
-      'Study an affordable named instrument; its subject becomes a permanent Crude capability rather than a physical item.',
+      'Study an affordable instrument. You learn its basic use permanently; it is a skill rather than a physical item.',
       'Choose the next-trip loadout at Home, then Bind and depart.',
       'Use Survey in the world when no encounter is active to record the carried instruments’ readings for one turn.',
     ],
     selection:
-      'Choose the exact named Research node or one owned subject in the current Home loadout. The Field Kit only displays the exact instruments that were frozen when this expedition began.',
+      'Choose the instrument you want to study or add to your next loadout. The Field Kit shows only the instruments you packed before the expedition began.',
     result:
-      'Only a durable Research, loadout, or Survey receipt changes its named fact. A refused or stale action leaves the station, owned capabilities, packed set, observations, and turn unchanged.',
+      'A successful study, loadout change, or Survey is saved before it takes effect. If the action cannot be completed, your learned instruments, packed set, observations, and current turn do not change.',
     relatedGuides: [
       { label: 'Mara', href: '/people/mara' },
       { label: 'Survey Post construction', href: '/buildings/survey-post' },
@@ -270,7 +270,7 @@ export const serviceGuides: ServiceGuide[] = [
     remember: [
       'An instrument is a permanent Reality capability, never a Storehouse, Field Kit supply, or equipment object.',
       'A Survey advances one turn and records observations; it does not promise a coordinate, resource, site, traveller, or map reveal.',
-      'Precision improvements are not published as completed paid actions until their exact typed quote and receipt owner is live.',
+      'Precision improvements are planned, but are not listed as usable upgrades until the game can show their full cost and result before confirmation.',
     ],
   },
   {
@@ -287,10 +287,10 @@ export const serviceGuides: ServiceGuide[] = [
     workflow: [
       'Select a person at the fire.',
       'Review whether they are travelling or at home.',
-      'Confirm the exact placement change.',
+      'Confirm the placement change.',
     ],
     selection:
-      'Choose the exact recruited person and review their current travelling or home placement before confirming a change.',
+      'Choose a recruited person and review whether they are travelling or at home before confirming a change.',
     result:
       'A completed placement change updates that person’s current location. If party capacity or the shown placement prevents it, their existing placement remains intact.',
     relatedGuides: [
@@ -321,7 +321,7 @@ export const serviceGuides: ServiceGuide[] = [
       'Make changes at home before the next encounter.',
     ],
     selection:
-      'Choose one party member, then the exact Gear or Gambit face you intend to change. Gear and Gambits keep their displayed slot and priority context.',
+      'Choose one party member, then the Gear or Gambit you want to change. Gear keeps its equipment slot, and Gambits keep their shown priority order.',
     result:
       'A completed change keeps the shown equipped item or Gambit order for later preparation. An ineligible gear choice or unfinished edit leaves the current setup unchanged.',
     relatedGuides: [
@@ -348,11 +348,11 @@ export const serviceGuides: ServiceGuide[] = [
     ],
     workflow: [
       'Choose the Raw Essence amount or refine all.',
-      'Review the exact Crystal return at the current rate.',
+      'Review how many Essence Crystals you will receive at the current rate.',
       'Commit the refinement.',
     ],
     selection:
-      'Choose the exact Raw Essence amount or the available refine-all option, then read the current Crystal return.',
+      'Choose an amount of Raw Essence, or refine all of it, then review how many Essence Crystals you will receive.',
     result:
       'Only a completed refinement exchanges the selected Raw Essence for the shown Essence Crystals. If the amount or rate no longer matches, the current reserve remains unchanged.',
     relatedGuides: [
@@ -363,7 +363,7 @@ export const serviceGuides: ServiceGuide[] = [
     remember: [
       'Raw Essence and spendable Essence are distinct.',
       'Progression can improve the refinement rate and returned-essence behavior.',
-      'The current preview is the authority for the result.',
+      'Always check the preview before refining; it shows the amount you will receive.',
     ],
   },
   {
@@ -374,13 +374,13 @@ export const serviceGuides: ServiceGuide[] = [
       'Review the creatures encountered in generated worlds and compare an observed individual with its known species.',
     useFor: [
       'Reviewing encountered species',
-      'Comparing observed traits and habitat records',
+      'Comparing observed traits and habitats',
       'Revisiting what has actually been disclosed',
     ],
     workflow: [
       'Open a recorded creature family.',
       'Choose an encountered species or record.',
-      'Compare the observed individual with the retained species information.',
+      'Compare the observed individual with what you have learned about its species.',
     ],
     selection:
       'Choose an already recorded creature family and then an encountered species or record within it.',
@@ -392,7 +392,7 @@ export const serviceGuides: ServiceGuide[] = [
       { label: 'Library collections', href: '/buildings/library' },
     ],
     remember: [
-      'The Bestiary records disclosed encounters rather than revealing unseen creatures.',
+      'The Bestiary records creatures you have encountered; it does not reveal unseen species.',
       'Traveller writing lives in the Library; the Bestiary covers the other living things met in worlds.',
     ],
   },
