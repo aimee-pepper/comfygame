@@ -7,20 +7,31 @@ import { fileURLToPath } from 'node:url';
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const read = (relative) => readFile(path.join(root, relative), 'utf8');
 
-test('Aimee Reference publishes the Asset Splash List and three organized Game Design plan routes', async () => {
-  const [home, references, preparation, route, source] = await Promise.all([
+test('Aimee Reference publishes the audited parallax World Splash inventory and three organized Game Design plan routes', async () => {
+  const [home, references, splashAssets, preparation, route, source] = await Promise.all([
     read('app/page.tsx'),
     read('app/references/page.tsx'),
+    read('app/references/world-splash-assets/page.tsx'),
     read('scripts/prepare-pages.mjs'),
     read('app/references/[slug]/page.tsx'),
     read('lib/design-references.ts'),
   ]);
   assert.match(home, /Aimee Reference/);
-  assert.match(home, /Asset Splash List/);
+  assert.match(home, /World Splash Asset Inventory/);
   assert.match(home, /Resource, crafting, and world plans/);
-  assert.match(references, /reference-assets\/world-splash-five-layer-inventory-v1\.html/);
+  assert.match(home, /references\/world-splash-assets/);
+  assert.match(references, /references\/world-splash-assets/);
   assert.match(preparation, /world-splash-five-layer-inventory-v1\.html/);
-  assert.match(preparation, /world-splash-five-layer-inventory-v1-app\.js/);
+  assert.match(preparation, /references\/world-splash-assets\.html/);
+  assert.doesNotMatch(preparation, /world-splash-five-layer-inventory-v1-app\.js/);
+  assert.match(splashAssets, /five-layer parallax/);
+  assert.match(splashAssets, /temporary proof of concept/);
+  assert.match(splashAssets, /Audit conclusion: the recovered list is not enough/);
+  assert.match(splashAssets, /Complete painter-facing inventory/);
+  assert.match(splashAssets, /Landscape arrangement kit/);
+  assert.match(splashAssets, /Ground-material kit/);
+  assert.match(splashAssets, /Flora, tree, and canopy kit/);
+  assert.doesNotMatch(splashAssets, /phone-review|Copy receipt|Download/);
   for (const file of [
     'resource-crafting-world-ecology-cohesive-plan-v1.md',
     'resource-crafting-world-overhaul-structure-v1.md',

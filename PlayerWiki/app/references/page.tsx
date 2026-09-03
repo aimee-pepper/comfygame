@@ -1,23 +1,20 @@
-import { ExternalLink } from 'lucide-react';
 import Link from '@/components/wiki-link';
 import { GuideBreadcrumbs } from '@/components/guide-navigation';
 import { PageIntro } from '@/components/page-intro';
 import { SiteFrame } from '@/components/site-frame';
 import { designReferences } from '@/lib/design-references';
 
-const basePath = (process.env.NEXT_PUBLIC_BASE_PATH ?? '').replace(/\/+$/, '');
-const assetSplashListHref = `${basePath}/reference-assets/world-splash-five-layer-inventory-v1.html`;
 export default function ReferencesPage() {
   return <SiteFrame sidebar>
     <GuideBreadcrumbs items={[{ label: 'Home', href: '/' }, { label: 'Aimee Reference' }]} />
     <PageIntro eyebrow="Project reference" title="Aimee Reference" summary="A clearly labelled home for Aimee's system plans, implementation roadmaps, and visual production references." />
     <section className="article-section note-card" aria-labelledby="asset-splash-list-heading">
-      <h2 id="asset-splash-list-heading">Asset Splash List</h2>
-      <p>Open the five-layer World Splash asset inventory, including every required asset family and the locked moving/static layer split.</p>
+      <h2 id="asset-splash-list-heading">World Splash Asset Inventory</h2>
+      <p>Read the normal Wiki page for the final five-layer parallax inventory, its completeness audit, the world varieties the recovered list does not yet cover, and the prescribed expansion.</p>
       <nav aria-label="Asset Splash List reference">
-        <a href={assetSplashListHref}>Open the Asset Splash List <ExternalLink size={14} aria-hidden="true" /></a>
+        <Link href="/references/world-splash-assets">Open the World Splash Asset Inventory</Link>
       </nav>
-      <p><small>This is a review reference, not player-facing game authority.</small></p>
+      <p><small>This is a planning and art-production reference, not a claim that unfinished world variants are already playable.</small></p>
     </section>
     <section className="article-section" aria-labelledby="resource-crafting-plans-heading">
       <h2 id="resource-crafting-plans-heading">Resource, crafting, and generated-world plans</h2>

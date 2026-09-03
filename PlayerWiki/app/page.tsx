@@ -102,9 +102,9 @@ export default function Home() {
             <Link href="/references">Open Aimee Reference</Link>
           </div>
           <div className="topic-grid">
-            <Link className="topic-card" href="/references">
+            <Link className="topic-card" href="/references/world-splash-assets">
               <LibraryBig aria-hidden="true" />
-              <span><strong>Asset Splash List</strong><small>Open the five-layer World Splash asset inventory and its required asset families.</small></span>
+              <span><strong>World Splash Asset Inventory</strong><small>Open the organized final-parallax inventory, completeness audit, missing world coverage, and prescribed expansion.</small></span>
             </Link>
             <Link className="topic-card" href="/references">
               <LibraryBig aria-hidden="true" />
