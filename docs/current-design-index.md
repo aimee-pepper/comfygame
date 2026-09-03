@@ -83,6 +83,7 @@ When two documents disagree:
 | Gambit stat thresholds | `gambit-stat-thresholds-current.md` | HP percentages remain fractional; Talin uses typed absolute armour marks |
 | Ashe Ground technique | `ashe-ground-technique-current.md` | Protective emanation interception; values remain playtest tuning |
 | Traveller authoring | `traveller-template.md` | Required structure and validation |
+| Character background and voice | `full-cast-background-and-voice-guide-current.md` | Settled 29-person background anchors, voice differentiation and the plain-world-fact boundary for later clue rewrites |
 | Implemented six | `traveller-identities-existing-six-current.md` | Honest clue replacements and expansion targets |
 | Implemented-six diary packets | `implemented-six-diary-packets-current.md` | Complete 6/7/6/7/7/14 page plans and authored additions |
 | Early–mid signatures | `traveller-signatures-early-mid-current.md` | Bryn, Orsa, Vance and Talin; playtest thresholds |

@@ -1,6 +1,7 @@
 import cohesivePlan from '../../docs/resource-crafting-world-ecology-cohesive-plan-v1.md?raw';
 import overhaulPlan from '../../docs/resource-crafting-world-overhaul-structure-v1.md?raw';
 import implementationRoadmap from '../../docs/resource-crafting-world-implementation-roadmap-v1.md?raw';
+import characterBackgroundVoice from '../../docs/full-cast-background-and-voice-guide-current.md?raw';
 
 export interface DesignReferenceLink {
   href: string;
@@ -29,7 +30,20 @@ const systemLinks: DesignReferenceLink[] = [
   { href: '/crafting', title: 'Individual crafting systems', summary: 'Open the separate Apothecary, maker, instrument, Distillery, Channelworks, Anchorage, and refining guides.' },
 ];
 
+const characterLinks: DesignReferenceLink[] = [
+  { href: '/people', title: 'People', summary: 'Browse all twenty-nine travellers in campaign order and open each person\'s complete page.' },
+  { href: '/village', title: 'The Village', summary: 'See where recruited specialists contribute and which facilities are available or planned.' },
+  { href: '/journey', title: 'The player journey', summary: 'See where meetings, recruitment, recovered pages, and later story beats fit into play.' },
+];
+
 export const designReferences: DesignReference[] = [
+  {
+    slug: 'character-background-and-voice',
+    title: 'Character Background and Voice Guide',
+    summary: 'The settled background, personality, speaking style, and world-clue boundaries for all twenty-nine travellers.',
+    source: characterBackgroundVoice,
+    systemLinks: characterLinks,
+  },
   {
     slug: 'resource-crafting-world-ecology-plan',
     title: 'Resource, Crafting, World, and Ecology Plan',

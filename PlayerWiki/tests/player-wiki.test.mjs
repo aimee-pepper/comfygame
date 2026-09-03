@@ -7,14 +7,15 @@ import { fileURLToPath } from 'node:url';
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const read = (relative) => readFile(path.join(root, relative), 'utf8');
 
-test('Aimee Reference publishes the audited parallax World Splash inventory and three organized Game Design plan routes', async () => {
-  const [home, references, splashAssets, preparation, route, source] = await Promise.all([
+test('Aimee Reference publishes the audited World Splash inventory, three system plans, and the full-cast background and voice guide', async () => {
+  const [home, references, splashAssets, preparation, route, source, characterGuide] = await Promise.all([
     read('app/page.tsx'),
     read('app/references/page.tsx'),
     read('app/references/world-splash-assets/page.tsx'),
     read('scripts/prepare-pages.mjs'),
     read('app/references/[slug]/page.tsx'),
     read('lib/design-references.ts'),
+    read('../docs/full-cast-background-and-voice-guide-current.md'),
   ]);
   assert.match(home, /Aimee Reference/);
   assert.match(home, /World Splash Asset Inventory/);
@@ -41,6 +42,7 @@ test('Aimee Reference publishes the audited parallax World Splash inventory and 
     await access(path.resolve(root, '../docs', file));
   }
   for (const slug of [
+    'character-background-and-voice',
     'resource-crafting-world-ecology-plan',
     'resource-crafting-world-overhaul',
     'resource-crafting-world-roadmap',
@@ -55,6 +57,13 @@ test('Aimee Reference publishes the audited parallax World Splash inventory and 
   assert.ok(route.indexOf('<article className="article-section markdown-reference">') < route.indexOf('{reference.systemLinks.length'));
   assert.doesNotMatch(route, /reference\.systemLinks\.length\s*\?\s*<section[\s\S]*:\s*<article/);
   assert.match(references, /Each page contains its complete authored plan/);
+  assert.match(references, /Character Background and Voice Guide/);
+  assert.match(source, /full-cast-background-and-voice-guide-current\.md/);
+  for (const name of ['Vance', 'Noll', 'Halloway', 'Mara', 'Edren', 'Isolde', 'Sela', 'Bryn', 'Orsa', 'Talin', 'Nessa', 'Corrin', 'Dagg', 'Rook', 'Lys', 'Bracken', 'Fen', 'Wren', 'Kestrel', 'Maud', 'Marrick', 'Sabine', 'Grimmond', 'Oda', 'Auber', 'Ashe', 'Tovin', 'Perren', 'Nine'])
+    assert.match(characterGuide, new RegExp(`### ${name} —`));
+  assert.match(characterGuide, /75% warm, clear English/);
+  assert.match(characterGuide, /world fact comes first/i);
+  assert.match(characterGuide, /Personal memories, relationship stories/);
   assert.match(source, /systemLinks/);
   assert.doesNotMatch(preparation, /resource-crafting-world-ecology-cohesive-plan-v1\.md/);
   await access(path.resolve(root, '../AssetLab/world-splash-five-layer-inventory-v1.html'));

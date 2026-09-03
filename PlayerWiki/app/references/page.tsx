@@ -5,6 +5,9 @@ import { SiteFrame } from '@/components/site-frame';
 import { designReferences } from '@/lib/design-references';
 
 export default function ReferencesPage() {
+  const characterReference = designReferences.find((reference) => reference.slug === 'character-background-and-voice');
+  const resourceReferences = designReferences.filter((reference) => reference.slug !== 'character-background-and-voice');
+
   return <SiteFrame sidebar>
     <GuideBreadcrumbs items={[{ label: 'Home', href: '/' }, { label: 'Aimee Reference' }]} />
     <PageIntro eyebrow="Project reference" title="Aimee Reference" summary="A clearly labelled home for Aimee's system plans, implementation roadmaps, and visual production references." />
@@ -23,11 +26,18 @@ export default function ReferencesPage() {
       </nav>
       <p><small>This is a planning and art-production reference, not a claim that unfinished world variants are already playable.</small></p>
     </section>
+    {characterReference ? <section className="article-section note-card" aria-labelledby="character-background-voice-heading">
+      <h2 id="character-background-voice-heading">Character Background and Voice Guide</h2>
+      <p>Review the settled background, personality, speaking style, and clue-writing boundaries for every traveller before their world clues are rewritten.</p>
+      <nav aria-label="Character Background and Voice reference">
+        <Link href={`/references/${characterReference.slug}`}>Open the Character Background and Voice Guide</Link>
+      </nav>
+    </section> : null}
     <section className="article-section" aria-labelledby="resource-crafting-plans-heading">
       <h2 id="resource-crafting-plans-heading">Resource, crafting, and generated-world plans</h2>
       <p>Each page contains its complete authored plan, clearly marked open decisions, and implementation order. Related subject pages remain linked beneath the plan for deeper current-game reference.</p>
       <div className="topic-grid">
-        {designReferences.map((reference) => <Link className="topic-card" href={`/references/${reference.slug}`} key={reference.slug}><span><strong>{reference.title}</strong><small>{reference.summary}</small></span></Link>)}
+        {resourceReferences.map((reference) => <Link className="topic-card" href={`/references/${reference.slug}`} key={reference.slug}><span><strong>{reference.title}</strong><small>{reference.summary}</small></span></Link>)}
       </div>
     </section>
   </SiteFrame>;
