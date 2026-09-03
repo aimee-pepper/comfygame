@@ -173,7 +173,7 @@ Encounter and inspect one naturally generated member of each accepted body-plan/
 - Advanced resources may still generate before they are harvestable.
 - Ordinary flora remains safe.
 - Dangerous flora contact/poison identity remains explicit.
-- Sites, portals, enemies, and other foreground owners cannot be hidden or overwritten by canopies.
+- Canopies may deliberately conceal distant sites, creatures, resources, and undiscovered paths through one saved visibility rule. They cannot overwrite placed identities, erase established knowledge, disagree with Look or the minimap, or cause avoidable contact damage before the required warning.
 
 ### Focused gates
 
@@ -182,6 +182,7 @@ Encounter and inspect one naturally generated member of each accepted body-plan/
 - A committed harvest adds the exact yield once and depletes the exact placement once.
 - Stale node, moved player, changed tool, full/invalid custody, replay, and write failure are inert.
 - Relaunch preserves live and depleted placements.
+- Relaunch preserves canopy concealment, revealed areas, discovered site/portal knowledge, and any visibility change caused by harvesting a tree.
 
 ### Mounted gate
 

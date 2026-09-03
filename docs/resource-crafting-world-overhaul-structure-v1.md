@@ -143,6 +143,8 @@ Map receipts need versioned layout style, world dimensions, region identities, p
 - Dangerous flora remains explicitly generated and disclosed rather than inferred from an ordinary species description.
 - Trees occupy real canopy and trunk structures.
 - Canopy view changes when the player moves beneath it, revealing the trunk and ground below.
+- Dense canopy intentionally limits distant visibility for ground, resources, creatures, sites, and undiscovered passages. Look, movement, map knowledge, and rendering use the same saved visibility state.
+- Immediate dangerous contact remains truthfully warned before commitment, while known portals and discovered sites retain their saved identity even when foliage obstructs the local view.
 - Tree harvesting requires an appropriate Axe tier; small plants use a Scythe tier; difficult or dangerous plants require better tools.
 
 ### Structural change

@@ -395,7 +395,17 @@ Trees become real world structures rather than an absent resource abstraction.
 - Outside a canopy, the player sees the leaves and crown.
 - Beneath the canopy, the presentation reveals the trunk and the ground beneath it.
 - The trunk becomes an eligible harvesting target when the player has the required Axe tier.
-- Canopy presentation must not hide hazards, sites, portals, or occupied tiles from the rules.
+- Dense canopy can intentionally limit the player's view. Distant ground, resources, creatures, sites, and
+  undiscovered passages may remain concealed until the party approaches, moves beneath the leaves, or gains a
+  clear line of sight.
+- Concealment is owned by the world rules and frozen receipt, not created accidentally by drawing leaves over
+  information the rules consider visible. Look, movement, the minimap, discovery, and rendering must agree.
+- A dangerous placement can be concealed at a distance, but it must receive its proper warning before the
+  player commits an avoidable contact action. Forest cover cannot create unexplained invisible damage.
+- A known portal or discovered site remains known. Canopy may obstruct the immediate view, but cannot erase its
+  saved identity, block its interaction without explanation, or make it disappear from established knowledge.
+- Harvesting or removing a trunk can open the view beneath its canopy; that change belongs to the saved placed
+  tree rather than being recomputed differently after relaunch.
 
 Exact canopy footprint, movement, line-of-sight, regrowth, and tree-felling consequences remain **Will discuss with Aimee**.
 

@@ -91,7 +91,7 @@ export const progressionPlan = [
 export const worldGenerationPlan = [
   ['Ground layout', 'Choose an arrangement such as uniform, striated, scattered, clustered, graded, or fractured, then fill its regions with granular ground types. Final names and weights will be discussed with Aimee.'],
   ['Ground and liquid types', 'Use multiple recognizable dirt, sand, stone, mineral, and liquid types. Granite regions can host Granite; Sand can become a glassmaking input.'],
-  ['Flora', 'Terrain, light, atmosphere, weather, water, and temperature all constrain what can grow. Trees gain real canopy and trunk behavior.'],
+  ['Flora', 'Terrain, light, atmosphere, weather, water, and temperature all constrain what can grow. Dense tree canopy can conceal distant features until the party approaches or moves beneath it; Look, the map, discovery, and the saved world all agree about what has been revealed.'],
   ['Creatures', 'Readable body plans and habitat rules support aquatic, land, amphibious, flying, and hybrid forms. Anatomy determines useful material types and subtypes.'],
   ['Environment', 'When two possible conditions conflict, temperature or another relevant pressure chooses which one appears; the world itself is not rejected. Compatible written combinations may transform, such as rain and miasma becoming acid rain when that rule is approved.'],
   ['World size', 'Writing can eventually request smaller or larger worlds. Exact dimensions and costs will be discussed with Aimee.'],
