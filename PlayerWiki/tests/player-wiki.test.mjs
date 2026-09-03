@@ -8,13 +8,14 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const read = (relative) => readFile(path.join(root, relative), 'utf8');
 
 test('Aimee Reference publishes the World Splash inventory, system plans, voice guide, and rewritten clue corpus', async () => {
-  const [home, references, splashAssets, preparation, route, source, characterGuide, voiceAuthority, rewrittenClues, travellerCatalogue] = await Promise.all([
+  const [home, references, splashAssets, preparation, route, source, firstPassTuning, characterGuide, voiceAuthority, rewrittenClues, travellerCatalogue] = await Promise.all([
     read('app/page.tsx'),
     read('app/references/page.tsx'),
     read('app/references/world-splash-assets/page.tsx'),
     read('scripts/prepare-pages.mjs'),
     read('app/references/[slug]/page.tsx'),
     read('lib/design-references.ts'),
+    read('../docs/resource-world-first-pass-tuning-v1.md'),
     read('../docs/full-cast-background-and-voice-guide-current.md'),
     read('../docs/full-cast-voice-authority-current.md'),
     read('../docs/full-cast-world-clue-rewrite-current.md'),
@@ -38,6 +39,7 @@ test('Aimee Reference publishes the World Splash inventory, system plans, voice 
   assert.doesNotMatch(splashAssets, /phone-review|Copy receipt|Download/);
   for (const file of [
     'resource-crafting-world-ecology-cohesive-plan-v1.md',
+    'resource-world-first-pass-tuning-v1.md',
     'resource-crafting-world-overhaul-structure-v1.md',
     'resource-crafting-world-implementation-roadmap-v1.md',
   ]) {
@@ -48,6 +50,7 @@ test('Aimee Reference publishes the World Splash inventory, system plans, voice 
     'character-background-and-voice',
     'rewritten-world-clues',
     'resource-crafting-world-ecology-plan',
+    'resource-world-numbers-decided-so-far',
     'resource-crafting-world-overhaul',
     'resource-crafting-world-roadmap',
   ]) assert.match(source, new RegExp(slug));
@@ -67,6 +70,20 @@ test('Aimee Reference publishes the World Splash inventory, system plans, voice 
   assert.match(references, /not yet implemented in the game/i);
   assert.match(source, /full-cast-background-and-voice-guide-current\.md/);
   assert.match(source, /full-cast-world-clue-rewrite-current\.md/);
+  for (const heading of [
+    'Biological material quality',
+    'How a selected biological material changes an item',
+    'Mined and gathered world materials',
+    'World sizes',
+    'Regional arrangements',
+    'Harvesting controls and turn costs',
+    'Canopy and discovery',
+    "Sorting Rubble at Noll's Recycler",
+    'What remains for the next design passes',
+  ]) assert.match(firstPassTuning, new RegExp(heading.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')));
+  assert.match(firstPassTuning, /Mined resources do not use this table/);
+  assert.match(firstPassTuning, /generated creature body plans/);
+  assert.match(firstPassTuning, /Sigil acquisition order/);
   for (const name of ['Vance', 'Noll', 'Halloway', 'Mara', 'Edren', 'Isolde', 'Sela', 'Bryn', 'Orsa', 'Talin', 'Nessa', 'Corrin', 'Dagg', 'Rook', 'Lys', 'Bracken', 'Fen', 'Wren', 'Kestrel', 'Maud', 'Marrick', 'Sabine', 'Grimmond', 'Oda', 'Auber', 'Ashe', 'Tovin', 'Perren', 'Nine'])
     assert.match(characterGuide, new RegExp(`### ${name} —`));
   assert.match(characterGuide, /75% warm, clear English/);

@@ -3,6 +3,7 @@ import overhaulPlan from '../../docs/resource-crafting-world-overhaul-structure-
 import implementationRoadmap from '../../docs/resource-crafting-world-implementation-roadmap-v1.md?raw';
 import characterBackgroundVoice from '../../docs/full-cast-background-and-voice-guide-current.md?raw';
 import rewrittenWorldClues from '../../docs/full-cast-world-clue-rewrite-current.md?raw';
+import firstPassTuning from '../../docs/resource-world-first-pass-tuning-v1.md?raw';
 
 export interface DesignReferenceLink {
   href: string;
@@ -57,6 +58,13 @@ export const designReferences: DesignReference[] = [
     title: 'Resource, Crafting, World, and Ecology Plan',
     summary: 'The organized intended player loop, material hierarchy, recipes, progression, ecology, world generation, and Wiki contract.',
     source: cohesivePlan,
+    systemLinks,
+  },
+  {
+    slug: 'resource-world-numbers-decided-so-far',
+    title: 'Resource, Harvesting, and World Numbers Decided So Far',
+    summary: 'The complete first-pass values for biological quality, item-stat contributions, ungraded mined resources, world sizes and arrangements, harvesting, canopy discovery, and Recycler Rubble sorting—without pre-deciding the next creature or Sigil pass.',
+    source: firstPassTuning,
     systemLinks,
   },
   {
