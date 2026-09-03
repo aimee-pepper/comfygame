@@ -76,7 +76,7 @@ export const lootPaths = [
     current:
       'Harvesting gives the resource named by the deposit or plant. Returned stock is still held as counted resources or individual material samples, depending on the source.',
     accepted:
-      'Every physical yield becomes a World material with a frozen quality band. Ordinary plants remain safe; only clearly dangerous placements own contact harm.',
+      'Mined yields become simple exact-name quantities with one normal/green presentation and no quality. Biological yields use quality only where their own material rules call for it. Ordinary plants remain safe; only clearly dangerous placements own contact harm.',
   },
   {
     name: 'Generated creatures',
@@ -97,7 +97,7 @@ export const lootPaths = [
     current:
       'Each placed discovery keeps its own Search, depletion, and storage rules. A depleted site remains part of that world’s history rather than turning into another reward.',
     accepted:
-      'The discovery and its position stay unchanged. Only physical materials move to subtype-and-quality stacks.',
+      'The discovery and its position stay unchanged. Mined rewards move to exact-name quantity stacks; quality-bearing biological rewards move to subtype-and-quality stacks.',
   },
   {
     name: 'Nearby territory finds',
@@ -111,14 +111,14 @@ export const lootPaths = [
     current:
       'The expedition result divides eligible carried holdings into recovered and lost lines. Material lines may still be shown as individual samples or broad family groupings.',
     accepted:
-      'Recovered plus lost will equal the exact carried quantity for every family and quality band. Protected stock brought from the Cottage returns in full, and replay cannot duplicate either side.',
+      'Recovered plus lost will equal the exact carried quantity for every ungraded mined stack and every quality-bearing biological stack. Protected stock brought from the Cottage returns in full, and replay cannot duplicate either side.',
   },
   {
     name: 'Trading, crafting, and recycling',
     current:
       'Different services currently use a mixture of counted resources, individual material samples, and finished items.',
     accepted:
-      'Every trade, recipe, and Recycler choice names the physical type or subtype, quality, and quantity involved. When quality matters, the player chooses it; another grade is never silently sold, crafted, or recycled.',
+      'Every trade, recipe, and Recycler choice names the exact material, applicable subtype and quality, and quantity involved. Mined materials never show a quality choice. When biological quality matters, the player chooses it; another grade is never silently sold, crafted, or recycled.',
   },
 ] as const;
 
@@ -196,7 +196,7 @@ export const craftingFamilyStatus: CraftingFamilyStatus[] = [
     name: 'Bowyer',
     status: 'Changing in a future update',
     current: 'Longbow, Sling, and Throwing Set are playable through their current station and study gates.',
-    accepted: 'The same three weapons keep their recognizable parts and use player-selected physical types/subtypes and four-band quality stacks.',
+    accepted: 'The same three weapons keep their recognizable parts and use player-selected physical types/subtypes. Mined parts stay ungraded; approved biological parts retain their four-band quality choice.',
     changes: ['Longbow', 'Sling', 'Throwing Set'].map((name) => ({ name, current: 'Playable with individually selected material samples.', accepted: 'The same parts selected from visible physical categories, with direct previewed stat contributions.' })),
   },
   {
@@ -205,7 +205,7 @@ export const craftingFamilyStatus: CraftingFamilyStatus[] = [
     status: 'Changing in a future update',
     current: 'Fitted Point, Fitted Edge, Fitted Maul, and Fitted Polearm are playable. Polearm appears after Maud’s fitting pattern is known.',
     accepted: 'All four keep their damage choices and name the physical material categories needed for each part.',
-    changes: ['Fitted Point', 'Fitted Edge', 'Fitted Maul', 'Fitted Polearm'].map((name) => ({ name, current: 'Playable by choosing a head, support, and fitting that meet the current requirements.', accepted: 'The same form uses visible head, support, and fitting categories plus a player-chosen quality stack.' })),
+    changes: ['Fitted Point', 'Fitted Edge', 'Fitted Maul', 'Fitted Polearm'].map((name) => ({ name, current: 'Playable by choosing a head, support, and fitting that meet the current requirements.', accepted: 'The same form uses visible head, support, and fitting categories. Mined choices have no quality; biological quality is chosen only where it affects the result.' })),
   },
   {
     slug: 'armoury',
@@ -213,20 +213,20 @@ export const craftingFamilyStatus: CraftingFamilyStatus[] = [
     status: 'Changing in a future update',
     current: 'Rigid Shell, Insulated Layer, and Balanced Laminate rebuild one chosen eligible protective item.',
     accepted: 'Each profile keeps the item’s identity and replaces hidden property samples with named body, lining, binding, and fitting families.',
-    changes: ['Rigid Shell', 'Insulated Layer', 'Balanced Laminate'].map((name) => ({ name, current: 'Playable by rebuilding one chosen item.', accepted: 'The same rebuild uses recognizable layer categories and player-selected quality, with the resulting stats shown before confirmation.' })),
+    changes: ['Rigid Shell', 'Insulated Layer', 'Balanced Laminate'].map((name) => ({ name, current: 'Playable by rebuilding one chosen item.', accepted: 'The same rebuild uses recognizable layer categories and player-selected biological quality where applicable, with fixed ungraded mined contributions and all resulting stats shown before confirmation.' })),
   },
   {
     slug: 'instruments',
     name: 'Field Instruments',
     status: 'Changing in a future update',
     current: 'All eight instruments are permanent Research capabilities. Good and Fine precision upgrades are playable and automatically use the weakest individual samples that meet their hidden requirements.',
-    accepted: 'Keep the current instrument precision tiers and costs unless separately changed. Replace hidden property searches with visible physical categories; the player chooses the contributing resource quality.',
+    accepted: 'Keep the current instrument precision tiers and costs unless separately changed. Replace hidden property searches with visible physical categories; mined inputs have no quality, while the player chooses biological quality where it affects the result.',
     changes: [
       { name: 'Sunglass and Chronometer', current: 'Use qualifying lustrous samples.', accepted: 'Quartz, Silver, Gold, Feather, or Quill.' },
       { name: 'Thermoscope', current: 'Uses qualifying insulating samples.', accepted: 'Fibre, Resin, Pelt, Down, Hide, or Oil.' },
       { name: 'Hygrometer', current: 'Uses qualifying flexible samples.', accepted: 'Fibre, Hide, Pelt, or Fin.' },
-      { name: 'Loupe', current: 'Uses qualifying hard samples.', accepted: 'Iron Ore, Adamant, Obsidian, Quartz, Bone, Scale, Plate, Chitin, or Shell.' },
-      { name: 'Level and Barometer', current: 'Use qualifying dense samples.', accepted: 'Rubble, Iron Ore, Adamant, Bone, Plate, or Shell.' },
+      { name: 'Loupe', current: 'Uses qualifying hard samples.', accepted: 'Iron, Adamant, Obsidian, Quartz, Bone, Scale, Chitin, Shell, or another approved physical subtype.' },
+      { name: 'Level and Barometer', current: 'Use qualifying dense samples.', accepted: 'An approved structural stone, Iron, Adamant, Bone, Chitin, Shell, or another approved physical subtype.' },
       { name: 'Vivometer', current: 'Uses qualifying reactive samples.', accepted: 'Resin, Toxin, Spore, Reagent, Oil, Venom, or Ichor.' },
     ],
   },
@@ -253,7 +253,7 @@ export const craftingFamilyStatus: CraftingFamilyStatus[] = [
     name: 'Recycler',
     status: 'Changing in a future update',
     current: 'Dismantles one selected eligible, unequipped piece and returns its recorded construction materials or listed salvage.',
-    accepted: 'Returns the exact physical type/subtype, resource quality, colour/source detail, and quantity recorded by construction. The old-salvage migration mapping remains to be designed.',
+    accepted: 'Returns each mined input to its exact-name ungraded stack and each biological input to its recorded type/subtype, quality, colour/source detail, and quantity. The old-salvage migration mapping remains to be designed.',
     changes: [{ name: 'Dismantle gear', current: 'One selected eligible piece; protected, equipped, malformed, and undefined pieces are refused.', accepted: 'Keep the same protections and return the selected material types, qualities, and quantities recorded when the item was made.' }],
   },
   {
@@ -300,17 +300,21 @@ export function futureResourceCopy(name: string) {
   if (name === 'Mote') return 'Motes remain permanent Reality currency, with no material quality or storage slot.';
   if (name === 'Ichor') return 'Ichor will use its settled physical source category and one of four resource qualities. Older stock must move into the new system without inventing a creature source.';
   if (name === 'Rubble') return 'Rubble will not remain a finished resource with no physical identity. Aimee will choose removal or a renamed mixed find processed only into materials supported by its source region.';
-  return `${name} will use a recognizable physical type or subtype and one of four resource qualities. Source world, species where relevant, and inherited colour remain available in expanded history without needlessly splitting the stack.`;
+  if (['Clay', 'Ore', 'Iron Ore', 'Copper', 'Silver', 'Gold', 'Quartz', 'Obsidian', 'Salt', 'Sulfur', 'Mercury', 'Adamant', 'Rift-glass'].includes(name)) {
+    const intendedName = name === 'Ore' || name === 'Iron Ore' ? 'Iron' : name;
+    return `${intendedName} will be one simple exact-name quantity stack. It has no Poor, Common, Rare, or Exceptional variants and always uses the normal/green presentation. Its source does not split the stack.`;
+  }
+  return `${name} will use a recognizable physical type or subtype. Quality applies only if this biological material is explicitly approved for the four-band system; source world, species where relevant, and inherited colour remain available in expanded history without needlessly splitting the stack.`;
 }
 
 export const openDecisions = [
   {
     title: 'Final material and recipe taxonomy',
-    body: 'Aimee has settled the hierarchy: broad category, specific physical type, optional precise subtype, species/source variant, and four resource qualities. The complete type/subtype registry and every recipe eligibility list still need joint review.',
+    body: 'Aimee has settled the hierarchy: broad category, specific physical type, optional precise subtype, then species/source and four quality bands only where biological variation matters. Mined resources use plain exact names, one normal/green presentation, and no quality. The complete type/subtype registry and every recipe eligibility list still need joint review.',
   },
   {
     title: 'Mixed geological find',
-    body: 'Aimee prefers replacing finished Rubble with a mixed find shaped by its region. Processing it could yield a small grab bag from that zone, including an occasional material the player could not yet reach or harvest. Its name, frequency, number of results, regional weighting, quality, and processing facility remain open.',
+    body: 'Aimee prefers replacing finished Rubble with a mixed find shaped by its region. Processing it could yield a small grab bag from that zone, including an occasional material the player could not yet reach or harvest. Its name, frequency, number of results, regional weighting, and processing facility remain open. Any mined results remain ungraded.',
   },
   {
     title: 'Harvest and facility progression',
@@ -318,7 +322,7 @@ export const openDecisions = [
   },
   {
     title: 'Crafted statistics and Peerless equipment',
-    body: 'Resource quality directly improves real item statistics. Exact contributions, the multi-input result-quality rule, alpha drops, maximum-facility Peerless chance, and a possible matching-NPC bonus remain open.',
+    body: 'Biological-material quality directly improves real item statistics. Mined materials use fixed authored contributions with no quality roll. Exact contributions, the multi-input result-quality rule, alpha drops, maximum-facility Peerless chance, and a possible matching-NPC bonus remain open.',
   },
   {
     title: 'World generation and direct targeting',
@@ -334,7 +338,7 @@ export const correctionStatus = [
   {
     label: 'Must change',
     title: 'Material storage',
-    body: 'The current game mixes counted World resources, individual material samples, and family-only summaries. The intended default is one subtype-and-quality stack, with species-specific items and colour in expanded detail. Alternate inventory views change only how materials are sorted, never where they are stored or who owns them.',
+    body: 'The current game mixes counted World resources, individual material samples, and family-only summaries. The intended default is one exact-name quantity stack for each mined material and one subtype-and-quality stack for each approved biological material, with species-specific items and colour in expanded detail. Alternate inventory views change only how materials are sorted, never where they are stored or who owns them.',
   },
   {
     label: 'Must change',

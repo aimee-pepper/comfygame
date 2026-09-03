@@ -85,7 +85,7 @@ export default function Home() {
           </div>
           <div className="table-wrap">
             <table>
-              <thead><tr><th>Resource</th><th>Rarity</th><th>Mostly found</th><th>Useful for</th></tr></thead>
+              <thead><tr><th>Resource</th><th>Current world frequency</th><th>Mostly found</th><th>Useful for</th></tr></thead>
               <tbody>
                 {resources.map(([name, rarity, found, use]) => {
                   const resource = content.resources.find((entry) => entry.name === name);

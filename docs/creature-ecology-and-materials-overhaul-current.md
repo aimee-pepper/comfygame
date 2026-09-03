@@ -2,11 +2,12 @@
 
 > **Superseded material-model boundary (3 September 2026):** the habitat, body-plan, deterministic
 > species, and anatomy-derived-drop work in this document remains useful design input. Its six-band
-> resource quality, family-only stack key, generic family vocabulary, and property-gated recipe
-> passages are not the final material authority. Aimee's later direction requires four resource
+> resource-wide quality, family-only stack key, generic family vocabulary, and property-gated recipe
+> passages are not the final material authority. Aimee's later direction requires four creature-material
 > qualities (Poor, Common, Rare, Exceptional), a category → type → subtype → quality → species-source
 > hierarchy, default subtype+quality stacks, and recipes whose eligibility is expressed through
-> physical names/categories rather than hidden property thresholds. Peerless remains finished gear
+> physical names/categories rather than hidden property thresholds. Mined world resources remain simple
+> exact-name quantity stacks with one normal/green presentation and no quality axis. Peerless remains finished gear
 > only. Use `resource-crafting-world-ecology-cohesive-plan-v1.md` for the intended model. This file
 > remains evidence of the current runtime and the ecology calculations that must be reconciled, not
 > an instruction to preserve the obsolete inventory/recipe model.

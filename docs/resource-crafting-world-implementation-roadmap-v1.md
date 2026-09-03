@@ -87,7 +87,7 @@ No structural implementation starts until all decisions needed by its first vert
 
 ### Build
 
-- Stable IDs for material broad categories, physical types, precise subtypes, and four resource quality bands.
+- Stable IDs for material broad categories and physical types/subtypes; four quality bands only for approved quality-bearing biological materials. Mined world resources have one ungraded normal/green state.
 - Stable IDs for body plans, habitat access, ground/liquid types, layout styles, tool classes/tiers, processed materials, recipe ingredient scopes, facility tiers, and world sizes.
 - Authored eligibility registries rather than ad hoc switch statements.
 - Versioned generation and material-receipt envelopes.
@@ -164,7 +164,7 @@ Encounter and inspect one naturally generated member of each accepted body-plan/
 - Rock Pick/basic Pick, Axe, and Scythe ownership routes accepted in Phase 0.
 - Tool-tier requirements on resource nodes, tree trunks, ordinary plants, and dangerous harvestable flora.
 - Tree canopy/trunk placement and under-canopy presentation.
-- Exact harvested type/subtype, quality, colour/source, quantity, depletion, and custody receipt.
+- Exact mined material and quantity, or exact biological type/subtype, quality, colour/source and quantity where that domain supports quality; plus depletion and custody receipt.
 - Truthful blocked copy that names the required tool tier.
 
 ### Preserve
@@ -189,7 +189,7 @@ Play a progression from basic gathering through at least one blocked advanced no
 
 ### Build one retained-owner path at a time
 
-- New physical type/subtype + four-band material stack authority.
+- Exact-name ungraded stacks for mined world resources plus physical type/subtype + four-band stack authority for approved quality-bearing biological materials.
 - Source-species/world/colour sub-lot history under each stack.
 - A compatibility reader that can project untouched legacy stock into an exact current consumer without rewriting or losing it.
 - A new writer only for the producer promoted in the current slice.
@@ -210,8 +210,8 @@ Suggested custody delivery order:
 
 ### Migration rules
 
-- Preserve every unit count, quality, source, colour, ownership location, pending Return line, trade line, selected quote, and equipment receipt.
-- Map old grades to Poor/Common/Rare/Exceptional through one published deterministic table.
+- Preserve every unit count, applicable quality, source, colour, ownership location, pending Return line, trade line, selected quote, and equipment receipt.
+- Keep scalar mined holdings ungraded and map them directly to their exact named resource. Map old biological grades to Poor/Common/Rare/Exceptional through one published deterministic table.
 - Never invent species provenance.
 - Preserve materially distinct old samples as distinct types/subtypes when the new registry requires it.
 - Combine only samples that share the new stack key.
@@ -222,7 +222,7 @@ Suggested custody delivery order:
 
 - Before/after quantity census by custody owner and stack key.
 - Multi-species same-stack aggregation with expandable source detail.
-- Distinct physical subtype and quality remain separate.
+- Distinct physical subtype and quality remain separate for quality-bearing stock; mined stock never gains a quality field or split.
 - Partial Return proves recovered plus lost equals carried.
 - Trade, craft, recycle, and relaunch cannot duplicate or delete stock.
 - Materials never consume item slots.
@@ -238,7 +238,7 @@ Collect several species variants and qualities, inspect carried detail, partiall
 
 Recommended first vertical slices after Phase 0 decisions:
 
-1. Ore to Ingot
+1. One metal-processing route only if Phase 0 proves that a real recipe needs a distinct processed form
 2. Hide to Leather
 3. Fibre to Cord/Cloth
 4. Timber to Planks/Hafts
@@ -250,7 +250,7 @@ Each process defines:
 - owning facility and required level;
 - static inputs and substitute categories;
 - explicit player selection;
-- quality and colour transfer;
+- applicable biological quality and colour transfer; mined inputs remain ungraded;
 - quantity conversion;
 - output custody;
 - repeat consumers;
@@ -311,7 +311,7 @@ This order may change after Phase 0 resolves facility ownership, but every live 
 
 ### Build
 
-- Material type/subtype and quality contribution tables mapped only to real game statistics.
+- Material type/subtype contribution tables mapped only to real game statistics, with quality multipliers limited to approved biological inputs and fixed contributions for mined materials.
 - Deterministic multi-input result-quality calculation.
 - Rough/Fine/Superior/Exceptional crafted names.
 - Peerless alpha-drop route.
@@ -326,7 +326,7 @@ This order may change after Phase 0 resolves facility ownership, but every live 
 ### Focused gates
 
 - Exact selected inputs produce exact previewed ordinary statistics.
-- Each quality band raises the intended contribution.
+- Each biological quality band raises its intended contribution; Sand, Gold, Granite and other mined materials have no band to raise.
 - Peerless never exists as raw material.
 - Peerless production cannot be save-scummed through an unfrozen random result.
 - Staffing affects chance only if Aimee approves it and the exact staffed state is durably owned.
@@ -409,9 +409,9 @@ Old-save decoding remains as long as supported saves require it.
 5. Encounter an unharvestable advanced node without losing it.
 6. Harvest accessible world, flora, tree, and creature materials.
 7. Return with a deterministic partial and full-haul example.
-8. Inspect physical type/subtype + quality stacks and their source/colour details.
+8. Inspect simple exact-name mined stacks and physical type/subtype + quality biological stacks with their source/colour details.
 9. Process raw materials.
-10. Select low-quality inputs for one craft and high-quality inputs for another.
+10. Select low-quality and high-quality biological inputs for appropriate crafts, and confirm mined ingredients offer quantity selection without a fabricated quality choice.
 11. Confirm previewed statistics and crafted names.
 12. Sell/buy eligible stock.
 13. Recycle a receipt-backed item.

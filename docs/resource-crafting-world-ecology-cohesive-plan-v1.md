@@ -11,7 +11,8 @@ authority:
 
 - the current twelve broad terrain cases are not enough to describe the final range of generated lands;
 - the current twenty-three resource IDs are not a finished material catalogue;
-- the six-band crafting-material model is superseded by four resource qualities;
+- the six-band creature-material model is superseded by four quality bands for quality-bearing biological materials;
+- mined world resources are simple named holdings with one normal/green presentation and no quality axis;
 - family-only material identity is superseded by category, type, subtype, quality, and source detail; and
 - hidden material-property thresholds cannot decide whether an unrelated material satisfies a recipe.
 
@@ -24,8 +25,8 @@ discarding the deterministic work underneath them.
 | Current implementation | Why it cannot be the final model | Intended correction |
 |---|---|---|
 | `MaterialFamilyID` puts generic world stock and creature parts in one flat family enum | It cannot express category → type → subtype, and names such as `ore`, `plate`, `reagent`, and `toxin` hide the actual material | Versioned physical-material registry with explicit hierarchy and domain |
-| `CraftMaterialQualityBand` uses Rough, Standard, Fine, Superior, Exceptional, and Peerless for material units | This contradicts Aimee's four resource bands and incorrectly permits Peerless raw resources | Poor, Common, Rare, and Exceptional for resources; Peerless only for finished gear |
-| many world resources are scalar balances while creature/flora samples are exact property-bearing units | Return, storage, trade, crafting, and migration cannot share the intended stack/provenance behavior | One material-lot contract beneath subtype+quality stacks, with arcane currency kept separate |
+| `CraftMaterialQualityBand` uses Rough, Standard, Fine, Superior, Exceptional, and Peerless across material units | This mixes creature-material quality with simple mined stock and incorrectly permits Peerless raw materials | Poor, Common, Rare, and Exceptional only for approved quality-bearing biological materials; mined world resources have no quality; Peerless remains finished gear only |
+| many mined world resources are scalar balances while creature/flora samples are exact property-bearing units | The systems need shared transaction safety without pretending that Sand or Gold needs quality or species provenance | Simple exact-name quantity stacks for mined resources; subtype + quality stacks and retained source units only for materials whose biological variation matters |
 | several recipes accept broad family lists plus hidden property floors | A player can be told an unrelated object qualifies because an invisible number is high enough | Authored exact/category/type/subtype ingredient slots; properties affect only previewed finished-item stats |
 | `GroundType` mixes geology, loose surface, water depth, deposits, vegetation, and missing ground | More visuals or resources cannot make this small mixed enum produce genuinely varied worlds | Separate frozen layers for region pattern, relief, geology, surface, hydrology, deposits, flora, and occupancy |
 | current World Resource placement starts from a global catalogue filtered by host rules | Host filtering improves plausibility but still treats resources as additions after the land | Each region creates its own eligible resource pool from its actual formation and ecology |
@@ -43,11 +44,11 @@ Bookbinder's resource game should form one understandable cycle:
 6. Use the right harvesting equipment to collect what the world already contains.
 7. Return with the surviving haul.
 8. Process raw resources at appropriate Cottage facilities.
-9. Choose exact materials and qualities for a recipe.
+9. Choose exact materials and, only for quality-bearing biological ingredients, their quality.
 10. Craft a result whose statistics and appearance clearly reflect those choices.
 11. Improve harvesting tools, facilities, and recipe tiers so more of future worlds becomes usable.
 
-Progression does not make advanced materials stop existing. It improves the player's ability to find deliberately, harvest, process, and use what generated worlds can already contain.
+Progression improves the tools, knowledge, and facilities that let players deliberately find, harvest, process, and use more demanding materials.
 
 ## Resource identity
 
@@ -60,8 +61,8 @@ The intended hierarchy is:
 1. **Broad category** - a physical class used by flexible recipes, such as Scales.
 2. **Specific material type** - a recognizable physical kind, such as Fish Scales.
 3. **Precise subtype** - a materially different version required by advanced recipes, such as Armoured Fish Scales.
-4. **Quality** - Poor, Common, Rare, or Exceptional, which creates a separate default stack within the subtype.
-5. **Species-specific item** - the generated species unit inside that quality stack, retaining its inherited colour, values, source, and history.
+4. **Quality, where that material supports it** - Poor, Common, Rare, or Exceptional for approved quality-bearing biological materials, creating a separate default stack within the subtype.
+5. **Species-specific item** - the generated species unit inside that quality-bearing stack, retaining its inherited colour, values, source, and history.
 
 Example:
 
@@ -82,11 +83,14 @@ or its appearance. A colourful name alone never creates another subtype.
 
 | Source | Broad recipe category | Material type examples | Precise subtype examples | Species/source detail |
 |---|---|---|---|---|
-| Ground and geology | Stone | Granite, Limestone, Sandstone, Basalt | Dressed or broken forms belong to processing/state, not quality | Region and world |
-| Ground and geology | Loose mineral | Clay, Silica Sand, Mineral Debris | A physically distinct clay or sand only when it changes processing | Region and world |
-| Ground and geology | Metal Ore | Iron Ore, Copper Ore, Silver Ore, Gold Ore, Mercury Ore, Adamant Ore | A distinct deposit form only when a real process or recipe uses it | Deposit, region, and world |
-| Ground and geology | Crystal and glass | Quartz, Obsidian, Rift-glass | Physically distinct crystal/glass forms | Deposit, region, and world |
-| Ground and geology | Mineral salt | Salt, Sulfur | Distinct mineral forms only when they have different uses | Deposit, region, and world |
+| Ground and geology | Structural stone | Granite, Limestone, Sandstone, Slate, Basalt, Marble | Dressed, cut, or broken forms belong to processing/state, not quality | Region and world |
+| Ground and geology | Loose earth and aggregate | Sand, Clay, Gravel | Mineral Debris only if the mixed-find system is approved | Region and world; one normal/green quantity stack per exact material |
+| Ground and geology | Common metal | Iron, Copper, Tin | A distinct processed form only when a real recipe actually uses it | Deposit, region, and world; one normal/green quantity stack per exact material |
+| Ground and geology | Precious and unusual metal | Silver, Gold, Mercury, Adamant | A distinct processed form only when a real recipe actually uses it | Deposit, region, and world; one normal/green quantity stack per exact material |
+| Ground and geology | Crystal and mineral glass | Quartz, Obsidian, Rift-glass | Physically distinct crystal or glass forms | Deposit, region, and world |
+| Ground and geology | Reactive mineral | Salt, Sulfur, Alum, Saltpeter | Distinct minerals retained only when recipes use their different functions | Deposit, liquid margin, region, and world |
+| Ground and geology | Mineral pigment | Ochre | Additional mineral pigments only when ink, dye, paint, or finishing recipes use them | Deposit, region, and world |
+| Ground and geology | Fuel-bearing material | Coal | Additional fuels only when processing creates a meaningful recurring demand | Formation, region, and world |
 | Flora | Wood | Softwood Log, Hardwood Log | Physically distinct trunk wood such as dense or resinous wood, if recipes need it | Generated plant species, colour, and world |
 | Flora | Plant Fibre | Stem Fibre, Leaf Fibre, Bark Fibre | A materially different tough or silky fibre | Generated plant species, colour, and world |
 | Flora | Plant Part | Leaf, Root, Flower, Spore, Sap, Resin | Toxic Sap, Irritant Spore, or another visible physical subtype | Generated plant species, colour, and world |
@@ -102,7 +106,7 @@ or its appearance. A colourful name alone never creates another subtype.
 This registry changes several current nouns:
 
 - **Rubble** stops being a finished resource. Its possible successor is the region-bound mixed find described later.
-- **Ore** becomes **Iron Ore**. Copper, Silver, Gold, Mercury, and Adamant also name raw ores before processing; their ingots or refined forms are separate processed materials.
+- generic **Ore** becomes the actual metal it represents, such as **Iron**. Copper, Silver, Gold, Mercury, and Adamant likewise keep their plain names. A processed form is added only when an actual crafting loop needs a distinct intermediate; the system does not force every metal through an ore/ingot vocabulary.
 - **Timber** becomes a raw Log type and a processed Plank type instead of one word covering both states.
 - **Pulp** is processed stock rather than something a plant drops ready-made.
 - **Reagent** is a recipe category over named leaves, roots, flowers, spores, saps, resins, venoms, and prepared extracts; it is not one universal substance.
@@ -111,6 +115,34 @@ This registry changes several current nouns:
 - **Fin** is a source part; its useful harvested material resolves to the actual Skin/Membrane or rigid structure rather than a generic fin token unless a recipe truly needs a whole fin.
 - world-node **Ichor** is retired from new generation. Ichor is a creature material unless a separately authored world source is approved.
 - **Raw Essence** and **Motes** are arcane currencies/resources, not ordinary physical materials. They do not gain creature provenance or resource-quality bands.
+
+Mined world resources are intentionally simple. Sand is **Sand**. Gold is **Gold**. Granite is **Granite**.
+Each stacks only by its exact material identity and quantity and always uses the normal/green presentation.
+They do not gain Poor, Common, Rare, or Exceptional variants, and the deposit or world that supplied them
+does not split the player-facing stack.
+
+### Ground and geology need a complete functional catalogue
+
+The ground catalogue should not be as endlessly variable as generated flora and fauna, because a rock does not
+need a species identity. It does need enough breadth to make regions feel materially different and to support
+the whole Cottage economy. The intended catalogue therefore covers distinct functions rather than stopping at
+four stones, a few metals, and two salts:
+
+- **construction stone** for foundations, masonry, fixtures, and architecture;
+- **fine or workable stone** for carving, instruments, fittings, and decorative work;
+- **loose earth and aggregate** for glass, mortar, ceramics, fill, and construction;
+- **common metals** for tools, weapons, fittings, and mechanisms;
+- **precious and unusual metals** for trade, advanced equipment, instruments, inscriptions, and late recipes;
+- **crystals and mineral glass** for optics, focuses, cutting edges, inks, and Channelworks;
+- **reactive minerals** for remedies, tanning, dyes, preservation, distillation, and chemical processing;
+- **mineral pigments** for inks, dyes, painted finishes, and appearance-led crafts; and
+- **fuel-bearing materials** only where an actual processing loop consumes them repeatedly.
+
+The names in the starting registry are a working discussion set, not permission to add filler. Each candidate
+must have a believable geological host, at least two useful consumers or one widely reused processing role,
+an understandable harvesting tier, and a clear reason to exist beside its neighbours. The final pass must map
+every approved material to terrain, world pressures, tools, recipes, buildings, trade, and World Writing before
+its Sigil or clue order is designed.
 
 No line in this table authorizes a material just because it sounds plausible. Before promotion, every type or
 subtype needs a causal producer, at least two sensible consumers or one reusable processing role, player-facing
@@ -126,24 +158,42 @@ Exact colour blending and multi-material appearance rules remain **Will discuss 
 
 ## Quality and inventory stacks
 
-### Resource qualities
+### Mined world resources
 
-Resources use exactly four quality bands:
+Mined ground and deposit resources have no quality axis. Their default stack key is simply:
 
-| Resource quality | Colour | Inventory behavior |
+> Exact material identity
+
+Examples:
+
+- Sand x12
+- Gold x3
+- Granite x8
+
+All three use the normal/green presentation. Their source world may remain in acquisition history where useful,
+but source never creates another stack and never changes their crafting strength. Crafting uses their authored,
+fixed material contribution.
+
+### Quality-bearing biological materials
+
+Approved quality-bearing biological materials use exactly four quality bands:
+
+| Biological material quality | Colour | Inventory behavior |
 |---|---|---|
 | Poor | White | Separate stack within the most-specific resolved type or subtype |
 | Common | Green | Separate stack within the most-specific resolved type or subtype |
 | Rare | Blue | Separate stack within the most-specific resolved type or subtype |
 | Exceptional | Purple | Separate stack within the most-specific resolved type or subtype |
 
-Peerless is not a resource quality.
+Creature materials are the confirmed use of this system. Whether any flora-derived material also needs quality
+bands remains **Will discuss with Aimee**; it must not inherit them automatically. Peerless is not a raw-material
+quality.
 
 ### Stack key
 
-The default player-facing material stack key is:
+The default player-facing stack key for a quality-bearing material is:
 
-> Most-specific resolved material type/subtype + resource quality
+> Most-specific resolved material type/subtype + biological-material quality
 
 If a material has no meaningful subtype, its type is the stack key. A subtype is not invented merely to fill
 every level of the hierarchy.
@@ -152,8 +202,8 @@ Examples:
 
 - Common Fish Scales x8
 - Rare Armoured Fish Scales x3
-- Poor Granite x12
-- Exceptional Red Fibre x2, if Red Fibre is ultimately approved as a distinct physical material rather than only a colour variant
+- Sand x12, as a simple ungraded mined holding
+- Gold x3, as a simple ungraded mined holding
 
 Expanded detail shows:
 
@@ -164,17 +214,18 @@ Expanded detail shows:
 - the visible statistics the selected units would contribute to a craft;
 - discovery history where disclosure is allowed.
 
-The source species does not split the default stack. A materially different subtype or quality does.
+The source species does not split a biological material's default stack. A materially different subtype or
+quality does. A mined material never receives a quality split in the first place.
 
 ### Inventory views and sorting
 
-The player should not be locked to one presentation. Inventory can offer alternate views or sorting by broad category, material type, subtype, quality, species, source world, colour, quantity, or recent acquisition. These are projections over the same owned material units; changing the view never moves, merges, spends, or duplicates anything.
+The player should not be locked to one presentation. Inventory can offer alternate views or sorting by broad category, material type, subtype, quality where applicable, species, source world, colour, quantity, or recent acquisition. These are projections over the same holdings; changing the view never moves, merges, spends, or duplicates anything.
 
-The default remains subtype + quality because it keeps common crafting stock compact while preserving each species-specific item one level beneath it. A recipe picker may temporarily group by the ingredient scope it needs, but the confirmation still names the exact subtype, quality, species-specific units, and quantity that will be consumed.
+The default for quality-bearing biological stock remains subtype + quality because it keeps crafting stock compact while preserving each species-specific item one level beneath it. Mined stock remains one row per exact material. A recipe picker may temporarily group by the ingredient scope it needs, but the confirmation names the exact material, applicable subtype/quality/source units, and quantity that will be consumed.
 
 ### Player-controlled selection
 
-Where quality affects a result, the player chooses the exact stack and quantity. The game must not automatically prefer low quality or high quality.
+Where biological-material quality affects a result, the player chooses the exact stack and quantity. The game must not automatically prefer low quality or high quality. Mined ingredients require only exact material and quantity selection because there is no higher or lower grade to substitute.
 
 This allows the player to save strong materials for the Binder, spend them on a favourite companion, or deliberately make inexpensive equipment for someone used less often.
 
@@ -201,7 +252,7 @@ The existing property model can remain useful behind generation and crafted-stat
 
 - Recipes ask for recognizable materials and categories.
 - A selected material contributes direct, previewed statistics.
-- Higher resource quality directly improves the values contributed by that material.
+- Higher biological-material quality directly improves the values contributed by that material.
 - A Poor Hide might contribute less Armour than an Exceptional Hide.
 - Material properties may influence viable statistics such as Armour, damage, accuracy, reach, status application, resistance, healing, or another actually implemented value.
 - There is no durability system. Terms such as brittle, dependable, wear, or breakage cannot be used as implied mechanics.
@@ -221,10 +272,11 @@ For creature materials, the base values must come from the frozen creature that 
 - venom or other reactive anatomy can contribute to the exact supported status potency or duration; and
 - colour and lustre can affect appearance or value where that finished item supports them.
 
-World materials use the same principle: Granite, Iron, Obsidian, Fibre, and other physical types have authored
-base contributions, while the frozen deposit or plant supplies any permitted variation. Resource quality then
-multiplies or adds to those concrete contributions. A recipe never asks for “hardness 55”; it asks for an
-Armoured Fish Scale, any Scale, an Iron Ingot, or another understandable physical input. The preview says
+Mined world materials such as Granite, Iron, Obsidian, Sand, and Gold have authored fixed contributions by
+material identity. Their deposits do not roll a crafting quality, and no quality multiplier is applied. Plants
+may supply permitted biological variation only after their own quality rule is explicitly approved. A recipe
+never asks for “hardness 55”; it asks for Armoured Fish Scales, any Scales, Iron, Gold, Sand, or another
+understandable physical input. The preview says
 “+2 Armour” or “+1 damage,” not “high hardness.”
 
 Subtype assignment may use anatomy or formation data once, during generation. For example, sufficiently
@@ -271,7 +323,7 @@ If a proposed material has only one arbitrary use, Game Design must either:
 
 Aimee approves the processed-material layer. The intended economy has four levels:
 
-1. **Raw world materials** - ground, ore, sand, timber, fibre, resin, fluids, salts, and other directly harvested matter.
+1. **Raw world materials** - stone, named metals, sand, timber, fibre, resin, fluids, salts, and other directly harvested matter.
 2. **Raw creature and flora materials** - scales, hides, pelts, bone, chitin, venom, oils, coloured fibres, and other generated biological matter.
 3. **Processed materials** - ingots, glass, leather, cloth, cord, planks, prepared extracts, and other standardized useful stock.
 4. **Finished components and items** - weapon parts, armour layers, instruments, remedies, conduits, buildings, and final equipment.
@@ -341,7 +393,7 @@ Every new-version world resolves and freezes these layers in order:
 1. **World size** — total explorable area and generation budgets.
 2. **Regional arrangement** — how many major regions exist and how they meet.
 3. **Relief and landform** — elevation, slopes, basins, ridges, cliffs, chasms, and passable connections.
-4. **Underlying geology** — Granite, Limestone, Sandstone, Basalt, ore-bearing rock, and other approved physical formations.
+4. **Underlying geology** — Granite, Limestone, Sandstone, Basalt, metal-bearing rock, and other approved physical formations.
 5. **Surface form** — exposed bedrock, broken stone, gravel, sand, clay soil, loam, peat, mud, or another approved walkable surface.
 6. **Hydrology and liquid** — river, pond, lake, sea, marsh, shallow/deep relationship, and fresh, salt, brine, mineral, or another approved liquid type.
 7. **Surface deposits and weather state** — snow, settled ash, salt crust, rain, airborne ash, miasma, and other compatible conditions without erasing the ground below.
@@ -381,19 +433,19 @@ Physical terrain should create appropriate harvest opportunities. Granite ground
 
 The recommended first physical catalogue is intentionally compact but composable:
 
-- **geology:** Granite, Limestone, Sandstone, Basalt, Obsidian-bearing volcanic formation, Quartz-bearing formation, and approved ore-bearing formations;
-- **loose/surface ground:** broken stone or scree, gravel, silica sand, clay soil, loam, peat, and mud;
+- **geology:** Granite, Limestone, Sandstone, Slate, Basalt, Marble, Obsidian-bearing volcanic formation, Quartz-bearing formation, fuel-bearing formation, and approved metal-bearing formations;
+- **loose/surface ground:** broken stone or scree, gravel, sand, clay soil, loam, peat, and mud;
 - **liquids:** fresh water, salt water, brine, and mineral water, each with separate shallow/deep topology where applicable;
 - **surface deposits:** snow, settled ash, and salt crust; and
 - **non-material structure:** chasms, groundcover, trunks, and canopies remain separate from the material under them.
 
 This creates useful combinations such as Granite bedrock beneath snow, Basalt scree beneath settled ash,
-salt-crusted silica sand, or a muddy Limestone riverbank. Those combinations are receipt facts, not new enum
+salt-crusted sand, or a muddy Limestone riverbank. Those combinations are receipt facts, not new enum
 cases improvised by the renderer.
 
 Resource placement follows the resolved region:
 
-- rock and ore nodes come from the region's geology and formation;
+- stone and metal nodes come from the region's geology and formation;
 - sand, clay, salt, and other bulk finds come from compatible surfaces or margins;
 - wood, fibre, resin, spores, and named plant parts come from generated flora that can live there;
 - creature materials come only from the anatomy of generated creatures that can inhabit the region;
@@ -510,7 +562,7 @@ Rubble is not an acceptable name for a specific finished resource. Aimee's prefe
 The intended behavior is:
 
 - broken terrain can yield a renamed mixed geological find such as Unsorted Stone or Mineral Debris;
-- its frozen source-region receipt defines the real stone, ore, mineral, or glass-bearing materials it can contain;
+- its frozen source-region receipt defines the real stone, metal, mineral, or glass-bearing materials it can contain;
 - processing produces a bounded selection from that receipt, never a global bag of unrelated resources;
 - the result may include a material the player saw in that region but could not reach or harvest directly, making the find useful without replacing tools or exploration;
 - processing consumes the mixed find, so save/reload cannot reroll it indefinitely.
@@ -530,10 +582,12 @@ not a choice Engineering should improvise.
    at least one start-connected source, while tool access, amount, distance, and danger remain generated.
 4. **World sizes.** Confirm whether the intended 12/15/18/26/36 ladder should replace the current
    12/15/18/23/28 ladder.
-5. **Material arithmetic.** Set the four quality thresholds/multipliers and the recipe-slot formulas that turn
-   frozen producer measurements into concrete item statistics. These are balance tables, not recipe eligibility.
+5. **Material arithmetic.** Set the four biological-material quality thresholds/multipliers and the recipe-slot formulas that turn
+   frozen creature measurements into concrete item statistics. Mined materials instead use fixed authored
+   contributions with no quality roll. These are balance tables, not recipe eligibility.
 6. **Processing ownership.** Set the first processed-material list and which existing or planned Cottage
-   facility owns ore smelting, glass, leather, cloth/cord, planks/pulp, plant extracts, and mixed geological sorting.
+   facility owns any metal processing that real recipes require, plus glass, leather, cloth/cord, planks/pulp,
+   plant extracts, and mixed geological sorting.
 
 After those six choices, Game Design can produce the complete terrain→resource→flora→creature host matrix,
 the exact recipe eligibility lists, and the harvesting tiers without guessing. Only then should the project

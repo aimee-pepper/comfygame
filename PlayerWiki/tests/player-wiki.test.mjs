@@ -142,7 +142,10 @@ test('crafting overview separates the current property model from the intended p
   assert.doesNotMatch(page, /All current recipes by station/);
   assert.match(craftingGuide, /Properties affect the result, not eligibility/);
   assert.match(craftingGuide, /numerical properties and uses them to calculate concrete finished-item statistics/);
-  assert.match(inventory, /default material stack is subtype plus quality/);
+  assert.match(inventory, /Sand is Sand and Gold is Gold/);
+  assert.match(inventory, /Mined resources do not use these bands/);
+  assert.match(inventory, /Approved biological materials use subtype plus quality/);
+  assert.match(resources, /normal\/green presentation/);
   assert.match(equipment, /actual numerical properties change concrete finished-item statistics/);
   assert.match(world, /Current generator and intended ecology/);
   assert.match(progression, /Current progression and intended expansion/);

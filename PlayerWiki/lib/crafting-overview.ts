@@ -27,25 +27,25 @@ export const floraMaterialPropertyDerivations = [
 
 export const materialScoreBoundary = {
   currentGrade: 'The current 0–100 grade is separate from the six properties. It averages each contributing trait’s distance from 50, multiplies that extremity by 85, adds up to 25 from Lustre, then limits the result to 0–100. Because unusually low traits can raise this grade, it must not become the new four-band quality formula.',
-  intended: 'Keep every concrete property derived from the creature, plant, or World material that produced it. Use physical family, type, or subtype to decide whether it fits a recipe. Use Poor, Common, Rare, or Exceptional quality to scale the material’s previewed contribution to the finished item. The exact conversion from each property and component into item statistics still needs to be settled with Aimee before this change is made.',
+  intended: 'Keep every concrete property derived from the creature or plant that produced a biological material. Use physical family, type, or subtype to decide whether it fits a recipe. Poor, Common, Rare, or Exceptional quality can scale an approved biological material’s previewed contribution. Mined materials such as Sand, Gold, and Granite have no quality and use a fixed authored contribution. The exact conversion into item statistics still needs to be settled with Aimee before this change is made.',
   currentExceptions: 'Current creature and Flora harvests derive their values from the body or plant that produced them. Trading Post samples instead generate values from a range, and some Recycler returns use fixed records. The intended system must give those materials values supported by their real source rather than unrelated numbers.',
 } as const;
 
 export const materialCustodyFlow = [
-  ['Field and combat rewards', 'Current holdings mix counted resources with individual samples that remember their source.', 'Receive a recognizable physical type or subtype immediately, with species, colour, world, and inherited values available in expanded detail.'],
-  ['Expedition Return', 'The return can treat counted resources and individual material samples differently.', 'Decide the recovered and lost quantity once for every subtype-and-quality stack. Together, those amounts must equal everything the party carried.'],
-  ['Storehouse', 'World stock and creature samples are not yet one complete material inventory.', 'Default-stack by precise subtype plus quality. Materials never consume item slots; expanding a stack shows its species-specific items and sources.'],
-  ['Trading Post', 'Individual samples use hidden traits to set their price and determine merchant stock.', 'Buy and sell a chosen subtype, quality band, and quantity. Resold stock keeps its band and species/source history.'],
+  ['Field and combat rewards', 'Current holdings mix counted resources with individual samples that remember their source.', 'Receive mined resources as simple exact-name quantities. Receive biological materials as recognizable physical types or subtypes, with applicable quality, species, colour, world, and inherited values available in expanded detail.'],
+  ['Expedition Return', 'The return can treat counted resources and individual material samples differently.', 'Decide recovered and lost quantities once for every exact-name mined stack and every subtype-and-quality biological stack. Together, those amounts must equal everything the party carried.'],
+  ['Storehouse', 'World stock and creature samples are not yet one complete material inventory.', 'Stack mined resources by exact material and quantity. Stack approved biological materials by precise subtype plus quality. Neither consumes item slots; biological stacks can expand to show species-specific items and sources.'],
+  ['Trading Post', 'Individual samples use hidden traits to set their price and determine merchant stock.', 'Buy and sell mined resources by exact material and quantity, or biological materials by subtype, quality band, and quantity. Resold biological stock keeps its band and species/source history.'],
   ['Crafting pickers', 'Several makers currently choose individual samples by hidden numerical thresholds.', 'Recipes list broad, specific, or precise physical categories. Where quality affects the result, the player deliberately chooses the stack and quantity.'],
-  ['Recycler', 'Dismantling returns recorded construction samples or fixed salvage.', 'Return the subtype, quality, species-specific details, and quantity recorded when the item was made. Older fixed salvage must move safely into the four quality bands and never receive a made-up grade.'],
+  ['Recycler', 'Dismantling returns recorded construction samples or fixed salvage.', 'Return each recorded mined material as its ungraded exact-name quantity and each recorded biological material with its subtype, quality, species-specific details, and quantity. Older salvage must migrate without inventing a grade.'],
   ['Closing and reopening the game', 'Old and new forms of material storage can coexist in a save.', 'Every stack, quantity, source-history link, pending return, trade offer, and recorded construction material reloads exactly once.'],
 ] as const;
 
 export const qualityRules = [
-  ['Poor', 'White resource band; separate stack.'],
-  ['Common', 'Green resource band; separate stack.'],
-  ['Rare', 'Blue resource band; separate stack.'],
-  ['Exceptional', 'Purple resource band; separate stack.'],
+  ['Poor', 'White biological-material band; separate stack within a subtype.'],
+  ['Common', 'Green biological-material band; separate stack within a subtype.'],
+  ['Rare', 'Blue biological-material band; separate stack within a subtype.'],
+  ['Exceptional', 'Purple biological-material band; separate stack within a subtype.'],
 ] as const;
 
 export const coatingLifecycle = {
@@ -69,12 +69,12 @@ export const materialIdentityHierarchy = [
   ['Broad category', 'Scales', 'A flexible recipe can accept several physically related scale types.'],
   ['Type', 'Fish Scales', 'A narrower recipe accepts fish-scale subtypes but not every scale.'],
   ['Subtype', 'Armoured Fish Scales', 'An advanced recipe can require this materially distinct subtype.'],
-  ['Quality', 'Poor, Common, Rare, Exceptional', 'Creates the default separate stacks within each subtype.'],
+  ['Quality', 'Poor, Common, Rare, Exceptional', 'Creates separate stacks only for approved quality-bearing biological materials. Mined materials do not use this level.'],
   ['Species-specific item', 'Armoured scales from one generated fish species', 'Lives inside its subtype-and-quality stack while retaining colour, values, source, and history.'],
 ] as const;
 
 export const inventoryViews = [
-  ['Default', 'Subtype + quality', 'Rare Armoured Fish Scales stack together; expand the stack to inspect each species-specific item.'],
+  ['Default', 'Exact mined material, or biological subtype + quality', 'Sand and Gold each form one simple quantity stack. Rare Armoured Fish Scales stack together and can expand to show each species-specific item.'],
   ['Material', 'Category, type, or subtype', 'Browse related physical materials without merging their owned stacks.'],
   ['Quality', 'Poor, Common, Rare, Exceptional', 'Compare the grades available for deliberate crafting selection.'],
   ['Origin', 'Species, source world, or recent acquisition', 'Find the exact units and inherited colours behind a stack.'],
@@ -82,7 +82,7 @@ export const inventoryViews = [
 
 export const progressionPlan = [
   ['Harvesting tools', 'Better Picks, Axes, and Scythes let the player collect increasingly difficult metals, trees, and plants. Advanced resources may exist before the player can harvest them.'],
-  ['Processing facilities', 'Raw materials become a modest set of useful intermediates such as ingots, glass, leather, cloth, cord, planks, and prepared extracts. The exact list and owners remain under discussion.'],
+  ['Processing facilities', 'Raw materials become a modest set of useful intermediates such as glass, leather, cloth, cord, planks, prepared extracts, and processed metal forms only where real recipes need them. The exact list and owners remain under discussion.'],
   ['Facility levels', 'Upgrading a facility opens later processing and recipe tiers instead of preventing advanced worlds from generating.'],
   ['Recipe tiers', 'Later recipes can ask for narrower or precise material subtypes and produce stronger results.'],
   ['World Writing', 'Players can directly call at least some ground, liquid, base resources, world sizes, and ecological material pressures such as Chitin. Unwritten facets remain generated.'],

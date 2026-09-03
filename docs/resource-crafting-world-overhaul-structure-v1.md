@@ -28,12 +28,12 @@ The Player Wiki is an eleventh cross-system publication owner. It changes with e
 - World resources and generated material samples use more than one custody model.
 - Generated material samples can retain exact source, qualifier, grade, and continuous properties.
 - Some screens summarize by family while recipes and durable storage still operate on exact units.
-- Current quality vocabulary and display names do not match Aimee's four resource bands.
+- Current quality vocabulary and display names do not match Aimee's four bands for quality-bearing biological materials, while mined world resources should not have quality at all.
 
 ### Intended structure
 
-- Separate physical hierarchy: broad category, specific type, optional precise subtype, quality, then species-specific item/unit.
-- Default-stack by precise subtype plus Poor/Common/Rare/Exceptional.
+- Separate physical hierarchy: broad category, specific type, optional precise subtype, then quality and species-specific unit only for materials whose biological variation matters.
+- Mined world resources stack by exact material and quantity with one normal/green presentation. Quality-bearing biological materials default-stack by precise subtype plus Poor/Common/Rare/Exceptional.
 - Provide alternate sorting and views by category, type, subtype, quality, species, source world, colour, quantity, or recency without changing custody.
 - Expand a stack to inspect source species, world, inherited colour, quantities, and stat contributions.
 - Preserve source identity without making every species a separate item type.
@@ -49,7 +49,7 @@ The final model spans Field holdings, Return, Storehouse, Trading Post, crafting
 - Final physical type and subtype registry.
 - Whether inherited colour selection consumes named sub-lots or another deterministic quantity receipt.
 - Player-facing expanded-history depth before a source species has been discovered.
-- Whether any quality-neutral physical recipe exists.
+- Which flora-derived materials, if any, genuinely need quality rather than the mined-resource simple-stack rule.
 
 ## 2. Creature generation and loot
 
@@ -174,7 +174,7 @@ Flora identity, placement, terrain underlay, canopy footprint, disclosure, dange
 - Axes unlock increasingly difficult woods and trunks.
 - Scythes unlock increasingly difficult or dangerous flora.
 - A starting Rock Pick and basic Axe may be starting, found, or early crafted equipment after Aimee chooses the opening.
-- Extracted material receives a physical type/subtype, quality, source, colour where applicable, and quantity exactly once.
+- A mined yield receives its exact material identity and quantity once, with no quality roll. A quality-bearing biological yield additionally receives type/subtype, quality, source and colour where applicable.
 
 ### Structural change
 
@@ -198,14 +198,14 @@ World placement, Look, harvesting, tool custody/equipment, depletion, carried ma
 ### Intended structure
 
 - Raw materials become a modest set of recognizable, reusable intermediates.
-- Examples under consideration include Ingots, Glass, Leather, Cloth, Cord, Planks, and Prepared Extracts.
+- Examples under consideration include processed metal forms where a real recipe needs them, plus Glass, Leather, Cloth, Cord, Planks, and Prepared Extracts. Ingots are not a mandatory extra identity for every metal.
 - Each intermediate has several physically sensible consumers.
 - Processing facilities gain upgrade tiers that unlock later material transformations and recipe tiers.
 - Processing adds capability, not repetitive busywork.
 
 ### Structural change
 
-Each process needs an exact input category, accepted subtypes, quality behavior, output quality, colour/provenance transfer, quantity conversion, facility tier, unlock, quote, atomic commit, custody destination, and Recycler behavior.
+Each process needs an exact input category, accepted subtypes, applicable quality behavior, colour/provenance transfer where relevant, quantity conversion, facility tier, unlock, quote, atomic commit, custody destination, and Recycler behavior. A mined input does not acquire quality merely because it is processed.
 
 ### Will discuss with Aimee
 
@@ -264,7 +264,7 @@ Every current recipe needs a versioned ingredient definition. Current property-t
 ### Intended structure
 
 - Only existing or explicitly approved statistics receive material contributions.
-- Resource quality directly scales those contributions.
+- Quality scales contributions only for approved quality-bearing biological inputs. Mined materials use fixed authored contributions by exact material identity.
 - The preview exposes every contribution and resulting final statistic.
 - Crafted equipment names use Rough, Fine, Superior, or Exceptional according to the deterministic result-quality calculation.
 - Peerless equipment comes from high-level alpha drops or an approved maximum-facility craft chance, never from Peerless raw resources.
@@ -272,7 +272,7 @@ Every current recipe needs a versioned ingredient definition. Current property-t
 
 ### Structural change
 
-Define one stable stat-contribution table by physical material type/subtype and quality. Preserve existing equipment identity, ownership, equipped state, history, and legal combat form during migration.
+Define one stable stat-contribution table by physical material type/subtype, with a quality multiplier only for approved quality-bearing inputs. Preserve existing equipment identity, ownership, equipped state, history, and legal combat form during migration.
 
 ### Will discuss with Aimee
 
