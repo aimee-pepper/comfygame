@@ -67,7 +67,7 @@ export const statusReferences: StatusReference[] = [
     effect: 'It deals its shown world-turn poison damage while turns remain. Entering the same kind of danger renews the remaining time rather than stacking a second copy.',
     duration: 'It counts down on world turns in the active expedition.',
     boundary: 'This is not the encounter Poison affliction. Combat remedies are not presented as a field use.',
-    clearing: 'No separate current Field Kit clearing action is published for this world effect.',
+    clearing: 'The Field Kit does not currently offer a separate action that clears this world effect.',
     persistence: 'It is held in the active expedition state while its turns remain; completing or leaving a combat encounter does not make it a combat affliction.',
     itemSlugs: [],
   },

@@ -87,8 +87,8 @@ test('crafting overview separates the current property model from the intended p
   for (const quality of ['Poor', 'Common', 'Rare', 'Exceptional'])
     assert.match(status, new RegExp(`'${quality}'`));
   assert.doesNotMatch(status.slice(status.indexOf('export const qualityBands'), status.indexOf('export const worldMaterialFamilies')), /Peerless/);
-  assert.match(page, /Current game and intended recipe system/);
-  assert.match(page, /Every system now has its own page/);
+  assert.match(page, /How recipes work now and how they will change/);
+  assert.match(page, /Every system has its own page/);
   assert.doesNotMatch(page, /All current recipes by station/);
   assert.match(craftingGuide, /Properties affect the result, not eligibility/);
   assert.match(craftingGuide, /numerical properties and uses them to calculate concrete finished-item statistics/);
@@ -98,10 +98,10 @@ test('crafting overview separates the current property model from the intended p
   assert.match(progression, /Current progression and intended expansion/);
   assert.match(bestiary, /Creature materials inherit real anatomy/);
   assert.match(overview, /Because unusually low traits can raise this grade/);
-  assert.match(overview, /Trading Post supplier samples instead synthesize property ranges/);
+  assert.match(overview, /Trading Post samples instead generate values from a range/);
   assert.match(overview, /the world itself is not rejected/);
   assert.match(resources, /Intended material identity/);
-  assert.match(resources, /Loot, return, and custody/);
+  assert.match(resources, /Gathering, return, and storage/);
   assert.match(loot, /href="\/resources#loot-and-custody"/);
 });
 
@@ -117,9 +117,9 @@ test('locked coating and starter-rune rules remain separate from the current bui
   assert.match(overview, /begins with no known runes/);
   assert.match(overview, /Illumination and Sun guaranteed on a safe unavoidable path/);
   assert.match(overview, /Existing campaigns keep every known rune and owned World Page/);
-  assert.match(consumables, /Locked intended rule/);
+  assert.match(consumables, /Planned rule/);
   assert.match(item, /Current and intended coating duration/);
-  assert.match(writing, /Locked intended opening/);
+  assert.match(writing, /Planned opening/);
   assert.match(gettingStarted, /If the introduction is interrupted/);
 });
 
@@ -153,7 +153,7 @@ test('World Writing reference keeps current vocabulary, connection, compound, an
     /Copper supplies Cyan, Ichor Magenta, Sulfur Yellow, and Obsidian Depth/,
   );
   assert.match(writing, /12-application vial/);
-  assert.match(writing, /changes a Focus’s authored colour, not its meaning/);
+  assert.match(writing, /changes the colour you gave a Focus, not its meaning/);
   assert.match(writing, /\/crafting\/writing-ink/);
   assert.match(writing, /\/resources/);
 });
@@ -173,14 +173,14 @@ test('World Writing resource-pursuit Pages keep opening, mid-reach, and late rec
     [...positions].sort((left, right) => left - right),
     positions,
   );
-  assert.match(recipes, /not promise a deposit, route, map shape/);
+  assert.match(recipes, /not promise a deposit, safe path, map shape/);
   assert.match(recipes, /not promised/);
   assert.match(recipes, /not an owned World Page or automatic Template/);
   assert.match(recipes, /Fountain pen/);
   assert.match(writing, /Three resource-pursuit Pages/);
   assert.match(
     writing,
-    /never guarantees a particular terrain, resource, route, or safe approach/,
+    /never guarantees a particular terrain, resource, path, or safe approach/,
   );
   for (const id of ids) assert.doesNotMatch(writing, new RegExp(id));
 });
@@ -282,20 +282,20 @@ test('wiki formatting standard makes detail pages complete while category pages 
   ]) assert.match(readme, new RegExp(phrase));
 
   const completeDetailContracts = {
-    'app/actions/[slug]/page.tsx': ['Surface', 'Available when', 'Committed change', 'Cost', 'What the result keeps', 'When it cannot complete'],
+    'app/actions/[slug]/page.tsx': ['Where you find it', 'Available when', 'What happens', 'Cost', 'What the game saves', 'When it cannot complete'],
     'app/bestiary/[slug]/page.tsx': ['Combat profile', 'Health', 'Attack', 'Notice range', 'World conditions required', 'World conditions that help', 'Encounter and companionship'],
-    'components/facility-detail.tsx': ['Access and foundation', 'Village area', 'Current route', 'When usable', 'Exact construction', 'What this facility currently offers', 'Current crafting and Research', 'Related materials and next steps'],
-    'app/crafting/[slug]/page.tsx': ['Current station and approved direction', 'Access and readiness', 'Current recipes and requirements', 'Material choices', 'Commit and result', 'Results and their use'],
-    'app/equipment/[slug]/page.tsx': ['Current equipment facts', 'Eligibility', 'Material and reforge facts', 'ItemCraftingRoutes', 'Custody and swapping', 'Trading and recycling'],
-    'app/items/[slug]/page.tsx': ['Current use', 'Field Kit and carrying', 'Identification and knowledge', 'Use and custody', 'ItemCraftingRoutes', 'Trading', 'Recycler'],
-    'app/people/[slug]/page.tsx': ['Campaign order', 'Meeting context', 'Diary reward', 'At the Cottage', 'Book pages', 'location clues'],
+    'components/facility-detail.tsx': ['Access and foundation', 'Village area', 'Where to find it', 'When usable', 'Construction cost', 'What this facility currently offers', 'Current crafting and Research', 'Related materials and next steps'],
+    'app/crafting/[slug]/page.tsx': ['How it works now and how it will change', 'Access and readiness', 'Current recipes and requirements', 'Material choices', 'Make it and receive the result', 'Results and their use'],
+    'app/equipment/[slug]/page.tsx': ['Current equipment facts', 'Eligibility', 'Material and reforge facts', 'ItemCraftingRoutes', 'Storage and swapping', 'Trading and recycling'],
+    'app/items/[slug]/page.tsx': ['Current use', 'Field Kit and carrying', 'Identification and knowledge', 'Use and storage', 'ItemCraftingRoutes', 'Trading', 'Recycler'],
+    'app/people/[slug]/page.tsx': ['Campaign order', 'Meeting context', 'Book reward', 'At the Cottage', 'Book pages', 'location clues'],
     'app/research/[slug]/page.tsx': ['Current node details', 'Earlier upgrades', 'Other requirements', 'Base cost', 'Result', 'Study and retain'],
     'app/resources/[slug]/page.tsx': ['How to obtain it', 'Trade', 'Primary pressure', 'Required conditions', 'Conditions that help', 'Current service and research uses', 'Craft recipes', 'Building recipes'],
-    'app/sites/[slug]/page.tsx': ['Current world association', 'Placement', 'Search', 'Conditions', 'Disclosed result after completion', 'Look and depletion'],
-    'app/statuses/[slug]/page.tsx': ['Current rule', 'Source', 'Effect', 'Duration', 'Where it applies', 'Clear or prevent', 'Keep the boundary clear'],
-    'app/techniques/[slug]/page.tsx': ['Current use', 'Source or grant', 'Who can use it', 'Trigger', 'Target', 'Exact current result', 'Costs, cooldowns, and limits'],
+    'app/sites/[slug]/page.tsx': ['Where it may appear', 'Placement', 'Search', 'Conditions', 'What it provides', 'Look and depletion'],
+    'app/statuses/[slug]/page.tsx': ['Current rule', 'Source', 'Effect', 'Duration', 'Where it applies', 'Clear or prevent', 'Where the effect applies'],
+    'app/techniques/[slug]/page.tsx': ['How to use it', 'How it is learned', 'Who can use it', 'When it activates', 'Target', 'What it does', 'Costs, cooldowns, and limits'],
     'app/terrain/[slug]/page.tsx': ['Movement', 'Sight', 'Resource relationship', 'Related current resources'],
-    'app/flora/[slug]/page.tsx': ['Current output', 'Inspect before acting'],
+    'app/flora/[slug]/page.tsx': ['What it provides', 'Inspect before acting'],
     'app/world/conditions/[slug]/page.tsx': ['What it shapes', 'In a bound world'],
   };
   for (const [relative, requiredFacts] of Object.entries(completeDetailContracts)) {
@@ -317,11 +317,11 @@ test('Bestiary publishes stable named encounter profiles without claiming save d
   );
   assert.match(
     detail,
-    /does not promise companionship or disclose any individual’s trust state/,
+    /does not promise that every animal can become a companion or reveal the trust of an animal you have not met/,
   );
   assert.match(
     detail,
-    /No separate fixed status or drop is published for this profile/,
+    /does not currently have a separate fixed status or guaranteed drop/,
   );
   assert.ok(snapshot.creatures.every((entry) => entry.slug && entry.name));
 });
@@ -340,7 +340,7 @@ test('site directory keeps current conditions, disclosed results, and depletion 
   );
   assert.match(
     detail,
-    /does not reveal whether it was rolled into an undiscovered world/,
+    /do not reveal whether one exists in an unexplored part of your world/,
   );
   assert.match(
     detail,
@@ -359,10 +359,10 @@ test('Village directory separates live buildings from scheduled entries and give
   assert.equal(snapshot.stations.length, 22);
   assert.equal(snapshot.scheduledStations.length, 1);
   assert.match(directory, /buildingStatus/);
-  assert.match(directory, /Scheduled, not live/);
-  assert.match(directory, /No live action, service, recipe, or reward is published/);
-  assert.match(detail, /This destination is not a live player route/);
-  assert.match(detail, /Exact construction/);
+  assert.match(directory, /Planned — not available yet/);
+  assert.match(directory, /Future costs, recipes, actions, and rewards/);
+  assert.match(detail, /not available to visit or build yet/);
+  assert.match(detail, /Construction cost/);
   assert.match(detail, /Related materials and next steps/);
 });
 
@@ -381,7 +381,7 @@ test('Village building routes are discoverable from player navigation and materi
     ].map(read),
   );
   for (const source of sources) assert.match(source, /\/village|\/buildings\//);
-  assert.match(sources[1], /Scheduled destination/);
+  assert.match(sources[1], /Planned destination/);
   assert.match(sources[4], /Browse Village buildings/);
   assert.match(sources[5], /\/buildings\/\$\{station\.slug\}/);
   assert.match(sources[7], /Village buildings/);
@@ -423,7 +423,7 @@ test('item details link published recipes and resources without guessing absent 
   assert.match(routes, /Current acquisition/);
   assert.match(
     routes,
-    /No current station preparation or construction recipe is published/,
+    /does not currently have a station recipe/,
   );
   assert.match(routes, /Related resources/);
   assert.match(itemDetail, /ItemCraftingRoutes/);
@@ -443,7 +443,7 @@ test('Research directory provides stable semantic node routes with complete curr
   assert.match(directory, /Base cost/);
   assert.match(directory, /Ready when/);
   assert.match(detail, /Current node details/);
-  assert.match(detail, /Bundled construction/);
+  assert.match(detail, /Included with a building/);
   assert.match(detail, /Study and retain/);
   assert.match(detail, /\/buildings\/library/);
   assert.match(guide, /How to access Research/);
@@ -476,7 +476,7 @@ test('conditions reference separates the four encounter afflictions from current
   assert.match(reference, /does not hide creatures or affect apexes/);
   assert.match(directory, /Conditions and effects/);
   assert.match(directory, /Encounter afflictions/);
-  assert.match(detail, /Keep the boundary clear/);
+  assert.match(detail, /Where the effect applies/);
   assert.match(detail, /\/items\/\$\{item\.slug\}/);
 });
 
@@ -493,7 +493,7 @@ test('technique reference gives each current technique and Gambit component a st
   assert.match(reference, /the next enabled rule can be considered/);
   assert.match(directory, /Techniques and Gambits/);
   assert.match(directory, /Gambit action/);
-  assert.match(detail, /Source or grant/);
+  assert.match(detail, /How it is learned/);
   assert.match(detail, /Costs, cooldowns, and limits/);
   assert.equal(snapshot.combatTechniques.length, 25);
   assert.equal(snapshot.gambitComponents.length, 27);
@@ -539,7 +539,7 @@ test('action reference keeps current player actions, costs, results, and unavail
   assert.match(reference, /craftingSystems\.map/);
   assert.match(reference, /serviceGuides\.map/);
   assert.match(directory, /Action reference/);
-  assert.match(directory, /Current station transaction/);
+  assert.match(directory, /Crafting stations/);
   assert.match(detail, /Available when/);
   assert.match(detail, /When it cannot complete/);
 });
@@ -558,11 +558,11 @@ test('Trading directory distinguishes rotating offer pools from durable player r
   const directory = await read('app/trading/page.tsx');
   const reference = await read('lib/trading-reference.ts');
   const sync = await read('scripts/sync-content.mjs');
-  assert.match(directory, /no durable player-facing listing identity/);
+  assert.match(directory, /individual items on its shelves can change/);
   assert.match(directory, /Current resource offer pools/);
   assert.match(directory, /Known consumables that may enter the pool/);
   assert.match(directory, /Ordinary gear that may enter the pool/);
-  assert.match(directory, /Cancel, refusal, and stock changes/);
+  assert.match(directory, /Sell only what you selected/);
   assert.match(reference, /buyableResourceBands/);
   assert.match(reference, /merchantConsumables/);
   assert.match(reference, /ordinaryMerchantGear/);
@@ -575,9 +575,9 @@ test('Recycler directory keeps authored salvage profiles separate from current p
   const directory = await read('app/recycling/page.tsx');
   const reference = await read('lib/recycling-reference.ts');
   const sync = await read('scripts/sync-content.mjs');
-  assert.match(directory, /no durable player-facing transaction ID/);
-  assert.match(directory, /Standard salvage profiles/);
-  assert.match(directory, /Construction-receipt recovery/);
+  assert.match(directory, /Every recovery preview belongs to the Stored or Waiting piece you selected/);
+  assert.match(directory, /Standard salvage patterns/);
+  assert.match(directory, /Recovering recorded construction materials/);
   assert.match(directory, /When a piece stays protected/);
   assert.match(directory, /Confirm only the displayed preview/);
   for (const profile of [
@@ -608,11 +608,11 @@ test('Recycler first use keeps Noll, the 15-Essence bench, empty state, exact pr
     assert.match(journey, new RegExp(stableID));
   assert.match(journey, /15 Essence/);
   assert.match(journey, /No gear to dismantle/);
-  assert.match(journey, /Dismantle without recovery/);
+  assert.match(journey, /destroyed without returning materials/);
   assert.match(journey, /Field Separation Kit remains absent/);
   assert.match(
     journey,
-    /stale, invalid, busy, or save-failed recovery keeps the preview open/,
+    /If the item or preview changes, another action is busy, or the game cannot save/,
   );
   for (const source of [directory, service, building])
     assert.match(source, /recyclerFirstUse/);
@@ -635,25 +635,25 @@ test('Anchorage first anchor keeps Tovin, exact construction, Frame custody, Atl
   assert.match(journey, /seamID: 'natural_anchor'/);
   assert.match(journey, /200 Essence · 40 Iron Ore · 20 Quartz · 18 Pulp/);
   assert.match(journey, /60 Essence/);
-  assert.match(journey, /Work and Deliveries are not published/);
+  assert.match(journey, /Work and Deliveries are not available yet/);
   assert.match(
     journey,
-    /Cancel, a stale quote, a busy control, insufficient Essence, or a failed durable write spends nothing/,
+    /Cancelling, a changed preview, another busy action, insufficient Essence, or a failed save spends nothing/,
   );
   assert.match(
     journey,
-    /does not end the expedition, bank the current haul, reset the world, duplicate a Frame, or create a delivery/,
+    /does not end the expedition, bring the current haul home, reset the world, duplicate a Frame, or create a delivery/,
   );
   assert.match(
     journey,
-    /Sustain or Let rest is a later explicit settlement choice/,
+    /Sustain or Let rest becomes a separate choice later/,
   );
   for (const source of [service, building, crafting, site])
     assert.match(source, /anchorageFirstAnchor/);
   assert.match(service, /First held realm: Tovin to Atlas Seam/);
   assert.match(building, /Build the Anchorage with Tovin/);
-  assert.match(crafting, /Anchor Frame is a separate carried route/);
-  assert.match(site, /Anchor one exact world/);
+  assert.match(crafting, /Using an Anchor Frame in the field/);
+  assert.match(site, /Anchor one world/);
 });
 
 test('Blacksmith first use keeps Halloway, exact foundation, Pointed Blade custody, complete stock, and useful Reforge publication boundary distinct', async () => {
@@ -674,15 +674,15 @@ test('Blacksmith first use keeps Halloway, exact foundation, Pointed Blade custo
   );
   assert.doesNotMatch(journey, /stone and iron/i);
   assert.match(journey, /World or Creature Material/);
-  assert.match(journey, /two exact property-30\+ materials and 8 Essence/);
+  assert.match(journey, /two materials with the required 30\+ property, 8 Essence/);
   assert.match(journey, /does not promise a paid Reforge success/);
-  assert.match(journey, /Same-name gear is never substituted/);
+  assert.match(journey, /never substitutes another item with the same name/);
   for (const source of [service, building, place, crafting])
     assert.match(source, /blacksmithFirstUse/);
   assert.match(service, /Third opening find: Halloway to Pointed Blade/);
   assert.match(building, /Build the Blacksmith with Halloway/);
   assert.match(place, /Build it with Halloway/);
-  assert.match(crafting, /Pointed Blade is the first live maker family/);
+  assert.match(crafting, /Pointed Blade is the first available weapon form/);
   for (const source of [building, place])
     assert.doesNotMatch(source, /stone and the iron/);
 });
@@ -776,15 +776,15 @@ test('complete people records are discoverable through player-facing Library, si
       ].map(read),
     );
   assert.match(search, /People and records/);
-  assert.match(search, /Authored book page/);
-  assert.match(search, /Spoiler-marked location hint/);
+  assert.match(search, /Book page/);
+  assert.match(search, /Spoiler-marked location clue/);
   assert.match(search, /page\.prose/);
   assert.match(search, /location-hints/);
   assert.match(glossary, /People and records/);
-  assert.match(knowledge, /complete current authored book record/);
+  assert.match(knowledge, /all of that person’s currently available book pages/);
   assert.match(service, /guide\.slug === 'library'/);
   assert.match(place, /place\.id === 'library'/);
-  assert.match(sites, /People’s location records/);
+  assert.match(sites, /Clues in people’s books/);
   assert.match(frame, /label: 'People'/);
 });
 
@@ -820,15 +820,15 @@ test('place details expose only their current construction, service, and station
   assert.match(detail, /Action reference/);
 });
 
-test('equipment routes retain slot, recipe, frozen-piece and custody guidance', async () => {
+test('equipment routes retain slot, recipe, saved-piece and storage guidance', async () => {
   const index = await read('app/equipment/page.tsx');
   const detail = await read('app/equipment/[slug]/page.tsx');
-  assert.match(index, /Current combat facts/);
-  assert.match(index, /Current recipe route/);
-  assert.match(index, /No current recipe published/);
+  assert.match(index, /Combat facts/);
+  assert.match(index, /How to make it/);
+  assert.match(index, /No crafting recipe is available yet/);
   assert.match(index, /Worn by another person/);
-  assert.match(detail, /frozen piece profile/);
-  assert.match(detail, /Reforge rank and provenance/);
+  assert.match(detail, /slot and combat details it had when it was created or found/);
+  assert.match(detail, /Reforge rank and material history/);
   assert.match(detail, /same-slot swap/);
   assert.match(detail, /carried in the active world/);
   assert.match(detail, /\/crafting\/blacksmith/);
@@ -840,14 +840,14 @@ test('consumable routes keep current effect, target, preparation, carrying, and 
   const detail = await read('app/items/[slug]/page.tsx');
   const supplies = await read('app/consumables/page.tsx');
   const contentSource = await read('lib/content.ts');
-  assert.match(index, /Current recipe route/);
+  assert.match(index, /How to make it/);
   assert.match(index, /Prepare the next Field Kit at Home/);
   assert.match(index, /Target/);
   assert.match(detail, /Field Kit and carrying/);
-  assert.match(detail, /Commit the shown use/);
+  assert.match(detail, /Use the selected item/);
   assert.match(detail, /href: '\/consumables'/);
-  assert.match(supplies, /12-turn field effect/);
-  assert.match(supplies, /Commit only the shown use/);
+  assert.match(supplies, /lasts for 12 world turns/);
+  assert.match(supplies, /Review before using an item/);
   assert.match(contentSource, /function consumableEffect/);
   assert.match(contentSource, /function consumableTarget/);
   assert.match(contentSource, /function consumableDuration/);
@@ -858,8 +858,8 @@ test('curio routes explain recognition and custody without exposing an unknown r
   const detail = await read('app/items/[slug]/page.tsx');
   assert.match(index, /Keep unknown results unknown/);
   assert.match(index, /study one safely at Home/);
-  assert.match(index, /Current route/);
-  assert.match(index, /Identified and transferable/);
+  assert.match(index, /Where it comes from/);
+  assert.match(index, /Can be sold once identified/);
   assert.match(detail, /Identification and knowledge/);
   assert.match(detail, /identified with Solvent while carried/);
   assert.match(detail, /does not treat this object as recyclable gear/);
@@ -890,7 +890,7 @@ test('sanitized player snapshot has useful implemented coverage and inline visua
   assert.equal(content.travellers.length, 8);
   assert.equal(
     content.resources.find((resource) => resource.id === 'rubble')?.acquisition,
-    'Rank-0 mineral node; hard Substrate/Relief; staple trade',
+    'Mineral nodes requiring Extraction 0; hard Substrate/Relief; sold as a staple good',
   );
   for (const resource of content.resources) {
     assert.ok(resource.consumerAuthority, `${resource.id} consumer authority`);
@@ -961,12 +961,12 @@ test('crafting has a linked system index and complete resource cross-reference s
   assert.match(resourceDetail, /How to obtain it/);
   assert.match(resourceDetail, /Current service and research uses/);
   assert.match(resourceDetail, /Material role in current recipes/);
-  assert.match(resourceDetail, /scalar count never silently replaces it/);
-  assert.match(resourceDetail, /Exact resource use/);
+  assert.match(resourceDetail, /an ordinary resource count never replaces it/);
+  assert.match(resourceDetail, /How much it uses/);
   const craftingIndex = await read('app/crafting/page.tsx');
   const craftingDetail = await read('app/crafting/[slug]/page.tsx');
   assert.match(craftingIndex, /PixelImage/);
-  assert.match(craftingIndex, /Current game and intended recipe system/);
+  assert.match(craftingIndex, /How recipes work now and how they will change/);
   assert.match(craftingIndex, /Preparations and processing/);
   assert.match(craftingIndex, /Weapons, clothing, and protection/);
   assert.match(craftingIndex, /Expedition tools and worldwork/);
@@ -978,7 +978,7 @@ test('crafting has a linked system index and complete resource cross-reference s
   assert.match(craftingDetail, /crafting-station/);
   assert.match(craftingDetail, /Access and readiness/);
   assert.match(craftingDetail, /Material choices/);
-  assert.match(craftingDetail, /Commit and result/);
+  assert.match(craftingDetail, /Make it and receive the result/);
   assert.match(craftingDetail, /serviceForStation/);
   assert.match(craftingDetail, /recipeReadiness/);
   assert.match(craftingDetail, /Current recipes and requirements/);
@@ -997,20 +997,20 @@ test('crafting has a linked system index and complete resource cross-reference s
   const facilityDetail = await read('components/facility-detail.tsx');
   assert.match(facilityDetail, /Current crafting and Research/);
   assert.match(facilityDetail, /Material choices/);
-  assert.match(facilityDetail, /Result and custody/);
+  assert.match(facilityDetail, /Finished result and storage/);
   const craftingGuide = await read('app/crafting/page.tsx');
-  assert.match(craftingGuide, /Keep cost forms distinct/);
-  assert.match(craftingGuide, /One cannot silently replace another/);
+  assert.match(craftingGuide, /Keep each kind of cost distinct/);
+  assert.match(craftingGuide, /never substitutes one for another/);
   const search = await read('app/search/page.tsx');
   assert.match(search, /Current crafting/);
   assert.match(search, /recipeReadiness/);
   const glossary = await read('app/glossary/page.tsx');
   assert.match(glossary, /Current recipe availability/);
   const progression = await read('app/resources/progression/page.tsx');
-  assert.match(progression, /Crafting matrix lists only current recipe routes/);
+  assert.match(progression, /Compare every material in the implemented game/);
   const equipment = await read('app/equipment/page.tsx');
   assert.match(equipment, /recipeReadiness/);
-  assert.match(equipment, /No current recipe published/);
+  assert.match(equipment, /No crafting recipe is available yet/);
   for (const source of [
     await read('app/research/page.tsx'),
     await read('app/research/[slug]/page.tsx'),
@@ -1041,8 +1041,8 @@ test('public loot, resources, and crafting guides separate implemented truth fro
   assert.match(loot, /href="\/resources#loot-and-custody"/);
   assert.match(resources, /lootPaths/);
   assert.match(status, /Playable now/);
-  assert.match(truthPair, /Implemented now/);
-  assert.match(truthPair, /Intended implementation/);
+  assert.match(truthPair, /Playable now/);
+  assert.match(truthPair, /Planned design/);
   assert.match(status, /worldMaterialFamilies/);
   assert.match(status, /creatureMaterialFamilies/);
   assert.match(status, /Poor/);
@@ -1267,7 +1267,7 @@ test('Village facilities have one complete canonical detail owner and legacy red
   const placeDetail = await read('app/places/[slug]/page.tsx');
   assert.match(facility, /buildingActions/);
   assert.match(facility, /How to use it/);
-  assert.match(facility, /Choose the current entry/);
+  assert.match(facility, /Choose what to work with/);
   assert.match(facility, /After you confirm/);
   assert.match(facility, /Worth remembering/);
   assert.match(serviceIndex, /VillageIndexRedirect/);
@@ -1433,7 +1433,7 @@ test('combat guide integrates retained party and gear references without a visua
   assert.match(combat, /\/equipment\/\$\{weapon\.slug\}/);
   assert.match(combat, /Prepare before an encounter/);
   assert.match(combat, /Attack, Techniques, Item, and Withdraw/);
-  assert.match(combat, /second-tap prompt/);
+  assert.match(combat, /second prompt confirms the target/);
   assert.match(combat, /no separate Defend key/);
   assert.match(
     combat,
@@ -1630,11 +1630,11 @@ test('current progression is a task-oriented implemented-truth reference without
   const starts = await read('lib/system-guides.ts');
   assert.match(progression, /Current task checklist/);
   assert.match(progression, /Read the next Page before Binding/);
-  assert.match(progression, /Use the world to recover what you need now/);
-  assert.match(progression, /Choose one current Village improvement/);
-  assert.match(progression, /Study a ready Research node/);
+  assert.match(progression, /Use the world to recover what you need/);
+  assert.match(progression, /Choose a Village improvement/);
+  assert.match(progression, /Study available Research/);
   assert.match(progression, /Prepare people, gear, and supplies/);
-  assert.match(progression, /does not promise that a particular construction/);
+  assert.match(progression, /particular building, recipe, Research entry, or world may not be ready/);
   assert.match(progression, /\/research/);
   assert.match(starts, /\/resources\/progression/);
 });
@@ -1709,13 +1709,13 @@ test('Economy guide keeps current listings, refinement, and recycling player-fac
   assert.match(economy, /Choose a quantity from the resource reserve/);
   assert.match(economy, /Raw Essence and spendable Essence remain distinct/);
   assert.match(economy, /Current resource offer pools/);
-  assert.match(economy, /Material offers today and after the approved update/);
-  assert.match(economy, /Keep currencies and holdings distinct/);
-  assert.match(economy, /is a Reality currency and is not ordinarily traded/);
-  assert.match(economy, /Sell from the exact holding shown/);
+  assert.match(economy, /Material offers now and in the intended system/);
+  assert.match(economy, /Keep currencies and belongings distinct/);
+  assert.match(economy, /is a special currency and is not ordinarily traded/);
+  assert.match(economy, /Sell only what you selected/);
   assert.match(economy, /\/systems\/inventory-custody/);
-  assert.match(economy, /shown yield/);
-  assert.match(economy, /previous offer stays uncommitted/);
+  assert.match(economy, /materials shown/);
+  assert.match(economy, /Opening a listing, changing quantity, choosing Cancel, or going Back does not move money or goods/);
   assert.match(economy, /\/buildings\/trading-post/);
   assert.match(economy, /href="\/recycling"/);
   assert.match(economy, /\/buildings\/essence-spring/);
@@ -1748,14 +1748,14 @@ test('Field supplies guide documents current preparation, targets, Scent Mask, c
   const systems = await read('lib/system-guides.ts');
   const frame = systems;
   assert.match(supplies, /Prepare the next Field Kit at Home/);
-  assert.match(supplies, /current capacity/);
+  assert.match(supplies, /kit’s remaining capacity/);
   assert.match(supplies, /Healing and direct supplies/);
   assert.match(supplies, /Scent Mask/);
-  assert.match(supplies, /12-turn/);
+  assert.match(supplies, /12 world turns/);
   assert.match(supplies, /Solvent and unidentified curios/);
   assert.match(supplies, /Trying an unknown curio/);
   assert.match(supplies, /Cancel leaves it unused/);
-  assert.match(supplies, /losing the shown target changes nothing/);
+  assert.match(supplies, /If a target is no longer available, the item is not used/);
   assert.match(supplies, /\/curios/);
   assert.match(systems, /href: '\/consumables'/);
   assert.match(frame, /href: '\/consumables'/);
@@ -1769,7 +1769,7 @@ test('Animals guide documents current Attend, trust, companion placement, combat
   assert.match(animals, /Recruit Sabine and build the Menagerie/);
   assert.match(animals, /within two tiles/);
   assert.match(animals, /not immediately adjacent/);
-  assert.match(animals, /patient presence/);
+  assert.match(animals, /patient company/);
   assert.match(animals, /returns to the Menagerie/);
   assert.match(
     animals,
@@ -1800,11 +1800,11 @@ test('Equipment and material-effects guide keeps current slots, ownership, sampl
   ])
     assert.match(guide, new RegExp(slot));
   assert.match(guide, /Worn by another person/);
-  assert.match(guide, /stays read-only until the party returns/);
-  assert.match(guide, /provenance, grade, and current result/);
-  assert.match(guide, /one exact eligible sample/);
+  assert.match(guide, /cannot be changed until the party returns/);
+  assert.match(guide, /where it came from, its grade, and how it changes the result/);
+  assert.match(guide, /one suitable material sample in each slot/);
   assert.match(guide, /keeps its construction history/);
-  assert.match(guide, /changed piece, stock, or quote/);
+  assert.match(guide, /chosen piece, available materials, or price changes/);
   assert.match(guide, /\/crafting\/blacksmith/);
   assert.match(guide, /\/systems\/party-preparation/);
   assert.match(systems, /href: '\/equipment'/);
@@ -1831,7 +1831,7 @@ test('Sites and hazards reference documents only current Look profiles, search s
   assert.match(guide, /becomes depleted only when its final current Search completes/);
   assert.match(
     guide,
-    /does not promise that a site is already present in an undiscovered world/,
+    /does not guarantee a site exists in a world you have not explored/,
   );
   assert.match(guide, /\/bestiary/);
   assert.match(guide, /\/sites/);
@@ -1850,16 +1850,55 @@ test('Inventory and custody guide preserves current locations, selected holdings
   assert.match(guide, /worn by another person is marked/);
   assert.match(guide, /Instruments are listed separately from supplies/);
   assert.match(guide, /Previewing changes nothing/);
-  assert.match(guide, /price, stock, funds, capacity, or identity changes/);
+  assert.match(guide, /price, stock, funds, space, or selected item changes/);
   assert.match(
     guide,
-    /changed item, target, turn, or world state leaves the shown use uncommitted/,
+    /item, target, turn, or world changes, reopen the detail and choose again/,
   );
   assert.match(guide, /\/buildings\/storehouse/);
   assert.match(guide, /href: '\/trading'/);
   assert.match(guide, /<h3>Recycler<\/h3>/);
   assert.match(systems, /\/systems\/inventory-custody/);
   assert.match(frame, /\/systems\/inventory-custody/);
+});
+
+test('player-facing reference copy follows the plain warm language standard', async () => {
+  const readme = await read('README.md');
+  const content = JSON.parse(await read('data/player-content.json'));
+  assert.match(readme, /75% plain, warm language/);
+  assert.match(readme, /25% storybook flavour/);
+  assert.match(readme, /not yet playable begins with a visible `Planned` label/);
+
+  const visibleSources = await Promise.all([
+    'app/people/page.tsx',
+    'app/people/[slug]/page.tsx',
+    'components/facility-detail.tsx',
+    'app/actions/page.tsx',
+    'app/actions/[slug]/page.tsx',
+    'app/crafting/page.tsx',
+    'app/crafting/[slug]/page.tsx',
+    'app/equipment/page.tsx',
+    'app/recycling/page.tsx',
+    'app/trading/page.tsx',
+    'app/systems/inventory-custody/page.tsx',
+    'app/journey/page.tsx',
+    'app/research/page.tsx',
+  ].map(read));
+  const visibleCopy = visibleSources.join('\n');
+  for (const internalPhrase of [
+    'No current Village service route is published',
+    'Scheduled, not live',
+    'Current station transaction',
+    'no durable player-facing listing identity',
+    'Result and custody',
+    'Reforge remains an exact-piece boundary',
+    'Current station and approved direction',
+  ]) assert.doesNotMatch(visibleCopy, new RegExp(internalPhrase));
+  assert.match(visibleCopy, /Planned/);
+  assert.match(await read('app/journey/page.tsx'), /villageBuildings/);
+  for (const node of content.researchNodes) {
+    assert.doesNotMatch(node.blurb, /More still\.|It holds\. Mostly\.|There is no more wall\.|What happens after\. It is not nothing\.|The page stops being a list and starts being an argument\./, `${node.name} needs a plain result description`);
+  }
 });
 
 test('shared frame keeps phone search compact and offers persistent light and dark reading themes', async () => {

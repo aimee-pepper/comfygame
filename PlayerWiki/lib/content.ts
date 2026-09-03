@@ -239,7 +239,22 @@ interface PlayerContent {
   };
 }
 
-export const content = rawContent as PlayerContent;
+const itemSummaryOverrides: Record<string, string> = {
+  essence_crystal: 'Spendable Essence refined from Raw Essence and used for construction, Research, crafting, and other permanent work at the Cottage.',
+  heat_core: 'A distilled Heat Core used by the Channelworks to make Heat equipment.',
+  caustic_core: 'A distilled Caustic Core intended for later Channelworks equipment. Its combat housing is not available yet.',
+  light_core: 'A distilled Light Core intended for later combat-only Channelworks equipment. It does not illuminate a world.',
+  conduit_fixture: 'The first contained Heat housing made at the Channelworks. It keeps a record of the Core used to create it.',
+};
+
+const importedContent = rawContent as PlayerContent;
+export const content: PlayerContent = {
+  ...importedContent,
+  items: importedContent.items.map((item) => ({
+    ...item,
+    summary: itemSummaryOverrides[item.id] ?? item.summary,
+  })),
+};
 export const equipment = content.items.filter((item) => item.gear);
 export const consumables = content.items.filter((item) => item.consumable);
 export const curios = content.items.filter(
@@ -324,10 +339,11 @@ export function buildCost(station: Station) {
       ? 'Available at the start'
       : 'No construction cost listed';
   return station.buildCost
-    .map(
-      (cost) =>
-        `${cost.quantity ?? cost.amount ?? '?'} ${humanize(cost.id ?? cost.resource ?? cost.resourceID)}`,
-    )
+    .map((cost) => {
+      const id = cost.id ?? cost.resource ?? cost.resourceID;
+      const resource = content.resources.find((entry) => entry.id === id);
+      return `${cost.quantity ?? cost.amount ?? '?'} ${resource?.name ?? humanize(id)}`;
+    })
     .join(', ');
 }
 

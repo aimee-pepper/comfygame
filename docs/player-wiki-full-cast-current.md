@@ -41,8 +41,8 @@ exposing hidden people before the game does.
 | 21 | Marrick, formation leader | Marrick looks for shared ground where formations can be tested and improved around real people. | Marrick will teach formation support that helps the whole party adapt when someone is hurt. |
 | 22 | Sabine, menagerist | Sabine seeks healthy ecosystems where animals have space to approach, refuse, and return on their own terms. | Sabine will run the Menagerie, where animals can build trust, be housed, and join the party by choice. |
 | 23 | Grimmond, deep miner | Grimmond follows deep, mineral-rich seams where support, light, and breathable air all matter. | Grimmond will run the Deep Works, where you sound depth, follow known underground signs, and take finite pulls from buried seams. |
-| 24 | Oda, magic weaponsmith | Oda studies unlike forces that can be held close enough to trace how they travel. | Oda runs the Channelworks and Emanation Housing, where prepared forces can be contained and used safely. |
-| 25 | Auber, distiller | Auber looks for worlds where water, minerals, heat, and residue separate cleanly. | Auber runs the Distillery, where you crystallise blank cores and attune them to known forces. |
+| 24 | Oda, magic weaponsmith | Oda studies unlike forces that can be held close enough to trace how they travel. | Oda runs the Channelworks, where a Heat Core can currently become a stored Heat Conduit Fixture. Caustic and Light equipment are planned. |
+| 25 | Auber, distiller | Auber looks for worlds where water, minerals, heat, and residue separate cleanly. | Auber runs the Distillery, where you currently make Heat, Caustic, and Light Cores directly from gathered materials. |
 | 26 | Ashe, emanation specialist | Ashe follows visible warning signs around creatures already carrying an active force. | Ashe will teach combat techniques for recognising and responding to active emanations. |
 | 27 | Tovin, binder | Tovin can be found in a dark, enclosed world where time is precise but leaving is difficult. | Tovin runs the Anchorage, where you keep a portfolio of anchored realms and prepare ways to return to them. |
 | 28 | Perren, interpreter | Perren studies ruined rituals that can be understood in more than one valid way. | Perren's later story will teach Mirror and help interpret ritual fragments without forcing a single answer. |
@@ -66,7 +66,7 @@ their page is recovered.
 
 ### 2. Noll — six authored pages; five currently publishable
 
-**Service:** Recycler. **Diary reward:** none currently published.
+**Service:** Recycler. **Book reward:** No additional reward.
 
 1–2. **Where someone is** — broken pieces that keep an edge and hard matter held in clear seams.
 3. **Word of someone** — Vance and the difference between price and provenance.

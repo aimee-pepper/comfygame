@@ -63,7 +63,7 @@ export const wikiNavigationSections: WikiNavigationSection[] = [
     links: [
       { href: '/crafting', label: 'Crafting' },
       { href: '/resources', label: 'Resources' },
-      { href: '/systems/inventory-custody', label: 'Inventory and custody' },
+      { href: '/systems/inventory-custody', label: 'Inventory and storage' },
       { href: '/equipment', label: 'Equipment' },
       { href: '/consumables', label: 'Consumables and Field Kit' },
       { href: '/curios', label: 'Curios and key items' },

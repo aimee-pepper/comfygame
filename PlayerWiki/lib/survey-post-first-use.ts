@@ -6,11 +6,11 @@ export const surveyPostFirstUse = {
   construction: '50 Essence · 10 Timber · 8 Iron Ore · 2 Quartz',
   journey: [
     'Recruit Mara to reveal one Survey Post foundation in Home → Study.',
-    'Build only when the exact 50 Essence, 10 Timber, 8 Iron Ore, and 2 Quartz quote is ready.',
+    'Build when you have the displayed 50 Essence, 10 Timber, 8 Iron Ore, and 2 Quartz.',
     'Construction opens the tier-0 Survey Post and Field Instruments research. It grants no instrument, material, observation, map disclosure, or field action.',
-    'Study one current Field Instrument only from its exact Research preview. A durable purchase makes that subject a permanent Crude capability and packs it for the next world.',
-    'At Home, choose the owned instruments for the next trip. Departure freezes that chosen set and its current precision for the expedition.',
-    'In the world, use Survey only while no encounter is active. It reads every valid carried instrument in canonical order, records those observations, and costs one turn.',
+    'Study one Field Instrument from its Research preview. A completed purchase permanently teaches that subject at Crude precision and makes it available for the next world.',
+    'At Home, choose which learned instruments to take on the next trip. Departure keeps that set and its precision unchanged for the expedition.',
+    'In the world, use Survey only while no encounter is active. It reads every valid carried instrument in a consistent order, records the observations, and costs one turn.',
   ],
   instruments: [
     ['sunglass', 'Sunglass', 'Illumination', '30 Essence · 3 Copper · 2 Quartz'],
@@ -25,18 +25,18 @@ export const surveyPostFirstUse = {
   loadoutAndSurvey: [
     'An unconfigured next-trip loadout carries every owned instrument. The first change creates an explicit choice; an explicit empty loadout remains empty after relaunch.',
     'Instruments are permanent Reality capabilities, not Storehouse stacks, Field Kit supply entries, equipment, or output-bin objects. A full Storehouse or Waiting pile cannot block studying or improving one.',
-    'The active World Field Kit tray is read-only: it shows only the exact subjects and precisions frozen at departure. Home changes cannot alter that expedition.',
+    'In a world, the Field Kit shows only the subjects and precision chosen at departure. Changes made at Home apply to a later expedition, not the current one.',
     'Survey consumes no instrument and promises no coordinate, resource, site, traveller, fog reveal, or map completion. It records only the carried subjects and advances one ordinary turn.',
   ],
   refusalAndRelaunch: [
-    'Before a durable construction or Research receipt, a shortfall, stale preview, unavailable Mara, busy action, or failed save spends nothing and keeps the current preview truthful.',
-    'No packed valid instrument says so; an active encounter must finish first. A stale field state records neither an observation nor a turn.',
-    'Mara being away changes only the current Home Research discount. It does not lock the station, remove ownership, or rewrite a completed cost.',
-    'After relaunch, the station, completed Research, explicit Home loadout, frozen expedition instruments, and observations retain their durable truth without a duplicate grant, reading, or spend.',
+    'If something is missing, the preview changes, Mara is unavailable, another action is busy, or the game cannot save, nothing is spent.',
+    'If no usable instrument is packed, the game says so; an active encounter must finish first. If the world changes before Survey completes, it records no observation and spends no turn.',
+    'When Mara is away, only her Home Research discount changes. The station and learned instruments remain available, and completed purchases keep their original price.',
+    'After reopening the game, the station, completed Research, chosen Home loadout, expedition instruments, and observations return as saved without duplicating a purchase or reading.',
   ],
   improvementBoundary: [
     'Crude → Good is playable now and needs two property-35+ Home materials and 20 Essence; Good → Fine needs three property-65+ materials and 50 Essence.',
-    'The current improvement automatically selects the weakest exact qualifying Home samples. Its preview and commitment own the exact Essence, material spend, and resulting precision.',
-    'Improvement preserves the same permanent instrument identity and affects only future departures; it never places a physical output in Storehouse or alters an active run.',
+    'An improvement automatically chooses the weakest suitable materials kept at Home. The preview shows the Essence, materials, and resulting precision before you confirm.',
+    'The improvement raises the same permanent instrument and affects only future departures; it never creates an item in Storehouse or alters an expedition already underway.',
   ],
 } as const;

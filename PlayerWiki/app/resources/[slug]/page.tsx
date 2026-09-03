@@ -65,13 +65,13 @@ export default async function ResourceDetail({
         />
       </div>
       <section className="article-section">
-        <h2>Current custody and approved direction</h2>
+        <h2>How it works now and how it will change</h2>
         <TruthPair current={`${resource.name} currently follows the acquisition, storage, trade, and recipe rules described on this page.`} accepted={futureResourceCopy(resource.name)} />
       </section>
       <section className="article-section">
         <h2>How to obtain it</h2>
         <dl className="fact-grid">
-          <div><dt>Current route</dt><dd>{resource.consumerAuthority.acquisition}</dd></div>
+          <div><dt>How to get it</dt><dd>{resource.consumerAuthority.acquisition}</dd></div>
           <div><dt>Trade</dt><dd>{resource.tradeStatus}</dd></div>
         </dl>
         <p>
@@ -102,12 +102,12 @@ export default async function ResourceDetail({
           <ul>
             {resource.consumerAuthority.otherConsumers.map((line) => <li key={line}>{line}</li>)}
           </ul>
-        ) : <p>No current service or research sink is listed for this resource.</p>}
+        ) : <p>No service or Research currently uses this resource.</p>}
       </section>
       <section className="article-section">
         <h2>Material role in current recipes</h2>
-        <p>Scalar stock pays only the fixed costs shown below. When a recipe instead asks for an exact physical or creature material, the recipe names that selection; a scalar count never silently replaces it.</p>
-        {craftUses.length ? <ul className="compact-list">{craftUses.map((recipe) => { const ingredient = recipe.ingredients.find((entry) => entry.resourceID === resource.id)!; const system = systemFor(recipe.system); return <li key={`${recipe.id}-role`}><Link href={`/crafting/${recipe.system}`}>{recipe.name}</Link> · {ingredient.role ?? 'fixed cost'}{ingredient.amount ? ` · ${ingredient.amount} required` : ''}{system ? ` at ${system.name}` : ''}</li>; })}</ul> : <p>This resource has no currently documented scalar recipe cost.</p>}
+        <p>Counted stock pays only the fixed costs shown below. When a recipe asks for a particular physical or creature material, it names that choice clearly; an ordinary resource count never replaces it.</p>
+        {craftUses.length ? <ul className="compact-list">{craftUses.map((recipe) => { const ingredient = recipe.ingredients.find((entry) => entry.resourceID === resource.id)!; const system = systemFor(recipe.system); return <li key={`${recipe.id}-role`}><Link href={`/crafting/${recipe.system}`}>{recipe.name}</Link> · {ingredient.role ?? 'ingredient'}{ingredient.amount ? ` · ${ingredient.amount} required` : ''}{system ? ` at ${system.name}` : ''}</li>; })}</ul> : <p>No current recipe lists this resource as a counted ingredient.</p>}
       </section>
       <section className="article-section">
         <h2>Craft recipes</h2>
@@ -119,7 +119,7 @@ export default async function ResourceDetail({
                   <th>Recipe</th>
                   <th>Output</th>
                   <th>System</th>
-                  <th>Exact resource use</th>
+                      <th>How much it uses</th>
                 </tr>
               </thead>
               <tbody>

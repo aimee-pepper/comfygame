@@ -12,7 +12,7 @@ export type SystemGuideCategory = {
 };
 
 export const playerStartGuides: PlayerGuide[] = [
-  { label: 'Getting started', href: '/getting-started', summary: 'Create a campaign and begin the current route.' },
+  { label: 'Getting started', href: '/getting-started', summary: 'Create a campaign, write a Page, enter a world, and bring discoveries home.' },
   { label: 'Your current journey', href: '/journey', summary: 'Move from Writing through a world and back to the Village.' },
   { label: 'Current progression', href: '/resources/progression', summary: 'Choose a current next task without assuming a future gate order.' },
 ];
@@ -56,7 +56,7 @@ export const systemGuideCategories: SystemGuideCategory[] = [
     guides: [
       { label: 'Crafting', href: '/crafting', summary: 'Choose a station, exact inputs, material rules, and the current result.' },
       { label: 'Equipment', href: '/equipment', summary: 'Compare eight slots, item facts, material effects, and reforge routes.' },
-      { label: 'Inventory and custody', href: '/systems/inventory-custody', summary: 'Follow current items between storage, the Field Kit, and worn gear.' },
+      { label: 'Inventory and storage', href: '/systems/inventory-custody', summary: 'Follow items between the Storehouse, Waiting, the Field Kit, and worn gear.' },
       { label: 'Consumables and Field Kit', href: '/consumables', summary: 'Prepare carried supplies and choose their current use targets.' },
       { label: 'Economy and exchange', href: '/trading', summary: 'Trade, refine, and recycle through the current Village screens.' },
     ],

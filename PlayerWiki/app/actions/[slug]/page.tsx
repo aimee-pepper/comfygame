@@ -13,8 +13,8 @@ export default async function ActionDetail({ params }: { params: Promise<{ slug:
   return <SiteFrame sidebar>
     <GuideBreadcrumbs items={[{ label: 'Systems', href: '/systems' }, { label: 'Action reference', href: '/actions' }, { label: action.name }]} />
     <PageIntro eyebrow={action.group} title={action.name} summary={action.change} />
-    <section className="article-section"><h2>Current action facts</h2><dl className="fact-grid"><div><dt>Surface</dt><dd>{action.surface}</dd></div><div><dt>Available when</dt><dd>{action.availability}</dd></div><div><dt>Committed change</dt><dd>{action.change}</dd></div><div><dt>Cost</dt><dd>{action.cost}</dd></div></dl></section>
-    <section className="article-section two-column"><div><h2>What the result keeps</h2><p>{action.persistence}</p></div><div><h2>When it cannot complete</h2><p>{action.unavailable}</p></div></section>
+    <section className="article-section"><h2>How this action works</h2><dl className="fact-grid"><div><dt>Where you find it</dt><dd>{action.surface}</dd></div><div><dt>Available when</dt><dd>{action.availability}</dd></div><div><dt>What happens</dt><dd>{action.change}</dd></div><div><dt>Cost</dt><dd>{action.cost}</dd></div></dl></section>
+    <section className="article-section two-column"><div><h2>What the game saves</h2><p>{action.persistence}</p></div><div><h2>When it cannot complete</h2><p>{action.unavailable}</p></div></section>
     <RelatedGuides links={[{ label: 'All actions', href: '/actions' }, ...action.related, { label: 'Getting started', href: '/getting-started' }, { label: 'Journey', href: '/journey' }]} />
   </SiteFrame>;
 }

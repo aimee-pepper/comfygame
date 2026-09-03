@@ -19,13 +19,13 @@ export interface DesignReference {
 const systemLinks: DesignReferenceLink[] = [
   { href: '/journey', title: 'The player loop', summary: 'How Writing, exploration, return, Village work, preparation, and the next journey connect.' },
   { href: '/resources', title: 'Materials and resource identity', summary: 'World and creature materials, their acquisition, consumers, and intended physical vocabulary.' },
-  { href: '/systems/inventory-custody', title: 'Quality, stacks, and custody', summary: 'Subtype-and-quality stacks, alternate views, exact selection, return, storage, and relaunch.' },
+  { href: '/systems/inventory-custody', title: 'Quality, stacks, and storage', summary: 'Subtype-and-quality stacks, alternate views, deliberate selection, return, storage, and reopening the game.' },
   { href: '/crafting', title: 'Recipes and ingredient categories', summary: 'Static ingredients, broad types, precise subtypes, previews, quality, and commit rules.' },
   { href: '/resources/progression', title: 'Harvesting and processing progression', summary: 'Current tasks beside the intended tool, facility, processing, and recipe progression.' },
   { href: '/equipment', title: 'Equipment materials and quality', summary: 'How selected materials affect equipment now and in the accepted intended design.' },
   { href: '/world', title: 'World generation and resource hosting', summary: 'World pressures, ground, water, weather, ecology, and intended causal material placement.' },
-  { href: '/bestiary', title: 'Creatures, ecology, and physical drops', summary: 'Current encounter records beside the intended anatomy, habitat, and canonical-material rules.' },
-  { href: '/systems/world-writing', title: 'World Writing and targeting', summary: 'How authored pressures work now and how accepted resource and world-size targeting will fit.' },
+  { href: '/bestiary', title: 'Creatures, ecology, and physical drops', summary: 'Current encounters beside the intended anatomy, habitat, and physical-material rules.' },
+  { href: '/systems/world-writing', title: 'World Writing and targeting', summary: 'How written pressures work now and how accepted resource and world-size targeting will fit.' },
   { href: '/crafting', title: 'Individual crafting systems', summary: 'Open the separate Apothecary, maker, instrument, Distillery, Channelworks, Anchorage, and refining guides.' },
 ];
 

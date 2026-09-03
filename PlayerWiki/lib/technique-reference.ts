@@ -69,7 +69,7 @@ export const techniqueReferences: TechniqueReference[] = [
     name: component.name,
     group: gambitGroup[component.kind],
     source: `An owned Gambit ${component.kind} component.`,
-    eligible: 'Only the party member whose Gambit editor shows this owned component can use it in a rule; no gear grant is published for it.',
+    eligible: 'Only a party member who has learned this component can use it in a Gambit. It does not grant gear.',
     trigger: gambitTrigger[component.kind],
     target: gambitTarget[component.kind],
     result: component.blurb,

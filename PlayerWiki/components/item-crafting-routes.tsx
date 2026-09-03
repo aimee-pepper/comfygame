@@ -21,7 +21,7 @@ export function ItemCraftingRoutes({ item }: { item: Item }) {
     <>
       <section className="article-section">
         <h2>Current acquisition</h2>
-        {routes.length ? <div className="item-route-list">{routes.map((recipe) => { const system = systemFor(recipe.system); return <article className="note-card" key={recipe.id}><h3><Link href={`/crafting/${recipe.system}`}>{recipe.name}</Link></h3><p>Prepared at {system?.station ?? humanize(recipe.system)}. Its current output is {recipe.result}.</p><ul className="compact-list">{recipe.ingredients.map((ingredient, index) => <li key={`${recipe.id}-${index}`}>{ingredientLabel(ingredient)}</li>)}</ul></article>; })}</div> : <p>No current station preparation or construction recipe is published for this exact item. This guide does not infer another acquisition route.</p>}
+        {routes.length ? <div className="item-route-list">{routes.map((recipe) => { const system = systemFor(recipe.system); return <article className="note-card" key={recipe.id}><h3><Link href={`/crafting/${recipe.system}`}>{recipe.name}</Link></h3><p>Prepared at {system?.station ?? humanize(recipe.system)}. It makes {recipe.result}.</p><ul className="compact-list">{recipe.ingredients.map((ingredient, index) => <li key={`${recipe.id}-${index}`}>{ingredientLabel(ingredient)}</li>)}</ul></article>; })}</div> : <p>This item does not currently have a station recipe. Check the rest of its page for another known source.</p>}
       </section>
       {resources.length > 0 && <section className="article-section">
         <h2>Related resources</h2>

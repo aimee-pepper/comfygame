@@ -15,9 +15,9 @@ export default async function TechniqueDetail({ params }: { params: Promise<{ sl
   return <SiteFrame sidebar>
     <GuideBreadcrumbs items={[{ label: 'Systems', href: '/systems' }, { label: 'Combat', href: '/systems/combat' }, { label: 'Techniques and Gambits', href: '/techniques' }, { label: reference.name }]} />
     <PageIntro eyebrow={reference.group} title={reference.name} summary={reference.result} />
-    <section className="article-section"><h2>Current use</h2><dl className="fact-grid"><div><dt>Source or grant</dt><dd>{reference.source}</dd></div><div><dt>Who can use it</dt><dd>{reference.eligible}</dd></div><div><dt>Trigger</dt><dd>{reference.trigger}</dd></div><div><dt>Target</dt><dd>{reference.target}</dd></div></dl></section>
-    <section className="article-section two-column"><div><h2>Exact current result</h2><p>{reference.result}</p></div><div><h2>Costs, cooldowns, and limits</h2><p>{reference.limits}</p></div></section>
-    <section className="article-section note-card"><h2>Use the current card or rule</h2><p>The mounted combat card or Gambit editor is the final source for this action’s current readiness and target. A changed target, cooling technique, or incomplete rule does not commit a substitute action.</p></section>
+    <section className="article-section"><h2>How to use it</h2><dl className="fact-grid"><div><dt>How it is learned</dt><dd>{reference.source}</dd></div><div><dt>Who can use it</dt><dd>{reference.eligible}</dd></div><div><dt>When it activates</dt><dd>{reference.trigger}</dd></div><div><dt>Target</dt><dd>{reference.target}</dd></div></dl></section>
+    <section className="article-section two-column"><div><h2>What it does</h2><p>{reference.result}</p></div><div><h2>Costs, cooldowns, and limits</h2><p>{reference.limits}</p></div></section>
+    <section className="article-section note-card"><h2>Check the encounter before choosing</h2><p>The combat card or Gambit editor shows whether this action is ready and which targets are still valid. If the target changes, the technique is cooling down, or the Gambit is incomplete, the game will not silently use a different action.</p></section>
     <RelatedGuides links={[{ label: 'All techniques and Gambits', href: '/techniques' }, { label: 'Combat', href: '/systems/combat' }, { label: 'Party and Gear', href: '/systems/party-preparation' }, { label: 'Equipment', href: '/equipment' }, { label: 'Research', href: '/research' }]} />
   </SiteFrame>;
 }

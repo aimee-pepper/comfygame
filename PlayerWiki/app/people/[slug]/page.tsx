@@ -80,7 +80,7 @@ export default async function PersonDetail({
             <dd>{person.role}</dd>
           </div>
           <div>
-            <dt>Diary reward</dt>
+            <dt>Book reward</dt>
             <dd>{person.diaryReward}</dd>
           </div>
         </dl>

@@ -136,7 +136,7 @@ export const serviceGuides: ServiceGuide[] = [
     remember: [
       'The first completed build teaches Lesser Salve but does not prepare one.',
       'Writing ink and vial preparation remain at the Scriptorium.',
-      'Unknown recipes stay absent until current inference or another legitimate discovery adds them.',
+      'Unknown recipes stay hidden until your ingredients or another discovery teach them.',
     ],
   },
   {
@@ -182,7 +182,7 @@ export const serviceGuides: ServiceGuide[] = [
     useFor: [
       'Reviewing realms you have already held permanently',
       'Constructing an Anchor Frame from the required world materials',
-      'Starting a valid revisit from a saved realm snapshot',
+      'Returning to a world you have already anchored',
     ],
     workflow: [
       'Recruit Tovin, then build the Anchorage foundation in Home → Realms.',
@@ -225,7 +225,7 @@ export const serviceGuides: ServiceGuide[] = [
       'Read the recovered wording and any explicitly attached teaching.',
     ],
     selection:
-      'Choose the current collection and then the exact shelf or record you want to read.',
+      'Choose a collection, then the shelf or record you want to read.',
     result:
       'Opening a record changes what you are reading, not what the recovered record says. Unavailable wording remains unavailable rather than being filled in.',
     relatedGuides: [
@@ -259,7 +259,7 @@ export const serviceGuides: ServiceGuide[] = [
     selection:
       'Choose the instrument you want to study or add to your next loadout. The Field Kit shows only the instruments you packed before the expedition began.',
     result:
-      'A successful study, loadout change, or Survey is saved before it takes effect. If the action cannot be completed, your learned instruments, packed set, observations, and current turn do not change.',
+      'A study, loadout change, or Survey takes effect only after it saves successfully. If it cannot be completed, your learned instruments, packed set, observations, and world turn do not change.',
     relatedGuides: [
       { label: 'Mara', href: '/people/mara' },
       { label: 'Survey Post construction', href: '/buildings/survey-post' },
@@ -268,7 +268,7 @@ export const serviceGuides: ServiceGuide[] = [
       { label: 'World conditions', href: '/world' },
     ],
     remember: [
-      'An instrument is a permanent Reality capability, never a Storehouse, Field Kit supply, or equipment object.',
+      'An instrument is a permanent field skill, not a physical Storehouse item, Field Kit supply, or piece of equipment.',
       'A Survey advances one turn and records observations; it does not promise a coordinate, resource, site, traveller, or map reveal.',
       'Precision improvements are planned, but are not listed as usable upgrades until the game can show their full cost and result before confirmation.',
     ],
@@ -280,7 +280,7 @@ export const serviceGuides: ServiceGuide[] = [
     summary:
       'Choose which recruited people travel with you and which remain safely at home.',
     useFor: [
-      'Sending a current companion home',
+      'Sending a travelling companion home',
       'Adding an available resident to the travelling party',
       'Reviewing party-capacity consequences before a transfer',
     ],
@@ -311,7 +311,7 @@ export const serviceGuides: ServiceGuide[] = [
     summary:
       'Review the people travelling with you, equip stored gear, and prepare combat Gambits before entering a world.',
     useFor: [
-      'Reviewing health, rank and current placement',
+      'Reviewing health, rank, and whether someone is at Home or in the party',
       'Equipping and removing eligible gear',
       'Editing the priority order and conditions of Gambits',
     ],
@@ -323,7 +323,7 @@ export const serviceGuides: ServiceGuide[] = [
     selection:
       'Choose one party member, then the Gear or Gambit you want to change. Gear keeps its equipment slot, and Gambits keep their shown priority order.',
     result:
-      'A completed change keeps the shown equipped item or Gambit order for later preparation. An ineligible gear choice or unfinished edit leaves the current setup unchanged.',
+      'A successful change saves the equipped item or Gambit order you chose. An ineligible gear choice or unfinished edit leaves the earlier setup unchanged.',
     relatedGuides: [
       { label: 'People', href: '/people' },
       { label: 'Equipment', href: '/equipment' },
@@ -343,18 +343,18 @@ export const serviceGuides: ServiceGuide[] = [
       'Refine Raw Essence into spendable Essence Crystals and manage progression that changes the return economy.',
     useFor: [
       'Refining a chosen amount of Raw Essence',
-      'Reviewing the current refinement return',
+      'Reviewing how many Essence Crystals refining will provide',
       'Unlearning eligible combat techniques',
     ],
     workflow: [
       'Choose the Raw Essence amount or refine all.',
-      'Review how many Essence Crystals you will receive at the current rate.',
-      'Commit the refinement.',
+      'Review how many Essence Crystals you will receive at the displayed rate.',
+      'Confirm the refinement.',
     ],
     selection:
       'Choose an amount of Raw Essence, or refine all of it, then review how many Essence Crystals you will receive.',
     result:
-      'Only a completed refinement exchanges the selected Raw Essence for the shown Essence Crystals. If the amount or rate no longer matches, the current reserve remains unchanged.',
+      'A successful refinement exchanges the chosen Raw Essence for the number of Essence Crystals shown. If the amount or rate changes before confirmation, your Raw Essence remains unchanged.',
     relatedGuides: [
       { label: 'Raw Essence', href: '/resources/essence-raw' },
       { label: 'Crafting systems', href: '/crafting' },

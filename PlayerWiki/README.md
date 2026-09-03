@@ -13,6 +13,10 @@ This is the public, player-facing Bookbinder wiki. It is deliberately separate f
 - Desktop directory pages use the available viewport width with modest edge gutters and left-anchored navigation. The sidebar and article have independent vertical scroll regions; narrow screens return to one ordinary document flow.
 - Visuals sit on the pages for the things they depict; there is no separate visual-assets section.
 - Internal source paths, provenance, stable identifiers, roadmap status, and decision history are excluded from the player surface.
+- Informational copy uses roughly 75% plain, warm language and no more than 25% storybook flavour. A player should understand the practical meaning on the first read.
+- Character dialogue and recovered book prose may keep each writer's distinctive voice. Directory labels, summaries, instructions, availability messages, tables, and rules must never hide their meaning behind that voice.
+- Development shorthand such as “route published,” “custody,” “stale quote,” “receipt owner,” “retained identity,” and “committed result” is translated into the action a player sees: available in the game, stored or carried, review the changed preview, saved result, same selected item, and what happens after confirmation.
+- Content that is accepted but not yet playable begins with a visible `Planned` label and describes the intended player experience. It is never phrased as a missing “published route.”
 - `scripts/sync-content.mjs` creates a sanitized, read-only player snapshot from implemented content and copies only the related visuals used by these pages. It is not a runtime asset catalogue or source of gameplay truth.
 
 ## Local use

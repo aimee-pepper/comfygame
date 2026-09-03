@@ -35,8 +35,8 @@ export const craftingSystems: CraftingSystem[] = [
     summary:
       'Make remedies, coatings and field supplies from named resources and property-matched natural samples.',
     access: ['Build the Apothecary.', 'Use a recipe that is currently known.'],
-    materialChoice: 'When a preparation asks for a sample, choose the exact weakest qualifying sample shown by that recipe. Scent Mask uses its separate exact creature-material selection.',
-    commitResult: 'A committed preparation spends the named scalar resources, current Essence or Mote cost, and selected input only when output room is available; it produces the listed item.',
+    materialChoice: 'When a preparation needs a natural sample, the recipe shows which of your qualifying samples it will use, beginning with the weakest suitable one. Scent Mask has its own creature-material choice.',
+    commitResult: 'The named resources, Essence or Mote cost, and chosen material are spent together after the result has somewhere to go. You then receive the listed item.',
     howItWorks: [
       'Learn or infer the preparation.',
       'Choose any required natural sample that meets the shown property floor.',
@@ -49,14 +49,14 @@ export const craftingSystems: CraftingSystem[] = [
     station: 'Blacksmith',
     stationID: 'blacksmith',
     summary:
-      'Construct a Pointed Blade from an exact point and grip; material quality and family shape the finished weapon.',
-    access: ['Build the Blacksmith.', 'Use the stable Pointed Blade schematic.'],
-    materialChoice: 'Choose one exact point and one exact grip from the family allowed by each socket; the selected materials shape the current quality and combat form.',
-    commitResult: 'A committed construction spends the selected point, grip, and shown Essence cost, then creates one persistent weapon.',
+      'Construct a Pointed Blade from one suitable point and one suitable grip; their material and quality shape the finished weapon.',
+    access: ['Build the Blacksmith.', 'Learn the Pointed Blade schematic.'],
+    materialChoice: 'Choose one point and one different grip from the families allowed by the recipe. Their material and quality shape the weapon’s combat form.',
+    commitResult: 'Making the weapon spends the chosen point, grip, and displayed Essence cost together, then stores one Pointed Blade.',
     howItWorks: [
       'Select one eligible point and one eligible grip.',
       'Review the resulting quality, combat shape and Essence cost.',
-      'Constructing consumes those exact samples and creates one persistent weapon.',
+      'Constructing consumes both chosen materials and creates one weapon.',
     ],
   },
   {
@@ -66,9 +66,9 @@ export const craftingSystems: CraftingSystem[] = [
     stationID: 'tannery',
     summary:
       'Turn flexible, living and structural samples into coats, gloves and boots.',
-    access: ['Build the Tannery.', 'Meet the current wear research or tier gate for the chosen pattern.'],
-    materialChoice: 'Every named outer, lining, palm, binding, upper, and sole socket accepts only its shown families and properties; the primary selected pieces contribute most strongly to the result.',
-    commitResult: 'A committed construction spends the selected exact stock and shown Essence together, then creates the selected protective item.',
+    access: ['Build the Tannery.', 'Learn the required wear Research or reach the tier shown by the chosen pattern.'],
+    materialChoice: 'Every named outer layer, lining, palm, binding, upper, and sole accepts only the material choices shown for that part; the main selected pieces contribute most strongly to the result.',
+    commitResult: 'Making the item spends all chosen materials and the displayed Essence cost together, then stores the selected coat, gloves, or boots.',
     howItWorks: [
       'Choose a distinct sample for every named part.',
       'Higher-quality primary pieces contribute most strongly to the result.',
@@ -82,9 +82,9 @@ export const craftingSystems: CraftingSystem[] = [
     stationID: 'bowyer',
     summary:
       'Build far-reaching physical weapons without maintaining a separate ammunition inventory.',
-    access: ['Build the Bowyer.', 'Meet the current broaden or masterwork research gate for the chosen design.'],
-    materialChoice: 'Choose the limbs, cord, projectile, edges, pouch, or grip only from the families accepted by that socket; the current preview shows the quality supported by those selections.',
-    commitResult: 'A committed construction consumes the shown exact components and creates the selected longbow, sling, or throwing set.',
+    access: ['Build the Bowyer.', 'Learn the Research required by the chosen design.'],
+    materialChoice: 'Choose the limbs, cord, projectile, edges, pouch, or grip from the material families accepted by that part of the recipe. The preview shows the quality those choices support.',
+    commitResult: 'Making the weapon consumes the components in the preview and stores the selected longbow, sling, or throwing set.',
     howItWorks: [
       'Choose the limbs, cord, projectile or edges required by the design.',
       'The preview shows the quality the selected stock can support.',
@@ -97,14 +97,14 @@ export const craftingSystems: CraftingSystem[] = [
     station: 'The Weaponsmith',
     stationID: 'weaponsmith',
     summary:
-      'Fit current points, edges and mauls around exact components and a learned fitting pattern.',
+      'Build fitted points, edges, mauls, and polearms from compatible heads, supports, fittings, and a learned pattern.',
     access: ['Build the Weaponsmith.', 'Use the learned fitting pattern for the selected design.'],
-    materialChoice: 'Choose the head or edge, supporting structure, and fitting from the exact metal or creature-material families accepted by each socket.',
-    commitResult: 'A committed construction creates the chosen fitted weapon and freezes its selected material facts into the finished result.',
+    materialChoice: 'Choose the head or edge, supporting structure, and fitting from the metal or creature-material families accepted by each part of the recipe.',
+    commitResult: 'Making the weapon spends all materials shown in the preview and stores their material details on the finished piece.',
     howItWorks: [
       'Select the head or edge, supporting structure and fitting.',
-      'Choose the current fitted design shown by the station.',
-      'The finished weapon freezes its selected materials and resulting combat facts.',
+      'Choose one fitted design available at the station.',
+      'The finished weapon keeps its selected materials and the combat statistics they produce.',
     ],
   },
   {
@@ -115,12 +115,12 @@ export const craftingSystems: CraftingSystem[] = [
     summary:
       'Rebuild one existing protective item in place as a rigid, insulated or balanced construction.',
     access: ['Build the Armoury.', 'Choose an eligible stored or worn protective item.'],
-    materialChoice: 'Choose the exact body, layer, lining, binding, and fitting samples accepted by the selected Rigid, Insulated, or Balanced profile.',
-    commitResult: 'A committed rebuild spends the selected samples and shown Essence, replaces the protection profile, and preserves the item’s stable physical history.',
+    materialChoice: 'Choose the body, layer, lining, binding, and fitting materials accepted by the selected Rigid, Insulated, or Balanced profile.',
+    commitResult: 'Rebuilding spends the chosen materials and displayed Essence, replaces the protection profile, and keeps the same item and its history.',
     howItWorks: [
       'Choose an eligible stored or worn protective item.',
-      'Choose one exact sample for each layer, body, binding or fitting.',
-      'The rebuild keeps the item identity but replaces its construction profile and spends the shown Essence.',
+      'Choose one material for each layer, body, binding, or fitting.',
+      'The rebuild keeps the same item but replaces its construction profile and spends the displayed Essence.',
     ],
   },
   {
@@ -131,13 +131,13 @@ export const craftingSystems: CraftingSystem[] = [
     summary:
       'Study permanent world-reading capabilities at the Survey Post, then improve them to Good or Fine precision.',
     access: ['Build the Survey Post and study one of the eight named Research nodes.'],
-    materialChoice: 'Good and Fine improvements automatically use the weakest exact samples that meet the instrument’s displayed property requirement.',
-    commitResult: 'Research grants one named subject at Crude precision. A committed improvement spends its shown Essence and qualifying samples, then raises that permanent capability to Good or Fine.',
+    materialChoice: 'Good and Fine improvements automatically use the weakest materials that meet the instrument’s displayed requirement.',
+    commitResult: 'Research teaches one named subject at Crude precision. An improvement spends its displayed Essence and qualifying materials, then permanently raises that subject to Good or Fine.',
     howItWorks: [
       'Study one named instrument from Field Instruments Research; it becomes a permanent capability rather than an item.',
       'Choose the owned subjects to pack at Home; departure freezes their set and precision for that world.',
       'Use Survey in the world to record every valid carried subject for one turn.',
-      'At the Survey Post, review and commit a Good or Fine precision improvement when the exact costs are ready.',
+      'At the Survey Post, review and confirm a Good or Fine precision improvement when you have all of its costs.',
     ],
   },
   {
@@ -146,13 +146,13 @@ export const craftingSystems: CraftingSystem[] = [
     station: 'The Distillery',
     stationID: 'distillery',
     summary:
-      'Directly attune Heat, Caustic, or Light through qualifying exact materials and 16 Essence.',
-    access: ['Auber has enabled and the Distillery is built.', 'The selected attunement, its exact material, catalyst, 16 Essence, and output storage are available.'],
-    materialChoice: 'Choose the qualifying provenance-bearing sample and exact catalyst named by the selected attunement preview.',
-    commitResult: 'A committed attunement spends 16 Essence and its listed inputs to create the selected Heat, Caustic, or Light Core. There is no blank-core step.',
+      'Distil a Heat, Caustic, or Light Core from suitable materials, its named catalyst, and 16 Essence.',
+    access: ['Meet Auber and build the Distillery.', 'Have the required material, catalyst, 16 Essence, and room for the finished Core.'],
+    materialChoice: 'Choose a suitable material sample and the catalyst named by the selected attunement preview.',
+    commitResult: 'Distilling spends 16 Essence and the listed ingredients together, then stores the selected Heat, Caustic, or Light Core. There is no blank-core step.',
     howItWorks: [
       'Choose Heat, Caustic, or Light attunement.',
-      'Select a qualifying provenance-bearing sample and the exact catalyst.',
+      'Select a suitable material sample and the required catalyst.',
       'Spend 16 Essence to create the selected Core.',
     ],
   },
@@ -162,13 +162,13 @@ export const craftingSystems: CraftingSystem[] = [
     station: 'The Channelworks',
     stationID: 'channelworks',
     summary: 'Convert one valid player-made Heat Core into one stored Heat Conduit Fixture.',
-    access: ['Oda has enabled and the Channelworks is built.', 'One valid Heat Core remains in the quoted custody and the Fixture has room.'],
-    materialChoice: 'The process accepts the exact valid Heat Core named by the preview; it has no substitute catalyst or generic material selection.',
-    commitResult: 'A committed process consumes the Heat Core and stores the Fixture. The current loop ends at that stored Fixture.',
+    access: ['Meet Oda and build the Channelworks.', 'Have the Heat Core shown by the preview and room to store the Fixture.'],
+    materialChoice: 'The process uses the specific Heat Core selected in the preview. It does not accept another catalyst or a generic material in its place.',
+    commitResult: 'Confirming consumes the selected Heat Core and stores one Fixture. The playable process currently ends with that stored Fixture.',
     howItWorks: [
       'Select the valid Heat Core shown by the station.',
-      'Review the exact input and output destination.',
-      'Commit one Fixture only when the quoted Core and storage remain valid.',
+      'Review the selected Core and where the Fixture will be stored.',
+      'Confirm only while that Core and storage space are still available.',
     ],
   },
   {
@@ -176,14 +176,14 @@ export const craftingSystems: CraftingSystem[] = [
     name: 'Anchor Frame',
     station: 'The Anchorage',
     stationID: 'anchorage',
-    summary: 'Assemble one portable Anchor Frame from six distinct exact materials and Essence.',
-    access: ['Tovin has enabled and the Anchorage is built.', 'Six distinct selected materials, 60 Essence, and output custody remain valid.'],
+    summary: 'Assemble one portable Anchor Frame from six different materials and Essence.',
+    access: ['Tovin has enabled and the Anchorage is built.', 'Six different selected materials, 60 Essence, and enough output space remain available.'],
     materialChoice: 'Choose two materials with hardness 65+, two with density 65+, one with flexibility 55+, and one with reactivity 65+. No selected material may fill two positions.',
-    commitResult: 'A committed frame spends its exact six selected units and 60 Essence, then stores one Frame in the quoted Storehouse or Waiting destination. Its later field use belongs to a valid natural anchoring route.',
+    commitResult: 'Making a Frame spends the six chosen materials and 60 Essence together, then places one Frame in the Storehouse or Waiting destination shown. You can later use it at a suitable natural anchor.',
     howItWorks: [
       'Fill each of the six distinct property positions.',
       'Review the selected material history and 60 Essence cost.',
-      'Commit one portable Anchor Frame into the shown custody.',
+      'Create one portable Anchor Frame and place it in the destination shown.',
     ],
   },
   {
@@ -195,10 +195,10 @@ export const craftingSystems: CraftingSystem[] = [
       'Convert Raw Essence into spendable Essence Crystals at the current refinement rate.',
     access: ['Open the Essence Spring.'],
     materialChoice: 'Choose a stored Raw Essence amount or use the available refine-all action.',
-    commitResult: 'A committed refinement converts the chosen Raw Essence at the exact rate shown in the current preview; later capability can improve that rate.',
+    commitResult: 'Refining converts the chosen Raw Essence at the rate shown in the preview. Later Research can improve that rate.',
     howItWorks: [
       'Choose an amount of stored Raw Essence or refine all.',
-      'The preview shows the exact Crystal return.',
+      'The preview shows how many Essence Crystals you will receive.',
       'Later capability can improve the rate and settle newly returned Raw automatically.',
     ],
   },
@@ -211,7 +211,7 @@ export const craftingSystems: CraftingSystem[] = [
       'Prepare CMY and Depth ink applications for eligible source marks on a Page.',
     access: ['Open the Writing Desk and choose eligible source marks on a Page.'],
     materialChoice: 'Choose Cyan, Magenta, Yellow, and Depth proportions from Copper, Ichor, Sulfur, and Obsidian stock; Resin seals the vial.',
-    commitResult: 'A committed preparation creates a 12-application vial. Binding spends one matching application for each inked source it uses.',
+    commitResult: 'Preparing the ink creates a vial with 12 applications. Binding spends one matching application for each inked source it uses.',
     howItWorks: [
       'Choose Cyan, Magenta, Yellow and Depth proportions.',
       'Copper, Ichor, Sulfur and Obsidian supply those channels; Resin seals the vial.',
@@ -452,7 +452,7 @@ export const craftingRecipes: CraftRecipe[] = [
       ...e('Grip', ['fiber', 'timber', 'copper', 'silver', 'gold']),
     ],
     notes:
-      'Creature Fang, Quill, Bone, Tusk, Horn, Hide, Pelt and Fin can also fill eligible sockets.',
+      'Creature Fang, Quill, Bone, Tusk, Horn, Hide, Pelt and Fin can also fill compatible recipe parts.',
   },
   {
     id: 'supple-coat',
@@ -470,7 +470,7 @@ export const craftingRecipes: CraftRecipe[] = [
     result: 'Working Gloves',
     ingredients: [...e('Hand', ['fiber']), ...e('Facing', [])],
     notes:
-      'Uses property-bearing creature and world samples chosen for the shown sockets.',
+      'Uses creature and world materials chosen for the parts shown in the recipe.',
   },
   {
     id: 'working-boots',
@@ -490,7 +490,7 @@ export const craftingRecipes: CraftRecipe[] = [
     result: 'Longbow',
     ingredients: [...e('Limbs', ['timber']), ...e('String', ['fiber'])],
     notes:
-      'Horn, Quill, Bone, Hide and Fin can substitute in eligible sockets.',
+      'Horn, Quill, Bone, Hide and Fin can substitute for compatible recipe parts.',
     readiness: 'Current Tier 0 Bowyer recipe once the Bowyer is built.',
   },
   {
@@ -584,7 +584,7 @@ export const craftingRecipes: CraftRecipe[] = [
       ...e('Linings', ['fiber']),
       ...e('Outer', ['ore', 'copper', 'adamant', 'timber']),
     ],
-    notes: 'Many creature materials also qualify for the exact layers shown.',
+    notes: 'Many creature materials can also fill the layers shown in the recipe.',
     readiness: 'Current Tier 1 Armoury profile after the named Broaden capability is available.',
   },
   {
@@ -692,7 +692,7 @@ export const craftingRecipes: CraftRecipe[] = [
     result: 'Essence Crystals',
     ingredients: [r('essence_raw', 1, 'input currency')],
     notes:
-      'The output rate is shown before committing and can improve through progression.',
+      'The output rate is shown before you confirm and can improve through progression.',
   },
   {
     id: 'prepared-ink',
@@ -738,14 +738,14 @@ export function recipesFor(slug: string) {
 }
 
 export function recipeReadiness(recipe: CraftRecipe) {
-  return recipe.readiness ?? 'Current once the named station, recipe knowledge, exact inputs, and output custody shown by its preview are ready.';
+  return recipe.readiness ?? 'Available when its station is open, the recipe is known, the shown ingredients are ready, and there is room for the result.';
 }
 
 export const definedButNotLiveCrafting = [
 ] as const;
 
 export const scheduledButNotLiveStations = [
-  'Menagerie and Deep Works are scheduled construction concepts, not current player stations or recipe routes.',
+  'The Menagerie and Deep Works are planned buildings. They are not available crafting stations yet.',
 ] as const;
 
 export function definedButNotLiveForSystem(slug: string) {

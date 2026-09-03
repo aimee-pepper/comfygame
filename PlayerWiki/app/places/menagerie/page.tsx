@@ -19,7 +19,7 @@ export default function MenageriePage() {
       </section>
       <section className="article-section note-card">
         <h2>What this page does not invent</h2>
-        <p>No retained Menagerie artwork, exact foundation cost, or separate station-action reference is published in the current Player Wiki snapshot. Those details remain absent here until their exact player-facing sources are available.</p>
+        <p><strong>Planned:</strong> the Menagerie’s artwork, foundation cost, and individual actions have not been finalized for players yet. They will be added here once those parts are ready for the game.</p>
       </section>
       <RelatedGuides links={[{ label: 'Animals and companionship', href: '/systems/animals-companionship' }, { label: 'Attend an animal', href: '/actions/attend-animal' }, { label: 'Bestiary records', href: '/bestiary' }, { label: 'Party preparation', href: '/systems/party-preparation' }]} />
     </SiteFrame>

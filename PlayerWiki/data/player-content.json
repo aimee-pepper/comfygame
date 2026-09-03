@@ -16,19 +16,19 @@
       ],
       "tradeBand": "Staple",
       "isRealityCurrency": false,
-      "acquisition": "Rank-0 mineral node; hard Substrate/Relief; staple trade",
+      "acquisition": "Mineral nodes requiring Extraction 0; hard Substrate/Relief; sold as a staple good",
       "tradeStatus": "Staple trade band",
       "currentUses": [
         "No current Village construction recipe uses this resource."
       ],
       "consumerAuthority": {
-        "acquisition": "Rank-0 mineral node; hard Substrate/Relief; staple trade",
+        "acquisition": "Mineral nodes requiring Extraction 0; hard Substrate/Relief; sold as a staple good",
         "buildingConsumers": [],
         "recipeConsumers": [
-          "exact units may satisfy compatible physical sockets"
+          "individual pieces of material may satisfy matching physical recipe parts"
         ],
         "otherConsumers": [
-          "scalar stock can only be sold"
+          "Can currently be sold but has no other use"
         ]
       },
       "assetURL": "/game-assets/resources/rubble.png"
@@ -48,7 +48,7 @@
       ],
       "tradeBand": "Staple",
       "isRealityCurrency": false,
-      "acquisition": "Rank-0 wet, soft Substrate node; staple trade",
+      "acquisition": "Wet, soft Substrate deposits requiring Extraction 0; sold as a staple good",
       "tradeStatus": "Staple trade band",
       "currentUses": [
         "Used to construct the Armoury.",
@@ -58,15 +58,15 @@
         "Used to construct the Distillery."
       ],
       "consumerAuthority": {
-        "acquisition": "Rank-0 wet, soft Substrate node; staple trade",
+        "acquisition": "Wet, soft Substrate deposits requiring Extraction 0; sold as a staple good",
         "buildingConsumers": [
           "Reliquary 8, Scriptorium 10, Armoury 12, Apothecary 16, Distillery 30"
         ],
         "recipeConsumers": [
-          "compatible exact units in physical making"
+          "individual pieces of material that fit the recipe"
         ],
         "otherConsumers": [
-          "Armoury research totals 22"
+          "Armoury Research uses 22 in total"
         ]
       },
       "assetURL": "/game-assets/resources/clay.png"
@@ -86,7 +86,7 @@
       ],
       "tradeBand": "Staple",
       "isRealityCurrency": false,
-      "acquisition": "Rank-0 mineral node; current sites; staple trade; legacy Recycler",
+      "acquisition": "Mineral nodes requiring Extraction 0; some discovered sites; sold as a staple good; returned by recycling some older gear",
       "tradeStatus": "Staple trade band",
       "currentUses": [
         "Used to construct the Blacksmith.",
@@ -98,15 +98,15 @@
         "Used to construct the Anchorage."
       ],
       "consumerAuthority": {
-        "acquisition": "Rank-0 mineral node; current sites; staple trade; legacy Recycler",
+        "acquisition": "Mineral nodes requiring Extraction 0; some discovered sites; sold as a staple good; returned by recycling some older gear",
         "buildingConsumers": [
           "Blacksmith 12, Survey Post 8, Reliquary 12, Armoury 28, Weaponsmith 32, Channelworks 50, Anchorage 40"
         ],
         "recipeConsumers": [
-          "compatible exact units across physical makers"
+          "individual pieces of material at compatible crafting stations"
         ],
         "otherConsumers": [
-          "Spring, Hold, Satchel, Bargain, instruction and permanence research"
+          "Used by Spring, Hold, Satchel, Bargain, Gambit, and Permanence Research"
         ]
       },
       "assetURL": "/game-assets/resources/ore.png"
@@ -126,23 +126,23 @@
       ],
       "tradeBand": "Uncommon",
       "isRealityCurrency": false,
-      "acquisition": "Rank-1 ductile/volatile seam; uncommon trade",
+      "acquisition": "Ductile or volatile seams requiring Extraction 1; sold as an uncommon good",
       "tradeStatus": "Uncommon trade band",
       "currentUses": [
         "Used to construct the Armoury.",
         "Used to construct the Weaponsmith."
       ],
       "consumerAuthority": {
-        "acquisition": "Rank-1 ductile/volatile seam; uncommon trade",
+        "acquisition": "Ductile or volatile seams requiring Extraction 1; sold as an uncommon good",
         "buildingConsumers": [
           "Armoury 8, Weaponsmith 12"
         ],
         "recipeConsumers": [
           "Cyan pigment",
-          "compatible fittings/bindings/grips"
+          "can fill a matching Fitting, Binding, or Grip part"
         ],
         "otherConsumers": [
-          "maker progression, Brush, Ink Mixing, Sunglass and Level"
+          "Used by maker Research, Brush, Ink Mixing, Sunglass and Level"
         ]
       },
       "assetURL": "/game-assets/resources/copper.png"
@@ -163,20 +163,20 @@
       ],
       "tradeBand": "Rare",
       "isRealityCurrency": false,
-      "acquisition": "Rank-2 rich ductile seam; rare sale",
+      "acquisition": "Rich ductile seams requiring Extraction 2; sold as a rare material",
       "tradeStatus": "Rare trade band",
       "currentUses": [
         "Used to construct the Distillery.",
         "Used to construct the Channelworks."
       ],
       "consumerAuthority": {
-        "acquisition": "Rank-2 rich ductile seam; rare sale",
+        "acquisition": "Rich ductile seams requiring Extraction 2; sold as a rare material",
         "buildingConsumers": [
           "Distillery 20, Channelworks 20"
         ],
         "recipeConsumers": [
           "Light Core catalyst 2",
-          "compatible fittings"
+          "can fill a matching Fitting part"
         ],
         "otherConsumers": [
           "Ruling Frame, Fountain Pen, four precision instruments and every Page Lens tier"
@@ -199,21 +199,21 @@
       ],
       "tradeBand": "Precious",
       "isRealityCurrency": false,
-      "acquisition": "Rank-2 very rich ductile seam; precious sale",
+      "acquisition": "Very rich ductile seams requiring Extraction 2; sold as a precious material",
       "tradeStatus": "Precious trade band",
       "currentUses": [
         "Used to construct the Weaponsmith."
       ],
       "consumerAuthority": {
-        "acquisition": "Rank-2 very rich ductile seam; precious sale",
+        "acquisition": "Very rich ductile seams requiring Extraction 2; sold as a precious material",
         "buildingConsumers": [
           "Weaponsmith 4"
         ],
         "recipeConsumers": [
-          "compatible fittings/bindings/grips"
+          "can fill a matching Fitting, Binding, or Grip part"
         ],
         "otherConsumers": [
-          "Weaponsmith broaden/masterwork 6 total"
+          "Weaponsmith upgrades use 6 in total"
         ]
       },
       "assetURL": "/game-assets/resources/gold.png"
@@ -234,7 +234,7 @@
       ],
       "tradeBand": "Uncommon",
       "isRealityCurrency": false,
-      "acquisition": "Rank-1 hard seam; clear air/high light; uncommon trade",
+      "acquisition": "Hard seams requiring Extraction 1; clear air/high light; sold as an uncommon good",
       "tradeStatus": "Uncommon trade band",
       "currentUses": [
         "Used to construct the Survey Post.",
@@ -244,15 +244,15 @@
         "Used to construct the Anchorage."
       ],
       "consumerAuthority": {
-        "acquisition": "Rank-1 hard seam; clear air/high light; uncommon trade",
+        "acquisition": "Hard seams requiring Extraction 1; clear air/high light; sold as an uncommon good",
         "buildingConsumers": [
           "Survey Post 2, Apothecary 6, Distillery 30, Channelworks 20, Anchorage 20"
         ],
         "recipeConsumers": [
-          "Seamlight 1, Farsight 1, exact optical/Light Core selection"
+          "Seamlight 1, Farsight 1, optical materials and the Light Core ingredient"
         ],
         "otherConsumers": [
-          "Spring 22, pen work 14, seven instruments, four Page Lens tiers"
+          "22 for Spring upgrades, 14 for Penmanship, plus seven instruments and four Page Lens tiers"
         ]
       },
       "assetURL": "/game-assets/resources/quartz.png"
@@ -272,17 +272,17 @@
       ],
       "tradeBand": "Uncommon",
       "isRealityCurrency": false,
-      "acquisition": "Rank-1 ash/geothermal seam; uncommon trade",
+      "acquisition": "Ash or geothermal seams requiring Extraction 1; sold as an uncommon good",
       "tradeStatus": "Uncommon trade band",
       "currentUses": [
         "No current Village construction recipe uses this resource."
       ],
       "consumerAuthority": {
-        "acquisition": "Rank-1 ash/geothermal seam; uncommon trade",
+        "acquisition": "Ash or geothermal seams requiring Extraction 1; sold as an uncommon good",
         "buildingConsumers": [],
         "recipeConsumers": [
-          "Depth pigment",
-          "compatible exact edges/points"
+          "provides Depth pigment",
+          "a compatible Edge or Point"
         ],
         "otherConsumers": []
       },
@@ -304,13 +304,13 @@
       ],
       "tradeBand": "Staple",
       "isRealityCurrency": false,
-      "acquisition": "Rank-0 saline/briny/low-water deposit; staple trade",
+      "acquisition": "Saline, briny, or low-water deposits requiring Extraction 0; sold as a staple good",
       "tradeStatus": "Staple trade band",
       "currentUses": [
         "Used to construct the Tannery."
       ],
       "consumerAuthority": {
-        "acquisition": "Rank-0 saline/briny/low-water deposit; staple trade",
+        "acquisition": "Saline, briny, or low-water deposits requiring Extraction 0; sold as a staple good",
         "buildingConsumers": [
           "Tannery 8"
         ],
@@ -318,7 +318,7 @@
           "Clearing Draught 1, Solvent 1"
         ],
         "otherConsumers": [
-          "Fitted Layers 4"
+          "Fitted Layers Research uses 4"
         ]
       },
       "assetURL": "/game-assets/resources/salt.png"
@@ -338,13 +338,13 @@
       ],
       "tradeBand": "Uncommon",
       "isRealityCurrency": false,
-      "acquisition": "Rank-0 hot volatile/geothermal deposit; uncommon trade",
+      "acquisition": "Hot volatile or geothermal deposits requiring Extraction 0; sold as an uncommon good",
       "tradeStatus": "Uncommon trade band",
       "currentUses": [
         "No current Village construction recipe uses this resource."
       ],
       "consumerAuthority": {
-        "acquisition": "Rank-0 hot volatile/geothermal deposit; uncommon trade",
+        "acquisition": "Hot volatile or geothermal deposits requiring Extraction 0; sold as an uncommon good",
         "buildingConsumers": [],
         "recipeConsumers": [
           "Firebrand 1, Heat Core 2, Yellow pigment"
@@ -369,19 +369,19 @@
       ],
       "tradeBand": "Rare",
       "isRealityCurrency": false,
-      "acquisition": "Rank-3 rich ductile/volatile mineral; rare sale",
+      "acquisition": "Rich ductile or volatile deposits requiring Extraction 3; sold as a rare material",
       "tradeStatus": "Rare trade band",
       "currentUses": [
         "No current Village construction recipe uses this resource."
       ],
       "consumerAuthority": {
-        "acquisition": "Rank-3 rich ductile/volatile mineral; rare sale",
+        "acquisition": "Rich ductile or volatile deposits requiring Extraction 3; sold as a rare material",
         "buildingConsumers": [],
         "recipeConsumers": [
           "Flashsalt 1, Stillwater 1"
         ],
         "otherConsumers": [
-          "Chaining 2, Thermoscope 2, Barometer 3, Silvered Back 2"
+          "Chaining uses 2, Thermoscope 2, Barometer 3, and Silvered Back 2"
         ]
       },
       "assetURL": "/game-assets/resources/mercury.png"
@@ -402,19 +402,19 @@
       ],
       "tradeBand": "Precious",
       "isRealityCurrency": false,
-      "acquisition": "Rank-4 extreme hard/valuable unstable seam; precious sale",
+      "acquisition": "Extremely hard, valuable seams in unstable worlds requiring Extraction 4; sold as a precious material",
       "tradeStatus": "Precious trade band",
       "currentUses": [
         "No current Village construction recipe uses this resource."
       ],
       "consumerAuthority": {
-        "acquisition": "Rank-4 extreme hard/valuable unstable seam; precious sale",
+        "acquisition": "Extremely hard, valuable seams in unstable worlds requiring Extraction 4; sold as a precious material",
         "buildingConsumers": [],
         "recipeConsumers": [
-          "compatible high-grade exact stock"
+          "matching high-quality materials"
         ],
         "otherConsumers": [
-          "Chronometer 2, Fine Scale 2, Long Glass 4"
+          "Chronometer Research uses 2, The Fine Scale uses 2, and The Long Glass uses 4"
         ]
       },
       "assetURL": "/game-assets/resources/adamant.png"
@@ -434,7 +434,7 @@
       ],
       "tradeBand": "Staple",
       "isRealityCurrency": false,
-      "acquisition": "fibrous/small woody flora; Wayfarer organic bonus; current sites; staple trade; legacy Recycler",
+      "acquisition": "fibrous/small woody flora; Wayfarer's Table harvest bonus; some discovered sites; sold as a staple good; returned by recycling some older gear",
       "tradeStatus": "Staple trade band",
       "currentUses": [
         "Used to construct the Blacksmith.",
@@ -443,16 +443,16 @@
         "Used to construct the Wayfarer's Table."
       ],
       "consumerAuthority": {
-        "acquisition": "fibrous/small woody flora; Wayfarer organic bonus; current sites; staple trade; legacy Recycler",
+        "acquisition": "fibrous/small woody flora; Wayfarer's Table harvest bonus; some discovered sites; sold as a staple good; returned by recycling some older gear",
         "buildingConsumers": [
           "Blacksmith 6, Tannery 20, Bowyer 18, Wayfarer's Table 12"
         ],
         "recipeConsumers": [
           "Seamlight 1, Venom 1, Briar Oil 1",
-          "compatible physical sockets"
+          "matching physical recipe parts"
         ],
         "otherConsumers": [
-          "Tannery/Bowyer and many instruction, Focus, Bargain, Hold and Satchel nodes"
+          "Used by Tannery, Bowyer, Gambit, Focus, Bargain, Hold, and Satchel Research"
         ]
       },
       "assetURL": "/game-assets/resources/fiber.png"
@@ -472,7 +472,7 @@
       ],
       "tradeBand": "Staple",
       "isRealityCurrency": false,
-      "acquisition": "tall woody flora; Wayfarer organic bonus; staple trade; legacy Recycler",
+      "acquisition": "tall woody flora; Wayfarer's Table harvest bonus; sold as a staple good; returned by recycling some older gear",
       "tradeStatus": "Staple trade band",
       "currentUses": [
         "Used to construct the Tannery.",
@@ -482,16 +482,16 @@
         "Used to construct the Wayfarer's Table."
       ],
       "consumerAuthority": {
-        "acquisition": "tall woody flora; Wayfarer organic bonus; staple trade; legacy Recycler",
+        "acquisition": "tall woody flora; Wayfarer's Table harvest bonus; sold as a staple good; returned by recycling some older gear",
         "buildingConsumers": [
           "Tannery 12, Bowyer 24, Scriptorium 14, Survey Post 10, Wayfarer's Table 14"
         ],
         "recipeConsumers": [
           "Stonebark 1, Torch 2",
-          "compatible limbs/hafts/grips"
+          "can fill a matching Limb, Haft, or Grip part"
         ],
         "otherConsumers": [
-          "Bowyer, Brush, Desk and Level research"
+          "Used by Bowyer, Brush, Writing Desk, and Level Research"
         ]
       },
       "assetURL": "/game-assets/resources/timber.png"
@@ -511,23 +511,23 @@
       ],
       "tradeBand": "Staple",
       "isRealityCurrency": false,
-      "acquisition": "fleshy flora; Wayfarer organic bonus; staple trade; legacy Recycler",
+      "acquisition": "fleshy flora; Wayfarer's Table harvest bonus; sold as a staple good; returned by recycling some older gear",
       "tradeStatus": "Staple trade band",
       "currentUses": [
         "Used to construct the Wayfarer's Table.",
         "Used to construct the Anchorage."
       ],
       "consumerAuthority": {
-        "acquisition": "fleshy flora; Wayfarer organic bonus; staple trade; legacy Recycler",
+        "acquisition": "fleshy flora; Wayfarer's Table harvest bonus; sold as a staple good; returned by recycling some older gear",
         "buildingConsumers": [
           "Wayfarer's Table 6, Anchorage 18"
         ],
         "recipeConsumers": [
           "Salve 2, Clearing 1, Lure 1",
-          "personal compound formalization"
+          "creating a personal Compound"
         ],
         "otherConsumers": [
-          "Continuous Settling 8, Compound Assembly 4"
+          "Continuous Settling uses 8; Compound Assembly uses 4"
         ]
       },
       "assetURL": "/game-assets/resources/pulp.png"
@@ -547,13 +547,13 @@
       ],
       "tradeBand": "Staple",
       "isRealityCurrency": false,
-      "acquisition": "secondary yield from qualifying woody defended flora; staple trade",
+      "acquisition": "secondary yield from qualifying woody defended flora; sold as a staple good",
       "tradeStatus": "Staple trade band",
       "currentUses": [
         "Used to construct the Bowyer."
       ],
       "consumerAuthority": {
-        "acquisition": "secondary yield from qualifying woody defended flora; staple trade",
+        "acquisition": "secondary yield from qualifying woody defended flora; sold as a staple good",
         "buildingConsumers": [
           "Bowyer 8"
         ],
@@ -565,10 +565,10 @@
           "Briar Oil",
           "Torch",
           "every ink vial",
-          "compatible bindings"
+          "can fill a matching Binding part"
         ],
         "otherConsumers": [
-          "Bowyer, Ink Mixing, Compounds, Fountain Pen, Vivometer"
+          "Used by Bowyer, Ink Mixing, Compound Assembly, Fountain Pen, and Vivometer Research"
         ]
       },
       "assetURL": "/game-assets/resources/resin.png"
@@ -588,17 +588,17 @@
       ],
       "tradeBand": "Uncommon",
       "isRealityCurrency": false,
-      "acquisition": "chemically defended flora; uncommon trade",
+      "acquisition": "chemically defended flora; sold as an uncommon good",
       "tradeStatus": "Uncommon trade band",
       "currentUses": [
         "No current Village construction recipe uses this resource."
       ],
       "consumerAuthority": {
-        "acquisition": "chemically defended flora; uncommon trade",
+        "acquisition": "chemically defended flora; sold as an uncommon good",
         "buildingConsumers": [],
         "recipeConsumers": [
           "Venom 1, Lure 1, Caustic Core option 2",
-          "compatible specialist exact stock"
+          "matching specialist materials"
         ],
         "otherConsumers": []
       },
@@ -619,13 +619,13 @@
       ],
       "tradeBand": "Uncommon",
       "isRealityCurrency": false,
-      "acquisition": "fungal flora favoured by dark/decay; uncommon trade",
+      "acquisition": "fungal flora favoured by dark/decay; sold as an uncommon good",
       "tradeStatus": "Uncommon trade band",
       "currentUses": [
         "No current Village construction recipe uses this resource."
       ],
       "consumerAuthority": {
-        "acquisition": "fungal flora favoured by dark/decay; uncommon trade",
+        "acquisition": "fungal flora favoured by dark/decay; sold as an uncommon good",
         "buildingConsumers": [],
         "recipeConsumers": [
           "Salve 1, Greater Salve 2, Broad Antidote 1"
@@ -650,19 +650,19 @@
       ],
       "tradeBand": "Uncommon",
       "isRealityCurrency": false,
-      "acquisition": "chemosynthetic flora in volatile substrate/toxic air; uncommon trade",
+      "acquisition": "chemosynthetic flora in volatile substrate/toxic air; sold as an uncommon good",
       "tradeStatus": "Uncommon trade band",
       "currentUses": [
         "Used to construct the Apothecary."
       ],
       "consumerAuthority": {
-        "acquisition": "chemosynthetic flora in volatile substrate/toxic air; uncommon trade",
+        "acquisition": "chemosynthetic flora in volatile substrate/toxic air; sold as an uncommon good",
         "buildingConsumers": [
           "Apothecary 12"
         ],
         "recipeConsumers": [
           "Scent Mask, Quenching, Broad Antidote, Firebrand, Flashsalt, Solvent",
-          "exact specialist stock"
+          "matching specialist materials"
         ],
         "otherConsumers": []
       },
@@ -682,20 +682,20 @@
       ],
       "tradeBand": "Rare",
       "isRealityCurrency": false,
-      "acquisition": "scalar definition is creature-only/no ordinary node; exact units come from creature outcomes/merchant; rare sale",
+      "acquisition": "Obtained from creatures rather than an ordinary world deposit; individual pieces of material come from creature rewards/merchant; sold as a rare material",
       "tradeStatus": "Rare trade band",
       "currentUses": [
         "No current Village construction recipe uses this resource."
       ],
       "consumerAuthority": {
-        "acquisition": "scalar definition is creature-only/no ordinary node; exact units come from creature outcomes/merchant; rare sale",
+        "acquisition": "Obtained from creatures rather than an ordinary world deposit; individual pieces of material come from creature rewards/merchant; sold as a rare material",
         "buildingConsumers": [],
         "recipeConsumers": [
           "Greater Salve, Broad Antidote, Farsight, Magenta pigment, Caustic Core option",
-          "compatible exact stock"
+          "matching specialist materials"
         ],
         "otherConsumers": [
-          "Vivometer 2, Long Glass 4"
+          "Vivometer Research uses 2; The Long Glass uses 4"
         ]
       },
       "assetURL": "/game-assets/resources/ichor.png"
@@ -716,13 +716,13 @@
       ],
       "tradeBand": "Rare",
       "isRealityCurrency": false,
-      "acquisition": "Rank-3 seam beside chasms in unstable worlds; rare sale",
+      "acquisition": "Seams beside chasms in unstable worlds requiring Extraction 3; sold as a rare material",
       "tradeStatus": "Rare trade band",
       "currentUses": [
         "No current Village construction recipe uses this resource."
       ],
       "consumerAuthority": {
-        "acquisition": "Rank-3 seam beside chasms in unstable worlds; rare sale",
+        "acquisition": "Seams beside chasms in unstable worlds requiring Extraction 3; sold as a rare material",
         "buildingConsumers": [],
         "recipeConsumers": [
           "Stillwater 1, Waystone 1"
@@ -746,20 +746,20 @@
       ],
       "tradeBand": "Nontradeable",
       "isRealityCurrency": false,
-      "acquisition": "direct wild pickup; current site JSON also pays it; nontradeable",
+      "acquisition": "direct wild pickup; some discovered sites also award it; cannot be traded",
       "tradeStatus": "Not traded",
       "currentUses": [
         "No current Village construction recipe uses this resource."
       ],
       "consumerAuthority": {
-        "acquisition": "direct wild pickup; current site JSON also pays it; nontradeable",
+        "acquisition": "direct wild pickup; some discovered sites also award it; cannot be traded",
         "buildingConsumers": [],
         "recipeConsumers": [
           "Essence Spring refinement at 2:1, then 3:1 after Second Pass",
           "optional Continuous Settling"
         ],
         "otherConsumers": [
-          "continuation precursor"
+          "refined into Essence for continued progression"
         ]
       },
       "assetURL": "/game-assets/resources/essence_raw.png"
@@ -779,13 +779,13 @@
       ],
       "tradeBand": "Nontradeable",
       "isRealityCurrency": true,
-      "acquisition": "Reality-layer authored site/cache/permanent awards; nontradeable",
+      "acquisition": "Named sites, caches, and permanent rewards; cannot be traded",
       "tradeStatus": "Reality currency · not traded",
       "currentUses": [
         "No current Village construction recipe uses this resource."
       ],
       "consumerAuthority": {
-        "acquisition": "Reality-layer authored site/cache/permanent awards; nontradeable",
+        "acquisition": "Named sites, caches, and permanent rewards; cannot be traded",
         "buildingConsumers": [],
         "recipeConsumers": [
           "Waystone 1"
@@ -3933,7 +3933,7 @@
       "contribution": "Noll runs the Recycler, where unwanted ordinary gear can be previewed and dismantled for useful materials.",
       "roleLabel": "Service",
       "role": "Recycler",
-      "diaryReward": "none currently published",
+      "diaryReward": "No additional reward",
       "diaryPageLabel": "5 book pages",
       "diaryPages": [
         {
@@ -5709,7 +5709,7 @@
       "calling": "magic weaponsmith",
       "order": 24,
       "meetingContext": "Oda studies unlike forces that can be held close enough to trace how they travel.",
-      "contribution": "Oda runs the Channelworks and Emanation Housing, where prepared forces can be contained and used safely.",
+      "contribution": "Oda runs the Channelworks, where a Heat Core can currently become a stored Heat Conduit Fixture. Caustic and Light equipment are planned.",
       "roleLabel": "Service",
       "role": "Channelworks",
       "diaryReward": "Emanation Housing Schematic",
@@ -5814,7 +5814,7 @@
       "calling": "distiller",
       "order": 25,
       "meetingContext": "Auber looks for worlds where water, minerals, heat, and residue separate cleanly.",
-      "contribution": "Auber runs the Distillery, where you crystallise blank cores and attune them to known forces.",
+      "contribution": "Auber runs the Distillery, where you currently make Heat, Caustic, and Light Cores directly from gathered materials.",
       "roleLabel": "Service",
       "role": "Distillery",
       "diaryReward": "Brine focus",
@@ -7161,105 +7161,105 @@
     {
       "id": "instruction",
       "name": "Instruction",
-      "blurb": "Teaching a hand to act without you. Rules are assembled from what you learn here.",
+      "blurb": "Learn more Gambit targets, conditions, actions, and rule slots, then let the Binder follow written Gambits too.",
       "order": 0,
       "stationID": null
     },
     {
       "id": "hand",
       "name": "The Hand",
-      "blurb": "What you are able to write, and how precisely.",
+      "blurb": "Learn two special World Writing Sigils from discoveries made in generated worlds.",
       "order": 1,
       "stationID": null
     },
     {
       "id": "hold",
       "name": "The Hold",
-      "blurb": "What you can carry, store and keep.",
+      "blurb": "Increase Storehouse space and the amount your party can carry home.",
       "order": 2,
       "stationID": null
     },
     {
       "id": "lexicon",
       "name": "The Lexicon",
-      "blurb": "Words for the page. Every one of them is a thing you could already see; what you buy here is the way to say it.",
+      "blurb": "Learn new Focuses that can be used in World Writing.",
       "order": 3,
       "stationID": null
     },
     {
       "id": "bargain",
       "name": "The Bargain",
-      "blurb": "Trading a world's peace for its time, and back again.",
+      "blurb": "Learn Sigils that trade greater danger or instability for a more stable world, plus Peace for the reverse choice.",
       "order": 4,
       "stationID": null
     },
     {
       "id": "penmanship",
       "name": "Penmanship",
-      "blurb": "Writing smaller, and saying more than one thing at a time. Taught, never worked out alone.",
+      "blurb": "Improve Writing tools, prepared ink, Compounds, and the Scriptorium.",
       "order": 5,
       "stationID": "scriptorium"
     },
     {
       "id": "instruments",
       "name": "Field Instruments",
-      "blurb": "One for each subject. Each reads the world you are standing in.",
+      "blurb": "Learn field instruments that let Survey measure one part of a generated world.",
       "order": 6,
       "stationID": "survey_post"
     },
     {
       "id": "spring",
       "name": "The Spring",
-      "blurb": "Refine what comes home, deepen its return, and eventually settle new Raw automatically.",
+      "blurb": "Improve Raw Essence refinement and the Essence received at home.",
       "order": 7,
       "stationID": "essence_spring"
     },
     {
       "id": "lens",
       "name": "The Page Lens",
-      "blurb": "Read a page before you spend it. It shows you only what you have already been out and measured.",
+      "blurb": "Add clearer numerical and causal information to the World Writing preview.",
       "order": 8,
       "stationID": "scriptorium"
     },
     {
       "id": "tannery_wear",
       "name": "Wear",
-      "blurb": "Fit flexible living material into useful protection.",
+      "blurb": "Unlock and improve flexible clothing and protection at the Tannery.",
       "order": 9,
       "stationID": "tannery"
     },
     {
       "id": "tannery_carry",
       "name": "Carry",
-      "blurb": "Prepare fitted straps and expansions for a deeper field pack.",
+      "blurb": "Unlock Tannery work used by later satchel improvements.",
       "order": 10,
       "stationID": "tannery"
     },
     {
       "id": "tannery_keep",
       "name": "Keep",
-      "blurb": "Line and bind storage so the room can safely hold more.",
+      "blurb": "Unlock Tannery work used by later Storehouse improvements.",
       "order": 11,
       "stationID": "tannery"
     },
     {
       "id": "bowyer_craft",
       "name": "The Bowyer's Craft",
-      "blurb": "Broaden the far-reaching forms Fen can fit, then learn to carry their best stock honestly.",
+      "blurb": "Unlock more Bowyer weapons and higher construction tiers.",
       "order": 12,
       "stationID": "bowyer"
     },
     {
       "id": "armoury_craft",
       "name": "Defensive Constructions",
-      "blurb": "Broaden Bracken's defensive choices, then retain the finest stock honestly.",
+      "blurb": "Unlock more Armoury constructions and higher construction tiers.",
       "order": 13,
       "stationID": "armoury"
     },
     {
       "id": "weaponsmith_craft",
       "name": "Fitting and Leverage",
-      "blurb": "Broaden Maud's close forms, then retain exceptional stock without changing what fitting means.",
+      "blurb": "Unlock more Weaponsmith forms and higher construction tiers.",
       "order": 14,
       "stationID": "weaponsmith"
     }
@@ -7269,7 +7269,7 @@
       "id": "tannery_wear_root",
       "branch": "tannery_wear",
       "name": "A fitted beginning",
-      "blurb": "Corrin can fit a supple coat, working gloves and working boots from the exact stock you choose.",
+      "blurb": "Unlocks Supple Coat, Working Gloves, and Working Boots at the Tannery.",
       "cost": {
         "essence": 12,
         "resources": {
@@ -7286,7 +7286,7 @@
       "id": "bowyer_broaden",
       "branch": "bowyer_craft",
       "name": "Three answers at range",
-      "blurb": "Add the sling and throwing set while keeping every result within Tier 3.",
+      "blurb": "Unlocks Sling and Throwing Set and raises the Bowyer to its next crafting tier.",
       "cost": {
         "essence": 55,
         "resources": {
@@ -7305,7 +7305,7 @@
       "id": "armoury_broaden",
       "branch": "armoury_craft",
       "name": "Protection by purpose",
-      "blurb": "Add Insulated layer and Balanced laminate while keeping every result within Tier 3.",
+      "blurb": "Unlocks Insulated Layer and Balanced Laminate and raises the Armoury to its next crafting tier.",
       "cost": {
         "essence": 60,
         "resources": {
@@ -7324,7 +7324,7 @@
       "id": "weaponsmith_point_root",
       "branch": "weaponsmith_craft",
       "name": "Fitted point",
-      "blurb": "Fit a close piercing point around repeatable Finesse-led motion.",
+      "blurb": "Unlocks the Fitted Point close-range piercing weapon at the Weaponsmith.",
       "cost": {
         "essence": 0,
         "resources": {}
@@ -7339,7 +7339,7 @@
       "id": "weaponsmith_broaden",
       "branch": "weaponsmith_craft",
       "name": "Balance and consequence",
-      "blurb": "Add fitted edge and maul forms while keeping results within Tier 3.",
+      "blurb": "Unlocks Fitted Edge and Fitted Maul and raises the Weaponsmith to its next crafting tier.",
       "cost": {
         "essence": 75,
         "resources": {
@@ -7360,7 +7360,7 @@
       "id": "weaponsmith_masterwork",
       "branch": "weaponsmith_craft",
       "name": "Masterwork leverage",
-      "blurb": "Let exceptional selected stock retain its natural Tier 4 construction quality.",
+      "blurb": "Lets exceptional Weaponsmith materials produce Tier 4 equipment.",
       "cost": {
         "essence": 150,
         "resources": {
@@ -7381,7 +7381,7 @@
       "id": "armoury_masterwork",
       "branch": "armoury_craft",
       "name": "Masterwork protection",
-      "blurb": "Let exceptional selected stock retain its natural Tier 4 construction quality.",
+      "blurb": "Lets exceptional Armoury materials produce Tier 4 equipment.",
       "cost": {
         "essence": 120,
         "resources": {
@@ -7402,7 +7402,7 @@
       "id": "bowyer_masterwork",
       "branch": "bowyer_craft",
       "name": "Masterwork draw",
-      "blurb": "Let exceptional selected stock retain its natural Tier 4 construction quality.",
+      "blurb": "Lets exceptional Bowyer materials produce Tier 4 equipment.",
       "cost": {
         "essence": 110,
         "resources": {
@@ -7423,7 +7423,7 @@
       "id": "tannery_carry_root",
       "branch": "tannery_carry",
       "name": "Fitted expansion",
-      "blurb": "Corrin can prepare the bindings required by advanced satchel projects.",
+      "blurb": "Unlocks the Tannery binding work required by advanced satchel improvements.",
       "cost": {
         "essence": 18,
         "resources": {
@@ -7440,7 +7440,7 @@
       "id": "tannery_wear_tier_two",
       "branch": "tannery_wear",
       "name": "Fitted layers",
-      "blurb": "Fit several qualities together closely enough for Tier 2 flexible construction.",
+      "blurb": "Unlocks Tier 2 flexible clothing and protection at the Tannery.",
       "cost": {
         "essence": 28,
         "resources": {
@@ -7460,7 +7460,7 @@
       "id": "tannery_keep_root",
       "branch": "tannery_keep",
       "name": "Lined storage",
-      "blurb": "Corrin can prepare the lining and bindings required by advanced Storehouse projects.",
+      "blurb": "Unlocks the Tannery lining and binding work required by advanced Storehouse improvements.",
       "cost": {
         "essence": 18,
         "resources": {
@@ -7477,7 +7477,7 @@
       "id": "reason_about_targets",
       "branch": "instruction",
       "name": "Choosing a target",
-      "blurb": "Tell a rule which enemy it means.",
+      "blurb": "Adds “Foe: lowest HP” to the Gambit parts you can use.",
       "cost": {
         "essence": 12,
         "resources": {
@@ -7494,7 +7494,7 @@
       "id": "reason_about_the_large",
       "branch": "instruction",
       "name": "Choosing the largest",
-      "blurb": "Go at the biggest thing in the room, on purpose.",
+      "blurb": "Adds “Foe: highest HP” to the Gambit parts you can use.",
       "cost": {
         "essence": 20,
         "resources": {
@@ -7513,7 +7513,7 @@
       "id": "reason_about_self",
       "branch": "instruction",
       "name": "Reasoning about yourself",
-      "blurb": "A rule that looks inward before it looks out.",
+      "blurb": "Adds “Self” to the Gambit parts you can use.",
       "cost": {
         "essence": 18,
         "resources": {
@@ -7530,7 +7530,7 @@
       "id": "notice_thirty",
       "branch": "instruction",
       "name": "Noticing 30%",
-      "blurb": "A finer threshold than half.",
+      "blurb": "Adds “30%” to the Gambit parts you can use.",
       "cost": {
         "essence": 15,
         "resources": {}
@@ -7545,7 +7545,7 @@
       "id": "notice_seventy",
       "branch": "instruction",
       "name": "Noticing 70%",
-      "blurb": "Act before things are dire.",
+      "blurb": "Adds “70%” to the Gambit parts you can use.",
       "cost": {
         "essence": 15,
         "resources": {}
@@ -7560,7 +7560,7 @@
       "id": "notice_ten",
       "branch": "instruction",
       "name": "Noticing 10%",
-      "blurb": "The last moment anything can be done.",
+      "blurb": "Adds “10%” to the Gambit parts you can use.",
       "cost": {
         "essence": 30,
         "resources": {
@@ -7579,7 +7579,7 @@
       "id": "reason_upward",
       "branch": "instruction",
       "name": "Reasoning upward",
-      "blurb": "Conditions that trigger on plenty rather than on lack.",
+      "blurb": "Adds “above” to the Gambit parts you can use.",
       "cost": {
         "essence": 25,
         "resources": {
@@ -7598,7 +7598,7 @@
       "id": "instruct_skill",
       "branch": "instruction",
       "name": "Instructing a skill",
-      "blurb": "Rules that reach for something better than a swing.",
+      "blurb": "Adds “Skill” to the Gambit parts you can use.",
       "cost": {
         "essence": 22,
         "resources": {
@@ -7617,7 +7617,7 @@
       "id": "instruct_retreat",
       "branch": "instruction",
       "name": "Instructing retreat",
-      "blurb": "Knowing when to stop is a rule like any other.",
+      "blurb": "Adds “Flee” to the Gambit parts you can use.",
       "cost": {
         "essence": 26,
         "resources": {
@@ -7636,7 +7636,7 @@
       "id": "longer_instruction",
       "branch": "instruction",
       "name": "A longer instruction",
-      "blurb": "One more rule your companion will follow.",
+      "blurb": "Adds one Gambit slot to every companion.",
       "cost": {
         "essence": 30,
         "resources": {
@@ -7655,7 +7655,7 @@
       "id": "longer_instruction_two",
       "branch": "instruction",
       "name": "A longer instruction, again",
-      "blurb": "And one more after that.",
+      "blurb": "Adds another Gambit slot to every companion.",
       "cost": {
         "essence": 65,
         "resources": {
@@ -7675,7 +7675,7 @@
       "id": "automate_self",
       "branch": "instruction",
       "name": "Write your own hand",
-      "blurb": "Your own rules, followed without you. The hardest thing to teach.",
+      "blurb": "Lets the Binder follow written Gambits automatically in combat.",
       "cost": {
         "essence": 70,
         "resources": {
@@ -7696,7 +7696,7 @@
       "id": "study_growth",
       "branch": "hand",
       "name": "Study: growth",
-      "blurb": "Copper-green bloom over everything it touches.",
+      "blurb": "Teaches the Verdigris Bloom Sigil for World Writing.",
       "cost": {
         "essence": 20,
         "resources": {
@@ -7713,7 +7713,7 @@
       "id": "study_permanence",
       "branch": "hand",
       "name": "Study: permanence",
-      "blurb": "Something that shouldn't be buried, buried anyway.",
+      "blurb": "Teaches the Mote Vein Sigil for World Writing.",
       "cost": {
         "essence": 60,
         "resources": {
@@ -7732,7 +7732,7 @@
       "id": "shelving_one",
       "branch": "hold",
       "name": "Shelving",
-      "blurb": "Room at home for more of what you drag back.",
+      "blurb": "Raises Storehouse capacity by one tier.",
       "cost": {
         "essence": 20,
         "resources": {
@@ -7749,7 +7749,7 @@
       "id": "shelving_two",
       "branch": "hold",
       "name": "Shelving, deeper",
-      "blurb": "More still.",
+      "blurb": "Raises Storehouse capacity by one tier.",
       "cost": {
         "essence": 40,
         "resources": {
@@ -7769,7 +7769,7 @@
       "id": "shelving_three",
       "branch": "hold",
       "name": "Shelving, to the rafters",
-      "blurb": "There is no more wall.",
+      "blurb": "Raises Storehouse capacity by one tier.",
       "cost": {
         "essence": 75,
         "resources": {
@@ -7789,7 +7789,7 @@
       "id": "satchel_one",
       "branch": "hold",
       "name": "Satchel stitching",
-      "blurb": "Carry more out of a world before you have to choose.",
+      "blurb": "Raises the party’s field carrying capacity by one tier.",
       "cost": {
         "essence": 15,
         "resources": {
@@ -7806,7 +7806,7 @@
       "id": "satchel_two",
       "branch": "hold",
       "name": "Satchel, reinforced",
-      "blurb": "It holds. Mostly.",
+      "blurb": "Raises the party’s field carrying capacity by one tier.",
       "cost": {
         "essence": 35,
         "resources": {
@@ -7826,7 +7826,7 @@
       "id": "deepen_spring",
       "branch": "spring",
       "name": "Deepen the spring",
-      "blurb": "More essence waiting each time you come home.",
+      "blurb": "Increases the Essence received at home by one Spring tier.",
       "cost": {
         "essence": 45,
         "resources": {
@@ -7844,7 +7844,7 @@
       "id": "essence_second_pass",
       "branch": "spring",
       "name": "Second pass",
-      "blurb": "Practice the ordinary conversion until each Raw Essence yields three instead of two.",
+      "blurb": "Improves refinement so each Raw Essence becomes 3 Essence instead of 2.",
       "cost": {
         "essence": 80,
         "resources": {
@@ -7861,7 +7861,7 @@
       "id": "essence_continuous_settling",
       "branch": "spring",
       "name": "Continuous settling",
-      "blurb": "Automatically refine only the Raw retained by each new expedition outcome.",
+      "blurb": "Automatically refines only the Raw Essence kept from each new expedition return.",
       "cost": {
         "essence": 120,
         "resources": {
@@ -7881,7 +7881,7 @@
       "id": "bargain_root",
       "branch": "bargain",
       "name": "The trade",
-      "blurb": "A world that crawls with things holds together longer. Learn to ask for that on purpose.",
+      "blurb": "Teaches the Swarm Sigil, which asks for more creatures in exchange for more Stability.",
       "cost": {
         "essence": 18,
         "resources": {
@@ -7898,7 +7898,7 @@
       "id": "bargain_weather",
       "branch": "bargain",
       "name": "Foul weather",
-      "blurb": "Let the sky do the work.",
+      "blurb": "Teaches the Storm Sigil, which asks for dangerous weather in exchange for more Stability.",
       "cost": {
         "essence": 26,
         "resources": {
@@ -7917,7 +7917,7 @@
       "id": "bargain_ground",
       "branch": "bargain",
       "name": "Unsettled ground",
-      "blurb": "The most stability the trade can buy, and the ground you have to cross for it.",
+      "blurb": "Teaches the Tremor Sigil, which asks for unstable ground in exchange for more Stability.",
       "cost": {
         "essence": 40,
         "resources": {
@@ -7936,7 +7936,7 @@
       "id": "bargain_teeth",
       "branch": "bargain",
       "name": "Fewer, worse",
-      "blurb": "Thin them out, and make what remains a problem.",
+      "blurb": "Teaches the Predation Sigil, which asks for fewer but stronger creatures in exchange for more Stability.",
       "cost": {
         "essence": 30,
         "resources": {
@@ -7955,7 +7955,7 @@
       "id": "bargain_rot",
       "branch": "bargain",
       "name": "Bad ground",
-      "blurb": "What grows here is wrong, and it spreads.",
+      "blurb": "Teaches the Blight Sigil, which asks for harmful growth in exchange for more Stability.",
       "cost": {
         "essence": 28,
         "resources": {
@@ -7974,7 +7974,7 @@
       "id": "bargain_air",
       "branch": "bargain",
       "name": "Bad air",
-      "blurb": "It costs you a little every turn you stay.",
+      "blurb": "Teaches the Miasma Sigil, which asks for damaging air in exchange for more Stability.",
       "cost": {
         "essence": 34,
         "resources": {
@@ -7993,7 +7993,7 @@
       "id": "bargain_peace",
       "branch": "bargain",
       "name": "Peace",
-      "blurb": "The trade run backwards: a quiet world, and less of it. For somewhere you mean to keep.",
+      "blurb": "Teaches the Peace Sigil, which asks for a quieter world but provides less Stability.",
       "cost": {
         "essence": 48,
         "resources": {
@@ -8014,7 +8014,7 @@
       "id": "shelving_four",
       "branch": "hold",
       "name": "Shelving, wall to wall",
-      "blurb": "Every wall is shelf now. You stopped noticing when.",
+      "blurb": "Raises Storehouse capacity by one tier.",
       "cost": {
         "essence": 130,
         "resources": {
@@ -8035,7 +8035,7 @@
       "id": "shelving_five",
       "branch": "hold",
       "name": "A second room",
-      "blurb": "The room next door was never used for anything else anyway.",
+      "blurb": "Raises Storehouse capacity by one tier.",
       "cost": {
         "essence": 210,
         "resources": {
@@ -8055,7 +8055,7 @@
       "id": "shelving_six",
       "branch": "hold",
       "name": "The undercroft",
-      "blurb": "Cold, dry, and further down than you remembered digging.",
+      "blurb": "Raises Storehouse capacity by one tier.",
       "cost": {
         "essence": 340,
         "resources": {
@@ -8075,7 +8075,7 @@
       "id": "shelving_seven",
       "branch": "hold",
       "name": "The undercroft, extended",
-      "blurb": "It goes back further than the house above it.",
+      "blurb": "Raises Storehouse capacity by one tier.",
       "cost": {
         "essence": 550,
         "resources": {
@@ -8095,7 +8095,7 @@
       "id": "shelving_eight",
       "branch": "hold",
       "name": "A hall for it",
-      "blurb": "You could lose something in here and find it again years later.",
+      "blurb": "Raises Storehouse capacity by one tier.",
       "cost": {
         "essence": 890,
         "resources": {
@@ -8115,7 +8115,7 @@
       "id": "shelving_nine",
       "branch": "hold",
       "name": "More than you can carry",
-      "blurb": "There is no longer a question of whether to keep a thing.",
+      "blurb": "Raises Storehouse capacity by one tier.",
       "cost": {
         "essence": 1440,
         "resources": {
@@ -8135,7 +8135,7 @@
       "id": "satchel_three",
       "branch": "hold",
       "name": "Satchel, deepened",
-      "blurb": "Deeper than it looks, which was the point.",
+      "blurb": "Raises the party’s field carrying capacity by one tier.",
       "cost": {
         "essence": 70,
         "resources": {
@@ -8156,7 +8156,7 @@
       "id": "satchel_four",
       "branch": "hold",
       "name": "A second strap",
-      "blurb": "Across the other shoulder. Heavier, and worth it.",
+      "blurb": "Raises the party’s field carrying capacity by one tier.",
       "cost": {
         "essence": 140,
         "resources": {
@@ -8176,7 +8176,7 @@
       "id": "satchel_five",
       "branch": "hold",
       "name": "Panniers",
-      "blurb": "Slung either side. You walk differently now.",
+      "blurb": "Raises the party’s field carrying capacity by one tier.",
       "cost": {
         "essence": 280,
         "resources": {
@@ -8196,7 +8196,7 @@
       "id": "pen_brush",
       "branch": "penmanship",
       "name": "A brush",
-      "blurb": "A copper ferrule holds fibre bristles to a timber handle. Half the room, and Isolde will not stop calling it a beginning.",
+      "blurb": "Unlocks the Brush as a finer World Writing hand.",
       "cost": {
         "essence": 45,
         "resources": {
@@ -8215,7 +8215,7 @@
       "id": "pen_desk",
       "branch": "penmanship",
       "name": "A table that doesn't rock",
-      "blurb": "Isolde's first condition, and she was right about it. Raises the Scriptorium.",
+      "blurb": "Raises the Scriptorium by one tier and opens the next stage of Penmanship.",
       "cost": {
         "essence": 70,
         "resources": {
@@ -8235,7 +8235,7 @@
       "id": "pen_ink_mixing",
       "branch": "penmanship",
       "name": "Ink Mixing",
-      "blurb": "Prepare deliberate liquid inks without changing the hand that lays them down.",
+      "blurb": "Unlocks prepared Cyan, Magenta, Yellow, and Depth ink.",
       "cost": {
         "essence": 40,
         "resources": {
@@ -8256,7 +8256,7 @@
       "id": "pen_compounds",
       "branch": "penmanship",
       "name": "Compound Assembly",
-      "blurb": "Assemble learned Sigils without confusing their meaning with their shape.",
+      "blurb": "Unlocks Compound Assembly for turning a learned statement into a reusable Compound Sigil.",
       "cost": {
         "essence": 55,
         "resources": {
@@ -8277,7 +8277,7 @@
       "id": "pen_chaining",
       "branch": "penmanship",
       "name": "Chaining",
-      "blurb": "Joining one statement to another, so a world can have two kinds of land in it.",
+      "blurb": "Unlocks Chaining, which connects one written statement to another so a world can contain two kinds of land.",
       "cost": {
         "essence": 90,
         "resources": {
@@ -8297,7 +8297,7 @@
       "id": "pen_press",
       "branch": "penmanship",
       "name": "A ruling frame",
-      "blurb": "Lines true enough to write a hair's width between them. Raises the Scriptorium again.",
+      "blurb": "Raises the Scriptorium by one tier and opens the next stage of Penmanship.",
       "cost": {
         "essence": 140,
         "resources": {
@@ -8317,7 +8317,7 @@
       "id": "pen_fountain",
       "branch": "penmanship",
       "name": "A fountain pen",
-      "blurb": "A nib ground to nothing and a barrel that holds its ink. Everything, in a quarter of the room.",
+      "blurb": "Unlocks the Fountain Pen as the finest current World Writing hand.",
       "cost": {
         "essence": 220,
         "resources": {
@@ -8338,7 +8338,7 @@
       "id": "study_starlight",
       "branch": "lexicon",
       "name": "Starlight",
-      "blurb": "The faintest mark that a world has a sky at all.",
+      "blurb": "Teaches Starlight as a Focus for World Writing.",
       "cost": {
         "essence": 14,
         "resources": {
@@ -8355,7 +8355,7 @@
       "id": "study_weather",
       "branch": "lexicon",
       "name": "Weather",
-      "blurb": "Mist, and the river it becomes.",
+      "blurb": "Teaches Weather as a Focus for World Writing.",
       "cost": {
         "essence": 18,
         "resources": {
@@ -8372,7 +8372,7 @@
       "id": "study_rivers",
       "branch": "lexicon",
       "name": "Rivers",
-      "blurb": "Water that goes somewhere.",
+      "blurb": "Teaches Rivers as a Focus for World Writing.",
       "cost": {
         "essence": 22,
         "resources": {
@@ -8391,7 +8391,7 @@
       "id": "study_wetland",
       "branch": "lexicon",
       "name": "Wetland",
-      "blurb": "Ground that never decides whether it is water.",
+      "blurb": "Teaches Wetland as a Focus for World Writing.",
       "cost": {
         "essence": 28,
         "resources": {
@@ -8410,7 +8410,7 @@
       "id": "study_springs",
       "branch": "lexicon",
       "name": "Springs",
-      "blurb": "Water arriving from underneath, hot.",
+      "blurb": "Teaches Springs as a Focus for World Writing.",
       "cost": {
         "essence": 34,
         "resources": {
@@ -8429,7 +8429,7 @@
       "id": "study_thin_air",
       "branch": "lexicon",
       "name": "Thin air",
-      "blurb": "Air that is barely there. Nothing else thins a sky.",
+      "blurb": "Teaches Thin air as a Focus for World Writing.",
       "cost": {
         "essence": 26,
         "resources": {
@@ -8446,7 +8446,7 @@
       "id": "study_burning",
       "branch": "lexicon",
       "name": "Burning",
-      "blurb": "Fire in a landscape, and what it takes with it.",
+      "blurb": "Teaches Burning as a Focus for World Writing.",
       "cost": {
         "essence": 24,
         "resources": {
@@ -8463,7 +8463,7 @@
       "id": "study_the_vent",
       "branch": "lexicon",
       "name": "The vent",
-      "blurb": "Rock that has not finished moving.",
+      "blurb": "Teaches The vent as a Focus for World Writing.",
       "cost": {
         "essence": 38,
         "resources": {
@@ -8482,7 +8482,7 @@
       "id": "study_the_melt",
       "branch": "lexicon",
       "name": "The melt",
-      "blurb": "Stone as a liquid.",
+      "blurb": "Teaches The melt as a Focus for World Writing.",
       "cost": {
         "essence": 44,
         "resources": {
@@ -8501,7 +8501,7 @@
       "id": "study_salt",
       "branch": "lexicon",
       "name": "Salt",
-      "blurb": "What is left where water was, and what it does to life.",
+      "blurb": "Teaches Salt as a Focus for World Writing.",
       "cost": {
         "essence": 20,
         "resources": {
@@ -8518,7 +8518,7 @@
       "id": "study_brimstone",
       "branch": "lexicon",
       "name": "Brimstone",
-      "blurb": "The yellow rock, and the air around it.",
+      "blurb": "Teaches Brimstone as a Focus for World Writing.",
       "cost": {
         "essence": 28,
         "resources": {
@@ -8537,7 +8537,7 @@
       "id": "study_silt",
       "branch": "lexicon",
       "name": "Silt",
-      "blurb": "Ground sorted fine and washed through.",
+      "blurb": "Teaches Silt as a Focus for World Writing.",
       "cost": {
         "essence": 20,
         "resources": {
@@ -8554,7 +8554,7 @@
       "id": "study_decay",
       "branch": "lexicon",
       "name": "Decay",
-      "blurb": "What happens after. It is not nothing.",
+      "blurb": "Teaches Decay as a Focus for World Writing.",
       "cost": {
         "essence": 22,
         "resources": {
@@ -8571,7 +8571,7 @@
       "id": "study_mycology",
       "branch": "lexicon",
       "name": "Mycology",
-      "blurb": "What grows where there is no sun to grow by.",
+      "blurb": "Teaches Mycology as a Focus for World Writing.",
       "cost": {
         "essence": 32,
         "resources": {
@@ -8590,7 +8590,7 @@
       "id": "study_the_swarm",
       "branch": "lexicon",
       "name": "The swarm",
-      "blurb": "Small things, and a great many of them.",
+      "blurb": "Teaches The swarm as a Focus for World Writing.",
       "cost": {
         "essence": 24,
         "resources": {
@@ -8609,7 +8609,7 @@
       "id": "study_the_foul",
       "branch": "lexicon",
       "name": "The foul air",
-      "blurb": "Air that does not want you in it.",
+      "blurb": "Teaches The foul air as a Focus for World Writing.",
       "cost": {
         "essence": 36,
         "resources": {
@@ -8628,7 +8628,7 @@
       "id": "study_the_pull",
       "branch": "lexicon",
       "name": "The pull",
-      "blurb": "A world that rises and falls to something.",
+      "blurb": "Teaches The pull as a Focus for World Writing.",
       "cost": {
         "essence": 30,
         "resources": {
@@ -8645,7 +8645,7 @@
       "id": "study_clockwork",
       "branch": "lexicon",
       "name": "Clockwork",
-      "blurb": "Somebody built a thing that keeps time, and it runs still.",
+      "blurb": "Teaches Clockwork as a Focus for World Writing.",
       "cost": {
         "essence": 42,
         "resources": {
@@ -8664,7 +8664,7 @@
       "id": "study_lattice",
       "branch": "lexicon",
       "name": "Lattice",
-      "blurb": "Stone that grew rather than settled, and holds a light without being lit.",
+      "blurb": "Teaches Lattice as a Focus for World Writing.",
       "cost": {
         "essence": 30,
         "resources": {
@@ -8681,7 +8681,7 @@
       "id": "sunglass",
       "branch": "instruments",
       "name": "Sunglass",
-      "blurb": "Smoked quartz in a copper ring. You can look at a sky and put a number to it.",
+      "blurb": "Teaches the Sunglass at Crude precision so Survey can measure illumination.",
       "cost": {
         "essence": 30,
         "resources": {
@@ -8699,7 +8699,7 @@
       "id": "level",
       "branch": "instruments",
       "name": "Level",
-      "blurb": "A bubble in a tube of oil, in a timber frame. How much of this country is uphill.",
+      "blurb": "Teaches the Level at Crude precision so Survey can measure relief.",
       "cost": {
         "essence": 35,
         "resources": {
@@ -8717,7 +8717,7 @@
       "id": "thermoscope",
       "branch": "instruments",
       "name": "Thermoscope",
-      "blurb": "Mercury in a sealed stem. It reads the cold as readily as the heat, which is the hard part.",
+      "blurb": "Teaches the Thermoscope at Crude precision so Survey can measure thermal.",
       "cost": {
         "essence": 55,
         "resources": {
@@ -8735,7 +8735,7 @@
       "id": "hygrometer",
       "branch": "instruments",
       "name": "Hygrometer",
-      "blurb": "A hair under tension, and a silver needle. It measures how much water a world will actually give you.",
+      "blurb": "Teaches the Hygrometer at Crude precision so Survey can measure hydrology.",
       "cost": {
         "essence": 55,
         "resources": {
@@ -8753,7 +8753,7 @@
       "id": "loupe",
       "branch": "instruments",
       "name": "Loupe",
-      "blurb": "Close work. What the ground is made of, seen properly rather than guessed at from the colour.",
+      "blurb": "Teaches the Loupe at Crude precision so Survey can measure substrate.",
       "cost": {
         "essence": 60,
         "resources": {
@@ -8771,7 +8771,7 @@
       "id": "vivometer",
       "branch": "instruments",
       "name": "Vivometer",
-      "blurb": "Resin, ichor and a lens. It answers the only question that matters about a world: what does it feed.",
+      "blurb": "Teaches the Vivometer at Crude precision so Survey can measure vitality.",
       "cost": {
         "essence": 90,
         "resources": {
@@ -8790,7 +8790,7 @@
       "id": "barometer",
       "branch": "instruments",
       "name": "Barometer",
-      "blurb": "A column of mercury against a silvered scale. Air has a weight, and the weight tells you the rest.",
+      "blurb": "Teaches the Barometer at Crude precision so Survey can measure atmosphere.",
       "cost": {
         "essence": 95,
         "resources": {
@@ -8809,7 +8809,7 @@
       "id": "chronometer",
       "branch": "instruments",
       "name": "Chronometer",
-      "blurb": "Adamant escapement, silver train. **Reading time is the hardest thing to learn**, so it is the last.",
+      "blurb": "Teaches the Chronometer at Crude precision so Survey can measure cycle.",
       "cost": {
         "essence": 150,
         "resources": {
@@ -8828,7 +8828,7 @@
       "id": "lens_targets",
       "branch": "lens",
       "name": "Ground and true",
-      "blurb": "Flat glass, honestly worked. The page starts giving you numbers — for the subjects you have been out and measured, and no others.",
+      "blurb": "Adds numerical pressure readings to the World preview for subjects you have measured in the field.",
       "cost": {
         "essence": 70,
         "resources": {
@@ -8846,7 +8846,7 @@
       "id": "lens_attribution",
       "branch": "lens",
       "name": "Silvered back",
-      "blurb": "Which of the things you wrote did what, secondaries included. The page stops being a list and starts being an argument.",
+      "blurb": "Shows which parts of your Page contributed to each previewed world pressure.",
       "cost": {
         "essence": 120,
         "resources": {
@@ -8867,7 +8867,7 @@
       "id": "lens_instability",
       "branch": "lens",
       "name": "The fine scale",
-      "blurb": "Greed on one side of the beam and contradiction on the other. You can finally see which of the two is eating your world.",
+      "blurb": "Shows which written requests and contradictions are consuming the world’s Stability.",
       "cost": {
         "essence": 180,
         "resources": {
@@ -8888,7 +8888,7 @@
       "id": "lens_living",
       "branch": "lens",
       "name": "The long glass",
-      "blurb": "What a world will grow, before it has grown it. The last thing a page can be made to say.",
+      "blurb": "Adds a preview of the kinds of life a written world is likely to support.",
       "cost": {
         "essence": 260,
         "resources": {

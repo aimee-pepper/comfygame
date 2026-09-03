@@ -1,8 +1,8 @@
 export function TruthPair({
   current,
   accepted,
-  currentLabel = 'Implemented now',
-  acceptedLabel = 'Intended implementation',
+  currentLabel = 'Playable now',
+  acceptedLabel = 'Planned design',
 }: {
   current: string;
   accepted: string;

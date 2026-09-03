@@ -4,9 +4,10 @@ import { PageIntro } from '@/components/page-intro';
 import { PixelImage } from '@/components/pixel-image';
 import { SiteFrame } from '@/components/site-frame';
 import { content, humanize } from '@/lib/content';
+import { villageBuildings } from '@/lib/village';
 
-function constructionCost(station: (typeof content.stations)[number]) {
-  if (!station.buildCost.length) return 'No current construction cost is published.';
+function constructionCost(station: (typeof villageBuildings)[number]) {
+  if (!station.buildCost.length) return 'A construction cost is not available yet.';
   return station.buildCost.map((cost, index) => {
     const id = cost.id ?? cost.resource ?? cost.resourceID;
     const resource = id ? content.resources.find((entry) => entry.id === id) : null;
@@ -16,8 +17,8 @@ function constructionCost(station: (typeof content.stations)[number]) {
 }
 
 export default function JourneyGuide() {
-  const startingPlaces = content.stations.filter((station) => station.unlockedAtStart);
-  const buildablePlaces = content.stations.filter((station) => !station.unlockedAtStart);
+  const startingPlaces = villageBuildings.filter((station) => station.status === 'implemented' && station.unlockedAtStart);
+  const buildablePlaces = villageBuildings.filter((station) => station.status === 'implemented' && !station.unlockedAtStart);
   const firstGear = content.items.find((item) => item.gear && item.assetURL);
   return (
     <SiteFrame sidebar>
@@ -36,11 +37,11 @@ export default function JourneyGuide() {
           <li><span><strong>Review the return at the Village</strong><p>Use the expedition result to review what came back, resolve any capacity decision, then prepare the next trip or put returned resources toward a current construction, recipe, or Research cost.</p></span></li>
         </ol>
       </section>
-      <section className="article-section journey-strip"><Link href="/resources/progression"><img src={content.writingAssetURL} alt="Writing Desk parchment" /><span><strong>Current task checklist</strong><small>Move from the next Page through resources, Village work, Research, party preparation, and return.</small></span></Link><Link href="/systems/exploration"><img src={content.explorationVisuals.entryPortal} alt="Entry portal" /><span><strong>World route</strong><small>Use the entry portal and current world detail as you explore.</small></span></Link>{firstGear?.assetURL && <Link href={`/equipment/${firstGear.slug}`}><PixelImage src={firstGear.assetURL} alt={`${firstGear.name} icon`} size={58} /><span><strong>Party preparation</strong><small>Compare custody and the current slot before equipping.</small></span></Link>}</section>
+      <section className="article-section journey-strip"><Link href="/resources/progression"><img src={content.writingAssetURL} alt="Writing Desk parchment" /><span><strong>Current task checklist</strong><small>Move from the next Page through resources, Village work, Research, party preparation, and return.</small></span></Link><Link href="/systems/exploration"><img src={content.explorationVisuals.entryPortal} alt="Entry portal" /><span><strong>World journey</strong><small>Use the entry portal and the world’s visible details as you explore.</small></span></Link>{firstGear?.assetURL && <Link href={`/equipment/${firstGear.slug}`}><PixelImage src={firstGear.assetURL} alt={`${firstGear.name} icon`} size={58} /><span><strong>Party preparation</strong><small>Check where the gear is and whether it fits the current slot before equipping.</small></span></Link>}</section>
       <section className="article-section two-column">
         <div>
           <h2>What this guide does not promise</h2>
-          <p>It describes the routes, costs, and choices currently shown in the game. It does not prescribe a future building or Research order, and it does not promise an unavailable route.</p>
+          <p>It describes the paths, costs, and choices currently shown in the game. It does not prescribe a future building or Research order, and it does not promise features that are not playable yet.</p>
         </div>
         <div className="note-card">
           <h3>Read the current screen</h3>
@@ -55,7 +56,7 @@ export default function JourneyGuide() {
       </section>
       <section className="article-section">
         <h2>Current Village construction</h2>
-        <p>Each row is a current building with its published construction requirements. Open the place page to see its current service and any current crafting it owns.</p>
+        <p>Each row is an available building with its construction requirements. Open the building page to see its services and crafting.</p>
         <div className="table-wrap data-table"><table><thead><tr><th>Building</th><th>Construction requirements</th><th>Current use</th></tr></thead><tbody>
           {buildablePlaces.map((station) => <tr key={station.id}><td><Link href={`/buildings/${station.slug}`}>{station.name}</Link></td><td>{constructionCost(station)}</td><td>{station.blurb}</td></tr>)}
         </tbody></table></div>
@@ -64,7 +65,7 @@ export default function JourneyGuide() {
         <h2>Services, crafting, and Research</h2>
         <div className="definition-grid">
           <div><h3><Link href="/village">Village</Link></h3><p>Use the one Village guide to find storage, party preparation, trade, refinement, records, construction, and each current station.</p></div>
-          <div><h3><Link href="/crafting">Crafting systems</Link></h3><p>Open a current station guide to compare its published inputs, material choices, output, and access facts before you commit a recipe.</p></div>
+          <div><h3><Link href="/crafting">Crafting systems</Link></h3><p>Open a station guide to compare its ingredients, material choices, result, and requirements before you confirm a recipe.</p></div>
           <div><h3><Link href="/research">Research</Link></h3><p>Open the current Research node to compare listed prerequisites, base cost, and current result. Earlier listed upgrades are required when the node says so; this guide does not predict an order beyond those current requirements.</p></div>
         </div>
       </section>

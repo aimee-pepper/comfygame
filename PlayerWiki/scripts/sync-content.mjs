@@ -122,6 +122,68 @@ const runtimeAsset = (familyID, semanticKey) =>
 const safeFileName = (value) =>
   `${String(value).replaceAll(/[^a-zA-Z0-9_-]/g, '-')}.png`;
 const compactCopy = (value) => value.replaceAll(/\s+/g, ' ').trim();
+const playerResourceCopy = (value) => compactCopy(value)
+  .replace(/No current Village construction recipe uses this resource\.?/g, 'Not currently used for Village construction.')
+  .replace(/^Rank-(\d+) mineral node/, 'Mineral nodes requiring Extraction $1')
+  .replace(/^Rank-(\d+) wet, soft Substrate node/, 'Wet, soft Substrate deposits requiring Extraction $1')
+  .replace(/^Rank-(\d+) ductile\/volatile seam/, 'Ductile or volatile seams requiring Extraction $1')
+  .replace(/^Rank-(\d+) rich ductile seam/, 'Rich ductile seams requiring Extraction $1')
+  .replace(/^Rank-(\d+) very rich ductile seam/, 'Very rich ductile seams requiring Extraction $1')
+  .replace(/^Rank-(\d+) hard seam/, 'Hard seams requiring Extraction $1')
+  .replace(/^Rank-(\d+) ash\/geothermal seam/, 'Ash or geothermal seams requiring Extraction $1')
+  .replace(/^Rank-(\d+) saline\/briny\/low-water deposit/, 'Saline, briny, or low-water deposits requiring Extraction $1')
+  .replace(/^Rank-(\d+) hot volatile\/geothermal deposit/, 'Hot volatile or geothermal deposits requiring Extraction $1')
+  .replace(/^Rank-(\d+) rich ductile\/volatile mineral/, 'Rich ductile or volatile deposits requiring Extraction $1')
+  .replace(/^Rank-(\d+) extreme hard\/valuable unstable seam/, 'Extremely hard, valuable seams in unstable worlds requiring Extraction $1')
+  .replace(/^Rank-(\d+) seam beside chasms in unstable worlds/, 'Seams beside chasms in unstable worlds requiring Extraction $1')
+  .replace(/\bstaple trade\b/g, 'sold as a staple good')
+  .replace(/\buncommon trade\b/g, 'sold as an uncommon good')
+  .replace(/\brare sale\b/g, 'sold as a rare material')
+  .replace(/\bprecious sale\b/g, 'sold as a precious material')
+  .replace(/\blegacy Recycler\b/g, 'returned by recycling some older gear')
+  .replace(/\bcurrent sites\b/g, 'some discovered sites')
+  .replace(/\bcurrent site JSON also pays it\b/g, 'some discovered sites also award it')
+  .replace(/\bexact units\b/g, 'individual pieces of material')
+  .replace(/\bexact optical\/Light Core selection\b/g, 'optical materials and the Light Core ingredient')
+  .replace(/\bcompatible exact stock\b/g, 'matching specialist materials')
+  .replace(/\bcompatible high-grade exact stock\b/g, 'matching high-quality materials')
+  .replace(/\bcompatible physical sockets\b/g, 'matching physical recipe parts')
+  .replace(/\bphysical sockets\b/g, 'physical recipe parts')
+  .replace(/\bcompatible individual material units in physical making\b/g, 'individual pieces of material that fit the recipe')
+  .replace(/\bcompatible individual material units across physical makers\b/g, 'individual pieces of material at compatible crafting stations')
+  .replace(/\bcompatible individual pieces of material in physical making\b/g, 'individual pieces of material that fit the recipe')
+  .replace(/\bcompatible individual pieces of material across physical makers\b/g, 'individual pieces of material at compatible crafting stations')
+  .replace(/\bcompatible exact edges\/points\b/g, 'a compatible Edge or Point')
+  .replace(/\bcompatible specialist exact stock\b/g, 'matching specialist materials')
+  .replace(/\bexact specialist stock\b/g, 'matching specialist materials')
+  .replace(/\bscalar stock\b/g, 'ordinary counted stock')
+  .replace(/\bscalar definition is creature-only\/no ordinary node\b/g, 'Obtained from creatures rather than an ordinary world deposit')
+  .replace(/\bcreature outcomes\b/g, 'creature rewards')
+  .replace(/\bReality-layer authored site\/cache\/permanent awards\b/g, 'Named sites, caches, and permanent rewards')
+  .replace(/\bcontinuation precursor\b/g, 'refined into Essence for continued progression')
+  .replace(/\bmaker progression\b/g, 'maker Research')
+  .replace(/\bWayfarer organic bonus\b/g, "Wayfarer's Table harvest bonus")
+  .replace(/\bpersonal compound formalization\b/g, 'creating a personal Compound')
+  .replace(/\bnontradeable\b/g, 'cannot be traded')
+  .replace(/\bordinary counted stock can only be sold\b/g, 'Can currently be sold but has no other use')
+  .replace(/\bArmoury research totals (\d+)\b/g, 'Armoury Research uses $1 in total')
+  .replace(/\bSpring, Hold, Satchel, Bargain, instruction and permanence research\b/g, 'Used by Spring, Hold, Satchel, Bargain, Gambit, and Permanence Research')
+  .replace(/\bcompatible fittings\/bindings\/grips\b/g, 'can fill a matching Fitting, Binding, or Grip part')
+  .replace(/\bcompatible fittings\b/g, 'can fill a matching Fitting part')
+  .replace(/\bcompatible limbs\/hafts\/grips\b/g, 'can fill a matching Limb, Haft, or Grip part')
+  .replace(/\bcompatible bindings\b/g, 'can fill a matching Binding part')
+  .replace(/\bDepth pigment\b/g, 'provides Depth pigment')
+  .replace(/\bSpring (\d+), pen work (\d+), seven instruments, four Page Lens tiers\b/g, '$1 for Spring upgrades, $2 for Penmanship, plus seven instruments and four Page Lens tiers')
+  .replace(/\bWeaponsmith broaden\/masterwork (\d+) total\b/g, 'Weaponsmith upgrades use $1 in total')
+  .replace(/\bFitted Layers (\d+)\b/g, 'Fitted Layers Research uses $1')
+  .replace(/\bTannery\/Bowyer and many instruction, Focus, Bargain, Hold and Satchel nodes\b/g, 'Used by Tannery, Bowyer, Gambit, Focus, Bargain, Hold, and Satchel Research')
+  .replace(/\bBowyer, Brush, Desk and Level research\b/g, 'Used by Bowyer, Brush, Writing Desk, and Level Research')
+  .replace(/\bContinuous Settling (\d+), Compound Assembly (\d+)\b/g, 'Continuous Settling uses $1; Compound Assembly uses $2')
+  .replace(/\bBowyer, Ink Mixing, Compounds, Fountain Pen, Vivometer\b/g, 'Used by Bowyer, Ink Mixing, Compound Assembly, Fountain Pen, and Vivometer Research')
+  .replace(/^maker Research,/, 'Used by maker Research,')
+  .replace(/\bVivometer (\d+), Long Glass (\d+)\b/g, 'Vivometer Research uses $1; The Long Glass uses $2')
+  .replace(/\bChronometer (\d+), Fine Scale (\d+), Long Glass (\d+)\b/g, 'Chronometer Research uses $1, The Fine Scale uses $2, and The Long Glass uses $3')
+  .replace(/\bChaining (\d+), Thermoscope (\d+), Barometer (\d+), Silvered Back (\d+)\b/g, 'Chaining uses $1, Thermoscope $2, Barometer $3, and Silvered Back $4');
 const slugFor = (name) =>
   name.toLowerCase().replaceAll(/[^a-z0-9]+/g, '-').replaceAll(/(^-|-$)/g, '');
 const conditionLabel = (condition) => {
@@ -133,6 +195,84 @@ const conditionLabel = (condition) => {
   if (condition.maximum !== undefined) return `${subject} at or below ${limit}`;
   if (condition.minimum !== undefined) return `${subject} at or above ${limit}`;
   return subject;
+};
+const readableID = (value) => String(value ?? '')
+  .replaceAll(/[_-]/g, ' ')
+  .replace(/^./, (letter) => letter.toUpperCase());
+const researchBranchCopy = {
+  instruction: 'Learn more Gambit targets, conditions, actions, and rule slots, then let the Binder follow written Gambits too.',
+  hand: 'Learn two special World Writing Sigils from discoveries made in generated worlds.',
+  hold: 'Increase Storehouse space and the amount your party can carry home.',
+  lexicon: 'Learn new Focuses that can be used in World Writing.',
+  bargain: 'Learn Sigils that trade greater danger or instability for a more stable world, plus Peace for the reverse choice.',
+  penmanship: 'Improve Writing tools, prepared ink, Compounds, and the Scriptorium.',
+  instruments: 'Learn field instruments that let Survey measure one part of a generated world.',
+  spring: 'Improve Raw Essence refinement and the Essence received at home.',
+  lens: 'Add clearer numerical and causal information to the World Writing preview.',
+  tannery_wear: 'Unlock and improve flexible clothing and protection at the Tannery.',
+  tannery_carry: 'Unlock Tannery work used by later satchel improvements.',
+  tannery_keep: 'Unlock Tannery work used by later Storehouse improvements.',
+  bowyer_craft: 'Unlock more Bowyer weapons and higher construction tiers.',
+  armoury_craft: 'Unlock more Armoury constructions and higher construction tiers.',
+  weaponsmith_craft: 'Unlock more Weaponsmith forms and higher construction tiers.',
+};
+const researchResultCopy = {
+  tannery_wear_root: 'Unlocks Supple Coat, Working Gloves, and Working Boots at the Tannery.',
+  bowyer_broaden: 'Unlocks Sling and Throwing Set and raises the Bowyer to its next crafting tier.',
+  armoury_broaden: 'Unlocks Insulated Layer and Balanced Laminate and raises the Armoury to its next crafting tier.',
+  weaponsmith_point_root: 'Unlocks the Fitted Point close-range piercing weapon at the Weaponsmith.',
+  weaponsmith_broaden: 'Unlocks Fitted Edge and Fitted Maul and raises the Weaponsmith to its next crafting tier.',
+  weaponsmith_masterwork: 'Lets exceptional Weaponsmith materials produce Tier 4 equipment.',
+  armoury_masterwork: 'Lets exceptional Armoury materials produce Tier 4 equipment.',
+  bowyer_masterwork: 'Lets exceptional Bowyer materials produce Tier 4 equipment.',
+  tannery_carry_root: 'Unlocks the Tannery binding work required by advanced satchel improvements.',
+  tannery_wear_tier_two: 'Unlocks Tier 2 flexible clothing and protection at the Tannery.',
+  tannery_keep_root: 'Unlocks the Tannery lining and binding work required by advanced Storehouse improvements.',
+  longer_instruction: 'Adds one Gambit slot to every companion.',
+  longer_instruction_two: 'Adds another Gambit slot to every companion.',
+  automate_self: 'Lets the Binder follow written Gambits automatically in combat.',
+  deepen_spring: 'Increases the Essence received at home by one Spring tier.',
+  essence_second_pass: 'Improves refinement so each Raw Essence becomes 3 Essence instead of 2.',
+  essence_continuous_settling: 'Automatically refines only the Raw Essence kept from each new expedition return.',
+  pen_brush: 'Unlocks the Brush as a finer World Writing hand.',
+  pen_desk: 'Raises the Scriptorium by one tier and opens the next stage of Penmanship.',
+  pen_ink_mixing: 'Unlocks prepared Cyan, Magenta, Yellow, and Depth ink.',
+  pen_compounds: 'Unlocks Compound Assembly for turning a learned statement into a reusable Compound Sigil.',
+  pen_chaining: 'Unlocks Chaining, which connects one written statement to another so a world can contain two kinds of land.',
+  pen_press: 'Raises the Scriptorium by one tier and opens the next stage of Penmanship.',
+  pen_fountain: 'Unlocks the Fountain Pen as the finest current World Writing hand.',
+  bargain_root: 'Teaches the Swarm Sigil, which asks for more creatures in exchange for more Stability.',
+  bargain_weather: 'Teaches the Storm Sigil, which asks for dangerous weather in exchange for more Stability.',
+  bargain_ground: 'Teaches the Tremor Sigil, which asks for unstable ground in exchange for more Stability.',
+  bargain_teeth: 'Teaches the Predation Sigil, which asks for fewer but stronger creatures in exchange for more Stability.',
+  bargain_rot: 'Teaches the Blight Sigil, which asks for harmful growth in exchange for more Stability.',
+  bargain_air: 'Teaches the Miasma Sigil, which asks for damaging air in exchange for more Stability.',
+  bargain_peace: 'Teaches the Peace Sigil, which asks for a quieter world but provides less Stability.',
+  lens_targets: 'Adds numerical pressure readings to the World preview for subjects you have measured in the field.',
+  lens_attribution: 'Shows which parts of your Page contributed to each previewed world pressure.',
+  lens_instability: 'Shows which written requests and contradictions are consuming the world’s Stability.',
+  lens_living: 'Adds a preview of the kinds of life a written world is likely to support.',
+};
+const gambitComponentNameByID = new Map(
+  gambitComponentSource.components.map((component) => [component.id, component.name]),
+);
+const researchBlurb = (node) => {
+  if (researchResultCopy[node.id]) return researchResultCopy[node.id];
+  if (node.id.startsWith('shelving_')) return 'Raises Storehouse capacity by one tier.';
+  if (node.id.startsWith('satchel_')) return 'Raises the party’s field carrying capacity by one tier.';
+  const grant = node.grants?.[0];
+  if (!grant) return compactCopy(node.blurb);
+  if (grant.kind === 'gambitComponent') {
+    const name = gambitComponentNameByID.get(grant.id) ?? readableID(grant.id);
+    return `Adds “${name}” to the Gambit parts you can use.`;
+  }
+  if (grant.kind === 'symbol') {
+    const symbolNames = { verdigris_bloom: 'Verdigris Bloom', mote_vein: 'Mote Vein' };
+    return `Teaches the ${symbolNames[grant.id] ?? readableID(grant.id)} Sigil for World Writing.`;
+  }
+  if (grant.kind === 'focus') return `Teaches ${node.name} as a Focus for World Writing.`;
+  if (grant.kind === 'instrument') return `Teaches the ${node.name} at Crude precision so Survey can measure ${readableID(grant.id).toLowerCase()}.`;
+  return compactCopy(node.blurb);
 };
 const resourceDefinitionByID = new Map(
   resourceSource.resources.map((resource) => [resource.id, resource]),
@@ -154,9 +294,9 @@ const resourceConsumerAuthorityByID = new Map(
     .map(([resource, acquisition, buildings, recipes, other]) => {
       const id = resource.match(/`([^`]+)`/)?.[1];
       if (!id) throw new Error(`Resource consumer authority row has no stable resource id: ${resource}`);
-      const values = (value) => (value === '—' ? [] : value.split(/;\s*/).map(compactCopy));
+      const values = (value) => (value === '—' ? [] : value.split(/;\s*/).map(playerResourceCopy));
       return [id, {
-        acquisition,
+        acquisition: playerResourceCopy(acquisition),
         buildingConsumers: values(buildings),
         recipeConsumers: values(recipes),
         otherConsumers: values(other),
@@ -390,7 +530,7 @@ const cast = await Promise.all(castRows.map(async (row) => {
     throw new Error(`Full-cast guide has no matching authored traveller for ${row.name}`);
   }
   const serviceLine = diary.body.match(
-    /^\*\*(Service|Role):\*\* ([\s\S]*?)\. \*\*Diary rewards?:\*\* ([\s\S]*?)\.\n\n/,
+    /^\*\*(Service|Role):\*\* ([\s\S]*?)\. \*\*(?:Book|Diary) rewards?:\*\* ([\s\S]*?)\.\n\n/,
   );
   if (!serviceLine) {
     throw new Error(`Full-cast guide has no service or role line for ${row.name}`);
@@ -719,7 +859,7 @@ const playerContent = {
     .map((branch) => ({
       id: branch.id,
       name: branch.name,
-      blurb: branch.blurb,
+      blurb: researchBranchCopy[branch.id] ?? branch.blurb,
       order: branch.order,
       stationID: branch.station ?? null,
     }))
@@ -728,7 +868,7 @@ const playerContent = {
     id: node.id,
     branch: node.branch,
     name: node.name,
-    blurb: node.blurb,
+    blurb: researchBlurb(node),
     cost: {
       essence: node.cost?.essence ?? 0,
       resources: node.cost?.resources ?? {},

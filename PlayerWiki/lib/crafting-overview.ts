@@ -26,19 +26,19 @@ export const floraMaterialPropertyDerivations = [
 ] as const;
 
 export const materialScoreBoundary = {
-  currentGrade: 'The live 0–100 grade is separate from the six properties. It averages each contributing trait’s distance from 50, multiplies that extremity by 85, adds up to 25 from Lustre, then clamps the result to 0–100. Because unusually low traits can raise this grade, it must not become the new four-band quality formula.',
-  intended: 'Keep every concrete property derived from the source creature, plant, or World material. Use physical family/type/subtype for recipe eligibility. Use Poor, Common, Rare, or Exceptional quality to scale the selected material’s previewed contribution to the finished item. The exact per-property, per-component stat conversion still needs to be settled with Aimee before implementation.',
-  currentExceptions: 'Current creature and Flora harvests are morphology-derived. Trading Post supplier samples instead synthesize property ranges, and some Recycler returns use fixed property records. Those paths must emit or preserve canonical material receipts rather than inventing unrelated values.',
+  currentGrade: 'The current 0–100 grade is separate from the six properties. It averages each contributing trait’s distance from 50, multiplies that extremity by 85, adds up to 25 from Lustre, then limits the result to 0–100. Because unusually low traits can raise this grade, it must not become the new four-band quality formula.',
+  intended: 'Keep every concrete property derived from the creature, plant, or World material that produced it. Use physical family, type, or subtype to decide whether it fits a recipe. Use Poor, Common, Rare, or Exceptional quality to scale the material’s previewed contribution to the finished item. The exact conversion from each property and component into item statistics still needs to be settled with Aimee before this change is made.',
+  currentExceptions: 'Current creature and Flora harvests derive their values from the body or plant that produced them. Trading Post samples instead generate values from a range, and some Recycler returns use fixed records. The intended system must give those materials values supported by their real source rather than unrelated numbers.',
 } as const;
 
 export const materialCustodyFlow = [
-  ['Field and combat rewards', 'Current holdings mix counted resources with individual, source-bearing samples.', 'Receive a recognizable physical type or subtype immediately, with species, colour, world, and inherited values retained in expandable detail.'],
-  ['Expedition Return', 'The return can divide counted resources and exact samples through different paths.', 'Freeze one quantity outcome for every precise subtype and quality stack. Recovered plus lost must equal the exact carried amount.'],
+  ['Field and combat rewards', 'Current holdings mix counted resources with individual samples that remember their source.', 'Receive a recognizable physical type or subtype immediately, with species, colour, world, and inherited values available in expanded detail.'],
+  ['Expedition Return', 'The return can treat counted resources and individual material samples differently.', 'Decide the recovered and lost quantity once for every subtype-and-quality stack. Together, those amounts must equal everything the party carried.'],
   ['Storehouse', 'World stock and creature samples are not yet one complete material inventory.', 'Default-stack by precise subtype plus quality. Materials never consume item slots; expanding a stack shows its species-specific items and sources.'],
-  ['Trading Post', 'Exact samples use hidden traits in their price and merchant stock.', 'Buy and sell an exact subtype, quality band, and quantity. Resold stock keeps its band and species/source history.'],
-  ['Crafting pickers', 'Several makers select exact samples by numerical trait thresholds.', 'Recipes list broad, specific, or precise physical categories. Where quality affects the result, the player deliberately chooses the exact stack and quantity.'],
-  ['Recycler', 'Dismantling returns exact recorded samples or fixed salvage.', 'Return the subtype, quality, species-specific items, and quantity in the construction receipt. Older fixed salvage must migrate losslessly through a published four-band mapping; it must never silently default to a made-up grade.'],
-  ['Cold relaunch', 'Old and new custody forms can coexist in a save.', 'Every stack, quantity, source-history link, pending return, trade line, and construction receipt reloads exactly once.'],
+  ['Trading Post', 'Individual samples use hidden traits to set their price and determine merchant stock.', 'Buy and sell a chosen subtype, quality band, and quantity. Resold stock keeps its band and species/source history.'],
+  ['Crafting pickers', 'Several makers currently choose individual samples by hidden numerical thresholds.', 'Recipes list broad, specific, or precise physical categories. Where quality affects the result, the player deliberately chooses the stack and quantity.'],
+  ['Recycler', 'Dismantling returns recorded construction samples or fixed salvage.', 'Return the subtype, quality, species-specific details, and quantity recorded when the item was made. Older fixed salvage must move safely into the four quality bands and never receive a made-up grade.'],
+  ['Closing and reopening the game', 'Old and new forms of material storage can coexist in a save.', 'Every stack, quantity, source-history link, pending return, trade offer, and recorded construction material reloads exactly once.'],
 ] as const;
 
 export const qualityRules = [
@@ -49,15 +49,15 @@ export const qualityRules = [
 ] as const;
 
 export const coatingLifecycle = {
-  current: 'The current combat implementation consumes a weapon coating on the next eligible successful strike.',
+  current: 'Right now, a weapon coating is used up by the next successful strike that can apply it.',
   intended: 'Every weapon coating lasts for exactly one world excursion. It is bound to the chosen weapon and active world, survives travel, encounters, backgrounding and cold relaunch in that same excursion, and ends only when that excursion ends. It is never consumed merely because one strike, turn, encounter, or amount of real time passed.',
-  migration: 'If an older save contains a live prepared coating in an active encounter, preserve it on that exact weapon for the remainder of that same excursion. Do not create a coating from inventory and do not carry one into a later world.',
+  migration: 'If an older save contains an active prepared coating during an encounter, keep it on that weapon for the remainder of the same excursion. Do not create a coating from inventory and do not carry one into a later world.',
 } as const;
 
 export const starterRuneFlow = {
   current: 'A fresh campaign currently knows 12 compound symbols and 15 source symbols and owns three starter World Pages: Open Flats, Rainwashed Shore, and Stone Hollow.',
-  intended: 'A new campaign begins with no known runes. Its first excursion is a broadly generated, frozen introductory world with Illumination and Sun guaranteed on a safe unavoidable path. Rune knowledge survives return, defeat, interruption, and cold relaunch. After both discoveries return home, Writing teaches Illumination as the subject and Sun as its source, then the player joins them and binds the first player-authored world. Every unwritten facet of that world remains generated.',
-  recovery: 'Leaving before both discoveries never deadlocks the campaign. The same frozen introductory world remains available, already learned rune knowledge stays learned, and the missing discovery remains safely reachable until collected. The introductory route does not depend on voluntary return or a loss-prone haul.',
+  intended: 'A new campaign begins with no known runes. Its first excursion is a broadly generated introductory world with Illumination and Sun guaranteed on a safe unavoidable path. Those discoveries survive return, defeat, interruption, and closing the game. Once both are brought home, Writing teaches Illumination as the subject and Sun as its source; the player joins them and binds the first world they shape themselves. Everything they did not write remains generated.',
+  recovery: 'Leaving before both discoveries never blocks the campaign. The same introductory world remains available, already learned rune knowledge stays learned, and the missing discovery remains safely reachable until collected. This opening journey does not depend on a voluntary return or on bringing home vulnerable cargo.',
   legacy: 'Existing campaigns keep every known rune and owned World Page. Nothing is revoked, duplicated, or replaced during migration.',
 } as const;
 
@@ -93,13 +93,13 @@ export const worldGenerationPlan = [
   ['Ground and liquid types', 'Use multiple recognizable dirt, sand, stone, mineral, and liquid types. Granite regions can host Granite; Sand can become a glassmaking input.'],
   ['Flora', 'Terrain, light, atmosphere, weather, water, and temperature all constrain what can grow. Trees gain real canopy and trunk behavior.'],
   ['Creatures', 'Readable body plans and habitat rules support aquatic, land, amphibious, flying, and hybrid forms. Anatomy determines useful material types and subtypes.'],
-  ['Environment', 'When condition candidates are incompatible, temperature or another relevant pressure deterministically selects one; the world itself is not rejected. Compatible authored combinations may transform, such as rain and miasma becoming acid rain when that rule is approved.'],
+  ['Environment', 'When two possible conditions conflict, temperature or another relevant pressure chooses which one appears; the world itself is not rejected. Compatible written combinations may transform, such as rain and miasma becoming acid rain when that rule is approved.'],
   ['World size', 'Writing can eventually request smaller or larger worlds. Exact dimensions and costs will be discussed with Aimee.'],
 ] as const;
 
 export const incrementalDelivery = [
-  ['One useful path at a time', 'A first slice can take one canonical material from a current producer through Field acquisition, Return, Storehouse, and one useful recipe or service.'],
+  ['One useful path at a time', 'An update can take one real material from gathering through Return and Storehouse into one useful recipe or service.'],
   ['Legacy compatibility', 'Untouched buildings may keep their current rules until their own slice is replaced. Their current limitation is shown honestly instead of delaying every update.'],
-  ['Safe migration', 'Each slice migrates only the stock and receipts it owns, idempotently and without loss, duplication, silent quality changes, or unreadable saves.'],
+  ['Safe migration', 'Each update converts only the affected materials and saved crafting history. Repeating the migration must never lose or duplicate anything, change quality, or make an old save unreadable.'],
   ['Continuous publication', 'The Wiki changes with every delivered slice so implemented and intended behavior never blur together.'],
 ] as const;

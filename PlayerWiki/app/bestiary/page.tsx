@@ -9,6 +9,7 @@ import { content } from '@/lib/content';
 import { creatureMaterialPropertyDerivations, materialScoreBoundary } from '@/lib/crafting-overview';
 import { creatureMaterialFamilies } from '@/lib/player-guide-status';
 import { serviceForSlug } from '@/lib/services';
+import { villageLocation } from '@/lib/village';
 
 export default function BestiaryPage() {
   const guide = serviceForSlug('bestiary');
@@ -17,7 +18,7 @@ export default function BestiaryPage() {
   const visualURL = station.assetURL ?? station.contextAssetURL;
   const visualLabel = station.assetURL
     ? `${station.name} building visual`
-    : `${station.zone} town setting`;
+    : `${villageLocation(station.zone)} town setting`;
 
   return (
     <SiteFrame sidebar>
@@ -26,7 +27,7 @@ export default function BestiaryPage() {
         <PixelImage src={visualURL} alt={visualLabel} size={96} />
         <PageIntro eyebrow="World records" title="Bestiary" summary={guide.summary} />
       </div>
-      <p className="service-visual-note">The current retained building visual for {station.name}.</p>
+      <p className="service-visual-note">The current building appearance for {station.name}.</p>
       <DirectoryIndex label="Browse creatures" entries={content.creatures.map((creature) => ({ href: `/bestiary/${creature.slug}`, name: creature.name }))} />
       <DirectoryDetailsIntro title="Compare creature profiles" summary="Use these public field and combat facts without changing what your own campaign has discovered." />
       <section className="article-section">
@@ -52,7 +53,7 @@ export default function BestiaryPage() {
       </section>
       <section className="article-section">
         <h2>Creature materials inherit real anatomy</h2>
-        <TruthPair current="Generated creature drops already calculate their six material properties from the defeated creature’s saved covering, skeleton, armament, finish, and emanation. The current family list and grade model are older and incomplete, but the property values are not arbitrary labels." accepted="The canonical family, type, and subtype decide which recipe socket accepts the material. Its inherited numerical properties then contribute to concrete item statistics, while its four-band quality controls the strength of those contributions." acceptedLabel="Intended design" />
+        <TruthPair current="Generated creature drops already calculate six material properties from the defeated creature’s covering, skeleton, natural weapons, finish, and emanation. The current family list and grade model are older and incomplete, but those values come from the creature rather than arbitrary labels." accepted="A material’s family, type, and subtype decide which recipe slot accepts it. Its inherited numerical properties then contribute to concrete item statistics, while its four-band quality controls the strength of those contributions." acceptedLabel="Intended design" />
         <div className="table-wrap"><table><thead><tr><th>Material property</th><th>Current creature-derived calculation</th></tr></thead><tbody>{creatureMaterialPropertyDerivations.map(([property, calculation]) => <tr key={property}><td><strong>{property}</strong></td><td>{calculation}</td></tr>)}</tbody></table></div>
         <p className="note-card"><strong>Quality is separate:</strong> {materialScoreBoundary.currentGrade}</p>
       </section>

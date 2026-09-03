@@ -28,7 +28,7 @@ export default function ResourcesPage() {
         summary="World resources are shaped by pressures in the Page and the world that Binding generates. Use this table to compare where each resource tends to appear and what it currently builds."
       />
       <DirectoryIndex label="Browse resources" entries={content.resources.map((resource) => ({ href: `/resources/${resource.slug}`, name: resource.name, imageURL: resource.assetURL, imageAlt: `${resource.name} inventory icon` }))} />
-      <DirectoryDetailsIntro title="Compare resources" summary="Scan every current resource’s acquisition, recipe and service consumers, construction use, and trade status before opening its complete entry." />
+      <DirectoryDetailsIntro title="Compare resources" summary="See how every current resource is found, what recipes, services, and buildings use it, and whether it can be traded before opening its complete entry." />
       <div className="table-wrap data-table">
         <table>
           <thead>
@@ -62,8 +62,8 @@ export default function ResourcesPage() {
                   <td>{resource.consumerAuthority.acquisition}</td>
                   <td>
                     <ul className="compact-list">
-                      <li><strong>Craft / process:</strong> {resource.consumerAuthority.recipeConsumers.length ? resource.consumerAuthority.recipeConsumers.join('; ') : 'No current process listed'}</li>
-                      <li><strong>Service / research:</strong> {resource.consumerAuthority.otherConsumers.length ? resource.consumerAuthority.otherConsumers.join('; ') : 'No other current sink listed'}</li>
+                      <li><strong>Craft / process:</strong> {resource.consumerAuthority.recipeConsumers.length ? resource.consumerAuthority.recipeConsumers.join('; ') : 'No current recipe or process'}</li>
+                      <li><strong>Service / Research:</strong> {resource.consumerAuthority.otherConsumers.length ? resource.consumerAuthority.otherConsumers.join('; ') : 'No other current use'}</li>
                       {recipes.length > 0 && <li><strong>Current recipe pages:</strong> {recipes.map((recipe, index) => <span key={recipe.id}>{index ? ', ' : ''}<Link href={`/crafting/${recipe.system}`}>{recipe.name}</Link></span>)}</li>}
                     </ul>
                   </td>
@@ -78,15 +78,15 @@ export default function ResourcesPage() {
       <section className="article-section">
         <h2>Rules shared by resources and materials</h2>
         <TruthPair
-          current="The game currently mixes counted World resources with individual, source-bearing material samples. The table above describes those live acquisition and spending routes."
+          current="The game currently stores some World resources as quantities and other gathered materials as individual samples that remember where they came from. The table above shows how each one is currently found and used."
           accepted="Physical stock will use recognizable broad categories, specific types, and precise subtypes with four resource qualities. Species, world, colour, and inherited values remain available in expanded history without needlessly splitting otherwise identical stock."
           acceptedLabel="Intended design"
         />
-        <p><a href="#loot-and-custody">Follow loot from the world to the Cottage</a> · <Link href="/guide-status">See what is changing</Link></p>
+        <p><a href="#loot-and-custody">Follow materials from the world to the Cottage</a> · <Link href="/guide-status">See what is changing</Link></p>
       </section>
       <section className="article-section" id="loot-and-custody">
-        <h2>Loot, return, and custody</h2>
-        <p>These routes explain where a found material goes. The resource and item entries remain the source for what the exact holding is and what can consume it.</p>
+        <h2>Gathering, return, and storage</h2>
+        <p>These paths explain where a found material goes. Open its resource or item page to learn exactly what it is and where it can be used.</p>
         <div className="status-card-grid">{lootPaths.map((path) => <article className="status-card" key={path.name}><h3>{path.name}</h3><TruthPair current={path.current} accepted={path.accepted} /></article>)}</div>
       </section>
       <section className="article-section">
@@ -95,7 +95,7 @@ export default function ResourcesPage() {
         <div className="table-wrap"><table><thead><tr><th>Level</th><th>Example</th><th>Player meaning</th></tr></thead><tbody>{materialIdentityHierarchy.map(([level, example, meaning]) => <tr key={level}><td><strong>{level}</strong></td><td>{example}</td><td>{meaning}</td></tr>)}</tbody></table></div>
         <div className="definition-grid"><div><h3>Resource qualities</h3><p>{qualityBands.join(' · ')}</p><p>White, green, blue, and purple respectively. Each subtype and quality has its own default stack.</p></div><div><h3>How a stack reads</h3><p><strong>{canonicalStackExample}</strong>. Expand it to inspect every species-specific item, source world, inherited colour, quantity, and visible stat contribution.</p></div><div><h3>Inventory views</h3><p>The default groups subtype + quality. Alternate views can sort by material, quality, species, source, colour, quantity, or recency without moving or merging stock.</p></div><div><h3>Selection</h3><p>When quality affects the result, the player chooses which quality to spend. No recipe silently substitutes another grade.</p></div><div><h3>Peerless</h3><p>Peerless is reserved for legendary equipment, not raw resources.</p></div></div>
       </section>
-      <section className="article-section note-card"><h2>What stays separate</h2><p>Items, equipment, Pages, Curios, placed sites, Raw Essence, Motes, and authored guardian rewards keep their own identities. A depleted site remains part of its world’s history. Gold material is also separate from Gold Coins.</p></section>
+      <section className="article-section note-card"><h2>What stays separate</h2><p>Items, equipment, Pages, Curios, placed sites, Raw Essence, Motes, and special guardian rewards remain separate from ordinary material stacks. A depleted site remains part of its world’s history. Gold material is also separate from Gold Coins.</p></section>
       <section className="article-section">
         <h2>Flora materials inherit their plant</h2>
         <p>Current harvested plant samples already derive properties from the saved plant traits. These values remain part of the intended material system and will contribute to concrete crafted-item statistics rather than acting as universal recipe passwords.</p>

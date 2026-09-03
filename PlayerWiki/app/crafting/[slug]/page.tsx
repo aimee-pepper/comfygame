@@ -66,7 +66,7 @@ function resultLink(item: NonNullable<ReturnType<typeof resultItem>>) {
 
 function constructionCost(station: (typeof content.stations)[number]) {
   if (station.unlockedAtStart) return 'Available at the start of a campaign.';
-  if (!station.buildCost.length) return 'No current construction cost is published.';
+  if (!station.buildCost.length) return 'A construction cost is not available yet.';
   return <>{station.buildCost.map((cost, index) => {
     const id = cost.id ?? cost.resource ?? cost.resourceID;
     const resource = id ? content.resources.find((entry) => entry.id === id) : null;
@@ -105,31 +105,31 @@ export default async function CraftingSystemDetail({
       />
       {guideStatus && <section className="article-section">
         <p className="status-pill">{guideStatus.status}</p>
-        <h2>Current station and approved direction</h2>
+        <h2>How it works now and how it will change</h2>
         <TruthPair current={guideStatus.current} accepted={guideStatus.accepted} />
       </section>}
       <section className="article-section">
         {station?.assetURL && <div className="crafting-station"><PixelImage src={station.assetURL} alt={`${station.name} building visual`} size={72} /><p><strong>{station.name}</strong> is the current station visual for this system.</p></div>}
         <h2>Access and readiness</h2>
         <dl className="fact-grid">
-          <div><dt>Current state</dt><dd>Current player station process</dd></div>
+          <div><dt>Availability</dt><dd>See the status above for whether this station and recipe family can be used now.</dd></div>
           <div><dt>Station access</dt><dd>{station ? <><Link href={`/buildings/${station.slug}`}>{station.name}</Link> · {constructionCost(station)}</> : 'Open the station named above.'}</dd></div>
-          <div><dt>Current route</dt><dd><ul className="compact-list">{system.access.map((fact) => <li key={fact}>{fact}</li>)}</ul></dd></div>
+          <div><dt>How to reach it</dt><dd><ul className="compact-list">{system.access.map((fact) => <li key={fact}>{fact}</li>)}</ul></dd></div>
         </dl>
       </section>
       <section className="article-section">
-        <h2>Current workflow</h2>
+        <h2>How to use this station</h2>
         <ol className="numbered-guide">
           {system.howItWorks.map((step) => (
             <li key={step}>{step}</li>
           ))}
         </ol>
       </section>
-      {system.slug === 'apothecary' && <section className="article-section"><h2>Lesser Salve is the first known preparation</h2><div className="definition-grid"><div><h3>What construction gives you</h3><p>The completed Apothecary teaches the Lesser Salve recipe only. It does not give a Salve, spend a flexible material, or consume Resin.</p><p><Link href="/buildings/apothecary">Read the complete Apothecary entry</Link></p></div><div><h3>What preparation needs</h3><p>{apothecaryFirstUse.firstRecipe}</p><p>A flexible material means one exact eligible Home material, not a generic count or any named object.</p></div></div><h3>Current shortfalls stay specific</h3><ul className="compact-list">{apothecaryFirstUse.shortfalls.map((line) => <li key={line}>{line}</li>)}</ul><p>{apothecaryFirstUse.inference}</p></section>}
-      {system.slug === 'blacksmith' && <section className="article-section"><h2>Pointed Blade is the first live maker family</h2><p>Halloway’s completed foundation teaches this Schematic and no finished gear. The recipe uses one exact point and one different exact grip; its current quality quote sets the real Essence cost before confirmation.</p><ul className="compact-list">{blacksmithFirstUse.pointedBlade.map((line) => <li key={line}>{line}</li>)}</ul><p>{blacksmithFirstUse.stockBoundary}</p><p><Link href="/buildings/blacksmith">Read Halloway’s complete Blacksmith entry</Link></p></section>}
-      {system.slug === 'blacksmith' && <section className="article-section note-card"><h2>Reforge remains an exact-piece boundary</h2><ul className="compact-list">{blacksmithFirstUse.reforgeBoundary.map((line) => <li key={line}>{line}</li>)}</ul></section>}
-      {system.slug === 'anchorage' && <section className="article-section"><h2>Anchor Frame is a separate carried route</h2><p>Build the Anchorage after <Link href="/people/tovin">Tovin</Link> joins the Village, then satisfy every exact requirement for one Frame:</p><ul className="compact-list">{anchorageFirstAnchor.frameRequirements.map((line) => <li key={line}>{line}</li>)}</ul><p>One material cannot fill two positions. The completed Frame goes to its quoted Storehouse or Waiting destination; it is packed later through the Field Kit. It is useful on valid clear ground, while a discovered <Link href="/sites/atlas-seam">Atlas Seam</Link> is an independent route that does not require a Frame.</p><p><Link href="/buildings/anchorage">Read the complete first-anchor journey and confirmation boundary</Link></p></section>}
-      {system.slug === 'instruments' && <section className="article-section"><h2>Study a permanent field capability</h2><p>After <Link href="/people/mara">Mara</Link> joins the Village and the <Link href="/buildings/survey-post">Survey Post</Link> is built, each Field Instruments Research node grants one named subject at Crude precision. It is a permanent Reality capability, not a physical output or equipment object.</p><div className="table-wrap"><table><thead><tr><th>Instrument</th><th>Subject</th><th>Undiscounted current cost</th></tr></thead><tbody>{surveyPostFirstUse.instruments.map(([id, name, subject, cost]) => <tr key={id}><td>{name}</td><td>{subject}</td><td>{cost}</td></tr>)}</tbody></table></div><p>The current Research preview, including Mara’s current Home staffing discount, is the authority before you study a node. A full Storehouse or Waiting pile cannot block this no-output capability purchase.</p></section>}
+      {system.slug === 'apothecary' && <section className="article-section"><h2>Lesser Salve is the first known preparation</h2><div className="definition-grid"><div><h3>What construction gives you</h3><p>The completed Apothecary teaches the Lesser Salve recipe only. It does not give a Salve, spend a flexible material, or consume Resin.</p><p><Link href="/buildings/apothecary">Read the complete Apothecary entry</Link></p></div><div><h3>What preparation needs</h3><p>{apothecaryFirstUse.firstRecipe}</p><p>A flexible material means one eligible material stored at Home, not a generic amount or an unrelated named object.</p></div></div><h3>If ingredients are missing</h3><ul className="compact-list">{apothecaryFirstUse.shortfalls.map((line) => <li key={line}>{line}</li>)}</ul><p>{apothecaryFirstUse.inference}</p></section>}
+      {system.slug === 'blacksmith' && <section className="article-section"><h2>Pointed Blade is the first available weapon form</h2><p>Completing Halloway’s foundation teaches this Schematic but does not give you finished gear. The recipe uses one chosen point and one different chosen grip. The preview shows the final Essence price before you confirm.</p><ul className="compact-list">{blacksmithFirstUse.pointedBlade.map((line) => <li key={line}>{line}</li>)}</ul><p>{blacksmithFirstUse.stockBoundary}</p><p><Link href="/buildings/blacksmith">Read Halloway’s complete Blacksmith entry</Link></p></section>}
+      {system.slug === 'blacksmith' && <section className="article-section note-card"><h2>Reforge changes one chosen item</h2><ul className="compact-list">{blacksmithFirstUse.reforgeBoundary.map((line) => <li key={line}>{line}</li>)}</ul></section>}
+      {system.slug === 'anchorage' && <section className="article-section"><h2>Using an Anchor Frame in the field</h2><p>Build the Anchorage after <Link href="/people/tovin">Tovin</Link> joins the Village, then meet every requirement for one Frame:</p><ul className="compact-list">{anchorageFirstAnchor.frameRequirements.map((line) => <li key={line}>{line}</li>)}</ul><p>One material cannot fill two positions. The completed Frame goes to the Storehouse, or Waiting if storage is full, and can be packed later through the Field Kit. It works on valid clear ground. A discovered <Link href="/sites/atlas-seam">Atlas Seam</Link> can anchor a world without a Frame.</p><p><Link href="/buildings/anchorage">Read the complete first-anchor journey</Link></p></section>}
+      {system.slug === 'instruments' && <section className="article-section"><h2>Study a permanent field skill</h2><p>After <Link href="/people/mara">Mara</Link> joins the Village and the <Link href="/buildings/survey-post">Survey Post</Link> is built, each Field Instruments Research entry teaches one named subject at Crude precision. It is a permanent skill rather than a physical item.</p><div className="table-wrap"><table><thead><tr><th>Instrument</th><th>Subject</th><th>Cost before discounts</th></tr></thead><tbody>{surveyPostFirstUse.instruments.map(([id, name, subject, cost]) => <tr key={id}><td>{name}</td><td>{subject}</td><td>{cost}</td></tr>)}</tbody></table></div><p>Check the Research preview before studying; it includes any staffing discount from Mara. A full Storehouse or Waiting area cannot block this purchase because it does not create an item.</p></section>}
       {system.slug === 'instruments' && <section className="article-section note-card"><h2>Good and Fine precision are playable now</h2><ul className="compact-list">{surveyPostFirstUse.improvementBoundary.map((line) => <li key={line}>{line}</li>)}</ul><p><Link href="/buildings/survey-post">Read packing, Survey, refusal, and relaunch boundaries</Link></p></section>}
       <section className="article-section">
         <h2>Material choices</h2>
@@ -178,18 +178,18 @@ export default async function CraftingSystemDetail({
       <section className="article-section two-column crafting-output-guide">
         <div>
           <h2>Results and their use</h2>
-          {outputItems.length ? <ul className="compact-list">{outputItems.map(({ recipe, item }) => <li key={recipe.id}>{item ? <><Link href={resultLink(item)}>{recipe.result}</Link> — {item.summary}</> : <><strong>{recipe.result}</strong> — use the station’s quoted destination and result description.</>}</li>)}</ul> : <p>No separately published result entry is available for this current station process.</p>}
+          {outputItems.length ? <ul className="compact-list">{outputItems.map(({ recipe, item }) => <li key={recipe.id}>{item ? <><Link href={resultLink(item)}>{recipe.result}</Link> — {item.summary}</> : <><strong>{recipe.result}</strong> — check the station preview to see where it will go and what it will do.</>}</li>)}</ul> : <p>This station process does not yet have a separate result page.</p>}
         </div>
         <div>
           <h2>Related routes</h2>
-          <p>{station ? <><Link href={`/buildings/${station.slug}`}>{station.name}</Link> holds this station. </> : null}Open each linked resource for its current acquisition and other published consumers; the item or equipment guide retains the result’s player-facing facts.</p>
+          <p>{station ? <><Link href={`/buildings/${station.slug}`}>{station.name}</Link> is the home of this craft. </> : null}Open each linked resource to learn how to obtain it and where else it is used. Open the finished item or equipment page for the complete result.</p>
         </div>
       </section>
-      {notLive.length ? <section className="article-section note-card crafting-boundary"><h2>Defined, but not a current recipe</h2><ul className="compact-list">{notLive.map((entry) => <li key={entry.name}><strong>{entry.name}:</strong> {entry.detail}</li>)}</ul></section> : null}
-      {guideStatus?.changes.length ? <section className="article-section"><h2>Recipe-by-recipe changes</h2><p>“Implemented now” describes the current build. “Intended implementation” is not yet a live recipe; ingredient categories and stat values marked for Aimee review are not final.</p><div className="status-card-grid">{guideStatus.changes.map((change) => <article className="status-card" key={change.name}><h3>{change.name}</h3><TruthPair current={change.current} accepted={change.accepted} /></article>)}</div></section> : null}
+      {notLive.length ? <section className="article-section note-card crafting-boundary"><h2>Planned recipes — not available yet</h2><ul className="compact-list">{notLive.map((entry) => <li key={entry.name}><strong>{entry.name}:</strong> {entry.detail}</li>)}</ul></section> : null}
+      {guideStatus?.changes.length ? <section className="article-section"><h2>Recipe-by-recipe changes</h2><p>“Playable now” describes the game today. “Planned design” is not available yet; ingredient categories and stat values marked for Aimee review are not final.</p><div className="status-card-grid">{guideStatus.changes.map((change) => <article className="status-card" key={change.name}><h3>{change.name}</h3><TruthPair current={change.current} accepted={change.accepted} /></article>)}</div></section> : null}
       {system.slug === 'apothecary' && <section className="article-section note-card"><h2>What the first build does not grant</h2><p>{apothecaryFirstUse.catalogueBoundary}</p><ul className="compact-list">{apothecaryFirstUse.costs.map((line) => <li key={line}>{line}</li>)}</ul></section>}
       <section className="article-section note-card">
-        <h2>Commit and result</h2>
+        <h2>Make it and receive the result</h2>
         <p>{system.commitResult}</p>
       </section>
       <RelatedGuides links={[{ label: 'All crafting systems', href: '/crafting' }, ...(station ? [{ label: station.name, href: `/buildings/${station.slug}` }] : []), { label: 'Village', href: '/village' }, ...relatedResources.slice(0, 3).flatMap((resource) => resource ? [{ label: resource.name, href: `/resources/${resource.slug}` }] : []), { label: 'All resources', href: '/resources' }]} />

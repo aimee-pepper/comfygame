@@ -59,7 +59,7 @@ export default function Home() {
           <div className="section-heading"><div><p className="eyebrow">The first journey</p><h2 id="journey-heading">Prepare, write, and step through</h2></div><Link href="/getting-started">Read the full first-trip guide</Link></div>
           <div className="journey-strip">
             <Link href="/systems/world-writing"><img src={content.writingAssetURL} alt="Writing Desk parchment" /><span><strong>Write a Page</strong><small>Use the Writing Desk to review, shape, and Bind the next world.</small></span></Link>
-            <Link href="/systems/exploration"><img src={content.explorationVisuals.entryPortal} alt="Entry portal" /><span><strong>Enter the world</strong><small>The entry portal stays on the map as the route back through the expedition.</small></span></Link>
+            <Link href="/systems/exploration"><img src={content.explorationVisuals.entryPortal} alt="Entry portal" /><span><strong>Enter the world</strong><small>The entry portal stays on the map as your way home during the expedition.</small></span></Link>
             {firstSupply && <Link href={`/items/${firstSupply.slug}`}><PixelImage src={firstSupply.assetURL} alt={`${firstSupply.name} icon`} size={58} /><span><strong>Carry a supply</strong><small>Open an item entry to understand its exact use before the field.</small></span></Link>}
           </div>
         </section>
@@ -121,7 +121,7 @@ export default function Home() {
           <div className="topic-grid">
             <Link className="topic-card" href="/resources#loot-and-custody">
               <PackageOpen aria-hidden="true" />
-              <span><strong>Resources, loot &amp; materials</strong><small>Use one canonical guide for resource entries, return and custody, quality, and the intended physical-material overhaul.</small></span>
+              <span><strong>Resources, loot &amp; materials</strong><small>Find resource entries, expedition returns, storage, quality, and the intended physical-material overhaul in one guide.</small></span>
             </Link>
           </div>
         </section>
