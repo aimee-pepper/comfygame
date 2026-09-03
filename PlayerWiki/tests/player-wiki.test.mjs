@@ -157,6 +157,8 @@ test('crafting overview separates the current property model from the intended p
   assert.match(overview, /keeps its appropriate minimap record/);
   assert.match(overview, /Aquatic creatures can use shallow and deep water/);
   assert.match(overview, /perches are not universally required/);
+  assert.match(overview, /It does not currently sort Rubble/);
+  assert.match(overview, /mostly common local materials/);
   assert.match(resources, /Intended material identity/);
   assert.match(resources, /Gathering, return, and storage/);
   assert.match(loot, /href="\/resources#loot-and-custody"/);
@@ -635,6 +637,9 @@ test('Recycler directory keeps authored salvage profiles separate from current p
   assert.match(directory, /Every recovery preview belongs to the Stored or Waiting piece you selected/);
   assert.match(directory, /Standard salvage patterns/);
   assert.match(directory, /Recovering recorded construction materials/);
+  assert.match(directory, /Planned Rubble sorting/);
+  assert.match(directory, /common local materials appear most often/);
+  assert.match(directory, /rare local material is only a small bonus chance/);
   assert.match(directory, /When a piece stays protected/);
   assert.match(directory, /Confirm only the displayed preview/);
   for (const profile of [

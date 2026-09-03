@@ -29,6 +29,15 @@ export default function RecyclingDirectory() {
       <PageIntro eyebrow="Current Village reference" title="Recycler returns" summary="Compare what different kinds of gear can return, then review the exact materials before choosing one piece to dismantle." />
     </div>
     <section className="article-section"><h2>Materials returned now and in the intended design</h2><TruthPair current="The Recycler dismantles one eligible piece at a time. Gear with recorded construction materials returns selected parts of those materials; older standard gear follows its listed salvage pattern." accepted="The same one-piece rule remains. Mined materials return to their exact-name quantity stacks with no quality. Biological materials return to their recorded subtype, quality, and quantity stacks with species details still available. The Recycler never invents or substitutes a quality." /></section>
+    <section className="article-section">
+      <h2>Planned Rubble sorting</h2>
+      <TruthPair
+        current="Rubble is currently a counted resource, and the Recycler currently accepts eligible gear rather than raw Rubble."
+        accepted="Rubble remains one simple, ungraded mixed resource. A separate Recycler action will let you choose an amount and preview the materials hidden in those exact units. The source region controls what can appear: common local materials appear most often, uncommon finds appear less often, and a genuinely rare local material is only a small bonus chance."
+        acceptedLabel="Intended design"
+      />
+      <p>The Recycler will never produce a material that was absent from the Rubble’s source region. Once shown, a preview cannot be changed by cancelling, reopening, or relaunching. Exact quantities, odds, unlock requirements, and any processing cost are still being balanced.</p>
+    </section>
     <section className="article-section note-card">
       <h2>Noll’s first Recycler</h2>
       <p>Recruit <Link href="/people/noll">Noll</Link> to reveal the Recycler foundation in Home → Make. Its complete build cost is <strong>{recyclerFirstUse.buildCost}</strong>. Building it creates the bench, not a dismantling result.</p>

@@ -52,7 +52,7 @@ until step 6 proves the player has learned the terms and can deliberately produc
 ### Decisions to settle with Aimee
 
 1. Final physical material category/type/subtype registry.
-2. Mixed geological find name, collection frequency, region-weighted outputs, and processing owner.
+2. Rubble collection frequency, batch size, region-weighted outputs, Recycler tier or unlock, and processing cost.
 3. Ground and liquid type catalogue.
 4. Ground layout style set.
 5. World size tiers and dimensions.
@@ -243,12 +243,13 @@ Collect several species variants and qualities, inspect carried detail, partiall
 
 Recommended first vertical slices after Phase 0 decisions:
 
-1. One metal-processing route only if Phase 0 proves that a real recipe needs a distinct processed form
-2. Hide to Leather
-3. Fibre to Cord/Cloth
-4. Timber to Planks/Hafts
-5. Sand or suitable mineral input to Glass
-6. Biological/mineral inputs to Prepared Extracts
+1. Rubble sorting at Noll's Recycler, with common-first regional results and a low-chance rare local bonus
+2. One metal-processing route only if Phase 0 proves that a real recipe needs a distinct processed form
+3. Hide to Leather
+4. Fibre to Cord/Cloth
+5. Timber to Planks/Hafts
+6. Sand or suitable mineral input to Glass
+7. Biological/mineral inputs to Prepared Extracts
 
 Each process defines:
 
@@ -398,7 +399,7 @@ Remove legacy paths only after the complete reader/writer census proves they hav
 - scalar/material duplicate custody;
 - obsolete loot projection;
 - old fixed-size-only generation assumptions;
-- Rubble as a finished resource if Aimee removes it;
+- Rubble as a direct finished recipe ingredient after its Recycler sorting path is live;
 - compatibility adapters that have completed migration.
 
 Old-save decoding remains as long as supported saves require it.

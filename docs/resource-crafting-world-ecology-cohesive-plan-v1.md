@@ -84,7 +84,7 @@ or its appearance. A colourful name alone never creates another subtype.
 | Source | Broad recipe category | Material type examples | Precise subtype examples | Species/source detail |
 |---|---|---|---|---|
 | Ground and geology | Structural stone | Granite, Limestone, Sandstone, Slate, Basalt, Marble | Dressed, cut, or broken forms belong to processing/state, not quality | Region and world |
-| Ground and geology | Loose earth and aggregate | Sand, Clay, Gravel | Mineral Debris only if the mixed-find system is approved | Region and world; one normal/green quantity stack per exact material |
+| Ground and geology | Loose earth and aggregate | Sand, Clay, Gravel, Rubble | Rubble is a mixed raw find separated at the Recycler, not a finished recipe material | Region and world; one normal/green quantity stack per exact material, with Rubble retaining its underlying source-region batches |
 | Ground and geology | Common metal | Iron, Copper, Tin | A distinct processed form only when a real recipe actually uses it | Deposit, region, and world; one normal/green quantity stack per exact material |
 | Ground and geology | Precious and unusual metal | Silver, Gold, Mercury, Adamant | A distinct processed form only when a real recipe actually uses it | Deposit, region, and world; one normal/green quantity stack per exact material |
 | Ground and geology | Crystal and mineral glass | Quartz, Obsidian, Rift-glass | Physically distinct crystal or glass forms | Deposit, region, and world |
@@ -105,7 +105,8 @@ or its appearance. A colourful name alone never creates another subtype.
 
 This registry changes several current nouns:
 
-- **Rubble** stops being a finished resource. Its possible successor is the region-bound mixed find described later.
+- **Rubble** remains a familiar raw resource name, but stops acting as an interchangeable finished crafting
+  material. It is a region-bound mixed geological find that the Recycler separates into real local materials.
 - generic **Ore** becomes the actual metal it represents, such as **Iron**. Copper, Silver, Gold, Mercury, and Adamant likewise keep their plain names. A processed form is added only when an actual crafting loop needs a distinct intermediate; the system does not force every metal through an ore/ingot vocabulary.
 - **Timber** becomes a raw Log type and a processed Plank type instead of one word covering both states.
 - **Pulp** is processed stock rather than something a plant drops ready-made.
@@ -599,17 +600,32 @@ The exact compatibility matrix, gameplay effects, and visual requirements remain
 
 ## Rubble
 
-Rubble is not an acceptable name for a specific finished resource. Aimee's preferred direction is now a mixed, region-causal raw find because it can provide a fun bounded grab bag from a zone the player could not fully explore or harvest with current tools.
+Rubble is an ungraded mixed geological find. It is useful precisely because broken ground may contain several
+materials, but recipes should use the real materials recovered from it rather than treating Rubble as a
+universal crafting substance.
 
 The intended behavior is:
 
-- broken terrain can yield a renamed mixed geological find such as Unsorted Stone or Mineral Debris;
+- broken terrain can yield Rubble;
+- the player's ordinary inventory shows one simple, normal/green Rubble quantity rather than qualities or a
+  different item name for every world;
 - its frozen source-region receipt defines the real stone, metal, mineral, or glass-bearing materials it can contain;
-- processing produces a bounded selection from that receipt, never a global bag of unrelated resources;
+- combining visible Rubble stacks does not discard those underlying source-region batches;
+- Noll's Recycler processes a selected quantity of Rubble separately from its gear-dismantling flow;
+- the Recycler preview shows the frozen result for those selected units before commitment, and processing
+  produces that result exactly once;
+- common materials supported by the source region dominate the result. Less common materials occur less often,
+  and a genuinely rare local material appears only as a low-chance bonus rather than replacing the ordinary
+  return;
+- Rubble never produces anything absent from its source region;
 - the result may include a material the player saw in that region but could not reach or harvest directly, making the find useful without replacing tools or exploration;
-- processing consumes the mixed find, so save/reload cannot reroll it indefinitely.
+- processing consumes the selected Rubble and adds every previewed material atomically. Cancel, stale state,
+  insufficient quantity, invalid custody, or write failure changes nothing;
+- preview, refusal, backgrounding, and relaunch never reroll the result.
 
-**Will discuss with Aimee:** final player-facing name, where it is collected, output count, how strongly the source receipt favors common versus inaccessible regional materials, and which facility processes it.
+**Will discuss with Aimee:** collection frequency, batch size, exact common/uncommon/rare weights, output quantities,
+how the player selects among underlying source-region batches, Recycler unlock or tier requirement, and whether
+processing has an additional cost.
 
 ## Decisions to close before Sigil and clue design
 
@@ -627,9 +643,9 @@ not a choice Engineering should improvise.
 5. **Material arithmetic.** Set the four biological-material quality thresholds/multipliers and the recipe-slot formulas that turn
    frozen creature measurements into concrete item statistics. Mined materials instead use fixed authored
    contributions with no quality roll. These are balance tables, not recipe eligibility.
-6. **Processing ownership.** Set the first processed-material list and which existing or planned Cottage
-   facility owns any metal processing that real recipes require, plus glass, leather, cloth/cord, planks/pulp,
-   plant extracts, and mixed geological sorting.
+6. **Processing ownership.** Rubble sorting belongs to the Recycler. Set the first remaining processed-material
+   list and which existing or planned Cottage facility owns any metal processing that real recipes require,
+   plus glass, leather, cloth/cord, planks/pulp, and plant extracts.
 
 After those six choices, Game Design can produce the complete terrain→resource→flora→creature host matrix,
 the exact recipe eligibility lists, and the harvesting tiers without guessing. Only then should the project

@@ -299,7 +299,7 @@ export function futureResourceCopy(name: string) {
   if (name === 'Raw Essence') return 'Raw Essence remains a quality-free precursor. Return it to the Cottage and refine it at the Essence Spring.';
   if (name === 'Mote') return 'Motes remain permanent Reality currency, with no material quality or storage slot.';
   if (name === 'Ichor') return 'Ichor will use its settled physical source category and one of four resource qualities. Older stock must move into the new system without inventing a creature source.';
-  if (name === 'Rubble') return 'Rubble will not remain a finished resource with no physical identity. Aimee will choose removal or a renamed mixed find processed only into materials supported by its source region.';
+  if (name === 'Rubble') return 'Rubble will remain a simple, ungraded mixed find. Noll’s Recycler will separate selected Rubble into materials supported by its source region: mostly common finds, less-frequent uncommon finds, and only a small chance of a rare local bonus.';
   if (['Clay', 'Ore', 'Iron Ore', 'Copper', 'Silver', 'Gold', 'Quartz', 'Obsidian', 'Salt', 'Sulfur', 'Mercury', 'Adamant', 'Rift-glass'].includes(name)) {
     const intendedName = name === 'Ore' || name === 'Iron Ore' ? 'Iron' : name;
     return `${intendedName} will be one simple exact-name quantity stack. It has no Poor, Common, Rare, or Exceptional variants and always uses the normal/green presentation. Its source does not split the stack.`;
@@ -314,7 +314,7 @@ export const openDecisions = [
   },
   {
     title: 'Mixed geological find',
-    body: 'Aimee prefers replacing finished Rubble with a mixed find shaped by its region. Processing it could yield a small grab bag from that zone, including an occasional material the player could not yet reach or harvest. Its name, frequency, number of results, regional weighting, and processing facility remain open. Any mined results remain ungraded.',
+    body: 'Rubble remains the simple, ungraded name for a mixed find shaped by its source region. Noll’s Recycler will sort a selected quantity into mostly common local materials, with uncommon results appearing less often and a rare local material possible only as a low-chance bonus. Collection frequency, batch size, exact weights and quantities, Recycler unlock or tier, and any processing cost still need to be settled.',
   },
   {
     title: 'Harvest and facility progression',

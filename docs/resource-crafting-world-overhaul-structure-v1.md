@@ -343,20 +343,26 @@ The resolved environment receipt must own both mechanics and visuals. Rendering 
 - Exact damage/status/visibility/movement/harvest effects.
 - Animation, haze, particle, colour, and sound requirements.
 
-## 11. Mixed geological find
+## 11. Rubble sorting
 
-Rubble cannot remain a specific final crafting resource.
+Rubble remains a simple, ungraded raw-resource name, but cannot remain a universal finished crafting material.
+It is a region-causal mixed find that gives the player a bounded grab bag from a zone they could not fully
+explore or harvest yet.
 
-Aimee prefers a region-causal mixed raw find because it can give the player a bounded grab bag from a zone they could not fully explore or harvest yet.
-
-- Rename it to an intuitive mixed find such as Unsorted Stone or Mineral Debris.
 - Its exact source-region receipt freezes which local materials are eligible before the player obtains it.
-- A processing facility separates it into only those supported materials.
+- Visible Rubble stacks by name and quantity while its underlying batches retain those source receipts.
+- Noll's Recycler separates a selected quantity into only those supported materials, in a flow distinct from
+  dismantling gear.
+- Common local materials dominate. Uncommon results are less frequent, and a genuinely rare local material is
+  only a low-chance bonus rather than a replacement for the ordinary return.
 - It may yield an otherwise inaccessible regional material, but cannot yield anything absent from that region.
-- It never rerolls on preview, refusal, relaunch, or repeated inspection.
+- The preview is frozen for the selected units and commits atomically; preview, cancellation, refusal, and
+  relaunch cannot reroll it.
 - It supplements exploration and harvesting tools rather than replacing their dependable yields.
 
-**Will discuss with Aimee:** name, acquisition frequency, output count, regional weighting, quality inheritance, and processing-facility owner.
+**Will discuss with Aimee:** acquisition frequency, selected batch size, exact regional weights, output quantities,
+source-batch selection, Recycler tier or unlock requirement, and any processing cost. Rubble and every mined
+output remain ungraded.
 
 ## 12. Player Wiki publication owner
 
