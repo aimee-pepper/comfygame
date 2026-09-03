@@ -8,6 +8,13 @@ export default function ReferencesPage() {
   return <SiteFrame sidebar>
     <GuideBreadcrumbs items={[{ label: 'Home', href: '/' }, { label: 'Aimee Reference' }]} />
     <PageIntro eyebrow="Project reference" title="Aimee Reference" summary="A clearly labelled home for Aimee's system plans, implementation roadmaps, and visual production references." />
+    <section className="article-section note-card" aria-labelledby="screen-authoring-map-heading">
+      <h2 id="screen-authoring-map-heading">Screen Authoring Map</h2>
+      <p>See the complete in-game screen hierarchy as a colour-coded tree: Aimee-authored compositions, implemented Asset/Engineering updates, partial or asset-ready work, and screens still using default UI.</p>
+      <nav aria-label="Screen Authoring Map reference">
+        <Link href="/references/screen-authoring-map">Open the Screen Authoring Map</Link>
+      </nav>
+    </section>
     <section className="article-section note-card" aria-labelledby="asset-splash-list-heading">
       <h2 id="asset-splash-list-heading">World Splash Asset Inventory</h2>
       <p>Read the normal Wiki page for the final five-layer parallax inventory, its completeness audit, the world varieties the recovered list does not yet cover, and the prescribed expansion.</p>
