@@ -34,6 +34,21 @@ That slice is useful proof and may be phone-delivered even though other resource
 
 ## Phase 0 - Close the remaining design choices
 
+### Required design order
+
+Do not finalize Sigil acquisition, traveller land clues, or exact World Writing unlock order before the
+material and land model they describe is stable. Close Phase 0 in this order:
+
+1. canonical physical-material registry and the mapping from every current resource/material;
+2. category/type/subtype recipe eligibility and concrete stat-contribution rules;
+3. final regional land, geology, surface, liquid, deposit, and ecology model;
+4. causal terrain/flora/creature/resource host matrices;
+5. harvesting and processing progression over that finished physical model;
+6. only then World Writing vocabulary, Sigil acquisition order, and clue learnability.
+
+The rewritten traveller clues remain the prose-quality benchmark. Their mechanical conditions are provisional
+until step 6 proves the player has learned the terms and can deliberately produce the described land.
+
 ### Decisions to settle with Aimee
 
 1. Final physical material category/type/subtype registry.

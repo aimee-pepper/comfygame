@@ -1,10 +1,21 @@
 # Creature ecology and creature-material overhaul — current
 
-**Status:** Game Design implementation authority for habitat, body-derived material families and ordinary
-reward provenance. Not yet implemented. The final six-band material identity, storage, capability and physical
-Schematic rules are settled in `crafting-components-and-schematics-current.md`, which supersedes every open-choice,
-pure-no-grade or continuous-property crafting passage retained below for historical comparison. The pressure-budget
-creature generator remains the underlying causal model.
+> **Superseded material-model boundary (3 September 2026):** the habitat, body-plan, deterministic
+> species, and anatomy-derived-drop work in this document remains useful design input. Its six-band
+> resource quality, family-only stack key, generic family vocabulary, and property-gated recipe
+> passages are not the final material authority. Aimee's later direction requires four resource
+> qualities (Poor, Common, Rare, Exceptional), a category → type → subtype → quality → species-source
+> hierarchy, default subtype+quality stacks, and recipes whose eligibility is expressed through
+> physical names/categories rather than hidden property thresholds. Peerless remains finished gear
+> only. Use `resource-crafting-world-ecology-cohesive-plan-v1.md` for the intended model. This file
+> remains evidence of the current runtime and the ecology calculations that must be reconciled, not
+> an instruction to preserve the obsolete inventory/recipe model.
+
+**Status:** Game Design implementation input for habitat, body-derived material families and ordinary
+reward provenance. The final ecology work is not yet implemented. `crafting-components-and-schematics-current.md`
+records the currently implemented six-band migration lineage, but Aimee's later four-band hierarchy supersedes
+it for final-product material, storage and recipe design. The pressure-budget creature generator remains useful
+causal input.
 **Priority:** after the early encounter-scaling **source checkpoint** and the opening causal field baseline;
 phone combat-feel acceptance is nonblocking. Complete this before expanding creature-material crafting or
 claiming creature/world visual diversity complete.

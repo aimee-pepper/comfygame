@@ -1,8 +1,35 @@
-# Resource, Crafting, World, and Ecology Plan V1
+# Resource, Crafting, World, and Ecology Plan V2
 
-Status: Game Design direction from Aimee's Top Level Notes, organized for system design and future Player Wiki publication.
+Status: intended-system authority and decision draft, reconciled against Aimee's Top Level Notes and later clarifications on 3 September 2026.
 
 This document describes the intended game. It does not claim these systems are already implemented. The public Wiki must always distinguish **Implemented now** from **Intended design** until each part is delivered and verified.
+
+## What this plan supersedes
+
+Two older design conclusions are useful records of the current implementation but are not final-product
+authority:
+
+- the current twelve broad terrain cases are not enough to describe the final range of generated lands;
+- the current twenty-three resource IDs are not a finished material catalogue;
+- the six-band crafting-material model is superseded by four resource qualities;
+- family-only material identity is superseded by category, type, subtype, quality, and source detail; and
+- hidden material-property thresholds cannot decide whether an unrelated material satisfies a recipe.
+
+The current connected-region, water-topology, reachability, frozen-receipt, habitat, and anatomy calculations
+remain valuable foundations. The overhaul replaces their temporary vocabularies and consumers rather than
+discarding the deterministic work underneath them.
+
+### Current implementation mismatches
+
+| Current implementation | Why it cannot be the final model | Intended correction |
+|---|---|---|
+| `MaterialFamilyID` puts generic world stock and creature parts in one flat family enum | It cannot express category → type → subtype, and names such as `ore`, `plate`, `reagent`, and `toxin` hide the actual material | Versioned physical-material registry with explicit hierarchy and domain |
+| `CraftMaterialQualityBand` uses Rough, Standard, Fine, Superior, Exceptional, and Peerless for material units | This contradicts Aimee's four resource bands and incorrectly permits Peerless raw resources | Poor, Common, Rare, and Exceptional for resources; Peerless only for finished gear |
+| many world resources are scalar balances while creature/flora samples are exact property-bearing units | Return, storage, trade, crafting, and migration cannot share the intended stack/provenance behavior | One material-lot contract beneath subtype+quality stacks, with arcane currency kept separate |
+| several recipes accept broad family lists plus hidden property floors | A player can be told an unrelated object qualifies because an invisible number is high enough | Authored exact/category/type/subtype ingredient slots; properties affect only previewed finished-item stats |
+| `GroundType` mixes geology, loose surface, water depth, deposits, vegetation, and missing ground | More visuals or resources cannot make this small mixed enum produce genuinely varied worlds | Separate frozen layers for region pattern, relief, geology, surface, hydrology, deposits, flora, and occupancy |
+| current World Resource placement starts from a global catalogue filtered by host rules | Host filtering improves plausibility but still treats resources as additions after the land | Each region creates its own eligible resource pool from its actual formation and ecology |
+| current size ladder ends at 28×28 | This is roughly 2.4 times an ordinary 18×18 world, not the intended roughly four-times area | Validate the proposed 36×36 upper tier with matching budgets and minimap scrolling |
 
 ## The player loop
 
@@ -46,6 +73,49 @@ Example:
 
 This retains the connection between world pressures, generated species, and useful loot without forcing players to manage one item type per species.
 
+### Starting physical-material registry
+
+This is the recommended starting registry for our design discussion. It is deliberately smaller than a list
+of generated species and more specific than the current generic `Reagent`, `Toxin`, `Ore`, or `Rubble`
+holdings. A subtype exists only when the physical difference changes a recipe, a finished item's statistics,
+or its appearance. A colourful name alone never creates another subtype.
+
+| Source | Broad recipe category | Material type examples | Precise subtype examples | Species/source detail |
+|---|---|---|---|---|
+| Ground and geology | Stone | Granite, Limestone, Sandstone, Basalt | Dressed or broken forms belong to processing/state, not quality | Region and world |
+| Ground and geology | Loose mineral | Clay, Silica Sand, Mineral Debris | A physically distinct clay or sand only when it changes processing | Region and world |
+| Ground and geology | Metal Ore | Iron Ore, Copper Ore, Silver Ore, Gold Ore, Mercury Ore, Adamant Ore | A distinct deposit form only when a real process or recipe uses it | Deposit, region, and world |
+| Ground and geology | Crystal and glass | Quartz, Obsidian, Rift-glass | Physically distinct crystal/glass forms | Deposit, region, and world |
+| Ground and geology | Mineral salt | Salt, Sulfur | Distinct mineral forms only when they have different uses | Deposit, region, and world |
+| Flora | Wood | Softwood Log, Hardwood Log | Physically distinct trunk wood such as dense or resinous wood, if recipes need it | Generated plant species, colour, and world |
+| Flora | Plant Fibre | Stem Fibre, Leaf Fibre, Bark Fibre | A materially different tough or silky fibre | Generated plant species, colour, and world |
+| Flora | Plant Part | Leaf, Root, Flower, Spore, Sap, Resin | Toxic Sap, Irritant Spore, or another visible physical subtype | Generated plant species, colour, and world |
+| Creature | Skin | Smooth Skin, Aquatic Skin, Membrane | Thick, tough, or armoured forms only where anatomy supports them | Generated creature species, colour, and world |
+| Creature | Hide | Rawhide | Tough Rawhide or another visibly thicker structural subtype | Generated creature species, colour, and world |
+| Creature | Pelt | Fur Pelt | Short, thick, or otherwise physically different pelts | Generated creature species, colour, and world |
+| Creature | Scales | Fish Scales, Reptile Scales | Armoured Fish Scales and equivalent anatomical subtypes | Generated creature species, colour, and world |
+| Creature | Feathers | Flight Feathers, Down, Quills | A physically different feather structure, not a rarity adjective | Generated creature species, colour, and world |
+| Creature | Shell and Chitin | Shell, Chitin, Carapace | Layered Shell or Chitin Plate where anatomy supports it | Generated creature species, colour, and world |
+| Creature | Hard Animal Part | Bone, Fang, Tusk, Horn, Claw | Hollow Bone, Dense Bone, or another structural subtype | Generated creature species, colour, and world |
+| Creature | Animal Fluid | Oil, Venom, Ichor | A physically distinct secretion only when its effect differs | Generated creature species, colour, and world |
+
+This registry changes several current nouns:
+
+- **Rubble** stops being a finished resource. Its possible successor is the region-bound mixed find described later.
+- **Ore** becomes **Iron Ore**. Copper, Silver, Gold, Mercury, and Adamant also name raw ores before processing; their ingots or refined forms are separate processed materials.
+- **Timber** becomes a raw Log type and a processed Plank type instead of one word covering both states.
+- **Pulp** is processed stock rather than something a plant drops ready-made.
+- **Reagent** is a recipe category over named leaves, roots, flowers, spores, saps, resins, venoms, and prepared extracts; it is not one universal substance.
+- **Toxin** is likewise an eligibility category. The inventory holds the actual Toxic Sap, Irritant Spore, Venom, or other named substance.
+- **Plate** is not a universal animal material. The anatomy resolves to Armoured Scales, Chitin Plate, Shell, a scute-like Hide subtype, or another truthful physical part.
+- **Fin** is a source part; its useful harvested material resolves to the actual Skin/Membrane or rigid structure rather than a generic fin token unless a recipe truly needs a whole fin.
+- world-node **Ichor** is retired from new generation. Ichor is a creature material unless a separately authored world source is approved.
+- **Raw Essence** and **Motes** are arcane currencies/resources, not ordinary physical materials. They do not gain creature provenance or resource-quality bands.
+
+No line in this table authorizes a material just because it sounds plausible. Before promotion, every type or
+subtype needs a causal producer, at least two sensible consumers or one reusable processing role, player-facing
+art/identity, and a complete custody path.
+
 ### Colour is inherited
 
 Generated creatures should derive visible colour from the world. Their physical drops retain that colour information. When a coloured material is used in clothing or another visibly material-led object, its colour can contribute to the crafted result.
@@ -62,10 +132,10 @@ Resources use exactly four quality bands:
 
 | Resource quality | Colour | Inventory behavior |
 |---|---|---|
-| Poor | White | Separate stack within the physical material type |
-| Common | Green | Separate stack within the physical material type |
-| Rare | Blue | Separate stack within the physical material type |
-| Exceptional | Purple | Separate stack within the physical material type |
+| Poor | White | Separate stack within the most-specific resolved type or subtype |
+| Common | Green | Separate stack within the most-specific resolved type or subtype |
+| Rare | Blue | Separate stack within the most-specific resolved type or subtype |
+| Exceptional | Purple | Separate stack within the most-specific resolved type or subtype |
 
 Peerless is not a resource quality.
 
@@ -73,7 +143,10 @@ Peerless is not a resource quality.
 
 The default player-facing material stack key is:
 
-> Precise material subtype + resource quality
+> Most-specific resolved material type/subtype + resource quality
+
+If a material has no meaningful subtype, its type is the stack key. A subtype is not invented merely to fill
+every level of the hierarchy.
 
 Examples:
 
@@ -109,7 +182,7 @@ Automatic lowest-grade allocation is acceptable only for a recipe whose result i
 
 ## Recipes
 
-### Three scopes of substitute ingredient
+### Four ingredient forms
 
 Recipes can combine static ingredients with one or more substitute slots:
 
@@ -134,6 +207,30 @@ The existing property model can remain useful behind generation and crafted-stat
 - There is no durability system. Terms such as brittle, dependable, wear, or breakage cannot be used as implied mechanics.
 
 The craft preview must show the exact before-and-after statistics produced by the player's current material selection.
+
+The current six generated material properties are not being replaced by physical recipe slots. They remain
+possible internal measurements of the creature, plant, or deposit that produced a material. Their job is to
+calculate concrete finished-item results after a physically eligible material has been selected.
+
+For creature materials, the base values must come from the frozen creature that actually produced the part:
+
+- covering structure and coverage can contribute to the Armour or protection of an eligible armour recipe;
+- insulation can contribute to a named resistance or ward already owned by the finished item;
+- the creature's pierce, rend, or crush anatomy can contribute to an eligible weapon's damage result;
+- mass and flexibility can contribute to an already-supported initiative, accuracy, or similar final statistic;
+- venom or other reactive anatomy can contribute to the exact supported status potency or duration; and
+- colour and lustre can affect appearance or value where that finished item supports them.
+
+World materials use the same principle: Granite, Iron, Obsidian, Fibre, and other physical types have authored
+base contributions, while the frozen deposit or plant supplies any permitted variation. Resource quality then
+multiplies or adds to those concrete contributions. A recipe never asks for “hardness 55”; it asks for an
+Armoured Fish Scale, any Scale, an Iron Ingot, or another understandable physical input. The preview says
+“+2 Armour” or “+1 damage,” not “high hardness.”
+
+Subtype assignment may use anatomy or formation data once, during generation. For example, sufficiently
+protective overlapping scales may become the explicit subtype **Armoured Fish Scales**. From that point onward,
+recipes test the subtype ID, not a hidden threshold. This preserves causal variation without making the player
+reverse-engineer invisible numbers.
 
 ### Crafted item quality
 
@@ -231,20 +328,46 @@ Exact canopy footprint, movement, line-of-sight, regrowth, and tree-felling cons
 
 The existing deterministic seed, frozen world receipt, land/water placement principles, reachability protections, and water-body distinction provide a useful foundation. The overhaul must not destroy those properties.
 
+The present generator is therefore a migration baseline, not the final product. Its broad `Stone`, `Soil`,
+`Sand`, `Rubble`, `Ash`, `Water`, `Deep Water`, `Ice`, `Mud`, `Growth`, `Groundcover`, and `Chasm` cases mix
+several different ideas: underlying material, surface texture, liquid depth, vegetation, deposit, and absence
+of ground. The final generator stores those ideas separately so two worlds can be physically different without
+inventing an unrelated movement rule for every visual variation.
+
+### Final world-generation layers
+
+Every new-version world resolves and freezes these layers in order:
+
+1. **World size** — total explorable area and generation budgets.
+2. **Regional arrangement** — how many major regions exist and how they meet.
+3. **Relief and landform** — elevation, slopes, basins, ridges, cliffs, chasms, and passable connections.
+4. **Underlying geology** — Granite, Limestone, Sandstone, Basalt, ore-bearing rock, and other approved physical formations.
+5. **Surface form** — exposed bedrock, broken stone, gravel, sand, clay soil, loam, peat, mud, or another approved walkable surface.
+6. **Hydrology and liquid** — river, pond, lake, sea, marsh, shallow/deep relationship, and fresh, salt, brine, mineral, or another approved liquid type.
+7. **Surface deposits and weather state** — snow, settled ash, salt crust, rain, airborne ash, miasma, and other compatible conditions without erasing the ground below.
+8. **Flora structure** — groundcover, ordinary plants, dangerous placed flora, shrubs, trunks, and canopies that fit the resolved habitat.
+9. **Resource hosts** — exact deposits and harvestable material placements derived from the preceding physical layers.
+10. **Creature and site ecology** — habitats, food/cover relationships, generated body plans, and compatible sites after the land actually exists.
+
+Each layer owns a distinct fact in the frozen receipt. Rendering, Look, movement, harvesting, World History,
+and relaunch all read that same result rather than deriving competing interpretations.
+
 ### Ground pattern and composition are separate
 
 World generation first chooses how ground is arranged, then chooses the physical ground or liquid types that fill the available sockets.
 
-Potential ground-pattern families include:
+The recommended initial regional-arrangement families are:
 
-- Uniform - one dominant ground type;
-- Striated - long bands or layers;
-- Scattered - many separated patches;
-- Clustered - a few large regions;
-- Graded - one composition transitions into another;
-- Fractured - broken pockets divided by hostile or impassable seams.
+- **Dominant** — one main composition with a small number of subordinate inclusions;
+- **Banded** — long readable bands or layers;
+- **Patchwork** — several separated patches of comparable importance;
+- **Clustered** — a few large contiguous regions;
+- **Gradient** — composition changes progressively across the map; and
+- **Fractured** — regions are divided by breaks, chasms, water, or hostile seams while preserving a valid route.
 
-These names are working vocabulary. Final pattern names, counts, weighting, and visual language remain **Will discuss with Aimee**.
+These are generation structures, not clues that expect the player to decode phrases such as “short views” or
+“narrow seams.” If a pattern later becomes writable, its Rune Dictionary entry, preview, arrival copy, and
+field presentation must teach the same plain meaning.
 
 Each socket can then resolve to a granular physical type, such as:
 
@@ -256,6 +379,30 @@ Each socket can then resolve to a granular physical type, such as:
 
 Physical terrain should create appropriate harvest opportunities. Granite ground can support Granite nodes. Sand can be collected and processed into glass. Resource presence is causally connected to the generated region rather than scattered without explanation.
 
+The recommended first physical catalogue is intentionally compact but composable:
+
+- **geology:** Granite, Limestone, Sandstone, Basalt, Obsidian-bearing volcanic formation, Quartz-bearing formation, and approved ore-bearing formations;
+- **loose/surface ground:** broken stone or scree, gravel, silica sand, clay soil, loam, peat, and mud;
+- **liquids:** fresh water, salt water, brine, and mineral water, each with separate shallow/deep topology where applicable;
+- **surface deposits:** snow, settled ash, and salt crust; and
+- **non-material structure:** chasms, groundcover, trunks, and canopies remain separate from the material under them.
+
+This creates useful combinations such as Granite bedrock beneath snow, Basalt scree beneath settled ash,
+salt-crusted silica sand, or a muddy Limestone riverbank. Those combinations are receipt facts, not new enum
+cases improvised by the renderer.
+
+Resource placement follows the resolved region:
+
+- rock and ore nodes come from the region's geology and formation;
+- sand, clay, salt, and other bulk finds come from compatible surfaces or margins;
+- wood, fibre, resin, spores, and named plant parts come from generated flora that can live there;
+- creature materials come only from the anatomy of generated creatures that can inhabit the region;
+- sites may add authored rewards only through their own explicit result; and
+- Raw Essence and Motes keep their separate supernatural acquisition rules.
+
+A world never rolls “any resource” after terrain generation. It builds eligible candidates from actual regions,
+then places a deterministic subset according to abundance, world size, access, and occupancy.
+
 ### World size
 
 World Writing may include size Sigils. The smallest world can be somewhat smaller than the current map; the largest may be approximately four times its current area.
@@ -264,7 +411,11 @@ World Writing may include size Sigils. The smallest world can be somewhat smalle
 - A large world uses the same minimap viewport, which scrolls with the player.
 - Size changes area, travel, placement capacity, and discovery opportunity without changing the fixed native UI target.
 
-Exact dimensions, costs, unlock order, and generation budgets remain **Will discuss with Aimee**.
+The current live ladder is 12, 15, 18, 23, and 28 tiles across. It provides only about 2.4 times the ordinary
+18×18 area at its largest. The recommended intended ladder is **12, 15, 18, 26, and 36**, making the largest
+world exactly four times the ordinary world's area. This remains a design target until performance, placement
+budgets, stability costs, and the fixed minimap behavior are verified; Engineering must not silently treat the
+current 28×28 maximum as the final answer.
 
 ### Direct targeting through World Writing
 
@@ -281,6 +432,12 @@ The final World Writing vocabulary should distinguish:
 - unwritten facets that remain generated.
 
 Direct requests must matter. They need not make every exact node safe, adjacent, or guaranteed unless the authored rule explicitly says so.
+
+Recommended guarantee for a directly written physical ground or base resource: the frozen world must contain
+at least one start-connected truthful source of it. If the player's tool is too weak, that source still appears
+and Look explains the missing tool; writing cannot quietly fail merely because progression blocks extraction.
+Amount, distance, hazards, and additional deposits remain generated. Ecological requests such as Chitin bias
+compatible anatomy and habitats but do not promise a named species.
 
 ### Granular causal ecology
 
@@ -359,6 +516,28 @@ The intended behavior is:
 - processing consumes the mixed find, so save/reload cannot reroll it indefinitely.
 
 **Will discuss with Aimee:** final player-facing name, where it is collected, output count, how strongly the source receipt favors common versus inaccessible regional materials, and which facility processes it.
+
+## Decisions to close before Sigil and clue design
+
+The dependency audit leaves six genuine product decisions. Everything else above is a structural correction,
+not a choice Engineering should improvise.
+
+1. **Physical vocabulary.** Approve or revise the starting registry, especially Skin versus Hide versus Pelt,
+   and the proposed removal of generic Plate, Fin, Reagent, Toxin, Timber, Pulp-as-a-drop, and world Ichor.
+2. **Land vocabulary.** Approve or revise the six regional arrangements and the initial geology, surface,
+   liquid, and deposit catalogue.
+3. **Written guarantee.** Confirm the recommendation that a directly written ground or base resource guarantees
+   at least one start-connected source, while tool access, amount, distance, and danger remain generated.
+4. **World sizes.** Confirm whether the intended 12/15/18/26/36 ladder should replace the current
+   12/15/18/23/28 ladder.
+5. **Material arithmetic.** Set the four quality thresholds/multipliers and the recipe-slot formulas that turn
+   frozen producer measurements into concrete item statistics. These are balance tables, not recipe eligibility.
+6. **Processing ownership.** Set the first processed-material list and which existing or planned Cottage
+   facility owns ore smelting, glass, leather, cloth/cord, planks/pulp, plant extracts, and mixed geological sorting.
+
+After those six choices, Game Design can produce the complete terrain→resource→flora→creature host matrix,
+the exact recipe eligibility lists, and the harvesting tiers without guessing. Only then should the project
+decide which land/material concepts deserve Sigils, when those Sigils drop, and which traveller clues are fair.
 
 ## Incremental delivery
 

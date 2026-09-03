@@ -1,5 +1,15 @@
 # World terrain regions and resource hosting — current
 
+> **Final-product authority boundary (3 September 2026):** this document specifies the bounded
+> connected-terrain and host-placement correction used by the current generator. It is a useful
+> implementation foundation, not the final land, geology, resource, or World Writing design.
+> Aimee has explicitly rejected the conclusion that twelve broad `GroundType` cases and the current
+> twenty-three resource IDs can describe the final range of generated worlds. The intended overhaul
+> separates regional arrangement, physical composition, surface conditions, causal resources, and
+> ecology as described in `resource-crafting-world-ecology-cohesive-plan-v1.md`. Preserve this
+> document for current-runtime and migration truth; do not use its exclusions to block the final
+> vocabulary.
+
 **Status:** Game Design implementation authority; accepted Dynamic Terrain v2 and south-wall packs are
 source-integrated and installed. This checkpoint supplies their production world-generation topology;
 installed-phone visual acceptance remains separate.
@@ -17,7 +27,8 @@ airborne water remains in the air. Mineral seams occur in ground that can physic
 what its generated body can produce. Snow and settled Ash lie over existing terrain rather than replacing it.
 
 This is a generation correction, not a new terrain vocabulary. The twelve live `GroundType` cases and the
-twenty-three current World Resource catalogue IDs are sufficient for opening and midgame. Do not add another
+twenty-three current World Resource catalogue IDs are sufficient for this bounded current-runtime checkpoint,
+not for the final product. Do not add another
 ground or resource merely to make this checkpoint look broader.
 
 ## Frozen tile model
