@@ -163,6 +163,7 @@ Encounter and inspect one naturally generated member of each accepted body-plan/
 
 - Rock Pick/basic Pick, Axe, and Scythe ownership routes accepted in Phase 0.
 - Tool-tier requirements on resource nodes, tree trunks, ordinary plants, and dangerous harvestable flora.
+- Field controls: movement-centre hold for quick-use items, Interact hold for field-tool selection, Interact for eligible underfoot harvesting, and a direction into an adjacent blocking harvest target for the selected tool.
 - Tree canopy/trunk placement and under-canopy presentation.
 - Exact mined material and quantity, or exact biological type/subtype, quality, colour/source and quantity where that domain supports quality; plus depletion and custody receipt.
 - Truthful blocked copy that names the required tool tier.
@@ -177,6 +178,7 @@ Encounter and inspect one naturally generated member of each accepted body-plan/
 ### Focused gates
 
 - Ineligible tools do not consume turns or nodes unless the accepted rule explicitly charges an attempt.
+- Opening either hold menu, changing or cancelling a tool selection, and refusing a wrong-tool or invalid target are zero-turn and mutation-free.
 - A committed harvest adds the exact yield once and depletes the exact placement once.
 - Stale node, moved player, changed tool, full/invalid custody, replay, and write failure are inert.
 - Relaunch preserves live and depleted placements.

@@ -357,6 +357,31 @@ The game should provide a recognizable sequence of picks and axes. A starting Ro
 
 Exact metals, tier count, starting ownership, upgrade recipes, and harvest thresholds remain **Will discuss with Aimee**.
 
+### Field tool and quick-item controls
+
+Aimee's leading control direction separates supplies from harvesting tools while keeping both close to movement:
+
+- holding the centre of the movement arrows opens the quick-use or Field Kit item menu;
+- holding **Interact** opens the field-tool selector for available tools such as the Scythe, Axe, or Pick;
+- choosing a tool makes it the active field tool and costs no turn;
+- tapping **Interact** uses the active tool on an eligible harvestable feature beneath the party, such as a
+  passable plant tile; and
+- pressing a movement direction toward an adjacent solid harvestable feature uses the active tool against that
+  feature, such as swinging the Axe at a blocking tree trunk instead of attempting an impossible move.
+
+The target's physical position determines the input: underfoot features use Interact, while adjacent blocking
+features use a direction. Walking across ordinary passable flora never harvests it by accident. Opening a menu,
+changing the active tool, backing out, choosing the wrong tool, or pressing toward an ineligible target costs no
+turn and changes nothing. Only the rules-confirmed harvest pays its normal turn cost and changes the exact node
+and carried yield.
+
+The currently selected tool stays visibly identified and survives backgrounding and cold relaunch during the
+expedition. It is a field-tool choice, not a weapon slot, item charge, or durability system. If the selected tool
+is no longer available, the game clears that selection and explains why before any action is committed.
+
+Exact button art, hold timing, menu composition, and whether the selection persists between expeditions remain
+**Will discuss with Aimee** after the interaction is tried at the fixed native layout.
+
 ### Plants and scythes
 
 Small ordinary plants can be gathered with a simple Scythe. More dangerous or difficult plants require higher harvesting tiers. Ordinary flora remains non-damaging; only explicitly dangerous placed flora owns its authored contact or poison behavior.

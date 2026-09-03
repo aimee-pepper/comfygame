@@ -175,6 +175,7 @@ Flora identity, placement, terrain underlay, canopy footprint, disclosure, dange
 - Scythes unlock increasingly difficult or dangerous flora.
 - A starting Rock Pick and basic Axe may be starting, found, or early crafted equipment after Aimee chooses the opening.
 - A mined yield receives its exact material identity and quantity once, with no quality roll. A quality-bearing biological yield additionally receives type/subtype, quality, source and colour where applicable.
+- Holding the movement-pad centre opens quick-use/Field Kit items; holding Interact selects a field tool. Interact applies the selected tool to an eligible underfoot feature, while a direction into an adjacent blocking feature applies it there. Menu, selection, cancel, wrong-tool, and ineligible-target paths are zero-turn; only a committed harvest changes time, node state, or custody.
 
 ### Structural change
 
@@ -186,6 +187,7 @@ World placement, Look, harvesting, tool custody/equipment, depletion, carried ma
 - Axe and Scythe tiers.
 - Starting tool ownership versus early discovery/crafting.
 - Node yields, harvest turn costs, tool effects, and whether tools are equipped or persistent capabilities.
+- Exact hold timing, menu composition, visible active-tool treatment, and whether tool selection persists between expeditions.
 - Mixed geological find name, collection frequency, regional output weighting, and processing owner.
 
 ## 6. Processing facilities and intermediates
