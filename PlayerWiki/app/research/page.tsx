@@ -1,5 +1,6 @@
 import Link from '@/components/wiki-link';
 import type { ReactNode } from 'react';
+import { DirectoryDetailsIntro, DirectoryIndex } from '@/components/directory-navigation';
 import { GuideBreadcrumbs, RelatedGuides } from '@/components/guide-navigation';
 import { PageIntro } from '@/components/page-intro';
 import { SiteFrame } from '@/components/site-frame';
@@ -28,6 +29,8 @@ export default function ResearchDirectory() {
   return <SiteFrame sidebar>
     <GuideBreadcrumbs items={[{ label: 'Systems', href: '/systems' }, { label: 'Research', href: '/systems/research' }, { label: 'Research directory' }]} />
     <PageIntro eyebrow="Player reference" title="Research directory" summary="Browse every current Research node by branch. Open a node to see its current prerequisites, base cost, result, linked station, and any bundled construction." />
+    <DirectoryIndex label="Browse Research" entries={content.researchNodes.map((node) => ({ href: `/research/${researchNodeSlug(node)}`, name: node.name }))} />
+    <DirectoryDetailsIntro title="Compare Research by branch" summary="Scan prerequisites, base cost, and current result; the full node page holds its complete dependencies and related routes." />
     {content.researchBranches.map((branch) => {
       const nodes = content.researchNodes.filter((node) => node.branch === branch.id);
       const station = branch.stationID ? content.stations.find((entry) => entry.id === branch.stationID) : null;

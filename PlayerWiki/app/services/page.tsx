@@ -1,4 +1,5 @@
 import Link from '@/components/wiki-link';
+import { DirectoryDetailsIntro, DirectoryIndex } from '@/components/directory-navigation';
 import { GuideBreadcrumbs, RelatedGuides } from '@/components/guide-navigation';
 import { PageIntro } from '@/components/page-intro';
 import { PixelImage } from '@/components/pixel-image';
@@ -15,6 +16,8 @@ export default function ServicesPage() {
         title="Village services"
         summary="Understand what each everyday village screen does, what it changes, and where to prepare before the next expedition."
       />
+      <DirectoryIndex label="Browse Village services" entries={serviceGuides.map((guide) => { const station = content.stations.find((entry) => entry.id === guide.stationID); return { href: `/services/${guide.slug}`, name: guide.name, imageURL: station?.assetURL ?? station?.contextAssetURL, imageAlt: station?.assetURL ? `${station.name} building visual` : `${station?.zone ?? 'Village'} town setting` }; })} />
+      <DirectoryDetailsIntro title="Compare services" summary="Use these concise cards to find the right service and area. The linked service page holds the complete workflow, confirmations, and result boundaries." />
       <section className="article-section">
         <div className="topic-grid">
           {serviceGuides.map((guide) => {

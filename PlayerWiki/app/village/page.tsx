@@ -1,4 +1,5 @@
 import Link from '@/components/wiki-link';
+import { DirectoryDetailsIntro, DirectoryIndex } from '@/components/directory-navigation';
 import { GuideBreadcrumbs, RelatedGuides } from '@/components/guide-navigation';
 import { PageIntro } from '@/components/page-intro';
 import { PixelImage } from '@/components/pixel-image';
@@ -10,7 +11,8 @@ export default function VillageDirectory() {
   return <SiteFrame sidebar>
     <GuideBreadcrumbs items={[{ label: 'Home', href: '/' }, { label: 'Village' }]} />
     <PageIntro eyebrow="Village" title="Village buildings and services" summary="Find each current Village destination, when it becomes usable, its published foundation requirement, and the service, station work, or Research it connects to." />
-    <section className="article-section note-card"><h2>Find your way around the Village</h2><nav aria-label="Village sections"><Link href="/places">Places and stations</Link><Link href="/services">Village services</Link><Link href="/systems/village-construction">Construction and unlocks</Link></nav></section>
+    <DirectoryIndex label="Browse Village buildings" entries={villageBuildings.map((building) => ({ href: `/buildings/${building.slug}`, name: building.name, imageURL: building.assetURL, imageAlt: `${building.name} building visual` }))} />
+    <DirectoryDetailsIntro title="Compare Village buildings" summary="Each card keeps access, foundation, current work, and a short output preview together. The building page holds the full construction record; the service page holds the full workflow." />
     <section className="article-section"><h2>Current Village</h2><p>Open a building for its exact current requirement, actions, recipes, and related resources. A displayed live entry is a current player route; a scheduled entry is clearly marked and is not an available screen.</p><div className="village-directory">{villageBuildings.map((building) => {
       const { service, systems, recipes } = buildingActions(building);
       return <article className="village-directory-card" key={building.id}>
@@ -18,6 +20,7 @@ export default function VillageDirectory() {
         <dl className="village-card-facts"><div><dt>Access</dt><dd>{building.status === 'scheduled' ? 'Not yet implemented' : building.unlockedAtStart ? 'Available at the start' : building.keeper ? <>Meet <Link href={`/people/${building.keeperID?.replaceAll('_', '-')}`}>{building.keeper}</Link>, then build</> : 'Use the current Village route'}</dd></div><div><dt>Foundation</dt><dd>{building.status === 'scheduled' ? 'No live construction action published' : buildCost(building)}</dd></div><div><dt>Current work</dt><dd>{building.status === 'scheduled' ? 'No live action or recipe is published' : service ? <Link href={`/services/${service.slug}`}>{service.name}</Link> : systems.length ? systems.map((system, index) => <span key={system.slug}>{index ? ' · ' : ''}<Link href={`/crafting/${system.slug}`}>{system.name}</Link></span>) : 'Open the current building detail'}</dd></div><div><dt>Outputs</dt><dd>{building.status === 'scheduled' ? 'Not published as live' : recipes.length ? recipes.slice(0, 3).map((recipe, index) => <span key={recipe.id}>{index ? ' · ' : ''}<Link href={`/crafting/${recipe.system}`}>{recipe.result}</Link></span>) : service ? 'See the service detail' : 'No separate current output list published'}</dd></div></dl>
       </article>;
     })}</div></section>
+    <section className="article-section note-card"><h2>Rules and related Village guides</h2><p>The cards above summarize each destination. Use the dedicated guides for rules shared by more than one place rather than repeating them in every building card.</p><nav aria-label="Village rules and guides"><Link href="/services">Browse service workflows</Link><Link href="/systems/village-construction">Understand construction and unlocks</Link></nav></section>
     <section className="article-section note-card"><h2>Scheduled, not live</h2><p>Scheduled entries preserve only their current published identity and placement. They do not promise a usable screen, cost, recipe, or reward until that route is implemented.</p></section>
     <RelatedGuides links={[{ label: 'Village services', href: '/services' }, { label: 'Trading offer reference', href: '/trading' }, { label: 'Recycler return reference', href: '/recycling' }, { label: 'Crafting directory', href: '/crafting' }, { label: 'Resources', href: '/resources' }, { label: 'Current progression', href: '/resources/progression' }, { label: 'Village construction guide', href: '/systems/village-construction' }]} />
   </SiteFrame>;

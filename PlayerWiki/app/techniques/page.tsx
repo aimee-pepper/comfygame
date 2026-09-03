@@ -1,4 +1,5 @@
 import Link from '@/components/wiki-link';
+import { DirectoryDetailsIntro, DirectoryIndex } from '@/components/directory-navigation';
 import { GuideBreadcrumbs, RelatedGuides } from '@/components/guide-navigation';
 import { PageIntro } from '@/components/page-intro';
 import { SiteFrame } from '@/components/site-frame';
@@ -10,6 +11,8 @@ export default function TechniqueDirectory() {
   return <SiteFrame sidebar>
     <GuideBreadcrumbs items={[{ label: 'Systems', href: '/systems' }, { label: 'Combat', href: '/systems/combat' }, { label: 'Techniques and Gambits' }]} />
     <PageIntro eyebrow="Player reference" title="Techniques and Gambits" summary="Open a current technique or Gambit part to see exactly who can use it, when it can fire, its legal target, current result, and listed limit." />
+    <DirectoryIndex label="Browse techniques and Gambit parts" entries={techniqueReferences.map((reference) => ({ href: `/techniques/${reference.slug}`, name: reference.name }))} />
+    <DirectoryDetailsIntro title="Compare techniques and Gambit parts" summary="Scan trigger, target, result, and source by rules family; each entry explains its complete eligibility and limits." />
     {groups.map((group) => {
       const references = techniqueReferences.filter((reference) => reference.group === group);
       if (!references.length) return null;

@@ -119,9 +119,9 @@ export default function Home() {
             <Link href="/guide-status">Open the status guide</Link>
           </div>
           <div className="topic-grid">
-            <Link className="topic-card" href="/loot">
+            <Link className="topic-card" href="/resources#loot-and-custody">
               <PackageOpen aria-hidden="true" />
-              <span><strong>Loot &amp; materials</strong><small>See how resources move today and how the intended physical-material overhaul will change them.</small></span>
+              <span><strong>Resources, loot &amp; materials</strong><small>Use one canonical guide for resource entries, return and custody, quality, and the intended physical-material overhaul.</small></span>
             </Link>
           </div>
         </section>

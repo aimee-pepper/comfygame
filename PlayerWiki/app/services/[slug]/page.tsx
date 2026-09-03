@@ -107,12 +107,12 @@ export default async function ServiceDetail({
       {guide.slug === 'library' && <section className="article-section note-card"><h2>People and records</h2><p>The Library helps you return to recovered records. The Player Wiki keeps each person’s complete current authored book pages together and separates location-hint stages with a clear spoiler boundary.</p><p><Link href="/people">Browse complete people records</Link></p></section>}
       <RelatedGuides links={[
         { label: 'All village services', href: '/services' },
-        { label: `${station.name} construction and keeper`, href: `/places/${station.slug}` },
+        { label: `${station.name} construction and keeper`, href: `/buildings/${station.slug}` },
         ...guide.relatedGuides,
         ...(guide.slug === 'library' ? [{ label: 'People and complete records', href: '/people' }] : []),
         ...(guide.slug === 'trading-post' ? [{ label: 'Trading offer and sale terms', href: '/trading' }] : []),
         ...(guide.slug === 'recycler' ? [{ label: 'Recycler return reference', href: '/recycling' }] : []),
-        ...(guide.slug === 'apothecary' ? [{ label: 'Nessa', href: '/people/nessa' }, { label: 'Apothecary construction', href: '/places/apothecary' }, { label: 'Apothecary preparations', href: '/crafting/apothecary' }, { label: 'Lesser Salve', href: '/items/salve-lesser' }] : []),
+        ...(guide.slug === 'apothecary' ? [{ label: 'Nessa', href: '/people/nessa' }, { label: 'Apothecary construction', href: '/buildings/apothecary' }, { label: 'Apothecary preparations', href: '/crafting/apothecary' }, { label: 'Lesser Salve', href: '/items/salve-lesser' }] : []),
         ...(guide.slug === 'blacksmith' ? [{ label: 'Halloway', href: '/people/halloway' }, { label: 'Blacksmith construction', href: '/buildings/blacksmith' }, { label: 'Pointed Blade construction', href: '/crafting/blacksmith' }, { label: 'Equipment and material effects', href: '/systems/equipment-materials' }] : []),
         ...(guide.slug === 'anchorage' ? [{ label: 'Tovin', href: '/people/tovin' }, { label: 'Anchorage construction', href: '/buildings/anchorage' }, { label: 'Anchor Frame', href: '/crafting/anchorage' }, { label: 'Atlas Seam', href: '/sites/atlas-seam' }] : []),
         ...(guide.slug === 'recycler' ? [{ label: 'Noll', href: '/people/noll' }, { label: 'Recycler construction', href: '/buildings/recycler' }] : []),

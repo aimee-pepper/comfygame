@@ -1,4 +1,5 @@
 import Link from '@/components/wiki-link';
+import { DirectoryDetailsIntro, DirectoryIndex } from '@/components/directory-navigation';
 import { PageIntro } from '@/components/page-intro';
 import { PixelImage } from '@/components/pixel-image';
 import { SiteFrame } from '@/components/site-frame';
@@ -40,20 +41,9 @@ export default function CraftingSystemsPage() {
       title="Crafting systems"
       summary="Choose one station or production family. Every system now has its own page for access, current recipes, intended ingredient rules, outputs, refusals, and related resources."
     />
+    <DirectoryIndex label="Browse crafting systems" entries={systemGroups.flatMap((group) => group.slugs).flatMap((slug) => { const system = systemFor(slug); if (!system) return []; const station = content.stations.find((entry) => entry.id === system.stationID); return [{ href: `/crafting/${slug}`, name: system.name, imageURL: station?.assetURL, imageAlt: station ? `${station.name} building visual` : undefined }]; })} />
 
-    <section className="article-section note-card">
-      <h2>Use this page as a directory</h2>
-      <p>This page no longer repeats every recipe from every station. Open the system you are using for its complete <strong>Implemented now</strong> and <strong>Intended implementation</strong> details.</p>
-      <TruthPair current="Each system page lists the recipes, inputs, outputs, access, and limitations available in the current game." accepted="Each same system page separately explains its accepted physical-material categories, quality behavior, result statistics, and changes that are not implemented yet." acceptedLabel="Intended organization" />
-      <nav aria-label="Shared crafting rules">
-        <Link href="/systems/crafting">Recipe and ingredient rules</Link>
-        <Link href="/resources">Materials and acquisition</Link>
-        <Link href="/systems/inventory-custody">Quality, stacks, and custody</Link>
-        <Link href="/systems/equipment-materials">Equipment results and material effects</Link>
-        <Link href="/resources/progression">Resource and facility progression</Link>
-        <Link href="/world">World generation and harvesting</Link>
-      </nav>
-    </section>
+    <DirectoryDetailsIntro title="Compare crafting families" summary="The cards below give each family’s purpose and implementation status. Open one system for its complete current recipes and accepted intended design." />
 
     {systemGroups.map((group) => <section className="article-section" key={group.title}>
       <h2>{group.title}</h2>
@@ -78,6 +68,20 @@ export default function CraftingSystemsPage() {
         })}
       </div>
     </section>)}
+
+    <section className="article-section note-card">
+      <h2>Rules shared by crafting systems</h2>
+      <p>Each full system page keeps the recipes, inputs, outputs, access, limitations, and accepted intended material behavior for that one family. Shared ingredient, quality, result, progression, and world-acquisition rules live in the guides below instead of being repeated in every directory card.</p>
+      <TruthPair current="Each system page lists the recipes, inputs, outputs, access, and limitations available in the current game." accepted="Each same system page separately explains its accepted physical-material categories, quality behavior, result statistics, and changes that are not implemented yet." acceptedLabel="Intended organization" />
+      <nav aria-label="Shared crafting rules">
+        <Link href="/systems/crafting">Recipe and ingredient rules</Link>
+        <Link href="/resources">Materials and acquisition</Link>
+        <Link href="/systems/inventory-custody">Quality, stacks, and custody</Link>
+        <Link href="/systems/equipment-materials">Equipment results and material effects</Link>
+        <Link href="/resources/progression">Resource and facility progression</Link>
+        <Link href="/world">World generation and harvesting</Link>
+      </nav>
+    </section>
 
     <section className="article-section">
       <h2>Reuse and adjacent services</h2>

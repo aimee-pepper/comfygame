@@ -11,8 +11,16 @@ export function SiteFrame({
   children: ReactNode;
   sidebar?: boolean;
 }) {
+  const footer = (
+    <footer>
+      <span>Bookbinder Player Wiki</span>
+      <Link href="/references">Aimee Reference</Link>
+      <Link href="/glossary">Glossary</Link>
+    </footer>
+  );
+
   return (
-    <div className="site-shell">
+    <div className={`site-shell${sidebar ? ' site-shell-with-sidebar' : ''}`}>
       <header className="site-header">
         <div className="brand-tools">
           <Link
@@ -79,16 +87,17 @@ export function SiteFrame({
               </div>
             ))}
           </aside>
-          <main className="wiki-main">{children}</main>
+          <div className="wiki-content-column">
+            <main className="wiki-main">{children}</main>
+            {footer}
+          </div>
         </div>
       ) : (
-        <main>{children}</main>
+        <>
+          <main>{children}</main>
+          {footer}
+        </>
       )}
-      <footer>
-        <span>Bookbinder Player Wiki</span>
-        <Link href="/references">Aimee Reference</Link>
-        <Link href="/glossary">Glossary</Link>
-      </footer>
     </div>
   );
 }

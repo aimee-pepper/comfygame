@@ -71,7 +71,6 @@ export const wikiNavigationSections: WikiNavigationSection[] = [
       { href: '/crafting', label: 'Crafting systems' },
       { href: '/systems/crafting', label: 'Crafting rules' },
       { href: '/resources', label: 'Resources' },
-      { href: '/loot', label: 'Loot and materials' },
       { href: '/systems/inventory-custody', label: 'Inventory and custody' },
       { href: '/equipment', label: 'Equipment' },
       { href: '/systems/equipment-materials', label: 'Material effects' },

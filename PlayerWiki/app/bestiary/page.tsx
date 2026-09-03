@@ -1,4 +1,5 @@
 import Link from '@/components/wiki-link';
+import { DirectoryDetailsIntro, DirectoryIndex } from '@/components/directory-navigation';
 import { GuideBreadcrumbs, RelatedGuides } from '@/components/guide-navigation';
 import { PageIntro } from '@/components/page-intro';
 import { PixelImage } from '@/components/pixel-image';
@@ -26,6 +27,13 @@ export default function BestiaryPage() {
         <PageIntro eyebrow="World records" title="Bestiary" summary={guide.summary} />
       </div>
       <p className="service-visual-note">The current retained building visual for {station.name}.</p>
+      <DirectoryIndex label="Browse creatures" entries={content.creatures.map((creature) => ({ href: `/bestiary/${creature.slug}`, name: creature.name }))} />
+      <DirectoryDetailsIntro title="Compare creature profiles" summary="Use these public field and combat facts without changing what your own campaign has discovered." />
+      <section className="article-section">
+        <h2>Current named encounter profiles</h2>
+        <p>These profiles describe the current named encounter types. World conditions influence whether a profile can appear; they never promise an encounter in a particular world.</p>
+        <div className="table-wrap data-table"><table><thead><tr><th>Creature</th><th>Field profile</th><th>Combat</th></tr></thead><tbody>{content.creatures.map((creature) => <tr key={creature.id}><td><Link href={`/bestiary/${creature.slug}`}>{creature.name}</Link></td><td>{creature.isNocturnal ? 'Night profile' : 'Day profile'} · Sight {creature.sightRadius}</td><td>Tier {creature.tier} · {creature.maxHP} health · {creature.attack} attack</td></tr>)}</tbody></table></div>
+      </section>
       <section className="article-section two-column">
         <div>
           <h2>Use the in-game record first</h2>
@@ -36,11 +44,6 @@ export default function BestiaryPage() {
           <p>Use Look and the active encounter presentation for the exact tile and creature in front of the party.</p>
           <p><Link href="/systems/exploration">Open Exploration</Link> · <Link href="/systems/combat">Open Combat</Link></p>
         </div>
-      </section>
-      <section className="article-section">
-        <h2>Current named encounter profiles</h2>
-        <p>These profiles describe the current named encounter types. World conditions influence whether a profile can appear; they never promise an encounter in a particular world.</p>
-        <div className="table-wrap data-table"><table><thead><tr><th>Creature</th><th>Field profile</th><th>Combat</th></tr></thead><tbody>{content.creatures.map((creature) => <tr key={creature.id}><td><Link href={`/bestiary/${creature.slug}`}>{creature.name}</Link></td><td>{creature.isNocturnal ? 'Night profile' : 'Day profile'} · Sight {creature.sightRadius}</td><td>Tier {creature.tier} · {creature.maxHP} health · {creature.attack} attack</td></tr>)}</tbody></table></div>
       </section>
       <section className="article-section">
         <h2>Individual records stay private</h2>
