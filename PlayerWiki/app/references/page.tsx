@@ -6,7 +6,8 @@ import { designReferences } from '@/lib/design-references';
 
 export default function ReferencesPage() {
   const characterReference = designReferences.find((reference) => reference.slug === 'character-background-and-voice');
-  const resourceReferences = designReferences.filter((reference) => reference.slug !== 'character-background-and-voice');
+  const clueReference = designReferences.find((reference) => reference.slug === 'rewritten-world-clues');
+  const resourceReferences = designReferences.filter((reference) => !['character-background-and-voice', 'rewritten-world-clues'].includes(reference.slug));
 
   return <SiteFrame sidebar>
     <GuideBreadcrumbs items={[{ label: 'Home', href: '/' }, { label: 'Aimee Reference' }]} />
@@ -31,6 +32,13 @@ export default function ReferencesPage() {
       <p>Review the settled background, personality, speaking style, and clue-writing boundaries for every traveller before their world clues are rewritten.</p>
       <nav aria-label="Character Background and Voice reference">
         <Link href={`/references/${characterReference.slug}`}>Open the Character Background and Voice Guide</Link>
+      </nav>
+    </section> : null}
+    {clueReference ? <section className="article-section note-card" aria-labelledby="rewritten-world-clues-heading">
+      <h2 id="rewritten-world-clues-heading">Rewritten World Clues</h2>
+      <p>Read all 137 proposed location clues in their verified character voices, plus the correction that turns Tovin's one-off Isolde clue into a normal relationship page. This copy is ready for review but is not yet implemented in the game.</p>
+      <nav aria-label="Rewritten World Clues reference">
+        <Link href={`/references/${clueReference.slug}`}>Open the Rewritten World Clues</Link>
       </nav>
     </section> : null}
     <section className="article-section" aria-labelledby="resource-crafting-plans-heading">

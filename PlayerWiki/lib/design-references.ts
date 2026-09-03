@@ -2,6 +2,7 @@ import cohesivePlan from '../../docs/resource-crafting-world-ecology-cohesive-pl
 import overhaulPlan from '../../docs/resource-crafting-world-overhaul-structure-v1.md?raw';
 import implementationRoadmap from '../../docs/resource-crafting-world-implementation-roadmap-v1.md?raw';
 import characterBackgroundVoice from '../../docs/full-cast-background-and-voice-guide-current.md?raw';
+import rewrittenWorldClues from '../../docs/full-cast-world-clue-rewrite-current.md?raw';
 
 export interface DesignReferenceLink {
   href: string;
@@ -42,6 +43,13 @@ export const designReferences: DesignReference[] = [
     title: 'Character Background and Voice Guide',
     summary: 'The human background, personality, social habits, humour, speaking style, and world-clue boundaries for all twenty-nine travellers.',
     source: characterBackgroundVoice,
+    systemLinks: characterLinks,
+  },
+  {
+    slug: 'rewritten-world-clues',
+    title: 'Rewritten World Clues',
+    summary: 'The complete plain-language clue set for all twenty-nine travellers, ready for Aimee review before Engineering integration.',
+    source: rewrittenWorldClues,
     systemLinks: characterLinks,
   },
   {

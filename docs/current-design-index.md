@@ -84,6 +84,7 @@ When two documents disagree:
 | Ashe Ground technique | `ashe-ground-technique-current.md` | Protective emanation interception; values remain playtest tuning |
 | Traveller authoring | `traveller-template.md` | Required structure and validation |
 | Character background and voice | `full-cast-background-and-voice-guide-current.md` | Human-first 29-person background anchors, social and emotional voice differentiation, and the plain-world-fact boundary for later clue rewrites |
+| Rewritten world clues | `full-cast-world-clue-rewrite-current.md` | Exact plain-language copy for all 137 traveller location conditions plus the correction of Tovin's one-off Isolde page into the established whereabouts structure; proposed for Engineering integration after Aimee review |
 | Implemented six | `traveller-identities-existing-six-current.md` | Honest clue replacements and expansion targets |
 | Implemented-six diary packets | `implemented-six-diary-packets-current.md` | Complete 6/7/6/7/7/14 page plans and authored additions |
 | Early–mid signatures | `traveller-signatures-early-mid-current.md` | Bryn, Orsa, Vance and Talin; playtest thresholds |

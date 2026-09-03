@@ -7,8 +7,8 @@ import { fileURLToPath } from 'node:url';
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const read = (relative) => readFile(path.join(root, relative), 'utf8');
 
-test('Aimee Reference publishes the audited World Splash inventory, three system plans, and the full-cast background and voice guide', async () => {
-  const [home, references, splashAssets, preparation, route, source, characterGuide, voiceAuthority] = await Promise.all([
+test('Aimee Reference publishes the World Splash inventory, system plans, voice guide, and rewritten clue corpus', async () => {
+  const [home, references, splashAssets, preparation, route, source, characterGuide, voiceAuthority, rewrittenClues, travellerCatalogue] = await Promise.all([
     read('app/page.tsx'),
     read('app/references/page.tsx'),
     read('app/references/world-splash-assets/page.tsx'),
@@ -17,6 +17,8 @@ test('Aimee Reference publishes the audited World Splash inventory, three system
     read('lib/design-references.ts'),
     read('../docs/full-cast-background-and-voice-guide-current.md'),
     read('../docs/full-cast-voice-authority-current.md'),
+    read('../docs/full-cast-world-clue-rewrite-current.md'),
+    read('../Sources/Content/Data/travellers.json'),
   ]);
   assert.match(home, /Aimee Reference/);
   assert.match(home, /World Splash Asset Inventory/);
@@ -44,6 +46,7 @@ test('Aimee Reference publishes the audited World Splash inventory, three system
   }
   for (const slug of [
     'character-background-and-voice',
+    'rewritten-world-clues',
     'resource-crafting-world-ecology-plan',
     'resource-crafting-world-overhaul',
     'resource-crafting-world-roadmap',
@@ -59,7 +62,11 @@ test('Aimee Reference publishes the audited World Splash inventory, three system
   assert.doesNotMatch(route, /reference\.systemLinks\.length\s*\?\s*<section[\s\S]*:\s*<article/);
   assert.match(references, /Each page contains its complete authored plan/);
   assert.match(references, /Character Background and Voice Guide/);
+  assert.match(references, /Rewritten World Clues/);
+  assert.match(references, /all 137 proposed location clues/i);
+  assert.match(references, /not yet implemented in the game/i);
   assert.match(source, /full-cast-background-and-voice-guide-current\.md/);
+  assert.match(source, /full-cast-world-clue-rewrite-current\.md/);
   for (const name of ['Vance', 'Noll', 'Halloway', 'Mara', 'Edren', 'Isolde', 'Sela', 'Bryn', 'Orsa', 'Talin', 'Nessa', 'Corrin', 'Dagg', 'Rook', 'Lys', 'Bracken', 'Fen', 'Wren', 'Kestrel', 'Maud', 'Marrick', 'Sabine', 'Grimmond', 'Oda', 'Auber', 'Ashe', 'Tovin', 'Perren', 'Nine'])
     assert.match(characterGuide, new RegExp(`### ${name} —`));
   assert.match(characterGuide, /75% warm, clear English/);
@@ -79,6 +86,25 @@ test('Aimee Reference publishes the audited World Splash inventory, three system
   assert.match(voiceAuthority, /existing clue and dialogue corpus still requires a separate rewrite/);
   for (const name of ['Vance', 'Noll', 'Halloway', 'Mara', 'Edren', 'Isolde', 'Sela', 'Bryn', 'Orsa', 'Talin', 'Nessa', 'Corrin', 'Dagg', 'Rook', 'Lys', 'Bracken', 'Fen', 'Wren', 'Kestrel', 'Maud', 'Marrick', 'Sabine', 'Grimmond', 'Oda', 'Auber', 'Ashe', 'Tovin', 'Perren', 'Nine'])
     assert.match(voiceAuthority, new RegExp(`\\| \\d+ \\| ${name} \\|`));
+  const catalogue = JSON.parse(travellerCatalogue);
+  const selfClueIDs = catalogue.pages
+    .filter((page) => page.kind === 'locationClue' && page.diary === page.about)
+    .map((page) => page.id);
+  const rewrittenRows = [...rewrittenClues.matchAll(/^\| `([^`]+)` \|/gm)].map((match) => match[1]);
+  assert.equal(selfClueIDs.length, 137);
+  assert.equal(rewrittenRows.length, 137);
+  assert.deepEqual(new Set(rewrittenRows), new Set(selfClueIDs));
+  assert.equal(new Set(rewrittenRows).size, 137);
+  assert.match(rewrittenClues, /Most of the ground is hard stone, and broken edges stay sharp/);
+  assert.match(rewrittenClues, /Mind your hands; the world is already doing part of the work/);
+  assert.match(rewrittenClues, /At its brightest, the whole horizon turns almost white/);
+  assert.match(rewrittenClues, /This world is crowded with animals/);
+  assert.match(rewrittenClues, /The next interval rarely arrives when the last one suggests it should/);
+  assert.match(rewrittenClues, /change its kind from `locationClue` to `whereabouts`/);
+  assert.match(rewrittenClues, /If you are looking for her, try\s+> high, stony ground/);
+  assert.doesNotMatch(rewrittenClues, /Value does not make a place consent/);
+  assert.doesNotMatch(rewrittenClues, /A plan may do the same if its exits remain honest/);
+  assert.doesNotMatch(rewrittenClues, /A body is never the whole system/);
   assert.match(source, /systemLinks/);
   assert.doesNotMatch(preparation, /resource-crafting-world-ecology-cohesive-plan-v1\.md/);
   await access(path.resolve(root, '../AssetLab/world-splash-five-layer-inventory-v1.html'));
