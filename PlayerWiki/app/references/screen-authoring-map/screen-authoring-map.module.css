@@ -152,9 +152,9 @@
 }
 
 .default {
-  color: #4c515a;
-  border-color: #8d949f;
-  background: #e8eaee;
+  color: #731d18;
+  border-color: #cf4f45;
+  background: #ffe0da;
 }
 
 @media (max-width: 720px) {
