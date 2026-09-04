@@ -44,6 +44,10 @@ These decisions do not revoke physical-material identity, ungraded geological/fl
 choice when meaningful, saved-world preservation, or the AGENTS.md fixed-phone and Asset restrictions.
 Authorization to proceed with this Game Design work is not a blanket resumption of every other lead's queue.
 
+**Later closure:** [early progression implementation packet](early-progression-implementation-packet-v1.md)
+settles the first-six priority, signatures, blind gates, clue migration and ordinary source tables.
+Its exact rows supersede the proposed opening and outstanding host-frequency authoring below.
+
 ## 2. First journey: gain a useful capability before adding another prerequisite
 
 Proposed opening tendency, replacing the inherited mandatory sell → recycle → forge emphasis:

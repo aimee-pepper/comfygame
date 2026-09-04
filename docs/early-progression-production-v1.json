@@ -1,0 +1,732 @@
+{
+  "id": "early.progression.v1",
+  "status": "decided intended behavior; numerical values are unmeasured first-pass tuning; not runtime data",
+  "scope": "new-generation worlds and the first six recruitment priorities; remaining roster metadata preserves prior blind access and relative order",
+  "environment": {
+    "units": "normalized game pressures, not degrees Celsius",
+    "rootTemperature": {
+      "formula": "(thermal.peak + thermal.floor) / 2",
+      "frozenRootWhen": "thermal.floor < 25 or resolved root liquid is frozen",
+      "categories": [
+        {
+          "id": "cool",
+          "minimumInclusive": 25,
+          "maximumExclusive": 40
+        },
+        {
+          "id": "temperate",
+          "minimumInclusive": 40,
+          "maximumExclusive": 60
+        },
+        {
+          "id": "warm",
+          "minimumInclusive": 60,
+          "maximumInclusive": 75
+        }
+      ]
+    },
+    "photosynthesis": {
+      "reading": "illumination.peak",
+      "minimumInclusive": 30,
+      "minimumExistingViability": 0.46808510638297873
+    },
+    "rootWater": {
+      "formula": "clamp(hydrology.availableMagnitude + (fresh liquid shore within 2 passable steps ? 15 : 0), 0, 100)",
+      "freshSalinityMaximumInclusive": 25,
+      "categories": [
+        {
+          "id": "fresh_damp",
+          "minimumInclusive": 25,
+          "maximumExclusive": 50
+        },
+        {
+          "id": "fresh_moist",
+          "minimumInclusive": 50,
+          "maximumInclusive": 75
+        }
+      ],
+      "excluded": [
+        "submerged",
+        "frozen",
+        "acid_precipitation",
+        "corrosive_air"
+      ]
+    },
+    "regionGeologyFallback": {
+      "bedrockWeights": {
+        "granite": 40,
+        "sandstone": 40,
+        "basalt": 20
+      },
+      "soilWeights": {
+        "loam": 70,
+        "clay_soil": 30
+      },
+      "ironBearingChance": 0.6,
+      "coalBearingChanceOnSandstone": 0.6,
+      "clayDepositUnderMudChance": 0.5
+    },
+    "worldFacts": [
+      {
+        "id": "early.fact.fresh_growing_land.v1",
+        "label": "Fresh growing land",
+        "all": [
+          "one entry-connected region has at least 12 compatible ordinary root tiles",
+          "region has at least one legal resin-shrub site and one legal small-softwood site"
+        ]
+      },
+      {
+        "id": "early.fact.workable_iron.v1",
+        "label": "Workable iron",
+        "all": [
+          "entry-connected iron_bearing region",
+          "granite, sandstone or basalt bedrock",
+          "at least one exposed dry iron-node face with adjacent passable land"
+        ]
+      },
+      {
+        "id": "early.fact.fibre_growth.v1",
+        "label": "Fibre-bearing growth",
+        "all": [
+          "one entry-connected region has at least 12 compatible ordinary root tiles",
+          "region supports both stem-patch and leaf-rosette profiles"
+        ]
+      }
+    ]
+  },
+  "placement": {
+    "minerals": {
+      "budget": "max(3, roundHalfUp(entryConnectedPassableLand / 28))",
+      "rarityWeights": {
+        "common": 70,
+        "uncommon": 25,
+        "rare": 5
+      },
+      "ordinaryReservations": [
+        {
+          "producer": "early.node.iron.v1",
+          "count": 1
+        },
+        {
+          "producer": "early.node.coal.v1",
+          "count": 1
+        }
+      ],
+      "reservationPolicy": "only if host eligible; written placements satisfy counts and spend same budget; unavailable reservation released"
+    },
+    "looseEarth": {
+      "budget": "max(2, roundHalfUp(entryConnectedPassableLand / 56))",
+      "ordinaryClayReservation": 2
+    },
+    "flora": {
+      "budget": "max(6, roundHalfUp(compatibleOrdinaryRootTiles / 12 * min(2, vitality.peak / 50))) if compatibleOrdinaryRootTiles >= 12 else 0",
+      "ordinaryReservations": [
+        {
+          "producer": "early.flora.stem_patch.v1",
+          "count": 2
+        },
+        {
+          "producer": "early.flora.leaf_rosette.v1",
+          "count": 1
+        },
+        {
+          "producer": "early.flora.resin_shrub.v1",
+          "count": 1
+        },
+        {
+          "producer": "early.flora.small_softwood.v1",
+          "count": 2
+        }
+      ],
+      "remainingSizeWeights": {
+        "low": 35,
+        "medium": 30,
+        "tree": 35
+      },
+      "withinSizeEligibleProfileWeights": "equal; small hardwood competes equally with small softwood in tree group"
+    },
+    "ordinaryFirstSourceDistance": [
+      4,
+      12
+    ],
+    "ordinaryRemainingSourceDistance": [
+      6,
+      24
+    ],
+    "criticalRoutePolicy": "reserve reachable action positions before blocking trunks; crown overlap cannot invalidate a portal, teaching, traveller, or declared source route",
+    "writtenSourceDistance": [
+      3,
+      8
+    ],
+    "writtenSecondNodeMaximumDistance": 4,
+    "salts": {
+      "region": "early.region.v1",
+      "formation": "early.formation.v1",
+      "ordinaryReservation": "early.reservation.v1",
+      "flora": "early.flora.v1",
+      "clue": "early.clue.v2"
+    },
+    "tinyWorldPolicy": "no duplicated placements or impossible receipts; do not declare a written guarantee feasible without capacity; ordinary reservations may be reduced with recorded reason"
+  },
+  "recruitment": {
+    "roster": [
+      {
+        "id": "vance",
+        "authoredOrder": 1,
+        "campaignPhase": "opening",
+        "storyArrivalBand": 0,
+        "minimumRecruitsForBlindDiscovery": 0
+      },
+      {
+        "id": "nessa",
+        "authoredOrder": 2,
+        "campaignPhase": "opening",
+        "storyArrivalBand": 0,
+        "minimumRecruitsForBlindDiscovery": 0
+      },
+      {
+        "id": "halloway",
+        "authoredOrder": 3,
+        "campaignPhase": "opening",
+        "storyArrivalBand": 0,
+        "minimumRecruitsForBlindDiscovery": 0
+      },
+      {
+        "id": "bryn",
+        "authoredOrder": 4,
+        "campaignPhase": "early-mid",
+        "storyArrivalBand": 1,
+        "minimumRecruitsForBlindDiscovery": 1
+      },
+      {
+        "id": "corrin",
+        "authoredOrder": 5,
+        "campaignPhase": "early-mid",
+        "storyArrivalBand": 1,
+        "minimumRecruitsForBlindDiscovery": 1
+      },
+      {
+        "id": "noll",
+        "authoredOrder": 6,
+        "campaignPhase": "early-mid",
+        "storyArrivalBand": 1,
+        "minimumRecruitsForBlindDiscovery": 1
+      },
+      {
+        "id": "mara",
+        "authoredOrder": 7,
+        "campaignPhase": "opening",
+        "storyArrivalBand": 1,
+        "minimumRecruitsForBlindDiscovery": 0
+      },
+      {
+        "id": "edren",
+        "authoredOrder": 8,
+        "campaignPhase": "opening",
+        "storyArrivalBand": 1,
+        "minimumRecruitsForBlindDiscovery": 0
+      },
+      {
+        "id": "isolde",
+        "authoredOrder": 9,
+        "campaignPhase": "startOfMid",
+        "storyArrivalBand": 2,
+        "minimumRecruitsForBlindDiscovery": 3
+      },
+      {
+        "id": "sela",
+        "authoredOrder": 10,
+        "campaignPhase": "mid",
+        "storyArrivalBand": 2,
+        "minimumRecruitsForBlindDiscovery": 4
+      },
+      {
+        "id": "orsa",
+        "authoredOrder": 11,
+        "campaignPhase": "early-mid",
+        "storyArrivalBand": 2,
+        "minimumRecruitsForBlindDiscovery": 6
+      },
+      {
+        "id": "talin",
+        "authoredOrder": 12,
+        "campaignPhase": "mid",
+        "storyArrivalBand": 3,
+        "minimumRecruitsForBlindDiscovery": 7
+      },
+      {
+        "id": "dagg",
+        "authoredOrder": 13,
+        "campaignPhase": "mid",
+        "storyArrivalBand": 3,
+        "minimumRecruitsForBlindDiscovery": 10
+      },
+      {
+        "id": "rook",
+        "authoredOrder": 14,
+        "campaignPhase": "mid",
+        "storyArrivalBand": 3,
+        "minimumRecruitsForBlindDiscovery": 11
+      },
+      {
+        "id": "lys",
+        "authoredOrder": 15,
+        "campaignPhase": "mid",
+        "storyArrivalBand": 3,
+        "minimumRecruitsForBlindDiscovery": 12
+      },
+      {
+        "id": "bracken",
+        "authoredOrder": 16,
+        "campaignPhase": "mid",
+        "storyArrivalBand": 4,
+        "minimumRecruitsForBlindDiscovery": 13
+      },
+      {
+        "id": "fen",
+        "authoredOrder": 17,
+        "campaignPhase": "mid",
+        "storyArrivalBand": 4,
+        "minimumRecruitsForBlindDiscovery": 14
+      },
+      {
+        "id": "wren",
+        "authoredOrder": 18,
+        "campaignPhase": "mid-late",
+        "storyArrivalBand": 4,
+        "minimumRecruitsForBlindDiscovery": 15
+      },
+      {
+        "id": "kestrel",
+        "authoredOrder": 19,
+        "campaignPhase": "mid-late",
+        "storyArrivalBand": 4,
+        "minimumRecruitsForBlindDiscovery": 16
+      },
+      {
+        "id": "maud",
+        "authoredOrder": 20,
+        "campaignPhase": "mid-late",
+        "storyArrivalBand": 4,
+        "minimumRecruitsForBlindDiscovery": 17
+      },
+      {
+        "id": "marrick",
+        "authoredOrder": 21,
+        "campaignPhase": "late",
+        "storyArrivalBand": 5,
+        "minimumRecruitsForBlindDiscovery": 18
+      },
+      {
+        "id": "sabine",
+        "authoredOrder": 22,
+        "campaignPhase": "late",
+        "storyArrivalBand": 5,
+        "minimumRecruitsForBlindDiscovery": 19
+      },
+      {
+        "id": "grimmond",
+        "authoredOrder": 23,
+        "campaignPhase": "late",
+        "storyArrivalBand": 5,
+        "minimumRecruitsForBlindDiscovery": 20
+      },
+      {
+        "id": "oda",
+        "authoredOrder": 24,
+        "campaignPhase": "late",
+        "storyArrivalBand": 5,
+        "minimumRecruitsForBlindDiscovery": 21
+      },
+      {
+        "id": "auber",
+        "authoredOrder": 25,
+        "campaignPhase": "late",
+        "storyArrivalBand": 5,
+        "minimumRecruitsForBlindDiscovery": 22
+      },
+      {
+        "id": "ashe",
+        "authoredOrder": 26,
+        "campaignPhase": "late",
+        "storyArrivalBand": 6,
+        "minimumRecruitsForBlindDiscovery": 23
+      },
+      {
+        "id": "tovin",
+        "authoredOrder": 27,
+        "campaignPhase": "late",
+        "storyArrivalBand": 6,
+        "minimumRecruitsForBlindDiscovery": 24
+      },
+      {
+        "id": "perren",
+        "authoredOrder": 28,
+        "campaignPhase": "late",
+        "storyArrivalBand": 6,
+        "minimumRecruitsForBlindDiscovery": 25
+      },
+      {
+        "id": "nine",
+        "authoredOrder": 29,
+        "campaignPhase": "late",
+        "storyArrivalBand": 7,
+        "minimumRecruitsForBlindDiscovery": 26
+      }
+    ],
+    "clues": [
+      {
+        "travellerID": "vance",
+        "signatureVersion": 1,
+        "signature": [
+          {
+            "kind": "pressure",
+            "condition": {
+              "target": "relief",
+              "measure": "aspect",
+              "key": "openness",
+              "minimum": 68
+            },
+            "passage": "The land is broad and open, with few barriers between one horizon and the next. A loaded cart could cross without the ground inventing a toll."
+          }
+        ],
+        "pages": [
+          {
+            "id": "vance_where_0",
+            "diary": "vance",
+            "kind": "locationClue",
+            "about": "vance",
+            "clueIndex": 0,
+            "prose": "The land is broad and open, with few barriers between one horizon and the next. A loaded cart could cross without the ground inventing a toll.",
+            "prefersConditions": []
+          }
+        ],
+        "historicalClueAliases": [
+          {
+            "pageID": "vance_where_0",
+            "creditsCurrentIndices": [
+              0
+            ]
+          }
+        ]
+      },
+      {
+        "travellerID": "nessa",
+        "signatureVersion": 2,
+        "signature": [
+          {
+            "kind": "resolvedFact",
+            "condition": "early.fact.fresh_growing_land.v1",
+            "passage": "There is fresh water here and enough daylight for green plants. I have been collecting resin beside the trees."
+          }
+        ],
+        "pages": [
+          {
+            "id": "nessa_where_0_v2",
+            "diary": "nessa",
+            "kind": "locationClue",
+            "about": "nessa",
+            "clueIndex": 0,
+            "prose": "There is fresh water here and enough daylight for green plants. I have been collecting resin beside the trees.",
+            "prefersConditions": []
+          }
+        ],
+        "historicalClueAliases": [
+          {
+            "pageID": "nessa_where_0",
+            "creditsCurrentIndices": [
+              0
+            ]
+          },
+          {
+            "pageID": "nessa_where_1",
+            "creditsCurrentIndices": [
+              0
+            ]
+          },
+          {
+            "pageID": "nessa_where_2",
+            "creditsCurrentIndices": [
+              0
+            ]
+          },
+          {
+            "pageID": "nessa_where_3",
+            "creditsCurrentIndices": [
+              0
+            ]
+          }
+        ]
+      },
+      {
+        "travellerID": "halloway",
+        "signatureVersion": 2,
+        "signature": [
+          {
+            "kind": "resolvedFact",
+            "condition": "early.fact.workable_iron.v1",
+            "passage": "Iron shows in the exposed rock here. A stone pick can work this seam; I do not need a furnace to find my way to it."
+          }
+        ],
+        "pages": [
+          {
+            "id": "halloway_where_0_v2",
+            "diary": "halloway",
+            "kind": "locationClue",
+            "about": "halloway",
+            "clueIndex": 0,
+            "prose": "Iron shows in the exposed rock here. A stone pick can work this seam; I do not need a furnace to find my way to it.",
+            "prefersConditions": []
+          }
+        ],
+        "historicalClueAliases": [
+          {
+            "pageID": "halloway_where_0",
+            "creditsCurrentIndices": [
+              0
+            ]
+          },
+          {
+            "pageID": "halloway_where_1",
+            "creditsCurrentIndices": [
+              0
+            ]
+          }
+        ]
+      },
+      {
+        "travellerID": "bryn",
+        "signatureVersion": 2,
+        "signature": [
+          {
+            "kind": "pressure",
+            "condition": {
+              "target": "relief",
+              "measure": "aspect",
+              "key": "openness",
+              "maximum": 40
+            },
+            "passage": "The paths bend between close walls of land. I can guard one approach without watching the whole horizon."
+          }
+        ],
+        "pages": [
+          {
+            "id": "bryn_where_0_v2",
+            "diary": "bryn",
+            "kind": "locationClue",
+            "about": "bryn",
+            "clueIndex": 0,
+            "prose": "The paths bend between close walls of land. I can guard one approach without watching the whole horizon.",
+            "prefersConditions": []
+          }
+        ],
+        "historicalClueAliases": [
+          {
+            "pageID": "bryn_where_0",
+            "creditsCurrentIndices": [
+              0
+            ]
+          },
+          {
+            "pageID": "bryn_where_1",
+            "creditsCurrentIndices": [
+              0
+            ]
+          },
+          {
+            "pageID": "bryn_where_2",
+            "creditsCurrentIndices": [
+              0
+            ]
+          }
+        ]
+      },
+      {
+        "travellerID": "corrin",
+        "signatureVersion": 2,
+        "signature": [
+          {
+            "kind": "resolvedFact",
+            "condition": "early.fact.fibre_growth.v1",
+            "passage": "Fibrous stems and broad, tough leaves grow on the damp ground here. There is enough to cut without pulling up the roots."
+          }
+        ],
+        "pages": [
+          {
+            "id": "corrin_where_0_v2",
+            "diary": "corrin",
+            "kind": "locationClue",
+            "about": "corrin",
+            "clueIndex": 0,
+            "prose": "Fibrous stems and broad, tough leaves grow on the damp ground here. There is enough to cut without pulling up the roots.",
+            "prefersConditions": []
+          }
+        ],
+        "historicalClueAliases": [
+          {
+            "pageID": "corrin_where_0",
+            "creditsCurrentIndices": [
+              0
+            ]
+          },
+          {
+            "pageID": "corrin_where_1",
+            "creditsCurrentIndices": [
+              0
+            ]
+          },
+          {
+            "pageID": "corrin_where_2",
+            "creditsCurrentIndices": [
+              0
+            ]
+          },
+          {
+            "pageID": "corrin_where_3",
+            "creditsCurrentIndices": [
+              0
+            ]
+          }
+        ]
+      },
+      {
+        "travellerID": "noll",
+        "signatureVersion": 1,
+        "signature": [
+          {
+            "kind": "pressure",
+            "condition": {
+              "target": "substrate",
+              "measure": "form",
+              "key": "hard",
+              "minimum": 35
+            },
+            "passage": "Hard stone and compacted ground keep sharp edges when they break. The pieces could be fitted together again after the whole fails."
+          },
+          {
+            "kind": "pressure",
+            "condition": {
+              "target": "substrate",
+              "measure": "aspect",
+              "key": "dispersion",
+              "maximum": 40
+            },
+            "passage": "Useful material is concentrated in a few narrow seams rather than spread across the ground. Separate pieces should be easy to recover."
+          }
+        ],
+        "pages": [
+          {
+            "id": "noll_where_0",
+            "diary": "noll",
+            "kind": "locationClue",
+            "about": "noll",
+            "clueIndex": 0,
+            "prose": "Hard stone and compacted ground keep sharp edges when they break. The pieces could be fitted together again after the whole fails.",
+            "prefersConditions": []
+          },
+          {
+            "id": "noll_where_1",
+            "diary": "noll",
+            "kind": "locationClue",
+            "about": "noll",
+            "clueIndex": 1,
+            "prose": "Useful material is concentrated in a few narrow seams rather than spread across the ground. Separate pieces should be easy to recover.",
+            "prefersConditions": []
+          }
+        ],
+        "historicalClueAliases": [
+          {
+            "pageID": "noll_where_0",
+            "creditsCurrentIndices": [
+              0
+            ]
+          },
+          {
+            "pageID": "noll_where_1",
+            "creditsCurrentIndices": [
+              1
+            ]
+          }
+        ]
+      }
+    ],
+    "selector": {
+      "blindGate": "known current clue or mapped historical location clue OR recruitedCount >= minimumRecruitsForBlindDiscovery",
+      "storyBand": "earliest represented eligible band",
+      "score": "unique known current clue count + 2 * unique known current causally-authored condition count",
+      "ties": [
+        "authoredOrder ascending",
+        "id ascending"
+      ],
+      "maximumNewTravellerPerWorld": 1,
+      "arrivalChance": "min(1, .25 + .75 * causallyAuthoredConditions / totalConditions + .25 * priorSelectedNearMisses); 1 if priorSelectedNearMisses >= 2",
+      "failedRoll": "no substitute traveller"
+    }
+  },
+  "teaching": {
+    "intro": [
+      "Illumination",
+      "Sun"
+    ],
+    "reservedEntries": [
+      {
+        "id": "teaching.target.hydrology",
+        "rewardKind": "target",
+        "rewardID": "hydrology",
+        "title": "Water in a world",
+        "copy": "Hydrology describes the water in a world. Pair it with a water source to say where that water comes from.",
+        "evidence": "entry-connected safely observable liquid water"
+      },
+      {
+        "id": "teaching.focus.river",
+        "rewardKind": "focus",
+        "rewardID": "river",
+        "title": "River",
+        "copy": "A river is connected moving surface water. Write RIVER when the water should travel across the land.",
+        "evidence": "frozen generated source IDs contains river"
+      },
+      {
+        "id": "teaching.target.substrate",
+        "rewardKind": "target",
+        "rewardID": "substrate",
+        "title": "Ground and material",
+        "copy": "Substrate describes what the ground is made from. A named resource asks for a source you can gather, with the required tool.",
+        "evidence": "a safely observable exposed mineral face"
+      },
+      {
+        "id": "teaching.focus.iron",
+        "rewardKind": "focus",
+        "rewardID": "iron",
+        "title": "Iron",
+        "copy": "Iron can be worked from an exposed seam with a stone pick. Write IRON into the ground when you want a reachable source.",
+        "evidence": "early.fact.workable_iron.v1"
+      }
+    ],
+    "policy": "same one independent recovered-teaching opportunity per world; one reward per record; opening band; unknown prerequisite target ranks before its focus; early maker entries rank before unrelated same-age candidates until read; due candidates retain priority",
+    "locationCluePolicy": "use ordinary diary slot and normalized traveller bucket; until both makers recruited, on alternating eligible resolved worlds starting first, reserve a missing Nessa or Halloway v2 location clue, least recovered clues then Nessa; exact existing due diary nominee wins, and postpones rather than consumes reservation; no duplicate IDs; no new extra diary slot",
+    "noObservationLeak": "clues may describe another world; teaching evidence and map highlights require actual visible-compatible facts; writing previews disclose only authored effects and known requirements"
+  },
+  "acceptance": {
+    "seedSet": "unsigned integer world seeds 0 through 999, generation version early.progression.v1; new campaign state fixtures at zero, one and three recruits; ordinary unwritten targets stay fully generated",
+    "routeCases": [
+      "Nessa foundation and first Lesser Salve",
+      "Halloway foundation and Pick 2",
+      "optional iron blade after existing forge"
+    ],
+    "initialBudgets": {
+      "salveRouteHarvestActions": 6,
+      "pickRouteHarvestActionsAcrossWorlds": 13,
+      "maximumNoncombatMovementPerUsefulOutAndBackLeg": 48,
+      "targetUsefulJourneyShareOfFiniteWorldTurns": 0.6,
+      "minimumNextBindRunway": "actual cheapest legal ordinary Bind quote, not assumed flat 10 Essence"
+    },
+    "sourceFrequencyReviewThresholds": {
+      "ironInOrdinaryWorldsMinimumShare": 0.4,
+      "coalInOrdinaryWorldsMinimumShare": 0.25,
+      "freshGrowingLandInOrdinaryWorldsMinimumShare": 0.25,
+      "eligibleHostMissingReservedProducerMaximum": 0,
+      "earlyMakerSelectedNearMissesBeforeGuaranteedArrival": 2
+    },
+    "status": "thresholds are design acceptance targets; no seed corpus or campaign pacing run claimed"
+  }
+}

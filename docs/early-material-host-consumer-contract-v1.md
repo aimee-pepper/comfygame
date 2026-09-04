@@ -1,8 +1,8 @@
 # Early material host and consumer contract V1
 
 **Status:** completed bounded Game Design specification; first-pass tuning, not shipped or play-verified.
-Closes physical eligibility, finite harvests, starter outputs and transaction behavior. Acquisition frequency,
-full route pacing and native implementation remain verification/promotion gates.
+Closes physical eligibility, finite harvests, starter outputs and transaction behavior. The [early progression packet](early-progression-implementation-packet-v1.md) now closes category mapping,
+ordinary source reservations and recruitment. Full route pacing and native implementation remain verification/promotion gates.
 
 Authority: [Aimee's direction and first packet](game-design-early-progression-direction-2026-09-04.md),
 the four resource/world authorities at `b4081f63`, and runtime inspection at `216d2498`. Aimee additionally
