@@ -84,6 +84,50 @@ Suitable worlds set aside some source opportunities for the early crafts. They d
 
 The intended first healing trip needs six harvest actions before travel and encounters. Building the forge and improving the Pick needs thirteen harvest actions across enough source-bearing worlds. Those are ingredient calculations, **not measured trip lengths**. The complete route still needs testing for travel, survival, returning safely, and enough Essence left to bind another world. A useful expedition should not require clearing its whole map.
 
+### T2 smelting and useful specialist crafts — decided intended behavior
+
+**Iron Ingot making opens at Blacksmith T2.** Upgrade the working forge with raw materials you can already gather. Its earlier raw-material recipes remain available. The first Ingots have two useful destinations: a better Scythe and a reinforced cloth garment at Corrin’s Tannery.
+
+The Tannery also has a useful first garment made entirely from plant materials. You do not need to upgrade the forge, find Salt, or hunt an animal just to use your new cloth-making room. Leather becomes a separate optional path.
+
+**First-pass recipes and costs — not current phone recipes:**
+
+| Project or craft | Inputs | Result |
+| --- | --- | --- |
+| Blacksmith T2 | 20 Essence, 8 Iron, 4 Clay, 4 Logs | Learn Iron smelting and the Scythe improvement |
+| Tannery foundation after Corrin joins | 20 Essence, 6 Logs, 4 Clay, 4 Plant Fibre | Learn Cord, Cloth, and the woven garments; no free stock |
+| Iron smelting | 2 Iron, 1 Coal | 1 Iron Ingot |
+| Plant Cord | 2 Stem or Leaf Fibre | 1 Plant Cord |
+| Plant Cloth | 4 Stem or Leaf Fibre | 1 Plant Cloth |
+| Woven Guard | 1 Plant Cloth, 1 Plant Cord | Fine Body equipment with total Protection 1.5 |
+| Buckled Woven Guard | 2 Plant Cloth, 1 Plant Cord, 1 Iron Ingot | Fine Body equipment with total Protection 2.0 |
+| Scythe 1 → 2 at Blacksmith T2 | Owned Scythe 1, 2 Iron Ingots, 1 Log, 2 Plant Fibre | Improve the same tool with an iron edge |
+
+The listed processing and item recipes cost no Essence. These garments add no Initiative or heat protection. Ingots, Cord, and Cloth are ungraded materials. Cloth and ties retain the chosen plant colours, while buckles use the selected Iron. Matching ingredients can come from several plants; ingredients with different visible results require a deliberate choice rather than silently blending colours.
+
+Scythe 2 can cut tall fibrous stalks on suitable thriving land for 3 Stem Fibre in one harvest action. The ordinary smaller fibre plants remain available with Scythe 1. A tall patch can appear before you have the better tool, and selecting it explains what is needed.
+
+From an existing basic forge, opening the Tannery and making a Woven Guard needs **20 Essence, 6 Logs, 4 Clay, and 10 Plant Fibre** in total. Adding T2 and making the Buckled version instead needs **40 Essence, 10 Logs, 8 Clay, 14 Plant Fibre, 10 Iron, and 1 Coal**. These combined costs are starting balance proposals, not measured affordability. You choose which improvement to pursue; the game does not require buying them all together.
+
+### Optional Hide-to-Leather path — decided intended behavior
+
+Some generated animals can provide **Smooth Skin, Supple Hide, or Tough Hide**, according to their actual covering. A feathered, scaled, shelled, or furry animal does not silently become a Hide source. Relevant creatures can be highlighted for a known recipe as soon as normally visible, but a possible drop is not a promise. Their appearance and species remain generated.
+
+**First-pass reward tuning:** a qualifying creature has a 70% chance to provide its covering after defeat, yielding 1–4 parts according to body size. The part’s actual source determines its Poor, Common, Rare, or Exceptional quality and its colour. Better quality improves its contribution to an eligible craft; it does not make the animal drop more pieces. No tool is required to collect that defeat reward.
+
+Salt comes from real dry Salt crust around a suitable saline margin or deposit. It is gathered by hand: 2 Salt in one action, then that placement is depleted. Fresh growing country does not automatically supply Salt. This separate gathering trip is one reason Leather is optional rather than a prerequisite for the first Tannery crafts.
+
+| Optional Tannery recipe | Inputs | Result |
+| --- | --- | --- |
+| Leather | 2 matching Smooth Skin, Supple Hide, or Tough Hide, plus 1 Salt | 1 Leather retaining the parts’ quality and colour |
+| Leather Guard | 2 matching Leather plus 1 Plant Cord | Body equipment with Protection calculated from that Leather; the preview shows the exact result |
+
+Both recipes cost no Essence. Matching parts can come from several animals when their type, quality, colour, and relevant properties are the same. Different qualities or colours are not silently averaged together. A complete Leather Guard uses **4 matching raw parts, 2 Salt, and 2 Plant Fibre**, including its processing steps.
+
+Leather determines the garment’s finished quality: Poor parts make Rough work, Common makes Fine, Rare makes Superior, and Exceptional makes Exceptional. It adds no hidden Initiative, heat protection, or durability. Dismantling returns the recorded prepared Leather and Cord; it does not also refund the raw parts or spent Salt. Existing equipment and older materials remain available through their supported uses.
+
+Animal frequency, source matching, combat, and the complete gathering journey still need playtesting. This closes a small useful Leather path; the wider creature catalogue and later material families remain separate work.
+
 ### The Binder’s own Gambits
 
 Self-automation remains an earned ability; opening Party does not grant it. Existing unlocked campaigns keep it. The intended owner is the recovered instruction **Let your own rules run**, found in a world and read in the Library. Party uses learned Gambits and never teaches this ability. Reading does not create a rule or change any rule's enabled state.
@@ -115,7 +159,7 @@ These are the completed starting specifications for the early material path. The
 | Pick 1 → 2 | Owned Pick plus the blade's raw-material bundle; no Essence | The same Pick improved to level 2 |
 | Axe 1 → 2 | Owned Axe plus the blade's raw-material bundle; no Essence | The same Axe improved to level 2 |
 
-Iron is the blade's point, Log its handle, Fibre its binding, and Coal the forge fuel. Handle and binding choices can change colour; they do not add a new statistic to this starter blade. Fuel does not tint equipment. There is no first Scythe improvement specified in this set. Pick 2 opens the first uncommon mineral group, including Quartz; shop level and tool level are separate, so these tool improvements belong at the basic forge.
+Iron is the blade's point, Log its handle, Fibre its binding, and Coal the forge fuel. Handle and binding choices can change colour; they do not add a new statistic to this starter blade. Fuel does not tint equipment. The first Scythe improvement belongs to Blacksmith T2, as described above. Pick 2 opens the first uncommon mineral group, including Quartz; shop level and tool level are separate, so these tool improvements belong at the basic forge.
 
 ### Early gathering sources
 
@@ -130,7 +174,7 @@ Iron is the blade's point, Log its handle, Fibre its binding, and Coal the forge
 | Softwood Log | Small softwood tree; Axe 1 | One hit, 2 Logs |
 | Hardwood Log | Small hardwood tree; Axe 2 | Two hits, 5 Logs on completion |
 
-These starter plants belong to compatible temperate, moist, light-supporting habitats, without intrinsic danger or acid air. A tree has a small cross-shaped crown; its trunk and canopy change together when felled. A successful gathering hit spends one world turn. Cancelling or choosing an unsuitable tool spends none. Partly harvested sources retain their progress and do not regrow in this first set.
+These starter plants belong to compatible cool, temperate, or warm habitats with fresh damp or moist roots and sufficient daylight, without intrinsic danger, frozen or submerged roots, acid precipitation, or corrosive air. A tree has a small cross-shaped crown; its trunk and canopy change together when felled. A successful gathering hit spends one world turn. Cancelling or choosing an unsuitable tool spends none. Partly harvested sources retain their progress and do not regrow in this first set.
 
 Early ingredients must have ordinary gathering routes; they cannot depend exclusively on a lucky merchant offer, recycling, creature loot, or a later resource-Writing symbol. The complete gathering and return journey still needs playtesting.
 
@@ -142,15 +186,30 @@ Early ingredients must have ordinary gathering routes; they cannot depend exclus
 | Clay, either Log, or either Plant Fibre, per unit | 1 Gold | 2 Gold |
 | Starter Iron Pointed Blade | 10 Gold | 20 Gold |
 
+**Additional intended trade tuning:**
+
+| Prepared material or item | Sell | Buy, when offered |
+| --- | ---: | ---: |
+| Iron Ingot | 4 Gold | 8 Gold |
+| Plant Cord | 1 Gold | 2 Gold |
+| Plant Cloth | 2 Gold | 4 Gold |
+| Woven Guard | 5 Gold | 10 Gold |
+| Buckled Woven Guard | 12 Gold | 24 Gold |
+| Salt | 1 Gold | 2 Gold |
+| Smooth Skin: Poor / Common / Rare / Exceptional | 2 / 2 / 3 / 3 Gold | 4 / 4 / 6 / 6 Gold |
+| Supple or Tough Hide: Poor / Common / Rare / Exceptional | 2 / 3 / 4 / 5 Gold | 4 / 6 / 8 / 10 Gold |
+| Leather: Poor / Common / Rare / Exceptional | 3 / 4 / 5 / 6 Gold | 6 / 8 / 10 / 12 Gold |
+| Leather Guard: Rough / Fine / Superior / Exceptional | 8 / 10 / 13 / 15 Gold | 16 / 20 / 26 / 30 Gold |
+
+Dismantling a Woven Guard returns its Cloth and Cord. The Buckled version also returns its recorded Ingot. Prepared materials do not also refund their raw inputs, and spent fuel or Salt never returns. These are starting prices, not a promise that every merchant stocks every item.
+
 Buying the blade's full raw bundle costs 26 Gold. Dismantling that blade returns its recorded 4 Iron, 1 Log, and 2 Plant Fibre; the spent Coal does not return. Those recovered materials sell for 11 Gold. No new tool-dismantling route is added. Buying, making, and selling must not create an ordinary unlimited-profit loop.
 
 ## 4. Unsettled proposals
 
 ### Blacksmith growth alongside the Village
 
-The recommendation is **T1 raw-material gear → T2 Ingot making → T3 advanced forgework and refinement**. Aimee suggested T2 or T3 for Ingots; the exact placement is not decided. The intention is to introduce exportable prepared metal when specialist shops can use it, while keeping basic recipes simple.
-
-The working conversion is 2 units of the matching solid metal plus 1 Coal for 1 named Ingot, with no Essence cost. The upgrade price and first specialist consumers remain to be settled. Mercury, stone, glass, and creature parts are not smeltable solid metal.
+Blacksmith T2 is now decided for Iron Ingots, with its first useful consumers specified above. T3, other metal Ingots, and the wider later-facility progression still need design work. A new process will arrive with something useful to make from it.
 
 ### Refining a favourite piece toward Peerless
 

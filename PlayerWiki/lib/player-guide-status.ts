@@ -170,7 +170,7 @@ export const craftingFamilyStatus: CraftingFamilyStatus[] = [
     name: 'Blacksmith',
     status: 'Partly playable',
     current: 'Pointed Blade can be made. A paid Reforge improvement is not verified by the current first-use guide. Seven other defined forms are not available from the station.',
-    accepted: 'The starter Iron Pointed Blade uses raw Iron, Log, Plant Fibre, and Coal. Later forms use sensible physical components; mined and ordinary plant materials are ungraded. Refitting preserves older workmanship; a separate journey toward Peerless remains an unsettled refinement proposal.',
+    accepted: 'The starter Iron Pointed Blade uses raw Iron, Log, Plant Fibre, and Coal. T2 adds Iron smelting and Scythe 2, with Iron Ingots also used by the Tannery. Later forms use sensible physical components; mined and ordinary plant materials are ungraded. Refitting preserves older workmanship; a separate journey toward Peerless remains an unsettled refinement proposal.',
     changes: [
       { name: 'Pointed Blade', current: 'One chosen point and a different chosen grip.', accepted: 'Starter Iron variant: 4 Iron, 1 Softwood or Hardwood Log, 2 Stem or Leaf Fibre, and 1 Coal; 0 Essence. Fine quality, Close Pierce, total Power 2.0. These are first-pass values, not current costs.' },
       { name: 'Cutting Blade', current: 'Defined, but not unlockable or playable.', accepted: 'One Edge and one Grip after a future explicit unlock.' },
@@ -188,7 +188,7 @@ export const craftingFamilyStatus: CraftingFamilyStatus[] = [
     name: 'Tannery',
     status: 'Changing in a future update',
     current: 'Supple Coat, Working Gloves, and Working Boots use individually selected samples that must meet hidden physical requirements.',
-    accepted: 'The same three patterns move to player-selected physical type/subtype and four-band quality stacks. Their final category lists and stat contributions remain under design review.',
+    accepted: 'The early Tannery now has specified Plant Cord, Plant Cloth, Woven Guard, and Buckled Woven Guard recipes. Its first woven garment works without Ingots, Salt, or animal parts. An optional Leather Guard uses Leather made from matching Smooth Skin, Supple Hide, or Tough Hide plus Salt. Existing patterns keep their current behavior while their physical replacements are completed.',
     changes: ['Supple Coat', 'Working Gloves', 'Working Boots'].map((name) => ({ name, current: 'Playable with the current individually selected material recipe.', accepted: 'Use visible physical part categories and player-selected quality; preview the resulting Armour and other real stat contributions.' })),
   },
   {

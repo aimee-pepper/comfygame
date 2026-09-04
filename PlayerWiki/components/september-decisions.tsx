@@ -4,14 +4,14 @@ export type DecisionTopic = 'crafting' | 'progression' | 'exploration' | 'writin
 
 const updates: Record<DecisionTopic, { current?: string; decided: string; tuning?: string; open?: string }> = {
   crafting: {
-    decided: 'Starter Blacksmith gear uses raw materials, with no separate Ingot, Haft, or Cord step. The basic forge improves the stone Pick and Axe with iron working parts. Basic healing no longer requires Quartz. Later specialist recipes can use prepared components. Earlier recipes remain usable after an upgrade.',
+    decided: 'Starter Blacksmith gear uses raw materials, with no separate Ingot, Haft, or Cord step. The basic forge improves the stone Pick and Axe with iron working parts. Basic healing no longer requires Quartz. Blacksmith T2 makes Iron Ingots for a better Scythe and a reinforced woven garment. Corrin can make a useful plant-cloth garment before Ingots or Leather. An optional Leather path uses actual creature coverings and Salt. Earlier recipes remain usable after an upgrade.',
     tuning: 'The new starter blade and either tool improvement use 4 Iron, 1 Log, 2 Plant Fibre, and 1 Coal, with no Essence. Lesser Salve uses 1 Resin and 1 Plant Fibre. These are intended first-pass recipes, not current phone costs.',
-    open: 'Ingot making at Blacksmith T2 is recommended; T2 versus T3 and its price are not settled. Refining an existing piece toward Peerless is being designed. The proposed Mote + maximum shop + attending keeper guarantee is not implemented; partial odds and Mote spending on a miss remain open. The old twentieth-copy rule is reopened.',
+    open: 'Refining an existing piece toward Peerless is being designed. The proposed Mote + maximum shop + attending keeper guarantee is not implemented; partial odds and Mote spending on a miss remain open. The old twentieth-copy rule is reopened.',
   },
   progression: {
     decided: 'Begin with a stone Pick, Axe, and Scythe in the dedicated tool roll. First Pick and Axe improvements belong at the basic forge. Healing must not depend on a later mineral upgrade. Nessa and Halloway can be discovered from the beginning; Bryn, Corrin, and Noll can follow after one recruit. Useful location clues can still reach ahead. Recipes and costs remain revisable.',
     tuning: 'Apothecary: 20 Essence, 4 Clay, 4 Logs. Blacksmith: 20 Essence, 8 Iron, 4 Plant Fibre, 4 Logs. Starter Plant Fibre means Stem or Leaf Fibre; Logs mean Softwood or Hardwood. These are intended starting values, not installed costs.',
-    open: 'The new early route still needs implementation and journey testing. The wider campaign redesign and Ingot tier remain separate work. Current directory order remains current behavior.',
+    open: 'The new early route still needs implementation and journey testing. T2 smelting and the first cloth/Leather specialist paths are specified; the wider campaign redesign remains separate work. Current directory order remains current behavior.',
   },
   exploration: {
     decided: 'A successful journey should usually leave worthwhile territory unexplored. Trees, canopy, and branching routes create choices without hiding required teaching or erasing earned minimap knowledge. There is no artificial reveal cap or routine full-map reward. Pinning a known recipe highlights useful sources as soon as normally visible, including new creatures, without prior inspection or a suitable tool. Random drops remain possible; fog and hidden rewards stay hidden.',

@@ -22,7 +22,7 @@ There is no request to replace your existing Library work or finish every task t
 
 ## 3. Open design work that does not need homework
 
-The exact Blacksmith Ingot tier and upgrade price, specialist placement, full character reorder, encounter and gathering frequencies, recipe balancing, refinement odds, and preview behavior remain design work. The current recommendation is Ingot making at T2, but it is still a proposal. You are welcome to steer it; none of these has been made a mandatory approval chore for you.
+Blacksmith T2 Iron Ingots, the upgrade’s starting cost, the first useful cloth and Leather crafts, and the early maker discovery rules are now specified in **Design Decisions · 4 September**. They are intended changes awaiting implementation and playtesting. The wider character order, later materials, encounter and gathering balance, refinement odds, and preview behavior remain design work. You are welcome to steer these; none is a mandatory approval chore for you.
 
 Your decisions already recorded today include flexible costs and ordering, intuitive raw-material starter gear, stone opening tools, exploration that leaves territory unexplored, colour-led gathering, recipe relevance separate from tool readiness, and the agreed visual treatment. They do not need to be approved again.
 

@@ -114,7 +114,7 @@ export const inventoryViews = [
 export const progressionPlan = [
   ['Harvesting tools', 'The opening expedition kit contains an owned stone Pick, stone Axe, and stone Scythe in a dedicated three-place tool roll. They do not consume the item or Field Kit spaces used for supplies. Better packed tools replace the lower tier in their class and collect increasingly difficult metals, trees, and plants.'],
   ['Processing facilities', 'Noll sorts Rubble; Halloway owns metal and Glass furnace work; Corrin makes Leather, Cord, and Cloth; Fen shapes Planks and Hafts; Isolde makes Pulp, Paper, pigments, and writing ink; Nessa makes named extracts; Grimmond cuts later named Stone Blocks. Each process arrives with real recipe consumers.'],
-  ['Facility levels', 'The basic Blacksmith makes starter gear and improves the Pick and Axe directly from raw stock. Later upgrades open useful processing; Ingot making at T2 alongside specialist buildings is proposed, not settled. T1 recipes remain usable.'],
+  ['Facility levels', 'The basic Blacksmith makes starter gear and improves the Pick and Axe directly from raw stock. Blacksmith T2 makes Iron Ingots for Scythe 2 and the Tannery’s Buckled Woven Guard. Corrin’s first Woven Guard needs only plant materials; Leather is an optional creature-and-Salt branch. T1 recipes remain usable.'],
   ['Recipe tiers', 'Later recipes can ask for narrower or precise material subtypes and produce stronger results.'],
   ['World Writing', 'Players can directly call at least some ground, liquid, base resources, world sizes, and ecological material pressures such as Chitin. Unwritten facets remain generated.'],
 ] as const;
