@@ -1,5 +1,6 @@
 import Link from '@/components/wiki-link';
 import { GuideBreadcrumbs, RelatedGuides } from '@/components/guide-navigation';
+import { SeptemberDecisions } from '@/components/september-decisions';
 import { PageIntro } from '@/components/page-intro';
 import { SiteFrame } from '@/components/site-frame';
 import { buildCost, content, humanize } from '@/lib/content';
@@ -46,6 +47,7 @@ export function FacilityDetail({ slug }: { slug: string }) {
   return <SiteFrame sidebar>
     <GuideBreadcrumbs items={[{ label: 'Village', href: '/village' }, { label: building.name }]} />
     <PageIntro eyebrow={buildingStatus(building)} title={building.name} summary={building.blurb} />
+    <SeptemberDecisions topic={['blacksmith', 'apothecary'].includes(building.id) ? 'crafting' : 'progression'} />
 
     {(building.assetURL || building.contextAssetURL) && <section className="article-section place-visuals" aria-label={`${building.name} Village visual`}>
       {building.assetURL && <figure className="place-visual place-building"><img src={building.assetURL} alt={`${building.name} building visual`} /><figcaption>The current building visual for {building.name}.</figcaption></figure>}

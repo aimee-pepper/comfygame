@@ -1,3 +1,4 @@
+import { SeptemberDecisions } from '@/components/september-decisions';
 import Link from '@/components/wiki-link';
 import { DirectoryDetailsIntro, DirectoryIndex } from '@/components/directory-navigation';
 import { PageIntro } from '@/components/page-intro';
@@ -10,6 +11,7 @@ import { serviceForStation } from '@/lib/services';
 export default function PeoplePage() {
   const people = [...content.cast].sort((left, right) => left.order - right.order);
   return <SiteFrame sidebar><PageIntro eyebrow="Reference" title="People" summary="Meet the travellers and Cottage specialists in campaign order. Each person’s page explains where to find them, what they bring home, and where to read their book." />
+    <SeptemberDecisions topic="people" />
     <DirectoryIndex label="Browse people" entries={people.map((person) => ({ href: `/people/${person.slug}`, name: person.name, imageURL: person.assetURL, imageAlt: `${person.name} character cameo` }))} />
     <DirectoryDetailsIntro title="People in campaign order" summary="See where each person is found, what they add to the Cottage, and where to read their book." />
     <section className="article-section table-wrap data-table people-directory" aria-label="Campaign-order people directory"><table><thead><tr><th>Order</th><th>Person</th><th>Where you meet them</th><th>What they add</th><th>Book</th></tr></thead><tbody>{people.map((person) => {

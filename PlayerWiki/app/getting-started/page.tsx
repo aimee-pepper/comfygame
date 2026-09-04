@@ -1,3 +1,4 @@
+import { SeptemberDecisions } from '@/components/september-decisions';
 import Link from '@/components/wiki-link';
 import { PageIntro } from '@/components/page-intro';
 import { PixelImage } from '@/components/pixel-image';
@@ -19,6 +20,7 @@ export default function GettingStarted() {
   const firstSupply = content.items.find((item) => item.consumable && item.assetURL);
 
   return <SiteFrame sidebar><PageIntro eyebrow="Start here" title="Getting started" summary="Bookbinder alternates between preparing at home, writing a world, exploring it, and bringing discoveries back to strengthen the next expedition." />
+    <SeptemberDecisions topic="progression" />
     <section className="article-section first-trip-visuals"><h2>Three things to recognise</h2><div className="journey-strip">
       <Link href="/systems/world-writing"><img src={content.writingAssetURL} alt="Writing Desk parchment" /><span><strong>Writing Desk</strong><small>Use the parchment workspace to shape the Page before Binding.</small></span></Link>
       <Link href="/systems/exploration"><img src={content.explorationVisuals.entryPortal} alt="Entry portal" /><span><strong>Entry portal</strong><small>Your arrival point remains marked as you explore the world.</small></span></Link>

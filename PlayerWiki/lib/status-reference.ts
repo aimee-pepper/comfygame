@@ -74,7 +74,7 @@ export const statusReferences: StatusReference[] = [
   {
     id: 'world-scent-mask', slug: 'scent-mask', name: 'Scent Mask', category: 'World effect',
     summary: 'A timed field effect that changes only scent-based creature notice.',
-    sources: 'Apply a carried Scent Mask from the Field Kit outside combat.',
+    sources: 'Can be prepared. Field Kit use is unverified for the current phone build; the described scent effect is the intended field behavior.',
     effect: 'Animals relying only on scent hesitate for one action. Other senses and close contact still detect the party; it does not hide creatures or affect apexes.',
     duration: 'The current prepared mask lasts 12 world turns, with remaining turns shown in the Field Kit.',
     boundary: 'Scent Mask is a field effect, not an encounter affliction or a general stealth state.',

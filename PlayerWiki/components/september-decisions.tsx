@@ -1,0 +1,48 @@
+import Link from '@/components/wiki-link';
+
+export type DecisionTopic = 'crafting' | 'progression' | 'exploration' | 'writing' | 'appearance' | 'people' | 'status';
+
+const updates: Record<DecisionTopic, { decided: string; tuning?: string; open?: string }> = {
+  crafting: {
+    decided: 'Starter Blacksmith gear uses raw materials, with no separate Ingot, Haft, or Cord step. The basic forge improves the stone Pick and Axe with iron working parts. Basic healing no longer requires Quartz. Later specialist recipes can use prepared components. Earlier recipes remain usable after an upgrade.',
+    tuning: 'The new starter blade and either tool improvement use 4 Iron, 1 Log, 2 Plant Fibre, and 1 Coal, with no Essence. Lesser Salve uses 1 Resin and 1 Plant Fibre. These are intended first-pass recipes, not current phone costs.',
+    open: 'Ingot making at Blacksmith T2 is recommended; T2 versus T3 and its price are not settled. Refining an existing piece toward Peerless is being designed. The proposed Mote + maximum shop + attending keeper guarantee is not implemented; partial odds and Mote spending on a miss remain open. The old twentieth-copy rule is reopened.',
+  },
+  progression: {
+    decided: 'Begin with a stone Pick, Axe, and Scythe in the dedicated tool roll. First Pick and Axe improvements belong at the basic forge. Healing must not depend on a later mineral upgrade. Recipes, costs, and the order of people and buildings can change for a more useful, understandable start.',
+    tuning: 'Apothecary: 20 Essence, 4 Clay, 4 Logs. Blacksmith: 20 Essence, 8 Iron, 4 Plant Fibre, 4 Logs. Starter Plant Fibre means Stem or Leaf Fibre; Logs mean Softwood or Hardwood. These are intended starting values, not installed costs.',
+    open: 'Vance → Nessa/Halloway → Bryn/Corrin/Noll is a proposed opening priority. The full campaign order and Ingot tier are not decided. Current directory order remains current behavior.',
+  },
+  exploration: {
+    decided: 'A successful journey should usually leave worthwhile territory unexplored. Trees, canopy, and branching routes create choices without hiding required teaching or erasing earned minimap knowledge. There is no artificial reveal cap or routine full-map reward. Pinning a known recipe highlights useful sources as soon as normally visible, including new creatures, without prior inspection or a suitable tool. Random drops remain possible; fog and hidden rewards stay hidden.',
+    open: 'The amount of unexplored territory and Stability budget need playtesting. No universal completion percentage is fixed.',
+  },
+  writing: {
+    decided: 'The intended opening teaches Illumination and Sun through a safe introductory excursion, then visibly connects the player’s first written choice to the world they bind. Unwritten features remain generated. Traveller clues use recognizable world facts and vocabulary the player has had a chance to learn; existing knowledge and Pages remain in older saves.',
+    open: 'Clue placement and the full new discovery order are still being worked out.',
+  },
+  appearance: {
+    decided: 'Material colour is a worthwhile gathering goal. Every equipment component region receives its selected tint while keeping its silhouette and shading. Quality colours the name highlight and thumbnail border, not the item art; potions keep recognizable authored colours. World palettes stay stable, with separate foliage (including grass), water, and sky channels; an assigned shade takes precedence. Grass colour does not grant harvestability. Recipe tracking uses a thin soft pulsing outline, then a brief collection/completion sparkle.',
+    open: 'Final world-entry layer sizes, placement, and movement remain open. Aimee’s Library work is in progress; sky/cloud homework is optional study work.',
+  },
+  people: {
+    decided: 'People and buildings may move earlier so the player has time to enjoy what they add. Clues must use recognizable facts and teachable vocabulary. Current character pages retain the current campaign order until changes are delivered.',
+    open: 'Vance, then Nessa and Halloway, then Bryn, Corrin, and Noll is a proposed opening priority, not a compulsory single-file sequence. The full twenty-nine-person reorder is not settled.',
+  },
+  status: {
+    decided: 'The wiki separates current behavior, decided intended behavior, unsettled proposals, and first-pass tuning. Today’s crafting, stone-tool, exploration, recipe-tracking, and colour decisions are intended changes. Costs and order can be revised.',
+    open: 'Scent Mask and Seamlight can be prepared, but Field Kit use is unverified for the current phone build. Crafting save-failure handling is being checked; no completed reliability fix or observed item loss is claimed. No new Gambits or Training delivery has been verified.',
+  },
+};
+
+export function SeptemberDecisions({ topic }: { topic: DecisionTopic }) {
+  const update = updates[topic];
+  return <section className="article-section note-card">
+    <h2>4 September decisions</h2>
+    <p><strong>Current behavior:</strong> Sections labelled current describe the existing game. The changes recorded here are not yet verified as delivered.</p>
+    <p><strong>Decided intended behavior:</strong> {update.decided}</p>
+    {update.tuning && <p><strong>First-pass tuning:</strong> {update.tuning}</p>}
+    {update.open && <p><strong>{topic === 'status' ? 'Verification pending' : 'Unsettled proposals and remaining work'}:</strong> {update.open}</p>}
+    <p><Link href="/references/design-decisions-september-4">Read the complete decisions and early recipe tables</Link> · <Link href="/references/aimee-homework">Aimee Homework</Link></p>
+  </section>;
+}

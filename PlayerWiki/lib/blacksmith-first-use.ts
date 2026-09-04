@@ -28,8 +28,8 @@ export const blacksmithFirstUse = {
     'Until that corrected quote is available, this guide does not promise a paid Reforge success or repeat-rank improvement. It never treats Reforge as generic item upgrading.',
   ],
   refusalAndRelaunch: [
-    'If an ingredient is missing, the foundation or preview changes, Halloway is unavailable, another action is busy, or the game cannot save, nothing is spent and no success is shown.',
-    'Closing the game before a successful build, Make, or Reforge leaves the earlier materials and selected item unchanged. Closing it after success restores the one finished result without charging twice or making a duplicate.',
+    'Missing ingredients, changed requirements, or an unavailable action should prevent spending. Save-failure handling for crafting is being checked; a completed correction is not yet verified.',
+    'Decided intended behavior: a saved craft must restore one result and one payment after reopening. If saving fails, ingredients and the selected item must remain unchanged; current failure handling is still being checked.',
     'The game never substitutes another item with the same name. A completed Make or future Reforge always applies to the one piece you selected.',
   ],
 } as const;

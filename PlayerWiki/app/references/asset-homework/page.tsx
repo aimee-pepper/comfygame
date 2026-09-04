@@ -22,7 +22,8 @@ export default function AssetHomeworkPage() {
       }}>{homework}</ReactMarkdown>
     </article>
     <RelatedGuides links={[
-      { href: '/references', label: 'Aimee Reference' },
+      { href: '/references/aimee-homework', label: 'Aimee Homework and decisions' },
+    { href: '/references', label: 'Aimee Reference' },
       { href: '/references/world-splash-assets', label: 'World Splash Asset Inventory' },
       { href: '/references/resource-world-numbers-decided-so-far', label: 'Settled world rules' },
     ]} />

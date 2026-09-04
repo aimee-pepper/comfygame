@@ -1,3 +1,4 @@
+import { SeptemberDecisions } from '@/components/september-decisions';
 import Link from '@/components/wiki-link';
 import { DirectoryDetailsIntro, DirectoryIndex } from '@/components/directory-navigation';
 import { PageIntro } from '@/components/page-intro';
@@ -10,6 +11,7 @@ import { terrainProfiles, worldConditions } from '@/lib/world-reference';
 export default function WorldReferencePage() {
   const terrainVisual = terrainProfiles.find((terrain) => terrain.assetURL);
   return <SiteFrame sidebar><PageIntro eyebrow="Field reference" title="World conditions, terrain, and Flora" summary="Use this reference to understand the current world facts you can inspect without predicting a bound map’s hidden tiles, deposits, sites, creatures, or exact Flora." />
+    <SeptemberDecisions topic="appearance" />
     <DirectoryIndex label="Browse world conditions" entries={worldConditions.map((condition) => ({ href: `/world/conditions/${condition.slug}`, name: condition.name }))} />
     <DirectoryDetailsIntro title="World reference at a glance" summary="Start with a condition, terrain profile, or Flora relationship, then open its full entry for the complete current and intended boundaries." />
     <section className="article-section world-reference-grid"><article><h2>World conditions</h2><p>Read the eight conditions that shape a bound world without revealing everything the game has not shown you yet.</p><nav>{worldConditions.map((condition) => <Link href={`/world/conditions/${condition.slug}`} key={condition.id}>{condition.name}</Link>)}</nav></article><article>{terrainVisual?.assetURL && <PixelImage src={terrainVisual.assetURL} alt="Current world terrain visual" size={64} />}<h2>Terrain</h2><p>Check revealed ground for its movement cost, sight, and relationship to nearby resources.</p><Link href="/terrain">Browse terrain profiles</Link></article><article><h2>Flora and harvesting</h2><p>Each plant has its own harvest. The ground name alone does not tell you what a plant will provide.</p><Link href="/flora">Browse Flora and their harvests</Link></article></section>

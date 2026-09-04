@@ -1,3 +1,4 @@
+import { SeptemberDecisions } from '@/components/september-decisions';
 import Link from '@/components/wiki-link';
 import { DirectoryDetailsIntro, DirectoryIndex } from '@/components/directory-navigation';
 import { PageIntro } from '@/components/page-intro';
@@ -27,6 +28,7 @@ export default function ResourcesPage() {
         title="Resources"
         summary="World resources are shaped by pressures in the Page and the world that Binding generates. Use this table to compare where each resource tends to appear and what it currently builds."
       />
+    <SeptemberDecisions topic="progression" />
       <DirectoryIndex label="Browse resources" entries={content.resources.map((resource) => ({ href: `/resources/${resource.slug}`, name: resource.name, imageURL: resource.assetURL, imageAlt: `${resource.name} inventory icon` }))} />
       <DirectoryDetailsIntro title="Compare resources" summary="See how every current resource is found, what recipes, services, and buildings use it, and whether it can be traded before opening its complete entry." />
       <div className="table-wrap data-table">

@@ -64,6 +64,14 @@ For independently recolourable areas, keep separate layers and retain their shad
 - Equipment quality appears in the item-name highlight colour and the square thumbnail border, not in the item artwork.
 - Potions, remedies, and similar supplies retain their recognizable authored colours.
 
+### Recipe tracking: agreed intended treatment
+
+A pinned known recipe highlights useful sources as soon as they become normally visible, including newly generated creatures. No prior inspection or harvest is needed. A source remains relevant even if the current tool cannot gather it; selecting it explains the tool requirement. A possible creature drop is never presented as guaranteed, and nothing is exposed through fog.
+
+Use a thin, softly pulsing outline that preserves the source's colours and uses a consistent tracking colour distinct from quality. A brief sparkle marks collecting something needed or completing the gathering goal. This is decided intended behavior, not a claim of a delivered in-game effect or an additional drawing assignment.
+
+The separate **Aimee Homework** page collects game-design decisions; this page remains the artwork list.
+
 ## 6. What the final export brief will provide
 
 Before **SKY-03** becomes ready, Asset Lead will add exact canvas dimensions, the visible crop, transparent margins, placement and alignment, colour-layer requirements, PNG format, and any movement or tiling requirements. You do not need to guess these or repaint sources to fit an arbitrary size.

@@ -1,3 +1,4 @@
+import { SeptemberDecisions } from '@/components/september-decisions';
 import type { Metadata } from 'next';
 import Link from '@/components/wiki-link';
 import { notFound } from 'next/navigation';
@@ -47,8 +48,8 @@ export default async function PersonDetail({
           eyebrow={person.calling}
           title={person.name}
           summary={person.contribution}
-        />
-      </div>
+        /></div>
+    <SeptemberDecisions topic="people" />
       <nav className="person-record-navigation" aria-label={`${person.name} records`}>
         <a href="#meeting">
           <strong>Meeting</strong>

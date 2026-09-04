@@ -123,7 +123,7 @@ export const lootPaths = [
 ] as const;
 
 const apothecaryChanges: CraftingChange[] = ([
-  ['Lesser Salve', 'One flexible sample at 25 or better, plus 1 Resin.', '1 eligible ungraded Plant Fibre and 1 Resin.'],
+  ['Lesser Salve', 'One flexible sample at 25 or better, plus 1 Resin.', '1 Stem or Leaf Fibre and 1 Resin; no Essence. Intended first-pass recipe, with the existing base healing of 10.'],
   ['Salve', 'One insulating sample at 40 or better, plus 2 Pulp, 1 Spore, and 1 Resin.', '2 Pulp, 1 Spore, and 1 Resin.'],
   ['Greater Salve', 'One reactive sample at 60 or better, plus 1 Ichor, 2 Spore, and 2 Resin.', '1 Creature Ichor, 2 Spore, and 2 Resin.'],
   ['Clearing Draught', 'One reactive sample at 35 or better, 1 Pulp, and 1 Salt.', 'Planned: 1 named cleansing or reactive plant substance from the recipe’s disclosed eligibility list, 1 Pulp, and 1 Salt; displayed as Clearing Wash. The final named list is still being authored.'],
@@ -141,7 +141,7 @@ const apothecaryChanges: CraftingChange[] = ([
   ['Torch', 'One reactive sample at 30 or better, 1 Resin, and 2 Timber.', '2 eligible Logs and 1 Resin.'],
   ['Farsight Draught', 'One lustrous sample at 50 or better, 1 Quartz, and 1 Ichor.', '1 Quartz and 1 Creature Ichor.'],
   ['Scent Mask', 'One individual creature Hide, Pelt, Down, or Oil, plus 1 Reagent.', 'Planned: one visible scent-bearing creature-material category and one named masking plant substance. The final type/subtype list is still being authored.'],
-  ['Seamlight', '1 Quartz, 1 Resin, and 1 Fibre. It can be made, but it cannot yet be used from the Field Kit.', '1 Quartz, 1 Resin, and 1 eligible Plant Fibre; the completed field action guides toward a portal without creating light.'],
+  ['Seamlight', '1 Quartz, 1 Resin, and 1 Fibre. It can be made; Field Kit use is unverified for the current phone build.', '1 Quartz, 1 Resin, and 1 eligible Plant Fibre; the completed field action guides toward a portal without creating light.'],
 ] as const).map(([name, current, accepted]) => ({ name, current, accepted }));
 
 export const craftingFamilyStatus: CraftingFamilyStatus[] = [
@@ -150,7 +150,7 @@ export const craftingFamilyStatus: CraftingFamilyStatus[] = [
     name: 'Essence Spring',
     status: 'Playable now',
     current: 'Refine Raw Essence manually at 2 Essence each, or 3 after Second Pass. Continuous Settling can refine newly returned Raw Essence.',
-    accepted: 'The rates and progression stay the same. The future material update only makes returned material storage consistent.',
+    accepted: 'No replacement rate is specified here. Current rates remain the reference; future prices and progression are revisable tuning. Returned material storage becomes consistent.',
     changes: [
       { name: 'Refine Raw Essence', current: 'Choose a positive amount and spend it for the displayed return.', accepted: 'Unchanged.' },
       { name: 'Second Pass', current: 'Raises the return to 3 Essence for each Raw Essence.', accepted: 'Unchanged.' },
@@ -161,7 +161,7 @@ export const craftingFamilyStatus: CraftingFamilyStatus[] = [
     slug: 'apothecary',
     name: 'Apothecary',
     status: 'Partly playable',
-    current: 'Nineteen preparations can be learned and made. Scent Mask can use an animal material in the Field, and Seamlight can guide the party toward a portal.',
+    current: 'Nineteen preparations can be learned and made. Scent Mask and Seamlight Field Kit use has not yet been verified for the current phone build.',
     accepted: 'Keep all nineteen results and their completed Field uses, while replacing arbitrary hidden-property samples with recognizable physical ingredients.',
     changes: apothecaryChanges,
   },
@@ -169,10 +169,10 @@ export const craftingFamilyStatus: CraftingFamilyStatus[] = [
     slug: 'blacksmith',
     name: 'Blacksmith',
     status: 'Partly playable',
-    current: 'Pointed Blade and the separate Reforge service are playable. Seven other defined forms are not available from the station.',
-    accepted: 'Eight named schematics use physical component families. Reforge becomes one-component Refitting while preserving older workmanship.',
+    current: 'Pointed Blade can be made. A paid Reforge improvement is not verified by the current first-use guide. Seven other defined forms are not available from the station.',
+    accepted: 'The starter Iron Pointed Blade uses raw Iron, Log, Plant Fibre, and Coal. Later forms use sensible physical components; mined and ordinary plant materials are ungraded. Refitting preserves older workmanship; a separate journey toward Peerless remains an unsettled refinement proposal.',
     changes: [
-      { name: 'Pointed Blade', current: 'One chosen point and a different chosen grip.', accepted: 'A Point family and a Grip family, each with an explicit quality band.' },
+      { name: 'Pointed Blade', current: 'One chosen point and a different chosen grip.', accepted: 'Starter Iron variant: 4 Iron, 1 Softwood or Hardwood Log, 2 Stem or Leaf Fibre, and 1 Coal; 0 Essence. Fine quality, Close Pierce, total Power 2.0. These are first-pass values, not current costs.' },
       { name: 'Cutting Blade', current: 'Defined, but not unlockable or playable.', accepted: 'One Edge and one Grip after a future explicit unlock.' },
       { name: 'Hand Maul', current: 'Defined, but not unlockable or playable.', accepted: 'One Crush Head and one Haft after a future explicit unlock.' },
       { name: 'Long Spear', current: 'Defined, but not unlockable or playable.', accepted: 'One Point, one Haft, and one Binding after a future explicit unlock.' },
@@ -180,7 +180,7 @@ export const craftingFamilyStatus: CraftingFamilyStatus[] = [
       { name: 'Helm', current: 'Defined, but not unlockable or playable.', accepted: 'One Hard Shell and one Lining after a future explicit unlock.' },
       { name: 'Rigid Guard', current: 'Defined, but not unlockable or playable.', accepted: 'Two Rigid Body quantities and one Binding after a future explicit unlock.' },
       { name: 'Field Pick', current: 'Defined, but not unlockable or playable.', accepted: 'A non-Quartz Point, a Crush Head, and a Haft once hard-node use is ready.' },
-      { name: 'Reforge', current: 'Improves one chosen eligible piece while preserving its identity and history.', accepted: 'Refitting replaces one chosen component; paid older ranks remain as workmanship.' },
+      { name: 'Reforge', current: 'A paid improvement is not verified; the current guide keeps the corrected Reforge journey planned.', accepted: 'Refitting replaces one chosen component; paid older ranks remain as workmanship.' },
     ],
   },
   {
@@ -220,7 +220,7 @@ export const craftingFamilyStatus: CraftingFamilyStatus[] = [
     name: 'Field Instruments',
     status: 'Changing in a future update',
     current: 'All eight instruments are permanent Research capabilities. Good and Fine precision upgrades are playable and automatically use the weakest individual samples that meet their hidden requirements.',
-    accepted: 'Keep the current instrument precision tiers and costs unless separately changed. Replace hidden property searches with visible physical categories; mined and ordinary flora inputs have no quality, while the player chooses creature-material quality where it affects the result.',
+    accepted: 'Current instrument precision tiers and costs are reference values; future costs and unlock order are revisable first-pass tuning. Replace hidden property searches with visible physical categories; mined and ordinary flora inputs have no quality, while the player chooses creature-material quality where it affects the result.',
     changes: [
       { name: 'Sunglass and Chronometer', current: 'Use qualifying lustrous samples.', accepted: 'Quartz, Silver, Gold, Feather, or Quill.' },
       { name: 'Thermoscope', current: 'Uses qualifying insulating samples.', accepted: 'Eligible Plant Fibre, Resin, Pelt, Down, Hide, or Oil.' },
@@ -239,9 +239,9 @@ export const craftingFamilyStatus: CraftingFamilyStatus[] = [
     changes: [
       { name: 'Brush', current: '45 Essence, 2 Copper, 6 Fibre, and 4 Timber.', accepted: '45 Essence, 2 Copper, 6 eligible Plant Fibre, and 4 eligible Logs from the new material stacks.' },
       { name: 'Writing Desk', current: '70 Essence, 6 Clay, and 8 Timber.', accepted: '70 Essence, 6 Clay, and 8 eligible Logs; the identity changes from generic Timber without adding a pre-Fen Plank gate.' },
-      { name: 'Ink Mixing', current: '40 Essence, 2 Copper, 2 Quartz, and 4 Resin.', accepted: 'Same cost from World material stacks.' },
+      { name: 'Ink Mixing', current: '40 Essence, 2 Copper, 2 Quartz, and 4 Resin.', accepted: 'Current cost retained as first-pass tuning, paid from World material stacks.' },
       { name: 'Prepared ink vial', current: 'Copper, Ichor, Sulfur, and Obsidian supply Cyan, Magenta, Yellow, and Depth. One resource makes four measures; Resin seals a 12-use vial.', accepted: 'Keep the exact math; Creature Ichor replaces legacy Ichor after migration.' },
-      { name: 'Compound Assembly', current: '55 Essence, 4 Pulp, 4 Resin, and 2 Quartz; formalizing a proven statement then costs 20 Essence and 4 Pulp.', accepted: 'Same costs from material stacks.' },
+      { name: 'Compound Assembly', current: '55 Essence, 4 Pulp, 4 Resin, and 2 Quartz; formalizing a proven statement then costs 20 Essence and 4 Pulp.', accepted: 'Current costs retained as first-pass tuning, paid from material stacks.' },
       { name: 'Seamward', current: 'Playable with identified Seamlight, 10 Essence, ash or prepared ink, and eligible empty gear.', accepted: 'Unchanged; it guides to a portal and never creates illumination.' },
       { name: 'Chaining', current: 'Names 90 Essence, 2 Mercury, and 1 Mote, but it cannot yet spend the Mote safely.', accepted: 'Keep the same price once the game can spend that one Mote exactly once.' },
       { name: 'Press', current: '140 Essence, 6 Quartz, and 4 Silver.', accepted: 'Unchanged.' },
@@ -352,9 +352,9 @@ export const correctionStatus = [
     body: 'Several recipes still accept unrelated materials because a hidden property number is high enough. Their replacements will use visible broad, specific, or precise physical categories.',
   },
   {
-    label: 'Must change',
+    label: 'Verification pending',
     title: 'Scent Mask and Seamlight field access',
-    body: 'Both can be made, but neither can yet be used properly through the Field Kit. The correction adds a clear action for each item without granting either one for free.',
+    body: 'Both can be made. Field Kit use is unverified for the current phone build; earlier guide descriptions disagreed. The intended field actions apply scent masking or portal guidance, respectively, without granting a free item.',
   },
   {
     label: 'Must change',

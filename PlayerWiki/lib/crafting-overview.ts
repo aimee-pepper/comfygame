@@ -112,9 +112,9 @@ export const inventoryViews = [
 ] as const;
 
 export const progressionPlan = [
-  ['Harvesting tools', 'The opening expedition kit contains an owned Rock Pick, basic Axe, and basic Scythe in a dedicated three-place tool roll. They do not consume the item or Field Kit spaces used for supplies. Better packed tools replace the lower tier in their class and collect increasingly difficult metals, trees, and plants.'],
+  ['Harvesting tools', 'The opening expedition kit contains an owned stone Pick, stone Axe, and stone Scythe in a dedicated three-place tool roll. They do not consume the item or Field Kit spaces used for supplies. Better packed tools replace the lower tier in their class and collect increasingly difficult metals, trees, and plants.'],
   ['Processing facilities', 'Noll sorts Rubble; Halloway owns metal and Glass furnace work; Corrin makes Leather, Cord, and Cloth; Fen shapes Planks and Hafts; Isolde makes Pulp, Paper, pigments, and writing ink; Nessa makes named extracts; Grimmond cuts later named Stone Blocks. Each process arrives with real recipe consumers.'],
-  ['Facility levels', 'Upgrading a facility opens later processing and recipe tiers instead of preventing advanced worlds from generating.'],
+  ['Facility levels', 'The basic Blacksmith makes starter gear and improves the Pick and Axe directly from raw stock. Later upgrades open useful processing; Ingot making at T2 alongside specialist buildings is proposed, not settled. T1 recipes remain usable.'],
   ['Recipe tiers', 'Later recipes can ask for narrower or precise material subtypes and produce stronger results.'],
   ['World Writing', 'Players can directly call at least some ground, liquid, base resources, world sizes, and ecological material pressures such as Chitin. Unwritten facets remain generated.'],
 ] as const;
@@ -145,7 +145,7 @@ export const processingQualityRules = [
 ] as const;
 
 export const craftedAppearanceRules = [
-  ['Equipment and visible gear', 'Each visibly different material component keeps its selected colour. A haft, binding, lining, plate, blade, or trim can therefore contribute its own region to the finished object.'],
+  ['Equipment and visible gear', 'Every material component region keeps its selected colour, with a consistent silhouette and preserved shading. Quality uses the name highlight and thumbnail border, not a recolouring of the item artwork. A haft, binding, lining, plate, blade, or trim can therefore contribute its own region to the finished object.'],
   ['Potions and recognizable supplies', 'Keep the standardized authored colour used to identify the item at a glance. Ingredient colour does not recolour a potion, remedy, or another supply whose appearance communicates its function.'],
   ['Inventory and history', 'Colour remains source and appearance detail beneath the material stack. It never creates another stack or changes recipe eligibility by itself.'],
 ] as const;

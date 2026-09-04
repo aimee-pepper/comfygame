@@ -22,6 +22,11 @@ export default function SearchPage() {
     () => '',
   );
   const categories = [
+    { label: 'Decisions and homework', entries: [
+      { name: 'Design Decisions · 4 September', summary: 'Stone Pick Axe Scythe, Iron Pointed Blade, Lesser Salve, Blacksmith Ingot T2 T3 progression, Nessa Halloway order, recipe pin tracking glow, exploration canopy, colour palettes, Peerless refinement Mote guarantee and open odds. Current behavior, decided intended behavior, first-pass tuning, unsettled proposals.', href: '/references/design-decisions-september-4', type: 'Decisions and proposals', assetURL: null, alt: '' },
+      { name: 'Aimee Homework', summary: 'Decision needed: should a Mote spent on a missed refinement attempt guarantee lasting progress? Optional art, sky clouds Library books.', href: '/references/aimee-homework', type: 'Open choice', assetURL: null, alt: '' },
+      { name: 'Asset Homework', summary: 'Optional sky cloud studies, Library books in progress, final export brief to follow.', href: '/references/asset-homework', type: 'Optional artwork', assetURL: null, alt: '' },
+    ] },
     { label: 'Player guides', entries: [...playerStartGuides, ...systemGuides].map((entry) => ({ name: entry.label, summary: entry.summary, href: entry.href, type: 'Player guide', assetURL: null, alt: '' })) },
     { label: 'Resources', entries: content.resources.map(entry => ({ name: entry.name, summary: entry.summary, href: `/resources/${entry.slug}`, type: 'Resource', assetURL: entry.assetURL, alt: `${entry.name} inventory icon` })) },
     { label: 'Equipment', entries: content.items.filter(entry => entry.gear).map(entry => ({ name: entry.name, summary: entry.summary, href: `/equipment/${entry.slug}`, type: 'Equipment', assetURL: entry.assetURL, alt: `${entry.name} icon` })) },

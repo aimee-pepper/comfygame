@@ -1,3 +1,4 @@
+import { SeptemberDecisions } from '@/components/september-decisions';
 import type { Metadata } from 'next';
 import Link from '@/components/wiki-link';
 import { notFound } from 'next/navigation';
@@ -103,6 +104,7 @@ export default async function CraftingSystemDetail({
         title={system.name}
         summary={system.summary}
       />
+    <SeptemberDecisions topic="crafting" />
       {guideStatus && <section className="article-section">
         <p className="status-pill">{guideStatus.status}</p>
         <h2>How it works now and how it will change</h2>

@@ -1669,7 +1669,7 @@ test('wiki navigation uses a standard subject hierarchy without a duplicate refe
   const aimeeSection = sidebar.slice(sidebar.lastIndexOf("label: 'Aimee Reference'"));
   assert.deepEqual(
     [...aimeeSection.matchAll(/href: '([^']+)'/g)].map((match) => match[1]),
-    ['/references'],
+    ['/references', '/references/design-decisions-september-4', '/references/aimee-homework', '/references/asset-homework'],
   );
   assert.doesNotMatch(frame, /prepareLinks|referenceLinks|<p>Reference<\/p>/);
   assert.doesNotMatch(systems, /Village, crafting and records/);

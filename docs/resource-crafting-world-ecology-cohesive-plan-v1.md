@@ -1,5 +1,7 @@
 # Resource, Crafting, World, and Ecology Plan V2
 
+> **Updated 4 September 2026 — decided intended behavior, not current phone behavior.** Costs, recipes, upgrades, and character order are revisable first-pass tuning. Starter tools are stone; basic Blacksmith gear and first Pick/Axe improvements use raw materials; basic healing no longer needs Quartz. Ingot making at T2 and the new Peerless refinement route remain proposals. Recipe tracking highlights relevant sources as soon as normally visible, without prior inspection or tool readiness. See **Design Decisions · 4 September** in Aimee Reference for the complete current/intended comparison and the exact early recipes. These changes supersede older cost/order freezes and the old Peerless chance and twentieth-copy rule.
+
 Status: intended-system authority and decision draft, reconciled against Aimee's Top Level Notes and later clarifications on 3 September 2026.
 
 This document describes the intended game. It does not claim these systems are already implemented. The public Wiki must always distinguish **Implemented now** from **Intended design** until each part is delivered and verified.
@@ -343,16 +345,9 @@ deterministic result and every contributing socket appear in the preview.
 
 Peerless is a legendary equipment quality, not a resource band.
 
-Potential sources are:
+High-level alpha equipment drops remain an intended source.
 
-- equipment dropped by high-level alpha creatures; and
-- a small chance for a maximum-level crafting facility to produce a Peerless result when the recipe uses the required high-quality inputs.
-
-At a maximum level-3 facility, an eligible craft using only Rare or Exceptional quality-bearing inputs has the
-accepted Peerless chance in the tuning reference. Staffing the facility with its matching specialist improves
-that chance, and the accepted bad-luck protection guarantees the twentieth consecutive eligible craft of the
-same schematic at the same facility. Its progress is visible. A Peerless result resets only that schematic's
-counter, so cheap work in another family cannot prepare an expensive item to become Peerless.
+**Unsettled proposal, updated 4 September:** refine an existing eligible piece toward Peerless. One Mote, a maximum-level shop, and its attending matching keeper would together guarantee success; one or two advantages would still offer a disclosed chance. Partial odds, Mote spending on a miss, preview behavior, and old bad-luck progress remain open. The former 3%/5% chance and twentieth-copy guarantee are reopened, not an additional settled rule. Peerless remains finished equipment only and never an ordinary progression requirement.
 
 ### No arbitrary single-use materials
 
@@ -431,7 +426,7 @@ The main progression axes are:
 
 ### Mining and cutting tools
 
-The opening expedition kit contains an exact owned Rock Pick, basic Axe, and basic Scythe. They fit a dedicated
+The opening expedition kit contains an exact owned stone Pick, stone Axe, and stone Scythe. They fit a dedicated
 three-place tool roll—one place for each class—rather than consuming ordinary item or Field Kit capacity. The
 opening loadout packs all three by default, and a higher tier replaces the lower tier in that class. Holding
 Interact selects only among packed tools; it does not grant an invisible account-wide capability. The accepted

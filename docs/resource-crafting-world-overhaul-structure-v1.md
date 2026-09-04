@@ -1,5 +1,7 @@
 # Resource, Crafting, Creature, and World Overhaul Structure V1
 
+> **Updated 4 September 2026 — decided intended behavior, not current phone behavior.** Costs, recipes, upgrades, and character order are revisable first-pass tuning. Starter tools are stone; basic Blacksmith gear and first Pick/Axe improvements use raw materials; basic healing no longer needs Quartz. Ingot making at T2 and the new Peerless refinement route remain proposals. Recipe tracking highlights relevant sources as soon as normally visible, without prior inspection or tool readiness. See **Design Decisions · 4 September** in Aimee Reference for the complete current/intended comparison and the exact early recipes. These changes supersede older cost/order freezes and the old Peerless chance and twentieth-copy rule.
+
 Status: implementation-planning authority derived from Aimee's Top Level Notes and reconciled through the first cross-system coherence and play-feel pass.
 
 This document separates current runtime foundations from the intended system. It is not an Engineering dispatch. It authorizes bounded, compatible vertical slices, not incoherent partial mechanics. A subject is reserved for Aimee only when it needs her creative or product preference; ordinary system completion remains Game Design work.
@@ -178,7 +180,7 @@ Flora identity, placement, terrain underlay, canopy footprint, disclosure, dange
 - Better Picks unlock roughly two or three additional metal/mineral groups per tier.
 - Axes unlock increasingly difficult woods and trunks.
 - Scythes unlock increasingly difficult or dangerous flora.
-- The opening expedition kit contains an exact owned Rock Pick, basic Axe, and basic Scythe in a dedicated three-place tool roll. One Pick, one Axe, and one Scythe fit without consuming ordinary item or Field Kit capacity; a higher tier replaces the lower tier in its class. Only tools packed with the active expedition party appear in the field-tool selector.
+- The opening expedition kit contains an exact owned stone Pick, stone Axe, and stone Scythe in a dedicated three-place tool roll. One Pick, one Axe, and one Scythe fit without consuming ordinary item or Field Kit capacity; a higher tier replaces the lower tier in its class. Only tools packed with the active expedition party appear in the field-tool selector.
 - A mined or ordinary flora yield receives its exact material identity and quantity once, with no quality roll. A quality-bearing creature yield additionally receives type/subtype, quality, source and colour where applicable.
 - Holding the movement-pad centre opens quick-use/Field Kit items; holding Interact selects a field tool. Interact applies the selected tool to an eligible underfoot feature, while a direction into an adjacent blocking feature applies it there. Menu, selection, cancel, wrong-tool, and ineligible-target paths are zero-turn; only a committed harvest changes time, node state, or custody.
 
@@ -292,7 +294,7 @@ Every current recipe needs a versioned ingredient definition. Current property-t
 - Quality scales contributions only for approved quality-bearing creature inputs. Mined and ordinary flora materials use fixed authored contributions by exact material identity.
 - The preview exposes every contribution and resulting final statistic.
 - Crafted equipment names use Rough, Fine, Superior, or Exceptional according to the deterministic result-quality calculation.
-- Peerless equipment comes from high-level alpha drops or an approved maximum-facility craft chance, never from Peerless raw resources.
+- Peerless equipment can come from high-level alpha drops; the craft/refinement route is an unsettled proposal. It never comes from Peerless raw resources.
 - There is no equipment durability mechanic.
 - Continuous component values are summed before one final rounding. Discrete values that cannot express four meaningful bands do not receive a fake quality scale; quality improves primary Power/protection instead.
 
@@ -303,7 +305,7 @@ Define one stable stat-contribution table by physical material type/subtype, wit
 ### Settled rule and remaining content work
 
 - The baseline-plus-source contribution formula, role ceilings, and 70/30 identity-socket result rule are in the tuning authority. Each material/recipe socket still needs its content row and a combat-balance check.
-- Peerless crafting uses the accepted maximum-facility chance, staffing bonus, and twentieth eligible craft protection, scoped to one schematic at one facility with visible progress. It is never a progression gate.
+- **Unsettled proposal, updated 4 September:** refine an existing eligible piece toward Peerless. One Mote, a maximum-level shop, and its attending matching keeper would together guarantee success; one or two advantages would still offer a disclosed chance. Partial odds, Mote spending on a miss, preview behavior, and old bad-luck progress remain open. The former 3%/5% chance and twentieth-copy guarantee are reopened, not an additional settled rule. Peerless remains finished equipment only and never an ordinary progression requirement.
 - Alpha eligibility remains a later content decision. Multi-material equipment preserves separate visible
   component colours; the schematic pass still needs to name which parts are actually visible.
 

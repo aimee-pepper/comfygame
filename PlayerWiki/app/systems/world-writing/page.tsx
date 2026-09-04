@@ -1,3 +1,4 @@
+import { SeptemberDecisions } from '@/components/september-decisions';
 import Link from '@/components/wiki-link';
 import { GuideBreadcrumbs, RelatedGuides } from '@/components/guide-navigation';
 import { PageIntro } from '@/components/page-intro';
@@ -16,6 +17,7 @@ const steps = [
 
 export default function WorldWriting() {
   return <SiteFrame sidebar><GuideBreadcrumbs items={[{ label: 'Systems', href: '/systems' }, { label: 'World Writing' }]} /><PageIntro eyebrow="System guide" title="World Writing" summary="A Page is a request, not a tile-by-tile map. You arrange Sigils to influence the pressures and qualities of the world that Binding creates." />
+    <SeptemberDecisions topic="writing" />
     <figure className="feature-figure">{content.writingAssetURL && <img src={content.writingAssetURL} alt="The parchment used by the Writing Desk" />}<figcaption>The Writing Desk keeps the Page, writing tools, vocabulary, and World preview in one workspace.</figcaption></figure>
     <section className="article-section writing-visual-guide"><h2>What you work with</h2><p>The Writing Desk keeps these parts together: choose a tool, place a mark, then connect it to build the Page.</p><div className="writing-visual-strip">{content.writingVisuals.map((visual) => visual.assetURL && <figure key={visual.id}><img src={visual.assetURL} alt={visual.alt} /><figcaption>{visual.label}</figcaption></figure>)}</div></section>
     <section className="article-section"><h2>Write a Page in this order</h2><div className="step-grid">{steps.map(([number, title, text]) => <article key={number}><span>{number}</span><h3>{title}</h3><p>{text}</p></article>)}</div></section>

@@ -1,3 +1,4 @@
+import { SeptemberDecisions } from '@/components/september-decisions';
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { PageIntro } from '@/components/page-intro';
@@ -15,6 +16,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 export default async function EquipmentDetail({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params; const item = equipment.find(entry => entry.slug === slug); if (!item || !item.gear) notFound();
   return <SiteFrame sidebar><GuideBreadcrumbs items={[{ label: 'Reference', href: '/equipment' }, { label: 'Equipment', href: '/equipment' }, { label: item.name }]} /><div className="entity-heading"><PixelImage src={item.assetURL} alt={`${item.name} icon`} size={96} /><PageIntro eyebrow={`${humanize(item.rarity)} ${humanize(item.gear.slot)}`} title={item.name} summary={item.summary} /></div>
+    <SeptemberDecisions topic="appearance" />
     <section className="article-section"><h2>Current equipment facts</h2><dl className="fact-grid">{Object.entries(item.gear).map(([key, value]) => <div key={key}><dt>{humanize(key)}</dt><dd>{humanize(value)}</dd></div>)}</dl></section>
     <section className="article-section two-column"><div><h2>Eligibility</h2><p>This physical piece fits the {humanize(item.gear.slot)} slot. The piece keeps the slot and combat details it had when it was created or found; later catalogue changes do not rewrite gear you already own.</p></div><div><h2>Material and reforge facts</h2><p>{itemProperties(item).length ? itemProperties(item).join('. ') : 'This catalogue entry has no extra material effect beyond its listed slot, tier, and combat facts.'} Reforge rank and material history belong to each physical piece, so inspect the selected item before changing gear.</p></div></section>
     <ItemCraftingRoutes item={item} />
