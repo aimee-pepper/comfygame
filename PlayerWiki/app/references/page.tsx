@@ -12,6 +12,11 @@ export default function ReferencesPage() {
   return <SiteFrame sidebar>
     <GuideBreadcrumbs items={[{ label: 'Home', href: '/' }, { label: 'Aimee Reference' }]} />
     <PageIntro eyebrow="Project reference" title="Aimee Reference" summary="A clearly labelled home for Aimee's system plans, implementation roadmaps, and visual production references." />
+    <section className="article-section note-card">
+      <h2>Asset Homework</h2>
+      <p>A running hand-authoring list for spare moments: bright and dark sky studies, cloud shapes, the Library books in progress, and clear status for final export specifications.</p>
+      <Link href="/references/asset-homework">Open Asset Homework</Link>
+    </section>
     <section className="article-section note-card" aria-labelledby="screen-authoring-map-heading">
       <h2 id="screen-authoring-map-heading">Screen Authoring Map</h2>
       <p>See the complete in-game screen hierarchy as a colour-coded tree: Aimee-authored compositions, implemented Asset/Engineering updates, partial or asset-ready work, and screens still using default UI.</p>
