@@ -46,13 +46,13 @@ is added to the already-simple Blacksmith T1 recipes.
 
 The three new prepared materials are exact **ungraded World-material** stocks. Preserve ingredient-source
 lots through processing so cloth/ties use the selected fibre colour and the Ingot keeps its metal receipt.
-One processing operation selects one exact fibre subtype and source-colour lot across its inputs; if the
-player lacks that homogeneous quantity, do not silently blend colours. Mixing source lots needs a later
-explicit recipe, not an arbitrary averaged colour. Several same-colour units from the same eligible lot
+One processing operation selects one exact fibre subtype and source-colour group across its inputs; if the
+player lacks that output-equivalent quantity, do not silently blend colours. Mixing source lots needs a later
+explicit recipe, not an arbitrary averaged colour. Several same-colour units from the same eligible group
 may supply a batch. Both Stem and Leaf Fibre are eligible; Bark and generic legacy Fibre remain excluded.
 
 A finished garment's body and ties may deliberately use different source colours. The buckled version's
-two Cloth units must share one selected lot/colour; its buckles use Iron. Show a source picker only where
+two Cloth units must share one selected group/colour; its buckles use Iron. Show a source picker only where
 that choice changes visible output. Standard Iron processing requires no chooser when its result is
 identical. Chosen units, intermediate provenance, displayed result, value and destination freeze before
 spending. All processing/crafting/upgrading is durable-save-first, idempotent and capacity-independent for
@@ -100,7 +100,7 @@ runway; do not assume both new foundations/upgrades are affordable from starting
 Engineering's focused acceptance: resolve every input set; verify acyclic unlocks from the stone kit;
 compare displayed quote with the expanded totals; ensure Tannery has Woven Guard before any Ingot; preserve
 T1 recipes after T2; require a packed Scythe 2 at a real tall-stem producer; retain the exact tool identity;
-verify source-colour selection, one homogeneous processing lot, no double-returned raw ingredients,
+verify source-colour selection, one output-equivalent processing group, no double-returned raw ingredients,
 normal-merchant no-arbitrage, and save-failure rollback for each transaction family. No native or pacing
 checks are claimed by this design document. JSON arithmetic and declared-ID checks are authoring checks.
 
@@ -109,3 +109,12 @@ in this packet. **Implementation dependencies:** completed early source/registry
 source-lot support, facility tier mapping and exact garment/Scythe native consumers. Literal assets stay
 with Asset only after Engineering names those implemented consumers and state protocols. **Separate:**
 Leather/creature production, later Ingots, T3 and Peerless. No Aimee approval or Homework answer blocks T2.
+
+## Source grouping clarification
+
+A source group is not one harvested instance or one historical receipt. Combine owned units whose exact
+material subtype, quality (when present), colour and recipe-relevant source measurements are identical,
+while retaining every parent receipt and selected quantity. Two matching patches may supply one Cloth;
+two matching animals may supply four Hide. No numerical averaging, guessed provenance, or loss of parent
+identity is permitted. In the picker, identical-result groups need no duplicate choices. Different
+measurements or colours still require an explicit choice; grouping never makes an ineligible type qualify.

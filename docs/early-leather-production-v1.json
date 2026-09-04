@@ -1,0 +1,240 @@
+{
+  "id": "early.leather.v1",
+  "status": "decided intended; first-pass tuning; not runtime-delivered",
+  "materials": [
+    {
+      "id": "creature.skin.smooth",
+      "name": "Smooth Skin",
+      "whenPrimaryHide": "aquatic habitat or piscine body plan",
+      "sellByBand": [
+        2,
+        2,
+        3,
+        3
+      ]
+    },
+    {
+      "id": "creature.hide.supple",
+      "name": "Supple Hide",
+      "whenPrimaryHide": "not aquatic/piscine; hardness < 25",
+      "sellByBand": [
+        2,
+        3,
+        4,
+        5
+      ]
+    },
+    {
+      "id": "creature.hide.tough",
+      "name": "Tough Hide",
+      "whenPrimaryHide": "not aquatic/piscine; hardness >= 25",
+      "sellByBand": [
+        2,
+        3,
+        4,
+        5
+      ]
+    },
+    {
+      "id": "processed.leather",
+      "name": "Leather",
+      "sellByBand": [
+        3,
+        4,
+        5,
+        6
+      ]
+    },
+    {
+      "id": "world.salt",
+      "name": "Salt",
+      "ungraded": true,
+      "sell": 1,
+      "buy": 2
+    }
+  ],
+  "bandOrder": [
+    "Poor",
+    "Common",
+    "Rare",
+    "Exceptional"
+  ],
+  "buyRule": "twice exact sale value",
+  "primaryReward": {
+    "chance": 0.7,
+    "quantity": "clamp(1 + floor(size / 25), 1, 4)",
+    "salt": "early.creature.covering.reward.v1",
+    "policy": "replace new-generation primary-hide branch, preserve other anatomy reward branches"
+  },
+  "sourceQuality": {
+    "partExpression": "(covering.coverage + derived.flexibility) / 2 without intermediate rounding",
+    "score": "roundHalfUp(.75 * partExpression + .25 * sourceWorldDangerValue)",
+    "dangerValues": [
+      20,
+      35,
+      50,
+      65,
+      80,
+      95
+    ],
+    "bands": [
+      [
+        0,
+        24
+      ],
+      [
+        25,
+        59
+      ],
+      [
+        60,
+        84
+      ],
+      [
+        85,
+        100
+      ]
+    ],
+    "multipliers": [
+      0.75,
+      1,
+      1.25,
+      1.5
+    ]
+  },
+  "saltProducer": {
+    "id": "early.gather.salt_crust.v1",
+    "minimumSalinity": 60,
+    "surface": "salt_crust",
+    "formationOrHistory": [
+      "salt_bearing_evaporite",
+      "receded_saline_liquid_margin"
+    ],
+    "drySalineMarginCrustChance": 0.5,
+    "aridSalineEvaporiteChance": 0.35,
+    "aridRootWaterMaximumExclusive": 25,
+    "ordinaryReservationAfterClay": 1,
+    "budget": "existing looseEarth budget, no expansion",
+    "yield": {
+      "world.salt": 2
+    },
+    "hits": 1,
+    "tool": "hand"
+  },
+  "recipes": [
+    {
+      "id": "early.process.leather.v1",
+      "station": "tannery",
+      "minimumPlayerTier": 1,
+      "essence": 0,
+      "partQuantity": 2,
+      "eligibleParts": [
+        "creature.skin.smooth",
+        "creature.hide.supple",
+        "creature.hide.tough"
+      ],
+      "homogeneous": [
+        "subtype",
+        "band",
+        "colour",
+        "recipeRelevantSourceMeasurements"
+      ],
+      "otherInputs": {
+        "world.salt": 1
+      },
+      "output": {
+        "processed.leather": 1
+      }
+    },
+    {
+      "id": "early.craft.leather_guard.v1",
+      "station": "tannery",
+      "minimumPlayerTier": 1,
+      "essence": 0,
+      "inputs": {
+        "processed.leather": 2,
+        "processed.cord.plant": 1
+      },
+      "leatherHomogeneous": [
+        "band",
+        "colour",
+        "recipeRelevantSourceMeasurements"
+      ],
+      "output": "early.item.leather_guard.v1"
+    }
+  ],
+  "item": {
+    "id": "early.item.leather_guard.v1",
+    "name": "Leather Guard",
+    "slot": "armor",
+    "protection": "roundToQuarter(4 * (.5 + retainedCoveringProtection / 200) * qualityMultiplier + .25)",
+    "coveringProtection": "covering.hardness * covering.coverage / 100",
+    "qualityVotes": {
+      "leather": 1,
+      "cord": 0
+    },
+    "finishedQuality": [
+      "Rough",
+      "Fine",
+      "Superior",
+      "Exceptional"
+    ],
+    "otherStats": {},
+    "sellByBand": [
+      8,
+      10,
+      13,
+      15
+    ],
+    "salvage": {
+      "processed.leather": 2,
+      "processed.cord.plant": 1
+    }
+  },
+  "fixtures": [
+    {
+      "id": "early.fixture.terrestrial_hide.v1",
+      "habitat": "terrestrial",
+      "bodyPlan": "quadruped",
+      "appendageType": "limbed",
+      "covering": {
+        "coverage": 60,
+        "hardness": 20,
+        "length": 20
+      },
+      "size": 30,
+      "sourceWorldDangerBand": 1,
+      "expectedSubtype": "creature.hide.supple",
+      "expectedFlexibility": 48,
+      "expectedQualityScore": 49,
+      "expectedBand": "Common",
+      "expectedSuccessfulYield": 2,
+      "expectedGarmentProtection": 2.5
+    },
+    {
+      "id": "early.fixture.shallow_skin.v1",
+      "habitat": "aquatic",
+      "bodyPlan": "piscine",
+      "appendageType": "finned",
+      "covering": {
+        "coverage": 70,
+        "hardness": 10,
+        "length": 10
+      },
+      "size": 30,
+      "sourceWorldDangerBand": 1,
+      "expectedSubtype": "creature.skin.smooth",
+      "expectedFlexibility": 49.5,
+      "expectedQualityScore": 54,
+      "expectedBand": "Common",
+      "expectedSuccessfulYield": 2,
+      "expectedGarmentProtection": 2.5
+    }
+  ],
+  "fullGarmentInputs": {
+    "matchingRawParts": 4,
+    "world.salt": 2,
+    "early.plant_fibre.v1": 2
+  },
+  "sourceGrouping": "may span multiple parent receipts with identical output-relevant values; preserve all selected parent IDs and quantities; never require all inputs from one animal"
+}
