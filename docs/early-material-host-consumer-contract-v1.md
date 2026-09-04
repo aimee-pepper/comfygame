@@ -1,5 +1,7 @@
 # Early material host and consumer contract V1
 
+**T2 closure:** [the specialist packet](early-specialist-implementation-packet-v1.md) now settles Blacksmith T2 Iron Ingots, its raw-material upgrade cost and first useful consumers; it supersedes the T2 proposal language below.
+
 **Status:** completed bounded Game Design specification; first-pass tuning, not shipped or play-verified.
 Closes physical eligibility, finite harvests, starter outputs and transaction behavior. The [early progression packet](early-progression-implementation-packet-v1.md) now closes category mapping,
 ordinary source reservations and recruitment. Full route pacing and native implementation remain verification/promotion gates.

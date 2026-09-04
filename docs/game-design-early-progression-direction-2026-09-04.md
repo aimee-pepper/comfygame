@@ -1,5 +1,7 @@
 # Early progression design direction — 4 September 2026
 
+**T2 closure:** [the specialist packet](early-specialist-implementation-packet-v1.md) now settles Blacksmith T2 Iron Ingots, its raw-material upgrade cost and first useful consumers; it supersedes the T2 proposal language below.
+
 ## 1. Authority and status
 
 Aimee directly authorized this design work in Game Design task `01a06e50-9d04-72a0-a0ab-80a2b3aa7aa7`

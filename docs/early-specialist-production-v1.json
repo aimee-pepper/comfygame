@@ -1,0 +1,217 @@
+{
+  "id": "early.specialists.v1",
+  "status": "decided intended behavior; first-pass numerical tuning, not shipped or measured",
+  "materials": [
+    {
+      "id": "processed.ingot.iron",
+      "name": "Iron Ingot",
+      "domain": "worldMaterial",
+      "quality": "ungraded",
+      "sell": 4,
+      "buy": 8
+    },
+    {
+      "id": "processed.cord.plant",
+      "name": "Plant Cord",
+      "domain": "worldMaterial",
+      "quality": "ungraded",
+      "sell": 1,
+      "buy": 2
+    },
+    {
+      "id": "processed.cloth.plant",
+      "name": "Plant Cloth",
+      "domain": "worldMaterial",
+      "quality": "ungraded",
+      "sell": 2,
+      "buy": 4
+    }
+  ],
+  "projects": [
+    {
+      "id": "early.upgrade.blacksmith_t2.v1",
+      "keeper": "halloway",
+      "requires": "built blacksmith T1",
+      "essence": 20,
+      "inputs": {
+        "world.iron": 8,
+        "world.clay": 4,
+        "early.log.v1": 4
+      },
+      "result": "blacksmith player T2, stored tier 1; learn iron smelting and Scythe 2 recipe"
+    },
+    {
+      "id": "early.build.tannery.v1",
+      "keeper": "corrin",
+      "requires": "Corrin recruited",
+      "essence": 20,
+      "inputs": {
+        "early.log.v1": 6,
+        "world.clay": 4,
+        "early.plant_fibre.v1": 4
+      },
+      "result": "built tannery player T1, stored tier 0; learn Plant Cord, Plant Cloth, Woven Guard and Buckled Woven Guard recipes; no free outputs"
+    }
+  ],
+  "recipes": [
+    {
+      "id": "early.process.iron_ingot.v1",
+      "station": "blacksmith",
+      "minimumPlayerTier": 2,
+      "essence": 0,
+      "inputs": {
+        "world.iron": 2,
+        "world.coal": 1
+      },
+      "output": {
+        "processed.ingot.iron": 1
+      }
+    },
+    {
+      "id": "early.process.plant_cord.v1",
+      "station": "tannery",
+      "minimumPlayerTier": 1,
+      "essence": 0,
+      "inputs": {
+        "early.plant_fibre.v1": 2
+      },
+      "output": {
+        "processed.cord.plant": 1
+      }
+    },
+    {
+      "id": "early.process.plant_cloth.v1",
+      "station": "tannery",
+      "minimumPlayerTier": 1,
+      "essence": 0,
+      "inputs": {
+        "early.plant_fibre.v1": 4
+      },
+      "output": {
+        "processed.cloth.plant": 1
+      }
+    },
+    {
+      "id": "early.craft.woven_guard.v1",
+      "station": "tannery",
+      "minimumPlayerTier": 1,
+      "essence": 0,
+      "inputs": {
+        "processed.cloth.plant": 1,
+        "processed.cord.plant": 1
+      },
+      "outputItem": "early.item.woven_guard.v1"
+    },
+    {
+      "id": "early.craft.buckled_woven_guard.v1",
+      "station": "tannery",
+      "minimumPlayerTier": 1,
+      "essence": 0,
+      "inputs": {
+        "processed.cloth.plant": 2,
+        "processed.cord.plant": 1,
+        "processed.ingot.iron": 1
+      },
+      "outputItem": "early.item.buckled_woven_guard.v1"
+    },
+    {
+      "id": "early.upgrade.scythe_2.v1",
+      "station": "blacksmith",
+      "minimumPlayerTier": 2,
+      "essence": 0,
+      "ownedToolRequired": {
+        "class": "scythe",
+        "tier": 1
+      },
+      "inputs": {
+        "processed.ingot.iron": 2,
+        "early.log.v1": 1,
+        "early.plant_fibre.v1": 2
+      },
+      "output": "same Scythe identity and tool-roll slot, tier 2, iron working edge"
+    }
+  ],
+  "items": [
+    {
+      "id": "early.item.woven_guard.v1",
+      "name": "Woven Guard",
+      "slot": "armor",
+      "quality": "Fine",
+      "totalProtection": 1.5,
+      "initiativeBonus": 0,
+      "heatWard": 0,
+      "sell": 5,
+      "buy": 10,
+      "components": {
+        "body": "processed.cloth.plant",
+        "ties": "processed.cord.plant"
+      },
+      "salvage": {
+        "processed.cloth.plant": 1,
+        "processed.cord.plant": 1
+      }
+    },
+    {
+      "id": "early.item.buckled_woven_guard.v1",
+      "name": "Buckled Woven Guard",
+      "slot": "armor",
+      "quality": "Fine",
+      "totalProtection": 2,
+      "initiativeBonus": 0,
+      "heatWard": 0,
+      "sell": 12,
+      "buy": 24,
+      "components": {
+        "body": "processed.cloth.plant",
+        "ties": "processed.cord.plant",
+        "buckles": "processed.ingot.iron"
+      },
+      "salvage": {
+        "processed.cloth.plant": 2,
+        "processed.cord.plant": 1,
+        "processed.ingot.iron": 1
+      }
+    }
+  ],
+  "floraAddition": {
+    "id": "early.flora.tall_stem.v1",
+    "host": "same ordinary cohort and loam/clay root eligibility as early.flora.stem_patch.v1, plus vitality.peak >= 60",
+    "body": "tall fibrous stalks; passable; no intrinsic contact damage",
+    "interaction": "underfoot Interact with packed Scythe 2",
+    "hits": 1,
+    "yield": {
+      "flora.fibre.stem": 3
+    },
+    "depletion": "inert passable remnant; no regrowth",
+    "remainingFloraSizeWeightsWhenEligible": {
+      "low": 30,
+      "medium": 30,
+      "tall": 10,
+      "tree": 30
+    }
+  },
+  "fullJourneyTotals": {
+    "builtForgeToTanneryAndWovenGuard": {
+      "essence": 20,
+      "logs": 6,
+      "clay": 4,
+      "plantFibre": 10
+    },
+    "builtForgeToT2TanneryAndBuckledGuard": {
+      "essence": 40,
+      "logs": 10,
+      "clay": 8,
+      "plantFibre": 14,
+      "iron": 10,
+      "coal": 1
+    },
+    "builtForgeToT2AndScythe2": {
+      "essence": 20,
+      "logs": 5,
+      "clay": 4,
+      "plantFibre": 2,
+      "iron": 12,
+      "coal": 2
+    }
+  }
+}
