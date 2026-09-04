@@ -113,7 +113,7 @@ export const inventoryViews = [
 
 export const progressionPlan = [
   ['Harvesting tools', 'The opening expedition kit contains an owned Rock Pick, basic Axe, and basic Scythe in a dedicated three-place tool roll. They do not consume the item or Field Kit spaces used for supplies. Better packed tools replace the lower tier in their class and collect increasingly difficult metals, trees, and plants.'],
-  ['Processing facilities', 'Noll sorts Rubble; Halloway owns metal and Glass furnace work; Corrin makes Leather, Cord, and Cloth; Fen shapes Planks and Hafts; Isolde makes Pulp, Paper, pigments, and writing ink; Nessa makes named extracts; Grimmond owns later Dressed Stone. Each process arrives with real recipe consumers.'],
+  ['Processing facilities', 'Noll sorts Rubble; Halloway owns metal and Glass furnace work; Corrin makes Leather, Cord, and Cloth; Fen shapes Planks and Hafts; Isolde makes Pulp, Paper, pigments, and writing ink; Nessa makes named extracts; Grimmond cuts later named Stone Blocks. Each process arrives with real recipe consumers.'],
   ['Facility levels', 'Upgrading a facility opens later processing and recipe tiers instead of preventing advanced worlds from generating.'],
   ['Recipe tiers', 'Later recipes can ask for narrower or precise material subtypes and produce stronger results.'],
   ['World Writing', 'Players can directly call at least some ground, liquid, base resources, world sizes, and ecological material pressures such as Chitin. Unwritten facets remain generated.'],
@@ -144,6 +144,12 @@ export const processingQualityRules = [
   ['Applied once', 'Processing never multiplies quality and then lets the finished recipe multiply the same quality again.'],
 ] as const;
 
+export const craftedAppearanceRules = [
+  ['Equipment and visible gear', 'Each visibly different material component keeps its selected colour. A haft, binding, lining, plate, blade, or trim can therefore contribute its own region to the finished object.'],
+  ['Potions and recognizable supplies', 'Keep the standardized authored colour used to identify the item at a glance. Ingredient colour does not recolour a potion, remedy, or another supply whose appearance communicates its function.'],
+  ['Inventory and history', 'Colour remains source and appearance detail beneath the material stack. It never creates another stack or changes recipe eligibility by itself.'],
+] as const;
+
 export const processingConversions = [
   ['Named metal Ingot', '2 matching raw solid metal + 1 Coal', '1 matching named Ingot', 'Halloway · Blacksmith'],
   ['Ordinary Glass', '2 Sand + 1 Coal, or 1 Quartz + 1 Coal', '1 Glass', 'Halloway · Blacksmith'],
@@ -154,7 +160,7 @@ export const processingConversions = [
   ['Haft', '1 eligible Log', '1 matching Haft', 'Fen · Bowyer'],
   ['Pulp', '2 eligible fibrous plant units', '2 Pulp', 'Isolde · Scriptorium'],
   ['Paper', '2 eligible fibrous plant units', '4 Paper sheets', 'Isolde · Scriptorium'],
-  ['Dressed Stone', '2 matching named stone', '1 matching Dressed Stone', 'Grimmond · Deep Works'],
+  ['Named Stone Block', '2 matching units of one named stone', '1 matching block, such as a Granite Block', 'Grimmond · Deep Works'],
   ['Writing pigment', '1 eligible mineral or botanical colour source', '4 pigment measures', 'Isolde · Scriptorium'],
 ] as const;
 

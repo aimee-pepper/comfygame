@@ -158,9 +158,12 @@ Generated creatures should derive visible colour from the world. Their physical 
 
 Colour is provenance and appearance data, not a reason to create another inventory stack. An expanded stack can show how many units of each inherited colour or species variant it contains. A recipe that cares about visible colour lets the player choose the contributing units deliberately.
 
-Colour never creates another inventory stack. The only unsettled appearance rule is how one visibly material-led
-item should display several selected source colours; the choices are preserved regions, the primary material's
-colour, or a deliberate blend, as listed in the final Aimee choices section.
+Colour never creates another inventory stack. Equipment and other visibly material-led gear preserve separate
+coloured regions for the materials the player chose: a haft, binding, lining, plate, blade, trim, or similar visible
+part keeps its own selected material colour. This provides a modest but meaningful form of character
+customization. Items whose colour must communicate their function at a glance use a standardized authored
+appearance instead. A potion, remedy, or similar recognition-critical supply does not change colour because of
+the materials used to make it.
 
 ## Quality and inventory stacks
 
@@ -391,7 +394,7 @@ return to a universal Workshop and does not require a new catch-all processing b
 | Planks and Hafts | The exact eligible Log | Fen · Bowyer | Fen owns timber selection and shaping. Planks may serve construction; Hafts exist only where weapon or tool recipes consume them |
 | Pulp and Paper | The exact eligible fibrous plant stock | Isolde · Scriptorium | Pulp stops dropping ready-made from plants. Pulp and Paper are alternate one-step outputs, so ordinary paper does not require processing the same stock twice. The Scriptorium owns paper stock as well as writing tools and ink |
 | Named prepared extracts | The exact eligible leaf, root, flower, spore, sap, resin, venom, oil, or other named substance | Nessa · Apothecary | `Prepared Extract`, `Reagent`, and `Toxin` are recipe categories, not universal inventory items; the output keeps a useful physical name |
-| Dressed Stone, only when a later recipe genuinely needs it | The exact named structural stone | Grimmond · Deep Works | Early construction may continue to use raw named stone. A later dressed form cannot become an opening-game dependency before Grimmond is reachable |
+| Named Stone Block, only when a later recipe genuinely needs it | Two units of the same named structural stone | Grimmond · Deep Works | This is ordinary stone cut into an even building piece: Granite makes a Granite Block, Limestone makes a Limestone Block, and so on. Early construction may continue to use raw named stone. A Stone Block cannot become an opening-game dependency before Grimmond is reachable |
 | Writing pigments and prepared ink | Exact eligible mineral pigment or botanical colour source | Isolde · Scriptorium | Scriptorium retains exclusive CMY+Depth writing-ink ownership; this does not move reactive stains or remedies from the Apothecary |
 
 Auber's Distillery keeps its separate Raw Essence and direct Core-attunement role; there is no Blank Core step. It does not become the owner
@@ -742,11 +745,9 @@ With those foundations closed, Game Design can produce the complete terrain→re
 the exact recipe eligibility lists, and the harvesting tiers without guessing. Only then should the project
 decide which land/material concepts deserve Sigils, when those Sigils drop, and which traveller clues are fair.
 
-## The only remaining Aimee choices in this pass
+## The only remaining Aimee choice in this pass
 
-1. **Multi-colour finished items.** When one visibly material-led craft uses several source colours, should it
-   preserve separate coloured regions, use the primary material's colour, or create a deliberate blend?
-2. **Waystone body.** Rift-glass, one Mote, and 12 Essence remain fixed. The permanent hard physical body still
+1. **Waystone body.** Rift-glass, one Mote, and 12 Essence remain fixed. The permanent hard physical body still
    needs one approved named World material.
 
 Complete recipe lists, facility tiers, creature bodies, ecology matrices, Sigil order, and clue teaching are

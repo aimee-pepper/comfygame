@@ -255,10 +255,14 @@ The first-pass conversion rules are below. Each is one immediate Cottage transac
 | Make a Haft | 1 eligible Log | 1 matching Haft |
 | Make Pulp | 2 eligible fibrous plant units | 2 Pulp |
 | Make Paper | 2 eligible fibrous plant units | 4 Paper sheets |
-| Dress structural stone | 2 matching named stone | 1 matching Dressed Stone |
+| Cut a named Stone Block | 2 matching named stone | 1 matching named Stone Block, such as a Granite Block |
 | Prepare a writing pigment | 1 eligible mineral or botanical colour source | 4 measures of that pigment |
 
 Named extracts do not use a universal conversion ratio; each one is the preparation recipe itself. Rift-glass cannot be converted into ordinary Glass. A process is promoted only with at least two real consumers or one broadly reused consumer family, so these ratios do not authorize empty intermediate stock.
+
+Equipment and other visibly material-led gear preserve separate colour regions for their selected visible
+components. Standardized recognition-critical supplies, including potions and remedies, keep their authored
+colour so two functionally different supplies remain easy to distinguish at a glance.
 
 ## Stack lots and exact transactions
 

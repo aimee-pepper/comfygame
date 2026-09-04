@@ -85,7 +85,8 @@ Still to author in later Game Design passes:
 3. Facility upgrade depth and recipe-tier progression.
 4. Exact category eligibility and quantities for every recipe.
 5. Weather/atmosphere compatibility and transformation matrix.
-6. Colour inheritance and crafted appearance behavior after Aimee chooses how multiple selected colours combine.
+6. Visible-component colour maps for each equipment schematic. Selected visible materials keep separate colour
+   regions; standardized recognition-critical supplies such as potions retain their authored colours.
 
 ### Deliverables
 
@@ -273,7 +274,7 @@ Recommended first vertical slices after Phase 0 decisions:
 6. Sand or Quartz to ordinary Glass at Halloway's Blacksmith furnace
 7. Fibrous plant stock directly to either Pulp or Paper at Isolde's Scriptorium
 8. Named creature or plant inputs to named prepared extracts at Nessa's Apothecary
-9. Named structural stone to Dressed Stone at Grimmond's Deep Works only when a later recipe needs it
+9. Named structural stone to a matching named Stone Block at Grimmond's Deep Works only when a later recipe needs it
 10. Mineral or botanical colour sources to writing pigment/ink at Isolde's Scriptorium
 
 Each process defines:
@@ -341,6 +342,8 @@ The order within a facility may follow its first reachable consumers, but owners
 - Exact preview equals exact committed output.
 - Higher quality is never substituted silently.
 - Result name, statistics, colour, custody, history, trade and recycle receipt survive relaunch.
+- Equipment previews show each colour-bearing component separately. Potions and other recognition-critical
+  supplies show their standardized authored appearance rather than inheriting ingredient colours.
 
 ## Phase 8 - Crafted quality, statistics, and Peerless gear
 

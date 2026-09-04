@@ -51,7 +51,8 @@ The final model spans Field holdings, Return, Storehouse, Trading Post, crafting
 - Promote only candidate material types with a causal producer, host, tool, custody path, trade and Recycler behavior, and two sensible consumers or one reusable processing role.
 - Keep flora-derived materials ungraded by default; a future exception needs a demonstrated recurring choice.
 - Discovery-safe history shows no undiscovered species name. Known source lots can be expanded in full.
-- Aimee's remaining visual choice is how several selected source colours appear on one finished object.
+- Equipment and other visibly material-led gear preserve separate coloured regions for their selected visible
+  components. Standardized recognition-critical supplies such as potions keep their authored colour instead.
 
 ## 2. Creature generation and loot
 
@@ -203,7 +204,7 @@ World placement, Look, harvesting, tool custody/equipment, depletion, carried ma
 ### Intended structure
 
 - Raw materials become a modest set of recognizable, reusable intermediates.
-- The accepted first set is a named metal Ingot only where a real recipe needs smelted metal, plus Glass, Leather, Cord, Cloth, Planks, Hafts where a recipe uses them, Pulp, Paper, named prepared extracts, writing pigments/ink, and later Dressed Stone where it has real consumers. An Ingot is not a mandatory extra step for every metal recipe.
+- The accepted first set is a named metal Ingot only where a real recipe needs smelted metal, plus Glass, Leather, Cord, Cloth, Planks, Hafts where a recipe uses them, Pulp, Paper, named prepared extracts, writing pigments/ink, and later named Stone Blocks where they have real consumers. A Stone Block is an even building piece cut from a named stone, such as a Granite Block; it is not a separate kind of rock. An Ingot is not a mandatory extra step for every metal recipe.
 - Each intermediate has several physically sensible consumers.
 - Processing facilities gain upgrade tiers that unlock later material transformations and recipe tiers.
 - Processing adds capability, not repetitive busywork.
@@ -274,7 +275,8 @@ Every current recipe needs a versioned ingredient definition. Current property-t
 - Exact category and substitution lists for every recipe.
 - Which recipes are quality-neutral.
 - Recipe-specific identity-bearing quality sockets; an ungraded designated socket uses the fixed Fine rank-1 workmanship baseline.
-- Aimee's remaining colour-composition choice for recipes using more than one visible source colour.
+- Exact visible-component colour regions for every equipment schematic. Recognition-critical supplies keep their
+  standardized authored colour and do not inherit ingredient colours.
 
 ## 8. Equipment statistics and quality
 
@@ -302,7 +304,8 @@ Define one stable stat-contribution table by physical material type/subtype, wit
 
 - The baseline-plus-source contribution formula, role ceilings, and 70/30 identity-socket result rule are in the tuning authority. Each material/recipe socket still needs its content row and a combat-balance check.
 - Peerless crafting uses the accepted maximum-facility chance, staffing bonus, and twentieth eligible craft protection, scoped to one schematic at one facility with visible progress. It is never a progression gate.
-- Alpha eligibility and multi-material colour composition remain later content/visual decisions.
+- Alpha eligibility remains a later content decision. Multi-material equipment preserves separate visible
+  component colours; the schematic pass still needs to name which parts are actually visible.
 
 ## 9. World Writing and resource targeting
 

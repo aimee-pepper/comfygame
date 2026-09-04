@@ -313,12 +313,15 @@ export function futureResourceCopy(name: string) {
 
 export const openDecisions = [
   {
-    title: 'How should several visible material colours appear on one crafted item?',
-    body: 'Colour never creates another inventory stack. When a visibly material-led recipe uses several chosen colours, should the finished object use the primary material’s colour, preserve separate coloured regions, or use a deliberate blend? This is an appearance choice, so the Wiki will not choose it silently.',
-  },
-  {
     title: 'What permanent World material should form the Waystone’s hard body?',
     body: 'Rift-glass, one Mote, and 12 Essence remain fixed. The final physical body could be a named structural stone, Obsidian, Adamant, or another already-approved hard World material. This choice affects the item’s identity and world-writing goal, so it remains open for Aimee.',
+  },
+] as const;
+
+export const acceptedChoices = [
+  {
+    title: 'Visible equipment materials keep their colours',
+    body: 'Equipment and other visibly material-led gear preserve separate coloured regions for the materials the player selected. Standardized recognition-critical items such as potions and remedies keep their authored colours instead, so they remain easy to tell apart at a glance.',
   },
 ] as const;
 

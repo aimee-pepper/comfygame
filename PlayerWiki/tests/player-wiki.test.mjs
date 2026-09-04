@@ -1138,6 +1138,8 @@ test('public loot, resources, and crafting guides separate implemented truth fro
   assert.match(status, /Exceptional/);
   assert.match(status, /same subtype and quality share a default stack/);
   assert.match(status, /another grade is never silently/);
+  assert.match(status, /Visible equipment materials keep their colours/);
+  assert.match(status, /Standardized recognition-critical items such as potions/);
   assert.match(status, /Waystone’s hard body/);
 });
 
