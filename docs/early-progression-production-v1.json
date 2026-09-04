@@ -50,7 +50,8 @@
         "frozen",
         "acid_precipitation",
         "corrosive_air"
-      ]
+      ],
+      "identityRule": "resolved root liquid/precipitation is ordinary water; saline water fails fresh threshold; other liquids and unknown identities are ineligible"
     },
     "regionGeologyFallback": {
       "bedrockWeights": {
@@ -92,7 +93,13 @@
           "region supports both stem-patch and leaf-rosette profiles"
         ]
       }
-    ]
+    ],
+    "hazardFacetMapping": {
+      "acid_precipitation": "saved precipitation chemistry explicitly acid; not inferred from colour or a generic toxic tag",
+      "corrosive_air": "saved atmosphere chemistry explicitly corrosive; not inferred from generic toxic tag",
+      "currentPressureOnlyFallback": "no acid/corrosive facet exists in current source catalogue; keep absent unless a named resolved transformation explicitly creates it; Miasma toxic stays toxic, Mercury remains non-water",
+      "unknownNewFacet": "exclude ordinary cohort until resolved; never silently ordinary"
+    }
   },
   "placement": {
     "minerals": {

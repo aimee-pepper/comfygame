@@ -24,6 +24,17 @@ fresh. Damp roots are 25–under 50; moist roots are 50–75 inclusive. Water ab
 frozen roots, acid precipitation and corrosive air exclude this ordinary cohort. These are independent
 facts: a green-looking tile or a water colour cannot certify them.
 
+**Liquid identity and hazard adapter:** fresh roots require resolved ordinary water (including ordinary
+water precipitation), not merely a low global salinity number. Saline water fails the fresh threshold;
+Mercury and any other non-water root liquid are ineligible. A new unresolved liquid identity is ineligible
+until resolved. The current pressure source catalogue has generic `toxic` tags but no acid/corrosive facet:
+Miasma alone is toxic, not automatically acid rain; Mercury is non-water, not ordinary root moisture.
+Set `acid_precipitation` or `corrosive_air` only from a saved explicitly named chemistry/transformation
+result. If no such transform participates in this minimum slice, those two facets remain absent. Never
+infer them from colour, and never invent an unapproved Rain-plus-Miasma reaction. Unknown new chemistry
+is excluded from the ordinary cohort pending resolution. Existing disclosed toxic world hazards still
+apply to the player independently of whether an ordinary plant can grow there.
+
 **Sun consistency:** a baseline Thermal 50 plus current Sun produces peak 90/floor 58, midpoint 74:
 ordinary warm roots, subject to the other resolved conditions. The old `TerrainRules.paint` rule turning
 soil into sand solely above peak 75 must not run again after the new region has resolved ordinary roots.
