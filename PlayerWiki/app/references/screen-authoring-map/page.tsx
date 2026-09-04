@@ -62,7 +62,7 @@ export default function ScreenAuthoringMapPage() {
           <h2 id="screen-tree-heading">In-game screen tree</h2>
           <p>Districts and locked stations stay visible here so unfinished UI cannot disappear from the count.</p>
         </div>
-        <span>Party updated 4 September 2026</span>
+        <span>Party and Apothecary updated 4 September 2026</span>
       </div>
       <ul className={`${styles.branch} ${styles.root}`}>
         {screenAuthoringTree.map((node) => <ScreenNode node={node} key={node.title} />)}
@@ -72,7 +72,7 @@ export default function ScreenAuthoringMapPage() {
     <section className="article-section note-card" aria-labelledby="how-to-read-heading">
       <h2 id="how-to-read-heading">How to read this tracker</h2>
       <p><strong>Aimee authored</strong> means Aimee supplied or directly authored the defining composition. <strong>Asset / Engineering updated</strong> means the current native consumer has an implemented UI pass. <strong>Partial or asset-ready</strong> covers active corrections, mixed old/new surfaces, or artwork awaiting Engineering. <strong>Default / legacy UI</strong> means the accessible screen still needs a production UI pass.</p>
-      <p>This records presentation progress only. “Updated” does not mean visual acceptance is complete or an ability is unlocked. Party delivery status was refreshed on 4 September; other branches retain the 2 September inventory. The latest human Gambits/Training update preserves existing rules and entitlements; interactive phone review and visual acceptance remain pending.</p>
+      <p>This records presentation progress only. “Updated” does not mean visual acceptance is complete or an ability is unlocked. Party and Apothecary delivery status was refreshed on 4 September; other branches retain the 2 September inventory. The human Gambits/Training update preserves existing rules and entitlements. The Apothecary presentation preserves existing recipes and knowledge. Interactive campaign playthrough and physical-phone visual acceptance remain pending.</p>
     </section>
   </SiteFrame>;
 }

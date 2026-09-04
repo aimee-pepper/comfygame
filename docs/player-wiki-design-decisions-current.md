@@ -15,7 +15,7 @@ The existing campaign, costs, recipes, and character order remain the current-ga
 | Scent Mask and Seamlight | Both can be prepared. Field Kit use has not yet been verified for the current phone build. Earlier descriptions disagreed about their availability; neither a working field action nor its absence is confirmed here. |
 | Recipe tracking and visual changes | Automatic ingredient highlighting, the complete material-colour treatment, and the new world palettes are intended changes; this update is not a claim they are already playable. |
 
-Ordinary consumable and physical-gear crafts now confirm success only after their result is saved. If saving fails, these crafts refuse without spending ingredients or granting the item. This correction has been delivered and checked with focused tests; an interactive crafting playthrough has not yet been completed. This does not mean every economy action or the material overhaul has changed. The Binder and human Gambits/Training presentation update has also been delivered, with clearer rule colours, capitalized labels, and the corrected earned-automation explanation. Existing unlocks, entitlements, Training rules, and Gambit rules are unchanged. Interactive phone navigation and visual acceptance remain pending. The unfinished world-entry artwork is not made current by either delivery.
+Ordinary consumable and physical-gear crafts now confirm success only after their result is saved. If saving fails, these crafts refuse without spending ingredients or granting the item. This correction has been delivered and checked with focused tests; an interactive crafting playthrough has not yet been completed. This does not mean every economy action or the material overhaul has changed. The Binder and human Gambits/Training presentation update has also been delivered, with clearer rule colours, capitalized labels, and the corrected earned-automation explanation. Existing unlocks, entitlements, Training rules, and Gambit rules are unchanged. Interactive phone navigation and visual acceptance remain pending. The Apothecary’s new recipe tiles, recipe details, and preparation presentation are also delivered. Its existing recipes, learned knowledge, and material choices are unchanged; the early recipes below have not arrived with this presentation update. Physical-phone visual acceptance and a campaign playthrough remain pending. The unfinished world-entry artwork is not made current by these deliveries.
 
 ## 2. Decided intended behavior
 
@@ -53,7 +53,36 @@ Pin a known recipe to see relevant sources highlighted **as soon as they become 
 
 The intended new campaign begins with no known runes. The introductory world safely provides Illumination and Sun, and missing either does not block a retry. Learned discoveries survive defeat, return, and reopening. At home, the player connects Illumination to Sun and sees the effect of that choice in the world they bind. Unwritten features remain generated. Existing campaigns keep their knowledge and Pages.
 
-That first lesson should make authorship visible. Traveller clues should describe recognizable world facts using vocabulary the player has had a chance to learn. They should not require guessing an invisible threshold. People and later buildings can move earlier so there is time to enjoy their contribution; a complete new order for all twenty-nine people has not been chosen.
+That first lesson should make authorship visible. Traveller clues should describe recognizable world facts using vocabulary the player has had a chance to learn. They should not require guessing an invisible threshold. The first practical makers now have a decided intended discovery priority, shown below. Later people keep their relative order and existing early-access opportunities for this step; a wider campaign redesign remains separate.
+
+### Earlier practical makers — decided intended behavior
+
+The intended priority is **Vance → Nessa and Halloway → Bryn, Corrin, and Noll**. These are opportunities, not six compulsory arrivals in a line. A new world still offers at most one new person, and finding a useful clue can let you reach ahead.
+
+| Person | Intended place to look | Earliest ordinary discovery |
+| --- | --- | --- |
+| Vance | Broad, open country | From the beginning |
+| Nessa | Fresh growing land with daylight, resin-bearing shrubs, and trees | From the beginning |
+| Halloway | Exposed Iron that a stone Pick can work | From the beginning |
+| Bryn | Close, bending paths with limited approaches | After one person joins |
+| Corrin | Damp growing land with fibrous stems and tough leaves | After one person joins |
+| Noll | Hard ground with concentrated useful material | After one person joins |
+
+Nessa no longer asks you to seek toxic air and reactive ground before making your first healing supply. Halloway no longer requires an unusually hot world. The old requirement to recruit three people first will not secretly delay the new early makers. These changes are intended; the character directory continues to describe the delivered game until the replacement arrives.
+
+Early location clues give Nessa and Halloway extra attention. The next useful Writing lessons explain water, River, ground, and Iron. Each lesson teaches one thing when read in the Library, without an Essence charge. Finding a clue does not itself teach all the words in it. Learning opportunities come from the world and retain their protection against repeated unlucky misses.
+
+Old diaries and collected Pages remain yours. An older location clue continues to help you find its person, with an updated location hint alongside its original record. Existing people, buildings, tools, knowledge, and unlocked abilities remain. Already-created worlds keep their original contents.
+
+### Ordinary gathering — decided intended behavior
+
+The early materials have ordinary sources as well as deliberate Writing routes. Iron needs an Iron-bearing formation; Coal needs a compatible seam. Clay comes from a genuine Clay placement. Resin, Logs, and Plant Fibre come from plants suited to the land, light, water, and temperature. A stone-coloured tile does not automatically contain Iron, and green ground is not automatically harvestable.
+
+Suitable worlds set aside some source opportunities for the early crafts. They do not put the whole starter catalogue into every world. Cold, submerged, corrosive, or otherwise unsuitable ground can support different things. Sunlight by itself does not guarantee a forest or a safe journey. Your pinned recipe can help you notice relevant sources when you can normally see them.
+
+**First-pass source tuning:** where the necessary hosts exist, reserve one ordinary Iron node, one Coal node, and two Clay gathers. Suitable growing land starts with two Stem Fibre patches, one Leaf Fibre plant, one Resin shrub, and two small Softwoods. More plants and nodes depend on the world’s size, growth, and eligible sources. Hardwood can appear before you have the Axe needed to harvest it. Written guarantees count toward these source budgets; they are not duplicate bonus caches.
+
+The intended first healing trip needs six harvest actions before travel and encounters. Building the forge and improving the Pick needs thirteen harvest actions across enough source-bearing worlds. Those are ingredient calculations, **not measured trip lengths**. The complete route still needs testing for travel, survival, returning safely, and enough Essence left to bind another world. A useful expedition should not require clearing its whole map.
 
 ### The Binder’s own Gambits
 
@@ -122,10 +151,6 @@ Buying the blade's full raw bundle costs 26 Gold. Dismantling that blade returns
 The recommendation is **T1 raw-material gear → T2 Ingot making → T3 advanced forgework and refinement**. Aimee suggested T2 or T3 for Ingots; the exact placement is not decided. The intention is to introduce exportable prepared metal when specialist shops can use it, while keeping basic recipes simple.
 
 The working conversion is 2 units of the matching solid metal plus 1 Coal for 1 named Ingot, with no Essence cost. The upgrade price and first specialist consumers remain to be settled. Mercury, stone, glass, and creature parts are not smeltable solid metal.
-
-### Earlier practical makers
-
-The proposed opening order is Vance, then Nessa and Halloway, then Bryn, Corrin, and Noll. This is a proposed discovery priority, not six compulsory arrivals in single file. Clues and world availability must support it. It does not silently replace the current character directory's order or complete the later campaign reorder.
 
 ### Refining a favourite piece toward Peerless
 

@@ -127,7 +127,7 @@ export const screenAuthoringTree: ScreenAuthoringNode[] = [
                       { title: 'Learn', status: 'default' },
                     ],
                   },
-                  { title: 'Apothecary', status: 'default' },
+                  { title: 'Apothecary', status: 'updated', note: 'Recipe tiles, recipe detail, and preparation presentation delivered. Existing recipes and knowledge remain; physical-phone visual acceptance and campaign playthrough are pending.' },
                   { title: 'Tannery', status: 'default' },
                   { title: 'Bowyer', status: 'default' },
                   { title: 'Armoury', status: 'default' },
