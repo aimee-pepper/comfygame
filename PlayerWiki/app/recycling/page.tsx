@@ -28,7 +28,7 @@ export default function RecyclingDirectory() {
       {recyclerStation?.assetURL && <PixelImage src={recyclerStation.assetURL} alt="Recycler building visual" size={96} />}
       <PageIntro eyebrow="Current Village reference" title="Recycler returns" summary="Compare what different kinds of gear can return, then review the exact materials before choosing one piece to dismantle." />
     </div>
-    <section className="article-section"><h2>Materials returned now and in the intended design</h2><TruthPair current="The Recycler dismantles one eligible piece at a time. Gear with recorded construction materials returns selected parts of those materials; older standard gear follows its listed salvage pattern." accepted="The same one-piece rule remains. Mined materials return to their exact-name quantity stacks with no quality. Biological materials return to their recorded subtype, quality, and quantity stacks with species details still available. The Recycler never invents or substitutes a quality." /></section>
+    <section className="article-section"><h2>Materials returned now and in the intended design</h2><TruthPair current="The Recycler dismantles one eligible piece at a time. Gear with recorded construction materials returns selected parts of those materials; older standard gear follows its listed salvage pattern." accepted="The same one-piece rule remains. Mined materials and ordinary flora return to their exact-name or subtype quantity stacks with no quality. Creature materials return to their recorded subtype, quality, and quantity stacks with species details still available. The Recycler never invents or substitutes a quality." /></section>
     <section className="article-section">
       <h2>Planned Rubble sorting</h2>
       <TruthPair
@@ -36,7 +36,9 @@ export default function RecyclingDirectory() {
         accepted="Rubble remains one simple, ungraded mixed resource. A separate Recycler action will let you choose an amount and preview the materials hidden in those exact units. The source region controls what can appear: common local materials appear most often, uncommon finds appear less often, and a genuinely rare local material is only a small bonus chance."
         acceptedLabel="Intended design"
       />
-      <p>The Recycler will never produce a material that was absent from the Rubble’s source region. Once shown, a preview cannot be changed by cancelling, reopening, or relaunching. The first-pass batch, output, odds, access, and cost are now settled in <Link href="/references/resource-world-numbers-decided-so-far">Resource, Harvesting, and World Numbers Decided So Far</Link>; this action is still planned rather than playable.</p>
+      <p>The Recycler will never produce a material that was absent from the Rubble’s source region. Once shown, a preview cannot be changed by cancelling, reopening, or relaunching. This action is still planned rather than playable.</p>
+      <div className="table-wrap"><table><tbody><tr><th>Amount</th><td>Choose 2, 4, or 6 Rubble from one source-region batch.</td></tr><tr><th>Cost</th><td>Recycler level 1 · 0 Essence · 0 world turns.</td></tr><tr><th>Base result</th><td>One local material for every 2 Rubble. The first is always common; each later result is 75% common and 25% uncommon.</td></tr><tr><th>Rare local bonus</th><td>Sorting 4 or 6 Rubble has one 5% chance for one extra rare material that existed in that region.</td></tr><tr><th>Unavailable pool</th><td>If the region has no uncommon or rare material, that outcome cannot appear.</td></tr></tbody></table></div>
+      <p><Link href="/references/resource-world-numbers-decided-so-far">Read the complete first-pass resource and world rules</Link>.</p>
     </section>
     <section className="article-section note-card">
       <h2>Noll’s first Recycler</h2>

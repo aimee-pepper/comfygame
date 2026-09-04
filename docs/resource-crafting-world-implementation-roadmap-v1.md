@@ -17,20 +17,28 @@ Every phase has four states:
 
 The public Player Wiki updates at each delivered state, not only when the entire program ends. Phase numbers below describe dependency lanes, not mandatory release barriers; a bounded vertical slice may cross several phases and ship as soon as its own path is complete.
 
-## First playable vertical slice
+## First playable vertical slices
 
-After the minimum registries and compatibility bridge exist, ship one representative path before broad conversion:
+After the minimum registries and compatibility bridge exist, ship the simpler geological path before the more complex creature-material path.
 
-1. One canonical physical subtype from one existing producer.
-2. One quality band assignment and species-specific unit beneath its default subtype + quality stack.
-3. Field acquisition, Expedition Return, and Storehouse custody for that material.
-4. One recipe using a static ingredient plus a broad, type, or subtype category slot.
-5. Explicit player quality selection if that recipe's result changes with quality.
-6. One trade or Recycler round trip where currently reachable.
-7. One old-save/current-reserve migration example.
-8. Cold relaunch and exact quantity preservation.
+### Slice A: one ungraded geological material
 
-That slice is useful proof and may be phone-delivered even though other resources, recipes, and buildings still use the prior model.
+1. One exact named material from one causally compatible region and finite harvest placement.
+2. Field acquisition, Expedition Return, and Storehouse quantity custody.
+3. One static or exact-material recipe consumer.
+4. Trading Post or Recycler round trip where currently reachable.
+5. One exact legacy mapping and cold-relaunch quantity proof.
+
+### Slice B: one quality-bearing creature material
+
+1. One canonical physical subtype from an existing generated body plan.
+2. Four-band quality and several species/source lots beneath the subtype + quality stack.
+3. Field acquisition, Return, Storehouse, expanded source detail, and discovery-safe naming.
+4. One recipe using a category/type/subtype slot, explicit quality selection, and source-lot selection only when the result changes.
+5. Trade and receipt-backed Recycler round trips.
+6. One ambiguous Legacy-stack preservation example and cold-relaunch proof.
+
+Each slice is useful proof and may be phone-delivered even though other resources, recipes, and buildings still use the prior model. Beginning with mined stock proves the shared transaction path without mixing in quality, species, or colour prematurely.
 
 ## Phase 0 - Close the remaining design choices
 
@@ -54,23 +62,30 @@ until step 6 proves the player has learned the terms and can deliberately produc
 Closed by Aimee's resource/world decisions:
 
 1. Physical material category/type/subtype registry and ungraded mined-resource rule.
-2. Rubble batch, region-backed output weights, initial Recycler access, and processing cost.
+2. Rubble quantity choices, region-backed output weights, initial Recycler access, and processing cost.
 3. Initial ground and liquid catalogue.
 4. Homogeneous, Dominant, Banded, Patchwork, Clustered, Gradient, and Fractured layout set.
 5. 12×12, 15×15, 18×18, 26×26, and 36×36 world sizes.
-6. Pick, Axe, and Scythe starting tiers, first material groups, harvest timing, and persistent field-tool selection.
+6. Exact opening-kit Rock Pick, Axe, and Scythe ownership; three tool tiers; first material groups; harvest timing; and persistent packed-tool preference.
 7. Processed-material ownership across Recycler, Blacksmith, Tannery, Bowyer, Scriptorium, Apothecary, and Deep Works.
-8. Material-to-stat ceilings, multi-input crafted quality, and maximum-facility Peerless chance/staffing rule.
-9. A directly written ground or base resource guarantees one start-connected truthful source while exact distance, quantity, hazards, and tool access remain generated.
+8. Baseline-plus-source material arithmetic, identity-bearing multi-input crafted quality, and schematic-scoped maximum-facility Peerless chance/staffing rule.
+9. Ground, liquid, base-resource, and ecological-material requests use their distinct guarantee or pressure rules and disclose known tool access before Binding.
+10. Flora materials remain ungraded by default.
+11. Exact source-lot selection appears only when it changes output, and ambiguous old stock remains Legacy stock rather than receiving invented provenance.
+12. A direct base-resource guarantee reserves its whole first-pass source cluster—two common nodes, two uncommon nodes, one rare node, or one hand-gathering placement—before later occupancy.
+13. First-pass raw-material prices, processing ratios, and early/middle/late affordability targets use the tuning authority until a justified recipe-specific balance pass replaces them.
+14. Ordinary buy → process/craft → sell loops cannot return the full purchased input cost; authored commissions are the only explicit exception.
+15. Opening Pick, Axe, and Scythe use a dedicated three-place tool roll and do not consume ordinary item or Field Kit capacity.
+16. Incompatible conditions resolve by approved transformation, then total pressure support, then a frozen stable tie-break; the pre-Bind preview discloses any direct request that becomes influence instead of a guarantee.
 
-Still to author with Aimee where the later slice needs it:
+Still to author in later Game Design passes:
 
 1. Creature body-plan and habitat grammar.
 2. Terrain/flora compatibility matrix.
-3. Facility upgrade depth, process conversion ratios, and recipe-tier progression.
+3. Facility upgrade depth and recipe-tier progression.
 4. Exact category eligibility and quantities for every recipe.
 5. Weather/atmosphere compatibility and transformation matrix.
-6. Colour inheritance, selection, and crafted appearance behavior.
+6. Colour inheritance and crafted appearance behavior after Aimee chooses how multiple selected colours combine.
 
 ### Deliverables
 
@@ -84,13 +99,13 @@ Still to author with Aimee where the later slice needs it:
 
 ### Exit gate
 
-No structural implementation starts until all decisions needed by its first vertical slice are closed. Decisions for unrelated later slices may remain marked **Will discuss with Aimee**.
+No structural implementation starts until all decisions needed by its first vertical slice are closed. Decisions for unrelated later slices remain visibly pending without being mislabelled as Aimee decisions.
 
 ## Phase 1 - Add versioned registries without changing gameplay
 
 ### Build
 
-- Stable IDs for material broad categories and physical types/subtypes; four quality bands only for approved quality-bearing biological materials. Mined world resources have one ungraded normal/green state.
+- Stable IDs for material broad categories and physical types/subtypes; four quality bands only for approved quality-bearing creature materials. Mined world resources and ordinary flora have one ungraded normal/green state.
 - Stable IDs for body plans, habitat access, ground/liquid types, layout styles, tool classes/tiers, processed materials, recipe ingredient scopes, facility tiers, and world sizes.
 - Authored eligibility registries rather than ad hoc switch statements.
 - Versioned generation and material-receipt envelopes.
@@ -112,11 +127,13 @@ No structural implementation starts until all decisions needed by its first vert
 ### Build behind a new generation version
 
 - Ground-layout style selection separated from physical composition.
+- Dependency-ordered region generation: size/arrangement; relief/geology; hydrology; resolved climate; derived surfaces; flora; reserved guarantees/resources; then creature/site/traveller/hazard/portal occupancy.
 - Granular ground and liquid region types.
 - Region receipts that own material composition and eligible resource hosts.
 - Deterministic node clustering derived from the region rather than global random scattering.
 - Versioned world dimensions and minimap transform.
 - Compatibility with current entry, portal, site, encounter, and reachability placement.
+- Reservation proving later occupancy cannot overwrite a written guarantee or mandatory route.
 
 ### Do not yet change
 
@@ -164,12 +181,13 @@ Encounter and inspect one naturally generated member of each accepted body-plan/
 
 ### Build
 
-- Rock Pick/basic Pick, Axe, and Scythe ownership routes accepted in Phase 0.
+- Exact owned Rock Pick, basic Axe, and basic Scythe in a dedicated opening tool roll; selection includes only tools packed with the active party, and the three required classes never consume ordinary supply capacity.
 - Tool-tier requirements on resource nodes, tree trunks, ordinary plants, and dangerous harvestable flora.
 - Field controls: movement-centre hold for quick-use items, Interact hold for field-tool selection, Interact for eligible underfoot harvesting, and a direction into an adjacent blocking harvest target for the selected tool.
 - Tree canopy/trunk placement and under-canopy presentation.
-- Exact mined material and quantity, or exact biological type/subtype, quality, colour/source and quantity where that domain supports quality; plus depletion and custody receipt.
+- Exact mined/flora material and quantity, or exact creature type/subtype, quality, colour/source and quantity; plus depletion and custody receipt.
 - Truthful blocked copy that names the required tool tier.
+- Deterministic action precedence: encounter, traveller, site, portal, or authored hazard before harvest; underfoot loose/plant placements use Interact; adjacent blocking trunks/nodes use direction; a living creature never receives an accidental tool action.
 
 ### Preserve
 
@@ -197,7 +215,7 @@ Play a progression from basic gathering through at least one blocked advanced no
 
 ### Build one retained-owner path at a time
 
-- Exact-name ungraded stacks for mined world resources plus physical type/subtype + four-band stack authority for approved quality-bearing biological materials.
+- Exact-name ungraded stacks for mined world resources and ordinary flora plus physical type/subtype + four-band stack authority for approved quality-bearing creature materials.
 - Source-species/world/colour sub-lot history under each stack.
 - A compatibility reader that can project untouched legacy stock into an exact current consumer without rewriting or losing it.
 - A new writer only for the producer promoted in the current slice.
@@ -219,8 +237,8 @@ Suggested custody delivery order:
 ### Migration rules
 
 - Preserve every unit count, applicable quality, source, colour, ownership location, pending Return line, trade line, selected quote, and equipment receipt.
-- Keep scalar mined holdings ungraded and map them directly to their exact named resource. Map old biological grades to Poor/Common/Rare/Exceptional through one published deterministic table.
-- Never invent species provenance.
+- Keep scalar mined holdings ungraded and map them directly to their exact named resource. Map old creature-material bands through the published Rough→Poor, Standard→Common, Fine/Superior→Rare, Exceptional/Peerless→Exceptional table. Remove quality from world/flora stock without erasing its legacy lot value; ambiguous Timber, Fibre, Toxin, or Reagent remains visibly Legacy unless its receipt proves a new physical identity.
+- Never invent species provenance. An ambiguous holding remains a visible Legacy stack with its old quantity and value; compatible old recipes may consume it, the Trading Post may buy it, and a conservative Recycler exchange may be added when no old consumer remains.
 - Preserve materially distinct old samples as distinct types/subtypes when the new registry requires it.
 - Combine only samples that share the new stack key.
 - Migration is idempotent and fail-closed.
@@ -235,6 +253,7 @@ Suggested custody delivery order:
 - Trade, craft, recycle, and relaunch cannot duplicate or delete stock.
 - Materials never consume item slots.
 - A still-legacy building remains usable under its prior rule or truthfully unavailable for that exact route; it never consumes a promoted stack through an unverified projection.
+- No Legacy stack satisfies a new physical category by inference.
 
 ### Mounted gate
 
@@ -246,14 +265,14 @@ Collect several species variants and qualities, inspect carried detail, partiall
 
 Recommended first vertical slices after Phase 0 decisions:
 
-1. Rubble sorting at Noll's Recycler, with the accepted common-first regional result and rare local bonus
+1. Rubble sorting at Noll's Recycler: 2/4/6 units from one source batch, one output per pair, common first result, 75/25 common/uncommon later results, and one 5% rare local bonus chance on transactions of at least four
 2. One named-metal refining route at Halloway's Blacksmith only when its first two real consumers ship with it
 3. Hide or Skin to Leather at Corrin's Tannery
 4. Plant Fibre to Cord or Cloth at Corrin's Tannery
 5. Log to Planks or a recipe-specific Haft at Fen's Bowyer
 6. Sand or Quartz to ordinary Glass at Halloway's Blacksmith furnace
-7. Fibrous plant stock to Pulp and Pulp to Paper at Isolde's Scriptorium
-8. Named biological or botanical inputs to named prepared extracts at Nessa's Apothecary
+7. Fibrous plant stock directly to either Pulp or Paper at Isolde's Scriptorium
+8. Named creature or plant inputs to named prepared extracts at Nessa's Apothecary
 9. Named structural stone to Dressed Stone at Grimmond's Deep Works only when a later recipe needs it
 10. Mineral or botanical colour sources to writing pigment/ink at Isolde's Scriptorium
 
@@ -262,7 +281,8 @@ Each process defines:
 - owning facility and required level;
 - static inputs and substitute categories;
 - explicit player selection;
-- applicable biological quality and colour transfer; mined inputs remain ungraded;
+- applicable creature-material quality and colour transfer; mined and ordinary flora inputs remain ungraded;
+- one declared quality behavior: preserve, standardize as ungraded, or recipe-defined;
 - quantity conversion;
 - output custody;
 - repeat consumers;
@@ -275,6 +295,7 @@ Each process defines:
 - Stale/cancelled/failed commits consume nothing.
 - Output appears once in the correct stack and remains through relaunch.
 - Every promoted intermediate has at least two meaningful current or same-release consumers.
+- A common finished recipe has at most one mandatory processing step; only exceptional/capstone work may require two.
 
 ## Phase 7 - Replace the recipe engine and migrate every maker
 
@@ -285,9 +306,11 @@ Each process defines:
 - Specific category lines.
 - Precise subtype lines.
 - Explicit quantity and player-chosen quality.
+- Exact source-lot choice only when it changes a visible result; deterministic oldest-first allocation otherwise.
 - Direct stat contribution preview.
 - Atomic exact-stack consumption.
 - No hidden property threshold as eligibility.
+- Discovery-safe picker contents: known owned eligible stock, never unrevealed species filler.
 
 ### System migration order
 
@@ -323,11 +346,11 @@ The order within a facility may follow its first reachable consumers, but owners
 
 ### Build
 
-- Material type/subtype contribution tables mapped only to real game statistics, with quality multipliers limited to approved biological inputs and fixed contributions for mined materials.
+- Material type/subtype contribution tables mapped only to real game statistics, using the accepted baseline-plus-source formula for quality-bearing creature materials and fixed contributions for mined and standardized materials.
 - Deterministic multi-input result-quality calculation.
-- Rough/Fine/Superior/Exceptional crafted names.
+- Rough/Fine/Superior/Exceptional crafted names, with every ungraded designated socket contributing the fixed Fine rank-1 baseline.
 - Peerless alpha-drop route.
-- Apply the accepted maximum-facility all-high-quality Peerless chance, matching-specialist modifier, and twentieth-craft protection.
+- Apply the accepted maximum-facility all-high-quality Peerless chance, matching-specialist modifier, and twentieth-craft protection per schematic at one facility with visible progress.
 
 ### Prohibited
 
@@ -338,7 +361,7 @@ The order within a facility may follow its first reachable consumers, but owners
 ### Focused gates
 
 - Exact selected inputs produce exact previewed ordinary statistics.
-- Each biological quality band raises its intended contribution; Sand, Gold, Granite and other mined materials have no band to raise.
+- Each creature-material quality band raises its intended contribution; Sand, Gold, Granite and other mined materials and ordinary flora have no band to raise.
 - Peerless never exists as raw material.
 - Peerless production cannot be save-scummed through an unfrozen random result.
 - Staffing affects chance only through the accepted matching-specialist rule, and the exact staffed state is durably owned.
@@ -357,7 +380,8 @@ The order within a facility may follow its first reachable consumers, but owners
 
 - Written facts have a strong, truthful effect.
 - Unwritten facts remain generated.
-- A directly written ground or base resource produces at least one start-connected truthful source. Exact distance, quantity, hazards, and tool access remain generated.
+- A ground declaration creates a meaningful entry-connected region; a liquid declaration creates an observable connected body/shoreline; a base resource creates one start-connected harvest source; an ecological material request remains a pressure.
+- The pre-Bind quote names which rule applies and any tool requirement already known to the Binder.
 - Ecological material targeting pressures anatomy/habitat without forcing one named species.
 - Tool requirements still govern harvesting.
 - Existing campaigns and Pages remain valid.
@@ -366,7 +390,7 @@ The order within a facility may follow its first reachable consumers, but owners
 
 - Every new Sigil changes only its authored target.
 - Same Page and seed produce the same world.
-- A targeted ground/resource appears according to the accepted direct-call rule.
+- A targeted ground, liquid, or resource appears according to its distinct accepted direct-call rule.
 - A Chitin request measurably changes eligible creature populations without eliminating unrelated ecology.
 - World preview and World History describe only disclosed facts.
 
@@ -421,9 +445,9 @@ Old-save decoding remains as long as supported saves require it.
 5. Encounter an unharvestable advanced node without losing it.
 6. Harvest accessible world, flora, tree, and creature materials.
 7. Return with a deterministic partial and full-haul example.
-8. Inspect simple exact-name mined stacks and physical type/subtype + quality biological stacks with their source/colour details.
+8. Inspect simple exact-name mined stacks, ungraded flora type/subtype stacks, and physical type/subtype + quality creature stacks with their source/colour details.
 9. Process raw materials.
-10. Select low-quality and high-quality biological inputs for appropriate crafts, and confirm mined ingredients offer quantity selection without a fabricated quality choice.
+10. Select low-quality and high-quality creature inputs for appropriate crafts, exercise source-lot choice only where output differs, and confirm mined and ordinary flora ingredients offer quantity selection without a fabricated quality choice.
 11. Confirm previewed statistics and crafted names.
 12. Sell/buy eligible stock.
 13. Recycle a receipt-backed item.
@@ -432,7 +456,7 @@ Old-save decoding remains as long as supported saves require it.
 
 ### Public Wiki promotion gate
 
-- Every page clearly distinguishes Implemented now, Intended design, and Will discuss with Aimee.
+- Every page clearly distinguishes Implemented now, Intended design, unfinished Game Design work, and the few Choices for Aimee.
 - Every delivered current recipe exactly matches the runtime.
 - Every future recipe remains visibly future until implemented.
 - Every material links to acquisition, processing, recipes, equipment, storage, trade, Return, recycling, relevant terrain/flora/creatures, and World Writing.

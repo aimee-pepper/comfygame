@@ -71,8 +71,8 @@ test('Aimee Reference publishes the World Splash inventory, system plans, voice 
   assert.match(source, /full-cast-background-and-voice-guide-current\.md/);
   assert.match(source, /full-cast-world-clue-rewrite-current\.md/);
   for (const heading of [
-    'Biological material quality',
-    'How a selected biological material changes an item',
+    'Creature-material quality',
+    'How a selected creature material changes an item',
     'Mined and gathered world materials',
     'World sizes',
     'Regional arrangements',
@@ -81,13 +81,17 @@ test('Aimee Reference publishes the World Splash inventory, system plans, voice 
     "Sorting Rubble at Noll's Recycler",
     'What remains for the next design passes',
   ]) assert.match(firstPassTuning, new RegExp(heading.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')));
-  assert.match(firstPassTuning, /Mined resources do not use this table/);
+  assert.match(firstPassTuning, /Mined resources and ordinary flora do not use this table/);
   assert.match(firstPassTuning, /generated creature body plans/);
   assert.match(firstPassTuning, /Sigil acquisition order/);
   assert.match(firstPassTuning, /Where processing belongs/);
+  assert.match(firstPassTuning, /dedicated three-place tool roll/);
+  assert.match(firstPassTuning, /stable hash of the frozen Page, world seed, and facet ID/);
+  assert.match(firstPassTuning, /Opening facilities use broadly hosted materials/);
+  assert.match(firstPassTuning, /closed buy → process or craft → sell loop cannot return as much Gold/);
   for (const owner of ['Noll · Recycler', 'Halloway · Blacksmith', 'Corrin · Tannery', 'Fen · Bowyer', 'Isolde · Scriptorium', 'Nessa · Apothecary', 'Grimmond · Deep Works'])
     assert.match(firstPassTuning, new RegExp(owner.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')));
-  assert.match(firstPassTuning, /ownership decision itself is closed/);
+  assert.match(firstPassTuning, /There is no universal processing station and no return of the standalone Workshop/);
   for (const name of ['Vance', 'Noll', 'Halloway', 'Mara', 'Edren', 'Isolde', 'Sela', 'Bryn', 'Orsa', 'Talin', 'Nessa', 'Corrin', 'Dagg', 'Rook', 'Lys', 'Bracken', 'Fen', 'Wren', 'Kestrel', 'Maud', 'Marrick', 'Sabine', 'Grimmond', 'Oda', 'Auber', 'Ashe', 'Tovin', 'Perren', 'Nine'])
     assert.match(characterGuide, new RegExp(`### ${name} —`));
   assert.match(characterGuide, /75% warm, clear English/);
@@ -164,8 +168,9 @@ test('crafting overview separates the current property model from the intended p
   assert.match(craftingGuide, /Properties affect the result, not eligibility/);
   assert.match(craftingGuide, /numerical properties and uses them to calculate concrete finished-item statistics/);
   assert.match(inventory, /Sand is Sand and Gold is Gold/);
-  assert.match(inventory, /Mined resources do not use these bands/);
-  assert.match(inventory, /Approved biological materials use subtype plus quality/);
+  assert.match(inventory, /Mined resources and ordinary flora materials do not use these bands/);
+  assert.match(inventory, /Approved creature materials use subtype plus quality/);
+  assert.match(inventory, /dedicated three-place tool roll/);
   assert.match(resources, /normal\/green presentation/);
   assert.match(equipment, /actual numerical properties change concrete finished-item statistics/);
   assert.match(world, /Current generator and intended ecology/);
@@ -173,13 +178,15 @@ test('crafting overview separates the current property model from the intended p
   assert.match(bestiary, /Creature materials inherit real anatomy/);
   assert.match(overview, /Because unusually low traits can raise this grade/);
   assert.match(overview, /Trading Post samples instead generate values from a range/);
-  assert.match(overview, /the world itself is not rejected/);
+  assert.match(overview, /The world itself is never rejected/);
+  assert.match(overview, /stable hash of the frozen Page, world seed, and facet/);
+  assert.match(overview, /do not consume the item or Field Kit spaces/);
   assert.match(overview, /Homogeneous uses one ground composition throughout/);
   assert.match(overview, /keeps its appropriate minimap record/);
   assert.match(overview, /Aquatic creatures can use shallow and deep water/);
   assert.match(overview, /perches are not universally required/);
   assert.match(overview, /It does not currently sort Rubble/);
-  assert.match(overview, /mostly common local materials/);
+  assert.match(overview, /75% common/);
   assert.match(resources, /Intended material identity/);
   assert.match(resources, /Gathering, return, and storage/);
   assert.match(loot, /href="\/resources#loot-and-custody"/);
@@ -257,10 +264,10 @@ test('World Writing resource-pursuit Pages keep opening, mid-reach, and late rec
   assert.match(recipes, /not promised/);
   assert.match(recipes, /not an owned World Page or automatic Template/);
   assert.match(recipes, /Fountain pen/);
-  assert.match(writing, /Three resource-pursuit Pages/);
+  assert.match(writing, /Three current resource-pursuit Pages/);
   assert.match(
     writing,
-    /never guarantees a particular terrain, resource, path, or safe approach/,
+    /do not guarantee an exact terrain or resource/,
   );
   for (const id of ids) assert.doesNotMatch(writing, new RegExp(id));
 });
@@ -488,9 +495,9 @@ test('world reference publishes current terrain, pressure, resource-host, and ha
   assert.match(reference, /Tall Growth/);
   assert.match(reference, /resourceHostingGroups/);
   assert.match(reference, /Rift-glass/);
-  assert.match(world, /directly written ground or base resource guarantees one start-connected truthful source/);
-  assert.match(world, /exact distance, amount, hazards, and required tool remain part of the generated result/);
-  assert.match(world, /Ecological pressures do not promise one species, plant, site, or animal/);
+  assert.match(world, /Intended written guarantees/);
+  assert.match(world, /published first-pass cluster yield/);
+  assert.match(world, /ground, liquid, base resources, and ecological materials/);
   assert.match(flora, /never predicts an unseen plant/);
 });
 

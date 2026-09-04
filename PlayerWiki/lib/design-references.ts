@@ -22,7 +22,7 @@ export interface DesignReference {
 const systemLinks: DesignReferenceLink[] = [
   { href: '/journey', title: 'The player loop', summary: 'How Writing, exploration, return, Village work, preparation, and the next journey connect.' },
   { href: '/resources', title: 'Materials and resource identity', summary: 'World and creature materials, their acquisition, consumers, and intended physical vocabulary.' },
-  { href: '/systems/inventory-custody', title: 'Materials, stacks, and storage', summary: 'Simple mined-resource stacks, biological subtype-and-quality stacks, alternate views, deliberate selection, return, storage, and reopening the game.' },
+  { href: '/systems/inventory-custody', title: 'Materials, stacks, and storage', summary: 'Simple mined-resource stacks, ungraded flora stacks, creature subtype-and-quality stacks, alternate views, deliberate selection, return, storage, and reopening the game.' },
   { href: '/crafting', title: 'Recipes and ingredient categories', summary: 'Static ingredients, broad types, precise subtypes, previews, quality, and commit rules.' },
   { href: '/resources/progression', title: 'Harvesting and processing progression', summary: 'Current tasks beside the intended tool, facility, processing, and recipe progression.' },
   { href: '/equipment', title: 'Equipment materials and quality', summary: 'How selected materials affect equipment now and in the accepted intended design.' },
@@ -62,8 +62,8 @@ export const designReferences: DesignReference[] = [
   },
   {
     slug: 'resource-world-numbers-decided-so-far',
-    title: 'Resource, Harvesting, and World Numbers Decided So Far',
-    summary: 'The complete first-pass values for biological quality, item-stat contributions, ungraded mined resources, world sizes and arrangements, harvesting, canopy discovery, and Recycler Rubble sorting—without pre-deciding the next creature or Sigil pass.',
+    title: 'Resource, Harvesting, and World First-Pass Rules',
+    summary: 'The reconciled first-pass rules for creature-material quality, item-stat contributions, compact source lots, ungraded mined and flora resources, world sizes and guarantees, harvesting, canopy discovery, processing, migration, and Recycler Rubble sorting.',
     source: firstPassTuning,
     systemLinks,
   },
