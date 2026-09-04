@@ -14,6 +14,6 @@ export default function GuideStatusPage() {
     <section className="article-section"><h2>Corrections and planned work</h2><div className="definition-grid">{correctionStatus.map((entry) => <div key={entry.title}><p className="status-pill">{entry.label}</p><h3>{entry.title}</h3><p>{entry.body}</p></div>)}</div></section>
     <section className="article-section"><h2>Decisions already made</h2><div className="definition-grid">{acceptedChoices.map((entry) => <div key={entry.title}><h3>{entry.title}</h3><p>{entry.body}</p></div>)}</div></section>
     <section className="article-section"><h2>Game Design work still to finish</h2><div className="definition-grid">{laterDesignWork.map((entry) => <div key={entry.title}><h3>{entry.title}</h3><p>{entry.body}</p></div>)}</div></section>
-    <section className="article-section note-card"><h2>Choices for Aimee</h2>{openDecisions.length === 0 ? <p>{openDecisionSummary}</p> : <><p>Everything not listed here is owned by the design and implementation passes above.</p>{openDecisions.map((entry) => <div key={entry.title}><h3>{entry.title}</h3><p>{entry.body}</p></div>)}</>}</section>
+    <section className="article-section note-card"><h2>Choices for Aimee</h2>{openDecisions.length === 0 ? <p>{openDecisionSummary}</p> : <><p>Everything not listed here is owned by the design and implementation passes above.</p>{openDecisions.map((entry) => <div key={entry.title}><h3>{entry.title}</h3><p>{entry.body}</p></div>)}</>}<p><Link href="/references/aimee-homework">Open Aimee Homework</Link></p></section>
   </SiteFrame>;
 }

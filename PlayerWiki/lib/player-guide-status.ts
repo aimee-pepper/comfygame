@@ -311,8 +311,8 @@ export function futureResourceCopy(name: string) {
   return `${name} will use a recognizable physical type or subtype. Creature materials use the four quality bands where approved; ordinary flora remains ungraded. Source world, species where relevant, and inherited colour remain available in expanded history without needlessly splitting the stack.`;
 }
 
-export const openDecisions: ReadonlyArray<{ title: string; body: string }> = [];
-export const openDecisionSummary = 'No resource, crafting, harvesting, or world-foundation decision in this pass is waiting on Aimee. Remaining content tables belong to Game Design, and implementation can begin in bounded compatible slices.';
+export const openDecisions: ReadonlyArray<{ title: string; body: string }> = [{ title: 'Spending a Mote on a missed refinement', body: 'Should a Mote used in an incomplete setup be spent with no lasting improvement on a miss, or should every spent Mote guarantee lasting progress? Game Design recommends lasting progress. This is the existing Aimee Homework question; early crafting work can continue.' }];
+export const openDecisionSummary = 'Open choices are maintained in Aimee Homework. Recipe tables, balance numbers, and implementation remain team work.';
 
 export const acceptedChoices = [
   {

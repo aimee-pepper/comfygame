@@ -1141,7 +1141,8 @@ test('public loot, resources, and crafting guides separate implemented truth fro
   assert.match(status, /Visible equipment materials keep their colours/);
   assert.match(status, /Standardized recognition-critical items such as potions/);
   assert.match(status, /Obsidian forms the Waystone’s hard body/);
-  assert.match(status, /No resource, crafting, harvesting, or world-foundation decision in this pass is waiting on Aimee/);
+  assert.match(status, /Spending a Mote on a missed refinement/);
+  assert.match(status, /existing Aimee Homework question/);
 });
 
 test('wiki uses the full desktop width with left-anchored navigation and independent scrolling', async () => {
