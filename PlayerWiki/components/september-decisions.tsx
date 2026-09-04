@@ -30,9 +30,9 @@ const updates: Record<DecisionTopic, { current?: string; decided: string; tuning
     open: 'Vance, then Nessa and Halloway, then Bryn, Corrin, and Noll is a proposed opening priority, not a compulsory single-file sequence. The full twenty-nine-person reorder is not settled.',
   },
   status: {
-    current: 'Ordinary consumable and physical-gear crafts now confirm success only after saving. A failed save refuses the craft without spending ingredients or granting the item. This correction is delivered and covered by focused tests; interactive crafting playthrough is still pending.',
+    current: 'Ordinary consumable and physical-gear crafts now confirm success only after saving. A failed save refuses the craft without spending ingredients or granting the item. This correction is delivered and covered by focused tests; interactive crafting playthrough is still pending. The Binder and human Gambits/Training presentation update is also delivered, including clearer rule colours, capitalized labels, and the earned-automation explanation.',
     decided: 'The wiki separates current behavior, decided intended behavior, unsettled proposals, and first-pass tuning. Today’s crafting, stone-tool, exploration, recipe-tracking, and colour decisions are intended changes. Costs and order can be revised.',
-    open: 'Scent Mask and Seamlight can be prepared, but Field Kit use is unverified for the current phone build. The crafting correction covers ordinary consumable and physical-gear crafts, not every economy action or the overhaul. The further Party presentation correction has not been delivered; no completed native visual acceptance is claimed.',
+    open: 'Scent Mask and Seamlight can be prepared, but Field Kit use is unverified for the current phone build. The crafting correction covers ordinary consumable and physical-gear crafts, not every economy action or the overhaul. Interactive phone navigation and visual acceptance of the Party presentation are still pending. Unlocks, existing entitlements, Training rules, and Gambit rules are unchanged.',
   },
 };
 

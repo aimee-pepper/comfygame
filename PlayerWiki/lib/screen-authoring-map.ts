@@ -69,17 +69,18 @@ export const screenAuthoringTree: ScreenAuthoringNode[] = [
                   },
                   {
                     title: 'Party',
-                    status: 'default',
+                    status: 'updated',
+                    note: 'Binder and human presentation delivered. Interactive phone review and visual acceptance remain pending; animal presentation is unchanged.',
                     children: [
-                      { title: 'Roster', status: 'default' },
+                      { title: 'Roster', status: 'updated', note: 'Earlier delivered roster presentation.' },
                       {
-                        title: 'Character page',
-                        status: 'default',
+                        title: 'Character page — Binder and humans',
+                        status: 'updated',
                         children: [
-                          { title: 'Gear', status: 'default' },
-                          { title: 'Training', status: 'default' },
-                          { title: 'Stats', status: 'default' },
-                          { title: 'Gambits', status: 'default' },
+                          { title: 'Gear', status: 'updated', note: 'Earlier delivered human presentation.' },
+                          { title: 'Training', status: 'updated', note: 'Delivered 4 September. Rules and unlocks preserved; interactive phone review and visual acceptance pending.' },
+                          { title: 'Stats', status: 'updated', note: 'Earlier delivered human presentation.' },
+                          { title: 'Gambits', status: 'updated', note: 'Delivered 4 September. Rules and unlocks preserved; interactive phone review and visual acceptance pending.' },
                         ],
                       },
                     ],
