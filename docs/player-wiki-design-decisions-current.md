@@ -15,7 +15,7 @@ The existing campaign, costs, recipes, and character order remain the current-ga
 | Scent Mask and Seamlight | Both can be prepared. Field Kit use has not yet been verified for the current phone build. Earlier descriptions disagreed about their availability; neither a working field action nor its absence is confirmed here. |
 | Recipe tracking and visual changes | Automatic ingredient highlighting, the complete material-colour treatment, and the new world palettes are intended changes; this update is not a claim they are already playable. |
 
-Crafting must keep your ingredients and result together when saving. Save-failure handling is being checked; a completed reliability correction has not been verified. This is not a report of an observed lost item. No new current-game claim is being made for Gambits, Training, or the unfinished world-entry artwork.
+Ordinary consumable and physical-gear crafts now confirm success only after their result is saved. If saving fails, these crafts refuse without spending ingredients or granting the item. This correction has been delivered and checked with focused tests; an interactive crafting playthrough has not yet been completed. This does not mean every economy action or the material overhaul has changed. No completed presentation acceptance is claimed for Gambits, Training, or the unfinished world-entry artwork.
 
 ## 2. Decided intended behavior
 

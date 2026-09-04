@@ -28,8 +28,8 @@ export const blacksmithFirstUse = {
     'Until that corrected quote is available, this guide does not promise a paid Reforge success or repeat-rank improvement. It never treats Reforge as generic item upgrading.',
   ],
   refusalAndRelaunch: [
-    'Missing ingredients, changed requirements, or an unavailable action should prevent spending. Save-failure handling for crafting is being checked; a completed correction is not yet verified.',
-    'Decided intended behavior: a saved craft must restore one result and one payment after reopening. If saving fails, ingredients and the selected item must remain unchanged; current failure handling is still being checked.',
+    'A physical-gear craft confirms success only after saving its result. If saving fails, the craft refuses without spending its ingredients or granting the item. This delivered correction has focused test coverage; an interactive crafting playthrough remains pending.',
+    'A saved physical-gear craft keeps its one result and payment together. A failed save leaves the craft unspent. The future Reforge journey remains planned; this correction does not make Reforge available.',
     'The game never substitutes another item with the same name. A completed Make or future Reforge always applies to the one piece you selected.',
   ],
 } as const;

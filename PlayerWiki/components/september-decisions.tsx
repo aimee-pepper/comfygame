@@ -2,7 +2,7 @@ import Link from '@/components/wiki-link';
 
 export type DecisionTopic = 'crafting' | 'progression' | 'exploration' | 'writing' | 'appearance' | 'people' | 'status';
 
-const updates: Record<DecisionTopic, { decided: string; tuning?: string; open?: string }> = {
+const updates: Record<DecisionTopic, { current?: string; decided: string; tuning?: string; open?: string }> = {
   crafting: {
     decided: 'Starter Blacksmith gear uses raw materials, with no separate Ingot, Haft, or Cord step. The basic forge improves the stone Pick and Axe with iron working parts. Basic healing no longer requires Quartz. Later specialist recipes can use prepared components. Earlier recipes remain usable after an upgrade.',
     tuning: 'The new starter blade and either tool improvement use 4 Iron, 1 Log, 2 Plant Fibre, and 1 Coal, with no Essence. Lesser Salve uses 1 Resin and 1 Plant Fibre. These are intended first-pass recipes, not current phone costs.',
@@ -30,8 +30,9 @@ const updates: Record<DecisionTopic, { decided: string; tuning?: string; open?: 
     open: 'Vance, then Nessa and Halloway, then Bryn, Corrin, and Noll is a proposed opening priority, not a compulsory single-file sequence. The full twenty-nine-person reorder is not settled.',
   },
   status: {
+    current: 'Ordinary consumable and physical-gear crafts now confirm success only after saving. A failed save refuses the craft without spending ingredients or granting the item. This correction is delivered and covered by focused tests; interactive crafting playthrough is still pending.',
     decided: 'The wiki separates current behavior, decided intended behavior, unsettled proposals, and first-pass tuning. Today’s crafting, stone-tool, exploration, recipe-tracking, and colour decisions are intended changes. Costs and order can be revised.',
-    open: 'Scent Mask and Seamlight can be prepared, but Field Kit use is unverified for the current phone build. Crafting save-failure handling is being checked; no completed reliability fix or observed item loss is claimed. No new Gambits or Training delivery has been verified.',
+    open: 'Scent Mask and Seamlight can be prepared, but Field Kit use is unverified for the current phone build. The crafting correction covers ordinary consumable and physical-gear crafts, not every economy action or the overhaul. The further Party presentation correction has not been delivered; no completed native visual acceptance is claimed.',
   },
 };
 
@@ -39,7 +40,7 @@ export function SeptemberDecisions({ topic }: { topic: DecisionTopic }) {
   const update = updates[topic];
   return <section className="article-section note-card">
     <h2>4 September decisions</h2>
-    <p><strong>Current behavior:</strong> Sections labelled current describe the existing game. The changes recorded here are not yet verified as delivered.</p>
+    <p><strong>Current behavior:</strong> {update.current ?? 'Sections labelled current describe the existing game. The intended changes recorded here are not yet verified as delivered.'}</p>
     <p><strong>Decided intended behavior:</strong> {update.decided}</p>
     {update.tuning && <p><strong>First-pass tuning:</strong> {update.tuning}</p>}
     {update.open && <p><strong>{topic === 'status' ? 'Verification pending' : 'Unsettled proposals and remaining work'}:</strong> {update.open}</p>}

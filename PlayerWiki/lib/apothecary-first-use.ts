@@ -21,7 +21,7 @@ export const apothecaryFirstUse = {
   boundaries: [
     'Construction teaches Lesser Salve but spends no recipe material and creates no item.',
     'A successful preparation uses one qualifying material and 1 Resin, then places one Lesser Salve in the Storehouse or Waiting, depending on the space available.',
-    'Cancel or an unmet requirement should leave materials and knowledge unchanged. Save-failure handling for preparations is being checked; a completed correction is not yet verified.',
+    'Ordinary preparations confirm success only after saving. If saving fails, the preparation refuses without spending ingredients or granting the item. This delivered correction has focused test coverage; an interactive crafting playthrough remains pending.',
     'After reopening the game, an unfinished build remains unfinished. A completed build keeps the Apothecary and Lesser Salve knowledge, while a successful preparation keeps its one stored result.',
   ],
   inference: 'Bringing suggestive partial stock can reveal one additional current recipe without consuming stock or preparing an item. Its detail then names every remaining requirement. Partial stock never makes Lesser Salve—or another recipe—ready by itself.',
