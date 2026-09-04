@@ -1,3 +1,4 @@
+import { BinderGambitUnlock } from '@/components/binder-gambit-unlock';
 import type { Metadata } from 'next';
 import Link from '@/components/wiki-link';
 import { notFound } from 'next/navigation';
@@ -22,6 +23,7 @@ export default async function ResearchNodeDetail({ params }: { params: Promise<{
   return <SiteFrame sidebar>
     <GuideBreadcrumbs items={[{ label: 'Research', href: '/research' }, { label: node.name }]} />
     <PageIntro eyebrow={branch?.name ?? 'Research'} title={node.name} summary={node.blurb} />
+    {node.id === 'automate_self' && <BinderGambitUnlock />}
     <section className="article-section"><h2>Current node details</h2><dl className="fact-grid"><div><dt>Branch</dt><dd>{branch?.name ?? 'Current Research'}</dd></div><div><dt>Research screen</dt><dd>{station ? <Link href={`/buildings/${station.slug}`}>{station.name}</Link> : 'Current Research screen'}</dd></div><div><dt>Earlier upgrades</dt><dd>{prerequisites.length ? prerequisites.join(', ') : 'No earlier upgrade listed'}</dd></div><div><dt>Other requirements</dt><dd>{[node.needsStationTier > 0 ? `Station tier ${node.needsStationTier}` : null, node.needsInstruments > 0 ? `${node.needsInstruments} field readings` : null, node.needsLifetimeRawRefined > 0 ? `${node.needsLifetimeRawRefined} Raw Essence refined` : null].filter(Boolean).join(' · ') || 'No other requirement listed'}</dd></div></dl></section>
     <section className="article-section two-column"><div><h2>Base cost</h2>{node.cost.essence === 0 && resourceCosts.length === 0 ? <p>Free.</p> : <ul className="compact-list">{node.cost.essence > 0 && <li>{node.cost.essence} Essence</li>}{resourceCosts.map(([id, amount]) => { const resource = content.resources.find((entry) => entry.id === id); return <li key={id}>{amount} {resource ? <Link href={`/resources/${resource.slug}`}>{resource.name}</Link> : humanize(id)}</li>; })}</ul>}<p>Open the Research entry before choosing Study; it confirms the price and whether every requirement is ready.</p></div><div><h2>Result</h2><p>{node.blurb}</p>{bundled && <p><strong>Included with a building:</strong> this Research is learned when <Link href={`/buildings/${bundled.slug}`}>{bundled.name}</Link> is built.</p>}</div></section>
     <section className="article-section"><h2>Study and retain</h2><p>Choose this visible node only after its listed requirements and current cost are ready. A completed Study keeps this upgrade. If the current requirement or cost has changed, return to the Research detail; the node does not take a partial cost.</p></section>

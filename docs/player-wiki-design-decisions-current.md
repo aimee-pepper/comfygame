@@ -55,6 +55,12 @@ The intended new campaign begins with no known runes. The introductory world saf
 
 That first lesson should make authorship visible. Traveller clues should describe recognizable world facts using vocabulary the player has had a chance to learn. They should not require guessing an invisible threshold. People and later buildings can move earlier so there is time to enjoy their contribution; a complete new order for all twenty-nine people has not been chosen.
 
+### The Binder’s own Gambits
+
+Self-automation remains an earned ability; opening Party does not grant it. Existing unlocked campaigns keep it. The intended owner is the recovered instruction **Let your own rules run**, found in a world and read in the Library. Party uses learned Gambits and never teaches this ability. Reading does not create a rule or change any rule's enabled state.
+
+The first-pass plan makes this later instruction eligible after Binder level 8, eight resolved expeditions, and the three opening Gambit teachings: **Check yourself**, **Leave the fight**, and **Use your skill**. Those timing values remain revisable. The replacement teaching route is not yet verified as delivered; old Workshop wording must not be read as proof that a current route exists. Until the ability is learned, the Binder takes manual turns. The current locked message is being corrected to explain that without directing the player to an unavailable destination.
+
 ### World and equipment colour
 
 Worlds use stable, coordinated palettes, with separate foliage, water, and sky colours. Grass belongs visually to foliage; that does not make every patch harvestable. A specifically assigned shade takes precedence. Returning or reopening keeps the same world colours.

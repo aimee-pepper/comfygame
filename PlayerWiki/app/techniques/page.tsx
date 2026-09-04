@@ -1,3 +1,4 @@
+import { BinderGambitUnlock } from '@/components/binder-gambit-unlock';
 import Link from '@/components/wiki-link';
 import { DirectoryDetailsIntro, DirectoryIndex } from '@/components/directory-navigation';
 import { GuideBreadcrumbs, RelatedGuides } from '@/components/guide-navigation';
@@ -15,6 +16,7 @@ export default function TechniqueDirectory() {
   return <SiteFrame sidebar>
     <GuideBreadcrumbs items={[{ label: 'Systems', href: '/systems' }, { label: 'Combat', href: '/systems/combat' }, { label: 'Techniques and Gambits' }]} />
     <PageIntro eyebrow="Player reference" title="Techniques and Gambits" summary="Open a technique or Gambit part to see who can use it, when it can activate, which targets it accepts, what it does, and any limits." />
+    <BinderGambitUnlock />
     <DirectoryIndex label="Browse techniques and Gambit parts" entries={techniqueReferences.map((reference) => ({ href: `/techniques/${reference.slug}`, name: reference.name }))} />
     <DirectoryDetailsIntro title="Compare techniques and Gambit parts" summary="Compare when each one activates, who or what it can target, what it does, and how it is learned. Each full entry includes every requirement and limit." />
     {groups.map((group) => {
